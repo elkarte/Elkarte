@@ -409,7 +409,8 @@ class Unread_Controller extends Action_Controller
 
 		foreach ($sort_methods as $key => $val)
 		{
-			switch ($key) {
+			switch ($key)
+			{
 				case 'subject':
 				case 'starter':
 					$sorticon = 'alpha';

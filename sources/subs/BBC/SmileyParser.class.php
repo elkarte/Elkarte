@@ -118,7 +118,7 @@ class SmileyParser
 	/**
 	 * @param string $message
 	 *
-	 * @return mixed|string
+	 * @return string
 	 */
 	public function parse($message)
 	{
@@ -250,7 +250,7 @@ class SmileyParser
 				ORDER BY LENGTH(code) DESC',
 				array(
 				),
-				function($row) use (&$smileysfrom, &$smileysto, &$smileysdescs)
+				function ($row) use (&$smileysfrom, &$smileysto, &$smileysdescs)
 				{
 					$smileysfrom[] = $row['code'];
 					$smileysto[] = htmlspecialchars($row['filename']);

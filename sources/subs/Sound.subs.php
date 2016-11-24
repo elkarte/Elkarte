@@ -67,8 +67,8 @@ function createWaveFile($word)
 		{
 			case 0:
 				for ($j = 0, $n = strlen($sound_letter); $j < $n; $j++)
-					for ($k = 0, $m = round(mt_rand(15, 25) / 10); $k < $m; $k++)
-						$sound_word .= $word[$i] === 's' ? $sound_letter[$j] : chr(mt_rand(max(ord($sound_letter[$j]) - 1, 0x00), min(ord($sound_letter[$j]) + 1, 0xFF)));
+				for ($k = 0, $m = round(mt_rand(15, 25) / 10); $k < $m; $k++)
+					$sound_word .= $word[$i] === 's' ? $sound_letter[$j] : chr(mt_rand(max(ord($sound_letter[$j]) - 1, 0x00), min(ord($sound_letter[$j]) + 1, 0xFF)));
 			break;
 
 			case 1:

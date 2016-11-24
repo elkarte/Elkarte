@@ -397,7 +397,7 @@ function getOldDrafts($days)
 		array(
 			'poster_time_old' => time() - (86400 * $days),
 		),
-		function($row)
+		function ($row)
 		{
 			return (int) $row['id_draft'];
 		}

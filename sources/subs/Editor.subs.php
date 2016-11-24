@@ -419,7 +419,7 @@ function create_control_richedit($editorOptions)
 					ORDER BY smiley_row, smiley_order',
 					array(
 					),
-					function($row)
+					function ($row)
 					{
 						global $context;
 

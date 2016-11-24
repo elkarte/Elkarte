@@ -75,7 +75,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		if (!empty($options['admin_preferences']))
 		{
-			$context['admin_preferences'] = serializeToJson($options['admin_preferences'], function($array_form) {
+			$context['admin_preferences'] = serializeToJson($options['admin_preferences'], function ($array_form) {
 				global $context;
 
 				$context['admin_preferences'] = $array_form;
@@ -1495,7 +1495,7 @@ class ModerationCenter_Controller extends Action_Controller
 						'style' => 'width: 4%;text-align: center;',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return '<input type="checkbox" name="deltpl[]" value="' . $rowData['id_comment'] . '" class="input_check" />';
 						},
 						'class' => 'centertext',
@@ -1575,13 +1575,11 @@ class ModerationCenter_Controller extends Action_Controller
 	 * @param int $start The item to start with (for pagination purposes)
 	 * @param int $items_per_page  The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
-	 * @param string $approve_query
-	 * @param string $dummy
 	 */
-	public function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
+	public function list_getWatchedUsers($start, $items_per_page, $sort)
 	{
 		// Find all our watched users
-		return watchedUsers($start, $items_per_page, $sort, $approve_query, $dummy);
+		return watchedUsers($start, $items_per_page, $sort);
 	}
 
 	/**

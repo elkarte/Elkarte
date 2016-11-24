@@ -891,7 +891,7 @@ function updateBanMembers()
 			'current_time' => time(),
 			'blank_string' => '',
 		),
-		function($row) use (&$memberIDs, &$memberEmails, &$memberEmailWild)
+		function ($row) use (&$memberIDs, &$memberEmails, &$memberEmailWild)
 		{
 			if ($row['id_member'])
 				$memberIDs[$row['id_member']] = $row['id_member'];
@@ -936,7 +936,7 @@ function updateBanMembers()
 			FROM {db_prefix}members AS mem
 			WHERE ' . implode(' OR ', $queryPart),
 			$queryValues,
-			function($row) use (&$allMembers, &$updates, &$newMembers)
+			function ($row) use (&$allMembers, &$updates, &$newMembers)
 			{
 				if (!in_array($row['id_member'], $allMembers))
 				{
@@ -972,7 +972,7 @@ function updateBanMembers()
 			'current_time' => time(),
 			'ban_flag' => 10,
 		),
-		function($row) use (&$allMembers, &$updates)
+		function ($row) use (&$allMembers, &$updates)
 		{
 			// Don't do this twice!
 			if (!in_array($row['id_member'], $allMembers))

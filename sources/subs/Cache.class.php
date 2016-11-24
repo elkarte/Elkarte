@@ -226,6 +226,8 @@ class Cache
 	 *
 	 * @param string $key
 	 * @param int $ttl = 120
+	 *
+	 * @return null|boolean if it was a hit
 	 */
 	public function get($key, $ttl = 120)
 	{
@@ -267,15 +269,10 @@ class Cache
 	 * @param string $key
 	 * @param int $ttl
 	 *
-	 * @return bool if it was a hit
+	 * @return null|boolean if it was a hit
 	 */
 	public function getVar(&$var, $key, $ttl = 120)
 	{
-		if (!$this->isEnabled())
-		{
-			return;
-		}
-
 		$var = $this->get($key, $ttl);
 
 		return !$this->isMiss();

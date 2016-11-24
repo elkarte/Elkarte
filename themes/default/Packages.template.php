@@ -845,7 +845,7 @@ function template_file_permissions()
 						linkData.onclick = dynamicExpandFolder;
 
 						var folderImage = document.createElement("img");
-						folderImage.src = \'', addcslashes($settings['default_images_url'], "\\"), '/board.png\';
+						folderImage.src = \'', addcslashes($settings['default_images_url'], '\\'), '/board.png\';
 						linkData.appendChild(folderImage);
 
 						linkData.appendChild(fileName);

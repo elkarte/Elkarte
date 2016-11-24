@@ -305,7 +305,7 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 				'category_list' => $categories,
 				'member_list' => $members,
 			),
-			function($row) use (&$updates, $check_collapsable)
+			function ($row) use (&$updates, $check_collapsable)
 			{
 				if (empty($row['is_collapsed']) && (!empty($row['can_collapse']) || !$check_collapsable))
 					$updates['insert'][] = array($row['id_member'], $row['id_cat']);

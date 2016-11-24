@@ -138,7 +138,7 @@ function detectExceedingMessages($start, $increment)
 			'start' => $start,
 			'increment' => $increment - 1,
 		),
-		function($row)
+		function ($row)
 		{
 			return $row['id_msg'];
 		}
@@ -168,7 +168,7 @@ function getExceedingMessages($msg)
 		array(
 			'messages' => $msg,
 		),
-		function($row) use ($scripturl)
+		function ($row) use ($scripturl)
 		{
 			return '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>';
 		}
@@ -263,7 +263,7 @@ function recountApprovedMessages($start, $increment)
 			'start' => $start,
 			'max_id' => $start + $increment,
 		),
-		function($row)
+		function ($row)
 		{
 			setTopicAttribute($row['id_topic'], array('num_replies' => $row['real_num_replies']));
 		}
@@ -296,7 +296,7 @@ function recountUnapprovedMessages($start, $increment)
 			'start' => $start,
 			'max_id' => $start + $increment,
 		),
-		function($row)
+		function ($row)
 		{
 			setTopicAttribute($row['id_topic'], array('unapproved_posts' => $row['real_unapproved_posts']));
 		}
@@ -488,7 +488,7 @@ function updatePersonalMessagesCounter()
 		array(
 			'is_not_deleted' => 0,
 		),
-		function($row)
+		function ($row)
 		{
 			updateMemberData($row['id_member'], array('personal_messages' => $row['real_num']));
 		}
@@ -505,7 +505,7 @@ function updatePersonalMessagesCounter()
 			'is_not_deleted' => 0,
 			'is_not_read' => 0,
 		),
-		function($row)
+		function ($row)
 		{
 			updateMemberData($row['id_member'], array('unread_messages' => $row['real_num']));
 		}
@@ -667,7 +667,7 @@ function getTopicsToMove($id_board)
 		array(
 			'id_board' => $id_board,
 		),
-		function($row)
+		function ($row)
 		{
 			return $row['id_topic'];
 		}
@@ -790,7 +790,7 @@ function updateZeroPostMembers()
 				array(
 					'zero' => 0,
 				),
-				function($row)
+				function ($row)
 				{
 					// Set the post count to zero for any delinquents we may have found
 					return $row['id_member'];

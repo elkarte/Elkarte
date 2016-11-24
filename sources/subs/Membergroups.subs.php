@@ -341,7 +341,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 			'group_list' => $groups,
 			'member_list' => $members,
 		),
-		function($row) use ($group_names)
+		function ($row) use ($group_names)
 		{
 			return array('group' => $group_names[$row['id_group']], 'member' => $row['id_member']);
 		}
@@ -593,7 +593,7 @@ function cache_getMembergroupList()
 			'mod_group' => 3,
 			'blank_string' => '',
 		),
-		function($row) use ($scripturl)
+		function ($row) use ($scripturl)
 		{
 			return '<a href="' . $scripturl . '?action=groups;sa=members;group=' . $row['id_group'] . '" ' . ($row['online_color'] ? 'style="color: ' . $row['online_color'] . '"' : '') . '>' . $row['group_name'] . '</a>';
 		}
@@ -1284,7 +1284,7 @@ function copyBoardPermissions($id_group, $copy_from)
 		array(
 			'copy_from' => $copy_from,
 		),
-		function($row) use ($id_group)
+		function ($row) use ($id_group)
 		{
 			return array($id_group, $row['id_profile'], $row['permission'], $row['add_deny']);
 		}
@@ -1431,7 +1431,7 @@ function detachGroupFromBoards($id_group, $boards, $access_list)
 			'board_access_list' => $boards[$access_list],
 			'column' => $access_list == 'allow' ? 'member_groups' : 'deny_member_groups',
 		),
-		function($row) use ($id_group, $access_list, $db)
+		function ($row) use ($id_group, $access_list, $db)
 		{
 			$db->query('', '
 				UPDATE {db_prefix}boards
@@ -1625,7 +1625,7 @@ function getIDMemberFromGroupModerators($moderators)
 		array(
 			'moderators' => $moderators,
 		),
-		function($row)
+		function ($row)
 		{
 			return $row['id_member'];
 		}
@@ -1948,7 +1948,7 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
 		array_merge($where_parameters, array(
 			'sort' => $sort,
 		)),
-		function($row) use ($scripturl)
+		function ($row) use ($scripturl)
 		{
 			return array(
 				'id' => $row['id_request'],
@@ -2068,7 +2068,7 @@ function getUnassignableGroups($ignore_protected)
 			'min_posts' => -1,
 			'is_protected' => 1,
 		),
-		function($row)
+		function ($row)
 		{
 			return $row['id_group'];
 		},

@@ -818,7 +818,7 @@ class DbTable_PostgreSQL extends DbTable
 	/**
 	 * Static method that allows to retrieve or create an instance of this class.
 	 * @param object $db - A Database_PostgreSQL object
-	 * @return object - A DbTable_PostgreSQL object
+	 * @return DbTable_PostgreSQL - A DbTable_PostgreSQL object
 	 */
 	public static function db_table($db)
 	{

@@ -1539,6 +1539,7 @@ function currentContext($messages_request, $reset = false)
 	if (!$message)
 	{
 		$db->free_result($messages_request);
+
 		return false;
 	}
 
@@ -1772,7 +1773,7 @@ function response_prefix()
  * is less than 255 characters (for database limits)
  *
  * @param string $value - The string to evaluate as valid email
- * @return bool|string - The email if valid, false if not a valid email
+ * @return string|false - The email if valid, false if not a valid email
  */
 function isValidEmail($value)
 {

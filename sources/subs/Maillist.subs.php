@@ -381,7 +381,7 @@ function maillist_templates($template_type, $subject = null)
 			'generic' => 0,
 			'current_member' => $user_info['id'],
 		),
-		function($row) use ($subject)
+		function ($row) use ($subject)
 		{
 			$template = array(
 				'title' => $row['template_title'],

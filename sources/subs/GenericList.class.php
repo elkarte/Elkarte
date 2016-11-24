@@ -243,7 +243,7 @@ class Generic_List
 		{
 				$this->context['headers'][] = array(
 					'id' => $column_id,
-					'label' => isset($column['header']['value']) ?$column['header']['value']: '',
+					'label' => isset($column['header']['value']) ? $column['header']['value'] : '',
 					'href' => empty($this->listOptions['default_sort_col']) || empty($column['sort']) ? '' : $this->listOptions['base_href'] . ';' . $this->sortVar . '=' . $column_id . ($column_id === $this->context['sort']['id'] && !$this->context['sort']['desc'] && isset($column['sort']['reverse']) ? ';' . $this->descVar : '') . (empty($this->context['start']) ? '' : ';' . $this->context['start_var_name'] . '=' . $this->context['start']),
 					'sort_image' => empty($this->listOptions['default_sort_col']) || empty($column['sort']) || $column_id !== $this->context['sort']['id'] ? null : ($this->context['sort']['desc'] ? 'down' : 'up'),
 					'class' => isset($column['header']['class']) ? $column['header']['class'] : '',
@@ -271,7 +271,7 @@ class Generic_List
 
 		// Call the function and include which items we want and in what order.
 		$this->listItems = call_user_func_array($this->listOptions['get_items']['function'], array_merge(array($this->context['start'], $this->context['items_per_page'], $this->sort), empty($this->listOptions['get_items']['params']) ? array() : $this->listOptions['get_items']['params']));
-		$this->listItems = !empty($this->listItems) ?$this->listItems: array();
+		$this->listItems = !empty($this->listItems) ? $this->listItems : array();
 
 		$this->loopItems();
 	}

@@ -960,7 +960,7 @@ class ProfileOptions_Controller extends Action_Controller
 		// By default the new primary is the old one.
 		$newPrimary = $old_profile['id_group'];
 		$addGroups = array_flip(explode(',', $old_profile['additional_groups']));
-		$canChangePrimary = $old_profile['id_group'] == 0 ? 1 : 0;
+		$canChangePrimary = $old_profile['id_group'] == 0;
 		$changeType = isset($this->_req->post->primary) ? 'primary' : (isset($this->_req->post->req) ? 'request' : 'free');
 
 		// One way or another, we have a target group in mind...
@@ -1002,7 +1002,7 @@ class ProfileOptions_Controller extends Action_Controller
 
 			// If this is their old primary, can we change it?
 			if ($row['id_group'] == $old_profile['id_group'] && ($row['group_type'] > 1 || $context['can_manage_membergroups']) && $canChangePrimary !== false)
-				$canChangePrimary = 1;
+				$canChangePrimary = true;
 
 			// If we are not doing a force primary move, don't do it automatically if current primary is not 0.
 			if ($changeType != 'primary' && $old_profile['id_group'] != 0)

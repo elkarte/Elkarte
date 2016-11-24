@@ -428,7 +428,7 @@ function deleteMembers($users, $check_not_admin = false)
 			'pm_ignore_list' => implode(', pm_ignore_list) != 0 OR FIND_IN_SET(', $users),
 			'buddy_list' => implode(', buddy_list) != 0 OR FIND_IN_SET(', $users),
 		),
-		function($row) use ($users)
+		function ($row) use ($users)
 		{
 			updateMemberData($row['id_member'], array(
 				'pm_ignore_list' => implode(',', array_diff(explode(',', $row['pm_ignore_list']), $users)),
@@ -1032,7 +1032,7 @@ function membersAllowedTo($permission, $board_id = null)
 			'member_group_allowed_implode' => implode(', mem.additional_groups) != 0 OR FIND_IN_SET(', $member_groups['allowed']),
 			'member_group_denied_implode' => implode(', mem.additional_groups) != 0 OR FIND_IN_SET(', $member_groups['denied']),
 		),
-		function($row)
+		function ($row)
 		{
 			return $row['id_member'];
 		}
@@ -1485,7 +1485,7 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
 {
 	$allowed_conditions = array(
 		'member_ids'   => 'id_member IN ({array_int:member_ids})',
-		'member_names' => function(&$members)
+		'member_names' => function (&$members)
 		{
 			$mem_query = array();
 
@@ -1783,7 +1783,7 @@ function getMember($search, $buddies = array())
 			'activation_status' => array(1, 12),
 			'limit' => Util::strlen($search) <= 2 ? 100 : 200,
 		),
-		function($row)
+		function ($row)
 		{
 			$row['real_name'] = strtr($row['real_name'], array('&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;'));
 
@@ -2460,7 +2460,7 @@ function updateMemberData($members, $data)
 					FROM {db_prefix}members
 					WHERE ' . $condition,
 					$parameters,
-					function($row)
+					function ($row)
 					{
 						return $row['member_name'];
 					}

@@ -307,7 +307,7 @@ function is_not_banned($forceCheck = false)
 				WHERE
 					(' . implode(' OR ', $ban_query) . ')',
 				$ban_query_vars,
-				function($row) use($user_info, $restrictions, &$flag_is_activated)
+				function ($row) use($user_info, $restrictions, &$flag_is_activated)
 				{
 					// Store every type of ban that applies to you in your session.
 					foreach ($restrictions as $restriction)
@@ -360,7 +360,7 @@ function is_not_banned($forceCheck = false)
 				'ban_list' => $bans,
 				'current_time' => time(),
 			),
-			function($row)
+			function ($row)
 			{
 				$_SESSION['ban']['cannot_access']['ids'][] = $row['id_ban'];
 				$_SESSION['ban']['cannot_access']['reason'] = $row['reason'];

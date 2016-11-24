@@ -241,7 +241,7 @@ class ManageMaillist_Controller extends Action_Controller
 						'value' => $txt['message_action'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $context, $txt;
 
 							$id = $rowData['id_email'] . ';';

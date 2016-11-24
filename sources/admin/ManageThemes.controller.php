@@ -1251,9 +1251,11 @@ class ManageThemes_Controller extends Action_Controller
 				addTheme($inserts);
 
 			updateSettings(array('knownThemes' => strtr($modSettings['knownThemes'] . ',' . $id_theme, array(',,' => ','))));
+
+			redirectexit('action=admin;area=theme;sa=install;theme_id=' . $id_theme . ';' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
-		redirectexit('action=admin;area=theme;sa=install;theme_id=' . $id_theme . ';' . $context['session_var'] . '=' . $context['session_id']);
+		redirectexit('action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
 	}
 
 	/**
@@ -1269,7 +1271,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// This happens when the admin session is gone and the user has to login again
 		if (empty($_FILES['theme_gz']) && empty($this->_req->post->theme_gz))
-			redirectexit('action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
+			return;
 
 		// Set the default settings...
 		$this->theme_name = strtok(basename(isset($_FILES['theme_gz']) ? $_FILES['theme_gz']['name'] : $this->_req->post->theme_gz), '.');
@@ -1285,8 +1287,6 @@ class ManageThemes_Controller extends Action_Controller
 
 			read_tgz_file($this->_req->post->theme_gz, BOARDDIR . '/themes/' . $this->theme_name, false, true);
 		}
-		else
-			redirectexit('action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
 	}
 
 	/**
