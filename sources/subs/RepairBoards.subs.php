@@ -1346,7 +1346,7 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
 	detectServer()->setTimeLimit(600);
 
 	// Errr, wait.  How much time has this taken already?
-	if (!$force && microtime(true) - $time_start > 3)
+	if (!$force && microtime(true) - $time_start < 3000)
 		return;
 
 	// Restore the query cache if interested.

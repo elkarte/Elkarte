@@ -522,11 +522,10 @@ function template_load_drafts_below()
 					</div>';
 
 	// Code for showing and hiding drafts
-	echo '
-		<script>
+	addInlineJavascript('
 			var oSwapDraftOptions = new elk_Toggle({
 				bToggleEnabled: true,
-				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['draft']) ? 'false' : 'true', ',
+				bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['draft']) ? 'false' : 'true') . ',
 				aSwappableContainers: [
 					\'postDraftOptions\',
 				],
@@ -534,27 +533,27 @@ function template_load_drafts_below()
 					{
 						sId: \'postDraftExpand\',
 						classExpanded: \'chevricon i-chevron-up\',
-						titleExpanded: ', JavaScriptEscape($txt['hide']), ',
+						titleExpanded: ' . JavaScriptEscape($txt['hide']) . ',
 						classCollapsed: \'chevricon i-chevron-down\',
-						titleCollapsed: ', JavaScriptEscape($txt['show']), '
+						titleCollapsed: ' . JavaScriptEscape($txt['show']) . '
 					}
 				],
 				aSwapLinks: [
 					{
 						sId: \'postDraftExpandLink\',
-						msgExpanded: ', JavaScriptEscape($txt['draft_hide']), ',
-						msgCollapsed: ', JavaScriptEscape($txt['draft_load']), '
+						msgExpanded: ' . JavaScriptEscape($txt['draft_hide']) . ',
+						msgCollapsed: ' . JavaScriptEscape($txt['draft_load']) . '
 					}
 				],
 				oThemeOptions: {
-					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+					bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') . ',
 					sOptionName: \'minmax_preferences\',
 					sSessionId: elk_session_id,
 					sSessionVar: elk_session_var,
 					sAdditionalVars: \';minmax_key=draft\'
 				},
 			});
-		</script>';
+		', true);
 }
 
 /**
@@ -707,14 +706,15 @@ function template_postarea_below()
 				txt_ignoring_user = "', $txt['ignoring_user'], '",
 				txt_new = "', $txt['new'], '",
 				txt_posted_by = "', $txt['posted_by'], '",
-				txt_on = "', $txt['on'], '";';
+				txt_on = "', $txt['on'], '";
+		</script>';
 
 	// Code for showing and hiding additional options.
 	if (!empty($settings['additional_options_collapsible']))
-		echo '
+		addInlineJavascript('
 			var oSwapAdditionalOptions = new elk_Toggle({
 				bToggleEnabled: true,
-				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['post']) ? 'false' : 'true', ',
+				bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['post']) ? 'false' : 'true') . ',
 				funcOnBeforeCollapse: function () {
 					document.getElementById(\'additional_options\').value = \'0\';
 				},
@@ -728,29 +728,26 @@ function template_postarea_below()
 					{
 						sId: \'postMoreExpand\',
 						classExpanded: \'chevricon i-chevron-up\',
-						titleExpanded: ', JavaScriptEscape($txt['hide']), ',
+						titleExpanded: ' . JavaScriptEscape($txt['hide']) . ',
 						classCollapsed: \'chevricon i-chevron-down\',
-						titleCollapsed: ', JavaScriptEscape($txt['show']), '
+						titleCollapsed: ' . JavaScriptEscape($txt['show']) . '
 					}
 				],
 				aSwapLinks: [
 					{
 						sId: \'postMoreExpandLink\',
-						msgExpanded: ', JavaScriptEscape($context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt']), ',
-						msgCollapsed: ', JavaScriptEscape($context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt']), '
+						msgExpanded: ' . JavaScriptEscape($context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt']) . ',
+						msgCollapsed: ' . JavaScriptEscape($context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt']) . '
 					}
 				],
 				oThemeOptions: {
-					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+					bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') . ',
 					sOptionName: \'minmax_preferences\',
 					sSessionId: elk_session_id,
 					sSessionVar: elk_session_var,
 					sAdditionalVars: \';minmax_key=post\'
 				},
-			});';
-
-	echo '
-		</script>';
+			});', true);
 
 	template_topic_replies_below();
 }

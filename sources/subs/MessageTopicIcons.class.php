@@ -110,12 +110,12 @@ class MessageTopicIcons extends ElkArte\ValuesContainer
 			if ($this->_check)
 			{
 				$this->data[$icon] = $settings[file_exists($this->_theme_dir . '/images/post/' . $icon . '.png')
-					? MessageTopicIcons::IMAGE_URL
-					: MessageTopicIcons::DEFAULT_URL] . '/post/' . $icon . '.png';
+					? self::IMAGE_URL
+					: self::DEFAULT_URL] . '/post/' . $icon . '.png';
 			}
 			else
 			{
-				$this->data[$icon] = $settings[MessageTopicIcons::IMAGE_URL] . '/post/' . $icon . '.png';
+				$this->data[$icon] = $settings[self::IMAGE_URL] . '/post/' . $icon . '.png';
 			}
 		}
 	}

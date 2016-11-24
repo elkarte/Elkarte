@@ -434,7 +434,7 @@ class Search_Controller extends Action_Controller
 				else
 				{
 					$num_res = $this->_search->getResults($_SESSION['search_cache']['id_search'], $humungousTopicPosts, $maxMessageResults);
-					if ($num_res === false)
+					if (empty($num_res))
 					{
 						$context['search_errors']['query_not_specific_enough'] = true;
 						$this->action_search();

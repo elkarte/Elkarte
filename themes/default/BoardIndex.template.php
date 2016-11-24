@@ -139,11 +139,10 @@ function template_info_center_below()
 	</section>';
 
 	// Info center collapse object.
-	echo '
-	<script>
+	addInlineJavascript('
 		var oInfoCenterToggle = new elk_Toggle({
 			bToggleEnabled: true,
-			bCurrentlyCollapsed: ', empty($context['minmax_preferences']['info']) ? 'false' : 'true', ',
+			bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['info']) ? 'false' : 'true') . ',
 			aSwappableContainers: [
 				\'upshrinkHeaderIC\'
 			],
@@ -151,31 +150,31 @@ function template_info_center_below()
 				{
 					sId: \'upshrink_ic\',
 					classExpanded: \'chevricon i-chevron-up\',
-					titleExpanded: ', JavaScriptEscape($txt['hide']), ',
+					titleExpanded: ' . JavaScriptEscape($txt['hide']) . ',
 					classCollapsed: \'chevricon i-chevron-down\',
-					titleCollapsed: ', JavaScriptEscape($txt['show']), '
+					titleCollapsed: ' . JavaScriptEscape($txt['show']) . '
 				}
 			],
 			aSwapLinks: [
 				{
 					sId: \'upshrink_link\',
-					msgExpanded: ', JavaScriptEscape(sprintf($txt['info_center_title'], $context['forum_name_html_safe'])), ',
-					msgCollapsed: ', JavaScriptEscape(sprintf($txt['info_center_title'], $context['forum_name_html_safe'])), '
+					msgExpanded: ' . JavaScriptEscape(sprintf($txt['info_center_title'], $context['forum_name_html_safe'])) . ',
+					msgCollapsed: ' . JavaScriptEscape(sprintf($txt['info_center_title'], $context['forum_name_html_safe'])) . '
 				}
 			],
 			oThemeOptions: {
-				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+				bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') . ',
 				sOptionName: \'minmax_preferences\',
 				sSessionId: elk_session_id,
 				sSessionVar: elk_session_var,
 				sAdditionalVars: \';minmax_key=info\'
 			},
 			oCookieOptions: {
-				bUseCookie: ', $context['user']['is_guest'] ? 'true' : 'false', ',
+				bUseCookie: ' . ($context['user']['is_guest'] ? 'true' : 'false') . ',
 				sCookieName: \'upshrinkIC\'
 			}
 		});
-	</script>';
+	', true);
 }
 
 /**

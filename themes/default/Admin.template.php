@@ -1087,10 +1087,10 @@ function template_show_settings()
 						</fieldset>';
 				}
 				// A simple message?
-				elseif ($config_var['type'] == 'message')
+				elseif ($config_var['type'] == 'var_message')
 				{
 					echo '
-						<div', !empty($config_var['name']) ? ' id="' . $config_var['name'] . '"' : '', '>', $config_var['message'], '</div>';
+						<div', !empty($config_var['name']) ? ' id="' . $config_var['name'] . '"' : '', '>', $config_var['var_message'], '</div>';
 				}
 				// Color picker?
 				elseif ($config_var['type'] == 'color')

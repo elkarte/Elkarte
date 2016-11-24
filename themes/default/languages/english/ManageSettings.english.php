@@ -122,8 +122,7 @@ $txt['likeRestrictAdmins'] = 'Restrict administrators to limits';
 $txt['likeAllowSelf'] = 'Allow members to like their own posts';
 $txt['likeDisplayLimit'] = 'Set the maximum number of "liked by" names to display in the topic view, 0 for no limit, -1 to disable';
 
-$txt['caching_information'] = 'ElkArte supports caching of user data (such as query results) through the use of accelerators. The currently supported accelerators include:
-<ul class="normallist">{supported_accelerators}</ul>
+$txt['caching_information'] = 'ElkArte supports caching of user data (such as query results) through the use of accelerators. The currently supported accelerators include: {supported_accelerators}
 Caching will work best if you have PHP compiled with one of the above optimizers, or have memcache available. If you do not have any optimizer installed file based caching will be used.';
 $txt['detected_accelerators'] = 'The following accelerators have been detected: <strong class="success">%1$s</strong>';
 

@@ -137,13 +137,12 @@ form, input, button, select, textarea,
  * @todo - Can we do this by class? What about default styling? Needed?
  * Declaring as overflow: auto; is probably a good idea.
  */
-
 fieldset {
 	margin: 5px 0;
 	padding: 6px;
 	border-radius: 5px;
 	overflow: auto;
-	border: none;
+	border: 1px solid transparent;
 }
 
 /* Specific box-sizing declarations */
@@ -959,7 +958,8 @@ a.bbc_link {
 }
 
 #search_form button {
-	border: 0;
+	border: 1px solid transparent;
+	margin-left: -5px;
 }
 
 #search_form .input_text {
@@ -974,6 +974,7 @@ a.bbc_link {
 #search_form select {
 	border: 1px solid;
 	border-right: none;
+	margin-bottom: 1px;
 }
 
 #search_form select:focus {

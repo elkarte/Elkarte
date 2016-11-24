@@ -501,6 +501,10 @@ div.bbc_footnotes .meaction {
 	opacity: 1;
 }
 
+#search_form button {
+	border-color: #CCCCCC;
+}
+
 #mlsearch_options {
 	background-color: white;
 }

@@ -1036,6 +1036,63 @@ $(function() {
 });
 
 /**
+ * Server Settings > Caching, toggles input fields on/off as appropriate for
+ * a given cache engine selection
+ */
+function toggleCache ()
+{
+	var memcache = $('#cache_memcached').parent(),
+		cachedir = $('#cachedir').parent(),
+		cacheuid = $('#cache_uid').parent(),
+		cachepassword = $('#cache_password').parent(),
+		cacheconfirm = $('#cache_password_confirm').parent();
+
+	// Show the memcache server box only if memcache has been selected
+	if (cache_type.value !== "memcached")
+	{
+		memcache.slideUp();
+		memcache.prev().slideUp(100);
+	}
+	else
+	{
+		memcache.slideDown();
+		memcache.prev().slideDown(100);
+	}
+
+	// don't show the directory if its not filebased
+	if (cache_type.value === "filebased")
+	{
+		cachedir.slideDown();
+		cachedir.prev().slideDown(100);
+	}
+	else
+	{
+		cachedir.slideUp(100);
+		cachedir.prev().slideUp(100);
+	}
+
+	// right now only xcache needs the uid/password
+	if (cache_type.value === "xcache")
+	{
+		cacheuid.slideDown(100);
+		cacheuid.prev().slideDown(100);
+		cachepassword.slideDown(100);
+		cachepassword.prev().slideDown(100);
+		cacheconfirm.slideDown(100);
+		cacheconfirm.prev().slideDown(100);
+	}
+	else
+	{
+		cacheuid.slideUp(100);
+		cacheuid.prev().slideUp(100);
+		cachepassword.slideUp(100);
+		cachepassword.prev().slideUp(100);
+		cacheconfirm.slideUp(100);
+		cacheconfirm.prev().slideUp(100);
+	}
+}
+
+/**
  * Hides local / subdomain cookie options in the ACP based on selected choices
  * area=serversettings;sa=cookie
  */

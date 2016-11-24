@@ -140,7 +140,7 @@ class Debug
 	 *         s => seconds at which the query has been executed into the request
 	 *         t => time taken by the query
 	 */
-	public function db($value)
+	public function db_query($value)
 	{
 		if (!$this->_track)
 			return;
