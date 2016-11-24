@@ -241,17 +241,6 @@ class Generic_List
 		$this->context['headers'] = array();
 		foreach ($this->listOptions['columns'] as $column_id => $column)
 		{
-<<<<<<< HEAD
-				$this->context['headers'][] = array(
-					'id' => $column_id,
-					'label' => isset($column['header']['value']) ? $column['header']['value'] : '',
-					'href' => empty($this->listOptions['default_sort_col']) || empty($column['sort']) ? '' : $this->listOptions['base_href'] . ';' . $this->sortVar . '=' . $column_id . ($column_id === $this->context['sort']['id'] && !$this->context['sort']['desc'] && isset($column['sort']['reverse']) ? ';' . $this->descVar : '') . (empty($this->context['start']) ? '' : ';' . $this->context['start_var_name'] . '=' . $this->context['start']),
-					'sort_image' => empty($this->listOptions['default_sort_col']) || empty($column['sort']) || $column_id !== $this->context['sort']['id'] ? null : ($this->context['sort']['desc'] ? 'down' : 'up'),
-					'class' => isset($column['header']['class']) ? $column['header']['class'] : '',
-					'style' => isset($column['header']['style']) ? $column['header']['style'] : '',
-					'colspan' => isset($column['header']['colspan']) ? $column['header']['colspan'] : '',
-				);
-=======
 			if (isset($column['evaluate']) && $column['evaluate'] === false)
 			{
 				continue;
@@ -259,14 +248,13 @@ class Generic_List
 
 			$this->context['headers'][] = array(
 				'id' => $column_id,
-				'label' => isset($column['header']['value']) ?$column['header']['value']: '',
+				'label' => isset($column['header']['value']) ? $column['header']['value'] : '',
 				'href' => empty($this->listOptions['default_sort_col']) || empty($column['sort']) ? '' : $this->listOptions['base_href'] . ';' . $this->sortVar . '=' . $column_id . ($column_id === $this->context['sort']['id'] && !$this->context['sort']['desc'] && isset($column['sort']['reverse']) ? ';' . $this->descVar : '') . (empty($this->context['start']) ? '' : ';' . $this->context['start_var_name'] . '=' . $this->context['start']),
 				'sort_image' => empty($this->listOptions['default_sort_col']) || empty($column['sort']) || $column_id !== $this->context['sort']['id'] ? null : ($this->context['sort']['desc'] ? 'down' : 'up'),
 				'class' => isset($column['header']['class']) ? $column['header']['class'] : '',
 				'style' => isset($column['header']['style']) ? $column['header']['style'] : '',
 				'colspan' => isset($column['header']['colspan']) ? $column['header']['colspan'] : '',
 			);
->>>>>>> 3fa8f00... ! make sure table headers also respect 'evaluate' command
 		}
 	}
 
