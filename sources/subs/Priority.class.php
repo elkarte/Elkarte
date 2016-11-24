@@ -180,12 +180,14 @@ class Priority
 		// Now the funny part, let's start with some cleanup: collecting all the entities we know and pruning those that cannot be placed somewhere
 		$all_known = array_merge(array_keys($all_entities), array_keys($this->_all_after), array_keys($this->_all_before));
 
-		$all['before'] = array();
+		$all = array(
+			'before' => array()
+			'after' => array()
+		);
 		foreach ($this->_all_before as $key => $value)
 			if (in_array($value, $all_known))
 				$all['before'][$key] = $value;
 
-		$all['after'] = array();
 		foreach ($this->_all_after as $key => $value)
 			if (in_array($value, $all_known))
 				$all['after'][$key] = $value;

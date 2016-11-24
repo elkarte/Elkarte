@@ -923,7 +923,7 @@ function loadBasedOnTheme($based_on, $explicit_images = false)
 			'images_url' => 'images_url',
 			'theme_dir' => 'theme_dir',
 			'based_on' => '%/' . $based_on,
-			'based_on_path' => '%' . "\\" . $based_on,
+			'based_on_path' => '%\\' . $based_on,
 		)
 	);
 	$temp = $db->fetch_assoc($request);
