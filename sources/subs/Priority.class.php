@@ -181,7 +181,7 @@ class Priority
 		$all_known = array_merge(array_keys($all_entities), array_keys($this->_all_after), array_keys($this->_all_before));
 
 		$all = array(
-			'before' => array()
+			'before' => array(),
 			'after' => array()
 		);
 		foreach ($this->_all_before as $key => $value)
