@@ -39,12 +39,9 @@ function cache_quick_get($key, $file, $function, $params, $level = 1)
  * - It may "miss" so shouldn't be depended on
  * - Uses the cache engine chosen in the ACP and saved in settings.php
  * - It supports:
- *     Turck MMCache: http://turck-mmcache.sourceforge.net/index_old.html#api
  *     Xcache: http://xcache.lighttpd.net/wiki/XcacheApi
  *     memcache: http://www.php.net/memcache
  *     APC: http://www.php.net/apc
- *     eAccelerator: http://bart.eaccelerator.net/doc/phpdoc/
- *     Zend: http://files.zend.com/help/Zend-Platform/output_cache_functions.htm
  *     Zend: http://files.zend.com/help/Zend-Platform/zend_cache_functions.htm
  *
  * @param string $key
