@@ -421,7 +421,6 @@ function loadAllPermissions()
 			'who_view' => array(false, 'general'),
 			'search_posts' => array(false, 'general'),
 			'karma_edit' => array(false, 'general'),
-			'like_posts' => array(false, 'general'),
 			'like_posts_stats' => array(false, 'general'),
 			'disable_censor' => array(false, 'general'),
 			'pm_read' => array(false, 'pm'),
