@@ -573,69 +573,11 @@ class Email_Parse
 						// Message is a DSN (Delivery Status Notification)
 						elseif ($this->_boundary_section[$i]->headers['content-type'] === 'message/delivery-status')
 						{
-							// These sections often have extra blank lines, so cannot be counted on to be
-							// fully accessible in ->headers. The "body" of this section contains values
-							// formatted by FIELD: [TYPE;] VALUE
-							$dsn_body = array();
-							foreach (explode("\n", str_replace("\r\n", "\n", $this->_boundary_section[$i]->body)) as $line)
-							{
-								$type = '';
-								list($field, $rest) = explode(':', $line);
-
-								if (strpos($line, ';'))
-								{
-									list ($type, $val) = explode(';', $rest);
-								}
-								else
-								{
-									$val = $rest;
-								}
-
-								$dsn_body[trim(strtolower($field))] = array('type' => trim($type), 'value' => trim($val));
-							}
-
-							switch ($dsn_body['action']['value'])
-							{
-								case 'delayed':
-								// Remove this if we don't want to flag delayed delivery addresses as "dirty"
-								// May be caused by temporary net failures, e.g. DNS outage
-								// Lack of break is intentional
-								case 'failed':
-									// The email failed to be delivered.
-									$this->_is_dsn = true;
-									$this->_dsn = array('headers' => $this->_boundary_section[$i]->headers, 'body' => $dsn_body);
-									break;
-								default:
-									$this->_is_dsn = false;
-							}
+							$this->_process_DSN($i);
 						}
 
 						// Attachments, we love em
-						if ($this->_boundary_section[$i]->headers['content-disposition'] === 'attachment' || $this->_boundary_section[$i]->headers['content-disposition'] === 'inline' || isset($this->_boundary_section[$i]->headers['content-id']))
-						{
-							// Get the attachments file name
-							if (isset($this->_boundary_section[$i]->headers['x-parameters']['content-disposition']['filename']))
-							{
-								$file_name = $this->_boundary_section[$i]->headers['x-parameters']['content-disposition']['filename'];
-							}
-							elseif (isset($this->_boundary_section[$i]->headers['x-parameters']['content-type']['name']))
-							{
-								$file_name = $this->_boundary_section[$i]->headers['x-parameters']['content-type']['name'];
-							}
-							else
-							{
-								continue;
-							}
-
-							// Load the attachment data
-							$this->attachments[$file_name] = $this->_boundary_section[$i]->body;
-
-							// Inline attachments are a bit more complicated.
-							if (isset($this->_boundary_section[$i]->headers['content-id']) && $this->_boundary_section[$i]->headers['content-disposition'] === 'inline')
-							{
-								$this->inline_files[$file_name] = trim($this->_boundary_section[$i]->headers['content-id'], ' <>');
-							}
-						}
+						$this->_process_attachments($i);
 					}
 
 					// We always return a plain text version for use
@@ -680,6 +622,7 @@ class Email_Parse
 							{
 								$this->attachments[$key] = $value;
 							}
+
 							foreach ($this->_boundary_section[$id]->inline_files as $key => $value)
 							{
 								$this->inline_files[$key] = $value;
@@ -701,6 +644,86 @@ class Email_Parse
 				// deal with all the rest (e.g. image/xyx) the standard way
 				$this->body = $this->_decode_string($this->body, $this->headers['content-transfer-encoding'], $this->headers['x-parameters']['content-type']['charset']);
 				break;
+		}
+	}
+
+	/**
+	 * If the boundary is a failed email response, set the DSN flag for the admin
+	 *
+	 * @param int $i The section being worked
+	 */
+	private function _process_DSN($i)
+	{
+		// These sections often have extra blank lines, so cannot be counted on to be
+		// fully accessible in ->headers. The "body" of this section contains values
+		// formatted by FIELD: [TYPE;] VALUE
+		$dsn_body = array();
+		foreach (explode("\n", str_replace("\r\n", "\n", $this->_boundary_section[$i]->body)) as $line)
+		{
+			$type = '';
+			list($field, $rest) = explode(':', $line);
+
+			if (strpos($line, ';'))
+			{
+				list ($type, $val) = explode(';', $rest);
+			}
+			else
+			{
+				$val = $rest;
+			}
+
+			$dsn_body[trim(strtolower($field))] = array('type' => trim($type), 'value' => trim($val));
+		}
+
+		switch ($dsn_body['action']['value'])
+		{
+			case 'delayed':
+				// Remove this if we don't want to flag delayed delivery addresses as "dirty"
+				// May be caused by temporary net failures, e.g. DNS outage
+				// Lack of break is intentional
+			case 'failed':
+				// The email failed to be delivered.
+				$this->_is_dsn = true;
+				$this->_dsn = array('headers' => $this->_boundary_section[$i]->headers, 'body' => $dsn_body);
+				break;
+			default:
+				$this->_is_dsn = false;
+		}
+	}
+
+	/**
+	 * If the boundary section is "attachment" or "inline", process and save the data
+	 *
+	 * - Data is saved in ->attachments or ->inline_files
+	 *
+	 * @param int $i The section being worked
+	 */
+	private function _process_attachments($i)
+	{
+		if ($this->_boundary_section[$i]->headers['content-disposition'] === 'attachment' || $this->_boundary_section[$i]->headers['content-disposition'] === 'inline' || isset($this->_boundary_section[$i]->headers['content-id']))
+		{
+			// Get the attachments file name
+			if (isset($this->_boundary_section[$i]->headers['x-parameters']['content-disposition']['filename']))
+			{
+				$file_name = $this->_boundary_section[$i]->headers['x-parameters']['content-disposition']['filename'];
+			}
+			elseif (isset($this->_boundary_section[$i]->headers['x-parameters']['content-type']['name']))
+			{
+				$file_name = $this->_boundary_section[$i]->headers['x-parameters']['content-type']['name'];
+			}
+			else
+			{
+				return;
+			}
+
+			// Load the attachment data
+			$this->attachments[$file_name] = $this->_boundary_section[$i]->body;
+
+			// Inline attachments are a bit more complicated.
+			if (isset($this->_boundary_section[$i]->headers['content-id']) && $this->_boundary_section[$i]->headers['content-disposition'] === 'inline')
+			{
+				$this->inline_files[$file_name] = trim($this->_boundary_section[$i]->headers['content-id'], ' <>');
+			}
 		}
 	}
 
