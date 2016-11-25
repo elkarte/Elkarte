@@ -501,6 +501,7 @@ function prepareCreditsData()
 			'<a href="http://jquery.org/">JQuery</a> | &copy; jQuery Foundation and other contributors | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="http://jqueryui.com/">JQuery UI</a> | &copy; jQuery Foundation and other contributors | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="https://github.com/tchwork/jsqueeze">Jsqueeze</a> &copy Nicolas Grekas| Licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>',
+			'<a href="https://github.com/mailcheck">MailCheck</a> | &copy; Received Inc | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="http://www.openwall.com/phpass/">PH Pass</a> | Author: Solar Designer | Placed in the public domain</a>',
 			'<a href="http://www.sceditor.com/">SCEditor</a> | &copy; Sam Clarke | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="http://sourceforge.net/projects/simplehtmldom/">Simple HTML DOM</a> | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',

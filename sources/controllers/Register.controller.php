@@ -172,8 +172,18 @@ class Register_Controller extends Action_Controller
 		// Show the user the right form.
 		$context['sub_template'] = $current_step == 1 ? 'registration_agreement' : 'registration_form';
 		$context['page_title'] = $current_step == 1 ? $txt['registration_agreement'] : $txt['registration_form'];
-		loadJavascriptFile('register.js');
-		addInlineJavascript('disableAutoComplete();', true);
+		loadJavascriptFile(array('register.js', 'mailcheck.min.js'));
+		addInlineJavascript('disableAutoComplete();
+		$("input[type=email]").on("blur", function(event) {
+			$(this).mailcheck({
+				suggested: function(element, suggestion) {
+				  	$("#suggestion").html("' . $txt['register_did_you'] . ' <b><i>" + suggestion.full + "</b></i>");
+				},
+				empty: function(element) {
+				  	$("#suggestion").html("");
+				}
+			});
+		});', true);
 
 		// Add the register chain to the link tree.
 		$context['linktree'][] = array(
@@ -1169,6 +1179,18 @@ class Register_Controller extends Action_Controller
 			$context['sub_template'] = 'contact_form_done';
 		else
 		{
+			loadJavascriptFile('mailcheck.min.js');
+			addInlineJavascript('disableAutoComplete();
+			$("input[type=email]").on("blur", function(event) {
+				$(this).mailcheck({
+					suggested: function(element, suggestion) {
+				  		$("#suggestion").html("' . $txt['register_did_you'] . ' <b><i>" + suggestion.full + "</b></i>");
+					},
+					empty: function(element) {
+						$("#suggestion").html("");
+					}
+				});
+			});', true);
 			$context['sub_template'] = 'contact_form';
 			$context['page_title'] = $txt['admin_contact_form'];
 

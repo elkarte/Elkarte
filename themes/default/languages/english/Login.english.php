@@ -61,6 +61,7 @@ $txt['in_maintain_mode'] = 'This board is in Maintenance Mode.';
 // These two are used as a javascript alert; please use international characters directly, not as entities.
 $txt['register_agree'] = 'Please read and accept the agreement before registering.';
 $txt['register_passwords_differ_js'] = 'The two passwords you entered are not the same!';
+$txt['register_did_you'] = 'Did you mean';
 
 $txt['approval_after_registration'] = 'Thank you for registering. The admin must approve your registration before you may begin to use your account, you will receive an email shortly advising you of the admins decision.';
 
