@@ -201,6 +201,8 @@ class Recent_Controller extends Action_Controller
 	{
 		global $context, $txt, $scripturl;
 
+		$txt_like_post = '<li></li>';
+
 		// Can they like/unlike this post?
 		if ($post['can_like'] || $post['can_unlike'])
 		{
@@ -212,12 +214,12 @@ class Recent_Controller extends Action_Controller
 				</li>';
 		}
 		// Or just view the count
-		else
+		elseif (!empty($post['like_counter']))
 		{
 			$txt_like_post = '
-				<li class="listlevel1' . (!empty($post['like_counter']) ? ' liked"' : '"') . '>
-					<a href="javascript:void(0)" title="' . (!empty($post['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$post['id']]['member']) : '') . '" class="linklevel1 likes_button">' .
-						(!empty($post['like_counter']) ? '<span class="likes_indicator">' . $post['like_counter'] . '</span>&nbsp;' . $txt['likes'] : '&nbsp;') .  '
+				<li class="listlevel1 liked">
+					<a href="javascript:void(0)" title="' . $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$post['id']]['member']) . '" class="linklevel1 likes_button">
+						<span class="likes_indicator">' . $post['like_counter'] . '</span>&nbsp;' . $txt['likes'] . '
 					</a>
 				</li>';
 		}
