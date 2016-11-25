@@ -91,14 +91,7 @@ class Pbe_Imap extends AbstractModel
 		$this->_is_gmail = strpos($this->_hostname, '.gmail.') !== false;
 
 		// I suppose that without this information we can't do anything.
-		if (empty($this->_hostname) || empty($this->_username) || empty($this->_password))
-		{
-			return false;
-		}
-		else
-		{
-			return $this;
-		}
+		return (empty($this->_hostname) || empty($this->_username) || empty($this->_password)) ? false : $this;
 	}
 
 	/**
@@ -200,7 +193,7 @@ class Pbe_Imap extends AbstractModel
 	}
 
 	/**
-	 * Deletes an email from and imap inbox
+	 * Deletes an email from an imap inbox
 	 *
 	 * @param int $email_uid - The email id
 	 */
