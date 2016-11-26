@@ -994,82 +994,117 @@ class Email_Parse
 	 * - returns the found key or false.  If found will also save it in the in-reply-to header
 	 *
 	 * @param string $key optional
-	 * @return string of key of false on failure
+	 * @return string of key or false on failure
 	 */
 	public function load_key($key = '')
 	{
 		$regex_key = '~(([a-z0-9]{32})\-(p|t|m)(\d+))~i';
 		$match = array();
-		$found_key = false;
 
+		// Supplied a key, lets check it
 		if (!empty($key))
 		{
 			preg_match($regex_key, $key, $match);
 		}
+		// Otherwise we play find the key
 		else
 		{
-			// Check our reply_to_msg_id based on in-reply-to and references, the key *should* be there.
-			if (empty($this->headers['in-reply-to']) || preg_match($regex_key, $this->headers['in-reply-to'], $match) === 0)
+			if (!$this->_load_key_from_headers($regex_key))
 			{
-				// Check if references are set, sometimes email clients thread from there
-				if (!empty($this->headers['references']))
-				{
-					// Maybe our security key is in the references
-					$refs = explode(' ', $this->headers['references']);
-					foreach ($refs as $ref)
-					{
-						if (preg_match($regex_key, $ref, $match))
-						{
-							// Found the key in the ref, set the in-reply-to
-							$this->headers['in-reply-to'] = $match[1];
-							$found_key = true;
-							break;
-						}
-					}
-				}
-			}
-			else
-			{
-				$found_key = true;
-			}
-
-			// Nada ... Lets look a bit deeper
-			if (!$found_key)
-			{
-				// Not found in the headers, so lets search the body for the [key]
-				// as we insert that on outbound email just for this
-				$regex_key = '~\[(([a-z0-9]{32})\-(p|t|m)(\d+))\]~i';
-
-				// Check the message body
-				if (preg_match($regex_key, $this->body, $match) === 1)
-				{
-					$this->headers['in-reply-to'] = $match[1];
-				}
-				// Grrr ... check everything!
-				elseif (preg_match($regex_key, $this->raw_message, $match) === 1)
-				{
-					$this->headers['in-reply-to'] = $match[1];
-				}
-				// Force feeding
-				elseif (!empty($key))
-				{
-					$this->headers['in-reply-to'] = $key;
-				}
+				$this->_load_key_from_body();
 			}
 		}
 
-		// Load the key details so they can be accessed
+		return !empty($this->message_key_id) ? $this->message_key_id : false;
+	}
+
+	/**
+	 * Searches the most common locations for the security key
+	 *
+	 * - Normal return location would be in the in-reply-to header
+	 * - Common for it to be shifted to a reference header
+	 *
+	 * @param string $regex_key
+	 *
+	 * @return bool is the security key is found or not
+	 */
+	private function _load_key_from_headers($regex_key)
+	{
+		$found_key = false;
+
+		// Check our reply_to_msg_id based on in-reply-to and references, the key *should* be there.
+		if (empty($this->headers['in-reply-to']) || preg_match($regex_key, $this->headers['in-reply-to'], $match) === 0)
+		{
+			// Check if references are set, sometimes email clients thread from there
+			if (!empty($this->headers['references']))
+			{
+				// Maybe our security key is in the references
+				$refs = explode(' ', $this->headers['references']);
+				foreach ($refs as $ref)
+				{
+					if (preg_match($regex_key, $ref, $match))
+					{
+						// Found the key in the ref, set the in-reply-to
+						$this->headers['in-reply-to'] = $match[1];
+						$this->_load_key_details($match);
+						$found_key = true;
+						break;
+					}
+				}
+			}
+		}
+		else
+		{
+			$this->_load_key_details($match);
+			$found_key = true;
+		}
+
+		return $found_key;
+	}
+
+	/**
+	 * Searches the message body or the raw email in search of the key
+	 *
+	 * - Not found in the headers, so lets search the body for the [key]
+	 * as we insert that on outbound email just for this
+	 */
+	private function _load_key_from_body()
+	{
+		$regex_key = '~\[(([a-z0-9]{32})\-(p|t|m)(\d+))\]~i';
+		$found_key = false;
+
+		// Check the message body
+		if (preg_match($regex_key, $this->body, $match) === 1)
+		{
+			$this->headers['in-reply-to'] = $match[1];
+			$this->_load_key_details($match);
+			$found_key = true;
+		}
+		// Grrr ... check everything!
+		elseif (preg_match($regex_key, $this->raw_message, $match) === 1)
+		{
+			$this->headers['in-reply-to'] = $match[1];
+			$this->_load_key_details($match);
+			$found_key = true;
+		}
+
+		return $found_key;
+	}
+
+	/**
+	 * Loads found key details for use in other functions
+	 *
+	 * @param string[] $match from regex 1=>full, 2=>key, 3=>p|t|m, 4=>12345
+	 */
+	private function _load_key_details($match)
+	{
 		if (!empty($match[1]))
 		{
 			$this->message_key_id = $match[1];
 			$this->message_key = $match[2];
 			$this->message_type = $match[3];
 			$this->message_id = (int) $match[4];
-
-			return $match[1];
 		}
-
-		return false;
 	}
 
 	/**
@@ -1182,8 +1217,6 @@ class Email_Parse
 		{
 			$this->spam_found = true;
 		}
-		// Cisco Ironport ... This header is encrypted so its useless other than knowing it was scanned
-		//elseif (isset($this->headers['x-ironport-anti-spam-result']) && strtolower(substr($this->headers['x-ironport-anti-spam-result'],0, 4)) === 'No idea what to check')
 		// Nucleus Mailscanner
 		elseif (isset($this->headers['x-nucleus-mailscanner']) && strtolower($this->headers['x-nucleus-mailscanner']) !== 'found to be clean')
 		{
