@@ -1231,11 +1231,16 @@ class Email_Parse
 	 * Validates that the ip is a valid ip4 address
 	 *
 	 * @param string|null $string
-	 * @return array
+	 * @return string
 	 */
 	private function _parse_ip($string)
 	{
-		$string = trim($string, '[] ');
+		if (preg_match('~\[?([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})\]?~', $string, $matches) !== 1)
+		{
+			return '';
+		}
+
+		$string = trim($matches[0], '[] ');
 
 		// Validate it matches an ip4 standard
 		if (filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false)
@@ -1244,7 +1249,7 @@ class Email_Parse
 		}
 		else
 		{
-			return;
+			return '';
 		}
 	}
 
