@@ -16,10 +16,7 @@ global $txt;
 // Lots of needs
 require_once(BOARDDIR . '/sources/database/Db.php');
 require_once(BOARDDIR . '/sources/database/Db-abstract.class.php');
-require_once(BOARDDIR . '/sources/Errors.class.php');
-require_once(BOARDDIR . '/sources/subs/Errors/Errors.php');
 require_once(BOARDDIR . '/sources/Subs.php');
-require_once(BOARDDIR . '/sources/subs/Cache.class.php');
 require_once(BOARDDIR . '/sources/subs/Cache.subs.php');
 require_once(BOARDDIR . '/sources/database/Database.subs.php');
 require_once(BOARDDIR . '/install/installcore.php');
