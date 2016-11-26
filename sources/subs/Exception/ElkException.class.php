@@ -145,7 +145,7 @@ class Elk_Exception extends Exception
 	 *
 	 * @return string The index or the message.
 	 */
-	protected function logMessage($message, $lang)
+	protected function logMessage($msg, $lang)
 	{
 		global $user_info, $language, $txt;
 
