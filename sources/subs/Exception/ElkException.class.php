@@ -156,8 +156,8 @@ class Elk_Exception extends Exception
 		if ($language == $user_info['language'])
 			loadLanguage($lang, $language);
 
-		$msg = !isset($txt[$msg]) ? $msg : (empty() ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
-		Errors::instance()->log_error($msg, 'general', $this->sprintf, $this->getFile(), $this->getLine());
+		$msg = !isset($txt[$msg]) ? $msg : (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
+		Errors::instance()->log_error($msg, 'general', $this->getFile(), $this->getLine());
 	}
 
 	/**
