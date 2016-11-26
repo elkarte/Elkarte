@@ -27,11 +27,8 @@ use ErrorException;
  */
 final class ErrorHandler extends Errors
 {
-	/** @var string The prepared error string from getTrace to display when debug is enabled */
-	private $error_text = '';
-
 	/** @var int Mask for errors that are fatal and will halt */
-	protected $fatalErrors;
+	protected $fatalErrors = E_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_CORE_ERROR | E_PARSE;
 
 	/** @var string The error string from $e->getMessage() */
 	private $error_string;
@@ -50,11 +47,6 @@ final class ErrorHandler extends Errors
 	 */
 	public function __construct()
 	{
-		$this->errors = Errors::instance();
-
-		// Build the bitwise mask
-		$this->fatalErrors = E_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_CORE_ERROR | E_PARSE;
-
 		// Register the class handlers to the PHP handler functions
 		set_error_handler(array($this, 'error_handler'));
 		set_exception_handler(array($this, 'exception_handler'));
@@ -134,8 +126,8 @@ final class ErrorHandler extends Errors
 	 *
 	 * - It dies with fatal_error() if the error_level matches with error_reporting.
 	 *
-	 * @param Exception|Throwable $e The error. Since the code shall work with php 5 and 7
-	 *                               we cannot type-hint the function parameter.
+	 * @param \Exception|\Throwable $e The error. Since the code shall work with php 5 and 7
+	 *                                 we cannot type-hint the function parameter.
 	 */
 	public function exception_handler($e)
 	{
@@ -164,7 +156,7 @@ final class ErrorHandler extends Errors
 
 		// If this is an E_ERROR, E_USER_ERROR, E_WARNING, or E_USER_WARNING.... die.  Violently so.
 		if ($this->error_level & $this->fatalErrors || $this->error_level % 255 === E_WARNING || $isException)
-			$this->_setup_fatal_error_context($message, false);
+			$this->_setup_fatal_error_context($message, $this->error_level);
 		else
 		{
 			// Display debug information?
@@ -204,9 +196,7 @@ final class ErrorHandler extends Errors
 	/**
 	 * Builds the error text stack trace for display when using debug options
 	 *
-	 * @param exception $e
-	 * @param string|null $err_file
-	 * @param int|null $err_line
+	 * @param \Exception|\Throwable $exception
 	 */
 	private function _prepareErrorDisplay($exception)
 	{
@@ -227,6 +217,7 @@ final class ErrorHandler extends Errors
 			}
 
 			$result = array();
+			$key = 0;
 			foreach ($trace as $key => $stackPoint)
 			{
 				$result[] = sprintf(
@@ -239,7 +230,7 @@ final class ErrorHandler extends Errors
 				);
 			}
 			// trace always ends with {main}
-			$result[] = '#' . ++$key . ' {main}';
+			$result[] = '#' . {++$key} . ' {main}';
 
 			// write tracelines into main template
 			return sprintf(
