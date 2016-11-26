@@ -1139,7 +1139,6 @@ class ManageMaillist_Controller extends Action_Controller
 			'items_per_page' => 0,
 			'no_items_label' => $txt['no_parsers'],
 			'base_href' => $scripturl . '?action=admin;area=maillist;sa=sortparsers',
-			'default_sort_col' => 'filterorder',
 			'get_items' => array(
 				'function' => array($this, 'load_filter_parser'),
 				'params' => array(
