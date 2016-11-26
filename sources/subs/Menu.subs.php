@@ -393,7 +393,7 @@ function callMenu($selectedMenu)
 }
 
 /**
- * Loads up all the defult menu entries available.
+ * Loads up all the default menu entries available.
  *
  * @return array
  */
