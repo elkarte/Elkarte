@@ -1100,6 +1100,7 @@ class Email_Parse
 	{
 		if (!empty($match[1]))
 		{
+			// 1=>7738c27ae6c431495ad26587f30e2121-m29557, 2=>7738c27ae6c431495ad26587f30e2121, 3=>m, 4=>29557
 			$this->message_key_id = $match[1];
 			$this->message_key = $match[2];
 			$this->message_type = $match[3];
