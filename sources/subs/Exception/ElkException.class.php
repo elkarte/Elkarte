@@ -13,6 +13,8 @@
  *
  */
 
+use ElkArte\Errors\Errors;
+
 /**
  * Class Elk_Exception
  */
@@ -58,7 +60,7 @@ class Elk_Exception extends Exception
 		$this->log = $log;
 		$this->sprintf = $sprintf;
 
-		$this->index_message = $this->_cleanMessage($message);
+		$this->index_message = $this->loadMessage($message);
 
 		if (isset($txt[$this->index_message]))
 			$real_message = $txt[$this->index_message];
@@ -87,9 +89,9 @@ class Elk_Exception extends Exception
 	 *   - "index" can be anything
 	 * - "language" is loaded by loadLanguage.
 	 *
-	 * @return string The index or the message.
+	 * @return string[]
 	 */
-	protected function _cleanMessage($message)
+	protected function parseMessage($message)
 	{
 		// Load message with language support
 		if (is_array($message))
@@ -115,7 +117,47 @@ class Elk_Exception extends Exception
 
 		loadLanguage($language);
 
+		return array($msg, $language);
+	}
+
+	/**
+	 * Loads the languadge file specified in Elk_Exception::parseMessage()
+	 * and replaces the index received in the constructor.
+	 *
+	 * @return string The index or the message.
+	 */
+	protected function loadMessage($message)
+	{
+		global $user_info, $language, $txt;
+
+		list ($msg, $lang) = $this->parseMessage($message);
+		$this->logMessage($message $lang);
+		loadLanguage($lang);
+
+		$msg = !isset($txt[$msg]) ? $msg : (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
+
 		return $msg;
+	}
+
+	/**
+	 * Loads the languadge file specified in Elk_Exception::parseMessage()
+	 * and replaces the index received in the constructor.
+	 *
+	 * @return string The index or the message.
+	 */
+	protected function logMessage($message, $lang)
+	{
+		global $user_info, $language, $txt;
+
+		/*
+		 * Don't need to reload the language file if both the user and
+		 * the forum share the same languasge.
+		 */
+		if ($language == $user_info['language'])
+			loadLanguage($lang, $language);
+
+		$msg = !isset($txt[$msg]) ? $msg : (empty() ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
+		Errors::instance()->log_error($msg, 'general', $this->sprintf, $this->getFile(), $this->getLine());
 	}
 
 	/**
