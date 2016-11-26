@@ -91,6 +91,7 @@ class Recent_Controller extends Action_Controller
 				'post_reply_any' => 'can_reply',
 				'mark_any_notify' => 'can_mark_notify',
 				'delete_any' => 'can_delete',
+				'like_posts' => 'can_like'
 			)
 		);
 	}
@@ -163,6 +164,9 @@ class Recent_Controller extends Action_Controller
 			$context['posts'] = $this->_grabber->getRecentPosts($this->_start, $this->_permissions);
 		}
 
+		// Load any likes for the messages
+		$context['likes'] = $this->_getLikes($context['posts']);
+
 		foreach ($context['posts'] as $counter => $post)
 		{
 			// Some posts - the first posts - can't just be deleted.
@@ -171,35 +175,87 @@ class Recent_Controller extends Action_Controller
 			// And some cannot be quoted...
 			$context['posts'][$counter]['tests']['can_quote'] = $context['posts'][$counter]['tests']['can_reply'] && $quote_enabled;
 
+			// Likes are always a bit particular
+			$post['you_liked'] = !empty($context['likes'][$counter]['member'])
+				&& isset($context['likes'][$counter]['member'][$user_info['id']]);
+			$post['use_likes'] = allowedTo('like_posts') && empty($context['is_locked'])
+				&& ($post['poster']['id'] != $user_info['id'] || !empty($modSettings['likeAllowSelf']))
+				&& (empty($modSettings['likeMinPosts']) ? true : $modSettings['likeMinPosts'] <= $user_info['posts']);
+			$post['like_count'] = !empty($context['likes'][$counter]['count']) ? $context['likes'][$counter]['count'] : 0;
+			$post['can_like'] = !empty($post['tests']['can_like']) && $post['use_likes'];
+			$post['can_unlike'] = $post['use_likes'] && $post['you_liked'];
+			$post['like_counter'] = $post['like_count'];
+
 			// Let's add some buttons here!
-			$context['posts'][$counter]['buttons'] = array(
-				// How about... even... remove it entirely?!
-				'remove' => array(
-					'href' => $scripturl . '?action=deletemsg;msg=' . $post['id'] . ';topic=' . $post['topic'] . ';recent;' . $context['session_var'] . '=' . $context['session_id'],
-					'text' => $txt['remove'],
-					'test' => 'can_delete',
-					'custom' => 'onclick="return confirm(' . JavaScriptEscape($txt['remove_message'] . '?') . ');"',
-				),
-				// Can we request notification of topics?
-				'notify' => array(
-					'href' => $scripturl . '?action=notify;topic=' . $post['topic'] . '.' . $post['start'],
-					'text' => $txt['notify'],
-					'test' => 'can_mark_notify',
-				),
-				// If they *can* reply?
-				'reply' => array(
-					'href' => $scripturl . '?action=post;topic=' . $post['topic'] . '.' . $post['start'],
-					'text' => $txt['reply'],
-					'test' => 'can_reply',
-				),
-				// If they *can* quote?
-				'quote' => array(
-					'href' => $scripturl . '?action=post;topic=' . $post['topic'] . '.' . $post['start'] . ';quote=' . $post['id'],
-					'text' => $txt['quote'],
-					'test' => 'can_quote',
-				),
-			);
+			$context['posts'][$counter]['buttons'] = $this->_addButtons($post);
 		}
+	}
+
+	/**
+	 * Create the buttons that are available for this post
+	 *
+	 * @param $post
+	 * @return array
+	 */
+	private function _addButtons($post)
+	{
+		global $context, $txt, $scripturl;
+
+		$txt_like_post = '<li></li>';
+
+		// Can they like/unlike this post?
+		if ($post['can_like'] || $post['can_unlike'])
+		{
+			$txt_like_post = '
+				<li class="listlevel1' . (!empty($post['like_counter']) ? ' liked"' : '"') . '>
+					<a class="linklevel1 ' . ($post['can_unlike'] ? 'unlike_button' : 'like_button') . '" href="javascript:void(0)" title="' . (!empty($post['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$post['id']]['member']) : '') . '" onclick="likePosts.prototype.likeUnlikePosts(event,' . $post['id'] . ', ' . $post['topic'] . '); return false;">' .
+						(!empty($post['like_counter']) ? '<span class="likes_indicator">' . $post['like_counter'] . '</span>&nbsp;' . $txt['likes'] : $txt['like_post']) . '
+					</a>
+				</li>';
+		}
+		// Or just view the count
+		elseif (!empty($post['like_counter']))
+		{
+			$txt_like_post = '
+				<li class="listlevel1 liked">
+					<a href="javascript:void(0)" title="' . $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$post['id']]['member']) . '" class="linklevel1 likes_button">
+						<span class="likes_indicator">' . $post['like_counter'] . '</span>&nbsp;' . $txt['likes'] . '
+					</a>
+				</li>';
+		}
+
+		return  array(
+			// How about... even... remove it entirely?!
+			'remove' => array(
+				'href' => $scripturl . '?action=deletemsg;msg=' . $post['id'] . ';topic=' . $post['topic'] . ';recent;' . $context['session_var'] . '=' . $context['session_id'],
+				'text' => $txt['remove'],
+				'test' => 'can_delete',
+				'custom' => 'onclick="return confirm(' . JavaScriptEscape($txt['remove_message'] . '?') . ');"',
+			),
+			// Can we request notification of topics?
+			'notify' => array(
+				'href' => $scripturl . '?action=notify;topic=' . $post['topic'] . '.' . $post['start'],
+				'text' => $txt['notify'],
+				'test' => 'can_mark_notify',
+			),
+			// If they *can* reply?
+			'reply' => array(
+				'href' => $scripturl . '?action=post;topic=' . $post['topic'] . '.' . $post['start'],
+				'text' => $txt['reply'],
+				'test' => 'can_reply',
+			),
+			// If they *can* quote?
+			'quote' => array(
+				'href' => $scripturl . '?action=post;topic=' . $post['topic'] . '.' . $post['start'] . ';quote=' . $post['id'],
+				'text' => $txt['quote'],
+				'test' => 'can_quote',
+			),
+			// If they *can* like?
+			'like' => array(
+				'override' => $txt_like_post,
+				'test' => 'can_like',
+			),
+		);
 	}
 
 	/**
@@ -310,5 +366,66 @@ class Recent_Controller extends Action_Controller
 
 		// Set up the pageindex
 		$this->_base_url = $scripturl . '?action=recent';
+	}
+
+	/**
+	 * Loads the likes for the set of recent messages
+	 *
+	 * @param array $messages
+	 */
+	private function _getLikes($messages)
+	{
+		global $modSettings;
+
+		$likes = array();
+
+		// Load in the likes for this group of messages
+		if (!empty($modSettings['likes_enabled']))
+		{
+			// Just the message id please
+			$messages = array_column($messages, 'id');
+
+			require_once(SUBSDIR . '/Likes.subs.php');
+			$likes = loadLikes($messages, true);
+
+			$this->_likesJS();
+		}
+
+		return $likes;
+	}
+
+	/**
+	 * Load in the JS for likes functionality
+	 */
+	private function _likesJS()
+	{
+		global $txt;
+
+		// ajax controller for likes
+		loadJavascriptFile('like_posts.js', array('defer' => true));
+		addJavascriptVar(array(
+			'likemsg_are_you_sure' => JavaScriptEscape($txt['likemsg_are_you_sure']),
+		));
+		loadLanguage('Errors');
+
+		// Initiate likes and the tooltips for likes
+		addInlineJavascript('
+			$(function() {
+				var likePostInstance = likePosts.prototype.init({
+					oTxt: ({
+						btnText : ' . JavaScriptEscape($txt['ok_uppercase']) . ',
+						likeHeadingError : ' . JavaScriptEscape($txt['like_heading_error']) . ',
+						error_occurred : ' . JavaScriptEscape($txt['error_occurred']) . '
+					}),
+				});
+
+				$(".like_button, .unlike_button, .likes_button").SiteTooltip({
+					hoverIntent: {
+						sensitivity: 10,
+						interval: 150,
+						timeout: 50
+					}
+				});
+			});', true);
 	}
 }

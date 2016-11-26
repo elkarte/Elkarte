@@ -649,20 +649,21 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
  *
  * What it does:
  * - Create a quick button, pass an array of the button name with key values
- * - array('somename' => array(href => text => custom => test =>))
- *        - href => link to call when button is pressed
- *        - text => text to display in the button
- *        - custom => custom action to perform, generally used to add 'onclick' events (optional)
- *        - test => key to check in the $tests array before showing the button (optional)
- *    - checkboxes can be shown as well as buttons, use array('check' => array(checkbox => (true | always), name =>
- * value =>)
- *        - if true follows show moderation as checkbox setting, always will always show
- *        - name => name of the checkbox array, like delete, will have [] added for the form
- *        - value => value for the checkbox to return in the post
+ * - array('somename' => array(href => '' text => '' custom => '' test => ''))
+ *      - href => link to call when button is pressed
+ *      - text => text to display in the button
+ *      - custom => custom action to perform, generally used to add 'onclick' events (optional)
+ *      - test => key to check in the $tests array before showing the button (optional)
+ * 		- override => full and complete <li></li> to use for the button
+ * - checkboxes can be shown as well as buttons,
+ *		- use array('check' => array(checkbox => (true | always), name => value =>)
+ *      - if true follows show moderation as checkbox setting, always will always show
+ *      - name => name of the checkbox array, like delete, will have [] added for the form
+ *      - value => value for the checkbox to return in the post
  *
  * @param array $strip - the $context index where the strip is stored
- * @param bool[] $tests - an array of tests to determine if the button should
- * be displayed or not
+ * @param bool[] $tests - an array of tests to determine if the button should be displayed or not
+ * @return string of buttons
  */
 function template_quickbutton_strip($strip, $tests = array())
 {
@@ -675,21 +676,34 @@ function template_quickbutton_strip($strip, $tests = array())
 		if (isset($value['checkbox']))
 		{
 			if (!empty($value['checkbox']) && ((!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1) || $value['checkbox'] === 'always'))
+			{
 				$buttons[] = '
 						<li class="listlevel1 ' . $key . '">
 							<input class="input_check ' . $key . '_check" type="checkbox" name="' . $value['name'] . '[]" value="' . $value['value'] . '" />
 						</li>';
+			}
 		}
 		elseif (!isset($value['test']) || !empty($tests[$value['test']]))
-			$buttons[] = '
+		{
+			if (!empty($value['override']))
+			{
+				$buttons[] = $value['override'];
+			}
+			else
+			{
+				$buttons[] = '
 						<li class="listlevel1">
 							<a href="' . $value['href'] . '" class="linklevel1 ' . $key . '_button"' . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '>' . $value['text'] . '</a>
 						</li>';
+			}
+		}
 	}
 
 	// No buttons? No button strip either.
 	if (empty($buttons))
-		return;
+	{
+		return '';
+	}
 
 	echo '
 					<ul class="quickbuttons">', implode('

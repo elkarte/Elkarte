@@ -685,6 +685,12 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 /**
  * Function to get most liked topics.
  *
+ *  - Rewards threads that generate distinct likers in fewer posts.  So if a thread generated 20 unique
+ * likes in 3 posts vs 20 in 20 posts it would get more weight.
+ * - The more unique members that like a thread the more popular it will be.
+ * - Adds weight to threads which have posts with many likes vs threads with many posts with many single likes
+ * - Can still be gamed but what can you do
+ *
  * @package Likes
  * @param null|int $board - An optional board id to find most liked topics in.
  *  If omitted, {query_wanna_see_board} is used to return the most liked topics in the boards
