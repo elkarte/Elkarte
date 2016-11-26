@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Grabs unread messages from an imap account and saves them as .eml files
+ * Grabs unread messages from an imap account
  * Passes any new messages found to the postby email function for processing
  *
  * @name      ElkArte Forum
@@ -13,7 +13,7 @@
  */
 
 /**
- * Grabs unread messages from an imap account and saves them as .eml files
+ * Grabs unread messages from an imap account
  * Passes any new messages found to the postby email function for processing
  */
 class Pbe_Imap extends AbstractModel
