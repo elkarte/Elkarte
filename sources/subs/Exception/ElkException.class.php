@@ -13,7 +13,7 @@
  *
  */
 
-use ElkArte\Errors\Errors;
+use ElkArte\Errors\Errors as E;
 
 /**
  * Class Elk_Exception
@@ -157,7 +157,7 @@ class Elk_Exception extends Exception
 			loadLanguage($lang, $language);
 
 		$msg = !isset($txt[$msg]) ? $msg : (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
-		Errors::instance()->log_error($msg, 'general', $this->getFile(), $this->getLine());
+		E::instance()->log_error($msg, 'general', $this->getFile(), $this->getLine());
 	}
 
 	/**
@@ -165,6 +165,6 @@ class Elk_Exception extends Exception
 	 */
 	public function fatalLangError()
 	{
-		Errors::instance()->fatal_lang_error($this->index_message, $this->log, $this->sprintf);
+		E::instance()->fatal_lang_error($this->index_message, $this->log, $this->sprintf);
 	}
 }
