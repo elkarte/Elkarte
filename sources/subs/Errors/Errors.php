@@ -27,11 +27,19 @@ use Template_Layers;
  */
 class Errors
 {
-	/**
-	 * Sole private Errors instance
-	 * @var Errors
-	 */
+	/** @var Errors Sole private Errors instance */
 	private static $_errors = null;
+
+	/** @var string[] The types of categories we have */
+	private $errorTypes = array(
+		'general',
+		'critical',
+		'database',
+		'undefined_vars',
+		'user',
+		'template',
+		'debug',
+	);
 
 	/**
 	 * Halts execution, optionally displays an error message
@@ -44,46 +52,40 @@ class Errors
 	}
 
 	/**
-	 * Log an error to the error log if the error logging is enabled.
-	 *
-	 * - filename and line should be __FILE__ and __LINE__, respectively.
-	 *
-	 * Example use:
-	 *   - die(Errors::instance()->log_error($msg));
-	 *
-	 * @param string $error_message
-	 * @param string|boolean $error_type = 'general'
-	 * @param string|null $file = null
-	 * @param int|null $line = null
+	 * @param string $errorType
 	 */
-	public function log_error($error_message, $error_type = 'general', $file = null, $line = null)
+	public function addErrorTypes($errorType)
 	{
-		global $modSettings, $user_info, $scripturl, $last_error;
+		$this->errorTypes[] = $errorType;
+	}
 
-		$db = database();
+	/**
+	 * @return string[]
+	 */
+	protected function getErrorTypes()
+	{
 		static $tried_hook = false;
 
-		// Check if error logging is actually on.
-		if (empty($modSettings['enableErrorLogging']))
-			return $error_message;
+		// Perhaps integration wants to add specific error types for the log
+		$errorTypes = array();
+		if (empty($tried_hook))
+		{
+			// This prevents us from infinite looping if the hook or call produces an error.
+			$tried_hook = true;
+			call_integration_hook('integrate_error_types', array(&$errorTypes));
+			$this->errorTypes += $errorTypes;
+		}
 
-		// Basically, htmlspecialchars it minus &. (for entities!)
-		$error_message = strtr($error_message, array('<' => '&lt;', '>' => '&gt;', '"' => '&quot;'));
-		$error_message = strtr($error_message, array('&lt;br /&gt;' => '<br />', '&lt;b&gt;' => '<strong>', '&lt;/b&gt;' => '</strong>', "\n" => '<br />'));
+		return $this->errorTypes;
+	}
 
-		// Add a file and line to the error message?
-		// Don't use the actual txt entries for file and line but instead use %1$s for file and %2$s for line
-		// Window style slashes don't play well, lets convert them to the unix style.
-		$file = ($file === null) ? $file = '' : str_replace('\\', '/', $file);
-		$line = ($line === null) ? $line = 0 : (int) $line;
+	/**
+	 * @return string
+	 */
+	private function parseQueryString()
+	{
+		global $scripturl;
 
-		// Just in case there's no id_member or IP set yet.
-		if (empty($user_info['id']))
-			$user_info['id'] = 0;
-		if (empty($user_info['ip']))
-			$user_info['ip'] = '';
-
-		// Find the best query string we can...
 		$query_string = empty($_SERVER['QUERY_STRING']) ? (empty($_SERVER['REQUEST_URL']) ? '' : str_replace($scripturl, '', $_SERVER['REQUEST_URL'])) : $_SERVER['QUERY_STRING'];
 
 		// Don't log the session hash in the url twice, it's a waste.
@@ -93,29 +95,20 @@ class Errors
 		if (isset($_POST['board']) && !isset($_GET['board']))
 			$query_string .= ($query_string == '' ? 'board=' : ';board=') . $_POST['board'];
 
-		// What types of categories do we have?$other_error_types = array();
-		$known_error_types = array(
-			'general',
-			'critical',
-			'database',
-			'undefined_vars',
-			'user',
-			'template',
-			'debug',
-		);
+		return $query_string;
+	}
 
-		// Perhaps integration wants to add specific error types for the log
-		$other_error_types = array();
-		if (empty($tried_hook))
-		{
-			// This prevents us from infinite looping if the hook or call produces an error.
-			$tried_hook = true;
-			call_integration_hook('integrate_error_types', array(&$other_error_types));
-			$known_error_types += $other_error_types;
-		}
+	private function insertLog($query_string, $error_message, $error_type, $file, $line)
+	{
+		global $user_info, $last_error;
 
-		// Make sure the category that was specified is a valid one
-		$error_type = in_array($error_type, $known_error_types) && $error_type !== true ? $error_type : 'general';
+		$db = database();
+
+		// Just in case there's no id_member or IP set yet.
+		if (empty($user_info['id']))
+			$user_info['id'] = 0;
+		if (empty($user_info['ip']))
+			$user_info['ip'] = '';
 
 		// Don't log the same error countless times, as we can get in a cycle of depression...
 		$error_info = array($user_info['id'], time(), $user_info['ip'], $query_string, $error_message, (string) $_SESSION['session_value'], $error_type, $file, $line);
@@ -130,6 +123,51 @@ class Errors
 			);
 			$last_error = $error_info;
 		}
+	}
+
+	/**
+	 * Log an error to the error log if the error logging is enabled.
+	 *
+	 * - filename and line should be __FILE__ and __LINE__, respectively.
+	 *
+	 * Example use:
+	 *   - die(Errors::instance()->log_error($msg));
+	 *
+	 * @param string $error_message
+	 * @param string|boolean $error_type = 'general'
+	 * @param string $file = ''
+	 * @param int $line = 0
+	 *
+	 * @return string
+	 */
+	public function log_error($error_message, $error_type = 'general', $file = '', $line = 00)
+	{
+		global $modSettings;
+
+		$db = database();
+
+		// Check if error logging is actually on.
+		if (empty($modSettings['enableErrorLogging']))
+			return $error_message;
+
+		// Basically, htmlspecialchars it minus &. (for entities!)
+		$error_message = strtr($error_message, array('<' => '&lt;', '>' => '&gt;', '"' => '&quot;'));
+		$error_message = strtr($error_message, array('&lt;br /&gt;' => '<br />', '&lt;b&gt;' => '<strong>', '&lt;/b&gt;' => '</strong>', "\n" => '<br />'));
+
+		// Add a file and line to the error message?
+		// Don't use the actual txt entries for file and line but instead use %1$s for file and %2$s for line
+		// Windows-style slashes don't play well, lets convert them to the unix style.
+		$file = str_replace('\\', '/', $file);
+		$line = (int) $line;
+
+		// Find the best query string we can...
+		$query_string = $this->parseQueryString();
+
+		// Make sure the category that was specified is a valid one
+		$error_type = in_array($error_type, $this->getErrorTypes()) && $error_type !== true ? $error_type : 'general';
+
+		// Insert the error into the database.
+		$this->insertLog($query_string, $error_message, $error_type, $file, $line);
 
 		// Return the message to make things simpler.
 		return $error_message;
@@ -144,10 +182,12 @@ class Errors
 	 * @param string $error
 	 * @param string $error_type = 'general'
 	 * @param string|mixed[] $sprintf = array()
-	 * @param string|null $file = null
-	 * @param int|null $line = null
+	 * @param string|null $file = ''
+	 * @param int|null $line = 0
+	 *
+	 * @return string
 	 */
-	public function log_lang_error($error, $error_type = 'general', $sprintf = array(), $file = null, $line = null)
+	public function log_lang_error($error, $error_type = 'general', $sprintf = array(), $file = '', $line = 0)
 	{
 		global $user_info, $language, $txt;
 
@@ -161,6 +201,9 @@ class Errors
 		// Load the language file, only if it needs to be reloaded
 		if ($reload_lang_file)
 			loadLanguage('Errors');
+
+		// Return the message to make things simpler.
+		return $error_message;
 	}
 
 	/**
@@ -204,7 +247,7 @@ class Errors
 	 * @param string $error_message
 	 * @param string $error_code string or int code
 	 */
-	final protected function _setup_fatal_error_context($error_message, $error_code)
+	final protected function _setup_fatal_ErrorContext($error_message, $error_code)
 	{
 		global $context, $txt, $ssi_on_error_method;
 		static $level = 0;

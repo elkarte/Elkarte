@@ -156,7 +156,7 @@ final class ErrorHandler extends Errors
 
 		// If this is an E_ERROR, E_USER_ERROR, E_WARNING, or E_USER_WARNING.... die.  Violently so.
 		if ($this->error_level & $this->fatalErrors || $this->error_level % 255 === E_WARNING || $isException)
-			$this->_setup_fatal_error_context($message, $this->error_level);
+			$this->_setup_fatal_ErrorContext($message, $this->error_level);
 		else
 		{
 			// Display debug information?
@@ -194,43 +194,22 @@ final class ErrorHandler extends Errors
 	}
 
 	/**
-	 * Builds the error text stack trace for display when using debug options
+	 * Builds the error text for display.
+	 *
+	 * Shows the stack trace if in debug mode and user is admin.
 	 *
 	 * @param \Exception|\Throwable $exception
+	 *
+	 * $return string The fully parsed error message
 	 */
 	private function _prepareErrorDisplay($exception)
 	{
 		global $db_show_debug;
 
 		// Showing the errors, lets make it look decent
-		if ($db_show_debug === true)
+		if ($db_show_debug === true && allowedTo('admin_forum'))
 		{
-			// these are our templates
-			$traceline = '#%s %s(%s): %s(%s)';
 			$msg = 'PHP Fatal error:  Uncaught exception \'%s\' with message \'%s\' in %s:%s<br>Stack trace:<br>%s<br>  thrown in %s on line %s';
-
-			$trace = $exception->getTrace();
-			foreach ($trace as $key => $stackPoint)
-			{
-				// convert arguments to their type
-				$trace[$key]['args'] = array_map('gettype', $trace[$key]['args']);
-			}
-
-			$result = array();
-			$key = 0;
-			foreach ($trace as $key => $stackPoint)
-			{
-				$result[] = sprintf(
-					$traceline,
-					$key,
-					$stackPoint['file'],
-					$stackPoint['line'],
-					$stackPoint['function'],
-					implode(', ', $stackPoint['args'])
-				);
-			}
-			// trace always ends with {main}
-			$result[] = '#' . {++$key} . ' {main}';
 
 			// write tracelines into main template
 			return sprintf(
@@ -239,12 +218,48 @@ final class ErrorHandler extends Errors
 				$exception->getMessage(),
 				$exception->getFile(),
 				$exception->getLine(),
-				implode('<br>', $result),
+				implode('<br>', $this->parseTrace($exception)),
 				$exception->getFile(),
 				$exception->getLine()
 			);
 		}
 		else
 			return $this->error_name . ': ' . $this->error_string;
+	}
+
+	/**
+	 * Builds the stack trace for display.
+	 *
+	 * @param \Exception|\Throwable $exception
+	 *
+	 * $return string The fully parsed stack trace
+	 */
+	private function parseTrace($exception)
+	{
+		$traceline = '#%s %s(%s): %s(%s)';
+		$trace = $exception->getTrace();
+		foreach ($trace as $key => $stackPoint)
+		{
+			// convert arguments to their type
+			$trace[$key]['args'] = array_map('gettype', $trace[$key]['args']);
+		}
+
+		$result = array();
+		$key = 0;
+		foreach ($trace as $key => $stackPoint)
+		{
+			$result[] = sprintf(
+				$traceline,
+				$key,
+				$stackPoint['file'],
+				$stackPoint['line'],
+				$stackPoint['function'],
+				implode(', ', $stackPoint['args'])
+			);
+		}
+		// trace always ends with {main}
+		$result[] = '#' . ++$key . ' {main}';
+
+		return $result;
 	}
 }
