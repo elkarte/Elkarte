@@ -62,12 +62,6 @@ class Custom_Search extends SearchAPI
 	protected $min_word_length = null;
 
 	/**
-	 * Any word excluded from the search?
-	 * @var array
-	 */
-	protected $_excludedWords = array();
-
-	/**
 	 * What databases support the custom index?
 	 * @var array
 	 */
@@ -122,16 +116,6 @@ class Custom_Search extends SearchAPI
 		$y = strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
 
 		return $y < $x ? 1 : ($y > $x ? -1 : 0);
-	}
-
-	/**
-	 * Adds the excluded words list
-	 *
-	 * @param string[] $words An array of words to exclude
-	 */
-	public function setExcludedWords($words)
-	{
-		$this->_excludedWords = $words;
 	}
 
 	/**

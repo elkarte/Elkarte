@@ -55,12 +55,6 @@ class Fulltext_Search extends SearchAPI
 	protected $min_word_length = 4;
 
 	/**
-	 * Any word excluded from the search?
-	 * @var array
-	 */
-	protected $_excludedWords = array();
-
-	/**
 	 * What databases support the fulltext index?
 	 * @var array
 	 */
@@ -136,16 +130,6 @@ class Fulltext_Search extends SearchAPI
 		$y = \Util::strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
 
 		return $x < $y ? 1 : ($x > $y ? -1 : 0);
-	}
-
-	/**
-	 * Adds the excluded words list
-	 *
-	 * @param string[] $words An array of words
-	 */
-	public function setExcludedWords($words)
-	{
-		$this->_excludedWords = $words;
 	}
 
 	/**

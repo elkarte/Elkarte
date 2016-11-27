@@ -41,6 +41,12 @@ abstract class SearchAPI implements Search_Interface
 	public $is_supported;
 
 	/**
+	 * Any word excluded from the search?
+	 * @var array
+	 */
+	protected $_excludedWords = array();
+
+	/**
 	 * Method to check whether the method can be performed by the API.
 	 *
 	 * @deprecated since 1.1 - check that the method is callable
@@ -61,6 +67,16 @@ abstract class SearchAPI implements Search_Interface
 	{
 		// Always fall back to the standard search method.
 		return true;
+	}
+
+	/**
+	 * Adds the excluded words list
+	 *
+	 * @param string[] $words An array of words to exclude
+	 */
+	public function setExcludedWords($words)
+	{
+		$this->_excludedWords = $words;
 	}
 
 	/**
