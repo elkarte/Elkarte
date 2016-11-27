@@ -145,7 +145,7 @@ function template_ban_edit()
 							<input type="checkbox" id="suggestions_', $key, '_', $count, '" name="ban_suggestions[', $key, '][]" ', !empty($context['ban_suggestions']['saved_triggers'][$key]) && in_array($ip, $context['ban_suggestions']['saved_triggers'][$key]) ? 'checked="checked" ' : '', 'value="', $ip, '" />
 						</dt>
 						<dd>
-							<label for="suggestions_', $key, '_', $count++, '">', $ip, '</label>
+							<label for="suggestions_', $key, '_', ($count++), '">', $ip, '</label>
 						</dd>';
 
 					echo '

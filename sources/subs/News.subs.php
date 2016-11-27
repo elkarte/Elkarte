@@ -98,7 +98,7 @@ function excludeBannedMembers()
 	while ($row = $db->fetch_assoc($request))
 	{
 		$condition_array[] = '{string:email_' . $count . '}';
-		$condition_array_params['email_' . $count++] = $row['email_address'];
+		$condition_array_params['email_' . ($count++)] = $row['email_address'];
 	}
 	$db->free_result($request);
 

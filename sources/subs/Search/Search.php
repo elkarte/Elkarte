@@ -1184,7 +1184,7 @@ class Search
 				foreach ($this->_excludedPhrases as $phrase)
 				{
 					$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:excluded_phrases_' . $count . '}';
-					$subject_query_params['excluded_phrases_' . $count++] = $this->_searchAPI->prepareWord($phrase, $this->noRegexp());
+					$subject_query_params['excluded_phrases_' . ($count++)] = $this->_searchAPI->prepareWord($phrase, $this->noRegexp());
 				}
 			}
 
@@ -1340,7 +1340,7 @@ class Search
 					{
 						$where[] = 'm.subject NOT' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:all_word_body_' . $count . '}';
 					}
-					$main_query['parameters']['all_word_body_' . $count++] = $this->_searchAPI->prepareWord($regularWord, $this->noRegexp());
+					$main_query['parameters']['all_word_body_' . ($count++)] = $this->_searchAPI->prepareWord($regularWord, $this->noRegexp());
 				}
 
 				if (!empty($where))
@@ -1618,13 +1618,13 @@ class Search
 
 					$subject_query['where'][] = '(subj' . $numTables . '.word IS NULL)';
 					$subject_query['where'][] = 'm.body NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:body_not_' . $count . '}';
-					$subject_query['params']['body_not_' . $count++] = $this->_searchAPI->prepareWord($subjectWord, $this->noRegexp());
+					$subject_query['params']['body_not_' . ($count++)] = $this->_searchAPI->prepareWord($subjectWord, $this->noRegexp());
 				}
 				else
 				{
 					$subject_query['inner_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.id_topic = ' . ($prev_join === 0 ? 't' : 'subj' . $prev_join) . '.id_topic)';
 					$subject_query['where'][] = 'subj' . $numTables . '.word LIKE {string:subject_like_' . $count . '}';
-					$subject_query['params']['subject_like_' . $count++] = empty($modSettings['search_match_words']) ? '%' . $subjectWord . '%' : $subjectWord;
+					$subject_query['params']['subject_like_' . ($count++)] = empty($modSettings['search_match_words']) ? '%' . $subjectWord . '%' : $subjectWord;
 					$prev_join = $numTables;
 				}
 			}
@@ -1668,7 +1668,7 @@ class Search
 				{
 					$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:exclude_phrase_' . $count . '}';
 					$subject_query['where'][] = 'm.body NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:exclude_phrase_' . $count . '}';
-					$subject_query['params']['exclude_phrase_' . $count++] = $this->_searchAPI->prepareWord($phrase, $this->noRegexp());
+					$subject_query['params']['exclude_phrase_' . ($count++)] = $this->_searchAPI->prepareWord($phrase, $this->noRegexp());
 				}
 			}
 

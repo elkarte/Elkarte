@@ -212,7 +212,7 @@ class Fulltext extends SearchAPI
 			foreach ($words['words'] as $regularWord)
 			{
 				$query_where[] = 'm.body' . (in_array($regularWord, $query_params['excluded_words']) ? ' NOT' : '') . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' LIKE ' : ' RLIKE ') . '{string:complex_body_' . $count . '}';
-				$query_params['complex_body_' . $count++] = $this->prepareWord($regularWord, $search_data['no_regexp']);
+				$query_params['complex_body_' . ($count++)] = $this->prepareWord($regularWord, $search_data['no_regexp']);
 			}
 		}
 
@@ -251,7 +251,7 @@ class Fulltext extends SearchAPI
 			foreach ($query_params['excluded_phrases'] as $phrase)
 			{
 				$query_where[] = 'subject NOT ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' LIKE ' : 'RLIKE') . '{string:exclude_subject_phrase_' . $count . '}';
-				$query_params['exclude_subject_phrase_' . $count++] = $this->prepareWord($phrase, $search_data['no_regexp']);
+				$query_params['exclude_subject_phrase_' . ($count++)] = $this->prepareWord($phrase, $search_data['no_regexp']);
 			}
 		}
 
@@ -261,7 +261,7 @@ class Fulltext extends SearchAPI
 			foreach ($query_params['excluded_subject_words'] as $excludedWord)
 			{
 				$query_where[] = 'subject NOT ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' LIKE ' : 'RLIKE') . '{string:exclude_subject_words_' . $count . '}';
-				$query_params['exclude_subject_words_' . $count++] = $this->prepareWord($excludedWord, $search_data['no_regexp']);
+				$query_params['exclude_subject_words_' . ($count++)] = $this->prepareWord($excludedWord, $search_data['no_regexp']);
 			}
 		}
 
