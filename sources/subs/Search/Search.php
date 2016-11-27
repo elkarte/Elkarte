@@ -110,9 +110,9 @@ class Search
 
 	/**
 	 * Builds the array of words for use in the db query
-	 * @var null|array
+	 * @var array
 	 */
-	private $_searchWords = null;
+	private $_searchWords = array();
 
 	/**
 	 * Words excluded from indexes
@@ -487,7 +487,7 @@ class Search
 	{
 		global $modSettings, $context;
 
-		if ($this->_searchWords !== null)
+		if (count($this->_searchWords) > 0)
 		{
 			return $this->_searchWords;
 		}
