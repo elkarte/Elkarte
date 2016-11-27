@@ -47,6 +47,8 @@ final class ErrorHandler extends Errors
 	 */
 	public function __construct()
 	{
+        parent::__construct();
+
 		// Build the bitwise mask
 		$this->fatalErrors = E_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_CORE_ERROR | E_PARSE;
 
@@ -261,7 +263,7 @@ final class ErrorHandler extends Errors
 			);
 		}
 		// trace always ends with {main}
-		$result[] = '#' . ++$key . ' {main}';
+		$result[] = '#' . (++$key) . ' {main}';
 
 		return $result;
 	}

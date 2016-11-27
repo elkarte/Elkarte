@@ -442,7 +442,7 @@ class Errors extends AbstractModel
 	public static function instance()
 	{
 		if (self::$_errors === null)
-			self::$_errors = new self(database());
+			self::$_errors = new self;
 
 		return self::$_errors;
 	}

@@ -32,7 +32,7 @@ class Log extends AbstractModel
 	 * @param array|null $filter this->_db query of the view filter being used
 	 * @param int[]|null $error_list int list of error ID's to work on
 	 */
-	function deleteErrors($type, $filter = null, $error_list = null)
+	public function deleteErrors($type, $filter = null, $error_list = null)
 	{
 		// Delete all or just some?
 		if ($type == 'delall' && empty($filter))
@@ -67,7 +67,7 @@ class Log extends AbstractModel
 	 * @param array $filter this->_db query of the filter being used
 	 * @return integer
 	 */
-	function numErrors($filter = array())
+	public function numErrors($filter = array())
 	{
 		// Just how many errors are there?
 		$result = $this->_db->query('', '
@@ -92,7 +92,7 @@ class Log extends AbstractModel
 	 * @param string $sort_direction DESC or ASC results
 	 * @param array|null $filter
 	 */
-	function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
+	public function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 	{
 		global $scripturl, $txt;
 
@@ -169,7 +169,7 @@ class Log extends AbstractModel
 	 * @param array|null $filter
 	 * @param string|null $sort
 	 */
-	function fetchErrorsByType($filter = null, $sort = null)
+	public function fetchErrorsByType($filter = null, $sort = null)
 	{
 		global $txt, $scripturl;
 
