@@ -16,7 +16,7 @@ namespace ElkArte\Errors;
 /**
  *  This class is an experiment for the job of handling errors.
  */
-class ErrorContext
+final class ErrorContext
 {
 	/**
 	 * Holds the unique identifier of the error (a name).
