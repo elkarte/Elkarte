@@ -432,6 +432,35 @@ class UpgradeInstructions_upgrade_1_1
 					}
 				}
 			),
+			array(
+				'debug_title' => 'Updating filter/parser table columns...',
+				'function' => function($db, $db_table)
+				{
+					// Filter type was 5 now needs to be 6
+					$db_table->db_change_column('{db_prefix}postby_emails_filters',
+						'filter_style',
+						array(
+							'type' => 'char',
+							'size' => 6,
+							'default' => ''
+						)
+					);
+					// Update any filte to filter, and parse to parser
+					$db->query('', '
+						UPDATE {db_prefix}postby_emails_filters
+						SET filter_style = 'filter'
+						WHERE filter_style = 'filte',
+						array()
+					);
+
+					$db->query('', '
+						UPDATE {db_prefix}postby_emails_filters
+						SET filter_style = 'parser'
+						WHERE filter_style = 'parse',
+						array()
+					);
+				}
+			),
 		);
 	}
 

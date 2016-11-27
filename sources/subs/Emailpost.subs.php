@@ -1751,7 +1751,7 @@ function query_key_maintenance($email_message)
 
 	$db = database();
 
-	// Olds keys simply expire
+	// Old keys simply expire
 	$days = (!empty($modSettings['maillist_key_active'])) ? $modSettings['maillist_key_active'] : 21;
 	$delete_old = time() - ($days * 24 * 60 * 60);
 

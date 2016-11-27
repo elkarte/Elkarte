@@ -26,7 +26,9 @@ if (!defined('ELK'))
 }
 // Or a scheduled task
 else
+{
 	postbyemail_imap();
+}
 
 /**
  * postbyemail_imap()
@@ -40,12 +42,18 @@ function postbyemail_imap()
 {
 	// No imap, why bother?
 	if (!function_exists('imap_open'))
+	{
 		return false;
+	}
 
 	$pbe = new Pbe_Imap();
 
 	if ($pbe !== false)
+	{
 		return $pbe->process();
+	}
 	else
+	{
 		return false;
+	}
 }

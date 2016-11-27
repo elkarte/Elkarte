@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Grabs unread messages from an imap account and saves them as .eml files
+ * Grabs unread messages from an imap account
  * Passes any new messages found to the postby email function for processing
  *
  * @name      ElkArte Forum
@@ -13,7 +13,7 @@
  */
 
 /**
- * Grabs unread messages from an imap account and saves them as .eml files
+ * Grabs unread messages from an imap account
  * Passes any new messages found to the postby email function for processing
  */
 class Pbe_Imap extends AbstractModel
@@ -89,16 +89,6 @@ class Pbe_Imap extends AbstractModel
 		// Values used for options
 		$this->_delete = (bool) $this->_loadModsettings('maillist_imap_delete');
 		$this->_is_gmail = strpos($this->_hostname, '.gmail.') !== false;
-
-		// I suppose that without this information we can't do anything.
-		if (empty($this->_hostname) || empty($this->_username) || empty($this->_password))
-		{
-			return false;
-		}
-		else
-		{
-			return $this;
-		}
 	}
 
 	/**
@@ -151,26 +141,42 @@ class Pbe_Imap extends AbstractModel
 	}
 
 	/**
+	 * Simply checks to see that the values from the ACP are complete
+	 *
+	 * @return bool
+	 */
+	private function _checkValues()
+	{
+		// I suppose that without this information we can't do anything.
+		return (empty($this->_hostname) || empty($this->_username) || empty($this->_password)) ? false : true;
+	}
+
+	/**
 	 * Finds the inbox of the email
 	 */
 	protected function _get_inbox()
 	{
-		// Based on the type selected get/set the additional connection details
-		$connection = $this->_port_type();
-		$this->_hostname .= (strpos($this->_hostname, ':') === false) ? ':' . $connection['port'] : '';
-		$this->_imap_server = '{' . $this->_hostname . '/' . $connection['protocol'] . $connection['flags'] . '}';
-		$this->_mailbox = $this->_imap_server . imap_utf7_encode($this->_mailbox);
+		$this->_inbox = $this->_checkValues();
 
-		// Connect to the mailbox using the supplied credentials and protocol
-		$this->_inbox = imap_open($this->_mailbox, $this->_username, $this->_password);
-
-		// Connection error, logging may help debug
-		if ($this->_inbox === false)
+		if ($this->_inbox)
 		{
-			$imap_error = imap_last_error();
-			if (!empty($imap_error))
+			// Based on the type selected get/set the additional connection details
+			$connection = $this->_port_type();
+			$this->_hostname .= (strpos($this->_hostname, ':') === false) ? ':' . $connection['port'] : '';
+			$this->_imap_server = '{' . $this->_hostname . '/' . $connection['protocol'] . $connection['flags'] . '}';
+			$this->_mailbox = $this->_imap_server . imap_utf7_encode($this->_mailbox);
+
+			// Connect to the mailbox using the supplied credentials and protocol
+			$this->_inbox = imap_open($this->_mailbox, $this->_username, $this->_password);
+
+			// Connection error, logging may help debug
+			if ($this->_inbox === false)
 			{
-				Errors::instance()->log_error($imap_error, 'debug', 'IMAP');
+				$imap_error = imap_last_error();
+				if (!empty($imap_error))
+				{
+					Errors::instance()->log_error($imap_error, 'debug', 'IMAP');
+				}
 			}
 		}
 	}
@@ -200,7 +206,7 @@ class Pbe_Imap extends AbstractModel
 	}
 
 	/**
-	 * Deletes an email from and imap inbox
+	 * Deletes an email from an imap inbox
 	 *
 	 * @param int $email_uid - The email id
 	 */
