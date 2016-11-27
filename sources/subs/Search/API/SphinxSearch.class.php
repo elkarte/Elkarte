@@ -275,7 +275,7 @@ class Sphinx_Search extends SearchAPI
 				if ($mySphinx->GetLastError())
 					\Errors::instance()->log_error($mySphinx->GetLastError());
 
-				\throw new Elk_Exception('error_no_search_daemon');
+				throw new \Elk_Exception('error_no_search_daemon');
 			}
 
 			// Get the relevant information from the search results.
