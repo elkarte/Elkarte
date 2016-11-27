@@ -21,11 +21,12 @@ namespace ElkArte\Errors;
 
 use Elk_Exception;
 use Template_Layers;
+use AbstractModel;
 
 /**
  * Class to handle all forum errors and exceptions
  */
-class Errors
+class Errors extends AbstractModel
 {
 	/** @var Errors Sole private Errors instance */
 	private static $_errors = null;
@@ -102,7 +103,7 @@ class Errors
 	{
 		global $user_info, $last_error;
 
-		$db = database();
+		$this->_db = database();
 
 		// Just in case there's no id_member or IP set yet.
 		if (empty($user_info['id']))
@@ -115,7 +116,7 @@ class Errors
 		if (empty($last_error) || $last_error != $error_info)
 		{
 			// Insert the error into the database.
-			$db->insert('',
+			$this->_db->insert('',
 				'{db_prefix}log_errors',
 				array('id_member' => 'int', 'log_time' => 'int', 'ip' => 'string-16', 'url' => 'string-65534', 'message' => 'string-65534', 'session' => 'string', 'error_type' => 'string', 'file' => 'string-255', 'line' => 'int'),
 				$error_info,
@@ -142,12 +143,8 @@ class Errors
 	 */
 	public function log_error($error_message, $error_type = 'general', $file = '', $line = 00)
 	{
-		global $modSettings;
-
-		$db = database();
-
 		// Check if error logging is actually on.
-		if (empty($modSettings['enableErrorLogging']))
+		if (empty($this->_modSettings['enableErrorLogging']))
 			return $error_message;
 
 		// Basically, htmlspecialchars it minus &. (for entities!)
@@ -344,7 +341,6 @@ class Errors
 	{
 		global $mbname, $maintenance, $webmaster_email, $db_error_send;
 
-		$db = database();
 		$cache = Cache::instance();
 
 		// Just check we're not in any buffers, just in case.
@@ -362,7 +358,7 @@ class Errors
 		if ($cache->getVar($temp, 'db_last_error', 600))
 			$db_last_error = max($db_last_error, $temp);
 
-		// Perhaps we want to notify by mail that there was a db error
+		// Perhaps we want to notify by mail that there was a this->_db error
 		if ($db_last_error < time() - 3600 * 24 * 3 && empty($maintenance) && !empty($db_error_send))
 		{
 			// Try using shared memory if possible.
@@ -371,8 +367,8 @@ class Errors
 				logLastDatabaseError();
 
 			// Language files aren't loaded yet :'(
-			$db_error = $db->last_error($db->connection());
-			@mail($webmaster_email, $mbname . ': Database Error!', 'There has been a problem with the database!' . ($db_error == '' ? '' : "\n" . $db->db_title() . ' reported:' . "\n" . $db_error) . "\n\n" . 'This is a notice email to let you know that the system could not connect to the database, contact your host if this continues.');
+			$db_error = $this->_db->last_error($this->_db->connection());
+			@mail($webmaster_email, $mbname . ': Database Error!', 'There has been a problem with the database!' . ($db_error == '' ? '' : "\n" . $this->_db->db_title() . ' reported:' . "\n" . $db_error) . "\n\n" . 'This is a notice email to let you know that the system could not connect to the database, contact your host if this continues.');
 		}
 
 		// What to do?  Language files haven't and can't be loaded yet...
@@ -446,7 +442,7 @@ class Errors
 	public static function instance()
 	{
 		if (self::$_errors === null)
-			self::$_errors = new Errors();
+			self::$_errors = new self(database());
 
 		return self::$_errors;
 	}
