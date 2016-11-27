@@ -854,7 +854,7 @@ function checkExistingTriggerIP($ip_array, $fullip = '')
 		return $return;
 
 	if ($return['error'] === 'ban_trigger_already_exists')
-		Errors::instance()->fatal_lang_error($return['error'][0], false, $return['error'][1]);
+		throw new Elk_Exception($return['error'][0], false, $return['error'][1]);
 
 	return false;
 }
@@ -1283,7 +1283,7 @@ function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group
 		)
 	);
 	if ($db->num_rows($request) == 0)
-		Errors::instance()->fatal_lang_error('ban_not_found', false);
+		throw new Elk_Exception('ban_not_found', false);
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!isset($context['ban']))

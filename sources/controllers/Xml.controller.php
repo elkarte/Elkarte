@@ -54,7 +54,7 @@ class Xml_Controller extends Action_Controller
 
 		// Act a bit special for XML, probably never see it anyway :P
 		if (empty($subAction))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		// Off we go then, (it will check permissions)
 		$action->dispatch($subAction);

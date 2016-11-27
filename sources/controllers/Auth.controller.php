@@ -127,7 +127,7 @@ class Auth_Controller extends Action_Controller
 
 		// Been guessing a lot, haven't we?
 		if (isset($_SESSION['failed_login']) && $_SESSION['failed_login'] >= $modSettings['failed_login_threshold'] * 3)
-			Errors::instance()->fatal_lang_error('login_threshold_fail', 'critical');
+			throw new Elk_Exception('login_threshold_fail', 'critical');
 
 		// Set up the cookie length.  (if it's invalid, just fall through and use the default.)
 		if (isset($_POST['cookieneverexp']) || (!empty($_POST['cookielength']) && $_POST['cookielength'] == -1))
@@ -520,7 +520,7 @@ class Auth_Controller extends Action_Controller
 		{
 			// Strike!  You're outta there!
 			if ($_GET['member'] != $user_info['id'])
-				Errors::instance()->fatal_lang_error('login_cookie_error', false);
+				throw new Elk_Exception('login_cookie_error', false);
 
 			$user_info['can_mod'] = allowedTo('access_mod_center') || (!$user_info['is_guest'] && ($user_info['mod_cache']['gq'] != '0=1' || $user_info['mod_cache']['bq'] != '0=1' || ($modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']))));
 			if ($user_info['can_mod'] && isset($user_settings['openid_uri']) && empty($user_settings['openid_uri']))
@@ -715,7 +715,7 @@ function checkActivation()
 	}
 	// Awaiting approval still?
 	elseif ($activation_status == 3)
-		Errors::instance()->fatal_lang_error('still_awaiting_approval', 'user');
+		throw new Elk_Exception('still_awaiting_approval', 'user');
 	// Awaiting deletion, changed their mind?
 	elseif ($activation_status == 4)
 	{

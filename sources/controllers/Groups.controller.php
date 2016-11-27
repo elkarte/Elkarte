@@ -231,7 +231,7 @@ class Groups_Controller extends Action_Controller
 
 		// No browsing of guests, membergroup 0 or moderators or non-existing groups.
 		if ($context['group'] === false || in_array($current_group, array(-1, 0, 3)))
-			Errors::instance()->fatal_lang_error('membergroup_does_not_exist', false);
+			throw new Elk_Exception('membergroup_does_not_exist', false);
 
 		$context['group']['id'] = $context['group']['id_group'];
 		$context['group']['name'] = $context['group']['group_name'];
@@ -269,7 +269,7 @@ class Groups_Controller extends Action_Controller
 
 		// If this group is hidden then it can only "exist" if the user can moderate it!
 		if ($context['group']['hidden'] && !$context['group']['can_moderate'])
-			Errors::instance()->fatal_lang_error('membergroup_does_not_exist', false);
+			throw new Elk_Exception('membergroup_does_not_exist', false);
 
 		// You can only assign membership if you are the moderator and/or can manage groups!
 		if (!$context['group']['can_moderate'])

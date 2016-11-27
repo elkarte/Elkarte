@@ -80,7 +80,7 @@ class Search_Controller extends Action_Controller
 
 		// If load management is on and the load is high, no need to even show the form.
 		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
-			Errors::instance()->fatal_lang_error('loadavg_search_disabled', false);
+			throw new Elk_Exception('loadavg_search_disabled', false);
 
 	}
 
@@ -117,7 +117,7 @@ class Search_Controller extends Action_Controller
 
 		// Is the load average too high to allow searching just now?
 		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
-			Errors::instance()->fatal_lang_error('loadavg_search_disabled', false);
+			throw new Elk_Exception('loadavg_search_disabled', false);
 
 		loadLanguage('Search');
 
@@ -860,7 +860,7 @@ class Search_Controller extends Action_Controller
 		{
 			// Admins can be bothered with a failure
 			if ($user_info['is_admin'])
-				Errors::instance()->fatal_lang_error('search_invalid_weights');
+				throw new Elk_Exception('search_invalid_weights');
 
 			// Even if users will get an answer, the admin should know something is broken
 			Errors::instance()->log_lang_error('search_invalid_weights');

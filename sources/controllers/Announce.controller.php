@@ -41,7 +41,7 @@ class Announce_Controller extends Action_Controller
 
 		// You need to announce something
 		if (empty($topic))
-			Errors::instance()->fatal_lang_error('topic_gone', false);
+			throw new Elk_Exception('topic_gone', false);
 
 		// Language files
 		loadLanguage('Post');
@@ -126,7 +126,7 @@ class Announce_Controller extends Action_Controller
 
 		// Check that at least one membergroup was selected (set from announce sub template)
 		if (empty($_who))
-			Errors::instance()->fatal_lang_error('no_membergroup_selected');
+			throw new Elk_Exception('no_membergroup_selected');
 
 		// Make sure all membergroups are integers and can access the board of the announcement.
 		foreach ($_who as $id => $mg)

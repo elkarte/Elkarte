@@ -292,14 +292,14 @@ class ManageErrors_Controller extends Action_Controller
 
 		// Not like we can look at just any old file
 		if ($ext !== '.php' || (strpos($file, $real_board) === false && strpos($file, $real_source) === false) || strpos($file, $real_cache) !== false || in_array($basename, $excluded) || !is_readable($file))
-			Errors::instance()->fatal_lang_error('error_bad_file', true, array(htmlspecialchars($filename, ENT_COMPAT, 'UTF-8')));
+			throw new Elk_Exception('error_bad_file', true, array(htmlspecialchars($filename, ENT_COMPAT, 'UTF-8')));
 
 		// Get the min and max lines
 		$min = $line - 16 <= 0 ? 1 : $line - 16;
 		$max = $line + 21; // One additional line to make everything work out correctly
 
 		if ($max <= 0 || $min >= $max)
-			Errors::instance()->fatal_lang_error('error_bad_line');
+			throw new Elk_Exception('error_bad_line');
 
 		$file_data = explode('<br />', highlight_php_code(htmlspecialchars(implode('', file($file)), ENT_COMPAT, 'UTF-8')));
 

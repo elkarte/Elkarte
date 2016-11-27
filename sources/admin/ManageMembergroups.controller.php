@@ -391,7 +391,7 @@ class ManageMembergroups_Controller extends Action_Controller
 
 					// Keep protected groups ... well, protected!
 					if ($copy_type['group_type'] == 1)
-						Errors::instance()->fatal_lang_error('membergroup_does_not_exist');
+						throw new Elk_Exception('membergroup_does_not_exist');
 				}
 
 				// Don't allow copying of a real privileged person!
@@ -512,7 +512,7 @@ class ManageMembergroups_Controller extends Action_Controller
 
 		// Now, do we have a valid id?
 		if (!allowedTo('admin_forum') && !empty($current_group_id) && $current_group['group_type'] == 1)
-			Errors::instance()->fatal_lang_error('membergroup_does_not_exist', false);
+			throw new Elk_Exception('membergroup_does_not_exist', false);
 
 		// The delete this membergroup button was pressed.
 		if (isset($this->_req->post->delete))
@@ -521,7 +521,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			validateToken('admin-mmg');
 
 			if (empty($current_group_id))
-				Errors::instance()->fatal_lang_error('membergroup_does_not_exist', false);
+				throw new Elk_Exception('membergroup_does_not_exist', false);
 
 			// Let's delete the group
 			deleteMembergroups($current_group['id_group']);
@@ -536,7 +536,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			validateToken('admin-mmg');
 
 			if (empty($current_group_id))
-				Errors::instance()->fatal_lang_error('membergroup_does_not_exist', false);
+				throw new Elk_Exception('membergroup_does_not_exist', false);
 
 			$validator = new Data_Validator();
 
@@ -699,7 +699,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		$row = membergroupById($current_group['id_group'], true);
 
 		if (empty($row) || (!allowedTo('admin_forum') && $row['group_type'] == 1))
-			Errors::instance()->fatal_lang_error('membergroup_does_not_exist', false);
+			throw new Elk_Exception('membergroup_does_not_exist', false);
 
 		$row['icons'] = explode('#', $row['icons']);
 

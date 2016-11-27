@@ -413,7 +413,7 @@ abstract class Database_Abstract implements Database
 
 		if (class_exists('Errors'))
 		{
-			Errors::instance()->fatal_error($error_message, false);
+			throw new Elk_Exception($error_message, false);
 
 			// Cannot continue...
 			exit;

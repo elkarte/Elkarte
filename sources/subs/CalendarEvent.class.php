@@ -212,7 +212,7 @@ class Calendar_Event
 			$event = getEventProperties($this->_event_id);
 
 			if ($event === false)
-				Errors::instance()->fatal_lang_error('no_access', false);
+				throw new Elk_Exception('no_access', false);
 
 			// If it has a board, then they should be editing it within the topic.
 			if (!empty($event['topic']['id']) && !empty($event['topic']['first_msg']))

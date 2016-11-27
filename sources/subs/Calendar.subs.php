@@ -274,9 +274,9 @@ function canLinkEvent()
 
 	// No board?  No topic?!?
 	if (empty($board))
-		Errors::instance()->fatal_lang_error('missing_board_id', false);
+		throw new Elk_Exception('missing_board_id', false);
 	if (empty($topic))
-		Errors::instance()->fatal_lang_error('missing_topic_id', false);
+		throw new Elk_Exception('missing_topic_id', false);
 
 	// Administrator, Moderator, or owner.  Period.
 	if (!allowedTo('admin_forum') && !allowedTo('moderate_board'))
@@ -287,11 +287,11 @@ function canLinkEvent()
 		{
 			// Not the owner of the topic.
 			if ($row['id_member_started'] != $user_info['id'])
-				Errors::instance()->fatal_lang_error('not_your_topic', 'user');
+				throw new Elk_Exception('not_your_topic', 'user');
 		}
 		// Topic/Board doesn't exist.....
 		else
-			Errors::instance()->fatal_lang_error('calendar_no_topic', 'general');
+			throw new Elk_Exception('calendar_no_topic', 'general');
 	}
 }
 

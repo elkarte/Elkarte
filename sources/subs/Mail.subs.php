@@ -826,7 +826,7 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 	}
 
 	if (!isset($txt[$template . '_subject']) || !isset($txt[$template . '_body']))
-		Errors::instance()->fatal_lang_error('email_no_template', 'template', array($template));
+		throw new Elk_Exception('email_no_template', 'template', array($template));
 
 	$ret = array(
 		'subject' => $txt[$template . '_subject'],

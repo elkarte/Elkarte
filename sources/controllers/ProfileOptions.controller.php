@@ -64,7 +64,7 @@ class ProfileOptions_Controller extends Action_Controller
 
 		// Do a quick check to ensure people aren't getting here illegally!
 		if (!$context['user']['is_owner'] || empty($modSettings['enable_buddylist']))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		loadTemplate('ProfileOptions');
 
@@ -854,7 +854,7 @@ class ProfileOptions_Controller extends Action_Controller
 
 		// Have the admins enabled this option?
 		if (empty($modSettings['allow_ignore_boards']))
-			Errors::instance()->fatal_lang_error('ignoreboards_disallowed', 'user');
+			throw new Elk_Exception('ignoreboards_disallowed', 'user');
 
 		loadTemplate('ProfileOptions');
 
@@ -946,7 +946,7 @@ class ProfileOptions_Controller extends Action_Controller
 		$group_id = $this->_req->getPost('gid', 'intval', $this->_req->getQuery('gid', 'intval', null));
 
 		if (!isset($group_id) && !isset($this->_req->post->primary))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		// GID may be from a link or a form
 		checkSession(isset($this->_req->query->gid) ? 'get' : 'post');
@@ -988,12 +988,12 @@ class ProfileOptions_Controller extends Action_Controller
 
 				// Does the group type match what we're doing - are we trying to request a non-requestable group?
 				if ($changeType === 'request' && $row['group_type'] != 2)
-					Errors::instance()->fatal_lang_error('no_access', false);
+					throw new Elk_Exception('no_access', false);
 				// What about leaving a requestable group we are not a member of?
 				elseif ($changeType === 'free' && $row['group_type'] == 2 && $old_profile['id_group'] != $row['id_group'] && !isset($addGroups[$row['id_group']]))
-					Errors::instance()->fatal_lang_error('no_access', false);
+					throw new Elk_Exception('no_access', false);
 				elseif ($changeType === 'free' && $row['group_type'] != 3 && $row['group_type'] != 2)
-					Errors::instance()->fatal_lang_error('no_access', false);
+					throw new Elk_Exception('no_access', false);
 
 				// We can't change the primary group if this is hidden!
 				if ($row['hidden'] == 2)
@@ -1015,7 +1015,7 @@ class ProfileOptions_Controller extends Action_Controller
 
 		// Didn't find the target?
 		if (!$foundTarget)
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		// Final security check, don't allow users to promote themselves to admin.
 		require_once(SUBSDIR . '/ProfileOptions.subs.php');
@@ -1030,7 +1030,7 @@ class ProfileOptions_Controller extends Action_Controller
 		if ($changeType === 'request')
 		{
 			if (logMembergroupRequest($group_id, $this->_memID))
-				Errors::instance()->fatal_lang_error('profile_error_already_requested_group');
+				throw new Elk_Exception('profile_error_already_requested_group');
 
 			// Send an email to all group moderators etc.
 			require_once(SUBSDIR . '/Mail.subs.php');

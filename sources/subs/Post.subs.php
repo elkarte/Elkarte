@@ -1067,7 +1067,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 				)
 			);
 			if ($db->num_rows($request) == 0)
-				Errors::instance()->fatal_lang_error('quoted_post_deleted', false);
+				throw new Elk_Exception('quoted_post_deleted', false);
 			list ($form_subject, $mname, $mdate, $form_message) = $db->fetch_row($request);
 			$db->free_result($request);
 

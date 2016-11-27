@@ -65,7 +65,7 @@ function log_lang_error($error, $error_type = 'general', $sprintf = array(), $fi
  */
 function fatal_error($error, $log = 'general')
 {
-	Errors::instance()->fatal_error($error, $log);
+	throw new Elk_Exception($error, $log);
 }
 
 /**
@@ -87,7 +87,7 @@ function fatal_error($error, $log = 'general')
  */
 function fatal_lang_error($error, $log = 'general', $sprintf = array())
 {
-	Errors::instance()->fatal_lang_error($error, $log, $sprintf);
+	throw new Elk_Exception($error, $log, $sprintf);
 }
 
 /**

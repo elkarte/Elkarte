@@ -691,7 +691,7 @@ function attachmentChecks($attachID)
 
 	// Let's get their attention.
 	if (!empty($error))
-		Errors::instance()->fatal_lang_error('attach_check_nag', 'debug', array($error));
+		throw new Elk_Exception('attach_check_nag', 'debug', array($error));
 
 	// These are the only valid image types.
 	$validImageTypes = array(

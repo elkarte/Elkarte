@@ -212,7 +212,7 @@ class ManageServer_Controller extends Action_Controller
 				unset($this->_req->post->globalCookies);
 
 			if (!empty($this->_req->post->globalCookiesDomain) && strpos($boardurl, $this->_req->post->globalCookiesDomain) === false)
-				Errors::instance()->fatal_lang_error('invalid_cookie_domain', false);
+				throw new Elk_Exception('invalid_cookie_domain', false);
 
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();

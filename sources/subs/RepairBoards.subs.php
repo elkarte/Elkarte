@@ -1275,7 +1275,7 @@ function createSalvageArea()
 		if ($db->affected_rows() <= 0)
 		{
 			loadLanguage('Admin');
-			Errors::instance()->fatal_lang_error('salvaged_category_error', false);
+			throw new Elk_Exception('salvaged_category_error', false);
 		}
 
 		$salvageCatID = $db->insert_id('{db_prefix}categories', 'id_cat');
@@ -1309,7 +1309,7 @@ function createSalvageArea()
 		if ($db->affected_rows() <= 0)
 		{
 			loadLanguage('Admin');
-			Errors::instance()->fatal_lang_error('salvaged_board_error', false);
+			throw new Elk_Exception('salvaged_board_error', false);
 		}
 
 		$salvageBoardID = $db->insert_id('{db_prefix}boards', 'id_board');

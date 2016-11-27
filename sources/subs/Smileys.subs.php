@@ -199,7 +199,7 @@ function getSmiley($id)
 		)
 	);
 	if ($db->num_rows($request) != 1)
-		Errors::instance()->fatal_lang_error('smiley_not_found');
+		throw new Elk_Exception('smiley_not_found');
 	$current_smiley = $db->fetch_assoc($request);
 	$db->free_result($request);
 

@@ -61,14 +61,14 @@ class Poll_Controller extends Action_Controller
 		$row = checkVote($topic);
 
 		if (empty($row))
-			Errors::instance()->fatal_lang_error('poll_error', false);
+			throw new Elk_Exception('poll_error', false);
 
 		// If this is a guest can they vote?
 		if ($user_info['is_guest'])
 		{
 			// Guest voting disabled?
 			if (!$row['guest_vote'])
-				Errors::instance()->fatal_lang_error('guest_vote_disabled');
+				throw new Elk_Exception('guest_vote_disabled');
 			// Guest already voted?
 			elseif (!empty($this->_req->cookie->guest_poll_vote) && preg_match('~^[0-9,;]+$~', $this->_req->cookie->guest_poll_vote) && strpos($this->_req->cookie->guest_poll_vote, ';' . $row['id_poll'] . ',') !== false)
 			{
@@ -94,7 +94,7 @@ class Poll_Controller extends Action_Controller
 						unset($this->_req->cookie->guest_poll_vote);
 				}
 				else
-					Errors::instance()->fatal_lang_error('poll_error', false);
+					throw new Elk_Exception('poll_error', false);
 
 				unset($guestinfo, $guestvoted, $i);
 			}
@@ -102,11 +102,11 @@ class Poll_Controller extends Action_Controller
 
 		// Is voting locked or has it expired?
 		if (!empty($row['voting_locked']) || (!empty($row['expire_time']) && time() > $row['expire_time']))
-			Errors::instance()->fatal_lang_error('poll_error', false);
+			throw new Elk_Exception('poll_error', false);
 
 		// If they have already voted and aren't allowed to change their vote - hence they are outta here!
 		if (!$user_info['is_guest'] && $row['selected'] != -1 && empty($row['change_vote']))
-			Errors::instance()->fatal_lang_error('poll_error', false);
+			throw new Elk_Exception('poll_error', false);
 		// Otherwise if they can change their vote yet they haven't sent any options... remove their vote and redirect.
 		elseif (!empty($row['change_vote']) && !$user_info['is_guest'] && empty($this->_req->post->options))
 		{
@@ -134,11 +134,11 @@ class Poll_Controller extends Action_Controller
 
 		// Make sure the option(s) are valid.
 		if (empty($this->_req->post->options))
-			Errors::instance()->fatal_lang_error('didnt_select_vote', false);
+			throw new Elk_Exception('didnt_select_vote', false);
 
 		// Too many options checked!
 		if (count($this->_req->post->options) > $row['max_votes'])
-			Errors::instance()->fatal_lang_error('poll_too_many_votes', false, array($row['max_votes']));
+			throw new Elk_Exception('poll_too_many_votes', false, array($row['max_votes']));
 
 		$pollOptions = array();
 		$inserts = array();
@@ -213,7 +213,7 @@ class Poll_Controller extends Action_Controller
 			$poll['locked'] = '0';
 		// Sorry, a moderator locked it.
 		elseif ($poll['locked'] == '2' && !allowedTo('moderate_board'))
-			Errors::instance()->fatal_lang_error('locked_by_admin', 'user');
+			throw new Elk_Exception('locked_by_admin', 'user');
 		// A moderator *is* locking it.
 		elseif ($poll['locked'] == '0' && allowedTo('moderate_board'))
 			$poll['locked'] = '2';
@@ -248,7 +248,7 @@ class Poll_Controller extends Action_Controller
 
 		// No topic, means you can't edit the poll
 		if (empty($topic))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		// We work hard with polls.
 		require_once(SUBSDIR . '/Poll.subs.php');
@@ -266,14 +266,14 @@ class Poll_Controller extends Action_Controller
 
 		// Assume it all exists, right?
 		if (empty($pollinfo))
-			Errors::instance()->fatal_lang_error('no_board');
+			throw new Elk_Exception('no_board');
 
 		// If we are adding a new poll - make sure that there isn't already a poll there.
 		if (!$context['is_edit'] && !empty($pollinfo['id_poll']))
-			Errors::instance()->fatal_lang_error('poll_already_exists');
+			throw new Elk_Exception('poll_already_exists');
 		// Otherwise, if we're editing it, it does exist I assume?
 		elseif ($context['is_edit'] && empty($pollinfo['id_poll']))
-			Errors::instance()->fatal_lang_error('poll_not_found');
+			throw new Elk_Exception('poll_not_found');
 
 		// Can you do this?
 		if ($context['is_edit'] && !allowedTo('poll_edit_any'))
@@ -519,7 +519,7 @@ class Poll_Controller extends Action_Controller
 
 		// HACKERS (!!) can't edit :P.
 		if (empty($topic))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		// Is this a new poll, or editing an existing?
 		$isEdit = isset($this->_req->post->add) ? 0 : 1;
@@ -532,10 +532,10 @@ class Poll_Controller extends Action_Controller
 
 		// Check their adding/editing is valid.
 		if (!$isEdit && !empty($bcinfo['id_poll']))
-			Errors::instance()->fatal_lang_error('poll_already_exists');
+			throw new Elk_Exception('poll_already_exists');
 		// Are we editing a poll which doesn't exist?
 		elseif ($isEdit && empty($bcinfo['id_poll']))
-			Errors::instance()->fatal_lang_error('poll_not_found');
+			throw new Elk_Exception('poll_not_found');
 
 		// Check if they have the power to add or edit the poll.
 		if ($isEdit && !allowedTo('poll_edit_any'))
@@ -699,7 +699,7 @@ class Poll_Controller extends Action_Controller
 
 		// Make sure the topic is not empty.
 		if (empty($topic))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		// Verify the session.
 		checkSession('get');
@@ -712,7 +712,7 @@ class Poll_Controller extends Action_Controller
 		{
 			$pollStarters = pollStarters($topic);
 			if (empty($pollStarters))
-				Errors::instance()->fatal_lang_error('no_access', false);
+				throw new Elk_Exception('no_access', false);
 
 			list ($topicStarter, $pollStarter) = $pollStarters;
 			if ($topicStarter == $user_info['id'] || ($pollStarter != 0 && $pollStarter == $user_info['id']))

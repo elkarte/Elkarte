@@ -183,7 +183,7 @@ class Packages_Controller extends Action_Controller
 
 		// If we can't find the file, our install ends here
 		if (!file_exists(BOARDDIR . '/packages/' . $this->_filename))
-			Errors::instance()->fatal_lang_error('package_no_file', false);
+			throw new Elk_Exception('package_no_file', false);
 
 		// Do we have an existing id, for uninstalls and the like.
 		$this->install_id = $this->_req->getQuery('pid', 'intval', 0);
@@ -209,7 +209,7 @@ class Packages_Controller extends Action_Controller
 		// Get the package info...
 		$packageInfo = getPackageInfo($this->_filename);
 		if (!is_array($packageInfo))
-			Errors::instance()->fatal_lang_error($packageInfo);
+			throw new Elk_Exception($packageInfo);
 
 		$packageInfo['filename'] = $this->_filename;
 
@@ -411,7 +411,7 @@ class Packages_Controller extends Action_Controller
 		}
 		// Well we don't know what it is then, so we stop
 		else
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 	}
 
 	/**
@@ -436,7 +436,7 @@ class Packages_Controller extends Action_Controller
 			if (!isset($package_installed['old_version']))
 			{
 				deltree(BOARDDIR . '/packages/temp');
-				Errors::instance()->fatal_lang_error('package_cant_uninstall', false);
+				throw new Elk_Exception('package_cant_uninstall', false);
 			}
 
 			$actions = parsePackageInfo($packageInfo['xml'], $testing, 'uninstall');
@@ -445,7 +445,7 @@ class Packages_Controller extends Action_Controller
 			if (empty($actions))
 			{
 				deltree(BOARDDIR . '/packages/temp');
-				Errors::instance()->fatal_lang_error('package_uninstall_cannot', false);
+				throw new Elk_Exception('package_uninstall_cannot', false);
 			}
 
 			// Can't edit the custom themes it's edited if you're uninstalling, they must be removed.
@@ -512,7 +512,7 @@ class Packages_Controller extends Action_Controller
 				// No temp directory was able to be made, that's fatal
 				deltree(BOARDDIR . '/packages/temp', false);
 				if (!mktree(BOARDDIR . '/packages/temp', 0777))
-					Errors::instance()->fatal_lang_error('package_cant_download', false);
+					throw new Elk_Exception('package_cant_download', false);
 			}
 		}
 	}
@@ -535,7 +535,7 @@ class Packages_Controller extends Action_Controller
 
 		// And if the file does not exist there is a problem
 		if (!file_exists(BOARDDIR . '/packages/' . $this->_filename))
-			Errors::instance()->fatal_lang_error('package_no_file', false);
+			throw new Elk_Exception('package_no_file', false);
 
 		// If this is an uninstall, we'll have an id.
 		$this->install_id = $this->_req->getQuery('pid', 'intval', 0);
@@ -597,7 +597,7 @@ class Packages_Controller extends Action_Controller
 		// Get the package info...
 		$packageInfo = getPackageInfo($this->_filename);
 		if (!is_array($packageInfo))
-			Errors::instance()->fatal_lang_error($packageInfo);
+			throw new Elk_Exception($packageInfo);
 
 		$packageInfo['filename'] = $this->_filename;
 
@@ -1101,7 +1101,7 @@ class Packages_Controller extends Action_Controller
 
 		// We need to know the operation key for the search and replace?
 		if (!isset($this->_req->query->operation_key, $this->_req->query->filename) && !is_numeric($this->_req->query->operation_key))
-			Errors::instance()->fatal_lang_error('operation_invalid', 'general');
+			throw new Elk_Exception('operation_invalid', 'general');
 
 		// Load the required file.
 		require_once(SUBSDIR . '/Themes.subs.php');
@@ -1188,7 +1188,7 @@ class Packages_Controller extends Action_Controller
 		if (isset($this->_req->query->restore))
 		{
 			create_chmod_control(array(), array(), true);
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 		}
 
 		// This is a time and memory eating ...
@@ -1547,7 +1547,7 @@ class Packages_Controller extends Action_Controller
 				if ($validate_custom)
 				{
 					if (!preg_match('~^[4567][4567][4567]$~', $context['custom_value']))
-						Errors::instance()->fatal_error($txt['chmod_value_invalid']);
+						throw new Elk_Exception($txt['chmod_value_invalid']);
 				}
 
 				// Nothing to do?
@@ -1556,7 +1556,7 @@ class Packages_Controller extends Action_Controller
 			}
 			// Should never get here,
 			else
-				Errors::instance()->fatal_lang_error('no_access', false);
+				throw new Elk_Exception('no_access', false);
 
 			// Setup the custom value.
 			$custom_value = octdec('0' . $context['custom_value']);
@@ -2051,7 +2051,7 @@ function fetchPerms__recursive($path, &$data, $level)
 
 	// @todo Shouldn't happen - but better error message?
 	if (!is_dir($path))
-		Errors::instance()->fatal_lang_error('no_access', false);
+		throw new Elk_Exception('no_access', false);
 
 	// This is where we put stuff we've found for sorting.
 	$foundData = array(

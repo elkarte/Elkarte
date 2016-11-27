@@ -39,7 +39,7 @@ class Likes_Controller extends Action_Controller
 
 		// If likes are disabled, we don't go any further
 		if (empty($modSettings['likes_enabled']))
-			Errors::instance()->fatal_lang_error('feature_disabled', true);
+			throw new Elk_Exception('feature_disabled', true);
 	}
 
 	/**
@@ -634,7 +634,7 @@ class Likes_Controller extends Action_Controller
 
 		// Likes are not on, your quest for statistics ends here
 		if (empty($modSettings['likes_enabled']))
-			Errors::instance()->fatal_lang_error('feature_disabled', true);
+			throw new Elk_Exception('feature_disabled', true);
 
 		// And you can see the stats
 		isAllowedTo('like_posts_stats');
@@ -676,7 +676,7 @@ class Likes_Controller extends Action_Controller
 
 		// Likes are not on, your quest for statistics ends here
 		if (empty($modSettings['likes_enabled']))
-			Errors::instance()->fatal_lang_error('feature_disabled', true);
+			throw new Elk_Exception('feature_disabled', true);
 
 		// Worthy to view like statistics?
 		isAllowedTo('like_posts_stats');

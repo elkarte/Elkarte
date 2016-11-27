@@ -412,7 +412,7 @@ class ManageBoards_Controller extends Action_Controller
 			if (isset($this->_req->post->delete_action) && $this->_req->post->delete_action == 1)
 			{
 				if (empty($this->_req->post->cat_to))
-					Errors::instance()->fatal_lang_error('mboards_delete_error');
+					throw new Elk_Exception('mboards_delete_error');
 
 				deleteCategories(array($this->cat), (int) $this->_req->post->cat_to);
 			}
@@ -634,7 +634,7 @@ class ManageBoards_Controller extends Action_Controller
 			elseif (!empty($this->_req->post->placement) && !empty($this->_req->post->board_order))
 			{
 				if (!in_array($this->_req->post->placement, array('before', 'after', 'child')))
-					Errors::instance()->fatal_lang_error('mangled_post', false);
+					throw new Elk_Exception('mangled_post', false);
 
 				$boardOptions['move_to'] = $this->_req->post->placement;
 				$boardOptions['target_board'] = (int) $this->_req->post->board_order;
@@ -659,7 +659,7 @@ class ManageBoards_Controller extends Action_Controller
 			}
 
 			if (strlen(implode(',', $boardOptions['access_groups'])) > 255 || strlen(implode(',', $boardOptions['deny_groups'])) > 255)
-				Errors::instance()->fatal_lang_error('too_many_groups', false);
+				throw new Elk_Exception('too_many_groups', false);
 
 			// Change '1 & 2' to '1 &amp; 2', but not '&amp;' to '&amp;amp;'...
 			$boardOptions['board_name'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $this->_req->post->board_name);
@@ -729,7 +729,7 @@ class ManageBoards_Controller extends Action_Controller
 			if (isset($this->_req->post->delete_action) && $this->_req->post->delete_action == 1)
 			{
 				if (empty($this->_req->post->board_to))
-					Errors::instance()->fatal_lang_error('mboards_delete_board_error');
+					throw new Elk_Exception('mboards_delete_board_error');
 
 				deleteBoards(array($board_id), (int) $this->_req->post->board_to);
 			}

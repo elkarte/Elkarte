@@ -138,7 +138,7 @@ class UnZip
 
 		// This function sorta needs gzinflate!
 		if (!function_exists('gzinflate'))
-			Errors::instance()->fatal_lang_error('package_no_zlib', 'critical');
+			throw new Elk_Exception('package_no_zlib', 'critical');
 
 		// Make sure we have this loaded.
 		loadLanguage('Packages');

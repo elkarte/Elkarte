@@ -566,7 +566,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 
 	// Can't change reserved vars.
 	if (isset($regOptions['theme_vars']) && count(array_intersect(array_keys($regOptions['theme_vars']), $reservedVars)) != 0)
-		Errors::instance()->fatal_lang_error('no_theme');
+		throw new Elk_Exception('no_theme');
 
 	$tokenizer = new Token_Hash();
 
@@ -849,7 +849,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 			// If it's not just entire word, check for it in there somewhere...
 			if ($checkMe == $reservedCheck || (Util::strpos($checkMe, $reservedCheck) !== false && empty($modSettings['reserveWord'])))
 				if ($fatal)
-					Errors::instance()->fatal_lang_error('username_reserved', 'password', array($reserved));
+					throw new Elk_Exception('username_reserved', 'password', array($reserved));
 				else
 					return true;
 		}
@@ -857,7 +857,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 		$censor_name = $name;
 		if (censor($censor_name) != $name)
 			if ($fatal)
-				Errors::instance()->fatal_lang_error('name_censored', 'password', array($name));
+				throw new Elk_Exception('name_censored', 'password', array($name));
 			else
 				return true;
 	}
@@ -866,7 +866,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	foreach (array('*') as $char)
 		if (strpos($checkName, $char) !== false)
 			if ($fatal)
-				Errors::instance()->fatal_lang_error('username_reserved', 'password', array($char));
+				throw new Elk_Exception('username_reserved', 'password', array($char));
 			else
 				return true;
 
@@ -967,7 +967,7 @@ function groupsAllowedTo($permission, $board_id = null)
 			$board_data = fetchBoardsInfo(array('boards' => $board_id), array('selects' => 'permissions'));
 
 			if (empty($board_data))
-				Errors::instance()->fatal_lang_error('no_board');
+				throw new Elk_Exception('no_board');
 			$profile_id = $board_data[$board_id]['id_profile'];
 		}
 		else

@@ -1008,7 +1008,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 				// Still not a unique column name? Leave it up to the user, then.
 				if (!$unique)
-					Errors::instance()->fatal_lang_error('custom_option_not_unique');
+					throw new Elk_Exception('custom_option_not_unique');
 
 				// And create a new field
 				$new_field = array(

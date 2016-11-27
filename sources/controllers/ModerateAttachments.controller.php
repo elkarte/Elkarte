@@ -62,7 +62,7 @@ class ModerateAttachments_Controller extends Action_Controller
 			$attachments[] = (int) $this->_req->query->aid;
 
 		if (empty($attachments))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		// @todo nb: this requires permission to approve posts, not manage attachments
 		// Now we have some ID's cleaned and ready to approve, but first - let's check we have permission!
@@ -89,7 +89,7 @@ class ModerateAttachments_Controller extends Action_Controller
 		$redirect = 'topic=' . $attach_home['id_topic'] . '.msg' . $attach_home['id_msg'] . '#msg' . $attach_home['id_msg'];
 
 		if (empty($attachments))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		// Finally, we are there. Follow through!
 		if ($is_approve)
