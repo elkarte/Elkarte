@@ -28,7 +28,7 @@ use ErrorException;
 final class ErrorHandler extends Errors
 {
 	/** @var int Mask for errors that are fatal and will halt */
-	protected $fatalErrors = E_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_CORE_ERROR | E_PARSE;
+	protected $fatalErrors = 0;
 
 	/** @var string The error string from $e->getMessage() */
 	private $error_string;
@@ -47,6 +47,9 @@ final class ErrorHandler extends Errors
 	 */
 	public function __construct()
 	{
+		// Build the bitwise mask
+		$this->fatalErrors = E_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_CORE_ERROR | E_PARSE;
+
 		// Register the class handlers to the PHP handler functions
 		set_error_handler(array($this, 'error_handler'));
 		set_exception_handler(array($this, 'exception_handler'));
