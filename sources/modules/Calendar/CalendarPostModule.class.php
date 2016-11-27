@@ -69,7 +69,7 @@ class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
 	/**
 	 * before_save_post event, checks the event title is set
 	 *
-	 * @param Error_Context $post_errors
+	 * @param ErrorContext $post_errors
 	 */
 	public function before_save_post($post_errors)
 	{
