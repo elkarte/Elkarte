@@ -287,7 +287,6 @@ class Search_Controller extends Action_Controller
 		// Are you allowed?
 		isAllowedTo('search_posts');
 
-		Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 		$this->_search = new \ElkArte\Search\Search();
 		$this->_search->setWeights($this->_weight_factors, $this->_weight, $this->_weight_total);
 

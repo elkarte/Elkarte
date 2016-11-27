@@ -47,6 +47,45 @@ abstract class SearchAPI implements Search_Interface
 	protected $_excludedWords = array();
 
 	/**
+	 * What words are banned?
+	 * @var array
+	 */
+	protected $bannedWords = array();
+
+	/**
+	 * What is the minimum word length?
+	 * @var int
+	 */
+	protected $min_word_length = 3;
+
+	/**
+	 * What databases support the custom index?
+	 * @var array
+	 */
+	protected $supported_databases = array('MySQL', 'PostgreSQL');
+
+	/**
+	 * Fulltext::__construct()
+	 */
+	public function __construct()
+	{
+		global $modSettings;
+
+		$this->bannedWords = empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']);
+		$this->min_word_length = $this->_getMinWordLength();
+	}
+
+	/**
+	 * Fulltext::_getMinWordLength()
+	 *
+	 * What is the minimum word length full text supports?
+	 */
+	protected function _getMinWordLength()
+	{
+		return 3;
+	}
+
+	/**
 	 * Method to check whether the method can be performed by the API.
 	 *
 	 * @deprecated since 1.1 - check that the method is callable
@@ -66,7 +105,7 @@ abstract class SearchAPI implements Search_Interface
 	public function isValid()
 	{
 		// Always fall back to the standard search method.
-		return true;
+		return in_array(DB_TYPE, $this->supported_databases);
 	}
 
 	/**

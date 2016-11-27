@@ -22,7 +22,7 @@ namespace ElkArte\Search\API;
  *
  * @package Search
  */
-class Fulltext_Search extends SearchAPI
+class Fulltext extends SearchAPI
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
@@ -61,7 +61,7 @@ class Fulltext_Search extends SearchAPI
 	protected $supported_databases = array('MySQL');
 
 	/**
-	 * Fulltext_Search::__construct()
+	 * Fulltext::__construct()
 	 */
 	public function __construct()
 	{
@@ -80,7 +80,7 @@ class Fulltext_Search extends SearchAPI
 	}
 
 	/**
-	 * Fulltext_Search::_getMinWordLength()
+	 * Fulltext::_getMinWordLength()
 	 *
 	 * What is the minimum word length full text supports?
 	 */
@@ -133,7 +133,7 @@ class Fulltext_Search extends SearchAPI
 	}
 
 	/**
-	 * Fulltext_Search::prepareIndexes()
+	 * Fulltext::prepareIndexes()
 	 *
 	 * Do we have to do some work with the words we are searching for to prepare them?
 	 *
@@ -179,7 +179,7 @@ class Fulltext_Search extends SearchAPI
 	}
 
 	/**
-	 * Fulltext_Search::indexedWordQuery()
+	 * Fulltext::indexedWordQuery()
 	 *
 	 * Search for indexed words.
 	 *

@@ -23,7 +23,7 @@ namespace ElkArte\Search\API;
  *
  * @package Search
  */
-class Custom_Search extends SearchAPI
+class Custom extends SearchAPI
 {
 	/**
 	 *This is the last version of ElkArte that this was tested on, to protect against API changes.
@@ -50,25 +50,7 @@ class Custom_Search extends SearchAPI
 	protected $indexSettings = array();
 
 	/**
-	 * What words are banned?
-	 * @var array
-	 */
-	protected $bannedWords = array();
-
-	/**
-	 * What is the minimum word length?
-	 * @var int
-	 */
-	protected $min_word_length = null;
-
-	/**
-	 * What databases support the custom index?
-	 * @var array
-	 */
-	protected $supported_databases = array('MySQL', 'PostgreSQL');
-
-	/**
-	 * Custom_Search::__construct()
+	 * Custom::__construct()
 	 */
 	public function __construct()
 	{

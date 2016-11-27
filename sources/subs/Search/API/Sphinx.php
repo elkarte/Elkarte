@@ -28,7 +28,7 @@ namespace ElkArte\Search\API;
  *
  * @package Search
  */
-class Sphinx_Search extends SearchAPI
+class Sphinx extends SearchAPI
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
@@ -257,7 +257,7 @@ class Sphinx_Search extends SearchAPI
 				if ($mySphinx->GetLastError())
 					\Errors::instance()->log_error($mySphinx->GetLastError());
 
-				throw new \Elk_Exception('error_no_search_daemon');
+				\Errors::instance()->fatal_lang_error('error_no_search_daemon');
 			}
 
 			// Get the relevant information from the search results.

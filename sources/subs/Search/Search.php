@@ -241,27 +241,27 @@ class Search
 	/**
 	 * Creates a search API and returns the object.
 	 */
-	public function findSearchAPI()
+	public function findSearchAPI($searchClass)
 	{
 		global $modSettings, $txt;
 
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// Load up the search API we are going to use.
-		if (empty($modSettings['search_index']))
-			$modSettings['search_index'] = 'Standard_Search';
-		elseif (in_array($modSettings['search_index'], array('custom', 'fulltext')))
-			$modSettings['search_index'] = ucfirst($modSettings['search_index']) . '_Search';
+		if (!empty($modSettings['search_index']) && empty($searchClass))
+			$searchClass = ucfirst($modSettings['search_index']);
 
-		$search_class_name = '\\ElkArte\\Search\\API\\' . $modSettings['search_index'];
+		$fqcn = '\\ElkArte\\Search\\API\\' . $searchClass;
 
-		if (!class_implements($search_class_name, 'Search_Interface'))
+		if (!class_implements($fqcn, 'Search_Interface'))
 		{
 			throw new \Elk_Exception('search_api_missing');
 		}
-
-		// Create an instance of the search API and check it is valid for this version of the software.
-		$this->_searchAPI = new $search_class_name();
+		else
+		{
+			// Create an instance of the search API and check it is valid for this version of the software.
+			$this->_searchAPI = new $fqcn;
+		}
 
 		// An invalid Search API? Log the error and set it to use the standard API
 		if (!$this->_searchAPI || (!$this->_searchAPI->isValid()) || !matchPackageVersion($this->_forum_version, $this->_searchAPI->min_elk_version . '-' . $this->_searchAPI->version_compatible))
@@ -270,7 +270,7 @@ class Search
 			loadLanguage('Errors');
 			\Errors::instance()->log_error(sprintf($txt['search_api_not_compatible'], $search_class_name), 'critical');
 
-			$this->_searchAPI = new \ElkArte\Search\API\Standard_Search();
+			$this->_searchAPI = new \ElkArte\Search\API\Standard;
 		}
 
 		return $this->_searchAPI;

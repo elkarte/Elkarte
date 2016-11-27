@@ -23,13 +23,6 @@
  */
 class ManageSearch_Controller extends Action_Controller
 {
-	/**
-	 * Pre Dispatch, called before other methods.
-	 */
-	public function pre_dispatch()
-	{
-		Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
-	}
 
 	/**
 	 * Main entry point for the admin search settings screen.
@@ -617,16 +610,18 @@ class ManageSearch_Controller extends Action_Controller
 		global $txt, $scripturl;
 
 		$apis = array();
+		$search = new \ElkArte\Search\Search();
 
 		try
 		{
-			$files = new GlobIterator(SUBSDIR . '/Search/API/*Search.class.php', FilesystemIterator::SKIP_DOTS);
+			$files = new GlobIterator(SUBSDIR . '/Search/API/*.php', FilesystemIterator::SKIP_DOTS);
 			foreach ($files as $file)
 			{
 				if ($file->isFile())
 				{
-					$index_name = str_replace('Search', '_Search', $file->getBasename('.class.php'));
-					$common_name = strtolower(str_replace('Search', '', $file->getBasename('.class.php')));
+					$index_name = $file->getBasename('.php');
+					$common_name = strtolower($index_name);
+					return $search->findSearchAPI($common_name);
 					$search_class_name = '\\ElkArte\\Search\\API\\' . $index_name;
 
 					if (class_implements($search_class_name, 'Search_Interface'))

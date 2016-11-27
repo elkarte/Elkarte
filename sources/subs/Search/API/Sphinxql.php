@@ -28,7 +28,7 @@ namespace ElkArte\Search\API;
  *
  * @package Search
  */
-class Sphinxql_Search extends SearchAPI
+class Sphinxql extends SearchAPI
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
@@ -151,7 +151,7 @@ class Sphinxql_Search extends SearchAPI
 
 			// No connection, daemon not running?  log the error
 			if ($mySphinx === false)
-				throw new \Elk_Exception('error_no_search_daemon');
+				\Errors::instance()->fatal_lang_error('error_no_search_daemon');
 
 			// Compile different options for our query
 			$query = 'SELECT *' . (empty($search_params['topic']) ? ', COUNT(*) num' : '') . ', WEIGHT() weights, (weights + (relevance/1000)) rank FROM elkarte_index';
@@ -213,7 +213,7 @@ class Sphinxql_Search extends SearchAPI
 				if (mysqli_error($mySphinx))
 					\Errors::instance()->log_error(mysqli_error($mySphinx));
 
-				throw new \Elk_Exception('error_no_search_daemon');
+				\Errors::instance()->fatal_lang_error('error_no_search_daemon');
 			}
 
 			// Get the relevant information from the search results.
