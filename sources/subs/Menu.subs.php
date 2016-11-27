@@ -19,17 +19,46 @@
  * Create a menu.
  *
  * @param mixed[] $menuData the menu array
+ *  - Possible indexes:
+ * 	- Menu name with named indexes as follows:
+ *     - string $title       => Section title
+ *     - bool $enabled       => Is the section enabled / shown
+ *     - array $areas        => Array of areas within this menu section, see below
+ *     - array $permission   => Permission required to access the whole section
+ *
+ *  - $areas sub array from above, named indexes as follows:
+ *     - array $permission  => Array of permissions to determine who can access this area
+ *     - string $label      => Optional text string for link (Otherwise $txt[$index] will be used)
+ *     - string $controller => Name of controller required for this area
+ *     - string $function   => Method in controller to call when area is selected
+ *     - string $icon       => File name of an icon to use on the menu, if using a class set as transparent.png
+ *     - string $class      => CSS class name to apply to the icon img, used to apply a sprite icon
+ *     - string $custom_url => URL to call for this menu item
+ *     - bool $enabled      => Should this area even be enabled / accessible?
+ *     - bool $hidden       => If the area is visible in the menu
+ *     - string $select     => If set, references another area
+ *     - array $subsections => Array of subsections for this menu area, see below
+ *
+ *  - $subsections sub array from $areas above, unnamed indexes interpreted as follows, single named index 'enabled'
+ *     - string 0           => Label for this subsection
+ *     - array 1            => Array of permissions to check for this subsection.
+ *     - bool 2             => Is this the default subaction - if not set for any will default to first...
+ *     - bool enabled       => Enabled or not
+ *     - array active       => Set the button active for other subsections.
+ *     - string url         => Custom url for the subsection
  * @param mixed[] $menuOptions an array of options that can be used to override some default behaviours.
- *   It can accept the following indexes:
- *    - action                    => overrides the default action
- *    - current_area              => overrides the current area
- *    - extra_url_parameters      => an array or pairs or parameters to be added to the url
- *    - disable_url_session_check => (boolean) if true the session var/id are omitted from the url
- *    - base_url                  => an alternative base url
- *    - menu_type                 => alternative menu types?
- *    - can_toggle_drop_down      => (boolean) if the menu can "toggle"
- *    - template_name             => an alternative template to load (instead of Generic)
- *    - layer_name                => alternative layer name for the menu
+ *  - Possible indexes:
+ *     - action                    => overrides the default action
+ *     - current_area              => overrides the current area
+ *     - extra_url_parameters      => an array or pairs or parameters to be added to the url
+ *     - disable_url_session_check => (boolean) if true the session var/id are omitted from the url
+ *     - base_url                  => an alternative base url
+ *     - menu_type                 => alternative menu types?
+ *     - can_toggle_drop_down      => (boolean) if the menu can "toggle"
+ *     - template_name             => an alternative template to load (instead of Generic)
+ *     - layer_name                => alternative layer name for the menu
+ *     - hook                      => hook name to call integrate_ . 'hook name' . '_areas'
+ *     - default_include_dir       => directory to include for function support
  * @return mixed[]|false
  */
 function createMenu($menuData, $menuOptions = array())
@@ -40,36 +69,6 @@ function createMenu($menuData, $menuOptions = array())
 
 	// Work out where we should get our images from.
 	$context['menu_image_path'] = file_exists($settings['theme_dir'] . '/images/admin/change_menu.png') ? $settings['images_url'] . '/admin' : $settings['default_images_url'] . '/admin';
-
-	/**
-	 * Note menuData is array of form:
-	 *
-	 * Possible fields:
-	 *  For Section:
-	 *    string $title:     Section title.
-	 *    bool $enabled:     Should section be shown?
-	 *    array $areas:      Array of areas within this section.
-	 *    array $permission: Permission required to access the whole section.
-	 *  For Areas:
-	 *    array $permission:  Array of permissions to determine who can access this area.
-	 *    string $label:      Optional text string for link (Otherwise $txt[$index] will be used)
-	 *    string $file:       Name of source file required for this area.
-	 *    string $function:   Function to call when area is selected.
-	 *    string $custom_url: URL to use for this menu item.
-	 *    string $icon:       File name of an icon to use on the menu, if using the sprite class, set as transparent.png
-	 *    string $class:      Class name to apply to the icon img, used to apply a sprite icon
-	 *    bool $enabled:      Should this area even be accessible?
-	 *    bool $hidden:       Should this area be visible?
-	 *    string $select:     If set this item will not be displayed - instead the item indexed here shall be.
-	 *    array $subsections: Array of subsections from this area.
-	 *
-	 *  For Subsections:
-	 *    string 0:     Text label for this subsection.
-	 *    array 1:      Array of permissions to check for this subsection.
-	 *    bool 2:       Is this the default subaction - if not set for any will default to first...
-	 *    bool enabled: Bool to say whether this should be enabled or not.
-	 *    array active: Set the button active for other subsections.
-	 */
 
 	// Every menu gets a unique ID, these are shown in first in, first out order.
 	$context['max_menu_id'] = isset($context['max_menu_id']) ? $context['max_menu_id'] + 1 : 1;
