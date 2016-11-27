@@ -115,7 +115,7 @@ function createMenu($menuData, $menuOptions = array())
 			// The profile menu has slightly different permissions
 			if (is_array($section['permission']) && isset($section['permission']['own'], $section['permission']['any']))
 			{
-				if (empty($area['permission'][$permission_set]) || !allowedTo($section['permission'][$permission_set]))
+				if (empty($section['permission'][$permission_set]) || !allowedTo($section['permission'][$permission_set]))
 					continue;
 			}
 			elseif (!allowedTo($section['permission']))
