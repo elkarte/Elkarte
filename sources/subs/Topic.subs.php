@@ -2612,8 +2612,8 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	sendNotifications($split1_ID_TOPIC, 'split');
 
 	// If there's a search index that needs updating, update it...
-	require_once(SUBSDIR . '/Search.subs.php');
-	$searchAPI = findSearchAPI();
+	$search = new \ElkArte\Search();
+	$searchAPI = $search->findSearchAPI();
 	if (is_callable(array($searchAPI, 'topicSplit')))
 		$searchAPI->topicSplit($split2_ID_TOPIC, $splitMessages);
 
