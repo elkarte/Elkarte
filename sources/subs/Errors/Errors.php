@@ -182,8 +182,8 @@ class Errors
 	 * @param string $error
 	 * @param string $error_type = 'general'
 	 * @param string|mixed[] $sprintf = array()
-	 * @param string|null $file = ''
-	 * @param int|null $line = 0
+	 * @param string $file = ''
+	 * @param int $line = 0
 	 *
 	 * @return string
 	 */
