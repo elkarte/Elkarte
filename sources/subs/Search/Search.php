@@ -528,7 +528,7 @@ class Search
 			);
 
 			// Sort the indexed words (large words -> small words -> excluded words).
-			if ($this->_searchAPI->supportsMethod('searchSort'))
+			if (is_callable(array($this->_searchAPI, 'searchSort')))
 			{
 				$this->_searchAPI->setExcludedWords($this->_excludedWords);
 				usort($orParts[$orIndex], array($this->_searchAPI, 'searchSort'));
@@ -555,7 +555,7 @@ class Search
 				}
 
 				// Have we got indexes to prepare?
-				if ($this->_searchAPI->supportsMethod('prepareIndexes'))
+				if (is_callable(array($this->_searchAPI, 'prepareIndexes')))
 				{
 					$this->_searchAPI->prepareIndexes($word, $this->_searchWords[$orIndex], $this->_excludedIndexWords, $is_excluded);
 				}
@@ -1306,7 +1306,7 @@ class Search
 		}
 
 		// We building an index?
-		if ($this->_searchAPI->supportsMethod('indexedWordQuery', $this->getParams()))
+		if (is_callable(array($this->_searchAPI, 'prepareWord')))
 		{
 			$indexedResults = $this->_prepare_word_index($id_search, $maxMessageResults);
 
@@ -1387,7 +1387,7 @@ class Search
 		call_integration_hook('integrate_main_search_query', array(&$main_query));
 
 		// Did we either get some indexed results, or otherwise did not do an indexed query?
-		if (!empty($indexedResults) || !$this->_searchAPI->supportsMethod('indexedWordQuery', $this->getParams()))
+		if (!empty($indexedResults) || !is_callable(array($this->_searchAPI, 'indexedWordQuery')))
 		{
 			$relevance = $this->_build_relevance($main_query['weights']);
 			$main_query['select']['relevance'] = $relevance;

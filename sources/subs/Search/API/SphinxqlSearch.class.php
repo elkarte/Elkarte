@@ -90,31 +90,6 @@ class Sphinxql_Search extends SearchAPI
 	}
 
 	/**
-	 * Check whether the method can be performed by this API.
-	 *
-	 * @param string $methodName The search method
-	 * @param string|null $query_params Parameters for the query
-	 */
-	public function supportsMethod($methodName, $query_params = null)
-	{
-		switch ($methodName)
-		{
-			case 'isValid':
-			case 'searchSort':
-			case 'setExcludedWords':
-			case 'prepareIndexes':
-			case 'searchQuery':
-				return true;
-			break;
-
-			default:
-				// All other methods, too bad dunno you.
-				return false;
-			break;
-		}
-	}
-
-	/**
 	 * If the settings don't exist we can't continue.
 	 */
 	public function isValid()

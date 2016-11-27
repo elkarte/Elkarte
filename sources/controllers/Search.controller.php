@@ -412,7 +412,7 @@ class Search_Controller extends Action_Controller
 		$query_params = $this->_search->getParams();
 
 		// Can this search rely on the API given the parameters?
-		if ($searchAPI->supportsMethod('searchQuery', $query_params))
+		if (is_callable(array($searchAPI, 'searchQuery')))
 		{
 			$participants = array();
 			$searchArray = array();

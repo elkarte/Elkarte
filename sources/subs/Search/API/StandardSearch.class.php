@@ -41,17 +41,4 @@ class Standard_Search extends SearchAPI
 	 * @var boolean
 	 */
 	public $is_supported = true;
-
-	/**
-	 * Method to check whether the method can be performed by the API.
-	 *
-	 * @param string $methodName
-	 * @param string|null $query_params
-	 * @return boolean
-	 */
-	public function supportsMethod($methodName, $query_params = null)
-	{
-		// Always fall back to the standard search method.
-		return false;
-	}
 }

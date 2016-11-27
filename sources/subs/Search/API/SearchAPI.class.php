@@ -43,11 +43,16 @@ abstract class SearchAPI implements Search_Interface
 	/**
 	 * Method to check whether the method can be performed by the API.
 	 *
+	 * @deprecated since 1.1 - check that the method is callable
+	 *
 	 * @param string $methodName
 	 * @param string|null $query_params
 	 * @return boolean
 	 */
-	abstract public function supportsMethod($methodName, $query_params = null);
+	public function supportsMethod($methodName, $query_params = null)
+	{
+		return is_callable(array($this, $methodName));
+	}
 
 	/**
 	 * If the settings don't exist we can't continue.

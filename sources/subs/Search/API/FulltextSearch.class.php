@@ -86,29 +86,6 @@ class Fulltext_Search extends SearchAPI
 	}
 
 	/**
-	 * Fulltext_Search::supportsMethod()
-	 *
-	 * Check whether the method can be performed by this API.
-	 *
-	 * @param string $methodName The search method
-	 * @param mixed[]|null $query_params The parameters for the query
-	 */
-	public function supportsMethod($methodName, $query_params = null)
-	{
-		switch ($methodName)
-		{
-			case 'searchSort':
-			case 'setExcludedWords':
-			case 'prepareIndexes':
-			case 'indexedWordQuery':
-				return true;
-			// All other methods, too bad dunno you.
-			default:
-				return false;
-		}
-	}
-
-	/**
 	 * Fulltext_Search::_getMinWordLength()
 	 *
 	 * What is the minimum word length full text supports?

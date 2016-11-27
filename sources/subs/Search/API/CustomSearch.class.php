@@ -97,34 +97,6 @@ class Custom_Search extends SearchAPI
 	}
 
 	/**
-	 * Check whether the search can be performed by this API.
-	 *
-	 * @param string $methodName The search method
-	 * @param string|null $query_params Parameters for the query
-	 * @return boolean|null
-	 */
-	public function supportsMethod($methodName, $query_params = null)
-	{
-		switch ($methodName)
-		{
-			case 'isValid':
-			case 'searchSort':
-			case 'setExcludedWords':
-			case 'prepareIndexes':
-			case 'indexedWordQuery':
-			case 'postCreated':
-			case 'postModified':
-				return true;
-			break;
-
-			// All other methods, too bad dunno you.
-			default:
-				return false;
-			break;
-		}
-	}
-
-	/**
 	 * If the settings don't exist we can't continue.
 	 */
 	public function isValid()
