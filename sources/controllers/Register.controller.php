@@ -17,6 +17,8 @@
  *
  */
 
+use ElkArte\Errors\ErrorContext;
+
 /**
  * Register_Controller Class
  * It registers new members, and it allows the administrator moderate member registration
@@ -230,7 +232,7 @@ class Register_Controller extends Action_Controller
 
 		// Were there any errors?
 		$context['registration_errors'] = array();
-		$reg_errors = Error_Context::context('register', 0);
+		$reg_errors = ErrorContext::context('register', 0);
 		if ($reg_errors->hasErrors())
 			$context['registration_errors'] = $reg_errors->prepareErrors();
 
@@ -254,7 +256,7 @@ class Register_Controller extends Action_Controller
 		global $modSettings;
 
 		// Start collecting together any errors.
-		$reg_errors = Error_Context::context('register', 0);
+		$reg_errors = ErrorContext::context('register', 0);
 
 		$this->_can_register();
 
@@ -315,7 +317,7 @@ class Register_Controller extends Action_Controller
 		global $txt, $modSettings, $context, $user_info;
 
 		// Start collecting together any errors.
-		$reg_errors = Error_Context::context('register', 0);
+		$reg_errors = ErrorContext::context('register', 0);
 
 		// Checks already done if coming from the action
 		if ($verifiedOpenID)
@@ -1219,7 +1221,7 @@ class Register_Controller extends Action_Controller
 		// Clean it up like mother would.
 		$context['checked_username'] = preg_replace('~[\t\n\r \x0B\0\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}]+~u', ' ', $context['checked_username']);
 
-		$errors = Error_Context::context('valid_username', 0);
+		$errors = ErrorContext::context('valid_username', 0);
 
 		require_once(SUBSDIR . '/Auth.subs.php');
 		validateUsername(0, $context['checked_username'], 'valid_username', true, false);

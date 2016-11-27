@@ -200,7 +200,7 @@ class Poll_Post_Module implements ElkArte\sources\modules\Module_Interface
 	/**
 	 * Checks the poll conditions before we go to save
 	 *
-	 * @param Error_Context$post_errors
+	 * @param ErrorContext $post_errors
 	 * @param array $topic_info
 	 */
 	public function before_save_post($post_errors, $topic_info)

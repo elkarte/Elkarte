@@ -16,6 +16,8 @@
  *
  */
 
+use ElkArte\Errors\ErrorContext;
+
 /**
  * ManageRegistration admin controller: handles the registration pages
  *
@@ -159,7 +161,7 @@ class ManageRegistration_Controller extends Action_Controller
 			);
 
 			require_once(SUBSDIR . '/Members.subs.php');
-			$reg_errors = Error_Context::context('register', 0);
+			$reg_errors = ErrorContext::context('register', 0);
 			$memberID = registerMember($regOptions, 'register');
 
 			// If there are "important" errors and you are not an admin: log the first error

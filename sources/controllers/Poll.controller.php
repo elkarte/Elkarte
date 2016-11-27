@@ -15,6 +15,8 @@
  *
  */
 
+use ElkArte\Errors\ErrorContext;
+
 /**
  * Poll_Controller Class
  * This receives requests for voting, locking, removing and editing polls.
@@ -259,7 +261,7 @@ class Poll_Controller extends Action_Controller
 		$context['start'] = $this->_req->getQuery('start', 'intval');
 		$context['is_edit'] = isset($this->_req->post->add) ? 0 : 1;
 
-		$poll_errors = Error_Context::context('poll');
+		$poll_errors = ErrorContext::context('poll');
 		$pollinfo = pollInfoForTopic($topic);
 
 		// Assume it all exists, right?
@@ -510,7 +512,7 @@ class Poll_Controller extends Action_Controller
 		if (empty($this->_req->post))
 			redirectexit('action=editpoll;topic=' . $topic . '.0');
 
-		$poll_errors = Error_Context::context('poll');
+		$poll_errors = ErrorContext::context('poll');
 
 		if (checkSession('post', '', false) != '')
 			$poll_errors->addError('session_timeout');

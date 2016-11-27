@@ -608,7 +608,7 @@ function loadProfileFields($force_reload = false)
 					}
 					elseif ($value !== null)
 					{
-						$errors = Error_Context::context('change_username', 0);
+						$errors = ElkArte\Errors\ErrorContext::context('change_username', 0);
 
 						validateUsername($context['id_member'], $value, 'change_username');
 

@@ -465,10 +465,10 @@ function deleteMembers($users, $check_not_admin = false)
  * @uses Auth.subs.php
  * @uses Mail.subs.php
  * @param mixed[] $regOptions
- * @param string $error_context
+ * @param string $ErrorContext
  * @return integer the ID of the newly created member
  */
-function registerMember(&$regOptions, $error_context = 'register')
+function registerMember(&$regOptions, $ErrorContext = 'register')
 {
 	global $scripturl, $txt;
 
@@ -481,7 +481,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Put any errors in here.
-	$reg_errors = Error_Context::context($error_context, 0);
+	$reg_errors = ElkArte\Errors\ErrorContext::context($ErrorContext, 0);
 
 	// What method of authorization are we going to use?
 	if (empty($regOptions['auth_method']) || !in_array($regOptions['auth_method'], array('password', 'openid')))
@@ -499,7 +499,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 	if (!Data_Validator::is_valid($regOptions, array('email' => 'valid_email|required|max_length[255]'), array('email' => 'trim')))
 		$reg_errors->addError('bad_email');
 
-	validateUsername(0, $regOptions['username'], $error_context, !empty($regOptions['check_reserved_name']));
+	validateUsername(0, $regOptions['username'], $ErrorContext, !empty($regOptions['check_reserved_name']));
 
 	// Generate a validation code if it's supposed to be emailed.
 	$validation_code = $regOptions['require'] === 'activation' ? generateValidationCode() : '';

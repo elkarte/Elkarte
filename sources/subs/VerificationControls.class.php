@@ -89,7 +89,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	elseif (!$isNew && !$do_test)
 		return true;
 
-	$verification_errors = Error_Context::context($verificationOptions['id']);
+	$verification_errors = ElkArte\Errors\ErrorContext::context($verificationOptions['id']);
 	$increase_error_count = false;
 
 	// Start with any testing.

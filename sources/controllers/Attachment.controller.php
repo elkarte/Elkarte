@@ -15,6 +15,8 @@
  *
  */
 
+use ElkArte\Errors\AttachmentErrorContext;
+
 /**
  * Attachment_Controller class.
  *
@@ -117,7 +119,7 @@ class Attachment_Controller extends Action_Controller
 		{
 			loadLanguage('Post');
 
-			$attach_errors = Attachment_Error_Context::context();
+			$attach_errors = AttachmentErrorContext::context();
 			$attach_errors->activate();
 
 			if ($context['attachments']['can']['post'] && empty($this->_req->post->from_qr))

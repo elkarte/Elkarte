@@ -11,6 +11,8 @@
  *
  */
 
+use ElkArte\Errors\ErrorContext;
+
 /**
  * This class controls execution for admin actions in the bans area
  * of the admin panel.
@@ -306,7 +308,7 @@ class ManageBans_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Bans.subs.php');
 
-		$ban_errors = Error_Context::context('ban', 1);
+		$ban_errors = ErrorContext::context('ban', 1);
 
 		// Saving a new or edited ban?
 		if ((isset($this->_req->post->add_ban) || isset($this->_req->post->modify_ban) || isset($this->_req->post->remove_selection)) && !$ban_errors->hasErrors())
@@ -663,7 +665,7 @@ class ManageBans_Controller extends Action_Controller
 		checkSession();
 		validateToken('admin-bet');
 
-		$ban_errors = Error_Context::context('ban', 1);
+		$ban_errors = ErrorContext::context('ban', 1);
 
 		// Adding or editing a ban group
 		if (isset($this->_req->post->add_ban) || isset($this->_req->post->modify_ban))

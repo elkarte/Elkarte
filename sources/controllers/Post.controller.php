@@ -17,13 +17,15 @@
  *
  */
 
+use ElkArte\Errors\ErrorContext;
+
 /**
  * Post_Controller Class
  * Everything related to posting new replies and topics and modifications of them
  */
 class Post_Controller extends Action_Controller
 {
-	/** @var null|Error_Context The post (messages) errors object */
+	/** @var null|ErrorContext The post (messages) errors object */
 	protected $_post_errors = null;
 
 	/** @var null|Template_Layers The template layers object */
@@ -46,7 +48,7 @@ class Post_Controller extends Action_Controller
 	 */
 	public function pre_dispatch()
 	{
-		$this->_post_errors = Error_Context::context('post', 1);
+		$this->_post_errors = ErrorContext::context('post', 1);
 		$this->_template_layers = Template_Layers::getInstance();
 
 		$this->preparse = \BBC\PreparseCode::getInstance();

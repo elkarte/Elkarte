@@ -11,10 +11,12 @@
  *
  */
 
+namespace ElkArte\Errors;
+
 /**
  *  This class is an experiment for the job of handling errors.
  */
-final class Error_Context
+class ErrorContext
 {
 	/**
 	 * Holds the unique identifier of the error (a name).
@@ -52,10 +54,10 @@ final class Error_Context
 	private $_language_files = array();
 
 	/**
-	 * Multiton. This is an array of instances of error_context.
+	 * Multiton. This is an array of instances of ErrorContext.
 	 * All callers use an error context ('post', 'attach', or 'default' if none chosen).
 	 *
-	 * @var array of error_context
+	 * @var array of ErrorContext
 	 */
 	private static $_contexts = null;
 
@@ -295,12 +297,12 @@ final class Error_Context
 	}
 
 	/**
-	 * Find and return error_context instance if it exists,
+	 * Find and return ErrorContext instance if it exists,
 	 * or create a new instance for $id if it didn't already exist.
 	 *
 	 * @param string $id
 	 * @param int|null $default_severity
-	 * @return Error_Context
+	 * @return ErrorContext
 	 */
 	public static function context($id = 'default', $default_severity = null)
 	{
@@ -308,7 +310,7 @@ final class Error_Context
 			self::$_contexts = array();
 
 		if (!array_key_exists($id, self::$_contexts))
-			self::$_contexts[$id] = new Error_Context($id, $default_severity);
+			self::$_contexts[$id] = new self($id, $default_severity);
 
 		return self::$_contexts[$id];
 	}

@@ -17,6 +17,8 @@
  *
  */
 
+use ElkArte\Errors\ErrorContext;
+
 /**
  * PersonalMessage_Controller class
  * It allows viewing, sending, deleting, and marking personal messages
@@ -949,7 +951,7 @@ class PersonalMessage_Controller extends Action_Controller
 		list ($modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']) = explode(',', $modSettings['pm_spam_settings']);
 
 		// Initialize the errors we're about to make.
-		$post_errors = Error_Context::context('pm', 1);
+		$post_errors = ErrorContext::context('pm', 1);
 
 		// Check whether we've gone over the limit of messages we can send per hour - fatal error if fails!
 		if (!empty($modSettings['pm_posts_per_hour'])
@@ -1268,7 +1270,7 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		$context['page_title'] = $txt['send_message'];
-		$error_types = Error_Context::context('pm', 1);
+		$error_types = ErrorContext::context('pm', 1);
 
 		// Got some known members?
 		$context['recipients'] = array(
