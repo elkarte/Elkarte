@@ -32,6 +32,7 @@
 		"phpunit/phpunit-selenium": "1.4.*"
 	},
 	"autoload": {
-		"files": ["sources/Autoloader.class.php"]
+		"files": ["sources/Autoloader.class.php"],
+		"psr-4": { "ElkArte\\": ["sources/", "sources/subs/"] }
 	}
 }

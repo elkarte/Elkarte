@@ -21,6 +21,9 @@ require_once(BOARDDIR . '/sources/subs/Cache.subs.php');
 require_once(BOARDDIR . '/sources/database/Database.subs.php');
 require_once(BOARDDIR . '/install/installcore.php');
 
+// Composer-Autoloader
+require_once(BOARDDIR . '/vendor/autoload.php');
+
 /**
  * Used to install ElkArte SQL files to a database scheme
  */
@@ -228,7 +231,6 @@ Class Elk_Testing_Setup
 		require_once(SUBSDIR . '/Util.class.php');
 		require_once(SUBSDIR . '/Auth.subs.php');
 
-		require(SOURCEDIR . '/Autoloader.class.php');
 		Elk_Autoloader::getInstance()->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
 
 		$settings['theme_dir'] = $settings['default_theme_dir'] = BOARDDIR . '/Themes/default';
