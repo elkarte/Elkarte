@@ -245,10 +245,5 @@ class Action
 
 		// Can't let you continue, sorry.
 		throw new Elk_Exception('error_sa_not_set');
-
-		// I said... can't.
-		trigger_error('No access...', E_USER_ERROR);
-
-		return false;
 	}
 }

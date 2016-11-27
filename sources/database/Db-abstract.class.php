@@ -411,12 +411,9 @@ abstract class Database_Abstract implements Database
 			Errors::instance()->log_error($log_message, 'critical', $file, $line);
 		}
 
-		if (class_exists('Errors'))
+		if (class_exists('Elk_Exception'))
 		{
 			throw new Elk_Exception($error_message, false);
-
-			// Cannot continue...
-			exit;
 		}
 		elseif ($error_type)
 			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''), $error_type);

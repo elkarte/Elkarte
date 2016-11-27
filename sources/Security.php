@@ -421,9 +421,6 @@ function is_not_banned($forceCheck = false)
 
 		// You banned, sucka!
 		throw new Elk_Exception(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_access']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_access']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']), 'user');
-
-		// If we get here, something's gone wrong.... but let's try anyway.
-		trigger_error('Hacking attempt...', E_USER_ERROR);
 	}
 	// You're not allowed to log in but yet you are. Let's fix that.
 	elseif (isset($_SESSION['ban']['cannot_login']) && !$user_info['is_guest'])
@@ -1113,9 +1110,6 @@ function isAllowedTo($permission, $boards = null)
 		writeLog(true);
 
 		throw new Elk_Exception('cannot_' . $error_permission, false);
-
-		// Getting this far is a really big problem, but let's try our best to prevent any cases...
-		trigger_error('Hacking attempt...', E_USER_ERROR);
 	}
 
 	// If you're doing something on behalf of some "heavy" permissions, validate your session.
@@ -1331,7 +1325,6 @@ function spamProtection($error_type, $fatal = true)
 		if ($fatal)
 		{
 			throw new Elk_Exception($error_type . '_WaitTime_broken', false, array($timeLimit));
-			return true;
 		}
 		else
 			return $timeLimit;
