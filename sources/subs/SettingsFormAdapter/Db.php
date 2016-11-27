@@ -24,7 +24,7 @@ class Db extends Adapter
 	 */
 	public function prepare()
 	{
-		global $txt, $helptxt, $modSettings;
+		global $modSettings;
 
 		loadLanguage('Help');
 
@@ -44,7 +44,7 @@ class Db extends Adapter
 				}
 
 				// Special case for inline permissions
-				if ($configVar[0] == 'permissions' && !allowedTo('manage_permissions'))
+				if ($configVar[0] === 'permissions' && !allowedTo('manage_permissions'))
 				{
 					continue;
 				}
@@ -54,7 +54,7 @@ class Db extends Adapter
 					'size' => !empty($configVar[2]) && !is_array($configVar[2]) ? $configVar[2] : (in_array($configVar[0], array('int', 'float')) ? 6 : 0),
 					'data' => array(),
 					'name' => $configVar[1],
-					'value' => isset($modSettings[$configVar[1]]) ? ($configVar[0] == 'select' ? $modSettings[$configVar[1]] : htmlspecialchars($modSettings[$configVar[1]], ENT_COMPAT, 'UTF-8')) : (in_array($configVar[0], array('int', 'float')) ? 0 : ''),
+					'value' => isset($modSettings[$configVar[1]]) ? ($configVar[0] === 'select' ? $modSettings[$configVar[1]] : htmlspecialchars($modSettings[$configVar[1]], ENT_COMPAT, 'UTF-8')) : (in_array($configVar[0], array('int', 'float')) ? 0 : ''),
 					'disabled' => false,
 					'invalid' => !empty($configVar['invalid']),
 					'javascript' => '',
@@ -99,7 +99,7 @@ class Db extends Adapter
 		$inlinePermissions = array_filter($this->configVars,
 			function ($configVar)
 			{
-				return isset($configVar[0]) && $configVar[0] == 'permissions';
+				return isset($configVar[0]) && $configVar[0] === 'permissions';
 			}
 		);
 		if (empty($inlinePermissions))
@@ -192,7 +192,7 @@ class Db extends Adapter
 		if (!empty($configVar[2]) && is_array($configVar[2]))
 		{
 			// If we allow multiple selections, we need to adjust a few things.
-			if ($configVar[0] == 'select' && !empty($configVar['multiple']))
+			if ($configVar[0] === 'select' && !empty($configVar['multiple']))
 			{
 				$this->context[$configVar[1]]['name'] .= '[]';
 				$this->context[$configVar[1]]['value'] = !empty($this->context[$configVar[1]]['value']) ? \Util::unserialize($this->context[$configVar[1]]['value']) : array();
@@ -224,7 +224,7 @@ class Db extends Adapter
 		{
 			if (!is_numeric($k))
 			{
-				if (substr($k, 0, 2) == 'on')
+				if (substr($k, 0, 2) === 'on')
 				{
 					$this->context[$configVar[1]]['javascript'] .= ' ' . $k . '="' . $v . '"';
 				}
@@ -254,16 +254,16 @@ class Db extends Adapter
 		$codes = \BBC\ParserWrapper::getInstance()->getCodes();
 		$bbcTags = $codes->getTags();
 
-		if (!isset($this->configValues[$var[1]]))
+		if (!isset($this->configValues[$var[1] . '_enabledTags']))
 		{
-			$this->configValues[$var[1]] = array();
+			$this->configValues[$var[1] . '_enabledTags'] = array();
 		}
-		elseif (!is_array($this->configValues[$var[1]]))
+		elseif (!is_array($this->configValues[$var[1] . '_enabledTags']))
 		{
-			$this->configValues[$var[1]] = array($this->configValues[$var[1]]);
+			$this->configValues[$var[1] . '_enabledTags'] = array($this->configValues[$var[1] . '_enabledTags']);
 		}
 
-		return implode(',', array_diff($bbcTags, $this->configValues[$var[1]]));
+		return implode(',', array_diff($bbcTags, $this->configValues[$var[1] . '_enabledTags']));
 	}
 
 	private function prepareLabel($configVar)
@@ -298,12 +298,12 @@ class Db extends Adapter
 	 */
 	private function initBbcChoices()
 	{
-		global $txt, $helptxt, $context, $modSettings;
+		global $helptxt, $modSettings;
 
 		$bbcChoice = array_filter($this->configVars,
 			function ($configVar)
 			{
-				return isset($configVar[0]) && $configVar[0] == 'bbc';
+				return isset($configVar[0]) && $configVar[0] === 'bbc';
 			}
 		);
 		if (empty($bbcChoice))
@@ -348,7 +348,7 @@ class Db extends Adapter
 		$setArray = array();
 		foreach ($this->configVars as $var)
 		{
-			if (!isset($var[1]) || !isset($this->configValues[$var[1]]) && $var[0] != 'check')
+			if (!isset($var[1]) || !isset($this->configValues[$var[1]]) && $var[0] !== 'check')
 			{
 				continue;
 			}
@@ -420,7 +420,7 @@ class Db extends Adapter
 			}
 
 			// Permissions?
-			elseif ($var[0] == 'permissions')
+			elseif ($var[0] === 'permissions')
 			{
 				$inlinePermissions[] = $var;
 			}
