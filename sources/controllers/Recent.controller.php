@@ -383,7 +383,7 @@ class Recent_Controller extends Action_Controller
 		if (!empty($modSettings['likes_enabled']))
 		{
 			// Just the message id please
-			$messages = array_map(function($element) {
+			$messages = array_map(function ($element) {
 				return (int) $element['id'];
 			}, $messages);
 
