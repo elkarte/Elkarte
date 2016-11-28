@@ -680,7 +680,8 @@ class ManageMaillist_Controller extends Action_Controller
 				array(
 					'position' => 'below_table_data',
 					'class' => 'submitbutton',
-					'value' => '<input type="submit" name="addfilter" value="' . $txt['add_filter'] . '" />
+					'value' => '
+						<input type="submit" name="addfilter" value="' . $txt['add_filter'] . '" />
 						<a class="linkbutton" href="' . $scripturl . '?action=admin;area=maillist;sa=sortfilters">' . $txt['sort_filter'] . '</a>',
 				),
 			),
@@ -1106,7 +1107,7 @@ class ManageMaillist_Controller extends Action_Controller
 					'position' => 'below_table_data',
 					'class' => 'submitbutton',
 					'value' => '
-						<input type="submit" name="addparser" value="' . $txt['add_parser'] . '" class="right_submit" />
+						<input type="submit" name="addparser" value="' . $txt['add_parser'] . '" />
 						<a class="linkbutton" href="' . $scripturl . '?action=admin;area=maillist;sa=sortparsers">' . $txt['sort_parser'] . '</a>',
 					),
 			),
