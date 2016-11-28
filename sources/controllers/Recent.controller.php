@@ -383,7 +383,9 @@ class Recent_Controller extends Action_Controller
 		if (!empty($modSettings['likes_enabled']))
 		{
 			// Just the message id please
-			$messages = array_column($messages, 'id');
+			$messages = array_map(function($element) {
+				return (int) $element['id'];
+			}, $messages);
 
 			require_once(SUBSDIR . '/Likes.subs.php');
 			$likes = loadLikes($messages, true);
