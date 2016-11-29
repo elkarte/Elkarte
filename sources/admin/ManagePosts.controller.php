@@ -117,7 +117,9 @@ class ManagePosts_Controller extends Action_Controller
 				$this->_req->post->censortext = explode("\n", strtr($this->_req->post->censortext, array("\r" => '')));
 
 				foreach ($this->_req->post->censortext as $c)
+				{
 					list ($censored_vulgar[], $censored_proper[]) = array_pad(explode('=', trim($c)), 2, '');
+				}
 			}
 			elseif (isset($this->_req->post->censor_vulgar, $this->_req->post->censor_proper))
 			{
@@ -125,8 +127,10 @@ class ManagePosts_Controller extends Action_Controller
 				{
 					foreach ($this->_req->post->censor_vulgar as $i => $value)
 					{
-						if (trim(strtr($value, '*', ' ')) == '')
+						if (trim(strtr($value, '*', ' ')) === '')
+						{
 							unset($this->_req->post->censor_vulgar[$i], $this->_req->post->censor_proper[$i]);
+						}
 					}
 
 					$censored_vulgar = $this->_req->post->censor_vulgar;
@@ -168,18 +172,23 @@ class ManagePosts_Controller extends Action_Controller
 		$censor_vulgar = explode("\n", $modSettings['censor_vulgar']);
 		$censor_proper = explode("\n", $modSettings['censor_proper']);
 
-
 		$context['censored_words'] = array();
 		for ($i = 0, $n = count($censor_vulgar); $i < $n; $i++)
 		{
 			if (empty($censor_vulgar[$i]))
+			{
 				continue;
+			}
 
 			// Skip it, it's either spaces or stars only.
-			if (trim(strtr($censor_vulgar[$i], '*', ' ')) == '')
+			if (trim(strtr($censor_vulgar[$i], '*', ' ')) === '')
+			{
 				continue;
+			}
 
-			$context['censored_words'][htmlspecialchars(trim($censor_vulgar[$i]))] = isset($censor_proper[$i]) ? htmlspecialchars($censor_proper[$i], ENT_COMPAT, 'UTF-8') : '';
+			$context['censored_words'][htmlspecialchars(trim($censor_vulgar[$i]))] = isset($censor_proper[$i])
+				? htmlspecialchars($censor_proper[$i], ENT_COMPAT, 'UTF-8')
+				: '';
 		}
 
 		call_integration_hook('integrate_censors');
@@ -243,18 +252,24 @@ class ManagePosts_Controller extends Action_Controller
 				$colData = getMessageTableColumns();
 				foreach ($colData as $column)
 				{
-					if ($column['name'] == 'body')
+					if ($column['name'] === 'body')
+					{
 						$body_type = $column['type'];
+					}
 				}
 
-				if (isset($body_type) && ($this->_req->post->max_messageLength > 65535 || $this->_req->post->max_messageLength == 0) && $body_type == 'text')
+				if (isset($body_type) && ($this->_req->post->max_messageLength > 65535 || $this->_req->post->max_messageLength == 0) && $body_type === 'text')
+				{
 					throw new Elk_Exception('convert_to_mediumtext', false, array($scripturl . '?action=admin;area=maintain;sa=database'));
+				}
 
 			}
 
 			// If we're changing the post preview length let's check its valid
 			if (!empty($this->_req->post->preview_characters))
+			{
 				$this->_req->post->preview_characters = (int) min(max(0, $this->_req->post->preview_characters), 512);
+			}
 
 			call_integration_hook('integrate_save_post_settings');
 
@@ -280,25 +295,25 @@ class ManagePosts_Controller extends Action_Controller
 
 		// Initialize it with our settings
 		$config_vars = array(
-				// Simple post options...
-				array('check', 'removeNestedQuotes'),
-				array('check', 'enableVideoEmbeding'),
-				array('check', 'enableCodePrettify'),
-				// Note show the warning as read if pspell not installed!
-				array('check', 'enableSpellChecking', 'postinput' => (function_exists('pspell_new') ? $txt['enableSpellChecking_warning'] : '<span class="error">' . $txt['enableSpellChecking_error'] . '</span>')),
+			// Simple post options...
+			array('check', 'removeNestedQuotes'),
+			array('check', 'enableVideoEmbeding'),
+			array('check', 'enableCodePrettify'),
+			// Note show the warning as read if pspell not installed!
+			array('check', 'enableSpellChecking', 'postinput' => (function_exists('pspell_new') ? $txt['enableSpellChecking_warning'] : '<span class="error">' . $txt['enableSpellChecking_error'] . '</span>')),
 			'',
-				// Posting limits...
-				array('int', 'max_messageLength', 'subtext' => $txt['max_messageLength_zero'], 'postinput' => $txt['manageposts_characters']),
-				array('int', 'topicSummaryPosts', 'postinput' => $txt['manageposts_posts']),
+			// Posting limits...
+			array('int', 'max_messageLength', 'subtext' => $txt['max_messageLength_zero'], 'postinput' => $txt['manageposts_characters']),
+			array('int', 'topicSummaryPosts', 'postinput' => $txt['manageposts_posts']),
 			'',
-				// Posting time limits...
-				array('int', 'spamWaitTime', 'postinput' => $txt['manageposts_seconds']),
-				array('int', 'edit_wait_time', 'postinput' => $txt['manageposts_seconds']),
-				array('int', 'edit_disable_time', 'subtext' => $txt['edit_disable_time_zero'], 'postinput' => $txt['manageposts_minutes']),
+			// Posting time limits...
+			array('int', 'spamWaitTime', 'postinput' => $txt['manageposts_seconds']),
+			array('int', 'edit_wait_time', 'postinput' => $txt['manageposts_seconds']),
+			array('int', 'edit_disable_time', 'subtext' => $txt['edit_disable_time_zero'], 'postinput' => $txt['manageposts_minutes']),
 			'',
-				// First & Last message preview lengths
-				array('select', 'message_index_preview', array($txt['message_index_preview_off'], $txt['message_index_preview_first'], $txt['message_index_preview_last'])),
-				array('int', 'preview_characters', 'subtext' => $txt['preview_characters_zero'], 'postinput' => $txt['preview_characters_units']),
+			// First & Last message preview lengths
+			array('select', 'message_index_preview', array($txt['message_index_preview_off'], $txt['message_index_preview_first'], $txt['message_index_preview_last'])),
+			array('int', 'preview_characters', 'subtext' => $txt['preview_characters_zero'], 'postinput' => $txt['preview_characters_units']),
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
