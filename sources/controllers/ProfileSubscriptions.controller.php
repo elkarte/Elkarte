@@ -85,7 +85,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 
 		// No gateways yet, no way to pay then, blame the admin !
 		if (empty($this->_gateways))
-			Errors::instance()->fatal_error($txt['paid_admin_not_setup_gateway']);
+			throw new Elk_Exception($txt['paid_admin_not_setup_gateway']);
 
 		// Get the members current subscriptions.
 		$context['current'] = loadMemberSubscriptions($memID, $context['subscriptions']);
@@ -217,7 +217,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 		// Selecting a subscription that does not exist or is not active?
 		if (!isset($this->_id_sub, $context['subscriptions'][$this->_id_sub]) || $context['subscriptions'][$this->_id_sub]['active'] == 0)
 		{
-			Errors::instance()->fatal_lang_error('paid_sub_not_active');
+			throw new Elk_Exception('paid_sub_not_active');
 		}
 
 		// Simplify...
@@ -233,7 +233,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 		// Check we have a valid cost.
 		if ($this->_order['flexible'] && $period === 'xx')
 		{
-			Errors::instance()->fatal_lang_error('paid_sub_not_active');
+			throw new Elk_Exception('paid_sub_not_active');
 		}
 
 		// Sort out the cost/currency.
@@ -248,7 +248,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 
 		// No active payment gateways, then no way to pay, time to bail out, blame the admin
 		if (empty($context['gateways']))
-			Errors::instance()->fatal_error($txt['paid_admin_not_setup_gateway']);
+			throw new Elk_Exception($txt['paid_admin_not_setup_gateway']);
 
 		// Now we are going to assume they want to take this out ;)
 		$new_data = array($this->_order['id'], $context['value'], $period, 'prepay');

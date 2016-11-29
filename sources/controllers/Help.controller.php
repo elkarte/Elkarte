@@ -100,7 +100,7 @@ class Help_Controller extends Action_Controller
 		global $txt, $helptxt, $context, $scripturl;
 
 		if (!isset($this->_req->query->help) || !is_string($this->_req->query->help))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		if (!isset($helptxt))
 			$helptxt = array();

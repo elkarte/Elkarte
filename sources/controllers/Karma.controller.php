@@ -107,7 +107,7 @@ class Karma_Controller extends Action_Controller
 		{
 			// If you are gonna try to repeat.... don't allow it.
 			if ($action == $dir)
-				Errors::instance()->fatal_lang_error('karma_wait_time', false, array($modSettings['karmaWaitTime'], ($modSettings['karmaWaitTime'] == 1 ? strtolower($txt['hour']) : $txt['hours'])));
+				throw new Elk_Exception('karma_wait_time', false, array($modSettings['karmaWaitTime'], ($modSettings['karmaWaitTime'] == 1 ? strtolower($txt['hour']) : $txt['hours'])));
 
 			updateKarma($id_executor, $id_target, $dir);
 		}
@@ -125,7 +125,7 @@ class Karma_Controller extends Action_Controller
 
 		// If the mod is disabled, show an error.
 		if (empty($modSettings['karmaMode']))
-			Errors::instance()->fatal_lang_error('feature_disabled', true);
+			throw new Elk_Exception('feature_disabled', true);
 
 		// If you're a guest or can't do this, blow you off...
 		is_not_guest();
@@ -140,11 +140,11 @@ class Karma_Controller extends Action_Controller
 		// @todo Should this be dropped in favor of post group permissions?
 		// Should this apply to the member you are smiting/applauding?
 		if (!$user_info['is_admin'] && $user_info['posts'] < $modSettings['karmaMinPosts'])
-			Errors::instance()->fatal_lang_error('not_enough_posts_karma', true, array($modSettings['karmaMinPosts']));
+			throw new Elk_Exception('not_enough_posts_karma', true, array($modSettings['karmaMinPosts']));
 
 		// And you can't modify your own, punk! (use the profile if you need to.)
 		if (empty($id_target) || $id_target == $user_info['id'])
-			Errors::instance()->fatal_lang_error('cant_change_own_karma', false);
+			throw new Elk_Exception('cant_change_own_karma', false);
 
 		// Delete any older items from the log so we can get the go ahead or not
 		clearKarma($modSettings['karmaWaitTime']);

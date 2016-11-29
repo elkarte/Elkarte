@@ -245,7 +245,7 @@ class ManagePaid_Controller extends Action_Controller
 
 		// Not made the settings yet?
 		if (empty($modSettings['paid_currency_symbol']))
-			Errors::instance()->fatal_lang_error('paid_not_set_currency', false, array($scripturl . '?action=admin;area=paidsubscribe;sa=settings'));
+			throw new Elk_Exception('paid_not_set_currency', false, array($scripturl . '?action=admin;area=paidsubscribe;sa=settings'));
 
 		// Some basic stuff.
 		$context['page_title'] = $txt['paid_subs_view'];
@@ -445,7 +445,7 @@ class ManagePaid_Controller extends Action_Controller
 
 				// There needs to be something.
 				if (empty($this->_req->post->span_value) || empty($this->_req->post->cost))
-					Errors::instance()->fatal_lang_error('paid_no_cost_value');
+					throw new Elk_Exception('paid_no_cost_value');
 			}
 			// Flexible is harder but more fun ;)
 			else
@@ -460,7 +460,7 @@ class ManagePaid_Controller extends Action_Controller
 				);
 
 				if (empty($this->_req->post->cost_day) && empty($this->_req->post->cost_week) && empty($this->_req->post->cost_month) && empty($this->_req->post->cost_year))
-					Errors::instance()->fatal_lang_error('paid_all_freq_blank');
+					throw new Elk_Exception('paid_all_freq_blank');
 			}
 
 			$cost = serialize($cost);
@@ -797,7 +797,7 @@ class ManagePaid_Controller extends Action_Controller
 			$context['sub_id'] = validateSubscriptionID($context['log_id']);
 
 		if (!isset($context['subscriptions'][$context['sub_id']]))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		$context['current_subscription'] = $context['subscriptions'][$context['sub_id']];
 
@@ -824,10 +824,10 @@ class ManagePaid_Controller extends Action_Controller
 				$member = getMemberByName($this->_req->post->name);
 
 				if (empty($member))
-					Errors::instance()->fatal_lang_error('error_member_not_found');
+					throw new Elk_Exception('error_member_not_found');
 
 				if (alreadySubscribed($context['sub_id'], $member['id_member']))
-					Errors::instance()->fatal_lang_error('member_already_subscribed');
+					throw new Elk_Exception('member_already_subscribed');
 
 				// Actually put the subscription in place.
 				if ($status == 1)
@@ -935,7 +935,7 @@ class ManagePaid_Controller extends Action_Controller
 		{
 			$row = getPendingSubscriptions($context['log_id']);
 			if (empty($row))
-				Errors::instance()->fatal_lang_error('no_access', false);
+				throw new Elk_Exception('no_access', false);
 
 			// Any pending payments?
 			$context['pending_payments'] = array();

@@ -21,6 +21,9 @@
  */
 class ManageErrors_Controller extends Action_Controller
 {
+	/** @var ElkArte\Errors\Log */
+	private $errorLog;
+
 	/**
 	 * Calls the right handler.
 	 * Requires admin_forum permission.
@@ -31,6 +34,8 @@ class ManageErrors_Controller extends Action_Controller
 	{
 		// Check for the administrative permission to do this.
 		isAllowedTo('admin_forum');
+
+		$this->errorLog = new ElkArte\Errors\Log(database());
 
 		// The error log. View the list or view a file?
 		$activity = $this->_req->getQuery('activity', 'strval');
@@ -58,8 +63,6 @@ class ManageErrors_Controller extends Action_Controller
 	{
 		global $scripturl, $txt, $context, $modSettings, $filter;
 
-		require_once(SUBSDIR . '/Error.subs.php');
-
 		// Templates, etc...
 		loadLanguage('Maintenance');
 		loadTemplate('Errors');
@@ -76,7 +79,7 @@ class ManageErrors_Controller extends Action_Controller
 			validateToken('admin-el');
 
 			$error_list = $this->_req->getPost('delete');
-			deleteErrors($type, $filter, $error_list);
+			$this->errorLog->deleteErrors($type, $filter, $error_list);
 
 			// Go back to where we were.
 			if ($type == 'delete')
@@ -85,7 +88,7 @@ class ManageErrors_Controller extends Action_Controller
 			redirectexit('action=admin;area=logs;sa=errorlog' . (isset($this->_req->query->desc) ? ';desc' : ''));
 		}
 
-		$num_errors = numErrors($filter);
+		$num_errors = $this->errorLog->numErrors($filter);
 		$members = array();
 
 		// If this filter is empty...
@@ -104,7 +107,7 @@ class ManageErrors_Controller extends Action_Controller
 		$context['start'] = $this->_req->query->start;
 		$context['errors'] = array();
 
-		$logdata = getErrorLogData($this->_req->query->start, $context['sort_direction'], $filter);
+		$logdata = $this->errorLog->getErrorLogData($this->_req->query->start, $context['sort_direction'], $filter);
 		if (!empty($logdata))
 		{
 			$context['errors'] = $logdata['errors'];
@@ -121,7 +124,7 @@ class ManageErrors_Controller extends Action_Controller
 
 		// What type of errors do we have and how many do we have?
 		$context['error_types'] = array();
-		$context['error_types'] = fetchErrorsByType($filter, $sort);
+		$context['error_types'] = $this->errorLog->fetchErrorsByType($filter, $sort);
 		$tmp = array_keys($context['error_types']);
 		$sum = (int) end($tmp);
 
@@ -292,14 +295,14 @@ class ManageErrors_Controller extends Action_Controller
 
 		// Not like we can look at just any old file
 		if ($ext !== '.php' || (strpos($file, $real_board) === false && strpos($file, $real_source) === false) || strpos($file, $real_cache) !== false || in_array($basename, $excluded) || !is_readable($file))
-			Errors::instance()->fatal_lang_error('error_bad_file', true, array(htmlspecialchars($filename, ENT_COMPAT, 'UTF-8')));
+			throw new Elk_Exception('error_bad_file', true, array(htmlspecialchars($filename, ENT_COMPAT, 'UTF-8')));
 
 		// Get the min and max lines
 		$min = $line - 16 <= 0 ? 1 : $line - 16;
 		$max = $line + 21; // One additional line to make everything work out correctly
 
 		if ($max <= 0 || $min >= $max)
-			Errors::instance()->fatal_lang_error('error_bad_line');
+			throw new Elk_Exception('error_bad_line');
 
 		$file_data = explode('<br />', highlight_php_code(htmlspecialchars(implode('', file($file)), ENT_COMPAT, 'UTF-8')));
 

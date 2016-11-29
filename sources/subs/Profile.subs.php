@@ -49,7 +49,7 @@ function currentMemberID($fatal = true, $reload_id = false)
 		is_not_guest('', $fatal);
 
 		if ($fatal)
-			Errors::instance()->fatal_lang_error('not_a_user', false);
+			throw new Elk_Exception('not_a_user', false);
 		else
 			return false;
 	}
@@ -608,7 +608,7 @@ function loadProfileFields($force_reload = false)
 					}
 					elseif ($value !== null)
 					{
-						$errors = Error_Context::context('change_username', 0);
+						$errors = ElkArte\Errors\ErrorContext::context('change_username', 0);
 
 						validateUsername($context['id_member'], $value, 'change_username');
 
@@ -621,7 +621,7 @@ function loadProfileFields($force_reload = false)
 							// Otherwise grab all of them and do not log anything
 							$error_severity = $errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
 							foreach ($errors->prepareErrors($error_severity) as $error)
-								Errors::instance()->fatal_error($error, $error_severity === null ? false : 'general');
+								throw new Elk_Exception($error, $error_severity === null ? false : 'general');
 						}
 					}
 				}
@@ -1285,7 +1285,7 @@ function makeThemeChanges($memID, $id_theme)
 
 	// Can't change reserved vars.
 	if ((isset($_POST['options']) && count(array_intersect(array_keys($_POST['options']), $reservedVars)) != 0) || (isset($_POST['default_options']) && count(array_intersect(array_keys($_POST['default_options']), $reservedVars)) != 0))
-		Errors::instance()->fatal_lang_error('no_access', false);
+		throw new Elk_Exception('no_access', false);
 
 	// Don't allow any overriding of custom fields with default or non-default options.
 	$request = $db->query('', '
@@ -2116,7 +2116,7 @@ function profileSaveAvatarData(&$value)
 	{
 		loadLanguage('Post');
 		if (!is_writable($uploadDir))
-			Errors::instance()->fatal_lang_error('attachments_no_write', 'critical');
+			throw new Elk_Exception('attachments_no_write', 'critical');
 
 		require_once(SUBSDIR . '/Package.subs.php');
 
@@ -2225,14 +2225,14 @@ function profileSaveAvatarData(&$value)
 				if (!is_writable($uploadDir))
 				{
 					loadLanguage('Post');
-					Errors::instance()->fatal_lang_error('attachments_no_write', 'critical');
+					throw new Elk_Exception('attachments_no_write', 'critical');
 				}
 
 				$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, null, null, true);
 				if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $new_avatar_name))
 				{
 					loadLanguage('Post');
-					Errors::instance()->fatal_lang_error('attach_timeout', 'critical');
+					throw new Elk_Exception('attach_timeout', 'critical');
 				}
 
 				$_FILES['attachment']['tmp_name'] = $new_avatar_name;
@@ -2362,7 +2362,7 @@ function profileSaveAvatarData(&$value)
 					loadLanguage('Post');
 					// I guess a man can try.
 					removeAttachments(array('id_member' => $memID));
-					Errors::instance()->fatal_lang_error('attach_timeout', 'critical');
+					throw new Elk_Exception('attach_timeout', 'critical');
 				}
 
 				// Attempt to chmod it.
@@ -2473,7 +2473,7 @@ function profileSaveGroups(&$value)
 			$db->free_result($request);
 
 			if (empty($another))
-				Errors::instance()->fatal_lang_error('at_least_one_admin', 'critical');
+				throw new Elk_Exception('at_least_one_admin', 'critical');
 		}
 	}
 

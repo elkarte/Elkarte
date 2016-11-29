@@ -520,7 +520,7 @@ class Database_PostgreSQL extends Database_Abstract
 			$context['error_message'] .= '<br /><br />' . nl2br($db_string);
 
 		// It's already been logged... don't log it again.
-		Errors::instance()->fatal_error($context['error_message'], false);
+		throw new Elk_Exception($context['error_message'], false);
 	}
 
 	/**

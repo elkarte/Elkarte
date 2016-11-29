@@ -15,6 +15,8 @@
  *
  */
 
+use ElkArte\Errors\ErrorContext;
+
 /**
  * Class Drafts_Post_Module
  *
@@ -217,7 +219,7 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 				unset($_POST['save_draft']);
 
 				// Be ready for surprises
-				$post_errors = Error_Context::context('post', 1);
+				$post_errors = ErrorContext::context('post', 1);
 
 				// If we were called from the autosave function, send something back
 				if (!empty($context['id_draft']) && isset($_REQUEST['xml']) && !$post_errors->hasError('session_timeout'))

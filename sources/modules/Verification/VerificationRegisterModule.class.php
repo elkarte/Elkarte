@@ -70,7 +70,7 @@ class Verification_Register_Module implements ElkArte\sources\modules\Module_Int
 	/**
 	 * Checks the user passed the verifications on the registration form.
 	 *
-	 * @param Error_Context $reg_errors Errors object from the registration controller
+	 * @param ErrorContext $reg_errors Errors object from the registration controller
 	 */
 	public function before_complete_register($reg_errors)
 	{

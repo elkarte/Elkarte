@@ -243,7 +243,7 @@ class ProfileHistory_Controller extends Action_Controller
 		if (preg_match('/^\d{1,3}\.(\d{1,3}|\*)\.(\d{1,3}|\*)\.(\d{1,3}|\*)$/', $context['ip']) == 0
 			&& isValidIPv6($context['ip']) === false)
 		{
-			Errors::instance()->fatal_lang_error('invalid_tracking_ip', false);
+			throw new Elk_Exception('invalid_tracking_ip', false);
 		}
 
 		$ip_var = str_replace('*', '%', $context['ip']);

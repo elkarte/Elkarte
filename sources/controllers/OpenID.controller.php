@@ -47,15 +47,15 @@ class OpenID_Controller extends Action_Controller
 
 		// Is OpenID even enabled?
 		if (empty($modSettings['enableOpenID']))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		// The OpenID provider did not respond with the OpenID mode? Throw an error..
 		if (!isset($this->_req->query->openid_mode))
-			Errors::instance()->fatal_lang_error('openid_return_no_mode', false);
+			throw new Elk_Exception('openid_return_no_mode', false);
 
 		// @todo Check for error status!
 		if ($this->_req->query->openid_mode !== 'id_res')
-			Errors::instance()->fatal_lang_error('openid_not_resolved');
+			throw new Elk_Exception('openid_not_resolved');
 
 		// We'll need our subs.
 		require_once(SUBSDIR . '/OpenID.subs.php');
@@ -81,20 +81,20 @@ class OpenID_Controller extends Action_Controller
 		// Get the association data.
 		$assoc = $openID->getAssociation($server_info['server'], $this->_req->query->openid_assoc_handle, true);
 		if ($assoc === null)
-			Errors::instance()->fatal_lang_error('openid_no_assoc');
+			throw new Elk_Exception('openid_no_assoc');
 
 		// Verify the OpenID signature.
 		if (!$this->_verify_string($assoc['secret']))
-			Errors::instance()->fatal_lang_error('openid_sig_invalid', 'critical');
+			throw new Elk_Exception('openid_sig_invalid', 'critical');
 
 		if (!isset($_SESSION['openid']['saved_data'][$this->_req->query->t]))
-			Errors::instance()->fatal_lang_error('openid_load_data');
+			throw new Elk_Exception('openid_load_data');
 
 		$openid_uri = $_SESSION['openid']['saved_data'][$this->_req->query->t]['openid_uri'];
 		$modSettings['cookieTime'] = $_SESSION['openid']['saved_data'][$this->_req->query->t]['cookieTime'];
 
 		if (empty($openid_uri))
-			Errors::instance()->fatal_lang_error('openid_load_data');
+			throw new Elk_Exception('openid_load_data');
 
 		// Any save fields to restore?
 		$openid_save_fields = isset($this->_req->query->sf) ? json_decode(base64_decode($this->_req->query->sf), true) : array();

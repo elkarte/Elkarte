@@ -15,6 +15,9 @@
  *
  */
 
+use ElkArte\Errors\ErrorContext;
+use ElkArte\Errors\AttachmentErrorContext;
+
 /**
  * Class Attachments_Post_Module
  */
@@ -28,7 +31,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 
 	/**
 	 * The objects that keeps track of errors.
-	 * @var Attachment_Error_Context
+	 * @var AttachmentErrorContext
 	 */
 	protected $_attach_errors = null;
 
@@ -84,7 +87,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 	{
 		if ($this->_attach_errors === null)
 		{
-			$this->_attach_errors = Attachment_Error_Context::context();
+			$this->_attach_errors = AttachmentErrorContext::context();
 
 			$this->_attach_errors->activate();
 		}
@@ -93,7 +96,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 	/**
 	 * Set up the errors for the template etc
 	 *
-	 * @param Error_Context $post_errors
+	 * @param ErrorContext $post_errors
 	 */
 	public function prepare_context($post_errors)
 	{
@@ -326,7 +329,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 	/**
 	 * Save attachments when the post is saved
 	 *
-	 * @param Error_Context $post_errors
+	 * @param ErrorContext $post_errors
 	 */
 	public function prepare_save_post($post_errors)
 	{

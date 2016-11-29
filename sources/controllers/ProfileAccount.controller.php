@@ -84,7 +84,7 @@ class ProfileAccount_Controller extends Action_Controller
 			|| ($context['user']['is_owner'] && !$cur_profile['warning'])
 			|| !allowedTo('issue_warning'))
 		{
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 		}
 
 		// Get the base (errors related) stuff done.
@@ -550,7 +550,7 @@ class ProfileAccount_Controller extends Action_Controller
 		// Check we got here as we should have!
 		if ($cur_profile != $user_profile[$this->_memID])
 		{
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 		}
 
 		$old_profile = &$cur_profile;
@@ -567,7 +567,7 @@ class ProfileAccount_Controller extends Action_Controller
 			$another = isAnotherAdmin($this->_memID);
 
 			if (empty($another))
-				Errors::instance()->fatal_lang_error('at_least_one_admin', 'critical');
+				throw new Elk_Exception('at_least_one_admin', 'critical');
 		}
 
 		// Do you have permission to delete others profiles, or is that your profile you wanna delete?

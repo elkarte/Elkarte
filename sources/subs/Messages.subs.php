@@ -183,7 +183,7 @@ function checkMessagePermissions($message)
 	{
 		// Give an extra five minutes over the disable time threshold, so they can type - assuming the post is public.
 		if ($message['approved'] && !empty($modSettings['edit_disable_time']) && $message['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
-			Errors::instance()->fatal_lang_error('modify_post_time_passed', false);
+			throw new Elk_Exception('modify_post_time_passed', false);
 		elseif ($message['id_member_poster'] == $user_info['id'] && !allowedTo('modify_own'))
 			isAllowedTo('modify_replies');
 		else

@@ -16,6 +16,8 @@
  *
  */
 
+use ElkArte\Errors\ErrorContext;
+
 /**
  * ManageRegistration admin controller: handles the registration pages
  *
@@ -159,14 +161,14 @@ class ManageRegistration_Controller extends Action_Controller
 			);
 
 			require_once(SUBSDIR . '/Members.subs.php');
-			$reg_errors = Error_Context::context('register', 0);
+			$reg_errors = ErrorContext::context('register', 0);
 			$memberID = registerMember($regOptions, 'register');
 
 			// If there are "important" errors and you are not an admin: log the first error
 			// Otherwise grab all of them and don't log anything
 			$error_severity = $reg_errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
 			foreach ($reg_errors->prepareErrors($error_severity) as $error)
-				Errors::instance()->fatal_error($error, $error_severity === null ? false : 'general');
+				throw new Elk_Exception($error, $error_severity === null ? false : 'general');
 
 			if (!empty($memberID))
 			{
@@ -349,7 +351,7 @@ class ManageRegistration_Controller extends Action_Controller
 
 			// Are there some contacts missing?
 			if (!empty($this->_req->post->coppaAge) && !empty($this->_req->post->coppaType) && empty($this->_req->post->coppaPost) && empty($this->_req->post->coppaFax))
-				Errors::instance()->fatal_lang_error('admin_setting_coppa_require_contact');
+				throw new Elk_Exception('admin_setting_coppa_require_contact');
 
 			// Post needs to take into account line breaks.
 			$this->_req->post->coppaPost = str_replace("\n", '<br />', empty($this->_req->post->coppaPost) ? '' : $this->_req->post->coppaPost);

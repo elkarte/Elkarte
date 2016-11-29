@@ -64,7 +64,7 @@ class Verification_PersonalMessage_Module implements ElkArte\sources\modules\Mod
 	/**
 	 * Checks the user passed the verifications on the PM page.
 	 *
-	 * @param \Error_Context $post_errors
+	 * @param \ErrorContext $post_errors
 	 */
 	public function before_sending($post_errors)
 	{

@@ -11,10 +11,14 @@
  *
  */
 
+namespace ElkArte\Errors;
+
 /**
  * Class Error context for attachments
+ *
+ * @todo Can this be simplified and extend ErrorContext?
  */
-class Attachment_Error_Context
+class AttachmentErrorContext
 {
 	/**
 	 * Holds our static instance of the class
@@ -30,7 +34,7 @@ class Attachment_Error_Context
 
 	/**
 	 * Holds any errors found
-	 * @var Error_Context|null
+	 * @var ErrorContext|null
 	 */
 	private $_generic_error = null;
 
@@ -59,7 +63,7 @@ class Attachment_Error_Context
 		if (!isset($this->_attachs[$id]))
 			$this->_attachs[$id] = array(
 				'name' => $name,
-				'error' => Error_Context::context($id, 1),
+				'error' => ErrorContext::context($id, 1),
 			);
 
 		$this->activate($id);
@@ -96,7 +100,7 @@ class Attachment_Error_Context
 		if ($this->_active_attach == 'generic')
 		{
 			if (!isset($this->_attachs[$this->_active_attach]))
-				$this->_generic_error = Error_Context::context('attach_generic_error', 1);
+				$this->_generic_error = ErrorContext::context('attach_generic_error', 1);
 
 			$this->_generic_error->addError($error, $lang_file);
 			return;
@@ -222,13 +226,13 @@ class Attachment_Error_Context
 	}
 
 	/**
-	 * Find and return Attachment_Error_Context instance if it exists,
+	 * Find and return Attachment_ErrorContext instance if it exists,
 	 * or create it if it doesn't exist
 	 */
 	public static function context()
 	{
 		if (self::$_context === null)
-			self::$_context = new Attachment_Error_Context();
+			self::$_context = new self();
 
 		return self::$_context;
 	}

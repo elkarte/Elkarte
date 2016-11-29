@@ -1,5 +1,7 @@
 <?php
 
+use ElkArte\Errors\ErrorContext;
+
 /**
  * TestCase class for members subs.
  *
@@ -40,7 +42,7 @@ class TestMembers extends PHPUnit_Framework_TestCase
 			'auth_method' => 'password',
 		);
 
-		$reg_errors = Error_Context::context('register', 0);
+		$reg_errors = ErrorContext::context('register', 0);
 		$this->memberID = registerMember($regOptions, 'register');
 
 		// First test is here: there should be no errors during the registration

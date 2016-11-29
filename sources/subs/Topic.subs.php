@@ -886,7 +886,7 @@ function moveTopicConcurrence($move_from = null, $id_board = null, $id_topic = n
 
 		$board_link = '<a href="' . $scripturl . '?board=' . $id_board . '.0">' . $board_name . '</a>';
 		$topic_link = '<a href="' . $scripturl . '?topic=' . $id_topic . '.0">' . $topic_subject . '</a>';
-		Errors::instance()->fatal_lang_error('topic_already_moved', false, array($topic_link, $board_link));
+		throw new Elk_Exception('topic_already_moved', false, array($topic_link, $board_link));
 	}
 }
 
@@ -918,7 +918,7 @@ function removeDeleteConcurrence()
 			}
 
 			// Give them a prompt before we remove the message
-			Errors::instance()->fatal_lang_error('post_already_deleted', false, array($confirm_url));
+			throw new Elk_Exception('post_already_deleted', false, array($confirm_url));
 		}
 	}
 }
@@ -2380,7 +2380,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 
 	// Nothing to split?
 	if (empty($splitMessages))
-		Errors::instance()->fatal_lang_error('no_posts_selected', false);
+		throw new Elk_Exception('no_posts_selected', false);
 
 	// Get some board info.
 	$topicAttribute = topicAttribute($split1_ID_TOPIC, array('id_board', 'approved'));
@@ -2405,7 +2405,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	);
 	// You can't select ALL the messages!
 	if ($db->num_rows($request) == 0)
-		Errors::instance()->fatal_lang_error('selected_all_posts', false);
+		throw new Elk_Exception('selected_all_posts', false);
 
 	$split1_first_msg = null;
 	$split1_last_msg = null;
@@ -2491,11 +2491,11 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 
 	// No database changes yet, so let's double check to see if everything makes at least a little sense.
 	if ($split1_first_msg <= 0 || $split1_last_msg <= 0 || $split2_first_msg <= 0 || $split2_last_msg <= 0 || $split1_replies < 0 || $split2_replies < 0 || $split1_unapprovedposts < 0 || $split2_unapprovedposts < 0 || !isset($split1_approved) || !isset($split2_approved))
-		Errors::instance()->fatal_lang_error('cant_find_messages');
+		throw new Elk_Exception('cant_find_messages');
 
 	// You cannot split off the first message of a topic.
 	if ($split1_first_msg > $split2_first_msg)
-		Errors::instance()->fatal_lang_error('split_first_post', false);
+		throw new Elk_Exception('split_first_post', false);
 
 	// The message that is starting the new topic may have likes, these become topic likes
 	require_once(SUBSDIR . '/Likes.subs.php');
@@ -2524,7 +2524,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	);
 	$split2_ID_TOPIC = $db->insert_id('{db_prefix}topics', 'id_topic');
 	if ($split2_ID_TOPIC <= 0)
-		Errors::instance()->fatal_lang_error('cant_insert_topic');
+		throw new Elk_Exception('cant_insert_topic');
 
 	// Move the messages over to the other topic.
 	$new_subject = strtr(Util::htmltrim(Util::htmlspecialchars($new_subject)), array("\r" => '', "\n" => '', "\t" => ''));
@@ -2705,13 +2705,13 @@ function splitDestinationBoard($toboard = 0)
 
 	$current_board = boardInfo($board, $topic);
 	if (empty($current_board))
-		Errors::instance()->fatal_lang_error('no_board');
+		throw new Elk_Exception('no_board');
 
 	if (!empty($toboard) && $board !== $toboard)
 	{
 		$destination_board = boardInfo($toboard);
 		if (empty($destination_board))
-			Errors::instance()->fatal_lang_error('no_board');
+			throw new Elk_Exception('no_board');
 	}
 
 	if (!isset($destination_board))
@@ -3178,7 +3178,7 @@ function getSubject($id_topic)
 	);
 
 	if ($db->num_rows($request) == 0)
-		Errors::instance()->fatal_lang_error('topic_gone', false);
+		throw new Elk_Exception('topic_gone', false);
 
 	list ($subject) = $db->fetch_row($request);
 	$db->free_result($request);

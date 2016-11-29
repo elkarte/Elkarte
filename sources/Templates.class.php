@@ -206,7 +206,7 @@ class Templates
 		// Cause an error otherwise.
 		elseif ($template_name !== 'Errors' && $template_name !== 'index' && $fatal)
 		{
-			Errors::instance()->fatal_lang_error('theme_template_error', 'template', array((string) $template_name));
+			throw new Elk_Exception('theme_template_error', 'template', array((string) $template_name));
 		}
 		elseif ($fatal)
 		{
@@ -507,7 +507,7 @@ class Templates
 		}
 		elseif ($fatal === false)
 		{
-			Errors::instance()->fatal_lang_error('theme_template_error', 'template', array((string) $sub_template_name));
+			throw new Elk_Exception('theme_template_error', 'template', array((string) $sub_template_name));
 		}
 		elseif ($fatal !== 'ignore')
 		{

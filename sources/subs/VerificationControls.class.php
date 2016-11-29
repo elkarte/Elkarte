@@ -89,7 +89,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	elseif (!$isNew && !$do_test)
 		return true;
 
-	$verification_errors = Error_Context::context($verificationOptions['id']);
+	$verification_errors = ElkArte\Errors\ErrorContext::context($verificationOptions['id']);
 	$increase_error_count = false;
 
 	// Start with any testing.
@@ -97,7 +97,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	{
 		// This cannot happen!
 		if (!isset($_SESSION[$verificationOptions['id'] . '_vv']['count']))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		foreach ($instances as $instance)
 		{
@@ -646,7 +646,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	public function doTest()
 	{
 		if ($this->_number_questions && (!isset($_SESSION[$this->_options['id'] . '_vv']['q']) || !isset($_REQUEST[$this->_options['id'] . '_vv']['q'])))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		if (!$this->_verifyAnswers())
 			return 'wrong_verification_answer';

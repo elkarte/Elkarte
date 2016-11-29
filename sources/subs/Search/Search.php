@@ -257,7 +257,7 @@ class Search
 
 		if (!class_implements($search_class_name, 'Search_Interface'))
 		{
-			\Errors::instance()->fatal_lang_error('search_api_missing');
+			throw new \Elk_Exception('search_api_missing');
 		}
 
 		// Create an instance of the search API and check it is valid for this version of the software.
@@ -852,7 +852,7 @@ class Search
 
 			if ($this->_db->num_rows($request) == 0)
 			{
-				\Errors::instance()->fatal_lang_error('topic_gone', false);
+				throw new \Elk_Exception('topic_gone', false);
 			}
 
 			$this->_search_params['brd'] = array();

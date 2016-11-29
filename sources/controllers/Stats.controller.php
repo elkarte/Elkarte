@@ -54,7 +54,7 @@ class Stats_Controller extends Action_Controller
 
 		// Page disabled - redirect them out
 		if (empty($modSettings['trackStats']))
-			Errors::instance()->fatal_lang_error('feature_disabled', true);
+			throw new Elk_Exception('feature_disabled', true);
 
 		// Expanding out the history summary
 		list($year, $month) = $this->_expandedStats();

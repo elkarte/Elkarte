@@ -17,6 +17,8 @@
  *
  */
 
+use ElkArte\Errors\ErrorContext;
+
 /**
  * PersonalMessage_Controller class
  * It allows viewing, sending, deleting, and marking personal messages
@@ -361,7 +363,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// No menu means no access.
 		if (!$pm_include_data && (!$user_info['is_guest'] || validateSession() !== true))
 		{
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 		}
 
 		// Make a note of the Unique ID for this menu.
@@ -498,7 +500,7 @@ class PersonalMessage_Controller extends Action_Controller
 			// Make sure you have access to this PM.
 			if (!isAccessiblePM($pmID, $context['folder'] === 'sent' ? 'outbox' : 'inbox'))
 			{
-				Errors::instance()->fatal_lang_error('no_access', false);
+				throw new Elk_Exception('no_access', false);
 			}
 
 			$context['current_pm'] = $pmID;
@@ -526,7 +528,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			if (!isAccessiblePM($pmsg, $context['folder'] === 'sent' ? 'outbox' : 'inbox'))
 			{
-				Errors::instance()->fatal_lang_error('no_access', false);
+				throw new Elk_Exception('no_access', false);
 			}
 		}
 
@@ -557,7 +559,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Make sure that we have been given a correct head pm id if we are in conversation mode
 		if ($context['display_mode'] == 2 && !empty($pmID) && $pmID != $lastData['id'])
 		{
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 		}
 
 		// If loadPMs returned results, lets show the pm subject list
@@ -739,7 +741,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			if (!empty($pmCount) && $pmCount >= $modSettings['pm_posts_per_hour'])
 			{
-				Errors::instance()->fatal_lang_error('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
+				throw new Elk_Exception('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
 			}
 		}
 
@@ -760,7 +762,7 @@ class PersonalMessage_Controller extends Action_Controller
 			// Make sure this is accessible (not deleted)
 			if (!isAccessiblePM($pmsg))
 			{
-				Errors::instance()->fatal_lang_error('no_access', false);
+				throw new Elk_Exception('no_access', false);
 			}
 
 			// Validate that this is one has been received?
@@ -770,7 +772,7 @@ class PersonalMessage_Controller extends Action_Controller
 			$row_quoted = loadPMQuote($pmsg, $isReceived);
 			if ($row_quoted === false)
 			{
-				Errors::instance()->fatal_lang_error('pm_not_yours', false);
+				throw new Elk_Exception('pm_not_yours', false);
 			}
 
 			// Censor the message.
@@ -949,7 +951,7 @@ class PersonalMessage_Controller extends Action_Controller
 		list ($modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']) = explode(',', $modSettings['pm_spam_settings']);
 
 		// Initialize the errors we're about to make.
-		$post_errors = Error_Context::context('pm', 1);
+		$post_errors = ErrorContext::context('pm', 1);
 
 		// Check whether we've gone over the limit of messages we can send per hour - fatal error if fails!
 		if (!empty($modSettings['pm_posts_per_hour'])
@@ -965,7 +967,7 @@ class PersonalMessage_Controller extends Action_Controller
 			{
 				if (!isset($this->_req->query->xml))
 				{
-					Errors::instance()->fatal_lang_error('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
+					throw new Elk_Exception('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
 				}
 				else
 				{
@@ -1268,7 +1270,7 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		$context['page_title'] = $txt['send_message'];
-		$error_types = Error_Context::context('pm', 1);
+		$error_types = ErrorContext::context('pm', 1);
 
 		// Got some known members?
 		$context['recipients'] = array(
@@ -1318,7 +1320,7 @@ class PersonalMessage_Controller extends Action_Controller
 			{
 				if (!isset($this->_req->query->xml))
 				{
-					Errors::instance()->fatal_lang_error('pm_not_yours', false);
+					throw new Elk_Exception('pm_not_yours', false);
 				}
 				else
 				{
@@ -1498,7 +1500,7 @@ class PersonalMessage_Controller extends Action_Controller
 			// Any errors?
 			if (!empty($updateErrors))
 			{
-				Errors::instance()->fatal_lang_error('labels_too_many', true, array($updateErrors));
+				throw new Elk_Exception('labels_too_many', true, array($updateErrors));
 			}
 		}
 
@@ -1849,14 +1851,14 @@ class PersonalMessage_Controller extends Action_Controller
 		// Check that this feature is even enabled!
 		if (empty($modSettings['enableReportPM']) || empty($this->_req->query->pmsg))
 		{
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 		}
 
 		$pmsg = $this->_req->getQuery('pmsg', 'intval', $this->_req->getPost('pmsg', 'intval', 0));
 
 		if (!isAccessiblePM($pmsg, 'inbox'))
 		{
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 		}
 
 		$context['pm_id'] = $pmsg;
@@ -1873,7 +1875,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			if (Util::strlen($poster_comment) > 254)
 			{
-				Errors::instance()->fatal_lang_error('post_too_long', false);
+				throw new Elk_Exception('post_too_long', false);
 			}
 
 			// Check the session before proceeding any further!
@@ -1911,7 +1913,7 @@ class PersonalMessage_Controller extends Action_Controller
 			// Maybe we shouldn't advertise this?
 			if (empty($admins))
 			{
-				Errors::instance()->fatal_lang_error('no_access', false);
+				throw new Elk_Exception('no_access', false);
 			}
 
 			$memberFromName = un_htmlspecialchars($memberFromName);
@@ -2110,13 +2112,13 @@ class PersonalMessage_Controller extends Action_Controller
 			$ruleName = Util::htmlspecialchars(trim($this->_req->post->rule_name));
 			if (empty($ruleName))
 			{
-				Errors::instance()->fatal_lang_error('pm_rule_no_name', false);
+				throw new Elk_Exception('pm_rule_no_name', false);
 			}
 
 			// Sanity check...
 			if (empty($this->_req->post->ruletype) || empty($this->_req->post->acttype))
 			{
-				Errors::instance()->fatal_lang_error('pm_rule_no_criteria', false);
+				throw new Elk_Exception('pm_rule_no_criteria', false);
 			}
 
 			// Let's do the criteria first - it's also hardest!
@@ -2185,7 +2187,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			if (empty($criteria) || (empty($actions) && !$doDelete))
 			{
-				Errors::instance()->fatal_lang_error('pm_rule_no_criteria', false);
+				throw new Elk_Exception('pm_rule_no_criteria', false);
 			}
 
 			// What are we storing?
@@ -2237,7 +2239,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Make sure the server is able to do this right now
 		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
 		{
-			Errors::instance()->fatal_lang_error('loadavg_search_disabled', false);
+			throw new Elk_Exception('loadavg_search_disabled', false);
 		}
 
 		// Some useful general permissions.
@@ -2903,7 +2905,7 @@ class PersonalMessage_Controller extends Action_Controller
 			// Make sure this is accessible, should be of course
 			if (!isAccessiblePM($pmsg, 'inbox'))
 			{
-				Errors::instance()->fatal_lang_error('no_access', false);
+				throw new Elk_Exception('no_access', false);
 			}
 
 			// Well then, you get to hear about it all over again

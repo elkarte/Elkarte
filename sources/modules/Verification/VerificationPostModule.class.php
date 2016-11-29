@@ -46,7 +46,7 @@ class Verification_Post_Module implements ElkArte\sources\modules\Module_Interfa
 	/**
 	 * Prepare $context for the post page.
 	 *
-	 * @param \Error_Context $_post_errors
+	 * @param \ErrorContext $_post_errors
 	 */
 	public function post_errors($_post_errors)
 	{
@@ -67,7 +67,7 @@ class Verification_Post_Module implements ElkArte\sources\modules\Module_Interfa
 	/**
 	 * Checks the user passed the verifications on the post page.
 	 * 
-	 * @param \Error_Context $_post_errors
+	 * @param \ErrorContext $_post_errors
 	 */
 	public function prepare_save_post($_post_errors)
 	{

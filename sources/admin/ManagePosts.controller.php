@@ -248,7 +248,7 @@ class ManagePosts_Controller extends Action_Controller
 				}
 
 				if (isset($body_type) && ($this->_req->post->max_messageLength > 65535 || $this->_req->post->max_messageLength == 0) && $body_type == 'text')
-					Errors::instance()->fatal_lang_error('convert_to_mediumtext', false, array($scripturl . '?action=admin;area=maintain;sa=database'));
+					throw new Elk_Exception('convert_to_mediumtext', false, array($scripturl . '?action=admin;area=maintain;sa=database'));
 
 			}
 

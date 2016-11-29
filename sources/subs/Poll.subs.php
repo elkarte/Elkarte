@@ -806,7 +806,7 @@ function getPollStarter($id_topic)
 		)
 	);
 	if ($db->num_rows($request) == 0)
-		Errors::instance()->fatal_lang_error('no_board');
+		throw new Elk_Exception('no_board');
 	$bcinfo = $db->fetch_assoc($request);
 	$db->free_result($request);
 

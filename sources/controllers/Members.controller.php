@@ -61,7 +61,7 @@ class Members_Controller extends Action_Controller
 
 		// You have to give a user
 		if (empty($user))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		call_integration_hook('integrate_add_buddies', array($user_info['id'], &$user));
 
@@ -111,7 +111,7 @@ class Members_Controller extends Action_Controller
 
 		// You have to give a user
 		if (empty($user))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		// Remove this user, assuming we can find them
 		if (in_array($user, $user_info['buddies']))

@@ -434,14 +434,14 @@ function resetPassword($memID, $username = null)
 	require_once(SUBSDIR . '/Members.subs.php');
 	if ($username !== null)
 	{
-		$errors = Error_Context::context('reset_pwd', 0);
+		$errors = ElkArte\Errors\ErrorContext::context('reset_pwd', 0);
 		validateUsername($memID, $user, 'reset_pwd');
 
 		// If there are "important" errors and you are not an admin: log the first error
 		// Otherwise grab all of them and don't log anything
 		$error_severity = $errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
 		foreach ($errors->prepareErrors($error_severity) as $error)
-			Errors::instance()->fatal_error($error, $error_severity === null ? false : 'general');
+			throw new Elk_Exception($error, $error_severity === null ? false : 'general');
 
 		// Update the database...
 		updateMemberData($memID, array('member_name' => $user, 'passwd' => $db_hash));
@@ -470,16 +470,16 @@ function resetPassword($memID, $username = null)
  * @package Authorization
  * @param int $memID
  * @param string $username
- * @param string $error_context
+ * @param string $ErrorContext
  * @param boolean $check_reserved_name
  * @param boolean $fatal pass through to isReservedName
  * @return string
  */
-function validateUsername($memID, $username, $error_context = 'register', $check_reserved_name = true, $fatal = true)
+function validateUsername($memID, $username, $ErrorContext = 'register', $check_reserved_name = true, $fatal = true)
 {
 	global $txt;
 
-	$errors = Error_Context::context($error_context, 0);
+	$errors = ElkArte\Errors\ErrorContext::context($ErrorContext, 0);
 
 	// Don't use too long a name.
 	if (Util::strlen($username) > 25)
@@ -767,7 +767,7 @@ function findUser($where, $where_params, $fatal = true)
 		if ($db->num_rows($request) == 0)
 		{
 			if ($fatal)
-				Errors::instance()->fatal_lang_error('no_user_with_email', false);
+				throw new Elk_Exception('no_user_with_email', false);
 			else
 				return false;
 		}

@@ -272,10 +272,10 @@ class ManageThemes_Controller extends Action_Controller
 					$this->_req->post->options['known_themes'][$key] = (int) $id;
 			}
 			else
-				Errors::instance()->fatal_lang_error('themes_none_selectable', false);
+				throw new Elk_Exception('themes_none_selectable', false);
 
 			if (!in_array($this->_req->post->options['theme_guests'], $this->_req->post->options['known_themes']))
-				Errors::instance()->fatal_lang_error('themes_default_selectable', false);
+				throw new Elk_Exception('themes_default_selectable', false);
 
 			// Commit the new settings.
 			updateSettings(array(
@@ -638,7 +638,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// Validate inputs/user.
 		if (empty($theme))
-			Errors::instance()->fatal_lang_error('no_theme', false);
+			throw new Elk_Exception('no_theme', false);
 
 		// Select the best fitting tab.
 		$context[$context['admin_menu_name']]['current_subsection'] = 'list';
@@ -815,7 +815,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// You can't delete the default theme!
 		if ($theme == 1)
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		// Its no longer known
 		$known = explode(',', $modSettings['knownThemes']);
@@ -950,7 +950,7 @@ class ManageThemes_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Themes.subs.php');
 
 		if (!$modSettings['theme_allow'] && $settings['disable_user_variant'] && !allowedTo('admin_forum'))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		loadLanguage('Profile');
 		loadTemplate('ManageThemes');
@@ -1164,7 +1164,7 @@ class ManageThemes_Controller extends Action_Controller
 		elseif ($method == 'upload')
 			$this->installFromZip();
 		else
-			Errors::instance()->fatal_lang_error('theme_install_general', false);
+			throw new Elk_Exception('theme_install_general', false);
 
 		// Something go wrong?
 		if ($this->theme_dir != '' && basename($this->theme_dir) != 'themes')
@@ -1267,7 +1267,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// Hopefully the themes directory is writable, or we might have a problem.
 		if (!is_writable(BOARDDIR . '/themes'))
-			Errors::instance()->fatal_lang_error('theme_install_write_error', 'critical');
+			throw new Elk_Exception('theme_install_write_error', 'critical');
 
 		// This happens when the admin session is gone and the user has to login again
 		if (empty($_FILES['theme_gz']) && empty($this->_req->post->theme_gz))
@@ -1283,7 +1283,7 @@ class ManageThemes_Controller extends Action_Controller
 		elseif (isset($this->_req->post->theme_gz))
 		{
 			if (!isAuthorizedServer($this->_req->post->theme_gz))
-				Errors::instance()->fatal_lang_error('not_valid_server');
+				throw new Elk_Exception('not_valid_server');
 
 			read_tgz_file($this->_req->post->theme_gz, BOARDDIR . '/themes/' . $this->theme_name, false, true);
 		}
@@ -1297,7 +1297,7 @@ class ManageThemes_Controller extends Action_Controller
 	public function installFromDir()
 	{
 		if (!is_dir($this->_req->post->theme_dir) || !file_exists($this->_req->post->theme_dir . '/theme_info.xml'))
-			Errors::instance()->fatal_lang_error('theme_install_error', false);
+			throw new Elk_Exception('theme_install_error', false);
 
 		$this->theme_name = basename($this->_req->post->theme_dir);
 		$this->theme_dir = $this->_req->post->theme_dir;
@@ -1312,7 +1312,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// Hopefully the themes directory is writable, or we might have a problem.
 		if (!is_writable(BOARDDIR . '/themes'))
-			Errors::instance()->fatal_lang_error('theme_install_write_error', 'critical');
+			throw new Elk_Exception('theme_install_write_error', 'critical');
 
 		// Make the new directory, standard characters only
 		$this->theme_dir = BOARDDIR . '/themes/' . preg_replace('~[^A-Za-z0-9_\- ]~', '', $this->_req->post->copy);
@@ -1631,7 +1631,7 @@ class ManageThemes_Controller extends Action_Controller
 		if (empty($selectedTheme))
 		{
 			// This should never be happening. Never I say. But... in case it does :P
-			Errors::instance()->fatal_lang_error('theme_edit_missing');
+			throw new Elk_Exception('theme_edit_missing');
 		}
 
 		$theme_dir = themeDirectory($context['theme_id']);
@@ -1641,7 +1641,7 @@ class ManageThemes_Controller extends Action_Controller
 		if (empty($file))
 		{
 			// @todo a better error message
-			Errors::instance()->fatal_lang_error('theme_edit_missing');
+			throw new Elk_Exception('theme_edit_missing');
 		}
 
 		// Checking PHP syntax on css files is not a most constructive use of processing power :P
@@ -1813,7 +1813,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// Eh? not trying to sneak a peek outside the theme directory are we
 		if (!file_exists($theme_dir . '/index.template.php') && !file_exists($theme_dir . '/css/index.css'))
-			Errors::instance()->fatal_lang_error('theme_edit_missing', false);
+			throw new Elk_Exception('theme_edit_missing', false);
 
 		// Now, where exactly are you?
 		if (isset($this->_req->query->directory))
@@ -1930,7 +1930,7 @@ class ManageThemes_Controller extends Action_Controller
 			elseif (file_exists($settings['default_theme_dir'] . '/' . $this->_req->query->template . '.template.php'))
 				$filename = $settings['default_theme_dir'] . '/' . $this->_req->query->template . '.template.php';
 			else
-				Errors::instance()->fatal_lang_error('no_access', false);
+				throw new Elk_Exception('no_access', false);
 
 			$fp = fopen($theme_dirs['theme_dir'] . '/' . $this->_req->query->template . '.template.php', 'w');
 			fwrite($fp, file_get_contents($filename));
@@ -1948,7 +1948,7 @@ class ManageThemes_Controller extends Action_Controller
 			elseif (file_exists($settings['default_theme_dir'] . '/languages/' . $this->_req->query->template . '.php'))
 				$filename = $settings['default_theme_dir'] . '/languages/' . $this->_req->query->template . '.php';
 			else
-				Errors::instance()->fatal_lang_error('no_access', false);
+				throw new Elk_Exception('no_access', false);
 
 			$fp = fopen($theme_dirs['theme_dir'] . '/languages/' . $this->_req->query->lang_file . '.php', 'w');
 			fwrite($fp, file_get_contents($filename));
@@ -2059,7 +2059,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// Eh? not trying to sneak a peek outside the theme directory are we
 		if (!file_exists($this->theme_dir . '/index.template.php') && !file_exists($this->theme_dir . '/css/index.css'))
-			Errors::instance()->fatal_lang_error('theme_edit_missing', false);
+			throw new Elk_Exception('theme_edit_missing', false);
 
 		// Get the filename from the appropriate spot
 		$filename = isset($this->_req->post->save) ? $this->_req->getPost('filename', 'strval', '') : $this->_req->getQuery('filename', 'strval', '');
@@ -2078,7 +2078,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// We shouldn't end up with no file
 		if (empty($filename))
-			Errors::instance()->fatal_lang_error('theme_edit_missing', false);
+			throw new Elk_Exception('theme_edit_missing', false);
 
 		// Initialize context
 		$context['allow_save'] = is_writable($this->theme_dir . '/' . $filename);

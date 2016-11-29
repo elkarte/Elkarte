@@ -471,7 +471,7 @@ function loadBoard()
 		{
 			loadPermissions();
 			loadTheme();
-			Errors::instance()->fatal_lang_error('topic_gone', false);
+			throw new Elk_Exception('topic_gone', false);
 		}
 	}
 
@@ -691,7 +691,7 @@ function loadBoard()
 			is_not_guest($txt['topic_gone']);
 		}
 		else
-			Errors::instance()->fatal_lang_error('topic_gone', false);
+			throw new Elk_Exception('topic_gone', false);
 	}
 
 	if ($user_info['is_mod'])
@@ -786,7 +786,7 @@ function loadPermissions()
 	{
 		// Make sure the board (if any) has been loaded by loadBoard().
 		if (!isset($board_info['profile']))
-			Errors::instance()->fatal_lang_error('no_board');
+			throw new Elk_Exception('no_board');
 
 		$request = $db->query('', '
 			SELECT permission, add_deny
@@ -2324,7 +2324,7 @@ function getBoardParents($id_parent)
 			// In the EXTREMELY unlikely event this happens, give an error message.
 			if ($db->num_rows($result) == 0)
 			{
-				Errors::instance()->fatal_lang_error('parent_not_found', 'critical');
+				throw new Elk_Exception('parent_not_found', 'critical');
 			}
 			while ($row = $db->fetch_assoc($result))
 			{

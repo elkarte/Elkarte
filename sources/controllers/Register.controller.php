@@ -17,6 +17,8 @@
  *
  */
 
+use ElkArte\Errors\ErrorContext;
+
 /**
  * Register_Controller Class
  * It registers new members, and it allows the administrator moderate member registration
@@ -60,7 +62,7 @@ class Register_Controller extends Action_Controller
 
 		// Check if the administrator has it disabled.
 		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == '3')
-			Errors::instance()->fatal_lang_error('registration_disabled', false);
+			throw new Elk_Exception('registration_disabled', false);
 	}
 
 	/**
@@ -161,7 +163,7 @@ class Register_Controller extends Action_Controller
 				if (empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
 				{
 					loadLanguage('Login');
-					Errors::instance()->fatal_lang_error('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
+					throw new Elk_Exception('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
 				}
 			}
 		}
@@ -230,7 +232,7 @@ class Register_Controller extends Action_Controller
 
 		// Were there any errors?
 		$context['registration_errors'] = array();
-		$reg_errors = Error_Context::context('register', 0);
+		$reg_errors = ErrorContext::context('register', 0);
 		if ($reg_errors->hasErrors())
 			$context['registration_errors'] = $reg_errors->prepareErrors();
 
@@ -254,7 +256,7 @@ class Register_Controller extends Action_Controller
 		global $modSettings;
 
 		// Start collecting together any errors.
-		$reg_errors = Error_Context::context('register', 0);
+		$reg_errors = ErrorContext::context('register', 0);
 
 		$this->_can_register();
 
@@ -282,7 +284,7 @@ class Register_Controller extends Action_Controller
 		if (!empty($modSettings['coppaAge']) && empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
 		{
 			loadLanguage('Login');
-			Errors::instance()->fatal_lang_error('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
+			throw new Elk_Exception('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
 		}
 
 		// Check the time gate for miscreants. First make sure they came from somewhere that actually set it up.
@@ -315,7 +317,7 @@ class Register_Controller extends Action_Controller
 		global $txt, $modSettings, $context, $user_info;
 
 		// Start collecting together any errors.
-		$reg_errors = Error_Context::context('register', 0);
+		$reg_errors = ErrorContext::context('register', 0);
 
 		// Checks already done if coming from the action
 		if ($verifiedOpenID)
@@ -476,7 +478,7 @@ class Register_Controller extends Action_Controller
 		if ($reg_errors->hasErrors(1) && !$user_info['is_admin'])
 		{
 			foreach ($reg_errors->prepareErrors(1) as $error)
-				Errors::instance()->fatal_error($error, 'general');
+				throw new Elk_Exception($error, 'general');
 		}
 
 		// Was there actually an error of some kind dear boy?
@@ -531,11 +533,11 @@ class Register_Controller extends Action_Controller
 
 		// You can't register if it's disabled.
 		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 3)
-			Errors::instance()->fatal_lang_error('registration_disabled', false);
+			throw new Elk_Exception('registration_disabled', false);
 
 		// Make sure they didn't just register with this session.
 		if (!empty($_SESSION['just_registered']) && empty($modSettings['disableRegisterCheck']))
-			Errors::instance()->fatal_lang_error('register_only_once', false);
+			throw new Elk_Exception('register_only_once', false);
 	}
 
 	/**
@@ -659,7 +661,7 @@ class Register_Controller extends Action_Controller
 				// No file found or a blank file, log the error so the admin knows there is a problem!
 				loadLanguage('Errors');
 				Errors::instance()->log_error($txt['registration_agreement_missing'], 'critical');
-				Errors::instance()->fatal_lang_error('registration_disabled', false);
+				throw new Elk_Exception('registration_disabled', false);
 			}
 		}
 	}
@@ -773,7 +775,7 @@ class Register_Controller extends Action_Controller
 		{
 			// Immediate 0 or disabled 3 means no need to try and activate
 			if (empty($modSettings['registration_method']) || $modSettings['registration_method'] == '3')
-				Errors::instance()->fatal_lang_error('no_access', false);
+				throw new Elk_Exception('no_access', false);
 
 			// Otherwise its simply invalid
 			$context['member_id'] = 0;
@@ -855,13 +857,13 @@ class Register_Controller extends Action_Controller
 		{
 			if (empty($modSettings['registration_method']) || $modSettings['registration_method'] == 3)
 			{
-				Errors::instance()->fatal_lang_error('no_access', false);
+				throw new Elk_Exception('no_access', false);
 			}
 
 			// @todo Separate the sprintf?
 			if (!Data_Validator::is_valid($this->_req->post, array('new_email' => 'valid_email|required|max_length[255]'), array('new_email' => 'trim')))
 			{
-				Errors::instance()->fatal_error(sprintf($txt['valid_email_needed'], htmlspecialchars($this->_req->post->new_email, ENT_COMPAT, 'UTF-8')), false);
+				throw new Elk_Exception(sprintf($txt['valid_email_needed'], htmlspecialchars($this->_req->post->new_email, ENT_COMPAT, 'UTF-8')), false);
 			}
 
 			// Make sure their email isn't banned.
@@ -871,7 +873,7 @@ class Register_Controller extends Action_Controller
 			// @todo Separate the sprintf?
 			if (userByEmail($this->_req->post->new_email))
 			{
-				Errors::instance()->fatal_lang_error('email_in_use', false, array(htmlspecialchars($this->_req->post->new_email, ENT_COMPAT, 'UTF-8')));
+				throw new Elk_Exception('email_in_use', false, array(htmlspecialchars($this->_req->post->new_email, ENT_COMPAT, 'UTF-8')));
 			}
 
 			require_once(SUBSDIR . '/Members.subs.php');
@@ -919,7 +921,7 @@ class Register_Controller extends Action_Controller
 
 			// This will ensure we don't actually get an error message if it works!
 			$context['error_title'] = '';
-			Errors::instance()->fatal_lang_error(!empty($email_change) ? 'change_email_success' : 'resend_email_success', false);
+			throw new Elk_Exception(!empty($email_change) ? 'change_email_success' : 'resend_email_success', false);
 		}
 	}
 
@@ -934,12 +936,12 @@ class Register_Controller extends Action_Controller
 		{
 			if (!empty($this->_row['is_activated']) && $this->_row['is_activated'] == 1)
 			{
-				Errors::instance()->fatal_lang_error('already_activated', false);
+				throw new Elk_Exception('already_activated', false);
 			}
 			elseif ($this->_row['validation_code'] === '')
 			{
 				loadLanguage('Profile');
-				Errors::instance()->fatal_error($txt['registration_not_approved'] . ' <a href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_row['member_name'] . '">' . $txt['here'] . '</a>.', false);
+				throw new Elk_Exception($txt['registration_not_approved'] . ' <a href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_row['member_name'] . '">' . $txt['here'] . '</a>.', false);
 			}
 
 			$context['sub_template'] = 'retry_activate';
@@ -966,7 +968,7 @@ class Register_Controller extends Action_Controller
 
 		// No User ID??
 		if (!isset($this->_req->query->member))
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		// Get the user details...
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -974,7 +976,7 @@ class Register_Controller extends Action_Controller
 
 		// If doesn't exist or not pending coppa
 		if (empty($member) || $member['is_activated'] != 5)
-			Errors::instance()->fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		if (isset($this->_req->query->form))
 		{
@@ -1219,7 +1221,7 @@ class Register_Controller extends Action_Controller
 		// Clean it up like mother would.
 		$context['checked_username'] = preg_replace('~[\t\n\r \x0B\0\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}]+~u', ' ', $context['checked_username']);
 
-		$errors = Error_Context::context('valid_username', 0);
+		$errors = ErrorContext::context('valid_username', 0);
 
 		require_once(SUBSDIR . '/Auth.subs.php');
 		validateUsername(0, $context['checked_username'], 'valid_username', true, false);

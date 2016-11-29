@@ -279,7 +279,7 @@ function maillist_load_filter_parser($id, $style)
 
 	// Check that the filter does exist
 	if (empty($row))
-		Errors::instance()->fatal_lang_error('email_error_no_filter');
+		throw new Elk_Exception('email_error_no_filter');
 
 	return $row;
 }

@@ -123,7 +123,7 @@ class Action
 		if (!array_key_exists($sa, $this->_subActions) || !is_array($this->_subActions[$sa]))
 		{
 			// Send an error and get out of here
-			Errors::instance()->fatal_lang_error('error_sa_not_set');
+			throw new Elk_Exception('error_sa_not_set');
 		}
 
 		$subAction = $this->_subActions[$sa];
@@ -134,7 +134,7 @@ class Action
 				$subAction = $this->_subActions[$this->_default];
 			else
 				// No dice
-				Errors::instance()->fatal_lang_error('error_sa_not_set');
+				throw new Elk_Exception('error_sa_not_set');
 
 		// Are you even permitted to?
 		if (isset($subAction['permission']))
@@ -216,7 +216,7 @@ class Action
 				$sa = $this->_default;
 			else
 				// No dice
-				Errors::instance()->fatal_lang_error('error_sa_not_set');
+				throw new Elk_Exception('error_sa_not_set');
 		}
 
 		return $sa;
@@ -244,11 +244,6 @@ class Action
 		}
 
 		// Can't let you continue, sorry.
-		Errors::instance()->fatal_lang_error('error_sa_not_set');
-
-		// I said... can't.
-		trigger_error('No access...', E_USER_ERROR);
-
-		return false;
+		throw new Elk_Exception('error_sa_not_set');
 	}
 }

@@ -69,7 +69,7 @@ class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
 	/**
 	 * before_save_post event, checks the event title is set
 	 *
-	 * @param Error_Context $post_errors
+	 * @param ErrorContext $post_errors
 	 */
 	public function before_save_post($post_errors)
 	{
@@ -228,17 +228,17 @@ class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
 
 			// Make sure the year and month are in the valid range.
 			if ($context['event']['month'] < 1 || $context['event']['month'] > 12)
-				Errors::instance()->fatal_lang_error('invalid_month', false);
+				throw new Elk_Exception('invalid_month', false);
 
 			if ($context['event']['year'] < $modSettings['cal_minyear'] || $context['event']['year'] > date('Y') + $modSettings['cal_limityear'])
-				Errors::instance()->fatal_lang_error('invalid_year', false);
+				throw new Elk_Exception('invalid_year', false);
 
 			// Get a list of boards they can post in.
 			require_once(SUBSDIR . '/Boards.subs.php');
 
 			$boards = boardsAllowedTo('post_new');
 			if (empty($boards))
-				Errors::instance()->fatal_lang_error('cannot_post_new', 'user');
+				throw new Elk_Exception('cannot_post_new', 'user');
 
 			// Load a list of boards for this event in the context.
 			$boardListOptions = array(

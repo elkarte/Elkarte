@@ -280,7 +280,7 @@ class Memberlist_Controller extends Action_Controller
 		if (!is_numeric($start))
 		{
 			if (preg_match('~^[^\'\\\\/]~u', Util::strtolower($start), $match) === 0)
-				Errors::instance()->fatal_error('Hacker?', false);
+				throw new Elk_Exception('Hacker?', false);
 
 			$start = ml_alphaStart($match[0]);
 		}

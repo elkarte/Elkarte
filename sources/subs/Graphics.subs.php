@@ -104,7 +104,7 @@ function checkImageContents($fileName, $extensiveCheck = false)
 	if (!$fp)
 	{
 		loadLanguage('Post');
-		Errors::instance()->fatal_lang_error('attach_timeout');
+		throw new Elk_Exception('attach_timeout');
 	}
 
 	$prev_chunk = '';

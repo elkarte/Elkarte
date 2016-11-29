@@ -346,7 +346,7 @@ function processAttachments($id_msg = null)
 {
 	global $context, $modSettings, $txt, $user_info, $ignore_temp, $topic, $board;
 
-	$attach_errors = Attachment_Error_Context::context();
+	$attach_errors = ElkArte\Errors\AttachmentErrorContext::context();
 
 	// Make sure we're uploading to the right place.
 	if (!empty($modSettings['automanage_attachments']))
@@ -691,7 +691,7 @@ function attachmentChecks($attachID)
 
 	// Let's get their attention.
 	if (!empty($error))
-		Errors::instance()->fatal_lang_error('attach_check_nag', 'debug', array($error));
+		throw new Elk_Exception('attach_check_nag', 'debug', array($error));
 
 	// These are the only valid image types.
 	$validImageTypes = array(
