@@ -1006,6 +1006,10 @@ a.active {
 	border: 1px solid #EEEEEE;
 }
 
+.linktree {
+	border-color: transparent;
+}
+
 .linktree:not(:last-child):after {
 	top: 0.25em;
 	width: 1.5em;
