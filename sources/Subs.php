@@ -642,7 +642,7 @@ function pc_next_permutation($p, $size)
  * - Only parses smileys if smileys is true.
  *
  * @param string|false $message if false return list of enabled bbc codes
- * @param bool|string $smileys = true if to parse smileys as well
+ * @param bool $smileys = true if to parse smileys as well
  * @return string
  */
 function parse_bbc($message, $smileys = true)
