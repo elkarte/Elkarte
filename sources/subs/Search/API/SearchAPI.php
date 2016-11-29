@@ -12,15 +12,13 @@
 
 namespace ElkArte\Search\API;
 
-use ElkArte\Search\Search_Interface;
-
 /**
  * Abstract class that defines the methods any search API shall implement
  * to properly work with ElkArte
  *
  * @package Search
  */
-abstract class SearchAPI implements Search_Interface
+abstract class SearchAPI
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
