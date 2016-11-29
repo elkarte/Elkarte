@@ -241,23 +241,19 @@ class Search
 	/**
 	 * Creates a search API and returns the object.
 	 */
-	public function findSearchAPI($searchClass)
+	public function findSearchAPI($searchClass = '')
 	{
 		global $modSettings, $txt;
 
 		require_once(SUBSDIR . '/Package.subs.php');
+		\Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 
 		// Load up the search API we are going to use.
 		if (!empty($modSettings['search_index']) && empty($searchClass))
-			$searchClass = ucfirst($modSettings['search_index']);
+			$searchClass = $modSettings['search_index'];
 
-		$fqcn = '\\ElkArte\\Search\\API\\' . $searchClass;
-
-		if (!class_implements($fqcn, 'Search_Interface'))
-		{
-			throw new \Elk_Exception('search_api_missing');
-		}
-		else
+		$fqcn = '\\ElkArte\\Search\\API\\' . ucfirst($searchClass);
+		if (class_exists($fqcn) && !is_a($fqcn, 'ElkArte\\Search\\API\\SearchAPI', true))
 		{
 			// Create an instance of the search API and check it is valid for this version of the software.
 			$this->_searchAPI = new $fqcn;
@@ -268,7 +264,7 @@ class Search
 		{
 			// Log the error.
 			loadLanguage('Errors');
-			\Errors::instance()->log_error(sprintf($txt['search_api_not_compatible'], $search_class_name), 'critical');
+			\Errors::instance()->log_error(sprintf($txt['search_api_not_compatible'], $fqcn), 'critical');
 
 			$this->_searchAPI = new \ElkArte\Search\API\Standard;
 		}

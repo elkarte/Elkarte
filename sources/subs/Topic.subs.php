@@ -2612,7 +2612,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	sendNotifications($split1_ID_TOPIC, 'split');
 
 	// If there's a search index that needs updating, update it...
-	$search = new \ElkArte\Search();
+	$search = new \ElkArte\Search\Search;
 	$searchAPI = $search->findSearchAPI();
 	if (is_callable(array($searchAPI, 'topicSplit')))
 		$searchAPI->topicSplit($split2_ID_TOPIC, $splitMessages);

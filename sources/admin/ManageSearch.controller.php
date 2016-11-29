@@ -621,25 +621,19 @@ class ManageSearch_Controller extends Action_Controller
 				{
 					$index_name = $file->getBasename('.php');
 					$common_name = strtolower($index_name);
-					return $search->findSearchAPI($common_name);
-					$search_class_name = '\\ElkArte\\Search\\API\\' . $index_name;
 
-					if (class_implements($search_class_name, 'Search_Interface'))
-					{
-						$searchAPI = new $search_class_name();
+					if ($common_name == 'searchapi')
+						continue;
 
-						// No Support? NEXT!
-						if (!$searchAPI->is_supported)
-							continue;
+					$searchAPI = $search->findSearchAPI($common_name);
 
-						$apis[$index_name] = array(
-							'filename' => $file->getFilename(),
-							'setting_index' => $index_name,
-							'has_template' => in_array($common_name, array('custom', 'fulltext', 'standard')),
-							'label' => $index_name && isset($txt['search_index_' . $common_name]) ? str_replace('{managesearch_url}', $scripturl . '?action=admin;area=managesearch;sa=manage' . $common_name, $txt['search_index_' . $common_name]) : '',
-							'desc' => $index_name && isset($txt['search_index_' . $common_name . '_desc']) ? str_replace('{managesearch_url}', $scripturl . '?action=admin;area=managesearch;sa=manage' . $common_name, $txt['search_index_' . $common_name . '_desc']) : '',
-						);
-					}
+					$apis[$index_name] = array(
+						'filename' => $file->getFilename(),
+						'setting_index' => $index_name,
+						'has_template' => in_array($common_name, array('custom', 'fulltext', 'standard')),
+						'label' => $index_name && isset($txt['search_index_' . $common_name]) ? str_replace('{managesearch_url}', $scripturl . '?action=admin;area=managesearch;sa=manage' . $common_name, $txt['search_index_' . $common_name]) : '',
+						'desc' => $index_name && isset($txt['search_index_' . $common_name . '_desc']) ? str_replace('{managesearch_url}', $scripturl . '?action=admin;area=managesearch;sa=manage' . $common_name, $txt['search_index_' . $common_name . '_desc']) : '',
+					);
 				}
 			}
 		}
