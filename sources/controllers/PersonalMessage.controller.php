@@ -430,7 +430,7 @@ class PersonalMessage_Controller extends Action_Controller
 		$template_layers = Template_Layers::getInstance();
 		$template_layers->addAfter('subject_list', 'pm');
 
-		$labelQuery = $context['folder'] != 'sent' ? '
+		$labelQuery = $context['folder'] !== 'sent' ? '
 				AND FIND_IN_SET(' . $context['current_label_id'] . ', pmr.labels) != 0' : '';
 
 		// They didn't pick a sort, so we use the forum default.
@@ -442,7 +442,7 @@ class PersonalMessage_Controller extends Action_Controller
 		{
 			case 'date':
 				$sort_by_query = 'pm.id_pm';
-				$descending = !empty($options['view_newest_pm_first']);
+				$descending = !empty($options['view_newest_pm_first']) && $descending;
 				break;
 			case 'name':
 				$sort_by_query = 'COALESCE(mem.real_name, \'\')';

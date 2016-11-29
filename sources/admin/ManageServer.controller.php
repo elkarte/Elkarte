@@ -295,6 +295,7 @@ class ManageServer_Controller extends Action_Controller
 
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=cache;save';
 		$context['settings_title'] = $txt['caching_settings'];
+		$context['settings_message'] = $txt['caching_information'] . '<br><br>' . $txt['cache_settings_message'];
 
 		// Prepare the template.
 		createToken('admin-ssc');
@@ -551,7 +552,6 @@ class ManageServer_Controller extends Action_Controller
 		// Define the variables we want to edit.
 		$config_vars = array(
 			// Only a few settings, but they are important
-			array('desc', $txt['caching_information'] . '<br><br>' . $txt['cache_settings_message'], '', 'desc'),
 			array('cache_enable', $txt['cache_enable'], 'file', 'select', $cache_level, 'cache_enable'),
 			array('cache_accelerator', $txt['cache_accelerator'], 'file', 'select', $detected_supported),
 		);

@@ -285,7 +285,7 @@ class Mentions_Controller extends Action_Controller
 				'action' => array(
 					'header' => array(
 						'value' => $txt['mentions_action'],
-						'class' => 'listaction',
+						'class' => 'listaction grid8',
 					),
 					'data' => array(
 						'function' => function ($row) {
@@ -296,7 +296,7 @@ class Mentions_Controller extends Action_Controller
 
 							return $opts . '<a href="' . $scripturl . '?action=mentions;sa=updatestatus;mark=delete;item=' . $row['id_mention'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';"><i class="icon i-remove" title="' . $txt['delete'] . '"></i></a>';
 						},
-						'class' => 'listaction',
+						'class' => 'listaction grid8',
 					),
 				),
 			),

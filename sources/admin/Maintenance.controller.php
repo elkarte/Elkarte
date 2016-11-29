@@ -1273,7 +1273,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_hooks()
 	{
-		global $scripturl, $context, $txt, $settings;
+		global $scripturl, $context, $txt;
 
 		require_once(SUBSDIR . '/AddonSettings.subs.php');
 
@@ -1352,8 +1352,6 @@ class Maintenance_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function ($data) {
-							global $settings;
-
 							return '<i class="icon i-post_moderation_' . $data['status'] . '" title="' . $data['img_text'] . '"></i>';
 						},
 						'class' => 'centertext',

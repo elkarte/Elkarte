@@ -153,8 +153,7 @@ function template_unread()
 								</div>
 								<div class="topic_latest">
 									<p class="topic_stats">
-										', $topic['replies'], ' ', $txt['replies'], '
-										<br />
+										', $topic['replies'], ' ', $txt['replies'], '<br />
 										', $topic['views'], ' ', $txt['views'], '
 									</p>
 									<p class="topic_lastpost">
