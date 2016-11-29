@@ -118,7 +118,7 @@ class Email_Parse
 
 	/**
 	 * Message id of the key
-	 * @var string
+	 * @var int
 	 */
 	public $message_id = null;
 
@@ -142,7 +142,7 @@ class Email_Parse
 
 	/**
 	 * Holds the sending ip of the email
-	 * @var string
+	 * @var string|boolean
 	 */
 	public $ip = false;
 
@@ -168,7 +168,7 @@ class Email_Parse
 
 	/**
 	 * Holds the current email address, to, from, cc
-	 * @var mixed[]
+	 * @var string
 	 */
 	private $_email_address = null;
 
