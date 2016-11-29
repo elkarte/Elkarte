@@ -196,7 +196,7 @@ hr {
 .category_header, .forum_category .category_header {
 	margin-bottom: 5px;
 	border-radius: 5px;
-	border: none;
+	border-color: transparent;
 	background: #EEEEEE;
 	color: #666666;
 	text-shadow: 1px 1px 0 #EBEBEB;
@@ -874,7 +874,7 @@ a.active {
 
 .pagelinks .navPages, .pagelinks .current_page {
 	border-radius: 8px;
-	border: none;
+	border-color: transparent;
 }
 
 /* our buddies &laquo; &raquo; */
@@ -1006,10 +1006,6 @@ a.active {
 	border: 1px solid #EEEEEE;
 }
 
-.linktree {
-	border: none;
-}
-
 .linktree:not(:last-child):after {
 	top: 0.25em;
 	width: 1.5em;
@@ -1044,7 +1040,7 @@ a.active {
 .forumposts > li,
 .content_category > div,
 .content_category > li {
-	border: none;
+	border-color: transparent;
 }
 
 .board_row, .childboard_row {
@@ -1105,11 +1101,11 @@ a.active {
 }
 
 #description_board .generalinfo, #forumposts .generalinfo {
-	border: none;
+	border-color: transparent;
 }
 
 .topic_listing > li {
-	border: none;
+	border-color: transparent;
 }
 
 .topic_listing li {
@@ -1183,7 +1179,6 @@ a.active {
 }
 
 .content_noframe {
-	border: none;
 	box-shadow: none;
 }
 
@@ -1487,8 +1482,7 @@ a.help .icon {
  */
 
 .statistics .category_header {
-	border: none;
-	border-bottom: 2px solid #CCCCCC;
+	border-color: #CCCCCC;
 	background: none;
 	text-shadow: none;
 }
@@ -1536,7 +1530,7 @@ a.help .icon {
 
 .ui-tabs .ui-tabs-panel {
 	padding-top: 0;
-	border: none;
+	border-color: transparent;
 	border-top: 8px solid #F6F6F6;
 }
 
