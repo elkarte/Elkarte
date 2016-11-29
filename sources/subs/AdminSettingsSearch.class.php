@@ -146,15 +146,7 @@ class AdminSettings_Search
 
 		foreach ($item[0] as $term)
 		{
-			if (isset($txt[$term]) && stripos($txt[$term], $search_term) !== false)
-			{
-				$found = $txt[$term];
-			}
-			elseif (isset($txt['setting_' . $term]) && stripos($txt['setting_' . $term], $search_term) !== false)
-			{
-				$found = $txt['setting_' . $term];
-			}
-			elseif (stripos($term, $search_term) !== false)
+			if (stripos($term, $search_term) !== false)
 			{
 				$found = $term;
 			}
@@ -245,11 +237,48 @@ class AdminSettings_Search
 			}
 
 			foreach ($config_vars as $var)
-				if (!empty($var[1]) && !in_array($var[0], array('permissions', 'switch', 'warning')))
-					$settings[] = array($var[(isset($var[2]) && in_array($var[2], array('file', 'db'))) ? 0 : 1], $setting_area[1]);
+				if (!empty($var[1]) && !in_array($var[0], array('permissions', 'callback', 'message', 'warning', 'title', 'desc')))
+					$settings[] = array($this->_get_label($var), $setting_area[1]);
 		}
 
 		return $settings;
+	}
+
+	private function _get_label($var)
+	{
+		global $txt;
+
+		$return = array();
+
+		// See if there are any labels that might fit?
+		if (isset($var[2]) && in_array($var[2], array('file', 'db')))
+		{
+			$var[1] = $var[0];
+		}
+
+		// See if there are any labels that might fit?
+		if (isset($var['text_label']))
+		{
+			$return = $var['text_label'];
+		}
+		elseif (isset($txt[$var[1]]))
+		{
+			$return = $txt[$var[1]];
+		}
+		elseif (isset($txt['setting_' . $var[1]]))
+		{
+			$return = $txt['setting_' . $var[1]];
+		}
+		elseif (isset($txt['groups_' . $var[1]]))
+		{
+			$return = $txt['groups_' . $var[1]];
+		}
+		else
+		{
+			$return = $var[1];
+		}
+
+		return $return;
 	}
 
 	/**

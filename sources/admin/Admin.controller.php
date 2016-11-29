@@ -65,8 +65,25 @@ class Admin_Controller extends Action_Controller
 		$context['robot_no_index'] = true;
 
 		// Need these to do much
-		require_once(SUBSDIR . '/Menu.subs.php');
 		require_once(SUBSDIR . '/Admin.subs.php');
+
+		// Actually create the menu!
+		$admin_include_data = $this->loadMenu();
+		$this->buildLinktree($admin_include_data);
+
+		// Now - finally - call the right place!
+		if (isset($admin_include_data['file']))
+			require_once($admin_include_data['file']);
+
+		callMenu($admin_include_data);
+	}
+
+	private function loadMenu()
+	{
+		global $txt, $context, $scripturl, $modSettings, $settings;
+
+		// Need these to do much
+		require_once(SUBSDIR . '/Menu.subs.php');
 
 		// Define the menu structure - see subs/Menu.subs.php for details!
 		$admin_areas = array(
@@ -542,6 +559,20 @@ class Admin_Controller extends Action_Controller
 		if ($admin_include_data === false)
 			throw new Elk_Exception('no_access', false);
 
+		// Make a note of the Unique ID for this menu.
+		$context['admin_menu_id'] = $context['max_menu_id'];
+		$context['admin_menu_name'] = 'menu_data_' . $context['admin_menu_id'];
+
+		// Where in the admin are we?
+		$context['admin_area'] = $admin_include_data['current_area'];
+
+		return $admin_include_data;
+	}
+
+	private function buildLinktree($admin_include_data)
+	{
+		global $txt, $context, $scripturl, $modSettings, $settings;
+
 		// Build the link tree.
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?action=admin',
@@ -559,19 +590,6 @@ class Admin_Controller extends Action_Controller
 				'url' => $scripturl . '?action=admin;area=' . $admin_include_data['current_area'] . ';sa=' . $admin_include_data['current_subsection'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 				'name' => $admin_include_data['subsections'][$admin_include_data['current_subsection']][0],
 			);
-
-		// Make a note of the Unique ID for this menu.
-		$context['admin_menu_id'] = $context['max_menu_id'];
-		$context['admin_menu_name'] = 'menu_data_' . $context['admin_menu_id'];
-
-		// Where in the admin are we?
-		$context['admin_area'] = $admin_include_data['current_area'];
-
-		// Now - finally - call the right place!
-		if (isset($admin_include_data['file']))
-			require_once($admin_include_data['file']);
-
-		callMenu($admin_include_data);
 	}
 
 	/**

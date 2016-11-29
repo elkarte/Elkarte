@@ -75,6 +75,7 @@ loadSession();
 loadUserSettings();
 loadBoard();
 loadPermissions();
+loadTheme();
 
 // Basic language is good to have for functional tests
 loadLanguage('index+Errors');
