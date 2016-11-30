@@ -153,7 +153,7 @@ class PayPal_Payment
 
 	/**
 	 * If this is a test sandbox run or not
-	 * @var string
+	 * @var bool
 	 */
 	private $paidsubsTest;
 

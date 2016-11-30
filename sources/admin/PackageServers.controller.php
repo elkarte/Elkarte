@@ -395,8 +395,6 @@ class PackageServers_Controller extends Action_Controller
 			throw new Elk_Exception('package_get_error_is_zero', false);
 
 		// Start off with nothing
-		$package_id = '';
-		$package_name = '';
 		$server = '';
 		$url = '';
 
