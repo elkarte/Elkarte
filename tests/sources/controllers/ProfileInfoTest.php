@@ -1,7 +1,7 @@
 <?php
 
 /**
- * TestCase class for manage posts settings
+ * TestCase class for the Profile Info Controller
  */
 class TestProfileInfo extends PHPUnit_Framework_TestCase
 {
@@ -12,7 +12,7 @@ class TestProfileInfo extends PHPUnit_Framework_TestCase
 	{
 		global $modSettings, $user_info, $settings;
 
-		// Lets hack in just enough info for the system to think we are logged
+		// Lets add in just enough info for the system to think we are logged
 		$modSettings['smiley_sets_known'] = 'none';
 		$modSettings['smileys_url'] = 'http://127.0.0.1/smileys';
 		$settings['default_theme_dir'] = '/var/www/themes/default';
@@ -63,7 +63,7 @@ class TestProfileInfo extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * Test the settings for admin search
+	 * Test the settings for profile summary
 	 */
 	public function testProfileI()
 	{
