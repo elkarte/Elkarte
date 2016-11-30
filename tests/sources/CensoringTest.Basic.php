@@ -5,12 +5,20 @@
  */
 class CensoringTest extends PHPUnit_Framework_TestCase
 {
+	protected $tests;
+
 	/**
 	 * prepare what is necessary to use in these tests.
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
 	function setUp()
 	{
+		$this->tests = array(
+			'this' => array('this' => 'not_this'),
+			'This' => array('This' => 'not_case_this'),
+			'ex' => array('ex' => 'not_ex'),
+			'EX' => array('EX' => 'not_ex'),
+		);
 	}
 
 	/**
@@ -23,103 +31,116 @@ class CensoringTest extends PHPUnit_Framework_TestCase
 
 	function testWholeWordsCaseSensitive()
 	{
-		global $modSettings, $options;
+		global $modSettings;
 
 		$inputText = 'This is a bit of text that will be used to test the censoring';
-		$tests = array(
-			'this' => 'not_this',
-			'This' => 'not_case_this',
-			'ex' => 'not_ex',
-			'EX' => 'not_ex',
-		);
+
 		$results = array(
 			'this' => 'This is a bit of text that will be used to test the censoring',
 			'This' => 'not_case_this is a bit of text that will be used to test the censoring',
 			'ex' => 'This is a bit of text that will be used to test the censoring',
 			'EX' => 'This is a bit of text that will be used to test the censoring',
 		);
-		$this->setCensors($tests);
 
 		$modSettings['allow_no_censored'] = false;
 		$modSettings['censorWholeWord'] = true;
 		$modSettings['censorIgnoreCase'] = false;
+
+		foreach ($this->tests as $key => $test)
+		{
+			$this->setCensors($test);
+
+			$censored = censor($inputText);
+
+			$this->assertEquals($censored, $results[$key]);
+		}
 	}
 
 	function testWholeWordsCaseInsensitive()
 	{
-		global $modSettings, $options;
+		global $modSettings;
 
 		$inputText = 'This is a bit of text that will be used to test the censoring';
-		$tests = array(
-			'this' => 'not_this',
-			'This' => 'not_case_this',
-			'ex' => 'not_ex',
-			'EX' => 'not_ex',
-		);
+
 		$results = array(
 			'this' => 'not_case_this is a bit of text that will be used to test the censoring',
 			'This' => 'not_case_this is a bit of text that will be used to test the censoring',
 			'ex' => 'This is a bit of text that will be used to test the censoring',
 			'EX' => 'This is a bit of text that will be used to test the censoring',
 		);
-		$this->setCensors($tests);
 
 		$modSettings['allow_no_censored'] = false;
 		$modSettings['censorWholeWord'] = true;
 		$modSettings['censorIgnoreCase'] = true;
+
+		foreach ($this->tests as $key => $test)
+		{
+			$this->setCensors($test);
+
+			$censored = censor($inputText);
+
+			$this->assertEquals($censored, $results[$key]);
+		}
 	}
 
 	function testNotWholeWordsCaseSensitive()
 	{
-		global $modSettings, $options;
+		global $modSettings;
 
 		$inputText = 'This is a bit of text that will be used to test the censoring';
-		$tests = array(
-			'this' => 'not_this',
-			'This' => 'not_case_this',
-			'ex' => 'not_ex',
-			'EX' => 'not_ex',
-		);
+
 		$results = array(
 			'this' => 'This is a bit of text that will be used to test the censoring',
 			'This' => 'not_case_this is a bit of text that will be used to test the censoring',
 			'ex' => 'This is a bit of tnot_ext that will be used to test the censoring',
 			'EX' => 'This is a bit of text that will be used to test the censoring',
 		);
-		$this->setCensors($tests);
 
 		$modSettings['allow_no_censored'] = false;
 		$modSettings['censorWholeWord'] = false;
 		$modSettings['censorIgnoreCase'] = false;
+
+		foreach ($this->tests as $key => $test)
+		{
+			$this->setCensors($test);
+
+			$censored = censor($inputText);
+
+			$this->assertEquals($censored, $results[$key]);
+		}
 	}
 
 	function testNotWholeWordsCaseInsensitive()
 	{
-		global $modSettings, $options;
+		global $modSettings;
 
 		$inputText = 'This is a bit of text that will be used to test the censoring';
-		$tests = array(
-			'this' => 'not_this',
-			'This' => 'not_case_this',
-			'ex' => 'not_ex',
-			'EX' => 'not_ex',
-		);
+
 		$results = array(
 			'this' => 'not_case_this is a bit of text that will be used to test the censoring',
 			'This' => 'not_case_this is a bit of text that will be used to test the censoring',
 			'ex' => 'This is a bit of tnot_ext that will be used to test the censoring',
 			'EX' => 'This is a bit of tnot_ext that will be used to test the censoring',
 		);
-		$this->setCensors($tests);
 
 		$modSettings['allow_no_censored'] = false;
 		$modSettings['censorWholeWord'] = false;
 		$modSettings['censorIgnoreCase'] = true;
+
+		foreach ($this->tests as $key => $test)
+		{
+			$this->setCensors($test);
+
+			$censored = censor($inputText);
+
+			$this->assertEquals($censored, $results[$key]);
+		}
 	}
 
 	protected function setCensors($pairs)
 	{
 		global $modSettings;
+
 		$vulgar = array();
 		$proper = array();
 
