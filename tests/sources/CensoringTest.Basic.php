@@ -49,8 +49,8 @@ class CensoringTest extends PHPUnit_Framework_TestCase
 		foreach ($this->tests as $key => $test)
 		{
 			$this->setCensors($test);
-
-			$censored = censor($inputText);
+			$censor = new Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
+			$censored = $censor->censor($inputText);
 
 			$this->assertEquals($censored, $results[$key]);
 		}
@@ -63,7 +63,7 @@ class CensoringTest extends PHPUnit_Framework_TestCase
 		$inputText = 'This is a bit of text that will be used to test the censoring';
 
 		$results = array(
-			'this' => 'not_case_this is a bit of text that will be used to test the censoring',
+			'this' => 'not_this is a bit of text that will be used to test the censoring',
 			'This' => 'not_case_this is a bit of text that will be used to test the censoring',
 			'ex' => 'This is a bit of text that will be used to test the censoring',
 			'EX' => 'This is a bit of text that will be used to test the censoring',
@@ -76,8 +76,8 @@ class CensoringTest extends PHPUnit_Framework_TestCase
 		foreach ($this->tests as $key => $test)
 		{
 			$this->setCensors($test);
-
-			$censored = censor($inputText);
+			$censor = new Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
+			$censored = $censor->censor($inputText);
 
 			$this->assertEquals($censored, $results[$key]);
 		}
@@ -103,8 +103,8 @@ class CensoringTest extends PHPUnit_Framework_TestCase
 		foreach ($this->tests as $key => $test)
 		{
 			$this->setCensors($test);
-
-			$censored = censor($inputText);
+			$censor = new Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
+			$censored = $censor->censor($inputText);
 
 			$this->assertEquals($censored, $results[$key]);
 		}
@@ -117,7 +117,7 @@ class CensoringTest extends PHPUnit_Framework_TestCase
 		$inputText = 'This is a bit of text that will be used to test the censoring';
 
 		$results = array(
-			'this' => 'not_case_this is a bit of text that will be used to test the censoring',
+			'this' => 'not_this is a bit of text that will be used to test the censoring',
 			'This' => 'not_case_this is a bit of text that will be used to test the censoring',
 			'ex' => 'This is a bit of tnot_ext that will be used to test the censoring',
 			'EX' => 'This is a bit of tnot_ext that will be used to test the censoring',
@@ -130,8 +130,8 @@ class CensoringTest extends PHPUnit_Framework_TestCase
 		foreach ($this->tests as $key => $test)
 		{
 			$this->setCensors($test);
-
-			$censored = censor($inputText);
+			$censor = new Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
+			$censored = $censor->censor($inputText);
 
 			$this->assertEquals($censored, $results[$key]);
 		}
