@@ -1,4 +1,4 @@
-++-<?php
+<?php
 
 /**
  * TestCase class for the Profile Info Controller
