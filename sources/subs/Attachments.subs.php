@@ -2121,16 +2121,19 @@ function getAttachmentPosition($id_attach)
  */
 function elk_getimagesize($file, $error = 'array')
 {
-	try
-	{
-		$sizes = getimagesize($file);
-	}
-	catch (\Exception $e)
+	$sizes = @getimagesize($file);
+
+	// Can't get it, what shall we return
+	if (empty($sizes))
 	{
 		if ($error === 'array')
+		{
 			$sizes = array(-1, -1, -1);
+		}
 		else
+		{
 			$sizes = false;
+		}
 	}
 
 	return $sizes;
