@@ -23,11 +23,12 @@ then
    # Travis is MySQL 5.5 on ubuntu 12.04 ATM
    sudo service mysql stop
    sudo apt-get -qq install python-software-properties > /dev/null
-   echo mysql-apt-config mysql-apt-config/enable-repo select "$DB" | sudo debconf-set-selections
-   wget http://dev.mysql.com/get/mysql-apt-config_0.2.1-1ubuntu12.04_all.deb > /dev/null
-   sudo dpkg --install mysql-apt-config_0.2.1-1ubuntu12.04_all.deb
+   echo mysql-apt-config mysql-apt-config/select-server select "$DB" | sudo debconf-set-selections
+   wget http://dev.mysql.com/get/mysql-apt-config_0.7.3-1_all.deb > /dev/null
+   sudo dpkg --install mysql-apt-config_0.7.3-1_all.deb
    sudo apt-get update -qq
    sudo apt-get install -qq -y -o Dpkg::Options::=--force-confnew mysql-server
+   sudo mysql_upgrade
 fi
 
 # Install Apache, PHP w/DB support if any
