@@ -18,7 +18,7 @@ SHORT_PHP=${TRAVIS_PHP_VERSION:0:3}
 sudo apt-get update -qq
 
 # Specific version of MySQL ?
-if [ "$DB" == "mysql-5.6" -o "$DB" == "mysql-5.7-dmr" ]
+if [ "$DB" == "mysql-5.6" -o "$DB" == "mysql-5.7" ]
 then
    # Travis is MySQL 5.5 on ubuntu 12.04 ATM
    sudo service mysql stop
@@ -88,7 +88,7 @@ then
         printf "\n"| pecl install apcu
     else
         printf "\n"| pecl install channel://pecl.php.net/APCu-4.0.10
-        
+
         # Install Xcache. Not available for PHP 7 :(.
         wget http://xcache.lighttpd.net/pub/Releases/3.2.0/xcache-3.2.0.tar.gz
         tar xf xcache-3.2.0.tar.gz
