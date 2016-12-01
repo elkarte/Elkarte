@@ -74,9 +74,6 @@ then
     then
         echo "Installing Composer"
         curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
-    else
-        echo "Updating Composer"
-        composer self-update
     fi
 fi
 
