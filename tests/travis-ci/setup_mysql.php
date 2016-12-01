@@ -14,6 +14,7 @@
 
 define('TESTDIR', dirname(__FILE__));
 define('BOARDDIR', dirname(__FILE__) . '/../..');
+define('CACHEDIR', BOARDDIR . '/cache');
 define('ELK', '1');
 
 require_once(TESTDIR . '/setup.php');
