@@ -36,3 +36,6 @@ fi
 
 # Setup a directory to hold screenshots of failed tests
 sudo mkdir /var/www/screenshots && chmod 777 /var/www/screenshots
+
+# Copy phpunit_coverage.php into the webserver's document root directory.
+cp /var/www/vendor/phpunit/phpunit-selenium/PHPUnit/Extensions/SeleniumCommon/phpunit_coverage.php /var/www
