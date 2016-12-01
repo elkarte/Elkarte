@@ -235,7 +235,7 @@ class PayPal_Payment
 		}
 
 		// Post IPN data back to PayPal to validate the IPN data is genuine
-		$this->paidsubsTest = !empty($modSettings['paidsubs_test']) ;
+		$this->paidsubsTest = !empty($modSettings['paidsubs_test']);
 		$this->_fetchReturnResponse();
 
 		// If PayPal IPN does not return verified then give up...
