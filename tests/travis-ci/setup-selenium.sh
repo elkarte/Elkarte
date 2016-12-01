@@ -19,7 +19,7 @@ fi
 
 # Update/Install Fx or chrome
 #sudo apt-get install firefox -y --no-install-recommends
-wget http://chromedriver.googlecode.com/files/chromedriver_linux64_23.0.1240.0.zip && unzip chromedriver_linux64_23.0.1240.0.zip && sudo mv chromedriver /usr/bin
+wget https://chromedriver.storage.googleapis.com/2.25/chromedriver_linux64.zip && unzip chromedriver_linux64.zip && sudo mv chromedriver /usr/bin
 
 # Start Selenium
 export DISPLAY=:99.0
