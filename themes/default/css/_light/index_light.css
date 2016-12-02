@@ -326,7 +326,7 @@ strong {
 }
 
 /* A quote, perhaps from another post. */
-.bbc_standard_quote, .bbc_alternate_quote,
+.bbc_quote,
 /* A code block - maybe PHP ;) - shared styles. */
 .bbc_code {
 	border-color: #CCCCCC;
@@ -334,7 +334,7 @@ strong {
 }
 
 /* Extra quote styling */
-.bbc_standard_quote, .bbc_alternate_quote, .quoteheader {
+.bbc_quote, .quoteheader {
 	box-shadow: 2px 2px 2px #DDDDDD;
 }
 

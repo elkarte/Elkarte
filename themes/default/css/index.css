@@ -712,7 +712,7 @@ em, .em {
 }
 
 /* A quote, perhaps from another post. */
-.bbc_standard_quote, .bbc_alternate_quote,
+.bbc_quote,
 /* A code block - maybe PHP ;) - shared styles. */
 .bbc_code {
 	overflow: auto;
@@ -741,13 +741,11 @@ em, .em {
 }
 
 /* Stop em compounding when elements are nested. */
-/* @todo - Scrap old extra divs in Subs.php. */
-.bbc_standard_quote .bbc_alternate_quote, .bbc_alternate_quote .bbc_standard_quote,
-.bbc_standard_quote .bbc_code, .bbc_alternate_quote .bbc_code, .bbc_standard_quote .codeheader,
-.bbc_alternate_quote .codeheader, .bbc_standard_quote .quoteheader, .bbc_alternate_quote .quoteheader,
+.bbc_quote .bbc_quote, .bbc_quote .bbc_code,
+.bbc_quote .codeheader, .bbc_quote .quoteheader,
 /* And for quote inside small text areas, like the topic summary. */
-#topic_summary .bbc_standard_quote, #topic_summary .bbc_alternate_quote,
-#topic_summary .bbc_code, #topic_summary .codeheader, #topic_summary .quoteheader {
+#topic_summary .bbc_quote, #topic_summary .bbc_code,
+#topic_summary .codeheader, #topic_summary .quoteheader {
 	font-size: 1em;
 }
 

@@ -253,7 +253,7 @@
 				continue;
 
 			// Ignore in quotes and signatures
-			if ("bbc_standard_quote;signature".indexOf(tag.parentNode.className) !== -1)
+			if ("bbc_quote;signature".indexOf(tag.parentNode.className) !== -1)
 				continue;
 
 			// No href or inner text not equal to href attr then we move along

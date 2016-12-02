@@ -594,17 +594,13 @@ class BBCParser
 				$quote_alt = !$quote_alt;
 			}
 		}
-		// Add a class to the quote to style alternating blockquotes
-		// @todo - Frankly it makes little sense to allow alternate blockquote
-		// styling without also catering for alternate quoteheader styling.
-		// I do remember coding that some time back, but it seems to have gotten
-		// lost somewhere in the Elk processes.
-		// Come to think of it, it may be better to append a second class rather
-		// than alter the standard one.
-		//  - Example: class="bbc_quote" and class="bbc_quote alt_quote".
-		// This would mean simpler CSS for themes (like default) which do not use the alternate styling,
-		// but would still allow it for themes that want it.
-		$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote>', '<blockquote class="bbc_' . ($quote_alt ? 'alternate' : 'standard') . '_quote">', $tag[Codes::ATTR_BEFORE]);
+		// Add a class to the quote and quoteheader to style alternating blockquotes
+		//  - Example: class="quoteheader" and class="quoteheader bbc_alt_quoteheader" on the header
+		//             class="bbc_quote" and class="bbc_quote bbc_alternate_quote" on the blockquote
+		// This allows simpler CSS for themes (like default) which do not use the alternate styling,
+		// but still allow it for themes that want it.
+		$tag[Codes::ATTR_BEFORE] = str_replace('<div class="quoteheader">', '<div class="quoteheader' . ($quote_alt ? ' bbc_alt_quoteheader' : '') . '">', $tag[Codes::ATTR_BEFORE]);
+		$tag[Codes::ATTR_BEFORE] = str_replace('<blockquote>', '<blockquote class="bbc_quote' . ($quote_alt ? ' bbc_alternate_quote' : '') . '">', $tag[Codes::ATTR_BEFORE]);
 	}
 
 	/**
