@@ -148,7 +148,7 @@ class Groups_Controller extends Action_Controller
 						'value' => $txt['membergroups_icons'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $settings;
 
 							if (!empty($rowData['icons'][0]) && !empty($rowData['icons'][1]))

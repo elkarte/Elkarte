@@ -351,7 +351,7 @@ class ManagePaid_Controller extends Action_Controller
 						'value' => $txt['modify'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $txt, $scripturl;
 
 							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modify;sid=' . $rowData['id'] . '"><i class="icon i-modify" title="' . $txt['modify'] . '"></i></a>';

@@ -116,6 +116,7 @@ class PayPal_Display
 
 		// If it's repeatable do some javascript to respect this idea.
 		if (!empty($sub_data['repeatable']))
+		{
 			$return_data['javascript'] = '
 				var container = document.getElementById("' . $return_data['id'] . '");
 
@@ -125,6 +126,7 @@ class PayPal_Display
 				{
 					document.getElementById("paypal_cmd").value = document.getElementById("do_paypal_recur").checked ? "_xclick-subscriptions" : "_xclick";
 				}';
+		}
 
 		return $return_data;
 	}
@@ -144,6 +146,18 @@ class PayPal_Payment
 	private $return_data;
 
 	/**
+	 * Data to send to paypal IPN
+	 * @var string
+	 */
+	private $requestString;
+
+	/**
+	 * If this is a test sandbox run or not
+	 * @var bool
+	 */
+	private $paidsubsTest;
+
+	/**
 	 * This function returns true/false for whether this gateway thinks the data is intended for it.
 	 *
 	 * @return boolean
@@ -154,15 +168,21 @@ class PayPal_Payment
 
 		// Has the user set up an email address?
 		if (empty($modSettings['paypal_email']))
+		{
 			return false;
+		}
 
 		// Check the correct transaction types are even here.
 		if ((!isset($_POST['txn_type']) && !isset($_POST['payment_status'])) || (!isset($_POST['business']) && !isset($_POST['receiver_email'])))
+		{
 			return false;
+		}
 
 		// Correct email address?
 		if (!isset($_POST['business']))
+		{
 			$_POST['business'] = $_POST['receiver_email'];
+		}
 
 		// Return true or false if the data is intended for this
 		return !($modSettings['paypal_email'] !== $_POST['business'] && (empty($modSettings['paypal_additional_emails']) || !in_array($_POST['business'], explode(',', $modSettings['paypal_additional_emails']))));
@@ -176,7 +196,6 @@ class PayPal_Payment
 	 * - PayPal will respond back with a single word, which is either VERIFIED if the message originated with PayPal or INVALID
 	 * - If valid returns the subscription and member IDs we are going to process if it passes
 	 *
-	 * @todo split this function into several chunks
 	 * @return string
 	 */
 	public function precheck()
@@ -195,111 +214,61 @@ class PayPal_Payment
 		{
 			$keyval = explode('=', $keyval);
 			if (count($keyval) === 2)
+			{
 				$my_post[$keyval[0]] = urldecode($keyval[1]);
+			}
 		}
 
 		// Put this to some default value.
 		if (!isset($my_post['txn_type']))
+		{
 			$my_post['txn_type'] = '';
+		}
 
 		// Build the request string - starting with the minimum requirement.
-		$requestString = 'cmd=_notify-validate';
+		$this->requestString = 'cmd=_notify-validate';
 
 		// Now my dear, add all the posted bits back in the exact order we got them
 		foreach ($my_post as $key => $value)
-			$requestString .= '&' . $key . '=' . urlencode($value);
+		{
+			$this->requestString .= '&' . $key . '=' . urlencode($value);
+		}
 
 		// Post IPN data back to PayPal to validate the IPN data is genuine
-		// First we try cURL
-		if (function_exists('curl_init') && $curl = curl_init((!empty($modSettings['paidsubs_test']) ? 'https://ipnpb.sandbox.' : 'https://ipnpb.') . 'paypal.com/cgi-bin/webscr'))
-		{
-			// Set the post data.
-			curl_setopt($curl, CURLOPT_POST, true);
-			curl_setopt($curl, CURLOPT_POSTFIELDSIZE, 0);
-			curl_setopt($curl, CURLOPT_POSTFIELDS, $requestString);
-
-			// Set up the headers so paypal will accept the post
-			curl_setopt($curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
-			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 1);
-			curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
-			curl_setopt($curl, CURLOPT_FORBID_REUSE, 1);
-
-			// Set TCP timeout to 30 seconds
-			curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 30);
-
-			// Set the http headers
-			curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-				'Content-Type: application/x-www-form-urlencoded',
-				'Content-Length: ' . strlen($requestString),
-				'Host: ipnpb.' . (!empty($modSettings['paidsubs_test']) ? 'sandbox.' : '') . 'paypal.com',
-				'Connection: close'
-			));
-
-			// The data returned as a string.
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-
-			// Fetch the data.
-			$this->return_data = curl_exec($curl);
-
-			// Close the session.
-			curl_close($curl);
-		}
-		// Otherwise good old HTTP.
-		else
-		{
-			// Setup the headers.
-			$header = 'POST /cgi-bin/webscr HTTP/1.1' . "\r\n";
-			$header .= 'Content-Type: application/x-www-form-urlencoded' . "\r\n";
-			$header .= 'Host: ipnpb.' . (!empty($modSettings['paidsubs_test']) ? 'sandbox.' : '') . 'paypal.com' . "\r\n";
-			$header .= 'Content-Length: ' . strlen($requestString) . "\r\n";
-			$header .= 'Connection: close' . "\r\n\r\n";
-
-			// Open the connection.
-			if (!empty($modSettings['paidsubs_test']))
-				$fp = fsockopen('ssl://ipnpb.sandbox.paypal.com', 443, $errno, $errstr, 30);
-			else
-				$fp = fsockopen('ssl://ipnpb.paypal.com', 443, $errno, $errstr, 30);
-
-			// Did it work?
-			if (!$fp)
-				generateSubscriptionError($txt['paypal_could_not_connect']);
-
-			// Put the data to the port.
-			fputs($fp, $header . $requestString);
-
-			// Get the data back...
-			while (!feof($fp))
-			{
-				$this->return_data = fgets($fp, 1024);
-				if (strcmp(trim($this->return_data), 'VERIFIED') === 0)
-					break;
-			}
-
-			// Clean up.
-			fclose($fp);
-		}
+		$this->paidsubsTest = !empty($modSettings['paidsubs_test']);
+		$this->_fetchReturnResponse();
 
 		// If PayPal IPN does not return verified then give up...
 		if (strcmp(trim($this->return_data), 'VERIFIED') !== 0)
+		{
 			exit;
+		}
 
 		// Now that we have received a VERIFIED response from PayPal, we perform some checks
 		// before we assume that the IPN is legitimate. First check that this is intended for us.
 		if ($modSettings['paypal_email'] !== $_POST['business'] && (empty($modSettings['paypal_additional_emails']) || !in_array($_POST['business'], explode(',', $modSettings['paypal_additional_emails']))))
+		{
 			exit;
+		}
 
 		// Is this a subscription - and if so is it a secondary payment that we need to process?
 		if ($this->isSubscription() && (empty($_POST['item_number']) || strpos($_POST['item_number'], '+') === false))
+		{
 			// Calculate the subscription it relates to!
 			$this->_findSubscription();
+		}
 
 		// Verify the currency!
 		if (trim(strtolower($_POST['mc_currency'])) !== strtolower($modSettings['paid_currency_code']))
+		{
 			generateSubscriptionError(sprintf($txt['paypal_currency_unkown'], $_POST['mc_currency'], $modSettings['paid_currency_code']));
+		}
 
 		// Can't exist if it doesn't contain anything.
 		if (empty($_POST['item_number']))
+		{
 			exit;
+		}
 
 		// Return the id_sub and id_member
 		return explode('+', $_POST['item_number']);
@@ -400,7 +369,9 @@ class PayPal_Payment
 
 		// Assume we have this?
 		if (empty($_POST['subscr_id']))
+		{
 			return false;
+		}
 
 		// Do we have this in the database?
 		$request = $db->query('', '
@@ -432,13 +403,122 @@ class PayPal_Payment
 					)
 				);
 				if ($db->num_rows($request) === 0)
+				{
 					return false;
+				}
 			}
 			else
+			{
 				return false;
+			}
 		}
+
 		list ($member_id, $subscription_id) = $db->fetch_row($request);
 		$_POST['item_number'] = $member_id . '+' . $subscription_id;
 		$db->free_result($request);
+	}
+
+	/**
+	 * Makes the request to paypal and returns the response
+	 * Attempts curl first and if not available fsockopen
+	 */
+	private function _fetchReturnResponse()
+	{
+		// First we try cURL
+		if (function_exists('curl_init') && $curl = curl_init(($this->paidsubsTest ? 'https://ipnpb.sandbox.' : 'https://ipnpb.') . 'paypal.com/cgi-bin/webscr'))
+		{
+			$this->_fetchReturnResponseCurl($curl);
+		}
+		// Otherwise good old HTTP.
+		else
+		{
+			$this->_fetchReturnResponseFs();
+		}
+	}
+
+	/**
+	 * Get paypal response to our requestString using curl
+	 *
+	 * @param $curl resource
+	 */
+	private function _fetchReturnResponseCurl($curl)
+	{
+		// Set the post data.
+		curl_setopt($curl, CURLOPT_POST, true);
+		curl_setopt($curl, CURLOPT_POSTFIELDSIZE, 0);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, $this->requestString);
+
+		// Set up the headers so paypal will accept the post
+		curl_setopt($curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 1);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
+		curl_setopt($curl, CURLOPT_FORBID_REUSE, 1);
+
+		// Set TCP timeout to 30 seconds
+		curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 30);
+
+		// Set the http headers
+		curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+			'Content-Type: application/x-www-form-urlencoded',
+			'Content-Length: ' . strlen($this->requestString),
+			'Host: ipnpb.' . ($this->paidsubsTest ? 'sandbox.' : '') . 'paypal.com',
+			'Connection: close'
+		));
+
+		// The data returned as a string.
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+
+		// Fetch the data.
+		$this->return_data = curl_exec($curl);
+
+		// Close the session.
+		curl_close($curl);
+	}
+
+	/**
+	 * Get paypal response to our requestString using curl
+	 */
+	private function _fetchReturnResponseFs()
+	{
+		global $txt;
+
+		// Setup the headers.
+		$header = 'POST /cgi-bin/webscr HTTP/1.1' . "\r\n";
+		$header .= 'Content-Type: application/x-www-form-urlencoded' . "\r\n";
+		$header .= 'Host: ipnpb.' . ($this->paidsubsTest ? 'sandbox.' : '') . 'paypal.com' . "\r\n";
+		$header .= 'Content-Length: ' . strlen($this->requestString) . "\r\n";
+		$header .= 'Connection: close' . "\r\n\r\n";
+
+		// Open the connection.
+		if ($this->paidsubsTest)
+		{
+			$fp = fsockopen('ssl://ipnpb.sandbox.paypal.com', 443, $errno, $errstr, 30);
+		}
+		else
+		{
+			$fp = fsockopen('ssl://ipnpb.paypal.com', 443, $errno, $errstr, 30);
+		}
+
+		// Did it work?
+		if (!$fp)
+		{
+			generateSubscriptionError($txt['paypal_could_not_connect']);
+		}
+
+		// Put the data to the port.
+		fputs($fp, $header . $this->requestString);
+
+		// Get the data back...
+		while (!feof($fp))
+		{
+			$this->return_data = fgets($fp, 1024);
+			if (strcmp(trim($this->return_data), 'VERIFIED') === 0)
+			{
+				break;
+			}
+		}
+
+		// Clean up.
+		fclose($fp);
 	}
 }

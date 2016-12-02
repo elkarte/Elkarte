@@ -8,7 +8,7 @@ set -x
 # some vars to make this easy to change
 SELENIUM_HUB_URL='http://127.0.0.1:4444'
 SELENIUM_JAR=/usr/share/selenium/selenium-server-standalone.jar
-SELENIUM_DOWNLOAD_URL=http://selenium-release.storage.googleapis.com/2.53/selenium-server-standalone-2.53.0.jar
+SELENIUM_DOWNLOAD_URL=http://selenium-release.storage.googleapis.com/2.53/selenium-server-standalone-2.53.1.jar
 
 # If selenium is not available, get it
 if [ ! -f "$SELENIUM_JAR" ]
@@ -17,9 +17,11 @@ then
     sudo wget -nv -O "$SELENIUM_JAR" "$SELENIUM_DOWNLOAD_URL"
 fi
 
-# Update/Install Fx or chrome
-#sudo apt-get install firefox -y --no-install-recommends
-wget http://chromedriver.googlecode.com/files/chromedriver_linux64_23.0.1240.0.zip && unzip chromedriver_linux64_23.0.1240.0.zip && sudo mv chromedriver /usr/bin
+# Update/Install Fx to the latest available
+sudo apt-get install firefox -y --no-install-recommends
+
+# install chrome driver for use in selenium
+wget https://chromedriver.storage.googleapis.com/2.25/chromedriver_linux64.zip && unzip chromedriver_linux64.zip && sudo mv chromedriver /usr/bin
 
 # Start Selenium
 export DISPLAY=:99.0
@@ -36,3 +38,6 @@ fi
 
 # Setup a directory to hold screenshots of failed tests
 sudo mkdir /var/www/screenshots && chmod 777 /var/www/screenshots
+
+# Copy phpunit_coverage.php into the webserver's document root directory.
+cp /var/www/vendor/phpunit/phpunit-selenium/PHPUnit/Extensions/SeleniumCommon/phpunit_coverage.php /var/www

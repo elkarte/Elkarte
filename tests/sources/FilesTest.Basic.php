@@ -186,6 +186,8 @@ class TestFiles extends PHPUnit_Framework_TestCase
 				continue;
 			if (strpos($file, BOARDDIR . '/themes/default/languages/') !== false)
 				continue;
+			if (strpos($file, 'phpunit_coverage.php') !== false)
+				continue;
 			if (basename($file) == 'index.php' && $file != BOARDDIR . '/index.php')
 				continue;
 			if ($file == BOARDDIR . '/Settings.php'

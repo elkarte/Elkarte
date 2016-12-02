@@ -249,7 +249,7 @@ class Emailpost_Controller extends Action_Controller
 		$email_message->message_type = 'x';
 		$email_message->message_key_id = '';
 		$email_message->message_key = '';
-		$email_message->message_id = '0';
+		$email_message->message_id = 0;
 
 		// Check if it's a DSN
 		// Hopefully, this will eventually DO something but for now
