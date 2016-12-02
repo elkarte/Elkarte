@@ -17,8 +17,10 @@ then
     sudo wget -nv -O "$SELENIUM_JAR" "$SELENIUM_DOWNLOAD_URL"
 fi
 
-# Update/Install Fx or chrome
-#sudo apt-get install firefox -y --no-install-recommends
+# Update/Install Fx to the latest available
+sudo apt-get install firefox -y --no-install-recommends
+
+# install chrome driver for use in selenium
 wget https://chromedriver.storage.googleapis.com/2.25/chromedriver_linux64.zip && unzip chromedriver_linux64.zip && sudo mv chromedriver /usr/bin
 
 # Start Selenium
