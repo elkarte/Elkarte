@@ -28,7 +28,7 @@ namespace ElkArte\Search\API;
  *
  * @package Search
  */
-class Sphinxql_Search extends SearchAPI
+class Sphinxql extends SearchAPI
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
@@ -61,12 +61,6 @@ class Sphinxql_Search extends SearchAPI
 	protected $min_word_length = 4;
 
 	/**
-	 * Any word excluded from the search?
-	 * @var array
-	 */
-	protected $_excludedWords = array();
-
-	/**
 	 * What databases are supported?
 	 * @var array
 	 */
@@ -87,31 +81,6 @@ class Sphinxql_Search extends SearchAPI
 		}
 
 		$this->bannedWords = empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']);
-	}
-
-	/**
-	 * Check whether the method can be performed by this API.
-	 *
-	 * @param string $methodName The search method
-	 * @param string|null $query_params Parameters for the query
-	 */
-	public function supportsMethod($methodName, $query_params = null)
-	{
-		switch ($methodName)
-		{
-			case 'isValid':
-			case 'searchSort':
-			case 'setExcludedWords':
-			case 'prepareIndexes':
-			case 'searchQuery':
-				return true;
-			break;
-
-			default:
-				// All other methods, too bad dunno you.
-				return false;
-			break;
-		}
 	}
 
 	/**
@@ -140,16 +109,6 @@ class Sphinxql_Search extends SearchAPI
 		$y = strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
 
 		return $x < $y ? 1 : ($x > $y ? -1 : 0);
-	}
-
-	/**
-	 * Adds the excluded words list
-	 *
-	 * @param string[] $words An array of words
-	 */
-	public function setExcludedWords($words)
-	{
-		$this->_excludedWords = $words;
 	}
 
 	/**
@@ -192,7 +151,7 @@ class Sphinxql_Search extends SearchAPI
 
 			// No connection, daemon not running?  log the error
 			if ($mySphinx === false)
-				throw new \Elk_Exception('error_no_search_daemon');
+				\Errors::instance()->fatal_lang_error('error_no_search_daemon');
 
 			// Compile different options for our query
 			$query = 'SELECT *' . (empty($search_params['topic']) ? ', COUNT(*) num' : '') . ', WEIGHT() weights, (weights + (relevance/1000)) rank FROM elkarte_index';
@@ -254,7 +213,7 @@ class Sphinxql_Search extends SearchAPI
 				if (mysqli_error($mySphinx))
 					\Errors::instance()->log_error(mysqli_error($mySphinx));
 
-				throw new \Elk_Exception('error_no_search_daemon');
+				\Errors::instance()->fatal_lang_error('error_no_search_daemon');
 			}
 
 			// Get the relevant information from the search results.

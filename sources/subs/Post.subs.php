@@ -373,8 +373,8 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	}
 
 	// If there's a custom search index, it may need updating...
-	require_once(SUBSDIR . '/Search.subs.php');
-	$searchAPI = findSearchAPI();
+	$search = new \ElkArte\Search\Search;
+	$searchAPI = $search->findSearchAPI();
 	if (is_callable(array($searchAPI, 'postCreated')))
 		$searchAPI->postCreated($msgOptions, $topicOptions, $posterOptions);
 
@@ -525,8 +525,8 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	}
 
 	// If there's a custom search index, it needs to be modified...
-	require_once(SUBSDIR . '/Search.subs.php');
-	$searchAPI = findSearchAPI();
+	$search = new \ElkArte\Search\Search;
+	$searchAPI = $search->findSearchAPI();
 	if (is_callable(array($searchAPI, 'postModified')))
 		$searchAPI->postModified($msgOptions, $topicOptions, $posterOptions);
 

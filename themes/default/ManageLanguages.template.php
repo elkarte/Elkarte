@@ -93,7 +93,7 @@ function template_download_language()
 		foreach ($group as $file)
 		{
 			echo '
-				<tr id="', $theme, '-', $count++, '">
+				<tr id="', $theme, '-', ($count++), '">
 					<td>
 						<strong>', $file['name'], '</strong><br />
 						<span class="smalltext">', $txt['languages_download_dest'], ': ', $file['destination'], '</span>
@@ -148,7 +148,7 @@ function template_download_language()
 
 		foreach ($group as $file)
 			echo '
-					', JavaScriptEscape($theme . '-' . $count++), ',';
+					', JavaScriptEscape($theme . '-' . ($count++)), ',';
 
 		echo '
 					null

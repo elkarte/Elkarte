@@ -22,7 +22,7 @@ namespace ElkArte\Search\API;
  *
  * @package Search
  */
-class Fulltext_Search extends SearchAPI
+class Fulltext extends SearchAPI
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
@@ -55,19 +55,13 @@ class Fulltext_Search extends SearchAPI
 	protected $min_word_length = 4;
 
 	/**
-	 * Any word excluded from the search?
-	 * @var array
-	 */
-	protected $_excludedWords = array();
-
-	/**
 	 * What databases support the fulltext index?
 	 * @var array
 	 */
 	protected $supported_databases = array('MySQL');
 
 	/**
-	 * Fulltext_Search::__construct()
+	 * Fulltext::__construct()
 	 */
 	public function __construct()
 	{
@@ -86,30 +80,7 @@ class Fulltext_Search extends SearchAPI
 	}
 
 	/**
-	 * Fulltext_Search::supportsMethod()
-	 *
-	 * Check whether the method can be performed by this API.
-	 *
-	 * @param string $methodName The search method
-	 * @param mixed[]|null $query_params The parameters for the query
-	 */
-	public function supportsMethod($methodName, $query_params = null)
-	{
-		switch ($methodName)
-		{
-			case 'searchSort':
-			case 'setExcludedWords':
-			case 'prepareIndexes':
-			case 'indexedWordQuery':
-				return true;
-			// All other methods, too bad dunno you.
-			default:
-				return false;
-		}
-	}
-
-	/**
-	 * Fulltext_Search::_getMinWordLength()
+	 * Fulltext::_getMinWordLength()
 	 *
 	 * What is the minimum word length full text supports?
 	 */
@@ -162,17 +133,7 @@ class Fulltext_Search extends SearchAPI
 	}
 
 	/**
-	 * Adds the excluded words list
-	 *
-	 * @param string[] $words An array of words
-	 */
-	public function setExcludedWords($words)
-	{
-		$this->_excludedWords = $words;
-	}
-
-	/**
-	 * Fulltext_Search::prepareIndexes()
+	 * Fulltext::prepareIndexes()
 	 *
 	 * Do we have to do some work with the words we are searching for to prepare them?
 	 *
@@ -218,7 +179,7 @@ class Fulltext_Search extends SearchAPI
 	}
 
 	/**
-	 * Fulltext_Search::indexedWordQuery()
+	 * Fulltext::indexedWordQuery()
 	 *
 	 * Search for indexed words.
 	 *
@@ -251,7 +212,7 @@ class Fulltext_Search extends SearchAPI
 			foreach ($words['words'] as $regularWord)
 			{
 				$query_where[] = 'm.body' . (in_array($regularWord, $query_params['excluded_words']) ? ' NOT' : '') . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' LIKE ' : ' RLIKE ') . '{string:complex_body_' . $count . '}';
-				$query_params['complex_body_' . $count++] = $this->prepareWord($regularWord, $search_data['no_regexp']);
+				$query_params['complex_body_' . ($count++)] = $this->prepareWord($regularWord, $search_data['no_regexp']);
 			}
 		}
 
@@ -290,7 +251,7 @@ class Fulltext_Search extends SearchAPI
 			foreach ($query_params['excluded_phrases'] as $phrase)
 			{
 				$query_where[] = 'subject NOT ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' LIKE ' : 'RLIKE') . '{string:exclude_subject_phrase_' . $count . '}';
-				$query_params['exclude_subject_phrase_' . $count++] = $this->prepareWord($phrase, $search_data['no_regexp']);
+				$query_params['exclude_subject_phrase_' . ($count++)] = $this->prepareWord($phrase, $search_data['no_regexp']);
 			}
 		}
 
@@ -300,7 +261,7 @@ class Fulltext_Search extends SearchAPI
 			foreach ($query_params['excluded_subject_words'] as $excludedWord)
 			{
 				$query_where[] = 'subject NOT ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' LIKE ' : 'RLIKE') . '{string:exclude_subject_words_' . $count . '}';
-				$query_params['exclude_subject_words_' . $count++] = $this->prepareWord($excludedWord, $search_data['no_regexp']);
+				$query_params['exclude_subject_words_' . ($count++)] = $this->prepareWord($excludedWord, $search_data['no_regexp']);
 			}
 		}
 

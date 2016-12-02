@@ -110,9 +110,9 @@ class Search
 
 	/**
 	 * Builds the array of words for use in the db query
-	 * @var null|array
+	 * @var array
 	 */
-	private $_searchWords = null;
+	private $_searchWords = array();
 
 	/**
 	 * Words excluded from indexes
@@ -241,36 +241,32 @@ class Search
 	/**
 	 * Creates a search API and returns the object.
 	 */
-	public function findSearchAPI()
+	public function findSearchAPI($searchClass = '')
 	{
 		global $modSettings, $txt;
 
 		require_once(SUBSDIR . '/Package.subs.php');
+		\Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 
 		// Load up the search API we are going to use.
-		if (empty($modSettings['search_index']))
-			$modSettings['search_index'] = 'Standard_Search';
-		elseif (in_array($modSettings['search_index'], array('custom', 'fulltext')))
-			$modSettings['search_index'] = ucfirst($modSettings['search_index']) . '_Search';
+		if (!empty($modSettings['search_index']) && empty($searchClass))
+			$searchClass = $modSettings['search_index'];
 
-		$search_class_name = '\\ElkArte\\Search\\API\\' . $modSettings['search_index'];
-
-		if (!class_implements($search_class_name, 'Search_Interface'))
+		$fqcn = '\\ElkArte\\Search\\API\\' . ucfirst($searchClass);
+		if (class_exists($fqcn) && !is_a($fqcn, 'ElkArte\\Search\\API\\SearchAPI', true))
 		{
-			throw new \Elk_Exception('search_api_missing');
+			// Create an instance of the search API and check it is valid for this version of the software.
+			$this->_searchAPI = new $fqcn;
 		}
-
-		// Create an instance of the search API and check it is valid for this version of the software.
-		$this->_searchAPI = new $search_class_name();
 
 		// An invalid Search API? Log the error and set it to use the standard API
 		if (!$this->_searchAPI || (!$this->_searchAPI->isValid()) || !matchPackageVersion($this->_forum_version, $this->_searchAPI->min_elk_version . '-' . $this->_searchAPI->version_compatible))
 		{
 			// Log the error.
 			loadLanguage('Errors');
-			\Errors::instance()->log_error(sprintf($txt['search_api_not_compatible'], $search_class_name), 'critical');
+			\Errors::instance()->log_error(sprintf($txt['search_api_not_compatible'], $fqcn), 'critical');
 
-			$this->_searchAPI = new \ElkArte\Search\API\Standard_Search();
+			$this->_searchAPI = new \ElkArte\Search\API\Standard;
 		}
 
 		return $this->_searchAPI;
@@ -487,7 +483,7 @@ class Search
 	{
 		global $modSettings, $context;
 
-		if ($this->_searchWords !== null)
+		if (count($this->_searchWords) > 0)
 		{
 			return $this->_searchWords;
 		}
@@ -528,7 +524,7 @@ class Search
 			);
 
 			// Sort the indexed words (large words -> small words -> excluded words).
-			if ($this->_searchAPI->supportsMethod('searchSort'))
+			if (is_callable(array($this->_searchAPI, 'searchSort')))
 			{
 				$this->_searchAPI->setExcludedWords($this->_excludedWords);
 				usort($orParts[$orIndex], array($this->_searchAPI, 'searchSort'));
@@ -555,7 +551,7 @@ class Search
 				}
 
 				// Have we got indexes to prepare?
-				if ($this->_searchAPI->supportsMethod('prepareIndexes'))
+				if (is_callable(array($this->_searchAPI, 'prepareIndexes')))
 				{
 					$this->_searchAPI->prepareIndexes($word, $this->_searchWords[$orIndex], $this->_excludedIndexWords, $is_excluded);
 				}
@@ -1184,7 +1180,7 @@ class Search
 				foreach ($this->_excludedPhrases as $phrase)
 				{
 					$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:excluded_phrases_' . $count . '}';
-					$subject_query_params['excluded_phrases_' . $count++] = $this->_searchAPI->prepareWord($phrase, $this->noRegexp());
+					$subject_query_params['excluded_phrases_' . ($count++)] = $this->_searchAPI->prepareWord($phrase, $this->noRegexp());
 				}
 			}
 
@@ -1306,7 +1302,7 @@ class Search
 		}
 
 		// We building an index?
-		if ($this->_searchAPI->supportsMethod('indexedWordQuery', $this->getParams()))
+		if (is_callable(array($this->_searchAPI, 'prepareWord')))
 		{
 			$indexedResults = $this->_prepare_word_index($id_search, $maxMessageResults);
 
@@ -1340,7 +1336,7 @@ class Search
 					{
 						$where[] = 'm.subject NOT' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:all_word_body_' . $count . '}';
 					}
-					$main_query['parameters']['all_word_body_' . $count++] = $this->_searchAPI->prepareWord($regularWord, $this->noRegexp());
+					$main_query['parameters']['all_word_body_' . ($count++)] = $this->_searchAPI->prepareWord($regularWord, $this->noRegexp());
 				}
 
 				if (!empty($where))
@@ -1387,7 +1383,7 @@ class Search
 		call_integration_hook('integrate_main_search_query', array(&$main_query));
 
 		// Did we either get some indexed results, or otherwise did not do an indexed query?
-		if (!empty($indexedResults) || !$this->_searchAPI->supportsMethod('indexedWordQuery', $this->getParams()))
+		if (!empty($indexedResults) || !is_callable(array($this->_searchAPI, 'indexedWordQuery')))
 		{
 			$relevance = $this->_build_relevance($main_query['weights']);
 			$main_query['select']['relevance'] = $relevance;
@@ -1618,13 +1614,13 @@ class Search
 
 					$subject_query['where'][] = '(subj' . $numTables . '.word IS NULL)';
 					$subject_query['where'][] = 'm.body NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:body_not_' . $count . '}';
-					$subject_query['params']['body_not_' . $count++] = $this->_searchAPI->prepareWord($subjectWord, $this->noRegexp());
+					$subject_query['params']['body_not_' . ($count++)] = $this->_searchAPI->prepareWord($subjectWord, $this->noRegexp());
 				}
 				else
 				{
 					$subject_query['inner_join'][] = '{db_prefix}log_search_subjects AS subj' . $numTables . ' ON (subj' . $numTables . '.id_topic = ' . ($prev_join === 0 ? 't' : 'subj' . $prev_join) . '.id_topic)';
 					$subject_query['where'][] = 'subj' . $numTables . '.word LIKE {string:subject_like_' . $count . '}';
-					$subject_query['params']['subject_like_' . $count++] = empty($modSettings['search_match_words']) ? '%' . $subjectWord . '%' : $subjectWord;
+					$subject_query['params']['subject_like_' . ($count++)] = empty($modSettings['search_match_words']) ? '%' . $subjectWord . '%' : $subjectWord;
 					$prev_join = $numTables;
 				}
 			}
@@ -1668,7 +1664,7 @@ class Search
 				{
 					$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:exclude_phrase_' . $count . '}';
 					$subject_query['where'][] = 'm.body NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:exclude_phrase_' . $count . '}';
-					$subject_query['params']['exclude_phrase_' . $count++] = $this->_searchAPI->prepareWord($phrase, $this->noRegexp());
+					$subject_query['params']['exclude_phrase_' . ($count++)] = $this->_searchAPI->prepareWord($phrase, $this->noRegexp());
 				}
 			}
 

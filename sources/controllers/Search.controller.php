@@ -287,7 +287,6 @@ class Search_Controller extends Action_Controller
 		// Are you allowed?
 		isAllowedTo('search_posts');
 
-		Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 		$this->_search = new \ElkArte\Search\Search();
 		$this->_search->setWeights($this->_weight_factors, $this->_weight, $this->_weight_total);
 
@@ -412,7 +411,7 @@ class Search_Controller extends Action_Controller
 		$query_params = $this->_search->getParams();
 
 		// Can this search rely on the API given the parameters?
-		if ($searchAPI->supportsMethod('searchQuery', $query_params))
+		if (is_callable(array($searchAPI, 'searchQuery')))
 		{
 			$participants = array();
 			$searchArray = array();

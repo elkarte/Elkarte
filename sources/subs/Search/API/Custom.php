@@ -23,7 +23,7 @@ namespace ElkArte\Search\API;
  *
  * @package Search
  */
-class Custom_Search extends SearchAPI
+class Custom extends SearchAPI
 {
 	/**
 	 *This is the last version of ElkArte that this was tested on, to protect against API changes.
@@ -50,31 +50,7 @@ class Custom_Search extends SearchAPI
 	protected $indexSettings = array();
 
 	/**
-	 * What words are banned?
-	 * @var array
-	 */
-	protected $bannedWords = array();
-
-	/**
-	 * What is the minimum word length?
-	 * @var int
-	 */
-	protected $min_word_length = null;
-
-	/**
-	 * Any word excluded from the search?
-	 * @var array
-	 */
-	protected $_excludedWords = array();
-
-	/**
-	 * What databases support the custom index?
-	 * @var array
-	 */
-	protected $supported_databases = array('MySQL', 'PostgreSQL');
-
-	/**
-	 * Custom_Search::__construct()
+	 * Custom::__construct()
 	 */
 	public function __construct()
 	{
@@ -94,34 +70,6 @@ class Custom_Search extends SearchAPI
 
 		$this->bannedWords = empty($modSettings['search_stopwords']) ? array() : explode(',', $modSettings['search_stopwords']);
 		$this->min_word_length = $this->indexSettings['bytes_per_word'];
-	}
-
-	/**
-	 * Check whether the search can be performed by this API.
-	 *
-	 * @param string $methodName The search method
-	 * @param string|null $query_params Parameters for the query
-	 * @return boolean|null
-	 */
-	public function supportsMethod($methodName, $query_params = null)
-	{
-		switch ($methodName)
-		{
-			case 'isValid':
-			case 'searchSort':
-			case 'setExcludedWords':
-			case 'prepareIndexes':
-			case 'indexedWordQuery':
-			case 'postCreated':
-			case 'postModified':
-				return true;
-			break;
-
-			// All other methods, too bad dunno you.
-			default:
-				return false;
-			break;
-		}
 	}
 
 	/**
@@ -150,16 +98,6 @@ class Custom_Search extends SearchAPI
 		$y = strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
 
 		return $y < $x ? 1 : ($y > $x ? -1 : 0);
-	}
-
-	/**
-	 * Adds the excluded words list
-	 *
-	 * @param string[] $words An array of words to exclude
-	 */
-	public function setExcludedWords($words)
-	{
-		$this->_excludedWords = $words;
 	}
 
 	/**
@@ -226,7 +164,7 @@ class Custom_Search extends SearchAPI
 		foreach ($words['words'] as $regularWord)
 		{
 			$query_where[] = 'm.body' . (in_array($regularWord, $query_params['excluded_words']) ? ' NOT' : '') . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' LIKE ' : ' RLIKE ') . '{string:complex_body_' . $count . '}';
-			$query_params['complex_body_' . $count++] = $this->prepareWord($regularWord, $search_data['no_regexp']);
+			$query_params['complex_body_' . ($count++)] = $this->prepareWord($regularWord, $search_data['no_regexp']);
 		}
 
 		if ($query_params['user_query'])
@@ -246,7 +184,7 @@ class Custom_Search extends SearchAPI
 			foreach ($query_params['excluded_phrases'] as $phrase)
 			{
 				$query_where[] = 'subject NOT ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' LIKE ' : ' RLIKE ') . '{string:exclude_subject_phrase_' . $count . '}';
-				$query_params['exclude_subject_phrase_' . $count++] = $this->prepareWord($phrase, $search_data['no_regexp']);
+				$query_params['exclude_subject_phrase_' . ($count++)] = $this->prepareWord($phrase, $search_data['no_regexp']);
 			}
 		}
 
@@ -256,7 +194,7 @@ class Custom_Search extends SearchAPI
 			foreach ($query_params['excluded_subject_words'] as $excludedWord)
 			{
 				$query_where[] = 'subject NOT ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' LIKE ' : ' RLIKE ') . '{string:exclude_subject_words_' . $count . '}';
-				$query_params['exclude_subject_words_' . $count++] = $this->prepareWord($excludedWord, $search_data['no_regexp']);
+				$query_params['exclude_subject_words_' . ($count++)] = $this->prepareWord($excludedWord, $search_data['no_regexp']);
 			}
 		}
 

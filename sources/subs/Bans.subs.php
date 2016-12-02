@@ -925,7 +925,7 @@ function updateBanMembers()
 	foreach ($memberEmailWild as $email)
 	{
 		$queryPart[] = 'mem.email_address LIKE {string:wild_' . $count . '}';
-		$queryValues['wild_' . $count++] = $email;
+		$queryValues['wild_' . ($count++)] = $email;
 	}
 
 	// Find all banned members.

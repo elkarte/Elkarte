@@ -28,7 +28,7 @@ namespace ElkArte\Search\API;
  *
  * @package Search
  */
-class Sphinx_Search extends SearchAPI
+class Sphinx extends SearchAPI
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
@@ -61,12 +61,6 @@ class Sphinx_Search extends SearchAPI
 	protected $min_word_length = 4;
 
 	/**
-	 * Any word excluded from the search?
-	 * @var array
-	 */
-	protected $_excludedWords = array();
-
-	/**
 	 * What databases are supported?
 	 * @var array
 	 */
@@ -92,6 +86,8 @@ class Sphinx_Search extends SearchAPI
 	/**
 	 * Check whether the method can be performed by this API.
 	 *
+	 * @deprecated since 1.1 - check that the method is callable
+	 *
 	 * @param string $methodName The search method
 	 * @param mixed[]|null $query_params Parameters for the query
 	 */
@@ -99,18 +95,11 @@ class Sphinx_Search extends SearchAPI
 	{
 		switch ($methodName)
 		{
-			case 'isValid':
-			case 'searchSort':
-			case 'setExcludedWords':
-			case 'prepareIndexes':
-				return true;
-			break;
 			case 'searchQuery':
 				// Search can be performed, but not for 'subject only' query.
 				return !$query_params['subject_only'];
 			default:
-				// All other methods, too bad dunno you.
-				return false;
+				return is_callable(array($this, $methodName));
 		}
 	}
 
@@ -143,16 +132,6 @@ class Sphinx_Search extends SearchAPI
 	}
 
 	/**
-	 * Adds the excluded words list
-	 *
-	 * @param string[] $words An array of words
-	 */
-	public function setExcludedWords($words)
-	{
-		$this->_excludedWords = $words;
-	}
-
-	/**
 	 * Do we have to do some work with the words we are searching for to prepare them?
 	 *
 	 * @param string Word(s) to index
@@ -182,6 +161,9 @@ class Sphinx_Search extends SearchAPI
 	public function searchQuery($search_params, $search_words, $excluded_words, &$participants, &$search_results)
 	{
 		global $user_info, $context, $modSettings;
+
+		if (!$search_params['subject_only'])
+			return 0;
 
 		// Only request the results if they haven't been cached yet.
 		$cached_results = array();
@@ -275,7 +257,7 @@ class Sphinx_Search extends SearchAPI
 				if ($mySphinx->GetLastError())
 					\Errors::instance()->log_error($mySphinx->GetLastError());
 
-				throw new \Elk_Exception('error_no_search_daemon');
+				\Errors::instance()->fatal_lang_error('error_no_search_daemon');
 			}
 
 			// Get the relevant information from the search results.

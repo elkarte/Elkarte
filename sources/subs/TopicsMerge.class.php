@@ -160,7 +160,7 @@ class TopicsMerge
 		if (count($this->_polls) > 1)
 		{
 			$request = $this->_db->query('', '
-				SELECT 
+				SELECT
 					t.id_topic, t.id_poll, m.subject, p.question
 				FROM {db_prefix}polls AS p
 					INNER JOIN {db_prefix}topics AS t ON (t.id_poll = p.id_poll)
@@ -241,7 +241,7 @@ class TopicsMerge
 
 		// Get the first and last message and the number of messages....
 		$request = $this->_db->query('', '
-			SELECT 
+			SELECT
 				approved, MIN(id_msg) AS first_msg, MAX(id_msg) AS last_msg, COUNT(*) AS message_count
 			FROM {db_prefix}messages
 			WHERE id_topic IN ({array_int:topics})
@@ -309,7 +309,7 @@ class TopicsMerge
 
 		// Get the member ID of the first and last message.
 		$request = $this->_db->query('', '
-			SELECT 
+			SELECT
 				id_member
 			FROM {db_prefix}messages
 			WHERE id_msg IN ({int:first_msg}, {int:last_msg})
@@ -404,8 +404,8 @@ class TopicsMerge
 		$response_prefix = response_prefix();
 
 		// If there's a search index that needs updating, update it...
-		require_once(SUBSDIR . '/Search.subs.php');
-		$searchAPI = findSearchAPI();
+		$search = new \ElkArte\Search\Search;
+		$searchAPI = $search->findSearchAPI();
 		if (is_callable(array($searchAPI, 'topicMerge')))
 			$searchAPI->topicMerge($id_topic, $this->_topics, $affected_msgs, empty($enforce_subject) ? null : array($response_prefix, $target_subject));
 	}

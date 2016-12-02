@@ -12,15 +12,13 @@
 
 namespace ElkArte\Search\API;
 
-use ElkArte\Search\Search_Interface;
-
 /**
  * Abstract class that defines the methods any search API shall implement
  * to properly work with ElkArte
  *
  * @package Search
  */
-abstract class SearchAPI implements Search_Interface
+abstract class SearchAPI
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
@@ -41,13 +39,63 @@ abstract class SearchAPI implements Search_Interface
 	public $is_supported;
 
 	/**
+	 * Any word excluded from the search?
+	 * @var array
+	 */
+	protected $_excludedWords = array();
+
+	/**
+	 * What words are banned?
+	 * @var array
+	 */
+	protected $bannedWords = array();
+
+	/**
+	 * What is the minimum word length?
+	 * @var int
+	 */
+	protected $min_word_length = 3;
+
+	/**
+	 * What databases support the custom index?
+	 * @var array
+	 */
+	protected $supported_databases = array('MySQL', 'PostgreSQL');
+
+	/**
+	 * Fulltext::__construct()
+	 */
+	public function __construct()
+	{
+		global $modSettings;
+
+		$this->bannedWords = empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']);
+		$this->min_word_length = $this->_getMinWordLength();
+	}
+
+	/**
+	 * Fulltext::_getMinWordLength()
+	 *
+	 * What is the minimum word length full text supports?
+	 */
+	protected function _getMinWordLength()
+	{
+		return 3;
+	}
+
+	/**
 	 * Method to check whether the method can be performed by the API.
+	 *
+	 * @deprecated since 1.1 - check that the method is callable
 	 *
 	 * @param string $methodName
 	 * @param string|null $query_params
 	 * @return boolean
 	 */
-	abstract public function supportsMethod($methodName, $query_params = null);
+	public function supportsMethod($methodName, $query_params = null)
+	{
+		return is_callable(array($this, $methodName));
+	}
 
 	/**
 	 * If the settings don't exist we can't continue.
@@ -55,7 +103,17 @@ abstract class SearchAPI implements Search_Interface
 	public function isValid()
 	{
 		// Always fall back to the standard search method.
-		return true;
+		return in_array(DB_TYPE, $this->supported_databases);
+	}
+
+	/**
+	 * Adds the excluded words list
+	 *
+	 * @param string[] $words An array of words to exclude
+	 */
+	public function setExcludedWords($words)
+	{
+		$this->_excludedWords = $words;
 	}
 
 	/**
