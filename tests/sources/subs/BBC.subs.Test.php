@@ -213,57 +213,57 @@ class TestBBC extends PHPUnit_Framework_TestCase
 			array(
 				'Quoting is a pain 1',
 				'[quote]This is a quote[/quote]',
-				'<div class="quoteheader">Quote</div><blockquote class="bbc_standard_quote">This is a quote</blockquote>',
+				'<div class="quoteheader">Quote</div><blockquote class="bbc_quote">This is a quote</blockquote>',
 			),
 			array(
 				'Quoting is a pain 1 bis',
 				'[quote]This is a quote[quote]of a quote[/quote][/quote]',
-				'<div class="quoteheader">Quote</div><blockquote class="bbc_standard_quote">This is a quote<div class="quoteheader">Quote</div><blockquote class="bbc_alternate_quote">of a quote</blockquote></blockquote>',
+				'<div class="quoteheader">Quote</div><blockquote class="bbc_quote">This is a quote<div class="quoteheader bbc_alt_quoteheader">Quote</div><blockquote class="bbc_quote bbc_alternate_quote">of a quote</blockquote></blockquote>',
 			),
 			array(
 				'Quoting is a pain 2',
 				'[quote author=unquoted author]This is a quote[/quote]',
-				'<div class="quoteheader">Quote from: unquoted author</div><blockquote class="bbc_standard_quote">This is a quote</blockquote>',
+				'<div class="quoteheader">Quote from: unquoted author</div><blockquote class="bbc_quote">This is a quote</blockquote>',
 			),
 			array(
 				'Quoting is a pain 3',
 				'[quote author=&quot;quoted author&quot;]This is a quote[/quote]',
-				'<div class="quoteheader">Quote from: quoted author</div><blockquote class="bbc_standard_quote">This is a quote</blockquote>',
+				'<div class="quoteheader">Quote from: quoted author</div><blockquote class="bbc_quote">This is a quote</blockquote>',
 			),
 			array(
 				'Quoting is a pain 4',
 				'[quote author=q]This is a quote[/quote]',
-				'<div class="quoteheader">Quote from: q</div><blockquote class="bbc_standard_quote">This is a quote</blockquote>',
+				'<div class="quoteheader">Quote from: q</div><blockquote class="bbc_quote">This is a quote</blockquote>',
 			),
 			array(
 				'Quoting is a pain 5',
 				'[quote author=qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuiop]This is a quote[/quote]',
-				'<div class="quoteheader">Quote from: qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuiop</div><blockquote class="bbc_standard_quote">This is a quote</blockquote>',
+				'<div class="quoteheader">Quote from: qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuiop</div><blockquote class="bbc_quote">This is a quote</blockquote>',
 			),
 			array(
 				'Quoting is a pain 6',
 				'[quote=something]This is a quote[/quote]',
-				'<div class="quoteheader">Quote from: something</div><blockquote class="bbc_standard_quote">This is a quote</blockquote>',
+				'<div class="quoteheader">Quote from: something</div><blockquote class="bbc_quote">This is a quote</blockquote>',
 			),
 			array(
 				'Quoting is a pain 7',
 				'[quote author=an author link=board=1;topic=123 date=12345678]This is a quote[/quote]',
-				'<div class="quoteheader"><a href="http://127.0.0.1/index.php?topic=123">Quote from: an author on ' . htmlTime(12345678) . '</a></div><blockquote class="bbc_standard_quote">This is a quote</blockquote>',
+				'<div class="quoteheader"><a href="http://127.0.0.1/index.php?topic=123">Quote from: an author on ' . htmlTime(12345678) . '</a></div><blockquote class="bbc_quote">This is a quote</blockquote>',
 			),
 			array(
 				'Quoting is a pain 8',
 				'[quote author=an author link=topic=123.msg123#msg123 date=12345678]This is a quote[/quote]',
-				'<div class="quoteheader"><a href="http://127.0.0.1/index.php?topic=123.msg123#msg123">Quote from: an author on ' . htmlTime(12345678) . '</a></div><blockquote class="bbc_standard_quote">This is a quote</blockquote>',
+				'<div class="quoteheader"><a href="http://127.0.0.1/index.php?topic=123.msg123#msg123">Quote from: an author on ' . htmlTime(12345678) . '</a></div><blockquote class="bbc_quote">This is a quote</blockquote>',
 			),
 			array(
 				'Quoting is a pain 9',
 				'[quote author=an author link=threadid=123.msg123#msg123 date=12345678]This is a quote[/quote]',
-				'<div class="quoteheader"><a href="http://127.0.0.1/index.php?threadid=123.msg123#msg123">Quote from: an author on ' . htmlTime(12345678) . '</a></div><blockquote class="bbc_standard_quote">This is a quote</blockquote>',
+				'<div class="quoteheader"><a href="http://127.0.0.1/index.php?threadid=123.msg123#msg123">Quote from: an author on ' . htmlTime(12345678) . '</a></div><blockquote class="bbc_quote">This is a quote</blockquote>',
 			),
 			array(
 				'Quoting is a pain 10',
 				'[quote author=an author link=action=profile;u=123 date=12345678]This is a quote[/quote]',
-				'<div class="quoteheader"><a href="http://127.0.0.1/index.php?action=profile;u=123">Quote from: an author on ' . htmlTime(12345678) . '</a></div><blockquote class="bbc_standard_quote">This is a quote</blockquote>',
+				'<div class="quoteheader"><a href="http://127.0.0.1/index.php?action=profile;u=123">Quote from: an author on ' . htmlTime(12345678) . '</a></div><blockquote class="bbc_quote">This is a quote</blockquote>',
 			),
 			array(
 				'Right tag',
