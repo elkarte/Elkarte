@@ -58,7 +58,7 @@ function template_login()
 		echo '
 						<dt>', $txt['otp_token'], '</dt>
 						<dd>
-							<input type="password" name="otp_token" id="otp_token" value="', $context['default_password'], '" size="8" class="input_password" placeholder="', $txt['otp_token'], '" />
+							<input type="password" name="otp_token" id="otp_token" value="', $context['default_password'], '" size="30" class="input_password" placeholder="', $txt['otp_token'], '" />
 						</dd>';
 
 	if (!empty($modSettings['enableOpenID']))
@@ -169,7 +169,7 @@ function template_kick_guest()
 		echo '
 						<dt>', $txt['otp_token'], '</dt>
 						<dd>
-							<input type="password" name="otp_token" id="otp_token" value="', $context['default_password'], '" size="8" class="input_password" placeholder="', $txt['otp_token'], '" />
+							<input type="password" name="otp_token" id="otp_token" value="', $context['default_password'], '" size="30" class="input_password" placeholder="', $txt['otp_token'], '" />
 						</dd>';
 
 	if (!empty($modSettings['enableOpenID']))
