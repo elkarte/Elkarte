@@ -54,7 +54,7 @@ class TestManageMembers_Controller extends ElkArteWebTest
 		// Then, navigate to member management.
 		$this->activateMember('user1', 'approve', 'ok');
 
-		// Finally, ensure they have been approvved.
+		// Finally, ensure they have been approved.
 		$this->url('index.php?action=admin;area=viewmembers;sa=search');
 		$this->byId('activated-1')->click();
 		$this->byId('activated-2')->click();

@@ -50,6 +50,7 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 	 */
 	protected function tearDown()
 	{
+		$this->timeouts()->implicitWait(0);
 		parent::tearDown();
 	}
 
@@ -61,6 +62,8 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 	public function setUpPage()
 	{
 		parent::setUpPage();
+
+		$this->timeouts()->implicitWait(3000);
 
 		if ($this->width && $this->height)
 			$this->currentWindow()->size(array('width' => $this->width, 'height' => $this->height));
