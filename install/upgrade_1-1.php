@@ -448,16 +448,21 @@ class UpgradeInstructions_upgrade_1_1
 					// Update any filte to filter, and parse to parser
 					$db->query('', '
 						UPDATE {db_prefix}postby_emails_filters
-						SET filter_style = 'filter'
-						WHERE filter_style = 'filte',
-						array()
+						SET filter_style = {string:to}
+						WHERE filter_style = {string:from}',
+						array(
+							'from' => 'filte',
+							'to' => 'filter'
+						)
 					);
-
 					$db->query('', '
 						UPDATE {db_prefix}postby_emails_filters
-						SET filter_style = 'parser'
-						WHERE filter_style = 'parse',
-						array()
+						SET filter_style = {string:to}
+						WHERE filter_style = {string:from}',
+						array(
+							'from' => 'parse',
+							'to' => 'parser'
+						)
 					);
 				}
 			),

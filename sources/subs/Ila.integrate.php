@@ -352,7 +352,7 @@ class Ila_Integrate
 			global $context;
 
 			$num = $data;
-			$isImage = true;
+			$is_image = array();
 
 			// Not a preview, then sanitize the attach id and determine the actual type
 			if (strpos($data, 'post_tmp_' . $user_info['id']) === false)
@@ -361,12 +361,10 @@ class Ila_Integrate
 
 				$num = (int) $data;
 				$is_image = isAttachmentImage($num);
-
-				$isImage = $is_image['is_image'];
 			}
 
 			// An image will get the light box treatment
-			if ($isImage)
+			if (!empty($is_image['is_image']))
 			{
 				$data = '<a id="link_' . $num . '" data-lightboximage="' . $num . '" href="' . $scripturl . '?action=dlattach;attach=' . $num . ';image' . '"><img src="' . $scripturl . '?action=dlattach;attach=' . $num . ';thumb" alt="" class="bbc_img" /></a>';
 			}

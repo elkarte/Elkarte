@@ -2143,6 +2143,7 @@ function elk_getimagesize($file, $error = 'array')
  * Checks if we have a known and support mime-type for which we have a thumbnail image
  *
  * @param string $file_ext
+ * @param bool $url
  *
  * @return bool|string
  */
