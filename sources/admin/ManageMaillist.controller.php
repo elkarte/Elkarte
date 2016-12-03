@@ -650,10 +650,10 @@ class ManageMaillist_Controller extends Action_Controller
 					'data' => array(
 						'sprintf' => array(
 							'format' => '<a href="?action=admin;area=maillist;sa=editfilter;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">
-										<img title="' . $txt['modify'] . '" src="' . $settings['images_url'] . '/buttons/modify.png" alt="*" />
+										<i class="icon i-modify" title="' . $txt['modify'] . '" alt="*"></i>
 									</a>
 									<a href="?action=admin;area=maillist;sa=deletefilter;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['filter_delete_warning']) . ') && submitThisOnce(this);" accesskey="d">
-										<img title="' . $txt['delete'] . '" src="' . $settings['images_url'] . '/buttons/delete.png" alt="*" />
+										<i class="icon i-delete" title="' . $txt['delete'] . '" alt="*"></i>
 									</a>',
 							'params' => array(
 								'id_filter' => true,
@@ -1076,10 +1076,10 @@ class ManageMaillist_Controller extends Action_Controller
 					'data' => array(
 						'sprintf' => array(
 							'format' => '<a href="?action=admin;area=maillist;sa=editparser;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">
-										<img title="' . $txt['modify'] . '" src="' . $settings['images_url'] . '/buttons/modify.png" alt="*" />
+										<i class="icon i-modify" title="' . $txt['modify'] . '" alt="*"></i>
 									</a>
 									<a href="?action=admin;area=maillist;sa=deleteparser;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['parser_delete_warning']) . ') && submitThisOnce(this);" accesskey="d">
-										<img title="' . $txt['delete'] . '" src="' . $settings['images_url'] . '/buttons/delete.png" alt="*" />
+										<i class="icon i-delete" title="' . $txt['delete'] . '" alt="*"></i>
 									</a>',
 							'params' => array(
 								'id_filter' => true,
