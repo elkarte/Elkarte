@@ -375,10 +375,8 @@ class Calendar_Controller extends Action_Controller
 			ob_start();
 
 		// Send the file headers
-		header('Pragma: ');
+		header('Pragma: no-cache');
 		header('Cache-Control: no-cache');
-		if (!isBrowser('gecko'))
-			header('Content-Transfer-Encoding: binary');
 		header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT');
 		header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . 'GMT');
 		header('Accept-Ranges: bytes');
