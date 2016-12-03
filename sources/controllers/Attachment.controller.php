@@ -431,9 +431,6 @@ class Attachment_Controller extends Action_Controller
 		}
 
 		// Send the attachment headers.
-		header('Pragma: ');
-		if (!isBrowser('gecko'))
-			header('Content-Transfer-Encoding: binary');
 		header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT');
 		header('Last-Modified: ' . gmdate('D, d M Y H:i:s', filemtime($filename)) . ' GMT');
 		header('Accept-Ranges: bytes');
@@ -467,9 +464,14 @@ class Attachment_Controller extends Action_Controller
 
 		// If this has an "image extension" - but isn't actually an image - then ensure it isn't cached cause of silly IE.
 		if (!isset($this->_req->query->image) && in_array($file_ext, array('gif', 'jpg', 'bmp', 'png', 'jpeg', 'tiff')))
+		{
+			header('Pragma: no-cache');
 			header('Cache-Control: no-cache');
+		}
 		else
+		{
 			header('Cache-Control: max-age=' . (525600 * 60) . ', private');
+		}
 
 		if (empty($modSettings['enableCompressedOutput']) || filesize($filename) > 4194304)
 			header('Content-Length: ' . filesize($filename));
@@ -637,9 +639,6 @@ class Attachment_Controller extends Action_Controller
 		}
 
 		// Send the attachment headers.
-		header('Pragma: ');
-		if (!isBrowser('gecko'))
-			header('Content-Transfer-Encoding: binary');
 		header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT');
 		header('Last-Modified: ' . gmdate('D, d M Y H:i:s', filemtime($filename)) . ' GMT');
 		header('Accept-Ranges: bytes');

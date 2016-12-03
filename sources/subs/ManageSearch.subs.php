@@ -107,9 +107,8 @@ function createSphinxConfig()
 		@ob_end_clean();
 
 	header('Content-Encoding: none');
-	header('Pragma: ');
-	if (!isBrowser('is_gecko'))
-		header('Content-Transfer-Encoding: binary');
+	header('Pragma: no-cache');
+	header('Cache-Control: no-cache');
 	header('Connection: close');
 	header('Content-Disposition: attachment; filename="sphinx.conf"');
 	header('Content-Type: application/octet-stream');
