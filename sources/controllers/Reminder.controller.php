@@ -152,6 +152,7 @@ class Reminder_Controller extends Action_Controller
 			return secretAnswerInput();
 
 		// No we're here setup the context for template number 2!
+		createToken('remind');
 		$context['sub_template'] = 'reminder_pick';
 		$context['current_member'] = array(
 			'id' => $member['id_member'],
