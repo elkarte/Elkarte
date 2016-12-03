@@ -324,19 +324,13 @@ class Attachment_Controller extends Action_Controller
 
 					// return mime type ala mimetype extension
 					$finfo = finfo_open(FILEINFO_MIME_TYPE);
+					$check = returnMimeThumb($full_attach[3]);
 
-					if (in_array($full_attach[3], array(
-						'c', 'cpp', 'css', 'csv', 'doc', 'docx', 'flv', 'html', 'htm', 'java', 'js', 'log', 'mp3',
-						'mp4', 'mgp', 'pdf', 'php', 'ppt', 'rtf', 'sql', 'tgz', 'txt', 'wav', 'xls', 'xml', 'zip'
-					)))
+					if ($check !== false)
 					{
 						$attachment[3] = 'png';
 						$attachment[6] = 'image/png';
-
-						// Show the mine thumbnail if it exists or just the default
-						$filename = $settings['theme_dir'] . '/images/mime_images/' . $full_attach[3] . '.png';
-						if (!file_exists($filename))
-							$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
+						$filename = $check;
 					}
 					else
 					{
@@ -543,12 +537,6 @@ class Attachment_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Attachments.subs.php');
 		require_once(SUBSDIR . '/Graphics.subs.php');
 
-		// Start off
-		$mime_type = '';
-		$real_filename = '';
-		$filename = '';
-		$file_ext = '';
-
 		try
 		{
 			if (empty($topic) || (string) (int) $this->_req->query->attach !== (string) $this->_req->query->attach)
@@ -587,24 +575,19 @@ class Attachment_Controller extends Action_Controller
 
 		// This is done to clear any output that was made before now.
 		while (ob_get_level() > 0)
+		{
 			@ob_end_clean();
+		}
 
 		// return mime type ala mimetype extension
 		$finfo = finfo_open(FILEINFO_MIME_TYPE);
+		$checkMime = returnMimeThumb($file_ext);
 
-		if (in_array($file_ext, array(
-			'c', 'cpp', 'css', 'csv', 'doc', 'docx', 'flv', 'html', 'htm', 'java', 'js', 'log', 'mp3',
-			'mp4', 'mgp', 'pdf', 'php', 'ppt', 'rtf', 'sql', 'tgz', 'txt', 'wav', 'xls', 'xml', 'zip'
-		)))
+		if ($checkMime !== false)
 		{
 			$mime_type = 'image/png';
 			$resize = false;
-			loadEssentialThemeData();
-
-			// Show the mine thumbnail if it exists or just the default
-			$filename = $settings['theme_dir'] . '/images/mime_images/' . $file_ext . '.png';
-			if (!file_exists($filename))
-				$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
+			$filename = $checkMime;
 		}
 		elseif (substr(finfo_file($finfo, $filename), 0, 5) !== 'image')
 		{
