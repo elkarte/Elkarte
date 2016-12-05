@@ -24,7 +24,7 @@ $time_start = microtime(true);
 const ELKBOOT = 1;
 
 // Shortcut for the browser cache stale
-const CACHE_STALE = '?R11B3';
+const CACHE_STALE = '?R11B4';
 
 // We're going to want a few globals... these are all set later.
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;

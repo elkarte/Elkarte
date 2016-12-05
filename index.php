@@ -20,13 +20,13 @@
 $time_start = microtime(true);
 
 // The software version
-const FORUM_VERSION = 'ElkArte 1.1 beta 3';
+const FORUM_VERSION = 'ElkArte 1.1 beta 4';
 
 // First things first, but not necessarily in that order.
 const ELK = '1';
 
 // Shortcut for the browser cache stale
-const CACHE_STALE = '?R11B3';
+const CACHE_STALE = '?R11B4';
 
 // Report errors but not depreciated ones
 error_reporting(E_ALL | E_STRICT & ~8192);
