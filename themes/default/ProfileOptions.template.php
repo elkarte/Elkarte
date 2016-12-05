@@ -1356,7 +1356,7 @@ function template_profile_smiley_pick()
  */
 function template_authentication_method()
 {
-	global $context, $settings, $scripturl, $modSettings, $txt;
+	global $context, $scripturl, $modSettings, $txt;
 
 	// The main header!
 	echo '
@@ -1391,7 +1391,7 @@ function template_authentication_method()
 							<dd>
 								<input type="password" name="passwrd1" id="elk_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['choose_pass'], '" />
 								<span id="elk_autov_pwmain_div" class="hide">
-									<img id="elk_autov_pwmain_img" class="centericon" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
+									<i id="elk_autov_pwmain_img" class="icon i-warn" alt="*"></i>
 								</span>
 							</dd>
 						</dl>
@@ -1402,7 +1402,7 @@ function template_authentication_method()
 							<dd>
 								<input type="password" name="passwrd2" id="elk_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['verify_pass'], '" />
 								<span id="elk_autov_pwverify_div" class="hide">
-									<img id="elk_autov_pwverify_img" class="centericon" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" />
+									<i id="elk_autov_pwverify_img" class="icon i-warn" alt="*"></i>
 								</span>
 							</dd>
 						</dl>

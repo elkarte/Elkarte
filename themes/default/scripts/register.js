@@ -345,14 +345,14 @@ elkRegister.prototype.setVerificationImage = function(imageHandle, imageIcon, al
 	if (!alt)
 		alt = '*';
 
-	var curImage = imageIcon ? (imageIcon === 'check' ? 'field_check.png' : 'field_valid.png') : 'field_invalid.png';
-	imageHandle.src = elk_images_url + '/icons/' + curImage;
+	var curClass = imageIcon ? (imageIcon === 'check' ? 'i-help' : 'i-check') : 'i-warn';
+
 	imageHandle.alt = alt;
 	imageHandle.title = alt;
+	imageHandle.className = 'icon ' + curClass;
 
 	return true;
 };
-
 
 /**
  * Sets up the form fields based on the chosen authentication method, openID or password

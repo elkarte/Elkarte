@@ -2138,3 +2138,41 @@ function elk_getimagesize($file, $error = 'array')
 
 	return $sizes;
 }
+
+/**
+ * Checks if we have a known and support mime-type for which we have a thumbnail image
+ *
+ * @param string $file_ext
+ * @param bool $url
+ *
+ * @return bool|string
+ */
+function returnMimeThumb($file_ext, $url = false)
+{
+	global $settings;
+
+	$filename = false;
+
+	if (in_array($file_ext, array(
+		'c', 'cpp', 'css', 'csv', 'doc', 'docx', 'flv', 'html', 'htm', 'java', 'js', 'log', 'mp3',
+		'mp4', 'mgp', 'pdf', 'php', 'ppt', 'rtf', 'sql', 'tgz', 'txt', 'wav', 'xls', 'xml', 'zip'
+	)))
+	{
+		if (empty($settings))
+		{
+			loadEssentialThemeData();
+		}
+
+		// Return the mine thumbnail if it exists or just the default
+		$filename = $settings['theme_dir'] . '/images/mime_images/' . $file_ext . '.png';
+		if (!file_exists($filename))
+		{
+			$file_ext = 'default';
+		}
+
+		$location = $url ? $settings['theme_url'] : $settings['theme_dir'];
+		$filename = $location . '/images/mime_images/' . $file_ext . '.png';
+	}
+
+	return $filename;
+}

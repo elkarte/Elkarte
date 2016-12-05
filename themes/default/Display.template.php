@@ -750,7 +750,7 @@ function template_display_poll_above()
  */
 function template_display_calendar_above()
 {
-	global $context, $txt, $settings;
+	global $context, $txt;
 
 	echo '
 			<section class="linked_events">
@@ -761,7 +761,7 @@ function template_display_calendar_above()
 	foreach ($context['linked_calendar_events'] as $event)
 		echo '
 						<li>
-							', ($event['can_edit'] ? '<a href="' . $event['modify_href'] . '"> <img src="' . $settings['images_url'] . '/icons/calendar_modify.png" alt="" title="' . $txt['modify'] . '" class="edit_event" /></a> ' : ''), '<strong>', $event['title'], '</strong>: ', $event['start_date'], ($event['start_date'] != $event['end_date'] ? ' - ' . $event['end_date'] : ''), '
+							', ($event['can_edit'] ? '<a href="' . $event['modify_href'] . '"><i class="icon i-modify" title="' . $txt['modify'] . '"></i></a> ' : ''), '<strong>', $event['title'], '</strong>: ', $event['start_date'], ($event['start_date'] != $event['end_date'] ? ' - ' . $event['end_date'] : ''), '
 						</li>';
 
 	echo '

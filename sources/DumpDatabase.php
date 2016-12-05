@@ -64,10 +64,6 @@ function DumpDatabase2()
 		header('Accept-Ranges: bytes');
 		header('Content-Encoding: none');
 
-		// Gecko browsers... don't like this. (Mozilla, Firefox, etc.)
-		if (!isBrowser('gecko'))
-			header('Content-Transfer-Encoding: binary');
-
 		// The file extension will include .gz...
 		$extension = '.sql.gz';
 	}

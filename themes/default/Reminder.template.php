@@ -95,7 +95,7 @@ function template_sent()
  */
 function template_set_password()
 {
-	global $context, $settings, $txt, $scripturl, $modSettings;
+	global $context, $txt, $scripturl, $modSettings;
 
 	echo '
 	<form id="reminder_form" action="', $scripturl, '?action=reminder;sa=setpassword2" name="reminder_form" method="post" accept-charset="UTF-8">
@@ -108,8 +108,8 @@ function template_set_password()
  					</dt>
 					<dd>
 						<input id="elk_autov_pwmain" type="password" name="passwrd1" size="22" class="input_password" />
-						<span id="elk_autov_pwmain_div" class="hide centericon">
-							<img id="elk_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
+						<span id="elk_autov_pwmain_div" class="hide">
+							<i id="elk_autov_pwmain_img" class="icon i-warn" alt="*"></i>
 						</span>
 					</dd>
 					<dt>
@@ -117,8 +117,8 @@ function template_set_password()
 					</dt>
 					<dd>
 						<input id="elk_autov_pwverify" type="password" name="passwrd2"  size="22" class="input_password" />
-						<span id="elk_autov_pwverify_div" class="hide centericon">
-							<img id="elk_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
+						<span id="elk_autov_pwverify_div" class="hide">
+							<i id="elk_autov_pwverify_img" class="icon i-warn" alt="*"></i>
 						</span>
 					</dd>';
 
@@ -161,7 +161,7 @@ function template_set_password()
  */
 function template_ask()
 {
-	global $context, $settings, $txt, $scripturl, $modSettings;
+	global $context, $txt, $scripturl, $modSettings;
 
 	echo '
 	<form id="creator" action="', $scripturl, '?action=reminder;sa=secret2" method="post" accept-charset="UTF-8" name="creator">
@@ -188,8 +188,8 @@ function template_ask()
  					</dt>
 					<dd>
 						<input type="password" name="passwrd1" id="elk_autov_pwmain" size="22" class="input_password" />
-						<span id="elk_autov_pwmain_div" class="hide centericon">
-							<img id="elk_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
+						<span id="elk_autov_pwmain_div" class="hide">
+							<i id="elk_autov_pwmain_img" class="icon i-warn" alt="*"></i>
 						</span>
 					</dd>
 					<dt>
@@ -197,8 +197,8 @@ function template_ask()
 					</dt>
 					<dd>
 						<input type="password" name="passwrd2" id="elk_autov_pwverify" size="22" class="input_password" />
-						<span id="elk_autov_pwverify_div" class="hide centericon">
-							<img id="elk_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" />
+						<span id="elk_autov_pwverify_div" class="hide">
+							<i id="elk_autov_pwverify_img" class="icon i-check" alt="*"></i>
 						</span>
 					</dd>';
 

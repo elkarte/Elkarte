@@ -97,7 +97,7 @@ legend {
 /*	$BBC		*/
 /* ------------------------------------------------------- */
 /* Extra quote styling */
-.bbc_standard_quote, .bbc_alternate_quote, .quoteheader {
+.bbc_quote, .quoteheader {
 	box-shadow: -2px 2px 2px #ddd;
 }
 /* /me uses this a lot. (emote, try typing /me in a post.) */

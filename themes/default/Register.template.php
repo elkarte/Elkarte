@@ -128,7 +128,7 @@ function template_registration_form()
 							<input type="text" name="user" id="elk_autov_username" size="30" tabindex="', $context['tabindex']++, '" maxlength="25" value="', isset($context['username']) ? $context['username'] : '', '" class="input_text" placeholder="', $txt['username'], '" required="required" autofocus="autofocus" />
 							<span id="elk_autov_username_div" class="hide">
 								<a id="elk_autov_username_link" href="#">
-									<img id="elk_autov_username_img" src="', $settings['images_url'], '/icons/field_check.png" alt="*" />
+									<i id="elk_autov_username_img" class="icon i-check" alt="*"></i>
 								</a>
 							</span>
 						</dd>';
@@ -143,7 +143,7 @@ function template_registration_form()
 							<input type="text" name="display" id="elk_autov_displayname" size="30" tabindex="', $context['tabindex']++, '" maxlength="25" value="', isset($context['display_name']) ? $context['display_name'] : '', '" class="input_text" placeholder="', $txt['display_name'], '" required="required" />
 							<span id="elk_autov_displayname_div" class="hide">
 								<a id="elk_autov_displayname_link" href="#">
-									<img id="elk_autov_displayname_img" src="', $settings['images_url'], '/icons/field_check.png" alt="*" />
+									<i id="elk_autov_displayname_img" class="icon i-check" alt="*"></i>
 								</a>
 							</span>
 						</dd>';
@@ -187,7 +187,7 @@ function template_registration_form()
 						<dd>
 							<input type="password" name="passwrd1" id="elk_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['choose_pass'], '" required="required" />
 							<span id="elk_autov_pwmain_div" class="hide">
-								<img id="elk_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
+								<i id="elk_autov_pwmain_img" class="icon i-warn" alt="*"></i>
 							</span>
 						</dd>
 					</dl>
@@ -196,7 +196,7 @@ function template_registration_form()
 						<dd>
 							<input type="password" name="passwrd2" id="elk_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['verify_pass'], '" required="required" />
 							<span id="elk_autov_pwverify_div" class="hide">
-								<img id="elk_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" />
+								<i id="elk_autov_pwverify_img" class="icon i-check" alt="*"></i>
 							</span>
 						</dd>
 					</dl>';

@@ -204,7 +204,7 @@ function template_unlinked_event_post()
  */
 function template_show_month_grid($grid_name)
 {
-	global $context, $settings, $txt, $scripturl, $modSettings;
+	global $context, $txt, $scripturl, $modSettings;
 
 	if (!isset($context['calendar_grid_' . $grid_name]))
 		return false;
@@ -357,13 +357,13 @@ function template_show_month_grid($grid_name)
 						if ($event['can_edit'])
 							echo '
 								<a class="modify_event" href="', $event['modify_href'], '">
-									<img src="' . $settings['images_url'] . '/icons/calendar_modify.png" alt="*" title="' . $txt['modify'] . '" />
+									<i class="icon i-modify" title="' . $txt['modify'] . '"></i>
 								</a>';
 
 						if ($event['can_export'])
 							echo '
 								<a class="modify_event" href="', $event['export_href'], '">
-									<img src="' . $settings['images_url'] . '/icons/calendar_export.png" alt=">" title="' . $txt['save'] . '"/>
+									<i class="icon i-download" title="' . $txt['save'] . '"></i>
 								</a>';
 
 						echo '
@@ -394,7 +394,7 @@ function template_show_month_grid($grid_name)
  */
 function template_show_week_grid($grid_name)
 {
-	global $context, $settings, $txt, $scripturl, $modSettings;
+	global $context, $txt, $scripturl, $modSettings;
 
 	if (!isset($context['calendar_grid_' . $grid_name]))
 		return false;
@@ -488,7 +488,7 @@ function template_show_week_grid($grid_name)
 					if ($event['can_edit'])
 						echo '
 								<a href="', $event['modify_href'], '">
-									<img src="' . $settings['images_url'] . '/icons/calendar_modify.png" alt="*" />
+									<i class="icon i-modify" title="' . $txt['modify'] . '"></i>
 								</a> ';
 
 					echo '

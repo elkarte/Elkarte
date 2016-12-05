@@ -301,7 +301,7 @@ class Ila_Integrate
 
 		return function (&$tag, &$data, $disabled) use ($user_info, $scripturl)
 		{
-			global $context, $settings;
+			global $context;
 
 			$num = $data;
 			$attachment = false;
@@ -319,13 +319,13 @@ class Ila_Integrate
 			if ($attachment)
 			{
 				$data = '<a href="' . $scripturl . '?action=dlattach;attach=' . $num . '">
-							<img src="' . $settings['images_url'] . '/icons/clip.png" alt="" class="bbc_img" />&nbsp;' . $attachment['filename'] . '
+							<i class="icon icon-small i-paperclip"></i>&nbsp;' . $attachment['filename'] . '
 						</a>&nbsp;(' . $attachment['size'] . ($attachment['is_image'] ? ' ' . $attachment['width'] . 'x' . $attachment['height'] : '') . ')';
 			}
 			else
 			{
 				$data = '<a href="' . $scripturl . '?action=dlattach;attach=' . $num . '">
-							<img src="' . $settings['images_url'] . '/icons/clip.png" alt="" class="bbc_img" />&nbsp;' . $num . '
+							<i class="icon icon-small i-paperclip"></i>&nbsp;' . $num . '
 						</a>';
 			}
 
@@ -352,7 +352,7 @@ class Ila_Integrate
 			global $context;
 
 			$num = $data;
-			$is_image = true;
+			$is_image = array();
 
 			// Not a preview, then sanitize the attach id and determine the actual type
 			if (strpos($data, 'post_tmp_' . $user_info['id']) === false)
@@ -361,17 +361,18 @@ class Ila_Integrate
 
 				$num = (int) $data;
 				$is_image = isAttachmentImage($num);
-				$is_image = $is_image['is_image'];
 			}
 
 			// An image will get the light box treatment
-			if ($is_image)
+			if (!empty($is_image['is_image']))
 			{
 				$data = '<a id="link_' . $num . '" data-lightboximage="' . $num . '" href="' . $scripturl . '?action=dlattach;attach=' . $num . ';image' . '"><img src="' . $scripturl . '?action=dlattach;attach=' . $num . ';thumb" alt="" class="bbc_img" /></a>';
 			}
 			else
 			{
-				$data = '<a href="' . $scripturl . '?action=dlattach;attach=' . $num . '"><img src="' . $scripturl . '?action=dlattach;attach=' . $num . ';thumb" alt="" class="bbc_img" /></a>';
+				// Not an image, determine a mime or us a default thumbnail
+				$check = returnMimeThumb((isset($is_image['fileext']) ? $is_image['fileext'] : ''), true);
+				$data = '<a href="' . $scripturl . '?action=dlattach;attach=' . $num . '"><img src="' . $check . '" alt="' . $is_image['filename'] . '" class="bbc_img" /></a>';
 			}
 
 			$context['ila_dont_show_attach_below'][] = $num;
