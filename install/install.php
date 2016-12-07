@@ -1158,6 +1158,18 @@ function action_adminAccount()
 	$incontext['continue'] = 1;
 
 	// Need this to check whether we need the database password.
+	if (!defined('ELK'))
+		define('ELK', 1);
+
+	if (!defined('SOURCEDIR'))
+		define('SOURCEDIR', dirname(__FILE__) . '/sources');
+
+	if (!defined('SUBSDIR'))
+		define('SUBSDIR', dirname(__FILE__) . '/sources/subs');
+
+	require_once(SOURCEDIR . '/Subs.php');
+	require_once(SUBSDIR . '/Util.class.php');
+
 	require(dirname(__FILE__) . '/Settings.php');
 	if (!defined('ELK'))
 		define('ELK', 1);
