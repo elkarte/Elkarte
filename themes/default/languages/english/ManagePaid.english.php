@@ -165,9 +165,12 @@ $txt['paid_sub_return'] = 'Return to Subscriptions';
 $txt['paid_current_desc'] = 'Below is a list of all your current and previous subscriptions. To extend an existing subscription simply select it from the list above.';
 $txt['paid_admin_add'] = 'Add This Subscription';
 
+// Errors
 $txt['paid_not_set_currency'] = 'You have not setup your currency yet. Please do so from the <a href="%1$s">Settings</a> section before continuing.';
-$txt['paid_no_cost_value'] = 'You must enter a cost and subscription length.';
+$txt['paid_no_cost_value'] = 'You must enter a cost for the subscription.';
 $txt['paid_all_freq_blank'] = 'You must enter a cost for at least one of the four durations.';
+$txt['paid_invalid_duration'] = 'You must supply a duration for this subscription.';
+$txt['paid_no_desc'] = 'You must enter a name and a description for this subscription.';
 
 // Some error strings.
 $txt['paid_no_data'] = 'No valid data was sent to the script.';

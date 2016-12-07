@@ -451,124 +451,38 @@ class ManagePaid_Controller extends Action_Controller
 		// Saving?
 		if (isset($_POST['save']))
 		{
+			// A little checking first
 			checkSession();
 			validateToken('admin-pms');
 
-			// Some cleaning...
-			$isActive = isset($_POST['active']) ? 1 : 0;
-			$isRepeatable = isset($_POST['repeatable']) ? 1 : 0;
-			$allowpartial = isset($_POST['allow_partial']) ? 1 : 0;
-			$reminder = isset($_POST['reminder']) ? (int) $_POST['reminder'] : 0;
-			$emailComplete = strlen($_POST['emailcomplete']) > 10 ? trim($_POST['emailcomplete']) : '';
-
-			// Is this a fixed one?
-			if ($_POST['duration_type'] == 'fixed')
-			{
-				// Clean the span.
-				$span = $_POST['span_value'] . $_POST['span_unit'];
-
-				// Sort out the cost.
-				$cost = array('fixed' => sprintf('%01.2f', strtr($_POST['cost'], ',', '.')));
-
-				// There needs to be something.
-				if (empty($_POST['span_value']) || empty($_POST['cost']))
-					fatal_lang_error('paid_no_cost_value');
-			}
-			// Flexible is harder but more fun ;)
-			else
-			{
-				$span = 'F';
-
-				$cost = array(
-					'day' => sprintf('%01.2f', strtr($_POST['cost_day'], ',', '.')),
-					'week' => sprintf('%01.2f', strtr($_POST['cost_week'], ',', '.')),
-					'month' => sprintf('%01.2f', strtr($_POST['cost_month'], ',', '.')),
-					'year' => sprintf('%01.2f', strtr($_POST['cost_year'], ',', '.')),
-				);
-
-				if (empty($_POST['cost_day']) && empty($_POST['cost_week']) && empty($_POST['cost_month']) && empty($_POST['cost_year']))
-					fatal_lang_error('paid_all_freq_blank');
-			}
-			$cost = serialize($cost);
-
-			// Yep, time to do additional groups.
-			$addgroups = array();
-			if (!empty($_POST['addgroup']))
-				foreach ($_POST['addgroup'] as $id => $dummy)
-					$addgroups[] = (int) $id;
-			$addgroups = implode(',', $addgroups);
-
-			// Is it new?!
-			if ($context['action_type'] == 'add')
-			{
-				$insert = array(
-					'name' => $_POST['name'],
-					'desc' => $_POST['desc'],
-					'isActive' => $isActive,
-					'span' => $span,
-					'cost' => $cost,
-					'prim_group' => $_POST['prim_group'],
-					'addgroups' => $addgroups,
-					'isRepeatable' => $isRepeatable,
-					'allowpartial' => $allowpartial,
-					'emailComplete' => $emailComplete,
-					'reminder' => $reminder,
-				);
-
-				$sub_id = insertSubscription($insert);
-			}
-			// Otherwise must be editing.
-			else
-			{
-				$ignore_active = countActiveSubscriptions($context['sub_id']);
-
-				$update = array(
-					'is_active' => $isActive,
-					'id_group' => !empty($_POST['prim_group']) ? $_POST['prim_group'] : 0,
-					'repeatable' => $isRepeatable,
-					'allow_partial' => $allowpartial,
-					'reminder' => $reminder,
-					'current_subscription' => $context['sub_id'],
-					'name' => $_POST['name'],
-					'desc' => $_POST['desc'],
-					'length' => $span,
-					'cost' => $cost,
-					'additional_groups' => !empty($addgroups) ? $addgroups : '',
-					'email_complete' => $emailComplete,
-				);
-
-				updateSubscription($update, $ignore_active);
-			}
-
-			call_integration_hook('integrate_save_subscription', array(($context['action_type'] == 'add' ? $sub_id : $context['sub_id']), $_POST['name'], $_POST['desc'], $isActive, $span, $cost, $_POST['prim_group'], $addgroups, $isRepeatable, $allowpartial, $emailComplete, $reminder));
-
-			redirectexit('action=admin;area=paidsubscribe;view');
+			// Lets try and save
+			$this->action_modify2();
 		}
 
-		// Defaults.
+		// If adding a new subscription set some defaults.
 		if ($context['action_type'] == 'add')
 		{
 			$context['sub'] = array(
-				'name' => '',
-				'desc' => '',
+				'name' => isset($_POST['name']) ? $_POST['name'] : '',
+				'desc' => isset($_POST['desc']) ? $_POST['desc'] : '',
 				'cost' => array(
-					'fixed' => 0,
+					'fixed' => isset($_POST['cost']) ? $_POST['cost'] : 0,
 				),
 				'span' => array(
-					'value' => '',
-					'unit' => 'D',
+					'value' => isset($_POST['span_value']) ? $_POST['span_value'] : '',
+					'unit' => isset($_POST['span_unit']) ? $_POST['span_unit'] : 'D',
 				),
 				'prim_group' => 0,
 				'add_groups' => array(),
-				'active' => 1,
-				'repeatable' => 1,
-				'allow_partial' => 0,
+				'active' => isset($_POST['active']) ? $_POST['active'] : 1,
+				'repeatable' => isset($_POST['repeatable']) ? $_POST['repeatable'] : 1,
+				'allow_partial' => isset($_POST['allow_partial']) ? $_POST['allow_partial'] : 0,
 				'duration' => 'fixed',
-				'email_complete' => '',
-				'reminder' => 0,
+				'email_complete' => isset($_POST['emailcomplete']) ? $_POST['emailcomplete'] : '',
+				'reminder' => isset($_POST['reminder']) ? $_POST['reminder'] : 0,
 			);
 		}
-		// Otherwise load up all the details.
+		// Otherwise load up all the details of the existing one
 		else
 		{
 			$context['sub'] = getSubscriptionDetails($context['sub_id']);
@@ -583,6 +497,143 @@ class ManagePaid_Controller extends Action_Controller
 
 		// This always happens.
 		createToken($context['action_type'] == 'delete' ? 'admin-pmsd' : 'admin-pms');
+	}
+
+	/**
+	 * Validates the post data for saving a subscription
+	 * If everything checks out will save or update as needed
+	 * If any issues are found with the form will create the error txt to
+	 * display and send them back to the form to try again
+	 */
+	private function action_modify2()
+	{
+		global $context;
+
+		// Use some standard validation functions in a few spots
+		require_once(SUBSDIR . '/DataValidator.class.php');
+
+		// No errors, yet.
+		$subscription_errors = Error_Context::context('subscription', 0);
+
+		// Some cleaning...
+		$isActive = isset($_POST['active']) ? 1 : 0;
+		$isRepeatable = isset($_POST['repeatable']) ? 1 : 0;
+		$allowpartial = isset($_POST['allow_partial']) ? 1 : 0;
+		$reminder = isset($_POST['reminder']) ? (int) $_POST['reminder'] : 0;
+		$emailComplete = strlen($_POST['emailcomplete']) > 10 ? trim($_POST['emailcomplete']) : '';
+
+		// Basic check
+		if (!Data_Validator::is_valid($_POST, array('name' => 'required', 'desc' => 'required'), array('name' => 'trim', 'desc' => 'trim')))
+			$subscription_errors->addError('paid_no_desc');
+
+		// Is this a fixed duration payment?
+		if ($_POST['duration_type'] === 'fixed')
+		{
+			// There needs to be something.
+			if (empty($_POST['cost']))
+				$subscription_errors->addError('paid_no_cost_value');
+
+			if (empty($_POST['span_value']))
+				$subscription_errors->addError('paid_invalid_duration');
+
+			if (!Data_Validator::is_valid($_POST, array('span_unit' => 'required|contains[D,W,M,Y]', 'span_value' => 'required|limits[1,]'), array('span_unit' => 'trim|strtoupper')))
+				$subscription_errors->addError('paid_invalid_duration');
+
+			// No errors, set the value
+			if (!$subscription_errors->hasErrors())
+			{
+				// Clean the span.
+				$span = $_POST['span_value'] . $_POST['span_unit'];
+
+				// Sort out the cost.
+				$cost = array('fixed' => sprintf('%01.2f', strtr($_POST['cost'], ',', '.')));
+			}
+		}
+		// Flexible is harder but more fun ;)
+		else
+		{
+			$span = 'F';
+
+			if (empty($_POST['cost_day']) && empty($_POST['cost_week']) && empty($_POST['cost_month']) && empty($_POST['cost_year']))
+				$subscription_errors->addError('paid_all_freq_blank');
+			else
+				$cost = array(
+					'day' => sprintf('%01.2f', strtr($_POST['cost_day'], ',', '.')),
+					'week' => sprintf('%01.2f', strtr($_POST['cost_week'], ',', '.')),
+					'month' => sprintf('%01.2f', strtr($_POST['cost_month'], ',', '.')),
+					'year' => sprintf('%01.2f', strtr($_POST['cost_year'], ',', '.')),
+				);
+		}
+
+		// One or more errors, go back to the start
+		if ($subscription_errors->hasErrors())
+		{
+			unset ($_POST['save']);
+			createToken('admin-pms');
+
+			// Set the errors so the form can show them
+			$context['subscription_error'] = array(
+				'errors' => $subscription_errors->prepareErrors(),
+				'type' => $subscription_errors->getErrorType() == 0 ? 'minor' : 'serious',
+			);
+
+			return $this->action_modify();
+		}
+
+		$cost = serialize($cost);
+
+		// Yep, time to do additional groups.
+		$addgroups = array();
+		if (!empty($_POST['addgroup']))
+			foreach ($_POST['addgroup'] as $id => $dummy)
+				$addgroups[] = (int) $id;
+		$addgroups = implode(',', $addgroups);
+
+		// Is it new?!
+		if ($context['action_type'] == 'add')
+		{
+			$insert = array(
+				'name' => $_POST['name'],
+				'desc' => $_POST['desc'],
+				'isActive' => $isActive,
+				'span' => $span,
+				'cost' => $cost,
+				'prim_group' => $_POST['prim_group'],
+				'addgroups' => $addgroups,
+				'isRepeatable' => $isRepeatable,
+				'allowpartial' => $allowpartial,
+				'emailComplete' => $emailComplete,
+				'reminder' => $reminder,
+			);
+
+			$sub_id = insertSubscription($insert);
+		}
+		// Otherwise must be editing.
+		else
+		{
+			$ignore_active = countActiveSubscriptions($context['sub_id']);
+
+			$update = array(
+				'is_active' => $isActive,
+				'id_group' => !empty($_POST['prim_group']) ? $_POST['prim_group'] : 0,
+				'repeatable' => $isRepeatable,
+				'allow_partial' => $allowpartial,
+				'reminder' => $reminder,
+				'current_subscription' => $context['sub_id'],
+				'name' => $_POST['name'],
+				'desc' => $_POST['desc'],
+				'length' => $span,
+				'cost' => $cost,
+				'additional_groups' => !empty($addgroups) ? $addgroups : '',
+				'email_complete' => $emailComplete,
+			);
+
+			updateSubscription($update, $ignore_active);
+		}
+
+		call_integration_hook('integrate_save_subscription', array(($context['action_type'] == 'add' ? $sub_id : $context['sub_id']), $_POST['name'], $_POST['desc'], $isActive, $span, $cost, $_POST['prim_group'], $addgroups, $isRepeatable, $allowpartial, $emailComplete, $reminder));
+
+		redirectexit('action=admin;area=paidsubscribe;view');
 	}
 
 	/**
