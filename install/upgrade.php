@@ -59,8 +59,9 @@ $upcontext['steps'] = array(
 	0 => array(1, 'Login', 'action_welcomeLogin', 2),
 	1 => array(2, 'Upgrade Options', 'action_upgradeOptions', 2),
 	2 => array(3, 'Backup', 'action_backupDatabase', 10),
-	3 => array(4, 'Database Changes', 'action_databaseChanges', 70),
-	4 => array(5, 'Delete Upgrade', 'action_deleteUpgrade', 1),
+	3 => array(4, 'Convert to UTF8', 'action_convertToUTF8', 8),
+	4 => array(5, 'Database Changes', 'action_databaseChanges', 70),
+	5 => array(6, 'Delete Upgrade', 'action_deleteUpgrade', 1),
 );
 
 // Just to remember which one has files in it.
@@ -167,6 +168,8 @@ if (empty($upcontext['updated']))
 // Load up some essential data...
 loadEssentialData();
 
+$upcontext['is_utf8'] = !isset($modSettings['elkVersion']) && ($db_type == 'mysql' || $db_type == 'mysqli') && (!isset($db_character_set) || $db_character_set !== 'utf8' || empty($modSettings['global_character_set']) || $modSettings['global_character_set'] !== 'UTF-8');
+
 // Are we going to be mimicking SSI at this point?
 if (isset($_GET['ssi']))
 {
@@ -243,8 +246,8 @@ if (isset($_GET['data']))
 	$support_js = $upcontext['upgrade_status']['js'];
 
 	// Load the language.
-	if (file_exists($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php'))
-		require_once($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php');
+	if (file_exists(LANGUAGEDIR . '/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php'))
+		require_once(LANGUAGEDIR . '/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php');
 }
 // Set the defaults.
 else
@@ -570,8 +573,8 @@ function action_welcomeLogin()
 		$check &= @file_exists(dirname(__FILE__) . '/upgrade_1-0.sql');
 
 	// If the db is not UTF
-	if (!isset($modSettings['elkVersion']) && ($db_type == 'mysql' || $db_type == 'mysqli') && (!isset($db_character_set) || $db_character_set !== 'utf8' || empty($modSettings['global_character_set']) || $modSettings['global_character_set'] !== 'UTF-8'))
-		return throw_error('The upgrader detected your database is not UTF-8. In order to be able to upgrade, please first convert your database to the UTF-8 charset.');
+// 	if (!isset($modSettings['elkVersion']) && ($db_type == 'mysql' || $db_type == 'mysqli') && (!isset($db_character_set) || $db_character_set !== 'utf8' || empty($modSettings['global_character_set']) || $modSettings['global_character_set'] !== 'UTF-8'))
+// 		return throw_error('The upgrader detected your database is not UTF-8. In order to be able to upgrade, please first convert your database to the UTF-8 charset.');
 
 	// Don't tell them what files exactly because it's a spot check -
 	// just like teachers don't tell which problems they are spot checking, that's dumb.
@@ -609,11 +612,11 @@ function action_welcomeLogin()
 	if (!file_exists($CACHEDIR_temp))
 		return throw_error('The cache directory could not be found.<br /><br />Please make sure you have a directory called &quot;cache&quot; in your forum directory before continuing.');
 
-	if (!file_exists($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/index.' . $upcontext['language'] . '.php') && !isset($modSettings['elkVersion']) && !isset($_GET['lang']))
+	if (!file_exists(LANGUAGEDIR . '/' . $upcontext['language'] . '/index.' . $upcontext['language'] . '.php') && !isset($modSettings['elkVersion']) && !isset($_GET['lang']))
 		return throw_error('The upgrader was unable to find language files for the language specified in Settings.php.<br />ElkArte will not work without the primary language files installed.<br /><br />Please either install them, or <a href="' . $upgradeurl . '?step=0;lang=english">use english instead</a>.');
 	elseif (!isset($_GET['skiplang']))
 	{
-		$temp = substr(@implode('', @file($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/index.' . $upcontext['language'] . '.php')), 0, 4096);
+		$temp = substr(@implode('', @file(LANGUAGEDIR . '/' . $upcontext['language'] . '/index.' . $upcontext['language'] . '.php')), 0, 4096);
 		preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
 		if (empty($match[1]) || $match[1] != CURRENT_LANG_VERSION)
@@ -621,10 +624,10 @@ function action_welcomeLogin()
 	}
 
 	// This needs to exist!
-	if (!file_exists($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php'))
+	if (!file_exists(LANGUAGEDIR . '/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php'))
 		return throw_error('The upgrader could not find the &quot;Install&quot; language file for the forum default language, ' . $upcontext['language'] . '.<br /><br />Please make certain you uploaded all the files included in the package, even the theme and language files for the default theme.<br />&nbsp;&nbsp;&nbsp;[<a href="' . $upgradeurl . '?lang=english">Try English</a>]');
 	else
-		require_once($modSettings['theme_dir'] . '/languages/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php');
+		require_once(LANGUAGEDIR . '/' . $upcontext['language'] . '/Install.' . $upcontext['language'] . '.php');
 
 	if (!makeFilesWritable($writable_files))
 		return false;
@@ -858,15 +861,15 @@ function checkLogin()
 			$upcontext['upgrade_status']['pass'] = $upcontext['user']['pass'];
 
 			// Set the language to that of the user?
-			if (isset($user_language) && $user_language != $upcontext['language'] && file_exists($modSettings['theme_dir'] . '/languages/' . basename($user_language, '.lng') . '/index.' . basename($user_language, '.lng') . '.php'))
+			if (isset($user_language) && $user_language != $upcontext['language'] && file_exists(LANGUAGEDIR . '/' . basename($user_language, '.lng') . '/index.' . basename($user_language, '.lng') . '.php'))
 			{
 				$user_language = basename($user_language, '.lng');
-				$temp = substr(@implode('', @file($modSettings['theme_dir'] . '/languages/' . $user_language . '/index.' . $user_language . '.php')), 0, 4096);
+				$temp = substr(@implode('', @file(LANGUAGEDIR . '/' . $user_language . '/index.' . $user_language . '.php')), 0, 4096);
 				preg_match('~(?://|/\*)\s*Version:\s+(.+?);\s*index(?:[\s]{2}|\*/)~i', $temp, $match);
 
 				if (empty($match[1]) || $match[1] != CURRENT_LANG_VERSION)
 					$upcontext['upgrade_options_warning'] = 'The language files for your selected language, ' . $user_language . ', have not been updated to the latest version. Upgrade will continue with the forum default, ' . $upcontext['language'] . '.';
-				elseif (!file_exists($modSettings['theme_dir'] . '/languages/' . $user_language . '/Install.' . $user_language . '.php'))
+				elseif (!file_exists(LANGUAGEDIR . '/' . $user_language . '/Install.' . $user_language . '.php'))
 					$upcontext['upgrade_options_warning'] = 'The language files for your selected language, ' . $user_language . ', have not been uploaded/updated as the &quot;Install&quot; language file is missing. Upgrade will continue with the forum default, ' . $upcontext['language'] . '.';
 				else
 				{
@@ -875,7 +878,7 @@ function checkLogin()
 					$upcontext['upgrade_status']['lang'] = $upcontext['language'];
 
 					// Include the file.
-					require_once($modSettings['theme_dir'] . '/languages/' . $user_language . '/Install.' . $user_language . '.php');
+					require_once(LANGUAGEDIR . '/' . $user_language . '/Install.' . $user_language . '.php');
 				}
 			}
 
@@ -898,10 +901,18 @@ function checkLogin()
  */
 function action_upgradeOptions()
 {
-	global $command_line, $modSettings, $is_debug, $maintenance, $upcontext, $db_type;
+	global $command_line, $modSettings, $is_debug, $maintenance, $upcontext;
+	global $db_type, $db_character_set;
 
 	$upcontext['sub_template'] = 'upgrade_options';
 	$upcontext['page_title'] = 'Upgrade Options';
+
+	if ($upcontext['is_utf8'])
+	{
+		$upcontext['available_charsets'] = availableCharsets();
+		$possible_charset = detectPossibleCharset();
+		$upcontext['charset_detected'] = isset($upcontext['available_charsets'][$possible_charset]) ? $upcontext['available_charsets'][$possible_charset] : 'utf8';
+	}
 
 	// If we've not submitted then we're done.
 	if (empty($_POST['upcont']))
@@ -997,8 +1008,14 @@ function action_upgradeOptions()
 	}
 
 	// If we're not backing up then jump one.
-	if (empty($_POST['backup']))
+	if (empty($_POST['backup']) && !$upcontext['is_utf8'])
 		$upcontext['current_step']++;
+
+	if ($upcontext['is_utf8'])
+	{
+		$charsets = availableCharsets();
+		$upcontext['selected_charset'] = isset($charsets[$_POST['src_charset']]) ? $charsets[$_POST['src_charset']] : 'ISO-8859-1';
+	}
 
 	// If we've got here then let's proceed to the next step!
 	return true;
@@ -1014,6 +1031,13 @@ function action_backupDatabase()
 	$upcontext['sub_template'] = isset($_GET['xml']) ? 'backup_xml' : 'backup_database';
 	$upcontext['page_title'] = 'Backup Database';
 
+	// Not entirely sure this is needed
+	if ($upcontext['is_utf8'])
+	{
+		$charsets = availableCharsets();
+		$upcontext['selected_charset'] = isset($_POST['src_charset']) && isset($charsets[$_POST['src_charset']]) ? $charsets[$_POST['src_charset']] : 'ISO-8859-1';
+	}
+
 	// Done it already - js wise?
 	if (!empty($_POST['backup_done']))
 		return true;
@@ -1023,8 +1047,9 @@ function action_backupDatabase()
 
 	// Get all the table names.
 	$filter = str_replace('_', '\_', preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0 ? $match[2] : $db_prefix) . '%';
-	$db = preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0 ? strtr($match[1], array('`' => '')) : false;
-	$tables = $db->db_list_tables($db, $filter);
+	$database = preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0 ? strtr($match[1], array('`' => '')) : false;
+
+	$tables = $db->db_list_tables($database, $filter);
 
 	$table_names = array();
 	foreach ($tables as $table)
@@ -1091,6 +1116,387 @@ function action_backupDatabase()
 	return false;
 }
 
+function detectPossibleCharset()
+{
+	$db = database();
+	$charsets = availableCharsets();
+
+	// Use the messages.body column as indicator for the database charset.
+	$request = $db->query('', '
+		SHOW FULL COLUMNS
+		FROM {db_prefix}messages
+		LIKE {string:body_like}',
+		array(
+			'body_like' => 'body',
+		)
+	);
+	$column_info = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	// A collation looks like latin1_swedish. We only need the character set.
+	list($database_charset) = explode('_', $column_info['Collation']);
+	$database_charset = in_array($database_charset, $charsets) ? array_search($database_charset, $charsets) : $database_charset;
+
+	return $database_charset;
+}
+
+function availableCharsets()
+{
+	global $db_type;
+
+	$db = database();
+
+	// It's a MySQL-only thingy (in future mysqli as well)
+	if ($db_type != 'mysql')
+		return true;
+
+	// The character sets used in SMF's language files with their db equivalent.
+	$charsets = array(
+		// Chinese-traditional.
+		'big5' => 'big5',
+		// Chinese-simplified.
+		'gbk' => 'gbk',
+		// West European.
+		'ISO-8859-1' => 'latin1',
+		// Romanian.
+		'ISO-8859-2' => 'latin2',
+		// Turkish.
+		'ISO-8859-9' => 'latin5',
+		// West European with Euro sign.
+		'ISO-8859-15' => 'latin9',
+		// Thai.
+		'tis-620' => 'tis620',
+		// Persian, Chinese, etc.
+		'UTF-8' => 'utf8',
+		// Russian.
+		'windows-1251' => 'cp1251',
+		// Greek.
+		'windows-1253' => 'utf8',
+		// Hebrew.
+		'windows-1255' => 'utf8',
+		// Arabic.
+		'windows-1256' => 'cp1256',
+	);
+
+	// Get a list of character sets supported by your MySQL server.
+	$request = $db->query('', '
+		SHOW CHARACTER SET',
+		array(
+		)
+	);
+	$db_charsets = array();
+	while ($row = $db->fetch_assoc($request))
+		$db_charsets[] = $row['Charset'];
+
+	$db->free_result($request);
+
+	// Character sets supported by both MySQL and SMF's language files.
+	return array_intersect($charsets, $db_charsets);
+}
+
+/**
+ * Step 3: Convert to UTF8?
+ *
+ * Convert both data and database tables to UTF-8 character set.
+ * It requires the admin_forum permission.
+ * This only works if UTF-8 is not the global character set.
+ * It supports all character sets used by SMF's language files.
+ */
+function action_convertToUTF8()
+{
+	global $upcontext, $txt, $language, $db_character_set, $db_type;
+	global $modSettings, $user_info, $sourcedir, $db_prefix;
+
+	$db = database();
+
+	// It's a MySQL-only thingy (in future mysqli as well)
+	if ($db_type != 'mysql')
+		return true;
+
+	// Character sets supported by both MySQL and SMF's language files.
+	$charsets = availableCharsets();
+
+	$upcontext['selected_charset'] = isset($charsets[$_POST['src_charset']]) ? $charsets[$_POST['src_charset']] : 'ISO-8859-1';
+
+	// Translation table for the character sets not native for MySQL.
+	$translation_tables = array(
+		'windows-1255' => array(
+			'0x81' => '\'\'',		'0x8A' => '\'\'',		'0x8C' => '\'\'',
+			'0x8D' => '\'\'',		'0x8E' => '\'\'',		'0x8F' => '\'\'',
+			'0x90' => '\'\'',		'0x9A' => '\'\'',		'0x9C' => '\'\'',
+			'0x9D' => '\'\'',		'0x9E' => '\'\'',		'0x9F' => '\'\'',
+			'0xCA' => '\'\'',		'0xD9' => '\'\'',		'0xDA' => '\'\'',
+			'0xDB' => '\'\'',		'0xDC' => '\'\'',		'0xDD' => '\'\'',
+			'0xDE' => '\'\'',		'0xDF' => '\'\'',		'0xFB' => '\'\'',
+			'0xFC' => '\'\'',		'0xFF' => '\'\'',		'0xC2' => '0xFF',
+			'0x80' => '0xFC',		'0xE2' => '0xFB',		'0xA0' => '0xC2A0',
+			'0xA1' => '0xC2A1',		'0xA2' => '0xC2A2',		'0xA3' => '0xC2A3',
+			'0xA5' => '0xC2A5',		'0xA6' => '0xC2A6',		'0xA7' => '0xC2A7',
+			'0xA8' => '0xC2A8',		'0xA9' => '0xC2A9',		'0xAB' => '0xC2AB',
+			'0xAC' => '0xC2AC',		'0xAD' => '0xC2AD',		'0xAE' => '0xC2AE',
+			'0xAF' => '0xC2AF',		'0xB0' => '0xC2B0',		'0xB1' => '0xC2B1',
+			'0xB2' => '0xC2B2',		'0xB3' => '0xC2B3',		'0xB4' => '0xC2B4',
+			'0xB5' => '0xC2B5',		'0xB6' => '0xC2B6',		'0xB7' => '0xC2B7',
+			'0xB8' => '0xC2B8',		'0xB9' => '0xC2B9',		'0xBB' => '0xC2BB',
+			'0xBC' => '0xC2BC',		'0xBD' => '0xC2BD',		'0xBE' => '0xC2BE',
+			'0xBF' => '0xC2BF',		'0xD7' => '0xD7B3',		'0xD1' => '0xD781',
+			'0xD4' => '0xD7B0',		'0xD5' => '0xD7B1',		'0xD6' => '0xD7B2',
+			'0xE0' => '0xD790',		'0xEA' => '0xD79A',		'0xEC' => '0xD79C',
+			'0xED' => '0xD79D',		'0xEE' => '0xD79E',		'0xEF' => '0xD79F',
+			'0xF0' => '0xD7A0',		'0xF1' => '0xD7A1',		'0xF2' => '0xD7A2',
+			'0xF3' => '0xD7A3',		'0xF5' => '0xD7A5',		'0xF6' => '0xD7A6',
+			'0xF7' => '0xD7A7',		'0xF8' => '0xD7A8',		'0xF9' => '0xD7A9',
+			'0x82' => '0xE2809A',	'0x84' => '0xE2809E',	'0x85' => '0xE280A6',
+			'0x86' => '0xE280A0',	'0x87' => '0xE280A1',	'0x89' => '0xE280B0',
+			'0x8B' => '0xE280B9',	'0x93' => '0xE2809C',	'0x94' => '0xE2809D',
+			'0x95' => '0xE280A2',	'0x97' => '0xE28094',	'0x99' => '0xE284A2',
+			'0xC0' => '0xD6B0',		'0xC1' => '0xD6B1',		'0xC3' => '0xD6B3',
+			'0xC4' => '0xD6B4',		'0xC5' => '0xD6B5',		'0xC6' => '0xD6B6',
+			'0xC7' => '0xD6B7',		'0xC8' => '0xD6B8',		'0xC9' => '0xD6B9',
+			'0xCB' => '0xD6BB',		'0xCC' => '0xD6BC',		'0xCD' => '0xD6BD',
+			'0xCE' => '0xD6BE',		'0xCF' => '0xD6BF',		'0xD0' => '0xD780',
+			'0xD2' => '0xD782',		'0xE3' => '0xD793',		'0xE4' => '0xD794',
+			'0xE5' => '0xD795',		'0xE7' => '0xD797',		'0xE9' => '0xD799',
+			'0xFD' => '0xE2808E',	'0xFE' => '0xE2808F',	'0x92' => '0xE28099',
+			'0x83' => '0xC692',		'0xD3' => '0xD783',		'0x88' => '0xCB86',
+			'0x98' => '0xCB9C',		'0x91' => '0xE28098',	'0x96' => '0xE28093',
+			'0xBA' => '0xC3B7',		'0x9B' => '0xE280BA',	'0xAA' => '0xC397',
+			'0xA4' => '0xE282AA',	'0xE1' => '0xD791',		'0xE6' => '0xD796',
+			'0xE8' => '0xD798',		'0xEB' => '0xD79B',		'0xF4' => '0xD7A4',
+			'0xFA' => '0xD7AA',		'0xFF' => '0xD6B2',		'0xFC' => '0xE282AC',
+			'0xFB' => '0xD792',
+		),
+		'windows-1253' => array(
+			'0x81' => '\'\'',			'0x88' => '\'\'',			'0x8A' => '\'\'',
+			'0x8C' => '\'\'',			'0x8D' => '\'\'',			'0x8E' => '\'\'',
+			'0x8F' => '\'\'',			'0x90' => '\'\'',			'0x98' => '\'\'',
+			'0x9A' => '\'\'',			'0x9C' => '\'\'',			'0x9D' => '\'\'',
+			'0x9E' => '\'\'',			'0x9F' => '\'\'',			'0xAA' => '\'\'',
+			'0xD2' => '\'\'',			'0xFF' => '\'\'',			'0xCE' => '0xCE9E',
+			'0xB8' => '0xCE88',		'0xBA' => '0xCE8A',		'0xBC' => '0xCE8C',
+			'0xBE' => '0xCE8E',		'0xBF' => '0xCE8F',		'0xC0' => '0xCE90',
+			'0xC8' => '0xCE98',		'0xCA' => '0xCE9A',		'0xCC' => '0xCE9C',
+			'0xCD' => '0xCE9D',		'0xCF' => '0xCE9F',		'0xDA' => '0xCEAA',
+			'0xE8' => '0xCEB8',		'0xEA' => '0xCEBA',		'0xEC' => '0xCEBC',
+			'0xEE' => '0xCEBE',		'0xEF' => '0xCEBF',		'0xC2' => '0xFF',
+			'0xBD' => '0xC2BD',		'0xED' => '0xCEBD',		'0xB2' => '0xC2B2',
+			'0xA0' => '0xC2A0',		'0xA3' => '0xC2A3',		'0xA4' => '0xC2A4',
+			'0xA5' => '0xC2A5',		'0xA6' => '0xC2A6',		'0xA7' => '0xC2A7',
+			'0xA8' => '0xC2A8',		'0xA9' => '0xC2A9',		'0xAB' => '0xC2AB',
+			'0xAC' => '0xC2AC',		'0xAD' => '0xC2AD',		'0xAE' => '0xC2AE',
+			'0xB0' => '0xC2B0',		'0xB1' => '0xC2B1',		'0xB3' => '0xC2B3',
+			'0xB5' => '0xC2B5',		'0xB6' => '0xC2B6',		'0xB7' => '0xC2B7',
+			'0xBB' => '0xC2BB',		'0xE2' => '0xCEB2',		'0x80' => '0xD2',
+			'0x82' => '0xE2809A',	'0x84' => '0xE2809E',	'0x85' => '0xE280A6',
+			'0x86' => '0xE280A0',	'0xA1' => '0xCE85',		'0xA2' => '0xCE86',
+			'0x87' => '0xE280A1',	'0x89' => '0xE280B0',	'0xB9' => '0xCE89',
+			'0x8B' => '0xE280B9',	'0x91' => '0xE28098',	'0x99' => '0xE284A2',
+			'0x92' => '0xE28099',	'0x93' => '0xE2809C',	'0x94' => '0xE2809D',
+			'0x95' => '0xE280A2',	'0x96' => '0xE28093',	'0x97' => '0xE28094',
+			'0x9B' => '0xE280BA',	'0xAF' => '0xE28095',	'0xB4' => '0xCE84',
+			'0xC1' => '0xCE91',		'0xC3' => '0xCE93',		'0xC4' => '0xCE94',
+			'0xC5' => '0xCE95',		'0xC6' => '0xCE96',		'0x83' => '0xC692',
+			'0xC7' => '0xCE97',		'0xC9' => '0xCE99',		'0xCB' => '0xCE9B',
+			'0xD0' => '0xCEA0',		'0xD1' => '0xCEA1',		'0xD3' => '0xCEA3',
+			'0xD4' => '0xCEA4',		'0xD5' => '0xCEA5',		'0xD6' => '0xCEA6',
+			'0xD7' => '0xCEA7',		'0xD8' => '0xCEA8',		'0xD9' => '0xCEA9',
+			'0xDB' => '0xCEAB',		'0xDC' => '0xCEAC',		'0xDD' => '0xCEAD',
+			'0xDE' => '0xCEAE',		'0xDF' => '0xCEAF',		'0xE0' => '0xCEB0',
+			'0xE1' => '0xCEB1',		'0xE3' => '0xCEB3',		'0xE4' => '0xCEB4',
+			'0xE5' => '0xCEB5',		'0xE6' => '0xCEB6',		'0xE7' => '0xCEB7',
+			'0xE9' => '0xCEB9',		'0xEB' => '0xCEBB',		'0xF0' => '0xCF80',
+			'0xF1' => '0xCF81',		'0xF2' => '0xCF82',		'0xF3' => '0xCF83',
+			'0xF4' => '0xCF84',		'0xF5' => '0xCF85',		'0xF6' => '0xCF86',
+			'0xF7' => '0xCF87',		'0xF8' => '0xCF88',		'0xF9' => '0xCF89',
+			'0xFA' => '0xCF8A',		'0xFB' => '0xCF8B',		'0xFC' => '0xCF8C',
+			'0xFD' => '0xCF8D',		'0xFE' => '0xCF8E',		'0xFF' => '0xCE92',
+			'0xD2' => '0xE282AC',
+		),
+	);
+
+	// Make some preparations.
+	if (isset($translation_tables[$_POST['src_charset']]))
+	{
+		$replace = '%field%';
+		foreach ($translation_tables[$_POST['src_charset']] as $from => $to)
+			$replace = 'REPLACE(' . $replace . ', ' . $from . ', ' . $to . ')';
+	}
+
+	// Grab a list of tables.
+	if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) === 1)
+			$queryTables = $db->query('', '
+			SHOW TABLE STATUS
+			FROM `' . strtr($match[1], array('`' => '')) . '`
+			LIKE {string:table_name}',
+			array(
+				'table_name' => str_replace('_', '\_', $match[2]) . '%',
+			)
+		);
+	else
+		$queryTables = $db->query('', '
+			SHOW TABLE STATUS
+			LIKE {string:table_name}',
+			array(
+				'table_name' => str_replace('_', '\_', $db_prefix) . '%',
+			)
+		);
+
+	while ($table_info = $db->fetch_assoc($queryTables))
+	{
+		// Just to make sure it doesn't time out.
+		if (function_exists('apache_reset_timeout'))
+			@apache_reset_timeout();
+
+		$table_charsets = array();
+
+		// Loop through each column.
+		$queryColumns = $db->query('', '
+			SHOW FULL COLUMNS
+			FROM ' . $table_info['Name'],
+			array(
+			)
+		);
+		while ($column_info = $db->fetch_assoc($queryColumns))
+		{
+			// Only text'ish columns have a character set and need converting.
+			if (strpos($column_info['Type'], 'text') !== false || strpos($column_info['Type'], 'char') !== false)
+			{
+				$collation = empty($column_info['Collation']) || $column_info['Collation'] === 'NULL' ? $table_info['Collation'] : $column_info['Collation'];
+				if (!empty($collation) && $collation !== 'NULL')
+				{
+					list($charset) = explode('_', $collation);
+
+					if (!isset($table_charsets[$charset]))
+						$table_charsets[$charset] = array();
+
+					$table_charsets[$charset][] = $column_info;
+				}
+			}
+		}
+		$db->free_result($queryColumns);
+
+		// Only change the column if the data doesn't match the current charset.
+		if ((count($table_charsets) === 1 && key($table_charsets) !== $charsets[$_POST['src_charset']]) || count($table_charsets) > 1)
+		{
+			$updates_blob = '';
+			$updates_text = '';
+			foreach ($table_charsets as $charset => $columns)
+			{
+				if ($charset !== $charsets[$_POST['src_charset']])
+				{
+					foreach ($columns as $column)
+					{
+						$updates_blob .= '
+							CHANGE COLUMN `' . $column['Field'] . '` `' . $column['Field'] . '` ' . strtr($column['Type'], array('text' => 'blob', 'char' => 'binary')) . ($column['Null'] === 'YES' ? ' NULL' : ' NOT NULL') . (strpos($column['Type'], 'char') === false ? '' : ' default \'' . $column['Default'] . '\'') . ',';
+						$updates_text .= '
+							CHANGE COLUMN `' . $column['Field'] . '` `' . $column['Field'] . '` ' . $column['Type'] . ' CHARACTER SET ' . $charsets[$_POST['src_charset']] . ($column['Null'] === 'YES' ? '' : ' NOT NULL') . (strpos($column['Type'], 'char') === false ? '' : ' default \'' . $column['Default'] . '\'') . ',';
+					}
+				}
+			}
+
+			// Change the columns to binary form.
+			$db->query('', '
+				ALTER TABLE {raw:table_name}{raw:updates_blob}',
+				array(
+					'table_name' => $table_info['Name'],
+					'updates_blob' => substr($updates_blob, 0, -1),
+				)
+			);
+
+			// Convert the character set if MySQL has no native support for it.
+			if (isset($translation_tables[$_POST['src_charset']]))
+			{
+				$update = '';
+				foreach ($table_charsets as $charset => $columns)
+					foreach ($columns as $column)
+						$update .= '
+							' . $column['Field'] . ' = ' . strtr($replace, array('%field%' => $column['Field'])) . ',';
+
+				$db->query('', '
+					UPDATE {raw:table_name}
+					SET {raw:updates}',
+					array(
+						'table_name' => $table_info['Name'],
+						'updates' => substr($update, 0, -1),
+					)
+				);
+			}
+
+			// Change the columns back, but with the proper character set.
+			$db->query('', '
+				ALTER TABLE {raw:table_name}{raw:updates_text}',
+				array(
+					'table_name' => $table_info['Name'],
+					'updates_text' => substr($updates_text, 0, -1),
+				)
+			);
+		}
+
+		// Now do the actual conversion (if still needed).
+		if ($charsets[$_POST['src_charset']] !== 'utf8')
+			$db->query('', '
+				ALTER TABLE {raw:table_name}
+				CONVERT TO CHARACTER SET utf8',
+				array(
+					'table_name' => $table_info['Name'],
+				)
+			);
+	}
+	$db->free_result($queryTables);
+
+	// Let the settings know we have a new character set.
+	updateSettings(array('global_character_set' => 'UTF-8', 'previousCharacterSet' => (empty($translation_tables[$_POST['src_charset']])) ? $charsets[$_POST['src_charset']] : $translation_tables[$_POST['src_charset']]));
+
+	require_once(SUBSDIR . '/SettingsForm.class.php');
+	$new_settings = array(
+		'db_character_set' => '\'utf8\''
+	);
+	Settings_Form::save_file($new_settings);
+
+	// The conversion might have messed up some serialized strings. Fix them!
+	require_once(SUBSDIR . '/Charset.subs.php');
+	fix_serialized_columns();
+
+	return true;
+}
+
+/**
+ * Drop one or more indexes from a table and adds them back if specified
+ *
+ * @package Search
+ * @param string $table
+ * @param string[]|string $indexes
+ * @param boolean $add
+ */
+function alterFullTextIndex($table, $indexes, $add = false)
+{
+	$db = database();
+
+	$indexes = is_array($indexes) ? $indexes : array($indexes);
+
+	// Make sure it's gone before creating it.
+	$db->query('', '
+		ALTER TABLE ' . $table . '
+		DROP INDEX ' . implode(',
+		DROP INDEX ', $indexes),
+		array(
+			'db_error_skip' => true,
+		)
+	);
+
+	if ($add)
+	{
+		foreach ($indexes as $index)
+			$db->query('', '
+				ALTER TABLE ' . $table . '
+				ADD FULLTEXT {raw:name} ({raw:name})',
+				array(
+					'name' => $index
+				)
+			);
+	}
+}
+
 /**
  * Backup one table...
  *
@@ -1114,7 +1520,7 @@ function backupTable($table)
 }
 
 /**
- * Step 2: Everything.
+ * Step 4: Everything.
  */
 function action_databaseChanges()
 {
@@ -3954,7 +4360,29 @@ function template_upgrade_options()
 						<td style="width: 100%;">
 							<label for="backup">Backup tables in your database with the prefix &quot;backup_' . $db_prefix . '&quot;.</label>', isset($modSettings['elkVersion']) ? '' : ' (recommended!)', '
 						</td>
-					</tr>
+					</tr>';
+
+	if ($upcontext['is_utf8'])
+	{
+		echo '
+					<tr style="vertical-align: top;">
+						<td style="width: 2%;">
+							<input type="checkbox" name="convertutf8" id="convertutf8" value="1" checked="checked" disabled="disabled" class="input_check" />
+							<select name="src_charset">';
+		foreach ($upcontext['available_charsets'] as $encoding => $charset)
+		echo '
+								<option value="', $charset, '"', $charset === $upcontext['charset_detected'] ? ' selected' : '', '>', $charset, '</option>';
+
+		echo '
+							</select>
+						</td>
+						<td style="width: 100%;">
+							<label for="backup">Select the data character set in order to convert the database and data to UTF-8.</label><br />This is mandatory! This option will automatically generate a backup of the tables in your database with the prefix &quot;backup_' . $db_prefix . '&quot;.
+						</td>
+					</tr>';
+	}
+
+	echo '
 					<tr style="vertical-align: top;">
 						<td style="width: 2%;">
 							<input type="checkbox" name="maint" id="maint" value="1" checked="checked" class="input_check" />
@@ -4007,6 +4435,10 @@ function template_backup_database()
 			<input type="hidden" name="backup_done" id="backup_done" value="0" />
 			<strong>Completed <span id="tab_done">', $upcontext['cur_table_num'], '</span> out of ', $upcontext['table_count'], ' tables.</strong>
 			<span id="debuginfo"></span>';
+
+	if (isset($upcontext['selected_charset']))
+		echo '
+			<input type="hidden" name="src_charset" value="', $upcontext['selected_charset'], '" />';
 
 	// Dont any tables so far?
 	if (!empty($upcontext['previous_tables']))
