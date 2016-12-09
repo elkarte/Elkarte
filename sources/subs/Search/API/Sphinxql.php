@@ -77,6 +77,7 @@ class Sphinxql extends SearchAPI
 		if (!in_array(DB_TYPE, $this->supported_databases))
 		{
 			$this->is_supported = false;
+
 			return;
 		}
 
@@ -126,7 +127,9 @@ class Sphinxql extends SearchAPI
 		$fulltextWord = count($subwords) === 1 ? $word : '"' . $word . '"';
 		$wordsSearch['indexed_words'][] = $fulltextWord;
 		if ($isExcluded)
+		{
 			$wordsExclude[] = $fulltextWord;
+		}
 	}
 
 	/**
@@ -151,7 +154,9 @@ class Sphinxql extends SearchAPI
 
 			// No connection, daemon not running?  log the error
 			if ($mySphinx === false)
+			{
 				\Errors::instance()->fatal_lang_error('error_no_search_daemon');
+			}
 
 			// Compile different options for our query
 			$query = 'SELECT *' . (empty($search_params['topic']) ? ', COUNT(*) num' : '') . ', WEIGHT() weights, (weights + (relevance/1000)) rank FROM elkarte_index';
@@ -161,25 +166,39 @@ class Sphinxql extends SearchAPI
 
 			// Nothing to search, return zero results
 			if (trim($where_match) === '')
+			{
 				return 0;
+			}
 
 			if ($search_params['subject_only'])
+			{
 				$where_match = '@subject ' . $where_match;
+			}
 
 			$query .= ' WHERE MATCH(\'' . $where_match . '\')';
 
 			// Set the limits based on the search parameters.
 			$extra_where = array();
 			if (!empty($search_params['min_msg_id']) || !empty($search_params['max_msg_id']))
+			{
 				$extra_where[] = 'id >= ' . $search_params['min_msg_id'] . ' AND id <= ' . (empty($search_params['max_msg_id']) ? (int) $modSettings['maxMsgID'] : $search_params['max_msg_id']);
+			}
 			if (!empty($search_params['topic']))
+			{
 				$extra_where[] = 'id_topic = ' . (int) $search_params['topic'];
+			}
 			if (!empty($search_params['brd']))
+			{
 				$extra_where[] = 'id_board IN (' . implode(',', $search_params['brd']) . ')';
+			}
 			if (!empty($search_params['memberlist']))
+			{
 				$extra_where[] = 'id_member IN (' . implode(',', $search_params['memberlist']) . ')';
+			}
 			if (!empty($extra_where))
+			{
 				$query .= ' AND ' . implode(' AND ', $extra_where);
+			}
 
 			// Put together a sort string; besides the main column sort (relevance, id_topic, or num_replies)
 			$search_params['sort_dir'] = strtoupper($search_params['sort_dir']);
@@ -193,7 +212,9 @@ class Sphinxql extends SearchAPI
 
 			// Grouping by topic id makes it return only one result per topic, so don't set that for in-topic searches
 			if (empty($search_params['topic']))
+			{
 				$query .= ' GROUP BY id_topic WITHIN GROUP ORDER BY ' . $sphinx_sort;
+			}
 
 			$query .= ' ORDER BY ' . $sphinx_sort;
 			$query .= ' LIMIT 0,' . (int) $modSettings['sphinx_max_results'];
@@ -211,7 +232,9 @@ class Sphinxql extends SearchAPI
 			{
 				// Just log the error.
 				if (mysqli_error($mySphinx))
+				{
 					\Errors::instance()->log_error(mysqli_error($mySphinx));
+				}
 
 				\Errors::instance()->fatal_lang_error('error_no_search_daemon');
 			}
@@ -227,9 +250,13 @@ class Sphinxql extends SearchAPI
 				while ($match = mysqli_fetch_assoc($request))
 				{
 					if (empty($search_params['topic']))
+					{
 						$num = isset($match['num']) ? $match['num'] : (isset($match['@count']) ? $match['@count'] : 0);
+					}
 					else
+					{
 						$num = 0;
+					}
 
 					$cached_results['matches'][$match['id']] = array(
 						'id' => $match['id_topic'],
@@ -249,7 +276,7 @@ class Sphinxql extends SearchAPI
 		}
 
 		$participants = array();
-		foreach (array_slice(array_keys($cached_results['matches']), $_REQUEST['start'], $modSettings['search_results_per_page']) as $msgID)
+		foreach (array_slice(array_keys($cached_results['matches']), (int) $_REQUEST['start'], $modSettings['search_results_per_page']) as $msgID)
 		{
 			$context['topics'][$msgID] = $cached_results['matches'][$msgID];
 			$participants[$cached_results['matches'][$msgID]['id']] = false;
@@ -258,7 +285,9 @@ class Sphinxql extends SearchAPI
 		// Sentences need to be broken up in words for proper highlighting.
 		$search_results = array();
 		foreach ($search_words as $orIndex => $words)
+		{
 			$search_results = array_merge($search_results, $search_words[$orIndex]['subject_words']);
+		}
 
 		return $cached_results['num_results'];
 	}
@@ -275,20 +304,24 @@ class Sphinxql extends SearchAPI
 
 		// Split our search string and return an empty string if no matches
 		if (!preg_match_all('~ (-?)("[^"]+"|[^" ]+)~', ' ' . $string, $tokens, PREG_SET_ORDER))
+		{
 			return '';
+		}
 
 		// First we split our string into included and excluded words and phrases
 		$or_part = false;
 		foreach ($tokens as $token)
 		{
 			// Strip the quotes off of a phrase
-			if ($token[2][0] == '"')
+			if ($token[2][0] === '"')
 			{
 				$token[2] = substr($token[2], 1, -1);
 				$phrase = true;
 			}
 			else
+			{
 				$phrase = false;
+			}
 
 			// Prepare this token
 			$cleanWords = $this->_cleanString($token[2]);
@@ -297,32 +330,44 @@ class Sphinxql extends SearchAPI
 			$addWords = $phrase ? array('"' . $cleanWords . '"') : preg_split('~ ~u', $cleanWords, null, PREG_SPLIT_NO_EMPTY);
 
 			// Excluding this word?
-			if ($token[1] == '-')
+			if ($token[1] === '-')
+			{
 				$keywords['exclude'] = array_merge($keywords['exclude'], $addWords);
+			}
 			// OR'd keywords (we only do this if we have something to OR with)
-			elseif (($token[2] == 'OR' || $token[2] == '|') && count($keywords['include']))
+			elseif (($token[2] === 'OR' || $token[2] === '|') && count($keywords['include']))
 			{
 				$last = array_pop($keywords['include']);
 				if (!is_array($last))
+				{
 					$last = array($last);
+				}
 				$keywords['include'][] = $last;
 				$or_part = true;
 				continue;
 			}
 			// AND is implied in a Sphinx Search
-			elseif ($token[2] == 'AND' || $token[2] == '&')
+			elseif ($token[2] === 'AND' || $token[2] === '&')
+			{
 				continue;
+			}
 			// If this part of the query ended up being blank, skip it
-			elseif (trim($cleanWords) == '')
+			elseif (trim($cleanWords) === '')
+			{
 				continue;
+			}
 			// Must be something they want to search for!
 			else
 			{
 				// If this was part of an OR branch, add it to the proper section
 				if ($or_part)
+				{
 					$keywords['include'][count($keywords['include']) - 1] = array_merge($keywords['include'][count($keywords['include']) - 1], $addWords);
+				}
 				else
+				{
 					$keywords['include'] = array_merge($keywords['include'], $addWords);
+				}
 			}
 
 			// Start fresh on this...
@@ -331,15 +376,21 @@ class Sphinxql extends SearchAPI
 
 		// Let's make sure they're not canceling each other out
 		if (!count(array_diff($keywords['include'], $keywords['exclude'])))
+		{
 			return '';
+		}
 
 		// Now we compile our arrays into a valid search string
 		$query_parts = array();
 		foreach ($keywords['include'] as $keyword)
+		{
 			$query_parts[] = is_array($keyword) ? '(' . implode(' | ', $keyword) . ')' : $keyword;
+		}
 
 		foreach ($keywords['exclude'] as $keyword)
+		{
 			$query_parts[] = '-' . $keyword;
+		}
 
 		return implode(' ', $query_parts);
 	}
