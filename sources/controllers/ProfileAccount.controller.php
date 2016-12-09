@@ -74,7 +74,7 @@ class ProfileAccount_Controller extends Action_Controller
 		// jQuery-UI FTW!
 		$modSettings['jquery_include_ui'] = true;
 		loadCSSFile('jquery.ui.slider.css');
-		loadCSSFile('jquery.ui.theme.css');
+		loadCSSFile('jquery.ui.theme.min.css');
 
 		// Get all the actual settings.
 		list ($modSettings['warning_enable'], $modSettings['user_limit']) = explode(',', $modSettings['warning_settings']);
