@@ -1527,8 +1527,6 @@ a.help .icon {
 
 /* -------------------------------------------------------
  * $TABS
- * We can't control what jqueryui pollutes the DOM with, so deal with it
- * Styles for the profile summary tabs, or any jquery ui tabs
  * -------------------------------------------------------
  */
 
@@ -1547,29 +1545,31 @@ a.help .icon {
 	color: #FFFFFF;
 }
 
-.ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active {
+.ui-tabs .ui-tabs-nav .ui-state-active a,
+.ui-tabs .ui-tabs-nav .ui-state-active {
 	font-weight: normal;
 }
 
-.ui-tabs .ui-tabs-nav li a {
+.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
 	outline: none;
 	border-bottom-color: #CCCCCC;
 	border-radius: 5px 5px 0 0;
 	background: #F0F0F0;
 }
 
-.ui-tabs .ui-tabs-nav .ui-state-default a {
+.ui-tabs .ui-tabs-nav .ui-state-default .ui-tabs-anchor {
 	background: #FFFFFF;
 	color: #333333;
 }
 
-.ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active {
+.ui-tabs .ui-tabs-nav .ui-state-active .ui-tabs-anchor,
+.ui-tabs .ui-tabs-nav .ui-state-active {
 	border-radius: 5px 5px 0 0;
 	background: #F6F6F6;
 	color: #333333;
 }
 
-.ui-tabs .ui-state-hover {
+.ui-tabs .ui-tabs-nav li.ui-state-hover .ui-tabs-anchor {
 	background: #F0F0F0;
 	color: #555555;
 	text-decoration: none;

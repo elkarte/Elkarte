@@ -29,7 +29,6 @@
  *		$MODERATE............Move topic, split topic, merge topic.
  *
  *		$PROFILE.............The profile areas.
- *		$TABS...............Tabs used in the profile section, override jqueryUI css
  *		$PERSONAL............The personal messages (PM) areas.
  *		$CALENDAR............Wombats (and the calendar).
  *		$STATISTICS..........The statistics centre.
@@ -696,7 +695,6 @@ em, .em {
 .topic_sorting_row > h3, .topic_name h4 a,
 .poster .name,
 .keyinfo h5 a, .keyinfo h5 a strong,
-.ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active,
 .ui-dialog .ui-dialog-titlebar,
 #creator dt strong, .settings label,
 .popup_heading {
@@ -3706,58 +3704,6 @@ dl.merge_topic dd {
 	margin: 6px 0;
 }
 
-/* -------------------------------------------------------
- * $TABS
- * -------------------------------------------------------
- */
-
-
-/* We can't control what jQueryui pollutes the DOM with, so deal with it
- * Styles for the profile summary tabs, or any jQuery ui tabs
- */
-.ui-tabs .ui-tabs-nav {
-	position: relative;
-	margin: 0;
-	padding: 0;
-	list-style: none;
-}
-
-.ui-tabs .ui-tabs-nav li {
-	position: relative;
-	float: left;
-	margin: 0 3px -1px 0;
-	font-size: 0.929em;
-	line-height: 2.077em;
-}
-
-.ui-tabs .ui-tabs-nav li a {
-	display: block;
-	padding: 0 7px;
-	outline: none;
-	text-decoration: none;
-}
-
-.ui-tabs .ui-tabs-nav li.ui-tabs-selected a, .ui-tabs .ui-tabs-nav .ui-state-disabled a, .ui-tabs .ui-tabs-nav .ui-state-processing a {
-	cursor: default;
-}
-
-.ui-tabs .ui-tabs-nav li a, .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a {
-	cursor: pointer;
-}
-
-.ui-tabs .ui-tabs-hide {
-	display: none;
-}
-
-.ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active {
-	font-weight: bold;
-	border-radius: 2px 2px 0 0;
-}
-
-.ui-tabs .ui-state-hover {
-	border: 1px solid;
-	text-decoration: none;
-}
 
 /* -------------------------------------------------------
  *	$PROFILE

@@ -1438,45 +1438,6 @@ div.bbc_footnotes .meaction {
 
 /* -------------------------------------------------------
  * $TABS
- * We can't control what jqueryui pollutes the DOM with, so deal with it
- * Styles for the profile summary tabs, or any jquery ui tabs
- * -------------------------------------------------------
- */
-
-.ui-tabs .ui-tabs-nav li {
-	border: 1px #CCCCCC solid;
-	border-radius: 2px 2px 0 0;
-	color: #FEFEFE;
-}
-
-.ui-tabs .ui-tabs-nav li a {
-	outline: none;
-	border-bottom-color: #CCCCCC;
-	border-radius: 2px 2px 0 0;
-	background: #F0F0F0;
-}
-
-.ui-tabs .ui-tabs-nav .ui-state-default a {
-	background: #F4F4F4;
-	background-image: linear-gradient(to bottom, #FEFEFE, #E4E4E4);
-}
-
-.ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active {
-	background: #4B863C;
-	background-image: linear-gradient(to bottom, #5BA048, #3D6E32);
-	color: #FEFEFE;
-}
-
-.ui-tabs .ui-state-hover {
-	border-color: #CCCCCC;
-	border-top-color: #AFAFAF;
-	border-left-color: #AFAFAF;
-	background: #F0F0F0;
-	color: #585858;
-}
-
-/* -------------------------------------------------------
- * $PROFILE
  * -------------------------------------------------------
  */
 
@@ -1485,6 +1446,54 @@ div.bbc_footnotes .meaction {
 	border-top-color: #CCCCCC;
 	background: #FEFEFE none repeat scroll 0 0;
 }
+
+.ui-tabs .ui-tabs-nav li {
+	border: 1px #CCCCCC solid;
+	border-radius: 6px 6px 0 0;
+	color: #FEFEFE;
+}
+
+.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
+	outline: none;
+	border-bottom-color: #CCCCCC;
+	border-radius: 6px 6px 0 0;
+	background: #F0F0F0;
+}
+
+.ui-tabs .ui-tabs-nav .ui-state-default .ui-tabs-anchor {
+	background: #F4F4F4;
+	background-image: linear-gradient(to bottom, #FEFEFE, #E4E4E4);
+}
+
+.ui-tabs .ui-tabs-nav .ui-state-active .ui-tabs-anchor,
+.ui-tabs .ui-tabs-nav .ui-state-active {
+	background: #4B863C;
+	background-image: linear-gradient(to bottom, #5BA048, #3D6E32);
+	color: #FEFEFE;
+}
+
+.ui-tabs .ui-tabs-nav li.ui-state-hover .ui-tabs-anchor {
+	border-color: #CCCCCC;
+	border-top-color: #AFAFAF;
+	border-left-color: #AFAFAF;
+	background: #F0F0F0;
+	color: #585858;
+}
+
+li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover,
+li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
+	border-color: #5BA048;
+	border-top-color: #2D5024;
+	border-left-color: #2D5024;
+	background: #3D6E32;
+	box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3) inset;
+	color: #FEFEFE;
+}
+
+/* -------------------------------------------------------
+ * $PROFILE
+ * -------------------------------------------------------
+ */
 
 #profile_attachments {
 	border-color: #CCCCCC;
