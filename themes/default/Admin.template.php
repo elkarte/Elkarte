@@ -1175,13 +1175,7 @@ function template_admin_search_results()
 
 	echo '
 					<h2 class="category_header hdicon cat_img_search">
-						', sprintf($txt['admin_search_results_desc'], $context['search_term']), '
-						<form id="quick_search" class="floatright" action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8">
-							<i class="icon i-search"></i>
-							<input type="text" name="search_term" value="', $context['search_term'], '" class="input_text" />
-							<input type="hidden" name="sa" value="', $context['search_type'], '" />
-							<input type="submit" name="search_go" value="', $txt['admin_search_results_again'], '" />
-						</form>
+						', sprintf($txt['admin_search_results_desc'], $context['search_term']), template_admin_quick_search(), '
 					</h2>
 					<div class="generic_list_wrapper">
 						<div class="content">';
