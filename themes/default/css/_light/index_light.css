@@ -1438,45 +1438,6 @@ div.bbc_footnotes .meaction {
 
 /* -------------------------------------------------------
  * $TABS
- * We can't control what jqueryui pollutes the DOM with, so deal with it
- * Styles for the profile summary tabs, or any jquery ui tabs
- * -------------------------------------------------------
- */
-
-.ui-tabs .ui-tabs-nav li {
-	border: 1px #CCCCCC solid;
-	border-radius: 2px 2px 0 0;
-	color: #FEFEFE;
-}
-
-.ui-tabs .ui-tabs-nav li a {
-	outline: none;
-	border-bottom-color: #CCCCCC;
-	border-radius: 2px 2px 0 0;
-	background: #F0F0F0;
-}
-
-.ui-tabs .ui-tabs-nav .ui-state-default a {
-	background: #F4F4F4;
-	background-image: linear-gradient(to bottom, #FEFEFE, #E4E4E4);
-}
-
-.ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active {
-	background: #4B863C;
-	background-image: linear-gradient(to bottom, #5BA048, #3D6E32);
-	color: #FEFEFE;
-}
-
-.ui-tabs .ui-state-hover {
-	border-color: #CCCCCC;
-	border-top-color: #AFAFAF;
-	border-left-color: #AFAFAF;
-	background: #F0F0F0;
-	color: #585858;
-}
-
-/* -------------------------------------------------------
- * $PROFILE
  * -------------------------------------------------------
  */
 
@@ -1485,6 +1446,54 @@ div.bbc_footnotes .meaction {
 	border-top-color: #CCCCCC;
 	background: #FEFEFE none repeat scroll 0 0;
 }
+
+.ui-tabs .ui-tabs-nav li {
+	border: 1px #CCCCCC solid;
+	border-radius: 6px 6px 0 0;
+	color: #FEFEFE;
+}
+
+.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
+	outline: none;
+	border-bottom-color: #CCCCCC;
+	border-radius: 6px 6px 0 0;
+	background: #F0F0F0;
+}
+
+.ui-tabs .ui-tabs-nav .ui-state-default .ui-tabs-anchor {
+	background: #F4F4F4;
+	background-image: linear-gradient(to bottom, #FEFEFE, #E4E4E4);
+}
+
+.ui-tabs .ui-tabs-nav .ui-state-active .ui-tabs-anchor,
+.ui-tabs .ui-tabs-nav .ui-state-active {
+	background: #4B863C;
+	background-image: linear-gradient(to bottom, #5BA048, #3D6E32);
+	color: #FEFEFE;
+}
+
+.ui-tabs .ui-tabs-nav li.ui-state-hover .ui-tabs-anchor {
+	border-color: #CCCCCC;
+	border-top-color: #AFAFAF;
+	border-left-color: #AFAFAF;
+	background: #F0F0F0;
+	color: #585858;
+}
+
+li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover,
+li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
+	border-color: #5BA048;
+	border-top-color: #2D5024;
+	border-left-color: #2D5024;
+	background: #3D6E32;
+	box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3) inset;
+	color: #FEFEFE;
+}
+
+/* -------------------------------------------------------
+ * $PROFILE
+ * -------------------------------------------------------
+ */
 
 #profile_attachments {
 	border-color: #CCCCCC;
@@ -2172,6 +2181,14 @@ a.helpicon:hover, a > .iconline:hover, a > .icoffline:hover {
 
 .i-cog::before {
 	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='%23555555' stroke-width='.07em' fill='white' viewBox='0 0 32 32'%3E%3Cpath d='M29.18 19.07c-1.678-2.908-.668-6.634 2.256-8.328L28.29 5.295c-.897.527-1.942.83-3.057.83-3.36 0-6.085-2.743-6.085-6.126h-6.29c.01 1.04-.25 2.1-.81 3.07-1.68 2.903-5.41 3.892-8.34 2.21L.566 10.723c.905.515 1.69 1.268 2.246 2.234 1.677 2.904.673 6.624-2.24 8.32l3.145 5.447c.895-.522 1.935-.82 3.044-.82 3.35 0 6.07 2.725 6.087 6.092h6.29c-.004-1.036.258-2.08.81-3.04 1.676-2.903 5.4-3.894 8.325-2.22l3.145-5.446c-.9-.514-1.678-1.265-2.232-2.225zM16 22.48c-3.578 0-6.48-2.902-6.48-6.48S12.423 9.52 16 9.52c3.578 0 6.48 2.902 6.48 6.48s-2.902 6.48-6.48 6.48z'/%3E%3C/svg%3E");
+}
+
+.i-lock::before {
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='%23555555' stroke-width='.07em' fill='%23DAA520' viewBox='0 0 32 32'%3E%3Cpath d='M18.5 14h-0.5v-6c0-3.308-2.692-6-6-6h-4c-3.308 0-6 2.692-6 6v6h-0.5c-0.825 0-1.5 0.675-1.5 1.5v15c0 0.825 0.675 1.5 1.5 1.5h17c0.825 0 1.5-0.675 1.5-1.5v-15c0-0.825-0.675-1.5-1.5-1.5zM6 8c0-1.103 0.897-2 2-2h4c1.103 0 2 0.897 2 2v6h-8v-6z'/%3E%3C/svg%3E");
+}
+
+.i-pin::before {
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='%23555555' stroke-width='.07em' fill='%230080FF' viewBox='0 0 32 32'%3E%3Cpath d='M17 0l-3 3 3 3-7 8H3l5.5 5.5L0 30.77V32h1.23l11.27-8.5L18 29v-7l8-7 3 3 3-3L17 0zm-3 17l-2-2 7-7 2 2-7 7z'/%3E%3C/svg%3E");
 }
 
 .i-comments-blank::before {

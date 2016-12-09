@@ -353,9 +353,10 @@ class Ila_Integrate
 
 			$num = $data;
 			$is_image = array();
+			$preview = strpos($data, 'post_tmp_' . $user_info['id']);
 
 			// Not a preview, then sanitize the attach id and determine the actual type
-			if (strpos($data, 'post_tmp_' . $user_info['id']) === false)
+			if ($preview === false)
 			{
 				require_once(SUBSDIR . '/Attachments.subs.php');
 
@@ -364,7 +365,7 @@ class Ila_Integrate
 			}
 
 			// An image will get the light box treatment
-			if (!empty($is_image['is_image']))
+			if (!empty($is_image['is_image']) || $preview !== false)
 			{
 				$data = '<a id="link_' . $num . '" data-lightboximage="' . $num . '" href="' . $scripturl . '?action=dlattach;attach=' . $num . ';image' . '"><img src="' . $scripturl . '?action=dlattach;attach=' . $num . ';thumb" alt="" class="bbc_img" /></a>';
 			}

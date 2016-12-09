@@ -77,6 +77,7 @@ class Sphinx extends SearchAPI
 		if (!in_array(DB_TYPE, $this->supported_databases))
 		{
 			$this->is_supported = false;
+
 			return;
 		}
 
@@ -146,7 +147,9 @@ class Sphinx extends SearchAPI
 		$fulltextWord = count($subwords) === 1 ? $word : '"' . $word . '"';
 		$wordsSearch['indexed_words'][] = $fulltextWord;
 		if ($isExcluded)
+		{
 			$wordsExclude[] = $fulltextWord;
+		}
 	}
 
 	/**
@@ -163,7 +166,9 @@ class Sphinx extends SearchAPI
 		global $user_info, $context, $modSettings;
 
 		if (!$search_params['subject_only'])
+		{
 			return 0;
+		}
 
 		// Only request the results if they haven't been cached yet.
 		$cached_results = array();
@@ -189,7 +194,9 @@ class Sphinx extends SearchAPI
 
 			// Grouping by topic id makes it return only one result per topic, so don't set that for in-topic searches
 			if (empty($search_params['topic']))
+			{
 				$mySphinx->SetGroupBy('id_topic', SPH_GROUPBY_ATTR, $sphinx_sort);
+			}
 
 			// Set up the sort expression
 			$mySphinx->SetSortMode(SPH_SORT_EXPR, '(@weight + (relevance / 1000))');
@@ -199,16 +206,24 @@ class Sphinx extends SearchAPI
 
 			// Set the limits based on the search parameters.
 			if (!empty($search_params['min_msg_id']) || !empty($search_params['max_msg_id']))
+			{
 				$mySphinx->SetIDRange($search_params['min_msg_id'], empty($search_params['max_msg_id']) ? (int) $modSettings['maxMsgID'] : $search_params['max_msg_id']);
+			}
 
 			if (!empty($search_params['topic']))
+			{
 				$mySphinx->SetFilter('id_topic', array((int) $search_params['topic']));
+			}
 
 			if (!empty($search_params['brd']))
+			{
 				$mySphinx->SetFilter('id_board', $search_params['brd']);
+			}
 
 			if (!empty($search_params['memberlist']))
+			{
 				$mySphinx->SetFilter('id_member', $search_params['memberlist']);
+			}
 
 			// Construct the (binary mode & |) query while accounting for excluded words
 			$orResults = array();
@@ -218,31 +233,41 @@ class Sphinx extends SearchAPI
 				$inc_words = array_merge($inc_words, $words['indexed_words']);
 				$andResult = '';
 				foreach ($words['indexed_words'] as $sphinxWord)
+				{
 					$andResult .= (in_array($sphinxWord, $excluded_words) ? '-' : '') . $this->_cleanWordSphinx($sphinxWord, $mySphinx) . ' & ';
+				}
 				$orResults[] = substr($andResult, 0, -3);
 			}
 
 			// If no search terms are left after comparing against excluded words (i.e. "test -test" or "test last -test -last"),
 			// sending that to Sphinx would result in a fatal error
 			if (!count(array_diff($inc_words, $excluded_words)))
+			{
 				// Instead, fail gracefully (return "no results")
 				return 0;
+			}
 
 			$query = count($orResults) === 1 ? $orResults[0] : '(' . implode(') | (', $orResults) . ')';
 
 			// Subject only searches need to be specified.
 			if ($search_params['subject_only'])
+			{
 				$query = '@(subject) ' . $query;
+			}
 
 			// Choose an appropriate matching mode
 			$mode = SPH_MATCH_ALL;
 
 			// Over two words and searching for any (since we build a binary string, this will never get set)
 			if (substr_count($query, ' ') > 1 && (!empty($search_params['searchtype']) && $search_params['searchtype'] == 2))
-				   $mode = SPH_MATCH_ANY;
+			{
+				$mode = SPH_MATCH_ANY;
+			}
 			// Binary search?
 			if (preg_match('~[\|\(\)\^\$\?"\/=-]~', $query))
+			{
 				$mode = SPH_MATCH_EXTENDED;
+			}
 
 			// Set the matching mode
 			$mySphinx->SetMatchMode($mode);
@@ -255,7 +280,9 @@ class Sphinx extends SearchAPI
 			{
 				// Just log the error.
 				if ($mySphinx->GetLastError())
+				{
 					\Errors::instance()->log_error($mySphinx->GetLastError());
+				}
 
 				\Errors::instance()->fatal_lang_error('error_no_search_daemon');
 			}
@@ -269,12 +296,14 @@ class Sphinx extends SearchAPI
 			if (isset($request['matches']))
 			{
 				foreach ($request['matches'] as $msgID => $match)
+				{
 					$cached_results['matches'][$msgID] = array(
 						'id' => $match['attrs']['id_topic'],
 						'relevance' => round($match['attrs']['@count'] + $match['attrs']['relevance'] / 10000, 1) . '%',
 						'num_matches' => empty($search_params['topic']) ? $match['attrs']['@count'] : 0,
 						'matches' => array(),
 					);
+				}
 			}
 
 			// Store the search results in the cache.
@@ -282,7 +311,7 @@ class Sphinx extends SearchAPI
 		}
 
 		$participants = array();
-		foreach (array_slice(array_keys($cached_results['matches']), $_REQUEST['start'], $modSettings['search_results_per_page']) as $msgID)
+		foreach (array_slice(array_keys($cached_results['matches']), (int) $_REQUEST['start'], $modSettings['search_results_per_page']) as $msgID)
 		{
 			$context['topics'][$msgID] = $cached_results['matches'][$msgID];
 			$participants[$cached_results['matches'][$msgID]['id']] = false;
@@ -291,7 +320,9 @@ class Sphinx extends SearchAPI
 		// Sentences need to be broken up in words for proper highlighting.
 		$search_results = array();
 		foreach ($search_words as $orIndex => $words)
+		{
 			$search_results = array_merge($search_results, $search_words[$orIndex]['subject_words']);
+		}
 
 		return $cached_results['num_results'];
 	}
@@ -309,9 +340,10 @@ class Sphinx extends SearchAPI
 
 		// Unmatched (i.e. odd number of) quotation marks also cause fatal errors, so handle them
 		if (substr_count($sphinx_term, '"') % 2)
-
-		// Using preg_replace since it supports limiting the number of replacements
-		$sphinx_term = preg_replace('/"/', '', $sphinx_term, 1);
+		{
+			// Using preg_replace since it supports limiting the number of replacements
+			$sphinx_term = preg_replace('/"/', '', $sphinx_term, 1);
+		}
 
 		// Use the Sphinx API's built-in EscapeString function to escape special characters
 		$sphinx_term = $sphinx_client->EscapeString($sphinx_term);

@@ -114,7 +114,7 @@ final class ErrorHandler extends Errors
 		}
 
 		// Ignore errors if we're ignoring them or if the error code is not included in error_reporting.
-		if (!$error_level & error_reporting())
+		if (!($error_level & error_reporting()))
 		{
 			return true;
 		}

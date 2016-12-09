@@ -16,7 +16,8 @@ var disableDrafts = false;
 	'use strict';
 
 	// Editor instance
-	var editor;
+	var editor,
+		rangeHelper;
 
 	function elk_Mentions(options) {
 		// All the passed options and defaults are loaded to the opts object
@@ -39,6 +40,7 @@ var disableDrafts = false;
 			limit: 8,
 			maxLen: 25,
 			displayTpl: "<li data-value='${atwho-at}${name}' data-id='${id}'>${name}</li>",
+			acceptSpaceBar: true,
 			callbacks: {
 				filter: function (query, items, search_key) {
 					// Already cached this query, then use it
@@ -61,72 +63,58 @@ var disableDrafts = false;
 						return;
 					}
 
-					oMentions.opts._names = [];
-
 					// What we want
 					var obj = {
 						"suggest_type": "member",
 						"search": query.php_urlencode(),
 						"time": current_call
 					};
-					obj[elk_session_var] = elk_session_id;
 
 					// Make the request
-					$.ajax({
-						url: elk_scripturl + "?action=suggest;xml",
-						type: "post",
-						data: obj,
-						dataType: "xml",
-						async: false
-					})
-					.done(function(data) {
-						$(data).find('item').each(function (idx, item) {
-							if (typeof oMentions.opts._names[oMentions.opts._names.length] === 'undefined')
-								oMentions.opts._names[oMentions.opts._names.length] = {};
+					suggest(obj, function() {
+						// Update the time gate
+						oMentions.opts._last_call = current_call;
 
-							oMentions.opts._names[oMentions.opts._names.length - 1] = {
-								"id": $(item).attr('id'),
-								"name": $(item).text()
-							};
-						});
-					})
-					.fail(function(jqXHR, textStatus, errorThrown) {
-						if ('console' in window) {
-							window.console.info('Error:', textStatus, errorThrown.name);
-							window.console.info(jqXHR.responseText);
-						}
+						// Update the cache with the values for reuse in local filter
+						oMentions.opts.cache.names[query] = oMentions.opts._names;
+
+						// Update the query cache for use in revalidateMentions
+						oMentions.opts.cache.queries[oMentions.opts.cache.queries.length] = query;
+
+						callback(oMentions.opts._names);
 					});
-
-					// Update the time gate
-					oMentions.opts._last_call = current_call;
-
-					// Update the cache with the values for reuse in local filter
-					oMentions.opts.cache.names[query] = oMentions.opts._names;
-
-					// Update the query cache for use in revalidateMentions
-					oMentions.opts.cache.queries[oMentions.opts.cache.queries.length] = query;
-
-					callback(oMentions.opts._names);
 				},
 				beforeInsert: function(value, $li) {
 					oMentions.addUID($li.data('id'), $li.data('value'));
 
 					return value;
 				},
-				matcher: function(flag, subtext, should_start_with_space) {
-					var match, regexp;
+				matcher: function(flag, subtext, should_startWithSpace, acceptSpaceBar) {
+					var _a, _y, match, regexp, space;
 
 					flag = flag.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 
-					if (should_start_with_space)
+					if (should_startWithSpace) {
 						flag = '(?:^|\\s)' + flag;
+					}
 
-					regexp = new RegExp(flag + '([^ <>&"\'=\\\\\n]*)$|' + flag + '([^\\x00-\\xff]*)$', 'gi');
-					match = regexp.exec(subtext.replace());
-					if (match)
+					// Allow À - ÿ
+					_a = decodeURI("%C3%80");
+					_y = decodeURI("%C3%BF");
+
+					// Allow first last name entry?
+					space = acceptSpaceBar ? "\ " : "";
+
+					// regexp = new RegExp(flag + '([^ <>&"\'=\\\\\n]*)$|' + flag + '([^\\x00-\\xff]*)$', 'gi');
+					regexp = new RegExp(flag + "([A-Za-z" + _a + "-" + _y + "0-9_" + space + "\\[\\]\'\.\+\-]*)$|" + flag + "([^\\x00-\\xff]*)$", 'gi');
+					match = regexp.exec(subtext);
+
+					if (match) {
 						return match[2] || match[1];
-					else
+					}
+					else {
 						return null;
+					}
 				},
 				highlighter: function(li, query) {
 					var regexp;
@@ -168,6 +156,47 @@ var disableDrafts = false;
 		});
 
 		/**
+		 * Makes the ajax call for data, returns to callback function when done.
+		 *
+		 * @param obj values to pass to action suggest
+		 * @param callback function to call when we have completed our call
+		 */
+		function suggest(obj, callback)
+		{
+			var postString = "jsonString=" + JSON.stringify(obj) + "&" + elk_session_var + "=" + elk_session_id;
+
+			oMentions.opts._names = [];
+
+			$.ajax({
+				url: elk_scripturl + "?action=suggest;xml",
+				type: "post",
+				data: postString,
+				dataType: "xml"
+			})
+			.done(function(data) {
+				$(data).find('item').each(function (idx, item) {
+					if (typeof oMentions.opts._names[oMentions.opts._names.length] === 'undefined')
+						oMentions.opts._names[oMentions.opts._names.length] = {};
+
+					oMentions.opts._names[oMentions.opts._names.length - 1] = {
+						"id": $(item).attr('id'),
+						"name": $(item).text()
+					};
+				});
+
+				callback();
+			})
+			.fail(function(jqXHR, textStatus, errorThrown) {
+				if ('console' in window) {
+					window.console.info('Error:', textStatus, errorThrown.name);
+					window.console.info(jqXHR.responseText);
+				}
+
+				callback();
+			});
+		}
+
+		/**
 		 * Determine the caret position inside of sceditor's iframe
 		 *
 		 * What it does:
@@ -185,7 +214,7 @@ var disableDrafts = false;
 		 */
 		function findAtPosition() {
 			// Get sceditor's RangeHelper for use
-			var rangeHelper = editor.getRangeHelper();
+			rangeHelper = editor.getRangeHelper();
 
 			// Save the current state
 			rangeHelper.saveRange();
@@ -194,10 +223,11 @@ var disableDrafts = false;
 				parent = start.parentNode,
 				prev = start.previousSibling,
 				offset = {},
-				atPos;
+				atPos,
+				placefinder;
 
 			// Create a placefinder span containing a 'ZERO WIDTH SPACE' Character
-			var placefinder = start.ownerDocument.createElement('span');
+			placefinder = start.ownerDocument.createElement('span');
 			$(placefinder).text("200B").addClass('placefinder');
 
 			// Look back and find the mentions @ tag, so we can insert our span ahead of it
@@ -278,7 +308,7 @@ var disableDrafts = false;
 			oMentions;
 
 		base.init = function() {
-			// Grab this instance for use use in oDrafts
+			// Grab this instance for use use in oMentions
 			editor = this;
 		};
 

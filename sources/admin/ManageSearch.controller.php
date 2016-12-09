@@ -625,8 +625,6 @@ class ManageSearch_Controller extends Action_Controller
 					if ($common_name == 'searchapi')
 						continue;
 
-					$searchAPI = $search->findSearchAPI($common_name);
-
 					$apis[$index_name] = array(
 						'filename' => $file->getFilename(),
 						'setting_index' => $index_name,
