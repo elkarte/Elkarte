@@ -72,41 +72,18 @@ var disableDrafts = false;
 					obj[elk_session_var] = elk_session_id;
 
 					// Make the request
-					$.ajax({
-						url: elk_scripturl + "?action=suggest;xml",
-						type: "post",
-						data: obj,
-						dataType: "xml",
-						async: false
-					})
-					.done(function(data) {
-						$(data).find('item').each(function (idx, item) {
-							if (typeof oMentions.opts._names[oMentions.opts._names.length] === 'undefined')
-								oMentions.opts._names[oMentions.opts._names.length] = {};
+					suggest(obj, function() {
+						// Update the time gate
+						oMentions.opts._last_call = current_call;
 
-							oMentions.opts._names[oMentions.opts._names.length - 1] = {
-								"id": $(item).attr('id'),
-								"name": $(item).text()
-							};
-						});
-					})
-					.fail(function(jqXHR, textStatus, errorThrown) {
-						if ('console' in window) {
-							window.console.info('Error:', textStatus, errorThrown.name);
-							window.console.info(jqXHR.responseText);
-						}
+						// Update the cache with the values for reuse in local filter
+						oMentions.opts.cache.names[query] = oMentions.opts._names;
+
+						// Update the query cache for use in revalidateMentions
+						oMentions.opts.cache.queries[oMentions.opts.cache.queries.length] = query;
+
+						callback(oMentions.opts._names);
 					});
-
-					// Update the time gate
-					oMentions.opts._last_call = current_call;
-
-					// Update the cache with the values for reuse in local filter
-					oMentions.opts.cache.names[query] = oMentions.opts._names;
-
-					// Update the query cache for use in revalidateMentions
-					oMentions.opts.cache.queries[oMentions.opts.cache.queries.length] = query;
-
-					callback(oMentions.opts._names);
 				},
 				beforeInsert: function(value, $li) {
 					oMentions.addUID($li.data('id'), $li.data('value'));
@@ -166,6 +143,43 @@ var disableDrafts = false;
 		$(oIframeWindow).on("hidden.atwho", function(event, offset) {
 			disableDrafts = false;
 		});
+
+		/**
+		 * Makes the ajax call for data, returns to callback function when done.
+		 *
+		 * @param obj values to pass to action suggest
+		 * @param callback function to call when we have completed our call
+		 */
+		function suggest(obj, callback)
+		{
+			$.ajax({
+				url: elk_scripturl + "?action=suggest;xml",
+				type: "post",
+				data: obj,
+				dataType: "xml"
+			})
+			.done(function(data) {
+				$(data).find('item').each(function (idx, item) {
+					if (typeof oMentions.opts._names[oMentions.opts._names.length] === 'undefined')
+						oMentions.opts._names[oMentions.opts._names.length] = {};
+
+					oMentions.opts._names[oMentions.opts._names.length - 1] = {
+						"id": $(item).attr('id'),
+						"name": $(item).text()
+					};
+				});
+
+				callback();
+			})
+			.fail(function(jqXHR, textStatus, errorThrown) {
+				if ('console' in window) {
+					window.console.info('Error:', textStatus, errorThrown.name);
+					window.console.info(jqXHR.responseText);
+				}
+
+				callback();
+			});
+		}
 
 		/**
 		 * Determine the caret position inside of sceditor's iframe
@@ -278,7 +292,7 @@ var disableDrafts = false;
 			oMentions;
 
 		base.init = function() {
-			// Grab this instance for use use in oDrafts
+			// Grab this instance for use use in oMentions
 			editor = this;
 		};
 
