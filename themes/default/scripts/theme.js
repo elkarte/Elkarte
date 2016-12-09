@@ -22,13 +22,13 @@ $(function() {
 		$('#main_menu, ul.admin_menu, ul.sidebar_menu, ul.poster, ul.quickbuttons, #sort_by').superfish({delay : 300, speed: 175, hoverClass: 'sfhover'});
 
 	// Smooth scroll to top.
-	$("a[href=#top]").on("click", function(e) {
+	$("a[href='#top']").on("click", function(e) {
 		e.preventDefault();
 		$("html,body").animate({scrollTop: 0}, 1200);
 	});
 
 	// Smooth scroll to bottom.
-	$("a[href=#bot]").on("click", function(e) {
+	$("a[href='#bot']").on("click", function(e) {
 		e.preventDefault();
 
 		// Don't scroll all the way down to the footer, just the content bottom
@@ -58,7 +58,7 @@ $(function() {
 		$(this).parent().toggleClass("collapsed");
 	});
 
-	$(document).on('ready', 'legend', function () {
+	$('legend', function () {
 		if ($(this).data('collapsed'))
 			$(this).click();
 	});
