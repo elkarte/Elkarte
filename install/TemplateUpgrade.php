@@ -536,7 +536,7 @@ function template_welcome_message()
 	echo '
 			</table><br />
 			<span class="smalltext">
-				<strong>Note:</strong> If necessary the above security check can be bypassed for users who may administrate a server but not have admin rights on the forum. In order to bypass the above check simply open &quot;upgrade.php&quot; in a text editor and replace &quot;$disable_security = false;&quot; with &quot;$disable_security = true1;&quot; and refresh this page.
+				<strong>Note:</strong> If necessary the above security check can be bypassed for users who may administrate a server but not have admin rights on the forum. In order to bypass the above check simply open &quot;upgrade.php&quot; in a text editor and replace &quot;$disable_security = false;&quot; with &quot;$disable_security = true;&quot; and refresh this page.
 			</span>
 			<input type="hidden" name="login_attempt" id="login_attempt" value="1" />
 			<input type="hidden" name="js_works" id="js_works" value="0" />';
