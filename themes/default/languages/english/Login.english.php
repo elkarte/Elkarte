@@ -76,6 +76,7 @@ $txt['setting_registration_activate'] = 'Email Activation';
 $txt['setting_registration_approval'] = 'Admin Approval';
 $txt['setting_notify_new_registration'] = 'Notify administrators when a new member joins';
 $txt['setting_send_welcomeEmail'] = 'Send welcome email to new members';
+$txt['setting_show_DisplayNameOnRegistration'] = 'Allow users to enter their screen name';
 
 $txt['setting_coppaAge'] = 'Age below which to apply registration restrictions';
 $txt['setting_coppaAge_desc'] = '(Set to 0 to disable)';
