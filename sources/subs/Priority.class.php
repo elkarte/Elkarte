@@ -12,6 +12,8 @@
  */
 
 /**
+ * Priority Class An abstract class to deal with priority
+ * of template layers
  */
 class Priority
 {
@@ -192,7 +194,6 @@ class Priority
 	public function sort()
 	{
 		$this->_sorted_entities = array();
-		$all = array();
 
 		// Sorting
 		asort($this->_all_begin);
@@ -213,6 +214,7 @@ class Priority
 			'before' => array(),
 			'after' => array()
 		);
+
 		foreach ($this->_all_before as $key => $value)
 		{
 			if (in_array($value, $all_known))

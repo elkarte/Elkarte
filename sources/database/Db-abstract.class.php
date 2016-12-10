@@ -112,37 +112,21 @@ abstract class Database_Abstract implements Database
 		{
 			case 'int':
 				return $this->_replaceInt($matches[2], $replacement);
-			break;
-
 			case 'string':
 			case 'text':
 				return $this->_replaceString($replacement);
-			break;
-
 			case 'array_int':
 				return $this->_replaceArrayInt($matches[2], $replacement);
-			break;
-
 			case 'array_string':
 				return $this->_replaceArrayString($matches[2], $replacement);
-			break;
-
 			case 'date':
 				return $this->_replaceDate($matches[2], $replacement);
-			break;
-
 			case 'float':
 				return $this->_replaceFloat($matches[2], $replacement);
-			break;
-
 			case 'identifier':
 				return $this->_replaceIdentifier($replacement);
-			break;
-
 			case 'raw':
 				return $replacement;
-			break;
-
 			default:
 				$this->error_backtrace('Undefined type used in the database query. (' . $matches[1] . ':' . $matches[2] . ')', '', false, __FILE__, __LINE__);
 			break;

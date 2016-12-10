@@ -872,7 +872,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	 *
 	 * @param int $id
 	 * @param string $question
-	 * @param string $answers
+	 * @param string[] $answers
 	 * @param string $language
 	 */
 	private function _update($id, $question, $answers, $language)

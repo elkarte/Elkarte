@@ -544,14 +544,13 @@ class ManageFeatures_Controller extends Action_Controller
 		$context['sub_template'] = 'show_custom_profile';
 
 		// What about standard fields they can tweak?
-		// TODO: Join date is a moderately popular mod that would be good here.
-		$standard_fields = array('website', 'posts', 'warning_status');
+		$standard_fields = array('website', 'posts', 'warning_status', 'date_registered');
 
 		// What fields can't you put on the registration page?
-		$context['fields_no_registration'] = array('posts', 'warning_status');
+		$context['fields_no_registration'] = array('posts', 'warning_status', 'date_registered');
 
 		// Are we saving any standard field changes?
-		if (isset($this->_req->query->save))
+		if (isset($this->_req->post->save))
 		{
 			checkSession();
 			validateToken('admin-scp');
@@ -565,7 +564,9 @@ class ManageFeatures_Controller extends Action_Controller
 				foreach ($this->_req->post->active as $value)
 				{
 					if (isset($disable_fields[$value]))
+					{
 						unset($disable_fields[$value]);
+					}
 				}
 			}
 

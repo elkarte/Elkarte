@@ -281,6 +281,8 @@ $txt['last_edit_by'] = '<span class="lastedit">Last Edit</span>: %1$s by %2$s';
 $txt['notify_deactivate'] = 'Would you like to deactivate notification on this topic?';
 
 $txt['date_registered'] = 'Date Registered';
+$txt['date_joined'] = 'Joined';
+$txt['date_joined_format'] = '%b %d, %Y';
 
 $txt['recent_view'] = 'View all recent posts.';
 $txt['is_recent_updated'] = '%1$s is the most recently updated topic';

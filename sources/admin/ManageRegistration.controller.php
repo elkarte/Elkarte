@@ -168,7 +168,9 @@ class ManageRegistration_Controller extends Action_Controller
 			// Otherwise grab all of them and don't log anything
 			$error_severity = $reg_errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
 			foreach ($reg_errors->prepareErrors($error_severity) as $error)
+			{
 				throw new Elk_Exception($error, $error_severity === null ? false : 'general');
+			}
 
 			if (!empty($memberID))
 			{
@@ -187,19 +189,27 @@ class ManageRegistration_Controller extends Action_Controller
 		{
 			require_once(SUBSDIR . '/Membergroups.subs.php');
 			if (allowedTo('admin_forum'))
+			{
 				$includes = array('admin', 'globalmod', 'member');
+			}
 			else
+			{
 				$includes = array('globalmod', 'member', 'custom');
+			}
 
 			$groups = array();
 			$membergroups = getBasicMembergroupData($includes, array('hidden', 'protected'));
 			foreach ($membergroups as $membergroup)
+			{
 				$groups[$membergroup['id']] = $membergroup['name'];
+			}
 
 			$context['member_groups'] = $groups;
 		}
 		else
+		{
 			$context['member_groups'] = array();
+		}
 
 		// Basic stuff.
 		loadJavascriptFile('mailcheck.min.js');
@@ -395,17 +405,17 @@ class ManageRegistration_Controller extends Action_Controller
 		global $txt;
 
 		$config_vars = array(
-				array('select', 'registration_method', array($txt['setting_registration_standard'], $txt['setting_registration_activate'], $txt['setting_registration_approval'], $txt['setting_registration_disabled'])),
-				array('check', 'enableOpenID'),
-				array('check', 'notify_new_registration'),
-				array('check', 'send_welcomeEmail'),
-				array('check', 'show_DisplayNameOnRegistration'),
+			array('select', 'registration_method', array($txt['setting_registration_standard'], $txt['setting_registration_activate'], $txt['setting_registration_approval'], $txt['setting_registration_disabled'])),
+			array('check', 'enableOpenID'),
+			array('check', 'notify_new_registration'),
+			array('check', 'send_welcomeEmail'),
+			array('check', 'show_DisplayNameOnRegistration'),
 			'',
-				array('int', 'coppaAge', 'subtext' => $txt['setting_coppaAge_desc'], 'onchange' => 'checkCoppa();', 'onkeyup' => 'checkCoppa();'),
-				array('select', 'coppaType', array($txt['setting_coppaType_reject'], $txt['setting_coppaType_approval']), 'onchange' => 'checkCoppa();'),
-				array('large_text', 'coppaPost', 'subtext' => $txt['setting_coppaPost_desc']),
-				array('text', 'coppaFax'),
-				array('text', 'coppaPhone'),
+			array('int', 'coppaAge', 'subtext' => $txt['setting_coppaAge_desc'], 'onchange' => 'checkCoppa();', 'onkeyup' => 'checkCoppa();'),
+			array('select', 'coppaType', array($txt['setting_coppaType_reject'], $txt['setting_coppaType_approval']), 'onchange' => 'checkCoppa();'),
+			array('large_text', 'coppaPost', 'subtext' => $txt['setting_coppaPost_desc']),
+			array('text', 'coppaFax'),
+			array('text', 'coppaPhone'),
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well

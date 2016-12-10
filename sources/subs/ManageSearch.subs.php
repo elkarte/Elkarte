@@ -30,22 +30,28 @@ function detectFulltextIndex()
 	$request = $db->query('', '
 		SHOW INDEX
 		FROM {db_prefix}messages',
-		array(
-		)
+		array()
 	);
 	$context['fulltext_index'] = '';
 	if ($request !== false || $db->num_rows($request) != 0)
 	{
 		while ($row = $db->fetch_assoc($request))
-			if ($row['Column_name'] == 'body' && (isset($row['Index_type']) && $row['Index_type'] == 'FULLTEXT' || isset($row['Comment']) && $row['Comment'] == 'FULLTEXT'))
+		{
+			if ($row['Column_name'] === 'body' && (isset($row['Index_type']) && $row['Index_type'] === 'FULLTEXT' || isset($row['Comment']) && $row['Comment'] === 'FULLTEXT'))
+			{
 				$context['fulltext_index'][] = $row['Key_name'];
+			}
+		}
 		$db->free_result($request);
 
 		if (is_array($context['fulltext_index']))
+		{
 			$context['fulltext_index'] = array_unique($context['fulltext_index']);
+		}
 	}
 
 	if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
+	{
 		$request = $db->query('', '
 			SHOW TABLE STATUS
 			FROM {string:database_name}
@@ -55,7 +61,9 @@ function detectFulltextIndex()
 				'table_name' => str_replace('_', '\_', $match[2]) . 'messages',
 			)
 		);
+	}
 	else
+	{
 		$request = $db->query('', '
 			SHOW TABLE STATUS
 			LIKE {string:table_name}',
@@ -63,12 +71,17 @@ function detectFulltextIndex()
 				'table_name' => str_replace('_', '\_', $db_prefix) . 'messages',
 			)
 		);
+	}
 
 	if ($request !== false)
 	{
 		while ($row = $db->fetch_assoc($request))
-			if ((isset($row['Type']) && strtolower($row['Type']) != 'myisam') || (isset($row['Engine']) && strtolower($row['Engine']) != 'myisam'))
+		{
+			if ((isset($row['Type']) && strtolower($row['Type']) !== 'myisam') || (isset($row['Engine']) && strtolower($row['Engine']) !== 'myisam'))
+			{
 				$context['cannot_create_fulltext'] = true;
+			}
+		}
 
 		$db->free_result($request);
 	}

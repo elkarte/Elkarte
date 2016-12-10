@@ -390,7 +390,8 @@ function byte_format($number)
  * - Performs localization (more than just strftime would do alone.)
  *
  * @param int $log_time A unix timestamp
- * @param string|bool $show_today = true show "Today"/"Yesterday" or just a date
+ * @param string|bool $show_today = true show "Today"/"Yesterday",
+ *   false shows the date, a string can force a date format to use %b %d, %Y
  * @param string|bool $offset_type = false If false, uses both user time offset and forum offset.
  *   If 'forum', uses only the forum offset. Otherwise no offset is applied.
  */

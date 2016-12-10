@@ -174,7 +174,7 @@ class Filebased extends Cache_Method_Abstract
 	 *
 	 * Used by integrate_modify_cache_settings added in the title method
 	 *
-	 * @param array() $config_vars
+	 * @param array $config_vars
 	 */
 	public function settings(&$config_vars)
 	{

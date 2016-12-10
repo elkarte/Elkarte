@@ -232,7 +232,7 @@ function template_registration_form()
 						<dd>', preg_replace_callback('~<(input|select|textarea) ~', function ($matches) {
 							global $context;
 
-							return '<' . $matches[1] . ' tabindex="' . $context['tabindex']++ . '"';
+							return '<' . $matches[1] . ' tabindex="' . ($context['tabindex']++) . '"';
 						}, $field['input_html']), '</dd>';
 
 				// Drop this one so we don't show the additonal information header unless needed

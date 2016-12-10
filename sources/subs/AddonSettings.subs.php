@@ -212,7 +212,7 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
 				$exploded = explode('|', $function);
 
 				$temp_data[] = array(
-					'id' => 'hookid_' . $id++,
+					'id' => 'hookid_' . ($id++),
 					'hook_name' => $hook,
 					'function_name' => $function,
 					'real_function' => $exploded[0],
