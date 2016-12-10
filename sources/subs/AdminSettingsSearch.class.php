@@ -51,11 +51,19 @@ class AdminSettings_Search
 	public function __construct($language_files = array(), $include_files = array(), $settings_search = array())
 	{
 		if (!empty($language_files))
+		{
 			loadLanguage(implode('+', $language_files));
+		}
+
 		if (!empty($include_files))
+		{
 			$this->_include_files($include_files);
+		}
+
 		if (!empty($settings_search))
+		{
 			$this->_settings = $this->_load_settings($settings_search);
+		}
 	}
 
 	/**
@@ -69,12 +77,10 @@ class AdminSettings_Search
 	{
 		$this->_menu_name = $menu_name;
 
-		/* This is the huge array that defines everything ... it's items are formatted as follows:
-			0 = Language index (Can be array of indexes) to search through for this setting.
-			1 = URL for this indexes page.
-			2 = Help index for help associated with this item (If different from 0)
-		*/
-
+		// This is the huge array that defines everything ... it's items are formatted as follows:
+		//	0 = Language index (Can be array of indexes) to search through for this setting.
+		//	1 = URL for this indexes page.
+		//	2 = Help index for help associated with this item (If different from 0)
 		$this->_search_data = array(
 			// All the major sections of the forum.
 			'sections' => $this->_load_search_sections(),
@@ -89,6 +95,7 @@ class AdminSettings_Search
 	 * Actually perform the search of a term in the array
 	 *
 	 * @param string $search_term - The term to search
+	 *
 	 * @return string[] - an array of search results with 4 indexes:
 	 *                     - url
 	 *                     - name
@@ -113,7 +120,9 @@ class AdminSettings_Search
 					$search_result['url'] = $item[1] . ';' . $context['session_var'] . '=' . $context['session_id'];
 
 					if (substr($item[1], 0, 4) == 'area')
+					{
 						$search_result['url'] = $scripturl . '?action=admin;' . $search_result['url'] . ($section == 'settings' ? '#' . $item[0][0] : '');
+					}
 
 					$search_results[] = $search_result;
 				}
@@ -130,19 +139,22 @@ class AdminSettings_Search
 	 * @param string|string[] $item - A string or array of strings that may be
 	 *                        standalone strings, index for $txt, partial index
 	 *                        for $txt['setting_' . $item]
+	 *
 	 * @return string[] - An empty array if $search_term is not found, otherwise
 	 *                    part of the search_result array (consisting of 'name'
 	 *                    and 'help') of the term the result was found
 	 */
 	protected function _find_term($search_term, $item)
 	{
-		global $txt, $helptxt;
+		global $helptxt;
 
 		$found = false;
 		$return = array();
 
 		if (!is_array($item[0]))
+		{
 			$item[0] = array($item[0]);
+		}
 
 		foreach ($item[0] as $term)
 		{
@@ -237,18 +249,28 @@ class AdminSettings_Search
 			}
 
 			foreach ($config_vars as $var)
+			{
 				if (!empty($var[1]) && !in_array($var[0], array('permissions', 'callback', 'message', 'warning', 'title', 'desc')))
+				{
 					$settings[] = array($this->_get_label($var), $setting_area[1]);
+				}
+			}
 		}
 
 		return $settings;
 	}
 
+	/**
+	 * Checks if any configuration settings have label text that should be
+	 * included in the search
+	 *
+	 * @param $var
+	 *
+	 * @return string
+	 */
 	private function _get_label($var)
 	{
 		global $txt;
-
-		$return = array();
 
 		// See if there are any labels that might fit?
 		if (isset($var[2]) && in_array($var[2], array('file', 'db')))
@@ -297,11 +319,15 @@ class AdminSettings_Search
 			{
 				$sections[] = array($menu_item['label'], 'area=' . $menu_key);
 				if (!empty($menu_item['subsections']))
+				{
 					foreach ($menu_item['subsections'] as $key => $sublabel)
 					{
 						if (isset($sublabel['label']))
+						{
 							$sections[] = array($sublabel['label'], 'area=' . $menu_key . ';sa=' . $key);
+						}
 					}
+				}
 			}
 		}
 
