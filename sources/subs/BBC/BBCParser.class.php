@@ -52,7 +52,7 @@ class BBCParser
 	protected $do_smileys = true;
 	/** @var array  */
 	protected $open_tags = array();
-	/** @var  This is the actual tag that's open */
+	/** @var string|null This is the actual tag that's open */
 	protected $inside_tag;
 	/** @var Autolink|null  */
 	protected $autolinker;

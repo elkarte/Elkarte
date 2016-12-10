@@ -118,6 +118,7 @@ function approveAttachments($attachments)
  * @param string $query_type
  * @param bool $return_affected_messages = false
  * @param bool $autoThumbRemoval = true
+ * @return int[]|boolean returns affected messages if $return_affected_messages is set to true
  */
 function removeAttachments($condition, $query_type = '', $return_affected_messages = false, $autoThumbRemoval = true)
 {
