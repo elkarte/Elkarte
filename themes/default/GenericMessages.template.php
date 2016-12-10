@@ -43,7 +43,7 @@ function template_build_poster_div($message, $ignoring = false)
 									' . $message['member']['name'] . '
 								</a>';
 
-	// The new member info dropdown starts here. Note that conditionals have not been fully checked yet.
+	// The member info dropdown starts here.
 	$poster_div .= '
 								<ul id="msg_' . $message['id'] . '_extra_info" class="menulevel2' . ($ignoring ? ' hide"' : '" aria-haspopup="true"') . '>';
 
@@ -59,6 +59,10 @@ function template_build_poster_div($message, $ignoring = false)
 		if (!isset($context['disabled_fields']['posts']))
 			$poster_div .= '
 									<li class="listlevel2 postcount">' . $txt['member_postcount'] . ': ' . $message['member']['posts'] . '</li>';
+
+		if (!isset($context['disabled_fields']['date_registered']))
+			$poster_div .= '
+									<li class="listlevel2 registered">' . $txt['date_joined'] . ': ' . standardTime($message['member']['registered_raw'], $txt['date_joined_format']) . '</li>';
 
 		// Is karma display enabled?  Total or +/-?
 		if ($modSettings['karmaMode'] == '1')

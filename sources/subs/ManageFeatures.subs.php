@@ -327,8 +327,8 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 
 	if ($standardFields)
 	{
-		$standard_fields = array('website', 'posts', 'warning_status');
-		$fields_no_registration = array('posts', 'warning_status');
+		$standard_fields = array('website', 'posts', 'warning_status', 'date_registered');
+		$fields_no_registration = array('posts', 'warning_status', 'date_registered');
 		$disabled_fields = isset($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
 		$registration_fields = isset($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array();
 
@@ -345,7 +345,8 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 	{
 		// Load all the fields.
 		$request = $db->query('', '
-			SELECT id_field, col_name, field_name, field_desc, field_type, active, placement, vieworder
+			SELECT 
+				id_field, col_name, field_name, field_desc, field_type, active, placement, vieworder
 			FROM {db_prefix}custom_fields
 			ORDER BY {raw:sort}, vieworder ASC
 			LIMIT {int:start}, {int:items_per_page}',
@@ -356,7 +357,9 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
+		{
 			$list[$row['id_field']] = $row;
+		}
 		$db->free_result($request);
 	}
 
