@@ -551,7 +551,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$context['fields_no_registration'] = array('posts', 'warning_status');
 
 		// Are we saving any standard field changes?
-		if (isset($this->_req->query->save))
+		if (isset($this->_req->post->save))
 		{
 			checkSession();
 			validateToken('admin-scp');
@@ -565,7 +565,9 @@ class ManageFeatures_Controller extends Action_Controller
 				foreach ($this->_req->post->active as $value)
 				{
 					if (isset($disable_fields[$value]))
+					{
 						unset($disable_fields[$value]);
+					}
 				}
 			}
 
