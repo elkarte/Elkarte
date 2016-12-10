@@ -801,6 +801,7 @@ class UpgradeInstructions_upgrade_1_1
 					updateSettings(array(
 						'cal_maxyear' => '2030',
 						'cal_limityear' => '10',
+						'avatar_max_height' => '65',
 					));
 				}
 			)
