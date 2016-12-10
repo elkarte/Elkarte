@@ -23,7 +23,6 @@
  */
 class ManageSearch_Controller extends Action_Controller
 {
-
 	/**
 	 * Main entry point for the admin search settings screen.
 	 *
@@ -36,7 +35,7 @@ class ManageSearch_Controller extends Action_Controller
 	 *
 	 * @uses ManageSearch template.
 	 * @uses Search language file.
-	 * @see Action_Controller::action_index()
+	 * @see  Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
@@ -112,14 +111,18 @@ class ManageSearch_Controller extends Action_Controller
 
 		$context['search_engines'] = array();
 		if (!empty($modSettings['additional_search_engines']))
+		{
 			$context['search_engines'] = Util::unserialize($modSettings['additional_search_engines']);
+		}
 
 		for ($count = 0; $count < 3; $count++)
+		{
 			$context['search_engines'][] = array(
 				'name' => '',
 				'url' => '',
 				'separator' => '',
 			);
+		}
 
 		// A form was submitted.
 		if (isset($this->_req->query->save))
@@ -129,7 +132,9 @@ class ManageSearch_Controller extends Action_Controller
 			call_integration_hook('integrate_save_search_settings');
 
 			if (empty($this->_req->post->search_results_per_page))
+			{
 				$this->_req->post->search_results_per_page = !empty($modSettings['search_results_per_page']) ? $modSettings['search_results_per_page'] : $modSettings['defaultMaxMessages'];
+			}
 
 			$new_engines = array();
 			foreach ($this->_req->post->engine_name as $id => $searchengine)
@@ -170,17 +175,17 @@ class ManageSearch_Controller extends Action_Controller
 
 		// What are we editing anyway?
 		$config_vars = array(
-				// Permission...
-				array('permissions', 'search_posts'),
-				// Some simple settings.
-				array('check', 'search_dropdown'),
-				array('int', 'search_results_per_page'),
-				array('int', 'search_max_results', 'subtext' => $txt['search_max_results_disable']),
+			// Permission...
+			array('permissions', 'search_posts'),
+			// Some simple settings.
+			array('check', 'search_dropdown'),
+			array('int', 'search_results_per_page'),
+			array('int', 'search_max_results', 'subtext' => $txt['search_max_results_disable']),
 			'',
-				// Some limitations.
-				array('int', 'search_floodcontrol_time', 'subtext' => $txt['search_floodcontrol_time_desc'], 6, 'postinput' => $txt['seconds']),
-				array('title', 'additional_search_engines'),
-				array('callback', 'external_search_engines'),
+			// Some limitations.
+			array('int', 'search_floodcontrol_time', 'subtext' => $txt['search_floodcontrol_time_desc'], 6, 'postinput' => $txt['seconds']),
+			array('title', 'additional_search_engines'),
+			array('callback', 'external_search_engines'),
 		);
 
 		// Perhaps the search method wants to add some settings?
@@ -188,7 +193,9 @@ class ManageSearch_Controller extends Action_Controller
 		$searchAPI = $search->findSearchAPI();
 
 		if (is_callable(array($searchAPI, 'searchSettings')))
+		{
 			call_user_func_array($searchAPI->searchSettings);
+		}
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
 		call_integration_hook('integrate_modify_search_settings', array(&$config_vars));
@@ -241,17 +248,23 @@ class ManageSearch_Controller extends Action_Controller
 
 			$changes = array();
 			foreach ($factors as $factor)
+			{
 				$changes[$factor] = (int) $this->_req->post->{$factor};
+			}
 
 			updateSettings($changes);
 		}
 
 		$context['relative_weights'] = array('total' => 0);
 		foreach ($factors as $factor)
+		{
 			$context['relative_weights']['total'] += isset($modSettings[$factor]) ? $modSettings[$factor] : 0;
+		}
 
 		foreach ($factors as $factor)
+		{
 			$context['relative_weights'][$factor] = round(100 * (isset($modSettings[$factor]) ? $modSettings[$factor] : 0) / $context['relative_weights']['total'], 1);
+		}
 
 		createToken('admin-msw');
 	}
@@ -286,7 +299,9 @@ class ManageSearch_Controller extends Action_Controller
 
 		// Detect whether a fulltext index is set.
 		if ($context['supports_fulltext'])
+		{
 			detectFulltextIndex();
+		}
 
 		// Creating index, removing or simply changing the one in use?
 		if ($this->_req->getQuery('sa', 'trim', '') === 'createfulltext')
@@ -308,9 +323,11 @@ class ManageSearch_Controller extends Action_Controller
 
 			// Go back to the default search method.
 			if (!empty($modSettings['search_index']) && $modSettings['search_index'] == 'fulltext')
+			{
 				updateSettings(array(
 					'search_index' => '',
 				));
+			}
 		}
 		elseif ($this->_req->getQuery('sa', 'trim', '') === 'removecustom')
 		{
@@ -326,9 +343,11 @@ class ManageSearch_Controller extends Action_Controller
 
 			// Go back to the default search method.
 			if (!empty($modSettings['search_index']) && $modSettings['search_index'] === 'custom')
+			{
 				updateSettings(array(
 					'search_index' => '',
 				));
+			}
 		}
 		elseif (isset($this->_req->post->save))
 		{
@@ -351,8 +370,11 @@ class ManageSearch_Controller extends Action_Controller
 
 		// Get some info about the messages table, to show its size and index size.
 		if (method_exists($db_search, 'membersTableInfo'))
+		{
 			$context['table_info'] = array_merge($table_info_defaults, $db_search->membersTableInfo());
+		}
 		else
+		{
 			// Here may be wolves.
 			$context['table_info'] = array(
 				'data_length' => $txt['not_applicable'],
@@ -360,13 +382,16 @@ class ManageSearch_Controller extends Action_Controller
 				'fulltext_length' => $txt['not_applicable'],
 				'custom_index_length' => $txt['not_applicable'],
 			);
+		}
 
 		// Format the data and index length in human readable form.
 		foreach ($context['table_info'] as $type => $size)
 		{
 			// If it's not numeric then just break.  This database engine doesn't support size.
 			if (!is_numeric($size))
+			{
 				break;
+			}
 
 			$context['table_info'][$type] = byte_format($context['table_info'][$type]);
 		}
@@ -435,18 +460,21 @@ class ManageSearch_Controller extends Action_Controller
 			);
 			$context['start'] = isset($this->_req->post->start) ? (int) $this->_req->post->start : 0;
 			$context['step'] = isset($this->_req->post->step) ? (int) $this->_req->post->step : 0;
-
-			// Admin timeouts are painful when building these long indexes
-			if ($_SESSION['admin_time'] + 3300 < time() && $context['step'] >= 1)
-				$_SESSION['admin_time'] = time();
 		}
 
 		if ($context['step'] !== 0)
+		{
 			checkSession('request');
+
+			// Admin timeouts are painful when building these long indexes
+			$_SESSION['admin_time'] = time();
+		}
 
 		// Step 0: let the user determine how they like their index.
 		if ($context['step'] === 0)
+		{
 			$context['sub_template'] = 'create_index';
+		}
 
 		require_once(SUBSDIR . '/ManageSearch.subs.php');
 
@@ -466,12 +494,16 @@ class ManageSearch_Controller extends Action_Controller
 		if ($context['step'] === 2)
 		{
 			if ($context['index_settings']['bytes_per_word'] < 4)
+			{
 				$context['step'] = 3;
+			}
 			else
 			{
 				list ($context['start'], $complete) = removeCommonWordsFromIndex($context['start'], $index_properties[$context['index_settings']['bytes_per_word']]);
 				if ($complete)
+				{
 					$context['step'] = 3;
+				}
 
 				$context['sub_template'] = 'create_index_progress';
 
@@ -551,7 +583,9 @@ class ManageSearch_Controller extends Action_Controller
 						$context['error_type'] = 'serious';
 					}
 					else
+					{
 						$context['settings_message'][] = $txt['sphinx_test_passed'];
+					}
 				}
 				else
 				{
@@ -572,7 +606,9 @@ class ManageSearch_Controller extends Action_Controller
 						$context['error_type'] = 'serious';
 					}
 					else
+					{
 						$context['settings_message'][] = $txt['sphinxql_test_passed'];
+					}
 				}
 				else
 				{
@@ -610,8 +646,6 @@ class ManageSearch_Controller extends Action_Controller
 		global $txt, $scripturl;
 
 		$apis = array();
-		$search = new \ElkArte\Search\Search();
-
 		try
 		{
 			$files = new GlobIterator(SUBSDIR . '/Search/API/*.php', FilesystemIterator::SKIP_DOTS);
@@ -623,7 +657,9 @@ class ManageSearch_Controller extends Action_Controller
 					$common_name = strtolower($index_name);
 
 					if ($common_name == 'searchapi')
+					{
 						continue;
+					}
 
 					$apis[$index_name] = array(
 						'filename' => $file->getFilename(),
