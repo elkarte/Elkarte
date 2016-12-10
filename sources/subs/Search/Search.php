@@ -249,9 +249,12 @@ class Search
 		\Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 
 		// Load up the search API we are going to use.
-		if (!empty($modSettings['search_index']) && empty($searchClass))
-			$searchClass = $modSettings['search_index'];
+		if (empty($searchClass))
+		{
+			$searchClass = !empty($modSettings['search_index']) ? $modSettings['search_index'] : 'standard';
+		}
 
+		// Try to initialize the API
 		$fqcn = '\\ElkArte\\Search\\API\\' . ucfirst($searchClass);
 		if (class_exists($fqcn) && is_a($fqcn, 'ElkArte\\Search\\API\\SearchAPI', true))
 		{
