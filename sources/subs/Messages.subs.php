@@ -563,8 +563,9 @@ function recordReport($message, $poster_comment)
 
 /**
  * Count the new posts for a specific topic
+ *
  * @param int $topic
- * @param int $topicinfo
+ * @param array $topicinfo
  * @param int $timestamp
  * @return int
  */
@@ -589,6 +590,7 @@ function countNewPosts($topic, $topicinfo, $timestamp)
 	);
 	list ($start) = $db->fetch_row($request);
 	$db->free_result($request);
+
 	return $start;
 }
 
