@@ -470,10 +470,7 @@ class Codes
 				),
 				self::ATTR_CONTENT => '<img src="$1" alt="{alt}" style="{width}{height}" class="bbc_img resized" />',
 				self::ATTR_VALIDATE => function (&$tag, &$data) {
-					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
-					{
-						$data = 'http://' . $data;
-					}
+					$data = addProtocol($data);
 				},
 				self::ATTR_DISABLED_CONTENT => '($1)',
 				self::ATTR_BLOCK_LEVEL => false,
@@ -485,10 +482,7 @@ class Codes
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_CONTENT => '<img src="$1" alt="" class="bbc_img" />',
 				self::ATTR_VALIDATE => function (&$tag, &$data) {
-					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
-					{
-						$data = 'http://' . $data;
-					}
+					$data = addProtocol($data);
 				},
 				self::ATTR_DISABLED_CONTENT => '($1)',
 				self::ATTR_BLOCK_LEVEL => false,
@@ -501,10 +495,7 @@ class Codes
 				self::ATTR_CONTENT => '<a href="$1" class="bbc_link">$1</a>',
 				self::ATTR_VALIDATE => function (&$tag, &$data) {
 					//$data = removeBr($data);
-					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
-					{
-						$data = 'http://' . $data;
-					}
+					$data = addProtocol($data);
 				},
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => false,
@@ -520,9 +511,9 @@ class Codes
 					{
 						$data = '#post_' . substr($data, 1);
 					}
-					elseif (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
+					else
 					{
-						$data = 'http://' . $data;
+						$data = addProtocol($data);
 					}
 				},
 				self::ATTR_DISALLOW_CHILDREN => array(
@@ -867,10 +858,7 @@ class Codes
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_CONTENT => '<a href="$1" class="bbc_link" target="_blank">$1</a>',
 				self::ATTR_VALIDATE => function (&$tag, &$data) {
-					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
-					{
-						$data = 'http://' . $data;
-					}
+					$data = addProtocol($data);
 				},
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => false,
@@ -882,10 +870,7 @@ class Codes
 				self::ATTR_BEFORE => '<a href="$1" class="bbc_link" target="_blank">',
 				self::ATTR_AFTER => '</a>',
 				self::ATTR_VALIDATE => function (&$tag, &$data) {
-					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
-					{
-						$data = 'http://' . $data;
-					}
+					$data = addProtocol($data);
 				},
 				self::ATTR_DISALLOW_CHILDREN => array(
 					'email' => 1,
