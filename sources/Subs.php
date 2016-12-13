@@ -1795,9 +1795,10 @@ function isValidEmail($value)
  */
 function addProtocol($url, $protocols = array('http://', 'https://'))
 {
-	foreach ($protocols as $protocol)
+	$pattern = '/^(' . implode('|', array_map(function ($val) {return preg_quote($val, "/");}, $protocols)) . ')/i';
+
+	if (preg_match($pattern, $url) === 1)
 	{
-		if (substr($url, 0, strlen($protocol)) === $protocol)
 			return $url;
 	}
 
