@@ -1797,7 +1797,14 @@ function addProtocol($url, $protocols = array('http://', 'https://'))
 {
 	$pattern = '/^(' . implode('|', array_map(function ($val) {return preg_quote($val, "/");}, $protocols)) . ')/i';
 
-	if (preg_match($pattern, $url) === 1)
+	$found = false;
+	$url = preg_replace_callback($pattern, function($match) use (&$found) {
+		$found = true;
+
+		return strtolower($match[0]);
+	}, $url);
+
+	if ($found === true)
 	{
 			return $url;
 	}
