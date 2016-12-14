@@ -10,7 +10,7 @@ class TestManagePostsSettings extends PHPUnit_Framework_TestCase
 	 */
 	function setUp()
 	{
-		//
+		loadLanguage('Admin', 'english', true, true);
 	}
 
 	/**
@@ -18,9 +18,6 @@ class TestManagePostsSettings extends PHPUnit_Framework_TestCase
 	 */
 	public function testSettings()
 	{
-		// Trick
-		loadLanguage('Admin');
-
 		$controller = new ManagePosts_Controller(new Event_Manager());
 		$controller->pre_dispatch();
 		$settings = $controller->settings_search();

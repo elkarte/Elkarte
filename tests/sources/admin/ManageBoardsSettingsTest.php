@@ -10,7 +10,7 @@ class TestManageBoardsSettings extends PHPUnit_Framework_TestCase
 	 */
 	function setUp()
 	{
-		//
+		loadLanguage('ManagePermissions', 'english', true, true);
 	}
 
 	/**
