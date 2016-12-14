@@ -1798,6 +1798,7 @@ function addProtocol($url, $protocols = array())
 	if (empty($protocols))
 	{
 		$pattern = '~^(http://|https://)~i';
+		$protocols = array('http://');
 	}
 	else
 	{
