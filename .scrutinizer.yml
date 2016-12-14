@@ -71,15 +71,10 @@ checks:
         no_unnecessary_if: true
         no_unnecessary_final_modifier: true
         no_trailing_whitespace: true
-        no_short_method_names:
-            minimum: '3'
         no_short_open_tag: true
         no_property_on_interface: true
         no_non_implemented_abstract_methods: true
         no_goto: true
-        no_exit: true
-        no_eval: true
-        no_error_suppression: true
         no_empty_statements: true
         no_duplicate_arguments: true
         no_debug_code: true
@@ -109,7 +104,6 @@ checks:
         avoid_usage_of_logical_operators: true
         avoid_unnecessary_concatenation: true
         avoid_superglobals: false
-        avoid_perl_style_comments: true
         avoid_multiple_statements_on_same_line: true
         avoid_length_functions_in_loops: true
         avoid_duplicate_types: false
@@ -130,8 +124,6 @@ checks:
         use_isnan: true
         radix: true
         one_var: true
-        no_var: true
-        no_use_before_define: true
         no_unused_vars: true
         no_unreachable: true
         no_undefined: true
