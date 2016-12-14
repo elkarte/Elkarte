@@ -178,6 +178,8 @@ final class ErrorHandler extends Errors
 	/**
 	 * Display debug information, shows exceptions / errors similar to standard
 	 * PHP error output.
+	 *
+	 * @param string $message
 	 */
 	private function _displayDebug($message)
 	{

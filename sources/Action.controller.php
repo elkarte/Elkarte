@@ -62,18 +62,21 @@ abstract class Action_Controller
 	/**
 	 * Standard method to add an "home" button when using a custom action
 	 * as forum index.
+	 *
+	 * @param array $buttons
 	 */
 	public static function addForumButton(&$buttons)
 	{
 		global $scripturl, $txt;
 
-		$buttons = array_merge(array('base' => array(
-				'title' => $txt['home'],
-				'href' => $scripturl,
-				'data-icon' => 'i-home',
-				'show' => true,
-				'action_hook' => true,
-			)), $buttons);
+		$buttons = array_merge(array(
+			'base' => array(
+			'title' => $txt['home'],
+			'href' => $scripturl,
+			'data-icon' => 'i-home',
+			'show' => true,
+			'action_hook' => true,
+		)), $buttons);
 
 		$buttons['home']['href'] = $scripturl . '?action=forum';
 		$buttons['home']['data-icon'] = 'i-comment-blank';
@@ -82,6 +85,8 @@ abstract class Action_Controller
 	/**
 	 * Standard method to tweak the current action when using a custom
 	 * action as forum index.
+	 *
+	 * @param string $current_action
 	 */
 	public static function fixCurrentAction(&$current_action)
 	{
