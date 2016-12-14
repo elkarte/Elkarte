@@ -1392,7 +1392,7 @@ class BBCParser
 	/**
 	 * Get the last opened tag
 	 *
-	 * @return array
+	 * @return string
 	 */
 	protected function getLastOpenedTag()
 	{
