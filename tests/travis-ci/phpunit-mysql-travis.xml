@@ -18,6 +18,21 @@
           <directory suffix="Basic.php">/var/www/tests</directory>
       </testsuite>
   </testsuites>
+
+  <logging>
+     <log type="coverage-clover" target="/tmp/coverage.xml"/>
+     <log type="coverage-text" target="php://stdout" />
+  </logging>
+
+  <filter>
+      <whitelist addUncoveredFilesFromWhitelist="true">
+          <directory suffix=".php">/var/www/sources</directory>
+          <exclude>
+              <directory suffix=".php">/var/www/sources/ext</directory>
+          </exclude>
+      </whitelist>
+  </filter>
+
   <php>
       <const name="DBTYPE" value="MySQL"/>
   </php>
