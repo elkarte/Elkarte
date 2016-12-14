@@ -17,6 +17,11 @@
 
 namespace ElkArte\sources\subs\SettingsFormAdapter;
 
+/**
+ * Class File
+ *
+ * @package ElkArte\sources\subs\SettingsFormAdapter
+ */
 class File extends Db
 {
 	/**
@@ -57,7 +62,7 @@ class File extends Db
 	 */
 	public function prepare()
 	{
-		global $context, $modSettings;
+		global $modSettings;
 
 		$defines = array(
 			'boarddir',

@@ -47,7 +47,7 @@ class Admin_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		global $txt, $context, $scripturl, $modSettings, $settings;
+		global $context, $modSettings;
 
 		// Make sure the administrator has a valid session...
 		validateSession();
@@ -78,6 +78,15 @@ class Admin_Controller extends Action_Controller
 		callMenu($admin_include_data);
 	}
 
+	/**
+	 * Load the admin_areas array
+	 *
+	 * - Triggers addMenu admin_areas event
+	 * - Calls integration integrate_admin_include
+	 *
+	 * @return false|mixed[]
+	 * @throws Elk_Exception no_access
+	 */
 	private function loadMenu()
 	{
 		global $txt, $context, $scripturl, $modSettings, $settings;
@@ -569,9 +578,14 @@ class Admin_Controller extends Action_Controller
 		return $admin_include_data;
 	}
 
+	/**
+	 * Builds out the navigation link tree for the admin area
+	 *
+	 * @param array $admin_include_data
+	 */
 	private function buildLinktree($admin_include_data)
 	{
-		global $txt, $context, $scripturl, $modSettings, $settings;
+		global $txt, $context, $scripturl;
 
 		// Build the link tree.
 		$context['linktree'][] = array(

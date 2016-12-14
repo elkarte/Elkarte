@@ -339,7 +339,7 @@ class ManagePaid_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $scripturl, $txt, $settings;
+							global $scripturl, $txt;
 
 							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=viewsub;sid=' . $rowData['id'] . '"><i class="icon i-view" title="' . $txt['view'] . '"></i></a>';
 						},
@@ -365,7 +365,7 @@ class ManagePaid_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $txt, $scripturl, $settings;
+							global $txt, $scripturl;
 
 							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modify;delete;sid=' . $rowData['id'] . '"><i class="icon i-delete" title="' . $txt['delete'] . '"></i></a>';
 						},

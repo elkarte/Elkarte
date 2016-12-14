@@ -124,11 +124,13 @@ class Elk_Exception extends Exception
 	 * Loads the languadge file specified in Elk_Exception::parseMessage()
 	 * and replaces the index received in the constructor.
 	 *
+	 * @param string $message
+	 *
 	 * @return string The index or the message.
 	 */
 	protected function loadMessage($message)
 	{
-		global $user_info, $language, $txt;
+		global $txt;
 
 		list ($msg, $lang) = $this->parseMessage($message);
 		$this->logMessage($message, $lang);
@@ -140,8 +142,11 @@ class Elk_Exception extends Exception
 	}
 
 	/**
-	 * Loads the languadge file specified in Elk_Exception::parseMessage()
+	 * Loads the language file specified in Elk_Exception::parseMessage()
 	 * and replaces the index received in the constructor.
+	 *
+	 * @param string $msg
+	 * @param string $lang
 	 *
 	 * @return string The index or the message.
 	 */
@@ -149,10 +154,8 @@ class Elk_Exception extends Exception
 	{
 		global $user_info, $language, $txt;
 
-		/*
-		 * Don't need to reload the language file if both the user and
-		 * the forum share the same languasge.
-		 */
+		// Don't need to reload the language file if both the user and
+		// the forum share the same languasge.
 		if ($language == $user_info['language'])
 			loadLanguage($lang, $language);
 

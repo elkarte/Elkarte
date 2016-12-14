@@ -761,7 +761,7 @@ function template_inline_permissions($permission)
  */
 function template_postmod_permissions()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt, $modSettings;
 
 	echo '
 	<div id="admin_form_wrapper">
