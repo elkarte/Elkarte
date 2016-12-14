@@ -48,6 +48,10 @@ class TestAdminSearch extends PHPUnit_Framework_TestCase
 		global $context;
 		global $user_info;
 
+		/*
+		 * Forcefully reload language files to combat PHPUnit
+		 * messing up globals between tests.
+		 */
 		loadLanguage('Admin', 'english', true, true);
 		$user_info['permissions'][] = 'admin_forum';
 		$this->controller = new Admin_Controller(new Event_Manager());
