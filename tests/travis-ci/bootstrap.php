@@ -77,6 +77,13 @@ loadBoard();
 loadPermissions();
 loadTheme();
 
+// It should be added to the install and upgrade scripts.
+// But since the converters need to be updated also. This is easier.
+updateSettings(array(
+	'attachmentUploadDir' => serialize(array(1 => $modSettings['attachmentUploadDir'])),
+	'currentAttachmentUploadDir' => 1,
+));
+
 // Basic language is good to have for functional tests
 loadLanguage('index+Errors');
 

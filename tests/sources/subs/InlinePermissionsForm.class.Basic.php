@@ -16,14 +16,8 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 	 */
 	public function setUp()
 	{
-		global $settings, $boardurl, $txt, $language, $user_info, $db_prefix;
+		global $user_info;
 
-		// All this to initialize a language.
-		// @todo Surely there must be a better way...
-		$settings['theme_url'] = $settings['default_theme_url'] = $boardurl . '/themes/default';
-		$settings['theme_dir'] = $settings['default_theme_dir'] = BOARDDIR . '/themes/default';
-		$language = 'english';
-		$txt = array();
 		loadLanguage('Admin', 'english', true, true);
 
 		// Elevate the user.

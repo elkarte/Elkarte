@@ -13,13 +13,23 @@ class TestAdminSearch extends PHPUnit_Framework_TestCase
 	/**
 	 * Cleans up the environment after running a test.
 	 */
-	public function tearDown()
+	public function __destruct()
 	{
-		global $txt, $user_info;
+		global $user_info;
 
-		$txt = array();
-		$this->controller = null;
-		$user_info['permissions'][] = array();
+		$user_info['permissions'] = array();
+	}
+
+	/**
+	 * Hacky solution to generate coverage for the internal search methods
+	 * since calling the function within the data provider doesn't seem
+	 * to indicate any extra coverage generation.
+	 */
+	public function testBeforeSearchSettings()
+	{
+		global $context;
+
+		$this->settingsProvider();
 	}
 
 	/**
@@ -35,11 +45,14 @@ class TestAdminSearch extends PHPUnit_Framework_TestCase
 
 	public function settingsProvider()
 	{
-		global $context, $user_info;
+		global $context;
+		global $user_info;
 
 		loadLanguage('Admin', 'english', true, true);
 		$user_info['permissions'][] = 'admin_forum';
 		$this->controller = new Admin_Controller(new Event_Manager());
+
+		// Won't hurt to call this again...
 		$method = new ReflectionMethod($this->controller, 'loadMenu');
 		$method->setAccessible(true);
 		$method->invoke($this->controller);
@@ -47,10 +60,10 @@ class TestAdminSearch extends PHPUnit_Framework_TestCase
 		$context['search_term'] = 'enable';
 		$this->controller->action_search_internal();
 
-		return new ArrayIterator(array_map(function ($search_result)
+		return array_map(function ($search_result)
 			{
 				return array($search_result['url'], strtolower($search_result['name']));
 			}, $context['search_results']
-		));
+		);
 	}
 }

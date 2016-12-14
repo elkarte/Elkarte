@@ -47,6 +47,7 @@ class TestProfileInfo extends PHPUnit_Framework_TestCase
 		);
 
 		loadTheme();
+		loadLanguage('Profile', 'english', true, true);
 	}
 
 	/**
