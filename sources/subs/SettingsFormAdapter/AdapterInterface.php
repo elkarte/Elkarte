@@ -17,6 +17,11 @@
 
 namespace ElkArte\sources\subs\SettingsFormAdapter;
 
+/**
+ * Interface AdapterInterface
+ *
+ * @package ElkArte\sources\subs\SettingsFormAdapter
+ */
 interface AdapterInterface
 {
 	/**

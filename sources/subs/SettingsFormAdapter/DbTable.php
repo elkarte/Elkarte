@@ -13,6 +13,11 @@
 
 namespace ElkArte\sources\subs\SettingsFormAdapter;
 
+/**
+ * Class DbTable
+ *
+ * @package ElkArte\sources\subs\SettingsFormAdapter
+ */
 class DbTable extends Db
 {
 	private $db;
@@ -37,6 +42,9 @@ class DbTable extends Db
 	 */
 	private $indexes = array();
 
+	/**
+	 * DbTable constructor.
+	 */
 	public function __construct()
 	{
 		$this->db = database();

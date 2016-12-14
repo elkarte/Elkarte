@@ -301,6 +301,9 @@ class Browser_Detector
 		$this->_setMajorVersion();
 	}
 
+	/**
+	 * Returns the major revision number for a given ua string
+	 */
 	private function _setMajorVersion()
 	{
 		if ($this->_browsers['is_chrome'])

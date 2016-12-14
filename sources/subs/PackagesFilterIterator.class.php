@@ -18,6 +18,11 @@
  */
 class PackagesFilterIterator extends \FilterIterator
 {
+	/**
+	 * Identify if a file is a valid package type.
+	 *
+	 * @return bool
+	 */
 	public function accept()
 	{
 		$current = $this->current();
@@ -28,17 +33,20 @@ class PackagesFilterIterator extends \FilterIterator
 		{
 			return false;
 		}
+
 		// The temp directory that may or may not be present.
 		if ($filename === 'temp')
 		{
 			return false;
 		}
+
 		// Anything that, once extracted, doesn't contain a package-info.xml.
 		if (!($current->isDir()) && file_exists($current->getPathname() . '/package-info.xml'))
 		{
 			return false;
 		}
-		// And finally, ccept anything that has a "package-like" extension.
+
+		// And finally, accept anything that has a "package-like" extension.
 		return
 			substr(strtolower($filename), -7) == '.tar.gz'
 			|| substr(strtolower($filename), -4) != '.tgz'
