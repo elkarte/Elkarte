@@ -1793,9 +1793,16 @@ function isValidEmail($value)
  *                 added if none is found (optional, default array('http://', 'https://'))
  * @return string - The url with the protocol
  */
-function addProtocol($url, $protocols = array('http://', 'https://'))
+function addProtocol($url, $protocols = array())
 {
-	$pattern = '/^(' . implode('|', array_map(function ($val) {return preg_quote($val, "/");}, $protocols)) . ')/i';
+	if (empty($protocols))
+	{
+		$pattern = '~^(http://|https://)~i';
+	}
+	else
+	{
+		$pattern = '~^(' . implode('|', array_map(function ($val) {return preg_quote($val, '~');}, $protocols)) . ')~i';
+	}
 
 	$found = false;
 	$url = preg_replace_callback($pattern, function($match) use (&$found) {
