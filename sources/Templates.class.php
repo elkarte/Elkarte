@@ -114,11 +114,12 @@ class Templates
 	 *
 	 * @uses $this->templateInclude() to include the file.
 	 *
-	 * @param string|false $template_name
+	 * @param string|false    $template_name
 	 * @param string[]|string $style_sheets any style sheets to load with the template
-	 * @param bool $fatal = true if fatal is true, dies with an error message if the template cannot be found
+	 * @param bool            $fatal = true if fatal is true, dies with an error message if the template cannot be found
 	 *
-	 * @return boolean|null
+	 * @return bool|null
+	 * @throws Elk_Exception theme_template_error
 	 */
 	protected function requireTemplate($template_name, $style_sheets, $fatal)
 	{
@@ -480,9 +481,11 @@ class Templates
 	 *
 	 * @todo get rid of reading $_REQUEST directly
 	 *
-	 * @param string $sub_template_name
+	 * @param string      $sub_template_name
 	 * @param bool|string $fatal = false, $fatal = true is for templates that
 	 *   shouldn't get a 'pretty' error screen 'ignore' to skip
+	 *
+	 * @throws Elk_Exception theme_template_error
 	 */
 	public function loadSubTemplate($sub_template_name, $fatal = false)
 	{

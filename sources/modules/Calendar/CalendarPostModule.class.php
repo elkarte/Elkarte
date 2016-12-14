@@ -166,6 +166,8 @@ class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
 	 * Loads in context stuff related to the event
 	 *
 	 * @param int $event_id The id of the event
+	 *
+	 * @throws Elk_Exception cannot_post_new, invalid_year, invalid_month
 	 */
 	private function _prepareEventContext($event_id)
 	{

@@ -121,11 +121,13 @@ class UnTgz
 	/**
 	 * Class initialization, passes variables, loads dependencies
 	 *
-	 * @param string $data
-	 * @param string $destination
-	 * @param bool|string $single_file
-	 * @param bool $overwrite
+	 * @param string        $data
+	 * @param string        $destination
+	 * @param bool|string   $single_file
+	 * @param bool          $overwrite
 	 * @param null|string[] $files_to_extract
+	 *
+	 * @throws Elk_Exception package_no_zlib
 	 */
 	public function __construct($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 	{

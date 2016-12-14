@@ -315,6 +315,9 @@ function loadThemesAffected($id)
  *
  * @param string $path
  * @param string $relative
+ *
+ * @return array
+ * @throws Elk_Exception error_invalid_dir
  */
 function get_file_listing($path, $relative)
 {
@@ -721,6 +724,8 @@ function addThemeOptions($id_theme, $options, $value)
  * Deletes a theme from the database.
  *
  * @param int $id
+ *
+ * @throws Elk_Exception no_access
  */
 function deleteTheme($id)
 {

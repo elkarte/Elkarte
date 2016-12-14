@@ -934,6 +934,7 @@ class ProfileOptions_Controller extends Action_Controller
 	 * This function actually makes all the group changes
 	 *
 	 * @return string
+	 * @throws Elk_Exception no_access
 	 */
 	public function action_groupMembership2()
 	{

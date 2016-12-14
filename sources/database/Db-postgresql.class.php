@@ -479,8 +479,10 @@ class Database_PostgreSQL extends Database_Abstract
 	 * Database error.
 	 * Backtrace, log, try to fix.
 	 *
-	 * @param string $db_string
+	 * @param string        $db_string
 	 * @param resource|null $connection = null
+	 *
+	 * @throws Elk_Exception
 	 */
 	public function error($db_string, $connection = null)
 	{

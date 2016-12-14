@@ -396,8 +396,11 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
  * - if username is not set, only a new password is generated and sent.
  *
  * @package Authorization
- * @param int $memID
+ *
+ * @param int         $memID
  * @param string|null $username = null
+ *
+ * @throws Elk_Exception
  */
 function resetPassword($memID, $username = null)
 {
@@ -731,11 +734,13 @@ function isFirstLogin($id_member)
  * Search for a member by given criteria
  *
  * @package Authorization
- * @param string $where
+ *
+ * @param string  $where
  * @param mixed[] $where_params array of values to used in the where statement
- * @param bool $fatal
+ * @param bool    $fatal
  *
  * @return array of members data or false on failure
+ * @throws Elk_Exception no_user_with_email
  */
 function findUser($where, $where_params, $fatal = true)
 {

@@ -671,7 +671,11 @@ function attachmentUploadChecks($attachID)
  * - Requires that $_SESSION['temp_attachments'][$attachID] be properly populated.
  *
  * @package Attachments
+ *
  * @param int $attachID id of the attachment to check
+ *
+ * @return bool
+ * @throws Elk_Exception attach_check_nag
  */
 function attachmentChecks($attachID)
 {

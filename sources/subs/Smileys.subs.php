@@ -184,7 +184,9 @@ function updateSmiley($param)
  * Get detailed smiley information
  *
  * @param int $id
+ *
  * @return array
+ * @throws Elk_Exception smiley_not_found
  */
 function getSmiley($id)
 {

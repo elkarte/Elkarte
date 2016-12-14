@@ -236,6 +236,8 @@ class PersonalMessage_Controller extends Action_Controller
 	 * A menu to easily access different areas of the PM section
 	 *
 	 * @param string $area
+	 *
+	 * @throws Elk_Exception no_access
 	 */
 	private function _messageIndexBar($area)
 	{
@@ -1254,6 +1256,8 @@ class PersonalMessage_Controller extends Action_Controller
 	 * @param mixed[] $named_recipients
 	 * @param mixed[] $recipient_ids array keys of [bbc] => int[] and [to] => int[]
 	 * @param mixed[] $msg_options body, subject and reply values
+	 *
+	 * @throws Elk_Exception pm_not_yours
 	 */
 	public function messagePostError($named_recipients, $recipient_ids = array(), $msg_options = null)
 	{

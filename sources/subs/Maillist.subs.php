@@ -254,9 +254,12 @@ function list_count_filter_parser($id, $style)
  * - It will load only that filter/parser
  *
  * @package Maillist
- * @param int $id
+ *
+ * @param int    $id
  * @param string $style parser or filter
+ *
  * @return array of filters/parsers
+ * @throws Elk_Exception email_error_no_filter
  */
 function maillist_load_filter_parser($id, $style)
 {

@@ -188,7 +188,9 @@ class OpenID
 	 * Create and store an association to the given server.
 	 *
 	 * @param string $server
+	 *
 	 * @return array
+	 * @throws Elk_Exception openid_server_bad_response
 	 */
 	public function makeAssociation($server)
 	{
@@ -397,7 +399,9 @@ class OpenID
 	 * Retrieve server information.
 	 *
 	 * @param string $openid_url
-	 * @return boolean|array
+	 *
+	 * @return array|bool
+	 * @throws Elk_Exception openid_server_bad_response
 	 */
 	public function getServerInfo($openid_url)
 	{
@@ -473,7 +477,9 @@ function binary_to_long($str)
  * magnitude.
  *
  * @param string $value
+ *
  * @return string
+ * @throws Elk_Exception Only non-negative integers allowed
  */
 function long_to_binary($value)
 {

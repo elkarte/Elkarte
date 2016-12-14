@@ -2114,7 +2114,11 @@ function loadPMRecipientsAll($pmsg, $bcc_count = false)
  * - Supplied ID must have been sent to the user id requesting it and it must not have been deleted
  *
  * @package PersonalMessage
+ *
  * @param int $pm_id
+ *
+ * @return
+ * @throws Elk_Exception no_access
  */
 function loadPersonalMessage($pm_id)
 {

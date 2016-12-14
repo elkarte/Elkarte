@@ -464,9 +464,12 @@ function deleteMembers($users, $check_not_admin = false)
  * @package Members
  * @uses Auth.subs.php
  * @uses Mail.subs.php
+ *
  * @param mixed[] $regOptions
- * @param string $ErrorContext
- * @return integer the ID of the newly created member
+ * @param string  $ErrorContext
+ *
+ * @return int the ID of the newly created member
+ * @throws Elk_Exception no_theme
  */
 function registerMember(&$regOptions, $ErrorContext = 'register')
 {
@@ -812,10 +815,14 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
  * - the id_member variable is used to ignore duplicate matches with the current member.
  *
  * @package Members
+ *
  * @param string $name
- * @param int $current_ID_MEMBER
- * @param bool $is_name
- * @param bool $fatal
+ * @param int    $current_ID_MEMBER
+ * @param bool   $is_name
+ * @param bool   $fatal
+ *
+ * @return bool
+ * @throws Elk_Exception username_reserved, name_censored
  */
 function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal = true)
 {
@@ -922,10 +929,13 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
  * - The function takes different permission settings into account.
  *
  * @package Members
- * @param string $permission
+ *
+ * @param string       $permission
  * @param integer|null $board_id = null
- * @return an array containing an array for the allowed membergroup ID's
+ *
+ * @return array containing an array for the allowed membergroup ID's
  * and an array for the denied membergroup ID's.
+ * @throws Elk_Exception no_board
  */
 function groupsAllowedTo($permission, $board_id = null)
 {

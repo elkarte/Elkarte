@@ -174,6 +174,9 @@ function quoteMessageInfo($id_msg, $modify)
  * doesn't have permissions to modify the message.
  *
  * @param int $message
+ *
+ * @return array|bool
+ * @throws Elk_Exception modify_post_time_passed
  */
 function checkMessagePermissions($message)
 {

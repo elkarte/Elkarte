@@ -67,7 +67,9 @@ class Display_Controller extends Action_Controller
 	 * This is an abuse of the method, but it's easier that way.
 	 *
 	 * @param string $action the function name of the current action
-	 * @return boolean
+	 *
+	 * @return bool
+	 * @throws Elk_Exception not_a_topic
 	 */
 	public function trackStats($action = '')
 	{

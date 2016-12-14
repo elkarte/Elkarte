@@ -230,6 +230,8 @@ function is_not_guest($message = '', $is_fatal = true)
  * - Forces a recheck if force_check is true.
  *
  * @param bool $forceCheck = false
+ *
+ * @throws Elk_Exception
  */
 function is_not_banned($forceCheck = false)
 {
@@ -604,9 +606,12 @@ function log_ban($ban_ids = array(), $email = null)
  * - Performs an immediate ban if the turns turns out positive.
  *
  * @package Bans
+ *
  * @param string $email
  * @param string $restriction
  * @param string $error
+ *
+ * @throws Elk_Exception
  */
 function isBannedEmail($email, $restriction, $error)
 {
@@ -680,8 +685,10 @@ function isBannedEmail($email, $restriction, $error)
  *
  * @param string $type = 'post' (post, get, request)
  * @param string $from_action = ''
- * @param bool $is_fatal = true
+ * @param bool   $is_fatal = true
+ *
  * @return string the error message if is_fatal is false.
+ * @throws Elk_Exception
  */
 function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 {
@@ -823,9 +830,11 @@ function createToken($action, $type = 'post')
  *
  * @param string $action
  * @param string $type = 'post' (get, request, or post)
- * @param bool $reset = true Reset the token on failure
- * @param bool $fatal if true a fatal_lang_error is issued for invalid tokens, otherwise false is returned
- * @return boolean except for $action == 'login' where the token is returned
+ * @param bool   $reset = true Reset the token on failure
+ * @param bool   $fatal if true a fatal_lang_error is issued for invalid tokens, otherwise false is returned
+ *
+ * @return bool except for $action == 'login' where the token is returned
+ * @throws Elk_Exception token_verify_fail
  */
 function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 {
@@ -938,7 +947,10 @@ function cleanTokens($complete = false, $suffix = '')
  * - Frees a sequence number without checking if action == 'free'.
  *
  * @param string $action
- * @param bool $is_fatal = true
+ * @param bool   $is_fatal = true
+ *
+ * @return bool
+ * @throws Elk_Exception error_form_already_submitted
  */
 function checkSubmitOnce($action, $is_fatal = false)
 {
@@ -1069,7 +1081,9 @@ function allowedTo($permission, $boards = null)
  * - If they are a guest and cannot do it, this calls is_not_guest().
  *
  * @param string[]|string $permission array of or single string, of permissions to check
- * @param int[]|null $boards = null
+ * @param int[]|null      $boards = null
+ *
+ * @throws Elk_Exception
  */
 function isAllowedTo($permission, $boards = null)
 {
@@ -1271,8 +1285,11 @@ function showEmailAddress($userProfile_hideEmail, $userProfile_id)
  * - The time taken depends on error_type - generally uses the modSetting.
  * - Generates a fatal message when triggered, suspending execution.
  *
- * @param string $error_type used also as a $txt index. (not an actual string.)
+ * @param string  $error_type used also as a $txt index. (not an actual string.)
  * @param boolean $fatal is the spam check a fatal error on failure
+ *
+ * @return bool|int|mixed
+ * @throws Elk_Exception
  */
 function spamProtection($error_type, $fatal = true)
 {
@@ -1493,9 +1510,11 @@ function loadBadBehavior()
  *
  * - Importantly, even if the password was right we DON'T TELL THEM!
  *
- * @param int $id_member
+ * @param int         $id_member
  * @param string|bool $password_flood_value = false or string joined on |'s
- * @param boolean $was_correct = false
+ * @param boolean     $was_correct = false
+ *
+ * @throws Elk_Exception no_access
  */
 function validatePasswordFlood($id_member, $password_flood_value = false, $was_correct = false)
 {

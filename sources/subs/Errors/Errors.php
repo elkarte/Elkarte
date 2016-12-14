@@ -99,6 +99,15 @@ class Errors extends AbstractModel
 		return $query_string;
 	}
 
+	/**
+	 * Insert an error entry in to the log_errors table
+	 *
+	 * @param string $query_string
+	 * @param string $error_message
+	 * @param string $error_type
+	 * @param string $file
+	 * @param int $line
+	 */
 	private function insertLog($query_string, $error_message, $error_type, $file, $line)
 	{
 		global $user_info, $last_error;
@@ -209,8 +218,10 @@ class Errors extends AbstractModel
 	 * - This function stops execution and displays an error message.
 	 * - It logs the error message if $log is specified.
 	 *
-	 * @param string $error
+	 * @param string         $error
 	 * @param string|boolean $log defaults to 'general' false will skip logging, true will use general
+	 *
+	 * @throws Elk_Exception
 	 */
 	public function fatal_error($error = '', $log = 'general')
 	{
@@ -228,9 +239,11 @@ class Errors extends AbstractModel
 	 * - uses Errors language file and applies the $sprintf information if specified.
 	 * - the information is logged if log is specified.
 	 *
-	 * @param string $error
+	 * @param string         $error
 	 * @param string|boolean $log defaults to 'general' false will skip logging, true will use general
-	 * @param string[] $sprintf defaults to empty array()
+	 * @param string[]       $sprintf defaults to empty array()
+	 *
+	 * @throws Elk_Exception
 	 */
 	public function fatal_lang_error($error, $log = 'general', $sprintf = array())
 	{

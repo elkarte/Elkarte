@@ -180,9 +180,11 @@ class Calendar_Event
 	 * If new the default values are loaded.
 	 *
 	 * @param array $options The options may come from a form. Used to set
-	 *                 some of the defaults in case of new events.
-	 * @param int $member_id - the id of the member saving the event
+	 *              some of the defaults in case of new events.
+	 * @param int   $member_id - the id of the member saving the event
+	 *
 	 * @return mixed[] The event structure.
+	 * @throws Elk_Exception no_access
 	 */
 	public function load($options, $member_id)
 	{

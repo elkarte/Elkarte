@@ -93,10 +93,12 @@ function reencodeImage($fileName, $preferred_format = 0)
  * - if extensiveCheck is true, searches for asp/php short tags as well.
  *
  * @package Graphics
+ *
  * @param string $fileName The path to the file
- * @param bool $extensiveCheck = false if it should perform extensive checks
+ * @param bool   $extensiveCheck = false if it should perform extensive checks
  *
  * @return bool Whether the image appears to be safe
+ * @throws Elk_Exception attach_timeout
  */
 function checkImageContents($fileName, $extensiveCheck = false)
 {

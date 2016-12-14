@@ -316,8 +316,11 @@ function updateTask($id_task, $disabled = null, $offset = null, $interval = null
  * Loads the details from a given task.
  *
  * @package ScheduledTasks
+ *
  * @param int $id_task
+ *
  * @return array
+ * @throws Elk_Exception no_access
  */
 function loadTaskDetails($id_task)
 {
