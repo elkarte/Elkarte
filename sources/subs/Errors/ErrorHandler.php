@@ -256,9 +256,9 @@ final class ErrorHandler extends Errors
 			$result[] = sprintf(
 				$traceline,
 				$key,
-				$stackPoint['file'],
-				$stackPoint['line'],
-				$stackPoint['function'],
+				!empty($stackPoint['file']) ? $stackPoint['file'] : '',
+				!empty($stackPoint['line']) ? $stackPoint['line'] : '',
+				!empty($stackPoint['function']) ? $stackPoint['function'] : '',
 				implode(', ', $stackPoint['args'])
 			);
 		}
