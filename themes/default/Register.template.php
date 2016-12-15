@@ -79,7 +79,7 @@ function template_registration_agreement()
  */
 function template_registration_form()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt, $modSettings;
 
 	addInlineJavascript('
 		function verifyAgree()

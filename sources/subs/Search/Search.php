@@ -240,6 +240,10 @@ class Search
 
 	/**
 	 * Creates a search API and returns the object.
+	 *
+	 * @param string $searchClass
+	 *
+	 * @return API\Standard|null|object
 	 */
 	public function findSearchAPI($searchClass = '')
 	{
@@ -656,10 +660,12 @@ class Search
 	 * with those present in the $param array (usually $_REQUEST['params'])
 	 *
 	 * @param mixed[] $params - An array of search parameters
-	 * @param int $recentPercentage - A coefficient to calculate the lowest
-	 *            message id to start search from
-	 * @param int $maxMembersToSearch - The maximum number of members to consider
-	 *            when multiple are found
+	 * @param int     $recentPercentage - A coefficient to calculate the lowest
+	 *                message id to start search from
+	 * @param int     $maxMembersToSearch - The maximum number of members to consider
+	 *                when multiple are found
+	 *
+	 * @throws \Elk_Exception topic_gone
 	 */
 	public function mergeSearchParams($params, $recentPercentage, $maxMembersToSearch)
 	{

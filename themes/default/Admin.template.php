@@ -1171,11 +1171,11 @@ function template_show_settings()
  */
 function template_admin_search_results()
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt;
 
 	echo '
 					<h2 class="category_header hdicon cat_img_search">
-						', sprintf($txt['admin_search_results_desc'], $context['search_term']), template_admin_quick_search(), '
+						', sprintf($txt['admin_search_results_desc'], $context['search_term']) . template_admin_quick_search() . '
 					</h2>
 					<div class="generic_list_wrapper">
 						<div class="content">';

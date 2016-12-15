@@ -192,8 +192,11 @@ function getMsgMemberID($messageID)
  * - Used by ManageBoards.controller.php to change the settings of a board.
  *
  * @package Boards
- * @param int $board_id
+ *
+ * @param int     $board_id
  * @param mixed[] $boardOptions
+ *
+ * @throws Elk_Exception no_board
  */
 function modifyBoard($board_id, &$boardOptions)
 {
@@ -811,6 +814,7 @@ function fixChildren($parent, $newLevel, $newParent)
  *
  * @param array $query
  *
+ * @throws Elk_Exception no_valid_parent
  * @package Boards
  */
 function getBoardTree($query = array())

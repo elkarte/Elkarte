@@ -17,6 +17,11 @@
 
 namespace ElkArte\sources\subs\SessionHandler;
 
+/**
+ * Class DatabaseHandler
+ *
+ * @package ElkArte\sources\subs\SessionHandler
+ */
 class DatabaseHandler extends SessionHandler
 {
 	/**

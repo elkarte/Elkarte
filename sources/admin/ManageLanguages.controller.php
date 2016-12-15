@@ -287,8 +287,6 @@ class ManageLanguages_Controller extends Action_Controller
 	 */
 	public function action_downloadlang()
 	{
-		global $context, $txt, $scripturl;
-
 		// @todo for the moment there is no facility to download packages, so better kill it here
 		throw new Elk_Exception('no_access', false);
 
@@ -1089,10 +1087,13 @@ class ManageLanguages_Controller extends Action_Controller
 		return $this->_settings();
 	}
 
+	/**
+	 * Update the language in use
+	 *
+	 * @param string $language
+	 */
 	private function updateLanguage($language)
 	{
-		global $context;
-
 		$configVars = array(
 			array('language')
 		);

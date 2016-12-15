@@ -419,9 +419,12 @@ class Packages_Controller extends Action_Controller
 	 * Actions are defined by parsePackageInfo
 	 * Sets the is_installed flag
 	 *
-	 * @param array $package_installed
-	 * @param array $packageInfo Details for the package being tested/installed, set by getPackageInfo
+	 * @param array   $package_installed
+	 * @param array   $packageInfo Details for the package being tested/installed, set by getPackageInfo
 	 * @param boolean $testing passed to parsePackageInfo, true for test install, false for real install
+	 *
+	 * @return array
+	 * @throws Elk_Exception package_cant_uninstall, package_uninstall_cannot
 	 */
 	private function _get_package_actions($package_installed, $packageInfo, $testing = true)
 	{
@@ -898,7 +901,7 @@ class Packages_Controller extends Action_Controller
 	 */
 	public function action_browse()
 	{
-		global $txt, $scripturl, $context, $settings;
+		global $txt, $scripturl, $context;
 
 		$context['page_title'] .= ' - ' . $txt['browse_packages'];
 		$context['forum_version'] = FORUM_VERSION;
@@ -2025,9 +2028,12 @@ class Packages_Controller extends Action_Controller
  * Checks the permissions of all the areas that will be affected by the package
  *
  * @package Packages
- * @param string $path
+ *
+ * @param string  $path
  * @param mixed[] $data
- * @param int $level
+ * @param int     $level
+ *
+ * @throws Elk_Exception no_access
  */
 function fetchPerms__recursive($path, &$data, $level)
 {

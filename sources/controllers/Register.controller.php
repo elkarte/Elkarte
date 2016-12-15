@@ -311,6 +311,8 @@ class Register_Controller extends Action_Controller
 	 * - Does the actual registration to the system
 	 *
 	 * @param bool $verifiedOpenID = false
+	 *
+	 * @throws Elk_Exception
 	 */
 	public function do_register($verifiedOpenID = false)
 	{
@@ -894,6 +896,8 @@ class Register_Controller extends Action_Controller
 	 * - Will resend an activation code to non-active account
 	 *
 	 * @param bool $email_change if the email was changed or not
+	 *
+	 * @throws Elk_Exception
 	 */
 	private function _activate_resend($email_change)
 	{
@@ -927,6 +931,8 @@ class Register_Controller extends Action_Controller
 
 	/**
 	 * Validates a supplied activation code is valid
+	 *
+	 * @throws Elk_Exception already_activated, registration_not_approved
 	 */
 	private function _activate_validate_code()
 	{

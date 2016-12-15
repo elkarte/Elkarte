@@ -358,11 +358,14 @@ abstract class Database_Abstract implements Database
 	/**
 	 * This function tries to work out additional error information from a back trace.
 	 *
-	 * @param string $error_message
-	 * @param string $log_message
+	 * @param string         $error_message
+	 * @param string         $log_message
 	 * @param string|boolean $error_type
-	 * @param string|null $file
-	 * @param integer|null $line
+	 * @param string|null    $file
+	 * @param integer|null   $line
+	 *
+	 * @return array
+	 * @throws Elk_Exception
 	 */
 	public function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
 	{

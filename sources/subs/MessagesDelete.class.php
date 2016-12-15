@@ -323,11 +323,14 @@ class MessagesDelete
 	 * - normally, local and global should be the localCookies and globalCookies settings, respectively.
 	 * - uses boardurl to determine these two things.
 	 *
-	 * @param int $message The message id
+	 * @param int  $message The message id
 	 * @param bool $decreasePostCount if true users' post count will be reduced
 	 * @param bool $check_permissions if true the method will also check
 	 *              permissions to delete the message/topic (may result in fatal
 	 *              errors or login screens)
+	 *
+	 * @return bool
+	 * @throws Elk_Exception recycle_no_valid_board
 	 */
 	public function removeMessage($message, $decreasePostCount = true, $check_permissions = true)
 	{
@@ -723,7 +726,9 @@ class MessagesDelete
 	 *
 	 * @param mixed[] $row Details on the message
 	 * @param mixed[] $board The the user is in (?)
+	 *
 	 * @return bool|string
+	 * @throws Elk_Exception cannot_delete_replies, cannot_delete_own, modify_post_time_passed
 	 */
 	protected function _checkDeletePermissions($row, $board)
 	{

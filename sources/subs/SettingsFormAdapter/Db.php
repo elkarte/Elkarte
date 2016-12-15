@@ -17,6 +17,11 @@
 
 namespace ElkArte\sources\subs\SettingsFormAdapter;
 
+/**
+ * Class Db
+ *
+ * @package ElkArte\sources\subs\SettingsFormAdapter
+ */
 class Db extends Adapter
 {
 	/**
@@ -266,6 +271,11 @@ class Db extends Adapter
 		return implode(',', array_diff($bbcTags, $this->configValues[$var[1] . '_enabledTags']));
 	}
 
+	/**
+	 * Simply create the config var label value
+	 *
+	 * @param array $configVar
+	 */
 	private function prepareLabel($configVar)
 	{
 		global $txt;

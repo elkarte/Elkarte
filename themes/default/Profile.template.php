@@ -34,7 +34,7 @@ function template_profile_above()
 
 	// If an error occurred while trying to save previously, give the user a clue!
 	echo '
-					', template_error_message();
+					' . template_error_message();
 
 	// If the profile was update successfully, let the user know this.
 	if (!empty($context['profile_updated']))

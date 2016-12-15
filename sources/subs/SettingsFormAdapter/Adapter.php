@@ -17,6 +17,11 @@
 
 namespace ElkArte\sources\subs\SettingsFormAdapter;
 
+/**
+ * Class Adapter
+ *
+ * @package ElkArte\sources\subs\SettingsFormAdapter
+ */
 abstract class Adapter implements AdapterInterface
 {
 	/**
@@ -76,7 +81,7 @@ abstract class Adapter implements AdapterInterface
 	 */
 	protected function prepareContext()
 	{
-		global $context, $txt, $modSettings;
+		global $context;
 
 		$context['config_vars'] = $this->context;
 	}

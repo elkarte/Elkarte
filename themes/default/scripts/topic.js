@@ -869,9 +869,16 @@ function expandThumbLB(thumbID) {
 		$elk_lb_content = $('#elk_lb_content'),
 		ajaxIndicatorOn = function () {
 			$('<div id="lightbox-loading"><i class="icon icon-spin icon-xl i-spinner"></i><div>').appendTo($elk_lb_content);
+			$('html, body').addClass('elk_lb_no_scrolling');
 		},
 		ajaxIndicatorOff = function () {
 			$('#lightbox-loading').remove();
+		},
+		closeLightbox = function () {
+			$elk_lightbox.hide();
+			$elk_lb_content.html('').removeAttr('style').removeClass('expand');
+			$('html, body').removeClass('elk_lb_no_scrolling');
+			$(window).off('resize.expandThumb');
 		};
 
 	// Create the lightbox container only if needed
@@ -902,15 +909,12 @@ function expandThumbLB(thumbID) {
 
 			ajaxIndicatorOff();
 		})
-		.error(function () {
+		.on('error', function () {
 			// Perhaps a message, but for now make it look like we tried and failed
 			setTimeout(function () {
 				ajaxIndicatorOff();
-				$("#elk_lightbox").hide();
-				$elk_lb_content.html('');
+				closeLightbox();
 			}, 1500);
-
-			$(window).off('resize.expandThumb');
 		});
 
 	// Provide an expand to full image icon click
@@ -928,9 +932,7 @@ function expandThumbLB(thumbID) {
 	$elk_lightbox.on('click', function (event) {
 		if (event.target.id !== $elk_expand_icon.attr('id')) {
 			event.preventDefault();
-			$elk_lightbox.hide();
-			$elk_lb_content.html('').removeAttr('style').removeClass('expand');
-			$(window).off('resize.expandThumb');
+			closeLightbox();
 		}
 	});
 
@@ -938,9 +940,7 @@ function expandThumbLB(thumbID) {
 	$(window).on('keydown', function (event) {
 		if (event.keyCode === 27) {
 			event.preventDefault();
-			$elk_lightbox.hide();
-			$elk_lb_content.html('').removeAttr('style');
-			$(window).off('resize.expandThumb');
+			closeLightbox();
 		}
 	});
 

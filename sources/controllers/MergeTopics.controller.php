@@ -156,6 +156,9 @@ class MergeTopics_Controller extends Action_Controller
 	 * - redirects to ?action=mergetopics;sa=done.
 	 *
 	 * @param int[] $topics = array() of topic ids
+	 *
+	 * @return bool
+	 * @throws Elk_Exception merge_need_more_topics
 	 */
 	public function action_mergeExecute($topics = array())
 	{

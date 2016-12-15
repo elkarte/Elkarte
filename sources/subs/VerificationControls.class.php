@@ -37,7 +37,10 @@ function loadVerificationControls()
  * Create a anti-bot verification control?
  *
  * @param mixed[] $verificationOptions
- * @param bool $do_test = false If we are validating the input to a verification control
+ * @param bool    $do_test = false If we are validating the input to a verification control
+ *
+ * @return array|bool
+ * @throws Elk_Exception no_access
  */
 function create_control_verification(&$verificationOptions, $do_test = false)
 {
@@ -641,7 +644,8 @@ class Verification_Controls_Questions implements Verification_Controls
 	/**
 	 * Performs the test to see if the answer is correct
 	 *
-	 * @return string|boolean
+	 * @return bool|string
+	 * @throws Elk_Exception no_access
 	 */
 	public function doTest()
 	{

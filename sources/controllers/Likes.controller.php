@@ -452,7 +452,7 @@ class Likes_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function ($row) {
-							global $txt, $settings;
+							global $txt;
 
 							$result = '<a href="' . $row['who'] . '" title="' . $txt['likes_show_who'] . '"><i class="icon i-users"></i></a>';
 

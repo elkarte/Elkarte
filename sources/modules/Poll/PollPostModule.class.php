@@ -201,7 +201,9 @@ class Poll_Post_Module implements ElkArte\sources\modules\Module_Interface
 	 * Checks the poll conditions before we go to save
 	 *
 	 * @param ErrorContext $post_errors
-	 * @param array $topic_info
+	 * @param array        $topic_info
+	 *
+	 * @throws Elk_Exception no_access
 	 */
 	public function before_save_post($post_errors, $topic_info)
 	{
@@ -323,9 +325,10 @@ class Poll_Post_Module implements ElkArte\sources\modules\Module_Interface
 	 * Creates a poll based on an array (of POST'ed data)
 	 *
 	 * @param mixed[] $options
-	 * @param string $user_name The username of the member that creates the poll
+	 * @param string  $user_name The username of the member that creates the poll
 	 *
 	 * @return int - the id of the newly created poll
+	 * @throws Elk_Exception poll_range_error
 	 */
 	protected function _createPoll($options, $user_name)
 	{

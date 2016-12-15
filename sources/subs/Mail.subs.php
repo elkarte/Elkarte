@@ -800,12 +800,16 @@ function mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break)
  * Load a template from EmailTemplates language file.
  *
  * @package Mail
- * @param string $template
- * @param mixed[] $replacements
- * @param string $lang = ''
- * @param bool $loadLang = true
+ *
+ * @param string   $template
+ * @param mixed[]  $replacements
+ * @param string   $lang = ''
+ * @param bool     $loadLang = true
  * @param string[] $suffixes - Additional suffixes to find and return
  * @param string[] $additional_files - Additional language files to load
+ *
+ * @return array
+ * @throws Elk_Exception email_no_template
  */
 function loadEmailTemplate($template, $replacements = array(), $lang = '', $loadLang = true, $suffixes = array(), $additional_files = array())
 {

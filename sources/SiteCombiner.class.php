@@ -283,8 +283,6 @@ class Site_Combiner
 	 */
 	protected function _removeHives($ext)
 	{
-		global $context;
-
 		$path = $this->_archive_dir . '/hive-*.' . $ext;
 
 		$glob = new GlobIterator($path, FilesystemIterator::SKIP_DOTS);

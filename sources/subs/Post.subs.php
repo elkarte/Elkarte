@@ -1009,12 +1009,14 @@ function lastPost()
  * - if editing is true, returns $message|$message[errors], else returns array($subject, $message)
  *
  * @package Posts
- * @param int|bool $editing
+ *
+ * @param int|bool       $editing
  * @param int|null|false $topic
- * @param string $first_subject
- * @param int $msg_id
+ * @param string         $first_subject
+ * @param int            $msg_id
  *
  * @return false|mixed[]
+ * @throws Elk_Exception
  */
 function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 {

@@ -565,7 +565,7 @@ class ManageMaillist_Controller extends Action_Controller
 	 */
 	public function action_list_filters()
 	{
-		global $context, $scripturl, $txt, $settings, $modSettings;
+		global $context, $scripturl, $txt, $modSettings;
 
 		$id = 0;
 
@@ -1005,7 +1005,7 @@ class ManageMaillist_Controller extends Action_Controller
 	 */
 	public function action_list_parsers()
 	{
-		global $context, $scripturl, $txt, $settings, $modSettings;
+		global $context, $scripturl, $txt, $modSettings;
 
 		$id = 0;
 

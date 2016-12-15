@@ -127,10 +127,6 @@ class PackageServers_Controller extends Action_Controller
 		// Load our subs worker.
 		require_once(SUBSDIR . '/PackageServers.subs.php');
 
-		$server = '';
-		$url = '';
-		$name = '';
-
 		// Browsing the packages from a server
 		if (isset($this->_req->query->server))
 			list($name, $url, $server) = $this->_package_server();
@@ -509,6 +505,7 @@ class PackageServers_Controller extends Action_Controller
 	 * - Reads the database to fetch the server url and name
 	 *
 	 * @return array
+	 * @throws Elk_Exception couldnt_connect
 	 */
 	private function _package_server()
 	{

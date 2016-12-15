@@ -116,6 +116,8 @@ class Action
 	 * - Must be a valid index in the _subActions array.
 	 *
 	 * @param string $sa
+	 *
+	 * @throws Elk_Exception error_sa_not_set
 	 */
 	public function dispatch($sa)
 	{
@@ -204,6 +206,9 @@ class Action
 	 * - Used only to set the context for the template.
 	 *
 	 * @param string $sa The subaction to call
+	 *
+	 * @return string error_sa_not_set
+	 * @throws Elk_Exception error_sa_not_set
 	 */
 	public function subaction($sa)
 	{
@@ -232,6 +237,9 @@ class Action
 	 * or this instance was not initialized, or the action cannot be found in it.
 	 *
 	 * @param string $sa The sub action
+	 *
+	 * @return bool error_sa_not_set
+	 * @throws Elk_Exception error_sa_not_set
 	 */
 	public function isAllowedTo($sa)
 	{

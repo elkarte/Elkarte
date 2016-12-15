@@ -95,6 +95,9 @@ class InlinePermissions extends Adapter
 		$this->excluded_groups = $excluded_groups;
 	}
 
+	/**
+	 * InlinePermissions constructor.
+	 */
 	public function __construct()
 	{
 		$this->db = database();

@@ -95,6 +95,8 @@ class Karma_Controller extends Action_Controller
 	 * @param int $id_target who is getting the action
 	 * @param int $action applaud or smite
 	 * @param int $dir
+	 *
+	 * @throws Elk_Exception karma_wait_time
 	 */
 	private function _give_karma($id_executor, $id_target, $action, $dir)
 	{
@@ -117,7 +119,9 @@ class Karma_Controller extends Action_Controller
 	 * Makes sure that a user can perform the karma action
 	 *
 	 * @param int $id_target
-	 * @return integer
+	 *
+	 * @return int
+	 * @throws Elk_Exception feature_disabled
 	 */
 	private function _prepare_karma($id_target)
 	{

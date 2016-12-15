@@ -62,7 +62,9 @@ class InlinePermissions_Form extends ElkArte\sources\subs\SettingsFormAdapter\In
 		$permissionsForm = new self;
 		$permissionsForm->setPermissions($permissions);
 
-		return $permissionsForm->save();
+		$permissionsForm->save();
+
+		return null;
 	}
 
 	/**
@@ -83,7 +85,9 @@ class InlinePermissions_Form extends ElkArte\sources\subs\SettingsFormAdapter\In
 		$permissionsForm->setExcludedGroups($excluded_groups);
 		$permissionsForm->setPermissions($permissions);
 
-		return $permissionsForm->prepare();
+		$permissionsForm->prepare();
+
+		return null;
 	}
 }
 

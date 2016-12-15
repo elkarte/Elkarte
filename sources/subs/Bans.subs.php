@@ -841,9 +841,12 @@ function validateIPBan($ip_array, $fullip = '')
  * - optimized for the database.
  *
  * @package Bans
- * @param int[] $ip_array array of ip array ints
+ *
+ * @param int[]  $ip_array array of ip array ints
  * @param string $fullip
- * @return boolean
+ *
+ * @return bool
+ * @throws Elk_Exception
  * @deprecated since 1.1 - use validateIPBan instead
  */
 function checkExistingTriggerIP($ip_array, $fullip = '')
@@ -1251,11 +1254,14 @@ function list_getNumBans()
  * Retrieves all the ban items belonging to a certain ban group
  *
  * @package Bans
+ *
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param int $sort A string indicating how to sort the results
  * @param int $ban_group_id
+ *
  * @return array
+ * @throws Elk_Exception ban_not_found
  */
 function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group_id = 0)
 {

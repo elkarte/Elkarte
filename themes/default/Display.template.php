@@ -834,7 +834,7 @@ function template_pages_and_buttons_below()
  */
 function template_display_attachments($message, $ignoring)
 {
-	global $context, $txt, $scripturl, $settings;
+	global $context, $txt, $scripturl;
 
 	echo '
 							<footer id="msg_', $message['id'], '_footer" class="attachments', $ignoring ? ' hide"' : '"', '>';

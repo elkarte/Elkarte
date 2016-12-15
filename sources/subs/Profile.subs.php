@@ -21,7 +21,8 @@
  * @param boolean $fatal if the function ends in a fatal error in case of problems (default true)
  * @param boolean $reload_id if true the already set value is ignored (default false)
  *
- * @return integer if no error.  May return false in case of problems only if $fatal is set to false
+ * @return int if no error.  May return false in case of problems only if $fatal is set to false
+ * @throws Elk_Exception not_a_user
  */
 function currentMemberID($fatal = true, $reload_id = false)
 {
@@ -1257,6 +1258,8 @@ function saveProfileChanges(&$profile_vars, $memID)
  *
  * @param int $memID
  * @param int $id_theme
+ *
+ * @throws Elk_Exception no_access
  */
 function makeThemeChanges($memID, $id_theme)
 {
@@ -2088,10 +2091,13 @@ function profileValidateSignature(&$value)
 
 /**
  * The avatar is incredibly complicated, what with the options... and what not.
+ *
  * @todo argh, the avatar here. Take this out of here!
  *
  * @param mixed[] $value
+ *
  * @return false|string
+ * @throws Elk_Exception attachments_no_write, attach_timeout
  */
 function profileSaveAvatarData(&$value)
 {
@@ -2391,6 +2397,9 @@ function profileSaveAvatarData(&$value)
  * Save a members group.
  *
  * @param int $value
+ *
+ * @return bool
+ * @throws Elk_Exception at_least_one_admin
  */
 function profileSaveGroups(&$value)
 {

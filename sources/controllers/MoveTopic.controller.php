@@ -257,6 +257,7 @@ class MoveTopic_Controller extends Action_Controller
 	 * - If the member is the topic starter requires the move_own permission, otherwise the move_any permission.
 	 *
 	 * @return bool
+	 * @throws Elk_Exception no_access
 	 */
 	private function _check_access_2()
 	{

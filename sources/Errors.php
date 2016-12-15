@@ -58,9 +58,10 @@ function log_lang_error($error, $error_type = 'general', $sprintf = array(), $fi
  * An irrecoverable error. This function stops execution and displays an error message.
  * It logs the error message if $log is specified.
  *
- * @param string $error
+ * @param string         $error
  * @param string|boolean $log defaults to  'general', use false to skip setup_fatal_error_context
  *
+ * @throws Elk_Exception
  * @deprecated since 1.1
  */
 function fatal_error($error, $log = 'general')
@@ -79,10 +80,11 @@ function fatal_error($error, $log = 'general')
  * - uses Errors language file and applies the $sprintf information if specified.
  * - the information is logged if log is specified.
  *
- * @param string $error
+ * @param string         $error
  * @param string|boolean $log defaults to 'general' false will skip logging, true will use general
- * @param string[] $sprintf defaults to empty array()
+ * @param string[]       $sprintf defaults to empty array()
  *
+ * @throws Elk_Exception
  * @deprecated since 1.1
  */
 function fatal_lang_error($error, $log = 'general', $sprintf = array())

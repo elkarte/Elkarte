@@ -19,9 +19,12 @@
  * Set the permission level for a specific profile, group, or group for a profile.
  *
  * @package Permissions
- * @param string $level The level ('restrict', 'standard', etc.)
+ *
+ * @param string       $level The level ('restrict', 'standard', etc.)
  * @param integer|null $group The group to set the permission for
  * @param integer|null $profile = null, int id of the permissions group or 'null' if we're setting it for a group
+ *
+ * @throws Elk_Exception no_access
  */
 function setPermissionLevel($level, $group = null, $profile = null)
 {
@@ -1247,7 +1250,10 @@ function renamePermissionProfile($id_profile, $name)
  * Delete a permission profile
  *
  * @package Permissions
+ *
  * @param int[] $profiles
+ *
+ * @throws Elk_Exception no_access
  */
 function deletePermissionProfiles($profiles)
 {

@@ -595,7 +595,7 @@ class Theme extends \Theme
 	 */
 	public function setupThemeContext($forceload = false)
 	{
-		global $modSettings, $user_info, $scripturl, $context, $settings, $options, $txt, $boarddir;
+		global $modSettings, $user_info, $scripturl, $context, $settings, $options, $txt;
 
 		static $loaded = false;
 
@@ -802,7 +802,7 @@ class Theme extends \Theme
 	 */
 	public function setupMenuContext()
 	{
-		global $context, $modSettings, $user_info, $txt, $scripturl, $settings;
+		global $context, $modSettings, $user_info, $settings;
 
 		// Set up the menu privileges.
 		$context['allow_search'] = !empty($modSettings['allow_guestAccess']) ? allowedTo('search_posts') : (!$user_info['is_guest'] && allowedTo('search_posts'));

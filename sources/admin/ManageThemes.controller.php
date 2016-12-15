@@ -1263,8 +1263,6 @@ class ManageThemes_Controller extends Action_Controller
 	 */
 	public function installFromZip()
 	{
-		global $context;
-
 		// Hopefully the themes directory is writable, or we might have a problem.
 		if (!is_writable(BOARDDIR . '/themes'))
 			throw new Elk_Exception('theme_install_write_error', 'critical');

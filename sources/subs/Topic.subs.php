@@ -846,6 +846,9 @@ function moveTopics($topics, $toBoard, $log = false)
  * @param null|int $move_from The board the topic belongs to
  * @param null|int $id_board The "current" board
  * @param null|int $id_topic The topic id
+ *
+ * @return bool
+ * @throws Elk_Exception topic_already_moved
  */
 function moveTopicConcurrence($move_from = null, $id_board = null, $id_topic = null)
 {
@@ -2367,10 +2370,12 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
  * logs the action in the moderation log.
  * a notification is sent to all users monitoring this topic.
  *
- * @param int $split1_ID_TOPIC
- * @param int[] $splitMessages
+ * @param int    $split1_ID_TOPIC
+ * @param int[]  $splitMessages
  * @param string $new_subject
+ *
  * @return int the topic ID of the new split topic.
+ * @throws Elk_Exception no_posts_selected
  */
 function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 {
@@ -2697,7 +2702,9 @@ function splitAttemptMove($boards, $totopic)
  * Retrieves information of the current and destination board of a split topic
  *
  * @param int $toboard
+ *
  * @return array
+ * @throws Elk_Exception no_board
  */
 function splitDestinationBoard($toboard = 0)
 {
@@ -3154,7 +3161,9 @@ function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_
  * Load the subject from a given topic id.
  *
  * @param int $id_topic
+ *
  * @return string
+ * @throws Elk_Exception topic_gone
  */
 function getSubject($id_topic)
 {

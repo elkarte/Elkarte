@@ -205,6 +205,8 @@ class ProfileSubscriptions_Controller extends Action_Controller
 	 * - Accessed with ?action=profile;u=123;area=subscriptions;confirm
 	 *
 	 * @param int $memID The id of the member who is ordering
+	 *
+	 * @throws Elk_Exception paid_sub_not_active
 	 */
 	private function _confirmOrder($memID)
 	{

@@ -789,7 +789,9 @@ function getPollChoices($id_poll)
  * Get the poll starter from a given poll.
  *
  * @param int $id_topic The id of the topic that has an associated poll
+ *
  * @return array
+ * @throws Elk_Exception no_board
  */
 function getPollStarter($id_topic)
 {

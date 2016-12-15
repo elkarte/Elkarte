@@ -862,7 +862,9 @@ function getSubscriptionDetails($sub_id)
  * Used to validate an existing subscription ID.
  *
  * @param int $id
+ *
  * @return int
+ * @throws Elk_Exception no_access
  */
 function validateSubscriptionID($id)
 {
@@ -921,7 +923,9 @@ function alreadySubscribed($id_sub, $id_member)
  * Get the current status from a given subscription.
  *
  * @param int $log_id
- * @return integer
+ *
+ * @return int
+ * @throws Elk_Exception no_access
  */
 function getSubscriptionStatus($log_id)
 {

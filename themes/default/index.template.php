@@ -390,7 +390,7 @@ function template_uc_news_fader()
 		echo '
 			<div id="news">
 				<h2>', $txt['news'], '</h2>
-				', template_news_fader(), '
+				' . template_news_fader() . '
 			</div>';
 	}
 }

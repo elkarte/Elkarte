@@ -1673,6 +1673,8 @@ class ManageSmileys_Controller extends Action_Controller
 	 * A function to import new smileys from an existing directory into the database.
 	 *
 	 * @param string $smileyPath
+	 *
+	 * @throws Elk_Exception smiley_set_unable_to_import
 	 */
 	public function importSmileys($smileyPath)
 	{

@@ -3172,6 +3172,10 @@ img.new_posts {
 	color: #CCCCCC;
 }
 
+.elk_lb_no_scrolling {
+	overflow: hidden;
+}
+
 .attachment_thumb, .attachment_name {
 	display: block;
 	margin: 0 auto;

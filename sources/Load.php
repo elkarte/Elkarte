@@ -2292,6 +2292,9 @@ function fix_calendar_text()
  * - Returns an array of information about the boards found.
  *
  * @param int $id_parent
+ *
+ * @return array
+ * @throws Elk_Exception parent_not_found
  */
 function getBoardParents($id_parent)
 {

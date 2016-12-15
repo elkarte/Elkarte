@@ -470,8 +470,11 @@ class Database_MySQL extends Database_Abstract
 	 * Database error.
 	 * Backtrace, log, try to fix.
 	 *
-	 * @param string $db_string
+	 * @param string      $db_string
 	 * @param mysqli|null $connection = null
+	 *
+	 * @return bool
+	 * @throws Elk_Exception
 	 */
 	public function error($db_string, $connection = null)
 	{
