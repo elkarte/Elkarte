@@ -243,6 +243,7 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 	);
 
 	require_once(SUBSDIR . '/Package.subs.php');
+	require_once(SUBSDIR . '/Attachments.subs.php');
 
 	// Get the image file, we have to work with something after all
 	$fp_destination = fopen($destination, 'wb');
@@ -348,8 +349,10 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 			// Set the input and output image size
 			$src_width = empty($src_width) ? $imagick->getImageWidth() : $src_width;
 			$src_height = empty($src_height) ? $imagick->getImageHeight() : $src_height;
-			$dest_width = empty($max_width) ? $src_width : $max_width;
-			$dest_height = empty($max_height) ? $src_height : $max_height;
+
+			// The behavior of bestfit changed in Imagick 3.0.0 and it will now scale up, we prevent that
+			$dest_width = empty($max_width) ? $src_width : min($max_width, $src_width);
+			$dest_height = empty($max_height) ? $src_height : min($max_height, $src_height);
 
 			// Set jpeg image quality to 80
 			if ($default_formats[$preferred_format] === 'jpeg')
