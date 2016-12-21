@@ -2157,26 +2157,43 @@ function returnMimeThumb($file_ext, $url = false)
 
 	$filename = false;
 
-	if (in_array($file_ext, array(
-		'c', 'cpp', 'css', 'csv', 'doc', 'docx', 'flv', 'html', 'htm', 'java', 'js', 'log', 'mp3',
-		'mp4', 'mgp', 'pdf', 'php', 'ppt', 'rtf', 'sql', 'tgz', 'txt', 'wav', 'xls', 'xml', 'zip'
-	)))
+	// These are not meant to be exhaustive, just some of the most common attached on a forum
+	static $generics = array(
+		'arc' => array('tgz', 'zip', 'rar', '7z', 'gz'),
+		'doc' =>array('doc', 'docx', 'wpd', 'odt'),
+		'sound' => array('wav', 'mp3', 'pcm', 'aiff', 'wma', 'm4a'),
+		'video' => array('mp4', 'mgp', 'mpeg', 'mp4', 'wmv', 'flv', 'aiv', 'mov', 'swf'),
+		'txt' => array('rtf', 'txt', 'log'),
+		'presentation' => array('ppt', 'pps', 'odp'),
+		'spreadsheet' => array('xls', 'xlr', 'ods'),
+		'web' => array('html', 'htm')
+	);
+	foreach ($generics as $generic_extension => $generic_types)
 	{
-		if (empty($settings))
+		if (in_array($file_ext, $generic_types))
 		{
-			loadEssentialThemeData();
+			$file_ext = $generic_extension;
+			break;
 		}
-
-		// Return the mine thumbnail if it exists or just the default
-		$filename = $settings['theme_dir'] . '/images/mime_images/' . $file_ext . '.png';
-		if (!file_exists($filename))
-		{
-			$file_ext = 'default';
-		}
-
-		$location = $url ? $settings['theme_url'] : $settings['theme_dir'];
-		$filename = $location . '/images/mime_images/' . $file_ext . '.png';
 	}
+
+	static $distinct = array('arc', 'doc', 'sound', 'video', 'txt', 'presentation', 'spreadsheet', 'web',
+		'c', 'cpp', 'css', 'csv', 'java', 'js', 'pdf', 'php', 'sql', 'xml');
+
+
+	if (empty($settings))
+	{
+		loadEssentialThemeData();
+	}
+
+	// Return the mine thumbnail if it exists or just the default
+	if (!in_array($file_ext, $distinct) || !file_exists($settings['theme_dir'] . '/images/mime_images/' . $file_ext . '.png'))
+	{
+		$file_ext = 'default';
+	}
+
+	$location = $url ? $settings['theme_url'] : $settings['theme_dir'];
+	$filename = $location . '/images/mime_images/' . $file_ext . '.png';
 
 	return $filename;
 }
