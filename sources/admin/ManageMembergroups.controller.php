@@ -538,6 +538,11 @@ class ManageMembergroups_Controller extends Action_Controller
 			if (empty($current_group_id))
 				throw new Elk_Exception('membergroup_does_not_exist', false);
 
+			// Empty values will be replaced by validator values where they exist
+			$empty_post = array('max_messages' => null, 'min_posts' => null, 'group_type' => null, 'group_desc' => '',
+				'group_name' => '', 'group_hidden' => null, 'group_inherit' => null, 'icon_count' => null,
+				'icon_image' => '', 'online_color' => '', 'boardaccess' => null);
+
 			$validator = new Data_Validator();
 
 			// Cleanup the inputs! :D
@@ -562,12 +567,14 @@ class ManageMembergroups_Controller extends Action_Controller
 			$validator->validate($this->_req->post);
 
 			// Insert the clean data
-			$our_post = array_replace((array) $this->_req->post, $validator->validation_data());
+			$our_post = array_replace((array) $this->_req->post, $empty_post, $validator->validation_data());
 
 			// Can they really inherit from this group?
 			$inherit_type  = array();
 			if ($our_post['group_inherit'] != -2 && !allowedTo('admin_forum'))
+			{
 				$inherit_type = membergroupById($our_post['group_inherit']);
+			}
 
 			$min_posts = $our_post['group_type'] == -1 && $our_post['min_posts'] >= 0 && $current_group['id_group'] > 3 ? $our_post['min_posts'] : ($current_group['id_group'] == 4 ? 0 : -1);
 			$group_inherit = $current_group['id_group'] > 1 && $current_group['id_group'] != 3 && (empty($inherit_type['group_type']) || $inherit_type['group_type'] != 1) ? $our_post['group_inherit'] : -2;
@@ -601,8 +608,12 @@ class ManageMembergroups_Controller extends Action_Controller
 				$changed_boards['ignore'] = array();
 
 				if ($our_post['boardaccess'])
+				{
 					foreach ($our_post['boardaccess'] as $group_id => $action)
+					{
 						$changed_boards[$action][] = (int) $group_id;
+					}
+				}
 
 				foreach (array('allow', 'deny') as $board_action)
 				{
