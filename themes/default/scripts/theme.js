@@ -89,20 +89,21 @@ $(function() {
 			var $this = $(this);
 
 			// No saved data, then lets set it to auto
-			if ($.isEmptyObject($this.data()))
+			if ($.isEmptyObject($this.data('bbc_img')))
 			{
-				$this.data("bbc_img", {
-						width: $this.css('width'),
-						height: $this.css('height'),
-						'max-width': $this.css('max-width'),
-						'max-height': $this.css('max-height')
+				$this.data('bbc_img', {
+					width: $this.css('width'),
+					height: $this.css('height'),
+					'max-width': $this.css('max-width'),
+					'max-height': $this.css('max-height')
 				});
 				$this.css({'width': $this.css('width') === 'auto' ? null : 'auto'});
 				$this.css({'height': $this.css('height') === 'auto' ? null : 'auto'});
 
 				// Override default css to allow the image to expand fully, add a div to expand in
 				$this.css({'max-height': 'none'});
-				$this.wrap('<div style="overflow: auto;"></div>');
+				$this.css({'max-width': '100%'});
+				$this.wrap('<div style="overflow:auto;display:inline-block;"></div>');
 			}
 			else
 			{
@@ -113,7 +114,7 @@ $(function() {
 				$this.css({'max-height': $this.data("bbc_img")['max-height']});
 
 				// Remove the data
-				$this.removeData();
+				$this.removeData('bbc_img');
 
 				// Remove the div we added to allow the image to overflow expand in
 				$this.unwrap();
