@@ -215,9 +215,13 @@ abstract class Action_Controller
 		if (!empty($modSettings[$setting_key]))
 		{
 			$modules = explode(',', $modSettings[$setting_key]);
+
 			foreach ($modules as $module)
 			{
-				$class = ucfirst($module) . '_' . ucfirst($this->getHook()) . '_Module';
+				// drafts => Drafts, some_name => SomeName
+				$module_name = array_map('ucfirst', explode('_', $module));
+				$class = implode('', $module_name) . '_' . ucfirst($this->getHook()) . '_Module';
+
 				if (class_exists($class))
 				{
 					$classes[] = $class;
