@@ -1306,8 +1306,10 @@ function query_key_owner($email_message)
 {
 	$db = database();
 
-	if (empty($email_message))
+	if (!isset($email_message->message_key, $email_message->message_type, $email_message->message_id))
+	{
 		return false;
+	}
 
 	// Check that this is a reply to an "actual" message by finding the key in the sent email table
 	$request = $db->query('', '
