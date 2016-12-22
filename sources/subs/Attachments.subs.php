@@ -2155,8 +2155,6 @@ function returnMimeThumb($file_ext, $url = false)
 {
 	global $settings;
 
-	$filename = false;
-
 	// These are not meant to be exhaustive, just some of the most common attached on a forum
 	static $generics = array(
 		'arc' => array('tgz', 'zip', 'rar', '7z', 'gz'),
@@ -2179,7 +2177,6 @@ function returnMimeThumb($file_ext, $url = false)
 
 	static $distinct = array('arc', 'doc', 'sound', 'video', 'txt', 'presentation', 'spreadsheet', 'web',
 		'c', 'cpp', 'css', 'csv', 'java', 'js', 'pdf', 'php', 'sql', 'xml');
-
 
 	if (empty($settings))
 	{

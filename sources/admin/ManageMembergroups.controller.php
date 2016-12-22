@@ -570,7 +570,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			$our_post = array_replace((array) $this->_req->post, $empty_post, $validator->validation_data());
 
 			// Can they really inherit from this group?
-			$inherit_type  = array();
+			$inherit_type = array();
 			if ($our_post['group_inherit'] != -2 && !allowedTo('admin_forum'))
 			{
 				$inherit_type = membergroupById($our_post['group_inherit']);
