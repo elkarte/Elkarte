@@ -226,7 +226,7 @@ class Auth_Controller extends Action_Controller
 			require_once(EXTDIR . '/GoogleAuthenticator.php');
 			$ga = New GoogleAuthenticator();
 
-			$ga->GetCode($user_settings['otp_secret']);
+			$ga->getCode($user_settings['otp_secret']);
 			$checkResult = $ga->verifyCode($user_settings['otp_secret'], $_POST['otp_token'], 2);
 			if (!$checkResult)
 			{
