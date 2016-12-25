@@ -192,6 +192,17 @@ abstract class Action_Controller
 	}
 
 	/**
+	 * Public function to return the modules hook class name
+	 */
+	public function getModuleClass()
+	{
+		// Use the base controller name for the hook, ie post
+		$module_class = str_replace('_Controller', '', get_class($this));
+
+		return ucfirst($module_class);
+	}
+
+	/**
 	 * Finds modules registered to a certain controller
 	 *
 	 * What it does:
@@ -215,9 +226,13 @@ abstract class Action_Controller
 		if (!empty($modSettings[$setting_key]))
 		{
 			$modules = explode(',', $modSettings[$setting_key]);
+
 			foreach ($modules as $module)
 			{
-				$class = ucfirst($module) . '_' . ucfirst($this->getHook()) . '_Module';
+				// drafts => Drafts, some_name => SomeName
+				$module_name = array_map('ucfirst', explode('_', $module));
+				$class = implode('', $module_name) . '_' . $this->getModuleClass() . '_Module';
+
 				if (class_exists($class))
 				{
 					$classes[] = $class;

@@ -440,12 +440,15 @@ fieldset dl {
 
 #core_features hr {
 	padding: 0;
-	margin: 4px 0 12px 0;
+	margin: 4px 0 8px 0;
 }
 
 #core_features .features {
 	padding: 0 12px;
 	overflow: auto;
+	box-sizing: border-box;
+	float: left;
+	width: 50%;
 }
 
 .core_features_status_box {
@@ -458,7 +461,7 @@ fieldset dl {
 /* Still works without it if you reload the page, but rather odd that it's hiding. */
 .features_image {
 	float: left;
-	margin: 0 12px 0 0;
+	margin: 0 6px;
 }
 
 .features_switch {
@@ -467,7 +470,7 @@ fieldset dl {
 
 .features h3 {
 	padding: 0;
-	margin: 0 6px 0 105px;
+	margin: 0 .5em 0 6em;
 	font-size: 1.071em;
 	overflow: hidden;
 	white-space: pre;
@@ -477,9 +480,10 @@ fieldset dl {
 }
 
 .features p {
-	margin: 0 105px;
+	margin: 0 4.5em 0 6.426em;
 	padding: 0;
-	min-height: 56px;
+	height: 9em;
+	overflow: auto;
 }
 
 #private {
