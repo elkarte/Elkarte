@@ -565,14 +565,18 @@ class ManageSearch_Controller extends Action_Controller
 			}
 
 			// Try to connect via Sphinx API?
-			if (!empty($modSettings['search_index']) && ($modSettings['search_index'] === 'Sphinx' || empty($modSettings['search_index'])))
+			if (empty($modSettings['search_index']) || $modSettings['search_index'] === 'Sphinx')
 			{
-				if (@file_exists(SOURCEDIR . '/sphinxapi.php'))
+				// This is included with sphinx
+				if (file_exists(SOURCEDIR . '/sphinxapi.php'))
 				{
 					include_once(SOURCEDIR . '/sphinxapi.php');
+					$server = !empty($modSettings['sphinx_searchd_server']) ? $modSettings['sphinx_searchd_server'] : 'localhost';
+					$port = !empty($modSettings['sphinx_searchd_port']) ? $modSettings['sphinxql_searchd_port'] : '9312';
+
 					$mySphinx = new SphinxClient();
-					$mySphinx->SetServer($modSettings['sphinx_searchd_server'], (int) $modSettings['sphinx_searchd_port']);
-					$mySphinx->SetLimits(0, (int) $modSettings['sphinx_max_results']);
+					$mySphinx->SetServer($server, (int) $port);
+					$mySphinx->SetLimits(0, 25);
 					$mySphinx->SetMatchMode(SPH_MATCH_BOOLEAN);
 					$mySphinx->SetSortMode(SPH_SORT_ATTR_ASC, 'id_topic');
 
@@ -584,6 +588,7 @@ class ManageSearch_Controller extends Action_Controller
 					}
 					else
 					{
+						updateSettings(array('sphinx_searchd_server' => $server, 'sphinx_searchd_port' => $port));
 						$context['settings_message'][] = $txt['sphinx_test_passed'];
 					}
 				}
@@ -595,25 +600,22 @@ class ManageSearch_Controller extends Action_Controller
 			}
 
 			// Try to connect via SphinxQL
-			if (!empty($modSettings['search_index']) && ($modSettings['search_index'] === 'Sphinxql' || empty($modSettings['search_index'])))
+			if (empty($modSettings['search_index']) || $modSettings['search_index'] === 'Sphinxql')
 			{
-				if (!empty($modSettings['sphinx_searchd_server']) && !empty($modSettings['sphinxql_searchd_port']))
-				{
-					$result = @mysqli_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']), '', '', '', (int) $modSettings['sphinxql_searchd_port']);
-					if ($result === false)
-					{
-						$context['settings_message'][] = $txt['sphinxql_test_connect_failed'];
-						$context['error_type'] = 'serious';
-					}
-					else
-					{
-						$context['settings_message'][] = $txt['sphinxql_test_passed'];
-					}
-				}
-				else
+				$server = !empty($modSettings['sphinx_searchd_server']) ? $modSettings['sphinx_searchd_server'] : 'localhost';
+				$server = $server === 'localhost' ? '127.0.0.1' : $server;
+				$port = !empty($modSettings['sphinxql_searchd_port']) ? $modSettings['sphinxql_searchd_port'] : '9306';
+
+				$result = @mysqli_connect($server, '', '', '', (int) $port);
+				if ($result === false)
 				{
 					$context['settings_message'][] = $txt['sphinxql_test_connect_failed'];
 					$context['error_type'] = 'serious';
+				}
+				else
+				{
+					updateSettings(array('sphinx_searchd_server' => $server, 'sphinxql_searchd_port' => $port));
+					$context['settings_message'][] = $txt['sphinxql_test_passed'];
 				}
 			}
 		}

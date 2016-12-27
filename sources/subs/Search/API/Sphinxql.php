@@ -147,7 +147,7 @@ class Sphinxql extends SearchAPI
 
 		// Only request the results if they haven't been cached yet.
 		$cached_results = array();
-		if (!\Cache::instance()->getVar($cached_results, 'ssearchql_results_' . md5($user_info['query_see_board'] . '_' . $context['params'])))
+		if (!\Cache::instance()->getVar($cached_results, 'searchql_results_' . md5($user_info['query_see_board'] . '_' . $context['params'])))
 		{
 			// Create an instance of the sphinx client and set a few options.
 			$mySphinx = @mysqli_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']), '', '', '', (int) $modSettings['sphinxql_searchd_port']);
