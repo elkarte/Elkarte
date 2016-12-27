@@ -565,7 +565,7 @@ class ManageSearch_Controller extends Action_Controller
 			}
 
 			// Try to connect via Sphinx API?
-			if (!empty($modSettings['search_index']) && (stripos($modSettings['search_index'], 'sphinx_') === 0 || empty($modSettings['search_index'])))
+			if (!empty($modSettings['search_index']) && ($modSettings['search_index'] === 'Sphinx' || empty($modSettings['search_index'])))
 			{
 				if (@file_exists(SOURCEDIR . '/sphinxapi.php'))
 				{
@@ -595,7 +595,7 @@ class ManageSearch_Controller extends Action_Controller
 			}
 
 			// Try to connect via SphinxQL
-			if (!empty($modSettings['search_index']) && (stripos($modSettings['search_index'], 'sphinxql_') === 0 || empty($modSettings['search_index'])))
+			if (!empty($modSettings['search_index']) && ($modSettings['search_index'] === 'Sphinxql' || empty($modSettings['search_index'])))
 			{
 				if (!empty($modSettings['sphinx_searchd_server']) && !empty($modSettings['sphinxql_searchd_port']))
 				{
