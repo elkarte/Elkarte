@@ -588,6 +588,7 @@ class ManageSearch_Controller extends Action_Controller
 					}
 					else
 					{
+						updateSettings(array('sphinx_searchd_server' => $server, 'sphinx_searchd_port' => $port));
 						$context['settings_message'][] = $txt['sphinx_test_passed'];
 					}
 				}
@@ -613,6 +614,7 @@ class ManageSearch_Controller extends Action_Controller
 				}
 				else
 				{
+					updateSettings(array('sphinx_searchd_server' => $server, 'sphinxql_searchd_port' => $port));
 					$context['settings_message'][] = $txt['sphinxql_test_passed'];
 				}
 			}
