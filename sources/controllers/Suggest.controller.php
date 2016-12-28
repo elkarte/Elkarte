@@ -21,7 +21,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Suggest Controler
+ * Suggest Controller
  */
 class Suggest_Controller extends Action_Controller
 {
@@ -77,7 +77,7 @@ class Suggest_Controller extends Action_Controller
 				$suggest = new $currentSearch['class'];
 
 				// Okay, let's at least assume the method exists... *rolleyes*
-				$context['xml_data'] = $suggest->$currentSearch['function']();
+				$context['xml_data'] = $suggest->{$currentSearch['function']}();
 			}
 			// Let's maintain the "namespace" action_suggest_
 			elseif (function_exists('action_suggest_' . $currentSearch['function']))
