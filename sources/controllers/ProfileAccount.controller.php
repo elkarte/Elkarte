@@ -233,7 +233,7 @@ class ProfileAccount_Controller extends Action_Controller
 			0 => $txt['profile_warning_effect_none'],
 		);
 
-		foreach (array('watch', 'moderation', 'mute') as $status)
+		foreach (array('watch', 'moderate', 'mute') as $status)
 		{
 			if ($modSettings['warning_' . $status] != 110)
 			{
