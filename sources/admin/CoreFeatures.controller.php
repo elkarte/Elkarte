@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.0.10
  *
  */
 
@@ -390,6 +390,9 @@ class CoreFeatures_Controller extends Action_Controller
 		elseif (!empty($defaultAction))
 			$context['sub_action'] = $defaultAction;
 		else
-			$context['sub_action'] = array_pop($temp = array_keys($subActions));
+		{
+			$temp = array_keys($subActions);
+			$context['sub_action'] = array_pop($temp);
+		}
 	}
 }

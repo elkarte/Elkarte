@@ -882,3 +882,26 @@ upgrade_query("
 );
 ---}
 ---#
+
+/******************************************************************************/
+--- Changes for 1.0.10
+/******************************************************************************/
+---# Update to new ICQ syntax
+---{
+$request = upgrade_query("
+  SELECT id_field, col_name
+  FROM {$db_prefix}custom_fields
+  WHERE placement=1");
+
+  while ($row = $db->fetch_assoc($request))
+  {
+    if ($row['col_name'] == 'cust_icq')
+    {
+      upgrade_query('
+        UPDATE {$db_prefix}custom_fields
+        SET enclose=\'<a class="icq" href="//www.icq.com/people/{INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>\'
+        WHERE id_field=' . $row['id_field']);
+    }
+  }
+---}
+---#
