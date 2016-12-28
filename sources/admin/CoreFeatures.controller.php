@@ -390,6 +390,9 @@ class CoreFeatures_Controller extends Action_Controller
 		elseif (!empty($defaultAction))
 			$context['sub_action'] = $defaultAction;
 		else
-			$context['sub_action'] = array_pop($temp = array_keys($subActions));
+		{
+			$temp = array_keys($subActions);
+			$context['sub_action'] = array_pop($temp);
+		}
 	}
 }
