@@ -998,7 +998,7 @@ VALUES
 INSERT INTO {$db_prefix}custom_fields
 	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
-	('cust_icq', 'ICQ', 'This is your ICQ number.', 'text', 12, '', 'regex~[1-9][0-9]{4,9}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="icq" href="http://www.icq.com/whitepages/about_me.php?uin={INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>', 1);
+	('cust_icq', 'ICQ', 'This is your ICQ number.', 'text', 12, '', 'regex~[1-9][0-9]{4,9}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="icq" href="//www.icq.com/people/{INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>', 1);
 INSERT INTO {$db_prefix}custom_fields
 	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
