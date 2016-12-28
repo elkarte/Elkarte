@@ -461,14 +461,15 @@ class ManageSearch_Controller extends Action_Controller
 			);
 			$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
 			$context['step'] = isset($_REQUEST['step']) ? (int) $_REQUEST['step'] : 0;
-
-			// Admin timeouts are painful when building these long indexes
-			if ($_SESSION['admin_time'] + 3300 < time() && $context['step'] >= 1)
-				$_SESSION['admin_time'] = time();
 		}
 
 		if ($context['step'] !== 0)
+		{
 			checkSession('request');
+
+			// Admin timeouts are painful when building these long indexes
+			$_SESSION['admin_time'] = time();
+		}
 
 		// Step 0: let the user determine how they like their index.
 		if ($context['step'] === 0)
