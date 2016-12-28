@@ -153,7 +153,7 @@ function sessionClose()
 function sessionRead($session_id)
 {
 	if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $session_id) == 0)
-		return false;
+		return '';
 
 	// Get our database, quick
 	$db = database();
@@ -171,7 +171,7 @@ function sessionRead($session_id)
 	list ($sess_data) = $db->fetch_row($result);
 	$db->free_result($result);
 
-	return $sess_data;
+	return $sess_data !== null ? $sess_data : '';
 }
 
 /**
@@ -212,7 +212,7 @@ function sessionWrite($session_id, $data)
 			array('session_id')
 		);
 
-	return $result;
+	return $db->affected_rows() == 0 ? false : true;
 }
 
 /**
@@ -233,13 +233,15 @@ function sessionDestroy($session_id)
 	$db = database();
 
 	// Just delete the row...
-	return $db->query('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}sessions
 		WHERE session_id = {string:session_id}',
 		array(
 			'session_id' => $session_id,
 		)
 	);
+
+	return true;
 }
 
 /**
@@ -263,11 +265,13 @@ function sessionGC($max_lifetime)
 	$db = database();
 
 	// Clean up after yerself ;).
-	return $db->query('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}sessions
 		WHERE last_update < {int:last_update}',
 		array(
 			'last_update' => time() - $max_lifetime,
 		)
 	);
+
+	return $db->affected_rows() == 0 ? false : true;
 }
