@@ -120,7 +120,7 @@ class Settings_Form
 			else
 			{
 				$varname = $config_var[0];
-				global $$varname;
+				global ${$varname};
 
 				// Set the subtext in case it's part of the label.
 				// @todo Temporary. Preventing divs inside label tags.
