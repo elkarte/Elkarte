@@ -495,6 +495,7 @@
 			e.preventDefault();
 			var files = $(this)[0].files;
 			dragDropAttachment.prototype.handleFileUpload(files, obj);
+			this.value = null;
 		});
 	});
 
