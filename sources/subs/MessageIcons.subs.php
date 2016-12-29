@@ -122,11 +122,11 @@ function sortMessageIconTable()
 {
 	$db = database();
 
+	$db->skip_error(true);
 	$db->query('alter_table', '
 		ALTER TABLE {db_prefix}message_icons
 		ORDER BY icon_order',
-		array(
-			'db_error_skip' => true,
-		)
+		array()
 	);
+	$db->skip_error(null);
 }

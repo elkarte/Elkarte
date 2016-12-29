@@ -756,6 +756,7 @@ function updateZeroPostMembers()
 
 	$db = database();
 
+	$db->skip_error(true);
 	$createTemporary = $db->query('', '
 			CREATE TEMPORARY TABLE {db_prefix}tmp_maint_recountposts (
 				id_member mediumint(8) unsigned NOT NULL default {string:string_zero},
@@ -771,10 +772,10 @@ function updateZeroPostMembers()
 			array(
 				'zero' => 0,
 				'string_zero' => '0',
-				'db_error_skip' => true,
 				'recycle' => $modSettings['recycle_board'],
 			)
 		) !== false;
+		$db->skip_error(null);
 
 		if ($createTemporary)
 		{

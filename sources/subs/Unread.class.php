@@ -540,6 +540,7 @@ class Unread
 				LEFT JOIN {db_prefix}members AS mems ON (mems.id_member = ms.id_member)',
 		);
 
+		$db->skip_error(true);
 		$this->_have_temp_table = $this->_db->query('', '
 			CREATE TEMPORARY TABLE {db_prefix}topics_posted_in (
 				id_topic mediumint(8) unsigned NOT NULL default {string:string_zero},
@@ -563,12 +564,12 @@ class Unread
 				'current_member' => $this->_user_id,
 				'is_approved' => 1,
 				'string_zero' => '0',
-				'db_error_skip' => true,
 			)
 		) !== false;
 
 		// If that worked, create a sample of the log_topics table too.
 		if ($this->_have_temp_table)
+		{
 			$this->_have_temp_table = $this->_db->query('', '
 				CREATE TEMPORARY TABLE {db_prefix}log_topics_posted_in (
 					PRIMARY KEY (id_topic)
@@ -579,9 +580,10 @@ class Unread
 				WHERE lt.id_member = {int:current_member}',
 				array(
 					'current_member' => $this->_user_id,
-					'db_error_skip' => true,
 				)
 			) !== false;
+		}
+		$db->skip_error(null);
 	}
 
 	/**
@@ -595,6 +597,7 @@ class Unread
 			)
 		);
 
+		$db->skip_error(true);
 		// Let's copy things out of the log_topics table, to reduce searching.
 		$this->_have_temp_table = $this->_db->query('', '
 			CREATE TEMPORARY TABLE {db_prefix}log_topics_unread (
@@ -612,8 +615,8 @@ class Unread
 				'current_member' => $this->_user_id,
 				'earliest_msg' => $this->_earliest_msg,
 				'is_approved' => 1,
-				'db_error_skip' => true,
 			))
 		) !== false;
+		$db->skip_error(null);
 	}
 }

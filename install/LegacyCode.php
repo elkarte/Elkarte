@@ -25,17 +25,21 @@ function textfield_alter($change, $substep)
 
 	$db = database();
 
+	$db->skip_error(true);
 	$request = $db->query('', '
 		SHOW FULL COLUMNS
 		FROM {db_prefix}' . $change['table'] . '
 		LIKE {string:column}',
 		array(
 			'column' => $change['column'],
-			'db_error_skip' => true,
 		)
 	);
+	$db->skip_error(null);
+
 	if ($db->num_rows($request) === 0)
+	{
 		die('Unable to find column ' . $change['column'] . ' inside table ' . $db_prefix . $change['table']);
+	}
 	$table_row = $db->fetch_assoc($request);
 	$db->free_result($request);
 
@@ -48,35 +52,43 @@ function textfield_alter($change, $substep)
 	// Get the character set that goes with the collation of the column.
 	if ($column_fix && !empty($table_row['Collation']))
 	{
+		$db->skip_error(true);
 		$request = $db->query('', '
 			SHOW COLLATION
 			LIKE {string:collation}',
 			array(
 				'collation' => $table_row['Collation'],
-				'db_error_skip' => true,
 			)
 		);
+		$db->skip_error(null);
+
 		// No results? Just forget it all together.
 		if ($db->num_rows($request) === 0)
+		{
 			unset($table_row['Collation']);
+		}
 		else
+		{
 			$collation_info = $db->fetch_assoc($request);
+		}
 		$db->free_result($request);
 	}
 
 	if ($column_fix)
 	{
+		$db->skip_error(true);
 		// Make sure there are no NULL's left.
 		if ($null_fix)
+		{
 			$db->query('', '
 				UPDATE {db_prefix}' . $change['table'] . '
 				SET ' . $change['column'] . ' = {string:default}
 				WHERE ' . $change['column'] . ' IS NULL',
 				array(
 					'default' => isset($change['default']) ? $change['default'] : '',
-					'db_error_skip' => true,
 				)
 			);
+		}
 
 		// Do the actual alteration.
 		$db->query('', '
@@ -84,9 +96,9 @@ function textfield_alter($change, $substep)
 			CHANGE COLUMN ' . $change['column'] . ' ' . $change['column'] . ' ' . $change['type'] . (isset($collation_info['Charset']) ? ' CHARACTER SET ' . $collation_info['Charset'] . ' COLLATE ' . $collation_info['Collation'] : '') . ($change['null_allowed'] ? '' : ' NOT NULL') . (isset($change['default']) ? ' default {string:default}' : ''),
 			array(
 				'default' => isset($change['default']) ? $change['default'] : '',
-				'db_error_skip' => true,
 			)
 		);
+		$db->skip_error(null);
 	}
 
 	nextSubstep($substep);

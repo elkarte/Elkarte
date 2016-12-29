@@ -171,6 +171,7 @@ $db = load_database();
 // Does this exist?
 if (isset($modSettings['elkVersion']))
 {
+	$db->skip_error(true);
 	$request = $db->query('', '
 		SELECT variable, value
 		FROM {db_prefix}themes
@@ -181,11 +182,13 @@ if (isset($modSettings['elkVersion']))
 			'theme_url' => 'theme_url',
 			'theme_dir' => 'theme_dir',
 			'images_url' => 'images_url',
-			'db_error_skip' => true,
 		)
 	);
+	$db->skip_error(null);
 	while ($row = $db->fetch_assoc($request))
+	{
 		$modSettings[$row['variable']] = $row['value'];
+	}
 	$db->free_result($request);
 }
 
@@ -441,25 +444,28 @@ function loadEssentialData()
 
 		$db = load_database();
 
+		$db->skip_error(true);
 		if ($db_type == 'mysql' && isset($db_character_set) && preg_match('~^\w+$~', $db_character_set) === 1)
+		{
 			$db->query('', '
-			SET NAMES ' . $db_character_set,
-			array(
-				'db_error_skip' => true,
+				SET NAMES ' . $db_character_set,
+				array()
 			)
-		);
+		};
 
 		// Load the modSettings data...
 		$request = $db->query('', '
 			SELECT variable, value
 			FROM {db_prefix}settings',
-			array(
-				'db_error_skip' => true,
-			)
+			array()
 		);
+		$db->skip_error(null);
+
 		$modSettings = array();
 		while ($row = $db->fetch_assoc($request))
+		{
 			$modSettings[$row['variable']] = $row['value'];
+		}
 		$db->free_result($request);
 	}
 	else
@@ -651,24 +657,29 @@ function checkLogin()
 		$oldDB = false;
 		if (empty($db_type) || $db_type == 'mysql')
 		{
+			$db->skip_error(true);
 			$request = $db->query('', '
 				SHOW COLUMNS
 				FROM {db_prefix}members
 				LIKE {string:member_name}',
 				array(
 					'member_name' => 'memberName',
-					'db_error_skip' => true,
 				)
 			);
+			$db->skip_error(null);
 			if ($db->num_rows($request) != 0)
+			{
 				$oldDB = true;
+			}
 			$db->free_result($request);
 		}
 
 		// Get what we believe to be their details.
 		if (!$disable_security)
 		{
+			$db->skip_error(true);
 			if ($oldDB)
+			{
 				$request = $db->query('', '
 					SELECT id_member, memberName AS member_name, passwd, id_group,
 					additionalGroups AS additional_groups, lngfile
@@ -676,19 +687,21 @@ function checkLogin()
 					WHERE memberName = {string:member_name}',
 					array(
 						'member_name' => $_POST['user'],
-						'db_error_skip' => true,
 					)
 				);
+			}
 			else
+			{
 				$request = $db->query('', '
 					SELECT id_member, member_name, passwd, id_group, additional_groups, lngfile
 					FROM {db_prefix}members
 					WHERE member_name = {string:member_name}',
 					array(
 						'member_name' => $_POST['user'],
-						'db_error_skip' => true,
 					)
 				);
+			}
+			$db->skip_error(null);
 
 			if ($db->num_rows($request) != 0)
 			{
@@ -796,6 +809,7 @@ function checkLogin()
 				// Do we actually have permission?
 				if (!in_array(1, $groups))
 				{
+					$db->skip_error(true);
 					$request = $db->query('', '
 						SELECT permission
 						FROM {db_prefix}permissions
@@ -804,11 +818,13 @@ function checkLogin()
 						array(
 							'groups' => $groups,
 							'admin_forum' => 'admin_forum',
-							'db_error_skip' => true,
 						)
 					);
+					$db->skip_error(null);
 					if ($db->num_rows($request) == 0)
+					{
 						return throw_error('You need to be an admin to perform an upgrade!');
+					}
 					$db->free_result($request);
 				}
 
@@ -879,13 +895,13 @@ function action_upgradeOptions()
 	// Get hold of our db
 	$db = load_database();
 
+	$db->skip_error(true);
 	// No one opts in so why collect incomplete stats
 	$db->query('', '
 		DELETE FROM {db_prefix}settings
 		WHERE variable = {string:allow_sm_stats}',
 		array(
 			'allow_sm_stats' => 'allow_sm_stats',
-			'db_error_skip' => true,
 		)
 	);
 
@@ -895,9 +911,9 @@ function action_upgradeOptions()
 		WHERE variable = {string:integrate}',
 		array(
 			'integrate' => 'integrate_%',
-			'db_error_skip' => true,
 		)
 	);
+	$db->skip_error(null);
 
 	// Emptying the error log?
 	if (!empty($_POST['empty_error']))
@@ -1327,6 +1343,7 @@ function getMemberGroups()
 
 	$db = load_database();
 
+	$db->skip_error(true);
 	$request = $db->query('', '
 		SELECT group_name, id_group
 		FROM {db_prefix}membergroups
@@ -1334,7 +1351,6 @@ function getMemberGroups()
 		array(
 			'admin_group' => 1,
 			'old_group' => 7,
-			'db_error_skip' => true,
 		)
 	);
 	if ($request === false)
@@ -1346,12 +1362,15 @@ function getMemberGroups()
 			array(
 				'admin_group' => 1,
 				'old_group' => 7,
-				'db_error_skip' => true,
 			)
 		);
 	}
+	$db->skip_error(null);
+
 	while ($row = $db->fetch_row($request))
+	{
 		$member_groups[trim($row[0])] = $row[1];
+	}
 	$db->free_result($request);
 
 	return $member_groups;
@@ -1837,32 +1856,41 @@ function discoverCollation()
 	{
 		$db = load_database();
 
+		$db->skip_error(true);
 		$request = $db->query('', '
 			SHOW TABLE STATUS
 			LIKE {string:table_name}',
 			array(
 				'table_name' => "{$db_prefix}members",
-				'db_error_skip' => true,
 			)
 		);
+		$db->skip_error(null);
+
 		if ($db->num_rows($request) === 0)
+		{
 			die('Unable to find members table!');
+		}
+
 		$table_status = $db->fetch_assoc($request);
 		$db->free_result($request);
 
 		if (!empty($table_status['Collation']))
 		{
+			$db->skip_error(true);
 			$request = $db->query('', '
 				SHOW COLLATION
 				LIKE {string:collation}',
 				array(
 					'collation' => $table_status['Collation'],
-					'db_error_skip' => true,
 				)
 			);
+			$db->skip_error(null);
+
 			// Got something?
 			if ($db->num_rows($request) !== 0)
+			{
 				$collation_info = $db->fetch_assoc($request);
+			}
 			$db->free_result($request);
 
 			// Excellent!

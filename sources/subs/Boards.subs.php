@@ -750,13 +750,14 @@ function reorderBoards()
 	}
 
 	// Sort the records of the boards table on the board_order value.
+	$db->skip_error(true);
 	$db->query('alter_table', '
 		ALTER TABLE {db_prefix}boards
 		ORDER BY board_order',
 		array(
-			'db_error_skip' => true,
 		)
 	);
+	$db->skip_error(null);
 }
 
 /**

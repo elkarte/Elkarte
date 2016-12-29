@@ -283,14 +283,14 @@ function alterFullTextIndex($table, $indexes, $add = false)
 	$indexes = is_array($indexes) ? $indexes : array($indexes);
 
 	// Make sure it's gone before creating it.
+	$db->skip_error(true);
 	$db->query('', '
 		ALTER TABLE ' . $table . '
 		DROP INDEX ' . implode(',
 		DROP INDEX ', $indexes),
-		array(
-			'db_error_skip' => true,
-		)
+		array()
 	);
+	$db->skip_error(null);
 
 	if ($add)
 	{
