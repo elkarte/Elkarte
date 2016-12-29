@@ -2694,11 +2694,6 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	return $data;
 }
 
-if (!function_exists('crc32_compat'))
-{
-	require_once(SUBSDIR . '/Compat.subs.php');
-}
-
 /**
  * Checks if a package is installed or not
  *

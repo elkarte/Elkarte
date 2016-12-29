@@ -137,29 +137,3 @@ function sha1_rol($num, $cnt)
 
 	return ($num << $cnt) | $a;
 }
-
-/**
- * Compatibility function.
- */
-if (!function_exists('crc32_compat'))
-{
-	/**
-	 * crc32 doesn't work as expected on 64-bit functions - make our own.
-	 * http://www.php.net/crc32#79567
-	 *
-	 * @param int $number
-	 */
-	function crc32_compat($number)
-	{
-		$crc = crc32($number);
-
-		if ($crc & 0x80000000)
-		{
-			$crc ^= 0xffffffff;
-			$crc += 1;
-			$crc = -$crc;
-		}
-
-		return $crc;
-	}
-}
