@@ -1178,7 +1178,10 @@ function isAllowedTo($permission, $boards = null)
  *
  * @param string[]|string $permissions array of permission names to check access against
  * @param bool $check_access = true
- * @param bool $simple = true
+ * @param bool $simple = true Set $simple to true to use this function in compatibility mode
+ *             otherwise, the resultant array becomes split into the multiple
+ *             permissions that were passed. Other than that, it's just the normal
+ *             state of play that you're used to.
  */
 function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 {
@@ -1189,13 +1192,6 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 	// Arrays are nice, most of the time.
 	if (!is_array($permissions))
 		$permissions = array($permissions);
-
-	/*
-	 * Set $simple to true to use this function in compatibility mode
-	 * Otherwise, the resultant array becomes split into the multiple
-	 * permissions that were passed. Other than that, it's just the normal
-	 * state of play that you're used to.
-	 */
 
 	// I am the master, the master of the universe!
 	if ($user_info['is_admin'])
