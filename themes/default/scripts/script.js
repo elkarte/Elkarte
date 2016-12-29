@@ -633,41 +633,6 @@ function hashModeratePassword(doForm, username, cur_session_id, token)
 }
 
 /**
- * Shows the page numbers by clicking the dots (in compact view).
- * @todo @DEPRECATED it is not used. If we don't care about compatibility it can be removed
- *
- * @param {type} spanNode
- * @param {type} baseURL
- * @param {type} firstPage
- * @param {type} lastPage
- * @param {type} perPage
- */
-function expandPages(spanNode, baseURL, firstPage, lastPage, perPage)
-{
-	var replacement = '',
-		i = 0,
-		oldLastPage = 0,
-		perPageLimit = 50;
-
-	// Prevent too many pages to be loaded at once.
-	if ((lastPage - firstPage) / perPage > perPageLimit)
-	{
-		oldLastPage = lastPage;
-		lastPage = firstPage + perPageLimit * perPage;
-	}
-
-	// Calculate the new pages.
-	for (i = firstPage; i < lastPage; i += perPage)
-		replacement += '<a class="navPages" href="' + baseURL.replace(/%1\$d/, i).replace(/%%/g, '%') + '">' + (1 + i / perPage) + '</a> ';
-
-	if (oldLastPage > 0)
-		replacement += '<span class="expand_pages" role="menuitem" onclick="expandPages(this, \'' + baseURL + '\', ' + lastPage + ', ' + oldLastPage + ', ' + perPage + ');"> ... </span> ';
-
-	// Replace the dots by the new page links.
-	setOuterHTML(spanNode, replacement);
-}
-
-/**
  * Used by elk_Toggle to add an image to the swap/toggle array
  *
  * @param {string} sSrc
