@@ -203,19 +203,6 @@ function getElkTables()
 }
 
 /**
- * Wrapper function for db_optimize_table
- *
- * @package Maintenance
- * @param string $tablename
- */
-function optimizeTable($tablename)
-{
-	$db_table = db_table();
-
-	return $db_table->optimize($tablename);
-}
-
-/**
  * Gets the last topics id.
  *
  * @package Maintenance
