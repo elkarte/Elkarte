@@ -47,51 +47,6 @@ function updateChildPermissions($parents, $profile = null)
 }
 
 /**
- * Dummy class for compatibility sake
- */
-class InlinePermissions_Form extends ElkArte\sources\subs\SettingsFormAdapter\InlinePermissions
-{
-	/**
-	 * Save the permissions of a form containing inline permissions.
-	 *
-	 * @param string[] $permissions
-	 * @deprecated since 1.1
-	 */
-	public static function save_inline_permissions($permissions)
-	{
-		$permissionsForm = new self;
-		$permissionsForm->setPermissions($permissions);
-
-		$permissionsForm->save();
-
-		return null;
-	}
-
-	/**
-	 * Initialize a form with inline permissions settings.
-	 * It loads a context variables for each permission.
-	 * This function is used by several settings screens
-	 * to set specific permissions.
-	 *
-	 * @param string[] $permissions
-	 * @param int[]    $excluded_groups = array()
-	 * @deprecated since 1.1
-	 *
-	 * @uses ManagePermissions template.
-	 */
-	public static function init_inline_permissions($permissions, $excluded_groups = array())
-	{
-		$permissionsForm = new self;
-		$permissionsForm->setExcludedGroups($excluded_groups);
-		$permissionsForm->setPermissions($permissions);
-
-		$permissionsForm->prepare();
-
-		return null;
-	}
-}
-
-/**
  * Show a collapsible box to set a specific permission.
  * The function is called by templates to show a list of permissions settings.
  * Calls the template function template_inline_permissions().
