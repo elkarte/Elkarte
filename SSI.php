@@ -1234,12 +1234,6 @@ function ssi_showPoll($topicID = null, $output_method = 'echo')
 	if (empty($context['poll']))
 		return array();
 
-	// For "compatibility" sake
-	// @deprecated since 1.0
-	$context['poll']['allow_vote'] = $context['allow_vote'];
-	$context['poll']['allow_view_results'] = $context['allow_poll_view'];
-	$context['poll']['topic'] = $topicID;
-
 	if ($output_method != 'echo')
 		return $context['poll'];
 
