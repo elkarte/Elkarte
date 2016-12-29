@@ -566,39 +566,32 @@ class Mentions_Controller extends Action_Controller
 
 	/**
 	 * Updating the status from the listing?
-	 * @deprecated since 1.1 - Use Mentioning::updateStatus instead
 	 */
 	public function action_updatestatus()
 	{
+		global $modSettings;
+
 		checkSession('request');
 
-		$this->setData(array(
-			'id_mention' => $this->_req->getQuery('item', 'intval', 0),
-			'mark' => $this->_req->getQuery('mark'),
-		));
+		$mentioning = new Mentioning(database(), new Data_Validator, $modSettings['enabled_mentions']);
 
-		// Make sure its all good
-		if ($this->_isAccessible())
+		$id_mention = $this->_req->getQuery('item', 'intval', 0);
+		$mark = $this->_req->getQuery('mark');
+
+		$this->_buildUrl();
+
+		switch ($mark)
 		{
-			$this->_buildUrl();
-
-			switch ($this->_validator->mark)
-			{
-				case 'read':
-					changeMentionStatus($this->_validator->id_mention, $this->_known_status['read']);
-					break;
-				case 'unread':
-					changeMentionStatus($this->_validator->id_mention, $this->_known_status['new']);
-					break;
-				case 'delete':
-					changeMentionStatus($this->_validator->id_mention, $this->_known_status['deleted']);
-					break;
-				case 'readall':
-					loadLanguage('Mentions');
-					$mentions = $this->list_loadMentions((int) $this->_page, $this->_items_per_page, $this->_sort, $this->_all, $this->_type);
-					$this->_markMentionsRead($mentions);
-					break;
-			}
+			case 'read':
+			case 'unread':
+			case 'delete':
+				$mentioning->updateStatus($id_mention, $mark);
+				break;
+			case 'readall':
+				loadLanguage('Mentions');
+				$mentions = $this->list_loadMentions((int) $this->_page, $this->_items_per_page, $this->_sort, $this->_all, $this->_type);
+				$mentioning->markread($mentions);
+				break;
 		}
 
 		redirectexit('action=mentions;sa=list' . $this->_url_param);
