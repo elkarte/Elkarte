@@ -746,17 +746,7 @@ class Theme extends \Theme
 		// Set some specific vars.
 		$context['page_title_html_safe'] = \Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
 
-		// 1.0 backward compatibility: if you already put the icon in the theme dir
-		// use that one, otherwise the default
-		// @deprecated since 1.1
-		if (file_exists($settings['images_url'] . '/mobile.png'))
-		{
-			$context['favicon'] = $settings['images_url'] . '/mobile.png';
-		}
-		else
-		{
-			$context['favicon'] = $scripturl . '/mobile.png';
-		}
+		$context['favicon'] = $scripturl . '/mobile.png';
 
 		// Load a custom CSS file?
 		if (file_exists($settings['theme_dir'] . '/css/custom.css'))
