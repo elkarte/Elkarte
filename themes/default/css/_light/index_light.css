@@ -1287,6 +1287,22 @@ div.bbc_footnotes .meaction{
 .signature, .attachments, .custom_fields_above_signature {
 	border-top: 1px solid #bfbfbf;
 }
+
+/* attachment details below thumbnails */
+.attachment_name, .attachment_details {
+	border: solid 1px #afafaf;
+	background: #E4E4E4 !important;
+	color: #444 !important;
+	border-bottom: 1px solid #afafaf !important;
+}
+.attachment_name {
+	border-bottom: none;
+}
+.attachment_details {
+	border-top: none;
+	border-radius: 0 0 .5em .5em;
+}
+
 /* Used by video embed JS when autolinking video links */
 .elk_video {
 	border: #27a348 1px solid;
