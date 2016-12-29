@@ -668,7 +668,7 @@ class News_Controller extends Action_Controller
 }
 
 /**
- * Called from dumpTags to convert data to xml
+ * Called to convert data to xml
  * Finds urls for local site and sanitizes them
  *
  * @param string $val
@@ -797,24 +797,4 @@ function cdata_parse($data, $ns = '')
 	$cdata .= ']]>';
 
 	return strtr($cdata, array('<![CDATA[]]>' => ''));
-}
-
-/**
- * Formats data retrieved in other functions into xml format.
- *
- * - Additionally formats data based on the specific format passed.
- * - This function is recursively called to handle sub arrays of data.
- *
- * @deprecated since 1.1 - use template_xml_news instead
- *
- * @param mixed[] $data the array to output as xml data
- * @param int $i the amount of indentation to use.
- * @param string|null $tag if specified, it will be used instead of the keys of data.
- * @param string $xml_format  one of rss, rss2, rdf, atom
- * @throws Elk_Exception
- */
-function dumpTags($data, $i, $tag = null, $xml_format = 'rss')
-{
-	theme()->getTemplates()->load('Xml');
-	template_xml_news($data, $i, $tag, $xml_format);
 }
