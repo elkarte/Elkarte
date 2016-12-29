@@ -155,20 +155,6 @@ elk_DraftAutoSave.prototype.onDraftDone = function(XMLDoc)
 	if (!XMLDoc || !XMLDoc.getElementsByTagName('draft')[0])
 		return this.draftCancel();
 
-	// @deprecated since 1.1 - the check on #id_draft existence is for backward compatibility with 1.0
-	if ($('#id_draft').length === 0)
-	{
-		var formID = $('#' + this.opt.sTextareaID).closest("form").attr('id');
-		$('#' + formID).append(
-			$('<input />').attr({
-				type: 'hidden',
-				id: this.opt.sLastID,
-				name: 'id_draft',
-				value: this.opt.id_draft
-			})
-		);
-	}
-
 	// Grab the returned draft id and saved time from the response
 	this.sCurDraftId = XMLDoc.getElementsByTagName('draft')[0].getAttribute('id');
 	this.sLastSaved = XMLDoc.getElementsByTagName('draft')[0].childNodes[0].nodeValue;
