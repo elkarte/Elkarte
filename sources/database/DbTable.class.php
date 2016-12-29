@@ -176,7 +176,7 @@ abstract class DbTable
 	 * Optimize a table
 	 *
 	 * @param string $table - the table to be optimized
-	 * @return int
+	 * @return int - how much it was gained
 	 */
 	abstract public function optimize($table);
 
