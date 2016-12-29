@@ -87,6 +87,11 @@ class DbSearch_PostgreSQL implements DbSearch
 			$db->skip_error(true);
 		}
 
+		if (!empty($db_values['db_error_skip']))
+		{
+			$db->skip_error(true);
+		}
+
 		$return = $db->query('', $db_string,
 			$db_values, $connection
 		);
