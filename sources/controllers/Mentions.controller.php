@@ -549,19 +549,18 @@ class Mentions_Controller extends Action_Controller
 	 * Did you read the mention? Then let's move it to the graveyard.
 	 * Used in Display.controller.php, it may be merged to action_updatestatus
 	 * though that would require to add an optional parameter to avoid the redirect
-	 * @deprecated since 1.1 - Use Mentioning::markread instead
 	 */
 	public function action_markread()
 	{
-		checkSession('request');
+		global $modSettings;
 
-		// Common checks to determine if we can go on
-		if (!$this->_isAccessible())
-			return;
+		checkSession('request');
 
 		$this->_buildUrl();
 
-		changeMentionStatus($this->_validator->id_mention, $this->_known_status['read']);
+		$id_mention = $this->_req->getQuery('item', 'intval', 0);
+		$mentioning = new Mentioning(database(), new Data_Validator, $modSettings['enabled_mentions']);
+		$mentioning->updateStatus($id_mention, 'read');
 	}
 
 	/**
@@ -598,30 +597,6 @@ class Mentions_Controller extends Action_Controller
 	}
 
 	/**
-	 * Marks an array of mentions as read
-	 *
-	 * @param int[] $mention_ids An array of mention ids. Each of them will be
-	 *              validated independently
-	 * @deprecated since 1.1
-	 */
-	protected function _markMentionsRead($mention_ids)
-	{
-		if (empty($mention_ids))
-			return;
-
-		foreach ($mention_ids as $mention)
-		{
-			$this->setData(array(
-				'id_mention' => $mention['id_mention'],
-				'mark' => 'read',
-			));
-
-			if ($this->_isAccessible())
-				changeMentionStatus($this->_validator->id_mention, $this->_known_status['read']);
-		}
-	}
-
-	/**
 	 * Builds the link back so you return to the right list of mentions
 	 */
 	protected function _buildUrl()
@@ -632,30 +607,6 @@ class Mentions_Controller extends Action_Controller
 		$this->_page = $this->_req->getQuery('start', 'trim', '');
 
 		$this->_url_param = ($this->_all ? ';all' : '') . (!empty($this->_type) ? ';type=' . $this->_type : '') . ($this->_req->getQuery('start') !== null ? ';start=' . $this->_req->getQuery('start') : '');
-	}
-
-	/**
-	 * Check if the user can access the mention
-	 * @deprecated since 1.1
-	 */
-	protected function _isAccessible()
-	{
-		require_once(SUBSDIR . '/Mentions.subs.php');
-
-		$this->_validator = new Data_Validator();
-		$sanitization = array(
-			'id_mention' => 'intval',
-			'mark' => 'trim',
-		);
-		$validation = array(
-			'id_mention' => 'validate_ownmention',
-			'mark' => 'contains[read,unread,delete,readall]',
-		);
-
-		$this->_validator->sanitation_rules($sanitization);
-		$this->_validator->validation_rules($validation);
-
-		return $this->_validator->validate($this->_data);
 	}
 
 	/**
