@@ -27,30 +27,6 @@ class Mentions_Controller extends Action_Controller
 	protected $_known_mentions = array();
 
 	/**
-	 * Will hold all available mention status
-	 * 'new' => 0, 'read' => 1, 'deleted' => 2, 'unapproved' => 3,
-	 *
-	 * @var array
-	 */
-	protected $_known_status = array();
-
-	/**
-	 * Holds the instance of the data validation class
-	 *
-	 * @var object
-	 * @deprecated since 1.1
-	 */
-	protected $_validator = null;
-
-	/**
-	 * Holds the passed data for this instance, is passed through the validator
-	 *
-	 * @var array
-	 * @deprecated since 1.1
-	 */
-	protected $_data = null;
-
-	/**
 	 * The type of the mention we are looking at (if empty means all of them)
 	 *
 	 * @var string
@@ -109,17 +85,10 @@ class Mentions_Controller extends Action_Controller
 	/**
 	 * Mentions_Controller constructor.
 	 *
-	 * @param Event_Manager|null $eventManager
+	 * @param Event_Manager $eventManager
 	 */
-	public function __construct($eventManager = null)
+	public function __construct($eventManager)
 	{
-		$this->_known_status = array(
-			'new' => Mentioning::MNEW,
-			'read' => Mentioning::READ,
-			'deleted' => Mentioning::DELETED,
-			'unapproved' => Mentioning::UNAPPROVED,
-		);
-
 		$this->_known_sorting = array('id_member_from', 'type', 'log_time');
 
 		parent::__construct($eventManager);
@@ -153,15 +122,6 @@ class Mentions_Controller extends Action_Controller
 			throw new Elk_Exception('no_access', false);
 
 		Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
-
-		// @deprecated since 1.1
-		$this->_data = array(
-			'type' => $this->_req->getPost('type'),
-			'uid' => $this->_req->getPost('uid'),
-			'msg' => $this->_req->getPost('msg'),
-			'id_member_from' => $this->_req->getPost('from'),
-			'log_time' => $this->_req->getPost('log_time'),
-		);
 
 		$this->_known_mentions = $this->_findMentionTypes();
 	}
@@ -477,33 +437,6 @@ class Mentions_Controller extends Action_Controller
 	}
 
 	/**
-	 * Sets the specifics of a mention call in this instance
-	 *
-	 * @param mixed[] $data must contain uid, type and msg at a minimum
-	 * @deprecated since 1.1
-	 */
-	public function setData($data)
-	{
-		if (isset($data['id_member']))
-		{
-			$this->_data = array(
-				'uid' => is_array($data['id_member']) ? $data['id_member'] : array($data['id_member']),
-				'type' => $data['type'],
-				'msg' => $data['id_msg'],
-				'status' => isset($data['status']) && in_array($data['status'], $this->_known_status) ? $this->_known_status[$data['status']] : 0,
-			);
-
-			if (isset($data['id_member_from']))
-				$this->_data['id_member_from'] = $data['id_member_from'];
-
-			if (isset($data['log_time']))
-				$this->_data['log_time'] = $data['log_time'];
-		}
-		else
-			$this->_data = $data;
-	}
-
-	/**
 	 * Did you read the mention? Then let's move it to the graveyard.
 	 * Used in Display.controller.php, it may be merged to action_updatestatus
 	 * though that would require to add an optional parameter to avoid the redirect
@@ -565,46 +498,5 @@ class Mentions_Controller extends Action_Controller
 		$this->_page = $this->_req->getQuery('start', 'trim', '');
 
 		$this->_url_param = ($this->_all ? ';all' : '') . (!empty($this->_type) ? ';type=' . $this->_type : '') . ($this->_req->getQuery('start') !== null ? ';start=' . $this->_req->getQuery('start') : '');
-	}
-
-	/**
-	 * Check if the user can do what he is supposed to do, and validates the input
-	 * @deprecated since 1.1
-	 */
-	protected function _isValid()
-	{
-		$this->_validator = new Data_Validator();
-		$sanitization = array(
-			'type' => 'trim',
-			'msg' => 'intval',
-		);
-		$validation = array(
-			'type' => 'required|contains[' . implode(',', $this->_known_mentions) . ']',
-			'uid' => 'isarray',
-		);
-
-		// Any optional fields we need to check?
-		if (isset($this->_data['id_member_from']))
-		{
-			$sanitization['id_member_from'] = 'intval';
-			$validation['id_member_from'] = 'required|notequal[0]';
-		}
-		if (isset($this->_data['log_time']))
-		{
-			$sanitization['log_time'] = 'intval';
-			$validation['log_time'] = 'required|notequal[0]';
-		}
-
-		$this->_validator->sanitation_rules($sanitization);
-		$this->_validator->validation_rules($validation);
-
-		if (!$this->_validator->validate($this->_data))
-			return false;
-
-		// If everything is fine, let's include our helper functions and prepare for the fun!
-		require_once(SUBSDIR . '/Mentions.subs.php');
-		loadLanguage('Mentions');
-
-		return true;
 	}
 }
