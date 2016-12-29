@@ -680,10 +680,6 @@ function InTopicModeration(oOptions)
 	this.bButtonsShown = false;
 	this.iNumSelected = 0;
 
-	// Add backwards compatibility with old themes.
-	if (typeof(this.opt.sSessionVar) === 'undefined')
-		this.opt.sSessionVar = 'sesc';
-
 	this.init();
 }
 
