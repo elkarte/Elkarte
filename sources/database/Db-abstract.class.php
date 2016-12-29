@@ -483,9 +483,13 @@ abstract class Database_Abstract implements Database
 	public function skip_error($set = true)
 	{
 		if ($set === null)
-			$this->_skip_error = $this->_old_skip_error;
+		{
+			$set = $this->_old_skip_error;
+		}
 		else
+		{
 			$this->_old_skip_error = $this->_skip_error;
+		}
 
 		$this->_skip_error = $set;
 	}
