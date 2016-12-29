@@ -1683,8 +1683,6 @@ function profileLoadSignatureData()
 		'max_font_size' => isset($sig_limits[7]) ? $sig_limits[7] : 0,
 		'bbc' => !empty($sig_bbc) ? explode(',', $sig_bbc) : array(),
 	);
-	// Kept this line in for backwards compatibility!
-	$context['max_signature_length'] = $context['signature_limits']['max_length'];
 
 	// Warning message for signature image limits?
 	$context['signature_warning'] = '';
