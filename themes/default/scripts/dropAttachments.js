@@ -32,8 +32,6 @@
 			topic = 0,
 			oTxt = {},
 			errorMsg = '',
-			// @deprecated since 1.1 - here just for backward compatibility
-			fileDisplayTemplate = '<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="control fa fa-times-circle"></div></div>',
 			oEvents = {},
 			$str,
 
@@ -67,9 +65,7 @@
 				filesUploadedSuccessfully = [];
 				if (typeof params.topic !== 'undefined')
 					topic = params.topic;
-				if (typeof params.fileDisplayTemplate !== 'undefined')
-					fileDisplayTemplate = params.fileDisplayTemplate;
-				$str = $(fileDisplayTemplate);
+				$str = $(params.fileDisplayTemplate);
 				board = params.board;
 				oTxt = params.oTxt;
 				if (typeof params.existingSelector !== 'undefined')
