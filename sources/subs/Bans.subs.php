@@ -833,36 +833,6 @@ function validateIPBan($ip_array, $fullip = '')
 }
 
 /**
- * Checks whether a given IP range already exists in the trigger list.
- *
- * What it does:
- * - If yes, it returns an error message.
- * - Otherwise, it returns an array
- * - optimized for the database.
- *
- * @package Bans
- *
- * @param int[]  $ip_array array of ip array ints
- * @param string $fullip
- *
- * @return bool
- * @throws Elk_Exception
- * @deprecated since 1.1 - use validateIPBan instead
- */
-function checkExistingTriggerIP($ip_array, $fullip = '')
-{
-	$return = validateIPBan($ip_array, $fullip);
-
-	if (empty($return['error']))
-		return $return;
-
-	if ($return['error'] === 'ban_trigger_already_exists')
-		throw new Elk_Exception($return['error'][0], false, $return['error'][1]);
-
-	return false;
-}
-
-/**
  * As it says... this tries to review the list of banned members, to match new bans.
  *
  * - Note: is_activated >= 10: a member is banned.
