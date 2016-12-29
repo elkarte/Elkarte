@@ -1584,30 +1584,6 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null, $
 }
 
 /**
- * Get all avatars information... as long as they're in default directory still?
- * Not currently used
- *
- * @deprecated since 1.0
- *
- * @return mixed[] avatars information
- */
-function getAvatarsDefault()
-{
-	$db = database();
-
-	return $db->fetchQuery('
-		SELECT id_attach, id_folder, id_member, filename, file_hash
-		FROM {db_prefix}attachments
-		WHERE attachment_type = {int:attachment_type}
-			AND id_member > {int:guest_id_member}',
-		array(
-			'attachment_type' => 0,
-			'guest_id_member' => 0,
-		)
-	);
-}
-
-/**
  * Recursive function to retrieve server-stored avatar files
  *
  * @package Attachments
