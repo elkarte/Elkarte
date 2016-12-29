@@ -427,27 +427,6 @@ abstract class Database_Abstract implements Database
 	}
 
 	/**
-	 * This function optimizes a table.
-	 *
-	 * - reclaims storage occupied by dead tuples. In normal PostgreSQL operation, tuples
-	 * that are deleted or obsoleted by an update are not physically removed from their table;
-	 * they remain present until a VACUUM is done. Therefore it's necessary to do VACUUM periodically,
-	 * especially on frequently-updated tables.
-	 *
-	 * @param string $table - the table to be optimized
-	 *
-	 * @deprecated since 1.1 - the function was moved to DbTable class
-	 *
-	 * @return int how much it was gained
-	 */
-	public function db_optimize_table($table)
-	{
-		$db_table = db_table();
-
-		return $db_table->optimize($table);
-	}
-
-	/**
 	 * Retrieve the connection object
 	 *
 	 * @return resource what? The connection
