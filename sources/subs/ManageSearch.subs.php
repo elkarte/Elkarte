@@ -283,18 +283,18 @@ function alterFullTextIndex($table, $indexes, $add = false)
 	$indexes = is_array($indexes) ? $indexes : array($indexes);
 
 	// Make sure it's gone before creating it.
-	$db->skip_error(true);
+	$db->skip_next_error();
 	$db->query('', '
 		ALTER TABLE ' . $table . '
 		DROP INDEX ' . implode(',
 		DROP INDEX ', $indexes),
 		array()
 	);
-	$db->skip_error(null);
 
 	if ($add)
 	{
 		foreach ($indexes as $index)
+		{
 			$db->query('', '
 				ALTER TABLE ' . $table . '
 				ADD FULLTEXT {raw:name} ({raw:name})',
@@ -302,6 +302,7 @@ function alterFullTextIndex($table, $indexes, $add = false)
 					'name' => $index
 				)
 			);
+		}
 	}
 }
 

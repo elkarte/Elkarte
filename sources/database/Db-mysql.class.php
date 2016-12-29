@@ -248,7 +248,7 @@ class Database_MySQL extends Database_Abstract
 		else
 			$ret = @mysqli_query($connection, $db_string, MYSQLI_USE_RESULT);
 
-		// @deprecated since 1.1 - use skip_error method
+		// @deprecated since 1.1 - use skip_next_error method
 		if (!empty($db_values['db_error_skip']))
 		{
 			$old_skip = $this->_skip_error;
@@ -256,11 +256,21 @@ class Database_MySQL extends Database_Abstract
 		}
 
 		if ($ret === false && !$this->_skip_error)
+		{
 			$ret = $this->error($db_string, $connection);
+		}
 
-		// @deprecated since 1.1 - use skip_error method
+		// @deprecated since 1.1 - use skip_next_error method
 		if (isset($old_skip))
+		{
 			$this->_skip_error = $old_skip;
+		}
+
+		// Revert not to skip errors
+		if ($this->_skip_error === true)
+		{
+			$this->_skip_error = false;
+		}
 
 		// Debugging.
 		if ($db_show_debug === true)

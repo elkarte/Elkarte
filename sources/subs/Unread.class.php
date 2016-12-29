@@ -540,7 +540,7 @@ class Unread
 				LEFT JOIN {db_prefix}members AS mems ON (mems.id_member = ms.id_member)',
 		);
 
-		$db->skip_error(true);
+		$db->skip_next_error();
 		$this->_have_temp_table = $this->_db->query('', '
 			CREATE TEMPORARY TABLE {db_prefix}topics_posted_in (
 				id_topic mediumint(8) unsigned NOT NULL default {string:string_zero},
@@ -570,6 +570,7 @@ class Unread
 		// If that worked, create a sample of the log_topics table too.
 		if ($this->_have_temp_table)
 		{
+			$db->skip_next_error();
 			$this->_have_temp_table = $this->_db->query('', '
 				CREATE TEMPORARY TABLE {db_prefix}log_topics_posted_in (
 					PRIMARY KEY (id_topic)
@@ -583,7 +584,6 @@ class Unread
 				)
 			) !== false;
 		}
-		$db->skip_error(null);
 	}
 
 	/**
@@ -597,7 +597,7 @@ class Unread
 			)
 		);
 
-		$db->skip_error(true);
+		$db->skip_next_error();
 		// Let's copy things out of the log_topics table, to reduce searching.
 		$this->_have_temp_table = $this->_db->query('', '
 			CREATE TEMPORARY TABLE {db_prefix}log_topics_unread (
@@ -617,6 +617,5 @@ class Unread
 				'is_approved' => 1,
 			))
 		) !== false;
-		$db->skip_error(null);
 	}
 }

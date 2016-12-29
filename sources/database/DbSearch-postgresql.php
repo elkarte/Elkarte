@@ -84,18 +84,18 @@ class DbSearch_PostgreSQL implements DbSearch
 		{
 			$db_string = preg_replace('~^\s*INSERT\sIGNORE~i', 'INSERT', $db_string);
 			// Don't error on multi-insert.
-			$db->skip_error(true);
+			$db->skip_next_error();
 		}
 
+		// @deprecated since 1.1 - temporary measure until a proper skip_error is implemented
 		if (!empty($db_values['db_error_skip']))
 		{
-			$db->skip_error(true);
+			$db->skip_next_error();
 		}
 
 		$return = $db->query('', $db_string,
 			$db_values, $connection
 		);
-		$db->skip_error(null);
 
 		return $return;
 	}

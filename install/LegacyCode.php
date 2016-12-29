@@ -25,7 +25,7 @@ function textfield_alter($change, $substep)
 
 	$db = database();
 
-	$db->skip_error(true);
+	$db->skip_next_error();
 	$request = $db->query('', '
 		SHOW FULL COLUMNS
 		FROM {db_prefix}' . $change['table'] . '
@@ -34,7 +34,6 @@ function textfield_alter($change, $substep)
 			'column' => $change['column'],
 		)
 	);
-	$db->skip_error(null);
 
 	if ($db->num_rows($request) === 0)
 	{
@@ -52,7 +51,7 @@ function textfield_alter($change, $substep)
 	// Get the character set that goes with the collation of the column.
 	if ($column_fix && !empty($table_row['Collation']))
 	{
-		$db->skip_error(true);
+		$db->skip_next_error();
 		$request = $db->query('', '
 			SHOW COLLATION
 			LIKE {string:collation}',
@@ -60,7 +59,6 @@ function textfield_alter($change, $substep)
 				'collation' => $table_row['Collation'],
 			)
 		);
-		$db->skip_error(null);
 
 		// No results? Just forget it all together.
 		if ($db->num_rows($request) === 0)
@@ -76,7 +74,7 @@ function textfield_alter($change, $substep)
 
 	if ($column_fix)
 	{
-		$db->skip_error(true);
+		$db->skip_next_error();
 		// Make sure there are no NULL's left.
 		if ($null_fix)
 		{
@@ -90,6 +88,7 @@ function textfield_alter($change, $substep)
 			);
 		}
 
+		$db->skip_next_error();
 		// Do the actual alteration.
 		$db->query('', '
 			ALTER TABLE {db_prefix}' . $change['table'] . '
@@ -98,7 +97,6 @@ function textfield_alter($change, $substep)
 				'default' => isset($change['default']) ? $change['default'] : '',
 			)
 		);
-		$db->skip_error(null);
 	}
 
 	nextSubstep($substep);

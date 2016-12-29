@@ -450,14 +450,13 @@ function sortSmileyTable()
 {
 	$db = database();
 
-	$db->skip_error(null);
+	$db->skip_next_error();
 	// Order the table by code length.
 	$db->query('alter_table', '
 		ALTER TABLE {db_prefix}smileys
 		ORDER BY LENGTH(code) DESC',
 		array()
 	);
-	$db->skip_error(null);
 }
 
 /**

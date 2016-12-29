@@ -34,16 +34,10 @@ abstract class Database_Abstract implements Database
 	protected $_query_count = 0;
 
 	/**
-	 * Yet another way to skip a database error
+	 * The way to skip a database error
 	 * @var boolean
 	 */
 	protected $_skip_error = false;
-
-	/**
-	 * This is used to remember the "previous" state of the skip_error parameter
-	 * @var null|boolean
-	 */
-	protected $_old_skip_error = false;
 
 	/**
 	 * MySQL supports unbuffered queries, this remembers if we are running an
@@ -475,23 +469,11 @@ abstract class Database_Abstract implements Database
 	}
 
 	/**
-	 * Defines if the class should or not return the error in case of failures.
-	 *
-	 * @param null|boolean $set if true the query method will not return any error
-	 *                     if null will restore the last known value of skip_error
+	 * {@inheritDoc}
 	 */
-	public function skip_error($set = true)
+	public function skip_next_error()
 	{
-		if ($set === null)
-		{
-			$set = $this->_old_skip_error;
-		}
-		else
-		{
-			$this->_old_skip_error = $this->_skip_error;
-		}
-
-		$this->_skip_error = $set;
+		$this->_skip_error = true;
 	}
 
 	/**

@@ -271,14 +271,13 @@ function sortSpiderTable()
 {
 	$db = database();
 
-	$db->skip_error(true);
+	$db->skip_next_error();
 	// Order the table by user_agent length.
 	$db->query('alter_table', '
 		ALTER TABLE {db_prefix}spiders
 		ORDER BY LENGTH(user_agent) DESC',
 		array()
 	);
-	$db->skip_error(null);
 }
 
 /**

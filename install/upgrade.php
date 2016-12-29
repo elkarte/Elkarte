@@ -171,7 +171,7 @@ $db = load_database();
 // Does this exist?
 if (isset($modSettings['elkVersion']))
 {
-	$db->skip_error(true);
+	$db->skip_next_error();
 	$request = $db->query('', '
 		SELECT variable, value
 		FROM {db_prefix}themes
@@ -184,7 +184,6 @@ if (isset($modSettings['elkVersion']))
 			'images_url' => 'images_url',
 		)
 	);
-	$db->skip_error(null);
 	while ($row = $db->fetch_assoc($request))
 	{
 		$modSettings[$row['variable']] = $row['value'];
@@ -444,7 +443,7 @@ function loadEssentialData()
 
 		$db = load_database();
 
-		$db->skip_error(true);
+		$db->skip_next_error();
 		if ($db_type == 'mysql' && isset($db_character_set) && preg_match('~^\w+$~', $db_character_set) === 1)
 		{
 			$db->query('', '
@@ -453,13 +452,13 @@ function loadEssentialData()
 			)
 		};
 
+		$db->skip_next_error();
 		// Load the modSettings data...
 		$request = $db->query('', '
 			SELECT variable, value
 			FROM {db_prefix}settings',
 			array()
 		);
-		$db->skip_error(null);
 
 		$modSettings = array();
 		while ($row = $db->fetch_assoc($request))
@@ -657,7 +656,7 @@ function checkLogin()
 		$oldDB = false;
 		if (empty($db_type) || $db_type == 'mysql')
 		{
-			$db->skip_error(true);
+			$db->skip_next_error();
 			$request = $db->query('', '
 				SHOW COLUMNS
 				FROM {db_prefix}members
@@ -666,7 +665,6 @@ function checkLogin()
 					'member_name' => 'memberName',
 				)
 			);
-			$db->skip_error(null);
 			if ($db->num_rows($request) != 0)
 			{
 				$oldDB = true;
@@ -677,9 +675,9 @@ function checkLogin()
 		// Get what we believe to be their details.
 		if (!$disable_security)
 		{
-			$db->skip_error(true);
 			if ($oldDB)
 			{
+				$db->skip_next_error();
 				$request = $db->query('', '
 					SELECT id_member, memberName AS member_name, passwd, id_group,
 					additionalGroups AS additional_groups, lngfile
@@ -692,6 +690,7 @@ function checkLogin()
 			}
 			else
 			{
+				$db->skip_next_error();
 				$request = $db->query('', '
 					SELECT id_member, member_name, passwd, id_group, additional_groups, lngfile
 					FROM {db_prefix}members
@@ -701,7 +700,6 @@ function checkLogin()
 					)
 				);
 			}
-			$db->skip_error(null);
 
 			if ($db->num_rows($request) != 0)
 			{
@@ -809,7 +807,7 @@ function checkLogin()
 				// Do we actually have permission?
 				if (!in_array(1, $groups))
 				{
-					$db->skip_error(true);
+					$db->skip_next_error();
 					$request = $db->query('', '
 						SELECT permission
 						FROM {db_prefix}permissions
@@ -820,7 +818,6 @@ function checkLogin()
 							'admin_forum' => 'admin_forum',
 						)
 					);
-					$db->skip_error(null);
 					if ($db->num_rows($request) == 0)
 					{
 						return throw_error('You need to be an admin to perform an upgrade!');
@@ -895,7 +892,7 @@ function action_upgradeOptions()
 	// Get hold of our db
 	$db = load_database();
 
-	$db->skip_error(true);
+	$db->skip_next_error();
 	// No one opts in so why collect incomplete stats
 	$db->query('', '
 		DELETE FROM {db_prefix}settings
@@ -905,6 +902,7 @@ function action_upgradeOptions()
 		)
 	);
 
+	$db->skip_next_error();
 	// Cleanup all the hooks (we are upgrading, so better have everything cleaned up)
 	$db->query('', '
 		DELETE FROM {db_prefix}settings
@@ -913,7 +911,6 @@ function action_upgradeOptions()
 			'integrate' => 'integrate_%',
 		)
 	);
-	$db->skip_error(null);
 
 	// Emptying the error log?
 	if (!empty($_POST['empty_error']))
@@ -1343,7 +1340,7 @@ function getMemberGroups()
 
 	$db = load_database();
 
-	$db->skip_error(true);
+	$db->skip_next_error();
 	$request = $db->query('', '
 		SELECT group_name, id_group
 		FROM {db_prefix}membergroups
@@ -1355,6 +1352,7 @@ function getMemberGroups()
 	);
 	if ($request === false)
 	{
+		$db->skip_next_error();
 		$request = $db->query('', '
 			SELECT membergroup, id_group
 			FROM {db_prefix}membergroups
@@ -1365,7 +1363,6 @@ function getMemberGroups()
 			)
 		);
 	}
-	$db->skip_error(null);
 
 	while ($row = $db->fetch_row($request))
 	{
@@ -1405,7 +1402,6 @@ function parse_sql($filename)
 	$db_table = db_table_install();
 	$db_wrapper = new DbWrapper($db, $replaces);
 	$db_table_wrapper = new DbTableWrapper($db_table);
-	$db->skip_error();
 
 	// Make our own error handler.
 	set_error_handler('sql_error_handler');
@@ -1856,7 +1852,7 @@ function discoverCollation()
 	{
 		$db = load_database();
 
-		$db->skip_error(true);
+		$db->skip_next_error();
 		$request = $db->query('', '
 			SHOW TABLE STATUS
 			LIKE {string:table_name}',
@@ -1864,7 +1860,6 @@ function discoverCollation()
 				'table_name' => "{$db_prefix}members",
 			)
 		);
-		$db->skip_error(null);
 
 		if ($db->num_rows($request) === 0)
 		{
@@ -1876,7 +1871,7 @@ function discoverCollation()
 
 		if (!empty($table_status['Collation']))
 		{
-			$db->skip_error(true);
+			$db->skip_next_error();
 			$request = $db->query('', '
 				SHOW COLLATION
 				LIKE {string:collation}',
@@ -1884,7 +1879,6 @@ function discoverCollation()
 					'collation' => $table_status['Collation'],
 				)
 			);
-			$db->skip_error(null);
 
 			// Got something?
 			if ($db->num_rows($request) !== 0)

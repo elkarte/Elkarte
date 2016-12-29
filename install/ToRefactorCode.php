@@ -143,10 +143,9 @@ function upgrade_query($string, $unbuffered = false)
 	// Get the query result - working around some specific security - just this once!
 	$modSettings['disableQueryCheck'] = true;
 	$db->setUnbuffered($unbuffered);
-	$db->skip_error(true);
+	$db->skip_next_error();
 	$result = $db->query('', $string, array('security_override' => true));
 	$db->setUnbuffered(false);
-	$db->skip_error(null);
 
 	// Failure?!
 	if ($result !== false)

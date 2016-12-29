@@ -589,7 +589,7 @@ class Install_Controller
 			// Let's try that database on for size... assuming we haven't already lost the opportunity.
 			if ($db_name != '')
 			{
-				$db->skip_error(true);
+				$db->skip_next_error();
 				$db->query('', "
 					CREATE DATABASE IF NOT EXISTS `$db_name`",
 					array(
@@ -597,12 +597,11 @@ class Install_Controller
 					),
 					$db_connection
 				);
-				$db->skip_error(null);
 
 				// Okay, let's try the prefix if it didn't work...
 				if (!$db->select_db($db_name, $db_connection) && $db_name != '')
 				{
-					$db->skip_error(true);
+					$db->skip_next_error();
 					$db->query('', "
 						CREATE DATABASE IF NOT EXISTS `$_POST[db_prefix]$db_name`",
 						array(
@@ -610,7 +609,6 @@ class Install_Controller
 						),
 						$db_connection
 					);
-					$db->skip_error(null);
 
 					if ($db->select_db($_POST['db_prefix'] . $db_name, $db_connection))
 					{
@@ -737,14 +735,13 @@ class Install_Controller
 		$db = load_database();
 		$db_table = db_table_install();
 
-		$db->skip_error(true);
 		// Before running any of the queries, let's make sure another version isn't already installed.
+		$db->skip_next_error();
 		$result = $db->query('', '
 			SELECT variable, value
 			FROM {db_prefix}settings',
 			array()
 		);
-		$db->skip_error(null);
 
 		$modSettings = array();
 		if ($result !== false)
@@ -763,14 +760,13 @@ class Install_Controller
 		$modSettings['disableQueryCheck'] = true;
 
 		// Since we are UTF8, select it. PostgreSQL requires passing it as a string...
-		$db->skip_error(true);
+		$db->skip_next_error();
 		$db->query('', '
 			SET NAMES {'. ($db_type == 'postgresql' ? 'string' : 'raw') . ':utf8}',
 			array(
 				'utf8' => 'utf8',
 			)
 		);
-		$db->skip_error(null);
 
 		$replaces = array(
 			'{$db_prefix}' => $db_prefix,
@@ -883,7 +879,7 @@ class Install_Controller
 		}
 
 		// Check for the ALTER privilege.
-		$db->skip_error(true);
+		$db->skip_next_error();
 		$can_alter_table = $db->query('', "
 			ALTER TABLE {$db_prefix}log_digest
 			ORDER BY id_topic",
@@ -891,7 +887,7 @@ class Install_Controller
 				'security_override' => true
 			)
 		) === false;
-		$db->skip_error(null);
+
 		if (!empty($databases[$db_type]['alter_support']) && $can_alter_table)
 		{
 			$incontext['error'] = $txt['error_db_alter_priv'];
@@ -940,7 +936,7 @@ class Install_Controller
 
 		$incontext['require_db_confirm'] = empty($db_type) || !empty($databases[$db_type]['require_db_confirm']);
 
-		$db->skip_error(true);
+		$db->skip_next_error();
 		// Only allow create an admin account if they don't have one already.
 		$request = $db->query('', '
 			SELECT id_member
@@ -951,7 +947,6 @@ class Install_Controller
 				'admin_group' => 1,
 			)
 		);
-		$db->skip_error(null);
 
 		// Skip the step if an admin already exists
 		if ($db->num_rows($request) != 0)
@@ -998,7 +993,7 @@ class Install_Controller
 			$invalid_characters = preg_match('~[<>&"\'=\\\]~', $_POST['username']) != 0;
 			$_POST['username'] = preg_replace('~[<>&"\'=\\\]~', '', $_POST['username']);
 
-			$db->skip_error(true);
+			$db->skip_next_error();
 			$result = $db->query('', '
 				SELECT id_member, password_salt
 				FROM {db_prefix}members
@@ -1009,7 +1004,6 @@ class Install_Controller
 					'email' => stripslashes($_POST['email']),
 				)
 			);
-			$db->skip_error(null);
 
 			if ($db->num_rows($result) != 0)
 			{
@@ -1139,14 +1133,13 @@ class Install_Controller
 
 		if (!empty($db_character_set) && !empty($databases[$db_type]['utf8_support']))
 		{
-			$db->skip_error(true);
+			$db->skip_next_error();
 			$db->query('', '
 				SET NAMES {raw:db_character_set}',
 				array(
 					'db_character_set' => $db_character_set,
 				)
 			);
-			$db->skip_error(null);
 		}
 
 		// As track stats is by default enabled let's add some activity.
@@ -1161,14 +1154,13 @@ class Install_Controller
 		// upgrade when pointing to index.php and the install directory is still there.
 		updateSettingsFile(array('install_time' => time()));
 
-		$db->skip_error(true);
+		$db->skip_next_error();
 		// We're going to want our lovely $modSettings now.
 		$request = $db->query('', '
 			SELECT variable, value
 			FROM {db_prefix}settings',
 			array()
 		);
-		$db->skip_error(null);
 		// Only proceed if we can load the data.
 		if ($request)
 		{
@@ -1181,7 +1173,7 @@ class Install_Controller
 		if (isset($incontext['member_id']) && isset($incontext['member_salt']))
 			setLoginCookie(3153600 * 60, $incontext['member_id'], hash('sha256', $incontext['passwd'] . $incontext['member_salt']));
 
-		$db->skip_error(true);
+		$db->skip_next_error();
 		$result = $db->query('', '
 			SELECT value
 			FROM {db_prefix}settings
@@ -1190,7 +1182,6 @@ class Install_Controller
 				'db_sessions' => 'databaseSession_enable',
 			)
 		);
-		$db->skip_error(null);
 
 		if ($db->num_rows($result) != 0)
 		{
@@ -1223,7 +1214,7 @@ class Install_Controller
 		require_once(SUBSDIR . '/Topic.subs.php');
 		updateTopicStats();
 
-		$db->skip_error(true);
+		$db->skip_next_error();
 		$request = $db->query('', '
 			SELECT id_msg
 			FROM {db_prefix}messages
@@ -1232,7 +1223,6 @@ class Install_Controller
 			LIMIT 1',
 			array()
 		);
-		$db->skip_error(null);
 
 		if ($db->num_rows($request) > 0)
 			updateStats('subject', 1, htmlspecialchars($txt['default_topic_subject']));
