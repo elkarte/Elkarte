@@ -43,18 +43,12 @@ abstract class Action_Controller
 	 * Requires the name of the controller we want to instantiate, lowercase and
 	 * without the "_Controller" part.
 	 *
-	 * @param null|Event_Manager $eventManager - The event manager
+	 * @param Event_Manager $eventManager - The event manager
 	 */
-	public function __construct($eventManager = null)
+	public function __construct($eventManager)
 	{
 		// Dependency injection will come later
 		$this->_req = HttpReq::instance();
-
-		// A safety-net to remain backward compatible
-		if ($eventManager === null)
-		{
-			$eventManager = new Event_Manager();
-		}
 
 		$this->_events = $eventManager;
 	}
