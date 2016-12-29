@@ -508,6 +508,12 @@ function processAttachments($id_msg = null)
 		if (empty($_SESSION['temp_attachments'][$attachID]['errors']))
 			attachmentChecks($attachID);
 
+		// Want to correct for phonetographer photos?
+		if (!empty($modSettings['attachment_autorotate']) && empty($_SESSION['temp_attachments'][$attachID]['errors']) && substr($_SESSION['temp_attachments'][$attachID]['type'], 0, 5) === 'image')
+		{
+			autoRotateImage($_SESSION['temp_attachments'][$attachID]['tmp_name']);
+		}
+
 		// Sort out the errors for display and delete any associated files.
 		if (!empty($_SESSION['temp_attachments'][$attachID]['errors']))
 		{
