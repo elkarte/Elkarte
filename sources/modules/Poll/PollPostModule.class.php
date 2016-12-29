@@ -267,9 +267,7 @@ class Poll_Post_Module implements ElkArte\sources\modules\Module_Interface
 
 		$context['poll']['question'] = isset($_REQUEST['question']) ? Util::htmlspecialchars(trim($_REQUEST['question'])) : '';
 
-		$context['choices'] = $context['poll']['choices'] = array();
-		// @deprecated since 1.1 - backward compatibility with 1.0
-		$context['choices'] &= $context['poll']['choices'];
+		$context['poll']['choices'] = array();
 		$choice_id = 0;
 
 		$_POST['options'] = empty($_POST['options']) ? array() : htmlspecialchars__recursive($_POST['options']);

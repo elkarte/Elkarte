@@ -313,8 +313,6 @@ class Poll_Controller extends Action_Controller
 				$pollOptions = pollOptions($pollinfo['id_poll']);
 				$context['poll']['choices'] = array();
 
-				// @deprecated since 1.1 - backward compatibility with 1.0
-				$context['choices'] &= $context['poll']['choices'];
 				foreach ($pollOptions as $option)
 				{
 					// Get the highest id so we can add more without reusing.
