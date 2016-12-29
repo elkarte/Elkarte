@@ -628,8 +628,11 @@ class Database_PostgreSQL extends Database_Abstract
 				$insertRows[] = $this->quote($insertData, $this->_array_combine($indexed_columns, $dataRow), $connection);
 
 			$inserted_results = 0;
+			$skip_error = $method == 'ignore' || $table === $db_prefix . 'log_errors';
 			foreach ($insertRows as $entry)
 			{
+				$this->_skip_error = $skip_error;
+
 				// Do the insert.
 				$this->query('', '
 					INSERT INTO ' . $table . '("' . implode('", "', $indexed_columns) . '")
@@ -637,7 +640,6 @@ class Database_PostgreSQL extends Database_Abstract
 						' . $entry,
 					array(
 						'security_override' => true,
-						'db_error_skip' => $method == 'ignore' || $table === $db_prefix . 'log_errors',
 					),
 					$connection
 				);

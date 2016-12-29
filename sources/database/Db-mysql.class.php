@@ -735,6 +735,8 @@ class Database_MySQL extends Database_Abstract
 		// Determine the method of insertion.
 		$queryTitle = $method === 'replace' ? 'REPLACE' : ($method == 'ignore' ? 'INSERT IGNORE' : 'INSERT');
 
+		$skip_error = $table === $db_prefix . 'log_errors';
+		$this->_skip_error = $skip_error;
 		// Do the insert.
 		$this->query('', '
 			' . $queryTitle . ' INTO ' . $table . '(`' . implode('`, `', $indexed_columns) . '`)
@@ -743,7 +745,6 @@ class Database_MySQL extends Database_Abstract
 				', $insertRows),
 			array(
 				'security_override' => true,
-				'db_error_skip' => $table === $db_prefix . 'log_errors',
 			),
 			$connection
 		);
