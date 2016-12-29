@@ -653,10 +653,12 @@ class Maintenance_Controller extends Action_Controller
 
 		// For each table....
 		$context['optimized_tables'] = array();
+		$db_table = db_table();
+
 		foreach ($tables as $table)
 		{
 			// Optimize the table!  We use backticks here because it might be a custom table.
-			$data_freed = optimizeTable($table['table_name']);
+			$data_freed = $db_table->optimize($table['table_name']);
 
 			if ($data_freed > 0)
 				$context['optimized_tables'][] = array(
