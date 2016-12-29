@@ -772,7 +772,6 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	$invalid_old_url = array(
 		'action=dlattach',
 		'action=jsoption',
-		'action=viewadminfile',
 		';xml',
 		';api',
 	);

@@ -120,7 +120,6 @@ class Site_Dispatcher
 		'unreadreplies' => array('Unread_Controller', 'action_unreadreplies'),
 		'viewprofile' => array('Profile_Controller', 'action_index'),
 		'viewquery' => array('AdminDebug_Controller', 'action_viewquery'),
-		'viewadminfile' => array('AdminDebug_Controller', 'action_viewadminfile'),
 		'.xml' => array('News_Controller', 'action_showfeed'),
 		'xmlhttp' => array('Xml_Controller', 'action_index'),
 		'xmlpreview' => array('XmlPreview_Controller', 'action_index'),
