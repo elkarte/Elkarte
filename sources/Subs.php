@@ -16,62 +16,6 @@
  */
 
 /**
- * Update some basic statistics.
- *
- * @deprecated since 1.1 - use directly the update{Statistic}Stats functions instead
- *
- * 'member' statistic updates the latest member, the total member
- *  count, and the number of unapproved members.
- * 'member' also only counts approved members when approval is on, but
- *  is much more efficient with it off.
- *
- * 'message' changes the total number of messages, and the
- *  highest message id by id_msg - which can be parameters 1 and 2,
- *  respectively.
- *
- * 'topic' updates the total number of topics, or if parameter1 is true
- *  simply increments them.
- *
- * 'subject' updates the log_search_subjects in the event of a topic being
- *  moved, removed or split.  parameter1 is the topicid, parameter2 is the new subject
- *
- * 'postgroups' case updates those members who match condition's
- *  post-based membergroups in the database (restricted by parameter1).
- *
- * @param string $type Stat type - can be 'member', 'message', 'topic', 'subject' or 'postgroups'
- * @param int|string|boolean|mixed[]|null $parameter1 pass through value
- * @param int|string|boolean|mixed[]|null $parameter2 pass through value
- */
-function updateStats($type, $parameter1 = null, $parameter2 = null)
-{
-	switch ($type)
-	{
-		case 'member':
-			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberStats($parameter1, $parameter2);
-			break;
-		case 'message':
-			require_once(SUBSDIR . '/Messages.subs.php');
-			updateMessageStats($parameter1, $parameter2);
-			break;
-		case 'subject':
-			require_once(SUBSDIR . '/Messages.subs.php');
-			updateSubjectStats($parameter1, $parameter2);
-			break;
-		case 'topic':
-			require_once(SUBSDIR . '/Topic.subs.php');
-			updateTopicStats($parameter1);
-			break;
-		case 'postgroups':
-			require_once(SUBSDIR . '/Membergroups.subs.php');
-			updatePostGroupStats($parameter1, $parameter2);
-			break;
-		default:
-			trigger_error('updateStats(): Invalid statistic type \'' . $type . '\'', E_USER_NOTICE);
-	}
-}
-
-/**
  * Updates the settings table as well as $modSettings... only does one at a time if $update is true.
  *
  * What it does:
@@ -540,45 +484,6 @@ function un_htmlspecialchars($string)
 }
 
 /**
- * Calculates all the possible permutations (orders) of an array.
- *
- * What it does:
- * - Caution: should not be called on arrays bigger than 8 elements as this function is memory hungry
- * - returns an array containing each permutation.
- * - e.g. (1,2,3) returns (1,2,3), (1,3,2), (2,1,3), (2,3,1), (3,1,2), and (3,2,1)
- * - A combinations without repetition N! function so 3! = 6 and 10! = 3,628,800 combinations
- * - Used by parse_bbc to allow bbc tag parameters to be in any order and still be
- * parsed properly
- *
- * @deprecated since 1.0.5
- * @param mixed[] $array index array of values
- * @return mixed[] array representing all permutations of the supplied array
- */
-function permute($array)
-{
-	$orders = array($array);
-
-	$n = count($array);
-	$p = range(0, $n);
-	for ($i = 1; $i < $n; null)
-	{
-		$p[$i]--;
-		$j = $i % 2 != 0 ? $p[$i] : 0;
-
-		$temp = $array[$i];
-		$array[$i] = $array[$j];
-		$array[$j] = $temp;
-
-		for ($i = 1; $p[$i] == 0; $i++)
-			$p[$i] = $i;
-
-		$orders[] = $array;
-	}
-
-	return $orders;
-}
-
-/**
  * Lexicographic permutation function.
  *
  * This is a special type of permutation which involves the order of the set. The next
@@ -629,64 +534,6 @@ function pc_next_permutation($p, $size)
 	}
 
 	return $p;
-}
-
-/**
- * Parse bulletin board code in a string, as well as smileys optionally.
- *
- * @deprecated since 1.1b1
- *
- * What it does:
- * - Only parses bbc tags which are not disabled in disabledBBC.
- * - Handles basic HTML, if enablePostHTML is on.
- * - Caches the from/to replace regular expressions so as not to reload them every time a string is parsed.
- * - Only parses smileys if smileys is true.
- *
- * @param string|false $message if false return list of enabled bbc codes
- * @param bool $smileys = true if to parse smileys as well
- * @return string
- */
-function parse_bbc($message, $smileys = true)
-{
-	// Don't waste cycles
-	if ($message === '')
-		return '';
-
-	$parser = \BBC\ParserWrapper::getInstance();
-
-	// This is a deprecated way of getting codes
-	if ($message === false)
-	{
-		return $parser->getCodes();
-	}
-
-	return $parser->parseMessage($message, $smileys);
-}
-
-/**
- * Parse smileys in the passed message.
- *
- * What it does:
- * - The smiley parsing function which makes pretty faces appear :).
- * - If custom smiley sets are turned off by smiley_enable, the default set of smileys will be used.
- * - These are specifically not parsed in code tags [url=mailto:Dad@blah.com]
- * - Caches the smileys from the database or array in memory.
- * - Doesn't return anything, but rather modifies message directly.
- *
- * @param string $message The string containing smileys to parse
- * @deprecated since 1.1b1
- */
-function parsesmileys(&$message)
-{
-	// No smiley set at all?!
-	if ($GLOBALS['user_info']['smiley_set'] == 'none' || trim($message) == '')
-	{
-		return;
-	}
-
-	$wrapper = \BBC\ParserWrapper::getInstance();
-	$parser = $wrapper->getSmileyParser();
-	$message = $parser->parseBlock($message);
 }
 
 /**
@@ -925,10 +772,6 @@ function determineTopicClass(&$topic_context)
 
 	if ($topic_context['is_sticky'])
 		$topic_context['class'] .= '_sticky';
-
-	// This is so old themes will still work.
-	// @deprecated since 1.0 do not rely on it
-	$topic_context['extended_class'] = &$topic_context['class'];
 }
 
 /**
@@ -939,23 +782,6 @@ function determineTopicClass(&$topic_context)
 function setupThemeContext($forceload = false)
 {
 	return theme()->setupThemeContext($forceload);
-}
-
-/**
- * Helper function to set the system memory to a needed value
- *
- * What it does:
- * - If the needed memory is greater than current, will attempt to get more
- * - If in_use is set to true, will also try to take the current memory usage in to account
- *
- * @param string $needed The amount of memory to request, if needed, like 256M
- * @param bool $in_use Set to true to account for current memory usage of the script
- * @return boolean true if we have at least the needed memory
- * @deprecated since 1.1
- */
-function setMemoryLimit($needed, $in_use = false)
-{
-	return detectServer()->setMemoryLimit($needed, $in_use);
 }
 
 /**
@@ -989,36 +815,6 @@ function memoryReturnBytes($val)
 	}
 
 	return $num;
-}
-
-/**
- * Wrapper function for set_time_limit
- *
- * When called, attempts to restart the timeout counter from zero.
- *
- * This sets the maximum time in seconds a script is allowed to run before it is terminated by the parser.
- * You can not change this setting with ini_set() when running in safe mode.
- * Your web server can have other timeout configurations that may also interrupt PHP execution.
- * Apache has a Timeout directive and IIS has a CGI timeout function.
- * Security extension may also disable this function, such as Suhosin
- * Hosts may add this to the disabled_functions list in php.ini
- *
- * If the current time limit is not unlimited it is possible to decrease the
- * total time limit if the sum of the new time limit and the current time spent
- * running the script is inferior to the original time limit. It is inherent to
- * the way set_time_limit() works, it should rather be called with an
- * appropriate value every time you need to allocate a certain amount of time
- * to execute a task than only once at the beginning of the script.
- *
- * Before calling set_time_limit(), we check if this function is available
- *
- * @param int $time_limit The time limit
- * @param bool $server_reset whether to reset the server timer or not
- * @deprecated since 1.1
- */
-function setTimeLimit($time_limit, $server_reset = true)
-{
-	return detectServer()->setTimeLimit($time_limit, $server_reset);
 }
 
 /**
@@ -1266,34 +1062,6 @@ function text2words($text, $max_chars = 20, $encrypt = false)
 		// Filter out all words that occur more than once.
 		return array_unique($returned_words);
 	}
-}
-
-/**
- * Creates an image/text button
- *
- * @param string $name
- * @param string $alt
- * @param string $label = ''
- * @param string|boolean $custom = ''
- * @param boolean $force_use = false
- * @return string
- *
- * @deprecated since 1.0 this will be removed at some point, do not rely on this function
- */
-function create_button($name, $alt, $label = '', $custom = '', $force_use = false)
-{
-	global $settings, $txt;
-
-	// Does the current loaded theme have this and we are not forcing the usage of this function?
-	if (function_exists('template_create_button') && !$force_use)
-		return template_create_button($name, $alt, $label = '', $custom = '');
-
-	if (!$settings['use_image_buttons'])
-		return $txt[$alt];
-	elseif (!empty($settings['use_buttons']))
-		return '<img src="' . $settings['images_url'] . '/buttons/' . $name . '" alt="' . $txt[$alt] . '" ' . $custom . ' />' . ($label != '' ? '&nbsp;<strong>' . $txt[$label] . '</strong>' : '');
-	else
-		return '<img src="' . $settings['lang_images_url'] . '/' . $name . '" alt="' . $txt[$alt] . '" ' . $custom . ' />';
 }
 
 /**
@@ -1878,29 +1646,6 @@ function isBrowser($browser)
 		detectBrowser();
 
 	return !empty($context['browser'][$browser]) || !empty($context['browser']['is_' . $browser]) ? true : false;
-}
-
-/**
- * Replace all vulgar words with respective proper words. (substring or whole words..)
- *
- * @deprecated use censor() or Censor class
- *
- * What it does:
- * - it censors the passed string.
- * - if the admin setting allow_no_censored is on it does not censor unless force is also set.
- * - if the admin setting allow_no_censored is off will censor words unless the user has set
- * it to not censor in their profile and force is off
- * - it caches the list of censored words to reduce parsing.
- * - Returns the censored text
- *
- * @param string &$text
- * @param bool $force = false
- */
-function censorText(&$text, $force = false)
-{
-	$text = censor($text, $force);
-
-	return $text;
 }
 
 /**
