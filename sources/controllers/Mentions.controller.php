@@ -477,48 +477,6 @@ class Mentions_Controller extends Action_Controller
 	}
 
 	/**
-	 * We will, we will notify you
-	 * @deprecated since 1.1 - Use Notifications::create instead
-	 */
-	public function action_add()
-	{
-		global $user_info;
-
-		// Common checks to determine if we can go on
-		if (!$this->_isValid())
-			return;
-
-		// Cleanup, validate and remove the invalid values (0 and $user_info['id'])
-		$id_target = array_diff(array_map('intval', array_unique($this->_validator->uid)), array(0, $user_info['id']));
-
-		if (empty($id_target))
-			return false;
-
-		addMentions($user_info['id'], $id_target, $this->_validator->msg, $this->_validator->type, $this->_validator->log_time, $this->_data['status']);
-	}
-
-	/**
-	 * Politely remove a mention when a post like is taken back
-	 * @deprecated since 1.1 - Use Notifications::create instead
-	 */
-	public function action_rlike()
-	{
-		global $user_info;
-
-		// Common checks to determine if we can go on
-		if (!$this->_isValid())
-			return;
-
-		// Cleanup, validate and remove the invalid values (0 and $user_info['id'])
-		$id_target = array_diff(array_map('intval', array_unique($this->_validator->uid)), array(0, $user_info['id']));
-
-		if (empty($id_target))
-			return false;
-
-		rlikeMentions($user_info['id'], $id_target, $this->_validator->msg);
-	}
-
-	/**
 	 * Sets the specifics of a mention call in this instance
 	 *
 	 * @param mixed[] $data must contain uid, type and msg at a minimum
