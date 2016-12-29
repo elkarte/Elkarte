@@ -306,6 +306,10 @@ class Database_PostgreSQL extends Database_Abstract
 		if ($this->_db_last_result === false && !$this->_skip_error)
 			$this->_db_last_result = $this->error($db_string, $connection);
 
+		// @deprecated since 1.1 - use skip_error method
+		if (isset($old_skip))
+			$this->_skip_error = $old_skip;
+
 		if ($this->_in_transaction)
 			$this->db_transaction('commit', $connection);
 
