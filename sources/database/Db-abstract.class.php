@@ -43,7 +43,7 @@ abstract class Database_Abstract implements Database
 	 * This is used to remember the "previous" state of the skip_error parameter
 	 * @var null|boolean
 	 */
-	protected $_old_skip_error = null;
+	protected $_old_skip_error = false;
 
 	/**
 	 * MySQL supports unbuffered queries, this remembers if we are running an
