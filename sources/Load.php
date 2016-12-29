@@ -2169,17 +2169,6 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 
 				break;
 			}
-			// @deprecated since 1.0 - old way of archiving language files, all in one directory
-			elseif (file_exists($file[0] . '/languages/' . $file[1] . '.' . $file[2] . '.php'))
-			{
-				// Include it!
-				$templates->templateInclude($file[0] . '/languages/' . $file[1] . '.' . $file[2] . '.php');
-
-				// Note that we found it.
-				$found = true;
-
-				break;
-			}
 		}
 
 		// That couldn't be found!  Log the error, but *try* to continue normally.
