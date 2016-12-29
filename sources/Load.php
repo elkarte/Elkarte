@@ -116,16 +116,6 @@ function reloadSettings()
 	// Is post moderation alive and well?
 	$modSettings['postmod_active'] = isset($modSettings['admin_features']) ? in_array('pm', explode(',', $modSettings['admin_features'])) : true;
 
-	// @deprecated since 1.0.6 compatibility setting for migration
-	if (!isset($modSettings['avatar_max_height']))
-	{
-		$modSettings['avatar_max_height'] = isset($modSettings['avatar_max_height_external']) ? $modSettings['avatar_max_height_external'] : 65;
-	}
-	if (!isset($modSettings['avatar_max_width']))
-	{
-		$modSettings['avatar_max_width'] = isset($modSettings['avatar_max_width_external']) ? $modSettings['avatar_max_width_external'] : 65;
-	}
-
 	if (!isset($_SERVER['HTTPS']) || strtolower($_SERVER['HTTPS']) == 'off')
 	{
 		$modSettings['secureCookies'] = 0;
