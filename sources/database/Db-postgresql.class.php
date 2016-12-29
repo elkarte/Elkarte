@@ -310,12 +310,6 @@ class Database_PostgreSQL extends Database_Abstract
 			$this->_db_last_result = $this->error($db_string, $connection);
 		}
 
-		// @deprecated since 1.1 - use skip_next_error method
-		if (isset($old_skip))
-		{
-			$this->_skip_error = $old_skip;
-		}
-
 		// Revert not to skip errors
 		if ($this->_skip_error === true)
 		{
