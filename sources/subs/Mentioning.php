@@ -166,10 +166,11 @@ class Mentioning extends AbstractModel
 	 * though that would require to add an optional parameter to avoid the redirect
 	 *
 	 * @param int $mention_id
+	 * @return bool if successfully changed or not
 	 */
 	public function markread($mention_id)
 	{
-		$this->updateStatus($mention_id, 'readall');
+		return $this->updateStatus($mention_id, 'readall');
 	}
 
 	/**
@@ -177,6 +178,7 @@ class Mentioning extends AbstractModel
 	 *
 	 * @param int|int[] $items
 	 * @param string $mark
+	 * @return bool if successfully changed or not
 	 */
 	public function updateStatus($items, $mark)
 	{
@@ -189,16 +191,17 @@ class Mentioning extends AbstractModel
 			{
 				case 'read':
 				case 'readall':
-					$this->_changeStatus($own_id, 'read');
+					return $this->_changeStatus($own_id, 'read');
 					break;
 				case 'unread':
-					$this->_changeStatus($own_id, 'new');
+					return $this->_changeStatus($own_id, 'new');
 					break;
 				case 'delete':
-					$this->_changeStatus($own_id, 'deleted');
+					return $this->_changeStatus($own_id, 'deleted');
 					break;
 			}
 		}
+		return false;
 	}
 
 	/**
@@ -281,6 +284,7 @@ class Mentioning extends AbstractModel
 	 * @package Mentions
 	 * @param int|int[] $id_mentions the mention id in the db
 	 * @param string $status status to update, 'new', 'read', 'deleted', 'unapproved'
+	 * @return bool if successfully changed or not
 	 */
 	protected function _changeStatus($id_mentions, $status = 'read')
 	{
@@ -299,7 +303,9 @@ class Mentioning extends AbstractModel
 
 		// Update the top level mentions count
 		if ($success)
+		{
 			$this->_updateMenuCount($this->_known_status[$status], $user_info['id']);
+		}
 
 		return $success;
 	}
