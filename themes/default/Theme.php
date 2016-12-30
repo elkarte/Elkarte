@@ -621,7 +621,7 @@ class Theme extends BaseTheme
 		if (isBrowser('possibly_robot'))
 		{
 			// @todo Maybe move this somewhere better?!
-			$controller = new \ScheduledTasks_Controller();
+			$controller = new \ScheduledTasks_Controller(new \Event_Manager());
 
 			// What to do, what to do?!
 			if (empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())
