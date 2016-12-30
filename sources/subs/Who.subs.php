@@ -521,6 +521,6 @@ function prepareCreditsData()
 	call_integration_hook('integrate_credits', array(&$credits));
 
 	// Copyright information
-	$credits['copyrights']['elkarte'] = '&copy; 2012 - 2014 ElkArte Forum contributors';
+	$credits['copyrights']['elkarte'] = '&copy; 2012 - 2017 ElkArte Forum contributors';
 	return $credits;
 }
