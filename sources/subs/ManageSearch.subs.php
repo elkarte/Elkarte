@@ -205,8 +205,8 @@ source elkarte_source
 				IF(m.id_msg < 0.7 * s.value, 0, (m.id_msg - 0.7 * s.value) / (0.3 * s.value)) * ' . $weight['age'] . ' + \
 				IF(t.num_replies < 50, t.num_replies / 50, 1) * ' . $weight['length'] . ' + \
 				IF(m.id_msg = t.id_first_msg, 1, 0) * ' . $weight['first_message'] . ' + \
-				IF(t.num_likes < 10, t.num_likes / 10, 1) * ' . $weight['likes'] . ' + \
-				IF(t.is_sticky = 0, 0, 100) * ' . $weight['sticky'] . ' \
+				IF(t.num_likes < 20, t.num_likes / 20, 1) * ' . $weight['likes'] . ' + \
+				IF(t.is_sticky = 0, 0, 1) * ' . $weight['sticky'] . ' \
 			) / ' . $weight_total . ') AS relevance \
 		FROM ', $db_prefix, 'messages AS m, ', $db_prefix, 'topics AS t, ', $db_prefix, 'settings AS s \
 		WHERE t.id_topic = m.id_topic \

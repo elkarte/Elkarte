@@ -158,8 +158,8 @@ class Sphinxql extends SearchAPI
 				\Errors::instance()->fatal_lang_error('error_no_search_daemon');
 			}
 
-			// Compile different options for our query
-			$query = 'SELECT *' . (empty($search_params['topic']) ? ', COUNT(*) num' : '') . ', WEIGHT() weights, (weights + (relevance/1000)) rank FROM elkarte_index';
+			// Compile different options for our query, relevance value is capped at 1M in indexing function
+			$query = 'SELECT *' . (empty($search_params['topic']) ? ', COUNT(*) num' : '') . ', WEIGHT() weights, (weights + (relevance/10)) rank FROM elkarte_index';
 
 			// Construct the (binary mode & |) query.
 			$where_match = $this->_constructQuery($search_params['search']);
@@ -220,7 +220,7 @@ class Sphinxql extends SearchAPI
 			$query .= ' LIMIT 0,' . (int) $modSettings['sphinx_max_results'];
 
 			// Set any options needed, like field weights
-			$query .= ' OPTION field_weights=(subject=' . (!empty($modSettings['search_weight_subject']) ? $modSettings['search_weight_subject'] * 200 : 1000) . ',body=1000),
+			$query .= ' OPTION field_weights=(subject=' . (!empty($modSettings['search_weight_subject']) ? $modSettings['search_weight_subject'] * 10 : 100) . ',body=100),
 			ranker=proximity_bm25,
 			max_matches=' . (int) $modSettings['sphinx_max_results'];
 
@@ -260,7 +260,7 @@ class Sphinxql extends SearchAPI
 
 					$cached_results['matches'][$match['id']] = array(
 						'id' => $match['id_topic'],
-						'relevance' => round($match['relevance'] / 10000, 1) . '%',
+						'relevance' => round($match['rank'] / 5000, 1) . '%',
 						'num_matches' => $num,
 						'matches' => array(),
 					);
