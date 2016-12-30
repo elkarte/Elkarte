@@ -60,9 +60,6 @@ class Poll_Display_Module implements ElkArte\sources\modules\Module_Interface
 	{
 		global $context;
 
-		// @deprecated since 1.1 - $context['is_poll'] is not used anywhere.
-		$context['is_poll'] = $topicinfo['id_poll'] > 0 && self::$_enabled && allowedTo('poll_view');
-
 		$this->_id_poll = $topicinfo['id_poll'];
 
 		$anyown_permissions = array(
@@ -86,7 +83,7 @@ class Poll_Display_Module implements ElkArte\sources\modules\Module_Interface
 		global $context, $scripturl, $txt;
 
 		// Create the poll info if it exists.
-		if ($context['is_poll'])
+		if ($this->_id_poll > 0)
 		{
 			$template_layers->add('display_poll');
 			require_once(SUBSDIR . '/Poll.subs.php');
