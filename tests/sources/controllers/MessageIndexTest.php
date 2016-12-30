@@ -75,7 +75,7 @@ class TestMessageIndex extends PHPUnit_Framework_TestCase
 	{
 		global $context, $board_info;
 
-		$controller = new MessageIndex_Controller();
+		$controller = new MessageIndex_Controller(new Event_Manager());
 		$controller->pre_dispatch();
 		$controller->action_index();
 
