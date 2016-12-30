@@ -248,19 +248,22 @@ class Database_MySQL extends Database_Abstract
 		else
 			$ret = @mysqli_query($connection, $db_string, MYSQLI_USE_RESULT);
 
-		// @deprecated since 1.1 - use skip_error method
+		// @deprecated since 1.1 - use skip_next_error method
 		if (!empty($db_values['db_error_skip']))
 		{
-			$old_skip = $this->_skip_error;
 			$this->_skip_error = true;
 		}
 
-		if ($ret === false && !$this->_skip_error)
+		if ($ret === false && $this->_skip_error === false)
+		{
 			$ret = $this->error($db_string, $connection);
+		}
 
-		// @deprecated since 1.1 - use skip_error method
-		if (isset($old_skip))
-			$this->_skip_error = $old_skip;
+		// Revert not to skip errors
+		if ($this->_skip_error === true)
+		{
+			$this->_skip_error = false;
+		}
 
 		// Debugging.
 		if ($db_show_debug === true)
@@ -732,6 +735,8 @@ class Database_MySQL extends Database_Abstract
 		// Determine the method of insertion.
 		$queryTitle = $method === 'replace' ? 'REPLACE' : ($method == 'ignore' ? 'INSERT IGNORE' : 'INSERT');
 
+		$skip_error = $table === $db_prefix . 'log_errors';
+		$this->_skip_error = $skip_error;
 		// Do the insert.
 		$this->query('', '
 			' . $queryTitle . ' INTO ' . $table . '(`' . implode('`, `', $indexed_columns) . '`)
@@ -740,7 +745,6 @@ class Database_MySQL extends Database_Abstract
 				', $insertRows),
 			array(
 				'security_override' => true,
-				'db_error_skip' => $table === $db_prefix . 'log_errors',
 			),
 			$connection
 		);

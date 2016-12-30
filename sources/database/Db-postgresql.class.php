@@ -299,12 +299,22 @@ class Database_PostgreSQL extends Database_Abstract
 
 		$this->_db_last_result = @pg_query($connection, $db_string);
 
-		// @deprecated since 1.1 - use skip_error method
+		// @deprecated since 1.1 - use skip_next_error method
 		if (!empty($db_values['db_error_skip']))
+		{
 			$this->_skip_error = true;
+		}
 
 		if ($this->_db_last_result === false && !$this->_skip_error)
+		{
 			$this->_db_last_result = $this->error($db_string, $connection);
+		}
+
+		// Revert not to skip errors
+		if ($this->_skip_error === true)
+		{
+			$this->_skip_error = false;
+		}
 
 		if ($this->_in_transaction)
 			$this->db_transaction('commit', $connection);
@@ -618,8 +628,11 @@ class Database_PostgreSQL extends Database_Abstract
 				$insertRows[] = $this->quote($insertData, $this->_array_combine($indexed_columns, $dataRow), $connection);
 
 			$inserted_results = 0;
+			$skip_error = $method == 'ignore' || $table === $db_prefix . 'log_errors';
 			foreach ($insertRows as $entry)
 			{
+				$this->_skip_error = $skip_error;
+
 				// Do the insert.
 				$this->query('', '
 					INSERT INTO ' . $table . '("' . implode('", "', $indexed_columns) . '")
@@ -627,7 +640,6 @@ class Database_PostgreSQL extends Database_Abstract
 						' . $entry,
 					array(
 						'security_override' => true,
-						'db_error_skip' => $method == 'ignore' || $table === $db_prefix . 'log_errors',
 					),
 					$connection
 				);

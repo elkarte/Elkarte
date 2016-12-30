@@ -123,7 +123,7 @@ Class Elk_Testing_Setup
 		}
 		$replaces['{$default_reserved_names}'] = strtr($replaces['{$default_reserved_names}'], array('\\\\n' => '\\n'));
 
-		$this->_db->skip_error();
+		$this->_db->skip_next_error();
 		$db_wrapper = new DbWrapper($this->_db, $replaces);
 		$db_table_wrapper = new DbTableWrapper($this->_db_table);
 
