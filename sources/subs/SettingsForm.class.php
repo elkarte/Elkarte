@@ -71,6 +71,11 @@ class Settings_Form
 	const FILE_ADAPTER = 'ElkArte\\sources\\subs\\SettingsFormAdapter\\File';
 
 	/**
+	 * @var ElkArte\sources\subs\SettingsFormAdapter\Adapter
+	 */
+	private $adapter;
+
+	/**
 	 * @return array
 	 */
 	public function getConfigVars()
@@ -101,11 +106,6 @@ class Settings_Form
 	{
 		$this->adapter->setConfigValues($configValues);
 	}
-
-	/**
-	 * @var ElkArte\sources\subs\SettingsFormAdapter\Adapter
-	 */
-	private $adapter;
 
 	/**
 	 * @param string|null $adapter Will default to the file adapter if none is specified.
