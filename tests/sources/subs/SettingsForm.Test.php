@@ -185,42 +185,6 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 		return $messageBody;
 	}
 
-	public function testOld()
-	{
-		global $modSettings, $user_info;
-
-		// Remove permisssion
-		$user_info['permissions'] = array_filter($user_info['permissions'], function ($permisssion) {
-			return $permisssion !== 'manage_permissions';
-		});
-		unset($this->configVars[8]);
-
-		$settingsForm = new Settings_Form;
-		$settingsForm->settings($this->configVars);
-		$this->assertSame($this->configVars, $settingsForm->settings());
-		Settings_Form::save_db($this->configVars, $this->configValues);
-
-		$db = database();
-		$request = $db->query('', '
-			SELECT variable, value
-			FROM {db_prefix}settings
-			WHERE variable IN ({array_string:setting_name})',
-			array(
-				'setting_name' => array_keys($this->configValues),
-			)
-		);
-		$modSettings = array();
-		if (!$request)
-			Errors::instance()->display_db_error();
-		while ($row = $db->fetch_row($request))
-			$modSettings[$row[0]] = $row[1];
-		$db->free_result($request);
-
-		$modSettings['bbc_disabled_' . $this->configVars[9][1]] = $this->configValues['name9'];
-		Settings_Form::prepare_db($this->configVars);
-		$this->assertisSaved();
-	}
-
 	public function testPrepareFile()
 	{
 		global $context;
