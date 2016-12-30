@@ -748,15 +748,6 @@ function reorderBoards()
 					)
 				);
 	}
-
-	// Sort the records of the boards table on the board_order value.
-	$db->skip_next_error();
-	$db->query('alter_table', '
-		ALTER TABLE {db_prefix}boards
-		ORDER BY board_order',
-		array(
-		)
-	);
 }
 
 /**

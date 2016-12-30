@@ -441,25 +441,6 @@ function getMaxSmileyOrder()
 }
 
 /**
- * This function sorts the smiley table by code length,
- * it is needed as MySQL withdrew support for functions in order by.
- *
- * @deprecated since 1.0 - the ordering is done in the query, probably not needed
- */
-function sortSmileyTable()
-{
-	$db = database();
-
-	$db->skip_next_error();
-	// Order the table by code length.
-	$db->query('alter_table', '
-		ALTER TABLE {db_prefix}smileys
-		ORDER BY LENGTH(code) DESC',
-		array()
-	);
-}
-
-/**
  * Callback function for createList().
  * Lists all smiley sets.
  *

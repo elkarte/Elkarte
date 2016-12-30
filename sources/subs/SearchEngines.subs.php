@@ -262,25 +262,6 @@ function recacheSpiderNames()
 }
 
 /**
- * Sort the search engine table by user agent name to avoid misidentifying of engine.
- *
- * @package SearchEngines
- * @deprecated since 1.0 - the ordering is done in the query, probably not needed
- */
-function sortSpiderTable()
-{
-	$db = database();
-
-	$db->skip_next_error();
-	// Order the table by user_agent length.
-	$db->query('alter_table', '
-		ALTER TABLE {db_prefix}spiders
-		ORDER BY LENGTH(user_agent) DESC',
-		array()
-	);
-}
-
-/**
  * Return spiders, within the limits specified by parameters
  * (used by createList() callbacks)
  *

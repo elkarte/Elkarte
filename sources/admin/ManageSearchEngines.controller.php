@@ -357,9 +357,6 @@ class ManageSearchEngines_Controller extends Action_Controller
 			// Goes in as it is...
 			updateSpider($context['id_spider'], $this->_req->post->spider_name, $this->_req->post->spider_agent, $ips);
 
-			// Order by user agent length.
-			sortSpiderTable();
-
 			Cache::instance()->remove('spider_search');
 			recacheSpiderNames();
 
