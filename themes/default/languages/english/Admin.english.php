@@ -766,7 +766,6 @@ $txt['hooks_field_included_file'] = 'Included file';
 $txt['hooks_field_file_name'] = 'File Name';
 $txt['hooks_field_hook_exists'] = 'Status';
 $txt['hooks_active'] = 'Exists';
-$txt['hooks_disabled'] = 'Disabled'; //@deprecated since 1.1 - it's no more possible to disable hooks
 $txt['hooks_missing'] = 'Not found';
 $txt['hooks_no_hooks'] = 'There are currently no hooks in the system.';
 $txt['hooks_disable_legend'] = 'Legend';
