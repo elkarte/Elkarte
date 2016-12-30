@@ -89,7 +89,7 @@ function template_modify_weights()
 					</dd>
 					<dt>
 						<a href="', $scripturl, '?action=quickhelp;help=search_weight_likes" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
-						<label for="weight6_val">						', $txt['search_weight_likes'], ':</label>
+						<label for="weight7_val">						', $txt['search_weight_likes'], ':</label>
 					</dt>
 					<dd>
 						<span class="search_weight"><input type="text" name="search_weight_likes" id="weight7_val" value="', empty($modSettings['search_weight_likes']) ? '0' : $modSettings['search_weight_likes'], '" onchange="calculateNewValues()" size="3" class="input_text" /></span>

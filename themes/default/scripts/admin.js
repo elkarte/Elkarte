@@ -806,13 +806,13 @@ function toggleDuration(toChange)
 function calculateNewValues()
 {
 	var total = 0;
-	for (var i = 1; i <= 6; i++)
+	for (var i = 1; i <= 7; i++)
 	{
 		total += parseInt(document.getElementById('weight' + i + '_val').value);
 	}
 
 	document.getElementById('weighttotal').innerHTML = total;
-	for (i = 1; i <= 6; i++)
+	for (i = 1; i <= 7; i++)
 	{
 		document.getElementById('weight' + i).innerHTML = (Math.round(1000 * parseInt(document.getElementById('weight' + i + '_val').value) / total) / 10) + '%';
 	}
