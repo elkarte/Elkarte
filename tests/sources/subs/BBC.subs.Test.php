@@ -541,13 +541,14 @@ class TestBBC extends PHPUnit_Framework_TestCase
 	 */
 	public function testBBcode()
 	{
+		$parsers = \BBC\ParserWrapper::getInstance();
 		foreach ($this->bbcTestCases as $testcase)
 		{
 			$name = $testcase[0];
 			$test = $testcase[1];
 			$expected = $testcase[2];
 
-			$result = parse_bbc($test);
+			$result = $parsers->parseMessage($test);
 
 			$this->assertEquals($expected, $result, $name);
 		}
@@ -558,12 +559,13 @@ class TestBBC extends PHPUnit_Framework_TestCase
 	 */
 	public function testInvalidBBcode()
 	{
+		$parsers = \BBC\ParserWrapper::getInstance();
 		foreach ($this->bbcInvalidTestCases as $testcase)
 		{
 			$name = 'Broken ' . $testcase[0];
 			$test = $testcase[1];
 
-			$result = parse_bbc($test);
+			$result = $parsers->parseMessage($test);
 
 			$this->assertEquals($test, $result, $name);
 		}
