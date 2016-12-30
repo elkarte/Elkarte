@@ -112,43 +112,6 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 }
 
 /**
- * Changes a specific mention status for a member
- *
- * - Can be used to mark as read, new, deleted, etc
- * - note that delete is a "soft-delete" because otherwise anyway we have to remember
- * - when a user was already mentioned for a certain message (e.g. in case of editing)
- *
- * @package Mentions
- * @param int $id_mention the mention id in the db
- * @param int $status status to update, 'new' => 0, 'read' => 1, 'deleted' => 2, 'unapproved' => 3
- *
- * @deprecated since 1.1 - Use Mentioning::changestatus() instead
- */
-function changeMentionStatus($id_mention, $status = 1)
-{
-	global $user_info;
-
-	$db = database();
-
-	$db->query('', '
-		UPDATE {db_prefix}log_mentions
-		SET status = {int:status}
-		WHERE id_mention = {int:id_mention}',
-		array(
-			'id_mention' => $id_mention,
-			'status' => $status,
-		)
-	);
-	$success = $db->affected_rows() != 0;
-
-	// Update the top level mentions count
-	if ($success)
-		updateMentionMenuCount($status, $user_info['id']);
-
-	return $success;
-}
-
-/**
  * Completely remove from the database a set of mentions.
  *
  * Doesn't check permissions, access, anything. It just deletes everything.
