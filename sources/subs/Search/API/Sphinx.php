@@ -84,26 +84,6 @@ class Sphinx extends SearchAPI
 	}
 
 	/**
-	 * Check whether the method can be performed by this API.
-	 *
-	 * @deprecated since 1.1 - check that the method is callable
-	 *
-	 * @param string $methodName The search method
-	 * @param mixed[]|null $query_params Parameters for the query
-	 */
-	public function supportsMethod($methodName, $query_params = null)
-	{
-		switch ($methodName)
-		{
-			case 'searchQuery':
-				// Search can be performed, but not for 'subject only' query.
-				return !$query_params['subject_only'];
-			default:
-				return is_callable(array($this, $methodName));
-		}
-	}
-
-	/**
 	 * If the settings don't exist we can't continue.
 	 */
 	public function isValid()
