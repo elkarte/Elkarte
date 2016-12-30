@@ -775,7 +775,6 @@ class Xml_Controller extends Action_Controller
 				if (!empty($iconInsert))
 				{
 					updateMessageIcon($iconInsert);
-					sortMessageIconTable();
 				}
 				else
 					$errors[] = array('value' => $txt['no_sortable_items']);
