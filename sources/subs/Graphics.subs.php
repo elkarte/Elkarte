@@ -316,9 +316,6 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 			// Get a new instance of Imagick for use
 			$imagick = new Imagick($destName);
 
-			// Fix image rotations for iphone cameras etc.
-			autoRotateImage($imagick);
-
 			// Set the input and output image size
 			$src_width = empty($src_width) ? $imagick->getImageWidth() : $src_width;
 			$src_height = empty($src_height) ? $imagick->getImageHeight() : $src_height;
@@ -342,7 +339,7 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 			$success = $imagick->writeImage($destName);
 
 			// Free resources associated with the Imagick object
-			$imagick->destroy();
+			$imagick->clear();
 		}
 		catch(Exception $e)
 		{
@@ -423,65 +420,262 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 }
 
 /**
+ * Calls GD or ImageMagick functions to correct an images orientation
+ * based on the EXIF orientation flag
+ *
+ * @param string $image_name
+ */
+function autoRotateImage($image_name)
+{
+	if (checkImagick())
+	{
+		autoRotateImageWithIM($image_name);
+	}
+	elseif (checkGD())
+	{
+		autoRotateImageWithGD($image_name);
+	}
+}
+
+/**
+ * Autorotate an image based on its EXIF Orientation tag.
+ *
+ * What it does:
+ * - GD only
+ * - Checks exif data for orientation flag and rotates image so its proper
+ * - Does not update orientation flag as GD removes EXIF data
+ * - Only works with jpeg images, could add TIFF as well
+ * - Writes the update image back to $image_name
+ *
+ * @package Graphics
+ * @uses GD
+ * @param string $image_name full location of the file
+ */
+function autoRotateImageWithGD($image_name)
+{
+	// Read the EXIF data
+	$exif = function_exists('exif_read_data') ? @exif_read_data($image_name) : array();
+
+	// We're only interested in the exif orientation
+	$orientation = isset($exif['Orientation']) ? $exif['Orientation'] : 0;
+
+	// For now we only process jpeg images, so check that we have one
+	$sizes = @getimagesize($image_name);
+
+	// Not a jpeg or not rotated, done!
+	if ($sizes === false || $sizes[2] !== 2 || $orientation === 0 || !imageMemoryCheck($sizes))
+	{
+		return false;
+	}
+
+	// Load the image object so we can begin the transformation(s)
+	$source = imagecreatefromjpeg($image_name);
+
+	// Time to spin and mirror as needed
+	switch ($orientation)
+	{
+		// 0 & 1 Not set or Normal
+		case 0:
+		case 1:
+			break;
+		// 2 Mirror image, Normal orientation
+		case 2:
+			$source = flopImageGD($source, $sizes);
+			break;
+		// 3 Normal image, rotated 180
+		case 3:
+			$source = rotateImageGD($source, 180);
+			break;
+		// 4 Mirror image, rotated 180
+		case 4:
+			$source = flipImageGD($source, $sizes);
+			break;
+		// 5 Mirror image, rotated 90 CCW
+		case 5:
+			$source = flopImageGD($source, $sizes);
+			$source = rotateImageGD($source, 90);
+			break;
+		// 6 Normal image, rotated 90 CCW
+		case 6:
+			$source = rotateImageGD($source, -90);
+			break;
+		// 7 Mirror image, rotated 90 CW
+		case 7:
+			$source = flopImageGD($source, $sizes);
+			$source = rotateImageGD($source, -90);
+			break;
+		// 8 Normal image, rotated 90 CW
+		case 8:
+			$source = rotateImageGD($source, 90);
+			break;
+	}
+
+	// Save the updated image, free resources
+	imagejpeg($source, $image_name);
+	imagedestroy($source);
+
+	return true;
+}
+
+/**
  * Autorotate an image based on its EXIF Orientation tag.
  *
  * - ImageMagick only
  * - Checks exif data for orientation flag and rotates image so its proper
  * - Updates orientation flag if rotation was required
  *
- * @param object $image
+ * @param object $image_name
  */
-function autoRotateImage($image)
+function autoRotateImageWithIM($image_name)
 {
+	// Get a new instance of Imagick for use
+	$image = new Imagick($image_name);
+
 	// This method should exist if Imagick has been compiled against ImageMagick version
 	// 6.3.0 or higher which is forever ago, but we check anyway ;)
-	if (!method_exists($image , 'getImageOrientation'))
-		return;
+	if (!method_exists($image, 'getImageOrientation'))
+		return false;
 
 	$orientation = $image->getImageOrientation();
-
 	switch ($orientation)
 	{
-		// (0 & 1) Not set or Normal
-		case imagick::ORIENTATION_UNDEFINED:
-		case imagick::ORIENTATION_TOPLEFT:
+		// 0 & 1 Not set or Normal
+		case Imagick::ORIENTATION_UNDEFINED:
+		case Imagick::ORIENTATION_TOPLEFT:
 			break;
-		// (2) Mirror image, Normal orientation
-		case imagick::ORIENTATION_TOPRIGHT:
+		// 2 Mirror image, Normal orientation
+		case Imagick::ORIENTATION_TOPRIGHT:
 			$image->flopImage();
 			break;
-		// (3) Normal image, rotated 180
-		case imagick::ORIENTATION_BOTTOMRIGHT:
-			$image->rotateImage("#000", 180);
+		// 3 Normal image, rotated 180
+		case Imagick::ORIENTATION_BOTTOMRIGHT:
+			$image->rotateImage('#000', 180);
 			break;
-		// (4) Mirror image, rotated 180
-		case imagick::ORIENTATION_BOTTOMLEFT:
-			$image->rotateImage("#000", 180);
+		// 4 Mirror image, rotated 180
+		case Imagick::ORIENTATION_BOTTOMLEFT:
+			$image->flipImage();
+			break;
+		// 5 Mirror image, rotated 90 CCW
+		case Imagick::ORIENTATION_LEFTTOP:
+			$image->rotateImage('#000', 90);
 			$image->flopImage();
 			break;
-		// (5) Mirror image, rotated 90 CCW
-		case imagick::ORIENTATION_LEFTTOP:
-			$image->rotateImage("#000", 90);
+		// 6 Normal image, rotated 90 CCW
+		case Imagick::ORIENTATION_RIGHTTOP:
+			$image->rotateImage('#000', 90);
+			break;
+		// 7 Mirror image, rotated 90 CW
+		case Imagick::ORIENTATION_RIGHTBOTTOM:
+			$image->rotateImage('#000', -90);
 			$image->flopImage();
 			break;
-		// (6) Normal image, rotated 90 CCW
-		case imagick::ORIENTATION_RIGHTTOP:
-			$image->rotateImage("#000", 90);
-			break;
-		// (7) Mirror image, rotated 90 CW
-		case imagick::ORIENTATION_RIGHTBOTTOM:
-			$image->rotateImage("#000", -90);
-			$image->flopImage();
-			break;
-		// (8) Normal image, rotated 90 CW
-		case imagick::ORIENTATION_LEFTBOTTOM:
-			$image->rotateImage("#000", -90);
+		// 8 Normal image, rotated 90 CW
+		case Imagick::ORIENTATION_LEFTBOTTOM:
+			$image->rotateImage('#000', -90);
 			break;
 	}
 
 	// Now that it's auto-rotated, make sure the EXIF data is correctly updated
 	if ($orientation >= 2)
-		$image->setImageOrientation(imagick::ORIENTATION_TOPLEFT);
+	{
+		$image->setImageOrientation(Imagick::ORIENTATION_TOPLEFT);
+	}
+
+	// Save the new image in the destination location
+	$success = $image->writeImage($image_name);
+
+	// Free resources associated with the Imagick object
+	$image->clear();
+
+	return $success;
+}
+
+/**
+ * Rotate an image by X degrees, GD function
+ *
+ * @param resource $image
+ * @param int $degrees
+ *
+ * @package Graphics
+ * @uses GD
+ * @return resource
+ */
+function rotateImageGD($image, $degrees)
+{
+	// Kind of need this to do anything
+	if (function_exists('imagerotate'))
+	{
+		// Use positive degrees so GD does not get confused
+		$degrees -= floor($degrees / 360) * 360;
+
+		// Rotate away
+		$background = imagecolorallocatealpha($image, 255, 255, 255, 127);
+		$image = imagerotate($image, $degrees, $background);
+	}
+
+	return $image;
+}
+
+/**
+ * Flop an image using GD functions by copying top to bottom / flop
+ *
+ * @param resource $image
+ * @param array $sizes populated with getimagesize results
+ *
+ * @package Graphics
+ * @uses GD
+ * @return resource
+ */
+function flopImageGD($image, $sizes)
+{
+	return flipImageGD($image, $sizes, 'horizontal');
+}
+
+/**
+ * Flip an image using GD function by copying top to bottom / flip vertical
+ *
+ * @param resource $image
+ * @param array $sizes populated with getimagesize results
+ * @param string $axis vertical for flip about vertical otherwise horizontal flip
+ *
+ * @package Graphics
+ * @uses GD
+ * @return resource
+ */
+function flipImageGD($image, $sizes, $axis = 'vertical')
+{
+	// If the built in function (php 5.5) is available, use it
+	if (function_exists('imageflip'))
+	{
+		imageflip($image, $axis === 'vertical' ? IMG_FLIP_VERTICAL : IMG_FLIP_HORIZONTAL);
+	}
+	// Pixel mapping then
+	else
+	{
+		$new = imagecreatetruecolor($sizes[0], $sizes[1]);
+		imagealphablending($new, false);
+		imagesavealpha($new, true);
+
+		if ($axis === 'vertical')
+		{
+			for ($y = 0; $y < $sizes[1]; $y++)
+			{
+				imagecopy($new, $image, 0, $y, 0, $sizes[1] - $y - 1, $sizes[0], 1);
+			}
+		}
+		else
+		{
+			for ($x = 0; $x < $sizes[0]; $x++)
+			{
+				imagecopy($new, $image, $x, 0, $sizes[0] - $x - 1, 0, 1, $sizes[1]);
+			}
+		}
+
+		$image = $new;
+		unset($new);
+	}
+
+	return $image;
 }
 
 /**
