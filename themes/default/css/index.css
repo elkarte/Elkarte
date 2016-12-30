@@ -2369,22 +2369,39 @@ div.core_posts {
 	padding: 8px 0;
 	font-size: 0.857em;
 }
-.attachments {
-	margin: 20px 0 0 0;
-	clear: both;
-}
-.attachments .attachment {
-	padding: 6px 8px;
+.attachment_block {
 	display: inline-block;
-	min-width: 22%;
-}
-.attachment_thumb {
-	margin: 0 auto;
+	max-width: 99%;
+	min-width: 21em;
+	margin: 0 .25em 1em .25em;
+	vertical-align: bottom;
 	text-align: center;
+	overflow: hidden;
 }
-/* @todo - Look at deprecating this hr. */
-.attachments hr {
+.attachment_image {
+	margin: 2em 0 0 0;
+}
+.attachment_name, .attachment_details {
+	display: block;
+}
+/* Just eye candy. */
+.attachment_name {
+	margin: .5em 0 0 0;
+}
+/* Important stuff. */
+.attachment_name:before {
+	display: block;
 	clear: both;
+	content: "";
+}
+/* Important stuff. */
+/* Auto scaling of images in posts, sigs, attachments, etc. */
+/* @todo - Cross check where this is defined earlier */
+.inner .bbc_img, .signature .bbc_img, .attachment_image {
+	height: auto;
+	width: auto;
+	max-width: 100%;
+	max-height: 800px;
 }
 /* Separator of posts. More useful in the print stylesheet. */
 .forumposts .post_separator {

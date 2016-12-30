@@ -849,35 +849,27 @@ function template_display_attachments($message, $ignoring)
 		}
 
 		echo '
-									<div class="attachment">';
+									<div class="attachment_block">';
 
 		if ($attachment['is_image'])
 		{
-			echo '
-										<div class="attachment_thumb">';
-
 			if ($attachment['thumbnail']['has_thumb'])
 				echo '
-											<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" onclick="', $attachment['thumbnail']['javascript'], '"><img src="', $attachment['thumbnail']['href'], '" alt="" id="thumb_', $attachment['id'], '" /></a>';
+											<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" onclick="', $attachment['thumbnail']['javascript'], '">
+												<img class="attachment_image" src="', $attachment['thumbnail']['href'], '" alt="" id="thumb_', $attachment['id'], '" />
+											</a>';
 			else
 				echo '
-											<img src="' . $attachment['href'] . ';image" alt="" style="width:' . $attachment['width'] . 'px; height:' . $attachment['height'] . 'px;"/>';
-
-			echo '
-										</div>';
+											<img class="attachment_image" src="', $attachment['href'], ';image" alt="" style="width:', $attachment['width'], 'px; height:', $attachment['height'], 'px;" />';
 		}
 
 		echo '
-										<div class="attachment_name">
-											<a href="' . $attachment['href'] . '"><img src="' . $settings['images_url'] . '/icons/clip.png" class="centericon" alt="*" />&nbsp;' . $attachment['name'] . '</a> ';
+											<a href="', $attachment['href'], '" class="attachment_name">', $attachment['name'], '</a>
+											<span class="attachment_details">', $attachment['size'], ($attachment['is_image'] ? ', ' . $attachment['real_width'] . 'x' . $attachment['real_height'] . ' - ' . sprintf($txt['attach_viewed'], $attachment['downloads']) : ' ' . sprintf($txt['attach_downloaded'], $attachment['downloads'])) . '</span>';
 
 		if (!$attachment['is_approved'] && $context['can_approve'])
 			echo '
 											<a class="linkbutton" href="', $scripturl, '?action=attachapprove;sa=approve;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve'], '</a>&nbsp;|&nbsp;<a class="linkbutton" href="', $scripturl, '?action=attachapprove;sa=reject;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['delete'], '</a>';
-		echo '
-											<br />', $attachment['size'], ($attachment['is_image'] ? ', ' . $attachment['real_width'] . 'x' . $attachment['real_height'] . '<br />' . sprintf($txt['attach_viewed'], $attachment['downloads']) : '<br />' . sprintf($txt['attach_downloaded'], $attachment['downloads'])), '
-										</div>';
-
 		echo '
 									</div>';
 	}
