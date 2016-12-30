@@ -27,6 +27,9 @@ function detectFulltextIndex()
 
 	$db = database();
 
+	// Something like 5.7.16
+	list($ver,) = explode('-', $db->db_server_version());
+
 	$request = $db->query('', '
 		SHOW INDEX
 		FROM {db_prefix}messages',
@@ -75,9 +78,15 @@ function detectFulltextIndex()
 
 	if ($request !== false)
 	{
+		// InnoDB full-text search (FTS) is available in MySQL >=5.6.4
+		$innodb_capable = version_compare($ver, '5.6.4') >= 0;
+
 		while ($row = $db->fetch_assoc($request))
 		{
-			if ((isset($row['Type']) && strtolower($row['Type']) !== 'myisam') || (isset($row['Engine']) && strtolower($row['Engine']) !== 'myisam'))
+			$check1 = isset($row['Type']) && strtolower($row['Type']) !== 'myisam' && !$innodb_capable;
+			$check2 = isset($row['Engine']) && strtolower($row['Engine']) !== 'myisam' && !$innodb_capable;
+
+			if ($check1 || $check2)
 			{
 				$context['cannot_create_fulltext'] = true;
 			}
