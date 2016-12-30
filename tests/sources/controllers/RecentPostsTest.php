@@ -70,7 +70,7 @@ class TestRecentPosts extends PHPUnit_Framework_TestCase
 	{
 		global $context;
 
-		$controller = new Recent_Controller();
+		$controller = new Recent_Controller(new Event_Manager());
 		$controller->pre_dispatch();
 		$controller->action_recent();
 

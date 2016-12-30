@@ -587,7 +587,7 @@ Should be an empty line in between.',
 			$test = $testcase[1];
 			$expected = $testcase[2];
 
-			$result = $parsers->parseMessage($test);
+			$result = $parsers->parseMessage($test, 1);
 
 			$this->assertEquals($expected, $result, $name);
 		}
@@ -604,7 +604,7 @@ Should be an empty line in between.',
 			$name = 'Broken ' . $testcase[0];
 			$test = $testcase[1];
 
-			$result = $parsers->parseMessage($test);
+			$result = $parsers->parseMessage($test, 1);
 
 			$this->assertEquals($test, $result, $name);
 		}
