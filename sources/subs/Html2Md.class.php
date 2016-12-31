@@ -160,7 +160,7 @@ class Html_2_Md
 		// Using the internal DOM methods requires we need to do a little extra work
 		if ($this->_parser)
 		{
-			$this->markdown = html_entity_decode(htmlspecialchars_decode($this->markdown, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
+			$this->markdown = htmlspecialchars_decode($this->markdown, ENT_QUOTES);
 
 			if (preg_match('~<body>(.*)</body>~s', $this->markdown, $body))
 				$this->markdown = $body[1];
@@ -196,6 +196,9 @@ class Html_2_Md
 			'|?|' => '?',
 			'&lt?' => '<?'
 		));
+
+		if ($this->_parser)
+			$this->markdown = html_entity_decode($this->markdown, ENT_QUOTES, 'UTF-8');
 
 		// Strip the chaff and any excess blank lines we may have produced
 		$this->markdown = trim($this->markdown);
@@ -298,7 +301,7 @@ class Html_2_Md
 		switch ($tag)
 		{
 			case 'a':
-				$markdown = $this->_convert_anchor($node);
+				$markdown = $this->line_end . $this->_convert_anchor($node);
 				break;
 			case 'abbr':
 				$markdown = $this->_convert_abbr($node);
@@ -1016,7 +1019,7 @@ class Html_2_Md
 				if (preg_match('~^(.{1,' . $width . '})(?:\s|$|,|\.)~', $string, $matches))
 				{
 					// Add the #width to the output and set up for the next pass
-					$lines[] = ($in_quote && $matches[1][0] !== '>' ? '> ' : '') . $matches[1];
+					$lines[] = ($in_quote && $matches[1][0] !== '>' ? '> ' : '') . ltrim($matches[1], ' ');
 					$string = Util::substr($string, Util::strlen($matches[1]));
 				}
 				// Humm just a long word with no place to break so we simply cut it after width characters
