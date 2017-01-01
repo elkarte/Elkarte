@@ -121,6 +121,7 @@ require(SOURCEDIR . '/Autoloader.class.php');
 $autoloder = Elk_Autoloader::getInstance();
 $autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
 $autoloder->register(SOURCEDIR, '\\ElkArte');
+$autoloder->register(SOURCEDIR . '/subs/BBC', '\\BBC');
 
 // Show lots of debug information below the page, not for production sites
 if ($db_show_debug === true)
