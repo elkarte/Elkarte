@@ -46,7 +46,7 @@ class TestHTML2Md extends PHPUnit_Framework_TestCase
 			array(
 				'Table',
 				'<h3>Simple table</h3><br /><br /><table><br /><thead><br /><tr><br /><th>Header 1</th><br /><th>Header 2</th><br /></tr><br /></thead><br /><tbody><br /><tr><br /><td>Cell 1</td><br /><td>Cell 2</td><br /></tr><br /><tr><br /><td>Cell 3</td><br /><td>Cell 4</td><br /></tr><br /></tbody><br /></table>',
-				"### Simple table\n \n \n| Header 1 | Header 2 |\n| -------- | -------- | \n| Cell 1   | Cell 2   |\n| Cell 3   | Cell 4   |"
+				"### Simple table\n  \n  \n| Header 1 | Header 2 |\n| -------- | -------- | \n| Cell 1   | Cell 2   |\n| Cell 3   | Cell 4   |"
 			),
 			array(
 				'Quotes',
