@@ -956,9 +956,9 @@ function template_profile_block_moderation()
 				echo '
 					<dt class="clear">
 						<span class="alert">', $txt['user_is_banned'], '</span>&nbsp;
-						[<a href="#" onclick="document.getElementById(\'ban_info\').style.display = document.getElementById(\'ban_info\').getComputedStyle().getPropertyValue("display") === \'none\' ? \'inline\' : \'none\';return false;">' . $txt['view_ban'] . '</a>]
+						<a class="linkbutton" href="#" onclick="document.getElementById(\'ban_info\').style.display = window.getComputedStyle(getElementById(\'ban_info\')).getPropertyValue(\'display\') === \'none\' ? \'inline\' : \'none\';return false;">' . $txt['view_ban'] . '</a>
 					</dt>
-					<dt class="clear hide" id="ban_info">
+					<dd class="hide" id="ban_info">
 						<strong>', $txt['user_banned_by_following'], ':</strong>';
 
 				foreach ($context['member']['bans'] as $ban)
@@ -967,7 +967,7 @@ function template_profile_block_moderation()
 						<span class="smalltext">', $ban['explanation'], '</span>';
 
 				echo '
-					</dt>';
+					</dd>';
 			}
 
 			echo '
