@@ -453,15 +453,20 @@ class Bootstrap
 	{
 		global $ssi_theme, $ssi_layers;
 
-		if (isset($_REQUEST['ssi_theme']) && (int) $_REQUEST['ssi_theme'] === (int) $ssi_theme)
+		// Check on any hacking attempts.
+		if (isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS']))
 		{
 			die('No access...');
 		}
-		elseif (isset($_COOKIE['ssi_theme']) && (int) $_COOKIE['ssi_theme'] === (int) $ssi_theme)
+		elseif (isset($_REQUEST['ssi_theme']) && (int) $_REQUEST['ssi_theme'] == (int) $ssi_theme)
 		{
 			die('No access...');
 		}
-		elseif (isset($_REQUEST['ssi_layers'], $ssi_layers) && (@get_magic_quotes_gpc() ? stripslashes($_REQUEST['ssi_layers']) : $_REQUEST['ssi_layers']) == $ssi_layers)
+		elseif (isset($_COOKIE['ssi_theme']) && (int) $_COOKIE['ssi_theme'] == (int) $ssi_theme)
+		{
+			die('No access...');
+		}
+		elseif (isset($_REQUEST['ssi_layers'], $ssi_layers) && $_REQUEST['ssi_layers'] == $ssi_layers)
 		{
 			die('No access...');
 		}
