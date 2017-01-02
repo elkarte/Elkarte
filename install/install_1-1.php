@@ -2269,7 +2269,7 @@ class InstallInstructions_install_1_1
 				// cal_maxyear kept for compatibility purposes
 				array('cal_maxyear', '2030'),
 				array('cal_limityear', '10'),
-				array('cal_minyear', '2008'),
+				array('cal_minyear', date('Y') - 4),
 				array('cal_daysaslink', '0'),
 				array('cal_defaultboard', ''),
 				array('cal_showholidays', '1'),
