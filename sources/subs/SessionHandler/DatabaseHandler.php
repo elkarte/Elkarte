@@ -31,7 +31,9 @@ class DatabaseHandler extends SessionHandler
 	{
 		// Better safe than sorry
 		if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $sessionId) == 0)
+		{
 			return false;
+		}
 
 		// Just delete the row...
 		$this->_db->query('', '
@@ -52,7 +54,9 @@ class DatabaseHandler extends SessionHandler
 	{
 		// Just set to the default or lower?  Ignore it for a higher value. (hopefully)
 		if (!empty($this->_modSettings['databaseSession_lifetime']) && ($maxLifetime <= 1440 || $this->_modSettings['databaseSession_lifetime'] > $maxLifetime))
+		{
 			$maxLifetime = max($this->_modSettings['databaseSession_lifetime'], 60);
+		}
 
 		// Clean up after yerself ;).
 		$this->_db->query('', '
@@ -72,7 +76,9 @@ class DatabaseHandler extends SessionHandler
 	public function read($sessionId)
 	{
 		if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $sessionId) == 0)
-			return false;
+		{
+			return '';
+		}
 
 		// Look for it in the database.
 		$result = $this->_db->query('', '
@@ -87,12 +93,7 @@ class DatabaseHandler extends SessionHandler
 		list ($sessionData) = $this->_db->fetch_row($result);
 		$this->_db->free_result($result);
 
-		if (empty($sessionData))
-		{
-			return '';
-		}
-
-		return $sessionData;
+		return empty($sessionData) ? '' : $sessionData;
 	}
 
 	/**
@@ -101,7 +102,9 @@ class DatabaseHandler extends SessionHandler
 	public function write($sessionId, $data)
 	{
 		if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $sessionId) == 0)
+		{
 			return false;
+		}
 
 		// First try to update an existing row...
 		$this->_db->query('', '

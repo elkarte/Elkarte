@@ -63,9 +63,13 @@ class Elk_Exception extends Exception
 		$this->index_message = $this->loadMessage($message);
 
 		if (isset($txt[$this->index_message]))
+		{
 			$real_message = $txt[$this->index_message];
+		}
 		else
+		{
 			$real_message = $this->index_message;
+		}
 
 		// Make sure everything is assigned properly
 		parent::__construct($real_message, $code, $previous);
@@ -121,7 +125,7 @@ class Elk_Exception extends Exception
 	}
 
 	/**
-	 * Loads the languadge file specified in Elk_Exception::parseMessage()
+	 * Loads the language file specified in Elk_Exception::parseMessage()
 	 * and replaces the index received in the constructor.
 	 *
 	 * @param string $message
@@ -143,24 +147,25 @@ class Elk_Exception extends Exception
 
 	/**
 	 * Loads the language file specified in Elk_Exception::parseMessage()
-	 * and replaces the index received in the constructor.
+	 * and replaces the index received in the constructor.  Logs the message if needed.
 	 *
 	 * @param string $msg
 	 * @param string $lang
-	 *
-	 * @return string The index or the message.
 	 */
 	protected function logMessage($msg, $lang)
 	{
 		global $user_info, $language, $txt;
 
 		// Don't need to reload the language file if both the user and
-		// the forum share the same languasge.
-		if ($language == $user_info['language'])
+		// the forum share the same language.
+		if ($language !== $user_info['language'])
 			loadLanguage($lang, $language);
 
-		$msg = !isset($txt[$msg]) ? $msg : (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
-		E::instance()->log_error($msg, 'general', $this->getFile(), $this->getLine());
+		if ($this->log !== false)
+		{
+			$msg = !isset($txt[$msg]) ? $msg : (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
+			E::instance()->log_error($msg, $this->log, $this->getFile(), $this->getLine());
+		}
 	}
 
 	/**
