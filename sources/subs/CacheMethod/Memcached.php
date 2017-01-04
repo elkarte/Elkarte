@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file contains functions that deal with getting and setting cache values.
+ * This file contains functions that deal with getting and setting memcacheD cache values.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -14,7 +14,7 @@
 namespace ElkArte\sources\subs\CacheMethod;
 
 /**
- * Memcached and Memcache.
+ * Memcached
  */
 class Memcached extends Cache_Method_Abstract
 {
@@ -24,10 +24,9 @@ class Memcached extends Cache_Method_Abstract
 	protected $title = 'Memcached';
 
 	/**
-	 * Memcached is the first choice, if this is
-	 * not available then Memcache is used.
+	 * Memcached instance representing the connection to the memcache servers.
 	 *
-	 * @var \Memcached|\Memcache
+	 * @var \Memcached
 	 */
 	protected $obj;
 
@@ -38,21 +37,14 @@ class Memcached extends Cache_Method_Abstract
 	{
 		if (empty($options['servers']))
 		{
-			$options['servers'] = array();
+			$options['servers'] = array('');
 		}
 
 		parent::__construct($options);
 
 		if ($this->isAvailable())
 		{
-			if (class_exists('\\Memcached', false))
-			{
-				$this->obj = new \Memcached;
-			}
-			elseif (class_exists('\\Memcache', false))
-			{
-				$this->obj = new \Memcache;
-			}
+			$this->obj = new \Memcached($this->is_persit());
 			$this->setOptions();
 			$this->addServers();
 		}
@@ -64,6 +56,7 @@ class Memcached extends Cache_Method_Abstract
 	public function exists($key)
 	{
 		$this->get($key);
+
 		return !$this->is_miss;
 	}
 
@@ -73,7 +66,9 @@ class Memcached extends Cache_Method_Abstract
 	public function put($key, $value, $ttl = 120)
 	{
 		if ($value === null)
+		{
 			$this->obj->delete($key);
+		}
 
 		$this->obj->set($key, $value, $ttl);
 	}
@@ -109,19 +104,24 @@ class Memcached extends Cache_Method_Abstract
 	{
 		$serversmList = $this->getServers();
 		$retVal = !empty($serversmList);
+
 		foreach ($this->_options['servers'] as $server)
 		{
 			$server = explode(':', trim($server));
+			$server[0] = !empty($server[0]) ? $server[0] : 'localhost';
 			$server[1] = !empty($server[1]) ? $server[1] : 11211;
+
 			if (!in_array(implode(':', $server), $serversmList, true))
+			{
 				$retVal |= $this->obj->addServer($server[0], $server[1]);
+			}
 		}
 
 		return $retVal;
 	}
 
 	/**
-	 * Get memcache servers.
+	 * Get memcached servers.
 	 *
 	 * @return array A list of servers in the daemon.
 	 */
@@ -135,44 +135,33 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	protected function setOptions()
 	{
-		if (class_exists('\\Memcached', false))
-		{
-			/*
-			 * the timeout after which a server is considered DEAD.
-			 */
-			$this->obj->setOption(\Memcached::OPT_CONNECT_TIMEOUT, 100);
+		/*
+		 * the timeout after which a server is considered DEAD.
+		 */
+		$this->obj->setOption(\Memcached::OPT_CONNECT_TIMEOUT, 100);
 
-			/*
-			 * If one memcached node is dead, its keys (and only its
-			 * keys) will be evenly distributed to other nodes.
-			 */
-			$this->obj->setOption(\Memcached::OPT_DISTRIBUTION, \Memcached::DISTRIBUTION_CONSISTENT);
+		/*
+		 * If one memcached node is dead, its keys (and only its
+		 * keys) will be evenly distributed to other nodes.
+		 */
+		$this->obj->setOption(\Memcached::OPT_DISTRIBUTION, \Memcached::DISTRIBUTION_CONSISTENT);
 
-			/*
-			 * number of connection issues before a server is marked
-			 * as DEAD, and removed from the list of servers.
-			 */
-			$this->obj->setOption(\Memcached::OPT_SERVER_FAILURE_LIMIT, 2);
+		/*
+		 * number of connection issues before a server is marked
+		 * as DEAD, and removed from the list of servers.
+		 */
+		$this->obj->setOption(\Memcached::OPT_SERVER_FAILURE_LIMIT, 2);
 
-			/*
-			 * enables the removal of dead servers.
-			 */
-			$this->obj->setOption(\Memcached::OPT_REMOVE_FAILED_SERVERS, true);
+		/*
+		 * enables the removal of dead servers.
+		 */
+		$this->obj->setOption(\Memcached::OPT_REMOVE_FAILED_SERVERS, true);
 
-			/*
-			 * after a node is declared DEAD, libmemcached will
-			 * try it again after that many seconds.
-			 */
-			$this->obj->setOption(\Memcached::OPT_RETRY_TIMEOUT, 1);
-		}
-		elseif (class_exists('\\Memcache', false))
-		{
-			$this->obj->setOption(\Memcache::OPT_CONNECT_TIMEOUT, 100);
-			$this->obj->setOption(\Memcache::OPT_DISTRIBUTION, \Memcache::DISTRIBUTION_CONSISTENT);
-			$this->obj->setOption(\Memcache::OPT_SERVER_FAILURE_LIMIT, 2);
-			$this->obj->setOption(\Memcache::OPT_REMOVE_FAILED_SERVERS, true);
-			$this->obj->setOption(\Memcache::OPT_RETRY_TIMEOUT, 1);
-		}
+		/*
+		 * after a node is declared DEAD, libmemcached will
+		 * try it again after that many seconds.
+		 */
+		$this->obj->setOption(\Memcached::OPT_RETRY_TIMEOUT, 1);
 	}
 
 	/**
@@ -180,7 +169,7 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	public function isAvailable()
 	{
-		return class_exists('\\Memcached') || class_exists('\\Memcache');
+		return class_exists('\\Memcached');
 	}
 
 	/**
@@ -191,8 +180,8 @@ class Memcached extends Cache_Method_Abstract
 		$version = $this->obj->getVersion();
 
 		return array(
-			'title' => $this->title,
-			'version' => !empty($version) ? current($version) : 0
+			'title' => $this->title(),
+			'version' => !empty($version) ? current($version) : '0.0.0'
 		);
 	}
 
@@ -208,14 +197,29 @@ class Memcached extends Cache_Method_Abstract
 		global $txt;
 
 		$var = array(
-			'cache_memcached', $txt['cache_memcached'], 'file',
-			'text', $txt['cache_memcached'], 'cache_memcached',
+			'cache_memcached', $txt['cache_memcached'], 'file', 'text', 30, 'cache_memcached',
 			'force_div_id' => 'memcached_cache_memcached',
 		);
+
 		$serversmList = $this->getServers();
+
 		if (!empty($serversmList))
-			$var['postinput'] = $txt['cache_memcached_servers'] . implode('<br>', $serversmList);
+		{
+			$var['postinput'] = $txt['cache_memcached_servers'] . implode('</li><li>', $serversmList) . '</li></ul>';
+		}
 
 		$config_vars[] = $var;
+	}
+
+	/**
+	 * If this should be done as a persistent connection
+	 *
+	 * @return string|null
+	 */
+	private function is_persit()
+	{
+		global $db_persist;
+
+		return !empty($db_persist) ? $this->prefix . '_memcached' : null;
 	}
 }
