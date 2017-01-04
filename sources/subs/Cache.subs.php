@@ -55,6 +55,7 @@ function cache_put_data($key, $value, $ttl = 120)
 
 /**
  * Gets the value from the cache specified by key, so long as it is not older than ttl seconds.
+ *
  * - It may often "miss", so shouldn't be depended on.
  * - It supports the same as Cache::instance()->put().
  *
@@ -94,6 +95,7 @@ function clean_cache($type = '')
  *             an array with 'title' and 'version' is returned.
  *             If false, for each engine available an array with 'title' (string)
  *             and 'supported' (bool) is returned.
+ *
  * @return mixed[]
  */
 function loadCacheEngines($supported_only = true)
@@ -116,7 +118,9 @@ function loadCacheEngines($supported_only = true)
 			if ($obj instanceof ElkArte\sources\subs\CacheMethod\Cache_Method_Abstract)
 			{
 				if ($supported_only && $obj->isAvailable())
+				{
 					$engines[strtolower($engine_name)] = $obj->details();
+				}
 				elseif ($supported_only === false)
 				{
 					$engines[strtolower($engine_name)] = $obj;

@@ -72,7 +72,7 @@ interface Cache_Method_Interface
 	public function clean($type = '');
 
 	/**
-	 * Certain caching engines (e.g. filesyste) may require fixes to the cache key
+	 * Certain caching engines (e.g. filesystem) may require fixes to the cache key
 	 * this method is here to allow fixing the key appropriately.
 	 *
 	 * @param string $key
