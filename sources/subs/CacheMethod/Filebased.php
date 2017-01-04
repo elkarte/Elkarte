@@ -50,6 +50,7 @@ class Filebased extends Cache_Method_Abstract
 	 * to help the tests stay running smoothly.
 	 *
 	 * @param string $key
+	 *
 	 * @return string
 	 */
 	public function getFileName($key)
@@ -85,7 +86,9 @@ class Filebased extends Cache_Method_Abstract
 			// Write out the cache file, check that the cache write was successful; all the data must be written
 			// If it fails due to low diskspace, or other, remove the cache file
 			if (@file_put_contents(CACHEDIR . '/' . $fName, $cache_data, LOCK_EX) !== strlen($cache_data))
+			{
 				@unlink(CACHEDIR . '/' . $fName);
+			}
 		}
 	}
 
@@ -102,6 +105,7 @@ class Filebased extends Cache_Method_Abstract
 			if (filesize(CACHEDIR . '/' . $fName) > 10)
 			{
 				$value = json_decode(file_get_contents(CACHEDIR . '/' . $fName));
+
 				if ($value->expiration < time())
 				{
 					@unlink(CACHEDIR . '/' . $fName);
@@ -111,12 +115,14 @@ class Filebased extends Cache_Method_Abstract
 				{
 					$return = $value->data;
 				}
+
 				unset($value);
 				$this->is_miss = $return === null;
 
 				return $return;
 			}
 		}
+
 		$this->is_miss = true;
 
 		return $return;
@@ -127,16 +133,16 @@ class Filebased extends Cache_Method_Abstract
 	 */
 	public function clean($type = '')
 	{
-		// To be complete, we also clear out the cache dir so we get any js/css hive files
-		// Remove the cache files in our disk cache directory
 		try
 		{
 			$files = new FilesystemIterator(CACHEDIR, FilesystemIterator::SKIP_DOTS);
 
 			foreach ($files as $file)
 			{
-				if ($file->getFileName() !== 'index.php' && $file->getFileName() !== '.htaccess' && (!$type || $file->getExtension() == $type))
+				if ($file->getFileName() !== 'index.php' && $file->getFileName() !== '.htaccess' && $file->getExtension() === 'json')
+				{
 					@unlink($file->getPathname());
+				}
 			}
 		}
 		catch (UnexpectedValueException $e)
