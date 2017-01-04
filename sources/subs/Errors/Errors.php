@@ -221,11 +221,11 @@ class Errors extends AbstractModel
 	 * @param string         $error
 	 * @param string|boolean $log defaults to 'general' false will skip logging, true will use general
 	 *
-	 * @throws Elk_Exception
+	 * @throws \Elk_Exception
 	 */
 	public function fatal_error($error = '', $log = 'general')
 	{
-		throw new Elk_Exception($error, $log);
+		throw new \Elk_Exception($error, $log);
 	}
 
 	/**
@@ -243,11 +243,11 @@ class Errors extends AbstractModel
 	 * @param string|boolean $log defaults to 'general' false will skip logging, true will use general
 	 * @param string[]       $sprintf defaults to empty array()
 	 *
-	 * @throws Elk_Exception
+	 * @throws \Elk_Exception
 	 */
 	public function fatal_lang_error($error, $log = 'general', $sprintf = array())
 	{
-		throw new Elk_Exception($error, $log, $sprintf);
+		throw new \Elk_Exception($error, $log, $sprintf);
 	}
 
 	/**
@@ -285,7 +285,7 @@ class Errors extends AbstractModel
 		$context['sub_template'] = 'fatal_error';
 
 		if (class_exists('Template_Layers'))
-			Template_Layers::getInstance()->isError();
+			\Template_Layers::getInstance()->isError();
 
 		// If this is SSI, what do they want us to do?
 		if (ELK === 'SSI')
@@ -354,7 +354,7 @@ class Errors extends AbstractModel
 	{
 		global $mbname, $maintenance, $webmaster_email, $db_error_send;
 
-		$cache = Cache::instance();
+		$cache = \Cache::instance();
 
 		// Just check we're not in any buffers, just in case.
 		while (ob_get_level() > 0)
