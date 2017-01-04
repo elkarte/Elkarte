@@ -2384,7 +2384,7 @@ class InstallInstructions_install_1_1
 				array('warning_watch', '10'),
 				array('warning_moderate', '35'),
 				array('warning_mute', '60'),
-				array('admin_features', ''),
+				array('admin_features', 'cp'),
 				array('last_mod_report_action', '0'),
 				array('pruningOptions', '30,180,180,180,30,7,0'),
 				array('cache_enable', '1'),
