@@ -44,7 +44,7 @@ class Memcached extends Cache_Method_Abstract
 
 		if ($this->isAvailable())
 		{
-			$this->obj = new \Memcached($this->is_persit());
+			$this->obj = new \Memcached($this->_is_persist());
 			$this->setOptions();
 			$this->addServers();
 		}
@@ -216,7 +216,7 @@ class Memcached extends Cache_Method_Abstract
 	 *
 	 * @return string|null
 	 */
-	private function is_persit()
+	private function _is_persist()
 	{
 		global $db_persist;
 

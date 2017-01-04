@@ -134,7 +134,7 @@ class Memcache extends Cache_Method_Abstract
 
 			if (!in_array(implode(':', $server), $serversmList, true))
 			{
-				$retVal |= $this->obj->addServer($server[0], $server[1], $this->is_persit());
+				$retVal |= $this->obj->addServer($server[0], $server[1], $this->_is_persist());
 				$this->setOptions($server[0], $server[1]);
 			}
 		}
@@ -219,7 +219,7 @@ class Memcache extends Cache_Method_Abstract
 	 *
 	 * @return string
 	 */
-	private function is_persit()
+	private function _is_persist()
 	{
 		global $db_persist;
 
