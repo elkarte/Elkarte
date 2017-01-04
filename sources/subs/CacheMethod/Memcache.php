@@ -81,7 +81,7 @@ class Memcache extends Cache_Method_Abstract
 			$this->obj->delete($key);
 		}
 
-		$this->obj->set($key, $value, 0, $ttl);
+		$this->obj->set($key, $value, MEMCACHE_COMPRESSED, $ttl);
 	}
 
 	/**
@@ -180,13 +180,11 @@ class Memcache extends Cache_Method_Abstract
 	 */
 	public function details()
 	{
-		global $txt;
-
 		$version = @$this->obj->getVersion();
 
 		return array(
 			'title' => $this->title(),
-			'version' => !empty($version) ? $version : $txt['not_applicable']
+			'version' => !empty($version) ? $version : '0.0.0'
 		);
 	}
 
@@ -202,8 +200,8 @@ class Memcache extends Cache_Method_Abstract
 		global $txt;
 
 		$var = array(
-			'cache_memcached', $txt['cache_memcached'], 'file', 'text', $txt['cache_memcached'], 'cache_memcached',
-			'force_div_id' => 'memcached_cache_memcached',
+			'cache_memcached', $txt['cache_memcache'], 'file', 'text', 30, 'cache_memcached',
+			'force_div_id' => 'memcache_cache_memcache',
 		);
 
 		$serversmList = $this->getServers();
