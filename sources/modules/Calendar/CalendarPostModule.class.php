@@ -21,7 +21,7 @@
  *
  * @package Calendar
  */
-class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
+class Calendar_Post_Module extends ElkArte\sources\modules\Abstract_Module
 {
 	/**
 	 * If we are making a topic event

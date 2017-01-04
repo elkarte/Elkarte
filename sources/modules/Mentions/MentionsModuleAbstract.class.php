@@ -16,7 +16,7 @@
  *
  * @package Mentions
  */
-abstract class Mentions_Module_Abstract implements ElkArte\sources\modules\Module_Interface
+abstract class Mentions_Module_Abstract extends ElkArte\sources\modules\Abstract_Module
 {
 	/**
 	 * Based on the $action returns the enabled mention types to register to the

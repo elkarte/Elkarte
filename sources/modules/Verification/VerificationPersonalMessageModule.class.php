@@ -20,7 +20,7 @@
  *
  * Adds Visual Verification controls to the PM page for those that need it.
  */
-class Verification_PersonalMessage_Module implements ElkArte\sources\modules\Module_Interface
+class Verification_PersonalMessage_Module extends ElkArte\sources\modules\Abstract_Module
 {
 	/**
 	 * {@inheritdoc }

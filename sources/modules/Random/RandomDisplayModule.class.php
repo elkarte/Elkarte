@@ -14,7 +14,7 @@
 /**
  * Class Random_Display_Module
  */
-class Random_Display_Module implements ElkArte\sources\modules\Module_Interface
+class Random_Display_Module extends ElkArte\sources\modules\Abstract_Module
 {
 	/**
 	 * @var bool

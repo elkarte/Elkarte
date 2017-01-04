@@ -21,7 +21,7 @@ use ElkArte\Errors\AttachmentErrorContext;
 /**
  * Class Attachments_Post_Module
  */
-class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interface
+class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 {
 	/**
 	 * The mode of attachments (disabled/enabled/show only).

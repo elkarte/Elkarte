@@ -20,7 +20,7 @@
  *
  * Events and functions for post based drafts
  */
-class Drafts_Admin_Module implements ElkArte\sources\modules\Module_Interface
+class Drafts_Admin_Module extends ElkArte\sources\modules\Abstract_Module
 {
 	/**
 	 * {@inheritdoc}

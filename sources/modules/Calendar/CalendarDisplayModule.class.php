@@ -20,7 +20,7 @@
  *
  * @package Calendar
  */
-class Calendar_Display_Module implements ElkArte\sources\modules\Module_Interface
+class Calendar_Display_Module extends ElkArte\sources\modules\Abstract_Module
 {
 	/**
 	 * {@inheritdoc }

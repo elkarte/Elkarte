@@ -20,7 +20,7 @@
  *
  * Handles adding the show drafts area to the user profile
  */
-class Drafts_Profile_Module implements ElkArte\sources\modules\Module_Interface
+class Drafts_Profile_Module extends ElkArte\sources\modules\Abstract_Module
 {
 	/**
 	 * {@inheritdoc }

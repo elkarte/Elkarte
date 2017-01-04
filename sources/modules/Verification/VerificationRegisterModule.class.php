@@ -20,7 +20,7 @@
  *
  * Adds Visual Verification controls to the Registration page.
  */
-class Verification_Register_Module implements ElkArte\sources\modules\Module_Interface
+class Verification_Register_Module extends ElkArte\sources\modules\Abstract_Module
 {
 	/**
 	 * {@inheritdoc }

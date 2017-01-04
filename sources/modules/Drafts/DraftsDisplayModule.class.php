@@ -20,7 +20,7 @@
  *
  * Enables draft functions for teh Display.controller page (quick reply)
  */
-class Drafts_Display_Module implements ElkArte\sources\modules\Module_Interface
+class Drafts_Display_Module extends ElkArte\sources\modules\Abstract_Module
 {
 	/**
 	 * Autosave switch
