@@ -21,10 +21,16 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 {
 	/**
 	 * The settings of the caching engine
+	 *
 	 * @var array
 	 */
 	public $_options = null;
 
+	/**
+	 * Cache hit or not
+	 *
+	 * @var bool
+	 */
 	protected $is_miss = true;
 
 	/**
@@ -59,8 +65,7 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 	}
 
 	/**
-	 * Obtain the variables necessary to
-	 * help build the final key for storage.
+	 * Obtain the variables necessary to help build the final key for storage.
 	 *
 	 * @param string $key
 	 * @return string
@@ -89,7 +94,7 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function settings(&$confing_vars)
+	public function settings(&$config_vars)
 	{
 	}
 
