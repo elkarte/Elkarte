@@ -75,31 +75,33 @@ class File extends Db
 			'mmessage',
 			'mbname',
 		);
+
 		foreach ($this->configVars as $identifier => $configVar)
 		{
 			$new_setting = $configVar;
+
 			if (is_array($configVar) && isset($configVar[1]))
 			{
 				$varname = $configVar[0];
 				global ${$varname};
 
 				// Rewrite the definition a bit.
-				$new_setting = array(
-					$configVar[3],
-					$configVar[0],
-					'text_label' => $configVar[1],
-				);
+				$new_setting[0] = $configVar[3];
+				$new_setting[1] = $configVar[0];
+				$new_setting['text_label'] = $configVar[1];
+
 				if (isset($configVar[4]))
 				{
 					$new_setting[2] = $configVar[4];
 				}
+
 				if (isset($configVar[5]))
 				{
 					$new_setting['helptext'] = $configVar[5];
 				}
 
 				// Special value needed from the settings file?
-				if ($configVar[2] == 'file')
+				if ($configVar[2] === 'file')
 				{
 					$value = in_array($varname, $defines) ? constant(strtoupper($varname)) : $$varname;
 					if (in_array($varname, $safe_strings))
@@ -172,13 +174,13 @@ class File extends Db
 			function ($configVar)
 			{
 				// We just saved the file-based settings, so skip their definitions.
-				if (!is_array($configVar) || $configVar[2] == 'file')
+				if (!is_array($configVar) || $configVar[2] === 'file')
 				{
 					return '';
 				}
 
 				// Rewrite the definition a bit.
-				if (is_array($configVar) && $configVar[2] == 'db')
+				if (is_array($configVar) && $configVar[2] === 'db')
 				{
 					return array($configVar[3], $configVar[0]);
 				}
@@ -214,11 +216,11 @@ class File extends Db
 		// Fix the forum's URL if necessary.
 		if (isset($this->configValues['boardurl']))
 		{
-			if (substr($this->configValues['boardurl'], -10) == '/index.php')
+			if (substr($this->configValues['boardurl'], -10) === '/index.php')
 			{
 				$this->configValues['boardurl'] = substr($this->configValues['boardurl'], 0, -10);
 			}
-			elseif (substr($this->configValues['boardurl'], -1) == '/')
+			elseif (substr($this->configValues['boardurl'], -1) === '/')
 			{
 				$this->configValues['boardurl'] = substr($this->configValues['boardurl'], 0, -1);
 			}
@@ -363,7 +365,7 @@ class File extends Db
 		for ($i = 0, $n = count($this->settingsArray); $i < $n; $i++)
 		{
 			// Don't trim or bother with it if it's not a variable.
-			if (substr($this->settingsArray[$i], 0, 1) != '$')
+			if (substr($this->settingsArray[$i], 0, 1) !== '$')
 			{
 				continue;
 			}
@@ -384,7 +386,7 @@ class File extends Db
 			}
 
 			// End of the file ... maybe
-			if (substr(trim($this->settingsArray[$i]), 0, 2) == '?' . '>')
+			if (substr(trim($this->settingsArray[$i]), 0, 2) === '?' . '>')
 			{
 				$end = $i;
 			}
@@ -399,7 +401,7 @@ class File extends Db
 		// Still more variables to go?  Then lets add them at the end.
 		if (!empty($this->new_settings))
 		{
-			if (trim($this->settingsArray[$end]) == '?' . '>')
+			if (trim($this->settingsArray[$end]) === '?' . '>')
 			{
 				$this->settingsArray[$end++] = '';
 			}
