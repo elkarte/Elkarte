@@ -1048,7 +1048,7 @@ function toggleCache ()
 		cacheconfirm = $('#cache_password_confirm').parent();
 
 	// Show the memcache server box only if memcache has been selected
-	if (cache_type.value !== "memcached")
+	if (cache_type.value.substr(0, 8) !== "memcache")
 	{
 		memcache.slideUp();
 		memcache.prev().slideUp(100);
