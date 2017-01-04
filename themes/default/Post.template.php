@@ -476,7 +476,7 @@ function template_add_new_attachments()
 		numOfAttachmentAllowed: ' . $context['attachments']['num_allowed'] . ',
 		totalAttachSizeUploaded: ' . (isset($context['attachments']['total_size']) && !empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0) . ',
 		numAttachUploaded: ' . (isset($context['attachments']['quantity']) && !empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0) . ',
-		fileDisplayTemplate: \'<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="control fa fa-times-circle"></div></div>\',
+		fileDisplayTemplate: \'<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="control icon i-close"></div></div>\',
 		oTxt: {
 			allowedExtensions : ' . JavaScriptEscape(sprintf($txt['cant_upload_type'], $context['attachments']['allowed_extensions'])) . ',
 			totalSizeAllowed : ' . JavaScriptEscape($txt['attach_max_total_file_size']) . ',
