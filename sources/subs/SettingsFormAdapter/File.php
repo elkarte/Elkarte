@@ -137,7 +137,7 @@ class File extends Db
 	 */
 	public function save()
 	{
-		$this->cleanSettings();
+		$this->_cleanSettings();
 
 		// When was Settings.php last changed?
 		$this->last_settings_change = filemtime(BOARDDIR . '/Settings.php');
@@ -199,7 +199,7 @@ class File extends Db
 	/**
 	 * Fix the cookie name by removing invalid characters
 	 */
-	private function fixCookieName()
+	private function _fixCookieName()
 	{
 		// Fix the darn stupid cookiename! (more may not be allowed, but these for sure!)
 		if (isset($this->configValues['cookiename']))
@@ -209,11 +209,10 @@ class File extends Db
 	}
 
 	/**
-	 *
+	 * Fix the forum's URL if necessary so that it is a valid root url
 	 */
-	private function fixBoardUrl()
+	private function _fixBoardUrl()
 	{
-		// Fix the forum's URL if necessary.
 		if (isset($this->configValues['boardurl']))
 		{
 			if (substr($this->configValues['boardurl'], -10) === '/index.php')
@@ -230,12 +229,12 @@ class File extends Db
 	}
 
 	/**
-	 *
+	 * For all known configuration values, ensures they are properly cast / escaped
 	 */
-	private function cleanSettings()
+	private function _cleanSettings()
 	{
-		$this->fixCookieName();
-		$this->fixBoardUrl();
+		$this->_fixCookieName();
+		$this->_fixBoardUrl();
 
 		// Any passwords?
 		$config_passwords = array(
@@ -290,6 +289,7 @@ class File extends Db
 			}
 		}
 
+		// Escape and update Setting strings
 		foreach ($config_strs as $configVar)
 		{
 			if (isset($this->configValues[$configVar]))
@@ -305,6 +305,7 @@ class File extends Db
 			}
 		}
 
+		// Ints are saved as integers
 		foreach ($config_ints as $configVar)
 		{
 			if (isset($this->configValues[$configVar]))
@@ -313,6 +314,7 @@ class File extends Db
 			}
 		}
 
+		// Convert checkbox selections to 0 / 1
 		foreach ($config_bools as $key)
 		{
 			// Check boxes need to be part of this settings form
@@ -345,7 +347,11 @@ class File extends Db
 	}
 
 	/**
+	 * Updates / Validates the Settings array for later output.
 	 *
+	 * - Updates any values that have been changed.
+	 * - Key/value pairs that did not exists are added at the end of the array.
+	 * - Ensures the completed array is valid for later output
 	 */
 	private function _prepareSettings()
 	{
@@ -424,6 +430,7 @@ class File extends Db
 
 	/**
 	 * Write out the contents of Settings.php file.
+	 *
 	 * This function will add the variables passed to it in $this->new_settings,
 	 * to the Settings.php file.
 	 */
