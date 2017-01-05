@@ -27,6 +27,9 @@
 
 class Admin_Controller extends Action_Controller
 {
+	private $_checkFor = array('gd', 'imagick', 'db_server', 'php', 'server',
+							  'zend', 'apc', 'memcache', 'memcached', 'xcache', 'opcache');
+
 	/**
 	 * Pre Dispatch, called before other methods.  Loads integration hooks
 	 * and HttpReq instance.
@@ -640,22 +643,7 @@ class Admin_Controller extends Action_Controller
 		$context['forum_version'] = FORUM_VERSION;
 
 		// Get a list of current server versions.
-		$checkFor = array(
-			'gd',
-			'imagick',
-			'db_server',
-			'mmcache',
-			'eaccelerator',
-			'zend',
-			'apc',
-			'memcache',
-			'xcache',
-			'opcache',
-			'php',
-			'server',
-		);
-		$context['current_versions'] = getServerVersions($checkFor);
-
+		$context['current_versions'] = getServerVersions($this->_checkFor);
 		$context['can_admin'] = allowedTo('admin_forum');
 		$context['sub_template'] = 'admin';
 		$context['page_title'] = $txt['admin_center'];
@@ -712,22 +700,7 @@ class Admin_Controller extends Action_Controller
 		$context['forum_version'] = FORUM_VERSION;
 
 		// Get a list of current server versions.
-		$checkFor = array(
-			'gd',
-			'imagick',
-			'db_server',
-			'mmcache',
-			'eaccelerator',
-			'zend',
-			'apc',
-			'memcached',
-			'xcache',
-			'opcache',
-			'php',
-			'server',
-		);
-		$context['current_versions'] = getServerVersions($checkFor);
-
+		$context['current_versions'] = getServerVersions($this->_checkFor);
 		$context['can_admin'] = allowedTo('admin_forum');
 		$context['sub_template'] = 'credits';
 		$context['page_title'] = $txt['support_credits_title'];

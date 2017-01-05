@@ -175,7 +175,9 @@ class Cache
 	 * - It supports:
 	 *   - Xcache: http://xcache.lighttpd.net/wiki/XcacheApi
 	 *   - memcache: http://www.php.net/memcache
+	 *   - memcached: http://www.php.net/memcached
 	 *   - APC: http://www.php.net/apc
+	 *   - APCu: http://us3.php.net/manual/en/book.apcu.php
 	 *   - Zend: http://files.zend.com/help/Zend-Platform/output_cache_functions.htm
 	 *   - Zend: http://files.zend.com/help/Zend-Platform/zend_cache_functions.htm
 	 *
@@ -458,7 +460,7 @@ class Cache
 					'cache_password' => $cache_password,
 				);
 			}
-			elseif ($cache_accelerator === 'memcached')
+			elseif (substr($cache_accelerator, 0, 8) === 'memcache')
 			{
 				$options = array(
 					'servers' => explode(',', $cache_memcached),

@@ -58,9 +58,13 @@ class Xcache extends Cache_Method_Abstract
 	public function put($key, $value, $ttl = 120)
 	{
 		if ($value === null)
+		{
 			xcache_unset($key);
+		}
 		else
+		{
 			xcache_set($key, $value, $ttl);
+		}
 	}
 
 	/**
@@ -87,13 +91,17 @@ class Xcache extends Cache_Method_Abstract
 		if ($type === '' || $type === 'user')
 		{
 			for ($i = 0; $i < $vcnt; $i++)
+			{
 				xcache_clear_cache(XC_TYPE_VAR, $i);
+			}
 		}
 
 		if ($type === '' || $type === 'data')
 		{
 			for ($i = 0; $i < $pcnt; $i++)
+			{
 				xcache_clear_cache(XC_TYPE_PHP, $i);
+			}
 		}
 	}
 

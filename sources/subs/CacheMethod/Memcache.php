@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file contains functions that deal with getting and setting memcacheD cache values.
+ * This file contains functions that deal with getting and setting cache values.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -14,21 +14,28 @@
 namespace ElkArte\sources\subs\CacheMethod;
 
 /**
- * Memcached
+ * Memcached and Memcache.
  */
-class Memcached extends Cache_Method_Abstract
+class Memcache extends Cache_Method_Abstract
 {
 	/**
 	 * {@inheritdoc}
 	 */
-	protected $title = 'Memcached';
+	protected $title = 'Memcache';
 
 	/**
-	 * Memcached instance representing the connection to the memcache servers.
+	 * Creates a Memcache instance representing the connection to the memcache servers.
 	 *
-	 * @var \Memcached
+	 * @var \Memcache
 	 */
 	protected $obj;
+
+	/**
+	 * If the daemon has valid servers in it pool
+	 *
+	 * @var bool
+	 */
+	protected $_is_running;
 
 	/**
 	 * {@inheritdoc}
@@ -44,9 +51,8 @@ class Memcached extends Cache_Method_Abstract
 
 		if ($this->isAvailable())
 		{
-			$this->obj = new \Memcached($this->_is_persist());
-			$this->setOptions();
-			$this->addServers();
+			$this->obj = new \Memcache;
+			$this->_is_running = $this->addServers();
 		}
 	}
 
@@ -65,12 +71,17 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
+		if (!$this->_is_running)
+		{
+			return false;
+		}
+
 		if ($value === null)
 		{
 			$this->obj->delete($key);
 		}
 
-		$this->obj->set($key, $value, $ttl);
+		$this->obj->set($key, $value, MEMCACHE_COMPRESSED, $ttl);
 	}
 
 	/**
@@ -78,6 +89,11 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	public function get($key, $ttl = 120)
 	{
+		if (!$this->_is_running)
+		{
+			return false;
+		}
+
 		$result = $this->obj->get($key);
 		$this->is_miss = $result === null || $result === false;
 
@@ -89,6 +105,11 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	public function clean($type = '')
 	{
+		if (!$this->_is_running)
+		{
+			return false;
+		}
+
 		// Clear it out, really invalidate whats there
 		$this->obj->flush();
 	}
@@ -113,7 +134,8 @@ class Memcached extends Cache_Method_Abstract
 
 			if (!in_array(implode(':', $server), $serversmList, true))
 			{
-				$retVal |= $this->obj->addServer($server[0], $server[1]);
+				$retVal |= $this->obj->addServer($server[0], $server[1], $this->_is_persist());
+				$this->setOptions($server[0], $server[1]);
 			}
 		}
 
@@ -121,47 +143,28 @@ class Memcached extends Cache_Method_Abstract
 	}
 
 	/**
-	 * Get memcached servers.
+	 * Get memcache servers.
 	 *
 	 * @return array A list of servers in the daemon.
 	 */
 	protected function getServers()
 	{
-		return array_keys((array) $this->obj->getStats());
+		$servers = @$this->obj->getExtendedStats();
+
+		return !empty($servers) ? array_keys((array) $servers) : array();
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * Set a few server specific options.  Could be done as part of setServer
+	 * but left here for convenience
+	 *
+	 * @param string $server
+	 * @param int    $port
 	 */
-	protected function setOptions()
+	protected function setOptions($server, $port)
 	{
-		/*
-		 * the timeout after which a server is considered DEAD.
-		 */
-		$this->obj->setOption(\Memcached::OPT_CONNECT_TIMEOUT, 100);
-
-		/*
-		 * If one memcached node is dead, its keys (and only its
-		 * keys) will be evenly distributed to other nodes.
-		 */
-		$this->obj->setOption(\Memcached::OPT_DISTRIBUTION, \Memcached::DISTRIBUTION_CONSISTENT);
-
-		/*
-		 * number of connection issues before a server is marked
-		 * as DEAD, and removed from the list of servers.
-		 */
-		$this->obj->setOption(\Memcached::OPT_SERVER_FAILURE_LIMIT, 2);
-
-		/*
-		 * enables the removal of dead servers.
-		 */
-		$this->obj->setOption(\Memcached::OPT_REMOVE_FAILED_SERVERS, true);
-
-		/*
-		 * after a node is declared DEAD, libmemcached will
-		 * try it again after that many seconds.
-		 */
-		$this->obj->setOption(\Memcached::OPT_RETRY_TIMEOUT, 1);
+		// host, port, timeout, retry_interval, status
+		$this->obj->setServerParams($server, $port, 1, 5, true);
 	}
 
 	/**
@@ -169,7 +172,7 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	public function isAvailable()
 	{
-		return class_exists('\\Memcached');
+		return class_exists('\\Memcache');
 	}
 
 	/**
@@ -177,11 +180,11 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	public function details()
 	{
-		$version = $this->obj->getVersion();
+		$version = @$this->obj->getVersion();
 
 		return array(
 			'title' => $this->title(),
-			'version' => !empty($version) ? current($version) : '0.0.0'
+			'version' => !empty($version) ? $version : '0.0.0'
 		);
 	}
 
@@ -197,8 +200,8 @@ class Memcached extends Cache_Method_Abstract
 		global $txt;
 
 		$var = array(
-			'cache_memcached', $txt['cache_memcached'], 'file', 'text', 30, 'cache_memcached',
-			'force_div_id' => 'memcached_cache_memcached',
+			'cache_memcached', $txt['cache_memcache'], 'file', 'text', 30, 'cache_memcached',
+			'force_div_id' => 'memcache_cache_memcache',
 		);
 
 		$serversmList = $this->getServers();
@@ -214,12 +217,12 @@ class Memcached extends Cache_Method_Abstract
 	/**
 	 * If this should be done as a persistent connection
 	 *
-	 * @return string|null
+	 * @return string
 	 */
 	private function _is_persist()
 	{
 		global $db_persist;
 
-		return !empty($db_persist) ? $this->prefix . '_memcached' : null;
+		return !empty($db_persist);
 	}
 }
