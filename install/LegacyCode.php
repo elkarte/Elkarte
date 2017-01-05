@@ -16,8 +16,8 @@
 /**
  * Alter a text column definition preserving its character set.
  *
- * @param type $change
- * @param type $substep
+ * @param mixed $change
+ * @param string $substep
  */
 function textfield_alter($change, $substep)
 {
@@ -34,7 +34,6 @@ function textfield_alter($change, $substep)
 			'column' => $change['column'],
 		)
 	);
-
 	if ($db->num_rows($request) === 0)
 	{
 		die('Unable to find column ' . $change['column'] . ' inside table ' . $db_prefix . $change['table']);
@@ -74,8 +73,8 @@ function textfield_alter($change, $substep)
 
 	if ($column_fix)
 	{
-		$db->skip_next_error();
 		// Make sure there are no NULL's left.
+		$db->skip_next_error();
 		if ($null_fix)
 		{
 			$db->query('', '
@@ -88,8 +87,8 @@ function textfield_alter($change, $substep)
 			);
 		}
 
-		$db->skip_next_error();
 		// Do the actual alteration.
+		$db->skip_next_error();
 		$db->query('', '
 			ALTER TABLE {db_prefix}' . $change['table'] . '
 			CHANGE COLUMN ' . $change['column'] . ' ' . $change['column'] . ' ' . $change['type'] . (isset($collation_info['Charset']) ? ' CHARACTER SET ' . $collation_info['Charset'] . ' COLLATE ' . $collation_info['Collation'] : '') . ($change['null_allowed'] ? '' : ' NOT NULL') . (isset($change['default']) ? ' default {string:default}' : ''),
@@ -123,7 +122,9 @@ function checkChange(&$change)
 
 	// Not a column we need to check on?
 	if (!in_array($change['name'], array('memberGroups', 'passwordSalt')))
+	{
 		return;
+	}
 
 	// Break it up you (six|seven).
 	$temp = explode(' ', str_replace('NOT NULL', 'NOT_NULL', $change['text']));
@@ -142,8 +143,9 @@ function checkChange(&$change)
 				'new_name' => $temp[2],
 		));
 		if ($db->num_rows != 1)
+		{
 			return;
-
+		}
 		list (, $current_type) = $db->fetch_assoc($request);
 		$db->free_result($request);
 	}
@@ -157,11 +159,11 @@ function checkChange(&$change)
 				'table' => $change['table'],
 			)
 		);
-
 		// Mayday!
 		if ($db->num_rows($request) == 0)
+		{
 			return;
-
+		}
 		// Oh where, oh where has my little field gone. Oh where can it be...
 		while ($row = $db->fetch_assoc($request))
 		{
@@ -175,9 +177,10 @@ function checkChange(&$change)
 
 	// If this doesn't match, the column may of been altered for a reason.
 	if (trim($current_type) != trim($temp[3]))
+	{
 		$temp[3] = $current_type;
+	}
 
 	// Piece this back together.
 	$change['text'] = str_replace('NOT_NULL', 'NOT NULL', implode(' ', $temp));
 }
-

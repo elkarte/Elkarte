@@ -74,7 +74,9 @@ class DbTableWrapper
 	{
 		$args = func_get_args();
 		if (!isset($args[4]))
+		{
 			$args[4] = 'ignore';
+		}
 
 		// In this case errors are ignored, so the return is always true
 		call_user_func_array(array($this->db, 'db_create_table'), $args);
@@ -181,16 +183,28 @@ if (class_exists('DbTable_MySQL'))
 			//    DROP PRI MARY KEY
 			//    DROP IND EX
 			$short = substr(trim($statement), 0, 8);
+
 			if (in_array($short, array('DROP COL', 'CHANGE C')))
+			{
 				return 'drop_column';
+			}
+
 			elseif (substr($short, 0, 5) === 'ADD `')
+			{
 				return 'add_column';
+			}
 			elseif (in_array($short, array('ADD PRIM', 'ADD UNIQ', 'ADD INDE')))
+			{
 				return 'add_index';
+			}
 			elseif (in_array($short, array('DROP PRI', 'DROP IND')))
+			{
 				return 'drop_index';
+			}
 			else
+			{
 				return false;
+			}
 		}
 
 		/**
@@ -202,7 +216,10 @@ if (class_exists('DbTable_MySQL'))
 		public static function db_table($db)
 		{
 			if (is_null(self::$_tbl_inst))
+			{
 				self::$_tbl_inst = new DbTable_MySQL_Install($db);
+			}
+
 			return self::$_tbl_inst;
 		}
 	}
@@ -301,27 +318,42 @@ if (class_exists('DbTable_PostgreSQL'))
 			//    DROP IND EX
 			$short = substr(trim($statement), 0, 8);
 			if (in_array($short, array('DROP COL', 'RENAME C')))
+			{
 				return 'drop_column';
+			}
+
 			if (in_array($short, array('ALTER CO', 'ADD COLU')))
+			{
 				return 'add_column';
+			}
 			elseif (in_array($short, array('ADD PRIM', 'CREATE U', 'CREATE I')) || substr($short, 0, 6) === 'CREATE ')
+			{
 				return 'add_index';
+			}
 			elseif (in_array($short, array('DROP CON', 'DROP IND')))
+			{
 				return 'drop_index';
+			}
 			else
+			{
 				return false;
+			}
 		}
 
 		/**
 		* Static method that allows to retrieve or create an instance of this class.
 		*
 		* @param object $db - A DbTable_PostgreSQL object
+		 *
 		* @return object - A DbTable_PostgreSQL_Install object
 		*/
 		public static function db_table($db)
 		{
 			if (is_null(self::$_tbl_inst))
+			{
 				self::$_tbl_inst = new DbTable_PostgreSQL_Install($db);
+			}
+
 			return self::$_tbl_inst;
 		}
 	}
@@ -340,7 +372,11 @@ function sql_error_handler($errno, $errstr, $errfile, $errline)
 	global $support_js;
 
 	if ($support_js)
+	{
 		return true;
+	}
 	else
+	{
 		echo 'Error: ' . $errstr . ' File: ' . $errfile . ' Line: ' . $errline;
+	}
 }

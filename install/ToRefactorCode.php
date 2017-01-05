@@ -6,8 +6,8 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * license:    BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.1 beta 4
  *
@@ -16,9 +16,11 @@
 /**
  * This performs a table alter, but does it unbuffered so the script can time out professionally.
  *
- * @param string $change
- * @param int $substep
+ * @param string  $change
+ * @param int     $substep
  * @param boolean $is_test
+ *
+ * @return boolean
  */
 function protected_alter($change, $substep, $is_test = false)
 {
@@ -41,17 +43,25 @@ function protected_alter($change, $substep, $is_test = false)
 
 				// Do some checks on the data if we have it set.
 				if (isset($change['col_type']))
+				{
 					$found &= $change['col_type'] === $column['type'];
+				}
+
 				if (isset($change['null_allowed']))
+				{
 					$found &= $column['null'] == $change['null_allowed'];
+				}
+
 				if (isset($change['default']))
+				{
 					$found &= $change['default'] === $column['default'];
+				}
 			}
 		}
 	}
 	elseif ($change['type'] === 'index')
 	{
-		$request = upgrade_query( '
+		$request = upgrade_query('
 			SHOW INDEX
 			FROM ' . $db_prefix . $change['table']);
 		if ($request !== false)
@@ -59,8 +69,12 @@ function protected_alter($change, $substep, $is_test = false)
 			$cur_index = array();
 
 			while ($row = $db->fetch_assoc($request))
+			{
 				if ($row['Key_name'] === $change['name'])
+				{
 					$cur_index[(int) $row['Seq_in_index']] = $row['Column_name'];
+				}
+			}
 
 			ksort($cur_index, SORT_NUMERIC);
 			$found = array_values($cur_index) === $change['target_columns'];
@@ -71,13 +85,19 @@ function protected_alter($change, $substep, $is_test = false)
 
 	// If we're trying to add and it's added, we're done.
 	if ($found && in_array($change['method'], array('add', 'change')))
+	{
 		return true;
+	}
 	// Otherwise if we're removing and it wasn't found we're also done.
 	elseif (!$found && in_array($change['method'], array('remove', 'change_remove')))
+	{
 		return true;
+	}
 	// Otherwise is it just a test?
 	elseif ($is_test)
+	{
 		return false;
+	}
 
 	// Not found it yet? Bummer! How about we see if we're currently doing it?
 	$running = false;
@@ -89,7 +109,9 @@ function protected_alter($change, $substep, $is_test = false)
 		while ($row = $db->fetch_assoc($request))
 		{
 			if (strpos($row['Info'], 'ALTER TABLE ' . $db_prefix . $change['table']) !== false && strpos($row['Info'], $change['text']) !== false)
+			{
 				$found = true;
+			}
 		}
 
 		// Can't find it? Then we need to run it fools!
@@ -102,7 +124,9 @@ function protected_alter($change, $substep, $is_test = false)
 				' . $change['text'], true) !== false;
 
 			if (!$success)
+			{
 				return false;
+			}
 
 			// Return
 			$running = true;
@@ -111,6 +135,7 @@ function protected_alter($change, $substep, $is_test = false)
 		elseif (!$found)
 		{
 			$db->free_result($request);
+
 			return true;
 		}
 
@@ -129,13 +154,15 @@ function protected_alter($change, $substep, $is_test = false)
  * Performs the actual query against the db
  * Checks for errors so it can inform of issues
  *
- * @param string $string
+ * @param string  $string
  * @param boolean $unbuffered
+ *
+ * @return boolean|resource
  */
 function upgrade_query($string, $unbuffered = false)
 {
-	global $db_connection, $db_server, $db_user, $db_passwd, $db_type, $command_line, $upcontext, $upgradeurl, $modSettings;
-	global $db_name;
+	global $db_connection, $db_server, $db_user, $db_passwd, $db_type, $command_line;
+	global $upcontext, $upgradeurl, $modSettings, $db_name;
 
 	// Retrieve our database
 	$db = load_database();
@@ -149,7 +176,9 @@ function upgrade_query($string, $unbuffered = false)
 
 	// Failure?!
 	if ($result !== false)
+	{
 		return $result;
+	}
 
 	// Grab the error message and see if its failure worthy
 	$db_error_message = $db->last_error($db_connection);
@@ -175,12 +204,16 @@ function upgrade_query($string, $unbuffered = false)
 		if ($mysql_errno == 1016)
 		{
 			if (preg_match('~\'([^\.\']+)~', $db_error_message, $match) != 0 && !empty($match[1]))
-				mysqli_query( '
+			{
+				mysqli_query('
 					REPAIR TABLE `' . $match[1] . '`');
+			}
 
 			$result = mysqli_query($string);
 			if ($result !== false)
+			{
 				return $result;
+			}
 		}
 		elseif ($mysql_errno == 2013)
 		{
@@ -191,20 +224,30 @@ function upgrade_query($string, $unbuffered = false)
 				$result = mysqli_query($string);
 
 				if ($result !== false)
+				{
 					return $result;
+				}
 			}
 		}
 		// Duplicate column name... should be okay ;).
 		elseif (in_array($mysql_errno, array(1060, 1061, 1068, 1091)))
+		{
 			return false;
+		}
 		// Duplicate insert... make sure it's the proper type of query ;).
 		elseif (in_array($mysql_errno, array(1054, 1062, 1146)) && $error_query)
+		{
 			return false;
+		}
 		// Creating an index on a non-existent column.
 		elseif ($mysql_errno == 1072)
+		{
 			return false;
+		}
 		elseif ($mysql_errno == 1050 && substr(trim($string), 0, 12) == 'RENAME TABLE')
+		{
 			return false;
+		}
 	}
 	// If a table already exists don't go potty.
 	else
@@ -212,25 +255,35 @@ function upgrade_query($string, $unbuffered = false)
 		if (in_array(substr(trim($string), 0, 8), array('CREATE T', 'CREATE S', 'DROP TABL', 'ALTER TA', 'CREATE I')))
 		{
 			if (strpos($db_error_message, 'exist') !== false)
+			{
 				return true;
+			}
 			// SQLite
 			if (strpos($db_error_message, 'missing') !== false)
+			{
 				return true;
+			}
 		}
 		elseif (strpos(trim($string), 'INSERT ') !== false)
 		{
 			if (strpos($db_error_message, 'duplicate') !== false)
+			{
 				return true;
+			}
 		}
 	}
 
 	// Get the query string so we pass everything.
 	$query_string = '';
 	foreach ($_GET as $k => $v)
+	{
 		$query_string .= ';' . $k . '=' . $v;
+	}
 
 	if (strlen($query_string) != 0)
+	{
 		$query_string = '?' . substr($query_string, 1);
+	}
 
 	if ($command_line)
 	{
@@ -242,6 +295,7 @@ function upgrade_query($string, $unbuffered = false)
 	if (!empty($upcontext['return_error']))
 	{
 		$upcontext['error_message'] = $db_error_message;
+
 		return false;
 	}
 
