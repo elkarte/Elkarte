@@ -448,13 +448,13 @@ function template_add_new_attachments()
 		var IlaDropEvents = {
 			UploadSuccess: function($button, data) {
 				var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
-					trigger: $(\'<div class="fa share fa-share-alt-square" />\')
+					trigger: $(\'<div class="share icon i-share" />\')
 				});
 				inlineAttach.addInterface($button, data.attachid);
 			},
 			RemoveSuccess: function(attachid) {
 				var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
-					trigger: $(\'<div class="fa share fa-share-alt-square" />\')
+					trigger: $(\'<div class="share icon i-share" />\')
 				});
 				inlineAttach.removeAttach(attachid);
 			}
