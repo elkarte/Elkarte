@@ -67,7 +67,7 @@ function template_chmod()
 		<div class="panel">
 			<h2>Your FTP connection information</h2>
 			<h3>The upgrader can fix any issues with file permissions to make upgrading as simple as possible. Simply enter your connection information below or alternatively click <a href="#" onclick="warning_popup();">here</a> for a list of files which need to be changed.</h3>
-			<script><!-- // --><![CDATA[
+			<script>
 				function warning_popup()
 				{
 					var popup = window.open(\'\',\'popup\',\'height=150,width=400,scrollbars=yes\'),
@@ -81,7 +81,7 @@ function template_chmod()
 					content.write(\'<a href="javascript:self.close();">close</a>\n\t\t</div>\n\t</body>\n</html>\');
 					content.close();
 				}
-		// ]]></script>';
+		</script>';
 
 	if (!empty($upcontext['chmod']['ftp_error']))
 		echo '
@@ -149,15 +149,15 @@ function template_upgrade_above()
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="robots" content="noindex" />
 		<title>', $txt['upgrade_upgrade_utility'], '</title>
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?10RC1" />
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/_light/index_light.css?10RC1" />
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/install.css?10RC1" />
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" id="jquery"></script>
-		<script><!-- // --><![CDATA[
-			window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-1.11.4.min.js"><\/script>\');
-		// ]]></script>
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?11RC1" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/_light/index_light.css?11RC1" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/install.css?11RC1" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" id="jquery"></script>
+		<script>
+			window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-3.1.1.min.js"><\/script>\');
+		</script>
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
-		<script><!-- // --><![CDATA[
+		<script>
 			var elk_scripturl = \'', $upgradeurl, '\',
 				elk_charset = \'UTF-8\',
 				startPercent = ', $upcontext['overall_percent'], ';
@@ -181,7 +181,7 @@ function template_upgrade_above()
 					document.getElementById(\'overall__text\').innerHTML = overall_width + "%";
 				}
 			}
-		// ]]></script>
+		</script>
 	</head>
 	<body>
 	<div id="header">
@@ -320,7 +320,7 @@ function template_upgrade_below()
 	if (!empty($upcontext['pause']))
 	{
 		echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			var countdown = 3,
 				dontSubmit = false;
 
@@ -338,7 +338,7 @@ function template_upgrade_below()
 
 				setTimeout("doAutoSubmit();", 1000);
 			}
-		// ]]></script>';
+		</script>';
 	}
 }
 
@@ -392,7 +392,7 @@ function template_welcome_message()
 	echo '
 		<script src="', $settings['default_theme_url'], '/scripts/sha256.js"></script>
 		<script src="', $settings['default_theme_url'], '/scripts/admin.js"></script>
-		<script><!-- // --><![CDATA[
+		<script>
 			var oUpgradeCenter = new elk_AdminIndex({
 				bLoadAnnouncements: false,
 
@@ -408,7 +408,7 @@ function template_welcome_message()
 
 				bLoadUpdateNotification: false
 			});
-		// ]]></script>
+		</script>
 		<h3>', sprintf($txt['upgrade_ready_proceed'], CURRENT_VERSION), '</h3>
 		<form id="upform" action="', $upcontext['form_url'], '" method="post" accept-charset="UTF-8" name="upform"', empty($upcontext['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $upcontext['rid'] . '\');"' : '', '>
 		<input type="hidden" name="', $upcontext['login_token_var'], '" value="', $upcontext['login_token'], '" />
@@ -546,7 +546,7 @@ function template_welcome_message()
 
 	// This defines whether javascript is going to work elsewhere :D
 	echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			if (document.getElementById(\'js_works\'))
 				document.getElementById(\'js_works\').value = 1;
 			var currentVersionRounds = 0;
@@ -584,7 +584,7 @@ function template_welcome_message()
 			if (typeof(elkSelectText) == \'undefined\')
 				document.getElementById(\'js_script_missing_error\').style.display = \'\';
 
-		// ]]></script>';
+		</script>';
 }
 
 /**
@@ -689,7 +689,7 @@ function template_backup_database()
 	if ($support_js)
 	{
 		echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			var lastTable = ', $upcontext['cur_table_num'], ';
 
 			function getNextTables()
@@ -732,7 +732,7 @@ function template_backup_database()
 					getNextTables();
 			}
 			getNextTables();
-		// ]]></script>';
+		</script>';
 	}
 }
 
@@ -809,7 +809,7 @@ function template_database_changes()
 	if ($support_js)
 	{
 		echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			var lastItem = ', $upcontext['current_debug_item_num'], ',
 				sLastString = "', strtr($upcontext['current_debug_item_name'], array('"' => '&quot;')), '",
 				iLastSubStepProgress = -1,
@@ -1062,7 +1062,7 @@ function template_database_changes()
 			getNextItem();';
 
 		echo '
-		// ]]></script>';
+		</script>';
 	}
 	return;
 }
@@ -1098,7 +1098,7 @@ function template_upgrade_complete()
 	if (!empty($upcontext['can_delete_script']))
 		echo '
 			<label for="delete_self"><input type="checkbox" id="delete_self" onclick="doTheDelete(this);" class="input_check" /> Delete this upgrade.php and its data files now.</label> <em>(doesn\'t work on all servers.)</em>
-			<script><!-- // --><![CDATA[
+			<script>
 				function doTheDelete(theCheck)
 				{
 					var theImage = document.getElementById ? document.getElementById("delete_upgrader") : document.all.delete_upgrader;
@@ -1106,7 +1106,7 @@ function template_upgrade_complete()
 					theImage.src = "', $upgradeurl, '?delete=1&ts_" + (new Date().getTime());
 					theCheck.disabled = true;
 				}
-			// ]]></script>
+			</script>
 			<img src="', $settings['default_theme_url'], '/images/blank.png" alt="" id="delete_upgrader" /><br />';
 
 	echo '<br />

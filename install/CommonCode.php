@@ -139,7 +139,7 @@ class Ftp_Connection
 	}
 
 	/**
-		* Changes a files atrributes (chmod)
+		* Changes a files attributes (chmod)
 		*
 		* @param string $ftp_file
 		* @param int $chmod
@@ -288,7 +288,7 @@ class Ftp_Connection
 	}
 
 	/**
-		* Generates a direcotry listing for the current directory
+		* Generates a directory listing for the current directory
 		*
 		* @param string $ftp_path
 		* @param string|boolean $search
@@ -333,7 +333,7 @@ class Ftp_Connection
 	}
 
 	/**
-		* Determins the current dirctory we are in
+		* Determines the current directory we are in
 		*
 		* @param string $file
 		* @param string|null $listing
@@ -475,8 +475,6 @@ class Ftp_Connection
  */
 function load_possible_databases($type = null)
 {
-	global $databases;
-
 	$files = glob(__DIR__ . '/Db-check-*.php');
 
 	foreach ($files as $file)
@@ -555,10 +553,10 @@ function db_version_check()
 {
 	global $db_type, $databases, $db_connection;
 
-	$curver = $databases[$db_type]['version_check']($db_connection);
-	$curver = preg_replace('~\-.+?$~', '', $curver);
+	$current_version = $databases[$db_type]['version_check']{($db_connection)};
+	$current_version = preg_replace('~\-.+?$~', '', $current_version);
 
-	return version_compare($databases[$db_type]['version'], $curver, '<=');
+	return version_compare($databases[$db_type]['version'], $current_version, '<=');
 }
 
 /**
@@ -611,8 +609,9 @@ function saveFileSettings($config_vars, $settingsArray)
 	{
 		if (trim($settingsArray[$i]) === '?>')
 			$settingsArray[$i] = '';
+
 		// Don't trim or bother with it if it's not a variable.
-		if (substr($settingsArray[$i], 0, 1) == '$')
+		if (substr($settingsArray[$i], 0, 1) === '$')
 		{
 			$settingsArray[$i] = trim($settingsArray[$i]) . "\n";
 
@@ -626,8 +625,8 @@ function saveFileSettings($config_vars, $settingsArray)
 					}
 					else
 					{
-						$comment = strstr(substr($settingsArray[$i], strpos($settingsArray[$i], ';')), '#');
-						$settingsArray[$i] = '$' . $var . ' = \'' . $val . '\';' . ($comment != '' ? "\t\t" . $comment : "\n");
+						$comment = strstr(substr(un_htmlspecialchars($settingsArray[$i]), strpos(un_htmlspecialchars($settingsArray[$i]), ';')), '#');
+						$settingsArray[$i] = '$' . $var . ' = \'' . $val . '\';' . ($comment != '' ? "\t\t" . rtrim($comment) : "\n");
 					}
 
 					unset($config_vars[$var]);
@@ -642,8 +641,8 @@ function saveFileSettings($config_vars, $settingsArray)
 		$settingsArray[$i++] = '';
 		foreach ($config_vars as $var => $val)
 		{
-			if ($val != '#remove#')
-				$settingsArray[$i++] = "\n$" . $var . ' = \'' . $val . '\';';
+			if ($val !== '#remove#')
+				$settingsArray[$i++] = "\n" . '$' . $var . ' = \'' . $val . '\';' . "\n";
 		}
 	}
 
@@ -653,17 +652,18 @@ function saveFileSettings($config_vars, $settingsArray)
 		return false;
 	fclose($fp);
 
+	clearstatcache();
 	$fp = fopen(TMP_BOARDDIR . '/Settings.php', 'r+');
 
 	// Gotta have one of these ;)
 	if (trim($settingsArray[0]) != '<?php')
-		fwrite($fp, "<?php\n");
+		fwrite($fp, '<?php' . "\n");
 
 	$lines = count($settingsArray);
 	for ($i = 0; $i < $lines; $i++)
 	{
 		// Don't just write a bunch of blank lines.
-		if ($settingsArray[$i] != '' || @$settingsArray[$i - 1] != '')
+		if ($settingsArray[$i] != '' || (isset($settingsArray[$i - 1]) && $settingsArray[$i - 1] != ''))
 			fwrite($fp, strtr($settingsArray[$i], "\r", ''));
 	}
 	fclose($fp);
