@@ -839,7 +839,8 @@ class InstallInstructions_install_1_1
 					'enclose' => '',
 					'placement' => 3,
 					'rows' => 0,
-					'cols' => 0),
+					'cols' => 0
+				),
 				array(
 					'col_name' => 'cust_locate',
 					'field_name' => 'Location',
@@ -859,7 +860,8 @@ class InstallInstructions_install_1_1
 					'enclose' => '',
 					'placement' => 0,
 					'rows' => 0,
-					'cols' => 0),
+					'cols' => 0
+				),
 				array(
 					'col_name' => 'cust_aim',
 					'field_name' => 'AOL Instant Messenger',
@@ -879,7 +881,8 @@ class InstallInstructions_install_1_1
 					'enclose' => '<a class="aim" href="aim:goim?screenname={INPUT}&message=Hello!+Are+you+there?" target="_blank" title="AIM - {INPUT}"><img src="{IMAGES_URL}/profile/aim.png" alt="AIM - {INPUT}"></a>',
 					'placement' => 1,
 					'rows' => 0,
-					'cols' => 0),
+					'cols' => 0
+				),
 				array(
 					'col_name' => 'cust_icq',
 					'field_name' => 'ICQ',
@@ -899,7 +902,8 @@ class InstallInstructions_install_1_1
 					'enclose' => '<a class="icq" href="//www.icq.com/people/{INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>',
 					'placement' => 1,
 					'rows' => 0,
-					'cols' => 0),
+					'cols' => 0
+				),
 				array(
 					'col_name' => 'cust_skye',
 					'field_name' => 'Skype',
@@ -919,7 +923,8 @@ class InstallInstructions_install_1_1
 					'enclose' => '<a href="skype:{INPUT}?call" class="icon i-skype icon-big" title="Skype call {INPUT}"><s>Skype call {INPUT}</s></a>',
 					'placement' => 1,
 					'rows' => 0,
-					'cols' => 0),
+					'cols' => 0
+				),
 				array(
 					'col_name' => 'cust_fbook',
 					'field_name' => 'Facebook Profile',
@@ -939,7 +944,8 @@ class InstallInstructions_install_1_1
 					'enclose' => '<a target="_blank" href="https://www.facebook.com/{INPUT}" class="icon i-facebook icon-big" title="Facebook"><s>Facebook</s></a>',
 					'placement' => 1,
 					'rows' => 0,
-					'cols' => 0),
+					'cols' => 0
+				),
 				array(
 					'col_name' => 'cust_twitt',
 					'field_name' => 'Twitter Profile',
@@ -959,7 +965,8 @@ class InstallInstructions_install_1_1
 					'enclose' => '<a target="_blank" href="https://www.twitter.com/{INPUT}" class="icon i-twitter icon-big" title="Twitter Profile"><s>Twitter Profile</s></a>',
 					'placement' => 1,
 					'rows' => 0,
-					'cols' => 0),
+					'cols' => 0
+				),
 				array(
 					'col_name' => 'cust_linked',
 					'field_name' => 'LinkedIn Profile',
@@ -979,10 +986,11 @@ class InstallInstructions_install_1_1
 					'enclose' => '<a href="{INPUT}" class="icon i-linkedin icon-big" title="Linkedin Profile"><s>Linkedin Profile</s></a>',
 					'placement' => 1,
 					'rows' => 0,
-					'cols' => 0),
+					'cols' => 0
+				),
 				array(
-					'col_name' => 'cust_gplus'
-					'field_name' =>, 'Google+ Profile',
+					'col_name' => 'cust_gplus',
+					'field_name' => 'Google+ Profile',
 					'field_desc' => 'This is your Google+ profile url.',
 					'field_type' => 'text',
 					'field_length' => 255,
@@ -999,7 +1007,8 @@ class InstallInstructions_install_1_1
 					'enclose' => '<a target="_blank" href="{INPUT}" class="icon i-google-plus icon-big" title="G+ Profile"><s>G+ Profile</s></a>',
 					'placement' => 1,
 					'rows' => 0,
-					'cols' => 0),
+					'cols' => 0
+				),
 				array(
 					'col_name' => 'cust_yim',
 					'field_name' => 'Yahoo! Messenger',
@@ -1019,7 +1028,8 @@ class InstallInstructions_install_1_1
 					'enclose' => '<a class="yim" href="http://edit.yahoo.com/config/send_webmesg?.target={INPUT}" target="_blank" title="Yahoo! Messenger - {INPUT}"><img src="http://opi.yahoo.com/online?m=g&t=0&u={INPUT}" alt="Yahoo! Messenger - {INPUT}"></a>',
 					'placement' => 1,
 					'rows' => 0,
-					'cols' => 0),
+					'cols' => 0
+				),
 				array(
 					'col_name' => 'cust_insta',
 					'field_name' => 'Instagram Profile',
@@ -1039,7 +1049,8 @@ class InstallInstructions_install_1_1
 					'enclose' => '<a class="i-instagram icon-big" href="https://www.instagram.com/{INPUT}/" target="_blank" title="Instagram"><s>Instagram</s></a>',
 					'placement' => 1,
 					'rows' => 0,
-					'cols' => 0),
+					'cols' => 0
+				),
 			),
 			array('id_field')
 		);
