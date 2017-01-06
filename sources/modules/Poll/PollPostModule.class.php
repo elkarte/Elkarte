@@ -20,7 +20,7 @@
  *
  * This class contains all matter of things related to creating polls
  */
-class Poll_Post_Module implements ElkArte\sources\modules\Module_Interface
+class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 {
 	protected static $_make_poll = false;
 

@@ -20,7 +20,7 @@
  *
  * Adds Visual Verification controls to the Post page for those that need it.
  */
-class Verification_Post_Module implements ElkArte\sources\modules\Module_Interface
+class Verification_Post_Module extends ElkArte\sources\modules\Abstract_Module
 {
 	/**
 	 * {@inheritDoc}

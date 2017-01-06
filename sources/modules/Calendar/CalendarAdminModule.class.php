@@ -21,7 +21,7 @@
  *
  * @package Calendar
  */
-class Calendar_Admin_Module implements ElkArte\sources\modules\Module_Interface
+class Calendar_Admin_Module extends ElkArte\sources\modules\Abstract_Module
 {
 	/**
 	 * {@inheritdoc}

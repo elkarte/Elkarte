@@ -136,7 +136,7 @@ class Event_Manager
 			return $this->_instances[$class_name];
 		else
 		{
-			$instance = new $class_name();
+			$instance = new $class_name(HttpReq::instance());
 			$this->_setInstance($class_name, $instance);
 
 			return $instance;

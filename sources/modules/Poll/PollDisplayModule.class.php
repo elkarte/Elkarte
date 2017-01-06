@@ -18,7 +18,7 @@
 /**
  * Class Poll_Display_Module
  */
-class Poll_Display_Module implements ElkArte\sources\modules\Module_Interface
+class Poll_Display_Module extends ElkArte\sources\modules\Abstract_Module
 {
 	/**
 	 * If polls are enabled

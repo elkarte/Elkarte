@@ -41,7 +41,7 @@ abstract class AbstractModel
 		global $modSettings;
 
 		$this->_db = $db ?: database();
-		$this->_modSettings = new ArrayObject($modSettings, ArrayObject::ARRAY_AS_PROPS);
+		$this->_modSettings = new ArrayObject($modSettings ?: array(), ArrayObject::ARRAY_AS_PROPS);
 	}
 
 	/**

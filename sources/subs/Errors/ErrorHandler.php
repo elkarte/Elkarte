@@ -248,7 +248,7 @@ final class ErrorHandler extends Errors
 		foreach ($trace as $key => $stackPoint)
 		{
 			// convert arguments to their type
-			$trace[$key]['args'] = array_map('gettype', $trace[$key]['args']);
+			$trace[$key]['args'] = array_map('gettype', isset($trace[$key]['args']) ? $trace[$key]['args'] : array());
 		}
 
 		$result = array();

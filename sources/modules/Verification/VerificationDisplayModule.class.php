@@ -20,7 +20,7 @@
  *
  * Adding Visual Verification event to Quick Reply area (display.controller)
  */
-class Verification_Display_Module implements ElkArte\sources\modules\Module_Interface
+class Verification_Display_Module extends ElkArte\sources\modules\Abstract_Module
 {
 	/**
 	 * {@inheritdoc }

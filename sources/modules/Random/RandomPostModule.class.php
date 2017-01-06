@@ -16,7 +16,7 @@
  *
  * Collection of small items not requiring a separate module
  */
-class Random_Post_Module implements ElkArte\sources\modules\Module_Interface
+class Random_Post_Module extends ElkArte\sources\modules\Abstract_Module
 {
 	/**
 	 * {@inheritDoc}

@@ -22,7 +22,7 @@ use ElkArte\Errors\ErrorContext;
  *
  * Events and functions for post based drafts
  */
-class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
+class Drafts_Post_Module extends ElkArte\sources\modules\Abstract_Module
 {
 	/**
 	 * Autosave enabled

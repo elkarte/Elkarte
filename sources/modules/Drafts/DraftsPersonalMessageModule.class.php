@@ -20,7 +20,7 @@
  *
  * Prepares the draft functions for the personal message page
  */
-class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_Interface
+class Drafts_PersonalMessage_Module extends ElkArte\sources\modules\Abstract_Module
 {
 	/**
 	 * Autosave enabled

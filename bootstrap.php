@@ -122,6 +122,7 @@ require(SOURCEDIR . '/Autoloader.class.php');
 $autoloder = Elk_Autoloader::getInstance();
 $autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
 $autoloder->register(SOURCEDIR, '\\ElkArte');
+$autoloder->register(SOURCEDIR . '/subs/BBC', '\\BBC');
 
 /**
  * Set this to one of three values depending on what you want to happen in the case of a fatal error.

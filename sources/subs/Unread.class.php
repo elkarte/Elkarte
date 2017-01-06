@@ -391,9 +391,7 @@ class Unread
 				FROM {db_prefix}topics_posted_in AS t
 					LEFT JOIN {db_prefix}log_topics_posted_in AS lt ON (lt.id_topic = t.id_topic)
 				WHERE t.id_board IN ({array_int:boards})
-					AND COALESCE(lt.id_msg, t.id_msg) < t.id_last_msg' .
-					($this->_post_mod ? ' AND t.approved = {int:is_approved}' : '') .
-					($this->_unwatch ? ' AND COALESCE(lt.unwatched, 0) != 1' : '') . '
+					AND COALESCE(lt.id_msg, t.id_msg) < t.id_last_msg
 				ORDER BY {raw:order}
 				LIMIT {int:offset}, {int:limit}',
 				array_merge($this->_query_parameters, array(

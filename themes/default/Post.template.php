@@ -448,13 +448,13 @@ function template_add_new_attachments()
 		var IlaDropEvents = {
 			UploadSuccess: function($button, data) {
 				var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
-					trigger: $(\'<div class="fa share fa-share-alt-square" />\')
+					trigger: $(\'<div class="share icon i-share" />\')
 				});
 				inlineAttach.addInterface($button, data.attachid);
 			},
 			RemoveSuccess: function(attachid) {
 				var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
-					trigger: $(\'<div class="fa share fa-share-alt-square" />\')
+					trigger: $(\'<div class="share icon i-share" />\')
 				});
 				inlineAttach.removeAttach(attachid);
 			}
@@ -476,6 +476,7 @@ function template_add_new_attachments()
 		numOfAttachmentAllowed: ' . $context['attachments']['num_allowed'] . ',
 		totalAttachSizeUploaded: ' . (isset($context['attachments']['total_size']) && !empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0) . ',
 		numAttachUploaded: ' . (isset($context['attachments']['quantity']) && !empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0) . ',
+		fileDisplayTemplate: \'<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="control icon i-close"></div></div>\',
 		oTxt: {
 			allowedExtensions : ' . JavaScriptEscape(sprintf($txt['cant_upload_type'], $context['attachments']['allowed_extensions'])) . ',
 			totalSizeAllowed : ' . JavaScriptEscape($txt['attach_max_total_file_size']) . ',

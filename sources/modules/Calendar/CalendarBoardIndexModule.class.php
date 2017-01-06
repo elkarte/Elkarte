@@ -18,7 +18,7 @@
 /**
  * This class's task is to show the upcoming events in the BoardIndex.
  */
-class Calendar_BoardIndex_Module implements ElkArte\sources\modules\Module_Interface
+class Calendar_BoardIndex_Module extends ElkArte\sources\modules\Abstract_Module
 {
 	/**
 	 * {@inheritdoc }
