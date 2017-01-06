@@ -13,11 +13,6 @@
  *
  */
 
-// Show me the errors of my way
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 require('installcore.php');
 
 // General options for the script.
