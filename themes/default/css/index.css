@@ -3583,18 +3583,14 @@ ul.post_options li {
 
 .abort, .remove, .share {
 	float: right;
-	overflow: hidden;
-	padding: 4px 6px;
-	font-size: 1em;
+	padding: 4px 5px 2px 5px;
+	max-width: 1em;
 	cursor: pointer;
-	border-radius: 5px;
+	border-radius: 4px;
 }
 
 .share {
-	display: inline-block;
 	float: none;
-	margin: auto 5px;
-	vertical-align: middle;
 }
 
 .drop_attachmnts_error {
