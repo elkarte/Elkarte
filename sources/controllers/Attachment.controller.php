@@ -581,21 +581,15 @@ class Attachment_Controller extends Action_Controller
 			@ob_end_clean();
 		}
 
-		// return mime type ala mimetype extension
+		// Return mime type ala mimetype extension
 		$finfo = finfo_open(FILEINFO_MIME_TYPE);
-		$checkMime = returnMimeThumb($file_ext);
 
-		if ($checkMime !== false)
+		if (substr(finfo_file($finfo, $filename), 0, 5) !== 'image')
 		{
+			$checkMime = returnMimeThumb($file_ext);
 			$mime_type = 'image/png';
 			$resize = false;
 			$filename = $checkMime;
-		}
-		elseif (substr(finfo_file($finfo, $filename), 0, 5) !== 'image')
-		{
-			$mime_type = 'image/png';
-			$resize = false;
-			$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
 		}
 		finfo_close($finfo);
 
