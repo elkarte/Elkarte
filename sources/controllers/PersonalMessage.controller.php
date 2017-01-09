@@ -1323,7 +1323,8 @@ class PersonalMessage_Controller extends Action_Controller
 			$_POST = htmlspecialchars__recursive($_POST);
 
 			// Save the fields.
-			saveProfileFields();
+			$fields = ProfileOptions_Controller::getFields('contactprefs');
+			saveProfileFields($fields['fields'], $fields['hook']);
 
 			if (!empty($profile_vars))
 				updateMemberData($user_info['id'], $profile_vars);

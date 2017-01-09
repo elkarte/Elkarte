@@ -192,6 +192,7 @@ class Register_Controller extends Action_Controller
 
 			// Here, and here only, emulate the permissions the user would have to do this.
 			$user_info['permissions'] = array_merge($user_info['permissions'], array('profile_account_own', 'profile_extra_own'));
+			require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
 			$reg_fields = ProfileOptions_Controller::getFields('registration');
 
 			// We might have had some submissions on this front - go check.

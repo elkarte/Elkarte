@@ -595,7 +595,10 @@ class Profile_Controller extends Action_Controller
 			}
 			elseif (in_array($current_area, array('account', 'forumprofile', 'theme', 'contactprefs')))
 			{
-				saveProfileFields();
+				require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
+				$fields = ProfileOptions_Controller::getFields($current_area);
+
+				saveProfileFields($fields['fields'], $fields['hook']);
 			}
 			else
 			{
