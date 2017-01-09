@@ -1,7 +1,18 @@
 html, body, p, code:before, table {
 	margin: 0;
-	padding: 0;
+	padding: 0 0 0 0;
 	color: #444;
+}
+html {
+	overflow: auto;
+	height: 100%;
+	-webkit-overflow-scrolling: touch;
+}
+body {
+	position: relative;
+	overflow: auto;
+	min-height: 100%;
+	word-wrap: break-word;
 }
 [contenteditable="true"] {
 	font: 87.5%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", Arial, sans-serif;

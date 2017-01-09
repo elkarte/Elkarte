@@ -1,7 +1,18 @@
 html, body, p, code:before, table {
 	margin: 0;
-	padding: 0;
+	padding: 0 0 0 0;
 	color: #444;
+}
+html {
+	overflow: auto;
+	height: 100%;
+	-webkit-overflow-scrolling: touch;
+}
+body {
+	position: relative;
+	overflow: auto;
+	min-height: 100%;
+	word-wrap: break-word;
 }
 [contenteditable="true"] {
 	font: 90%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
