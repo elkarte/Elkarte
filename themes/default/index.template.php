@@ -49,6 +49,9 @@ function template_init()
 		  if this is 'never' or isn't set at all, images from the default theme will not be used. */
 		'use_default_images' => 'never',
 
+		// Set to true if you want to include font awesome's css file
+		'require_font-awesome' => false,
+
 		// The version this template/theme is for. This should probably be the version of the forum it was created for.
 		'theme_version' => '1.0',
 

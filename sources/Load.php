@@ -1512,8 +1512,11 @@ function loadTheme($id_theme = 0, $initialize = true)
 	if (!empty($settings['require_theme_strings']))
 		loadLanguage('ThemeStrings', '', false);
 
-	// Load font Awesome fonts
-	loadCSSFile('font-awesome.min.css');
+	// Load font Awesome fonts, @deprecated in 1.1 and will be removed in 2.0
+	if (!empty($settings['require_font-awesome']) || !empty($modSettings['require_font-awesome']))
+	{
+		loadCSSFile('font-awesome.min.css');
+	}
 
 	// We allow theme variants, because we're cool.
 	if (!empty($settings['theme_variants']))
