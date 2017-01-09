@@ -594,7 +594,9 @@ class Profile_Controller extends Action_Controller
 				$controller->action_authentication(true);
 			}
 			elseif (in_array($current_area, array('account', 'forumprofile', 'theme', 'contactprefs')))
+			{
 				saveProfileFields();
+			}
 			else
 			{
 				$force_redirect = true;
