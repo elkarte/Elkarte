@@ -179,7 +179,7 @@ class Reminder_Controller extends Action_Controller
 		$context += array(
 			'page_title' => $txt['reminder_set_password'],
 			'sub_template' => 'set_password',
-			'code' => $_REQUEST['code'],
+			'code' => Util::htmlspecialchars($_REQUEST['code']),
 			'memID' => (int) $_REQUEST['u']
 		);
 
