@@ -386,7 +386,7 @@ class Poll_Controller extends Action_Controller
 			$context['last_choice_id'] = $last_id;
 
 			if ($context['can_moderate_poll'])
-				$context['poll']['expiration'] = $_POST['poll_expire'];
+				$context['poll']['expiration'] = (int) $_POST['poll_expire'];
 
 			// Check the question/option count for errors.
 			// @todo: why !$poll_errors->hasErrors()?

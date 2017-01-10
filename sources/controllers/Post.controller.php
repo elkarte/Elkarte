@@ -229,11 +229,11 @@ class Post_Controller extends Action_Controller
 			// Set up the poll options.
 			$context['poll'] = array(
 				'max_votes' => empty($_POST['poll_max_votes']) ? '1' : max(1, $_POST['poll_max_votes']),
-				'hide_results' => empty($_POST['poll_hide']) ? 0 : $_POST['poll_hide'],
-				'expiration' => !isset($_POST['poll_expire']) ? '' : $_POST['poll_expire'],
+				'hide_results' => empty($_POST['poll_hide']) ? 0 : (int) $_POST['poll_hide'],
+				'expiration' => !isset($_POST['poll_expire']) ? 0 : (int) $_POST['poll_expire'],
 				'change_vote' => isset($_POST['poll_change_vote']),
 				'guest_vote' => isset($_POST['poll_guest_vote']),
-				'guest_vote_allowed' => in_array(-1, $allowedVoteGroups['allowed']),
+				'guest_vote_allowed' => in_array(-2, $allowedVoteGroups['allowed']),
 			);
 
 			// Make all five poll choices empty.
