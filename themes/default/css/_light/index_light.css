@@ -1407,10 +1407,6 @@ div.bbc_footnotes .meaction {
 	color: #FEFEFE;
 }
 
-.remove {
-	background-color: #ff1310;
-}
-
 .abort {
 	border: 2px solid #ff1310;
 }
@@ -2182,7 +2178,7 @@ a.helpicon:hover, a > .iconline:hover, a > .icoffline:hover {
 }
 
 .i-delete::before {
-	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='%23000000' stroke-width='.01em' fill='white' viewBox='0 0 32 32'%3E%3Cpath d='M4 10v20c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V10H4zm6 18H8V14h2v14zm4 0h-2V14h2v14zm4 0h-2V14h2v14zm4 0h-2V14h2v14zm4.5-24H20V1.5c0-.82-.68-1.5-1.5-1.5h-7c-.82 0-1.5.68-1.5 1.5V4H3.5C2.68 4 2 4.68 2 5.5V8h26V5.5c0-.82-.68-1.5-1.5-1.5zM18 4h-6V2.02h6V4z'/%3E%3C/svg%3E");
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='%23FFFFFF' stroke-width='1px' fill='%23ff1310' viewBox='0 0 32 32'%3E%3Cpath d='M4 10v20c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V10H4zm6 18H8V14h2v14zm4 0h-2V14h2v14zm4 0h-2V14h2v14zm4 0h-2V14h2v14zm4.5-24H20V1.5c0-.82-.68-1.5-1.5-1.5h-7c-.82 0-1.5.68-1.5 1.5V4H3.5C2.68 4 2 4.68 2 5.5V8h26V5.5c0-.82-.68-1.5-1.5-1.5zM18 4h-6V2.02h6V4z'/%3E%3C/svg%3E");
 }
 
 .i-cog::before {
