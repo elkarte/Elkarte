@@ -135,7 +135,6 @@ class ManageRegistration_Controller extends Action_Controller
 			if (empty($this->_req->post->password) || !is_string($this->_req->post->password) || trim($this->_req->post->password) === '')
 			{
 				require_once(SUBSDIR . '/Auth.subs.php');
-				mt_srand(time() + 1277);
 				$password = generateValidationCode();
 			}
 			else
