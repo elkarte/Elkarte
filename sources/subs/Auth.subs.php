@@ -818,12 +818,13 @@ function userByEmail($email, $username = null)
  * Generate a random validation code.
  *
  * @package Authorization
+ * @param int $length the number of characters to return
  */
-function generateValidationCode()
+function generateValidationCode($length = 10)
 {
 	$tokenizer = new Token_Hash();
 
-	return $tokenizer->generate_hash();
+	return $tokenizer->generate_hash((int) $length);
 }
 
 /**
