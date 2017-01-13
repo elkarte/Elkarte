@@ -102,9 +102,9 @@ class Reminder_Controller extends Action_Controller
 		{
 			// Awaiting approval...
 			if (trim($member['validation_code']) === '')
-				throw new Elk_Exception($txt['registration_not_approved'] . ' <a href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_req->post->user . '">' . $txt['here'] . '</a>.', false);
+				throw new Elk_Exception($txt['registration_not_approved'] . ' <a class="linkbutton" href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_req->post->user . '">' . $txt['here'] . '</a>.', false);
 			else
-				throw new Elk_Exception($txt['registration_not_activated'] . ' <a href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_req->post->user . '">' . $txt['here'] . '</a>.', false);
+				throw new Elk_Exception($txt['registration_not_activated'] . ' <a class="linkbutton" href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_req->post->user . '">' . $txt['here'] . '</a>.', false);
 		}
 
 		// You can't get emailed if you have no email address.
