@@ -1033,7 +1033,7 @@ function template_show_settings()
 
 					foreach ($config_var['data'] as $option)
 					{
-						if (empty($var['multiple']))
+						if (empty($config_var['multiple']))
 						{
 							$selected = $option[0] == $config_var['value'];
 						}
@@ -1041,6 +1041,7 @@ function template_show_settings()
 						{
 							$selected = in_array($option[0], $config_var['value']);
 						}
+
 						echo '
 							<option value="', $option[0], '"', $selected ? ' selected' : '', '>', $option[1], '</option>';
 					}
