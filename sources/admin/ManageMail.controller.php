@@ -224,7 +224,8 @@ class ManageMail_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$settingsForm->setConfigVars($this->_settings());
+		$config_vars = $this->_settings();
+		$settingsForm->setConfigVars($config_vars);
 
 		// Piece of redundant code, for the javascript
 		$processedBirthdayEmails = array();
@@ -248,6 +249,7 @@ class ManageMail_Controller extends Action_Controller
 
 			// We don't want to save the subject and body previews.
 			unset($config_vars['birthday_subject'], $config_vars['birthday_body']);
+			$settingsForm->setConfigVars($config_vars);
 			call_integration_hook('integrate_save_mail_settings');
 
 			// You can not send more per page load than you can per minute
