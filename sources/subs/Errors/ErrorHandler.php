@@ -87,6 +87,7 @@ final class ErrorHandler extends Errors
 				$type = 'Unknown Error';
 			break;
 		}
+
 		if ($isException)
 		{
 			$type = 'Exception';
@@ -231,7 +232,7 @@ final class ErrorHandler extends Errors
 			);
 		}
 		else
-			return $this->error_name . ': ' . $this->error_string;
+			return $this->error_string;
 	}
 
 	/**
