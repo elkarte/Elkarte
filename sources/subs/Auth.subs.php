@@ -423,9 +423,9 @@ function resetPassword($memID, $username = null)
 		$user = trim($username);
 	}
 
-	// Generate a 10 digit random password.
+	// Generate a random password.
 	$tokenizer = new Token_Hash();
-	$newPassword = $tokenizer->generate_hash();
+	$newPassword = $tokenizer->generate_hash(14);
 
 	// Create a db hash for the generated password
 	require_once(EXTDIR . '/PasswordHash.php');

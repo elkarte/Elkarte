@@ -134,8 +134,8 @@ class ManageRegistration_Controller extends Action_Controller
 			// Generate a password
 			if (empty($this->_req->post->password) || !is_string($this->_req->post->password) || trim($this->_req->post->password) === '')
 			{
-				require_once(SUBSDIR . '/Auth.subs.php');
-				$password = generateValidationCode();
+				$tokenizer = new Token_Hash();
+				$password = $tokenizer->generate_hash(14);
 			}
 			else
 			{
