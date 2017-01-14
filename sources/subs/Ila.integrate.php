@@ -108,14 +108,14 @@ class Ila_Integrate
 				\BBC\Codes::ATTR_TAG => 'attach',
 				\BBC\Codes::ATTR_TYPE => \BBC\Codes::TYPE_UNPARSED_CONTENT,
 				\BBC\Codes::ATTR_PARAM => array(
-					'width' => array(
-						\BBC\Codes::PARAM_ATTR_OPTIONAL => true,
-						\BBC\Codes::PARAM_ATTR_VALUE => 'width:100%;max-width:$1px;',
-						\BBC\Codes::PARAM_ATTR_MATCH => '(\d+)',
-					),
 					'height' => array(
 						\BBC\Codes::PARAM_ATTR_OPTIONAL => false,
 						\BBC\Codes::PARAM_ATTR_VALIDATE => self::validate_height(),
+						\BBC\Codes::PARAM_ATTR_MATCH => '(\d+)',
+					),
+					'width' => array(
+						\BBC\Codes::PARAM_ATTR_OPTIONAL => true,
+						\BBC\Codes::PARAM_ATTR_VALUE => 'width:100%;max-width:$1px;',
 						\BBC\Codes::PARAM_ATTR_MATCH => '(\d+)',
 					),
 					'align' => array(
