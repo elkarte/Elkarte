@@ -27,11 +27,11 @@ then
 	# If we have pics, lets upload them
 	if [ ! -z "$screenshots" ]
 	then
-		wget http://imgur.com/tools/imgurbash.sh -O /var/www/imgurbash.sh && chmod +x /var/www/imgurbash.sh
+		wget https://raw.githubusercontent.com/tremby/imgur.sh/master/imgur.sh -O /var/www/imgur.sh && chmod +x /var/www/imgur.sh
 		echo "********** Failed tests screenshots **********"
 		for screenshot in $screenshots
 		do
-			/var/www/imgurbash.sh $screenshot
+			/var/www/imgur.sh $screenshot
 		done
 	fi
 fi
