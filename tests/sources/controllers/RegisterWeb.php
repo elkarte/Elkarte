@@ -29,6 +29,7 @@ class TestRegister_Controller extends ElkArteWebTest
 		// Set it to email activation
 		updateSettings(array('registration_method' => 1));
 		updateSettings(array('visual_verification_type' => 0));
+		updateSettings(array('reg_verification' => 0));
 
 		parent::setUp();
 	}
@@ -48,16 +49,16 @@ class TestRegister_Controller extends ElkArteWebTest
 	public function registerMember()
 	{
 		$username = 'testuser';
-		$email = 'a.valid@emailaddress.tld';
+		$email = 'valid@emailaddress.net';
 		$password = 'ainttellin';
 
 		// Register from the main menu
 		$this->url('index.php');
-		$this->byCssSelector('#button_register > a')->click();
+		$this->clickit('#button_register > a');
 		$this->assertEquals('Registration Agreement', $this->title());
 
 		// Accept the agreement, we should see the Registration form
-		$this->byCssSelector('#confirm_buttons input[type="submit"]')->click();
+		$this->clickit('#confirm_buttons input[type="submit"]');
 		$this->assertEquals('Registration Form', $this->title());
 
 		// Fill out the registration form
@@ -89,7 +90,7 @@ class TestRegister_Controller extends ElkArteWebTest
 		$this->registerMember();
 
 		// We need this to avoid our anti-spam feature
-		sleep(8.5);
+		sleep(9);
 
 		// Let's select register!
 		$this->byName('regSubmit')->click();
@@ -118,7 +119,7 @@ class TestRegister_Controller extends ElkArteWebTest
 
 		// Select login from the main page
 		$this->url('index.php');
-		$this->byCssSelector('#button_login > a')->click();
+		$this->clickit('#button_login > a');
 		$this->assertEquals('Log in', $this->title());
 
 		// Fill in the form, long hand style
@@ -131,7 +132,7 @@ class TestRegister_Controller extends ElkArteWebTest
 		$this->keys('user49');
 
 		// Submit it
-		$this->byCssSelector('.login > div > dl > input[type="submit"]')->click();
+		$this->clickit('.login > div > dl > input[type="submit"]');
 		$this->url('index.php?action=profile;area=deleteaccount');
 
 		// Delete the account by using the main profile area.
@@ -142,6 +143,6 @@ class TestRegister_Controller extends ElkArteWebTest
 		$this->assertEquals('user49', $passwordInput->value());
 
 		// Submit it
-		$this->byCssSelector('input[type="submit"]')->click();
+		$this->clickit('input[type="submit"]');
 	}
 }

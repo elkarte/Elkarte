@@ -28,7 +28,7 @@ class TestAuth_Controller extends ElkArteWebTest
 
 		// Select login from the main page
 		$this->url('index.php');
-		$this->byCssSelector('#button_login > a')->click();
+		$this->clickit('#button_login > a');
 		$this->assertEquals('Log in', $this->title());
 
 		// Fill in the form, long hand style
@@ -43,7 +43,7 @@ class TestAuth_Controller extends ElkArteWebTest
 		$this->assertEquals($password, $passwordInput->value());
 
 		// Submit it
-		$this->byCssSelector('.login > div > dl > input[type="submit"]')->click();
+		$this->clickit('.login > div > dl > input[type="submit"]');
 
 		// Nope, huh? I hope :P
 		$this->assertEquals('That username does not exist.', $this->byClassName('errorbox')->text());
@@ -52,7 +52,7 @@ class TestAuth_Controller extends ElkArteWebTest
 	/**
 	 * Try to logout with action=logout
 	 *
-	 * Should fail sincw we have not logged in.
+	 * Should fail since we have not logged in.
 	 */
 	public function testLogout()
 	{

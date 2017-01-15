@@ -27,7 +27,7 @@ class TestManageMembergroups_Controller extends ElkArteWebTest
 		// Fill in the new group form with initial values
 		$this->ById('group_name_input')->value('Test Group');
 		$this->ById('checkall_check')->click();
-		$this->byCssSelector('input[value="Add group"]')->click();
+		$this->clickit('input[value="Add group"]');
 
 		// Group Details, give it a description, icons, etc
 		$this->assertEquals("Edit Membergroup", $this->title());
@@ -49,7 +49,7 @@ class TestManageMembergroups_Controller extends ElkArteWebTest
 	{
 		// In order to interact with hidden elements, we need to expose them.
 		// Here we hover (move) over the profile button
-		// so the logout button is visable, such that we can click it.
+		// so the logout button is visible, such that we can click it.
 		$this->timeouts()->implicitWait(10000);
 		$this->moveto(array(
 			'element' => $this->byId('button_profile'),
@@ -57,7 +57,7 @@ class TestManageMembergroups_Controller extends ElkArteWebTest
 			'yoffset' => 10,
 			)
 		);
-		$this->byCssSelector('#button_logout > a')->click();
+		$this->clickit('#button_logout > a');
 		$this->assertContains('Log In', $this->byCssSelector('#button_login > a')->text());
 	}
 }

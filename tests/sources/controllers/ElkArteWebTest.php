@@ -63,7 +63,7 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 	{
 		parent::setUpPage();
 
-		$this->timeouts()->implicitWait(3000);
+		$this->timeouts()->implicitWait(10000);
 
 		if ($this->width && $this->height)
 			$this->currentWindow()->size(array('width' => $this->width, 'height' => $this->height));
@@ -90,7 +90,7 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 		// Quick login
 		$this->byName('user')->value($this->adminuser);
 		$this->byName('passwrd')->value($this->adminpass);
-		$this->byCssSelector('#password_login > input[type="submit"]')->click();
+		$this->clickit('#password_login > input[type="submit"]');
 
 		// Should see the admin button now
 		$this->assertContains('Admin', $this->byCssSelector('#button_admin > a')->text());
@@ -105,9 +105,20 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 		$this->byCssSelector('#button_admin > a')->click();
 		$this->assertEquals('Administration Log in', $this->title());
 		$this->byId('admin_pass')->value($this->adminpass);
-		$this->byCssSelector('input[type="submit"]')->click();
+		$this->clickit('input[type="submit"]');
 
 		// Validate we are there
 		$this->assertEquals('Administration Center', $this->title());
+	}
+
+	/**
+	 * Click the selector and briefly pause.
+	 *
+	 * @param string $selector
+	 */
+	public function clickit($selector)
+	{
+		$this->byCssSelector($selector)->click();
+		sleep(1);
 	}
 }
