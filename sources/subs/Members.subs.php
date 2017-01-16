@@ -505,7 +505,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 	validateUsername(0, $regOptions['username'], $ErrorContext, !empty($regOptions['check_reserved_name']));
 
 	// Generate a validation code if it's supposed to be emailed.
-	$validation_code = $regOptions['require'] === 'activation' ? generateValidationCode() : '';
+	$validation_code = $regOptions['require'] === 'activation' ? generateValidationCode(14) : '';
 
 	// Does the first password match the second?
 	if ($regOptions['password'] != $regOptions['password_check'] && $regOptions['auth_method'] == 'password')
@@ -589,7 +589,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		'date_registered' => !empty($regOptions['time']) ? $regOptions['time'] : time(),
 		'member_ip' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $regOptions['ip'],
 		'member_ip2' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $regOptions['ip2'],
-		'validation_code' => $validation_code,
+		'validation_code' => substr(hash('sha256', $validation_code), 0, 10),
 		'real_name' => !empty($regOptions['real_name']) ? $regOptions['real_name'] : $regOptions['username'],
 		'pm_email_notify' => 1,
 		'id_theme' => 0,
@@ -1988,6 +1988,8 @@ function enforceReactivation($conditions)
 	assert(isset($conditions['activated_status']));
 	assert(isset($conditions['selected_member']));
 	assert(isset($conditions['validation_code']));
+
+	$conditions['validation_code'] = substr(hash('sha256', $conditions['validation_code']), 0, 10);
 
 	$available_conditions = array(
 		'time_before' => '

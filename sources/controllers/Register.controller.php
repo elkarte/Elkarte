@@ -909,12 +909,19 @@ class Register_Controller extends Action_Controller
 		{
 			require_once(SUBSDIR . '/Mail.subs.php');
 
+			// Since you lost it, you get a nice new code
+			$validation_code = generateValidationCode(14);
+			$this->_row['validation_code'] = substr(hash('sha256', $validation_code), 0, 10);
+
+			require_once(SUBSDIR . '/Members.subs.php');
+			updateMemberData($this->_row['id_member'], array('validation_code' => $this->_row['validation_code']));
+
 			$replacements = array(
 				'REALNAME' => $this->_row['real_name'],
 				'USERNAME' => $this->_row['member_name'],
-				'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $this->_row['id_member'] . ';code=' . $this->_row['validation_code'],
+				'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $this->_row['id_member'] . ';code=' . $validation_code,
 				'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=register;sa=activate;u=' . $this->_row['id_member'],
-				'ACTIVATIONCODE' => $this->_row['validation_code'],
+				'ACTIVATIONCODE' => $validation_code,
 				'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
 			);
 
@@ -927,7 +934,7 @@ class Register_Controller extends Action_Controller
 			spamProtection('remind');
 
 			// This will ensure we don't actually get an error message if it works!
-			$context['error_title'] = '';
+			$context['error_title'] = $txt['invalid_activation_resend'];
 			throw new Elk_Exception(!empty($email_change) ? 'change_email_success' : 'resend_email_success', false);
 		}
 	}
@@ -941,7 +948,9 @@ class Register_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context;
 
-		if ($this->_req->getQuery('code', 'trim', '') != $this->_row['validation_code'])
+		$code = substr(hash('sha256', $this->_req->getQuery('code', 'trim', '')), 0, 10);
+
+		if ($code !== $this->_row['validation_code'])
 		{
 			if (!empty($this->_row['is_activated']) && $this->_row['is_activated'] == 1)
 			{
@@ -1048,7 +1057,6 @@ class Register_Controller extends Action_Controller
 	public function action_verificationcode()
 	{
 		global $context, $scripturl;
-	//	vid=register;rand=ef746ef2ee7ad37a35ce512cf9aa43d2;sound
 
 		$verification_id = isset($this->_req->query->vid) ? $this->_req->query->vid : '';
 		$code = $verification_id && isset($_SESSION[$verification_id . '_vv']) ? $_SESSION[$verification_id . '_vv']['code'] : (isset($_SESSION['visual_verification_code']) ? $_SESSION['visual_verification_code'] : '');

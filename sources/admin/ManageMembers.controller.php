@@ -1286,7 +1286,7 @@ class ManageMembers_Controller extends Action_Controller
 			$this->conditions['selected_member'] = $member['id'];
 
 			// Generate a random activation code.
-			$this->conditions['validation_code'] = generateValidationCode();
+			$this->conditions['validation_code'] = generateValidationCode(14);
 
 			// Set these members for activation - I know this includes two id_member checks but it's safer than bodging $condition ;).
 			enforceReactivation($this->conditions);

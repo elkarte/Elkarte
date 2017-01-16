@@ -117,7 +117,7 @@ class Reminder_Controller extends Action_Controller
 			|| ($this->_req->getPost('reminder_type') === 'email'))
 		{
 			// Randomly generate a new password, with only alpha numeric characters that is a max length of 10 chars.
-			$password = generateValidationCode();
+			$password = generateValidationCode(14);
 
 			require_once(SUBSDIR . '/Mail.subs.php');
 			$replacements = array(
@@ -136,9 +136,9 @@ class Reminder_Controller extends Action_Controller
 
 			if (empty($member['openid_uri']))
 			{
-				require_once(SUBSDIR . '/Members.subs.php');
 				// Set the password in the database.
-				updateMemberData($member['id_member'], array('validation_code' => substr(md5($password), 0, 10)));
+				require_once(SUBSDIR . '/Members.subs.php');
+				updateMemberData($member['id_member'], array('validation_code' => substr(hash('sha256', $password), 0, 10)));
 			}
 
 			// Set up the template.
@@ -202,10 +202,8 @@ class Reminder_Controller extends Action_Controller
 		checkSession();
 		validateToken('remind-sp');
 
-		if (empty($this->_req->post->u) || !isset($this->_req->post->passwrd1) || !isset($this->_req->post->passwrd2))
+		if (empty($this->_req->post->u) || !isset($this->_req->post->passwrd1, $this->_req->post->passwrd2))
 			throw new Elk_Exception('no_access', false);
-
-		$this->_req->post->u = (int) $this->_req->post->u;
 
 		if ($this->_req->post->passwrd1 != $this->_req->post->passwrd2)
 			throw new Elk_Exception('passwords_dont_match', false);
@@ -213,17 +211,20 @@ class Reminder_Controller extends Action_Controller
 		if ($this->_req->post->passwrd1 === '')
 			throw new Elk_Exception('no_password', false);
 
+		$member_id = $this->_req->getPost('u', 'intval', -1);
+		$code = $this->_req->getPost('code', 'trim', '');
+
 		loadLanguage('Login');
 
 		// Get the code as it should be from the database.
 		require_once(SUBSDIR . '/Members.subs.php');
-		$member = getBasicMemberData((int) $this->_req->post->u, array('authentication' => true));
+		$member = getBasicMemberData($member_id, array('authentication' => true));
 
 		// Does this user exist at all? Is he activated? Does he have a validation code?
 		if (empty($member) || $member['is_activated'] != 1 || $member['validation_code'] === '')
 			throw new Elk_Exception('invalid_userid', false);
 
-		// Is the password actually valid?
+		// Is the password actually valid to the forums rules?
 		require_once(SUBSDIR . '/Auth.subs.php');
 		$passwordError = validatePassword($this->_req->post->passwrd1, $member['member_name'], array($member['email_address']));
 
@@ -232,25 +233,25 @@ class Reminder_Controller extends Action_Controller
 			throw new Elk_Exception('profile_error_password_' . $passwordError, false);
 
 		// Quit if this code is not right.
-		if (empty($this->_req->post->code) || substr($member['validation_code'], 0, 10) !== substr(md5($this->_req->post->code), 0, 10))
+		if (empty($code) || $member['validation_code'] !== substr(hash('sha256', $code), 0, 10))
 		{
 			// Stop brute force attacks like this.
-			validatePasswordFlood($this->_req->post->u, $member['passwd_flood'], false);
+			validatePasswordFlood($member_id, $member['passwd_flood'], false);
 
 			throw new Elk_Exception($txt['invalid_activation_code'], false);
 		}
 
 		// Just in case, flood control.
-		validatePasswordFlood($this->_req->post->u, $member['passwd_flood'], true);
+		validatePasswordFlood($member_id, $member['passwd_flood'], true);
 
 		// User validated.  Update the database!
 		require_once(SUBSDIR . '/Auth.subs.php');
 		$sha_passwd = $this->_req->post->passwrd1;
 		require_once(SUBSDIR . '/Members.subs.php');
 		if (isset($this->_req->post->otp))
-			updateMemberData($this->_req->post->u, array('validation_code' => '', 'passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true), 'enable_otp' => 0));
+			updateMemberData($member_id, array('validation_code' => '', 'passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true), 'enable_otp' => 0));
 		else
-			updateMemberData($this->_req->post->u, array('validation_code' => '', 'passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true)));
+			updateMemberData($member_id, array('validation_code' => '', 'passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true)));
 
 		call_integration_hook('integrate_reset_pass', array($member['member_name'], $member['member_name'], $this->_req->post->passwrd1));
 

@@ -463,7 +463,8 @@ function loadProfileFields($force_reload = false)
 				if ($isValid === true && !empty($modSettings['send_validation_onChange']) && !allowedTo('moderate_forum'))
 				{
 					require_once(SUBSDIR . '/Auth.subs.php');
-					$profile_vars['validation_code'] = generateValidationCode();
+					$old_profile['validation_code'] = generateValidationCode(14);
+					$profile_vars['validation_code'] = substr(hash('sha256', $old_profile['validation_code']), 0, 10);
 					$profile_vars['is_activated'] = 2;
 					$context['profile_execute_on_save'][] = 'profileSendActivation';
 					unset($context['profile_execute_on_save']['reload_user']);
@@ -1616,7 +1617,7 @@ function isCustomFieldValid($field, $value)
  */
 function profileSendActivation()
 {
-	global $profile_vars, $txt, $context, $scripturl, $cookiename, $cur_profile, $language, $modSettings;
+	global $profile_vars, $old_profile, $txt, $context, $scripturl, $cookiename, $cur_profile, $language, $modSettings;
 
 	require_once(SUBSDIR . '/Mail.subs.php');
 
@@ -1625,8 +1626,8 @@ function profileSendActivation()
 		return;
 
 	$replacements = array(
-		'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $context['id_member'] . ';code=' . $profile_vars['validation_code'],
-		'ACTIVATIONCODE' => $profile_vars['validation_code'],
+		'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $context['id_member'] . ';code=' . $old_profile['validation_code'],
+		'ACTIVATIONCODE' => $old_profile['validation_code'],
 		'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=register;sa=activate;u=' . $context['id_member'],
 	);
 
