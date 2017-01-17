@@ -809,6 +809,9 @@ function insertEvent(&$eventOptions)
 	$eventOptions['span'] = isset($eventOptions['span']) && $eventOptions['span'] > 0 ? (int) $eventOptions['span'] : 0;
 
 	// Make sure the start date is in ISO order.
+	$year = '';
+	$month = '';
+	$day = '';
 	if (($num_results = sscanf($eventOptions['start_date'], '%d-%d-%d', $year, $month, $day)) !== 3)
 		trigger_error('insertEvent(): invalid start date format given', E_USER_ERROR);
 
@@ -866,6 +869,9 @@ function modifyEvent($event_id, &$eventOptions)
 	$eventOptions['title'] = Util::htmlspecialchars($eventOptions['title'], ENT_QUOTES);
 
 	// Scan the start date for validity and get its components.
+	$year = '';
+	$month = '';
+	$day = '';
 	if (($num_results = sscanf($eventOptions['start_date'], '%d-%d-%d', $year, $month, $day)) !== 3)
 		trigger_error('modifyEvent(): invalid start date format given', E_USER_ERROR);
 

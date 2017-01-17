@@ -538,7 +538,7 @@ class Unread
 				LEFT JOIN {db_prefix}members AS mems ON (mems.id_member = ms.id_member)',
 		);
 
-		$db->skip_next_error();
+		$this->_db->skip_next_error();
 		$this->_have_temp_table = $this->_db->query('', '
 			CREATE TEMPORARY TABLE {db_prefix}topics_posted_in (
 				id_topic mediumint(8) unsigned NOT NULL default {string:string_zero},
@@ -595,7 +595,7 @@ class Unread
 			)
 		);
 
-		$db->skip_next_error();
+		$this->_db->skip_next_error();
 		// Let's copy things out of the log_topics table, to reduce searching.
 		$this->_have_temp_table = $this->_db->query('', '
 			CREATE TEMPORARY TABLE {db_prefix}log_topics_unread (
