@@ -2197,6 +2197,7 @@ function getTopicsPostsAndPoster($topic, $limit, $sort)
  * @param int[] $messages
  * @param mixed[] $messageDetails
  * @param string $type = replies
+ * @throws Elk_Exception
  */
 function removeMessages($messages, $messageDetails, $type = 'replies')
 {

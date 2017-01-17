@@ -187,6 +187,7 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 	 * @param string[] $lang_files Language files to load (optional)
 	 * @param string[] $replacements Additional replacements for the loadEmailTemplate function (optional)
 	 * @return mixed[]
+	 * @throws \Elk_Exception
 	 */
 	protected function _loadStringsByTemplate($template, $keys, $users, $users_data, $lang_files = array(), $replacements = array())
 	{

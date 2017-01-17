@@ -60,6 +60,7 @@ class Notifications extends AbstractModel
 	 * Registers the known notifications to the system, allows for integration to add more
 	 *
 	 * @param \Database $db
+	 * @throws Elk_Exception
 	 */
 	public function __construct($db)
 	{

@@ -200,6 +200,7 @@ class Emailuser_Controller extends Action_Controller
 	 * Does the actual sending of the email if everything checks out as OK
 	 *
 	 * @param mixed[] $row
+	 * @throws Elk_Exception
 	 */
 	private function _sendTopic($row)
 	{

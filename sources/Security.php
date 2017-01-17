@@ -27,6 +27,7 @@
  * which saves all request (POST and GET) data.
  *
  * @param string $type = admin
+ * @throws Elk_Exception
  */
 function validateSession($type = 'admin')
 {

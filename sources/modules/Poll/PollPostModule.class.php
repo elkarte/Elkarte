@@ -87,6 +87,7 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * @param array $topic_attributes
 	 * @param int $topic
 	 * @param int $board
+	 * @throws Elk_Exception
 	 */
 	public function prepare_context($topic_attributes, $topic, $board)
 	{
@@ -246,6 +247,7 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * Create the poll!
 	 *
 	 * @param array $topicOptions
+	 * @throws Elk_Exception
 	 */
 	public function pre_save_post(&$topicOptions)
 	{

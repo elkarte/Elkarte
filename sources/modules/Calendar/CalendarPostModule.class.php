@@ -140,6 +140,7 @@ class Calendar_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * @param int $id_member_poster
 	 *
 	 * @throws Controller_Redirect_Exception
+	 * @throws Elk_Exception
 	 */
 	public function prepare_context($id_member_poster)
 	{

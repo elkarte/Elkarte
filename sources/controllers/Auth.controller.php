@@ -384,6 +384,7 @@ class Auth_Controller extends Action_Controller
 	 *
 	 * @param boolean $internal if true, it doesn't check the session
 	 * @param boolean $redirect if true, redirect to the board index
+	 * @throws Elk_Exception
 	 */
 	public function action_logout($internal = false, $redirect = true)
 	{

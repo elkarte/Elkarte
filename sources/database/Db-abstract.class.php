@@ -76,6 +76,7 @@ abstract class Database_Abstract implements Database
 	 * sent to the database.
 	 *
 	 * @param mixed[] $matches
+	 * @throws Elk_Exception
 	 */
 	public function replacement__callback($matches)
 	{
@@ -230,6 +231,7 @@ abstract class Database_Abstract implements Database
 	 * @param mixed $identifier
 	 * @param mixed $replacement
 	 * @return string
+	 * @throws Elk_Exception
 	 */
 	protected function _replaceInt($identifier, $replacement)
 	{
@@ -244,6 +246,7 @@ abstract class Database_Abstract implements Database
 	 * @param string $identifier
 	 * @param mixed[] $replacement
 	 * @return string
+	 * @throws Elk_Exception
 	 */
 	protected function _replaceArrayInt($identifier, $replacement)
 	{
@@ -285,6 +288,7 @@ abstract class Database_Abstract implements Database
 	 * @param string $identifier
 	 * @param mixed[] $replacement
 	 * @return string
+	 * @throws Elk_Exception
 	 */
 	protected function _replaceArrayString($identifier, $replacement)
 	{
@@ -310,6 +314,7 @@ abstract class Database_Abstract implements Database
 	 * @param mixed $identifier
 	 * @param mixed $replacement
 	 * @return string
+	 * @throws Elk_Exception
 	 */
 	protected function _replaceDate($identifier, $replacement)
 	{
@@ -325,6 +330,7 @@ abstract class Database_Abstract implements Database
 	 * @param mixed $identifier
 	 * @param mixed $replacement
 	 * @return string
+	 * @throws Elk_Exception
 	 */
 	protected function _replaceFloat($identifier, $replacement)
 	{
@@ -338,6 +344,7 @@ abstract class Database_Abstract implements Database
 	 *
 	 * @param mixed $replacement
 	 * @return string
+	 * @throws Elk_Exception
 	 */
 	protected function _replaceIdentifier($replacement)
 	{

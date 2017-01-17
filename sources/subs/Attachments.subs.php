@@ -341,6 +341,7 @@ function attachments_init_dir(&$tree, &$count)
  * @package Attachments
  * @param int|null $id_msg = null or id of the message with attachments, if any.
  *                  If null, this is an upload in progress for a new post.
+ * @throws Elk_Exception
  */
 function processAttachments($id_msg = null)
 {

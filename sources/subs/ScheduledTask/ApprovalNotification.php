@@ -30,6 +30,7 @@ class Approval_Notification implements Scheduled_Task_Interface
 	 * Checks who needs to receive approvals emails and sends them.
 	 *
 	 * @return bool
+	 * @throws \Elk_Exception
 	 */
 	public function run()
 	{

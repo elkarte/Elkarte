@@ -746,6 +746,7 @@ function pbe_emailError($error, $email_message)
 /**
  * Writes email attachments as temp names in the proper attachment directory
  *
+ * What it does:
  * - populates $_SESSION['temp_attachments'] with the email attachments
  * - calls attachmentChecks to validate them
  * - skips ones flagged with errors
@@ -755,6 +756,7 @@ function pbe_emailError($error, $email_message)
  * @package Maillist
  * @param mixed[] $pbe
  * @param Email_Parse $email_message
+ * @throws Elk_Exception
  */
 function pbe_email_attachments($pbe, $email_message)
 {

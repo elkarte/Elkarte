@@ -204,6 +204,7 @@ class Announce_Controller extends Action_Controller
 	 *                 It must contain:
 	 *                  - subject: the subject of the topic
 	 *                  - body: the body of the topic
+	 * @throws Elk_Exception
 	 */
 	private function _send_announcement($member_info, $topic_info)
 	{

@@ -116,7 +116,8 @@ class Database_MySQL extends Database_Abstract
 	 * @param string $identifier
 	 * @param string $db_string
 	 * @param mixed[]|false $db_values = array()
-	 * @param resource|false|null $connection = null
+	 * @param mysqli_result|false|null $connection = null
+	 * @throws Elk_Exception
 	 */
 	public function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{

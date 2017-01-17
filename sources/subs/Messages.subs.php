@@ -280,6 +280,7 @@ function removeNonTopicMessages($memID)
  *
  * @param int $message The message id
  * @param bool $decreasePostCount if true users' post count will be reduced
+ * @throws Elk_Exception
  */
 function removeMessage($message, $decreasePostCount = true)
 {

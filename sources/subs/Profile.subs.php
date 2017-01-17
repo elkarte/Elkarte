@@ -1173,6 +1173,7 @@ function profileValidateEmail($email, $memID = 0)
  *
  * @param mixed[] $profile_vars
  * @param int $memID id_member
+ * @throws Elk_Exception
  */
 function saveProfileChanges(&$profile_vars, $memID)
 {

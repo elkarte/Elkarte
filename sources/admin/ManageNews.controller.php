@@ -510,6 +510,7 @@ class ManageNews_Controller extends Action_Controller
 	 *
 	 * @uses the ManageNews template and email_members_send sub template.
 	 * @param bool $clean_only = false; if set, it will only clean the variables, put them in context, then return.
+	 * @throws Elk_Exception
 	 */
 	public function action_mailingsend($clean_only = false)
 	{

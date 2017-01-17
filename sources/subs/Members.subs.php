@@ -36,6 +36,7 @@
  * @package Members
  * @param int[]|int $users
  * @param bool $check_not_admin = false
+ * @throws Elk_Exception
  */
 function deleteMembers($users, $check_not_admin = false)
 {
@@ -1016,6 +1017,7 @@ function groupsAllowedTo($permission, $board_id = null)
  * @param integer|null $board_id = null
  *
  * @return int[] an array containing member ID's.
+ * @throws Elk_Exception
  */
 function membersAllowedTo($permission, $board_id = null)
 {

@@ -477,6 +477,7 @@ function resetPassword($memID, $username = null)
  * @param boolean $check_reserved_name
  * @param boolean $fatal pass through to isReservedName
  * @return string
+ * @throws Elk_Exception
  */
 function validateUsername($memID, $username, $ErrorContext = 'register', $check_reserved_name = true, $fatal = true)
 {

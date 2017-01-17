@@ -115,7 +115,8 @@ class Database_PostgreSQL extends Database_Abstract
 	 * @param string $db_string
 	 * @param mixed[] $db_values
 	 * @param resource|null $connection
-	 * @return resource|boolean
+	 * @return bool|resource|string|void
+	 * @throws Elk_Exception
 	 */
 	public function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
@@ -960,6 +961,7 @@ class Database_PostgreSQL extends Database_Abstract
 	 *
 	 * @param mixed $replacement
 	 * @return string
+	 * @throws Elk_Exception
 	 */
 	protected function _replaceIdentifier($replacement)
 	{

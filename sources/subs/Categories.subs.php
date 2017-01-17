@@ -178,6 +178,7 @@ function createCategory($catOptions)
  *
  * @param int[] $categories
  * @param integer|null $moveBoardsTo = null
+ * @throws Elk_Exception
  */
 function deleteCategories($categories, $moveBoardsTo = null)
 {

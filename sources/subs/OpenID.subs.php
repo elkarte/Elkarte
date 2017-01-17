@@ -41,6 +41,7 @@ class OpenID
 	 * @param mixed[]|null $save_fields = array()
 	 * @param string|null $return_action = null
 	 * @return string
+	 * @throws Elk_Exception
 	 */
 	public function validate($openid_uri, $return = false, $save_fields = array(), $return_action = null)
 	{
@@ -361,6 +362,7 @@ class OpenID
 	 * Generate private key
 	 *
 	 * @return string
+	 * @throws Elk_Exception
 	 */
 	public function generate_private_key()
 	{

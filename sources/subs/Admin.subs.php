@@ -388,6 +388,7 @@ function updateAdminPreferences()
  * @param string $template
  * @param mixed[] $replacements
  * @param int[] $additional_recipients
+ * @throws Elk_Exception
  */
 function emailAdmins($template, $replacements = array(), $additional_recipients = array())
 {

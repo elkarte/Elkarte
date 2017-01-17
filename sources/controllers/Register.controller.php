@@ -551,6 +551,7 @@ class Register_Controller extends Action_Controller
 	 * - Drops fields that we specially exclude during registration
 	 *
 	 * @param bool $has_real_name - if true adds 'real_name' as well
+	 * @throws Elk_Exception
 	 */
 	private function _extra_vars($has_real_name)
 	{

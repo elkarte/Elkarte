@@ -227,6 +227,7 @@ class Email_Parse
 	 * - Must have admin permissions
 	 *
 	 * @param string $location
+	 * @throws Elk_Exception
 	 */
 	private function _readFailed($location)
 	{

@@ -811,6 +811,7 @@ function approvePosts($msgs, $approve = true)
  * @package Posts
  * @param int[]|int $setboards
  * @param int $id_msg = 0
+ * @throws Elk_Exception
  */
 function updateLastMessages($setboards, $id_msg = 0)
 {

@@ -23,14 +23,15 @@ namespace ElkArte\sources\subs\ScheduledTask;
  * - Remove expired subscriptions
  * - Notify of subscriptions about to expire
  *
- * @package ScheduledTasks
+ * @package ElkArte\sources\subs\ScheduledTask
  */
 class Paid_Subscriptions implements Scheduled_Task_Interface
 {
 	/**
 	 * Removes expired and reminds members who have ones close to expiration
-	 * 
+	 *
 	 * @return bool
+	 * @throws \Elk_Exception
 	 */
 	public function run()
 	{

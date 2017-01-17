@@ -279,6 +279,7 @@ class Draft_Controller extends Post_Controller
 	 *
 	 * @param string $redirect - The url to redirect to after the drafts have
 	 * been deleted
+	 * @throws Elk_Exception
 	 */
 	private function _action_delete($redirect = '')
 	{
