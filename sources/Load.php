@@ -2769,7 +2769,7 @@ function serializeToJson($variable, $save_callback = null)
 		// If unserialize fails as well, let's just store an empty array
 		if ($array_form === false)
 		{
-			$array_form = array(0, 0);
+			$array_form = array(0, '', 0);
 		}
 
 		// Time to update the value if necessary
