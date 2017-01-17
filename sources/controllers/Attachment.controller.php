@@ -529,7 +529,7 @@ class Attachment_Controller extends Action_Controller
 	 */
 	public function action_tmpattach()
 	{
-		global $txt, $modSettings, $user_info, $topic, $settings;
+		global $txt, $modSettings, $user_info, $topic;
 
 		// Make sure some attachment was requested!
 		if (!isset($this->_req->query->attach))
