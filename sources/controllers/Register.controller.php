@@ -694,6 +694,9 @@ class Register_Controller extends Action_Controller
 
 			$context['page_title'] = $txt['invalid_activation_resend'];
 
+			// Don't let them wack away on their resend
+			spamProtection('remind');
+
 			// This will ensure we don't actually get an error message if it works!
 			$context['error_title'] = '';
 
