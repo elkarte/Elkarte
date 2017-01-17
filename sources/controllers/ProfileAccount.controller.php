@@ -463,6 +463,7 @@ class ProfileAccount_Controller extends Action_Controller
 	 * Issue a pm to the member getting the warning
 	 *
 	 * @return int
+	 * @throws Elk_Exception
 	 */
 	private function _issue_warning_pm()
 	{

@@ -82,11 +82,12 @@ class Generic_List
 	protected $descVar = '';
 
 	/**
-	 * Starts a new list
+	 * Generic_List constructor, Starts a new list
 	 * Makes sure the passed list contains the minimum needed options to create a list
 	 * Loads the options in to this instance
 	 *
 	 * @param array $listOptions
+	 * @throws Elk_Exception
 	 */
 	public function __construct(array $listOptions)
 	{

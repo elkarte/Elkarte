@@ -725,6 +725,7 @@ function highlight_php_code($code)
  *
  * @param string $setLocation = '' The URL to redirect to
  * @param bool $refresh = false, enable to send a refresh header, default is a location header
+ * @throws Elk_Exception
  */
 function redirectexit($setLocation = '', $refresh = false)
 {
@@ -803,6 +804,7 @@ function redirectexit_callback($matches)
  * @param bool|null $do_footer = null Output the footer
  * @param bool $from_index = false If we're coming from index.php
  * @param bool $from_fatal_error = false If we are exiting due to a fatal error
+ * @throws Elk_Exception
  */
 function obExit($header = null, $do_footer = null, $from_index = false, $from_fatal_error = false)
 {

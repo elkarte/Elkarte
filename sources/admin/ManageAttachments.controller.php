@@ -1728,6 +1728,7 @@ class ManageAttachments_Controller extends Action_Controller
 	 * @param mixed[] $to_fix attachments to fix
 	 * @param int $max_substep = 0
 	 * @todo Move to ManageAttachments.subs.php
+	 * @throws Elk_Exception
 	 */
 	private function _pauseAttachmentMaintenance($to_fix, $max_substep = 0)
 	{

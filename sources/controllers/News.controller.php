@@ -814,6 +814,7 @@ function cdata_parse($data, $ns = '')
  * @param int $i the amount of indentation to use.
  * @param string|null $tag if specified, it will be used instead of the keys of data.
  * @param string $xml_format  one of rss, rss2, rdf, atom
+ * @throws Elk_Exception
  */
 function dumpTags($data, $i, $tag = null, $xml_format = 'rss')
 {

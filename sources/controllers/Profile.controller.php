@@ -740,6 +740,7 @@ class Profile_Controller extends Action_Controller
 	 * If a password validation before a change is needed, this is the function to do it
 	 *
 	 * @param bool $check_password if this profile update requires a password verification
+	 * @throws Elk_Exception
 	 */
 	private function _check_password($check_password)
 	{

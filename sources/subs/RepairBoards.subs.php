@@ -1337,6 +1337,7 @@ function createSalvageArea()
  * @param string $current_step_description
  * @param int $max_substep = none
  * @param boolean $force = false
+ * @throws Elk_Exception
  */
 function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0, $force = false)
 {
@@ -1388,6 +1389,7 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
  *
  * @param boolean $do_fix
  * @return mixed[]
+ * @throws Elk_Exception
  */
 function findForumErrors($do_fix = false)
 {

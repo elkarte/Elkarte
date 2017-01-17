@@ -282,6 +282,7 @@ function getPackageInfo($gzfilename)
  * @param mixed[] $chmodOptions
  * @param boolean $restore_write_status
  * @return array|boolean
+ * @throws Elk_Exception
  */
 function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $restore_write_status = false)
 {
@@ -599,6 +600,7 @@ function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
  * @param string $destination_url
  * @param string[]|null $files = none
  * @param bool $return = false
+ * @throws Elk_Exception
  */
 function packageRequireFTP($destination_url, $files = null, $return = false)
 {

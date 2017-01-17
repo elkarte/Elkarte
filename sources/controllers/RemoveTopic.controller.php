@@ -275,6 +275,7 @@ class RemoveTopic_Controller extends Action_Controller
 	 * After deleting a message(s) returns the user to the best possible location
 	 *
 	 * @param bool $full_topic if the entire topic was removed
+	 * @throws Elk_Exception
 	 */
 	private function _redirectBack($full_topic)
 	{

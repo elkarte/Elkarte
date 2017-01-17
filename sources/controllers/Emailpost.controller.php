@@ -45,6 +45,7 @@ class Emailpost_Controller extends Action_Controller
 	 * @param string|null $data used to supply a full headers+body email
 	 * @param boolean $force used to override common failure errors
 	 * @param string|null $key used to supply a lost key
+	 * @throws Elk_Exception
 	 */
 	public function action_pbe_post($data = null, $force = false, $key = null)
 	{
@@ -219,6 +220,7 @@ class Emailpost_Controller extends Action_Controller
 	 * - Accessed through emailtopic.
 	 *
 	 * @param string|null $data used to supply a full body+headers email
+	 * @throws Elk_Exception
 	 */
 	public function action_pbe_topic($data = null)
 	{
@@ -331,6 +333,7 @@ class Emailpost_Controller extends Action_Controller
 	 *
 	 * @param string $data raw email string, including headers
 	 * @return boolean
+	 * @throws Elk_Exception
 	 */
 	public function action_pbe_preview($data = '')
 	{
@@ -388,6 +391,7 @@ class Emailpost_Controller extends Action_Controller
  * @param mixed[] $pbe array of all pbe user_info values
  * @param Email_Parse $email_message
  * @param mixed[] $topic_info
+ * @throws Elk_Exception
  */
 function pbe_create_post($pbe, $email_message, $topic_info)
 {
@@ -489,6 +493,7 @@ function pbe_create_post($pbe, $email_message, $topic_info)
  * @param mixed[] $pbe array of pbe 'user_info' values
  * @param Email_Parse $email_message
  * @param mixed[] $pm_info
+ * @throws Elk_Exception
  */
 function pbe_create_pm($pbe, $email_message, $pm_info)
 {
@@ -544,6 +549,7 @@ function pbe_create_pm($pbe, $email_message, $pm_info)
  * @param mixed[] $pbe array of pbe 'user_info' values
  * @param Email_Parse $email_message
  * @param mixed[] $board_info
+ * @throws Elk_Exception
  */
 function pbe_create_topic($pbe, $email_message, $board_info)
 {

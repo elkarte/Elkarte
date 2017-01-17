@@ -105,6 +105,7 @@ final class ErrorHandler extends Errors
 	 * @param string $error_string
 	 * @param string $file
 	 * @param int $line
+	 * @throws Elk_Exception
 	 */
 	public function error_handler($error_level, $error_string, $file, $line)
 	{
@@ -134,6 +135,7 @@ final class ErrorHandler extends Errors
 	 *
 	 * @param \Exception|\Throwable $e The error. Since the code shall work with php 5 and 7
 	 *                                 we cannot type-hint the function parameter.
+	 * @throws Elk_Exception
 	 */
 	public function exception_handler($e)
 	{

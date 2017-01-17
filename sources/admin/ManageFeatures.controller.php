@@ -1496,6 +1496,7 @@ class ManageFeatures_Controller extends Action_Controller
  *    pausePermsSave(), pauseAttachmentMaintenance(), pauseRepairProcess()
  *
  * @param int $applied_sigs
+ * @throws Elk_Exception
  */
 function pauseSignatureApplySettings($applied_sigs)
 {

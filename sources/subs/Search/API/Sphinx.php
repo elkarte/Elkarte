@@ -158,6 +158,7 @@ class Sphinx extends SearchAPI
 	 * @param string[] $excluded_words
 	 * @param int[] $participants
 	 * @param string[] $search_results
+	 * @throws \Elk_Exception
 	 */
 	public function searchQuery($search_params, $search_words, $excluded_words, &$participants, &$search_results)
 	{

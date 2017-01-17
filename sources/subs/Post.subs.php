@@ -57,6 +57,7 @@ function un_preparsecode($message)
  * @param mixed[] $msgOptions
  * @param mixed[] $topicOptions
  * @param mixed[] $posterOptions
+ * @throws Elk_Exception
  */
 function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
@@ -418,6 +419,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
  * @param mixed[] $msgOptions
  * @param mixed[] $topicOptions
  * @param mixed[] $posterOptions
+ * @throws Elk_Exception
  */
 function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
@@ -563,6 +565,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
  * @package Posts
  * @param int|int[] $msgs - array of message ids
  * @param bool $approve = true
+ * @throws Elk_Exception
  */
 function approvePosts($msgs, $approve = true)
 {

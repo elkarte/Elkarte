@@ -256,6 +256,7 @@ class Errors extends AbstractModel
 	 * @uses Errors template, fatal_error sub template
 	 * @param string $error_message
 	 * @param string $error_code string or int code
+	 * @throws Elk_Exception
 	 */
 	final protected function _setup_fatal_ErrorContext($error_message, $error_code)
 	{

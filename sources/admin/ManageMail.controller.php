@@ -390,6 +390,7 @@ class ManageMail_Controller extends Action_Controller
 	 *
 	 * @param int $all_emails total emails to be sent
 	 * @param int $sent_emails number of emails sent so far
+	 * @throws Elk_Exception
 	 */
 	private function _pauseMailQueueClear($all_emails, $sent_emails)
 	{

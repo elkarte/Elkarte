@@ -119,6 +119,7 @@ class OpenID
 	 * - Note that this function will not return when authentication is required.
 	 *
 	 * @return boolean|null
+	 * @throws Elk_Exception
 	 */
 	public function revalidate()
 	{
@@ -308,6 +309,7 @@ class OpenID
 	 *
 	 * @param bool $regenerate = false
 	 * @return string return false on failure or an array() on success
+	 * @throws Elk_Exception
 	 */
 	public function setup_DH($regenerate = false)
 	{
@@ -327,6 +329,7 @@ class OpenID
 	 * - It generates them if they're not stored or $regenerate parameter is true.
 	 *
 	 * @param bool $regenerate
+	 * @throws Elk_Exception
 	 */
 	public function get_keys($regenerate)
 	{

@@ -481,6 +481,7 @@ class ProfileOptions_Controller extends Action_Controller
 	 * Only appropriate for people using OpenID.
 	 *
 	 * @param bool $saving = false
+	 * @throws Elk_Exception
 	 */
 	public function action_authentication($saving = false)
 	{

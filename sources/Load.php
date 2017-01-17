@@ -1843,6 +1843,7 @@ function loadEssentialThemeData()
  * @param bool $fatal = true if fatal is true, dies with an error message if the template cannot be found
  *
  * @return boolean|null
+ * @throws Elk_Exception
  */
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {

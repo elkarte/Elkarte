@@ -312,6 +312,7 @@ class Drafts_PersonalMessage_Module extends ElkArte\sources\modules\Abstract_Mod
 	 * @param array $recipientList
 	 *
 	 * @throws Controller_Redirect_Exception
+	 * @throws Elk_Exception
 	 */
 	public function before_sending($recipientList)
 	{

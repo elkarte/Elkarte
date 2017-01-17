@@ -170,6 +170,7 @@ function url_parts($local, $global)
  *
  * @package Authorization
  * @param string $type = 'admin'
+ * @throws Elk_Exception
  */
 function adminLogin($type = 'admin')
 {

@@ -247,6 +247,7 @@ function prepareMessageContext($message)
  * first messages of a topic
  *
  * @param int $memID The member id
+ * @throws Elk_Exception
  */
 function removeNonTopicMessages($memID)
 {

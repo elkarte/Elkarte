@@ -111,6 +111,7 @@ function getMessageIcons($board_id)
  *
  * @uses Post language
  * @uses GenericControls template
+ * @throws Elk_Exception
  */
 function create_control_richedit($editorOptions)
 {

@@ -31,6 +31,7 @@ class Remove_Topic_Redirect implements Scheduled_Task_Interface
 	 * Removes all of the expired Move Redirect topic notices that people hate
 	 *
 	 * @return bool
+	 * @throws \Elk_Exception
 	 */
 	public function run()
 	{

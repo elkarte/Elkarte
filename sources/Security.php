@@ -165,6 +165,7 @@ function checkPassword($type, $hash = false)
  *
  * @param string $message = ''
  * @param boolean $is_fatal = true
+ * @throws Elk_Exception
  */
 function is_not_guest($message = '', $is_fatal = true)
 {

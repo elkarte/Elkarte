@@ -618,6 +618,7 @@ function pbe_check_moderation(&$pbe)
  * @package Maillist
  * @param string $error
  * @param Email_Parse $email_message
+ * @throws Elk_Exception
  */
 function pbe_emailError($error, $email_message)
 {

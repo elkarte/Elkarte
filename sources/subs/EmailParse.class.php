@@ -201,6 +201,7 @@ class Email_Parse
 	 *
 	 * @param string $data optional, if supplied must be a full headers+body email string
 	 * @param string $location optional, used for debug
+	 * @throws Elk_Exception
 	 */
 	public function read_data($data = '', $location = '')
 	{
@@ -291,6 +292,7 @@ class Email_Parse
 	 * @param boolean $html - flag to determine if we are saving html or not
 	 * @param string $data - full header+message string
 	 * @param string $location - optional, used for debug
+	 * @throws Elk_Exception
 	 */
 	public function read_email($html = false, $data = '', $location = '')
 	{
