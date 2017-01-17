@@ -308,8 +308,6 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	// Clear out the stat cache.
 	trackStats();
 
-// debug
-file_put_contents (BOARDDIR . '/test_email.txt', $to . "\n" . $subject . "\n" . $message . "\n" . $headers . $unq_id . "\n" . $return_path);
 	// Everything go smoothly?
 	return $mail_result;
 }
