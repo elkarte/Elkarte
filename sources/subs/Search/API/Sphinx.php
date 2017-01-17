@@ -67,12 +67,10 @@ class Sphinx extends SearchAPI
 	protected $supported_databases = array('MySQL');
 
 	/**
-	 * Nothing to do
+	 * Check we support this db, set banned words
 	 */
 	public function __construct()
 	{
-		global $modSettings;
-
 		// Is this database supported?
 		if (!in_array(DB_TYPE, $this->supported_databases))
 		{
@@ -81,7 +79,7 @@ class Sphinx extends SearchAPI
 			return;
 		}
 
-		$this->bannedWords = empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']);
+		parent::__construct();
 	}
 
 	/**
