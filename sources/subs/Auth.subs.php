@@ -19,6 +19,7 @@
  * Sets the login cookie and session based on the id_member and password passed.
  *
  * What it does:
+ *
  * - password should be already encrypted with the cookie salt.
  * - logs the user out if id_member is zero.
  * - sets the cookie and session to last the number of seconds specified by cookie_length.
@@ -124,6 +125,7 @@ function setLoginCookie($cookie_length, $id, $password = '')
  * Get the domain and path for the cookie
  *
  * What it does:
+ *
  * - normally, local and global should be the localCookies and globalCookies settings, respectively.
  * - uses boardurl to determine these two things.
  *
@@ -164,6 +166,7 @@ function url_parts($local, $global)
  * Question the verity of the admin by asking for his or her password.
  *
  * What it does:
+ *
  * - loads Login.template.php and uses the admin_login sub template.
  * - sends data to template so the admin is sent on to the page they
  *   wanted if their password is correct, otherwise they can try again.
@@ -298,6 +301,7 @@ function construct_query_string($get)
  * Finds members by email address, username, or real name.
  *
  * What it does:
+ *
  * - searches for members whose username, display name, or e-mail address match the given pattern of array names.
  * - searches only buddies if buddies_only is set.
  *
@@ -390,6 +394,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
  * Generates a random password for a user and emails it to them.
  *
  * What it does:
+ *
  * - called by ProfileOptions controller when changing someone's username.
  * - checks the validity of the new username.
  * - generates and sets a new password for the given user.
@@ -513,6 +518,7 @@ function validateUsername($memID, $username, $ErrorContext = 'register', $check_
  * Checks whether a password meets the current forum rules
  *
  * What it does:
+ *
  * - called when registering/choosing a password.
  * - checks the password obeys the current forum settings for password strength.
  * - if password checking is enabled, will check that none of the words in restrict_in appear in the password.
@@ -561,6 +567,7 @@ function validatePassword($password, $username, $restrict_in = array())
  * Checks whether an entered password is correct for the user
  *
  * What it does:
+ *
  * - called when logging in or whenever a password needs to be validated for a user
  * - used to generate a new hash for the db, used during registration or any password changes
  * - if a non SHA256 password is sent, will generate one with SHA256(user + password) and return it in password
@@ -612,6 +619,7 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
  * Quickly find out what moderation authority this user has
  *
  * What it does:
+ *
  * - builds the moderator, group and board level querys for the user
  * - stores the information on the current users moderation powers in $user_info['mod_cache'] and $_SESSION['mc']
  *

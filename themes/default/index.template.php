@@ -654,6 +654,7 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
  * Generate a strip of "quick" buttons (those present next to each message)
  *
  * What it does:
+ *
  * - Create a quick button, pass an array of the button name with key values
  * - array('somename' => array(href => '' text => '' custom => '' test => ''))
  *      - href => link to call when button is pressed

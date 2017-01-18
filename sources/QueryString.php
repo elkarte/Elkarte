@@ -20,6 +20,7 @@
  * Clean the request variables - add html entities to GET and slashes if magic_quotes_gpc is Off.
  *
  * What it does:
+ *
  * - Uses Request to determine as best it can client IPs for the current request.
  * - Uses Request cleanRequest() to:
  *   - Clean the request variables (ENV, GET, POST, COOKIE, SERVER)
@@ -150,6 +151,7 @@ function expandIPv6($addr, $strict_check = true)
  * Adds html entities to the array/variable.  Uses two underscores to guard against overloading.
  *
  * What it does:
+ *
  * - Adds entities (&quot;, &lt;, &gt;) to the array or string var.
  * - Importantly, does not effect keys, only values.
  * - Calls itself recursively if necessary.
@@ -175,6 +177,7 @@ function htmlspecialchars__recursive($var, $level = 0)
  * Trim a string including the HTML space, character 160.  Uses two underscores to guard against overloading.
  *
  * What it does:
+ *
  * - Trims a string or an array using html characters as well.
  * - Remove spaces (32), tabs (9), returns (13, 10, and 11), nulls (0), and hard spaces. (160)
  * - Does not effect keys, only values.
@@ -202,6 +205,7 @@ function htmltrim__recursive($var, $level = 0)
  * Clean up the XML to make sure it doesn't contain invalid characters.
  *
  * What it does:
+ *
  * - Removes invalid XML characters to assure the input string being
  * parsed properly.
  *
@@ -242,6 +246,7 @@ function JavaScriptEscape($string)
  * Rewrite URLs to include the session ID.
  *
  * What it does:
+ *
  * - Rewrites the URLs outputted to have the session ID, if the user
  *   is not accepting cookies and is using a standard web browser.
  * - Handles rewriting URLs for the queryless URLs option.

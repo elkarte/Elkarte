@@ -52,6 +52,7 @@ function get_files_recursive($dir_path)
  * Callback function for the integration hooks list (list_integration_hooks)
  *
  * What it does:
+ *
  * - Gets all of the hooks in the system and their status
  * - Would be better documented if Ema was not lazy
  *
@@ -254,6 +255,7 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
  * Simply returns the total count of integration hooks
  *
  * What it does:
+ *
  * - used by createList() as a callback to determine the number of hooks in
  * use in the system
  *
@@ -278,6 +280,7 @@ function integration_hooks_count($filter = false)
  * Parses modSettings to create integration hook array
  *
  * What it does:
+ *
  * - used by createList() callbacks
  *
  * @package AddonSettings

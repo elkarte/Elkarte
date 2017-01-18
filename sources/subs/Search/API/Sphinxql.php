@@ -22,6 +22,7 @@ namespace ElkArte\Search\API;
  * SearchAPI-Sphinxql.class.php, SphinxQL API,
  *
  * What it does:
+ *
  * - Used when an Sphinx search daemon is running
  * - Access is via Sphinx's own implementation of MySQL network protocol (SphinxQL)
  * - Requires Sphinx 2 or higher

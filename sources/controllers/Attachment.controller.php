@@ -21,6 +21,7 @@ use ElkArte\Errors\AttachmentErrorContext;
  * Attachment_Controller class.
  *
  * What it does:
+ *
  * - Handles the downloading of an attachment or avatar
  * - Handles the uploading of attachments via Ajax
  * - increments the download count where applicable

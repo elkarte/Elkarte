@@ -130,6 +130,7 @@ function automanage_attachments_check_directory()
  * Creates a directory as defined by the admin attach options
  *
  * What it does:
+ *
  * - Attempts to make the directory writable
  * - Places an .htaccess in new directories for security
  *
@@ -219,6 +220,7 @@ function automanage_attachments_create_directory($updir)
  * Determines the current base directory and attachment directory
  *
  * What it does:
+ *
  * - Increments the above directory to the next available slot
  * - Uses automanage_attachments_create_directory to create the incremental directory
  *
@@ -304,6 +306,7 @@ function get_directory_tree_elements($directory)
  * Helper function for automanage_attachments_create_directory
  *
  * What it does:
+ *
  * - Gets the directory w/o drive letter for windows
  *
  * @package Attachments
@@ -335,6 +338,7 @@ function attachments_init_dir(&$tree, &$count)
  * Handles the actual saving of attachments to a directory.
  *
  * What it does:
+ *
  * - Loops through $_FILES['attachment'] array and saves each file to the current attachments folder.
  * - Validates the save location actually exists.
  *
@@ -628,6 +632,7 @@ function getTempAttachById($attach_id)
  * Checks if an uploaded file produced any appropriate error code
  *
  * What it does:
+ *
  * - Checks for error codes in the error segment of the file array that is
  * created by PHP during the file upload.
  *
@@ -669,6 +674,7 @@ function attachmentUploadChecks($attachID)
  * Performs various checks on an uploaded file.
  *
  * What it does:
+ *
  * - Requires that $_SESSION['temp_attachments'][$attachID] be properly populated.
  *
  * @package Attachments
@@ -864,6 +870,7 @@ function attachmentChecks($attachID)
  * Create an attachment, with the given array of parameters.
  *
  * What it does:
+ *
  * - Adds any additional or missing parameters to $attachmentOptions.
  * - Renames the temporary file.
  * - Creates a thumbnail if the file is an image and the option enabled.
@@ -1054,6 +1061,7 @@ function createAttachment(&$attachmentOptions)
  * Get the avatar with the specified ID.
  *
  * What it does:
+ *
  * - It gets avatar data (folder, name of the file, filehash, etc)
  * from the database.
  * - Must return the same values and in the same order as getAttachmentFromTopic()
@@ -1097,6 +1105,7 @@ function getAvatar($id_attach)
  * Get the specified attachment.
  *
  * What it does:
+ *
  * - This includes a check of the topic
  * - it only returns the attachment if it's indeed attached to a message in the topic given as parameter, and query_see_board...
  * - Must return the same values and in the same order as getAvatar()
@@ -1135,6 +1144,7 @@ function getAttachmentFromTopic($id_attach, $id_topic)
  * Get the thumbnail of specified attachment.
  *
  * What it does:
+ *
  * - This includes a check of the topic
  * - it only returns the attachment if it's indeed attached to a message in the topic given as parameter, and query_see_board...
  * - Must return the same values and in the same order as getAvatar()
@@ -1175,6 +1185,7 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
  * Returns if the given attachment ID is an image file or not
  *
  * What it does:
+ *
  * - Given an attachment id, checks that it exists as an attachment
  * - Verifies the message its associated is on a board the user can see
  * - Sets 'is_image' if the attachment is an image file
@@ -1223,6 +1234,7 @@ function isAttachmentImage($id_attach)
  * Increase download counter for id_attach.
  *
  * What it does:
+ *
  * - Does not check if it's a thumbnail.
  *
  * @package Attachments
@@ -1246,6 +1258,7 @@ function increaseDownloadCounter($id_attach)
  * Saves a file and stores it locally for avatar use by id_member.
  *
  * What it does:
+ *
  * - supports GIF, JPG, PNG, BMP and WBMP formats.
  * - detects if GD2 is available.
  * - uses resizeImageFile() to resize to max_width by max_height, and saves the result to a file.
@@ -1361,6 +1374,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
  * Get the size of a specified image with better error handling.
  *
  * What it does:
+ *
  * - Uses getimagesize() to determine the size of a file.
  * - Attempts to connect to the server first so it won't time out.
  *
@@ -1495,6 +1509,7 @@ function getAvatarPath()
  * Little utility function for the $id_folder computation for attachments.
  *
  * What it does:
+ *
  * - This returns the id of the folder where the attachment or avatar will be saved.
  * - If multiple attachment directories are not enabled, this will be 1 by default.
  *
@@ -1819,6 +1834,7 @@ function attachmentsSizeForMessage($id_msg, $include_count = true)
  * This loads an attachment's contextual data including, most importantly, its size if it is an image.
  *
  * What it does:
+ *
  * - Pre-condition: $attachments array to have been filled with the proper attachment data, as Display() does.
  * - It requires the view_attachments permission to calculate image size.
  * - It attempts to keep the "aspect ratio" of the posted image in line, even if it has to be resized by

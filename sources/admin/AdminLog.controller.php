@@ -15,6 +15,7 @@
  * Admin logs controller.
  *
  * What it does:
+ *
  * - This class manages logs, and forwards to display, pruning,
  * and other actions on logs.
  *

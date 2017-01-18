@@ -535,6 +535,7 @@ function moveTopicsPermissions($moveCache)
  * Moves one or more topics to a specific board.
  *
  * What it does:
+ *
  * - Determines the source boards for the supplied topics
  * - Handles the moving of mark_read data
  * - Updates the posts count of the affected boards

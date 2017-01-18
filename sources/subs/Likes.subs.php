@@ -89,6 +89,7 @@ function loadLikes($messages, $prepare = true)
  * Prepares the like array for use in the template
  *
  * What it does:
+ *
  * - Replaces the current member id with 'You' if they like a post and makes it first
  * - Truncates the like list at a given number and adds in +x others
  *
@@ -604,6 +605,7 @@ function dbMostLikedMessage($limit = 10)
  * Function to get most liked messages in a topic
  *
  * What it does:
+ *
  * - For a supplied topic gets the, default 5, posts that have been liked
  * - Returns the messages in descending order of likes
  *

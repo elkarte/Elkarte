@@ -20,6 +20,7 @@
  * Check if the user is who he/she says he is.
  *
  * What it does:
+ *
  * - This function makes sure the user is who they claim to be by requiring a
  * password to be typed in every hour.
  * - This check can be turned on and off by the securityDisable setting.
@@ -127,6 +128,7 @@ function validateSession($type = 'admin')
  * Validates a supplied password is correct
  *
  * What it does:
+ *
  * - Uses integration function to verify password is enabled
  * - Uses validateLoginPassword to check using standard ElkArte methods
  *
@@ -160,6 +162,7 @@ function checkPassword($type, $hash = false)
  * Require a user who is logged in. (not a guest.)
  *
  * What it does:
+ *
  * - Checks if the user is currently a guest, and if so asks them to login with a message telling them why.
  * - Message is what to tell them when asking them to login.
  *
@@ -227,6 +230,7 @@ function is_not_guest($message = '', $is_fatal = true)
  * Apply restrictions for banned users. For example, disallow access.
  *
  * What it does:
+ *
  * - If the user is banned, it dies with an error.
  * - Caches this information for optimization purposes.
  * - Forces a recheck if force_check is true.
@@ -477,6 +481,7 @@ function is_not_banned($forceCheck = false)
  * Fix permissions according to ban status.
  *
  * What it does:
+ *
  * - Applies any states of banning by removing permissions the user cannot have.
  * @package Bans
  */
@@ -564,6 +569,7 @@ function banPermissions()
  * Log a ban in the database.
  *
  * What it does:
+ *
  * - Log the current user in the ban logs.
  * - Increment the hit counters for the specified ban ID's (if any.)
  *
@@ -604,6 +610,7 @@ function log_ban($ban_ids = array(), $email = null)
  * Checks if a given email address might be banned.
  *
  * What it does:
+ *
  * - Check if a given email is banned.
  * - Performs an immediate ban if the turns turns out positive.
  *
@@ -679,6 +686,7 @@ function isBannedEmail($email, $restriction, $error)
  * Make sure the user's correct session was passed, and they came from here.
  *
  * What it does:
+ *
  * - Checks the current session, verifying that the person is who he or she should be.
  * - Also checks the referrer to make sure they didn't get sent here.
  * - Depends on the disableCheckUA setting, which is usually missing.
@@ -913,6 +921,7 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
  * Removes old unused tokens from session
  *
  * What it does:
+ *
  * - defaults to 3 hours before a token is considered expired
  * - if $complete = true will remove all tokens
  *
@@ -942,6 +951,7 @@ function cleanTokens($complete = false, $suffix = '')
  * Check whether a form has been submitted twice.
  *
  * What it does:
+ *
  * - Registers a sequence number for a form.
  * - Checks whether a submitted sequence number is registered in the current session.
  * - Depending on the value of is_fatal shows an error or returns true or false.
@@ -996,6 +1006,7 @@ function checkSubmitOnce($action, $is_fatal = false)
  * This function checks whether the user is allowed to do permission. (ie. post_new.)
  *
  * What it does:
+ *
  * - If boards parameter is specified, checks those boards instead of the current one (if applicable).
  * - Always returns true if the user is an administrator.
  *
@@ -1077,6 +1088,7 @@ function allowedTo($permission, $boards = null)
  * This function returns fatal error if the user doesn't have the respective permission.
  *
  * What it does:
+ *
  * - Uses allowedTo() to check if the user is allowed to do permission.
  * - Checks the passed boards or current board for the permission.
  * - If they are not, it loads the Errors language file and shows an error using $txt['cannot_' . $permission].
@@ -1138,6 +1150,7 @@ function isAllowedTo($permission, $boards = null)
  * Return the boards a user has a certain (board) permission on. (array(0) if all.)
  *
  * What it does:
+ *
  * - returns a list of boards on which the user is allowed to do the specified permission.
  * - returns an array with only a 0 in it if the user has permission to do this on every board.
  * - returns an empty array if he or she cannot do this on any board.
@@ -1283,6 +1296,7 @@ function showEmailAddress($userProfile_hideEmail, $userProfile_id)
  * This function attempts to protect from carrying out specific actions repeatedly.
  *
  * What it does:
+ *
  * - Checks if a user is trying specific actions faster than a given minimum wait threshold.
  * - The time taken depends on error_type - generally uses the modSetting.
  * - Generates a fatal message when triggered, suspending execution.
@@ -1473,6 +1487,7 @@ function constructBanQueryIP($fullip)
  * Decide if we are going to enable bad behavior scanning for this user
  *
  * What it does:
+ *
  * - Admins and Moderators get a free pass
  * - Optionally existing users with post counts over a limit are bypassed
  * - Others get a humane frisking

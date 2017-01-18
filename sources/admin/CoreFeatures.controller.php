@@ -19,6 +19,7 @@
  * This class takes care of the Core Features admin screen.
  *
  * What it does:
+ *
  * - It sets up the context, initializes the features info for display
  * - updates the settings for enabled/disabled core features as requested.
  * - loads in module core features

@@ -101,6 +101,7 @@ function getServerVersions($checkFor)
  * Builds the available tasks for this admin / moderator
  *
  * What it does:
+ *
  * - Sets up the support resource txt stings
  * - Called from Admin.controller action_home and action_credits
  *
@@ -177,6 +178,7 @@ function getQuickAdminTasks()
  * Get detailed version information about the physical Elk files on the server.
  *
  * What it does:
+ *
  * - the input parameter allows to set whether to include SSI.php and whether
  *   the results should be sorted.
  * - returns an array containing information on source files, templates and
@@ -334,6 +336,7 @@ function readFileVersions(&$version_info, $directories, $pattern)
  * Saves the time of the last db error for the error log
  *
  * What it does:
+ *
  * - Done separately from Settings_Form::save_file() to avoid race conditions
  * which can occur during a db error
  * - If it fails Settings.php will assume 0
@@ -380,6 +383,7 @@ function updateAdminPreferences()
  * Send all the administrators a lovely email.
  *
  * What it does:
+ *
  * - It loads all users who are admins or have the admin forum permission.
  * - It uses the email template and replacements passed in the parameters.
  * - It sends them an email.

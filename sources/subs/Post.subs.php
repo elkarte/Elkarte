@@ -1008,6 +1008,7 @@ function lastPost()
  * Prepares a post subject for the post form
  *
  * What it does:
+ *
  * - Will add the appropriate Re: to the post subject if its a reply to an existing post
  * - If quoting a post, or editing a post, this function also prepares the message body
  * - if editing is true, returns $message|$message[errors], else returns array($subject, $message)

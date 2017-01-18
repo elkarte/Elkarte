@@ -749,6 +749,7 @@ function loadAllCustomFields()
  * Load all the available mention types
  *
  * What it does:
+ *
  * - Scans teh subs\MentionType directory for files
  * - Calls its getType method
  *
@@ -775,6 +776,7 @@ function getNotificationTypes()
  * Returns the modules for the given mentions
  *
  * What it does:
+ *
  * - Calls each modules static function ::getModules
  * - Called from ManageFeatures.controller as part of notification settings
  *
@@ -799,6 +801,7 @@ function getMentionsModules($enabled_mentions)
  * Loads available frontpage controllers for selection in the look/layout area of the ACP
  *
  * What it does:
+ *
  * - Scans controllerdir and addonsdir for .controller.php fils
  * - Checks if found files have a static frontPageOptions method
  *

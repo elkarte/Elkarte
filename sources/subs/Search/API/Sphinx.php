@@ -22,6 +22,7 @@ namespace ElkArte\Search\API;
  * SearchAPI-Sphinx.class.php, Sphinx API,
  *
  * What it does:
+ *
  * - used when a Sphinx search daemon is running
  * - Access is via the Sphinx native search API (SphinxAPI)
  * - sphinxapi.php is part of the Sphinx package, the file must be added to SOURCEDIR

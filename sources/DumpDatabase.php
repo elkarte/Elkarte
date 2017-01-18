@@ -19,6 +19,7 @@
  * Dumps the database.
  *
  * What it does:
+ *
  * - It writes all of the database to standard output.
  * - It uses gzip compression if compress is set in the URL/post data.
  * - It may possibly time out, and mess up badly if you were relying on it. :P

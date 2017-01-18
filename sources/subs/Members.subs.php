@@ -19,6 +19,7 @@
  * Delete one or more members.
  *
  * What it does:
+ *
  * - Requires profile_remove_own or profile_remove_any permission for
  * respectively removing your own account or any account.
  * - Non-admins cannot delete admins.
@@ -455,6 +456,7 @@ function deleteMembers($users, $check_not_admin = false)
  * Registers a member to the forum.
  *
  * What it does:
+ *
  * - Allows two types of interface: 'guest' and 'admin'. The first
  * - includes hammering protection, the latter can perform the registration silently.
  * - The strings used in the options array are assumed to be escaped.
@@ -2400,6 +2402,7 @@ function memberQuerySeeBoard($id_member)
  * Updates the columns in the members table.
  *
  * What it does:
+ *
  * - Assumes the data has been htmlspecialchar'd, no sanitation is performed on the data.
  * - This function should be used whenever member data needs to be updated in place of an UPDATE query.
  * - $data is an associative array of the columns to be updated and their respective values.

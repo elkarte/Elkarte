@@ -21,6 +21,7 @@ namespace ElkArte\sources\subs\ScheduledTask;
  * Class Daily_Maintenance - This function does daily cleaning up:
  *
  * What it does:
+ *
  * - decrements warning levels if it's enabled
  * - consolidate spider statistics
  * - fix MySQL version

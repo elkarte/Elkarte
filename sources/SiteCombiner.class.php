@@ -14,6 +14,7 @@
  * Used to combine css or js files in to a single file
  *
  * What it does:
+ *
  * - Checks if the files have changed, and if so rebuilds the amalgamation
  * - Calls minification classes to reduce size of css and js file saving bandwidth
  * - Can creates a .gz file, be would require .htaccess or the like to use

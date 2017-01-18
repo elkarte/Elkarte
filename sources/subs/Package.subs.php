@@ -793,6 +793,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
  * Parses the actions in package-info.xml file from packages.
  *
  * What it does:
+ *
  * - Package should be an Xml_Array with package-info as its base.
  * - Testing_only should be true if the package should not actually be applied.
  * - Method can be upgrade, install, or uninstall.  Its default is install.
@@ -1471,6 +1472,7 @@ function parse_path($path)
  * Deletes all the files in a directory, and all the files in sub directories inside it.
  *
  * What it does:
+ *
  * - Requires access to delete these files.
  * - Recursively goes in to all sub directories looking for files to delete
  * - Optionally removes the directory as well, otherwise will leave an empty tree behind

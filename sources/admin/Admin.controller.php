@@ -19,6 +19,7 @@
  * Admin controller class.
  *
  * What it does:
+ *
  * - This class handles the first general admin screens: home,
  * - Handles admin area search actions and end admin session.
  *

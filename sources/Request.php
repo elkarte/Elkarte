@@ -15,6 +15,7 @@
  * Class to parse $_REQUEST for always necessary data, such as 'action', 'board', 'topic', 'start'.
  *
  * What it does:
+ *
  * - Sanitizes the necessary data
  * - Determines the origin of $_REQUEST for use in security checks
  */

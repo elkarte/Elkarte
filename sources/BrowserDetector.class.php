@@ -20,6 +20,7 @@
  * settings needed for them.
  *
  * What it does:
+ *
  * - Detects the following browsers
  * - Opera, Webkit, Firefox, Web_tv, Konqueror, IE, Gecko
  * - Webkit variants: Chrome, iphone, blackberry, android, safari, ipad, ipod

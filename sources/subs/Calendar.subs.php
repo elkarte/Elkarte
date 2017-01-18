@@ -19,6 +19,7 @@
  * Get all birthdays within the given time range.
  *
  * What it does:
+ *
  * - finds all the birthdays in the specified range of days.
  * - works with birthdays set for no year, or any other year, and respects month and year boundaries.
  *
@@ -88,6 +89,7 @@ function getBirthdayRange($low_date, $high_date)
  * Get all calendar events within the given time range.
  *
  * What it does:
+ *
  * - finds all the posted calendar events within a date range.
  * - both the earliest_date and latest_date should be in the standard YYYY-MM-DD format.
  * - censors the posted event titles.
@@ -257,6 +259,7 @@ function getHolidayRange($low_date, $high_date)
  * Does permission checks to see if an event can be linked to a board/topic.
  *
  * What it does:
+ *
  * - checks if the current user can link the current topic to the calendar, permissions et al.
  * - this requires the calendar_post permission, a forum moderator, or a topic starter.
  * - expects the $topic and $board variables to be set.
@@ -605,6 +608,7 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
  * Retrieve all events for the given days, independently of the users offset.
  *
  * What it does:
+ *
  * - cache callback function used to retrieve the birthdays, holidays, and events between now and now + days_to_index.
  * - widens the search range by an extra 24 hours to support time offset shifts.
  * - used by the cache_getRecentEvents function to get the information needed to calculate the events taking the users time offset into account.
@@ -790,6 +794,7 @@ function getEventPoster($event_id)
  * Inserts events in to the calendar
  *
  * What it does:
+ *
  * - Consolidating the various INSERT statements into this function.
  * - inserts the passed event information into the calendar table.
  * - allows to either set a time span (in days) or an end_date.

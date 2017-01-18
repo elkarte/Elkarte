@@ -14,6 +14,7 @@
  * ElkArte autoloader
  *
  * What it does:
+ *
  * - Automatically finds and includes the files for a given class name
  * - Follows controller naming conventions to find the right file to load
  */

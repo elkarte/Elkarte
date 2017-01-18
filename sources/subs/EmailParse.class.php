@@ -15,6 +15,7 @@
  * Class to parse and email in to its header and body parts for use in posting
  *
  * What it does:
+ *
  * - Can read from a supplied string, stdin or from the failed email database
  * - Parses and decodes headers, return them in a named array $headers
  * - Parses, decodes and translates message body returns body and plain_body sections

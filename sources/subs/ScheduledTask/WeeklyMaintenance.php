@@ -21,6 +21,7 @@ namespace ElkArte\sources\subs\ScheduledTask;
  * Class Weekly_Maintenance - Weekly maintenance tasks
  *
  * What it does:
+ *
  * - remove empty or temporary settings
  * - prune logs
  * - obsolete paid subscriptions
