@@ -25,7 +25,7 @@
 $ssi_on_error_method = false;
 
 /**
- * Don't do john didley if the forum's been shut down competely.
+ * Don't do john didley if the forum's been shut down completely.
  */
 // $ssi_maintenance_off = false;
 
@@ -72,7 +72,7 @@ if (isset($_GET['ssi_function']) && function_exists('ssi_' . $_GET['ssi_function
 if (isset($_GET['ssi_function']))
 	exit;
 // You shouldn't just access SSI.php directly by URL!!
-elseif (basename($_SERVER['PHP_SELF']) == 'SSI.php')
+elseif (basename($_SERVER['PHP_SELF']) === 'SSI.php')
 	die(sprintf($txt['ssi_not_direct'], $user_info['is_admin'] ? '\'' . addslashes(__FILE__) . '\'' : '\'SSI.php\''));
 
 error_reporting($ssi_error_reporting);
@@ -88,7 +88,7 @@ return true;
  */
 function ssi_shutdown()
 {
-	if (!isset($_GET['ssi_function']) || $_GET['ssi_function'] != 'shutdown')
+	if (!isset($_GET['ssi_function']) || $_GET['ssi_function'] !== 'shutdown')
 		template_footer();
 }
 
@@ -103,7 +103,7 @@ function ssi_welcome($output_method = 'echo')
 {
 	global $context, $txt, $scripturl;
 
-	if ($output_method == 'echo')
+	if ($output_method === 'echo')
 	{
 		if ($context['user']['is_guest'])
 			echo replaceBasicActionUrl($txt[$context['can_register'] ? 'welcome_guest_register' : 'welcome_guest']);
@@ -125,7 +125,7 @@ function ssi_menubar($output_method = 'echo')
 {
 	global $context;
 
-	if ($output_method == 'echo')
+	if ($output_method === 'echo')
 		template_menu();
 	// What else could this do?
 	else
@@ -143,7 +143,7 @@ function ssi_logout($redirect_to = '', $output_method = 'echo')
 {
 	global $context, $txt, $scripturl;
 
-	if ($redirect_to != '')
+	if ($redirect_to !== '')
 		$_SESSION['logout_url'] = $redirect_to;
 
 	// Guests can't log out.
@@ -152,7 +152,7 @@ function ssi_logout($redirect_to = '', $output_method = 'echo')
 
 	$link = '<a href="' . $scripturl . '?action=logout;' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['logout'] . '</a>';
 
-	if ($output_method == 'echo')
+	if ($output_method === 'echo')
 		echo $link;
 	else
 		return $link;
@@ -216,7 +216,7 @@ function ssi_recentPosts($num_recent = 8, $exclude_boards = null, $include_board
  * Fetch a post with a particular ID.
  *
  * - By default will only show if you have permission to the see the board
- * in question - this can be overriden.
+ * in question - this can be overridden.
  *
  * @todo this may use getRecentPosts with some modification
  *
@@ -291,7 +291,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 			AND m.approved = {int:is_approved}' : '') . '
 		' . (empty($query_where) ? '' : 'AND ' . $query_where) . '
 		ORDER BY ' . $query_order . '
-		' . ($query_limit == '' ? '' : 'LIMIT ' . $query_limit),
+		' . ($query_limit === '' ? '' : 'LIMIT ' . $query_limit),
 		array_merge($query_where_params, array(
 			'current_member' => $user_info['id'],
 			'is_approved' => 1,
@@ -344,7 +344,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 	$db->free_result($request);
 
 	// Just return it.
-	if ($output_method != 'echo' || empty($posts))
+	if ($output_method !== 'echo' || empty($posts))
 		return $posts;
 
 	echo '
@@ -527,7 +527,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 	krsort($posts);
 
 	// Just return it.
-	if ($output_method != 'echo' || empty($posts))
+	if ($output_method !== 'echo' || empty($posts))
 		return $posts;
 
 	echo '
@@ -564,7 +564,7 @@ function ssi_topPoster($topNumber = 1, $output_method = 'echo')
 	$top_posters = topPosters($topNumber);
 
 	// Just return all the top posters.
-	if ($output_method != 'echo')
+	if ($output_method !== 'echo')
 		return $top_posters;
 
 	// Make a quick array to list the links in.
@@ -595,7 +595,7 @@ function ssi_topBoards($num_top = 10, $output_method = 'echo')
 		$boards[$id]['new'] = empty($board['is_read']);
 
 	// If we shouldn't output or have nothing to output, just jump out.
-	if ($output_method != 'echo' || empty($boards))
+	if ($output_method !== 'echo' || empty($boards))
 		return $boards;
 
 	echo '
@@ -645,7 +645,7 @@ function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'ec
 		$topics[$topic_id]['link'] = '<a href="' . $scripturl . '?topic=' . $row['id'] . '.0">' . $row['subject'] . '</a>';
 	}
 
-	if ($output_method != 'echo' || empty($topics))
+	if ($output_method !== 'echo' || empty($topics))
 		return $topics;
 
 	echo '
@@ -704,7 +704,7 @@ function ssi_latestMember($output_method = 'echo')
 {
 	global $txt, $context;
 
-	if ($output_method == 'echo')
+	if ($output_method === 'echo')
 		echo '
 	', sprintf($txt['welcome_newest_member'], $context['common_stats']['latest_member']['link']), '<br>';
 	else
@@ -723,7 +723,7 @@ function ssi_randomMember($random_type = '', $output_method = 'echo')
 	global $modSettings;
 
 	// If we're looking for something to stay the same each day then seed the generator.
-	if ($random_type == 'day')
+	if ($random_type === 'day')
 	{
 		// Set the seed to change only once per day.
 		mt_srand(floor(time() / 86400));
@@ -739,7 +739,7 @@ function ssi_randomMember($random_type = '', $output_method = 'echo')
 		$result = ssi_queryMembers('member_lesser_equal', $member_id, 1, 'id_member DESC', $output_method);
 
 	// Just to be sure put the random generator back to something... random.
-	if ($random_type != '')
+	if ($random_type !== '')
 		mt_srand(time());
 
 	return $result;
@@ -818,7 +818,7 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 	loadMemberData($members);
 
 	// Draw the table!
-	if ($output_method == 'echo')
+	if ($output_method === 'echo')
 		echo '
 		<table class="ssi_table">';
 
@@ -833,7 +833,7 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 		$query_members[$member] = $memberContext[$member];
 
 		// Only do something if we're echo'ing.
-		if ($output_method == 'echo')
+		if ($output_method === 'echo')
 			echo '
 			<tr>
 				<td class="centertext">
@@ -844,7 +844,7 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 	}
 
 	// End the table if appropriate.
-	if ($output_method == 'echo')
+	if ($output_method === 'echo')
 		echo '
 		</table>';
 
@@ -878,7 +878,7 @@ function ssi_boardStats($output_method = 'echo')
 		'categories' => numCategories(),
 	);
 
-	if ($output_method != 'echo')
+	if ($output_method !== 'echo')
 		return $totals;
 
 	echo '
@@ -908,7 +908,7 @@ function ssi_whosOnline($output_method = 'echo')
 	$return = getMembersOnlineStats($membersOnlineOptions);
 
 	// Add some redundancy for backwards compatibility reasons.
-	if ($output_method != 'echo')
+	if ($output_method !== 'echo')
 		return $return + array(
 			'users' => $return['users_online'],
 			'guests' => $return['num_guests'],
@@ -951,7 +951,7 @@ function ssi_logOnline($output_method = 'echo')
 {
 	writeLog();
 
-	if ($output_method != 'echo')
+	if ($output_method !== 'echo')
 		return ssi_whosOnline($output_method);
 	else
 		ssi_whosOnline($output_method);
@@ -968,10 +968,10 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 {
 	global $scripturl, $txt, $user_info, $modSettings, $context, $settings;
 
-	if ($redirect_to != '')
+	if ($redirect_to !== '')
 		$_SESSION['login_url'] = $redirect_to;
 
-	if ($output_method != 'echo' || !$user_info['is_guest'])
+	if ($output_method !== 'echo' || !$user_info['is_guest'])
 		return $user_info['is_guest'];
 
 	$context['default_username'] = isset($_POST['user']) ? preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($_POST['user'], ENT_COMPAT, 'UTF-8')) : '';
@@ -1022,7 +1022,7 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 	// Focus on the correct input - username or password.
 	echo '
 		<script>
-			document.forms.frmLogin.', isset($context['default_username']) && $context['default_username'] != '' ? 'passwrd' : 'user', '.focus();
+			document.forms.frmLogin.', isset($context['default_username']) && $context['default_username'] !== '' ? 'passwrd' : 'user', '.focus();
 		</script>';
 
 }
@@ -1158,7 +1158,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 
 	$return['allowed_warning'] = $row['max_votes'] > 1 ? sprintf($txt['poll_options6'], min(count($options), $row['max_votes'])) : '';
 
-	if ($output_method != 'echo')
+	if ($output_method !== 'echo')
 		return $return;
 
 	if ($allow_view_results)
@@ -1198,7 +1198,6 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 function ssi_showPoll($topicID = null, $output_method = 'echo')
 {
 	global $txt, $user_info, $context, $scripturl;
-	global $board;
 	static $last_board = null;
 
 	require_once(SUBSDIR . '/Poll.subs.php');
@@ -1240,7 +1239,7 @@ function ssi_showPoll($topicID = null, $output_method = 'echo')
 	$context['poll']['allow_view_results'] = $context['allow_poll_view'];
 	$context['poll']['topic'] = $topicID;
 
-	if ($output_method != 'echo')
+	if ($output_method !== 'echo')
 		return $context['poll'];
 
 	echo '
@@ -1369,7 +1368,7 @@ function ssi_quickSearch($output_method = 'echo')
 	if (!allowedTo('search_posts'))
 		return;
 
-	if ($output_method != 'echo')
+	if ($output_method !== 'echo')
 		return $scripturl . '?action=search';
 
 	echo '
@@ -1389,7 +1388,7 @@ function ssi_news($output_method = 'echo')
 {
 	global $context;
 
-	if ($output_method != 'echo')
+	if ($output_method !== 'echo')
 		return $context['random_news_line'];
 
 	echo $context['random_news_line'];
@@ -1414,7 +1413,7 @@ function ssi_todaysBirthdays($output_method = 'echo')
 	);
 	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
-	if ($output_method != 'echo')
+	if ($output_method !== 'echo')
 		return $return['calendar_birthdays'];
 
 	foreach ($return['calendar_birthdays'] as $member)
@@ -1441,7 +1440,7 @@ function ssi_todaysHolidays($output_method = 'echo')
 	);
 	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
-	if ($output_method != 'echo')
+	if ($output_method !== 'echo')
 		return $return['calendar_holidays'];
 
 	echo '
@@ -1467,7 +1466,7 @@ function ssi_todaysEvents($output_method = 'echo')
 	);
 	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
-	if ($output_method != 'echo')
+	if ($output_method !== 'echo')
 		return $return['calendar_events'];
 
 	foreach ($return['calendar_events'] as $event)
@@ -1501,7 +1500,7 @@ function ssi_todaysCalendar($output_method = 'echo')
 	);
 	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
-	if ($output_method != 'echo')
+	if ($output_method !== 'echo')
 		return $return;
 
 	if (!empty($return['calendar_holidays']))
@@ -1592,7 +1591,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 	);
 	if ($db->num_rows($request) == 0)
 	{
-		if ($output_method == 'echo')
+		if ($output_method === 'echo')
 			die($txt['ssi_no_guests']);
 		else
 			return array();
@@ -1665,7 +1664,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 
 	$return[count($return) - 1]['is_last'] = true;
 
-	if ($output_method != 'echo')
+	if ($output_method !== 'echo')
 		return $return;
 
 	foreach ($return as $news)
@@ -1727,7 +1726,7 @@ function ssi_recentEvents($max_events = 7, $output_method = 'echo')
 	foreach ($return as $mday => $array)
 		$return[$mday][count($array) - 1]['is_last'] = true;
 
-	if ($output_method != 'echo' || empty($return))
+	if ($output_method !== 'echo' || empty($return))
 		return $return;
 
 	// Well the output method is echo.
@@ -1870,7 +1869,7 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 	$db->free_result($request);
 
 	// So you just want an array?  Here you can have it.
-	if ($output_method == 'array' || empty($attachments))
+	if ($output_method === 'array' || empty($attachments))
 		return $attachments;
 
 	// Give them the default.
