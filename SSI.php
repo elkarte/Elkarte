@@ -170,7 +170,7 @@ function ssi_logout($redirect_to = '', $output_method = 'echo')
 		return false;
 	}
 
-	$link = '<a href="' . $scripturl . '?action=logout;' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['logout'] . '</a>';
+	$link = '<a class="linkbutton" href="' . $scripturl . '?action=logout;' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['logout'] . '</a>';
 
 	if ($output_method === 'echo')
 	{
@@ -509,9 +509,13 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 	// Find all the posts in distinct topics. Newer ones will have higher IDs.
 	$request = $db->query('substring', '
 		SELECT
-			ml.poster_time, mf.subject, mf.id_member AS id_op_member, ml.id_member, ml.id_msg, t.id_topic, t.num_replies, t.num_views, mg.online_color,
+			ml.poster_time, ml.id_member, ml.id_msg, ml.smileys_enabled, ml.icon,
+			mf.subject, mf.id_member AS id_op_member, 
+			t.id_topic, t.num_replies, t.num_views, t.id_last_msg, t.id_first_msg,
+			mg.online_color,
 			COALESCE(mem.real_name, ml.poster_name) AS poster_name,
-			COALESCE(memop.real_name, mf.poster_name) AS op_name, SUBSTRING(ml.body, 1, 384) AS body, ml.smileys_enabled, ml.icon
+			COALESCE(memop.real_name, mf.poster_name) AS op_name,
+			SUBSTRING(ml.body, 1, 384) AS body
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
 			INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
@@ -1105,8 +1109,9 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 	$context['default_username'] = isset($_POST['user']) ? preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($_POST['user'], ENT_COMPAT, 'UTF-8')) : '';
 
 	echo '
-		<script src="', $settings['default_theme_url'], '/scripts/sha256.js"></script>
+		<script src="', $settings['default_theme_url'], '/scripts/sha256.js"></script>';
 
+	echo '
 		<form action="', $scripturl, '?action=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
 		<div class="login centertext">
 			<div class="well">';
@@ -1129,9 +1134,13 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 	echo '
 				<dl>
 					<dt>', $txt['username'], ':</dt>
-					<dd><input type="text" name="user" size="20" value="', $context['default_username'], '" class="input_text" autofocus="autofocus" placeholder="', $txt['username'], '" /></dd>
+					<dd>
+						<input type="text" name="user" size="20" value="', $context['default_username'], '" class="input_text" autofocus="autofocus" placeholder="', $txt['username'], '" />
+					</dd>
 					<dt>', $txt['password'], ':</dt>
-					<dd><input type="password" name="passwrd" value="" size="20" class="input_password" placeholder="', $txt['password'], '" /></dd>
+					<dd>
+						<input type="password" name="passwrd" value="" size="20" class="input_password" placeholder="', $txt['password'], '" />
+					</dd>
 				</dl>';
 
 	if (!empty($modSettings['enableOpenID']))
@@ -1139,13 +1148,18 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 		echo '<p><strong>&mdash;', $txt['or'], '&mdash;</strong></p>
 				<dl>
 					<dt>', $txt['openid'], ':</dt>
-					<dd><input type="text" name="openid_identifier" class="input_text openid_login" size="17" />&nbsp;<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a></dd>
+					<dd>
+						<input type="text" name="openid_identifier" class="input_text openid_login" size="17" />
+						&nbsp;<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
+					</dd>
 				</dl>';
 	}
 
 	echo '
 				<input type="submit" value="', $txt['login'], '" />
-				<p class="smalltext"><a href="', $scripturl, '?action=reminder">', $txt['forgot_your_password'], '</a></p>
+				<p class="smalltext">
+					<a href="', $scripturl, '?action=reminder">', $txt['forgot_your_password'], '</a>
+				</p>
 				<input type="hidden" name="hash_passwrd" value="" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
@@ -1158,7 +1172,6 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 		<script>
 			document.forms.frmLogin.', isset($context['default_username']) && $context['default_username'] !== '' ? 'passwrd' : 'user', '.focus();
 		</script>';
-
 }
 
 /**
@@ -1844,6 +1857,8 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 		'include_avatars' => false,
 		'previews' => $length
 	);
+
+	require_once(SUBSDIR . '/MessageIndex.subs.php');
 	$request = messageIndexTopics($board, 0, $start, $limit, 'first_post', 't.id_topic', $indexOptions);
 
 	if (empty($request))
@@ -2155,7 +2170,7 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 				<td>', $attach['file']['filesize'], '</td>
 			</tr>';
 	}
-	
+
 	echo '
 		</table>';
 }
