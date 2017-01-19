@@ -71,6 +71,11 @@ class Reminder_Controller extends Action_Controller
 
 		// No where params just yet
 		$where_params = array();
+		$where = '';
+
+		// Clean them up
+		$_POST['user'] = isset($_POST['user']) ? Util::htmlspecialchars($_POST['user']) : '';
+		$_REQUEST['uid'] = (int) isset($_REQUEST['uid']) ? $_REQUEST['uid'] : 0;
 
 		// Coming with a known ID?
 		if (!empty($_REQUEST['uid']))
@@ -78,7 +83,7 @@ class Reminder_Controller extends Action_Controller
 			$where = 'id_member = {int:id_member}';
 			$where_params['id_member'] = (int) $_REQUEST['uid'];
 		}
-		elseif (isset($_POST['user']) && $_POST['user'] != '')
+		elseif ($_POST['user'] != '')
 		{
 			$where = 'member_name = {string:member_name}';
 			$where_params['member_name'] = $_POST['user'];
