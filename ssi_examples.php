@@ -57,118 +57,116 @@ template_ssi_above();
 	<p>Need more information on using SSI.php? Check out <a href="https://github.com/elkarte/Elkarte/wiki/SSI">Using SSI.php article</a> or <a href="http://www.elkarte.net/index.php">ask on the forum</a>.</p>
 
 	<div id="sidenav" class="content">
-		<div class="content">
-			<h2 id="functionlist">Function List</h2>
-			<h3>Recent Items</h3>
+		<h2 id="functionlist">Function List</h2>
+		<h3>Recent Items</h3>
+		<ul>
+			<li>
+				<a href="#" onclick="showSSIBlock('ssi_recentTopics');return false;">Recent Topics</a>
+			</li>
+			<li>
+				<a href="#" onclick="showSSIBlock('ssi_recentPosts');return false;">Recent Posts</a>
+			</li>
+			<li>
+				<a href="#" onclick="showSSIBlock('ssi_recentPoll');return false;">Recent Poll</a>
+			</li>
+		</ul>
+		<h3>Top Items</h3>
+		<ul>
+			<li>
+				<a href="#" onclick="showSSIBlock('ssi_topBoards');return false;">Top Boards</a>
+			</li>
+			<li>
+				<a href="#" onclick="showSSIBlock('ssi_topTopicsViews');return false;">Top Topics</a>
+			</li>
+			<li>
+				<a href="#" onclick="showSSIBlock('ssi_topPoll');return false;">Top Poll</a>
+			</li>
+			<li>
+				<a href="#" onclick="showSSIBlock('ssi_topPoster');return false;">Top Poster</a>
+			</li>
+		</ul>
+		<h3>Members</h3>
+		<ul>
+			<li>
+				<a href="#" onclick="showSSIBlock('ssi_latestMember');return false;">Latest Member Function</a>
+			</li>
+			<li>
+				<a href="#" onclick="showSSIBlock('ssi_randomMember');return false;">Member of the Day</a>
+			</li>
+			<li>
+				<a href="#" onclick="showSSIBlock('ssi_whosOnline');return false;">Who's Online</a>
+			</li>
+		</ul>
+		<h3>Authentication</h3>
+		<ul>
+			<li>
+				<a href="#" onclick="showSSIBlock('ssi_login');return false;">Welcome, Login &amp; Logout</a>
+			</li>
+		</ul>
+		<h3>Calendar</h3>
+		<ul>
+			<li>
+				<a href="#" onclick="showSSIBlock('ssi_todaysCalendar');return false;">Today's Events</a>
+			</li>
+			<li>
+				<a href="#" onclick="showSSIBlock('ssi_recentEvents');return false;">Recent Events</a>
+			</li>
+		</ul>
+		<h3>Miscellaneous</h3>
+		<ul>
+			<li>
+				<a href="#" onclick="showSSIBlock('ssi_boardStats');return false;">Forum Stats</a>
+			</li>
+			<li>
+				<a href="#" onclick="showSSIBlock('ssi_news');return false;">News</a>
+			</li>
+			<li>
+				<a href="#" onclick="showSSIBlock('ssi_boardNews');return false;">Board News</a>
+			</li>
+			<li>
+				<a href="#" onclick="showSSIBlock('ssi_menubar');return false;">Menubar</a>
+			</li>
+			<li>
+				<a href="#" onclick="showSSIBlock('ssi_quickSearch');return false;">Quick Search Box</a>
+			</li>
+			<li>
+				<a href="#" onclick="showSSIBlock('ssi_recentAttachments');return false;">Recent Attachments</a>
+			</li>
+		</ul>
+		<?php if ($user_info['is_admin'])
+		{
+			?>
+			<h3>Advanced Functions <i class="helpicon i-help" title="Functions that require additional tweaking, not just copy and paste."></i></h3>
 			<ul>
 				<li>
-					<a href="#" onclick="showSSIBlock('ssi_recentTopics');return false;">Recent Topics</a>
+					<a href="#" onclick="showSSIBlock('ssi_showPoll');return false;">Show Single Poll</a>
 				</li>
 				<li>
-					<a href="#" onclick="showSSIBlock('ssi_recentPosts');return false;">Recent Posts</a>
+					<a href="#" onclick="showSSIBlock('ssi_fetchPosts');return false;">Show Single Post</a>
 				</li>
 				<li>
-					<a href="#" onclick="showSSIBlock('ssi_recentPoll');return false;">Recent Poll</a>
+					<a href="#" onclick="showSSIBlock('ssi_fetchMember');return false;">Show Single Member</a>
+				</li>
+				<li>
+					<a href="#" onclick="showSSIBlock('ssi_fetchGroupMembers');return false;">Show Group Members</a>
 				</li>
 			</ul>
-			<h3>Top Items</h3>
-			<ul>
-				<li>
-					<a href="#" onclick="showSSIBlock('ssi_topBoards');return false;">Top Boards</a>
-				</li>
-				<li>
-					<a href="#" onclick="showSSIBlock('ssi_topTopicsViews');return false;">Top Topics</a>
-				</li>
-				<li>
-					<a href="#" onclick="showSSIBlock('ssi_topPoll');return false;">Top Poll</a>
-				</li>
-				<li>
-					<a href="#" onclick="showSSIBlock('ssi_topPoster');return false;">Top Poster</a>
-				</li>
-			</ul>
-			<h3>Members</h3>
-			<ul>
-				<li>
-					<a href="#" onclick="showSSIBlock('ssi_latestMember');return false;">Latest Member Function</a>
-				</li>
-				<li>
-					<a href="#" onclick="showSSIBlock('ssi_randomMember');return false;">Member of the Day</a>
-				</li>
-				<li>
-					<a href="#" onclick="showSSIBlock('ssi_whosOnline');return false;">Who's Online</a>
-				</li>
-			</ul>
-			<h3>Authentication</h3>
-			<ul>
-				<li>
-					<a href="#" onclick="showSSIBlock('ssi_login');return false;">Welcome, Login &amp; Logout</a>
-				</li>
-			</ul>
-			<h3>Calendar</h3>
-			<ul>
-				<li>
-					<a href="#" onclick="showSSIBlock('ssi_todaysCalendar');return false;">Today's Events</a>
-				</li>
-				<li>
-					<a href="#" onclick="showSSIBlock('ssi_recentEvents');return false;">Recent Events</a>
-				</li>
-			</ul>
-			<h3>Miscellaneous</h3>
-			<ul>
-				<li>
-					<a href="#" onclick="showSSIBlock('ssi_boardStats');return false;">Forum Stats</a>
-				</li>
-				<li>
-					<a href="#" onclick="showSSIBlock('ssi_news');return false;">News</a>
-				</li>
-				<li>
-					<a href="#" onclick="showSSIBlock('ssi_boardNews');return false;">Board News</a>
-				</li>
-				<li>
-					<a href="#" onclick="showSSIBlock('ssi_menubar');return false;">Menubar</a>
-				</li>
-				<li>
-					<a href="#" onclick="showSSIBlock('ssi_quickSearch');return false;">Quick Search Box</a>
-				</li>
-				<li>
-					<a href="#" onclick="showSSIBlock('ssi_recentAttachments');return false;">Recent Attachments</a>
-				</li>
-			</ul>
-			<?php if ($user_info['is_admin'])
-			{
-				?>
-				<h3>Advanced Functions <i class="helpicon i-help" title="Functions that require additional tweaking, not just copy and paste."></i></h3>
-				<ul>
-					<li>
-						<a href="#" onclick="showSSIBlock('ssi_showPoll');return false;">Show Single Poll</a>
-					</li>
-					<li>
-						<a href="#" onclick="showSSIBlock('ssi_fetchPosts');return false;">Show Single Post</a>
-					</li>
-					<li>
-						<a href="#" onclick="showSSIBlock('ssi_fetchMember');return false;">Show Single Member</a>
-					</li>
-					<li>
-						<a href="#" onclick="showSSIBlock('ssi_fetchGroupMembers');return false;">Show Group Members</a>
-					</li>
-				</ul>
-			<?php } ?>
-			<h3>Website Samples</h3>
-			<ul>
-				<li>
-					<a href="#" onclick="showSSIBlock('htmlhome');">Sample 1</a>
-				</li>
-			</ul>
-			<h2 id="other">Other</h2>
-			<ul>
-				<li>
-					<a href="#" onclick="toggleVisibleByClass('ssi_preview', false);return false;">Show all examples</a>
-				</li>
-				<li>
-					<a href="#" onclick="toggleVisibleByClass('ssi_preview', true);return false;">Hide all examples</a>
-				</li>
-			</ul>
-		</div>
+		<?php } ?>
+		<h3>Website Samples</h3>
+		<ul>
+			<li>
+				<a href="#" onclick="showSSIBlock('htmlhome');">Sample 1</a>
+			</li>
+		</ul>
+		<h2 id="other">Other</h2>
+		<ul>
+			<li>
+				<a href="#" onclick="toggleVisibleByClass('ssi_preview', false);return false;">Show all examples</a>
+			</li>
+			<li>
+				<a href="#" onclick="toggleVisibleByClass('ssi_preview', true);return false;">Hide all examples</a>
+			</li>
+		</ul>
 	</div>
 
 	<div id="preview" class="content">
