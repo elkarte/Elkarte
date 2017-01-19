@@ -1827,9 +1827,11 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 		FROM {db_prefix}boards
 		WHERE ' . ($board === null ? '' : 'id_board = {int:current_board}
 			AND ') . 'FIND_IN_SET(-1, member_groups) != 0
+			AND redirect = {string:blank_redirect}
 		LIMIT 1',
 		array(
 			'current_board' => $board,
+			'blank_redirect' => '',
 		)
 	);
 	if ($db->num_rows($request) == 0)
