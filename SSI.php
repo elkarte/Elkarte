@@ -437,7 +437,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 	// Count number of new posts per topic.
 	if (!$user_info['is_guest'])
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT
 				m.id_topic, COALESCE(lt.id_msg, lmr.id_msg, -2) + 1 AS new_from
 			FROM {db_prefix}messages AS m
