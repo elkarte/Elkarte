@@ -532,14 +532,12 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 	while ($row = $db->fetch_assoc($request))
 	{
 		$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), array('<br>' => '&#10;')));
-		if (Util::strlen($row['body']) > 128)
-		{
-			$row['body'] = Util::substr($row['body'], 0, 128) . '...';
-		}
 
-		// Censor the subject.
+		// Censor the subject and body.
 		$row['subject'] = censor($row['subject']);
 		$row['body'] = censor($row['body']);
+
+		$row['body'] = Util::shorten_text($row['body'], 128);
 
 		// Build the array.
 		$posts[$row['id_last_msg']] = array(
