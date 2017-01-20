@@ -1,6 +1,6 @@
 html, body, p, code:before, table {
 	margin: 0;
-	padding: 0 0 0 0;
+	padding: 0;
 	color: #444;
 }
 html {
