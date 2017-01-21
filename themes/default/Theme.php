@@ -53,17 +53,9 @@ class Theme extends \Theme
 			header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 			header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
 
-			if ($this->headerSent('Content-Type') === false)
+			if ($this->headerSent('Content-Type') === false && (!isset($_REQUEST['xml']) && !isset($_REQUEST['api'])))
 			{
-				// Are we debugging the template/html content?
-				if ((!isset($_REQUEST['xml']) && !isset($_REQUEST['api'])) && isset($_GET['debug']) && !isBrowser('ie'))
-				{
-					header('Content-Type: application/xhtml+xml');
-				}
-				elseif (!isset($_REQUEST['xml']) && !isset($_REQUEST['api']))
-				{
-					header('Content-Type: text/html; charset=UTF-8');
-				}
+				header('Content-Type: text/html; charset=UTF-8');
 			}
 		}
 
