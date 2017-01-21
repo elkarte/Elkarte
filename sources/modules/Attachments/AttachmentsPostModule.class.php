@@ -114,6 +114,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * would be insane.  What needs to be done is have this bowl of spaghetti fixed.
 	 *
 	 * What it does:
+	 *
 	 * - Infuriates anyone trying to read the code or follow the execution path
 	 * - Causes hallucinations and sleepless nights
 	 * - Known to induce binge drinking
@@ -121,6 +122,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * @param bool $show_additional_options
 	 * @param int $board
 	 * @param int $topic
+	 * @throws Elk_Exception
 	 */
 	public function finalize_post_form(&$show_additional_options, $board, $topic)
 	{
@@ -330,6 +332,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * Save attachments when the post is saved
 	 *
 	 * @param ErrorContext $post_errors
+	 * @throws Elk_Exception
 	 */
 	public function prepare_save_post($post_errors)
 	{
@@ -346,6 +349,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * Handles both the saving and removing of attachments on post save
 	 *
 	 * @param int $msg
+	 * @throws Elk_Exception
 	 */
 	protected function saveAttachments($msg)
 	{

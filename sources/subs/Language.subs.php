@@ -48,6 +48,7 @@ function list_getNumLanguages()
  * Fetch the actual language information.
  *
  * What it does:
+ *
  * - Callback for $listOptions['get_items']['function'] in action_edit.
  * - Determines which languages are available by looking for the "index.{language}.php" file.
  * - Also figures out how many users are using a particular language.

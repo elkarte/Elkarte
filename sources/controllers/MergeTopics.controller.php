@@ -27,6 +27,7 @@ class MergeTopics_Controller extends Action_Controller
 	 * Merges two or more topics into one topic.
 	 *
 	 * What it does:
+	 *
 	 * - delegates to the other functions (based on the URL parameter sa).
 	 * - loads the MergeTopics template.
 	 * - requires the merge_any permission.
@@ -59,6 +60,7 @@ class MergeTopics_Controller extends Action_Controller
 	 * Allows to pick a topic to merge the current topic with.
 	 *
 	 * What it does:
+	 *
 	 * - is accessed with ?action=mergetopics;sa=index
 	 * - default sub action for ?action=mergetopics.
 	 * - uses 'merge' sub template of the MergeTopics template.

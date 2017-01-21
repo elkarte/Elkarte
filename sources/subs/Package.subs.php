@@ -282,6 +282,7 @@ function getPackageInfo($gzfilename)
  * @param mixed[] $chmodOptions
  * @param boolean $restore_write_status
  * @return array|boolean
+ * @throws Elk_Exception
  */
 function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $restore_write_status = false)
 {
@@ -599,6 +600,7 @@ function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
  * @param string $destination_url
  * @param string[]|null $files = none
  * @param bool $return = false
+ * @throws Elk_Exception
  */
 function packageRequireFTP($destination_url, $files = null, $return = false)
 {
@@ -791,6 +793,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
  * Parses the actions in package-info.xml file from packages.
  *
  * What it does:
+ *
  * - Package should be an Xml_Array with package-info as its base.
  * - Testing_only should be true if the package should not actually be applied.
  * - Method can be upgrade, install, or uninstall.  Its default is install.
@@ -1469,6 +1472,7 @@ function parse_path($path)
  * Deletes all the files in a directory, and all the files in sub directories inside it.
  *
  * What it does:
+ *
  * - Requires access to delete these files.
  * - Recursively goes in to all sub directories looking for files to delete
  * - Optionally removes the directory as well, otherwise will leave an empty tree behind

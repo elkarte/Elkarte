@@ -23,6 +23,10 @@ abstract class Abstract_Module implements Module_Interface
 {
 	protected $_req = null;
 
+	/**
+	 * Abstract_Module constructor.
+	 * @param \HttpReq $req
+	 */
 	public function __construct(\HttpReq $req)
 	{
 		$this->_req = $req;

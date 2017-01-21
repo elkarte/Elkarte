@@ -489,6 +489,7 @@ function modifyBoard($board_id, &$boardOptions)
  * @package Boards
  * @param mixed[] $boardOptions
  * @return int The new board id
+ * @throws Elk_Exception
  */
 function createBoard($boardOptions)
 {
@@ -583,6 +584,7 @@ function createBoard($boardOptions)
  * @package Boards
  * @param int[] $boards_to_remove
  * @param int|null $moveChildrenTo = null
+ * @throws Elk_Exception
  */
 function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 {

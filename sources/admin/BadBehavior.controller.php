@@ -32,6 +32,7 @@ class BadBehavior_Controller extends Action_Controller
 	 * View the forum's badbehavior log.
 	 *
 	 * What it does:
+	 *
 	 * - This function sets all the context up to show the badbehavior log for review.
 	 * - It requires the maintain_forum permission.
 	 * - It is accessed from ?action=admin;area=logs;sa=badbehaviorlog.
@@ -200,6 +201,7 @@ class BadBehavior_Controller extends Action_Controller
 	 * Performs the removal of one or multiple log entries
 	 *
 	 * @param array $filter - an array describing the current filter
+	 * @throws Elk_Exception
 	 */
 	protected function _action_delete($filter)
 	{

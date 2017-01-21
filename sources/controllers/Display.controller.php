@@ -87,6 +87,7 @@ class Display_Controller extends Action_Controller
 	 * The central part of the board - topic display.
 	 *
 	 * What it does:
+	 *
 	 * - This function loads the posts in a topic up so they can be displayed.
 	 * - It requires a topic, and can go to the previous or next topic from it.
 	 * - It jumps to the correct post depending on a number/time/IS_MSG passed.

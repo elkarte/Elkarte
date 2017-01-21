@@ -22,6 +22,7 @@
  * Removes the passed id_topic's checking for permissions.
  *
  * @param int[]|int $topics The topics to remove (can be an id or an array of ids).
+ * @throws Elk_Exception
  */
 function removeTopicsPermissions($topics)
 {
@@ -50,13 +51,15 @@ function removeTopicsPermissions($topics)
 
 /**
  * Removes the passed id_topic's.
- * Permissions are NOT checked here because the function is used in a scheduled task
+ *
+ * - Permissions are NOT checked here because the function is used in a scheduled task
  *
  * @param int[]|int $topics The topics to remove (can be an id or an array of ids).
  * @param bool $decreasePostCount if true users' post count will be reduced
  * @param bool $ignoreRecycling if true topics are not moved to the recycle board (if it exists).
  * @param bool $log if true logs the action.
  * @param int[] $removeCacheBoards an array matching topics and boards.
+ * @throws Elk_Exception
  */
 function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = false, $log = false, $removeCacheBoards = array())
 {
@@ -435,6 +438,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
  * Moves lots of topics to a specific board and checks if the user can move them
  *
  * @param array $moveCache [0] => int[] is the topic, [1] => int[]  is the board to move to.
+ * @throws Elk_Exception
  */
 function moveTopicsPermissions($moveCache)
 {
@@ -529,14 +533,18 @@ function moveTopicsPermissions($moveCache)
 
 /**
  * Moves one or more topics to a specific board.
- * Determines the source boards for the supplied topics
- * Handles the moving of mark_read data
- * Updates the posts count of the affected boards
- * This function doesn't check permissions.
+ *
+ * What it does:
+ *
+ * - Determines the source boards for the supplied topics
+ * - Handles the moving of mark_read data
+ * - Updates the posts count of the affected boards
+ * - This function doesn't check permissions.
  *
  * @param int[]|int $topics
  * @param int $toBoard
  * @param bool $log if true logs the action.
+ * @throws Elk_Exception
  */
 function moveTopics($topics, $toBoard, $log = false)
 {
@@ -1382,6 +1390,7 @@ function getTopicInfoByMsg($topic, $msg = null)
  * @param string $delete_type
  * @param boolean $exclude_stickies
  * @param int $older_than
+ * @throws Elk_Exception
  */
 function removeOldTopics(array $boards, $delete_type, $exclude_stickies, $older_than)
 {
@@ -2030,6 +2039,7 @@ function topicsDetails($topics)
  * @param int[] $topics
  * @param bool $log If true the action is logged
  * @return int Number of topics toggled
+ * @throws Elk_Exception
  */
 function toggleTopicSticky($topics, $log = false)
 {
@@ -2197,6 +2207,7 @@ function getTopicsPostsAndPoster($topic, $limit, $sort)
  * @param int[] $messages
  * @param mixed[] $messageDetails
  * @param string $type = replies
+ * @throws Elk_Exception
  */
 function removeMessages($messages, $messageDetails, $type = 'replies')
 {
@@ -2232,6 +2243,7 @@ function removeMessages($messages, $messageDetails, $type = 'replies')
  * @param int[] $messages
  * @param mixed[] $messageDetails
  * @param string $type = replies
+ * @throws Elk_Exception
  */
 function approveMessages($messages, $messageDetails, $type = 'replies')
 {
@@ -2256,6 +2268,7 @@ function approveMessages($messages, $messageDetails, $type = 'replies')
  * @param int[] $topics array of topics ids
  * @param bool $approve = true
  * @param bool $log if true logs the action.
+ * @throws Elk_Exception
  */
 function approveTopics($topics, $approve = true, $log = false)
 {
@@ -2322,6 +2335,7 @@ function approveTopics($topics, $approve = true, $log = false)
  * @param string $subject the text that will become the message subject
  * @param mixed[] $board_info some board information (at least id, name, if posts are counted)
  * @param string $new_topic used to build the url for moving to a new topic
+ * @throws Elk_Exception
  */
 function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 {
@@ -2632,6 +2646,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
  *
  * @param mixed[] $boards an array containing basic info of the origin and destination boards (from splitDestinationBoard)
  * @param int $totopic id of the destination topic
+ * @throws Elk_Exception
  */
 function splitAttemptMove($boards, $totopic)
 {
@@ -3233,6 +3248,7 @@ function updateTopicStats($increment = null)
  *
  * @param int[] $topics The topics to lock (can be an id or an array of ids).
  * @param bool $log if true logs the action.
+ * @throws Elk_Exception
  */
 function toggleTopicsLock($topics, $log = false)
 {

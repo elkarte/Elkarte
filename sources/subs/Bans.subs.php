@@ -19,6 +19,7 @@
  * Saves one or more ban triggers into a ban item: according to the suggestions
  *
  * What it does:
+ *
  * - Checks the $_POST variable to verify if the trigger is present
  * - Load triggers in to an array for validation
  * - Validates and saves/updates the triggers for a given ban
@@ -92,6 +93,7 @@ function saveTriggers($suggestions, $ban_group, $member = 0, $trigger_id = 0)
  * This function removes a batch of triggers based on ids
  *
  * What it does:
+ *
  * - Doesn't clean the inputs, expects valid input
  * - Removes the ban triggers by id or group
  *
@@ -148,6 +150,7 @@ function removeBanTriggers($items_ids = array(), $group_id = false)
  * This function removes a batch of ban groups based on ids
  *
  * What it does:
+ *
  * - Doesn't clean the inputs
  * - Removes entries from the ban group list, one or many
  *
@@ -182,6 +185,7 @@ function removeBanGroups($group_ids)
  * Removes ban logs
  *
  * What it does:
+ *
  * - By default (no id's passed) truncate the table
  * - Doesn't clean the inputs
  *
@@ -642,6 +646,7 @@ function updateBanGroup($ban_info = array())
  * Creates a new ban group
  *
  * What it does:
+ *
  * - If a ban group with the same name already exists or the group s successfully created the ID is returned
  * - On error the error code is returned or false
  *
@@ -766,6 +771,7 @@ function range2ip($low, $high)
  * Checks whether a given IP range already exists in the trigger list.
  *
  * What it does:
+ *
  * - If yes, it returns an error message.
  * - Otherwise, it returns an array
  * - optimized for the database.
@@ -836,6 +842,7 @@ function validateIPBan($ip_array, $fullip = '')
  * Checks whether a given IP range already exists in the trigger list.
  *
  * What it does:
+ *
  * - If yes, it returns an error message.
  * - Otherwise, it returns an array
  * - optimized for the database.

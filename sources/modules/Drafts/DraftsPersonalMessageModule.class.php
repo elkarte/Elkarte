@@ -160,6 +160,7 @@ class Drafts_PersonalMessage_Module extends ElkArte\sources\modules\Abstract_Mod
 	 * Loads in a group of PM drafts for the user.
 	 *
 	 * What it does:
+	 *
 	 * - Loads a specific draft for current use in pm editing box if selected.
 	 * - Used in the posting screens to allow draft selection
 	 * - Will load a draft if selected is supplied via post
@@ -189,6 +190,7 @@ class Drafts_PersonalMessage_Module extends ElkArte\sources\modules\Abstract_Mod
 	 * Loads in a group of PM drafts for the user.
 	 *
 	 * What it does:
+	 *
 	 * - Loads a specific draft for current use in pm editing box if selected.
 	 * - Used in the posting screens to allow draft selection
 	 * - Will load a draft if selected is supplied via post
@@ -312,6 +314,7 @@ class Drafts_PersonalMessage_Module extends ElkArte\sources\modules\Abstract_Mod
 	 * @param array $recipientList
 	 *
 	 * @throws Controller_Redirect_Exception
+	 * @throws Elk_Exception
 	 */
 	public function before_sending($recipientList)
 	{

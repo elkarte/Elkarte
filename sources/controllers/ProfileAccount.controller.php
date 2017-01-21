@@ -378,6 +378,7 @@ class ProfileAccount_Controller extends Action_Controller
 	 * Does the actual issuing of a warning to a member
 	 *
 	 * What it does:
+	 *
 	 * - Validates the inputs
 	 * - Sends the warning PM if required, to the member
 	 * - Logs the action
@@ -463,6 +464,7 @@ class ProfileAccount_Controller extends Action_Controller
 	 * Issue a pm to the member getting the warning
 	 *
 	 * @return int
+	 * @throws Elk_Exception
 	 */
 	private function _issue_warning_pm()
 	{

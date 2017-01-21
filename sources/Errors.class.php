@@ -23,7 +23,7 @@ class Errors
 	/**
 	 * Retrieve the sole instance of this class.
 	 *
-	 * @return Errors
+	 * @return E
 	 */
 	public static function instance()
 	{

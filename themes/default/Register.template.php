@@ -379,7 +379,7 @@ function template_registration_form()
 			</fieldset>';
 	}
 
-	if ($context['visual_verification'])
+	if (isset($context['visual_verification']))
 	{
 		template_verification_controls($context['visual_verification_id'], '
 			<h2 class="category_header">' . $txt['verification'] . '</h2>

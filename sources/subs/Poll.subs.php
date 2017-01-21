@@ -267,6 +267,7 @@ function topicFromPoll($pollID)
  * Return poll options, customized for a given member.
  *
  * What it does:
+ *
  * - The function adds to poll options the information if the user
  * has voted in this poll.
  * - It censors the label in the result array.

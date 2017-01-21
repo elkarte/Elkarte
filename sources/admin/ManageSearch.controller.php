@@ -27,6 +27,7 @@ class ManageSearch_Controller extends Action_Controller
 	 * Main entry point for the admin search settings screen.
 	 *
 	 * What it does:
+	 *
 	 * - It checks permissions, and it forwards to the appropriate function based on
 	 * the given sub-action.
 	 * - Defaults to sub-action 'settings'.
@@ -273,6 +274,7 @@ class ManageSearch_Controller extends Action_Controller
 	 * Edit the search method and search index used.
 	 *
 	 * What it does:
+	 *
 	 * - Calculates the size of the current search indexes in use.
 	 * - Allows to create and delete a fulltext index on the messages table.
 	 * - Allows to delete a custom index (that action_create() created).
@@ -408,6 +410,7 @@ class ManageSearch_Controller extends Action_Controller
 	 * Create a custom search index for the messages table.
 	 *
 	 * What it does:
+	 *
 	 * - Called by ?action=admin;area=managesearch;sa=createmsgindex.
 	 * - Linked from the action_edit screen.
 	 * - Requires the admin_forum permission.

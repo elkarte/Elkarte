@@ -212,6 +212,7 @@ class UnTgz
 	 * Reads the archive file header
 	 *
 	 * What it does:
+	 *
 	 * - validates that the file is a tar.gz
 	 * - validates that its compressed with deflate
 	 * - processes header information so we can set the start of archive data

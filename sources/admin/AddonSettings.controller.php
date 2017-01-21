@@ -137,6 +137,7 @@ class AddonSettings_Controller extends Action_Controller
 	 *
 	 * @param mixed[] $subActions An array containing all possible subactions.
 	 * @param string $defaultAction the default action to be called if no valid subaction was found.
+	 * @throws Elk_Exception
 	 */
 	public function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')
 	{

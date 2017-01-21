@@ -216,6 +216,7 @@ function deleteMembergroups($groups)
  * @param bool $permissionCheckDone = false
  *
  * @return boolean
+ * @throws Elk_Exception
  */
 function removeMembersFromGroups($members, $groups = null, $permissionCheckDone = false)
 {
@@ -422,6 +423,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
  *                     available. If not, assign it to the additional group.
  * @param bool $permissionCheckDone = false if true, it checks permission of the current user to add groups ('manage_membergroups')
  * @return boolean success or failure
+ * @throws Elk_Exception
  */
 function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDone = false)
 {

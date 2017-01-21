@@ -115,6 +115,7 @@ class HttpReq
 	 * what function cleanRequest() does.
 	 *
 	 * What it does:
+	 *
 	 * - Finds items added by cleanRequest to $_REQUEST
 	 * - Adds the above to both $_POST and $_GET
 	 * - Looks for duplicate items in $_REQUEST and $_POST and uses the $_REQUEST
@@ -146,6 +147,7 @@ class HttpReq
 	 * Looks for the post value "jsonString" and expands values to POST
 	 *
 	 * What it does:
+	 *
 	 * - Looks for jsonString passed in post
 	 * - json decodes the string and loads its values in to POST
 	 * - Does *not* overwrite any existing keys

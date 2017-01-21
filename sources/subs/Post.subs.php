@@ -57,6 +57,7 @@ function un_preparsecode($message)
  * @param mixed[] $msgOptions
  * @param mixed[] $topicOptions
  * @param mixed[] $posterOptions
+ * @throws Elk_Exception
  */
 function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
@@ -418,6 +419,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
  * @param mixed[] $msgOptions
  * @param mixed[] $topicOptions
  * @param mixed[] $posterOptions
+ * @throws Elk_Exception
  */
 function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
@@ -563,6 +565,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
  * @package Posts
  * @param int|int[] $msgs - array of message ids
  * @param bool $approve = true
+ * @throws Elk_Exception
  */
 function approvePosts($msgs, $approve = true)
 {
@@ -811,6 +814,7 @@ function approvePosts($msgs, $approve = true)
  * @package Posts
  * @param int[]|int $setboards
  * @param int $id_msg = 0
+ * @throws Elk_Exception
  */
 function updateLastMessages($setboards, $id_msg = 0)
 {
@@ -1004,6 +1008,7 @@ function lastPost()
  * Prepares a post subject for the post form
  *
  * What it does:
+ *
  * - Will add the appropriate Re: to the post subject if its a reply to an existing post
  * - If quoting a post, or editing a post, this function also prepares the message body
  * - if editing is true, returns $message|$message[errors], else returns array($subject, $message)

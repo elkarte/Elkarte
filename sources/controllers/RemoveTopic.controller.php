@@ -54,6 +54,7 @@ class RemoveTopic_Controller extends Action_Controller
 	 * Completely remove an entire topic.
 	 *
 	 * What it does:
+	 *
 	 * - Redirects to the board when completed.
 	 * - Accessed by ?action=removetopic2
 	 * - Removes a topic if it has not already been removed.
@@ -172,6 +173,7 @@ class RemoveTopic_Controller extends Action_Controller
 	 * Move back a topic or post from the recycle board to its original board.
 	 *
 	 * What it does:
+	 *
 	 * - Merges back the posts to the original as necessary.
 	 * - Accessed by ?action=restoretopic
 	 */
@@ -275,6 +277,7 @@ class RemoveTopic_Controller extends Action_Controller
 	 * After deleting a message(s) returns the user to the best possible location
 	 *
 	 * @param bool $full_topic if the entire topic was removed
+	 * @throws Elk_Exception
 	 */
 	private function _redirectBack($full_topic)
 	{

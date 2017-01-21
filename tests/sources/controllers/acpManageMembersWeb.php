@@ -38,10 +38,10 @@ class TestManageMembers_Controller extends ElkArteWebTest
 
 		// Let's do it: approve/delete...
 		$this->assertContains('new accounts', $this->byCssSelector('.additional_row a:last-child')->text());
-		$this->byCssSelector('.additional_row a:last-child')->click();
+		$this->clickit('.additional_row a:last-child');
 		$this->assertContains($mname, $this->byCssSelector('#list_approve_list_0')->text());
-		$this->byCssSelector('#list_approve_list_0 input')->click();
-		$this->byCssSelector('select[name=todo] option[value=' . $el . ']')->click();
+		$this->clickit('#list_approve_list_0 input');
+		$this->clickit('select[name=todo] option[value=' . $el . ']');
 		$this->assertContains('all selected members?', $this->alertText());
 		$this->acceptAlert();
 	}
@@ -58,7 +58,7 @@ class TestManageMembers_Controller extends ElkArteWebTest
 		$this->url('index.php?action=admin;area=viewmembers;sa=search');
 		$this->byId('activated-1')->click();
 		$this->byId('activated-2')->click();
-		$this->byCssSelector('input[value=Search]')->click();
+		$this->clickit('input[value=Search]');
 		$this->assertContains('user1', $this->byId('member_list')->text());
 	}
 

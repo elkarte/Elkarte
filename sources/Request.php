@@ -15,6 +15,7 @@
  * Class to parse $_REQUEST for always necessary data, such as 'action', 'board', 'topic', 'start'.
  *
  * What it does:
+ *
  * - Sanitizes the necessary data
  * - Determines the origin of $_REQUEST for use in security checks
  */
@@ -351,6 +352,7 @@ final class Request
 	 * Clean the request variables - add html entities to GET and slashes if magic_quotes_gpc is Off.
 	 *
 	 * What it does:
+	 *
 	 * - cleans the request variables (ENV, GET, POST, COOKIE, SERVER) and
 	 *   makes sure the query string was parsed correctly.
 	 * - handles the URLs passed by the queryless URLs option.

@@ -26,6 +26,7 @@ class ManagePosts_Controller extends Action_Controller
 	 * The main entrance point for the 'Posts and topics' screen.
 	 *
 	 * What it does:
+	 *
 	 * - Like all others, it checks permissions, then forwards to the right function
 	 * based on the given sub-action.
 	 * - Defaults to sub-action 'posts'.

@@ -53,6 +53,7 @@ interface AdapterInterface
 	 * It will put them in Settings.php or in the settings table.
 	 *
 	 * What it does:
+	 *
 	 * - Used to save those settings set from ?action=admin;area=serversettings.
 	 * - Requires the admin_forum permission.
 	 * - Contains arrays of the types of data to save into Settings.php.

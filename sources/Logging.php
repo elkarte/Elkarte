@@ -127,6 +127,7 @@ function writeLog($force = false)
  * Logs the last database error into a file.
  *
  * What it does:
+ *
  * - Attempts to use the backup file first, to store the last database error
  * - only updates db_last_error.txt if the first was successful.
  */
@@ -165,6 +166,7 @@ function logLastDatabaseError()
  * Track Statistics.
  *
  * What it does:
+ *
  * - Caches statistics changes, and flushes them if you pass nothing.
  * - If '+' is used as a value, it will be incremented.
  * - It does not actually commit the changes until the end of the page view.

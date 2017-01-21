@@ -75,6 +75,7 @@ class Post_Controller extends Action_Controller
 	 * display of errors and polls.
 	 *
 	 * What it does:
+	 *
 	 * - Validates that we're posting in a board.
 	 * - Find the topic id if a message id is passed, else assume it's a new message
 	 * - Get the response prefix in the default forum language.
@@ -638,6 +639,7 @@ class Post_Controller extends Action_Controller
 	 * Posts or saves the message composed with Post().
 	 *
 	 * What it does:
+	 *
 	 * - Requires various permissions depending on the action.
 	 * - Handles attachment, post, and calendar saving.
 	 * - Sends off notifications, and allows for announcements and moderation.

@@ -19,6 +19,7 @@
  * This class takes care of the Core Features admin screen.
  *
  * What it does:
+ *
  * - It sets up the context, initializes the features info for display
  * - updates the settings for enabled/disabled core features as requested.
  * - loads in module core features
@@ -42,6 +43,7 @@ class CoreFeatures_Controller extends Action_Controller
 	 * This is an overall control panel enabling/disabling lots of the forums key features.
 	 *
 	 * What it does:
+	 *
 	 * - Uses internally an array of all the features that can be enabled/disabled.
 	 * - $core_features, each option can have the following:
 	 *    - title - Text title of this item (If standard string does not exist).
@@ -345,6 +347,7 @@ class CoreFeatures_Controller extends Action_Controller
 	 *
 	 * @param mixed[] $subActions = array() An array containing all possible subactions.
 	 * @param string $defaultAction = '' the default action to be called if no valid subaction was found.
+	 * @throws Elk_Exception
 	 */
 	public function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')
 	{

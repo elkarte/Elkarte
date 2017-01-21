@@ -46,6 +46,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 * loaded by the dispatcher).
 	 *
 	 * What it does:
+	 *
 	 * - It sets the context, load templates and language file(s), as necessary
 	 * for the function that will be called.
 	 */
@@ -184,6 +185,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 * This is the main function of personal messages, called before the action handler.
 	 *
 	 * What it does:
+	 *
 	 * - PersonalMessages is a menu-based controller.
 	 * - It sets up the menu.
 	 * - Calls from the menu the appropriate method/function for the current area.
@@ -1842,6 +1844,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 * Allows the user to report a personal message to an administrator.
 	 *
 	 * What it does:
+	 *
 	 * - In the first instance requires that the ID of the message to report is passed through $_GET.
 	 * - It allows the user to report to either a particular administrator - or the whole admin team.
 	 * - It will forward on a copy of the original message without allowing the reporter to make changes.
@@ -1978,6 +1981,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 * List and allow adding/entering all man rules, such as
 	 *
 	 * What it does:
+	 *
 	 * - If it itches, it will be scratched.
 	 * - Yes or No are perfectly acceptable answers to almost every question.
 	 * - Men see in only 16 colors, Peach, for example, is a fruit, not a color.
@@ -2231,6 +2235,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 * Actually do the search of personal messages and show the results
 	 *
 	 * What it does:
+	 *
 	 * - accessed with ?action=pm;sa=search2
 	 * - checks user input and searches the pm table for messages matching the query.
 	 * - uses the search_results sub template of the PersonalMessage template.
@@ -2562,6 +2567,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 * Handles the parameters when searching on specific labels
 	 *
 	 * What it does:
+	 *
 	 * - Returns the label query for use in the main search query
 	 * - Sets the parameters for use in the query
 	 *
@@ -2622,6 +2628,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 * Handles the parameters when searching on specific users
 	 *
 	 * What it does:
+	 *
 	 * - Returns the user query for use in the main search query
 	 * - Sets the parameters for use in the query
 	 *
@@ -2709,6 +2716,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 * Sets the search params for the query
 	 *
 	 * What it does:
+	 *
 	 * - Uses existing ones if coming from pagination or uses those passed from the search pm form
 	 * - Validates passed params are valid
 	 */
@@ -2754,6 +2762,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 * Extract search params from a string
 	 *
 	 * What it does:
+	 *
 	 * - When paging search results, reads and decodes the passed parameters
 	 * - Places what it finds back in search_params
 	 */
@@ -2803,6 +2812,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 * Allows to search through personal messages.
 	 *
 	 * What it does:
+	 *
 	 * - accessed with ?action=pm;sa=search
 	 * - shows the screen to search pm's (?action=pm;sa=search)
 	 * - uses the search sub template of the PersonalMessage template.

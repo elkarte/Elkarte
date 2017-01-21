@@ -19,6 +19,7 @@
  * Delete one or more members.
  *
  * What it does:
+ *
  * - Requires profile_remove_own or profile_remove_any permission for
  * respectively removing your own account or any account.
  * - Non-admins cannot delete admins.
@@ -36,6 +37,7 @@
  * @package Members
  * @param int[]|int $users
  * @param bool $check_not_admin = false
+ * @throws Elk_Exception
  */
 function deleteMembers($users, $check_not_admin = false)
 {
@@ -454,6 +456,7 @@ function deleteMembers($users, $check_not_admin = false)
  * Registers a member to the forum.
  *
  * What it does:
+ *
  * - Allows two types of interface: 'guest' and 'admin'. The first
  * - includes hammering protection, the latter can perform the registration silently.
  * - The strings used in the options array are assumed to be escaped.
@@ -505,7 +508,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 	validateUsername(0, $regOptions['username'], $ErrorContext, !empty($regOptions['check_reserved_name']));
 
 	// Generate a validation code if it's supposed to be emailed.
-	$validation_code = $regOptions['require'] === 'activation' ? generateValidationCode() : '';
+	$validation_code = $regOptions['require'] === 'activation' ? generateValidationCode(14) : '';
 
 	// Does the first password match the second?
 	if ($regOptions['password'] != $regOptions['password_check'] && $regOptions['auth_method'] == 'password')
@@ -589,7 +592,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		'date_registered' => !empty($regOptions['time']) ? $regOptions['time'] : time(),
 		'member_ip' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $regOptions['ip'],
 		'member_ip2' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $regOptions['ip2'],
-		'validation_code' => $validation_code,
+		'validation_code' => substr(hash('sha256', $validation_code), 0, 10),
 		'real_name' => !empty($regOptions['real_name']) ? $regOptions['real_name'] : $regOptions['username'],
 		'pm_email_notify' => 1,
 		'id_theme' => 0,
@@ -1016,6 +1019,7 @@ function groupsAllowedTo($permission, $board_id = null)
  * @param integer|null $board_id = null
  *
  * @return int[] an array containing member ID's.
+ * @throws Elk_Exception
  */
 function membersAllowedTo($permission, $board_id = null)
 {
@@ -1989,6 +1993,8 @@ function enforceReactivation($conditions)
 	assert(isset($conditions['selected_member']));
 	assert(isset($conditions['validation_code']));
 
+	$conditions['validation_code'] = substr(hash('sha256', $conditions['validation_code']), 0, 10);
+
 	$available_conditions = array(
 		'time_before' => '
 				AND date_registered < {int:time_before}',
@@ -2396,6 +2402,7 @@ function memberQuerySeeBoard($id_member)
  * Updates the columns in the members table.
  *
  * What it does:
+ *
  * - Assumes the data has been htmlspecialchar'd, no sanitation is performed on the data.
  * - This function should be used whenever member data needs to be updated in place of an UPDATE query.
  * - $data is an associative array of the columns to be updated and their respective values.

@@ -1753,6 +1753,7 @@ class Packages_Controller extends Action_Controller
 	 * @param string $sort A string indicating how to sort the results
 	 * @param string $params 'type' type of package
 	 * @param bool $installed
+	 * @throws Elk_Exception
 	 */
 	public function list_packages($start, $items_per_page, $sort, $params, $installed)
 	{

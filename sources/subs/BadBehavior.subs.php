@@ -15,6 +15,7 @@
  * Delete all or some of the entries in the bad behavior log.
  *
  * What it does:
+ *
  * - It applies any necessary filters to deletion.
  * - It attempts to TRUNCATE the table to reset the auto_increment.
  * - Redirects back to the badbehavior log when done.
@@ -68,6 +69,7 @@ function deleteBadBehavior($type, $filter)
  * Get the number of badbehavior log entries.
  *
  * What it does:
+ *
  * - Will take in to account any current filter value in its count result
  *
  * @package BadBehavior

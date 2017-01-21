@@ -102,6 +102,7 @@ class ManageThemes_Controller extends Action_Controller
 	 * sub-action.
 	 *
 	 * What it does:
+	 *
 	 * - It loads both the Themes and Settings language files.
 	 * - Checks the session by GET or POST to verify the sent data.
 	 * - Requires the user to not be a guest.
@@ -246,6 +247,7 @@ class ManageThemes_Controller extends Action_Controller
 	 * as well as global theme settings.
 	 *
 	 * What it does:
+	 *
 	 * - sets the settings theme_allow, theme_guests, and knownThemes.
 	 * - requires the admin_forum permission.
 	 * - accessed with ?action=admin;area=theme;sa=admin.
@@ -617,6 +619,7 @@ class ManageThemes_Controller extends Action_Controller
 	 * Administrative global settings.
 	 *
 	 * What it does:
+	 *
 	 * - Saves and requests global theme settings. ($settings)
 	 * - Loads the Admin language file.
 	 * - Calls action_admin() if no theme is specified. (the theme center.)
@@ -797,6 +800,7 @@ class ManageThemes_Controller extends Action_Controller
 	 * Remove a theme from the database.
 	 *
 	 * What it does:
+	 *
 	 * - Removes an installed theme.
 	 * - Requires an administrator.
 	 * - Accessed with ?action=admin;area=theme;sa=remove.
@@ -842,6 +846,7 @@ class ManageThemes_Controller extends Action_Controller
 	 * Remove a theme from the database in response to an ajax api request
 	 *
 	 * What it does:
+	 *
 	 * - Removes an installed theme.
 	 * - Requires an administrator.
 	 * - Accessed with ?action=admin;area=theme;sa=remove;api
@@ -934,6 +939,7 @@ class ManageThemes_Controller extends Action_Controller
 	 * Allows a user or administrator to pick a new theme with an interface.
 	 *
 	 * What it does:
+	 *
 	 * - Can edit everyone's (u = 0), guests' (u = -1), or a specific user's.
 	 * - Uses the Themes template. (pick sub template.)
 	 * - Accessed with ?action=admin;area=theme;sa=pick.
@@ -1113,6 +1119,7 @@ class ManageThemes_Controller extends Action_Controller
 	 * Installs new themes, either from a gzip or copy of the default.
 	 *
 	 * What it does:
+	 *
 	 * - Puts themes in $boardurl/themes.
 	 * - Assumes the gzip has a root directory in it. (ie default.)
 	 * - Requires admin_forum.
@@ -1354,6 +1361,7 @@ class ManageThemes_Controller extends Action_Controller
 	 * Set a theme option via javascript.
 	 *
 	 * What it does:
+	 *
 	 * - sets a theme option without outputting anything.
 	 * - can be used with javascript, via a dummy image... (which doesn't require
 	 *   the page to reload.)
@@ -1475,6 +1483,7 @@ class ManageThemes_Controller extends Action_Controller
 	 * Allows choosing, browsing, and editing a themes files.
 	 *
 	 * What it does:
+	 *
 	 * - Its subactions handle several features:
 	 *   - edit_template: display and edit a PHP template file
 	 *   - edit_style: display and edit a CSS file
@@ -1788,6 +1797,7 @@ class ManageThemes_Controller extends Action_Controller
 	 * Handles user browsing in theme directories.
 	 *
 	 * What it does:
+	 *
 	 * - The display will allow to choose a file for editing,
 	 * if it is writable.
 	 * - accessed with ?action=admin;area=theme;sa=browse

@@ -31,6 +31,7 @@ class ManageServer_Controller extends Action_Controller
 	 * the appropriate one based on the sub-action.
 	 *
 	 * What it does:
+	 *
 	 * - Requires the admin_forum permission.
 	 * - Redirects to the appropriate function based on the sub-action.
 	 *
@@ -108,6 +109,7 @@ class ManageServer_Controller extends Action_Controller
 	 * the result for generalSettings form.
 	 *
 	 * What it does:
+	 *
 	 * - Requires the admin_forum permission.
 	 * - Uses the edit_settings administration area.
 	 * - Contains the actual array of settings to show from Settings.php.
@@ -148,6 +150,7 @@ class ManageServer_Controller extends Action_Controller
 	 * for _databaseSettings.
 	 *
 	 * What it does:
+	 *
 	 * - It shows an interface for the settings in Settings.php to be changed.
 	 * - It contains the actual array of settings to show from Settings.php.
 	 * - Requires the admin_forum permission.
@@ -357,6 +360,7 @@ class ManageServer_Controller extends Action_Controller
 	 * Allows us to see the servers php settings
 	 *
 	 * What it does:
+	 *
 	 * - loads the settings into an array for display in a template
 	 * - drops cookie values just in case
 	 *

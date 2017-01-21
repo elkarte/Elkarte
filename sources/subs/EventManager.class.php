@@ -123,6 +123,7 @@ class Event_Manager
 	 * Retrieves or creates the instance of an object.
 	 *
 	 * What it does:
+	 *
 	 * - Objects are stored in order to be shared between different triggers
 	 * in the same Event_Manager.
 	 * - If the object doesn't exist yet, it is created
@@ -214,6 +215,7 @@ class Event_Manager
 	 * of the Event_Manager.
 	 *
 	 * What it does:
+	 *
 	 * - Each class must have a static Method ::hooks
 	 * - Method ::hooks must return an array defining where and how the class
 	 * will interact with the object that started the Event_Manager.

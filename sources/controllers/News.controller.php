@@ -61,6 +61,7 @@ class News_Controller extends Action_Controller
 	 * Outputs xml data representing recent information or a profile.
 	 *
 	 * What it does:
+	 *
 	 * - Can be passed 4 subactions which decide what is output:
 	 *     * 'recent' for recent posts,
 	 *     * 'news' for news topics,
@@ -814,6 +815,7 @@ function cdata_parse($data, $ns = '')
  * @param int $i the amount of indentation to use.
  * @param string|null $tag if specified, it will be used instead of the keys of data.
  * @param string $xml_format  one of rss, rss2, rdf, atom
+ * @throws Elk_Exception
  */
 function dumpTags($data, $i, $tag = null, $xml_format = 'rss')
 {

@@ -101,6 +101,7 @@ class Search_Controller extends Action_Controller
 	 * Ask the user what they want to search for.
 	 *
 	 * What it does:
+	 *
 	 * - Shows the screen to search forum posts (action=search),
 	 * - Uses the main sub template of the Search template.
 	 * - Uses the Search language file.
@@ -243,6 +244,7 @@ class Search_Controller extends Action_Controller
 	 * Gather the results and show them.
 	 *
 	 * What it does:
+	 *
 	 * - Checks user input and searches the messages table for messages matching the query.
 	 * - Requires the search_posts permission.
 	 * - Uses the results sub template of the Search template.
@@ -520,6 +522,7 @@ class Search_Controller extends Action_Controller
 	 * So all it does is to fallback and return.
 	 *
 	 * What it does:
+	 *
 	 * - Callback function for the results sub template.
 	 * - Loads the necessary contextual data to show a search result.
 	 *

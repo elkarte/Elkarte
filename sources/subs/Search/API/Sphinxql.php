@@ -22,6 +22,7 @@ namespace ElkArte\Search\API;
  * SearchAPI-Sphinxql.class.php, SphinxQL API,
  *
  * What it does:
+ *
  * - Used when an Sphinx search daemon is running
  * - Access is via Sphinx's own implementation of MySQL network protocol (SphinxQL)
  * - Requires Sphinx 2 or higher
@@ -71,8 +72,6 @@ class Sphinxql extends SearchAPI
 	 */
 	public function __construct()
 	{
-		global $modSettings;
-
 		// Is this database supported?
 		if (!in_array(DB_TYPE, $this->supported_databases))
 		{
@@ -81,7 +80,7 @@ class Sphinxql extends SearchAPI
 			return;
 		}
 
-		$this->bannedWords = empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']);
+		parent::__construct();
 	}
 
 	/**
@@ -140,6 +139,7 @@ class Sphinxql extends SearchAPI
 	 * @param string[] $excluded_words Words to exclude, not used in this API
 	 * @param int[] $participants
 	 * @param string[] $search_results
+	 * @throws \Elk_Exception
 	 */
 	public function searchQuery($search_params, $search_words, $excluded_words, &$participants, &$search_results)
 	{

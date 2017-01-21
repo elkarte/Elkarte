@@ -39,6 +39,7 @@ class ManageMembers_Controller extends Action_Controller
 	 * The main entrance point for the Manage Members screen.
 	 *
 	 * What it does:
+	 *
 	 * - As everyone else, it calls a function based on the given sub-action.
 	 * - Called by ?action=admin;area=viewmembers.
 	 * - Requires the moderate_forum permission.
@@ -699,6 +700,7 @@ class ManageMembers_Controller extends Action_Controller
 	 * Search the member list, using one or more criteria.
 	 *
 	 * What it does:
+	 *
 	 * - Called by ?action=admin;area=viewmembers;sa=search.
 	 * - Requires the moderate_forum permission.
 	 * - form is submitted to action=admin;area=viewmembers;sa=query.
@@ -725,6 +727,7 @@ class ManageMembers_Controller extends Action_Controller
 	 * List all members who are awaiting approval / activation, sortable on different columns.
 	 *
 	 * What it does:
+	 *
 	 * - It allows instant approval or activation of (a selection of) members.
 	 * - Called by ?action=admin;area=viewmembers;sa=browse;type=approve
 	 * or ?action=admin;area=viewmembers;sa=browse;type=activate.
@@ -1070,6 +1073,7 @@ class ManageMembers_Controller extends Action_Controller
 	 * This function handles the approval, rejection, activation or deletion of members.
 	 *
 	 * What it does:
+	 *
 	 * - Called by ?action=admin;area=viewmembers;sa=approve.
 	 * - Requires the moderate_forum permission.
 	 * - Redirects to ?action=admin;area=viewmembers;sa=browse
@@ -1286,7 +1290,7 @@ class ManageMembers_Controller extends Action_Controller
 			$this->conditions['selected_member'] = $member['id'];
 
 			// Generate a random activation code.
-			$this->conditions['validation_code'] = generateValidationCode();
+			$this->conditions['validation_code'] = generateValidationCode(14);
 
 			// Set these members for activation - I know this includes two id_member checks but it's safer than bodging $condition ;).
 			enforceReactivation($this->conditions);

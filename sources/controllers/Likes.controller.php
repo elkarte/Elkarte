@@ -103,6 +103,7 @@ class Likes_Controller extends Action_Controller
 	 * Likes a post due to its awesomeness
 	 *
 	 * What it does:
+	 *
 	 * - Permission checks are done in prepare_likes
 	 * - It redirects back to the referrer afterward.
 	 * - It is accessed via ?action=like,sa=likepost
@@ -623,6 +624,7 @@ class Likes_Controller extends Action_Controller
 	 * Like stats controller function, used by API calls.
 	 *
 	 * What it does:
+	 *
 	 * - Validates whether user is allowed to see stats or not.
 	 * - Decides which tab data to fetch and show to user.
 	 */
@@ -664,6 +666,7 @@ class Likes_Controller extends Action_Controller
 	 * Like stats controller function.
 	 *
 	 * What it does:
+	 *
 	 * - Validates whether user is allowed to see stats or not.
 	 * - Presents a general page without data that will be fully loaded by API calls.
 	 * - Used when JS is not enabled and data is fulled by page request
@@ -718,6 +721,7 @@ class Likes_Controller extends Action_Controller
 	 * Determines the most liked message in the system
 	 *
 	 * What it does:
+	 *
 	 * - Fetches the most liked message data
 	 * - Returns the data via ajax
 	 */
@@ -742,6 +746,7 @@ class Likes_Controller extends Action_Controller
 	 * Determine the most liked topics in the system
 	 *
 	 * What it does:
+	 *
 	 * - Gets the most liked topics in the system
 	 * - Returns the data via ajax
 	 */

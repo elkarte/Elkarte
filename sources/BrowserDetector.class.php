@@ -20,6 +20,7 @@
  * settings needed for them.
  *
  * What it does:
+ *
  * - Detects the following browsers
  * - Opera, Webkit, Firefox, Web_tv, Konqueror, IE, Gecko
  * - Webkit variants: Chrome, iphone, blackberry, android, safari, ipad, ipod
@@ -65,6 +66,7 @@ class Browser_Detector
 	 * The main method of this class, you know the one that does the job: detect the thing.
 	 *
 	 * What it does:
+	 *
 	 * - Determines the user agent (browser) as best it can.
 	 * - The method fills the instance variables _is_mobile and _is_tablet,
 	 * and the _browsers array.
@@ -263,6 +265,7 @@ class Browser_Detector
 	 * Detect Safari / Chrome / Opera / iP[ao]d / iPhone / Android / Blackberry from webkit.
 	 *
 	 * What it does:
+	 *
 	 * - set the browser version for Safari and Chrome
 	 * - set the mobile flag for mobile based useragents
 	 */
@@ -337,6 +340,7 @@ class Browser_Detector
 	 * Additional IE checks and settings.
 	 *
 	 * What it does:
+	 *
 	 * - determines the version of the IE browser in use
 	 * - detects ie4 onward
 	 * - attempts to distinguish between IE and IE in compatibility view
@@ -382,6 +386,7 @@ class Browser_Detector
 	 * Additional firefox checks.
 	 *
 	 * What it does:
+	 *
 	 * - Gets the version of the FF browser in use
 	 * - Considers all FF variants as FF including IceWeasel, IceCat, Shiretoko and Minefiled
 	 */
@@ -409,6 +414,7 @@ class Browser_Detector
 	 * More Opera checks if we are opera <15
 	 *
 	 * What it does:
+	 *
 	 * - checks for the version of Opera in use
 	 * - uses checks for 10 first and falls through to <9
 	 */
@@ -426,6 +432,7 @@ class Browser_Detector
 	 * Get the browser name that we will use in the <body id="this_browser">
 	 *
 	 * What it does:
+	 *
 	 * - The order of each browser in $browser_priority is important
 	 * - if you want to have id='ie6' and not id='ie' then it must appear first in the list of ie browsers
 	 * - only sets browsers that may need some help via css for compatibility

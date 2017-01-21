@@ -423,6 +423,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
  * Prepare text strings for sending as email body or header.
  *
  * What it does:
+ *
  * - In case there are higher ASCII characters in the given string, this
  * function will attempt the transport method 'quoted-printable'.
  * - Otherwise the transport method '7bit' is used.

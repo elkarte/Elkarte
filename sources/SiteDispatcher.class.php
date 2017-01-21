@@ -16,6 +16,7 @@
  * Dispatch the request to the function or method registered to handle it.
  *
  * What it does:
+ *
  * - Try first the critical functionality (maintenance, no guest access)
  * - Then, in order:
  *     * forum's main actions: board index, message index, display topic

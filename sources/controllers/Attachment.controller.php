@@ -21,6 +21,7 @@ use ElkArte\Errors\AttachmentErrorContext;
  * Attachment_Controller class.
  *
  * What it does:
+ *
  * - Handles the downloading of an attachment or avatar
  * - Handles the uploading of attachments via Ajax
  * - increments the download count where applicable
@@ -171,6 +172,7 @@ class Attachment_Controller extends Action_Controller
 	 * Function to remove attachments which were added via ajax calls
 	 *
 	 * What it does:
+	 *
 	 * - Currently called by drag drop attachment functionality
 	 * - Requires file name and file path
 	 * - Responds back with success or error
@@ -241,6 +243,7 @@ class Attachment_Controller extends Action_Controller
 	 * Downloads an attachment or avatar, and increments the download count.
 	 *
 	 * What it does:
+	 *
 	 * - It requires the view_attachments permission. (not for avatars!)
 	 * - It disables the session parser, and clears any previous output.
 	 * - It is accessed via the query string ?action=dlattach.
@@ -529,7 +532,7 @@ class Attachment_Controller extends Action_Controller
 	 */
 	public function action_tmpattach()
 	{
-		global $txt, $modSettings, $user_info, $topic, $settings;
+		global $txt, $modSettings, $user_info, $topic;
 
 		// Make sure some attachment was requested!
 		if (!isset($this->_req->query->attach))
@@ -581,21 +584,15 @@ class Attachment_Controller extends Action_Controller
 			@ob_end_clean();
 		}
 
-		// return mime type ala mimetype extension
+		// Return mime type ala mimetype extension
 		$finfo = finfo_open(FILEINFO_MIME_TYPE);
-		$checkMime = returnMimeThumb($file_ext);
 
-		if ($checkMime !== false)
+		if (substr(finfo_file($finfo, $filename), 0, 5) !== 'image')
 		{
+			$checkMime = returnMimeThumb($file_ext);
 			$mime_type = 'image/png';
 			$resize = false;
 			$filename = $checkMime;
-		}
-		elseif (substr(finfo_file($finfo, $filename), 0, 5) !== 'image')
-		{
-			$mime_type = 'image/png';
-			$resize = false;
-			$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
 		}
 		finfo_close($finfo);
 

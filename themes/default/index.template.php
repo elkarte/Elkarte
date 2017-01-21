@@ -49,6 +49,9 @@ function template_init()
 		  if this is 'never' or isn't set at all, images from the default theme will not be used. */
 		'use_default_images' => 'never',
 
+		// Set to true if you want to include font awesome's css file
+		'require_font-awesome' => false,
+
 		// The version this template/theme is for. This should probably be the version of the forum it was created for.
 		'theme_version' => '1.0',
 
@@ -651,6 +654,7 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
  * Generate a strip of "quick" buttons (those present next to each message)
  *
  * What it does:
+ *
  * - Create a quick button, pass an array of the button name with key values
  * - array('somename' => array(href => '' text => '' custom => '' test => ''))
  *      - href => link to call when button is pressed

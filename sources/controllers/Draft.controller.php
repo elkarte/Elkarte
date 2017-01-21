@@ -79,6 +79,7 @@ class Draft_Controller extends Post_Controller
 	 * Show all drafts of a given type by the current user
 	 *
 	 * What it does:
+	 *
 	 * - Allows for the deleting and loading/editing of drafts
 	 *
 	 * @uses the showdrafts template
@@ -181,6 +182,7 @@ class Draft_Controller extends Post_Controller
 	 * Show all PM drafts of the current user
 	 *
 	 * What it does:
+	 *
 	 * - Allows for the deleting and loading/editing of PM drafts
 	 *
 	 * @uses the showPMDrafts template
@@ -279,6 +281,7 @@ class Draft_Controller extends Post_Controller
 	 *
 	 * @param string $redirect - The url to redirect to after the drafts have
 	 * been deleted
+	 * @throws Elk_Exception
 	 */
 	private function _action_delete($redirect = '')
 	{

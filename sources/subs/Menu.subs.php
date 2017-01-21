@@ -60,6 +60,7 @@
  *     - hook                      => hook name to call integrate_ . 'hook name' . '_areas'
  *     - default_include_dir       => directory to include for function support
  * @return mixed[]|false
+ * @throws Elk_Exception
  */
 function createMenu($menuData, $menuOptions = array())
 {

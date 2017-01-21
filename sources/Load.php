@@ -19,6 +19,7 @@
  * Load the $modSettings array and many necessary forum settings.
  *
  * What it does:
+ *
  * - load the settings from cache if available, otherwise from the database.
  * - sets the timezone
  * - checks the load average settings if available.
@@ -147,6 +148,7 @@ function reloadSettings()
  * Load all the important user information.
  *
  * What it does:
+ *
  * - sets up the $user_info array
  * - assigns $user_info['query_wanna_see_board'] for what boards the user can see.
  * - first checks for cookie or integration validation.
@@ -419,6 +421,7 @@ function loadUserSettings()
  * Check for moderators and see if they have access to the board.
  *
  * What it does:
+ *
  * - sets up the $board_info array for current board information.
  * - if cache is enabled, the $board_info array is stored in cache.
  * - redirects to appropriate post if only message id is requested.
@@ -702,6 +705,7 @@ function loadBoard()
  * Load this user's permissions.
  *
  * What it does:
+ *
  * - If the user is an admin, validate that they have not been banned.
  * - Attempt to load permissions from cache for cache level > 2
  * - See if the user is possibly a robot and apply added permissions as needed
@@ -999,6 +1003,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
  * Loads the user's basic values... meant for template/theme usage.
  *
  * What it does:
+ *
  * - Always loads the minimal values of username, name, id, href, link, email, show_email, registered, registered_timestamp
  * - if $context['loadMemberContext_set'] is not minimal it will load in full a full set of user information
  * - prepares signature for display (censoring if enabled)
@@ -1379,6 +1384,7 @@ function initTheme($id_theme = 0)
  * Load a theme, by ID.
  *
  * What it does:
+ *
  * - identify the theme to be loaded.
  * - validate that the theme is valid and that the user has permission to use it
  * - load the users theme settings and site settings into $options.
@@ -1512,8 +1518,11 @@ function loadTheme($id_theme = 0, $initialize = true)
 	if (!empty($settings['require_theme_strings']))
 		loadLanguage('ThemeStrings', '', false);
 
-	// Load font Awesome fonts
-	loadCSSFile('font-awesome.min.css');
+	// Load font Awesome fonts, @deprecated in 1.1 and will be removed in 2.0
+	if (!empty($settings['require_font-awesome']) || !empty($modSettings['require_font-awesome']))
+	{
+		loadCSSFile('font-awesome.min.css');
+	}
 
 	// We allow theme variants, because we're cool.
 	if (!empty($settings['theme_variants']))
@@ -1828,6 +1837,7 @@ function loadEssentialThemeData()
  * Load a template - if the theme doesn't include it, use the default.
  *
  * What it does:
+ *
  * - loads a template file with the name template_name from the current, default, or base theme.
  * - detects a wrong default theme directory and tries to work around it.
  * - can be used to only load style sheets by using false as the template name
@@ -1840,6 +1850,7 @@ function loadEssentialThemeData()
  * @param bool $fatal = true if fatal is true, dies with an error message if the template cannot be found
  *
  * @return boolean|null
+ * @throws Elk_Exception
  */
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
@@ -1850,6 +1861,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  * Load a sub-template.
  *
  * What it does:
+ *
  * - loads the sub template specified by sub_template_name, which must be in an already-loaded template.
  * - if ?debug is in the query string, shows administrators a marker after every sub template
  * for debugging purposes.
@@ -1858,6 +1870,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  * @param bool|string $fatal = false
  * - $fatal = true is for templates that shouldn't get a 'pretty' error screen
  * - $fatal = 'ignore' to skip
+ * @throws Elk_Exception
  */
 function loadSubTemplate($sub_template_name, $fatal = false)
 {
@@ -1904,6 +1917,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
  * Add a Javascript file for output later
  *
  * What it does:
+ *
  * - Can be passed an array of filenames, all which will have the same
  *   parameters applied,
  * - if you need specific parameters on a per file basis, call it multiple times
@@ -1940,6 +1954,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
  * Add an asset (css, js or other) file for output later
  *
  * What it does:
+ *
  * - Can be passed an array of filenames, all which will have the same
  *   parameters applied,
  * - If you need specific parameters on a per file basis, call it multiple times
@@ -2083,6 +2098,7 @@ function addJavascriptVar($vars, $escape = false)
  * Add a block of inline Javascript code to be executed later
  *
  * What it does:
+ *
  * - only use this if you have to, generally external JS files are better, but for very small scripts
  *   or for scripts that require help from PHP/whatever, this can be useful.
  * - all code added with this function is added to the same <script> tag so do make sure your JS is clean!
@@ -2287,6 +2303,7 @@ function fix_calendar_text()
  * Get all parent boards (requires first parent as parameter)
  *
  * What it does:
+ *
  * - It finds all the parents of id_parent, and that board itself.
  * - Additionally, it detects the moderators of said boards.
  * - Returns an array of information about the boards found.
@@ -2616,6 +2633,7 @@ function serverIs($server)
  * Do some important security checks:
  *
  * What it does:
+ *
  * - Checks the existence of critical files e.g. install.php
  * - Checks for an active admin session.
  * - Checks cache directory is writable.
@@ -2766,7 +2784,7 @@ function serializeToJson($variable, $save_callback = null)
 		// If unserialize fails as well, let's just store an empty array
 		if ($array_form === false)
 		{
-			$array_form = array();
+			$array_form = array(0, '', 0);
 		}
 
 		// Time to update the value if necessary

@@ -486,6 +486,7 @@ class Xml_Controller extends Action_Controller
 	 * Reorders the smileys from a drag/drop event
 	 *
 	 * What it does:
+	 *
 	 * - Will move them from post to popup location and visa-versa
 	 * - Will move them to new rows
 	 */

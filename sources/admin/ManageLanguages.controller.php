@@ -26,6 +26,7 @@ class ManageLanguages_Controller extends Action_Controller
 	 * This is the main function for the languages area.
 	 *
 	 * What it does:
+	 *
 	 * - It dispatches the requests.
 	 * - Loads the ManageLanguages template. (sub-actions will use it)
 	 *
@@ -277,6 +278,7 @@ class ManageLanguages_Controller extends Action_Controller
 	 * Download a language file from the website.
 	 *
 	 * What it does:
+	 *
 	 * - Requires a valid download ID ("did") in the URL.
 	 * - Also handles installing language files.
 	 * - Attempts to chmod things as needed.

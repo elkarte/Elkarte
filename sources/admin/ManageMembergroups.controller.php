@@ -26,6 +26,7 @@ class ManageMembergroups_Controller extends Action_Controller
 	 * Main dispatcher, the en\trance point for all 'Manage Membergroup' actions.
 	 *
 	 * What it does:
+	 *
 	 * - It forwards to a function based on the given subaction, default being subaction 'index', or, without manage_membergroup
 	 * permissions, then 'settings'.
 	 * - Called by ?action=admin;area=membergroups.
@@ -97,6 +98,7 @@ class ManageMembergroups_Controller extends Action_Controller
 	 * Shows an overview of the current membergroups.
 	 *
 	 * What it does:
+	 *
 	 * - Called by ?action=admin;area=membergroups.
 	 * - Requires the manage_membergroups permission.
 	 * - Splits the membergroups in regular ones and post count based groups.
@@ -328,6 +330,7 @@ class ManageMembergroups_Controller extends Action_Controller
 	 * This function handles adding a membergroup and setting some initial properties.
 	 *
 	 * What it does:
+	 *
 	 * -Called by ?action=admin;area=membergroups;sa=add.
 	 * -It requires the manage_membergroups permission.
 	 * -Allows to use a predefined permission profile or copy one from another group.
@@ -465,6 +468,7 @@ class ManageMembergroups_Controller extends Action_Controller
 	 * Deleting a membergroup by URL (not implemented).
 	 *
 	 * What it does:
+	 *
 	 * - Called by ?action=admin;area=membergroups;sa=delete;group=x;session_var=y.
 	 * - Requires the manage_membergroups permission.
 	 * - Redirects to ?action=admin;area=membergroups.
@@ -486,6 +490,7 @@ class ManageMembergroups_Controller extends Action_Controller
 	 * Editing a membergroup.
 	 *
 	 * What it does:
+	 *
 	 * - Screen to edit a specific membergroup.
 	 * - Called by ?action=admin;area=membergroups;sa=edit;group=x.
 	 * - It requires the manage_membergroups permission.
@@ -771,6 +776,7 @@ class ManageMembergroups_Controller extends Action_Controller
 	 * Set some general membergroup settings and permissions.
 	 *
 	 * What it does:
+	 *
 	 * - Called by ?action=admin;area=membergroups;sa=settings
 	 * - Requires the admin_forum permission (and manage_permissions for changing permissions)
 	 * - Redirects to itself.

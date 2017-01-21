@@ -372,6 +372,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
  * Load all the payment gateways.
  *
  * What it does:
+ *
  * - Checks the Sources directory for any files fitting the format of a payment gateway,
  * - Loads each file to check it's valid, includes each file and returns the
  * - Function name and whether it should work with this version of the software.

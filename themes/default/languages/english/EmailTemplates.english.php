@@ -27,7 +27,7 @@ $txt['scheduled_approval_email_event'] = 'The following events are awaiting appr
 	@description:
 */
 $txt['resend_activate_message_subject'] = 'Welcome to {FORUMNAME}';
-$txt['resend_activate_message_body'] = 'Thank you for registering at {FORUMNAME}. Your username is {USERNAME}. If you forget your password, you can reset it by visiting {FORGOTPASSWORDLINK}.
+$txt['resend_activate_message_body'] = 'Thank you for registering at {FORUMNAME}. Your username is {USERNAME}. If you forget your password, you can reset it by visiting {FORGOTPASSWORDLINK}
 
 Before you can login, you must first activate your account by selecting the following link:
 
@@ -105,7 +105,7 @@ This is due to the following reason: {REASON}
 $txt['admin_approve_accept_subject'] = 'Welcome to {FORUMNAME}';
 $txt['admin_approve_accept_body'] = 'Welcome, {NAME}
 
-Your account has been activated manually by the admin and you can now login and post. Your username is: {USERNAME}. If you forget your password, you can change it at {FORGOTPASSWORDLINK}.
+Your account has been activated manually by the admin and you can now login and post. Your username is: {USERNAME}. If you forget your password, you can change it at {FORGOTPASSWORDLINK}
 
 {REGARDS}';
 
@@ -513,7 +513,7 @@ You may change it after you login by going to the profile page, or by visiting t
 	@description:
 */
 $txt['register_activate_subject'] = 'Welcome to {FORUMNAME}';
-$txt['register_activate_body'] = 'Thank you for registering at {FORUMNAME}. Your username is {USERNAME}. If you forget your password, you can reset it by visiting {FORGOTPASSWORDLINK}.
+$txt['register_activate_body'] = 'Thank you for registering at {FORUMNAME}. Your username is {USERNAME}. If you forget your password, you can reset it by visiting {FORGOTPASSWORDLINK}
 
 Before you can login, you first need to activate your account. To do so, please follow this link:
 
@@ -592,7 +592,7 @@ Before you can login, the admin requires consent from your parent/guardian for y
 	@description:
 */
 $txt['register_immediate_subject'] = 'Welcome to {FORUMNAME}';
-$txt['register_immediate_body'] = 'Thank you for registering at {FORUMNAME}. Your username is {USERNAME}. If you forget your password, you may change it at {FORGOTPASSWORDLINK}.
+$txt['register_immediate_body'] = 'Thank you for registering at {FORUMNAME}. Your username is {USERNAME}. If you forget your password, you may change it at {FORGOTPASSWORDLINK}
 
 {REGARDS}';
 
@@ -626,7 +626,7 @@ You may update your profile by visiting this page after you login:
 $txt['register_pending_subject'] = 'Welcome to {FORUMNAME}';
 $txt['register_pending_body'] = 'Hello {REALNAME}, your registration request at {FORUMNAME} has been received.
 
-The username you registered with was {USERNAME}. If you forget your password, you can change it at {FORGOTPASSWORDLINK}.
+The username you registered with was {USERNAME}. If you forget your password, you can change it at {FORGOTPASSWORDLINK}
 
 Before you can login and start using the forum, your request will be reviewed and approved.  When this happens, you will receive another email from this address.
 

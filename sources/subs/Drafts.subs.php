@@ -183,6 +183,7 @@ function modify_post_draft($draft)
  * Loads a single draft
  *
  * What it does:
+ *
  * - Validates draft id/owner match if check is set to true
  * - Draft id must match the type selected (post or pm)
  *
@@ -275,6 +276,7 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $order = 
  * Deletes one or many drafts from the DB
  *
  * What it does:
+ *
  * - Validates the drafts are from the user
  * - If supplied an array of drafts will attempt to remove all of them
  *
@@ -312,6 +314,7 @@ function deleteDrafts($id_draft, $member_id = -1, $check = true)
  * Retrieve how many drafts the given user has.
  *
  * What it does:
+ *
  * - This function checks for expired lifetime on drafts (they would be removed
  * by a scheduled task), and doesn't count those.
  *
@@ -413,6 +416,7 @@ function getOldDrafts($days)
  * @package Drafts
  * @param mixed[] $draft
  * @param boolean $check_last_save
+ * @throws Elk_Exception
  */
 function saveDraft($draft, $check_last_save = false)
 {
@@ -491,6 +495,7 @@ function saveDraft($draft, $check_last_save = false)
  * @param mixed[] $recipientList
  * @param mixed[] $draft
  * @param boolean $check_last_save
+ * @throws Elk_Exception
  */
 function savePMDraft($recipientList, $draft, $check_last_save = false)
 {

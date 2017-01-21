@@ -247,6 +247,7 @@ function prepareMessageContext($message)
  * first messages of a topic
  *
  * @param int $memID The member id
+ * @throws Elk_Exception
  */
 function removeNonTopicMessages($memID)
 {
@@ -280,6 +281,7 @@ function removeNonTopicMessages($memID)
  *
  * @param int $message The message id
  * @param bool $decreasePostCount if true users' post count will be reduced
+ * @throws Elk_Exception
  */
 function removeMessage($message, $decreasePostCount = true)
 {

@@ -80,6 +80,7 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * Sets up poll options in context for use in the template
 	 *
 	 * What it does:
+	 *
 	 * - Validates the topic can have a poll added
 	 * - Validates the poster can add a poll or not
 	 * - Prepares options so a poll can be added (or not) given the above results
@@ -87,6 +88,7 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * @param array $topic_attributes
 	 * @param int $topic
 	 * @param int $board
+	 * @throws Elk_Exception
 	 */
 	public function prepare_context($topic_attributes, $topic, $board)
 	{
@@ -157,6 +159,7 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * @param string $destination
 	 * @param string $page_title
 	 * @param Template_Layers $template_layers
+	 * @throws Elk_Exception
 	 */
 	public function finalize_post_form(&$destination, &$page_title, $template_layers)
 	{
@@ -246,6 +249,7 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * Create the poll!
 	 *
 	 * @param array $topicOptions
+	 * @throws Elk_Exception
 	 */
 	public function pre_save_post(&$topicOptions)
 	{

@@ -53,6 +53,7 @@ class Emailuser_Controller extends Action_Controller
 	 * Send a topic to a friend.
 	 *
 	 * What it does:
+	 *
 	 * - Requires the send_topic permission.
 	 * - Redirects back to the first page of the topic when done.
 	 * - Is accessed via ?action=emailuser;sa=sendtopic.
@@ -200,6 +201,7 @@ class Emailuser_Controller extends Action_Controller
 	 * Does the actual sending of the email if everything checks out as OK
 	 *
 	 * @param mixed[] $row
+	 * @throws Elk_Exception
 	 */
 	private function _sendTopic($row)
 	{

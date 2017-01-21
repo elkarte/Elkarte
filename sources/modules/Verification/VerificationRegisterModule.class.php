@@ -48,6 +48,7 @@ class Verification_Register_Module extends ElkArte\sources\modules\Abstract_Modu
 	 * Prepare $context for the registration form.
 	 *
 	 * @param int $current_step current step of the registration process
+	 * @throws Elk_Exception
 	 */
 	public function prepare_context($current_step)
 	{
@@ -71,6 +72,7 @@ class Verification_Register_Module extends ElkArte\sources\modules\Abstract_Modu
 	 * Checks the user passed the verifications on the registration form.
 	 *
 	 * @param ErrorContext $reg_errors Errors object from the registration controller
+	 * @throws Elk_Exception
 	 */
 	public function before_complete_register($reg_errors)
 	{

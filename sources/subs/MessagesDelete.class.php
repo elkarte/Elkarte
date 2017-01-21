@@ -71,6 +71,7 @@ class MessagesDelete
 	 * topics to restore (see MessagesDelete::restoreTopics)
 	 *
 	 * @param int[] $msgs_id Messages to restore
+	 * @throws Elk_Exception
 	 */
 	public function restoreMessages($msgs_id)
 	{
@@ -844,6 +845,7 @@ class MessagesDelete
 	 * @param int[] $msgs
 	 * @param integer $from_topic
 	 * @param integer $target_topic
+	 * @throws Elk_Exception
 	 */
 	private function _mergePosts($msgs, $from_topic, $target_topic)
 	{

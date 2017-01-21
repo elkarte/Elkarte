@@ -22,6 +22,7 @@ namespace ElkArte\Search\API;
  * SearchAPI-Sphinx.class.php, Sphinx API,
  *
  * What it does:
+ *
  * - used when a Sphinx search daemon is running
  * - Access is via the Sphinx native search API (SphinxAPI)
  * - sphinxapi.php is part of the Sphinx package, the file must be added to SOURCEDIR
@@ -67,12 +68,10 @@ class Sphinx extends SearchAPI
 	protected $supported_databases = array('MySQL');
 
 	/**
-	 * Nothing to do
+	 * Check we support this db, set banned words
 	 */
 	public function __construct()
 	{
-		global $modSettings;
-
 		// Is this database supported?
 		if (!in_array(DB_TYPE, $this->supported_databases))
 		{
@@ -81,7 +80,7 @@ class Sphinx extends SearchAPI
 			return;
 		}
 
-		$this->bannedWords = empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']);
+		parent::__construct();
 	}
 
 	/**
@@ -160,6 +159,7 @@ class Sphinx extends SearchAPI
 	 * @param string[] $excluded_words
 	 * @param int[] $participants
 	 * @param string[] $search_results
+	 * @throws \Elk_Exception
 	 */
 	public function searchQuery($search_params, $search_words, $excluded_words, &$participants, &$search_results)
 	{

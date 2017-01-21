@@ -96,6 +96,7 @@ class Auth_Controller extends Action_Controller
 	 * Actually logs you in.
 	 *
 	 * What it does:
+	 *
 	 * - Checks credentials and checks that login was successful.
 	 * - It employs protection against a specific IP or user trying to brute force
 	 *   a login to an account.
@@ -378,12 +379,14 @@ class Auth_Controller extends Action_Controller
 	 * Logs the current user out of their account.
 	 *
 	 * What it does:
+	 *
 	 * - It requires that the session hash is sent as well, to prevent automatic logouts by images or javascript.
 	 * - It redirects back to $_SESSION['logout_url'], if it exists.
 	 * - It is accessed via ?action=logout;session_var=...
 	 *
 	 * @param boolean $internal if true, it doesn't check the session
 	 * @param boolean $redirect if true, redirect to the board index
+	 * @throws Elk_Exception
 	 */
 	public function action_logout($internal = false, $redirect = true)
 	{
@@ -460,6 +463,7 @@ class Auth_Controller extends Action_Controller
 	 * Throws guests out to the login screen when guest access is off.
 	 *
 	 * What it does:
+	 *
 	 * - It sets $_SESSION['login_url'] to $_SERVER['REQUEST_URL'].
 	 *
 	 * @uses 'kick_guest' sub template found in Login.template.php.
@@ -486,6 +490,7 @@ class Auth_Controller extends Action_Controller
 	 * Display a message about the forum being in maintenance mode.
 	 *
 	 * What it does:
+	 *
 	 * - Displays a login screen with sub template 'maintenance'.
 	 * - It sends a 503 header, so search engines don't index while we're in maintenance mode.
 	 */
@@ -563,6 +568,7 @@ class Auth_Controller extends Action_Controller
 	 * Loads other possible password hash / crypts using the post data
 	 *
 	 * What it does:
+	 *
 	 * - Used when a board is converted to see if the user credentials and a 3rd
 	 * party hash satisfy whats in the db passwd field
 	 *
@@ -738,7 +744,7 @@ function checkActivation()
 	{
 		Errors::instance()->log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', false);
 
-		$context['login_errors'][] = $txt['activate_not_completed1'] . ' <a href="' . $scripturl . '?action=register;sa=activate;resend;u=' . $user_settings['id_member'] . '">' . $txt['activate_not_completed2'] . '</a>';
+		$context['login_errors'][] = $txt['activate_not_completed1'] . ' <a class="linkbutton" href="' . $scripturl . '?action=register;sa=activate;resend;u=' . $user_settings['id_member'] . '">' . $txt['activate_not_completed2'] . '</a>';
 		return false;
 	}
 	return true;

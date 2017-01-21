@@ -22,6 +22,7 @@ class ManageBBC_Controller extends Action_Controller
 	 * The BBC admin area
 	 *
 	 * What it does:
+	 *
 	 * - This method is the entry point for index.php?action=admin;area=postsettings;sa=bbc
 	 * and it calls a function based on the sub-action, here only display.
 	 * - requires admin_forum permissions

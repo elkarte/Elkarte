@@ -244,6 +244,7 @@ class Register_Controller extends Action_Controller
 	 * and not (for example) OpenID.
 	 *
 	 * What it does:
+	 *
 	 * - Validates all requirements have been filled in properly
 	 * - Passes final processing to do_register
 	 * - Directs back to register on errors
@@ -520,7 +521,7 @@ class Register_Controller extends Action_Controller
 		{
 			call_integration_hook('integrate_activate', array($regOptions['username'], 1, 1));
 
-			setLoginCookie(60 * $modSettings['cookieTime'], $memberID, hash('sha256', Util::strtolower($regOptions['username']) . $regOptions['password'] . $regOptions['register_vars']['password_salt']));
+			setLoginCookie(60 * $modSettings['cookieTime'], $memberID, hash('sha256', $regOptions['register_vars']['passwd'] . $regOptions['register_vars']['password_salt']));
 
 			redirectexit('action=auth;sa=check;member=' . $memberID, detectServer()->is('needs_login_fix'));
 		}
@@ -546,11 +547,13 @@ class Register_Controller extends Action_Controller
 	 * Collect all extra registration fields someone might have filled in.
 	 *
 	 * What it does:
+	 *
 	 * - Classifies variables as possible string, int, float or bool
 	 * - Casts all posted data to the proper type (string, float, etc)
 	 * - Drops fields that we specially exclude during registration
 	 *
 	 * @param bool $has_real_name - if true adds 'real_name' as well
+	 * @throws Elk_Exception
 	 */
 	private function _extra_vars($has_real_name)
 	{
@@ -636,6 +639,7 @@ class Register_Controller extends Action_Controller
 	 * Loads the registration agreement in the users language
 	 *
 	 * What it does:
+	 *
 	 * - Opens and loads the registration agreement file
 	 * - If one is available in the users language loads that version as well
 	 * - If none is found and it is required, ends the registration process and logs the error
@@ -672,6 +676,7 @@ class Register_Controller extends Action_Controller
 	 * Sets the users language file
 	 *
 	 * What it does:
+	 *
 	 * - If language support is enabled, loads whats available
 	 * - Verifies the users choice is available
 	 * - Sets in in context / session
@@ -753,6 +758,7 @@ class Register_Controller extends Action_Controller
 	 * Verify the activation code, and activate the user if correct.
 	 *
 	 * What it does:
+	 *
 	 * - Accessed by ?action=register;sa=activate
 	 * - Processes activation code requests
 	 * - Checks if the user is already activate and if so does nothing
@@ -846,6 +852,7 @@ class Register_Controller extends Action_Controller
 	 * Change their email address if not active
 	 *
 	 * What it does:
+	 *
 	 * - Requires the user enter the id/password for the account
 	 * - The account must not be active 0 or awaiting reactivation 2
 	 */
@@ -892,6 +899,7 @@ class Register_Controller extends Action_Controller
 	 * Resend an activation code to a user
 	 *
 	 * What it does:
+	 *
 	 * - Called with action=register;sa=activate;resend
 	 * - Will resend an activation code to non-active account
 	 *
@@ -909,12 +917,19 @@ class Register_Controller extends Action_Controller
 		{
 			require_once(SUBSDIR . '/Mail.subs.php');
 
+			// Since you lost it, you get a nice new code
+			$validation_code = generateValidationCode(14);
+			$this->_row['validation_code'] = substr(hash('sha256', $validation_code), 0, 10);
+
+			require_once(SUBSDIR . '/Members.subs.php');
+			updateMemberData($this->_row['id_member'], array('validation_code' => $this->_row['validation_code']));
+
 			$replacements = array(
 				'REALNAME' => $this->_row['real_name'],
 				'USERNAME' => $this->_row['member_name'],
-				'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $this->_row['id_member'] . ';code=' . $this->_row['validation_code'],
+				'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $this->_row['id_member'] . ';code=' . $validation_code,
 				'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=register;sa=activate;u=' . $this->_row['id_member'],
-				'ACTIVATIONCODE' => $this->_row['validation_code'],
+				'ACTIVATIONCODE' => $validation_code,
 				'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
 			);
 
@@ -923,8 +938,11 @@ class Register_Controller extends Action_Controller
 
 			$context['page_title'] = $txt['invalid_activation_resend'];
 
+			// Don't let them wack away on their resend
+			spamProtection('remind');
+
 			// This will ensure we don't actually get an error message if it works!
-			$context['error_title'] = '';
+			$context['error_title'] = $txt['invalid_activation_resend'];
 			throw new Elk_Exception(!empty($email_change) ? 'change_email_success' : 'resend_email_success', false);
 		}
 	}
@@ -938,7 +956,9 @@ class Register_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context;
 
-		if ($this->_req->getQuery('code', 'trim', '') != $this->_row['validation_code'])
+		$code = substr(hash('sha256', $this->_req->getQuery('code', 'trim', '')), 0, 10);
+
+		if ($code !== $this->_row['validation_code'])
 		{
 			if (!empty($this->_row['is_activated']) && $this->_row['is_activated'] == 1)
 			{
@@ -1045,7 +1065,6 @@ class Register_Controller extends Action_Controller
 	public function action_verificationcode()
 	{
 		global $context, $scripturl;
-	//	vid=register;rand=ef746ef2ee7ad37a35ce512cf9aa43d2;sound
 
 		$verification_id = isset($this->_req->query->vid) ? $this->_req->query->vid : '';
 		$code = $verification_id && isset($_SESSION[$verification_id . '_vv']) ? $_SESSION[$verification_id . '_vv']['code'] : (isset($_SESSION['visual_verification_code']) ? $_SESSION['visual_verification_code'] : '');

@@ -363,6 +363,7 @@ class PackageServers_Controller extends Action_Controller
 	 * Download a package.
 	 *
 	 * What it does:
+	 *
 	 * - Accessed by action=admin;area=packageservers;sa=download
 	 * - If server is set, loads json file from package server
 	 *     - requires both section and num values to validate the file to download from the json file

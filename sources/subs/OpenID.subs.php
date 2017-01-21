@@ -30,6 +30,7 @@ class OpenID
 	 * Validate the supplied OpenID, redirects to the IDP server
 	 *
 	 * What it does:
+	 *
 	 * - Openid_uri is the URI given by the user
 	 * - Validates the URI and changes it to a fully canonical URL
 	 * - Determines the IDP server and delegation
@@ -41,6 +42,7 @@ class OpenID
 	 * @param mixed[]|null $save_fields = array()
 	 * @param string|null $return_action = null
 	 * @return string
+	 * @throws Elk_Exception
 	 */
 	public function validate($openid_uri, $return = false, $save_fields = array(), $return_action = null)
 	{
@@ -118,6 +120,7 @@ class OpenID
 	 * - Note that this function will not return when authentication is required.
 	 *
 	 * @return boolean|null
+	 * @throws Elk_Exception
 	 */
 	public function revalidate()
 	{
@@ -307,6 +310,7 @@ class OpenID
 	 *
 	 * @param bool $regenerate = false
 	 * @return string return false on failure or an array() on success
+	 * @throws Elk_Exception
 	 */
 	public function setup_DH($regenerate = false)
 	{
@@ -326,6 +330,7 @@ class OpenID
 	 * - It generates them if they're not stored or $regenerate parameter is true.
 	 *
 	 * @param bool $regenerate
+	 * @throws Elk_Exception
 	 */
 	public function get_keys($regenerate)
 	{
@@ -361,6 +366,7 @@ class OpenID
 	 * Generate private key
 	 *
 	 * @return string
+	 * @throws Elk_Exception
 	 */
 	public function generate_private_key()
 	{

@@ -30,6 +30,10 @@ sudo chmod -R 777 /var/www
 # composer is updated in setup-server.sh
 if [ "$SHORT_DB" != "none" ]
 then
+    # Start a memcached service on localhost and on the default port. In order to test against
+    # multiple memcached instances we spawn a couple more, so we do that during this before script
+    memcached -p 11212 -d
+    memcached -p 11213 -d
     composer install --no-interaction --prefer-source --quiet
 
     # Install the right database for this run
@@ -43,6 +47,7 @@ then
     sudo chmod -R 777 /var/www/vendor
 
     # common php.ini updates (if any)
+	phpenv config-add /var/www/tests/travis-ci/config.ini
     phpenv config-add /var/www/tests/travis-ci/travis_php.ini
 
     # If this is a code coverage run, we need to enable selenium and capture its coverage results

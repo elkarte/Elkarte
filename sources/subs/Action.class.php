@@ -83,6 +83,7 @@ class Action
 	 * Initialize the instance with an array of sub-actions.
 	 *
 	 * What it does:
+	 *
 	 * - Sub-actions have to be in the format expected for Action::_subActions array,
 	 * indexed by sa.
 	 *
@@ -202,6 +203,7 @@ class Action
 	 * Return the subaction.
 	 *
 	 * What it does:
+	 *
 	 * - This method checks if $sa is enabled, and falls back to default if not.
 	 * - Used only to set the context for the template.
 	 *
@@ -231,6 +233,7 @@ class Action
 	 * Security check: verify that the user has the permission to perform the given action.
 	 *
 	 * What it does:
+	 *
 	 * - Verifies if the user has the permission set for the given action.
 	 * - Return true if no permission was set for the action.
 	 * - Results in a fatal_lang_error() if the user doesn't have permission,

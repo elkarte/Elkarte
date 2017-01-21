@@ -333,6 +333,7 @@ class Calendar_Controller extends Action_Controller
 	 * This function offers up a download of an event in iCal 2.0 format.
 	 *
 	 * What it does:
+	 *
 	 * - Follows the conventions in RFC5546 http://tools.ietf.org/html/rfc5546
 	 * - Sets events as all day events since we don't have hourly events
 	 * - Will honor and set multi day events

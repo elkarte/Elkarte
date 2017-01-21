@@ -34,6 +34,7 @@ class Emailpost_Controller extends Action_Controller
 	 * Main email posting controller, reads, parses, checks and posts an email message or PM
 	 *
 	 * What it does:
+	 *
 	 * - Allows a user to reply to a topic on the board by emailing a reply to a
 	 * notification message.
 	 * - It must have the security key in the email or it will be rejected
@@ -45,6 +46,7 @@ class Emailpost_Controller extends Action_Controller
 	 * @param string|null $data used to supply a full headers+body email
 	 * @param boolean $force used to override common failure errors
 	 * @param string|null $key used to supply a lost key
+	 * @throws Elk_Exception
 	 */
 	public function action_pbe_post($data = null, $force = false, $key = null)
 	{
@@ -213,12 +215,14 @@ class Emailpost_Controller extends Action_Controller
 	 * New Topic posting controller, reads, parses, checks and posts a new topic
 	 *
 	 * What it does:
+	 *
 	 * - New topics do not have security keys in them so they are subject to spoofing
 	 * - It must be from the email of a registered user
 	 * - It must have been sent to an email ID that has been set to post new topics
 	 * - Accessed through emailtopic.
 	 *
 	 * @param string|null $data used to supply a full body+headers email
+	 * @throws Elk_Exception
 	 */
 	public function action_pbe_topic($data = null)
 	{
@@ -325,12 +329,14 @@ class Emailpost_Controller extends Action_Controller
 	 * Used to preview a failed email from the ACP
 	 *
 	 * What it does:
+	 *
 	 * - Called from ManageMaillist.controller, which checks topic/message permission for viewing
 	 * - Calls pbe_load_text to prepare text for the preview
 	 * - Returns an array of values for use in the template
 	 *
 	 * @param string $data raw email string, including headers
 	 * @return boolean
+	 * @throws Elk_Exception
 	 */
 	public function action_pbe_preview($data = '')
 	{
@@ -380,6 +386,7 @@ class Emailpost_Controller extends Action_Controller
  * Attempts to create a reply post on the forum
  *
  * What it does:
+ *
  * - Checks if the user has permissions to post/reply/postby email
  * - Calls pbe_load_text to prepare text for the post
  * - returns true if successful or false for any number of failures
@@ -388,6 +395,7 @@ class Emailpost_Controller extends Action_Controller
  * @param mixed[] $pbe array of all pbe user_info values
  * @param Email_Parse $email_message
  * @param mixed[] $topic_info
+ * @throws Elk_Exception
  */
 function pbe_create_post($pbe, $email_message, $topic_info)
 {
@@ -489,6 +497,7 @@ function pbe_create_post($pbe, $email_message, $topic_info)
  * @param mixed[] $pbe array of pbe 'user_info' values
  * @param Email_Parse $email_message
  * @param mixed[] $pm_info
+ * @throws Elk_Exception
  */
 function pbe_create_pm($pbe, $email_message, $pm_info)
 {
@@ -532,6 +541,7 @@ function pbe_create_pm($pbe, $email_message, $pm_info)
  * Create a new topic by email
  *
  * What it does:
+ *
  * - Called by pbe_topic to create a new topic or by pbe_main to create a new topic via a subject change
  * - checks posting permissions, but requires all email validation checks are complete
  * - Calls pbe_load_text to prepare text for the post
@@ -544,6 +554,7 @@ function pbe_create_pm($pbe, $email_message, $pm_info)
  * @param mixed[] $pbe array of pbe 'user_info' values
  * @param Email_Parse $email_message
  * @param mixed[] $board_info
+ * @throws Elk_Exception
  */
 function pbe_create_topic($pbe, $email_message, $board_info)
 {
@@ -648,6 +659,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
  * Calls the necessary functions to extract and format the message so its ready for posting
  *
  * What it does:
+ *
  * - Converts an email response (text or html) to a BBC equivalent via pbe_Email_to_bbc
  * - Formats the email response so it looks structured and not chopped up (via pbe_fix_email_body)
  *

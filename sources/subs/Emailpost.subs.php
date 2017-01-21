@@ -16,6 +16,7 @@
  * Converts text / HTML to BBC
  *
  * What it does:
+ *
  * - protects certain tags from conversion
  * - strips original message from the reply if possible
  * - If the email is html based, this will convert basic html tags to bbc tags
@@ -113,6 +114,7 @@ function pbe_run_parsers($text)
  * Prepares the email body so that it looks like a forum post
  *
  * What it does:
+ *
  * - Removes extra content as defined in the ACP filters
  * - Fixes quotes and quote levels
  * - Re-flows (unfolds) an email using the EmailFormat.class
@@ -618,6 +620,7 @@ function pbe_check_moderation(&$pbe)
  * @package Maillist
  * @param string $error
  * @param Email_Parse $email_message
+ * @throws Elk_Exception
  */
 function pbe_emailError($error, $email_message)
 {
@@ -746,6 +749,8 @@ function pbe_emailError($error, $email_message)
 /**
  * Writes email attachments as temp names in the proper attachment directory
  *
+ * What it does:
+ *
  * - populates $_SESSION['temp_attachments'] with the email attachments
  * - calls attachmentChecks to validate them
  * - skips ones flagged with errors
@@ -755,6 +760,7 @@ function pbe_emailError($error, $email_message)
  * @package Maillist
  * @param mixed[] $pbe
  * @param Email_Parse $email_message
+ * @throws Elk_Exception
  */
 function pbe_email_attachments($pbe, $email_message)
 {

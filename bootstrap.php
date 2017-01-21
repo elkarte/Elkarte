@@ -17,7 +17,9 @@
 
 // Bootstrap only once.
 if (defined('ELKBOOT'))
+{
 	return true;
+}
 
 $time_start = microtime(true);
 
@@ -40,16 +42,24 @@ $ssi_error_reporting = error_reporting(E_ALL | E_STRICT & ~8192);
 // Directional only script time usage for display
 // getrusage is missing in php < 7 on Windows
 if (function_exists('getrusage'))
+{
 	$rusage_start = getrusage();
+}
 else
+{
 	$rusage_start = array();
+}
 
 $db_show_debug = false;
 
 // We don't need no globals. (a bug in "old" versions of PHP)
 foreach (array('db_character_set', 'cachedir') as $variable)
+{
 	if (isset($GLOBALS[$variable]))
+	{
 		unset($GLOBALS[$variable], $GLOBALS[$variable]);
+	}
+}
 
 // Where the Settings.php file is located
 $settings_loc = __DIR__ . '/Settings.php';
@@ -62,6 +72,7 @@ if (file_exists('install'))
 	{
 		require_once($settings_loc);
 	}
+
 	if (empty($ignore_install_dir))
 	{
 		if (file_exists($settings_loc) && empty($_SESSION['installing']))
@@ -73,7 +84,7 @@ if (file_exists('install'))
 			$redirec_file = 'install.php';
 		}
 
-		header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/install/' . $redirec_file);
+		header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) === 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] === '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/install/' . $redirec_file);
 		die();
 	}
 }
@@ -84,17 +95,29 @@ else
 
 // Make sure the paths are correct... at least try to fix them.
 if (!file_exists($boarddir) && file_exists(__DIR__ . '/agreement.txt'))
+{
 	$boarddir = __DIR__;
+}
 if (!file_exists($sourcedir . '/SiteDispatcher.class.php') && file_exists($boarddir . '/sources'))
+{
 	$sourcedir = $boarddir . '/sources';
+}
 
 // Check that directories which didn't exist in past releases are initialized.
 if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
+{
 	$cachedir = $boarddir . '/cache';
+}
+
 if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'))
+{
 	$extdir = $sourcedir . '/ext';
+}
+
 if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir . '/themes/default/languages'))
+{
 	$languagedir = $boarddir . '/themes/default/languages';
+}
 
 // Time to forget about variables and go with constants!
 DEFINE('BOARDDIR', $boarddir);
@@ -137,7 +160,9 @@ $ssi_on_error_method = false;
 
 // Don't do john didley if the forum's been shut down completely.
 if ($maintenance == 2 && (!isset($ssi_maintenance_off) || $ssi_maintenance_off !== true))
+{
 	die($mmessage);
+}
 
 if ($db_show_debug === true && isset($rusage_start))
 {
@@ -146,7 +171,9 @@ if ($db_show_debug === true && isset($rusage_start))
 
 // Forum in extended maintenance mode? Our trip ends here with a bland message.
 if (!empty($maintenance) && $maintenance == 2)
+{
 	Errors::instance()->display_maintenance_message();
+}
 
 // Clean the request.
 cleanRequest();
@@ -168,28 +195,45 @@ elk_seed_generator();
 
 // Check on any hacking attempts.
 if (isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS']))
+{
 	die('No access...');
+}
 elseif (isset($_REQUEST['ssi_theme']) && (int) $_REQUEST['ssi_theme'] == (int) $ssi_theme)
+{
 	die('No access...');
+}
 elseif (isset($_COOKIE['ssi_theme']) && (int) $_COOKIE['ssi_theme'] == (int) $ssi_theme)
+{
 	die('No access...');
+}
 elseif (isset($_REQUEST['ssi_layers'], $ssi_layers) && (@get_magic_quotes_gpc() ? stripslashes($_REQUEST['ssi_layers']) : $_REQUEST['ssi_layers']) == $ssi_layers)
+{
 	die('No access...');
+}
+
 if (isset($_REQUEST['context']))
+{
 	die('No access...');
+}
 
 // Gzip output? (because it must be boolean and true, this can't be hacked.)
 if (isset($ssi_gzip) && $ssi_gzip === true && detectServer()->outPutCompressionEnabled())
+{
 	ob_start('ob_gzhandler');
+}
 else
+{
 	$modSettings['enableCompressedOutput'] = '0';
+}
 
 // Primarily, this is to fix the URLs...
 ob_start('ob_sessrewrite');
 
 // Start the session... known to scramble SSI includes in cases...
 if (!headers_sent())
+{
 	loadSession();
+}
 else
 {
 	if (isset($_COOKIE[session_name()]) || isset($_REQUEST[session_name()]))
@@ -234,11 +278,15 @@ loadBadBehavior();
 
 // @todo: probably not the best place, but somewhere it should be set...
 if (!headers_sent())
+{
 	header('Content-Type: text/html; charset=UTF-8');
+}
 
 // Take care of any banning that needs to be done.
 if (isset($_REQUEST['ssi_ban']) || (isset($ssi_ban) && $ssi_ban === true))
+{
 	is_not_banned();
+}
 
 // Do we allow guests in here?
 if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && basename($_SERVER['PHP_SELF']) != 'SSI.php')
@@ -254,19 +302,27 @@ if (isset($ssi_layers))
 	$template_layers = Template_Layers::getInstance();
 	$template_layers->removeAll();
 	foreach ($ssi_layers as $layer)
+	{
 		$template_layers->addBegin($layer);
+	}
 	template_header();
 }
 else
+{
 	setupThemeContext();
+}
 
 // We need to set up user agent, and make more checks on the request
 $req = request();
 
 // Make sure they didn't muss around with the settings... but only if it's not cli.
 if (isset($_SERVER['REMOTE_ADDR']) && session_id() == '')
+{
 	trigger_error($txt['ssi_session_broken'], E_USER_NOTICE);
+}
 
 // Without visiting the forum this session variable might not be set on submit.
 if (!isset($_SESSION['USER_AGENT']) && (!isset($_GET['ssi_function']) || $_GET['ssi_function'] !== 'pollVote'))
+{
 	$_SESSION['USER_AGENT'] = $req->user_agent();
+}

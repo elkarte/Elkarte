@@ -27,6 +27,7 @@ class ManagePaid_Controller extends Action_Controller
 	 * The main entrance point for the 'Paid Subscription' screen,
 	 *
 	 * What it does:
+	 *
 	 * - calling the right function based on the given sub-action.
 	 * - It defaults to sub-action 'view'.
 	 * - Accessed from ?action=admin;area=paidsubscribe.
@@ -114,7 +115,8 @@ class ManagePaid_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$settingsForm->setConfigVars($this->_settings());
+		$config_vars = $this->_settings();
+		$settingsForm->setConfigVars($config_vars);
 
 		// Some important context stuff
 		$context['page_title'] = $txt['settings'];
@@ -173,6 +175,7 @@ class ManagePaid_Controller extends Action_Controller
 				$this->_req->post->paid_currency_code = trim($this->_req->post->paid_currency_code);
 
 				unset($config_vars['dummy_currency']);
+				$settingsForm->setConfigVars($config_vars);
 				$settingsForm->setConfigValues((array) $this->_req->post);
 				$settingsForm->save();
 				redirectexit('action=admin;area=paidsubscribe;sa=settings');

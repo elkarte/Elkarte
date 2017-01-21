@@ -82,6 +82,7 @@ class ManageAttachments_Controller extends Action_Controller
 	 * The main 'Attachments and Avatars' admin.
 	 *
 	 * What it does:
+	 *
 	 * - This method is the entry point for index.php?action=admin;area=manageattachments
 	 * and it calls a function based on the sub-action.
 	 * - It requires the manage_attachments permission.
@@ -572,6 +573,7 @@ class ManageAttachments_Controller extends Action_Controller
 	 * Show several file maintenance options.
 	 *
 	 * What it does:
+	 *
 	 * - Called by ?action=admin;area=manageattachments;sa=maintain.
 	 * - Calculates file statistics (total file size, number of attachments,
 	 * number of avatars, attachment space available).
@@ -762,6 +764,7 @@ class ManageAttachments_Controller extends Action_Controller
 	 * This function will performs many attachment checks and provides ways to fix them
 	 *
 	 * What it does:
+	 *
 	 * - Checks for the following common issues
 	 * - Orphan Thumbnails
 	 * - Attachments that have no thumbnails
@@ -1721,6 +1724,7 @@ class ManageAttachments_Controller extends Action_Controller
 	 * Function called in-between each round of attachments and avatar repairs.
 	 *
 	 * What it does:
+	 *
 	 * - Called by repairAttachments().
 	 * - If repairAttachments() has more steps added, this function needs updated!
 	 *
@@ -1728,6 +1732,7 @@ class ManageAttachments_Controller extends Action_Controller
 	 * @param mixed[] $to_fix attachments to fix
 	 * @param int $max_substep = 0
 	 * @todo Move to ManageAttachments.subs.php
+	 * @throws Elk_Exception
 	 */
 	private function _pauseAttachmentMaintenance($to_fix, $max_substep = 0)
 	{

@@ -130,6 +130,7 @@ class ProfileInfo_Controller extends Action_Controller
 	 * Prepares the tabs for the profile summary page
 	 *
 	 * What it does:
+	 *
 	 * - Tab information for use in the summary page
 	 * - Each tab template defines a div, the value of which are the template(s) to load in that div
 	 * - array(array(1, 2), array(3, 4)) <div>template 1, template 2</div><div>template 3 template 4</div>

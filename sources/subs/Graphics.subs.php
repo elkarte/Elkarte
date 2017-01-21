@@ -59,6 +59,7 @@ function createThumbnail($source, $max_width, $max_height)
  * Used to re-encodes an image to a specified image format
  *
  * What it does:
+ *
  * - creates a copy of the file at the same location as fileName.
  * - the file would have the format preferred_format if possible, otherwise the default format is jpeg.
  * - the function makes sure that all non-essential image contents are disposed.
@@ -90,6 +91,7 @@ function reencodeImage($fileName, $preferred_format = 0)
  * Searches through the file to see if there's potentially harmful non-binary content.
  *
  * What it does:
+ *
  * - if extensiveCheck is true, searches for asp/php short tags as well.
  *
  * @package Graphics
@@ -214,6 +216,7 @@ function imageMemoryCheck($sizes)
  * Resize an image from a remote location or a local file.
  *
  * What it does:
+ *
  * - Puts the resized image at the destination location.
  * - The file would have the format preferred_format if possible,
  * otherwise the default format is jpeg.
@@ -302,6 +305,7 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
  * Resize an image proportionally to fit within the defined max_width and max_height limits
  *
  * What it does:
+ *
  * - Will do nothing to the image if the file fits within the size limits
  * - If Image Magick is present it will use those function over any GD solutions
  * - If GD2 is present, it'll use it to achieve better quality (imagecopyresampled)
@@ -469,6 +473,7 @@ function autoRotateImage($image_name)
  * Autorotate an image based on its EXIF Orientation tag.
  *
  * What it does:
+ *
  * - GD only
  * - Checks exif data for orientation flag and rotates image so its proper
  * - Does not update orientation flag as GD removes EXIF data
@@ -549,6 +554,7 @@ function autoRotateImageWithGD($image_name)
  * Autorotate an image based on its EXIF Orientation tag.
  *
  * What it does:
+ *
  * - ImageMagick only
  * - Checks exif data for orientation flag and rotates image so its proper
  * - Updates orientation flag if rotation was required
@@ -722,6 +728,7 @@ function flipImageGD($image, $sizes, $axis = 'vertical')
  * Copy / resize an image using GD bicubic methods
  *
  * What it does:
+ *
  * - Used when imagecopyresample() is not available
  * - Uses bicubic resizing methods which are lower quality then imagecopyresample
  *
@@ -790,6 +797,7 @@ if (!function_exists('imagecreatefrombmp'))
 	 * It is set only if it doesn't already exist (for forwards compatibility.)
 	 *
 	 * What it does:
+	 *
 	 * - It only supports uncompressed bitmaps.
 	 * - It only supports standard windows bitmaps (no os/2 variants)
 	 * - Returns an image identifier representing the bitmap image
@@ -981,6 +989,7 @@ if (!function_exists('imagecreatefrombmp'))
  * Show an image containing the visual verification code for registration.
  *
  * What it does:
+ *
  * - Requires the GD extension.
  * - Uses a random font for each letter from default_theme_dir/fonts.
  * - Outputs a png if possible, otherwise a gif.

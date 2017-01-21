@@ -61,6 +61,7 @@ class Templates
 	 * Load a template - if the theme doesn't include it, use the default.
 	 *
 	 * What it does:
+	 *
 	 * - Loads a template file with the name template_name from the current, default, or base theme.
 	 * - Detects a wrong default theme directory and tries to work around it.
 	 * - Can be used to only load style sheets by using false as the template name
@@ -74,6 +75,7 @@ class Templates
 	 * @param bool $fatal = true if fatal is true, dies with an error message if the template cannot be found
 	 *
 	 * @return boolean|null
+	 * @throws Elk_Exception
 	 */
 	public function load($template_name, $style_sheets = array(), $fatal = true)
 	{
@@ -107,6 +109,7 @@ class Templates
 	 * <b>Internal function! Do not use it, use loadTemplate instead</b>
 	 *
 	 * What it does:
+	 *
 	 * - Loads a template file with the name template_name from the current, default, or base theme.
 	 * - Detects a wrong default theme directory and tries to work around it.
 	 * - Can be used to only load style sheets by using false as the template name
@@ -225,6 +228,7 @@ class Templates
 	 * Load the template/language file using eval or require? (with eval we can show an error message!)
 	 *
 	 * What it does:
+	 *
 	 * - Loads the template or language file specified by filename.
 	 * - Uses eval unless disableTemplateEval is enabled.
 	 * - Outputs a parse error if the file did not exist or contained errors.
@@ -475,6 +479,7 @@ class Templates
 	 * Load a sub-template.
 	 *
 	 * What it does:
+	 *
 	 * - loads the sub template specified by sub_template_name, which must be in an already-loaded template.
 	 * - if ?debug is in the query string, shows administrators a marker after every sub template
 	 * for debugging purposes.
