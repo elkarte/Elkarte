@@ -592,7 +592,7 @@ class Register_Controller extends Action_Controller
 		{
 			call_integration_hook('integrate_activate', array($regOptions['username'], 1, 1));
 
-			setLoginCookie(60 * $modSettings['cookieTime'], $memberID, hash('sha256', Util::strtolower($regOptions['username']) . $regOptions['password'] . $regOptions['register_vars']['password_salt']));
+			setLoginCookie(60 * $modSettings['cookieTime'], $memberID, hash('sha256', $regOptions['register_vars']['passwd'] . $regOptions['register_vars']['password_salt']));
 
 			redirectexit('action=auth;sa=check;member=' . $memberID, $context['server']['needs_login_fix']);
 		}
@@ -693,6 +693,9 @@ class Register_Controller extends Action_Controller
 			sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 
 			$context['page_title'] = $txt['invalid_activation_resend'];
+
+			// Don't let them wack away on their resend
+			spamProtection('remind');
 
 			// This will ensure we don't actually get an error message if it works!
 			$context['error_title'] = '';
