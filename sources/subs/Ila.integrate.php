@@ -373,9 +373,17 @@ class Ila_Integrate
 			}
 			else
 			{
-				// Not an image, determine a mime or us a default thumbnail
+				// Not an image, determine a mime or use a default thumbnail
 				$check = returnMimeThumb((isset($is_image['fileext']) ? $is_image['fileext'] : ''), true);
-				$data = '<a href="' . $scripturl . '?action=dlattach;attach=' . $num . '"><img src="' . $check . '" alt="' . $is_image['filename'] . '" class="bbc_img" /></a>';
+
+				if ($is_image === false)
+				{
+					$data = '<img src="' . $check . '" alt="' . $is_image['filename'] . '" class="bbc_img" />';
+				}
+				else
+				{
+					$data = '<a href="' . $scripturl . '?action=dlattach;attach=' . $num . '"><img src="' . $check . '" alt="' . $is_image['filename'] . '" class="bbc_img" /></a>';
+				}
 			}
 
 			$context['ila_dont_show_attach_below'][] = $num;
