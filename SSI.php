@@ -340,7 +340,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 		$row['subject'] = censor($row['subject']);
 		$row['body'] = censor($row['body']);
 
-		$preview = strip_tags(strtr($row['body'], array('<br>' => '&#10;')));
+		$preview = strip_tags(strtr($row['body'], array('<br />' => '&#10;')));
 
 		// Build the array.
 		$posts[] = array(
@@ -531,7 +531,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 	$posts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), array('<br>' => '&#10;')));
+		$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
 
 		// Censor the subject and body.
 		$row['subject'] = censor($row['subject']);
@@ -786,7 +786,7 @@ function ssi_latestMember($output_method = 'echo')
 
 	if ($output_method === 'echo')
 		echo '
-		', sprintf($txt['welcome_newest_member'], $context['common_stats']['latest_member']['link']), '<br>';
+		', sprintf($txt['welcome_newest_member'], $context['common_stats']['latest_member']['link']), '<br />';
 	else
 	{
 		return $context['common_stats']['latest_member'];
@@ -939,7 +939,7 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 			<tr>
 				<td class="centertext">
 					', $query_members[$member]['link'], '
-					<br>', $query_members[$member]['avatar']['image'], '
+					<br />', $query_members[$member]['avatar']['image'], '
 				</td>
 			</tr>';
 		}
@@ -990,10 +990,10 @@ function ssi_boardStats($output_method = 'echo')
 	}
 
 	echo '
-		', $txt['total_members'], ': <a href="', $scripturl . '?action=memberlist">', comma_format($totals['members']), '</a><br>
-		', $txt['total_posts'], ': ', comma_format($totals['posts']), '<br>
-		', $txt['total_topics'], ': ', comma_format($totals['topics']), ' <br>
-		', $txt['total_cats'], ': ', comma_format($totals['categories']), '<br>
+		', $txt['total_members'], ': <a href="', $scripturl . '?action=memberlist">', comma_format($totals['members']), '</a><br />
+		', $txt['total_posts'], ': ', comma_format($totals['posts']), '<br />
+		', $txt['total_topics'], ': ', comma_format($totals['topics']), ' <br />
+		', $txt['total_cats'], ': ', comma_format($totals['categories']), '<br />
 		', $txt['total_boards'], ': ', comma_format($totals['boards']);
 }
 
@@ -1052,13 +1052,13 @@ function ssi_whosOnline($output_method = 'echo')
 		echo ' (' . implode(', ', $bracketList) . ')';
 	}
 
-	echo '<br>
+	echo '<br />
 			', implode(', ', $return['list_users_online']);
 
 	// Showing membergroups?
 	if (!empty($settings['show_group_key']) && !empty($return['membergroups']))
 	{
-		echo '<br>
+		echo '<br />
 			[' . implode(']&nbsp;&nbsp;[', $return['membergroups']) . ']';
 	}
 }
@@ -1118,7 +1118,7 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 	if (!empty($context['login_errors']))
 	{
 		echo '
-			<p class="errorbox">', implode('<br>', $context['login_errors']), '</p><br>';
+			<p class="errorbox">', implode('<br />', $context['login_errors']), '</p><br />';
 	}
 
 	// Or perhaps there's some special description for this time?
@@ -1318,13 +1318,13 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 	{
 		echo '
 		<form class="ssi_poll" action="', $boardurl, '/SSI.php?ssi_function=pollVote" method="post" accept-charset="UTF-8">
-			<strong>', $return['question'], '</strong><br>
-			', !empty($return['allowed_warning']) ? $return['allowed_warning'] . '<br>' : '';
+			<strong>', $return['question'], '</strong><br />
+			', !empty($return['allowed_warning']) ? $return['allowed_warning'] . '<br />' : '';
 
 		foreach ($return['options'] as $option)
 		{
 			echo '
-			<label for="', $option['id'], '">', $option['vote_button'], ' ', $option['option'], '</label><br>';
+			<label for="', $option['id'], '">', $option['vote_button'], ' ', $option['option'], '</label><br />';
 		}
 
 		echo '
@@ -1721,7 +1721,7 @@ function ssi_todaysCalendar($output_method = 'echo')
 	if (!empty($return['calendar_holidays']))
 	{
 		echo '
-			<span class="holiday">' . $txt['calendar_prompt'] . ' ' . implode(', ', $return['calendar_holidays']) . '<br></span>';
+			<span class="holiday">' . $txt['calendar_prompt'] . ' ' . implode(', ', $return['calendar_holidays']) . '<br /></span>';
 	}
 
 	if (!empty($return['calendar_birthdays']))
@@ -1736,7 +1736,7 @@ function ssi_todaysCalendar($output_method = 'echo')
 		}
 
 		echo '
-			<br>';
+			<br />';
 	}
 
 	if (!empty($return['calendar_events']))
@@ -1938,7 +1938,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 		if (!$news['is_last'])
 		{
 			echo '
-			<hr>';
+			<hr />';
 		}
 	}
 }
