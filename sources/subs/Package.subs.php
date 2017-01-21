@@ -2231,7 +2231,7 @@ function package_flush_cache($trash = false)
 		$result = package_chmod($filename);
 
 		// If we are not doing our test pass, then lets do a full write check
-		if (!$trash)
+		if (!$trash && !is_dir($filename))
 		{
 			// Acid test, can we really open this file for writing?
 			$fp = ($result) ? fopen($filename, 'r+') : $result;
@@ -2253,9 +2253,12 @@ function package_flush_cache($trash = false)
 
 	foreach ($package_cache as $filename => $data)
 	{
-		$fp = fopen($filename, in_array(substr($filename, -3), $text_filetypes) ? 'w' : 'wb');
-		fwrite($fp, $data);
-		fclose($fp);
+		if (!is_dir($filename))
+		{
+			$fp = fopen($filename, in_array(substr($filename, -3), $text_filetypes) ? 'w' : 'wb');
+			fwrite($fp, $data);
+			fclose($fp);
+		}
 	}
 
 	$package_cache = array();
