@@ -298,7 +298,7 @@ class ManageServer_Controller extends Action_Controller
 
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=cache;save';
 		$context['settings_title'] = $txt['caching_settings'];
-		$context['settings_message'] = $txt['caching_information'] . '<br><br>' . $txt['cache_settings_message'];
+		$context['settings_message'] = $txt['caching_information'] . '<br /><br />' . $txt['cache_settings_message'];
 
 		// Prepare the template.
 		createToken('admin-ssc');

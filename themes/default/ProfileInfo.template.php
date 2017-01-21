@@ -1013,9 +1013,9 @@ function template_profile_block_buddies()
 				echo '
 				<div class="attachment">
 					<div class="generic_border centertext">
-						', $data['avatar']['image'], '<br>
+						', $data['avatar']['image'], '<br />
 						<a href="', $scripturl, '?action=profile;u=', $data['id'], '">', $data['name'], '</a>
-						<br>
+						<br />
 						', template_member_online($data), '<em><span class="smalltext"> ' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '</span></em>
 						<div class="contact">';
 

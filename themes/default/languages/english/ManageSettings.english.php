@@ -133,7 +133,7 @@ $txt['cache_level2'] = 'Level 2 Caching';
 $txt['cache_level3'] = 'Level 3 Caching (Not Recommended)';
 $txt['cache_memcached'] = 'Memcached settings';
 $txt['cache_memcache'] = 'Memcache settings';
-$txt['cache_memcached_servers'] = '<br>Added servers:<ul class="bbc_list"><li>';
+$txt['cache_memcached_servers'] = '<br />Added servers:<ul class="bbc_list"><li>';
 $txt['cache_accelerator'] = 'Caching Accelerator';
 $txt['cache_uid'] = 'Cache Accelerator Userid';
 $txt['cache_password'] = 'Cache Accelerator Password';

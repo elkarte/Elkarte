@@ -120,7 +120,7 @@ function template_edit_profile_field()
 						</dd>
 						<dt>
 							<a id="field_show_enclosed" href="', $scripturl, '?action=quickhelp;help=field_show_enclosed" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
-							<label for="enclose">', $txt['custom_edit_enclose'], ':</label><br>
+							<label for="enclose">', $txt['custom_edit_enclose'], ':</label><br />
 							<span class="smalltext">', $txt['custom_edit_enclose_desc'], '</span>
 						</dt>
 						<dd>
@@ -175,7 +175,7 @@ function template_edit_profile_field()
 						</dd>
 						<dt id="options_dt">
 							<a href="', $scripturl, '?action=quickhelp;help=customoptions" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
-							<label for="options_dd">', $txt['custom_edit_options'], ':</label><br>
+							<label for="options_dd">', $txt['custom_edit_options'], ':</label><br />
 							<span class="smalltext">', $txt['custom_edit_options_desc'], '</span>
 						</dt>
 						<dd id="options_dd">
@@ -184,12 +184,12 @@ function template_edit_profile_field()
 	if (!empty($context['field']['show_nodefault']))
 	{
 		echo '
-								<input type="radio" name="default_select" value="no_default"', $context['field']['default_select'] == 'no_default' ? ' checked="checked"' : '', ' class="input_radio" /><label>' . $txt['custom_edit_options_no_default'] . '</label><br>';
+								<input type="radio" name="default_select" value="no_default"', $context['field']['default_select'] == 'no_default' ? ' checked="checked"' : '', ' class="input_radio" /><label>' . $txt['custom_edit_options_no_default'] . '</label><br />';
 	}
 
 	foreach ($context['field']['options'] as $k => $option)
 		echo '
-							', $k == 0 ? '' : '<br>', '<input type="radio" name="default_select" value="', $k, '"', $context['field']['default_select'] == $option ? ' checked="checked"' : '', ' /><input type="text" name="select_option[', $k, ']" value="', $option, '" class="input_text" />';
+							', $k == 0 ? '' : '<br />', '<input type="radio" name="default_select" value="', $k, '"', $context['field']['default_select'] == $option ? ' checked="checked"' : '', ' /><input type="text" name="select_option[', $k, ']" value="', $option, '" class="input_text" />';
 
 	echo '
 							<span id="addopt"></span>
@@ -209,7 +209,7 @@ function template_edit_profile_field()
 					<dl class="settings">
 						<dt id="mask_dt">
 							<a id="custom_mask" href="', $scripturl, '?action=quickhelp;help=custom_mask" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
-							<label for="mask">', $txt['custom_edit_mask'], ':</label><br>
+							<label for="mask">', $txt['custom_edit_mask'], ':</label><br />
 							<span class="smalltext">', $txt['custom_edit_mask_desc'], '</span>
 						</dt>
 						<dd>

@@ -165,7 +165,7 @@ function template_error_log()
 							<li>
 								<a class="scope" href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=file;value=', $error['file']['search'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_file'], '" class="icon i-search"></a>
 								<span>
-									', $txt['file'], ': ', $error['file']['link'], '<br>
+									', $txt['file'], ': ', $error['file']['link'], '<br />
 									', $txt['line'], ': ', $error['file']['line'], '
 								</span>
 							</li>

@@ -1027,7 +1027,7 @@ class Register_Controller extends Action_Controller
 				$ul = '                ';
 				$crlf = "\r\n";
 				$data = $context['forum_contacts'] . $crlf . $txt['coppa_form_address'] . ':' . $crlf . $txt['coppa_form_date'] . ':' . $crlf . $crlf . $crlf . replaceBasicActionUrl($txt['coppa_form_body']);
-				$data = str_replace(array('{PARENT_NAME}', '{CHILD_NAME}', '{USER_NAME}', '<br>', '<br />'), array($ul, $ul, $member['member_name'], $crlf, $crlf), $data);
+				$data = str_replace(array('{PARENT_NAME}', '{CHILD_NAME}', '{USER_NAME}', '<br />', '<br />'), array($ul, $ul, $member['member_name'], $crlf, $crlf), $data);
 
 				// Send the headers.
 				header('Connection: close');

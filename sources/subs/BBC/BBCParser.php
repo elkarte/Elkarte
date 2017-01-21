@@ -134,7 +134,7 @@ class BBCParser
 
 		$this->resetParser();
 
-		// @todo change this to <br> (it will break tests)
+		// @todo change this to <br> (it will break tests and previews and ...)
 		$this->message = str_replace("\n", '<br />', $this->message);
 
 		// Check if the message might have a link or email to save a bunch of parsing in autolink()
