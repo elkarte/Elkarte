@@ -25,6 +25,7 @@ class ManageBans_Controller extends Action_Controller
 	 * Ban center. The main entrance point for all ban center functions.
 	 *
 	 * What it does:
+	 *
 	 * - It is accessed by ?action=admin;area=ban.
 	 * - It chooses a function based on the 'sa' parameter, like many others.
 	 * - The default sub-action is action_list().
@@ -101,6 +102,7 @@ class ManageBans_Controller extends Action_Controller
 	 * Shows a list of bans currently set.
 	 *
 	 * What it does:
+	 *
 	 * - It is accessed by ?action=admin;area=ban;sa=list.
 	 * - It removes expired bans.
 	 * - It allows sorting on different criteria.
@@ -507,6 +509,7 @@ class ManageBans_Controller extends Action_Controller
 	 * This handles the listing of ban log entries, and allows their deletion.
 	 *
 	 * What it does:
+	 *
 	 * - Shows a list of logged access attempts by banned users.
 	 * - It is accessed by ?action=admin;area=ban;sa=log.
 	 * - allows sorting of several columns.
@@ -882,6 +885,7 @@ class ManageBans_Controller extends Action_Controller
 	 * This handles the screen for showing the banned entities
 	 *
 	 * What it does:
+	 *
 	 * - It is accessed by ?action=admin;area=ban;sa=browse
 	 * - It uses sub-tabs for browsing by IP, hostname, email or username.
 	 *

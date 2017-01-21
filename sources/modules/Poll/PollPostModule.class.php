@@ -80,6 +80,7 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * Sets up poll options in context for use in the template
 	 *
 	 * What it does:
+	 *
 	 * - Validates the topic can have a poll added
 	 * - Validates the poster can add a poll or not
 	 * - Prepares options so a poll can be added (or not) given the above results

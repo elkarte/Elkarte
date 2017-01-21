@@ -24,6 +24,7 @@ class ManageAvatars_Controller extends Action_Controller
 	 * The Avatars admin area
 	 *
 	 * What it does:
+	 *
 	 * - This method is the entry point for index.php?action=admin;area=manageattachments;sa=avatars
 	 * - It calls a function based on the sub-action.
 	 * - Is called from ManageAttachments.controller.php

@@ -27,6 +27,7 @@ class ManagePaid_Controller extends Action_Controller
 	 * The main entrance point for the 'Paid Subscription' screen,
 	 *
 	 * What it does:
+	 *
 	 * - calling the right function based on the given sub-action.
 	 * - It defaults to sub-action 'view'.
 	 * - Accessed from ?action=admin;area=paidsubscribe.

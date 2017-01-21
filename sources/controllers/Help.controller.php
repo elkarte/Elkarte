@@ -44,6 +44,7 @@ class Help_Controller extends Action_Controller
 	 * Prepares the help page.
 	 *
 	 * What it does:
+	 *
 	 * - It is accessed by ?action=help.
 	 *
 	 * @uses Help template and Manual language file.

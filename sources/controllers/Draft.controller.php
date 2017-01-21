@@ -79,6 +79,7 @@ class Draft_Controller extends Post_Controller
 	 * Show all drafts of a given type by the current user
 	 *
 	 * What it does:
+	 *
 	 * - Allows for the deleting and loading/editing of drafts
 	 *
 	 * @uses the showdrafts template
@@ -181,6 +182,7 @@ class Draft_Controller extends Post_Controller
 	 * Show all PM drafts of the current user
 	 *
 	 * What it does:
+	 *
 	 * - Allows for the deleting and loading/editing of PM drafts
 	 *
 	 * @uses the showPMDrafts template

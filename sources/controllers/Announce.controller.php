@@ -26,6 +26,7 @@ class Announce_Controller extends Action_Controller
 	 * This function is called before the flow is redirected to action_selectgroup() or action_send().
 	 *
 	 * What it does:
+	 *
 	 * - Checks the topic announcement permissions and loads the announcement template.
 	 * - Requires the announce_topic permission.
 	 *
@@ -65,6 +66,7 @@ class Announce_Controller extends Action_Controller
 	 * Allow a user to chose the membergroups to send the announcement to.
 	 *
 	 * What it does:
+	 *
 	 * - Lets the user select the membergroups that will receive the topic announcement.
 	 * - Accessed by action=announce;sa=selectgroup
 	 *
@@ -100,6 +102,7 @@ class Announce_Controller extends Action_Controller
 	 * Send the announcement in chunks.
 	 *
 	 * What it does:
+	 *
 	 * - Splits the members to be sent a topic announcement into chunks.
 	 * - Composes notification messages in all languages needed.
 	 * - Does the actual sending of the topic announcements in chunks.

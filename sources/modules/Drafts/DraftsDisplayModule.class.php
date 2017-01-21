@@ -60,6 +60,7 @@ class Drafts_Display_Module extends ElkArte\sources\modules\Abstract_Module
 	 * Prepares context for draft buttons and listing
 	 *
 	 * What it does:
+	 *
 	 * - Sets/checks the ability to save and autosave drafts for JS and button display
 	 * - Builds the list of drafts available to load
 	 * - Loads necessary Draft javascript functions for full editor or text area

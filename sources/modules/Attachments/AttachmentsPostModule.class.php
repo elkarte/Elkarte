@@ -114,6 +114,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * would be insane.  What needs to be done is have this bowl of spaghetti fixed.
 	 *
 	 * What it does:
+	 *
 	 * - Infuriates anyone trying to read the code or follow the execution path
 	 * - Causes hallucinations and sleepless nights
 	 * - Known to induce binge drinking

@@ -46,6 +46,7 @@ class SplitTopics_Controller extends Action_Controller
 	 * Splits a topic into two topics.
 	 *
 	 * What it does:
+	 *
 	 * - Delegates to the other functions (based on the URL parameter 'sa').
 	 * - Loads the SplitTopics template.
 	 * - Requires the split_any permission.
@@ -85,6 +86,7 @@ class SplitTopics_Controller extends Action_Controller
 	 * Screen shown before the actual split.
 	 *
 	 * What it does:
+	 *
 	 * - Is accessed with ?action=splittopics or ?action=splittopics;sa=index
 	 * - Default sub action for ?action=splittopics.
 	 * - Redirects to action_splitSelectTopics if the message given turns out to be
@@ -154,6 +156,7 @@ class SplitTopics_Controller extends Action_Controller
 	 * Do the actual split.
 	 *
 	 * What it does:
+	 *
 	 * - Is accessed with ?action=splittopics;sa=execute.
 	 * - Supports three ways of splitting:
 	 *   (1) only one message is split off.
@@ -236,6 +239,7 @@ class SplitTopics_Controller extends Action_Controller
 	 * Do the actual split of a selection of topics.
 	 *
 	 * What it does:
+	 *
 	 * - Is accessed with ?action=splittopics;sa=splitSelection.
 	 * - Uses the main SplitTopics template.
 	 *
@@ -280,6 +284,7 @@ class SplitTopics_Controller extends Action_Controller
 	 * Allows the user to select the messages to be split.
 	 *
 	 * What it does:
+	 *
 	 * - Is accessed with ?action=splittopics;sa=selectTopics.
 	 * - Uses 'select' sub template of the SplitTopics template or (for
 	 * XMLhttp) the 'split' sub template of the Xml template.

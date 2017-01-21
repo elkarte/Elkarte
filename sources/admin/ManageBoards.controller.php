@@ -39,6 +39,7 @@ class ManageBoards_Controller extends Action_Controller
 	 * The main dispatcher; delegates.
 	 *
 	 * What it does:
+	 *
 	 * - This is the main entry point for all the manageboards admin screens.
 	 * - Called by ?action=admin;area=manageboards.
 	 * - It checks the permissions, based on the sub-action, and calls a function based on the sub-action.
@@ -122,6 +123,7 @@ class ManageBoards_Controller extends Action_Controller
 	 * The main control panel thing, the screen showing all boards and categories.
 	 *
 	 * What it does:
+	 *
 	 * - Called by ?action=admin;area=manageboards or ?action=admin;area=manageboards;sa=move.
 	 * - Requires manage_boards permission.
 	 * - It also handles the interface for moving boards.
@@ -270,6 +272,7 @@ class ManageBoards_Controller extends Action_Controller
 	 * Modify a specific category.
 	 *
 	 * What it does:
+	 *
 	 * - screen for editing and repositioning a category.
 	 * - Also used to show the confirm deletion of category screen
 	 * - Called by ?action=admin;area=manageboards;sa=cat
@@ -366,6 +369,7 @@ class ManageBoards_Controller extends Action_Controller
 	 * Function for handling a submitted form saving the category.
 	 *
 	 * What it does:
+	 *
 	 * - complete the modifications to a specific category.
 	 * - It also handles deletion of a category.
 	 * - It requires manage_boards permission.
@@ -602,6 +606,7 @@ class ManageBoards_Controller extends Action_Controller
 	 * Make changes to/delete a board.
 	 *
 	 * What it does:
+	 *
 	 * - function for handling a submitted form saving the board.
 	 * - It also handles deletion of a board.
 	 * - Called by ?action=admin;area=manageboards;sa=board2

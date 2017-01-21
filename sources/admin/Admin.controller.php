@@ -44,6 +44,7 @@ class Admin_Controller extends Action_Controller
 	 * The main admin handling function.
 	 *
 	 * What it does:
+	 *
 	 * - It initialises all the basic context required for the admin center.
 	 * - It passes execution onto the relevant admin section.
 	 * - If the passed section is not found it shows the admin home page.
@@ -614,6 +615,7 @@ class Admin_Controller extends Action_Controller
 	 * The main administration section.
 	 *
 	 * What it does:
+	 *
 	 * - It prepares all the data necessary for the administration front page.
 	 * - It uses the Admin template along with the admin sub template.
 	 * - It requires the moderate_forum, manage_membergroups, manage_bans,
@@ -664,6 +666,7 @@ class Admin_Controller extends Action_Controller
 	 * The credits section in admin panel.
 	 *
 	 * What it does:
+	 *
 	 * - Determines the current level of support functions from the server, such as
 	 * current level of caching engine or graphics library's installed.
 	 * - Accessed by ?action=admin;area=credits
@@ -723,6 +726,7 @@ class Admin_Controller extends Action_Controller
 	 * This function allocates out all the search stuff.
 	 *
 	 * What it does:
+	 *
 	 * - Accessed with /index.php?action=admin;area=search[;search_type=x]
 	 * - Sets up an array of applicable sub-actions (search types) and the function that goes with each
 	 * - Search type specified by "search_type" request variable (either from a
@@ -771,6 +775,7 @@ class Admin_Controller extends Action_Controller
 	 * A complicated but relatively quick internal search.
 	 *
 	 * What it does:
+	 *
 	 * - Can be accessed with /index.php?action=admin;sa=search;search_term=x) or
 	 * from the admin search form ("Task/Setting" option)
 	 * - Polls the controllers for their configuration settings

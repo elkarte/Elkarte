@@ -37,6 +37,7 @@ class Stats_Controller extends Action_Controller
 	 * Display some useful/interesting board statistics.
 	 *
 	 * What it does:
+	 *
 	 * - Gets all the statistics in order and puts them in.
 	 * - Uses the Stats template and language file. (and main sub template.)
 	 * - Requires the view_stats permission.
@@ -172,6 +173,7 @@ class Stats_Controller extends Action_Controller
 	 * Loads in the the "top" statistics
 	 *
 	 * What it does:
+	 *
 	 * - Calls support topXXXX functions to load stats
 	 * - Places results in to context
 	 * - Uses Top posters, topBoards, topTopicReplies, topTopicViews, topTopicStarter, topTimeOnline

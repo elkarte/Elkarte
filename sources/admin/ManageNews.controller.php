@@ -38,6 +38,7 @@ class ManageNews_Controller extends Action_Controller
 	 * The news dispatcher / delegator
 	 *
 	 * What it does:
+	 *
 	 * - This is the entrance point for all News and Newsletter screens.
 	 * - Called by ?action=admin;area=news.
 	 * - It does the permission checks, and calls the appropriate function
@@ -114,6 +115,7 @@ class ManageNews_Controller extends Action_Controller
 	 * Let the administrator(s) edit the news items for the forum.
 	 *
 	 * What it does:
+	 *
 	 * - It writes an entry into the moderation log.
 	 * - This function uses the edit_news administration area.
 	 * - Called by ?action=admin;area=news.
@@ -266,6 +268,7 @@ class ManageNews_Controller extends Action_Controller
 	 * This function allows a user to select the membergroups to send their mailing to.
 	 *
 	 * What it does:
+	 *
 	 * - Called by ?action=admin;area=news;sa=mailingmembers.
 	 * - Requires the send_mail permission.
 	 * - Form is submitted to ?action=admin;area=news;mailingcompose.
@@ -335,6 +338,7 @@ class ManageNews_Controller extends Action_Controller
 	 * Shows a form to edit a forum mailing and its recipients.
 	 *
 	 * What it does:
+	 *
 	 * - Called by ?action=admin;area=news;sa=mailingcompose.
 	 * - Requires the send_mail permission.
 	 * - Form is submitted to ?action=admin;area=news;sa=mailingsend.
@@ -503,6 +507,7 @@ class ManageNews_Controller extends Action_Controller
 	 * Handles the sending of the forum mailing in batches.
 	 *
 	 * What it does:
+	 *
 	 * - Called by ?action=admin;area=news;sa=mailingsend
 	 * - Requires the send_mail permission.
 	 * - Redirects to itself when more batches need to be sent.
@@ -864,6 +869,7 @@ class ManageNews_Controller extends Action_Controller
 	 * Set general news and newsletter settings and permissions.
 	 *
 	 * What it does:
+	 *
 	 * - Called by ?action=admin;area=news;sa=settings.
 	 * - Requires the forum_admin permission.
 	 *

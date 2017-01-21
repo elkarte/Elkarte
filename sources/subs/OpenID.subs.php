@@ -30,6 +30,7 @@ class OpenID
 	 * Validate the supplied OpenID, redirects to the IDP server
 	 *
 	 * What it does:
+	 *
 	 * - Openid_uri is the URI given by the user
 	 * - Validates the URI and changes it to a fully canonical URL
 	 * - Determines the IDP server and delegation

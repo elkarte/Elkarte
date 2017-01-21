@@ -284,6 +284,7 @@ class Email_Parse
 	 * its available.
 	 *
 	 * What it does:
+	 *
 	 * - read/load data
 	 * - split headers from the body
 	 * - break header string in to individual header keys
@@ -385,6 +386,7 @@ class Email_Parse
 	 * Content headers need to be set so we can properly decode the message body.
 	 *
 	 * What it does:
+	 *
 	 * - Content headers often use the optional parameter value syntax which need to be
 	 * specially processed.
 	 * - Parses or sets defaults for the following:
@@ -766,6 +768,7 @@ class Email_Parse
 	 * Converts a header string to ascii/UTF8
 	 *
 	 * What it does:
+	 *
 	 * - Headers, mostly subject and names may be encoded as quoted printable or base64
 	 * to allow for non ascii characters in those fields.
 	 * - This encoding is separate from the message body encoding and must be
@@ -853,6 +856,7 @@ class Email_Parse
 	 * Checks the body text to see if it may need to be further decoded
 	 *
 	 * What it does:
+	 *
 	 * - Sadly whats in the body text is not always what the header claims, or the
 	 * header is just wrong. Copy/paste in to email from other apps etc.
 	 * This does an extra check for quoted printable DNA and if found decodes the
@@ -903,6 +907,7 @@ class Email_Parse
 	 * Checks the message components to determine if the message is a DSN
 	 *
 	 * What it does:
+	 *
 	 * - Checks the content of the message, looking for headers and values that
 	 * correlate with the message being a DSN. _parse_body checks for the existence
 	 * of a "message/delivery-status" header
@@ -926,6 +931,7 @@ class Email_Parse
 	 * Tries to find the original intended recipient that failed to deliver
 	 *
 	 * What it does:
+	 *
 	 * - Checks the headers of a DSN for the various ways that the intended recipient
 	 *   Might have been included in the DSN headers
 	 *

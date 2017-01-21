@@ -44,6 +44,7 @@ class Suggest_Controller extends Action_Controller
 	 * functionality and passes execution to them.
 	 *
 	 * What it does:
+	 *
 	 * - Accessed by action=suggest.
 	 * - Passes execution to the registered handler (member)
 	 * - Allows integration to register additional handlers

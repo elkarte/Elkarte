@@ -43,6 +43,7 @@ class CoreFeatures_Controller extends Action_Controller
 	 * This is an overall control panel enabling/disabling lots of the forums key features.
 	 *
 	 * What it does:
+	 *
 	 * - Uses internally an array of all the features that can be enabled/disabled.
 	 * - $core_features, each option can have the following:
 	 *    - title - Text title of this item (If standard string does not exist).

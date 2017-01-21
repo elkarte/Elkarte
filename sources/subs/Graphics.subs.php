@@ -797,6 +797,7 @@ if (!function_exists('imagecreatefrombmp'))
 	 * It is set only if it doesn't already exist (for forwards compatibility.)
 	 *
 	 * What it does:
+	 *
 	 * - It only supports uncompressed bitmaps.
 	 * - It only supports standard windows bitmaps (no os/2 variants)
 	 * - Returns an image identifier representing the bitmap image

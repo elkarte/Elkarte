@@ -53,6 +53,7 @@ class Spellcheck_Controller extends Action_Controller
 	 * Spell checks the post for typos ;).
 	 *
 	 * What it does:
+	 *
 	 * - It uses the pspell library, which MUST be installed.
 	 * - It has problems with internationalization.
 	 * - It is accessed via ?action=spellcheck.
@@ -114,6 +115,7 @@ class Spellcheck_Controller extends Action_Controller
 	 * Builds the mis spelled words array for use in JS
 	 *
 	 * What it does:
+	 *
 	 * - Examines all words passed to it, checking spelling of each
 	 * - Incorrect ones are supplied an array of possible substitutions
 	 *

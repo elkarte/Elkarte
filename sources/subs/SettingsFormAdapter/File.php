@@ -44,6 +44,7 @@ class File extends Db
 	 * to the settings.php file
 	 *
 	 * What it does:
+	 *
 	 * - The basic usage of the six numbered key fields are
 	 * - array(0 ,1, 2, 3, 4, 5
 	 *    0 variable name - the name of the saved variable
@@ -124,6 +125,7 @@ class File extends Db
 	 * They're also available for addons and integrations.
 	 *
 	 * What it does:
+	 *
 	 * - updates the Settings.php file with the changes supplied in new_settings.
 	 * - expects new_settings to be an associative array, with the keys as the
 	 *   variable names in Settings.php, and the values the variable values.

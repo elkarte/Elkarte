@@ -70,6 +70,7 @@ class MoveTopic_Controller extends Action_Controller
 	 * This function allows to move a topic
 	 *
 	 * What it does:
+	 *
 	 * - It must be called with a topic specified. (that is, global $topic must
 	 * be set... @todo fix this thing.)
 	 * - Validates access
@@ -115,6 +116,7 @@ class MoveTopic_Controller extends Action_Controller
 	 * Executes the actual move of a topic.
 	 *
 	 * What it does:
+	 *
 	 * - It is called on the submit of action_movetopic.
 	 * - This function logs that topics have been moved in the moderation log.
 	 * - Upon successful completion redirects to message index.
@@ -219,6 +221,7 @@ class MoveTopic_Controller extends Action_Controller
 	 * Validates that the member can access the topic
 	 *
 	 * What it does:
+	 *
 	 * - Checks that a topic is supplied
 	 * - Validates the topic information can be loaded
 	 * - If the topic is not approved yet, must have approve permissions to move it
@@ -251,6 +254,7 @@ class MoveTopic_Controller extends Action_Controller
 	 * Checks access and input validation before committing the move
 	 *
 	 * What it does:
+	 *
 	 * - Checks that a topic is supplied
 	 * - Validates the move location
 	 * - Checks redirection details if its a redirection is to be posted
@@ -309,6 +313,7 @@ class MoveTopic_Controller extends Action_Controller
 	 * Renames the topic during the move if requested
 	 *
 	 * What it does:
+	 *
 	 * - Renames the moved topic with a new topic subject
 	 * - If enforce_subject is set, renames all posts withing the moved topic posts with a new subject
 	 */
@@ -350,6 +355,7 @@ class MoveTopic_Controller extends Action_Controller
 	 * Posts a redirection topic in the original location of the moved topic
 	 *
 	 * What it does:
+	 *
 	 * - If leaving a moved "where did it go" topic, validates the needed inputs
 	 * - Posts a new topic in the originating board of the topic to be moved.
 	 */
@@ -410,6 +416,7 @@ class MoveTopic_Controller extends Action_Controller
 	 * Accounts for board / user post counts when a topic is moved.
 	 *
 	 * What it does:
+	 *
 	 * - Checks if a topic is being moved to/from a board that does/does'nt count posts.
 	 */
 	private function _count_update()

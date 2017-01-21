@@ -196,6 +196,7 @@ class Ila_Integrate
 	 * Display controller hook, called from prepareDisplayContext_callback integrate_before_prepare_display_context
 	 *
 	 * What it does:
+	 *
 	 * - Drops attachments from the message if they were rendered inline
 	 *
 	 * @param mixed[] $message
@@ -223,6 +224,7 @@ class Ila_Integrate
 	 * Settings hook for the admin panel
 	 *
 	 * What it does:
+	 *
 	 * - Defines our settings array and uses our settings class to manage the data
 	 *
 	 * @param array $config_vars

@@ -61,6 +61,7 @@ class News_Controller extends Action_Controller
 	 * Outputs xml data representing recent information or a profile.
 	 *
 	 * What it does:
+	 *
 	 * - Can be passed 4 subactions which decide what is output:
 	 *     * 'recent' for recent posts,
 	 *     * 'news' for news topics,

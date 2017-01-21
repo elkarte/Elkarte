@@ -38,6 +38,7 @@ class Poll_Controller extends Action_Controller
 	 * Allow the user to vote.
 	 *
 	 * What it does:
+	 *
 	 * - It is called to register a vote in a poll.
 	 * - Must be called with a topic and option specified.
 	 * - Requires the poll_vote permission.
@@ -183,6 +184,7 @@ class Poll_Controller extends Action_Controller
 	 * Lock the voting for a poll.
 	 *
 	 * What it does:
+	 *
 	 * - Must be called with a topic specified in the URL.
 	 * - An admin always has over riding permission to lock a poll.
 	 * - If not an admin must have poll_lock_any permission, otherwise must
@@ -231,6 +233,7 @@ class Poll_Controller extends Action_Controller
 	 * Display screen for editing or adding a poll.
 	 *
 	 * What it does:
+	 *
 	 * - Must be called with a topic specified in the URL.
 	 * - If the user is adding a poll to a topic, must contain the variable
 	 * 'add' in the url.
@@ -495,6 +498,7 @@ class Poll_Controller extends Action_Controller
 	 * Update the settings for a poll, or add a new one.
 	 *
 	 * What it does:
+	 *
 	 * - Must be called with a topic specified in the URL.
 	 * - The user must have poll_edit_any/poll_add_any permission for the relevant action. Otherwise
 	 * they must be poll starter with poll_edit_own permission for editing, or be topic starter
@@ -687,6 +691,7 @@ class Poll_Controller extends Action_Controller
 	 * Remove a poll from a topic without removing the topic.
 	 *
 	 * What it does:
+	 *
 	 * - Must be called with a topic specified in the URL.
 	 * - Requires poll_remove_any permission, unless it's the poll starter
 	 * with poll_remove_own permission.

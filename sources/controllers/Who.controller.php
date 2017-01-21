@@ -38,6 +38,7 @@ class Who_Controller extends Action_Controller
 	 * Who's online, and what are they doing?
 	 *
 	 * What it does:
+	 *
 	 * - This function prepares the who's online data for the Who template.
 	 * - It requires the who_view permission.
 	 * - It is enabled with the who_enabled setting.

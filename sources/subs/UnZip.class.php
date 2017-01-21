@@ -243,6 +243,7 @@ class UnZip
 	 * Used to process the actual CDR record
 	 *
 	 * What it does:
+	 *
 	 * - Is a repeated sequence of [file header] . . .  until the end of central dir record.
 	 * - Relative offset, used so we can find the actual data entry for each file in the archive
 	 * - Validates the number of found files in the CDR matches what the ECDR record claims
@@ -370,6 +371,7 @@ class UnZip
 	 * Reads the local header, [local file header + file data + data_descriptor]
 	 *
 	 * What it does:
+	 *
 	 * - Unpacks the local file header, 26 bytes after the signature
 	 * - Updates certain CDR fields based on the variable length data found
 	 * - Sets the compressed data in to the array for processing
@@ -464,6 +466,7 @@ class UnZip
 	 * Alters processing based on the general purpose flag bits
 	 *
 	 * What it does:
+	 *
 	 * - If bit 1 is set the file is protected, so it returns an empty one
 	 * - If bit 3 is set then the data descriptor is read and processed
 	 *

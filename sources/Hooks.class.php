@@ -84,6 +84,7 @@ final class Hooks
 	 * Process functions of an integration hook.
 	 *
 	 * What it does:
+	 *
 	 * - calls all functions of the given hook.
 	 * - supports static class method calls.
 	 *
@@ -440,6 +441,7 @@ final class Hooks
 	 * Remove an integration hook function.
 	 *
 	 * What it does:
+	 *
 	 * - Removes the given function from the given hook.
 	 * - Does nothing if the function is not available.
 	 *

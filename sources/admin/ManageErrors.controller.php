@@ -53,6 +53,7 @@ class ManageErrors_Controller extends Action_Controller
 	 * View the forum's error log.
 	 *
 	 * What it does:
+	 *
 	 * - This method sets all the context up to show the error log for maintenance.
 	 * - It requires the admin_forum permission.
 	 * - It is accessed from ?action=admin;area=logs;sa=errorlog.

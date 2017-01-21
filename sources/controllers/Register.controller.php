@@ -244,6 +244,7 @@ class Register_Controller extends Action_Controller
 	 * and not (for example) OpenID.
 	 *
 	 * What it does:
+	 *
 	 * - Validates all requirements have been filled in properly
 	 * - Passes final processing to do_register
 	 * - Directs back to register on errors
@@ -546,6 +547,7 @@ class Register_Controller extends Action_Controller
 	 * Collect all extra registration fields someone might have filled in.
 	 *
 	 * What it does:
+	 *
 	 * - Classifies variables as possible string, int, float or bool
 	 * - Casts all posted data to the proper type (string, float, etc)
 	 * - Drops fields that we specially exclude during registration
@@ -637,6 +639,7 @@ class Register_Controller extends Action_Controller
 	 * Loads the registration agreement in the users language
 	 *
 	 * What it does:
+	 *
 	 * - Opens and loads the registration agreement file
 	 * - If one is available in the users language loads that version as well
 	 * - If none is found and it is required, ends the registration process and logs the error
@@ -673,6 +676,7 @@ class Register_Controller extends Action_Controller
 	 * Sets the users language file
 	 *
 	 * What it does:
+	 *
 	 * - If language support is enabled, loads whats available
 	 * - Verifies the users choice is available
 	 * - Sets in in context / session
@@ -754,6 +758,7 @@ class Register_Controller extends Action_Controller
 	 * Verify the activation code, and activate the user if correct.
 	 *
 	 * What it does:
+	 *
 	 * - Accessed by ?action=register;sa=activate
 	 * - Processes activation code requests
 	 * - Checks if the user is already activate and if so does nothing
@@ -847,6 +852,7 @@ class Register_Controller extends Action_Controller
 	 * Change their email address if not active
 	 *
 	 * What it does:
+	 *
 	 * - Requires the user enter the id/password for the account
 	 * - The account must not be active 0 or awaiting reactivation 2
 	 */
@@ -893,6 +899,7 @@ class Register_Controller extends Action_Controller
 	 * Resend an activation code to a user
 	 *
 	 * What it does:
+	 *
 	 * - Called with action=register;sa=activate;resend
 	 * - Will resend an activation code to non-active account
 	 *

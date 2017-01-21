@@ -378,6 +378,7 @@ class ProfileAccount_Controller extends Action_Controller
 	 * Does the actual issuing of a warning to a member
 	 *
 	 * What it does:
+	 *
 	 * - Validates the inputs
 	 * - Sends the warning PM if required, to the member
 	 * - Logs the action

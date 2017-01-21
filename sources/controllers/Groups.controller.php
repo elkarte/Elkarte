@@ -206,6 +206,7 @@ class Groups_Controller extends Action_Controller
 	 * Display members of a group, and allow adding of members to a group.
 	 *
 	 * What it does:
+	 *
 	 * - It can be called from ManageMembergroups if it needs templating within the admin environment.
 	 * - It shows a list of members that are part of a given membergroup.
 	 * - It is called by ?action=moderate;area=viewgroups;sa=members;group=x

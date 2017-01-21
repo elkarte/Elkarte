@@ -172,6 +172,7 @@ class Attachment_Controller extends Action_Controller
 	 * Function to remove attachments which were added via ajax calls
 	 *
 	 * What it does:
+	 *
 	 * - Currently called by drag drop attachment functionality
 	 * - Requires file name and file path
 	 * - Responds back with success or error
@@ -242,6 +243,7 @@ class Attachment_Controller extends Action_Controller
 	 * Downloads an attachment or avatar, and increments the download count.
 	 *
 	 * What it does:
+	 *
 	 * - It requires the view_attachments permission. (not for avatars!)
 	 * - It disables the session parser, and clears any previous output.
 	 * - It is accessed via the query string ?action=dlattach.

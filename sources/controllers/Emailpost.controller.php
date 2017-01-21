@@ -34,6 +34,7 @@ class Emailpost_Controller extends Action_Controller
 	 * Main email posting controller, reads, parses, checks and posts an email message or PM
 	 *
 	 * What it does:
+	 *
 	 * - Allows a user to reply to a topic on the board by emailing a reply to a
 	 * notification message.
 	 * - It must have the security key in the email or it will be rejected
@@ -214,6 +215,7 @@ class Emailpost_Controller extends Action_Controller
 	 * New Topic posting controller, reads, parses, checks and posts a new topic
 	 *
 	 * What it does:
+	 *
 	 * - New topics do not have security keys in them so they are subject to spoofing
 	 * - It must be from the email of a registered user
 	 * - It must have been sent to an email ID that has been set to post new topics
@@ -327,6 +329,7 @@ class Emailpost_Controller extends Action_Controller
 	 * Used to preview a failed email from the ACP
 	 *
 	 * What it does:
+	 *
 	 * - Called from ManageMaillist.controller, which checks topic/message permission for viewing
 	 * - Calls pbe_load_text to prepare text for the preview
 	 * - Returns an array of values for use in the template

@@ -223,6 +223,7 @@ class Util
 	 * Shorten a string of text
 	 *
 	 * What it does:
+	 *
 	 * - Shortens a text string to a given visual length
 	 * - Considers certain html entities as 1 in length, &amp; &nbsp; etc
 	 * - Optionally adds ending ellipsis that honor length or are appended
@@ -442,6 +443,7 @@ class Util
 	 * Remove slashes recursively.
 	 *
 	 * What it does:
+	 *
 	 * - removes slashes, recursively, from the array or string var.
 	 * - effects both keys and values of arrays.
 	 * - calls itself recursively to handle arrays of arrays.
@@ -472,6 +474,7 @@ class Util
 	 * Removes url stuff from the array/variable.
 	 *
 	 * What it does:
+	 *
 	 * - takes off url encoding (%20, etc.) from the array or string var.
 	 * - importantly, does it to keys too!
 	 * - calls itself recursively if there are any sub arrays.
@@ -502,6 +505,7 @@ class Util
 	 * Unescapes any array or variable.
 	 *
 	 * What it does:
+	 *
 	 * - unescapes, recursively, from the array or string var.
 	 * - effects both keys and values of arrays.
 	 * - calls itself recursively to handle arrays of arrays.
@@ -532,6 +536,7 @@ class Util
 	/**
 	 * Wrappers for unserialize
 	 * What it does:
+	 *
 	 * - if using PHP < 7 it will use ext/safe_unserialize
 	 * - if using PHP > 7 will use the built in unserialize
 	 *

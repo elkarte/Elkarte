@@ -41,6 +41,7 @@ class Server extends \ArrayObject
 	 * Helper function to set the system memory to a needed value
 	 *
 	 * What it does:
+	 *
 	 * - If the needed memory is greater than current, will attempt to get more
 	 * - If in_use is set to true, will also try to take the current memory usage in to account
 	 *

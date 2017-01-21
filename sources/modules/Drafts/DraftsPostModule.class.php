@@ -102,6 +102,7 @@ class Drafts_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * Get the post editor setup to work with drafts
 	 *
 	 * What it does:
+	 *
 	 * - Loads draft plugin to the editor options
 	 * - Loads available drafts that can be loaded in to the editor
 	 * - Updates the editor shortcut lines
@@ -251,6 +252,7 @@ class Drafts_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * Loads in a group of post drafts for the user.
 	 *
 	 * What it does:
+	 *
 	 * - Loads a specific draft for current use in the postbox if selected.
 	 * - Used in the posting screens to allow draft selection
 	 * - Will load a draft if selected is supplied via post

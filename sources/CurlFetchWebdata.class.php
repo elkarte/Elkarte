@@ -115,6 +115,7 @@ class Curl_Fetch_Webdata
 	 * Main calling function
 	 *
 	 * What it does:
+	 *
 	 * - Will request the page data from a given $url
 	 * - Optionally will post data to the page form if post data is supplied
 	 * - Passed arrays will be converted to a post string joined with &'s
@@ -228,6 +229,7 @@ class Curl_Fetch_Webdata
 	 * Used to return the results to the calling program
 	 *
 	 * What it does:
+	 *
 	 * - Called as ->result() will return the full final array
 	 * - Called as ->result('body') to just return the page source of the result
 	 *
@@ -248,6 +250,7 @@ class Curl_Fetch_Webdata
 	 * Will return all results from all loops (redirects)
 	 *
 	 * What it does:
+	 *
 	 * - Can be called as ->result_raw(x) where x is a specific loop results.
 	 * - Call as ->result_raw() for everything.
 	 *
@@ -268,6 +271,7 @@ class Curl_Fetch_Webdata
 	 * Takes supplied POST data and url encodes it
 	 *
 	 * What it does:
+	 *
 	 * - Forms the date (for post) in to a string var=xyz&var2=abc&var3=123
 	 * - Drops vars with @ since we don't support sending files (uploading)
 	 *
@@ -295,6 +299,7 @@ class Curl_Fetch_Webdata
 	 * Sets the final cURL options for the current call
 	 *
 	 * What it does:
+	 *
 	 * - Overwrites our default values with user supplied ones or appends new user ones to what we have
 	 * - Sets the callback function now that $this exists
 	 *
@@ -344,6 +349,7 @@ class Curl_Fetch_Webdata
 	 * Callback function to parse returned headers
 	 *
 	 * What it does:
+	 *
 	 * - lowercase everything to make it consistent
 	 *
 	 * @param object $cr Not used but passed by the cURL agent

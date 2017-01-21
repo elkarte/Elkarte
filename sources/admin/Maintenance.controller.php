@@ -57,6 +57,7 @@ class Maintenance_Controller extends Action_Controller
 	 * Main dispatcher, the maintenance access point.
 	 *
 	 * What it does:
+	 *
 	 * - This, as usual, checks permissions, loads language files,
 	 * and forwards to the actual workers.
 	 *
@@ -490,6 +491,7 @@ class Maintenance_Controller extends Action_Controller
 	 * MEDIUMTEXT and vice versa.
 	 *
 	 * What it does:
+	 *
 	 * - It requires the admin_forum permission.
 	 * - This is needed only for MySQL.
 	 * - During the conversion from MEDIUMTEXT to TEXT it check if any of the
@@ -613,6 +615,7 @@ class Maintenance_Controller extends Action_Controller
 	 * Optimizes all tables in the database and lists how much was saved.
 	 *
 	 * What it does:
+	 *
 	 * - It requires the admin_forum permission.
 	 * - It shows as the maintain_forum admin area.
 	 * - It is accessed from ?action=admin;area=maintain;sa=database;activity=optimize.
@@ -669,6 +672,7 @@ class Maintenance_Controller extends Action_Controller
 	 * Recount many forum totals that can be recounted automatically without harm.
 	 *
 	 * What it does:
+	 *
 	 * - it requires the admin_forum permission.
 	 * - It shows the maintain_forum admin area.
 	 * - The function redirects back to ?action=admin;area=maintain when complete.
@@ -1392,6 +1396,7 @@ class Maintenance_Controller extends Action_Controller
 	 * Recalculate all members post counts
 	 *
 	 * What it does:
+	 *
 	 * - It requires the admin_forum permission.
 	 * - Recounts all posts for members found in the message table
 	 * - Updates the members post count record in the members table

@@ -197,6 +197,7 @@ abstract class Theme
 	 * Add a block of inline Javascript code to be executed later
 	 *
 	 * What it does:
+	 *
 	 * - only use this if you have to, generally external JS files are better, but for very small scripts
 	 *   or for scripts that require help from PHP/whatever, this can be useful.
 	 * - all code added with this function is added to the same <script> tag so do make sure your JS is clean!

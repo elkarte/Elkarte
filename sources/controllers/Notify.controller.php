@@ -37,6 +37,7 @@ class Notify_Controller extends Action_Controller
 	 * Turn off/on notification for a particular topic.
 	 *
 	 * What it does:
+	 *
 	 * - Must be called with a topic specified in the URL.
 	 * - The sub-action can be 'on', 'off', or nothing for what to do.
 	 * - Requires the mark_any_notify permission.
@@ -164,6 +165,7 @@ class Notify_Controller extends Action_Controller
 	 * Turn off/on notification for a particular board.
 	 *
 	 * What it does:
+	 *
 	 * - Must be called with a board specified in the URL.
 	 * - Only uses the template if no sub action is used. (on/off)
 	 * - Requires the mark_notify permission.
@@ -292,6 +294,7 @@ class Notify_Controller extends Action_Controller
 	 * Turn off/on unread replies subscription for a topic
 	 *
 	 * What it does:
+	 *
 	 * - Must be called with a topic specified in the URL.
 	 * - The sub-action can be 'on', 'off', or nothing for what to do.
 	 * - Requires the mark_any_notify permission.

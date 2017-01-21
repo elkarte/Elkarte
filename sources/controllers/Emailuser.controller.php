@@ -53,6 +53,7 @@ class Emailuser_Controller extends Action_Controller
 	 * Send a topic to a friend.
 	 *
 	 * What it does:
+	 *
 	 * - Requires the send_topic permission.
 	 * - Redirects back to the first page of the topic when done.
 	 * - Is accessed via ?action=emailuser;sa=sendtopic.
