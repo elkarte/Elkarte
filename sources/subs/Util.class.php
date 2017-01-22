@@ -487,7 +487,7 @@ class Util
 
 		// Strip the slashes from every element.
 		foreach ($var as $k => $v)
-			$new_var[stripslashes($k)] = $level > 25 ? null : stripslashes_recursive($v, $level + 1);
+			$new_var[stripslashes($k)] = $level > 25 ? null : self::stripslashes_recursive($v, $level + 1);
 
 		return $new_var;
 	}
