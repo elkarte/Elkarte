@@ -322,12 +322,12 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 			AND m.approved = {int:is_approved}' : '') . '
 		' . (empty($query_where) ? '' : 'AND ' . $query_where) . '
 		ORDER BY ' . $query_order . '
-		' . ($query_limit === '' ? '' : 'LIMIT {int:query_limit}'),
+		' . (empty($query_limit) ? '' : 'LIMIT {int:query_limit}'),
 		array_merge($query_where_params, array(
 			'current_member' => $user_info['id'],
 			'is_approved' => 1,
 			'query_limit' => $query_limit,
-		))
+1		))
 	);
 
 	$bbc_parser = \BBC\ParserWrapper::getInstance();
