@@ -568,7 +568,7 @@ class Unread
 		// If that worked, create a sample of the log_topics table too.
 		if ($this->_have_temp_table)
 		{
-			$db->skip_next_error();
+			$this->_db->skip_next_error();
 			$this->_have_temp_table = $this->_db->query('', '
 				CREATE TEMPORARY TABLE {db_prefix}log_topics_posted_in (
 					PRIMARY KEY (id_topic)
