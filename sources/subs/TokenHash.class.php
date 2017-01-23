@@ -56,8 +56,13 @@ class Token_Hash
 	 */
 	private function _state_seed()
 	{
-		// If openssl is installed, let it create a 16 character code
-		if (function_exists('openssl_random_pseudo_bytes'))
+		// PHP >= 7
+		if (is_callable('random_bytes'))
+		{
+			$this->random_state = bin2hex(random_bytes(8));
+		}
+		// If openssl is installed, let it create a character code
+		elseif (function_exists('openssl_random_pseudo_bytes') && (substr(PHP_OS, 0, 3) !== 'WIN' || version_compare(PHP_VERSION, '5.3.4', '>=')))
 		{
 			$this->random_state = bin2hex(openssl_random_pseudo_bytes(8));
 		}
@@ -93,6 +98,7 @@ class Token_Hash
 		$this->_gen_salt();
 
 		// A random character password to hash
+		$this->_state_seed();
 		$password = bin2hex($this->get_random_bytes($length));
 
 		// Hash away
