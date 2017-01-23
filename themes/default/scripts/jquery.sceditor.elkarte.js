@@ -424,7 +424,6 @@ $.sceditor.plugins.bbcode.bbcode
 
 			if (element[0].tagName.toLowerCase() === 'cite')
 				return '';
-
 			if ($elm.attr('author'))
 				author = ' author=' + $elm.attr('author').php_unhtmlspecialchars();
 			if ($elm.attr('date'))
@@ -542,7 +541,7 @@ $.sceditor.plugins.bbcode.bbcode
 			if (typeof attrs.type !== "undefined")
 				style = ' style="list-style-type: ' + attrs.type + '"';
 
-			return '<ul' + style + '>' + content.replace("</li><br />", "</li>") + '</ul>';
+			return '<ul' + style + '>' + content.replace(/<\/li><br \/>/g, '</li>') + '</ul>';
 		}
 	})
 	.set('li', {
