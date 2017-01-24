@@ -2,7 +2,7 @@
 #
 # Portable PHP password hashing framework.
 #
-# Version 0.3 / genuine.
+# Version 0.3 / elkarte.
 #
 # Written by Solar Designer <solar at openwall.com> in 2004-2006 and placed in
 # the public domain.  Revised in subsequent years, still public domain.
@@ -24,13 +24,14 @@
 # Obviously, since this code is in the public domain, the above are not
 # requirements (there can be none), but merely suggestions.
 #
+
 class PasswordHash {
 	var $itoa64;
 	var $iteration_count_log2;
 	var $portable_hashes;
 	var $random_state;
 
-	function PasswordHash($iteration_count_log2, $portable_hashes)
+	public function __construct( $iteration_count_log2, $portable_hashes )
 	{
 		$this->itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
@@ -40,27 +41,37 @@ class PasswordHash {
 
 		$this->portable_hashes = $portable_hashes;
 
-		$this->random_state = microtime();
-		if (function_exists('getmypid'))
-			$this->random_state .= getmypid();
+		$this->random_state = microtime() . uniqid(rand(), TRUE);
 	}
 
-	function get_random_bytes($count)
+	private function get_random_bytes($count)
 	{
 		$output = '';
-		if (@is_readable('/dev/urandom') &&
-		    ($fh = @fopen('/dev/urandom', 'rb'))) {
+
+		// PHP >= 7
+		if (is_callable('random_bytes')) {
+			$output = random_bytes($count);
+		}
+		// *nix
+		elseif (@is_readable('/dev/urandom') &&
+			($fh = @fopen('/dev/urandom', 'rb'))) {
 			$output = fread($fh, $count);
 			fclose($fh);
 		}
+		// This is much to slow on windows php < 5.3.4
+		elseif (function_exists('openssl_random_pseudo_bytes') &&
+			(substr(PHP_OS, 0, 3) !== 'WIN' || version_compare(PHP_VERSION, '5.3.4', '>='))) {
+			$output = openssl_random_pseudo_bytes($count);
+		}
 
+		// Do it ourselves then
 		if (strlen($output) < $count) {
 			$output = '';
 			for ($i = 0; $i < $count; $i += 16) {
 				$this->random_state =
-				    md5(microtime() . $this->random_state);
+					md5(microtime() . $this->random_state);
 				$output .=
-				    pack('H*', md5($this->random_state));
+					pack('H*', md5($this->random_state));
 			}
 			$output = substr($output, 0, $count);
 		}
@@ -68,7 +79,7 @@ class PasswordHash {
 		return $output;
 	}
 
-	function encode64($input, $count)
+	private function encode64($input, $count)
 	{
 		$output = '';
 		$i = 0;
@@ -91,7 +102,7 @@ class PasswordHash {
 		return $output;
 	}
 
-	function gensalt_private($input)
+	private function gensalt_private($input)
 	{
 		$output = '$P$';
 		$output .= $this->itoa64[min($this->iteration_count_log2 +
@@ -101,7 +112,7 @@ class PasswordHash {
 		return $output;
 	}
 
-	function crypt_private($password, $setting)
+	private function crypt_private($password, $setting)
 	{
 		$output = '*0';
 		if (substr($setting, 0, 2) == $output)
@@ -146,7 +157,7 @@ class PasswordHash {
 		return $output;
 	}
 
-	function gensalt_extended($input)
+	private function gensalt_extended($input)
 	{
 		$count_log2 = min($this->iteration_count_log2 + 8, 24);
 		# This should be odd to not reveal weak DES keys, and the
@@ -164,7 +175,7 @@ class PasswordHash {
 		return $output;
 	}
 
-	function gensalt_blowfish($input)
+	private function gensalt_blowfish($input)
 	{
 		# This one needs to use a different order of characters and a
 		# different encoding scheme from the one in encode64() above.
@@ -205,14 +216,17 @@ class PasswordHash {
 		return $output;
 	}
 
-	function HashPassword($password)
+	public function HashPassword($password)
 	{
+		if ( strlen( $password ) > 4096 )
+			return '*';
+
 		$random = '';
 
 		if (CRYPT_BLOWFISH == 1 && !$this->portable_hashes) {
 			$random = $this->get_random_bytes(16);
 			$hash =
-			    crypt($password, $this->gensalt_blowfish($random));
+				crypt($password, $this->gensalt_blowfish($random));
 			if (strlen($hash) == 60)
 				return $hash;
 		}
@@ -221,7 +235,7 @@ class PasswordHash {
 			if (strlen($random) < 3)
 				$random = $this->get_random_bytes(3);
 			$hash =
-			    crypt($password, $this->gensalt_extended($random));
+				crypt($password, $this->gensalt_extended($random));
 			if (strlen($hash) == 20)
 				return $hash;
 		}
@@ -229,8 +243,8 @@ class PasswordHash {
 		if (strlen($random) < 6)
 			$random = $this->get_random_bytes(6);
 		$hash =
-		    $this->crypt_private($password,
-		    $this->gensalt_private($random));
+			$this->crypt_private($password,
+				$this->gensalt_private($random));
 		if (strlen($hash) == 34)
 			return $hash;
 
@@ -240,12 +254,46 @@ class PasswordHash {
 		return '*';
 	}
 
-	function CheckPassword($password, $stored_hash)
+	public function CheckPassword($password, $stored_hash)
 	{
+		if ( strlen( $password ) > 4096 )
+			return false;
+
 		$hash = $this->crypt_private($password, $stored_hash);
 		if ($hash[0] == '*')
 			$hash = crypt($password, $stored_hash);
 
-		return $hash == $stored_hash;
+		return $this->_hash_equals($hash, $stored_hash);
+	}
+
+	/**
+	 * Timing attack safe string comparison
+	 *
+	 * Unlike normal === comparisons where the function returns after the
+	 * first non match, here the time taken is independent of the number of
+	 * characters that match.
+	 *
+	 * @see http://php.net/manual/en/function.hash-equals.php#117101
+	 *
+	 * This function should be used to mitigate timing attacks; for instance,
+	 * when testing crypt() password hashes.
+	 *
+	 * @param string $a
+	 * @param string $b
+	 *
+	 * @return bool
+	 */
+	private function _hash_equals($a, $b)
+	{
+		// PHP 5.6+
+		if (function_exists('hash_equals'))
+		{
+			return hash_equals($a, $b);
+		}
+
+		$ret = strlen($a) ^ strlen($b);
+		$ret |= array_sum(unpack("C*", $a ^ $b));
+
+		return !$ret;
 	}
 }
