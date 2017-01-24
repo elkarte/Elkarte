@@ -219,7 +219,7 @@ final class ErrorHandler extends Errors
 		// Showing the errors, lets make it look decent
 		if ($db_show_debug === true && allowedTo('admin_forum'))
 		{
-			$msg = 'PHP Fatal error:  Uncaught exception \'%s\' with message \'%s\' in %s:%s<br>Stack trace:<br>%s<br>  thrown in %s on line %s';
+			$msg = 'PHP Fatal error:  Uncaught exception \'%s\' with message \'%s\' in %s:%s<br />Stack trace:<br />%s<br />  thrown in %s on line %s';
 
 			// write tracelines into main template
 			return sprintf(
@@ -228,7 +228,7 @@ final class ErrorHandler extends Errors
 				$exception->getMessage(),
 				$exception->getFile(),
 				$exception->getLine(),
-				implode('<br>', $this->parseTrace($exception)),
+				implode('<br />', $this->parseTrace($exception)),
 				$exception->getFile(),
 				$exception->getLine()
 			);

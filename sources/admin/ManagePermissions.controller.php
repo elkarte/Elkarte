@@ -228,7 +228,7 @@ class ManagePermissions_Controller extends Action_Controller
 
 							if (!empty($rowData['children']))
 								$group_name .= '
-									<br>
+									<br />
 									<span class="smalltext">' . $txt['permissions_includes_inherited'] . ': &quot;' . implode('&quot;, &quot;', $rowData['children']) . '&quot;</span>';
 
 							return $group_name;

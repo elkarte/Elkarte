@@ -47,12 +47,24 @@ class PasswordHash {
 	private function get_random_bytes($count)
 	{
 		$output = '';
-		if (@is_readable('/dev/urandom') &&
+
+		// PHP >= 7
+		if (is_callable('random_bytes')) {
+			$output = random_bytes($count);
+		}
+		// *nix
+		elseif (@is_readable('/dev/urandom') &&
 		    ($fh = @fopen('/dev/urandom', 'rb'))) {
 			$output = fread($fh, $count);
 			fclose($fh);
 		}
+		// This is much to slow on windows php < 5.3.4
+		elseif (function_exists('openssl_random_pseudo_bytes') &&
+			(substr(PHP_OS, 0, 3) !== 'WIN' || version_compare(PHP_VERSION, '5.3.4', '>='))) {
+			$output = openssl_random_pseudo_bytes($count);
+		}
 
+		// Do it ourselves then
 		if (strlen($output) < $count) {
 			$output = '';
 			for ($i = 0; $i < $count; $i += 16) {

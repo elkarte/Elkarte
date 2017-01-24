@@ -336,7 +336,7 @@ final class Request
 			$topic = (int) $_REQUEST['topic'];
 
 			// @todo in Display $_REQUEST['start'] is not always a number
-			$_REQUEST['start'] = isset($_REQUEST['start']) && preg_match('~^(:?(:?from|msg)?\d+|new)$~', $_REQUEST['start']) ? $_REQUEST['start'] : 0;
+			$_REQUEST['start'] = isset($_REQUEST['start']) && preg_match('~^((from|msg)?\d+|new)$~', $_REQUEST['start']) ? $_REQUEST['start'] : 0;
 
 			// Now make sure the online log gets the right number.
 			$_GET['topic'] = $topic;

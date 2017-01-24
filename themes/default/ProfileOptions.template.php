@@ -1371,7 +1371,7 @@ function template_authentication_method()
 						<input type="radio" onclick="updateAuthMethod();" name="authenticate" value="openid" id="auth_openid"', $context['auth_method'] == 'openid' ? ' checked="checked"' : '', ' />
 						<label for="auth_openid">', $txt['authenticate_openid'], '</label>
 						<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
-						<br>
+						<br />
 						<input type="radio" onclick="updateAuthMethod();" name="authenticate" value="passwd" id="auth_pass"', $context['auth_method'] == 'password' ? ' checked="checked"' : '', ' />
 						<label for="auth_pass">', $txt['authenticate_password'], '</label>
 					</dt>

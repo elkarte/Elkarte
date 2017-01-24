@@ -487,7 +487,7 @@ function autoRotateImage($image_name)
 function autoRotateImageWithGD($image_name)
 {
 	// Read the EXIF data
-	$exif = function_exists('exif_read_data') ? exif_read_data($image_name) : array();
+	$exif = function_exists('exif_read_data') ? @exif_read_data($image_name) : array();
 
 	// We're only interested in the exif orientation
 	$orientation = isset($exif['Orientation']) ? $exif['Orientation'] : 0;

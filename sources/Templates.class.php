@@ -292,11 +292,6 @@ class Templates
 			ob_start();
 		}
 
-		if (isset($_GET['debug']))
-		{
-			header('Content-Type: application/xhtml+xml; charset=UTF-8');
-		}
-
 		// Don't cache error pages!!
 		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 		header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
@@ -511,6 +506,7 @@ class Templates
 
 		if (function_exists($theme_function))
 		{
+			$this->_templateDebug($sub_template_name, true);
 			$theme_function();
 		}
 		elseif ($fatal === false)
@@ -520,6 +516,23 @@ class Templates
 		elseif ($fatal !== 'ignore')
 		{
 			die(Errors::instance()->log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load the %s sub template!', (string) $sub_template_name), 'template'));
+		}
+
+		$this->_templateDebug($sub_template_name);
+	}
+
+	/**
+	 * Are we showing debugging for templates?  Just make sure not to do it before the doctype...
+	 *
+	 * @param bool $start
+	 * @param string $sub_template_name
+	 */
+	private function _templateDebug($sub_template_name, $start = false)
+	{
+		if (isset($_REQUEST['debug']) && allowedTo('admin_forum') && !in_array($sub_template_name, array('init')) && ob_get_length() > 0 && !isset($_REQUEST['xml']) && !isset($_REQUEST['api']))
+		{
+			echo '
+ 				<div class="warningbox">---- ', $sub_template_name, ' ', ($start ? 'starts' : 'ends'), ' ----</div>';
 		}
 	}
 
