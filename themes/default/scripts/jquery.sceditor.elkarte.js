@@ -501,6 +501,7 @@ $.sceditor.plugins.bbcode.bbcode
 		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
 		format: function(element, content) {
 			var attribs = '',
+				$elm = $(element),
 				style = function(name) {
 					return element.style ? element.style[name] : null;
 				};
@@ -509,23 +510,30 @@ $.sceditor.plugins.bbcode.bbcode
 			if (typeof element.attr('data-sceditor-emoticon') !== "undefined")
 				return content;
 
-			// only add width and height if one is specified
+			// only add the parameters that are specified
 			if (element.attr('width') || style('width'))
-				attribs += " width=" + $(element).width();
+				attribs += " width=" + $elm.width();
 			if (element.attr('height') || style('height'))
-				attribs += " height=" + $(element).height();
+				attribs += " height=" + $elm.height();
+			if (element.attr('title'))
+				attribs += ' title="' + element.attr('title') + '"';
+			if (element.attr('alt'))
+				attribs += ' alt="' + element.attr('alt') + '"';
 
 			return '[img' + attribs + ']' + element.attr('src') + '[/img]';
 		},
 		html: function(token, attrs, content) {
-			var parts,
-				attribs = '';
+			var attribs = '';
 
-			// handle [img width=340 height=240]url[/img]
+			// handle [img alt=alt title=title width=123 height=123]url[/img]
 			if (typeof attrs.width !== "undefined")
 				attribs += ' width="' + attrs.width + '"';
 			if (typeof attrs.height !== "undefined")
 				attribs += ' height="' + attrs.height + '"';
+			if (typeof attrs.title !== "undefined")
+				attribs += ' title="' + attrs.title + '"';
+			if (typeof attrs.alt !== "undefined")
+				attribs += ' alt="' + attrs.alt + '"';
 
 			return '<img' + attribs + ' src="' + content + '" />';
 		}
