@@ -24,6 +24,15 @@ body {
 	font: 90%/130% Helvetica, "Helvetica Neue", "Liberation Sans", Arial, sans-serif;
 }
 
+a, a:link, a:visited {
+	text-decoration: none;
+}
+
+a:hover, a.new_win:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
 ul, ol {
 	margin-top: 0;
 	margin-bottom: 0;

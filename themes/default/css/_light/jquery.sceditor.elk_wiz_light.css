@@ -24,6 +24,15 @@ body {
 	font: 87.5%/150% "Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Droid Sans", "Helvetica Neue", "Trebuchet MS", Arial, sans-serif;
 }
 
+a, a:link, a:visited {
+	text-decoration: none;
+}
+
+a:hover, a.new_win:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
 ul, ol {
 	margin-top: 0;
 	margin-bottom: 0;
