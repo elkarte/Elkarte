@@ -1271,6 +1271,8 @@ class BBCParser
 				$possible['regex_cache'][] = '(\s+' . $param . '=' . $quote . (isset($info[Codes::PARAM_ATTR_MATCH]) ? $info[Codes::PARAM_ATTR_MATCH] : '(.+?)') . $quote . ')';
 			}
 
+			// Place any required params first
+			array_multisort($possible['optionals'], SORT_DESC,  $possible['param_check'], $possible['regex_cache']);
 			$possible['regex_size'] = count($possible[Codes::ATTR_PARAM]) - 1;
 			$possible['regex_keys'] = range(0, $possible['regex_size']);
 		}
