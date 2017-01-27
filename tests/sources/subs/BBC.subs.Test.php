@@ -138,27 +138,32 @@ class TestBBC extends PHPUnit_Framework_TestCase
 			array(
 				'Test img 3',
 				'[img width=100]http://adomain.tld/an_image.png[/img]',
-				'<img src="http://adomain.tld/an_image.png" alt="" style="width:100%;max-width:100px;" class="bbc_img resized" />',
+				'<img src="http://adomain.tld/an_image.png" title="" alt="" style="width:100%;max-width:100px;" class="bbc_img resized" />',
 			),
 			array(
 				'Test img 4',
 				'[img height=100]http://adomain.tld/an_image.png[/img]',
-				'<img src="http://adomain.tld/an_image.png" alt="" style="max-height:100px;" class="bbc_img resized" />',
+				'<img src="http://adomain.tld/an_image.png" title="" alt="" style="max-height:100px;" class="bbc_img resized" />',
 			),
 			array(
 				'Test img 5',
 				'[img height=100 width=150]http://adomain.tld/an_image.png[/img]',
-				'<img src="http://adomain.tld/an_image.png" alt="" style="width:100%;max-width:150px;max-height:100px;" class="bbc_img resized" />',
+				'<img src="http://adomain.tld/an_image.png" title="" alt="" style="width:100%;max-width:150px;max-height:100px;" class="bbc_img resized" />',
 			),
 			array(
 				'Test img 6',
 				'[img alt=some text width=150 height=100]http://adomain.tld/an_image.png[/img]',
-				'<img src="http://adomain.tld/an_image.png" alt="some text" style="width:100%;max-width:150px;max-height:100px;" class="bbc_img resized" />',
+				'<img src="http://adomain.tld/an_image.png" title="" alt="some text" style="width:100%;max-width:150px;max-height:100px;" class="bbc_img resized" />',
 			),
 			array(
 				'Test img 7',
-				'[img width=150 height=100 alt=some text]http://adomain.tld/an_image.png[/img]',
-				'<img src="http://adomain.tld/an_image.png" alt="some text" style="width:100%;max-width:150px;max-height:100px;" class="bbc_img resized" />',
+				'[img width=150 height=100 title=some text]http://adomain.tld/an_image.png[/img]',
+				'<img src="http://adomain.tld/an_image.png" title="some text" alt="" style="width:100%;max-width:150px;max-height:100px;" class="bbc_img resized" />',
+			),
+			array(
+				'Test img 8',
+				'[img alt=alt8 width=150 height=100 title=some text]http://adomain.tld/an_image.png[/img]',
+				'<img src="http://adomain.tld/an_image.png" title="some text" alt="alt8" style="width:100%;max-width:150px;max-height:100px;" class="bbc_img resized" />',
 			),
 			array(
 				'Unnamed iurl links',
