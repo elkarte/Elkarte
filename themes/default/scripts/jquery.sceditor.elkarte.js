@@ -362,6 +362,21 @@ $.sceditor.plugins.bbcode.bbcode
 		format: '[pre]{0}[/pre]',
 		html: '<pre>{0}</pre>'
 	})
+	.set('member', {
+		tags: {
+			member: null
+		},
+		isInline: true,
+		format: function (element, content) {
+			return '[member=' + element.attr('data-mention') + ']' + content.replace('@', '') + '[/member]';
+		},
+		html: function (token, attrs, content) {
+			if (typeof attrs.defaultattr === 'undefined' || attrs.defaultattr.length === 0)
+				attrs.defaultattr = content;
+
+			return '<a href="' + elk_scripturl + '?action=profile;u=' + attrs.defaultattr + '" class="mention" data-mention="' + attrs.defaultattr + '">@' + content.replace('@', '') + '</a>';
+		}
+	})
 	/*
 	 * ElkArte modified tags, modified so they support the existing paradigm
 	 *
@@ -581,5 +596,34 @@ $.sceditor.plugins.bbcode.bbcode
 		skipLastLineBreak: true,
 		format: '[list type=decimal]{0}[/list]',
 		html: '<ol>{0}</ol>'
+	})
+	.set('url', {
+		allowsEmpty: true,
+		tags: {
+			a: {
+				href: null
+			}
+		},
+		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
+		format: function (element, content) {
+			var url = element.attr('href');
+
+			// make sure this link is not an e-mail, if it is return e-mail BBCode
+			if (url.substr(0, 7) === 'mailto:') {
+				return '[email="' + url.substr(7) + '"]' + content + '[/email]';
+			}
+			// make sure this link is not an mentions, if it is return member BBCode
+			else if (typeof element.attr('data-mention') !== 'undefined')
+			{
+				return '[member=' + element.attr('data-mention') + ']' + content.replace('@', '') + '[/member]';
+			}
+
+			return '[url=' + url + ']' + content + '[/url]';
+		},
+		html: function (token, attrs, content) {
+			attrs.defaultattr = $.sceditor.escapeEntities(attrs.defaultattr, true) || content;
+
+			return '<a href="' + $.sceditor.escapeUriScheme(attrs.defaultattr) + '" class="mention">' + content + '</a>';
+		}
 	}
 );
