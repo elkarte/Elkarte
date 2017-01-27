@@ -454,21 +454,26 @@ class Codes
 				self::ATTR_TAG => 'img',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_PARAM => array(
-					'alt' => array(
-						self::PARAM_ATTR_OPTIONAL => true,
-					),
 					'width' => array(
-						self::PARAM_ATTR_OPTIONAL => true,
 						self::PARAM_ATTR_VALUE => 'width:100%;max-width:$1px;',
 						self::PARAM_ATTR_MATCH => '(\d+)',
+						self::PARAM_ATTR_OPTIONAL => true,
 					),
 					'height' => array(
-						self::PARAM_ATTR_OPTIONAL => true,
 						self::PARAM_ATTR_VALUE => 'max-height:$1px;',
 						self::PARAM_ATTR_MATCH => '(\d+)',
+						self::PARAM_ATTR_OPTIONAL => true,
+					),
+					'title' => array(
+						self::PARAM_ATTR_MATCH => '(.+?)',
+						self::PARAM_ATTR_OPTIONAL => true,
+					),
+					'alt' => array(
+						self::PARAM_ATTR_MATCH => '(.+?)',
+						self::PARAM_ATTR_OPTIONAL => true,
 					),
 				),
-				self::ATTR_CONTENT => '<img src="$1" alt="{alt}" style="{width}{height}" class="bbc_img resized" />',
+				self::ATTR_CONTENT => '<img src="$1" title="{title}" alt="{alt}" style="{width}{height}" class="bbc_img resized" />',
 				self::ATTR_VALIDATE => function (&$tag, &$data) {
 					$data = addProtocol($data);
 				},
