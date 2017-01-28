@@ -1370,14 +1370,14 @@ function initTheme($id_theme = 0)
 
 	// Setup the default theme file. In the future, this won't exist and themes will just have to extend it if they want
 	require_once($settings['default_theme_dir'] . '/Theme.php');
-	$context['default_theme_instance'] = new \Themes\DefaultTheme\Theme(1);
+	$default_theme_instance = new \Themes\DefaultTheme\Theme(1);
 
 	// Check if there is a Theme file
 	if ($id_theme != 1 && !empty($settings['theme_dir']) && file_exists($settings['theme_dir'] . '/Theme.php'))
 	{
 		require_once($settings['theme_dir'] . '/Theme.php');
 
-		$class = '\\Themes\\' . basename($settings['theme_dir']) . '\\Theme';
+		$class = '\\Themes\\' . basename(ucfirst($settings['theme_dir'])) . 'Theme\\Theme';
 
 		$theme = new $class($id_theme);
 
@@ -1385,7 +1385,7 @@ function initTheme($id_theme = 0)
 	}
 	else
 	{
-		$context['theme_instance'] = $context['default_theme_instance'];
+		$context['theme_instance'] = $default_theme_instance;
 	}
 }
 
