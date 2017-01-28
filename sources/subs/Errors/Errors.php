@@ -131,7 +131,7 @@ class Errors extends AbstractModel
 			$user_info['ip'] = '';
 
 		// Don't log the same error countless times, as we can get in a cycle of depression...
-		$error_info = array($user_info['id'], time(), $user_info['ip'], $query_string, $error_message, (string) $_SESSION['session_value'], $error_type, $file, $line);
+		$error_info = array($user_info['id'], time(), $user_info['ip'], $query_string, $error_message, isset($_SESSION['session_value']) ? (string) $_SESSION['session_value'] : 'no_session_data', $error_type, $file, $line);
 		if (empty($last_error) || $last_error != $error_info)
 		{
 			// Insert the error into the database.
