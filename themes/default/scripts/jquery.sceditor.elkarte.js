@@ -352,9 +352,6 @@ $.sceditor.plugins.bbcode.bbcode
 		html: '<pre>{0}</pre>'
 	})
 	.set('member', {
-		tags: {
-			member: null
-		},
 		isInline: true,
 		format: function (element, content) {
 			return '[member=' + element.attr('data-mention') + ']' + content.replace('@', '') + '[/member]';
@@ -364,6 +361,51 @@ $.sceditor.plugins.bbcode.bbcode
 				attrs.defaultattr = content;
 
 			return '<a href="' + elk_scripturl + '?action=profile;u=' + attrs.defaultattr + '" class="mention" data-mention="' + attrs.defaultattr + '">@' + content.replace('@', '') + '</a>';
+		}
+	})
+	.set('attachurl', {
+		allowsEmpty: false,
+		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
+		format: function (element, content) {
+			return '[attachurl]' + content + '[/attachurl]';
+		},
+		html: function (token, attrs, content) {
+			// @todo new action to return real filename?
+			return '<a href="' + elk_scripturl + '?action=dlattach;attach=' + content + ';' + elk_session_var + '=' + elk_session_id + '" data-ila="' + content + '">(<i class="icon i-paperclip"></i>&nbsp;' + ila_filename + ')</a>';
+		}
+	})
+	.set('attach', {
+		allowsEmpty: false,
+		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
+		format: function (element, content) {
+			var	attribs = '',
+				params = function(names) {
+					names.forEach(function(name) {
+						if (element.attr(name))
+							attribs += ' ' + name + '=' + element.attr(name);
+						else if (element.style[name])
+							attribs += ' ' + name + '=' + element.style[name];
+					});
+				};
+
+			params(['width', 'height', 'align']);
+			return '[attach' + attribs + ']' + content + '[/attach]';
+		},
+		html: function (token, attrs, content) {
+			var attribs = '',
+				align = '',
+				params = function(names) {
+					names.forEach(function(name) {
+						if (typeof attrs[name] !== 'undefined')
+							attribs += ' ' + name + '=' + attrs[name];
+					});
+				};
+
+			params(['width', 'height', 'align']);
+			if (typeof attrs.align !== 'undefined')
+				align = ' class="img_bbc float' + attrs.align + '"';
+
+			return '<img' + attribs + align + ' src="' + elk_scripturl + '?action=dlattach;attach=' + content + ';thumb;' + elk_session_var + '=' + elk_session_id + '" data-ila="' + content + '" />';
 		}
 	})
 	/*
@@ -497,7 +539,7 @@ $.sceditor.plugins.bbcode.bbcode
 		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
 		format: function (element, content) {
 			var attribs = '',
-				param = function (names) {
+				params = function (names) {
 					names.forEach(function (name) {
 						if (element.attr(name))
 							attribs += ' ' + name + '=' + element.attr(name);
@@ -510,13 +552,20 @@ $.sceditor.plugins.bbcode.bbcode
 			if (typeof element.attr('data-sceditor-emoticon') !== 'undefined')
 				return content;
 
+			// check if this is an ILA ?
+			if (element.attr('data-ila'))
+			{
+				params(['width', 'height', 'align']);
+				return '[attach' + attribs + ']' + element.attr('data-ila') + '[/attach]';
+			}
+
 			// normal image then
-			param(['width', 'height', 'title', 'alt']);
+			params(['width', 'height', 'title', 'alt']);
 			return '[img' + attribs + ']' + element.attr('src') + '[/img]';
 		},
 		html: function (token, attrs, content) {
 			var attribs = '',
-				param = function (names) {
+				params = function (names) {
 					names.forEach(function (name) {
 						if (typeof attrs[name] !== 'undefined')
 							attribs += ' ' + name + '="' + attrs[name] + '"';
@@ -524,7 +573,7 @@ $.sceditor.plugins.bbcode.bbcode
 				};
 
 			// handle [img alt=alt title=title width=123 height=123]url[/img]
-			param(['width', 'height', 'alt', 'title']);
+			params(['width', 'height', 'alt', 'title']);
 			return '<img' + attribs + ' src="' + content + '" />';
 		}
 	})
@@ -583,12 +632,13 @@ $.sceditor.plugins.bbcode.bbcode
 		format: function (element, content) {
 			var url = element.attr('href');
 
-			// make sure this link is not an e-mail, if it is return e-mail BBCode
+			// return the type of link we are currently dealing with
 			if (url.substr(0, 7) === 'mailto:')
 				return '[email="' + url.substr(7) + '"]' + content + '[/email]';
-			// make sure this link is not a mention, if it is return a member BBCode
-			else if (typeof element.attr('data-mention') !== 'undefined')
+			if (typeof element.attr('data-mention') !== 'undefined')
 				return '[member=' + element.attr('data-mention') + ']' + content.replace('@', '') + '[/member]';
+			if (typeof element.attr('data-ila') !== 'undefined')
+				return '[attachurl]' + element.attr('data-ila') + '[/attachurl]';
 
 			return '[url=' + url + ']' + content + '[/url]';
 		},
