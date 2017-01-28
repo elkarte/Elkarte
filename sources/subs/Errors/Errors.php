@@ -43,6 +43,16 @@ class Errors extends AbstractModel
 	);
 
 	/**
+	 * In case of maintenance of very early errors, the database may not be available,
+	 * this __construct will feed AbstractModel with a value just to stop it
+	 * from trying to initialize the database connection.
+	 */
+	public function __construct($db = null)
+	{
+		parent::__construct($db);
+	}
+
+	/**
 	 * Halts execution, optionally displays an error message
 	 *
 	 * @param string|integer $error
@@ -464,7 +474,16 @@ class Errors extends AbstractModel
 	public static function instance()
 	{
 		if (self::$_errors === null)
-			self::$_errors = new self;
+		{
+			if (function_exists('database'))
+			{
+				self::$_errors = new self;
+			}
+			else
+			{
+				self::$_errors = new self(1);
+			}
+		}
 
 		return self::$_errors;
 	}
