@@ -742,13 +742,13 @@ class Theme extends \Theme
 		// 1.0 backward compatibility: if you already put the icon in the theme dir
 		// use that one, otherwise the default
 		// @deprecated since 1.1
-		if (file_exists($settings['images_url'] . '/mobile.png'))
+		if (file_exists($scripturl . '/mobile.png'))
 		{
-			$context['favicon'] = $settings['images_url'] . '/mobile.png';
+			$context['favicon'] = $scripturl . '/mobile.png';
 		}
 		else
 		{
-			$context['favicon'] = $scripturl . '/mobile.png';
+			$context['favicon'] = $settings['images_url'] . '/mobile.png';
 		}
 
 		// Load a custom CSS file?

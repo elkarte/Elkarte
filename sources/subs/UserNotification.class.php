@@ -109,7 +109,9 @@ class User_Notification extends AbstractModel
 		loadJavascriptFile('desktop-notify.js');
 		addInlineJavascript('
 			$(function() {
-				ElkNotifier.add(new ElkDesktop());
+				ElkNotifier.add(new ElkDesktop(
+					{\'icon\': $(\'head\').find("link[rel=\'shortcut icon\']").attr("href")}
+				));
 			});', true);
 	}
 
