@@ -80,7 +80,6 @@ class Ila_Integrate
 				\BBC\Codes::ATTR_TYPE => \BBC\Codes::TYPE_UNPARSED_CONTENT,
 				\BBC\Codes::ATTR_PARAM => array(
 					'width' => array(
-						\BBC\Codes::PARAM_ATTR_OPTIONAL => false,
 						\BBC\Codes::PARAM_ATTR_VALIDATE => self::validate_width(),
 						\BBC\Codes::PARAM_ATTR_MATCH => '(\d+)',
 					),
@@ -109,7 +108,6 @@ class Ila_Integrate
 				\BBC\Codes::ATTR_TYPE => \BBC\Codes::TYPE_UNPARSED_CONTENT,
 				\BBC\Codes::ATTR_PARAM => array(
 					'height' => array(
-						\BBC\Codes::PARAM_ATTR_OPTIONAL => false,
 						\BBC\Codes::PARAM_ATTR_VALIDATE => self::validate_height(),
 						\BBC\Codes::PARAM_ATTR_MATCH => '(\d+)',
 					),
