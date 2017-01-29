@@ -70,6 +70,8 @@ class BBCParser
 	protected $lastAutoPos = 0;
 	/** @var array content fo the footnotes */
 	protected $fn_content = array();
+	/** @var array  */
+	protected $tag_possible = array();
 
 	/**
 	 * BBCParser constructor.
@@ -1260,26 +1262,36 @@ class BBCParser
 		if (!isset($possible['regex_cache']))
 		{
 			$possible['regex_cache'] = array();
-			foreach ($possible[Codes::ATTR_PARAM] as $p => $info)
+			$possible['param_check'] = array();
+			$possible['optionals'] = array();
+
+			foreach ($possible[Codes::ATTR_PARAM] as $param => $info)
 			{
 				$quote = empty($info[Codes::PARAM_ATTR_QUOTED]) ? '' : '&quot;';
-
-				$possible['regex_cache'][] = '(\s+' . $p . '=' . $quote . (isset($info[Codes::PARAM_ATTR_MATCH]) ? $info[Codes::PARAM_ATTR_MATCH] : '(.+?)') . $quote . ')' . (empty($info[Codes::PARAM_ATTR_OPTIONAL]) ? '' : '?');
+				$possible['optionals'][] = !empty($info[Codes::PARAM_ATTR_OPTIONAL]);
+				$possible['param_check'][] = ' ' . $param . '=' . $quote;
+				$possible['regex_cache'][] = '(\s+' . $param . '=' . $quote . (isset($info[Codes::PARAM_ATTR_MATCH]) ? $info[Codes::PARAM_ATTR_MATCH] : '(.+?)') . $quote . ')';
 			}
-			$possible['regex_size'] = count($possible['regex_cache']) - 1;
-			$possible['regex_keys'] = range(0, $possible['regex_size']);
+
+			$possible['regex_size'] = count($possible[Codes::ATTR_PARAM]) - 1;
 		}
+
+		// Tag setup for this loop
+		$this->tag_possible = $possible;
 
 		// Okay, this may look ugly and it is, but it's not going to happen much and it is the best way
 		// of allowing any order of parameters but still parsing them right.
-		$message_stub = substr($this->message, $this->pos1 - 1);
+		$message_stub = $this->messageStub();
+
+		// Set regex optional flags only if the param *is* optional and it *was not used* in this tag
+		$this->optionalParam($message_stub);
 
 		// If an addon adds many parameters we can exceed max_execution time, lets prevent that
 		// 5040 = 7, 40,320 = 8, (N!) etc
 		$max_iterations = self::MAX_PERMUTE_ITERATIONS;
 
 		// Use the same range to start each time. Most BBC is in the order that it should be in when it starts.
-		$keys = $possible['regex_keys'];
+		$keys = $this->setKeys();
 
 		// Step, one by one, through all possible permutations of the parameters until we have a match
 		do
@@ -1287,7 +1299,7 @@ class BBCParser
 			$match_preg = '~^';
 			foreach ($keys as $key)
 			{
-				$match_preg .= $possible['regex_cache'][$key];
+				$match_preg .= $this->tag_possible['regex_cache'][$key];
 			}
 			$match_preg .= '\]~i';
 
@@ -1296,6 +1308,87 @@ class BBCParser
 		} while (!$match && --$max_iterations && ($keys = pc_next_permutation($keys, $possible['regex_size'])));
 
 		return $match;
+	}
+
+	/**
+	 * Sorts the params so they are in a required to optional order.
+	 *
+	 * Supports the assumption that the params as defined in CODES is the preferred / common
+	 * order they are found in, and inserted by, the editor toolbar.
+	 *
+	 * @return array
+	 */
+	private function setKeys()
+	{
+		$control_order = array();
+		$this->tag_possible['regex_keys'] = range(0, $this->tag_possible['regex_size']);
+
+		// Push optional params to the end of the stack but maintain current order of required ones
+		foreach ($this->tag_possible['regex_keys'] as $index => $info)
+		{
+			$control_order[$index] = $index;
+
+			if ($this->tag_possible['optionals'][$index])
+				$control_order[$index] = $index + $this->tag_possible['regex_size'];
+		}
+
+		array_multisort($control_order, SORT_ASC, $this->tag_possible['regex_cache']);
+
+		return $this->tag_possible['regex_keys'];
+	}
+
+	/**
+	 * Sets the optional parameter search flag only where needed.
+	 *
+	 * What it does:
+	 *
+	 * - Sets the optional ()? flag only for optional params that were not actually used
+	 * - This makes the permutation function match all required *and* passed parameters
+	 * - Returns false if an non optional tag was not found
+	 *
+	 * @param string $message_stub
+	 */
+	protected function optionalParam($message_stub)
+	{
+		// Set optional flag only if the param is optional and it was not used in this tag
+		foreach ($this->tag_possible['optionals'] as $index => $optional)
+		{
+			// @todo more robust, and slower, check would be a preg_match on $possible['regex_cache'][$index]
+			$param_exists = stripos($message_stub, $this->tag_possible['param_check'][$index]) !== false;
+
+			// Only make unused optional tags as optional
+			if ($optional)
+			{
+				if ($param_exists)
+					$this->tag_possible['optionals'][$index] = false;
+				else
+					$this->tag_possible['regex_cache'][$index] .= '?';
+			}
+		}
+	}
+
+	/**
+	 * Given the position in a message, extracts the tag for analysis
+	 *
+	 * What it does:
+	 *
+	 * - Given ' width=100 height=100 alt=image]....[/img]more text and [tags]...'
+	 * - Returns ' width=100 height=100 alt=image]....[/img]'
+	 *
+	 * @return string
+	 */
+	protected function messageStub()
+	{
+		// For parameter searching, swap in \n's to reduce any regex greediness
+		$message_stub = str_replace('<br />', "\n", substr($this->message, $this->pos1 - 1)) . "\n";
+
+		// Attempt to pull out just this tag
+		if (preg_match('~(?:.+?)\](?>.|(?R))*?\[\/' . $this->tag_possible[Codes::ATTR_TAG] . '\](?:.|\s)~i', $message_stub, $matches) === 1)
+		{
+			$message_stub = $matches[0];
+		}
+
+		return $message_stub;
 	}
 
 	/**

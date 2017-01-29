@@ -153,9 +153,9 @@ function create_control_richedit($editorOptions)
 			'elk_smileys_url' => $settings['smileys_url'],
 			'bbc_quote_from' => $txt['quote_from'],
 			'bbc_quote' => $txt['quote'],
-			'bbc_search_on' => $txt['search_on']), true
+			'bbc_search_on' => $txt['search_on'],
+			'ila_filename' => $txt['file'] . ' ' . $txt['name']), true
 		);
-
 		// Editor language file
 		if (!empty($txt['lang_locale']))
 			loadJavascriptFile($scripturl . '?action=jslocale;sa=sceditor', array('defer' => true), 'sceditor_language');
