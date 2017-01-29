@@ -200,6 +200,9 @@ class Html_2_Md
 			'&lt?' => '<?'
 		));
 
+		if ($this->_parser)
+			$this->markdown = html_entity_decode($this->markdown, ENT_QUOTES, 'UTF-8');
+
 		// Strip the chaff and any excess blank lines we may have produced
 		$this->markdown = trim($this->markdown);
 		$this->markdown = preg_replace("~(\n(\s)?){3,}~", "\n\n", $this->markdown);
