@@ -575,6 +575,8 @@ function loadBoard()
 			$board_info['groups'] = $row['member_groups'] == '' ? array() : explode(',', $row['member_groups']);
 			$board_info['deny_groups'] = $row['deny_member_groups'] == '' ? array() : explode(',', $row['deny_member_groups']);
 
+			call_integration_hook('integrate_loaded_board', array(&$board_info, &$row));
+
 			do
 			{
 				if (!empty($row['id_moderator']))
@@ -611,8 +613,6 @@ function loadBoard()
 
 				list ($board_info['unapproved_user_topics']) = $db->fetch_row($request);
 			}
-
-			call_integration_hook('integrate_loaded_board', array(&$board_info, &$row));
 
 			if ($cache->isEnabled() && (empty($topic) || $cache->levelHigherThan(2)))
 			{
