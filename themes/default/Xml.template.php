@@ -548,7 +548,7 @@ function template_feedatom()
 		<link rel="alternate" type="text/html" href="', $scripturl, '" />
 		<link rel="self" type="application/rss+xml" href="', $scripturl, '?type=atom;action=.xml', $context['url_parts'], '" />
 		<id>', $scripturl, '</id>
-		<icon>', $settings['images_url'] . '/mobile.png</icon>
+		<icon>', $context['favicon'] . '</icon>
 		<logo>', $context['header_logo_url_html_safe'], '</logo>
 
 		<updated>', gmstrftime('%Y-%m-%dT%H:%M:%SZ'), '</updated>

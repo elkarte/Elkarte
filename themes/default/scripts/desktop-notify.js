@@ -235,7 +235,7 @@
 
 				notif.createNotification(request.desktop_notifications.title, {
 					body: request.desktop_notifications.message,
-					icon: elk_images_url + '/mobile.png'
+					icon: opt.icon
 				});
 			}
 		};

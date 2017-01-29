@@ -135,7 +135,8 @@ function template_error_log()
 								<span>
 									', $error['member']['session'], '
 								</span>
-							</li>
+							</li>';
+		echo '
 							<li>
 								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=error_type;value=', $error['error_type']['type'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_type'], '" class="icon i-search"></a>
 								<span>

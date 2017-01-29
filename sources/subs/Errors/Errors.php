@@ -43,6 +43,16 @@ class Errors extends AbstractModel
 	);
 
 	/**
+	 * In case of maintenance of very early errors, the database may not be available,
+	 * this __construct will feed AbstractModel with a value just to stop it
+	 * from trying to initialize the database connection.
+	 */
+	public function __construct($db = null)
+	{
+		parent::__construct($db);
+	}
+
+	/**
 	 * Halts execution, optionally displays an error message
 	 *
 	 * @param string|integer $error
@@ -121,7 +131,7 @@ class Errors extends AbstractModel
 			$user_info['ip'] = '';
 
 		// Don't log the same error countless times, as we can get in a cycle of depression...
-		$error_info = array($user_info['id'], time(), $user_info['ip'], $query_string, $error_message, (string) $_SESSION['session_value'], $error_type, $file, $line);
+		$error_info = array($user_info['id'], time(), $user_info['ip'], $query_string, $error_message, isset($_SESSION['session_value']) ? (string) $_SESSION['session_value'] : 'no_session_data', $error_type, $file, $line);
 		if (empty($last_error) || $last_error != $error_info)
 		{
 			// Insert the error into the database.
@@ -464,7 +474,16 @@ class Errors extends AbstractModel
 	public static function instance()
 	{
 		if (self::$_errors === null)
-			self::$_errors = new self;
+		{
+			if (function_exists('database'))
+			{
+				self::$_errors = new self;
+			}
+			else
+			{
+				self::$_errors = new self(1);
+			}
+		}
 
 		return self::$_errors;
 	}

@@ -1329,6 +1329,7 @@ function setupMenuContext()
 
 /**
  * Generate a random seed and ensure it's stored in settings.
+ * @deprecated
  */
 function elk_seed_generator()
 {

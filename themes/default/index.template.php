@@ -165,7 +165,7 @@ function template_html_above()
 
 	// Show all the relative links, such as help, search, contents, and the like.
 	echo '
-	<link rel="shortcut icon" sizes="196x196" href="' . $settings['images_url'] . '/mobile.png" />
+	<link rel="shortcut icon" sizes="196x196" href="' . $context['favicon'] . '" />
 	<link rel="help" href="', $scripturl, '?action=help" />
 	<link rel="contents" href="', $scripturl, '" />', ($context['allow_search'] ? '
 	<link rel="search" href="' . $scripturl . '?action=search" />' : '');

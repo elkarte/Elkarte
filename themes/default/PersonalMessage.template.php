@@ -392,22 +392,22 @@ function template_subject_list()
 						<thead>
 							<tr class="table_head">
 								<th class="pm_icon">
-									<a href="', $scripturl, '?action=pm;view;f=', $context['folder'], ';start=', $context['start'], ';sort=', $context['sort_by'], ($context['sort_direction'] === 'up' ? '' : ';desc'), ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''), '">
+									<a href="', $scripturl, '?action=pm;view;f=', $context['folder'], ';start=', $context['start'], ';sort=', $context['sort_by'], ($context['sort_direction'] === 'up' ? ';asc' : ';desc'), ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''), '">
 										<i class="icon i-shuffle" title="', $txt['pm_change_view'], '"><s>', $txt['pm_change_view'], '</s></i>
 									</a>
 								</th>
 								<th class="pm_date">
-									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=date', ($context['sort_by'] === 'date' && $context['sort_direction'] === 'up' ? ';desc' : ''), $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '">
+									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=date', ($context['sort_by'] === 'date' && $context['sort_direction'] === 'up' ? ';desc' : ';asc'), $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '">
 										', $txt['date'], $context['sort_by'] === 'date' ? ' <i class="icon icon-small i-sort-numeric-' . $context['sort_direction'] . '"></i>' : '', '
 									</a>
 								</th>
 								<th class="pm_subject">
-									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=subject', ($context['sort_by'] === 'subject' && $context['sort_direction'] === 'up' ? ';desc' : ''), $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '">
+									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=subject', ($context['sort_by'] === 'subject' && $context['sort_direction'] === 'up' ? ';desc' : ';asc'), $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '">
 										', $txt['subject'], $context['sort_by'] === 'subject' ? ' <i class="icon icon-small i-sort-alpha-' . $context['sort_direction'] . '"></i>' : '', '
 									</a>
 								</th>
 								<th class="pm_from">
-									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=name', ($context['sort_by'] === 'name' && $context['sort_direction'] === 'up' ? ';desc' : ''), $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '">
+									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=name', ($context['sort_by'] === 'name' && $context['sort_direction'] === 'up' ? ';desc' : ';asc'), $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '">
 										', ($context['from_or_to'] === 'from' ? $txt['from'] : $txt['to']), $context['sort_by'] === 'name' ? ' <i class="icon icon-small i-sort-alpha-' . $context['sort_direction'] . '"></i>' : '', '
 									</a>
 								</th>
@@ -427,7 +427,7 @@ function template_subject_list()
 	// Use the query callback to get the subject list
 	while ($message = $context['get_pmessage']('subject'))
 	{
-		$discussion_url = $context['display_mode'] == 0 || $context['current_pm'] == $message['id'] ? '' : ($scripturl . '?action=pm;pmid=' . $message['id'] . ';kstart;f=' . $context['folder'] . ';start=' . $context['start'] . ';sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';' : ';desc') . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''));
+		$discussion_url = $context['display_mode'] == 0 || $context['current_pm'] == $message['id'] ? '' : ($scripturl . '?action=pm;pmid=' . $message['id'] . ';kstart;f=' . $context['folder'] . ';start=' . $context['start'] . ';sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';asc' : ';desc') . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''));
 
 		echo '
 							<tr class="standard_row">

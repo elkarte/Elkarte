@@ -446,7 +446,10 @@ class PersonalMessage_Controller extends Action_Controller
 		{
 			case 'date':
 				$sort_by_query = 'pm.id_pm';
-				$descending = !empty($options['view_newest_pm_first']) && $descending;
+				if (!empty($options['view_newest_pm_first']) && !isset($this->_req->query->desc) && !isset($this->_req->query->asc))
+				{
+					$descending = true;
+				}
 				break;
 			case 'name':
 				$sort_by_query = 'COALESCE(mem.real_name, \'\')';
