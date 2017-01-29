@@ -120,9 +120,14 @@ function template_messages()
 			$ignoring = false;
 
 		// Show the message anchor and a "new" anchor if this message is new.
+		if ($message['id'] != $context['first_message'] && ($message['first_new']))
+			echo '
+				<a id="new">&nbsp;</a>	
+				<hr class="new_post_separator" />';
+
 		echo '
 				<article class="post_wrapper forumposts ', $message['classes'], $message['approved'] ? '' : ' approvebg', '">', $message['id'] != $context['first_message'] ? '
-					<a class="post_anchor" id="msg' . $message['id'] . '"></a>' . ($message['first_new'] ? '<a id="new"></a>' : '') : '';
+					<a class="post_anchor" id="msg' . $message['id'] . '"></a>' : '';
 
 		// Showing the sidebar posting area?
 		if (empty($options['hide_poster_area']))
