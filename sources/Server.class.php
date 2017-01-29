@@ -29,6 +29,7 @@ class Server extends \ArrayObject
 	 */
 	public function __construct($server = null)
 	{
+
 		if (!is_array($server))
 		{
 			$server = isset($_SERVER) ? $_SERVER : array();
@@ -186,5 +187,16 @@ class Server extends \ArrayObject
 	public function outPutCompressionEnabled()
 	{
 		return ini_get('zlib.output_compression') >= 1 || ini_get('output_handler') == 'ob_gzhandler';
+	}
+
+	/**
+	 * Returns if the system supports / is using https connections
+	 *
+	 * @return bool
+	 */
+	public function supportsSSL()
+	{
+		return isset($this->HTTPS) &&
+			($this->HTTPS === "on" || $this->HTTPS === 1 || $this->SERVER_PORT === 443);
 	}
 }
