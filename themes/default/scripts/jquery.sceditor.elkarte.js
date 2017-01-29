@@ -10,6 +10,8 @@
  * @version 1.1 beta 4
  */
 
+/** global: elk_session_var, elk_session_id, ila_filename, elk_scripturl  */
+
 /**
  * Extension functions to provide ElkArte compatibility with sceditor
  */
@@ -563,7 +565,7 @@ $.sceditor.plugins.bbcode.bbcode
 							attribs += ' ' + name + '=' + element.attr(name);
 						else if (element[0].style[name])
 							attribs += ' ' + name + '=' + element[0].style[name];
-					})
+					});
 				};
 
 			// check if this is an emoticon image
