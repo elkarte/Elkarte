@@ -363,6 +363,24 @@ $.sceditor.plugins.bbcode.bbcode
 			return '<a href="' + elk_scripturl + '?action=profile;u=' + attrs.defaultattr + '" class="mention" data-mention="' + attrs.defaultattr + '">@' + content.replace('@', '') + '</a>';
 		}
 	})
+	.set('me', {
+		tags: {
+			me: {
+				'data-me' : null
+			}
+		},
+		isInline: true,
+		quoteType: $.sceditor.BBCodeParser.QuoteType.always,
+		format: function (element, content) {
+			return '[me=' + element.attr('data-me') + ']' + content.replace(element.attr('data-me') + ' ', '') + '[/me]';
+		},
+		html: function (token, attrs, content) {
+			if (typeof attrs.defaultattr === 'undefined' || attrs.defaultattr.length === 0)
+				attrs.defaultattr = '';
+
+			return '<me data-me="' + attrs.defaultattr + '">' + attrs.defaultattr + ' ' + content + '</me>';
+		}
+	})
 	.set('attachurl', {
 		allowsEmpty: false,
 		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
