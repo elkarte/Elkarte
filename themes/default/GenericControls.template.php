@@ -71,6 +71,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 				$("#', $editor_id, '").sceditor({
 					style: "', $settings['theme_url'], '/css/', $context['theme_variant_url'], 'jquery.sceditor.elk_wiz', $context['theme_variant'], '.css', CACHE_STALE, '",
 					width: "100%",
+					startInSourceMode: ', $editor_context['rich_active'] ? 'false' : 'true', ',
 					toolbarContainer: $("#editor_toolbar_container"),
 					resizeWidth: false,
 					resizeMaxHeight: -1,
@@ -150,17 +151,16 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 				});
 				$editor_data["', $editor_id, '"] = $("#', $editor_id, '").data("sceditor");
 				$editor_container["', $editor_id, '"] = $(".sceditor-container");
-				$editor_data["', $editor_id, '"].css("code {white-space: pre;}").createPermanentDropDown();', $editor_context['rich_active'] ? '' : '
-				$editor_data["' . $editor_id . '"].sourceMode(true);', '
+				$editor_data["', $editor_id, '"].css("code {white-space: pre;}").createPermanentDropDown();
 				if (!(is_ie || is_ff || is_opera || is_safari || is_chrome))
 					$(".sceditor-button-source").hide();
 				', isset($context['post_error']['errors']['no_message']) || isset($context['post_error']['errors']['long_message']) ? '
 				$editor_container["' . $editor_id . '"].find("textarea, iframe").addClass("border_error");' : '', '
-		}
-
-		$(function() {
-			elk_editor();
-		});
+			}
+	
+			$(function() {
+				elk_editor();
+			});
 
 		</script>';
 }
