@@ -29,7 +29,6 @@ class Server extends \ArrayObject
 	 */
 	public function __construct($server = null)
 	{
-
 		if (!is_array($server))
 		{
 			$server = isset($_SERVER) ? $_SERVER : array();
@@ -197,6 +196,6 @@ class Server extends \ArrayObject
 	public function supportsSSL()
 	{
 		return isset($this->HTTPS) &&
-			($this->HTTPS === "on" || $this->HTTPS === 1 || $this->SERVER_PORT === 443);
+			($this->HTTPS === 'on' || $this->HTTPS === 1 || $this->SERVER_PORT === 443);
 	}
 }
