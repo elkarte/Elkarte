@@ -443,20 +443,15 @@ $.sceditor.plugins.bbcode.bbcode
 		format: function (element, content) {
 			var from = '';
 
-			if ($(element[0]).hasClass('php'))
-				return '[php]' + content.replace('&#91;', '[') + '[/php]';
-
-			if ($(element).children("cite:first").length === 1) {
-				from = $(element).children("cite:first").text().trim();
-				$(element).attr({'from': from.php_htmlspecialchars()});
+			if (element.children("cite:first").length === 1) {
+				from = element.children("cite:first").text().trim();
+				element.attr({'from': from.php_htmlspecialchars()});
 				from = '=' + from;
-				content = '';
-				$(element).children("cite:first").remove();
-				content = this.elementToBbcode($(element));
+				element.children("cite:first").remove();
+				content = this.elementToBbcode(element);
 			}
-			else {
-				if (typeof $(element).attr('from') !== 'undefined')
-					from = '=' + $(element).attr('from').php_unhtmlspecialchars();
+			else if (typeof element.attr('from') !== 'undefined') {
+				from = '=' + element.attr('from').php_unhtmlspecialchars();
 			}
 
 			return '[code' + from + ']' + content.replace('&#91;', '[') + '[/code]';
@@ -482,24 +477,20 @@ $.sceditor.plugins.bbcode.bbcode
 		format: function (element, content) {
 			var author = '',
 				date = '',
-				link = '',
-				$elm = $(element);
+				link = '';
 
 			if (element[0].tagName.toLowerCase() === 'cite')
 				return '';
-			if ($elm.attr('author'))
-				author = ' author=' + $elm.attr('author').php_unhtmlspecialchars();
-			if ($elm.attr('date'))
-				date = ' date=' + $elm.attr('date');
-			if ($elm.attr('link'))
-				link = ' link=' + $elm.attr('link');
+			if (element.attr('author'))
+				author = ' author=' + element.attr('author').php_unhtmlspecialchars();
+			if (element.attr('date'))
+				date = ' date=' + element.attr('date');
+			if (element.attr('link'))
+				link = ' link=' + element.attr('link');
 			if (author === '' && date === '' && link !== '')
-				link = '=' + $elm.attr('link');
+				link = '=' + element.attr('link');
 
 			return '[quote' + author + date + link + ']' + content + '[/quote]';
-		},
-		attrs: function () {
-			return ['author', 'date', 'link'];
 		},
 		html: function (element, attrs, content) {
 			var attr_author = '',
