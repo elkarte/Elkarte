@@ -72,12 +72,6 @@ code:before, code {
 	text-align: left;
 }
 
-code cite {
-	position: relative;
-	top: -1.6em;
-	padding-left: 3em;
-}
-
 blockquote {
 	overflow: auto;
 	margin: 0 0 1em 0;
@@ -94,6 +88,15 @@ blockquote cite, code cite {
 	background: #FFFFFF;
 	color: #008299;
 	font-size: 0.786em;
+}
+
+code cite {
+	position: relative;
+	top: -1.7em;
+	margin-left: 3em;
+	font-size: 1em;
+	padding: 0;
+	line-height: 1.3em;
 }
 
 /* Will correctly colour down to seventh level of nested quotes in editor. Can be extended easily enough. */

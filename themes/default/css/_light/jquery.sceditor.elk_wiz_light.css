@@ -92,10 +92,11 @@ blockquote cite, code cite {
 
 code cite {
 	position: relative;
-	top: -1.9em;
-	margin-bottom: -1.5em;
-	margin-left: 2.7em;
-	font-size: 1.3em;
+	top: -1.7em;
+	margin-left: 3em;
+	font-size: 1.07em;
+	padding: 0;
+	line-height: 1.3em;
 }
 
 /* Will correctly colour down to seventh level of nested quotes in editor. Can be extended easily enough. */
