@@ -261,7 +261,7 @@ class Permissions
 			{
 				foreach ($children[$row['id_group']] as $child)
 				{
-					$permissions[] = array($child, $row['id_profile'], $row['permission'], $row['add_deny']);
+					$permissions[] = array($row['permission'], $child, $row['add_deny'], $row['id_profile']);
 				}
 			}
 			$this->db->free_result($request);
