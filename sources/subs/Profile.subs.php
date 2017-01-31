@@ -1737,7 +1737,8 @@ function profileLoadAvatarData()
 
 	$context['avatar_url'] = $modSettings['avatar_url'];
 
-	$valid_protocol = substr($cur_profile['avatar'], 0, 7) === 'http://' || substr($cur_profile['avatar'], 0, 8) === 'https://';
+	$valid_protocol = preg_match('~^https' . (detectServer()->supportsSSL() ? '' : '?') . '://~i', $cur_profile['avatar']) === 1;
+	$schema = 'http' . (detectServer()->supportsSSL() ? 's' : '') . '://';
 
 	// @todo Temporary
 	if ($context['user']['is_owner'])
@@ -1747,7 +1748,7 @@ function profileLoadAvatarData()
 
 	// Default context.
 	$context['member']['avatar'] += array(
-		'custom' => $valid_protocol ? $cur_profile['avatar'] : 'http://',
+		'custom' => $valid_protocol ? $cur_profile['avatar'] : $schema,
 		'selection' => $valid_protocol ? $cur_profile['avatar'] : '',
 		'id_attach' => $cur_profile['id_attach'],
 		'filename' => $cur_profile['filename'],
@@ -1762,7 +1763,7 @@ function profileLoadAvatarData()
 		$context['member']['avatar'] += array(
 			'choice' => 'upload',
 			'server_pic' => 'blank.png',
-			'external' => 'http://'
+			'external' => $schema
 		);
 		$context['member']['avatar']['href'] = empty($cur_profile['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $cur_profile['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $cur_profile['filename'];
 	}
@@ -1776,19 +1777,19 @@ function profileLoadAvatarData()
 		$context['member']['avatar'] += array(
 			'choice' => 'gravatar',
 			'server_pic' => 'blank.png',
-			'external' => 'http://'
+			'external' => 'https://'
 		);
 	elseif ($cur_profile['avatar'] != '' && file_exists($modSettings['avatar_directory'] . '/' . $cur_profile['avatar']) && $context['member']['avatar']['allow_server_stored'])
 		$context['member']['avatar'] += array(
 			'choice' => 'server_stored',
 			'server_pic' => $cur_profile['avatar'] == '' ? 'blank.png' : $cur_profile['avatar'],
-			'external' => 'http://'
+			'external' => $schema
 		);
 	else
 		$context['member']['avatar'] += array(
 			'choice' => 'none',
 			'server_pic' => 'blank.png',
-			'external' => 'http://'
+			'external' => $schema
 		);
 
 	// Get a list of all the avatars.
@@ -2190,10 +2191,10 @@ function profileSaveAvatarData(&$value)
 
 		$profile_vars['avatar'] = str_replace(' ', '%20', preg_replace('~action(?:=|%3d)(?!dlattach)~i', 'action-', $_POST['userpicpersonal']));
 
-		if ($profile_vars['avatar'] === 'http://' || $profile_vars['avatar'] === 'http:///')
+		if (preg_match('~^https?:///?$~i', $profile_vars['avatar']) === 1)
 			$profile_vars['avatar'] = '';
 		// Trying to make us do something we'll regret?
-		elseif (!$valid_http && !$valid_https)
+		elseif ((!$valid_http && !$valid_https) || ($valid_http && detectServer()->supportsSSL()))
 			return 'bad_avatar';
 		// Should we check dimensions?
 		elseif (!empty($modSettings['avatar_max_height']) || !empty($modSettings['avatar_max_width']))
