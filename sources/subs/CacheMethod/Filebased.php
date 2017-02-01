@@ -43,7 +43,7 @@ class Filebased extends Cache_Method_Abstract
 	 *
 	 * @var string
 	 */
-	protected $ext = 'json';
+	protected $ext = 'php';
 
 	/**
 	 * Obtain from the parent class the variables necessary
@@ -81,7 +81,7 @@ class Filebased extends Cache_Method_Abstract
 		// Or stashing it away
 		else
 		{
-			$cache_data = json_encode(array('expiration' => time() + $ttl, 'data' => $value));
+			$cache_data = "<?php '" . json_encode(array('expiration' => time() + $ttl, 'data' => $value)) . "';";
 
 			// Write out the cache file, check that the cache write was successful; all the data must be written
 			// If it fails due to low diskspace, or other, remove the cache file
@@ -104,7 +104,7 @@ class Filebased extends Cache_Method_Abstract
 		{
 			if (filesize(CACHEDIR . '/' . $fName) > 10)
 			{
-				$value = json_decode(file_get_contents(CACHEDIR . '/' . $fName));
+				$value = json_decode(substr(file_get_contents(CACHEDIR . '/' . $fName), 7, -2));
 
 				if ($value->expiration < time())
 				{
