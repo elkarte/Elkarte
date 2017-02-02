@@ -173,11 +173,13 @@ class ManageLanguages_Controller extends Action_Controller
 			{
 				$language = $this->_req->post->def_language;
 				$this->updateLanguage($language);
+				redirectexit('action=admin;area=languages;sa=edit');
 			}
 		}
 
 		// Create another one time token here.
 		createToken('admin-lang');
+		createToken('admin-ssc');
 
 		$listOptions = array(
 			'id' => 'language_list',
@@ -251,7 +253,8 @@ class ManageLanguages_Controller extends Action_Controller
 					'position' => 'bottom_of_list',
 					'value' => '
 						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
-						<input type="submit" name="set_default" value="' . $txt['save'] . '"' . (is_writable(BOARDDIR . '/Settings.php') ? '' : ' disabled="disabled"') . ' />',
+						<input type="submit" name="set_default" value="' . $txt['save'] . '"' . (is_writable(BOARDDIR . '/Settings.php') ? '' : ' disabled="disabled"') . ' />
+						<input type="hidden" name="' . $context['admin-ssc_token_var'] . '" value="' . $context['admin-ssc_token'] . '" />',
 				),
 			),
 			// For highlighting the default.
@@ -1015,7 +1018,7 @@ class ManageLanguages_Controller extends Action_Controller
 		global $scripturl, $context, $txt;
 
 		// Initialize the form
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
@@ -1076,7 +1079,7 @@ class ManageLanguages_Controller extends Action_Controller
 		// Get our languages. No cache.
 		$languages = getLanguages(false);
 		foreach ($languages as $lang)
-			$config_vars['language'][4][$lang['filename']] = array($lang['filename'], strtr($lang['name'], array('-utf8' => ' (UTF-8)')));
+			$config_vars['language'][4][] = array($lang['filename'], strtr($lang['name'], array('-utf8' => ' (UTF-8)')));
 
 		return $config_vars;
 	}
@@ -1097,7 +1100,7 @@ class ManageLanguages_Controller extends Action_Controller
 	private function updateLanguage($language)
 	{
 		$configVars = array(
-			array('language')
+			array('language', '', 'file')
 		);
 		$configValues = array(
 			'language' => $language
