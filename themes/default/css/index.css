@@ -2850,6 +2850,14 @@ img.new_posts {
 	border: 1px solid;
 }
 
+/* small negative margin on #new for better viewport position */
+#new:before {
+	display: block;
+	visibility: hidden;
+	margin-top: -1em;
+	content: '';
+}
+
 /* Poster and postarea + moderation area underneath */
 .forumposts .content, .forumposts.approvebg {
 	overflow: visible;
@@ -3191,6 +3199,27 @@ img.new_posts {
 /* Separator of posts. More useful in the print stylesheet. */
 .post_separator {
 	display: none;
+}
+
+/* New post HR, --\/--separates the read from the new */
+.new_post_separator {
+	display: none;
+	margin-top: .5em;
+	height: 0;
+}
+
+.new_post_separator:after, .new_post_separator:before {
+	position: relative;
+	top: -11px;
+	left: 50%;
+	z-index: 1;
+	display: block;
+	width: 0;
+	content: '';
+}
+
+.new_post_separator:before {
+	top: 0;
 }
 
 /* Used by video embed JS when autolinking video links */

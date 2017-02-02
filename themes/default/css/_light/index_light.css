@@ -1338,6 +1338,20 @@ div.bbc_footnotes .meaction {
 	border-color: #CCCCCC;
 }
 
+.new_post_separator {
+	display: block;
+}
+
+.new_post_separator:after, .new_post_separator:before {
+	border-width: 10px 10px 0;
+	border-style: solid;
+	border-color: #E4E4E4 transparent;
+}
+
+.new_post_separator:before {
+	border-color: #BBBBBB transparent;
+}
+
 /* Used by video embed JS when autolinking video links */
 .elk_video {
 	border-color: #27A348;
