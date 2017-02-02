@@ -553,7 +553,7 @@ function db_version_check()
 {
 	global $db_type, $databases, $db_connection;
 
-	$current_version = $databases[$db_type]['version_check']{($db_connection)};
+	$current_version = call_user_func($databases[$db_type]['version_check'], $db_connection);
 	$current_version = preg_replace('~\-.+?$~', '', $current_version);
 
 	return version_compare($databases[$db_type]['version'], $current_version, '<=');
@@ -602,6 +602,9 @@ function action_deleteInstaller()
  */
 function saveFileSettings($config_vars, $settingsArray)
 {
+	definePaths();
+	require_once(SOURCEDIR . '/Subs.php');
+
 	if (count($settingsArray) == 1)
 		$settingsArray = preg_split('~[\r\n]~', $settingsArray[0]);
 

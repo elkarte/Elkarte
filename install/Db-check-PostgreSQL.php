@@ -9,7 +9,7 @@
  *
  */
 
-$databases['postgresql'] = array(
+$GLOBALS['databases']['postgresql'] = array(
 	'name' => 'PostgreSQL',
 	'extension' => 'PostgreSQL (PgSQL)',
 	'version' => '8.3',

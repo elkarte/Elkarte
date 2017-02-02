@@ -9,7 +9,7 @@
  *
  */
 
-$databases['mysql'] = array(
+$GLOBALS['databases']['mysql'] = array(
 	'name' => 'MySQL',
 	'extension' => 'MySQL Improved (MySQLi)',
 	'version' => '5.0.52',
