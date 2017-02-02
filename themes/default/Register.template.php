@@ -157,7 +157,13 @@ function template_registration_form()
 							<input type="email" name="email" id="elk_autov_reserve1" size="30" tabindex="', $context['tabindex']++, '" value="', isset($context['email']) ? $context['email'] : '', '" class="input_text" placeholder="', $txt['user_email_address'], '" required="required" />
 							<span id="suggestion" class="smalltext"></span>
 						</dd>
-					</dl>';
+ 						<dt>
+ 							<label for="notify_announcements">', $txt['notify_announcements'], ':</label>
+ 						</dt>
+ 						<dd>
+ 							<input type="checkbox" name="notify_announcements" id="notify_announcements" tabindex="', $context['tabindex']++, '"', $context['notify_announcements'] ? ' checked="checked"' : '', ' class="input_check" />
+ 						</dd>
+ 					</dl>';
 
 	// If OpenID is enabled, give the user a choice between password and OpenID.
 	if (!empty($modSettings['enableOpenID']))

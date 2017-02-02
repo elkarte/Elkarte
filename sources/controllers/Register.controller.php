@@ -228,6 +228,7 @@ class Register_Controller extends Action_Controller
 			$context['openid'] = $this->_req->getPost('openid_identifier', 'trim', '');
 			$context['username'] = $this->_req->getPost('user', 'Util::htmlspecialchars', '');
 			$context['email'] = $this->_req->getPost('email', 'Util::htmlspecialchars', '');
+			$context['notify_announcements'] = (int) !empty($this->_req->post->notify_announcements);
 		}
 
 		// Were there any errors?

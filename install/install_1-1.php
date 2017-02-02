@@ -1825,7 +1825,7 @@ class InstallInstructions_install_1_1
 				array('name' => 'likes_given',          'type' => 'mediumint', 'size' => 5, 'unsigned' => true, 'default' => 0),
 				array('name' => 'likes_received',       'type' => 'mediumint', 'size' => 5, 'unsigned' => true, 'default' => 0),
 				array('name' => 'usertitle',            'type' => 'varchar', 'size' => 255, 'default' => ''),
-				array('name' => 'notify_announcements', 'type' => 'tinyint', 'size' => 4, 'default' => 1),
+				array('name' => 'notify_announcements', 'type' => 'tinyint', 'size' => 4, 'default' => 0),
 				array('name' => 'notify_regularity',    'type' => 'tinyint', 'size' => 4, 'default' => 1),
 				array('name' => 'notify_send_body',     'type' => 'tinyint', 'size' => 4, 'default' => 0),
 				array('name' => 'notify_types',         'type' => 'tinyint', 'size' => 4, 'default' => 2),

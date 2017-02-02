@@ -164,6 +164,7 @@ $txt['redirects'] = 'Redirects';
 $txt['choose_pass'] = 'Choose password';
 $txt['verify_pass'] = 'Verify password';
 $txt['position'] = 'Position';
+$txt['notify_announcements'] = 'Sign up to receive important site news by email';
 
 $txt['profile_of'] = 'View the profile of';
 $txt['total'] = 'Total';

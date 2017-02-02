@@ -613,6 +613,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		'ignore_boards' => '',
 		'smiley_set' => '',
 		'openid_uri' => (!empty($regOptions['openid']) ? $regOptions['openid'] : ''),
+		'notify_announcements' => (!empty($regOptions['notify_announcements']) ? 1 : 0),
 	);
 
 	// Setup the activation status on this new account so it is correct - firstly is it an under age account?
