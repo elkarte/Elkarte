@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1 beta 4
+ * @version 1.1 Release Candidate 1
  *
  */
 
@@ -26,7 +26,7 @@ $time_start = microtime(true);
 const ELKBOOT = 1;
 
 // Shortcut for the browser cache stale
-const CACHE_STALE = '?R11B4';
+const CACHE_STALE = '?R11RC1';
 
 // We're going to want a few globals... these are all set later.
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;

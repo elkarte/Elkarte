@@ -11,7 +11,7 @@
  * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  * license:    BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1 beta 4
+ * @version 1.1 Release Candidate 1
  *
  *
  * Adding options to one of the setting screens isn't hard.
