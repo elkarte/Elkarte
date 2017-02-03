@@ -242,7 +242,7 @@ class Packages_Controller extends Action_Controller
 
 		// No actions found, return so we can display an error
 		if (empty($actions))
-			return;
+			redirectexit('action=admin;area=packages');
 
 		// Now prepare things for the template using the package actions class
 		$pka = new Package_Actions();

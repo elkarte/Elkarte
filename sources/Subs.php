@@ -2002,7 +2002,14 @@ function dieGif($expired = false)
 	$linenum = '';
 	if (headers_sent($filename, $linenum))
 	{
-		Errors::instance()->log_error('Headers already sent in ' . $filename . ' at line ' . $linenum);
+		if (empty($filename))
+		{
+			ob_clean();
+		}
+		else
+		{
+			Errors::instance()->log_error('Headers already sent in ' . $filename . ' at line ' . $linenum);
+		}
 	}
 
 	if ($expired === true)
