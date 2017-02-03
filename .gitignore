@@ -1,6 +1,6 @@
 Settings.php
 Settings_bak.php
-db_last_error.php
+db_last_error.txt
 cache/data*.php
 Packages/backups/*
 Packages/temp
