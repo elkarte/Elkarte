@@ -85,10 +85,10 @@ class Html_2_Md
 
 		// The XML parser will not deal gracefully with these
 		$this->html = strtr($this->html, array(
-			'?<' => "|?|<",
-			'?>' => "|?|>",
-			'>?' => ">|?|",
-			'<?' => "&lt?"
+			'?<' => "|?|&lt",
+			'?>' => "|?|&gt",
+			'>?' => "&gt|?|",
+			'<?' => "&lt|?|"
 		));
 
 		// Set the dom parser to use and load the HTML to the parser
@@ -125,10 +125,7 @@ class Html_2_Md
 			$previous = libxml_use_internal_errors(true);
 
 			// Set up basic parameters for DomDocument, including silencing structural errors
-			$this->doc = new DOMDocument();
-			$this->doc->preserveWhiteSpace = false;
-			$this->doc->encoding = 'UTF-8';
-			$this->doc->loadHTML('<?xml encoding="UTF-8">' . $this->html);
+			$this->_setupDOMDocument();
 
 			// Set the error handle back to what it was, and flush
 			libxml_use_internal_errors($previous);
@@ -149,12 +146,8 @@ class Html_2_Md
 	 */
 	public function get_markdown()
 	{
-		// If there is nothing to parse, its quite easy
-		if (($this->_parser && $this->doc->getElementsByTagName('body')->item(0) === null) || (!$this->_parser && $this->doc === false))
-			return '';
-
 		// For this html node, find all child elements and convert
-		$body = ($this->_parser) ? $this->doc->getElementsByTagName('body')->item(0) : $this->doc->root;
+		$body = $this->_getBody();
 		$this->_convert_childNodes($body);
 
 		// Done replacing HTML elements, now get the converted DOM tree back into a string
@@ -164,11 +157,6 @@ class Html_2_Md
 		if ($this->_parser)
 		{
 			$this->markdown = html_entity_decode(htmlspecialchars_decode($this->markdown, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
-
-			if (preg_match('~<body>(.*)</body>~s', $this->markdown, $body))
-				$this->markdown = $body[1];
-			elseif (preg_match('~<html>(.*)</html>~s', $this->markdown, $body))
-				$this->markdown = $body[1];
 		}
 
 		// Clean up any excess spacing etc
@@ -182,10 +170,84 @@ class Html_2_Md
 	}
 
 	/**
+	 * Returns just the body of the HTML, as best possible, so we are not dealing with head
+	 * and above head markup
+	 *
+	 * @return object
+	 */
+	private function  _getBody()
+	{
+		// If there is a head node, then off with his head!
+		$this->_clipHead();
+
+		// The body of the HTML is where its at.
+		if ($this->_parser)
+		{
+			$body = $this->doc->getElementsByTagName('body')->item(0);
+		}
+		else
+		{
+			if ($this->doc->find('body', 0) !== null)
+			{
+				$body = $this->doc->find('body', 0);
+			}
+			elseif ($this->doc->find('html', 0) !== null)
+			{
+				$body = $this->doc->find('html', 0);
+			}
+			else
+			{
+				$body = $this->doc->root;
+			}
+		}
+
+		return $body;
+	}
+
+	/**
+	 * Remove any <head node from the DOM
+	 */
+	private function _clipHead()
+	{
+		$head = ($this->_parser) ? $this->doc->getElementsByTagName('head')->item(0) : $this->doc->find('head', 0)->outertext;
+		if ($head !== null)
+		{
+			if ($this->_parser)
+			{
+				$head->parentNode->removeChild($head);
+			}
+			else
+			{
+				$this->doc->find('head', 0)->outertext = '';
+			}
+		}
+	}
+
+	/**
+	 * Sets up processing parameters for DOMDocument to ensure that text is processed as UTF-8
+	 */
+	private function _setupDOMDocument()
+	{
+		// If the html is already wrapped, remove it
+		$this->html = $this->_returnBodyText($this->html);
+
+		// Set up processing details
+		$this->doc = new DOMDocument();
+		$this->doc->preserveWhiteSpace = false;
+		$this->doc->encoding = 'UTF-8';
+
+		// Do what we can to ensure this is processed as UTF-8
+		$this->doc->loadHTML('<?xml encoding="UTF-8"><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head><body>' . $this->html . '</body></html>');
+	}
+
+	/**
 	 * Normalize any spacing and excess blank lines that may have been generated
 	 */
 	private function _clean_markdown()
 	{
+		// We only want the content, no wrappers
+		$this->markdown = $this->_returnBodyText($this->markdown);
+
 		// Remove non breakable spaces that may be hiding in here
 		$this->markdown = str_replace("\xC2\xA0\x20", ' ', $this->markdown);
 		$this->markdown = str_replace("\xC2\xA0", ' ', $this->markdown);
@@ -196,8 +258,10 @@ class Html_2_Md
 
 		// Replace content that we "hide" from the XML parsers
 		$this->markdown = strtr($this->markdown, array(
-			"|?|" => '?',
-			"&lt?" => '<?'
+			'|?|&gt' => '?>',
+			'|?|&lt' => '?<',
+			"&lt|?|" => '<?',
+			"&gt|?|" => '>?'
 		));
 
 		// Strip the chaff and any excess blank lines we may have produced
@@ -206,6 +270,23 @@ class Html_2_Md
 		$this->markdown = preg_replace("~(^\s\s\n){3,}~m", "  \n  \n", $this->markdown);
 		$this->markdown = preg_replace("~(^\s\s\r?\n){3,}~m", "  \n  \n", $this->markdown);
 		$this->markdown = preg_replace("~(^\s\s(?:\r?\n){2}){3,}~m", "  \n  \n", $this->markdown);
+	}
+
+	/**
+	 * Looks for the text inside of <body> and then <html>, returning just the inner
+	 *
+	 * @param $text
+	 *
+	 * @return string
+	 */
+	private function _returnBodyText($text)
+	{
+		if (preg_match('~<body>(.*)</body>~su', $text, $body))
+			return $body[1];
+		elseif (preg_match('~<html>(.*)</html>~su', $text, $body))
+			return $body[1];
+
+		return $text;
 	}
 
 	/**
@@ -913,9 +994,9 @@ class Html_2_Md
 				$html = $doc->saveHTML();
 
 				// We just want the html of the inserted node, it *may* be wrapped
-				if (preg_match('~<body>(.*)</body>~s', $html, $body))
+				if (preg_match('~<body>(.*)</body>~su', $html, $body))
 					$html = $body[1];
-				elseif (preg_match('~<html>(.*)</html>~s', $html, $body))
+				elseif (preg_match('~<html>(.*)</html>~su', $html, $body))
 					$html = $body[1];
 
 				// Clean it up
@@ -1002,7 +1083,7 @@ class Html_2_Md
 			while (!empty($string))
 			{
 				// Get the next #width characters before a break (space, punctuation tab etc)
-				if (preg_match('~^(.{1,' . $width . '})(?:\s|$|,|\.)~', $string, $matches))
+				if (preg_match('~^(.{1,' . $width . '})(?:\s|$|,|\.)~u', $string, $matches))
 				{
 					// Add the #width to the output and set up for the next pass
 					$lines[] = ($in_quote && $matches[1][0] !== '>' ? '> ' : '') . $matches[1];
