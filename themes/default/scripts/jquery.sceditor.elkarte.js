@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.4
+ * @version 1.0.10
  * Extension functions to provide ElkArte compatibility with sceditor
  */
 
