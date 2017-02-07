@@ -85,10 +85,10 @@ class Html_2_Md
 
 		// The XML parser will not deal gracefully with these
 		$this->html = strtr($this->html, array(
-			'?<' => "|?|&lt",
-			'?>' => "|?|&gt",
-			'>?' => "&gt|?|",
-			'<?' => "&lt|?|"
+			'?<' => '|?|&lt',
+			'?>' => '|?|&gt',
+			'>?' => '&gt|?|',
+			'<?' => '&lt|?|'
 		));
 
 		// Set the dom parser to use and load the HTML to the parser
@@ -260,8 +260,8 @@ class Html_2_Md
 		$this->markdown = strtr($this->markdown, array(
 			'|?|&gt' => '?>',
 			'|?|&lt' => '?<',
-			"&lt|?|" => '<?',
-			"&gt|?|" => '>?'
+			'&lt|?|' => '<?',
+			'&gt|?|' => '>?'
 		));
 
 		// Strip the chaff and any excess blank lines we may have produced
