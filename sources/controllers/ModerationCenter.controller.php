@@ -1707,15 +1707,18 @@ class ModerationCenter_Controller extends Action_Controller
 		$watched_users = basicWatchedUsers();
 
 		$context['watched_users'] = array();
-		foreach ($watched_users as $user)
+		if (is_array($watched_users) || is_object($watched_users))
 		{
-			$context['watched_users'][] = array(
-				'id' => $user['id_member'],
-				'name' => $user['real_name'],
-				'link' => '<a href="' . $scripturl . '?action=profile;u=' . $user['id_member'] . '">' . $user['real_name'] . '</a>',
-				'href' => $scripturl . '?action=profile;u=' . $user['id_member'],
-				'last_login' => !empty($user['last_login']) ? standardTime($user['last_login']) : '',
-			);
+			foreach ($watched_users as $user)
+			{
+				$context['watched_users'][] = array(
+					'id' => $user['id_member'],
+					'name' => $user['real_name'],
+					'link' => '<a href="' . $scripturl . '?action=profile;u=' . $user['id_member'] . '">' . $user['real_name'] . '</a>',
+					'href' => $scripturl . '?action=profile;u=' . $user['id_member'],
+					'last_login' => !empty($user['last_login']) ? standardTime($user['last_login']) : '',
+				);
+			}
 		}
 
 		return 'watched_users';
