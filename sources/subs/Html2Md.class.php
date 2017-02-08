@@ -82,10 +82,10 @@ class Html_2_Md
 
 		// The XML parser will not deal gracefully with these
 		$this->html = strtr($this->html, array(
-			'?<' => '|?|<',
-			'?>' => '|?|>',
-			'>?' => '>|?|',
-			'<?' => '&lt?'
+			'?<' => '|?|&lt',
+			'?>' => '|?|&gt',
+			'>?' => '&gt|?|',
+			'<?' => '&lt|?|'
 		));
 
 		// Set the dom parser to use and load the HTML to the parser
@@ -122,10 +122,7 @@ class Html_2_Md
 			$previous = libxml_use_internal_errors(true);
 
 			// Set up basic parameters for DomDocument, including silencing structural errors
-			$this->doc = new DOMDocument();
-			$this->doc->preserveWhiteSpace = false;
-			$this->doc->encoding = 'UTF-8';
-			$this->doc->loadHTML('<?xml encoding="UTF-8">' . $this->html);
+			$this->_setupDOMDocument();
 
 			// Set the error handle back to what it was, and flush
 			libxml_use_internal_errors($previous);
@@ -146,12 +143,8 @@ class Html_2_Md
 	 */
 	public function get_markdown()
 	{
-		// If there is nothing to parse, its quite easy
-		if (($this->_parser && $this->doc->getElementsByTagName('body')->item(0) === null) || (!$this->_parser && $this->doc === false))
-			return '';
-
 		// For this html node, find all child elements and convert
-		$body = ($this->_parser) ? $this->doc->getElementsByTagName('body')->item(0) : $this->doc->root;
+		$body = $this->_getBody();
 		$this->_convert_childNodes($body);
 
 		// Done replacing HTML elements, now get the converted DOM tree back into a string
@@ -160,12 +153,7 @@ class Html_2_Md
 		// Using the internal DOM methods requires we need to do a little extra work
 		if ($this->_parser)
 		{
-			$this->markdown = htmlspecialchars_decode($this->markdown, ENT_QUOTES);
-
-			if (preg_match('~<body>(.*)</body>~s', $this->markdown, $body))
-				$this->markdown = $body[1];
-			elseif (preg_match('~<html>(.*)</html>~s', $this->markdown, $body))
-				$this->markdown = $body[1];
+			$this->markdown = html_entity_decode(htmlspecialchars_decode($this->markdown, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
 		}
 
 		// Clean up any excess spacing etc
@@ -173,9 +161,82 @@ class Html_2_Md
 
 		// Wordwrap?
 		if (!empty($this->body_width))
+		{
 			$this->markdown = $this->_utf8_wordwrap($this->markdown, $this->body_width, $this->line_end);
+		}
 
 		return $this->markdown;
+	}
+
+	/**
+	 * Returns just the body of the HTML, as best possible, so we are not dealing with head
+	 * and above head markup
+	 *
+	 * @return object
+	 */
+	private function _getBody()
+	{
+		// If there is a head node, then off with his head!
+		$this->_clipHead();
+
+		// The body of the HTML is where its at.
+		if ($this->_parser)
+		{
+			$body = $this->doc->getElementsByTagName('body')->item(0);
+		}
+		else
+		{
+			if ($this->doc->find('body', 0) !== null)
+			{
+				$body = $this->doc->find('body', 0);
+			}
+			elseif ($this->doc->find('html', 0) !== null)
+			{
+				$body = $this->doc->find('html', 0);
+			}
+			else
+			{
+				$body = $this->doc->root;
+			}
+		}
+
+		return $body;
+	}
+
+	/**
+	 * Remove any <head node from the DOM
+	 */
+	private function _clipHead()
+	{
+		$head = ($this->_parser) ? $this->doc->getElementsByTagName('head')->item(0) : $this->doc->find('head', 0)->outertext;
+		if ($head !== null)
+		{
+			if ($this->_parser)
+			{
+				$head->parentNode->removeChild($head);
+			}
+			else
+			{
+				$this->doc->find('head', 0)->outertext = '';
+			}
+		}
+	}
+
+	/**
+	 * Sets up processing parameters for DOMDocument to ensure that text is processed as UTF-8
+	 */
+	private function _setupDOMDocument()
+	{
+		// If the html is already wrapped, remove it
+		$this->html = $this->_returnBodyText($this->html);
+
+		// Set up processing details
+		$this->doc = new DOMDocument();
+		$this->doc->preserveWhiteSpace = false;
+		$this->doc->encoding = 'UTF-8';
+
+		// Do what we can to ensure this is processed as UTF-8
+		$this->doc->loadHTML('<?xml encoding="UTF-8"><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head><body>' . $this->html . '</body></html>');
 	}
 
 	/**
@@ -183,21 +244,25 @@ class Html_2_Md
 	 */
 	private function _clean_markdown()
 	{
-		// Remove any "bonus" tags
-		if ($this->strip_tags)
-			$this->markdown = strip_tags($this->markdown);
-
-		if ($this->_parser)
-			$this->markdown = html_entity_decode($this->markdown, ENT_QUOTES, 'UTF-8');
+		// We only want the content, no wrappers
+		$this->markdown = $this->_returnBodyText($this->markdown);
 
 		// Remove non breakable spaces that may be hiding in here
 		$this->markdown = str_replace("\xC2\xA0\x20", ' ', $this->markdown);
 		$this->markdown = str_replace("\xC2\xA0", ' ', $this->markdown);
 
+		// Remove any "bonus" tags
+		if ($this->strip_tags)
+		{
+			$this->markdown = strip_tags($this->markdown);
+		}
+
 		// Replace content that we "hide" from the XML parsers
 		$this->markdown = strtr($this->markdown, array(
-			'|?|' => '?',
-			'&lt?' => '<?'
+			'|?|&gt' => '?>',
+			'|?|&lt' => '?<',
+			'&lt|?|' => '<?',
+			'&gt|?|' => '>?'
 		));
 
 		// Strip the chaff and any excess blank lines we may have produced
@@ -209,11 +274,33 @@ class Html_2_Md
 	}
 
 	/**
+	 * Looks for the text inside of <body> and then <html>, returning just the inner
+	 *
+	 * @param $text
+	 *
+	 * @return string
+	 */
+	private function _returnBodyText($text)
+	{
+		if (preg_match('~<body>(.*)</body>~su', $text, $body))
+		{
+			return $body[1];
+		}
+		elseif (preg_match('~<html>(.*)</html>~su', $text, $body))
+		{
+			return $body[1];
+		}
+
+		return $text;
+	}
+
+	/**
 	 * For a given node, checks if it is anywhere nested inside of a code block
 	 *  - Prevents converting anything that's inside a code block
 	 *
 	 * @param object $node
 	 * @param boolean $parser flag for internal or external parser
+	 * @return boolean
 	 */
 	private static function _has_parent_code($node, $parser)
 	{
@@ -221,12 +308,16 @@ class Html_2_Md
 		while ($parent)
 		{
 			if ($parent === null)
+			{
 				return false;
+			}
 
 			// Anywhere nested inside a code block we don't render tags
 			$tag = $parser ? $parent->nodeName : $parent->nodeName();
 			if ($tag === 'code')
+			{
 				return true;
+			}
 
 			// Back out another level, until we are done
 			$parent = $parser ? $parent->parentNode : $parent->parentNode();
@@ -240,6 +331,7 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 * @param boolean $parser flag for internal or external parser
+	 * @return int
 	 */
 	private static function _has_parent_list($node, $parser)
 	{
@@ -252,7 +344,9 @@ class Html_2_Md
 			// Anywhere nested inside a list we need to get the depth
 			$tag = $parser ? $parent->nodeName : $parent->nodeName();
 			if (in_array($tag, $inlist))
+			{
 				$depth++;
+			}
 
 			// Back out another level
 			$parent = $parser ? $parent->parentNode : $parent->parentNode();
@@ -269,7 +363,9 @@ class Html_2_Md
 	private function _convert_childNodes($node)
 	{
 		if (self::_has_parent_code($node, $this->_parser))
+		{
 			return;
+		}
 
 		// Keep traversing till we are at the base of this node
 		if ($node->hasChildNodes())
@@ -364,7 +460,9 @@ class Html_2_Md
 					$markdown = $this->_escape_text($markdown);
 				}
 				else
+				{
 					$markdown = rtrim($this->_get_value($node)) . $this->line_break;
+				}
 				break;
 			case 'pre':
 				$markdown = $this->_get_value($node) . $this->line_break;
@@ -372,7 +470,9 @@ class Html_2_Md
 			case 'div':
 				$markdown = $this->line_end . $this->_get_value($node) . $this->line_end;
 				if (!$node->hasChildNodes())
+				{
 					$markdown = $this->_escape_text($markdown);
+				}
 				break;
 			//case '#text':
 			//  $markdown = $this->_escape_text($this->_get_value($node));
@@ -413,7 +513,9 @@ class Html_2_Md
 				$node->parentNode->replaceChild($markdown_node, $node);
 			}
 			else
+			{
 				$node->outertext = $markdown;
+			}
 		}
 	}
 
@@ -424,6 +526,7 @@ class Html_2_Md
 	 * md:   *[HTML]: Hyper Text Markup Language
 	 *
 	 * @param object $node
+	 * @return string
 	 */
 	private function _convert_abbr($node)
 	{
@@ -431,9 +534,13 @@ class Html_2_Md
 		$value = $this->_get_value($node);
 
 		if (!empty($title))
+		{
 			$markdown = '*[' . $value . ']: ' . $title . $this->line_break;
+		}
 		else
+		{
 			$markdown = '';
+		}
 
 		return $markdown;
 	}
@@ -458,15 +565,23 @@ class Html_2_Md
 
 		// Provide a more compact [name] if none is given
 		if ($value == $node->getAttribute('href') || empty($value))
+		{
 			$value = empty($title) ? $txt['link'] : $title;
+		}
 
 		// Special processing just for our own footnotes
 		if ($class === 'target' || $class === 'footnote_return')
+		{
 			$markdown = $value;
+		}
 		elseif (!empty($title))
+		{
 			$markdown = '[' . $value . '](' . $href . ' "' . $title . '")';
+		}
 		else
+		{
 			$markdown = '[' . $value . '](' . $href . ')';
+		}
 
 		// Some links can be very long and if we wrap them they break
 		$this->_check_link_lenght($markdown);
@@ -481,6 +596,7 @@ class Html_2_Md
 	 * md: > quote
 	 *
 	 * @param object $node
+	 * @return string
 	 */
 	private function _convert_blockquote($node)
 	{
@@ -495,7 +611,9 @@ class Html_2_Md
 
 		// Each line gets a '> ' in front of it, just like email quotes really
 		foreach ($lines as $line)
+		{
 			$markdown .= '> ' . ltrim($line, "\t") . $this->line_end;
+		}
 
 		$markdown .= $this->line_end;
 
@@ -511,6 +629,7 @@ class Html_2_Md
 	 * md: `code`
 	 *
 	 * @param object $node
+	 * @return string
 	 */
 	private function _convert_code($node)
 	{
@@ -522,7 +641,9 @@ class Html_2_Md
 		// If there are html tags in this code block, we need to disable strip tags
 		// This is NOT the ideal way to handle this, needs something along the lines of preparse and unpreparse.
 		if ($this->strip_tags && preg_match('~<[^<]+>~', $value))
+		{
 			$this->strip_tags = false;
+		}
 
 		// Get the number of lines of code that we have
 		$lines = preg_split('~\r\n|\r|\n~', $value);
@@ -536,9 +657,13 @@ class Html_2_Md
 
 			// Remove any leading and trailing blank lines
 			if (empty($first_line))
+			{
 				array_shift($lines);
+			}
 			if (empty($last_line))
+			{
 				array_pop($lines);
+			}
 
 			// Convert what remains
 			$markdown = '';
@@ -553,7 +678,9 @@ class Html_2_Md
 
 			// The parser will encode, but we don't want that for our code block
 			if ($this->_parser)
+			{
 				$markdown = html_entity_decode($markdown, ENT_QUOTES, 'UTF-8');
+			}
 		}
 		// Single line, back tick and move on
 		else
@@ -564,12 +691,16 @@ class Html_2_Md
 			{
 				// If the ticks were at the start/end of the word space it off
 				if ($lines[0][0] == '`' || substr($lines[0], -1) == '`')
+				{
 					$lines[0] = ' ' . $lines[0] . ' ';
+				}
 
 				$markdown = $ticks . ($this->_parser ? html_entity_decode($lines[0], ENT_QUOTES, 'UTF-8') : $lines[0]) . $ticks;
 			}
 			else
+			{
 				$markdown = '`' . ($this->_parser ? html_entity_decode($lines[0], ENT_QUOTES, 'UTF-8') : $lines[0]) . '`';
+			}
 		}
 
 		return $markdown;
@@ -588,6 +719,7 @@ class Html_2_Md
 	 *
 	 * @param int $level
 	 * @param string $content
+	 * @return string
 	 */
 	private function _convert_header($level, $content)
 	{
@@ -600,7 +732,9 @@ class Html_2_Md
 			$markdown = $content . $this->line_end . str_repeat($underline, $length) . $this->line_break;
 		}
 		else
+		{
 			$markdown = str_repeat('#', $level) . ' ' . $content . $this->line_break;
+		}
 
 		return $markdown;
 	}
@@ -612,6 +746,7 @@ class Html_2_Md
 	 * md: ![alt](source 'title')
 	 *
 	 * @param object $node
+	 * @return string
 	 */
 	private function _convert_image($node)
 	{
@@ -620,9 +755,13 @@ class Html_2_Md
 		$title = $node->getAttribute('title');
 
 		if (!empty($title))
+		{
 			$markdown = '![' . $alt . '](' . $src . ' "' . $title . '")';
+		}
 		else
+		{
 			$markdown = '![' . $alt . '](' . $src . ')';
+		}
 
 		// Adjust width if needed to maintain the image
 		$this->_check_link_lenght($markdown);
@@ -637,6 +776,7 @@ class Html_2_Md
 	 * md * one
 	 *
 	 * @param object $node
+	 * @return string
 	 */
 	private function _convert_list($node)
 	{
@@ -648,7 +788,9 @@ class Html_2_Md
 
 		// Unordered lists get a simple bullet
 		if ($list_type === 'ul')
+		{
 			$markdown = str_repeat("\t", $depth) . '* ' . $value;
+		}
 		// Ordered lists need a number
 		else
 		{
@@ -665,12 +807,15 @@ class Html_2_Md
 	 * - Have to build top down vs normal inside out due to needing col numbers and widths
 	 *
 	 * @param object $node
+	 * @return string
 	 */
 	private function _convert_table($node)
 	{
 		$table_heading = $node->getElementsByTagName('th');
 		if ($this->_get_item($table_heading, 0) === null)
+		{
 			return;
+		}
 
 		$th_parent = ($table_heading) ? ($this->_parser ? $this->_get_item($table_heading, 0)->parentNode->nodeName : $this->_get_item($table_heading, 0)->parentNode()->nodeName()) : false;
 
@@ -721,7 +866,9 @@ class Html_2_Md
 
 					// Keep track of the longest col cell as we go
 					if ($width[$row][$col] > $max[$col])
+					{
 						$max[$col] = $width[$row][$col];
+					}
 				}
 			}
 
@@ -733,7 +880,9 @@ class Html_2_Md
 				{
 					// Build the header row once
 					if ($row === 0)
+					{
 						$header[] = str_repeat('-', $max[$col]);
+					}
 
 					// Build the data for each col, align/pad as needed
 					$temp[] = $this->_align_row_content($align[$row][$col], $width[$row][$col], $value[$row][$col], $max[$col]);
@@ -744,7 +893,9 @@ class Html_2_Md
 
 				// Stuff in the header after the th row
 				if ($row === 0)
+				{
 					$rows[] = '| ' . implode(' | ', $header) . ' | ';
+				}
 			}
 
 			// Adjust the word wrapping since this has a table, will get mussed by email anyway
@@ -760,58 +911,82 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 * @param int $item
+	 * @return object
 	 */
 	private function _get_item($node, $item)
 	{
 		if ($this->_parser)
+		{
 			return $node->item($item);
+		}
 		else
+		{
 			return $node[$item];
+		}
 	}
 
 	/**
 	 * Helper function for getting a node length
 	 *
 	 * @param object|array $node
+	 * @return int
 	 */
 	private function _get_length($node)
 	{
 		if ($this->_parser)
+		{
 			return $node->length;
+		}
 		else
+		{
 			return count($node);
+		}
 	}
 
 	/**
 	 * Helper function for getting a node value
 	 *
 	 * @param object $node
+	 * @return string
 	 */
 	private function _get_value($node)
 	{
 		if ($node === null)
+		{
 			return '';
+		}
 
 		if ($this->_parser)
+		{
 			return $node->nodeValue;
+		}
 		else
+		{
 			return html_entity_decode(htmlspecialchars_decode($node->innertext, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
+		}
 	}
 
 	/**
 	 * Helper function for getting a node name
 	 *
 	 * @param object $node
+	 * @return string
 	 */
 	private function _get_name($node)
 	{
 		if ($node === null)
+		{
 			return '';
+		}
 
 		if ($this->_parser)
+		{
 			return $node->nodeName;
+		}
 		else
+		{
 			return $node->nodeName();
+		}
 	}
 
 	/**
@@ -820,6 +995,7 @@ class Html_2_Md
 	 * - Returns the absolute number of an <li> inside an <ol>
 	 *
 	 * @param object $node
+	 * @return int
 	 */
 	private function _get_list_position($node)
 	{
@@ -834,7 +1010,9 @@ class Html_2_Md
 		{
 			$current_node = $this->_parser ? $list_node->childNodes->item($i) : $list_node->childNodes($i);
 			if ($current_node === $node)
+			{
 				$position = $i + 1;
+			}
 		}
 
 		return $position;
@@ -849,6 +1027,7 @@ class Html_2_Md
 	 * @param int $width
 	 * @param string $content
 	 * @param int $max
+	 * @return string
 	 */
 	private function _align_row_content($align, $width, $content, $max)
 	{
@@ -876,6 +1055,7 @@ class Html_2_Md
 	 * Gets the inner html of a node
 	 *
 	 * @param DOMNode|object $node
+	 * @return string
 	 */
 	private function _get_innerHTML($node)
 	{
@@ -889,20 +1069,25 @@ class Html_2_Md
 			return preg_replace('@^<' . $tag . '[^>]*>|</' . $tag . '>$@', '', $html);
 		}
 		else
+		{
 			return $node->innertext;
+		}
 	}
 
 	/**
 	 * Gets the outer html of a node
 	 *
 	 * @param DOMNode|object $node
+	 * @return string
 	 */
 	private function _get_outerHTML($node)
 	{
 		if ($this->_parser)
 		{
 			if (version_compare(PHP_VERSION, '5.3.6') >= 0)
+			{
 				return htmlspecialchars_decode($this->doc->saveHTML($node));
+			}
 			else
 			{
 				// @todo remove when 5.3.6 min
@@ -911,18 +1096,18 @@ class Html_2_Md
 				$html = $doc->saveHTML();
 
 				// We just want the html of the inserted node, it *may* be wrapped
-				if (preg_match('~<body>(.*)</body>~s', $html, $body))
-					$html = $body[1];
-				elseif (preg_match('~<html>(.*)</html>~s', $html, $body))
-					$html = $body[1];
+				$html = $this->_returnBodyText($html);
 
 				// Clean it up
 				$html = rtrim($html, "\n");
+
 				return html_entity_decode(htmlspecialchars_decode($html, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
 			}
 		}
 		else
+		{
 			return $node->outertext;
+		}
 	}
 
 	/**
@@ -932,12 +1117,15 @@ class Html_2_Md
 	 * be converted by md to html as <strong>stuff</strong>
 	 *
 	 * @param string $value
+	 * @return string
 	 */
 	private function _escape_text($value)
 	{
 		// Search and replace ...
 		foreach ($this->_textEscapeRegex as $regex => $replacement)
+		{
 			$value = preg_replace('~' . $regex . '~', $replacement, $value);
+		}
 
 		return $value;
 	}
@@ -948,6 +1136,7 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 * @param string $value
+	 * @return string
 	 */
 	private function _has_ticks($node, $value)
 	{
@@ -956,7 +1145,9 @@ class Html_2_Md
 
 		// Inside of a pre, we don't do anything
 		if ($code_parent === 'pre')
+		{
 			return $value;
+		}
 
 		// If we have backticks in code, then we back tick the ticks
 		// e.g. <code>`bla`</code> will become `` `bla` `` so markdown will deal with it properly
@@ -971,7 +1162,9 @@ class Html_2_Md
 			while (true)
 			{
 				if (!in_array($ticks, $matches[0]))
+				{
 					break;
+				}
 				$ticks .= '`';
 			}
 		}
@@ -1004,6 +1197,7 @@ class Html_2_Md
 	 * @param string $string
 	 * @param int $width
 	 * @param string $break
+	 * @return string
 	 */
 	private function _utf8_wordwrap($string, $width = 75, $break = "\n")
 	{
@@ -1016,7 +1210,7 @@ class Html_2_Md
 			while (!empty($string))
 			{
 				// Get the next #width characters before a break (space, punctuation tab etc)
-				if (preg_match('~^(.{1,' . $width . '})(?:\s|$|,|\.)~', $string, $matches))
+				if (preg_match('~^(.{1,' . $width . '})(?:\s|$|,|\.)~u', $string, $matches))
 				{
 					// Add the #width to the output and set up for the next pass
 					$lines[] = ($in_quote && $matches[1][0] !== '>' ? '> ' : '') . ltrim($matches[1], ' ');
