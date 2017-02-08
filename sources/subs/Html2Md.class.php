@@ -295,6 +295,8 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 * @param boolean $parser flag for internal or external parser
+	 *
+	 * @return boolean
 	 */
 	private static function _has_parent_code($node, $parser)
 	{
@@ -321,6 +323,8 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 * @param boolean $parser flag for internal or external parser
+	 *
+	 * @return int
 	 */
 	private static function _has_parent_list($node, $parser)
 	{
@@ -382,7 +386,7 @@ class Html_2_Md
 		switch ($tag)
 		{
 			case 'a':
-				$markdown = $this->_convert_anchor($node);
+				$markdown = $this->line_end . $this->_convert_anchor($node);
 				break;
 			case 'abbr':
 				$markdown = $this->_convert_abbr($node);
@@ -505,6 +509,7 @@ class Html_2_Md
 	 * md:   *[HTML]: Hyper Text Markup Language
 	 *
 	 * @param object $node
+	 * @return string
 	 */
 	private function _convert_abbr($node)
 	{
@@ -550,9 +555,7 @@ class Html_2_Md
 			$markdown = '[' . $value . '](' . $href . ')';
 
 		// Some links can be very long and if we wrap them they break
-		$line_strlen = Util::strlen($markdown);
-		if ($line_strlen > $this->body_width)
-			$this->body_width = $line_strlen;
+		$this->_check_link_lenght($markdown);
 
 		return $markdown;
 	}
@@ -564,6 +567,7 @@ class Html_2_Md
 	 * md: > quote
 	 *
 	 * @param object $node
+	 * @return string
 	 */
 	private function _convert_blockquote($node)
 	{
@@ -581,6 +585,7 @@ class Html_2_Md
 			$markdown .= '> ' . ltrim($line, "\t") . $this->line_end;
 
 		$markdown .= $this->line_end;
+
 		return $markdown;
 	}
 
@@ -593,12 +598,13 @@ class Html_2_Md
 	 * md: `code`
 	 *
 	 * @param object $node
+	 * @return string
 	 */
 	private function _convert_code($node)
 	{
 		$value = $this->_get_innerHTML($node);
 
-		// If we have a multi line code block, we are working outside to in, and need to convert the br's ourselfs
+		// If we have a multi line code block, we are working outside to in, and need to convert the br's ourselves
 		$value = preg_replace('~<br( /)?' . '>~', "\n", str_replace('&nbsp;', ' ', $value));
 
 		// If there are html tags in this code block, we need to disable strip tags
@@ -628,9 +634,7 @@ class Html_2_Md
 			{
 				// Adjust the word wrapping since this has code tags, leave it up to
 				// the email client to mess these up ;)
-				$line_strlen = strlen($line) + 5;
-				if ($line_strlen > $this->body_width)
-					$this->body_width = $line_strlen;
+				$this->_check_link_lenght($markdown, 5);
 
 				$markdown .= str_repeat(' ', 4) . $line . $this->line_end;
 			}
@@ -672,6 +676,7 @@ class Html_2_Md
 	 *
 	 * @param int $level
 	 * @param string $content
+	 * @return string
 	 */
 	private function _convert_header($level, $content)
 	{
@@ -696,6 +701,7 @@ class Html_2_Md
 	 * md: ![alt](source 'title')
 	 *
 	 * @param object $node
+	 * @return string
 	 */
 	private function _convert_image($node)
 	{
@@ -708,6 +714,9 @@ class Html_2_Md
 		else
 			$markdown = '![' . $alt . '](' . $src . ')';
 
+		// Adjust width if needed to maintain the image
+		$this->_check_link_lenght($markdown);
+
 		return $markdown;
 	}
 
@@ -718,6 +727,7 @@ class Html_2_Md
 	 * md * one
 	 *
 	 * @param object $node
+	 * @return string
 	 */
 	private function _convert_list($node)
 	{
@@ -746,12 +756,13 @@ class Html_2_Md
 	 * - Have to build top down vs normal inside out due to needing col numbers and widths
 	 *
 	 * @param object $node
+	 * @return string
 	 */
 	private function _convert_table($node)
 	{
 		$table_heading = $node->getElementsByTagName('th');
 		if ($this->_get_item($table_heading, 0) === null)
-			return;
+			return '';
 
 		$th_parent = ($table_heading) ? ($this->_parser ? $this->_get_item($table_heading, 0)->parentNode->nodeName : $this->_get_item($table_heading, 0)->parentNode()->nodeName()) : false;
 
@@ -829,9 +840,7 @@ class Html_2_Md
 			}
 
 			// Adjust the word wrapping since this has a table, will get mussed by email anyway
-			$line_strlen = strlen($rows[1]) + 2;
-			if ($line_strlen > $this->body_width)
-				$this->body_width = $line_strlen;
+			$this->_check_link_lenght($rows[1], 2);
 
 			// Return what we did so it can be swapped in
 			return implode($this->line_end, $rows);
@@ -855,7 +864,8 @@ class Html_2_Md
 	/**
 	 * Helper function for getting a node length
 	 *
-	 * @param object $node
+	 * @param object|array $node
+	 * @return int
 	 */
 	private function _get_length($node)
 	{
@@ -869,6 +879,7 @@ class Html_2_Md
 	 * Helper function for getting a node value
 	 *
 	 * @param object $node
+	 * @return string
 	 */
 	private function _get_value($node)
 	{
@@ -885,6 +896,7 @@ class Html_2_Md
 	 * Helper function for getting a node name
 	 *
 	 * @param object $node
+	 * @return string
 	 */
 	private function _get_name($node)
 	{
@@ -903,6 +915,7 @@ class Html_2_Md
 	 * - Returns the absolute number of an <li> inside an <ol>
 	 *
 	 * @param object $node
+	 * @return int
 	 */
 	private function _get_list_position($node)
 	{
@@ -932,6 +945,7 @@ class Html_2_Md
 	 * @param int $width
 	 * @param string $content
 	 * @param int $max
+	 * @return string
 	 */
 	private function _align_row_content($align, $width, $content, $max)
 	{
@@ -958,7 +972,8 @@ class Html_2_Md
 	/**
 	 * Gets the inner html of a node
 	 *
-	 * @param object $node
+	 * @param DOMNode|object $node
+	 * @return string
 	 */
 	private function _get_innerHTML($node)
 	{
@@ -978,7 +993,8 @@ class Html_2_Md
 	/**
 	 * Gets the outer html of a node
 	 *
-	 * @param object $node
+	 * @param DOMNode|object $node
+	 * @return string
 	 */
 	private function _get_outerHTML($node)
 	{
@@ -994,10 +1010,7 @@ class Html_2_Md
 				$html = $doc->saveHTML();
 
 				// We just want the html of the inserted node, it *may* be wrapped
-				if (preg_match('~<body>(.*)</body>~su', $html, $body))
-					$html = $body[1];
-				elseif (preg_match('~<html>(.*)</html>~su', $html, $body))
-					$html = $body[1];
+				$html = $this->_returnBodyText($html);
 
 				// Clean it up
 				$html = rtrim($html, "\n");
@@ -1015,6 +1028,7 @@ class Html_2_Md
 	 * be converted by md to html as <strong>stuff</strong>
 	 *
 	 * @param string $value
+	 * @return string
 	 */
 	private function _escape_text($value)
 	{
@@ -1031,6 +1045,7 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 * @param string $value
+	 * @return string
 	 */
 	private function _has_ticks($node, $value)
 	{
@@ -1063,6 +1078,23 @@ class Html_2_Md
 	}
 
 	/**
+	 * Helper function to adjust wrapping width for long-ish links
+	 *
+	 * @param string $markdown
+	 * @param bool|int $buffer
+	 * @return int
+	 */
+	private function _check_link_lenght($markdown, $buffer = false)
+	{
+		// Some links can be very long and if we wrap them they break
+		$line_strlen = Util::strlen($markdown) + (!empty($buffer) ? (int) $buffer : 0);
+		if ($line_strlen > $this->body_width)
+		{
+			$this->body_width = $line_strlen;
+		}
+	}
+
+	/**
 	 * Breaks a string up so its no more than width characters long
 	 *
 	 * - Will break at word boundaries
@@ -1071,6 +1103,7 @@ class Html_2_Md
 	 * @param string $string
 	 * @param int $width
 	 * @param string $break
+	 * @return string
 	 */
 	private function _utf8_wordwrap($string, $width = 75, $break = "\n")
 	{
@@ -1086,7 +1119,7 @@ class Html_2_Md
 				if (preg_match('~^(.{1,' . $width . '})(?:\s|$|,|\.)~u', $string, $matches))
 				{
 					// Add the #width to the output and set up for the next pass
-					$lines[] = ($in_quote && $matches[1][0] !== '>' ? '> ' : '') . $matches[1];
+					$lines[] = ($in_quote && $matches[1][0] !== '>' ? '> ' : '') . ltrim($matches[1], ' ');
 					$string = Util::substr($string, Util::strlen($matches[1]));
 				}
 				// Humm just a long word with no place to break so we simply cut it after width characters
