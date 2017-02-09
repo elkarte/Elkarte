@@ -656,15 +656,15 @@ div.windowbg, div.windowbg2 {
 }
 /* Extra code block styling. */
 .bbc_code {
-	overflow: auto;
-	height: 20em;
 	white-space: nowrap;
 	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
 	resize: vertical;
+	height: auto;
+	max-height: 20em;
 }
 .bbc_code .tab {
 	width: 4ex;
-	white-space:pre;
+	white-space: pre;
 	display: inline-block;
 }
 /* Stop em compounding when elements are nested. */
