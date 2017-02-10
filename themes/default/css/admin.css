@@ -931,6 +931,7 @@ ul.moderation_notes li {
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 	/* The next bits should fix https://github.com/elkarte/Elkarte/issues/567 */
 	word-wrap: break-word;
+	word-break: break-all;
 	-webkit-hyphens: auto;
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;

@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.0.10
  *
  * This file contains javascript associated with the drag drop of files functionality
  * while posting

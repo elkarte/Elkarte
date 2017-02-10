@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.7
+ * @version 1.0.10
  *
  */
 
@@ -410,7 +410,7 @@ class PackageServers_Controller extends Action_Controller
 			$listing = json_decode(fetch_web_data($url));
 
 			// Find the requested package by section and number, make sure it matches
-			$section = $listing->$_GET['section'];
+			$section = $listing->{$_GET['section']};
 
 			// This is what they requested, yes?
 			if (basename($section[$_GET['num']]->server[0]->download) === $_GET['package'])

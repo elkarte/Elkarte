@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.4
+ * @version 1.0.10
  * Extension functions to provide ElkArte compatibility with sceditor
  */
 
@@ -562,7 +562,7 @@ $.sceditor.plugins.bbcode.bbcode
 
 			if (attrs.type)
 				style = 'style="list-style-type: ' + attrs.type + '"';
-			return '<' + code + ' ' + style + '>' + content + '</' + code + '>';
+			return '<' + code + ' ' + style + '>' + content.replace(/<\/li><br \/>/g, '</li>') + '</' + code + '>';
 		}
 	})
 	.set('li', {
@@ -573,11 +573,13 @@ $.sceditor.plugins.bbcode.bbcode
 			ul: null
 		},
 		breakStart: true,
-		format: function(element, content) {
-			if ($(element[0]).css('list-style-type') === 'disc')
+		format: function (element, content) {
+			var type = $(element[0]).prop('style')['list-style-type'];
+
+			if (type === 'disc' || type === '')
 				return '[list]' + content + '[/list]';
 			else
-				return '[list type=' + $(element[0]).css('list-style-type') + ']' + content + '[/list]';
+				return '[list type=' + type + ']' + content + '[/list]';
 		},
 		isInline: false,
 		skipLastLineBreak: true,
