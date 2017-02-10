@@ -271,6 +271,16 @@ class TestBBC extends PHPUnit_Framework_TestCase
 				'<div class="quoteheader"><a href="http://127.0.0.1/index.php?action=profile;u=123">Quote from: an author on ' . htmlTime(12345678) . '</a></div><blockquote class="bbc_quote">This is a quote</blockquote>',
 			),
 			array(
+				'Quoting is a pain 11',
+				'[quote author=an author date=1486679559 link=msg=123][quote]This is a quote[/quote]Of a quote[/quote]',
+				'<div class="quoteheader"><a href="http://127.0.0.1/index.php?msg=123">Quote from: an author on ' . htmlTime(1486679559) . '</a></div><blockquote class="bbc_quote"><div class="quoteheader bbc_alt_quoteheader">Quote</div><blockquote class="bbc_quote bbc_alternate_quote">This is a quote</blockquote>Of a quote</blockquote>'
+			),
+			array(
+				'Quoting is a pain 12',
+				'[quote author=&quot;[quoted author]&quot;]This is a quote[/quote]',
+				'<div class="quoteheader">Quote from: [quoted author]</div><blockquote class="bbc_quote">This is a quote</blockquote>',
+			),
+			array(
 				'Right tag',
 				'[right]ElkArte[/right]',
 				'<div style="text-align: right;">ElkArte</div>',

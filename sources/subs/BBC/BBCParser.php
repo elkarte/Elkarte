@@ -1383,7 +1383,7 @@ class BBCParser
 		$message_stub = str_replace('<br />', "\n", substr($this->message, $this->pos1 - 1)) . "\n";
 
 		// Attempt to pull out just this tag
-		if (preg_match('~(?:.+?)\](?>.|(?R))*?\[\/' . $this->tag_possible[Codes::ATTR_TAG] . '\](?:.|\s)~i', $message_stub, $matches) === 1)
+		if (preg_match('~^(?:.+?)\](?>.|(?R))*?\[\/' . $this->tag_possible[Codes::ATTR_TAG] . '\](?:.|\s)~i', $message_stub, $matches) === 1)
 		{
 			$message_stub = $matches[0];
 		}
