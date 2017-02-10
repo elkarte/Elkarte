@@ -415,7 +415,7 @@ class BBCParser
 			// Trim inside whitespace
 			if (!empty($tag[Codes::ATTR_TRIM]) && $tag[Codes::ATTR_TRIM] !== Codes::TRIM_INSIDE)
 			{
-				$this->trimWhiteSpace($this->pos + 1);
+				$this->trimWhiteSpace($this->pos);
 			}
 		}
 
