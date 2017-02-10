@@ -37,13 +37,13 @@ class PackagesFilterIterator extends \FilterIterator
 		// The temp directory that may or may not be present.
 		if ($filename === 'temp')
 		{
-			return false;
+			return true;
 		}
 
 		// Anything that, once extracted, doesn't contain a package-info.xml.
 		if (!($current->isDir() && file_exists($current->getPathname() . '/package-info.xml')))
 		{
-			return false;
+			return true;
 		}
 
 		// And finally, accept anything that has a "package-like" extension.
