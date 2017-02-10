@@ -41,15 +41,15 @@ class PackagesFilterIterator extends \FilterIterator
 		}
 
 		// Anything that, once extracted, doesn't contain a package-info.xml.
-		if (!($current->isDir() && file_exists($current->getPathname() . '/package-info.xml')))
+		if ($current->isDir())
 		{
-			return false;
+			return file_exists($current->getPathname() . '/package-info.xml');
 		}
 
 		// And finally, accept anything that has a "package-like" extension.
 		return
-			substr(strtolower($filename), -7) == '.tar.gz'
-			|| substr(strtolower($filename), -4) != '.tgz'
-			|| substr(strtolower($filename), -4) != '.zip';
+			substr(strtolower($filename), -7) === '.tar.gz'
+			|| substr(strtolower($filename), -4) === '.tgz'
+			|| substr(strtolower($filename), -4) === '.zip';
 	}
 }
