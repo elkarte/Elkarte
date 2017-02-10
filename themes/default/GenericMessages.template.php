@@ -34,7 +34,7 @@ function template_build_poster_div($message, $ignoring = false)
 	// Show a link to the member's profile.
 	if (!empty($message['member']['id']))
 		$poster_div .= '
-								<a class="linklevel1 name" href="' . $scripturl . '?action=profile;u=' . $message['member']['id'] . '">
+								<a class="linklevel1 name" href="' . $message['member']['href'] . '">
 									' . $message['member']['name'] . '
 								</a>';
 	else
@@ -211,7 +211,7 @@ function template_build_poster_div($message, $ignoring = false)
 		if (!empty($settings['show_user_images']) && empty($options['show_no_avatars']) && !empty($message['member']['avatar']['image']))
 			$poster_div .= '
 							<li class="listlevel1 poster_avatar">
-								<a class="linklevel1" href="' . $scripturl . '?action=profile;u=' . $message['member']['id'] . '">
+								<a class="linklevel1" href="' . $message['member']['href'] . '">
 									' . $message['member']['avatar']['image'] . '
 								</a>
 							</li>';
