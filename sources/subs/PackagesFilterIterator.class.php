@@ -35,7 +35,7 @@ class PackagesFilterIterator extends \FilterIterator
 		}
 
 		// The temp directory that may or may not be present.
-		if ($filename === 'temp')
+		if ($current->isDir() && ($filename === 'temp' || $filename === 'backup'))
 		{
 			return false;
 		}
