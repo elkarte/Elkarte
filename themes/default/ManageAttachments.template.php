@@ -30,11 +30,11 @@ function template_maintenance()
 				<dt><label>', $txt['attachment_manager_total_avatars'], ':</label></dt>
 				<dd>', $context['num_avatars'], '</dd>
 				<dt><label>', $txt['attachmentdir_size'], ':</label></dt>
-				<dd>', $context['attachment_total_size'], ' ', $txt['kilobyte'], '</dd>
+				<dd>', $context['attachment_total_size'], '</dd>
 				<dt><label>', $txt['attach_current_dir'], ':</label></dt>
 				<dd>', $context['attach_dirs'][$modSettings['currentAttachmentUploadDir']], '</dd>
 				<dt><label>', $txt['attachmentdir_size_current'], ':</label></dt>
-				<dd>', $context['attachment_current_size'], ' ', $txt['kilobyte'], '</dd>
+				<dd>', $context['attachment_current_size'], '</dd>
 				<dt><label>', $txt['attachment_space'], ':</label></dt>
 				<dd>', isset($context['attachment_space']) ? $context['attachment_space'] . ' ' . $txt['kilobyte'] : $txt['attachmentdir_size_not_set'], '</dd>
 				<dt><label>', $txt['attachmentdir_files_current'], ':</label></dt>
