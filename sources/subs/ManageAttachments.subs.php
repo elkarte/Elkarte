@@ -1518,7 +1518,6 @@ function attachDirProperties($dir)
 	);
 	list ($current_dir['files'], $current_dir['size']) = $db->fetch_row($request);
 	$db->free_result($request);
-	$current_dir['size'] /= 1024;
 
 	return $current_dir;
 }
