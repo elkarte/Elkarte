@@ -303,7 +303,7 @@ class ManageAttachments_Controller extends Action_Controller
 				),
 				empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && count($modSettings['attachmentUploadDir']) == 1
 					? array('text', 'attachmentUploadDir', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 40, 'invalid' => !$context['valid_upload_dir'])
-					: array('var_message', 'attach_current_directory', 'subtext' => $txt['attachmentUploadDir_multiple_configure'], 'message' => 'attachment_path', 'invalid' => empty($context['valid_upload_dir']), 'text_label' => (!empty($context['valid_upload_dir'])
+					: array('var_message', 'attach_current_directory', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 'message' => 'attachment_path', 'invalid' => empty($context['valid_upload_dir']), 'text_label' => (!empty($context['valid_upload_dir'])
 						? $txt['attach_current_dir']
 						: $txt['attach_current_dir_warning'])
 				),
@@ -605,7 +605,7 @@ class ManageAttachments_Controller extends Action_Controller
 		// If they specified a limit only....
 		if (!empty($modSettings['attachmentDirSizeLimit']))
 			$context['attachment_space'] = comma_format(max($modSettings['attachmentDirSizeLimit'] - $current_dir['size'], 0), 2);
-		$context['attachment_current_size'] = comma_format($current_dir['size'], 2);
+		$context['attachment_current_size'] = byte_format($current_dir['size']);
 
 		if (!empty($modSettings['attachmentDirFileLimit']))
 			$context['attachment_files'] = comma_format(max($modSettings['attachmentDirFileLimit'] - $current_dir['files'], 0), 0);
