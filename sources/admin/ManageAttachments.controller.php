@@ -270,7 +270,7 @@ class ManageAttachments_Controller extends Action_Controller
 		$txt['attachment_path'] = $context['attachmentUploadDir'];
 		$txt['basedirectory_for_attachments_path'] = isset($modSettings['basedirectory_for_attachments']) ? $modSettings['basedirectory_for_attachments'] : '';
 		$txt['use_subdirectories_for_attachments_note'] = empty($modSettings['attachment_basedirectories']) || empty($modSettings['use_subdirectories_for_attachments']) ? $txt['use_subdirectories_for_attachments_note'] : '';
-		$txt['attachmentUploadDir_multiple_configure'] = '<a href="' . $scripturl . '?action=admin;area=manageattachments;sa=attachpaths">[' . $txt['attachmentUploadDir_multiple_configure'] . ']</a>';
+		$txt['attachmentUploadDir_multiple_configure'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=manageattachments;sa=attachpaths">' . $txt['attachmentUploadDir_multiple_configure'] . '</a>';
 		$txt['attach_current_dir'] = empty($modSettings['automanage_attachments']) ? $txt['attach_current_dir'] : $txt['attach_last_dir'];
 		$txt['attach_current_dir_warning'] = $txt['attach_current_dir'] . $txt['attach_current_dir_warning'];
 		$txt['basedirectory_for_attachments_warning'] = $txt['basedirectory_for_attachments_current'] . $txt['basedirectory_for_attachments_warning'];
@@ -302,8 +302,8 @@ class ManageAttachments_Controller extends Action_Controller
 						: $txt['basedirectory_for_attachments_warning']))
 				),
 				empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && count($modSettings['attachmentUploadDir']) == 1
-					? array('text', 'attachmentUploadDir', 'subtext' => $txt['attachmentUploadDir_multiple_configure'], 40, 'invalid' => !$context['valid_upload_dir'])
-					: array('var_message', 'attach_current_directory', 'subtext' => $txt['attachmentUploadDir_multiple_configure'], 'message' => 'attachment_path', 'invalid' => empty($context['valid_upload_dir']), 'text_label' => (!empty($context['valid_upload_dir'])
+					? array('text', 'attachmentUploadDir', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 40, 'invalid' => !$context['valid_upload_dir'])
+					: array('var_message', 'attach_current_directory', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 'message' => 'attachment_path', 'invalid' => empty($context['valid_upload_dir']), 'text_label' => (!empty($context['valid_upload_dir'])
 						? $txt['attach_current_dir']
 						: $txt['attach_current_dir_warning'])
 				),
@@ -605,7 +605,7 @@ class ManageAttachments_Controller extends Action_Controller
 		// If they specified a limit only....
 		if (!empty($modSettings['attachmentDirSizeLimit']))
 			$context['attachment_space'] = comma_format(max($modSettings['attachmentDirSizeLimit'] - $current_dir['size'], 0), 2);
-		$context['attachment_current_size'] = comma_format($current_dir['size'], 2);
+		$context['attachment_current_size'] = byte_format($current_dir['size']);
 
 		if (!empty($modSettings['attachmentDirFileLimit']))
 			$context['attachment_files'] = comma_format(max($modSettings['attachmentDirFileLimit'] - $current_dir['files'], 0), 0);

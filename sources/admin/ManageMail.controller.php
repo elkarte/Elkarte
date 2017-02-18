@@ -332,8 +332,8 @@ class ManageMail_Controller extends Action_Controller
 				array('password', 'smtp_password'),
 			'',
 				array('select', 'birthday_email', $emails, 'value' => array('subject' => $subject, 'body' => $body), 'javascript' => 'onchange="fetch_birthday_preview()"'),
-				'birthday_subject' => array('var_message', 'birthday_subject', 'var_message' => $processedBirthdayEmails[empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']]['subject'], 'disabled' => true, 'size' => strlen($subject) + 3),
-				'birthday_body' => array('var_message', 'birthday_body', 'var_message' => nl2br($body), 'disabled' => true, 'size' => ceil(strlen($body) / 25)),
+				'birthday_subject' => array('var_message', 'birthday_subject', 'message' => $processedBirthdayEmails[empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']]['subject'], 'disabled' => true, 'size' => strlen($subject) + 3),
+				'birthday_body' => array('var_message', 'birthday_body', 'message' => nl2br($body), 'disabled' => true, 'size' => ceil(strlen($body) / 25)),
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well

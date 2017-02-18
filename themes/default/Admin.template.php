@@ -1091,7 +1091,7 @@ function template_show_settings()
 				elseif ($config_var['type'] == 'var_message')
 				{
 					echo '
-						<div', !empty($config_var['name']) ? ' id="' . $config_var['name'] . '"' : '', '>', $config_var['var_message'], '</div>';
+						<div', !empty($config_var['name']) ? ' id="' . $config_var['name'] . '"' : '', '>', $config_var['message'], '</div>';
 				}
 				// Color picker?
 				elseif ($config_var['type'] == 'color')
