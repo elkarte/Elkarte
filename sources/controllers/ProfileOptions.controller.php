@@ -71,7 +71,7 @@ class ProfileOptions_Controller extends Action_Controller
 				'hook' => 'pmprefs'
 			),
 			'registration' => array(
-				'fields' => explode(',', $modSettings['registration_fields']),
+				'fields' => !empty($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array(),
 				'hook' => 'registration'
 			)
 		);
