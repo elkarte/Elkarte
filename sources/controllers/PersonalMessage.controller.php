@@ -1323,6 +1323,7 @@ class PersonalMessage_Controller extends Action_Controller
 			$_POST = htmlspecialchars__recursive($_POST);
 
 			// Save the fields.
+			require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
 			$fields = ProfileOptions_Controller::getFields('contactprefs');
 			saveProfileFields($fields['fields'], $fields['hook']);
 
