@@ -1029,6 +1029,11 @@ function saveProfileFields($fields, $hook)
 	// Cycle through the profile fields working out what to do!
 	foreach ($fields as $key)
 	{
+		if ($key === 'hr')
+		{
+			continue;
+		}
+
 		$field = $profile_fields[$key];
 
 		if (!isset($_POST[$key]) || !empty($field['is_dummy']) || (isset($_POST['preview_signature']) && $key == 'signature'))
