@@ -1029,7 +1029,7 @@ function saveProfileFields($fields, $hook)
 	// Cycle through the profile fields working out what to do!
 	foreach ($fields as $key)
 	{
-		if ($key === 'hr')
+		if (!isset($profile_fields[$key]))
 		{
 			continue;
 		}
