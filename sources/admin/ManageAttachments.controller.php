@@ -259,6 +259,7 @@ class ManageAttachments_Controller extends Action_Controller
 		$upload_max_filesize = ini_get('upload_max_filesize');
 		$testPM = !empty($post_max_size) ? (memoryReturnBytes($post_max_size) >= (isset($modSettings['attachmentPostLimit']) ? $modSettings['attachmentPostLimit'] * 1024 : 0)) : true;
 		$testUM = !empty($upload_max_filesize) ? (memoryReturnBytes($upload_max_filesize) >= (isset($modSettings['attachmentSizeLimit']) ? $modSettings['attachmentSizeLimit'] * 1024 : 0)) : true;
+		$testImgRotate = class_exists('Imagick') || (get_extension_funcs('gd') && function_exists('exif_read_data'));
 
 		$config_vars = array(
 			array('title', 'attachment_manager_settings'),
@@ -282,7 +283,7 @@ class ManageAttachments_Controller extends Action_Controller
 				array('warning', empty($testUM) ? 'attachment_filesize_warning' : ''),
 				array('int', 'attachmentSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 				array('int', 'attachmentNumPerPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
-				array('check', 'attachment_autorotate'),
+				array('check', 'attachment_autorotate', 'postinput' => empty($testImgRotate) ? $txt['attachment_autorotate_na'] : ''),
 			// Security Items
 			array('title', 'attachment_security_settings'),
 				// Extension checks etc.
