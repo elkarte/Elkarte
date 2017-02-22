@@ -111,6 +111,11 @@ class TestBBC extends PHPUnit_Framework_TestCase
 				'footnote<sup class="bbc_footnotes"><a class="target" href="#fn1_1" id="ref1_1">[1]</a></sup>something<div class="bbc_footnotes"><div class="target" id="fn1_1"><sup>1&nbsp;</sup>footnote <img src="http://127.0.0.1/smileys/default/smiley.gif" alt="&#58;&#41;" title="Smiley" class="smiley" /><a class="footnote_return" href="#ref1_1">&crarr;</a></div></div>',
 			),
 			array(
+				'Footnote 3',
+				'footnote :)[footnote][b]footnote[/b] :)[/footnote]something :)',
+				'footnote <img src="http://127.0.0.1/smileys/default/smiley.gif" alt="&#58;&#41;" title="Smiley" class="smiley" /><sup class="bbc_footnotes"><a class="target" href="#fn1_2" id="ref1_2">[1]</a></sup>something <img src="http://127.0.0.1/smileys/default/smiley.gif" alt="&#58;&#41;" title="Smiley" class="smiley" /><div class="bbc_footnotes"><div class="target" id="fn1_2"><sup>1&nbsp;</sup><strong class="bbc_strong">footnote</strong> <img src="http://127.0.0.1/smileys/default/smiley.gif" alt="&#58;&#41;" title="Smiley" class="smiley" /><a class="footnote_return" href="#ref1_2">&crarr;</a></div></div>',
+			),
+			array(
 				'Font parsed',
 				'[font=whatever]test[/font]',
 				'<span style="font-family: whatever;" class="bbc_font">test</span>',
