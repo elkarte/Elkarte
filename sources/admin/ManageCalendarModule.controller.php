@@ -105,12 +105,12 @@ class ManageCalendarModule_Controller extends Action_Controller
 		global $scripturl, $txt, $context;
 
 		// Submitting something...
-		if (isset($this->_req->query->delete) && !empty($this->_req->query->holiday))
+		if (isset($this->_req->post->delete) && !empty($this->_req->post->holiday))
 		{
 			checkSession();
 			validateToken('admin-mc');
 
-			$to_remove = array_map('intval', array_keys($this->_req->query->holiday));
+			$to_remove = array_map('intval', array_keys($this->_req->post->holiday));
 
 			// Now the IDs are "safe" do the delete...
 			require_once(SUBSDIR . '/Calendar.subs.php');
