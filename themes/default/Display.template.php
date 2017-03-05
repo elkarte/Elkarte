@@ -849,7 +849,7 @@ function template_display_attachments($message, $ignoring)
 		}
 
 		echo '
-									<div class="attachment_block">';
+									<div class="attachment">';
 
 		if ($attachment['is_image'])
 		{
