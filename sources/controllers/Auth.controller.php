@@ -67,7 +67,8 @@ class Auth_Controller extends Action_Controller
 
 		// Get the template ready.... not really much else to do.
 		$context['page_title'] = $txt['login'];
-		$context['default_username'] = Util::htmlspecialchars($_REQUEST['u']);
+		$_REQUEST['u'] = isset($_REQUEST['u']) ? Util::htmlspecialchars($_REQUEST['u']) : '';
+		$context['default_username'] = &$_REQUEST['u'];
 		$context['using_openid'] = isset($_GET['openid']);
 		$context['default_password'] = '';
 		$context['never_expire'] = false;
