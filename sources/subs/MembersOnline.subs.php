@@ -60,7 +60,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 
 	// Get it from the cache and send it back.
 	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] > 1 && ($temp = cache_get_data('membersOnlineStats-' . $membersOnlineOptions['sort'], 240)) !== null)
-		return $temp;
+		return filter_members_online($temp, empty($membersOnlineOptions['reverse_sort']) ? 'ksort' : 'krsort');
 
 	// Initialize the array that'll be returned later on.
 	$membersOnlineStats = array(
@@ -141,9 +141,6 @@ function getMembersOnlineStats($membersOnlineOptions)
 			'is_last' => false,
 		);
 
-		// This is the compact version, simply implode it to show.
-		$membersOnlineStats['list_users_online'][$row[$membersOnlineOptions['sort']] . '_' . $row['member_name']] = empty($row['show_online']) ? '<em>' . $link . '</em>' : $link;
-
 		// Store all distinct (primary) membergroups that are shown.
 		if (!isset($membersOnlineStats['online_groups'][$row['id_group']]))
 			$membersOnlineStats['online_groups'][$row['id_group']] = array(
@@ -176,12 +173,41 @@ function getMembersOnlineStats($membersOnlineOptions)
 		}
 	}
 
+	// Hidden and non-hidden members make up all online members.
+	$membersOnlineStats['num_users_online'] = count($membersOnlineStats['users_online']) + $membersOnlineStats['num_users_hidden'] - (isset($modSettings['show_spider_online']) && $modSettings['show_spider_online'] > 1 ? count($spider_finds) : 0);
+
+	cache_put_data('membersOnlineStats-' . $membersOnlineOptions['sort'], $membersOnlineStats, 240);
+
+	return filter_members_online($membersOnlineStats, empty($membersOnlineOptions['reverse_sort']) ? 'ksort' : 'krsort');
+}
+
+/**
+ * Post-retrieval processing.
+ * Needed mainly for when the cache is enabled and online users have to be
+ * filtered out based on permissions.
+ *
+ * @package Members
+ * @param mixed[] $membersOnlineStats
+ * @param string $sortFunction
+ * @return mixed[]
+ */
+function filter_members_online($membersOnlineStats, $sortFunction)
+{
+	global $modSettings;
+
+	foreach ($membersOnlineStats['users_online'] as $key => $row)
+	{
+		if (allowedTo('moderate_forum') === false && $row['hidden'])
+		{
+			continue;
+		}
+		// This is the compact version, simply implode it to show.
+		$membersOnlineStats['list_users_online'][$key] = $row['hidden'] ? '<em>' . $row['link'] . '</em>' : $row['link'];
+	}
+
 	// Time to sort the list a bit.
 	if (!empty($membersOnlineStats['users_online']))
 	{
-		// Determine the sort direction.
-		$sortFunction = empty($membersOnlineOptions['reverse_sort']) ? 'ksort' : 'krsort';
-
 		// Sort the two lists.
 		$sortFunction($membersOnlineStats['users_online']);
 		$sortFunction($membersOnlineStats['list_users_online']);
@@ -193,11 +219,6 @@ function getMembersOnlineStats($membersOnlineOptions)
 
 	// Also sort the membergroups.
 	ksort($membersOnlineStats['online_groups']);
-
-	// Hidden and non-hidden members make up all online members.
-	$membersOnlineStats['num_users_online'] = count($membersOnlineStats['users_online']) + $membersOnlineStats['num_users_hidden'] - (isset($modSettings['show_spider_online']) && $modSettings['show_spider_online'] > 1 ? count($spider_finds) : 0);
-
-	cache_put_data('membersOnlineStats-' . $membersOnlineOptions['sort'], $membersOnlineStats, 240);
 
 	return $membersOnlineStats;
 }
