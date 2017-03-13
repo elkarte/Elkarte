@@ -1447,6 +1447,7 @@ function parse_path($path)
 		'ADMINDIR' => ADMINDIR,
 		'CONTROLLERDIR' => CONTROLLERDIR,
 		'EXTDIR' => EXTDIR,
+		'ADDONSDIR' => ADDONSDIR,
 		'AVATARSDIR' => $modSettings['avatar_directory'],
 		'THEMEDIR' => $settings['default_theme_dir'],
 		'IMAGESDIR' => $settings['default_theme_dir'] . '/' . basename($settings['default_images_url']),
@@ -1456,7 +1457,7 @@ function parse_path($path)
 
 	// Do we parse in a package directory?
 	if (!empty($temp_path))
-		$dirs['$package'] = $temp_path;
+		$dirs['PACKAGE'] = $temp_path;
 
 	if (strlen($path) == 0)
 		trigger_error('parse_path(): There should never be an empty filename', E_USER_ERROR);
