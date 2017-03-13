@@ -383,7 +383,11 @@ class Elk_Autoloader
 				$this->_file_name = SUBSDIR . '/' . $this->_givenname . '.integrate.php';
 				if (!stream_resolve_include_path($this->_file_name))
 				{
-					$this->_file_name = '';
+					$this->_file_name = ADDONSDIR . '/' . $this->_givenname . '/' . $this->_givenname . '.integrate.php';
+					if (!stream_resolve_include_path($this->_file_name))
+					{
+						$this->_file_name = '';
+					}
 				}
 				break;
 			// Some_Display => Subscriptions-Some.class.php
