@@ -130,6 +130,7 @@ function createSphinxConfig()
 	// Check paths are set, if not use some defaults
 	$modSettings['sphinx_data_path'] = empty($modSettings['sphinx_data_path']) ? '/var/sphinx/data' : $modSettings['sphinx_data_path'];
 	$modSettings['sphinx_log_path'] = empty($modSettings['sphinx_log_path']) ? '/var/sphinx/log' : $modSettings['sphinx_log_path'];
+	$prefix = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte');
 
 	// Output our minimal configuration file to get them started
 	echo '#
@@ -141,7 +142,7 @@ function createSphinxConfig()
 # /usr/local/etc/sphinx.conf
 #
 
-source elkarte_source
+source ', $prefix, '_source
 {
 	type				= mysql
 	sql_host			= ', $db_server, '
@@ -181,7 +182,7 @@ source elkarte_source
 	sql_attr_timestamp	= num_replies
 }
 
-source elkarte_delta_source : elkarte_source
+source ', $prefix, '_delta_source : ', $prefix, '_source
 {
 	sql_query_pre = SET NAMES utf8
 	sql_query_pre = SET SESSION query_cache_type=OFF
@@ -192,11 +193,11 @@ source elkarte_delta_source : elkarte_source
 			AND s2.variable = \'maxMsgID\'
 }
 
-index elkarte_base_index
+index ', $prefix, '_base_index
 {
 	html_strip		= 1
-	source			= elkarte_source
-	path			= ', $modSettings['sphinx_data_path'], '/elkarte_sphinx_base.index', empty($modSettings['sphinx_stopword_path']) ? '' : '
+	source			= ', $prefix, '_source
+	path			= ', $modSettings['sphinx_data_path'], '/', $prefix, '_sphinx_base.index', empty($modSettings['sphinx_stopword_path']) ? '' : '
 	stopwords		= ' . $modSettings['sphinx_stopword_path'], '
 	min_word_len	= 2
 	charset_type	= utf-8
@@ -204,17 +205,17 @@ index elkarte_base_index
 	ignore_chars	= -, U+AD
 }
 
-index elkarte_delta_index : elkarte_base_index
+index ', $prefix, '_delta_index : ', $prefix, '_base_index
 {
-	source			= elkarte_delta_source
-	path			= ', $modSettings['sphinx_data_path'], '/elkarte_sphinx_delta.index
+	source			= ', $prefix, '_delta_source
+	path			= ', $modSettings['sphinx_data_path'], '/', $prefix, '_sphinx_delta.index
 }
 
-index elkarte_index
+index ', $prefix, '_index
 {
 	type			= distributed
-	local			= elkarte_base_index
-	local			= elkarte_delta_index
+	local			= ', $prefix, '_base_index
+	local			= ', $prefix, '_delta_index
 }
 
 indexer

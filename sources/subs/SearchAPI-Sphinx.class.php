@@ -252,7 +252,8 @@ class Sphinx_Search
 			$mySphinx->SetMatchMode($mode);
 
 			// Execute the search query.
-			$request = $mySphinx->Query($query, 'elkarte_index');
+			$index = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte') . '_index';
+			$request = $mySphinx->Query($query, $index);
 
 			// Can a connection to the daemon be made?
 			if ($request === false)
