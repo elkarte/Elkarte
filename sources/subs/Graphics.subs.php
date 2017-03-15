@@ -327,6 +327,7 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 			// Set jpeg image quality to 80
 			if ($default_formats[$preferred_format] === 'jpeg')
 			{
+				$imagick->borderImage('white', 0, 0);
 				$imagick->setImageCompression(Imagick::COMPRESSION_JPEG);
 				$imagick->setImageCompressionQuality(80);
 			}
