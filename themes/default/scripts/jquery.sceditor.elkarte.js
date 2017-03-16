@@ -378,6 +378,17 @@ $.sceditor.plugins.bbcode.bbcode
 		format: '[pre]{0}[/pre]',
 		html: '<pre>{0}</pre>'
 	})
+	.set('center', {
+		tags: {
+			center: null
+		},
+		styles: {
+			'text-align': ['center', '-webkit-center', '-moz-center', '-khtml-center']
+		},
+		isInline: true,
+		format: '[center]{0}[/center]',
+		html: '<span style="display:block;text-align:center">{0}</span>'
+	})
 	/*
 	 * ElkArte modified tags, modified so they support the existing paradigm
 	 *
