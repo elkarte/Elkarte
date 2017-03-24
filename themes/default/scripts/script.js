@@ -1082,34 +1082,36 @@ function createEventListener(oTarget)
  *
  * @param {type} elem
  */
-function grabJumpToContent(elem)
-{
-	var oXMLDoc = getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=jumpto;xml'),
-		aBoardsAndCategories = [],
-		i = 0,
-		n = 0;
+function grabJumpToContent() {
+	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=jumpto;xml', onJumpReceived);
 
-	if (oXMLDoc.responseXML)
+	return false;
+}
+
+/**
+ * Callback function for loading the jumpto box
+ *
+ * @param {object} XMLDoc
+ */
+function onJumpReceived(oXMLDoc) {
+	var aBoardsAndCategories = [],
+		i,
+		n,
+		items = oXMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('item');
+
+	for (i = 0, n = items.length; i < n; i++)
 	{
-		var items = oXMLDoc.responseXML.getElementsByTagName('elk')[0].getElementsByTagName('item');
-		for (i = 0, n = items.length; i < n; i++)
-		{
-			aBoardsAndCategories[aBoardsAndCategories.length] = {
-				id: parseInt(items[i].getAttribute('id')),
-				isCategory: items[i].getAttribute('type') === 'category',
-				name: items[i].firstChild.nodeValue.removeEntities(),
-				is_current: false,
-				childLevel: parseInt(items[i].getAttribute('childlevel'))
-			};
-		}
+		aBoardsAndCategories[aBoardsAndCategories.length] = {
+			id: parseInt(items[i].getAttribute('id')),
+			isCategory: items[i].getAttribute('type') === 'category',
+			name: items[i].firstChild.nodeValue.removeEntities(),
+			is_current: false,
+			childLevel: parseInt(items[i].getAttribute('childlevel'))
+		};
 	}
 
 	for (i = 0, n = aJumpTo.length; i < n; i++)
 		aJumpTo[i].fillSelect(aBoardsAndCategories);
-
-	// Internet Explorer needs this to keep the box dropped down.
-	elem.style.width = 'auto';
-	elem.focus();
 }
 
 /**
@@ -1139,6 +1141,13 @@ function JumpTo(oJumpToOptions)
 	this.opt = oJumpToOptions;
 	this.dropdownList = null;
 	this.showSelect();
+
+	createEventListener(this.dropdownList);
+
+	if (is_mobile && is_touch)
+		this.dropdownList.addEventListener('touchstart', grabJumpToContent);
+	else
+		this.dropdownList.addEventListener('mouseenter', grabJumpToContent);
 }
 
 // Remove all the options in the select. Method of the JumpTo class.
@@ -1147,7 +1156,7 @@ JumpTo.prototype.removeAll = function ()
 //	var dropdownList = document.getElementById(this.opt.sContainerId + '_select');
 for (var i = this.dropdownList.options.length; i > 0; i--)
 		this.dropdownList.remove(i - 1);
-}
+};
 
 // Show the initial select box (onload). Method of the JumpTo class.
 JumpTo.prototype.showSelect = function ()
@@ -1160,7 +1169,7 @@ JumpTo.prototype.showSelect = function ()
 	if (sChildLevelPrefix !== '')
 		sChildLevelPrefix = sChildLevelPrefix + this.opt.sBoardPrefix;
 
-	document.getElementById(this.opt.sContainerId).innerHTML = this.opt.sJumpToTemplate.replace(/%select_id%/, this.opt.sContainerId + '_select').replace(/%dropdown_list%/, '<select ' + (this.opt.bDisabled === true ? 'disabled="disabled" ' : '') + (this.opt.sClassName !== undefined ? 'class="' + this.opt.sClassName + '" ' : '') + 'name="' + (this.opt.sCustomName !== undefined ? this.opt.sCustomName : this.opt.sContainerId + '_select') + '" id="' + this.opt.sContainerId + '_select" ' + ('implementation' in document ? '' : 'onmouseover="grabJumpToContent(this);" ') + ('onbeforeactivate' in document ? 'onbeforeactivate' : 'onfocus') + '="grabJumpToContent(this);"><option value="' + (this.opt.bNoRedirect !== undefined && this.opt.bNoRedirect === true ? this.opt.iCurBoardId : '?board=' + this.opt.iCurBoardId + '.0') + '">' + sChildLevelPrefix + this.opt.sCurBoardName.removeEntities() + '</option></select>&nbsp;' + (this.opt.sGoButtonLabel !== undefined ? '<input type="button" class="button_submit" value="' + this.opt.sGoButtonLabel + '" onclick="window.location.href = \'' + elk_prepareScriptUrl(elk_scripturl) + 'board=' + this.opt.iCurBoardId + '.0\';" />' : ''));
+	document.getElementById(this.opt.sContainerId).innerHTML = this.opt.sJumpToTemplate.replace(/%select_id%/, this.opt.sContainerId + '_select').replace(/%dropdown_list%/, '<select ' + (this.opt.bDisabled === true ? 'disabled="disabled" ' : '') + (this.opt.sClassName !== undefined ? 'class="' + this.opt.sClassName + '" ' : '') + 'name="' + (this.opt.sCustomName !== undefined ? this.opt.sCustomName : this.opt.sContainerId + '_select') + '" id="' + this.opt.sContainerId + '_select"><option value="' + (this.opt.bNoRedirect !== undefined && this.opt.bNoRedirect === true ? this.opt.iCurBoardId : '?board=' + this.opt.iCurBoardId + '.0') + '">' + sChildLevelPrefix + this.opt.sCurBoardName.removeEntities() + '</option></select>&nbsp;' + (this.opt.sGoButtonLabel !== undefined ? '<input type="button" class="button_submit" value="' + this.opt.sGoButtonLabel + '" onclick="window.location.href = \'' + elk_prepareScriptUrl(elk_scripturl) + 'board=' + this.opt.iCurBoardId + '.0\';" />' : ''));
 	this.dropdownList = document.getElementById(this.opt.sContainerId + '_select');
 };
 
@@ -1168,10 +1177,11 @@ JumpTo.prototype.showSelect = function ()
 JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 {
 	this.removeAll();
-	if ('onbeforeactivate' in document)
-		this.dropdownList.onbeforeactivate = null;
+
+	if (is_mobile && is_touch)
+		this.dropdownList.removeEventListener('touchstart', grabJumpToContent);
 	else
-		this.dropdownList.onfocus = null;
+		this.dropdownList.removeEventListener('mouseenter', grabJumpToContent);
 
 	// Create a document fragment that'll allowing inserting big parts at once.
 	var oListFragment = document.createDocumentFragment(),
