@@ -605,7 +605,7 @@ VALUES
 INSERT INTO {$db_prefix}custom_fields
 	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
-	('cust_skye', 'Skype', 'This is your Skype account name', 'text', 32, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a href="skype:{INPUT}?call"><img src="http://mystatus.skype.com/smallicon/{INPUT}" alt="Skype - {INPUT}" title="Skype - {INPUT}" /></a>', 1);
+	('cust_skye', 'Skype', 'This is your Skype account name', 'text', 32, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a href="skype:{INPUT}?call"><i class="fa fa-skype" title="Skype - {INPUT}"></i></a>', 1);
 INSERT INTO {$db_prefix}custom_fields
 	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
