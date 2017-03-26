@@ -78,35 +78,6 @@ class PersonalMessage_Controller extends Action_Controller
 		if (isset($_GET['done']) && ($_GET['done'] === 'sent'))
 			$context['pm_sent'] = true;
 
-		// Now we have the labels, and assuming we have unsorted mail, apply our rules!
-		if ($user_settings['new_pm'])
-		{
-			$context['labels'] = $user_settings['message_labels'] == '' ? array() : explode(',', $user_settings['message_labels']);
-			foreach ($context['labels'] as $id_label => $label_name)
-			{
-				$context['labels'][(int) $id_label] = array(
-					'id' => $id_label,
-					'name' => trim($label_name),
-					'messages' => 0,
-					'unread_messages' => 0,
-				);
-			}
-
-			$context['labels'][-1] = array(
-				'id' => -1,
-				'name' => $txt['pm_msg_label_inbox'],
-				'messages' => 0,
-				'unread_messages' => 0,
-			);
-
-			// Apply our rules to the new PM's
-			applyRules();
-			updateMemberData($user_info['id'], array('new_pm' => 0));
-
-			// Turn the new PM's status off, for the popup alert, since they have entered the PM area
-			toggleNewPM($user_info['id']);
-		}
-
 		// Load the label data.
 		if ($user_settings['new_pm'] || ($context['labels'] = cache_get_data('labelCounts:' . $user_info['id'], 720)) === null)
 		{
@@ -129,6 +100,17 @@ class PersonalMessage_Controller extends Action_Controller
 			);
 
 			loadPMLabels();
+		}
+
+		// Now we have the labels, and assuming we have unsorted mail, apply our rules!
+		if ($user_settings['new_pm'])
+		{
+			// Apply our rules to the new PM's
+			applyRules();
+			updateMemberData($user_info['id'], array('new_pm' => 0));
+
+			// Turn the new PM's status off, for the popup alert, since they have entered the PM area
+			toggleNewPM($user_info['id']);
 		}
 
 		// This determines if we have more labels than just the standard inbox.
