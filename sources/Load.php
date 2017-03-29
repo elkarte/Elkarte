@@ -1632,6 +1632,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	// A bit lonely maybe, though I think it should be set up *after* teh theme variants detection
 	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] .  'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
+	$context['right_to_left'] = !empty($txt['lang_rtl']);
 
 	// Allow overriding the board wide time/number formats.
 	if (empty($user_settings['time_format']) && !empty($txt['time_format']))
@@ -1648,7 +1649,6 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$settings['lang_images_url'] = $settings['images_url'] . '/' . (!empty($txt['image_lang']) ? $txt['image_lang'] : $user_info['language']);
 
 	// Set a couple of bits for the template.
-	$context['right_to_left'] = !empty($txt['lang_rtl']);
 	$context['tabindex'] = 1;
 
 	// RTL languages require an additional stylesheet.
