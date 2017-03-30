@@ -83,9 +83,9 @@ if [ "$TRAVIS_PHP_VERSION" != "5.3" ]
 then
     if [ "$TRAVIS_PHP_VERSION" == "7.0" ]
     then
-        printf "\n"| pecl install apcu
+        printf "\n"| pecl install -f apcu
     else
-        printf "\n"| pecl install channel://pecl.php.net/APCu-4.0.10
+        printf "\n"| pecl install -f channel://pecl.php.net/APCu-4.0.10
 
         # Install Xcache. Not available for PHP 7 :(.
         wget http://xcache.lighttpd.net/pub/Releases/3.2.0/xcache-3.2.0.tar.gz
