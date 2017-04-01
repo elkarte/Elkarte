@@ -2372,8 +2372,8 @@ div.core_posts {
 .attachment_block, .attachment {
 	display: inline-block;
 	max-width: 99%;
-	min-width: 17em;
-	margin: 0 .25em 1em .25em;
+	min-width: 19em;
+	margin: 0 .5em 1em 0;
 	vertical-align: bottom;
 	text-align: center;
 	overflow: hidden;
@@ -2383,10 +2383,20 @@ div.core_posts {
 }
 .attachment_name, .attachment_details {
 	display: block;
+	width: 18em;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	padding: 0 .25em;
 }
-/* Just eye candy. */
 .attachment_name {
-	margin: .5em 0 0 0;
+	 margin: .5em 0 0 0;
+}
+.attachment_name_exp, .attachment_details_exp {
+	width: auto;
+}
+.attachment_name_exp {
+	margin: -.5em 0 0;
 }
 /* Important stuff. */
 .attachment_name:before {
