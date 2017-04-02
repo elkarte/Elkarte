@@ -366,8 +366,8 @@ function template_add_new_attachments()
 						<span id="postAttachment"></span>
 						<dl id="postAttachment2">';
 
-	// But, only show them if they haven't reached a limit. Or a mod author hasn't hidden them.
-	if ($context['attachments']['num_allowed'] > 0 || !empty($context['dont_show_them']))
+	// Show the box even if they reached the limit, maybe they want to remove one!
+	if (empty($context['dont_show_them']))
 	{
 		echo '
 							<dt class="drop_area">
