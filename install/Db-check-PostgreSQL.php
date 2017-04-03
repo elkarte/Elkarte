@@ -12,7 +12,7 @@
 $GLOBALS['databases']['postgresql'] = array(
 	'name' => 'PostgreSQL',
 	'extension' => 'PostgreSQL (PgSQL)',
-	'version' => '8.3',
+	'version' => '9.1',
 	'function_check' => 'pg_connect',
 	'version_check' => function($db_connection) {
 		$request = pg_query('SELECT version()');

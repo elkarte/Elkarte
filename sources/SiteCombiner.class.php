@@ -239,7 +239,7 @@ class Site_Combiner
 
 			// CSSmin it to save some space
 			require_once(EXTDIR . '/cssmin.php');
-			$compressor = new CSSmin($this->_cache);
+			$compressor = new CSSmin();
 			$this->_minified_cache = $compressor->run($this->_cache);
 
 			// Combine in any pre minimized css files to our new minimized string
