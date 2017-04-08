@@ -818,7 +818,7 @@ function loadPermissions()
  */
 function loadMemberData($users, $is_name = false, $set = 'normal')
 {
-	global $user_profile, $modSettings, $board_info, $context;
+	global $user_profile, $modSettings, $board_info, $context, $user_info;
 
 	$db = database();
 
@@ -914,7 +914,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	}
 
 	// Custom profile fields as well
-	if (!empty($new_loaded_ids) && $set !== 'minimal' && (in_array('cp', $context['admin_features'])))
+	if (!empty($new_loaded_ids) && !empty($user_info['id']) && $set !== 'minimal' && (in_array('cp', $context['admin_features'])))
 	{
 		$request = $db->query('', '
 			SELECT id_member, variable, value
