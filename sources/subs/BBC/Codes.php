@@ -409,7 +409,7 @@ class Codes
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<sup class="bbc_footnotes">%fn%',
 				self::ATTR_AFTER => '%fn%</sup>',
-				self::ATTR_TRIM => self::TRIM_BOTH,
+				self::ATTR_TRIM => self::TRIM_NONE,
 				self::ATTR_DISALLOW_PARENTS => array(
 					'footnote' => 1,
 					'code' => 1,
@@ -419,7 +419,7 @@ class Codes
 				),
 				self::ATTR_DISALLOW_BEFORE => '',
 				self::ATTR_DISALLOW_AFTER => '',
-				self::ATTR_BLOCK_LEVEL => true,
+				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => true,
 				self::ATTR_LENGTH => 8,
 			),
