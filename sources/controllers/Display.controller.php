@@ -680,9 +680,12 @@ class Display_Controller
 		{
 			$context['mentions_enabled'] = true;
 
+			// This is needed just in case someone does quick-edit... too bad it will be loaded even the member cannot do any quick-edit
+			loadJavascriptFile(array('mentioning.js'));
+
 			// Just using the plain text quick reply and not the editor
 			if (empty($options['use_editor_quick_reply']))
-				loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.min.js', 'mentioning.js'));
+				loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.min.js'));
 
 			loadCSSFile('jquery.atwho.css');
 
