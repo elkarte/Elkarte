@@ -323,6 +323,27 @@ function loadUserSettings()
 	// If the user is a guest, initialize all the critical user settings.
 	else
 	{
+		// Guests need this too, it won't be emitted otherwise
+		static $added_once = false;
+
+		if (!$added_once)
+		{
+			if (!isset($context['html_headers']))
+				$context['html_headers'] = '';
+
+			if (!empty($modSettings['avatar_max_width']) || !empty($modSettings['avatar_max_height']))
+			{
+				$context['html_headers'] .= '
+	<style>
+		.avatarresize {' . (!empty($modSettings['avatar_max_width']) ? '
+			max-width:' . $modSettings['avatar_max_width'] . 'px;' : '') . (!empty($modSettings['avatar_max_height']) ? '
+			max-height:' . $modSettings['avatar_max_height'] . 'px;' : '') . '
+		}
+	</style>';
+			}
+			$added_once = true;
+		}
+
 		// This is what a guest's variables should be.
 		$username = '';
 		$user_info = array('groups' => array(-1));
