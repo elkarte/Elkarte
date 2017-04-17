@@ -1,0 +1,3479 @@
+<?xml version="1.0"?>
+<!DOCTYPE modification SYSTEM "http://www.elkarte.net/site/modification">
+<modification xmlns="http://www.elkarte.net/site/modification" xmlns:elk="http://www.elkarte.net/">
+
+	<id>Elkarte Contributors:ElkArte_1010_patch</id>
+	<version>1.0</version>
+	<file name="BOARDDIR/SSI.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.9
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			AND m.approved = {int:is_approved}' : '') . '
+		' . (empty($query_where) ? '' : 'AND ' . $query_where) . '
+		ORDER BY ' . $query_order . '
+		' . ($query_limit == '' ? '' : 'LIMIT ' . $query_limit),
+		array_merge($query_where_params, array(
+			'current_member' => $user_info['id'],
+			'is_approved' => 1,
+		))
+	);
+	$posts = array();]]></search>
+			<add><![CDATA[			AND m.approved = {int:is_approved}' : '') . '
+		' . (empty($query_where) ? '' : 'AND ' . $query_where) . '
+		ORDER BY ' . $query_order . '
+		' . ($query_limit == '' ? '' : 'LIMIT {int:query_limit}'),
+		array_merge($query_where_params, array(
+			'current_member' => $user_info['id'],
+			'is_approved' => 1,
+			'query_limit' => $query_limit,
+		))
+	);
+	$posts = array();]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			AND t.approved = {int:is_approved}
+			AND ml.approved = {int:is_approved}' : '') . '
+		ORDER BY t.id_last_msg DESC
+		LIMIT ' . $num_recent,
+		array(
+			'include_boards' => empty($include_boards) ? '' : $include_boards,
+			'exclude_boards' => empty($exclude_boards) ? '' : $exclude_boards,
+			'min_message_id' => $modSettings['maxMsgID'] - 35 * min($num_recent, 5),
+			'is_approved' => 1,
+		)
+	);
+	$topics = array();]]></search>
+			<add><![CDATA[			AND t.approved = {int:is_approved}
+			AND ml.approved = {int:is_approved}' : '') . '
+		ORDER BY t.id_last_msg DESC
+		LIMIT {int:num_recent}',
+		array(
+			'include_boards' => empty($include_boards) ? '' : $include_boards,
+			'exclude_boards' => empty($exclude_boards) ? '' : $exclude_boards,
+			'min_message_id' => $modSettings['maxMsgID'] - 35 * min($num_recent, 5),
+			'is_approved' => 1,
+			'num_recent' => $num_recent,
+		)
+	);
+	$topics = array();]]></add>
+		</operation>
+	</file>
+	<file name="BOARDDIR/index.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.9
+ *
+ */
+
+$forum_version = 'ElkArte 1.0.9';
+define('FORUM_VERSION', $forum_version);
+
+// First things first, but not necessarily in that order.
+define('ELK', 1);
+
+// Shortcut for the browser cache stale
+define('CACHE_STALE', '?109');
+
+if (function_exists('set_magic_quotes_runtime'))
+	@set_magic_quotes_runtime(0);]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+
+$forum_version = 'ElkArte 1.0.10';
+define('FORUM_VERSION', $forum_version);
+
+// First things first, but not necessarily in that order.
+define('ELK', 1);
+
+// Shortcut for the browser cache stale
+define('CACHE_STALE', '?1010');
+
+if (function_exists('set_magic_quotes_runtime'))
+	@set_magic_quotes_runtime(0);]]></add>
+		</operation>
+	</file>
+		</operation>
+	</file>
+	<file name="SOURCEDIR/Load.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.8
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[ */
+function loadMemberData($users, $is_name = false, $set = 'normal')
+{
+	global $user_profile, $modSettings, $board_info, $context;
+
+	$db = database();
+]]></search>
+			<add><![CDATA[ */
+function loadMemberData($users, $is_name = false, $set = 'normal')
+{
+	global $user_profile, $modSettings, $board_info, $context, $user_info;
+
+	$db = database();
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	}
+
+	// Custom profile fields as well
+	if (!empty($new_loaded_ids) && $set !== 'minimal' && (in_array('cp', $context['admin_features'])))
+	{
+		$request = $db->query('', '
+			SELECT id_member, variable, value]]></search>
+			<add><![CDATA[	}
+
+	// Custom profile fields as well
+	if (!empty($new_loaded_ids) && !empty($user_info['id']) && $set !== 'minimal' && (in_array('cp', $context['admin_features'])))
+	{
+		$request = $db->query('', '
+			SELECT id_member, variable, value]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+	// A bit lonely maybe, though I think it should be set up *after* teh theme variants detection
+	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] .  'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
+
+	// Allow overriding the board wide time/number formats.
+	if (empty($user_settings['time_format']) && !empty($txt['time_format']))]]></search>
+			<add><![CDATA[
+	// A bit lonely maybe, though I think it should be set up *after* teh theme variants detection
+	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] .  'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
+	$context['right_to_left'] = !empty($txt['lang_rtl']);
+
+	// Allow overriding the board wide time/number formats.
+	if (empty($user_settings['time_format']) && !empty($txt['time_format']))]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	$settings['lang_images_url'] = $settings['images_url'] . '/' . (!empty($txt['image_lang']) ? $txt['image_lang'] : $user_info['language']);
+
+	// Set a couple of bits for the template.
+	$context['right_to_left'] = !empty($txt['lang_rtl']);
+	$context['tabindex'] = 1;
+
+	// RTL languages require an additional stylesheet.]]></search>
+			<add><![CDATA[	$settings['lang_images_url'] = $settings['images_url'] . '/' . (!empty($txt['image_lang']) ? $txt['image_lang'] : $user_info['language']);
+
+	// Set a couple of bits for the template.
+	$context['tabindex'] = 1;
+
+	// RTL languages require an additional stylesheet.]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		// If unserialize fails as well, let's just store an empty array
+		if ($array_form === false)
+		{
+			$array_form = array();
+		}
+
+		// Time to update the value if necessary]]></search>
+			<add><![CDATA[		// If unserialize fails as well, let's just store an empty array
+		if ($array_form === false)
+		{
+			$array_form = array(0, '', 0);
+		}
+
+		// Time to update the value if necessary]]></add>
+		</operation>
+	</file>
+	<file name="SOURCEDIR/Request.php">
+		<operation>
+			<search position="replace"><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			// $topic and $_REQUEST['start'] are numbers, numbers I say.
+			$topic = (int) $_REQUEST['topic'];
+			// @todo in Display $_REQUEST['start'] is not always a number
+			$_REQUEST['start'] = isset($_REQUEST['start']) && preg_match('~^(:?(:?from|msg)?\d+|new)$~', $_REQUEST['start']) ? $_REQUEST['start'] : 0;
+
+			// Now make sure the online log gets the right number.
+			$_GET['topic'] = $topic;]]></search>
+			<add><![CDATA[			// $topic and $_REQUEST['start'] are numbers, numbers I say.
+			$topic = (int) $_REQUEST['topic'];
+			// @todo in Display $_REQUEST['start'] is not always a number
+			$_REQUEST['start'] = isset($_REQUEST['start']) && preg_match('~^((from|msg)?\d+|new)$~', $_REQUEST['start']) ? $_REQUEST['start'] : 0;
+
+			// Now make sure the online log gets the right number.
+			$_GET['topic'] = $topic;]]></add>
+		</operation>
+	</file>
+	<file name="SOURCEDIR/Session.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.9
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[function sessionRead($session_id)
+{
+	if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $session_id) == 0)
+		return false;
+
+	// Get our database, quick
+	$db = database();]]></search>
+			<add><![CDATA[function sessionRead($session_id)
+{
+	if (preg_match('~^[A-Za-z0-9,-]{16,64}$~', $session_id) == 0)
+		return '';
+
+	// Get our database, quick
+	$db = database();]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	list ($sess_data) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $sess_data;
+}
+
+/**]]></search>
+			<add><![CDATA[	list ($sess_data) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $sess_data !== null ? $sess_data : '';
+}
+
+/**]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			array('session_id')
+		);
+
+	return $result;
+}
+
+/**]]></search>
+			<add><![CDATA[			array('session_id')
+		);
+
+	return $db->affected_rows() == 0 ? false : true;
+}
+
+/**]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	$db = database();
+
+	// Just delete the row...
+	return $db->query('', '
+		DELETE FROM {db_prefix}sessions
+		WHERE session_id = {string:session_id}',
+		array(
+			'session_id' => $session_id,
+		)
+	);
+}
+
+/**]]></search>
+			<add><![CDATA[	$db = database();
+
+	// Just delete the row...
+	$db->query('', '
+		DELETE FROM {db_prefix}sessions
+		WHERE session_id = {string:session_id}',
+		array(
+			'session_id' => $session_id,
+		)
+	);
+
+	return true;
+}
+
+/**]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	$db = database();
+
+	// Clean up after yerself ;).
+	return $db->query('', '
+		DELETE FROM {db_prefix}sessions
+		WHERE last_update < {int:last_update}',
+		array(
+			'last_update' => time() - $max_lifetime,
+		)
+	);
+}]]></search>
+			<add><![CDATA[	$db = database();
+
+	// Clean up after yerself ;).
+	$db->query('', '
+		DELETE FROM {db_prefix}sessions
+		WHERE last_update < {int:last_update}',
+		array(
+			'last_update' => time() - $max_lifetime,
+		)
+	);
+
+	return $db->affected_rows() == 0 ? false : true;
+}]]></add>
+		</operation>
+	</file>
+	<file name="SOURCEDIR/Subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.8
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[				'content' => '<a href="$1" class="bbc_link" target="_blank">$1</a>',
+				'validate' => create_function('&$tag, &$data, $disabled', '
+					$data = strtr($data, array(\'<br />\' => \'\'));
+					if (strpos($data, \'http://\') !== 0 && strpos($data, \'https://\') !== 0)
+						$data = \'http://\' . $data;
+				'),
+			),]]></search>
+			<add><![CDATA[				'content' => '<a href="$1" class="bbc_link" target="_blank">$1</a>',
+				'validate' => create_function('&$tag, &$data, $disabled', '
+					$data = strtr($data, array(\'<br />\' => \'\'));
+					if (preg_match("~^https?://~i", $data) !== 1)
+						$data = \'http://\' . $data;
+				'),
+			),]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[				'before' => '<a href="$1" class="bbc_link" target="_blank">',
+				'after' => '</a>',
+				'validate' => create_function('&$tag, &$data, $disabled', '
+					if (strpos($data, \'http://\') !== 0 && strpos($data, \'https://\') !== 0)
+						$data = \'http://\' . $data;
+				'),
+				'disallow_children' => array('email', 'ftp', 'url', 'iurl'),]]></search>
+			<add><![CDATA[				'before' => '<a href="$1" class="bbc_link" target="_blank">',
+				'after' => '</a>',
+				'validate' => create_function('&$tag, &$data, $disabled', '
+					if (preg_match("~^https?://~i", $data) !== 1)
+						$data = \'http://\' . $data;
+				'),
+				'disallow_children' => array('email', 'ftp', 'url', 'iurl'),]]></add>
+		</operation>
+	</file>
+	<file name="ADMINDIR/CoreFeatures.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.2
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		elseif (!empty($defaultAction))
+			$context['sub_action'] = $defaultAction;
+		else
+			$context['sub_action'] = array_pop($temp = array_keys($subActions));
+	}
+}]]></search>
+			<add><![CDATA[		elseif (!empty($defaultAction))
+			$context['sub_action'] = $defaultAction;
+		else
+		{
+			$temp = array_keys($subActions);
+			$context['sub_action'] = array_pop($temp);
+		}
+	}
+}]]></add>
+		</operation>
+	</file>
+	<file name="ADMINDIR/ManageAttachments.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.8
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		$upload_max_filesize = ini_get('upload_max_filesize');
+		$testPM = !empty($post_max_size) ? (memoryReturnBytes($post_max_size) >= (isset($modSettings['attachmentPostLimit']) ? $modSettings['attachmentPostLimit'] * 1024 : 0)) : true;
+		$testUM = !empty($upload_max_filesize) ? (memoryReturnBytes($upload_max_filesize) >= (isset($modSettings['attachmentSizeLimit']) ? $modSettings['attachmentSizeLimit'] * 1024 : 0)) : true;
+
+		$config_vars = array(
+			array('title', 'attachment_manager_settings'),]]></search>
+			<add><![CDATA[		$upload_max_filesize = ini_get('upload_max_filesize');
+		$testPM = !empty($post_max_size) ? (memoryReturnBytes($post_max_size) >= (isset($modSettings['attachmentPostLimit']) ? $modSettings['attachmentPostLimit'] * 1024 : 0)) : true;
+		$testUM = !empty($upload_max_filesize) ? (memoryReturnBytes($upload_max_filesize) >= (isset($modSettings['attachmentSizeLimit']) ? $modSettings['attachmentSizeLimit'] * 1024 : 0)) : true;
+		$testImgRotate = class_exists('Imagick') || (get_extension_funcs('gd') && function_exists('exif_read_data'));
+
+		$config_vars = array(
+			array('title', 'attachment_manager_settings'),]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[				array('warning', empty($testUM) ? 'attachment_filesize_warning' : ''),
+				array('int', 'attachmentSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
+				array('int', 'attachmentNumPerPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
+			// Security Items
+			array('title', 'attachment_security_settings'),
+				// Extension checks etc.]]></search>
+			<add><![CDATA[				array('warning', empty($testUM) ? 'attachment_filesize_warning' : ''),
+				array('int', 'attachmentSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
+				array('int', 'attachmentNumPerPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
+				array('check', 'attachment_autorotate', 'postinput' => empty($testImgRotate) ? $txt['attachment_autorotate_na'] : ''),
+			// Security Items
+			array('title', 'attachment_security_settings'),
+				// Extension checks etc.]]></add>
+		</operation>
+	</file>
+	<file name="ADMINDIR/ManageSearch.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.8
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			);
+			$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
+			$context['step'] = isset($_REQUEST['step']) ? (int) $_REQUEST['step'] : 0;
+
+			// Admin timeouts are painful when building these long indexes
+			if ($_SESSION['admin_time'] + 3300 < time() && $context['step'] >= 1)
+				$_SESSION['admin_time'] = time();
+		}
+
+		if ($context['step'] !== 0)
+			checkSession('request');
+
+		// Step 0: let the user determine how they like their index.
+		if ($context['step'] === 0)
+			$context['sub_template'] = 'create_index';]]></search>
+			<add><![CDATA[			);
+			$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
+			$context['step'] = isset($_REQUEST['step']) ? (int) $_REQUEST['step'] : 0;
+		}
+
+		if ($context['step'] !== 0)
+		{
+			checkSession('request');
+
+			// Admin timeouts are painful when building these long indexes
+			$_SESSION['admin_time'] = time();
+		}
+
+		// Step 0: let the user determine how they like their index.
+		if ($context['step'] === 0)
+			$context['sub_template'] = 'create_index';]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[					$mySphinx->SetMatchMode(SPH_MATCH_BOOLEAN);
+					$mySphinx->SetSortMode(SPH_SORT_ATTR_ASC, 'id_topic');
+
+					$request = $mySphinx->Query('test', 'elkarte_index');
+					if ($request === false)
+					{
+						$context['settings_message'][] = $txt['sphinx_test_connect_failed'];]]></search>
+			<add><![CDATA[					$mySphinx->SetMatchMode(SPH_MATCH_BOOLEAN);
+					$mySphinx->SetSortMode(SPH_SORT_ATTR_ASC, 'id_topic');
+
+					$index = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte') . '_index';
+					$request = $mySphinx->Query('test', $index);
+					if ($request === false)
+					{
+						$context['settings_message'][] = $txt['sphinx_test_connect_failed'];]]></add>
+		</operation>
+	</file>
+	<file name="ADMINDIR/PackageServers.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.7
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			$listing = json_decode(fetch_web_data($url));
+
+			// Find the requested package by section and number, make sure it matches
+			$section = $listing->$_GET['section'];
+
+			// This is what they requested, yes?
+			if (basename($section[$_GET['num']]->server[0]->download) === $_GET['package'])]]></search>
+			<add><![CDATA[			$listing = json_decode(fetch_web_data($url));
+
+			// Find the requested package by section and number, make sure it matches
+			$section = $listing->{$_GET['section']};
+
+			// This is what they requested, yes?
+			if (basename($section[$_GET['num']]->server[0]->download) === $_GET['package'])]]></add>
+		</operation>
+	</file>
+	<file name="CONTROLLERDIR/Auth.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.7
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+		// Get the template ready.... not really much else to do.
+		$context['page_title'] = $txt['login'];
+		$context['default_username'] = &$_REQUEST['u'];
+		$context['using_openid'] = isset($_GET['openid']);
+		$context['default_password'] = '';]]></search>
+			<add><![CDATA[
+		// Get the template ready.... not really much else to do.
+		$context['page_title'] = $txt['login'];
+		$_REQUEST['u'] = isset($_REQUEST['u']) ? Util::htmlspecialchars($_REQUEST['u']) : '';
+		$context['default_username'] = &$_REQUEST['u'];
+		$context['using_openid'] = isset($_GET['openid']);
+		$context['default_password'] = '';]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		// Set up the cookie length.  (if it's invalid, just fall through and use the default.)
+		if (isset($_POST['cookieneverexp']) || (!empty($_POST['cookielength']) && $_POST['cookielength'] == -1))
+			$modSettings['cookieTime'] = 3153600;
+		elseif (!empty($_POST['cookielength']) && ($_POST['cookielength'] >= 1 || $_POST['cookielength'] <= 525600))
+			$modSettings['cookieTime'] = (int) $_POST['cookielength'];
+
+		loadLanguage('Login');]]></search>
+			<add><![CDATA[		// Set up the cookie length.  (if it's invalid, just fall through and use the default.)
+		if (isset($_POST['cookieneverexp']) || (!empty($_POST['cookielength']) && $_POST['cookielength'] == -1))
+			$modSettings['cookieTime'] = 3153600;
+		elseif (!empty($_POST['cookielength']) && ($_POST['cookielength'] >= 1 && $_POST['cookielength'] <= 525600))
+			$modSettings['cookieTime'] = (int) $_POST['cookielength'];
+
+		loadLanguage('Login');]]></add>
+		</operation>
+	</file>
+	<file name="CONTROLLERDIR/Display.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.7
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		{
+			$context['mentions_enabled'] = true;
+
+			// Just using the plain text quick reply and not the editor
+			if (empty($options['use_editor_quick_reply']))
+				loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.min.js', 'mentioning.js'));
+
+			loadCSSFile('jquery.atwho.css');
+]]></search>
+			<add><![CDATA[		{
+			$context['mentions_enabled'] = true;
+
+			// This is needed just in case someone does quick-edit... too bad it will be loaded even the member cannot do any quick-edit
+			loadJavascriptFile(array('mentioning.js'));
+
+			// Just using the plain text quick reply and not the editor
+			if (empty($options['use_editor_quick_reply']))
+				loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.min.js'));
+
+			loadCSSFile('jquery.atwho.css');
+]]></add>
+		</operation>
+	</file>
+	<file name="CONTROLLERDIR/PersonalMessage.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.5
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		if (isset($_GET['done']) && ($_GET['done'] === 'sent'))
+			$context['pm_sent'] = true;
+
+		// Now we have the labels, and assuming we have unsorted mail, apply our rules!
+		if ($user_settings['new_pm'])
+		{
+			$context['labels'] = $user_settings['message_labels'] == '' ? array() : explode(',', $user_settings['message_labels']);
+			foreach ($context['labels'] as $id_label => $label_name)]]></search>
+			<add><![CDATA[		if (isset($_GET['done']) && ($_GET['done'] === 'sent'))
+			$context['pm_sent'] = true;
+
+		// Load the label data.
+		if ($user_settings['new_pm'] || ($context['labels'] = cache_get_data('labelCounts:' . $user_info['id'], 720)) === null)
+		{
+			$context['labels'] = $user_settings['message_labels'] == '' ? array() : explode(',', $user_settings['message_labels']);
+			foreach ($context['labels'] as $id_label => $label_name)]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[				'unread_messages' => 0,
+			);
+
+			// Apply our rules to the new PM's
+			applyRules();
+			updateMemberData($user_info['id'], array('new_pm' => 0));]]></search>
+			<add><![CDATA[				'unread_messages' => 0,
+			);
+
+			loadPMLabels();
+		}
+
+		// Now we have the labels, and assuming we have unsorted mail, apply our rules!
+		if ($user_settings['new_pm'])
+		{
+			// Apply our rules to the new PM's
+			applyRules();
+			updateMemberData($user_info['id'], array('new_pm' => 0));]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			toggleNewPM($user_info['id']);
+		}
+
+		// Load the label data.
+		if ($user_settings['new_pm'] || ($context['labels'] = cache_get_data('labelCounts:' . $user_info['id'], 720)) === null)
+		{
+			$context['labels'] = $user_settings['message_labels'] == '' ? array() : explode(',', $user_settings['message_labels']);
+			foreach ($context['labels'] as $id_label => $label_name)
+			{
+				$context['labels'][(int) $id_label] = array(
+					'id' => $id_label,
+					'name' => trim($label_name),
+					'messages' => 0,
+					'unread_messages' => 0,
+				);
+			}
+
+			$context['labels'][-1] = array(
+				'id' => -1,
+				'name' => $txt['pm_msg_label_inbox'],
+				'messages' => 0,
+				'unread_messages' => 0,
+			);
+
+			loadPMLabels();
+		}
+
+		// This determines if we have more labels than just the standard inbox.
+		$context['currently_using_labels'] = count($context['labels']) > 1 ? 1 : 0;
+]]></search>
+			<add><![CDATA[			toggleNewPM($user_info['id']);
+		}
+
+		// This determines if we have more labels than just the standard inbox.
+		$context['currently_using_labels'] = count($context['labels']) > 1 ? 1 : 0;
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			$_POST = htmlspecialchars__recursive($_POST);
+
+			// Save the fields.
+			saveProfileFields();
+
+			if (!empty($profile_vars))
+				updateMemberData($user_info['id'], $profile_vars);]]></search>
+			<add><![CDATA[			$_POST = htmlspecialchars__recursive($_POST);
+
+			// Save the fields.
+			require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
+			$fields = ProfileOptions_Controller::getFields('contactprefs');
+			saveProfileFields($fields['fields'], $fields['hook']);
+
+			if (!empty($profile_vars))
+				updateMemberData($user_info['id'], $profile_vars);]]></add>
+		</operation>
+	</file>
+	<file name="CONTROLLERDIR/Poll.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.3
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			$context['last_choice_id'] = $last_id;
+
+			if ($context['can_moderate_poll'])
+				$context['poll']['expiration'] = $_POST['poll_expire'];
+
+			// Check the question/option count for errors.
+			// @todo: why !$poll_errors->hasErrors()?]]></search>
+			<add><![CDATA[			$context['last_choice_id'] = $last_id;
+
+			if ($context['can_moderate_poll'])
+				$context['poll']['expiration'] = (int) $_POST['poll_expire'];
+
+			// Check the question/option count for errors.
+			// @todo: why !$poll_errors->hasErrors()?]]></add>
+		</operation>
+	</file>
+	<file name="CONTROLLERDIR/Post.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.5
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			// Set up the poll options.
+			$context['poll'] = array(
+				'max_votes' => empty($_POST['poll_max_votes']) ? '1' : max(1, $_POST['poll_max_votes']),
+				'hide_results' => empty($_POST['poll_hide']) ? 0 : $_POST['poll_hide'],
+				'expiration' => !isset($_POST['poll_expire']) ? '' : $_POST['poll_expire'],
+				'change_vote' => isset($_POST['poll_change_vote']),
+				'guest_vote' => isset($_POST['poll_guest_vote']),
+				'guest_vote_allowed' => in_array(-1, $allowedVoteGroups['allowed']),
+			);
+
+			// Make all five poll choices empty.]]></search>
+			<add><![CDATA[			// Set up the poll options.
+			$context['poll'] = array(
+				'max_votes' => empty($_POST['poll_max_votes']) ? '1' : max(1, $_POST['poll_max_votes']),
+				'hide_results' => empty($_POST['poll_hide']) ? 0 : (int) $_POST['poll_hide'],
+				'expiration' => !isset($_POST['poll_expire']) ? 0 : (int) $_POST['poll_expire'],
+				'change_vote' => isset($_POST['poll_change_vote']),
+				'guest_vote' => isset($_POST['poll_guest_vote']),
+				'guest_vote_allowed' => in_array(-1, $allowedVoteGroups['allowed']),
+			);
+
+			// Make all five poll choices empty.]]></add>
+		</operation>
+	</file>
+	<file name="CONTROLLERDIR/Profile.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.2
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[				$controller->action_authentication(true);
+			}
+			elseif (in_array($current_area, array('account', 'forumprofile', 'theme', 'contactprefs')))
+				saveProfileFields();
+			else
+			{
+				$force_redirect = true;]]></search>
+			<add><![CDATA[				$controller->action_authentication(true);
+			}
+			elseif (in_array($current_area, array('account', 'forumprofile', 'theme', 'contactprefs')))
+			{
+				require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
+				$fields = ProfileOptions_Controller::getFields($current_area);
+
+				saveProfileFields($fields['fields'], $fields['hook']);
+			}
+			else
+			{
+				$force_redirect = true;]]></add>
+		</operation>
+	</file>
+	<file name="CONTROLLERDIR/ProfileAccount.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.7
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			0 => $txt['profile_warning_effect_none'],
+		);
+
+		foreach (array('watch', 'moderation', 'mute') as $status)
+		{
+			if ($modSettings['warning_' . $status] != 110)
+			{]]></search>
+			<add><![CDATA[			0 => $txt['profile_warning_effect_none'],
+		);
+
+		foreach (array('watch', 'moderate', 'mute') as $status)
+		{
+			if ($modSettings['warning_' . $status] != 110)
+			{]]></add>
+		</operation>
+	</file>
+	<file name="CONTROLLERDIR/ProfileOptions.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.3
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[ */
+class ProfileOptions_Controller extends Action_Controller
+{
+	/**
+	 * Default method, if another action is not called
+	 * by the menu.]]></search>
+			<add><![CDATA[ */
+class ProfileOptions_Controller extends Action_Controller
+{
+	public static function getFields($area)
+	{
+		global $modSettings;
+
+		$fields = array(
+			'account' => array(
+				'fields' => array(
+					'member_name', 'real_name', 'date_registered', 'posts', 'lngfile', 'hr',
+					'id_group', 'hr',
+					'email_address', 'hide_email', 'show_online', 'hr',
+					'passwrd1', 'passwrd2', 'hr',
+					'secret_question', 'secret_answer',
+				),
+				'hook' => 'account'
+				),
+			'forumprofile' => array(
+				'fields' => array(
+					'avatar_choice', 'hr', 'personal_text', 'hr',
+					'bday1', 'location', 'gender', 'hr',
+					'usertitle', 'signature', 'hr',
+					'karma_good', 'hr',
+					'website_title', 'website_url',
+				),
+				'hook' => 'forum'
+			),
+			'theme' => array(
+				'fields' => array(
+					'id_theme', 'smiley_set', 'hr',
+					'time_format', 'time_offset', 'hr',
+					'theme_settings',
+				),
+				'hook' => 'themepick'
+			),
+			'contactprefs' => array(
+				'fields' => array(
+					'receive_from',
+					'hr',
+					'pm_settings',
+				),
+				'hook' => 'pmprefs'
+			),
+			'registration' => array(
+				'fields' => !empty($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array(),
+				'hook' => 'registration'
+			)
+		);
+
+		if (isset($fields[$area]))
+		{
+			return $fields[$area];
+		}
+		else
+		{
+			return array();
+		}
+	}
+	/**
+	 * Default method, if another action is not called
+	 * by the menu.]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		$context['sub_template'] = 'edit_options';
+		$context['page_desc'] = $txt['account_info'];
+
+		setupProfileContext(
+			array(
+				'member_name', 'real_name', 'date_registered', 'posts', 'lngfile', 'hr',
+				'id_group', 'hr',
+				'email_address', 'hide_email', 'show_online', 'hr',
+				'passwrd1', 'passwrd2', 'hr',
+				'secret_question', 'secret_answer',
+			),
+			'account'
+		);
+	}
+
+	/**]]></search>
+			<add><![CDATA[		$context['sub_template'] = 'edit_options';
+		$context['page_desc'] = $txt['account_info'];
+
+		$fields = ProfileOptions_Controller::getFields('account');
+		setupProfileContext($fields['fields'], $fields['hook']);
+	}
+
+	/**]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		$context['page_desc'] = replaceBasicActionUrl($txt['forumProfile_info']);
+		$context['show_preview_button'] = true;
+
+		setupProfileContext(
+			array(
+				'avatar_choice', 'hr', 'personal_text', 'hr',
+				'bday1', 'location', 'gender', 'hr',
+				'usertitle', 'signature', 'hr',
+				'karma_good', 'hr',
+				'website_title', 'website_url',
+			),
+			'forum'
+		);
+	}
+
+	/**]]></search>
+			<add><![CDATA[		$context['page_desc'] = replaceBasicActionUrl($txt['forumProfile_info']);
+		$context['show_preview_button'] = true;
+
+		$fields = ProfileOptions_Controller::getFields('forumprofile');
+		setupProfileContext($fields['fields'], $fields['hook']);
+	}
+
+	/**]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		$context['page_desc'] = $txt['pm_settings_desc'];
+
+		// Setup the profile context and call the 'integrate_pmprefs_profile_fields' hook
+		setupProfileContext(
+			array(
+				'receive_from',
+				'hr',
+				'pm_settings',
+			),
+			'pmprefs'
+		);
+	}
+
+	/**]]></search>
+			<add><![CDATA[		$context['page_desc'] = $txt['pm_settings_desc'];
+
+		// Setup the profile context and call the 'integrate_pmprefs_profile_fields' hook
+		$fields = ProfileOptions_Controller::getFields('contactprefs');
+		setupProfileContext($fields['fields'], $fields['hook']);
+	}
+
+	/**]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		$context['sub_template'] = 'edit_options';
+		$context['page_desc'] = $txt['theme_info'];
+
+		setupProfileContext(
+			array(
+				'id_theme', 'smiley_set', 'hr',
+				'time_format', 'time_offset', 'hr',
+				'theme_settings',
+			),
+			'themepick'
+		);
+	}
+
+	/**]]></search>
+			<add><![CDATA[		$context['sub_template'] = 'edit_options';
+		$context['page_desc'] = $txt['theme_info'];
+
+		$fields = ProfileOptions_Controller::getFields('theme');
+		setupProfileContext($fields['fields'], $fields['hook']);
+	}
+
+	/**]]></add>
+		</operation>
+	</file>
+	<file name="CONTROLLERDIR/Register.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.7
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+			// Here, and here only, emulate the permissions the user would have to do this.
+			$user_info['permissions'] = array_merge($user_info['permissions'], array('profile_account_own', 'profile_extra_own'));
+			$reg_fields = explode(',', $modSettings['registration_fields']);
+
+			// We might have had some submissions on this front - go check.
+			foreach ($reg_fields as $field)
+			{
+				if (isset($_POST[$field]))
+					$cur_profile[$field] = Util::htmlspecialchars($_POST[$field]);
+			}
+
+			// Load all the fields in question.
+			setupProfileContext($reg_fields, 'registration');
+		}
+
+		// Generate a visual verification code to make sure the user is no bot.]]></search>
+			<add><![CDATA[
+			// Here, and here only, emulate the permissions the user would have to do this.
+			$user_info['permissions'] = array_merge($user_info['permissions'], array('profile_account_own', 'profile_extra_own'));
+			require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
+			$reg_fields = ProfileOptions_Controller::getFields('registration');
+
+			// We might have had some submissions on this front - go check.
+			foreach ($reg_fields['fields'] as $field)
+			{
+				if (isset($_POST[$field]))
+					$cur_profile[$field] = Util::htmlspecialchars($_POST[$field]);
+			}
+
+			// Load all the fields in question.
+			setupProfileContext($reg_fields['fields'], $reg_fields['hook']);
+		}
+
+		// Generate a visual verification code to make sure the user is no bot.]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		{
+			call_integration_hook('integrate_activate', array($regOptions['username'], 1, 1));
+
+			setLoginCookie(60 * $modSettings['cookieTime'], $memberID, hash('sha256', Util::strtolower($regOptions['username']) . $regOptions['password'] . $regOptions['register_vars']['password_salt']));
+
+			redirectexit('action=auth;sa=check;member=' . $memberID, $context['server']['needs_login_fix']);
+		}]]></search>
+			<add><![CDATA[		{
+			call_integration_hook('integrate_activate', array($regOptions['username'], 1, 1));
+
+			setLoginCookie(60 * $modSettings['cookieTime'], $memberID, hash('sha256', $regOptions['register_vars']['passwd'] . $regOptions['register_vars']['password_salt']));
+
+			redirectexit('action=auth;sa=check;member=' . $memberID, $context['server']['needs_login_fix']);
+		}]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+			$context['page_title'] = $txt['invalid_activation_resend'];
+
+			// This will ensure we don't actually get an error message if it works!
+			$context['error_title'] = '';
+]]></search>
+			<add><![CDATA[
+			$context['page_title'] = $txt['invalid_activation_resend'];
+
+			// Don't let them wack away on their resend
+			spamProtection('remind');
+
+			// This will ensure we don't actually get an error message if it works!
+			$context['error_title'] = '';
+]]></add>
+		</operation>
+	</file>
+	<file name="CONTROLLERDIR/Reminder.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+		// No where params just yet
+		$where_params = array();
+
+		// Coming with a known ID?
+		if (!empty($_REQUEST['uid']))]]></search>
+			<add><![CDATA[
+		// No where params just yet
+		$where_params = array();
+		$where = '';
+
+		// Clean them up
+		$_POST['user'] = isset($_POST['user']) ? Util::htmlspecialchars($_POST['user']) : '';
+		$_REQUEST['uid'] = (int) isset($_REQUEST['uid']) ? $_REQUEST['uid'] : 0;
+
+		// Coming with a known ID?
+		if (!empty($_REQUEST['uid']))]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			$where = 'id_member = {int:id_member}';
+			$where_params['id_member'] = (int) $_REQUEST['uid'];
+		}
+		elseif (isset($_POST['user']) && $_POST['user'] != '')
+		{
+			$where = 'member_name = {string:member_name}';
+			$where_params['member_name'] = $_POST['user'];]]></search>
+			<add><![CDATA[			$where = 'id_member = {int:id_member}';
+			$where_params['id_member'] = (int) $_REQUEST['uid'];
+		}
+		elseif ($_POST['user'] != '')
+		{
+			$where = 'member_name = {string:member_name}';
+			$where_params['member_name'] = $_POST['user'];]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		$context += array(
+			'page_title' => $txt['reminder_set_password'],
+			'sub_template' => 'set_password',
+			'code' => $_REQUEST['code'],
+			'memID' => (int) $_REQUEST['u']
+		);
+]]></search>
+			<add><![CDATA[		$context += array(
+			'page_title' => $txt['reminder_set_password'],
+			'sub_template' => 'set_password',
+			'code' => Util::htmlspecialchars($_REQUEST['code']),
+			'memID' => (int) $_REQUEST['u']
+		);
+]]></add>
+		</operation>
+	</file>
+	<file name="CONTROLLERDIR/SplitTopics.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.2
+ *
+ * Original module by Mach8 - We'll never forget you.
+ */]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ * Original module by Mach8 - We'll never forget you.
+ */]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		// This is a special case for split topics from quick-moderation checkboxes
+		if (isset($_REQUEST['subname_enc']))
+		{
+			$this->_new_topic_subject = urldecode($_REQUEST['subname_enc']);
+			$this->_set_session_values();
+		}
+]]></search>
+			<add><![CDATA[		// This is a special case for split topics from quick-moderation checkboxes
+		if (isset($_REQUEST['subname_enc']))
+		{
+			$this->_new_topic_subject = trim(Util::htmlspecialchars(urldecode($_REQUEST['subname_enc'])));
+			$this->_set_session_values();
+		}
+]]></add>
+		</operation>
+	</file>
+	<file name="CONTROLLERDIR/Suggest.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.8
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	die('No access...');
+
+/**
+ * Suggest Controler
+ */
+class Suggest_Controller extends Action_Controller
+{]]></search>
+			<add><![CDATA[	die('No access...');
+
+/**
+ * Suggest Controller
+ */
+class Suggest_Controller extends Action_Controller
+{]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[				$suggest = new $currentSearch['class'];
+
+				// Okay, let's at least assume the method exists... *rolleyes*
+				$context['xml_data'] = $suggest->$currentSearch['function']();
+			}
+			// Let's maintain the "namespace" action_suggest_
+			elseif (function_exists('action_suggest_' . $currentSearch['function']))]]></search>
+			<add><![CDATA[				$suggest = new $currentSearch['class'];
+
+				// Okay, let's at least assume the method exists... *rolleyes*
+				$context['xml_data'] = $suggest->{$currentSearch['function']}();
+			}
+			// Let's maintain the "namespace" action_suggest_
+			elseif (function_exists('action_suggest_' . $currentSearch['function']))]]></add>
+		</operation>
+	</file>
+	<file name="SOURCEDIR/database/DbTable-mysql.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		list ($type, $size) = $this->db_calculate_type($column['type'], $column['size']);
+
+		// Allow unsigned integers (mysql only)
+		$unsigned = in_array($type, array('int', 'tinyint', 'smallint', 'mediumint', 'bigint')) && !empty($column['unsigned']) ? 'unsigned ' : '';
+
+		if ($size !== null)
+			$type = $type . '(' . $size . ')';]]></search>
+			<add><![CDATA[		list ($type, $size) = $this->db_calculate_type($column['type'], $column['size']);
+
+		// Allow unsigned integers (mysql only)
+		$unsigned = in_array($type, array('int', 'tinyint', 'smallint', 'mediumint', 'bigint', 'float')) && !empty($column['unsigned']) ? 'unsigned ' : '';
+
+		if ($size !== null)
+			$type = $type . '(' . $size . ')';]]></add>
+		</operation>
+	</file>
+	<file name="SUBSDIR/Attachments.subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.8
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation error="ignore">
+			<search position="replace"><![CDATA[		// This is a generic error
+		$attach_errors->activate();
+		$attach_errors->addError('attach_no_upload');
+		$attach_errors->addError(is_array($attachment) ? array($attachment[0], $attachment[1]) : $attachment);
+
+		// And delete the files 'cos they ain't going nowhere.
+		foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)]]></search>
+			<add><![CDATA[		// This is a generic error
+		$attach_errors->activate();
+		$attach_errors->addError('attach_no_upload');
+		// @todo This is likely the result of some refactoring, verify when $attachment is not set and why
+		if (isset($attachment))
+		{
+			$attach_errors->addError(is_array($attachment) ? array($attachment[0], $attachment[1]) : $attachment);
+		}
+
+		// And delete the files 'cos they ain't going nowhere.
+		foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		if (empty($_SESSION['temp_attachments'][$attachID]['errors']))
+			attachmentChecks($attachID);
+
+		// Sort out the errors for display and delete any associated files.
+		if (!empty($_SESSION['temp_attachments'][$attachID]['errors']))
+		{]]></search>
+			<add><![CDATA[		if (empty($_SESSION['temp_attachments'][$attachID]['errors']))
+			attachmentChecks($attachID);
+
+		// Want to correct for phonetographer photos?
+		if (!empty($modSettings['attachment_autorotate']) && empty($_SESSION['temp_attachments'][$attachID]['errors']) && substr($_SESSION['temp_attachments'][$attachID]['type'], 0, 5) === 'image')
+		{
+			autoRotateImage($_SESSION['temp_attachments'][$attachID]['tmp_name']);
+		}
+
+		// Sort out the errors for display and delete any associated files.
+		if (!empty($_SESSION['temp_attachments'][$attachID]['errors']))
+		{]]></add>
+		</operation>
+	</file>
+	<file name="SUBSDIR/Graphics.subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.7
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			// Get a new instance of Imagick for use
+			$imagick = new Imagick($destName);
+
+			// Fix image rotations for iphone cameras etc.
+			autoRotateImage($imagick);
+
+			// Set the input and output image size
+			$src_width = empty($src_width) ? $imagick->getImageWidth() : $src_width;
+			$src_height = empty($src_height) ? $imagick->getImageHeight() : $src_height;
+			$dest_width = empty($max_width) ? $src_width : $max_width;
+			$dest_height = empty($max_height) ? $src_height : $max_height;
+
+			// Set jpeg image quality to 80
+			if ($default_formats[$preferred_format] === 'jpeg')
+			{
+				$imagick->setImageCompression(Imagick::COMPRESSION_JPEG);
+				$imagick->setImageCompressionQuality(80);
+			}]]></search>
+			<add><![CDATA[			// Get a new instance of Imagick for use
+			$imagick = new Imagick($destName);
+
+			// Set the input and output image size
+			$src_width = empty($src_width) ? $imagick->getImageWidth() : $src_width;
+			$src_height = empty($src_height) ? $imagick->getImageHeight() : $src_height;
+
+			// The behavior of bestfit changed in Imagick 3.0.0 and it will now scale up, we prevent that
+			$dest_width = empty($max_width) ? $src_width : min($max_width, $src_width);
+			$dest_height = empty($max_height) ? $src_height : min($max_height, $src_height);
+
+			// Set jpeg image quality to 80
+			if ($default_formats[$preferred_format] === 'jpeg')
+			{
+				$imagick->borderImage('white', 0, 0);
+				$imagick->setImageCompression(Imagick::COMPRESSION_JPEG);
+				$imagick->setImageCompressionQuality(80);
+			}]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			$success = $imagick->writeImage($destName);
+
+			// Free resources associated with the Imagick object
+			$imagick->destroy();
+		}
+		catch(Exception $e)
+		{]]></search>
+			<add><![CDATA[			$success = $imagick->writeImage($destName);
+
+			// Free resources associated with the Imagick object
+			$imagick->clear();
+		}
+		catch(Exception $e)
+		{]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[}
+
+/**
+ * Autorotate an image based on its EXIF Orientation tag.
+ *
+ * - ImageMagick only
+ * - Checks exif data for orientation flag and rotates image so its proper
+ * - Updates orientation flag if rotation was required
+ *
+ * @param object $image
+ */
+function autoRotateImage($image)
+{
+	// This method should exist if Imagick has been compiled against ImageMagick version
+	// 6.3.0 or higher which is forever ago, but we check anyway ;)
+	if (!method_exists($image , 'getImageOrientation'))
+		return;
+
+	$orientation = $image->getImageOrientation();
+
+	switch ($orientation)
+	{
+		// (0 & 1) Not set or Normal
+		case imagick::ORIENTATION_UNDEFINED:
+		case imagick::ORIENTATION_TOPLEFT:
+			break;
+		// (2) Mirror image, Normal orientation
+		case imagick::ORIENTATION_TOPRIGHT:
+			$image->flopImage();
+			break;
+		// (3) Normal image, rotated 180
+		case imagick::ORIENTATION_BOTTOMRIGHT:
+			$image->rotateImage("#000", 180);
+			break;
+		// (4) Mirror image, rotated 180
+		case imagick::ORIENTATION_BOTTOMLEFT:
+			$image->rotateImage("#000", 180);
+			$image->flopImage();
+			break;
+		// (5) Mirror image, rotated 90 CCW
+		case imagick::ORIENTATION_LEFTTOP:
+			$image->rotateImage("#000", 90);
+			$image->flopImage();
+			break;
+		// (6) Normal image, rotated 90 CCW
+		case imagick::ORIENTATION_RIGHTTOP:
+			$image->rotateImage("#000", 90);
+			break;
+		// (7) Mirror image, rotated 90 CW
+		case imagick::ORIENTATION_RIGHTBOTTOM:
+			$image->rotateImage("#000", -90);
+			$image->flopImage();
+			break;
+		// (8) Normal image, rotated 90 CW
+		case imagick::ORIENTATION_LEFTBOTTOM:
+			$image->rotateImage("#000", -90);
+			break;
+	}
+
+	// Now that it's auto-rotated, make sure the EXIF data is correctly updated
+	if ($orientation >= 2)
+		$image->setImageOrientation(imagick::ORIENTATION_TOPLEFT);
+}
+
+/**]]></search>
+			<add><![CDATA[}
+
+/**
+ * Calls GD or ImageMagick functions to correct an images orientation
+ * based on the EXIF orientation flag
+ *
+ * @param string $image_name
+ */
+function autoRotateImage($image_name)
+{
+	if (checkImagick())
+	{
+		autoRotateImageWithIM($image_name);
+	}
+	elseif (checkGD())
+	{
+		autoRotateImageWithGD($image_name);
+	}
+}
+
+/**
+ * Autorotate an image based on its EXIF Orientation tag.
+ *
+ * What it does:
+ * - GD only
+ * - Checks exif data for orientation flag and rotates image so its proper
+ * - Does not update orientation flag as GD removes EXIF data
+ * - Only works with jpeg images, could add TIFF as well
+ * - Writes the update image back to $image_name
+ *
+ * @package Graphics
+ * @uses GD
+ * @param string $image_name full location of the file
+ */
+function autoRotateImageWithGD($image_name)
+{
+	// Read the EXIF data
+	$exif = function_exists('exif_read_data') ? @exif_read_data($image_name) : array();
+
+	// We're only interested in the exif orientation
+	$orientation = isset($exif['Orientation']) ? $exif['Orientation'] : 0;
+
+	// For now we only process jpeg images, so check that we have one
+	$sizes = @getimagesize($image_name);
+
+	// Not a jpeg or not rotated, done!
+	if ($sizes === false || $sizes[2] !== 2 || $orientation === 0 || !imageMemoryCheck($sizes))
+	{
+		return false;
+	}
+
+	// Load the image object so we can begin the transformation(s)
+	$source = imagecreatefromjpeg($image_name);
+
+	// Time to spin and mirror as needed
+	switch ($orientation)
+	{
+		// 0 & 1 Not set or Normal
+		case 0:
+		case 1:
+			break;
+		// 2 Mirror image, Normal orientation
+		case 2:
+			$source = flopImageGD($source, $sizes);
+			break;
+		// 3 Normal image, rotated 180
+		case 3:
+			$source = rotateImageGD($source, 180);
+			break;
+		// 4 Mirror image, rotated 180
+		case 4:
+			$source = flipImageGD($source, $sizes);
+			break;
+		// 5 Mirror image, rotated 90 CCW
+		case 5:
+			$source = flopImageGD($source, $sizes);
+			$source = rotateImageGD($source, 90);
+			break;
+		// 6 Normal image, rotated 90 CCW
+		case 6:
+			$source = rotateImageGD($source, -90);
+			break;
+		// 7 Mirror image, rotated 90 CW
+		case 7:
+			$source = flopImageGD($source, $sizes);
+			$source = rotateImageGD($source, -90);
+			break;
+		// 8 Normal image, rotated 90 CW
+		case 8:
+			$source = rotateImageGD($source, 90);
+			break;
+	}
+
+	// Save the updated image, free resources
+	imagejpeg($source, $image_name);
+	imagedestroy($source);
+
+	return true;
+}
+
+/**
+ * Autorotate an image based on its EXIF Orientation tag.
+ *
+ * - ImageMagick only
+ * - Checks exif data for orientation flag and rotates image so its proper
+ * - Updates orientation flag if rotation was required
+ *
+ * @param object $image_name
+ */
+function autoRotateImageWithIM($image_name)
+{
+	// Get a new instance of Imagick for use
+	$image = new Imagick($image_name);
+
+	// This method should exist if Imagick has been compiled against ImageMagick version
+	// 6.3.0 or higher which is forever ago, but we check anyway ;)
+	if (!method_exists($image, 'getImageOrientation'))
+		return false;
+
+	$orientation = $image->getImageOrientation();
+	switch ($orientation)
+	{
+		// 0 & 1 Not set or Normal
+		case Imagick::ORIENTATION_UNDEFINED:
+		case Imagick::ORIENTATION_TOPLEFT:
+			break;
+		// 2 Mirror image, Normal orientation
+		case Imagick::ORIENTATION_TOPRIGHT:
+			$image->flopImage();
+			break;
+		// 3 Normal image, rotated 180
+		case Imagick::ORIENTATION_BOTTOMRIGHT:
+			$image->rotateImage('#000', 180);
+			break;
+		// 4 Mirror image, rotated 180
+		case Imagick::ORIENTATION_BOTTOMLEFT:
+			$image->flipImage();
+			break;
+		// 5 Mirror image, rotated 90 CCW
+		case Imagick::ORIENTATION_LEFTTOP:
+			$image->rotateImage('#000', 90);
+			$image->flopImage();
+			break;
+		// 6 Normal image, rotated 90 CCW
+		case Imagick::ORIENTATION_RIGHTTOP:
+			$image->rotateImage('#000', 90);
+			break;
+		// 7 Mirror image, rotated 90 CW
+		case Imagick::ORIENTATION_RIGHTBOTTOM:
+			$image->rotateImage('#000', -90);
+			$image->flopImage();
+			break;
+		// 8 Normal image, rotated 90 CW
+		case Imagick::ORIENTATION_LEFTBOTTOM:
+			$image->rotateImage('#000', -90);
+			break;
+	}
+
+	// Now that it's auto-rotated, make sure the EXIF data is correctly updated
+	if ($orientation >= 2)
+	{
+		$image->setImageOrientation(Imagick::ORIENTATION_TOPLEFT);
+	}
+
+	// Save the new image in the destination location
+	$success = $image->writeImage($image_name);
+
+	// Free resources associated with the Imagick object
+	$image->clear();
+
+	return $success;
+}
+
+/**
+ * Rotate an image by X degrees, GD function
+ *
+ * @param resource $image
+ * @param int $degrees
+ *
+ * @package Graphics
+ * @uses GD
+ * @return resource
+ */
+function rotateImageGD($image, $degrees)
+{
+	// Kind of need this to do anything
+	if (function_exists('imagerotate'))
+	{
+		// Use positive degrees so GD does not get confused
+		$degrees -= floor($degrees / 360) * 360;
+
+		// Rotate away
+		$background = imagecolorallocatealpha($image, 255, 255, 255, 127);
+		$image = imagerotate($image, $degrees, $background);
+	}
+
+	return $image;
+}
+
+/**
+ * Flop an image using GD functions by copying top to bottom / flop
+ *
+ * @param resource $image
+ * @param array $sizes populated with getimagesize results
+ *
+ * @package Graphics
+ * @uses GD
+ * @return resource
+ */
+function flopImageGD($image, $sizes)
+{
+	return flipImageGD($image, $sizes, 'horizontal');
+}
+
+/**
+ * Flip an image using GD function by copying top to bottom / flip vertical
+ *
+ * @param resource $image
+ * @param array $sizes populated with getimagesize results
+ * @param string $axis vertical for flip about vertical otherwise horizontal flip
+ *
+ * @package Graphics
+ * @uses GD
+ * @return resource
+ */
+function flipImageGD($image, $sizes, $axis = 'vertical')
+{
+	// If the built in function (php 5.5) is available, use it
+	if (function_exists('imageflip'))
+	{
+		imageflip($image, $axis === 'vertical' ? IMG_FLIP_VERTICAL : IMG_FLIP_HORIZONTAL);
+	}
+	// Pixel mapping then
+	else
+	{
+		$new = imagecreatetruecolor($sizes[0], $sizes[1]);
+		imagealphablending($new, false);
+		imagesavealpha($new, true);
+
+		if ($axis === 'vertical')
+		{
+			for ($y = 0; $y < $sizes[1]; $y++)
+			{
+				imagecopy($new, $image, 0, $y, 0, $sizes[1] - $y - 1, $sizes[0], 1);
+			}
+		}
+		else
+		{
+			for ($x = 0; $x < $sizes[0]; $x++)
+			{
+				imagecopy($new, $image, $x, 0, $sizes[0] - $x - 1, 0, 1, $sizes[1]);
+			}
+		}
+
+		$image = $new;
+		unset($new);
+	}
+
+	return $image;
+}
+
+/**]]></add>
+		</operation>
+	</file>
+	<file name="SUBSDIR/ManageSearch.subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.2
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	// Check paths are set, if not use some defaults
+	$modSettings['sphinx_data_path'] = empty($modSettings['sphinx_data_path']) ? '/var/sphinx/data' : $modSettings['sphinx_data_path'];
+	$modSettings['sphinx_log_path'] = empty($modSettings['sphinx_log_path']) ? '/var/sphinx/log' : $modSettings['sphinx_log_path'];
+
+	// Output our minimal configuration file to get them started
+	echo '#]]></search>
+			<add><![CDATA[	// Check paths are set, if not use some defaults
+	$modSettings['sphinx_data_path'] = empty($modSettings['sphinx_data_path']) ? '/var/sphinx/data' : $modSettings['sphinx_data_path'];
+	$modSettings['sphinx_log_path'] = empty($modSettings['sphinx_log_path']) ? '/var/sphinx/log' : $modSettings['sphinx_log_path'];
+	$prefix = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte');
+
+	// Output our minimal configuration file to get them started
+	echo '#]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[# /usr/local/etc/sphinx.conf
+#
+
+source elkarte_source
+{
+	type				= mysql
+	sql_host			= ', $db_server, ']]></search>
+			<add><![CDATA[# /usr/local/etc/sphinx.conf
+#
+
+source ', $prefix, '_source
+{
+	type				= mysql
+	sql_host			= ', $db_server, ']]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	sql_attr_timestamp	= num_replies
+}
+
+source elkarte_delta_source : elkarte_source
+{
+	sql_query_pre = SET NAMES utf8
+	sql_query_pre = SET SESSION query_cache_type=OFF]]></search>
+			<add><![CDATA[	sql_attr_timestamp	= num_replies
+}
+
+source ', $prefix, '_delta_source : ', $prefix, '_source
+{
+	sql_query_pre = SET NAMES utf8
+	sql_query_pre = SET SESSION query_cache_type=OFF]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			AND s2.variable = \'maxMsgID\'
+}
+
+index elkarte_base_index
+{
+	html_strip		= 1
+	source			= elkarte_source
+	path			= ', $modSettings['sphinx_data_path'], '/elkarte_sphinx_base.index', empty($modSettings['sphinx_stopword_path']) ? '' : '
+	stopwords		= ' . $modSettings['sphinx_stopword_path'], '
+	min_word_len	= 2
+	charset_type	= utf-8]]></search>
+			<add><![CDATA[			AND s2.variable = \'maxMsgID\'
+}
+
+index ', $prefix, '_base_index
+{
+	html_strip		= 1
+	source			= ', $prefix, '_source
+	path			= ', $modSettings['sphinx_data_path'], '/', $prefix, '_sphinx_base.index', empty($modSettings['sphinx_stopword_path']) ? '' : '
+	stopwords		= ' . $modSettings['sphinx_stopword_path'], '
+	min_word_len	= 2
+	charset_type	= utf-8]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	ignore_chars	= -, U+AD
+}
+
+index elkarte_delta_index : elkarte_base_index
+{
+	source			= elkarte_delta_source
+	path			= ', $modSettings['sphinx_data_path'], '/elkarte_sphinx_delta.index
+}
+
+index elkarte_index
+{
+	type			= distributed
+	local			= elkarte_base_index
+	local			= elkarte_delta_index
+}
+
+indexer]]></search>
+			<add><![CDATA[	ignore_chars	= -, U+AD
+}
+
+index ', $prefix, '_delta_index : ', $prefix, '_base_index
+{
+	source			= ', $prefix, '_delta_source
+	path			= ', $modSettings['sphinx_data_path'], '/', $prefix, '_sphinx_delta.index
+}
+
+index ', $prefix, '_index
+{
+	type			= distributed
+	local			= ', $prefix, '_base_index
+	local			= ', $prefix, '_delta_index
+}
+
+indexer]]></add>
+		</operation>
+	</file>
+	<file name="SUBSDIR/MembersOnline.subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.8
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+	// Get it from the cache and send it back.
+	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] > 1 && ($temp = cache_get_data('membersOnlineStats-' . $membersOnlineOptions['sort'], 240)) !== null)
+		return $temp;
+
+	// Initialize the array that'll be returned later on.
+	$membersOnlineStats = array(]]></search>
+			<add><![CDATA[
+	// Get it from the cache and send it back.
+	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] > 1 && ($temp = cache_get_data('membersOnlineStats-' . $membersOnlineOptions['sort'], 240)) !== null)
+		return filter_members_online($temp, empty($membersOnlineOptions['reverse_sort']) ? 'ksort' : 'krsort');
+
+	// Initialize the array that'll be returned later on.
+	$membersOnlineStats = array(]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			'is_last' => false,
+		);
+
+		// This is the compact version, simply implode it to show.
+		$membersOnlineStats['list_users_online'][$row[$membersOnlineOptions['sort']] . '_' . $row['member_name']] = empty($row['show_online']) ? '<em>' . $link . '</em>' : $link;
+
+		// Store all distinct (primary) membergroups that are shown.
+		if (!isset($membersOnlineStats['online_groups'][$row['id_group']]))
+			$membersOnlineStats['online_groups'][$row['id_group']] = array(]]></search>
+			<add><![CDATA[			'is_last' => false,
+		);
+
+		// Store all distinct (primary) membergroups that are shown.
+		if (!isset($membersOnlineStats['online_groups'][$row['id_group']]))
+			$membersOnlineStats['online_groups'][$row['id_group']] = array(]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		}
+	}
+
+	// Time to sort the list a bit.
+	if (!empty($membersOnlineStats['users_online']))
+	{
+		// Determine the sort direction.
+		$sortFunction = empty($membersOnlineOptions['reverse_sort']) ? 'ksort' : 'krsort';
+
+		// Sort the two lists.
+		$sortFunction($membersOnlineStats['users_online']);
+		$sortFunction($membersOnlineStats['list_users_online']);]]></search>
+			<add><![CDATA[		}
+	}
+
+	// Hidden and non-hidden members make up all online members.
+	$membersOnlineStats['num_users_online'] = count($membersOnlineStats['users_online']) + $membersOnlineStats['num_users_hidden'] - (isset($modSettings['show_spider_online']) && $modSettings['show_spider_online'] > 1 ? count($spider_finds) : 0);
+
+	cache_put_data('membersOnlineStats-' . $membersOnlineOptions['sort'], $membersOnlineStats, 240);
+
+	return filter_members_online($membersOnlineStats, empty($membersOnlineOptions['reverse_sort']) ? 'ksort' : 'krsort');
+}
+
+/**
+ * Post-retrieval processing.
+ * Needed mainly for when the cache is enabled and online users have to be
+ * filtered out based on permissions.
+ *
+ * @package Members
+ * @param mixed[] $membersOnlineStats
+ * @param string $sortFunction
+ * @return mixed[]
+ */
+function filter_members_online($membersOnlineStats, $sortFunction)
+{
+	global $modSettings;
+
+	foreach ($membersOnlineStats['users_online'] as $key => $row)
+	{
+		if (allowedTo('moderate_forum') === false && $row['hidden'])
+		{
+			continue;
+		}
+		// This is the compact version, simply implode it to show.
+		$membersOnlineStats['list_users_online'][$key] = $row['hidden'] ? '<em>' . $row['link'] . '</em>' : $row['link'];
+	}
+
+	// Time to sort the list a bit.
+	if (!empty($membersOnlineStats['users_online']))
+	{
+		// Sort the two lists.
+		$sortFunction($membersOnlineStats['users_online']);
+		$sortFunction($membersOnlineStats['list_users_online']);]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	// Also sort the membergroups.
+	ksort($membersOnlineStats['online_groups']);
+
+	// Hidden and non-hidden members make up all online members.
+	$membersOnlineStats['num_users_online'] = count($membersOnlineStats['users_online']) + $membersOnlineStats['num_users_hidden'] - (isset($modSettings['show_spider_online']) && $modSettings['show_spider_online'] > 1 ? count($spider_finds) : 0);
+
+	cache_put_data('membersOnlineStats-' . $membersOnlineOptions['sort'], $membersOnlineStats, 240);
+
+	return $membersOnlineStats;
+}
+]]></search>
+			<add><![CDATA[	// Also sort the membergroups.
+	ksort($membersOnlineStats['online_groups']);
+
+	return $membersOnlineStats;
+}
+]]></add>
+		</operation>
+	</file>
+	<file name="SUBSDIR/Package.subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.8
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		$result = package_chmod($filename);
+
+		// If we are not doing our test pass, then lets do a full write check
+		if (!$trash)
+		{
+			// Acid test, can we really open this file for writing?
+			$fp = ($result) ? fopen($filename, 'r+') : $result;]]></search>
+			<add><![CDATA[		$result = package_chmod($filename);
+
+		// If we are not doing our test pass, then lets do a full write check
+		if (!$trash && !is_dir($filename))
+		{
+			// Acid test, can we really open this file for writing?
+			$fp = ($result) ? fopen($filename, 'r+') : $result;]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+	foreach ($package_cache as $filename => $data)
+	{
+		$fp = fopen($filename, in_array(substr($filename, -3), $text_filetypes) ? 'w' : 'wb');
+		fwrite($fp, $data);
+		fclose($fp);
+	}
+
+	$package_cache = array();]]></search>
+			<add><![CDATA[
+	foreach ($package_cache as $filename => $data)
+	{
+		if (!is_dir($filename))
+		{
+			$fp = fopen($filename, in_array(substr($filename, -3), $text_filetypes) ? 'w' : 'wb');
+			fwrite($fp, $data);
+			fclose($fp);
+		}
+	}
+
+	$package_cache = array();]]></add>
+		</operation>
+	</file>
+	<file name="SUBSDIR/Profile.subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.6
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[/**
+ * Save the profile changes.
+ */
+function saveProfileFields()
+{
+	global $profile_fields, $profile_vars, $context, $old_profile, $post_errors, $cur_profile;
+
+	// Load them up.
+	loadProfileFields();
+]]></search>
+			<add><![CDATA[/**
+ * Save the profile changes.
+ */
+function saveProfileFields($fields, $hook)
+{
+	global $profile_fields, $profile_vars, $context, $old_profile, $post_errors, $cur_profile;
+
+	if (!empty($hook))
+		call_integration_hook('integrate_' . $hook . '_profile_fields', array(&$fields));
+
+	// Load them up.
+	loadProfileFields();
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	$context['log_changes'] = array();
+
+	// Cycle through the profile fields working out what to do!
+	foreach ($profile_fields as $key => $field)
+	{
+		if (!isset($_POST[$key]) || !empty($field['is_dummy']) || (isset($_POST['preview_signature']) && $key == 'signature'))
+			continue;
+]]></search>
+			<add><![CDATA[	$context['log_changes'] = array();
+
+	// Cycle through the profile fields working out what to do!
+	foreach ($fields as $key)
+	{
+		if (!isset($profile_fields[$key]))
+		{
+			continue;
+		}
+
+		$field = $profile_fields[$key];
+
+		if (!isset($_POST[$key]) || !empty($field['is_dummy']) || (isset($_POST['preview_signature']) && $key == 'signature'))
+			continue;
+]]></add>
+		</operation>
+	</file>
+	<file name="SUBSDIR/SearchAPI-Sphinx.class.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			$mySphinx->SetMatchMode($mode);
+
+			// Execute the search query.
+			$request = $mySphinx->Query($query, 'elkarte_index');
+
+			// Can a connection to the daemon be made?
+			if ($request === false)]]></search>
+			<add><![CDATA[			$mySphinx->SetMatchMode($mode);
+
+			// Execute the search query.
+			$index = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte') . '_index';
+			$request = $mySphinx->Query($query, $index);
+
+			// Can a connection to the daemon be made?
+			if ($request === false)]]></add>
+		</operation>
+	</file>
+	<file name="SUBSDIR/SearchAPI-Sphinxql.class.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.2
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[				fatal_lang_error('error_no_search_daemon');
+
+			// Compile different options for our query
+			$query = 'SELECT *' . (empty($search_params['topic']) ? ', COUNT(*) num' : '') . ', WEIGHT() weights, (weights + (relevance/1000)) rank FROM elkarte_index';
+
+			// Construct the (binary mode & |) query.
+			$where_match = $this->_constructQuery($search_params['search']);]]></search>
+			<add><![CDATA[				fatal_lang_error('error_no_search_daemon');
+
+			// Compile different options for our query
+			$index = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte') . '_index';
+			$query = 'SELECT *' . (empty($search_params['topic']) ? ', COUNT(*) num' : '') . ', WEIGHT() weights, (weights + (relevance/1000)) rank FROM ' . $index;
+
+			// Construct the (binary mode & |) query.
+			$where_match = $this->_constructQuery($search_params['search']);]]></add>
+		</operation>
+	</file>
+	<file name="SUBSDIR/SettingsForm.class.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.8
+ *
+ *
+ * Adding options to one of the setting screens isn't hard.]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ *
+ * Adding options to one of the setting screens isn't hard.]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			else
+			{
+				$varname = $config_var[0];
+				global $$varname;
+
+				// Set the subtext in case it's part of the label.
+				// @todo Temporary. Preventing divs inside label tags.]]></search>
+			<add><![CDATA[			else
+			{
+				$varname = $config_var[0];
+				global ${$varname};
+
+				// Set the subtext in case it's part of the label.
+				// @todo Temporary. Preventing divs inside label tags.]]></add>
+		</operation>
+	</file>
+	<file name="SUBSDIR/Subscriptions-PayPal.class.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+		// Post IPN data back to PayPal to validate the IPN data is genuine
+		// First we try cURL
+		if (function_exists('curl_init') && $curl = curl_init((!empty($modSettings['paidsubs_test']) ? 'https://www.sandbox.' : 'http://www.') . 'paypal.com/cgi-bin/webscr'))
+		{
+			// Set the post data.
+			curl_setopt($curl, CURLOPT_POST, true);]]></search>
+			<add><![CDATA[
+		// Post IPN data back to PayPal to validate the IPN data is genuine
+		// First we try cURL
+		if (function_exists('curl_init') && $curl = curl_init((!empty($modSettings['paidsubs_test']) ? 'https://www.sandbox.' : 'https://www.') . 'paypal.com/cgi-bin/webscr'))
+		{
+			// Set the post data.
+			curl_setopt($curl, CURLOPT_POST, true);]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			if (!empty($modSettings['paidsubs_test']))
+				$fp = fsockopen('ssl://www.sandbox.paypal.com', 443, $errno, $errstr, 30);
+			else
+				$fp = fsockopen('www.paypal.com', 80, $errno, $errstr, 30);
+
+			// Did it work?
+			if (!$fp)]]></search>
+			<add><![CDATA[			if (!empty($modSettings['paidsubs_test']))
+				$fp = fsockopen('ssl://www.sandbox.paypal.com', 443, $errno, $errstr, 30);
+			else
+				$fp = fsockopen('ssl://www.paypal.com', 443, $errno, $errstr, 30);
+
+			// Did it work?
+			if (!$fp)]]></add>
+		</operation>
+	</file>
+	<file name="SUBSDIR/Util.class.php">
+		<operation>
+			<search position="replace"><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0.8
+ *
+ */
+]]></search>
+			<add><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+		// Strip the slashes from every element.
+		foreach ($var as $k => $v)
+			$new_var[stripslashes($k)] = $level > 25 ? null : stripslashes_recursive($v, $level + 1);
+
+		return $new_var;
+	}]]></search>
+			<add><![CDATA[
+		// Strip the slashes from every element.
+		foreach ($var as $k => $v)
+			$new_var[stripslashes($k)] = $level > 25 ? null : self::stripslashes_recursive($v, $level + 1);
+
+		return $new_var;
+	}]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/Admin.template.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.5
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[					echo '
+							<fieldset id="', $config_var['name'], '">
+								<legend>', $txt['bbcTagsToUse_select'], '</legend>
+								<ul>';
+
+					foreach ($context['bbc_columns'] as $bbcColumn)
+					{
+						foreach ($bbcColumn as $bbcTag)
+							echo '
+									<li class="list_bbc floatleft">
+										<input type="checkbox" name="', $config_var['name'], '_enabledTags[]" id="tag_', $config_var['name'], '_', $bbcTag['tag'], '" value="', $bbcTag['tag'], '"', !in_array($bbcTag['tag'], $context['bbc_sections'][$config_var['name']]['disabled']) ? ' checked="checked"' : '', ' class="input_check" /> <label for="tag_', $config_var['name'], '_', $bbcTag['tag'], '">', $bbcTag['tag'], '</label>', $bbcTag['show_help'] ? ' (<a href="' . $scripturl . '?action=quickhelp;help=tag_' . $bbcTag['tag'] . '" onclick="return reqOverlayDiv(this.href);">?</a>)' : '', '
+									</li>';
+					}]]></search>
+			<add><![CDATA[					echo '
+							<fieldset id="', $config_var['name'], '">
+								<legend>', $txt['bbcTagsToUse_select'], '</legend>
+								<ul class="list_bbc">';
+
+					foreach ($context['bbc_columns'] as $bbcColumn)
+					{
+						foreach ($bbcColumn as $bbcTag)
+							echo '
+									<li>
+										<input type="checkbox" name="', $config_var['name'], '_enabledTags[]" id="tag_', $config_var['name'], '_', $bbcTag['tag'], '" value="', $bbcTag['tag'], '"', !in_array($bbcTag['tag'], $context['bbc_sections'][$config_var['name']]['disabled']) ? ' checked="checked"' : '', ' class="input_check" /> <label for="tag_', $config_var['name'], '_', $bbcTag['tag'], '">', $bbcTag['tag'], '</label>', $bbcTag['show_help'] ? ' (<a href="' . $scripturl . '?action=quickhelp;help=tag_' . $bbcTag['tag'] . '" onclick="return reqOverlayDiv(this.href);">?</a>)' : '', '
+									</li>';
+					}]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/Display.template.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.6
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+		if ($attachment['is_image'])
+		{
+			echo '
+										<div class="attachment_thumb">';
+
+			if ($attachment['thumbnail']['has_thumb'])
+				echo '
+											<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" onclick="', $attachment['thumbnail']['javascript'], '"><img src="', $attachment['thumbnail']['href'], '" alt="" id="thumb_', $attachment['id'], '" /></a>';
+			else
+				echo '
+											<img src="' . $attachment['href'] . ';image" alt="" style="width:' . $attachment['width'] . 'px; height:' . $attachment['height'] . 'px;"/>';
+
+			echo '
+										</div>';
+		}
+
+		echo '
+										<div class="attachment_name">
+											<a href="' . $attachment['href'] . '"><img src="' . $settings['images_url'] . '/icons/clip.png" class="centericon" alt="*" />&nbsp;' . $attachment['name'] . '</a> ';
+
+		if (!$attachment['is_approved'] && $context['can_approve'])
+			echo '
+											<a class="linkbutton" href="', $scripturl, '?action=attachapprove;sa=approve;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve'], '</a>&nbsp;|&nbsp;<a class="linkbutton" href="', $scripturl, '?action=attachapprove;sa=reject;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['delete'], '</a>';
+		echo '
+											<br />', $attachment['size'], ($attachment['is_image'] ? ', ' . $attachment['real_width'] . 'x' . $attachment['real_height'] . '<br />' . sprintf($txt['attach_viewed'], $attachment['downloads']) : '<br />' . sprintf($txt['attach_downloaded'], $attachment['downloads'])), '
+										</div>';
+
+		echo '
+									</div>';
+	}
+]]></search>
+			<add><![CDATA[
+		if ($attachment['is_image'])
+		{
+			if ($attachment['thumbnail']['has_thumb'])
+				echo '
+											<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" onclick="', $attachment['thumbnail']['javascript'], '">
+												<img class="attachment_image" src="', $attachment['thumbnail']['href'], '" alt="" id="thumb_', $attachment['id'], '" />
+											</a>';
+			else
+				echo '
+											<img class="attachment_image" src="', $attachment['href'], ';image" alt="" style="width:', $attachment['width'], 'px; height:', $attachment['height'], 'px;" />';
+		}
+
+		echo '
+											<a href="', $attachment['href'], '" class="attachment_name">', $attachment['name'], '</a>
+											<span class="attachment_details">', $attachment['size'], ($attachment['is_image'] ? ', ' . $attachment['real_width'] . 'x' . $attachment['real_height'] . ' - ' . sprintf($txt['attach_viewed'], $attachment['downloads']) : ' ' . sprintf($txt['attach_downloaded'], $attachment['downloads'])) . '</span>';
+
+		if (!$attachment['is_approved'] && $context['can_approve'])
+			echo '
+											<a class="linkbutton" href="', $scripturl, '?action=attachapprove;sa=approve;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve'], '</a>&nbsp;|&nbsp;<a class="linkbutton" href="', $scripturl, '?action=attachapprove;sa=reject;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['delete'], '</a>';
+		echo '
+									</div>';
+	}
+]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/GenericControls.template.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.4
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			function elk_editor() {',
+				!empty($context['bbcodes_handlers']) ? $context['bbcodes_handlers'] : '', '
+				$("#', $editor_id, '").sceditor({
+					style: "', $settings['theme_url'], '/css/', $context['theme_variant_url'], 'jquery.sceditor.elk_wiz', $context['theme_variant'], '.css",
+					width: "100%",
+					toolbarContainer: $("#editor_toolbar_container"),
+					resizeWidth: false,]]></search>
+			<add><![CDATA[			function elk_editor() {',
+				!empty($context['bbcodes_handlers']) ? $context['bbcodes_handlers'] : '', '
+				$("#', $editor_id, '").sceditor({
+					style: "', $settings['theme_url'], '/css/', $context['theme_variant_url'], 'jquery.sceditor.elk_wiz', $context['theme_variant'], '.css', CACHE_STALE, '",
+					width: "100%",
+					toolbarContainer: $("#editor_toolbar_container"),
+					resizeWidth: false,]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/GenericHelpers.template.php">
+		<operation>
+			<search position="replace"><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+	echo '
+				<li class="check_all">
+					<input type="checkbox" id="check_all" ', $all_selected ? 'checked="checked" ' : '', 'onclick="invertAll(this, this.form, \'groups\');" class="input_check" />
+					<label for="check_all">', $txt['check_all'], '</label>
+				</li>
+			</ul>]]></search>
+			<add><![CDATA[
+	echo '
+				<li class="check_all">
+					<input type="checkbox" id="check_all" ', $all_selected ? 'checked="checked" ' : '', 'onclick="invertAll(this, this.form, \'', $current_group_list['id'], '\');" class="input_check" />
+					<label for="check_all">', $txt['check_all'], '</label>
+				</li>
+			</ul>]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/ManageSearch.template.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.2
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[				<div class="content">
+					<dl class="settings">
+						<dt>
+							<label for="sphinx_data_path_input"><strong>', $txt['sphinx_index_data_path'], '</strong></label><br />
+							<span class="smalltext">', $txt['sphinx_index_data_path_desc'], '</span>
+						</dt>]]></search>
+			<add><![CDATA[				<div class="content">
+					<dl class="settings">
+						<dt>
+							<label for="sphinx_index_prefix_input"><strong>', $txt['sphinx_index_prefix'], '</strong></label><br />
+							<span class="smalltext">', $txt['sphinx_index_prefix_desc'], '</span>
+						</dt>
+						<dd>
+							<input type="text" name="sphinx_index_prefix" id="sphinx_index_prefix_input" value="', isset($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_data_path'] : 'elkarte', '" size="65" />
+						</dd>
+						<dt>
+							<label for="sphinx_data_path_input"><strong>', $txt['sphinx_index_data_path'], '</strong></label><br />
+							<span class="smalltext">', $txt['sphinx_index_data_path_desc'], '</span>
+						</dt>]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/Poll.template.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/css/_besocial/index_besocial.css">
+		<operation>
+			<search position="replace"><![CDATA[	opacity: 0.9;
+}
+
+/*	$PROFILE		*/
+/* ------------------------------------------------------- */
+#warndiv .ui-widget-header {]]></search>
+			<add><![CDATA[	opacity: 0.9;
+}
+
+/* attachment details below thumbnails */
+.attachment_name, .attachment_details {
+	border: solid 1px #afafaf;
+	color: #444 !important;
+}
+.attachment_name {
+	border-bottom: none;
+	border-radius: .25em .25em 0 0;
+}
+.attachment_details {
+	border-top: none;
+	border-radius: 0 0 .25em .25em;
+}
+
+/*	$PROFILE		*/
+/* ------------------------------------------------------- */
+#warndiv .ui-widget-header {]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/css/_besocial/jquery.sceditor.elk_wiz_besocial.css">
+		<operation>
+			<search position="replace"><![CDATA[	padding: 0;
+	color: #444;
+}
+[contenteditable="true"] {
+	font: 90%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
+}]]></search>
+			<add><![CDATA[	padding: 0;
+	color: #444;
+}
+html {
+	overflow: auto;
+	height: 100%;
+	-webkit-overflow-scrolling: touch;
+}
+body {
+	position: relative;
+	overflow: auto;
+	min-height: 100%;
+	word-wrap: break-word;
+}
+[contenteditable="true"] {
+	font: 90%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
+}]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/css/_light/index_light.css">
+		<operation>
+			<search position="replace"><![CDATA[.signature, .attachments, .custom_fields_above_signature {
+	border-top: 1px solid #bfbfbf;
+}
+/* Used by video embed JS when autolinking video links */
+.elk_video {
+	border: #27a348 1px solid;]]></search>
+			<add><![CDATA[.signature, .attachments, .custom_fields_above_signature {
+	border-top: 1px solid #bfbfbf;
+}
+
+/* attachment details below thumbnails */
+.attachment_name, .attachment_details {
+	border: solid 1px #afafaf;
+	background: #E4E4E4 !important;
+	color: #444 !important;
+	border-bottom: 1px solid #afafaf !important;
+}
+.attachment_name {
+	border-bottom: none;
+}
+.attachment_details {
+	border-top: none;
+	border-radius: 0 0 .5em .5em;
+}
+
+/* Used by video embed JS when autolinking video links */
+.elk_video {
+	border: #27a348 1px solid;]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/css/_light/jquery.sceditor.elk_wiz_light.css">
+		<operation>
+			<search position="replace"><![CDATA[	padding: 0;
+	color: #444;
+}
+[contenteditable="true"] {
+	font: 87.5%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", Arial, sans-serif;
+}]]></search>
+			<add><![CDATA[	padding: 0;
+	color: #444;
+}
+html {
+	overflow: auto;
+	height: 100%;
+	-webkit-overflow-scrolling: touch;
+}
+body {
+	position: relative;
+	overflow: auto;
+	min-height: 100%;
+	word-wrap: break-word;
+}
+[contenteditable="true"] {
+	font: 87.5%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", Arial, sans-serif;
+}]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/css/admin.css">
+		<operation>
+			<search position="replace"><![CDATA[	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+	/* The next bits should fix https://github.com/elkarte/Elkarte/issues/567 */
+	word-wrap: break-word;
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	-ms-hyphens: auto;]]></search>
+			<add><![CDATA[	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+	/* The next bits should fix https://github.com/elkarte/Elkarte/issues/567 */
+	word-wrap: break-word;
+	word-break: break-all;
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	-ms-hyphens: auto;]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/css/index.css">
+		<operation>
+			<search position="replace"><![CDATA[}
+/* Extra code block styling. */
+.bbc_code {
+	overflow: auto;
+	height: 20em;
+	white-space: nowrap;
+	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
+	resize: vertical;
+}
+.bbc_code .tab {
+	width: 4ex;
+	white-space:pre;
+	display: inline-block;
+}
+/* Stop em compounding when elements are nested. */]]></search>
+			<add><![CDATA[}
+/* Extra code block styling. */
+.bbc_code {
+	white-space: nowrap;
+	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
+	resize: vertical;
+	height: auto;
+	max-height: 20em;
+}
+.bbc_code .tab {
+	width: 4ex;
+	white-space: pre;
+	display: inline-block;
+}
+/* Stop em compounding when elements are nested. */]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	padding: 8px 0;
+	font-size: 0.857em;
+}
+.attachments {
+	margin: 20px 0 0 0;
+	clear: both;
+}
+.attachments .attachment {
+	padding: 6px 8px;
+	display: inline-block;
+	min-width: 22%;
+}
+.attachment_thumb {
+	margin: 0 auto;
+	text-align: center;
+}
+/* @todo - Look at deprecating this hr. */
+.attachments hr {
+	clear: both;
+}
+/* Separator of posts. More useful in the print stylesheet. */
+.forumposts .post_separator {]]></search>
+			<add><![CDATA[	padding: 8px 0;
+	font-size: 0.857em;
+}
+.attachment_block, .attachment {
+	display: inline-block;
+	max-width: 99%;
+	min-width: 19em;
+	margin: 0 .5em 1em 0;
+	vertical-align: bottom;
+	text-align: center;
+	overflow: hidden;
+}
+.attachment_image {
+	margin: 2em 0 0 0;
+}
+.attachment_name, .attachment_details {
+	display: block;
+	width: 18em;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	padding: 0 .25em;
+}
+.attachment_name {
+	 margin: .5em 0 0 0;
+}
+.attachment_name_exp, .attachment_details_exp {
+	width: auto;
+}
+.attachment_name_exp {
+	margin: -.5em 0 0;
+}
+/* Important stuff. */
+.attachment_name:before {
+	display: block;
+	clear: both;
+	content: "";
+}
+/* Important stuff. */
+/* Auto scaling of images in posts, sigs, attachments, etc. */
+/* @todo - Cross check where this is defined earlier */
+.inner .bbc_img, .signature .bbc_img, .attachment_image {
+	height: auto;
+	width: auto;
+	max-width: 100%;
+	max-height: 800px;
+}
+/* Separator of posts. More useful in the print stylesheet. */
+.forumposts .post_separator {]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/index.template.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.6
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			' . (!empty($modSettings['pollMode']) ? '<span class="topicicon img_poll"> </span>' . $txt['poll'] : '') . '
+		</p>
+		<p>
+			<span class="topicicon img_locked"> </span>' . $txt['locked_topic'] . '<br />' . ($modSettings['enableStickyTopics'] == '1' ? '
+			<span class="topicicon img_sticky"> </span>' . $txt['sticky_topic'] . '<br />' : '') . '
+		</p>';
+}]]></search>
+			<add><![CDATA[			' . (!empty($modSettings['pollMode']) ? '<span class="topicicon img_poll"> </span>' . $txt['poll'] : '') . '
+		</p>
+		<p>
+			<span class="topicicon img_locked"> </span>' . $txt['locked_topic'] . '<br />' . (!empty($modSettings['enableStickyTopics']) ? '
+			<span class="topicicon img_sticky"> </span>' . $txt['sticky_topic'] . '<br />' : '') . '
+		</p>';
+}]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		</ul>';
+
+	addInlineJavascript('
+		$(\'#elkFadeScroller\').Elk_NewsFader();', true);
+}]]></search>
+			<add><![CDATA[		</ul>';
+
+	addInlineJavascript('
+		$(\'#elkFadeScroller\').Elk_NewsFader(' . (empty($settings['newsfader_time']) ? '' : '{\'iFadeDelay\': ' . $settings['newsfader_time'] . '}') . ');', true);
+}]]></add>
+		</operation>
+	</file>
+	<file name="LANGUAGEDIR/english/Admin.english.php">
+		<operation>
+			<search position="replace"><![CDATA[$txt['attachment_image_reencode_note'] = '(requires GD module or ImageMagick)';
+$txt['attachment_image_paranoid_warning'] = 'The extensive security checks can result in a large number of rejected attachments.';
+$txt['attachment_image_paranoid'] = 'Perform extensive security checks on uploaded image attachments';
+$txt['attachmentThumbnails'] = 'Resize images when showing under posts';
+$txt['attachment_thumb_png'] = 'Save thumbnails as PNG';
+$txt['attachment_thumb_memory'] = 'Adaptive thumbnail memory';]]></search>
+			<add><![CDATA[$txt['attachment_image_reencode_note'] = '(requires GD module or ImageMagick)';
+$txt['attachment_image_paranoid_warning'] = 'The extensive security checks can result in a large number of rejected attachments.';
+$txt['attachment_image_paranoid'] = 'Perform extensive security checks on uploaded image attachments';
+$txt['attachment_autorotate'] = 'Detect and fix improperly rotated images';
+$txt['attachment_autorotate_na'] = '(Not available on this system)';
+$txt['attachmentThumbnails'] = 'Resize images when showing under posts';
+$txt['attachment_thumb_png'] = 'Save thumbnails as PNG';
+$txt['attachment_thumb_memory'] = 'Adaptive thumbnail memory';]]></add>
+		</operation>
+	</file>
+	<file name="LANGUAGEDIR/english/Help.english.php">
+		<operation>
+			<search position="replace"><![CDATA[$helptxt['attachmentCheckExtensions'] = 'Check this box to enable attachment filtering, which will only allow files to be uploaded with the file extensions that you have defined.';
+$helptxt['attachmentExtensions'] = 'Specify what attachment types are allowed, for example: jpg,png,gif  Remember to be careful in what you allow as some file extensions can cause a security risk to your website.';
+$helptxt['attachment_image_paranoid'] = 'Selecting this option will enable very strict security checks on image attachments. Warning! These extensive checks can fail on valid images too. It is strongly recommended to only use this option together with image re-encoding, in order to have ElkArte try to resample the images which fail the security checks: if successful, they will be sanitized and uploaded. Otherwise, if image re-encoding is not enabled, all attachments failing checks will be rejected.';
+$helptxt['attachmentShowImages'] = 'If the uploaded file is a picture, this will automatically display it underneath the post.';
+$helptxt['attachmentThumbnails'] = 'Enable this to show post images as a smaller thumbnail image, which when selected will expand to the full sized image.';
+$helptxt['attachment_thumb_png'] = 'When creating thumbnails to display under a post, this will only create them as png files.';]]></search>
+			<add><![CDATA[$helptxt['attachmentCheckExtensions'] = 'Check this box to enable attachment filtering, which will only allow files to be uploaded with the file extensions that you have defined.';
+$helptxt['attachmentExtensions'] = 'Specify what attachment types are allowed, for example: jpg,png,gif  Remember to be careful in what you allow as some file extensions can cause a security risk to your website.';
+$helptxt['attachment_image_paranoid'] = 'Selecting this option will enable very strict security checks on image attachments. Warning! These extensive checks can fail on valid images too. It is strongly recommended to only use this option together with image re-encoding, in order to have ElkArte try to resample the images which fail the security checks: if successful, they will be sanitized and uploaded. Otherwise, if image re-encoding is not enabled, all attachments failing checks will be rejected.';
+$helptxt['attachment_autorotate'] = 'Selecting this option will allow the system to detect rotated images, typical of phone cameras, and automatically adjust the orientation such that the image top is oriented up.  Requires either ImageMagick or both GD and Exif modules to be available.';
+$helptxt['attachmentShowImages'] = 'If the uploaded file is a picture, this will automatically display it underneath the post.';
+$helptxt['attachmentThumbnails'] = 'Enable this to show post images as a smaller thumbnail image, which when selected will expand to the full sized image.';
+$helptxt['attachment_thumb_png'] = 'When creating thumbnails to display under a post, this will only create them as png files.';]]></add>
+		</operation>
+	</file>
+	<file name="LANGUAGEDIR/english/Profile.english.php">
+		<operation>
+			<search position="replace"><![CDATA[$txt['profile_warning_effect_watch'] = 'User will be added to moderator watch list.';
+$txt['profile_warning_effect_own_watched'] = 'You are on the moderator watch list.';
+$txt['profile_warning_is_watch'] = 'being watched';
+$txt['profile_warning_effect_moderation'] = 'All users posts will be moderated.';
+$txt['profile_warning_effect_own_moderated'] = 'All your posts will be moderated.';
+$txt['profile_warning_is_moderation'] = 'posts are moderated';
+$txt['profile_warning_effect_mute'] = 'User will not be able to post.';]]></search>
+			<add><![CDATA[$txt['profile_warning_effect_watch'] = 'User will be added to moderator watch list.';
+$txt['profile_warning_effect_own_watched'] = 'You are on the moderator watch list.';
+$txt['profile_warning_is_watch'] = 'being watched';
+$txt['profile_warning_effect_moderate'] = 'All users posts will be moderated.';
+$txt['profile_warning_effect_own_moderated'] = 'All your posts will be moderated.';
+$txt['profile_warning_is_moderation'] = 'posts are moderated';
+$txt['profile_warning_effect_mute'] = 'User will not be able to post.';]]></add>
+		</operation>
+	</file>
+	<file name="LANGUAGEDIR/english/Search.english.php">
+		<operation>
+			<search position="replace"><![CDATA[$txt['sphinxql_test_connect_failed'] = 'Unable to access SphinxQL. Make sure your sphinx.conf has a separate listen directive for the SphinxQL port. SphinxQL search will not work until you fix the problem';
+$txt['sphinx_test_api_missing'] = 'The sphinxapi.php file is missing in your &quot;sources&quot; directory. You need to copy this file from the Sphinx distribution. Sphinx search will not work until you fix the problem.';
+$txt['sphinx_description'] = 'Use this interface to supply the access details to your Sphinx search daemon. <strong>These settings are only used to create</strong> an initial sphinx.conf configuration file which you will need to save in your Sphinx configuration directory (typically /usr/local/etc). Generally the options below can be left untouched, however they assume that the Sphinx software was installed in /usr/local and use /var/sphinx for the search index data storage. In order to keep Sphinx up to date, you must use a cron job to update the indexes, otherwise new or deleted content will not be reflected in  the search results. The configuration file defines two indexes:<br /><br/><strong>elkarte_delta_index</strong>, an index that only stores recent changes and can be called frequently. <strong>elkarte_base_index</strong>, an index that stores the full database and should be called less frequently. Example:<br /><span class="tt">10 3 * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate elkarte_base_index<br />0 * * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate elkarte_delta_index</span>';
+$txt['sphinx_index_data_path'] = 'Index data path:';
+$txt['sphinx_index_data_path_desc'] = 'This is the path that contains the search index files used by Sphinx.<br />It <strong>must</strong> exist and be accessible for reading and writing by the Sphinx indexer and search daemon.';
+$txt['sphinx_log_file_path'] = 'Log file path:';]]></search>
+			<add><![CDATA[$txt['sphinxql_test_connect_failed'] = 'Unable to access SphinxQL. Make sure your sphinx.conf has a separate listen directive for the SphinxQL port. SphinxQL search will not work until you fix the problem';
+$txt['sphinx_test_api_missing'] = 'The sphinxapi.php file is missing in your &quot;sources&quot; directory. You need to copy this file from the Sphinx distribution. Sphinx search will not work until you fix the problem.';
+$txt['sphinx_description'] = 'Use this interface to supply the access details to your Sphinx search daemon. <strong>These settings are only used to create</strong> an initial sphinx.conf configuration file which you will need to save in your Sphinx configuration directory (typically /usr/local/etc). Generally the options below can be left untouched, however they assume that the Sphinx software was installed in /usr/local and use /var/sphinx for the search index data storage. In order to keep Sphinx up to date, you must use a cron job to update the indexes, otherwise new or deleted content will not be reflected in  the search results. The configuration file defines two indexes:<br /><br/><strong>elkarte_delta_index</strong>, an index that only stores recent changes and can be called frequently. <strong>elkarte_base_index</strong>, an index that stores the full database and should be called less frequently. Example:<br /><span class="tt">10 3 * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate elkarte_base_index<br />0 * * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate elkarte_delta_index</span>';
+$txt['sphinx_index_prefix'] = 'Index prefix:';
+$txt['sphinx_index_prefix_desc'] = 'This is the prefix for the base and delta indexes.<br />By default it uses elkarte and the two indexes will be elkarte_base_index and elkarte_delta_index. Sphinx will connect to elkarte_index (prefix_index).  If you change this be sure to use the correct prefix in your cron task.';
+$txt['sphinx_index_data_path'] = 'Index data path:';
+$txt['sphinx_index_data_path_desc'] = 'This is the path that contains the search index files used by Sphinx.<br />It <strong>must</strong> exist and be accessible for reading and writing by the Sphinx indexer and search daemon.';
+$txt['sphinx_log_file_path'] = 'Log file path:';]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/scripts/dropAttachments.js">
+		<operation>
+			<search position="replace"><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0
+ *
+ * This file contains javascript associated with the drag drop of files functionality
+ * while posting]]></search>
+			<add><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0.10
+ *
+ * This file contains javascript associated with the drag drop of files functionality
+ * while posting]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			e.preventDefault();
+			var files = $(this)[0].files;
+			dragDropAttachment.prototype.handleFileUpload(files, obj);
+		});
+	});
+]]></search>
+			<add><![CDATA[			e.preventDefault();
+			var files = $(this)[0].files;
+			dragDropAttachment.prototype.handleFileUpload(files, obj);
+			this.value = null;
+		});
+	});
+]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/scripts/jquery.sceditor.elkarte.js">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.4
+ * Extension functions to provide ElkArte compatibility with sceditor
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.10
+ * Extension functions to provide ElkArte compatibility with sceditor
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		format: '[pre]{0}[/pre]',
+		html: '<pre>{0}</pre>'
+	})
+	/*
+	 * ElkArte modified tags, modified so they support the existing paradigm
+	 *]]></search>
+			<add><![CDATA[		format: '[pre]{0}[/pre]',
+		html: '<pre>{0}</pre>'
+	})
+	.set('center', {
+		tags: {
+			center: null
+		},
+		styles: {
+			'text-align': ['center', '-webkit-center', '-moz-center', '-khtml-center']
+		},
+		isInline: true,
+		format: '[center]{0}[/center]',
+		html: '<span style="display:block;text-align:center">{0}</span>'
+	})
+	/*
+	 * ElkArte modified tags, modified so they support the existing paradigm
+	 *]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
+		format: function(element, content) {
+			var attribs = '',
+				style = function(name) {
+					return element.style ? element.style[name] : null;
+				};]]></search>
+			<add><![CDATA[		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
+		format: function(element, content) {
+			var attribs = '',
+				$elm = $(element),
+				style = function(name) {
+					return element.style ? element.style[name] : null;
+				};]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			if (typeof element.attr('data-sceditor-emoticon') !== "undefined")
+				return content;
+
+			// only add width and height if one is specified
+			if (element.attr('width') || style('width'))
+				attribs += " width=" + $(element).width();
+			if (element.attr('height') || style('height'))
+				attribs += " height=" + $(element).height();
+
+			return '[img' + attribs + ']' + element.attr('src') + '[/img]';
+		},
+		html: function(token, attrs, content) {
+			var parts,
+				attribs = '';
+
+			// handle [img width=340 height=240]url[/img]
+			if (typeof attrs.width !== "undefined")
+				attribs += ' width="' + attrs.width + '"';
+			if (typeof attrs.height !== "undefined")
+				attribs += ' height="' + attrs.height + '"';
+
+			return '<img' + attribs + ' src="' + content + '" />';
+		}]]></search>
+			<add><![CDATA[			if (typeof element.attr('data-sceditor-emoticon') !== "undefined")
+				return content;
+
+			// only add the parameters that are specified
+			if (element.attr('width') || style('width'))
+				attribs += " width=" + $elm.width();
+			if (element.attr('height') || style('height'))
+				attribs += " height=" + $elm.height();
+			if (element.attr('alt'))
+				attribs += ' alt="' + element.attr('alt') + '"';
+
+			return '[img' + attribs + ']' + element.attr('src') + '[/img]';
+		},
+		html: function(token, attrs, content) {
+			var attribs = '';
+
+			// handle [img alt=alt width=123 height=123]url[/img]
+			if (typeof attrs.width !== "undefined")
+				attribs += ' width="' + attrs.width + '"';
+			if (typeof attrs.height !== "undefined")
+				attribs += ' height="' + attrs.height + '"';
+			if (typeof attrs.alt !== "undefined")
+				attribs += ' alt="' + attrs.alt + '"';
+
+			return '<img' + attribs + ' src="' + content + '" />';
+		}]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+			if (attrs.type)
+				style = 'style="list-style-type: ' + attrs.type + '"';
+			return '<' + code + ' ' + style + '>' + content + '</' + code + '>';
+		}
+	})
+	.set('li', {]]></search>
+			<add><![CDATA[
+			if (attrs.type)
+				style = 'style="list-style-type: ' + attrs.type + '"';
+			return '<' + code + ' ' + style + '>' + content.replace(/<\/li><br \/>/g, '</li>') + '</' + code + '>';
+		}
+	})
+	.set('li', {]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			ul: null
+		},
+		breakStart: true,
+		format: function(element, content) {
+			if ($(element[0]).css('list-style-type') === 'disc')
+				return '[list]' + content + '[/list]';
+			else
+				return '[list type=' + $(element[0]).css('list-style-type') + ']' + content + '[/list]';
+		},
+		isInline: false,
+		skipLastLineBreak: true,]]></search>
+			<add><![CDATA[			ul: null
+		},
+		breakStart: true,
+		format: function (element, content) {
+			var type = $(element[0]).prop('style')['list-style-type'];
+
+			if (type === 'disc' || type === '')
+				return '[list]' + content + '[/list]';
+			else
+				return '[list type=' + type + ']' + content + '[/list]';
+		},
+		isInline: false,
+		skipLastLineBreak: true,]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/scripts/script.js">
+		<operation>
+			<search position="replace"><![CDATA[ *
+ * @param {type} elem
+ */
+function grabJumpToContent(elem)
+{
+	var oXMLDoc = getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=jumpto;xml'),
+		aBoardsAndCategories = [],
+		i = 0,
+		n = 0;
+
+	if (oXMLDoc.responseXML)
+	{
+		var items = oXMLDoc.responseXML.getElementsByTagName('elk')[0].getElementsByTagName('item');
+		for (i = 0, n = items.length; i < n; i++)
+		{
+			aBoardsAndCategories[aBoardsAndCategories.length] = {
+				id: parseInt(items[i].getAttribute('id')),
+				isCategory: items[i].getAttribute('type') === 'category',
+				name: items[i].firstChild.nodeValue.removeEntities(),
+				is_current: false,
+				childLevel: parseInt(items[i].getAttribute('childlevel'))
+			};
+		}
+	}
+
+	for (i = 0, n = aJumpTo.length; i < n; i++)
+		aJumpTo[i].fillSelect(aBoardsAndCategories);
+
+	// Internet Explorer needs this to keep the box dropped down.
+	elem.style.width = 'auto';
+	elem.focus();
+}
+
+/**]]></search>
+			<add><![CDATA[ *
+ * @param {type} elem
+ */
+function grabJumpToContent() {
+	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=jumpto;xml', onJumpReceived);
+
+	return false;
+}
+
+/**
+ * Callback function for loading the jumpto box
+ *
+ * @param {object} XMLDoc
+ */
+function onJumpReceived(oXMLDoc) {
+	var aBoardsAndCategories = [],
+		i,
+		n,
+		items = oXMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('item');
+
+	for (i = 0, n = items.length; i < n; i++)
+	{
+		aBoardsAndCategories[aBoardsAndCategories.length] = {
+			id: parseInt(items[i].getAttribute('id')),
+			isCategory: items[i].getAttribute('type') === 'category',
+			name: items[i].firstChild.nodeValue.removeEntities(),
+			is_current: false,
+			childLevel: parseInt(items[i].getAttribute('childlevel'))
+		};
+	}
+
+	for (i = 0, n = aJumpTo.length; i < n; i++)
+		aJumpTo[i].fillSelect(aBoardsAndCategories);
+}
+
+/**]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	this.opt = oJumpToOptions;
+	this.dropdownList = null;
+	this.showSelect();
+}
+
+// Remove all the options in the select. Method of the JumpTo class.]]></search>
+			<add><![CDATA[	this.opt = oJumpToOptions;
+	this.dropdownList = null;
+	this.showSelect();
+
+	createEventListener(this.dropdownList);
+
+	if (is_mobile && is_touch)
+		this.dropdownList.addEventListener('touchstart', grabJumpToContent);
+	else
+		this.dropdownList.addEventListener('mouseenter', grabJumpToContent);
+}
+
+// Remove all the options in the select. Method of the JumpTo class.]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[//	var dropdownList = document.getElementById(this.opt.sContainerId + '_select');
+for (var i = this.dropdownList.options.length; i > 0; i--)
+		this.dropdownList.remove(i - 1);
+}
+
+// Show the initial select box (onload). Method of the JumpTo class.
+JumpTo.prototype.showSelect = function ()]]></search>
+			<add><![CDATA[//	var dropdownList = document.getElementById(this.opt.sContainerId + '_select');
+for (var i = this.dropdownList.options.length; i > 0; i--)
+		this.dropdownList.remove(i - 1);
+};
+
+// Show the initial select box (onload). Method of the JumpTo class.
+JumpTo.prototype.showSelect = function ()]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	if (sChildLevelPrefix !== '')
+		sChildLevelPrefix = sChildLevelPrefix + this.opt.sBoardPrefix;
+
+	document.getElementById(this.opt.sContainerId).innerHTML = this.opt.sJumpToTemplate.replace(/%select_id%/, this.opt.sContainerId + '_select').replace(/%dropdown_list%/, '<select ' + (this.opt.bDisabled === true ? 'disabled="disabled" ' : '') + (this.opt.sClassName !== undefined ? 'class="' + this.opt.sClassName + '" ' : '') + 'name="' + (this.opt.sCustomName !== undefined ? this.opt.sCustomName : this.opt.sContainerId + '_select') + '" id="' + this.opt.sContainerId + '_select" ' + ('implementation' in document ? '' : 'onmouseover="grabJumpToContent(this);" ') + ('onbeforeactivate' in document ? 'onbeforeactivate' : 'onfocus') + '="grabJumpToContent(this);"><option value="' + (this.opt.bNoRedirect !== undefined && this.opt.bNoRedirect === true ? this.opt.iCurBoardId : '?board=' + this.opt.iCurBoardId + '.0') + '">' + sChildLevelPrefix + this.opt.sCurBoardName.removeEntities() + '</option></select>&nbsp;' + (this.opt.sGoButtonLabel !== undefined ? '<input type="button" class="button_submit" value="' + this.opt.sGoButtonLabel + '" onclick="window.location.href = \'' + elk_prepareScriptUrl(elk_scripturl) + 'board=' + this.opt.iCurBoardId + '.0\';" />' : ''));
+	this.dropdownList = document.getElementById(this.opt.sContainerId + '_select');
+};
+]]></search>
+			<add><![CDATA[	if (sChildLevelPrefix !== '')
+		sChildLevelPrefix = sChildLevelPrefix + this.opt.sBoardPrefix;
+
+	document.getElementById(this.opt.sContainerId).innerHTML = this.opt.sJumpToTemplate.replace(/%select_id%/, this.opt.sContainerId + '_select').replace(/%dropdown_list%/, '<select ' + (this.opt.bDisabled === true ? 'disabled="disabled" ' : '') + (this.opt.sClassName !== undefined ? 'class="' + this.opt.sClassName + '" ' : '') + 'name="' + (this.opt.sCustomName !== undefined ? this.opt.sCustomName : this.opt.sContainerId + '_select') + '" id="' + this.opt.sContainerId + '_select"><option value="' + (this.opt.bNoRedirect !== undefined && this.opt.bNoRedirect === true ? this.opt.iCurBoardId : '?board=' + this.opt.iCurBoardId + '.0') + '">' + sChildLevelPrefix + this.opt.sCurBoardName.removeEntities() + '</option></select>&nbsp;' + (this.opt.sGoButtonLabel !== undefined ? '<input type="button" class="button_submit" value="' + this.opt.sGoButtonLabel + '" onclick="window.location.href = \'' + elk_prepareScriptUrl(elk_scripturl) + 'board=' + this.opt.iCurBoardId + '.0\';" />' : ''));
+	this.dropdownList = document.getElementById(this.opt.sContainerId + '_select');
+};
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
+{
+	this.removeAll();
+	if ('onbeforeactivate' in document)
+		this.dropdownList.onbeforeactivate = null;
+	else
+		this.dropdownList.onfocus = null;
+
+	// Create a document fragment that'll allowing inserting big parts at once.
+	var oListFragment = document.createDocumentFragment(),]]></search>
+			<add><![CDATA[JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
+{
+	this.removeAll();
+
+	if (is_mobile && is_touch)
+		this.dropdownList.removeEventListener('touchstart', grabJumpToContent);
+	else
+		this.dropdownList.removeEventListener('mouseenter', grabJumpToContent);
+
+	// Create a document fragment that'll allowing inserting big parts at once.
+	var oListFragment = document.createDocumentFragment(),]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/scripts/script_elk.js">
+		<operation>
+			<search position="replace"><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0.1
+ *
+ * This file contains javascript utility functions specific to ElkArte
+ */
+
+/**
+ * Sets an auto height so small code blocks collapse
+ * Sets a height for larger code blocks and lets them resize / overflow as normal
+ */
+function elk_codefix()
+{
+	$('.bbc_code').each(function()
+	{
+		$(this).height("auto");
+		if ($(this).height() > 200)
+			$(this).css('height', '20em');
+	});
+}
+]]></search>
+			<add><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0.10
+ *
+ * This file contains javascript utility functions specific to ElkArte
+ */
+
+/**
+ * Sets code blocks such that resize vertical works as expect.  Done this way to avoid
+ * page jumps to named anchors missing the target.
+ */
+function elk_codefix()
+{
+	$('.bbc_code').each(function()
+	{
+		var $this = $(this);
+
+		// If it has a scroll bar, allow the user to resize it vertically
+		if ($this.get(0).scrollHeight > $this.innerHeight()) {
+			$this.css('height', $this.height());
+			$this.css('max-height', 'none');
+		}
+		else {
+			$this.css('resize', 'none');
+		}
+	});
+}
+]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/scripts/topic.js">
+		<operation>
+			<search position="replace"><![CDATA[function expandThumb(thumbID)
+{
+	var img = document.getElementById('thumb_' + thumbID),
+		link = document.getElementById('link_' + thumbID);
+
+	// Save the currently displayed image attributes
+	var tmp_src = img.src,]]></search>
+			<add><![CDATA[function expandThumb(thumbID)
+{
+	var img = document.getElementById('thumb_' + thumbID),
+		link = document.getElementById('link_' + thumbID),
+		name = link.nextSibling;
+
+	// Some browsers will add empty text so loop to the next element node
+	while (name && name.nodeType !== 1) {
+		name = name.nextSibling;
+	}
+	var details = name.nextSibling;
+	while (details && details.nodeType !== 1) {
+		details = details.nextSibling;
+	}
+
+	// Save the currently displayed image attributes
+	var tmp_src = img.src,]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	img.style.width = link.style.width;
+	img.style.height = link.style.height;
+
+	// Now place the image attributes back
+	link.href = tmp_src;
+	link.style.width = tmp_width;]]></search>
+			<add><![CDATA[	img.style.width = link.style.width;
+	img.style.height = link.style.height;
+
+	// Swap the class name on the title/desc
+	name.className = name.className.includes('_exp') ? 'attachment_name' : 'attachment_name attachment_name_exp';
+	details.className = details.className.includes('_exp') ? 'attachment_details' : 'attachment_details attachment_details_exp';
+
+	// Now place the image attributes back
+	link.href = tmp_src;
+	link.style.width = tmp_width;]]></add>
+		</operation>
+	</file>
+</modification>
