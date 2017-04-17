@@ -233,7 +233,7 @@ class Post_Controller extends Action_Controller
 				'expiration' => !isset($_POST['poll_expire']) ? 0 : (int) $_POST['poll_expire'],
 				'change_vote' => isset($_POST['poll_change_vote']),
 				'guest_vote' => isset($_POST['poll_guest_vote']),
-				'guest_vote_allowed' => in_array(-2, $allowedVoteGroups['allowed']),
+				'guest_vote_allowed' => in_array(-1, $allowedVoteGroups['allowed']),
 			);
 
 			// Make all five poll choices empty.
