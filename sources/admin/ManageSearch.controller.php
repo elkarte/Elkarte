@@ -535,6 +535,7 @@ class ManageSearch_Controller extends Action_Controller
 			validateToken('admin-mssphinx');
 
 			updateSettings(array(
+				'sphinx_index_prefix' => trim($_POST['sphinx_index_prefix']),
 				'sphinx_data_path' => rtrim($_POST['sphinx_data_path'], '/'),
 				'sphinx_log_path' => rtrim($_POST['sphinx_log_path'], '/'),
 				'sphinx_stopword_path' => $_POST['sphinx_stopword_path'],
