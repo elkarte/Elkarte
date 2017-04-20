@@ -54,6 +54,12 @@ class Drafts_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	protected static $_eventsManager = null;
 
 	/**
+	 * Loading draft into the editor?
+	 * @var mixed
+	 */
+	protected $_loading_draft = false;
+
+	/**
 	 * {@inheritdoc }
 	 */
 	public static function hooks(\Event_Manager $eventsManager)
@@ -128,6 +134,11 @@ class Drafts_Post_Module extends ElkArte\sources\modules\Abstract_Module
 
 			$this->_prepareDraftsContext($user_info['id'], $topic);
 
+			if (!empty($this->_loading_draft))
+			{
+				$editorOptions['value'] = $context['message'];
+			}
+
 			if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 			{
 				if (!isset($editorOptions['plugin_addons']))
@@ -137,8 +148,6 @@ class Drafts_Post_Module extends ElkArte\sources\modules\Abstract_Module
 
 				// @todo remove
 				$context['drafts_autosave_frequency'] = self::$_autosave_frequency;
-
-				$editorOptions['value'] = $context['message'];
 
 				$editorOptions['plugin_addons'][] = 'draft';
 				$editorOptions['plugin_options'][] = '
@@ -277,7 +286,7 @@ class Drafts_Post_Module extends ElkArte\sources\modules\Abstract_Module
 
 		// has a specific draft has been selected?  Load it up if there is not already a message already in the editor
 		if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
-			loadDraft((int) $_REQUEST['id_draft'], 0, true, true);
+			$this->_loading_draft = loadDraft((int) $_REQUEST['id_draft'], 0, true, true);
 
 		// load all the drafts for this user that meet the criteria
 		$order = 'poster_time DESC';
