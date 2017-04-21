@@ -83,12 +83,13 @@ class User_Access_Mentions implements Scheduled_Task_Interface
 							LIMIT {int:start}, {int:limit}',
 							array(
 								'current_member' => $member,
-								'mention_types' => array('mentionmem', 'likemsg', 'rlikemsg'),
-								'user_see_board' => ($can == 'can' ? '' : 'NOT ') . $user_see_board,
+								'mention_types' => array('mentionmem', 'likemsg', 'rlikemsg', 'quotedmem'),
+								'user_see_board' => ($can == 'can' ? '' : 'NOT ') . '(' . $user_see_board . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? ' AND b.id_board != ' . $modSettings['recycle_board'] : '') . ')',
 								'start' => $start,
 								'limit' => $limit,
 							)
 						);
+
 						$mentions = array();
 						$remove = array();
 						while ($row = $db->fetch_assoc($request))
@@ -196,14 +197,15 @@ class User_Access_Mentions implements Scheduled_Task_Interface
 					WHERE mnt.id_member = {int:current_member}
 						AND mnt.mention_type IN ({array_string:mention_types})
 						AND {raw:user_see_board}
-						AND mnt.is_accessible = 0
+						AND mnt.is_accessible = 1
 					LIMIT 1',
 					array(
 						'current_member' => $row['id_member'],
-						'mention_types' => array('mentionmem', 'likemsg', 'rlikemsg'),
-						'user_see_board' => 'NOT ' . $user_see_board,
+						'mention_types' => array('mentionmem', 'likemsg', 'rlikemsg', 'quotedmem'),
+						'user_see_board' => 'NOT (' . $user_see_board . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? ' AND b.id_board != ' . $modSettings['recycle_board'] : '') . ')',
 					)
 				);
+
 				// One row of results is enough: scheduleTaskImmediate!
 				if ($db->num_rows($request2) == 1)
 				{

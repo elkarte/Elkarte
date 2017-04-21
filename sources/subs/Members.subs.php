@@ -2367,27 +2367,40 @@ function updateMemberStats($id_member = null, $real_name = null)
  *
  * @package Members
  * @param integer $id_member a valid member id
+ * @return string Query string
  */
 function memberQuerySeeBoard($id_member)
 {
 	global $modSettings;
 
 	$member = getBasicMemberData($id_member, array('moderation' => true));
+	if (empty($member))
+	{
+		return '0=1';
+	}
 
 	if (empty($member['additional_groups']))
+	{
 		$groups = array($member['id_group'], $member['id_post_group']);
+	}
 	else
+	{
 		$groups = array_merge(
 			array($member['id_group'], $member['id_post_group']),
 			explode(',', $member['additional_groups'])
 		);
+	}
 
 	foreach ($groups as $k => $v)
+	{
 		$groups[$k] = (int) $v;
+	}
 	$groups = array_unique($groups);
 
 	if (in_array(1, $groups))
+	{
 		return '1=1';
+	}
 	else
 	{
 		require_once(SUBSDIR . '/Boards.subs.php');
