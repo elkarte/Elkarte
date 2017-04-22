@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.0.10
  *
  */
 
@@ -594,7 +594,12 @@ class Profile_Controller extends Action_Controller
 				$controller->action_authentication(true);
 			}
 			elseif (in_array($current_area, array('account', 'forumprofile', 'theme', 'contactprefs')))
-				saveProfileFields();
+			{
+				require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
+				$fields = ProfileOptions_Controller::getFields($current_area);
+
+				saveProfileFields($fields['fields'], $fields['hook']);
+			}
 			else
 			{
 				$force_redirect = true;

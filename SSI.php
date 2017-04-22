@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.9
+ * @version 1.0.10
  *
  */
 
@@ -25,7 +25,7 @@ if (defined('ELK'))
 define('ELK', 'SSI');
 
 // Shortcut for the browser cache stale
-define('CACHE_STALE', '?109');
+define('CACHE_STALE', '?1010');
 
 // We're going to want a few globals... these are all set later.
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
@@ -441,10 +441,11 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 			AND m.approved = {int:is_approved}' : '') . '
 		' . (empty($query_where) ? '' : 'AND ' . $query_where) . '
 		ORDER BY ' . $query_order . '
-		' . ($query_limit == '' ? '' : 'LIMIT ' . $query_limit),
+		' . ($query_limit == '' ? '' : 'LIMIT {int:query_limit}'),
 		array_merge($query_where_params, array(
 			'current_member' => $user_info['id'],
 			'is_approved' => 1,
+			'query_limit' => $query_limit,
 		))
 	);
 	$posts = array();
@@ -561,12 +562,13 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			AND t.approved = {int:is_approved}
 			AND ml.approved = {int:is_approved}' : '') . '
 		ORDER BY t.id_last_msg DESC
-		LIMIT ' . $num_recent,
+		LIMIT {int:num_recent}',
 		array(
 			'include_boards' => empty($include_boards) ? '' : $include_boards,
 			'exclude_boards' => empty($exclude_boards) ? '' : $exclude_boards,
 			'min_message_id' => $modSettings['maxMsgID'] - 35 * min($num_recent, 5),
 			'is_approved' => 1,
+			'num_recent' => $num_recent,
 		)
 	);
 	$topics = array();

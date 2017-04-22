@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.0.10
  *
  */
 
@@ -181,7 +181,8 @@ class Sphinxql_Search
 				fatal_lang_error('error_no_search_daemon');
 
 			// Compile different options for our query
-			$query = 'SELECT *' . (empty($search_params['topic']) ? ', COUNT(*) num' : '') . ', WEIGHT() weights, (weights + (relevance/1000)) rank FROM elkarte_index';
+			$index = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte') . '_index';
+			$query = 'SELECT *' . (empty($search_params['topic']) ? ', COUNT(*) num' : '') . ', WEIGHT() weights, (weights + (relevance/1000)) rank FROM ' . $index;
 
 			// Construct the (binary mode & |) query.
 			$where_match = $this->_constructQuery($search_params['search']);

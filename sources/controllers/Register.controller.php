@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.7
+ * @version 1.0.10
  *
  */
 
@@ -192,17 +192,18 @@ class Register_Controller extends Action_Controller
 
 			// Here, and here only, emulate the permissions the user would have to do this.
 			$user_info['permissions'] = array_merge($user_info['permissions'], array('profile_account_own', 'profile_extra_own'));
-			$reg_fields = explode(',', $modSettings['registration_fields']);
+			require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
+			$reg_fields = ProfileOptions_Controller::getFields('registration');
 
 			// We might have had some submissions on this front - go check.
-			foreach ($reg_fields as $field)
+			foreach ($reg_fields['fields'] as $field)
 			{
 				if (isset($_POST[$field]))
 					$cur_profile[$field] = Util::htmlspecialchars($_POST[$field]);
 			}
 
 			// Load all the fields in question.
-			setupProfileContext($reg_fields, 'registration');
+			setupProfileContext($reg_fields['fields'], $reg_fields['hook']);
 		}
 
 		// Generate a visual verification code to make sure the user is no bot.
@@ -592,7 +593,7 @@ class Register_Controller extends Action_Controller
 		{
 			call_integration_hook('integrate_activate', array($regOptions['username'], 1, 1));
 
-			setLoginCookie(60 * $modSettings['cookieTime'], $memberID, hash('sha256', Util::strtolower($regOptions['username']) . $regOptions['password'] . $regOptions['register_vars']['password_salt']));
+			setLoginCookie(60 * $modSettings['cookieTime'], $memberID, hash('sha256', $regOptions['register_vars']['passwd'] . $regOptions['register_vars']['password_salt']));
 
 			redirectexit('action=auth;sa=check;member=' . $memberID, $context['server']['needs_login_fix']);
 		}
@@ -693,6 +694,9 @@ class Register_Controller extends Action_Controller
 			sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 
 			$context['page_title'] = $txt['invalid_activation_resend'];
+
+			// Don't let them wack away on their resend
+			spamProtection('remind');
 
 			// This will ensure we don't actually get an error message if it works!
 			$context['error_title'] = '';

@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.10
  *
  */
 
@@ -681,7 +681,7 @@ class DbTable_MySQL extends DbTable
 		list ($type, $size) = $this->db_calculate_type($column['type'], $column['size']);
 
 		// Allow unsigned integers (mysql only)
-		$unsigned = in_array($type, array('int', 'tinyint', 'smallint', 'mediumint', 'bigint')) && !empty($column['unsigned']) ? 'unsigned ' : '';
+		$unsigned = in_array($type, array('int', 'tinyint', 'smallint', 'mediumint', 'bigint', 'float')) && !empty($column['unsigned']) ? 'unsigned ' : '';
 
 		if ($size !== null)
 			$type = $type . '(' . $size . ')';

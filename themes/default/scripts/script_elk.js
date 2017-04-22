@@ -3,22 +3,29 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.1
+ * @version 1.0.10
  *
  * This file contains javascript utility functions specific to ElkArte
  */
 
 /**
- * Sets an auto height so small code blocks collapse
- * Sets a height for larger code blocks and lets them resize / overflow as normal
+ * Sets code blocks such that resize vertical works as expect.  Done this way to avoid
+ * page jumps to named anchors missing the target.
  */
 function elk_codefix()
 {
 	$('.bbc_code').each(function()
 	{
-		$(this).height("auto");
-		if ($(this).height() > 200)
-			$(this).css('height', '20em');
+		var $this = $(this);
+
+		// If it has a scroll bar, allow the user to resize it vertically
+		if ($this.get(0).scrollHeight > $this.innerHeight()) {
+			$this.css('height', $this.height());
+			$this.css('max-height', 'none');
+		}
+		else {
+			$this.css('resize', 'none');
+		}
 	});
 }
 

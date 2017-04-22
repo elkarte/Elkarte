@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.8
+ * @version 1.0.10
  *
  */
 
@@ -818,7 +818,7 @@ function loadPermissions()
  */
 function loadMemberData($users, $is_name = false, $set = 'normal')
 {
-	global $user_profile, $modSettings, $board_info, $context;
+	global $user_profile, $modSettings, $board_info, $context, $user_info;
 
 	$db = database();
 
@@ -914,7 +914,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	}
 
 	// Custom profile fields as well
-	if (!empty($new_loaded_ids) && $set !== 'minimal' && (in_array('cp', $context['admin_features'])))
+	if (!empty($new_loaded_ids) && !empty($user_info['id']) && $set !== 'minimal' && (in_array('cp', $context['admin_features'])))
 	{
 		$request = $db->query('', '
 			SELECT id_member, variable, value
@@ -1632,6 +1632,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	// A bit lonely maybe, though I think it should be set up *after* teh theme variants detection
 	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] .  'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
+	$context['right_to_left'] = !empty($txt['lang_rtl']);
 
 	// Allow overriding the board wide time/number formats.
 	if (empty($user_settings['time_format']) && !empty($txt['time_format']))
@@ -1648,7 +1649,6 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$settings['lang_images_url'] = $settings['images_url'] . '/' . (!empty($txt['image_lang']) ? $txt['image_lang'] : $user_info['language']);
 
 	// Set a couple of bits for the template.
-	$context['right_to_left'] = !empty($txt['lang_rtl']);
 	$context['tabindex'] = 1;
 
 	// RTL languages require an additional stylesheet.
@@ -3188,7 +3188,7 @@ function serializeToJson($variable, $save_callback = null)
 		// If unserialize fails as well, let's just store an empty array
 		if ($array_form === false)
 		{
-			$array_form = array();
+			$array_form = array(0, '', 0);
 		}
 
 		// Time to update the value if necessary

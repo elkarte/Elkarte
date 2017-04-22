@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE package-info SYSTEM "http://www.elkarte.net/site/package-info">
+<package-info xmlns="http://www.elkarte.net/site/package-info" xmlns:elk="http://www.elkarte.net/">
+	<id>Elkarte Contributors:ElkArte_1010_patch</id>
+	<name>ElkArte 1.0.10 patch</name>
+	<version>1.0.0</version>
+	<type>modification</type>
+		<install for="1.0.9">
+			<modification>modifications.xml</modification>
+			<require-file name="PasswordHash.php" destination="EXTDIR" />
+			<require-file name="cssmin.php" destination="EXTDIR" />
+			<require-file name="Html2Md.class.php" destination="SUBSDIR" />
+			<require-file name="jquery.sceditor.min.js" destination="THEMEDIR/default" />
+			<redirect url="$scripturl?action=admin;area=packages" timeout="5000" parsebbc="true">redirect</redirect>
+		</install>
+		<uninstall for="1.0.10">
+			<modification reverse="true">modifications.xml</modification>
+			<require-file name="old/PasswordHash.php" destination="EXTDIR" />
+			<require-file name="old/cssmin.php" destination="EXTDIR" />
+			<require-file name="old/Html2Md.class.php" destination="SUBSDIR" />
+			<require-file name="old/jquery.sceditor.min.js" destination="THEMEDIR/default" />
+			<redirect url="$scripturl?action=admin;area=packages" timeout="5000" parsebbc="true">redirect</redirect>
+		</uninstall>
+</package-info>

@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.0.10
  *
  */
 
@@ -386,7 +386,7 @@ class Poll_Controller extends Action_Controller
 			$context['last_choice_id'] = $last_id;
 
 			if ($context['can_moderate_poll'])
-				$context['poll']['expiration'] = $_POST['poll_expire'];
+				$context['poll']['expiration'] = (int) $_POST['poll_expire'];
 
 			// Check the question/option count for errors.
 			// @todo: why !$poll_errors->hasErrors()?

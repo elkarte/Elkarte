@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.10
  *
  */
 
@@ -252,7 +252,8 @@ class Sphinx_Search
 			$mySphinx->SetMatchMode($mode);
 
 			// Execute the search query.
-			$request = $mySphinx->Query($query, 'elkarte_index');
+			$index = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte') . '_index';
+			$request = $mySphinx->Query($query, $index);
 
 			// Can a connection to the daemon be made?
 			if ($request === false)

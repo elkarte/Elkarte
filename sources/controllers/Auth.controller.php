@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.7
+ * @version 1.0.10
  *
  */
 
@@ -67,6 +67,7 @@ class Auth_Controller extends Action_Controller
 
 		// Get the template ready.... not really much else to do.
 		$context['page_title'] = $txt['login'];
+		$_REQUEST['u'] = isset($_REQUEST['u']) ? Util::htmlspecialchars($_REQUEST['u']) : '';
 		$context['default_username'] = &$_REQUEST['u'];
 		$context['using_openid'] = isset($_GET['openid']);
 		$context['default_password'] = '';
@@ -128,7 +129,7 @@ class Auth_Controller extends Action_Controller
 		// Set up the cookie length.  (if it's invalid, just fall through and use the default.)
 		if (isset($_POST['cookieneverexp']) || (!empty($_POST['cookielength']) && $_POST['cookielength'] == -1))
 			$modSettings['cookieTime'] = 3153600;
-		elseif (!empty($_POST['cookielength']) && ($_POST['cookielength'] >= 1 || $_POST['cookielength'] <= 525600))
+		elseif (!empty($_POST['cookielength']) && ($_POST['cookielength'] >= 1 && $_POST['cookielength'] <= 525600))
 			$modSettings['cookieTime'] = (int) $_POST['cookielength'];
 
 		loadLanguage('Login');

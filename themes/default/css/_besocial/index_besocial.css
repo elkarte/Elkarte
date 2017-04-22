@@ -1142,6 +1142,20 @@ a.active {
 	opacity: 0.9;
 }
 
+/* attachment details below thumbnails */
+.attachment_name, .attachment_details {
+	border: solid 1px #afafaf;
+	color: #444 !important;
+}
+.attachment_name {
+	border-bottom: none;
+	border-radius: .25em .25em 0 0;
+}
+.attachment_details {
+	border-top: none;
+	border-radius: 0 0 .25em .25em;
+}
+
 /*	$PROFILE		*/
 /* ------------------------------------------------------- */
 #warndiv .ui-widget-header {

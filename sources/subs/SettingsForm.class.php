@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.8
+ * @version 1.0.10
  *
  *
  * Adding options to one of the setting screens isn't hard.
@@ -120,7 +120,7 @@ class Settings_Form
 			else
 			{
 				$varname = $config_var[0];
-				global $$varname;
+				global ${$varname};
 
 				// Set the subtext in case it's part of the label.
 				// @todo Temporary. Preventing divs inside label tags.

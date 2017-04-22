@@ -16,7 +16,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.8
+ * @version 1.0.10
  *
  */
 
@@ -443,7 +443,11 @@ function processAttachments($id_msg = null)
 		// This is a generic error
 		$attach_errors->activate();
 		$attach_errors->addError('attach_no_upload');
-		$attach_errors->addError(is_array($attachment) ? array($attachment[0], $attachment[1]) : $attachment);
+		// @todo This is likely the result of some refactoring, verify when $attachment is not set and why
+		if (isset($attachment))
+		{
+			$attach_errors->addError(is_array($attachment) ? array($attachment[0], $attachment[1]) : $attachment);
+		}
 
 		// And delete the files 'cos they ain't going nowhere.
 		foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
@@ -507,6 +511,12 @@ function processAttachments($id_msg = null)
 		// If there were no errors to this pont, we apply some addtional checks
 		if (empty($_SESSION['temp_attachments'][$attachID]['errors']))
 			attachmentChecks($attachID);
+
+		// Want to correct for phonetographer photos?
+		if (!empty($modSettings['attachment_autorotate']) && empty($_SESSION['temp_attachments'][$attachID]['errors']) && substr($_SESSION['temp_attachments'][$attachID]['type'], 0, 5) === 'image')
+		{
+			autoRotateImage($_SESSION['temp_attachments'][$attachID]['tmp_name']);
+		}
 
 		// Sort out the errors for display and delete any associated files.
 		if (!empty($_SESSION['temp_attachments'][$attachID]['errors']))

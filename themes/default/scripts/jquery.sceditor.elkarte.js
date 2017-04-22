@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.4
+ * @version 1.0.10
  * Extension functions to provide ElkArte compatibility with sceditor
  */
 
@@ -378,6 +378,17 @@ $.sceditor.plugins.bbcode.bbcode
 		format: '[pre]{0}[/pre]',
 		html: '<pre>{0}</pre>'
 	})
+	.set('center', {
+		tags: {
+			center: null
+		},
+		styles: {
+			'text-align': ['center', '-webkit-center', '-moz-center', '-khtml-center']
+		},
+		isInline: true,
+		format: '[center]{0}[/center]',
+		html: '<span style="display:block;text-align:center">{0}</span>'
+	})
 	/*
 	 * ElkArte modified tags, modified so they support the existing paradigm
 	 *
@@ -518,6 +529,7 @@ $.sceditor.plugins.bbcode.bbcode
 		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
 		format: function(element, content) {
 			var attribs = '',
+				$elm = $(element),
 				style = function(name) {
 					return element.style ? element.style[name] : null;
 				};
@@ -526,23 +538,26 @@ $.sceditor.plugins.bbcode.bbcode
 			if (typeof element.attr('data-sceditor-emoticon') !== "undefined")
 				return content;
 
-			// only add width and height if one is specified
+			// only add the parameters that are specified
 			if (element.attr('width') || style('width'))
-				attribs += " width=" + $(element).width();
+				attribs += " width=" + $elm.width();
 			if (element.attr('height') || style('height'))
-				attribs += " height=" + $(element).height();
+				attribs += " height=" + $elm.height();
+			if (element.attr('alt'))
+				attribs += ' alt="' + element.attr('alt') + '"';
 
 			return '[img' + attribs + ']' + element.attr('src') + '[/img]';
 		},
 		html: function(token, attrs, content) {
-			var parts,
-				attribs = '';
+			var attribs = '';
 
-			// handle [img width=340 height=240]url[/img]
+			// handle [img alt=alt width=123 height=123]url[/img]
 			if (typeof attrs.width !== "undefined")
 				attribs += ' width="' + attrs.width + '"';
 			if (typeof attrs.height !== "undefined")
 				attribs += ' height="' + attrs.height + '"';
+			if (typeof attrs.alt !== "undefined")
+				attribs += ' alt="' + attrs.alt + '"';
 
 			return '<img' + attribs + ' src="' + content + '" />';
 		}
@@ -558,7 +573,7 @@ $.sceditor.plugins.bbcode.bbcode
 
 			if (attrs.type)
 				style = 'style="list-style-type: ' + attrs.type + '"';
-			return '<' + code + ' ' + style + '>' + content + '</' + code + '>';
+			return '<' + code + ' ' + style + '>' + content.replace(/<\/li><br \/>/g, '</li>') + '</' + code + '>';
 		}
 	})
 	.set('li', {
@@ -569,11 +584,13 @@ $.sceditor.plugins.bbcode.bbcode
 			ul: null
 		},
 		breakStart: true,
-		format: function(element, content) {
-			if ($(element[0]).css('list-style-type') === 'disc')
+		format: function (element, content) {
+			var type = $(element[0]).prop('style')['list-style-type'];
+
+			if (type === 'disc' || type === '')
 				return '[list]' + content + '[/list]';
 			else
-				return '[list type=' + $(element[0]).css('list-style-type') + ']' + content + '[/list]';
+				return '[list type=' + type + ']' + content + '[/list]';
 		},
 		isInline: false,
 		skipLastLineBreak: true,

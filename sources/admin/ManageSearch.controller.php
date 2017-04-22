@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.8
+ * @version 1.0.10
  *
  */
 
@@ -461,14 +461,15 @@ class ManageSearch_Controller extends Action_Controller
 			);
 			$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
 			$context['step'] = isset($_REQUEST['step']) ? (int) $_REQUEST['step'] : 0;
-
-			// Admin timeouts are painful when building these long indexes
-			if ($_SESSION['admin_time'] + 3300 < time() && $context['step'] >= 1)
-				$_SESSION['admin_time'] = time();
 		}
 
 		if ($context['step'] !== 0)
+		{
 			checkSession('request');
+
+			// Admin timeouts are painful when building these long indexes
+			$_SESSION['admin_time'] = time();
+		}
 
 		// Step 0: let the user determine how they like their index.
 		if ($context['step'] === 0)
@@ -534,6 +535,7 @@ class ManageSearch_Controller extends Action_Controller
 			validateToken('admin-mssphinx');
 
 			updateSettings(array(
+				'sphinx_index_prefix' => trim($_POST['sphinx_index_prefix']),
 				'sphinx_data_path' => rtrim($_POST['sphinx_data_path'], '/'),
 				'sphinx_log_path' => rtrim($_POST['sphinx_log_path'], '/'),
 				'sphinx_stopword_path' => $_POST['sphinx_stopword_path'],
@@ -569,7 +571,8 @@ class ManageSearch_Controller extends Action_Controller
 					$mySphinx->SetMatchMode(SPH_MATCH_BOOLEAN);
 					$mySphinx->SetSortMode(SPH_SORT_ATTR_ASC, 'id_topic');
 
-					$request = $mySphinx->Query('test', 'elkarte_index');
+					$index = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte') . '_index';
+					$request = $mySphinx->Query('test', $index);
 					if ($request === false)
 					{
 						$context['settings_message'][] = $txt['sphinx_test_connect_failed'];

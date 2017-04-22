@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.5
+ * @version 1.0.10
  *
  */
 
@@ -1013,13 +1013,13 @@ function template_show_settings()
 					echo '
 							<fieldset id="', $config_var['name'], '">
 								<legend>', $txt['bbcTagsToUse_select'], '</legend>
-								<ul>';
+								<ul class="list_bbc">';
 
 					foreach ($context['bbc_columns'] as $bbcColumn)
 					{
 						foreach ($bbcColumn as $bbcTag)
 							echo '
-									<li class="list_bbc floatleft">
+									<li>
 										<input type="checkbox" name="', $config_var['name'], '_enabledTags[]" id="tag_', $config_var['name'], '_', $bbcTag['tag'], '" value="', $bbcTag['tag'], '"', !in_array($bbcTag['tag'], $context['bbc_sections'][$config_var['name']]['disabled']) ? ' checked="checked"' : '', ' class="input_check" /> <label for="tag_', $config_var['name'], '_', $bbcTag['tag'], '">', $bbcTag['tag'], '</label>', $bbcTag['show_help'] ? ' (<a href="' . $scripturl . '?action=quickhelp;help=tag_' . $bbcTag['tag'] . '" onclick="return reqOverlayDiv(this.href);">?</a>)' : '', '
 									</li>';
 					}
