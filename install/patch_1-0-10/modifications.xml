@@ -22,6 +22,12 @@
 ]]></add>
 		</operation>
 		<operation>
+			<search position="replace"><![CDATA[// Shortcut for the browser cache stale
+define('CACHE_STALE', '?109');]]></search>
+			<add><![CDATA[// Shortcut for the browser cache stale
+define('CACHE_STALE', '?1010');]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[			AND m.approved = {int:is_approved}' : '') . '
 		' . (empty($query_where) ? '' : 'AND ' . $query_where) . '
 		ORDER BY ' . $query_order . '
