@@ -390,7 +390,6 @@ class ProfileOptions_Controller extends Action_Controller
 		$context['sub_template'] = 'edit_options';
 		$context['page_desc'] = $txt['account_info'];
 
-<<<<<<< HEAD
 		if (!empty($modSettings['enableOTP']))
 		{
 			$fields = ProfileOptions_Controller::getFields('account_otp');
