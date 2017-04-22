@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.0.10
  *
  * Original module by Mach8 - We'll never forget you.
  */
@@ -282,7 +282,7 @@ class SplitTopics_Controller extends Action_Controller
 		// This is a special case for split topics from quick-moderation checkboxes
 		if (isset($_REQUEST['subname_enc']))
 		{
-			$this->_new_topic_subject = urldecode($_REQUEST['subname_enc']);
+			$this->_new_topic_subject = trim(Util::htmlspecialchars(urldecode($_REQUEST['subname_enc'])));
 			$this->_set_session_values();
 		}
 

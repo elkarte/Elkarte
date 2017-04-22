@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.5
+ * @version 1.0.10
  *
  */
 
@@ -1323,7 +1323,9 @@ class PersonalMessage_Controller extends Action_Controller
 			$_POST = htmlspecialchars__recursive($_POST);
 
 			// Save the fields.
-			saveProfileFields();
+			require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
+			$fields = ProfileOptions_Controller::getFields('contactprefs');
+			saveProfileFields($fields['fields'], $fields['hook']);
 
 			if (!empty($profile_vars))
 				updateMemberData($user_info['id'], $profile_vars);

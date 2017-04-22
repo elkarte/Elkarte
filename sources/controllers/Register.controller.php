@@ -192,17 +192,18 @@ class Register_Controller extends Action_Controller
 
 			// Here, and here only, emulate the permissions the user would have to do this.
 			$user_info['permissions'] = array_merge($user_info['permissions'], array('profile_account_own', 'profile_extra_own'));
-			$reg_fields = explode(',', $modSettings['registration_fields']);
+			require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
+			$reg_fields = ProfileOptions_Controller::getFields('registration');
 
 			// We might have had some submissions on this front - go check.
-			foreach ($reg_fields as $field)
+			foreach ($reg_fields['fields'] as $field)
 			{
 				if (isset($_POST[$field]))
 					$cur_profile[$field] = Util::htmlspecialchars($_POST[$field]);
 			}
 
 			// Load all the fields in question.
-			setupProfileContext($reg_fields, 'registration');
+			setupProfileContext($reg_fields['fields'], $reg_fields['hook']);
 		}
 
 		// Generate a visual verification code to make sure the user is no bot.
