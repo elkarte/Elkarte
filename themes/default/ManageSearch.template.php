@@ -479,6 +479,13 @@ function template_manage_sphinx()
 			<div class="content">
 				<dl class="settings">
 					<dt>
+						<label for="sphinx_index_prefix_input">', $txt['sphinx_index_prefix'], '</label><br />
+						<span class="smalltext">', $txt['sphinx_index_prefix_desc'], '</span>
+					</dt>
+					<dd>
+						<input type="text" name="sphinx_index_prefix" id="sphinx_index_prefix_input" value="', isset($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_data_path'] : 'elkarte', '" size="65" />
+					</dd>
+					<dt>
 						<label for="sphinx_data_path_input">', $txt['sphinx_index_data_path'], '</label><br />
 						<span class="smalltext">', $txt['sphinx_index_data_path_desc'], '</span>
 					</dt>

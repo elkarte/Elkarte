@@ -428,6 +428,17 @@ $.sceditor.plugins.bbcode.bbcode
 			return '<img' + attribs + align + ' src="' + elk_scripturl + '?action=dlattach;attach=' + content + ';thumb;' + elk_session_var + '=' + elk_session_id + '" data-ila="' + content + '" />';
 		}
 	})
+	.set('center', {
+		tags: {
+			center: null
+		},
+		styles: {
+			'text-align': ['center', '-webkit-center', '-moz-center', '-khtml-center']
+		},
+		isInline: true,
+		format: '[center]{0}[/center]',
+		html: '<span style="display:block;text-align:center">{0}</span>'
+	})
 	/*
 	 * ElkArte modified tags, modified so they support the existing paradigm
 	 *
@@ -574,6 +585,7 @@ $.sceditor.plugins.bbcode.bbcode
 			params(['width', 'height', 'title', 'alt']);
 			return '[img' + attribs + ']' + element.attr('src') + '[/img]';
 		},
+
 		html: function (token, attrs, content) {
 			var attribs = '',
 				params = function (names) {
@@ -594,12 +606,12 @@ $.sceditor.plugins.bbcode.bbcode
 		skipLastLineBreak: true,
 		allowedChildren: ['#', '*', 'li'],
 		html: function (element, attrs, content) {
-			var style = '';
+			var style = '',
+				code = 'ul';
 
-			if (typeof attrs.type !== 'undefined')
-				style = ' style="list-style-type: ' + attrs.type + '"';
-
-			return '<ul' + style + '>' + content.replace(/<\/li><br \/>/g, '</li>') + '</ul>';
+			if (attrs.type)
+				style = 'style="list-style-type: ' + attrs.type + '"';
+			return '<' + code + ' ' + style + '>' + content.replace(/<\/li><br \/>/g, '</li>') + '</' + code + '>';
 		}
 	})
 	.set('li', {

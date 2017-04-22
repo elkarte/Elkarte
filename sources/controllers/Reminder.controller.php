@@ -79,8 +79,8 @@ class Reminder_Controller extends Action_Controller
 		elseif ($this->_req->getPost('user') !== '')
 		{
 			$where = 'member_name = {string:member_name}';
-			$where_params['member_name'] = $this->_req->post->user;
-			$where_params['email_address'] = $this->_req->post->user;
+			$where_params['member_name'] = $this->_req->getPost('user', 'trim|Util::htmlspecialchars[ENT_QUOTES]');
+			$where_params['email_address'] = $this->_req->getPost('user', 'trim|Util::htmlspecialchars[ENT_QUOTES]');
 		}
 
 		// You must enter a username/email address.
@@ -179,7 +179,7 @@ class Reminder_Controller extends Action_Controller
 		$context += array(
 			'page_title' => $txt['reminder_set_password'],
 			'sub_template' => 'set_password',
-			'code' => $this->_req->query->code,
+			'code' => Util::htmlspecialchars($this->_req->query->code),
 			'memID' => (int) $this->_req->query->u
 		);
 

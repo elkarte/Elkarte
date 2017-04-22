@@ -651,7 +651,10 @@ class Profile_Controller extends Action_Controller
 				// @todo yes this is ugly, but saveProfileFields needs to be updated first
 				$_POST = (array) $this->_req->post;
 
-				saveProfileFields();
+				require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
+				$fields = ProfileOptions_Controller::getFields($this->_current_area);
+
+				saveProfileFields($fields['fields'], $fields['hook']);
 			}
 			else
 			{

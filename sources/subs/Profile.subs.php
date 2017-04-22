@@ -995,9 +995,12 @@ function loadProfileFields($force_reload = false)
 /**
  * Save the profile changes.
  */
-function saveProfileFields()
+function saveProfileFields($fields, $hook)
 {
 	global $profile_fields, $profile_vars, $context, $old_profile, $post_errors, $cur_profile;
+
+	if (!empty($hook))
+		call_integration_hook('integrate_' . $hook . '_profile_fields', array(&$fields));
 
 	// Load them up.
 	loadProfileFields();
@@ -1015,8 +1018,15 @@ function saveProfileFields()
 	$context['log_changes'] = array();
 
 	// Cycle through the profile fields working out what to do!
-	foreach ($profile_fields as $key => $field)
+	foreach ($fields as $key)
 	{
+		if (!isset($profile_fields[$key]))
+		{
+			continue;
+		}
+
+		$field = $profile_fields[$key];
+
 		if (!isset($_POST[$key]) || !empty($field['is_dummy']) || (isset($_POST['preview_signature']) && $key === 'signature'))
 			continue;
 

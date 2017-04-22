@@ -857,7 +857,7 @@ function loadPermissions()
  */
 function loadMemberData($users, $is_name = false, $set = 'normal')
 {
-	global $user_profile, $modSettings, $board_info, $context;
+	global $user_profile, $modSettings, $board_info, $context, $user_info;
 
 	$db = database();
 	$cache = Cache::instance();
@@ -954,7 +954,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	}
 
 	// Custom profile fields as well
-	if (!empty($new_loaded_ids) && $set !== 'minimal' && (in_array('cp', $context['admin_features'])))
+	if (!empty($new_loaded_ids) && !empty($user_info['id']) && $set !== 'minimal' && (in_array('cp', $context['admin_features'])))
 	{
 		$request = $db->query('', '
 			SELECT id_member, variable, value
@@ -1541,6 +1541,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	// A bit lonely maybe, though I think it should be set up *after* the theme variants detection
 	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] . 'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
+	$context['right_to_left'] = !empty($txt['lang_rtl']);
 
 	// Allow overriding the board wide time/number formats.
 	if (empty($user_settings['time_format']) && !empty($txt['time_format']))

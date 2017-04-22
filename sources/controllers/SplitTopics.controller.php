@@ -309,7 +309,7 @@ class SplitTopics_Controller extends Action_Controller
 		// This is a special case for split topics from quick-moderation checkboxes
 		if (isset($this->_req->query->subname_enc))
 		{
-			$this->_new_topic_subject = urldecode($this->_req->query->subname_enc);
+			$this->_new_topic_subject = trim(Util::htmlspecialchars(urldecode($this->_req->query->subname_enc)));
 			$this->_set_session_values();
 		}
 

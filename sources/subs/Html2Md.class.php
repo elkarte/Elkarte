@@ -300,6 +300,7 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 * @param boolean $parser flag for internal or external parser
+	 *
 	 * @return boolean
 	 */
 	private static function _has_parent_code($node, $parser)
@@ -331,6 +332,7 @@ class Html_2_Md
 	 *
 	 * @param object $node
 	 * @param boolean $parser flag for internal or external parser
+	 *
 	 * @return int
 	 */
 	private static function _has_parent_list($node, $parser)
@@ -766,6 +768,9 @@ class Html_2_Md
 		// Adjust width if needed to maintain the image
 		$this->_check_link_lenght($markdown);
 
+		// Adjust width if needed to maintain the image
+		$this->_check_link_lenght($markdown);
+
 		return $markdown;
 	}
 
@@ -814,7 +819,7 @@ class Html_2_Md
 		$table_heading = $node->getElementsByTagName('th');
 		if ($this->_get_item($table_heading, 0) === null)
 		{
-			return;
+			return '';
 		}
 
 		$th_parent = ($table_heading) ? ($this->_parser ? $this->_get_item($table_heading, 0)->parentNode->nodeName : $this->_get_item($table_heading, 0)->parentNode()->nodeName()) : false;

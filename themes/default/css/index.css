@@ -3105,16 +3105,49 @@ img.new_posts {
 	border-top: 1px solid;
 }
 
-.attachments {
-	clear: both;
-	margin: 20px 0 0 0;
-}
-
-.attachments .attachment {
+.attachment_block, .attachment {
 	display: inline-block;
-	box-sizing: border-box;
-	padding: 6px 8px;
-	width: 24%;
+	max-width: 99%;
+	min-width: 19em;
+	margin: 0 .5em 1em 0;
+	vertical-align: bottom;
+	text-align: center;
+	overflow: hidden;
+}
+.attachment_image {
+	margin: 2em 0 0 0;
+}
+.attachment_name, .attachment_details {
+	display: block;
+	width: 18em;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	padding: 0 .25em;
+}
+.attachment_name {
+	 margin: .5em 0 0 0;
+}
+.attachment_name_exp, .attachment_details_exp {
+	width: auto;
+}
+.attachment_name_exp {
+	margin: -.5em 0 0;
+}
+/* Important stuff. */
+.attachment_name:before {
+	display: block;
+	clear: both;
+	content: "";
+}
+/* Important stuff. */
+/* Auto scaling of images in posts, sigs, attachments, etc. */
+/* @todo - Cross check where this is defined earlier */
+.inner .bbc_img, .signature .bbc_img, .attachment_image {
+	height: auto;
+	width: auto;
+	max-width: 100%;
+	max-height: 800px;
 }
 
 /* Poor Mans lightbox support */
