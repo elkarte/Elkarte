@@ -600,12 +600,15 @@
 			});
 
 			// Rather click and select?
-			obj.find('#attachment_click').change(function(e) {
+			$input = obj.find('#attachment_click');
+			$input.change(function(e) {
 				e.preventDefault();
 				var files = $(this)[0].files;
 				handleFileUpload(files, obj);
 				this.value = null;
 			});
+			$input.clone().appendTo('.drop_area_fileselect_text');
+			$input.hide();
 		});
 		init(params);
 		return {

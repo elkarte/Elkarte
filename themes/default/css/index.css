@@ -3547,21 +3547,19 @@ ul.post_options li {
 
 .drop_area_fileselect {
 	position: absolute;
-	margin-left: -9em;
-	margin-top: -.5em;
-	width: 8em;
 	opacity: 0.0001;
 	cursor: pointer;
-}
-
-#chrome .drop_area_fileselect,
-#safari .drop_area_fileselect {
-	padding-left: 180px;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	width: 100%;
 }
 
 .drop_area_fileselect_text {
 	padding: 0 4px;
 	white-space: nowrap;
+	position: relative;
 }
 
 .drop_area .mobile {
@@ -6067,18 +6065,7 @@ a > i {
 	}
 
 	.drop_area_fileselect {
-		width: auto;
-		top: 1em;
-		left: 0;
-		padding-left: 0;
-		margin-left: 55px;
-		margin-top: 0;
 		height: 3.5em !important;
-	}
-
-	#chrome .drop_area_fileselect,
-	#safari .drop_area_fileselect{
-		padding-left: 0;
 	}
 
 	.drop_area .desktop {

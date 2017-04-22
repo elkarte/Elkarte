@@ -1459,6 +1459,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 	elseif ($user_info['is_guest'] && isset($_COOKIE['upshrink']))
 		$context['minmax_preferences'] = array('upshrink' => $_COOKIE['upshrink']);
 
+	// Load the basic layers
+	theme()->loadDefaultLayers();
+
 	// @todo when are these set before loadTheme(0, true)?
 	loadThemeContext();
 
@@ -1505,9 +1508,6 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	if (!isset($txt))
 		$txt = array();
-
-	// Load the basic layers
-	theme()->loadDefaultLayers();
 
 	// Defaults in case of odd things
 	$settings['avatars_on_indexes'] = 0;
