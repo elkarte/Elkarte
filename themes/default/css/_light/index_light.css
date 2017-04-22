@@ -1325,6 +1325,21 @@ div.bbc_footnotes .meaction {
 	border-top-color: #BFBFBF;
 }
 
+/* attachment details below thumbnails */
+.attachment_name, .attachment_details {
+	border: solid 1px #afafaf;
+	background: #E4E4E4 !important;
+	color: #444 !important;
+	border-bottom: 1px solid #afafaf !important;
+}
+.attachment_name {
+	border-bottom: none;
+}
+.attachment_details {
+	border-top: none;
+	border-radius: 0 0 .5em .5em;
+}
+
 /* Poor Mans lightbox support */
 #elk_lightbox {
 	background: rgba(0, 0, 0, .5);

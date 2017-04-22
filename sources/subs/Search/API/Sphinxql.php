@@ -158,8 +158,9 @@ class Sphinxql extends SearchAPI
 				\Errors::instance()->fatal_lang_error('error_no_search_daemon');
 			}
 
-			// Compile different options for our query, relevance value is capped at 1M in indexing function
-			$query = 'SELECT *' . (empty($search_params['topic']) ? ', COUNT(*) num' : '') . ', WEIGHT() weights, (weights + (relevance/10)) rank FROM elkarte_index';
+			// Compile different options for our query
+			$index = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte') . '_index';
+			$query = 'SELECT *' . (empty($search_params['topic']) ? ', COUNT(*) num' : '') . ', WEIGHT() weights, (weights + (relevance/1000)) rank FROM ' . $index;
 
 			// Construct the (binary mode & |) query.
 			$where_match = $this->_constructQuery($search_params['search']);

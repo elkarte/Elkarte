@@ -43,7 +43,7 @@ function template_list_groups_collapsible($group = 'default_groups_list')
 
 	echo '
 				<li class="check_all">
-					<input type="checkbox" id="check_all" ', $all_selected ? 'checked="checked" ' : '', 'onclick="invertAll(this, this.form, \'', $current_group_list['id'], '\');" />
+					<input type="checkbox" id="check_all" ', $all_selected ? 'checked="checked" ' : '', 'onclick="invertAll(this, this.form, \'', $current_group_list['id'], '\');" class="input_check" />
 					<label for="check_all">', $txt['check_all'], '</label>
 				</li>
 			</ul>

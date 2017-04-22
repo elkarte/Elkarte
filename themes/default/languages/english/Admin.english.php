@@ -392,6 +392,7 @@ $txt['attachment_image_reencode_note'] = '(requires GD module or ImageMagick)';
 $txt['attachment_image_paranoid_warning'] = 'The extensive security checks can result in a large number of rejected attachments.';
 $txt['attachment_image_paranoid'] = 'Perform extensive security checks on uploaded image attachments';
 $txt['attachment_autorotate'] = 'Detect and fix improperly rotated images';
+$txt['attachment_autorotate_na'] = '(Not available on this system)';
 $txt['attachmentThumbnails'] = 'Resize images when showing under posts';
 $txt['attachment_thumb_png'] = 'Save thumbnails as PNG';
 $txt['attachment_thumb_memory'] = 'Adaptive thumbnail memory';

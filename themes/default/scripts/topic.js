@@ -966,7 +966,17 @@ function expandThumbLB(thumbID) {
 function expandThumb(thumbID)
 {
 	var img = document.getElementById('thumb_' + thumbID),
-		link = document.getElementById('link_' + thumbID);
+		link = document.getElementById('link_' + thumbID),
+		name = link.nextSibling;
+
+	// Some browsers will add empty text so loop to the next element node
+	while (name && name.nodeType !== 1) {
+		name = name.nextSibling;
+	}
+	var details = name.nextSibling;
+	while (details && details.nodeType !== 1) {
+		details = details.nextSibling;
+	}
 
 	// Save the currently displayed image attributes
 	var tmp_src = img.src,
@@ -977,6 +987,10 @@ function expandThumb(thumbID)
 	img.src = link.href;
 	img.style.width = link.style.width;
 	img.style.height = link.style.height;
+
+	// Swap the class name on the title/desc
+	name.className = name.className.includes('_exp') ? 'attachment_name' : 'attachment_name attachment_name_exp';
+	details.className = details.className.includes('_exp') ? 'attachment_details' : 'attachment_details attachment_details_exp';
 
 	// Now place the image attributes back
 	link.href = tmp_src;

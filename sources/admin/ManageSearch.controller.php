@@ -544,6 +544,7 @@ class ManageSearch_Controller extends Action_Controller
 			validateToken('admin-mssphinx');
 
 			updateSettings(array(
+				'sphinx_index_prefix' => rtrim($this->_req->post->sphinx_index_prefix, '/'),
 				'sphinx_data_path' => rtrim($this->_req->post->sphinx_data_path, '/'),
 				'sphinx_log_path' => rtrim($this->_req->post->sphinx_log_path, '/'),
 				'sphinx_stopword_path' => $this->_req->post->sphinx_stopword_path,
@@ -583,7 +584,8 @@ class ManageSearch_Controller extends Action_Controller
 					$mySphinx->SetMatchMode(SPH_MATCH_BOOLEAN);
 					$mySphinx->SetSortMode(SPH_SORT_ATTR_ASC, 'id_topic');
 
-					$request = $mySphinx->Query('test', 'elkarte_index');
+					$index = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte') . '_index';
+					$request = $mySphinx->Query('test', $index);
 					if ($request === false)
 					{
 						$context['settings_message'][] = $txt['sphinx_test_connect_failed'];

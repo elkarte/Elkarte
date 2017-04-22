@@ -83,11 +83,17 @@ class PersonalMessage_Controller extends Action_Controller
 			$context['pm_sent'] = true;
 		}
 
-		// Now we have the labels, and assuming we have unsorted mail, apply our rules!
-		if ($user_settings['new_pm'])
+		// Load the label data.
+		if ($user_settings['new_pm'] || ($context['labels'] = cache_get_data('labelCounts:' . $user_info['id'], 720)) === null)
 		{
 			$this->_loadLabels();
 
+			loadPMLabels();
+		}
+
+		// Now we have the labels, and assuming we have unsorted mail, apply our rules!
+		if ($user_settings['new_pm'])
+		{
 			// Apply our rules to the new PM's
 			applyRules();
 
@@ -1823,7 +1829,9 @@ class PersonalMessage_Controller extends Action_Controller
 			$_POST = htmlspecialchars__recursive($_POST);
 
 			// Save the fields.
-			saveProfileFields();
+			require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
+			$fields = ProfileOptions_Controller::getFields('contactprefs');
+			saveProfileFields($fields['fields'], $fields['hook']);
 
 			if (!empty($profile_vars))
 			{

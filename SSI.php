@@ -327,7 +327,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 			'current_member' => $user_info['id'],
 			'is_approved' => 1,
 			'query_limit' => $query_limit,
-1		))
+		))
 	);
 
 	$bbc_parser = \BBC\ParserWrapper::getInstance();

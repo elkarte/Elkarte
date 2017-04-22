@@ -849,7 +849,7 @@ function template_news_fader()
 		</ul>';
 
 	addInlineJavascript('
-		$(\'#elkFadeScroller\').Elk_NewsFader();', true);
+		$(\'#elkFadeScroller\').Elk_NewsFader(' . (empty($settings['newsfader_time']) ? '' : '{\'iFadeDelay\': ' . $settings['newsfader_time'] . '}') . ');', true);
 }
 
 /**

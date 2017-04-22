@@ -25,6 +25,73 @@
  */
 class ProfileOptions_Controller extends Action_Controller
 {
+	public static function getFields($area)
+	{
+		global $modSettings;
+
+		$fields = array(
+			'account' => array(
+				'fields' => array(
+					'member_name', 'real_name', 'date_registered', 'posts', 'lngfile', 'hr',
+					'id_group', 'hr',
+					'email_address', 'hide_email', 'show_online', 'hr',
+					'passwrd1', 'passwrd2', 'hr',
+					'secret_question', 'secret_answer',
+				),
+				'hook' => 'account'
+			),
+			'account_otp' => array(
+				'fields' => array(
+					'member_name', 'real_name', 'date_registered', 'posts', 'lngfile', 'hr',
+					'id_group', 'hr',
+					'email_address', 'hide_email', 'show_online', 'hr',
+					'passwrd1', 'passwrd2', 'hr',
+					'secret_question', 'secret_answer', 'hr',
+					'enable_otp', 'otp_secret', 'hr'
+				),
+				'hook' => 'account'
+			),
+			'forumprofile' => array(
+				'fields' => array(
+					'avatar_choice', 'hr',
+					'bday1', 'usertitle','hr',
+					'signature', 'hr',
+					'karma_good', 'hr',
+					'website_title', 'website_url',
+				),
+				'hook' => 'forum'
+			),
+			'theme' => array(
+				'fields' => array(
+					'id_theme', 'smiley_set', 'hr',
+					'time_format', 'time_offset', 'hr',
+					'theme_settings',
+				),
+				'hook' => 'themepick'
+			),
+			'contactprefs' => array(
+				'fields' => array(
+					'receive_from',
+					'hr',
+					'pm_settings',
+				),
+				'hook' => 'pmprefs'
+			),
+			'registration' => array(
+				'fields' => !empty($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array(),
+				'hook' => 'registration'
+			)
+		);
+
+		if (isset($fields[$area]))
+		{
+			return $fields[$area];
+		}
+		else
+		{
+			return array();
+		}
+	}
 	/**
 	 * Member id for the profile being viewed
 	 * @var int
@@ -325,17 +392,8 @@ class ProfileOptions_Controller extends Action_Controller
 
 		if (!empty($modSettings['enableOTP']))
 		{
-			setupProfileContext(
-				array(
-					'member_name', 'real_name', 'date_registered', 'posts', 'lngfile', 'hr',
-					'id_group', 'hr',
-					'email_address', 'hide_email', 'show_online', 'hr',
-					'passwrd1', 'passwrd2', 'hr',
-					'secret_question', 'secret_answer', 'hr',
-					'enable_otp', 'otp_secret', 'hr'
-				),
-				'account'
-			);
+			$fields = ProfileOptions_Controller::getFields('account_otp');
+			setupProfileContext($fields['fields'], $fields['hook']);
 
 			loadJavascriptFile('qrcode.js');
 			addInlineJavascript('
@@ -380,17 +438,9 @@ class ProfileOptions_Controller extends Action_Controller
 		}
 		else
 		{
-			setupProfileContext(
-				array(
-					'member_name', 'real_name', 'date_registered', 'posts', 'lngfile', 'hr',
-					'id_group', 'hr',
-					'email_address', 'hide_email', 'show_online', 'hr',
-					'passwrd1', 'passwrd2', 'hr',
-					'secret_question', 'secret_answer', 'hr',
-				),
-				'account'
-			);
+			$fields = ProfileOptions_Controller::getFields('account');
 		}
+		setupProfileContext($fields['fields'], $fields['hook']);
 	}
 
 
@@ -411,16 +461,8 @@ class ProfileOptions_Controller extends Action_Controller
 		$context['page_desc'] = replaceBasicActionUrl($txt['forumProfile_info']);
 		$context['show_preview_button'] = true;
 
-		setupProfileContext(
-			array(
-				'avatar_choice', 'hr',
-				'bday1', 'usertitle', 'hr',
-				'signature', 'hr',
-				'karma_good', 'hr',
-				'website_title', 'website_url',
-			),
-			'forum'
-		);
+		$fields = ProfileOptions_Controller::getFields('forumprofile');
+		setupProfileContext($fields['fields'], $fields['hook']);
 	}
 
 	/**
@@ -438,14 +480,8 @@ class ProfileOptions_Controller extends Action_Controller
 		$context['page_desc'] = $txt['pm_settings_desc'];
 
 		// Setup the profile context and call the 'integrate_pmprefs_profile_fields' hook
-		setupProfileContext(
-			array(
-				'receive_from',
-				'hr',
-				'pm_settings',
-			),
-			'pmprefs'
-		);
+		$fields = ProfileOptions_Controller::getFields('contactprefs');
+		setupProfileContext($fields['fields'], $fields['hook']);
 	}
 
 	/**
@@ -466,14 +502,8 @@ class ProfileOptions_Controller extends Action_Controller
 		$context['sub_template'] = 'edit_options';
 		$context['page_desc'] = $txt['theme_info'];
 
-		setupProfileContext(
-			array(
-				'id_theme', 'smiley_set', 'hr',
-				'time_format', 'time_offset', 'hr',
-				'theme_settings',
-			),
-			'themepick'
-		);
+		$fields = ProfileOptions_Controller::getFields('theme');
+		setupProfileContext($fields['fields'], $fields['hook']);
 	}
 
 	/**

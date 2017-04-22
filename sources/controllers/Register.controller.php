@@ -739,10 +739,11 @@ class Register_Controller extends Action_Controller
 
 			// Here, and here only, emulate the permissions the user would have to do this.
 			$user_info['permissions'] = array_merge($user_info['permissions'], array('profile_account_own', 'profile_extra_own'));
-			$reg_fields = explode(',', $modSettings['registration_fields']);
+			require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
+			$reg_fields = ProfileOptions_Controller::getFields('registration');
 
 			// We might have had some submissions on this front - go check.
-			foreach ($reg_fields as $field)
+			foreach ($reg_fields['fields'] as $field)
 			{
 				if (isset($this->_req->post->{$field}))
 				{
@@ -751,7 +752,7 @@ class Register_Controller extends Action_Controller
 			}
 
 			// Load all the fields in question.
-			setupProfileContext($reg_fields, 'registration');
+			setupProfileContext($reg_fields['fields'], $reg_fields['hook']);
 		}
 	}
 
@@ -941,6 +942,9 @@ class Register_Controller extends Action_Controller
 
 			// Don't let them wack away on their resend
 			spamProtection('remind');
+
+			// This will ensure we don't actually get an error message if it works!
+			$context['error_title'] = '';
 
 			// This will ensure we don't actually get an error message if it works!
 			$context['error_title'] = $txt['invalid_activation_resend'];
