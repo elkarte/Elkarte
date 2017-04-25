@@ -1046,7 +1046,7 @@ class InstallInstructions_install_1_1
 					'bbc' => 0,
 					'can_search' => 0,
 					'default_value' => '',
-					'enclose' => '<a class="i-instagram icon-big" href="https://www.instagram.com/{INPUT}/" target="_blank" title="Instagram"><s>Instagram</s></a>',
+					'enclose' => '<a class="icon i-instagram icon-big" href="https://www.instagram.com/{INPUT}/" target="_blank" title="Instagram"><s>Instagram</s></a>',
 					'placement' => 1,
 					'rows' => 0,
 					'cols' => 0
