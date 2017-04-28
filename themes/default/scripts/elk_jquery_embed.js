@@ -141,7 +141,7 @@
 			embed_html = '<div class="elk_video"><iframe width="640px" height="385px" style="max-width: 98%; max-height: auto;" src="{src}" frameborder="0" allowfullscreen></iframe></div>',
 			handlers = {};
 		handlers['youtube.com'] = function(path, a, embed) {
-			var videoID = path.match(/\bv[=/]([^&#?$]+)/i) || path.match(/#p\/(?:a\/)?[uf]\/\d+\/([^?$]+)/i) || path.match(/([\w-]{11})/i);
+			var videoID = path.match(/\bv[=/]([^&#?$]+)/i) || path.match(/#p\/(?:a\/)?[uf]\/\d+\/([^?$]+)/i) || path.match(/(?:\/)([\w-]{11})/i);
 			if (!videoID || !(videoID = videoID[1]))
 				return;
 
