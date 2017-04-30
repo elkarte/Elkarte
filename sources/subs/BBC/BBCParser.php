@@ -120,7 +120,7 @@ class BBCParser
 	{
 		call_integration_hook('integrate_pre_bbc_parser', array(&$message, $this->bbc));
 
-		$this->message = $message;
+		$this->message = (string) $message;
 
 		// Don't waste cycles
 		if ($this->message === '')
