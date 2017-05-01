@@ -35,7 +35,7 @@ fi
 if [ "$SHORT_DB" == "postgres" ]
 then
     sudo apt-get -qq -y --force-yes install apache2 libapache2-mod-php5 php5-pgsql php5-curl > /dev/null
-elif [ "$SHORT_DB" == "mysql" ]
+elif [ "$SHORT_DB" == "mysql" ] || [ "$SHORT_DB" == "mariadb" ]
 then
     sudo apt-get -qq -y --force-yes install apache2 libapache2-mod-php5 php5-mysql php5-curl > /dev/null
 else
@@ -59,7 +59,7 @@ if [ "$SHORT_DB" == "postgres" ]
 then
     psql -c "DROP DATABASE IF EXISTS elkarte_test;" -U postgres
     psql -c "create database elkarte_test;" -U postgres
-elif [ "$SHORT_DB" == "mysql" ]
+elif [ "$SHORT_DB" == "mysql" ] || [ "$SHORT_DB" == "mariadb" ]
 then
     mysql -e "DROP DATABASE IF EXISTS elkarte_test;" -uroot
     mysql -e "create database IF NOT EXISTS elkarte_test;" -uroot
