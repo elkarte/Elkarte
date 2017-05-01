@@ -83,12 +83,13 @@ class PersonalMessage_Controller extends Action_Controller
 			$context['pm_sent'] = true;
 		}
 
-		// Load the label data.
-		if ($user_settings['new_pm'] || ($context['labels'] = cache_get_data('labelCounts:' . $user_info['id'], 720)) === null)
+		// Load the label counts data.
+		if ($user_settings['new_pm'] || !Cache::instance()->getVar($context['labels'], 'labelCounts:' . $user_info['id'], 720))
 		{
 			$this->_loadLabels();
 
-			loadPMLabels();
+			// Get the message count for each label
+			$context['labels'] = loadPMLabels($context['labels']);
 		}
 
 		// Now we have the labels, and assuming we have unsorted mail, apply our rules!
@@ -102,15 +103,6 @@ class PersonalMessage_Controller extends Action_Controller
 
 			// Turn the new PM's status off, for the popup alert, since they have entered the PM area
 			toggleNewPM($user_info['id']);
-		}
-
-		// Load the label counts data.
-		if ($user_settings['new_pm'] || !Cache::instance()->getVar($context['labels'], 'labelCounts:' . $user_info['id'], 720))
-		{
-			$this->_loadLabels();
-
-			// Get the message count for each label
-			$context['labels'] = loadPMLabels($context['labels']);
 		}
 
 		// This determines if we have more labels than just the standard inbox.
