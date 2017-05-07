@@ -237,6 +237,11 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 	if (!checkGD() && !checkImagick())
 		return false;
 
+	if (!file_exists($source))
+	{
+		return false;
+	}
+
 	static $default_formats = array(
 		'1' => 'gif',
 		'2' => 'jpeg',
