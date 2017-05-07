@@ -125,7 +125,7 @@ function template_info_center_below()
 
 	// Here's where the "Info Center" starts...
 	echo '
-	<section id="info_center" class="forum_category">
+	<aside id="info_center" class="forum_category">
 		<h2 class="category_header panel_toggle">
 				<i id="upshrink_ic" class="hide chevricon i-chevron-', empty($context['minmax_preferences']['info']) ? 'up' : 'down', '" title="', $txt['hide'], '"></i>
 			<a href="#" id="upshrink_link">', sprintf($txt['info_center_title'], $context['forum_name_html_safe']), '</a>
@@ -136,7 +136,7 @@ function template_info_center_below()
 
 	echo '
 		</ul>
-	</section>';
+	</aside>';
 
 	// Info center collapse object.
 	addInlineJavascript('

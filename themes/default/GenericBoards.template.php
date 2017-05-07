@@ -131,7 +131,7 @@ function template_list_boards(array $boards, $id)
 
 		echo '
 						</h3>
-						<div class="board_description">', $board['description'], '</div>';
+						<h4 class="board_description">', $board['description'], '</h4>';
 
 		// Show the "Moderators: ". Each has name, href, link, and id. (but we're gonna use link_moderators.)
 		if (!empty($board['moderators']))
@@ -142,9 +142,9 @@ function template_list_boards(array $boards, $id)
 		echo '
 					</div>
 					<div class="board_latest">
-						<p class="board_stats">
+						<aside class="board_stats">
 							', comma_format($board['posts']), ' ', $board['is_redirect'] ? $txt['redirects'] : $txt['posts'], $board['is_redirect'] ? '' : '<br /> ' . comma_format($board['topics']) . ' ' . $txt['board_topics'], '
-						</p>';
+						</aside>';
 
 		// @todo - Last post message still needs some work. Probably split the language string into three chunks.
 		// Example:

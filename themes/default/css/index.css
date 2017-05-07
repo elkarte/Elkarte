@@ -373,6 +373,15 @@ del .bbc_link:link, del .bbc_link:visited {
 	text-decoration: line-through;
 }
 
+/* bbc links wrapped in sub / sup */
+sup a.bbc_link {
+	vertical-align: sub;
+}
+
+sub a.bbc_link {
+	vertical-align: middle;
+}
+
 .childboards .new_posts {
 	padding: 1px 3px 2px;
 	font-size: 0.857em;

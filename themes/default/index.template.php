@@ -125,7 +125,7 @@ function call_template_callbacks($id, $array)
  */
 function template_html_above()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt, $modSettings;
 
 	// Show right to left and the character set for ease of translating.
 	echo '<!DOCTYPE html>
@@ -239,14 +239,14 @@ function template_body_above()
 
 	// Skip nav link.
 	echo '
-	<section id="top_section">
+	<header id="top_section">
 		<aside class="wrapper">';
 
 	call_template_callbacks('th', $context['theme_header_callbacks']);
 
 	echo '
 		</aside>
-		<header id="header" class="wrapper', !empty($settings['header_layout']) ? ($settings['header_layout'] == 1 ? ' centerheader' : ' rightheader') : '', empty($context['minmax_preferences']['upshrink']) ? '"' : ' hide" aria-hidden="true"', '>
+		<section id="header" class="wrapper', !empty($settings['header_layout']) ? ($settings['header_layout'] == 1 ? ' centerheader' : ' rightheader') : '', empty($context['minmax_preferences']['upshrink']) ? '"' : ' hide" aria-hidden="true"', '>
 			<h1 id="forumtitle">
 				<a class="forumlink" href="', $scripturl, '">', $context['forum_name'], '</a>';
 
@@ -259,12 +259,12 @@ function template_body_above()
 
 	// Show the menu here, according to the menu sub template.
 	echo '
-		</header>';
+		</section>';
 
 	template_menu();
 
 	echo '
-	</section>
+	</header>
 	<div id="wrapper" class="wrapper">
 		<aside id="upper_section"', empty($context['minmax_preferences']['upshrink']) ? '' : ' class="hide" aria-hidden="true"', '>';
 
@@ -278,7 +278,7 @@ function template_body_above()
 
 	// The main content should go here.
 	echo '
-		<section id="main_content_section"><a id="skipnav"></a>';
+		<div id="main_content_section"><a id="skipnav"></a>';
 }
 
 /**
@@ -409,7 +409,7 @@ function template_body_below()
 	global $context, $txt;
 
 	echo '
-		</section>
+		</div>
 	</div>';
 
 	// Show RSS link, as well as the copyright.
@@ -514,7 +514,7 @@ function template_menu()
 
 	// WAI-ARIA a11y tweaks have been applied here.
 	echo '
-				<nav id="menu_nav" role="navigation">
+				<nav id="menu_nav">
 					<ul id="main_menu" class="wrapper" role="menubar">';
 
 	// The upshrink image, right-floated.
@@ -827,7 +827,7 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
 		$options['extra'] = '';
 
 	echo '
-			<nav class="pagesection" role="application">
+			<nav class="pagesection">
 				', $pages, '
 				', !empty($button_strip) && !empty($context[$button_strip]) ? template_button_strip($context[$button_strip], $strip_direction) : '',
 	$options['extra'], '

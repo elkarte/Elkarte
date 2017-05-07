@@ -126,16 +126,18 @@ function template_messages()
 				<hr class="new_post_separator" />';
 
 		echo '
-				<article class="post_wrapper forumposts ', $message['classes'], $message['approved'] ? '' : ' approvebg', '">', $message['id'] != $context['first_message'] ? '
+				<section class="post_wrapper forumposts ', $message['classes'], $message['approved'] ? '' : ' approvebg', '">', $message['id'] != $context['first_message'] ? '
 					<a class="post_anchor" id="msg' . $message['id'] . '"></a>' : '';
 
 		// Showing the sidebar posting area?
 		if (empty($options['hide_poster_area']))
 			echo '
-					<ul class="poster">', template_build_poster_div($message, $ignoring), '</ul>';
+					<aside>
+						<ul class="poster">', template_build_poster_div($message, $ignoring), '</ul>
+					</aside>';
 
 		echo '
-					<div class="postarea', empty($options['hide_poster_area']) ? '' : '2', '">
+					<article class="postarea', empty($options['hide_poster_area']) ? '' : '2', '">
 						<footer class="keyinfo">
 						', (!empty($options['hide_poster_area']) ? '<ul class="poster poster2">' . template_build_poster_div($message, $ignoring) . '</ul>' : '');
 
@@ -160,7 +162,7 @@ function template_messages()
 		}
 
 		echo '
-							<span id="post_subject_', $message['id'], '" class="post_subject">', $message['subject'], '</span>
+							<h2 id="post_subject_', $message['id'], '" class="post_subject">', $message['subject'], '</h2>
 							<span id="messageicon_', $message['id'], '" class="messageicon', ($message['icon_url'] !== $settings['images_url'] . '/post/xx.png') ? '"' : ' hide"', '>
 								<img src="', $message['icon_url'] . '" alt=""', $message['can_modify'] ? ' id="msg_icon_' . $message['id'] . '"' : '', ' />
 							</span>
@@ -379,8 +381,8 @@ function template_messages()
 
 		echo '
 						</footer>
-					</div>
-				</article>
+					</article>
+				</section>
 				<hr class="post_separator" />';
 	}
 }
