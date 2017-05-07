@@ -2861,7 +2861,6 @@ class InstallInstructions_install_1_1
 				array(1, 'theme_url', '{$boardurl}/themes/default'),
 				array(1, 'images_url', '{$boardurl}/themes/default/images'),
 				array(1, 'theme_dir', '{BOARDDIR}/themes/default'),
-				array(1, 'show_bbc', '1'),
 				array(1, 'show_latest_member', '1'),
 				array(1, 'show_modify', '1'),
 				array(1, 'show_user_images', '1'),
