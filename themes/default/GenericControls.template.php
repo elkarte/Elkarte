@@ -132,7 +132,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					{}';
 
 	// Show all the editor command buttons
-	if ($context['show_bbc'] && $bbcContainer !== null)
+	if ($bbcContainer !== null)
 	{
 		echo ',
 					toolbar: "';
