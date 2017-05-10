@@ -199,10 +199,10 @@ class Sphinx extends SearchAPI
 			}
 
 			// Set up the sort expression
-			$mySphinx->SetSortMode(SPH_SORT_EXPR, '(@weight + (relevance / 1000))');
+			$mySphinx->SetSortMode(SPH_SORT_EXPR, '(@weight + (relevance / 10))');
 
 			// Update the field weights for subject vs body
-			$mySphinx->SetFieldWeights(array('subject' => !empty($modSettings['search_weight_subject']) ? $modSettings['search_weight_subject'] * 200 : 1000, 'body' => 1000));
+			$mySphinx->SetFieldWeights(array('subject' => !empty($modSettings['search_weight_subject']) ? $modSettings['search_weight_subject'] * 10 : 100, 'body' => 100));
 
 			// Set the limits based on the search parameters.
 			if (!empty($search_params['min_msg_id']) || !empty($search_params['max_msg_id']))
@@ -300,7 +300,7 @@ class Sphinx extends SearchAPI
 				{
 					$cached_results['matches'][$msgID] = array(
 						'id' => $match['attrs']['id_topic'],
-						'relevance' => round($match['attrs']['@count'] + $match['attrs']['relevance'] / 10000, 1) . '%',
+						'relevance' => round($match['attrs']['@count'] + $match['attrs']['relevance'] / 5000, 1) . '%',
 						'num_matches' => empty($search_params['topic']) ? $match['attrs']['@count'] : 0,
 						'matches' => array(),
 					);
