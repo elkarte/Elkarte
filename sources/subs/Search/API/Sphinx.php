@@ -332,7 +332,7 @@ class Sphinx extends SearchAPI
 	 * Clean up a search word/phrase/term for Sphinx.
 	 *
 	 * @param string $sphinx_term
-	 * @param SphinxClient $sphinx_client
+	 * @param \SphinxClient $sphinx_client
 	 */
 	private function _cleanWordSphinx($sphinx_term, $sphinx_client)
 	{

@@ -994,6 +994,10 @@ function loadProfileFields($force_reload = false)
 
 /**
  * Save the profile changes.
+ *
+ * @param string[] $fields
+ * @param string $hook
+ * @throws \Elk_Exception
  */
 function saveProfileFields($fields, $hook)
 {

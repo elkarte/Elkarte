@@ -190,8 +190,6 @@ function getMembersOnlineStats($membersOnlineOptions)
  */
 function filter_members_online($membersOnlineStats, $sortFunction)
 {
-	global $modSettings;
-
 	foreach ($membersOnlineStats['users_online'] as $key => $row)
 	{
 		if (allowedTo('moderate_forum') === false && $row['hidden'])

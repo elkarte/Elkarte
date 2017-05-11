@@ -242,8 +242,8 @@ function reqWin(desktopURL, alternateWidth, alternateHeight, noScrollbars)
  * Open a overlay div on the screen
  *
  * @param {string} desktopURL
- * @param {string} sHeader
- * @param {string} sIcon
+ * @param {string} [sHeader]
+ * @param {string} [sIcon]
  */
 function reqOverlayDiv(desktopURL, sHeader, sIcon)
 {
@@ -481,7 +481,7 @@ function array_search(variable, theArray)
 /**
  * Find a specific radio button in its group and select it.
  *
- * @param {type} oRadioGroup
+ * @param {HTMLInputElement} oRadioGroup
  * @param {type} sName
  */
 function selectRadioByName(oRadioGroup, sName)
@@ -1564,7 +1564,7 @@ function pollOptions()
  * Generate the number of days in a given month for a given year
  * Used to populate the day pulldown in the calendar
  *
- * @param {type} offset
+ * @param {int} [offset] optional
  */
 function generateDays(offset)
 {

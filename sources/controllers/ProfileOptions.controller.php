@@ -19,12 +19,19 @@
 
 /**
  * ProfileOptions_Controller Class.
- * Does the job of showing and editing people's profiles.
- * Interface to buddy list, ignore list, notifications, authentication options, forum profile
+ *
+ * - Does the job of showing and editing people's profiles.
+ * - Interface to buddy list, ignore list, notifications, authentication options, forum profile
  * account settings, etc
  */
 class ProfileOptions_Controller extends Action_Controller
 {
+	/**
+	 * Returns the profile fields for a given area
+	 *
+	 * @param string $area
+	 * @return array|mixed
+	 */
 	public static function getFields($area)
 	{
 		global $modSettings;
@@ -92,6 +99,7 @@ class ProfileOptions_Controller extends Action_Controller
 			return array();
 		}
 	}
+
 	/**
 	 * Member id for the profile being viewed
 	 * @var int
@@ -393,7 +401,7 @@ class ProfileOptions_Controller extends Action_Controller
 
 		if (!empty($modSettings['enableOTP']))
 		{
-			$fields = ProfileOptions_Controller::getFields('account_otp');
+			$fields = self::getFields('account_otp');
 			setupProfileContext($fields['fields'], $fields['hook']);
 
 			loadJavascriptFile('qrcode.js');
@@ -439,7 +447,7 @@ class ProfileOptions_Controller extends Action_Controller
 		}
 		else
 		{
-			$fields = ProfileOptions_Controller::getFields('account');
+			$fields = self::getFields('account');
 		}
 		setupProfileContext($fields['fields'], $fields['hook']);
 	}
@@ -462,7 +470,7 @@ class ProfileOptions_Controller extends Action_Controller
 		$context['page_desc'] = replaceBasicActionUrl($txt['forumProfile_info']);
 		$context['show_preview_button'] = true;
 
-		$fields = ProfileOptions_Controller::getFields('forumprofile');
+		$fields = self::getFields('forumprofile');
 		setupProfileContext($fields['fields'], $fields['hook']);
 	}
 
@@ -481,7 +489,7 @@ class ProfileOptions_Controller extends Action_Controller
 		$context['page_desc'] = $txt['pm_settings_desc'];
 
 		// Setup the profile context and call the 'integrate_pmprefs_profile_fields' hook
-		$fields = ProfileOptions_Controller::getFields('contactprefs');
+		$fields = self::getFields('contactprefs');
 		setupProfileContext($fields['fields'], $fields['hook']);
 	}
 
@@ -503,7 +511,7 @@ class ProfileOptions_Controller extends Action_Controller
 		$context['sub_template'] = 'edit_options';
 		$context['page_desc'] = $txt['theme_info'];
 
-		$fields = ProfileOptions_Controller::getFields('theme');
+		$fields = self::getFields('theme');
 		setupProfileContext($fields['fields'], $fields['hook']);
 	}
 

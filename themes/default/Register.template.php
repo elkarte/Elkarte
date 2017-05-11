@@ -76,6 +76,8 @@ function template_registration_agreement()
 
 /**
  * Before registering - get their information.
+ *
+ * @uses ParseError
  */
 function template_registration_form()
 {
