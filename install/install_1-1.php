@@ -1046,7 +1046,7 @@ class InstallInstructions_install_1_1
 					'bbc' => 0,
 					'can_search' => 0,
 					'default_value' => '',
-					'enclose' => '<a class="i-instagram icon-big" href="https://www.instagram.com/{INPUT}/" target="_blank" title="Instagram"><s>Instagram</s></a>',
+					'enclose' => '<a class="icon i-instagram icon-big" href="https://www.instagram.com/{INPUT}/" target="_blank" title="Instagram"><s>Instagram</s></a>',
 					'placement' => 1,
 					'rows' => 0,
 					'cols' => 0
@@ -2861,7 +2861,6 @@ class InstallInstructions_install_1_1
 				array(1, 'theme_url', '{$boardurl}/themes/default'),
 				array(1, 'images_url', '{$boardurl}/themes/default/images'),
 				array(1, 'theme_dir', '{BOARDDIR}/themes/default'),
-				array(1, 'show_bbc', '1'),
 				array(1, 'show_latest_member', '1'),
 				array(1, 'show_modify', '1'),
 				array(1, 'show_user_images', '1'),

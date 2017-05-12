@@ -607,7 +607,7 @@
 				handleFileUpload(files, obj);
 				this.value = null;
 			});
-			$input.clone().appendTo('.drop_area_fileselect_text');
+			$input.clone(true, true).appendTo('.drop_area_fileselect_text');
 			$input.hide();
 		});
 		init(params);

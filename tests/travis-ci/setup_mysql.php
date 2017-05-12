@@ -83,7 +83,11 @@ class Elk_Testing_mysql extends Elk_Testing_Setup
 		$this->_db_user = 'root';
 		$this->_db_passwd = '';
 		$db_prefix = $this->_db_prefix = 'elkarte_';
-
+		$link = mysql_connect($this->_db_server, $this->_db_user, $this->_db_passwd);
+		if (!$link) {
+				die('Could not connect: ' . mysql_error());
+		}
+		printf("MySQL server version: %s\n", mysql_get_server_info());
 		// Start the database interface
 		Database_MySQL::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd, $this->_db_prefix);
 		$this->_db = Database_MySQL::db();

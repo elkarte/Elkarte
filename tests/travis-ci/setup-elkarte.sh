@@ -38,6 +38,7 @@ then
 
     # Install the right database for this run
     if [ "$SHORT_DB" == "mysql" ]; then sudo php ./tests/travis-ci/setup_mysql.php; fi
+    if [ "$SHORT_DB" == "mariadb" ]; then sudo php ./tests/travis-ci/setup_mysql.php; fi
     if [ "$SHORT_DB" == "postgres" ]; then sudo php ./tests/travis-ci/setup_pgsql.php; fi
 
     # Remove the install dir
@@ -47,7 +48,7 @@ then
     sudo chmod -R 777 /var/www/vendor
 
     # common php.ini updates (if any)
-	phpenv config-add /var/www/tests/travis-ci/config.ini
+    phpenv config-add /var/www/tests/travis-ci/config.ini
     phpenv config-add /var/www/tests/travis-ci/travis_php.ini
 
     # If this is a code coverage run, we need to enable selenium and capture its coverage results

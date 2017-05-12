@@ -83,10 +83,10 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 	{
 		// If -1 means preview the whole body
 		if ($indexOptions['previews'] === -1)
-			$indexOptions['custom_selects'] += array('ml.body AS last_body', 'mf.body AS first_body');
+			$indexOptions['custom_selects'] = array_merge($indexOptions['custom_selects'], array('ml.body AS last_body', 'mf.body AS first_body'));
 		// Default: a SUBSTRING
 		elseif (!empty($indexOptions['previews']))
-			$indexOptions['custom_selects'] += array('SUBSTRING(ml.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS last_body', 'SUBSTRING(mf.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS first_body');
+			$indexOptions['custom_selects'] =  array_merge($indexOptions['custom_selects'], array('SUBSTRING(ml.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS last_body', 'SUBSTRING(mf.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS first_body'));
 
 		if (!empty($indexOptions['include_avatars']))
 		{

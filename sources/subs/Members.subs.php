@@ -1244,11 +1244,11 @@ function populateDuplicateMembers(&$members)
 		return false;
 
 	// Fetch all members with this IP address, we'll filter out the current ones in a sec.
-	$members = membersByIP($ips, 'exact', true);
+	$potential_dupes = membersByIP($ips, 'exact', true);
 
 	$duplicate_members = array();
 	$duplicate_ids = array();
-	foreach ($members as $row)
+	foreach ($potential_dupes as $row)
 	{
 		//$duplicate_ids[] = $row['id_member'];
 
@@ -1303,6 +1303,7 @@ function populateDuplicateMembers(&$members)
 
 	// Now we have all the duplicate members, stick them with their respective member in the list.
 	if (!empty($duplicate_members))
+	{
 		foreach ($members as $key => $member)
 		{
 			if (isset($duplicate_members[$member['member_ip']]))
@@ -1323,6 +1324,7 @@ function populateDuplicateMembers(&$members)
 				$member_track[] = $duplicate_member['id'];
 			}
 		}
+	}
 }
 
 /**

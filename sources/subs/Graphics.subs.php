@@ -237,6 +237,11 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 	if (!checkGD() && !checkImagick())
 		return false;
 
+	if (!file_exists($source))
+	{
+		return false;
+	}
+
 	static $default_formats = array(
 		'1' => 'gif',
 		'2' => 'jpeg',
@@ -481,7 +486,6 @@ function autoRotateImage($image_name)
  * - Only works with jpeg images, could add TIFF as well
  * - Writes the update image back to $image_name
  *
-<<<<<<< HEAD
  * @package Graphics
  * @uses GD
  * @param string $image_name full location of the file

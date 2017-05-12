@@ -17,6 +17,10 @@ matrix:
       env: DB=postgres-9.4
       addons:
         postgresql: "9.4"
+    - php: 5.6
+      env: DB=mariadb-10.0
+      addons:
+        mariadb: '10.0'
   fast_finish: true
 
 # Create a Travis memcached enabled environment for the test suite to run in and

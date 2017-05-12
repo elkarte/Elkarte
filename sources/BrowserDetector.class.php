@@ -358,9 +358,10 @@ class Browser_Detector
 		}
 
 		// "modern" ie uses trident 4=ie8, 5=ie9, 6=ie10, even in compatibility view
-		if (preg_match('~Trident/([0-9.])~i', $this->_ua, $trident_match) === 1)
+		if (preg_match('~Trident/([4-9])\.~i', $this->_ua, $trident_match) === 1)
 		{
-			$this->_browsers['is_ie' . ((int) $trident_match[1] + 4)] = true;
+			$trident_match[1] = (int) $trident_match[1];
+			$this->_browsers['is_ie' . ($trident_match[1] + 4)] = true;
 
 			// If trident is set, see the (if any) msie tag in the user agent matches ... if not its in some compatibility view
 			if (isset($msie_match[1]) && ($msie_match[1] < $trident_match[1] + 4))
