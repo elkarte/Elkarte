@@ -356,16 +356,20 @@ strong {
 	color: #377828;
 }
 /* Styling for tables inside posts */
-.inner > .bbc_table_container > .bbc_table td {
+.inner > .bbc_table_container > .bbc_table td,
+.messageContent > .bbc_table_container > .bbc_table td {
 	border-bottom: 1px solid #ccc;
 	border-right: 1px solid #ccc;
 }
-.inner > .bbc_table_container > .bbc_table th {
+.inner > .bbc_table_container > .bbc_table th,
+.messageContent > .bbc_table_container > .bbc_table th {
 	border-bottom: 1px solid #bbb;
 	border-right: 1px solid #ccc;
 }
 .inner > .bbc_table_container > .bbc_table td:last-child,
-.inner > .bbc_table_container > .bbc_table th:last-child  {
+.inner > .bbc_table_container > .bbc_table th:last-child,
+.messageContent > .bbc_table_container > .bbc_table td:last-child,
+.messageContent > .bbc_table_container > .bbc_table th:last-child {
 	border-right: none;
 }
 
@@ -1316,7 +1320,7 @@ div.bbc_footnotes .meaction {
 	color: #3D6E32;
 }
 
-.inner {
+.inner, .messageContent {
 	border-top-color: #BFBFBF;
 }
 

@@ -796,11 +796,13 @@ strong, .bbc_strong {
 }
 
 /* Styling for bbc tables inside posts */
-.inner > .bbc_table_container > .bbc_table {
+.inner > .bbc_table_container > .bbc_table,
+.messageContent > .bbc_table_container > .bbc_table {
 	border-collapse: collapse;
 }
 
-.inner > .bbc_table_container > .bbc_table th {
+.inner > .bbc_table_container > .bbc_table th,
+.messageContent > .bbc_table_container > .bbc_table th {
 	text-align: center;
 }
 
@@ -3086,7 +3088,7 @@ img.new_posts {
 	font-weight: bold;
 }
 
-.inner {
+.inner, .messageContent {
 	margin: 0;
 	padding: 7px 8px 2px 2px;
 	min-height: 70px;
@@ -3098,7 +3100,8 @@ img.new_posts {
 	border-top: 1px solid;
 }
 
-#topic_summary .inner {
+#topic_summary .inner,
+#topic_summary .messageContent {
 	clear: both;
 }
 
@@ -3152,7 +3155,7 @@ img.new_posts {
 /* Important stuff. */
 /* Auto scaling of images in posts, sigs, attachments, etc. */
 /* @todo - Cross check where this is defined earlier */
-.inner .bbc_img, .signature .bbc_img, .attachment_image {
+.inner .bbc_img, .messageContent .bbc_img, .signature .bbc_img, .attachment_image {
 	height: auto;
 	width: auto;
 	max-width: 100%;
@@ -4607,7 +4610,8 @@ div.labels {
 }
 
 /* Test code - an attempt to make recent posts less overwhelming. */
-#recentposts .inner {
+#recentposts .inner,
+#recentposts .messageContent {
 	position: relative;
 	overflow: auto;
 	max-height: 20em;
