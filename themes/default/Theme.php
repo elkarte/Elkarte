@@ -62,7 +62,7 @@ class Theme extends \Theme
 		if ($this->headerSent('Content-Type') === false)
 		{
 			// Probably temporary ($_REQUEST['xml'] should be replaced by $_REQUEST['api'])
-			if (isset($_REQUEST['api']) && $_REQUEST['api'] == 'json')
+			if (isset($_REQUEST['api']) && $_REQUEST['api'] === 'json')
 			{
 				header('Content-Type: application/json; charset=UTF-8');
 			}
@@ -81,7 +81,7 @@ class Theme extends \Theme
 			loadSubTemplate($layer . '_above', 'ignore');
 		}
 
-		if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'defaults' && isset($settings['default_template']))
+		if (isset($settings['use_default_images']) && $settings['use_default_images'] === 'defaults' && isset($settings['default_template']))
 		{
 			$settings['theme_url'] = $settings['default_theme_url'];
 			$settings['images_url'] = $settings['default_images_url'];
@@ -144,7 +144,7 @@ class Theme extends \Theme
 		$context['load_time'] = round(microtime(true) - $time_start, 3);
 		$context['load_queries'] = $db->num_queries();
 
-		if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'defaults' && isset($settings['default_template']))
+		if (isset($settings['use_default_images']) && $settings['use_default_images'] === 'defaults' && isset($settings['default_template']))
 		{
 			$settings['theme_url'] = $settings['actual_theme_url'];
 			$settings['images_url'] = $settings['actual_images_url'];
@@ -536,7 +536,7 @@ class Theme extends \Theme
 		else
 		{
 			$type = empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time() ? 'task' : 'mailq';
-			$ts = $type == 'mailq' ? $modSettings['mail_next_send'] : $modSettings['next_task_time'];
+			$ts = $type === 'mailq' ? $modSettings['mail_next_send'] : $modSettings['next_task_time'];
 
 			addInlineJavascript('
 		function elkAutoTask()
@@ -612,7 +612,7 @@ class Theme extends \Theme
 		$context['news_lines'] = array_filter(explode("\n", str_replace("\r", '', trim(addslashes($modSettings['news'])))));
 		for ($i = 0, $n = count($context['news_lines']); $i < $n; $i++)
 		{
-			if (trim($context['news_lines'][$i]) == '')
+			if (trim($context['news_lines'][$i]) === '')
 			{
 				continue;
 			}
@@ -695,7 +695,7 @@ class Theme extends \Theme
 		$context['additional_dropdown_search'] = prepareSearchEngines();
 
 		// This is done to allow theme authors to customize it as they want.
-		$context['show_pm_popup'] = $context['user']['popup_messages'] && !empty($options['popup_messages']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != 'pm');
+		$context['show_pm_popup'] = $context['user']['popup_messages'] && !empty($options['popup_messages']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] !== 'pm');
 
 		// Add the PM popup here instead. Theme authors can still override it simply by editing/removing the 'fPmPopup' in the array.
 		if ($context['show_pm_popup'])
@@ -936,23 +936,23 @@ class Theme extends \Theme
 		{
 			$current_action = $context['current_action'];
 		}
-		elseif ($context['current_action'] == 'profile')
+		elseif ($context['current_action'] === 'profile')
 		{
 			$current_action = 'pm';
 		}
-		elseif ($context['current_action'] == 'theme')
+		elseif ($context['current_action'] === 'theme')
 		{
-			$current_action = isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'pick' ? 'profile' : 'admin';
+			$current_action = isset($_REQUEST['sa']) && $_REQUEST['sa'] === 'pick' ? 'profile' : 'admin';
 		}
-		elseif ($context['current_action'] == 'login2' || ($user_info['is_guest'] && $context['current_action'] == 'reminder'))
+		elseif ($context['current_action'] === 'login2' || ($user_info['is_guest'] && $context['current_action'] === 'reminder'))
 		{
 			$current_action = 'login';
 		}
-		elseif ($context['current_action'] == 'groups' && $context['allow_moderation_center'])
+		elseif ($context['current_action'] === 'groups' && $context['allow_moderation_center'])
 		{
 			$current_action = 'moderate';
 		}
-		elseif ($context['current_action'] == 'moderate' && $context['allow_admin'])
+		elseif ($context['current_action'] === 'moderate' && $context['allow_admin'])
 		{
 			$current_action = 'admin';
 		}
@@ -1109,7 +1109,7 @@ class Theme extends \Theme
 		}
 
 		// If not a user variant, select the default.
-		if ($context['theme_variant'] == '' || !in_array($context['theme_variant'], $settings['theme_variants']))
+		if ($context['theme_variant'] === '' || !in_array($context['theme_variant'], $settings['theme_variants']))
 		{
 			$context['theme_variant'] = !empty($settings['default_variant']) && in_array($settings['default_variant'], $settings['theme_variants']) ? $settings['default_variant'] : $settings['theme_variants'][0];
 		}
