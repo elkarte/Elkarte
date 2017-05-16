@@ -138,7 +138,7 @@ function template_messages()
 
 		echo '
 					<article class="postarea', empty($options['hide_poster_area']) ? '' : '2', '">
-						<footer class="keyinfo">
+						<header class="keyinfo">
 						', (!empty($options['hide_poster_area']) ? '<ul class="poster poster2">' . template_build_poster_div($message, $ignoring) . '</ul>' : '');
 
 		if (!empty($context['follow_ups'][$message['id']]))
@@ -170,7 +170,7 @@ function template_messages()
 								<a href="', $message['href'], '" rel="nofollow">', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', '</a>', !empty($message['counter']) ? ' &ndash; ' : '', $message['html_time'], '
 							</h5>
 							<div id="msg_', $message['id'], '_quick_mod"', $ignoring ? ' class="hide"' : '', '></div>
-						</footer>';
+						</header>';
 
 		// Ignoring this user? Hide the post.
 		if ($ignoring)
@@ -189,7 +189,7 @@ function template_messages()
 
 		// Show the post itself, finally!
 		echo '
-						<div id="msg_', $message['id'], '" class="inner', $ignoring ? ' hide"' : '"', '>', $message['body'], '</div>';
+						<div id="msg_', $message['id'], '" class="messageContent', $ignoring ? ' hide"' : '"', '>', $message['body'], '</div>';
 
 		// Assuming there are attachments...
 		if (!empty($message['attachment']))
