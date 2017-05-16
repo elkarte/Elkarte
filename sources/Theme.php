@@ -33,6 +33,12 @@ abstract class Theme
 	protected $templates;
 
 	/**
+	 * Holds base actions that we do not want crawled / indexed
+	 * @var string[]
+	 */
+	protected $no_index_actions = array();
+
+	/**
 	 * Holds the Template_Layers instance
 	 * @var Template_Layers
 	 */
@@ -107,6 +113,9 @@ abstract class Theme
 				'media' => array(),
 			);
 		}
+
+		$this->no_index_actions = array('profile', 'search', 'calendar', 'memberlist', 'help', 'who', 'stats',
+			'login', 'reminder', 'register', 'verificationcode', 'contact');
 	}
 
 	/**

@@ -604,6 +604,7 @@ class Theme extends \Theme
 		$context['current_time'] = standardTime(time(), false);
 		$context['current_action'] = isset($_GET['action']) ? $_GET['action'] : '';
 		$context['show_quick_login'] = !empty($modSettings['enableVBStyleLogin']) && $user_info['is_guest'];
+		$context['robot_no_index'] = in_array($context['current_action'], $this->no_index_actions);
 
 		$bbc_parser = \BBC\ParserWrapper::getInstance();
 
