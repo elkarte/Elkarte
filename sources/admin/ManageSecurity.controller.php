@@ -252,7 +252,7 @@ class ManageSecurity_Controller extends Action_Controller
 
 		// Have we blocked anything in the last 7 days?
 		if (!empty($modSettings['badbehavior_enabled']))
-			$context['settings_message'][] = bb2_insert_stats(true) . '<a href="' . $boardurl . '/index.php?action=admin;area=logs;sa=badbehaviorlog;desc" /> [' . $txt['badbehavior_details'] . ']</a>';
+			$context['settings_message'][] = bb2_insert_stats(true) . ' <a class="linkbutton" href="' . $boardurl . '/index.php?action=admin;area=logs;sa=badbehaviorlog;desc">' . $txt['badbehavior_details'] . '</a>';
 
 		// Current whitelist data
 		$whitelist = array('badbehavior_ip_wl', 'badbehavior_useragent_wl', 'badbehavior_url_wl');
