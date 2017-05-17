@@ -131,7 +131,8 @@ function template_html_above()
 	echo '<!DOCTYPE html>
 <html', $context['right_to_left'] ? ' dir="rtl"' : '', '>
 <head>
-	<title>', $context['page_title_html_safe'], '</title>';
+	<title>', $context['page_title_html_safe'], '</title>
+	<meta charset="UTF-8" />';
 
 	// Tell IE to render the page in standards not compatibility mode. really for ie >= 8
 	// Note if this is not in the first 4k, its ignored, that's why its here
@@ -139,11 +140,7 @@ function template_html_above()
 		echo '
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />';
 
-	// load in any css from addons or themes so they can overwrite if wanted
-	template_css();
-
 	echo '
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="viewport" content="width=device-width" />
 	<meta name="mobile-web-app-capable" content="yes" />
 	<meta name="description" content="', $context['page_title_html_safe'], '" />';
@@ -157,6 +154,9 @@ function template_html_above()
 	if (!empty($context['robot_no_index']))
 		echo '
 	<meta name="robots" content="noindex" />';
+
+	// load in any css from addons or themes so they can overwrite if wanted
+	template_css();
 
 	// Present a canonical url for search engines to prevent duplicate content in their indices.
 	if (!empty($context['canonical_url']))
