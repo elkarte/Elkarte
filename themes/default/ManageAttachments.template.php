@@ -159,7 +159,7 @@ function template_maintenance()
 	if (!empty($modSettings['attachmentDirFileLimit']))
 		echo '
 					<dt>
-						<a href="' . $scripturl . '?action=quickhelp;help=attachment_transfer_empty" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>' . $txt['help'] . '</s></a>', $txt['attachment_transfer_empty'], '</a>
+						<a href="' . $scripturl . '?action=quickhelp;help=attachment_transfer_empty" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>' . $txt['help'] . '</s></a>', $txt['attachment_transfer_empty'], '
 					</dt>
 					<dd>
 						<input type="checkbox" name="empty_it"', $context['checked'] ? ' checked="checked"' : '', ' />

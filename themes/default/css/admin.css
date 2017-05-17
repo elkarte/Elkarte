@@ -967,12 +967,12 @@ dl.admin_permissions dd {
 
 /* Styles for the themes section.
 ------------------------------------------------- */
-ul.theme_options {
+ul.theme_options, ul.basic_options {
 	padding: 0;
 	margin: 0;
 }
 
-ul.theme_options li {
+ul.theme_options li, ul.basic_options li {
 	list-style: none;
 	padding: 0.4em;
 }
