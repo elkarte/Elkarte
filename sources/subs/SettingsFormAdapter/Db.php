@@ -16,6 +16,7 @@
  */
 
 namespace ElkArte\sources\subs\SettingsFormAdapter;
+use BBC\ParserWrapper;
 
 /**
  * Class Db
@@ -256,7 +257,7 @@ class Db extends Adapter
 	 */
 	private function setBbcChoices($var)
 	{
-		$codes = \BBC\ParserWrapper::getInstance()->getCodes();
+		$codes = ParserWrapper::getInstance()->getCodes();
 		$bbcTags = $codes->getTags();
 
 		if (!isset($this->configValues[$var[1] . '_enabledTags']))
@@ -322,7 +323,7 @@ class Db extends Adapter
 		}
 
 		// What are the options, eh?
-		$codes = \BBC\ParserWrapper::getInstance()->getCodes();
+		$codes = ParserWrapper::getInstance()->getCodes();
 		$bbcTags = $codes->getTags();
 		$bbcTags = array_unique($bbcTags);
 		$bbc_sections = array();
