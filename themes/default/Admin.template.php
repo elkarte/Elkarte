@@ -152,7 +152,7 @@ function template_credits()
 					<div id="admincenter">
 						<div id="support_credits">
 							<h2 class="category_header">
-								', $txt['support_title'], ' <img id="credits_logo" src="', $settings['images_url'], '/', $context['theme_variant_url'], 'logo_elk.png"alt="" />
+								', $txt['support_title'], ' <img id="credits_logo" src="', $settings['images_url'], '/', $context['theme_variant_url'], 'logo_elk.png" alt="" />
 							</h2>
 							<div class="content">
 								<strong>', $txt['support_versions'], ':</strong><br />
