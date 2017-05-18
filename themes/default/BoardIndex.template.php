@@ -40,18 +40,19 @@ function template_boards_list()
 
 		// @todo - Invent nifty class name for boardindex header bars.
 		echo '
-		<section class="forum_category" id="category_', $category['id'], '">
-			<h2 class="category_header">';
+		
+		<header class="category_header">';
 
 		// If this category even can collapse, show a link to collapse it.
 		if ($category['can_collapse'])
 			echo '
-				<a class="chevricon i-chevron-', $category['is_collapsed'] ? 'down' : 'up', '" href="', $category['collapse_href'], '" title="', $category['is_collapsed'] ? $txt['show'] : $txt['hide'], '"></a>';
+			<a class="chevricon i-chevron-', $category['is_collapsed'] ? 'down' : 'up', '" href="', $category['collapse_href'], '" title="', $category['is_collapsed'] ? $txt['show'] : $txt['hide'], '"></a>';
 
 		// The "category link" is only a link for logged in members. Guests just get the name.
 		echo '
 				', $category['link'], '
-			</h2>';
+		</header>
+		<section class="forum_category" id="category_', $category['id'], '">';
 
 		// Assuming the category hasn't been collapsed...
 		if (!$category['is_collapsed'])
