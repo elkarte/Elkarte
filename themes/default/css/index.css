@@ -613,8 +613,19 @@ em, .em {
 	font-size: 1.071em;
 }
 
+/* above/below create list items */
 .additional_row {
 	padding: 6px 0;
+}
+
+.generic_list_wrapper .additional_row > a.linkbutton {
+	font-size: 1em;
+	margin: 5px 0 0;
+}
+
+.generic_menu {
+	display: block;
+	padding: 5px 0 0;
 }
 
 /* The generic wrapper thingy. Used by generic list template */

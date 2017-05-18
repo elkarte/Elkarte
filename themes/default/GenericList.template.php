@@ -240,24 +240,18 @@ function template_additional_rows($row_position, $cur_list)
  */
 function template_create_list_menu($list_menu)
 {
-	global $settings;
-
 	echo '
-			<div class="menu', $list_menu['position'], ' additional_row', empty($list_menu['class']) ? '' : ' ' . $list_menu['class'], '"', empty($list_menu['style']) ? '' : ' style="' . $list_menu['style'] . '"', '>';
-
-	$items = count($list_menu['links']);
-	$count = 0;
+		<ul class="generic_menu float', $list_menu['position'], empty($list_menu['class']) ? '' : ' ' . $list_menu['class'], '"', empty($list_menu['style']) ? '' : ' style="' . $list_menu['style'] . '"', '>';
 
 	foreach ($list_menu['links'] as $link)
 	{
-		$count++;
-		if (!empty($link['href']))
-			echo '
-				<a href="', $link['href'], '">', $link['is_selected'] ? '<img src="' . $settings['images_url'] . '/selected.png" alt="&gt;" /> ' : '';
-
-		echo $link['label'], !empty($link['href']) ? '</a>' : '', $items !== $count ? '&nbsp;|&nbsp;' : '';
+		echo '
+			<li class="listlevel1">
+				<a class="linklevel1', $link['is_selected'] ? ' active' : '', '" href="', !empty($link['href']) ? $link['href'] : '#', '">',
+				$link['label'], !empty($link['href']) ? '</a>' : '', '
+			</li>';
 	}
 
 	echo '
-			</div>';
+		</ul>';
 }
