@@ -987,7 +987,7 @@ function template_show_settings()
 				$javascript = !empty($config_var['javascript']) ? $config_var['javascript'] : '';
 				$disabled = !empty($config_var['disabled']) ? ' disabled="disabled"' : '';
 				$invalid = !empty($config_var['invalid']) ? ' class="error"' : '';
-				$size = !empty($config_var['size'] && is_numeric($config_var['size'])) ? ' size="' . $config_var['size'] . '"' : '';
+				$size = !empty($config_var['size']) && is_numeric($config_var['size']) ? ' size="' . $config_var['size'] . '"' : '';
 				$subtext = !empty($config_var['subtext']) ? '<br /><span class="smalltext"> ' . $config_var['subtext'] . '</span>' : '';
 
 				// Show the [?] button.
