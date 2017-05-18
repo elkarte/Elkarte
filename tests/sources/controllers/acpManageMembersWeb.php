@@ -37,8 +37,8 @@ class TestManageMembers_Controller extends ElkArteWebTest
 		$this->assertEquals('Manage Members', $this->title());
 
 		// Let's do it: approve/delete...
-		$this->assertContains('new accounts', $this->byCssSelector('.additional_row a:last-child')->text());
-		$this->clickit('.additional_row a:last-child');
+		$this->assertContains('new accounts', $this->byCssSelector('.generic_menu li a:last-child')->text());
+		$this->clickit('.generic_menu li a:last-child');
 		$this->assertContains($mname, $this->byCssSelector('#list_approve_list_0')->text());
 		$this->clickit('#list_approve_list_0 input');
 		$this->clickit('select[name=todo] option[value=' . $el . ']');
