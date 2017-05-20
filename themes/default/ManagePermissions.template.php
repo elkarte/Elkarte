@@ -697,7 +697,7 @@ function template_inline_permissions($permission)
 	global $context, $txt, $modSettings;
 
 	echo '
-		<fieldset id="', $permission, '">
+		<fieldset id="ip_', $permission, '">
 			<legend>', $txt['avatar_select_permission'], '</legend>';
 
 	if (empty($modSettings['permission_enable_deny']))
@@ -809,16 +809,16 @@ function template_postmod_permissions()
 							', $txt['permissions_post_moderation_group'], '
 						</th>
 						<th><i class="icon icon-small i-check" title="', $txt['permissions_post_moderation_allow'], '"></i></th>
-						<th><i class="icon icon-small i-post_moderation_moderate title="', $txt['permissions_post_moderation_moderate'], '"></i></th>
+						<th><i class="icon icon-small i-post_moderation_moderate" title="', $txt['permissions_post_moderation_moderate'], '"></i></th>
 						<th><i class="icon icon-small i-post_moderation_deny" title="', $txt['permissions_post_moderation_disallow'], '"></i></th>
 						<th><i class="icon icon-small i-check" title="', $txt['permissions_post_moderation_allow'], '"></i></th>
-						<th><i class="icon icon-small i-post_moderation_moderate title="', $txt['permissions_post_moderation_moderate'], '"></i></th>
+						<th><i class="icon icon-small i-post_moderation_moderate" title="', $txt['permissions_post_moderation_moderate'], '"></i></th>
 						<th><i class="icon icon-small i-post_moderation_deny" title="', $txt['permissions_post_moderation_disallow'], '"></i></th>
 						<th><i class="icon icon-small i-check" title="', $txt['permissions_post_moderation_allow'], '"></i></th>
-						<th><i class="icon icon-small i-post_moderation_moderate title="', $txt['permissions_post_moderation_moderate'], '"></i></th>
+						<th><i class="icon icon-small i-post_moderation_moderate" title="', $txt['permissions_post_moderation_moderate'], '"></i></th>
 						<th><i class="icon icon-small i-post_moderation_deny" title="', $txt['permissions_post_moderation_disallow'], '"></i></th>
 						<th><i class="icon icon-small i-check" title="', $txt['permissions_post_moderation_allow'], '"></i></th>
-						<th><i class="icon icon-small i-post_moderation_moderate title="', $txt['permissions_post_moderation_moderate'], '"></i></th>
+						<th><i class="icon icon-small i-post_moderation_moderate" title="', $txt['permissions_post_moderation_moderate'], '"></i></th>
 						<th><i class="icon icon-small i-post_moderation_deny" title="', $txt['permissions_post_moderation_disallow'], '"></i></th>
 					</tr>
 				</thead>
@@ -862,7 +862,7 @@ function template_postmod_permissions()
 		</form>
 		<p class="smalltext" style="padding-left: 10px;">
 			<strong>', $txt['permissions_post_moderation_legend'], ':</strong><br />
-			<i class="icon icon-small i-post_moderation_allow"></i><br />
+			<i class="icon icon-small i-post_moderation_allow"></i> - ', $txt['permissions_post_moderation_allow'], '<br />
 			<i class="icon icon-small i-post_moderation_moderate"></i> - ', $txt['permissions_post_moderation_moderate'], '<br />
 			<i class="icon icon-small i-post_moderation_deny"></i> - ', $txt['permissions_post_moderation_disallow'], '
 		</p>

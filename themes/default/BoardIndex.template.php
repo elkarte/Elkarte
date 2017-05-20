@@ -40,18 +40,19 @@ function template_boards_list()
 
 		// @todo - Invent nifty class name for boardindex header bars.
 		echo '
-		<section class="forum_category" id="category_', $category['id'], '">
-			<h2 class="category_header">';
+		
+		<header class="category_header">';
 
 		// If this category even can collapse, show a link to collapse it.
 		if ($category['can_collapse'])
 			echo '
-				<a class="chevricon i-chevron-', $category['is_collapsed'] ? 'down' : 'up', '" href="', $category['collapse_href'], '" title="', $category['is_collapsed'] ? $txt['show'] : $txt['hide'], '"></a>';
+			<a class="chevricon i-chevron-', $category['is_collapsed'] ? 'down' : 'up', '" href="', $category['collapse_href'], '" title="', $category['is_collapsed'] ? $txt['show'] : $txt['hide'], '"></a>';
 
 		// The "category link" is only a link for logged in members. Guests just get the name.
 		echo '
 				', $category['link'], '
-			</h2>';
+		</header>
+		<section class="forum_category" id="category_', $category['id'], '">';
 
 		// Assuming the category hasn't been collapsed...
 		if (!$category['is_collapsed'])
@@ -125,7 +126,7 @@ function template_info_center_below()
 
 	// Here's where the "Info Center" starts...
 	echo '
-	<section id="info_center" class="forum_category">
+	<aside id="info_center" class="forum_category">
 		<h2 class="category_header panel_toggle">
 				<i id="upshrink_ic" class="hide chevricon i-chevron-', empty($context['minmax_preferences']['info']) ? 'up' : 'down', '" title="', $txt['hide'], '"></i>
 			<a href="#" id="upshrink_link">', sprintf($txt['info_center_title'], $context['forum_name_html_safe']), '</a>
@@ -136,7 +137,7 @@ function template_info_center_below()
 
 	echo '
 		</ul>
-	</section>';
+	</aside>';
 
 	// Info center collapse object.
 	addInlineJavascript('

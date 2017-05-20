@@ -281,21 +281,21 @@ function template_simple_message($msg)
 {
 	// @todo find a better name for $msg['date']
 	echo '
-			<div class="', $msg['class'], ' forumposts">', !empty($msg['counter']) ? '
+			<article class="', $msg['class'], ' forumposts">', !empty($msg['counter']) ? '
 				<div class="counter">' . $msg['counter'] . '</div>' : '', '
-				<div class="topic_details">
+				<header class="topic_details">
 					<h5>
 						', $msg['title'], '
 					</h5>', !empty($msg['date']) ? '
 					<span class="smalltext">' . $msg['date'] . '</span>' : '', '
-				</div>
-				<div class="inner">
+				</header>
+				<section class="inner">
 					', $msg['body'], '
-				</div>';
+				</section>';
 
 	if (!empty($msg['buttons']))
 		template_quickbutton_strip($msg['buttons'], !empty($msg['tests']) ? $msg['tests'] : array());
 
 	echo '
-			</div>';
+			</article>';
 }

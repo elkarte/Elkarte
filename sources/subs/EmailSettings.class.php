@@ -26,7 +26,6 @@
  */
 class Email_Settings extends Settings_Form
 {
-
 	/**
 	 * static function saveTableSettings, now part of the Settings Form class
 	 *
@@ -47,6 +46,7 @@ class Email_Settings extends Settings_Form
 		{
 			$configValues = (array) $configValues;
 		}
+
 		$settingsForm = new self(self::DBTABLE_ADAPTER);
 		/** @var ElkArte\sources\subs\SettingsFormAdapter\DbTable */
 		$settingsAdapter = $settingsForm->getAdapter();

@@ -16,6 +16,7 @@
  */
 
 namespace ElkArte\sources\subs\SettingsFormAdapter;
+use BBC\ParserWrapper;
 
 /**
  * Class Db
@@ -58,7 +59,7 @@ class Db extends Adapter
 					'type' => $configVar[0],
 					'size' => !empty($configVar[2]) && !is_array($configVar[2]) ? $configVar[2] : (in_array($configVar[0], array('int', 'float')) ? 6 : 0),
 					'data' => array(),
-					'name' => $configVar[1],
+					'name' => str_replace(' ', '_', $configVar[1]),
 					'value' => isset($modSettings[$configVar[1]]) ? ($configVar[0] === 'select' ? $modSettings[$configVar[1]] : htmlspecialchars($modSettings[$configVar[1]], ENT_COMPAT, 'UTF-8')) : (in_array($configVar[0], array('int', 'float')) ? 0 : ''),
 					'disabled' => false,
 					'invalid' => !empty($configVar['invalid']),
@@ -107,10 +108,12 @@ class Db extends Adapter
 				return isset($configVar[0]) && $configVar[0] === 'permissions';
 			}
 		);
+
 		if (empty($inlinePermissions))
 		{
 			return;
 		}
+
 		$permissionsForm = new InlinePermissions;
 		$permissionsForm->setExcludedGroups(isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
 		$permissionsForm->setPermissions($inlinePermissions);
@@ -256,7 +259,7 @@ class Db extends Adapter
 	 */
 	private function setBbcChoices($var)
 	{
-		$codes = \BBC\ParserWrapper::getInstance()->getCodes();
+		$codes = ParserWrapper::getInstance()->getCodes();
 		$bbcTags = $codes->getTags();
 
 		if (!isset($this->configValues[$var[1] . '_enabledTags']))
@@ -322,7 +325,7 @@ class Db extends Adapter
 		}
 
 		// What are the options, eh?
-		$codes = \BBC\ParserWrapper::getInstance()->getCodes();
+		$codes = ParserWrapper::getInstance()->getCodes();
 		$bbcTags = $codes->getTags();
 		$bbcTags = array_unique($bbcTags);
 		$bbc_sections = array();
@@ -422,13 +425,13 @@ class Db extends Adapter
 	{
 		list ($setArray) = $this->sanitizeVars();
 		$inlinePermissions = array();
+
 		foreach ($this->configVars as $var)
 		{
-			if (!isset($var[1]) || !isset($this->configValues[$var[1]]))
+			if (!isset($var[1]) || (!isset($this->configValues[$var[1]]) && $var[0] !== 'permissions'))
 			{
 				continue;
 			}
-
 			// Permissions?
 			elseif ($var[0] === 'permissions')
 			{

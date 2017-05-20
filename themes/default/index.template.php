@@ -125,13 +125,14 @@ function call_template_callbacks($id, $array)
  */
 function template_html_above()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt, $modSettings;
 
 	// Show right to left and the character set for ease of translating.
 	echo '<!DOCTYPE html>
 <html', $context['right_to_left'] ? ' dir="rtl"' : '', '>
 <head>
-	<title>', $context['page_title_html_safe'], '</title>';
+	<title>', $context['page_title_html_safe'], '</title>
+	<meta charset="UTF-8" />';
 
 	// Tell IE to render the page in standards not compatibility mode. really for ie >= 8
 	// Note if this is not in the first 4k, its ignored, that's why its here
@@ -139,11 +140,7 @@ function template_html_above()
 		echo '
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />';
 
-	// load in any css from addons or themes so they can overwrite if wanted
-	template_css();
-
 	echo '
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="viewport" content="width=device-width" />
 	<meta name="mobile-web-app-capable" content="yes" />
 	<meta name="description" content="', $context['page_title_html_safe'], '" />';
@@ -157,6 +154,9 @@ function template_html_above()
 	if (!empty($context['robot_no_index']))
 		echo '
 	<meta name="robots" content="noindex" />';
+
+	// load in any css from addons or themes so they can overwrite if wanted
+	template_css();
 
 	// Present a canonical url for search engines to prevent duplicate content in their indices.
 	if (!empty($context['canonical_url']))
@@ -239,14 +239,14 @@ function template_body_above()
 
 	// Skip nav link.
 	echo '
-	<section id="top_section">
+	<header id="top_section">
 		<aside class="wrapper">';
 
 	call_template_callbacks('th', $context['theme_header_callbacks']);
 
 	echo '
 		</aside>
-		<header id="header" class="wrapper', !empty($settings['header_layout']) ? ($settings['header_layout'] == 1 ? ' centerheader' : ' rightheader') : '', empty($context['minmax_preferences']['upshrink']) ? '"' : ' hide" aria-hidden="true"', '>
+		<section id="header" class="wrapper', !empty($settings['header_layout']) ? ($settings['header_layout'] == 1 ? ' centerheader' : ' rightheader') : '', empty($context['minmax_preferences']['upshrink']) ? '"' : ' hide" aria-hidden="true"', '>
 			<h1 id="forumtitle">
 				<a class="forumlink" href="', $scripturl, '">', $context['forum_name'], '</a>';
 
@@ -259,12 +259,12 @@ function template_body_above()
 
 	// Show the menu here, according to the menu sub template.
 	echo '
-		</header>';
+		</section>';
 
 	template_menu();
 
 	echo '
-	</section>
+	</header>
 	<div id="wrapper" class="wrapper">
 		<aside id="upper_section"', empty($context['minmax_preferences']['upshrink']) ? '' : ' class="hide" aria-hidden="true"', '>';
 
@@ -278,7 +278,7 @@ function template_body_above()
 
 	// The main content should go here.
 	echo '
-		<section id="main_content_section"><a id="skipnav"></a>';
+		<div id="main_content_section"><a id="skipnav"></a>';
 }
 
 /**
@@ -409,7 +409,7 @@ function template_body_below()
 	global $context, $txt;
 
 	echo '
-		</section>
+		</div>
 	</div>';
 
 	// Show RSS link, as well as the copyright.
@@ -514,7 +514,7 @@ function template_menu()
 
 	// WAI-ARIA a11y tweaks have been applied here.
 	echo '
-				<nav id="menu_nav" role="navigation">
+				<nav id="menu_nav">
 					<ul id="main_menu" class="wrapper" role="menubar">';
 
 	// The upshrink image, right-floated.
@@ -827,7 +827,7 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
 		$options['extra'] = '';
 
 	echo '
-			<nav class="pagesection" role="application">
+			<nav class="pagesection">
 				', $pages, '
 				', !empty($button_strip) && !empty($context[$button_strip]) ? template_button_strip($context[$button_strip], $strip_direction) : '',
 	$options['extra'], '

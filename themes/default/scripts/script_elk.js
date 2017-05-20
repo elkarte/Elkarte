@@ -1246,7 +1246,7 @@ errorbox_handler.prototype.removeError = function(error_box, error_elem)
  * @param {string} parent id of the parent "add more button: we will place this before
  * @param {object} oDtName object of dt element options (type, class, size)
  * @param {object} oDdName object of the dd element options (type, class size)
- * @param {object} oData optional select box object, 1:{id:value,name:display name}, ...
+ * @param {object} [oData] optional select box object, 1:{id:value,name:display name}, ...
  */
 function addAnotherOption(parent, oDtName, oDdName, oData)
 {

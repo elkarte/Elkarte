@@ -202,8 +202,8 @@ String.prototype.easyReplace = function (oReplacements)
 /**
  * Simulate php str_repeat function
  *
- * @param {type} sString
- * @param {type} iTime
+ * @param {string} sString
+ * @param {int} iTime
  */
 function php_str_repeat(sString, iTime)
 {
@@ -242,8 +242,8 @@ function reqWin(desktopURL, alternateWidth, alternateHeight, noScrollbars)
  * Open a overlay div on the screen
  *
  * @param {string} desktopURL
- * @param {string} sHeader
- * @param {string} sIcon
+ * @param {string} [sHeader]
+ * @param {string} [sIcon]
  */
 function reqOverlayDiv(desktopURL, sHeader, sIcon)
 {
@@ -481,7 +481,7 @@ function array_search(variable, theArray)
 /**
  * Find a specific radio button in its group and select it.
  *
- * @param {type} oRadioGroup
+ * @param {HTMLInputElement} oRadioGroup
  * @param {type} sName
  */
 function selectRadioByName(oRadioGroup, sName)
@@ -515,9 +515,9 @@ function selectAllRadio(oInvertCheckbox, oForm, sMask, sValue)
  * Invert all check boxes at once by clicking a single checkbox.
  *
  * @param {object} oInvertCheckbox
- * @param {string} oForm
- * @param {string} sMask
- * @param {boolean} bIgnoreDisabled
+ * @param {HTMLFormElement} oForm
+ * @param {string} [sMask]
+ * @param {boolean} [bIgnoreDisabled]
  */
 function invertAll(oInvertCheckbox, oForm, sMask, bIgnoreDisabled)
 {
@@ -555,8 +555,8 @@ window.setTimeout(function() {elk_sessionKeepAlive();}, 1200000);
  *
  * @param {string} option name being set
  * @param {string} value of the option
- * @param {string} theme its being set or null for all
- * @param {string} additional_vars to use in the url request that will be sent
+ * @param {string|null} theme its being set or null for all
+ * @param {string|null} additional_vars to use in the url request that will be sent
  */
 function elk_setThemeOption(option, value, theme, additional_vars)
 {
@@ -636,11 +636,11 @@ function hashModeratePassword(doForm, username, cur_session_id, token)
  * Shows the page numbers by clicking the dots (in compact view).
  * @todo @DEPRECATED it is not used. If we don't care about compatibility it can be removed
  *
- * @param {type} spanNode
- * @param {type} baseURL
- * @param {type} firstPage
- * @param {type} lastPage
- * @param {type} perPage
+ * @param {HTMLElement} spanNode
+ * @param {string} baseURL
+ * @param {int} firstPage
+ * @param {int} lastPage
+ * @param {int} perPage
  */
 function expandPages(spanNode, baseURL, firstPage, lastPage, perPage)
 {
@@ -832,7 +832,12 @@ elk_Toggle.prototype.init = function()
 	}
 };
 
-// Collapse or expand the section.
+/**
+ * Collapse or expand the section.
+ *
+ * @param {boolean} bCollapse
+ * @param {boolean} [bInit]
+ */
 elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 {
 	var i = 0,
@@ -1001,7 +1006,7 @@ function create_ajax_indicator_ele()
  * Creates and event listener object for a given object
  * Object events can then be added with addEventListener
  *
- * @param {type} oTarget
+ * @param {HTMLElement} oTarget
  */
 function createEventListener(oTarget)
 {
@@ -1033,8 +1038,6 @@ function createEventListener(oTarget)
 
 /**
  * This function will retrieve the contents needed for the jump to boxes.
- *
- * @param {type} elem
  */
 function grabJumpToContent() {
 	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=jumpto;xml', onJumpReceived);
@@ -1045,7 +1048,7 @@ function grabJumpToContent() {
 /**
  * Callback function for loading the jumpto box
  *
- * @param {object} XMLDoc
+ * @param {object} oXMLDoc
  */
 function onJumpReceived(oXMLDoc) {
 	var aBoardsAndCategories = [],
@@ -1561,7 +1564,7 @@ function pollOptions()
  * Generate the number of days in a given month for a given year
  * Used to populate the day pulldown in the calendar
  *
- * @param {type} offset
+ * @param {int} [offset] optional
  */
 function generateDays(offset)
 {
@@ -1679,6 +1682,10 @@ function initHighlightSelection(container_id)
 
 /**
  * Auto submits a paused form, such as a maintenance task
+ *
+ * @param {int} countdown
+ * @param {string} txt_message
+ * @param {string} [formName=autoSubmit]
  */
 function doAutoSubmit(countdown, txt_message, formName)
 {

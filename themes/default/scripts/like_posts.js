@@ -364,7 +364,10 @@
 				$like_post_message_data.append(htmlContent).show();
 
 				// Hover subject link to show message body preview
-				$('.message_title').SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
+				$('.message_title').SiteTooltip({hoverIntent: {sensitivity: 10, interval: 500, timeout: 50}});
+
+				// All done with this
+				hideSpinnerOverlay();
 			},
 
 			// The most liked Topics !

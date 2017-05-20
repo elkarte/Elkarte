@@ -650,10 +650,10 @@ class ManageMaillist_Controller extends Action_Controller
 					'data' => array(
 						'sprintf' => array(
 							'format' => '<a href="?action=admin;area=maillist;sa=editfilter;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">
-										<i class="icon i-modify" title="' . $txt['modify'] . '" alt="*"></i>
+										<i class="icon i-modify" title="' . $txt['modify'] . '"></i>
 									</a>
 									<a href="?action=admin;area=maillist;sa=deletefilter;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['filter_delete_warning']) . ') && submitThisOnce(this);" accesskey="d">
-										<i class="icon i-delete" title="' . $txt['delete'] . '" alt="*"></i>
+										<i class="icon i-delete" title="' . $txt['delete'] . '"></i>
 									</a>',
 							'params' => array(
 								'id_filter' => true,
@@ -929,7 +929,6 @@ class ManageMaillist_Controller extends Action_Controller
 				$this->_req->post->filter_style = 'filter';
 
 				Email_Settings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array('id_filter'), $editId, $editName);
-				writeLog();
 				redirectexit('action=admin;area=maillist;sa=emailfilters;saved');
 			}
 		}
@@ -1076,10 +1075,10 @@ class ManageMaillist_Controller extends Action_Controller
 					'data' => array(
 						'sprintf' => array(
 							'format' => '<a href="?action=admin;area=maillist;sa=editparser;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">
-										<i class="icon i-modify" title="' . $txt['modify'] . '" alt="*"></i>
+										<i class="icon i-modify" title="' . $txt['modify'] . '"></i>
 									</a>
 									<a href="?action=admin;area=maillist;sa=deleteparser;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['parser_delete_warning']) . ') && submitThisOnce(this);" accesskey="d">
-										<i class="icon i-delete" title="' . $txt['delete'] . '" alt="*"></i>
+										<i class="icon i-delete" title="' . $txt['delete'] . '"></i>
 									</a>',
 							'params' => array(
 								'id_filter' => true,
@@ -1315,7 +1314,6 @@ class ManageMaillist_Controller extends Action_Controller
 
 				// Save, log, show
 				Email_Settings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array('id_filter'), $editId, $editName);
-				writeLog();
 				redirectexit('action=admin;area=maillist;sa=emailparser;saved');
 			}
 		}

@@ -46,6 +46,8 @@ class Errors extends AbstractModel
 	 * In case of maintenance of very early errors, the database may not be available,
 	 * this __construct will feed AbstractModel with a value just to stop it
 	 * from trying to initialize the database connection.
+	 *
+	 * @param $db Database|null
 	 */
 	public function __construct($db = null)
 	{

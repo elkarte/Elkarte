@@ -152,7 +152,7 @@ function template_credits()
 					<div id="admincenter">
 						<div id="support_credits">
 							<h2 class="category_header">
-								', $txt['support_title'], ' <img id="credits_logo" src="', $settings['images_url'], '/', $context['theme_variant_url'], 'logo_elk.png"alt="" />
+								', $txt['support_title'], ' <img id="credits_logo" src="', $settings['images_url'], '/', $context['theme_variant_url'], 'logo_elk.png" alt="" />
 							</h2>
 							<div class="content">
 								<strong>', $txt['support_versions'], ':</strong><br />
@@ -772,7 +772,7 @@ function template_edit_censored()
 						<input type="checkbox" name="censorIgnoreCase" value="1" id="censorIgnoreCase_check"', empty($modSettings['censorIgnoreCase']) ? '' : ' checked="checked"', ' />
 					</dd>
 					<dt>
-						<a href="' . $scripturl . '?action=quickhelp;help=allow_no_censored" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>' . $txt['help'] . '</s></a><label for="allow_no_censored">', $txt['censor_allow'], '</label></dt>
+						<a href="' . $scripturl . '?action=quickhelp;help=allow_no_censored" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>' . $txt['help'] . '</s></a><label for="allow_no_censored">', $txt['censor_allow'], '</label>
 					</dt>
 					<dd>
 						<input type="checkbox" name="allow_no_censored" value="1" id="allow_no_censored"', empty($modSettings['allow_no_censored']) ? '' : ' checked="checked"', ' />
@@ -915,7 +915,7 @@ function template_show_settings()
 					if (empty($config_var['class']))
 					{
 						echo '
-						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['helptext'] . '" onclick="return reqOverlayDiv(this.href);" class="hdicon cat_img_helptopics help" alt="' . $txt['help'] . '"></a>';
+						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['helptext'] . '" onclick="return reqOverlayDiv(this.href);" class="hdicon cat_img_helptopics help" title="' . $txt['help'] . '"></a>';
 					}
 					else
 					{
@@ -987,7 +987,7 @@ function template_show_settings()
 				$javascript = !empty($config_var['javascript']) ? $config_var['javascript'] : '';
 				$disabled = !empty($config_var['disabled']) ? ' disabled="disabled"' : '';
 				$invalid = !empty($config_var['invalid']) ? ' class="error"' : '';
-				$size = !empty($config_var['size']) ? ' size="' . $config_var['size'] . '"' : '';
+				$size = !empty($config_var['size']) && is_numeric($config_var['size']) ? ' size="' . $config_var['size'] . '"' : '';
 				$subtext = !empty($config_var['subtext']) ? '<br /><span class="smalltext"> ' . $config_var['subtext'] . '</span>' : '';
 
 				// Show the [?] button.
@@ -1559,11 +1559,11 @@ function template_callback_external_search_engines()
 		{
 			echo '
 			<dt>
-				<label for="">', $txt['name'], ': <input type="text" name="engine_name[]" value="', $data['name'], '" size="50" class="input_text verification_question" /></label>
+				<label>', $txt['name'], ': <input type="text" name="engine_name[]" value="', $data['name'], '" size="50" class="input_text verification_question" /></label>
 			</dt>
 			<dd>
-				<label for="">', $txt['url'], ': <input type="text" name="engine_url[]" value="', $data['url'], '" size="35" class="input_text verification_answer" /></label><br />
-				<label for="">', $txt['words_sep'], ': <input type="text" name="engine_separator[]" value="', $data['separator'], '" size="5" class="input_text verification_answer" /></label>
+				<label>', $txt['url'], ': <input type="text" name="engine_url[]" value="', $data['url'], '" size="35" class="input_text verification_answer" /></label><br />
+				<label>', $txt['words_sep'], ': <input type="text" name="engine_separator[]" value="', $data['separator'], '" size="5" class="input_text verification_answer" /></label>
 			</dd>';
 		}
 	}

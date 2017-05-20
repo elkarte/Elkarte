@@ -43,7 +43,7 @@ function template_lp_stats()
 
 	// Now a container to be filled by JS
 	echo '
-			<h2 class="category_header" id="like_post_current_tab_desc"></h2>
+			<h2 class="category_header" id="like_post_current_tab_desc">_</h2>
 			<div class="like_post_stats_data individual_data">
 				<div class="like_post_message_data"></div>
 				<div class="like_post_topic_data"></div>
@@ -61,7 +61,7 @@ function template_lp_stats()
 	echo '
 		</div>';
 
-	echo '<script defer="defer">
+	echo '<script>
 		$(function() {
 			likePostStats.prototype.init({
 				txtStrings: {

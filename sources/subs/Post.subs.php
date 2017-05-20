@@ -1034,7 +1034,6 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 	switch ($editing)
 	{
 		case 1:
-		{
 			require_once(SUBSDIR . '/Messages.subs.php');
 
 			// Get the existing message.
@@ -1052,10 +1051,8 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 				$message['errors'] = $errors;
 
 			return $message;
-		}
 		// Posting a quoted reply?
 		case 2:
-		{
 			$msg_id = !empty($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
 
 			// Make sure they _can_ quote this post, and if so get it.
@@ -1094,10 +1091,8 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 			$form_message = '[quote author=' . $mname . ' link=msg=' . (int) $msg_id . ' date=' . $mdate . ']' . "\n" . rtrim($form_message) . "\n" . '[/quote]';
 
 			break;
-		}
 		// Posting a reply without a quote?
 		case 3:
-		{
 			// Get the first message's subject.
 			$form_subject = $first_subject;
 
@@ -1112,14 +1107,11 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 			$form_message = '';
 
 			break;
-		}
 		case 4:
-		{
 			$form_subject = isset($_GET['subject']) ? $_GET['subject'] : '';
 			$form_message = '';
 
 			break;
-		}
 	}
 
 	return array($form_subject, $form_message);

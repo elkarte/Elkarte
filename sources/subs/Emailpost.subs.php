@@ -1503,10 +1503,15 @@ function query_load_message($message_type, $message_id, $pbe)
 		);
 	}
 	$topic_info = array();
-	// Found the information, load the topic_info array with the data for this topic and board
-	if ($db->num_rows($request) !== 0)
-		$topic_info = $db->fetch_assoc($request);
-	$db->free_result($request);
+	if (isset($request))
+	{
+		// Found the information, load the topic_info array with the data for this topic and board
+		if ($db->num_rows($request) !== 0)
+		{
+			$topic_info = $db->fetch_assoc($request);
+		}
+		$db->free_result($request);
+	}
 
 	// Return the results or false
 	return !empty($topic_info) ? $topic_info : false;

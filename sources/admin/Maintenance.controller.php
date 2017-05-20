@@ -1378,7 +1378,7 @@ class Maintenance_Controller extends Action_Controller
 							<i class="icon i-post_moderation_moderate" title="' . $txt['hooks_disabled'] . '"></i>' . $txt['hooks_disable_legend_disabled'] . '
 						</li>
 						<li>
-							<i class="icon i-post_moderation_deny" title="' . $txt['hooks_missing'] . '"/></i>' . $txt['hooks_disable_legend_missing'] . '
+							<i class="icon i-post_moderation_deny" title="' . $txt['hooks_missing'] . '"></i>' . $txt['hooks_disable_legend_missing'] . '
 						</li>
 					</ul>'
 				),

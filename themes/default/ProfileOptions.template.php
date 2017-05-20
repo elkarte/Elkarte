@@ -235,6 +235,8 @@ function template_editIgnoreList()
 
 /**
  * Template for editing profile options.
+ *
+ * @uses ParseError
  */
 function template_edit_options()
 {

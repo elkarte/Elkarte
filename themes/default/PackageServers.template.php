@@ -235,22 +235,24 @@ function template_package_list()
 
 				// Location of file: http://someplace/.
 				echo '
-								<ul>
-									<li><i class="icon i-download"></i> ', $txt['file_location'], ':&nbsp; <a href="', $package['server']['download'], '">', $package['server']['download'], '</a></li>';
+								<li>
+									<ul>
+										<li><i class="icon i-download"></i> ', $txt['file_location'], ':&nbsp; <a href="', $package['server']['download'], '">', $package['server']['download'], '</a></li>';
 
 				// Location of issues?
 				if (!empty($package['server']['bugs']))
 					echo '
-									<li><i class="icon i-bug"></i> ', $txt['bug_location'], ':&nbsp; <a href="', $package['server']['bugs'], '">', $package['server']['bugs'], '</a></li>';
+										<li><i class="icon i-bug"></i> ', $txt['bug_location'], ':&nbsp; <a href="', $package['server']['bugs'], '">', $package['server']['bugs'], '</a></li>';
 
 				// Location of support?
 				if (!empty($package['server']['support']))
 					echo '
-									<li><i class="icon i-support"></i> ', $txt['support_location'], ':&nbsp; <a href="', $package['server']['support'], '">', $package['server']['support'], '</a></li>';
+										<li><i class="icon i-support"></i> ', $txt['support_location'], ':&nbsp; <a href="', $package['server']['support'], '">', $package['server']['support'], '</a></li>';
 
 				// Description: bleh bleh!
 				echo '
-								</ul>
+									</ul>
+								</li>
 								<li>
 									<div class="infobox">', $txt['package_description'], ':&nbsp; ', $package['description'], '</div>
 								</li>

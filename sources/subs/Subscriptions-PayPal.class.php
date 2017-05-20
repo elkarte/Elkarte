@@ -141,7 +141,7 @@ class PayPal_Payment
 {
 	/**
 	 * Holds the IPN response data
-	 * @var mixed[]
+	 * @var string|mixed[]
 	 */
 	private $return_data;
 

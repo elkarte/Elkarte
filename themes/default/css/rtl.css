@@ -670,7 +670,7 @@ dl.settings img {
 	float: right;
 	margin: 2px 2px 0 0;
 }
-.inner {
+.inner, .messageContent {
 	padding: 7px 2px 2px 8px;
 }
 /* Used by video embed JS when autolinking video links */

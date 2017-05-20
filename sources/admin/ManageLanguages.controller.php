@@ -222,7 +222,7 @@ class ManageLanguages_Controller extends Action_Controller
 						'function' => function ($rowData) {
 							global $scripturl;
 
-							return sprintf('<a href="%1$s?action=admin;area=languages;sa=editlang;lid=%2$s">%3$s</a>', $scripturl, $rowData['id'], $rowData['name']);
+							return sprintf('<a href="%1$s?action=admin;area=languages;sa=editlang;lid=%2$s">%3$s<i class="icon icon-small i-modify"></i></a>', $scripturl, $rowData['id'], $rowData['name']);
 						},
 					),
 				),

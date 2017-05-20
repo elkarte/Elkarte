@@ -31,8 +31,8 @@ function template_recent()
 	template_pagesection();
 
 	echo '
-		<div id="recentposts">
-			<h2 class="category_header hdicon cat_img_posts">', $txt['recent_posts'], '</h2>';
+		<main id="recentposts">
+			<header class="category_header hdicon cat_img_posts">', $txt['recent_posts'], '</header>';
 
 	foreach ($context['posts'] as $post)
 	{
@@ -44,7 +44,7 @@ function template_recent()
 	}
 
 	echo '
-		</div>';
+		</main>';
 
 	template_pagesection();
 
