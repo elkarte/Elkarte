@@ -393,7 +393,10 @@ class Elk_Autoloader
 			// Some_Display => Subscriptions-Some.class.php
 			case 'Display':
 			case 'Payment':
-				$this->_file_name = SUBSDIR . '/Subscriptions-' . implode('_', $this->_name) . '.class.php';
+				if (!empty($this->_name))
+				{
+					$this->_file_name = SUBSDIR . '/Subscriptions-' . implode('_', $this->_name) . '.class.php';
+				}
 				break;
 			case 'Module':
 				if (file_exists(SOURCEDIR . '/modules/' . $this->_name[0] . '/' . $this->_givenname . 'Module.class.php'))
