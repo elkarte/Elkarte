@@ -1427,6 +1427,7 @@ class Maintenance_Controller extends Action_Controller
 
 		// Ask for some extra time, on big boards this may take a bit
 		detectServer()->setTimeLimit(600);
+		Debug::get()->off();
 
 		// The functions here will come in handy
 		require_once(SUBSDIR . '/Maintenance.subs.php');
@@ -1460,12 +1461,14 @@ class Maintenance_Controller extends Action_Controller
 			$context['continue_post_data'] = '<input type="hidden" name="' . $context['admin-recountposts_token_var'] . '" value="' . $context['admin-recountposts_token'] . '" />
 					<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />';
 
+			Debug::get()->on();
 			return;
 		}
 
 		// No countable posts? set posts counter to 0
 		updateZeroPostMembers();
 
+		Debug::get()->on();
 		// All done, clean up and go back to maintenance
 		unset($_SESSION['total_members']);
 		redirectexit('action=admin;area=maintain;sa=members;done=recountposts');

@@ -1,208 +1,313 @@
-/*!
- * Copyright 2012 Tsvetan Tsvetkov
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * Author: Tsvetan Tsvetkov (tsekach@gmail.com)
- */
-(function (win) {
+/*! HTML5 Notification - v3.0.0 - 2016-09-19
+
+Copyright 2016 Tsvetan Tsvetkov
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+/** @namespace window */
+/** @namespace window.webkitNotifications */
+/** @namespace window.external */
+(function() {
     /*
      Safari native methods required for Notifications do NOT run in strict mode.
      */
-    //"use strict";
-    var PERMISSION_DEFAULT = "default",
-        PERMISSION_GRANTED = "granted",
-        PERMISSION_DENIED = "denied",
-        PERMISSION = [PERMISSION_GRANTED, PERMISSION_DEFAULT, PERMISSION_DENIED],
-        defaultSetting = {
-            pageVisibility: false,
-            autoClose: 0
-        },
-        empty = {},
-        emptyString = "",
-        isSupported = (function () {
-            var isSupported = false;
-            /*
-             * Use try {} catch() {} because the check for IE may throws an exception
-             * if the code is run on browser that is not Safar/Chrome/IE or
-             * Firefox with html5notifications plugin.
-             *
-             * Also, we canNOT detect if msIsSiteMode method exists, as it is
-             * a method of host object. In IE check for existing method of host
-             * object returns undefined. So, we try to run it - if it runs
-             * successfully - then it is IE9+, if not - an exceptions is thrown.
-             */
-            try {
-                isSupported = !!(/* Safari, Chrome */win.Notification || /* Chrome & ff-html5notifications plugin */win.webkitNotifications || /* Firefox Mobile */navigator.mozNotification || /* IE9+ */(win.external && win.external.msIsSiteMode() !== undefined));
-            } catch (e) {}
-            return isSupported;
-        }()),
-        ieVerification = Math.floor((Math.random() * 10) + 1),
-        isFunction = function (value) { return (value && (value).constructor === Function); },
-        isString = function (value) {return (value && (value).constructor === String); },
-        isObject = function (value) {return (value && (value).constructor === Object); },
-        /**
-         * Dojo Mixin
-         */
-        mixin = function (target, source) {
-            var name, s;
-            for (name in source) {
-                s = source[name];
-                if (!(name in target) || (target[name] !== s && (!(name in empty) || empty[name] !== s))) {
-                    target[name] = s;
-                }
+    //'use strict';
+    // local variables
+    var PERMISSION_DEFAULT = "default";
+    // The user decision is unknown; in this case the application will act as if permission was denied.
+    var PERMISSION_GRANTED = "granted";
+    // The user has explicitly granted permission for the current origin to display system notifications.
+    var PERMISSION_DENIED = "denied";
+    // The user has explicitly denied permission for the current origin to display system notifications.
+    var PERMISSION_NOTSUPPORTED = "notsupported";
+    // The Notification API is not supported on current environment
+    // map for the old permission values
+    var PERMISSIONS = [ PERMISSION_GRANTED, PERMISSION_DEFAULT, PERMISSION_DENIED, PERMISSION_NOTSUPPORTED ];
+    var DIRESCTIONS = [ "auto", "ltr", "rtl" ];
+    /*
+        IE does not support Notifications in the same meaning as other modern browsers.
+        On the other side, IE9+(except MS Edge) implement flashing pinned site taskbar buttons.
+        Each time new IE Notification is create, previous flashing and icon overlay is cleared.
+        So, we need to keep track of the notification that calls close method.
+     */
+    var IENotificationIndex = -1;
+    var IECloseNotificationEvents = [ "click", "scroll", "focus" ];
+    var getIco = function(icon) {
+        var lastIndex = icon.lastIndexOf(".");
+        return (lastIndex !== -1 ? icon.substr(0, lastIndex) : icon) + ".ico";
+    };
+    /*
+     * Internal Notificaiton constructor. Keeps the original Notification
+     * constructor if any or use empty function constructor for browsers
+     * that do not support Notifications
+     */
+    var _Notification = window.Notification || /* Opera Mobile/Android Browser */
+    window.webkitNotifications && WebKitNotification || /* IE9+ pinned site */
+    "external" in window && "msIsSiteMode" in window.external && window.external.msIsSiteMode() !== undefined && IENotification || /* Notifications Not supported. Return dummy constructor */
+    DummyNotification;
+    /**
+     * @constructor DummyNotification
+     */
+    function DummyNotification() {
+        var dummyElement = document.createElement("div");
+        this.addEventListener = function(eventName, callback) {
+            dummyElement.addEventListener(eventName, callback.bind(this));
+        };
+        this.removeEventListener = function(eventName, callback) {
+            dummyElement.removeEventListener(eventName, callback.bind(this));
+        };
+        this.dispatchEvent = function(eventName) {
+            if (typeof eventName !== "string") {
+                return;
             }
-            return target; // Object
-        },
-        noop = function () {},
-        settings = defaultSetting;
-    function getNotification(title, options) {
-        var notification;
-        if (win.Notification) { /* Safari 6, Chrome (23+) */
-            notification =  new win.Notification(title, {
-                /* The notification's icon - For Chrome in Windows, Linux & Chrome OS */
-                icon: isString(options.icon) ? options.icon : options.icon.x32,
-                /* The notification’s subtitle. */
-                body: options.body || emptyString,
-                /*
-                    The notification’s unique identifier.
-                    This prevents duplicate entries from appearing if the user has multiple instances of your website open at once.
-                */
-                tag: options.tag || emptyString
-            });
-        } else if (win.webkitNotifications) { /* FF with html5Notifications plugin installed */
-            notification = win.webkitNotifications.createNotification(options.icon, title, options.body);
-            notification.show();
-        } else if (navigator.mozNotification) { /* Firefox Mobile */
-            notification = navigator.mozNotification.createNotification(title, options.body, options.icon);
-            notification.show();
-        } else if (win.external && win.external.msIsSiteMode()) { /* IE9+ */
-            //Clear any previous notifications
-            win.external.msSiteModeClearIconOverlay();
-            win.external.msSiteModeSetIconOverlay((isString(options.icon) ? options.icon : options.icon.x16), title);
-            win.external.msSiteModeActivate();
-            notification = {
-                "ieVerification": ieVerification + 1
-            };
-        }
-        return notification;
-    }
-    function getWrapper(notification) {
-        return {
-            close: function () {
-                if (notification) {
-                    if (notification.close) {
-                        //http://code.google.com/p/ff-html5notifications/issues/detail?id=58
-                        notification.close();
-                    }
-                    else if (notification.cancel) {
-                        notification.cancel();
-                    } else if (win.external && win.external.msIsSiteMode()) {
-                        if (notification.ieVerification === ieVerification) {
-                            win.external.msSiteModeClearIconOverlay();
-                        }
-                    }
-                }
+            try {
+                dummyElement.dispatchEvent(new Event(eventName));
+            } catch (e) {
+                var event = document.createEvent("Event");
+                event.initEvent(eventName, false, true);
+                dummyElement.dispatchEvent(event);
             }
         };
     }
-    function requestPermission(callback) {
-        if (!isSupported) { return; }
-        var callbackFunction = isFunction(callback) ? callback : noop;
-        if (win.webkitNotifications && win.webkitNotifications.checkPermission) {
-            /*
-             * Chrome 23 supports win.Notification.requestPermission, but it
-             * breaks the browsers, so use the old-webkit-prefixed
-             * win.webkitNotifications.checkPermission instead.
-             *
-             * Firefox with html5notifications plugin supports this method
-             * for requesting permissions.
-             */
-            win.webkitNotifications.requestPermission(callbackFunction);
-        } else if (win.Notification && win.Notification.requestPermission) {
-            win.Notification.requestPermission(callbackFunction);
+    Object.defineProperty(DummyNotification, "permission", {
+        enumerable: true,
+        get: function() {
+            return PERMISSION_NOTSUPPORTED;
         }
-    }
-    function permissionLevel() {
-        var permission;
-        if (!isSupported) { return; }
-        if (win.Notification && win.Notification.permissionLevel) {
-            //Safari 6
-            permission = win.Notification.permissionLevel();
-        } else if (win.webkitNotifications && win.webkitNotifications.checkPermission) {
-            //Chrome & Firefox with html5-notifications plugin installed
-            permission = PERMISSION[win.webkitNotifications.checkPermission()];
-        } else if (win.Notification && win.Notification.permission) {
-            // Firefox 23+
-            permission = win.Notification.permission;
-        } else if (navigator.mozNotification) {
-            //Firefox Mobile
-            permission = PERMISSION_GRANTED;
-        } else if (win.external && (win.external.msIsSiteMode() !== undefined)) { /* keep last */
-            //IE9+
-            permission = win.external.msIsSiteMode() ? PERMISSION_GRANTED : PERMISSION_DEFAULT;
+    });
+    Object.defineProperty(DummyNotification, "requestPermission", {
+        enumerable: true,
+        writable: true,
+        value: function(callback) {
+            callback(this.permission);
         }
-        return permission;
-    }
+    });
     /**
-     *
+     * @constructor IENotification
      */
-    function config(params) {
-        if (params && isObject(params)) {
-            mixin(settings, params);
+    function IENotification(title, options) {
+        DummyNotification.call(this);
+        var notificationIndex = IENotificationIndex;
+        Object.defineProperties(this, {
+            close: {
+                value: function(event) {
+                    if (notificationIndex === IENotificationIndex) {
+                        window.external.msSiteModeClearIconOverlay();
+                        // Remove close events
+                        IECloseNotificationEvents.forEach(function(event) {
+                            window.removeEventListener(event, this.close);
+                        }.bind(this));
+                        this.dispatchEvent("click");
+                        this.dispatchEvent("close");
+                        notificationIndex = null;
+                    }
+                }.bind(this)
+            }
+        });
+        // Clear any previous icon overlay
+        this.close();
+        // Set icon
+        if (this.icon) {
+            window.external.msSiteModeSetIconOverlay(getIco(this.icon), this.description || this.title);
         }
-        return settings;
+        // Blink icon
+        window.external.msSiteModeActivate();
+        // Trigger show event
+        this.dispatchEvent("show");
+        // Attach close event to window
+        IECloseNotificationEvents.forEach(function(event) {
+            window.addEventListener(event, this.close);
+        }.bind(this));
+        // Increment notification index
+        notificationIndex = ++IENotificationIndex;
     }
-
-    function createNotification(title, options) {
-        var notification,
-            notificationWrapper;
-        /*
-            Return undefined if notifications are not supported.
-
-            Return undefined if no permissions for displaying notifications.
-
-            Title and icons are required. Return undefined if not set.
-         */
-        if (isSupported && isString(title) && (options && (isString(options.icon) || isObject(options.icon))) && (permissionLevel() === PERMISSION_GRANTED)) {
-            notification = getNotification(title, options);
+    Object.defineProperty(IENotification, "permission", {
+        enumerable: true,
+        get: function() {
+            var isTabPinned = window.external.msIsSiteMode();
+            return isTabPinned ? PERMISSION_GRANTED : PERMISSION_DENIED;
         }
-        notificationWrapper = getWrapper(notification);
-        //Auto-close notification
-        if (settings.autoClose && notification && !notification.ieVerification && notification.addEventListener) {
-            notification.addEventListener("show", function () {
-                var notification = notificationWrapper;
-                win.setTimeout(function () {
-                    notification.close();
-                }, settings.autoClose);
+    });
+    Object.defineProperty(IENotification, "requestPermission", {
+        enumerable: true,
+        writable: true,
+        value: function(callback) {
+            return new Promise(function(resolve, reject) {
+                if (this.permission === PERMISSION_DENIED) {
+                    alert(this.PERMISSION_REQUEST_MESSAGE);
+                }
+                resolve(this.permission);
+            }.bind(this));
+        }
+    });
+    Object.defineProperty(IENotification, "PERMISSION_REQUEST_MESSAGE", {
+        writable: true,
+        value: "IE supports notifications in pinned mode only. Pin this page on your taskbar to receive notifications."
+    });
+    /**
+     * @constructor WebKitNotification
+     */
+    function WebKitNotification() {}
+    Object.defineProperty(WebKitNotification, "permission", {
+        enumerable: true,
+        get: function() {
+            return PERMISSIONS[window.webkitNotifications.checkPermission()];
+        }
+    });
+    Object.defineProperty(WebKitNotification, "requestPermission", {
+        enumerable: true,
+        writable: true,
+        value: function(callback) {
+            return new Promise(function(resolve, reject) {
+                window.webkitNotifications.requestPermission(function(permission) {
+                    resolve(permission);
+                });
             });
         }
-        return notificationWrapper;
+    });
+    /*
+        [Safari] Safari6 do not support Notification.permission.
+        Instead, it support Notification.permissionLevel()
+     */
+    if (!_Notification.permission) {
+        Object.defineProperty(_Notification, "permission", {
+            enumerable: true,
+            get: function() {
+                return _Notification.permissionLevel && _Notification.permissionLevel();
+            }
+        });
     }
-    win.notify = {
-        PERMISSION_DEFAULT: PERMISSION_DEFAULT,
-        PERMISSION_GRANTED: PERMISSION_GRANTED,
-        PERMISSION_DENIED: PERMISSION_DENIED,
-        isSupported: isSupported,
-        config: config,
-        createNotification: createNotification,
-        permissionLevel: permissionLevel,
-        requestPermission: requestPermission
-    };
-    if (isFunction(Object.seal)) {
-        Object.seal(win.notify);
+    /**
+     * @constructor Notification
+     */
+    function Notification(title, options) {
+        var dir;
+        var notification;
+        if (!arguments.length) {
+            throw TypeError('Failed to construct "Notification": 1 argument required, but only 0 present.');
+        }
+        /*
+            Chrome display notifications when title is empty screen, but
+            Safari do NOT.
+
+            Set title to non-display characted in order to display notifications
+            in Safari as well when title is empty.
+         */
+        if (title === "") {
+            title = "\b";
+        }
+        if (arguments.length > 1 && "object" !== typeof options) {
+            throw TypeError('Failed to construct "Notification": parameter 2 ("options") is not an object.');
+        }
+        dir = Object(options).dir;
+        if (dir !== undefined && DIRESCTIONS.indexOf(dir) === -1) {
+            throw TypeError('Failed to construct "Notification": The provided value "' + dir + '" is not a valid enum value of type NotificationDirection.');
+        }
+        options = Object(options);
+        notification = new _Notification(title, options);
+        /* TODO: actions property */
+        /* TODO: badge property */
+        if (!notification.body) {
+            Object.defineProperty(notification, "body", {
+                value: String(options.body || "")
+            });
+        }
+        if (!notification.data) {
+            Object.defineProperty(notification, "data", {
+                value: options.data || null
+            });
+        }
+        if (!notification.dir) {
+            Object.defineProperty(notification, "dir", {
+                value: dir || DIRESCTIONS[0]
+            });
+        }
+        if (!notification.icon) {
+            Object.defineProperty(notification, "icon", {
+                value: String(options.icon || "")
+            });
+        }
+        if (!notification.lang) {
+            Object.defineProperty(notification, "lang", {
+                value: String(options.lang || "")
+            });
+        }
+        /* TODO: noscreen property */
+        /* TODO: renotify property */
+        if (!notification.requireInteraction) {
+            Object.defineProperty(notification, "requireInteraction", {
+                value: Boolean(options.requireInteraction)
+            });
+        }
+        /* TODO: sound property */
+        if (!notification.silent) {
+            Object.defineProperty(notification, "silent", {
+                value: Boolean(options.silent)
+            });
+        }
+        if (!notification.tag) {
+            Object.defineProperty(notification, "tag", {
+                value: String(options.tag || "")
+            });
+        }
+        if (!notification.title) {
+            Object.defineProperty(notification, "title", {
+                value: String(title)
+            });
+        }
+        if (!notification.timestamp) {
+            Object.defineProperty(notification, "timestamp", {
+                value: new Date().getTime()
+            });
+        }
+        /* TODO: vibrate property */
+        return notification;
     }
-}(window));
+    Object.defineProperty(Notification, "permission", {
+        enumerable: true,
+        get: function() {
+            return _Notification.permission;
+        }
+    });
+    /*
+        Notification.requestPermission should return a Promise(by spec).
+        Keep the original method and replace it with a custom one that
+        checks if the call of Notification.requestPermission returns a promise
+        and if not, then return a custom object that simulates the Promise object.
+
+        Specification:
+        Notification.requestPermission().then(callback);
+
+        Old Spec:
+        Notification.requestPermission(callback);
+     */
+    Object.defineProperty(Notification, "requestPermission", {
+        enumerable: true,
+        value: function() {
+            return new Promise(function(resolve, reject) {
+                var promise = _Notification.requestPermission(function(permission) {
+                    resolve(permission);
+                });
+                if (!(promise instanceof Promise)) {
+                    return;
+                }
+                resolve(promise);
+            });
+        }
+    });
+    window.Notification = Notification;
+})();
 
 /**
  * @name      ElkArte Forum
@@ -220,11 +325,13 @@
 		'use strict';
 		opt = (opt) ? opt : {};
 		var notif,
-			aleradyChecked = false,
+			alreadyChecked = false,
+			alreadyAsked = false,
 			permission_granted = false;
 
 		var init = function(opt) {
-			notif = notify;
+		
+			notif = Notification;
 		};
 
 		var send = function(request) {
@@ -233,7 +340,7 @@
 				if (!hasPermissions())
 					return;
 
-				notif.createNotification(request.desktop_notifications.title, {
+				var myNotification = new Notification(request.desktop_notifications.title, {
 					body: request.desktop_notifications.message,
 					icon: opt.icon
 				});
@@ -241,13 +348,24 @@
 		};
 
 		var hasPermissions = function() {
-			if (aleradyChecked)
+			if (alreadyChecked)
 				return permission_granted;
 
-			notif.requestPermission();
+			if (alreadyAsked === false && notif.permission == "default" && notif.permission != "notsupported") {
+				notif.requestPermission();
+				alreadyAsked = true;
+			}
+			permission_granted = notif.permission == "granted"
 
-			permission_granted = notif.permissionLevel() === notif.PERMISSION_GRANTED;
-			aleradyChecked = true;
+			function onPermissionGranted() {
+				permission_granted = true;
+			}
+
+			function onPermissionDenied() {
+				permission_granted = false;
+			}
+
+			alreadyChecked = notif.permission != "default";
 
 			return permission_granted;
 		};
@@ -274,3 +392,4 @@
 	}
 
 })();
+

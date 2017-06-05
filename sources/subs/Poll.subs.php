@@ -28,6 +28,7 @@ function associatedPoll($topicID, $pollID = null)
 	// Retrieve the poll ID.
 	if ($pollID === null)
 	{
+		require_once(SUBSDIR . '/Topic.subs.php');
 		$pollID = topicAttribute($topicID, array('id_poll'));
 
 		return $pollID['id_poll'];

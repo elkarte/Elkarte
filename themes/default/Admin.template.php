@@ -844,7 +844,14 @@ function template_not_done()
 
 	echo '
 				<input type="submit" name="cont" value="', $txt['not_done_continue'], '" class="right_submit" />
-				', $context['continue_post_data'], '
+				', $context['continue_post_data'];
+	if (!empty($context['admin-maint_token_var']))
+	{
+		echo '
+				<input type="hidden" name="' . $context['admin-maint_token_var'] . '" value="' . $context['admin-maint_token'] . '" />';
+	}
+
+	echo '
 			</form>
 		</div>
 	</div>
