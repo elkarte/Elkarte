@@ -14,6 +14,10 @@ SHORT_DB=${DB%%-*}
 TRAVIS_PHP_VERSION=$2
 SHORT_PHP=${TRAVIS_PHP_VERSION:0:3}
 
+# Prepares for the installer testing
+sudo mkdir /var/www/test
+sudo cp -r * /var/www/test/
+
 # Rename ElkArte test files so they can be used by the install
 mv ./Settings.sample.php ./Settings.php
 mv ./Settings_bak.sample.php ./Settings_bak.php
