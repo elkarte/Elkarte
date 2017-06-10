@@ -176,6 +176,9 @@ class TestFiles extends PHPUnit_Framework_TestCase
 				continue;
 			if (strpos($file, BOARDDIR . '/smileys/') !== false)
 				continue;
+			// This is the path used by ElkArteInstallWeb
+			if (strpos($file, BOARDDIR . '/test/') !== false)
+				continue;
 			if (strpos($file, BOARDDIR . '/tests/') !== false)
 				continue;
 			if (strpos($file, BOARDDIR . '/wiki/') !== false)
@@ -212,7 +215,7 @@ class TestFiles extends PHPUnit_Framework_TestCase
 					continue;
 				}
 			}
-			$this->assertTrue($found, $file);
+			$this->assertTrue($found, 'Failing on: ' . $file);
 		}
 	}
 }
