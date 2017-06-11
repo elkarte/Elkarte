@@ -369,7 +369,7 @@ function comma_format($number, $override_decimal_count = false)
  */
 function thousands_format($number, $override_decimal_count = false)
 {
-	foreach (array('', ' k', ' M', ' G', ' T') as $dummy => $kb)
+	foreach (array('', ' k', ' M', ' G', ' T') as $kb)
 	{
 		if ($number < 1000)
 		{
@@ -394,7 +394,7 @@ function byte_format($number)
 	global $txt;
 
 	$kb = '';
-	foreach (array('byte', 'kilobyte', 'megabyte', 'gigabyte') as $dummy => $kb)
+	foreach (array('byte', 'kilobyte', 'megabyte', 'gigabyte') as $kb)
 	{
 		if ($number < 1024)
 		{
