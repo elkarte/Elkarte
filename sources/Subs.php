@@ -334,6 +334,8 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
  *
  * @param float $number The float value to apply comma formatting
  * @param integer|bool $override_decimal_count = false or number of decimals
+ *
+ * @return string
  */
 function comma_format($number, $override_decimal_count = false)
 {
@@ -355,6 +357,29 @@ function comma_format($number, $override_decimal_count = false)
 
 	// Format the string with our friend, number_format.
 	return number_format($number, (float) $number === $number ? ($override_decimal_count === false ? $decimal_count : $override_decimal_count) : 0, $decimal_separator, $thousands_separator);
+}
+
+/**
+ * Formats a number to a multiple of thousands x, x k, x M, x G, x T
+ *
+ * @param float $number The value to format
+ * @param integer|bool $override_decimal_count = false or number of decimals
+ *
+ * @return string
+ */
+function thousands_format($number, $override_decimal_count = false)
+{
+	foreach (array('', ' k', ' M', ' G', ' T') as $dummy => $kb)
+	{
+		if ($number < 1000)
+		{
+			break;
+		}
+
+		$number /= 1000;
+	}
+
+	return comma_format($number, $override_decimal_count) . $kb;
 }
 
 /**
