@@ -193,8 +193,10 @@ function is_not_guest($message = '', $is_fatal = true)
 		loadTheme();
 
 	// Never redirect to an attachment
-	if (strpos($_SERVER['REQUEST_URL'], 'dlattach') === false)
+	if (validLoginUrl($_SERVER['REQUEST_URL']))
+	{
 		$_SESSION['login_url'] = $_SERVER['REQUEST_URL'];
+	}
 
 	// Load the Login template and language file.
 	loadLanguage('Login');
@@ -1688,4 +1690,38 @@ function checkSecurityFiles()
 	}
 
 	return $has_files;
+}
+
+/**
+ * The login URL should not redirect to certain areas (attachments, js actions, etc)
+ * this function does these checks and return if the URL is valid or not.
+ *
+ * @param string $url - The URL to validate
+ * @param bool $match_board - If true tries to match board|topic in the URL as well
+ * @return bool
+ */
+function validLoginUrl($url, $match_board = false)
+{
+	if (empty($url))
+	{
+		return false;
+	}
+
+	if (substr($url, 0, 7) !== 'http://' && substr($url, 0, 8) !== 'https://')
+	{
+		return false;
+	}
+
+	$invalid_strings = array('dlattach' => '~(board|topic)[=,]~', 'jslocale' => '', 'login' => '');
+	call_integration_hook('integrate_validLoginUrl', array(&$invalid_strings));
+
+	foreach ($invalid_strings as $invalid_string => $valid_match)
+	{
+		if (strpos($url, $invalid_string) !== false || ($match_board === true && !empty($valid_match) && preg_match($valid_match, $url) == 0))
+		{
+			return false;
+		}
+	}
+
+	return true;
 }

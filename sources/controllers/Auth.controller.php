@@ -84,7 +84,7 @@ class Auth_Controller extends Action_Controller
 		);
 
 		// Set the login URL - will be used when the login process is done (but careful not to send us to an attachment).
-		if (isset($_SESSION['old_url']) && strpos($_SESSION['old_url'], 'dlattach') === false && preg_match('~(board|topic)[=,]~', $_SESSION['old_url']) != 0)
+		if (isset($_SESSION['old_url']) && validLoginUrl($_SESSION['old_url'], true))
 			$_SESSION['login_url'] = $_SESSION['old_url'];
 		else
 			unset($_SESSION['login_url']);
@@ -124,7 +124,7 @@ class Auth_Controller extends Action_Controller
 		spamProtection('login');
 
 		// Set the login_url if it's not already set (but careful not to send us to an attachment).
-		if ((empty($_SESSION['login_url']) && isset($_SESSION['old_url']) && strpos($_SESSION['old_url'], 'dlattach') === false && preg_match('~(board|topic)[=,]~', $_SESSION['old_url']) != 0) || (isset($_GET['quicklogin']) && isset($_SESSION['old_url']) && strpos($_SESSION['old_url'], 'login') === false))
+		if (empty($_SESSION['login_url']) && isset($_SESSION['old_url']) && validLoginUrl($_SESSION['old_url'], true))
 			$_SESSION['login_url'] = $_SESSION['old_url'];
 
 		// Been guessing a lot, haven't we?
@@ -479,7 +479,7 @@ class Auth_Controller extends Action_Controller
 		createToken('login');
 
 		// Never redirect to an attachment
-		if (strpos($_SERVER['REQUEST_URL'], 'dlattach') === false)
+		if (validLoginUrl($_SERVER['REQUEST_URL']))
 			$_SESSION['login_url'] = $_SERVER['REQUEST_URL'];
 
 		$context['sub_template'] = 'kick_guest';
@@ -536,21 +536,17 @@ class Auth_Controller extends Action_Controller
 			}
 
 			// Some whitelisting for login_url...
-			if (empty($_SESSION['login_url']))
-				redirectexit();
-			elseif (!empty($_SESSION['login_url']) && (substr($_SESSION['login_url'], 0, 7) !== 'http://' && substr($_SESSION['login_url'], 0, 8) !== 'https://'))
+			if (validLoginUrl($_SESSION['login_url']) === false)
 			{
-				unset($_SESSION['login_url']);
-				redirectexit();
+				$temp = '';
 			}
 			else
 			{
 				// Best not to clutter the session data too much...
 				$temp = $_SESSION['login_url'];
-				unset($_SESSION['login_url']);
-
-				redirectexit($temp);
 			}
+			unset($_SESSION['login_url']);
+			redirectexit($temp);
 		}
 
 		// It'll never get here... until it does :P
