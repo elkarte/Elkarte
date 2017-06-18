@@ -995,7 +995,7 @@ function template_show_settings()
 				$disabled = !empty($config_var['disabled']) ? ' disabled="disabled"' : '';
 				$invalid = !empty($config_var['invalid']) ? ' class="error"' : '';
 				$size = !empty($config_var['size']) && is_numeric($config_var['size']) ? ' size="' . $config_var['size'] . '"' : '';
-				$subtext = !empty($config_var['subtext']) ? '<br /><span class="smalltext"> ' . $config_var['subtext'] . '</span>' : '';
+				$subtext = !empty($config_var['subtext']) ? '<br /><span class="smalltext' . ($disabled ? ' disabled' : ($invalid ? ' error' : '')) . '"> ' . $config_var['subtext'] . '</span>' : '';
 
 				// Show the [?] button.
 				if (isset($config_var['helptext']))
@@ -1009,7 +1009,7 @@ function template_show_settings()
 						<a id="setting_', $config_var['name'], '">';
 				}
 
-				echo '</a> <span', ($config_var['disabled'] ? ' class="disabled"' : $invalid), '><label for="', $config_var['name'], '">', $config_var['label'], '</label>', $subtext, '</span>
+				echo '</a><label for="', $config_var['name'], '"', ($config_var['disabled'] ? ' class="disabled"' : $invalid), '>', $config_var['label'], '</label>', $subtext, '
 					</dt>
 					<dd', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_dd"' : ''), '>',
 				$preinput;
