@@ -295,6 +295,7 @@ class ManageSearch_Controller extends Action_Controller
 		$context['page_title'] = $txt['search_method_title'];
 		$context['sub_template'] = 'select_search_method';
 		$context['supports_fulltext'] = $db_search->search_support('fulltext');
+		$context['fulltext_index'] = false;
 
 		// Load any apis.
 		$context['search_apis'] = $this->loadSearchAPIs();
@@ -302,7 +303,7 @@ class ManageSearch_Controller extends Action_Controller
 		// Detect whether a fulltext index is set.
 		if ($context['supports_fulltext'])
 		{
-			detectFulltextIndex();
+			$fulltext_index = detectFulltextIndex();
 		}
 
 		// Creating index, removing or simply changing the one in use?
@@ -311,17 +312,15 @@ class ManageSearch_Controller extends Action_Controller
 			checkSession('get');
 			validateToken('admin-msm', 'get');
 
-			$context['fulltext_index'] = 'body';
-			alterFullTextIndex('{db_prefix}messages', $context['fulltext_index'], true);
+			$context['fulltext_index'] = true;
+			alterFullTextIndex('{db_prefix}messages', 'body', true);
 		}
-		elseif ($this->_req->getQuery('sa', 'trim', '') === 'removefulltext' && !empty($context['fulltext_index']))
+		elseif ($this->_req->getQuery('sa', 'trim', '') === 'removefulltext' && !empty($fulltext_index))
 		{
 			checkSession('get');
 			validateToken('admin-msm', 'get');
 
-			alterFullTextIndex('{db_prefix}messages', $context['fulltext_index']);
-
-			$context['fulltext_index'] = '';
+			alterFullTextIndex('{db_prefix}messages', $fulltext_index);
 
 			// Go back to the default search method.
 			if (!empty($modSettings['search_index']) && $modSettings['search_index'] == 'fulltext')

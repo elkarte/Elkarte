@@ -334,6 +334,8 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
  *
  * @param float $number The float value to apply comma formatting
  * @param integer|bool $override_decimal_count = false or number of decimals
+ *
+ * @return string
  */
 function comma_format($number, $override_decimal_count = false)
 {
@@ -358,6 +360,29 @@ function comma_format($number, $override_decimal_count = false)
 }
 
 /**
+ * Formats a number to a multiple of thousands x, x k, x M, x G, x T
+ *
+ * @param float $number The value to format
+ * @param integer|bool $override_decimal_count = false or number of decimals
+ *
+ * @return string
+ */
+function thousands_format($number, $override_decimal_count = false)
+{
+	foreach (array('', ' k', ' M', ' G', ' T') as $kb)
+	{
+		if ($number < 1000)
+		{
+			break;
+		}
+
+		$number /= 1000;
+	}
+
+	return comma_format($number, $override_decimal_count) . $kb;
+}
+
+/**
  * Formats a number to a computer byte size value xB, xKB, xMB, xGB
  *
  * @param int $number
@@ -369,7 +394,7 @@ function byte_format($number)
 	global $txt;
 
 	$kb = '';
-	foreach (array('byte', 'kilobyte', 'megabyte', 'gigabyte') as $dummy => $kb)
+	foreach (array('byte', 'kilobyte', 'megabyte', 'gigabyte') as $kb)
 	{
 		if ($number < 1024)
 		{

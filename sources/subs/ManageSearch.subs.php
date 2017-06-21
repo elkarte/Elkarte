@@ -35,22 +35,19 @@ function detectFulltextIndex()
 		FROM {db_prefix}messages',
 		array()
 	);
-	$context['fulltext_index'] = '';
+	$fulltext_index = array();
 	if ($request !== false || $db->num_rows($request) != 0)
 	{
 		while ($row = $db->fetch_assoc($request))
 		{
 			if ($row['Column_name'] === 'body' && (isset($row['Index_type']) && $row['Index_type'] === 'FULLTEXT' || isset($row['Comment']) && $row['Comment'] === 'FULLTEXT'))
 			{
-				$context['fulltext_index'][] = $row['Key_name'];
+				$fulltext_index[] = $row['Key_name'];
 			}
 		}
 		$db->free_result($request);
 
-		if (is_array($context['fulltext_index']))
-		{
-			$context['fulltext_index'] = array_unique($context['fulltext_index']);
-		}
+		$fulltext_index = array_unique($fulltext_index);
 	}
 
 	if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
@@ -94,6 +91,8 @@ function detectFulltextIndex()
 
 		$db->free_result($request);
 	}
+
+	return $fulltext_index;
 }
 
 /**

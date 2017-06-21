@@ -70,7 +70,7 @@ class Random_Post_Module extends ElkArte\sources\modules\Abstract_Module
 			$context['show_boards_dropdown'] = true;
 
 			require_once(SUBSDIR . '/Boards.subs.php');
-			$context += getBoardList(array('not_redirection' => true, 'allowed_to' => 'post_new'));
+			$context += getBoardList(array('not_redirection' => true, 'allowed_to' => array('post_new', 'post_unapproved_topics')));
 			$context['boards_current_disabled'] = false;
 
 			if (!empty($context['categories']))
