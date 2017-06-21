@@ -16,6 +16,7 @@
  * in the common area for all addons in admin panel.
  *
  * What it does:
+ *
  *  - Some addons will define their own areas, but for simple cases,
  * when you have only a setting or two, this area will allow you
  * to hook into it seamlessly, and your additions will be sent
@@ -73,6 +74,9 @@ class AddonSettings_Controller extends Action_Controller
 
 	/**
 	 * If you have a general mod setting to add stick it here.
+	 *
+	 * @event integrate_save_general_mod_settings allows for special processing needs during save operations
+	 * for addons added to Addon Settings area
 	 */
 	public function action_addonSettings_display()
 	{
@@ -112,6 +116,8 @@ class AddonSettings_Controller extends Action_Controller
 
 	/**
 	 * Retrieve any custom admin settings for or from addons.
+	 *
+	 * @event integrate_general_mod_settings allows adding new settings for addons in the generic Addons Settings
 	 */
 	private function _settings()
 	{
@@ -137,6 +143,7 @@ class AddonSettings_Controller extends Action_Controller
 	 *
 	 * @param mixed[] $subActions An array containing all possible subactions.
 	 * @param string $defaultAction the default action to be called if no valid subaction was found.
+	 *
 	 * @throws Elk_Exception
 	 */
 	public function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')

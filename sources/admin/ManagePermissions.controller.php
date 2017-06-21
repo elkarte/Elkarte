@@ -52,6 +52,7 @@ class ManagePermissions_Controller extends Action_Controller
 	 * - Checks the permissions, based on the sub-action.
 	 * - Called by ?action=managepermissions.
 	 *
+	 * @event integrate_sa_manage_permissions used to add new subactions
 	 * @uses ManagePermissions language file.
 	 * @see Action_Controller::action_index()
 	 */
@@ -156,6 +157,8 @@ class ManagePermissions_Controller extends Action_Controller
 	 * - Called by ?action=managepermissions
 	 * - Creates an array of all the groups with the number of members and permissions.
 	 *
+	 * @event integrate_list_regular_membergroups_list
+	 * @event integrate_list_post_count_membergroups_list
 	 * @uses ManagePermissions language file.
 	 * @uses ManagePermissions template file.
 	 * @uses ManageBoards template, permission_index sub-template.
@@ -579,7 +582,7 @@ class ManagePermissions_Controller extends Action_Controller
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
 		// Make sure only one of the quick options was selected.
-		if ((!empty($this->_req->post->predefined) && ((isset($this->_req->post->copy_from) && $this->_req->post->copy_from != 'empty') || !empty($this->_req->post->permissions))) || (!empty($this->_req->post->copy_from) && $this->_req->post->copy_from != 'empty' && !empty($this->_req->post->permissions)))
+		if ((!empty($this->_req->post->predefined) && ((isset($this->_req->post->copy_from) && $this->_req->post->copy_from !== 'empty') || !empty($this->_req->post->permissions))) || (!empty($this->_req->post->copy_from) && $this->_req->post->copy_from !== 'empty' && !empty($this->_req->post->permissions)))
 			throw new Elk_Exception('permissions_only_one_option', false);
 
 		if (empty($this->_req->post->group) || !is_array($this->_req->post->group))
@@ -622,7 +625,7 @@ class ManagePermissions_Controller extends Action_Controller
 			}
 		}
 		// Set a permission profile based on the permissions of a selected group.
-		elseif ($this->_req->post->copy_from != 'empty')
+		elseif ($this->_req->post->copy_from !== 'empty')
 		{
 			// Just checking the input.
 			if (!is_numeric($this->_req->post->copy_from))
@@ -654,9 +657,9 @@ class ManagePermissions_Controller extends Action_Controller
 			if (!in_array($this->_req->post->add_remove, array('add', 'clear', 'deny')) || !in_array($permissionType, array('membergroup', 'board')))
 				redirectexit('action=admin;area=permissions;pid=' . $this->_pid);
 
-			if ($this->_req->post->add_remove == 'clear')
+			if ($this->_req->post->add_remove === 'clear')
 			{
-				if ($permissionType == 'membergroup')
+				if ($permissionType === 'membergroup')
 					deletePermission($this->_req->post->group, $permission, $this->illegal_permissions);
 				else
 					deleteBoardPermission($this->_req->post->group, $bid, $permission);
@@ -664,22 +667,22 @@ class ManagePermissions_Controller extends Action_Controller
 			// Add a permission (either 'set' or 'deny').
 			else
 			{
-				$add_deny = $this->_req->post->add_remove == 'add' ? '1' : '0';
+				$add_deny = $this->_req->post->add_remove === 'add' ? '1' : '0';
 				$permChange = array();
 				foreach ($this->_req->post->group as $groupID)
 				{
 					if ($groupID == -1 && in_array($permission, $this->illegal_guest_permissions))
 						continue;
 
-					if ($permissionType == 'membergroup' && $groupID != 1 && $groupID != 3 && (empty($this->illegal_permissions) || !in_array($permission, $this->illegal_permissions)))
+					if ($permissionType === 'membergroup' && $groupID != 1 && $groupID != 3 && (empty($this->illegal_permissions) || !in_array($permission, $this->illegal_permissions)))
 						$permChange[] = array($permission, $groupID, $add_deny);
-					elseif ($permissionType != 'membergroup')
+					elseif ($permissionType !== 'membergroup')
 						$permChange[] = array($permission, $groupID, $add_deny, $bid);
 				}
 
 				if (!empty($permChange))
 				{
-					if ($permissionType == 'membergroup')
+					if ($permissionType === 'membergroup')
 						replacePermission($permChange);
 					// Board permissions go into the other table.
 					else
@@ -746,7 +749,7 @@ class ManagePermissions_Controller extends Action_Controller
 		$context['profile']['can_modify'] = !$context['profile']['id'] || $context['profiles'][$context['profile']['id']]['can_modify'];
 
 		// Set up things a little nicer for board related stuff...
-		if ($context['permission_type'] == 'board')
+		if ($context['permission_type'] === 'board')
 		{
 			$context['profile']['name'] = $context['profiles'][$context['profile']['id']]['name'];
 			$context[$context['admin_menu_name']]['current_subsection'] = 'profiles';
@@ -759,7 +762,7 @@ class ManagePermissions_Controller extends Action_Controller
 		);
 
 		// General permissions?
-		if ($context['permission_type'] == 'membergroup')
+		if ($context['permission_type'] === 'membergroup')
 			$permissions['membergroup'] = fetchPermissions($this->_req->query->group);
 
 		// Fetch current board permissions...
@@ -842,13 +845,13 @@ class ManagePermissions_Controller extends Action_Controller
 				if (is_array($perm_array))
 				{
 					foreach ($perm_array as $permission => $value)
-						if ($value == 'on' || $value == 'deny')
+						if ($value === 'on' || $value === 'deny')
 						{
 							// Don't allow people to escalate themselves!
 							if (in_array($permission, $this->illegal_permissions))
 								continue;
 
-							$givePerms[$perm_type][] = array($permission, $current_group_id, $value == 'deny' ? 0 : 1);
+							$givePerms[$perm_type][] = array($permission, $current_group_id, $value === 'deny' ? 0 : 1);
 						}
 				}
 			}
@@ -885,6 +888,8 @@ class ManagePermissions_Controller extends Action_Controller
 
 	/**
 	 * A screen to set some general settings for permissions.
+	 * 
+	 * @event integrate_save_permission_settings
 	 */
 	public function action_permSettings_display()
 	{
@@ -930,6 +935,8 @@ class ManagePermissions_Controller extends Action_Controller
 
 	/**
 	 * Simple function to return settings in config_vars format.
+	 * 
+	 * @event integrate_modify_permission_settings
 	 */
 	private function _settings()
 	{
@@ -1035,6 +1042,8 @@ class ManagePermissions_Controller extends Action_Controller
 
 	/**
 	 * Present a nice way of applying post moderation.
+	 * 
+	 * @event integrate_post_moderation_mapping passed $mappings to add other post moderation values
 	 */
 	public function action_postmod()
 	{
@@ -1088,13 +1097,13 @@ class ManagePermissions_Controller extends Action_Controller
 					$temp = $this->_req->post->{$index};
 					if (isset($temp[$group['id']]))
 					{
-						if ($temp[$group['id']] == 'allow')
+						if ($temp[$group['id']] === 'allow')
 						{
 							// Give them both sets for fun.
 							$new_permissions[] = array($context['current_profile'], $group['id'], $data[0], 1);
 							$new_permissions[] = array($context['current_profile'], $group['id'], $data[1], 1);
 						}
-						elseif ($temp[$group['id']] == 'moderate')
+						elseif ($temp[$group['id']] === 'moderate')
 							$new_permissions[] = array($context['current_profile'], $group['id'], $data[1], 1);
 					}
 				}
@@ -1121,7 +1130,7 @@ class ManagePermissions_Controller extends Action_Controller
 						if ($index == 0)
 							$context['profile_groups'][$id_group][$key] = 'allow';
 						// Otherwise only bother with moderate if not on allow.
-						elseif ($context['profile_groups'][$id_group][$key] != 'allow')
+						elseif ($context['profile_groups'][$id_group][$key] !== 'allow')
 							$context['profile_groups'][$id_group][$key] = 'moderate';
 					}
 				}

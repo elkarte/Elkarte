@@ -511,6 +511,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
  * Used to render a timestamp to html5 <time> tag format.
  *
  * @param int $timestamp A unix timestamp
+ *
  * @return string
  */
 function htmlTime($timestamp)
@@ -537,6 +538,7 @@ function htmlTime($timestamp)
  *
  * @param bool $use_user_offset = true if use_user_offset is true, applies the user's offset as well
  * @param int|null $timestamp = null A unix timestamp (null to use current time)
+ *
  * @return int seconds since the unix epoch
  */
 function forum_time($use_user_offset = true, $timestamp = null)
@@ -559,6 +561,7 @@ function forum_time($use_user_offset = true, $timestamp = null)
  * - Additionally converts &nbsp with str_replace
  *
  * @param string $string The string to apply htmlspecialchars_decode
+ *
  * @return string string without entities
  */
 function un_htmlspecialchars($string)
@@ -583,6 +586,7 @@ function un_htmlspecialchars($string)
  *
  * @deprecated since 1.0.5
  * @param mixed[] $array index array of values
+ *
  * @return mixed[] array representing all permutations of the supplied array
  */
 function permute($array)
@@ -676,6 +680,7 @@ function pc_next_permutation($p, $size)
  *
  * @param string|false $message if false return list of enabled bbc codes
  * @param bool $smileys = true if to parse smileys as well
+ *
  * @return string
  */
 function parse_bbc($message, $smileys = true)
@@ -732,6 +737,7 @@ function parsesmileys(&$message)
  * - used to parse PHP code from inside [code] and [php] tags.
  *
  * @param string $code The string containing php code
+ *
  * @return string the code with highlighted HTML.
  */
 function highlight_php_code($code)
@@ -758,6 +764,7 @@ function highlight_php_code($code)
  * - Calls call_integration_hook integrate_redirect before headers are sent
  * - Diverts final execution to obExit() which means a end to processing and sending of final output
  *
+ * @event integrate_redirect called before headers are sent
  * @param string $setLocation = '' The URL to redirect to
  * @param bool $refresh = false, enable to send a refresh header, default is a location header
  * @throws Elk_Exception
@@ -837,10 +844,13 @@ function redirectexit_callback($matches)
  * - Takes care of template loading and remembering the previous URL.
  * - Calls ob_start() with ob_sessrewrite to fix URLs if necessary.
  *
+ * @event integrate_invalid_old_url allows adding to "from" urls we don't save
+ * @event integrate_exit inform portal, etc. that we're integrated with to exit
  * @param bool|null $header = null Output the header
  * @param bool|null $do_footer = null Output the footer
  * @param bool $from_index = false If we're coming from index.php
  * @param bool $from_fatal_error = false If we are exiting due to a fatal error
+ *
  * @throws Elk_Exception
  */
 function obExit($header = null, $do_footer = null, $from_index = false, $from_fatal_error = false)
@@ -990,6 +1000,7 @@ function setupThemeContext($forceload = false)
  *
  * @param string $needed The amount of memory to request, if needed, like 256M
  * @param bool $in_use Set to true to account for current memory usage of the script
+ *
  * @return boolean true if we have at least the needed memory
  * @deprecated since 1.1
  */
@@ -1002,6 +1013,7 @@ function setMemoryLimit($needed, $in_use = false)
  * Helper function to convert memory string settings to bytes
  *
  * @param string $val The byte string, like 256M or 1G
+ *
  * @return integer The string converted to a proper integer in bytes
  */
 function memoryReturnBytes($val)
@@ -1139,6 +1151,7 @@ function template_admin_warning_above()
  * - Internal function used to convert a user-readable format to a format suitable for the database.
  *
  * @param string $fullip A full dot notation IP address
+ *
  * @return array|string 'unknown' if the ip in the input was '255.255.255.255'
  */
 function ip2range($fullip)
@@ -1198,6 +1211,7 @@ function ip2range($fullip)
  * Lookup an IP; try shell_exec first because we can do a timeout on it.
  *
  * @param string $ip A full dot notation IP address
+ *
  * @return string
  */
 function host_from_ip($ip)
@@ -1317,6 +1331,7 @@ function text2words($text, $max_chars = 20, $encrypt = false)
  * @param string $label = ''
  * @param string|boolean $custom = ''
  * @param boolean $force_use = false
+ *
  * @return string
  *
  * @deprecated since 1.0 this will be removed at some point, do not rely on this function
@@ -1375,6 +1390,7 @@ function elk_seed_generator()
  *
  * @param string $hook The name of the hook to call
  * @param mixed[] $parameters = array() Parameters to pass to the hook
+ *
  * @return mixed[] the results of the functions
  */
 function call_integration_hook($hook, $parameters = array())
@@ -1442,6 +1458,7 @@ function remove_integration_function($hook, $function, $file = '')
  * - Does basic scan to ensure characters are inside a valid range
  *
  * @param mixed[] $matches matches from a preg_match_all
+ *
  * @return string $string
  */
 function replaceEntities__callback($matches)
@@ -1487,6 +1504,7 @@ function replaceEntities__callback($matches)
  * - Does basic checks to keep characters inside a viewable range.
  *
  * @param mixed[] $matches array of matches as output from preg_match_all
+ *
  * @return string $string
  */
 function fixchar__callback($matches)
@@ -1523,6 +1541,7 @@ function fixchar__callback($matches)
  * - For example strpos, strlen, substr etc
  *
  * @param mixed[] $matches array of matches for a preg_match_all
+ *
  * @return string
  */
 function entity_fix__callback($matches)
@@ -1569,6 +1588,7 @@ function prepareSearchEngines()
  *
  * @param resource $messages_request holds a query result
  * @param bool $reset
+ *
  * @return integer|boolean
  */
 function currentContext($messages_request, $reset = false)
@@ -1705,7 +1725,9 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 /**
  * Helper function to replace commonly used urls in text strings
  *
+ * @event integrate_basic_url_replacement add additional place holder replacements
  * @param string $string the string to inject URLs into
+ *
  * @return string the input string with the place-holders replaced with
  *           the correct URLs
  */
@@ -1749,6 +1771,7 @@ function replaceBasicActionUrl($string)
  *
  * - Calls integration hook integrate_list_"unique_list_id" to allow easy modifying
  *
+ * @event integrate_list_$listID called before every createlist to allow access to its listoptions
  * @param mixed[] $listOptions associative array of option => value
  */
 function createList($listOptions)
@@ -1784,6 +1807,7 @@ function request()
 function db_last_error()
 {
 	$time = trim(file_get_contents(BOARDDIR . '/db_last_error.txt'));
+
 	if (preg_match('~^\d{10}$~', $time) === 1)
 		return $time;
 	else
@@ -1828,6 +1852,7 @@ function response_prefix()
  * is less than 255 characters (for database limits)
  *
  * @param string $value - The string to evaluate as valid email
+ *
  * @return string|false - The email if valid, false if not a valid email
  */
 function isValidEmail($value)
@@ -1845,6 +1870,7 @@ function isValidEmail($value)
  * @param string $url - The url
  * @param string[] $protocols - A list of protocols to check, the first is
  *                 added if none is found (optional, default array('http://', 'https://'))
+ *
  * @return string - The url with the protocol
  */
 function addProtocol($url, $protocols = array())
@@ -1878,6 +1904,7 @@ function addProtocol($url, $protocols = array())
  * Removes nested quotes from a text string.
  *
  * @param string $text - The body we want to remove nested quotes from
+ *
  * @return string - The same body, just without nested quotes
  */
 function removeNestedQuotes($text)
@@ -1897,7 +1924,9 @@ function removeNestedQuotes($text)
 
 /**
  * Change a \t to a span that will show a tab
+ *
  * @param $string
+ *
  * @return mixed
  */
 function tabToHtmlTab($string)
@@ -1909,6 +1938,7 @@ function tabToHtmlTab($string)
  * Remove <br />
  *
  * @param $string
+ *
  * @return mixed
  */
 function removeBr($string)
@@ -1991,6 +2021,7 @@ function censor($text, $force = false)
  * one button of a button strip.
  *
  * @param mixed[] $button_strip
+ *
  * @return bool
  */
 function can_see_button_strip($button_strip)

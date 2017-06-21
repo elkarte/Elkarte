@@ -32,6 +32,7 @@ class ManageMembergroups_Controller extends Action_Controller
 	 * - Called by ?action=admin;area=membergroups.
 	 * - Requires the manage_membergroups or the admin_forum permission.
 	 *
+	 * @event integrate_sa_manage_membergroups Used to add more sub actions
 	 * @uses ManageMembergroups template.
 	 * @uses ManageMembers language file.
 	 * @see Action_Controller::action_index()
@@ -104,6 +105,8 @@ class ManageMembergroups_Controller extends Action_Controller
 	 * - Splits the membergroups in regular ones and post count based groups.
 	 * - It also counts the number of members part of each membergroup.
 	 *
+	 * @event integrate_list_regular_membergroups_list
+	 * @event integrate_list_post_count_membergroups_list
 	 * @uses ManageMembergroups template, main.
 	 */
 	public function action_list()
@@ -331,11 +334,12 @@ class ManageMembergroups_Controller extends Action_Controller
 	 *
 	 * What it does:
 	 *
-	 * -Called by ?action=admin;area=membergroups;sa=add.
-	 * -It requires the manage_membergroups permission.
-	 * -Allows to use a predefined permission profile or copy one from another group.
-	 * -Redirects to action=admin;area=membergroups;sa=edit;group=x.
+	 * - Called by ?action=admin;area=membergroups;sa=add.
+	 * - It requires the manage_membergroups permission.
+	 * - Allows to use a predefined permission profile or copy one from another group.
+	 * - Redirects to action=admin;area=membergroups;sa=edit;group=x.
 	 *
+	 * @event integrate_add_membergroup passed $id_group and $postCountBasedGroup
 	 * @uses the new_group sub template of ManageMembergroups.
 	 */
 	public function action_add()
@@ -497,6 +501,8 @@ class ManageMembergroups_Controller extends Action_Controller
 	 * - Also handles the delete button of the edit form.
 	 * - Redirects to ?action=admin;area=membergroups.
 	 *
+	 * @event integrate_save_membergroup, passed $current_group['id_group']
+	 * @event integrate_view_membergroup
 	 * @uses the edit_group sub template of ManageMembergroups.
 	 */
 	public function action_edit()
@@ -781,6 +787,7 @@ class ManageMembergroups_Controller extends Action_Controller
 	 * - Requires the admin_forum permission (and manage_permissions for changing permissions)
 	 * - Redirects to itself.
 	 *
+	 * @event integrate_save_membergroup_settings
 	 * @uses membergroup_settings sub template of ManageMembergroups.
 	 */
 	public function action_groupSettings_display()
@@ -817,6 +824,8 @@ class ManageMembergroups_Controller extends Action_Controller
 
 	/**
 	 * Return the configuration settings for membergroups management.
+	 * 
+	 * @event integrate_modify_membergroup_settings
 	 */
 	private function _settings()
 	{

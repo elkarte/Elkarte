@@ -27,6 +27,7 @@
  * - Uses the adminLogin() function of subs/Auth.subs.php if they need to login,
  * which saves all request (POST and GET) data.
  *
+ * @event integrate_validateSession Called at start of validateSession
  * @param string $type = admin
  * @throws Elk_Exception
  */
@@ -132,6 +133,7 @@ function validateSession($type = 'admin')
  * - Uses integration function to verify password is enabled
  * - Uses validateLoginPassword to check using standard ElkArte methods
  *
+ * @event integrate_verify_password allows integration to verify the password
  * @param string $type
  * @param bool $hash if the supplied password is in _hash_pass
  *
@@ -485,6 +487,9 @@ function is_not_banned($forceCheck = false)
  * What it does:
  *
  * - Applies any states of banning by removing permissions the user cannot have.
+ *
+ * @event integrate_post_ban_permissions Allows to update denied permissions
+ * @event integrate_warn_permissions Allows changing of permissions for users on warning moderate
  * @package Bans
  */
 function banPermissions()
@@ -617,7 +622,6 @@ function log_ban($ban_ids = array(), $email = null)
  * - Performs an immediate ban if the turns turns out positive.
  *
  * @package Bans
- *
  * @param string $email
  * @param string $restriction
  * @param string $error
@@ -812,8 +816,13 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 /**
  * Lets give you a token of our appreciation.
  *
+ * What it does:
+ *
+ * - Creates a one time use form token
+ *
  * @param string $action The specific site action that a token will be generated for
  * @param string $type = 'post' If the token will be returned via post or get
+ *
  * @return string[] array of token var, time, csrf, token
  */
 function createToken($action, $type = 'post')
@@ -839,6 +848,15 @@ function createToken($action, $type = 'post')
 
 /**
  * Only patrons with valid tokens can ride this ride.
+ *
+ * What it does:
+ *
+ * - Validates that the received token is correct
+ * - 1. The token exists in session.
+ * - 2. The {$type} variable should exist.
+ * - 3. We concatenate the variable we received with the user agent
+ * - 4. Match that result against what is in the session.
+ * - 5. If it matches, success, otherwise we fallout.
  *
  * @param string $action
  * @param string $type = 'post' (get, request, or post)
@@ -869,13 +887,6 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 
 	if (!isset($_SESSION['token'][$token_index]))
 		return false;
-
-	// This code validates a supplied token.
-	// 1. The token exists in session.
-	// 2. The {$type} variable should exist.
-	// 3. We concatenate the variable we received with the user agent
-	// 4. Match that result against what is in the session.
-	// 5. If it matches, success, otherwise we fallout.
 
 	// We need the user agent and client IP
 	$req = request();
@@ -924,7 +935,7 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
  *
  * What it does:
  *
- * - defaults to 3 hours before a token is considered expired
+ * - Defaults to 3 hours before a token is considered expired
  * - if $complete = true will remove all tokens
  *
  * @param bool $complete = false
@@ -1014,6 +1025,7 @@ function checkSubmitOnce($action, $is_fatal = false)
  *
  * @param string[]|string $permission permission
  * @param int[]|int|null $boards array of board IDs, a single id or null
+ *
  * @return boolean if the user can do the permission
  */
 function allowedTo($permission, $boards = null)
@@ -1153,9 +1165,9 @@ function isAllowedTo($permission, $boards = null)
  *
  * What it does:
  *
- * - returns a list of boards on which the user is allowed to do the specified permission.
- * - returns an array with only a 0 in it if the user has permission to do this on every board.
- * - returns an empty array if he or she cannot do this on any board.
+ * - Returns a list of boards on which the user is allowed to do the specified permission.
+ * - Returns an array with only a 0 in it if the user has permission to do this on every board.
+ * - Returns an empty array if he or she cannot do this on any board.
  * - If check_access is true will also make sure the group has proper access to that board.
  *
  * @param string[]|string $permissions array of permission names to check access against
@@ -1258,6 +1270,8 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 /**
  * Returns whether an email address should be shown and how.
  *
+ * What it does:
+ *
  * Possible outcomes are:
  * - 'yes': show the full email address
  * - 'yes_permission_override': show the full email address, either you
@@ -1268,6 +1282,7 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
  *
  * @param bool $userProfile_hideEmail
  * @param int $userProfile_id
+ *
  * @return string (yes, yes_permission_override, no_through_forum, no)
  */
 function showEmailAddress($userProfile_hideEmail, $userProfile_id)
@@ -1303,6 +1318,7 @@ function showEmailAddress($userProfile_hideEmail, $userProfile_id)
  * - The time taken depends on error_type - generally uses the modSetting.
  * - Generates a fatal message when triggered, suspending execution.
  *
+ * @event integrate_spam_protection Allows to update action wait timeOverrides
  * @param string  $error_type used also as a $txt index. (not an actual string.)
  * @param boolean $fatal is the spam check a fatal error on failure
  *
@@ -1448,9 +1464,12 @@ else
 /**
  * Helper function that puts together a ban query for a given ip
  *
+ * What it does:
+ *
  * - Builds the query for ipv6, ipv4 or 255.255.255.255 depending on whats supplied
  *
  * @param string $fullip An IP address either IPv6 or not
+ *
  * @return string A SQL condition
  */
 function constructBanQueryIP($fullip)
@@ -1527,7 +1546,10 @@ function loadBadBehavior()
 /**
  * This protects against brute force attacks on a member's password.
  *
+ * What it does:
+ *
  * - Importantly, even if the password was right we DON'T TELL THEM!
+ * - Allows 5 attempts every 10 seconds
  *
  * @param int         $id_member
  * @param string|bool $password_flood_value = false or string joined on |'s
@@ -1612,6 +1634,8 @@ function frameOptionsHeader($override = null)
 /**
  * This adds additional security headers that may prevent browsers from doing something they should not
  *
+ * What it does:
+ *
  * - X-XSS-Protection header - This header enables the Cross-site scripting (XSS) filter
  * built into most recent web browsers. It's usually enabled by default, so the role of this
  * header is to re-enable the filter for this particular website if it was disabled by the user.
@@ -1658,9 +1682,12 @@ function isAdminSessionActive()
 
 /**
  * Check if security files exist
+ *
  * If files are found, populate $context['security_controls_files']:
  * * 'title'	- $txt['security_risk']
  * * 'errors'	- An array of strings with the key being the filename and the value an error with the filename in it
+ *
+ * @event integrate_security_files Allows to add / modify to security files array
  *
  * @return bool
  */

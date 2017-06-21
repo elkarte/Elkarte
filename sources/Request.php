@@ -312,7 +312,7 @@ final class Request
 	/**
 	 * Finds and returns the topic numeric if its been requested
 	 *
-	 * helper function for parseRequest
+	 * - helper function for parseRequest
 	 */
 	private function _checkTopic()
 	{
@@ -353,12 +353,12 @@ final class Request
 	 *
 	 * What it does:
 	 *
-	 * - cleans the request variables (ENV, GET, POST, COOKIE, SERVER) and
+	 * - Cleans the request variables (ENV, GET, POST, COOKIE, SERVER) and
 	 *   makes sure the query string was parsed correctly.
-	 * - handles the URLs passed by the queryless URLs option.
-	 * - makes sure, regardless of php.ini, everything has slashes.
-	 * - use with ->parseRequest() to clean and set up variables like $board or $_REQUEST['start'].
-	 * - uses Request to try to determine client IPs for the current request.
+	 * - Handles the URLs passed by the queryless URLs option.
+	 * - Makes sure, regardless of php.ini, everything has slashes.
+	 * - Use with ->parseRequest() to clean and set up variables like $board or $_REQUEST['start'].
+	 * - Uses Request to try to determine client IPs for the current request.
 	 */
 	public function cleanRequest()
 	{
@@ -399,6 +399,8 @@ final class Request
 	/**
 	 * Checks the request and abruptly stops processing if issues are found
 	 *
+	 * What it does:
+	 *
 	 * - No magic quotes allowed
 	 * - Don't try to set a GLOBALS key in globals
 	 * - No numeric keys in $_GET, $_POST or $_FILE
@@ -432,6 +434,8 @@ final class Request
 
 	/**
 	 * Check for illegal numeric keys
+	 *
+	 * What it does:
 	 *
 	 * - Fail on illegal keys
 	 * - Clear ones that should not be allowed

@@ -2,10 +2,11 @@
 
 /**
  * This file is exclusively for generating reports to help assist forum
- * administrators keep track of their forum configuration and state. The
- * core report generation is done in two areas. Firstly, a report "generator"
- * will fill context with relevant data. Secondly, the choice of sub-template
- * will determine how this data is shown to the user
+ * administrators keep track of their site configuration and state. 
+ * 
+ * The core report generation is done in two areas. Firstly, a report "generator"
+ * will fill context with relevant data. Secondly, the choice of sub-template will
+ * determine how this data is shown to the user
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -21,25 +22,30 @@
 
 /**
  * "Report" Functions are responsible for generating data for reporting.
- * They are all called from action_index.
- * Never access the context directly, but use the data handling functions to do so.
+ * 
+ * - They are all called from action_index.
+ * - Never access the context directly, but use the data handling functions to do so.
  */
 class Reports_Controller extends Action_Controller
 {
 	/**
 	 * Handling function for generating reports.
-	 *  - Requires the admin_forum permission.
-	 *  - Loads the Reports template and language files.
-	 *  - Decides which type of report to generate, if this isn't passed
-	 *    through the querystring it will set the report_type sub-template to
-	 *    force the user to choose which type.
+	 * 
+	 * What it does:
+	 * 
+	 * - Requires the admin_forum permission.
+	 * - Loads the Reports template and language files.
+	 * - Decides which type of report to generate, if this isn't passed
+	 * through the querystring it will set the report_type sub-template to
+	 * force the user to choose which type.
 	 * - When generating a report chooses which sub_template to use.
 	 * - Depends on the cal_enabled setting, and many of the other cal_ settings.
 	 * - Will call the relevant report generation function.
 	 * - If generating report will call finishTables before returning.
+	 * - Accessed through ?action=admin;area=reports.
 	 *
-	 * Accessed through ?action=admin;area=reports.
-	 *
+	 * @event integrate_report_types
+	 * @event integrate_report_buttons
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -84,6 +90,7 @@ class Reports_Controller extends Action_Controller
 			);
 
 		$report_type = !empty($this->_req->post->rt) ? $this->_req->post->rt : (!empty($this->_req->query->rt) ? $this->_req->query->rt : null);
+		
 		// If they haven't chosen a report type which is valid, send them off to the report type chooser!
 		if (empty($report_type) || !isset($context['report_types'][$report_type]))
 		{
@@ -153,10 +160,11 @@ class Reports_Controller extends Action_Controller
 
 	/**
 	 * Standard report about what settings the boards have.
-	 * functions ending with "Report" are responsible for generating data
+	 * 
+	 * - Functions ending with "Report" are responsible for generating data
 	 * for reporting.
-	 * they are all called from action_index.
-	 * never access the context directly, but use the data handling
+	 * - They are all called from action_index.
+	 * - Never access the context directly, but use the data handling
 	 * functions to do so.
 	 */
 	public function action_boards()
@@ -177,8 +185,12 @@ class Reports_Controller extends Action_Controller
 
 		$boards_moderated = array();
 		foreach ($moderators as $id_board => $rows)
+		{
 			foreach ($rows as $row)
+			{
 				$boards_moderated[$id_board][] = $row['real_name'];
+			}
+		}
 
 		// Get all the possible membergroups!
 		$all_groups = getBasicMembergroupData(array('all'), array(), null, false);
@@ -266,10 +278,11 @@ class Reports_Controller extends Action_Controller
 
 	/**
 	 * Generate a report on the current permissions by board and membergroup.
-	 * functions ending with "Report" are responsible for generating data
+	 * 
+	 * - Functions ending with "Report" are responsible for generating data
 	 * for reporting.
-	 * they are all called from action_index.
-	 * never access the context directly, but use the data handling
+	 * - They are all called from action_index.
+	 * - Never access the context directly, but use the data handling
 	 * functions to do so.
 	 */
 	public function action_board_perms()
@@ -404,9 +417,10 @@ class Reports_Controller extends Action_Controller
 
 	/**
 	 * Show what the membergroups are made of.
-	 * functions ending with "Report" are responsible for generating data for reporting.
+	 * 
+	 * - Functions ending with "Report" are responsible for generating data for reporting.
 	 * they are all called from action_index.
-	 * never access the context directly, but use the data handling functions to do so.
+	 * - Never access the context directly, but use the data handling functions to do so.
 	 */
 	public function action_member_groups()
 	{
@@ -487,9 +501,10 @@ class Reports_Controller extends Action_Controller
 
 	/**
 	 * Show the large variety of group permissions assigned to each membergroup.
-	 * functions ending with "Report" are responsible for generating data for reporting.
+	 * 
+	 * - Functions ending with "Report" are responsible for generating data for reporting.
 	 * they are all called from action_index.
-	 * never access the context directly, but use the data handling
+	 * - Never access the context directly, but use the data handling
 	 * functions to do so.
 	 */
 	public function action_group_perms()
@@ -563,10 +578,11 @@ class Reports_Controller extends Action_Controller
 
 	/**
 	 * Report for showing all the forum staff members - quite a feat!
-	 * functions ending with "Report" are responsible for generating data
+	 * 
+	 * - Functions ending with "Report" are responsible for generating data
 	 * for reporting.
-	 * they are all called from action_index.
-	 * never access the context directly, but use the data handling
+	 * - They are all called from action_index.
+	 * - Never access the context directly, but use the data handling
 	 * functions to do so.
 	 */
 	public function action_staff()
@@ -657,10 +673,13 @@ class Reports_Controller extends Action_Controller
 
 /**
  * This function creates a new table of data, most functions will only use it once.
- * The core of this file, it creates a new, but empty, table of data in
+ * 
+ * What it does:
+ * 
+ * - The core of this file, it creates a new, but empty, table of data in
  * context, ready for filling using addData().
- * Fills the context variable current_table with the ID of the table created.
- * Keeps track of the current table count using context variable table_count.
+ * - Fills the context variable current_table with the ID of the table created.
+ * - Keeps track of the current table count using context variable table_count.
  *
  * @param string $title = '' Title to be displayed with this data table.
  * @param string $default_value = '' Value to be displayed if a key is missing from a row.
@@ -683,8 +702,8 @@ function newTable($title = '', $default_value = '', $shading = 'all', $width_nor
 		'title' => $title,
 		'default_value' => $default_value,
 		'shading' => array(
-			'left' => $shading == 'all' || $shading == 'left',
-			'top' => $shading == 'all' || $shading == 'top',
+			'left' => $shading === 'all' || $shading === 'left',
+			'top' => $shading === 'all' || $shading === 'top',
 		),
 		'width' => array(
 			'normal' => $width_normal,
@@ -705,13 +724,16 @@ function newTable($title = '', $default_value = '', $shading = 'all', $width_nor
 
 /**
  * Adds an array of data into an existing table.
- * - if there are no existing tables, will create one with default attributes.
- * - if custom_table isn't specified, it will use the last table created,
- * - if it is specified and doesn't exist the function will return false.
- * - if a set of keys have been specified, the function will check each
+ * 
+ * What it does:
+ * 
+ * - If there are no existing tables, will create one with default attributes.
+ * - If custom_table isn't specified, it will use the last table created,
+ * - If it is specified and doesn't exist the function will return false.
+ * - If a set of keys have been specified, the function will check each
  * required key is present in the incoming data. If this data is missing
  * the current tables default value will be used.
- * - if any key in the incoming data begins with '#sep#', the function
+ * - If any key in the incoming data begins with '#sep#', the function
  * will add a separator across the table at this point.
  * once the incoming data has been sanitized, it is added to the table.
  *
@@ -745,7 +767,7 @@ function addData($inc_data, $custom_table = null)
 				'v' => empty($inc_data[$key]) ? $context['tables'][$table]['default_value'] : $inc_data[$key],
 			);
 			// Special "hack" the adding separators when doing data by column.
-			if (substr($key, 0, 5) == '#sep#')
+			if (substr($key, 0, 5) === '#sep#')
 				$data[$key]['separator'] = true;
 		}
 	}
@@ -758,13 +780,13 @@ function addData($inc_data, $custom_table = null)
 				'v' => $value,
 			);
 
-			if (substr($key, 0, 5) == '#sep#')
+			if (substr($key, 0, 5) === '#sep#')
 				$data[$key]['separator'] = true;
 		}
 	}
 
 	// Is it by row?
-	if (empty($context['key_method']) || $context['key_method'] == 'rows')
+	if (empty($context['key_method']) || $context['key_method'] === 'rows')
 	{
 		// Add the data!
 		$context['tables'][$table]['data'][] = $data;
@@ -812,10 +834,11 @@ function addSeparator($title = '', $custom_table = null)
 
 /**
  * This does the necessary count of table data before displaying them.
- * is (unfortunately) required to create some useful variables for templates.
- * foreach data table created, it will count the number of rows and
+ * 
+ * - Is (unfortunately) required to create some useful variables for templates.
+ * - Foreach data table created, it will count the number of rows and
  * columns in the table.
- * will also create a max_width variable for the table, to give an
+ * - Will also create a max_width variable for the table, to give an
  * estimate width for the whole table * * if it can.
  */
 function finishTables()
@@ -834,9 +857,9 @@ function finishTables()
 		$context['tables'][$id]['column_count'] = count($curElement);
 
 		// Work out the rough width - for templates like the print template. Without this we might get funny tables.
-		if ($table['shading']['left'] && $table['width']['shaded'] != 'auto' && $table['width']['normal'] != 'auto')
+		if ($table['shading']['left'] && $table['width']['shaded'] !== 'auto' && $table['width']['normal'] !== 'auto')
 			$context['tables'][$id]['max_width'] = $table['width']['shaded'] + ($context['tables'][$id]['column_count'] - 1) * $table['width']['normal'];
-		elseif ($table['width']['normal'] != 'auto')
+		elseif ($table['width']['normal'] !== 'auto')
 			$context['tables'][$id]['max_width'] = $context['tables'][$id]['column_count'] * $table['width']['normal'];
 		else
 			$context['tables'][$id]['max_width'] = 'auto';
@@ -845,13 +868,16 @@ function finishTables()
 
 /**
  * Set the keys in use by the tables - these ensure entries MUST exist if the data isn't sent
- *  - sets the current set of "keys" expected in each data array passed to
+ * 
+ * What it does:
+ * 
+ * - Sets the current set of "keys" expected in each data array passed to
  * addData.
  * - It also sets the way we are adding data to the data table.
- * - method specifies whether the data passed to addData represents a new
+ * - Method specifies whether the data passed to addData represents a new
  * column, or a new row.
- * - keys is an array whose keys are the keys for data being passed to addData().
- * - if reverse is set to true, then the values of the variable "keys"
+ * - Keys is an array whose keys are the keys for data being passed to addData().
+ * - If reverse is set to true, then the values of the variable "keys"
  * are used as opposed to the keys(!
  *
  * @param string $method = 'rows' rows or cols
@@ -869,5 +895,5 @@ function setKeys($method = 'rows', $keys = array(), $reverse = false)
 		$context['keys'] = $keys;
 
 	// Rows or columns?
-	$context['key_method'] = $method == 'rows' ? 'rows' : 'cols';
+	$context['key_method'] = $method === 'rows' ? 'rows' : 'cols';
 }

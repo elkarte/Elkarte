@@ -274,7 +274,9 @@ class Maintenance_Controller extends Action_Controller
 	/**
 	 * Supporting function for the routine maintenance area.
 	 *
-	 * @uses sub template maintain_routine, Template file Maintenance
+	 * @event integrate_routine_maintenance, passed $context['routine_actions'] array to allow
+	 * addons to add more options
+	 * @uses Template Maintenance, sub template maintain_routine
 	 */
 	public function action_routine()
 	{
@@ -366,6 +368,10 @@ class Maintenance_Controller extends Action_Controller
 
 	/**
 	 * Supporting function for the topics maintenance area.
+	 * 
+	 * @event integrate_topics_maintenance, passed $context['topics_actions'] to allow addons
+	 * to add additonal topic maintance functions
+	 * @uses GenericBoards template, sub template maintain_topics
 	 */
 	public function action_topics()
 	{
@@ -1459,7 +1465,7 @@ class Maintenance_Controller extends Action_Controller
 			$context['continue_percent'] = round(100 * $start / $total_members);
 			$context['not_done_title'] = $txt['not_done_title'] . ' (' . $context['continue_percent'] . '%)';
 			$context['continue_post_data'] = '<input type="hidden" name="' . $context['admin-recountposts_token_var'] . '" value="' . $context['admin-recountposts_token'] . '" />
-					<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />';
+				<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />';
 
 			Debug::get()->on();
 			return;

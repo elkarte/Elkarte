@@ -44,6 +44,7 @@ class ManageNews_Controller extends Action_Controller
 	 * - It does the permission checks, and calls the appropriate function
 	 * based on the requested sub-action.
 	 *
+	 * @event integrate_sa_manage_news used to add new subactions
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -104,7 +105,7 @@ class ManageNews_Controller extends Action_Controller
 		$context['sub_action'] = $subAction;
 
 		// Force the right area...
-		if (substr($subAction, 0, 7) == 'mailing')
+		if (substr($subAction, 0, 7) === 'mailing')
 			$context[$context['admin_menu_name']]['current_subsection'] = 'mailingmembers';
 
 		// Call the right function for this sub-action.
@@ -121,6 +122,8 @@ class ManageNews_Controller extends Action_Controller
 	 * - Called by ?action=admin;area=news.
 	 * - Requires the edit_news permission.
 	 * - Can be accessed with ?action=admin;sa=editnews.
+	 * 
+	 * @event integrate_list_news_lists
 	 */
 	public function action_editnews()
 	{
@@ -766,14 +769,14 @@ class ManageNews_Controller extends Action_Controller
 
 			if (!empty($context['recipients']['members']))
 			{
-				$sendQuery .= ($sendQuery == '(' ? '' : ' OR ') . 'mem.id_member IN ({array_int:members})';
+				$sendQuery .= ($sendQuery === '(' ? '' : ' OR ') . 'mem.id_member IN ({array_int:members})';
 				$sendParams['members'] = $context['recipients']['members'];
 			}
 
 			$sendQuery .= ')';
 
 			// If we've not got a query then we must be done!
-			if ($sendQuery == '()')
+			if ($sendQuery === '()')
 				redirectexit('action=admin');
 
 			// Anything to exclude?
@@ -873,6 +876,7 @@ class ManageNews_Controller extends Action_Controller
 	 * - Called by ?action=admin;area=news;sa=settings.
 	 * - Requires the forum_admin permission.
 	 *
+	 * @event integrate_save_news_settings save new news settings
 	 * @uses ManageNews template, news_settings sub-template.
 	 */
 	public function action_newsSettings_display()
@@ -912,6 +916,8 @@ class ManageNews_Controller extends Action_Controller
 
 	/**
 	 * Get the settings of the forum related to news.
+	 * 
+	 * @event integrate_modify_news_settings add new news settings
 	 */
 	private function _settings()
 	{

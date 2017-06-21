@@ -128,6 +128,7 @@ class ManageBoards_Controller extends Action_Controller
 	 * - Requires manage_boards permission.
 	 * - It also handles the interface for moving boards.
 	 *
+	 * @event integrate_boards_main Used to access global board arrays before the template
 	 * @uses ManageBoards template, main sub-template.
 	 */
 	public function action_main()
@@ -278,6 +279,7 @@ class ManageBoards_Controller extends Action_Controller
 	 * - Called by ?action=admin;area=manageboards;sa=cat
 	 * - Requires manage_boards permission.
 	 *
+	 * @event integrate_edit_category access category globals before the template
 	 * @uses ManageBoards template, modify_category sub-template.
 	 */
 	public function action_cat()
@@ -436,6 +438,7 @@ class ManageBoards_Controller extends Action_Controller
 	 * - also used to show the confirm deletion of category screen (sub-template confirm_board_delete).
 	 * - requires manage_boards permission.
 	 *
+	 * @event integrate_edit_board 
 	 * @uses the modify_board sub-template of the ManageBoards template.
 	 * @uses ManagePermissions language
 	 */
@@ -612,6 +615,8 @@ class ManageBoards_Controller extends Action_Controller
 	 * - Called by ?action=admin;area=manageboards;sa=board2
 	 * - Redirects to ?action=admin;area=manageboards.
 	 * - It requires manage_boards permission.
+	 * 
+	 * @event integrate_save_board
 	 */
 	public function action_board2()
 	{
@@ -751,6 +756,7 @@ class ManageBoards_Controller extends Action_Controller
 	/**
 	 * A screen to display and allow to set a few general board and category settings.
 	 *
+	 * @event integrate_save_board_settings called during manage board settings
 	 * @uses modify_general_settings sub-template.
 	 */
 	public function action_boardSettings_display()
@@ -794,6 +800,8 @@ class ManageBoards_Controller extends Action_Controller
 
 	/**
 	 * Retrieve and return all admin settings for boards management.
+	 * 
+	 * @event integrate_modify_board_settings add config settings to boards management
 	 */
 	private function _settings()
 	{

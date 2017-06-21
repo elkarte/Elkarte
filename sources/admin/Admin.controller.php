@@ -28,12 +28,16 @@
 
 class Admin_Controller extends Action_Controller
 {
+	/**
+	 * @var string[] areas to find current installed status and installed version
+	 */
 	private $_checkFor = array('gd', 'imagick', 'db_server', 'php', 'server',
 							  'zend', 'apc', 'memcache', 'memcached', 'xcache', 'opcache');
 
 	/**
-	 * Pre Dispatch, called before other methods.  Loads integration hooks
-	 * and HttpReq instance.
+	 * Pre Dispatch, called before other methods.
+	 *
+	 * - Loads integration hooks
 	 */
 	public function pre_dispatch()
 	{
@@ -86,8 +90,14 @@ class Admin_Controller extends Action_Controller
 	/**
 	 * Load the admin_areas array
 	 *
-	 * - Triggers addMenu admin_areas event
-	 * - Calls integration integrate_admin_include
+	 * What it does:
+	 *
+	 * - Creates the admin menu
+	 * - Allows integrations to add/edit menu with addMenu event and integrate_admin_include
+	 *
+	 * @event integrate_admin_include used add files to include for administration
+	 * @event addMenu passed admin area area, allows active modules registered to this event to add items to the admin menu,
+	 * @event integrate_admin_areas passed admin area area, used to add items to the admin menu
 	 *
 	 * @return false|mixed[]
 	 * @throws Elk_Exception no_access
@@ -571,7 +581,9 @@ class Admin_Controller extends Action_Controller
 
 		// Nothing valid?
 		if ($admin_include_data === false)
+		{
 			throw new Elk_Exception('no_access', false);
+		}
 
 		// Make a note of the Unique ID for this menu.
 		$context['admin_menu_id'] = $context['max_menu_id'];
@@ -782,6 +794,9 @@ class Admin_Controller extends Action_Controller
 	 * - Calls integrate_admin_search to allow addons to add search configs
 	 * - Loads up the "Help" language file and all of the "Manage" language files
 	 * - Loads up information about each item it found for the template
+	 *
+	 * @event integrate_admin_search Allows integration to add areas to the internal admin search
+	 * @event search Allows active modules registered to search to add settings for internal search
 	 */
 	public function action_search_internal()
 	{
@@ -891,6 +906,11 @@ class Admin_Controller extends Action_Controller
 	/**
 	 * This file allows the user to search the wiki documentation
 	 * for a little help.
+	 *
+	 * What it does:
+	 *
+	 * - Creates an exception since GitHub does not yet support API wiki searches so the connection
+	 * will fail.
 	 */
 	public function action_search_doc()
 	{
@@ -929,7 +949,9 @@ class Admin_Controller extends Action_Controller
 
 		// Move through the api layer.
 		if (!$results->exists('api'))
+		{
 			throw new Elk_Exception('cannot_connect_doc_site');
+		}
 
 		// Are there actually some results?
 		if ($results->exists('api/query/search/p'))
@@ -958,8 +980,12 @@ class Admin_Controller extends Action_Controller
 		cleanTokens(false, '-admin');
 
 		if (isset($this->_req->query->redir, $this->_req->server->HTTP_REFERER))
+		{
 			redirectexit($_SERVER['HTTP_REFERER']);
+		}
 		else
+		{
 			redirectexit();
+		}
 	}
 }

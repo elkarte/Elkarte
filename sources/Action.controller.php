@@ -104,6 +104,7 @@ abstract class Action_Controller
 	 * Tells if the controller requires the security framework to be loaded.
 	 *
 	 * @param string $action the function name of the current action
+	 *
 	 * @return boolean
 	 */
 	public function needSecurity($action = '')
@@ -115,6 +116,7 @@ abstract class Action_Controller
 	 * Tells if the controller needs the theme loaded up.
 	 *
 	 * @param string $action the function name of the current action
+	 *
 	 * @return boolean
 	 */
 	public function needTheme($action = '')
@@ -126,6 +128,7 @@ abstract class Action_Controller
 	 * Tells if the controller wants to be tracked.
 	 *
 	 * @param string $action the function name of the current action
+	 *
 	 * @return boolean
 	 */
 	public function trackStats($action = '')
@@ -184,6 +187,7 @@ abstract class Action_Controller
 		{
 			// Use the base controller name for the hook, ie post
 			$this->_hook = str_replace('_Controller', '', get_class($this));
+
 			// Initialize the events associated with this controller
 			$this->_initEventManager();
 		}
@@ -257,6 +261,8 @@ abstract class Action_Controller
 
 	/**
 	 * Called before any other action method in this class.
+	 *
+	 * What it does:
 	 *
 	 * - Allows for initializations, such as default values or
 	 * loading templates or language files.

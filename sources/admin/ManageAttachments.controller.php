@@ -87,6 +87,7 @@ class ManageAttachments_Controller extends Action_Controller
 	 * and it calls a function based on the sub-action.
 	 * - It requires the manage_attachments permission.
 	 *
+	 * @event integrate_sa_manage_attachments
 	 * @uses ManageAttachments template.
 	 * @uses Admin language file.
 	 * @uses template layer 'manage_files' for showing the tab bar.
@@ -148,6 +149,7 @@ class ManageAttachments_Controller extends Action_Controller
 	 * - This is the default sub-action of the 'Attachments and Avatars' center.
 	 * - Called by index.php?action=admin;area=manageattachments;sa=attachments.
 	 *
+	 * @event integrate_save_attachment_settings
 	 * @uses 'attachments' sub template.
 	 */
 	public function action_attachSettings_display()
@@ -239,6 +241,8 @@ class ManageAttachments_Controller extends Action_Controller
 
 	/**
 	 * Retrieve and return the administration settings for attachments.
+	 * 
+	 * @event integrate_modify_attachment_settings
 	 */
 	private function _settings()
 	{

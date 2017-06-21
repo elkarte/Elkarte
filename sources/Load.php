@@ -27,6 +27,10 @@
  * - calls add_integration_function
  * - calls integrate_pre_include, integrate_pre_load,
  *
+ * @event integrate_load_average is called if load average is enabled
+ * @event integrate_pre_include to allow including files at startup
+ * @event integrate_pre_load to call any pre load integration functions.
+ *
  * @global array $modSettings is a giant array of all of the forum-wide settings and statistics.
  */
 function reloadSettings()
@@ -165,6 +169,9 @@ function reloadSettings()
  * - checks password length, if member is activated and the login span isn't over.
  * - if validation fails for the user, $id_member is set to 0.
  * - updates the last visit time when needed.
+ *
+ * @event integrate_verify_user allow for integration to verify a user
+ * @event integrate_user_info to allow for adding to $user_info array
  */
 function loadUserSettings()
 {
@@ -438,6 +445,12 @@ function loadUserSettings()
  * - determines the local moderators for the board.
  * - adds group id 3 if the user is a local moderator for the board they are in.
  * - prevents access if user is not in proper group nor a local moderator of the board.
+ *
+ * @event integrate_load_board_query allows to add tables and columns to the query, used
+ * to add to the $board_info array
+ * @event integrate_loaded_board called after board_info is populated, allows to add
+ * directly to $board_info
+ *
  */
 function loadBoard()
 {
@@ -772,7 +785,8 @@ function loadPermissions()
 	{
 		// Get the general permissions.
 		$request = $db->query('', '
-			SELECT permission, add_deny
+			SELECT 
+				permission, add_deny
 			FROM {db_prefix}permissions
 			WHERE id_group IN ({array_int:member_groups})
 				' . $spider_restrict,
@@ -802,7 +816,8 @@ function loadPermissions()
 			throw new Elk_Exception('no_board');
 
 		$request = $db->query('', '
-			SELECT permission, add_deny
+			SELECT 
+				permission, add_deny
 			FROM {db_prefix}board_permissions
 			WHERE (id_group IN ({array_int:member_groups})
 				' . $spider_restrict . ')
@@ -850,9 +865,15 @@ function loadPermissions()
 /**
  * Loads an array of users' data by ID or member_name.
  *
+ * @event integrate_load_member_data allows to add to the columns & tables for $user_profile
+ * array population
+ * @event integrate_add_member_data called after data is loaded, allows integration
+ * to directly add to the user_profile array
+ *
  * @param int[]|int|string[]|string $users An array of users by id or name
  * @param bool $is_name = false $users is by name or by id
  * @param string $set = 'normal' What kind of data to load (normal, profile, minimal)
+ *
  * @return array|bool The ids of the members loaded or false
  */
 function loadMemberData($users, $is_name = false, $set = 'normal')
@@ -1019,8 +1040,10 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
  * - loads in the members custom fields if any
  * - prepares the users buddy list, including reverse buddy flags
  *
+ * @event integrate_member_context allows to manipulate $memberContext[user]
  * @param int $user
  * @param bool $display_custom_fields = false
+ *
  * @return boolean
  */
 function loadMemberContext($user, $display_custom_fields = false)
@@ -1183,7 +1206,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 /**
  * Loads information about what browser the user is viewing with and places it in $context
  *
- * @uses the class from BrowserDetect.class.php
+ * @uses Browser_Detector class from BrowserDetect.class.php
  */
 function detectBrowser()
 {
@@ -1404,6 +1427,10 @@ function initTheme($id_theme = 0)
  * - loads default JS variables for use in every theme
  * - loads default JS scripts for use in every theme
  *
+ * @event integrate_init_theme used to call initialization theme integration functions and
+ * change / update $settings
+ * @event integrate_theme_include allows to include files at this point
+ * @event integrate_load_theme calls functions after theme is loaded
  * @param int $id_theme = 0
  * @param bool $initialize = true
  */
@@ -2507,7 +2534,9 @@ function loadDatabase()
  *
  * @todo this function seems more useful than expected, it should be improved. :P
  *
+ * @event integrate_avatar allows access to $avatar array before it is returned
  * @param mixed[] $profile array containing the users profile data
+ *
  * @return mixed[] $avatar
  */
 function determineAvatar($profile)

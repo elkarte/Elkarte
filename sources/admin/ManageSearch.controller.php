@@ -34,6 +34,7 @@ class ManageSearch_Controller extends Action_Controller
 	 * - Called by ?action=admin;area=managesearch.
 	 * - Requires the admin_forum permission.
 	 *
+	 * @event integrate_sa_manage_search add new search actions
 	 * @uses ManageSearch template.
 	 * @uses Search language file.
 	 * @see  Action_Controller::action_index()
@@ -95,6 +96,7 @@ class ManageSearch_Controller extends Action_Controller
 	 * - Called by ?action=admin;area=managesearch;sa=settings.
 	 * - Requires the admin_forum permission.
 	 *
+	 * @event integrate_save_search_settings
 	 * @uses ManageSearch template, 'modify_settings' sub-template.
 	 */
 	public function action_searchSettings_display()
@@ -169,6 +171,8 @@ class ManageSearch_Controller extends Action_Controller
 
 	/**
 	 * Retrieve admin search settings
+	 * 
+	 * @event integrate_modify_search_settings
 	 */
 	private function _settings()
 	{
@@ -218,6 +222,8 @@ class ManageSearch_Controller extends Action_Controller
 	 * - Called by ?action=admin;area=managesearch;sa=weights.
 	 * - Requires the admin_forum permission.
 	 *
+	 * @event integrate_modify_search_weights
+	 * @event integrate_save_search_weights
 	 * @uses ManageSearch template, 'modify_weights' sub-template.
 	 */
 	public function action_weight()
@@ -323,7 +329,7 @@ class ManageSearch_Controller extends Action_Controller
 			alterFullTextIndex('{db_prefix}messages', $fulltext_index);
 
 			// Go back to the default search method.
-			if (!empty($modSettings['search_index']) && $modSettings['search_index'] == 'fulltext')
+			if (!empty($modSettings['search_index']) && $modSettings['search_index'] === 'fulltext')
 			{
 				updateSettings(array(
 					'search_index' => '',
@@ -662,7 +668,7 @@ class ManageSearch_Controller extends Action_Controller
 					$index_name = $file->getBasename('.php');
 					$common_name = strtolower($index_name);
 
-					if ($common_name == 'searchapi')
+					if ($common_name === 'searchapi')
 					{
 						continue;
 					}

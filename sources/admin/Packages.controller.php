@@ -84,6 +84,7 @@ class Packages_Controller extends Action_Controller
 	/**
 	 * Entry point, the default method of this controller.
 	 *
+	 * @event integrate_sa_packages
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -304,9 +305,9 @@ class Packages_Controller extends Action_Controller
 				// Get the part of the file we'll be dealing with.
 				preg_match('~^\$(languagedir|languages_dir|imagesdir|themedir)(\\|/)*(.+)*~i', $action_data['unparsed_destination'], $matches);
 
-				if ($matches[1] == 'imagesdir')
+				if ($matches[1] === 'imagesdir')
 					$path = '/' . basename($settings['default_images_url']);
-				elseif ($matches[1] == 'languagedir' || $matches[1] == 'languages_dir')
+				elseif ($matches[1] === 'languagedir' || $matches[1] === 'languages_dir')
 					$path = '/languages';
 				else
 					$path = '';
@@ -356,7 +357,7 @@ class Packages_Controller extends Action_Controller
 								);
 							else
 								$context['theme_actions'][$id]['actions'][] = array(
-									'type' => $txt['package_extract'] . ' ' . ($action_data['type'] == 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
+									'type' => $txt['package_extract'] . ' ' . ($action_data['type'] === 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
 									'action' => strtr($real_path, array('\\' => '/', BOARDDIR => '.')),
 									'description' => '',
 									'value' => base64_encode(json_encode(array('type' => $action_data['type'], 'orig' => $action_data['destination'], 'future' => $real_path, 'id' => $id))),
@@ -691,7 +692,7 @@ class Packages_Controller extends Action_Controller
 					usort($db_package_log, array($this, '_sort_table_first'));
 					foreach ($db_package_log as $k => $log)
 					{
-						if ($log[0] == 'remove_table')
+						if ($log[0] === 'remove_table')
 							$tables[] = $log[1];
 						elseif (in_array($log[1], $tables))
 							unset($db_package_log[$k]);
@@ -724,11 +725,11 @@ class Packages_Controller extends Action_Controller
 		{
 			foreach ($package_installed['db_changes'] as $change)
 			{
-				if ($change[0] == 'remove_table' && isset($change[1]))
+				if ($change[0] === 'remove_table' && isset($change[1]))
 					$table_installer->db_drop_table($change[1]);
-				elseif ($change[0] == 'remove_column' && isset($change[2]))
+				elseif ($change[0] === 'remove_column' && isset($change[2]))
 					$table_installer->db_remove_column($change[1], $change[2]);
-				elseif ($change[0] == 'remove_index' && isset($change[2]))
+				elseif ($change[0] === 'remove_index' && isset($change[2]))
 					$table_installer->db_remove_index($change[1], $change[2]);
 			}
 		}
@@ -758,7 +759,7 @@ class Packages_Controller extends Action_Controller
 		if ($a[0] == $b[0])
 			return 0;
 
-		return $a[0] == 'remove_table' ? -1 : 1;
+		return $a[0] === 'remove_table' ? -1 : 1;
 	}
 
 	/**
@@ -838,7 +839,7 @@ class Packages_Controller extends Action_Controller
 			elseif (is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
 				$context['filedata'] = htmlspecialchars(file_get_contents(BOARDDIR . '/packages/' . $this->_req->query->package . '/' . $this->_req->query->file));
 
-			if (strtolower(strrchr($this->_req->query->file, '.')) == '.php')
+			if (strtolower(strrchr($this->_req->query->file, '.')) === '.php')
 				$context['filedata'] = highlight_php_code($context['filedata']);
 		}
 	}
@@ -873,14 +874,14 @@ class Packages_Controller extends Action_Controller
 		checkSession('get');
 
 		// Ack, don't allow deletion of arbitrary files here, could become a security hole somehow!
-		if (!isset($this->_req->query->package) || $this->_req->query->package == 'index.php' || $this->_req->query->package == 'installed.list' || $this->_req->query->package == 'backups')
+		if (!isset($this->_req->query->package) || $this->_req->query->package === 'index.php' || $this->_req->query->package === 'installed.list' || $this->_req->query->package === 'backups')
 			redirectexit('action=admin;area=packages;sa=browse');
 		$this->_req->query->package = preg_replace('~[\.]+~', '.', strtr($this->_req->query->package, array('/' => '_', '\\' => '_')));
 
 		// Can't delete what's not there.
 		if (file_exists(BOARDDIR . '/packages/' . $this->_req->query->package)
-			&& (substr($this->_req->query->package, -4) == '.zip' || substr($this->_req->query->package, -4) == '.tgz' || substr($this->_req->query->package, -7) == '.tar.gz' || is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
-			&& $this->_req->query->package != 'backups' && substr($this->_req->query->package, 0, 1) != '.')
+			&& (substr($this->_req->query->package, -4) === '.zip' || substr($this->_req->query->package, -4) === '.tgz' || substr($this->_req->query->package, -7) === '.tar.gz' || is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
+			&& $this->_req->query->package !== 'backups' && substr($this->_req->query->package, 0, 1) !== '.')
 		{
 			create_chmod_control(array(BOARDDIR . '/packages/' . $this->_req->query->package), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=remove;package=' . $this->_req->query->package, 'crash_on_error' => true));
 
@@ -905,7 +906,7 @@ class Packages_Controller extends Action_Controller
 
 		$context['page_title'] .= ' - ' . $txt['browse_packages'];
 		$context['forum_version'] = FORUM_VERSION;
-		$installed = $context['sub_action'] == 'installed' ? true : false;
+		$installed = $context['sub_action'] === 'installed' ? true : false;
 		$context['package_types'] = $installed ? array('modification') : array('modification', 'avatar', 'language', 'smiley', 'unknown');
 
 		foreach ($context['package_types'] as $type)
@@ -1007,7 +1008,7 @@ class Packages_Controller extends Action_Controller
 					array(
 						'position' => 'bottom_of_list',
 						'class' => 'submitbutton',
-						'value' => ($context['sub_action'] == 'browse'
+						'value' => ($context['sub_action'] === 'browse'
 							? '<div class="smalltext">' . $txt['package_installed_key'] . '<i class="icon icon-small i-green-dot"></i>' . $txt['package_installed_current'] . '<i class="icon icon-small i-red-dot"></i>' . $txt['package_installed_old'] . '</div>'
 							: '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=flush;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['package_delete_list_warning'] . '\');">' . $txt['delete_list'] . '</a>'),
 					),
@@ -1167,9 +1168,9 @@ class Packages_Controller extends Action_Controller
 		);
 
 		// Let's do some formatting...
-		$operation_text = $context['operations']['position'] == 'replace' ? 'operation_replace' : ($context['operations']['position'] == 'before' ? 'operation_after' : 'operation_before');
+		$operation_text = $context['operations']['position'] === 'replace' ? 'operation_replace' : ($context['operations']['position'] === 'before' ? 'operation_after' : 'operation_before');
 		$bbc_parser = \BBC\ParserWrapper::getInstance();
-		$context['operations']['search'] = $bbc_parser->parsePackage('[code=' . $txt['operation_find'] . ']' . ($context['operations']['position'] == 'end' ? '?&gt;' : $context['operations']['search']) . '[/code]');
+		$context['operations']['search'] = $bbc_parser->parsePackage('[code=' . $txt['operation_find'] . ']' . ($context['operations']['position'] === 'end' ? '?&gt;' : $context['operations']['search']) . '[/code]');
 		$context['operations']['replace'] = $bbc_parser->parsePackage('[code=' . $txt[$operation_text] . ']' . $context['operations']['replace'] . '[/code]');
 
 		// No layers
@@ -1569,7 +1570,7 @@ class Packages_Controller extends Action_Controller
 			{
 				if (in_array($status, array('execute', 'writable', 'read')))
 					package_chmod($path, $status);
-				elseif ($status == 'custom' && !empty($custom_value))
+				elseif ($status === 'custom' && !empty($custom_value))
 				{
 					// Use FTP if we have it.
 					if (!empty($package_ftp) && !empty($_SESSION['pack_ftp']))
@@ -1612,7 +1613,7 @@ class Packages_Controller extends Action_Controller
 			}
 
 			// Have we built up our list of special files?
-			if (!isset($this->_req->post->specialFiles) && $context['predefined_type'] != 'free')
+			if (!isset($this->_req->post->specialFiles) && $context['predefined_type'] !== 'free')
 			{
 				$context['special_files'] = array();
 
@@ -1961,7 +1962,7 @@ class Packages_Controller extends Action_Controller
 					}
 
 					// Add-on / Modification
-					if ($packageInfo['type'] == 'addon' || $packageInfo['type'] == 'modification' || $packageInfo['type'] == 'mod')
+					if ($packageInfo['type'] === 'addon' || $packageInfo['type'] === 'modification' || $packageInfo['type'] === 'mod')
 					{
 						$sort_id['modification']++;
 						$sort_id['mod']++;
@@ -1981,21 +1982,21 @@ class Packages_Controller extends Action_Controller
 						}
 					}
 					// Avatar package.
-					elseif ($packageInfo['type'] == 'avatar')
+					elseif ($packageInfo['type'] === 'avatar')
 					{
 						$sort_id[$packageInfo['type']]++;
 						$packages['avatar'][strtolower($packageInfo[$sort])] = md5($package->getFilename());
 						$context['available_avatar'][md5($package->getFilename())] = $packageInfo;
 					}
 					// Smiley package.
-					elseif ($packageInfo['type'] == 'smiley')
+					elseif ($packageInfo['type'] === 'smiley')
 					{
 						$sort_id[$packageInfo['type']]++;
 						$packages['smiley'][strtolower($packageInfo[$sort])] = md5($package->getFilename());
 						$context['available_smiley'][md5($package->getFilename())] = $packageInfo;
 					}
 					// Language package.
-					elseif ($packageInfo['type'] == 'language')
+					elseif ($packageInfo['type'] === 'language')
 					{
 						$sort_id[$packageInfo['type']]++;
 						$packages['language'][strtolower($packageInfo[$sort])] = md5($package->getFilename());
@@ -2231,15 +2232,15 @@ function pausePermsSave()
 	$context['page_title'] = $txt['package_file_perms_applying'];
 
 	// And how are we progressing with our directories
-	$context['remaining_items'] = count($context['method'] == 'individual' ? $context['to_process'] : $context['directory_list']);
-	$context['progress_message'] = sprintf($context['method'] == 'individual' ? $txt['package_file_perms_items_done'] : $txt['package_file_perms_dirs_done'], $context['total_items'] - $context['remaining_items'], $context['total_items']);
+	$context['remaining_items'] = count($context['method'] === 'individual' ? $context['to_process'] : $context['directory_list']);
+	$context['progress_message'] = sprintf($context['method'] === 'individual' ? $txt['package_file_perms_items_done'] : $txt['package_file_perms_dirs_done'], $context['total_items'] - $context['remaining_items'], $context['total_items']);
 	$context['progress_percent'] = round(($context['total_items'] - $context['remaining_items']) / $context['total_items'] * 100, 1);
 
 	// Never more than 100%!
 	$context['progress_percent'] = min($context['progress_percent'], 100);
 
 	// And how are we progressing with files within a directory
-	if ($context['method'] != 'individual' && !empty($context['total_files']))
+	if ($context['method'] !== 'individual' && !empty($context['total_files']))
 	{
 		$context['file_progress_message'] = sprintf($txt['package_file_perms_files_done'], $context['file_offset'], $context['total_files']);
 		$context['file_progress_percent'] = round($context['file_offset'] / $context['total_files'] * 100, 1);

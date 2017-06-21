@@ -44,6 +44,7 @@ class ManageMembers_Controller extends Action_Controller
 	 * - Called by ?action=admin;area=viewmembers.
 	 * - Requires the moderate_forum permission.
 	 *
+	 * @event integrate_manage_members used to add subactions and tabs
 	 * @uses ManageMembers template
 	 * @uses ManageMembers language file.
 	 * @see Action_Controller::action_index()
@@ -122,13 +123,13 @@ class ManageMembers_Controller extends Action_Controller
 				'label' => $txt['view_all_members'],
 				'description' => $txt['admin_members_list'],
 				'url' => $scripturl . '?action=admin;area=viewmembers;sa=all',
-				'is_selected' => $subAction == 'all',
+				'is_selected' => $subAction === 'all',
 			),
 			'search' => array(
 				'label' => $txt['mlist_search'],
 				'description' => $txt['admin_members_list'],
 				'url' => $scripturl . '?action=admin;area=viewmembers;sa=search',
-				'is_selected' => $subAction == 'search' || $subAction == 'query',
+				'is_selected' => $subAction === 'search' || $subAction === 'query',
 			),
 			'approve' => array(
 				'label' => sprintf($txt['admin_browse_awaiting_approval'], $context['awaiting_approval']),
@@ -149,16 +150,16 @@ class ManageMembers_Controller extends Action_Controller
 		call_integration_hook('integrate_manage_members', array(&$subActions));
 
 		// Sort out the tabs for the ones which may not exist!
-		if (!$context['show_activate'] && ($subAction != 'browse' || $this->_req->query->type != 'activate'))
+		if (!$context['show_activate'] && ($subAction !== 'browse' || $this->_req->query->type!== 'activate'))
 		{
 			$context['tabs']['approve']['is_last'] = true;
 			unset($context['tabs']['activate']);
 		}
 
 		// Unset approval tab if it shouldn't be there.
-		if (!$context['show_approve'] && ($subAction != 'browse' || $this->_req->query->type != 'approve'))
+		if (!$context['show_approve'] && ($subAction !== 'browse' || $this->_req->query->type !== 'approve'))
 		{
-			if (!$context['show_activate'] && ($subAction != 'browse' || $this->_req->query->type != 'activate'))
+			if (!$context['show_activate'] && ($subAction !== 'browse' || $this->_req->query->type !== 'activate'))
 				$context['tabs']['search']['is_last'] = true;
 			unset($context['tabs']['approve']);
 		}
@@ -179,6 +180,9 @@ class ManageMembers_Controller extends Action_Controller
 	 * - Called by ?action=admin;area=viewmembers;sa=all or ?action=admin;area=viewmembers;sa=query.
 	 * - Requires the moderate_forum permission.
 	 *
+	 * @event integrate_list_member_list
+	 * @event integrate_view_members_params passed $params
+
 	 * @uses the view_members sub template of the ManageMembers template.
 	 */
 	public function action_list()
@@ -193,7 +197,7 @@ class ManageMembers_Controller extends Action_Controller
 			$this->_multiMembersAction();
 
 		// Check input after a member search has been submitted.
-		if ($context['sub_action'] == 'query')
+		if ($context['sub_action'] === 'query')
 		{
 			// Retrieving the membergroups and postgroups.
 			require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -263,7 +267,7 @@ class ManageMembers_Controller extends Action_Controller
 			call_integration_hook('integrate_view_members_params', array(&$params));
 
 			$search_params = array();
-			if ($context['sub_action'] == 'query' && !empty($this->_req->query->params) && empty($this->_req->post->types))
+			if ($context['sub_action'] === 'query' && !empty($this->_req->query->params) && empty($this->_req->post->types))
 				$search_params = @json_decode(base64_decode($this->_req->query->params), true);
 			elseif (!empty($this->_req->post))
 			{
@@ -291,7 +295,7 @@ class ManageMembers_Controller extends Action_Controller
 				if (in_array($param_info['type'], array('int', 'age')))
 					$search_params[$param_name] = (int) $search_params[$param_name];
 				// Date values have to match the specified format.
-				elseif ($param_info['type'] == 'date')
+				elseif ($param_info['type'] === 'date')
 				{
 					// Check if this date format is valid.
 					if (preg_match('/^\d{4}-\d{1,2}-\d{1,2}$/', $search_params[$param_name]) == 0)
@@ -308,7 +312,7 @@ class ManageMembers_Controller extends Action_Controller
 						$search_params['types'][$param_name] = '=';
 
 					// Handle special case 'age'.
-					if ($param_info['type'] == 'age')
+					if ($param_info['type'] === 'age')
 					{
 						// All people that were born between $lowerlimit and $upperlimit are currently the specified age.
 						$datearray = getdate(forum_time());
@@ -317,12 +321,12 @@ class ManageMembers_Controller extends Action_Controller
 						if (in_array($search_params['types'][$param_name], array('-', '--', '=')))
 						{
 							$query_parts[] = ($param_info['db_fields'][0]) . ' > {string:' . $param_name . '_minlimit}';
-							$where_params[$param_name . '_minlimit'] = ($search_params['types'][$param_name] == '--' ? $upperlimit : $lowerlimit);
+							$where_params[$param_name . '_minlimit'] = ($search_params['types'][$param_name] === '--' ? $upperlimit : $lowerlimit);
 						}
 						if (in_array($search_params['types'][$param_name], array('+', '++', '=')))
 						{
 							$query_parts[] = ($param_info['db_fields'][0]) . ' <= {string:' . $param_name . '_pluslimit}';
-							$where_params[$param_name . '_pluslimit'] = ($search_params['types'][$param_name] == '++' ? $lowerlimit : $upperlimit);
+							$where_params[$param_name . '_pluslimit'] = ($search_params['types'][$param_name] === '++' ? $lowerlimit : $upperlimit);
 
 							// Make sure that members that didn't set their birth year are not queried.
 							$query_parts[] = ($param_info['db_fields'][0]) . ' > {date:dec_zero_date}';
@@ -330,7 +334,7 @@ class ManageMembers_Controller extends Action_Controller
 						}
 					}
 					// Special case - equals a date.
-					elseif ($param_info['type'] == 'date' && $search_params['types'][$param_name] == '=')
+					elseif ($param_info['type'] === 'date' && $search_params['types'][$param_name] === '=')
 					{
 						$query_parts[] = $param_info['db_fields'][0] . ' > ' . $search_params[$param_name] . ' AND ' . $param_info['db_fields'][0] . ' < ' . ($search_params[$param_name] + 86400);
 					}
@@ -338,7 +342,7 @@ class ManageMembers_Controller extends Action_Controller
 						$query_parts[] = $param_info['db_fields'][0] . ' ' . $range_trans[$search_params['types'][$param_name]] . ' ' . $search_params[$param_name];
 				}
 				// Checkboxes.
-				elseif ($param_info['type'] == 'checkbox')
+				elseif ($param_info['type'] === 'checkbox')
 				{
 					// Each checkbox or no checkbox at all is checked -> ignore.
 					if (!is_array($search_params[$param_name]) || count($search_params[$param_name]) == 0 || count($search_params[$param_name]) == count($param_info['values']))
@@ -398,7 +402,7 @@ class ManageMembers_Controller extends Action_Controller
 			$search_url_params = null;
 
 		// Construct the additional URL part with the query info in it.
-		$context['params_url'] = $context['sub_action'] == 'query' ? ';sa=query;params=' . $search_url_params : '';
+		$context['params_url'] = $context['sub_action'] === 'query' ? ';sa=query;params=' . $search_url_params : '';
 
 		// Get the title and sub template ready..
 		$context['page_title'] = $txt['admin_members'];
@@ -620,7 +624,7 @@ class ManageMembers_Controller extends Action_Controller
 			return;
 
 		// Are we performing a delete?
-		if ($this->_req->post->maction == 'delete' && allowedTo('profile_remove_any'))
+		if ($this->_req->post->maction === 'delete' && allowedTo('profile_remove_any'))
 		{
 			// Delete all the selected members.
 			require_once(SUBSDIR . '/Members.subs.php');
@@ -637,7 +641,7 @@ class ManageMembers_Controller extends Action_Controller
 			{
 				if ($this->_req->post->maction == $group . 'group' && !empty($this->_req->post->new_membergroup))
 				{
-					if ($group == 'p')
+					if ($group === 'p')
 						$type = 'force_primary';
 					else
 						$type = 'only_additional';
@@ -734,6 +738,7 @@ class ManageMembers_Controller extends Action_Controller
 	 * - The form submits to ?action=admin;area=viewmembers;sa=approve.
 	 * - Requires the moderate_forum permission.
 	 *
+	 * @event integrate_list_approve_list
 	 * @uses the admin_browse sub template of the ManageMembers template.
 	 */
 	public function action_browse()
@@ -749,7 +754,7 @@ class ManageMembers_Controller extends Action_Controller
 			$context['tabs'][$context['browse_type']]['is_selected'] = true;
 
 		// Allowed filters are those we can have, in theory.
-		$context['allowed_filters'] = $context['browse_type'] == 'approve' ? array(3, 4, 5) : array(0, 2);
+		$context['allowed_filters'] = $context['browse_type'] === 'approve' ? array(3, 4, 5) : array(0, 2);
 		$context['current_filter'] = isset($this->_req->query->filter) && in_array($this->_req->query->filter, $context['allowed_filters']) && !empty($context['activation_numbers'][$this->_req->query->filter]) ? (int) $this->_req->query->filter : -1;
 
 		// Sort out the different sub areas that we can actually filter by.
@@ -791,7 +796,7 @@ class ManageMembers_Controller extends Action_Controller
 		$context['show_duplicates'] = !empty($_SESSION['showdupes']);
 
 		// Determine which actions we should allow on this page.
-		if ($context['browse_type'] == 'approve')
+		if ($context['browse_type'] === 'approve')
 		{
 			// If we are approving deleted accounts we have a slightly different list... actually a mirror ;)
 			if ($context['current_filter'] == 4)
@@ -808,7 +813,7 @@ class ManageMembers_Controller extends Action_Controller
 					'rejectemail' => $txt['admin_browse_w_reject'] . ' ' . $txt['admin_browse_w_email'],
 				);
 		}
-		elseif ($context['browse_type'] == 'activate')
+		elseif ($context['browse_type'] === 'activate')
 			$context['allowed_actions'] = array(
 				'ok' => $txt['admin_browse_w_activate'],
 				'okemail' => $txt['admin_browse_w_activate'] . ' ' . $txt['admin_browse_w_email'],
@@ -852,7 +857,7 @@ class ManageMembers_Controller extends Action_Controller
 				else if (document.forms.postForm.todo.value == "remind")
 					message = "' . $txt['admin_browse_w_remind'] . '";
 				else
-					message = "' . ($context['browse_type'] == 'approve' ? $txt['admin_browse_w_approve'] : $txt['admin_browse_w_activate']) . '";';
+					message = "' . ($context['browse_type'] === 'approve' ? $txt['admin_browse_w_approve'] : $txt['admin_browse_w_activate']) . '";';
 		$javascript .= '
 				if (confirm(message + " ' . $txt['admin_browse_warn'] . '"))
 					document.forms.postForm.submit();
@@ -1155,7 +1160,7 @@ class ManageMembers_Controller extends Action_Controller
 		// Log what we did?
 		if (!empty($modSettings['modlog_enabled']) && in_array($this->_req->post->todo, array('ok', 'okemail', 'require_activation', 'remind')))
 		{
-			$log_action = $this->_req->post->todo == 'remind' ? 'remind_member' : 'approve_member';
+			$log_action = $this->_req->post->todo === 'remind' ? 'remind_member' : 'approve_member';
 
 			foreach ($this->member_info as $member)
 				logAction($log_action, array('member' => $member['id']), 'admin');
@@ -1208,7 +1213,7 @@ class ManageMembers_Controller extends Action_Controller
 		deleteMembers($this->conditions['members']);
 
 		// Send email telling them they aren't welcome?
-		if ($this->_req->post->todo == 'deleteemail')
+		if ($this->_req->post->todo === 'deleteemail')
 		{
 			foreach ($this->member_info as $member)
 			{
@@ -1230,7 +1235,7 @@ class ManageMembers_Controller extends Action_Controller
 		deleteMembers($this->conditions['members']);
 
 		// Send email telling them they aren't welcome?
-		if ($this->_req->post->todo == 'rejectemail')
+		if ($this->_req->post->todo === 'rejectemail')
 		{
 			foreach ($this->member_info as $member)
 			{
@@ -1255,7 +1260,7 @@ class ManageMembers_Controller extends Action_Controller
 		approveMembers($this->conditions);
 
 		// Check for email.
-		if ($this->_req->post->todo == 'okemail')
+		if ($this->_req->post->todo === 'okemail')
 		{
 			foreach ($this->member_info as $member)
 			{

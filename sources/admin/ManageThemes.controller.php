@@ -21,6 +21,7 @@
  * Creating and distributing theme packages:
  * There isn't that much required to package and distribute your own themes...
  * just do the following:
+ * 
  *  - create a theme_info.xml file, with the root element theme-info.
  *  - its name should go in a name element, just like description.
  *  - your name should go in author. (email in the email attribute.)
@@ -582,23 +583,23 @@ class ManageThemes_Controller extends Action_Controller
 		foreach ($context['options'] as $i => $setting)
 		{
 			// Is this disabled?
-			if ($setting['id'] == 'calendar_start_day' && empty($modSettings['cal_enabled']))
+			if ($setting['id'] === 'calendar_start_day' && empty($modSettings['cal_enabled']))
 			{
 				unset($context['options'][$i]);
 				continue;
 			}
-			elseif (($setting['id'] == 'topics_per_page' || $setting['id'] == 'messages_per_page') && !empty($modSettings['disableCustomPerPage']))
+			elseif (($setting['id'] === 'topics_per_page' || $setting['id'] === 'messages_per_page') && !empty($modSettings['disableCustomPerPage']))
 			{
 				unset($context['options'][$i]);
 				continue;
 			}
 
 			// Type of field so we display the right input field
-			if (!isset($setting['type']) || $setting['type'] == 'bool')
+			if (!isset($setting['type']) || $setting['type'] === 'bool')
 				$context['options'][$i]['type'] = 'checkbox';
-			elseif ($setting['type'] == 'int' || $setting['type'] == 'integer')
+			elseif ($setting['type'] === 'int' || $setting['type'] === 'integer')
 				$context['options'][$i]['type'] = 'number';
-			elseif ($setting['type'] == 'string')
+			elseif ($setting['type'] === 'string')
 				$context['options'][$i]['type'] = 'text';
 
 			if (isset($setting['options']))
@@ -625,6 +626,8 @@ class ManageThemes_Controller extends Action_Controller
 	 * - Calls action_admin() if no theme is specified. (the theme center.)
 	 * - Requires admin_forum permission.
 	 * - Accessed with ?action=admin;area=theme;sa=list&th=xx.
+	 * 
+	 * @event integrate_init_theme
 	 */
 	public function action_setthemesettings()
 	{
@@ -709,7 +712,7 @@ class ManageThemes_Controller extends Action_Controller
 					elseif (empty($item['type']))
 						$options[$option][$item['id']] = $options[$option][$item['id']] ? 1 : 0;
 					// Number
-					elseif ($item['type'] == 'number')
+					elseif ($item['type'] === 'number')
 						$options[$option][$item['id']] = (int) $options[$option][$item['id']];
 				}
 			}
@@ -753,11 +756,11 @@ class ManageThemes_Controller extends Action_Controller
 				continue;
 
 			// Create the right input fields for the data
-			if (!isset($setting['type']) || $setting['type'] == 'bool')
+			if (!isset($setting['type']) || $setting['type'] === 'bool')
 				$context['settings'][$i]['type'] = 'checkbox';
-			elseif ($setting['type'] == 'int' || $setting['type'] == 'integer')
+			elseif ($setting['type'] === 'int' || $setting['type'] === 'integer')
 				$context['settings'][$i]['type'] = 'number';
-			elseif ($setting['type'] == 'string')
+			elseif ($setting['type'] === 'string')
 				$context['settings'][$i]['type'] = 'text';
 
 			if (isset($setting['options']))
@@ -1162,19 +1165,19 @@ class ManageThemes_Controller extends Action_Controller
 			$method = 'copy';
 
 		// Copy the default theme?
-		if (!empty($this->_req->post->copy) && $method == 'copy')
+		if (!empty($this->_req->post->copy) && $method === 'copy')
 			$this->copyDefault();
 		// Install from another directory
-		elseif (isset($this->_req->post->theme_dir) && $method == 'path')
+		elseif (isset($this->_req->post->theme_dir) && $method === 'path')
 			$this->installFromDir();
 		// Uploaded a zip file to install from
-		elseif ($method == 'upload')
+		elseif ($method === 'upload')
 			$this->installFromZip();
 		else
 			throw new Elk_Exception('theme_install_general', false);
 
 		// Something go wrong?
-		if ($this->theme_dir != '' && basename($this->theme_dir) != 'themes')
+		if ($this->theme_dir != '' && basename($this->theme_dir) !== 'themes')
 		{
 			// Defaults.
 			$install_info = array(
@@ -1223,7 +1226,7 @@ class ManageThemes_Controller extends Action_Controller
 
 			if (isset($install_info['based_on']))
 			{
-				if ($install_info['based_on'] == 'default')
+				if ($install_info['based_on'] === 'default')
 				{
 					$install_info['theme_url'] = $settings['default_theme_url'];
 					$install_info['images_url'] = $settings['default_images_url'];
@@ -1419,7 +1422,7 @@ class ManageThemes_Controller extends Action_Controller
 		}
 
 		// If this is the admin preferences the passed value will just be an element of it.
-		if ($this->_req->query->var == 'admin_preferences')
+		if ($this->_req->query->var === 'admin_preferences')
 		{
 			if (!empty($options['admin_preferences']))
 			{
@@ -1444,7 +1447,7 @@ class ManageThemes_Controller extends Action_Controller
 			$this->_req->query->val = json_encode($options['admin_preferences']);
 		}
 		// If this is the window min/max settings, the passed window name will just be an element of it.
-		elseif ($this->_req->query->var == 'minmax_preferences')
+		elseif ($this->_req->query->var === 'minmax_preferences')
 		{
 			if (!empty($options['minmax_preferences']))
 			{
@@ -1532,9 +1535,9 @@ class ManageThemes_Controller extends Action_Controller
 		// We're editing .css, .template.php, .{language}.php or others.
 		// Note: we're here sending $theme_dir as parameter to action_()
 		// controller functions, which isn't cool. To be refactored.
-		if (substr($this->_req->query->filename, -4) == '.css')
+		if (substr($this->_req->query->filename, -4) === '.css')
 			$this->_action_edit_style();
-		elseif (substr($this->_req->query->filename, -13) == '.template.php')
+		elseif (substr($this->_req->query->filename, -13) === '.template.php')
 			$this->_action_edit_template();
 		else
 			$this->_action_edit_file();
@@ -1653,9 +1656,9 @@ class ManageThemes_Controller extends Action_Controller
 
 		// Checking PHP syntax on css files is not a most constructive use of processing power :P
 		// We need to know what kind of file we have
-		$is_php = substr($this->_req->post->filename, -4) == '.php';
-		$is_template = substr($this->_req->post->filename, -13) == '.template.php';
-		$is_css = substr($this->_req->post->filename, -4) == '.css';
+		$is_php = substr($this->_req->post->filename, -4) === '.php';
+		$is_template = substr($this->_req->post->filename, -13) === '.template.php';
+		$is_css = substr($this->_req->post->filename, -4) === '.css';
 
 		// Check you up
 		if (checkSession('post', '', false) === '' && validateToken('admin-te-' . md5($selectedTheme . '-' . $this->_req->post->filename), 'post', false) === true)
@@ -1844,7 +1847,7 @@ class ManageThemes_Controller extends Action_Controller
 
 			$temp = dirname($this->_req->query->directory);
 			array_unshift($context['theme_files'], array(
-				'filename' => $temp == '.' || $temp == '' ? '/ (..)' : $temp . ' (..)',
+				'filename' => $temp === '.' || $temp == '' ? '/ (..)' : $temp . ' (..)',
 				'is_writable' => is_writable($theme_dir . '/' . $temp),
 				'is_directory' => true,
 				'is_template' => false,
@@ -1974,7 +1977,7 @@ class ManageThemes_Controller extends Action_Controller
 		$dir = dir($settings['default_theme_dir']);
 		while ($entry = $dir->read())
 		{
-			if (substr($entry, -13) == '.template.php')
+			if (substr($entry, -13) === '.template.php')
 				$templates[] = substr($entry, 0, -13);
 		}
 		$dir->close();
@@ -1992,7 +1995,7 @@ class ManageThemes_Controller extends Action_Controller
 			$dir = dir($theme_dirs['base_theme_dir']);
 			while ($entry = $dir->read())
 			{
-				if (substr($entry, -13) == '.template.php' && !in_array(substr($entry, 0, -13), $templates))
+				if (substr($entry, -13) === '.template.php' && !in_array(substr($entry, 0, -13), $templates))
 					$templates[] = substr($entry, 0, -13);
 			}
 			$dir->close();
@@ -2032,7 +2035,7 @@ class ManageThemes_Controller extends Action_Controller
 		$dir = dir($theme_dirs['theme_dir']);
 		while ($entry = $dir->read())
 		{
-			if (substr($entry, -13) == '.template.php' && isset($context['available_templates'][substr($entry, 0, -13)]))
+			if (substr($entry, -13) === '.template.php' && isset($context['available_templates'][substr($entry, 0, -13)]))
 			{
 				$context['available_templates'][substr($entry, 0, -13)]['already_exists'] = true;
 				$context['available_templates'][substr($entry, 0, -13)]['can_copy'] = is_writable($theme_dirs['theme_dir'] . '/' . $entry);

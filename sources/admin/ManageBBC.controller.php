@@ -27,6 +27,7 @@ class ManageBBC_Controller extends Action_Controller
 	 * and it calls a function based on the sub-action, here only display.
 	 * - requires admin_forum permissions
 	 *
+	 * @event integrate_sa_manage_bbc Used to add more sub actions
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -57,6 +58,7 @@ class ManageBBC_Controller extends Action_Controller
 	 *
 	 * - This method handles displaying and changing which BBC tags are enabled on the forum.
 	 *
+	 * @event integrate_save_bbc_settings called during the save action
 	 * @uses Admin template, edit_bbc_settings sub-template.
 	 */
 	public function action_bbcSettings_display()
@@ -115,6 +117,8 @@ class ManageBBC_Controller extends Action_Controller
 
 	/**
 	 * Return the BBC settings of the forum.
+	 * 
+	 * @event integrate_modify_bbc_settings used to add more options to config vars
 	 */
 	private function _settings()
 	{

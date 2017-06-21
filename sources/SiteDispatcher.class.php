@@ -225,6 +225,9 @@ class Site_Dispatcher
 	/**
 	 * Compares the $_GET['action'] with array or naming patterns to find
 	 * a suitable controller.
+	 *
+	 * @event integrate_actions Allows to extend or change $actionArray, allowed actions,
+	 * through the hook
 	 */
 	protected function determineAction()
 	{
@@ -290,6 +293,18 @@ class Site_Dispatcher
 
 	/**
 	 * Relay control to the respective function or method.
+	 *
+	 * What it does:
+	 *
+	 * - Calls generic pre (_before) hook based on the controllers class name.
+	 *   - e.g. integrate_action_draft_before will be called before Draft_Controller
+	 * - Calls the controllers pre_dispatch method
+	 * - Calls the controllers selected method
+	 * - Calls generic post (_after) hook based on the controllers class name.
+	 *   - e.g. integrate_action_draft_after will be called after Draft_Controller
+	 *
+	 * @event integrate_action_xyz_before
+	 * @event integrate_action_xyz_after
 	 */
 	public function dispatch()
 	{

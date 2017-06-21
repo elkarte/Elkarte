@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Most of the "models" require some common stuff (like a constructor).
- * Here it is.
+ * Implementing this interface will make controllers usable as a front page
+ * replacing the classic board index.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors

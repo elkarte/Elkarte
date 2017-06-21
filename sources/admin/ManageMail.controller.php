@@ -18,6 +18,8 @@
 /**
  * This class is the administration mailing controller.
  *
+ * What it does:
+ * 
  * - It handles mail configuration,
  * - It displays and allows to remove items from the mail queue.
  *
@@ -30,6 +32,7 @@ class ManageMail_Controller extends Action_Controller
 	 *
 	 * - This function checks permissions and passes control through to the relevant section.
 	 *
+	 * @event integrate_sa_manage_mail Used to add more sub actions
 	 * @see Action_Controller::action_index()
 	 * @uses Help and MangeMail language files
 	 */
@@ -210,6 +213,7 @@ class ManageMail_Controller extends Action_Controller
 	/**
 	 * Allows to view and modify the mail settings.
 	 *
+	 * @event integrate_save_mail_settings
 	 * @uses show_settings sub template
 	 */
 	public function action_mailSettings_display()
@@ -295,6 +299,8 @@ class ManageMail_Controller extends Action_Controller
 
 	/**
 	 * Retrieve and return mail administration settings.
+	 * 
+	 * @event integrate_modify_mail_settings Add new settings
 	 */
 	private function _settings()
 	{

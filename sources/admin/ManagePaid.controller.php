@@ -33,6 +33,7 @@ class ManagePaid_Controller extends Action_Controller
 	 * - Accessed from ?action=admin;area=paidsubscribe.
 	 * - It requires admin_forum permission for admin based actions.
 	 *
+	 * @event integrate_sa_manage_subscriptions
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -104,6 +105,8 @@ class ManagePaid_Controller extends Action_Controller
 	 * - i.e. modify which payment methods are to be used.
 	 * - It requires the moderate_forum permission
 	 * - Accessed from ?action=admin;area=paidsubscribe;sa=settings.
+	 * 
+	 * @event integrate_save_subscription_settings
 	 */
 	public function action_paidSettings_display()
 	{
@@ -167,7 +170,7 @@ class ManagePaid_Controller extends Action_Controller
 			if (empty($context['error_type']))
 			{
 				// Sort out the currency stuff.
-				if ($this->_req->post->paid_currency != 'other')
+				if ($this->_req->post->paid_currency !== 'other')
 				{
 					$this->_req->post->paid_currency_code = $this->_req->post->paid_currency;
 					$this->_req->post->paid_currency_symbol = $txt[$this->_req->post->paid_currency . '_symbol'];
@@ -188,6 +191,8 @@ class ManagePaid_Controller extends Action_Controller
 
 	/**
 	 * Retrieve subscriptions settings.
+	 * 
+	 * @event integrate_modify_subscription_settings
 	 */
 	private function _settings()
 	{
@@ -239,8 +244,12 @@ class ManagePaid_Controller extends Action_Controller
 	/**
 	 * View a list of all the current subscriptions
 	 *
+	 * What it does:
+	 * 
 	 * - Requires the admin_forum permission.
 	 * - Accessed from ?action=admin;area=paidsubscribe;sa=view.
+	 * 
+	 * @event integrate_list_subscription_list
 	 */
 	public function action_view()
 	{
@@ -397,6 +406,9 @@ class ManagePaid_Controller extends Action_Controller
 	 * Adding, editing and deleting subscriptions.
 	 *
 	 * - Accessed from ?action=admin;area=paidsubscribe;sa=modify.
+	 * 
+	 * @event integrate_delete_subscription passed ID of deletion
+	 * @event integrate_save_subscription
 	 */
 	public function action_modify()
 	{
@@ -408,7 +420,7 @@ class ManagePaid_Controller extends Action_Controller
 		$context['action_type'] = $context['sub_id'] ? (isset($this->_req->query->delete) ? 'delete' : 'edit') : 'add';
 
 		// Setup the template.
-		$context['sub_template'] = $context['action_type'] == 'delete' ? 'delete_subscription' : 'modify_subscription';
+		$context['sub_template'] = $context['action_type'] === 'delete' ? 'delete_subscription' : 'modify_subscription';
 		$context['page_title'] = $txt['paid_' . $context['action_type'] . '_subscription'];
 
 		// Delete it?
@@ -438,7 +450,7 @@ class ManagePaid_Controller extends Action_Controller
 			$emailComplete = strlen($this->_req->post->emailcomplete) > 10 ? trim($this->_req->post->emailcomplete) : '';
 
 			// Is this a fixed one?
-			if ($this->_req->post->duration_type == 'fixed')
+			if ($this->_req->post->duration_type === 'fixed')
 			{
 				// Clean the span.
 				$span = $this->_req->post->span_value . $this->_req->post->span_unit;
@@ -478,7 +490,7 @@ class ManagePaid_Controller extends Action_Controller
 			$addGroups = implode(',', $addGroups);
 
 			// Is it new?!
-			if ($context['action_type'] == 'add')
+			if ($context['action_type'] === 'add')
 			{
 				$insert = array(
 					'name' => $this->_req->post->name,
@@ -519,13 +531,13 @@ class ManagePaid_Controller extends Action_Controller
 				updateSubscription($update, $ignore_active);
 			}
 
-			call_integration_hook('integrate_save_subscription', array(($context['action_type'] == 'add' ? $sub_id : $context['sub_id']), $this->_req->post->name, $this->_req->post->desc, $isActive, $span, $cost, $this->_req->post->prim_group, $addGroups, $isRepeatable, $allowPartial, $emailComplete, $reminder));
+			call_integration_hook('integrate_save_subscription', array(($context['action_type'] === 'add' ? $sub_id : $context['sub_id']), $this->_req->post->name, $this->_req->post->desc, $isActive, $span, $cost, $this->_req->post->prim_group, $addGroups, $isRepeatable, $allowPartial, $emailComplete, $reminder));
 
 			redirectexit('action=admin;area=paidsubscribe;view');
 		}
 
 		// Defaults.
-		if ($context['action_type'] == 'add')
+		if ($context['action_type'] === 'add')
 		{
 			$context['sub'] = array(
 				'name' => '',
@@ -561,15 +573,19 @@ class ManagePaid_Controller extends Action_Controller
 		$context['groups'] = getBasicMembergroupData(array('permission'));
 
 		// This always happens.
-		createToken($context['action_type'] == 'delete' ? 'admin-pmsd' : 'admin-pms');
+		createToken($context['action_type'] === 'delete' ? 'admin-pmsd' : 'admin-pms');
 	}
 
 	/**
 	 * View all the users subscribed to a particular subscription.
 	 *
+	 * What it does:
+	 * 
 	 * - Requires the admin_forum permission.
 	 * - Accessed from ?action=admin;area=paidsubscribe;sa=viewsub.
 	 * - Subscription ID is required, in the form of $_GET['sid'].
+	 * 
+	 * @event integrate_list_subscribed_users_list
 	 */
 	public function action_viewsub()
 	{
@@ -897,7 +913,7 @@ class ManagePaid_Controller extends Action_Controller
 		}
 
 		// Default attributes.
-		if ($context['action_type'] == 'add')
+		if ($context['action_type'] === 'add')
 		{
 			$context['sub'] = array(
 				'id' => 0,
@@ -948,12 +964,12 @@ class ManagePaid_Controller extends Action_Controller
 				foreach ($pending_details as $id => $pending)
 				{
 					// Only this type need be displayed.
-					if ($pending[3] == 'payback')
+					if ($pending[3] === 'payback')
 					{
 						// Work out what the options were.
 						$costs = Util::unserialize($context['current_subscription']['real_cost']);
 
-						if ($context['current_subscription']['real_length'] == 'F')
+						if ($context['current_subscription']['real_length'] === 'F')
 						{
 							foreach ($costs as $duration => $cost)
 							{
@@ -978,11 +994,11 @@ class ManagePaid_Controller extends Action_Controller
 					foreach ($pending_details as $id => $pending)
 					{
 						// Found the one to action?
-						if ($this->_req->query->pending == $id && $pending[3] == 'payback' && isset($context['pending_payments'][$id]))
+						if ($this->_req->query->pending == $id && $pending[3] === 'payback' && isset($context['pending_payments'][$id]))
 						{
 							// Flexible?
 							if (isset($this->_req->query->accept))
-								addSubscription($context['current_subscription']['id'], $row['id_member'], $context['current_subscription']['real_length'] == 'F' ? strtoupper(substr($pending[2], 0, 1)) : 0);
+								addSubscription($context['current_subscription']['id'], $row['id_member'], $context['current_subscription']['real_length'] === 'F' ? strtoupper(substr($pending[2], 0, 1)) : 0);
 							unset($pending_details[$id]);
 
 							$new_details = serialize($pending_details);

@@ -59,7 +59,6 @@ class ManageDraftsModule_Controller extends Action_Controller
 
 	/**
 	 * Integrate drafts in to the delete member chain
-	 * call_integration_hook('integrate_delete_members' ...)
 	 *
 	 * @param int[] $users
 	 */
@@ -79,7 +78,6 @@ class ManageDraftsModule_Controller extends Action_Controller
 
 	/**
 	 * Integrate draft permission in to the members and board permissions
-	 * call_integration_hook('integrate_load_permissions' ...
 	 *
 	 * @param array $permissionGroups
 	 * @param array $permissionList
@@ -187,6 +185,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 	 * - Requires the admin_forum permission.
 	 * - Accessed from ?action=admin;area=managedrafts
 	 *
+	 * @event integrate_save_drafts_settings
 	 * @uses Admin template, edit_topic_settings sub-template.
 	 */
 	public function action_draftSettings_display()
@@ -251,6 +250,8 @@ class ManageDraftsModule_Controller extends Action_Controller
 
 	/**
 	 * Returns all admin drafts settings in config_vars format.
+	 * 
+	 * @event integrate_modify_drafts_settings
 	 */
 	private function _settings()
 	{
