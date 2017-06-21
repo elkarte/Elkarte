@@ -717,10 +717,10 @@ function updateMembersPostCount($start, $increment)
 
 	$request = $db->query('', '
 		SELECT /*!40001 SQL_NO_CACHE */ m.id_member, COUNT(m.id_member) AS posts
-		FROM ({db_prefix}messages AS m, {db_prefix}boards AS b)
+		FROM {db_prefix}messages AS m
+			INNER JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
 		WHERE m.id_member != {int:zero}
-			AND b.count_posts = {int:zero}
-			AND m.id_board = b.id_board ' . (!empty($modSettings['recycle_enable']) ? '
+			AND b.count_posts = {int:zero}' . (!empty($modSettings['recycle_enable']) ? '
 			AND b.id_board != {int:recycle}' : '') . '
 		GROUP BY m.id_member
 		LIMIT {int:start}, {int:number}',
@@ -758,51 +758,50 @@ function updateZeroPostMembers()
 
 	$db->skip_next_error();
 	$createTemporary = $db->query('', '
-			CREATE TEMPORARY TABLE {db_prefix}tmp_maint_recountposts (
-				id_member mediumint(8) unsigned NOT NULL default {string:string_zero},
-				PRIMARY KEY (id_member)
-			)
-			SELECT m.id_member
-			FROM ({db_prefix}messages AS m,{db_prefix}boards AS b)
-			WHERE m.id_member != {int:zero}
-				AND b.count_posts = {int:zero}
-				AND m.id_board = b.id_board ' . (!empty($modSettings['recycle_enable']) ? '
-				AND b.id_board != {int:recycle}' : '') . '
-			GROUP BY m.id_member',
+		CREATE TEMPORARY TABLE {db_prefix}tmp_maint_recountposts (
+			id_member mediumint(8) unsigned NOT NULL default {string:string_zero},
+			PRIMARY KEY (id_member)
+		)
+		SELECT m.id_member
+		FROM {db_prefix}messages AS m
+			INNER JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
+		WHERE m.id_member != {int:zero}
+			AND b.count_posts = {int:zero}' . (!empty($modSettings['recycle_enable']) ? '
+			AND b.id_board != {int:recycle}' : '') . '
+		GROUP BY m.id_member',
+		array(
+			'zero' => 0,
+			'string_zero' => '0',
+			'recycle' => $modSettings['recycle_board'],
+		)
+	) !== false;
+
+	if ($createTemporary)
+	{
+		// Outer join the members table on the temporary table finding the members that
+		// have a post count but no posts in the message table
+		$members = $db->fetchQueryCallback('
+			SELECT mem.id_member, mem.posts
+			FROM {db_prefix}members AS mem
+				LEFT OUTER JOIN {db_prefix}tmp_maint_recountposts AS res ON (res.id_member = mem.id_member)
+			WHERE res.id_member IS NULL
+				AND mem.posts != {int:zero}',
 			array(
 				'zero' => 0,
-				'string_zero' => '0',
-				'recycle' => $modSettings['recycle_board'],
-			)
-		) !== false;
-
-		if ($createTemporary)
-		{
-			// Outer join the members table on the temporary table finding the members that
-			// have a post count but no posts in the message table
-			$members = $db->fetchQueryCallback('
-				SELECT mem.id_member, mem.posts
-				FROM {db_prefix}members AS mem
-				LEFT OUTER JOIN {db_prefix}tmp_maint_recountposts AS res
-				ON res.id_member = mem.id_member
-				WHERE res.id_member IS null
-					AND mem.posts != {int:zero}',
-				array(
-					'zero' => 0,
-				),
-				function ($row)
-				{
-					// Set the post count to zero for any delinquents we may have found
-					return $row['id_member'];
-				}
-			);
-
-			if (!empty($members))
+			),
+			function ($row)
 			{
-				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData($members, array('posts' => 0));
+				// Set the post count to zero for any delinquents we may have found
+				return $row['id_member'];
 			}
+		);
+
+		if (!empty($members))
+		{
+			require_once(SUBSDIR . '/Members.subs.php');
+			updateMemberData($members, array('posts' => 0));
 		}
+	}
 }
 
 /**

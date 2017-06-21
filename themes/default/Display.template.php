@@ -879,7 +879,7 @@ function template_display_attachments($message, $ignoring)
 		{
 			if ($attachment['thumbnail']['has_thumb'])
 				echo '
-											<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" onclick="', $attachment['thumbnail']['lightbox'], '">
+											<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" ', $attachment['thumbnail']['lightbox'], '>
 												<img class="attachment_image" src="', $attachment['thumbnail']['href'], '" alt="" id="thumb_', $attachment['id'], '" />
 											</a>';
 			else

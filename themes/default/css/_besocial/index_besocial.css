@@ -1702,11 +1702,11 @@ a.help .icon {
 }
 
 .i-chevron-circle-right::before {
-	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='#000' viewBox='0 0 32 32'%3E%3Cpath d='M16 0C7.163 0 0 7.163 0 16s7.163 16 16 16 16-7.163 16-16S24.837 0 16 0zm0 29C8.82 29 3 23.18 3 16S8.82 3 16 3s13 5.82 13 13-5.82 13-13 13z'/%3E%3Cpath d='M11.086 22.086l2.83 2.83L22.828 16l-8.915-8.913-2.828 2.828L17.173 16z'/%3E%3C/svg%3E");
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' viewBox='0 0 32 32'%3E%3Cpath d='M16 0C7.163 0 0 7.163 0 16s7.163 16 16 16 16-7.163 16-16S24.837 0 16 0zm0 29C8.82 29 3 23.18 3 16S8.82 3 16 3s13 5.82 13 13-5.82 13-13 13z'/%3E%3Cpath d='M11.086 22.086l2.83 2.83L22.828 16l-8.915-8.913-2.828 2.828L17.173 16z'/%3E%3C/svg%3E");
 }
 
 .i-chevron-circle-left::before {
-	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='#000' viewBox='0 0 32 32'%3E%3Cpath d='M16 32c8.837 0 16-7.163 16-16S24.837 0 16 0 0 7.163 0 16s7.163 16 16 16zm0-29c7.18 0 13 5.82 13 13s-5.82 13-13 13S3 23.18 3 16 8.82 3 16 3z'/%3E%3Cpath d='M20.914 9.914l-2.83-2.83L9.172 16l8.915 8.913 2.828-2.828L14.827 16z'/%3E%3C/svg%3E");
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='black' viewBox='0 0 32 32'%3E%3Cpath d='M16 32c8.837 0 16-7.163 16-16S24.837 0 16 0 0 7.163 0 16s7.163 16 16 16zm0-29c7.18 0 13 5.82 13 13s-5.82 13-13 13S3 23.18 3 16 8.82 3 16 3z'/%3E%3Cpath d='M20.914 9.914l-2.83-2.83L9.172 16l8.915 8.913 2.828-2.828L14.827 16z'/%3E%3C/svg%3E");
 }
 
 /* Dots, these are simple SVG geometry icons and are not from any font set */
