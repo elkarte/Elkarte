@@ -1,4 +1,4 @@
-integrate_report_types<?php
+<?php
 
 /**
  * The main purpose of this file is to show a list of all badbehavior entries
