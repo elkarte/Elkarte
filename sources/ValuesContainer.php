@@ -17,7 +17,7 @@ namespace ElkArte;
  * Class ValuesContainer
  *
  * - Implements generic ArrayAccess and getter/setter bag for use
- * 
+ *
  * @package ElkArte
  */
 class ValuesContainer implements \ArrayAccess
@@ -37,7 +37,9 @@ class ValuesContainer implements \ArrayAccess
 	public function __construct($data = null)
 	{
 		if ($data !== null)
+		{
 			$this->data = (array) $data;
+		}
 	}
 
 	/**

@@ -147,7 +147,9 @@ class Elk_Autoloader
 	{
 		// Build the paths where we are going to look for files
 		foreach ($dir as $include)
+		{
 			$this->_dir .= $include . PATH_SEPARATOR;
+		}
 
 		// Initialize
 		$this->_setupAutoloader();

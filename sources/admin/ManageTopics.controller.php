@@ -19,6 +19,7 @@ class ManageTopics_Controller extends Action_Controller
 	/**
 	 * Check permissions and forward to the right method.
 	 *
+	 * @event integrate_sa_manage_topics
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -49,9 +50,12 @@ class ManageTopics_Controller extends Action_Controller
 	/**
 	 * Administration page for topics: allows to display and set settings related to topics.
 	 *
-	 * Requires the admin_forum permission.
-	 * Accessed from ?action=admin;area=postsettings;sa=topics.
+	 * What it does:
 	 *
+	 * - Requires the admin_forum permission.
+	 * - Accessed from ?action=admin;area=postsettings;sa=topics.
+	 *
+	 * @event integrate_save_topic_settings
 	 * @uses Admin template, edit_topic_settings sub-template.
 	 */
 	public function action_topicSettings_display()
@@ -94,6 +98,8 @@ class ManageTopics_Controller extends Action_Controller
 
 	/**
 	 * Return configuration settings for topics.
+	 *
+	 * @event integrate_modify_topic_settings
 	 */
 	private function _settings()
 	{

@@ -23,7 +23,8 @@
  * - filename and line should be __FILE__ and __LINE__, respectively.
  *
  * Example use:
- *  die(log_error($msg));
+ *
+ * - die(log_error($msg));
  *
  * @param string $error_message
  * @param string|boolean $error_type = 'general'

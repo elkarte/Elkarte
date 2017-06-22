@@ -26,6 +26,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 	/**
 	 * Entry point for this section.
 	 *
+	 * @event integrate_sa_manage_search_engines add additonal search engine actions
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -65,6 +66,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 	/**
 	 * This is the admin settings page for search engines.
+	 *
+	 * @event integrate_save_search_engine_settings
 	 */
 	public function action_engineSettings_display()
 	{
@@ -137,6 +140,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 	/**
 	 * Return configuration settings for search engines
+	 *
+	 * @event integrate_modify_search_engine_settings
 	 */
 	private function _settings()
 	{
@@ -178,6 +183,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 	/**
 	 * View a list of all the spiders we know about.
+	 *
+	 * @event integrate_list_spider_list
 	 */
 	public function action_spiders()
 	{
@@ -383,6 +390,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 	/**
 	 * See what spiders have been up to.
+	 *
+	 * @event integrate_list_spider_logs
 	 */
 	public function action_logs()
 	{
@@ -504,6 +513,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 	/**
 	 * Show the spider statistics.
+	 *
+	 * @event integrate_list_spider_stat_list
 	 */
 	public function action_stats()
 	{

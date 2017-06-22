@@ -90,6 +90,7 @@ final class Hooks
 	 *
 	 * @param string $hook
 	 * @param mixed[] $parameters = array()
+	 *
 	 * @return mixed[] the results of the functions
 	 */
 	public function hook($hook, $parameters = array())
@@ -274,9 +275,14 @@ final class Hooks
 	/**
 	 * Find all integration files (default is *.integrate.php) in the supplied directory
 	 *
+	 * What it does:
+	 *
+	 * - Searches the ADDONSDIR (and below) (by default) for xxxx.integrate.php files
+	 * - Will use a composer.json (optional) to load basic information about the addon
+	 * - Will set the call name as xxx_Integrate
+	 *
 	 * @param string $basepath
 	 * @param string $ext
-	 *
 	 */
 	public function discoverIntegrations($basepath, $ext = '.integrate.php')
 	{
@@ -413,7 +419,8 @@ final class Hooks
 	protected function _store($hook, $integration_call)
 	{
 		$request = $this->_db->query('', '
-			SELECT value
+			SELECT 
+				value
 			FROM {db_prefix}settings
 			WHERE variable = {string:variable}',
 			array(
@@ -457,7 +464,8 @@ final class Hooks
 
 		// Get the permanent functions.
 		$request = $this->_db->query('', '
-			SELECT value
+			SELECT 
+				value
 			FROM {db_prefix}settings
 			WHERE variable = {string:variable}',
 			array(
@@ -515,6 +523,7 @@ final class Hooks
 	 * @param Database|null $db A database connection
 	 * @param Debug|null $debug A class for debugging
 	 * @param string[]|null $paths An array of paths for replacement
+	 *
 	 * @return Hooks An instance of the class.
 	 */
 	public static function get($db = null, $debug = null, $paths = null)

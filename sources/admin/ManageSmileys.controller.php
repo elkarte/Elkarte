@@ -199,6 +199,8 @@ class ManageSmileys_Controller extends Action_Controller
 
 	/**
 	 * List, add, remove, modify smileys sets.
+	 *
+	 * @event integrate_list_smiley_set_list
 	 */
 	public function action_edit()
 	{
@@ -325,7 +327,7 @@ class ManageSmileys_Controller extends Action_Controller
 					'position' => 'below_table_data',
 					'class' => 'submitbutton',
 					'value' => '
-						<input type="submit" name="delete_set" value="' . $txt['smiley_sets_delete'] . '" onclick="return confirm(\'' . $txt['smiley_sets_confirm'] . '\');" class="right_submit" />
+						<input type="submit" name="delete_set" value="' . $txt['smiley_sets_delete'] . '" onclick="return confirm(\'' . $txt['smiley_sets_confirm'] . '\');" />
 						<a class="linkbutton" href="' . $scripturl . '?action=admin;area=smileys;sa=modifyset">' . $txt['smiley_sets_add'] . '</a> ',
 				),
 			),
@@ -567,7 +569,7 @@ class ManageSmileys_Controller extends Action_Controller
 				throw new Elk_Exception('smiley_not_unique');
 
 			// If we are uploading - check all the smiley sets are writable!
-			if ($this->_req->post->method != 'existing')
+			if ($this->_req->post->method !== 'existing')
 			{
 				$writeErrors = array();
 				foreach ($context['smiley_sets'] as $set)
@@ -633,7 +635,7 @@ class ManageSmileys_Controller extends Action_Controller
 				$this->_req->post->smiley_filename = $destName;
 			}
 			// What about uploading several files?
-			elseif ($this->_req->post->method != 'existing')
+			elseif ($this->_req->post->method !== 'existing')
 			{
 				$newName = '';
 				foreach ($_FILES as $name => $dummy)
@@ -755,6 +757,8 @@ class ManageSmileys_Controller extends Action_Controller
 
 	/**
 	 * Add, remove, edit smileys.
+	 *
+	 * @event integrate_list_smiley_list
 	 */
 	public function action_editsmiley()
 	{
@@ -1120,6 +1124,8 @@ class ManageSmileys_Controller extends Action_Controller
 
 	/**
 	 * Allows to edit the message icons.
+	 *
+	 * @event integrate_list_message_icon_list
 	 */
 	public function action_editicon()
 	{
@@ -1146,7 +1152,7 @@ class ManageSmileys_Controller extends Action_Controller
 				deleteMessageIcons($deleteIcons);
 			}
 			// Editing/Adding an icon?
-			elseif ($context['sub_action'] == 'editicon' && isset($this->_req->query->icon))
+			elseif ($context['sub_action'] === 'editicon' && isset($this->_req->query->icon))
 			{
 				$this->_req->query->icon = (int) $this->_req->query->icon;
 
@@ -1332,7 +1338,7 @@ class ManageSmileys_Controller extends Action_Controller
 		createList($listOptions);
 
 		// If we're adding/editing an icon we'll need a list of boards
-		if ($context['sub_action'] == 'editicon' || isset($this->_req->post->add))
+		if ($context['sub_action'] === 'editicon' || isset($this->_req->post->add))
 		{
 			// Force the sub_template just in case.
 			$context['sub_template'] = 'editicon';
@@ -1366,7 +1372,7 @@ class ManageSmileys_Controller extends Action_Controller
 		{
 			checkSession('get');
 
-			$this->_req->query->location = empty($this->_req->query->location) || $this->_req->query->location != 'popup' ? 0 : 2;
+			$this->_req->query->location = empty($this->_req->query->location) || $this->_req->query->location !== 'popup' ? 0 : 2;
 			$this->_req->query->source = empty($this->_req->query->source) ? 0 : (int) $this->_req->query->source;
 
 			if (empty($this->_req->query->source))
@@ -1399,8 +1405,8 @@ class ManageSmileys_Controller extends Action_Controller
 		foreach (array_keys($context['smileys']) as $location)
 			$context['smileys'][$location] = array(
 				'id' => $location,
-				'title' => $location == 'postform' ? $txt['smileys_location_form'] : $txt['smileys_location_popup'],
-				'description' => $location == 'postform' ? $txt['smileys_location_form_description'] : $txt['smileys_location_popup_description'],
+				'title' => $location === 'postform' ? $txt['smileys_location_form'] : $txt['smileys_location_popup'],
+				'description' => $location === 'postform' ? $txt['smileys_location_form_description'] : $txt['smileys_location_popup_description'],
 				'last_row' => count($context['smileys'][$location]['rows']),
 				'rows' => array_values($context['smileys'][$location]['rows']),
 			);
@@ -1513,7 +1519,7 @@ class ManageSmileys_Controller extends Action_Controller
 		{
 			foreach ($extracted as $file)
 			{
-				if (basename($file['filename']) == 'package-info.xml')
+				if (basename($file['filename']) === 'package-info.xml')
 				{
 					$base_path = dirname($file['filename']) . '/';
 					break;
@@ -1547,7 +1553,7 @@ class ManageSmileys_Controller extends Action_Controller
 
 		foreach ($actions as $action)
 		{
-			if ($action['type'] == 'readme' || $action['type'] == 'license')
+			if ($action['type'] === 'readme' || $action['type'] === 'license')
 			{
 				$type = 'package_' . $action['type'];
 				if (file_exists(BOARDDIR . '/packages/temp/' . $base_path . $action['filename']))
@@ -1566,11 +1572,11 @@ class ManageSmileys_Controller extends Action_Controller
 
 				continue;
 			}
-			elseif ($action['type'] == 'require-dir')
+			elseif ($action['type'] === 'require-dir')
 			{
 				// Do this one...
 				$thisAction = array(
-					'type' => $txt['package_extract'] . ' ' . ($action['type'] == 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
+					'type' => $txt['package_extract'] . ' ' . ($action['type'] === 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
 					'action' => Util::htmlspecialchars(strtr($action['destination'], array(BOARDDIR => '.')))
 				);
 
@@ -1591,7 +1597,7 @@ class ManageSmileys_Controller extends Action_Controller
 
 				$context['actions'][] = $thisAction;
 			}
-			elseif ($action['type'] == 'credits')
+			elseif ($action['type'] === 'credits')
 			{
 				// Time to build the billboard
 				$credits_tag = array(

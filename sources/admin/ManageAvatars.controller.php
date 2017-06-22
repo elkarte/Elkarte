@@ -30,6 +30,7 @@ class ManageAvatars_Controller extends Action_Controller
 	 * - Is called from ManageAttachments.controller.php
 	 * - requires manage_attachments permissions
 	 *
+	 * @event integrate_sa_manage_avatars
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -62,6 +63,7 @@ class ManageAvatars_Controller extends Action_Controller
 	 *
 	 * - Called by index.php?action=admin;area=manageattachments;sa=avatars.
 	 *
+	 * @event integrate_save_avatar_settings
 	 * @uses 'avatars' sub-template.
 	 */
 	public function action_avatarSettings_display()
@@ -102,6 +104,8 @@ class ManageAvatars_Controller extends Action_Controller
 
 	/**
 	 * This method retrieves and returns the settings.
+	 *
+	 * @event integrate_modify_avatar_settings
 	 */
 	private function _settings()
 	{

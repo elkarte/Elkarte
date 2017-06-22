@@ -280,6 +280,7 @@ class Site_Combiner
 
 	/**
 	 * Deletes hives from the cache based on extension.
+	 *
 	 * @param string $ext
 	 */
 	protected function _removeHives($ext)

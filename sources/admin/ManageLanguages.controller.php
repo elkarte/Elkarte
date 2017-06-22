@@ -30,6 +30,7 @@ class ManageLanguages_Controller extends Action_Controller
 	 * - It dispatches the requests.
 	 * - Loads the ManageLanguages template. (sub-actions will use it)
 	 *
+	 * @event integrate_sa_manage_languages Used to add more sub actions
 	 * @uses ManageSettings language file
 	 * @see Action_Controller::action_index()
 	 */
@@ -1012,6 +1013,8 @@ class ManageLanguages_Controller extends Action_Controller
 	 * - Accessed by ?action=admin;area=languages;sa=settings
 	 * - This method handles the display, allows to edit, and saves the result
 	 * for the _languageSettings form.
+	 *
+	 * @event integrate_save_language_settings
 	 */
 	public function action_languageSettings_display()
 	{
@@ -1061,6 +1064,8 @@ class ManageLanguages_Controller extends Action_Controller
 
 	/**
 	 * Load up all of the language settings
+	 *
+	 * @event integrate_modify_language_settings Use to add new config options
 	 */
 	private function _settings()
 	{

@@ -47,8 +47,11 @@ abstract class AbstractModel
 	/**
 	 * Method to return a $modSetting value
 	 *
+	 * What it does:
+	 *
 	 * - Returned value will be the value or null of the key is not set
-	 * - If you simply want a value back access it directly as $this->_modSettings->name or $this->_modSettings[name]
+	 * - If you simply want a value back access it directly as $this->_modSettings->name
+	 * or $this->_modSettings[name]
 	 *
 	 * @param string $name The key name of the value to return
 	 * @param mixed|null $default default value to return if key value is not found

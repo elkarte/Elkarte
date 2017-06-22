@@ -49,14 +49,14 @@ class Modlog_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Modlog.subs.php');
 
 		// Are we looking at the moderation log or the administration log.
-		$context['log_type'] = isset($this->_req->query->sa) && $this->_req->query->sa == 'adminlog' ? 3 : 1;
+		$context['log_type'] = isset($this->_req->query->sa) && $this->_req->query->sa === 'adminlog' ? 3 : 1;
 
 		// Trying to view the admin log, lets check you can.
 		if ($context['log_type'] == 3)
 			isAllowedTo('admin_forum');
 
 		// These change dependant on whether we are viewing the moderation or admin log.
-		if ($context['log_type'] == 3 || $this->_req->query->action == 'admin')
+		if ($context['log_type'] == 3 || $this->_req->query->action === 'admin')
 			$context['url_start'] = '?action=admin;area=logs;sa=' . ($context['log_type'] == 3 ? 'adminlog' : 'modlog') . ';type=' . $context['log_type'];
 		else
 			$context['url_start'] = '?action=moderate;area=modlog;type=' . $context['log_type'];
@@ -130,7 +130,7 @@ class Modlog_Controller extends Action_Controller
 		);
 
 		// If they are searching by action, then we must do some manual intervention to search in their language!
-		if ($search_params['type'] == 'action' && !empty($search_params['string']))
+		if ($search_params['type'] === 'action' && !empty($search_params['string']))
 		{
 			// Build a regex which looks for the words
 			$regex = '';

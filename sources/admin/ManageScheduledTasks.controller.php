@@ -30,6 +30,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	 * based on the sub-action.
 	 * - Everything here requires admin_forum permission.
 	 *
+	 * @event integrate_sa_manage_scheduled_tasks
 	 * @uses ManageScheduledTasks template file
 	 * @uses ManageScheduledTasks language file
 	 *
@@ -80,6 +81,8 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	/**
 	 * List all the scheduled task in place on the forum.
 	 *
+	 * @event integrate_autotask_include (depreciated since 1.1)
+	 * @event integrate_list_scheduled_tasks
 	 * @uses ManageScheduledTasks template, view_scheduled_tasks sub-template
 	 */
 	public function action_tasks()
@@ -296,7 +299,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			$unit = in_array(substr($this->_req->post->unit, 0, 1), array('m', 'h', 'd', 'w')) ? substr($this->_req->post->unit, 0, 1) : 'd';
 
 			// Don't allow one minute intervals.
-			if ($interval == 1 && $unit == 'm')
+			if ($interval == 1 && $unit === 'm')
 				$interval = 2;
 
 			// Is it disabled?
@@ -349,7 +352,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			'items_per_page' => 30,
 			'title' => $txt['scheduled_log'],
 			'no_items_label' => $txt['scheduled_log_empty'],
-			'base_href' => $context['admin_area'] == 'scheduledtasks' ? $scripturl . '?action=admin;area=scheduledtasks;sa=tasklog' : $scripturl . '?action=admin;area=logs;sa=tasklog',
+			'base_href' => $context['admin_area'] === 'scheduledtasks' ? $scripturl . '?action=admin;area=scheduledtasks;sa=tasklog' : $scripturl . '?action=admin;area=logs;sa=tasklog',
 			'default_sort_col' => 'date',
 			'get_items' => array(
 				'function' => array($this, 'list_getTaskLogEntries'),
@@ -411,7 +414,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $context['admin_area'] == 'scheduledtasks' ? $scripturl . '?action=admin;area=scheduledtasks;sa=tasklog' : $scripturl . '?action=admin;area=logs;sa=tasklog',
+				'href' => $context['admin_area'] === 'scheduledtasks' ? $scripturl . '?action=admin;area=scheduledtasks;sa=tasklog' : $scripturl . '?action=admin;area=logs;sa=tasklog',
 				'token' => 'admin-tl',
 			),
 			'additional_rows' => array(

@@ -27,6 +27,7 @@ class AdminLog_Controller extends Action_Controller
 	 * This method decides which log to load.
 	 * Accessed by ?action=admin;area=logs
 	 *
+	 * @event integrate_sa_manage_logs used to add additional log viewing functions, passed subActions array
 	 * @uses _initPruningSettingsForm
 	 */
 	public function action_index()
@@ -104,7 +105,7 @@ class AdminLog_Controller extends Action_Controller
 		// Set up the action control
 		$action = new Action('manage_logs');
 
-		// By default do the basic settings, call integrate_sa_modify_features
+		// By default do the basic settings, call integrate_sa_manage_logs
 		$subAction = $action->initialize($subActions, 'errorlog');
 
 		// Call the right function for this sub-action.
@@ -114,7 +115,10 @@ class AdminLog_Controller extends Action_Controller
 	/**
 	 * Allow to edit the settings on the pruning screen.
 	 *
-	 * Uses the _pruningSettings form.
+ 	 * @event integrate_prune_settings add additonal settings to the auto pruning display.  If you add any
+	 * additional logs make sure to add them at the end.  Additionally, make sure you add them to the
+	 * weekly scheduled task.
+	 * @uses _pruningSettings form.
 	 */
 	public function action_pruningSettings_display()
 	{

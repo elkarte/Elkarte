@@ -47,6 +47,7 @@ function cleanRequest()
  * Validates a IPv6 address. returns true if it is ipv6.
  *
  * @param string $ip ip address to be validated
+ *
  * @return boolean true|false
  */
 function isValidIPv6($ip)
@@ -58,6 +59,7 @@ function isValidIPv6($ip)
  * Converts IPv6s to numbers.  This makes ban checks much easier.
  *
  * @param string $ip ip address to be converted
+ *
  * @return int[] array
  */
 function convertIPv6toInts($ip)
@@ -86,6 +88,7 @@ function convertIPv6toInts($ip)
  *
  * @param string $addr ipv6 address string
  * @param boolean $strict_check checks length to expanded address for compliance
+ *
  * @return boolean|string expanded ipv6 address.
  */
 function expandIPv6($addr, $strict_check = true)
@@ -159,6 +162,7 @@ function expandIPv6($addr, $strict_check = true)
  *
  * @param array|string $var The string or array of strings to add entities
  * @param int $level = 0 The current level we're at within the array (if called recursively)
+ *
  * @return array|string The string or array of strings with entities added
  */
 function htmlspecialchars__recursive($var, $level = 0)
@@ -186,6 +190,7 @@ function htmlspecialchars__recursive($var, $level = 0)
  *
  * @param array|string $var The string or array of strings to trim
  * @param int $level = 0 How deep we're at within the array (if called recursively)
+ *
  * @return mixed[]|string The trimmed string or array of trimmed strings
  */
 function htmltrim__recursive($var, $level = 0)
@@ -210,6 +215,7 @@ function htmltrim__recursive($var, $level = 0)
  * parsed properly.
  *
  * @param string $string The string to clean
+ *
  * @return string The clean string
  */
 function cleanXml($string)
@@ -222,6 +228,7 @@ function cleanXml($string)
  * Escapes (replaces) characters in strings to make them safe for use in javascript
  *
  * @param string $string The string to escape
+ *
  * @return string The escaped string
  */
 function JavaScriptEscape($string)
@@ -254,6 +261,7 @@ function JavaScriptEscape($string)
  *   string, ''. (it would not work well like that anyway.)
  *
  * @param string $buffer The unmodified output buffer
+ *
  * @return string The modified output buffer
  */
 function ob_sessrewrite($buffer)

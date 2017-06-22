@@ -37,6 +37,7 @@ class ManageRegistration_Controller extends Action_Controller
 	 * - Accessed by ?action=admin;area=regcenter.
 	 * - Requires either the moderate_forum or the admin_forum permission.
 	 *
+	 * @event integrate_sa_manage_registrations add new registration sub actions
 	 * @uses Login language file
 	 * @uses Register template.
 	 * @see Action_Controller::action_index()
@@ -262,7 +263,7 @@ class ManageRegistration_Controller extends Action_Controller
 				$context['editable_agreements']['.' . $lang['filename']] = $lang['name'];
 
 				// Are we editing this?
-				if (isset($this->_req->post->agree_lang) && $this->_req->post->agree_lang == '.' . $lang['filename'])
+				if (isset($this->_req->post->agree_lang) && $this->_req->post->agree_lang === '.' . $lang['filename'])
 					$context['current_agreement'] = '.' . $lang['filename'];
 			}
 		}
@@ -339,6 +340,8 @@ class ManageRegistration_Controller extends Action_Controller
 	 * - General registration settings and Coppa compliance settings.
 	 * - Accessed by ?action=admin;area=regcenter;sa=settings.
 	 * - Requires the admin_forum permission.
+	 *
+	 * @event integrate_save_registration_settings
 	 */
 	public function action_registerSettings_display()
 	{
@@ -398,6 +401,8 @@ class ManageRegistration_Controller extends Action_Controller
 
 	/**
 	 * Return configuration settings for new members registration.
+	 *
+	 * @event integrate_modify_registration_settings
 	 */
 	private function _settings()
 	{

@@ -35,6 +35,7 @@ class ManageServer_Controller extends Action_Controller
 	 * - Requires the admin_forum permission.
 	 * - Redirects to the appropriate function based on the sub-action.
 	 *
+	 * @event integrate_sa_server_settings
 	 * @uses edit_settings adminIndex.
 	 * @see Action_Controller::action_index()
 	 */
@@ -114,6 +115,8 @@ class ManageServer_Controller extends Action_Controller
 	 * - Uses the edit_settings administration area.
 	 * - Contains the actual array of settings to show from Settings.php.
 	 * - Accessed from ?action=admin;area=serversettings;sa=general.
+	 *
+	 * @event integrate_save_general_settings
 	 */
 	public function action_generalSettings_display()
 	{
@@ -156,6 +159,8 @@ class ManageServer_Controller extends Action_Controller
 	 * - Requires the admin_forum permission.
 	 * - Uses the edit_settings administration area.
 	 * - Accessed from ?action=admin;area=serversettings;sa=database.
+	 *
+	 * @event integrate_save_database_settings
 	 */
 	public function action_databaseSettings_display()
 	{
@@ -191,6 +196,8 @@ class ManageServer_Controller extends Action_Controller
 	 *
 	 * This method handles the display, allows to edit, and saves the result
 	 * for the _cookieSettings form.
+	 *
+	 * @event integrate_save_cookie_settings
 	 */
 	public function action_cookieSettings_display()
 	{
@@ -258,6 +265,8 @@ class ManageServer_Controller extends Action_Controller
 	 *
 	 * This method handles the display, allows to edit, and saves the result
 	 * for _cacheSettings form.
+	 *
+	 * @event integrate_save_cache_settings
 	 */
 	public function action_cacheSettings_display()
 	{
@@ -312,6 +321,9 @@ class ManageServer_Controller extends Action_Controller
 	 *
 	 * This method handles the display, allows to edit, and saves the result
 	 * for the _loadavgSettings form.
+	 *
+	 * @event integrate_loadavg_settings
+	 * @event integrate_save_loadavg_settings
 	 */
 	public function action_loadavgSettings_display()
 	{
@@ -336,9 +348,9 @@ class ManageServer_Controller extends Action_Controller
 			{
 				if (strpos($key, 'loadavg') === 0 || $key === 'loadavg_enable')
 					continue;
-				elseif ($key == 'loadavg_auto_opt' && $value <= 1)
+				elseif ($key === 'loadavg_auto_opt' && $value <= 1)
 					$this->_req->post->loadavg_auto_opt = '1.0';
-				elseif ($key == 'loadavg_forum' && $value < 10)
+				elseif ($key === 'loadavg_forum' && $value < 10)
 					$this->_req->post->loadavg_forum = '10.0';
 				elseif ($value < 2)
 					$this->_req->{$key} = '2.0';
@@ -412,6 +424,8 @@ class ManageServer_Controller extends Action_Controller
 
 	/**
 	 * This function returns all general settings.
+	 *
+	 * @event integrate_modify_general_settings
 	 */
 	private function _generalSettings()
 	{
@@ -447,6 +461,8 @@ class ManageServer_Controller extends Action_Controller
 
 	/**
 	 * This function returns database settings.
+	 *
+	 * @event integrate_modify_database_settings
 	 */
 	private function _databaseSettings()
 	{
@@ -489,6 +505,8 @@ class ManageServer_Controller extends Action_Controller
 
 	/**
 	 * This little function returns all cookie settings.
+	 *
+	 * @event integrate_modify_cookie_settings
 	 */
 	private function _cookieSettings()
 	{
@@ -502,7 +520,7 @@ class ManageServer_Controller extends Action_Controller
 				array('localCookies', $txt['localCookies'], 'subtext' => $txt['localCookies_note'], 'db', 'check', false, 'localCookies'),
 				array('globalCookies', $txt['globalCookies'], 'subtext' => $txt['globalCookies_note'], 'db', 'check', false, 'globalCookies'),
 				array('globalCookiesDomain', $txt['globalCookiesDomain'], 'subtext' => $txt['globalCookiesDomain_note'], 'db', 'text', false, 'globalCookiesDomain'),
-				array('secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies', 'disabled' => !isset($this->_req->server->HTTPS) || !(strtolower($this->_req->server->HTTPS) == 'on' || strtolower($this->_req->server->HTTPS) == '1')),
+				array('secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies', 'disabled' => !isset($this->_req->server->HTTPS) || !(strtolower($this->_req->server->HTTPS) === 'on' || strtolower($this->_req->server->HTTPS) == '1')),
 				array('httponlyCookies', $txt['httponlyCookies'], 'subtext' => $txt['httponlyCookies_note'], 'db', 'check', false, 'httponlyCookies'),
 			'',
 				// Sessions
@@ -528,6 +546,8 @@ class ManageServer_Controller extends Action_Controller
 
 	/**
 	 * This little function returns all cache settings.
+	 *
+	 * @event integrate_modify_cache_settings
 	 */
 	private function _cacheSettings()
 	{
@@ -585,6 +605,8 @@ class ManageServer_Controller extends Action_Controller
 
 	/**
 	 * This little function returns load management settings.
+	 *
+	 * @event integrate_modify_loadavg_settings
 	 */
 	private function _loadavgSettings()
 	{

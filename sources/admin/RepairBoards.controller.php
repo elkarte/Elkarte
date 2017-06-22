@@ -36,8 +36,9 @@ class RepairBoards_Controller extends Action_Controller
 
 	/**
 	 * Finds or repairs errors in the database to fix possible problems.
-	 * Requires the admin_forum permission.
-	 * Accessed by ?action=admin;area=repairboards.
+	 *
+	 * - Requires the admin_forum permission.
+	 * - Accessed by ?action=admin;area=repairboards.
 	 *
 	 * @uses raw_data sub-template.
 	 */

@@ -277,6 +277,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 	/**
 	 * Show and allow to modify calendar settings.
 	 *
+	 * @event integrate_save_calendar_settings
 	 * - The method uses a Settings_Form to do the work.
 	 */
 	public function action_calendarSettings_display()
@@ -324,6 +325,8 @@ class ManageCalendarModule_Controller extends Action_Controller
 
 	/**
 	 * Retrieve and return all admin settings for the calendar.
+	 *
+	 * @event integrate_modify_calendar_settings Used to add new calendar settings
 	 */
 	private function _settings()
 	{

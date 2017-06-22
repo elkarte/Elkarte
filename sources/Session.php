@@ -43,7 +43,6 @@ function loadSession()
 	}
 
 	// @todo Set the session cookie path?
-
 	// If it's already been started... probably best to skip this.
 	if ((ini_get('session.auto_start') == 1 && !empty($modSettings['databaseSession_enable'])) || session_id() == '')
 	{

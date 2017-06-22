@@ -45,6 +45,7 @@ class PackageServers_Controller extends Action_Controller
 	 *
 	 * - Accessed by action=admin;area=packageservers
 	 *
+	 * @event integrate_sa_package_servers
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -483,11 +484,11 @@ class PackageServers_Controller extends Action_Controller
 		if (!is_array($context['package']))
 			throw new Elk_Exception('package_cant_download', false);
 
-		if ($context['package']['type'] == 'modification')
+		if ($context['package']['type'] === 'modification')
 			$context['package']['install']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">[ ' . $txt['install_mod'] . ' ]</a>';
-		elseif ($context['package']['type'] == 'avatar')
+		elseif ($context['package']['type'] === 'avatar')
 			$context['package']['install']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">[ ' . $txt['use_avatars'] . ' ]</a>';
-		elseif ($context['package']['type'] == 'language')
+		elseif ($context['package']['type'] === 'language')
 			$context['package']['install']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">[ ' . $txt['add_languages'] . ' ]</a>';
 		else
 			$context['package']['install']['link'] = '';
@@ -557,7 +558,7 @@ class PackageServers_Controller extends Action_Controller
 		// Make sure it has a sane filename.
 		$_FILES['package']['name'] = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('_', '.', ''), $_FILES['package']['name']);
 
-		if (strtolower(substr($_FILES['package']['name'], -4)) != '.zip' && strtolower(substr($_FILES['package']['name'], -4)) != '.tgz' && strtolower(substr($_FILES['package']['name'], -7)) != '.tar.gz')
+		if (strtolower(substr($_FILES['package']['name'], -4)) !== '.zip' && strtolower(substr($_FILES['package']['name'], -4)) !== '.tgz' && strtolower(substr($_FILES['package']['name'], -7)) !== '.tar.gz')
 			throw new Elk_Exception('package_upload_error_supports', false, array('zip, tgz, tar.gz'));
 
 		// We only need the filename...
@@ -622,11 +623,11 @@ class PackageServers_Controller extends Action_Controller
 			}
 		}
 
-		if ($context['package']['type'] == 'modification')
+		if ($context['package']['type'] === 'modification')
 			$context['package']['install']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">[ ' . $txt['install_mod'] . ' ]</a>';
-		elseif ($context['package']['type'] == 'avatar')
+		elseif ($context['package']['type'] === 'avatar')
 			$context['package']['install']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">[ ' . $txt['use_avatars'] . ' ]</a>';
-		elseif ($context['package']['type'] == 'language')
+		elseif ($context['package']['type'] === 'language')
 			$context['package']['install']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">[ ' . $txt['add_languages'] . ' ]</a>';
 		else
 			$context['package']['install']['link'] = '';
@@ -652,7 +653,7 @@ class PackageServers_Controller extends Action_Controller
 		checkSession();
 
 		// If they put a slash on the end, get rid of it.
-		if (substr($this->_req->post->serverurl, -1) == '/')
+		if (substr($this->_req->post->serverurl, -1) === '/')
 			$this->_req->post->serverurl = substr($this->_req->post->serverurl, 0, -1);
 
 		// Are they both nice and clean?

@@ -33,6 +33,7 @@ class ManagePosts_Controller extends Action_Controller
 	 * - Accessed from ?action=admin;area=postsettings.
 	 * - Requires (and checks for) the admin_forum permission.
 	 *
+	 * @event integrate_sa_manage_posts used to add new subactions
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -97,6 +98,8 @@ class ManagePosts_Controller extends Action_Controller
 	 * - Requires the admin_forum permission.
 	 * - Accessed from ?action=admin;area=postsettings;sa=censor.
 	 *
+	 * @event integrate_save_censors
+	 * @event integrate_censors
 	 * @uses the Admin template and the edit_censored sub template.
 	 */
 	public function action_censor()
@@ -225,6 +228,7 @@ class ManagePosts_Controller extends Action_Controller
 	 * - Requires the admin_forum permission.
 	 * - Accessed from ?action=admin;area=postsettings;sa=posts.
 	 *
+	 * @event integrate_save_post_settings
 	 * @uses Admin template, edit_post_settings sub-template.
 	 */
 	public function action_postSettings_display()
@@ -289,6 +293,8 @@ class ManagePosts_Controller extends Action_Controller
 
 	/**
 	 * Return admin configuration settings for posts.
+	 *
+	 * @event integrate_modify_post_settings
 	 */
 	private function _settings()
 	{

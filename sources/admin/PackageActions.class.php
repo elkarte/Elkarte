@@ -654,17 +654,17 @@ class Package_Actions extends Action_Controller
 				$this->_action['unparsed_destination'] = $this->_action['unparsed_filename'];
 
 			// If it's not auto do we think we have something we can act upon?
-			if ($theme_action != 'auto' && !in_array($matches[1], array('languagedir', 'languages_dir', 'imagesdir', 'themedir')))
+			if ($theme_action !== 'auto' && !in_array($matches[1], array('languagedir', 'languages_dir', 'imagesdir', 'themedir')))
 				$theme_action = '';
 			// ... or if it's auto do we even want to do anything?
-			elseif ($theme_action == 'auto' && $matches[1] != 'imagesdir')
+			elseif ($theme_action === 'auto' && $matches[1] !== 'imagesdir')
 				$theme_action = '';
 
 			// So, we still want to do something?
 			if ($theme_action != '')
 				$this->themeFinds['candidates'][] = $this->_action;
 			// Otherwise is this is going into another theme record it.
-			elseif ($matches[1] == 'themes_dir')
+			elseif ($matches[1] === 'themes_dir')
 				$this->themeFinds['other_themes'][] = strtolower(strtr(parse_path($destination), array('\\' => '/')) . '/' . basename($this->_action['filename']));
 		}
 	}
@@ -782,7 +782,7 @@ class Package_Actions extends Action_Controller
 	 */
 	public function action_code2()
 	{
-		if ($this->_action['type'] == 'code' && !empty($this->_action['filename']))
+		if ($this->_action['type'] === 'code' && !empty($this->_action['filename']))
 		{
 			// This is just here as reference for what is available.
 			global $context;
@@ -798,7 +798,7 @@ class Package_Actions extends Action_Controller
 	 */
 	public function action_credits2()
 	{
-		if ($this->_action['type'] == 'credits')
+		if ($this->_action['type'] === 'credits')
 		{
 			// Time to build the billboard
 			$this->credits_tag = array(

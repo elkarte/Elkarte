@@ -41,7 +41,9 @@ class AdminDebug_Controller extends Action_Controller
 
 	/**
 	 * Show the database queries for debugging
+	 *
 	 * What this does:
+	 *
 	 * - Toggles the session variable 'view_queries'.
 	 * - Views a list of queries and analyzes them.
 	 * - Requires the admin_forum permission.
