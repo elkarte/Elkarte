@@ -619,7 +619,6 @@ em, .em {
 }
 
 .generic_list_wrapper .additional_row > a.linkbutton {
-	font-size: 1em;
 	margin: 5px 0 0;
 }
 
@@ -2157,6 +2156,10 @@ a.bbc_link {
 
 .category_boards, .board_row, .childboard_row {
 	margin: 1px 0 0 0;
+}
+
+.category_header .chevricon {
+	padding-top: .25em;
 }
 
 .board_row,

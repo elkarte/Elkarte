@@ -589,6 +589,10 @@ div.bbc_footnotes .meaction {
 	top: -1px;
 }
 
+#main_menu .listlevel1 {
+	padding: .25em 0 0;
+}
+
 .poster .listlevel1 a.linklevel1 {
 	font-size: 1.1em;
 }
@@ -854,6 +858,14 @@ a.active {
 	right: 6px;
 	content: "\25BA";
 	font-size: 1em;
+}
+
+#menu_nav .listlevel1.subsections>a:before {
+	margin: 1px 3px 0 0;
+	float: left;
+	font-size: .75em;
+	content: "\25BC";
+	color: #43a8da;
 }
 
 /* -------------------------------------------------------
@@ -1318,11 +1330,6 @@ a.active {
 }
 
 /* More little boxes on a hillside. */
-.warningbox, .successbox, .infobox, .errorbox {
-	padding: 6px 12px;
-	border-left-width: 5px;
-}
-
 .warningbox {
 	border: 1px solid #FFD324;
 	background: #FFF6CA;
@@ -1341,6 +1348,11 @@ a.active {
 .errorbox {
 	border: 1px solid #CE9E9E;
 	background: #F5DFDF;
+}
+
+.warningbox, .successbox, .infobox, .errorbox {
+	padding: 6px 12px;
+	border-left-width: 5px;
 }
 
 /* -------------------------------------------------------
@@ -1862,7 +1874,7 @@ a.help .icon {
 }
 
 .i-home::before, .i-forum::before {
-	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%2343a8da' viewBox='0 0 32 32'%3E%3Cpath d='M32 18.45L16 6.03 0 18.45v-5.063L16 .967l16 12.42zM28 18v12h-8v-8h-8v8H4V18l12-9z'/%3E%3C/svg%3E");
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23008299' viewBox='0 0 32 32'%3E%3Cpath d='M32 18.45L16 6.03 0 18.45v-5.063L16 .967l16 12.42zM28 18v12h-8v-8h-8v8H4V18l12-9z'/%3E%3C/svg%3E");
 }
 
 .i-delete::before {

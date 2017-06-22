@@ -30,6 +30,10 @@
 	box-shadow: none;
 }
 
+#manage_maintenance div.content {
+	border: none;
+}
+
 .admin_menu .subsections:hover .linklevel1:after {
 	display: none;
 }
