@@ -150,7 +150,7 @@ class ManageMembers_Controller extends Action_Controller
 		call_integration_hook('integrate_manage_members', array(&$subActions));
 
 		// Sort out the tabs for the ones which may not exist!
-		if (!$context['show_activate'] && ($subAction !== 'browse' || $this->_req->query->type!== 'activate'))
+		if (!$context['show_activate'] && ($subAction !== 'browse' || $this->_req->query->type !== 'activate'))
 		{
 			$context['tabs']['approve']['is_last'] = true;
 			unset($context['tabs']['activate']);
@@ -182,7 +182,6 @@ class ManageMembers_Controller extends Action_Controller
 	 *
 	 * @event integrate_list_member_list
 	 * @event integrate_view_members_params passed $params
-
 	 * @uses the view_members sub template of the ManageMembers template.
 	 */
 	public function action_list()
