@@ -888,7 +888,7 @@ class ManagePermissions_Controller extends Action_Controller
 
 	/**
 	 * A screen to set some general settings for permissions.
-	 * 
+	 *
 	 * @event integrate_save_permission_settings
 	 */
 	public function action_permSettings_display()
@@ -935,7 +935,7 @@ class ManagePermissions_Controller extends Action_Controller
 
 	/**
 	 * Simple function to return settings in config_vars format.
-	 * 
+	 *
 	 * @event integrate_modify_permission_settings
 	 */
 	private function _settings()
@@ -1042,7 +1042,7 @@ class ManagePermissions_Controller extends Action_Controller
 
 	/**
 	 * Present a nice way of applying post moderation.
-	 * 
+	 *
 	 * @event integrate_post_moderation_mapping passed $mappings to add other post moderation values
 	 */
 	public function action_postmod()

@@ -983,9 +983,7 @@ class Admin_Controller extends Action_Controller
 		{
 			redirectexit($_SERVER['HTTP_REFERER']);
 		}
-		else
-		{
-			redirectexit();
-		}
+
+		redirectexit();
 	}
 }

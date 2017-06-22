@@ -19,7 +19,7 @@
  * This class is the administration mailing controller.
  *
  * What it does:
- * 
+ *
  * - It handles mail configuration,
  * - It displays and allows to remove items from the mail queue.
  *
@@ -299,7 +299,7 @@ class ManageMail_Controller extends Action_Controller
 
 	/**
 	 * Retrieve and return mail administration settings.
-	 * 
+	 *
 	 * @event integrate_modify_mail_settings Add new settings
 	 */
 	private function _settings()

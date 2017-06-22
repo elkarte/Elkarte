@@ -250,7 +250,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 
 	/**
 	 * Returns all admin drafts settings in config_vars format.
-	 * 
+	 *
 	 * @event integrate_modify_drafts_settings
 	 */
 	private function _settings()

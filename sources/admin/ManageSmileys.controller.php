@@ -199,7 +199,7 @@ class ManageSmileys_Controller extends Action_Controller
 
 	/**
 	 * List, add, remove, modify smileys sets.
-	 * 
+	 *
 	 * @event integrate_list_smiley_set_list
 	 */
 	public function action_edit()
@@ -757,7 +757,7 @@ class ManageSmileys_Controller extends Action_Controller
 
 	/**
 	 * Add, remove, edit smileys.
-	 * 
+	 *
 	 * @event integrate_list_smiley_list
 	 */
 	public function action_editsmiley()
@@ -1124,7 +1124,7 @@ class ManageSmileys_Controller extends Action_Controller
 
 	/**
 	 * Allows to edit the message icons.
-	 * 
+	 *
 	 * @event integrate_list_message_icon_list
 	 */
 	public function action_editicon()

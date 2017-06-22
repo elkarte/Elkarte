@@ -438,7 +438,7 @@ class ManageBoards_Controller extends Action_Controller
 	 * - also used to show the confirm deletion of category screen (sub-template confirm_board_delete).
 	 * - requires manage_boards permission.
 	 *
-	 * @event integrate_edit_board 
+	 * @event integrate_edit_board
 	 * @uses the modify_board sub-template of the ManageBoards template.
 	 * @uses ManagePermissions language
 	 */
@@ -615,7 +615,7 @@ class ManageBoards_Controller extends Action_Controller
 	 * - Called by ?action=admin;area=manageboards;sa=board2
 	 * - Redirects to ?action=admin;area=manageboards.
 	 * - It requires manage_boards permission.
-	 * 
+	 *
 	 * @event integrate_save_board
 	 */
 	public function action_board2()
@@ -800,7 +800,7 @@ class ManageBoards_Controller extends Action_Controller
 
 	/**
 	 * Retrieve and return all admin settings for boards management.
-	 * 
+	 *
 	 * @event integrate_modify_board_settings add config settings to boards management
 	 */
 	private function _settings()

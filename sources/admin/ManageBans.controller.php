@@ -304,7 +304,7 @@ class ManageBans_Controller extends Action_Controller
 	 *  - is accessed by ?action=admin;area=ban;sa=edit;bg=x
 	 *  - uses the ban_edit sub template of the ManageBans template.
 	 *  - shows a list of ban triggers for the specified ban.
-	 * 
+	 *
 	 * @event integrate_list_ban_items
 	 */
 	public function action_edit()

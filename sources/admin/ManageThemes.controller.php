@@ -21,7 +21,7 @@
  * Creating and distributing theme packages:
  * There isn't that much required to package and distribute your own themes...
  * just do the following:
- * 
+ *
  *  - create a theme_info.xml file, with the root element theme-info.
  *  - its name should go in a name element, just like description.
  *  - your name should go in author. (email in the email attribute.)
@@ -626,7 +626,7 @@ class ManageThemes_Controller extends Action_Controller
 	 * - Calls action_admin() if no theme is specified. (the theme center.)
 	 * - Requires admin_forum permission.
 	 * - Accessed with ?action=admin;area=theme;sa=list&th=xx.
-	 * 
+	 *
 	 * @event integrate_init_theme
 	 */
 	public function action_setthemesettings()

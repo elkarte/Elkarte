@@ -104,7 +104,7 @@ class ManageAvatars_Controller extends Action_Controller
 
 	/**
 	 * This method retrieves and returns the settings.
-	 * 
+	 *
 	 * @event integrate_modify_avatar_settings
 	 */
 	private function _settings()

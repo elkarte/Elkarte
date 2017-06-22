@@ -824,7 +824,7 @@ class ManageMembergroups_Controller extends Action_Controller
 
 	/**
 	 * Return the configuration settings for membergroups management.
-	 * 
+	 *
 	 * @event integrate_modify_membergroup_settings
 	 */
 	private function _settings()

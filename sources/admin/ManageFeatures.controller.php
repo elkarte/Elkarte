@@ -148,7 +148,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 * Config array for changing the basic forum settings
 	 *
 	 * - Accessed from ?action=admin;area=featuresettings;sa=basic;
-	 * 
+	 *
 	 * @event integrate_save_basic_settings
 	 */
 	public function action_basicSettings_display()
@@ -206,7 +206,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 * Allows modifying the global layout settings in the forum
 	 *
 	 * - Accessed through ?action=admin;area=featuresettings;sa=layout;
-	 * 
+	 *
 	 * @event integrate_save_layout_settings
 	 */
 	public function action_layoutSettings_display()
@@ -255,7 +255,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 * Display configuration settings page for karma settings.
 	 *
 	 * - Accessed from ?action=admin;area=featuresettings;sa=karma;
-	 * 
+	 *
 	 * @event integrate_save_karma_settings
 	 */
 	public function action_karmaSettings_display()
@@ -290,7 +290,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 * Display configuration settings page for likes settings.
 	 *
 	 * - Accessed from ?action=admin;area=featuresettings;sa=likes;
-	 * 
+	 *
 	 * @event integrate_save_likes_settings
 	 */
 	public function action_likesSettings_display()
@@ -325,7 +325,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 * Initializes the mentions settings admin page.
 	 *
 	 * - Accessed from ?action=admin;area=featuresettings;sa=mention;
-	 * 
+	 *
 	 * @event integrate_save_modify_mention_settings
 	 */
 	public function action_notificationsSettings_display()
@@ -426,7 +426,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 * Display configuration settings for signatures on forum.
 	 *
 	 * - Accessed from ?action=admin;area=featuresettings;sa=sig;
-	 * 
+	 *
 	 * @event integrate_save_signature_settings
 	 */
 	public function action_signatureSettings_display()
@@ -1151,7 +1151,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 * Editing personal messages settings
 	 *
 	 * - Accessed with ?action=admin;area=featuresettings;sa=pmsettings
-	 * 
+	 *
 	 * @event integrate_save_pmsettings_settings
 	 */
 	public function action_pmsettings()
@@ -1196,7 +1196,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Return basic feature settings.
-	 * 
+	 *
 	 * @event integrate_modify_basic_settings Adds to General features and Options
 	 */
 	private function _basicSettings()
@@ -1264,7 +1264,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Return layout settings.
-	 * 
+	 *
 	 * @event integrate_modify_layout_settings Adds options to Configuration->Layout
 	 */
 	private function _layoutSettings()
@@ -1307,7 +1307,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Return karma settings.
-	 * 
+	 *
 	 * @event integrate_modify_karma_settings Adds to Configuration->Karma
 	 */
 	private function _karmaSettings()
@@ -1345,7 +1345,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Return likes settings.
-	 * 
+	 *
 	 * @event integrate_modify_likes_settings Adds to Configuration->Likes
 	 */
 	private function _likesSettings()
@@ -1381,7 +1381,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Return mentions settings.
-	 * 
+	 *
 	 * @event integrate_modify_mention_settings Adds to Configuration->Mentions
 	 */
 	private function _notificationsSettings()
@@ -1434,7 +1434,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 * Return signature settings.
 	 *
 	 * - Used in admin center search and settings form
-	 * 
+	 *
 	 * @event integrate_modify_signature_settings Adds options to Signature Settings
 	 */
 	private function _signatureSettings()
@@ -1491,7 +1491,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 * Return pm settings.
 	 *
 	 * - Used in admin center search and settings form
-	 * 
+	 *
 	 * @event integrate_modify_pmsettings_settings Adds / Modifies PM Settings
 	 */
 	private function _pmSettings()

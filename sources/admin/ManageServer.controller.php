@@ -115,7 +115,7 @@ class ManageServer_Controller extends Action_Controller
 	 * - Uses the edit_settings administration area.
 	 * - Contains the actual array of settings to show from Settings.php.
 	 * - Accessed from ?action=admin;area=serversettings;sa=general.
-	 * 
+	 *
 	 * @event integrate_save_general_settings
 	 */
 	public function action_generalSettings_display()
@@ -159,7 +159,7 @@ class ManageServer_Controller extends Action_Controller
 	 * - Requires the admin_forum permission.
 	 * - Uses the edit_settings administration area.
 	 * - Accessed from ?action=admin;area=serversettings;sa=database.
-	 * 
+	 *
 	 * @event integrate_save_database_settings
 	 */
 	public function action_databaseSettings_display()
@@ -196,7 +196,7 @@ class ManageServer_Controller extends Action_Controller
 	 *
 	 * This method handles the display, allows to edit, and saves the result
 	 * for the _cookieSettings form.
-	 * 
+	 *
 	 * @event integrate_save_cookie_settings
 	 */
 	public function action_cookieSettings_display()
@@ -265,7 +265,7 @@ class ManageServer_Controller extends Action_Controller
 	 *
 	 * This method handles the display, allows to edit, and saves the result
 	 * for _cacheSettings form.
-	 * 
+	 *
 	 * @event integrate_save_cache_settings
 	 */
 	public function action_cacheSettings_display()
@@ -321,7 +321,7 @@ class ManageServer_Controller extends Action_Controller
 	 *
 	 * This method handles the display, allows to edit, and saves the result
 	 * for the _loadavgSettings form.
-	 * 
+	 *
 	 * @event integrate_loadavg_settings
 	 * @event integrate_save_loadavg_settings
 	 */
@@ -424,7 +424,7 @@ class ManageServer_Controller extends Action_Controller
 
 	/**
 	 * This function returns all general settings.
-	 * 
+	 *
 	 * @event integrate_modify_general_settings
 	 */
 	private function _generalSettings()
@@ -461,7 +461,7 @@ class ManageServer_Controller extends Action_Controller
 
 	/**
 	 * This function returns database settings.
-	 * 
+	 *
 	 * @event integrate_modify_database_settings
 	 */
 	private function _databaseSettings()
@@ -505,7 +505,7 @@ class ManageServer_Controller extends Action_Controller
 
 	/**
 	 * This little function returns all cookie settings.
-	 * 
+	 *
 	 * @event integrate_modify_cookie_settings
 	 */
 	private function _cookieSettings()
@@ -546,7 +546,7 @@ class ManageServer_Controller extends Action_Controller
 
 	/**
 	 * This little function returns all cache settings.
-	 * 
+	 *
 	 * @event integrate_modify_cache_settings
 	 */
 	private function _cacheSettings()
@@ -605,7 +605,7 @@ class ManageServer_Controller extends Action_Controller
 
 	/**
 	 * This little function returns load management settings.
-	 * 
+	 *
 	 * @event integrate_modify_loadavg_settings
 	 */
 	private function _loadavgSettings()

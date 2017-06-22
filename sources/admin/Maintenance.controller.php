@@ -368,7 +368,7 @@ class Maintenance_Controller extends Action_Controller
 
 	/**
 	 * Supporting function for the topics maintenance area.
-	 * 
+	 *
 	 * @event integrate_topics_maintenance, passed $context['topics_actions'] to allow addons
 	 * to add additonal topic maintance functions
 	 * @uses GenericBoards template, sub template maintain_topics

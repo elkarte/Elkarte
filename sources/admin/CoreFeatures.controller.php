@@ -124,8 +124,8 @@ class CoreFeatures_Controller extends Action_Controller
 
 	/**
 	 * Return the configuration settings available for core features page.
-	 * 
-	 * @event integrate_core_features passed $core_features array allowing for adding new 
+	 *
+	 * @event integrate_core_features passed $core_features array allowing for adding new
 	 * ones to the feature page
 	 */
 	public function settings()

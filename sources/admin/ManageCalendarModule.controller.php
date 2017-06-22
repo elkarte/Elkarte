@@ -325,7 +325,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 
 	/**
 	 * Retrieve and return all admin settings for the calendar.
-	 * 
+	 *
 	 * @event integrate_modify_calendar_settings Used to add new calendar settings
 	 */
 	private function _settings()

@@ -105,7 +105,7 @@ class ManagePaid_Controller extends Action_Controller
 	 * - i.e. modify which payment methods are to be used.
 	 * - It requires the moderate_forum permission
 	 * - Accessed from ?action=admin;area=paidsubscribe;sa=settings.
-	 * 
+	 *
 	 * @event integrate_save_subscription_settings
 	 */
 	public function action_paidSettings_display()
@@ -191,7 +191,7 @@ class ManagePaid_Controller extends Action_Controller
 
 	/**
 	 * Retrieve subscriptions settings.
-	 * 
+	 *
 	 * @event integrate_modify_subscription_settings
 	 */
 	private function _settings()
@@ -245,10 +245,10 @@ class ManagePaid_Controller extends Action_Controller
 	 * View a list of all the current subscriptions
 	 *
 	 * What it does:
-	 * 
+	 *
 	 * - Requires the admin_forum permission.
 	 * - Accessed from ?action=admin;area=paidsubscribe;sa=view.
-	 * 
+	 *
 	 * @event integrate_list_subscription_list
 	 */
 	public function action_view()
@@ -406,7 +406,7 @@ class ManagePaid_Controller extends Action_Controller
 	 * Adding, editing and deleting subscriptions.
 	 *
 	 * - Accessed from ?action=admin;area=paidsubscribe;sa=modify.
-	 * 
+	 *
 	 * @event integrate_delete_subscription passed ID of deletion
 	 * @event integrate_save_subscription
 	 */
@@ -580,11 +580,11 @@ class ManagePaid_Controller extends Action_Controller
 	 * View all the users subscribed to a particular subscription.
 	 *
 	 * What it does:
-	 * 
+	 *
 	 * - Requires the admin_forum permission.
 	 * - Accessed from ?action=admin;area=paidsubscribe;sa=viewsub.
 	 * - Subscription ID is required, in the form of $_GET['sid'].
-	 * 
+	 *
 	 * @event integrate_list_subscribed_users_list
 	 */
 	public function action_viewsub()

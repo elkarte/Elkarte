@@ -2,8 +2,8 @@
 
 /**
  * This file is exclusively for generating reports to help assist forum
- * administrators keep track of their site configuration and state. 
- * 
+ * administrators keep track of their site configuration and state.
+ *
  * The core report generation is done in two areas. Firstly, a report "generator"
  * will fill context with relevant data. Secondly, the choice of sub-template will
  * determine how this data is shown to the user
@@ -22,7 +22,7 @@
 
 /**
  * "Report" Functions are responsible for generating data for reporting.
- * 
+ *
  * - They are all called from action_index.
  * - Never access the context directly, but use the data handling functions to do so.
  */
@@ -30,9 +30,9 @@ class Reports_Controller extends Action_Controller
 {
 	/**
 	 * Handling function for generating reports.
-	 * 
+	 *
 	 * What it does:
-	 * 
+	 *
 	 * - Requires the admin_forum permission.
 	 * - Loads the Reports template and language files.
 	 * - Decides which type of report to generate, if this isn't passed
@@ -90,7 +90,7 @@ class Reports_Controller extends Action_Controller
 			);
 
 		$report_type = !empty($this->_req->post->rt) ? $this->_req->post->rt : (!empty($this->_req->query->rt) ? $this->_req->query->rt : null);
-		
+
 		// If they haven't chosen a report type which is valid, send them off to the report type chooser!
 		if (empty($report_type) || !isset($context['report_types'][$report_type]))
 		{
@@ -160,7 +160,7 @@ class Reports_Controller extends Action_Controller
 
 	/**
 	 * Standard report about what settings the boards have.
-	 * 
+	 *
 	 * - Functions ending with "Report" are responsible for generating data
 	 * for reporting.
 	 * - They are all called from action_index.
@@ -278,7 +278,7 @@ class Reports_Controller extends Action_Controller
 
 	/**
 	 * Generate a report on the current permissions by board and membergroup.
-	 * 
+	 *
 	 * - Functions ending with "Report" are responsible for generating data
 	 * for reporting.
 	 * - They are all called from action_index.
@@ -417,7 +417,7 @@ class Reports_Controller extends Action_Controller
 
 	/**
 	 * Show what the membergroups are made of.
-	 * 
+	 *
 	 * - Functions ending with "Report" are responsible for generating data for reporting.
 	 * they are all called from action_index.
 	 * - Never access the context directly, but use the data handling functions to do so.
@@ -501,7 +501,7 @@ class Reports_Controller extends Action_Controller
 
 	/**
 	 * Show the large variety of group permissions assigned to each membergroup.
-	 * 
+	 *
 	 * - Functions ending with "Report" are responsible for generating data for reporting.
 	 * they are all called from action_index.
 	 * - Never access the context directly, but use the data handling
@@ -578,7 +578,7 @@ class Reports_Controller extends Action_Controller
 
 	/**
 	 * Report for showing all the forum staff members - quite a feat!
-	 * 
+	 *
 	 * - Functions ending with "Report" are responsible for generating data
 	 * for reporting.
 	 * - They are all called from action_index.
@@ -673,9 +673,9 @@ class Reports_Controller extends Action_Controller
 
 /**
  * This function creates a new table of data, most functions will only use it once.
- * 
+ *
  * What it does:
- * 
+ *
  * - The core of this file, it creates a new, but empty, table of data in
  * context, ready for filling using addData().
  * - Fills the context variable current_table with the ID of the table created.
@@ -724,9 +724,9 @@ function newTable($title = '', $default_value = '', $shading = 'all', $width_nor
 
 /**
  * Adds an array of data into an existing table.
- * 
+ *
  * What it does:
- * 
+ *
  * - If there are no existing tables, will create one with default attributes.
  * - If custom_table isn't specified, it will use the last table created,
  * - If it is specified and doesn't exist the function will return false.
@@ -834,7 +834,7 @@ function addSeparator($title = '', $custom_table = null)
 
 /**
  * This does the necessary count of table data before displaying them.
- * 
+ *
  * - Is (unfortunately) required to create some useful variables for templates.
  * - Foreach data table created, it will count the number of rows and
  * columns in the table.
@@ -868,9 +868,9 @@ function finishTables()
 
 /**
  * Set the keys in use by the tables - these ensure entries MUST exist if the data isn't sent
- * 
+ *
  * What it does:
- * 
+ *
  * - Sets the current set of "keys" expected in each data array passed to
  * addData.
  * - It also sets the way we are adding data to the data table.

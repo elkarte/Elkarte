@@ -293,7 +293,7 @@ class ManagePosts_Controller extends Action_Controller
 
 	/**
 	 * Return admin configuration settings for posts.
-	 * 
+	 *
 	 * @event integrate_modify_post_settings
 	 */
 	private function _settings()

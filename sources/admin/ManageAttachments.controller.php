@@ -241,7 +241,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 	/**
 	 * Retrieve and return the administration settings for attachments.
-	 * 
+	 *
 	 * @event integrate_modify_attachment_settings
 	 */
 	private function _settings()

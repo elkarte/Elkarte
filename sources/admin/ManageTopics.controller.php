@@ -51,7 +51,7 @@ class ManageTopics_Controller extends Action_Controller
 	 * Administration page for topics: allows to display and set settings related to topics.
 	 *
 	 * What it does:
-	 * 
+	 *
 	 * - Requires the admin_forum permission.
 	 * - Accessed from ?action=admin;area=postsettings;sa=topics.
 	 *
@@ -98,7 +98,7 @@ class ManageTopics_Controller extends Action_Controller
 
 	/**
 	 * Return configuration settings for topics.
-	 * 
+	 *
 	 * @event integrate_modify_topic_settings
 	 */
 	private function _settings()

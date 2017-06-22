@@ -171,7 +171,7 @@ class ManageSearch_Controller extends Action_Controller
 
 	/**
 	 * Retrieve admin search settings
-	 * 
+	 *
 	 * @event integrate_modify_search_settings
 	 */
 	private function _settings()

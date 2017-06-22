@@ -117,7 +117,7 @@ class ManageBBC_Controller extends Action_Controller
 
 	/**
 	 * Return the BBC settings of the forum.
-	 * 
+	 *
 	 * @event integrate_modify_bbc_settings used to add more options to config vars
 	 */
 	private function _settings()

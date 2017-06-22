@@ -122,7 +122,7 @@ class ManageNews_Controller extends Action_Controller
 	 * - Called by ?action=admin;area=news.
 	 * - Requires the edit_news permission.
 	 * - Can be accessed with ?action=admin;sa=editnews.
-	 * 
+	 *
 	 * @event integrate_list_news_lists
 	 */
 	public function action_editnews()
@@ -916,7 +916,7 @@ class ManageNews_Controller extends Action_Controller
 
 	/**
 	 * Get the settings of the forum related to news.
-	 * 
+	 *
 	 * @event integrate_modify_news_settings add new news settings
 	 */
 	private function _settings()

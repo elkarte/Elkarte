@@ -82,7 +82,7 @@ class ManageSecurity_Controller extends Action_Controller
 	 * Handle settings regarding general security of the site.
 	 *
 	 * - Uses a settings form for security options.
-	 * 
+	 *
 	 * @event integrate_save_general_security_settings
 	 */
 	public function action_securitySettings_display()
@@ -119,7 +119,7 @@ class ManageSecurity_Controller extends Action_Controller
 	 * Allows to display and eventually change the moderation settings of the forum.
 	 *
 	 * - Uses the moderation settings form.
-	 * 
+	 *
 	 * @event integrate_save_moderation_settings
 	 */
 	public function action_moderationSettings_display()
@@ -179,7 +179,7 @@ class ManageSecurity_Controller extends Action_Controller
 	 * Handles admin security spam settings.
 	 *
 	 * - Displays a page with settings and eventually allows the admin to change them.
-	 * 
+	 *
 	 * @event integrate_save_spam_settings
 	 */
 	public function action_spamSettings_display()
@@ -326,7 +326,7 @@ class ManageSecurity_Controller extends Action_Controller
 
 	/**
 	 * Moderation settings.
-	 * 
+	 *
 	 * @event integrate_modify_moderation_settings add new moderation settings
 	 */
 	private function _moderationSettings()
@@ -358,7 +358,7 @@ class ManageSecurity_Controller extends Action_Controller
 
 	/**
 	 * Security settings.
-	 * 
+	 *
 	 * @event integrate_general_security_settings add more security settings
 	 */
 	private function _securitySettings()
@@ -406,7 +406,7 @@ class ManageSecurity_Controller extends Action_Controller
 
 	/**
 	 * Spam settings.
-	 * 
+	 *
 	 * @event integrate_spam_settings mmmm Spam
 	 */
 	private function _spamSettings()
