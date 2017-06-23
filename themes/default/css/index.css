@@ -2626,6 +2626,8 @@ img.new_posts {
 	display: block;
 	padding: 6px;
 	text-align: right;
+	width: 50%;
+	float: right;
 }
 
 .basic_row, .sticky_row, .locked_row {
