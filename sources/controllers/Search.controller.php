@@ -76,12 +76,15 @@ class Search_Controller extends Action_Controller
 
 		// If coming from the quick search box, and we want to search on members, well we need to do that ;)
 		if (isset($_REQUEST['search_selection']) && $_REQUEST['search_selection'] === 'members')
+		{
 			redirectexit($scripturl . '?action=memberlist;sa=search;fields=name,email;search=' . urlencode($_REQUEST['search']));
+		}
 
 		// If load management is on and the load is high, no need to even show the form.
 		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
+		{
 			throw new Elk_Exception('loadavg_search_disabled', false);
-
+		}
 	}
 
 	/**
