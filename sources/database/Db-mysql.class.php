@@ -92,6 +92,13 @@ class Database_MySQL extends Database_Abstract
 			array(
 			)
 		);
+		// Sorry to change your config, but this may be a pain for the time being...
+		self::$_db->query('', '
+			SET sql_mode = {string:empty}',
+			array(
+				'empty' => ''
+			)
+		);
 
 		return $connection;
 	}
