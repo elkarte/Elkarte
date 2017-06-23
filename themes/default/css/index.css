@@ -4480,6 +4480,10 @@ div.labels {
 	text-decoration: none;
 }
 
+.weekdays {
+	padding: 8px 8px 0 180px;
+}
+
 /* Use the old one true layout trick here. */
 .weeklist .content, .weeklist .calendar_today {
 	margin: 0 0 -95px 11.5em;
