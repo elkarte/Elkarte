@@ -234,7 +234,7 @@ function template_deleteAccount()
 		echo '
 				<div class="errorbox">', $txt['own_profile_confirm'], '</div>
 				<div class="submitbutton">
-					<strong', (isset($context['modify_error']['bad_password']) || isset($context['modify_error']['no_password']) ? ' class="error"' : ''), '><label for="oldpasswrd">', $txt['current_password'], '</label>: </strong>
+					<span', (isset($context['modify_error']['bad_password']) || isset($context['modify_error']['no_password']) ? ' class="error"' : ''), '><label for="oldpasswrd">', $txt['current_password'], '</label>: </span>
 					<input type="password" id="oldpasswrd" name="oldpasswrd" size="20" class="input_password" />&nbsp;&nbsp;&nbsp;&nbsp;
 					<input type="submit" name="save" value="', $txt['delete'], '" />';
 
