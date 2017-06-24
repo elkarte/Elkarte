@@ -6140,6 +6140,11 @@ a > i {
 	.keyinfo h5 {
 		padding: 3px;
 	}
+	.keyinfo h5:after {
+		content: "";
+		display: block;
+		clear: both;
+	}
 
 	h2 .views_text, h2 .nextlinks {
 		display: block;
