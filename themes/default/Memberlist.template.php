@@ -24,7 +24,7 @@ function template_mlsearch_above()
 	<form id="mlsearch" action="' . $scripturl . '?action=memberlist;sa=search" method="post" accept-charset="UTF-8">
 		<ul class="floatright">
 			<li>
-				<input id="mlsearch_input" class="input_text" onfocus="toggle_mlsearch_opt();" type="text" name="search" value="' . $context['old_search_value'] . '" placeholder="' . $txt['mlist_search'] . '" />&nbsp;
+				<input id="mlsearch_input" class="input_text" onfocus="toggle_mlsearch_opt();" type="text" name="search" value="' . $context['old_search_value'] . '" placeholder="' . $txt['mlist_search'] . '" />
 				<button type="submit" name="search2" class="with_select"><i class="icon i-search icon-shade"></i></button>
 				<ul id="mlsearch_options" class="nojs">';
 
