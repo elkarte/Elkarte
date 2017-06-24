@@ -6372,13 +6372,6 @@ a > i {
 		margin-bottom: 6px;
 	}
 
-	a.linklevel1.button_strip_notify,
-	a.linklevel1.button_strip_print, a.linklevel1.button_strip_send, .inline_mod_check,
-	a.linklevel1.quotetonew_button, a.linklevel1.button_strip_post_poll,
-	.keyinfo .post_subject, li.listlevel1.quickmod_select_all, p.inline.membergroups {
-		display: none !important;
-	}
-
 	#display_jump_to {
 		float: none;
 	}
@@ -6557,7 +6550,7 @@ a > i {
 	}
 
 	.quickbuttons .modified {
-		display: none;
+		white-space: normal;
 	}
 
 	.mlist li .group {
