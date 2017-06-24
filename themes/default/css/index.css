@@ -6027,6 +6027,7 @@ a > i {
 
 	.pagelinks {
 		min-width: 100%;
+		float: none;
 		/* Necessary for some browsers to keep the pages all on the same line */
 		height: 30px;
 	}
