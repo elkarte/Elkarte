@@ -239,6 +239,30 @@ class Attachment_Controller extends Action_Controller
 		}
 	}
 
+	public function action_no_attach($text = null)
+	{
+		global $txt;
+
+		require_once(SUBSDIR . '/Graphics.subs.php');
+		if ($text === null)
+		{
+			loadLanguage('Errors');
+			$text = $txt['attachment_not_found'];
+		}
+
+		$this->_send_headers('no_image', 'no_image', 'image/png', false, 'inline', 'no_image.png', true, false);
+
+		$img = generateTextImage($text, 200);
+
+		if ($img === false)
+		{
+			throw new Elk_Exception('no_access', false);
+		}
+
+		echo $img;
+		die();
+	}
+
 	/**
 	 * Downloads an attachment or avatar, and increments the download count.
 	 *
@@ -260,7 +284,9 @@ class Attachment_Controller extends Action_Controller
 
 		// Make sure some attachment was requested!
 		if (!isset($this->_req->query->attach) && !isset($this->_req->query->id))
-			throw new Elk_Exception('no_access', false);
+		{
+			return $this->action_no_attach();
+		}
 
 		// We need to do some work on attachments and avatars.
 		require_once(SUBSDIR . '/Attachments.subs.php');
@@ -363,7 +389,7 @@ class Attachment_Controller extends Action_Controller
 
 		if (empty($attachment))
 		{
-			throw new Elk_Exception('no_access', false);
+			return $this->action_no_attach();
 		}
 
 		list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
@@ -443,7 +469,9 @@ class Attachment_Controller extends Action_Controller
 		}
 		// On some of the less-bright hosts, readfile() is disabled.  It's just a faster, more byte safe, version of what's in the if.
 		elseif (isset($callback) || @readfile($filename) === null)
+		{
 			echo isset($callback) ? $callback(file_get_contents($filename)) : file_get_contents($filename);
+		}
 
 		obExit(false);
 	}
@@ -458,7 +486,9 @@ class Attachment_Controller extends Action_Controller
 
 		// Make sure some attachment was requested!
 		if (!isset($this->_req->query->attach))
-			throw new Elk_Exception('no_access', false);
+		{
+			return $this->action_no_attach();
+		}
 
 		// We need to do some work on attachments and avatars.
 		require_once(SUBSDIR . '/Attachments.subs.php');
@@ -483,7 +513,9 @@ class Attachment_Controller extends Action_Controller
 				$attachment = getAttachmentFromTopic($id_attach, $topic);
 
 				if (empty($attachment))
-					throw new Elk_Exception('no_access', false);
+				{
+					return $this->action_no_attach();
+				}
 
 				list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
 
