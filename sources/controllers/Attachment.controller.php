@@ -383,104 +383,26 @@ class Attachment_Controller extends Action_Controller
 			$filename = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $file_hash);
 		}
 
-		// This is done to clear any output that was made before now.
-		while (ob_get_level() > 0)
-			@ob_end_clean();
-
-		if (!empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java')))
-		{
-			ob_start('ob_gzhandler');
-		}
-		else
-		{
-			ob_start();
-			header('Content-Encoding: none');
-		}
-
-		// No point in a nicer message, because this is supposed to be an attachment anyway...
-		if (!file_exists($filename))
-		{
-			loadLanguage('Errors');
-
-			header((preg_match('~HTTP/1\.[01]~i', $this->_req->server->SERVER_PROTOCOL) ? $this->_req->server->SERVER_PROTOCOL : 'HTTP/1.0') . ' 404 Not Found');
-			header('Content-Type: text/plain; charset=UTF-8');
-
-			// We need to die like this *before* we send any anti-caching headers as below.
-			die('404 - ' . $txt['attachment_not_found']);
-		}
-
-		// If it hasn't been modified since the last time this attachment was retrieved, there's no need to display it again.
-		if (!empty($this->_req->server->HTTP_IF_MODIFIED_SINCE))
-		{
-			list ($modified_since) = explode(';', $this->_req->server->HTTP_IF_MODIFIED_SINCE);
-			if (strtotime($modified_since) >= filemtime($filename))
-			{
-				@ob_end_clean();
-
-				// Answer the question - no, it hasn't been modified ;).
-				header('HTTP/1.1 304 Not Modified');
-				exit;
-			}
-		}
-
-		// Check whether the ETag was sent back, and cache based on that...
 		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
-		if (!empty($this->_req->server->HTTP_IF_NONE_MATCH) && strpos($this->_req->server->HTTP_IF_NONE_MATCH, $eTag) !== false)
-		{
-			@ob_end_clean();
-
-			header('HTTP/1.1 304 Not Modified');
-			exit;
-		}
-
-		// Send the attachment headers.
-		header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT');
-		header('Last-Modified: ' . gmdate('D, d M Y H:i:s', filemtime($filename)) . ' GMT');
-		header('Accept-Ranges: bytes');
-		header('Connection: close');
-		header('ETag: ' . $eTag);
+		$use_compression = !empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java'));
+		$disposition = !isset($this->_req->query->image) ? 'attachment' : 'inline';
+		$do_cache = false === (!isset($this->_req->query->image) && in_array($file_ext, array('gif', 'jpg', 'bmp', 'png', 'jpeg', 'tiff')));
 
 		// Make sure the mime type warrants an inline display.
 		if (isset($this->_req->query->image) && !empty($mime_type) && strpos($mime_type, 'image/') !== 0)
-			unset($this->_req->query->image);
-		// Does this have a mime type?
-		elseif (!empty($mime_type) && (isset($this->_req->query->image) || !in_array($file_ext, array('jpg', 'gif', 'jpeg', 'x-ms-bmp', 'png', 'psd', 'tiff', 'iff'))))
-			header('Content-Type: ' . strtr($mime_type, array('image/bmp' => 'image/x-ms-bmp')));
-		else
 		{
-			header('Content-Type: ' . (isBrowser('ie') || isBrowser('opera') ? 'application/octetstream' : 'application/octet-stream'));
+			unset($this->_req->query->image);
+			$mime_type = '';
+		}
+		// Does this have a mime type?
+		elseif (empty($mime_type) || !(isset($this->_req->query->image) || !in_array($file_ext, array('jpg', 'gif', 'jpeg', 'x-ms-bmp', 'png', 'psd', 'tiff', 'iff'))))
+		{
+			$mime_type = '';
 			if (isset($this->_req->query->image))
 				unset($this->_req->query->image);
 		}
 
-		$disposition = !isset($this->_req->query->image) ? 'attachment' : 'inline';
-
-		// Different browsers like different standards...
-		if (isBrowser('firefox'))
-			header('Content-Disposition: ' . $disposition . '; filename*=UTF-8\'\'' . rawurlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)));
-		elseif (isBrowser('opera'))
-			header('Content-Disposition: ' . $disposition . '; filename="' . preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename) . '"');
-		elseif (isBrowser('ie'))
-			header('Content-Disposition: ' . $disposition . '; filename="' . urlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)) . '"');
-		else
-			header('Content-Disposition: ' . $disposition . '; filename="' . $real_filename . '"');
-
-		// If this has an "image extension" - but isn't actually an image - then ensure it isn't cached cause of silly IE.
-		if (!isset($this->_req->query->image) && in_array($file_ext, array('gif', 'jpg', 'bmp', 'png', 'jpeg', 'tiff')))
-		{
-			header('Pragma: no-cache');
-			header('Cache-Control: no-cache');
-		}
-		else
-		{
-			header('Cache-Control: max-age=' . (525600 * 60) . ', private');
-		}
-
-		if (empty($modSettings['enableCompressedOutput']) || filesize($filename) > 4194304)
-			header('Content-Length: ' . filesize($filename));
-
-		// Try to buy some time...
-		detectServer()->setTimeLimit(600);
+		$this->_send_headers($filename, $eTag, $mime_type, $use_compression, $disposition, $real_filename, $do_cache);
 
 		// Recode line endings for text files, if enabled.
 		if (!empty($modSettings['attachmentRecodeLineEndings']) && !isset($this->_req->query->image) && in_array($file_ext, array('txt', 'css', 'htm', 'html', 'php', 'xml')))
@@ -578,12 +500,6 @@ class Attachment_Controller extends Action_Controller
 		}
 		$resize = true;
 
-		// This is done to clear any output that was made before now.
-		while (ob_get_level() > 0)
-		{
-			@ob_end_clean();
-		}
-
 		// Return mime type ala mimetype extension
 		$finfo = finfo_open(FILEINFO_MIME_TYPE);
 
@@ -596,67 +512,11 @@ class Attachment_Controller extends Action_Controller
 		}
 		finfo_close($finfo);
 
-		ob_start();
-		header('Content-Encoding: none');
-
-		// No point in a nicer message, because this is supposed to be an attachment anyway...
-		if (!file_exists($filename))
-		{
-			loadLanguage('Errors');
-
-			header((preg_match('~HTTP/1\.[01]~i', $this->_req->server->SERVER_PROTOCOL) ? $this->_req->server->SERVER_PROTOCOL : 'HTTP/1.0') . ' 404 Not Found');
-			header('Content-Type: text/plain; charset=UTF-8');
-
-			// We need to die like this *before* we send any anti-caching headers as below.
-			die('404 - ' . $txt['attachment_not_found']);
-		}
-
-		// If it hasn't been modified since the last time this attachment was retrieved, there's no need to display it again.
-		if (!empty($this->_req->server->HTTP_IF_MODIFIED_SINCE))
-		{
-			list ($modified_since) = explode(';', $this->_req->server->HTTP_IF_MODIFIED_SINCE);
-			if (strtotime($modified_since) >= filemtime($filename))
-			{
-				@ob_end_clean();
-
-				// Answer the question - no, it hasn't been modified ;).
-				header('HTTP/1.1 304 Not Modified');
-				exit;
-			}
-		}
-
-		// Check whether the ETag was sent back, and cache based on that...
 		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
-		if (!empty($this->_req->server->HTTP_IF_NONE_MATCH) && strpos($this->_req->server->HTTP_IF_NONE_MATCH, $eTag) !== false)
-		{
-			@ob_end_clean();
+		$use_compression = !empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java'));
+		$do_cache = false === (!isset($this->_req->query->image) && in_array($file_ext, array('gif', 'jpg', 'bmp', 'png', 'jpeg', 'tiff')));
 
-			header('HTTP/1.1 304 Not Modified');
-			exit;
-		}
-
-		// Send the attachment headers.
-		header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT');
-		header('Last-Modified: ' . gmdate('D, d M Y H:i:s', filemtime($filename)) . ' GMT');
-		header('Accept-Ranges: bytes');
-		header('Connection: close');
-		header('ETag: ' . $eTag);
-		header('Content-Type: ' . strtr($mime_type, array('image/bmp' => 'image/x-ms-bmp')));
-
-		// Different browsers like different standards...
-		if (isBrowser('firefox'))
-			header('Content-Disposition: inline; filename*=UTF-8\'\'' . rawurlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)));
-		elseif (isBrowser('opera'))
-			header('Content-Disposition: inline; filename="' . preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename) . '"');
-		elseif (isBrowser('ie'))
-			header('Content-Disposition: inline; filename="' . urlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)) . '"');
-		else
-			header('Content-Disposition: inline; filename="' . $real_filename . '"');
-
-		header('Cache-Control: max-age=' . (525600 * 60) . ', private');
-
-		// Try to buy some time...
-		detectServer()->setTimeLimit(600);
+		$this->_send_headers($filename, $eTag, $mime_type, $use_compression, 'inline', $real_filename, $do_cache);
 
 		if ($resize && resizeImageFile($filename, $filename . '_thumb', 100, 100))
 		{
@@ -675,5 +535,101 @@ class Attachment_Controller extends Action_Controller
 			echo file_get_contents($filename);
 
 		obExit(false);
+	}
+
+	protected function _send_headers($filename, $eTag, $mime_type, $use_compression, $disposition, $real_filename, $do_cache, $check_filename = true)
+	{
+		global $txt;
+
+		// This is done to clear any output that was made before now.
+		while (ob_get_level() > 0)
+		{
+			@ob_end_clean();
+		}
+
+		if ($use_compression === true)
+		{
+			ob_start('ob_gzhandler');
+		}
+		else
+		{
+			ob_start();
+			header('Content-Encoding: none');
+		}
+
+		// No point in a nicer message, because this is supposed to be an attachment anyway...
+		if ($check_filename === true && !file_exists($filename))
+		{
+			loadLanguage('Errors');
+
+			header((preg_match('~HTTP/1\.[01]~i', $this->_req->server->SERVER_PROTOCOL) ? $this->_req->server->SERVER_PROTOCOL : 'HTTP/1.0') . ' 404 Not Found');
+			header('Content-Type: text/plain; charset=UTF-8');
+
+			// We need to die like this *before* we send any anti-caching headers as below.
+			die('404 - ' . $txt['attachment_not_found']);
+		}
+
+		// If it hasn't been modified since the last time this attachment was retrieved, there's no need to display it again.
+		if (!empty($this->_req->server->HTTP_IF_MODIFIED_SINCE))
+		{
+			list ($modified_since) = explode(';', $this->_req->server->HTTP_IF_MODIFIED_SINCE);
+			if ($check_filename === false || strtotime($modified_since) >= filemtime($filename))
+			{
+				@ob_end_clean();
+
+				// Answer the question - no, it hasn't been modified ;).
+				header('HTTP/1.1 304 Not Modified');
+				exit;
+			}
+		}
+
+		// Check whether the ETag was sent back, and cache based on that...
+		if (!empty($this->_req->server->HTTP_IF_NONE_MATCH) && strpos($this->_req->server->HTTP_IF_NONE_MATCH, $eTag) !== false)
+		{
+			@ob_end_clean();
+
+			header('HTTP/1.1 304 Not Modified');
+			exit;
+		}
+
+		// Send the attachment headers.
+		header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT');
+		header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $check_filename === true ? filemtime($filename) : time() - 525600 * 60) . ' GMT');
+		header('Accept-Ranges: bytes');
+		header('Connection: close');
+		header('ETag: ' . $eTag);
+
+		if (!empty($mime_type) && strpos($mime_type, 'image/') === 0)
+		{
+			header('Content-Type: ' . strtr($mime_type, array('image/bmp' => 'image/x-ms-bmp')));
+		}
+		else
+		{
+			header('Content-Type: ' . (isBrowser('ie') || isBrowser('opera') ? 'application/octetstream' : 'application/octet-stream'));
+		}
+
+		// Different browsers like different standards...
+		if (isBrowser('firefox'))
+			header('Content-Disposition: ' . $disposition . '; filename*=UTF-8\'\'' . rawurlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)));
+		elseif (isBrowser('opera'))
+			header('Content-Disposition: ' . $disposition . '; filename="' . preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename) . '"');
+		elseif (isBrowser('ie'))
+			header('Content-Disposition: ' . $disposition . '; filename="' . urlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)) . '"');
+		else
+			header('Content-Disposition: ' . $disposition . '; filename="' . $real_filename . '"');
+
+		// If this has an "image extension" - but isn't actually an image - then ensure it isn't cached cause of silly IE.
+		if ($do_cache === true)
+		{
+			header('Cache-Control: max-age=' . (525600 * 60) . ', private');
+		}
+		else
+		{
+			header('Pragma: no-cache');
+			header('Cache-Control: no-cache');
+		}
+
+		// Try to buy some time...
+		detectServer()->setTimeLimit(600);
 	}
 }
