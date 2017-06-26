@@ -141,7 +141,8 @@ function template_topic_listing()
 		<div class="warningbox">', $context['unapproved_posts_message'], '</div>';
 
 		echo '
-		<main><ul class="topic_listing" id="messageindex">';
+		<main>
+		<ul class="topic_listing" id="messageindex">';
 
 		// No topics.... just say, "sorry bub".
 		if (empty($context['topics']))
@@ -269,7 +270,8 @@ function template_topic_listing()
 		}
 
 		echo '
-		</ul></main>';
+		</ul>
+		</main>';
 
 		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']))
 		{
@@ -321,7 +323,7 @@ function template_topic_listing_below()
 
 	echo '
 	<footer id="topic_icons" class="description">
-		<div class="qaction_row" id="message_index_jump_to">&nbsp;</div>';
+		<div class="qaction_row floatright" id="message_index_jump_to">&nbsp;</div>';
 
 	if (!$context['no_topic_listing'])
 		template_basicicons_legend();

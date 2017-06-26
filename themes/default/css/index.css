@@ -619,7 +619,6 @@ em, .em {
 }
 
 .generic_list_wrapper .additional_row > a.linkbutton {
-	font-size: 1em;
 	margin: 5px 0 0;
 }
 
@@ -2159,6 +2158,10 @@ a.bbc_link {
 	margin: 1px 0 0 0;
 }
 
+.category_header .chevricon {
+	padding-top: .25em;
+}
+
 .board_row,
 .childboard_row,
 .forumposts > li,
@@ -2623,6 +2626,8 @@ img.new_posts {
 	display: block;
 	padding: 6px;
 	text-align: right;
+	width: 50%;
+	float: right;
 }
 
 .basic_row, .sticky_row, .locked_row {
@@ -4473,6 +4478,10 @@ div.labels {
 
 .weeklist h4 a:hover {
 	text-decoration: none;
+}
+
+.weekdays {
+	padding: 8px 8px 0 180px;
 }
 
 /* Use the old one true layout trick here. */

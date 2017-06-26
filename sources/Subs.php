@@ -1925,9 +1925,9 @@ function removeNestedQuotes($text)
 /**
  * Change a \t to a span that will show a tab
  *
- * @param $string
+ * @param string $string
  *
- * @return mixed
+ * @return string
  */
 function tabToHtmlTab($string)
 {
@@ -1937,9 +1937,9 @@ function tabToHtmlTab($string)
 /**
  * Remove <br />
  *
- * @param $string
+ * @param string $string
  *
- * @return mixed
+ * @return string
  */
 function removeBr($string)
 {

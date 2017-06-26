@@ -590,12 +590,19 @@ class Search
 	/**
 	 * Encodes search params ($this->_search_params) in an URL-compatible way
 	 *
+	 * @param array $search build param index with specific search term (did you mean?)
+	 *
 	 * @return string - the encoded string to be appended to the URL
 	 */
-	public function compileURLparams()
+	public function compileURLparams($search = array())
 	{
 		$temp_params = $this->_search_params;
 		$encoded = array();
+
+		if (!empty($search))
+		{
+			$temp_params['search'] = implode(' ', $search);
+		}
 
 		// *** Encode all search params
 		// All search params have been checked, let's compile them to a single string... made less simple by PHP 4.3.9 and below.
@@ -770,7 +777,8 @@ class Search
 
 			// Retrieve a list of possible members.
 			$request = $this->_db->query('', '
-				SELECT id_member
+				SELECT 
+					id_member
 				FROM {db_prefix}members
 				WHERE {raw:match_possible_users}',
 				array(
@@ -842,7 +850,8 @@ class Search
 		if (!empty($this->_search_params['topic']))
 		{
 			$request = $this->_db->query('', '
-				SELECT b.id_board
+				SELECT 
+					b.id_board
 				FROM {db_prefix}topics AS t
 					INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 				WHERE t.id_topic = {int:search_topic_id}
@@ -1083,7 +1092,8 @@ class Search
 			$did_you_mean['search'] = array_merge($did_you_mean['search'], $temp_excluded['search']);
 			$did_you_mean['display'] = array_merge($did_you_mean['display'], $temp_excluded['display']);
 
-			$suggestion_param = $this->compileURLparams();
+			// Provide the potential correct spelling term in the param
+			$suggestion_param = $this->compileURLparams($did_you_mean['search']);
 			$suggestion_display = implode(' ', $did_you_mean['display']);
 		}
 	}
@@ -1492,7 +1502,8 @@ class Search
 	{
 		// Load the posters...
 		$request = $this->_db->query('', '
-			SELECT id_member
+			SELECT 
+				id_member
 			FROM {db_prefix}messages
 			WHERE id_member != {int:no_member}
 				AND id_msg IN ({array_int:message_list})

@@ -115,7 +115,7 @@ class AdminLog_Controller extends Action_Controller
 	/**
 	 * Allow to edit the settings on the pruning screen.
 	 *
- 	 * @event integrate_prune_settings add additonal settings to the auto pruning display.  If you add any
+	 * @event integrate_prune_settings add additonal settings to the auto pruning display.  If you add any
 	 * additional logs make sure to add them at the end.  Additionally, make sure you add them to the
 	 * weekly scheduled task.
 	 * @uses _pruningSettings form.

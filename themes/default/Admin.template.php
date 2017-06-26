@@ -1541,14 +1541,13 @@ function template_admin_quick_search()
 	{
 		echo '
 			<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8" id="quick_search" class="floatright">
-				<i class="icon i-search"></i>
 				<input type="text" name="search_term" placeholder="', $txt['admin_search'], '" class="input_text" />
 				<select name="sa">
 					<option value="internal"', (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] == 'internal' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_internal'], '</option>
 					<option value="member"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'member' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_member'], '</option>
 					<option value="online"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'online' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_online'], '</option>
 				</select>
-				<input type="submit" name="search_go" id="search_go" value="', $txt['admin_search_go'], '" />
+				<button type="submit" name="search_go" id="search_go" ><i class="icon i-search"></i></button>
 			</form>';
 	}
 }

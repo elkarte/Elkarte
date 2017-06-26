@@ -210,7 +210,7 @@ function template_results()
 		</div>';
 
 	// Or perhaps they made a spelling error, lets give them a hint
-	if (isset($context['did_you_mean']) || empty($context['topics']))
+	if (!empty($context['did_you_mean']) || empty($context['topics']))
 	{
 		echo '
 			<div id="search_results">
