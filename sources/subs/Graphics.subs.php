@@ -1433,9 +1433,6 @@ function generateTextImage($text, $width = 100, $height = 100, $format = 'png')
 		$image = imagecreate($width, $height);
 		$font_size = 3;
 
-		$background = imagecolorallocate($image, 255, 255, 255);
-		$text_color = imagecolorallocate($image, 0, 0, 0);
-
 		// The loop is to try to fit the text into the image.
 		do
 		{
@@ -1446,7 +1443,7 @@ function generateTextImage($text, $width = 100, $height = 100, $format = 'png')
 			$h_offset = ($height - $text_height) / 2;
 		} while ($text_width > $width && $font_size-- > 1);
 
-		imagestring($image, $font_size, $w_offset, $h_offset,  $text, $text_color);
+		imagestring($image, $font_size, $w_offset, $h_offset,  $text, imagecolorallocate($image, 0, 0, 0));
 		$create_function($image);
 		return $image;
 	}

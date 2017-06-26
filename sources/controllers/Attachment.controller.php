@@ -260,7 +260,7 @@ class Attachment_Controller extends Action_Controller
 		}
 
 		echo $img;
-		die();
+		obExit(false);
 	}
 
 	/**
@@ -276,7 +276,7 @@ class Attachment_Controller extends Action_Controller
 	 */
 	public function action_dlattach()
 	{
-		global $txt, $modSettings, $user_info, $context, $topic, $board, $settings;
+		global $modSettings, $user_info, $context, $topic, $board, $settings;
 
 		// Some defaults that we need.
 		$context['no_last_modified'] = true;
@@ -482,7 +482,7 @@ class Attachment_Controller extends Action_Controller
 	 */
 	public function action_tmpattach()
 	{
-		global $txt, $modSettings, $user_info, $topic;
+		global $modSettings, $user_info, $topic;
 
 		// Make sure some attachment was requested!
 		if (!isset($this->_req->query->attach))
