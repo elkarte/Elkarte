@@ -569,25 +569,23 @@ class Attachment_Controller extends Action_Controller
 		obExit(false);
 	}
 
+	/**
+	 * Takes care of sending out the most common headers.
+	 *
+	 * @param string $filename Full path+file name of the file in the filesystem
+	 * @param string $eTag ETag cache validator
+	 * @param string $mime_type The mime-type of the file
+	 * @param blloean $use_compression If use gzip compression
+	 * @param string $disposition The value of the Content-Disposition header
+	 * @param string $real_filename The original name of the file
+	 * @param blloean $do_cache If send the a max-age header or not
+	 * @param blloean $check_filename When false, any check on $filename is skipped
+	 */
 	protected function _send_headers($filename, $eTag, $mime_type, $use_compression, $disposition, $real_filename, $do_cache, $check_filename = true)
 	{
 		global $txt;
 
-		// This is done to clear any output that was made before now.
-		while (ob_get_level() > 0)
-		{
-			@ob_end_clean();
-		}
-
-		if ($use_compression === true)
-		{
-			ob_start('ob_gzhandler');
-		}
-		else
-		{
-			ob_start();
-			header('Content-Encoding: none');
-		}
+		obStart($use_compression);
 
 		// No point in a nicer message, because this is supposed to be an attachment anyway...
 		if ($check_filename === true && !file_exists($filename))

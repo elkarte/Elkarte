@@ -86,11 +86,7 @@ class Jslocale_Controller extends Action_Controller
 		Template_Layers::getInstance()->removeAll();
 
 		// Lets make sure we aren't going to output anything nasty.
-		@ob_end_clean();
-		if (!empty($modSettings['enableCompressedOutput']))
-			ob_start('ob_gzhandler');
-		else
-			ob_start();
+		obStart(!empty($modSettings['enableCompressedOutput']));
 	}
 
 	/**

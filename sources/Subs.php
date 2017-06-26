@@ -2077,3 +2077,27 @@ function dieGif($expired = false)
 	header('Content-Type: image/gif');
 	die("\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\x00\x00\x00\x21\xF9\x04\x01\x00\x00\x00\x00\x2C\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3B");
 }
+
+/**
+ * Prepare ob_start with or without gzip compression
+ *
+ * @param bool $use_compression Starts compressed headers.
+ */
+function obStart($use_compression = false)
+{
+	// This is done to clear any output that was made before now.
+	while (ob_get_level() > 0)
+	{
+		@ob_end_clean();
+	}
+
+	if ($use_compression === true)
+	{
+		ob_start('ob_gzhandler');
+	}
+	else
+	{
+		ob_start();
+		header('Content-Encoding: none');
+	}
+}
