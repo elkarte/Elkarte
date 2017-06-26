@@ -369,11 +369,7 @@ class Calendar_Controller extends Action_Controller
 		$filecontents = build_ical_content($event);
 
 		// Send some standard headers.
-		@ob_end_clean();
-		if (!empty($modSettings['enableCompressedOutput']))
-			ob_start('ob_gzhandler');
-		else
-			ob_start();
+		obStart(!empty($modSettings['enableCompressedOutput']));
 
 		// Send the file headers
 		header('Pragma: no-cache');

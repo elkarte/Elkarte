@@ -6036,6 +6036,7 @@ a > i {
 
 	.pagelinks {
 		min-width: 100%;
+		float: none;
 		/* Necessary for some browsers to keep the pages all on the same line */
 		height: 30px;
 	}
@@ -6148,6 +6149,11 @@ a > i {
 
 	.keyinfo h5 {
 		padding: 3px;
+	}
+	.keyinfo h5:after {
+		content: "";
+		display: block;
+		clear: both;
 	}
 
 	h2 .views_text, h2 .nextlinks {
@@ -6375,13 +6381,6 @@ a > i {
 		margin-bottom: 6px;
 	}
 
-	a.linklevel1.button_strip_notify,
-	a.linklevel1.button_strip_print, a.linklevel1.button_strip_send, .inline_mod_check,
-	a.linklevel1.quotetonew_button, a.linklevel1.button_strip_post_poll,
-	.keyinfo .post_subject, li.listlevel1.quickmod_select_all, p.inline.membergroups {
-		display: none !important;
-	}
-
 	#display_jump_to {
 		float: none;
 	}
@@ -6560,7 +6559,7 @@ a > i {
 	}
 
 	.quickbuttons .modified {
-		display: none;
+		white-space: normal;
 	}
 
 	.mlist li .group {
@@ -6582,6 +6581,10 @@ a > i {
 
 	dd {
 		padding-left: 4% !important;
+	}
+	/* Override the previous for charts in the stats page */
+	.statsbar {
+		padding-left: 0% !important;
 	}
 
 	dd input, dd select, dd textarea {

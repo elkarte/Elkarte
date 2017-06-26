@@ -1385,3 +1385,70 @@ function showLetterImage($letter)
 	// Nothing more to come.
 	die();
 }
+
+/**
+ * Simple function to generate an image containing some text.
+ * It uses preferentially Imagick if present, otherwise GD.
+ * Font and size are fixed.
+ *
+ * @package Graphics
+ * @param string $text The text the image should contain
+ * @param int $width Width of the final image
+ * @param int $height Height of the image
+ * @param string $format Type of the image (valid types are png, jpeg, gif)
+ *
+ * @return boolean|resource The image or false if neither Imagick nor GD are found
+ */
+function generateTextImage($text, $width = 100, $height = 100, $format = 'png')
+{
+	global $settings;
+
+	$valid_formats = array('jpeg', 'png', 'gif');
+	if (!in_array($format, $valid_formats))
+	{
+		$format = 'png';
+	}
+
+	if (checkImagick() === true)
+	{
+		$image = new \Imagick();
+		$image->newImage($width, $height, new ImagickPixel('white'));
+		$image->setImageFormat($format);
+
+		$draw = new \ImagickDraw();
+		$draw->setStrokeColor(new \ImagickPixel('black'));
+		$draw->setFillColor(new \ImagickPixel('black'));
+
+		$draw->setStrokeWidth(1);
+		$draw->setFontSize($width / 5);
+		$draw->setTextAlignment(\Imagick::ALIGN_CENTER);
+		$draw->setFont($settings['default_theme_dir'] . '/fonts/VDS_New.ttf');
+
+		$imagick->annotateimage($draw, 40, 40, 0, $text);
+		return $imagick;
+	}
+	elseif (checkGD() === true)
+	{
+		$create_function = 'image' . $format;
+		$image = imagecreate($width, $height);
+		$font_size = 3;
+
+		// The loop is to try to fit the text into the image.
+		do
+		{
+			$text_width = imagefontwidth($font_size) * strlen($text);
+			$text_height = imagefontheight($font_size);
+
+			$w_offset = ($width - $text_width) / 2;
+			$h_offset = ($height - $text_height) / 2;
+		} while ($text_width > $width && $font_size-- > 1);
+
+		imagestring($image, $font_size, $w_offset, $h_offset,  $text, imagecolorallocate($image, 0, 0, 0));
+		$create_function($image);
+		return $image;
+	}
+	else
+	{
+		return false;
+	}
+}

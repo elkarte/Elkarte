@@ -225,13 +225,9 @@ class News_Controller extends Action_Controller
 		$context['recent_posts_data'] = $xml;
 		$context['xml_format'] = $xml_format;
 
-		// This is an xml file....
-		@ob_end_clean();
-		if (!empty($modSettings['enableCompressedOutput']))
-			ob_start('ob_gzhandler');
-		else
-			ob_start();
+		obStart(!empty($modSettings['enableCompressedOutput']));
 
+		// This is an xml file....
 		if (isset($this->_req->query->debug))
 			header('Content-Type: text/xml; charset=UTF-8');
 		elseif ($xml_format === 'rss' || $xml_format === 'rss2')

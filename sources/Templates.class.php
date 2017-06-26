@@ -282,15 +282,7 @@ class Templates
 		global $context, $txt, $scripturl, $modSettings, $boardurl;
 		global $maintenance, $mtitle, $mmessage;
 
-		@ob_end_clean();
-		if (!empty($modSettings['enableCompressedOutput']))
-		{
-			ob_start('ob_gzhandler');
-		}
-		else
-		{
-			ob_start();
-		}
+		obStart(!empty($modSettings['enableCompressedOutput']));
 
 		// Don't cache error pages!!
 		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');

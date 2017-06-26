@@ -220,11 +220,7 @@ class OpenID_Controller extends Action_Controller
 	{
 		global $scripturl, $modSettings;
 
-		@ob_end_clean();
-		if (!empty($modSettings['enableCompressedOutput']))
-			ob_start('ob_gzhandler');
-		else
-			ob_start();
+		obStart(!empty($modSettings['enableCompressedOutput']));
 
 		header('Content-Type: application/xrds+xml');
 		echo '<?xml version="1.0" encoding="UTF-8"?' . '>';
