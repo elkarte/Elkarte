@@ -45,6 +45,13 @@ class TestCache extends PHPUnit_Framework_TestCase
 	public function testApc()
 	{
 		$this->_cache_obj = new ElkArte\sources\subs\CacheMethod\Apc(array());
+
+		// We may not build APCu for every matrix
+		if (!$this->_cache_obj->isAvailable())
+		{
+			$this->markTestSkipped('APCu is not loaded; skipping this test method');
+		}
+
 		$this->doCacheTests();
 	}
 
@@ -74,6 +81,7 @@ class TestCache extends PHPUnit_Framework_TestCase
 		{
 			$this->markTestSkipped('Xcache is not loaded; skipping this test method');
 		}
+
 		$this->doCacheTests();
 	}
 
@@ -100,7 +108,7 @@ class TestCache extends PHPUnit_Framework_TestCase
 		$cache->enable(true);
 		$this->assertSame($cache_enable, $cache->getLevel());
 		$this->assertTrue($cache->isEnabled());
-		
+
 		$test_array = array('anindex' => 'avalue', array());
 
 		$cache->put('test', $test_array);

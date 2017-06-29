@@ -14,7 +14,6 @@
  *
  * It extends PHPUnit_Extensions_Selenium2TestCase and provides additional functions
  * as well as sets up the common environments for all tests
- *
  */
 abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 {
@@ -39,7 +38,10 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 
 		// Set the base URL for the tests.
 		if (!defined('PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST'))
+		{
 			DEFINE('PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST', 'http://127.0.0.1/');
+		}
+
 		$this->setBrowserUrl(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST);
 
 		parent::setUp();
@@ -56,6 +58,7 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 
 	/**
 	 * Common setUpPage functions
+	 *
 	 * - Calls parent setUpPage
 	 * - sets a window size good for screenshots etc.
 	 */
@@ -66,7 +69,9 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 		$this->timeouts()->implicitWait(10000);
 
 		if ($this->width && $this->height)
+		{
 			$this->currentWindow()->size(array('width' => $this->width, 'height' => $this->height));
+		}
 	}
 
 	/**
@@ -102,7 +107,7 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 	public function enterACP()
 	{
 		// Select admin, enter password
-		$this->byCssSelector('#button_admin > a')->click();
+		$this->clickit('#button_admin > a');
 		$this->assertEquals('Administration Log in', $this->title());
 		$this->byId('admin_pass')->value($this->adminpass);
 		$this->clickit('input[type="submit"]');

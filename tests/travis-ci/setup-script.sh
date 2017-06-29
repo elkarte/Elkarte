@@ -1,26 +1,36 @@
 #!/bin/bash
 #
 # Run PHPUnit tests,
-# if its 5.6+mysql then generate test coverage as well
 
 set -e
-set -x
+set +x
 
+# Access passed params from travis.yml
 DB=$1
-SHORT_DB=${DB%%-*}
-
 TRAVIS_PHP_VERSION=$2
+WEBTESTS=$3
+COVERAGE=$4
+
+# Common names
+SHORT_DB=${DB%%-*}
 SHORT_PHP=${TRAVIS_PHP_VERSION:0:3}
 
-# Run phpunit tests for the site
-if [ "$SHORT_PHP" == "5.6" -a "$SHORT_DB" == "mysql" ]
+# If this is a web test run then we need to enable selenium
+if [ "$WEBTESTS" == "true" ]
 then
-    /var/www/vendor/bin/phpunit --configuration /var/www/tests/travis-ci/phpunit-with-coverage-$SHORT_DB-travis.xml
-    /var/www/vendor/bin/phpunit /var/www/tests/travis-ci/BootstrapRunTest.php
-elif [ "$SHORT_DB" == "none" ]
-then
-    /var/www/vendor/bin/phpunit --configuration /var/www/tests/travis-ci/phpunit-basic-travis.xml
-else
-    /var/www/vendor/bin/phpunit --configuration /var/www/tests/travis-ci/phpunit-$SHORT_DB-travis.xml
-    /var/www/vendor/bin/phpunit /var/www/tests/travis-ci/BootstrapRunTest.php
+    phpenv config-add /var/www/tests/travis-ci/travis_webtest_php.ini
+    sudo /var/www/tests/travis-ci/setup-selenium.sh
 fi
+
+# Build a config string for PHPUnit
+COVER=""
+WEB=""
+if [ "$COVERAGE" != "true" ]; then COVER="--no-coverage"; fi
+if [ "$WEBTESTS" == "true" ]; then WEB="-with-webtest"; fi
+CONFIG="--configuration /var/www/tests/travis-ci/phpunit${WEB}-${SHORT_DB}-travis.xml ${COVER}"
+
+# Run PHPUnit tests for the site
+/var/www/vendor/bin/phpunit ${CONFIG}
+
+# Run validation (lock file)
+if [ "$SHORT_DB" != "none" ]; then /var/www/vendor/bin/phpunit /var/www/tests/travis-ci/BootstrapRunTest.php; fi

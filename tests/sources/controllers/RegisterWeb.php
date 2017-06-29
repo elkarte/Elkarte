@@ -76,7 +76,7 @@ class TestRegister_Controller extends ElkArteWebTest
 		$this->registerMember();
 
 		// Let's select register!
-		$this->byName('regSubmit')->click();
+		$this->clickit('input[name="regSubmit"]');
 
 		// Should fail for speed reasons
 		$this->assertContains('You went through the registration process too quickly', $this->byCssSelector('div.errorbox')->text());
@@ -93,7 +93,7 @@ class TestRegister_Controller extends ElkArteWebTest
 		sleep(9);
 
 		// Let's select register!
-		$this->byName('regSubmit')->click();
+		$this->clickit('input[name="regSubmit"]');
 
 		// Did it work? Did it work?
 		$this->assertEquals('Registration Successful', $this->byCssSelector('h2.category_header')->text());
@@ -125,11 +125,13 @@ class TestRegister_Controller extends ElkArteWebTest
 		// Fill in the form, long hand style
 		$usernameInput = $this->byId('user');
 		$usernameInput->clear();
-		$this->keys('user49');
+		//$this->keys('user49');
+		$usernameInput->value('user49');
 
 		$passwordInput = $this->byId('passwrd');
 		$passwordInput->clear();
-		$this->keys('user49');
+		//$this->keys('user49');
+		$passwordInput->value('user49');
 
 		// Submit it
 		$this->clickit('.login > div > dl > input[type="submit"]');
@@ -139,7 +141,8 @@ class TestRegister_Controller extends ElkArteWebTest
 		$this->assertEquals('Delete this account: user49', $this->title());
 		$passwordInput = $this->byId('oldpasswrd');
 		$passwordInput->clear();
-		$this->keys('user49');
+		$passwordInput->value('user49');
+		//$this->keys('user49');
 		$this->assertEquals('user49', $passwordInput->value());
 
 		// Submit it

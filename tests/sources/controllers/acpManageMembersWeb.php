@@ -25,7 +25,9 @@ class TestManageMembers_Controller extends ElkArteWebTest
 				'require' => $require[$i],
 				'memberGroup' => 2,
 			);
-			$memberID = registerMember($regOptions);
+
+			// Will show sh: 1: sendmail: not found in the console
+			registerMember($regOptions);
 			$_SESSION['just_registered'] = 0;
 		}
 	}
@@ -56,8 +58,8 @@ class TestManageMembers_Controller extends ElkArteWebTest
 
 		// Finally, ensure they have been approved.
 		$this->url('index.php?action=admin;area=viewmembers;sa=search');
-		$this->byId('activated-1')->click();
-		$this->byId('activated-2')->click();
+		$this->clickit('#activated-1');
+		$this->clickit('#activated-2');
 		$this->clickit('input[value=Search]');
 		$this->assertContains('user1', $this->byId('member_list')->text());
 	}

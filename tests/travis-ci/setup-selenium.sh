@@ -3,30 +3,49 @@
 # Install selenium server for functional web testing
 
 set -e
-set -x
+set +x
 
-# some vars to make this easy to change
-SELENIUM_HUB_URL='http://127.0.0.1:4444'
-SELENIUM_JAR=/usr/share/selenium/selenium-server-standalone.jar
-SELENIUM_DOWNLOAD_URL=http://selenium-release.storage.googleapis.com/2.53/selenium-server-standalone-2.53.1.jar
+# Some vars to make this easy to change
+WEBTESTS_HUB_URL='http://127.0.0.1:4444'
+WEBTESTS_JAR=/usr/share/selenium/selenium-server-standalone.jar
+WEBTESTS_DOWNLOAD_URL=http://selenium-release.storage.googleapis.com/3.0/selenium-server-standalone-3.0.1.jar
+
+# Location of geckodriver for use as webdriver in xvfb
+GECKODRIVER_DOWNLOAD_URL=https://github.com/mozilla/geckodriver/releases/download/v0.14.0/geckodriver-v0.14.0-linux64.tar.gz
+GECKODRIVER_TAR=/tmp/geckodriver.tar.gz
+
+# Location of chromedriver for use as webdriver in xvfb
+CHROMEDRIVER_DOWNLOAD_URL=https://chromedriver.storage.googleapis.com/2.9/chromedriver_linux64.zip
+CHROMEDRIVER_ZIP=/tmp/chromedriver.zip
 
 # If selenium is not available, get it
-if [ ! -f "$SELENIUM_JAR" ]
+if [ ! -f "$WEBTESTS_JAR" ]
 then
-    sudo mkdir -p $(dirname "$SELENIUM_JAR")
-    sudo wget -nv -O "$SELENIUM_JAR" "$SELENIUM_DOWNLOAD_URL"
+    sudo mkdir -p $(dirname "$WEBTESTS_JAR")
+    sudo wget -nv -O "$WEBTESTS_JAR" "$WEBTESTS_DOWNLOAD_URL"
 fi
 
-# Update/Install Fx to the latest available
-sudo apt-get install firefox -y --no-install-recommends
+# Fetch gecko driver for use in selenium
+if [ ! -f "/usr/bin/geckodriver" ]
+then
+    echo "Downloading geckodriver"
+    sudo wget -nv -O "$GECKODRIVER_TAR" "$GECKODRIVER_DOWNLOAD_URL"
+    sudo tar -xvf "$GECKODRIVER_TAR" -C "/usr/bin/"
+fi
 
-# install chrome driver for use in selenium
-wget https://chromedriver.storage.googleapis.com/2.25/chromedriver_linux64.zip && unzip chromedriver_linux64.zip && sudo mv chromedriver /usr/bin
+# Fetch chrome driver for use in selenium
+if [ ! -f "/usr/bin/chromedriver" ]
+then
+    echo "Downloading chromedriver"
+    sudo wget -nv -O "$CHROMEDRIVER_ZIP" "$CHROMEDRIVER_DOWNLOAD_URL"
+    sudo unzip "$CHROMEDRIVER_ZIP"
+    sudo mv chromedriver /usr/bin
+fi
 
-# Start Selenium
-export DISPLAY=:99.0
-sudo xvfb-run java -Dwebdriver.chromedriver.bin=/usr/bin/chromedriver -jar "$SELENIUM_JAR" > /tmp/selenium.log &
-wget --retry-connrefused --tries=120 --waitretry=3 --output-file=/dev/null "$SELENIUM_HUB_URL/wd/hub/status" -O /dev/null
+# Start Selenium, select gecko or chrome driver
+export DISPLAY=:99
+sudo xvfb-run -s "-screen 0 1280x800x24" java -Dwebdriver.geckodriver.bin=/usr/bin/geckodriver -jar "$WEBTESTS_JAR" > /tmp/selenium.log &
+wget --retry-connrefused --tries=120 --waitretry=3 --output-file=/dev/null "$WEBTESTS_HUB_URL/wd/hub/status" -O /dev/null
 
 # Test to see if the selenium server really did start
 if [ ! $? -eq 0 ]
@@ -38,6 +57,3 @@ fi
 
 # Setup a directory to hold screenshots of failed tests
 sudo mkdir /var/www/screenshots && chmod 777 /var/www/screenshots
-
-# Copy phpunit_coverage.php into the webserver's document root directory.
-cp /var/www/vendor/phpunit/phpunit-selenium/PHPUnit/Extensions/SeleniumCommon/phpunit_coverage.php /var/www

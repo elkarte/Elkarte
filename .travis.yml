@@ -1,54 +1,72 @@
-sudo: true
+sudo: required
 language: php
+dist: trusty
+group: edge
 
 matrix:
   include:
-    - php: 5.3
-      env: DB=mysql-5.5
+    - php: 5.4
+      env:
+        - DB=mysql-5.6
+        - WEBTESTS=false
+        - COVERAGE=false
     - php: 5.6
-      env: DB=mysql-5.6
-    - php: 7.0
-      env: DB=mysql-5.7
-    - php: 5.3
-      env: DB=postgres-9.3
+      env:
+        - DB=mysql-5.6
+        - WEBTESTS=true
+        - COVERAGE=true
+    - php: 7.1
+      env:
+        - DB=mysql-5.7
+        - WEBTESTS=false
+        - COVERAGE=false
+    - php: 5.4
+      env:
+        - DB=postgres-9.3
+        - WEBTESTS=false
+        - COVERAGE=false
     - php: 5.6
-      env: DB=postgres-9.3
-    - php: 7.0
-      env: DB=postgres-9.4
-      addons:
-        postgresql: "9.4"
+      env:
+        - DB=postgres-9.4
+        - WEBTESTS=false
+        - COVERAGE=true
+    - php: 7.1
+      env:
+        - DB=postgres-9.5
+        - WEBTESTS=false
+        - COVERAGE=false
     - php: 5.6
-      env: DB=mariadb-10.0
+      env:
+        - DB=mariadb-10.0
+        - WEBTESTS=false
+        - COVERAGE=false
       addons:
         mariadb: '10.0'
   fast_finish: true
 
-# Create a Travis memcached enabled environment for the test suite to run in and
-# ensure that we test against localhost on Travis-CI.
-services: memcached
+addons:
+  firefox: "54.0"
 
+services:
+  memcached
+
+# Prepare the server (PHP, Apache, PHPUnit, APCu etc)
 install:
-  - chmod +x tests/travis-ci/setup-server.sh
-  - chmod +x tests/travis-ci/setup-selenium.sh
-  - tests/travis-ci/setup-server.sh $DB $TRAVIS_PHP_VERSION
+  - chmod +x tests/travis-ci/*.sh
+  - tests/travis-ci/setup-server.sh $DB $TRAVIS_PHP_VERSION $WEBTESTS $COVERAGE
 
-# Install ElkArte and memcached
-# The `services: memcached` will start a memcached service on localhost
-# and on the default port, but in order to test against multiple memcached
-# instances we need to spawn a couple more, so we do that during the before
-# script
+# Install ElkArte
 before_script:
-  - chmod +x tests/travis-ci/setup-elkarte.sh
-  - tests/travis-ci/setup-elkarte.sh $DB $TRAVIS_PHP_VERSION
+  - tests/travis-ci/setup-elkarte.sh $DB $TRAVIS_PHP_VERSION $WEBTESTS $COVERAGE
 
+# Run the PHPUnit tests
 script:
-  - chmod +x /var/www/tests/travis-ci/setup-script.sh
-  - /var/www/tests/travis-ci/setup-script.sh $DB $TRAVIS_PHP_VERSION
+  - /var/www/tests/travis-ci/setup-script.sh $DB $TRAVIS_PHP_VERSION $WEBTESTS $COVERAGE
 
+# Send coverage reports
 after_script:
-  - chmod +x /var/www/tests/travis-ci/setup-results.sh
-  - /var/www/tests/travis-ci/setup-results.sh $DB $TRAVIS_PHP_VERSION
+  - /var/www/tests/travis-ci/setup-results.sh $DB $TRAVIS_PHP_VERSION $WEBTESTS $COVERAGE
 
+# Output screen shots, error logs etc
 after_failure:
-  - chmod +x /var/www/tests/travis-ci/setup-failure.sh
-  - /var/www/tests/travis-ci/setup-failure.sh $DB $TRAVIS_PHP_VERSION
+  - /var/www/tests/travis-ci/setup-failure.sh $DB $TRAVIS_PHP_VERSION $WEBTESTS $COVERAGE
