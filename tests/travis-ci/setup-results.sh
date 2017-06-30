@@ -16,5 +16,8 @@ SHORT_DB=${DB%%-*}
 SHORT_PHP=${TRAVIS_PHP_VERSION:0:3}
 
 # Scrutinizer will merge all coverage data...
+if [ "$COVERAGE" == "true" ]
+then
 wget https://scrutinizer-ci.com/ocular.phar
 php ocular.phar code-coverage:upload --format=php-clover /tmp/coverage.xml
+fi
