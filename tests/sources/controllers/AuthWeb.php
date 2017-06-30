@@ -34,12 +34,14 @@ class TestAuth_Controller extends ElkArteWebTest
 		// Fill in the form, long hand style
 		$usernameInput = $this->byId('user');
 		$usernameInput->clear();
-		$this->keys($username);
+		$usernameInput->value($username);
+		//$this->keys($username);
 		$this->assertEquals($username, $usernameInput->value());
 
 		$passwordInput = $this->byId('passwrd');
 		$passwordInput->clear();
-		$this->keys($password);
+		$passwordInput->value($password);
+		//$this->keys($password);
 		$this->assertEquals($password, $passwordInput->value());
 
 		// Submit it

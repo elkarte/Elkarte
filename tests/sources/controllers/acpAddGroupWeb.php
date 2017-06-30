@@ -26,14 +26,14 @@ class TestManageMembergroups_Controller extends ElkArteWebTest
 
 		// Fill in the new group form with initial values
 		$this->ById('group_name_input')->value('Test Group');
-		$this->ById('checkall_check')->click();
+		$this->clickit('#checkall_check');
 		$this->clickit('input[value="Add group"]');
 
 		// Group Details, give it a description, icons, etc
 		$this->assertEquals("Edit Membergroup", $this->title());
 		$this->ById('group_desc_input')->value('The Test Group');
 		$this->ById('icon_count_input')->value('2');
-		$this->ByName('save')->click();
+		$this->clickit('input[name="save"]');
 
 		// We should be back at the group listing, the new group should be there
 		$this->assertEquals("Manage Membergroups", $this->title());

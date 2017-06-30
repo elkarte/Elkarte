@@ -42,7 +42,9 @@ class DbTable_MySQL_Install extends DbTable_MySQL
 		$this->_reservedTables = array();
 
 		foreach ($this->_reservedTables as $k => $table_name)
+		{
 			$this->_reservedTables[$k] = strtolower($db_prefix . $table_name);
+		}
 
 		// let's be sure.
 		$this->_package_log = array();
@@ -53,7 +55,7 @@ class DbTable_MySQL_Install extends DbTable_MySQL
 
 	/**
 	 * Static method that allows to retrieve or create an instance of this class.
-	 *
+`	 *
 	 * @param object $db - A Database_MySQL object
 	 *
 	 * @return object - A DbTable_MySQL object
@@ -61,7 +63,9 @@ class DbTable_MySQL_Install extends DbTable_MySQL
 	public static function db_table($db)
 	{
 		if (is_null(self::$_tbl_inst))
+		{
 			self::$_tbl_inst = new DbTable_MySQL_Install($db);
+		}
 
 		return self::$_tbl_inst;
 	}
@@ -83,11 +87,14 @@ class Elk_Testing_mysql extends Elk_Testing_Setup
 		$this->_db_user = 'root';
 		$this->_db_passwd = '';
 		$db_prefix = $this->_db_prefix = 'elkarte_';
-		$link = mysql_connect($this->_db_server, $this->_db_user, $this->_db_passwd);
-		if (!$link) {
-				die('Could not connect: ' . mysql_error());
+
+		$link = mysqli_connect($this->_db_server, $this->_db_user, $this->_db_passwd);
+		if (!$link)
+		{
+			die('Could not connect: ' . mysqli_error($link));
 		}
-		printf("MySQL server version: %s\n", mysql_get_server_info());
+		printf("MySQL server version: %s\n", mysqli_get_server_info($link));
+
 		// Start the database interface
 		Database_MySQL::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd, $this->_db_prefix);
 		$this->_db = Database_MySQL::db();

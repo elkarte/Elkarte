@@ -43,7 +43,9 @@ class DbTable_PostgreSQL_Install extends DbTable_PostgreSQL
 		$this->_reservedTables = array();
 
 		foreach ($this->_reservedTables as $k => $table_name)
+		{
 			$this->_reservedTables[$k] = strtolower($db_prefix . $table_name);
+		}
 
 		// let's be sure.
 		$this->_package_log = array();
@@ -61,7 +63,10 @@ class DbTable_PostgreSQL_Install extends DbTable_PostgreSQL
 	public static function db_table($db)
 	{
 		if (is_null(self::$_tbl_inst))
+		{
 			self::$_tbl_inst = new DbTable_PostgreSQL_Install($db);
+		}
+
 		return self::$_tbl_inst;
 	}
 }

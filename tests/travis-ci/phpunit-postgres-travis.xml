@@ -10,6 +10,7 @@
          syntaxCheck="false"
          verbose="true"
          bootstrap="/var/www/tests/travis-ci/bootstrap.php">
+
   <testsuites>
       <testsuite name="ElkArte Unit Tests">
           <directory suffix="Test.php">/var/www/tests</directory>
@@ -20,8 +21,8 @@
   </testsuites>
 
   <logging>
-     <log type="coverage-clover" target="/tmp/coverage.xml"/>
-     <log type="coverage-text" target="php://stdout" />
+      <log type="coverage-clover" target="/tmp/coverage.xml"/>
+      <log type="coverage-text" target="php://stdout" />
   </logging>
 
   <filter>
@@ -36,4 +37,5 @@
   <php>
       <const name="DBTYPE" value="PostgreSQL"/>
   </php>
+
 </phpunit>

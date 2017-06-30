@@ -119,7 +119,9 @@ Class Elk_Testing_Setup
 		foreach ($txt as $key => $value)
 		{
 			if (substr($key, 0, 8) == 'default_')
+			{
 				$replaces['{$' . $key . '}'] = addslashes($value);
+			}
 		}
 		$replaces['{$default_reserved_names}'] = strtr($replaces['{$default_reserved_names}'], array('\\\\n' => '\\n'));
 
@@ -136,15 +138,18 @@ Class Elk_Testing_Setup
 		$this->_install_instance = new $class_name($db_wrapper, $db_table_wrapper);
 		$methods = get_class_methods($this->_install_instance);
 
-		$this->_queries['tables'] = array_filter($methods, function ($method) {
+		$this->_queries['tables'] = array_filter($methods, function ($method)
+		{
 			return strpos($method, 'table_') === 0;
 		});
 
-		$this->_queries['inserts'] = array_filter($methods, function ($method) {
+		$this->_queries['inserts'] = array_filter($methods, function ($method)
+		{
 			return strpos($method, 'insert_') === 0;
 		});
 
-		$this->_queries['others'] = array_filter($methods, function ($method) {
+		$this->_queries['others'] = array_filter($methods, function ($method)
+		{
 			return substr($method, 0, 2) !== '__' && strpos($method, 'insert_') !== 0 && strpos($method, 'table_') !== 0;
 		});
 	}
@@ -159,7 +164,9 @@ Class Elk_Testing_Setup
 
 		// Bu-bye
 		foreach ($tables as $table)
+		{
 			$this->_db_table->db_drop_table($table);
+		}
 	}
 
 	/**
@@ -176,7 +183,7 @@ Class Elk_Testing_Setup
 			'$db_user = \'root\';',
 			'$db_prefix = \'elkarte_\';',
 			'$db_passwd = \'\';',
-			),
+		),
 			array(
 				'$boardurl = \'' . $this->_boardurl . '\';',
 				'$db_type = \'' . $this->_db_type . '\';',
@@ -189,7 +196,9 @@ Class Elk_Testing_Setup
 		);
 
 		if (strpos($file, 'if (file_exist') !== false)
+		{
 			$file = substr($file, 0, strpos($file, 'if (file_exist'));
+		}
 
 		file_put_contents(BOARDDIR . '/Settings.php', $file);
 	}
@@ -296,63 +305,6 @@ Class Elk_Testing_Setup
 		loadLanguage('Install');
 		updateSubjectStats(1, htmlspecialchars($txt['default_topic_subject']));
 	}
-
-	public function createTests()
-	{
-		// Sometimes it is necessary to exclude some tests...
-		$excluded = array(
-			// At the moment we setup the testing environment with an already
-			// installed forum, so test the installation would fail
-			'TestInstall.php'
-		);
-
-		// Get all the files
-		$allTests = $this->_testsInDir(BOARDDIR . '/tests/sources/*');
-		$allTests = array_merge($allTests, $this->_testsInDir(BOARDDIR . '/tests/install/*'));
-
-		// For each file create a test case
-		foreach ($allTests as $key => $test)
-		{
-			$test = realpath($test);
-
-			// Skip the excluded tests
-			if (in_array(basename($test), $excluded))
-				continue;
-
-			file_put_contents(BOARDDIR . '/tests/run_' . md5($test) . '.php', '<?php
-
-$testName = \'' . $test . '\';
-
-define(\'TESTDIR\', dirname(__FILE__) . \'/\');
-require_once(\'simpletest/autorun.php\');
-require_once(TESTDIR . \'../Settings.php\');
-
-class Test_' . $key . ' extends TestSuite
-{
-	function Test_' . $key . '()
-	{
-		$this->TestSuite(\'Test ' . $key . '\');
-
-		$this->addFile(\'' . $test . '\');
-	}
-}');
-		}
-	}
-
-	private function _testsInDir($dir)
-	{
-		$entities = glob($dir);
-		$files = array();
-		foreach ($entities as $entity)
-		{
-			if (is_dir($entity))
-				$files = array_merge($files, $this->_testsInDir($entity . '/*'));
-			else
-				$files[] = $entity;
-		}
-
-		return $files;
-	}
 }
 
 class DbWrapper
@@ -377,7 +329,9 @@ class DbWrapper
 		$args = func_get_args();
 
 		if ($this->count_mode)
+		{
 			return count($args[3]);
+		}
 
 		foreach ($args[3] as $key => $data)
 		{

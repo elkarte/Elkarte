@@ -12,6 +12,9 @@
          bootstrap="/var/www/tests/travis-ci/bootstrap.php">
 
   <testsuites>
+      <testsuite name="ElkArte Web Tests">
+          <directory suffix="Web.php">/var/www/tests</directory>
+      </testsuite>
       <testsuite name="ElkArte Unit Tests">
           <directory suffix="Test.php">/var/www/tests</directory>
       </testsuite>
@@ -20,10 +23,13 @@
       </testsuite>
   </testsuites>
 
-  <logging>
-     <log type="coverage-clover" target="/tmp/coverage.xml"/>
-     <log type="coverage-text" target="php://stdout" />
-  </logging>
+  <listeners>
+      <listener class="PHPUnit_Extensions_Selenium2TestCase_ScreenshotListener">
+          <arguments>
+              <string>/var/www/screenshots</string>
+          </arguments>
+      </listener>
+  </listeners>
 
   <filter>
       <whitelist addUncoveredFilesFromWhitelist="true">
@@ -34,7 +40,20 @@
       </whitelist>
   </filter>
 
+    <logging>
+        <log type="coverage-clover" target="/tmp/coverage.xml"/>
+        <log type="coverage-text" target="php://stdout" />
+    </logging>
+
   <php>
       <const name="DBTYPE" value="MySQL"/>
+      <const name="PHPUNIT_SELENIUM" value="true"/>
+      <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST" value="http://127.0.0.1/"/>
+      <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT" value="4444"/>
+      <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_BROWSER" value="*firefox"/>
+      <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM2_BROWSER" value="firefox"/>
+      <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_TESTS_URL" value="http://127.0.0.1"/>
+      <const name="PHPUNIT_TESTSUITE" value="true"/>
   </php>
+
 </phpunit>

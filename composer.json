@@ -1,7 +1,7 @@
 {
 	"name": "elkarte/elkarte",
 	"description": "ElkArte Forum Software application",
-	"version": "1.1.0-beta1",
+	"version": "1.1.0-RC1",
 	"type": "project",
 	"keywords": ["elkarte", "forum"],
 	"homepage": "http://www.elkarte.net",
@@ -15,7 +15,7 @@
 	],
 	"support": {
 		"issues": "https://github.com/elkarte/Elkarte/issues",
-		"forum": "https://www.elkarte.com/community/",
+		"forum": "http://www.elkarte.com/community/",
 		"wiki": "https://github.com/elkarte/Elkarte/wiki",
 		"irc": "irc://irc.freenode.org/elkarte"
 	},
@@ -27,9 +27,9 @@
 		"php": ">=5.3.3"
 	},
 	"require-dev": {
+		"phpunit/phpunit-selenium": "~3.0",
 		"phpunit/dbunit": "1.4.*",
-		"phpunit/phpunit": "4.8.*",
-		"phpunit/phpunit-selenium": "2.0.*"
+		"phpunit/phpunit": "~5.7"
 	},
 	"autoload": {
 		"files": ["sources/Autoloader.class.php"],
