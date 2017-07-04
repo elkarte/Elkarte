@@ -5,9 +5,9 @@
  *
  * What it does:
  *
- *  - it handles the session data in the database (more scalable.)
- *  - it uses the databaseSession_lifetime setting for garbage collection.
- *  - the custom session handler is set by loadSession().
+ *  - It handles the session data in the database (more scalable.)
+ *  - It uses the databaseSession_lifetime setting for garbage collection.
+ *  - The custom session handler is set by loadSession().
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -112,8 +112,4 @@ function loadSession()
 	}
 
 	$sc = $_SESSION['session_value'];
-	// This is here only to avoid session errors in PHP7
-	// microtime effectively forces the replacing of the session in the db each
-	// time the page is loaded
-	$_SESSION['mictrotime'] = microtime();
 }
