@@ -115,12 +115,13 @@ function checkImageContents($fileName, $extensiveCheck = false)
 	while (!feof($fp))
 	{
 		$cur_chunk = fread($fp, 8192);
+		$test_chunk = $prev_chunk . $cur_chunk;
 
 		// Though not exhaustive lists, better safe than sorry.
 		if (!empty($extensiveCheck))
 		{
 			// Paranoid check. Some like it that way.
-			if (preg_match('~(iframe|\\<\\?|\\<%|html|eval|body|script\W|(?-i)[CFZ]WS[\x01-\x0E])~i', $prev_chunk . $cur_chunk) === 1)
+			if (preg_match('~<\\?php|<script\W|(?-i)[CFZ]WS[\x01-\x0E]~i', $test_chunk) === 1)
 			{
 				fclose($fp);
 				return false;
@@ -128,15 +129,17 @@ function checkImageContents($fileName, $extensiveCheck = false)
 		}
 		else
 		{
-			// Check for potential infection
-			if (preg_match('~(iframe|(?<!cellTextIs)html|eval|body|script\W|(?-i)[CFZ]WS[\x01-\x0E])~i', $prev_chunk . $cur_chunk) === 1)
+			// Check for potential php injection
+			if (preg_match('~<\\?php|<script\s+language\s*=\s*(?:php|"php"|\'php\')\s*>~i', $test_chunk))
 			{
 				fclose($fp);
 				return false;
 			}
 		}
+
 		$prev_chunk = $cur_chunk;
 	}
+
 	fclose($fp);
 
 	return true;
