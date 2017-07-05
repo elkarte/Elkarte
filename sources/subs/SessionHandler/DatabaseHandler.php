@@ -117,10 +117,9 @@ class DatabaseHandler extends SessionHandler
 				'session_id' => $sessionId,
 			)
 		);
-		$result = $this->_db->affected_rows();
 
 		// If that didn't work, try inserting a new one.
-		if (empty($result))
+		if ($this->_db->affected_rows() == 0)
 		{
 			$this->_db->insert('ignore',
 				'{db_prefix}sessions',
@@ -128,9 +127,8 @@ class DatabaseHandler extends SessionHandler
 				array($sessionId, $data, time()),
 				array('session_id')
 			);
-			$result = $this->_db->affected_rows();
 		}
 
-		return !empty($result);
+		return true;
 	}
 }
