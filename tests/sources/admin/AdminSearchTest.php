@@ -1,7 +1,7 @@
 <?php
 
 /**
- * TestCase class for the admin seaech
+ * TestCase class for the admin search
  */
 class TestAdminSearch extends PHPUnit_Framework_TestCase
 {
@@ -27,8 +27,6 @@ class TestAdminSearch extends PHPUnit_Framework_TestCase
 	 */
 	public function testBeforeSearchSettings()
 	{
-		global $context;
-
 		$this->settingsProvider();
 	}
 
@@ -45,8 +43,7 @@ class TestAdminSearch extends PHPUnit_Framework_TestCase
 
 	public function settingsProvider()
 	{
-		global $context;
-		global $user_info;
+		global $context, $user_info;
 
 		/*
 		 * Forcefully reload language files to combat PHPUnit
