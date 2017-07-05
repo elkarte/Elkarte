@@ -575,11 +575,11 @@ class Attachment_Controller extends Action_Controller
 	 * @param string $filename Full path+file name of the file in the filesystem
 	 * @param string $eTag ETag cache validator
 	 * @param string $mime_type The mime-type of the file
-	 * @param blloean $use_compression If use gzip compression
+	 * @param boolean $use_compression If use gzip compression
 	 * @param string $disposition The value of the Content-Disposition header
 	 * @param string $real_filename The original name of the file
-	 * @param blloean $do_cache If send the a max-age header or not
-	 * @param blloean $check_filename When false, any check on $filename is skipped
+	 * @param boolean $do_cache If send the a max-age header or not
+	 * @param boolean $check_filename When false, any check on $filename is skipped
 	 */
 	protected function _send_headers($filename, $eTag, $mime_type, $use_compression, $disposition, $real_filename, $do_cache, $check_filename = true)
 	{
