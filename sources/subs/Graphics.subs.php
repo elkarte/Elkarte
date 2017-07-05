@@ -23,11 +23,12 @@
  * Create a thumbnail of the given source.
  *
  * @uses resizeImageFile() function to achieve the resize.
- *
  * @package Graphics
+ *
  * @param string $source The name of the source image
  * @param int $max_width The maximum allowed width
  * @param int $max_height The maximum allowed height
+ *
  * @return boolean whether the thumbnail creation was successful.
  */
 function createThumbnail($source, $max_width, $max_height)
@@ -36,11 +37,9 @@ function createThumbnail($source, $max_width, $max_height)
 
 	$destName = $source . '_thumb.tmp';
 
-	// Do the actual resize.
-	if (!empty($modSettings['attachment_thumb_png']))
-		$success = resizeImageFile($source, $destName, $max_width, $max_height, 3);
-	else
-		$success = resizeImageFile($source, $destName, $max_width, $max_height);
+	// Do the actual resize, thumbnails by default strip EXIF data to save space
+	$format = !empty($modSettings['attachment_thumb_png']) ? 3 : 0;
+	$success = resizeImageFile($source, $destName, $max_width, $max_height, $format, true);
 
 	// Okay, we're done with the temporary stuff.
 	$destName = substr($destName, 0, -4);
@@ -66,8 +65,13 @@ function createThumbnail($source, $max_width, $max_height)
  *
  * @package Graphics
  * @param string $fileName The path to the file
- * @param int $preferred_format The preferred format, 0 to automatically determine, 1 for gif, 2 for jpg,
- * 3 for png, 6 for bmp and 15 for wbmp
+ * @param int $preferred_format The preferred format
+ *   - 0 to automatically determine
+ *   - 1 for gif
+ *   - 2 for jpg
+ *   - 3 for png
+ *   - 6 for bmp
+ *   - 15 for wbmp
  *
  * @return boolean true on success, false on failure.
  */
@@ -130,7 +134,7 @@ function checkImageContents($fileName, $extensiveCheck = false)
 		else
 		{
 			// Check for potential php injection
-			if (preg_match('~<\\?php|<script\s+language\s*=\s*(?:php|"php"|\'php\')\s*>~i', $test_chunk))
+			if (preg_match('~<\\?php|<script\s+language\s*=\s*(?:php|"php"|\'php\')\s*>~i', $test_chunk) === 1)
 			{
 				fclose($fp);
 				return false;
@@ -231,10 +235,11 @@ function imageMemoryCheck($sizes)
  * @param int $max_width The maximum allowed width
  * @param int $max_height The maximum allowed height
  * @param int $preferred_format Used by Imagick/resizeImage
+ * @param bool $strip Allow IM to remove exif data as GD always will
  *
  * @return boolean Whether the thumbnail creation was successful.
  */
-function resizeImageFile($source, $destination, $max_width, $max_height, $preferred_format = 0)
+function resizeImageFile($source, $destination, $max_width, $max_height, $preferred_format = 0, $strip = false)
 {
 	// Nothing to do without GD or IM
 	if (!checkGD() && !checkImagick())
@@ -282,6 +287,7 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 		}
 		else
 			$sizes = array(-1, -1, -1);
+
 		fclose($fp_destination);
 	}
 	// We can't get to the file.
@@ -295,7 +301,7 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 	// A known and supported format?
 	if (checkImagick() && isset($default_formats[$sizes[2]]))
 	{
-		return resizeImage(null, $destination, null, null, $max_width, $max_height, true, $preferred_format);
+		return resizeImage(null, $destination, null, null, $max_width, $max_height, true, $preferred_format, $strip);
 	}
 	elseif (checkGD() && isset($default_formats[$sizes[2]]) && function_exists('imagecreatefrom' . $default_formats[$sizes[2]]))
 	{
@@ -332,11 +338,17 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
  * @param int $max_height The maximum allowed height
  * @param bool $force_resize = false Whether to override defaults and resize it
  * @param int $preferred_format - The preferred format
- *         - 0 to use jpeg, 1 for gif, 2 to force jpeg, 3 for png, 6 for bmp and 15 for wbmp
+ *   - 0 to use jpeg
+ *   - 1 for gif
+ *   - 2 to force jpeg
+ *   - 3 for png
+ *   - 6 for bmp
+ *   - 15 for wbmp
+ * @param bool $strip Whether to have IM strip EXIF data as GD will
  *
  * @return bool Whether resize was successful.
  */
-function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $max_height, $force_resize = false, $preferred_format = 0)
+function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $max_height, $force_resize = false, $preferred_format = 0, $strip = false)
 {
 	global $gd2;
 
@@ -377,6 +389,12 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 			// Create a new image in our preferred format and resize it if needed
 			$imagick->setImageFormat($default_formats[$preferred_format]);
 			$imagick->resizeImage($dest_width, $dest_height, Imagick::FILTER_LANCZOS, 1, true);
+
+			// Remove EXIF / ICC data?
+			if ($strip)
+			{
+				$imagick->stripImage();
+			}
 
 			// Save the new image in the destination location
 			$success = $imagick->writeImage($destName);
