@@ -121,7 +121,7 @@ class AdminSettings_Search
 
 					if (substr($item[1], 0, 4) == 'area')
 					{
-						$search_result['url'] = $scripturl . '?action=admin;' . $search_result['url'] . ($section == 'settings' ? '#' . $item[0][0] : '');
+						$search_result['url'] = $scripturl . '?action=admin;' . $search_result['url'] . ($section == 'settings' && !empty($item['named_link']) ? '#' . $item['named_link'] : '');
 					}
 
 					$search_results[] = $search_result;
@@ -252,7 +252,7 @@ class AdminSettings_Search
 			{
 				if (!empty($var[1]) && !in_array($var[0], array('permissions', 'callback', 'message', 'warning', 'title', 'desc')))
 				{
-					$settings[] = array($this->_get_label($var), $setting_area[1]);
+					$settings[] = array($this->_get_label($var), $setting_area[1], 'named_link' => $var[1]);
 				}
 			}
 		}
