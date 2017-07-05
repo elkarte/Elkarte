@@ -1538,23 +1538,21 @@ function generateTextImageWithIM($text, $width = 100, $height = 100, $format = '
 
 		// 28pt is ~2em given default font stack
 		$font_size = 28;
+
 		$draw = new ImagickDraw();
-		$draw->setFontSize($font_size);
 		$draw->setStrokeColor(new ImagickPixel('#000000'));
 		$draw->setFillColor(new ImagickPixel('#000000'));
-		$draw->setStrokeWidth(1);
+		$draw->setStrokeWidth(0);
 		$draw->setTextAlignment(Imagick::ALIGN_CENTER);
 		$draw->setFont($settings['default_theme_dir'] . '/fonts/VDS_New.ttf');
 
 		// Make sure the text will fit the the allowed space
-		$metric = $image->queryFontMetrics($draw, $text);
-		if (isset($metric['textWidth']) && $metric['textWidth'] > $width)
+		do
 		{
-			$image->clear();
-			$width = (int) $metric['textWidth'];
-			$image->newImage($width, $height, new ImagickPixel('white'));
-			$image->setImageFormat($format);
-		}
+			$draw->setFontSize($font_size);
+			$metric = $image->queryFontMetrics($draw, $text);
+			$text_width = (int) $metric['textWidth'];
+		} while ($text_width > $width && $font_size-- > 1);
 
 		// Place text in center of block
 		$image->annotateImage($draw, $width / 2, $height / 2 + $font_size / 4, 0, $text);
