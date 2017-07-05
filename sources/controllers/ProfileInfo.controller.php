@@ -440,12 +440,17 @@ class ProfileInfo_Controller extends Action_Controller
 		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
 		$context['current_member'] = $this->_memID;
 
+		// What are we viewing
+		$action = $this->_req->getQuery('sa', 'trim', '');
+		$action_title = array('messages' => 'Posts', 'attach' => 'Attachments', 'topics' => 'Topics', 'unwatchedtopics' => 'Unwatched');
+		$action_title = isset($action_title[$action]) ? $action_title[$action] : 'Posts';
+
 		loadTemplate('ProfileInfo');
 
 		// Create the tabs for the template.
 		$context[$context['profile_menu_name']]['tab_data'] = array(
-			'title' => $txt['showPosts'],
-			'description' => $txt['showPosts_help'],
+			'title' => $txt['show' . $action_title],
+			'description' => sprintf($txt['showGeneric_help'], $action_title),
 			'class' => 'profile',
 			'tabs' => array(
 				'messages' => array(
@@ -467,14 +472,14 @@ class ProfileInfo_Controller extends Action_Controller
 			throw new Elk_Exception('loadavg_show_posts_disabled', false);
 
 		// If we're specifically dealing with attachments use that function!
-		if ($this->_req->getQuery('sa', 'trim', '') === 'attach')
+		if ($action === 'attach')
 			return $this->action_showAttachments();
 		// Instead, if we're dealing with unwatched topics (and the feature is enabled) use that other function.
-		elseif ($this->_req->getQuery('sa', 'trim', '') === 'unwatchedtopics' && $modSettings['enable_unwatch'])
+		elseif ($action === 'unwatchedtopics' && $modSettings['enable_unwatch'])
 			return $this->action_showUnwatched();
 
 		// Are we just viewing topics?
-		$context['is_topics'] = $this->_req->getQuery('sa', 'trim', '') === 'topics' ? true : false;
+		$context['is_topics'] = $action === 'topics' ? true : false;
 
 		// If just deleting a message, do it and then redirect back.
 		if (isset($this->_req->query->delete) && !$context['is_topics'])
