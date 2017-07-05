@@ -1455,11 +1455,11 @@ function generateTextImageWithGD($text, $width = 100, $height = 100, $format = '
 	$font = $settings['default_theme_dir'] . '/fonts/VDS_New.ttf';
 
 	// The loop is to try to fit the text into the image.
-	$tt = function_exists('imagettftext');
-	$font_size = $tt ? 28 : 5;
+	$true_type = function_exists('imagettftext');
+	$font_size = $true_type ? 28 : 5;
 	do
 	{
-		if ($tt)
+		if ($true_type)
 		{
 			$metric = imagettfbbox($font_size, 0, $font, $text);
 			$text_width = abs($metric[4] - $metric[0]);
@@ -1473,9 +1473,9 @@ function generateTextImageWithGD($text, $width = 100, $height = 100, $format = '
 	} while ($text_width > $width && $font_size-- > 1);
 
 	$w_offset = ($width - $text_width) / 2;
-	$h_offset = $tt ? ($height / 2) + ($text_height / 2) : ($height - $text_height) / 2;
+	$h_offset = $true_type ? ($height / 2) + ($text_height / 2) : ($height - $text_height) / 2;
 
-	if ($tt)
+	if ($true_type)
 	{
 		imagettftext($image, $font_size, 0, $w_offset, $h_offset, $text_color, $font, $text);
 	}

@@ -119,7 +119,7 @@ class DatabaseHandler extends SessionHandler
 		);
 
 		// If that didn't work, try inserting a new one.
-		if (empty($this->_db->affected_rows()))
+		if ($this->_db->affected_rows() == 0)
 		{
 			$this->_db->insert('ignore',
 				'{db_prefix}sessions',
