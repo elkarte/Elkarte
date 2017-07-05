@@ -1404,6 +1404,9 @@ a.active {
 	border-top: none;
 	border-radius: 0 0 .25em .25em;
 }
+.generic_border .attachment_name {
+	border: 1px solid transparent;
+}
 
 /* -------------------------------------------------------
  *	$PROFILE
