@@ -1280,6 +1280,7 @@ class ProfileInfo_Controller extends Action_Controller
 		);
 
 		$context['member'] = &$memberContext[$this->_memID];
+		$context['member']['id'] = $this->_memID;
 
 		// Is the signature even enabled on this forum?
 		$context['signature_enabled'] = substr($modSettings['signature_settings'], 0, 1) == 1;
