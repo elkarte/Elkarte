@@ -1395,6 +1395,7 @@ function showLetterImage($letter)
  * Font and size are fixed.
  *
  * @package Graphics
+ *
  * @param string $text The text the image should contain
  * @param int $width Width of the final image
  * @param int $height Height of the image
@@ -1404,8 +1405,6 @@ function showLetterImage($letter)
  */
 function generateTextImage($text, $width = 100, $height = 100, $format = 'png')
 {
-	global $settings;
-
 	$valid_formats = array('jpeg', 'png', 'gif');
 	if (!in_array($format, $valid_formats))
 	{
@@ -1414,43 +1413,138 @@ function generateTextImage($text, $width = 100, $height = 100, $format = 'png')
 
 	if (checkImagick() === true)
 	{
-		$image = new \Imagick();
-		$image->newImage($width, $height, new ImagickPixel('white'));
-		$image->setImageFormat($format);
-
-		$draw = new \ImagickDraw();
-		$draw->setStrokeColor(new \ImagickPixel('black'));
-		$draw->setFillColor(new \ImagickPixel('black'));
-
-		$draw->setStrokeWidth(1);
-		$draw->setFontSize($width / 5);
-		$draw->setTextAlignment(\Imagick::ALIGN_CENTER);
-		$draw->setFont($settings['default_theme_dir'] . '/fonts/VDS_New.ttf');
-
-		$imagick->annotateimage($draw, 40, 40, 0, $text);
-		return $imagick;
+		return generateTextImageWithIM($text, $width, $height, $format);
 	}
 	elseif (checkGD() === true)
 	{
-		$create_function = 'image' . $format;
-		$image = imagecreate($width, $height);
-		$font_size = 3;
+		return generateTextImageWithGD($text, $width, $height, $format);
+	}
+	else
+	{
+		return false;
+	}
+}
 
-		// The loop is to try to fit the text into the image.
-		do
+/**
+ * Simple function to generate an image containing some text.
+ * It uses preferentially Imagick if present, otherwise GD.
+ * Font and size are fixed.
+ *
+ * @uses GD
+ *
+ * @package Graphics
+ *
+ * @param string $text The text the image should contain
+ * @param int $width Width of the final image
+ * @param int $height Height of the image
+ * @param string $format Type of the image (valid types are png, jpeg, gif)
+ *
+ * @return resource|boolean The image
+ */
+function generateTextImageWithGD($text, $width = 100, $height = 100, $format = 'png')
+{
+	global $settings;
+
+	$create_function = 'image' . $format;
+
+	// Create a white filled box
+	$image = imagecreate($width, $height);
+	imagecolorallocate($image, 255, 255, 255);
+
+	$text_color = imagecolorallocate($image, 0, 0, 0);
+	$font = $settings['default_theme_dir'] . '/fonts/VDS_New.ttf';
+
+	// The loop is to try to fit the text into the image.
+	$tt = function_exists('imagettftext');
+	$font_size = $tt ? 28 : 5;
+	do
+	{
+		if ($tt)
+		{
+			$metric = imagettfbbox($font_size, 0, $font, $text);
+			$text_width = abs($metric[4] - $metric[0]);
+			$text_height = abs($metric[5] - $metric[1]);
+		}
+		else
 		{
 			$text_width = imagefontwidth($font_size) * strlen($text);
 			$text_height = imagefontheight($font_size);
+		}
+	} while ($text_width > $width && $font_size-- > 1);
 
-			$w_offset = ($width - $text_width) / 2;
-			$h_offset = ($height - $text_height) / 2;
-		} while ($text_width > $width && $font_size-- > 1);
+	$w_offset = ($width - $text_width) / 2;
+	$h_offset = $tt ? ($height / 2) + ($text_height / 2) : ($height - $text_height) / 2;
 
-		imagestring($image, $font_size, $w_offset, $h_offset,  $text, imagecolorallocate($image, 0, 0, 0));
-		$create_function($image);
-		return $image;
+	if ($tt)
+	{
+		imagettftext($image, $font_size, 0, $w_offset, $h_offset, $text_color, $font, $text);
 	}
 	else
+	{
+		imagestring($image, $font_size, $w_offset, $h_offset, $text, $text_color);
+	}
+
+	// Capture the image string
+	ob_start();
+	$result = $create_function($image);
+	$image = ob_get_contents();
+	ob_end_clean();
+
+	return $result ? $image : false;
+}
+
+/**
+ * Function to generate an image containing some text.
+ * It uses Imagick, Font and size are fixed to fit within width
+ *
+ * @uses Imagick
+ *
+ * @package Graphics
+ *
+ * @param string $text The text the image should contain
+ * @param int $width Width of the final image
+ * @param int $height Height of the image
+ * @param string $format Type of the image (valid types are png, jpeg, gif)
+ *
+ * @return boolean|resource The image or false on error
+ */
+function generateTextImageWithIM($text, $width = 100, $height = 100, $format = 'png')
+{
+	global $settings;
+
+	try
+	{
+		$image = new Imagick();
+		$image->newImage($width, $height, new ImagickPixel('white'));
+		$image->setImageFormat($format);
+
+		// 28pt is ~2em given default font stack
+		$font_size = 28;
+		$draw = new ImagickDraw();
+		$draw->setFontSize($font_size);
+		$draw->setStrokeColor(new ImagickPixel('#000000'));
+		$draw->setFillColor(new ImagickPixel('#000000'));
+		$draw->setStrokeWidth(1);
+		$draw->setTextAlignment(Imagick::ALIGN_CENTER);
+		$draw->setFont($settings['default_theme_dir'] . '/fonts/VDS_New.ttf');
+
+		// Make sure the text will fit the the allowed space
+		$metric = $image->queryFontMetrics($draw, $text);
+		if (isset($metric['textWidth']) && $metric['textWidth'] > $width)
+		{
+			$image->clear();
+			$width = (int) $metric['textWidth'];
+			$image->newImage($width, $height, new ImagickPixel('white'));
+			$image->setImageFormat($format);
+		}
+
+		// Place text in center of block
+		$image->annotateImage($draw, $width / 2, $height / 2 + $font_size / 4, 0, $text);
+		$image = $image->getImageBlob();
+
+		return $image;
+	}
+	catch (Exception $e)
 	{
 		return false;
 	}
