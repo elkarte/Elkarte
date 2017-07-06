@@ -442,7 +442,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// What are we viewing
 		$action = $this->_req->getQuery('sa', 'trim', '');
-		$action_title = array('messages' => 'Posts', 'attach' => 'Attachments', 'topics' => 'Topics', 'unwatchedtopics' => 'Unwatched');
+		$action_title = array('messages' => 'Messages', 'attach' => 'Attachments', 'topics' => 'Topics', 'unwatchedtopics' => 'Unwatched');
 		$action_title = isset($action_title[$action]) ? $action_title[$action] : 'Posts';
 
 		loadTemplate('ProfileInfo');
@@ -450,7 +450,7 @@ class ProfileInfo_Controller extends Action_Controller
 		// Create the tabs for the template.
 		$context[$context['profile_menu_name']]['tab_data'] = array(
 			'title' => $txt['show' . $action_title],
-			'description' => sprintf($txt['showGeneric_help'], $action_title),
+			'description' => sprintf($txt['showGeneric_help'], $txt['show' . $action_title]),
 			'class' => 'profile',
 			'tabs' => array(
 				'messages' => array(
