@@ -723,8 +723,7 @@ class ProfileInfo_Controller extends Action_Controller
 				'filename' => array(
 					'header' => array(
 						'value' => $txt['show_attach_filename'],
-						'class' => 'lefttext',
-						'style' => 'width: 25%;',
+						'class' => 'lefttext grid25',
 					),
 					'data' => array(
 						'db' => 'filename',
@@ -734,10 +733,29 @@ class ProfileInfo_Controller extends Action_Controller
 						'reverse' => 'a.filename DESC',
 					),
 				),
+				'thumb' => array(
+					'header' => array(
+						'value' => '',
+					),
+					'data' => array(
+						'function' => function ($rowData) {
+							global $scripturl;
+
+							if ($rowData['is_image'] && !empty($rowData['id_thumb']))
+								return '<img src="' . $scripturl . '?action=dlattach;attach=' . $rowData['id_thumb'] . ';image" />';
+							else
+								return '<img src="' . $scripturl . '?action=dlattach;attach=' . $rowData['id'] . ';thumb" />';
+						},
+						'class' => 'centertext recent_attachments',
+					),
+					'sort' => array(
+						'default' => 'a.filename',
+						'reverse' => 'a.filename DESC',
+					),
+				),
 				'downloads' => array(
 					'header' => array(
 						'value' => $txt['show_attach_downloads'],
-						'style' => 'width: 12%;',
 					),
 					'data' => array(
 						'db' => 'downloads',
@@ -751,8 +769,7 @@ class ProfileInfo_Controller extends Action_Controller
 				'subject' => array(
 					'header' => array(
 						'value' => $txt['message'],
-						'class' => 'lefttext',
-						'style' => 'width: 30%;',
+						'class' => 'lefttext grid30',
 					),
 					'data' => array(
 						'db' => 'subject',
