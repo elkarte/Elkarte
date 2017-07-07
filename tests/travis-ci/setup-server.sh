@@ -114,4 +114,4 @@ sudo a2enconf fqdn
 sudo service apache2 restart
 
 # if we are not creating code coverage reports, do not run xdebug
-if [ "$COVERAGE" != "true" ]; then phpenv config-rm xdebug.ini; fi
+if [ "$COVERAGE" != "true" -o "${TRAVIS_PULL_REQUEST}" == "false" ]; then phpenv config-rm xdebug.ini; fi
