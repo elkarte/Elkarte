@@ -176,6 +176,7 @@ $txt['profileInfo'] = 'Profile Info';
 $txt['showPosts'] = 'Show Posts';
 $txt['showPosts_help'] = 'This section allows you to view all posts made by this member. Note that you can only see posts made in areas you currently have access to.';
 $txt['showMessages'] = 'Messages';
+$txt['showGeneric_help'] = 'This section allows you to view all %1$s made by this member. Note that you can only see %1$s made in areas you currently have access to.';
 $txt['showTopics'] = 'Topics';
 $txt['showUnwatched'] = 'Unwatched topics';
 $txt['showAttachments'] = 'Attachments';

@@ -61,6 +61,7 @@ class Database_PostgreSQL extends Database_Abstract
 	 * @param mixed[] $db_options
 	 *
 	 * @return resource
+	 * @throws Elk_Exception
 	 */
 	public static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
@@ -115,7 +116,8 @@ class Database_PostgreSQL extends Database_Abstract
 	 * @param string $db_string
 	 * @param mixed[] $db_values
 	 * @param resource|null $connection
-	 * @return bool|resource|string|void
+	 *
+	 * @return bool|resource|string
 	 * @throws Elk_Exception
 	 */
 	public function query($identifier, $db_string, $db_values = array(), $connection = null)
@@ -308,7 +310,7 @@ class Database_PostgreSQL extends Database_Abstract
 
 		if ($this->_db_last_result === false && !$this->_skip_error)
 		{
-			$this->_db_last_result = $this->error($db_string, $connection);
+			$this->error($db_string, $connection);
 		}
 
 		// Revert not to skip errors

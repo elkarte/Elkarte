@@ -48,7 +48,7 @@ abstract class Database_Abstract implements Database
 
 	/**
 	 * This holds the "values" used in the replacement__callback method
-	 * @var mixed[]
+	 * @var array
 	 */
 	protected $_db_callback_values = array();
 
