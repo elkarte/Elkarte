@@ -2405,15 +2405,12 @@ a.bbc_link {
 
 .topic_sorting > li {
 	float: right;
+	padding: 0 3px;
 }
 
 .topic_sorting {
 	float: right;
 	font-size: 1.143em;
-}
-
-.topic_sorting > li {
-	padding: 0 3px;
 }
 
 .topic_sorting.topic_sorting_recent {
@@ -2636,12 +2633,7 @@ img.new_posts {
 }
 
 /* Message index icons and topic status as sprites */
-.topicicon:before,
-.sticky_row .topic_info:before,
-.locked_row .topic_info:before,
-.sticky_row .topic_details:before,
-.locked_row .topic_details:before,
-.locked_row.sticky_row .topic_info:before {
+.topicicon:before {
 	display: inline-block;
 	width: 18px;
 	height: 16px;
@@ -2649,10 +2641,6 @@ img.new_posts {
 	background-repeat: no-repeat;
 	content: "";
 	vertical-align: middle;
-}
-
-.topicicon:before {
-	height: 18px;
 }
 
 /* Sprite icons for quick moderation, last post, sort etc */
@@ -2679,29 +2667,29 @@ img.new_posts {
 .img_thumbup:before     {background-position: -18px -126px;}
 .img_thumbdown:before   {background-position: -18px -144px;}
 
+.img_sortdown:before, .img_sortup:before {
+	padding-bottom: .1em;
+}
+
 /* sticky / locked icons for the upper right of the div */
 .sticky_row .topic_info:before,
 .locked_row .topic_info:before,
 .sticky_row .topic_details:before,
 .locked_row .topic_details:before,
-.locked_row.sticky_row .topic_info:before {
+.locked_row.sticky_row .topic_info:before,
+.locked_row.sticky_row .topic_info .topic_name:before {
+	display: inline-block;
 	float: right;
 	margin-right: -16px;
+	width: 16px;
+	height: 16px;
+	content: "";
 }
 
-.sticky_row .topic_info:before,
-.sticky_row .topic_details:before {
-	background-position: 0 -108px;
-}
-
-.locked_row .topic_info:before,
-.locked_row .topic_details:before {
-	background-position: 0 -54px;
-}
-
-.locked_row.sticky_row .topic_info:before {
-	width: 30px;
-	background-position: 0 -180px;
+.locked_row.sticky_row .topic_info .topic_name:before {
+	position: relative;
+	float: right;
+	margin-right: 0;
 }
 
 /* @todo - Extra classes for search results, etc. See if I can clean them up. */
@@ -5925,7 +5913,7 @@ a > i {
 		margin-right: -18px;
 	}
 
-	.topic_name, .topic_starter {
+	.topic_starter {
 		margin-right: 18px;
 	}
 
