@@ -2761,7 +2761,14 @@ function doSecurityChecks()
 		$context['warning_controls']['unapproved_members'] = sprintf($txt[$modSettings['unapprovedMembers'] == 1 ? 'approve_one_member_waiting' : 'approve_many_members_waiting'], $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve', $modSettings['unapprovedMembers']);
 
 	if (!empty($context['open_mod_reports']) && (empty($user_settings['mod_prefs']) || $user_settings['mod_prefs'][0] == 1))
+	{
 		$context['warning_controls']['open_mod_reports'] = '<a href="' . $scripturl . '?action=moderate;area=reports">' . sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']) . '</a>';
+	}
+
+	if (!empty($context['open_pm_reports']) && allowedTo('admin_forum'))
+	{
+		$context['warning_controls']['open_pm_reports'] = '<a href="' . $scripturl . '?action=moderate;area=pm_reports">' . sprintf($txt['pm_reports_waiting'], $context['open_pm_reports']) . '</a>';
+	}
 
 	if (isset($_SESSION['ban']['cannot_post']))
 	{

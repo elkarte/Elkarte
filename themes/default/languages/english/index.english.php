@@ -833,6 +833,7 @@ $txt['ajax_in_progress'] = 'Loading...';
 $txt['ajax_bad_response'] = 'Invalid response.';
 
 $txt['mod_reports_waiting'] = 'There are currently %1$d moderator reports open.';
+$txt['pm_reports_waiting'] = 'There are currently %1$d personal message reports open.';
 
 $txt['new_posts_in_category'] = 'Click to see the new posts in %1$s';
 $txt['verification'] = 'Verification';
