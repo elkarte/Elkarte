@@ -22,7 +22,9 @@
  *  - sets $context['open_mod_reports'] for template use
  *
  * @param boolean $flush = true if moderator menu count will be cleared
- * @param boolean $count_pms
+ * @param boolean $count_pms Default false, if false returns the number of message
+ *                           reports, if true sets $context['open_pm_reports'] and
+ *                           returns the both number of open PM and message reports
  */
 function recountOpenReports($flush = true, $count_pms = false)
 {
@@ -31,31 +33,49 @@ function recountOpenReports($flush = true, $count_pms = false)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT type, COUNT(*) as num_reports
 		FROM {db_prefix}log_reported
 		WHERE ' . $user_info['mod_cache']['bq'] . '
 			AND type IN ({array_string:rep_type})
 			AND closed = {int:not_closed}
-			AND ignore_all = {int:not_ignored}',
+			AND ignore_all = {int:not_ignored}
+		GROUP BY type',
 		array(
 			'not_closed' => 0,
 			'not_ignored' => 0,
-			'rep_type' => $count_pms ? array('pm') : array('msg'),
+			'rep_type' => array('pm', 'msg'),
 		)
 	);
-	list ($open_reports) = $db->fetch_row($request);
+	$open_reports = array(
+		'msg' => 0,
+		'pm' => 0,
+	);
+	while ($row = $db->fetch_assoc($request))
+	{
+		$open_reports[$row['type']] = $row['num_reports'];
+	}
 	$db->free_result($request);
 
 	$_SESSION['rc'] = array(
 		'id' => $user_info['id'],
 		'time' => time(),
-		'reports' => $open_reports,
+		'reports' => $open_reports['msg'],
+		'pm_reports' => $open_reports['pm'],
 	);
 
-	$context['open_mod_reports'] = $open_reports;
+	$context['open_mod_reports'] = $open_reports['msg'];
+	// Safety net, even though this (and the above)  should not be done here at all.
+	if ($count_pms)
+	{
+		$context['open_pm_reports'] = $open_reports['pm'];
+	}
+
 	if ($flush)
+	{
 		Cache::instance()->remove('num_menu_errors');
-	return $open_reports;
+	}
+
+	return $count_pms ? $open_reports : $open_reports['msg'];
 }
 
 /**
@@ -283,13 +303,18 @@ function loadModeratorMenuCounts($brd = null)
 			$menu_errors[$cache_key]['attachments'] = list_getNumUnapprovedAttachments($approve_query);
 		}
 
-		// Reported posts
+		// Reported posts (and PMs?)
 		if (!empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1')
-			$menu_errors[$cache_key]['reports'] = recountOpenReports(false);
+		{
+			$reports = recountOpenReports(false, allowedTo('admin_forum'));
+			$menu_errors[$cache_key]['reports'] = $reports['msg'];
 
-		// Reported PMs
-		if (!empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1' && allowedTo('admin_forum'))
-			$menu_errors[$cache_key]['pm_reports'] = recountOpenReports(false, true);
+			// Reported PMs
+			if (!empty($reports['pm']))
+			{
+				$menu_errors[$cache_key]['pm_reports'] = $reports['pm'];
+			}
+		}
 
 		// Email failures that require attention
 		if (!empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'))
