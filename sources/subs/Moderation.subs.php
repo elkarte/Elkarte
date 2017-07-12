@@ -251,6 +251,7 @@ function loadModeratorMenuCounts($brd = null)
 
 	// If its been cached, guess what, that's right use it!
 	$temp = Cache::instance()->get('num_menu_errors', 900);
+
 	if ($temp === null || !isset($temp[$cache_key]))
 	{
 		// Starting out with nothing is a good start
@@ -284,7 +285,11 @@ function loadModeratorMenuCounts($brd = null)
 
 		// Reported posts
 		if (!empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1')
-			$menu_errors[$cache_key]['reports'] = recountOpenReports(false, allowedTo('admin_forum'));
+			$menu_errors[$cache_key]['reports'] = recountOpenReports(false);
+
+		// Reported PMs
+		if (!empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1' && allowedTo('admin_forum'))
+			$menu_errors[$cache_key]['pm_reports'] = recountOpenReports(false, true);
 
 		// Email failures that require attention
 		if (!empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'))
@@ -311,7 +316,7 @@ function loadModeratorMenuCounts($brd = null)
 		}
 
 		// Grand Totals for the top most menus
-		$menu_errors[$cache_key]['pt_total'] = $menu_errors[$cache_key]['emailmod'] + $menu_errors[$cache_key]['postmod'] + $menu_errors[$cache_key]['reports'] + $menu_errors[$cache_key]['attachments'];
+		$menu_errors[$cache_key]['pt_total'] = $menu_errors[$cache_key]['emailmod'] + $menu_errors[$cache_key]['postmod'] + $menu_errors[$cache_key]['reports'] + $menu_errors[$cache_key]['attachments'] + $menu_errors[$cache_key]['pm_reports'];
 		$menu_errors[$cache_key]['mg_total'] = $menu_errors[$cache_key]['memberreq'] + $menu_errors[$cache_key]['groupreq'];
 		$menu_errors[$cache_key]['grand_total'] = $menu_errors[$cache_key]['pt_total'] + $menu_errors[$cache_key]['mg_total'];
 
