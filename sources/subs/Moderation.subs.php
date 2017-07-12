@@ -284,6 +284,7 @@ function loadModeratorMenuCounts($brd = null)
 			'postmod' => 0,
 			'topics' => 0,
 			'posts' => 0,
+			'pm_reports' => 0,
 		);
 
 		if ($modSettings['postmod_active'] && !empty($approve_boards))
