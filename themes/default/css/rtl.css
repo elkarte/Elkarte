@@ -192,9 +192,24 @@ h2 a.collapse {
 	float: left;
 }
 
-#search_form * {
-	/* Webkit (bleh) fix. */
+#search_form button, #search_form input, #search_form label {
 	float: right;
+}
+
+#search_form button {
+	margin-right: -5px;
+	margin-left: 0;
+}
+
+#search_form select {
+	border: 1px solid;
+	border-left: none;
+	width: 10em;
+}
+
+#search_form select:focus {
+	border: 1px solid;
+	border-left: none;
 }
 
 /* The main title. */
@@ -651,19 +666,8 @@ dl.settings img {
 	float: left;
 }
 
-.topic_lastpost .img_last_post {
+.topic_lastpost .i_last_post {
 	float: left;
-}
-
-.topicicon:before,
-.sticky_row .topic_info:before, .locked_row .topic_info:before,
-.sticky_row .topic_details:before, .locked_row .topic_details:before,
-.locked_row.sticky_row .topic_info:before {
-	background-image: url(../images/topic/topicicons.png);
-}
-
-.img_last_post:before {
-	background-position: -18px -162px;
 }
 
 .qaction_row {

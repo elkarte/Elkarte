@@ -225,6 +225,9 @@ function template_topic_listing()
 			if (!empty($topic['last_post']['member']['avatar']))
 				echo '
 						<span class="board_avatar"><a href="', $topic['last_post']['member']['href'], '"><img class="avatar" src="', $topic['last_post']['member']['avatar']['href'], '" alt="" /></a></span>';
+			else
+				echo '
+						<span class="board_avatar"><a href="#"></a></span>';
 
 			echo '
 						<a class="topicicon i-last_post', '" href="', $topic['last_post']['href'], '" title="', $txt['last_post'], '"></a>

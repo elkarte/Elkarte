@@ -728,7 +728,7 @@ function template_basicicons_legend()
 
 	echo '
 		<p class="floatleft">', !empty($modSettings['enableParticipation']) && $context['user']['is_logged'] ? '
-			<span class="topicicon i-profile"></span> ' . $txt['participation_caption'] : '<span class="topicicon i-normal"> </span>' . $txt['normal_topic'], '<br />
+			<span class="topicicon i-profile"></span> ' . $txt['participation_caption'] : '<span class="topicicon img_normal"> </span>' . $txt['normal_topic'], '<br />
 			' . (!empty($modSettings['pollMode']) ? '<span class="topicicon i-poll"> </span>' . $txt['poll'] : '') . '
 		</p>
 		<p>
