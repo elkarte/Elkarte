@@ -202,7 +202,7 @@ class ModerationCenter_Controller extends Action_Controller
 						),
 					),
 					'pm_reports' => array(
-						'label' => $txt['mc_reported_pms'],
+						'label' => $txt['mc_reported_pms'] . (!empty($mod_counts['pm_reports']) ? ' [' . $mod_counts['pm_reports'] . ']' : ''),
 						'enabled' => $user_info['is_admin'],
 						'controller' => 'ModerationCenter_Controller',
 						'function' => 'action_reportedPosts',

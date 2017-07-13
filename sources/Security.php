@@ -562,7 +562,13 @@ function banPermissions()
 
 	// Now that we have the mod cache taken care of lets setup a cache for the number of mod reports still open
 	if (isset($_SESSION['rc']) && $_SESSION['rc']['time'] > $modSettings['last_mod_report_action'] && $_SESSION['rc']['id'] == $user_info['id'])
+	{
 		$context['open_mod_reports'] = $_SESSION['rc']['reports'];
+		if (allowedTo('admin_forum'))
+		{
+			$context['open_pm_reports'] = $_SESSION['rc']['pm_reports'];
+		}
+	}
 	elseif ($_SESSION['mc']['bq'] != '0=1')
 	{
 		require_once(SUBSDIR . '/Moderation.subs.php');

@@ -711,7 +711,7 @@ class MessagesDelete
 		if ($updated_reports != 0)
 		{
 			updateSettings(array('last_mod_report_action' => time()));
-			recountOpenReports(true, allowedTo('admin_forum'));
+			recountOpenReports(true);
 		}
 
 		// Add it to the mod log.
