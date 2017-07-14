@@ -70,10 +70,9 @@ class Notifications extends AbstractModel
 
 		// Let's register all the notifications we know by default
 		$this->register(1, 'notification', array($this, '_send_notification'));
-		$this->register(2, 'email', array($this, '_send_email'), array('subject' => 'subject', 'body' => 'body'));
-		$this->register(3, 'email_daily', array($this, '_send_daily_email'), array('subject' => 'subject', 'body' => 'snippet'));
-		$this->register(4, 'email_weekly', array($this, '_send_weekly_email'), array('subject' => 'subject', 'body' => 'snippet'));
-
+		$this->register(2, 'email', array($this, '_send_email'), array('subject' => 'subject', 'body' => 'body', 'suffix' => true));
+		$this->register(3, 'email_daily', array($this, '_send_daily_email'), array('subject' => 'subject', 'body' => 'snippet', 'suffix' => true));
+		$this->register(4, 'email_weekly', array($this, '_send_weekly_email'), array('subject' => 'subject', 'body' => 'snippet', 'suffix' => true));
 		$this->_protect_id = true;
 
 		call_integration_hook('integrate_notifications_methods', array($this));
