@@ -778,22 +778,19 @@ class Theme extends \Theme
 	}
 
 	/**
-	 *
+	 * Adds required support CSS files.
 	 */
 	public function loadSupportCSS()
 	{
 		global $modSettings, $settings;
 
-		// Load a themes base SVG support file
-		if (file_exists($settings['theme_dir'] . '/css/icons_svg.css'))
-		{
-			loadCSSFile('icons_svg.css');
-		}
+		// Load the SVG support file with fallback to default theme
+		loadCSSFile('icons_svg.css');
 
 		// Load a base theme custom CSS file?
 		if (file_exists($settings['theme_dir'] . '/css/custom.css'))
 		{
-			loadCSSFile('custom.css');
+			loadCSSFile('custom.css', array('fallback' => false));
 		}
 
 		// Load font Awesome fonts, @deprecated in 1.1 and will be removed in 2.0
