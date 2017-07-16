@@ -91,7 +91,7 @@ function template_unread()
 		$current_header = $context['topics_headers'][$context['sort_by']];
 		echo '
 							<li class="listlevel1 topic_sorting_row">
-								<a class="sort topicicon img_sort', $context['sort_direction'], '" href="', $current_header['url'], '" title="', $context['sort_title'], '"></a>
+								<a class="sort topicicon i-sort', $context['sort_direction'], '" href="', $current_header['url'], '" title="', $context['sort_title'], '"></a>
 							</li>';
 
 		echo '
@@ -128,14 +128,14 @@ function template_unread()
 			echo '
 							<li class="', $color_class, '">
 								<div class="topic_info">
-									<p class="topic_icons', isset($message_icon_sprite[$topic['first_post']['icon']]) ? ' topicicon img_' . $topic['first_post']['icon'] : '', '">';
+									<p class="topic_icons', isset($message_icon_sprite[$topic['first_post']['icon']]) ? ' topicicon i-' . $topic['first_post']['icon'] : '', '">';
 
 			if (!isset($message_icon_sprite[$topic['first_post']['icon']]))
 				echo '
 										<img src="', $topic['first_post']['icon_url'], '" alt="" />';
 
 			echo '
-										', $topic['is_posted_in'] ? '<span class="fred topicicon img_profile"></span>' : '', '
+										', $topic['is_posted_in'] ? '<span class="fred topicicon i-profile"></span>' : '', '
 									</p>
 									<div class="topic_name">';
 
@@ -157,7 +157,7 @@ function template_unread()
 										', $topic['views'], ' ', $txt['views'], '
 									</p>
 									<p class="topic_lastpost">
-										<a class="topicicon img_last_post" href="', $topic['last_post']['href'], '" title="', $txt['last_post'], '"></a>
+										<a class="topicicon i-last_post" href="', $topic['last_post']['href'], '" title="', $txt['last_post'], '"></a>
 										', $topic['last_post']['html_time'], '<br />
 										', $txt['by'], ' ', $topic['last_post']['member']['link'], '
 									</p>

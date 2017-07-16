@@ -2405,15 +2405,12 @@ a.bbc_link {
 
 .topic_sorting > li {
 	float: right;
+	padding: 0 3px;
 }
 
 .topic_sorting {
 	float: right;
 	font-size: 1.143em;
-}
-
-.topic_sorting > li {
-	padding: 0 3px;
 }
 
 .topic_sorting.topic_sorting_recent {
@@ -2551,8 +2548,8 @@ img.new_posts {
 
 .fred {
 	position: absolute;
-	top: 16px;
-	left: 42%;
+	top: -5px;
+	left: 50%;
 }
 
 .topic_name, .topic_starter {
@@ -2598,7 +2595,7 @@ img.new_posts {
 	line-height: 1.429em;
 }
 
-.topic_lastpost .img_last_post {
+.topic_lastpost .i-last_post {
 	float: right;
 	padding: 4px;
 }
@@ -2611,11 +2608,12 @@ img.new_posts {
 }
 
 .topic_moderation_alt {
-	min-width: 56px;
+	min-width: 58px;
 }
 
-.topic_moderation_alt img {
-	padding: 2px 2px 0 2px;
+.topic_moderation_alt a {
+	padding: 1px 2px 1px 0;
+	line-height: 1.4em;
 }
 
 .topic_listing .warningbox {
@@ -2635,73 +2633,43 @@ img.new_posts {
 	width: 100%;
 }
 
-/* Message index icons and topic status as sprites */
-.topicicon:before,
-.sticky_row .topic_info:before,
-.locked_row .topic_info:before,
-.sticky_row .topic_details:before,
-.locked_row .topic_details:before,
-.locked_row.sticky_row .topic_info:before {
+/* Message index icons and topic status */
+.topicicon:before {
 	display: inline-block;
 	width: 18px;
 	height: 16px;
-	background-image: url(../images/topic/topicicons.png);
-	background-repeat: no-repeat;
 	content: "";
 	vertical-align: middle;
 }
 
-.topicicon:before {
-	height: 18px;
+/* Message index adjustments to standard svg icons */
+.i-sortdown:before, .i-sortup:before {
+	padding-bottom: .1em;
 }
 
-/* Sprite icons for quick moderation, last post, sort etc */
-.img_last_post:before    {background-position: 0 0;}
-.img_poll:before         {background-position: 0 -19px;}
-.img_profile:before      {background-position: 0 -37px;}
-.img_locked:before       {background-position: 0 -55px;}
-.img_move:before         {background-position: 0 -73px;}
-.img_remove:before       {background-position: 0 -91px;}
-.img_sticky:before       {background-position: 0 -109px;}
-.img_sortdown:before     {background-position: 0 -127px;}
-.img_sortup:before       {background-position: 0 -145px;}
-.img_normal:before       {background-position: 0 -163px;}
-.img_lockedsticky:before {background-position: 0 -181px;}
-
-/* Sprite Icons for the message icon, ? ! xx etc. */
-.img_clip:before        {background-position: -18px 0;}
-.img_lamp:before        {background-position: -18px -18px;}
-.img_poll:before        {background-position: -18px -36px;}
-.img_question:before    {background-position: -18px -54px;}
-.img_xx:before          {background-position: -18px -72px;}
-.img_moved:before       {background-position: -18px -90px;}
-.img_exclamation:before {background-position: -18px -108px;}
-.img_thumbup:before     {background-position: -18px -126px;}
-.img_thumbdown:before   {background-position: -18px -144px;}
+.fred.i-profile::before {
+	max-width: 14px;
+}
 
 /* sticky / locked icons for the upper right of the div */
 .sticky_row .topic_info:before,
 .locked_row .topic_info:before,
 .sticky_row .topic_details:before,
 .locked_row .topic_details:before,
-.locked_row.sticky_row .topic_info:before {
+.locked_row.sticky_row .topic_info:before,
+.locked_row.sticky_row .topic_info .topic_name:before {
+	display: inline-block;
 	float: right;
 	margin-right: -16px;
+	width: 16px;
+	height: 16px;
+	content: "";
 }
 
-.sticky_row .topic_info:before,
-.sticky_row .topic_details:before {
-	background-position: 0 -108px;
-}
-
-.locked_row .topic_info:before,
-.locked_row .topic_details:before {
-	background-position: 0 -54px;
-}
-
-.locked_row.sticky_row .topic_info:before {
-	width: 30px;
-	background-position: 0 -180px;
+.locked_row.sticky_row .topic_info .topic_name:before {
+	position: relative;
+	float: right;
+	margin-right: 0;
 }
 
 /* @todo - Extra classes for search results, etc. See if I can clean them up. */
@@ -5925,7 +5893,7 @@ a > i {
 		margin-right: -18px;
 	}
 
-	.topic_name, .topic_starter {
+	.topic_starter {
 		margin-right: 18px;
 	}
 

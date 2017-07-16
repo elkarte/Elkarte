@@ -158,6 +158,9 @@ function template_list_boards(array $boards, $id)
 			if (!empty($board['last_post']['member']['avatar']))
 				echo '
 							<span class="board_avatar"><a href="', $board['last_post']['member']['href'], '"><img class="avatar" src="', $board['last_post']['member']['avatar']['href'], '" alt="" /></a></span>';
+			else
+				echo '
+							<span class="board_avatar"><a href="#"></a></span>';
 			echo '
 							', $board['last_post']['last_post_message'], '
 						</p>';

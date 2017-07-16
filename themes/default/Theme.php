@@ -266,14 +266,17 @@ class Theme extends \Theme
 
 		$combiner = new \Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
 		$result = true;
+
 		if ($type === 'all' || $type === 'css')
 		{
 			$result &= $combiner->removeCssHives();
 		}
+
 		if ($type === 'all' || $type === 'js')
 		{
 			$result &= $combiner->removeJsHives();
 		}
+
 		return $result;
 	}
 
@@ -752,17 +755,6 @@ class Theme extends \Theme
 			$context['favicon'] = $settings['images_url'] . '/mobile.png';
 		}
 
-		// Load a custom CSS file?
-		if (file_exists($settings['theme_dir'] . '/css/custom.css'))
-		{
-			loadCSSFile('custom.css');
-		}
-
-		if (!empty($context['theme_variant']) && file_exists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css'))
-		{
-			loadCSSFile($context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css');
-		}
-
 		// Since it's nice to have avatars all of the same size, and in some cases the size detection may fail,
 		// let's add the css in any case
 		if (!isset($context['html_headers']))
@@ -782,6 +774,29 @@ class Theme extends \Theme
 		{
 			$this->addCSSRules('
 		.wrapper {width: ' . $settings['forum_width'] . ';}');
+		}
+	}
+
+	/**
+	 * Adds required support CSS files.
+	 */
+	public function loadSupportCSS()
+	{
+		global $modSettings, $settings;
+
+		// Load the SVG support file with fallback to default theme
+		loadCSSFile('icons_svg.css');
+
+		// Load a base theme custom CSS file?
+		if (file_exists($settings['theme_dir'] . '/css/custom.css'))
+		{
+			loadCSSFile('custom.css', array('fallback' => false));
+		}
+
+		// Load font Awesome fonts, @deprecated in 1.1 and will be removed in 2.0
+		if (!empty($settings['require_font-awesome']) || !empty($modSettings['require_font-awesome']))
+		{
+			loadCSSFile('font-awesome.min.css');
 		}
 	}
 
@@ -1122,6 +1137,18 @@ class Theme extends \Theme
 		if (!empty($context['theme_variant']))
 		{
 			loadCSSFile($context['theme_variant'] . '/index' . $context['theme_variant'] . '.css');
+
+			// Variant icon definitions?
+			if (file_exists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/icons_svg' . $context['theme_variant'] . '.css'))
+			{
+				loadCSSFile($context['theme_variant'] .  '/icons_svg' . $context['theme_variant'] . '.css');
+			}
+
+			// Load a theme variant custom CSS
+			if (!empty($context['theme_variant']) && file_exists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css'))
+			{
+				loadCSSFile($context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css');
+			}
 		}
 	}
 }

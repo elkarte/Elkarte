@@ -70,10 +70,9 @@ class Notifications extends AbstractModel
 
 		// Let's register all the notifications we know by default
 		$this->register(1, 'notification', array($this, '_send_notification'));
-		$this->register(2, 'email', array($this, '_send_email'), array('subject' => 'subject', 'body' => 'body'));
-		$this->register(3, 'email_daily', array($this, '_send_daily_email'), array('subject' => 'subject', 'body' => 'snippet'));
-		$this->register(4, 'email_weekly', array($this, '_send_weekly_email'), array('subject' => 'subject', 'body' => 'snippet'));
-
+		$this->register(2, 'email', array($this, '_send_email'), array('subject' => 'subject', 'body' => 'body', 'suffix' => true));
+		$this->register(3, 'email_daily', array($this, '_send_daily_email'), array('subject' => 'subject', 'body' => 'snippet', 'suffix' => true));
+		$this->register(4, 'email_weekly', array($this, '_send_weekly_email'), array('subject' => 'subject', 'body' => 'snippet', 'suffix' => true));
 		$this->_protect_id = true;
 
 		call_integration_hook('integrate_notifications_methods', array($this));
@@ -107,7 +106,9 @@ class Notifications extends AbstractModel
 		if (!empty($this->_to_send))
 		{
 			foreach ($this->_to_send as $task)
+			{
 				$this->_send_task($task);
+			}
 		}
 
 		$this->_to_send = array();
@@ -117,26 +118,33 @@ class Notifications extends AbstractModel
 	 * Function to register any new notification method.
 	 *
 	 * @param int $id This shall be a unique integer representing the notification method.
-	 *            <b>WARNING for addons developers</b>: please note that this has
-	 *            to be unique across addons, so if you develop an addon that
-	 *            extends notifications, please verify this id has not been
-	 *            "taken" by someone else!
+	 *
+	 * <b>WARNING for addons developers</b>: note that this has to be **unique** across
+	 * addons, so if you develop an addon that extends notifications, please verify this id
+	 * has not been "taken" by someone else! 1-4 are reserved system notifications.
 	 * @param int $key The string name identifying the notification method
-	 * @param mixed|mixed[] $callback A callable function/array/whatever that
-	 *                      will take care of sending the notification
+	 *
+	 *  - _send_email
+	 *  - _send_daily_email
+	 *  - _send_weekly_email
+	 * @param mixed|mixed[] $callback A callable function/array/whatever that will take care
+	 * of sending the notification
 	 * @param null|string[] $lang_data For the moment an array containing at least:
-	 *                        - 'subject' => 'something'
-	 *                        - 'body' => 'something_else'
-	 *                       the two will be used to identify the strings to be
-	 *                       used for the subject and the body respectively of
-	 *                       the notification.
+	 *
+	 *  - 'subject' => 'something'
+	 *  - 'body' => 'something_else'
+	 *  - 'suffix' => true/false
+	 *
+	 * Used to identify the strings for the subject and body respectively of the notification.
 	 * @throws Elk_Exception
 	 */
 	public function register($id, $key, $callback, $lang_data = null)
 	{
 		// 1-4 are system notifications and can not be changed.
 		if ($this->_protect_id && $id < 5)
+		{
 			throw new Elk_Exception('error_invalid_notification_id');
+		}
 
 		$this->_notifiers[$key] = array(
 			'id' => $id,
@@ -186,7 +194,9 @@ class Notifications extends AbstractModel
 
 				// Just in case...
 				if (empty($bodies))
+				{
 					continue;
+				}
 
 				call_user_func_array($this->_notifiers[$key]['callback'], array($obj, $task, $bodies, $this->_db));
 			}
@@ -317,7 +327,9 @@ class Notifications extends AbstractModel
 
 		$notification_types = array();
 		foreach ($notification_frequencies as $freq)
+		{
 			$notification_types[$freq] = array();
+		}
 
 		// notification_level can be:
 		//    - 0 => no notification
@@ -330,18 +342,24 @@ class Notifications extends AbstractModel
 		{
 			$this_pref = $preferences[$member][$notification_type];
 			if ($this_pref === 0)
+			{
 				continue;
+			}
 
 			// In the following two checks the use of the $this->_notification_frequencies
 			// is intended, because the numeric id is important and is not preserved
 			// in the local $notification_frequencies
 			if (isset($this->_notification_frequencies[1]))
+			{
 				$notification_types[$this->_notification_frequencies[1]][] = $member;
+			}
 
 			if ($this_pref > 1)
 			{
 				if (isset($this->_notification_frequencies[$this_pref]) && isset($notification_types[$this->_notification_frequencies[$this_pref]]))
+				{
 					$notification_types[$this->_notification_frequencies[$this_pref]][] = $member;
+				}
 			}
 		}
 
@@ -356,7 +374,9 @@ class Notifications extends AbstractModel
 	public static function getInstance()
 	{
 		if (self::$_instance === null)
+		{
 			self::$_instance = new Notifications(database());
+		}
 
 		return self::$_instance;
 	}
