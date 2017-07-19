@@ -652,7 +652,14 @@ class Profile_Controller extends Action_Controller
 				$_POST = (array) $this->_req->post;
 
 				require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
-				$fields = ProfileOptions_Controller::getFields($this->_current_area);
+				if ($this->_current_area === 'account' && !empty($modSettings['enableOTP']))
+				{
+					$fields = ProfileOptions_Controller::getFields('account_otp');
+				}
+				else
+				{
+					$fields = ProfileOptions_Controller::getFields($this->_current_area);
+				}
 
 				saveProfileFields($fields['fields'], $fields['hook']);
 			}
