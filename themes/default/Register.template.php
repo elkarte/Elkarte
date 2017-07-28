@@ -402,7 +402,22 @@ function template_registration_form()
 			<fieldset class="content">
 				<div id="agreement_box">
 					', $context['agreement'], '
-				</div>
+				</div>';
+
+		if (!empty($context['languages']))
+		{
+			echo '
+				<select id="agreement_lang" class="input_select">';
+			foreach ($context['languages'] as $key => $val)
+			{
+				echo '
+					<option value="', $key, '"', !empty($val['selected']) ? ' selected="selected"' : '', '>', $val['name'], '</option>';
+			}
+			echo '
+				</select>';
+// 			_debug($context['languages']);
+		}
+		echo '
 				<label for="checkbox_agreement">
 					<input type="checkbox" name="checkbox_agreement" id="checkbox_agreement" value="1"', ($context['registration_passed_agreement'] ? ' checked="checked"' : ''), ' tabindex="', $context['tabindex']++, '" />
 					', $txt['checkbox_agreement'], '

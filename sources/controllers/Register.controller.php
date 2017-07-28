@@ -83,6 +83,7 @@ class Register_Controller extends Action_Controller
 			'contact' => array($this, 'action_contact'),
 			'verificationcode' => array($this, 'action_verificationcode'),
 			'coppa' => array($this, 'action_coppa'),
+			'agrelang' => array($this, 'action_agrelang'),
 		);
 
 		// Setup the action handler
@@ -645,18 +646,24 @@ class Register_Controller extends Action_Controller
 	 * - If one is available in the users language loads that version as well
 	 * - If none is found and it is required, ends the registration process and logs the error
 	 * for the admin to investigate.
+	 * @param null|string $agreement_lang The language to load, if not specified,
+	 *                    set to the user language
 	 */
-	private function _load_require_agreement()
+	private function _load_require_agreement($agreement_lang = null)
 	{
 		global $context, $user_info, $txt;
 
 		if ($context['require_agreement'])
 		{
+			if ($agreement_lang === null)
+			{
+				$agreement_lang = $user_info['language'];
+			}
 			$bbc_parser = \BBC\ParserWrapper::getInstance();
 
 			// Have we got a localized one?
-			if (file_exists(BOARDDIR . '/agreement.' . $user_info['language'] . '.txt'))
-				$context['agreement'] = $bbc_parser->parseAgreement(file_get_contents(BOARDDIR . '/agreement.' . $user_info['language'] . '.txt'));
+			if (file_exists(BOARDDIR . '/agreement.' . $agreement_lang . '.txt'))
+				$context['agreement'] = $bbc_parser->parseAgreement(file_get_contents(BOARDDIR . '/agreement.' . $agreement_lang . '.txt'));
 			elseif (file_exists(BOARDDIR . '/agreement.txt'))
 				$context['agreement'] = $bbc_parser->parseAgreement(file_get_contents(BOARDDIR . '/agreement.txt'));
 			else
@@ -1257,5 +1264,43 @@ class Register_Controller extends Action_Controller
 		validateUsername(0, $context['checked_username'], 'valid_username', true, false);
 
 		$context['valid_username'] = !$errors->hasErrors();
+	}
+
+	public function action_agrelang()
+	{
+		global $txt, $context, $modSettings;
+
+		$langs = getLanguages();
+		$lang = $this->_req->post->lang;
+
+		Template_Layers::getInstance()->removeAll();
+		loadTemplate('Json');
+		$context['sub_template'] = 'send_json';
+		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
+
+		if (isset($langs[$lang]))
+		{
+			loadLanguage($lang);
+			try
+			{
+				$this->_load_require_agreement($lang);
+				if (!empty($context['agreement']))
+				{
+					$context['json_data'] = $context['agreement'];
+				}
+				else
+				{
+					$context['json_data'] = '';
+				}
+			}
+			catch (\Exception $e)
+			{
+				$context['json_data'] = $e->getMessage();
+			}
+		}
+		else
+		{
+			$context['json_data'] = '';
+		}
 	}
 }
