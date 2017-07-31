@@ -421,8 +421,8 @@ function onCheckChange()
 		$('#agreement_lang').change(function() {
 			$.ajax({
 				type: "POST",
-				url: elk_scripturl + "?action=register;xml;api=json;",
-				data: {sa: 'agrelang', lang: $(this).val()},
+				url: elk_scripturl + "?action=jslocale;sa=agreement;xml;api=json",
+				data: {lang: $(this).val()},
 				beforeSend: ajax_indicator(true)
 			})
 			.done(function(request) {

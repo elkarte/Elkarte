@@ -71,6 +71,37 @@ class Jslocale_Controller extends Action_Controller
 		$this->_sendFile();
 	}
 
+	public function action_agreement_api()
+	{
+		global $context, $modSettings;
+
+		$langs = getLanguages();
+		$lang = $this->_req->post->lang;
+
+		Template_Layers::getInstance()->removeAll();
+		loadTemplate('Json');
+		$context['sub_template'] = 'send_json';
+		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
+
+		if (isset($langs[$lang]))
+		{
+			// If you have to agree to the agreement, it needs to be fetched from the file.
+			$agreement = new \Agreement($lang);
+			try
+			{
+				$context['json_data'] = $agreement->getParsedText();
+			}
+			catch (\Elk_Exception $e)
+			{
+				$context['json_data'] = $e->getMessage();
+			}
+		}
+		else
+		{
+			$context['json_data'] = '';
+		}
+	}
+
 	/**
 	 * Handy shortcut to prepare the "system"
 	 *
