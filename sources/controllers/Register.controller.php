@@ -83,6 +83,7 @@ class Register_Controller extends Action_Controller
 			'contact' => array($this, 'action_contact'),
 			'verificationcode' => array($this, 'action_verificationcode'),
 			'coppa' => array($this, 'action_coppa'),
+			'agrelang' => array($this, 'action_agrelang'),
 		);
 
 		// Setup the action handler
@@ -204,7 +205,16 @@ class Register_Controller extends Action_Controller
 			$_SESSION['register']['timenow'] = time();
 
 		// If you have to agree to the agreement, it needs to be fetched from the file.
-		$this->_load_require_agreement();
+		$agreement = new \Agreement($user_info['language']);
+		$context['agreement'] = $agreement->getParsedText();
+
+		if (empty($context['agreement']))
+		{
+			// No file found or a blank file, log the error so the admin knows there is a problem!
+			loadLanguage('Errors');
+			Errors::instance()->log_error($txt['registration_agreement_missing'], 'critical');
+			throw new Elk_Exception('registration_disabled', false);
+		}
 
 		// If we have language support enabled then they need to be loaded
 		$this->_load_language_support();
@@ -634,43 +644,6 @@ class Register_Controller extends Action_Controller
 				$extra_register_vars[$var] = empty($this->_req->post->{$var}) ? 0 : 1;
 
 		return $extra_register_vars;
-	}
-
-	/**
-	 * Loads the registration agreement in the users language
-	 *
-	 * What it does:
-	 *
-	 * - Opens and loads the registration agreement file
-	 * - If one is available in the users language loads that version as well
-	 * - If none is found and it is required, ends the registration process and logs the error
-	 * for the admin to investigate.
-	 */
-	private function _load_require_agreement()
-	{
-		global $context, $user_info, $txt;
-
-		if ($context['require_agreement'])
-		{
-			$bbc_parser = \BBC\ParserWrapper::getInstance();
-
-			// Have we got a localized one?
-			if (file_exists(BOARDDIR . '/agreement.' . $user_info['language'] . '.txt'))
-				$context['agreement'] = $bbc_parser->parseAgreement(file_get_contents(BOARDDIR . '/agreement.' . $user_info['language'] . '.txt'));
-			elseif (file_exists(BOARDDIR . '/agreement.txt'))
-				$context['agreement'] = $bbc_parser->parseAgreement(file_get_contents(BOARDDIR . '/agreement.txt'));
-			else
-				$context['agreement'] = '';
-
-			// Nothing to show, lets disable registration and inform the admin of this error
-			if (empty($context['agreement']))
-			{
-				// No file found or a blank file, log the error so the admin knows there is a problem!
-				loadLanguage('Errors');
-				Errors::instance()->log_error($txt['registration_agreement_missing'], 'critical');
-				throw new Elk_Exception('registration_disabled', false);
-			}
-		}
 	}
 
 	/**

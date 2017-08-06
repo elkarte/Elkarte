@@ -415,3 +415,29 @@ function onCheckChange()
 	else
 		document.forms.postForm.emailPassword.disabled = false;
 }
+
+(function($) {
+	$(document).ready(function() {
+		$('#agreement_lang').change(function() {
+			$.ajax({
+				type: "POST",
+				url: elk_scripturl + "?action=jslocale;sa=agreement;xml;api=json",
+				data: {lang: $(this).val()},
+				beforeSend: ajax_indicator(true)
+			})
+			.done(function(request) {
+				if (request != '')
+				{
+					$('#agreement_box').html(request);
+				}
+			})
+			.fail(function(request) {
+				// Maybe reload with language attribute?
+			})
+			.always(function() {
+				// turn off the indicator
+				ajax_indicator(false);
+			})
+		});
+	});
+})(jQuery);

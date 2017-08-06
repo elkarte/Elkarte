@@ -260,13 +260,18 @@ class ManageRegistration_Controller extends Action_Controller
 		{
 			if (file_exists(BOARDDIR . '/agreement.' . $lang['filename'] . '.txt'))
 			{
-				$context['editable_agreements']['.' . $lang['filename']] = $lang['name'];
+				$context['editable_agreements'][$lang['filename']] = $lang['name'];
 
 				// Are we editing this?
-				if (isset($this->_req->post->agree_lang) && $this->_req->post->agree_lang === '.' . $lang['filename'])
-					$context['current_agreement'] = '.' . $lang['filename'];
+				if (isset($this->_req->post->agree_lang) && $this->_req->post->agree_lang === $lang['filename'])
+				{
+					$context['current_agreement'] = $lang['filename'];
+					break;
+				}
 			}
 		}
+
+		$agreement = new \Agreement($context['current_agreement']);
 
 		if (isset($this->_req->post->save) && isset($this->_req->post->agreement))
 		{
@@ -274,15 +279,14 @@ class ManageRegistration_Controller extends Action_Controller
 			validateToken('admin-rega');
 
 			// Off it goes to the agreement file.
-			$fp = fopen(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt', 'w');
-			fwrite($fp, str_replace("\r", '', $this->_req->post->agreement));
-			fclose($fp);
+			$agreement->save($this->_req->post->agreement);
 
 			updateSettings(array('requireAgreement' => !empty($this->_req->post->requireAgreement), 'checkboxAgreement' => !empty($this->_req->post->checkboxAgreement)));
 		}
 
-		$context['agreement'] = file_exists(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt') ? htmlspecialchars(file_get_contents(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt'), ENT_COMPAT, 'UTF-8') : '';
-		$context['warning'] = is_writable(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt') ? '' : $txt['agreement_not_writable'];
+		$context['agreement'] = Util::htmlspecialchars($agreement->getPlainText(false));
+
+		$context['warning'] = $agreement->isWritable() ? '' : $txt['agreement_not_writable'];
 		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
 		$context['checkbox_agreement'] = !empty($modSettings['checkboxAgreement']);
 
