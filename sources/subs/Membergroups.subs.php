@@ -1204,6 +1204,8 @@ function getMaxGroupID()
 /**
  * Adds a new group to the membergroups table.
  *
+ * @deprecated since 1.1 RC2 - use createMembergroup instead
+ *
  * @package Membergroups
  * @param int $id_group
  * @param string $groupname
@@ -1226,6 +1228,34 @@ function addMembergroup($id_group, $groupname, $minposts, $type)
 		),
 		array('id_group')
 	);
+}
+
+/**
+ * Adds a new group to the membergroups table.
+ *
+ * @package Membergroups
+ * @param string $groupname
+ * @param int $minposts
+ * @param string $type
+ */
+function createMembergroup($groupname, $minposts, $type)
+{
+	$db = database();
+
+	$db->insert('',
+		'{db_prefix}membergroups',
+		array(
+			'description' => 'string', 'group_name' => 'string-80', 'min_posts' => 'int',
+			'icons' => 'string', 'online_color' => 'string', 'group_type' => 'int',
+		),
+		array(
+			'', Util::htmlspecialchars($groupname, ENT_QUOTES), $minposts,
+			'1#icon.png', '', $type,
+		),
+		array('id_group')
+	);
+
+	return $db->insert_id('{db_prefix}membergroups');
 }
 
 /**
