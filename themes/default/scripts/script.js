@@ -1521,22 +1521,29 @@ function elkSelectText(oCurElement, bActOnElement)
  * @param {Array.} aElementNames
  * @param {string} sMask
  */
-function smc_saveEntities(sFormName, aElementNames, sMask)
-{
+function smc_saveEntities(sFormName, aElementNames, sMask) {
 	var i = 0,
 		n = 0;
 
-	if (typeof(sMask) === 'string')
-	{
-		for (i = 0, n = document.forms[sFormName].elements.length; i < n; i++)
-			if (document.forms[sFormName].elements[i].id.substr(0, sMask.length) == sMask)
+	if (typeof(sMask) === 'string') {
+		for (i = 0, n = document.forms[sFormName].elements.length; i < n; i++) {
+			if (document.forms[sFormName].elements[i].id.substr(0, sMask.length) === sMask) {
 				aElementNames[aElementNames.length] = document.forms[sFormName].elements[i].name;
+			}
+		}
 	}
 
-	for (i = 0, n = aElementNames.length; i < n; i++)
-	{
-		if (aElementNames[i] in document.forms[sFormName])
-			document.forms[sFormName][aElementNames[i]].value = document.forms[sFormName][aElementNames[i]].value.replace(/&#/g, '&#38;#');
+	for (i = 0, n = aElementNames.length; i < n; i++) {
+		if (aElementNames[i] in document.forms[sFormName]) {
+			// Handle the editor.
+			if (typeof post_box_name !== 'undefined' && aElementNames[i] === post_box_name && $editor_data[post_box_name] !== undefined) {
+				document.forms[sFormName][aElementNames[i]].value = $editor_data[post_box_name].val().replace(/&#/g, '&#38;#');
+				$editor_data[post_box_name].val(document.forms[sFormName][aElementNames[i]].value);
+			}
+			else {
+				document.forms[sFormName][aElementNames[i]].value = document.forms[sFormName][aElementNames[i]].value.replace(/&#/g, '&#38;#');
+			}
+		}
 	}
 }
 
