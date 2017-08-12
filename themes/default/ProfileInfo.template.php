@@ -753,14 +753,14 @@ function template_profile_block_contact()
 				if (empty($cf_show))
 				{
 					echo '
-				<ul class="cf_icon">';
+				<ul class="cf_icons">';
 					$cf_show = true;
 				}
 
 				// removed $field['name'], ': ', as it was annoying
 
 				echo '
-					<li>', $field['output_html'], '</li>';
+					<li class="cf_icon">', $field['output_html'], '</li>';
 			}
 		}
 
