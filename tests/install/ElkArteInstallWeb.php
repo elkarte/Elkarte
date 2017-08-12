@@ -19,8 +19,6 @@
 class ElkArteInstallWeb extends ElkArteWebTest
 {
 	protected $forumPath = '/var/www/test';
-	protected $adminuser = 'test_admin';
-	protected $adminpass = 'test_admin_pwd';
 
 	/**
 	 * You must provide a setUp() method for Selenium2TestCase
@@ -31,7 +29,7 @@ class ElkArteInstallWeb extends ElkArteWebTest
 	protected function setUp()
 	{
 		// Set the browser to be used by Selenium, it must be available on localhost
-		$this->setBrowser(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM2_BROWSER);
+		$this->setBrowser($this->browser);
 
 		// Set the base URL for the tests.
 		$this->setBrowserUrl('http://127.0.0.1/test');

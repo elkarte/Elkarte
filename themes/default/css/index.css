@@ -2961,7 +2961,7 @@ img.new_posts {
 	vertical-align: middle;
 }
 
-.listlevel2 > ol > li img, .listlevel2.warning img, .listlevel2.poster_ip img {
+.listlevel2.warning img, .listlevel2.poster_ip img {
 	padding: 0 4px;
 }
 
@@ -3877,10 +3877,9 @@ dl.merge_topic dd {
 	padding-left: 30px;
 }
 
-.profileblock .cf_icon {
-	display: block;
-	float: left;
-	margin: 4px 5px 0 0;
+.cf_icon > a > img {
+	vertical-align: middle;
+	padding: 0 4px 2px 4px;
 }
 
 #detailedinfo {
