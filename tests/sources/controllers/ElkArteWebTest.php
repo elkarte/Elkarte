@@ -21,9 +21,11 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 	protected $captureScreenshotOnFailure = true;
 	protected $screenshotPath = '/var/www/screenshots';
 	protected $width = 1280;
-	protected $height = 800;
+	protected $height = 1024;
 	protected $adminuser = 'test_admin';
 	protected $adminpass = 'test_admin_pwd';
+	protected $browser = 'firefox';
+	protected $port = 4444;
 
 	/**
 	 * You must provide a setUp() method for Selenium2TestCase
@@ -34,15 +36,9 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 	protected function setUp()
 	{
 		// Set the browser to be used by Selenium, it must be available on localhost
-		$this->setBrowser(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM2_BROWSER);
-
-		// Set the base URL for the tests.
-		if (!defined('PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST'))
-		{
-			DEFINE('PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST', 'http://127.0.0.1/');
-		}
-
-		$this->setBrowserUrl(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST);
+		$this->setBrowser($this->browser);
+		$this->setPort($this->port);
+		$this->setBrowserUrl('http://127.0.0.1/');
 
 		parent::setUp();
 	}
@@ -53,6 +49,7 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 	protected function tearDown()
 	{
 		$this->timeouts()->implicitWait(0);
+
 		parent::tearDown();
 	}
 
@@ -70,7 +67,7 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 
 		if ($this->width && $this->height)
 		{
-			$this->currentWindow()->size(array('width' => $this->width, 'height' => $this->height));
+			$this->setWindowSize();
 		}
 	}
 
