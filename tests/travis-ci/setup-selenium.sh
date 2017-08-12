@@ -8,7 +8,7 @@ set +x
 # Some vars to make this easy to change
 WEBTESTS_HUB_URL='http://127.0.0.1:4444'
 WEBTESTS_JAR=/usr/share/selenium/selenium-server-standalone.jar
-WEBTESTS_DOWNLOAD_URL=http://selenium-release.storage.googleapis.com/3.0/selenium-server-standalone-3.0.1.jar
+WEBTESTS_DOWNLOAD_URL=http://selenium-release.storage.googleapis.com/3.2/selenium-server-standalone-3.2.0.jar
 
 # Location of geckodriver for use as webdriver in xvfb
 GECKODRIVER_DOWNLOAD_URL=https://github.com/mozilla/geckodriver/releases/download/v0.14.0/geckodriver-v0.14.0-linux64.tar.gz
@@ -43,8 +43,8 @@ then
 fi
 
 # Start Selenium, select gecko or chrome driver
-export DISPLAY=:99
-sudo xvfb-run -s "-screen 0 1280x800x24" java -Dwebdriver.geckodriver.bin=/usr/bin/geckodriver -jar "$WEBTESTS_JAR" > /tmp/selenium.log &
+export DISPLAY=:99.0
+sudo xvfb-run java -Dwebdriver.geckodriver.bin=/usr/bin/geckodriver -jar "$WEBTESTS_JAR" > /tmp/selenium.log &
 wget --retry-connrefused --tries=120 --waitretry=3 --output-file=/dev/null "$WEBTESTS_HUB_URL/wd/hub/status" -O /dev/null
 
 # Test to see if the selenium server really did start

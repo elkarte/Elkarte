@@ -1,7 +1,6 @@
 sudo: required
 language: php
 dist: trusty
-group: edge
 
 matrix:
   include:
@@ -45,7 +44,7 @@ matrix:
   fast_finish: true
 
 addons:
-  firefox: "54.0"
+  firefox: "50.0"
 
 services:
   memcached
