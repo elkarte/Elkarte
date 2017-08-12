@@ -415,7 +415,6 @@ function template_registration_form()
 			}
 			echo '
 				</select>';
-// 			_debug($context['languages']);
 		}
 		echo '
 				<label for="checkbox_agreement">
