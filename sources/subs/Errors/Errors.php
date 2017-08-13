@@ -116,7 +116,7 @@ class Errors extends AbstractModel
 	 *
 	 * @param string $query_string
 	 * @param string $error_message
-	 * @param string $error_type
+	 * @param string|boolean $error_type
 	 * @param string $file
 	 * @param int $line
 	 */
