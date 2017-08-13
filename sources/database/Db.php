@@ -293,4 +293,11 @@ interface Database
 	 * @return string - the CREATE statement as string
 	 */
 	public function db_table_sql($tableName);
+
+	/**
+	 * Return the DB version the system is running under
+	 *
+	 * @return string - the version as string
+	 */
+	public function db_server_version();
 }
