@@ -647,7 +647,7 @@ class PreparseCode
 		);
 
 		// Find all closing tags (/table /tr /td etc)
-		while (preg_match('~\[(/)*(table|tr|td|th)\]~', $table_check, $matches) != false)
+		while (preg_match('~\[(/)*(table|tr|td|th)\]~', $table_check, $matches) === 1)
 		{
 			// Keep track of where this is.
 			$offset = strpos($table_check, $matches[0]);
