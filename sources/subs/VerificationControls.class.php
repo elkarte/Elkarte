@@ -802,7 +802,8 @@ class Verification_Controls_Questions implements Verification_Controls
 		if (!$cache->getVar($modSettings['question_id_cache'], 'verificationQuestionIds', 300) || !$modSettings['question_id_cache'])
 		{
 			$request = $db->query('', '
-				SELECT id_question, language
+				SELECT 
+					id_question, language
 				FROM {db_prefix}antispam_questions',
 				array()
 			);
@@ -818,7 +819,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	/**
 	 * Loads all the available antispam questions, or a subset based on a filter
 	 *
-	 * @param mixed[]|null $filter if specified it myst be an array with two indexes:
+	 * @param array|null $filter if specified it myst be an array with two indexes:
 	 *              - 'type' => a valid filter, it can be 'language' or 'id_question'
 	 *              - 'value' => the value of the filter (i.e. the language)
 	 */
@@ -834,7 +835,8 @@ class Verification_Controls_Questions implements Verification_Controls
 		// Load any question and answers!
 		$question_answers = array();
 		$request = $db->query('', '
-			SELECT id_question, question, answer, language
+			SELECT 
+				id_question, question, answer, language
 			FROM {db_prefix}antispam_questions' . ($filter === null || !isset($available_filters[$filter['type']]) ? '' : '
 			WHERE ' . $available_filters[$filter['type']]),
 			array(
