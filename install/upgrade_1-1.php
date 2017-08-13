@@ -333,7 +333,6 @@ class UpgradeInstructions_upgrade_1_1
 					if (!empty($modSettings['cal_enabled']))
 					{
 						enableModules('calendar', array('post', 'boardindex'));
-						Hooks::get()->enableIntegration('Calendar_Integrate');
 					}
 
 					if (!empty($modSettings['drafts_enabled']))

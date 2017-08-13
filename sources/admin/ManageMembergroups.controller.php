@@ -365,7 +365,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			$id_group = getMaxGroupID() + 1;
 			$minposts = !empty($this->_req->post->min_posts) ? (int) $this->_req->post->min_posts : '-1';
 
-			addMembergroup($id_group, $this->_req->post->group_name, $minposts, $group_type);
+			$id_group = createMembergroup($this->_req->post->group_name, $minposts, $group_type);
 
 			call_integration_hook('integrate_add_membergroup', array($id_group, $postCountBasedGroup));
 
