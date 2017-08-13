@@ -119,7 +119,7 @@ class Draft_Controller extends Post_Controller
 		$context['posts'] = array();
 		foreach ($user_drafts as $row)
 		{
-			$this->_prepare_body_subject($row['body'], $row['subject'], $row['id_draft'], $txt['drafts_none'], (bool) $row['smileys_enabled']);
+			$this->_prepare_body_subject($row['body'], $row['subject'], $txt['drafts_none'], (bool) $row['smileys_enabled']);
 
 			// And the data used by the template
 			$context['drafts'][$counter += $reverse ? -1 : 1] = array(
@@ -228,7 +228,7 @@ class Draft_Controller extends Post_Controller
 		$context['posts'] = array();
 		foreach ($user_drafts as $row)
 		{
-			$this->_prepare_body_subject($row['body'], $row['subject'], $row['id_draft'], $txt['no_subject'], true);
+			$this->_prepare_body_subject($row['body'], $row['subject'], $txt['no_subject'], true);
 
 			// Have they provided who this will go to?
 			$recipients = array(
@@ -339,19 +339,22 @@ class Draft_Controller extends Post_Controller
 	 *
 	 * @param string $body - The body of the message, passed by-ref
 	 * @param string $subject - The subject, passed by-ref
-	 * @param int $id_draft - The id of the draft, used for caching the parsed body
 	 * @param string $default_subject - The default subject if $subject is empty
 	 * @param bool $smiley_enabled - Is the smiley are enabled or not
 	 */
-	private function _prepare_body_subject(&$body, &$subject, $id_draft, $default_subject, $smiley_enabled = true)
+	private function _prepare_body_subject(&$body, &$subject, $default_subject, $smiley_enabled = true)
 	{
 		// Cleanup...
 		if (empty($body))
+		{
 			$body = '';
+		}
 
 		$subject = Util::htmltrim($subject);
 		if (empty($subject))
+		{
 			$subject = $default_subject;
+		}
 
 		// Censor...
 		$body = censor($body);
