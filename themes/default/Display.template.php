@@ -697,7 +697,7 @@ function template_display_poll_above()
 			if ($context['allow_poll_view'])
 				echo '
 							', $option['bar_ndt'], '
-							<span class="righttext">[ ', $option['votes'], ' ] (', $option['percent'], '%)</span>';
+							<span class="righttext poll-percent">[ ', $option['votes'], ' ] (', $option['percent'], '%)</span>';
 
 			echo '
 						</dd>';

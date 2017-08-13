@@ -1257,8 +1257,8 @@ div.bbc_footnotes .meaction {
 }
 
 .poll_gradient {
-	background: #1E5799;
-	background: linear-gradient(to bottom, #1E5799 0%,#2989d8 50%,#207CCA 51%,#7DB9E8 100%);
+	background: #5BA048;
+	background-image: linear-gradient(to bottom, #60BC78 0%, #27A348 100%);
 	border-color: #111;
 }
 

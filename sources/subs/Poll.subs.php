@@ -962,8 +962,7 @@ function loadPollContext($poll_id)
 			'votes' => $option['votes'],
 			'voted_this' => $option['voted_this'] != -1, /* Todo: I notice 'bar' here is not used in the theme any longer - only in SSI. */
 			'bar' => '<div class="poll_gradient" style="width: ' . $barWide . 'px;"></div>',
-			// Note: IE < 8 requires us to set a width on the container, too.
-			'bar_ndt' => $bar > 0 ? '<div class="bar" style="width: ' . $bar . '%;"><div style="width: ' . $bar . '%;"></div></div>' : '<div class="bar"></div>',
+			'bar_ndt' => $bar > 0 ? '<div class="bar poll-bar" style="width: ' . $bar . '%;"></div>' : '<div class="bar poll-bar"></div>',
 			'bar_width' => $barWide,
 			'option' => $bbc_parser->parsePoll($option['label']),
 			'vote_button' => '<input type="' . ($pollinfo['max_votes'] > 1 ? 'checkbox' : 'radio') . '" name="options[]" id="options-' . $i . '" value="' . $i . '" class="input_' . ($pollinfo['max_votes'] > 1 ? 'check' : 'radio') . '" />'
