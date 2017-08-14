@@ -1247,6 +1247,8 @@ function getThemeId($id_theme = 0)
 	else
 		$id_theme = $modSettings['theme_guests'];
 
+	call_integration_hook('integrate_customize_theme_id', array(&$id_theme));
+
 	// Verify the id_theme... no foul play.
 	// Always allow the board specific theme, if they are overriding.
 	if (!empty($board_info['theme']) && $board_info['override_theme'])
