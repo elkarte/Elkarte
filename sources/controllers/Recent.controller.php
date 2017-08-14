@@ -283,7 +283,7 @@ class Recent_Controller extends Action_Controller
 
 		// Find the number of posts in these category's, exclude the recycle board.
 		$boards_posts = boardsPosts(array(), $categories, false, false);
-		$this->_total_posts = array_sum($boards_posts);
+		$this->_total_posts = (int) array_sum($boards_posts);
 		$boards = array_keys($boards_posts);
 
 		if (empty($boards))
@@ -312,7 +312,7 @@ class Recent_Controller extends Action_Controller
 
 		// Fetch the number of posts for the supplied board IDs
 		$boards_posts = boardsPosts($this->_req->query->boards, array());
-		$this->_total_posts = array_sum($boards_posts);
+		$this->_total_posts = (int) array_sum($boards_posts);
 		$boards = array_keys($boards_posts);
 
 		// No boards, your request ends here

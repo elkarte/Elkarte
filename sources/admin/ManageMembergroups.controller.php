@@ -362,7 +362,6 @@ class ManageMembergroups_Controller extends Action_Controller
 			// Don't allow copying of a real privileged person!
 			$permissionsObject = new Permissions;
 			$illegal_permissions = $permissionsObject->getIllegalPermissions();
-			$id_group = getMaxGroupID() + 1;
 			$minposts = !empty($this->_req->post->min_posts) ? (int) $this->_req->post->min_posts : '-1';
 
 			$id_group = createMembergroup($this->_req->post->group_name, $minposts, $group_type);

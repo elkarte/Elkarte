@@ -128,7 +128,7 @@ class Elk_Exception extends Exception
 	 * Loads the language file specified in Elk_Exception::parseMessage()
 	 * and replaces the index received in the constructor.
 	 *
-	 * @param string $message
+	 * @param string|string[] $message
 	 *
 	 * @return string The index or the message.
 	 */

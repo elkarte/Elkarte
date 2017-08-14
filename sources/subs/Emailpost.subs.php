@@ -154,7 +154,7 @@ function pbe_fix_email_body($body, $html = false, $real_name = '', $charset = 'U
 
 	// Reflow and Cleanup this message to something that looks normal-er
 	$formatter = new Email_Format();
-	$body = $formatter->reflow($body, $html, $real_name, $charset);
+	$body = $formatter->reflow($body, $real_name, $charset);
 
 	return $body;
 }

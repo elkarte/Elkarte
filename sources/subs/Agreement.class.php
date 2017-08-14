@@ -1,16 +1,11 @@
 <?php
 
 /**
- * This class takes care of deleting and restoring messages in boards
- * that means posts and topics
+ * This class takes care of the registration agreement
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
- *
- * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.1 Release Candidate 1
  *
@@ -45,7 +40,7 @@ class Agreement
 	 * It stores strictly on the *language* agreement, no fallback.
 	 * If the language passed to the class is empty, then it uses agreement.txt.
 	 *
-	 * @param string $language the language of the agreement we want.
+	 * @param string $text the language of the agreement we want.
 	 */
 	public function save($text)
 	{
@@ -58,6 +53,7 @@ class Agreement
 	/**
 	 * Retrieves the plain text version of the agreement directly from
 	 * the file that contains it.
+	 *
 	 * It uses the language, but if the localized version doesn't exist
 	 * then it may return the english version.
 	 *
@@ -84,6 +80,7 @@ class Agreement
 
 	/**
 	 * Retrieves the BBC-parsed version of the agreement.
+	 *
 	 * It uses the language, but if the localized version doesn't exist
 	 * then it may return the english version.
 	 *
@@ -98,6 +95,7 @@ class Agreement
 
 	/**
 	 * Retrieves the BBC-parsed version of the agreement.
+	 *
 	 * If the language passed to the class is empty, then it uses agreement.txt.
 	 */
 	public function isWritable()

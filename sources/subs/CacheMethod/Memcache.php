@@ -217,7 +217,7 @@ class Memcache extends Cache_Method_Abstract
 	/**
 	 * If this should be done as a persistent connection
 	 *
-	 * @return string
+	 * @return boolean
 	 */
 	private function _is_persist()
 	{

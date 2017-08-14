@@ -102,6 +102,7 @@ abstract class Theme
 	{
 		$this->layers = Template_Layers::getInstance();
 		$this->templates = Templates::getInstance();
+		$this->id = $id;
 
 		$this->css_files = &$GLOBALS['context']['css_files'];
 		$this->js_files = &$GLOBALS['context']['js_files'];

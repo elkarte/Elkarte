@@ -29,7 +29,7 @@
  *  - $formatter = new Email_Format();
  *
  * Make the call, accepts a string of data and returns it formatted
- * - $body = $formatter->reflow($body, '', $html);
+ * - $body = $formatter->reflow($body);
  *
  * @package Maillist
  */
@@ -128,12 +128,11 @@ class Email_Format
 	 * - Returns a formatted string
 	 *
 	 * @param string $data
-	 * @param bool $html
 	 * @param string $real_name
 	 * @param string $charset
 	 * @param bool $bbc_br
 	 */
-	public function reflow($data, $html = false, $real_name = '', $charset = 'UTF-8', $bbc_br = true)
+	public function reflow($data, $real_name = '', $charset = 'UTF-8', $bbc_br = true)
 	{
 		global $modSettings;
 
