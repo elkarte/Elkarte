@@ -823,6 +823,8 @@ class Theme extends \Theme
 		$context['allow_moderation_center'] = $context['user']['can_mod'];
 		$context['allow_pm'] = allowedTo('pm_read');
 
+		call_integration_hook('integrate_setup_allow');
+
 		if ($context['allow_search'])
 		{
 			$context['theme_header_callbacks'] = elk_array_insert($context['theme_header_callbacks'], 'login_bar', array('search_bar'), 'after');
