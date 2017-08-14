@@ -158,16 +158,29 @@ class MarkRead_Controller extends Action_Controller
 
 		// Mark boards as read
 		if (!empty($boards))
+		{
 			markBoardsRead($boards, isset($this->_req->query->unread), true);
+		}
 
 		$_SESSION['id_msg_last_visit'] = $modSettings['maxMsgID'];
 		if (!empty($_SESSION['old_url']) && strpos($_SESSION['old_url'], 'action=unread') !== false)
+		{
 			return 'action=unread';
+		}
 
 		if (isset($_SESSION['topicseen_cache']))
+		{
 			$_SESSION['topicseen_cache'] = array();
+		}
 
-		return '';
+		if (!empty($modSettings['default_forum_action']))
+		{
+			return substr($modSettings['default_forum_action'], 1);
+		}
+		else
+		{
+			return '';
+		}
 	}
 
 	/**

@@ -540,7 +540,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 		else
 		{
 			$boards_can = boardsAllowedTo(array('make_sticky', 'move_any', 'move_own', 'remove_any', 'remove_own', 'lock_any', 'lock_own', 'merge_any', 'approve_posts'), true, false);
-			$redirect_url = isset($this->_req->post->redirect_url) ? $this->_req->post->redirect_url : (isset($_SESSION['old_url']) ? $_SESSION['old_url'] : '');
+			$redirect_url = isset($this->_req->post->redirect_url) ? $this->_req->post->redirect_url : (isset($_SESSION['old_url']) ? $_SESSION['old_url'] : substr($modSettings['default_forum_action'], 1));
 		}
 
 		if (!$user_info['is_guest'])

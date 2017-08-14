@@ -137,7 +137,12 @@ class Site_Dispatcher
 			!empty($modSettings['front_page'])
 			&& is_callable(array($modSettings['front_page'], 'frontPageHook'))
 		) {
+			$modSettings['default_forum_action'] = '?action=forum;';
 			call_user_func_array(array($modSettings['front_page'], 'frontPageHook'), array(&$this->_default_action));
+		}
+		else
+		{
+			$modSettings['default_forum_action'] = '';
 		}
 		return $this->_default_action;
 	}

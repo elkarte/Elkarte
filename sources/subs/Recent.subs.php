@@ -149,8 +149,8 @@ function prepareRecentPosts($messages, $start)
 			'category' => array(
 				'id' => $row['id_cat'],
 				'name' => $row['cname'],
-				'href' => $scripturl . '#c' . $row['id_cat'],
-				'link' => '<a href="' . $scripturl . '#c' . $row['id_cat'] . '">' . $row['cname'] . '</a>'
+				'href' => $scripturl . $modSettings['default_forum_action'] . '#c' . $row['id_cat'],
+				'link' => '<a href="' . $scripturl . $modSettings['default_forum_action'] . '#c' . $row['id_cat'] . '">' . $row['cname'] . '</a>'
 			),
 			'board' => array(
 				'id' => $row['id_board'],

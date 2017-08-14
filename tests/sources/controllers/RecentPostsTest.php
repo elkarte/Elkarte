@@ -15,6 +15,7 @@ class TestRecentPosts extends PHPUnit_Framework_TestCase
 		// Lets add in just enough info for the system to think we are logged
 		$modSettings['smiley_sets_known'] = 'none';
 		$modSettings['smileys_url'] = 'http://127.0.0.1/smileys';
+		$modSettings['default_forum_action'] = '';
 		$settings['default_theme_dir'] = '/var/www/themes/default';
 
 		// We are not logged in for this test, so lets fake it

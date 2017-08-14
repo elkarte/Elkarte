@@ -67,7 +67,7 @@ abstract class Action_Controller
 	 */
 	public static function addForumButton(&$buttons)
 	{
-		global $scripturl, $txt;
+		global $scripturl, $txt, $modSettings;
 
 		$buttons = array_merge(array(
 			'base' => array(
@@ -78,7 +78,7 @@ abstract class Action_Controller
 			'action_hook' => true,
 		)), $buttons);
 
-		$buttons['home']['href'] = $scripturl . '?action=forum';
+		$buttons['home']['href'] = $scripturl . $modSettings['default_forum_action'];
 		$buttons['home']['data-icon'] = 'i-comment-blank';
 	}
 

@@ -118,7 +118,7 @@ class Unread_Controller extends Action_Controller
 			$name = categoryName((int) $this->_req->query->c[0]);
 
 			$context['linktree'][] = array(
-				'url' => $scripturl . '#c' . (int) $this->_req->query->c[0],
+				'url' => $scripturl . $modSettings['default_forum_action'] . '#c' . (int) $this->_req->query->c[0],
 				'name' => $name
 			);
 		}

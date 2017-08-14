@@ -695,8 +695,8 @@ class Search_Controller extends Action_Controller
 			'category' => array(
 				'id' => $message['id_cat'],
 				'name' => $message['cat_name'],
-				'href' => $scripturl . '#c' . $message['id_cat'],
-				'link' => '<a href="' . $scripturl . '#c' . $message['id_cat'] . '">' . $message['cat_name'] . '</a>'
+				'href' => $scripturl . $modSettings['default_forum_action'] . '#c' . $message['id_cat'],
+				'link' => '<a href="' . $scripturl . $modSettings['default_forum_action'] . '#c' . $message['id_cat'] . '">' . $message['cat_name'] . '</a>'
 			)
 		));
 

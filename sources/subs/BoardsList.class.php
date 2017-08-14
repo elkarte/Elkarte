@@ -161,7 +161,7 @@ class Boards_List
 	 */
 	public function getBoards()
 	{
-		global $txt;
+		global $txt, $modSettings;
 
 		// Find all boards and categories, as well as related information.
 		$result_boards = $this->_db->query('boardindex_fetch_boards', '
@@ -219,7 +219,7 @@ class Boards_List
 						'can_collapse' => isset($row_board['can_collapse']) && $row_board['can_collapse'] == 1,
 						'collapse_href' => isset($row_board['can_collapse']) ? $this->_scripturl . '?action=collapse;c=' . $row_board['id_cat'] . ';sa=' . ($row_board['is_collapsed'] > 0 ? 'expand;' : 'collapse;') . $this->_session_url . '#c' . $row_board['id_cat'] : '',
 						'collapse_image' => isset($row_board['can_collapse']) ? '<img src="' . $this->_images_url . ($row_board['is_collapsed'] > 0 ? 'expand.png" alt="+"' : 'collapse.png" alt="-"') . ' />' : '',
-						'href' => $this->_scripturl . '#c' . $row_board['id_cat'],
+						'href' => $this->_scripturl . $modSettings['default_forum_action'] . '#c' . $row_board['id_cat'],
 						'boards' => array(),
 						'new' => false
 					);

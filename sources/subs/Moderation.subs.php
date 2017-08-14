@@ -1499,7 +1499,7 @@ function warningDailyLimit($member)
  */
 function getUnapprovedPosts($approve_query, $current_view, $boards_allowed, $start, $limit = 10)
 {
-	global $context, $scripturl, $user_info;
+	global $context, $scripturl, $user_info, $modSettings;
 
 	$db = database();
 
@@ -1569,7 +1569,7 @@ function getUnapprovedPosts($approve_query, $current_view, $boards_allowed, $sta
 			'category' => array(
 				'id' => $row['id_cat'],
 				'name' => $row['cat_name'],
-				'link' => '<a href="' . $scripturl . '#c' . $row['id_cat'] . '">' . $row['cat_name'] . '</a>',
+				'link' => '<a href="' . $scripturl . $modSettings['default_forum_action'] . '#c' . $row['id_cat'] . '">' . $row['cat_name'] . '</a>',
 			),
 			'can_delete' => $can_delete,
 		);
