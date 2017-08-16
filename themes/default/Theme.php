@@ -734,6 +734,7 @@ class Theme extends \Theme
 		{
 			addJavascriptVar(array('elk_scripturl' => '\'' . $scripturl . '\''));
 		}
+		addJavascriptVar(array('elk_forum_action' => '\'' . substr($modSettings['default_forum_action'], 1, -1) . '\''));
 
 		if (!isset($context['page_title']))
 		{
