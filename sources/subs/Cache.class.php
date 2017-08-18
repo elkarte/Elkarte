@@ -57,6 +57,12 @@ class Cache
 	protected $_accelerator = null;
 
 	/**
+	 * Cached keys
+	 * @var string[]
+	 */
+	protected $_cached_keys = array();
+
+	/**
 	 * The caching object
 	 * @var object|boolean
 	 */
@@ -97,6 +103,16 @@ class Cache
 		$this->_options = $options;
 
 		$this->_init();
+
+		$this->_cached_keys = $this->get('_cached_keys');
+	}
+
+	/**
+	 * Just before forgetting about the cache, let's save the existing keys.
+	 */
+	public function __destruct()
+	{
+		$this->put('_cached_keys', array_unique($this->_cached_keys));
 	}
 
 	/**
@@ -205,6 +221,7 @@ class Cache
 			$st = microtime(true);
 		}
 
+		$this->_cached_keys[] = $key;
 		$key = $this->_key($key);
 		$value = $value === null ? null : serialize($value);
 
@@ -414,6 +431,39 @@ class Cache
 
 		$key = $this->_key($key);
 		$this->_cache_obj->remove($key);
+	}
+
+	/**
+	 * Removes one or multiple keys from the cache.
+	 *
+	 * Supports the preg_match syntax.
+	 *
+	 * @param string|string[] $keys_match The regulat expression/s to match
+	 *                        the key to remove from the cache.
+	 * @param string $delimiter The delimiter used by preg_match.
+	 * @param string $modifiers Any modifier required by the regexp.
+	 */
+	public function removeKeys($keys_match, $delimiter = '~', $modifiers = '')
+	{
+		if (!$this->isEnabled())
+		{
+			return;
+		}
+
+		$to_remove = array();
+		foreach ((array) $keys_match as $k)
+		{
+			$to_remove[] = $k;
+		}
+		$pattern = $delimiter . implode('|', $to_remove) . $delimiter . $modifiers;
+
+		foreach ($this->_cached_keys as $cached_key)
+		{
+			if (preg_match($pattern, $cached_key) === 1)
+			{
+				$this->_cache_obj->remove($cached_key);
+			}
+		}
 	}
 
 	/**
