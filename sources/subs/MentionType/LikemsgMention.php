@@ -48,6 +48,6 @@ class Likemsg_Mention extends Mention_BoardAccess_Abstract
 			'MSGLINK' => replaceBasicActionUrl('{script_url}?msg=' . $this->_task->id_target),
 		);
 
-		return $this->_getNotificationStrings('notify_new_buddy', $keys, $members, $this->_task, array(), $replacements);
+		return $this->_getNotificationStrings('notify_new_likemsg', $keys, $members, $this->_task, array(), $replacements);
 	}
 }

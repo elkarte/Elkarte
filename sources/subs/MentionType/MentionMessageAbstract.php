@@ -149,9 +149,11 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 		$return = array();
 		if (!empty($template))
 		{
-			$langstrings = $this->_loadStringsByTemplate($template, $keys, $members, $members_data, $lang_files, $replacements);
 			foreach ($members as $member)
 			{
+				$langstrings = $this->_loadStringsByTemplate($template, $keys, $members, $members_data, $lang_files, $replacements);
+				$replacements['REALNAME'] = $members_data[$member]['real_name'];
+
 				$return[] = array(
 					'id_member_to' => $member,
 					'email_address' => $members_data[$member]['email_address'],
