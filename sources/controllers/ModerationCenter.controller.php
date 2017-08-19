@@ -1749,6 +1749,7 @@ class ModerationCenter_Controller extends Action_Controller
 			'memberreq' => '?action=admin;area=viewmembers;sa=browse;type=approve',
 			'groupreq' => '?action=moderate;area=groups;sa=requests',
 			'reports' => '?action=moderate;area=reports;sa=open',
+			'pm_reports' => '?action=moderate;area=pm_reports;sa=open',
 		);
 
 		return 'action_required';
