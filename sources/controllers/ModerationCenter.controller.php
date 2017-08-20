@@ -392,13 +392,13 @@ class ModerationCenter_Controller extends Action_Controller
 
 		list ($context['notice_body'], $context['notice_subject']) = $notice;
 
-		$parser = \BBC\ParserWrapper::getInstance();
+		$parser = \BBC\ParserWrapper::instance();
 
 		$context['notice_body'] = $parser->parseNotice($context['notice_body']);
 		$context['page_title'] = $txt['show_notice'];
 		$context['sub_template'] = 'show_notice';
 
-		Template_Layers::getInstance()->removeAll();
+		Template_Layers::instance()->removeAll();
 		loadTemplate('ModerationCenter');
 	}
 
@@ -495,7 +495,7 @@ class ModerationCenter_Controller extends Action_Controller
 		$context['reports'] = getModReports($context['view_closed'], $context['start'], 10, $show_pms);
 		$report_ids = array_keys($context['reports']);
 		$report_boards_ids = array();
-		$bbc_parser = \BBC\ParserWrapper::getInstance();
+		$bbc_parser = \BBC\ParserWrapper::instance();
 		foreach ($context['reports'] as $row)
 		{
 			$context['reports'][$row['id_report']] = array(
@@ -830,7 +830,7 @@ class ModerationCenter_Controller extends Action_Controller
 			}
 		}
 
-		$bbc_parser = \BBC\ParserWrapper::getInstance();
+		$bbc_parser = \BBC\ParserWrapper::instance();
 
 		$context['report'] = array(
 			'id' => $row['id_report'],
@@ -1813,7 +1813,7 @@ class ModerationCenter_Controller extends Action_Controller
 		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=index;notes', $this->_req->query->start, $moderator_notes_total, 10);
 		$context['start'] = $this->_req->query->start;
 
-		$bbc_parser = \BBC\ParserWrapper::getInstance();
+		$bbc_parser = \BBC\ParserWrapper::instance();
 
 		$context['notes'] = array();
 		foreach ($moderator_notes as $note)

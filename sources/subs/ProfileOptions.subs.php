@@ -45,7 +45,7 @@ function getBuddiesID($buddies, $adding = true)
 	// If we are mentioning buddies, then let them know who's their buddy.
 	if ($adding && !empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
 	{
-		$notifier = Notifications::getInstance();
+		$notifier = Notifications::instance();
 	}
 
 	// Add the new member(s) to the buddies array.

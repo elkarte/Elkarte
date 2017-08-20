@@ -63,7 +63,7 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = $scripturl;
-		Template_Layers::getInstance()->add('boardindex_outer');
+		Template_Layers::instance()->add('boardindex_outer');
 
 		// Do not let search engines index anything if there is a random thing in $_GET.
 		if (!empty($this->_req->query))
@@ -159,7 +159,7 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 		call_integration_hook('integrate_mark_read_button');
 		if (!empty($context['info_center_callbacks']))
 		{
-			Template_Layers::getInstance()->add('info_center');
+			Template_Layers::instance()->add('info_center');
 		}
 	}
 

@@ -95,7 +95,7 @@ class MarkRead_Controller extends Action_Controller
 
 		loadTemplate('Xml');
 
-		Template_Layers::getInstance()->removeAll();
+		Template_Layers::instance()->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		// Guests can't mark things.

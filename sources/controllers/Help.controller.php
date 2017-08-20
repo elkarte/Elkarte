@@ -125,7 +125,7 @@ class Help_Controller extends Action_Controller
 		$context['page_title'] = $context['forum_name'] . ' - ' . $txt['help'];
 
 		// Only show the 'popup' sub-template, no layers.
-		Template_Layers::getInstance()->removeAll();
+		Template_Layers::instance()->removeAll();
 		$context['sub_template'] = 'popup';
 
 		$helps = explode('+', $help_str);

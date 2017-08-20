@@ -195,7 +195,7 @@ class Boards_List
 			)
 		);
 
-		$bbc_parser = \BBC\ParserWrapper::getInstance();
+		$bbc_parser = \BBC\ParserWrapper::instance();
 
 		// Run through the categories and boards (or only boards)....
 		while ($row_board = $this->_db->fetch_assoc($result_boards))

@@ -58,7 +58,7 @@ require_once(SOURCEDIR . '/Security.php');
 require_once(SUBSDIR . '/Cache.subs.php');
 
 // Get the autoloader rolling
-$autoloder = Elk_Autoloader::getInstance();
+$autoloder = Elk_Autoloader::instance();
 $autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
 $autoloder->register(SOURCEDIR, '\\ElkArte');
 

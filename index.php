@@ -139,7 +139,7 @@ require_once(SUBSDIR . '/Cache.subs.php');
 
 // Initialize the class Autoloader
 require(SOURCEDIR . '/Autoloader.class.php');
-$autoloder = Elk_Autoloader::getInstance();
+$autoloder = Elk_Autoloader::instance();
 $autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
 $autoloder->register(SOURCEDIR, '\\ElkArte');
 $autoloder->register(SOURCEDIR . '/subs/BBC', '\\BBC');

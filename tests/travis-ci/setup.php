@@ -241,7 +241,7 @@ Class Elk_Testing_Setup
 		require_once(SUBSDIR . '/Util.class.php');
 		require_once(SUBSDIR . '/Auth.subs.php');
 
-		Elk_Autoloader::getInstance()->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
+		Elk_Autoloader::instance()->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
 
 		$settings['theme_dir'] = $settings['default_theme_dir'] = BOARDDIR . '/Themes/default';
 		$settings['theme_url'] = $settings['default_theme_url'] = $boardurl . '/themes/default';

@@ -161,7 +161,7 @@ class Search_Controller extends Action_Controller
 		// If you got back from search;sa=results by using the linktree, you get your original search parameters back.
 		if ($this->_search === null && isset($_REQUEST['params']))
 		{
-			Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
+			Elk_Autoloader::instance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 			$this->_search = new \ElkArte\Search\Search();
 			$this->_search->searchParamsFromString($_REQUEST['params']);
 
@@ -583,7 +583,7 @@ class Search_Controller extends Action_Controller
 			$charLimit = 50;
 
 			$message['body'] = strtr($message['body'], array("\n" => ' ', '<br />' => "\n"));
-			$bbc_parser = \BBC\ParserWrapper::getInstance();
+			$bbc_parser = \BBC\ParserWrapper::instance();
 			$message['body'] = $bbc_parser->parseMessage($message['body'], $message['smileys_enabled']);
 			$message['body'] = strip_tags(strtr($message['body'], array('</div>' => '<br />', '</li>' => '<br />')), '<br>');
 
@@ -627,7 +627,7 @@ class Search_Controller extends Action_Controller
 		else
 		{
 			// Run BBC interpreter on the message.
-			$bbc_parser = \BBC\ParserWrapper::getInstance();
+			$bbc_parser = \BBC\ParserWrapper::instance();
 			$message['body'] = $bbc_parser->parseMessage($message['body'], $message['smileys_enabled']);
 		}
 

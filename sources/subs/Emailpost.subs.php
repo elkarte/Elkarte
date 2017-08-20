@@ -938,7 +938,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	call_integration_hook('integrate_mailist_pre_parsebbc', array(&$message));
 
 	// Convert the remaining bbc to html
-	$bbc_wrapper = \BBC\ParserWrapper::getInstance();
+	$bbc_wrapper = \BBC\ParserWrapper::instance();
 	$message = $bbc_wrapper->parseMessage($message, false);
 
 	// Change list style to something standard to make text conversion easier
@@ -1054,7 +1054,7 @@ function pbe_disable_user_notify($email_message)
 		//Add a "mention" of email notification being disabled
 		if (!empty($modSettings['mentions_enabled']))
 		{
-			$notifier = Notifications::getInstance();
+			$notifier = Notifications::instance();
 			$notifier->add(new Notifications_Task(
 				'mailfail',
 				0,
@@ -1267,7 +1267,7 @@ function query_sender_wrapper($from)
 	// Clean up the signature line
 	if (!empty($result['signature']))
 	{
-		$bbc_wrapper = \BBC\ParserWrapper::getInstance();
+		$bbc_wrapper = \BBC\ParserWrapper::instance();
 		$result['signature'] = trim(un_htmlspecialchars(strip_tags(strtr($bbc_wrapper->parseSignature($result['signature'], false), array('</tr>' => "   \n", '<br />' => "   \n", '</div>' => "\n", '</li>' => "   \n", '&#91;' => '[', '&#93;' => ']')))));
 	}
 

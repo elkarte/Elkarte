@@ -1549,7 +1549,7 @@ class ManageSmileys_Controller extends Action_Controller
 		$context['actions'] = array();
 		$context['ftp_needed'] = false;
 
-		$bbc_parser = \BBC\ParserWrapper::getInstance();
+		$bbc_parser = \BBC\ParserWrapper::instance();
 
 		foreach ($actions as $action)
 		{

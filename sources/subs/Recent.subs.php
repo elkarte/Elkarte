@@ -54,7 +54,7 @@ function getLastPosts($latestPostOptions)
 	);
 
 	$posts = array();
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	while ($row = $db->fetch_assoc($request))
 	{
@@ -131,7 +131,7 @@ function prepareRecentPosts($messages, $start)
 	$counter = $start + 1;
 	$posts = array();
 	$board_ids = array('own' => array(), 'any' => array());
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 	foreach ($messages as $row)
 	{
 		// Censor everything.
@@ -336,7 +336,7 @@ function getLastTopics($latestTopicOptions)
 	);
 
 	$posts = array();
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	while ($row = $db->fetch_assoc($request))
 	{

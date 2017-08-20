@@ -152,7 +152,7 @@ class Mentions_Controller extends Action_Controller
 		if (empty($modSettings['mentions_enabled']))
 			throw new Elk_Exception('no_access', false);
 
-		Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
+		Elk_Autoloader::instance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
 
 		// @deprecated since 1.1
 		$this->_data = array(
@@ -362,7 +362,7 @@ class Mentions_Controller extends Action_Controller
 
 		loadTemplate('Json');
 		$context['sub_template'] = 'send_json';
-		$template_layers = Template_Layers::getInstance();
+		$template_layers = Template_Layers::instance();
 		$template_layers->removeAll();
 		require_once(SUBSDIR . '/Mentions.subs.php');
 

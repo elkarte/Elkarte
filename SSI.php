@@ -330,7 +330,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 		))
 	);
 
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	$posts = array();
 	while ($row = $db->fetch_assoc($request))
@@ -529,7 +529,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			'topic_list' => $topic_list
 		)
 	);
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 	$posts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
@@ -1291,7 +1291,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 		'options' => array()
 	);
 
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	// Calculate the percentages and bar lengths...
 	$divisor = $return['total_votes'] == 0 ? 1 : $return['total_votes'];
@@ -1868,7 +1868,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 		return false;
 	}
 
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	$return = array();
 	foreach ($request as $row)

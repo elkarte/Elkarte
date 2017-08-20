@@ -609,7 +609,7 @@ class Theme extends \Theme
 		$context['show_quick_login'] = !empty($modSettings['enableVBStyleLogin']) && $user_info['is_guest'];
 		$context['robot_no_index'] = in_array($context['current_action'], $this->no_index_actions);
 
-		$bbc_parser = \BBC\ParserWrapper::getInstance();
+		$bbc_parser = \BBC\ParserWrapper::instance();
 
 		// Get some news...
 		$context['news_lines'] = array_filter(explode("\n", str_replace("\r", '', trim(addslashes($modSettings['news'])))));
@@ -1099,7 +1099,7 @@ class Theme extends \Theme
 				$layers = array('html', 'body');
 			}
 
-			$template_layers = \Template_Layers::getInstance(true);
+			$template_layers = \Template_Layers::instance(true);
 			foreach ($layers as $layer)
 			{
 				$template_layers->addBegin($layer);

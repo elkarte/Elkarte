@@ -27,7 +27,7 @@ class TestCache extends PHPUnit_Framework_TestCase
 	 */
 	public function setUp()
 	{
-		Elk_Autoloader::getInstance()->register(SUBSDIR . '/CacheMethod', '\\ElkArte\\sources\\subs\\CacheMethod');
+		Elk_Autoloader::instance()->register(SUBSDIR . '/CacheMethod', '\\ElkArte\\sources\\subs\\CacheMethod');
 	}
 
 	/**

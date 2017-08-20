@@ -320,7 +320,7 @@ class ManageErrors_Controller extends Action_Controller
 		);
 
 		loadTemplate('Errors');
-		Template_Layers::getInstance()->removeAll();
+		Template_Layers::instance()->removeAll();
 		$context['sub_template'] = 'show_file';
 	}
 }

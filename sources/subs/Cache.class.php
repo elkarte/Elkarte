@@ -522,7 +522,7 @@ class Cache
 				);
 			}
 
-			Elk_Autoloader::getInstance()->register(SUBSDIR . '/CacheMethod', '\\ElkArte\\sources\\subs\\CacheMethod');
+			Elk_Autoloader::instance()->register(SUBSDIR . '/CacheMethod', '\\ElkArte\\sources\\subs\\CacheMethod');
 			self::$_instance = new Cache($cache_enable, $cache_accelerator, $options);
 		}
 

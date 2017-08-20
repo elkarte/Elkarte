@@ -250,7 +250,7 @@ class Search
 		global $modSettings, $txt;
 
 		require_once(SUBSDIR . '/Package.subs.php');
-		\Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
+		\Elk_Autoloader::instance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 
 		// Load up the search API we are going to use.
 		if (empty($searchClass))

@@ -76,7 +76,7 @@ class XmlPreview_Controller extends Action_Controller
 		else
 			preparsecode($news);
 
-		$bbc_parser = \BBC\ParserWrapper::getInstance();
+		$bbc_parser = \BBC\ParserWrapper::instance();
 
 		// Return the xml response to the template
 		$context['xml_data'] = array(
@@ -150,7 +150,7 @@ class XmlPreview_Controller extends Action_Controller
 			$member = getBasicMemberData($user, array('preferences' => true));
 
 			$member['signature'] = censor($member['signature']);
-			$bbc_parser = \BBC\ParserWrapper::getInstance();
+			$bbc_parser = \BBC\ParserWrapper::instance();
 			$member['signature'] = $bbc_parser->parseSignature($member['signature'], true);
 
 			// And now what they want it to be
@@ -266,7 +266,7 @@ class XmlPreview_Controller extends Action_Controller
 			if (!empty($this->_req->post->body))
 			{
 				preparsecode($warning_body);
-				$bbc_parser = \BBC\ParserWrapper::getInstance();
+				$bbc_parser = \BBC\ParserWrapper::instance();
 				$warning_body = $bbc_parser->parseNotice($warning_body);
 			}
 			$context['preview_message'] = $warning_body;
@@ -341,7 +341,7 @@ class XmlPreview_Controller extends Action_Controller
 			if (!empty($this->_req->post->body))
 			{
 				preparsecode($body);
-				$bbc_parser = \BBC\ParserWrapper::getInstance();
+				$bbc_parser = \BBC\ParserWrapper::instance();
 				$body = $bbc_parser->parseEmail($body);
 			}
 

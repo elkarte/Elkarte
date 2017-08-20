@@ -49,9 +49,9 @@ class Post_Controller extends Action_Controller
 	public function pre_dispatch()
 	{
 		$this->_post_errors = ErrorContext::context('post', 1);
-		$this->_template_layers = Template_Layers::getInstance();
+		$this->_template_layers = Template_Layers::instance();
 
-		$this->preparse = \BBC\PreparseCode::getInstance();
+		$this->preparse = \BBC\PreparseCode::instance();
 
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
@@ -365,7 +365,7 @@ class Post_Controller extends Action_Controller
 				$this->preparse->preparsecode($this->_form_message, true);
 
 				// Do all bulletin board code thing on the message
-				$bbc_parser = \BBC\ParserWrapper::getInstance();
+				$bbc_parser = \BBC\ParserWrapper::instance();
 				$this->preparse->preparsecode($context['preview_message']);
 				$context['preview_message'] = $bbc_parser->parseMessage($context['preview_message'], isset($_REQUEST['ns']) ? 0 : 1);
 				$context['preview_message'] = censor($context['preview_message']);
@@ -925,7 +925,7 @@ class Post_Controller extends Action_Controller
 
 			$this->preparse->preparsecode($_POST['message']);
 
-			$bbc_parser = \BBC\ParserWrapper::getInstance();
+			$bbc_parser = \BBC\ParserWrapper::instance();
 
 			// Let's see if there's still some content left without the tags.
 			if (Util::htmltrim(strip_tags($bbc_parser->parseMessage($_POST['message'], false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($_POST['message'], '[html]') === false))
@@ -1294,7 +1294,7 @@ class Post_Controller extends Action_Controller
 				$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true);
 
 				$this->preparse->preparsecode($_POST['message']);
-				$bbc_parser = \BBC\ParserWrapper::getInstance();
+				$bbc_parser = \BBC\ParserWrapper::instance();
 
 				if (Util::htmltrim(strip_tags($bbc_parser->parseMessage($_POST['message'], false), '<img>')) === '')
 				{
@@ -1334,7 +1334,7 @@ class Post_Controller extends Action_Controller
 
 				if (!empty($actually_mentioned))
 				{
-					$notifier = Notifications::getInstance();
+					$notifier = Notifications::instance();
 					$notifier->add(new Notifications_Task(
 						'Mentionmem',
 						$row['id_msg'],
@@ -1399,7 +1399,7 @@ class Post_Controller extends Action_Controller
 
 		if (isset($_REQUEST['xml']))
 		{
-			$bbc_parser = \BBC\ParserWrapper::getInstance();
+			$bbc_parser = \BBC\ParserWrapper::instance();
 			$context['sub_template'] = 'modifydone';
 
 			if (!$this->_post_errors->hasErrors() && isset($msgOptions['subject']) && isset($msgOptions['body']))

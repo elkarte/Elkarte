@@ -164,7 +164,7 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 	{
 		if (!empty($this->_actually_mentioned))
 		{
-			$notifier = \Notifications::getInstance();
+			$notifier = \Notifications::instance();
 			$notifier->add(new \Notifications_Task(
 				'mentionmem',
 				$msgOptions['id'],

@@ -155,7 +155,7 @@ class Profile_Controller extends Action_Controller
 		// Set the template for this area... if you still can :P
 		// and add the profile layer.
 		$context['sub_template'] = $this->_profile_include_data['function'];
-		Template_Layers::getInstance()->add('profile');
+		Template_Layers::instance()->add('profile');
 
 		// Need JS if we made it this far
 		loadJavascriptFile('profile.js');

@@ -1066,7 +1066,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 		return false;
 	}
 
-	$parsers = \BBC\ParserWrapper::getInstance();
+	$parsers = \BBC\ParserWrapper::instance();
 
 	// Well, it's loaded now anyhow.
 	$dataLoaded[$user] = true;
@@ -1391,7 +1391,7 @@ function initTheme($id_theme = 0)
 	$settings['actual_theme_dir'] = $settings['theme_dir'];
 
 	// Reload the templates
-	Templates::getInstance()->reloadDirectories($settings);
+	Templates::instance()->reloadDirectories($settings);
 
 	// Setup the default theme file. In the future, this won't exist and themes will just have to extend it if they want
 	require_once($settings['default_theme_dir'] . '/Theme.php');
@@ -1856,9 +1856,9 @@ function loadEssentialThemeData()
 	);
 
 	// Check we have some directories setup.
-	if (!Templates::getInstance()->hasDirectories())
+	if (!Templates::instance()->hasDirectories())
 	{
-		Templates::getInstance()->reloadDirectories($settings);
+		Templates::instance()->reloadDirectories($settings);
 	}
 
 	// Assume we want this.
@@ -1889,7 +1889,7 @@ function loadEssentialThemeData()
  */
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
-	return Templates::getInstance()->load($template_name, $style_sheets, $fatal);
+	return Templates::instance()->load($template_name, $style_sheets, $fatal);
 }
 
 /**
@@ -1909,7 +1909,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  */
 function loadSubTemplate($sub_template_name, $fatal = false)
 {
-	Templates::getInstance()->loadSubTemplate($sub_template_name, $fatal);
+	Templates::instance()->loadSubTemplate($sub_template_name, $fatal);
 
 	return true;
 }
@@ -2217,7 +2217,7 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 			$attempts[] = array($settings['default_theme_dir'], $template, 'english', $settings['default_theme_url']);
 		}
 
-		$templates = Templates::getInstance();
+		$templates = Templates::instance();
 
 		// Try to find the language file.
 		$found = false;
@@ -2791,7 +2791,7 @@ function doSecurityChecks()
 
 	// Finally, let's show the layer.
 	if ($show_warnings || !empty($context['warning_controls']))
-		\Template_Layers::getInstance()->addAfter('admin_warning', 'body');
+		\Template_Layers::instance()->addAfter('admin_warning', 'body');
 }
 
 /**
@@ -2808,7 +2808,7 @@ function loadBBCParsers()
 			$disabledBBC = explode(',', $modSettings['disabledBBC']);
 		else
 			$disabledBBC = $modSettings['disabledBBC'];
-		\BBC\ParserWrapper::getInstance()->setDisabled(empty($disabledBBC) ? array() : (array) $disabledBBC);
+		\BBC\ParserWrapper::instance()->setDisabled(empty($disabledBBC) ? array() : (array) $disabledBBC);
 	}
 
 	return 1;

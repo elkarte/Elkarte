@@ -103,7 +103,7 @@ class Attachment_Controller extends Action_Controller
 		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 
 		// Set up the template details
-		$template_layers = Template_Layers::getInstance();
+		$template_layers = Template_Layers::instance();
 		$template_layers->removeAll();
 		loadTemplate('Json');
 		$context['sub_template'] = 'send_json';
@@ -182,7 +182,7 @@ class Attachment_Controller extends Action_Controller
 		global $context, $txt;
 
 		// Prepare the template so we can respond with json
-		$template_layers = Template_Layers::getInstance();
+		$template_layers = Template_Layers::instance();
 		$template_layers->removeAll();
 		loadTemplate('Json');
 		$context['sub_template'] = 'send_json';

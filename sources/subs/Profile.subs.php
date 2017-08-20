@@ -195,7 +195,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 	);
 	$context['custom_fields'] = array();
 	$context['custom_fields_required'] = false;
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Shortcut.
@@ -1732,7 +1732,7 @@ function profileLoadSignatureData()
 		$context['member']['signature'] = censor($context['member']['signature']);
 		$context['member']['current_signature'] = $context['member']['signature'];
 		$signature = censor($signature);
-		$bbc_parser = \BBC\ParserWrapper::getInstance();
+		$bbc_parser = \BBC\ParserWrapper::instance();
 		$context['member']['signature_preview'] = $bbc_parser->parseSignature($signature, true);
 		$context['member']['signature'] = $_POST['signature'];
 	}
@@ -1933,7 +1933,7 @@ function profileValidateSignature(&$value)
 
 		// What about too many smileys!
 		$smiley_parsed = $unparsed_signature;
-		$wrapper = \BBC\ParserWrapper::getInstance();
+		$wrapper = \BBC\ParserWrapper::instance();
 		$parser = $wrapper->getSmileyParser();
 		$parser->setEnabled($GLOBALS['user_info']['smiley_set'] !== 'none' && trim($smiley_parsed) !== '');
 		$smiley_parsed = $parser->parseBlock($smiley_parsed);
@@ -3366,9 +3366,9 @@ function getMemberNotificationsProfile($member_id)
 		return array();
 
 	require_once(SUBSDIR . '/Notification.subs.php');
-	Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
+	Elk_Autoloader::instance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
 
-	$mention_methods = Notifications::getInstance()->getNotifiers();
+	$mention_methods = Notifications::instance()->getNotifiers();
 	$enabled_mentions = explode(',', $modSettings['enabled_mentions']);
 	$user_preferences = getUsersNotificationsPreferences($enabled_mentions, $member_id);
 	$mention_types = array();

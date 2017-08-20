@@ -913,7 +913,7 @@ function prepareMailingForPreview()
 	// We might need this in a bit
 	$cleanLatestMember = empty($context['send_html']) || $context['send_pm'] ? un_htmlspecialchars($modSettings['latestRealName']) : $modSettings['latestRealName'];
 
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	foreach ($processing as $key => $post)
 	{

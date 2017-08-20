@@ -73,7 +73,7 @@ class Memberlist_Controller extends Action_Controller
 
 		loadTemplate('Memberlist');
 		$context['sub_template'] = 'memberlist';
-		Template_Layers::getInstance()->add('mlsearch');
+		Template_Layers::instance()->add('mlsearch');
 
 		$context['listing_by'] = $this->_req->getQuery('sa', 'trim', 'all');
 

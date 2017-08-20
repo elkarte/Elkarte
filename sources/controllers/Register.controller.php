@@ -993,7 +993,7 @@ class Register_Controller extends Action_Controller
 			{
 				// Shortcut for producing underlines.
 				$context['ul'] = '<span class="underline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>';
-				Template_Layers::getInstance()->removeAll();
+				Template_Layers::instance()->removeAll();
 				$context['sub_template'] = 'coppa_form';
 				$context['page_title'] = replaceBasicActionUrl($txt['coppa_form_title']);
 				$context['coppa_body'] = str_replace(array('{PARENT_NAME}', '{CHILD_NAME}', '{USER_NAME}'), array($context['ul'], $context['ul'], $member['member_name']), replaceBasicActionUrl($txt['coppa_form_body']));
@@ -1060,7 +1060,7 @@ class Register_Controller extends Action_Controller
 
 			$context['verification_sound_href'] = $scripturl . '?action=register;sa=verificationcode;rand=' . md5(mt_rand()) . ($verification_id ? ';vid=' . $verification_id : '') . ';format=.wav';
 			$context['sub_template'] = 'verification_sound';
-			Template_Layers::getInstance()->removeAll();
+			Template_Layers::instance()->removeAll();
 
 			obExit();
 		}

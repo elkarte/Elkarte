@@ -772,7 +772,7 @@ class PreparseCode
 	 *
 	 * @return PreparseCode
 	 */
-	public static function getInstance()
+	public static function instance()
 	{
 		if (self::$instance === null)
 		{

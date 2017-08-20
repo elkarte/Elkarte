@@ -49,7 +49,7 @@ class Topic_Util
 
 		$icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
 
-		$parser = \BBC\ParserWrapper::getInstance();
+		$parser = \BBC\ParserWrapper::instance();
 
 		foreach ($topics_info as $row)
 		{

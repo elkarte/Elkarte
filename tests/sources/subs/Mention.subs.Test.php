@@ -117,7 +117,7 @@ class TestMentions extends PHPUnit_Framework_TestCase
 	{
 		$id_member = 2;
 
-		$notifier = Notifications::getInstance();
+		$notifier = Notifications::instance();
 		$notifier->add(new Notifications_Task(
 			'mentionmem',
 			$this->id_msg,
@@ -145,7 +145,7 @@ class TestMentions extends PHPUnit_Framework_TestCase
 		$user_info['id'] = 2;
 		$user_info['ip'] = '127.0.0.1';
 
-		$notifier = Notifications::getInstance();
+		$notifier = Notifications::instance();
 		$notifier->add(new Notifications_Task(
 			'likemsg',
 			$this->id_msg,

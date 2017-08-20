@@ -295,7 +295,7 @@ class ManageServer_Controller extends Action_Controller
 
 		loadLanguage('Maintenance');
 		createToken('admin-maint');
-		Template_Layers::getInstance()->add('clean_cache_button');
+		Template_Layers::instance()->add('clean_cache_button');
 
 		// Some javascript to enable / disable certain settings if the option is not selected
 		addInlineJavascript('

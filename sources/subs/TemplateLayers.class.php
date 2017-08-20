@@ -190,7 +190,7 @@ class Template_Layers extends Priority
 	 * @param boolean $error_safe if error mode is on or off
 	 * @return Template_Layers instance of the class
 	 */
-	public static function getInstance($error_safe = false)
+	public static function instance($error_safe = false)
 	{
 		if (self::$_instance === null)
 			self::$_instance = new Template_Layers();
@@ -198,5 +198,19 @@ class Template_Layers extends Priority
 		self::$_error_safe = $error_safe;
 
 		return self::$_instance;
+	}
+
+	/**
+	 * Find and return Template_Layers instance if it exists,
+	 * or create a new instance if it didn't already exist.
+	 *
+	 * @deprecated since Elk 1.1 - use instance instead
+	 *
+	 * @param boolean $error_safe if error mode is on or off
+	 * @return Template_Layers instance of the class
+	 */
+	public static function getInstance($error_safe = false)
+	{
+		return self::instance($error_safe);
 	}
 }

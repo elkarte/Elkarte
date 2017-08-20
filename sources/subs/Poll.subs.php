@@ -882,7 +882,7 @@ function loadPollContext($poll_id)
 		}
 	}
 
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	// Set up the basic poll information.
 	$context['poll'] = array(

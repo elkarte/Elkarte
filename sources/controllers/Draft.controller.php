@@ -361,7 +361,7 @@ class Draft_Controller extends Post_Controller
 		$subject = censor($subject);
 
 		// BBC-ilize the message.
-		$parser = \BBC\ParserWrapper::getInstance();
+		$parser = \BBC\ParserWrapper::instance();
 		$body = $parser->parseMessage($body, $smiley_enabled);
 	}
 }

@@ -148,7 +148,7 @@ class Who_Controller extends Action_Controller
 		$context['page_index'] = constructPageIndex($scripturl . '?action=who;sort=' . $context['sort_by'] . ($context['sort_direction'] === 'up' ? ';asc' : '') . ';show=' . $context['show_by'], $start, $totalMembers, $modSettings['defaultMaxMembers']);
 		$context['start'] = $start;
 		$context['sub_template'] = 'whos_online';
-		Template_Layers::getInstance()->add('whos_selection');
+		Template_Layers::instance()->add('whos_selection');
 
 		// Look for people online, provided they don't mind if you see they are.
 		$members = onlineMembers($conditions, $sort_method, $context['sort_direction'], $context['start']);

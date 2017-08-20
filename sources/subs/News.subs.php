@@ -27,7 +27,7 @@ function getNews()
 
 	$admin_current_news = array();
 
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	// Ready the current news.
 	foreach (explode("\n", $modSettings['news']) as $id => $line)

@@ -93,7 +93,7 @@ class Notifications extends AbstractModel
 	 */
 	public function send()
 	{
-		Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
+		Elk_Autoloader::instance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
 
 		$this->_notification_frequencies = array(
 			// 0 is for no notifications, so we start from 1 the counting, that saves a +1 later
@@ -371,7 +371,7 @@ class Notifications extends AbstractModel
 	 *
 	 * @return Notifications
 	 */
-	public static function getInstance()
+	public static function instance()
 	{
 		if (self::$_instance === null)
 		{

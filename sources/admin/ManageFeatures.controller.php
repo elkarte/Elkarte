@@ -182,7 +182,7 @@ class ManageFeatures_Controller extends Action_Controller
 		{
 			$clean_hives_result = theme()->cleanHives();
 
-			Template_Layers::getInstance()->removeAll();
+			Template_Layers::instance()->removeAll();
 			loadTemplate('Json');
 			addJavascriptVar(array('txt_invalid_response' => $txt['ajax_bad_response']), true);
 			$context['sub_template'] = 'send_json';
@@ -497,7 +497,7 @@ class ManageFeatures_Controller extends Action_Controller
 			checkSession();
 
 			// Clean up the tag stuff!
-			$codes = \BBC\ParserWrapper::getInstance()->getCodes();
+			$codes = \BBC\ParserWrapper::instance()->getCodes();
 			$bbcTags = $codes->getTags();
 
 			if (!isset($this->_req->post->signature_bbc_enabledTags))
@@ -1397,7 +1397,7 @@ class ManageFeatures_Controller extends Action_Controller
 			array('check', 'mentions_enabled'),
 		);
 
-		$notification_methods = Notifications::getInstance()->getNotifiers();
+		$notification_methods = Notifications::instance()->getNotifiers();
 		$notification_types = getNotificationTypes();
 		$current_settings = unserialize($modSettings['notification_methods']);
 
