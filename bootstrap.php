@@ -164,7 +164,7 @@ if ($maintenance == 2 && (!isset($ssi_maintenance_off) || $ssi_maintenance_off !
 	die($mmessage);
 }
 
-if ($db_show_debug === true && isset($rusage_start))
+if ($db_show_debug === true)
 {
 	Debug::instance()->rusage('start', $rusage_start);
 }

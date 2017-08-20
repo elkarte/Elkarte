@@ -34,9 +34,13 @@ error_reporting(E_ALL | E_STRICT & ~8192);
 // Directional only script time usage for display
 // getrusage is missing in php < 7 on Windows
 if (function_exists('getrusage'))
+{
 	$rusage_start = getrusage();
+}
 else
+{
 	$rusage_start = array();
+}
 
 // Turn on output buffering if it isn't already on (via php.ini for example)
 if (!ob_get_level())
@@ -46,8 +50,12 @@ $db_show_debug = false;
 
 // We don't need no globals. (a bug in "old" versions of PHP)
 foreach (array('db_character_set', 'cachedir') as $variable)
+{
 	if (isset($GLOBALS[$variable]))
+	{
 		unset($GLOBALS[$variable], $GLOBALS[$variable]);
+	}
+}
 
 // Where the Settings.php file is located
 $settings_loc = __DIR__ . '/Settings.php';
@@ -60,6 +68,7 @@ if (file_exists('install'))
 	{
 		require_once($settings_loc);
 	}
+
 	if (empty($ignore_install_dir))
 	{
 		// No install_time defined or finished the installing in the last 2 minutes
@@ -72,7 +81,7 @@ if (file_exists('install'))
 			$redirec_file = 'upgrade.php';
 		}
 
-		header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/install/' . $redirec_file);
+		header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) === 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] === '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/install/' . $redirec_file);
 		die();
 	}
 }
@@ -83,17 +92,29 @@ else
 
 // Make sure the paths are correct... at least try to fix them.
 if (!file_exists($boarddir) && file_exists(__DIR__ . '/agreement.txt'))
+{
 	$boarddir = __DIR__;
+}
 if (!file_exists($sourcedir . '/SiteDispatcher.class.php') && file_exists($boarddir . '/sources'))
+{
 	$sourcedir = $boarddir . '/sources';
+}
 
 // Check that directories which didn't exist in past releases are initialized.
 if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
+{
 	$cachedir = $boarddir . '/cache';
+}
+
 if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'))
+{
 	$extdir = $sourcedir . '/ext';
+}
+
 if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir . '/themes/default/languages'))
+{
 	$languagedir = $boarddir . '/themes/default/languages';
+}
 
 // Time to forget about variables and go with constants!
 DEFINE('BOARDDIR', $boarddir);
@@ -131,7 +152,9 @@ if ($db_show_debug === true)
 
 // Forum in extended maintenance mode? Our trip ends here with a bland message.
 if (!empty($maintenance) && $maintenance == 2)
+{
 	Errors::instance()->display_maintenance_message();
+}
 
 // Clean the request.
 cleanRequest();
