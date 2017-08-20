@@ -103,8 +103,6 @@ class Cache
 		$this->_options = $options;
 
 		$this->_init();
-
-		$this->_cached_keys = $this->get('_cached_keys');
 	}
 
 	/**
@@ -112,7 +110,14 @@ class Cache
 	 */
 	public function __destruct()
 	{
-		$this->put('_cached_keys', array_unique($this->_cached_keys));
+		$cached = $this->get('_cached_keys');
+		if ($cached === null)
+		{
+			$cached = array();
+		}
+
+		$_cached_keys = array_unique(array_merge($this->_cached_keys, $cached));
+		$this->put('_cached_keys', $_cached_keys);
 	}
 
 	/**
