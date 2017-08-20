@@ -39,7 +39,7 @@ function reloadSettings()
 
 	$db = database();
 	$cache = Cache::instance();
-	$hooks = Hooks::get();
+	$hooks = Hooks::instance();
 
 	// Try to load it from the cache first; it'll never get cached if the setting is off.
 	if (!$cache->getVar($modSettings, 'modSettings', 90))
@@ -1600,7 +1600,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	theme()->loadThemeJavascript();
 
-	Hooks::get()->newPath(array('$themedir' => $settings['theme_dir']));
+	Hooks::instance()->newPath(array('$themedir' => $settings['theme_dir']));
 
 	// Any files to include at this point?
 	call_integration_include_hook('integrate_theme_include');
@@ -2055,7 +2055,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 		{
 			foreach ($temp as $temp_params)
 			{
-				Debug::get()->add($params['debug_index'], $temp_params['options']['basename'] . '(' . (!empty($temp_params['options']['local']) ? (!empty($temp_params['options']['url']) ? basename($temp_params['options']['url']) : basename($temp_params['options']['dir'])) : '') . ')');
+				Debug::instance()->add($params['debug_index'], $temp_params['options']['basename'] . '(' . (!empty($temp_params['options']['local']) ? (!empty($temp_params['options']['url']) ? basename($temp_params['options']['url']) : basename($temp_params['options']['dir'])) : '') . ')');
 			}
 		}
 	}
@@ -2110,7 +2110,9 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 				$this_build[$this_id] = $context[$params['index_name']][$this_id] = array('filename' => $filename, 'options' => $params);
 
 				if ($db_show_debug === true)
-					Debug::get()->add($params['debug_index'], $params['basename'] . '(' . (!empty($params['local']) ? (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) : '') . ')');
+				{
+					Debug::instance()->add($params['debug_index'], $params['basename'] . '(' . (!empty($params['local']) ? (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) : '') . ')');
+				}
 			}
 
 			// Save it so we don't have to build this so often
@@ -2257,7 +2259,9 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 
 	// Keep track of what we're up to soldier.
 	if ($db_show_debug === true)
-		Debug::get()->add('language_files', $template_name . '.' . $lang . ' (' . $theme_name . ')');
+	{
+		Debug::instance()->add('language_files', $template_name . '.' . $lang . ' (' . $theme_name . ')');
+	}
 
 	// Remember what we have loaded, and in which language.
 	$already_loaded[$template_name] = $lang;

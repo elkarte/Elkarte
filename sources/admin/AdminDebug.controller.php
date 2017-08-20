@@ -61,7 +61,7 @@ class AdminDebug_Controller extends Action_Controller
 		// Don't allow except for administrators.
 		isAllowedTo('admin_forum');
 
-		$debug = Debug::get();
+		$debug = Debug::instance();
 
 		// If we're just hiding/showing, do it now.
 		if (isset($this->_req->query->sa) && $this->_req->query->sa === 'hide')

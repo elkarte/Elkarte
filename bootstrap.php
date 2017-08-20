@@ -166,7 +166,7 @@ if ($maintenance == 2 && (!isset($ssi_maintenance_off) || $ssi_maintenance_off !
 
 if ($db_show_debug === true && isset($rusage_start))
 {
-	Debug::get()->rusage('start', $rusage_start);
+	Debug::instance()->rusage('start', $rusage_start);
 }
 
 // Forum in extended maintenance mode? Our trip ends here with a bland message.

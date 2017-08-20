@@ -23,7 +23,7 @@ interface Frontpage_Interface
 	/**
 	 * Used to attach integrate_action_frontpage hook, to change the default action.
 	 *
-	 * - e.g. Hooks::get()->add('integrate_action_frontpage', 'ControllerName::frontPageHook');
+	 * - e.g. Hooks::instance()->add('integrate_action_frontpage', 'ControllerName::frontPageHook');
 	 *
 	 * @param string[] $default_action
 	 */

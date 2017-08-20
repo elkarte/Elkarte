@@ -125,7 +125,9 @@ $autoloder->register(SOURCEDIR . '/subs/BBC', '\\BBC');
 
 // Show lots of debug information below the page, not for production sites
 if ($db_show_debug === true)
-	Debug::get()->rusage('start', $rusage_start);
+{
+	Debug::instance()->rusage('start', $rusage_start);
+}
 
 // Forum in extended maintenance mode? Our trip ends here with a bland message.
 if (!empty($maintenance) && $maintenance == 2)
@@ -138,7 +140,7 @@ cleanRequest();
 loadDatabase();
 
 // Let's set up our shiny new hooks handler.
-Hooks::init(database(), Debug::get());
+Hooks::init(database(), Debug::instance());
 
 // It's time for settings loaded from the database.
 reloadSettings();

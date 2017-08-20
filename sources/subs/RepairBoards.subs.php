@@ -1352,7 +1352,7 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
 
 	// Restore the query cache if interested.
 	if ($db_show_debug === true)
-		Debug::get()->on();
+		Debug::instance()->on();
 
 	$context['continue_get_data'] = '?action=admin;area=repairboards' . (isset($_GET['fixErrors']) ? ';fixErrors' : '') . ';step=' . $_GET['step'] . ';substep=' . $_GET['substep'] . ';' . $context['session_var'] . '=' . $context['session_id'];
 	$context['page_title'] = $txt['not_done_title'];
@@ -1408,7 +1408,7 @@ function findForumErrors($do_fix = false)
 
 	// Don't allow the cache to get too full.
 	if ($db_show_debug === true)
-		Debug::get()->off();
+		Debug::instance()->off();
 
 	$context['total_steps'] = count($errorTests);
 

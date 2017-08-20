@@ -70,7 +70,7 @@ $context['forum_name_html_safe'] = $context['forum_name'];
 // Just like we are starting, almost
 cleanRequest();
 loadDatabase();
-Hooks::init(database(), Debug::get());
+Hooks::init(database(), Debug::instance());
 reloadSettings();
 elk_seed_generator();
 loadSession();

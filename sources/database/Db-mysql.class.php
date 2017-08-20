@@ -182,7 +182,7 @@ class Database_MySQL extends Database_Abstract
 		// Debugging.
 		if ($db_show_debug === true)
 		{
-			$debug = Debug::get();
+			$debug = Debug::instance();
 
 			// Get the file and line number this function was called.
 			list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);

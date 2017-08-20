@@ -512,7 +512,7 @@ final class Hooks
 			$db = database();
 
 		if ($debug === null)
-			$debug = Debug::get();
+			$debug = Debug::instance();
 
 		self::$_instance = new Hooks($db, $debug, $paths);
 	}
@@ -526,7 +526,7 @@ final class Hooks
 	 *
 	 * @return Hooks An instance of the class.
 	 */
-	public static function get($db = null, $debug = null, $paths = null)
+	public static function instance($db = null, $debug = null, $paths = null)
 	{
 		if (self::$_instance === null)
 			self::init($db, $debug, $paths);
