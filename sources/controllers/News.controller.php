@@ -238,7 +238,7 @@ class News_Controller extends Action_Controller
 			header('Content-Type: ' . (isBrowser('ie') ? 'text/xml' : 'application/rdf+xml') . '; charset=UTF-8');
 
 		loadTemplate('Xml');
-		Template_Layers::getInstance()->removeAll();
+		Template_Layers::instance()->removeAll();
 
 		// Are we outputting an rss feed or one with more information?
 		if ($xml_format === 'rss' || $xml_format === 'rss2')
@@ -342,7 +342,7 @@ class News_Controller extends Action_Controller
 
 		// Prepare it for the feed in the format chosen (rss, atom, etc)
 		$data = array();
-		$bbc_parser = \BBC\ParserWrapper::getInstance();
+		$bbc_parser = \BBC\ParserWrapper::instance();
 
 		foreach ($results as $row)
 		{
@@ -448,7 +448,7 @@ class News_Controller extends Action_Controller
 
 		// Loop on the results and prepare them in the format requested
 		$data = array();
-		$bbc_parser = \BBC\ParserWrapper::getInstance();
+		$bbc_parser = \BBC\ParserWrapper::instance();
 
 		foreach ($results as $row)
 		{

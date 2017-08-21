@@ -28,6 +28,7 @@ $txt['mc_posts'] = 'Posts needing approval';
 $txt['mc_groupreq'] = 'Group requests needing approval';
 $txt['mc_memberreq'] = 'Members needing approval';
 $txt['mc_reports'] = 'Report posts needing approval';
+$txt['mc_pm_reports'] = 'Reported personal messages';
 
 $txt['mc_cannot_connect_sm'] = 'You are unable to connect to ElkArte\'s latest news file.';
 

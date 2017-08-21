@@ -225,7 +225,7 @@ class ProfileInfo_Controller extends Action_Controller
 				// Find this user's most recent topics
 				$rows = load_user_topics($this->_memID, 0, $maxIndex, $range_limit);
 				$context['topics'] = array();
-				$bbc_parser = \BBC\ParserWrapper::getInstance();
+				$bbc_parser = \BBC\ParserWrapper::instance();
 
 				foreach ($rows as $row)
 				{
@@ -291,7 +291,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 				// Find this user's most recent posts
 				$rows = load_user_posts($this->_memID, 0, $maxIndex, $range_limit);
-				$bbc_parser = \BBC\ParserWrapper::getInstance();
+				$bbc_parser = \BBC\ParserWrapper::instance();
 				$context['posts'] = array();
 				foreach ($rows as $row)
 				{
@@ -541,7 +541,7 @@ class ProfileInfo_Controller extends Action_Controller
 		$counter = $reverse ? $context['start'] + $maxIndex + 1 : $context['start'];
 		$context['posts'] = array();
 		$board_ids = array('own' => array(), 'any' => array());
-		$bbc_parser = \BBC\ParserWrapper::getInstance();
+		$bbc_parser = \BBC\ParserWrapper::instance();
 		foreach ($rows as $row)
 		{
 			// Censor....
@@ -1177,7 +1177,7 @@ class ProfileInfo_Controller extends Action_Controller
 		$this->_define_user_values();
 
 		// This is returned only for ajax request to a jqueryUI tab
-		Template_Layers::getInstance()->removeAll();
+		Template_Layers::instance()->removeAll();
 		header('Content-Type: text/html; charset=UTF-8');
 
 		// Some buddies for you
@@ -1209,7 +1209,7 @@ class ProfileInfo_Controller extends Action_Controller
 		$context['profile_blocks'] = array();
 
 		// Flush everything since we intend to return the information to an ajax handler
-		Template_Layers::getInstance()->removeAll();
+		Template_Layers::instance()->removeAll();
 		header('Content-Type: text/html; charset=UTF-8');
 
 		// So, just what have you been up to?

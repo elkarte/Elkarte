@@ -78,7 +78,7 @@ class Jslocale_Controller extends Action_Controller
 		$langs = getLanguages();
 		$lang = $this->_req->post->lang;
 
-		Template_Layers::getInstance()->removeAll();
+		Template_Layers::instance()->removeAll();
 		loadTemplate('Json');
 		$context['sub_template'] = 'send_json';
 		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
@@ -114,7 +114,7 @@ class Jslocale_Controller extends Action_Controller
 		if (!empty($language_file))
 			loadLanguage($language_file);
 
-		Template_Layers::getInstance()->removeAll();
+		Template_Layers::instance()->removeAll();
 
 		// Lets make sure we aren't going to output anything nasty.
 		obStart(!empty($modSettings['enableCompressedOutput']));

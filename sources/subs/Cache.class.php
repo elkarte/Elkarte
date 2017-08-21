@@ -57,6 +57,12 @@ class Cache
 	protected $_accelerator = null;
 
 	/**
+	 * Cached keys
+	 * @var string[]
+	 */
+	protected $_cached_keys = array();
+
+	/**
 	 * The caching object
 	 * @var object|boolean
 	 */
@@ -97,6 +103,21 @@ class Cache
 		$this->_options = $options;
 
 		$this->_init();
+	}
+
+	/**
+	 * Just before forgetting about the cache, let's save the existing keys.
+	 */
+	public function __destruct()
+	{
+		$cached = $this->get('_cached_keys');
+		if ($cached === null)
+		{
+			$cached = array();
+		}
+
+		$_cached_keys = array_unique(array_merge($this->_cached_keys, $cached));
+		$this->put('_cached_keys', $_cached_keys);
 	}
 
 	/**
@@ -205,6 +226,7 @@ class Cache
 			$st = microtime(true);
 		}
 
+		$this->_cached_keys[] = $key;
 		$key = $this->_key($key);
 		$value = $value === null ? null : serialize($value);
 
@@ -216,7 +238,7 @@ class Cache
 		if ($db_show_debug === true)
 		{
 			$cache_hit['t'] = microtime(true) - $st;
-			Debug::get()->cache($cache_hit);
+			Debug::instance()->cache($cache_hit);
 		}
 	}
 
@@ -256,7 +278,7 @@ class Cache
 		{
 			$cache_hit['t'] = microtime(true) - $st;
 			$cache_hit['s'] = isset($value) ? strlen($value) : 0;
-			Debug::get()->cache($cache_hit);
+			Debug::instance()->cache($cache_hit);
 		}
 
 		call_integration_hook('cache_get_data', array($key, $ttl, $value));
@@ -417,6 +439,39 @@ class Cache
 	}
 
 	/**
+	 * Removes one or multiple keys from the cache.
+	 *
+	 * Supports the preg_match syntax.
+	 *
+	 * @param string|string[] $keys_match The regulat expression/s to match
+	 *                        the key to remove from the cache.
+	 * @param string $delimiter The delimiter used by preg_match.
+	 * @param string $modifiers Any modifier required by the regexp.
+	 */
+	public function removeKeys($keys_match, $delimiter = '~', $modifiers = '')
+	{
+		if (!$this->isEnabled())
+		{
+			return;
+		}
+
+		$to_remove = array();
+		foreach ((array) $keys_match as $k)
+		{
+			$to_remove[] = $k;
+		}
+		$pattern = $delimiter . implode('|', $to_remove) . $delimiter . $modifiers;
+
+		foreach ($this->_cached_keys as $cached_key)
+		{
+			if (preg_match($pattern, $cached_key) === 1)
+			{
+				$this->_cache_obj->remove($cached_key);
+			}
+		}
+	}
+
+	/**
 	 * Get the key for the cache.
 	 *
 	 * @param string $key
@@ -467,7 +522,7 @@ class Cache
 				);
 			}
 
-			Elk_Autoloader::getInstance()->register(SUBSDIR . '/CacheMethod', '\\ElkArte\\sources\\subs\\CacheMethod');
+			Elk_Autoloader::instance()->register(SUBSDIR . '/CacheMethod', '\\ElkArte\\sources\\subs\\CacheMethod');
 			self::$_instance = new Cache($cache_enable, $cache_accelerator, $options);
 		}
 

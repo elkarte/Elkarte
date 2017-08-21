@@ -1113,7 +1113,7 @@ function watchedUserPosts($start, $items_per_page, $sort, $approve_query, $delet
 	);
 
 	$member_posts = array();
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	while ($row = $db->fetch_assoc($request))
 	{
@@ -1443,7 +1443,7 @@ function moderatorNotice($id_notice)
 	$db->free_result($request);
 
 	// Make it look nice
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 	$notice_body = $bbc_parser->parseNotice($notice_body);
 
 	return array($notice_body, $notice_subject);
@@ -1499,7 +1499,7 @@ function warningDailyLimit($member)
  */
 function getUnapprovedPosts($approve_query, $current_view, $boards_allowed, $start, $limit = 10)
 {
-	global $context, $scripturl, $user_info;
+	global $context, $scripturl, $user_info, $modSettings;
 
 	$db = database();
 
@@ -1525,7 +1525,7 @@ function getUnapprovedPosts($approve_query, $current_view, $boards_allowed, $sta
 	);
 
 	$unapproved_items = array();
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	for ($i = 1; $row = $db->fetch_assoc($request); $i++)
 	{
@@ -1569,7 +1569,7 @@ function getUnapprovedPosts($approve_query, $current_view, $boards_allowed, $sta
 			'category' => array(
 				'id' => $row['id_cat'],
 				'name' => $row['cat_name'],
-				'link' => '<a href="' . $scripturl . '#c' . $row['id_cat'] . '">' . $row['cat_name'] . '</a>',
+				'link' => '<a href="' . $scripturl . $modSettings['default_forum_action'] . '#c' . $row['id_cat'] . '">' . $row['cat_name'] . '</a>',
 			),
 			'can_delete' => $can_delete,
 		);

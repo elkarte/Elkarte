@@ -187,7 +187,7 @@ class Topic_Controller extends Action_Controller
 		}
 
 		// Clean out the template layers
-		$template_layers = Template_Layers::getInstance();
+		$template_layers = Template_Layers::instance();
 		$template_layers->removeAll();
 
 		// Get the topic starter information.

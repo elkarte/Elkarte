@@ -58,7 +58,7 @@ require_once(SOURCEDIR . '/Security.php');
 require_once(SUBSDIR . '/Cache.subs.php');
 
 // Get the autoloader rolling
-$autoloder = Elk_Autoloader::getInstance();
+$autoloder = Elk_Autoloader::instance();
 $autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
 $autoloder->register(SOURCEDIR, '\\ElkArte');
 
@@ -70,7 +70,7 @@ $context['forum_name_html_safe'] = $context['forum_name'];
 // Just like we are starting, almost
 cleanRequest();
 loadDatabase();
-Hooks::init(database(), Debug::get());
+Hooks::init(database(), Debug::instance());
 reloadSettings();
 elk_seed_generator();
 loadSession();

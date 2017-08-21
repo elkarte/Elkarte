@@ -39,7 +39,7 @@ function reloadSettings()
 
 	$db = database();
 	$cache = Cache::instance();
-	$hooks = Hooks::get();
+	$hooks = Hooks::instance();
 
 	// Try to load it from the cache first; it'll never get cached if the setting is off.
 	if (!$cache->getVar($modSettings, 'modSettings', 90))
@@ -665,7 +665,7 @@ function loadBoard()
 		$context['linktree'] = array_merge(
 			$context['linktree'],
 			array(array(
-				'url' => $scripturl . '#c' . $board_info['cat']['id'],
+				'url' => $scripturl . $modSettings['default_forum_action'] . '#c' . $board_info['cat']['id'],
 				'name' => $board_info['cat']['name']
 			)),
 			array_reverse($board_info['parent_boards']),
@@ -1066,7 +1066,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 		return false;
 	}
 
-	$parsers = \BBC\ParserWrapper::getInstance();
+	$parsers = \BBC\ParserWrapper::instance();
 
 	// Well, it's loaded now anyhow.
 	$dataLoaded[$user] = true;
@@ -1247,6 +1247,8 @@ function getThemeId($id_theme = 0)
 	else
 		$id_theme = $modSettings['theme_guests'];
 
+	call_integration_hook('integrate_customize_theme_id', array(&$id_theme));
+
 	// Verify the id_theme... no foul play.
 	// Always allow the board specific theme, if they are overriding.
 	if (!empty($board_info['theme']) && $board_info['override_theme'])
@@ -1389,7 +1391,7 @@ function initTheme($id_theme = 0)
 	$settings['actual_theme_dir'] = $settings['theme_dir'];
 
 	// Reload the templates
-	Templates::getInstance()->reloadDirectories($settings);
+	Templates::instance()->reloadDirectories($settings);
 
 	// Setup the default theme file. In the future, this won't exist and themes will just have to extend it if they want
 	require_once($settings['default_theme_dir'] . '/Theme.php');
@@ -1598,7 +1600,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	theme()->loadThemeJavascript();
 
-	Hooks::get()->newPath(array('$themedir' => $settings['theme_dir']));
+	Hooks::instance()->newPath(array('$themedir' => $settings['theme_dir']));
 
 	// Any files to include at this point?
 	call_integration_include_hook('integrate_theme_include');
@@ -1854,9 +1856,9 @@ function loadEssentialThemeData()
 	);
 
 	// Check we have some directories setup.
-	if (!Templates::getInstance()->hasDirectories())
+	if (!Templates::instance()->hasDirectories())
 	{
-		Templates::getInstance()->reloadDirectories($settings);
+		Templates::instance()->reloadDirectories($settings);
 	}
 
 	// Assume we want this.
@@ -1887,7 +1889,7 @@ function loadEssentialThemeData()
  */
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
-	return Templates::getInstance()->load($template_name, $style_sheets, $fatal);
+	return Templates::instance()->load($template_name, $style_sheets, $fatal);
 }
 
 /**
@@ -1907,7 +1909,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  */
 function loadSubTemplate($sub_template_name, $fatal = false)
 {
-	Templates::getInstance()->loadSubTemplate($sub_template_name, $fatal);
+	Templates::instance()->loadSubTemplate($sub_template_name, $fatal);
 
 	return true;
 }
@@ -2053,7 +2055,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 		{
 			foreach ($temp as $temp_params)
 			{
-				Debug::get()->add($params['debug_index'], $temp_params['options']['basename'] . '(' . (!empty($temp_params['options']['local']) ? (!empty($temp_params['options']['url']) ? basename($temp_params['options']['url']) : basename($temp_params['options']['dir'])) : '') . ')');
+				Debug::instance()->add($params['debug_index'], $temp_params['options']['basename'] . '(' . (!empty($temp_params['options']['local']) ? (!empty($temp_params['options']['url']) ? basename($temp_params['options']['url']) : basename($temp_params['options']['dir'])) : '') . ')');
 			}
 		}
 	}
@@ -2108,7 +2110,9 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 				$this_build[$this_id] = $context[$params['index_name']][$this_id] = array('filename' => $filename, 'options' => $params);
 
 				if ($db_show_debug === true)
-					Debug::get()->add($params['debug_index'], $params['basename'] . '(' . (!empty($params['local']) ? (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) : '') . ')');
+				{
+					Debug::instance()->add($params['debug_index'], $params['basename'] . '(' . (!empty($params['local']) ? (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) : '') . ')');
+				}
 			}
 
 			// Save it so we don't have to build this so often
@@ -2213,7 +2217,7 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 			$attempts[] = array($settings['default_theme_dir'], $template, 'english', $settings['default_theme_url']);
 		}
 
-		$templates = Templates::getInstance();
+		$templates = Templates::instance();
 
 		// Try to find the language file.
 		$found = false;
@@ -2255,7 +2259,9 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 
 	// Keep track of what we're up to soldier.
 	if ($db_show_debug === true)
-		Debug::get()->add('language_files', $template_name . '.' . $lang . ' (' . $theme_name . ')');
+	{
+		Debug::instance()->add('language_files', $template_name . '.' . $lang . ' (' . $theme_name . ')');
+	}
 
 	// Remember what we have loaded, and in which language.
 	$already_loaded[$template_name] = $lang;
@@ -2785,7 +2791,7 @@ function doSecurityChecks()
 
 	// Finally, let's show the layer.
 	if ($show_warnings || !empty($context['warning_controls']))
-		\Template_Layers::getInstance()->addAfter('admin_warning', 'body');
+		\Template_Layers::instance()->addAfter('admin_warning', 'body');
 }
 
 /**
@@ -2802,7 +2808,7 @@ function loadBBCParsers()
 			$disabledBBC = explode(',', $modSettings['disabledBBC']);
 		else
 			$disabledBBC = $modSettings['disabledBBC'];
-		\BBC\ParserWrapper::getInstance()->setDisabled(empty($disabledBBC) ? array() : (array) $disabledBBC);
+		\BBC\ParserWrapper::instance()->setDisabled(empty($disabledBBC) ? array() : (array) $disabledBBC);
 	}
 
 	return 1;

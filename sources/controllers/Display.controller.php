@@ -121,7 +121,7 @@ class Display_Controller extends Action_Controller
 
 		// How much are we sticking on each page?
 		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
-		$this->_template_layers = Template_Layers::getInstance();
+		$this->_template_layers = Template_Layers::instance();
 		$this->_template_layers->addEnd('messages_informations');
 		$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
 
@@ -848,7 +848,7 @@ class Display_Controller extends Action_Controller
 		$message['subject'] = censor($message['subject']);
 
 		// Run BBC interpreter on the message.
-		$bbc_wrapper = \BBC\ParserWrapper::getInstance();
+		$bbc_wrapper = \BBC\ParserWrapper::instance();
 		$message['body'] = $bbc_wrapper->parseMessage($message['body'], $message['smileys_enabled']);
 
 		call_integration_hook('integrate_before_prepare_display_context', array(&$message));

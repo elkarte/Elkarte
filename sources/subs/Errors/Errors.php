@@ -303,7 +303,7 @@ class Errors extends AbstractModel
 		$context['sub_template'] = 'fatal_error';
 
 		if (class_exists('Template_Layers'))
-			\Template_Layers::getInstance()->isError();
+			\Template_Layers::instance()->isError();
 
 		// If this is SSI, what do they want us to do?
 		if (ELK === 'SSI')

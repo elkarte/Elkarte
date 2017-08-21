@@ -100,8 +100,8 @@ abstract class Theme
 	 */
 	public function __construct($id)
 	{
-		$this->layers = Template_Layers::getInstance();
-		$this->templates = Templates::getInstance();
+		$this->layers = Template_Layers::instance();
+		$this->templates = Templates::instance();
 		$this->id = $id;
 
 		$this->css_files = &$GLOBALS['context']['css_files'];

@@ -28,7 +28,7 @@ class Karma_Controller extends Action_Controller
 	 */
 	public function pre_dispatch()
 	{
-		Hooks::get()->loadIntegrationsSettings();
+		Hooks::instance()->loadIntegrationsSettings();
 	}
 
 	/**

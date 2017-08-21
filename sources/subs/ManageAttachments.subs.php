@@ -1080,7 +1080,7 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 
 	$db = database();
 
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	// Get all unapproved attachments.
 	return $db->fetchQueryCallback('

@@ -29,7 +29,7 @@
  */
 function preparsecode(&$message, $previewing = false)
 {
-	$preparse = \BBC\PreparseCode::getInstance();
+	$preparse = \BBC\PreparseCode::instance();
 	$preparse->preparsecode($message, $previewing);
 }
 
@@ -41,7 +41,7 @@ function preparsecode(&$message, $previewing = false)
  */
 function un_preparsecode($message)
 {
-	$un_preparse = \BBC\PreparseCode::getInstance();
+	$un_preparse = \BBC\PreparseCode::instance();
 	return $un_preparse->un_preparsecode($message);
 }
 
@@ -985,7 +985,7 @@ function lastPost()
 	$row['subject'] = censor($row['subject']);
 	$row['body'] = censor($row['body']);
 
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
 	$row['body'] = Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);

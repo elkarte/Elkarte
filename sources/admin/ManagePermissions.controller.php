@@ -538,7 +538,7 @@ class ManagePermissions_Controller extends Action_Controller
 
 		// Build the list of the boards.
 		$context['categories'] = array();
-		$bbc_parser = \BBC\ParserWrapper::getInstance();
+		$bbc_parser = \BBC\ParserWrapper::instance();
 		foreach ($cat_tree as $catid => $tree)
 		{
 			$context['categories'][$catid] = array(

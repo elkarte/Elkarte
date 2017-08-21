@@ -259,7 +259,7 @@ class Db extends Adapter
 	 */
 	private function setBbcChoices($var)
 	{
-		$codes = ParserWrapper::getInstance()->getCodes();
+		$codes = ParserWrapper::instance()->getCodes();
 		$bbcTags = $codes->getTags();
 
 		if (!isset($this->configValues[$var[1] . '_enabledTags']))
@@ -325,7 +325,7 @@ class Db extends Adapter
 		}
 
 		// What are the options, eh?
-		$codes = ParserWrapper::getInstance()->getCodes();
+		$codes = ParserWrapper::instance()->getCodes();
 		$bbcTags = $codes->getTags();
 		$bbcTags = array_unique($bbcTags);
 		$bbc_sections = array();

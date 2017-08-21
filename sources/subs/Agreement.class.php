@@ -88,7 +88,7 @@ class Agreement
 	 */
 	public function getParsedText($fallback = true)
 	{
-		$bbc_parser = \BBC\ParserWrapper::getInstance();
+		$bbc_parser = \BBC\ParserWrapper::instance();
 
 		return $bbc_parser->parseAgreement($this->getPlainText($fallback));
 	}

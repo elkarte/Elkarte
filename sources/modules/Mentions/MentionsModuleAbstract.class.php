@@ -32,7 +32,7 @@ abstract class Mentions_Module_Abstract extends ElkArte\sources\modules\Abstract
 
 		if (!empty($modSettings['mentions_enabled']))
 		{
-			Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
+			Elk_Autoloader::instance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
 
 			$mentions = explode(',', $modSettings['enabled_mentions']);
 

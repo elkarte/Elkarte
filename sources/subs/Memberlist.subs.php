@@ -330,7 +330,7 @@ function printMemberListRows($request)
 	// Load all the members for display.
 	loadMemberData($members);
 
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	$context['members'] = array();
 	foreach ($members as $member)

@@ -464,7 +464,7 @@ class Elk_Autoloader
 	 *
 	 * - Uses final definition to prevent child classes from overriding this method
 	 */
-	final public static function getInstance()
+	final public static function instance()
 	{
 		if (!self::$_instance)
 		{

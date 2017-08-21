@@ -73,7 +73,7 @@ class Members_Controller extends Action_Controller
 			// Do we want a mention for our newly added buddy?
 			if (!empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
 			{
-				$notifier = Notifications::getInstance();
+				$notifier = Notifications::instance();
 				$notifier->add(new Notifications_Task(
 					'buddy',
 					$user,

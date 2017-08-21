@@ -549,7 +549,7 @@ function dbMostLikedMessage($limit = 10)
 	);
 
 	$mostLikedMessages = array();
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	while ($row = $db->fetch_assoc($request))
 	{
@@ -618,7 +618,7 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 	global $scripturl;
 
 	$db = database();
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	// Most liked messages in a given topic
 	return $db->fetchQueryCallback('
@@ -904,7 +904,7 @@ function dbMostLikesReceivedUser($limit = 10)
 function dbMostLikedPostsByUser($id_member, $limit = 10)
 {
 	$db = database();
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	// Lets fetch highest liked posts by this user
 	return $db->fetchQueryCallback('
@@ -1023,7 +1023,7 @@ function dbMostLikesGivenUser($limit = 10)
 function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 {
 	$db = database();
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	// Lets fetch the latest liked posts by this user
 	return $db->fetchQueryCallback('

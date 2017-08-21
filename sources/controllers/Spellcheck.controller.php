@@ -106,7 +106,7 @@ class Spellcheck_Controller extends Action_Controller
 			);';
 
 		// And instruct the template system to just show the spellcheck sub template.
-		$this->_template_layers = Template_Layers::getInstance();
+		$this->_template_layers = Template_Layers::instance();
 		$this->_template_layers->removeAll();
 		$context['sub_template'] = 'spellcheck';
 	}

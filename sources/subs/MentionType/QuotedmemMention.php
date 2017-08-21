@@ -93,7 +93,7 @@ class Quotedmem_Mention extends Mention_BoardAccess_Abstract
 
 		if (!empty($members_id))
 		{
-			$notifier = \Notifications::getInstance();
+			$notifier = \Notifications::instance();
 			$notifier->add(new \Notifications_Task(
 				'quotedmem',
 				$msg_id,

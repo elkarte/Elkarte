@@ -276,7 +276,7 @@ class Recent_Controller extends Action_Controller
 				throw new Elk_Exception('no_access', false);
 
 			$context['linktree'][] = array(
-				'url' => $scripturl . '#c' . $categories[0],
+				'url' => $scripturl . $modSettings['default_forum_action'] . '#c' . $categories[0],
 				'name' => $name
 			);
 		}

@@ -1170,27 +1170,20 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 
 		oOption = document.createElement('option');
 		oText = document.createElement('span');
-		oText.innerHTML = (aBoardsAndCategories[i].isCategory ? this.opt.sCatPrefix : sChildLevelPrefix) + aBoardsAndCategories[i].name;
+		oText.innerHTML = sChildLevelPrefix + aBoardsAndCategories[i].name;
 
-		// Applying a category class to this option?
-		if (aBoardsAndCategories[i].isCategory && this.opt.sCatClass)
-			oOption.className = this.opt.sCatClass;
-
-		if (!aBoardsAndCategories[i].isCategory && aBoardsAndCategories[i].id === this.opt.iCurBoardId)
+		if (aBoardsAndCategories[i].id === this.opt.iCurBoardId)
 			oOption.selected = 'selected';
 
 		oOption.appendChild(oText);
 
 		if (!this.opt.bNoRedirect)
 		{
-			oOption.value = aBoardsAndCategories[i].isCategory ? '#c' + aBoardsAndCategories[i].id : '?board=' + aBoardsAndCategories[i].id + '.0';
+			oOption.value = '?board=' + aBoardsAndCategories[i].id + '.0';
 		}
 		else
 		{
-			if (aBoardsAndCategories[i].isCategory)
-				oOption.disabled = 'disabled';
-			else
-				oOption.value = aBoardsAndCategories[i].id;
+			oOption.value = aBoardsAndCategories[i].id;
 		}
 
 		oOptgroupFragment.appendChild(oOption);

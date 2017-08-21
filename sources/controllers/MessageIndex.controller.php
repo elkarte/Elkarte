@@ -150,12 +150,12 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 		loadTemplate('MessageIndex');
 		loadJavascriptFile('topic.js');
 
-		$bbc = \BBC\ParserWrapper::getInstance();
+		$bbc = \BBC\ParserWrapper::instance();
 
 		$context['name'] = $board_info['name'];
 		$context['sub_template'] = 'topic_listing';
 		$context['description'] = $bbc->parseBoard($board_info['description']);
-		$template_layers = Template_Layers::getInstance();
+		$template_layers = Template_Layers::instance();
 
 		// How many topics do we have in total?
 		$board_info['total_topics'] = allowedTo('approve_posts') ? $board_info['num_topics'] + $board_info['unapproved_topics'] : $board_info['num_topics'] + $board_info['unapproved_user_topics'];
@@ -540,7 +540,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 		else
 		{
 			$boards_can = boardsAllowedTo(array('make_sticky', 'move_any', 'move_own', 'remove_any', 'remove_own', 'lock_any', 'lock_own', 'merge_any', 'approve_posts'), true, false);
-			$redirect_url = isset($this->_req->post->redirect_url) ? $this->_req->post->redirect_url : (isset($_SESSION['old_url']) ? $_SESSION['old_url'] : '');
+			$redirect_url = isset($this->_req->post->redirect_url) ? $this->_req->post->redirect_url : (isset($_SESSION['old_url']) ? $_SESSION['old_url'] : substr($modSettings['default_forum_action'], 1));
 		}
 
 		if (!$user_info['is_guest'])

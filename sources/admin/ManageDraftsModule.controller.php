@@ -45,13 +45,13 @@ class ManageDraftsModule_Controller extends Action_Controller
 				{
 					enableModules('drafts', $modules);
 					calculateNextTrigger('remove_old_drafts');
-					Hooks::get()->enableIntegration('Drafts_Integrate');
+					Hooks::instance()->enableIntegration('Drafts_Integrate');
 				}
 				// Disabling, just forget about the modules
 				else
 				{
 					disableModules('drafts', $modules);
-					Hooks::get()->disableIntegration('Drafts_Integrate');
+					Hooks::instance()->disableIntegration('Drafts_Integrate');
 				}
 			},
 		);

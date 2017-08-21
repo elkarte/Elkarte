@@ -204,7 +204,7 @@ function is_not_guest($message = '', $is_fatal = true)
 	loadLanguage('Login');
 
 	// Apparently we're not in a position to handle this now. Let's go to a safer location for now.
-	if (!Template_Layers::getInstance()->hasLayers())
+	if (!Template_Layers::instance()->hasLayers())
 	{
 		$_SESSION['login_url'] = $scripturl . '?' . $_SERVER['QUERY_STRING'];
 		redirectexit('action=login');
@@ -524,7 +524,7 @@ function banPermissions()
 			'remove_own', 'remove_any',
 			'post_unapproved_topics', 'post_unapproved_replies_own', 'post_unapproved_replies_any',
 		);
-		Template_Layers::getInstance()->addAfter('admin_warning', 'body');
+		Template_Layers::instance()->addAfter('admin_warning', 'body');
 
 		call_integration_hook('integrate_post_ban_permissions', array(&$denied_permissions));
 		$user_info['permissions'] = array_diff($user_info['permissions'], $denied_permissions);

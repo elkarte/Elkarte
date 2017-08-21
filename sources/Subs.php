@@ -689,7 +689,7 @@ function parse_bbc($message, $smileys = true)
 	if ($message === '')
 		return '';
 
-	$parser = \BBC\ParserWrapper::getInstance();
+	$parser = \BBC\ParserWrapper::instance();
 
 	// This is a deprecated way of getting codes
 	if ($message === false)
@@ -722,7 +722,7 @@ function parsesmileys(&$message)
 		return;
 	}
 
-	$wrapper = \BBC\ParserWrapper::getInstance();
+	$wrapper = \BBC\ParserWrapper::instance();
 	$parser = $wrapper->getSmileyParser();
 	$message = $parser->parseBlock($message);
 }
@@ -778,7 +778,7 @@ function redirectexit($setLocation = '', $refresh = false)
 		// @todo this relies on 'flush_mail' being only set in AddMailQueue itself... :\
 		AddMailQueue(true);
 
-	Notifications::getInstance()->send();
+	Notifications::instance()->send();
 
 	$add = preg_match('~^(ftp|http)[s]?://~', $setLocation) == 0 && substr($setLocation, 0, 6) != 'about:';
 
@@ -811,7 +811,9 @@ function redirectexit($setLocation = '', $refresh = false)
 
 	// Debugging.
 	if ($db_show_debug === true)
-		$_SESSION['debug_redirect'] = Debug::get()->get_db();
+	{
+		$_SESSION['debug_redirect'] = Debug::instance()->get_db();
+	}
 
 	obExit(false);
 }
@@ -870,7 +872,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	// Clear out the stat cache.
 	trackStats();
 
-	Notifications::getInstance()->send();
+	Notifications::instance()->send();
 
 	// If we have mail to send, send it.
 	if (!empty($context['flush_mail']))
@@ -912,8 +914,12 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 			// Add $db_show_debug = true; to Settings.php if you want to show the debugging information.
 			// (since this is just debugging... it's okay that it's after </html>.)
 			if ($db_show_debug === true)
+			{
 				if (!isset($_REQUEST['xml']) && ((!isset($_GET['action']) || $_GET['action'] != 'viewquery') && !isset($_GET['api'])))
-					Debug::get()->display();
+				{
+					Debug::instance()->display();
+				}
+			}
 		}
 	}
 
@@ -1395,7 +1401,7 @@ function elk_seed_generator()
  */
 function call_integration_hook($hook, $parameters = array())
 {
-	return Hooks::get()->hook($hook, $parameters);
+	return Hooks::instance()->hook($hook, $parameters);
 }
 
 /**
@@ -1405,7 +1411,7 @@ function call_integration_hook($hook, $parameters = array())
  */
 function call_integration_include_hook($hook)
 {
-	Hooks::get()->include_hook($hook);
+	Hooks::instance()->include_hook($hook);
 }
 
 /**
@@ -1413,7 +1419,7 @@ function call_integration_include_hook($hook)
  */
 function call_integration_buffer()
 {
-	Hooks::get()->buffer_hook();
+	Hooks::instance()->buffer_hook();
 }
 
 /**
@@ -1428,7 +1434,7 @@ function call_integration_buffer()
  */
 function add_integration_function($hook, $function, $file = '', $permanent = true)
 {
-	Hooks::get()->add($hook, $function, $file, $permanent);
+	Hooks::instance()->add($hook, $function, $file, $permanent);
 }
 
 /**
@@ -1445,7 +1451,7 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
  */
 function remove_integration_function($hook, $function, $file = '')
 {
-	Hooks::get()->remove($hook, $function, $file);
+	Hooks::instance()->remove($hook, $function, $file);
 }
 
 /**

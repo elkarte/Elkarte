@@ -286,7 +286,7 @@ function getProfileEdits($start, $items_per_page, $sort, $memID)
 	);
 	$edits = array();
 	$members = array();
-	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::instance();
 	while ($row = $db->fetch_assoc($request))
 	{
 		$extra = Util::unserialize($row['extra']);

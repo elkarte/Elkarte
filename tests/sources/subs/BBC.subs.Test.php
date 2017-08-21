@@ -607,7 +607,7 @@ Should be an empty line in between.',
 	public function testPreparseBBcode()
 	{
 		$preparse = new \BBC\PreparseCode;
-		$parse = \BBC\ParserWrapper::getInstance();
+		$parse = \BBC\ParserWrapper::instance();
 
 		foreach ($this->bbcPreparseTestCases as $testcase)
 		{

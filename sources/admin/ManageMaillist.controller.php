@@ -341,7 +341,7 @@ class ManageMaillist_Controller extends Action_Controller
 		else
 			$text = $txt['badid'];
 
-		$parser = \BBC\ParserWrapper::getInstance();
+		$parser = \BBC\ParserWrapper::instance();
 
 		// Prep and show the template with what we found
 		$context['body'] = $parser->parseEmail($text);
@@ -562,7 +562,7 @@ class ManageMaillist_Controller extends Action_Controller
 		// Prepare and show the template
 		createToken('admin-ml');
 		$context['warning_data'] = array('notify' => '', 'notify_subject' => '', 'notify_body' => '');
-		$context['body'] = isset($fullerrortext) ? \BBC\ParserWrapper::getInstance()->parseEmail($fullerrortext) : '';
+		$context['body'] = isset($fullerrortext) ? \BBC\ParserWrapper::instance()->parseEmail($fullerrortext) : '';
 		$context['item'] = isset($this->_req->post->item) ? $this->_req->post->item : '';
 		$context['notice_to'] = $txt['to'] . ' ' . isset($temp_email[0]['from']) ? $temp_email[0]['from'] : '';
 		$context['page_title'] = $txt['bounce_title'];

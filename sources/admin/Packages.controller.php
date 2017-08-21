@@ -1039,7 +1039,7 @@ class Packages_Controller extends Action_Controller
 		// Deal with the template stuff.
 		loadTemplate('Xml');
 		$context['sub_template'] = 'generic_xml';
-		Template_Layers::getInstance()->removeAll();
+		Template_Layers::instance()->removeAll();
 
 		// Define the return data, this is simple.
 		$context['xml_data'] = array(
@@ -1169,12 +1169,12 @@ class Packages_Controller extends Action_Controller
 
 		// Let's do some formatting...
 		$operation_text = $context['operations']['position'] === 'replace' ? 'operation_replace' : ($context['operations']['position'] === 'before' ? 'operation_after' : 'operation_before');
-		$bbc_parser = \BBC\ParserWrapper::getInstance();
+		$bbc_parser = \BBC\ParserWrapper::instance();
 		$context['operations']['search'] = $bbc_parser->parsePackage('[code=' . $txt['operation_find'] . ']' . ($context['operations']['position'] === 'end' ? '?&gt;' : $context['operations']['search']) . '[/code]');
 		$context['operations']['replace'] = $bbc_parser->parsePackage('[code=' . $txt[$operation_text] . ']' . $context['operations']['replace'] . '[/code]');
 
 		// No layers
-		Template_Layers::getInstance()->removeAll();
+		Template_Layers::instance()->removeAll();
 		$context['sub_template'] = 'view_operations';
 	}
 
@@ -1485,7 +1485,7 @@ class Packages_Controller extends Action_Controller
 		{
 			loadTemplate('Xml');
 			$context['sub_template'] = 'generic_xml';
-			Template_Layers::getInstance()->removeAll();
+			Template_Layers::instance()->removeAll();
 		}
 	}
 

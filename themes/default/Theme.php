@@ -609,7 +609,7 @@ class Theme extends \Theme
 		$context['show_quick_login'] = !empty($modSettings['enableVBStyleLogin']) && $user_info['is_guest'];
 		$context['robot_no_index'] = in_array($context['current_action'], $this->no_index_actions);
 
-		$bbc_parser = \BBC\ParserWrapper::getInstance();
+		$bbc_parser = \BBC\ParserWrapper::instance();
 
 		// Get some news...
 		$context['news_lines'] = array_filter(explode("\n", str_replace("\r", '', trim(addslashes($modSettings['news'])))));
@@ -734,6 +734,7 @@ class Theme extends \Theme
 		{
 			addJavascriptVar(array('elk_scripturl' => '\'' . $scripturl . '\''));
 		}
+		addJavascriptVar(array('elk_forum_action' => '\'' . substr($modSettings['default_forum_action'], 1, -1) . '\''));
 
 		if (!isset($context['page_title']))
 		{
@@ -822,6 +823,8 @@ class Theme extends \Theme
 		$context['allow_calendar'] = allowedTo('calendar_view') && !empty($modSettings['cal_enabled']);
 		$context['allow_moderation_center'] = $context['user']['can_mod'];
 		$context['allow_pm'] = allowedTo('pm_read');
+
+		call_integration_hook('integrate_setup_allow');
 
 		if ($context['allow_search'])
 		{
@@ -1096,7 +1099,7 @@ class Theme extends \Theme
 				$layers = array('html', 'body');
 			}
 
-			$template_layers = \Template_Layers::getInstance(true);
+			$template_layers = \Template_Layers::instance(true);
 			foreach ($layers as $layer)
 			{
 				$template_layers->addBegin($layer);

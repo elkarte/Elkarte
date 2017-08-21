@@ -324,7 +324,7 @@ function createMenu($menuData, $menuOptions = array())
 	// Almost there - load the template and add to the template layers.
 	loadTemplate(isset($menuOptions['template_name']) ? $menuOptions['template_name'] : 'GenericMenu');
 	$menu_context['layer_name'] = (isset($menuOptions['layer_name']) ? $menuOptions['layer_name'] : 'generic_menu') . $menuOptions['menu_type'];
-	Template_Layers::getInstance()->add($menu_context['layer_name']);
+	Template_Layers::instance()->add($menu_context['layer_name']);
 
 	// Check we had something - for sanity sake.
 	if (empty($include_data))
@@ -355,7 +355,7 @@ function destroyMenu($menu_id = 'last')
 	if (!isset($context[$menu_name]))
 		return false;
 
-	Template_Layers::getInstance()->remove($context[$menu_name]['layer_name']);
+	Template_Layers::instance()->remove($context[$menu_name]['layer_name']);
 
 	unset($context[$menu_name]);
 }

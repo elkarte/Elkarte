@@ -142,7 +142,7 @@ require_once(SUBSDIR . '/Cache.subs.php');
 
 // Initialize the class Autoloader
 require(SOURCEDIR . '/Autoloader.class.php');
-$autoloder = Elk_Autoloader::getInstance();
+$autoloder = Elk_Autoloader::instance();
 $autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
 $autoloder->register(SOURCEDIR, '\\ElkArte');
 $autoloder->register(SOURCEDIR . '/subs/BBC', '\\BBC');
@@ -164,9 +164,9 @@ if ($maintenance == 2 && (!isset($ssi_maintenance_off) || $ssi_maintenance_off !
 	die($mmessage);
 }
 
-if ($db_show_debug === true && isset($rusage_start))
+if ($db_show_debug === true)
 {
-	Debug::get()->rusage('start', $rusage_start);
+	Debug::instance()->rusage('start', $rusage_start);
 }
 
 // Forum in extended maintenance mode? Our trip ends here with a bland message.
@@ -299,7 +299,7 @@ if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && $use
 // Load the stuff like the menu bar, etc.
 if (isset($ssi_layers))
 {
-	$template_layers = Template_Layers::getInstance();
+	$template_layers = Template_Layers::instance();
 	$template_layers->removeAll();
 	foreach ($ssi_layers as $layer)
 	{

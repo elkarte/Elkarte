@@ -498,7 +498,7 @@ function loadEssentialData()
 		require_once(SUBSDIR . '/Cache.subs.php');
 		require_once(SOURCEDIR . '/Security.php');
 		require_once(SOURCEDIR . '/Autoloader.class.php');
-		$autoloder = Elk_Autoloader::getInstance();
+		$autoloder = Elk_Autoloader::instance();
 		$autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
 		$autoloder->register(SOURCEDIR, '\\ElkArte');
 		load_possible_databases($db_type);

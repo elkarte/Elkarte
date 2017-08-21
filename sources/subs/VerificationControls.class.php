@@ -623,7 +623,7 @@ class Verification_Controls_Questions implements Verification_Controls
 		$questions = $this->_loadAntispamQuestions(array('type' => 'id_question', 'value' => $this->_questionIDs));
 		$asked_questions = array();
 
-		$parser = \BBC\ParserWrapper::getInstance();
+		$parser = \BBC\ParserWrapper::instance();
 
 		foreach ($questions as $row)
 		{

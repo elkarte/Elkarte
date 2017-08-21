@@ -1623,7 +1623,7 @@ function selectMessages($topic, $start, $items_per_page, $messages = array(), $o
 	);
 
 	$messages = array();
-	$parser = \BBC\ParserWrapper::getInstance();
+	$parser = \BBC\ParserWrapper::instance();
 
 	for ($counter = 0; $row = $db->fetch_assoc($request); $counter++)
 	{
@@ -1677,7 +1677,7 @@ function topicMessages($topic, $render = 'print')
 	);
 
 	$posts = array();
-	$parser = \BBC\ParserWrapper::getInstance();
+	$parser = \BBC\ParserWrapper::instance();
 
 	if ($render === 'print')
 	{
