@@ -151,7 +151,7 @@ class Likes_Controller extends Action_Controller
 					// Lets add in a mention to the member that just had their post liked
 					if (!empty($modSettings['mentions_enabled']))
 					{
-						$notifier = Notifications::getInstance();
+						$notifier = Notifications::instance();
 						$notifier->add(new Notifications_Task(
 							$type,
 							$this->_id_liked,
