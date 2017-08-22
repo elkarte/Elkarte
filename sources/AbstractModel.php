@@ -41,6 +41,6 @@ abstract class AbstractModel
 		global $modSettings;
 
 		$this->_db = $db ?: database();
-		$this->_modSettings = new ValuesContainer($modSettings ?: array());
+		$this->_modSettings = new \ElkArte\ValuesContainer($modSettings ?: array());
 	}
 }
