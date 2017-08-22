@@ -43,28 +43,4 @@ abstract class AbstractModel
 		$this->_db = $db ?: database();
 		$this->_modSettings = new ValuesContainer($modSettings ?: array());
 	}
-
-	/**
-	 * Method to return a $modSetting value
-	 *
-	 * What it does:
-	 *
-	 * - Returned value will be the value or null of the key is not set
-	 * - If you simply want a value back access it directly as $this->_modSettings->name
-	 * or $this->_modSettings[name]
-	 *
-	 * @param string $name The key name of the value to return
-	 * @param mixed|null $default default value to return if key value is not found
-	 */
-	protected function _loadModsettings($name = '', $default = null)
-	{
-		if (isset($this->_modSettings->{$name}))
-		{
-			return $this->_modSettings->{$name};
-		}
-		else
-		{
-			return $default;
-		}
-	}
 }

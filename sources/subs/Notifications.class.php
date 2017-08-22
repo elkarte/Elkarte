@@ -209,13 +209,10 @@ class Notifications extends AbstractModel
 	 * @param \ElkArte\sources\subs\MentionType\Mention_Type_Interface $obj
 	 * @param \Notifications_Task $task
 	 * @param mixed[] $bodies
-	 * @global $modSettings - Not sure if actually necessary
 	 */
 	protected function _send_notification(\ElkArte\sources\subs\MentionType\Mention_Type_Interface $obj, \Notifications_Task $task, $bodies)
 	{
-		global $modSettings;
-
-		$mentioning = new Mentioning($this->_db, new Data_Validator(), $modSettings['enabled_mentions']);
+		$mentioning = new Mentioning($this->_db, new Data_Validator(), $this->_modSettings->enabled_mentions);
 		foreach ($bodies as $body)
 		{
 			$mentioning->create($obj, array(
