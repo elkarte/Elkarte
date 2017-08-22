@@ -635,14 +635,14 @@ class Groups_Controller extends Action_Controller
 				array(
 					'position' => 'bottom_of_list',
 					'value' => '
-						<select name="req_action" onchange="if (this.value != 0 &amp;&amp; (this.value == \'reason\' || confirm(\'' . $txt['mc_groupr_warning'] . '\'))) this.form.submit();">
+						<select name="req_action" onchange="if (this.value != 0 &amp;&amp; (this.value === \'reason\' || confirm(\'' . $txt['mc_groupr_warning'] . '\'))) this.form.submit();">
 							<option value="0">' . $txt['with_selected'] . ':</option>
 							<option value="0" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['mc_groupr_approve'])) . '</option>
 							<option value="approve">&#10148;&nbsp;' . $txt['mc_groupr_approve'] . '</option>
 							<option value="reject">&#10148;&nbsp;' . $txt['mc_groupr_reject'] . '</option>
 							<option value="reason">&#10148;&nbsp;' . $txt['mc_groupr_reject_w_reason'] . '</option>
 						</select>
-						<input type="submit" name="go" value="' . $txt['go'] . '" onclick="var sel = document.getElementById(\'req_action\'); if (sel.value != 0 &amp;&amp; sel.value != \'reason\' &amp;&amp; !confirm(\'' . $txt['mc_groupr_warning'] . '\')) return false;" />',
+						<input type="submit" name="go" value="' . $txt['go'] . '" onclick="var sel = document.getElementById(\'req_action\'); if (sel.value != 0 &amp;&amp; sel.value !== \'reason\' &amp;&amp; !confirm(\'' . $txt['mc_groupr_warning'] . '\')) return false;" />',
 					'class' => 'floatright',
 				),
 			),
