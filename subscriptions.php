@@ -245,6 +245,7 @@ $gatewayClass->close();
  * Log an error then exit
  *
  * @param string $text
+ * @throws \Elk_Exception
  */
 function generateSubscriptionError($text)
 {

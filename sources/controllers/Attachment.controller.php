@@ -239,6 +239,12 @@ class Attachment_Controller extends Action_Controller
 		}
 	}
 
+	/**
+	 * Generates a language image based on text for display.
+	 *
+	 * @param null|string $text
+	 * @throws \Elk_Exception
+	 */
 	public function action_no_attach($text = null)
 	{
 		global $txt;
