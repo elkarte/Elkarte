@@ -6557,7 +6557,7 @@ a > i {
 	}
 	/* Override the previous for charts in the stats page */
 	.statsbar {
-		padding-left: 0% !important;
+		padding-left: 0 !important;
 	}
 
 	dd input, dd select, dd textarea {
