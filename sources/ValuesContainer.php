@@ -46,7 +46,7 @@ class ValuesContainer implements \ArrayAccess
 	 * Setter
 	 *
 	 * @param string|int $key
-	 * @param string|int|bool|null|object $val
+	 * @param mixed $val
 	 */
 	public function __set($key, $val)
 	{
@@ -57,7 +57,7 @@ class ValuesContainer implements \ArrayAccess
 	 * Getter
 	 *
 	 * @param string|int $key
-	 * @return string|int|bool|null|object
+	 * @return mixed
 	 */
 	public function __get($key)
 	{
@@ -65,6 +65,32 @@ class ValuesContainer implements \ArrayAccess
 			return $this->data[$key];
 		else
 			return null;
+	}
+
+	/**
+	 * Calling as method uses the argument as default
+	 *
+	 * @param string|int $key
+	 * @param mixed[] $args
+	 * @return mixed
+	 */
+	public function __call($key, $args)
+	{
+		if (isset($this->data[$key]))
+		{
+			return $this->data[$key];
+		}
+		else
+		{
+			if (isset($args[0]))
+			{
+				return $args[0];
+			}
+			else
+			{
+				return null;
+			}
+		}
 	}
 
 	/**
