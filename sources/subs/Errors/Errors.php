@@ -20,13 +20,11 @@
 namespace ElkArte\Errors;
 
 use Elk_Exception;
-use Template_Layers;
-use AbstractModel;
 
 /**
  * Class to handle all forum errors and exceptions
  */
-class Errors extends AbstractModel
+class Errors extends \AbstractModel
 {
 	/** @var Errors Sole private Errors instance */
 	private static $_errors = null;
@@ -273,7 +271,7 @@ class Errors extends AbstractModel
 	 * @uses Errors template, fatal_error sub template
 	 * @param string $error_message
 	 * @param string $error_code string or int code
-	 * @throws Elk_Exception
+	 * @throws \Elk_Exception
 	 */
 	final protected function _setup_fatal_ErrorContext($error_message, $error_code)
 	{

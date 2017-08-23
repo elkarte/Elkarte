@@ -80,14 +80,14 @@ class Pbe_Imap extends AbstractModel
 		parent::__construct();
 
 		// Values used for the connection
-		$this->_hostname = $this->_loadModsettings('maillist_imap_host', '');
-		$this->_username = $this->_loadModsettings('maillist_imap_uid', '');
-		$this->_password = $this->_loadModsettings('maillist_imap_pass', '');
-		$this->_mailbox = $this->_loadModsettings('maillist_imap_mailbox', '');
-		$this->_type = $this->_loadModsettings('maillist_imap_connection', '');
+		$this->_hostname = $this->_modSettings->maillist_imap_host('');
+		$this->_username = $this->_modSettings->maillist_imap_uid('');
+		$this->_password = $this->_modSettings->maillist_imap_pass('');
+		$this->_mailbox = $this->_modSettings->maillist_imap_mailbox('');
+		$this->_type = $this->_modSettings->maillist_imap_connection('');
 
 		// Values used for options
-		$this->_delete = (bool) $this->_loadModsettings('maillist_imap_delete');
+		$this->_delete = (bool) $this->_modSettings->maillist_imap_delete;
 		$this->_is_gmail = strpos($this->_hostname, '.gmail.') !== false;
 	}
 
