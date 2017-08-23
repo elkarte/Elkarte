@@ -72,7 +72,7 @@ $(function() {
 	// event with $('[data-lightboximage]').off('click.elk_lb');
 	$('[data-lightboximage]').on('click.elk_lb', function(e) {
 		e.preventDefault();
-		expandThumbLB($(this).data('lightboximage'));
+		expandThumbLB($(this).data('lightboximage'), $(this).data('lightboxmessage'));
 	});
 
 	// BBC [img] element toggle for height and width styles of an image.
