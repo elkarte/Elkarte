@@ -316,7 +316,7 @@ function template_users_multiactions($groups)
 	global $txt;
 
 	$select = '
-					<select name="maction" onchange="this.form.new_membergroup.disabled = (this.options[this.selectedIndex].value != \'pgroup\' && this.options[this.selectedIndex].value != \'agroup\');">
+					<select name="maction" onchange="this.form.new_membergroup.disabled = (this.options[this.selectedIndex].value !== \'pgroup\' && this.options[this.selectedIndex].value !== \'agroup\');">
 						<option value="">--------</option>
 						<option value="delete">' . $txt['admin_delete_members'] . '</option>
 						<option value="pgroup">' . $txt['admin_change_primary_membergroup'] . '</option>

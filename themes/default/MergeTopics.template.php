@@ -13,6 +13,11 @@
  *
  */
 
+/**
+ * Loads the GenericHelpers template
+ *
+ * @throws \Elk_Exception
+ */
 function template_MergeTopics_init()
 {
 	loadTemplate('GenericHelpers');

@@ -455,11 +455,8 @@ class ManageThemes_Controller extends Action_Controller
 			checkSession();
 			validateToken('admin-sto');
 
-			if (empty($this->_req->post->options))
-				$this->_options = array();
-
-			if (empty($this->_req->post->default_options))
-				$this->_default_options = array();
+			$this->_options = $this->_req->getPost('options', '', array());
+			$this->_default_options = $this->_req->getPost('default_options', '', array());
 
 			// Set up the query values.
 			$setValues = array();
@@ -495,10 +492,11 @@ class ManageThemes_Controller extends Action_Controller
 			checkSession();
 			validateToken('admin-sto');
 
-			$this->_options = empty($this->_req->post->options) ? array() : $this->_req->post->options;
-			$this->_options_master = empty($this->_req->post->options_master) ? array() : $this->_req->post->options_master;
-			$this->_default_options = empty($this->_req->post->default_options) ? array() : $this->_req->post->default_options;
-			$this->_default_options_master = empty($this->_req->post->default_options_master) ? array() : $this->_req->post->default_options_master;
+			$this->_options = $this->_req->getPost('options', '', array());
+			$this->_options_master = $this->_req->getPost('options_master', '', array());
+
+			$this->_default_options = $this->_req->getPost('default_options', '', array());
+			$this->_default_options_master = $this->_req->getPost('default_options_master', '', array());
 
 			$old_settings = array();
 			foreach ($this->_default_options as $opt => $val)

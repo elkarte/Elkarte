@@ -123,11 +123,10 @@ function pbe_run_parsers($text)
  * @uses EmailFormat.class.php
  * @package Maillist
  * @param string $body
- * @param boolean $html
  * @param string $real_name
  * @param string $charset character set of the text
  */
-function pbe_fix_email_body($body, $html = false, $real_name = '', $charset = 'UTF-8')
+function pbe_fix_email_body($body, $real_name = '', $charset = 'UTF-8')
 {
 	global $txt;
 

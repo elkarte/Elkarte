@@ -576,7 +576,7 @@ function elk_setThemeOption(option, value, theme, additional_vars)
  */
 function hashLoginPassword(doForm, cur_session_id, token)
 {
-	// Don't have our hash lib availalbe?
+	// Don't have our hash lib available?
 	if (typeof(hex_sha256) === 'undefined')
 		return;
 
@@ -1663,7 +1663,7 @@ function expandCollapse(id, icon, speed)
 	if (icon)
 		$('#' + icon).attr("src", elk_images_url + (oId.is(":hidden") !== true ? "/selected.png" : "/selected_open.png"));
 
-	// Open or collaspe the content id
+	// Open or collapse the content id
 	oId.slideToggle(speed);
 }
 

@@ -88,7 +88,7 @@ class Elk_Autoloader
 	protected $_paths;
 
 	/**
-	 * Constructor, not used, instead use getInstance()
+	 * Constructor, not used, instead use instance()
 	 */
 	protected function __construct()
 	{

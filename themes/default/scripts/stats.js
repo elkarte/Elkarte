@@ -11,7 +11,7 @@
  */
 
 /**
- * This file contains javascript associated with the displaying statitics and the like
+ * This file contains javascript associated with the displaying statistics and the like
  */
 
 /**

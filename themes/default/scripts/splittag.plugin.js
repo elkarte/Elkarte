@@ -185,7 +185,7 @@
 
 				// Create an area to place between the two quotes for text entry
 				blank = quote.ownerDocument.createElement('p');
-				$(blank).html('&nbsp');
+				$(blank).html('&nbsp;');
 
 				// Insert the new elements
 				range.insertNode(contentAfterRangeStart);
