@@ -5,12 +5,12 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1 Release Candidate 1
+ * @version 1.1 Release Candidate 2
  *
  */
 
 // Version Constants
-const CURRENT_VERSION = '1.1 RC 1';
+const CURRENT_VERSION = '1.1 RC 2';
 const CURRENT_LANG_VERSION = '1.1';
 const DB_SCRIPT_VERSION = '1-1';
 const REQUIRED_PHP_VERSION = '5.3.3';
@@ -25,7 +25,7 @@ function getUpgradeFiles()
 	return array(
 		array('upgrade_1-0.php', '1.0', '1.0'),
 		array('upgrade_1-0_' . $db_type . '.php', '1.0', '1.0'),
-		array('upgrade_1-1.php', '1.1 RC 1', CURRENT_VERSION),
-		array('upgrade_1-1_' . $db_type . '.php', '1.1 RC 1', CURRENT_VERSION),
+		array('upgrade_1-1.php', '1.1 RC 2', CURRENT_VERSION),
+		array('upgrade_1-1_' . $db_type . '.php', '1.1 RC 2', CURRENT_VERSION),
 	);
 }

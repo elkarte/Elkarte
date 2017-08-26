@@ -314,7 +314,7 @@ limitations under the License.
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1 Release Candidate 1
+ * @version 1.1 Release Candidate 2
  *
  * This bits acts as middle-man between the notify (above) and the ElkNotifications
  * providing the interface required by the latter.
