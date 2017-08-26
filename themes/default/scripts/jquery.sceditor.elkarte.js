@@ -7,7 +7,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1 Release Candidate 1
+ * @version 1.1 Release Candidate 2
  */
 
 /** global: elk_session_var, elk_session_id, ila_filename, elk_scripturl  */
