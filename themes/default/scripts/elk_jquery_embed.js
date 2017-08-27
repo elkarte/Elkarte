@@ -173,6 +173,7 @@
 
 			return [oSettings.youtube, tag];
 		};
+		handlers['m.youtube.com'] = handlers['youtube.com'];
 		handlers['youtu.be'] = handlers['youtube.com'];
 		handlers['vimeo.com'] = function(path, a, embed) {
 			var videoID = path.match(/^\/(\d+)/i);
