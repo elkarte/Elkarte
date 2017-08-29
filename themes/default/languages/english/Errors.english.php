@@ -370,6 +370,7 @@ $txt['ignoreboards_disallowed'] = 'The option to ignore boards has not been enab
 
 $txt['mboards_delete_error'] = 'No category selected.';
 $txt['mboards_delete_board_error'] = 'No board selected.';
+$txt['mboards_delete_board_has_posts'] = 'Selected board still has posts and/or topics.';
 
 $txt['mboards_parent_own_child_error'] = 'You can not make a parent its own child.';
 $txt['mboards_board_own_child_error'] = 'You can not make a board its own child.';

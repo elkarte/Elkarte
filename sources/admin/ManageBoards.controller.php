@@ -620,6 +620,14 @@ class ManageBoards_Controller extends Action_Controller
 		$board_id = $this->_req->getPost('boardid', 'intval', 0);
 		checkSession();
 		validateToken('admin-be-' . $this->_req->post->boardid);
+		$db = database();
+		$req = $db->query('', 'SELECT num_topics as topics, num_posts as posts
+			FROM {db_prefix}boards
+			WHERE id_board = {int:current_board}',
+			array('current_board' => $this->_req->post->boardid)
+		);
+		$row = $db->fetch_assoc($req);
+		$db->free_result($req);
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
@@ -725,14 +733,23 @@ class ManageBoards_Controller extends Action_Controller
 		}
 		elseif (isset($this->_req->post->delete) && !isset($this->_req->post->confirmation) && !isset($this->_req->post->no_children))
 		{
-			$this->action_board();
+			if ($row['topics'] || $row['posts']) {
+				throw new Elk_Exception('mboards_delete_board_has_posts');
+			}
+			else {
+				$this->action_board();
+			}
 			return;
 		}
 		elseif (isset($this->_req->post->delete))
 		{
-			// First off - check if we are moving all the current sub-boards first - before we start deleting!
-			if (isset($this->_req->post->delete_action) && $this->_req->post->delete_action == 1)
+			// First, check if our board still has posts or topics.
+			if ($row['topics'] || $row['posts']) {
+				throw new Elk_Exception('mboards_delete_board_has_posts');
+			}
+			else if (isset($this->_req->post->delete_action) && $this->_req->post->delete_action == 1)
 			{
+				// Check if we are moving all the current sub-boards first - before we start deleting!
 				if (empty($this->_req->post->board_to))
 					throw new Elk_Exception('mboards_delete_board_error');
 
