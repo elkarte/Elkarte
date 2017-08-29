@@ -620,17 +620,11 @@ class ManageBoards_Controller extends Action_Controller
 		$board_id = $this->_req->getPost('boardid', 'intval', 0);
 		checkSession();
 		validateToken('admin-be-' . $this->_req->post->boardid);
-		$db = database();
-		$req = $db->query('', 'SELECT num_topics as topics, num_posts as posts
-			FROM {db_prefix}boards
-			WHERE id_board = {int:current_board}',
-			array('current_board' => $this->_req->post->boardid)
-		);
-		$row = $db->fetch_assoc($req);
-		$db->free_result($req);
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
+
+		$posts = getBoardProperties($this->_req->post->boardid)['numPosts'];
 
 		// Mode: modify aka. don't delete.
 		if (isset($this->_req->post->edit) || isset($this->_req->post->add))
@@ -733,7 +727,7 @@ class ManageBoards_Controller extends Action_Controller
 		}
 		elseif (isset($this->_req->post->delete) && !isset($this->_req->post->confirmation) && !isset($this->_req->post->no_children))
 		{
-			if ($row['topics'] || $row['posts']) {
+			if ($posts) {
 				throw new Elk_Exception('mboards_delete_board_has_posts');
 			}
 			else {
@@ -744,7 +738,7 @@ class ManageBoards_Controller extends Action_Controller
 		elseif (isset($this->_req->post->delete))
 		{
 			// First, check if our board still has posts or topics.
-			if ($row['topics'] || $row['posts']) {
+			if ($posts) {
 				throw new Elk_Exception('mboards_delete_board_has_posts');
 			}
 			else if (isset($this->_req->post->delete_action) && $this->_req->post->delete_action == 1)
