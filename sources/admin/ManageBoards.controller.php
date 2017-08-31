@@ -629,6 +629,8 @@ class ManageBoards_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
 
+		$posts = getBoardProperties($this->_req->post->boardid)['numPosts'];
+
 		// Mode: modify aka. don't delete.
 		if (isset($this->_req->post->edit) || isset($this->_req->post->add))
 		{
@@ -730,14 +732,23 @@ class ManageBoards_Controller extends Action_Controller
 		}
 		elseif (isset($this->_req->post->delete) && !isset($this->_req->post->confirmation) && !isset($this->_req->post->no_children))
 		{
-			$this->action_board();
+			if ($posts) {
+				throw new Elk_Exception('mboards_delete_board_has_posts');
+			}
+			else {
+				$this->action_board();
+			}
 			return;
 		}
 		elseif (isset($this->_req->post->delete))
 		{
-			// First off - check if we are moving all the current sub-boards first - before we start deleting!
-			if (isset($this->_req->post->delete_action) && $this->_req->post->delete_action == 1)
+			// First, check if our board still has posts or topics.
+			if ($posts) {
+				throw new Elk_Exception('mboards_delete_board_has_posts');
+			}
+			else if (isset($this->_req->post->delete_action) && $this->_req->post->delete_action == 1)
 			{
+				// Check if we are moving all the current sub-boards first - before we start deleting!
 				if (empty($this->_req->post->board_to))
 					throw new Elk_Exception('mboards_delete_board_error');
 
