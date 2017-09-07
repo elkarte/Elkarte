@@ -99,13 +99,13 @@ class Notify_Controller extends Action_Controller
 
 		loadTemplate('Xml');
 
-		Template_Layers::instance()->removeAll();
+		theme()->getLayers()->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		// Even with Ajax, guests still can't do this
 		if ($user_info['is_guest'])
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['not_guests']
@@ -117,7 +117,7 @@ class Notify_Controller extends Action_Controller
 		// And members still need the right permissions
 		if (!allowedTo('mark_any_notify') || empty($topic) || empty($this->_req->query->sa))
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['cannot_mark_any_notify']
@@ -129,7 +129,7 @@ class Notify_Controller extends Action_Controller
 		// And sessions still matter, so you better have a valid one
 		if (checkSession('get', '', false))
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'url' => $scripturl . '?action=notify;sa=' . ($this->_req->query->sa === 'on' ? 'on' : 'off') . ';topic=' . $topic . '.' . $this->_req->query->start . ';' . $context['session_var'] . '=' . $context['session_id'],
@@ -228,13 +228,13 @@ class Notify_Controller extends Action_Controller
 
 		loadTemplate('Xml');
 
-		Template_Layers::instance()->removeAll();
+		theme()->getLayers()->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		// Permissions are an important part of anything ;).
 		if ($user_info['is_guest'])
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['not_guests']
@@ -246,7 +246,7 @@ class Notify_Controller extends Action_Controller
 		// Have to have provided the right information
 		if (!allowedTo('mark_notify') || empty($board) || empty($this->_req->query->sa))
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['cannot_mark_notify'],
@@ -258,7 +258,7 @@ class Notify_Controller extends Action_Controller
 		// Sessions are always verified
 		if (checkSession('get', '', false))
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'url' => $scripturl . '?action=notifyboard;sa=' . ($this->_req->query->sa === 'on' ? 'on' : 'off') . ';board=' . $board . '.' . $this->_req->query->start . ';' . $context['session_var'] . '=' . $context['session_id'],
@@ -330,13 +330,13 @@ class Notify_Controller extends Action_Controller
 
 		loadTemplate('Xml');
 
-		Template_Layers::instance()->removeAll();
+		theme()->getLayers()->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		// Sorry guests just can't do this
 		if ($user_info['is_guest'])
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['not_guests']
@@ -348,7 +348,7 @@ class Notify_Controller extends Action_Controller
 		// Let's do something only if the function is enabled
 		if (empty($modSettings['enable_unwatch']))
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['feature_disabled'],
@@ -360,7 +360,7 @@ class Notify_Controller extends Action_Controller
 		// Sessions need to be validated
 		if (checkSession('get', '', false))
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'url' => $scripturl . '?action=unwatchtopic;sa=' . ($this->_req->query->sa === 'on' ? 'on' : 'off') . ';topic=' . $topic . '.' . $this->_req->query->start . ';' . $context['session_var'] . '=' . $context['session_id'],

@@ -34,7 +34,7 @@ function getMessageIcons($board_id)
 
 	if (empty($modSettings['messageIcons_enable']))
 	{
-		loadLanguage('Post');
+		theme()->getTemplates()->loadLanguageFile('Post');
 
 		$icons = array(
 			array('value' => 'xx', 'name' => $txt['standard']),
@@ -121,7 +121,7 @@ function create_control_richedit($editorOptions)
 	$db = database();
 
 	// Load the Post language file... for the moment at least.
-	loadLanguage('Post');
+	theme()->getTemplates()->loadLanguageFile('Post');
 
 	// Every control must have a ID!
 	assert(isset($editorOptions['id']));
@@ -469,7 +469,7 @@ function create_control_richedit($editorOptions)
 
 	if (!empty($editorOptions['live_errors']))
 	{
-		loadLanguage('Errors');
+		theme()->getTemplates()->loadLanguageFile('Errors');
 
 		addInlineJavascript('
 	error_txts[\'no_subject\'] = ' . JavaScriptEscape($txt['error_no_subject']) . ';

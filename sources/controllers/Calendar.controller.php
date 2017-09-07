@@ -269,6 +269,7 @@ class Calendar_Controller extends Action_Controller
 			}
 			catch (Elk_Exception $e)
 			{
+				// @todo This should really integrate into $post_errors.
 				$e->fatalLangError();
 			}
 		}

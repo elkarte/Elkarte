@@ -1247,7 +1247,7 @@ function createSalvageArea()
 		$createOnce = true;
 
 	// Back to the forum's default language.
-	loadLanguage('Admin', $language);
+	theme()->getTemplates()->loadLanguageFile('Admin', $language);
 
 	// Check to see if a 'Salvage Category' exists, if not => insert one.
 	$result = $db->query('', '
@@ -1274,7 +1274,7 @@ function createSalvageArea()
 
 		if ($db->affected_rows() <= 0)
 		{
-			loadLanguage('Admin');
+			theme()->getTemplates()->loadLanguageFile('Admin');
 			throw new Elk_Exception('salvaged_category_error', false);
 		}
 
@@ -1308,7 +1308,7 @@ function createSalvageArea()
 
 		if ($db->affected_rows() <= 0)
 		{
-			loadLanguage('Admin');
+			theme()->getTemplates()->loadLanguageFile('Admin');
 			throw new Elk_Exception('salvaged_board_error', false);
 		}
 
@@ -1324,7 +1324,7 @@ function createSalvageArea()
 	);
 
 	// Restore the user's language.
-	loadLanguage('Admin');
+	theme()->getTemplates()->loadLanguageFile('Admin');
 }
 
 /**

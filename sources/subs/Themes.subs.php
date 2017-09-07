@@ -552,7 +552,7 @@ function availableThemes($current_theme, $current_member)
 
 				if (!empty($settings['theme_variants']))
 				{
-					loadLanguage('Settings');
+					theme()->getTemplates()->loadLanguageFile('Settings');
 
 					$available_themes[$id_theme]['variants'] = array();
 					foreach ($settings['theme_variants'] as $variant)

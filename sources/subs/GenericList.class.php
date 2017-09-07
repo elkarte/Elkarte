@@ -101,7 +101,7 @@ class Generic_List
 		$this->listOptions = $listOptions;
 
 		// Be ready for those pesky errors
-		loadLanguage('Errors');
+		theme()->getTemplates()->loadLanguageFile('Errors');
 
 		// Load the template
 		loadTemplate('GenericList');

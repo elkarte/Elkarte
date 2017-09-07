@@ -52,7 +52,7 @@ class AdminSettings_Search
 	{
 		if (!empty($language_files))
 		{
-			loadLanguage(implode('+', $language_files));
+			theme()->getTemplates()->loadLanguageFile(implode('+', $language_files));
 		}
 
 		if (!empty($include_files))

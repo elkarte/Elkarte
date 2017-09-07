@@ -59,7 +59,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 		global $context, $txt;
 
 		// Everything's gonna need this.
-		loadLanguage('ManageCalendar');
+		theme()->getTemplates()->loadLanguageFile('ManageCalendar');
 
 		// Default text.
 		$context['explain_text'] = $txt['calendar_desc'];

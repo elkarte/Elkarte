@@ -71,7 +71,7 @@ class Maintenance_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 
 		// Need something to talk about?
-		loadLanguage('Maintenance');
+		theme()->getTemplates()->loadLanguageFile('Maintenance');
 		loadTemplate('Maintenance');
 
 		// This uses admin tabs - as it should!
@@ -254,7 +254,7 @@ class Maintenance_Controller extends Action_Controller
 		}
 
 		loadTemplate('Packages');
-		loadLanguage('Packages');
+		theme()->getTemplates()->loadLanguageFile('Packages');
 
 		// $context['package_ftp'] may be set action_backup_display when an error occur
 		if (!isset($context['package_ftp']))
@@ -1086,7 +1086,7 @@ class Maintenance_Controller extends Action_Controller
 		// If we had an error...
 		if ($ftp->error !== false)
 		{
-			loadLanguage('Packages');
+			theme()->getTemplates()->loadLanguageFile('Packages');
 			$ftp_error = $ftp->last_message === null ? (isset($txt['package_ftp_' . $ftp->error]) ? $txt['package_ftp_' . $ftp->error] : '') : $ftp->last_message;
 
 			// Fill the boxes for a FTP connection with data from the previous attempt

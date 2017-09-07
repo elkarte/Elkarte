@@ -158,8 +158,8 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 *
 	 * @param string $destination
 	 * @param string $page_title
-	 * @param Template_Layers $template_layers
 	 * @throws Elk_Exception
+	 * @param ElkArte\Theme\TemplateLayers $template_layers
 	 */
 	public function finalize_post_form(&$destination, &$page_title, $template_layers)
 	{

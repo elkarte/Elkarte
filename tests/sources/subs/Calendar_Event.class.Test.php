@@ -30,6 +30,8 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 		$context['linktree'] = array();
 		// Faking an admin
 		$user_info['is_admin'] = true;
+		// Fiddling with globals is a chore in PHPUnit.
+		theme()->getTemplates()->loadLanguageFile('Errors', 'english', true, true);
 	}
 
 	/**

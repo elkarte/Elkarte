@@ -53,7 +53,7 @@ class ProfileInfo_Controller extends Action_Controller
 		if (!isset($context['user']['is_owner']))
 			$context['user']['is_owner'] = (int) $this->_memID === (int) $user_info['id'];
 
-		loadLanguage('Profile');
+		theme()->getTemplates()->loadLanguageFile('Profile');
 	}
 
 	/**
@@ -981,8 +981,8 @@ class ProfileInfo_Controller extends Action_Controller
 		// Verify if the user has sufficient permissions.
 		isAllowedTo('manage_permissions');
 
-		loadLanguage('ManagePermissions');
-		loadLanguage('Admin');
+		theme()->getTemplates()->loadLanguageFile('ManagePermissions');
+		theme()->getTemplates()->loadLanguageFile('Admin');
 		loadTemplate('ManageMembers');
 		loadTemplate('ProfileInfo');
 
@@ -1177,7 +1177,7 @@ class ProfileInfo_Controller extends Action_Controller
 		$this->_define_user_values();
 
 		// This is returned only for ajax request to a jqueryUI tab
-		Template_Layers::instance()->removeAll();
+		theme()->getLayers()->removeAll();
 		header('Content-Type: text/html; charset=UTF-8');
 
 		// Some buddies for you
@@ -1209,7 +1209,7 @@ class ProfileInfo_Controller extends Action_Controller
 		$context['profile_blocks'] = array();
 
 		// Flush everything since we intend to return the information to an ajax handler
-		Template_Layers::instance()->removeAll();
+		theme()->getLayers()->removeAll();
 		header('Content-Type: text/html; charset=UTF-8');
 
 		// So, just what have you been up to?
@@ -1334,7 +1334,7 @@ class ProfileInfo_Controller extends Action_Controller
 		{
 			include_once(SUBSDIR . '/Who.subs.php');
 			$action = determineActions($user_profile[$this->_memID]['url']);
-			loadLanguage('index');
+			theme()->getTemplates()->loadLanguageFile('index');
 
 			if ($action !== false)
 			{

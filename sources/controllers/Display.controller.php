@@ -121,7 +121,7 @@ class Display_Controller extends Action_Controller
 
 		// How much are we sticking on each page?
 		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
-		$this->_template_layers = Template_Layers::instance();
+		$this->_template_layers = theme()->getLayers();
 		$this->_template_layers->addEnd('messages_informations');
 		$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
 
@@ -476,7 +476,7 @@ class Display_Controller extends Action_Controller
 				addJavascriptVar(array(
 					'likemsg_are_you_sure' => JavaScriptEscape($txt['likemsg_are_you_sure']),
 				));
-				loadLanguage('Errors');
+				theme()->getTemplates()->loadLanguageFile('Errors');
 
 				// Initiate likes and the tooltips for likes
 				addInlineJavascript('

@@ -1493,7 +1493,7 @@ function banLoadAdditionalIPsError($member_id)
 function banLoadAdditionalIPs($member_id)
 {
 	// Borrowing a few language strings from profile.
-	loadLanguage('Profile');
+	theme()->getTemplates()->loadLanguageFile('Profile');
 
 	$search_list = array();
 	call_integration_hook('integrate_load_additional_ip_ban', array(&$search_list));

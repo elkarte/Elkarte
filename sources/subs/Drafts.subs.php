@@ -433,7 +433,7 @@ function saveDraft($draft, $check_last_save = false)
 		// Since we were called from the autosave function, send something back
 		if (!empty($id_draft))
 		{
-			loadLanguage('Drafts');
+			theme()->getTemplates()->loadLanguageFile('Drafts');
 			loadTemplate('Xml');
 			$context['sub_template'] = 'xml_draft';
 			$context['id_draft'] = $id_draft;

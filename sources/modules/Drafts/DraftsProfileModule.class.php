@@ -70,6 +70,6 @@ class Drafts_Profile_Module extends ElkArte\sources\modules\Abstract_Module
 	public function pre_load($post_errors)
 	{
 		if (empty($post_errors))
-			loadLanguage('Drafts');
+			theme()->getTemplates()->loadLanguageFile('Drafts');
 	}
 }

@@ -61,7 +61,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 
 		// Load the paid template anyway.
 		loadTemplate('ManagePaid');
-		loadLanguage('ManagePaid');
+		theme()->getTemplates()->loadLanguageFile('ManagePaid');
 
 		$memID = currentMemberID();
 		$context['member']['id'] = $memID;

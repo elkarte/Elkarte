@@ -195,7 +195,7 @@ function determineActions($urls, $preferred_prefix = false)
 	if (!allowedTo('who_view'))
 		return array();
 
-	loadLanguage('Who');
+	theme()->getTemplates()->loadLanguageFile('Who');
 
 	// Actions that require a specific permission level.
 	$allowedActions = array(

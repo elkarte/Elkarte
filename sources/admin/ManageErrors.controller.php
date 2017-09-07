@@ -65,7 +65,7 @@ class ManageErrors_Controller extends Action_Controller
 		global $scripturl, $txt, $context, $modSettings, $filter;
 
 		// Templates, etc...
-		loadLanguage('Maintenance');
+		theme()->getTemplates()->loadLanguageFile('Maintenance');
 		loadTemplate('Errors');
 
 		// Set up any filters chosen
@@ -320,7 +320,7 @@ class ManageErrors_Controller extends Action_Controller
 		);
 
 		loadTemplate('Errors');
-		Template_Layers::instance()->removeAll();
+		theme()->getLayers()->removeAll();
 		$context['sub_template'] = 'show_file';
 	}
 }

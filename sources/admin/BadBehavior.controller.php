@@ -47,7 +47,7 @@ class BadBehavior_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 
 		// Templates, etc...
-		loadLanguage('BadBehaviorlog');
+		theme()->getTemplates()->loadLanguageFile('BadBehaviorlog');
 		loadTemplate('BadBehavior');
 
 		// Functions we will need

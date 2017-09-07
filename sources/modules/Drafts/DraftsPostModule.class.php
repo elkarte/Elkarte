@@ -117,7 +117,7 @@ class Drafts_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * @param array $editorOptions
 	 * @param int $board
 	 * @param int $topic
-	 * @param Template_Layers $template_layers
+	 * @param ElkArte\Theme\TemplateLayers $template_layers
 	 */
 	public function finalize_post_form(&$editorOptions, $board, $topic, $template_layers)
 	{
@@ -130,7 +130,7 @@ class Drafts_Post_Module extends ElkArte\sources\modules\Abstract_Module
 		// Build a list of drafts that they can load into the editor
 		if (!empty(self::$_drafts_save))
 		{
-			loadLanguage('Drafts');
+			theme()->getTemplates()->loadLanguageFile('Drafts');
 
 			$this->_prepareDraftsContext($user_info['id'], $topic);
 
@@ -281,7 +281,7 @@ class Drafts_Post_Module extends ElkArte\sources\modules\Abstract_Module
 			return false;
 
 		// We haz drafts
-		loadLanguage('Drafts');
+		theme()->getTemplates()->loadLanguageFile('Drafts');
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
 		// has a specific draft has been selected?  Load it up if there is not already a message already in the editor

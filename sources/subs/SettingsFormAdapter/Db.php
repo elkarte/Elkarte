@@ -32,7 +32,7 @@ class Db extends Adapter
 	{
 		global $modSettings;
 
-		loadLanguage('Help');
+		theme()->getTemplates()->loadLanguageFile('Help');
 
 		foreach ($this->configVars as $configVar)
 		{

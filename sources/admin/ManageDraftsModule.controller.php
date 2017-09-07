@@ -174,7 +174,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 	public function action_index()
 	{
 		isAllowedTo('admin_forum');
-		loadLanguage('Drafts');
+		theme()->getTemplates()->loadLanguageFile('Drafts');
 
 		$this->action_draftSettings_display();
 	}
@@ -193,7 +193,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 		global $context, $txt, $scripturl;
 
 		isAllowedTo('admin_forum');
-		loadLanguage('Drafts');
+		theme()->getTemplates()->loadLanguageFile('Drafts');
 
 		// Initialize the form
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
@@ -257,7 +257,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 	{
 		global $txt;
 
-		loadLanguage('Drafts');
+		theme()->getTemplates()->loadLanguageFile('Drafts');
 
 		// Here are all the draft settings, a bit lite for now, but we can add more :P
 		$config_vars = array(

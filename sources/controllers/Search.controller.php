@@ -123,7 +123,7 @@ class Search_Controller extends Action_Controller
 		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
 			throw new Elk_Exception('loadavg_search_disabled', false);
 
-		loadLanguage('Search');
+		theme()->getTemplates()->loadLanguageFile('Search');
 
 		// Don't load this in XML mode.
 		if (!isset($_REQUEST['xml']))
@@ -187,7 +187,7 @@ class Search_Controller extends Action_Controller
 		// Load the error text strings if there were errors in the search.
 		if (!empty($context['search_errors']))
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['search_errors']['messages'] = array();
 			foreach ($context['search_errors'] as $search_error => $dummy)
 			{
@@ -282,7 +282,7 @@ class Search_Controller extends Action_Controller
 		// Maximum length of the string.
 		$context['search_string_limit'] = 100;
 
-		loadLanguage('Search');
+		theme()->getTemplates()->loadLanguageFile('Search');
 		if (!isset($_REQUEST['xml']))
 			loadTemplate('Search');
 		// If we're doing XML we need to use the results template regardless really.

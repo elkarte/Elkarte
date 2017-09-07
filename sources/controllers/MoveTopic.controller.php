@@ -203,9 +203,9 @@ class MoveTopic_Controller extends Action_Controller
 		// Ugly !
 		if ($user_info['language'] != $language)
 		{
-			loadLanguage('index', $language);
+			theme()->getTemplates()->loadLanguageFile('index', $language);
 			$temp = $txt['movetopic_default'];
-			loadLanguage('index');
+			theme()->getTemplates()->loadLanguageFile('index');
 			$txt['movetopic_default'] = $temp;
 		}
 
@@ -368,7 +368,7 @@ class MoveTopic_Controller extends Action_Controller
 		{
 			// Should be in the boardwide language.
 			if ($user_info['language'] != $language)
-				loadLanguage('index', $language);
+				theme()->getTemplates()->loadLanguageFile('index', $language);
 
 			$reason = Util::htmlspecialchars($this->_req->post->reason, ENT_QUOTES);
 			preparsecode($reason);

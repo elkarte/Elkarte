@@ -38,7 +38,7 @@ class ManageSmileys_Controller extends Action_Controller
 	{
 		global $context, $txt, $modSettings;
 
-		loadLanguage('ManageSmileys');
+		theme()->getTemplates()->loadLanguageFile('ManageSmileys');
 		loadTemplate('ManageSmileys');
 
 		$subActions = array(
@@ -1447,8 +1447,8 @@ class ManageSmileys_Controller extends Action_Controller
 		checkSession('request');
 
 		// One of these two may be necessary
-		loadLanguage('Errors');
-		loadLanguage('Packages');
+		theme()->getTemplates()->loadLanguageFile('Errors');
+		theme()->getTemplates()->loadLanguageFile('Packages');
 
 		require_once(SUBSDIR . '/Smileys.subs.php');
 		require_once(SUBSDIR . '/Package.subs.php');

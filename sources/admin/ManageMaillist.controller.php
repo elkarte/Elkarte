@@ -38,7 +38,7 @@ class ManageMaillist_Controller extends Action_Controller
 
 		// Template & language
 		loadTemplate('Maillist');
-		loadLanguage('Maillist');
+		theme()->getTemplates()->loadLanguageFile('Maillist');
 
 		// All the functions available
 		$subActions = array(
@@ -1428,7 +1428,7 @@ class ManageMaillist_Controller extends Action_Controller
 			$context['settings_message'] = $txt['saved'];
 
 		// Templates and language
-		loadLanguage('Admin');
+		theme()->getTemplates()->loadLanguageFile('Admin');
 		loadTemplate('Admin');
 		loadCSSFile('admin.css');
 

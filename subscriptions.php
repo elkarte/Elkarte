@@ -27,7 +27,7 @@ require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 require_once(SUBSDIR . '/Admin.subs.php');
 require_once(SUBSDIR . '/Members.subs.php');
 
-loadLanguage('ManagePaid');
+theme()->getTemplates()->loadLanguageFile('ManagePaid');
 
 // If there's literally nothing coming in, let's take flight!
 if (empty($_POST))

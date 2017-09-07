@@ -87,7 +87,7 @@ updateSettings(array(
 ));
 
 // Basic language is good to have for functional tests
-loadLanguage('index+Errors');
+theme()->getTemplates()->loadLanguageFile('index+Errors');
 
 // If we are running functional tests as well
 if (defined('PHPUNIT_SELENIUM'))

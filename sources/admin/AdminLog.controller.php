@@ -125,7 +125,7 @@ class AdminLog_Controller extends Action_Controller
 		global $txt, $scripturl, $context, $modSettings;
 
 		// Make sure we understand what's going on.
-		loadLanguage('ManageSettings');
+		theme()->getTemplates()->loadLanguageFile('ManageSettings');
 
 		$context['page_title'] = $txt['pruning_title'];
 

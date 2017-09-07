@@ -63,7 +63,7 @@ class Modlog_Controller extends Action_Controller
 
 		$context['can_delete'] = allowedTo('admin_forum');
 
-		loadLanguage('Modlog');
+		theme()->getTemplates()->loadLanguageFile('Modlog');
 
 		$context['page_title'] = $context['log_type'] == 3 ? $txt['modlog_admin_log'] : $txt['modlog_view'];
 

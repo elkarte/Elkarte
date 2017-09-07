@@ -41,7 +41,7 @@ class ManagePaid_Controller extends Action_Controller
 		global $context, $txt, $modSettings;
 
 		// Load the required language and template.
-		loadLanguage('ManagePaid');
+		theme()->getTemplates()->loadLanguageFile('ManagePaid');
 		loadTemplate('ManagePaid');
 
 		$subActions = array(

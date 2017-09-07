@@ -334,14 +334,14 @@ final class ErrorContext
 	private function _loadLang()
 	{
 		// Errors is always needed
-		loadLanguage('Errors');
+		theme()->getTemplates()->loadLanguageFile('Errors');
 
 		// Any custom one?
 		if (!empty($this->_language_files))
 			foreach ($this->_language_files as $language => $loaded)
 				if (!$loaded)
 				{
-					loadLanguage($language);
+					theme()->getTemplates()->loadLanguageFile($language);
 
 					// Remember this file has been loaded already
 					$this->_language_files[$language] = true;

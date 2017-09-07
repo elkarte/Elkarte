@@ -1777,7 +1777,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 {
 	global $scripturl, $txt, $settings, $modSettings;
 
-	loadLanguage('Stats');
+	theme()->getTemplates()->loadLanguageFile('Stats');
 
 	$db = database();
 

@@ -559,7 +559,7 @@ class Data_Validator
 		if (empty($this->_validation_errors))
 			return false;
 
-		loadLanguage('Validation');
+		theme()->getTemplates()->loadLanguageFile('Validation');
 		$result = array();
 
 		// Just want specific errors then it must be an array

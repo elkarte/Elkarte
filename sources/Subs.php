@@ -1840,9 +1840,9 @@ function response_prefix()
 			$response_prefix = $txt['response_prefix'];
 		else
 		{
-			loadLanguage('index', $language, false);
+			theme()->getTemplates()->loadLanguageFile('index', $language, false);
 			$response_prefix = $txt['response_prefix'];
-			loadLanguage('index');
+			theme()->getTemplates()->loadLanguageFile('index');
 		}
 
 		$cache->put('response_prefix', $response_prefix, 600);

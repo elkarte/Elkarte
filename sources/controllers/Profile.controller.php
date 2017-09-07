@@ -85,7 +85,7 @@ class Profile_Controller extends Action_Controller
 
 		// Don't reload this as we may have processed error strings.
 		if (empty($post_errors))
-			loadLanguage('Profile');
+			theme()->getTemplates()->loadLanguageFile('Profile');
 		loadTemplate('Profile');
 
 		// Trigger profile pre-load event
@@ -155,7 +155,7 @@ class Profile_Controller extends Action_Controller
 		// Set the template for this area... if you still can :P
 		// and add the profile layer.
 		$context['sub_template'] = $this->_profile_include_data['function'];
-		Template_Layers::instance()->add('profile');
+		theme()->getLayers()->add('profile');
 
 		// Need JS if we made it this far
 		loadJavascriptFile('profile.js');
@@ -678,7 +678,7 @@ class Profile_Controller extends Action_Controller
 			if (!empty($post_errors))
 			{
 				// Load the language file so we can give a nice explanation of the errors.
-				loadLanguage('Errors');
+				theme()->getTemplates()->loadLanguageFile('Errors');
 				$context['post_errors'] = $post_errors;
 			}
 			elseif (!empty($profile_vars))

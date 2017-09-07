@@ -43,7 +43,7 @@ class User_Notification extends AbstractModel
 	public function __construct()
 	{
 		parent::__construct();
-		loadLanguage('UserNotifications');
+		theme()->getTemplates()->loadLanguageFile('UserNotifications');
 	}
 
 	/**

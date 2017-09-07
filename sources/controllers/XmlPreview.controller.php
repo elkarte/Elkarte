@@ -106,7 +106,7 @@ class XmlPreview_Controller extends Action_Controller
 
 		// Needed to create the preview
 		require_once(SUBSDIR . '/Mail.subs.php');
-		loadLanguage('Errors');
+		theme()->getTemplates()->loadLanguageFile('Errors');
 
 		$context['post_error']['errors'] = array();
 		$context['send_pm'] = !empty($this->_req->post->send_pm) ? 1 : 0;
@@ -131,8 +131,8 @@ class XmlPreview_Controller extends Action_Controller
 		global $context, $txt, $user_info;
 
 		require_once(SUBSDIR . '/Profile.subs.php');
-		loadLanguage('Profile');
-		loadLanguage('Errors');
+		theme()->getTemplates()->loadLanguageFile('Profile');
+		theme()->getTemplates()->loadLanguageFile('Errors');
 
 		$user = isset($this->_req->post->user) ? (int) $this->_req->post->user : 0;
 		$is_owner = $user == $user_info['id'];
@@ -216,8 +216,8 @@ class XmlPreview_Controller extends Action_Controller
 		global $context, $txt, $user_info, $scripturl, $mbname;
 
 		require_once(SUBSDIR . '/Post.subs.php');
-		loadLanguage('Errors');
-		loadLanguage('ModerationCenter');
+		theme()->getTemplates()->loadLanguageFile('Errors');
+		theme()->getTemplates()->loadLanguageFile('ModerationCenter');
 
 		$context['post_error']['errors'] = array();
 
@@ -285,8 +285,8 @@ class XmlPreview_Controller extends Action_Controller
 		global $context, $txt, $scripturl, $mbname, $modSettings;
 
 		require_once(SUBSDIR . '/Post.subs.php');
-		loadLanguage('Errors');
-		loadLanguage('ModerationCenter');
+		theme()->getTemplates()->loadLanguageFile('Errors');
+		theme()->getTemplates()->loadLanguageFile('ModerationCenter');
 
 		$context['post_error']['errors'] = array();
 

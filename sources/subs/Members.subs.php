@@ -480,7 +480,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 
 	$db = database();
 
-	loadLanguage('Login');
+	theme()->getTemplates()->loadLanguageFile('Login');
 
 	// We'll need some external functions.
 	require_once(SUBSDIR . '/Auth.subs.php');

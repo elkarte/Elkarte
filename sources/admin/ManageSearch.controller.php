@@ -43,7 +43,7 @@ class ManageSearch_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		loadLanguage('Search');
+		theme()->getTemplates()->loadLanguageFile('Search');
 		loadTemplate('ManageSearch');
 
 		$subActions = array(

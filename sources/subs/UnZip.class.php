@@ -143,7 +143,7 @@ class UnZip
 			throw new Elk_Exception('package_no_zlib', 'critical');
 
 		// Make sure we have this loaded.
-		loadLanguage('Packages');
+		theme()->getTemplates()->loadLanguageFile('Packages');
 
 		// Likely to need this
 		require_once(SUBSDIR . '/Package.subs.php');

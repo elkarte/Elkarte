@@ -45,9 +45,9 @@ class ManageFeatures_Controller extends Action_Controller
 		global $context, $txt, $settings, $scripturl;
 
 		// Often Helpful
-		loadLanguage('Help');
-		loadLanguage('ManageSettings');
-		loadLanguage('Mentions');
+		theme()->getTemplates()->loadLanguageFile('Help');
+		theme()->getTemplates()->loadLanguageFile('ManageSettings');
+		theme()->getTemplates()->loadLanguageFile('Mentions');
 
 		// All the actions we know about
 		$subActions = array(
@@ -182,7 +182,7 @@ class ManageFeatures_Controller extends Action_Controller
 		{
 			$clean_hives_result = theme()->cleanHives();
 
-			Template_Layers::instance()->removeAll();
+			theme()->getLayers()->removeAll();
 			loadTemplate('Json');
 			addJavascriptVar(array('txt_invalid_response' => $txt['ajax_bad_response']), true);
 			$context['sub_template'] = 'send_json';
@@ -332,7 +332,7 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $txt, $context, $scripturl, $modSettings;
 
-		loadLanguage('Mentions');
+		theme()->getTemplates()->loadLanguageFile('Mentions');
 
 		// Instantiate the form
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
@@ -858,14 +858,14 @@ class ManageFeatures_Controller extends Action_Controller
 		// Any errors messages to show?
 		if (isset($this->_req->query->msg))
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 
 			if (isset($txt['custom_option_' . $this->_req->query->msg]))
 				$context['custom_option__error'] = $txt['custom_option_' . $this->_req->query->msg];
 		}
 
 		// Load the profile language for section names.
-		loadLanguage('Profile');
+		theme()->getTemplates()->loadLanguageFile('Profile');
 
 		// Load up the profile field, if one was supplied
 		if ($context['fid'])
@@ -1165,7 +1165,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$settingsForm->setConfigVars($this->_pmSettings());
 
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
-		loadLanguage('ManageMembers');
+		theme()->getTemplates()->loadLanguageFile('ManageMembers');
 
 		$context['pm_limits'] = loadPMLimits();
 
@@ -1388,8 +1388,8 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $txt, $modSettings;
 
-		loadLanguage('Profile');
-		loadLanguage('UserNotifications');
+		theme()->getTemplates()->loadLanguageFile('Profile');
+		theme()->getTemplates()->loadLanguageFile('UserNotifications');
 
 		// The mentions settings
 		$config_vars = array(

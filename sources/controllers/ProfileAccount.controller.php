@@ -88,7 +88,7 @@ class ProfileAccount_Controller extends Action_Controller
 		}
 
 		// Get the base (errors related) stuff done.
-		loadLanguage('Errors');
+		theme()->getTemplates()->loadLanguageFile('Errors');
 		$context['custom_error_title'] = $txt['profile_warning_errors_occurred'];
 
 		// Make sure things which are disabled stay disabled.

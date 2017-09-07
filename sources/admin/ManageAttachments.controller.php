@@ -732,9 +732,9 @@ class ManageAttachments_Controller extends Action_Controller
 				// And change the message to reflect this.
 				if (!empty($messages))
 				{
-					loadLanguage('index', $language, true);
+					theme()->getTemplates()->loadLanguageFile('index', $language, true);
 					setRemovalNotice($messages, $txt['attachment_delete_admin']);
-					loadLanguage('index', $user_info['language'], true);
+					theme()->getTemplates()->loadLanguageFile('index', $user_info['language'], true);
 				}
 			}
 		}

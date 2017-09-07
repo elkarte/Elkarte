@@ -79,7 +79,7 @@ class Poll_Display_Module extends ElkArte\sources\modules\Abstract_Module
 	/**
 	 * Prepare context to display the poll itself and the appropriate poll buttons
 	 *
-	 * @param Template_Layers $template_layers
+	 * @param ElkArte\Theme\TemplateLayers $template_layers
 	 */
 	public function prepare_context($template_layers)
 	{

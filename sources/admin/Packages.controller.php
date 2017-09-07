@@ -95,7 +95,7 @@ class Packages_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 
 		// Load all the basic stuff.
-		loadLanguage('Packages');
+		theme()->getTemplates()->loadLanguageFile('Packages');
 		loadTemplate('Packages');
 		loadCSSFile('admin.css');
 		$context['page_title'] = $txt['package'];
@@ -1039,7 +1039,7 @@ class Packages_Controller extends Action_Controller
 		// Deal with the template stuff.
 		loadTemplate('Xml');
 		$context['sub_template'] = 'generic_xml';
-		Template_Layers::instance()->removeAll();
+		theme()->getLayers()->removeAll();
 
 		// Define the return data, this is simple.
 		$context['xml_data'] = array(
@@ -1174,7 +1174,7 @@ class Packages_Controller extends Action_Controller
 		$context['operations']['replace'] = $bbc_parser->parsePackage('[code=' . $txt[$operation_text] . ']' . $context['operations']['replace'] . '[/code]');
 
 		// No layers
-		Template_Layers::instance()->removeAll();
+		theme()->getLayers()->removeAll();
 		$context['sub_template'] = 'view_operations';
 	}
 
@@ -1485,7 +1485,7 @@ class Packages_Controller extends Action_Controller
 		{
 			loadTemplate('Xml');
 			$context['sub_template'] = 'generic_xml';
-			Template_Layers::instance()->removeAll();
+			theme()->getLayers()->removeAll();
 		}
 	}
 

@@ -70,7 +70,7 @@ class ModerationCenter_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Menu.subs.php');
 
 		// Load the language, and the template.
-		loadLanguage('ModerationCenter');
+		theme()->getTemplates()->loadLanguageFile('ModerationCenter');
 		loadCSSFile('admin.css');
 
 		if (!empty($options['admin_preferences']))
@@ -398,7 +398,7 @@ class ModerationCenter_Controller extends Action_Controller
 		$context['page_title'] = $txt['show_notice'];
 		$context['sub_template'] = 'show_notice';
 
-		Template_Layers::instance()->removeAll();
+		theme()->getLayers()->removeAll();
 		loadTemplate('ModerationCenter');
 	}
 
@@ -898,7 +898,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// What have the other moderators done to this message?
 		require_once(SUBSDIR . '/Modlog.subs.php');
-		loadLanguage('Modlog');
+		theme()->getTemplates()->loadLanguageFile('Modlog');
 
 		// This is all the information from the moderation log.
 		$listOptions = array(
@@ -1240,7 +1240,7 @@ class ModerationCenter_Controller extends Action_Controller
 		$context['page_title'] = $txt['mc_warning_log_title'];
 
 		require_once(SUBSDIR . '/Moderation.subs.php');
-		loadLanguage('Modlog');
+		theme()->getTemplates()->loadLanguageFile('Modlog');
 
 		// If we're coming in from a search, get the variables.
 		if (!empty($this->_req->post->params) && empty($this->_req->post->is_search))
@@ -1533,7 +1533,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// Some of this stuff is overseas, so to speak.
 		loadTemplate('ModerationCenter');
-		loadLanguage('Profile');
+		theme()->getTemplates()->loadLanguageFile('Profile');
 
 		$subActions = array(
 			'log' => array($this, 'action_viewWarningLog'),

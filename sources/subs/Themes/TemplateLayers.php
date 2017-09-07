@@ -11,12 +11,16 @@
  *
  */
 
+namespace ElkArte\Themes;
+
+use Priority;
+
 /**
  * Class used to manage template layers
  *
  * An instance of the class can be retrieved with the static method getInstance
  */
-class Template_Layers extends Priority
+class TemplateLayers extends Priority
 {
 	/**
 	 * Layers not removed in case of errors
@@ -42,7 +46,7 @@ class Template_Layers extends Priority
 	/**
 	 * Add a new layer to the pile
 	 *
-	 * @param string $layer name of a layer
+	 * @param string   $layer    name of a layer
 	 * @param int|null $priority an integer defining the priority of the layer.
 	 */
 	public function add($layer, $priority = null)
@@ -50,13 +54,15 @@ class Template_Layers extends Priority
 		parent::add($layer, $priority);
 
 		if (self::$_error_safe)
+		{
 			$this->_error_safe_layers[] = $layer;
+		}
 	}
 
 	/**
 	 * Add a layer to the pile before another existing layer
 	 *
-	 * @param string $layer the name of a layer
+	 * @param string $layer     the name of a layer
 	 * @param string $following the name of the layer before which $layer must be added
 	 */
 	public function addBefore($layer, $following)
@@ -64,13 +70,15 @@ class Template_Layers extends Priority
 		parent::addBefore($layer, $following);
 
 		if (self::$_error_safe)
+		{
 			$this->_error_safe_layers[] = $layer;
+		}
 	}
 
 	/**
 	 * Add a layer to the pile after another existing layer
 	 *
-	 * @param string $layer the name of a layer
+	 * @param string $layer    the name of a layer
 	 * @param string $previous the name of the layer after which $layer must be added
 	 */
 	public function addAfter($layer, $previous)
@@ -78,13 +86,15 @@ class Template_Layers extends Priority
 		parent::addAfter($layer, $previous);
 
 		if (self::$_error_safe)
+		{
 			$this->_error_safe_layers[] = $layer;
+		}
 	}
 
 	/**
 	 * Add a layer at the end of the pile
 	 *
-	 * @param string $layer name of a layer
+	 * @param string   $layer    name of a layer
 	 * @param int|null $priority an integer defining the priority of the layer.
 	 */
 	public function addEnd($layer, $priority = null)
@@ -92,13 +102,15 @@ class Template_Layers extends Priority
 		parent::addEnd($layer, $priority);
 
 		if (self::$_error_safe)
+		{
 			$this->_error_safe_layers[] = $layer;
+		}
 	}
 
 	/**
 	 * Add a layer at the beginning of the pile
 	 *
-	 * @param string $layer name of a layer
+	 * @param string   $layer    name of a layer
 	 * @param int|null $priority an integer defining the priority of the layer.
 	 */
 	public function addBegin($layer, $priority = null)
@@ -106,7 +118,9 @@ class Template_Layers extends Priority
 		parent::addBegin($layer, $priority);
 
 		if (self::$_error_safe)
+		{
 			$this->_error_safe_layers[] = $layer;
+		}
 	}
 
 	/**
@@ -124,12 +138,14 @@ class Template_Layers extends Priority
 		if ($this->_is_error)
 		{
 			$dummy = $all_layers;
-			$all_layers = array();
+			$all_layers = [];
 
 			foreach ($dummy as $key => $val)
 			{
 				if (in_array($key, $this->_error_safe_layers))
+				{
 					$all_layers[$key] = $val;
+				}
 			}
 		}
 
@@ -147,7 +163,9 @@ class Template_Layers extends Priority
 	public function reverseLayers()
 	{
 		if ($this->_sorted_entities === null)
+		{
 			$this->prepareContext();
+		}
 
 		return array_reverse($this->_sorted_entities);
 	}
@@ -156,15 +174,23 @@ class Template_Layers extends Priority
 	 * Check if at least one layer has been added
 	 *
 	 * @param boolean $base if true will not consider body and html layers in result
+	 *
 	 * @return bool true if at least one layer has been added
 	 * @todo at that moment _all_after and _all_before are not considered because they may not be "forced"
 	 */
 	public function hasLayers($base = false)
 	{
 		if (!$base)
+		{
 			return (!empty($this->_all_general) || !empty($this->_all_begin) || !empty($this->_all_end));
+		}
 		else
-			return array_diff_key(array_merge($this->_all_general, $this->_all_begin, $this->_all_end), array('body' => 0, 'html' => 0));
+		{
+			return array_diff_key(array_merge($this->_all_general, $this->_all_begin, $this->_all_end), [
+				'body' => 0,
+				'html' => 0,
+			]);
+		}
 	}
 
 	/**
@@ -172,7 +198,8 @@ class Template_Layers extends Priority
 	 */
 	public function getLayers()
 	{
-		return array_keys(array_merge($this->_all_general, $this->_all_begin, $this->_all_end, $this->_all_after, $this->_all_before));
+		return array_keys(array_merge($this->_all_general, $this->_all_begin, $this->_all_end, $this->_all_after,
+			$this->_all_before));
 	}
 
 	/**
@@ -184,33 +211,24 @@ class Template_Layers extends Priority
 	}
 
 	/**
-	 * Find and return Template_Layers instance if it exists,
+	 * Find and return ElkArte\Theme\TemplateLayers instance if it exists,
 	 * or create a new instance if it didn't already exist.
 	 *
-	 * @param boolean $error_safe if error mode is on or off
-	 * @return Template_Layers instance of the class
-	 */
-	public static function instance($error_safe = false)
-	{
-		if (self::$_instance === null)
-			self::$_instance = new Template_Layers();
-
-		self::$_error_safe = $error_safe;
-
-		return self::$_instance;
-	}
-
-	/**
-	 * Find and return Template_Layers instance if it exists,
-	 * or create a new instance if it didn't already exist.
-	 *
-	 * @deprecated since Elk 1.1 - use instance instead
+	 * @deprecated use the theme object
 	 *
 	 * @param boolean $error_safe if error mode is on or off
-	 * @return Template_Layers instance of the class
+	 *
+	 * @return ElkArte\Theme\TemplateLayers instance of the class
 	 */
 	public static function getInstance($error_safe = false)
 	{
-		return self::instance($error_safe);
+		if (self::$_instance === null)
+		{
+			self::$_instance = theme()->getLayers();
+		}
+
+		self::$_error_safe = $error_safe;
+
+		return theme()->getLayers();
 	}
 }

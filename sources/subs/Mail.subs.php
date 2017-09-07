@@ -819,14 +819,14 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 	// First things first, load up the email templates language file, if we need to.
 	if ($loadLang)
 	{
-		loadLanguage('EmailTemplates', $lang);
+		theme()->getTemplates()->loadLanguageFile('EmailTemplates', $lang);
 		if (!empty($modSettings['maillist_enabled']))
-			loadLanguage('MaillistTemplates', $lang);
+			theme()->getTemplates()->loadLanguageFile('MaillistTemplates', $lang);
 
 		if (!empty($additional_files))
 		{
 			foreach ($additional_files as $file)
-				loadLanguage($file, $lang);
+				theme()->getTemplates()->loadLanguageFile($file, $lang);
 		}
 	}
 
@@ -889,7 +889,7 @@ function prepareMailingForPreview()
 {
 	global $context, $modSettings, $scripturl, $user_info, $txt;
 
-	loadLanguage('Errors');
+	theme()->getTemplates()->loadLanguageFile('Errors');
 	require_once(SUBSDIR . '/Post.subs.php');
 
 	$processing = array(

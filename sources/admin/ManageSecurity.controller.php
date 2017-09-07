@@ -34,8 +34,8 @@ class ManageSecurity_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		loadLanguage('Help');
-		loadLanguage('ManageSettings');
+		theme()->getTemplates()->loadLanguageFile('Help');
+		theme()->getTemplates()->loadLanguageFile('ManageSettings');
 
 		$subActions = array(
 			'general' => array($this, 'action_securitySettings_display', 'permission' => 'admin_forum'),

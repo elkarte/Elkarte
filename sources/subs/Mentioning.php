@@ -269,7 +269,7 @@ class Mentioning extends AbstractModel
 			return false;
 
 		// If everything is fine, let's prepare for the fun!
-		loadLanguage('Mentions');
+		theme()->getTemplates()->loadLanguageFile('Mentions');
 
 		return true;
 	}

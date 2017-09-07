@@ -44,7 +44,7 @@ class ManageServer_Controller extends Action_Controller
 		global $context, $txt;
 
 		// The settings are in here, I swear!
-		loadLanguage('ManageSettings');
+		theme()->getTemplates()->loadLanguageFile('ManageSettings');
 
 		// This is just to keep the database password more secure.
 		isAllowedTo('admin_forum');
@@ -293,9 +293,9 @@ class ManageServer_Controller extends Action_Controller
 			redirectexit('action=admin;area=serversettings;sa=cache;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
-		loadLanguage('Maintenance');
+		theme()->getTemplates()->loadLanguageFile('Maintenance');
 		createToken('admin-maint');
-		Template_Layers::instance()->add('clean_cache_button');
+		theme()->getLayers()->add('clean_cache_button');
 
 		// Some javascript to enable / disable certain settings if the option is not selected
 		addInlineJavascript('

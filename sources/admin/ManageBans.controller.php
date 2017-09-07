@@ -322,7 +322,7 @@ class ManageBans_Controller extends Action_Controller
 		$ban_group_id = isset($context['ban']['id']) ? $context['ban']['id'] : $this->_req->getQuery('bg', 'intval', 0);
 
 		// Template needs this to show errors using javascript
-		loadLanguage('Errors');
+		theme()->getTemplates()->loadLanguageFile('Errors');
 		createToken('admin-bet');
 		$context['form_url'] = $scripturl . '?action=admin;area=ban;sa=edit';
 

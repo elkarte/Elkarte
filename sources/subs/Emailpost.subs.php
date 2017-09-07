@@ -627,7 +627,7 @@ function pbe_emailError($error, $email_message)
 
 	$db = database();
 
-	loadLanguage('EmailTemplates');
+	theme()->getTemplates()->loadLanguageFile('EmailTemplates');
 
 	// Some extra items we will need to remove from the message subject
 	$pm_subject_leader = str_replace('{SUBJECT}', '', $txt['new_pm_subject']);
@@ -907,7 +907,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 {
 	global $context;
 
-	loadLanguage('Maillist');
+	theme()->getTemplates()->loadLanguageFile('Maillist');
 
 	// Check on some things needed by parse_bbc as an autotask does not load them
 	if (!isset($context['browser']))

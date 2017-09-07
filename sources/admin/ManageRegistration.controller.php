@@ -47,7 +47,7 @@ class ManageRegistration_Controller extends Action_Controller
 		global $context, $txt;
 
 		// Loading, always loading.
-		loadLanguage('Login');
+		theme()->getTemplates()->loadLanguageFile('Login');
 		loadTemplate('Register');
 		loadJavascriptFile('register.js');
 

@@ -20,6 +20,7 @@
 namespace ElkArte\Errors;
 
 use Elk_Exception;
+use AbstractModel;
 
 /**
  * Class to handle all forum errors and exceptions
@@ -209,7 +210,7 @@ class Errors extends \AbstractModel
 	{
 		global $user_info, $language, $txt;
 
-		loadLanguage('Errors', $language);
+		theme()->getTemplates()->loadLanguageFile('Errors', $language);
 
 		$reload_lang_file = $language != $user_info['language'];
 
@@ -218,7 +219,7 @@ class Errors extends \AbstractModel
 
 		// Load the language file, only if it needs to be reloaded
 		if ($reload_lang_file)
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 
 		// Return the message to make things simpler.
 		return $error_message;
@@ -299,6 +300,7 @@ class Errors extends \AbstractModel
 		// Load the template and set the sub template.
 		loadTemplate('Errors');
 		$context['sub_template'] = 'fatal_error';
+		theme()->getLayers()->isError();
 
 		if (class_exists('Template_Layers'))
 			\Template_Layers::instance()->isError();

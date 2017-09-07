@@ -66,7 +66,7 @@ class ManagePermissions_Controller extends Action_Controller
 		$this->illegal_permissions = $this->permissionsObject->getIllegalPermissions();
 		$this->illegal_guest_permissions = $this->permissionsObject->getIllegalGuestPermissions();
 
-		loadLanguage('ManagePermissions+ManageMembers');
+		theme()->getTemplates()->loadLanguageFile('ManagePermissions+ManageMembers');
 		loadTemplate('ManagePermissions');
 
 		// Format: 'sub-action' => array('function_to_call', 'permission_needed'),

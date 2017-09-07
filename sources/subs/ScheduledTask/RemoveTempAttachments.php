@@ -60,7 +60,7 @@ class Remove_Temp_Attachments implements Scheduled_Task_Interface
 			catch (UnexpectedValueException $e)
 			{
 				loadEssentialThemeData();
-				loadLanguage('Post');
+				theme()->getTemplates()->loadLanguageFile('Post');
 
 				$context['scheduled_errors']['remove_temp_attachments'][] = $txt['cant_access_upload_path'] . ' (' . $attach_dir . ')';
 				\Errors::instance()->log_error($txt['cant_access_upload_path'] . ' (' . $e->getMessage() . ')', 'critical');

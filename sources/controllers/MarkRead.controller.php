@@ -95,13 +95,13 @@ class MarkRead_Controller extends Action_Controller
 
 		loadTemplate('Xml');
 
-		Template_Layers::instance()->removeAll();
+		theme()->getLayers()->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		// Guests can't mark things.
 		if ($user_info['is_guest'])
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['not_guests']
@@ -115,7 +115,7 @@ class MarkRead_Controller extends Action_Controller
 			// Again, this is a special case, someone will deal with the others later :P
 			if ($this->_req->getQuery('sa') === 'all')
 			{
-				loadLanguage('Errors');
+				theme()->getTemplates()->loadLanguageFile('Errors');
 				$context['xml_data'] = array(
 					'error' => 1,
 					'url' => $scripturl . '?action=markasread;sa=all;' . $context['session_var'] . '=' . $context['session_id'],

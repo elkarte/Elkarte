@@ -83,7 +83,7 @@ class Paid_Subscriptions implements Scheduled_Task_Interface
 			// If this is the first one load the important bits.
 			if (empty($subs_reminded))
 			{
-				// Need the below for loadLanguage to work!
+				// Need the below for theme()->getTemplates()->loadLanguageFile to work!
 				require_once(SUBSDIR . '/Mail.subs.php');
 				loadEssentialThemeData();
 			}

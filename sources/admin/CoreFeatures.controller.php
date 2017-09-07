@@ -359,8 +359,8 @@ class CoreFeatures_Controller extends Action_Controller
 		// You need to be an admin to edit settings!
 		isAllowedTo('admin_forum');
 
-		loadLanguage('Help');
-		loadLanguage('ManageSettings');
+		theme()->getTemplates()->loadLanguageFile('Help');
+		theme()->getTemplates()->loadLanguageFile('ManageSettings');
 
 		$context['sub_template'] = 'show_settings';
 

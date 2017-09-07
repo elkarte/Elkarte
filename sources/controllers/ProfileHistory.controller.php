@@ -222,7 +222,7 @@ class ProfileHistory_Controller extends Action_Controller
 
 		loadTemplate('Profile');
 		loadTemplate('ProfileHistory');
-		loadLanguage('Profile');
+		theme()->getTemplates()->loadLanguageFile('Profile');
 
 		if ($this->_memID == 0)
 		{

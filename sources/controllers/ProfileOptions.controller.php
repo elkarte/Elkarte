@@ -526,7 +526,7 @@ class ProfileOptions_Controller extends Action_Controller
 	{
 		global $context, $cur_profile, $post_errors, $modSettings;
 
-		loadLanguage('Login');
+		theme()->getTemplates()->loadLanguageFile('Login');
 		loadTemplate('ProfileOptions');
 
 		// We are saving?

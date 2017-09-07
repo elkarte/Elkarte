@@ -402,7 +402,7 @@ class ManageNews_Controller extends Action_Controller
 		$this->action_mailingsend(true);
 
 		// We need a couple strings from the email template file
-		loadLanguage('EmailTemplates');
+		theme()->getTemplates()->loadLanguageFile('EmailTemplates');
 		require_once(SUBSDIR . '/News.subs.php');
 
 		// Get a list of all full banned users.  Use their Username and email to find them.

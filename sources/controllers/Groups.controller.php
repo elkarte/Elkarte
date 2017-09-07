@@ -33,8 +33,8 @@ class Groups_Controller extends Action_Controller
 		global $context, $txt, $scripturl, $user_info;
 
 		// Get the template stuff up and running.
-		loadLanguage('ManageMembers');
-		loadLanguage('ModerationCenter');
+		theme()->getTemplates()->loadLanguageFile('ManageMembers');
+		theme()->getTemplates()->loadLanguageFile('ModerationCenter');
 		loadTemplate('ManageMembergroups');
 
 		// If we can see the moderation center, and this has a mod bar entry, add the mod center bar.
@@ -535,7 +535,7 @@ class Groups_Controller extends Action_Controller
 				}
 
 				// Restore the current language.
-				loadLanguage('ModerationCenter');
+				theme()->getTemplates()->loadLanguageFile('ModerationCenter');
 			}
 		}
 
