@@ -572,7 +572,7 @@ $txt['skip_nav'] = 'Skip to main content';
 $txt['go_up'] = 'Go Up';
 $txt['go_down'] = 'Go Down';
 
-$forum_copyright = '<a href="http://www.elkarte.net" title="ElkArte Forum" target="_blank" class="new_win">powered by %1$s</a> | <a href="{credits_url}" title="Credits" target="_blank" class="new_win" rel="nofollow">credits</a>';
+$forum_copyright = '<a href="http://www.elkarte.net" title="ElkArte Forum" target="_blank" class="new_win">Powered by %1$s</a> | <a href="{credits_url}" title="Credits" target="_blank" class="new_win" rel="nofollow">Credits</a>';
 
 $txt['birthdays'] = 'Birthdays:';
 $txt['events'] = 'Events:';
