@@ -254,7 +254,6 @@ legend {
 /* ------------------------------------------------------- */
 .linktree:not(:last-child):after {
 	transform: scale(1) rotate(-135deg);
-	-webkit-transform: scale(1) rotate(-135deg);
 }
 
 /*	$BOARDICONS	*/
