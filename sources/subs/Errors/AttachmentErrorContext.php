@@ -207,14 +207,23 @@ class AttachmentErrorContext
 			);
 
 		if (!empty($this->_attachs))
+		{
 			foreach ($this->_attachs as $attachID => $error)
+			{
 				$returns[$attachID] = array(
 					'errors' => $error['error']->prepareErrors($severity),
 					'type' => $this->getErrorType(),
 					'title' => sprintf($txt['attach_warning'], $error['name']),
 				);
+			}
+		}
 
 		return $returns;
+	}
+
+	public function getName()
+	{
+		return 'attach_error_title';
 	}
 
 	/**

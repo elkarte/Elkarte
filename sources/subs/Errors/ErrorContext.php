@@ -138,11 +138,51 @@ final class ErrorContext
 	protected function getErrorName($error)
 	{
 		if (is_array($error))
-			return $error[0];
+		{
+			$first_error = array_values($error);
+			if (is_object($first_error[0]))
+			{
+				return $this->getErrorName($first_error[0]);
+			}
+			else
+			{
+				return $first_error[0];
+			}
+		}
 		elseif (is_object($error))
+		{
 			return $error->getName();
+		}
 		else
+		{
 			return $error;
+		}
+	}
+
+	/**
+	 * Finds the "value" of the error (Usually applicable only to
+	 * array of strings, being the second element of the array)
+	 *
+	 * @param mixed|mixed[] $error error code
+	 */
+	protected function getErrorValue($error)
+	{
+		if (is_array($error))
+		{
+			$first_error = array_values($error);
+			if (is_object($first_error[0]))
+			{
+				return null;
+			}
+			else
+			{
+				return $first_error[1];
+			}
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 	/**
@@ -266,11 +306,23 @@ final class ErrorContext
 		foreach ($errors as $error_val)
 		{
 			if (is_array($error_val))
-				$returns[$error_val[0]] = vsprintf(isset($txt['error_' . $error_val[0]]) ? $txt['error_' . $error_val[0]] : (isset($txt[$error_val[0]]) ? $txt[$error_val[0]] : $error_val[0]), $error_val[1]);
+			{
+				$name = $this->getErrorName($error_val);
+				$value = $this->getErrorValue($error_val);
+				if ($value === null)
+				{
+					continue;
+				}
+				$returns[$name] = vsprintf(isset($txt['error_' . $name]) ? $txt['error_' . $name] : (isset($txt[$name]) ? $txt[$name] : $name), $value);
+			}
 			elseif (is_object($error_val))
+			{
 				continue;
+			}
 			else
+			{
 				$returns[$error_val] = isset($txt['error_' . $error_val]) ? $txt['error_' . $error_val] : (isset($txt[$error_val]) ? $txt[$error_val] : $error_val);
+			}
 		}
 
 		return $returns;
