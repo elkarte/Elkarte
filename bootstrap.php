@@ -309,6 +309,15 @@ if (isset($ssi_layers))
 }
 else
 {
+	if (!empty($modSettings['front_page']) && is_callable(array($modSettings['front_page'], 'frontPageHook')))
+	{
+		$modSettings['default_forum_action'] = '?action=forum;';
+	}
+	else
+	{
+		$modSettings['default_forum_action'] = '';
+	}
+
 	setupThemeContext();
 }
 
