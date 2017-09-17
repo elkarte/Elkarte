@@ -352,6 +352,7 @@ function processAttachments($id_msg = null)
 	global $context, $modSettings, $txt, $user_info, $ignore_temp, $topic, $board;
 
 	$attach_errors = ElkArte\Errors\AttachmentErrorContext::context();
+	$added_initial_error = false;
 
 	// Make sure we're uploading to the right place.
 	if (!empty($modSettings['automanage_attachments']))
@@ -435,35 +436,36 @@ function processAttachments($id_msg = null)
 			'board' => !empty($board) ? $board : 0,
 		);
 
-	// If we have an initial error, lets just display it.
-	if (!empty($initial_error))
-	{
-		$_SESSION['temp_attachments']['initial_error'] = $initial_error;
-
-		// This is a generic error
-		$attach_errors->activate();
-		$attach_errors->addError('attach_no_upload');
-		// @todo This is likely the result of some refactoring, verify when $attachment is not set and why
-		if (isset($attachment))
-		{
-			$attach_errors->addError(is_array($attachment) ? array($attachment[0], $attachment[1]) : $attachment);
-		}
-
-		// And delete the files 'cos they ain't going nowhere.
-		foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
-		{
-			if (file_exists($_FILES['attachment']['tmp_name'][$n]))
-				unlink($_FILES['attachment']['tmp_name'][$n]);
-		}
-
-		$_FILES['attachment']['tmp_name'] = array();
-	}
-
 	// Loop through $_FILES['attachment'] array and move each file to the current attachments folder.
 	foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
 	{
 		if ($_FILES['attachment']['name'][$n] == '')
 			continue;
+
+		// If we have an initial error, lets just display it.
+		if (!empty($initial_error) && $added_initial_error === false)
+		{
+			$added_initial_error = true;
+			$_SESSION['temp_attachments']['initial_error'] = $initial_error;
+
+			// This is a generic error
+			$attach_errors->activate();
+			$attach_errors->addError('attach_no_upload');
+			// @todo This is likely the result of some refactoring, verify when $attachment is not set and why
+			if (isset($attachment))
+			{
+				$attach_errors->addError(is_array($attachment) ? array($attachment[0], $attachment[1]) : $attachment);
+			}
+
+			// And delete the files 'cos they ain't going nowhere.
+			foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
+			{
+				if (file_exists($_FILES['attachment']['tmp_name'][$n]))
+					unlink($_FILES['attachment']['tmp_name'][$n]);
+			}
+
+			$_FILES['attachment']['tmp_name'] = array();
+		}
 
 		// First, let's first check for PHP upload errors.
 		$errors = attachmentUploadChecks($n);
