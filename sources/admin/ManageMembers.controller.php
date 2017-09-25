@@ -1190,13 +1190,20 @@ class ManageMembers_Controller extends Action_Controller
 	{
 		global $scripturl;
 
+		require_once(SUBSDIR . '/Auth.subs.php');
+
 		foreach ($this->member_info as $member)
 		{
+			$this->conditions['selected_member'] = $member['id'];
+			$this->conditions['validation_code'] = generateValidationCode(14);
+
+			enforceReactivation($this->conditions);
+
 			$replacements = array(
 				'USERNAME' => $member['name'],
-				'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $member['id'] . ';code=' . $member['code'],
+				'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $member['id'] . ';code=' . $this->conditions['validation_code'],
 				'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=register;sa=activate;u=' . $member['id'],
-				'ACTIVATIONCODE' => $member['code'],
+				'ACTIVATIONCODE' => $this->conditions['validation_code'],
 			);
 
 			$emaildata = loadEmailTemplate('admin_approve_remind', $replacements, $member['language']);
