@@ -303,7 +303,7 @@ function template_messages()
 			if ($message['can_like'] || $message['can_unlike'])
 				echo '
 							<li class="listlevel1', !empty($message['like_counter']) ? ' liked"' : '"', '>
-								<a class="linklevel1 ', $message['can_unlike'] ? 'unlike_button' : 'like_button', '" href="javascript:void(0)" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" onclick="likePosts.prototype.likeUnlikePosts(event,', $message['id'], ', ', $context['current_topic'], '); return false;">',
+								<a class="linklevel1 ', $message['can_unlike'] ? 'unlike_button' : 'like_button', '" href="javascript:void(0)" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : $txt['like_post'], '" onclick="likePosts.prototype.likeUnlikePosts(event,', $message['id'], ', ', $context['current_topic'], '); return false;">',
 									!empty($message['like_counter']) ? '<span class="likes_indicator">' . $message['like_counter'] . '</span>&nbsp;' . $txt['likes'] : $txt['like_post'], '
 								</a>
 							</li>';
@@ -312,7 +312,7 @@ function template_messages()
 			else
 				echo '
 							<li class="listlevel1', !empty($message['like_counter']) ? ' liked"' : '"', '>
-								<a href="javascript:void(0)" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 likes_button">',
+								<a href="javascript:void(0)" role="button" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 likes_button">',
 									!empty($message['like_counter']) ? '<span class="likes_indicator">' . $message['like_counter'] . '</span>&nbsp;' . $txt['likes'] : '&nbsp;', '
 								</a>
 							</li>';
@@ -322,7 +322,7 @@ function template_messages()
 		if ($message['can_modify'])
 			echo '
 							<li id="modify_button_', $message['id'], '" class="listlevel1 quick_edit hide">
-								<a class="linklevel1 quick_edit" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')">', $txt['quick_edit'], '</a>
+								<a class="linklevel1 quick_edit" role="button" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')">', $txt['quick_edit'], '</a>
 							</li>';
 
 		// Can they reply? Have they turned on quick reply?

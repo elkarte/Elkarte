@@ -90,7 +90,7 @@ function template_verification_control_captcha($verify_id, $verify_context)
 
 	echo '
 				<div class="smalltext">
-					<a href="', $verify_context['image_href'], ';sound" id="visual_verification_', $verify_id, '_sound" data-type="sound" class="playsound" rel="nofollow">', $txt['visual_verification_sound'], '</a> / <a href="#visual_verification_', $verify_id, '_refresh" id="visual_verification_', $verify_id, '_refresh" class="refreshimage">', $txt['visual_verification_request_new'], '</a><br /><br />
+					<a href="', $verify_context['image_href'], ';sound" id="visual_verification_', $verify_id, '_sound" data-type="sound" class="playsound" rel="nofollow" onclick="document.getElementById(\'', $verify_id, '_vv[code]\').focus()">', $txt['visual_verification_sound'], '</a> / <a href="#visual_verification_', $verify_id, '_refresh" id="visual_verification_', $verify_id, '_refresh" class="refreshimage">', $txt['visual_verification_request_new'], '</a><br /><br />
 					<label for="', $verify_id, '_vv[code]">', $txt['visual_verification_description'], '</label>:
 					<input type="text" id="', $verify_id, '_vv[code]" name="', $verify_id, '_vv[code]" value="', !empty($verify_context['text_value']) ? $verify_context['text_value'] : '', '" size="30" tabindex="', $context['tabindex']++, '" class="', $verify_context['is_error'] ? 'border_error ' : '', 'input_text" />
 				</div>';

@@ -603,7 +603,9 @@ function template_verification_sound()
 			</object>';
 	else
 		echo '
-			<object type="audio/x-wav" data="', $context['verification_sound_href'], '"></object>';
+			<audio controls="controls" autoplay="autoplay">
+				<source src="', $context['verification_sound_href'], '" type="audio/wav">
+			</audio>';
 
 	echo '
 			<br />
