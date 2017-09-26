@@ -652,48 +652,48 @@ $helptxt['frame_security'] = 'The X-Frame-Options HTTP response header can be us
 	<br />
 	More information about this header may be found on the internet.';
 
-$helptxt['attachment_inline_title'] = '<b>Add an inline attachment</b><br />
+$helptxt['attachment_inline_title'] = '<b>Add an inline attachment</><br />
 		Example:
-		<br /><b>[attach=123 align=left width=400]</b>
+		<br /><b>[attach align=left width=400]123[/attach]</b>
 		<br />This will show a left-aligned image resized to 400 pixels wide with the post text flowing around it. Execpt for the attachment tag and the attachment id all other parameters are optional
-		<br /><b>[attach=123]</b>
-		<br />This will show the attachment as a thumbnail if available, if no thumbnail is available it will use a full sized image.  The image will be in line with the text of your post.
+		<br /><b>[attach]123[/attach]</b>
+		<br />This will show the attachment as a thumbnail if available, if no thumbnail is available it will use a full sized image. The image will be in line with the text of your post.
 		<br /><br />
-		<b>Options:</b>
-		<br />attach=x where x is the attachment id
+		<br /><b>Options:</b>
+		<br />where x is the attachment id
 		<br />align=left, center, right
 		<br />width=### (where # is number in pixels)
 		<br />height=### (where # is number in pixels)
 		<br />
-			<h3>Modes available</h3>
-			<p>
-				You can choose the inline mode you want for your attachment:
-				<ul>
-					<li>Thumbnail [attach=x] : Your image will be shown as a thumbnail</li>
-					<li>Text Link [attachurl=x] : Only a link is show with size and view details. By clicking on it, the image is displayed.</li>
-				</ul>
-			</p><br />
+		<h3>Modes available</h3>
+		<p>
+			You can choose the inline mode you want for your attachment:
+			<ul>
+				<li>Thumbnail [attach]x[/attach] : Your image will be shown as a thumbnail</li>
+				<li>Text Link [attachurl]x[/attachurl] : Only a link is show with size and view details. By clicking on it, the image is displayed.</li>
+			</ul>
+		</p><br />
 		<p>
 			You can choose how to align the inline image:
 			<ul>
 				<li>align=left : The image is aligned to the left and the text will flow around it</li>
 				<li>align=right : The image is aligned to the right and the text will flow around it</li>
 				<li>align=center : The image is centered and the text will be below it</li>
-			</ul>
+			<ul>
 		</p><br />
 		<p>
 			You can choose how wide to show the image:
 			<ul>
 				<li>width=123 : The image is displayed 123 pixels wide</li>
 				<li>If the width specified is larger than the image or larger than the forum allows the largest allowable width will be used</li>
-				<li>Can be used to shrink a thumbnail as well [attach=1 width=50] will display a 50px wide thumbnail
-			</ul>
+				<li>Can be used to shrink a thumbnail as well [attach width=50]x[/attach] will display a 50px wide thumbnail</li>
+			<ul>
 		</p><br />
 		<p>
 			You can choose how tall to show the image:
 			<ul>
 				<li>height=123 : The image is displayed 123 pixels tall</li>
 				<li>If the height specified is bigger than the image or bigger than the forum allows the biggest allowable width will be used</li>
-				<li>Can be used to shrink a thumbnail as well [attach=1 height=50] will display a 50px tall thumbnail
+				<li>Can be used to shrink a thumbnail as well [attach height=50]x[/attach] will display a 50px tall thumbnail</li>
 			</ul>
 		</p>';

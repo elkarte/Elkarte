@@ -325,7 +325,7 @@ function template_retry_activate()
 
 	// Just ask them for their code so they can try it again...
 	echo '
-		<form action="', $scripturl, '?action=register;sa=activate;u=', $context['member_id'], '" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '" method="get" accept-charset="UTF-8">
 			<h2 class="category_header">', $context['page_title'], '</h2>
 			<div class="well">
 				<dl class="settings">';
@@ -350,6 +350,9 @@ function template_retry_activate()
 				</dl>
 				<div class="submitbutton">
 					<input type="submit" value="', $txt['invalid_activation_submit'], '" />
+					<input type="hidden" name="action" value="register" />
+					<input type="hidden" name="sa" value="activate" />
+					<input type="hidden" name="u" value="', $context['member_id'], '" />
 				</div>
 			</div>
 		</form>';
