@@ -308,7 +308,7 @@ function template_post_page()
 	// Option to add a poll (javascript if enabled, otherwise preview with poll)
 	if (empty($context['make_poll']) && $context['can_add_poll'])
 		echo '
-							<input type="submit" name="poll" value="', $txt['add_poll'], '" onclick="return loadAddNewPoll(this, ', empty($context['current_board']) ? '0' : $context['current_board'], ', \'postmodify\');" />';
+							<input type="submit" name="poll" aria-label="', $txt['add_poll'], '" value="', $txt['add_poll'], '" onclick="return loadAddNewPoll(this, ', empty($context['current_board']) ? '0' : $context['current_board'], ', \'postmodify\');" />';
 
 	echo '
 						</div>';
