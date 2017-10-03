@@ -536,7 +536,7 @@ class Auth_Controller extends Action_Controller
 			}
 
 			// Some whitelisting for login_url...
-			if (validLoginUrl($_SESSION['login_url']) === false)
+			if (empty($_SESSION['login_url']) || validLoginUrl($_SESSION['login_url']) === false)
 			{
 				$temp = '';
 			}
