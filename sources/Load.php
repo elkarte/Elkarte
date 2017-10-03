@@ -1653,9 +1653,8 @@ function loadThemeUrls()
 				redirectexit('wwwRedirect');
 			else
 			{
-				list ($k, $v) = each($_GET);
-				if ($k != 'wwwRedirect')
-					redirectexit('wwwRedirect;' . $k . '=' . $v);
+				if (key($_GET) !== 'wwwRedirect')
+					redirectexit('wwwRedirect;' . key($_GET) . '=' . current($_GET));
 			}
 		}
 
