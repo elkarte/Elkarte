@@ -188,7 +188,7 @@ h2 a.collapse {
 }
 
 #search_form {
-	padding: 12px 8px 4px 3px;
+	padding: .75em .5em .25em .25em;
 	float: left;
 }
 
