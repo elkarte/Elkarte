@@ -940,7 +940,7 @@ a.bbc_link {
 #top_section_notice {
 	float: left;
 	margin: 0;
-	padding: 12px 8px 0 8px;
+	padding: .75em .5em .25em .25em;
 	min-width: 38%;
 	line-height: 1.286em;
 	font-weight: 700;
@@ -1554,7 +1554,6 @@ a.bbc_link {
 
 .linktree {
 	position: relative;
-	display: inline-block;
 	float: left;
 	padding: 0 1em 0 2em;
 	border: none;
@@ -1937,7 +1936,7 @@ a.bbc_link {
 
 .small_pagelinks li {
 	float: left;
-	display: inline;
+	display: block;
 }
 
 .small_pagelinks li:last-child {
@@ -1983,6 +1982,7 @@ a.bbc_link {
 	font-size: 2em;
 	transform: translateZ(0);
 	-webkit-transform: translateZ(0);
+	-ms-transform: translateZ(0);
 	backface-visibility: hidden;
 	-webkit-backface-visibility: hidden;
 	border: 1px solid;
@@ -2096,7 +2096,7 @@ a.bbc_link {
 	float: right;
 	overflow: auto;
 	margin: 0 0 3px 0;
-	padding: 0;
+	padding: 0 0 0 2px;
 	min-height: 2em;
 	width: 55%;
 }
@@ -2233,6 +2233,7 @@ a.bbc_link {
 .board_avatar {
 	float: left;
 	margin-right: 5px;
+	min-height: 3em;
 }
 
 .board_avatar a {
@@ -2499,7 +2500,6 @@ img.new_posts {
 
 .topic_listing > li {
 	display: table-row;
-	margin: 1px 0 0 0;
 	border: 1px solid;
 }
 
@@ -2587,7 +2587,6 @@ img.new_posts {
 }
 
 .topic_stats {
-	display: table-cell;
 	float: right;
 	padding: 0 16px 0 16px;
 	min-width: 14em;
@@ -2648,7 +2647,7 @@ img.new_posts {
 }
 
 .fred.i-profile::before {
-	max-width: 14px;
+	max-width: 12px;
 }
 
 /* sticky / locked icons for the upper right of the div */
@@ -2658,7 +2657,7 @@ img.new_posts {
 .locked_row .topic_details:before,
 .locked_row.sticky_row .topic_info:before,
 .locked_row.sticky_row .topic_info .topic_name:before {
-	display: inline-block;
+	display: block;
 	float: right;
 	margin-right: -16px;
 	width: 16px;
@@ -5710,9 +5709,9 @@ a > i {
 	}
 
 	.topic_moderation {
-		display: inline-block;
 		float: right;
 		width: auto;
+		margin-top: -0.5em;
 	}
 
 	.board_icon {
@@ -5743,7 +5742,8 @@ a > i {
 	}
 
 	.board_name {
-		margin: 12px 0 0;
+		margin-top: 7px;
+		padding: 0;
 	}
 
 	.board_lastposter {
@@ -6094,7 +6094,7 @@ a > i {
 	.drop_area .mobile .drop_area_fileselect_text {
 		padding-top: 1em;
 		padding-bottom: 1em;
-		width: 100%;
+		width: 95%;
 		display: inline-block;
 	}
 
@@ -6140,8 +6140,7 @@ a > i {
 	}
 
 	.board_row {
-		margin-top: 3px;
-		padding: 15px 0;
+		padding: 15px 0 7px 0;
 	}
 
 	.board_info .board_description, .board_info .moderators {
@@ -6159,6 +6158,7 @@ a > i {
 	.childboards li {
 		display: block;
 		font-size: 1.2em;
+		padding: 0 4px;
 	}
 
 	.childboards li:nth-child(n+2):before {
@@ -6304,7 +6304,6 @@ a > i {
 	}
 
 	.poster .listlevel1 {
-		display: inline-block;
 		float: left;
 	}
 
@@ -6610,7 +6609,6 @@ a > i {
 	}
 	#topic_summary .keyinfo h5 {
 		display: table-cell;
-		margin-right: 0.2em;
 		width: 100%;
 		float: none;
 		font-size: 1em;
@@ -6623,5 +6621,27 @@ a > i {
 
 	.linklevel1 {
 		white-space: normal;
+	}
+
+	#forumtitle {
+		font-size: 1.357em;
+	}
+}
+
+/* This one does 320px screens at default font size. */
+@media screen and (max-width: 20em) {
+	.icon-menu {
+		width: 1.55em;
+		height: 1.55em;
+	}
+
+	.icon-menu.i-account {
+		width: 1.55em;
+		height: 1.55em;
+	}
+
+	.i-account:before {
+		width: 2em;
+		height: 2em;
 	}
 }
