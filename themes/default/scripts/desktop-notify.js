@@ -330,7 +330,7 @@ limitations under the License.
 			permission_granted = false;
 
 		var init = function(opt) {
-		
+
 			notif = Notification;
 		};
 
@@ -351,11 +351,11 @@ limitations under the License.
 			if (alreadyChecked)
 				return permission_granted;
 
-			if (alreadyAsked === false && notif.permission == "default" && notif.permission != "notsupported") {
+			if (alreadyAsked === false && notif.permission === "default" && notif.permission !== "notsupported") {
 				notif.requestPermission();
 				alreadyAsked = true;
 			}
-			permission_granted = notif.permission == "granted"
+			permission_granted = notif.permission === "granted";
 
 			function onPermissionGranted() {
 				permission_granted = true;
@@ -365,7 +365,7 @@ limitations under the License.
 				permission_granted = false;
 			}
 
-			alreadyChecked = notif.permission != "default";
+			alreadyChecked = notif.permission !== "default";
 
 			return permission_granted;
 		};
