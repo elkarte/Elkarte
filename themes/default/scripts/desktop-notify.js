@@ -355,16 +355,8 @@ limitations under the License.
 				notif.requestPermission();
 				alreadyAsked = true;
 			}
+
 			permission_granted = notif.permission === "granted";
-
-			function onPermissionGranted() {
-				permission_granted = true;
-			}
-
-			function onPermissionDenied() {
-				permission_granted = false;
-			}
-
 			alreadyChecked = notif.permission !== "default";
 
 			return permission_granted;
