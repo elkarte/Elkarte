@@ -698,8 +698,8 @@ function template_action_notification()
 					</dt>
 					<dd>
 						<input id="notify_', $type, '" name="notify[', $type, '][status]" class="toggle_notify" type="checkbox" value="1" ', $mentions['enabled'] ? 'checked="checked"' : '', '/>
-						<label id="notify_', $type, '_method" for="notify_', $type, '_method">', $txt['notify_method'], '
-							<select name="notify[', $type, '][method]">';
+						<label for="notify_', $type, '_method">', $txt['notify_method'], '
+							<select id="notify_', $type, '_method" name="notify[', $type, '][method]">';
 
 		foreach ($mentions['data'] as $key => $method)
 		{

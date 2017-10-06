@@ -309,7 +309,7 @@ limitations under the License.
     window.Notification = Notification;
 })();
 
-/**
+/*!
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -320,8 +320,8 @@ limitations under the License.
  * providing the interface required by the latter.
  */
 
-(function() {
-	var ElkDesktop = (function(opt) {
+(function () {
+	var ElkDesktop = (function (opt) {
 		'use strict';
 		opt = (opt) ? opt : {};
 		var notif,
@@ -329,14 +329,12 @@ limitations under the License.
 			alreadyAsked = false,
 			permission_granted = false;
 
-		var init = function(opt) {
-		
+		var init = function (opt) {
 			notif = Notification;
 		};
 
-		var send = function(request) {
-			if (request.desktop_notifications.new_from_last > 0)
-			{
+		var send = function (request) {
+			if (request.desktop_notifications.new_from_last > 0) {
 				if (!hasPermissions())
 					return;
 
@@ -347,25 +345,17 @@ limitations under the License.
 			}
 		};
 
-		var hasPermissions = function() {
+		var hasPermissions = function () {
 			if (alreadyChecked)
 				return permission_granted;
 
-			if (alreadyAsked === false && notif.permission == "default" && notif.permission != "notsupported") {
+			if (alreadyAsked === false && notif.permission === "default" && notif.permission !== "notsupported") {
 				notif.requestPermission();
 				alreadyAsked = true;
 			}
-			permission_granted = notif.permission == "granted"
 
-			function onPermissionGranted() {
-				permission_granted = true;
-			}
-
-			function onPermissionDenied() {
-				permission_granted = false;
-			}
-
-			alreadyChecked = notif.permission != "default";
+			permission_granted = notif.permission === "granted";
+			alreadyChecked = notif.permission !== "default";
 
 			return permission_granted;
 		};
@@ -377,19 +367,17 @@ limitations under the License.
 	});
 
 	// AMD / RequireJS
-	if ( typeof define !== 'undefined' && define.amd) {
-		define([], function() {
+	if (typeof define !== 'undefined' && define.amd) {
+		define([], function () {
 			return ElkDesktop;
 		});
 	}
 	// CommonJS
-	else if ( typeof module !== 'undefined' && module.exports) {
+	else if (typeof module !== 'undefined' && module.exports) {
 		module.exports = ElkDesktop;
 	}
 	// included directly via <script> tag
 	else {
 		this.ElkDesktop = ElkDesktop;
 	}
-
 })();
-

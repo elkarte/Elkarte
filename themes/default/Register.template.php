@@ -130,7 +130,7 @@ function template_registration_form()
 							<input type="text" name="user" id="elk_autov_username" size="30" tabindex="', $context['tabindex']++, '" maxlength="25" value="', isset($context['username']) ? $context['username'] : '', '" class="input_text" placeholder="', $txt['username'], '" required="required" autofocus="autofocus" />
 							<span id="elk_autov_username_div" class="hide">
 								<a id="elk_autov_username_link" href="#">
-									<i id="elk_autov_username_img" class="icon i-check" alt="*"></i>
+									<i id="elk_autov_username_img" class="icon i-check"></i>
 								</a>
 							</span>
 						</dd>';
@@ -145,7 +145,7 @@ function template_registration_form()
 							<input type="text" name="display" id="elk_autov_displayname" size="30" tabindex="', $context['tabindex']++, '" maxlength="25" value="', isset($context['display_name']) ? $context['display_name'] : '', '" class="input_text" placeholder="', $txt['display_name'], '" required="required" />
 							<span id="elk_autov_displayname_div" class="hide">
 								<a id="elk_autov_displayname_link" href="#">
-									<i id="elk_autov_displayname_img" class="icon i-check" alt="*"></i>
+									<i id="elk_autov_displayname_img" class="icon i-check"></i>
 								</a>
 							</span>
 						</dd>';
@@ -195,7 +195,7 @@ function template_registration_form()
 						<dd>
 							<input type="password" name="passwrd1" id="elk_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['choose_pass'], '" required="required" />
 							<span id="elk_autov_pwmain_div" class="hide">
-								<i id="elk_autov_pwmain_img" class="icon i-warn" alt="*"></i>
+								<i id="elk_autov_pwmain_img" class="icon i-warn"></i>
 							</span>
 						</dd>
 					</dl>
@@ -204,7 +204,7 @@ function template_registration_form()
 						<dd>
 							<input type="password" name="passwrd2" id="elk_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['verify_pass'], '" required="required" />
 							<span id="elk_autov_pwverify_div" class="hide">
-								<i id="elk_autov_pwverify_img" class="icon i-check" alt="*"></i>
+								<i id="elk_autov_pwverify_img" class="icon i-check"></i>
 							</span>
 						</dd>
 					</dl>';
@@ -575,7 +575,9 @@ function template_coppa_form()
  */
 function template_verification_sound()
 {
-	global $context, $settings, $txt;
+	global $context, $settings, $txt, $db_show_debug;
+
+	$db_show_debug = false;
 
 	echo '<!DOCTYPE html>
 <html ', $context['right_to_left'] ? 'dir="rtl"' : '', '>
@@ -589,11 +591,14 @@ function template_verification_sound()
 	// Just show the help text and a "close window" link.
 	echo '
 	</head>
-	<body style="margin: 1ex;">
-		<div class="content description centertext">
+	<body style="margin: 0.5em;">
+		<div class="content centertext">
+			<br />
 			<a href="', $context['verification_sound_href'], ';sound" rel="nofollow">
 				<span style="font-size: 4em;">&#128266;</span>
-			</a><br />';
+			</a>
+			<br /><br />
+			<div>';
 
 	if (isBrowser('is_ie'))
 		echo '
@@ -604,11 +609,11 @@ function template_verification_sound()
 	else
 		echo '
 			<audio controls="controls" autoplay="autoplay">
-				<source src="', $context['verification_sound_href'], '" type="audio/wav">
+				<source src="', $context['verification_sound_href'], '" type="audio/x-wav">
 			</audio>';
 
 	echo '
-			<br />
+			</div>
 			<a href="', $context['verification_sound_href'], ';sound" rel="nofollow">', $txt['visual_verification_sound_again'], '</a><br />
 			<a href="', $context['verification_sound_href'], '" rel="nofollow">', $txt['visual_verification_sound_direct'], '</a><br /><br />
 			<a href="javascript:self.close();">', $txt['visual_verification_sound_close'], '</a><br />

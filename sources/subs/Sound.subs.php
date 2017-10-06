@@ -121,10 +121,56 @@ function createWaveFile($word)
 	header('Content-Type: audio/x-wav');
 	header('Cache-Control: no-cache');
 	header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT');
-	header('Content-Length: ' . strlen($wav));
+	header('Accept-Ranges: bytes');
 
 	// Output the wav.
-	echo $wav;
+	$range = set_range(strlen($wav));
+	$length = $range[1] - $range[0] + 1;
+	$stub = substr($wav, $range[0], $length);
+	header('Content-Length: ' . strlen($stub));
+	echo $stub;
 
 	return true;
+}
+
+/**
+ * Determines the range (file substr) to return in response to a media range request
+ *
+ * - Sets the substr range if the HTTP_RANGE header is found
+ * - Returns 206 Partial Content along with Content-Range header of the chosen range
+ * - Supports single range request only
+ *
+ * @param int $file_size
+ * @return array
+ */
+function set_range($file_size)
+{
+	$range = array(0, $file_size - 1);
+
+	// A range seek request (iOS, Android Chrome, etc)
+	if (isset($_SERVER['HTTP_RANGE']))
+	{
+		preg_match('~bytes=(\d+)?-(\d+)?~', $_SERVER['HTTP_RANGE'], $matches);
+
+		// range 0-1 or range 0-123456 style
+		if ($matches[1] !== '' && !empty($matches[2]))
+		{
+			$range = array(intval($matches[1]), intval($matches[2]));
+		}
+		// range x- Last bytes of the file starting from byte x
+		elseif ($matches[1] !== '' && empty($matches[2]))
+		{
+			$range = array(intval($matches[1]), $file_size - 1);
+		}
+		// range -y Last y bytes of the file
+		elseif (empty($matches[1]) && !empty($matches[2]))
+		{
+			$range = array($file_size - intval($matches[2]), $file_size - 1);
+		}
+
+		header('HTTP/1.1 206 Partial Content');
+		header('Content-Range: bytes ' . $range[0] . '-' . $range[1] . '/' . $file_size);
+	}
+
+	return $range;
 }

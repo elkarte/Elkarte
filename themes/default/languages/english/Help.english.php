@@ -652,10 +652,10 @@ $helptxt['frame_security'] = 'The X-Frame-Options HTTP response header can be us
 	<br />
 	More information about this header may be found on the internet.';
 
-$helptxt['attachment_inline_title'] = '<b>Add an inline attachment</><br />
+$helptxt['attachment_inline_title'] = '<b>Add an inline attachment</b><br />
 		Example:
 		<br /><b>[attach align=left width=400]123[/attach]</b>
-		<br />This will show a left-aligned image resized to 400 pixels wide with the post text flowing around it. Execpt for the attachment tag and the attachment id all other parameters are optional
+		<br />This will show a left-aligned image resized to 400 pixels wide with the post text flowing around it. Except for the attachment tag and the attachment id all other parameters are optional
 		<br /><b>[attach]123[/attach]</b>
 		<br />This will show the attachment as a thumbnail if available, if no thumbnail is available it will use a full sized image. The image will be in line with the text of your post.
 		<br /><br />

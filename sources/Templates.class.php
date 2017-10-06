@@ -330,9 +330,10 @@ class Templates
 			require_once(SUBSDIR . '/Package.subs.php');
 
 			$error = fetch_web_data($boardurl . strtr($filename, array(BOARDDIR => '', strtr(BOARDDIR, '\\', '/') => '')));
-			if (empty($error) && ini_get('track_errors') && !empty($php_errormsg))
+			$last_error = error_get_last();
+			if (empty($error) && ini_get('track_errors') && !empty($last_error['message']))
 			{
-				$error = $php_errormsg;
+				$error = $last_error['message'];
 			}
 			elseif (empty($error))
 			{
