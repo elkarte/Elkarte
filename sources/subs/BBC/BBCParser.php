@@ -118,7 +118,9 @@ class BBCParser
 	 */
 	public function parse($message)
 	{
-		call_integration_hook('integrate_pre_bbc_parser', array(&$message, $this->bbc));
+		// Allow addons access before entering the main parse loop, formally
+		// called as integrate_pre_parsebbc
+		call_integration_hook('integrate_pre_bbc_parser', array(&$message, &$this->bbc));
 
 		$this->message = (string) $message;
 
@@ -174,7 +176,8 @@ class BBCParser
 			$this->handleFootnotes();
 		}
 
-		// Allow addons access to what the parser created
+		// Allow addons access to what the parser created, formally
+		// called as integrate_post_parsebbc
 		$message = $this->message;
 		call_integration_hook('integrate_post_bbc_parser', array(&$message));
 		$this->message = $message;
