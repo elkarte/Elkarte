@@ -84,7 +84,7 @@
 
 						e.preventDefault();
 					});
-				$wrapper = $('<span class="smiley"></span>').append($img)
+				$wrapper = $('<span class="smiley"></span>').append($img);
 				line.append($wrapper);
 			}
 		},
