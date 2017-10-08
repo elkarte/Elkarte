@@ -165,6 +165,14 @@ h2 a.collapse {
 	padding: 4px 0 4px 8px;
 }
 
+.bbc_img.floatleft {
+	padding-left: .25em;
+}
+
+.bbc_img.floatright {
+	padding-right: .25em;
+}
+
 /*	$AJAX		*/
 /* ------------------------------------------------------- */
 
