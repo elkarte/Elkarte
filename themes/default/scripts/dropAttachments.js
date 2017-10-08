@@ -261,8 +261,8 @@
 		*/
 		createStatusbar = function(obj) {
 			var $control = $str.clone(),
-			    $button = $control.find('.control'),
-			    $progressbar = $control.find('.progressBar');
+				$button = $control.find('.control'),
+				$progressbar = $control.find('.progressBar');
 			$button.addClass('abort');
 
 			$('.progress_tracker').append($control);
