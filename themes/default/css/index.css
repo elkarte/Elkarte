@@ -786,6 +786,18 @@ strong, .bbc_strong {
 	border: 0;
 }
 
+.bbc_img.floatleft {
+	padding-right: .25em;
+}
+
+.bbc_img.floatright {
+	padding-left: .25em;
+}
+
+.bbc_img.floatcenter {
+	padding: 0 .25em;
+}
+
 .bbc_table {
 	color: inherit;
 	font: inherit;

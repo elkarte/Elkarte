@@ -215,7 +215,6 @@ function template_edit_group()
 							<input type="radio" name="group_type" id="group_type_private" value="0" ', !$context['group']['is_post_group'] && $context['group']['type'] == 0 ? 'checked="checked"' : '', ' onclick="swapPostGroup(0);" />
 							<label for="group_type_private">', $txt['membergroups_group_type_private'], '</label><br />';
 
-
 		if ($context['group']['allow_protected'])
 			echo '
 							<input type="radio" name="group_type" id="group_type_protected" value="1" ', $context['group']['type'] == 1 ? 'checked="checked"' : '', ' onclick="swapPostGroup(0);" />

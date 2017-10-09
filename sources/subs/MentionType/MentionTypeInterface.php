@@ -15,7 +15,7 @@ namespace ElkArte\sources\subs\MentionType;
 
 /**
  * Interface Mention_Type_Interface
- * 
+ *
  * @package ElkArte\sources\subs\MentionType
  */
 interface Mention_Type_Interface
@@ -83,7 +83,7 @@ interface Mention_Type_Interface
 	 *
 	 * @param array $lang_data
 	 * @param int[] $users
-	 * 
+	 *
 	 * @return mixed[] array(array(
 	 *                  id_member_to (int),
 	 *                  email_address (text),

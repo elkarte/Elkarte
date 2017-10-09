@@ -15,7 +15,7 @@ namespace ElkArte\sources\subs\MentionType;
 
 /**
  * Class Buddy_Mention
- * 
+ *
  * Handles mentioning of buddies
  *
  * @package ElkArte\sources\subs\MentionType

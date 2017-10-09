@@ -51,9 +51,9 @@ class Ila_Integrate
 	/**
 	 * - Adds in new BBC code tags for use with inline images
 	 *
-	 * @param mixed[] $codes
+	 * @param mixed[] $additional_bbc
 	 */
-	public static function integrate_additional_bbc(&$codes)
+	public static function integrate_additional_bbc(&$additional_bbc)
 	{
 		global $scripturl, $modSettings;
 
@@ -73,7 +73,7 @@ class Ila_Integrate
 		}
 
 		// Add ILA codes
-		$codes = array_merge($codes, array(
+		$additional_bbc = array_merge($additional_bbc, array(
 			// Require a width with optional height/align to allow use of full image and/or ;thumb
 			array(
 				\BBC\Codes::ATTR_TAG => 'attach',

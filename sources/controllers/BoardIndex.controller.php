@@ -125,7 +125,6 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 		$context['show_member_list'] = allowedTo('view_mlist');
 		$context['show_who'] = allowedTo('who_view') && !empty($modSettings['who_enabled']);
 
-
 		$context['page_title'] = sprintf($txt['forum_index'], $context['forum_name']);
 		$context['sub_template'] = 'boards_list';
 
