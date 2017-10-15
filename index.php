@@ -20,7 +20,7 @@
 $time_start = microtime(true);
 
 // The software version
-const FORUM_VERSION = 'ElkArte 1.1 RC 2';
+const FORUM_VERSION = 'ElkArte 1.1';
 
 // First things first, but not necessarily in that order.
 const ELK = '1';
