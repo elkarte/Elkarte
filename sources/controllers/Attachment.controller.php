@@ -415,7 +415,7 @@ class Attachment_Controller extends Action_Controller
 			$filename = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $file_hash);
 		}
 
-		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
+		$eTag = '"' . substr($id_attach . $real_filename . @filemtime($filename), 0, 64) . '"';
 		$use_compression = !empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java'));
 		$disposition = !isset($this->_req->query->image) ? 'attachment' : 'inline';
 		$do_cache = false === (!isset($this->_req->query->image) && in_array($file_ext, array('gif', 'jpg', 'bmp', 'png', 'jpeg', 'tiff')));
