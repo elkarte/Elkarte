@@ -2007,7 +2007,12 @@ function enforceReactivation($conditions)
 
 	$query_cond = array();
 	foreach ($conditions as $key => $dummy)
-		$query_cond[] = $available_conditions[$key];
+	{
+		if (isset($available_conditions[$key]))
+		{
+			$query_cond[] = $available_conditions[$key];
+		}
+	}
 
 	$conditions['not_activated'] = 0;
 
