@@ -6,7 +6,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1 Release Candidate 2
+ * @version 1.1
  *
  */
 
