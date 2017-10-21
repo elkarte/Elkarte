@@ -7,12 +7,9 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.6
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * This class contains one likable use, which allows members to like a post
@@ -23,15 +20,9 @@ class Likes_Controller extends Action_Controller
 {
 	/**
 	 * Holds the ajax response
-	 * @var string[]
+	 * @var array
 	 */
 	protected $_likes_response = array();
-
-	/**
-	 * If this was an ajax request or not
-	 * @var boolean
-	 */
-	protected $_api = false;
 
 	/**
 	 * The id of the message being liked
@@ -40,7 +31,19 @@ class Likes_Controller extends Action_Controller
 	protected $_id_liked = null;
 
 	/**
-	 * Default action method, if a specific methods wasn't
+	 * Entry point function for likes, permission checks, just makes sure its on
+	 */
+	public function pre_dispatch()
+	{
+		global $modSettings;
+
+		// If likes are disabled, we don't go any further
+		if (empty($modSettings['likes_enabled']))
+			throw new Elk_Exception('feature_disabled', true);
+	}
+
+	/**
+	 * Default action method, if a specific methods was not
 	 * directly called already. Simply forwards to likepost.
 	 *
 	 * @see Action_Controller::action_index()
@@ -52,49 +55,84 @@ class Likes_Controller extends Action_Controller
 	}
 
 	/**
-	 * Entry point function for likes, permission checks, just makes sure its on
-	 */
-	public function pre_dispatch()
-	{
-		global $modSettings;
-
-		// If likes are disabled, we don't go any further
-		if (empty($modSettings['likes_enabled']))
-			fatal_lang_error('feature_disabled', true);
-	}
-
-	/**
 	 * Liking a post via ajax, then _api will be added to the sa=
 	 * and this method will be called
+	 *
 	 * Calls the standard like method and then the api return method
 	 */
 	public function action_likepost_api()
 	{
-		$this->_api = true;
-		$this->action_likepost();
+		global $txt;
+
+		// An error if not possible to like.
+		if (!$this->_doLikePost('+', 'likemsg'))
+		{
+			if (empty($this->_likes_response))
+			{
+				loadLanguage('Errors');
+				$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
+			}
+		}
+
+		$this->likeResponse();
 	}
 
 	/**
 	 * Un liking a post via ajax
+	 *
 	 * Calls the standard unlike method and then the api return method
 	 */
 	public function action_unlikepost_api()
 	{
-		$this->_api = true;
-		$this->action_unlikepost();
+		global $txt;
+
+		// An error if not possible to like.
+		if (!$this->_doLikePost('-', 'rlikemsg'))
+		{
+			if (empty($this->_likes_response))
+			{
+				loadLanguage('Errors');
+				$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
+			}
+		}
+
+		$this->likeResponse();
 	}
 
 	/**
 	 * Likes a post due to its awesomeness
-	 * Permission checks are done in prepare_likes
-	 * It redirects back to the referrer afterward.
-	 * It is accessed via ?action=like,sa=likepost
+	 *
+	 * What it does:
+	 *
+	 * - Permission checks are done in prepare_likes
+	 * - It redirects back to the referrer afterward.
+	 * - It is accessed via ?action=like,sa=likepost
 	 */
 	public function action_likepost()
 	{
-		global $user_info, $topic, $txt, $modSettings;
+		global $topic;
 
-		$this->_id_liked = !empty($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : 0;
+		$this->_doLikePost('+', 'likemsg');
+
+		redirectexit('topic=' . $topic . '.msg' . $this->_id_liked . '#msg' . $this->_id_liked);
+	}
+
+	/**
+	 * Actually perform the "like" operation.
+	 *
+	 * Fills $_likes_response that can be used by likeResponse() in order to
+	 * return a JSON response
+	 *
+	 * @param string $sign '+' or '-'
+	 * @param string $type the type of like 'likemsg' or 'rlikemsg'
+	 *
+	 * @return bool
+	 */
+	protected function _doLikePost($sign, $type)
+	{
+		global $user_info, $modSettings;
+
+		$this->_id_liked = $this->_req->getPost('msg', 'intval', (isset($this->_req->query->msg) ? (int) $this->_req->query->msg : 0));
 
 		// We like these
 		require_once(SUBSDIR . '/Likes.subs.php');
@@ -107,98 +145,46 @@ class Likes_Controller extends Action_Controller
 			if ($liked_message && empty($liked_message['locked']))
 			{
 				// Like it
-				$likeResult = likePost($user_info['id'], $liked_message, '+');
+				$likeResult = likePost($user_info['id'], $liked_message, $sign);
 				if ($likeResult === true)
 				{
 					// Lets add in a mention to the member that just had their post liked
 					if (!empty($modSettings['mentions_enabled']))
 					{
-						require_once(CONTROLLERDIR . '/Mentions.controller.php');
-						$mentions = new Mentions_Controller();
-						$mentions->setData(array(
-							'id_member' => $liked_message['id_member'],
-							'type' => 'like',
-							'id_msg' => $this->_id_liked,
+						$notifier = Notifications::instance();
+						$notifier->add(new Notifications_Task(
+							$type,
+							$this->_id_liked,
+							$user_info['id'],
+							array('id_members' => array($liked_message['id_member']), 'rlike_notif' => empty($modSettings['mentions_dont_notify_rlike']))
 						));
-						$mentions->action_add();
 					}
 				}
-				elseif ($this->_api)
-					$this->_likes_response = array('result' => false, 'data' => $likeResult);
-			}
-			elseif ($this->_api)
-			{
-				loadLanguage('Errors');
-				$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
+
+				return true;
 			}
 		}
 
-		// Back to where we were, in theory
-		if ($this->_api)
-			$this->likeResponse();
-		else
-			redirectexit('topic=' . $topic . '.msg' . $this->_id_liked . '#msg' . $this->_id_liked);
+		return false;
 	}
 
 	/**
 	 * Unlikes a post that you previously liked ... no negatives though, hurts feelings :'(
-	 * It redirects back to the referrer afterward.
-	 * It is accessed via ?action=like,sa=unlikepost.
+	 *
+	 * - It redirects back to the referrer afterward.
+	 * - It is accessed via ?action=like,sa=unlikepost.
 	 */
 	public function action_unlikepost()
 	{
-		global $user_info, $topic, $txt, $modSettings;
+		global $user_info, $topic;
 
-		$this->_id_liked = !empty($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : 0;
+		$this->_doLikePost('-', 'rlikemsg');
 
-		// We used to like these
-		require_once(SUBSDIR . '/Likes.subs.php');
-		require_once(SUBSDIR . '/Messages.subs.php');
-
-		// Have to be able to access it to unlike it now
-		if ($this->prepare_like() && canAccessMessage($this->_id_liked))
-		{
-			$liked_message = basicMessageInfo($this->_id_liked, true, true);
-			if ($liked_message)
-			{
-				$likeResult = likePost($user_info['id'], $liked_message, '-');
-				if ($likeResult === true)
-				{
-					// Oh noes, taking the like back, let them know so they can complain
-					if (!empty($modSettings['mentions_enabled']))
-					{
-						require_once(CONTROLLERDIR . '/Mentions.controller.php');
-						$mentions = new Mentions_Controller();
-						$mentions->setData(array(
-							'id_member' => $liked_message['id_member'],
-							'type' => 'rlike',
-							'id_msg' => $this->_id_liked,
-						));
-
-						// Notifying that likes were removed ?
-						if (!empty($modSettings['mentions_dont_notify_rlike']))
-							$mentions->action_rlike();
-						else
-							$mentions->action_add();
-					}
-				}
-				elseif ($this->_api)
-					$this->_likes_response = array('result' => false, 'data' => $likeResult);
-			}
-			elseif ($this->_api)
-			{
-				loadLanguage('Errors');
-				$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
-			}
-		}
-
-		// Back we go
-		if ($this->_api)
-			$this->likeResponse();
-		elseif (!isset($_REQUEST['profile']))
+		// No longer liked, return to whence you came
+		if (!isset($this->_req->query->profile))
 			redirectexit('topic=' . $topic . '.msg' . $this->_id_liked . '#msg' . $this->_id_liked);
 		else
-			redirectexit('action=profile;area=showlikes;sa=given;u=' .$user_info['id']);
+			redirectexit('action=profile;area=showlikes;sa=given;u=' . $user_info['id']);
 	}
 
 	/**
@@ -266,7 +252,7 @@ class Likes_Controller extends Action_Controller
 			$check = false;
 
 		// If they have exceeded their limits, provide a message for the ajax response
-		if ($check === false && $this->_api)
+		if ($check === false)
 		{
 			loadLanguage('Errors');
 			$wait = $modSettings['likeWaitTime'] > 60 ? round($modSettings['likeWaitTime'] / 60, 2) : $modSettings['likeWaitTime'];
@@ -283,10 +269,9 @@ class Likes_Controller extends Action_Controller
 	public function action_showProfileLikes()
 	{
 		// Load in our helper functions
-		require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/Likes.subs.php');
 
-		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] === 'received')
+		if ($this->_req->getQuery('sa') === 'received')
 			$this->_action_showReceived();
 		else
 			$this->_action_showGiven();
@@ -365,13 +350,13 @@ class Likes_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$row', '
-							global $txt, $settings;
+						'function' => function ($row) {
+							global $txt;
 
-							$result = \'<a href="\' . $row[\'delete\'] . \'" onclick="return confirm(\\\'\' . $txt[\'likes_confirm_delete\'] . \'\\\');" title="\' . $txt[\'likes_delete\'] . \'"><img src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="" /></a>\';
+							$result = '<a href="' . $row['delete'] . '" onclick="return confirm(\'' . $txt['likes_confirm_delete'] . '\');" title="' . $txt['likes_delete'] . '"><i class="icon i-delete"></i></a>';
 
-							return $result;'
-						),
+							return $result;
+						},
 						'class' => 'centertext',
 						'style' => 'width: 10%',
 					),
@@ -467,13 +452,13 @@ class Likes_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$row', '
-							global $txt, $settings;
+						'function' => function ($row) {
+							global $txt;
 
-							$result = \'<a href="\' . $row[\'who\'] . \'" title="\' . $txt[\'likes_show_who\'] . \'"><img src="\' . $settings[\'images_url\'] . \'/icons/members.png" alt="" /></a>\';
+							$result = '<a href="' . $row['who'] . '" title="' . $txt['likes_show_who'] . '"><i class="icon i-users"></i></a>';
 
-							return $result;'
-						),
+							return $result;
+						},
 						'class' => 'centertext',
 						'style' => 'width: 10%',
 					),
@@ -497,21 +482,21 @@ class Likes_Controller extends Action_Controller
 	}
 
 	/**
-	 * Function to return an array of users that liked a particular
-	 * message.  Used in profile so a user can see the full
-	 * list of members, vs the truncated (optional) one shown in message display
-	 * accessed by ?action=likes;sa=showWhoLiked;msg=x
+	 * Function to return an array of users that liked a particular message.
+	 *
+	 * - Used in profile so a user can see the full list of members, vs the
+	 * truncated (optional) one shown in message display
+	 * - Accessed by ?action=likes;sa=showWhoLiked;msg=x
 	 */
 	public function action_showWhoLiked()
 	{
 		global $context, $txt, $scripturl;
 
-		require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/Likes.subs.php');
 		loadLanguage('Profile');
 
 		// Get the message in question
-		$message = isset($_REQUEST['msg']) ? $_REQUEST['msg'] : 0;
+		$message = $this->_req->getQuery('msg', 'intval', 0);
 
 		// Build the listoption array to display the data
 		$listOptions = array(
@@ -592,11 +577,11 @@ class Likes_Controller extends Action_Controller
 
 	/**
 	 * Callback for createList()
-	 * Returns a list of liked posts for a memmber
+	 * Returns a list of liked posts for a member
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param int $memberID
 	 */
 	public function list_loadLikesPosts($start, $items_per_page, $sort, $memberID)
@@ -609,9 +594,9 @@ class Likes_Controller extends Action_Controller
 	 * Callback for createList()
 	 * Returns a list of received likes based on posts
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param int $memberID
 	 */
 	public function list_loadLikesReceived($start, $items_per_page, $sort, $memberID)
@@ -624,14 +609,212 @@ class Likes_Controller extends Action_Controller
 	 * Callback for createList()
 	 * Returns a list of members that liked a post
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param int $messageID
 	 */
 	public function list_loadPostLikers($start, $items_per_page, $sort, $messageID)
 	{
 		// Get a list of this posts likers
 		return postLikers($start, $items_per_page, $sort, $messageID);
+	}
+
+	/**
+	 * Like stats controller function, used by API calls.
+	 *
+	 * What it does:
+	 *
+	 * - Validates whether user is allowed to see stats or not.
+	 * - Decides which tab data to fetch and show to user.
+	 */
+	public function action_index_api()
+	{
+		global $context, $modSettings;
+
+		require_once(SUBSDIR . '/Likes.subs.php');
+
+		// Likes are not on, your quest for statistics ends here
+		if (empty($modSettings['likes_enabled']))
+			throw new Elk_Exception('feature_disabled', true);
+
+		// And you can see the stats
+		isAllowedTo('like_posts_stats');
+
+		loadLanguage('LikePosts');
+
+		$subActions = array(
+			'messagestats' => array($this, 'action_messageStats'),
+			'topicstats' => array($this, 'action_topicStats'),
+			'boardstats' => array($this, 'action_boardStats'),
+			'mostlikesreceiveduserstats' => array($this, 'action_mostLikesReceivedUserStats'),
+			'mostlikesgivenuserstats' => array($this, 'action_mostLikesGivenUserStats'),
+		);
+
+		// Set up the action controller
+		$action = new Action('likesstats');
+
+		// Pick the correct sub-action, call integrate_sa_likesstats
+		$subAction = $action->initialize($subActions, 'messagestats', 'area');
+		$context['sub_action'] = $subAction;
+
+		// Call the right function for this sub-action.
+		$action->dispatch($subAction);
+	}
+
+	/**
+	 * Like stats controller function.
+	 *
+	 * What it does:
+	 *
+	 * - Validates whether user is allowed to see stats or not.
+	 * - Presents a general page without data that will be fully loaded by API calls.
+	 * - Used when JS is not enabled and data is fulled by page request
+	 */
+	public function action_likestats()
+	{
+		global $context, $txt, $modSettings;
+
+		require_once(SUBSDIR . '/Likes.subs.php');
+
+		// Likes are not on, your quest for statistics ends here
+		if (empty($modSettings['likes_enabled']))
+			throw new Elk_Exception('feature_disabled', true);
+
+		// Worthy to view like statistics?
+		isAllowedTo('like_posts_stats');
+
+		// Load the required files
+		loadLanguage('LikePosts');
+		loadJavascriptFile('like_posts.js');
+		loadTemplate('LikePostsStats');
+
+		// Template and tab data
+		$context['page_title'] = $txt['like_post_stats'];
+		$context['like_posts']['tab_desc'] = $txt['like_posts_stats_desc'];
+		$context['lp_stats_tabs'] = array(
+			'messagestats' => array(
+				'label' => $txt['like_post_message'],
+				'id' => 'messagestats',
+			),
+			'topicstats' => array(
+				'label' => $txt['like_post_topic'],
+				'id' => 'topicstats',
+			),
+			'boardstats' => array(
+				'label' => $txt['like_post_board'],
+				'id' => 'boardstats',
+			),
+			'usergivenstats' => array(
+				'label' => $txt['like_post_tab_mlmember'],
+				'id' => 'mostlikesreceiveduserstats',
+			),
+			'userreceivedstats' => array(
+				'label' => $txt['like_post_tab_mlgmember'],
+				'id' => 'mostlikesgivenuserstats',
+			),
+		);
+		$context['sub_template'] = 'lp_stats';
+	}
+
+	/**
+	 * Determines the most liked message in the system
+	 *
+	 * What it does:
+	 *
+	 * - Fetches the most liked message data
+	 * - Returns the data via ajax
+	 */
+	public function action_messageStats()
+	{
+		global $txt;
+
+		// Lets get the statistics!
+		$data = dbMostLikedMessage();
+
+		// Set the response
+		if (!empty($data))
+			$this->_likes_response = array('result' => true, 'data' => $data);
+		else
+			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
+
+		// Off we go
+		$this->likeResponse();
+	}
+
+	/**
+	 * Determine the most liked topics in the system
+	 *
+	 * What it does:
+	 *
+	 * - Gets the most liked topics in the system
+	 * - Returns the data via ajax
+	 */
+	public function action_topicStats()
+	{
+		global $txt;
+
+		$data = dbMostLikedTopic();
+
+		if (!empty($data))
+			$this->_likes_response = array('result' => true, 'data' => $data);
+		else
+			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
+
+		$this->likeResponse();
+	}
+
+	/**
+	 * Fetches the most liked board data
+	 * Returns the data via ajax
+	 */
+	public function action_boardStats()
+	{
+		global $txt;
+
+		$data = dbMostLikedBoard();
+
+		if (!empty($data))
+			$this->_likes_response = array('result' => true, 'data' => $data);
+		else
+			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
+
+		$this->likeResponse();
+	}
+
+	/**
+	 * Fetches the data for the highest likes received user
+	 * Returns the data via ajax
+	 */
+	public function action_mostLikesReceivedUserStats()
+	{
+		global $txt;
+
+		$data = dbMostLikesReceivedUser();
+
+		if (!empty($data))
+			$this->_likes_response = array('result' => true, 'data' => $data);
+		else
+			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
+
+		$this->likeResponse();
+	}
+
+	/**
+	 * Retrieves the most like giving user
+	 *
+	 * Returns the data via ajax
+	 */
+	public function action_mostLikesGivenUserStats()
+	{
+		global $txt;
+
+		$data = dbMostLikesGivenUser();
+
+		if (!empty($data))
+			$this->_likes_response = array('result' => true, 'data' => $data);
+		else
+			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
+		$this->likeResponse();
 	}
 }

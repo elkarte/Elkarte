@@ -1,31 +1,28 @@
 <?php
 
 /**
- * This controller allows to choose the features activated and disactivate them.
+ * This controller allows to choose features to activated and deactivate them.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.10
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * This class takes care of the Core Features admin screen.
  *
  * What it does:
+ *
  * - It sets up the context, initializes the features info for display
  * - updates the settings for enabled/disabled core features as requested.
+ * - loads in module core features
  *
  * @package CoreFeatures
  */
@@ -39,13 +36,14 @@ class CoreFeatures_Controller extends Action_Controller
 	public function action_index()
 	{
 		// just delegate to our preferred default
-		$this->action_features();
+		return $this->action_features();
 	}
 
 	/**
 	 * This is an overall control panel enabling/disabling lots of the forums key features.
 	 *
 	 * What it does:
+	 *
 	 * - Uses internally an array of all the features that can be enabled/disabled.
 	 * - $core_features, each option can have the following:
 	 *    - title - Text title of this item (If standard string does not exist).
@@ -58,7 +56,7 @@ class CoreFeatures_Controller extends Action_Controller
 	 */
 	public function action_features()
 	{
-		global $txt, $scripturl, $context, $settings, $modSettings;
+		global $txt, $context, $modSettings;
 
 		require_once(SUBSDIR . '/Admin.subs.php');
 
@@ -69,11 +67,11 @@ class CoreFeatures_Controller extends Action_Controller
 		$this->loadGeneralSettingParameters();
 
 		// Are we saving?
-		if (isset($_POST['save']))
+		if (isset($this->_req->post->save))
 		{
 			checkSession();
 
-			if (isset($_GET['xml']))
+			if (isset($this->_req->query->xml))
 			{
 				$tokenValidation = validateToken('admin-core', 'post', false);
 
@@ -83,71 +81,14 @@ class CoreFeatures_Controller extends Action_Controller
 			else
 				validateToken('admin-core');
 
-			$setting_changes = array('admin_features' => array());
+			$this->_save_core_features($core_features);
 
-			// Cycle each feature and change things as required!
-			foreach ($core_features as $id => $feature)
-			{
-				// Enabled?
-				if (!empty($_POST['feature_' . $id]))
-					$setting_changes['admin_features'][] = $id;
-
-				// Setting values to change?
-				if (isset($feature['settings']))
-				{
-					foreach ($feature['settings'] as $key => $value)
-					{
-						if (empty($_POST['feature_' . $id]) || (!empty($_POST['feature_' . $id]) && ($value < 2 || empty($modSettings[$key]))))
-							$setting_changes[$key] = !empty($_POST['feature_' . $id]) ? $value : !$value;
-					}
-				}
-
-				// Is there a call back for settings?
-				if (isset($feature['setting_callback']))
-				{
-					$returned_settings = $feature['setting_callback'](!empty($_POST['feature_' . $id]));
-					if (!empty($returned_settings))
-						$setting_changes = array_merge($setting_changes, $returned_settings);
-				}
-
-				// Standard save callback?
-				if (isset($feature['on_save']))
-					$feature['on_save']();
-			}
-
-			// Make sure this one setting is a string!
-			$setting_changes['admin_features'] = implode(',', $setting_changes['admin_features']);
-
-			// Make any setting changes!
-			updateSettings($setting_changes);
-
-			// This is needed to let menus appear if cache > 2
-			if ($modSettings['cache_enable'] > 2)
-				clean_cache('data');
-
-			// Any post save things?
-			foreach ($core_features as $id => $feature)
-			{
-				// Standard save callback?
-				if (isset($feature['save_callback']))
-					$feature['save_callback'](!empty($_POST['feature_' . $id]));
-			}
-
-			if (!isset($_REQUEST['xml']))
+			if (!isset($this->_req->query->xml))
 				redirectexit('action=admin;area=corefeatures;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
 		// Put them in context.
-		$context['features'] = array();
-		foreach ($core_features as $id => $feature)
-			$context['features'][$id] = array(
-				'title' => isset($feature['title']) ? $feature['title'] : $txt['core_settings_item_' . $id],
-				'desc' => isset($feature['desc']) ? $feature['desc'] : $txt['core_settings_item_' . $id . '_desc'],
-				'enabled' => in_array($id, $context['admin_features']),
-				'state' => in_array($id, $context['admin_features']) ? 'on' : 'off',
-				'url' => !empty($feature['url']) ? $scripturl . '?' . $feature['url'] . ';' . $context['session_var'] . '=' . $context['session_id'] : '',
-				'image' => (file_exists($settings['theme_dir'] . '/images/admin/feature_' . $id . '.png') ? $settings['images_url'] : $settings['default_images_url']) . '/admin/feature_' . $id . '.png',
-			);
+		$context['features'] = $this->_prepare_corefeatures($core_features);
 
 		// Are they a new user?
 		$context['is_new_install'] = !isset($modSettings['admin_features']);
@@ -158,8 +99,8 @@ class CoreFeatures_Controller extends Action_Controller
 			updateSettings(array('admin_features' => ''));
 
 		// sub_template is already generic_xml and the token is created somewhere else
-		if (isset($_REQUEST['xml']))
-			return;
+		if (isset($this->_req->query->xml))
+			return true;
 
 		$context['sub_template'] = 'core_features';
 		$context['page_title'] = $txt['core_settings_title'];
@@ -168,57 +109,42 @@ class CoreFeatures_Controller extends Action_Controller
 			'help' => '',
 			'description' => $txt['core_settings_desc'],
 		);
+		addJavascriptVar(array(
+			'token_name' => '',
+			'token_value' => '',
+			'feature_on_text' => $txt['core_settings_switch_off'],
+			'feature_off_text' => $txt['core_settings_switch_on']
+		), true);
 
 		// We love our tokens.
 		createToken('admin-core');
+
+		return true;
 	}
 
 	/**
 	 * Return the configuration settings available for core features page.
+	 *
+	 * @event integrate_core_features passed $core_features array allowing for adding new
+	 * ones to the feature page
 	 */
 	public function settings()
 	{
 		$core_features = array(
-			// cd = calendar.
-			'cd' => array(
-				'url' => 'action=admin;area=managecalendar',
-				'settings' => array(
-					'cal_enabled' => 1,
-				),
-			),
 			// cp = custom profile fields.
 			'cp' => array(
 				'url' => 'action=admin;area=featuresettings;sa=profile',
 				'save_callback' => 'custom_profiles_toggle_callback',
-				'setting_callback' => create_function('$value', '
+				'setting_callback' => function ($value) {
 					if (!$value)
 						return array(
-							\'disabled_profile_fields\' => \'\',
-							\'registration_fields\' => \'\',
-							\'displayFields\' => \'\',
+							'disabled_profile_fields' => '',
+							'registration_fields' => '',
+							'displayFields' => '',
 						);
 					else
 						return array();
-				'),
-			),
-			// dr = drafts
-			'dr' => array(
-				'url' => 'action=admin;area=managedrafts',
-				'settings' => array(
-					'drafts_enabled' => 1,
-					'drafts_post_enabled' => 2,
-					'drafts_pm_enabled' => 2,
-					'drafts_autosave_enabled' => 2,
-					'drafts_show_saved_enabled' => 2,
-				),
-				'setting_callback' => 'drafts_toggle_callback',
-			),
-			// ih = Integration Hooks Handling.
-			'ih' => array(
-				'url' => 'action=admin;area=maintain;sa=hooks',
-				'settings' => array(
-					'handlinghooks_enabled' => 1,
-				),
+				},
 			),
 			// k = karma.
 			'k' => array(
@@ -233,13 +159,22 @@ class CoreFeatures_Controller extends Action_Controller
 				'settings' => array(
 					'likes_enabled' => 1,
 				),
-				'setting_callback' => create_function('$value', '
-					require_once(SUBSDIR . \'/Mentions.subs.php\');
+				'setting_callback' => function ($value) {
+					global $modSettings;
+
+					require_once(SUBSDIR . '/Mentions.subs.php');
 
 					// Makes all the like/rlike mentions invisible (or visible)
-					toggleMentionsVisibility(\'like\', !empty($value));
-					toggleMentionsVisibility(\'rlike\', !empty($value));
-				'),
+					toggleMentionsVisibility('likemsg', !empty($value));
+					toggleMentionsVisibility('rlikemsg', !empty($value));
+
+					$current = !empty($modSettings['enabled_mentions']) ? explode(',', $modSettings['enabled_mentions']) : array();
+
+					if (!empty($value))
+						return array('enabled_mentions' => implode(',', array_merge($current, array('likemsg', 'rlikemsg'))));
+					else
+						return array('enabled_mentions' => implode(',', array_diff($current, array('likemsg', 'rlikemsg'))));
+				},
 			),
 			// ml = moderation log.
 			'ml' => array(
@@ -261,19 +196,18 @@ class CoreFeatures_Controller extends Action_Controller
 			// pm = post moderation.
 			'pm' => array(
 				'url' => 'action=admin;area=permissions;sa=postmod',
-				'setting_callback' => create_function('$value', '
-
+				'setting_callback' => function ($value) {
 					// Cannot use warning post moderation if disabled!
 					if (!$value)
 					{
-						require_once(SUBSDIR . \'/Moderation.subs.php\');
+						require_once(SUBSDIR . '/Moderation.subs.php');
 						approveAllUnapproved();
 
-						return array(\'warning_moderate\' => 0);
+						return array('warning_moderate' => 0);
 					}
 					else
 						return array();
-				'),
+				},
 			),
 			// ps = Paid Subscriptions.
 			'ps' => array(
@@ -290,32 +224,33 @@ class CoreFeatures_Controller extends Action_Controller
 			// w = warning.
 			'w' => array(
 				'url' => 'action=admin;area=securitysettings;sa=moderation',
-				'setting_callback' => create_function('$value', '
+				'setting_callback' => function ($value) {
 					global $modSettings;
-					list ($modSettings[\'warning_enable\'], $modSettings[\'user_limit\'], $modSettings[\'warning_decrement\']) = explode(\',\', $modSettings[\'warning_settings\']);
-					$warning_settings = ($value ? 1 : 0) . \',\' . $modSettings[\'user_limit\'] . \',\' . $modSettings[\'warning_decrement\'];
+
+					list ($modSettings['warning_enable'], $modSettings['user_limit'], $modSettings['warning_decrement']) = explode(',', $modSettings['warning_settings']);
+					$warning_settings = ($value ? 1 : 0) . ',' . $modSettings['user_limit'] . ',' . $modSettings['warning_decrement'];
 					if (!$value)
 					{
 						$returnSettings = array(
-							\'warning_watch\' => 0,
-							\'warning_moderate\' => 0,
-							\'warning_mute\' => 0,
+							'warning_watch' => 0,
+							'warning_moderate' => 0,
+							'warning_mute' => 0,
 						);
 					}
-					elseif (empty($modSettings[\'warning_enable\']) && $value)
+					elseif (empty($modSettings['warning_enable']) && $value)
 					{
 						$returnSettings = array(
-							\'warning_watch\' => 10,
-							\'warning_moderate\' => 35,
-							\'warning_mute\' => 60,
+							'warning_watch' => 10,
+							'warning_moderate' => 35,
+							'warning_mute' => 60,
 						);
 					}
 					else
 						$returnSettings = array();
 
-					$returnSettings[\'warning_settings\'] = $warning_settings;
+					$returnSettings['warning_settings'] = $warning_settings;
 					return $returnSettings;
-				'),
+				},
 			),
 			// Search engines
 			'sp' => array(
@@ -323,21 +258,68 @@ class CoreFeatures_Controller extends Action_Controller
 				'settings' => array(
 					'spider_mode' => 1,
 				),
-				'setting_callback' => create_function('$value', '
+				'setting_callback' => function ($value) {
 					// Turn off the spider group if disabling.
 					if (!$value)
-						return array(\'spider_group\' => 0, \'show_spider_online\' => 0);
-				'),
-				'on_save' => create_function('', '
-					require_once(SUBSDIR . \'/SearchEngines.subs.php\');
-				'),
+						return array('spider_group' => 0, 'show_spider_online' => 0);
+				},
+				'on_save' => function () {
+					require_once(SUBSDIR . '/SearchEngines.subs.php');
+				},
 			),
 		);
+
+		$this->_getModulesConfig($core_features);
 
 		// Anyone who would like to add a core feature?
 		call_integration_hook('integrate_core_features', array(&$core_features));
 
 		return $core_features;
+	}
+
+	/**
+	 * Searches the ADMINDIR looking for module managers and load the "Core Feature"
+	 * if existing.
+	 *
+	 * @param mixed[] $core_features The core features array
+	 */
+	protected function _getModulesConfig(&$core_features)
+	{
+		// Find appropriately named core feature files in the admin directory
+		$glob = new GlobIterator(ADMINDIR . '/Manage*Module.controller.php', FilesystemIterator::SKIP_DOTS);
+
+		foreach ($glob as $file)
+		{
+			$class = $file->getBasename('.controller.php') . '_Controller';
+
+			if (method_exists($class, 'addCoreFeature'))
+				$class::addCoreFeature($core_features);
+		}
+
+		$integrations = Hooks::instance()->discoverIntegrations(ADDONSDIR);
+
+		foreach ($integrations as $integration)
+		{
+			$core_features[$integration['id']] = array(
+				'url' => empty($integration['details']->extra->setting_url) ? '?action=admin;area=addonsettings' : $integration['details']->extra->setting_url,
+				'title' => $integration['title'],
+				'desc' => $integration['description'],
+			);
+
+			if (method_exists($integration['class'], 'setting_callback'))
+			{
+				$core_features[$integration['id']]['setting_callback'] = function ($value) use ($integration) {
+					$integration['class']::setting_callback($value);
+				};
+			}
+
+			if (method_exists($integration['class'], 'on_save'))
+			{
+				$core_features[$integration['id']]['on_save'] = function () use ($integration) {
+					$integration['class']::on_save();
+				};
+			}
+		}
 	}
 
 	/**
@@ -368,6 +350,7 @@ class CoreFeatures_Controller extends Action_Controller
 	 *
 	 * @param mixed[] $subActions = array() An array containing all possible subactions.
 	 * @param string $defaultAction = '' the default action to be called if no valid subaction was found.
+	 * @throws Elk_Exception
 	 */
 	public function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')
 	{
@@ -379,14 +362,11 @@ class CoreFeatures_Controller extends Action_Controller
 		loadLanguage('Help');
 		loadLanguage('ManageSettings');
 
-		// Will need the utility functions from here.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		$context['sub_template'] = 'show_settings';
 
 		// By default do the basic settings.
-		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
-			$context['sub_action'] = $_REQUEST['sa'];
+		if (isset($this->_req->query->sa, $subActions[$this->_req->query->sa]))
+			$context['sub_action'] = $this->_req->query->sa;
 		elseif (!empty($defaultAction))
 			$context['sub_action'] = $defaultAction;
 		else
@@ -394,5 +374,102 @@ class CoreFeatures_Controller extends Action_Controller
 			$temp = array_keys($subActions);
 			$context['sub_action'] = array_pop($temp);
 		}
+	}
+
+	/**
+	 * Takes care os saving the core features status (enabled/disabled)
+	 *
+	 * @param mixed[] $core_features - The array of all the core features, as
+	 *                returned by $this->settings()
+	 */
+	private function _save_core_features($core_features)
+	{
+		global $modSettings;
+
+		$setting_changes = array('admin_features' => array());
+
+		// Cycle each feature and change things as required!
+		foreach ($core_features as $id => $feature)
+		{
+			$feature_id = $this->_req->getPost('feature_' . $id);
+
+			// Enabled?
+			if (!empty($feature_id))
+				$setting_changes['admin_features'][] = $id;
+
+			// Setting values to change?
+			if (isset($feature['settings']))
+			{
+				foreach ($feature['settings'] as $key => $value)
+				{
+					if (empty($feature_id) || (!empty($feature_id) && ($value < 2 || empty($modSettings[$key]))))
+						$setting_changes[$key] = !empty($feature_id) ? $value : !$value;
+				}
+			}
+
+			// Is there a call back for settings?
+			if (isset($feature['setting_callback']))
+			{
+				$returned_settings = $feature['setting_callback'](!empty($feature_id));
+				if (!empty($returned_settings))
+					$setting_changes = array_merge($setting_changes, $returned_settings);
+			}
+
+			// Standard save callback?
+			if (isset($feature['on_save']))
+				$feature['on_save']();
+		}
+
+		// Make sure this one setting is a string!
+		$setting_changes['admin_features'] = implode(',', $setting_changes['admin_features']);
+
+		// Make any setting changes!
+		updateSettings($setting_changes);
+
+		// This is needed to let menus appear if cache > 2
+		if ($modSettings['cache_enable'] > 2)
+			clean_cache('data');
+
+		// Any post save things?
+		foreach ($core_features as $id => $feature)
+		{
+			// Standard save callback?
+			if (isset($feature['save_callback']))
+			{
+				$status = $this->_req->getPost('feature_' . $id);
+				$feature['save_callback'](!empty($status));
+			}
+		}
+	}
+
+	/**
+	 * Puts the core features data into a format usable by the template
+	 *
+	 * @param mixed[] $core_features - The array of all the core features, as
+	 *                returned by $this->settings()
+	 */
+	protected function _prepare_corefeatures($core_features)
+	{
+		global $context, $txt, $settings, $scripturl;
+
+		$features = array();
+		foreach ($core_features as $id => $feature)
+		{
+			$features[$id] = array(
+				'title' => isset($feature['title']) ? $feature['title'] : $txt['core_settings_item_' . $id],
+				'desc' => isset($feature['desc']) ? $feature['desc'] : $txt['core_settings_item_' . $id . '_desc'],
+				'enabled' => in_array($id, $context['admin_features']),
+				'state' => in_array($id, $context['admin_features']) ? 'on' : 'off',
+				'url' => !empty($feature['url']) ? $scripturl . '?' . $feature['url'] . ';' . $context['session_var'] . '=' . $context['session_id'] : '',
+				'image' => (file_exists($settings['theme_dir'] . '/images/admin/feature_' . $id . '.png') ? $settings['images_url'] : $settings['default_images_url']) . '/admin/feature_' . $id . '.png',
+			);
+		}
+
+		// Sort by title attribute
+		uasort($features, function ($a, $b) {
+			return strcmp(strtolower($a['title']), strtolower($b['title']));
+		});
+
+		return $features;
 	}
 }

@@ -7,12 +7,9 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.3
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Simple cURL class to fetch a web page
@@ -47,7 +44,7 @@ class Curl_Fetch_Webdata
 		CURLOPT_RETURNTRANSFER	=> 1, // Get returned value as a string (don't output it)
 		CURLOPT_HEADER			=> 1, // We need the headers to do our own redirect
 		CURLOPT_FOLLOWLOCATION	=> 0, // Don't follow, we will do it ourselves so safe mode and open_basedir will dig it
-		CURLOPT_USERAGENT		=> 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)', // set a normal looking useragent
+		CURLOPT_USERAGENT		=> 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)', // set a normal looking user agent
 		CURLOPT_CONNECTTIMEOUT	=> 10, // Don't wait forever on a connection
 		CURLOPT_TIMEOUT			=> 10, // A page should load in this amount of time
 		CURLOPT_MAXREDIRS		=> 3, // stop after this many redirects
@@ -58,7 +55,7 @@ class Curl_Fetch_Webdata
 	);
 
 	/**
-	 * Holds the passed or defautl value for redirects
+	 * Holds the passed or default value for redirects
 	 * @var int
 	 */
 	private $_max_redirect = 3;
@@ -101,10 +98,11 @@ class Curl_Fetch_Webdata
 
 	/**
 	 * Start the cURL object
-	 * - allow for user override values
+	 *
+	 * - Allow for user override values
 	 *
 	 * @param mixed[] $options cURL options as an array
-	 * @param int $max_redirect use to override the default of 3
+	 * @param int $max_redirect Maximum number of redirects
 	 */
 	public function __construct($options = array(), $max_redirect = 3)
 	{
@@ -117,10 +115,11 @@ class Curl_Fetch_Webdata
 	 * Main calling function
 	 *
 	 * What it does:
-	 * - will request the page data from a given $url
-	 * - optionally will post data to the page form if post data is supplied
-	 * - passed arrays will be converted to a post string joined with &'s
-	 * - calls _setOptions to set the curl opts array values based on the defaults and user input
+	 *
+	 * - Will request the page data from a given $url
+	 * - Optionally will post data to the page form if post data is supplied
+	 * - Passed arrays will be converted to a post string joined with &'s
+	 * - Calls _setOptions to set the curl opts array values based on the defaults and user input
 	 *
 	 * @param string $url the site we are going to fetch
 	 * @param mixed[]|string $post_data data to send in the curl request as post data
@@ -144,8 +143,8 @@ class Curl_Fetch_Webdata
 	 * Makes the actual cURL call
 	 *
 	 * What it does
-	 * - stores responses (url, code, error, headers, body) in the response array
-	 * - detects 301, 302, 307 codes and will redirect to the given response header location
+	 * - Stores responses (url, code, error, headers, body) in the response array
+	 * - Detects 301, 302, 307 codes and will redirect to the given response header location
 	 *
 	 * @param string $url site to fetch
 	 * @param bool $redirect flag to indicate if this was a redirect request or not
@@ -198,14 +197,17 @@ class Curl_Fetch_Webdata
 			$header_location = $this->_getRedirectURL($url, $this->_headers['location']);
 			$this->_redirect($header_location, $url);
 		}
+
+		return true;
 	}
 
 	/**
 	 * Used if being redirected to ensure we have a fully qualified address
-	 * returns the new url location for the redirect
 	 *
-	 * @param string $last_url where we went to
-	 * @param string $new_url where we were redirected to
+	 * - Returns the new url location for the redirect
+	 *
+	 * @param string $last_url URL where we went to
+	 * @param string $new_url URL where we were redirected to
 	 */
 	private function _getRedirectURL($last_url = '', $new_url = '')
 	{
@@ -227,8 +229,9 @@ class Curl_Fetch_Webdata
 	 * Used to return the results to the calling program
 	 *
 	 * What it does:
-	 * - called as ->result() will return the full final array
-	 * - called as ->result('body') to just return the page source of the result
+	 *
+	 * - Called as ->result() will return the full final array
+	 * - Called as ->result('body') to just return the page source of the result
 	 *
 	 * @param string $area used to return an area such as body, header, error
 	 */
@@ -236,7 +239,7 @@ class Curl_Fetch_Webdata
 	{
 		$max_result = count($this->_response) - 1;
 
-		// just return a specified area or the entire result?
+		// Just return a specified area or the entire result?
 		if ($area == '')
 			return $this->_response[$max_result];
 		else
@@ -247,6 +250,7 @@ class Curl_Fetch_Webdata
 	 * Will return all results from all loops (redirects)
 	 *
 	 * What it does:
+	 *
 	 * - Can be called as ->result_raw(x) where x is a specific loop results.
 	 * - Call as ->result_raw() for everything.
 	 *
@@ -267,11 +271,12 @@ class Curl_Fetch_Webdata
 	 * Takes supplied POST data and url encodes it
 	 *
 	 * What it does:
-	 * - forms the date (for post) in to a string var=xyz&var2=abc&var3=123
-	 * - drops vars with @ since we don't support sending files (uploading)
+	 *
+	 * - Forms the date (for post) in to a string var=xyz&var2=abc&var3=123
+	 * - Drops vars with @ since we don't support sending files (uploading)
 	 *
 	 * @param mixed[] $post_data
-	*/
+	 */
 	private function _buildPostData($post_data)
 	{
 		if (is_array($post_data))
@@ -280,7 +285,9 @@ class Curl_Fetch_Webdata
 
 			// Build the post data, drop ones with leading @'s since those can be used to send files, we don't support that.
 			foreach ($post_data as $name => $value)
+			{
 				$postvars[] = $name . '=' . urlencode($value[0] == '@' ? '' : $value);
+			}
 
 			return implode('&', $postvars);
 		}
@@ -292,8 +299,11 @@ class Curl_Fetch_Webdata
 	 * Sets the final cURL options for the current call
 	 *
 	 * What it does:
-	 * - overwrites our default values with user supplied ones or appends new user ones to what we have
-	 * - sets the callback function now that $this exists
+	 *
+	 * - Overwrites our default values with user supplied ones or appends new user ones to what we have
+	 * - Sets the callback function now that $this exists
+	 *
+	 * @uses _headerCallback()
 	 */
 	private function _setOptions()
 	{
@@ -322,10 +332,10 @@ class Curl_Fetch_Webdata
 	 * Called to initiate a redirect from a 301, 302 or 307 header
 	 *
 	 * What it does
-	 * - resets the cURL options for the loop, sets the referrer flag
+	 * - Resets the cURL options for the loop, sets the referrer flag
 	 *
-	 * @param string $target_url
-	 * @param string $referer_url
+	 * @param string $target_url The URL of the target
+	 * @param string $referer_url The URL of the link that referred us to the new target
 	 */
 	private function _redirect($target_url, $referer_url)
 	{
@@ -339,21 +349,22 @@ class Curl_Fetch_Webdata
 	 * Callback function to parse returned headers
 	 *
 	 * What it does:
-	 * - lowercases everything to make it consistent
 	 *
-	 * @param object $cr
-	 * @param string $header
+	 * - lowercase everything to make it consistent
+	 *
+	 * @param object $cr Not used but passed by the cURL agent
+	 * @param string $header The headers received
 	 */
 	private function _headerCallback($cr, $header)
 	{
 		$_header = trim($header);
 		$temp = explode(': ', $_header, 2);
 
-		// set proper headers only
+		// Set proper headers only
 		if (isset($temp[0]) && isset($temp[1]))
 			$this->_headers[strtolower($temp[0])] = trim($temp[1]);
 
-		// return the length of what was *passed* unless you want a Failed writing header error ;)
+		// Return the length of what was *passed* unless you want a Failed writing header error ;)
 		return strlen($header);
 	}
 }

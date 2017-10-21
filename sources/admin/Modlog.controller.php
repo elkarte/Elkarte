@@ -7,18 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.8
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Admin and moderation log controller.
@@ -54,13 +49,14 @@ class Modlog_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Modlog.subs.php');
 
 		// Are we looking at the moderation log or the administration log.
-		$context['log_type'] = isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'adminlog' ? 3 : 1;
+		$context['log_type'] = isset($this->_req->query->sa) && $this->_req->query->sa === 'adminlog' ? 3 : 1;
 
+		// Trying to view the admin log, lets check you can.
 		if ($context['log_type'] == 3)
 			isAllowedTo('admin_forum');
 
 		// These change dependant on whether we are viewing the moderation or admin log.
-		if ($context['log_type'] == 3 || $_REQUEST['action'] == 'admin')
+		if ($context['log_type'] == 3 || $this->_req->query->action === 'admin')
 			$context['url_start'] = '?action=admin;area=logs;sa=' . ($context['log_type'] == 3 ? 'adminlog' : 'modlog') . ';type=' . $context['log_type'];
 		else
 			$context['url_start'] = '?action=moderate;area=modlog;type=' . $context['log_type'];
@@ -78,23 +74,23 @@ class Modlog_Controller extends Action_Controller
 		$context['hoursdisable'] = 24;
 
 		// Handle deletion...
-		if (isset($_POST['removeall']) && $context['can_delete'])
+		if (isset($this->_req->post->removeall) && $context['can_delete'])
 		{
 			checkSession();
 			validateToken('mod-ml');
 			deleteLogAction($context['log_type'], $context['hoursdisable']);
 		}
-		elseif (!empty($_POST['remove']) && isset($_POST['delete']) && $context['can_delete'])
+		elseif (!empty($this->_req->post->remove) && isset($this->_req->post->delete) && $context['can_delete'])
 		{
 			checkSession();
 			validateToken('mod-ml');
-			deleteLogAction($context['log_type'], $context['hoursdisable'], $_POST['delete']);
+			deleteLogAction($context['log_type'], $context['hoursdisable'], $this->_req->post->delete);
 		}
 
 		// If we're coming from a search, get the variables.
-		if (!empty($_REQUEST['params']) && empty($_REQUEST['is_search']))
+		if (!empty($this->_req->post->params) && empty($this->_req->post->is_search))
 		{
-			$search_params = base64_decode(strtr($_REQUEST['params'], array(' ' => '+')));
+			$search_params = base64_decode(strtr($this->_req->post->params, array(' ' => '+')));
 			$search_params = @json_decode($search_params, true);
 		}
 
@@ -107,15 +103,15 @@ class Modlog_Controller extends Action_Controller
 		);
 
 		// Setup the allowed search
-		$context['order'] = isset($_REQUEST['sort']) && isset($searchTypes[$_REQUEST['sort']]) ? $_REQUEST['sort'] : 'member';
+		$context['order'] = isset($this->_req->query->sort) && isset($searchTypes[$this->_req->query->sort]) ? $this->_req->query->sort : 'member';
 
-		if (!isset($search_params['string']) || (!empty($_REQUEST['search']) && $search_params['string'] != $_REQUEST['search']))
-			$search_params_string = empty($_REQUEST['search']) ? '' : $_REQUEST['search'];
+		if (!isset($search_params['string']) || (!empty($this->_req->post->search) && $search_params['string'] != $this->_req->post->search))
+			$search_params_string = $this->_req->getPost('search', 'trim', '');
 		else
 			$search_params_string = $search_params['string'];
 
-		if (isset($_REQUEST['search_type']) || empty($search_params['type']) || !isset($searchTypes[$search_params['type']]))
-			$search_params_type = isset($_REQUEST['search_type']) && isset($searchTypes[$_REQUEST['search_type']]) ? $_REQUEST['search_type'] : $context['order'];
+		if (isset($this->_req->post->search_type) || empty($search_params['type']) || !isset($searchTypes[$search_params['type']]))
+			$search_params_type = isset($this->_req->post->search_type) && isset($searchTypes[$this->_req->post->search_type]) ? $this->_req->query->search_type : $context['order'];
 		else
 			$search_params_type = $search_params['type'];
 
@@ -134,7 +130,7 @@ class Modlog_Controller extends Action_Controller
 		);
 
 		// If they are searching by action, then we must do some manual intervention to search in their language!
-		if ($search_params['type'] == 'action' && !empty($search_params['string']))
+		if ($search_params['type'] === 'action' && !empty($search_params['string']))
 		{
 			// Build a regex which looks for the words
 			$regex = '';
@@ -153,15 +149,13 @@ class Modlog_Controller extends Action_Controller
 			}
 		}
 
-		require_once(SUBSDIR . '/GenericList.class.php');
-
 		// This is all the information required for a moderation/admin log listing.
 		$listOptions = array(
 			'id' => 'moderation_log_list',
 			'width' => '100%',
 			'items_per_page' => $context['displaypage'],
 			'no_items_label' => $txt['modlog_' . ($context['log_type'] == 3 ? 'admin_log_' : '') . 'no_entries_found'],
-			'base_href' => $scripturl . $context['url_start'] . (!empty($context['search_params']) ? ';params=' . $context['search_params'] : ''),
+			'base_href' => $scripturl . $context['url_start'],
 			'default_sort_col' => 'time',
 			'get_items' => array(
 				'function' => array($this, 'getModLogEntries'),
@@ -256,9 +250,9 @@ class Modlog_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$entry', '
-							return \'<input type="checkbox" class="input_check" name="delete[]" value="\' . $entry[\'id\'] . \'"\' . ($entry[\'editable\'] ? \'\' : \' disabled="disabled"\') . \' />\';
-						'),
+						'function' => function ($entry) {
+							return '<input type="checkbox" name="delete[]" value="' . $entry['id'] . '"' . ($entry['editable'] ? '' : ' disabled="disabled"') . ' />';
+						},
 						'class' => 'centertext',
 					),
 				),
@@ -278,14 +272,12 @@ class Modlog_Controller extends Action_Controller
 					'class' => 'submitbutton',
 					'position' => 'below_table_data',
 					'value' => '
-						<div id="quick_log_search">
-							' . $txt['modlog_search'] . ' (' . $txt['modlog_by'] . ': ' . $context['search']['label'] . ')
-							<input type="text" name="search" size="18" value="' . Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
-							<input type="submit" name="is_search" value="' . $txt['modlog_go'] . '" class="button_submit" />
-							' . ($context['can_delete'] ? '|&nbsp;
-							<input type="submit" name="remove" value="' . $txt['modlog_remove'] . '" onclick="return confirm(\'' . $txt['modlog_remove_selected_confirm'] . '\');" class="right_submit" />
-							<input type="submit" name="removeall" value="' . $txt['modlog_removeall'] . '" onclick="return confirm(\'' . $txt['modlog_remove_all_confirm'] . '\');" class="right_submit" />' : '') . '
-						</div>',
+						' . $txt['modlog_search'] . ' (' . $txt['modlog_by'] . ': ' . $context['search']['label'] . ')
+						<input type="text" name="search" size="18" value="' . Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
+						<input type="submit" name="is_search" value="' . $txt['modlog_go'] . '" />
+						' . ($context['can_delete'] ? '|&nbsp;
+						<input type="submit" name="remove" value="' . $txt['modlog_remove'] . '" onclick="return confirm(\'' . $txt['modlog_remove_selected_confirm'] . '\');" />
+						<input type="submit" name="removeall" value="' . $txt['modlog_removeall'] . '" onclick="return confirm(\'' . $txt['modlog_remove_all_confirm'] . '\');"/>' : ''),
 				),
 			),
 		);
@@ -304,9 +296,9 @@ class Modlog_Controller extends Action_Controller
 	 * Returns a list of moderation log entries
 	 * Uses list_getModLogEntries in modlog subs
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param string $query_string
 	 * @param mixed[] $query_params
 	 * @param int $log_type

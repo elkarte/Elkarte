@@ -7,18 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.10
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Reads a .tar.gz file, filename, in and extracts file(s) from it.
@@ -30,7 +25,7 @@ if (!defined('ELK'))
  * @param bool $single_file = false
  * @param bool $overwrite = false
  * @param string[]|null $files_to_extract = null
- * @return string|false
+ * @return array|false
  */
 function read_tgz_file($gzfilename, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
@@ -79,7 +74,7 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  * @param bool $single_file = false,
  * @param bool $overwrite = false,
  * @param string[]|null $files_to_extract = null
- * @return string|false
+ * @return array|false
  */
 function read_tgz_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
@@ -107,6 +102,7 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
  * @param bool $single_file
  * @param bool $overwrite
  * @param string[]|null $files_to_extract
+ * @return array|false
  */
 function read_zip_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
@@ -221,6 +217,8 @@ function loadInstalledPackages()
  *
  * @package Packages
  * @param string $gzfilename
+ *
+ * @return array|string error string on error array on success
  */
 function getPackageInfo($gzfilename)
 {
@@ -256,7 +254,6 @@ function getPackageInfo($gzfilename)
 	}
 
 	// Parse package-info.xml into an Xml_Array.
-	require_once(SUBSDIR . '/XmlArray.class.php');
 	$packageInfo = new Xml_Array($packageInfo);
 
 	// @todo Error message of some sort?
@@ -284,7 +281,8 @@ function getPackageInfo($gzfilename)
  * @param string[] $chmodFiles
  * @param mixed[] $chmodOptions
  * @param boolean $restore_write_status
- * @return boolean
+ * @return array|boolean
+ * @throws Elk_Exception
  */
 function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $restore_write_status = false)
 {
@@ -293,67 +291,6 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 	// If we're restoring the status of existing files prepare the data.
 	if ($restore_write_status && isset($_SESSION['pack_ftp']) && !empty($_SESSION['pack_ftp']['original_perms']))
 	{
-		/**
-		 * Get a listing of files that will need to be set back to the original state
-		 *
-		 * @param string $dummy1
-		 * @param string $dummy2
-		 * @param string $dummy3
-		 * @param boolean $do_change
-		 */
-		function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
-		{
-			global $txt, $package_ftp;
-
-			$restore_files = array();
-			foreach ($_SESSION['pack_ftp']['original_perms'] as $file => $perms)
-			{
-				// Check the file still exists, and the permissions were indeed different than now.
-				$file_permissions = @fileperms($file);
-				if (!file_exists($file) || $file_permissions == $perms)
-				{
-					unset($_SESSION['pack_ftp']['original_perms'][$file]);
-					continue;
-				}
-
-				// Are we wanting to change the permission?
-				if ($do_change && isset($_POST['restore_files']) && in_array($file, $_POST['restore_files']))
-				{
-					// Use FTP if we have it.
-					if (!empty($package_ftp))
-					{
-						$ftp_file = strtr($file, array($_SESSION['pack_ftp']['root'] => ''));
-						$package_ftp->chmod($ftp_file, $perms);
-					}
-					else
-						@chmod($file, $perms);
-
-					$new_permissions = @fileperms($file);
-					$result = $new_permissions == $perms ? 'success' : 'failure';
-					unset($_SESSION['pack_ftp']['original_perms'][$file]);
-				}
-				elseif ($do_change)
-				{
-					$new_permissions = '';
-					$result = 'skipped';
-					unset($_SESSION['pack_ftp']['original_perms'][$file]);
-				}
-
-				// Record the results!
-				$restore_files[] = array(
-					'path' => $file,
-					'old_perms_raw' => $perms,
-					'old_perms' => substr(sprintf('%o', $perms), -4),
-					'cur_perms' => substr(sprintf('%o', $file_permissions), -4),
-					'new_perms' => isset($new_permissions) ? substr(sprintf('%o', $new_permissions), -4) : '',
-					'result' => isset($result) ? $result : '',
-					'writable_message' => '<span style="color: ' . (@is_writable($file) ? 'green' : 'red') . '">' . (@is_writable($file) ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']) . '</span>',
-				);
-			}
-
-			return $restore_files;
-		}
-
 		$listOptions = array(
 			'id' => 'restore_file_permissions',
 			'title' => $txt['package_restore_permissions'],
@@ -387,12 +324,12 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 						'value' => $txt['package_restore_permissions_cur_status'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $txt;
 
-							$formatTxt = $rowData[\'result\'] == \'\' || $rowData[\'result\'] == \'skipped\' ? $txt[\'package_restore_permissions_pre_change\'] : $txt[\'package_restore_permissions_post_change\'];
-							return sprintf($formatTxt, $rowData[\'cur_perms\'], $rowData[\'new_perms\'], $rowData[\'writable_message\']);
-						'),
+							$formatTxt = $rowData['result'] == '' || $rowData['result'] == 'skipped' ? $txt['package_restore_permissions_pre_change'] : $txt['package_restore_permissions_post_change'];
+							return sprintf($formatTxt, $rowData['cur_perms'], $rowData['new_perms'], $rowData['writable_message']);
+						},
 						'class' => 'smalltext',
 					),
 				),
@@ -416,11 +353,11 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 						'value' => $txt['package_restore_permissions_result'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $txt;
 
-							return $txt[\'package_restore_permissions_action_\' . $rowData[\'result\']];
-						'),
+							return $txt['package_restore_permissions_action_' . $rowData['result']];
+						},
 						'class' => 'smalltext',
 					),
 				),
@@ -437,7 +374,6 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 				array(
 					'position' => 'after_title',
 					'value' => '<span class="smalltext">' . $txt['package_restore_permissions_desc'] . '</span>',
-					'class' => 'windowbg2',
 				),
 			),
 		);
@@ -457,10 +393,9 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 		}
 
 		// Create the list for display.
-		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
-		// If we just restored permissions then whereever we are, we are now done and dusted.
+		// If we just restored permissions then wherever we are, we are now done and dusted.
 		if (!empty($_POST['restore_perms']))
 			obExit();
 	}
@@ -479,9 +414,6 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 	// If we have some FTP information already, then let's assume it was required and try to get ourselves connected.
 	if (!empty($_SESSION['pack_ftp']['connected']))
 	{
-		// Load the file containing the Ftp_Connection class.
-		require_once(SUBSDIR . '/FtpConnection.class.php');
-
 		$package_ftp = new Ftp_Connection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
 
 		// Check for a valid connection
@@ -492,7 +424,6 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 	// Just got a submission did we?
 	if ((empty($package_ftp) || ($package_ftp->error !== false)) && isset($_POST['ftp_username']))
 	{
-		require_once(SUBSDIR . '/FtpConnection.class.php');
 		$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 		// We're connected, jolly good!
@@ -558,7 +489,6 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 		{
 			if (!isset($ftp))
 			{
-				require_once(SUBSDIR . '/FtpConnection.class.php');
 				$ftp = new Ftp_Connection(null);
 			}
 			elseif ($ftp->error !== false && !isset($ftp_error))
@@ -602,12 +532,75 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 }
 
 /**
+ * Get a listing of files that will need to be set back to the original state
+ *
+ * @param string $dummy1
+ * @param string $dummy2
+ * @param string $dummy3
+ * @param boolean $do_change
+ */
+function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
+{
+	global $txt, $package_ftp;
+
+	$restore_files = array();
+
+	foreach ($_SESSION['pack_ftp']['original_perms'] as $file => $perms)
+	{
+		// Check the file still exists, and the permissions were indeed different than now.
+		$file_permissions = @fileperms($file);
+		if (!file_exists($file) || $file_permissions == $perms)
+		{
+			unset($_SESSION['pack_ftp']['original_perms'][$file]);
+			continue;
+		}
+
+		// Are we wanting to change the permission?
+		if ($do_change && isset($_POST['restore_files']) && in_array($file, $_POST['restore_files']))
+		{
+			// Use FTP if we have it.
+			if (!empty($package_ftp))
+			{
+				$ftp_file = strtr($file, array($_SESSION['pack_ftp']['root'] => ''));
+				$package_ftp->chmod($ftp_file, $perms);
+			}
+			else
+				elk_chmod($file, $perms);
+
+			$new_permissions = @fileperms($file);
+			$result = $new_permissions == $perms ? 'success' : 'failure';
+			unset($_SESSION['pack_ftp']['original_perms'][$file]);
+		}
+		elseif ($do_change)
+		{
+			$new_permissions = '';
+			$result = 'skipped';
+			unset($_SESSION['pack_ftp']['original_perms'][$file]);
+		}
+
+		// Record the results!
+		$restore_files[] = array(
+			'path' => $file,
+			'old_perms_raw' => $perms,
+			'old_perms' => substr(sprintf('%o', $perms), -4),
+			'cur_perms' => substr(sprintf('%o', $file_permissions), -4),
+			'new_perms' => isset($new_permissions) ? substr(sprintf('%o', $new_permissions), -4) : '',
+			'result' => isset($result) ? $result : '',
+			'writable_message' => '<span class="' . (@is_writable($file) ? 'success' : 'alert') . '">' . (@is_writable($file) ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']) . '</span>',
+		);
+	}
+
+	return $restore_files;
+}
+
+/**
  * Use FTP functions to work with a package download/install
  *
  * @package Packages
  * @param string $destination_url
  * @param string[]|null $files = none
  * @param bool $return = false
+ * @throws Elk_Exception
  */
 function packageRequireFTP($destination_url, $files = null, $return = false)
 {
@@ -624,13 +617,13 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 
 			// This looks odd, but it's an attempt to work around PHP suExec.
 			if (!@is_writable($file))
-				@chmod($file, 0755);
+				elk_chmod($file, 0755);
 			if (!@is_writable($file))
-				@chmod($file, 0777);
+				elk_chmod($file, 0777);
 			if (!@is_writable(dirname($file)))
-				@chmod($file, 0755);
+				elk_chmod($file, 0755);
 			if (!@is_writable(dirname($file)))
-				@chmod($file, 0777);
+				elk_chmod($file, 0777);
 
 			$fp = is_dir($file) ? @opendir($file) : @fopen($file, 'rb');
 			if (@is_writable($file) && $fp)
@@ -649,7 +642,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	}
 
 	// They've opted to not use FTP, and try anyway.
-	if (isset($_SESSION['pack_ftp']) && $_SESSION['pack_ftp'] == false)
+	if (isset($_SESSION['pack_ftp']) && $_SESSION['pack_ftp'] === false)
 	{
 		if ($files === null)
 			return array();
@@ -661,13 +654,12 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 			{
 				mktree(dirname($file), 0755);
 				@touch($file);
-				@chmod($file, 0755);
+				elk_chmod($file, 0755);
 			}
-
 			if (!@is_writable($file))
-				@chmod($file, 0777);
+				elk_chmod($file, 0777);
 			if (!@is_writable(dirname($file)))
-				@chmod(dirname($file), 0777);
+				elk_chmod(dirname($file), 0777);
 
 			if (@is_writable($file))
 				unset($files[$k]);
@@ -677,9 +669,6 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	}
 	elseif (isset($_SESSION['pack_ftp']))
 	{
-		// Load the file containing the Ftp_Connection class.
-		require_once(SUBSDIR . '/FtpConnection.class.php');
-
 		$package_ftp = new Ftp_Connection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
 
 		if ($files === null)
@@ -722,7 +711,6 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	elseif (isset($_POST['ftp_username']))
 	{
 		// Attempt to make a new FTP connection
-		require_once(SUBSDIR . '/FtpConnection.class.php');
 		$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 		if ($ftp->error === false)
@@ -740,7 +728,6 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	{
 		if (!isset($ftp))
 		{
-			require_once(SUBSDIR . '/FtpConnection.class.php');
 			$ftp = new Ftp_Connection(null);
 		}
 		elseif ($ftp->error !== false && !isset($ftp_error))
@@ -806,6 +793,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
  * Parses the actions in package-info.xml file from packages.
  *
  * What it does:
+ *
  * - Package should be an Xml_Array with package-info as its base.
  * - Testing_only should be true if the package should not actually be applied.
  * - Method can be upgrade, install, or uninstall.  Its default is install.
@@ -821,7 +809,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
  */
 function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install', $previous_version = '')
 {
-	global $forum_version, $context, $temp_path, $language;
+	global $context, $temp_path, $language;
 
 	// Mayday!  That action doesn't exist!!
 	if (empty($packageXML) || !$packageXML->exists($method))
@@ -829,7 +817,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 
 	// We haven't found the package script yet...
 	$script = false;
-	$the_version = strtr($forum_version, array('ElkArte ' => ''));
+	$the_version = strtr(FORUM_VERSION, array('ElkArte ' => ''));
 
 	// Emulation support...
 	if (!empty($_SESSION['version_emulate']))
@@ -882,6 +870,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 
 	$context['readmes'] = array();
 	$context['licences'] = array();
+	$has_redirect = false;
 
 	// This is the testing phase... nothing shall be done yet.
 	foreach ($actions as $action)
@@ -890,6 +879,11 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 
 		if (in_array($actionType, array('readme', 'code', 'database', 'modification', 'redirect', 'license')))
 		{
+			if ($actionType == 'redirect')
+			{
+				$has_redirect = true;
+			}
+
 			// Allow for translated readme and license files.
 			if ($actionType == 'readme' || $actionType == 'license')
 			{
@@ -941,9 +935,8 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 				'filename' => $filename,
 				'description' => '',
 				'reverse' => $action->exists('@reverse') && $action->fetch('@reverse') == 'true',
-				'boardmod' => $action->exists('@format') && $action->fetch('@format') == 'boardmod',
 				'redirect_url' => $action->exists('@url') ? $action->fetch('@url') : '',
-				'redirect_timeout' => $action->exists('@timeout') ? (int) $action->fetch('@timeout') : '',
+				'redirect_timeout' => $action->exists('@timeout') ? (int) $action->fetch('@timeout') : 5000,
 				'parse_bbc' => $action->exists('@parsebbc') && $action->fetch('@parsebbc') == 'true',
 				'language' => (($actionType == 'readme' || $actionType == 'license') && $action->exists('@lang') && $action->fetch('@lang') == $language) ? $language : '',
 			);
@@ -966,10 +959,11 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 		{
 			// quick check of any supplied url
 			$url = $action->exists('@url') ? $action->fetch('@url') : '';
-			if (strlen(trim($url)) > 0 && substr($url, 0, 7) !== 'http://' && substr($url, 0, 8) !== 'https://')
+			if (strlen(trim($url)) > 0)
 			{
-				$url = 'http://' . $url;
-				if (strlen($url) < 8 || (substr($url, 0, 7) !== 'http://' && substr($url, 0, 8) !== 'https://'))
+				$url = addProtocol($url, array('http://', 'https://'));
+
+				if (strlen($url) < 8)
 					$url = '';
 			}
 
@@ -1023,9 +1017,13 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 			if (substr($actionType, 0, 4) == 'move' || substr($actionType, 0, 7) == 'require')
 			{
 				if ($action->exists('@from'))
+				{
 					$this_action['source'] = parse_path($action->fetch('@from'));
+				}
 				else
+				{
 					$this_action['source'] = $temp_path . $this_action['filename'];
+				}
 			}
 
 			// Check if these things can be done. (chmod's etc.)
@@ -1149,6 +1147,20 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 		}
 	}
 
+	if (!$has_redirect)
+	{
+		$return[] = array(
+			'type' => 'redirect',
+			'filename' => '',
+			'description' => '',
+			'reverse' => false,
+			'redirect_url' => '$scripturl?action=admin;area=packages',
+			'redirect_timeout' => 5000,
+			'parse_bbc' => false,
+			'language' => '',
+		);
+	}
+
 	// Only testing - just return a list of things to be done.
 	if ($testing_only)
 		return $return;
@@ -1266,11 +1278,10 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
  * @param string $versions
  * @param boolean $reset
  * @param string $the_version
- * @return highest install value string or false
+ * @return string|boolean highest install value string or false
  */
 function matchHighestPackageVersion($versions, $reset = false, $the_version)
 {
-	global $forum_version;
 	static $near_version = 0;
 
 	if ($reset)
@@ -1280,7 +1291,7 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
 	$versions = explode(',', str_replace(' ', '', strtolower($versions)));
 
 	// If it is not ElkArte, let's just give up
-	list ($the_brand,) = explode(' ', $forum_version, 2);
+	list ($the_brand,) = explode(' ', FORUM_VERSION, 2);
 	if ($the_brand != 'ElkArte')
 		return false;
 
@@ -1370,14 +1381,14 @@ function compareVersions($version1, $version2)
 	{
 		// Clean the version and extract the version parts.
 		$clean = str_replace(' ', '', strtolower($version));
-		preg_match('~(\d+)(?:\.(\d+|))?(?:\.)?(\d+|)(?:(alpha|beta|rc)(\d+|)(?:\.)?(\d+|))?(?:(dev))?(\d+|)~', $clean, $parts);
+		preg_match('~(\d+)(?:\.(\d+|))?(?:\.)?(\d+|)(?:(alpha|beta|rc)(\d+|)(?:\.)?(\d+|))?(?:\s(dev))?(\d+|)~', $clean, $parts);
 
 		// Build an array of parts.
 		$versions[$id] = array(
 			'major' => !empty($parts[1]) ? (int) $parts[1] : 0,
 			'minor' => !empty($parts[2]) ? (int) $parts[2] : 0,
 			'patch' => !empty($parts[3]) ? (int) $parts[3] : 0,
-			'type' => empty($parts[4]) ? 'stable' : $parts[4],
+			'type' => empty($parts[4]) && empty($parts[7]) ? 'stable' : (!empty($parts[7]) ? 'alpha' : $parts[4]),
 			'type_major' => !empty($parts[6]) ? (int) $parts[5] : 0,
 			'type_minor' => !empty($parts[6]) ? (int) $parts[6] : 0,
 			'dev' => !empty($parts[7]),
@@ -1426,7 +1437,7 @@ function parse_path($path)
 	global $modSettings, $settings, $temp_path;
 
 	if (empty($path))
-		return;
+		return '';
 
 	$dirs = array(
 		'\\' => '/',
@@ -1436,6 +1447,7 @@ function parse_path($path)
 		'ADMINDIR' => ADMINDIR,
 		'CONTROLLERDIR' => CONTROLLERDIR,
 		'EXTDIR' => EXTDIR,
+		'ADDONSDIR' => ADDONSDIR,
 		'AVATARSDIR' => $modSettings['avatar_directory'],
 		'THEMEDIR' => $settings['default_theme_dir'],
 		'IMAGESDIR' => $settings['default_theme_dir'] . '/' . basename($settings['default_images_url']),
@@ -1445,7 +1457,7 @@ function parse_path($path)
 
 	// Do we parse in a package directory?
 	if (!empty($temp_path))
-		$dirs['$package'] = $temp_path;
+		$dirs['PACKAGE'] = $temp_path;
 
 	if (strlen($path) == 0)
 		trigger_error('parse_path(): There should never be an empty filename', E_USER_ERROR);
@@ -1458,12 +1470,13 @@ function parse_path($path)
 }
 
 /**
- * Deletes all the files in a directory, and all the files in sub direcories inside it.
+ * Deletes all the files in a directory, and all the files in sub directories inside it.
  *
  * What it does:
+ *
  * - Requires access to delete these files.
- * - Recursivly goes in to all sub directories looking for files to delete
- * - Optioinaly removes the directory as well, otherwise will leave an empty tree behind
+ * - Recursively goes in to all sub directories looking for files to delete
+ * - Optionally removes the directory as well, otherwise will leave an empty tree behind
  *
  * @package Packages
  * @param string $dir
@@ -1476,8 +1489,39 @@ function deltree($dir, $delete_dir = true)
 	if (!file_exists($dir))
 		return;
 
-	$current_dir = @opendir($dir);
-	if ($current_dir == false)
+	// Read all the files in the directory
+	try
+	{
+		$entrynames = new FilesystemIterator($dir, FilesystemIterator::SKIP_DOTS);
+		foreach ($entrynames as $entryname)
+		{
+			// Recursively dive in to each directory looking for files to delete
+			if ($entryname->isDir())
+				deltree($entryname->getPathname());
+			// A file, delete it by any means necessary
+			else
+			{
+				// Here, 755 doesn't really matter since we're deleting it anyway.
+				if (isset($package_ftp))
+				{
+					$ftp_file = strtr($entryname->getPathname(), array($_SESSION['pack_ftp']['root'] => ''));
+
+					if (!$entryname->isWritable())
+						$package_ftp->chmod($ftp_file, 0777);
+
+					$package_ftp->unlink($ftp_file);
+				}
+				else
+				{
+					if (!$entryname->isWritable())
+						elk_chmod($entryname->getPathname(), 0777);
+
+					@unlink($entryname->getPathname());
+				}
+			}
+		}
+	}
+	catch (UnexpectedValueException $e)
 	{
 		// Can't open the directory for reading, try FTP to remove it before quiting
 		if ($delete_dir && isset($package_ftp))
@@ -1491,52 +1535,23 @@ function deltree($dir, $delete_dir = true)
 		return;
 	}
 
-	// Read all the files in the directory
-	while ($entryname = readdir($current_dir))
-	{
-		if (in_array($entryname, array('.', '..')))
-			continue;
-
-		// Recursivly dive in to each directory looking for files to delete
-		if (is_dir($dir . '/' . $entryname))
-			deltree($dir . '/' . $entryname);
-		// A file, delete it by any means necessary
-		else
-		{
-			// Here, 755 doesn't really matter since we're deleting it anyway.
-			if (isset($package_ftp))
-			{
-				$ftp_file = strtr($dir . '/' . $entryname, array($_SESSION['pack_ftp']['root'] => ''));
-
-				if (!is_writable($dir . '/' . $entryname))
-					$package_ftp->chmod($ftp_file, 0777);
-				$package_ftp->unlink($ftp_file);
-			}
-			else
-			{
-				if (!is_writable($dir . '/' . $entryname))
-					@chmod($dir . '/' . $entryname, 0777);
-				@unlink($dir . '/' . $entryname);
-			}
-		}
-	}
-
-	closedir($current_dir);
-
 	// Remove the directory entry as well?
 	if ($delete_dir)
 	{
 		if (isset($package_ftp))
 		{
 			$ftp_file = strtr($dir, array($_SESSION['pack_ftp']['root'] => ''));
-			if (!is_writable($dir . '/' . $entryname))
+
+			if ($entryname->getPathname()->isWritable())
 				$package_ftp->chmod($ftp_file, 0777);
+
 			$package_ftp->unlink($ftp_file);
 		}
 		else
 		{
 			if (!is_writable($dir))
-				@chmod($dir, 0777);
+				elk_chmod($dir, 0777);
+
 			@rmdir($dir);
 		}
 	}
@@ -1565,7 +1580,7 @@ function mktree($strPath, $mode)
 			if (isset($package_ftp))
 				$package_ftp->chmod(strtr($strPath, array($_SESSION['pack_ftp']['root'] => '')), $mode);
 			else
-				@chmod($strPath, $mode);
+				elk_chmod($strPath, $mode);
 		}
 
 		// See if we can open it for access, return the result
@@ -1589,7 +1604,7 @@ function mktree($strPath, $mode)
 		if (isset($package_ftp))
 			$package_ftp->chmod(dirname(strtr($strPath, array($_SESSION['pack_ftp']['root'] => ''))), $mode);
 		else
-			@chmod(dirname($strPath), $mode);
+			elk_chmod(dirname($strPath), $mode);
 	}
 
 	// Return an ftp control if using FTP
@@ -1612,7 +1627,7 @@ function mktree($strPath, $mode)
 	{
 		@mkdir($strPath, $mode);
 
-		// Check and retrun if we were successful
+		// Check and return if we were successful
 		$test = @opendir($strPath);
 		if ($test)
 		{
@@ -1644,7 +1659,7 @@ function copytree($source, $destination)
 		mktree($destination, 0777);
 
 	$current_dir = opendir($source);
-	if ($current_dir == false)
+	if ($current_dir === false)
 		return;
 
 	while ($entryname = readdir($current_dir))
@@ -1725,9 +1740,8 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 {
 	global $txt, $modSettings;
 
-	@set_time_limit(600);
+	detectServer()->setTimeLimit(600);
 
-	require_once(SUBSDIR . '/XmlArray.class.php');
 	$xml = new Xml_Array(strtr($file, array("\r" => '')));
 	$actions = array();
 	$everything_found = true;
@@ -2097,322 +2111,6 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 }
 
 /**
- * Parses a boardmod-style modification file (file).
- *
- * @package Packages
- * @param string $file
- * @param bool $testing = true tells it the modifications shouldn't actually be saved.
- * @param bool $undo = false specifies that the modifications the file requests should be undone.
- * @param mixed[] $theme_paths = array()
- * @return array an array of those changes made.
- */
-function parseBoardMod($file, $testing = true, $undo = false, $theme_paths = array())
-{
-	global $settings, $modSettings;
-
-	@set_time_limit(600);
-	$file = strtr($file, array("\r" => ''));
-
-	$working_file = null;
-	$working_search = null;
-	$working_data = '';
-	$replace_with = null;
-	$actions = array();
-	$everything_found = true;
-
-	// This holds all the template changes in the standard mod file.
-	$template_changes = array();
-
-	// This is just the temporary file.
-	$temp_file = $file;
-
-	// This holds the actual changes on a step counter basis.
-	$temp_changes = array();
-	$counter = 0;
-	$step_counter = 0;
-
-	// Before we do *anything*, let's build a list of what we're editing, as it's going to be used for other theme edits.
-	while (preg_match('~<(edit file|file|search|search for|add|add after|replace|add before|add above|above|before)>\n(.*?)\n</\\1>~is', $temp_file, $code_match) != 0)
-	{
-		$counter++;
-
-		// Get rid of the old stuff.
-		$temp_file = substr_replace($temp_file, '', strpos($temp_file, $code_match[0]), strlen($code_match[0]));
-
-		// No interest to us?
-		if ($code_match[1] != 'edit file' && $code_match[1] != 'file')
-		{
-			// It's a step, let's add that to the current steps.
-			if (isset($temp_changes[$step_counter]))
-				$temp_changes[$step_counter]['changes'][] = $code_match[0];
-			continue;
-		}
-
-		// We've found a new edit - let's make ourself heard, kind of.
-		$step_counter = $counter;
-		$temp_changes[$step_counter] = array(
-			'title' => $code_match[0],
-			'changes' => array(),
-		);
-
-		$filename = parse_path($code_match[2]);
-
-		// Now, is this a template file, and if so, which?
-		foreach ($theme_paths as $id => $theme)
-		{
-			// If this filename is relative, if so take a guess at what it should be.
-			if (strpos($filename, 'themes') === 0)
-				$filename = BOARDDIR . '/' . $filename;
-
-			if (strpos($filename, $theme['theme_dir']) === 0)
-				$template_changes[$id][$counter] = substr($filename, strlen($theme['theme_dir']) + 1);
-		}
-	}
-
-	// Reference for what theme ID this action belongs to.
-	$theme_id_ref = array();
-
-	// Now we know what templates we need to touch, cycle through each theme and work out what we need to edit.
-	if (!empty($template_changes[1]))
-	{
-		foreach ($theme_paths as $id => $theme)
-		{
-			// Don't do default, it means nothing to me.
-			if ($id == 1)
-				continue;
-
-			// Now, for each file do we need to edit it?
-			foreach ($template_changes[1] as $pos => $template_file)
-			{
-				// It does? Add it to the list darlin'.
-				if (file_exists($theme['theme_dir'] . '/' . $template_file) && (!isset($template_changes[$id][$pos]) || !in_array($template_file, $template_changes[$id][$pos])))
-				{
-					// Actually add it to the mod file too, so we can see that it will work ;)
-					if (!empty($temp_changes[$pos]['changes']))
-					{
-						$file .= "\n\n" . '<edit file>' . "\n" . $theme['theme_dir'] . '/' . $template_file . "\n" . '</edit file>' . "\n\n" . implode("\n\n", $temp_changes[$pos]['changes']);
-						$theme_id_ref[$counter] = $id;
-						$counter += 1 + count($temp_changes[$pos]['changes']);
-					}
-				}
-			}
-		}
-	}
-
-	$counter = 0;
-	$is_custom = 0;
-	while (preg_match('~<(edit file|file|search|search for|add|add after|replace|add before|add above|above|before)>\n(.*?)\n</\\1>~is', $file, $code_match) != 0)
-	{
-		// This is for working out what we should be editing.
-		$counter++;
-
-		// Edit a specific file.
-		if ($code_match[1] == 'file' || $code_match[1] == 'edit file')
-		{
-			// Backup the old file.
-			if ($working_file !== null)
-			{
-				package_chmod($working_file);
-
-				// Don't even dare.
-				if (basename($working_file) == 'Settings_bak.php')
-					continue;
-
-				if (!is_writable($working_file))
-					$actions[] = array(
-						'type' => 'chmod',
-						'filename' => $working_file
-					);
-
-				if (!$testing && !empty($modSettings['package_make_backups']) && file_exists($working_file))
-				{
-					if (basename($working_file) == 'Settings.php')
-						@copy($working_file, dirname($working_file) . '/Settings_bak.php');
-					else
-						@copy($working_file, $working_file . '~');
-				}
-
-				package_put_contents($working_file, $working_data, $testing);
-			}
-
-			if ($working_file !== null)
-				$actions[] = array(
-					'type' => 'saved',
-					'filename' => $working_file,
-					'is_custom' => $is_custom,
-				);
-
-			// Is this "now working on" file a theme specific one?
-			$is_custom = isset($theme_id_ref[$counter - 1]) ? $theme_id_ref[$counter - 1] : 0;
-
-			// Make sure the file exists!
-			$working_file = parse_path($code_match[2]);
-
-			if ($working_file[0] != '/' && $working_file[1] != ':')
-			{
-				trigger_error('parseBoardMod(): The filename \'' . $working_file . '\' is not a full path!', E_USER_WARNING);
-
-				$working_file = BOARDDIR . '/' . $working_file;
-			}
-
-			if (!file_exists($working_file))
-			{
-				$places_to_check = array(BOARDDIR, SOURCEDIR, $settings['default_theme_dir'], $settings['default_theme_dir'] . '/languages');
-
-				foreach ($places_to_check as $place)
-					if (file_exists($place . '/' . $working_file))
-					{
-						$working_file = $place . '/' . $working_file;
-						break;
-					}
-			}
-
-			if (file_exists($working_file))
-			{
-				// Load the new file.
-				$working_data = str_replace("\r", '', package_get_contents($working_file));
-
-				$actions[] = array(
-					'type' => 'opened',
-					'filename' => $working_file
-				);
-			}
-			else
-			{
-				$actions[] = array(
-					'type' => 'missing',
-					'filename' => $working_file
-				);
-
-				$working_file = null;
-				$everything_found = false;
-			}
-
-			// Can't be searching for something...
-			$working_search = null;
-		}
-		// Search for a specific string.
-		elseif (($code_match[1] == 'search' || $code_match[1] == 'search for') && $working_file !== null)
-		{
-			if ($working_search !== null)
-			{
-				$actions[] = array(
-					'type' => 'error',
-					'filename' => $working_file
-				);
-
-				$everything_found = false;
-			}
-
-			$working_search = $code_match[2];
-		}
-		// Must've already loaded a search string.
-		elseif ($working_search !== null)
-		{
-			// This is the base string....
-			$replace_with = $code_match[2];
-
-			// Add this afterward...
-			if ($code_match[1] == 'add' || $code_match[1] == 'add after')
-				$replace_with = $working_search . "\n" . $replace_with;
-			// Add this beforehand.
-			elseif ($code_match[1] == 'before' || $code_match[1] == 'add before' || $code_match[1] == 'above' || $code_match[1] == 'add above')
-				$replace_with .= "\n" . $working_search;
-			// Otherwise.. replace with $replace_with ;).
-		}
-
-		// If we have a search string, replace string, and open file..
-		if ($working_search !== null && $replace_with !== null && $working_file !== null)
-		{
-			// Make sure it's somewhere in the string.
-			if ($undo)
-			{
-				$temp = $replace_with;
-				$replace_with = $working_search;
-				$working_search = $temp;
-			}
-
-			if (strpos($working_data, $working_search) !== false)
-			{
-				$working_data = str_replace($working_search, $replace_with, $working_data);
-
-				$actions[] = array(
-					'type' => 'replace',
-					'filename' => $working_file,
-					'search' => $working_search,
-					'replace' => $replace_with,
-					'search_original' => $working_search,
-					'replace_original' => $replace_with,
-					'position' => $code_match[1] == 'replace' ? 'replace' : ($code_match[1] == 'add' || $code_match[1] == 'add after' ? 'before' : 'after'),
-					'is_custom' => $is_custom,
-					'failed' => false,
-				);
-			}
-			// It wasn't found!
-			else
-			{
-				$actions[] = array(
-					'type' => 'failure',
-					'filename' => $working_file,
-					'search' => $working_search,
-					'is_custom' => $is_custom,
-					'search_original' => $working_search,
-					'replace_original' => $replace_with,
-					'position' => $code_match[1] == 'replace' ? 'replace' : ($code_match[1] == 'add' || $code_match[1] == 'add after' ? 'before' : 'after'),
-					'is_custom' => $is_custom,
-					'failed' => true,
-				);
-
-				$everything_found = false;
-			}
-
-			// These don't hold any meaning now.
-			$working_search = null;
-			$replace_with = null;
-		}
-
-		// Get rid of the old tag.
-		$file = substr_replace($file, '', strpos($file, $code_match[0]), strlen($code_match[0]));
-	}
-
-	// Backup the old file.
-	if ($working_file !== null)
-	{
-		package_chmod($working_file);
-
-		if (!is_writable($working_file))
-			$actions[] = array(
-				'type' => 'chmod',
-				'filename' => $working_file
-			);
-
-		if (!$testing && !empty($modSettings['package_make_backups']) && file_exists($working_file))
-		{
-			if (basename($working_file) == 'Settings.php')
-				@copy($working_file, dirname($working_file) . '/Settings_bak.php');
-			else
-				@copy($working_file, $working_file . '~');
-		}
-
-		package_put_contents($working_file, $working_data, $testing);
-	}
-
-	if ($working_file !== null)
-		$actions[] = array(
-			'type' => 'saved',
-			'filename' => $working_file,
-			'is_custom' => $is_custom,
-		);
-
-	$actions[] = array(
-		'type' => 'result',
-		'status' => $everything_found
-	);
-
-	return $actions;
-}
-
-/**
  * Get the physical contents of a packages file
  *
  * @package Packages
@@ -2425,7 +2123,7 @@ function package_get_contents($filename)
 
 	if (!isset($package_cache))
 	{
-		$mem_check = setMemoryLimit('128M');
+		$mem_check = detectServer()->setMemoryLimit('128M');
 
 		// Windows doesn't seem to care about the memory_limit.
 		if (!empty($modSettings['package_disable_cache']) || $mem_check || stripos(PHP_OS, 'win') !== false)
@@ -2461,7 +2159,7 @@ function package_put_contents($filename, $data, $testing = false)
 	if (!isset($package_cache))
 	{
 		// Try to increase the memory limit - we don't want to run out of ram!
-		$mem_check = setMemoryLimit('128M');
+		$mem_check = detectServer()->setMemoryLimit('128M');
 
 		if (!empty($modSettings['package_disable_cache']) || $mem_check || stripos(PHP_OS, 'win') !== false)
 			$package_cache = array();
@@ -2613,7 +2311,7 @@ function package_chmod($filename, $perm_state = 'writable', $track_change = fals
 
 					mktree(dirname($chmod_file), 0755);
 					@touch($chmod_file);
-					@chmod($chmod_file, 0755);
+					elk_chmod($chmod_file, 0755);
 				}
 				else
 					$file_permissions = @fileperms($chmod_file);
@@ -2621,17 +2319,17 @@ function package_chmod($filename, $perm_state = 'writable', $track_change = fals
 
 			// This looks odd, but it's another attempt to work around PHP suExec.
 			if ($perm_state != 'writable')
-				@chmod($chmod_file, $perm_state == 'execute' ? 0755 : 0644);
+				elk_chmod($chmod_file, $perm_state == 'execute' ? 0755 : 0644);
 			else
 			{
 				if (!@is_writable($chmod_file))
-					@chmod($chmod_file, 0755);
+					elk_chmod($chmod_file, 0755);
 				if (!@is_writable($chmod_file))
-					@chmod($chmod_file, 0777);
+					elk_chmod($chmod_file, 0777);
 				if (!@is_writable(dirname($chmod_file)))
-					@chmod($chmod_file, 0755);
+					elk_chmod($chmod_file, 0755);
 				if (!@is_writable(dirname($chmod_file)))
-					@chmod($chmod_file, 0777);
+					elk_chmod($chmod_file, 0777);
 			}
 
 			// The ultimate writable test.
@@ -2734,23 +2432,21 @@ function package_crypt($pass)
 function package_create_backup($id = 'backup')
 {
 	$db = database();
-
-	$files = array();
+	$files = new ArrayIterator();
+	$use_relative_paths = empty($_REQUEST['use_full_paths']);
 
 	// The files that reside outside of sources, in the base, we add manually
-	$base_files = array('index.php', 'SSI.php', 'agreement.txt', 'ssi_examples.php', 'ssi_examples.shtml', 'subscriptions.php', 'email_imap_cron.php', 'emailpost.php', 'emailtopic.php');
+	$base_files = array('index.php', 'SSI.php', 'agreement.txt', 'subscriptions.php',
+	'email_imap_cron.php', 'emailpost.php', 'emailtopic.php');
 	foreach ($base_files as $file)
 	{
 		if (file_exists(BOARDDIR . '/' . $file))
-			$files[realpath(BOARDDIR . '/' . $file)] = array(
-				empty($_REQUEST['use_full_paths']) ? $file : BOARDDIR . '/' . $file,
-				stat(BOARDDIR . '/' . $file)
-			);
+			$files[$use_relative_paths ? $file : realpath(BOARDDIR . '/' . $file)] = BOARDDIR . '/' . $file;
 	}
 
 	// Root directory where most of our files reside
 	$dirs = array(
-		SOURCEDIR => empty($_REQUEST['use_full_paths']) ? 'sources/' : strtr(SOURCEDIR . '/', '\\', '/')
+		SOURCEDIR => $use_relative_paths ? 'sources/' : strtr(SOURCEDIR . '/', '\\', '/')
 	);
 
 	// Find all installed theme directories
@@ -2765,147 +2461,82 @@ function package_create_backup($id = 'backup')
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
-		$dirs[$row['value']] = empty($_REQUEST['use_full_paths']) ? 'themes/' . basename($row['value']) . '/' : strtr($row['value'] . '/', '\\', '/');
+		$dirs[$row['value']] = $use_relative_paths ? 'themes/' . basename($row['value']) . '/' : strtr($row['value'] . '/', '\\', '/');
 	$db->free_result($request);
 
-	// While we have directorys to check
-	while (!empty($dirs))
+	try
 	{
-		list ($dir, $dest) = each($dirs);
-		unset($dirs[$dir]);
-
-		// Get the file listing for this directory
-		$listing = @dir($dir);
-		if (!$listing)
-			continue;
-		while ($entry = $listing->read())
+		foreach ($dirs as $dir => $dest)
 		{
-			if (preg_match('~^(\.{1,2}|CVS|backup.*|help|images|.*\~)$~', $entry) != 0)
-				continue;
+			$iter = new RecursiveIteratorIterator(
+				new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+				RecursiveIteratorIterator::CHILD_FIRST,
+				RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
+			);
 
-			$filepath = realpath($dir . '/' . $entry);
-			if (isset($files[$filepath]))
-				continue;
-
-			$stat = stat($dir . '/' . $entry);
-
-			// If this is a directory, add it to the dir stack for processing
-			if ($stat['mode'] & 040000)
+			foreach ($iter as $entry => $dir)
 			{
-				$files[$filepath] = array($dest . $entry . '/', $stat);
-				$dirs[$dir . '/' . $entry] = $dest . $entry . '/';
+				if ($dir->isDir())
+					continue;
+
+				if (preg_match('~^(\.{1,2}|CVS|backup.*|help|images|.*\~)$~', $entry) != 0)
+					continue;
+
+				$files[$use_relative_paths ? str_replace(realpath(BOARDDIR), '', $entry) : $entry] = $entry;
 			}
-			else
-				$files[$filepath] = array($dest . $entry, $stat);
 		}
 
-		$listing->close();
+		// Make sure we have a backup directory and its writable
+		if (!file_exists(BOARDDIR . '/packages/backups'))
+			mktree(BOARDDIR . '/packages/backups', 0777);
+
+		if (!is_writable(BOARDDIR . '/packages/backups'))
+			package_chmod(BOARDDIR . '/packages/backups');
+
+		// Name the output file, yyyy-mm-dd_before_package_name.tar.gz
+		$output_file = BOARDDIR . '/packages/backups/' . strftime('%Y-%m-%d_') . preg_replace('~[$\\\\/:<>|?*"\']~', '', $id);
+		$output_ext = '.tar';
+
+		if (file_exists($output_file . $output_ext . '.gz'))
+		{
+			$i = 2;
+			while (file_exists($output_file . '_' . $i . $output_ext . '.gz'))
+				$i++;
+			$output_file = $output_file . '_' . $i . $output_ext;
+		}
+		else
+			$output_file .= $output_ext;
+
+		// Buy some more time so we have enough to create this archive
+		detectServer()->setTimeLimit(300);
+
+		$a = new PharData($output_file);
+		$a->buildFromIterator($files);
+		$a->compress(Phar::GZ);
+
+		/*
+		 * Destroying the local var tells PharData to close its internal
+		 * file pointer, enabling us to delete the uncompressed tarball.
+		 */
+		unset($a);
+		unlink($output_file);
 	}
-
-	// Make sure we have a backup directory and its writable
-	if (!file_exists(BOARDDIR . '/packages/backups'))
-		mktree(BOARDDIR . '/packages/backups', 0777);
-
-	if (!is_writable(BOARDDIR . '/packages/backups'))
-		package_chmod(BOARDDIR . '/packages/backups');
-
-	// Name the output file, yyyy-mm-dd_before_package_name.tar.gz
-	$output_file = BOARDDIR . '/packages/backups/' . strftime('%Y-%m-%d_') . preg_replace('~[$\\\\/:<>|?*"\']~', '', $id);
-	$output_ext = '.tar' . (function_exists('gzopen') ? '.gz' : '');
-
-	if (file_exists($output_file . $output_ext))
+	catch (Exception $e)
 	{
-		$i = 2;
-		while (file_exists($output_file . '_' . $i . $output_ext))
-			$i++;
-		$output_file = $output_file . '_' . $i . $output_ext;
-	}
-	else
-		$output_file .= $output_ext;
+		Errors::instance()->log_error($e->getMessage(), 'backup');
 
-	// Buy some more time so we have enough to create this archive
-	@set_time_limit(300);
-	if (function_exists('apache_reset_timeout'))
-		@apache_reset_timeout();
-
-	// Set up the file output handle, try gzip first to save space
-	if (function_exists('gzopen'))
-	{
-		$fwrite = 'gzwrite';
-		$fclose = 'gzclose';
-		$output = gzopen($output_file, 'wb');
-	}
-	else
-	{
-		$fwrite = 'fwrite';
-		$fclose = 'fclose';
-		$output = fopen($output_file, 'wb');
+		return false;
 	}
 
-	// For each file we found in the directory, we add them to a TAR archive
-	foreach ($files as $real_file => $file)
-	{
-		if (!file_exists($real_file))
-			continue;
-
-		// Check if its a directory
-		$stat = $file[1];
-		if (substr($file[0], -1) == '/')
-			$stat['size'] = 0;
-
-		// Create a tar file header, pack the details in to the fields
-		$current = pack('a100a8a8a8a12a12a8a1a100a6a2a32a32a8a8a155a12',
-			$file[0], // name of file
-			decoct($stat['mode']), // file mode
-			sprintf('%06d', decoct($stat['uid'])), // owner user ID
-			sprintf('%06d', decoct($stat['gid'])), // owner group ID
-			decoct($stat['size']), // length of file in bytes
-			decoct($stat['mtime']), // modify time of file
-			'', // checksum for header
-			0, // type of file
-			'', // name of linked file
-			'', // USTAR indicator
-			'', // USTAR version
-			'', // owner user name
-			'', // owner group name
-			'', // device major number
-			'', // device minor number
-			'', // prefix for file name
-			''
-		);
-
-		// Create the header checksum
-		$checksum = 256;
-		for ($i = 0; $i < 512; $i++)
-			$checksum += ord($current[$i]);
-
-		// Write out the file header (insert the checksum we just computed)
-		$fwrite($output, substr($current, 0, 148) . pack('a8', decoct($checksum)) . substr($current, 156, 511));
-
-		// If this is a directory entry all thats needed is the header
-		if ($stat['size'] == 0)
-			continue;
-
-		// Write the actual file contents to the backup file
-		$fp = fopen($real_file, 'rb');
-		while (!feof($fp))
-			$fwrite($output, fread($fp, 16384));
-		fclose($fp);
-
-		// Pad the output so its on 512 boundarys
-		$fwrite($output, pack('a' . (512 - $stat['size'] % 512), ''));
-	}
-
-	$fwrite($output, pack('a1024', ''));
-	$fclose($output);
+	return true;
 }
 
 /**
  * Get the contents of a URL, irrespective of allow_url_fopen.
  *
- * - reads the contents of an http or ftp address and retruns the page in a string
- * - will accept up to 3 page redirections (redirectio_level in the function call is private)
- * - if post_data is supplied, the value and lenght is posted to the given url as form data
+ * - reads the contents of an http or ftp address and returns the page in a string
+ * - will accept up to 3 page redirections (redirection_level in the function call is private)
+ * - if post_data is supplied, the value and length is posted to the given url as form data
  * - URL must be supplied in lowercase
  *
  * @package Packages
@@ -2927,9 +2558,6 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		return false;
 	elseif ($match[1] == 'ftp')
 	{
-		// Include the file containing the Ftp_Connection class.
-		require_once(SOURCEDIR . '/FtpConnection.class.php');
-
 		// Establish a connection and attempt to enable passive mode.
 		$ftp = new Ftp_Connection(($match[2] ? 'ssl://' : '') . $match[3], empty($match[5]) ? 21 : $match[5], 'anonymous', $webmaster_email);
 		if ($ftp->error !== false || !$ftp->passive())
@@ -2958,9 +2586,6 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	// More likely a standard HTTP URL, first try to use cURL if available
 	elseif (isset($match[1]) && $match[1] === 'http' && function_exists('curl_init'))
 	{
-		// Include the file containing the Curl_Fetch_Webdata class.
-		require_once(SOURCEDIR . '/CurlFetchWebdata.class.php');
-
 		$fetch_data = new Curl_Fetch_Webdata(array(), $redirection_level);
 		$fetch_data->get_url_data($url, $post_data);
 
@@ -3019,7 +2644,6 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		// Redirect in case this location is permanently or temporarily moved.
 		if ($redirection_level < 3 && preg_match('~^HTTP/\S+\s+30[127]~i', $response) === 1)
 		{
-			$header = '';
 			$location = '';
 			while (!feof($fp) && trim($header = fgets($fp, 4096)) != '')
 				if (strpos($header, 'Location:') !== false)
@@ -3091,11 +2715,12 @@ if (!function_exists('crc32_compat'))
  *
  * @package Packages
  * @param string $id of package to check
+ * @param string|null $install_id to check
+ *
+ * @return array
  */
-function isPackageInstalled($id)
+function isPackageInstalled($id, $install_id = null)
 {
-	global $context;
-
 	$db = database();
 
 	$result = array(
@@ -3103,7 +2728,7 @@ function isPackageInstalled($id)
 		'install_state' => null,
 		'old_themes' => null,
 		'old_version' => null,
-		'db_changes' => null
+		'db_changes' => array()
 	);
 
 	if (empty($id))
@@ -3115,13 +2740,13 @@ function isPackageInstalled($id)
 		FROM {db_prefix}log_packages
 		WHERE package_id = {string:current_package}
 			AND install_state != {int:not_installed}
-			' . (!empty($context['install_id']) ? ' AND id_install = {int:install_id} ' : '') . '
+			' . (!empty($install_id) ? ' AND id_install = {int:install_id} ' : '') . '
 		ORDER BY time_installed DESC
 		LIMIT 1',
 		array(
 			'not_installed' => 0,
 			'current_package' => $id,
-			'install_id' => $context['install_id'],
+			'install_id' => $install_id,
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
@@ -3144,10 +2769,11 @@ function isPackageInstalled($id)
  *
  * @package Packages
  * @param string $id package_id to update
+ * @param string $install_id install id of the package
  */
-function setPackageState($id)
+function setPackageState($id, $install_id)
 {
-	global $context, $user_info;
+	global $user_info;
 
 	$db = database();
 
@@ -3163,7 +2789,7 @@ function setPackageState($id)
 			'current_time' => time(),
 			'package_id' => $id,
 			'member_name' => $user_info['name'],
-			'install_id' => $context['install_id'],
+			'install_id' => $install_id,
 		)
 	);
 }
@@ -3177,8 +2803,6 @@ function setPackageState($id)
 function checkPackageDependency($id)
 {
 	$db = database();
-
-	$version = false;
 
 	$request = $db->query('', '
 		SELECT version
@@ -3272,4 +2896,38 @@ function isAuthorizedServer($remote_url)
 			return true;
 
 	return false;
+}
+
+/**
+ * Simple wrapper around chmod
+ *
+ * - Checks proper value for mode is supplied
+ * - Consolidates chmod error suppression to single function
+ *
+ * @param string $file
+ * @param string|int|null $mode
+ *
+ * @return bool
+ */
+function elk_chmod($file, $mode = null)
+{
+	$result = false;
+
+	if (!isset($mode))
+	{
+		if (is_dir($file))
+		{
+			$mode = 0755;
+		}
+		else
+		{
+			$mode = 0664;
+		}
+	}
+
+	// Make sure we have a form of 0777 or '777' or '0777' so its safe for intval '8'
+	if ($mode == decoct(octdec("$mode")))
+		$result = @chmod($file, intval($mode, 8));
+
+	return $result;
 }

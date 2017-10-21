@@ -7,18 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Simple FTP protocol implementation.
@@ -28,19 +23,19 @@ if (!defined('ELK'))
 class Ftp_Connection
 {
 	/**
-	 * holds the connection response
-	 * @var resource
+	 * Holds the connection response
+	 * @var resource|string
 	 */
 	public $connection;
 
 	/**
-	 * holds any errors
+	 * Holds any errors
 	 * @var string|boolean
 	 */
 	public $error;
 
 	/**
-	 * holds last message from the server
+	 * Holds last message from the server
 	 * @var string
 	 */
 	public $last_message;
@@ -54,10 +49,10 @@ class Ftp_Connection
 	/**
 	 * Create a new FTP connection...
 	 *
-	 * @param string $ftp_server
-	 * @param int $ftp_port
-	 * @param string $ftp_user
-	 * @param string $ftp_pass
+	 * @param string $ftp_server The server to connect to
+	 * @param int $ftp_port The port to connect to
+	 * @param string $ftp_user The username
+	 * @param string $ftp_pass The password
 	 */
 	public function __construct($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
 	{
@@ -73,10 +68,10 @@ class Ftp_Connection
 	/**
 	 * Connects to a server
 	 *
-	 * @param string $ftp_server
-	 * @param int $ftp_port
-	 * @param string $ftp_user
-	 * @param string $ftp_pass
+	 * @param string $ftp_server The server to connect to
+	 * @param int $ftp_port The port to connect to
+	 * @param string $ftp_user The username
+	 * @param string $ftp_pass The password
 	 */
 	public function connect($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
 	{
@@ -123,7 +118,7 @@ class Ftp_Connection
 	/**
 	 * Changes to a directory (chdir) via the ftp connection
 	 *
-	 * @param string $ftp_path
+	 * @param string $ftp_path The path to the directory
 	 * @return boolean
 	 */
 	public function chdir($ftp_path)
@@ -146,11 +141,11 @@ class Ftp_Connection
 	}
 
 	/**
-	 * Changes a files atrributes (chmod)
+	 * Changes a files attributes (chmod)
 	 *
-	 * @param string $ftp_file
-	 * @param int $chmod
-	 * @return boolean
+	 * @param string $ftp_file The file to CHMOD
+	 * @param int $chmod The value for the CHMOD operation
+	 * @return boolean If the chmod was successful or not
 	 */
 	public function chmod($ftp_file, $chmod)
 	{
@@ -174,8 +169,8 @@ class Ftp_Connection
 	/**
 	 * Deletes a file
 	 *
-	 * @param string $ftp_file
-	 * @return boolean
+	 * @param string $ftp_file The file to delete
+	 * @return boolean If the delete was successful or not
 	 */
 	public function unlink($ftp_file)
 	{
@@ -210,8 +205,9 @@ class Ftp_Connection
 		// Wait for a response that isn't continued with -, but don't wait too long.
 		$time = time();
 		do
-			$this->last_message = fgets($this->connection, 1024);
-		while ((strlen($this->last_message) < 4 || strpos($this->last_message, ' ') === 0 || strpos($this->last_message, ' ', 3) !== 3) && time() - $time < 5);
+		{
+					$this->last_message = fgets($this->connection, 1024);
+		} while ((strlen($this->last_message) < 4 || strpos($this->last_message, ' ') === 0 || strpos($this->last_message, ' ', 3) !== 3) && time() - $time < 5);
 
 		// Was the desired response returned?
 		return is_array($desired) ? in_array(substr($this->last_message, 0, 3), $desired) : substr($this->last_message, 0, 3) == $desired;
@@ -220,7 +216,7 @@ class Ftp_Connection
 	/**
 	 * Used to create a passive connection
 	 *
-	 * @return boolean
+	 * @return boolean If the connection was made or not
 	 */
 	public function passive()
 	{
@@ -232,8 +228,9 @@ class Ftp_Connection
 		@fwrite($this->connection, 'PASV' . "\r\n");
 		$time = time();
 		do
-			$response = fgets($this->connection, 1024);
-		while (substr($response, 3, 1) !== ' ' && time() - $time < 5);
+		{
+					$response = fgets($this->connection, 1024);
+		} while (substr($response, 3, 1) !== ' ' && time() - $time < 5);
 
 		// If it's not 227, we weren't given an IP and port, which means it failed.
 		if (strpos($response, '227 ') !== 0)
@@ -258,8 +255,8 @@ class Ftp_Connection
 	/**
 	 * Creates a new file on the server
 	 *
-	 * @param string $ftp_file
-	 * @return boolean
+	 * @param string $ftp_file The file to create
+	 * @return boolean If we were able to create the file
 	 */
 	public function create_file($ftp_file)
 	{
@@ -295,11 +292,11 @@ class Ftp_Connection
 	}
 
 	/**
-	 * Generates a direcotry listing for the current directory
+	 * Generates a directory listing for the current directory
 	 *
-	 * @param string $ftp_path
-	 * @param string|boolean $search
-	 * @return false|string
+	 * @param string $ftp_path The path to the directory
+	 * @param string|boolean $search Whether or not to get a recursive directory listing
+	 * @return false|string The results of the command or false if unsuccessful
 	 */
 	public function list_dir($ftp_path = '', $search = false)
 	{
@@ -340,11 +337,11 @@ class Ftp_Connection
 	}
 
 	/**
-	 * Determins the current dirctory we are in
+	 * Determines the current directory we are in
 	 *
-	 * @param string $file
-	 * @param string|null $listing
-	 * @return string|false
+	 * @param string $file The name of a file
+	 * @param string|null $listing  A directory listing or null to generate one
+	 * @return string|false The name of the file or false if it wasn't found
 	 */
 	public function locate($file, $listing = null)
 	{
@@ -355,8 +352,9 @@ class Ftp_Connection
 		@fwrite($this->connection, 'PWD' . "\r\n");
 		$time = time();
 		do
-			$response = fgets($this->connection, 1024);
-		while (substr($response, 3, 1) !== ' ' && time() - $time < 5);
+		{
+					$response = fgets($this->connection, 1024);
+		} while (substr($response, 3, 1) !== ' ' && time() - $time < 5);
 
 		// Check for 257!
 		if (preg_match('~^257 "(.+?)" ~', $response, $match) != 0)
@@ -389,8 +387,8 @@ class Ftp_Connection
 	/**
 	 * Creates a new directory on the server
 	 *
-	 * @param string $ftp_dir
-	 * @return boolean
+	 * @param string $ftp_dir The name of the directory to create
+	 * @return boolean If the operation was successful
 	 */
 	public function create_dir($ftp_dir)
 	{
@@ -412,8 +410,8 @@ class Ftp_Connection
 	/**
 	 * Detects the current path
 	 *
-	 * @param string $filesystem_path
-	 * @param string|null $lookup_file
+	 * @param string $filesystem_path The full path from the filesystem
+	 * @param string|null $lookup_file The name of a file in the specified path
 	 * @return string[] $username, $path, found_path
 	 */
 	public function detect_path($filesystem_path, $lookup_file = null)
@@ -450,9 +448,9 @@ class Ftp_Connection
 				$lookup_file = $_SERVER['PHP_SELF'];
 
 			$found_path = dirname($this->locate('*' . basename(dirname($lookup_file)) . '/' . basename($lookup_file), $data));
-			if ($found_path == false)
+			if ($found_path === false)
 				$found_path = dirname($this->locate(basename($lookup_file)));
-			if ($found_path != false)
+			if ($found_path !== false)
 				$path = $found_path;
 		}
 		elseif (is_resource($this->connection))

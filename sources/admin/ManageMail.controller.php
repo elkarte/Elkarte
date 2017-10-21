@@ -7,21 +7,18 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * This class is the administration mailing controller.
+ *
+ * What it does:
  *
  * - It handles mail configuration,
  * - It displays and allows to remove items from the mail queue.
@@ -31,16 +28,11 @@ if (!defined('ELK'))
 class ManageMail_Controller extends Action_Controller
 {
 	/**
-	 * Mail settings form
-	 * @var Settings_Form
-	 */
-	protected $_mailSettings;
-
-	/**
 	 * Main dispatcher.
 	 *
 	 * - This function checks permissions and passes control through to the relevant section.
 	 *
+	 * @event integrate_sa_manage_mail Used to add more sub actions
 	 * @see Action_Controller::action_index()
 	 * @uses Help and MangeMail language files
 	 */
@@ -50,9 +42,6 @@ class ManageMail_Controller extends Action_Controller
 
 		loadLanguage('Help');
 		loadLanguage('ManageMail');
-
-		// We'll need the utility functions from here.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		$subActions = array(
 			'browse' => array($this, 'action_browse', 'permission' => 'admin_forum'),
@@ -94,10 +83,10 @@ class ManageMail_Controller extends Action_Controller
 		loadTemplate('ManageMail');
 
 		// First, are we deleting something from the queue?
-		if (isset($_REQUEST['delete']))
+		if (isset($this->_req->post->delete))
 		{
 			checkSession('post');
-			deleteMailQueueItems($_REQUEST['delete']);
+			deleteMailQueueItems($this->_req->post->delete);
 		}
 
 		// Fetch the number of items in the current queue
@@ -126,9 +115,10 @@ class ManageMail_Controller extends Action_Controller
 						'value' => $txt['mailqueue_subject'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							return Util::shorten_text(Util::htmlspecialchars($rowData[\'subject\'], 50));
-						'),
+						'function' => function ($rowData) {
+							return Util::shorten_text(Util::htmlspecialchars($rowData['subject'], 50));
+						},
+						'class' => 'smalltext',
 					),
 					'sort' => array(
 						'default' => 'subject',
@@ -158,16 +148,16 @@ class ManageMail_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $txt;
 
 							// We probably have a text label with your priority.
-							$txtKey = sprintf(\'mq_mpriority_%1$s\', $rowData[\'priority\']);
+							$txtKey = sprintf('mq_mpriority_%1$s', $rowData['priority']);
 
 							// But if not, revert to priority 0.
-							return isset($txt[$txtKey]) ? $txt[$txtKey] : $txt[\'mq_mpriority_1\'];
-						'),
-						'class' => 'centertext',
+							return isset($txt[$txtKey]) ? $txt[$txtKey] : $txt['mq_mpriority_1'];
+						},
+						'class' => 'centertext smalltext',
 					),
 					'sort' => array(
 						'default' => 'priority',
@@ -179,9 +169,10 @@ class ManageMail_Controller extends Action_Controller
 						'value' => $txt['mailqueue_age'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							return time_since(time() - $rowData[\'time_sent\']);
-						'),
+						'function' => function ($rowData) {
+							return time_since(time() - $rowData['time_sent']);
+						},
+						'class' => 'smalltext',
 					),
 					'sort' => array(
 						'default' => 'time_sent',
@@ -193,9 +184,10 @@ class ManageMail_Controller extends Action_Controller
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							return \'<input type="checkbox" name="delete[]" value="\' . $rowData[\'id_mail\'] . \'" class="input_check" />\';
-						'),
+						'function' => function ($rowData) {
+							return '<input type="checkbox" name="delete[]" value="' . $rowData['id_mail'] . '" class="input_check" />';
+						},
+						'class' => 'centertext',
 					),
 				),
 			),
@@ -209,19 +201,19 @@ class ManageMail_Controller extends Action_Controller
 					'position' => 'bottom_of_list',
 					'class' => 'submitbutton',
 					'value' => '
-						<input type="submit" name="delete_redirects" value="' . $txt['quickmod_delete_selected'] . '" onclick="return confirm(\'' . $txt['quickmod_confirm'] . '\');" class="right_submit" />
+						<input type="submit" name="delete_redirects" value="' . $txt['quickmod_delete_selected'] . '" onclick="return confirm(\'' . $txt['quickmod_confirm'] . '\');" />
 						<a class="linkbutton" href="' . $scripturl . '?action=admin;area=mailqueue;sa=clear;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['mailqueue_clear_list_warning'] . '\');">' . $txt['mailqueue_clear_list'] . '</a> ',
 				),
 			),
 		);
 
-		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 
 	/**
 	 * Allows to view and modify the mail settings.
 	 *
+	 * @event integrate_save_mail_settings
 	 * @uses show_settings sub template
 	 */
 	public function action_mailSettings_display()
@@ -233,7 +225,11 @@ class ManageMail_Controller extends Action_Controller
 		$context['sub_template'] = 'show_settings';
 
 		// Initialize the form
-		$this->_initMailSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
+		$settingsForm->setConfigVars($config_vars);
 
 		// Piece of redundant code, for the javascript
 		$processedBirthdayEmails = array();
@@ -244,28 +240,28 @@ class ManageMail_Controller extends Action_Controller
 			$processedBirthdayEmails[$index][$element] = $value;
 		}
 
-		$config_vars = $this->_mailSettings->settings();
-
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			// Make the SMTP password a little harder to see in a backup etc.
-			if (!empty($_POST['smtp_password'][1]))
+			if (!empty($this->_req->post->smtp_password[1]))
 			{
-				$_POST['smtp_password'][0] = base64_encode($_POST['smtp_password'][0]);
-				$_POST['smtp_password'][1] = base64_encode($_POST['smtp_password'][1]);
+				$this->_req->post->smtp_password[0] = base64_encode($this->_req->post->smtp_password[0]);
+				$this->_req->post->smtp_password[1] = base64_encode($this->_req->post->smtp_password[1]);
 			}
 			checkSession();
 
 			// We don't want to save the subject and body previews.
 			unset($config_vars['birthday_subject'], $config_vars['birthday_body']);
+			$settingsForm->setConfigVars($config_vars);
 			call_integration_hook('integrate_save_mail_settings');
 
 			// You can not send more per page load than you can per minute
-			if (!empty($_POST['mail_batch_size']))
-				 $_POST['mail_batch_size'] = min((int) $_POST['mail_batch_size'], (int) $_POST['mail_period_limit']);
+			if (!empty($this->_req->post->mail_batch_size))
+				$this->_req->post->mail_batch_size = min((int) $this->_req->post->mail_batch_size, (int) $this->_req->post->mail_period_limit);
 
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=mailqueue;sa=settings');
 		}
 
@@ -273,9 +269,9 @@ class ManageMail_Controller extends Action_Controller
 		$context['settings_title'] = $txt['mailqueue_settings'];
 
 		// Prepare the config form
-		Settings_Form::prepare_db($config_vars);
+		$settingsForm->prepare();
 
-		// Build a litte JS so the birthday mail can be seen
+		// Build a little JS so the birthday mail can be seen
 		$javascript = '
 			var bDay = {';
 
@@ -302,21 +298,9 @@ class ManageMail_Controller extends Action_Controller
 	}
 
 	/**
-	 * Initialize mail administration settings.
-	 */
-	private function _initMailSettingsForm()
-	{
-		// Instantiate the form
-		$this->_mailSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_mailSettings->settings($config_vars);
-	}
-
-	/**
 	 * Retrieve and return mail administration settings.
+	 *
+	 * @event integrate_modify_mail_settings Add new settings
 	 */
 	private function _settings()
 	{
@@ -349,12 +333,13 @@ class ManageMail_Controller extends Action_Controller
 				array('select', 'mail_type', array($txt['mail_type_default'], 'SMTP')),
 				array('text', 'smtp_host'),
 				array('text', 'smtp_port'),
+				array('check', 'smtp_starttls'),
 				array('text', 'smtp_username'),
 				array('password', 'smtp_password'),
 			'',
 				array('select', 'birthday_email', $emails, 'value' => array('subject' => $subject, 'body' => $body), 'javascript' => 'onchange="fetch_birthday_preview()"'),
-				'birthday_subject' => array('var_message', 'birthday_subject', 'var_message' => $processedBirthdayEmails[empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']]['subject'], 'disabled' => true, 'size' => strlen($subject) + 3),
-				'birthday_body' => array('var_message', 'birthday_body', 'var_message' => nl2br($body), 'disabled' => true, 'size' => ceil(strlen($body) / 25)),
+				'birthday_subject' => array('var_message', 'birthday_subject', 'message' => $processedBirthdayEmails[empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']]['subject'], 'disabled' => true, 'size' => strlen($subject) + 3),
+				'birthday_body' => array('var_message', 'birthday_body', 'message' => nl2br($body), 'disabled' => true, 'size' => ceil(strlen($body) / 25)),
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
@@ -390,10 +375,10 @@ class ManageMail_Controller extends Action_Controller
 		$number_to_send = empty($modSettings['mail_period_limit']) ? 25 : $modSettings['mail_period_limit'];
 
 		// If we don't yet have the total to clear, find it.
-		$all_emails = isset($_GET['te']) ? (int) $_GET['te'] : list_getMailQueueSize();
+		$all_emails = isset($this->_req->query->te) ? (int) $this->_req->query->te : list_getMailQueueSize();
 
 		// If we don't know how many we sent, it must be because... we didn't send any!
-		$sent_emails = isset($_GET['sent']) ? (int) $_GET['sent'] : 0;
+		$sent_emails = isset($this->_req->query->sent) ? (int) $this->_req->query->sent : 0;
 
 		// Send this batch, then go for a short break...
 		while (reduceMailQueue($number_to_send, true, true) === true)
@@ -411,15 +396,14 @@ class ManageMail_Controller extends Action_Controller
 	 *
 	 * @param int $all_emails total emails to be sent
 	 * @param int $sent_emails number of emails sent so far
+	 * @throws Elk_Exception
 	 */
 	private function _pauseMailQueueClear($all_emails, $sent_emails)
 	{
 		global $context, $txt, $time_start;
 
 		// Try get more time...
-		@set_time_limit(600);
-		if (function_exists('apache_reset_timeout'))
-			@apache_reset_timeout();
+		detectServer()->setTimeLimit(600);
 
 		// Have we already used our maximum time?
 		if (time() - array_sum(explode(' ', $time_start)) < 5)

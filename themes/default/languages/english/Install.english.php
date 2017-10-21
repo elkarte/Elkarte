@@ -1,11 +1,12 @@
 <?php
-// Version: 1.0; Install
+// Version: 1.1; Install
 
 // These should be the same as those in index.language.php.
 $txt['lang_character_set'] = 'UTF-8';
 $txt['lang_rtl'] = false;
 
 $txt['install_step_welcome'] = 'Welcome';
+$txt['install_step_exist'] = 'Existance Check';
 $txt['install_step_writable'] = 'Writable Check';
 $txt['install_step_forum'] = 'Forum Settings';
 $txt['install_step_databaseset'] = 'Database Settings';
@@ -19,7 +20,7 @@ $txt['installer_language_set'] = 'Set';
 $txt['congratulations'] = 'Congratulations, the installation process is complete!';
 $txt['congratulations_help'] = 'If at any time you need support, or the forum fails to work properly, please remember that <a href="http://www.elkarte.net/index.php" target="_blank" class="new_win">help is available</a> if you need it.';
 $txt['still_writable'] = 'Your installation directory is still writable.  It\'s a good idea to chmod it so that it is not writable for security reasons.';
-$txt['delete_installer'] = 'Click here to delete this install.php file now.';
+$txt['delete_installer'] = 'Click here to try to delete the install directory now.';
 $txt['delete_installer_maybe'] = '<em>(doesn\'t work on all servers.)</em>';
 $txt['go_to_your_forum'] = 'Now you can see <a href="%1$s">your newly installed forum</a> and begin to use it.  You should first make sure you are logged in, after which you will be able to access the administration center.';
 $txt['good_luck'] = 'Thanks for installing ElkArte!';
@@ -184,7 +185,9 @@ $txt['error_mod_security'] = 'The installer has detected the mod_security module
 $txt['error_mod_security_no_write'] = 'The installer has detected the mod_security module is installed on your web server. Mod_security will block submitted forms even before ElkArte gets a say in anything. ElkArte has a built-in security scanner that will work more effectively than mod_security and that won\'t block submitted forms.<br /><br /><a href="http://www.elkarte.net/redirect/mod_security" target="_blank" class="new_win">More information about disabling mod_security</a><br /><br />Alternatively, you may wish to use your FTP client to chmod .htaccess in the forum directory to be writable (777), and then refresh this page.';
 $txt['error_utf8_version'] = 'The current version of your database doesn\'t support the use of the UTF-8 character set. You can not install ElkArte';
 $txt['error_valid_email_needed'] = 'You have not entered a valid email address.';
-$txt['error_already_installed'] = 'The installer has detected that you already have ElkArte installed. It is strongly advised that you do <strong>not</strong> try to overwrite an existing installation - continuing with installation <strong>may result in the loss or corruption of existing data</strong>.<br /><br />If you wish to upgrade please visit the <a href="http://www.elkarte.net/" target="_blank" class="new_win">ElkArte Community Website</a> and download the latest <em>upgrade</em> package.<br /><br />If you wish to overwrite your existing installation, including all data, it\'s recommended that you delete the existing database tables and replace Settings.php and try again.';
+$txt['error_already_installed'] = 'The installer has detected that you already have ElkArte installed. It is strongly advised that you do <strong>not</strong> try to overwrite an existing installation - continuing with installation <strong>may result in the loss or corruption of existing data</strong>.<ul><li>If you have just finished installing your forum, please delete the install directory from your server. {try_delete}</li><li>If you wish to upgrade please use the <a href="./upgrade.php"><strong>upgrade script</strong></a>.</li><li>If you wish to overwrite your existing installation, including all data, it\'s recommended that you delete the existing database tables and replace Settings.php and try again.</li></ul>';
+$txt['error_no_settings'] = 'It looks like Settings.php and/or Settings_bak.php are missing from the default directory of your forum, ElkArte will try to rename the sample files provided with the installation. If this operation fails, please rename Settings.sample.php and Settings_bak.sample.php respectively to Settings.php and Setting_bak.php before running this script.';
+$txt['error_settings_do_not_exist'] = 'Elkarte is not able to find and create the file/s <strong>%1$s</strong>. Please use ftp to go to the directory of your forum and rename the sample files provided with the installation package as follows before running again this script: <ul>%2$s</ul> If any of the files do not exist, create an empty file with the same name.';
 $txt['error_warning_notice'] = 'Warning!';
 $txt['error_script_outdated'] = 'This install script is out of date! The current version of ElkArte is %1$s but this install script is for %2$s.<br />
 	It is recommended that you visit the <a href="http://www.elkarte.net/" target="_blank" class="new_win">ElkArte</a> website to ensure you are installing the latest version.';
@@ -200,6 +203,7 @@ $txt['upgrade_upgrade_utility'] = 'ElkArte Upgrade Utility';
 $txt['upgrade_warning'] = 'Warning!';
 $txt['upgrade_critical_error'] = 'Critical Error!';
 $txt['upgrade_continue'] = 'Continue';
+$txt['upgrade_retry'] = 'Retry';
 $txt['upgrade_skip'] = 'Skip';
 $txt['upgrade_note'] = 'Note!';
 $txt['upgrade_step'] = 'Step';

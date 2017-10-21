@@ -7,12 +7,9 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * ManagePosts controller handles all the administration settings for topics and posts.
@@ -20,14 +17,9 @@ if (!defined('ELK'))
 class ManageTopics_Controller extends Action_Controller
 {
 	/**
-	 * Topic settings form
-	 * @var Settings_Form
-	 */
-	protected $_topicSettings;
-
-	/**
 	 * Check permissions and forward to the right method.
 	 *
+	 * @event integrate_sa_manage_topics
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -56,11 +48,14 @@ class ManageTopics_Controller extends Action_Controller
 	}
 
 	/**
-	 * Adminstration page for topics: allows to display and set settings related to topics.
+	 * Administration page for topics: allows to display and set settings related to topics.
 	 *
-	 * Requires the admin_forum permission.
-	 * Accessed from ?action=admin;area=postsettings;sa=topics.
-
+	 * What it does:
+	 *
+	 * - Requires the admin_forum permission.
+	 * - Accessed from ?action=admin;area=postsettings;sa=topics.
+	 *
+	 * @event integrate_save_topic_settings
 	 * @uses Admin template, edit_topic_settings sub-template.
 	 */
 	public function action_topicSettings_display()
@@ -68,16 +63,16 @@ class ManageTopics_Controller extends Action_Controller
 		global $context, $txt, $scripturl;
 
 		// Initialize the form
-		$this->_initTopicSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// Retrieve the current config settings
-		$config_vars = $this->_topicSettings->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Setup the template.
 		$context['sub_template'] = 'show_settings';
 
 		// Are we saving them - are we??
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			// Security checks
 			checkSession();
@@ -86,7 +81,8 @@ class ManageTopics_Controller extends Action_Controller
 			call_integration_hook('integrate_save_topic_settings');
 
 			// Save the result!
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 
 			// We're done here, pal.
 			redirectexit('action=admin;area=postsettings;sa=topics');
@@ -97,28 +93,13 @@ class ManageTopics_Controller extends Action_Controller
 		$context['settings_title'] = $txt['manageposts_topic_settings'];
 
 		// Prepare the settings
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize topicSettings form with the configuration settings for topics.
-	 */
-	private function _initTopicSettingsForm()
-	{
-		// We're working with them settings.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
-		// Instantiate the form
-		$this->_topicSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_topicSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
 	 * Return configuration settings for topics.
+	 *
+	 * @event integrate_modify_topic_settings
 	 */
 	private function _settings()
 	{
@@ -127,9 +108,9 @@ class ManageTopics_Controller extends Action_Controller
 		// initialize it with our settings
 		$config_vars = array(
 				// Some simple big bools...
-				array('check', 'enableStickyTopics'),
 				array('check', 'enableParticipation'),
 				array('check', 'enableFollowup'),
+				array('check', 'enable_unwatch'),
 				array('check', 'pollMode'),
 			'',
 				// Pagination etc...

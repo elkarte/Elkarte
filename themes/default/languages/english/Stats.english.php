@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; Stats
+// Version: 1.1; Stats
 
 $txt['most_online'] = 'Most Online';
 

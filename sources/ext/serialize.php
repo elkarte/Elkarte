@@ -9,9 +9,18 @@ namespace ElkArte\ext\upgradephp;
 /*
  * Used to impose practical limits for safe_unserialize()
  */
-define('MAX_SERIALIZED_INPUT_LENGTH', 4194304);
-define('MAX_SERIALIZED_ARRAY_LENGTH', 2048);
-define('MAX_SERIALIZED_ARRAY_DEPTH', 24);
+if (!defined('MAX_SERIALIZED_INPUT_LENGTH'))
+{
+	define('MAX_SERIALIZED_INPUT_LENGTH', 4194304);
+}
+if (!defined('MAX_SERIALIZED_ARRAY_LENGTH'))
+{
+	define('MAX_SERIALIZED_ARRAY_LENGTH', 2048);
+}
+if (!defined('MAX_SERIALIZED_ARRAY_DEPTH'))
+{
+	define('MAX_SERIALIZED_ARRAY_DEPTH', 24);
+}
 
 
 /**
@@ -50,7 +59,7 @@ function _safe_serialize( $value )
 		{
 			$out .= _safe_serialize($k) . _safe_serialize($v);
 		}
-		
+
 		return 'a:'.count($value).':{'.$out.'}';
 	}
 	if(is_resource($value))

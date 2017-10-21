@@ -5,13 +5,11 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1
  *
  */
 
@@ -22,7 +20,7 @@
  */
 function template_show_list($list_id = null)
 {
-	global $context, $settings, $txt;
+	global $context, $txt;
 
 	// Get a shortcut to the current list.
 	$list_id = $list_id === null ? $context['default_list'] : $list_id;
@@ -39,7 +37,7 @@ function template_show_list($list_id = null)
 	// Show the title of the table (if any), with an icon (if defined)
 	if (!empty($cur_list['title']))
 		echo '
-			<h3 class="category_header', !empty($cur_list['icon']) ? ' hdicon cat_img_' . $cur_list['icon'] : '', '">', $cur_list['title'], '</h3>';
+			<h2 class="category_header', !empty($cur_list['icon']) ? ' hdicon cat_img_' . $cur_list['icon'] : '', '">', $cur_list['title'], '</h2>';
 
 	// Show any data right after the title
 	if (isset($cur_list['additional_rows']['after_title']))
@@ -85,7 +83,7 @@ function template_show_list($list_id = null)
 			<div class="flow_auto">';
 
 		echo '
-				<div class="floatleft">', template_pagesection(false, false, array('page_index_markup' => $cur_list['page_index'])), '
+				<div class="floatleft">', template_pagesection(false, '', array('page_index_markup' => $cur_list['page_index'])), '
 				</div>';
 		$close_div = true;
 	}
@@ -119,7 +117,7 @@ function template_show_list($list_id = null)
 			$sort_title = $col_header['sort_image'] === 'up' ? $txt['sort_desc'] : $txt['sort_asc'];
 
 			echo '
-					<th scope="col" id="header_', $list_id, '_', $col_header['id'], '"', empty($col_header['class']) ? '' : ' class="' . $col_header['class'] . '"', empty($col_header['style']) ? '' : ' style="' . $col_header['style'] . '"', empty($col_header['colspan']) ? '' : ' colspan="' . $col_header['colspan'] . '"', '>', empty($col_header['href']) ? '' : '<a href="' . $col_header['href'] . '" rel="nofollow">', empty($col_header['label']) ? '&nbsp;' : $col_header['label'], empty($col_header['href']) ? '' : (empty($col_header['sort_image']) ? '</a>' : ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $col_header['sort_image'] . '.png" alt="" title="' . $sort_title . '" /></a>'), '</th>';
+					<th scope="col" id="header_', $list_id, '_', $col_header['id'], '"', empty($col_header['class']) ? '' : ' class="' . $col_header['class'] . '"', empty($col_header['style']) ? '' : ' style="' . $col_header['style'] . '"', empty($col_header['colspan']) ? '' : ' colspan="' . $col_header['colspan'] . '"', '>', empty($col_header['href']) ? '' : '<a href="' . $col_header['href'] . '" rel="nofollow">', empty($col_header['label']) ? '&nbsp;' : $col_header['label'], empty($col_header['href']) ? '' : (empty($col_header['sort_image']) ? '</a>' : ' <i class="sort icon i-sort-amount-' . $col_header['sort_image'] . '" title="' . $sort_title . '"></i></a>'), '</th>';
 		}
 
 		echo '
@@ -131,20 +129,21 @@ function template_show_list($list_id = null)
 			<tbody', empty($cur_list['sortable']) ? '' : ' id="table_grid_sortable"', '>';
 
 	// Show a nice message informing there are no items in this list.
-	// @todo - Nasty having styles and aligns still in the markup (IE6 stuffz).
-	// @todo - Should be done via the class.
 	if (empty($cur_list['rows']) && !empty($cur_list['no_items_label']))
 		echo '
 				<tr>
-					<td class="windowbg" colspan="', $cur_list['num_columns'], '" style="text-align:', !empty($cur_list['no_items_align']) ? $cur_list['no_items_align'] : 'center', '"><div class="padding">', $cur_list['no_items_label'], '</div></td>
+					<td colspan="', $cur_list['num_columns'], '">
+						<div class="', !empty($cur_list['no_items_align']) ? $cur_list['no_items_align'] : 'centertext', '">', $cur_list['no_items_label'], '</div>
+					</td>
 				</tr>';
+
 	// Show the list rows.
 	elseif (!empty($cur_list['rows']))
 	{
 		foreach ($cur_list['rows'] as $id => $row)
 		{
 			echo '
-				<tr class="standard_row ', $row['class'], '" id="list_', $list_id, '_', $id, '">';
+				<tr class="standard_row ', $row['class'], '" id="list_', $list_id, '_', str_replace(' ', '_', $id), '">';
 
 			foreach ($row['data'] as $row_data)
 				echo '
@@ -169,7 +168,7 @@ function template_show_list($list_id = null)
 		if (!empty($cur_list['items_per_page']) && !empty($cur_list['page_index']))
 			echo '
 				<div class="floatleft">',
-			template_pagesection(false, false, array('page_index_markup' => $cur_list['page_index'])), '
+			template_pagesection(false, '', array('page_index_markup' => $cur_list['page_index'])), '
 				</div>';
 
 		if (isset($cur_list['additional_rows']['below_table_data']))
@@ -207,6 +206,8 @@ function template_show_list($list_id = null)
  *
  * @param int $row_position
  * @param mixed[] $cur_list
+ *
+ * @return string as echoed output
  */
 function template_additional_rows($row_position, $cur_list)
 {
@@ -239,24 +240,18 @@ function template_additional_rows($row_position, $cur_list)
  */
 function template_create_list_menu($list_menu)
 {
-	global $settings;
-
 	echo '
-			<div class="menu', $list_menu['position'], ' additional_row', empty($list_menu['class']) ? '' : ' ' . $list_menu['class'], '"', empty($list_menu['style']) ? '' : ' style="' . $list_menu['style'] . '"', '>';
-
-	$items = count($list_menu['links']);
-	$count = 0;
+		<ul class="generic_menu float', $list_menu['position'], empty($list_menu['class']) ? '' : ' ' . $list_menu['class'], '"', empty($list_menu['style']) ? '' : ' style="' . $list_menu['style'] . '"', '>';
 
 	foreach ($list_menu['links'] as $link)
 	{
-		$count++;
-		if (!empty($link['href']))
-			echo '
-				<a href="', $link['href'], '">', $link['is_selected'] ? '<img src="' . $settings['images_url'] . '/selected.png" alt="&gt;" /> ' : '';
-
-		echo $link['label'], !empty($link['href']) ? '</a>' : '', $items !== $count ? '&nbsp;|&nbsp;' : '';
+		echo '
+			<li class="listlevel1">
+				<a class="linklevel1', $link['is_selected'] ? ' active' : '', '" href="', !empty($link['href']) ? $link['href'] : '#', '">',
+				$link['label'], !empty($link['href']) ? '</a>' : '', '
+			</li>';
 	}
 
 	echo '
-			</div>';
+		</ul>';
 }

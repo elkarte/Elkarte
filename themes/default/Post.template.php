@@ -5,13 +5,11 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.1
  *
  */
 
@@ -33,7 +31,7 @@ function template_postarea_above()
 
 	// Start the javascript...
 	echo '
-		<script><!-- // --><![CDATA[';
+		<script>';
 
 	// When using Go Back due to fatal_error, allow the form to be re-submitted with changes.
 	if (isBrowser('is_firefox'))
@@ -51,28 +49,28 @@ function template_postarea_above()
 
 	// End of the javascript
 	echo '
-		// ]]></script>';
+		</script>';
 
 	// Start the form and display the link tree.
 	echo '
-		<form action="', $scripturl, '?action=', $context['destination'], ';', empty($context['current_board']) ? '' : 'board=' . $context['current_board'], '" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" class="flow_hidden" onsubmit="', ($context['becomes_approved'] ? '' : 'alert(\'' . $txt['js_post_will_require_approval'] . '\');'), 'submitonce(this);smc_saveEntities(\'postmodify\', [\'subject\', \'', $context['post_box_name'], '\', \'guestname\', \'evtitle\', \'question\'], \'options\');revalidateMentions(\'postmodify\', \'', $context['post_box_name'], '\');" enctype="multipart/form-data">';
+		<form id="postmodify" action="', $scripturl, '?action=', $context['destination'], ';', empty($context['current_board']) ? '' : 'board=' . $context['current_board'], '" method="post" accept-charset="UTF-8" name="postmodify" class="flow_hidden" onsubmit="', ($context['becomes_approved'] ? '' : 'alert(\'' . $txt['js_post_will_require_approval'] . '\');'), 'submitonce(this);smc_saveEntities(\'postmodify\', [\'subject\', \'', $context['post_box_name'], '\', \'guestname\', \'evtitle\', \'question\'], \'options\');revalidateMentions(\'postmodify\', \'', $context['post_box_name'], '\');" enctype="multipart/form-data">';
 
 	// If the user wants to see how their message looks - the preview section is where it's at!
 	echo '
-			<div id="preview_section" class="forumposts"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
-				<h3 class="category_header">
+			<div id="preview_section"', isset($context['preview_message']) ? '' : ' class="hide"', '>
+				<h2 class="category_header">
 					<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
-				</h3>
-				<div class="post" id="preview_body">
+				</h2>
+				<div id="preview_body">
 					', empty($context['preview_message']) ? '<br />' : $context['preview_message'], '
 				</div>
 			</div>';
 
 	// Start the main table.
 	echo '
-			<div class="forumposts">', isset($context['current_topic']) ? '<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />' : '', '
-				<h3 class="category_header">', $context['page_title'], '</h3>
-				<div class="windowbg">
+			<div id="forumposts">', isset($context['current_topic']) ? '<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />' : '', '
+				<h2 class="category_header">', $context['page_title'], '</h2>
+				<div class="forumposts">
 					<div class="editor_wrapper">';
 
 	// If an error occurred, explain what happened.
@@ -94,13 +92,13 @@ function template_postarea_above()
 	// If it's locked, show a message to warn the replyer.
 	// @todo why not output it only for locked topics and why not use the template_show_error above?
 	echo '
-						<p class="information"', $context['locked'] ? '' : ' style="display: none"', ' id="lock_warning">
+						<p id="lock_warning" class="information', $context['locked'] ? '"' : ' hide"', '>
 							', $txt['topic_locked_no_reply'], '
 						</p>';
 
 	if (!empty($context['drafts_autosave']))
 		echo '
-						<div id="draft_section" class="successbox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>
+						<div id="draft_section" class="successbox', isset($context['draft_saved']) ? '"' : ' hide"', '>
 							', sprintf($txt['draft_saved'], $scripturl . '?action=profile;u=' . $context['user']['id'] . ';area=showdrafts'), '
 						</div>';
 
@@ -171,13 +169,13 @@ function template_postarea_above()
 function template_poll_edit_above()
 {
 	echo '
-					<hr class="clear" />
-					<div id="edit_poll">';
+						<div class="separator"></div>
+						<div id="edit_poll">';
 
 	template_poll_edit();
 
 	echo '
-					</div>';
+						</div>';
 }
 
 /**
@@ -189,87 +187,87 @@ function template_make_event_above()
 
 	// Are you posting a calendar event?
 	echo '
-					<hr class="clear" />
-					<div id="post_event">
-						<fieldset id="event_main">
-							<legend>', $txt['calendar_event_options'], '</legend>
-							<label for="evtitle"', isset($context['post_error']['no_event']) ? ' class="error"' : '', ' id="caption_evtitle">', $txt['calendar_event_title'], ':</label>
-							<input type="text" id="evtitle" name="evtitle" maxlength="255" size="55" value="', $context['event']['title'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
-							<div id="datepicker">
-								<input type="hidden" name="calendar" value="1" /><label for="year">', $txt['calendar_year'], '</label>
-								<select name="year" id="year" tabindex="', $context['tabindex']++, '" onchange="generateDays();">';
+						<hr class="clear" />
+						<div id="post_event">
+							<fieldset id="event_main">
+								<legend>', $txt['calendar_event_options'], '</legend>
+								<label for="evtitle"', isset($context['post_error']['no_event']) ? ' class="error"' : '', ' id="caption_evtitle">', $txt['calendar_event_title'], ':</label>
+								<input type="text" id="evtitle" name="evtitle" maxlength="255" size="55" value="', $context['event']['title'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
+								<div id="datepicker">
+									<input type="hidden" name="calendar" value="1" /><label for="year">', $txt['calendar_year'], '</label>
+									<select name="year" id="year" tabindex="', $context['tabindex']++, '" onchange="generateDays();">';
 
 	// Show a list of all the years we allow...
-	for ($year = $modSettings['cal_minyear']; $year <= $modSettings['cal_maxyear']; $year++)
+	for ($year = $context['cal_minyear']; $year <= $context['cal_maxyear']; $year++)
 		echo '
-									<option value="', $year, '"', $year == $context['event']['year'] ? ' selected="selected"' : '', '>', $year, '&nbsp;</option>';
+										<option value="', $year, '"', $year == $context['event']['year'] ? ' selected="selected"' : '', '>', $year, '&nbsp;</option>';
 
 	echo '
-								</select>
-								<label for="month">', $txt['calendar_month'], '</label>
-								<select name="month" id="month" onchange="generateDays();">';
+									</select>
+									<label for="month">', $txt['calendar_month'], '</label>
+									<select name="month" id="month" onchange="generateDays();">';
 
 	// There are 12 months per year - ensure that they all get listed.
 	for ($month = 1; $month <= 12; $month++)
 		echo '
-									<option value="', $month, '"', $month == $context['event']['month'] ? ' selected="selected"' : '', '>', $txt['months'][$month], '&nbsp;</option>';
+										<option value="', $month, '"', $month == $context['event']['month'] ? ' selected="selected"' : '', '>', $txt['months'][$month], '&nbsp;</option>';
 
 	echo '
-								</select>
-								<label for="day">', $txt['calendar_day'], '</label>
-								<select name="day" id="day">';
+									</select>
+									<label for="day">', $txt['calendar_day'], '</label>
+									<select name="day" id="day">';
 
 	// This prints out all the days in the current month - this changes dynamically as we switch months.
 	for ($day = 1; $day <= $context['event']['last_day']; $day++)
 		echo '
-									<option value="', $day, '"', $day == $context['event']['day'] ? ' selected="selected"' : '', '>', $day, '&nbsp;</option>';
+										<option value="', $day, '"', $day == $context['event']['day'] ? ' selected="selected"' : '', '>', $day, '&nbsp;</option>';
 
 	echo '
-								</select>
-							</div>';
+									</select>
+								</div>';
 
 	if (!empty($modSettings['cal_allowspan']) || ($context['event']['new'] && $context['is_new_post']))
 	{
 		echo '
-							<ul class="event_options">';
+								<ul class="event_options">';
 
 		// If events can span more than one day then allow the user to select how long it should last.
 		if (!empty($modSettings['cal_allowspan']))
 		{
 			echo '
-								<li>
-									<label for="span">', $txt['calendar_numb_days'], '</label>
-									<select id="span" name="span">';
+									<li>
+										<label for="span">', $txt['calendar_numb_days'], '</label>
+										<select id="span" name="span">';
 
 			for ($days = 1; $days <= $modSettings['cal_maxspan']; $days++)
 				echo '
-										<option value="', $days, '"', $days == $context['event']['span'] ? ' selected="selected"' : '', '>', $days, '&nbsp;</option>';
+											<option value="', $days, '"', $days == $context['event']['span'] ? ' selected="selected"' : '', '>', $days, '&nbsp;</option>';
 
 			echo '
-									</select>
-								</li>';
+										</select>
+									</li>';
 		}
 
 		// If this is a new event let the user specify which board they want the linked post to be put into.
 		if ($context['event']['new'] && $context['is_new_post'])
 		{
 			echo '
-								<li>
-									', template_select_boards('board', $txt['calendar_post_in']), '
-								</li>';
+									<li>
+										', template_select_boards('board', $txt['calendar_post_in']), '
+									</li>';
 		}
 
 		echo '
-							</ul>';
+								</ul>';
 	}
 
 	if ($context['make_event'] && (!$context['event']['new'] || !empty($context['current_board'])))
 		echo '
-							<input type="hidden" name="eventid" value="', $context['event']['id'], '" />';
+								<input type="hidden" name="eventid" value="', $context['event']['id'], '" />';
 
 	echo '
-						</fieldset>
-					</div>';
+							</fieldset>
+						</div>';
 }
 
 /**
@@ -287,7 +285,7 @@ function template_post_page()
 	if (!empty($context['member_ids']))
 	{
 		echo '
-							<div id="mentioned" style="display:none">';
+							<div id="mentioned" class="hide">';
 
 		foreach ($context['member_ids'] as $id)
 			echo '
@@ -303,21 +301,21 @@ function template_post_page()
 							', template_control_richedit_buttons($context['post_box_name']);
 
 	// Option to delete an event if user is editing one.
-	if ($context['make_event'] && !$context['event']['new'])
+	if (!empty($context['make_event']) && !$context['event']['new'])
 		echo '
-							<input type="submit" name="deleteevent" value="', $txt['event_delete'], '" onclick="return confirm(\'', $txt['event_delete_confirm'], '\');" class="button_submit" />';
+							<input type="submit" name="deleteevent" value="', $txt['event_delete'], '" onclick="return confirm(\'', $txt['event_delete_confirm'], '\');" />';
 
 	// Option to add a poll (javascript if enabled, otherwise preview with poll)
-	if (!$context['make_poll'] && $context['can_add_poll'])
+	if (empty($context['make_poll']) && $context['can_add_poll'])
 		echo '
-							<input type="submit" name="poll" value="', $txt['add_poll'], '" onclick="return loadAddNewPoll(this, ', empty($context['current_board']) ? '0' : $context['current_board'], ', \'postmodify\');" class="button_submit" />';
+							<input type="submit" name="poll" aria-label="', $txt['add_poll'], '" value="', $txt['add_poll'], '" onclick="return loadAddNewPoll(this, ', empty($context['current_board']) ? '0' : $context['current_board'], ', \'postmodify\');" />';
 
 	echo '
 						</div>';
 }
 
 /**
- * Show the additonal options section, allowing locking, sticky, adding of attachments, etc
+ * Show the additional options section, allowing locking, sticky, adding of attachments, etc
  */
 function template_additional_options_below()
 {
@@ -326,73 +324,35 @@ function template_additional_options_below()
 	// If the admin has enabled the hiding of the additional options - show a link and image for it.
 	if (!empty($settings['additional_options_collapsible']))
 		echo '
-					<h3 id="postAdditionalOptionsHeader" class="category_header">
-						<span id="category_toggle">&nbsp;
-							<span id="postMoreExpand" class="', empty($context['minmax_preferences']['pmdraft']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
-						</span>
+					<h3 id="postAdditionalOptionsHeader" class="category_header panel_toggle">
+							<i id="postMoreExpand" class="chevricon i-chevron-', empty($context['minmax_preferences']['post']) ? 'up' : 'down', ' hide" title="', $txt['hide'], '"></i>
 						<a href="#" id="postMoreExpandLink">', $context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt'], '</a>
 					</h3>';
 
 	echo '
-					<div id="', empty($settings['additional_options_collapsible']) ? 'postAdditionalOptionsNC"' : 'postAdditionalOptions"', empty($settings['additional_options_collapsible']) || empty($context['minmax_preferences']['post']) ? '' : ' style="display: none;"', '>';
+					<div id="', empty($settings['additional_options_collapsible']) ? 'postAdditionalOptionsNC"' : 'postAdditionalOptions"', empty($settings['additional_options_collapsible']) || empty($context['minmax_preferences']['post']) ? '' : ' class="hide"', '>';
 
-	// If this post already has attachments on it - give information about them.
-	if (!empty($context['attachments']['current']))
-		$context['attachments']['templates']['existing']();
-
-	// Is the user allowed to post any additional ones? If so give them the boxes to do it!
-	if ($context['attachments']['can']['post'])
-		$context['attachments']['templates']['add_new']();
+	// Is the user allowed to post or if this post already has attachments on it give them the boxes.
+	if ($context['attachments']['can']['post'] || !empty($context['attachments']['current']))
+		$context['attachments']['template']();
 
 	// Display the check boxes for all the standard options - if they are available to the user!
 	echo '
 						<div id="postMoreOptions" class="smalltext">
 							<ul class="post_options">
-								', $context['can_notify'] ? '<li><input type="hidden" name="notify" value="0" /><label for="check_notify"><input type="checkbox" name="notify" id="check_notify"' . ($context['notify'] || !empty($options['auto_notify']) ? ' checked="checked"' : '') . ' value="1" class="input_check" /> ' . $txt['notify_replies'] . '</label></li>' : '', '
-								', $context['can_lock'] ? '<li><input type="hidden" name="lock" value="0" /><label for="check_lock"><input type="checkbox" name="lock" id="check_lock"' . ($context['locked'] ? ' checked="checked"' : '') . ' value="1" class="input_check" /> ' . $txt['lock_topic'] . '</label></li>' : '', '
-								<li><label for="check_back"><input type="checkbox" name="goback" id="check_back"' . ($context['back_to_topic'] || !empty($options['return_to_post']) ? ' checked="checked"' : '') . ' value="1" class="input_check" /> ' . $txt['back_to_topic'] . '</label></li>
-								', $context['can_sticky'] ? '<li><input type="hidden" name="sticky" value="0" /><label for="check_sticky"><input type="checkbox" name="sticky" id="check_sticky"' . ($context['sticky'] ? ' checked="checked"' : '') . ' value="1" class="input_check" /> ' . $txt['sticky_after'] . '</label></li>' : '', '
-								<li><label for="check_smileys"><input type="checkbox" name="ns" id="check_smileys"', $context['use_smileys'] ? '' : ' checked="checked"', ' value="NS" class="input_check" /> ', $txt['dont_use_smileys'], '</label></li>', '
-								', $context['can_move'] ? '<li><input type="hidden" name="move" value="0" /><label for="check_move"><input type="checkbox" name="move" id="check_move" value="1" class="input_check" ' . (!empty($context['move']) ? 'checked="checked" ' : '') . '/> ' . $txt['move_after2'] . '</label></li>' : '', '
-								', $context['can_announce'] && $context['is_first_post'] ? '<li><label for="check_announce"><input type="checkbox" name="announce_topic" id="check_announce" value="1" class="input_check" ' . (!empty($context['announce']) ? 'checked="checked" ' : '') . '/> ' . $txt['announce_topic'] . '</label></li>' : '', '
-								', $context['show_approval'] ? '<li><label for="approve"><input type="checkbox" name="approve" id="approve" value="2" class="input_check" ' . ($context['show_approval'] === 2 ? 'checked="checked"' : '') . ' /> ' . $txt['approve_this_post'] . '</label></li>' : '', '
+								', $context['can_notify'] ? '<li><input type="hidden" name="notify" value="0" /><label for="check_notify"><input type="checkbox" name="notify" id="check_notify"' . ($context['notify'] || !empty($options['auto_notify']) ? ' checked="checked"' : '') . ' value="1" /> ' . $txt['notify_replies'] . '</label></li>' : '', '
+								', $context['can_lock'] ? '<li><input type="hidden" name="lock" value="0" /><label for="check_lock"><input type="checkbox" name="lock" id="check_lock"' . ($context['locked'] ? ' checked="checked"' : '') . ' value="1" /> ' . $txt['lock_topic'] . '</label></li>' : '', '
+								<li><label for="check_back"><input type="checkbox" name="goback" id="check_back"' . ($context['back_to_topic'] || !empty($options['return_to_post']) ? ' checked="checked"' : '') . ' value="1" /> ' . $txt['back_to_topic'] . '</label></li>
+								', $context['can_sticky'] ? '<li><input type="hidden" name="sticky" value="0" /><label for="check_sticky"><input type="checkbox" name="sticky" id="check_sticky"' . ($context['sticky'] ? ' checked="checked"' : '') . ' value="1" /> ' . $txt['sticky_after'] . '</label></li>' : '', '
+								<li><label for="check_smileys"><input type="checkbox" name="ns" id="check_smileys"', $context['use_smileys'] ? '' : ' checked="checked"', ' value="NS" /> ', $txt['dont_use_smileys'], '</label></li>', '
+								', $context['can_move'] ? '<li><input type="hidden" name="move" value="0" /><label for="check_move"><input type="checkbox" name="move" id="check_move" value="1" ' . (!empty($context['move']) ? 'checked="checked" ' : '') . '/> ' . $txt['move_after2'] . '</label></li>' : '', '
+								', $context['can_announce'] && $context['is_first_post'] ? '<li><label for="check_announce"><input type="checkbox" name="announce_topic" id="check_announce" value="1" ' . (!empty($context['announce']) ? 'checked="checked" ' : '') . '/> ' . $txt['announce_topic'] . '</label></li>' : '', '
+								', $context['show_approval'] ? '<li><label for="approve"><input type="checkbox" name="approve" id="approve" value="2" ' . ($context['show_approval'] === 2 ? 'checked="checked"' : '') . ' /> ' . $txt['approve_this_post'] . '</label></li>' : '', '
 							</ul>
 						</div>';
 
 	echo '
 					</div>';
-}
-
-/**
- * Creates a list of attachments already attached to this message
- */
-function template_show_existing_attachments()
-{
-	global $context, $txt, $modSettings;
-
-	echo '
-						<dl id="postAttachment">
-							<dt>
-								', $txt['attached'], ':
-							</dt>
-							<dd class="smalltext" style="width: 100%;">
-								<input type="hidden" name="attach_del[]" value="0" />
-								', $txt['uncheck_unwatchd_attach'], ':
-							</dd>';
-
-	foreach ($context['attachments']['current'] as $attachment)
-		echo '
-							<dd class="smalltext">
-								<label for="attachment_', $attachment['id'], '"><input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check" /> ', $attachment['name'], (empty($attachment['approved']) ? ' (' . $txt['awaiting_approval'] . ')' : ''),
-		!empty($modSettings['attachmentPostLimit']) || !empty($modSettings['attachmentSizeLimit']) ? sprintf($txt['attach_kb'], comma_format(round(max($attachment['size'], 1028) / 1028), 0)) : '', '</label>
-							</dd>';
-
-	echo '
-						</dl>';
-
-	if (!empty($context['files_in_session_warning']))
-		echo '
-						<div class="smalltext">', $context['files_in_session_warning'], '</div>';
 }
 
 /**
@@ -403,15 +363,18 @@ function template_add_new_attachments()
 	global $context, $txt, $modSettings;
 
 	echo '
+						<span id="postAttachment"></span>
 						<dl id="postAttachment2">';
 
-	// But, only show them if they haven't reached a limit. Or a mod author hasn't hidden them.
-	if ($context['attachments']['num_allowed'] > 0 || !empty($context['dont_show_them']))
+	// Show the box even if they reached the limit, maybe they want to remove one!
+	if (empty($context['dont_show_them']))
 	{
 		echo '
 							<dt class="drop_area">
-								<i class="fa fa-upload"></i> ', $txt['attach_drop_files'], '
-								<input class="drop_area_fileselect" type="file" multiple="multiple" name="attachment_click[]" id="attachment_click" class="input_file" />
+								<i class="icon i-upload"></i>
+								<span class="desktop">', $txt['attach_drop_files'], '</span>
+								<span class="mobile">', $txt['attach_drop_files_mobile'], '</span>
+								<input id="attachment_click" class="drop_area_fileselect input_file" type="file" multiple="multiple" name="attachment_click[]" />
 							</dt>
 							<dd class="progress_tracker"></dd>
 							<dd class="drop_attachments_error"></dd>
@@ -425,17 +388,33 @@ function template_add_new_attachments()
 		// Show more boxes if they aren't approaching that limit.
 		if ($context['attachments']['num_allowed'] > 1)
 			echo '
-								<script><!-- // --><![CDATA[
+								<script>
 									var allowed_attachments = ', $context['attachments']['num_allowed'], ',
 										current_attachment = 1,
 										txt_more_attachments_error = "', $txt['more_attachments_error'], '",
 										txt_more_attachments = "', $txt['more_attachments'], '",
 										txt_clean_attach = "', $txt['clean_attach'], '";
-								// ]]></script>
+								</script>
 							</dd>
 							<dd class="smalltext drop_attachments_no_js" id="moreAttachments"><a href="#" onclick="addAttachment(); return false;">(', $txt['more_attachments'], ')</a></dd>';
 		else
 			echo '
+							</dd>';
+	}
+
+	foreach ($context['attachments']['current'] as $attachment)
+	{
+		$label = $attachment['name'];
+		if (empty($attachment['approved']))
+			$label .= ' (' . $txt['awaiting_approval'] . ')';
+		if (!empty($modSettings['attachmentPostLimit']) || !empty($modSettings['attachmentSizeLimit']))
+			$label .= sprintf($txt['attach_kb'], comma_format(round(max($attachment['size'], 1028) / 1028), 0));
+
+		echo '
+							<dd class="smalltext">
+								<label for="attachment_', $attachment['id'], '">
+									<input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check inline_insert" data-attachid="', $attachment['id'], '" data-size="', $attachment['size'], '"/> ', $label, '
+								</label>
 							</dd>';
 	}
 
@@ -462,6 +441,54 @@ function template_add_new_attachments()
 	echo '
 							</dd>
 						</dl>';
+
+	if (!empty($context['attachments']['ila_enabled']))
+	{
+		addInlineJavascript('
+		var IlaDropEvents = {
+			UploadSuccess: function($button, data) {
+				var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
+					trigger: $(\'<div class="share icon i-share" />\')
+				});
+				inlineAttach.addInterface($button, data.attachid);
+			},
+			RemoveSuccess: function(attachid) {
+				var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
+					trigger: $(\'<div class="share icon i-share" />\')
+				});
+				inlineAttach.removeAttach(attachid);
+			}
+		};', true);
+	}
+	else
+	{
+		addInlineJavascript('
+		var IlaDropEvents = {};', true);
+	}
+
+	// Load up the drag and drop attachment magic
+	addInlineJavascript('
+	var dropAttach = new dragDropAttachment({
+		board: ' . $context['current_board'] . ',
+		allowedExtensions: ' . JavaScriptEscape($context['attachments']['allowed_extensions']) . ',
+		totalSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentPostLimit']) ? '' : $modSettings['attachmentPostLimit']) . ',
+		individualSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentSizeLimit']) ? '' : $modSettings['attachmentSizeLimit']) . ',
+		numOfAttachmentAllowed: ' . $context['attachments']['num_allowed'] . ',
+		totalAttachSizeUploaded: ' . (isset($context['attachments']['total_size']) && !empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0) . ',
+		numAttachUploaded: ' . (isset($context['attachments']['quantity']) && !empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0) . ',
+		fileDisplayTemplate: \'<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="control icon i-close"></div></div>\',
+		oTxt: {
+			allowedExtensions : ' . JavaScriptEscape(sprintf($txt['cant_upload_type'], $context['attachments']['allowed_extensions'])) . ',
+			totalSizeAllowed : ' . JavaScriptEscape($txt['attach_max_total_file_size']) . ',
+			individualSizeAllowed : ' . JavaScriptEscape(sprintf($txt['file_too_big'], comma_format($modSettings['attachmentSizeLimit'], 0))) . ',
+			numOfAttachmentAllowed : ' . JavaScriptEscape(sprintf($txt['attachments_limit_per_post'], $modSettings['attachmentNumPerPostLimit'])) . ',
+			postUploadError : ' . JavaScriptEscape($txt['post_upload_error']) . ',
+			areYouSure: ' . JavaScriptEscape($txt['ila_confirm_removal']) . '
+		},
+		existingSelector: \'.inline_insert\',
+		events: IlaDropEvents' . (isset($context['current_topic']) ? ',
+			topic: ' . $context['current_topic'] : '') . '
+	});', true);
 }
 
 /**
@@ -473,13 +500,11 @@ function template_load_drafts_below()
 
 	// Show a draft selection box
 	echo '
-					<h3 id="postDraftOptionsHeader" class="category_header">
-						<span id="category_toggle_more">&nbsp;
-							<span id="postDraftExpand" class="', empty($context['minmax_preferences']['draft']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
-						</span>
+					<h3 id="postDraftOptionsHeader" class="category_header panel_toggle">
+							<i id="postDraftExpand" class="chevricon i-chevron-', empty($context['minmax_preferences']['draft']) ? 'up' : 'down', ' hide" title="', $txt['hide'], '"></i>
 						<a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a>
 					</h3>
-					<div id="postDraftOptions"', empty($context['minmax_preferences']['draft']) ? '' : ' style="display: none;"', '>
+					<div id="postDraftOptions"', empty($context['minmax_preferences']['draft']) ? '' : ' class="hide"', '>
 						<dl class="settings">
 							<dt>
 								<strong>', $txt['subject'], '</strong>
@@ -498,39 +523,38 @@ function template_load_drafts_below()
 					</div>';
 
 	// Code for showing and hiding drafts
-	echo '
-		<script><!-- // --><![CDATA[
+	addInlineJavascript('
 			var oSwapDraftOptions = new elk_Toggle({
 				bToggleEnabled: true,
-				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['draft']) ? 'false' : 'true', ',
+				bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['draft']) ? 'false' : 'true') . ',
 				aSwappableContainers: [
 					\'postDraftOptions\',
 				],
 				aSwapClasses: [
 					{
 						sId: \'postDraftExpand\',
-						classExpanded: \'collapse\',
-						titleExpanded: ', JavaScriptEscape($txt['hide']), ',
-						classCollapsed: \'expand\',
-						titleCollapsed: ', JavaScriptEscape($txt['show']), '
+						classExpanded: \'chevricon i-chevron-up\',
+						titleExpanded: ' . JavaScriptEscape($txt['hide']) . ',
+						classCollapsed: \'chevricon i-chevron-down\',
+						titleCollapsed: ' . JavaScriptEscape($txt['show']) . '
 					}
 				],
 				aSwapLinks: [
 					{
 						sId: \'postDraftExpandLink\',
-						msgExpanded: ', JavaScriptEscape($txt['draft_hide']), ',
-						msgCollapsed: ', JavaScriptEscape($txt['draft_load']), '
+						msgExpanded: ' . JavaScriptEscape($txt['draft_hide']) . ',
+						msgCollapsed: ' . JavaScriptEscape($txt['draft_load']) . '
 					}
 				],
 				oThemeOptions: {
-					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+					bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') . ',
 					sOptionName: \'minmax_preferences\',
 					sSessionId: elk_session_id,
 					sSessionVar: elk_session_var,
 					sAdditionalVars: \';minmax_key=draft\'
 				},
 			});
-		// ]]></script>';
+		', true);
 }
 
 /**
@@ -544,8 +568,8 @@ function template_topic_replies_below()
 	if (isset($context['previous_posts']) && count($context['previous_posts']) > 0)
 	{
 		echo '
-		<div id="topic_summary" class="forumposts">
-			<h3 class="category_header">', $txt['topic_summary'], '</h3>
+		<div id="topic_summary">
+			<h2 class="category_header">', $txt['topic_summary'], '</h2>
 			<span id="new_replies"></span>';
 
 		$ignored_posts = array();
@@ -556,7 +580,7 @@ function template_topic_replies_below()
 				$ignored_posts[] = $ignoring = $post['id'];
 
 			echo '
-			<div class="', $post['alternate'] == 0 ? 'windowbg' : 'windowbg2', '">
+			<div class="content forumposts">
 				<div class="postarea2" id="msg', $post['id'], '">
 					<div class="keyinfo">
 						<h5 class="floatleft">
@@ -574,10 +598,10 @@ function template_topic_replies_below()
 
 			if ($ignoring)
 				echo '
-						<div id="msg_', $post['id'], '_ignored_prompt">
-							', $txt['ignoring_user'], '
-							<a href="#" id="msg_', $post['id'], '_ignored_link" style="display: none;">', $txt['show_ignore_user_post'], '</a>
-						</div>';
+					<div id="msg_', $post['id'], '_ignored_prompt">
+						', $txt['ignoring_user'], '
+						<a href="#" id="msg_', $post['id'], '_ignored_link" class="hide">', $txt['show_ignore_user_post'], '</a>
+					</div>';
 
 			echo '
 					<div class="inner" id="msg_', $post['id'], '_body">', $post['body'], '</div>
@@ -587,8 +611,8 @@ function template_topic_replies_below()
 
 		echo '
 		</div>
-		<script><!-- // --><![CDATA[
-			var aIgnoreToggles = new Array();';
+		<script>
+			var aIgnoreToggles = [];';
 
 		foreach ($ignored_posts as $post_id)
 		{
@@ -611,7 +635,7 @@ function template_topic_replies_below()
 		}
 
 		echo '
-		// ]]></script>';
+		</script>';
 	}
 }
 
@@ -625,7 +649,7 @@ function template_postarea_below()
 	global $context, $txt, $counter, $settings;
 
 	// Is visual verification enabled?
-	if ($context['require_verification'])
+	if (!empty($context['require_verification']))
 	{
 		template_verification_controls($context['visual_verification_id'], '
 						<div class="post_verification">
@@ -637,14 +661,23 @@ function template_postarea_below()
 	}
 
 	echo '
+						</div>
 					</div>
-				</div>
-			</div>';
+				</div>';
 
 	// Assuming this isn't a new topic pass across the last message id.
 	if (isset($context['topic_last_message']))
+	{
 		echo '
 			<input type="hidden" name="last_msg" value="', $context['topic_last_message'], '" />';
+	}
+
+	// Better remember the draft id when passing from a page to another.
+	if (isset($context['id_draft']))
+	{
+		echo '
+			<input type="hidden" name="id_draft" value="', $context['id_draft'], '" />';
+	}
 
 	// If we are starting a new topic starting from another one, here is the place to remember some details
 	if (!empty($context['original_post']))
@@ -659,7 +692,7 @@ function template_postarea_below()
 
 	// The variables used to preview a post without loading a new page.
 	echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			var form_name = "postmodify",
 				preview_area = "post",
 				current_board = ', empty($context['current_board']) ? 'null' : $context['current_board'], ',
@@ -674,14 +707,15 @@ function template_postarea_below()
 				txt_ignoring_user = "', $txt['ignoring_user'], '",
 				txt_new = "', $txt['new'], '",
 				txt_posted_by = "', $txt['posted_by'], '",
-				txt_on = "', $txt['on'], '";';
+				txt_on = "', $txt['on'], '";
+		</script>';
 
 	// Code for showing and hiding additional options.
 	if (!empty($settings['additional_options_collapsible']))
-		echo '
+		addInlineJavascript('
 			var oSwapAdditionalOptions = new elk_Toggle({
 				bToggleEnabled: true,
-				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['post']) ? 'false' : 'true', ',
+				bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['post']) ? 'false' : 'true') . ',
 				funcOnBeforeCollapse: function () {
 					document.getElementById(\'additional_options\').value = \'0\';
 				},
@@ -694,30 +728,27 @@ function template_postarea_below()
 				aSwapClasses: [
 					{
 						sId: \'postMoreExpand\',
-						classExpanded: \'collapse\',
-						titleExpanded: ', JavaScriptEscape($txt['hide']), ',
-						classCollapsed: \'expand\',
-						titleCollapsed: ', JavaScriptEscape($txt['show']), '
+						classExpanded: \'chevricon i-chevron-up\',
+						titleExpanded: ' . JavaScriptEscape($txt['hide']) . ',
+						classCollapsed: \'chevricon i-chevron-down\',
+						titleCollapsed: ' . JavaScriptEscape($txt['show']) . '
 					}
 				],
 				aSwapLinks: [
 					{
 						sId: \'postMoreExpandLink\',
-						msgExpanded: ', JavaScriptEscape($context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt']), ',
-						msgCollapsed: ', JavaScriptEscape($context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt']), '
+						msgExpanded: ' . JavaScriptEscape($context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt']) . ',
+						msgCollapsed: ' . JavaScriptEscape($context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt']) . '
 					}
 				],
 				oThemeOptions: {
-					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+					bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') . ',
 					sOptionName: \'minmax_preferences\',
 					sSessionId: elk_session_id,
 					sSessionVar: elk_session_var,
 					sAdditionalVars: \';minmax_key=post\'
 				},
-			});';
-
-	echo '
-		// ]]></script>';
+			});', true);
 
 	template_topic_replies_below();
 }
@@ -743,18 +774,16 @@ function template_spellcheck()
 				margin: 0;
 				background: #f0f0f0;
 				color: #000;
-				padding: 10px;
+				padding: 10px 10px 0 10px;
 			}
 			.highlight {
 				color: red;
 				font-weight: bold;
 			}
 			#spellview {
-				border-style: outset;
-				border: 1px solid black;
+				border: 1px inset black;
 				padding: 5px;
-				width: 95%;
-				height: 314px;
+				height: 300px;
 				overflow: auto;
 				background: #ffffff;
 			}
@@ -766,22 +795,22 @@ function template_spellcheck()
 
 	// As you may expect - we need a lot of javascript for this... load it from the separate files.
 	echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			var spell_formname = window.opener.spell_formname,
 				spell_fieldname = window.opener.spell_fieldname,
 				spell_full = window.opener.spell_full;
-		// ]]></script>
+		</script>
 		<script src="', $settings['default_theme_url'], '/scripts/spellcheck.js"></script>
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
-		<script><!-- // --><![CDATA[
+		<script>
 			', $context['spell_js'], '
-		// ]]></script>
+		</script>
 	</head>
 	<body onload="nextWord(false);">
 		<form action="#" method="post" accept-charset="UTF-8" name="spellingForm" id="spellingForm" onsubmit="return false;" style="margin: 0;">
 			<div id="spellview">&nbsp;</div>
 			<table class="table_grid">
-				<tr class="windowbg">
+				<tr>
 					<td style="width: 50%;vertical-align: top;">
 						<label for="changeto">', $txt['spellcheck_change_to'], '</label><br />
 						<input type="text" id="changeto" name="changeto" style="width: 98%;" class="input_text" />
@@ -794,10 +823,10 @@ function template_spellcheck()
 				</tr>
 			</table>
 			<div class="submitbutton">
-				<input type="button" name="change" value="', $txt['spellcheck_change'], '" onclick="replaceWord();" class="button_submit" />
-				<input type="button" name="changeall" value="', $txt['spellcheck_change_all'], '" onclick="replaceAll();" class="button_submit" />
-				<input type="button" name="ignore" value="', $txt['spellcheck_ignore'], '" onclick="nextWord(false);" class="button_submit" />
-				<input type="button" name="ignoreall" value="', $txt['spellcheck_ignore_all'], '" onclick="nextWord(true);" class="button_submit" />
+				<input type="button" name="change" value="', $txt['spellcheck_change'], '" onclick="replaceWord();" />
+				<input type="button" name="changeall" value="', $txt['spellcheck_change_all'], '" onclick="replaceAll();" />
+				<input type="button" name="ignore" value="', $txt['spellcheck_ignore'], '" onclick="nextWord(false);" />
+				<input type="button" name="ignoreall" value="', $txt['spellcheck_ignore_all'], '" onclick="nextWord(true);" />
 			</div>
 		</form>
 	</body>

@@ -1,25 +1,25 @@
-/**
+/*!
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
- *
+ * @version 1.1
+ */
+
+/**
  * This file contains javascript associated with the registration screen
  */
 
 /**
  * Elk Registration class
  *
- * @param {string} name of the registration form
- * @param {int} passwordDifficultyLevel
- * @param {array} regTextStrings
+ * @param {String} formID name of the registration form
+ * @param {Number} passwordDifficultyLevel
+ * @param {Array.} regTextStrings
  */
 function elkRegister(formID, passwordDifficultyLevel, regTextStrings)
 {
@@ -27,6 +27,7 @@ function elkRegister(formID, passwordDifficultyLevel, regTextStrings)
 	this.verificationFieldLength = 0;
 	this.textStrings = regTextStrings ? regTextStrings : [];
 	this.passwordLevel = passwordDifficultyLevel ? passwordDifficultyLevel : 0;
+	this.displayChanged = false;
 
 	// Setup all the fields!
 	this.autoSetup(formID);
@@ -52,12 +53,14 @@ elkRegister.prototype.addVerificationField = function(fieldType, fieldID)
 		eventHandler = 'refreshVerifyPassword';
 	else if (fieldType === 'username')
 		eventHandler = 'refreshUsername';
+	else if (fieldType === 'displayname')
+		eventHandler = 'refreshDisplayname';
 	else if (fieldType === 'reserved')
 		eventHandler = 'refreshMainPassword';
 
 	// Store this field.
 	var vFieldIndex = fieldType === 'reserved' ? fieldType + this.verificationFieldLength : fieldType;
-	this.verificationFields[vFieldIndex] = Array(6);
+	this.verificationFields[vFieldIndex] = new Array(6);
 	this.verificationFields[vFieldIndex][0] = fieldID;
 	this.verificationFields[vFieldIndex][1] = inputHandle;
 	this.verificationFields[vFieldIndex][2] = imageHandle;
@@ -82,7 +85,7 @@ elkRegister.prototype.addVerificationField = function(fieldType, fieldID)
 
 	// Make the div visible!
 	if (divHandle)
-		divHandle.style.display = '';
+		divHandle.style.display = 'inline';
 };
 
 // A button to trigger a username search
@@ -118,6 +121,8 @@ elkRegister.prototype.autoSetup = function(formID)
 			// Username can only be done with XML.
 			if (curElement.id.indexOf('username') !== -1)
 				curType = 'username';
+			else if (curElement.id.indexOf('displayname') !== -1)
+				curType = 'displayname';
 			else if (curElement.id.indexOf('pwmain') !== -1)
 				curType = 'pwmain';
 			else if (curElement.id.indexOf('pwverify') !== -1)
@@ -177,7 +182,7 @@ elkRegister.prototype.refreshMainPassword = function(called_from_verify)
 		}
 	}
 
-	var isValid = stringIndex === '' ? true : false;
+	var isValid = stringIndex === '';
 	if (stringIndex === '')
 		stringIndex = 'password_valid';
 
@@ -215,6 +220,11 @@ elkRegister.prototype.refreshUsername = function()
 	if (!this.verificationFields.username)
 		return false;
 
+	if (typeof this.verificationFields.displayname !== 'undefined' && this.displayChanged === false)
+	{
+		this.verificationFields.displayname[1].value = this.verificationFields.username[1].value;
+	}
+
 	// Restore the class name.
 	if (this.verificationFields.username[1].className)
 		this.verificationFields.username[1].className = this.verificationFields.username[5];
@@ -222,6 +232,34 @@ elkRegister.prototype.refreshUsername = function()
 	// Check the image is correct.
 	var alt = this.textStrings.username_check ? this.textStrings.username_check : '';
 	this.setVerificationImage(this.verificationFields.username[2], 'check', alt);
+
+	// Check the password is still OK.
+	this.refreshMainPassword();
+
+	return true;
+};
+
+// If the displayname is changed just revert the status of whether it's valid!
+elkRegister.prototype.refreshDisplayname = function(e)
+{
+	if (!this.verificationFields.displayname)
+		return false;
+
+	if (typeof e !== 'undefined')
+	{
+		if (!(e.altKey || e.ctrlKey || e.shiftKey) && e.which > 48)
+		{
+			this.displayChanged = true;
+		}
+	}
+
+	// Restore the class name.
+	if (this.verificationFields.displayname[1].className)
+		this.verificationFields.displayname[1].className = this.verificationFields.displayname[5];
+
+	// Check the image is correct.
+	var alt = this.textStrings.username_check ? this.textStrings.username_check : '';
+	this.setVerificationImage(this.verificationFields.displayname[2], 'check', alt);
 
 	// Check the password is still OK.
 	this.refreshMainPassword();
@@ -243,15 +281,23 @@ elkRegister.prototype.checkUsername = function(is_auto)
 
 	// Get the username and do nothing without one!
 	var curUsername = this.verificationFields.username[1].value;
-	if (!curUsername)
+	var curDisplayname = typeof this.verificationFields.displayname !== 'undefined' ? this.verificationFields.displayname[1].value : '';
+
+	if (!curUsername && !curDisplayname)
 		return false;
+
 
 	if (!is_auto)
 		ajax_indicator(true);
 
 	// Request a search on that username.
-	checkName = curUsername.php_to8bit().php_urlencode();
+	var checkName = curUsername.php_urlencode();
 	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=register;sa=usernamecheck;xml;username=' + checkName, null, this.checkUsernameCallback);
+	if (curDisplayname)
+	{
+		var checkDisplay = curDisplayname.php_urlencode();
+		sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=register;sa=usernamecheck;xml;username=' + checkDisplay, null, this.checkDisplaynameCallback);
+	}
 
 	return true;
 };
@@ -259,16 +305,33 @@ elkRegister.prototype.checkUsername = function(is_auto)
 // Callback for getting the username data.
 elkRegister.prototype.checkUsernameCallback = function(XMLDoc)
 {
+	var isValid = true;
+
 	if (XMLDoc.getElementsByTagName("username"))
 		isValid = parseInt(XMLDoc.getElementsByTagName("username")[0].getAttribute("valid"));
-	else
-		isValid = true;
 
 	// What to alt?
 	var alt = this.textStrings[isValid === 1 ? 'username_valid' : 'username_invalid'] ? this.textStrings[isValid === 1 ? 'username_valid' : 'username_invalid'] : '';
 
 	this.verificationFields.username[1].className = this.verificationFields.username[5] + ' ' + (isValid === 1 ? 'valid_input' : 'invalid_input');
 	this.setVerificationImage(this.verificationFields.username[2], isValid === 1, alt);
+
+	ajax_indicator(false);
+};
+
+// Callback for getting the displayname data.
+elkRegister.prototype.checkDisplaynameCallback = function(XMLDoc)
+{
+	var isValid = true;
+
+	if (XMLDoc.getElementsByTagName("username"))
+		isValid = parseInt(XMLDoc.getElementsByTagName("username")[0].getAttribute("valid"));
+
+	// What to alt?
+	var alt = this.textStrings[isValid === 1 ? 'username_valid' : 'username_invalid'] ? this.textStrings[isValid === 1 ? 'username_valid' : 'username_invalid'] : '';
+
+	this.verificationFields.displayname[1].className = this.verificationFields.displayname[5] + ' ' + (isValid === 1 ? 'valid_input' : 'invalid_input');
+	this.setVerificationImage(this.verificationFields.displayname[2], isValid === 1, alt);
 
 	ajax_indicator(false);
 };
@@ -282,20 +345,23 @@ elkRegister.prototype.setVerificationImage = function(imageHandle, imageIcon, al
 	if (!alt)
 		alt = '*';
 
-	var curImage = imageIcon ? (imageIcon === 'check' ? 'field_check.png' : 'field_valid.png') : 'field_invalid.png';
-	imageHandle.src = elk_images_url + '/icons/' + curImage;
+	var curClass = imageIcon ? (imageIcon === 'check' ? 'i-help' : 'i-check') : 'i-warn';
+
 	imageHandle.alt = alt;
 	imageHandle.title = alt;
+	imageHandle.className = 'icon ' + curClass;
 
 	return true;
 };
-
 
 /**
  * Sets up the form fields based on the chosen authentication method, openID or password
  */
 function updateAuthMethod()
 {
+	var currentAuthMethod,
+		currentForm;
+
 	// What authentication method is being used?
 	if (!document.getElementById('auth_openid') || !document.getElementById('auth_openid').checked)
 		currentAuthMethod = 'passwd';
@@ -308,19 +374,19 @@ function updateAuthMethod()
 
 	currentForm = document.getElementById('auth_openid').form.id;
 
-	document.forms[currentForm].openid_url.disabled = currentAuthMethod === 'openid' ? false : true;
-	document.forms[currentForm].elk_autov_pwmain.disabled = currentAuthMethod === 'passwd' ? false : true;
-	document.forms[currentForm].elk_autov_pwverify.disabled = currentAuthMethod === 'passwd' ? false : true;
-	document.getElementById('elk_autov_pwmain_div').style.display = currentAuthMethod === 'passwd' ? '' : 'none';
-	document.getElementById('elk_autov_pwverify_div').style.display = currentAuthMethod === 'passwd' ? '' : 'none';
+	document.forms[currentForm].openid_url.disabled = currentAuthMethod !== 'openid';
+	document.forms[currentForm].elk_autov_pwmain.disabled = currentAuthMethod !== 'passwd';
+	document.forms[currentForm].elk_autov_pwverify.disabled = currentAuthMethod !== 'passwd';
+	document.getElementById('elk_autov_pwmain_div').style.display = currentAuthMethod === 'passwd' ? 'inline' : 'none';
+	document.getElementById('elk_autov_pwverify_div').style.display = currentAuthMethod === 'passwd' ? 'inline' : 'none';
 
 	if (currentAuthMethod === 'passwd')
 	{
 		verificationHandle.refreshMainPassword();
 		verificationHandle.refreshVerifyPassword();
 		document.forms[currentForm].openid_url.style.backgroundColor = '';
-		document.getElementById('password1_group').style.display = '';
-		document.getElementById('password2_group').style.display = '';
+		document.getElementById('password1_group').style.display = 'block';
+		document.getElementById('password2_group').style.display = 'block';
 		document.getElementById('openid_group').style.display = 'none';
 	}
 	else
@@ -330,7 +396,7 @@ function updateAuthMethod()
 		document.forms[currentForm].openid_url.style.backgroundColor = '#FFF0F0';
 		document.getElementById('password1_group').style.display = 'none';
 		document.getElementById('password2_group').style.display = 'none';
-		document.getElementById('openid_group').style.display = '';
+		document.getElementById('openid_group').style.display = 'block';
 	}
 
 	return true;
@@ -349,3 +415,29 @@ function onCheckChange()
 	else
 		document.forms.postForm.emailPassword.disabled = false;
 }
+
+(function($) {
+	$(document).ready(function() {
+		$('#agreement_lang').change(function() {
+			$.ajax({
+				type: "POST",
+				url: elk_scripturl + "?action=jslocale;sa=agreement;xml;api=json",
+				data: {lang: $(this).val()},
+				beforeSend: ajax_indicator(true)
+			})
+			.done(function(request) {
+				if (request != '')
+				{
+					$('#agreement_box').html(request);
+				}
+			})
+			.fail(function(request) {
+				// Maybe reload with language attribute?
+			})
+			.always(function() {
+				// turn off the indicator
+				ajax_indicator(false);
+			})
+		});
+	});
+})(jQuery);

@@ -5,13 +5,11 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.7
+ * @version 1.1
  *
  */
 
@@ -20,7 +18,7 @@
  */
 function template_ManageNews_init()
 {
-	loadtemplate('GenericHelpers');
+	loadTemplate('GenericHelpers');
 }
 
 /**
@@ -39,64 +37,62 @@ function template_email_members()
 				', $txt['admin_news_select_recipients'], '
 			</div>
 			<div id="include_panel_header">
-				<h3 class="category_header">
+				<h2 class="category_header">
 					', $txt['include_these'], '
-				</h3>
+				</h2>
 			</div>
-			<div class="windowbg">
-				<div class="content">
-					<dl class="settings">
-						<dt>
-							<strong>', $txt['admin_news_select_group'], ':</strong><br />
-							<span class="smalltext">', $txt['admin_news_select_group_desc'], '</span>
-						</dt>
-						<dd>';
+			<div class="content">
+				<dl class="settings">
+					<dt>
+						<label>', $txt['admin_news_select_group'], ':</label><br />
+						<span class="smalltext">', $txt['admin_news_select_group_desc'], '</span>
+					</dt>
+					<dd>';
 
 	template_list_groups_collapsible('groups');
 
 	echo '
-						</dd>
-						<dt>
-							<strong><label for="emails">', $txt['admin_news_select_email'], '</label>:</strong><br />
-							<span class="smalltext">', $txt['admin_news_select_email_desc'], '</span>
-						</dt>
-						<dd>
-							<textarea id="emails" name="emails" rows="5" cols="30" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 98%; min-width: 98%' : 'width: 98%') . ';"></textarea>
-						</dd>
-						<dt>
-							<strong><label for="members">', $txt['admin_news_select_members'], '</label>:</strong><br />
-							<span class="smalltext">', $txt['admin_news_select_members_desc'], '</span>
-						</dt>
-						<dd>
-							<input type="text" name="members" id="members" value="" size="30" class="input_text" />
-							<span id="members_container"></span>
-						</dd>
-					</dl>
-					<hr class="bordercolor" />
-					<dl class="settings">
-						<dt>
-							<label for="email_force"><strong>', $txt['admin_news_select_override_notify'], ':</strong></label><br />
-							<span class="smalltext">', $txt['email_force'], '</span>
-						</dt>
-						<dd>
-							<input type="checkbox" name="email_force" id="email_force" value="1" class="input_check" />
-						</dd>
-					</dl>
-				</div>
+					</dd>
+					<dt>
+						<label for="emails">', $txt['admin_news_select_email'], ':</label><br />
+						<span class="smalltext">', $txt['admin_news_select_email_desc'], '</span>
+					</dt>
+					<dd>
+						<textarea id="emails" name="emails" rows="5" cols="30" style="width: 98%;"></textarea>
+					</dd>
+					<dt>
+						<label for="members">', $txt['admin_news_select_members'], ':</label><br />
+						<span class="smalltext">', $txt['admin_news_select_members_desc'], '</span>
+					</dt>
+					<dd>
+						<input type="text" name="members" id="members" value="" size="30" class="input_text" />
+						<span id="members_container"></span>
+					</dd>
+				</dl>
+				<hr class="bordercolor" />
+				<dl class="settings">
+					<dt>
+						<label for="email_force">', $txt['admin_news_select_override_notify'], ':</label><br />
+						<span class="smalltext">', $txt['email_force'], '</span>
+					</dt>
+					<dd>
+						<input type="checkbox" name="email_force" id="email_force" value="1" />
+					</dd>
+				</dl>
 			</div>
 			<div id="exclude_panel_header">
-				<h3 class="category_header">
-					<span id="category_toggle">&nbsp;
-						<span id="upshrink_ic" class="', empty($context['admin_preferences']['apn']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+				<h2 class="category_header panel_toggle">
+					<span>
+						<span id="upshrink_ic" class="chevricon i-chevron-', empty($context['admin_preferences']['apn']) ? 'up' : 'down', ' hide" title="', $txt['hide'], '"></span>
 					</span>
 					<a href="#" id="exclude_panel_link" >', $txt['exclude_these'], '</a>
-				</h3>
+				</h2>
 			</div>
-			<div id="exclude_panel_div" class="windowbg">
+			<div id="exclude_panel_div">
 				<div class="content">
 					<dl class="settings">
 						<dt>
-							<strong>', $txt['admin_news_select_excluded_groups'], ':</strong><br />
+							<label>', $txt['admin_news_select_excluded_groups'], ':</label><br />
 							<span class="smalltext">', $txt['admin_news_select_excluded_groups_desc'], '</span>
 						</dt>
 						<dd>';
@@ -105,7 +101,7 @@ function template_email_members()
 
 	echo '
 						<dt>
-							<strong>', $txt['admin_news_select_excluded_members'], ':</strong><br />
+							<label>', $txt['admin_news_select_excluded_members'], ':</label><br />
 							<span class="smalltext">', $txt['admin_news_select_excluded_members_desc'], '</span>
 						</dt>
 						<dd>
@@ -116,7 +112,7 @@ function template_email_members()
 				</div>
 			</div>
 			<div class="submitbutton">
-				<input type="submit" value="', $txt['admin_next'], '" class="button_submit" />
+				<input type="submit" value="', $txt['admin_next'], '" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			</div>
 		</form>
@@ -133,9 +129,9 @@ function template_email_members()
 			aSwapClasses: [
 				{
 					sId: \'upshrink_ic\',
-					classExpanded: \'collapse\',
+					classExpanded: \'chevricon i-chevron-up\',
 					titleExpanded: ' . JavaScriptEscape($txt['hide']) . ',
-					classCollapsed: \'expand\',
+					classCollapsed: \'chevricon i-chevron-down\',
 					titleCollapsed: ' . JavaScriptEscape($txt['show']) . '
 				}
 			],
@@ -197,28 +193,28 @@ function template_email_members_compose()
 	echo '
 	<div id="admincenter">
 		<form name="newsmodify" action="', $scripturl, '?action=admin;area=news;sa=mailingsend" method="post" accept-charset="UTF-8">
-			<h3 class="category_header">
+			<h2 class="category_header">
 				', $txt['admin_newsletters'], '
-			</h3>
+			</h2>
 			<div class="information">
 				', str_replace('{help_emailmembers}', $scripturl . '?action=quickhelp;help=emailmembers" onclick="return reqOverlayDiv(this.href);', $txt['email_variables']), '
 			</div>';
 
 	// The preview section
 	echo '
-			<div id="preview_section" class="forumposts"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
-				<h3 class="category_header">
+			<div id="preview_section"', isset($context['preview_message']) ? '' : ' class="hide"', '>
+				<h2 class="category_header">
 					<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
-				</h3>
-				<div class="post" id="preview_body">
+				</h2>
+				<div id="preview_body">
 					', empty($context['preview_message']) ? '<br />' : $context['preview_message'], '
 				</div>
 			</div>';
 
 	// Any errors to speak of?
 	echo '
-			<div class="windowbg">
-				<div id="post_error" class="', empty($context['error_type']) || $context['error_type'] != 'serious' ? 'warningbox' : 'errorbox', '"', empty($context['post_error']['messages']) ? ' style="display: none"' : '', '>
+			<div class="content">
+				<div id="post_error" class="', (empty($context['error_type']) || $context['error_type'] != 'serious' ? 'warningbox' : 'errorbox'), empty($context['post_error']['messages']) ? ' hide"' : '"', '>
 					<dl>
 						<dt>
 							<strong id="error_serious">', $txt['error_while_submitting'], '</strong>
@@ -232,7 +228,7 @@ function template_email_members_compose()
 				</div>';
 
 	// Show the editor area
-	echo'
+	echo '
 				<div class="editor_wrapper">
 					<dl id="post_header">
 						<dt class="clear_left">
@@ -250,18 +246,30 @@ function template_email_members_compose()
 
 	echo '
 					<ul>
-						<li><label for="send_pm"><input type="checkbox" name="send_pm" id="send_pm" ', !empty($context['send_pm']) ? 'checked="checked"' : '', 'class="input_check" onclick="checkboxes_status(this);" /> ', $txt['email_as_pms'], '</label></li>
-						<li><label for="send_html"><input type="checkbox" name="send_html" id="send_html" ', !empty($context['send_html']) ? 'checked="checked"' : '', 'class="input_check" onclick="checkboxes_status(this);" /> ', $txt['email_as_html'], '</label></li>
-						<li><label for="parse_html"><input type="checkbox" name="parse_html" id="parse_html" checked="checked" disabled="disabled" class="input_check" /> ', $txt['email_parsed_html'], '</label></li>
+						<li>
+							<label for="send_pm">
+								<input type="checkbox" name="send_pm" id="send_pm" ', !empty($context['send_pm']) ? 'checked="checked"' : '', 'onclick="checkboxes_status(this);" /> ', $txt['email_as_pms'], '
+							</label>
+						</li>
+						<li>
+							<label for="send_html">
+								<input type="checkbox" name="send_html" id="send_html" ', !empty($context['send_html']) ? 'checked="checked"' : '', 'onclick="checkboxes_status(this);" /> ', $txt['email_as_html'], '
+							</label>
+						</li>
+						<li>
+							<label for="parse_html">
+								<input type="checkbox" name="parse_html" id="parse_html" checked="checked" disabled="disabled" /> ', $txt['email_parsed_html'], '
+							</label>
+						</li>
 					</ul>
 					<div class="submitbutton">
 						', template_control_richedit_buttons($context['post_box_name']), '
+						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						<input type="hidden" name="email_force" value="', $context['email_force'], '" />
+						<input type="hidden" name="total_emails" value="', $context['total_emails'], '" />
+						<input type="hidden" name="max_id_member" value="', $context['max_id_member'], '" />
 					</div>
 				</div>
-				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input type="hidden" name="email_force" value="', $context['email_force'], '" />
-				<input type="hidden" name="total_emails" value="', $context['total_emails'], '" />
-				<input type="hidden" name="max_id_member" value="', $context['max_id_member'], '" />
 			</div>';
 
 	foreach ($context['recipients'] as $key => $values)
@@ -306,17 +314,16 @@ function template_email_members_send()
 	echo '
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=news;sa=mailingsend" method="post" accept-charset="UTF-8" name="autoSubmit" id="autoSubmit">
-			<h3 class="category_header">
+			<h2 class="category_header">
 				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['admin_newsletters'], '
-			</h3>
-			<div class="windowbg">
-				<div class="content">
-					<div class="progress_bar">
-						<div class="full_bar">', $context['percentage_done'], '% ', $txt['email_done'], '</div>
-						<div class="green_percent" style="width: ', $context['percentage_done'], '%;">&nbsp;</div>
-					</div>
-					<hr />
-					<input type="submit" name="cont" value="', $txt['email_continue'], '" class="right_submit" />
+			</h2>
+			<div class="content">
+				<div class="progress_bar">
+					<div class="full_bar">', $context['percentage_done'], '% ', $txt['email_done'], '</div>
+					<div class="green_percent" style="width: ', $context['percentage_done'], '%;">&nbsp;</div>
+				</div>
+				<div class="submitbutton">
+					<input type="submit" name="cont" value="', $txt['email_continue'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="subject" value="', $context['subject'], '" />
 					<input type="hidden" name="message" value="', $context['message'], '" />
@@ -338,9 +345,9 @@ function template_email_members_send()
 		</form>
 	</div>
 
-	<script><!-- // --><![CDATA[
+	<script>
 		doAutoSubmit(2, ', JavaScriptEscape($txt['email_continue']), ');
-	// ]]></script>';
+	</script>';
 }
 
 /**
@@ -352,17 +359,15 @@ function template_email_members_succeeded()
 
 	echo '
 	<div id="admincenter">
-		<h3 class="category_header">
+		<h2 class="category_header">
 			<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['admin_newsletters'], '
-		</h3>
-		<div class="windowbg">
-			<div class="content">
-				<div class="successbox">
-					', $txt['email_members_succeeded'], '
-				</div>
-				<hr />
-				<a href="', $scripturl, '?action=admin" class="linkbutton right_submit">', $txt['admin_back_to'], '</a>
+		</h2>
+		<div class="content">
+			<div class="successbox">
+				', $txt['email_members_succeeded'], '
 			</div>
+			<hr />
+			<a href="', $scripturl, '?action=admin" class="linkbutton right_submit">', $txt['admin_back_to'], '</a>
 		</div>
 	</div>';
 }

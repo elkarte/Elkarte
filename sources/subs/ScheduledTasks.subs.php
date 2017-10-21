@@ -7,12 +7,9 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.9
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Calculate the next time the passed tasks should be triggered.
@@ -58,7 +55,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 	$scheduleTaskImmediate = !empty($modSettings['scheduleTaskImmediate']) ? Util::unserialize($modSettings['scheduleTaskImmediate']) : array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		// scheduleTaskImmediate is a way to speed up scheduled tasts and fire them as fast as possible
+		// scheduleTaskImmediate is a way to speed up scheduled tasks and fire them as fast as possible
 		if (!empty($scheduleTaskImmediate) && isset($scheduleTaskImmediate[$row['task']]))
 			$next_time = next_time(1, '', rand(0, 60), true);
 		else
@@ -237,7 +234,7 @@ function logTask($id_log, $task_id, $total_time = null)
  * enabled, while the remaining are disabled
  *
  * @package ScheduledTasks
- * @param integer[] $enablers array od task IDs
+ * @param int[] $enablers array od task IDs
  */
 function updateTaskStatus($enablers)
 {
@@ -319,8 +316,11 @@ function updateTask($id_task, $disabled = null, $offset = null, $interval = null
  * Loads the details from a given task.
  *
  * @package ScheduledTasks
+ *
  * @param int $id_task
+ *
  * @return array
+ * @throws Elk_Exception no_access
  */
 function loadTaskDetails($id_task)
 {
@@ -340,7 +340,7 @@ function loadTaskDetails($id_task)
 	);
 	// Should never, ever, happen!
 	if ($db->num_rows($request) == 0)
-		fatal_lang_error('no_access', false);
+		throw new Elk_Exception('no_access', false);
 	while ($row = $db->fetch_assoc($request))
 	{
 		$task = array(
@@ -410,9 +410,9 @@ function scheduledTasks()
  * - Used by createList() callbacks.
  *
  * @package ScheduledTasks
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  *
  * @return array
  */
@@ -494,9 +494,6 @@ function processNextTasks($ts = 0)
 {
 	$db = database();
 
-	// We'll run tasks, or so we hope.
-	require_once(SUBSDIR . '/ScheduledTask.class.php');
-
 	// Select the next task to do.
 	$request = $db->query('', '
 		SELECT id_task, task, next_time, time_offset, time_regularity, time_unit
@@ -572,47 +569,21 @@ function run_this_task($id_task, $task_name)
 {
 	global $time_start, $modSettings;
 
+	Elk_Autoloader::instance()->register(SUBSDIR . '/ScheduledTask', '\\ElkArte\\sources\\subs\\ScheduledTask');
+
 	// Let's start logging the task and saying we failed it
 	$log_task_id = logTask(0, $id_task);
 
-	// The method must exist in ScheduledTask class, or we are wasting our time.
-	// Actually for extendability sake, we need to have other ways, so:
-	// A simple procedural function?
-	if (strpos($task_name, '::') === false && function_exists($task_name))
-	{
-		$method = $task_name;
+	$class = '\\ElkArte\\sources\\subs\\ScheduledTask\\' . implode('_', array_map('ucfirst', explode('_', $task_name)));
 
-		// Do the task...
-		$completed = $method();
+	if (class_exists($class))
+	{
+		$task = new $class();
+
+		$completed = $task->run();
 	}
-	// It may be a class (no static, sorry)
 	else
-	{
-		// It may be a custom one
-		if (strpos($task_name, '::') !== false)
-		{
-			$call = explode('::', $task_name);
-			$task_object = new $call[0];
-			$method = $call[1];
-		}
-		// Otherwise we try with the ScheduledTask class
-		else
-		{
-			$task_object = new Scheduled_Task();
-			$method = $task_name;
-		}
-
-		if (method_exists($task_object, $method))
-		{
-			// Try to stop a timeout, this would be bad...
-			@set_time_limit(300);
-			if (function_exists('apache_reset_timeout'))
-				@apache_reset_timeout();
-
-			// Do the task...
-			$completed = $task_object->{$method}();
-		}
-	}
+		$completed = run_this_task_compat($task_name);
 
 	$scheduleTaskImmediate = !empty($modSettings['scheduleTaskImmediate']) ? Util::unserialize($modSettings['scheduleTaskImmediate']) : array();
 	// Log that we did it ;)
@@ -634,6 +605,49 @@ function run_this_task($id_task, $task_name)
 		// If the task ended successfully, then log the proper time taken to complete
 		logTask($log_task_id, $id_task, $total_time);
 	}
+}
+
+/**
+ * 1.0 compatibility function, used to maintain compatibility with naming
+ * scheme used in ElkArte 1.0
+ *
+ * @package ScheduledTasks
+ * @param string $task_name name of the task, class name, function name, method in ScheduledTask.class
+ * @return mixed bool
+ * @deprecated since 1.1 - Deprecated in favour of naming scheme
+ */
+function run_this_task_compat($task_name)
+{
+	$completed = false;
+
+	// The method must exist in ScheduledTask class, or we are wasting our time.
+	// Actually for extendability sake, we need to have other ways, so:
+	// A simple procedural function?
+	if (strpos($task_name, '::') === false && function_exists($task_name))
+	{
+		$method = $task_name;
+
+		// Do the task...
+		$completed = $method();
+	}
+	// It may be a class (no static, sorry)
+	elseif (strpos($task_name, '::') !== false)
+	{
+		$call = explode('::', $task_name);
+		$task_object = new $call[0];
+		$method = $call[1];
+
+		if (method_exists($task_object, $method))
+		{
+			// Try to stop a timeout, this would be bad...
+			detectServer()->setTimeLimit(300);
+
+			// Do the task...
+			$completed = $task_object->{$method}();
+		}
+	}
+
+	return $completed;
 }
 
 /**

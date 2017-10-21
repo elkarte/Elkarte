@@ -5,13 +5,11 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (elk)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
 
@@ -182,7 +180,7 @@ function template_generic_preview()
 		<caption name="bbc" class="', isset($context['post_error']['no_bbc']) ? 'error' : '', '" />
 		<caption name="subject" class="', isset($context['post_error']['no_subject']) ? 'error' : '', '" />
 		<caption name="question" class="', isset($context['post_error']['no_question']) ? 'error' : '', '" />',
-		isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? '<post_error />' : '', '
+	isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? '<post_error />' : '', '
 	</errors>';
 
 	echo '
@@ -439,56 +437,161 @@ function template_generic_xml_recursive($xml_data, $parent_ident, $child_ident, 
 }
 
 /**
- * Output before webslices content
+ * Formats data retrieved in other functions into xml format.
+ * Additionally formats data based on the specific format passed.
+ * This function is recursively called to handle sub arrays of data.
+ *
+ * @param mixed[] $data the array to output as xml data
+ * @param int $i the amount of indentation to use.
+ * @param string|null $tag if specified, it will be used instead of the keys of data.
+ * @param string $xml_format one of rss, rss2, rdf, atom
  */
-function template_webslice_header_above()
+function template_xml_news($data, $i, $tag = null, $xml_format = 'rss')
 {
-	global $settings;
+	// For every array in the data...
+	foreach ($data as $key => $val)
+	{
+		// Skip it, it's been set to null.
+		if ($val === null)
+			continue;
 
-	echo '
-	<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/wireless.css" />';
+		// If a tag was passed, use it instead of the key.
+		$key = isset($tag) ? $tag : $key;
+
+		// First let's indent!
+		echo "\n", str_repeat("\t", $i);
+
+		// Grr, I hate kludges... almost worth doing it properly, here, but not quite.
+		if ($xml_format == 'atom' && $key == 'link')
+		{
+			echo '<link rel="alternate" type="text/html" href="', fix_possible_url($val), '" />';
+			continue;
+		}
+
+		// If it's empty/0/nothing simply output an empty tag.
+		if ($val == '')
+			echo '<', $key, ' />';
+		elseif ($xml_format == 'atom' && $key == 'category')
+			echo '<', $key, ' term="', $val, '" />';
+		else
+		{
+			// Beginning tag.
+			if ($xml_format == 'rdf' && $key == 'item' && isset($val['link']))
+			{
+				echo '<', $key, ' rdf:about="', fix_possible_url($val['link']), '">';
+				echo "\n", str_repeat("\t", $i + 1);
+				echo '<dc:format>text/html</dc:format>';
+			}
+			elseif ($xml_format == 'atom' && $key == 'summary')
+				echo '<', $key, ' type="html">';
+			else
+				echo '<', $key, '>';
+
+			if (is_array($val))
+			{
+				// An array.  Dump it, and then indent the tag.
+				template_xml_news($val, $i + 1, null, $xml_format);
+				echo "\n", str_repeat("\t", $i), '</', $key, '>';
+			}
+			// A string with returns in it.... show this as a multiline element.
+			elseif (strpos($val, "\n") !== false || strpos($val, '<br />') !== false)
+				echo "\n", fix_possible_url($val), "\n", str_repeat("\t", $i), '</', $key, '>';
+			// A simple string.
+			else
+				echo fix_possible_url($val), '</', $key, '>';
+		}
+	}
 }
 
 /**
- * This shows a webslice of the recent posts.
+ * Main Atom feed template
  */
-function template_webslice_recent_posts()
+function template_rdf()
 {
 	global $context, $scripturl, $txt;
 
-	// @todo test if this works
-	echo '
-	<div style="width: 100%; height: 100%; border: 1px solid black; padding: 0; margin: 0 0 0 0; font: 100.01%/100% Verdana, Helvetica, sans-serif;">
-		<div style="background: #080436; color: #ffffff; padding: 4px;">
-			', cleanXml($txt['recent_posts']), '
-		</div>';
+	echo '<?xml version="1.0" encoding="UTF-8"?' . '>
+	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://purl.org/rss/1.0/">
+		<channel rdf:about="', $scripturl, '">
+			<title>', $context['feed_title'], '</title>
+			<link>', $scripturl, '</link>
+			<description><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></description>
+			<items>
+				<rdf:Seq>';
 
-	// Recent posts bit
-	$alternate = 0;
 	foreach ($context['recent_posts_data'] as $item)
-	{
 		echo '
-		<div style="background: ', $alternate ? '#ECEDF3' : '#F6F6F6', '; font-size: 90%; padding: 2px;">
-			<strong><a href="', $item['link'], '">', cleanXml($item['subject']), '</a></strong> ', cleanXml($txt['by']), ' ', cleanXml(!empty($item['poster']['link']) ? '<a href="' . $item['poster']['link'] . '">' . $item['poster']['name'] . '</a>' : $item['poster']['name']), '
-		</div>';
-		$alternate = !$alternate;
-	}
+					<rdf:li rdf:resource="', $item['link'], '" />';
 
 	echo '
-	</div>
-	<div style="width: 100%; height: 100%; border: 0; padding: 0; margin: 0 0 0 0; font: 100.01%/100% Verdana, Helvetica, sans-serif;">
-		<div style="font-size: xx-small;" class="righttext">';
+				</rdf:Seq>
+			</items>
+		</channel>
+	';
 
-	// Send alerts for the logged in user if they have new PMs
-	if ($context['user']['is_guest'])
-		echo '
-			<a href="', $scripturl, '?action=login">', $txt['login'], '</a>';
-	else
-		echo '
-			', cleanXml($context['user']['name']), cleanXml(!empty($context['can_pm_read']) ? ', ' . (empty($context['user']['messages']) ? $txt['msg_alert_no_messages'] : (($context['user']['messages'] == 1 ? sprintf($txt['msg_alert_one_message'], $scripturl . '?action=pm') : sprintf($txt['msg_alert_many_message'], $scripturl . '?action=pm', $context['user']['messages'])) . ', ' . ($context['user']['unread_messages'] == 1 ? $txt['msg_alert_one_new'] : sprintf($txt['msg_alert_many_new'], $context['user']['unread_messages'])))) : '');
+	template_xml_news($context['recent_posts_data'], 1, 'item', $context['xml_format']);
+
 	echo '
-		</div>
-	</div>';
+	</rdf:RDF>';
+}
+
+/**
+ * Main Atom feed template
+ */
+function template_feedatom()
+{
+	global $context, $scripturl, $txt;
+
+	echo '<?xml version="1.0" encoding="UTF-8"?' . '>
+	<feed xmlns="http://www.w3.org/2005/Atom">
+		<title>', $context['feed_title'], '</title>
+		<link rel="alternate" type="text/html" href="', $scripturl, '" />
+		<link rel="self" type="application/rss+xml" href="', $scripturl, '?type=atom;action=.xml', $context['url_parts'], '" />
+		<id>', $scripturl, '</id>
+		<icon>', $context['favicon'] . '</icon>
+		<logo>', $context['header_logo_url_html_safe'], '</logo>
+
+		<updated>', gmstrftime('%Y-%m-%dT%H:%M:%SZ'), '</updated>
+		<subtitle><![CDATA[', strip_tags(un_htmlspecialchars($txt['xml_rss_desc'])), ']]></subtitle>
+		<generator uri="http://www.elkarte.net" version="', strtr(FORUM_VERSION, array('ElkArte' => '')), '">ElkArte</generator>
+		<author>
+			<name>', strip_tags(un_htmlspecialchars($context['forum_name'])), '</name>
+		</author>';
+
+	template_xml_news($context['recent_posts_data'], 2, 'entry', $context['xml_format']);
+
+	echo '
+	</feed>';
+}
+
+/**
+ * Main RSS feed template (0.92 and 2.0)
+ */
+function template_feedrss()
+{
+	global $context, $scripturl, $txt;
+
+	echo '<?xml version="1.0" encoding="UTF-8"?' . '>
+	<rss version=', $context['xml_format'] == 'rss2' ? '"2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"' : '"0.92"', ' xml:lang="', strtr($txt['lang_locale'], '_', '-'), '">
+		<channel>
+			<title>', $context['feed_title'], '</title>
+			<link>', $scripturl, '</link>
+			<description><![CDATA[', un_htmlspecialchars(strip_tags($txt['xml_rss_desc'])), ']]></description>
+			<generator>ElkArte</generator>
+			<ttl>30</ttl>
+			<image>
+				<url>', $context['header_logo_url_html_safe'], '</url>
+				<title>', $context['feed_title'], '</title>
+				<link>', $scripturl, '</link>
+			</image>';
+
+	// Output all of the associative array, start indenting with 2 tabs, and name everything "item".
+	template_xml_news($context['recent_posts_data'], 2, 'item', $context['xml_format']);
+
+	// Output the footer of the xml.
+	echo '
+		</channel>
+	</rss>';
 }
 
 /**

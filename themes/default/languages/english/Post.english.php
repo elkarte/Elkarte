@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; Post
+// Version: 1.1; Post
 
 $txt['post_reply'] = 'Post reply';
 $txt['post_in_board'] = 'Post in the board';
@@ -40,10 +40,10 @@ $txt['reset_votes_check'] = 'Check this if you want to reset all vote counts to 
 $txt['votes'] = 'votes';
 $txt['attach'] = 'Attach';
 $txt['clean_attach'] = 'Clear attachment';
-$txt['attached'] = 'Attached';
+$txt['attached'] = 'Attached'; // @deprecated since 1.1
 $txt['allowed_types'] = 'Allowed file types';
 $txt['cant_upload_type'] = 'You cannot upload that type of file. The only allowed extensions are %1$s.';
-$txt['uncheck_unwatchd_attach'] = 'Uncheck the attachments you no longer want attached';
+$txt['uncheck_unwatchd_attach'] = 'Uncheck the attachments you no longer want attached'; // @deprecated since 1.1
 $txt['restricted_filename'] = 'That is a restricted filename. Please try a different filename.';
 $txt['topic_locked_no_reply'] = 'Warning! This topic is currently/will be locked<br />Only admins and moderators can reply.';
 $txt['attachment_requires_approval'] = 'Note that any files attached will not be displayed until approved by a moderator.';
@@ -62,7 +62,8 @@ $txt['reported_by'] = 'has been reported by';
 $txt['board_moderate'] = 'on a board you moderate';
 $txt['report_comment'] = 'The reporter has made the following comment';
 
-$txt['attach_drop_files'] = 'Add files by dragging & dropping or <a class="drop_area_fileselect_text" href="#">selecting them</a>';
+$txt['attach_drop_files'] = 'Add files by dragging & dropping or <a class="drop_area_fileselect_text" href="javascript:void(0)">selecting them</a>';
+$txt['attach_drop_files_mobile'] = '<a class="drop_area_fileselect_text" href="javascript:void(0)">Add files</a>';
 $txt['attach_restrict_attachmentPostLimit'] = 'maximum total size %1$s KB';
 $txt['attach_restrict_attachmentSizeLimit'] = 'maximum individual size %1$s KB';
 $txt['attach_restrict_attachmentNumPerPostLimit'] = '%1$d per post';
@@ -177,3 +178,19 @@ $txt['ran_out_of_space'] = 'The upload directory is full. Please contact an admi
 $txt['attachments_no_write'] = 'The attachments upload directory is not writable.  Your attachment or avatar cannot be saved.';
 $txt['attachments_no_create'] = 'Unable to create a new attachment directory.  Your attachment or avatar cannot be saved.';
 $txt['attachments_limit_per_post'] = 'You may not upload more than %1$d attachments per post';
+
+// Post settings (when I implement the post interface)
+$txt['ila_insert'] = 'Insert Attachment %1$d in the message';
+$txt['ila_title'] = 'End-of-post expandable thumbnail ';
+$txt['ila_option1'] = 'Thumbnail';
+$txt['ila_option2'] = 'Text link';
+$txt['ila_option3'] = 'Short text link';
+$txt['ila_confirm_removal'] = 'Are you sure you want to remove permanently this attachment?';
+/*
+$txt['ila_thereare'] = 'There are only';
+$txt['ila_attachment'] = 'attachment(s)';
+$txt['ila_none'] = 'as expandable thumbnail';
+$txt['ila_img'] = 'as full-size graphic';
+$txt['ila_url'] = 'as a link';
+$txt['ila_mini'] = 'as a compact link';
+*/

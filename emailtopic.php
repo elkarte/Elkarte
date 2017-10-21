@@ -1,17 +1,21 @@
-#!/usr/local/bin/php -q
+#!/usr/bin/php -q
 <?php
 
 /**
  * Handles the creating of new topics by email
- * 
- * Note the shebang #!/usr/local/bin/php -q needs to point to the installed
- * location of php, this is the typical location but yours may be different.
+ *
+ * Note the shebang (#!) needs to point to the installed location of php on your
+ * system.  If you have shell access running "which php" should return the correct
+ * path to use.
+ *
+ * For example
+ * - Ubuntu and Debian would normally be #!/usr/bin/php -q
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1
  *
  */
 
@@ -23,14 +27,13 @@ if (!defined('STDIN'))
 error_reporting(0);
 
 // Need SSI to do much
-require_once(dirname(__FILE__) . '/SSI.php');
+require_once(dirname(__FILE__) . '/bootstrap.php');
 
 // No need to ID the server if we fall on our face :)
 $_SERVER['SERVER_SOFTWARE'] = '';
 $_SERVER['SERVER_NAME'] = '';
 
 // Our mail controller
-require_once(CONTROLLERDIR . '/Emailpost.controller.php');
 $controller = new Emailpost_Controller();
 $controller->action_pbe_topic();
 

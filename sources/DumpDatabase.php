@@ -7,23 +7,19 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Dumps the database.
  *
  * What it does:
+ *
  * - It writes all of the database to standard output.
  * - It uses gzip compression if compress is set in the URL/post data.
  * - It may possibly time out, and mess up badly if you were relying on it. :P
@@ -46,12 +42,12 @@ function DumpDatabase2()
 		$_REQUEST['data'] = true;
 
 	// Attempt to stop from dying...
-	@set_time_limit(600);
+	detectServer()->setTimeLimit(600);
 	$time_limit = ini_get('max_execution_time');
 	$start_time = time();
 
 	// @todo ... fail on not getting the requested memory?
-	setMemoryLimit('256M');
+	detectServer()->setMemoryLimit('256M');
 	$memory_limit = memoryReturnBytes(ini_get('memory_limit')) / 4;
 	$current_used_memory = 0;
 	$db_backup = '';
@@ -69,16 +65,12 @@ function DumpDatabase2()
 		header('Accept-Ranges: bytes');
 		header('Content-Encoding: none');
 
-		// Gecko browsers... don't like this. (Mozilla, Firefox, etc.)
-		if (!isBrowser('gecko'))
-			header('Content-Transfer-Encoding: binary');
-
 		// The file extension will include .gz...
 		$extension = '.sql.gz';
 	}
 	else
 	{
-		// Get rid of the gzipping alreading being done.
+		// Get rid of the gzipping already being done.
 		if (!empty($modSettings['enableCompressedOutput']))
 			@ob_end_clean();
 		// If we can, clean anything already sent from the output buffer...
@@ -152,10 +144,10 @@ function DumpDatabase2()
 			// Time is what we need here!
 			if (function_exists('apache_reset_timeout'))
 				@apache_reset_timeout();
-			elseif (!empty($time_limit) && ($start_time + $time_limit - 20 > time()))
+			elseif (!empty($time_limit) && (((int) $start_time + (int) $time_limit - 20) > time()))
 			{
 				$start_time = time();
-				@set_time_limit(150);
+				detectServer()->setTimeLimit(150);
 			}
 
 			// for the first pass, start the output with a custom line...
@@ -180,6 +172,7 @@ function DumpDatabase2()
 			{
 				echo $output_function($db_backup);
 				$current_used_memory = 0;
+
 				// This is probably redundant
 				unset($db_backup);
 				$db_backup = '';

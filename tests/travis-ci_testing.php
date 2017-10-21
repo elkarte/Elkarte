@@ -76,6 +76,14 @@ while ($row = $db->fetch_assoc($request))
 
 echo "\n" . 'Test cases run: ' . $global_results['tests_run'][0] . '/' . $global_results['tests_run'][1] . ', Passes: ' . $global_results['passes'] . ', Failures: ' . $global_results['failures'] . ', Exceptions: ' . $global_results['exceptions'] . "\n";
 
+$db_errors = trim(file_get_contents(BOARDDIR . '/db_last_error.txt'));
+
+if (!empty($db_errors))
+{
+	echo 'A database error occurred!' . "\n";
+	$final_return++;
+}
+
 exit($final_return);
 
 // Schema: Test cases run: 1/1, Passes: 0, Failures: 0, Exceptions: 0

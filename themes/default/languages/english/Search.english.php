@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; Search
+// Version: 1.1; Search
 
 $txt['set_parameters'] = 'Set Search Parameters';
 $txt['choose_board'] = 'Choose a board to search in, or search all';
@@ -35,6 +35,7 @@ $txt['search_weight_length'] = 'Relative search weight for topic length';
 $txt['search_weight_subject'] = 'Relative search weight for a matching subject';
 $txt['search_weight_first_message'] = 'Relative search weight for a first message match';
 $txt['search_weight_sticky'] = 'Relative search weight for a pinned topic';
+$txt['search_weight_likes'] = 'Relative search weight for topic likes';
 
 $txt['search_settings_desc'] = 'Here you can change the basic settings of the search function.';
 $txt['search_settings_title'] = 'Search Settings';
@@ -53,7 +54,7 @@ $txt['search_method_messages_index_space'] = 'Space used to index messages in th
 $txt['search_method_kilobytes'] = 'KB';
 $txt['search_method_fulltext_index'] = 'Fulltext index';
 $txt['search_method_no_index_exists'] = 'doesn\'t currently exist';
-$txt['search_method_fulltext_create'] = 'create a fulltext index';
+$txt['search_method_fulltext_create'] = 'Create a fulltext index';
 $txt['search_method_fulltext_cannot_create'] = 'cannot be created because the max message length is above 65,535 or table type is not MyISAM';
 $txt['search_method_index_already_exists'] = 'already created';
 $txt['search_method_fulltext_remove'] = 'remove fulltext index';
@@ -69,13 +70,13 @@ $txt['search_index_none'] = 'No index';
 $txt['search_index_custom'] = 'Custom index';
 $txt['search_index_label'] = 'Index';
 $txt['search_index_size'] = 'Size';
-$txt['search_index_create_custom'] = 'create custom index';
-$txt['search_index_custom_remove'] = 'remove custom index';
+$txt['search_index_create_custom'] = 'Create custom index';
+$txt['search_index_custom_remove'] = 'Remove custom index';
 
 $txt['search_index_sphinx'] = 'Sphinx';
-$txt['search_index_sphinx_desc'] = 'To adjust Sphinx settings, use [<a href="{managesearch_url}">Configure Sphinx</a>]';
+$txt['search_index_sphinx_desc'] = 'To adjust Sphinx settings, use <a class="linkbutton" href="{managesearch_url}">Configure Sphinx</a>';
 $txt['search_index_sphinxql'] = 'SphinxQL';
-$txt['search_index_sphinxql_desc'] = 'To adjust SphinxQL settings, use [<a href="{managesearch_url}">Configure Sphinx</a>]';
+$txt['search_index_sphinxql_desc'] = 'To adjust SphinxQL settings, use <a class="linkbutton" href="{managesearch_url}">Configure Sphinx</a>';
 
 $txt['search_force_index'] = 'Force the use of a search index';
 $txt['search_match_words'] = 'Match whole words only';
@@ -177,7 +178,7 @@ $txt['sphinxql_test_passed'] = 'All tests were successful, the system was able t
 $txt['sphinx_test_connect_failed'] = 'Unable to connect to the Sphinx daemon. Make sure it is running and configured properly. Sphinx search will not work until you fix the problem.';
 $txt['sphinxql_test_connect_failed'] = 'Unable to access SphinxQL. Make sure your sphinx.conf has a separate listen directive for the SphinxQL port. SphinxQL search will not work until you fix the problem';
 $txt['sphinx_test_api_missing'] = 'The sphinxapi.php file is missing in your &quot;sources&quot; directory. You need to copy this file from the Sphinx distribution. Sphinx search will not work until you fix the problem.';
-$txt['sphinx_description'] = 'Use this interface to supply the access details to your Sphinx search daemon. <strong>These settings are only used to create</strong> an initial sphinx.conf configuration file which you will need to save in your Sphinx configuration directory (typically /usr/local/etc). Generally the options below can be left untouched, however they assume that the Sphinx software was installed in /usr/local and use /var/sphinx for the search index data storage. In order to keep Sphinx up to date, you must use a cron job to update the indexes, otherwise new or deleted content will not be reflected in  the search results. The configuration file defines two indexes:<br /><br/><strong>elkarte_delta_index</strong>, an index that only stores recent changes and can be called frequently. <strong>elkarte_base_index</strong>, an index that stores the full database and should be called less frequently. Example:<br /><span class="tt">10 3 * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate elkarte_base_index<br />0 * * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate elkarte_delta_index</span>';
+$txt['sphinx_description'] = 'Use this interface to supply the access details to your Sphinx search daemon. <strong>These settings are only used to create</strong> an initial sphinx.conf configuration file which you will need to save in your Sphinx configuration directory (typically /usr/local/etc or /etc/sphinxsearch). Generally the options below can be left untouched, however they assume that the Sphinx software was installed in /usr/local and use /var/sphinx for the search index data storage. In order to keep Sphinx up to date, you must use a cron job to update the indexes, otherwise new or deleted content will not be reflected in  the search results. The configuration file defines two indexes:<br /><br/><strong>elkarte_delta_index</strong>, an index that only stores recent changes and can be called frequently. <strong>elkarte_base_index</strong>, an index that stores the full database and should be called less frequently. Example:<br /><span class="tt">10 3 * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate elkarte_base_index<br />0 * * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate elkarte_delta_index</span>';
 $txt['sphinx_index_prefix'] = 'Index prefix:';
 $txt['sphinx_index_prefix_desc'] = 'This is the prefix for the base and delta indexes.<br />By default it uses elkarte and the two indexes will be elkarte_base_index and elkarte_delta_index. Sphinx will connect to elkarte_index (prefix_index).  If you change this be sure to use the correct prefix in your cron task.';
 $txt['sphinx_index_data_path'] = 'Index data path:';

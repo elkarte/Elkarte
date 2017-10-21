@@ -3,20 +3,47 @@
 	border: 1px solid #CCCCCC;
 	border-radius: 7px;
 }
+
 .description, .information {
 	margin-top: 4px;
 }
+
 .popup_window.description {
 	margin: 12% auto;
 }
+
 #support_resources, #credits_sections {
 	margin: 0;
 }
-#manage_boards, #admincenter, h3 + .infobox {
+
+#manage_boards, .admincenter, h3 + .infobox {
 	margin-top: 12px;
 }
-#admincenter>#admin_form_wrapper {
+
+.admincenter > #admin_form_wrapper {
 	margin-top: 0;
+}
+
+#admin_content .content  {
+	background: #F6F6F6;
+	border: none;
+	box-shadow: none;
+}
+
+#manage_maintenance div.content {
+	border: none;
+}
+
+.admin_menu .subsections:hover .linklevel1:after {
+	display: none;
+}
+
+#admin_main_section, .quick_tasks, #mod_main_section,
+#support_credits, #admin_newsletters,
+#core_features, #entry_form,
+#groupForm, #mailqueue_stats, #manage_maintenance,
+#new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper {
+	border: 1px solid transparent;
 }
 
 /* Styles for the manage boards section.
@@ -24,11 +51,13 @@
 #manage_boards h2 {
 	margin-bottom: 6px;
 }
+
 #manage_boards .post_group, #manage_boards .regular_members {
-	border-bottom: 1px dotted #000;
+	border-bottom: 1px dotted #000000;
 }
+
 .ui-state-highlight {
-	background-color: #f5f5f5;
+	background-color: #F5F5F5;
 	border: 1px dashed #298299;
 }
 
@@ -43,17 +72,19 @@
 /* jQuery Dialog
 ------------------------------------------------- */
 .ui-dialog {
-	border: 1px solid #999;
+	border: 1px solid #999999;
 	box-shadow: 0 0 16px rgba(0, 0, 0, 0.3);
-	background-color: #f5f5f5;
+	background-color: #F5F5F5;
 	border-radius: 4px 4px 0 0;
 }
+
 .ui-dialog .ui-dialog-titlebar {
-	background-color: #fafafa;
+	background-color: #FAFAFA;
 	border-radius: 4px 4px 0 0;
 }
+
 .ui-widget-overlay {
-	background-color: #000;
+	background-color: #000000;
 	opacity: 0.3;
 }
 
@@ -61,22 +92,17 @@
 #quick_search {
 	font-size: 0.786em;
 }
-#quick_search .input_text, #quick_search select, #quick_search .button_submit {
-	margin: 5px 0 0 4px;
-}
-#quick_search .icon {
-	margin: 12px 0 0 4px;
-}
 
 /* alternate row colors on Modify Themes,Copy a template */
-.theme_options .windowbg2 {
-	background: #fcfcfc;
-	border-top: 1px solid #ccc;
-	border-bottom: 1px solid #ccc;
+.theme_options .content {
+	background: #FCFCFC;
+	border-top: 1px solid #CCCCCC;
+	border-bottom: 1px solid #CCCCCC;
 }
-.theme_options .windowbg {
-	border-top: 1px solid #ccc;
-	border-bottom: 1px solid #ccc;
+
+.theme_options .content {
+	border-top: 1px solid #CCCCCC;
+	border-bottom: 1px solid #CCCCCC;
 }
 
 /* the help ? icon in various spots */
@@ -84,4 +110,9 @@ a.help .icon {
 	margin: 0;
 	padding: 0 6px 2px 0;
 	vertical-align: middle;
+}
+
+#quick_tasks li {
+	border-bottom: 1px solid transparent;
+	border-top: 1px solid transparent;
 }

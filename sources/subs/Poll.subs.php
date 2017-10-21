@@ -8,9 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.8
- *
- * This file contains functions for dealing with polls.
+ * @version 1.1
  *
  */
 
@@ -27,43 +25,26 @@
  */
 function associatedPoll($topicID, $pollID = null)
 {
-	$db = database();
-
+	// Retrieve the poll ID.
 	if ($pollID === null)
 	{
-		// Retrieve the poll ID.
-		$request = $db->query('', '
-			SELECT id_poll
-			FROM {db_prefix}topics
-			WHERE id_topic = {int:current_topic}
-			LIMIT 1',
-			array(
-				'current_topic' => $topicID,
-			)
-		);
-		list ($pollID) = $db->fetch_row($request);
-		$db->free_result($request);
+		require_once(SUBSDIR . '/Topic.subs.php');
+		$pollID = topicAttribute($topicID, array('id_poll'));
 
-		return $pollID;
+		return $pollID['id_poll'];
 	}
 	else
 	{
-		$db->query('', '
-			UPDATE {db_prefix}topics
-			SET id_poll = {int:poll}
-			WHERE id_topic = {int:current_topic}',
-			array(
-				'current_topic' => $topicID,
-				'poll' => $pollID,
-			)
-		);
+		setTopicAttribute($topicID, array('id_poll' => $pollID));
 	}
+
+	return false;
 }
 
 /**
  * Remove a poll.
  *
- * @param int[]|int $pollID
+ * @param int[]|int $pollID The id of the poll to remove
  */
 function removePoll($pollID)
 {
@@ -102,7 +83,7 @@ function removePoll($pollID)
 /**
  * Reset votes for the poll.
  *
- * @param int $pollID
+ * @param int $pollID The ID of the poll to reset the votes on
  */
 function resetVotes($pollID)
 {
@@ -140,9 +121,10 @@ function resetVotes($pollID)
 
 /**
  * Get all poll information you wanted to know.
- * Only returns info on the poll, not its options.
  *
- * @param int $id_poll
+ * - Only returns info on the poll, not its options.
+ *
+ * @param int $id_poll The id of the poll to load
  * @param bool $ignore_permissions if true permissions are not checked.
  *             If false, {query_see_board} boardsAllowedTo('poll_view') and
  *             $modSettings['postmod_active'] will be considered in the query.
@@ -169,7 +151,7 @@ function pollInfo($id_poll, $ignore_permissions = true)
 	$request = $db->query('', '
 		SELECT
 			p.question, p.voting_locked, p.hide_results, p.expire_time, p.max_votes, p.change_vote,
-			p.guest_vote, p.id_member, IFNULL(mem.real_name, p.poster_name) AS poster_name,
+			p.guest_vote, p.id_member, COALESCE(mem.real_name, p.poster_name) AS poster_name,
 			p.num_guest_voters, p.reset_poll' . ($ignore_permissions ? '' : ',
 			b.id_board') . '
 		FROM {db_prefix}polls AS p
@@ -284,12 +266,15 @@ function topicFromPoll($pollID)
 
 /**
  * Return poll options, customized for a given member.
- * The function adds to poll options the information if the user
- * has voted in this poll.
- * It censors the label in the result array.
  *
- * @param int $id_poll
- * @param int $id_member
+ * What it does:
+ *
+ * - The function adds to poll options the information if the user
+ * has voted in this poll.
+ * - It censors the label in the result array.
+ *
+ * @param int $id_poll The id of the poll to query
+ * @param int $id_member The id of the member
  */
 function pollOptionsForMember($id_poll, $id_member)
 {
@@ -297,7 +282,7 @@ function pollOptionsForMember($id_poll, $id_member)
 
 	// Get the choices
 	$request = $db->query('', '
-		SELECT pc.id_choice, pc.label, pc.votes, IFNULL(lp.id_choice, -1) AS voted_this
+		SELECT pc.id_choice, pc.label, pc.votes, COALESCE(lp.id_choice, -1) AS voted_this
 		FROM {db_prefix}poll_choices AS pc
 			LEFT JOIN {db_prefix}log_polls AS lp ON (lp.id_choice = pc.id_choice AND lp.id_poll = {int:id_poll} AND lp.id_member = {int:current_member} AND lp.id_member != {int:not_guest})
 		WHERE pc.id_poll = {int:id_poll}',
@@ -310,7 +295,7 @@ function pollOptionsForMember($id_poll, $id_member)
 	$pollOptions = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		censorText($row['label']);
+		$row['label'] = censor($row['label']);
 		$pollOptions[$row['id_choice']] = $row;
 	}
 	$db->free_result($request);
@@ -322,7 +307,7 @@ function pollOptionsForMember($id_poll, $id_member)
  * Returns poll options.
  * It censors the label in the result array.
  *
- * @param int $id_poll
+ * @param int $id_poll The id of the poll to load its options
  */
 function pollOptions($id_poll)
 {
@@ -339,7 +324,7 @@ function pollOptions($id_poll)
 	$pollOptions = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		censorText($row['label']);
+		$row['label'] = censor($row['label']);
 		$pollOptions[$row['id_choice']] = $row;
 	}
 	$db->free_result($request);
@@ -525,7 +510,7 @@ function deletePollOptions($id_poll, $id_options)
  * Retrieves the topic and, if different, poll starter
  * for the poll associated with the $id_topic.
  *
- * @param int $id_topic
+ * @param int $id_topic The id of the topic
  */
 function pollStarters($id_topic)
 {
@@ -555,7 +540,7 @@ function pollStarters($id_topic)
 /**
  * Check if they have already voted, or voting is locked.
  *
- * @param int $topic
+ * @param int $topic the topic with an associated poll
  */
 function checkVote($topic)
 {
@@ -564,7 +549,7 @@ function checkVote($topic)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT IFNULL(lp.id_choice, -1) AS selected, p.voting_locked, p.id_poll, p.expire_time, p.max_votes, p.change_vote,
+		SELECT COALESCE(lp.id_choice, -1) AS selected, p.voting_locked, p.id_poll, p.expire_time, p.max_votes, p.change_vote,
 			p.guest_vote, p.reset_poll, p.num_guest_voters
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
@@ -587,8 +572,8 @@ function checkVote($topic)
 /**
  * Removes the member's vote from a poll.
  *
- * @param int $id_member
- * @param int $id_poll
+ * @param int $id_member The id of the member
+ * @param int $id_poll The topic with an associated poll.
  */
 function removeVote($id_member, $id_poll)
 {
@@ -608,8 +593,8 @@ function removeVote($id_member, $id_poll)
 /**
  * Used to decrease the vote counter for the given poll.
  *
- * @param int $id_poll
- * @param int[] $options
+ * @param int $id_poll The id of the poll to lower the vote count
+ * @param int[] $options The available poll options
  */
 function decreaseVoteCounter($id_poll, $options)
 {
@@ -632,8 +617,8 @@ function decreaseVoteCounter($id_poll, $options)
 /**
  * Increase the vote counter for the given poll.
  *
- * @param int $id_poll
- * @param int[] $options
+ * @param int $id_poll The id of the poll to increase the vote count
+ * @param int[] $options The available poll options
  */
 function increaseVoteCounter($id_poll, $options)
 {
@@ -654,7 +639,7 @@ function increaseVoteCounter($id_poll, $options)
 /**
  * Add a vote to a poll.
  *
- * @param mixed[] $insert
+ * @param mixed[] $insert array of vote details, includes member and their choice
  */
 function addVote($insert)
 {
@@ -671,7 +656,7 @@ function addVote($insert)
 /**
  * Increase the vote counter for guest votes.
  *
- * @param int $id_poll
+ * @param int $id_poll The id of the poll to increase
  */
 function increaseGuestVote($id_poll)
 {
@@ -690,9 +675,10 @@ function increaseGuestVote($id_poll)
 /**
  * Determines who voted what.
  *
- * @param int $id_member
- * @param int $id_poll
- * @return integer[]
+ * @param int $id_member id of the member who's vote choice we want
+ * @param int $id_poll id fo the poll the member voted in
+ *
+ * @return int[]
  */
 function determineVote($id_member, $id_poll)
 {
@@ -746,8 +732,8 @@ function pollStatus($id_topic)
 /**
  * Update the locked status from a given poll.
  *
- * @param int $id_poll
- * @param int $locked
+ * @param int $id_poll The id of the poll to check
+ * @param int $locked the value to set in voting_locked
  */
 function lockPoll($id_poll, $locked)
 {
@@ -767,7 +753,7 @@ function lockPoll($id_poll, $locked)
 /**
  * Gets poll choices from a given poll.
  *
- * @param int $id_poll
+ * @param int $id_poll The id of the poll
  * @return array
  */
 function getPollChoices($id_poll)
@@ -787,7 +773,7 @@ function getPollChoices($id_poll)
 	$number = 1;
 	while ($row = $db->fetch_assoc($request))
 	{
-		censorText($row['label']);
+		$row['label'] = censor($row['label']);
 		$choices[$row['id_choice']] = array(
 			'id' => $row['id_choice'],
 			'number' => $number++,
@@ -804,8 +790,10 @@ function getPollChoices($id_poll)
 /**
  * Get the poll starter from a given poll.
  *
- * @param int $id_topic
+ * @param int $id_topic The id of the topic that has an associated poll
+ *
  * @return array
+ * @throws Elk_Exception no_board
  */
 function getPollStarter($id_topic)
 {
@@ -822,7 +810,7 @@ function getPollStarter($id_topic)
 		)
 	);
 	if ($db->num_rows($request) == 0)
-		fatal_lang_error('no_board');
+		throw new Elk_Exception('no_board');
 	$bcinfo = $db->fetch_assoc($request);
 	$db->free_result($request);
 
@@ -836,7 +824,7 @@ function getPollStarter($id_topic)
  */
 function loadPollContext($poll_id)
 {
-	global $context, $user_info, $txt, $scripturl, $settings;
+	global $context, $user_info, $txt, $scripturl;
 
 	// Get the question and if it's locked.
 	$pollinfo = pollInfo($poll_id);
@@ -894,11 +882,13 @@ function loadPollContext($poll_id)
 		}
 	}
 
+	$bbc_parser = \BBC\ParserWrapper::instance();
+
 	// Set up the basic poll information.
 	$context['poll'] = array(
 		'id' => $poll_id,
 		'image' => 'normal_' . (empty($pollinfo['voting_locked']) ? 'poll' : 'locked_poll'),
-		'question' => parse_bbc($pollinfo['question']),
+		'question' => $bbc_parser->parsePoll($pollinfo['question']),
 		'total_votes' => $pollinfo['total'],
 		'change_vote' => !empty($pollinfo['change_vote']),
 		'is_locked' => !empty($pollinfo['voting_locked']),
@@ -970,12 +960,11 @@ function loadPollContext($poll_id)
 			'id' => 'options-' . $i,
 			'percent' => $bar,
 			'votes' => $option['votes'],
-			'voted_this' => $option['voted_this'] != -1,
-			'bar' => '<span style="white-space: nowrap;"><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'right' : 'left') . '.png" alt="" /><img src="' . $settings['images_url'] . '/poll_middle.png" style="width:' . $barWide . 'px; height: 12px;" alt="-" /><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'left' : 'right') . '.png" alt="" /></span>',
-			// Note: IE < 8 requires us to set a width on the container, too.
-			'bar_ndt' => $bar > 0 ? '<div class="bar" style="width: ' . $bar . '%;"><div style="width: ' . $bar . '%;"></div></div>' : '<div class="bar"></div>',
+			'voted_this' => $option['voted_this'] != -1, /* Todo: I notice 'bar' here is not used in the theme any longer - only in SSI. */
+			'bar' => '<div class="poll_gradient" style="width: ' . $barWide . 'px;"></div>',
+			'bar_ndt' => $bar > 0 ? '<div class="bar poll-bar" style="width: ' . $bar . '%;"></div>' : '<div class="bar poll-bar"></div>',
 			'bar_width' => $barWide,
-			'option' => parse_bbc($option['label']),
+			'option' => $bbc_parser->parsePoll($option['label']),
 			'vote_button' => '<input type="' . ($pollinfo['max_votes'] > 1 ? 'checkbox' : 'radio') . '" name="options[]" id="options-' . $i . '" value="' . $i . '" class="input_' . ($pollinfo['max_votes'] > 1 ? 'check' : 'radio') . '" />'
 		);
 	}

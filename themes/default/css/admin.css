@@ -9,56 +9,84 @@
 .action_admin .generic_list_wrapper .information {
 	margin: 8px 0;
 	padding: 4px 12px 2px 12px;
+	border: 1px solid;
+	border-radius: 2px;
 }
+
 .action_admin .generic_list_wrapper .information div {
 	background: none;
 }
+
 .information a {
 	font-weight: bold;
 }
+
 .action_admin .generic_list {
 	overflow: auto;
 }
-#admin_content .windowbg, #admin_content .windowbg2 {
+
+#admin_content .content {
 	margin-bottom: 5px;
+	border: none;
 }
-#admincenter {
+
+.admincenter {
 	overflow: auto;
 }
-#admincenter .content {
+
+.admincenter .content {
 	padding: 12px;
 }
-#admincenter .content .settings {
-	padding: 0 0 0 8px;
+
+.admincenter .content .settings {
+	padding: 5px 0 0 8px;
+}
+
+.admincenter .content hr.clear {
+	margin-left: 12px;
 }
 
 /* @todo - A general admin wrapper class. */
 #admin_main_section, div.quick_tasks, #mod_main_section,
 #support_credits, #admin_newsletters,
-#core_features, #generate_reports_type,
+#core_features,
 #groupForm, #mailqueue_stats, #manage_maintenance,
-#new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper{
+#new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper {
 	margin: 12px 0 0 0;
-	padding: 8px 8px 16px 8px;
+	padding: 8px;
 	overflow: auto;
 }
-#admin_form_wrapper div.windowbg, #support_credits div.windowbg,
-#generate_reports_type div.windowbg, #new_group div.windowbg,
-#view_group div.windowbg, #admin_newsletters .windowbg {
+
+#admin_main_section, .quick_tasks, #mod_main_section,
+#support_credits, #admin_newsletters,
+#core_features, #entry_form,
+#groupForm, #mailqueue_stats, #manage_maintenance,
+#new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper {
+	border: 1px solid;
+	border-radius: 7px;
+}
+
+#new_group div.content,
+#view_group div.content,
+#admin_newsletters .content {
 	background: none;
-	padding: 0;
+	padding: 2px 0 0 8px;
 	margin: 0 4px;
 }
+
 #mailqueue_stats {
 	padding: 8px 8px 0 8px;
 }
-#mailqueue_stats .windowbg {
+
+#mailqueue_stats .content {
 	background: none;
 	padding: 0;
 }
-#mailqueue_stats .windowbg .content {
+
+#mailqueue_stats .content {
 	padding: 12px 9px 0 9px;
 }
+
 #view_group .table_grid {
 	margin: 4px 0 8px 0;
 }
@@ -68,6 +96,7 @@
 .listaction {
 	text-align: center;
 }
+
 /* @todo could it be a sprite? */
 .listaction img {
 	width: 16px;
@@ -79,24 +108,33 @@
 #admin_newsletters .information {
 	margin: 8px 0;
 	padding: 8px 12px 6px 12px;
+	border: 1px solid;
+	border-radius: 2px;
 }
+
 #advanced_panel_header {
 	margin-bottom: 8px;
+	border: 1px solid;
+	border-radius: 2px;
 }
 
 #news_lists .newsarea {
 	width: 50%;
 }
+
 #news_lists .newsarea textarea {
 	width: 100%;
 	padding: 0 2px;
 }
+
 #news_lists .newspreview {
 	width: 45%;
 }
+
 td.newspreview {
 	vertical-align: top;
 }
+
 #news_lists .newspreview div {
 	overflow: auto;
 	width: 100%;
@@ -108,42 +146,53 @@ td.newspreview {
 .action_admin .generic_list .flow_auto {
 	padding: 4px 2px;
 }
+
 h3.category_header form {
 	font-size: .786em;
 }
+
 /* Chrome trick to avoid multiple lines of feature names */
-.category_header>h3 {
+.category_header > h3 {
 	white-space: nowrap;
 }
-.windowbg.nopadding {
+
+.content.nopadding {
 	margin: 4px 0 0 0;
 	padding: 0;
 }
-.windowbg ol {
+
+.content ol {
 	margin-top: 0;
 	margin-bottom: 0;
 }
+
 a.help .icon, a.help .icon_fixed {
 	margin: 0;
 	padding: 3px 4px 0 0;
 }
+
 h3 a.help .icon {
 	padding: 0 4px 0 0;
 }
+
 .settings .help .icon {
 	margin: 0 0 0 -20px;
 	position: absolute;
 }
+
 .table_caption, tr.table_caption td {
 	font-weight: bold;
 }
+
 .additional_row div.floatleft {
 	padding: 0 10px;
 }
+
 fieldset {
 	margin-bottom: 6px;
 	padding: 6px;
 }
+
 fieldset dl {
 	margin: 0;
 }
@@ -153,17 +202,15 @@ fieldset dl {
 /* @todo - Admin quick search bar, and results page. */
 #quick_search {
 	font-size: 0.857em;
+	margin-top: -2px;
 }
-#quick_search .icon, #quick_search .input_text,
-#quick_search select, #quick_search .button_submit {
-	float: left;
-	margin: 3px 0 0 4px;
-}
+
 #quick_search .icon {
-	margin: 8px 0 0 0;
+	margin: 4px 0 0 0;
 }
+
 /* @todo - The welcome thingy. */
-#admincenter .roundframe, #modcenter .roundframe {
+.admincenter .well, #modcenter .well {
 	background: none;
 	border: none;
 	box-shadow: none;
@@ -171,88 +218,118 @@ fieldset dl {
 	padding: 0;
 	overflow: visible;
 }
+
 #welcome {
 	font-size: 0.929em;
 	padding: 12px 9px 8px 9px;
+	border: 1px solid;
+	border-top: none;
+	border-radius: 0 0 7px 7px;
 }
+
 #welcome a {
 	font-weight: bold;
 }
+
 #welcome img {
 	vertical-align: middle;
 }
+
 .search_results {
 	margin: 0 -6px;
 }
+
 .search_results li {
 	margin: 0;
 	padding: 5px 0;
 	overflow: auto;
 	line-height: 1.7em;
+	border-bottom: double;
 }
+
 .search_results li p {
 	padding: 0 20px;
 	line-height: 1.7em;
 }
+
 #installedVersion, #latestVersion {
 	white-space: nowrap;
 }
+
 .versionFile {
 	width: 50%;
 }
+
 .versionFilePad {
 	padding-left: 3ex;
 	width: 50%;
 }
+
 .versionNumber {
 	width: 25%;
 }
+
 .censorWords {
-	margin-top: 1ex;
+	margin: 1em 0 0 1em;
 }
+
 /* Cleaned this up a bit for less clutter.
 /* Admin and moderation could generally do with a clean up everywhere.
 /* Live news from elkarte.net and support information. */
 #admin_main_section {
 	margin: 12px 0 20px 0;
-	padding: 8px 12px 4px 12px;
+	padding: 8px 8px 4px 8px;
 }
+
 #live_news, #supportVersionsTable {
 	width: 70%;
-	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+	box-sizing: border-box;
 }
+
 #supportVersionsTable {
 	width: 30%;
 	padding-left: 6px;
 }
-#admin_main_section .windowbg {
+
+#admin_main_section .content {
 	padding: 6px 0;
 	height: 12em;
 	overflow: auto;
+	border: 1px solid;
+	border-radius: 0;
 }
+
 #admin_search_box {
 	padding: 0.5em 0;
 }
+
 #live_news div.content, #supportVersionsTable div.content {
 	padding: 0 4px;
 	font-size: 0.929em;
 }
+
 #supportVersionsTable div.content {
 	padding: 0 8px;
 }
+
 #live_news div.content dl {
 	padding: 0;
 }
+
 #ourAnnouncements dt {
 	padding: 4px 6px 2px 6px;
+	border-top: 1px solid;
 }
+
 #ourAnnouncements dt a {
 	font-weight: bold;
 	display: block;
 }
+
 #ourAnnouncements dd {
 	margin: 0;
 	padding: 6px 12px;
+	border-top: double;
 }
 
 /* The update warning. */
@@ -268,12 +345,13 @@ fieldset dl {
 /* and the advantage is that a clean layout is always maintained.
 /* The <li>'s could be set to auto overflow instead, but that just clutters things up with scrollbars.
 /* Scrollbars here look worse, take up space, and don't really add anything useful in this context. */
-div.quick_tasks {
+
+.quick_tasks {
 	margin: -8px 0 0 0;
 	border-radius: 7px;
-	box-shadow: none;
 	padding: 0 0 16px 0;
 }
+
 #quick_tasks li {
 	list-style: none;
 	padding: 10px 6px 10px 6px;
@@ -281,17 +359,30 @@ div.quick_tasks {
 	width: 50%;
 	height: 8em;
 	overflow: auto;
+	border-top: 1px solid;
+	border-bottom: 1px solid;
 }
+
 #quick_tasks li a {
 	line-height: 1.6em;
 }
+
 .home_image {
 	float: left;
 	margin: 2px 10px;
 }
+
 #quick_tasks li span {
 	display: block;
 	margin: 0 0 0 70px;
+}
+
+#quick_tasks li:first-child, #quick_tasks li:nth-child(2) {
+	border-top: none;
+}
+
+#quick_tasks li:last-child, #quick_tasks li:nth-child(7) {
+	border-bottom: none;
 }
 
 /* Styles for the support and credits page.
@@ -304,34 +395,38 @@ div.quick_tasks {
 	position: relative;
 	padding: 6px 12px 12px 12px;
 }
-#support_resources {
-	margin: 16px 0 -24px 0;
+
+#support_resources, #credits_sections {
+	margin: 16px 0 0 0;
 }
+
 #credits_logo {
 	position: absolute;
 	right: 16px;
-	top: 10px;
+	top: 8px;
 	width: 75px;
 }
+
 #support_credits .content {
-	padding: 0 18px;
+	padding: 5px 18px;
 	line-height: 1.6em;
 }
+
 #support_credits .content p {
 	margin: 12px 0 0 0;
 	padding: 0;
 }
-#credits_sections {
-	margin: 0 0 -24px 0;
-}
+
 #support_credits dl {
 	padding: 0 6px;
 }
+
 #support_credits dt {
 	float: left;
 	padding: 6px 0.8em 0 0;
 	text-indent: -4px;
 }
+
 #support_credits dd {
 	padding: 6px 0;
 }
@@ -342,31 +437,40 @@ div.quick_tasks {
 #core_features {
 	padding: 20px 0;
 }
+
 #core_features hr {
 	padding: 0;
-	margin: 4px 0 12px 0;
+	margin: 4px 0 8px 0;
 }
-#core_features .content {
+
+#core_features .features {
 	padding: 0 12px;
 	overflow: auto;
+	box-sizing: border-box;
+	float: left;
+	width: 50%;
 }
+
 .core_features_status_box {
 	margin-left: 5px;
 	vertical-align: middle;
 }
+
 /* Keep your enemies close, and your submit buttons if your screen is huge. */
 /* Speaking of which, I can't see the last submit that is in the markup. */
 /* Still works without it if you reload the page, but rather odd that it's hiding. */
 .features_image {
 	float: left;
-	margin: 0 12px 0 0;
+	margin: 0 6px;
 }
+
 .features_switch {
 	float: right;
 }
+
 .features h3 {
 	padding: 0;
-	margin: 0 6px 0 105px;
+	margin: 0 .5em 0 6em;
 	font-size: 1.071em;
 	overflow: hidden;
 	white-space: pre;
@@ -374,11 +478,14 @@ div.quick_tasks {
 	min-height: 1.6em;
 	max-height: 1.6em;
 }
+
 .features p {
-	margin: 0 105px;
+	margin: 0 4.5em 0 6.426em;
 	padding: 0;
-	min-height: 56px;
+	height: 9em;
+	overflow: auto;
 }
+
 #private {
 	width: 100%;
 }
@@ -386,22 +493,25 @@ div.quick_tasks {
 /* Styles for the package manager.
 /* Haven't got here yet. :P
 ------------------------------------------------- */
-#package_list ol, #package_list ol li {
+#package_list ol {
 	list-style: decimal;
-	margin-left: 50px;
+	margin-left: 20px;
 	border: none;
 }
-#package_list ol ul, #package_list ol ul li {
-	margin-left: 0;
-	list-style: none;
-	border-radius: 3px;
-}
-#package_list {
+
+#package_list, .package_section {
 	list-style-type: none;
 }
+
+.package_section > ul {
+	margin-left: 5em;
+}
+
 #package_list li {
 	padding: 0.2em;
 	margin: 1px;
+	font-weight: 600;
+	border: 1px solid;
 }
 .package_id {
 	width: 35%;
@@ -414,10 +524,7 @@ div.quick_tasks {
 	overflow: auto;
 	padding-bottom: .5em;
 }
-.packages {
-	border: none !important;
-	list-style: none;
-}
+
 #find_code, #replace_code {
 	display: block;
 	font-family: "dejavu sans mono", "monaco", "lucida console", "courier new", monospace;
@@ -430,27 +537,31 @@ div.quick_tasks {
 	/* This is much better than the old max-height css. */
 	height: 10em;
 	resize: vertical;
+	border-top: 2px solid;
+	border-bottom: 2px solid;
 }
-.package_server {
-	padding: 0 3em;
-}
+
 .package_image {
 	width: 12px;
 	height: 11px;
 	margin-left: 2ex;
 }
+
 ul.package_servers {
 	margin: 0;
 	padding: 0;
 }
+
 ul.package_servers li {
 	list-style-type: none;
 }
+
 .file_content {
 	overflow: auto;
 	width: 100%;
 	padding-bottom: 1em;
 }
+
 .operation {
 	padding: 0 1em;
 }
@@ -460,8 +571,9 @@ ul.package_servers li {
 .strings_edit li {
 	display: inline-block;
 	width: 49%;
-	vertical-align:top;
+	vertical-align: top;
 }
+
 .strings_edit textarea {
 	width: 96%;
 	display: block;
@@ -473,87 +585,92 @@ ul.package_servers li {
 	font-size: 0.786em;
 	white-space: nowrap;
 }
+
 .fperm {
 	display: block;
 	width: 35%;
 	text-align: center;
 }
+
 .perm_read {
-	background-color: #d1f7bf;
+
 }
+
 .perm_write {
-	background-color: #ffbbbb;
+
 }
+
 .perm_execute {
-	background-color: #fdd7af;
+
 }
+
 .perm_custom {
-	background-color: #c2c6c0;
+
 }
+
 .perm_nochange {
-	background-color: #eee;
+
 }
 
 /* Styles for anti-spam questions.
 ------------------------------------------------------- */
-dl.settings dt.questions {
+.settings dt.questions {
 	width: 65%;
+	margin: 0;
 }
-dl.settings dd.questions {
+
+.settings dd.questions {
 	width: 35%;
 }
-dl.settings dt.questions input{
+
+.settings dt.questions input {
 	width: 80%;
 }
-dl.settings dd.questions input {
+
+.settings dd.questions input {
 	width: 90%;
 }
 
 /* Styles for the BBC permissions
 ------------------------------------------------- */
 .list_bbc {
-	width: 33%;
+	-moz-column-count: 3;
+	-webkit-column-count: 3;
+	column-count: 3;
 }
 
 /* Styles for the manage boards section.
 ------------------------------------------------- */
-#manage_boards .windowbg {
-	margin: 0;
-	padding: 0;
-}
-#manage_boards .content, #manage_attachments .content {
-	margin: -6px 0 12px 0;
-	padding: 6px 8px 16px 8px;
-	overflow: auto;
-}
-#manage_attachments .content {
-	margin: -10px 0 0;
-	padding: 6px 8px;
-}
 #attach_paths .input_text {
 	width: 100%;
 }
-#manage_boards ul {
-	margin: 0 0 12px;
+
+#manage_boards ul li {
+	border-top: 1px solid;
 }
-#manage_boards ul:nth-child(n+2) {
-	min-height: 12px;
+
+#manage_boards ul:nth-child(n+2) li {
 	padding-left: 30px;
-	margin: 0 0 -12px;
+	border: none;
 }
-.ui-state-highlight {
-	height: 25px;
-	cursor: move;
+
+/* This is the UL drop zone , normally not visible */
+#manage_boards ul.elk_droppings:nth-child(n+2) {
+	min-height: 1em;
+	margin: 0 0 -1em;
+	padding-left: 30px !important;
 }
-#manage_boards li, #manage_boards li.windowbg, #manage_boards li.windowbg2 {
+
+#manage_boards li, #manage_boards li.content {
 	list-style: none;
-	margin: 0;
-	padding-top: 12px;
+	line-height: 3em;
 }
+
 #manage_boards li img {
 	vertical-align: middle;
 	padding: 0 6px 3px 6px;
 }
+
 #manage_boards li .floatleft {
 	font-weight: bold;
 	padding: 0 6px;
@@ -561,57 +678,70 @@ dl.settings dd.questions input {
 	cursor: move;
 	width: 60%;
 }
-#manage_boards li .floatleft:before {
-	font-family: "Segoe UI Symbol", "DejaVu Sans", "GNU Unifont";
-	content: "\21f3";
-	padding-right: 5px;
-	font-size: 1.286em;
-	float: left;
-	margin-top: -1px;
-}
+
 .move_links {
 	padding: 0 13px 0 0;
 }
+
 .modify_boards {
 	padding: 0 0.5em;
 }
+
 #manage_boards span.modify_boards a {
 	border-radius: 3px;
 	padding: 3px 6px;
 	font-size: 1em;
+	text-transform: capitalize;
+	border: 1px solid;
 }
+
 #manage_boards span.modify_boards a:hover {
 	text-decoration: none;
 }
+
 #manage_boards dl {
 	padding: 8px 6px 0 6px;
 }
+
 #manage_boards dl textarea, #manage_boards dl table {
 	margin: 0 0 8px 0;
 }
+
 #manage_boards .post_group, #manage_boards .regular_members {
 	cursor: help;
+	border-bottom: 1px dotted;
 }
+
 .select_all_box {
 	margin-top: 0.5em;
 	padding: 2px 2px 5px 2px;
 }
+
 .visible_boards .board label,
 .select_all_box label,
 .select_category label {
-	width: 30%;
+	width: 32%;
 	display: inline-block;
 }
+
+.select_category, .select_all_box {
+	font-style: italic;
+	border-top: 1px dashed;
+	border-bottom: 1px dashed;
+}
+
 .visible_boards .select_all_box .floatright,
 .visible_boards .select_category .floatright,
 .visible_boards .board .floatright {
 	width: 55%;
 }
+
 .visible_boards .category:after, .visible_boards .board:after {
 	display: block;
 	clear: both;
 	content: "";
 }
+
 .visible_boards li {
 	padding: 2px;
 }
@@ -628,24 +758,18 @@ dl.settings dd.questions input {
 	display: block;
 	width: 49%;
 }
+
 .right dt {
 	padding-right: 10px;
 }
 
 /* Styles for the manage maintenance section.
 ------------------------------------------------- */
-#manage_maintenance div.windowbg, #manage_maintenance div.windowbg2 {
-	padding: 0;
-	margin: 0 0 4px 0;
-}
-#manage_maintenance .button_submit{
-	margin: 4px 10px 10px 10px;
-}
 #membersText, #rotText {
 	font-weight: bold;
 }
 
-/* Styles for the badbehaviour section.
+/* Styles for the bad behaviour section.
 ------------------------------------------------- */
 .bbfilter {
 	display: table-cell;
@@ -653,20 +777,26 @@ dl.settings dd.questions input {
 	width: 20px;
 	vertical-align: top;
 }
+
 .bbrequest_uri {
 	display: table-cell;
 }
 
 /* Stop the submit buttons running away on wide screens.*/
 #manage_maintenance form {
-	max-width: 75em;
 	margin: 0 12px;
 }
+
 #manage_maintenance .settings {
 	margin: 16px 0 0 0;
 }
+
 #manage_maintenance h3 a.help .icon {
 	padding: 4px 0 0;
+}
+
+#manage_maintenance div.content {
+	border-bottom: 1px solid;
 }
 
 /* Styles for the manage calendar section.
@@ -674,21 +804,26 @@ dl.settings dd.questions input {
 dl.settings dt.small_caption {
 	width: 20%;
 }
+
 dl.settings dd.small_caption {
 	width: 79%;
 }
+
 /* Styles for the manage permissions section.
 ------------------------------------------------- */
 #permissionForm .table_grid {
 	width: 100%;
 }
+
 #permissionForm .table_grid img.icon {
 	vertical-align: top;
 	width: 16px;
 }
+
 dl.admin_permissions dt {
 	width: 35%;
 }
+
 dl.admin_permissions dd {
 	width: 64%;
 }
@@ -698,6 +833,7 @@ dl.admin_permissions dd {
 .file_permissions .table_grid {
 	table-layout: fixed;
 	word-wrap: break-word;
+	hyphens: auto;
 	-webkit-hyphens: auto;
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;
@@ -705,17 +841,25 @@ dl.admin_permissions dd {
 
 /* Styles for the manage search section.
 ------------------------------------------------- */
-dl.settings dt.large_caption {
+.large_caption > dt {
 	width: 70%;
 }
-dl.settings dd.large_caption {
+
+.large_caption > dd {
 	width: 29%;
 }
+
+.large_caption > dt a img {
+	vertical-align: middle;
+	margin-top: -1px;
+}
+
 .search_weight {
 	width: 40px;
 	padding: 0 0.5em;
 	text-align: right;
 }
+
 .search_settings {
 	float: left;
 	width: 49%;
@@ -728,18 +872,22 @@ dl.settings dd.large_caption {
 .ban_restriction {
 	margin: 0.2em 0 0.2em 2.2em;
 }
+
 .ban_settings {
 	width: 46%;
 }
+
 .ban_text {
 	min-height: 64px;
 	max-height: 64px;
 	min-width: 50%;
 	max-width: 99%;
 }
+
 #manage_bans dl {
 	margin-bottom: 1em;
 }
+
 #manage_bans fieldset dl.settings {
 	margin-bottom: 0;
 }
@@ -749,6 +897,7 @@ dl.settings dd.large_caption {
 #fixed_area {
 	width: 97%;
 }
+
 .pending_payments {
 	margin: 0;
 	padding: 0;
@@ -761,64 +910,78 @@ dl.settings dd.large_caption {
 	display: block;
 	width: 40%;
 }
+
 .perm_boards {
 	padding: 0;
 	margin: 0 0 0.6em 0;
 }
+
 .perm_boards li {
 	padding: 0.3em 0.5em;
 	margin: 1px;
+	border: 1px solid;
 }
+
 .perm_classic {
 	margin: 0.2em;
 	width: 49%;
 }
+
 .permission_groups {
 	padding: 0;
 	margin: 0;
 }
+
 #manage_boards .permission_groups li {
 	list-style-type: none;
 	padding-top: 1px;
 }
+
 #manage_boards ul.permission_groups {
 	margin-bottom: 0;
 }
+
 .perms {
 	width: 20px;
 	display: inline-block;
 	text-align: center;
 }
+
 .edit_board {
 	padding: 0 8px 8px;
-	background-image: url(../images/icons/modify_small.png);
-	background-repeat: no-repeat;
+	background: url(../images/icons/modify_small.png) no-repeat;
 	margin-left: 3px;
 }
+
 .edit_board.nochanges {
 	background-image: url(../images/icons/field_valid.png);
 }
+
 .edit_board.changed {
 	background-image: url(../images/icons/field_invalid.png);
 }
+
 .perm_profile_delete {
-	width:5%;
+	width: 5%;
 }
 
 /* Styles for the themes section.
 ------------------------------------------------- */
-ul.theme_options {
+ul.theme_options, ul.basic_options {
 	padding: 0;
 	margin: 0;
 }
-ul.theme_options li {
+
+ul.theme_options li, ul.basic_options li {
 	list-style: none;
 	padding: 0.4em;
 }
+
 .is_directory {
 	padding-left: 18px;
 	background: url(../images/admin/boards.png) no-repeat;
 }
+
 .edit_file {
 	width: 100%;
 	font-family: monospace;
@@ -829,22 +992,70 @@ ul.theme_options li {
 dl.themes_list {
 	margin: 0;
 }
+
 dl.themes_list dt {
 	margin-bottom: 3px;
+	margin-top: 5px;
 }
+
 dl.themes_list dd {
 	font-style: italic;
 	white-space: nowrap;
+	margin-top: 5px;
 }
+
 .theme_options dt {
 	width: 55%;
 }
+
 .theme_options dd {
-	width: 40%
+	width: 40%;
 }
+
+/* Theme Management>Member Options>Change Current Options
+Adjusts display of wording and selections to one line.
+----------------------------------------------------------------*/
+#admin_form_wrapper .theme_options dt {
+    float: left;
+    clear: both;
+    margin: 0 0 10px 0;
+    padding: 0;
+    width: 55%;
+}
+
+#admin_form_wrapper .theme_options dd {
+    float: right;
+    overflow: auto;
+    margin: 0 0 3px 0;
+    padding: 0;
+    width: 45%;
+    min-height: 2em;
+}
+
+#admin_form_wrapper .input_check, .input_radio {
+    border: none;
+    background: none;
+    vertical-align: top;
+    margin: 0 2px 4px 4px;
+}
+
+/* alternate row colors on Modify Themes,Copy a template */
+.theme_options .content:nth-child(even), .theme_options li:nth-child(even) {
+	border-top: 1px solid;
+	border-bottom: 1px solid;
+}
+
 .theme_settings .input_text {
 	max-width: 100%;
 	width: 30em;
+}
+
+#css_preview_box {
+	display: none;
+	margin-bottom: 2ex;
+	width: 99%;
+	height: 300px;
+	border: 1px solid;
 }
 
 /* Styles for the registration center.
@@ -852,6 +1063,7 @@ dl.themes_list dd {
 .agreement, .reserved_names {
 	padding: 0;
 }
+
 #agreement, #reserved {
 	width: 99%;
 	padding: 0 .25em;
@@ -862,54 +1074,70 @@ dl.themes_list dd {
 #modcenter {
 	display: block;
 	width: 100%;
+	border-radius: 5px 5px 0 0;
 }
-#modcenter .windowbg, #modcenter .windowbg2, #modcenter .generic_list_wrapper {
+
+#modcenter .content, #modcenter .generic_list_wrapper {
 	overflow: visible;
-	margin: 4px 0 0 0;
+	margin: 2px 0 0 0;
+	border: 1px solid;
 }
+
 #modcenter .content {
 	padding: 12px;
 }
-#mod_main_section .windowbg {
-	padding: 6px 0;
+
+#mod_main_section .content {
+	padding: 6px;
 	height: 14em;
 	overflow: auto;
+	border: 1px solid;
+	border-radius: 0;
 }
+
 .modblock_left {
-	width: 49%;
+	width: 50%;
 	float: left;
 	clear: right;
-	margin: 0 0 1em 0;
+	padding: 0 5px 0 0;
+	box-sizing: border-box;
 }
+
 .modblock_right {
-	width: 49%;
+	width: 50%;
 	float: right;
-	margin: 0 0 1em 0;
+	margin: 0 0 5px 0;
+	box-sizing: border-box;
 }
+
 .modblock_left #ourAnnouncements {
 	height: 15em;
 	overflow: visible;
 }
+
 .modbox img.icon {
 	margin: 3px 5px 0 0;
 	vertical-align: text-top;
 }
 
 /* Moderation Notes */
-ul.moderation_notes {
+.moderation_notes {
 	margin: 0;
 	padding: 0;
 	list-style: none;
 	overflow: auto;
 	height: auto;
 }
-ul.moderation_notes li {
+
+.moderation_notes li {
 	padding: 0.2em;
-	border-bottom: 1px solid #ccc;
+	border-bottom: 1px solid;
 }
+
 .notes {
 	margin-top: 0.4em;
 }
+
 .post_note {
 	width: 85%;
 }
@@ -920,49 +1148,66 @@ ul.moderation_notes li {
 .grid_header {
 	height: 25px;
 }
+
 #error_log {
 	width: 100%;
+	border-top: 1px solid;
 }
-#error_log tr.windowbg td, #error_log tr.windowbg2 td {
+
+#error_log tr.content td {
 	padding: 8px;
 	line-height: 160%;
 }
+
 #error_log td div {
-	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
-	/* The next bits should fix https://github.com/elkarte/Elkarte/issues/567 */
+	box-sizing: border-box;
 	word-wrap: break-word;
 	word-break: break-all;
+	hyphens: auto;
 	-webkit-hyphens: auto;
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;
 }
-#error_log .error_who, #error_log .error_type {
+
+#error_log .error_who, #error_log .error_type, #error_log .error_where {
 	float: left;
 	width: 50%;
 	line-height: 1.8em;
 	padding: 0 4px 4px 4px;
 	vertical-align: bottom;
 }
+
 #error_log .error_where {
-	float: left;
 	width: 100%;
-	padding: 4px 0;
-	line-height: 1.6em;
+	padding-top: 4px;
+	border-top: 1px solid;
 }
-.error_where .scope {
+
+#error_log .error_who li>a, #error_log .error_type li>a, #error_log .error_where li>a,
+#error_log .error_who span, #error_log .error_type span, #error_log .error_where span {
 	display: table-cell;
-	padding: 4px;
-	width: 20px;
-	vertical-align: top;
 }
+
 #error_log .checkbox_column {
 	width: 15px;
 	vertical-align: top;
 	text-align: center;
 }
+
 #error_log a img {
 	vertical-align: middle;
 	margin: 0 8px 0 0;
+}
+
+#errorfile_table .current .linenumber:before {
+	content: '==>';
+}
+#errorfile_table .linetext {
+	white-space: nowrap;
+}
+#errorfile_table .current .linetext {
+	border: 1px solid;
+	border-left-width: 0;
 }
 
 /* Styles for the Report generation
@@ -972,193 +1217,134 @@ ul.moderation_notes li {
 	padding: 3px 0;
 }
 
-/* Admin menu icons as sprites @todo - Can clean this up some more. */
-/* Use some longhand declarations to cut the length of the entire list. */
-/* ------------------------------------------------- */
+.report_results th {
+	border-left: 1px solid;
+	border-right: 1px solid;
+}
 
 /* Admin menu icons as sprites
+/* Use some longhand declarations to cut the length of the entire list. */
+/* Admin menu icons as sprites
 ------------------------------------------------- */
-.linklevel2>img {
+.linklevel2 > img {
 	background-image: url(../images/admin/admin_sprite.png);
 	background-repeat: no-repeat;
 }
-.admin_img_administration {
-	background-position: 0 0;
-}
-.admin_img_attachment {
-	background-position: -16px 0;
-}
-.admin_img_ban {
-	background-position: -32px 0;
-}
-.admin_img_boards {
-	background-position: -48px 0;
-}
-.admin_img_calendar {
-	background-position: -64px 0;
-}
-.admin_img_corefeatures {
-	background-position: -80px 0;
-}
-.admin_img_current_theme {
-	background-position: -96px 0;
-}
-.admin_img_engines {
-	background-position: -112px 0;
-}
-.admin_img_exit {
-	background-position: -128px 0;
-}
-.admin_img_features {
-	background-position: -144px 0;
-}
-.admin_img_languages {
-	background-position: -160px 0;
-}
-.admin_img_logs {
-	background-position: -176px 0;
-}
-.admin_img_mail {
-	background-position: -192px 0;
-}
-.admin_img_maintain {
-	background-position: -208px 0;
-}
-.admin_img_membergroups {
-	background-position: -224px 0;
-}
-.admin_img_members {
-	background-position: -240px 0;
-}
-.admin_img_modifications {
-	background-position: -256px 0;
-}
-.admin_img_news {
-	background-position: -272px 0;
-}
-.admin_img_packages {
-	background-position: -288px 0;
-}
-.admin_img_paid {
-	background-position: -304px 0;
-}
-.admin_img_permissions {
-	background-position: -320px 0;
-}
-.admin_img_posts {
-	background-position: -336px 0;
-}
-.admin_img_regcenter {
-	background-position: -352px 0;
-}
-.admin_img_reports {
-	background-position: -368px 0;
-}
-.admin_img_scheduled {
-	background-position: -384px 0;
-}
-.admin_img_search {
-	background-position: -400px 0;
-}
-.admin_img_security {
-	background-position: -416px 0;
-}
-.admin_img_server {
-	background-position: -432px 0;
-}
-.admin_img_smiley {
-	background-position: -448px 0;
-}
+
+.admin_img_administration {background-position: 0 0;}
+.admin_img_attachment     {background-position: -16px 0;}
+.admin_img_ban            {background-position: -32px 0;}
+.admin_img_boards         {background-position: -48px 0;}
+.admin_img_calendar       {background-position: -64px 0;}
+.admin_img_corefeatures   {background-position: -80px 0;}
+.admin_img_current_theme  {background-position: -96px 0;}
+.admin_img_engines        {background-position: -112px 0;}
+.admin_img_exit           {background-position: -128px 0;}
+.admin_img_features       {background-position: -144px 0;}
+.admin_img_languages      {background-position: -160px 0;}
+.admin_img_logs           {background-position: -176px 0;}
+.admin_img_mail           {background-position: -192px 0;}
+.admin_img_maintain       {background-position: -208px 0;}
+.admin_img_membergroups   {background-position: -224px 0;}
+.admin_img_members        {background-position: -240px 0;}
+.admin_img_modifications  {background-position: -256px 0;}
+.admin_img_news           {background-position: -272px 0;}
+.admin_img_packages       {background-position: -288px 0;}
+.admin_img_paid           {background-position: -304px 0;}
+.admin_img_permissions    {background-position: -320px 0;}
+.admin_img_posts          {background-position: -336px 0;}
+.admin_img_regcenter      {background-position: -352px 0;}
+.admin_img_reports        {background-position: -368px 0;}
+.admin_img_scheduled      {background-position: -384px 0;}
+.admin_img_search         {background-position: -400px 0;}
+.admin_img_security       {background-position: -416px 0;}
+.admin_img_server         {background-position: -432px 0;}
+.admin_img_smiley         {background-position: -448px 0;}
+.admin_img_support        {background-position: -464px 0;}
+.admin_img_themes         {background-position: -480px 0;}
+
 .sortable_smiley li {
 	display: inline;
 	padding: 0 6px;
 }
-.ui-sortable li > a {
-	cursor: move;
-}
 
-.admin_img_support {
-	background-position: -464px 0;
-}
-.admin_img_themes {
-	background-position: -480px 0;
-}
 .pagelink, .current_page, .expand_pages {
 	border: 0;
 	background-color: transparent;
 }
-#taskpad select {
-	margin-top: 3px;
-}
-#taskpad {
-	margin: 2px 8px 2px 0;
-}
 
-/* Try out some nifty small screen friendliness, for the cost of a few more bytes. */
-/*@media screen and (max-width: 85em) {
-	.features p {
-		margin: 0;
-		padding: 0;
-		min-height: 10em;
-		max-height: 10em;
-	}
-
-}*/
 @media screen and (max-width: 33.750em) {
 	body {
 		padding: 0;
 	}
+
 	.visible_boards .select_all_box {
 		display: block;
 	}
+
 	.visible_boards label {
-		width: auto!important;
+		width: auto !important;
 		display: inline;
 	}
+
 	#wrapper, #footer_section .frame {
 		min-width: 100%;
 	}
+
 	#main_content_section {
 		padding: 0 10px;
 	}
+
 	/* Level 1 button background. */
 	.dropmenu li {
 		line-height: 3.2em;
 	}
+
 	.dropmenu li ul {
 		top: 3.45em;
 	}
+
 	.dropmenu li li a {
 		line-height: 3.2em;
 	}
+
 	#live_news, #supportVersionsTable {
 		width: 100%;
 	}
+
 	#live_news {
 		margin: 0 0 6px 0;
 	}
+
 	#supportVersionsTable {
 		padding: 0;
 	}
+
 	#quick_tasks ul li span {
 		display: block;
 		margin: 0 0 0 50px;
 	}
+
 	#credits_page {
 		padding-top: 35px;
 	}
+
 	#credits_page img {
 		right: 6px;
 	}
+
 	#core_features .features_image {
 		display: none;
 	}
+
 	#core_features .features_switch {
 		margin: -24px 0 0 5px;
 	}
+
 	#core_features .features h4 {
 		padding: 0 0 10px 0;
 	}
+
 	#core_features .features p {
 		margin: 0;
 		padding: 0;
@@ -1166,19 +1352,24 @@ ul.moderation_notes li {
 		max-height: 5em;
 		overflow: auto;
 	}
-	#manage_boards .windowbg {
+
+	#manage_boards .content {
 		line-height: 3.2em;
 	}
+
 	#manage_boards ul {
 		max-height: 120em;
 		padding: 0 0 10px 0;
 	}
+
 	#manage_boards dd, #manage_boards dt {
 		width: 100%;
 	}
+
 	#manage_boards dt {
 		line-height: 1.6em;
 	}
+
 	.perm_classic {
 		width: 100%;
 	}
@@ -1188,12 +1379,22 @@ ul.moderation_notes li {
 #sort_email_fp td, #custom_profile_fields td:nth-child(2), #message_icon_list td:nth-child(-n+3) {
 	cursor: move;
 }
-#sort_email_fp td:nth-child(2):before, #custom_profile_fields td:nth-child(2):before, #message_icon_list td:nth-child(1):before {
-	font-family: "Segoe UI Symbol", "DejaVu Sans", "GNU Unifont";
-	content: "\21f3";
-	padding-right: 5px;
-	font-size: 1.786em;
+#message_icon_list img {
+	vertical-align: middle;
 }
+
+/* Styles for the D&D indicators
+------------------------------------------------- */
+#sort_email_fp td:nth-child(2):before,
+#custom_profile_fields td:nth-child(2):before,
+#message_icon_list td:nth-child(1):before,
+#manage_boards li .floatleft:before {
+	margin-top: 1px;
+	padding-right: 5px;
+	content: "\2195";
+	font-size: 1.071em;
+}
+
 #custom_profile_fields td:nth-child(2):before {
 	float: left;
 	margin-top: 0.3em;
@@ -1205,20 +1406,35 @@ ul.moderation_notes li {
 	content: "";
 	display: table;
 }
+
 .ui-helper-clearfix:after {
 	clear: both;
 }
+
 .ui-helper-clearfix:before, .ui-helper-clearfix:after {
 	border-collapse: collapse;
 	content: "";
 	display: table;
 }
 
+.ui-sortable li > a {
+	cursor: move;
+}
+
+.ui-state-highlight {
+	height: 2em;
+	cursor: move;
+	border: 1px dashed;
+}
+
 /* jQuery Dialog */
 .ui-dialog {
 	padding: 0;
 	z-index: 100;
+	border: 1px solid;
+	border-radius: 4px 4px 0 0;
 }
+
 .ui-dialog .ui-dialog-title {
 	float: left;
 	margin: 0.5em 0;
@@ -1227,14 +1443,18 @@ ul.moderation_notes li {
 	white-space: nowrap;
 	width: 90%;
 }
+
 .ui-dialog .ui-dialog-titlebar {
 	padding: 0 1em;
 	font-weight: bold;
 	font-size: 1.071em;
+	border-radius: 4px 4px 0 0;
 }
+
 .ui-dialog .ui-dialog-content {
 	padding: 4px;
 }
+
 .ui-dialog .ui-dialog-titlebar-close {
 	cursor: pointer;
 	border: 0;
@@ -1244,9 +1464,11 @@ ul.moderation_notes li {
 	margin: 0.7em 0;
 	background: url(../images/buttons/delete.png) no-repeat scroll left center transparent;
 }
+
 .ui-dialog .ui-dialog-titlebar-close .ui-button-text {
 	display: none;
 }
+
 .ui-widget-overlay {
 	z-index: 100;
 	top: 0;

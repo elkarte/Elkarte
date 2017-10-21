@@ -10,18 +10,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.8
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Approve an attachment, or maybe even more - no permission check!
@@ -39,7 +34,7 @@ function approveAttachments($attachments)
 	// For safety, check for thumbnails...
 	$request = $db->query('', '
 		SELECT
-			a.id_attach, a.id_member, IFNULL(thumb.id_attach, 0) AS id_thumb
+			a.id_attach, a.id_member, COALESCE(thumb.id_attach, 0) AS id_thumb
 		FROM {db_prefix}attachments AS a
 			LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)
 		WHERE a.id_attach IN ({array_int:attachments})
@@ -75,7 +70,7 @@ function approveAttachments($attachments)
 	);
 
 	// In order to log the attachments, we really need their message and filename
-	$request = $db->query('', '
+	$db->fetchQueryCallback('
 		SELECT m.id_msg, a.filename
 		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (a.id_msg = m.id_msg)
@@ -84,18 +79,18 @@ function approveAttachments($attachments)
 		array(
 			'attachments' => $attachments,
 			'attachment_type' => 0,
-		)
+		),
+		function ($row)
+		{
+			logAction(
+				'approve_attach',
+				array(
+					'message' => $row['id_msg'],
+					'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', Util::htmlspecialchars($row['filename'])),
+				)
+			);
+		}
 	);
-
-	while ($row = $db->fetch_assoc($request))
-		logAction(
-			'approve_attach',
-			array(
-				'message' => $row['id_msg'],
-				'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', Util::htmlspecialchars($row['filename'])),
-			)
-		);
-	$db->free_result($request);
 
 	// Remove from the approval queue.
 	$db->query('', '
@@ -123,6 +118,7 @@ function approveAttachments($attachments)
  * @param string $query_type
  * @param bool $return_affected_messages = false
  * @param bool $autoThumbRemoval = true
+ * @return int[]|boolean returns affected messages if $return_affected_messages is set to true
  */
 function removeAttachments($condition, $query_type = '', $return_affected_messages = false, $autoThumbRemoval = true)
 {
@@ -166,6 +162,12 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 			if ($type == 'do_logging')
 				$do_logging = $condition['id_attach'];
 		}
+
+		if (empty($new_condition))
+		{
+			return false;
+		}
+
 		$condition = implode(' AND ', $new_condition);
 	}
 
@@ -174,11 +176,13 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 	$attach = array();
 	$parents = array();
 
+	require_once(SUBSDIR . '/Attachments.subs.php');
+
 	// Get all the attachment names and id_msg's.
 	$request = $db->query('', '
 		SELECT
 			a.id_folder, a.filename, a.file_hash, a.attachment_type, a.id_attach, a.id_member' . ($query_type == 'messages' ? ', m.id_msg' : ', a.id_msg') . ',
-			thumb.id_folder AS thumb_folder, IFNULL(thumb.id_attach, 0) AS id_thumb, thumb.filename AS thumb_filename, thumb.file_hash AS thumb_file_hash, thumb_parent.id_attach AS id_parent
+			thumb.id_folder AS thumb_folder, COALESCE(thumb.id_attach, 0) AS id_thumb, thumb.filename AS thumb_filename, thumb.file_hash AS thumb_file_hash, thumb_parent.id_attach AS id_parent
 		FROM {db_prefix}attachments AS a' .($query_type == 'members' ? '
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = a.id_member)' : ($query_type == 'messages' ? '
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)' : '')) . '
@@ -238,7 +242,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 	if (!empty($do_logging))
 	{
 		// In order to log the attachments, we really need their message and filename
-		$request = $db->query('', '
+		$db->fetchQueryCallback('
 			SELECT m.id_msg, a.filename
 			FROM {db_prefix}attachments AS a
 				INNER JOIN {db_prefix}messages AS m ON (a.id_msg = m.id_msg)
@@ -247,18 +251,18 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 			array(
 				'attachments' => $do_logging,
 				'attachment_type' => 0,
-			)
+			),
+			function ($row)
+			{
+				logAction(
+					'remove_attach',
+					array(
+						'message' => $row['id_msg'],
+						'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', Util::htmlspecialchars($row['filename'])),
+					)
+				);
+			}
 		);
-
-		while ($row = $db->fetch_assoc($request))
-			logAction(
-				'remove_attach',
-				array(
-					'message' => $row['id_msg'],
-					'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', Util::htmlspecialchars($row['filename'])),
-				)
-			);
-		$db->free_result($request);
 	}
 
 	if (!empty($attach))
@@ -274,6 +278,8 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 
 	if ($return_affected_messages)
 		return array_unique($msgs);
+	else
+		return true;
 }
 
 /**
@@ -545,7 +551,7 @@ function maxNoThumb()
  * Finds orphan thumbnails in the database
  *
  * - Checks in groups of 500
- * - Called by attachment maintance
+ * - Called by attachment maintenance
  * - If $fix_errors is set to true it will attempt to remove the thumbnail from disk
  *
  * @package Attachments
@@ -556,6 +562,8 @@ function maxNoThumb()
 function findOrphanThumbnails($start, $fix_errors, $to_fix)
 {
 	$db = database();
+
+	require_once(SUBSDIR . '/Attachments.subs.php');
 
 	$result = $db->query('', '
 		SELECT thumb.id_attach, thumb.id_folder, thumb.filename, thumb.file_hash
@@ -609,10 +617,10 @@ function findOrphanThumbnails($start, $fix_errors, $to_fix)
 }
 
 /**
- * Finds parents who thing they do have thumbnails, but dont
+ * Finds parents who thing they do have thumbnails, but don't
  *
  * - Checks in groups of 500
- * - Called by attachment maintance
+ * - Called by attachment maintenance
  * - If $fix_errors is set to true it will attempt to remove the thumbnail from disk
  *
  * @package Attachments
@@ -624,7 +632,7 @@ function findParentsOrphanThumbnails($start, $fix_errors, $to_fix)
 {
 	$db = database();
 
-	$result = $db->query('', '
+	$to_update = $db->fetchQueryCallback('
 		SELECT a.id_attach
 		FROM {db_prefix}attachments AS a
 			LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)
@@ -634,15 +642,12 @@ function findParentsOrphanThumbnails($start, $fix_errors, $to_fix)
 		array(
 			'no_thumb' => 0,
 			'substep' => $start,
-		)
+		),
+		function ($row)
+		{
+			return $row['id_attach'];
+		}
 	);
-	$to_update = array();
-	if ($db->num_rows($result) != 0)
-	{
-		while ($row = $db->fetch_assoc($result))
-			$to_update[] = $row['id_attach'];
-	}
-	$db->free_result($result);
 
 	// Do we need to delete what we have?
 	if ($fix_errors && !empty($to_update) && in_array('parent_missing_thumbnail', $to_fix))
@@ -678,6 +683,8 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 	global $modSettings;
 
 	$db = database();
+
+	require_once(SUBSDIR . '/Attachments.subs.php');
 
 	$repair_errors = array(
 		'wrong_folder' => 0,
@@ -812,7 +819,9 @@ function findOrphanAvatars($start, $fix_errors, $to_fix)
 
 	$db = database();
 
-	$result = $db->query('', '
+	require_once(SUBSDIR . '/Attachments.subs.php');
+
+	$to_remove = $db->fetchQueryCallback('
 		SELECT a.id_attach, a.id_folder, a.filename, a.file_hash, a.attachment_type
 		FROM {db_prefix}attachments AS a
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = a.id_member)
@@ -824,15 +833,9 @@ function findOrphanAvatars($start, $fix_errors, $to_fix)
 			'no_member' => 0,
 			'no_msg' => 0,
 			'substep' => $start,
-		)
-	);
-	$to_remove = array();
-	if ($db->num_rows($result) != 0)
-	{
-		while ($row = $db->fetch_assoc($result))
+		),
+		function ($row) use ($fix_errors, $to_fix, $modSettings)
 		{
-			$to_remove[] = $row['id_attach'];
-
 			// If we are repairing remove the file from disk now.
 			if ($fix_errors && in_array('avatar_no_member', $to_fix))
 			{
@@ -842,9 +845,10 @@ function findOrphanAvatars($start, $fix_errors, $to_fix)
 					$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
 				@unlink($filename);
 			}
+
+			return $row['id_attach'];
 		}
-	}
-	$db->free_result($result);
+	);
 
 	// Do we need to delete what we have?
 	if ($fix_errors && !empty($to_remove) && in_array('avatar_no_member', $to_fix))
@@ -877,7 +881,9 @@ function findOrphanAttachments($start, $fix_errors, $to_fix)
 {
 	$db = database();
 
-	$result = $db->query('', '
+	require_once(SUBSDIR . '/Attachments.subs.php');
+
+	$to_remove = $db->fetchQueryCallback('
 		SELECT a.id_attach, a.id_folder, a.filename, a.file_hash
 		FROM {db_prefix}attachments AS a
 			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
@@ -889,24 +895,19 @@ function findOrphanAttachments($start, $fix_errors, $to_fix)
 			'no_member' => 0,
 			'no_msg' => 0,
 			'substep' => $start,
-		)
-	);
-	$to_remove = array();
-	if ($db->num_rows($result) != 0)
-	{
-		while ($row = $db->fetch_assoc($result))
+		),
+		function ($row) use ($fix_errors, $to_fix)
 		{
-			$to_remove[] = $row['id_attach'];
-
 			// If we are repairing remove the file from disk now.
 			if ($fix_errors && in_array('attachment_no_msg', $to_fix))
 			{
 				$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
 				@unlink($filename);
 			}
+
+			return $row['id_attach'];
 		}
-	}
-	$db->free_result($result);
+	);
 
 	// Do we need to delete what we have?
 	if ($fix_errors && !empty($to_remove) && in_array('attachment_no_msg', $to_fix))
@@ -923,6 +924,8 @@ function findOrphanAttachments($start, $fix_errors, $to_fix)
 			)
 		);
 	}
+
+	return $to_remove;
 }
 
 /**
@@ -981,7 +984,7 @@ function validateAttachments($attachments, $approve_query)
 	$db = database();
 
 	// double check the attachments array, pick only what is returned from the database
-	$request = $db->query('', '
+	return $db->fetchQueryCallback('
 		SELECT a.id_attach, m.id_board, m.id_msg, m.id_topic
 		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
@@ -995,14 +998,12 @@ function validateAttachments($attachments, $approve_query)
 			'attachments' => $attachments,
 			'not_approved' => 0,
 			'attachment_type' => 0,
-		)
+		),
+		function ($row)
+		{
+			return $row['id_attach'];
+		}
 	);
-	$attachments = array();
-	while ($row = $db->fetch_assoc($request))
-		$attachments[] = $row['id_attach'];
-	$db->free_result($request);
-
-	return $attachments;
 }
 
 /**
@@ -1067,9 +1068,9 @@ function validateAttachID($id_attach)
  * - retrieve all the attachments waiting for approval the approver can approve
  *
  * @package Attachments
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param string $approve_query additional restrictions based on the boards the approver can see
  * @return mixed[] an array of unapproved attachments
  */
@@ -1079,10 +1080,12 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 
 	$db = database();
 
+	$bbc_parser = \BBC\ParserWrapper::instance();
+
 	// Get all unapproved attachments.
-	$request = $db->query('', '
+	return $db->fetchQueryCallback('
 		SELECT a.id_attach, a.filename, a.size, m.id_msg, m.id_topic, m.id_board, m.subject, m.body, m.id_member,
-			IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time,
+			COALESCE(mem.real_name, m.poster_name) AS poster_name, m.poster_time,
 			t.id_member_started, t.id_first_msg, b.name AS board_name, c.id_cat, c.name AS cat_name
 		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
@@ -1103,49 +1106,45 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 			'sort' => $sort,
 			'items_per_page' => $items_per_page,
 			'approve_query' => $approve_query,
-		)
-	);
-	$unapproved_items = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$unapproved_items[] = array(
-			'id' => $row['id_attach'],
-			'filename' => $row['filename'],
-			'size' => round($row['size'] / 1024, 2),
-			'time' => standardTime($row['poster_time']),
-			'html_time' => htmlTime($row['poster_time']),
-			'timestamp' => forum_time(true, $row['poster_time']),
-			'poster' => array(
-				'id' => $row['id_member'],
-				'name' => $row['poster_name'],
-				'link' => $row['id_member'] ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>' : $row['poster_name'],
-				'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
-			),
-			'message' => array(
-				'id' => $row['id_msg'],
-				'subject' => $row['subject'],
-				'body' => parse_bbc($row['body']),
+		),
+		function ($row) use ($scripturl, $bbc_parser)
+		{
+			return array(
+				'id' => $row['id_attach'],
+				'filename' => $row['filename'],
+				'size' => round($row['size'] / 1024, 2),
 				'time' => standardTime($row['poster_time']),
 				'html_time' => htmlTime($row['poster_time']),
 				'timestamp' => forum_time(true, $row['poster_time']),
-				'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
-			),
-			'topic' => array(
-				'id' => $row['id_topic'],
-			),
-			'board' => array(
-				'id' => $row['id_board'],
-				'name' => $row['board_name'],
-			),
-			'category' => array(
-				'id' => $row['id_cat'],
-				'name' => $row['cat_name'],
-			),
-		);
-	}
-	$db->free_result($request);
-
-	return $unapproved_items;
+				'poster' => array(
+					'id' => $row['id_member'],
+					'name' => $row['poster_name'],
+					'link' => $row['id_member'] ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>' : $row['poster_name'],
+					'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
+				),
+				'message' => array(
+					'id' => $row['id_msg'],
+					'subject' => $row['subject'],
+					'body' => $bbc_parser->parseMessage($row['body'], false),
+					'time' => standardTime($row['poster_time']),
+					'html_time' => htmlTime($row['poster_time']),
+					'timestamp' => forum_time(true, $row['poster_time']),
+					'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
+				),
+				'topic' => array(
+					'id' => $row['id_topic'],
+				),
+				'board' => array(
+					'id' => $row['id_board'],
+					'name' => $row['board_name'],
+				),
+				'category' => array(
+					'id' => $row['id_cat'],
+					'name' => $row['cat_name'],
+				),
+			);
+		}
+	);
 }
 
 /**
@@ -1281,7 +1280,8 @@ function attachDirStatus($dir, $expected_files)
 		return array('not_writable', true, '');
 
 	// Count the files with a glob, easier and less time consuming
-	$num_files = count(glob($dir . '/*.elk'));
+	$glob = new GlobIterator($dir . '/*.elk', FilesystemIterator::SKIP_DOTS);
+	$num_files = $glob->count();
 
 	if ($num_files < $expected_files)
 		return array('files_missing', true, $num_files);
@@ -1360,15 +1360,18 @@ function list_getNumFiles($browse_type)
 
 	// Depending on the type of file, different queries are used.
 	if ($browse_type === 'avatars')
+	{
 		$request = $db->query('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}attachments
-		WHERE id_member != {int:guest_id_member}',
-		array(
-			'guest_id_member' => 0,
-		)
-	);
+			SELECT COUNT(*)
+			FROM {db_prefix}attachments
+			WHERE id_member != {int:guest_id_member}',
+			array(
+				'guest_id_member' => 0,
+			)
+		);
+	}
 	else
+	{
 		$request = $db->query('', '
 			SELECT COUNT(*) AS num_attach
 			FROM {db_prefix}attachments AS a
@@ -1382,6 +1385,7 @@ function list_getNumFiles($browse_type)
 				'guest_id_member' => 0,
 			)
 		);
+	}
 
 	list ($num_files) = $db->fetch_row($request);
 	$db->free_result($request);
@@ -1396,9 +1400,9 @@ function list_getNumFiles($browse_type)
  * - Callback function for createList()
  *
  * @package Attachments
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param string $browse_type can be on eof 'avatars' or ... not. :P
  */
 function list_getFiles($start, $items_per_page, $sort, $browse_type)
@@ -1409,9 +1413,10 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
 
 	// Choose a query depending on what we are viewing.
 	if ($browse_type === 'avatars')
-		$request = $db->query('', '
+	{
+		return $db->fetchQuery('
 			SELECT
-				{string:blank_text} AS id_msg, IFNULL(mem.real_name, {string:not_applicable_text}) AS poster_name,
+				{string:blank_text} AS id_msg, COALESCE(mem.real_name, {string:not_applicable_text}) AS poster_name,
 				mem.last_login AS poster_time, 0 AS id_topic, a.id_member, a.id_attach, a.filename, a.file_hash, a.attachment_type,
 				a.size, a.width, a.height, a.downloads, {string:blank_text} AS subject, 0 AS id_board
 			FROM {db_prefix}attachments AS a
@@ -1428,10 +1433,12 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
 				'per_page' => $items_per_page,
 			)
 		);
+	}
 	else
-		$request = $db->query('', '
+	{
+		return $db->fetchQuery('
 			SELECT
-				m.id_msg, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.id_topic, m.id_member,
+				m.id_msg, COALESCE(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.id_topic, m.id_member,
 				a.id_attach, a.filename, a.file_hash, a.attachment_type, a.size, a.width, a.height, a.downloads, mf.subject, t.id_board
 			FROM {db_prefix}attachments AS a
 				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
@@ -1448,12 +1455,7 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
 				'per_page' => $items_per_page,
 			)
 		);
-	$files = array();
-	while ($row = $db->fetch_assoc($request))
-		$files[] = $row;
-	$db->free_result($request);
-
-	return $files;
+	}
 }
 
 /**
@@ -1477,10 +1479,7 @@ function overallAttachmentsSize()
 	list ($attachmentDirSize) = $db->fetch_row($request);
 	$db->free_result($request);
 
-	// Divide it into kilobytes.
-	$attachmentDirSize /= 1024;
-
-	return comma_format($attachmentDirSize, 2);
+	return byte_format($attachmentDirSize);
 }
 
 /**
@@ -1519,7 +1518,6 @@ function attachDirProperties($dir)
 	);
 	list ($current_dir['files'], $current_dir['size']) = $db->fetch_row($request);
 	$db->free_result($request);
-	$current_dir['size'] /= 1024;
 
 	return $current_dir;
 }
@@ -1534,6 +1532,8 @@ function moveAvatars()
 	global $modSettings;
 
 	$db = database();
+
+	require_once(SUBSDIR . '/Attachments.subs.php');
 
 	$request = $db->query('', '
 		SELECT id_attach, id_folder, id_member, filename, file_hash
@@ -1580,10 +1580,9 @@ function moveAvatars()
 function findAttachmentsToMove($from, $start, $limit)
 {
 	$db = database();
-	$attachments = array();
 
 	// Find some attachments to move
-	$request = $db->query('', '
+	$attachments = $db->fetchQuery('
 		SELECT id_attach, filename, id_folder, file_hash, size
 		FROM {db_prefix}attachments
 		WHERE id_folder = {int:folder}
@@ -1596,10 +1595,7 @@ function findAttachmentsToMove($from, $start, $limit)
 			'limit' => $limit,
 		)
 	);
-	$number = (int) $db->num_rows($request);
-	while ($row = $db->fetch_assoc($request))
-		$attachments[] = $row;
-	$db->free_result($request);
+	$number = count($attachments);
 
 	return array($number, $attachments);
 }
@@ -1661,7 +1657,7 @@ function attachmentsOfMessage($id_msg, $unapproved = false)
 {
 	$db = database();
 
-	$request = $db->query('', '
+	return $db->fetchQueryCallback('
 		SELECT id_attach
 		FROM {db_prefix}attachments
 		WHERE id_msg = {int:id_msg}' . ($unapproved ? '' : '
@@ -1671,14 +1667,12 @@ function attachmentsOfMessage($id_msg, $unapproved = false)
 			'id_msg' => $id_msg,
 			'is_approved' => 0,
 			'attachment_type' => 0,
-		)
+		),
+		function ($row)
+		{
+			return $row['id_attach'];
+		}
 	);
-	$attachments = array();
-	while ($row = $db->fetch_assoc($request))
-		$attachments[] = $row['id_attach'];
-	$db->free_result($request);
-
-	return $attachments;
 }
 
 /**

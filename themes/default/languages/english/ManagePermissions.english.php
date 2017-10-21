@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; ManagePermissions
+// Version: 1.1; ManagePermissions
 
 $txt['permissions_title'] = 'Manage Permissions';
 $txt['permissions_modify'] = 'Modify';
@@ -12,7 +12,7 @@ $txt['permissions_for_profile'] = 'Permissions for Profile';
 $txt['permissions_boards_desc'] = 'The list below shows which set of permissions has been assigned to each board on your forum. You may edit the assigned permission profile by either clicking the board name or select &quot;edit all&quot; from the bottom of the page. To edit the profile itself simply click the profile name.';
 $txt['permissions_board_all'] = 'Edit All';
 $txt['permission_profile'] = 'Permission Profile';
-$txt['permission_profile_desc'] = 'Which <a href="%1$s">permission set</a> the board should use.';
+$txt['permission_profile_desc'] = 'Which <a target="_blank" href="%1$s">permission set</a> the board should use.';
 $txt['permission_profile_inherit'] = 'Inherit from parent board';
 
 $txt['permissions_profile'] = 'Profile';
@@ -86,6 +86,8 @@ $txt['permissionname_karma_edit'] = 'Change other people\'s karma';
 $txt['permissionhelp_karma_edit'] = 'Karma is a feature that shows the popularity of a member. In order to use this feature, you need to have it enabled in \'Features and Options\'. This permission will allow a member group to cast a vote. This permission has no effect on guests.';
 $txt['permissionname_like_posts'] = 'Like other users\' posts';
 $txt['permissionhelp_like_posts'] = 'Likes is a feature that shows the popularity of a post. In order to use this feature, you need to have it enabled in \'Features and Options\'. This permission will allow a member group to like a post or unlike one they previously liked.  This permission has no effect on guests.';
+$txt['permissionname_like_posts_stats'] = 'See like posts stats';
+$txt['permissionhelp_like_posts_stats'] = 'This will allow users to see stats of posts liking';
 $txt['permissionname_disable_censor'] = 'Disable word censor';
 $txt['permissionhelp_disable_censor'] = 'Allows members the option to disable the word censor.';
 
@@ -284,12 +286,12 @@ $txt['permissionicon'] = '';
 
 $txt['permission_settings_title'] = 'Permission Settings';
 $txt['groups_manage_permissions'] = 'Member groups allowed to manage permissions';
-$txt['permission_settings_enable_deny'] = 'Enable the option to deny permissions';
+$txt['permission_enable_deny'] = 'Enable the option to deny permissions';
 // Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
 $txt['permission_disable_deny_warning'] = 'Turning off this option will update \\\'Deny\\\'-permissions to \\\'Disallow\\\'.';
 $txt['permission_by_board_desc'] = 'Here you can set which permission profile a board uses. You can create new permission profiles from the &quot;Edit Profiles&quot; menu.';
 $txt['permission_settings_desc'] = 'Here you can set who has permission to change permissions, as well as how sophisticated the permission system should be.';
-$txt['permission_settings_enable_postgroups'] = 'Enable permissions for post count based groups';
+$txt['permission_enable_postgroups'] = 'Enable permissions for post count based groups';
 // Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
 $txt['permission_disable_postgroups_warning'] = 'Disabling this setting will remove permissions currently set to post count based groups.';
 

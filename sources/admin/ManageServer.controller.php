@@ -9,18 +9,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * ManageServer administration pages controller.
@@ -32,52 +27,21 @@ if (!defined('ELK'))
 class ManageServer_Controller extends Action_Controller
 {
 	/**
-	 * Database settings form
-	 * @var Settings_Form
-	 */
-	protected $_databaseSettingsForm;
-
-	/**
-	 * General settings form
-	 * @var Settings_Form
-	 */
-	protected $_generalSettingsForm;
-
-	/**
-	 * Cache settings form
-	 * @var Settings_Form
-	 */
-	protected $_cacheSettingsForm;
-
-	/**
-	 * Cookies settings form
-	 * @var Settings_Form
-	 */
-	protected $_cookieSettingsForm;
-
-	/**
-	 * Load balancing settings form
-	 * @var Settings_Form
-	 */
-	protected $_balancingSettingsForm;
-
-	/**
 	 * This is the main dispatcher. Sets up all the available sub-actions, all the tabs and selects
 	 * the appropriate one based on the sub-action.
 	 *
 	 * What it does:
+	 *
 	 * - Requires the admin_forum permission.
 	 * - Redirects to the appropriate function based on the sub-action.
 	 *
+	 * @event integrate_sa_server_settings
 	 * @uses edit_settings adminIndex.
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
 		global $context, $txt;
-
-		// We're working with them settings here.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// The settings are in here, I swear!
 		loadLanguage('ManageSettings');
@@ -91,7 +55,7 @@ class ManageServer_Controller extends Action_Controller
 			'database' => array($this, 'action_databaseSettings_display', 'permission' => 'admin_forum'),
 			'cookie' => array($this, 'action_cookieSettings_display', 'permission' => 'admin_forum'),
 			'cache' => array($this, 'action_cacheSettings_display', 'permission' => 'admin_forum'),
-			'loads' => array($this, 'action_balancingSettings_display', 'permission' => 'admin_forum'),
+			'loads' => array($this, 'action_loadavgSettings_display', 'permission' => 'admin_forum'),
 			'phpinfo' => array($this, 'action_phpinfo', 'permission' => 'admin_forum'),
 		);
 
@@ -113,28 +77,26 @@ class ManageServer_Controller extends Action_Controller
 		$context['sub_template'] = 'show_settings';
 
 		// Any messages to speak of?
-		$context['settings_message'] = (isset($_REQUEST['msg']) && isset($txt[$_REQUEST['msg']])) ? $txt[$_REQUEST['msg']] : '';
+		$context['settings_message'] = (isset($this->_req->query->msg) && isset($txt[$this->_req->query->msg])) ? $txt[$this->_req->query->msg] : '';
 
 		// Warn the user if there's any relevant information regarding Settings.php.
-		if ($subAction != 'cache')
+		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
+
+		// Warn the user if the backup of Settings.php failed.
+		$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
+
+		if ($settings_not_writable)
 		{
-			// Warn the user if the backup of Settings.php failed.
-			$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
-			$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
-
-			if ($settings_not_writable)
-			{
-				$context['settings_message'] = $txt['settings_not_writable'];
-				$context['error_type'] = 'notice';
-			}
-			elseif ($settings_backup_fail)
-			{
-				$context['settings_message'] = $txt['admin_backup_fail'];
-				$context['error_type'] = 'notice';
-			}
-
-			$context['settings_not_writable'] = $settings_not_writable;
+			$context['settings_message'] = $txt['settings_not_writable'];
+			$context['error_type'] = 'notice';
 		}
+		elseif ($settings_backup_fail)
+		{
+			$context['settings_message'] = $txt['admin_backup_fail'];
+			$context['error_type'] = 'notice';
+		}
+
+		$context['settings_not_writable'] = $settings_not_writable;
 
 		// Call the right function for this sub-action.
 		$action->dispatch($subAction);
@@ -148,48 +110,40 @@ class ManageServer_Controller extends Action_Controller
 	 * the result for generalSettings form.
 	 *
 	 * What it does:
+	 *
 	 * - Requires the admin_forum permission.
 	 * - Uses the edit_settings administration area.
 	 * - Contains the actual array of settings to show from Settings.php.
 	 * - Accessed from ?action=admin;area=serversettings;sa=general.
+	 *
+	 * @event integrate_save_general_settings
 	 */
 	public function action_generalSettings_display()
 	{
 		global $scripturl, $context, $txt;
 
 		// Initialize the form
-		$this->_initGeneralSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
+
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_generalSettings());
 
 		// Setup the template stuff.
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=general;save';
 		$context['settings_title'] = $txt['general_settings'];
 
 		// Saving settings?
-		if (isset($_REQUEST['save']))
+		if (isset($this->_req->query->save))
 		{
 			call_integration_hook('integrate_save_general_settings');
 
-			$this->_generalSettingsForm->save();
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=serversettings;sa=general;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
 		}
 
 		// Fill the config array for the template and all that.
-		$this->_generalSettingsForm->prepare_file();
-	}
-
-	/**
-	 * Initialize _generalSettings form.
-	 */
-	private function _initGeneralSettingsForm()
-	{
-		// Start the form
-		$this->_generalSettingsForm = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_generalSettings();
-
-		// Set them vars for our settings form
-		return $this->_generalSettingsForm->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -199,18 +153,24 @@ class ManageServer_Controller extends Action_Controller
 	 * for _databaseSettings.
 	 *
 	 * What it does:
+	 *
 	 * - It shows an interface for the settings in Settings.php to be changed.
 	 * - It contains the actual array of settings to show from Settings.php.
 	 * - Requires the admin_forum permission.
 	 * - Uses the edit_settings administration area.
 	 * - Accessed from ?action=admin;area=serversettings;sa=database.
+	 *
+	 * @event integrate_save_database_settings
 	 */
 	public function action_databaseSettings_display()
 	{
 		global $scripturl, $context, $txt;
 
 		// Initialize the form
-		$this->_initDatabaseSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
+
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_databaseSettings());
 
 		// Setup the template stuff.
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=database;save';
@@ -218,29 +178,17 @@ class ManageServer_Controller extends Action_Controller
 		$context['save_disabled'] = $context['settings_not_writable'];
 
 		// Saving settings?
-		if (isset($_REQUEST['save']))
+		if (isset($this->_req->query->save))
 		{
 			call_integration_hook('integrate_save_database_settings');
 
-			$this->_databaseSettingsForm->save();
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=serversettings;sa=database;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
 		}
 
 		// Fill the config array for the template.
-		$this->_databaseSettingsForm->prepare_file();
-	}
-
-	/**
-	 * Initialize _databaseSettings form.
-	 */
-	private function _initDatabaseSettingsForm()
-	{
-		// instantiate the form
-		$this->_databaseSettingsForm = new Settings_Form();
-		$config_vars = $this->_databaseSettings();
-
-		// Set them vars for our settings form
-		return $this->_databaseSettingsForm->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -248,34 +196,39 @@ class ManageServer_Controller extends Action_Controller
 	 *
 	 * This method handles the display, allows to edit, and saves the result
 	 * for the _cookieSettings form.
+	 *
+	 * @event integrate_save_cookie_settings
 	 */
 	public function action_cookieSettings_display()
 	{
 		global $context, $scripturl, $txt, $modSettings, $cookiename, $user_settings, $boardurl;
 
 		// Initialize the form
-		$this->_initCookieSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
+
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_cookieSettings());
 
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=cookie;save';
 		$context['settings_title'] = $txt['cookies_sessions_settings'];
 
 		// Saving settings?
-		if (isset($_REQUEST['save']))
+		if (isset($this->_req->query->save))
 		{
 			call_integration_hook('integrate_save_cookie_settings');
 
 			// Its either local or global cookies
-			if (!empty($_POST['localCookies']) && empty($_POST['globalCookies']))
-				unset($_POST['globalCookies']);
+			if (!empty($this->_req->post->localCookies) && empty($this->_req->post->globalCookies))
+				unset($this->_req->post->globalCookies);
 
-			if (!empty($_POST['globalCookiesDomain']) && strpos($boardurl, $_POST['globalCookiesDomain']) === false)
-				fatal_lang_error('invalid_cookie_domain', false);
+			if (!empty($this->_req->post->globalCookiesDomain) && strpos($boardurl, $this->_req->post->globalCookiesDomain) === false)
+				throw new Elk_Exception('invalid_cookie_domain', false);
 
-			//Settings_Form::save_db($config_vars);
-			$this->_cookieSettingsForm->save();
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 
 			// If the cookie name was changed, reset the cookie.
-			if ($cookiename != $_POST['cookiename'])
+			if ($cookiename != $this->_req->post->cookiename)
 			{
 				require_once(SUBSDIR . '/Auth.subs.php');
 
@@ -285,10 +238,10 @@ class ManageServer_Controller extends Action_Controller
 				setLoginCookie(-3600, 0);
 
 				// Set the new one.
-				$cookiename = $_POST['cookiename'];
+				$cookiename = $this->_req->post->cookiename;
 				setLoginCookie(60 * $modSettings['cookieTime'], $user_settings['id_member'], hash('sha256', $user_settings['passwd'] . $user_settings['password_salt']));
 
-				redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $original_session_id, $context['server']['needs_login_fix']);
+				redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $original_session_id, detectServer()->is('needs_login_fix'));
 			}
 
 			redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
@@ -299,27 +252,12 @@ class ManageServer_Controller extends Action_Controller
 		hideGlobalCookies();
 
 		// Update when clicked
-		$("#localCookies, #globalCookies").click(function() {
+		$("#localCookies, #globalCookies").click(function () {
 			hideGlobalCookies();
 		});', true);
 
 		// Fill the config array.
-		$this->_cookieSettingsForm->prepare_file();
-	}
-
-	/**
-	 * Initialize _cookieSettings form.
-	 */
-	private function _initCookieSettingsForm()
-	{
-		// Start a new form
-		$this->_cookieSettingsForm = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_cookieSettings();
-
-		// Set them vars for our settings form
-		return $this->_cookieSettingsForm->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -327,13 +265,37 @@ class ManageServer_Controller extends Action_Controller
 	 *
 	 * This method handles the display, allows to edit, and saves the result
 	 * for _cacheSettings form.
+	 *
+	 * @event integrate_save_cache_settings
 	 */
 	public function action_cacheSettings_display()
 	{
-		global $context, $scripturl, $txt, $cache_accelerator, $modSettings;
+		global $context, $scripturl, $txt;
 
 		// Initialize the form
-		$this->_initCacheSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
+
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_cacheSettings());
+
+		// Saving again?
+		if (isset($this->_req->query->save))
+		{
+			call_integration_hook('integrate_save_cache_settings');
+
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
+
+			// we need to save the $cache_enable to $modSettings as well
+			updateSettings(array('cache_enable' => (int) $this->_req->post->cache_enable));
+
+			// exit so we reload our new settings on the page
+			redirectexit('action=admin;area=serversettings;sa=cache;' . $context['session_var'] . '=' . $context['session_id']);
+		}
+
+		loadLanguage('Maintenance');
+		createToken('admin-maint');
+		Template_Layers::instance()->add('clean_cache_button');
 
 		// Some javascript to enable / disable certain settings if the option is not selected
 		addInlineJavascript('
@@ -343,128 +305,74 @@ class ManageServer_Controller extends Action_Controller
 			cache_type.addEventListener("change", toggleCache);
 			toggleCache();', true);
 
-		$context['settings_message'] = $txt['caching_information'];
-
-		// Let them know if they may have problems
-		if ($cache_accelerator === 'filebased' && !empty($modSettings['cache_enable']) && extension_loaded('Zend OPcache'))
-		{
-			// The opcache will cache the filebased user data files, updating them based on opcache.revalidate_freq
-			// which can cause delays (or prevent) the invalidation of file cache files
-			$opcache_config = @opcache_get_configuration();
-			if (!empty($opcache_config['directives']['opcache.enable']))
-				$context['settings_message'] = $txt['cache_conflict'];
-		}
-
-		// Saving again?
-		if (isset($_GET['save']))
-		{
-			call_integration_hook('integrate_save_cache_settings');
-
-			$this->_cacheSettingsForm->save();
-
-			// we need to save the $cache_enable to $modSettings as well
-			updatesettings(array('cache_enable' => (int) $_POST['cache_enable']));
-
-			// exit so we reload our new settings on the page
-			redirectexit('action=admin;area=serversettings;sa=cache;' . $context['session_var'] . '=' . $context['session_id']);
-		}
-
-		loadLanguage('Maintenance');
-		createToken('admin-maint');
-		Template_Layers::getInstance()->add('clean_cache_button');
-
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=cache;save';
 		$context['settings_title'] = $txt['caching_settings'];
+		$context['settings_message'] = $txt['caching_information'] . '<br /><br />' . $txt['cache_settings_message'];
 
 		// Prepare the template.
 		createToken('admin-ssc');
 
 		// Prepare settings for display in the template.
-		$this->_cacheSettingsForm->prepare_file();
+		$settingsForm->prepare();
 	}
 
 	/**
-	 * Initialize _cacheSettings form.
-	 */
-	private function _initCacheSettingsForm()
-	{
-		// We need a setting form
-		$this->_cacheSettingsForm = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_cacheSettings();
-
-		// Set them vars for our settings form
-		return $this->_cacheSettingsForm->settings($config_vars);
-	}
-
-	/**
-	 * Allows to edit load balancing settings.
+	 * Allows to edit load management settings.
 	 *
 	 * This method handles the display, allows to edit, and saves the result
-	 * for the _balancingSettings form.
+	 * for the _loadavgSettings form.
+	 *
+	 * @event integrate_loadavg_settings
+	 * @event integrate_save_loadavg_settings
 	 */
-	public function action_balancingSettings_display()
+	public function action_loadavgSettings_display()
 	{
 		global $txt, $scripturl, $context;
 
 		// Initialize the form
-		$this->_initBalancingSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_balancingSettingsForm->settings();
+		$settingsForm->setConfigVars($this->_loadavgSettings());
 
 		call_integration_hook('integrate_loadavg_settings');
 
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=loads;save';
-		$context['settings_title'] = $txt['load_balancing_settings'];
+		$context['settings_title'] = $txt['loadavg_settings'];
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			// Stupidity is not allowed.
-			foreach ($_POST as $key => $value)
+			foreach ($this->_req->post as $key => $value)
 			{
 				if (strpos($key, 'loadavg') === 0 || $key === 'loadavg_enable')
 					continue;
-				elseif ($key == 'loadavg_auto_opt' && $value <= 1)
-					$_POST['loadavg_auto_opt'] = '1.0';
-				elseif ($key == 'loadavg_forum' && $value < 10)
-					$_POST['loadavg_forum'] = '10.0';
+				elseif ($key === 'loadavg_auto_opt' && $value <= 1)
+					$this->_req->post->loadavg_auto_opt = '1.0';
+				elseif ($key === 'loadavg_forum' && $value < 10)
+					$this->_req->post->loadavg_forum = '10.0';
 				elseif ($value < 2)
-					$_POST[$key] = '2.0';
+					$this->_req->{$key} = '2.0';
 			}
 
 			call_integration_hook('integrate_save_loadavg_settings');
 
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=serversettings;sa=loads;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
 		createToken('admin-ssc');
 		createToken('admin-dbsc');
-		$this->_balancingSettingsForm->prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize balancingSettings form.
-	 */
-	private function _initBalancingSettingsForm()
-	{
-		// Forms, we need them
-		$this->_balancingSettingsForm = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_balancingSettings();
-
-		// Set them vars for our settings form
-		return $this->_balancingSettingsForm->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
 	 * Allows us to see the servers php settings
 	 *
 	 * What it does:
+	 *
 	 * - loads the settings into an array for display in a template
 	 * - drops cookie values just in case
 	 *
@@ -516,6 +424,8 @@ class ManageServer_Controller extends Action_Controller
 
 	/**
 	 * This function returns all general settings.
+	 *
+	 * @event integrate_modify_general_settings
 	 */
 	private function _generalSettings()
 	{
@@ -527,12 +437,11 @@ class ManageServer_Controller extends Action_Controller
 			'',
 				array('maintenance', $txt['admin_maintain'], 'file', 'check'),
 				array('mtitle', $txt['maintenance_subject'], 'file', 'text', 36),
-				array('mmessage', $txt['maintenance_message'], 'file', 'text', 36),
+				array('mmessage', $txt['maintenance_message'], 'file', 'large_text', 6),
 			'',
 				array('webmaster_email', $txt['admin_webmaster_email'], 'file', 'text', 30),
 			'',
 				array('enableCompressedOutput', $txt['enableCompressedOutput'], 'db', 'check', null, 'enableCompressedOutput'),
-				array('disableTemplateEval', $txt['disableTemplateEval'], 'db', 'check', null, 'disableTemplateEval'),
 				array('disableHostnameLookup', $txt['disableHostnameLookup'], 'db', 'check', null, 'disableHostnameLookup'),
 		);
 
@@ -552,6 +461,8 @@ class ManageServer_Controller extends Action_Controller
 
 	/**
 	 * This function returns database settings.
+	 *
+	 * @event integrate_modify_database_settings
 	 */
 	private function _databaseSettings()
 	{
@@ -594,6 +505,8 @@ class ManageServer_Controller extends Action_Controller
 
 	/**
 	 * This little function returns all cookie settings.
+	 *
+	 * @event integrate_modify_cookie_settings
 	 */
 	private function _cookieSettings()
 	{
@@ -607,7 +520,7 @@ class ManageServer_Controller extends Action_Controller
 				array('localCookies', $txt['localCookies'], 'subtext' => $txt['localCookies_note'], 'db', 'check', false, 'localCookies'),
 				array('globalCookies', $txt['globalCookies'], 'subtext' => $txt['globalCookies_note'], 'db', 'check', false, 'globalCookies'),
 				array('globalCookiesDomain', $txt['globalCookiesDomain'], 'subtext' => $txt['globalCookiesDomain_note'], 'db', 'text', false, 'globalCookiesDomain'),
-				array('secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies', 'disabled' => !isset($_SERVER['HTTPS']) || !(strtolower($_SERVER['HTTPS']) == 'on' || strtolower($_SERVER['HTTPS']) == '1')),
+				array('secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies', 'disabled' => !isset($this->_req->server->HTTPS) || !(strtolower($this->_req->server->HTTPS) === 'on' || strtolower($this->_req->server->HTTPS) == '1')),
 				array('httponlyCookies', $txt['httponlyCookies'], 'subtext' => $txt['httponlyCookies_note'], 'db', 'check', false, 'httponlyCookies'),
 			'',
 				// Sessions
@@ -633,45 +546,48 @@ class ManageServer_Controller extends Action_Controller
 
 	/**
 	 * This little function returns all cache settings.
+	 *
+	 * @event integrate_modify_cache_settings
 	 */
 	private function _cacheSettings()
 	{
 		global $txt;
 
 		// Detect all available optimizers
-		$detected = array();
-		$detected['filebased'] = $txt['default_cache'];
+		$detected = loadCacheEngines(false);
+		$detected_names = array();
+		$detected_supported = array();
 
-		if (function_exists('eaccelerator_put'))
-			$detected['eaccelerator'] = $txt['eAccelerator_cache'];
-		if (function_exists('mmcache_put'))
-			$detected['mmcache'] = $txt['mmcache_cache'];
-		if (function_exists('apc_store') && !extension_loaded('apcu'))
-			$detected['apc'] = $txt['apc_cache'];
-		if (function_exists('apc_store') && extension_loaded('apcu'))
-			$detected['apcu'] = $txt['apc_cache'];
-		if (function_exists('output_cache_put') || function_exists('zend_shm_cache_store'))
-			$detected['zend'] = $txt['zend_cache'];
-		if (function_exists('memcache_set') || function_exists('memcached_set'))
-			$detected['memcached'] = $txt['memcached_cache'];
-		if (function_exists('xcache_set'))
-			$detected['xcache'] = $txt['xcache_cache'];
+		foreach ($detected as $key => $value)
+		{
+			$detected_names[] = $value->title();
+			$supported = $value->isAvailable();
+
+			if (!empty($supported))
+				$detected_supported[$key] = $value->title();
+		}
+
+		$txt['caching_information'] = str_replace('{supported_accelerators}', '<i>' . implode(', ', $detected_names) . '</i><br />', $txt['caching_information']);
 
 		// Set our values to show what, if anything, we found
-		$txt['cache_settings_message'] = sprintf($txt['detected_accelerators'], implode(', ', $detected));
+		$txt['cache_settings_message'] = sprintf($txt['detected_accelerators'], implode(', ', $detected_supported));
 		$cache_level = array($txt['cache_off'], $txt['cache_level1'], $txt['cache_level2'], $txt['cache_level3']);
 
 		// Define the variables we want to edit.
 		$config_vars = array(
 			// Only a few settings, but they are important
-			array('', $txt['cache_settings_message'], '', 'desc'),
 			array('cache_enable', $txt['cache_enable'], 'file', 'select', $cache_level, 'cache_enable'),
-			array('cache_accelerator', $txt['cache_accelerator'], 'file', 'select', $detected),
-			array('cache_uid', $txt['cache_uid'], 'file', 'text', $txt['cache_uid'], 'cache_uid'),
-			array('cache_password', $txt['cache_password'], 'file', 'password', $txt['cache_password'], 'cache_password'),
-			array('cache_memcached', $txt['cache_memcached'], 'file', 'text', $txt['cache_memcached'], 'cache_memcached'),
-			array('cachedir', $txt['cachedir'], 'file', 'text', 36, 'cache_cachedir'),
+			array('cache_accelerator', $txt['cache_accelerator'], 'file', 'select', $detected_supported),
 		);
+
+		// If the cache engine has specific settings, add them in
+		foreach ($detected as $key => $value)
+		{
+			if ($value->isAvailable())
+			{
+				$value->settings($config_vars);
+			}
+		}
 
 		// Notify the integration that we're preparing to mess up with cache settings...
 		call_integration_hook('integrate_modify_cache_settings', array(&$config_vars));
@@ -688,9 +604,11 @@ class ManageServer_Controller extends Action_Controller
 	}
 
 	/**
-	 * This little function returns load balancing settings.
+	 * This little function returns load management settings.
+	 *
+	 * @event integrate_modify_loadavg_settings
 	 */
-	private function _balancingSettings()
+	private function _loadavgSettings()
 	{
 		global $txt, $modSettings, $context;
 
@@ -703,6 +621,7 @@ class ManageServer_Controller extends Action_Controller
 			$context['settings_message'] = $txt['loadavg_disabled_windows'];
 		else
 		{
+			require_once(SUBSDIR . '/Server.subs.php');
 			$modSettings['load_average'] = detectServerLoad();
 
 			if ($modSettings['load_average'] !== false)
@@ -733,11 +652,11 @@ class ManageServer_Controller extends Action_Controller
 		foreach ($default_values as $name => $value)
 		{
 			// Use the default value if the setting isn't set yet.
-			$value = !isset($modSettings[$name]) ? $value : $modSettings[$name];
+			$value = isset($modSettings[$name]) ? $modSettings[$name] : $value;
 			$config_vars[] = array('text', $name, 'value' => $value, 'disabled' => $disabled);
 		}
 
-		// Notify the integration that we're preparing to mess with balancing settings...
+		// Notify the integration that we're preparing to mess with load management settings...
 		call_integration_hook('integrate_modify_loadavg_settings', array(&$config_vars));
 
 		return $config_vars;
@@ -748,6 +667,6 @@ class ManageServer_Controller extends Action_Controller
 	 */
 	public function balancingSettings_search()
 	{
-		return $this->_balancingSettings();
+		return $this->_loadavgSettings();
 	}
 }

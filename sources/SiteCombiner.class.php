@@ -7,16 +7,14 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Used to combine css or js files in to a single file
  *
  * What it does:
+ *
  * - Checks if the files have changed, and if so rebuilds the amalgamation
  * - Calls minification classes to reduce size of css and js file saving bandwidth
  * - Can creates a .gz file, be would require .htaccess or the like to use
@@ -114,7 +112,7 @@ class Site_Combiner
 	private $_url = 'http://closure-compiler.appspot.com/compile';
 
 	/**
-	 * Base post header to send to the closure complier
+	 * Base post header to send to the closure compiler
 	 * @var string
 	 */
 	private $_post_header = 'output_info=compiled_code&output_format=text&compilation_level=SIMPLE_OPTIMIZATIONS';
@@ -130,6 +128,8 @@ class Site_Combiner
 		// Init
 		$this->_archive_dir = $cachedir;
 		$this->_archive_url = $cacheurl;
+
+		$this->_spares = array();
 	}
 
 	/**
@@ -140,25 +140,35 @@ class Site_Combiner
 	 */
 	public function site_js_combine($files, $do_defered)
 	{
-		// No files or missing or not writeable directory then we are done
-		if (empty($files) || !file_exists($this->_archive_dir) || !is_writable($this->_archive_dir))
+		// No files or missing we are done
+		if (empty($files))
+		{
 			return false;
+		}
 
-		$this->_spares = array();
+		// Directory not writable then we are done
+		if ($this->_validDestination() === false)
+		{
+			// Anything is spare
+			$this->_addSpare($files);
+			return false;
+		}
 
-		// Get the filenames and last modified time for this batch
+		// Get the filename's and last modified time for this batch
 		foreach ($files as $id => $file)
 		{
 			$load = (!$do_defered && empty($file['options']['defer'])) || ($do_defered && !empty($file['options']['defer']));
 
 			// Get the ones that we would load locally so we can merge them
 			if ($load && (empty($file['options']['local']) || !$this->_addFile($file['options'])))
-				$this->_spares[$id] = $file;
+			{
+				$this->_addSpare(array($id => $file));
+			}
 		}
 
 		// Nothing to do, then we are done
 		if (count($this->_combine_files) === 0)
-			return;
+			return true;
 
 		// Create the archive name
 		$this->_buildName('.js');
@@ -167,7 +177,6 @@ class Site_Combiner
 		if ($this->_isStale())
 		{
 			// Our buddies will be needed for this to work.
-			require_once(EXTDIR . '/jsminplus.php');
 			require_once(SUBSDIR . '/Package.subs.php');
 
 			$this->_archive_header = '// ' . $this->_archive_filenames . "\n";
@@ -191,21 +200,33 @@ class Site_Combiner
 	 */
 	public function site_css_combine($files)
 	{
-		// No files or missing dir then we are done
-		if (empty($files) || !file_exists($this->_archive_dir))
+		// No files or missing we are done
+		if (empty($files))
+		{
 			return false;
+		}
+
+		// Directory not writable then we are done
+		if ($this->_validDestination() === false)
+		{
+			// Anything is spare
+			$this->_addSpare($files);
+			return false;
+		}
 
 		// Get the filenames and last modified time for this batch
 		foreach ($files as $id => $file)
 		{
 			// Get the ones that we would load locally so we can merge them
 			if (empty($file['options']['local']) || !$this->_addFile($file['options']))
-				$this->_spares[$id] = $file;
+			{
+				$this->_addSpare(array($id => $file));
+			}
 		}
 
 		// Nothing to do so return
 		if (count($this->_combine_files) === 0)
-			return;
+			return true;
 
 		// Create the css archive name
 		$this->_buildName('.css');
@@ -218,10 +239,10 @@ class Site_Combiner
 
 			// CSSmin it to save some space
 			require_once(EXTDIR . '/cssmin.php');
-			$compressor = new CSSmin($this->_cache);
+			$compressor = new CSSmin();
 			$this->_minified_cache = $compressor->run($this->_cache);
 
-			// Combined in any pre minimized to our new minimized string
+			// Combine in any pre minimized css files to our new minimized string
 			$this->_minified_cache .= "\n" . $this->_min_cache;
 
 			$this->_saveFiles();
@@ -242,9 +263,68 @@ class Site_Combiner
 	}
 
 	/**
+	 * Deletes the CSS hives from the cache.
+	 */
+	public function removeCssHives()
+	{
+		return $this->_removeHives('css');
+	}
+
+	/**
+	 * Deletes the JS hives from the cache.
+	 */
+	public function removeJsHives()
+	{
+		return $this->_removeHives('js');
+	}
+
+	/**
+	 * Deletes hives from the cache based on extension.
+	 *
+	 * @param string $ext
+	 */
+	protected function _removeHives($ext)
+	{
+		$path = $this->_archive_dir . '/hive-*.' . $ext;
+
+		$glob = new GlobIterator($path, FilesystemIterator::SKIP_DOTS);
+		$return = true;
+
+		foreach ($glob as $file)
+		{
+			$return &= @unlink($file->getPathname());
+		}
+		return $return;
+	}
+
+	/**
+	 * Tests if the destination directory exists and is writable
+	 *
+	 * @return bool
+	 */
+	protected function _validDestination()
+	{
+		return file_exists($this->_archive_dir) && is_writable($this->_archive_dir);
+	}
+
+	/**
+	 * Adds files to the spare list
+	 *
+	 * @param mixed[]
+	 */
+	protected function _addSpare($files)
+	{
+		foreach ($files as $id => $file)
+		{
+			$this->_spares[$id] = $file;
+		}
+	}
+
+	/**
 	 * Add all the file parameters to the $_combine_files array
 	 *
 	 * What it does:
+	 *
 	 * - If the file has a 'stale' option defined it will be added to the
 	 *   $_stales array as well to be used later
 	 * - Tags any files that are pre-minimized by filename matching .min.js
@@ -314,7 +394,7 @@ class Site_Combiner
 		// Save the hive, or a nest, or a conglomeration. Like it was grown
 		$this->_archive_name = 'hive-' . sha1($this->_archive_filenames) . $type;
 
-		// Create a unique cache stale for his hive ?12345
+		// Create a unique cache stale for this hive ?12345
 		if (!empty($this->_stales))
 			$this->_archive_stale = '?' . hash('crc32', implode(' ', $this->_stales));
 	}
@@ -323,6 +403,7 @@ class Site_Combiner
 	 * Reads each files contents in to the _combine_files array
 	 *
 	 * What it does:
+	 *
 	 * - For each file, loads its contents in to the content key
 	 * - If the file is CSS will convert some common relative links to the
 	 * location of the hive
@@ -341,6 +422,11 @@ class Site_Combiner
 		// Read in all the data so we can process
 		foreach ($this->_combine_files as $key => $file)
 		{
+			if (!file_exists($file['file']))
+			{
+				continue;
+			}
+
 			$tempfile = trim(file_get_contents($file['file']));
 			$tempfile = (substr($tempfile, -3) === '}()') ? $tempfile . ';' : $tempfile;
 			$this->_combine_files[$key]['content'] = $tempfile;
@@ -391,8 +477,9 @@ class Site_Combiner
 	 * to minimize the code
 	 *
 	 * What it does:
+	 *
 	 * - Attempt to use the closure-compiler API using code_url
-	 * - Failing that will use jsminplus
+	 * - Failing that will use JSqueeze
 	 * - Failing that it will use the closure-compiler API using js_code
 	 *    a) single block if it can or
 	 *    b) as multiple calls
@@ -400,20 +487,20 @@ class Site_Combiner
 	 */
 	private function _jsCompiler()
 	{
-		global $context;
-
 		// First try the closure request using code_url param
 		$fetch_data = $this->_closure_code_url();
 
-		// Nothing returned or an error, try our internal JSMinPlus minimizer
+		// Nothing returned or an error, try our internal JSqueeze minimizer
 		if ($fetch_data === false || trim($fetch_data) == '' || preg_match('/^Error\(\d{1,2}\):\s/m', $fetch_data))
 		{
 			// To prevent a stack overflow segmentation fault, which silently kills Apache, we need to limit
-			// recursion on windows.  This may cause jsminplus to fail, but at least its then catchable.
-			if ($context['server']['is_windows'])
+			// recursion on windows.  This may cause JSqueeze to fail, but at least its then catchable.
+			if (detectServer()->is('windows'))
 				@ini_set('pcre.recursion_limit', '524');
 
-			$fetch_data = JSMinPlus::minify($this->_cache);
+			require_once(EXTDIR . '/JSqueeze.php');
+			$jsqueeze = new Patchwork\JSqueeze;
+			$fetch_data = $jsqueeze->squeeze($this->_cache);
 		}
 
 		// If we still have no data, then try the post js_code method to the closure compiler
@@ -431,6 +518,7 @@ class Site_Combiner
 	 * Makes a request to the closure compiler using the code_url syntax
 	 *
 	 * What it does:
+	 *
 	 * - Allows us to make a single request and let the compiler fetch the files from us
 	 * - Best option if its available (closure can see the files)
 	 */
@@ -452,6 +540,7 @@ class Site_Combiner
 	 * Makes a request to the closure compiler using the js_code syntax
 	 *
 	 * What it does:
+	 *
 	 * - If our combined file size allows, this is done as a single post to the compiler
 	 * - If the combined string is to large, then it is processed as chunks done
 	 * to minimize the number of posts required
@@ -475,6 +564,7 @@ class Site_Combiner
 	 * Combine files in to <200k chunks and make closure compiler requests
 	 *
 	 * What it does:
+	 *
 	 * - Loads as many files as it can in to a single post request while
 	 * keeping the post size within the limits accepted by the service
 	 * - Will do multiple requests until done, combining the results
@@ -493,7 +583,7 @@ class Site_Combiner
 			$post_data_raw = '';
 
 			// Combine data in to chunks of < 200k to minimize http posts
-			while($i < $filecount)
+			while ($i < $filecount)
 			{
 				// Get the details for this file
 				$file = $combine_files[$i];
@@ -509,7 +599,7 @@ class Site_Combiner
 				$data = urlencode($file['content']);
 				$data_len = Util::strlen($data);
 
-				// While we can add data to the post and not acceed the post size allowed by the service
+				// While we can add data to the post and not exceed the post size allowed by the service
 				if ($data_len + $post_len < 200000)
 				{
 					$post_data .= $data;

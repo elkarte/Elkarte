@@ -1,23 +1,23 @@
-/**
+/*!
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
- *
+ * @version 1.1
+ */
+
+/**
  * This file contains javascript associated with a autosuggest control.
  */
 
 /**
  * The autosuggest class, used to display a selection list of members
  *
- * @param {type} oOptions
+ * @param {object} oOptions
  */
 function smc_AutoSuggest(oOptions)
 {
@@ -33,7 +33,7 @@ function smc_AutoSuggest(oOptions)
 	this.oSelectedDiv = null;
 	this.aCache = [];
 	this.aDisplayData = [];
-	this.sRetrieveURL = 'sRetrieveURL' in this.opt ? this.opt.sRetrieveURL : '%scripturl%action=suggest;suggest_type=%suggest_type%;search=%search%;%sessionVar%=%sessionID%;xml;time=%time%';
+	this.sRetrieveURL = 'sRetrieveURL' in this.opt ? this.opt.sRetrieveURL : '%scripturl%action=suggest;xml';
 
 	// How many objects can we show at once?
 	this.iMaxDisplayQuantity = 'iMaxDisplayQuantity' in this.opt ? this.opt.iMaxDisplayQuantity : 12;
@@ -47,7 +47,7 @@ function smc_AutoSuggest(oOptions)
 	// Are there any items that should be added in advance?
 	this.aListItems = 'aListItems' in this.opt ? this.opt.aListItems : [];
 
-	this.sItemTemplate = 'sItemTemplate' in this.opt ? this.opt.sItemTemplate : '<input type="hidden" name="%post_name%[]" value="%item_id%" /><a href="%item_href%" class="extern" onclick="window.open(this.href, \'_blank\'); return false;">%item_name%</a>&nbsp;<img src="%images_url%/pm_recipient_delete.png" alt="%delete_text%" title="%delete_text%" onclick="return %self%.deleteAddedItem(%item_id%);" />';
+	this.sItemTemplate = 'sItemTemplate' in this.opt ? this.opt.sItemTemplate : '<input type="hidden" name="%post_name%[]" value="%item_id%" /><a href="%item_href%" class="extern" onclick="window.open(this.href, \'_blank\'); return false;">%item_name%</a>&nbsp;<img src="%images_url%/pm_recipient_delete.png" alt="%delete_text%" title="%delete_text%" onclick="return %self%.deleteAddedItem(%item_id%)" />';
 	this.sTextDeleteItem = 'sTextDeleteItem' in this.opt ? this.opt.sTextDeleteItem : '';
 	this.oCallback = {};
 	this.bDoAutoAdd = false;
@@ -109,7 +109,11 @@ smc_AutoSuggest.prototype.init = function()
 	return true;
 };
 
-// Was it an enter key - if so assume they are trying to select something.
+/**
+ * Handle keypress events for the suggest controller
+ *
+ * @param oEvent
+ */
 smc_AutoSuggest.prototype.handleKey = function(oEvent)
 {
 	// Grab the event object, one way or the other
@@ -140,7 +144,7 @@ smc_AutoSuggest.prototype.handleKey = function(oEvent)
 			return true;
 		break;
 
-		// Enter.
+		// Was it an Enter key - if so assume they are trying to select something.
 		case 13:
 			if (this.aDisplayData.length > 0 && this.oSelectedDiv !== null)
 			{
@@ -404,7 +408,7 @@ smc_AutoSuggest.prototype.deleteAddedItem = function (sItemId)
 // Hide the box.
 smc_AutoSuggest.prototype.autoSuggestHide = function ()
 {
-	// Delay to allow events to propogate through....
+	// Delay to allow events to propagate through....
 	this.oHideTimer = setTimeout(this.opt.sSelf + '.autoSuggestActualHide();', 250);
 };
 
@@ -569,7 +573,7 @@ smc_AutoSuggest.prototype.autoSuggestUpdate = function ()
 	var sRealLastSearch = this.sLastSearch;
 	this.sLastSearch = sSearchString;
 
-	// Either nothing or we've completed a sentance.
+	// Either nothing or we've completed a sentence.
 	if (sSearchString === '' || sSearchString.substr(sSearchString.length - 1) === '"')
 	{
 		this.populateDiv();
@@ -619,10 +623,20 @@ smc_AutoSuggest.prototype.autoSuggestUpdate = function ()
 		this.oXmlRequestHandle.abort();
 
 	// Clean the text handle.
-	sSearchString = sSearchString.php_to8bit().php_urlencode();
+	sSearchString = sSearchString.php_urlencode();
 
 	// Get the document.
-	sendXMLDocument.call(this, this.sRetrieveURL.replace(/%scripturl%/g, elk_prepareScriptUrl(elk_scripturl)).replace(/%suggest_type%/g, this.opt.sSearchType).replace(/%search%/g, sSearchString).replace(/%sessionVar%/g, this.opt.sSessionVar).replace(/%sessionID%/g, this.opt.sSessionId).replace(/%time%/g, new Date().getTime()), '', this.onSuggestionReceived);
+	var obj = {
+			"suggest_type": this.opt.sSearchType,
+			"search": sSearchString,
+			"time": new Date().getTime()
+		},
+		postString;
+
+	// Post values plus session
+	postString = "jsonString=" + JSON.stringify(obj) + "&" + this.opt.sSessionVar + "=" + this.opt.sSessionId;
+
+	sendXMLDocument.call(this, this.sRetrieveURL.replace(/%scripturl%/g, elk_prepareScriptUrl(elk_scripturl)), postString, this.onSuggestionReceived);
 
 	return true;
 };

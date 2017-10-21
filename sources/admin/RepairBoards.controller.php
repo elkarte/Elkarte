@@ -7,18 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Repair boards controller handles a special admin action:
@@ -41,8 +36,9 @@ class RepairBoards_Controller extends Action_Controller
 
 	/**
 	 * Finds or repairs errors in the database to fix possible problems.
-	 * Requires the admin_forum permission.
-	 * Accessed by ?action=admin;area=repairboards.
+	 *
+	 * - Requires the admin_forum permission.
+	 * - Accessed by ?action=admin;area=repairboards.
 	 *
 	 * @uses raw_data sub-template.
 	 */
@@ -55,7 +51,7 @@ class RepairBoards_Controller extends Action_Controller
 		require_once(SUBSDIR . '/RepairBoards.subs.php');
 
 		// Try secure more memory.
-		setMemoryLimit('128M');
+		detectServer()->setMemoryLimit('128M');
 
 		// Print out the top of the webpage.
 		$context['page_title'] = $txt['admin_repair'];
@@ -74,7 +70,7 @@ class RepairBoards_Controller extends Action_Controller
 		);
 
 		// Start displaying errors without fixing them.
-		if (isset($_GET['fixErrors']))
+		if (isset($this->_req->query->fixErrors))
 			checkSession('get');
 
 		// Will want this.
@@ -82,7 +78,7 @@ class RepairBoards_Controller extends Action_Controller
 
 		// Giant if/else. The first displays the forum errors if a variable is not set and asks
 		// if you would like to continue, the other fixes the errors.
-		if (!isset($_GET['fixErrors']))
+		if (!isset($this->_req->query->fixErrors))
 		{
 			$context['error_search'] = true;
 			$context['repair_errors'] = array();
@@ -108,7 +104,7 @@ class RepairBoards_Controller extends Action_Controller
 		else
 		{
 			$context['error_search'] = false;
-			$context['to_fix'] = isset($_SESSION['repairboards_to_fix']) ? $_SESSION['repairboards_to_fix'] : array();
+			$context['to_fix'] = isset($this->_req->session->repairboards_to_fix) ? $this->_req->session->repairboards_to_fix : array();
 
 			require_once(SUBSDIR . '/Boards.subs.php');
 
@@ -126,16 +122,19 @@ class RepairBoards_Controller extends Action_Controller
 			updateSettings(array(
 				'settings_updated' => time(),
 			));
-			updateStats('message');
-			updateStats('topic');
+
+			require_once(SUBSDIR . '/Messages.subs.php');
+			updateMessageStats();
+
+			require_once(SUBSDIR . '/Topic.subs.php');
+			updateTopicStats();
+
 			updateSettings(array(
 				'calendar_updated' => time(),
 			));
 
 			if (!empty($salvageBoardID))
-			{
 				$context['redirect_to_recount'] = true;
-			}
 
 			$_SESSION['repairboards_to_fix'] = null;
 			$_SESSION['repairboards_to_fix2'] = null;

@@ -7,18 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * ManageMembergroups controller, administration page for membergroups.
@@ -28,24 +23,20 @@ if (!defined('ELK'))
 class ManageMembergroups_Controller extends Action_Controller
 {
 	/**
-	 * Groups Settings form
-	 * @var Settings_Form
-	 */
-	protected $_groupSettings;
-
-	/**
-	 * Main dispatcher, the entrance point for all 'Manage Membergroup' actions.
+	 * Main dispatcher, the en\trance point for all 'Manage Membergroup' actions.
 	 *
 	 * What it does:
+	 *
 	 * - It forwards to a function based on the given subaction, default being subaction 'index', or, without manage_membergroup
 	 * permissions, then 'settings'.
 	 * - Called by ?action=admin;area=membergroups.
 	 * - Requires the manage_membergroups or the admin_forum permission.
 	 *
+	 * @event integrate_sa_manage_membergroups Used to add more sub actions
 	 * @uses ManageMembergroups template.
 	 * @uses ManageMembers language file.
 	 * @see Action_Controller::action_index()
-	*/
+	 */
 	public function action_index()
 	{
 		global $context, $txt;
@@ -74,9 +65,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			'members' => array(
 				'controller' => 'Groups_Controller',
 				'function' => 'action_index',
-				'permission' => 'manage_membergroups',
-				'file' => 'Groups.controller.php',
-				'dir' => CONTROLLERDIR),
+				'permission' => 'manage_membergroups'),
 			'settings' => array(
 				'controller' => $this,
 				'function' => 'action_groupSettings_display',
@@ -93,7 +82,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		);
 
 		// Default to sub action 'index' or 'settings' depending on permissions.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('manage_membergroups') ? 'index' : 'settings');
+		$subAction = isset($this->_req->query->sa) && isset($subActions[$this->_req->query->sa]) ? $this->_req->query->sa : (allowedTo('manage_membergroups') ? 'index' : 'settings');
 
 		// Set that subaction, call integrate_sa_manage_membergroups
 		$subAction = $action->initialize($subActions, $subAction);
@@ -110,11 +99,14 @@ class ManageMembergroups_Controller extends Action_Controller
 	 * Shows an overview of the current membergroups.
 	 *
 	 * What it does:
+	 *
 	 * - Called by ?action=admin;area=membergroups.
 	 * - Requires the manage_membergroups permission.
 	 * - Splits the membergroups in regular ones and post count based groups.
 	 * - It also counts the number of members part of each membergroup.
 	 *
+	 * @event integrate_list_regular_membergroups_list
+	 * @event integrate_list_post_count_membergroups_list
 	 * @uses ManageMembergroups template, main.
 	 */
 	public function action_list()
@@ -127,7 +119,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		$listOptions = array(
 			'id' => 'regular_membergroups_list',
 			'title' => $txt['membergroups_regular'],
-			'base_href' => $scripturl . '?action=admin;area=membergroups' . (isset($_REQUEST['sort2']) ? ';sort2=' . urlencode($_REQUEST['sort2']) : ''),
+			'base_href' => $scripturl . '?action=admin;area=membergroups' . (isset($this->_req->query->sort2) ? ';sort2=' . urlencode($this->_req->query->sort2) : ''),
 			'default_sort_col' => 'name',
 			'get_items' => array(
 				'file' => SUBSDIR . '/Membergroups.subs.php',
@@ -145,25 +137,25 @@ class ManageMembergroups_Controller extends Action_Controller
 						'value' => $txt['membergroups_name'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $scripturl;
 
 							// Since the moderator group has no explicit members, no link is needed.
-							if ($rowData[\'id_group\'] == 3)
-								$group_name = $rowData[\'group_name\'];
+							if ($rowData['id_group'] == 3)
+								$group_name = $rowData['group_name'];
 							else
 							{
-								$group_name = sprintf(\'<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d">%3$s</a>\', $scripturl, $rowData[\'id_group\'], $rowData[\'group_name_color\']);
+								$group_name = sprintf('<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d">%3$s</a>', $scripturl, $rowData['id_group'], $rowData['group_name_color']);
 							}
 
 							// Add a help option for moderator and administrator.
-							if ($rowData[\'id_group\'] == 1)
-								$group_name .= sprintf(\' (<a href="%1$s?action=quickhelp;help=membergroup_administrator" onclick="return reqOverlayDiv(this.href);">?</a>)\', $scripturl);
-							elseif ($rowData[\'id_group\'] == 3)
-								$group_name .= sprintf(\' (<a href="%1$s?action=quickhelp;help=membergroup_moderator" onclick="return reqOverlayDiv(this.href);">?</a>)\', $scripturl);
+							if ($rowData['id_group'] == 1)
+								$group_name .= sprintf(' (<a href="%1$s?action=quickhelp;help=membergroup_administrator" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)', $scripturl);
+							elseif ($rowData['id_group'] == 3)
+								$group_name .= sprintf(' (<a href="%1$s?action=quickhelp;help=membergroup_moderator" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)', $scripturl);
 
 							return $group_name;
-						'),
+						},
 					),
 					'sort' => array(
 						'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, mg.group_name',
@@ -175,14 +167,14 @@ class ManageMembergroups_Controller extends Action_Controller
 						'value' => $txt['membergroups_icons'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $settings;
 
-							if (!empty($rowData[\'icons\'][0]) && !empty($rowData[\'icons\'][1]))
-								return str_repeat(\'<img src="\' . $settings[\'images_url\'] . \'/group_icons/\' . $rowData[\'icons\'][1] . \'" alt="*" />\', $rowData[\'icons\'][0]);
+							if (!empty($rowData['icons'][0]) && !empty($rowData['icons'][1]))
+								return str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $rowData['icons'][1] . '" alt="*" />', $rowData['icons'][0]);
 							else
-								return \'\';
-						'),
+								return '';
+						},
 					),
 					'sort' => array(
 						'default' => 'mg.icons',
@@ -194,12 +186,12 @@ class ManageMembergroups_Controller extends Action_Controller
 						'value' => $txt['membergroups_members_top'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $txt;
 
 							// No explicit members for the moderator group.
-							return $rowData[\'id_group\'] == 3 ? $txt[\'membergroups_guests_na\'] : comma_format($rowData[\'num_members\']);
-						'),
+							return $rowData['id_group'] == 3 ? $txt['membergroups_guests_na'] : comma_format($rowData['num_members']);
+						},
 					),
 					'sort' => array(
 						'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, 1',
@@ -229,14 +221,13 @@ class ManageMembergroups_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		// The second list shows the post count based groups.
 		$listOptions = array(
 			'id' => 'post_count_membergroups_list',
 			'title' => $txt['membergroups_post'],
-			'base_href' => $scripturl . '?action=admin;area=membergroups' . (isset($_REQUEST['sort']) ? ';sort=' . urlencode($_REQUEST['sort']) : ''),
+			'base_href' => $scripturl . '?action=admin;area=membergroups' . (isset($this->_req->query->sort) ? ';sort=' . urlencode($this->_req->query->sort) : ''),
 			'default_sort_col' => 'required_posts',
 			'request_vars' => array(
 				'sort' => 'sort2',
@@ -258,11 +249,11 @@ class ManageMembergroups_Controller extends Action_Controller
 						'value' => $txt['membergroups_name'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $scripturl;
 
-							return sprintf(\'<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d">%3$s</a>\', $scripturl, $rowData[\'id_group\'], $rowData[\'group_name_color\']);
-						'),
+							return sprintf('<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d">%3$s</a>', $scripturl, $rowData['id_group'], $rowData['group_name_color']);
+						},
 					),
 					'sort' => array(
 						'default' => 'mg.group_name',
@@ -274,14 +265,14 @@ class ManageMembergroups_Controller extends Action_Controller
 						'value' => $txt['membergroups_icons'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $settings;
 
-							if (!empty($rowData[\'icons\'][0]) && !empty($rowData[\'icons\'][1]))
-								return str_repeat(\'<img src="\' . $settings[\'images_url\'] . \'/group_icons/\' . $rowData[\'icons\'][1] . \'" alt="*" />\', $rowData[\'icons\'][0]);
+							if (!empty($rowData['icons'][0]) && !empty($rowData['icons'][1]))
+								return str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $rowData['icons'][1] . '" alt="*" />', $rowData['icons'][0]);
 							else
-								return \'\';
-						'),
+								return '';
+						},
 					),
 					'sort' => array(
 						'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, icons',
@@ -342,11 +333,13 @@ class ManageMembergroups_Controller extends Action_Controller
 	 * This function handles adding a membergroup and setting some initial properties.
 	 *
 	 * What it does:
-	 * -Called by ?action=admin;area=membergroups;sa=add.
-	 * -It requires the manage_membergroups permission.
-	 * -Allows to use a predefined permission profile or copy one from another group.
-	 * -Redirects to action=admin;area=membergroups;sa=edit;group=x.
 	 *
+	 * - Called by ?action=admin;area=membergroups;sa=add.
+	 * - It requires the manage_membergroups permission.
+	 * - Allows to use a predefined permission profile or copy one from another group.
+	 * - Redirects to action=admin;area=membergroups;sa=edit;group=x.
+	 *
+	 * @event integrate_add_membergroup passed $id_group and $postCountBasedGroup
 	 * @uses the new_group sub template of ManageMembergroups.
 	 */
 	public function action_add()
@@ -356,75 +349,73 @@ class ManageMembergroups_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// A form was submitted, we can start adding.
-		if (isset($_POST['group_name']) && trim($_POST['group_name']) != '')
+		if (isset($this->_req->post->group_name) && trim($this->_req->post->group_name) != '')
 		{
 			checkSession();
 			validateToken('admin-mmg');
 
-			$postCountBasedGroup = isset($_POST['min_posts']) && (!isset($_POST['postgroup_based']) || !empty($_POST['postgroup_based']));
-			$_POST['group_type'] = !isset($_POST['group_type']) || $_POST['group_type'] < 0 || $_POST['group_type'] > 3 || ($_POST['group_type'] == 1 && !allowedTo('admin_forum')) ? 0 : (int) $_POST['group_type'];
+			$postCountBasedGroup = isset($this->_req->post->min_posts) && (!isset($this->_req->post->postgroup_based) || !empty($this->_req->post->postgroup_based));
+			$group_type = !isset($this->_req->post->group_type) || $this->_req->post->group_type < 0 || $this->_req->post->group_type > 3 || ($this->_req->post->group_type == 1 && !allowedTo('admin_forum')) ? 0 : (int) $this->_req->post->group_type;
 
 			// @todo Check for members with same name too?
 
-			// Don't allow copying of a real priviledged person!
-			require_once(SUBSDIR . '/Permission.subs.php');
+			// Don't allow copying of a real privileged person!
+			$permissionsObject = new Permissions;
+			$illegal_permissions = $permissionsObject->getIllegalPermissions();
+			$minposts = !empty($this->_req->post->min_posts) ? (int) $this->_req->post->min_posts : '-1';
 
-			loadIllegalPermissions();
-			$id_group = getMaxGroupID() + 1;
-			$minposts = !empty($_POST['min_posts']) ? (int) $_POST['min_posts'] : '-1';
-
-			addMembergroup($id_group, $_POST['group_name'], $minposts, $_POST['group_type']);
+			$id_group = createMembergroup($this->_req->post->group_name, $minposts, $group_type);
 
 			call_integration_hook('integrate_add_membergroup', array($id_group, $postCountBasedGroup));
 
 			// Update the post groups now, if this is a post group!
-			if (isset($_POST['min_posts']))
-				updateStats('postgroups');
+			if (isset($this->_req->post->min_posts))
+			{
+				require_once(SUBSDIR . '/Membergroups.subs.php');
+				updatePostGroupStats();
+			}
 
 			// You cannot set permissions for post groups if they are disabled.
 			if ($postCountBasedGroup && empty($modSettings['permission_enable_postgroups']))
-				$_POST['perm_type'] = '';
+				$this->_req->post->perm_type = '';
 
-			if ($_POST['perm_type'] == 'predefined')
+			if ($this->_req->post->perm_type == 'predefined')
 			{
 				// Set default permission level.
 				require_once(SUBSDIR . '/ManagePermissions.subs.php');
-				setPermissionLevel($_POST['level'], $id_group, null);
+				setPermissionLevel($this->_req->post->level, $id_group, null);
 			}
 			// Copy or inherit the permissions!
-			elseif ($_POST['perm_type'] == 'copy' || $_POST['perm_type'] == 'inherit')
+			elseif ($this->_req->post->perm_type == 'copy' || $this->_req->post->perm_type == 'inherit')
 			{
-				$copy_id = $_POST['perm_type'] == 'copy' ? (int) $_POST['copyperm'] : (int) $_POST['inheritperm'];
+				$copy_id = $this->_req->post->perm_type == 'copy' ? (int) $this->_req->post->copyperm : (int) $this->_req->post->inheritperm;
 
 				// Are you a powerful admin?
 				if (!allowedTo('admin_forum'))
 				{
 					$copy_type = membergroupById($copy_id);
 
-					// Protected groups are... well, protected!
+					// Keep protected groups ... well, protected!
 					if ($copy_type['group_type'] == 1)
-						fatal_lang_error('membergroup_does_not_exist');
+						throw new Elk_Exception('membergroup_does_not_exist');
 				}
 
-				// Don't allow copying of a real priviledged person!
-				require_once(SUBSDIR . '/Permission.subs.php');
-				loadIllegalPermissions();
-
-				copyPermissions($id_group, $copy_id, $context['illegal_permissions']);
+				// Don't allow copying of a real privileged person!
+				copyPermissions($id_group, $copy_id, $illegal_permissions);
 				copyBoardPermissions($id_group, $copy_id);
 
 				// Also get some membergroup information if we're copying and not copying from guests...
-				if ($copy_id > 0 && $_POST['perm_type'] == 'copy')
+				if ($copy_id > 0 && $this->_req->post->perm_type == 'copy')
 					updateCopiedGroup($id_group, $copy_id);
 
 				// If inheriting say so...
-				elseif ($_POST['perm_type'] == 'inherit')
+				elseif ($this->_req->post->perm_type == 'inherit')
 					updateInheritedGroup($id_group, $copy_id);
 			}
 
 			// Make sure all boards selected are stored in a proper array.
 			$changed_boards = array();
-			$accesses = empty($_POST['boardaccess']) || !is_array($_POST['boardaccess']) ? array() : $_POST['boardaccess'];
+			$accesses = empty($this->_req->post->boardaccess) || !is_array($this->_req->post->boardaccess) ? array() : $this->_req->post->boardaccess;
 			$changed_boards['allow'] = array();
 			$changed_boards['deny'] = array();
 			$changed_boards['ignore'] = array();
@@ -439,7 +430,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			}
 
 			// If this is joinable then set it to show group membership in people's profiles.
-			if (empty($modSettings['show_group_membership']) && $_POST['group_type'] > 1)
+			if (empty($modSettings['show_group_membership']) && $group_type > 1)
 				updateSettings(array('show_group_membership' => 1));
 
 			// Rebuild the group cache.
@@ -448,7 +439,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			));
 
 			// We did it.
-			logAction('add_group', array('group' => $_POST['group_name']), 'admin');
+			logAction('add_group', array('group' => $this->_req->post->group_name), 'admin');
 
 			// Go change some more settings.
 			redirectexit('action=admin;area=membergroups;sa=edit;group=' . $id_group);
@@ -457,8 +448,8 @@ class ManageMembergroups_Controller extends Action_Controller
 		// Just show the 'add membergroup' screen.
 		$context['page_title'] = $txt['membergroups_new_group'];
 		$context['sub_template'] = 'new_group';
-		$context['post_group'] = isset($_REQUEST['postgroup']);
-		$context['undefined_group'] = !isset($_REQUEST['postgroup']) && !isset($_REQUEST['generalgroup']);
+		$context['post_group'] = isset($this->_req->query->postgroup);
+		$context['undefined_group'] = !isset($this->_req->query->postgroup) && !isset($this->_req->query->generalgroup);
 		$context['allow_protected'] = allowedTo('admin_forum');
 
 		if (!empty($modSettings['deny_boards_access']))
@@ -480,6 +471,7 @@ class ManageMembergroups_Controller extends Action_Controller
 	 * Deleting a membergroup by URL (not implemented).
 	 *
 	 * What it does:
+	 *
 	 * - Called by ?action=admin;area=membergroups;sa=delete;group=x;session_var=y.
 	 * - Requires the manage_membergroups permission.
 	 * - Redirects to ?action=admin;area=membergroups.
@@ -491,7 +483,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		checkSession('get');
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
-		deleteMembergroups((int) $_REQUEST['group']);
+		deleteMembergroups((int) $this->_req->query->group);
 
 		// Go back to the membergroup index.
 		redirectexit('action=admin;area=membergroups;');
@@ -501,19 +493,23 @@ class ManageMembergroups_Controller extends Action_Controller
 	 * Editing a membergroup.
 	 *
 	 * What it does:
+	 *
 	 * - Screen to edit a specific membergroup.
 	 * - Called by ?action=admin;area=membergroups;sa=edit;group=x.
 	 * - It requires the manage_membergroups permission.
 	 * - Also handles the delete button of the edit form.
 	 * - Redirects to ?action=admin;area=membergroups.
 	 *
+	 * @event integrate_save_membergroup, passed $current_group['id_group']
+	 * @event integrate_view_membergroup
 	 * @uses the edit_group sub template of ManageMembergroups.
 	 */
 	public function action_edit()
 	{
 		global $context, $txt, $modSettings;
 
-		$current_group_id = isset($_REQUEST['group']) ? (int) $_REQUEST['group'] : 0;
+		$current_group_id = isset($this->_req->query->group) ? (int) $this->_req->query->group : 0;
+		$current_group = array();
 
 		if (!empty($modSettings['deny_boards_access']))
 			loadLanguage('ManagePermissions');
@@ -526,16 +522,16 @@ class ManageMembergroups_Controller extends Action_Controller
 
 		// Now, do we have a valid id?
 		if (!allowedTo('admin_forum') && !empty($current_group_id) && $current_group['group_type'] == 1)
-			fatal_lang_error('membergroup_does_not_exist', false);
+			throw new Elk_Exception('membergroup_does_not_exist', false);
 
 		// The delete this membergroup button was pressed.
-		if (isset($_POST['delete']))
+		if (isset($this->_req->post->delete))
 		{
 			checkSession();
 			validateToken('admin-mmg');
 
 			if (empty($current_group_id))
-				fatal_lang_error('membergroup_does_not_exist', false);
+				throw new Elk_Exception('membergroup_does_not_exist', false);
 
 			// Let's delete the group
 			deleteMembergroups($current_group['id_group']);
@@ -543,16 +539,20 @@ class ManageMembergroups_Controller extends Action_Controller
 			redirectexit('action=admin;area=membergroups;');
 		}
 		// A form was submitted with the new membergroup settings.
-		elseif (isset($_POST['save']))
+		elseif (isset($this->_req->post->save))
 		{
 			// Validate the session.
 			checkSession();
 			validateToken('admin-mmg');
 
 			if (empty($current_group_id))
-				fatal_lang_error('membergroup_does_not_exist', false);
+				throw new Elk_Exception('membergroup_does_not_exist', false);
 
-			require_once(SUBSDIR . '/DataValidator.class.php');
+			// Empty values will be replaced by validator values where they exist
+			$empty_post = array('max_messages' => null, 'min_posts' => null, 'group_type' => null, 'group_desc' => '',
+				'group_name' => '', 'group_hidden' => null, 'group_inherit' => null, 'icon_count' => null,
+				'icon_image' => '', 'online_color' => '', 'boardaccess' => null);
+
 			$validator = new Data_Validator();
 
 			// Cleanup the inputs! :D
@@ -574,30 +574,36 @@ class ManageMembergroups_Controller extends Action_Controller
 			$validator->validation_rules(array(
 				'boardaccess' => 'contains[allow,ignore,deny]',
 			));
-			$validator->validate($_POST);
+			$validator->validate($this->_req->post);
+
+			// Insert the clean data
+			$our_post = array_replace((array) $this->_req->post, $empty_post, $validator->validation_data());
 
 			// Can they really inherit from this group?
-			if ($validator->group_inherit != -2 && !allowedTo('admin_forum'))
-				$inherit_type = membergroupById($validator->group_inherit);
+			$inherit_type = array();
+			if ($our_post['group_inherit'] != -2 && !allowedTo('admin_forum'))
+			{
+				$inherit_type = membergroupById($our_post['group_inherit']);
+			}
 
-			$min_posts = $validator->group_type == -1 && $validator->min_posts >= 0 && $current_group['id_group'] > 3 ? $validator->min_posts : ($current_group['id_group'] == 4 ? 0 : -1);
-			$group_inherit = $current_group['id_group'] > 1 && $current_group['id_group'] != 3 && (empty($inherit_type['group_type']) || $inherit_type['group_type'] != 1) ? $validator->group_inherit : -2;
+			$min_posts = $our_post['group_type'] == -1 && $our_post['min_posts'] >= 0 && $current_group['id_group'] > 3 ? $our_post['min_posts'] : ($current_group['id_group'] == 4 ? 0 : -1);
+			$group_inherit = $current_group['id_group'] > 1 && $current_group['id_group'] != 3 && (empty($inherit_type['group_type']) || $inherit_type['group_type'] != 1) ? $our_post['group_inherit'] : -2;
 
 			//@todo Don't set online_color for the Moderators group?
 
 			// Do the update of the membergroup settings.
 			$properties = array(
-				'max_messages' => $validator->max_messages,
+				'max_messages' => $our_post['max_messages'],
 				'min_posts' => $min_posts,
-				'group_type' => $validator->group_type < 0 || $validator->group_type > 3 || ($validator->group_type == 1 && !allowedTo('admin_forum')) ? 0 : $validator->group_type,
-				'hidden' => !$validator->group_hidden || $min_posts != -1 || $current_group['id_group'] == 3 ? 0 : $validator->group_hidden,
+				'group_type' => $our_post['group_type'] < 0 || $our_post['group_type'] > 3 || ($our_post['group_type'] == 1 && !allowedTo('admin_forum')) ? 0 : $our_post['group_type'],
+				'hidden' => !$our_post['group_hidden'] || $min_posts != -1 || $current_group['id_group'] == 3 ? 0 : $our_post['group_hidden'],
 				'id_parent' => $group_inherit,
 				'current_group' => $current_group['id_group'],
-				'group_name' => $validator->group_name,
-				'online_color' => $validator->online_color,
-				'icons' => $validator->icon_count <= 0 ? '' : min($validator->icon_count, 10) . '#' . $validator->icon_image,
+				'group_name' => $our_post['group_name'],
+				'online_color' => $our_post['online_color'],
+				'icons' => $our_post['icon_count'] <= 0 ? '' : min($our_post['icon_count'], 10) . '#' . $our_post['icon_image'],
 				// /me wonders why admin is *so* special
-				'description' => $current_group['id_group'] == 1 || $validator->group_type != -1 ? $validator->group_desc : '',
+				'description' => $current_group['id_group'] == 1 || $our_post['group_type'] != -1 ? $our_post['group_desc'] : '',
 			);
 			updateMembergroupProperties($properties);
 
@@ -611,9 +617,13 @@ class ManageMembergroups_Controller extends Action_Controller
 				$changed_boards['deny'] = array();
 				$changed_boards['ignore'] = array();
 
-				if ($validator->boardaccess)
-					foreach ($validator->boardaccess as $group_id => $action)
+				if ($our_post['boardaccess'])
+				{
+					foreach ($our_post['boardaccess'] as $group_id => $action)
+					{
 						$changed_boards[$action][] = (int) $group_id;
+					}
+				}
 
 				foreach (array('allow', 'deny') as $board_action)
 				{
@@ -632,7 +642,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			elseif ($current_group['id_group'] != 3)
 			{
 				// Making it a hidden group? If so remove everyone with it as primary group (Actually, just make them additional).
-				if ($validator->group_hidden == 2)
+				if ($our_post['group_hidden'] == 2)
 					setGroupToHidden($current_group['id_group']);
 
 				// Either way, let's check our "show group membership" setting is correct.
@@ -640,17 +650,17 @@ class ManageMembergroups_Controller extends Action_Controller
 			}
 
 			// Do we need to set inherited permissions?
-			if ($group_inherit != -2 && $group_inherit != $_POST['old_inherit'])
+			if ($group_inherit != -2 && $group_inherit != $this->_req->post->old_inherit)
 			{
-				require_once(SUBSDIR . '/Permission.subs.php');
-				updateChildPermissions($group_inherit);
+				$permissionsObject = new Permissions;
+				$permissionsObject->updateChild($group_inherit);
 			}
 
-			// Finally, moderators!
-			$moderator_string = isset($_POST['group_moderators']) ? trim($_POST['group_moderators']) : '';
+			// Lastly, moderators!
+			$moderator_string = isset($this->_req->post->group_moderators) ? trim($this->_req->post->group_moderators) : '';
 			detachGroupModerators($current_group['id_group']);
 
-			if ((!empty($moderator_string) || !empty($_POST['moderator_list'])) && $min_posts == -1 && $current_group['id_group'] != 3)
+			if ((!empty($moderator_string) || !empty($this->_req->post->moderator_list)) && $min_posts == -1 && $current_group['id_group'] != 3)
 			{
 				// Get all the usernames from the string
 				if (!empty($moderator_string))
@@ -673,7 +683,7 @@ class ManageMembergroups_Controller extends Action_Controller
 				else
 				{
 					$moderators = array();
-					foreach ($_POST['moderator_list'] as $moderator)
+					foreach ($this->_req->post->moderator_list as $moderator)
 						$moderators[] = (int) $moderator;
 
 					$group_moderators = array();
@@ -692,7 +702,8 @@ class ManageMembergroups_Controller extends Action_Controller
 			}
 
 			// There might have been some post group changes.
-			updateStats('postgroups');
+			require_once(SUBSDIR . '/Membergroups.subs.php');
+			updatePostGroupStats();
 
 			// We've definitely changed some group stuff.
 			updateSettings(array(
@@ -700,7 +711,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			));
 
 			// Log the edit.
-			logAction('edited_group', array('group' => $validator->group_name), 'admin');
+			logAction('edited_group', array('group' => $our_post['group_name']), 'admin');
 
 			redirectexit('action=admin;area=membergroups');
 		}
@@ -709,7 +720,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		$row = membergroupById($current_group['id_group'], true);
 
 		if (empty($row) || (!allowedTo('admin_forum') && $row['group_type'] == 1))
-			fatal_lang_error('membergroup_does_not_exist', false);
+			throw new Elk_Exception('membergroup_does_not_exist', false);
 
 		$row['icons'] = explode('#', $row['icons']);
 
@@ -770,10 +781,12 @@ class ManageMembergroups_Controller extends Action_Controller
 	 * Set some general membergroup settings and permissions.
 	 *
 	 * What it does:
+	 *
 	 * - Called by ?action=admin;area=membergroups;sa=settings
 	 * - Requires the admin_forum permission (and manage_permissions for changing permissions)
 	 * - Redirects to itself.
 	 *
+	 * @event integrate_save_membergroup_settings
 	 * @uses membergroup_settings sub template of ManageMembergroups.
 	 */
 	public function action_groupSettings_display()
@@ -783,24 +796,21 @@ class ManageMembergroups_Controller extends Action_Controller
 		$context['sub_template'] = 'show_settings';
 		$context['page_title'] = $txt['membergroups_settings'];
 
-		// Needed for the settings functions.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		// initialize the form
-		$this->_initGroupSettingsForm();
+		// Instantiate the form
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// Don't allow assignment of guests.
-		$context['permissions_excluded'] = array(-1);
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_settings());
 
-		$config_vars = $this->_groupSettings->settings();
-
-		if (isset($_REQUEST['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 			call_integration_hook('integrate_save_membergroup_settings');
 
 			// Yeppers, saving this...
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=membergroups;sa=settings');
 		}
 
@@ -808,28 +818,13 @@ class ManageMembergroups_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=membergroups;save;sa=settings';
 		$context['settings_title'] = $txt['membergroups_settings'];
 
-		// We need this for the in-line permissions
-		createToken('admin-mp');
-
-		Settings_Form::prepare_db($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
 	 * Return the configuration settings for membergroups management.
-	 */
-	private function _initGroupSettingsForm()
-	{
-		// Instantiate the form
-		$this->_groupSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_groupSettings->settings($config_vars);
-	}
-
-	/**
-	 * Return the configuration settings for membergroups management.
+	 *
+	 * @event integrate_modify_membergroup_settings
 	 */
 	private function _settings()
 	{

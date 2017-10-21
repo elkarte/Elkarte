@@ -12,3 +12,4 @@
 *.otf binary
 *.woff binary
 *.eot binary
+*.phar binary

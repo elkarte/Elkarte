@@ -11,28 +11,24 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.10
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Create a thumbnail of the given source.
  *
  * @uses resizeImageFile() function to achieve the resize.
- *
  * @package Graphics
- * @param string $source
- * @param int $max_width
- * @param int $max_height
+ *
+ * @param string $source The name of the source image
+ * @param int $max_width The maximum allowed width
+ * @param int $max_height The maximum allowed height
+ *
  * @return boolean whether the thumbnail creation was successful.
  */
 function createThumbnail($source, $max_width, $max_height)
@@ -41,11 +37,9 @@ function createThumbnail($source, $max_width, $max_height)
 
 	$destName = $source . '_thumb.tmp';
 
-	// Do the actual resize.
-	if (!empty($modSettings['attachment_thumb_png']))
-		$success = resizeImageFile($source, $destName, $max_width, $max_height, 3);
-	else
-		$success = resizeImageFile($source, $destName, $max_width, $max_height);
+	// Do the actual resize, thumbnails by default strip EXIF data to save space
+	$format = !empty($modSettings['attachment_thumb_png']) ? 3 : 0;
+	$success = resizeImageFile($source, $destName, $max_width, $max_height, $format, true);
 
 	// Okay, we're done with the temporary stuff.
 	$destName = substr($destName, 0, -4);
@@ -61,15 +55,24 @@ function createThumbnail($source, $max_width, $max_height)
 }
 
 /**
- * Used to re-econodes an image to a specifed image format
+ * Used to re-encodes an image to a specified image format
+ *
+ * What it does:
  *
  * - creates a copy of the file at the same location as fileName.
  * - the file would have the format preferred_format if possible, otherwise the default format is jpeg.
  * - the function makes sure that all non-essential image contents are disposed.
  *
  * @package Graphics
- * @param string $fileName
- * @param int $preferred_format = 0
+ * @param string $fileName The path to the file
+ * @param int $preferred_format The preferred format
+ *   - 0 to automatically determine
+ *   - 1 for gif
+ *   - 2 for jpg
+ *   - 3 for png
+ *   - 6 for bmp
+ *   - 15 for wbmp
+ *
  * @return boolean true on success, false on failure.
  */
 function reencodeImage($fileName, $preferred_format = 0)
@@ -85,37 +88,44 @@ function reencodeImage($fileName, $preferred_format = 0)
 	if (!unlink($fileName))
 		return false;
 
-	if (!rename($fileName . '.tmp', $fileName))
-		return false;
-
-	return true;
+	return rename($fileName . '.tmp', $fileName);
 }
 
 /**
- * Searches through the file to see if there's potentialy harmful non-binary content.
+ * Searches through the file to see if there's potentially harmful non-binary content.
+ *
+ * What it does:
  *
  * - if extensiveCheck is true, searches for asp/php short tags as well.
  *
  * @package Graphics
- * @param string $fileName
- * @param bool $extensiveCheck = false
+ *
+ * @param string $fileName The path to the file
+ * @param bool   $extensiveCheck = false if it should perform extensive checks
+ *
+ * @return bool Whether the image appears to be safe
+ * @throws Elk_Exception attach_timeout
  */
 function checkImageContents($fileName, $extensiveCheck = false)
 {
 	$fp = fopen($fileName, 'rb');
 	if (!$fp)
-		fatal_lang_error('attach_timeout');
+	{
+		loadLanguage('Post');
+		throw new Elk_Exception('attach_timeout');
+	}
 
 	$prev_chunk = '';
 	while (!feof($fp))
 	{
 		$cur_chunk = fread($fp, 8192);
+		$test_chunk = $prev_chunk . $cur_chunk;
 
 		// Though not exhaustive lists, better safe than sorry.
 		if (!empty($extensiveCheck))
 		{
 			// Paranoid check. Some like it that way.
-			if (preg_match('~(iframe|\\<\\?|\\<%|html|eval|body|script\W|(?-i)[CFZ]WS[\x01-\x0E])~i', $prev_chunk . $cur_chunk) === 1)
+			if (preg_match('~<\\?php|<script\W|(?-i)[CFZ]WS[\x01-\x0E]~i', $test_chunk) === 1)
 			{
 				fclose($fp);
 				return false;
@@ -123,15 +133,17 @@ function checkImageContents($fileName, $extensiveCheck = false)
 		}
 		else
 		{
-			// Check for potential infection
-			if (preg_match('~(iframe|(?<!cellTextIs)html|eval|body|script\W|(?-i)[CFZ]WS[\x01-\x0E])~i', $prev_chunk . $cur_chunk) === 1)
+			// Check for potential php injection
+			if (preg_match('~<\\?php|<script\s+language\s*=\s*(?:php|"php"|\'php\')\s*>~i', $test_chunk) === 1)
 			{
 				fclose($fp);
 				return false;
 			}
 		}
+
 		$prev_chunk = $cur_chunk;
 	}
+
 	fclose($fp);
 
 	return true;
@@ -142,6 +154,8 @@ function checkImageContents($fileName, $extensiveCheck = false)
  * whether the GD2 library is present.
  *
  * @package Graphics
+ *
+ * @return bool Whether or not GD is available.
  */
 function checkGD()
 {
@@ -161,6 +175,8 @@ function checkGD()
  * Checks whether the Imagick class is present.
  *
  * @package Graphics
+ *
+ * @return bool Whether or not the Imagick extension is available.
  */
 function checkImagick()
 {
@@ -172,15 +188,23 @@ function checkImagick()
  *
  * @package Graphics
  * @param int[] $sizes image size
+ *
+ * @return bool Whether or not the memory is available.
  */
 function imageMemoryCheck($sizes)
 {
 	global $modSettings;
 
+	// Just to be sure
+	if (!is_array($sizes) || $sizes[0] === -1)
+	{
+		return true;
+	}
+
 	// Doing the old 'set it and hope' way?
 	if (empty($modSettings['attachment_thumb_memory']))
 	{
-		setMemoryLimit('128M');
+		detectServer()->setMemoryLimit('128M');
 		return true;
 	}
 
@@ -192,28 +216,39 @@ function imageMemoryCheck($sizes)
 	$needed_memory = ($sizes[0] * $sizes[1] * 5);
 
 	// If we need more, lets try to get it
-	return setMemoryLimit($needed_memory, true);
+	return detectServer()->setMemoryLimit($needed_memory, true);
 }
 
 /**
- * Resizes an image from a remote location or a local file.
+ * Resize an image from a remote location or a local file.
+ *
+ * What it does:
  *
  * - Puts the resized image at the destination location.
  * - The file would have the format preferred_format if possible,
  * otherwise the default format is jpeg.
  *
  * @package Graphics
- * @param string $source
- * @param string $destination
- * @param int $max_width
- * @param int $max_height
- * @param int $preferred_format = 0
+ *
+ * @param string $source The name of the source image
+ * @param string $destination The name of the destination image
+ * @param int $max_width The maximum allowed width
+ * @param int $max_height The maximum allowed height
+ * @param int $preferred_format Used by Imagick/resizeImage
+ * @param bool $strip Allow IM to remove exif data as GD always will
+ *
+ * @return boolean Whether the thumbnail creation was successful.
  */
-function resizeImageFile($source, $destination, $max_width, $max_height, $preferred_format = 0)
+function resizeImageFile($source, $destination, $max_width, $max_height, $preferred_format = 0, $strip = false)
 {
 	// Nothing to do without GD or IM
 	if (!checkGD() && !checkImagick())
 		return false;
+
+	if (!file_exists($source))
+	{
+		return false;
+	}
 
 	static $default_formats = array(
 		'1' => 'gif',
@@ -224,31 +259,35 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 	);
 
 	require_once(SUBSDIR . '/Package.subs.php');
+	require_once(SUBSDIR . '/Attachments.subs.php');
 
 	// Get the image file, we have to work with something after all
 	$fp_destination = fopen($destination, 'wb');
-	if ($fp_destination && (substr($source, 0, 7) == 'http://' || substr($source, 0, 8) == 'https://'))
+	if ($fp_destination && (substr($source, 0, 7) === 'http://' || substr($source, 0, 8) === 'https://'))
 	{
 		$fileContents = fetch_web_data($source);
 
 		fwrite($fp_destination, $fileContents);
 		fclose($fp_destination);
 
-		$sizes = @getimagesize($destination);
+		$sizes = elk_getimagesize($destination);
 	}
 	elseif ($fp_destination)
 	{
-		$sizes = @getimagesize($source);
+		$sizes = elk_getimagesize($source);
 
 		$fp_source = fopen($source, 'rb');
 		if ($fp_source !== false)
 		{
 			while (!feof($fp_source))
+			{
 				fwrite($fp_destination, fread($fp_source, 8192));
+			}
 			fclose($fp_source);
 		}
 		else
 			$sizes = array(-1, -1, -1);
+
 		fclose($fp_destination);
 	}
 	// We can't get to the file.
@@ -261,19 +300,25 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 
 	// A known and supported format?
 	if (checkImagick() && isset($default_formats[$sizes[2]]))
-		return resizeImage(null, $destination, null, null, $max_width, $max_height, true, $preferred_format);
+	{
+		return resizeImage(null, $destination, null, null, $max_width, $max_height, true, $preferred_format, $strip);
+	}
 	elseif (checkGD() && isset($default_formats[$sizes[2]]) && function_exists('imagecreatefrom' . $default_formats[$sizes[2]]))
 	{
 		$imagecreatefrom = 'imagecreatefrom' . $default_formats[$sizes[2]];
 		if ($src_img = @$imagecreatefrom($destination))
+		{
 			return resizeImage($src_img, $destination, imagesx($src_img), imagesy($src_img), $max_width === null ? imagesx($src_img) : $max_width, $max_height === null ? imagesy($src_img) : $max_height, true, $preferred_format);
+		}
 	}
 
 	return false;
 }
 
 /**
- * Resizes an image proportionally to fit within the defined max_width and max_height limits
+ * Resize an image proportionally to fit within the defined max_width and max_height limits
+ *
+ * What it does:
  *
  * - Will do nothing to the image if the file fits within the size limits
  * - If Image Magick is present it will use those function over any GD solutions
@@ -287,14 +332,23 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
  * @package Graphics
  * @param resource|null $src_img null for Imagick images, resource form imagecreatefrom for GD
  * @param string $destName
- * @param int $src_width
- * @param int $src_height
- * @param int $max_width
- * @param int $max_height
- * @param bool $force_resize = false
- * @param int $preferred_format = 0
+ * @param int $src_width The width of the source image
+ * @param int $src_height The height of the source image
+ * @param int $max_width The maximum allowed width
+ * @param int $max_height The maximum allowed height
+ * @param bool $force_resize = false Whether to override defaults and resize it
+ * @param int $preferred_format - The preferred format
+ *   - 0 to use jpeg
+ *   - 1 for gif
+ *   - 2 to force jpeg
+ *   - 3 for png
+ *   - 6 for bmp
+ *   - 15 for wbmp
+ * @param bool $strip Whether to have IM strip EXIF data as GD will
+ *
+ * @return bool Whether resize was successful.
  */
-function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $max_height, $force_resize = false, $preferred_format = 0)
+function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $max_height, $force_resize = false, $preferred_format = 0, $strip = false)
 {
 	global $gd2;
 
@@ -332,9 +386,15 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 				$imagick->setImageCompressionQuality(80);
 			}
 
-			// Create a new image in our prefered format and resize it if needed
+			// Create a new image in our preferred format and resize it if needed
 			$imagick->setImageFormat($default_formats[$preferred_format]);
 			$imagick->resizeImage($dest_width, $dest_height, Imagick::FILTER_LANCZOS, 1, true);
+
+			// Remove EXIF / ICC data?
+			if ($strip)
+			{
+				$imagick->stripImage();
+			}
 
 			// Save the new image in the destination location
 			$success = $imagick->writeImage($destName);
@@ -342,10 +402,8 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 			// Free resources associated with the Imagick object
 			$imagick->clear();
 		}
-		catch(Exception $e)
+		catch (Exception $e)
 		{
-			// Not currently used, but here is the error
-			$success = $e->getMessage();
 			$success = false;
 		}
 
@@ -442,6 +500,7 @@ function autoRotateImage($image_name)
  * Autorotate an image based on its EXIF Orientation tag.
  *
  * What it does:
+ *
  * - GD only
  * - Checks exif data for orientation flag and rotates image so its proper
  * - Does not update orientation flag as GD removes EXIF data
@@ -461,10 +520,10 @@ function autoRotateImageWithGD($image_name)
 	$orientation = isset($exif['Orientation']) ? $exif['Orientation'] : 0;
 
 	// For now we only process jpeg images, so check that we have one
-	$sizes = @getimagesize($image_name);
+	$sizes = elk_getimagesize($image_name);
 
 	// Not a jpeg or not rotated, done!
-	if ($sizes === false || $sizes[2] !== 2 || $orientation === 0 || !imageMemoryCheck($sizes))
+	if ($sizes[2] !== 2 || $orientation === 0 || !imageMemoryCheck($sizes))
 	{
 		return false;
 	}
@@ -521,72 +580,85 @@ function autoRotateImageWithGD($image_name)
 /**
  * Autorotate an image based on its EXIF Orientation tag.
  *
+ * What it does:
+ *
  * - ImageMagick only
  * - Checks exif data for orientation flag and rotates image so its proper
  * - Updates orientation flag if rotation was required
+ * - Writes the update image back to $image_name
  *
- * @param object $image_name
+ * @uses Imagick
+ * @param string $image_name
  */
 function autoRotateImageWithIM($image_name)
 {
-	// Get a new instance of Imagick for use
-	$image = new Imagick($image_name);
-
-	// This method should exist if Imagick has been compiled against ImageMagick version
-	// 6.3.0 or higher which is forever ago, but we check anyway ;)
-	if (!method_exists($image, 'getImageOrientation'))
-		return false;
-
-	$orientation = $image->getImageOrientation();
-	switch ($orientation)
+	try
 	{
-		// 0 & 1 Not set or Normal
-		case Imagick::ORIENTATION_UNDEFINED:
-		case Imagick::ORIENTATION_TOPLEFT:
-			break;
-		// 2 Mirror image, Normal orientation
-		case Imagick::ORIENTATION_TOPRIGHT:
-			$image->flopImage();
-			break;
-		// 3 Normal image, rotated 180
-		case Imagick::ORIENTATION_BOTTOMRIGHT:
-			$image->rotateImage('#000', 180);
-			break;
-		// 4 Mirror image, rotated 180
-		case Imagick::ORIENTATION_BOTTOMLEFT:
-			$image->flipImage();
-			break;
-		// 5 Mirror image, rotated 90 CCW
-		case Imagick::ORIENTATION_LEFTTOP:
-			$image->rotateImage('#000', 90);
-			$image->flopImage();
-			break;
-		// 6 Normal image, rotated 90 CCW
-		case Imagick::ORIENTATION_RIGHTTOP:
-			$image->rotateImage('#000', 90);
-			break;
-		// 7 Mirror image, rotated 90 CW
-		case Imagick::ORIENTATION_RIGHTBOTTOM:
-			$image->rotateImage('#000', -90);
-			$image->flopImage();
-			break;
-		// 8 Normal image, rotated 90 CW
-		case Imagick::ORIENTATION_LEFTBOTTOM:
-			$image->rotateImage('#000', -90);
-			break;
-	}
+		// Get a new instance of Imagick for use
+		$image = new Imagick($image_name);
 
-	// Now that it's auto-rotated, make sure the EXIF data is correctly updated
-	if ($orientation >= 2)
+		// This method should exist if Imagick has been compiled against ImageMagick version
+		// 6.3.0 or higher which is forever ago, but we check anyway ;)
+		if (!method_exists($image, 'getImageOrientation'))
+		{
+			return false;
+		}
+
+		$orientation = $image->getImageOrientation();
+		switch ($orientation)
+		{
+			// 0 & 1 Not set or Normal
+			case Imagick::ORIENTATION_UNDEFINED:
+			case Imagick::ORIENTATION_TOPLEFT:
+				break;
+			// 2 Mirror image, Normal orientation
+			case Imagick::ORIENTATION_TOPRIGHT:
+				$image->flopImage();
+				break;
+			// 3 Normal image, rotated 180
+			case Imagick::ORIENTATION_BOTTOMRIGHT:
+				$image->rotateImage('#000', 180);
+				break;
+			// 4 Mirror image, rotated 180
+			case Imagick::ORIENTATION_BOTTOMLEFT:
+				$image->flipImage();
+				break;
+			// 5 Mirror image, rotated 90 CCW
+			case Imagick::ORIENTATION_LEFTTOP:
+				$image->rotateImage('#000', 90);
+				$image->flopImage();
+				break;
+			// 6 Normal image, rotated 90 CCW
+			case Imagick::ORIENTATION_RIGHTTOP:
+				$image->rotateImage('#000', 90);
+				break;
+			// 7 Mirror image, rotated 90 CW
+			case Imagick::ORIENTATION_RIGHTBOTTOM:
+				$image->rotateImage('#000', -90);
+				$image->flopImage();
+				break;
+			// 8 Normal image, rotated 90 CW
+			case Imagick::ORIENTATION_LEFTBOTTOM:
+				$image->rotateImage('#000', -90);
+				break;
+		}
+
+		// Now that it's auto-rotated, make sure the EXIF data is correctly updated
+		if ($orientation >= 2)
+		{
+			$image->setImageOrientation(Imagick::ORIENTATION_TOPLEFT);
+		}
+
+		// Save the new image in the destination location
+		$success = $image->writeImage($image_name);
+
+		// Free resources associated with the Imagick object
+		$image->clear();
+	}
+	catch (Exception $e)
 	{
-		$image->setImageOrientation(Imagick::ORIENTATION_TOPLEFT);
+		$success = false;
 	}
-
-	// Save the new image in the destination location
-	$success = $image->writeImage($image_name);
-
-	// Free resources associated with the Imagick object
-	$image->clear();
 
 	return $success;
 }
@@ -682,20 +754,22 @@ function flipImageGD($image, $sizes, $axis = 'vertical')
 /**
  * Copy / resize an image using GD bicubic methods
  *
+ * What it does:
+ *
  * - Used when imagecopyresample() is not available
  * - Uses bicubic resizing methods which are lower quality then imagecopyresample
  *
  * @package Graphics
- * @param resource $dst_img
- * @param resource $src_img
- * @param int $dst_x
- * @param int $dst_y
- * @param int $src_x
- * @param int $src_y
- * @param int $dst_w
- * @param int $dst_h
- * @param int $src_w
- * @param int $src_h
+ * @param resource $dst_img The destination image - a GD image resource
+ * @param resource $src_img The source image - a GD image resource
+ * @param int $dst_x The "x" coordinate of the destination image
+ * @param int $dst_y The "y" coordinate of the destination image
+ * @param int $src_x The "x" coordinate of the source image
+ * @param int $src_y The "y" coordinate of the source image
+ * @param int $dst_w The width of the destination image
+ * @param int $dst_h The height of the destination image
+ * @param int $src_w The width of the destination image
+ * @param int $src_h The height of the destination image
  */
 function imagecopyresamplebicubic($dst_img, $src_img, $dst_x, $dst_y, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h)
 {
@@ -747,16 +821,18 @@ function imagecopyresamplebicubic($dst_img, $src_img, $dst_x, $dst_y, $src_x, $s
 if (!function_exists('imagecreatefrombmp'))
 {
 	/**
-	 * It is set only if it doesn't already exist (for forwards compatiblity.)
+	 * It is set only if it doesn't already exist (for forwards compatibility.)
+	 *
+	 * What it does:
 	 *
 	 * - It only supports uncompressed bitmaps.
-	 * - It only supports standard windows bitmaps (no os/2 varients)
+	 * - It only supports standard windows bitmaps (no os/2 variants)
 	 * - Returns an image identifier representing the bitmap image
 	 * obtained from the given filename.
 	 *
 	 * @package Graphics
-	 * @param string $filename
-	 * @return resource
+	 * @param string $filename The name of the file
+	 * @return resource An image identifier representing the bitmap image
 	 */
 	function imagecreatefrombmp($filename)
 	{
@@ -769,7 +845,7 @@ if (!function_exists('imagecreatefrombmp'))
 		// Unpack the general information about the Bitmap Image File, first 14 Bytes
 		$header = unpack('vtype/Vsize/Vreserved/Voffset', fread($fp, 14));
 
-		// Upack the DIB header, it stores detailed information about the bitmap image the pixel format, 40 Bytes long
+		// Unpack the DIB header, it stores detailed information about the bitmap image the pixel format, 40 Bytes long
 		$info = unpack('Vsize/Vwidth/Vheight/vplanes/vbits/Vcompression/Vimagesize/Vxres/Vyres/Vncolor/Vcolorimportant', fread($fp, 40));
 
 		// Not a standard bitmap, bail out
@@ -783,6 +859,7 @@ if (!function_exists('imagecreatefrombmp'))
 			$dst_img = imagecreate($info['width'], $info['height']);
 
 		// Color bitCounts 1,4,8 have palette information we use
+		$palette = array();
 		if ($info['bits'] == 1 || $info['bits'] == 4 || $info['bits'] == 8)
 		{
 			$palette_size = $header['offset'] - 54;
@@ -791,7 +868,6 @@ if (!function_exists('imagecreatefrombmp'))
 			$palettedata = fread($fp, $palette_size);
 
 			// Create the rgb color array
-			$palette = array();
 			$n = 0;
 			for ($j = 0; $j < $palette_size; $j++)
 			{
@@ -939,13 +1015,16 @@ if (!function_exists('imagecreatefrombmp'))
 /**
  * Show an image containing the visual verification code for registration.
  *
+ * What it does:
+ *
  * - Requires the GD extension.
  * - Uses a random font for each letter from default_theme_dir/fonts.
  * - Outputs a png if possible, otherwise a gif.
  *
  * @package Graphics
- * @param string $code
- * @return false|null if something goes wrong.
+ * @param string $code The code to display
+ *
+ * @return false|null false if something goes wrong.
  */
 function showCodeImage($code)
 {
@@ -971,7 +1050,7 @@ function showCodeImage($code)
 	$simpleFGColor = $imageType == 0 ? true : false;
 	// High much to rotate each character.
 	$rotationType = $imageType == 1 ? 'none' : ($imageType > 3 ? 'low' : 'high');
-	// Do we show some characters inversed?
+	// Do we show some characters inverse?
 	$showReverseChars = $imageType > 3 ? true : false;
 	// Special case for not showing any characters.
 	$disableChars = $imageType == 0 ? true : false;
@@ -988,7 +1067,7 @@ function showCodeImage($code)
 	// Give the image a border?
 	$hasBorder = $simpleBGColor;
 
-	// The amount of pixels inbetween characters.
+	// The amount of pixels in between characters.
 	$character_spacing = 1;
 
 	// What color is the background - generally white unless we're on "hard".
@@ -1107,7 +1186,7 @@ function showCodeImage($code)
 		$dotbgcolor[$i] = $background_color[$i] < $foreground_color[$i] ? mt_rand(0, max($foreground_color[$i] - 20, 0)) : mt_rand(min($foreground_color[$i] + 20, 255), 255);
 	$randomness_color = imagecolorallocate($code_image, $dotbgcolor[0], $dotbgcolor[1], $dotbgcolor[2]);
 
-	// Some squares/rectanges for new extreme level
+	// Some squares/rectangles for new extreme level
 	if ($noiseType == 'extreme')
 	{
 		for ($i = 0; $i < rand(1, 5); $i++)
@@ -1167,8 +1246,8 @@ function showCodeImage($code)
 					$font_size = $gd2 ? 18 : 24;
 
 				// Work out the sizes - also fix the character width cause TTF not quite so wide!
-				$font_x = $fontHorSpace == 'minus' && $cur_x > 0 ? $cur_x - 3 : $cur_x + 5;
-				$font_y = $max_height - ($fontVerPos == 'vrandom' ? mt_rand(2, 8) : ($fontVerPos == 'random' ? mt_rand(3, 5) : 5));
+				$font_x = $fontHorSpace === 'minus' && $cur_x > 0 ? $cur_x - 3 : $cur_x + 5;
+				$font_y = $max_height - ($fontVerPos === 'vrandom' ? mt_rand(2, 8) : ($fontVerPos === 'random' ? mt_rand(3, 5) : 5));
 
 				// What font face?
 				if (!empty($ttfont_list))
@@ -1181,7 +1260,7 @@ function showCodeImage($code)
 				$fontcord = @imagettftext($code_image, $font_size, $angle, $font_x, $font_y, $char_color, $fontface, $character['id']);
 				if (empty($fontcord))
 					$can_do_ttf = false;
-				elseif ($is_reverse)
+				elseif ($is_reverse !== false)
 				{
 					imagefilledpolygon($code_image, $fontcord, 4, $fg_color);
 
@@ -1292,7 +1371,9 @@ function showCodeImage($code)
  * - Includes an image from a random sub directory of default_theme_dir/fonts.
  *
  * @package Graphics
- * @param string $letter
+ * @param string $letter A letter to show as an image
+ *
+ * @return false|null false if something goes wrong.
  */
 function showLetterImage($letter)
 {
@@ -1324,4 +1405,163 @@ function showLetterImage($letter)
 
 	// Nothing more to come.
 	die();
+}
+
+/**
+ * Simple function to generate an image containing some text.
+ * It uses preferentially Imagick if present, otherwise GD.
+ * Font and size are fixed.
+ *
+ * @package Graphics
+ *
+ * @param string $text The text the image should contain
+ * @param int $width Width of the final image
+ * @param int $height Height of the image
+ * @param string $format Type of the image (valid types are png, jpeg, gif)
+ *
+ * @return boolean|resource The image or false if neither Imagick nor GD are found
+ */
+function generateTextImage($text, $width = 100, $height = 100, $format = 'png')
+{
+	$valid_formats = array('jpeg', 'png', 'gif');
+	if (!in_array($format, $valid_formats))
+	{
+		$format = 'png';
+	}
+
+	if (checkImagick() === true)
+	{
+		return generateTextImageWithIM($text, $width, $height, $format);
+	}
+	elseif (checkGD() === true)
+	{
+		return generateTextImageWithGD($text, $width, $height, $format);
+	}
+	else
+	{
+		return false;
+	}
+}
+
+/**
+ * Simple function to generate an image containing some text.
+ * It uses preferentially Imagick if present, otherwise GD.
+ * Font and size are fixed.
+ *
+ * @uses GD
+ *
+ * @package Graphics
+ *
+ * @param string $text The text the image should contain
+ * @param int $width Width of the final image
+ * @param int $height Height of the image
+ * @param string $format Type of the image (valid types are png, jpeg, gif)
+ *
+ * @return resource|boolean The image
+ */
+function generateTextImageWithGD($text, $width = 100, $height = 100, $format = 'png')
+{
+	global $settings;
+
+	$create_function = 'image' . $format;
+
+	// Create a white filled box
+	$image = imagecreate($width, $height);
+	imagecolorallocate($image, 255, 255, 255);
+
+	$text_color = imagecolorallocate($image, 0, 0, 0);
+	$font = $settings['default_theme_dir'] . '/fonts/VDS_New.ttf';
+
+	// The loop is to try to fit the text into the image.
+	$true_type = function_exists('imagettftext');
+	$font_size = $true_type ? 28 : 5;
+	do
+	{
+		if ($true_type)
+		{
+			$metric = imagettfbbox($font_size, 0, $font, $text);
+			$text_width = abs($metric[4] - $metric[0]);
+			$text_height = abs($metric[5] - $metric[1]);
+		}
+		else
+		{
+			$text_width = imagefontwidth($font_size) * strlen($text);
+			$text_height = imagefontheight($font_size);
+		}
+	} while ($text_width > $width && $font_size-- > 1);
+
+	$w_offset = ($width - $text_width) / 2;
+	$h_offset = $true_type ? ($height / 2) + ($text_height / 2) : ($height - $text_height) / 2;
+
+	if ($true_type)
+	{
+		imagettftext($image, $font_size, 0, $w_offset, $h_offset, $text_color, $font, $text);
+	}
+	else
+	{
+		imagestring($image, $font_size, $w_offset, $h_offset, $text, $text_color);
+	}
+
+	// Capture the image string
+	ob_start();
+	$result = $create_function($image);
+	$image = ob_get_contents();
+	ob_end_clean();
+
+	return $result ? $image : false;
+}
+
+/**
+ * Function to generate an image containing some text.
+ * It uses Imagick, Font and size are fixed to fit within width
+ *
+ * @uses Imagick
+ *
+ * @package Graphics
+ *
+ * @param string $text The text the image should contain
+ * @param int $width Width of the final image
+ * @param int $height Height of the image
+ * @param string $format Type of the image (valid types are png, jpeg, gif)
+ *
+ * @return boolean|resource The image or false on error
+ */
+function generateTextImageWithIM($text, $width = 100, $height = 100, $format = 'png')
+{
+	global $settings;
+
+	try
+	{
+		$image = new Imagick();
+		$image->newImage($width, $height, new ImagickPixel('white'));
+		$image->setImageFormat($format);
+
+		// 28pt is ~2em given default font stack
+		$font_size = 28;
+
+		$draw = new ImagickDraw();
+		$draw->setStrokeColor(new ImagickPixel('#000000'));
+		$draw->setFillColor(new ImagickPixel('#000000'));
+		$draw->setStrokeWidth(0);
+		$draw->setTextAlignment(Imagick::ALIGN_CENTER);
+		$draw->setFont($settings['default_theme_dir'] . '/fonts/VDS_New.ttf');
+
+		// Make sure the text will fit the the allowed space
+		do
+		{
+			$draw->setFontSize($font_size);
+			$metric = $image->queryFontMetrics($draw, $text);
+			$text_width = (int) $metric['textWidth'];
+		} while ($text_width > $width && $font_size-- > 1);
+
+		// Place text in center of block
+		$image->annotateImage($draw, $width / 2, $height / 2 + $font_size / 4, 0, $text);
+		$image = $image->getImageBlob();
+
+		return $image;
+	}
+	catch (Exception $e)
+	{
+		return false;
+	}
 }

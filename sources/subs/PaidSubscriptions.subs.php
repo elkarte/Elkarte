@@ -7,18 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.8
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Returns how many people are subscribed to a paid subscription.
@@ -56,9 +51,9 @@ function list_getSubscribedUserCount($id_sub, $search_string, $search_vars = arr
  * Return the subscribed users list, for the given parameters.
  * @todo refactor outta here
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param int $id_sub
  * @param string $search_string
  * @param mixed[] $search_vars
@@ -72,7 +67,7 @@ function list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $searc
 	$request = $db->query('', '
 		SELECT
 			ls.id_sublog, ls.start_time, ls.end_time, ls.status, ls.payments_pending,
-			IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, {string:guest}) AS name
+			COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, {string:guest}) AS name
 		FROM {db_prefix}log_subscribed AS ls
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ls.id_member)
 		WHERE ls.id_subscribe = {int:current_subscription} ' . $search_string . '
@@ -220,7 +215,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 		}
 	}
 
-	// Firstly, see whether it exists, and is active. If so then this is meerly an extension.
+	// Firstly, see whether it exists, and is active. If so then this is merely an extension.
 	$request = $db->query('', '
 		SELECT
 			id_sublog, end_time, start_time
@@ -297,9 +292,10 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 	$newAddGroups = implode(',', $newAddGroups);
 
 	// Store the new settings.
+	require_once(SUBSDIR . '/Members.subs.php');
 	updateMemberData($id_member, array('id_group' => $id_group, 'additional_groups' => $newAddGroups));
 
-	// Now log the subscription - maybe we have a dorment subscription we can restore?
+	// Now log the subscription - maybe we have a dormant subscription we can restore?
 	$request = $db->query('', '
 		SELECT
 			id_sublog, end_time, start_time
@@ -374,32 +370,37 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 
 /**
  * Load all the payment gateways.
- * Checks the Sources directory for any files fitting the format of a payment gateway,
- * loads each file to check it's valid, includes each file and returns the
- * function name and whether it should work with this version of the software.
+ *
+ * What it does:
+ *
+ * - Checks the Sources directory for any files fitting the format of a payment gateway,
+ * - Loads each file to check it's valid, includes each file and returns the
+ * - Function name and whether it should work with this version of the software.
  *
  * @return array
  */
 function loadPaymentGateways()
 {
 	$gateways = array();
-	if ($dh = opendir(SUBSDIR))
+
+	try
 	{
-		while (($file = readdir($dh)) !== false)
+		$files = new FilesystemIterator(SUBSDIR, FilesystemIterator::SKIP_DOTS);
+		foreach ($files as $file)
 		{
-			if (is_file(SUBSDIR .'/'. $file) && preg_match('~^Subscriptions-([A-Za-z\d]+)\.class\.php$~', $file, $matches))
+			if ($file->isFile() && preg_match('~^Subscriptions-([A-Za-z\d]+)\.class\.php$~', $file->getFilename(), $matches))
 			{
 				// Check this is definitely a valid gateway!
-				$fp = fopen(SUBSDIR . '/' . $file, 'rb');
+				$fp = fopen($file->getPathname(), 'rb');
 				$header = fread($fp, 4096);
 				fclose($fp);
 
 				if (strpos($header, 'Payment Gateway: ' . $matches[1]) !== false)
 				{
-					require_once(SUBSDIR . '/' . $file);
+					require_once($file->getPathname());
 
 					$gateways[] = array(
-						'filename' => $file,
+						'filename' => $file->getFilename(),
 						'code' => strtolower($matches[1]),
 						// Don't need anything snazzier than this yet.
 						'valid_version' => class_exists($matches[1] . '_Payment') && class_exists($matches[1] . '_Display'),
@@ -410,7 +411,10 @@ function loadPaymentGateways()
 			}
 		}
 	}
-	closedir($dh);
+	catch (UnexpectedValueException $e)
+	{
+		// @todo
+	}
 
 	return $gateways;
 }
@@ -597,7 +601,7 @@ function loadAllSubsctiptions($sub_id)
 	$request = $db->query('', '
 		SELECT
 			ls.id_member, ls.old_id_group, ls.id_subscribe, ls.status,
-			mem.id_group, mem.additional_groups, IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, {string:guest}) AS name
+			mem.id_group, mem.additional_groups, COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, {string:guest}) AS name
 		FROM {db_prefix}log_subscribed AS ls
 			INNER JOIN {db_prefix}members AS mem ON (ls.id_member = mem.id_member)
 		WHERE ls.id_subscribe = {int:current_subscription}
@@ -667,6 +671,7 @@ function deleteSubscription($id)
 		// Apply the group changes, if there are any
 		if (!empty($changes))
 		{
+			require_once(SUBSDIR . '/Members.subs.php');
 			foreach ($changes as $id_member => $new_values)
 				updateMemberData($id_member, $new_values);
 		}
@@ -858,7 +863,9 @@ function getSubscriptionDetails($sub_id)
  * Used to validate an existing subscription ID.
  *
  * @param int $id
+ *
  * @return int
+ * @throws Elk_Exception no_access
  */
 function validateSubscriptionID($id)
 {
@@ -879,7 +886,7 @@ function validateSubscriptionID($id)
 
 	// Humm this should not happen, if it does, boom
 	if ($sub_id === null)
-		fatal_lang_error('no_access', false);
+		throw new Elk_Exception('no_access', false);
 
 	return $sub_id;
 }
@@ -917,7 +924,9 @@ function alreadySubscribed($id_sub, $id_member)
  * Get the current status from a given subscription.
  *
  * @param int $log_id
- * @return integer
+ *
+ * @return int
+ * @throws Elk_Exception no_access
  */
 function getSubscriptionStatus($log_id)
 {
@@ -941,7 +950,7 @@ function getSubscriptionStatus($log_id)
 
 	// Nothing found?
 	if (empty($status))
-		fatal_lang_error('no_access', false);
+		throw new Elk_Exception('no_access', false);
 
 	return $status;
 }
@@ -972,7 +981,7 @@ function updateSubscriptionItem($item)
  * When a refund is processed, this either removes it or sets a new end time to
  * reflect its no longer re-occurring
  *
- * @param mixed[] $subscription_info the susbscription information array
+ * @param mixed[] $subscription_info the subscription information array
  * @param int $member_id
  * @param int $time
  */
@@ -1031,8 +1040,11 @@ function prepareDeleteSubscriptions($toDelete)
 			'subscription_list' => $toDelete,
 		)
 	);
+	$delete = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$delete[$row['id_subscribe']] = $row['id_member'];
+	}
 	$db->free_result($request);
 
 	return $delete;
@@ -1051,7 +1063,7 @@ function getPendingSubscriptions($log_id)
 	$request = $db->query('', '
 		SELECT
 			ls.id_sublog, ls.id_subscribe, ls.id_member,
-			start_time, end_time, status, payments_pending, pending_details, IFNULL(mem.real_name, {string:blank_string}) AS username
+			start_time, end_time, status, payments_pending, pending_details, COALESCE(mem.real_name, {string:blank_string}) AS username
 		FROM {db_prefix}log_subscribed AS ls
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ls.id_member)
 		WHERE ls.id_sublog = {int:current_subscription_item}
@@ -1267,7 +1279,7 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 	}
 	$db->free_result($request);
 
-	// Now, for everything we are removing check they defintely are not allowed it.
+	// Now, for everything we are removing check they definitely are not allowed it.
 	$existingGroups = explode(',', $member_info['additional_groups']);
 	foreach ($existingGroups as $key => $group)
 		if (empty($group) || (in_array($group, $removals) && !in_array($group, $allowed)))

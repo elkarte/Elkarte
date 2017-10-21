@@ -41,20 +41,21 @@
 /*		$MEDIA...............Experimental media queries.
 /* ------------------------------------------------------- */
 
-
 /*	$GENERAL	*/
 /* ------------------------------------------------------- */
 /* Selects don't like to behave across OS and browsers, unfortunately. */
 .left_submit, .linkbutton_left {
 	float: right;
 }
+
 .right_submit, .linkbutton_right {
 	float: left;
 }
+
 /* Dont show disabled buttons as active on hover */
 input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
-	border-left: 1px solid #afafaf;
-	border-right: 1px solid #bfbfbf;
+	border-left: 1px solid #AFAFAF;
+	border-right: 1px solid #BFBFBF;
 }
 
 /* @todo - A common, tag-agnostic class to hold submit buttons, etc. */
@@ -71,12 +72,15 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 .floatright {
 	float: left;
 }
+
 .floatleft {
 	float: right;
 }
+
 .clear_left {
 	clear: right;
 }
+
 .clear_right {
 	clear: left;
 }
@@ -88,13 +92,16 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 .righttext {
 	text-align: left;
 }
+
 .lefttext {
 	text-align: right;
 }
+
 /* Styles for main headers. */
 .category_header .icon {
 	margin: 0 0 0 5px;
 }
+
 /* Category Header icons as sprites
 ------------------------------------------------- */
 h2 a.collapse {
@@ -106,12 +113,14 @@ h2 a.collapse {
 #category_toggle, #category_toggle_more, #upshrink_header {
 	float: left;
 }
+
 #category_toggle span, #category_toggle_more span, #upshrink_header span {
 	right: 50%;
 	left: auto;
 	margin-right: -42px;
 	margin-left: 0;
 }
+
 /* Upshrink image in the page top for the header collapse */
 #collapse_button .linklevel1 {
 	margin-right: 0;
@@ -122,17 +131,19 @@ h2 a.collapse {
 .warningbox {
 	padding-left: 12px;
 	padding-right: 35px;
-	background: #fff6ca url(../images/profile/warning_moderate.png) 99% 50% no-repeat;
+	background: #FFF6CA url(../images/profile/warning_moderate.png) 99% 50% no-repeat;
 }
+
 .successbox {
 	padding-left: 12px;
 	padding-right: 35px;
-	background: #efe url(../images/icons/field_valid.png) 99% 50% no-repeat;
+	background: #EEFFEE url(../images/icons/field_valid.png) 99% 50% no-repeat;
 }
+
 .infobox {
 	padding-left: 12px;
 	padding-right: 35px;
-	background: #d9edf7 url(../images/icons/quick_sticky.png) 99% 50% no-repeat;
+	background: #D9EDF7 url(../images/icons/quick_sticky.png) 99% 50% no-repeat;
 }
 
 /*	$BBC		*/
@@ -140,15 +151,26 @@ h2 a.collapse {
 .bbc_table td {
 	padding: 0 0 0 1em;
 }
+
 .bbc_table th {
 	padding: 0 0 0 1em;
 }
+
 .bbc_list {
 	padding: 0 35px 0 0;
 	text-align: right;
 }
+
 .bbc_footnotes {
 	padding: 4px 0 4px 8px;
+}
+
+.bbc_img.floatleft {
+	padding-left: .25em;
+}
+
+.bbc_img.floatright {
+	padding-right: .25em;
 }
 
 /*	$AJAX		*/
@@ -167,51 +189,78 @@ h2 a.collapse {
 	float: right;
 	/* @todo - See me grumblez in Issue #552. ;) */
 }
+
 .top_button {
 	margin-right: 1px;
 	margin-left: 0;
 }
+
 #search_form {
-	padding: 12px 8px 4px 3px;
+	padding: .75em .5em .25em .25em;
 	float: left;
 }
-#search_form * {
-	/* Webkit (bleh) fix. */
+
+#search_form button, #search_form input, #search_form label {
 	float: right;
 }
+
+#search_form button {
+	margin-right: -5px;
+	margin-left: 0;
+}
+
+#search_form select {
+	border: 1px solid;
+	border-left: none;
+	width: 10em;
+}
+
+#search_form select:focus {
+	border: 1px solid;
+	border-left: none;
+}
+
 /* The main title. */
 #forumtitle, .rightheader #forumtitle {
 	padding: 10px 13px 6px 10px;
 }
+
 .rightheader #forumtitle .forumlink {
 	float: left;
 }
+
 /* Float these items to the right. @todo - Simplify. */
 #logobox, .rightheader #logobox {
 	float: left;
 }
+
 .rightheader #logobox, .rightheader #logo {
 	float: right;
 }
+
 /* Tweak the logo */
 #logo {
 	margin: 0 0 0 8px;
 	float: left;
 }
+
 .rightheader #logo {
 	margin: 0 8px 0 0;
 }
+
 /* The user info, news, etc.*/
 #news {
 	margin-left: 0;
 	margin-right: -1px;
 }
+
 /* Main forum area. */
 /* The footer with copyright links etc. */
 #footer_section li {
 	padding-left: 5px;
 	padding-right: 0;
 }
+
 #footer_section .rssfeeds {
 	float: left;
 }
@@ -232,9 +281,11 @@ h2 a.collapse {
 .listlevel1 {
 	float: right;
 }
+
 .listlevel1#collapse_button, .listlevel1#button_profile {
 	float: left;
 }
+
 .listlevel1#button_profile img {
 	margin-right: 0;
 	margin-left: 0.6em;
@@ -244,30 +295,36 @@ h2 a.collapse {
 .menulevel2, .menulevel3 {
 	right: -9999px;
 }
+
 /* Level 3: drop menu positioning. */
 .menulevel3 {
 	margin: -2em 15.3em 0 0;
 }
+
 /* Reposition Level 2 drop menu as visible on hover. */
 /* @todo - Check Superfish class. I think .sfhover may be deprecated. */
 .listlevel1:hover .menulevel2, .listlevel1.sfhover .menulevel2 {
 	left: auto;
 	right: 0;
 }
+
 .listlevel1#button_profile:hover .menulevel2, .listlevel1#button_profile.sfhover .menulevel2 {
 	right: auto;
 	left: 0;
 }
+
 /* Hiding Level 3 drop menu off hover. */
 .listlevel1:hover .menulevel3, .listlevel1.sfhover .menulevel3 {
 	left: auto;
 	right: -9999px;
 }
+
 /* Reposition Level 3 drop menu as visible on hover. */
 .listlevel2:hover .menulevel3, .listlevel2.sfhover .menulevel3 {
 	left: auto;
 	right: -14px;
 }
+
 /* @todo - Note: The next declarations are for keyboard access with js disabled. */
 /* Hmm. These are tricky with the new Superfish/Superclick combo. */
 /* May need a noScript class added somewhere. Pondering required. */
@@ -292,12 +349,14 @@ h2 a.collapse {
 	float: right;
 	padding: 0 0 1em 10px;
 }
+
 /* Same styling for Level 1 and Level 2. */
 #menu_sidebar .listlevel1:hover .menulevel2,
 #menu_sidebar .listlevel1.sfhover .menulevel2 {
 	left: auto;
 	right: 170px;
 }
+
 /* @todo - Note: The next declarations are for keyboard access with js disabled. */
 /* Hmm. These are tricky with the new Superfish/Superclick combo. */
 /* May need a noScript class added somewhere. Pondering required. */
@@ -320,6 +379,7 @@ h2 a.collapse {
 	padding-left: 1em;
 	padding-right: 0;
 }
+
 .linktree {
 	float: right;
 	padding: 0 2em 0 1.1em;
@@ -330,6 +390,7 @@ h2 a.collapse {
 	right: auto;
 	left: -1em;
 }
+
 .linktree:first-child {
 	padding-right: 1em;
 	padding-left: 1.1em;
@@ -354,28 +415,34 @@ h2 a.collapse {
 .quickbuttons {
 	text-align: left;
 }
+
 /* Follow ups and topic summary need it a bit different. */
 .follow_ups, #topic_summary .quickbuttons {
 	float: left;
 	margin: -7px 7px 0 0;
 }
+
 /* Most of them. */
 .quickbuttons .listlevel1 {
 	float: left;
 }
+
 /* Odd cases. */
 .quickbuttons .modified {
 	float: right;
 	padding: 0 6px 0 0;
 }
+
 .quickbuttons .inline_mod_check {
 	float: right;
 }
+
 /* @todo - Save code by amalgamating common button background declarations. */
 .quickbuttons .linklevel1 {
 	float: right;
 	padding: 1px 22px 0 6px;
 }
+
 /* @todo - Check with js disabled after sorting most of the other crud. */
 /* Note: The next declarations are for keyboard access with js disabled. */
 /*.quickbuttons .linklevel1:focus {
@@ -385,19 +452,23 @@ h2 a.collapse {
 	left: auto;
 	right: 3px;
 }
+
 .quickmod_check {
 	left: auto;
 	right: 3px;
 }
+
 /* Quickbutton and follow ups drop menus. */
 .quickbuttons .menulevel2, .follow_ups .menulevel2 {
 	text-align: right;
 }
+
 .quickbuttons .listlevel1:hover .menulevel2,
 .quickbuttons .listlevel1.sfhover .menulevel2 {
 	left: -1px;
 	right: auto;
 }
+
 .quickbuttons .linklevel2 {
 	padding: 0 26px 0 6px;
 }
@@ -409,6 +480,7 @@ h2 a.collapse {
 .linavPages {
 	float: right;
 }
+
 /* @todo - Styling will need a bit more thought here. */
 /* Do not use display: inline-block;*/
 /* Why not? Because it has a well-known quirk. It's white-space-dependent. */
@@ -422,6 +494,7 @@ h2 a.collapse {
 .pagelinks .current_page {
 	float: right;
 }
+
 .expand_pages {
 	float: right;
 }
@@ -430,9 +503,11 @@ h2 a.collapse {
 .small_pagelinks {
 	float: left;
 }
+
 .small_pagelinks li {
 	float: right;
 }
+
 .small_pagelinks .navPages {
 	float: right;
 }
@@ -441,15 +516,18 @@ h2 a.collapse {
 	left: auto;
 	right: 0;
 }
+
 #pages_scroll_right {
 	right: auto;
 	left: 0;
 }
+
 /* Globally accessible top/bottom links. */
 #gotop, #gobottom {
 	left: auto;
 	right: 0;
 }
+
 /* Skip navigation link. */
 #top {
 	left: auto;
@@ -460,9 +538,10 @@ h2 a.collapse {
 /* ------------------------------------------------------- */
 
 /* A general table class. */
-.table_head>th {
+.table_head > th {
 	text-align: right;
 }
+
 /* GenericList */
 .sort_by_item .sort, .sort {
 	margin: 0 4px -4px 0;
@@ -476,16 +555,20 @@ h2 a.collapse {
 dl.settings {
 	clear: left;
 }
+
 dl.settings dt {
 	float: right;
 }
+
 /* @todo -Inefficient selector. Should not need dl or dt tags. */
 dl.settings dt.windowbg {
 	float: right;
 }
+
 dl.settings dd {
 	float: left;
 }
+
 dl.settings img {
 	margin: 0 0 0 10px;
 }
@@ -497,32 +580,40 @@ dl.settings img {
 	padding: 2px 0 0 6px;
 	float: right;
 }
+
 .board_info .board_description, .board_info .moderators {
 	margin: 0 56px 0 0;
 }
+
 .board_name {
 	padding: 0 56px 1px 0;
 }
+
 .board_stats {
 	text-align: left;
 	padding: 1px 6px 1px 0;
 	float: left;
 }
+
 .board_avatar {
 	float: right;
 	margin-right: 0;
 	margin-left: 5px;
 }
+
 .childboards {
 	margin: 0 64px 0 14px;
 }
-.childboards>li {
+
+.childboards > li {
 	padding: 6px 0 4px 0.3em;
 }
+
 /* The posting icons and mark read button. */
 #posting_icons {
 	margin: 0 4px 20px 0;
 }
+
 /* Icons for info centre title bars. */
 #ic_recentposts td, #ic_recentposts th, #ps_recentposts td, #ps_recentposts th, #ps_recenttopics td, #ps_recenttopics th {
 	text-align: right;
@@ -532,9 +623,11 @@ dl.settings img {
 	right: auto;
 	left: 0;
 }
-.topic_sorting>li {
+
+.topic_sorting > li {
 	float: left;
 }
+
 .topic_sorting {
 	float: left;
 }
@@ -547,42 +640,44 @@ dl.settings img {
 .sort_by_container {
 	float: left;
 }
+
 .topic_info {
 	padding: 7px 12px 6px 8px;
 }
+
 .topic_icons {
 	float: right;
 	padding: 6px 0 0;
 	text-align: inherit;
 }
+
 .fred {
 	left: auto;
 	margin: 0 -2px 0 0;
 }
+
 .topic_name, .topic_starter {
 	margin: 0 50px;
 }
+
 .topic_name h4 {
 	padding-right: 0;
 	padding-left: 30px;
 }
+
 .topic_stats {
 	text-align: left;
 	float: left;
 }
+
 .topic_lastpost img {
 	float: left;
 }
-.topic_lastpost .img_last_post {
+
+.topic_lastpost .i_last_post {
 	float: left;
 }
-.topicicon:before,
-.sticky_row .topic_info:before, .locked_row .topic_info:before,
-.sticky_row .topic_details:before, .locked_row .topic_details:before,
-.locked_row.sticky_row .topic_info:before {
-	background-image: url(../images/topic/topicicons.png);
-}
-.img_last_post:before {background-position: -18px -162px;}
+
 .qaction_row {
 	text-align: left;
 }
@@ -616,6 +711,7 @@ dl.settings img {
 .edit_event {
 	margin: 0 0 0 5px;
 }
+
 /* Poll question */
 #pollquestion {
 	padding: 0 25px 6px 0;
@@ -625,12 +721,14 @@ dl.settings img {
 #poll_options .options {
 	padding: 12px 25px 0 30px;
 }
+
 /* Absolute positioning stops these breaking the bars on narrow screens. */
 #poll_options .options .percentage {
 	right: auto;
 	left: 0;
 	float: left;
 }
+
 /* Topic information */
 .nextlinks {
 	float: left;
@@ -640,10 +738,12 @@ dl.settings img {
 .poster.poster2 {
 	float: right;
 }
+
 .poster.poster2 .name {
 	padding: 0 0 0 8px;
 	text-align: right;
 }
+
 /* Drop menu for the poster info. */
 .poster .listlevel1.sfhover .menulevel2, .poster .listlevel1:hover .menulevel2 {
 	left: auto;
@@ -654,6 +754,7 @@ dl.settings img {
 .poster {
 	float: right;
 }
+
 .postarea {
 	margin: 0 13em 0 0;
 	padding: 0 1.5em 0 1em;
@@ -662,29 +763,36 @@ dl.settings img {
 .post_subject {
 	float: left;
 }
+
 .messageicon {
 	float: right;
 	margin: -2px 0 -6px 6px;
 }
+
 .groupicon {
 	float: right;
 	margin: 2px 2px 0 0;
 }
-.inner {
+
+.inner, .messageContent {
 	padding: 7px 2px 2px 8px;
 }
+
 /* Used by video embed JS when autolinking video links */
 .elk_videoheader {
 	padding: 0 6px 0 4px;
 }
+
 /* Basic stuff for the bottom of Display.template.php. */
 #moderationbuttons {
 	float: right;
 }
+
 #moderationbuttons_strip {
 	float: right;
 	margin: 4px -4px 4px 0;
 }
+
 #moderationbuttons ul li {
 	padding: 0 0 4px 6px;
 }
@@ -694,8 +802,9 @@ dl.settings img {
 	float: left;
 	padding: 6px 0 5px 5px;
 }
+
 #display_jump_to input {
-    vertical-align: middle;
+	vertical-align: middle;
 }
 
 /* The send topic section. */
@@ -703,6 +812,7 @@ dl.settings img {
 	left: auto;
 	right: 5%;
 }
+
 .requiredfield {
 	left: auto;
 	right: 5%;
@@ -715,27 +825,31 @@ dl.settings img {
 #post_header dt, .postbox dt {
 	float: right;
 }
+
 #post_header dd, .postbox dd {
 	float: right;
 }
+
 #post_header img {
 	padding: 0 5px 2px 0;
 }
+
 ul.post_options {
 	margin: 0 12px 0 0;
 }
+
 ul.post_options li {
 	float: right;
 }
-#postAttachment dd, #postAttachment2 dd {
+
+#postAttachment2 dd {
 	margin: 4px 12px 4px 0;
 }
-#postAttachment dd {
-	float: right;
-}
+
 .draftautosave {
 	text-align: left;
 }
+
 .post_verification #verification_control {
 	margin: 4px 12px 4px 0;
 }
@@ -746,9 +860,11 @@ ul.post_options li {
 	padding-left: 0;
 	padding-top: 0.5em;
 }
+
 #event_main .event_options {
 	padding: 1em 1em 0.5em 0.5em;
 }
+
 #event_main select, .event_options li select,
 #event_main ul.event_options li .input_check {
 	margin: 0 0 0 12px;
@@ -759,23 +875,29 @@ ul.post_options li {
 	margin-left: auto;
 	margin-right: 2em;
 }
+
 #poll_main .poll_main li {
 	padding-left: auto;
 	padding-right: 12px;
 }
+
 #poll_main .poll_main input {
 	margin-left: auto;
 	margin-right: 12px;
 }
+
 #poll_main .poll_main, dl.poll_options {
 	padding: 0 8px 8px 0;
 }
+
 #poll_options .poll_options dt {
 	padding: 0 12px 0 0;
 }
+
 #poll_options .poll_options dd input {
 	margin-right: 0;
 }
+
 .shortcuts {
 	float: right;
 }
@@ -803,10 +925,12 @@ ul.post_options li {
 	float: right;
 	margin: 0 4px 4px 0;
 }
+
 .profileblock_right {
 	float: left;
 	margin: 0 0 4px 4px;
 }
+
 .profileblock ul li {
 	float: right;
 	margin-right: 0;
@@ -817,23 +941,29 @@ ul.post_options li {
 #basicinfo {
 	float: right;
 }
+
 #basicinfo .windowbg .content {
 	padding-left: 0;
 	padding-right: 30px;
 }
-.profileblock .cf_icon {
+
+.profileblock .cf_icons {
 	float: right;
 	margin: 4px 0 0 5px;
 }
+
 #detailedinfo {
 	float: left;
 }
+
 #detailedinfo dl, #tracking dl, .profileblock dl {
 	clear: left;
 }
+
 #detailedinfo dt, #tracking dt, .profileblock dt {
 	float: right;
 }
+
 #detailedinfo dd, #tracking dd, .profileblock dd {
 	float: right;
 }
@@ -843,15 +973,19 @@ ul.post_options li {
 	padding-right: 0;
 	padding-left: 5px;
 }
+
 #main_admsection #basicinfo h4 {
 	float: right;
 }
+
 #main_admsection #basicinfo .avatar {
 	float: left;
 }
+
 #main_admsection #basicinfo ul {
 	clear: right;
 }
+
 #main_admsection #basicinfo #userstatus {
 	clear: right;
 }
@@ -860,6 +994,7 @@ ul.post_options li {
 #generalstats .content dt {
 	float: right;
 }
+
 #generalstats .content dd {
 	float: right;
 }
@@ -867,9 +1002,11 @@ ul.post_options li {
 #show_attachments th {
 	text-align: right;
 }
+
 .activity_stats li {
 	float: right;
 }
+
 .activity_stats li .bar span {
 	left: auto;
 	right: -1555em;
@@ -880,6 +1017,7 @@ ul.post_options li {
 #popularposts {
 	float: right;
 }
+
 #popularactivity {
 	float: left;
 }
@@ -887,6 +1025,7 @@ ul.post_options li {
 #popularposts div.content dt, #popularactivity div.content dt {
 	float: right;
 }
+
 #popularposts div.content dd, #popularactivity div.content dd {
 	float: right;
 }
@@ -902,9 +1041,11 @@ ul.post_options li {
 .topic .time {
 	float: left;
 }
+
 .counter {
 	float: left;
 }
+
 .topic .mod_icons {
 	margin-right: 0;
 	margin-left: 12px;
@@ -914,10 +1055,12 @@ ul.post_options li {
 #creator dt {
 	float: right;
 }
+
 #creator dd {
 	float: left;
 	margin: 0 2px 10px 0;
 }
+
 .ignoreboards li {
 	float: right;
 }
@@ -938,26 +1081,33 @@ ul.post_options li {
 #personal_messages .capacity_bar {
 	margin: 6px 12px 0 0;
 }
+
 .pm_date {
 	text-align: right;
 }
+
 .pm_subject {
 	text-align: right;
 }
+
 .pm_from {
 	text-align: right;
 }
+
 #to_item_list_container div, #bcc_item_list_container div {
 	float: right;
 	margin-right: 0;
 	margin-left: 10px;
 }
+
 div.labels {
 	text-align: left;
 }
+
 .label_pms {
 	float: left;
 }
+
 .label_pms li {
 	margin-left: 0;
 	margin-right: 0.5em;
@@ -969,18 +1119,23 @@ div.labels {
 	float: right;
 	padding: 0 0 0 15px;
 }
+
 .previous_month, .next_month {
 	float: right;
 }
+
 .next_month {
 	float: left;
 }
+
 .weeklist {
 	text-align: right;
 }
+
 .weeklist h4 {
 	float: right;
 }
+
 /* Use the old one true layout trick here. */
 .weeklist .windowbg2, .weeklist .calendar_today {
 	margin: 0 11.5em -95px 0;
@@ -994,39 +1149,47 @@ div.labels {
 .statistics .category_header {
 	margin: 0 50.5% 0 0.5%;
 }
+
 .stats {
 	margin: 12px 50% 12px 0;
 }
+
 .stats.floatleft {
 	clear: right;
 }
+
 .stats dt {
 	float: right;
 	margin: 0 0 4px 2%;
 }
+
 #top_row .stats dd, .statsbar {
 	float: left;
 	padding: 0 0 0 4px;
 }
+
 .statsbar .bar {
 	float: right;
 	margin: 0 0 0 4px;
 }
+
 /* Absolute positioning stops these breaking the bars on narrow screens. */
 .statsbar .righttext {
 	right: auto;
 	left: 0;
 }
+
 #stats .lefttext {
 	text-align: right;
 }
+
 #stats .stats_month {
 	padding: 4px 30px 4px 8px;
 }
+
 #stats .stats_day {
 	padding: 4px 60px 4px 8px;
 }
-
 
 /*	$HELP		*/
 /* ------------------------------------------------------- */
@@ -1039,10 +1202,11 @@ div.labels {
 /* Yes some ugly importants since we don't have specific admin rtl css */
 .settings .help .icon {
 	margin: 1px -25px 0 0 !important;
-    position: absolute !important;
+	position: absolute !important;
 }
-#admincenter .content .settings {
-    padding: 0 8px 0 0 !important;
+
+.admincenter .content .settings {
+	padding: 0 8px 0 0 !important;
 }
 
 /* Styles for the tooltips. */
@@ -1060,7 +1224,6 @@ div.labels {
 /* The hide icon (red cross). */
 .popup_heading .hide_popup {
 	float: left;
-	background: url(../images/buttons/delete.png) 100% 50% no-repeat;
 }
 
 /*	$SEARCH		*/
@@ -1071,6 +1234,7 @@ div.labels {
 	float: right;
 	text-align: left;
 }
+
 #advanced_search dd {
 	float: right;
 	margin: 0 6px 0 0;
@@ -1086,16 +1250,18 @@ div.labels {
 
 .search_results_posts .quick_mod {
 	right: auto;
-	left: 0px;
+	left: 0;
 }
 
 /* The memberlist. */
 #mlsearch_options.nojs li:nth-child(odd) {
 	float: right;
 }
+
 #mlsearch_options.nojs li:nth-child(even) {
 	float: left;
 }
+
 #mlsearch_options .mlsearch_option .input_check {
 	margin-left: 0;
 	margin-right: 0.5em;
@@ -1109,10 +1275,12 @@ div.labels {
 .login dl {
 	clear: left;
 }
+
 .login dt {
 	float: right;
 	text-align: left;
 }
+
 .login dd {
 	float: left;
 	text-align: right;
@@ -1122,24 +1290,18 @@ div.labels {
 .register_form {
 	clear: left;
 }
+
 .register_form dt {
 	float: right;
 }
+
 .register_form dd {
 	float: right;
 }
+
 .coppa_contact {
 	margin-left: 0;
 	margin-right: 5ex;
-}
-
-/* Styles for maintenance mode. */
-#maintenance_mode {
-	text-align: right;
-}
-#maintenance_mode .floatleft {
-	margin-right: 0;
-	margin-left: 12px;
 }
 
 /*	$ERRORS		*/
@@ -1150,14 +1312,17 @@ div.labels {
 	padding: 7px 35px 7px 10px;
 	text-align: right;
 }
+
 .errorbox .listlevel1,
 .warningbox .listlevel1 {
 	padding-left: 0;
 	padding-right: 1em;
 }
+
 .errorbox .alert {
 	float: right;
 }
+
 .errorbox .smalltext {
 	padding-left: 0;
 	padding-right: 1em;
@@ -1174,131 +1339,168 @@ div.labels {
 		margin-right: 0;
 		margin-left: 5px;
 	}
+
 	.board_description, .moderators, .childboards {
 		margin: 0 8px 0 0;
 	}
+
 	/* Playing silly buggers with a sidebar menu option for narrow screens. */
 	#main_container {
 		padding: 0 12px 0 0;
 	}
+
 	#menu_sidebar {
 		left: auto;
 		right: -0.8em;
 	}
+
 	#menu_sidebar:hover {
 		padding: 0.8em 0.6em 1em 1em;
 	}
+
 	/* End playing silly buggers. */
 	.postarea {
 		margin: 0 8em 0 0;
 	}
+
 	.quickbuttons .modified {
 		text-align: right;
 	}
+
 	#forumposts .nextlinks {
 		text-align: left;
 	}
+
 	.ignoreboards.floatright {
 		float: none;
 	}
+
 	/* our stats page */
 	.statistics .category_header {
 		margin: 0;
 	}
+
 	.stats {
 		float: none;
 		margin: 0;
 	}
 }
+
 /* This one does 540 and smaller screens at default font size. */
 @media screen and (max-width: 33.750em) {
 	dt, dd, dd label, .login dt, #advanced_search dt {
 		text-align: right;
 	}
+
 	dd {
 		padding-left: 0;
 		padding-right: 8% !important;
 	}
+
 	#main_content_section {
 		padding: 1px 3px 16px 2px;
 	}
+
 	.post {
 		margin: 0 5px 0 0;
 	}
+
 	#wrapper {
 		padding-left: 2px;
 		padding-right: 2px;
 	}
+
 	#gotop {
 		margin-right: 1.45em;
 	}
+
 	#message_index_jump_to {
 		float: none;
 	}
+
 	.postarea {
 		display: block;
 		margin: 0;
 	}
+
 	h2 .views_text, h2 .nextlinks {
 		display: block;
 		float: none;
 	}
+
 	.childboards {
 		margin: 0 5px;
 	}
+
 	.board_name {
 		margin: 0;
 		padding: 0 35px 0 0;
 	}
+
 	#basicinfo, #detailedinfo {
 		float: none;
 	}
+
 	.admin_menu li {
 		float: right;
 	}
+
 	#main_menu {
 		clear: right;
 	}
+
 	.listlevel2:hover .menulevel3, .listlevel2.sfhover .menulevel3 {
 		left: auto;
 		right: -4px;
 	}
+
 	#main_menu li ul li, .admin_menu li ul li {
 		float: right;
 	}
+
 	ul.poster {
 		display: block;
 		clear: both;
 	}
+
 	.poster {
 		float: none;
 	}
+
 	.poster .listlevel1 {
 		display: inline-block;
 	}
+
 	.poster li.avatar {
 		float: right;
 	}
+
 	.poster .subsections {
 		float: left;
 		text-align: left;
 	}
+
 	.poster .membergroup {
 		float: left;
 	}
+
 	.postarea, .forumtitle {
 		padding: 2px;
 	}
+
 	.quickbuttons {
 		margin: 8px 3px 6px 8px;
 	}
+
 	#search_form {
 		float: none;
 		text-align: center;
 	}
+
 	.profileblock_left, .profileblock_right {
 		float: none;
 	}
+
 	.pagesection div.floatright {
 		float: none;
 	}
@@ -1311,6 +1513,7 @@ div.labels {
 	padding-right: 30px;
 	padding-left: 0 !important;
 }
+
 #manage_boards li .floatleft:before {
 	padding-right: 0 !important;
 	padding-left: 5px;

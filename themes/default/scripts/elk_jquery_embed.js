@@ -1,12 +1,11 @@
-/**
+/*!
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1
  *
  * Original code from Aziz, redone and refactored for ElkArte
- *
  */
 
 /**
@@ -74,7 +73,7 @@
 				clearTimeout(this.tagID);
 				showFlash(this, eURL);
 			})
-			.click(function(e) {
+			.on('click', function(e) {
 				// single click to begin playing the video
 				e.preventDefault();
 				var tag = this;
@@ -142,7 +141,7 @@
 			embed_html = '<div class="elk_video"><iframe width="640px" height="385px" style="max-width: 98%; max-height: auto;" src="{src}" frameborder="0" allowfullscreen></iframe></div>',
 			handlers = {};
 		handlers['youtube.com'] = function(path, a, embed) {
-			var videoID = path.match(/\bv[=/]([^&#?$]+)/i) || path.match(/#p\/(?:a\/)?[uf]\/\d+\/([^?$]+)/i) || path.match(/([\w-]{11})/i);
+			var videoID = path.match(/\bv[=/]([^&#?$]+)/i) || path.match(/#p\/(?:a\/)?[uf]\/\d+\/([^?$]+)/i) || path.match(/(?:\/)([\w-]{11})/i);
 			if (!videoID || !(videoID = videoID[1]))
 				return;
 
@@ -174,6 +173,7 @@
 
 			return [oSettings.youtube, tag];
 		};
+		handlers['m.youtube.com'] = handlers['youtube.com'];
 		handlers['youtu.be'] = handlers['youtube.com'];
 		handlers['vimeo.com'] = function(path, a, embed) {
 			var videoID = path.match(/^\/(\d+)/i);
@@ -234,7 +234,7 @@
 			links = $('[id^=msg_] a');
 
 		// Create the show/hide button
-		var showhideBtn = $('<a class="floatright" title="' + oSettings.hide_video + '"><img src="' + elk_images_url + '/selected.png"></a>').click(function() {
+		var showhideBtn = $('<a class="floatright" title="' + oSettings.hide_video + '"><img src="' + elk_images_url + '/selected.png"></a>').on('click', function() {
 				var $img = $(this).find("img"),
 					$vid = $(this).parent().next();
 
@@ -254,7 +254,7 @@
 				continue;
 
 			// Ignore in quotes and signatures
-			if ("bbc_standard_quote;signature".indexOf(tag.parentNode.className) !== -1)
+			if ("bbc_quote;signature".indexOf(tag.parentNode.className) !== -1)
 				continue;
 
 			// No href or inner text not equal to href attr then we move along

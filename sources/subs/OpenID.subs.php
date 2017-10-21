@@ -7,18 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.8
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * OpenID class, controls interfacing and communications for openid auth
@@ -26,17 +21,28 @@ if (!defined('ELK'))
 class OpenID
 {
 	/**
-	 * Openid_uri is the URI given by the user
-	 * Validates the URI and changes it to a fully canonical URL
-	 * Determines the IDP server and delegation
-	 * Optional array of fields to restore when validation complete.
-	 * Redirects the user to the IDP for validation
+	 * Defined in OpenID spec.
+	 */
+	protected $p = '155172898181473697471232257763715539915724801966915404479707795314057629378541917580651227423698188993727816152646631438561595825688188889951272158842675419950341258706556549803580104870537681476726513255747040765857479291291572334510643245094715007229621094194349783925984760375594985848253359305585439638443';
+	protected $g = '2';
+
+	/**
+	 * Validate the supplied OpenID, redirects to the IDP server
+	 *
+	 * What it does:
+	 *
+	 * - Openid_uri is the URI given by the user
+	 * - Validates the URI and changes it to a fully canonical URL
+	 * - Determines the IDP server and delegation
+	 * - Optional array of fields to restore when validation complete.
+	 * - Redirects the user to the IDP for validation
 	 *
 	 * @param string $openid_uri
 	 * @param bool $return = false
 	 * @param mixed[]|null $save_fields = array()
 	 * @param string|null $return_action = null
 	 * @return string
+	 * @throws Elk_Exception
 	 */
 	public function validate($openid_uri, $return = false, $save_fields = array(), $return_action = null)
 	{
@@ -50,7 +56,7 @@ class OpenID
 			return 'no_data';
 
 		// Is there an existing association?
-		if (($assoc = $this->getAssociation($response_data['provider'])) == null)
+		if (($assoc = $this->getAssociation($response_data['provider'])) === null)
 			$assoc = $this->makeAssociation($response_data['provider']);
 
 		// Include file for member existence
@@ -97,8 +103,8 @@ class OpenID
 		);
 
 		// If they are logging in but don't yet have an account or they are registering, let's request some additional information
-		if (($_REQUEST['action'] == 'login2' && !memberExists($openid_url)) || ($_REQUEST['action'] == 'register' || $_REQUEST['action'] == 'register2'))
-			$parameters[] = 'openid.sreg.optional=nickname,dob,gender';
+		if (($_REQUEST['action'] == 'login2' && !memberExists($openid_url)) || $_REQUEST['action'] == 'register')
+			$parameters[] = 'openid.sreg.optional=nickname,dob';
 
 		$redir_url = $response_data['server'] . '?' . implode('&', $parameters);
 
@@ -110,9 +116,11 @@ class OpenID
 
 	/**
 	 * Revalidate a user using OpenID.
-	 * Note that this function will not return when authentication is required.
+	 *
+	 * - Note that this function will not return when authentication is required.
 	 *
 	 * @return boolean|null
+	 * @throws Elk_Exception
 	 */
 	public function revalidate()
 	{
@@ -158,11 +166,13 @@ class OpenID
 		$request = $db->query('openid_select_assoc', '
 			SELECT server_url, handle, secret, issued, expires, assoc_type
 			FROM {db_prefix}openid_assoc
-			WHERE server_url = {string:server_url}' . ($handle === null ? '' : '
+			WHERE (server_url = {string:https_server_url} OR server_url = {string:http_server_url})
+			' . ($handle === null ? '' : '
 				AND handle = {string:handle}') . '
 			ORDER BY expires DESC',
 			array(
-				'server_url' => $server,
+				'http_server_url' => strtr($server, array('https://' => 'http://')),
+				'https_server_url' => strtr($server, array('http://' => 'https://')),
 				'handle' => $handle,
 			)
 		);
@@ -171,6 +181,7 @@ class OpenID
 			return null;
 
 		$return = $db->fetch_assoc($request);
+		$return['server_url'] = $server;
 		$db->free_result($request);
 
 		return $return;
@@ -180,12 +191,12 @@ class OpenID
 	 * Create and store an association to the given server.
 	 *
 	 * @param string $server
+	 *
 	 * @return array
+	 * @throws Elk_Exception openid_server_bad_response
 	 */
 	public function makeAssociation($server)
 	{
-		global $p;
-
 		$db = database();
 
 		$parameters = array(
@@ -218,7 +229,7 @@ class OpenID
 			$assoc_data[$match] = $matches[2][$key];
 
 		if (!isset($assoc_data['assoc_type']) || (empty($assoc_data['mac_key']) && empty($assoc_data['enc_mac_key'])))
-			fatal_lang_error('openid_server_bad_response');
+			throw new Elk_Exception('openid_server_bad_response');
 
 		// Clean things up a bit.
 		$handle = isset($assoc_data['assoc_handle']) ? $assoc_data['assoc_handle'] : '';
@@ -234,7 +245,7 @@ class OpenID
 		// Figure out the Diffie-Hellman secret.
 		if (!empty($assoc_data['enc_mac_key']))
 		{
-			$dh_secret = bcpowmod(binary_to_long(base64_decode($assoc_data['dh_server_public'])), $dh_keys['private'], $p);
+			$dh_secret = bcpowmod(binary_to_long(base64_decode($assoc_data['dh_server_public'])), $dh_keys['private'], $this->p);
 			$secret = base64_encode(binary_xor(sha1(long_to_binary($dh_secret), true), base64_decode($assoc_data['enc_mac_key'])));
 		}
 		else
@@ -285,8 +296,7 @@ class OpenID
 	{
 		// @todo Add in discovery.
 
-		if (substr($uri, 0, 7) !== 'http://' && substr($uri, 0, 8) !== 'https://')
-			$uri = 'http://' . $uri;
+		$uri = addProtocol($uri, array('http://', 'https://'));
 
 		// Strip http:// and https:// and if there is no / in what is left, add one
 		if (strpos(strtr($uri, array('http://' => '', 'https://' => '')), '/') === false)
@@ -297,20 +307,16 @@ class OpenID
 
 	/**
 	 * Prepare for a Diffie-Hellman key exchange.
+	 *
 	 * @param bool $regenerate = false
 	 * @return string return false on failure or an array() on success
+	 * @throws Elk_Exception
 	 */
 	public function setup_DH($regenerate = false)
 	{
-		global $p, $g;
-
 		// First off, do we have BC Math available?
 		if (!function_exists('bcpow'))
 			return false;
-
-		// Defined in OpenID spec.
-		$p = '155172898181473697471232257763715539915724801966915404479707795314057629378541917580651227423698188993727816152646631438561595825688188889951272158842675419950341258706556549803580104870537681476726513255747040765857479291291572334510643245094715007229621094194349783925984760375594985848253359305585439638443';
-		$g = '2';
 
 		// Make sure the scale is set.
 		bcscale(0);
@@ -320,13 +326,15 @@ class OpenID
 
 	/**
 	 * Retrieve DH keys from the store.
-	 * It generates them if they're not stored or $regerate parameter is true.
+	 *
+	 * - It generates them if they're not stored or $regenerate parameter is true.
 	 *
 	 * @param bool $regenerate
+	 * @throws Elk_Exception
 	 */
 	public function get_keys($regenerate)
 	{
-		global $modSettings, $p, $g;
+		global $modSettings;
 
 		// Ok lets take the easy way out, are their any keys already defined for us? They are changed in the daily maintenance scheduled task.
 		if (!empty($modSettings['dh_keys']) && !$regenerate)
@@ -339,9 +347,10 @@ class OpenID
 			);
 		}
 
-		// Dang it, now I have to do math.  And it's not just ordinary math, its the evil big interger math.  This will take a few seconds.
+		// Dang it, now I have to do math.  And it's not just ordinary math, its the evil big integer math.
+		// This will take a few seconds.
 		$private = $this->generate_private_key();
-		$public = bcpowmod($g, $private, $p);
+		$public = bcpowmod($this->g, $private, $this->p);
 
 		// Now that we did all that work, lets save it so we don't have to keep doing it.
 		$keys = array('dh_keys' => base64_encode($public) . "\n" . base64_encode($private));
@@ -357,13 +366,13 @@ class OpenID
 	 * Generate private key
 	 *
 	 * @return string
+	 * @throws Elk_Exception
 	 */
 	public function generate_private_key()
 	{
-		global $p;
 		static $cache = array();
 
-		$byte_string = long_to_binary($p);
+		$byte_string = long_to_binary($this->p);
 
 		if (isset($cache[$byte_string]))
 			list ($dup, $num_bytes) = $cache[$byte_string];
@@ -389,14 +398,16 @@ class OpenID
 			$num = binary_to_long($bytes);
 		} while (bccomp($num, $dup) < 0);
 
-		return bcadd(bcmod($num, $p), 1);
+		return bcadd(bcmod($num, $this->p), 1);
 	}
 
 	/**
 	 * Retrieve server information.
 	 *
 	 * @param string $openid_url
-	 * @return boolean|array
+	 *
+	 * @return array|bool
+	 * @throws Elk_Exception openid_server_bad_response
 	 */
 	public function getServerInfo($openid_url)
 	{
@@ -412,7 +423,7 @@ class OpenID
 
 		// dirty, but .. Yadis response? Let's get the <URI>
 		preg_match('~<URI.*?>(.*)</URI>~', $webdata, $uri);
-		if ($uri)
+		if (!empty($uri))
 		{
 			$response_data['provider'] = $uri[1];
 			$response_data['server'] = $uri[1];
@@ -421,7 +432,7 @@ class OpenID
 
 		// Some OpenID servers have strange but still valid HTML which makes our job hard.
 		if (preg_match_all('~<link([\s\S]*?)/?>~i', $webdata, $link_matches) == 0)
-			fatal_lang_error('openid_server_bad_response');
+			throw new Elk_Exception('openid_server_bad_response');
 
 		foreach ($link_matches[1] as $link_match)
 		{
@@ -444,8 +455,7 @@ class OpenID
 }
 
 /**
- * Given a binary string, returns the binary string converted to a
- * long number.
+ * Given a binary string, returns the binary string converted to a long number.
  *
  * @param string $str
  * @return string
@@ -467,17 +477,21 @@ function binary_to_long($str)
 
 /**
  * Given a long integer, returns the number converted to a binary
- * string. This function accepts long integer values of arbitrary
+ * string.
+ *
+ * This function accepts long integer values of arbitrary
  * magnitude.
  *
  * @param string $value
+ *
  * @return string
+ * @throws Elk_Exception Only non-negative integers allowed
  */
 function long_to_binary($value)
 {
 	$cmp = bccomp($value, 0);
 	if ($cmp < 0)
-		fatal_error('Only non-negative integers allowed.');
+		throw new Elk_Exception('Only non-negative integers allowed.');
 
 	if ($cmp == 0)
 		return "\x00";
@@ -490,7 +504,7 @@ function long_to_binary($value)
 		$value = bcdiv($value, 256);
 	}
 
-	if ($bytes && ($bytes[0] > 127))
+	if (!empty($bytes) && ($bytes[0] > 127))
 		array_unshift($bytes, 0);
 
 	$return = '';
@@ -501,11 +515,11 @@ function long_to_binary($value)
 }
 
 /**
- * Performs an exclusive or (^ bitwise operator) character for character on
- * two stings.  The result of the biwise operator is 1 if and only if
- * both bits differ.
+ * Performs an exclusive or (^ bitwise operator) character for character on two stings.
  *
- * Returns a binary string representing the per character positon comparison results.
+ * - The result of the biwise operator is 1 if and only if both bits differ.
+ *
+ * Returns a binary string representing the per character position comparison results.
  *
  * @param int $num1
  * @param int $num2

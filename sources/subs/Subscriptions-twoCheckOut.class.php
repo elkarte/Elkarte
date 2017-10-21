@@ -7,11 +7,11 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This file contains code also covered by:
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
 
@@ -60,7 +60,7 @@ class twoCheckOut_Display
 	 * plus all the standard ones for the subscription form
 	 *
 	 * @param int $unique_id for the transaction
-	 * @param mixed[] $sub_data subscription data array, name, reocurring, etc
+	 * @param mixed[] $sub_data subscription data array, name, reoccurring, etc
 	 * @param int $value amount of the transaction
 	 * @param string $period length of the transaction
 	 * @param string $return_url

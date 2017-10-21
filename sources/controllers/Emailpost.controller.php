@@ -7,16 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.8
+ * @version 1.1
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
- * Post-by-email controller.  Handles items pertaining to posting or PM an
- * item that was received by email
+ * Emailpost_Controller class.
+ * Handles items pertaining to posting or PM an item that was received by email
  *
  * @package Maillist
  */
@@ -29,14 +26,15 @@ class Emailpost_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		// default, default, by default... preview
-		$this->action_pbe_preview('');
+		// By default we go to preview
+		$this->action_pbe_preview();
 	}
 
 	/**
 	 * Main email posting controller, reads, parses, checks and posts an email message or PM
 	 *
 	 * What it does:
+	 *
 	 * - Allows a user to reply to a topic on the board by emailing a reply to a
 	 * notification message.
 	 * - It must have the security key in the email or it will be rejected
@@ -48,6 +46,7 @@ class Emailpost_Controller extends Action_Controller
 	 * @param string|null $data used to supply a full headers+body email
 	 * @param boolean $force used to override common failure errors
 	 * @param string|null $key used to supply a lost key
+	 * @throws Elk_Exception
 	 */
 	public function action_pbe_post($data = null, $force = false, $key = null)
 	{
@@ -55,15 +54,14 @@ class Emailpost_Controller extends Action_Controller
 
 		// The function is not even on ...
 		if (empty($modSettings['maillist_enabled']))
-			return;
+			return false;
 
 		// Our mail parser and our main subs
-		require_once(SUBSDIR . '/EmailParse.class.php');
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 
 		// Init
 		loadLanguage('Maillist');
-		setMemoryLimit('128M');
+		detectServer()->setMemoryLimit('128M');
 
 		// Load the email parser and get some data to work with
 		$email_message = new Email_Parse();
@@ -75,6 +73,31 @@ class Emailpost_Controller extends Action_Controller
 		$email_message->read_email(true, $email_message->raw_message);
 		$email_message->load_address();
 		$email_message->load_key($key);
+
+		// Check if it's a DSN, and handle it
+		if ($email_message->_is_dsn)
+		{
+			if (!empty($modSettings['pbe_bounce_detect']))
+			{
+				pbe_disable_user_notify($email_message);
+
+				// @todo Notify the user
+				if (!empty($modSettings['pbe_bounce_record']))
+				{
+					// They can record the message anyway, if they so wish
+					return pbe_emailError('error_bounced', $email_message);
+				}
+
+				// If they don't wish, then return false like recording the failure would do
+				return false;
+			}
+			else
+			{
+				// When the auto-disable function is not turned on, record the DSN
+				// In the failed email table for the admins to handle however
+				return pbe_emailError('error_bounced', $email_message);
+			}
+		}
 
 		// If the feature is on but the post/pm function is not enabled, just log the message.
 		if (empty($modSettings['pbe_post_enabled']) && empty($modSettings['pbe_pm_enabled']))
@@ -96,8 +119,9 @@ class Emailpost_Controller extends Action_Controller
 		if (empty($email_message->message_key_id))
 			return pbe_emailError('error_missing_key', $email_message);
 
+		require_once(SUBSDIR . '/Emailpost.subs.php');
 		// Good we have a key, who was it sent to?
-		$key_owner = query_key_owner($email_message->message_key_id);
+		$key_owner = query_key_owner($email_message);
 
 		// Can't find this key in the database, either
 		// a) spam attempt or b) replying with an expired/consumed key
@@ -114,6 +138,8 @@ class Emailpost_Controller extends Action_Controller
 
 		// The email looks valid, now on to check the actual user trying to make the post/pm
 		// lets load the topic/message info and any additional permissions we need
+		$topic_info = array();
+		$pm_info = array();
 		if ($email_message->message_type === 't' || $email_message->message_type === 'm')
 		{
 			// Load the message/topic details
@@ -178,7 +204,7 @@ class Emailpost_Controller extends Action_Controller
 			// We have now posted or PM'ed .. lets do some database maintenance cause maintenance is fun :'(
 			query_key_maintenance($email_message);
 
-			// Update this user so the log shows they were/are active, no luking in the email ether
+			// Update this user so the log shows they were/are active, no lurking in the email ether
 			query_update_member_stats($pbe, $email_message, $email_message->message_type === 'p' ? $pm_info : $topic_info);
 		}
 
@@ -189,12 +215,14 @@ class Emailpost_Controller extends Action_Controller
 	 * New Topic posting controller, reads, parses, checks and posts a new topic
 	 *
 	 * What it does:
+	 *
 	 * - New topics do not have security keys in them so they are subject to spoofing
 	 * - It must be from the email of a registered user
 	 * - It must have been sent to an email ID that has been set to post new topics
 	 * - Accessed through emailtopic.
 	 *
 	 * @param string|null $data used to supply a full body+headers email
+	 * @throws Elk_Exception
 	 */
 	public function action_pbe_topic($data = null)
 	{
@@ -202,15 +230,14 @@ class Emailpost_Controller extends Action_Controller
 
 		// The function is not even on ...
 		if (empty($modSettings['maillist_enabled']))
-			return;
+			return false;
 
 		// Our mail parser and our main subs
-		require_once(SUBSDIR . '/EmailParse.class.php');
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 
 		// Init
 		loadLanguage('Maillist');
-		setMemoryLimit('256M');
+		detectServer()->setMemoryLimit('256M');
 
 		// Get the data from one of our sources
 		$email_message = new Email_Parse();
@@ -225,7 +252,35 @@ class Emailpost_Controller extends Action_Controller
 		// No key for this, so set some blanks for the error function (if needed)
 		$email_message->message_type = 'x';
 		$email_message->message_key_id = '';
+		$email_message->message_key = '';
 		$email_message->message_id = 0;
+
+		// Check if it's a DSN
+		// Hopefully, this will eventually DO something but for now
+		// we'll just add it with a more specific error reason
+		if ($email_message->_is_dsn)
+		{
+			if (!empty($modSettings['pbe_bounce_detect']))
+			{
+				pbe_disable_user_notify($email_message);
+
+				// @todo Notify the user
+				if (!empty($modSettings['pbe_bounce_record']))
+				{
+					// They can record the message anyway, if they so wish
+					return pbe_emailError('error_bounced', $email_message);
+				}
+
+				// If they don't wish, then return false like recording the failure
+				return false;
+			}
+			else
+			{
+				// When the auto-disable function is not turned on, record the DSN
+				// In the failed email table for the admins to handle however
+				return pbe_emailError('error_bounced', $email_message);
+			}
+		}
 
 		// If the feature is on but the post/pm function is not enabled, just log the message.
 		if (empty($modSettings['pbe_post_enabled']))
@@ -274,19 +329,20 @@ class Emailpost_Controller extends Action_Controller
 	 * Used to preview a failed email from the ACP
 	 *
 	 * What it does:
+	 *
 	 * - Called from ManageMaillist.controller, which checks topic/message permission for viewing
 	 * - Calls pbe_load_text to prepare text for the preview
 	 * - Returns an array of values for use in the template
 	 *
 	 * @param string $data raw email string, including headers
 	 * @return boolean
+	 * @throws Elk_Exception
 	 */
-	public function action_pbe_preview($data)
+	public function action_pbe_preview($data = '')
 	{
 		global $txt, $modSettings;
 
 		// Our mail parser and our main subs
-		require_once(SUBSDIR . '/EmailParse.class.php');
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 
 		// Init
@@ -330,6 +386,7 @@ class Emailpost_Controller extends Action_Controller
  * Attempts to create a reply post on the forum
  *
  * What it does:
+ *
  * - Checks if the user has permissions to post/reply/postby email
  * - Calls pbe_load_text to prepare text for the post
  * - returns true if successful or false for any number of failures
@@ -338,6 +395,7 @@ class Emailpost_Controller extends Action_Controller
  * @param mixed[] $pbe array of all pbe user_info values
  * @param Email_Parse $email_message
  * @param mixed[] $topic_info
+ * @throws Elk_Exception
  */
 function pbe_create_post($pbe, $email_message, $topic_info)
 {
@@ -432,13 +490,14 @@ function pbe_create_post($pbe, $email_message, $topic_info)
  * - Checks if the user has permissions
  * - Calls pbe_load_text to prepare text for the pm
  * - Calls query_mark_pms to mark things as read
- * - Uses sendpm to do the actual "sending"
  * - Returns true if successful or false for any number of failures
  *
+ * @uses sendpm to do the actual "sending"
  * @package Maillist
  * @param mixed[] $pbe array of pbe 'user_info' values
  * @param Email_Parse $email_message
  * @param mixed[] $pm_info
+ * @throws Elk_Exception
  */
 function pbe_create_pm($pbe, $email_message, $pm_info)
 {
@@ -482,18 +541,20 @@ function pbe_create_pm($pbe, $email_message, $pm_info)
  * Create a new topic by email
  *
  * What it does:
+ *
  * - Called by pbe_topic to create a new topic or by pbe_main to create a new topic via a subject change
  * - checks posting permissions, but requires all email validation checks are complete
  * - Calls pbe_load_text to prepare text for the post
- * - Uses createPost to do the actual "posting"
  * - Calls sendNotifications to announce the new post
  * - Calls query_update_member_stats to show they did something
  * - Requires the pbe, email_message and board_info arrays to be populated.
  *
+ * @uses createPost to do the actual "posting"
  * @package Maillist
  * @param mixed[] $pbe array of pbe 'user_info' values
  * @param Email_Parse $email_message
  * @param mixed[] $board_info
+ * @throws Elk_Exception
  */
 function pbe_create_topic($pbe, $email_message, $board_info)
 {
@@ -598,7 +659,8 @@ function pbe_create_topic($pbe, $email_message, $board_info)
  * Calls the necessary functions to extract and format the message so its ready for posting
  *
  * What it does:
- * - Converts an email response (text or html) to a BBC equivalant via pbe_Email_to_bbc
+ *
+ * - Converts an email response (text or html) to a BBC equivalent via pbe_Email_to_bbc
  * - Formats the email response so it looks structured and not chopped up (via pbe_fix_email_body)
  *
  * @package Maillist
@@ -624,12 +686,12 @@ function pbe_load_text(&$html, $email_message, $pbe)
 	$text = pbe_email_to_bbc($text, $html);
 
 	$pbe['profile']['real_name'] = isset($pbe['profile']['real_name']) ? $pbe['profile']['real_name'] : '';
-	$text = pbe_fix_email_body($text, $html, $pbe['profile']['real_name'], (empty($email_message->_converted_utf8) ? $email_message->headers['x-parameters']['content-type']['charset'] : 'UTF-8'));
+	$text = pbe_fix_email_body($text, $pbe['profile']['real_name'], (empty($email_message->_converted_utf8) ? $email_message->headers['x-parameters']['content-type']['charset'] : 'UTF-8'));
 
 	// Do we even have a message left to post?
 	$text = Util::htmltrim($text);
 	if (empty($text))
-		return;
+		return '';
 
 	if ($email_message->message_type !== 'p')
 	{

@@ -7,23 +7,19 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Get all birthdays within the given time range.
  *
  * What it does:
+ *
  * - finds all the birthdays in the specified range of days.
  * - works with birthdays set for no year, or any other year, and respects month and year boundaries.
  *
@@ -93,6 +89,7 @@ function getBirthdayRange($low_date, $high_date)
  * Get all calendar events within the given time range.
  *
  * What it does:
+ *
  * - finds all the posted calendar events within a date range.
  * - both the earliest_date and latest_date should be in the standard YYYY-MM-DD format.
  * - censors the posted event titles.
@@ -143,7 +140,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 			continue;
 
 		// Force a censor of the title - as often these are used by others.
-		censorText($row['title'], $use_permissions ? false : true);
+		$row['title'] = censor($row['title'], $use_permissions ? false : true);
 
 		$start_date = sscanf($row['start_date'], '%04d-%02d-%02d');
 		$start_date = max(mktime(0, 0, 0, $start_date[1], $start_date[2], $start_date[0]), $low_date_time);
@@ -262,51 +259,42 @@ function getHolidayRange($low_date, $high_date)
  * Does permission checks to see if an event can be linked to a board/topic.
  *
  * What it does:
+ *
  * - checks if the current user can link the current topic to the calendar, permissions et al.
  * - this requires the calendar_post permission, a forum moderator, or a topic starter.
  * - expects the $topic and $board variables to be set.
  * - if the user doesn't have proper permissions, an error will be shown.
  *
  * @package Calendar
+ * @todo pass $board, $topic and $user_info['id'] as arguments with fallback for 1.1
  */
 function canLinkEvent()
 {
 	global $user_info, $topic, $board;
-
-	$db = database();
 
 	// If you can't post, you can't link.
 	isAllowedTo('calendar_post');
 
 	// No board?  No topic?!?
 	if (empty($board))
-		fatal_lang_error('missing_board_id', false);
+		throw new Elk_Exception('missing_board_id', false);
 	if (empty($topic))
-		fatal_lang_error('missing_topic_id', false);
+		throw new Elk_Exception('missing_topic_id', false);
 
 	// Administrator, Moderator, or owner.  Period.
 	if (!allowedTo('admin_forum') && !allowedTo('moderate_board'))
 	{
 		// Not admin or a moderator of this board. You better be the owner - or else.
-		$result = $db->query('', '
-			SELECT id_member_started
-			FROM {db_prefix}topics
-			WHERE id_topic = {int:current_topic}
-			LIMIT 1',
-			array(
-				'current_topic' => $topic,
-			)
-		);
-		if ($row = $db->fetch_assoc($result))
+		$row = topicAttribute($topic, array('id_member_started'));
+		if (!empty($row))
 		{
 			// Not the owner of the topic.
 			if ($row['id_member_started'] != $user_info['id'])
-				fatal_lang_error('not_your_topic', 'user');
+				throw new Elk_Exception('not_your_topic', 'user');
 		}
 		// Topic/Board doesn't exist.....
 		else
-			fatal_lang_error('calendar_no_topic', 'general');
-		$db->free_result($result);
+			throw new Elk_Exception('calendar_no_topic', 'general');
 	}
 }
 
@@ -358,7 +346,7 @@ function getCalendarGrid($month, $year, $calendarOptions)
 		'next_calendar' => array(
 			'year' => $month == 12 ? $year + 1 : $year,
 			'month' => $month == 12 ? 1 : $month + 1,
-			'disabled' => $modSettings['cal_maxyear'] < ($month == 12 ? $year + 1 : $year),
+			'disabled' => date('Y') + $modSettings['cal_limityear'] < ($month == 12 ? $year + 1 : $year),
 		),
 		'size' => isset($calendarOptions['size']) ? $calendarOptions['size'] : 'large',
 	);
@@ -529,7 +517,7 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 			'disabled' => $day < 7 && $modSettings['cal_minyear'] > ($month == 1 ? $year - 1 : $year),
 		),
 		'next_week' => array(
-			'disabled' => $day > 25 && $modSettings['cal_maxyear'] < ($month == 12 ? $year + 1 : $year),
+			'disabled' => $day > 25 && date('Y') + $modSettings['cal_limityear'] < ($month == 12 ? $year + 1 : $year),
 		),
 	);
 
@@ -563,7 +551,7 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 
 		$calendarGrid['week_number'] = (int) strftime('%U', mktime(0, 0, 0, $month, $day, $year)) + $nWeekAdjust;
 
-		// If this crosses a year boundry and includes january it should be week one.
+		// If this crosses a year boundary and includes january it should be week one.
 		if ((int) strftime('%Y', $curTimestamp + 518400) != $year && $calendarGrid['week_number'] > 53 && $first_day_of_next_year < 5)
 			$calendarGrid['week_number'] = 1;
 	}
@@ -620,6 +608,7 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
  * Retrieve all events for the given days, independently of the users offset.
  *
  * What it does:
+ *
  * - cache callback function used to retrieve the birthdays, holidays, and events between now and now + days_to_index.
  * - widens the search range by an extra 24 hours to support time offset shifts.
  * - used by the cache_getRecentEvents function to get the information needed to calculate the events taking the users time offset into account.
@@ -769,66 +758,6 @@ function cache_getRecentEvents($eventOptions)
 }
 
 /**
- * Makes sure the calendar post is valid.
- *
- * @package Calendar
- */
-function validateEventPost()
-{
-	global $modSettings;
-
-	if (!isset($_POST['deleteevent']))
-	{
-		// No month?  No year?
-		if (!isset($_POST['month']))
-			fatal_lang_error('event_month_missing', false);
-		if (!isset($_POST['year']))
-			fatal_lang_error('event_year_missing', false);
-
-		// Check the month and year...
-		if ($_POST['month'] < 1 || $_POST['month'] > 12)
-			fatal_lang_error('invalid_month', false);
-		if ($_POST['year'] < $modSettings['cal_minyear'] || $_POST['year'] > $modSettings['cal_maxyear'])
-			fatal_lang_error('invalid_year', false);
-	}
-
-	// Make sure they're allowed to post...
-	isAllowedTo('calendar_post');
-
-	if (isset($_POST['span']))
-	{
-		// Make sure it's turned on and not some fool trying to trick it.
-		if (empty($modSettings['cal_allowspan']))
-			fatal_lang_error('no_span', false);
-		if ($_POST['span'] < 1 || $_POST['span'] > $modSettings['cal_maxspan'])
-			fatal_lang_error('invalid_days_numb', false);
-	}
-
-	// There is no need to validate the following values if we are just deleting the event.
-	if (!isset($_POST['deleteevent']))
-	{
-		// No day?
-		if (!isset($_POST['day']))
-			fatal_lang_error('event_day_missing', false);
-		if (!isset($_POST['evtitle']) && !isset($_POST['subject']))
-			fatal_lang_error('event_title_missing', false);
-		elseif (!isset($_POST['evtitle']))
-			$_POST['evtitle'] = $_POST['subject'];
-
-		// Bad day?
-		if (!checkdate($_POST['month'], $_POST['day'], $_POST['year']))
-			fatal_lang_error('invalid_date', false);
-
-		// No title?
-		if (Util::htmltrim($_POST['evtitle']) === '')
-			fatal_lang_error('no_event_title', false);
-		if (Util::strlen($_POST['evtitle']) > 100)
-			$_POST['evtitle'] = Util::substr($_POST['evtitle'], 0, 100);
-		$_POST['evtitle'] = str_replace(';', '', $_POST['evtitle']);
-	}
-}
-
-/**
  * Get the event's poster.
  *
  * @package Calendar
@@ -864,6 +793,8 @@ function getEventPoster($event_id)
 /**
  * Inserts events in to the calendar
  *
+ * What it does:
+ *
  * - Consolidating the various INSERT statements into this function.
  * - inserts the passed event information into the calendar table.
  * - allows to either set a time span (in days) or an end_date.
@@ -883,6 +814,9 @@ function insertEvent(&$eventOptions)
 	$eventOptions['span'] = isset($eventOptions['span']) && $eventOptions['span'] > 0 ? (int) $eventOptions['span'] : 0;
 
 	// Make sure the start date is in ISO order.
+	$year = '';
+	$month = '';
+	$day = '';
 	if (($num_results = sscanf($eventOptions['start_date'], '%d-%d-%d', $year, $month, $day)) !== 3)
 		trigger_error('insertEvent(): invalid start date format given', E_USER_ERROR);
 
@@ -940,6 +874,9 @@ function modifyEvent($event_id, &$eventOptions)
 	$eventOptions['title'] = Util::htmlspecialchars($eventOptions['title'], ENT_QUOTES);
 
 	// Scan the start date for validity and get its components.
+	$year = '';
+	$month = '';
+	$day = '';
 	if (($num_results = sscanf($eventOptions['start_date'], '%d-%d-%d', $year, $month, $day)) !== 3)
 		trigger_error('modifyEvent(): invalid start date format given', E_USER_ERROR);
 
@@ -1087,10 +1024,8 @@ function eventInfoForTopic($id_topic)
 {
 	$db = database();
 
-	$events = array();
-
 	// Get event for this topic. If we have one.
-	$request = $db->query('', '
+	return $db->fetchQuery('
 		SELECT cal.id_event, cal.start_date, cal.end_date, cal.title, cal.id_member, mem.real_name
 		FROM {db_prefix}calendar AS cal
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = cal.id_member)
@@ -1100,28 +1035,22 @@ function eventInfoForTopic($id_topic)
 			'current_topic' => $id_topic,
 		)
 	);
-
-	while ($row = $db->fetch_assoc($request))
-		$events[] = $row;
-	$db->free_result($request);
-
-	return $events;
 }
 
 /**
  * Gets all of the holidays for the listing
  *
  * @package Calendar
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @return array
  */
 function list_getHolidays($start, $items_per_page, $sort)
 {
 	$db = database();
 
-	$request = $db->query('', '
+	return $db->fetchQuery('
 		SELECT id_holiday, YEAR(event_date) AS year, MONTH(event_date) AS month, DAYOFMONTH(event_date) AS day, title
 		FROM {db_prefix}calendar_holidays
 		ORDER BY {raw:sort}
@@ -1130,12 +1059,6 @@ function list_getHolidays($start, $items_per_page, $sort)
 			'sort' => $sort,
 		)
 	);
-	$holidays = array();
-	while ($row = $db->fetch_assoc($request))
-		$holidays[] = $row;
-	$db->free_result($request);
-
-	return $holidays;
 }
 
 /**
@@ -1164,11 +1087,14 @@ function list_getNumHolidays()
  * Remove a holiday from the calendar.
  *
  * @package Calendar
- * @param int[] $holiday_ids An array of ids for holidays.
+ * @param int|int[] $holiday_ids An array of ids for holidays.
  */
 function removeHolidays($holiday_ids)
 {
 	$db = database();
+
+	if (!is_array($holiday_ids))
+		$holiday_ids = array($holiday_ids);
 
 	$db->query('', '
 		DELETE FROM {db_prefix}calendar_holidays
@@ -1269,4 +1195,69 @@ function getHoliday($id_holiday)
 	$db->free_result($request);
 
 	return $holiday;
+}
+
+/**
+ * Puts together the content of an ical thing
+ *
+ * @param mixed[] $event - An array holding event details like:
+ *                  - long
+ *                  - year
+ *                  - month
+ *                  - day
+ *                  - span
+ *                  - realname
+ *                  - sequence
+ *                  - eventid
+ */
+function build_ical_content($event)
+{
+	global $webmaster_email, $mbname;
+
+	// Check the title isn't too long - iCal requires some formatting if so.
+	$title = str_split($event['title'], 30);
+	foreach ($title as $id => $line)
+	{
+		if ($id != 0)
+			$title[$id] = ' ' . $title[$id];
+		$title[$id] .= "\n";
+	}
+
+	// Format the dates.
+	$datestamp = date('Ymd\THis\Z', time());
+	$datestart = $event['year'] . ($event['month'] < 10 ? '0' . $event['month'] : $event['month']) . ($event['day'] < 10 ? '0' . $event['day'] : $event['day']);
+
+	// Do we have a event that spans several days?
+	if ($event['span'] > 1)
+	{
+		$dateend = strtotime($event['year'] . '-' . ($event['month'] < 10 ? '0' . $event['month'] : $event['month']) . '-' . ($event['day'] < 10 ? '0' . $event['day'] : $event['day']));
+		$dateend += ($event['span'] - 1) * 86400;
+		$dateend = date('Ymd', $dateend);
+	}
+
+	// This is what we will be sending later
+	$filecontents = '';
+	$filecontents .= 'BEGIN:VCALENDAR' . "\n";
+	$filecontents .= 'METHOD:PUBLISH' . "\n";
+	$filecontents .= 'PRODID:-//ElkArteCommunity//ElkArte ' . (!defined('FORUM_VERSION') ? 2.0 : strtr(FORUM_VERSION, array('ElkArte ' => ''))) . '//EN' . "\n";
+	$filecontents .= 'VERSION:2.0' . "\n";
+	$filecontents .= 'BEGIN:VEVENT' . "\n";
+	$filecontents .= 'ORGANIZER;CN="' . $event['realname'] . '":MAILTO:' . $webmaster_email . "\n";
+	$filecontents .= 'DTSTAMP:' . $datestamp . "\n";
+	$filecontents .= 'DTSTART;VALUE=DATE:' . $datestart . "\n";
+
+	// more than one day
+	if ($event['span'] > 1)
+		$filecontents .= 'DTEND;VALUE=DATE:' . $dateend . "\n";
+
+	// event has changed? advance the sequence for this UID
+	if ($event['sequence'] > 0)
+		$filecontents .= 'SEQUENCE:' . $event['sequence'] . "\n";
+
+	$filecontents .= 'SUMMARY:' . implode('', $title);
+	$filecontents .= 'UID:' . $event['eventid'] . '@' . str_replace(' ', '-', $mbname) . "\n";
+	$filecontents .= 'END:VEVENT' . "\n";
+	$filecontents .= 'END:VCALENDAR';
+
+	return $filecontents;
 }

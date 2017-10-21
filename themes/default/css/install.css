@@ -10,7 +10,7 @@ a:link, a:hover, a:visited {
 }
 h1.forumtitle {
 	font-size: 2em;
-	font-family: tahoma;
+	font-family: tahoma, serif;
 	margin: 0;
 	padding: 35px 0 0 15px;
 	float: left;
@@ -141,8 +141,6 @@ img#logo {
 /* End [WIP] */
 #time_elapsed {
 	clear: both;
-	padding: 1em 1em 0 1em;
-	border: 1px solid green;
 	/* [WIP] */
 	background: /*#f0f4f7*/ #fcfcfc;
 	margin: 1em 0.9em 0 0.9em;

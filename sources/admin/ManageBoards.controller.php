@@ -7,18 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * This class controls execution for actions in the manage boards area
@@ -29,15 +24,22 @@ if (!defined('ELK'))
 class ManageBoards_Controller extends Action_Controller
 {
 	/**
-	 * Boards settings form.
-	 * @var Settings_Form
+	 * Category being worked on
+	 * @var int
 	 */
-	protected $_boardSettings;
+	public $cat;
+
+	/**
+	 * Current board id being modified
+	 * @var int
+	 */
+	public $boardid;
 
 	/**
 	 * The main dispatcher; delegates.
 	 *
 	 * What it does:
+	 *
 	 * - This is the main entry point for all the manageboards admin screens.
 	 * - Called by ?action=admin;area=manageboards.
 	 * - It checks the permissions, based on the sub-action, and calls a function based on the sub-action.
@@ -50,9 +52,6 @@ class ManageBoards_Controller extends Action_Controller
 
 		// Everything's gonna need this.
 		loadLanguage('ManageBoards');
-
-		// We're working with them settings here.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Format: 'sub-action' => array('controller', 'function', 'permission'=>'need')
 		$subActions = array(
@@ -124,10 +123,12 @@ class ManageBoards_Controller extends Action_Controller
 	 * The main control panel thing, the screen showing all boards and categories.
 	 *
 	 * What it does:
+	 *
 	 * - Called by ?action=admin;area=manageboards or ?action=admin;area=manageboards;sa=move.
 	 * - Requires manage_boards permission.
 	 * - It also handles the interface for moving boards.
 	 *
+	 * @event integrate_boards_main Used to access global board arrays before the template
 	 * @uses ManageBoards template, main sub-template.
 	 */
 	public function action_main()
@@ -139,34 +140,36 @@ class ManageBoards_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Boards.subs.php');
 
 		// Moving a board, child of, before, after, top
-		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'move' && in_array($_REQUEST['move_to'], array('child', 'before', 'after', 'top')))
+		if (isset($this->_req->query->sa) && $this->_req->query->sa == 'move' && in_array($this->_req->query->move_to, array('child', 'before', 'after', 'top')))
 		{
 			checkSession('get');
-			validateToken('admin-bm-' . (int) $_REQUEST['src_board'], 'request');
+			validateToken('admin-bm-' . (int) $this->_req->query->src_board, 'request');
 
 			// Top is special, its the top!
-			if ($_REQUEST['move_to'] === 'top')
+			if ($this->_req->query->move_to === 'top')
 				$boardOptions = array(
-					'move_to' => $_REQUEST['move_to'],
-					'target_category' => (int) $_REQUEST['target_cat'],
+					'move_to' => $this->_req->query->move_to,
+					'target_category' => (int) $this->_req->query->target_cat,
 					'move_first_child' => true,
 				);
 			// Moving it after another board
 			else
 				$boardOptions = array(
-					'move_to' => $_REQUEST['move_to'],
-					'target_board' => (int) $_REQUEST['target_board'],
+					'move_to' => $this->_req->query->move_to,
+					'target_board' => (int) $this->_req->query->target_board,
 					'move_first_child' => true,
 				);
 
 			// Use modifyBoard to perform the action
-			modifyBoard((int) $_REQUEST['src_board'], $boardOptions);
+			modifyBoard((int) $this->_req->query->src_board, $boardOptions);
 		}
 
 		getBoardTree();
 
 		createToken('admin-sort');
-		$context['move_board'] = !empty($_REQUEST['move']) && isset($boards[(int) $_REQUEST['move']]) ? (int) $_REQUEST['move'] : 0;
+		$context['move_board'] = !empty($this->_req->query->move) && isset($boards[(int) $this->_req->query->move]) ? (int) $this->_req->query->move : 0;
+
+		$bbc_parser = \BBC\ParserWrapper::instance();
 
 		$context['categories'] = array();
 		foreach ($cat_tree as $catid => $tree)
@@ -179,12 +182,13 @@ class ManageBoards_Controller extends Action_Controller
 			$move_cat = !empty($context['move_board']) && $boards[$context['move_board']]['category'] == $catid;
 			foreach ($boardList[$catid] as $boardid)
 			{
+				$boards[$boardid]['description'] = $bbc_parser->parseBoard($boards[$boardid]['description']);
 				$context['categories'][$catid]['boards'][$boardid] = array(
 					'id' => &$boards[$boardid]['id'],
 					'name' => &$boards[$boardid]['name'],
 					'description' => &$boards[$boardid]['description'],
 					'child_level' => &$boards[$boardid]['level'],
-					'move' => $move_cat && ($boardid == $context['move_board'] || isChildOf($boardid, $context['move_board'])),
+					'move' => $move_cat && ($boardid == $context['move_board'] || isChildOf($boardid, (int) $context['move_board'])),
 					'permission_profile' => &$boards[$boardid]['profile'],
 				);
 			}
@@ -235,7 +239,7 @@ class ManageBoards_Controller extends Action_Controller
 							$context['categories'][$catid]['boards'][$prev_board]['move_links'] = array();
 
 						for ($i = 0; $i < -$difference; $i++)
-							if (($temp = array_pop($stack)) != null)
+							if (($temp = array_pop($stack)) !== null)
 								array_unshift($context['categories'][$catid]['boards'][$prev_board]['move_links'], $temp);
 					}
 
@@ -269,11 +273,13 @@ class ManageBoards_Controller extends Action_Controller
 	 * Modify a specific category.
 	 *
 	 * What it does:
+	 *
 	 * - screen for editing and repositioning a category.
 	 * - Also used to show the confirm deletion of category screen
 	 * - Called by ?action=admin;area=manageboards;sa=cat
 	 * - Requires manage_boards permission.
 	 *
+	 * @event integrate_edit_category access category globals before the template
 	 * @uses ManageBoards template, modify_category sub-template.
 	 */
 	public function action_cat()
@@ -285,20 +291,20 @@ class ManageBoards_Controller extends Action_Controller
 		getBoardTree();
 
 		// id_cat must be a number.... if it exists.
-		$_REQUEST['cat'] = isset($_REQUEST['cat']) ? (int) $_REQUEST['cat'] : 0;
+		$this->cat = $this->_req->getQuery('cat', 'intval', 0);
 
 		// Start with one - "In first place".
 		$context['category_order'] = array(
 			array(
 				'id' => 0,
 				'name' => $txt['mboards_order_first'],
-				'selected' => !empty($_REQUEST['cat']) ? $cat_tree[$_REQUEST['cat']]['is_first'] : false,
+				'selected' => !empty($this->cat) ? $cat_tree[$this->cat]['is_first'] : false,
 				'true_name' => ''
 			)
 		);
 
 		// If this is a new category set up some defaults.
-		if ($_REQUEST['sa'] == 'newcat')
+		if ($this->_req->query->sa == 'newcat')
 		{
 			$context['category'] = array(
 				'id' => 0,
@@ -310,29 +316,29 @@ class ManageBoards_Controller extends Action_Controller
 			);
 		}
 		// Category doesn't exist, man... sorry.
-		elseif (!isset($cat_tree[$_REQUEST['cat']]))
+		elseif (!isset($cat_tree[$this->cat]))
 			redirectexit('action=admin;area=manageboards');
 		else
 		{
 			$context['category'] = array(
-				'id' => $_REQUEST['cat'],
-				'name' => $cat_tree[$_REQUEST['cat']]['node']['name'],
-				'editable_name' => htmlspecialchars($cat_tree[$_REQUEST['cat']]['node']['name'], ENT_COMPAT, 'UTF-8'),
-				'can_collapse' => !empty($cat_tree[$_REQUEST['cat']]['node']['can_collapse']),
+				'id' => $this->cat,
+				'name' => $cat_tree[$this->cat]['node']['name'],
+				'editable_name' => htmlspecialchars($cat_tree[$this->cat]['node']['name'], ENT_COMPAT, 'UTF-8'),
+				'can_collapse' => !empty($cat_tree[$this->cat]['node']['can_collapse']),
 				'children' => array(),
-				'is_empty' => empty($cat_tree[$_REQUEST['cat']]['children'])
+				'is_empty' => empty($cat_tree[$this->cat]['children'])
 			);
 
-			foreach ($boardList[$_REQUEST['cat']] as $child_board)
+			foreach ($boardList[$this->cat] as $child_board)
 				$context['category']['children'][] = str_repeat('-', $boards[$child_board]['level']) . ' ' . $boards[$child_board]['name'];
 		}
 
 		$prevCat = 0;
 		foreach ($cat_tree as $catid => $tree)
 		{
-			if ($catid == $_REQUEST['cat'] && $prevCat > 0)
+			if ($catid == $this->cat && $prevCat > 0)
 				$context['category_order'][$prevCat]['selected'] = true;
-			elseif ($catid != $_REQUEST['cat'])
+			elseif ($catid != $this->cat)
 				$context['category_order'][$catid] = array(
 					'id' => $catid,
 					'name' => $txt['mboards_order_after'] . $tree['node']['name'],
@@ -342,10 +348,11 @@ class ManageBoards_Controller extends Action_Controller
 
 			$prevCat = $catid;
 		}
-		if (!isset($_REQUEST['delete']))
+
+		if (!isset($this->_req->query->delete))
 		{
 			$context['sub_template'] = 'modify_category';
-			$context['page_title'] = $_REQUEST['sa'] == 'newcat' ? $txt['mboards_new_cat_name'] : $txt['catEdit'];
+			$context['page_title'] = $this->_req->query->sa == 'newcat' ? $txt['mboards_new_cat_name'] : $txt['catEdit'];
 		}
 		else
 		{
@@ -354,8 +361,8 @@ class ManageBoards_Controller extends Action_Controller
 		}
 
 		// Create a special token.
-		createToken('admin-bc-' . $_REQUEST['cat']);
-		$context['token_check'] = 'admin-bc-' . $_REQUEST['cat'];
+		createToken('admin-bc-' . $this->cat);
+		$context['token_check'] = 'admin-bc-' . $this->cat;
 
 		call_integration_hook('integrate_edit_category');
 	}
@@ -364,6 +371,7 @@ class ManageBoards_Controller extends Action_Controller
 	 * Function for handling a submitted form saving the category.
 	 *
 	 * What it does:
+	 *
 	 * - complete the modifications to a specific category.
 	 * - It also handles deletion of a category.
 	 * - It requires manage_boards permission.
@@ -373,49 +381,49 @@ class ManageBoards_Controller extends Action_Controller
 	public function action_cat2()
 	{
 		checkSession();
-		validateToken('admin-bc-' . $_REQUEST['cat']);
+		validateToken('admin-bc-' . $this->_req->post->cat);
 
 		require_once(SUBSDIR . '/Categories.subs.php');
 
-		$_POST['cat'] = (int) $_POST['cat'];
+		$this->cat = (int) $this->_req->post->cat;
 
 		// Add a new category or modify an existing one..
-		if (isset($_POST['edit']) || isset($_POST['add']))
+		if (isset($this->_req->post->edit) || isset($this->_req->post->add))
 		{
 			$catOptions = array();
 
-			if (isset($_POST['cat_order']))
-				$catOptions['move_after'] = (int) $_POST['cat_order'];
+			if (isset($this->_req->post->cat_order))
+				$catOptions['move_after'] = (int) $this->_req->post->cat_order;
 
 			// Change "This & That" to "This &amp; That" but don't change "&cent" to "&amp;cent;"...
-			$catOptions['cat_name'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $_POST['cat_name']);
+			$catOptions['cat_name'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $this->_req->post->cat_name);
 
-			$catOptions['is_collapsible'] = isset($_POST['collapse']);
+			$catOptions['is_collapsible'] = isset($this->_req->post->collapse);
 
-			if (isset($_POST['add']))
+			if (isset($this->_req->post->add))
 				createCategory($catOptions);
 			else
-				modifyCategory($_POST['cat'], $catOptions);
+				modifyCategory($this->cat, $catOptions);
 		}
 		// If they want to delete - first give them confirmation.
-		elseif (isset($_POST['delete']) && !isset($_POST['confirmation']) && !isset($_POST['empty']))
+		elseif (isset($this->_req->post->delete) && !isset($this->_req->post->confirmation) && !isset($this->_req->post->empty))
 		{
 			$this->action_cat();
 			return;
 		}
 		// Delete the category!
-		elseif (isset($_POST['delete']))
+		elseif (isset($this->_req->post->delete))
 		{
 			// First off - check if we are moving all the current boards first - before we start deleting!
-			if (isset($_POST['delete_action']) && $_POST['delete_action'] == 1)
+			if (isset($this->_req->post->delete_action) && $this->_req->post->delete_action == 1)
 			{
-				if (empty($_POST['cat_to']))
-					fatal_lang_error('mboards_delete_error');
+				if (empty($this->_req->post->cat_to))
+					throw new Elk_Exception('mboards_delete_error');
 
-				deleteCategories(array($_POST['cat']), (int) $_POST['cat_to']);
+				deleteCategories(array($this->cat), (int) $this->_req->post->cat_to);
 			}
 			else
-				deleteCategories(array($_POST['cat']));
+				deleteCategories(array($this->cat));
 		}
 
 		redirectexit('action=admin;area=manageboards');
@@ -424,12 +432,13 @@ class ManageBoards_Controller extends Action_Controller
 	/**
 	 * Modify a specific board...
 	 *
-	 * What it doews
+	 * What it does
 	 * - screen for editing and repositioning a board.
 	 * - called by ?action=admin;area=manageboards;sa=board
 	 * - also used to show the confirm deletion of category screen (sub-template confirm_board_delete).
 	 * - requires manage_boards permission.
 	 *
+	 * @event integrate_edit_board
 	 * @uses the modify_board sub-template of the ManageBoards template.
 	 * @uses ManagePermissions language
 	 */
@@ -439,6 +448,7 @@ class ManageBoards_Controller extends Action_Controller
 
 		loadTemplate('ManageBoards');
 		require_once(SUBSDIR . '/Boards.subs.php');
+		require_once(SUBSDIR . '/Post.subs.php');
 		getBoardTree();
 
 		// For editing the profile we'll need this.
@@ -447,24 +457,26 @@ class ManageBoards_Controller extends Action_Controller
 		loadPermissionProfiles();
 
 		// id_board must be a number....
-		$_REQUEST['boardid'] = isset($_REQUEST['boardid']) ? (int) $_REQUEST['boardid'] : 0;
-		if (!isset($boards[$_REQUEST['boardid']]))
+		$this->boardid = $this->_req->getQuery('boardid', 'intval', 0);
+		if (!isset($boards[$this->boardid]))
 		{
-			$_REQUEST['boardid'] = 0;
-			$_REQUEST['sa'] = 'newboard';
+			$this->boardid = 0;
+			$this->_req->query->sa = 'newboard';
 		}
 
-		if ($_REQUEST['sa'] == 'newboard')
+		if ($this->_req->query->sa == 'newboard')
 		{
+			$this->cat = $this->_req->getQuery('cat', 'intval', 0);
+
 			// Category doesn't exist, man... sorry.
-			if (empty($_REQUEST['cat']))
+			if (empty($this->cat))
 				redirectexit('action=admin;area=manageboards');
 
 			// Some things that need to be setup for a new board.
 			$curBoard = array(
 				'member_groups' => array(0, -1),
 				'deny_groups' => array(),
-				'category' => (int) $_REQUEST['cat']
+				'category' => $this->cat
 			);
 			$context['board_order'] = array();
 			$context['board'] = array(
@@ -479,23 +491,23 @@ class ManageBoards_Controller extends Action_Controller
 				'profile' => 1,
 				'override_theme' => 0,
 				'redirect' => '',
-				'category' => (int) $_REQUEST['cat'],
+				'category' => $this->cat,
 				'no_children' => true,
 			);
 		}
 		else
 		{
 			// Just some easy shortcuts.
-			$curBoard = &$boards[$_REQUEST['boardid']];
-			$context['board'] = $boards[$_REQUEST['boardid']];
+			$curBoard = &$boards[$this->boardid];
+			$context['board'] = $boards[$this->boardid];
 			$context['board']['name'] = htmlspecialchars(strtr($context['board']['name'], array('&amp;' => '&')), ENT_COMPAT, 'UTF-8');
-			$context['board']['description'] = htmlspecialchars($context['board']['description'], ENT_COMPAT, 'UTF-8');
-			$context['board']['no_children'] = empty($boards[$_REQUEST['boardid']]['tree']['children']);
+			$context['board']['description'] = un_preparsecode($context['board']['description']);
+			$context['board']['no_children'] = empty($boards[$this->boardid]['tree']['children']);
 			$context['board']['is_recycle'] = !empty($modSettings['recycle_enable']) && !empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $context['board']['id'];
 		}
 
 		// As we may have come from the permissions screen keep track of where we should go on save.
-		$context['redirect_location'] = isset($_GET['rid']) && $_GET['rid'] == 'permissions' ? 'permissions' : 'boards';
+		$context['redirect_location'] = isset($this->_req->query->rid) && $this->_req->query->rid == 'permissions' ? 'permissions' : 'boards';
 
 		// We might need this to hide links to certain areas.
 		$context['can_manage_permissions'] = allowedTo('manage_permissions');
@@ -518,7 +530,7 @@ class ManageBoards_Controller extends Action_Controller
 			)
 		);
 
-		$context['groups'] += getOtherGroups($curBoard);
+		$context['groups'] += getOtherGroups($curBoard, $this->_req->query->sa == 'newboard');
 
 		// Category doesn't exist, man... sorry.
 		if (!isset($boardList[$curBoard['category']]))
@@ -526,7 +538,7 @@ class ManageBoards_Controller extends Action_Controller
 
 		foreach ($boardList[$curBoard['category']] as $boardid)
 		{
-			if ($boardid == $_REQUEST['boardid'])
+			if ($boardid == $this->boardid)
 			{
 				$context['board_order'][] = array(
 					'id' => $boardid,
@@ -542,19 +554,19 @@ class ManageBoards_Controller extends Action_Controller
 				$context['board_order'][] = array(
 					'id' => $boardid,
 					'name' => str_repeat('-', $boards[$boardid]['level']) . ' ' . $boards[$boardid]['name'],
-					'is_child' => empty($_REQUEST['boardid']) ? false : isChildOf($boardid, $_REQUEST['boardid']),
+					'is_child' => empty($this->boardid) ? false : isChildOf($boardid, $this->boardid),
 					'selected' => false
 				);
 			}
 		}
 
 		// Are there any places to move sub-boards to in the case where we are confirming a delete?
-		if (!empty($_REQUEST['boardid']))
+		if (!empty($this->boardid))
 		{
 			$context['can_move_children'] = false;
-			$context['children'] = $boards[$_REQUEST['boardid']]['tree']['children'];
+			$context['children'] = $boards[$this->boardid]['tree']['children'];
 			foreach ($context['board_order'] as $board)
-				if ($board['is_child'] == false && $board['selected'] == false)
+				if ($board['is_child'] === false && $board['selected'] === false)
 					$context['can_move_children'] = true;
 		}
 
@@ -567,7 +579,7 @@ class ManageBoards_Controller extends Action_Controller
 				'selected' => $catID == $curBoard['category']
 			);
 
-		$context['board']['moderators'] = getBoardModerators($_REQUEST['boardid']);
+		$context['board']['moderators'] = getBoardModerators($this->boardid);
 		$context['board']['moderator_list'] = empty($context['board']['moderators']) ? '' : '&quot;' . implode('&quot;, &quot;', $context['board']['moderators']) . '&quot;';
 
 		if (!empty($context['board']['moderators']))
@@ -575,7 +587,7 @@ class ManageBoards_Controller extends Action_Controller
 
 		$context['themes'] = getAllThemes();
 
-		if (!isset($_REQUEST['delete']))
+		if (!isset($this->_req->query->delete))
 		{
 			$context['sub_template'] = 'modify_board';
 			$context['page_title'] = $txt['boardsEdit'];
@@ -588,7 +600,7 @@ class ManageBoards_Controller extends Action_Controller
 		}
 
 		// Create a special token.
-		createToken('admin-be-' . $_REQUEST['boardid']);
+		createToken('admin-be-' . $this->boardid);
 
 		call_integration_hook('integrate_edit_board');
 	}
@@ -597,81 +609,93 @@ class ManageBoards_Controller extends Action_Controller
 	 * Make changes to/delete a board.
 	 *
 	 * What it does:
+	 *
 	 * - function for handling a submitted form saving the board.
 	 * - It also handles deletion of a board.
 	 * - Called by ?action=admin;area=manageboards;sa=board2
 	 * - Redirects to ?action=admin;area=manageboards.
 	 * - It requires manage_boards permission.
+	 *
+	 * @event integrate_save_board
 	 */
 	public function action_board2()
 	{
 		global $context;
 
-		$board_id = isset($_POST['boardid']) ? (int) $_POST['boardid'] : 0;
+		$board_id = $this->_req->getPost('boardid', 'intval', 0);
 		checkSession();
-		validateToken('admin-be-' . $_REQUEST['boardid']);
+		validateToken('admin-be-' . $this->_req->post->boardid);
 
 		require_once(SUBSDIR . '/Boards.subs.php');
+		require_once(SUBSDIR . '/Post.subs.php');
+
+		$posts = getBoardProperties($this->_req->post->boardid)['numPosts'];
 
 		// Mode: modify aka. don't delete.
-		if (isset($_POST['edit']) || isset($_POST['add']))
+		if (isset($this->_req->post->edit) || isset($this->_req->post->add))
 		{
 			$boardOptions = array();
 
 			// Move this board to a new category?
-			if (!empty($_POST['new_cat']))
+			if (!empty($this->_req->post->new_cat))
 			{
 				$boardOptions['move_to'] = 'bottom';
-				$boardOptions['target_category'] = (int) $_POST['new_cat'];
+				$boardOptions['target_category'] = (int) $this->_req->post->new_cat;
 			}
 			// Change the boardorder of this board?
-			elseif (!empty($_POST['placement']) && !empty($_POST['board_order']))
+			elseif (!empty($this->_req->post->placement) && !empty($this->_req->post->board_order))
 			{
-				if (!in_array($_POST['placement'], array('before', 'after', 'child')))
-					fatal_lang_error('mangled_post', false);
+				if (!in_array($this->_req->post->placement, array('before', 'after', 'child')))
+					throw new Elk_Exception('mangled_post', false);
 
-				$boardOptions['move_to'] = $_POST['placement'];
-				$boardOptions['target_board'] = (int) $_POST['board_order'];
+				$boardOptions['move_to'] = $this->_req->post->placement;
+				$boardOptions['target_board'] = (int) $this->_req->post->board_order;
 			}
 
 			// Checkboxes....
-			$boardOptions['posts_count'] = isset($_POST['count']);
-			$boardOptions['override_theme'] = isset($_POST['override_theme']);
-			$boardOptions['board_theme'] = (int) $_POST['boardtheme'];
+			$boardOptions['posts_count'] = isset($this->_req->post->count);
+			$boardOptions['override_theme'] = isset($this->_req->post->override_theme);
+			$boardOptions['board_theme'] = (int) $this->_req->post->boardtheme;
 			$boardOptions['access_groups'] = array();
 			$boardOptions['deny_groups'] = array();
 
-			if (!empty($_POST['groups']))
-				foreach ($_POST['groups'] as $group => $action)
+			if (!empty($this->_req->post->groups))
+			{
+				foreach ($this->_req->post->groups as $group => $action)
 				{
 					if ($action == 'allow')
 						$boardOptions['access_groups'][] = (int) $group;
 					elseif ($action == 'deny')
 						$boardOptions['deny_groups'][] = (int) $group;
 				}
+			}
 
 			if (strlen(implode(',', $boardOptions['access_groups'])) > 255 || strlen(implode(',', $boardOptions['deny_groups'])) > 255)
-				fatal_lang_error('too_many_groups', false);
+				throw new Elk_Exception('too_many_groups', false);
 
 			// Change '1 & 2' to '1 &amp; 2', but not '&amp;' to '&amp;amp;'...
-			$boardOptions['board_name'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $_POST['board_name']);
-			$boardOptions['board_description'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $_POST['desc']);
-			$boardOptions['moderator_string'] = $_POST['moderators'];
+			$boardOptions['board_name'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $this->_req->post->board_name);
 
-			if (isset($_POST['moderator_list']) && is_array($_POST['moderator_list']))
+			$boardOptions['board_description'] = Util::htmlspecialchars($this->_req->post->desc);
+			preparsecode($boardOptions['board_description']);
+
+			$boardOptions['moderator_string'] = $this->_req->post->moderators;
+
+			if (isset($this->_req->post->moderator_list) && is_array($this->_req->post->moderator_list))
 			{
 				$moderators = array();
-				foreach ($_POST['moderator_list'] as $moderator)
+				foreach ($this->_req->post->moderator_list as $moderator)
 					$moderators[(int) $moderator] = (int) $moderator;
+
 				$boardOptions['moderators'] = $moderators;
 			}
 
 			// Are they doing redirection?
-			$boardOptions['redirect'] = !empty($_POST['redirect_enable']) && isset($_POST['redirect_address']) && trim($_POST['redirect_address']) != '' ? trim($_POST['redirect_address']) : '';
+			$boardOptions['redirect'] = !empty($this->_req->post->redirect_enable) && isset($this->_req->post->redirect_address) && trim($this->_req->post->redirect_address) != '' ? trim($this->_req->post->redirect_address) : '';
 
 			// Profiles...
-			$boardOptions['profile'] = $_POST['profile'];
-			$boardOptions['inherit_permissions'] = $_POST['profile'] == -1;
+			$boardOptions['profile'] = $this->_req->post->profile;
+			$boardOptions['inherit_permissions'] = $this->_req->post->profile == -1;
 
 			// We need to know what used to be case in terms of redirection.
 			if (!empty($board_id))
@@ -685,19 +709,18 @@ class ManageBoards_Controller extends Action_Controller
 				elseif (empty($boardOptions['redirect']) != empty($properties['oldRedirect']))
 					$boardOptions['num_posts'] = 0;
 				// Resetting the count?
-				elseif ($boardOptions['redirect'] && !empty($_POST['reset_redirect']))
+				elseif ($boardOptions['redirect'] && !empty($this->_req->post->reset_redirect))
 					$boardOptions['num_posts'] = 0;
-
 			}
 
 			call_integration_hook('integrate_save_board', array($board_id, &$boardOptions));
 
 			// Create a new board...
-			if (isset($_POST['add']))
+			if (isset($this->_req->post->add))
 			{
 				// New boards by default go to the bottom of the category.
-				if (empty($_POST['new_cat']))
-					$boardOptions['target_category'] = (int) $_POST['cur_cat'];
+				if (empty($this->_req->post->new_cat))
+					$boardOptions['target_category'] = (int) $this->_req->post->cur_cat;
 				if (!isset($boardOptions['move_to']))
 					$boardOptions['move_to'] = 'bottom';
 
@@ -707,26 +730,35 @@ class ManageBoards_Controller extends Action_Controller
 			else
 				modifyBoard($board_id, $boardOptions);
 		}
-		elseif (isset($_POST['delete']) && !isset($_POST['confirmation']) && !isset($_POST['no_children']))
+		elseif (isset($this->_req->post->delete) && !isset($this->_req->post->confirmation) && !isset($this->_req->post->no_children))
 		{
-			$this->action_board();
+			if ($posts) {
+				throw new Elk_Exception('mboards_delete_board_has_posts');
+			}
+			else {
+				$this->action_board();
+			}
 			return;
 		}
-		elseif (isset($_POST['delete']))
+		elseif (isset($this->_req->post->delete))
 		{
-			// First off - check if we are moving all the current sub-boards first - before we start deleting!
-			if (isset($_POST['delete_action']) && $_POST['delete_action'] == 1)
+			// First, check if our board still has posts or topics.
+			if ($posts) {
+				throw new Elk_Exception('mboards_delete_board_has_posts');
+			}
+			else if (isset($this->_req->post->delete_action) && $this->_req->post->delete_action == 1)
 			{
-				if (empty($_POST['board_to']))
-					fatal_lang_error('mboards_delete_board_error');
+				// Check if we are moving all the current sub-boards first - before we start deleting!
+				if (empty($this->_req->post->board_to))
+					throw new Elk_Exception('mboards_delete_board_error');
 
-				deleteBoards(array($board_id), (int) $_POST['board_to']);
+				deleteBoards(array($board_id), (int) $this->_req->post->board_to);
 			}
 			else
 				deleteBoards(array($board_id), 0);
 		}
 
-		if (isset($_REQUEST['rid']) && $_REQUEST['rid'] == 'permissions')
+		if (isset($this->_req->query->rid) && $this->_req->query->rid == 'permissions')
 			redirectexit('action=admin;area=permissions;sa=board;' . $context['session_var'] . '=' . $context['session_id']);
 		else
 			redirectexit('action=admin;area=manageboards');
@@ -735,6 +767,7 @@ class ManageBoards_Controller extends Action_Controller
 	/**
 	 * A screen to display and allow to set a few general board and category settings.
 	 *
+	 * @event integrate_save_board_settings called during manage board settings
 	 * @uses modify_general_settings sub-template.
 	 */
 	public function action_boardSettings_display()
@@ -742,62 +775,44 @@ class ManageBoards_Controller extends Action_Controller
 		global $context, $txt, $scripturl;
 
 		// Initialize the form
-		$this->_initBoardSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// Get all settings
-		$config_vars = $this->_boardSettings->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Add some javascript stuff for the recycle box.
 		addInlineJavascript('
 				document.getElementById("recycle_board").disabled = !document.getElementById("recycle_enable").checked;', true);
 
-		// Don't let guests have these permissions.
-		$context['post_url'] = $scripturl . '?action=admin;area=manageboards;save;sa=settings';
-		$context['permissions_excluded'] = array(-1);
-
 		// Get the needed template bits
 		loadTemplate('ManageBoards');
 		$context['page_title'] = $txt['boards_and_cats'] . ' - ' . $txt['settings'];
 		$context['sub_template'] = 'show_settings';
+		$context['post_url'] = $scripturl . '?action=admin;area=manageboards;save;sa=settings';
 
 		// Warn the admin against selecting the recycle topic without selecting a board.
 		$context['force_form_onsubmit'] = 'if(document.getElementById(\'recycle_enable\').checked && document.getElementById(\'recycle_board\').value == 0) { return confirm(\'' . $txt['recycle_board_unselected_notice'] . '\');} return true;';
 
 		// Doing a save?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			call_integration_hook('integrate_save_board_settings');
 
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=manageboards;sa=settings');
 		}
 
-		// We need this for the in-line permissions
-		createToken('admin-mp');
-
 		// Prepare the settings...
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize the boardSettings form, with the current configuration
-	 * options for admin board settings screen.
-	 */
-	private function _initBoardSettingsForm()
-	{
-		// Instantiate the form
-		$this->_boardSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_boardSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
 	 * Retrieve and return all admin settings for boards management.
+	 *
+	 * @event integrate_modify_board_settings add config settings to boards management
 	 */
 	private function _settings()
 	{

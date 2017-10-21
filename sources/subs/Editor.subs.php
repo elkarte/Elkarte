@@ -8,18 +8,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Retrieves a list of message icons.
@@ -66,10 +61,12 @@ function getMessageIcons($board_id)
 	// Otherwise load the icons, and check we give the right image too...
 	else
 	{
-		if (($temp = cache_get_data('posting_icons-' . $board_id, 480)) == null)
+		$icons = array();
+		if (!Cache::instance()->getVar($icons, 'posting_icons-' . $board_id, 480))
 		{
-			$request = $db->query('', '
-				SELECT title, filename
+			$icon_data = $db->fetchQuery('
+				SELECT 
+					title, filename
 				FROM {db_prefix}message_icons
 				WHERE id_board IN (0, {int:board_id})
 				ORDER BY icon_order',
@@ -77,11 +74,6 @@ function getMessageIcons($board_id)
 					'board_id' => $board_id,
 				)
 			);
-			$icon_data = array();
-			while ($row = $db->fetch_assoc($request))
-				$icon_data[] = $row;
-			$db->free_result($request);
-
 			$icons = array();
 			foreach ($icon_data as $icon)
 			{
@@ -93,10 +85,8 @@ function getMessageIcons($board_id)
 				);
 			}
 
-			cache_put_data('posting_icons-' . $board_id, $icons, 480);
+			Cache::instance()->put('posting_icons-' . $board_id, $icons, 480);
 		}
-		else
-			$icons = $temp;
 	}
 
 	return array_values($icons);
@@ -104,12 +94,13 @@ function getMessageIcons($board_id)
 
 /**
  * Creates a box that can be used for richedit stuff like BBC, Smileys etc.
+ *
  * @param mixed[] $editorOptions associative array of options => value
- *  must contain:
+ *  Must contain:
  *   - id => unique id for the css
  *   - value => text for the editor or blank
- *  Optionaly
- *   - height => height of the intial box
+ * Optionally:
+ *   - height => height of the initial box
  *   - width => width of the box (100%)
  *   - force_rich => force wysiwyg to be enabled
  *   - disable_smiley_box => boolean to turn off the smiley box
@@ -117,19 +108,20 @@ function getMessageIcons($board_id)
  *       - 'post_button' => $txt['for post button'],
  *     ),
  *   - preview_type => 2 how to act on preview click, see template_control_richedit_buttons
+ *
+ * @uses Post language
+ * @uses GenericControls template
+ * @throws Elk_Exception
  */
 function create_control_richedit($editorOptions)
 {
-	global $txt, $modSettings, $options, $context, $settings, $user_info, $scripturl;
+	global $txt, $modSettings, $options, $context, $settings, $scripturl;
 	static $bbc_tags;
 
 	$db = database();
 
 	// Load the Post language file... for the moment at least.
 	loadLanguage('Post');
-
-	if (!empty($context['drafts_save']) || !empty($context['drafts_pm_save']))
-		loadLanguage('Drafts');
 
 	// Every control must have a ID!
 	assert(isset($editorOptions['id']));
@@ -142,8 +134,10 @@ function create_control_richedit($editorOptions)
 		$context['post_box_name'] = $editorOptions['id'];
 
 		// Some general stuff.
-		$settings['smileys_url'] = $modSettings['smileys_url'] . '/' . $user_info['smiley_set'];
-		if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
+		$settings['smileys_url'] = $context['user']['smiley_path'];
+
+		// @deprecated since 1.1
+		if (!isset($context['drafts_autosave_frequency']) && !empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 			$context['drafts_autosave_frequency'] = empty($modSettings['drafts_autosave_frequency']) ? 30000 : $modSettings['drafts_autosave_frequency'] * 1000;
 
 		// This really has some WYSIWYG stuff.
@@ -153,29 +147,26 @@ function create_control_richedit($editorOptions)
 			loadCSSFile($context['theme_variant'] . '/jquery.sceditor.elk' . $context['theme_variant'] . '.css');
 
 		// JS makes the editor go round
-		loadJavascriptFile(array('jquery.sceditor.min.js', 'jquery.sceditor.bbcode.min.js', 'jquery.sceditor.elkarte.js', 'post.js', 'splittag.plugin.js', 'dropAttachments.js'));
+		loadJavascriptFile(array('jquery.sceditor.bbcode.min.js', 'jquery.sceditor.elkarte.js', 'post.js', 'splittag.plugin.js', 'undo.plugin.min.js', 'dropAttachments.js'));
 		addJavascriptVar(array(
 			'post_box_name' => $editorOptions['id'],
 			'elk_smileys_url' => $settings['smileys_url'],
 			'bbc_quote_from' => $txt['quote_from'],
 			'bbc_quote' => $txt['quote'],
-			'bbc_search_on' => $txt['search_on']), true
+			'bbc_search_on' => $txt['search_on'],
+			'ila_filename' => $txt['file'] . ' ' . $txt['name']), true
 		);
-
 		// Editor language file
 		if (!empty($txt['lang_locale']))
 			loadJavascriptFile($scripturl . '?action=jslocale;sa=sceditor', array('defer' => true), 'sceditor_language');
 
-		// Drafts?
-		if ((!empty($context['drafts_save']) || !empty($context['drafts_pm_save'])) && !empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-			loadJavascriptFile('drafts.plugin.js');
-
 		// Mentions?
 		if (!empty($context['mentions_enabled']))
-			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.min.js', 'mentioning.plugin.js'));
+			loadJavascriptFile(array('jquery.atwho.min.js', 'jquery.caret.min.js', 'mentioning.plugin.js'));
 
 		// Our not so concise shortcut line
-		$context['shortcuts_text'] = $txt['shortcuts' . (!empty($context['drafts_save']) || !empty($context['drafts_pm_save']) ? '_drafts' : '') . (isBrowser('is_firefox') ? '_firefox' : '')];
+		if (!isset($context['shortcuts_text']))
+			$context['shortcuts_text'] = $txt['shortcuts' . (isBrowser('is_firefox') ? '_firefox' : '')];
 
 		// Spellcheck?
 		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
@@ -207,6 +198,10 @@ function create_control_richedit($editorOptions)
 		'preview_type' => isset($editorOptions['preview_type']) ? (int) $editorOptions['preview_type'] : 1,
 		'labels' => !empty($editorOptions['labels']) ? $editorOptions['labels'] : array(),
 		'locale' => !empty($txt['lang_locale']) ? $txt['lang_locale'] : 'en_US',
+		'plugin_addons' => !empty($editorOptions['plugin_addons']) ? $editorOptions['plugin_addons'] : array(),
+		'plugin_options' => !empty($editorOptions['plugin_options']) ? $editorOptions['plugin_options'] : array(),
+		'buttons' => !empty($editorOptions['buttons']) ? $editorOptions['buttons'] : array(),
+		'hidden_fields' => !empty($editorOptions['hidden_fields']) ? $editorOptions['hidden_fields'] : array(),
 	);
 
 	// Allow addons an easy way to add plugins, initialization objects, etc to the editor control
@@ -229,7 +224,7 @@ function create_control_richedit($editorOptions)
 	{
 		// The below array is used to show a command button in the editor, the execution
 		// and display details of any added buttons must be defined in the javascript files
-		// see  jquery.sceditor.elkarte.js under the $.sceditor.plugins.bbcode.bbcode area
+		// see jquery.sceditor.elkarte.js under the $.sceditor.plugins.bbcode.bbcode area
 		// for examples of how to use the .set command to add codes.  Include your new
 		// JS with addInlineJavascript() or loadJavascriptFile()
 		$bbc_tags['row1'] = array(
@@ -242,6 +237,7 @@ function create_control_richedit($editorOptions)
 			array('bulletlist', 'orderedlist', 'horizontalrule'),
 			array('spoiler', 'footnote', 'splittag'),
 			array('image', 'link', 'email'),
+			array('undo', 'redo'),
 		);
 
 		// Allow mods to add BBC buttons to the toolbar, actions are defined in the JS
@@ -294,7 +290,7 @@ function create_control_richedit($editorOptions)
 				}
 
 				// If the row is not empty, and the last added tag is not a space, add a space.
-				if (!empty($tagsRow) && $tagsRow[count($tagsRow) - 1] != 'space')
+				if (!empty($tagsRow) && $tagsRow[count($tagsRow) - 1] !== 'space')
 					$tagsRow[] = 'space';
 			}
 
@@ -313,7 +309,7 @@ function create_control_richedit($editorOptions)
 		);
 
 		// Load smileys - don't bother to run a query if we're not using the database's ones anyhow.
-		if (empty($modSettings['smiley_enable']) && $user_info['smiley_set'] != 'none')
+		if (empty($modSettings['smiley_enable']) && $context['smiley_enabled'])
 		{
 			$context['smileys']['postform'][] = array(
 				'smileys' => array(
@@ -412,26 +408,28 @@ function create_control_richedit($editorOptions)
 				'isLast' => true,
 			);
 		}
-		elseif ($user_info['smiley_set'] != 'none')
+		elseif ($context['smiley_enabled'])
 		{
-			if (($temp = cache_get_data('posting_smileys', 480)) == null)
+			$temp = array();
+			if (!Cache::instance()->getVar($temp, 'posting_smileys', 480))
 			{
-				$request = $db->query('', '
+				$db->fetchQueryCallback('
 					SELECT code, filename, description, smiley_row, hidden
 					FROM {db_prefix}smileys
 					WHERE hidden IN (0, 2)
 					ORDER BY smiley_row, smiley_order',
 					array(
-					)
-				);
-				while ($row = $db->fetch_assoc($request))
-				{
-					$row['filename'] = htmlspecialchars($row['filename'], ENT_COMPAT, 'UTF-8');
-					$row['description'] = htmlspecialchars($row['description'], ENT_COMPAT, 'UTF-8');
+					),
+					function ($row)
+					{
+						global $context;
 
-					$context['smileys'][empty($row['hidden']) ? 'postform' : 'popup'][$row['smiley_row']]['smileys'][] = $row;
-				}
-				$db->free_result($request);
+						$row['filename'] = htmlspecialchars($row['filename'], ENT_COMPAT, 'UTF-8');
+						$row['description'] = htmlspecialchars($row['description'], ENT_COMPAT, 'UTF-8');
+
+						$context['smileys'][empty($row['hidden']) ? 'postform' : 'popup'][$row['smiley_row']]['smileys'][] = $row;
+					}
+				);
 
 				foreach ($context['smileys'] as $section => $smileyRows)
 				{
@@ -446,8 +444,7 @@ function create_control_richedit($editorOptions)
 						$context['smileys'][$section][$last_row]['isLast'] = true;
 				}
 
-
-				cache_put_data('posting_smileys', $context['smileys'], 480);
+				Cache::instance()->put('posting_smileys', $context['smileys'], 480);
 			}
 			else
 				$context['smileys'] = $temp;
@@ -455,12 +452,12 @@ function create_control_richedit($editorOptions)
 			// The smiley popup may take advantage of Jquery UI ....
 			if (!empty($context['smileys']['popup']))
 				$modSettings['jquery_include_ui'] = true;
-
 		}
 	}
 
 	// Set a flag so the sub template knows what to do...
-	$context['show_bbc'] = !empty($modSettings['enableBBC']) && !empty($settings['show_bbc']);
+	// @deprecated since 1.1 - the option was removed, let's keep the variable just to avoid potential undefined indexes.
+	$context['show_bbc'] = true;
 
 	// Switch the URLs back... now we're back to whatever the main sub template is.  (like folder in PersonalMessage.)
 	if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'defaults' && isset($settings['default_template']))

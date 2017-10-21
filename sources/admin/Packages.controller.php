@@ -7,18 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.8
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * This class is the administration package manager controller.
@@ -30,8 +25,66 @@ if (!defined('ELK'))
 class Packages_Controller extends Action_Controller
 {
 	/**
+	 * listing of files in a packages
+	 * @var array|boolean
+	 */
+	private $_extracted_files;
+
+	/**
+	 * Filename of the package
+	 * @var string
+	 */
+	private $_filename;
+
+	/**
+	 * Base path of the package
+	 * @var string
+	 */
+	private $_base_path;
+
+	/**
+	 * If this is an un-install pass or not
+	 * @var boolean
+	 */
+	private $_uninstalling;
+
+	/**
+	 * If the package is installed, previously or not
+	 * @var boolean
+	 */
+	private $_is_installed;
+
+	/**
+	 * The id from the DB or an installed package
+	 * @var int
+	 */
+	public $install_id;
+
+	/**
+	 * Array of installed theme paths
+	 * @var string[]
+	 */
+	public $theme_paths;
+
+	/**
+	 * Array of files / directories that require permissions
+	 * @var array
+	 */
+	public $chmod_files;
+
+	/**
+	 * Pre Dispatch, called before other methods.
+	 */
+	public function pre_dispatch()
+	{
+		// Generic subs for this controller
+		require_once(SUBSDIR . '/Package.subs.php');
+	}
+
+	/**
 	 * Entry point, the default method of this controller.
 	 *
+	 * @event integrate_sa_packages
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -42,9 +95,9 @@ class Packages_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 
 		// Load all the basic stuff.
-		require_once(SUBSDIR . '/Package.subs.php');
 		loadLanguage('Packages');
-		loadTemplate('Packages', 'admin');
+		loadTemplate('Packages');
+		loadCSSFile('admin.css');
 		$context['page_title'] = $txt['package'];
 
 		// Delegation makes the world... that is, the package manager go 'round.
@@ -65,8 +118,12 @@ class Packages_Controller extends Action_Controller
 			'showoperations' => array($this, 'action_showoperations'),
 			// The following two belong to PackageServers,
 			// for UI's sake moved here at least temporarily
-			'servers' => array('file' => 'PackageServers.controller.php', 'controller' => 'PackageServers_Controller', 'function' => 'action_list'),
-			'upload' => array('file' => 'PackageServers.controller.php', 'controller' => 'PackageServers_Controller', 'function' => 'action_upload'),
+			'servers' => array(
+				'controller' => 'PackageServers_Controller',
+				'function' => 'action_list'),
+			'upload' => array(
+				'controller' => 'PackageServers_Controller',
+				'function' => 'action_upload'),
 		);
 
 		// Set up action/subaction stuff.
@@ -85,9 +142,6 @@ class Packages_Controller extends Action_Controller
 				'perms' => array(
 					'description' => $txt['package_file_perms_desc'],
 				),
-				'options' => array(
-					'description' => $txt['package_install_options_desc'],
-				),
 				// The following two belong to PackageServers,
 				// for UI's sake moved here at least temporarily
 				'servers' => array(
@@ -95,6 +149,9 @@ class Packages_Controller extends Action_Controller
 				),
 				'upload' => array(
 					'description' => $txt['upload_packages_desc'],
+				),
+				'options' => array(
+					'description' => $txt['package_install_options_desc'],
 				),
 			),
 		);
@@ -114,105 +171,54 @@ class Packages_Controller extends Action_Controller
 	 */
 	public function action_install()
 	{
-		global $txt, $context, $scripturl, $settings;
+		global $txt, $context, $scripturl;
 
 		// You have to specify a file!!
-		if (!isset($_REQUEST['package']) || trim($_REQUEST['package']) == '')
+		$file = $this->_req->getQuery('package', 'trim');
+		if (empty($file))
 			redirectexit('action=admin;area=packages');
 
-		$context['filename'] = preg_replace('~[\.]+~', '.', $_REQUEST['package']);
+		// What are we trying to do
+		$this->_filename = (string) preg_replace('~[\.]+~', '.', $file);
+		$this->_uninstalling = $this->_req->query->sa === 'uninstall';
+
+		// If we can't find the file, our install ends here
+		if (!file_exists(BOARDDIR . '/packages/' . $this->_filename))
+			throw new Elk_Exception('package_no_file', false);
 
 		// Do we have an existing id, for uninstalls and the like.
-		$context['install_id'] = isset($_REQUEST['pid']) ? (int) $_REQUEST['pid'] : 0;
+		$this->install_id = $this->_req->getQuery('pid', 'intval', 0);
 
-		// These will be needed
-		require_once(SUBSDIR . '/Package.subs.php');
+		// This will be needed
 		require_once(SUBSDIR . '/Themes.subs.php');
 
 		// Load up the package FTP information?
 		create_chmod_control();
 
-		// Make sure temp directory exists and is empty.
+		// Make sure our temp directory exists and is empty.
 		if (file_exists(BOARDDIR . '/packages/temp'))
 			deltree(BOARDDIR . '/packages/temp', false);
-
-		// Attempt to create the temp directory
-		if (!mktree(BOARDDIR . '/packages/temp', 0755))
-		{
-			deltree(BOARDDIR . '/packages/temp', false);
-			if (!mktree(BOARDDIR . '/packages/temp', 0777))
-			{
-				deltree(BOARDDIR . '/packages/temp', false);
-				create_chmod_control(array(BOARDDIR . '/packages/temp/delme.tmp'), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $_REQUEST['sa'] . ';package=' . $context['filename'], 'crash_on_error' => true));
-
-				deltree(BOARDDIR . '/packages/temp', false);
-				if (!mktree(BOARDDIR . '/packages/temp', 0777))
-					fatal_lang_error('package_cant_download', false);
-			}
-		}
-
-		// Change our last link tree item for more information on this Packages area.
-		$context['uninstalling'] = $_REQUEST['sa'] === 'uninstall';
-		$context['linktree'][count($context['linktree']) - 1] = array(
-			'url' => $scripturl . '?action=admin;area=packages;sa=browse',
-			'name' => $context['uninstalling'] ? $txt['package_uninstall_actions'] : $txt['install_actions']
-		);
-		$context['page_title'] .= ' - ' . ($context['uninstalling'] ? $txt['package_uninstall_actions'] : $txt['install_actions']);
-		$context['sub_template'] = 'view_package';
-
-		if (!file_exists(BOARDDIR . '/packages/' . $context['filename']))
-		{
-			deltree(BOARDDIR . '/packages/temp');
-			fatal_lang_error('package_no_file', false);
-		}
-
-		// Extract the files so we can get things like the readme, etc.
-		if (is_file(BOARDDIR . '/packages/' . $context['filename']))
-		{
-			$context['extracted_files'] = read_tgz_file(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
-			if ($context['extracted_files'] && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
-			{
-				foreach ($context['extracted_files'] as $file)
-				{
-					if (basename($file['filename']) == 'package-info.xml')
-					{
-						$context['base_path'] = dirname($file['filename']) . '/';
-						break;
-					}
-				}
-			}
-
-			if (!isset($context['base_path']))
-				$context['base_path'] = '';
-		}
-		elseif (is_dir(BOARDDIR . '/packages/' . $context['filename']))
-		{
-			copytree(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
-			$context['extracted_files'] = listtree(BOARDDIR . '/packages/temp');
-			$context['base_path'] = '';
-		}
 		else
-			fatal_lang_error('no_access', false);
+			$this->_create_temp_dir();
+
+		// Extract the files in to the temp so we can get things like the readme, etc.
+		$this->_extract_files_temp();
 
 		// Load up any custom themes we may want to install into...
-		$theme_paths = getThemesPathbyID();
+		$this->theme_paths = getThemesPathbyID();
 
 		// Get the package info...
-		$packageInfo = getPackageInfo($context['filename']);
+		$packageInfo = getPackageInfo($this->_filename);
 		if (!is_array($packageInfo))
-			fatal_lang_error($packageInfo);
+			throw new Elk_Exception($packageInfo);
 
-		$packageInfo['filename'] = $context['filename'];
-		$context['package_name'] = isset($packageInfo['name']) ? $packageInfo['name'] : $context['filename'];
+		$packageInfo['filename'] = $this->_filename;
 
-		// Set the type of extraction...
-		$context['extract_type'] = isset($packageInfo['type']) ? $packageInfo['type'] : 'modification';
-
-		// The mod isn't installed.... unless proven otherwise.
-		$context['is_installed'] = false;
+		// The addon isn't installed.... unless proven otherwise.
+		$this->_is_installed = false;
 
 		// See if it is installed?
-		$package_installed = isPackageInstalled($packageInfo['id']);
+		$package_installed = isPackageInstalled($packageInfo['id'], $this->install_id);
 
 		$context['database_changes'] = array();
 		if (isset($packageInfo['uninstall']['database']))
@@ -230,422 +236,68 @@ class Packages_Controller extends Action_Controller
 			}
 		}
 
-		// Uninstalling?
-		if ($context['uninstalling'])
-		{
-			// Wait, it's not installed yet!
-			if (!isset($package_installed['old_version']) && $context['uninstalling'])
-			{
-				deltree(BOARDDIR . '/packages/temp');
-				fatal_lang_error('package_cant_uninstall', false);
-			}
-
-			$actions = parsePackageInfo($packageInfo['xml'], true, 'uninstall');
-
-			// Gadzooks!  There's no uninstaller at all!?
-			if (empty($actions))
-			{
-				deltree(BOARDDIR . '/packages/temp');
-				fatal_lang_error('package_uninstall_cannot', false);
-			}
-
-			// Can't edit the custom themes it's edited if you're unisntalling, they must be removed.
-			$context['themes_locked'] = true;
-
-			// Only let them uninstall themes it was installed into.
-			foreach ($theme_paths as $id => $data)
-			{
-				if ($id != 1 && !in_array($id, $package_installed['old_themes']))
-					unset($theme_paths[$id]);
-			}
-		}
-		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] != $packageInfo['version'])
-		{
-			// Look for an upgrade...
-			$actions = parsePackageInfo($packageInfo['xml'], true, 'upgrade', $package_installed['old_version']);
-
-			// There was no upgrade....
-			if (empty($actions))
-				$context['is_installed'] = true;
-			else
-			{
-				// Otherwise they can only upgrade themes from the first time around.
-				foreach ($theme_paths as $id => $data)
-				{
-					if ($id != 1 && !in_array($id, $package_installed['old_themes']))
-						unset($theme_paths[$id]);
-				}
-			}
-		}
-		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] == $packageInfo['version'])
-			$context['is_installed'] = true;
-
-		if (!isset($package_installed['old_version']) || $context['is_installed'])
-			$actions = parsePackageInfo($packageInfo['xml'], true, 'install');
+		$actions = $this->_get_package_actions($package_installed, $packageInfo);
 
 		$context['actions'] = array();
 		$context['ftp_needed'] = false;
-		$context['has_failure'] = false;
-		$chmod_files = array();
 
 		// No actions found, return so we can display an error
 		if (empty($actions))
-			return;
+			redirectexit('action=admin;area=packages');
 
-		// This will hold data about anything that can be installed in other themes.
-		$themeFinds = array(
-			'candidates' => array(),
-			'other_themes' => array(),
+		// Now prepare things for the template using the package actions class
+		$pka = new Package_Actions();
+		$pka->test_init($actions, $this->_uninstalling, $this->_base_path, $this->theme_paths);
+
+		$context['has_failure'] = $pka->has_failure;
+		$context['failure_details'] = $pka->failure_details;
+		$context['actions'] = $pka->ourActions;
+
+		// Change our last link tree item for more information on this Packages area.
+		$context['linktree'][count($context['linktree']) - 1] = array(
+			'url' => $scripturl . '?action=admin;area=packages;sa=browse',
+			'name' => $this->_uninstalling ? $txt['package_uninstall_actions'] : $txt['install_actions']
 		);
 
-		// Now prepare things for the template.
-		foreach ($actions as $action)
-		{
-			// Not failed until proven otherwise.
-			$failed = false;
-			$thisAction = array();
-
-			if ($action['type'] == 'chmod')
-			{
-				$chmod_files[] = $action['filename'];
-				continue;
-			}
-			elseif ($action['type'] == 'readme' || $action['type'] == 'license')
-			{
-				$type = 'package_' . $action['type'];
-				if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
-					$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');
-				elseif (file_exists($action['filename']))
-					$context[$type] = htmlspecialchars(trim(file_get_contents($action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');
-
-				if (!empty($action['parse_bbc']))
-				{
-					require_once(SUBSDIR . '/Post.subs.php');
-					preparsecode($context[$type]);
-					$context[$type] = parse_bbc($context[$type]);
-				}
-				else
-					$context[$type] = nl2br($context[$type]);
-
-				continue;
-			}
-			// Don't show redirects.
-			elseif ($action['type'] == 'redirect')
-				continue;
-			elseif ($action['type'] == 'error')
-			{
-				$context['has_failure'] = true;
-				if (isset($action['error_msg']) && isset($action['error_var']))
-					$context['failure_details'] = sprintf($txt['package_will_fail_' . $action['error_msg']], $action['error_var']);
-				elseif (isset($action['error_msg']))
-					$context['failure_details'] = isset($txt['package_will_fail_' . $action['error_msg']]) ? $txt['package_will_fail_' . $action['error_msg']] : $action['error_msg'];
-			}
-			elseif ($action['type'] == 'modification')
-			{
-				if (!file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
-				{
-					$context['has_failure'] = true;
-					$context['actions'][] = array(
-						'type' => $txt['execute_modification'],
-						'action' => Util::htmlspecialchars(strtr($action['filename'], array(BOARDDIR => '.'))),
-						'description' => $txt['package_action_error'],
-						'failed' => true,
-					);
-				}
-				else
-				{
-					if ($action['boardmod'])
-						$mod_actions = parseBoardMod(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), true, $action['reverse'], $theme_paths);
-					else
-						$mod_actions = parseModification(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), true, $action['reverse'], $theme_paths);
-
-					if (count($mod_actions) == 1 && isset($mod_actions[0]) && $mod_actions[0]['type'] == 'error' && $mod_actions[0]['filename'] == '-')
-						$mod_actions[0]['filename'] = $action['filename'];
-
-					foreach ($mod_actions as $key => $mod_action)
-					{
-						// Lets get the last section of the file name.
-						if (isset($mod_action['filename']) && substr($mod_action['filename'], -13) != '.template.php')
-							$actual_filename = strtolower(substr(strrchr($mod_action['filename'], '/'), 1) . '||' . $action['filename']);
-						elseif (isset($mod_action['filename']) && preg_match('~([\w]*)/([\w]*)\.template\.php$~', $mod_action['filename'], $matches))
-							$actual_filename = strtolower($matches[1] . '/' . $matches[2] . '.template.php||' . $action['filename']);
-						else
-							$actual_filename = $key;
-
-						if ($mod_action['type'] == 'opened')
-							$failed = false;
-						elseif ($mod_action['type'] == 'failure')
-						{
-							if (empty($mod_action['is_custom']))
-								$context['has_failure'] = true;
-							$failed = true;
-						}
-						elseif ($mod_action['type'] == 'chmod')
-							$chmod_files[] = $mod_action['filename'];
-						elseif ($mod_action['type'] == 'saved')
-						{
-							if (!empty($mod_action['is_custom']))
-							{
-								if (!isset($context['theme_actions'][$mod_action['is_custom']]))
-									$context['theme_actions'][$mod_action['is_custom']] = array(
-										'name' => $theme_paths[$mod_action['is_custom']]['name'],
-										'actions' => array(),
-										'has_failure' => $failed,
-									);
-								else
-									$context['theme_actions'][$mod_action['is_custom']]['has_failure'] |= $failed;
-
-								$context['theme_actions'][$mod_action['is_custom']]['actions'][$actual_filename] = array(
-									'type' => $txt['execute_modification'],
-									'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
-									'description' => $failed ? $txt['package_action_failure'] : $txt['package_action_success'],
-									'failed' => $failed,
-								);
-							}
-							elseif (!isset($context['actions'][$actual_filename]))
-							{
-								$context['actions'][$actual_filename] = array(
-									'type' => $txt['execute_modification'],
-									'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
-									'description' => $failed ? $txt['package_action_failure'] : $txt['package_action_success'],
-									'failed' => $failed,
-								);
-							}
-							else
-							{
-								$context['actions'][$actual_filename]['failed'] |= $failed;
-								$context['actions'][$actual_filename]['description'] = $context['actions'][$actual_filename]['failed'] ? $txt['package_action_failure'] : $txt['package_action_success'];
-							}
-						}
-						elseif ($mod_action['type'] == 'skipping')
-						{
-							$context['actions'][$actual_filename] = array(
-								'type' => $txt['execute_modification'],
-								'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
-								'description' => $txt['package_action_skipping']
-							);
-						}
-						elseif ($mod_action['type'] == 'missing' && empty($mod_action['is_custom']))
-						{
-							$context['has_failure'] = true;
-							$context['actions'][$actual_filename] = array(
-								'type' => $txt['execute_modification'],
-								'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
-								'description' => $txt['package_action_missing'],
-								'failed' => true,
-							);
-						}
-						elseif ($mod_action['type'] == 'error')
-							$context['actions'][$actual_filename] = array(
-								'type' => $txt['execute_modification'],
-								'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
-								'description' => $txt['package_action_error'],
-								'failed' => true,
-							);
-					}
-
-					// We need to loop again just to get the operations down correctly.
-					foreach ($mod_actions as $operation_key => $mod_action)
-					{
-						// Lets get the last section of the file name.
-						if (isset($mod_action['filename']) && substr($mod_action['filename'], -13) != '.template.php')
-							$actual_filename = strtolower(substr(strrchr($mod_action['filename'], '/'), 1) . '||' . $action['filename']);
-						elseif (isset($mod_action['filename']) && preg_match('~([\w]*)/([\w]*)\.template\.php$~', $mod_action['filename'], $matches))
-							$actual_filename = strtolower($matches[1] . '/' . $matches[2] . '.template.php||' . $action['filename']);
-						else
-							$actual_filename = $operation_key;
-
-						// We just need it for actual parse changes.
-						if (!in_array($mod_action['type'], array('error', 'result', 'opened', 'saved', 'end', 'missing', 'skipping', 'chmod')))
-						{
-							if (empty($mod_action['is_custom']))
-								$context['actions'][$actual_filename]['operations'][] = array(
-									'type' => $txt['execute_modification'],
-									'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
-									'description' => $mod_action['failed'] ? $txt['package_action_failure'] : $txt['package_action_success'],
-									'position' => $mod_action['position'],
-									'operation_key' => $operation_key,
-									'filename' => $action['filename'],
-									'is_boardmod' => $action['boardmod'],
-									'failed' => $mod_action['failed'],
-									'ignore_failure' => !empty($mod_action['ignore_failure']),
-								);
-
-							// Themes are under the saved type.
-							if (isset($mod_action['is_custom']) && isset($context['theme_actions'][$mod_action['is_custom']]))
-								$context['theme_actions'][$mod_action['is_custom']]['actions'][$actual_filename]['operations'][] = array(
-									'type' => $txt['execute_modification'],
-									'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
-									'description' => $mod_action['failed'] ? $txt['package_action_failure'] : $txt['package_action_success'],
-									'position' => $mod_action['position'],
-									'operation_key' => $operation_key,
-									'filename' => $action['filename'],
-									'is_boardmod' => $action['boardmod'],
-									'failed' => $mod_action['failed'],
-									'ignore_failure' => !empty($mod_action['ignore_failure']),
-								);
-						}
-					}
-				}
-			}
-			elseif ($action['type'] == 'code')
-			{
-				$thisAction = array(
-					'type' => $txt['execute_code'],
-					'action' => Util::htmlspecialchars($action['filename']),
-				);
-			}
-			elseif ($action['type'] == 'database')
-			{
-				$thisAction = array(
-					'type' => $txt['execute_database_changes'],
-					'action' => Util::htmlspecialchars($action['filename']),
-				);
-			}
-			elseif (in_array($action['type'], array('create-dir', 'create-file')))
-			{
-				$thisAction = array(
-					'type' => $txt['package_create'] . ' ' . ($action['type'] == 'create-dir' ? $txt['package_tree'] : $txt['package_file']),
-					'action' => Util::htmlspecialchars(strtr($action['destination'], array(BOARDDIR => '.')))
-				);
-			}
-			elseif ($action['type'] == 'hook')
-			{
-				$action['description'] = !isset($action['hook'], $action['function']) ? $txt['package_action_failure'] : $txt['package_action_success'];
-
-				if (!isset($action['hook'], $action['function']))
-					$context['has_failure'] = true;
-
-				$thisAction = array(
-					'type' => $action['reverse'] ? $txt['execute_hook_remove'] : $txt['execute_hook_add'],
-					'action' => sprintf($txt['execute_hook_action'], Util::htmlspecialchars($action['hook'])),
-				);
-			}
-			elseif ($action['type'] == 'credits')
-			{
-				$thisAction = array(
-					'type' => $txt['execute_credits_add'],
-					'action' => sprintf($txt['execute_credits_action'], Util::htmlspecialchars($action['title'])),
-				);
-			}
-			elseif ($action['type'] == 'requires')
-			{
-				$installed_version = false;
-				$version_check = true;
-
-				// Package missing required values?
-				if (!isset($action['id']))
-					$context['has_failure'] = true;
-				else
-				{
-					// See if this dependency is installed
-					$installed_version = checkPackageDependency($action['id']);
-
-					// Do a version level check (if requested) in the most basic way
-					$version_check = (isset($action['version']) ? $installed_version == $action['version'] : true);
-				}
-
-				// Set success or failure information
-				$action['description'] = ($installed_version && $version_check) ? $txt['package_action_success'] : $txt['package_action_failure'];
-				$context['has_failure'] = !($installed_version && $version_check);
-				$thisAction = array(
-					'type' => $txt['package_requires'],
-					'action' => $txt['package_check_for'] . ' ' . $action['id'] . (isset($action['version']) ? (' / ' . ($version_check ? $action['version'] : '<span class="error">' . $action['version'] . '</span>')) : ''),
-				);
-			}
-			elseif (in_array($action['type'], array('require-dir', 'require-file')))
-			{
-				// Do this one...
-				$thisAction = array(
-					'type' => $txt['package_extract'] . ' ' . ($action['type'] == 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
-					'action' => Util::htmlspecialchars(strtr($action['destination'], array(BOARDDIR => '.')))
-				);
-
-				// Could this be theme related?
-				if (!empty($action['unparsed_destination']) && preg_match('~^\$(languagedir|languages_dir|imagesdir|themedir|themes_dir)~i', $action['unparsed_destination'], $matches))
-				{
-					// Is the action already stated?
-					$theme_action = !empty($action['theme_action']) && in_array($action['theme_action'], array('no', 'yes', 'auto')) ? $action['theme_action'] : 'auto';
-
-					// If it's not auto do we think we have something we can act upon?
-					if ($theme_action != 'auto' && !in_array($matches[1], array('languagedir', 'languages_dir', 'imagesdir', 'themedir')))
-						$theme_action = '';
-					// ... or if it's auto do we even want to do anything?
-					elseif ($theme_action == 'auto' && $matches[1] != 'imagesdir')
-						$theme_action = '';
-
-					// So, we still want to do something?
-					if ($theme_action != '')
-						$themeFinds['candidates'][] = $action;
-					// Otherwise is this is going into another theme record it.
-					elseif ($matches[1] == 'themes_dir')
-						$themeFinds['other_themes'][] = strtolower(strtr(parse_path($action['unparsed_destination']), array('\\' => '/')) . '/' . basename($action['filename']));
-				}
-			}
-			elseif (in_array($action['type'], array('move-dir', 'move-file')))
-				$thisAction = array(
-					'type' => $txt['package_move'] . ' ' . ($action['type'] == 'move-dir' ? $txt['package_tree'] : $txt['package_file']),
-					'action' => Util::htmlspecialchars(strtr($action['source'], array(BOARDDIR => '.'))) . ' => ' . Util::htmlspecialchars(strtr($action['destination'], array(BOARDDIR => '.')))
-				);
-			elseif (in_array($action['type'], array('remove-dir', 'remove-file')))
-			{
-				$thisAction = array(
-					'type' => $txt['package_delete'] . ' ' . ($action['type'] == 'remove-dir' ? $txt['package_tree'] : $txt['package_file']),
-					'action' => Util::htmlspecialchars(strtr($action['filename'], array(BOARDDIR => '.')))
-				);
-
-				// Could this be theme related?
-				if (!empty($action['unparsed_filename']) && preg_match('~^\$(languagedir|languages_dir|imagesdir|themedir|themes_dir)~i', $action['unparsed_filename'], $matches))
-				{
-					// Is the action already stated?
-					$theme_action = !empty($action['theme_action']) && in_array($action['theme_action'], array('no', 'yes', 'auto')) ? $action['theme_action'] : 'auto';
-					$action['unparsed_destination'] = $action['unparsed_filename'];
-
-					// If it's not auto do we think we have something we can act upon?
-					if ($theme_action != 'auto' && !in_array($matches[1], array('languagedir', 'languages_dir', 'imagesdir', 'themedir')))
-						$theme_action = '';
-					// ... or if it's auto do we even want to do anything?
-					elseif ($theme_action == 'auto' && $matches[1] != 'imagesdir')
-						$theme_action = '';
-
-					// So, we still want to do something?
-					if ($theme_action != '')
-						$themeFinds['candidates'][] = $action;
-					// Otherwise is this is going into another theme record it.
-					elseif ($matches[1] == 'themes_dir')
-						$themeFinds['other_themes'][] = strtolower(strtr(parse_path($action['unparsed_filename']), array('\\' => '/')) . '/' . basename($action['filename']));
-				}
-			}
-
-			if (empty($thisAction))
-				continue;
-
-			if (isset($action['filename']))
-			{
-				if ($context['uninstalling'])
-					$file = in_array($action['type'], array('remove-dir', 'remove-file')) ? $action['filename'] : BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename'];
-				else
-					$file = BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename'];
-
-				if (!file_exists($file))
-				{
-					$context['has_failure'] = true;
-
-					$thisAction += array(
-						'description' => $txt['package_action_error'],
-						'failed' => true,
-					);
-				}
-			}
-
-			// @todo None given?
-			if (empty($thisAction['description']))
-				$thisAction['description'] = isset($action['description']) ? $action['description'] : '';
-
-			$context['actions'][] = $thisAction;
-		}
+		// All things to make the template go round
+		$context['page_title'] .= ' - ' . ($this->_uninstalling ? $txt['package_uninstall_actions'] : $txt['install_actions']);
+		$context['sub_template'] = 'view_package';
+		$context['filename'] = $this->_filename;
+		$context['package_name'] = isset($packageInfo['name']) ? $packageInfo['name'] : $this->_filename;
+		$context['is_installed'] = $this->_is_installed;
+		$context['uninstalling'] = $this->_uninstalling;
+		$context['extract_type'] = isset($packageInfo['type']) ? $packageInfo['type'] : 'modification';
 
 		// Have we got some things which we might want to do "multi-theme"?
+		$this->_multi_theme($pka->themeFinds['candidates']);
+
+		// Trash the cache... which will also check permissions for us!
+		package_flush_cache(true);
+
+		// Clear the temp directory
+		if (file_exists(BOARDDIR . '/packages/temp'))
+			deltree(BOARDDIR . '/packages/temp');
+
+		// Will we need chmod permissions to pull this off
+		$this->chmod_files = !empty($pka->chmod_files) ? $pka->chmod_files : array();
+		if (!empty($this->chmod_files))
+		{
+			$ftp_status = create_chmod_control($this->chmod_files);
+			$context['ftp_needed'] = !empty($ftp_status['files']['notwritable']) && !empty($context['package_ftp']);
+		}
+
+		$context['post_url'] = $scripturl . '?action=admin;area=packages;sa=' . ($this->_uninstalling ? 'uninstall' : 'install') . ($context['ftp_needed'] ? '' : '2') . ';package=' . $this->_filename . ';pid=' . $this->install_id;
+		checkSubmitOnce('register');
+	}
+
+	/**
+	 * Determines the availability / validity of installing a package in any of the installed themes
+	 * @param array $themeFinds
+	 */
+	private function _multi_theme($themeFinds)
+	{
+		global $settings, $txt, $context;
+
 		if (!empty($themeFinds['candidates']))
 		{
 			foreach ($themeFinds['candidates'] as $action_data)
@@ -653,9 +305,9 @@ class Packages_Controller extends Action_Controller
 				// Get the part of the file we'll be dealing with.
 				preg_match('~^\$(languagedir|languages_dir|imagesdir|themedir)(\\|/)*(.+)*~i', $action_data['unparsed_destination'], $matches);
 
-				if ($matches[1] == 'imagesdir')
+				if ($matches[1] === 'imagesdir')
 					$path = '/' . basename($settings['default_images_url']);
-				elseif ($matches[1] == 'languagedir' || $matches[1] == 'languages_dir')
+				elseif ($matches[1] === 'languagedir' || $matches[1] === 'languages_dir')
 					$path = '/languages';
 				else
 					$path = '';
@@ -663,11 +315,11 @@ class Packages_Controller extends Action_Controller
 				if (!empty($matches[3]))
 					$path .= $matches[3];
 
-				if (!$context['uninstalling'])
+				if (!$this->_uninstalling)
 					$path .= '/' . basename($action_data['filename']);
 
 				// Loop through each custom theme to note it's candidacy!
-				foreach ($theme_paths as $id => $theme_data)
+				foreach ($this->theme_paths as $id => $theme_data)
 				{
 					if (isset($theme_data['theme_dir']) && $id != 1)
 					{
@@ -682,11 +334,12 @@ class Packages_Controller extends Action_Controller
 								$temp = dirname($real_path);
 								while (!file_exists($temp) && strlen($temp) > 1)
 									$temp = dirname($temp);
-								$chmod_files[] = $temp;
+
+								$this->chmod_files[] = $temp;
 							}
 
-							if ($action_data['type'] == 'require-dir' && !is_writable($real_path) && (file_exists($real_path) || !is_writable(dirname($real_path))))
-								$chmod_files[] = $real_path;
+							if ($action_data['type'] === 'require-dir' && !is_writable($real_path) && (file_exists($real_path) || !is_writable(dirname($real_path))))
+								$this->chmod_files[] = $real_path;
 
 							if (!isset($context['theme_actions'][$id]))
 								$context['theme_actions'][$id] = array(
@@ -694,9 +347,9 @@ class Packages_Controller extends Action_Controller
 									'actions' => array(),
 								);
 
-							if ($context['uninstalling'])
+							if ($this->_uninstalling)
 								$context['theme_actions'][$id]['actions'][] = array(
-									'type' => $txt['package_delete'] . ' ' . ($action_data['type'] == 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
+									'type' => $txt['package_delete'] . ' ' . ($action_data['type'] === 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
 									'action' => strtr($real_path, array('\\' => '/', BOARDDIR => '.')),
 									'description' => '',
 									'value' => base64_encode(json_encode(array('type' => $action_data['type'], 'orig' => $action_data['filename'], 'future' => $real_path, 'id' => $id))),
@@ -704,7 +357,7 @@ class Packages_Controller extends Action_Controller
 								);
 							else
 								$context['theme_actions'][$id]['actions'][] = array(
-									'type' => $txt['package_extract'] . ' ' . ($action_data['type'] == 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
+									'type' => $txt['package_extract'] . ' ' . ($action_data['type'] === 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
 									'action' => strtr($real_path, array('\\' => '/', BOARDDIR => '.')),
 									'description' => '',
 									'value' => base64_encode(json_encode(array('type' => $action_data['type'], 'orig' => $action_data['destination'], 'future' => $real_path, 'id' => $id))),
@@ -715,109 +368,212 @@ class Packages_Controller extends Action_Controller
 				}
 			}
 		}
-
-		// Trash the cache... which will also check permissions for us!
-		package_flush_cache(true);
-
-		if (file_exists(BOARDDIR . '/packages/temp'))
-			deltree(BOARDDIR . '/packages/temp');
-
-		if (!empty($chmod_files))
-		{
-			$ftp_status = create_chmod_control($chmod_files);
-			$context['ftp_needed'] = !empty($ftp_status['files']['notwritable']) && !empty($context['package_ftp']);
-		}
-
-		$context['post_url'] = $scripturl . '?action=admin;area=packages;sa=' . ($context['uninstalling'] ? 'uninstall' : 'install') . ($context['ftp_needed'] ? '' : '2') . ';package=' . $context['filename'] . ';pid=' . $context['install_id'];
-		checkSubmitOnce('register');
 	}
 
 	/**
-	 * Apply another type of (avatar, language, etc.) package.
+	 * Extracts a package file in the packages/temp directory
+	 *
+	 * - Sets the base path as needed
+	 * - Loads $this->_extracted_files with the package file listing
 	 */
-	public function action_install2()
+	private function _extract_files_temp()
 	{
-		global $txt, $context, $boardurl, $scripturl, $modSettings;
-
-		// Make sure we don't install this mod twice.
-		checkSubmitOnce('check');
-		checkSession();
-
-		// If there's no file, what are we installing?
-		if (!isset($_REQUEST['package']) || $_REQUEST['package'] == '')
-			redirectexit('action=admin;area=packages');
-		$context['filename'] = $_REQUEST['package'];
-
-		// If this is an uninstall, we'll have an id.
-		$context['install_id'] = isset($_REQUEST['pid']) ? (int) $_REQUEST['pid'] : 0;
-
-		require_once(SUBSDIR . '/Package.subs.php');
-		require_once(SUBSDIR . '/Themes.subs.php');
-
-		// @todo Perhaps do it in steps, if necessary?
-		$context['uninstalling'] = $_REQUEST['sa'] == 'uninstall2';
-
-		// Set up the linktree for other.
-		$context['linktree'][count($context['linktree']) - 1] = array(
-			'url' => $scripturl . '?action=admin;area=packages;sa=browse',
-			'name' => $context['uninstalling'] ? $txt['uninstall'] : $txt['extracting']
-		);
-		$context['page_title'] .= ' - ' . ($context['uninstalling'] ? $txt['uninstall'] : $txt['extracting']);
-		$context['sub_template'] = 'extract_package';
-
-		if (!file_exists(BOARDDIR . '/packages/' . $context['filename']))
-			fatal_lang_error('package_no_file', false);
-
-		// Load up the package FTP information?
-		create_chmod_control(array(), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $_REQUEST['sa'] . ';package=' . $_REQUEST['package']));
-
-		// Make sure temp directory exists and is empty!
-		if (file_exists(BOARDDIR . '/packages/temp'))
-			deltree(BOARDDIR . '/packages/temp', false);
-		else
-			mktree(BOARDDIR . '/packages/temp', 0777);
-
-		// Let the unpacker do the work.
-		if (is_file(BOARDDIR . '/packages/' . $context['filename']))
+		// Is it a file in the package directory
+		if (is_file(BOARDDIR . '/packages/' . $this->_filename))
 		{
-			$context['extracted_files'] = read_tgz_file(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
+			// Unpack the files in to the packages/temp directory
+			$this->_extracted_files = read_tgz_file(BOARDDIR . '/packages/' . $this->_filename, BOARDDIR . '/packages/temp');
 
-			if (!file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
+			// Determine the base path for the package
+			if ($this->_extracted_files && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
 			{
-				foreach ($context['extracted_files'] as $file)
+				foreach ($this->_extracted_files as $file)
 				{
-					if (basename($file['filename']) == 'package-info.xml')
+					if (basename($file['filename']) === 'package-info.xml')
 					{
-						$context['base_path'] = dirname($file['filename']) . '/';
+						$this->_base_path = dirname($file['filename']) . '/';
 						break;
 					}
 				}
 			}
 
-			if (!isset($context['base_path']))
-				$context['base_path'] = '';
+			if (!isset($this->_base_path))
+				$this->_base_path = '';
 		}
-		elseif (is_dir(BOARDDIR . '/packages/' . $context['filename']))
+		// Perhaps its a directory then, assumed to be extracted
+		elseif (!empty($this->_filename) && is_dir(BOARDDIR . '/packages/' . $this->_filename))
 		{
-			copytree(BOARDDIR . '/packages/' . $context['filename'], BOARDDIR . '/packages/temp');
-			$context['extracted_files'] = listtree(BOARDDIR . '/packages/temp');
-			$context['base_path'] = '';
+			// Copy the directory to the temp directory
+			copytree(BOARDDIR . '/packages/' . $this->_filename, BOARDDIR . '/packages/temp');
+
+			// Get the file listing
+			$this->_extracted_files = listtree(BOARDDIR . '/packages/temp');
+			$this->_base_path = '';
 		}
+		// Well we don't know what it is then, so we stop
 		else
-			fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
+	}
+
+	/**
+	 * Returns the actions that are required to install / uninstall / upgrade a package.
+	 * Actions are defined by parsePackageInfo
+	 * Sets the is_installed flag
+	 *
+	 * @param array   $package_installed
+	 * @param array   $packageInfo Details for the package being tested/installed, set by getPackageInfo
+	 * @param boolean $testing passed to parsePackageInfo, true for test install, false for real install
+	 *
+	 * @return array
+	 * @throws Elk_Exception package_cant_uninstall, package_uninstall_cannot
+	 */
+	private function _get_package_actions($package_installed, $packageInfo, $testing = true)
+	{
+		global $context;
+
+		$actions = array();
+
+		// Uninstalling?
+		if ($this->_uninstalling)
+		{
+			// Wait, it's not installed yet!
+			if (!isset($package_installed['old_version']))
+			{
+				deltree(BOARDDIR . '/packages/temp');
+				throw new Elk_Exception('package_cant_uninstall', false);
+			}
+
+			$actions = parsePackageInfo($packageInfo['xml'], $testing, 'uninstall');
+
+			// Gadzooks!  There's no uninstaller at all!?
+			if (empty($actions))
+			{
+				deltree(BOARDDIR . '/packages/temp');
+				throw new Elk_Exception('package_uninstall_cannot', false);
+			}
+
+			// Can't edit the custom themes it's edited if you're uninstalling, they must be removed.
+			$context['themes_locked'] = true;
+
+			// Only let them uninstall themes it was installed into.
+			foreach ($this->theme_paths as $id => $data)
+			{
+				if ($id != 1 && !in_array($id, $package_installed['old_themes']))
+					unset($this->theme_paths[$id]);
+			}
+		}
+		// Or is it already installed and you want to upgrade
+		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] != $packageInfo['version'])
+		{
+			// Look for an upgrade...
+			$actions = parsePackageInfo($packageInfo['xml'], $testing, 'upgrade', $package_installed['old_version']);
+
+			// There was no upgrade....
+			if (empty($actions))
+				$this->_is_installed = true;
+			else
+			{
+				// Otherwise they can only upgrade themes from the first time around.
+				foreach ($this->theme_paths as $id => $data)
+				{
+					if ($id != 1 && !in_array($id, $package_installed['old_themes']))
+						unset($this->theme_paths[$id]);
+				}
+			}
+		}
+		// Simply already installed
+		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] == $packageInfo['version'])
+			$this->_is_installed = true;
+
+		if (!isset($package_installed['old_version']) || $this->_is_installed)
+			$actions = parsePackageInfo($packageInfo['xml'], $testing, 'install');
+
+		return $actions;
+	}
+
+	/**
+	 * Creates the packages temp directory
+	 *
+	 * - First trys as 755, failing moves to 777
+	 * - Will try with FTP permissions for cases where the web server credentials
+	 * do not have create directory permissions
+	 */
+	private function _create_temp_dir()
+	{
+		global $context, $scripturl;
+
+		// Make the temp directory
+		if (!mktree(BOARDDIR . '/packages/temp', 0755))
+		{
+			// 755 did not work, try 777?
+			deltree(BOARDDIR . '/packages/temp', false);
+			if (!mktree(BOARDDIR . '/packages/temp', 0777))
+			{
+				// That did not work either, we need additional permissions
+				deltree(BOARDDIR . '/packages/temp', false);
+				create_chmod_control(array(BOARDDIR . '/packages/temp/delme.tmp'), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $this->_req->query->sa . ';package=' . $context['filename'], 'crash_on_error' => true));
+
+				// No temp directory was able to be made, that's fatal
+				deltree(BOARDDIR . '/packages/temp', false);
+				if (!mktree(BOARDDIR . '/packages/temp', 0777))
+					throw new Elk_Exception('package_cant_download', false);
+			}
+		}
+	}
+
+	/**
+	 * Actually installs a package
+	 */
+	public function action_install2()
+	{
+		global $txt, $context, $scripturl, $modSettings;
+
+		// Make sure we don't install this addon twice.
+		checkSubmitOnce('check');
+		checkSession();
+
+		// If there's no package file, what are we installing?
+		$this->_filename = $this->_req->getQuery('package', 'trim');
+		if (empty($this->_filename))
+			redirectexit('action=admin;area=packages');
+
+		// And if the file does not exist there is a problem
+		if (!file_exists(BOARDDIR . '/packages/' . $this->_filename))
+			throw new Elk_Exception('package_no_file', false);
+
+		// If this is an uninstall, we'll have an id.
+		$this->install_id = $this->_req->getQuery('pid', 'intval', 0);
+
+		// Installing in themes will require some help
+		require_once(SUBSDIR . '/Themes.subs.php');
+
+		// @todo Perhaps do it in steps, if necessary?
+		$this->_uninstalling = $this->_req->query->sa === 'uninstall2';
+
+		// Load up the package FTP information?
+		create_chmod_control(array(), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $this->_req->query->sa . ';package=' . $this->_req->query->package));
+
+		// Make sure temp directory exists and is empty!
+		if (file_exists(BOARDDIR . '/packages/temp'))
+			deltree(BOARDDIR . '/packages/temp', false);
+		else
+			$this->_create_temp_dir();
+
+		// Let the unpacker do the work.
+		$this->_extract_files_temp();
 
 		// Are we installing this into any custom themes?
 		$custom_themes = array(1);
 		$known_themes = explode(',', $modSettings['knownThemes']);
-		if (!empty($_POST['custom_theme']))
+		if (!empty($this->_req->post->custom_theme))
 		{
-			foreach ($_POST['custom_theme'] as $tid)
+			foreach ($this->_req->post->custom_theme as $tid)
 				if (in_array($tid, $known_themes))
 					$custom_themes[] = (int) $tid;
 		}
 
 		// Now load up the paths of the themes that we need to know about.
-		$theme_paths = getThemesPathbyID($custom_themes);
+		$this->theme_paths = getThemesPathbyID($custom_themes);
 		$themes_installed = array(1);
 
 		// Are there any theme copying that we want to take place?
@@ -826,12 +582,13 @@ class Packages_Controller extends Action_Controller
 			'require-dir' => array(),
 		);
 
-		if (!empty($_POST['theme_changes']))
+		if (!empty($this->_req->post->theme_changes))
 		{
-			foreach ($_POST['theme_changes'] as $change)
+			foreach ($this->_req->post->theme_changes as $change)
 			{
 				if (empty($change))
 					continue;
+
 				$theme_data = json_decode(base64_decode($change), true);
 				if (empty($theme_data['type']))
 					continue;
@@ -842,75 +599,44 @@ class Packages_Controller extends Action_Controller
 		}
 
 		// Get the package info...
-		$packageInfo = getPackageInfo($context['filename']);
-
+		$packageInfo = getPackageInfo($this->_filename);
 		if (!is_array($packageInfo))
-			fatal_lang_error($packageInfo);
+			throw new Elk_Exception($packageInfo);
 
-		$packageInfo['filename'] = $context['filename'];
+		$packageInfo['filename'] = $this->_filename;
 
-		// Set the type of extraction...
-		$context['extract_type'] = isset($packageInfo['type']) ? $packageInfo['type'] : 'modification';
+		$context['base_path'] = $this->_base_path;
 
 		// Create a backup file to roll back to! (but if they do this more than once, don't run it a zillion times.)
-		if (!empty($modSettings['package_make_full_backups']) && (!isset($_SESSION['last_backup_for']) || $_SESSION['last_backup_for'] != $context['filename'] . ($context['uninstalling'] ? '$$' : '$')))
+		if (!empty($modSettings['package_make_full_backups']) && (!isset($_SESSION['last_backup_for']) || $_SESSION['last_backup_for'] != $this->_filename . ($this->_uninstalling ? '$$' : '$')))
 		{
-			$_SESSION['last_backup_for'] = $context['filename'] . ($context['uninstalling'] ? '$$' : '$');
+			$_SESSION['last_backup_for'] = $this->_filename . ($this->_uninstalling ? '$$' : '$');
 
 			// @todo Internationalize this?
-			package_create_backup(($context['uninstalling'] ? 'backup_' : 'before_') . strtok($context['filename'], '.'));
+			package_create_backup(($this->_uninstalling ? 'backup_' : 'before_') . strtok($this->_filename, '.'));
 		}
 
-		// The mod isn't installed.... unless proven otherwise.
-		$context['is_installed'] = false;
+		// The addon isn't installed.... unless proven otherwise.
+		$this->_is_installed = false;
 
 		// Is it actually installed?
-		$package_installed = isPackageInstalled($packageInfo['id']);
+		$package_installed = isPackageInstalled($packageInfo['id'], $this->install_id);
 
-		// Wait, it's not installed yet!
-		// @todo Replace with a better error message!
-		if (!isset($package_installed['old_version']) && $context['uninstalling'])
-		{
-			deltree(BOARDDIR . '/packages/temp');
-			fatal_error('Hacker?', false);
-		}
-		// Uninstalling?
-		elseif ($context['uninstalling'])
-		{
-			$install_log = parsePackageInfo($packageInfo['xml'], false, 'uninstall');
+		// Fetch the install status and action log
+		$install_log = $this->_get_package_actions($package_installed, $packageInfo, false);
 
-			// Gadzooks!  There's no uninstaller at all!?
-			if (empty($install_log))
-				fatal_lang_error('package_uninstall_cannot', false);
-
-			// They can only uninstall from what it was originally installed into.
-			foreach ($theme_paths as $id => $data)
-				if ($id != 1 && !in_array($id, $package_installed['old_themes']))
-					unset($theme_paths[$id]);
-		}
-		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] != $packageInfo['version'])
-		{
-			// Look for an upgrade...
-			$install_log = parsePackageInfo($packageInfo['xml'], false, 'upgrade', $package_installed['old_version']);
-
-			// There was no upgrade....
-			if (empty($install_log))
-				$context['is_installed'] = true;
-			else
-			{
-				// Upgrade previous themes only!
-				foreach ($theme_paths as $id => $data)
-					if ($id != 1 && !in_array($id, $package_installed['old_themes']))
-						unset($theme_paths[$id]);
-			}
-		}
-		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] == $packageInfo['version'])
-			$context['is_installed'] = true;
-
-		if (!isset($package_installed['old_version']) || $context['is_installed'])
-			$install_log = parsePackageInfo($packageInfo['xml'], false, 'install');
-
+		// Set up the details for the sub template, linktree, etc
+		$context['linktree'][count($context['linktree']) - 1] = array(
+			'url' => $scripturl . '?action=admin;area=packages;sa=browse',
+			'name' => $this->_uninstalling ? $txt['uninstall'] : $txt['extracting']
+		);
+		$context['page_title'] .= ' - ' . ($this->_uninstalling ? $txt['uninstall'] : $txt['extracting']);
+		$context['sub_template'] = 'extract_package';
+		$context['filename'] = $this->_filename;
 		$context['install_finished'] = false;
+		$context['is_installed'] = $this->_is_installed;
+		$context['uninstalling'] = $this->_uninstalling;
+		$context['extract_type'] = isset($packageInfo['type']) ? $packageInfo['type'] : 'modification';
 
 		// We're gonna be needing the table db functions! ...Sometimes.
 		$table_installer = db_table();
@@ -918,89 +644,11 @@ class Packages_Controller extends Action_Controller
 		// @todo Make a log of any errors that occurred and output them?
 		if (!empty($install_log))
 		{
-			$failed_steps = array();
-			$failed_count = 0;
-
-			foreach ($install_log as $action)
-			{
-				$failed_count++;
-				if ($action['type'] == 'modification' && !empty($action['filename']))
-				{
-					if ($action['boardmod'])
-						$mod_actions = parseBoardMod(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), false, $action['reverse'], $theme_paths);
-					else
-						$mod_actions = parseModification(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), false, $action['reverse'], $theme_paths);
-
-					// Any errors worth noting?
-					foreach ($mod_actions as $key => $action)
-					{
-						if ($action['type'] == 'failure')
-							$failed_steps[] = array(
-								'file' => $action['filename'],
-								'large_step' => $failed_count,
-								'sub_step' => $key,
-								'theme' => 1,
-							);
-
-						// Gather the themes we installed into.
-						if (!empty($action['is_custom']))
-							$themes_installed[] = $action['is_custom'];
-					}
-				}
-				elseif ($action['type'] == 'code' && !empty($action['filename']))
-				{
-					// This is just here as reference for what is available.
-					global $txt, $modSettings, $context;
-
-					// Now include the file and be done with it ;).
-					if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
-						require(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']);
-				}
-				elseif ($action['type'] == 'credits')
-				{
-					// Time to build the billboard
-					$credits_tag = array(
-						'url' => $action['url'],
-						'license' => $action['license'],
-						'copyright' => $action['copyright'],
-						'title' => $action['title'],
-					);
-				}
-				elseif ($action['type'] == 'hook' && isset($action['hook'], $action['function']))
-				{
-					if ($action['reverse'])
-						remove_integration_function($action['hook'], $action['function'], $action['include_file']);
-					else
-						add_integration_function($action['hook'], $action['function'], $action['include_file']);
-				}
-				// Only do the database changes on uninstall if requested.
-				elseif ($action['type'] == 'database' && !empty($action['filename']) && (!$context['uninstalling'] || !empty($_POST['do_db_changes'])))
-				{
-					// These can also be there for database changes.
-					global $txt, $modSettings, $context;
-
-					// Let the file work its magic ;)
-					if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
-						require(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']);
-				}
-				// Handle a redirect...
-				elseif ($action['type'] == 'redirect' && !empty($action['redirect_url']))
-				{
-					$context['redirect_url'] = $action['redirect_url'];
-					$context['redirect_text'] = !empty($action['filename']) && file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']) ? file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']) : ($context['uninstalling'] ? $txt['package_uninstall_done'] : $txt['package_installed_done']);
-					$context['redirect_timeout'] = $action['redirect_timeout'];
-
-					// Parse out a couple of common urls.
-					$urls = array(
-						'$boardurl' => $boardurl,
-						'$scripturl' => $scripturl,
-						'$session_var' => $context['session_var'],
-						'$session_id' => $context['session_id'],
-					);
-
-					$context['redirect_url'] = strtr($context['redirect_url'], $urls);
-				}
-			}
+			// @todo Make a log of any errors that occurred and output them?
+			$pka = new Package_Actions();
+			$pka->install_init($install_log, $this->_uninstalling, $this->_base_path, $this->theme_paths, $themes_installed);
+			$failed_steps = $pka->failed_steps;
+			$themes_installed = $pka->themes_installed;
 
 			package_flush_cache();
 
@@ -1015,8 +663,8 @@ class Packages_Controller extends Action_Controller
 			// Change the installed state as required.
 			if (!empty($package_check['install_state']))
 			{
-				if ($context['uninstalling'])
-					setPackageState($package_check['package_id']);
+				if ($this->_uninstalling)
+					setPackageState($package_check['package_id'], $this->install_id);
 				else
 				{
 					// not uninstalling so must be an upgrade
@@ -1026,10 +674,11 @@ class Packages_Controller extends Action_Controller
 			}
 
 			// Assuming we're not uninstalling, add the entry.
-			if (!$context['uninstalling'])
+			if (!$this->_uninstalling)
 			{
 				// Any db changes from older version?
 				$table_log = $table_installer->package_log();
+
 				if (!empty($old_db_changes))
 					$db_package_log = empty($table_log) ? $old_db_changes : array_merge($old_db_changes, $table_log);
 				else
@@ -1043,7 +692,7 @@ class Packages_Controller extends Action_Controller
 					usort($db_package_log, array($this, '_sort_table_first'));
 					foreach ($db_package_log as $k => $log)
 					{
-						if ($log[0] == 'remove_table')
+						if ($log[0] === 'remove_table')
 							$tables[] = $log[1];
 						elseif (in_array($log[1], $tables))
 							unset($db_package_log[$k]);
@@ -1062,7 +711,7 @@ class Packages_Controller extends Action_Controller
 				$failed_step_insert = serialize($failed_steps);
 
 				// Credits tag?
-				$credits_tag = (empty($credits_tag)) ? '' : serialize($credits_tag);
+				$credits_tag = (empty($pka->credits_tag)) ? '' : serialize($pka->credits_tag);
 
 				// Add to the log packages
 				addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $package_installed['db_changes'], $is_upgrade, $credits_tag);
@@ -1072,15 +721,15 @@ class Packages_Controller extends Action_Controller
 		}
 
 		// If there's database changes - and they want them removed - let's do it last!
-		if (!empty($package_installed['db_changes']) && !empty($_POST['do_db_changes']))
+		if (!empty($package_installed['db_changes']) && !empty($this->_req->post->do_db_changes))
 		{
 			foreach ($package_installed['db_changes'] as $change)
 			{
-				if ($change[0] == 'remove_table' && isset($change[1]))
+				if ($change[0] === 'remove_table' && isset($change[1]))
 					$table_installer->db_drop_table($change[1]);
-				elseif ($change[0] == 'remove_column' && isset($change[2]))
+				elseif ($change[0] === 'remove_column' && isset($change[2]))
 					$table_installer->db_remove_column($change[1], $change[2]);
-				elseif ($change[0] == 'remove_index' && isset($change[2]))
+				elseif ($change[0] === 'remove_index' && isset($change[2]))
 					$table_installer->db_remove_index($change[1], $change[2]);
 			}
 		}
@@ -1090,7 +739,7 @@ class Packages_Controller extends Action_Controller
 			deltree(BOARDDIR . '/packages/temp');
 
 		// Log what we just did.
-		logAction($context['uninstalling'] ? 'uninstall_package' : (!empty($is_upgrade) ? 'upgrade_package' : 'install_package'), array('package' => Util::htmlspecialchars($packageInfo['name']), 'version' => Util::htmlspecialchars($packageInfo['version'])), 'admin');
+		logAction($this->_uninstalling ? 'uninstall_package' : (!empty($is_upgrade) ? 'upgrade_package' : 'install_package'), array('package' => Util::htmlspecialchars($packageInfo['name']), 'version' => Util::htmlspecialchars($packageInfo['version'])), 'admin');
 
 		// Just in case, let's clear the whole cache to avoid anything going up the swanny.
 		clean_cache();
@@ -1110,7 +759,7 @@ class Packages_Controller extends Action_Controller
 		if ($a[0] == $b[0])
 			return 0;
 
-		return $a[0] == 'remove_table' ? -1 : 1;
+		return $a[0] === 'remove_table' ? -1 : 1;
 	}
 
 	/**
@@ -1120,21 +769,19 @@ class Packages_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context;
 
-		require_once(SUBSDIR . '/Package.subs.php');
-
 		// No package?  Show him or her the door.
-		if (!isset($_REQUEST['package']) || $_REQUEST['package'] == '')
+		if (!isset($this->_req->query->package) || $this->_req->query->package == '')
 			redirectexit('action=admin;area=packages');
 
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=admin;area=packages;sa=list;package=' . $_REQUEST['package'],
+			'url' => $scripturl . '?action=admin;area=packages;sa=list;package=' . $this->_req->query->package,
 			'name' => $txt['list_file']
 		);
 		$context['page_title'] .= ' - ' . $txt['list_file'];
 		$context['sub_template'] = 'list';
 
 		// The filename...
-		$context['filename'] = $_REQUEST['package'];
+		$context['filename'] = $this->_req->query->package;
 
 		// Let the unpacker do the work.
 		if (is_file(BOARDDIR . '/packages/' . $context['filename']))
@@ -1150,51 +797,49 @@ class Packages_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context;
 
-		require_once(SUBSDIR . '/Package.subs.php');
-
 		// No package?  Show him or her the door.
-		if (!isset($_REQUEST['package']) || $_REQUEST['package'] == '')
+		if (!isset($this->_req->query->package) || $this->_req->query->package == '')
 			redirectexit('action=admin;area=packages');
 
 		// No file?  Show him or her the door.
-		if (!isset($_REQUEST['file']) || $_REQUEST['file'] == '')
+		if (!isset($this->_req->query->file) || $this->_req->query->file == '')
 			redirectexit('action=admin;area=packages');
 
-		$_REQUEST['package'] = preg_replace('~[\.]+~', '.', strtr($_REQUEST['package'], array('/' => '_', '\\' => '_')));
-		$_REQUEST['file'] = preg_replace('~[\.]+~', '.', $_REQUEST['file']);
+		$this->_req->query->package = preg_replace('~[\.]+~', '.', strtr($this->_req->query->package, array('/' => '_', '\\' => '_')));
+		$this->_req->query->file = preg_replace('~[\.]+~', '.', $this->_req->query->file);
 
-		if (isset($_REQUEST['raw']))
+		if (isset($this->_req->query->raw))
 		{
-			if (is_file(BOARDDIR . '/packages/' . $_REQUEST['package']))
-				echo read_tgz_file(BOARDDIR . '/packages/' . $_REQUEST['package'], $_REQUEST['file'], true);
-			elseif (is_dir(BOARDDIR . '/packages/' . $_REQUEST['package']))
-				echo file_get_contents(BOARDDIR . '/packages/' . $_REQUEST['package'] . '/' . $_REQUEST['file']);
+			if (is_file(BOARDDIR . '/packages/' . $this->_req->query->package))
+				echo read_tgz_file(BOARDDIR . '/packages/' . $this->_req->query->package, $this->_req->query->file, true);
+			elseif (is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
+				echo file_get_contents(BOARDDIR . '/packages/' . $this->_req->query->package . '/' . $this->_req->query->file);
 
 			obExit(false);
 		}
 
 		$context['linktree'][count($context['linktree']) - 1] = array(
-			'url' => $scripturl . '?action=admin;area=packages;sa=list;package=' . $_REQUEST['package'],
+			'url' => $scripturl . '?action=admin;area=packages;sa=list;package=' . $this->_req->query->package,
 			'name' => $txt['package_examine_file']
 		);
 		$context['page_title'] .= ' - ' . $txt['package_examine_file'];
 		$context['sub_template'] = 'examine';
 
 		// The filename...
-		$context['package'] = $_REQUEST['package'];
-		$context['filename'] = $_REQUEST['file'];
+		$context['package'] = $this->_req->query->package;
+		$context['filename'] = $this->_req->query->file;
 
 		// Let the unpacker do the work.... but make sure we handle images properly.
-		if (in_array(strtolower(strrchr($_REQUEST['file'], '.')), array('.bmp', '.gif', '.jpeg', '.jpg', '.png')))
-			$context['filedata'] = '<img src="' . $scripturl . '?action=admin;area=packages;sa=examine;package=' . $_REQUEST['package'] . ';file=' . $_REQUEST['file'] . ';raw" alt="' . $_REQUEST['file'] . '" />';
+		if (in_array(strtolower(strrchr($this->_req->query->file, '.')), array('.bmp', '.gif', '.jpeg', '.jpg', '.png')))
+			$context['filedata'] = '<img src="' . $scripturl . '?action=admin;area=packages;sa=examine;package=' . $this->_req->query->package . ';file=' . $this->_req->query->file . ';raw" alt="' . $this->_req->query->file . '" />';
 		else
 		{
-			if (is_file(BOARDDIR . '/packages/' . $_REQUEST['package']))
-				$context['filedata'] = htmlspecialchars(read_tgz_file(BOARDDIR . '/packages/' . $_REQUEST['package'], $_REQUEST['file'], true));
-			elseif (is_dir(BOARDDIR . '/packages/' . $_REQUEST['package']))
-				$context['filedata'] = htmlspecialchars(file_get_contents(BOARDDIR . '/packages/' . $_REQUEST['package'] . '/' . $_REQUEST['file']));
+			if (is_file(BOARDDIR . '/packages/' . $this->_req->query->package))
+				$context['filedata'] = htmlspecialchars(read_tgz_file(BOARDDIR . '/packages/' . $this->_req->query->package, $this->_req->query->file, true));
+			elseif (is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
+				$context['filedata'] = htmlspecialchars(file_get_contents(BOARDDIR . '/packages/' . $this->_req->query->package . '/' . $this->_req->query->file));
 
-			if (strtolower(strrchr($_REQUEST['file'], '.')) == '.php')
+			if (strtolower(strrchr($this->_req->query->file, '.')) === '.php')
 				$context['filedata'] = highlight_php_code($context['filedata']);
 		}
 	}
@@ -1229,21 +874,23 @@ class Packages_Controller extends Action_Controller
 		checkSession('get');
 
 		// Ack, don't allow deletion of arbitrary files here, could become a security hole somehow!
-		if (!isset($_GET['package']) || $_GET['package'] == 'index.php' || $_GET['package'] == 'installed.list' || $_GET['package'] == 'backups')
+		if (!isset($this->_req->query->package) || $this->_req->query->package === 'index.php' || $this->_req->query->package === 'installed.list' || $this->_req->query->package === 'backups')
 			redirectexit('action=admin;area=packages;sa=browse');
-		$_GET['package'] = preg_replace('~[\.]+~', '.', strtr($_GET['package'], array('/' => '_', '\\' => '_')));
+		$this->_req->query->package = preg_replace('~[\.]+~', '.', strtr($this->_req->query->package, array('/' => '_', '\\' => '_')));
 
 		// Can't delete what's not there.
-		if (file_exists(BOARDDIR . '/packages/' . $_GET['package']) && (substr($_GET['package'], -4) == '.zip' || substr($_GET['package'], -4) == '.tgz' || substr($_GET['package'], -7) == '.tar.gz' || is_dir(BOARDDIR . '/packages/' . $_GET['package'])) && $_GET['package'] != 'backups' && substr($_GET['package'], 0, 1) != '.')
+		if (file_exists(BOARDDIR . '/packages/' . $this->_req->query->package)
+			&& (substr($this->_req->query->package, -4) === '.zip' || substr($this->_req->query->package, -4) === '.tgz' || substr($this->_req->query->package, -7) === '.tar.gz' || is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
+			&& $this->_req->query->package !== 'backups' && substr($this->_req->query->package, 0, 1) !== '.')
 		{
-			create_chmod_control(array(BOARDDIR . '/packages/' . $_GET['package']), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=remove;package=' . $_GET['package'], 'crash_on_error' => true));
+			create_chmod_control(array(BOARDDIR . '/packages/' . $this->_req->query->package), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=remove;package=' . $this->_req->query->package, 'crash_on_error' => true));
 
-			if (is_dir(BOARDDIR . '/packages/' . $_GET['package']))
-				deltree(BOARDDIR . '/packages/' . $_GET['package']);
+			if (is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
+				deltree(BOARDDIR . '/packages/' . $this->_req->query->package);
 			else
 			{
-				@chmod(BOARDDIR . '/packages/' . $_GET['package'], 0777);
-				unlink(BOARDDIR . '/packages/' . $_GET['package']);
+				@chmod(BOARDDIR . '/packages/' . $this->_req->query->package, 0777);
+				unlink(BOARDDIR . '/packages/' . $this->_req->query->package);
 			}
 		}
 
@@ -1255,13 +902,11 @@ class Packages_Controller extends Action_Controller
 	 */
 	public function action_browse()
 	{
-		global $txt, $scripturl, $context, $forum_version, $settings;
-
-		require_once(SUBSDIR . '/GenericList.class.php');
+		global $txt, $scripturl, $context;
 
 		$context['page_title'] .= ' - ' . $txt['browse_packages'];
-		$context['forum_version'] = $forum_version;
-		$installed = $context['sub_action'] == 'installed' ? true : false;
+		$context['forum_version'] = FORUM_VERSION;
+		$installed = $context['sub_action'] === 'installed' ? true : false;
 		$context['package_types'] = $installed ? array('modification') : array('modification', 'avatar', 'language', 'smiley', 'unknown');
 
 		foreach ($context['package_types'] as $type)
@@ -1284,12 +929,14 @@ class Packages_Controller extends Action_Controller
 							'style' => 'width: 25%;',
 						),
 						'data' => array(
-							'function' => create_function('$package_md5', '
+							'function' => function ($package_md5) use ($type)  {
 								global $context;
 
-								if (isset($context[\'available_' . $type . '\'][$package_md5]))
-									return $context[\'available_' . $type . '\'][$package_md5][\'name\'];
-							'),
+								if (isset($context['available_' . $type . ''][$package_md5]))
+									return $context['available_' . $type . ''][$package_md5]['name'];
+
+								return '';
+							},
 						),
 						'sort' => array(
 							'default' => 'name',
@@ -1302,12 +949,14 @@ class Packages_Controller extends Action_Controller
 							'style' => 'width: 25%;',
 						),
 						'data' => array(
-							'function' => create_function('$package_md5', '
+							'function' => function ($package_md5) use ($type)  {
 								global $context;
 
-								if (isset($context[\'available_' . $type . '\'][$package_md5]))
-									return $context[\'available_' . $type . '\'][$package_md5][\'version\'];
-							'),
+								if (isset($context['available_' . $type . ''][$package_md5]))
+									return $context['available_' . $type . ''][$package_md5]['version'];
+
+								return '';
+							},
 						),
 						'sort' => array(
 							'default' => 'version',
@@ -1319,36 +968,38 @@ class Packages_Controller extends Action_Controller
 							'value' => '',
 						),
 						'data' => array(
-							'function' => create_function('$package_md5', '
+							'function' => function ($package_md5) use ($type) {
 								global $context, $scripturl, $txt;
 
-								if (!isset($context[\'available_' . $type . '\'][$package_md5]))
-									return \'\';
+								if (!isset($context['available_' . $type . ''][$package_md5]))
+									return '';
 
 								// Rewrite shortcut
-								$package = $context[\'available_' . $type . '\'][$package_md5];
-								$return = \'\';
+								$package = $context['available_' . $type . ''][$package_md5];
+								$return = '';
 
-								if ($package[\'can_uninstall\'])
-									$return = \'
-										<a href="\' . $scripturl . \'?action=admin;area=packages;sa=uninstall;package=\' . $package[\'filename\'] . \';pid=\' . $package[\'installed_id\'] . \'">[ \' . $txt[\'uninstall\'] . \' ]</a>\';
-								elseif ($package[\'can_emulate_uninstall\'])
-									$return = \'
-										<a href="\' . $scripturl . \'?action=admin;area=packages;sa=uninstall;ve=\' . $package[\'can_emulate_uninstall\'] . \';package=\' . $package[\'filename\'] . \';pid=\' . $package[\'installed_id\'] . \'">[ \' . $txt[\'package_emulate_uninstall\'] . \' \' . $package[\'can_emulate_uninstall\'] . \' ]</a>\';
-								elseif ($package[\'can_upgrade\'])
-									$return = \'
-										<a href="\' . $scripturl . \'?action=admin;area=packages;sa=install;package=\' . $package[\'filename\'] . \'">[ \' . $txt[\'package_upgrade\'] . \' ]</a>\';
-								elseif ($package[\'can_install\'])
-									$return = \'
-										<a href="\' . $scripturl . \'?action=admin;area=packages;sa=install;package=\' . $package[\'filename\'] . \'">[ \' . $txt[\'install_mod\'] . \' ]</a>\';
-								elseif ($package[\'can_emulate_install\'])
-									$return = \'
-										<a href="\' . $scripturl . \'?action=admin;area=packages;sa=install;ve=\' . $package[\'can_emulate_install\'] . \';package=\' . $package[\'filename\'] . \'">[ \' . $txt[\'package_emulate_install\'] . \' \' . $package[\'can_emulate_install\'] . \' ]</a>\';
+								if ($package['can_uninstall'])
+									$return = '
+										<a href="' . $scripturl . '?action=admin;area=packages;sa=uninstall;package=' . $package['filename'] . ';pid=' . $package['installed_id'] . '">[ ' . $txt['uninstall'] . ' ]</a>';
+								elseif ($package['can_emulate_uninstall'])
+									$return = '
+										<a href="' . $scripturl . '?action=admin;area=packages;sa=uninstall;ve=' . $package['can_emulate_uninstall'] . ';package=' . $package['filename'] . ';pid=' . $package['installed_id'] . '">[ ' . $txt['package_emulate_uninstall'] . ' ' . $package['can_emulate_uninstall'] . ' ]</a>';
+								elseif ($package['can_upgrade'])
+									$return = '
+										<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $package['filename'] . '">[ ' . $txt['package_upgrade'] . ' ]</a>';
+								elseif ($package['can_install'])
+									$return = '
+										<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $package['filename'] . '">[ ' . $txt['install_mod'] . ' ]</a>';
+								elseif ($package['can_emulate_install'])
+									$return = '
+										<a href="' . $scripturl . '?action=admin;area=packages;sa=install;ve=' . $package['can_emulate_install'] . ';package=' . $package['filename'] . '">[ ' . $txt['package_emulate_install'] . ' ' . $package['can_emulate_install'] . ' ]</a>';
 
-								return $return . \'
-										<a href="\' . $scripturl . \'?action=admin;area=packages;sa=list;package=\' . $package[\'filename\'] . \'">[ \' . $txt[\'list_files\'] . \' ]</a>
-										<a href="\' . $scripturl . \'?action=admin;area=packages;sa=remove;package=\' . $package[\'filename\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"\' . ($package[\'is_installed\'] && $package[\'is_current\'] ? \' onclick="return confirm(\\\'\' . $txt[\'package_delete_bad\'] . \'\\\');"\' : \'\') . \'>[ \' . $txt[\'package_delete\'] . \' ]</a>\';
-							'),
+								return $return . '
+										<a href="' . $scripturl . '?action=admin;area=packages;sa=list;package=' . $package['filename'] . '">[ ' . $txt['list_files'] . ' ]</a>
+										<a href="' . $scripturl . '?action=admin;area=packages;sa=remove;package=' . $package['filename'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"' . ($package['is_installed'] && $package['is_current']
+											? ' onclick="return confirm(\'' . $txt['package_delete_bad'] . '\');"'
+											: '') . '>[ ' . $txt['package_delete'] . ' ]</a>';
+							},
 							'class' => 'righttext',
 						),
 					),
@@ -1357,7 +1008,9 @@ class Packages_Controller extends Action_Controller
 					array(
 						'position' => 'bottom_of_list',
 						'class' => 'submitbutton',
-						'value' => ($context['sub_action'] == 'browse' ? '<div class="smalltext">' . $txt['package_installed_key'] . '<img src="' . $settings['images_url'] . '/icons/package_installed.png" alt="" class="centericon" /> ' . $txt['package_installed_current'] . '<img src="' . $settings['images_url'] . '/icons/package_old.png" alt="" class="centericon" /> ' . $txt['package_installed_old'] . '</div>' : '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=flush;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['package_delete_list_warning'] . '\');">' . $txt['delete_list'] . '</a>'),
+						'value' => ($context['sub_action'] === 'browse'
+							? '<div class="smalltext">' . $txt['package_installed_key'] . '<i class="icon icon-small i-green-dot"></i>' . $txt['package_installed_current'] . '<i class="icon icon-small i-red-dot"></i>' . $txt['package_installed_old'] . '</div>'
+							: '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=flush;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['package_delete_list_warning'] . '\');">' . $txt['delete_list'] . '</a>'),
 					),
 				),
 			);
@@ -1386,7 +1039,7 @@ class Packages_Controller extends Action_Controller
 		// Deal with the template stuff.
 		loadTemplate('Xml');
 		$context['sub_template'] = 'generic_xml';
-		Template_Layers::getInstance()->removeAll();
+		Template_Layers::instance()->removeAll();
 
 		// Define the return data, this is simple.
 		$context['xml_data'] = array(
@@ -1411,22 +1064,22 @@ class Packages_Controller extends Action_Controller
 	{
 		global $txt, $context, $modSettings;
 
-		if (isset($_POST['save']))
+		if (isset($this->_req->post->save))
 		{
 			checkSession('post');
 
 			updateSettings(array(
-				'package_server' => trim(Util::htmlspecialchars($_POST['pack_server'])),
-				'package_port' => trim(Util::htmlspecialchars($_POST['pack_port'])),
-				'package_username' => trim(Util::htmlspecialchars($_POST['pack_user'])),
-				'package_make_backups' => !empty($_POST['package_make_backups']),
-				'package_make_full_backups' => !empty($_POST['package_make_full_backups'])
+				'package_server' => $this->_req->getPost('pack_server', 'trim|Util::htmlspecialchars'),
+				'package_port' => $this->_req->getPost('pack_port', 'trim|Util::htmlspecialchars'),
+				'package_username' => $this->_req->getPost('pack_user', 'trim|Util::htmlspecialchars'),
+				'package_make_backups' => !empty($this->_req->post->package_make_backups),
+				'package_make_full_backups' => !empty($this->_req->post->package_make_full_backups)
 			));
 
 			redirectexit('action=admin;area=packages;sa=options');
 		}
 
-		if (preg_match('~^/home\d*/([^/]+?)/public_html~', $_SERVER['DOCUMENT_ROOT'], $match))
+		if (preg_match('~^/home\d*/([^/]+?)/public_html~', $this->_req->server->DOCUMENT_ROOT, $match))
 			$default_username = $match[1];
 		else
 			$default_username = '';
@@ -1450,19 +1103,18 @@ class Packages_Controller extends Action_Controller
 		// Can't be in here buddy.
 		isAllowedTo('admin_forum');
 
-		// We need to know the operation key for the search and replace, mod file looking at, is it a board mod?
-		if (!isset($_REQUEST['operation_key'], $_REQUEST['filename']) && !is_numeric($_REQUEST['operation_key']))
-			fatal_lang_error('operation_invalid', 'general');
+		// We need to know the operation key for the search and replace?
+		if (!isset($this->_req->query->operation_key, $this->_req->query->filename) && !is_numeric($this->_req->query->operation_key))
+			throw new Elk_Exception('operation_invalid', 'general');
 
 		// Load the required file.
-		require_once(SUBSDIR . '/Package.subs.php');
 		require_once(SUBSDIR . '/Themes.subs.php');
 
 		// Uninstalling the mod?
-		$reverse = isset($_REQUEST['reverse']) ? true : false;
+		$reverse = isset($this->_req->query->reverse) ? true : false;
 
 		// Get the base name.
-		$context['filename'] = preg_replace('~[\.]+~', '.', $_REQUEST['package']);
+		$context['filename'] = preg_replace('~[\.]+~', '.', $this->_req->query->package);
 
 		// We need to extract this again.
 		if (is_file(BOARDDIR . '/packages/' . $context['filename']))
@@ -1471,7 +1123,7 @@ class Packages_Controller extends Action_Controller
 			if ($context['extracted_files'] && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
 			{
 				foreach ($context['extracted_files'] as $file)
-					if (basename($file['filename']) == 'package-info.xml')
+					if (basename($file['filename']) === 'package-info.xml')
 					{
 						$context['base_path'] = dirname($file['filename']) . '/';
 						break;
@@ -1492,9 +1144,9 @@ class Packages_Controller extends Action_Controller
 		$theme_paths = getThemesPathbyID();
 
 		// For uninstall operations we only consider the themes in which the package is installed.
-		if (isset($_REQUEST['reverse']) && !empty($_REQUEST['install_id']))
+		if ($reverse && !empty($this->_req->query->install_id))
 		{
-			$install_id = (int) $_REQUEST['install_id'];
+			$install_id = (int) $this->_req->query->install_id;
 			if ($install_id > 0)
 			{
 				$old_themes = loadThemesAffected($install_id);
@@ -1506,26 +1158,23 @@ class Packages_Controller extends Action_Controller
 			}
 		}
 
-		// Boardmod?
-		if (isset($_REQUEST['boardmod']))
-			$mod_actions = parseBoardMod(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $_REQUEST['filename']), true, $reverse, $theme_paths);
-		else
-			$mod_actions = parseModification(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $_REQUEST['filename']), true, $reverse, $theme_paths);
+		$mod_actions = parseModification(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_req->query->filename), true, $reverse, $theme_paths);
 
 		// Ok lets get the content of the file.
 		$context['operations'] = array(
-			'search' => strtr(htmlspecialchars($mod_actions[$_REQUEST['operation_key']]['search_original'], ENT_COMPAT, 'UTF-8'), array('[' => '&#91;', ']' => '&#93;')),
-			'replace' => strtr(htmlspecialchars($mod_actions[$_REQUEST['operation_key']]['replace_original'], ENT_COMPAT, 'UTF-8'), array('[' => '&#91;', ']' => '&#93;')),
-			'position' => $mod_actions[$_REQUEST['operation_key']]['position'],
+			'search' => strtr(htmlspecialchars($mod_actions[$this->_req->query->operation_key]['search_original'], ENT_COMPAT, 'UTF-8'), array('[' => '&#91;', ']' => '&#93;')),
+			'replace' => strtr(htmlspecialchars($mod_actions[$this->_req->query->operation_key]['replace_original'], ENT_COMPAT, 'UTF-8'), array('[' => '&#91;', ']' => '&#93;')),
+			'position' => $mod_actions[$this->_req->query->operation_key]['position'],
 		);
 
 		// Let's do some formatting...
-		$operation_text = $context['operations']['position'] == 'replace' ? 'operation_replace' : ($context['operations']['position'] == 'before' ? 'operation_after' : 'operation_before');
-		$context['operations']['search'] = parse_bbc('[code=' . $txt['operation_find'] . ']' . ($context['operations']['position'] == 'end' ? '?&gt;' : $context['operations']['search']) . '[/code]');
-		$context['operations']['replace'] = parse_bbc('[code=' . $txt[$operation_text] . ']' . $context['operations']['replace'] . '[/code]');
+		$operation_text = $context['operations']['position'] === 'replace' ? 'operation_replace' : ($context['operations']['position'] === 'before' ? 'operation_after' : 'operation_before');
+		$bbc_parser = \BBC\ParserWrapper::instance();
+		$context['operations']['search'] = $bbc_parser->parsePackage('[code=' . $txt['operation_find'] . ']' . ($context['operations']['position'] === 'end' ? '?&gt;' : $context['operations']['search']) . '[/code]');
+		$context['operations']['replace'] = $bbc_parser->parsePackage('[code=' . $txt[$operation_text] . ']' . $context['operations']['replace'] . '[/code]');
 
 		// No layers
-		Template_Layers::getInstance()->removeAll();
+		Template_Layers::instance()->removeAll();
 		$context['sub_template'] = 'view_operations';
 	}
 
@@ -1540,24 +1189,23 @@ class Packages_Controller extends Action_Controller
 		checkSession('get');
 
 		// If we're restoring permissions this is just a pass through really.
-		if (isset($_GET['restore']))
+		if (isset($this->_req->query->restore))
 		{
 			create_chmod_control(array(), array(), true);
-			fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 		}
 
 		// This is a time and memory eating ...
-		setMemoryLimit('128M');
-		@set_time_limit(600);
+		detectServer()->setMemoryLimit('128M');
+		detectServer()->setTimeLimit(600);
 
 		// Load up some FTP stuff.
 		create_chmod_control();
 
-		if (empty($package_ftp) && !isset($_POST['skip_ftp']))
+		if (empty($package_ftp) && !isset($this->_req->post->skip_ftp))
 		{
-			require_once(SUBSDIR . '/FtpConnection.class.php');
 			$ftp = new Ftp_Connection(null);
-			list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
+			list ($username, $detect_path) = $ftp->detect_path(BOARDDIR);
 
 			$context['package_ftp'] = array(
 				'server' => isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost',
@@ -1735,6 +1383,7 @@ class Packages_Controller extends Action_Controller
 				continue;
 
 			if (substr(strtolower(strtr($theme['theme_dir'], array('\\' => '/'))), 0, strlen(BOARDDIR) + 7) === strtolower(strtr(BOARDDIR, array('\\' => '/')) . '/themes'))
+			{
 				$context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['themes']['contents'][substr($theme['theme_dir'], strlen(BOARDDIR) + 8)] = array(
 					'type' => 'dir_recursive',
 					'list_contents' => true,
@@ -1745,6 +1394,7 @@ class Packages_Controller extends Action_Controller
 						),
 					),
 				);
+			}
 			else
 			{
 				$context['file_tree'][strtr($theme['theme_dir'], array('\\' => '/'))] = array(
@@ -1761,36 +1411,36 @@ class Packages_Controller extends Action_Controller
 		}
 
 		// If we're submitting then let's move on to another function to keep things cleaner..
-		if (isset($_POST['action_changes']))
+		if (isset($this->_req->post->action_changes))
 			return $this->action_perms_save();
 
 		$context['look_for'] = array();
 
 		// Are we looking for a particular tree - normally an expansion?
-		if (!empty($_REQUEST['find']))
-			$context['look_for'][] = base64_decode($_REQUEST['find']);
+		if (!empty($this->_req->query->find))
+			$context['look_for'][] = base64_decode($this->_req->query->find);
 
 		// Only that tree?
-		$context['only_find'] = isset($_GET['xml']) && !empty($_REQUEST['onlyfind']) ? $_REQUEST['onlyfind'] : '';
+		$context['only_find'] = isset($this->_req->query->xml) && !empty($this->_req->query->onlyfind) ? $this->_req->query->onlyfind : '';
 		if ($context['only_find'])
 			$context['look_for'][] = $context['only_find'];
 
 		// Have we got a load of back-catalogue trees to expand from a submit etc?
-		if (!empty($_GET['back_look']))
+		if (!empty($this->_req->query->back_look))
 		{
-			$potententialTrees = json_decode(base64_decode($_GET['back_look']), true);
+			$potententialTrees = json_decode(base64_decode($this->_req->query->back_look), true);
 			foreach ($potententialTrees as $tree)
 				$context['look_for'][] = $tree;
 		}
 
 		// ... maybe posted?
-		if (!empty($_POST['back_look']))
-			$context['only_find'] = array_merge($context['only_find'], $_POST['back_look']);
+		if (!empty($this->_req->post->back_look))
+			$context['only_find'] = array_merge($context['only_find'], $this->_req->post->back_look);
 
 		$context['back_look_data'] = base64_encode(json_encode(array_slice($context['look_for'], 0, 15)));
 
 		// Are we finding more files than first thought?
-		$context['file_offset'] = !empty($_REQUEST['fileoffset']) ? (int) $_REQUEST['fileoffset'] : 0;
+		$context['file_offset'] = !empty($this->_req->query->fileoffset) ? (int) $this->_req->query->fileoffset : 0;
 
 		// Don't list more than this many files in a directory.
 		$context['file_limit'] = 150;
@@ -1831,11 +1481,11 @@ class Packages_Controller extends Action_Controller
 		}
 
 		// Is this actually xml?
-		if (isset($_GET['xml']))
+		if (isset($this->_req->query->xml))
 		{
 			loadTemplate('Xml');
 			$context['sub_template'] = 'generic_xml';
-			Template_Layers::getInstance()->removeAll();
+			Template_Layers::instance()->removeAll();
 		}
 	}
 
@@ -1849,8 +1499,8 @@ class Packages_Controller extends Action_Controller
 		umask(0);
 
 		$timeout_limit = 5;
-		$context['method'] = $_POST['method'] === 'individual' ? 'individual' : 'predefined';
-		$context['back_look_data'] = isset($_POST['back_look']) ? $_POST['back_look'] : array();
+		$context['method'] = $this->_req->post->method === 'individual' ? 'individual' : 'predefined';
+		$context['back_look_data'] = isset($this->_req->post->back_look) ? $this->_req->post->back_look : array();
 
 		// Skipping use of FTP?
 		if (empty($package_ftp))
@@ -1861,17 +1511,17 @@ class Packages_Controller extends Action_Controller
 		{
 			// Only these path roots are legal.
 			$legal_roots = array_keys($context['file_tree']);
-			$context['custom_value'] = (int) $_POST['custom_value'];
+			$context['custom_value'] = (int) $this->_req->post->custom_value;
 
 			// Continuing?
-			if (isset($_POST['toProcess']))
-				$_POST['permStatus'] = json_decode(base64_decode($_POST['toProcess']), true);
+			if (isset($this->_req->post->toProcess))
+				$this->_req->post->permStatus = json_decode(base64_decode($this->_req->post->toProcess), true);
 
-			if (isset($_POST['permStatus']))
+			if (isset($this->_req->post->permStatus))
 			{
 				$context['to_process'] = array();
 				$validate_custom = false;
-				foreach ($_POST['permStatus'] as $path => $status)
+				foreach ($this->_req->post->permStatus as $path => $status)
 				{
 					// Nothing to see here?
 					if ($status === 'no_change')
@@ -1895,13 +1545,13 @@ class Packages_Controller extends Action_Controller
 					// Now add it.
 					$context['to_process'][$path] = $status;
 				}
-				$context['total_items'] = isset($_POST['totalItems']) ? (int) $_POST['totalItems'] : count($context['to_process']);
+				$context['total_items'] = isset($this->_req->post->totalItems) ? (int) $this->_req->post->totalItems : count($context['to_process']);
 
 				// Make sure the chmod status is valid?
 				if ($validate_custom)
 				{
-					if (preg_match('~^[4567][4567][4567]$~', $context['custom_value']) == false)
-						fatal_error($txt['chmod_value_invalid']);
+					if (!preg_match('~^[4567][4567][4567]$~', $context['custom_value']))
+						throw new Elk_Exception($txt['chmod_value_invalid']);
 				}
 
 				// Nothing to do?
@@ -1910,7 +1560,7 @@ class Packages_Controller extends Action_Controller
 			}
 			// Should never get here,
 			else
-				fatal_lang_error('no_access', false);
+				throw new Elk_Exception('no_access', false);
 
 			// Setup the custom value.
 			$custom_value = octdec('0' . $context['custom_value']);
@@ -1920,7 +1570,7 @@ class Packages_Controller extends Action_Controller
 			{
 				if (in_array($status, array('execute', 'writable', 'read')))
 					package_chmod($path, $status);
-				elseif ($status == 'custom' && !empty($custom_value))
+				elseif ($status === 'custom' && !empty($custom_value))
 				{
 					// Use FTP if we have it.
 					if (!empty($package_ftp) && !empty($_SESSION['pack_ftp']))
@@ -1943,10 +1593,10 @@ class Packages_Controller extends Action_Controller
 		// If predefined this is a little different.
 		else
 		{
-			$context['predefined_type'] = isset($_POST['predefined']) ? $_POST['predefined'] : 'restricted';
-			$context['total_items'] = isset($_POST['totalItems']) ? (int) $_POST['totalItems'] : 0;
-			$context['directory_list'] = isset($_POST['dirList']) ? json_decode(base64_decode($_POST['dirList']), true) : array();
-			$context['file_offset'] = isset($_POST['fileOffset']) ? (int) $_POST['fileOffset'] : 0;
+			$context['predefined_type'] = $this->_req->getPost('predefined', 'trim|strval', 'restricted');
+			$context['total_items'] = $this->_req->getPost('totalItems', 'intval', 0);
+			$context['directory_list'] = isset($this->_req->post->dirList) ? json_decode(base64_decode($this->_req->post->dirList), true) : array();
+			$context['file_offset'] = $this->_req->getPost('fileOffset', 'intval', 0);
 
 			// Haven't counted the items yet?
 			if (empty($context['total_items']))
@@ -1963,7 +1613,7 @@ class Packages_Controller extends Action_Controller
 			}
 
 			// Have we built up our list of special files?
-			if (!isset($_POST['specialFiles']) && $context['predefined_type'] != 'free')
+			if (!isset($this->_req->post->specialFiles) && $context['predefined_type'] !== 'free')
 			{
 				$context['special_files'] = array();
 
@@ -1974,42 +1624,49 @@ class Packages_Controller extends Action_Controller
 			elseif ($context['predefined_type'] === 'free')
 				$context['special_files'] = array();
 			else
-				$context['special_files'] = json_decode(base64_decode($_POST['specialFiles']), true);
+				$context['special_files'] = json_decode(base64_decode($this->_req->post->specialFiles), true);
 
 			// Now we definitely know where we are, we need to go through again doing the chmod!
 			foreach ($context['directory_list'] as $path => $dummy)
 			{
 				// Do the contents of the directory first.
-				$dh = @opendir($path);
-				$file_count = 0;
-				$dont_chmod = false;
-				while ($entry = readdir($dh))
+				try
 				{
-					$file_count++;
+					$file_count = 0;
+					$dont_chmod = false;
 
-					// Actually process this file?
-					if (!$dont_chmod && !is_dir($path . '/' . $entry) && (empty($context['file_offset']) || $context['file_offset'] < $file_count))
+					$entrys = new FilesystemIterator($path, FilesystemIterator::SKIP_DOTS);
+					foreach ($entrys as $entry)
 					{
-						$status = $context['predefined_type'] === 'free' || isset($context['special_files'][$path . '/' . $entry]) ? 'writable' : 'execute';
-						package_chmod($path . '/' . $entry, $status);
-					}
+						$file_count++;
 
-					// See if we're out of time?
-					if (!$dont_chmod && time() - array_sum(explode(' ', $time_start)) > $timeout_limit)
-					{
-						$dont_chmod = true;
+						// Actually process this file?
+						if (!$dont_chmod && !$entry->isDir() && (empty($context['file_offset']) || $context['file_offset'] < $file_count))
+						{
+							$status = $context['predefined_type'] === 'free' || isset($context['special_files'][$entry->getPathname()]) ? 'writable' : 'execute';
+							package_chmod($entry->getPathname(), $status);
+						}
 
-						// Make note of how far we have come so we restart at the right point
-						$context['file_offset'] = $file_count;
-						break;
+						// See if we're out of time?
+						if (!$dont_chmod && time() - array_sum(explode(' ', $time_start)) > $timeout_limit)
+						{
+							$dont_chmod = true;
+
+							// Make note of how far we have come so we restart at the right point
+							$context['file_offset'] = isset($file_count) ? $file_count : 0;
+							break;
+						}
 					}
 				}
-				closedir($dh);
+				catch (UnexpectedValueException $e)
+				{
+					// @todo for now do nothing...
+				}
 
 				// If this is set it means we timed out half way through.
-				if ($dont_chmod)
+				if (!empty($dont_chmod))
 				{
-					$context['total_files'] = $file_count;
+					$context['total_files'] = isset($file_count) ? $file_count : 0;
 					pausePermsSave();
 				}
 
@@ -2051,7 +1708,7 @@ class Packages_Controller extends Action_Controller
 	}
 
 	/**
-	 * Recursive counts all the directorys under a given path
+	 * Recursive counts all the directory's under a given path
 	 *
 	 * @param string $dir
 	 */
@@ -2060,17 +1717,28 @@ class Packages_Controller extends Action_Controller
 		global $context;
 
 		$count = 0;
-		$dh = @opendir($dir);
-		while ($entry = readdir($dh))
+
+		try
 		{
-			if ($entry != '.' && $entry != '..' && is_dir($dir . '/' . $entry))
+			$iterator = new RecursiveIteratorIterator(
+				new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+				RecursiveIteratorIterator::SELF_FIRST,
+				RecursiveIteratorIterator::CATCH_GET_CHILD
+			);
+
+			foreach ($iterator as $path => $file)
 			{
-				$context['directory_list'][$dir . '/' . $entry] = 1;
-				$count++;
-				$count += $this->count_directories__recursive($dir . '/' . $entry);
+				if ($file->isDir())
+				{
+					$context['directory_list'][$path] = 1;
+					$count++;
+				}
 			}
 		}
-		closedir($dh);
+		catch (UnexpectedValueException $e)
+		{
+			// @todo
+		}
 
 		return $count;
 	}
@@ -2081,15 +1749,16 @@ class Packages_Controller extends Action_Controller
 	 * - Determines if the package is a mod, avatar, language package
 	 * - Determines if the package has been installed or not
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param string $params 'type' type of package
 	 * @param bool $installed
+	 * @throws Elk_Exception
 	 */
 	public function list_packages($start, $items_per_page, $sort, $params, $installed)
 	{
-		global $scripturl, $context, $forum_version;
+		global $scripturl, $context;
 		static $instadds, $packages;
 
 		// Start things up
@@ -2100,17 +1769,17 @@ class Packages_Controller extends Action_Controller
 		if (!@is_writable(BOARDDIR . '/packages'))
 			create_chmod_control(array(BOARDDIR . '/packages'), array('destination_url' => $scripturl . '?action=admin;area=packages', 'crash_on_error' => true));
 
-		list ($the_brand, $the_version) = explode(' ', $forum_version, 2);
+		list ($the_brand, $the_version) = explode(' ', FORUM_VERSION, 2);
 
 		// Here we have a little code to help those who class themselves as something of gods, version emulation ;)
-		if (isset($_GET['version_emulate']) && strtr($_GET['version_emulate'], array($the_brand => '')) == $the_version)
+		if (isset($this->_req->query->version_emulate) && strtr($this->_req->query->version_emulate, array($the_brand => '')) == $the_version)
 			unset($_SESSION['version_emulate']);
-		elseif (isset($_GET['version_emulate']))
+		elseif (isset($this->_req->query->version_emulate))
 		{
-			if (($_GET['version_emulate'] === 0 || $_GET['version_emulate'] === $forum_version) && isset($_SESSION['version_emulate']))
+			if (($this->_req->query->version_emulate === 0 || $this->_req->query->version_emulate === FORUM_VERSION) && isset($this->_req->session->version_emulate))
 				unset($_SESSION['version_emulate']);
-			elseif ($_GET['version_emulate'] !== 0)
-				$_SESSION['version_emulate'] = strtr($_GET['version_emulate'], array('-' => ' ', '+' => ' ', $the_brand . ' ' => ''));
+			elseif ($this->_req->query->version_emulate !== 0)
+				$_SESSION['version_emulate'] = strtr($this->_req->query->version_emulate, array('-' => ' ', '+' => ' ', $the_brand . ' ' => ''));
 		}
 
 		if (!empty($_SESSION['version_emulate']))
@@ -2160,8 +1829,11 @@ class Packages_Controller extends Action_Controller
 			foreach ($context['package_types'] as $type)
 				$packages[$type] = array();
 
-		if ($dir = @opendir(BOARDDIR . '/packages'))
+		try
 		{
+			$dir = new FilesystemIterator(BOARDDIR . '/packages', FilesystemIterator::SKIP_DOTS);
+			$filtered_dir = new PackagesFilterIterator($dir);
+
 			$dirs = array();
 			$sort_id = array(
 				'mod' => 1,
@@ -2172,40 +1844,33 @@ class Packages_Controller extends Action_Controller
 				'smiley' => 1,
 				'unknown' => 1,
 			);
-			while ($package = readdir($dir))
+			foreach ($filtered_dir as $package)
 			{
-				if ($package == '.' || $package == '..' || $package == 'temp' || (!(is_dir(BOARDDIR . '/packages/' . $package) && file_exists(BOARDDIR . '/packages/' . $package . '/package-info.xml')) && substr(strtolower($package), -7) != '.tar.gz' && substr(strtolower($package), -4) != '.tgz' && substr(strtolower($package), -4) != '.zip'))
-					continue;
-
-				$skip = false;
 				foreach ($context['package_types'] as $type)
-					if (isset($context['available_' . $type][md5($package)]))
-						$skip = true;
-
-				if ($skip)
-					continue;
+					if (isset($context['available_' . $type][md5($package->getFilename())]))
+						continue 2;
 
 				// Skip directories or files that are named the same.
-				if (is_dir(BOARDDIR . '/packages/' . $package))
+				if ($package->isDir())
 				{
 					if (in_array($package, $dirs))
 						continue;
 					$dirs[] = $package;
 				}
-				elseif (substr(strtolower($package), -7) == '.tar.gz')
+				elseif (substr(strtolower($package->getFilename()), -7) === '.tar.gz')
 				{
 					if (in_array(substr($package, 0, -7), $dirs))
 						continue;
 					$dirs[] = substr($package, 0, -7);
 				}
-				elseif (substr(strtolower($package), -4) == '.zip' || substr(strtolower($package), -4) == '.tgz')
+				elseif (strtolower($package->getExtension()) === 'zip' || strtolower($package->getExtension()) === 'tgz')
 				{
-					if (in_array(substr($package, 0, -4), $dirs))
+					if (in_array(substr($package->getBasename(), 0, -4), $dirs))
 						continue;
-					$dirs[] = substr($package, 0, -4);
+					$dirs[] = substr($package->getBasename(), 0, -4);
 				}
 
-				$packageInfo = getPackageInfo($package);
+				$packageInfo = getPackageInfo($package->getFilename());
 				if (!is_array($packageInfo))
 					continue;
 
@@ -2214,8 +1879,8 @@ class Packages_Controller extends Action_Controller
 					$packageInfo['installed_id'] = isset($installed_adds[$packageInfo['id']]) ? $installed_adds[$packageInfo['id']]['id'] : 0;
 					$packageInfo['sort_id'] = isset($sort_id[$packageInfo['type']]) ? $sort_id[$packageInfo['type']] : $sort_id['unknown'];
 					$packageInfo['is_installed'] = isset($installed_adds[$packageInfo['id']]);
-					$packageInfo['is_current'] = $packageInfo['is_installed'] && ($installed_adds[$packageInfo['id']]['version'] == $packageInfo['version']);
-					$packageInfo['is_newer'] = $packageInfo['is_installed'] && ($installed_adds[$packageInfo['id']]['version'] > $packageInfo['version']);
+					$packageInfo['is_current'] = $packageInfo['is_installed'] && isset($installed_adds[$packageInfo['id']]) && ($installed_adds[$packageInfo['id']]['version'] == $packageInfo['version']);
+					$packageInfo['is_newer'] = $packageInfo['is_installed'] && isset($installed_adds[$packageInfo['id']]) && ($installed_adds[$packageInfo['id']]['version'] > $packageInfo['version']);
 					$packageInfo['can_install'] = false;
 					$packageInfo['can_uninstall'] = false;
 					$packageInfo['can_upgrade'] = false;
@@ -2297,7 +1962,7 @@ class Packages_Controller extends Action_Controller
 					}
 
 					// Add-on / Modification
-					if ($packageInfo['type'] == 'addon' || $packageInfo['type'] == 'modification' || $packageInfo['type'] == 'mod')
+					if ($packageInfo['type'] === 'addon' || $packageInfo['type'] === 'modification' || $packageInfo['type'] === 'mod')
 					{
 						$sort_id['modification']++;
 						$sort_id['mod']++;
@@ -2312,44 +1977,47 @@ class Packages_Controller extends Action_Controller
 						}
 						else
 						{
-							$packages['modification'][strtolower($packageInfo[$sort]) . '_' . $sort_id['mod']] = md5($package);
-							$context['available_modification'][md5($package)] = $packageInfo;
+							$packages['modification'][strtolower($packageInfo[$sort]) . '_' . $sort_id['mod']] = md5($package->getFilename());
+							$context['available_modification'][md5($package->getFilename())] = $packageInfo;
 						}
 					}
 					// Avatar package.
-					elseif ($packageInfo['type'] == 'avatar')
+					elseif ($packageInfo['type'] === 'avatar')
 					{
 						$sort_id[$packageInfo['type']]++;
-						$packages['avatar'][strtolower($packageInfo[$sort])] = md5($package);
-						$context['available_avatar'][md5($package)] = $packageInfo;
+						$packages['avatar'][strtolower($packageInfo[$sort])] = md5($package->getFilename());
+						$context['available_avatar'][md5($package->getFilename())] = $packageInfo;
 					}
 					// Smiley package.
-					elseif ($packageInfo['type'] == 'smiley')
+					elseif ($packageInfo['type'] === 'smiley')
 					{
 						$sort_id[$packageInfo['type']]++;
-						$packages['smiley'][strtolower($packageInfo[$sort])] = md5($package);
-						$context['available_smiley'][md5($package)] = $packageInfo;
+						$packages['smiley'][strtolower($packageInfo[$sort])] = md5($package->getFilename());
+						$context['available_smiley'][md5($package->getFilename())] = $packageInfo;
 					}
 					// Language package.
-					elseif ($packageInfo['type'] == 'language')
+					elseif ($packageInfo['type'] === 'language')
 					{
 						$sort_id[$packageInfo['type']]++;
-						$packages['language'][strtolower($packageInfo[$sort])] = md5($package);
-						$context['available_language'][md5($package)] = $packageInfo;
+						$packages['language'][strtolower($packageInfo[$sort])] = md5($package->getFilename());
+						$context['available_language'][md5($package->getFilename())] = $packageInfo;
 					}
 					// Other stuff.
 					else
 					{
 						$sort_id['unknown']++;
-						$packages['unknown'][strtolower($packageInfo[$sort])] = md5($package);
-						$context['available_unknown'][md5($package)] = $packageInfo;
+						$packages['unknown'][strtolower($packageInfo[$sort])] = md5($package->getFilename());
+						$context['available_unknown'][md5($package->getFilename())] = $packageInfo;
 					}
 				}
 			}
-			closedir($dir);
+		}
+		catch (UnexpectedValueException $e)
+		{
+			// @todo for now do nothing...
 		}
 
-		if (isset($_GET['desc']))
+		if (isset($this->_req->query->desc))
 			krsort($packages[$params]);
 		else
 			ksort($packages[$params]);
@@ -2362,9 +2030,12 @@ class Packages_Controller extends Action_Controller
  * Checks the permissions of all the areas that will be affected by the package
  *
  * @package Packages
- * @param string $path
+ *
+ * @param string  $path
  * @param mixed[] $data
- * @param int $level
+ * @param int     $level
+ *
+ * @throws Elk_Exception no_access
  */
 function fetchPerms__recursive($path, &$data, $level)
 {
@@ -2372,8 +2043,10 @@ function fetchPerms__recursive($path, &$data, $level)
 
 	$isLikelyPath = false;
 	foreach ($context['look_for'] as $possiblePath)
+	{
 		if (substr($possiblePath, 0, strlen($path)) == $path)
 			$isLikelyPath = true;
+	}
 
 	// Is this where we stop?
 	if (isset($_GET['xml']) && !empty($context['look_for']) && !$isLikelyPath)
@@ -2386,7 +2059,7 @@ function fetchPerms__recursive($path, &$data, $level)
 
 	// @todo Shouldn't happen - but better error message?
 	if (!is_dir($path))
-		fatal_lang_error('no_access', false);
+		throw new Elk_Exception('no_access', false);
 
 	// This is where we put stuff we've found for sorting.
 	$foundData = array(
@@ -2394,47 +2067,57 @@ function fetchPerms__recursive($path, &$data, $level)
 		'folders' => array(),
 	);
 
-	$dh = opendir($path);
-	while ($entry = readdir($dh))
+	try
 	{
-		// Some kind of file?
-		if (is_file($path . '/' . $entry))
+		$entrys = new FilesystemIterator($path, FilesystemIterator::SKIP_DOTS);
+		foreach ($entrys as $entry)
 		{
-			// Are we listing PHP files in this directory?
-			if ($save_data && !empty($data['list_contents']) && substr($entry, -4) == '.php')
-				$foundData['files'][$entry] = true;
-			// A file we were looking for.
-			elseif ($save_data && isset($data['contents'][$entry]))
-				$foundData['files'][$entry] = true;
-		}
-		// It's a directory - we're interested one way or another, probably...
-		elseif ($entry != '.' && $entry != '..')
-		{
-			// Going further?
-			if ((!empty($data['type']) && $data['type'] == 'dir_recursive') || (isset($data['contents'][$entry]) && (!empty($data['contents'][$entry]['list_contents']) || (!empty($data['contents'][$entry]['type']) && $data['contents'][$entry]['type'] == 'dir_recursive'))))
+			// Some kind of file?
+			if ($entry->isFile())
 			{
-				if (!isset($data['contents'][$entry]))
-					$foundData['folders'][$entry] = 'dir_recursive';
-				else
-					$foundData['folders'][$entry] = true;
-
-				// If this wasn't expected inherit the recusiveness...
-				if (!isset($data['contents'][$entry]))
-					// We need to do this as we will be going all recursive.
-					$data['contents'][$entry] = array(
-						'type' => 'dir_recursive',
-					);
-
-				// Actually do the recursive stuff...
-				fetchPerms__recursive($path . '/' . $entry, $data['contents'][$entry], $level + 1);
+				// Are we listing PHP files in this directory?
+				if ($save_data && !empty($data['list_contents']) && $entry->getExtension() === 'php')
+					$foundData['files'][$entry->getFilename()] = true;
+				// A file we were looking for.
+				elseif ($save_data && isset($data['contents'][$entry->getFilename()]))
+					$foundData['files'][$entry->getFilename()] = true;
 			}
-			// Maybe it is a folder we are not descending into.
-			elseif (isset($data['contents'][$entry]))
-				$foundData['folders'][$entry] = true;
-			// Otherwise we stop here.
+			// It's a directory - we're interested one way or another, probably...
+			elseif ($entry->isDir())
+			{
+				// Going further?
+				if ((!empty($data['type']) && $data['type'] === 'dir_recursive')
+					|| (isset($data['contents'][$entry->getFilename()])
+						&& (!empty($data['contents'][$entry->getFilename()]['list_contents'])
+							|| (!empty($data['contents'][$entry->getFilename()]['type'])
+								&& $data['contents'][$entry->getFilename()]['type'] === 'dir_recursive'))))
+				{
+					if (!isset($data['contents'][$entry->getFilename()]))
+						$foundData['folders'][$entry->getFilename()] = 'dir_recursive';
+					else
+						$foundData['folders'][$entry->getFilename()] = true;
+
+					// If this wasn't expected inherit the recusiveness...
+					if (!isset($data['contents'][$entry->getFilename()]))
+						// We need to do this as we will be going all recursive.
+						$data['contents'][$entry->getFilename()] = array(
+							'type' => 'dir_recursive',
+						);
+
+					// Actually do the recursive stuff...
+					fetchPerms__recursive($entry->getPathname(), $data['contents'][$entry->getFilename()], $level + 1);
+				}
+				// Maybe it is a folder we are not descending into.
+				elseif (isset($data['contents'][$entry->getFilename()]))
+					$foundData['folders'][$entry->getFilename()] = true;
+				// Otherwise we stop here.
+			}
 		}
 	}
-	closedir($dh);
+	catch (UnexpectedValueException $e)
+	{
+		// @todo for now do nothing...
+	}
 
 	// Nothing to see here?
 	if (!$save_data)
@@ -2542,24 +2225,22 @@ function pausePermsSave()
 	global $context, $txt;
 
 	// Try get more time...
-	@set_time_limit(600);
-	if (function_exists('apache_reset_timeout'))
-		@apache_reset_timeout();
+	detectServer()->setTimeLimit(600);
 
 	// Set up the items for the pause form
 	$context['sub_template'] = 'pause_action_permissions';
 	$context['page_title'] = $txt['package_file_perms_applying'];
 
 	// And how are we progressing with our directories
-	$context['remaining_items'] = count($context['method'] == 'individual' ? $context['to_process'] : $context['directory_list']);
-	$context['progress_message'] = sprintf($context['method'] == 'individual' ? $txt['package_file_perms_items_done'] : $txt['package_file_perms_dirs_done'], $context['total_items'] - $context['remaining_items'], $context['total_items']);
+	$context['remaining_items'] = count($context['method'] === 'individual' ? $context['to_process'] : $context['directory_list']);
+	$context['progress_message'] = sprintf($context['method'] === 'individual' ? $txt['package_file_perms_items_done'] : $txt['package_file_perms_dirs_done'], $context['total_items'] - $context['remaining_items'], $context['total_items']);
 	$context['progress_percent'] = round(($context['total_items'] - $context['remaining_items']) / $context['total_items'] * 100, 1);
 
 	// Never more than 100%!
 	$context['progress_percent'] = min($context['progress_percent'], 100);
 
 	// And how are we progressing with files within a directory
-	if ($context['method'] != 'individual' && !empty($context['total_files']))
+	if ($context['method'] !== 'individual' && !empty($context['total_files']))
 	{
 		$context['file_progress_message'] = sprintf($txt['package_file_perms_files_done'], $context['file_offset'], $context['total_files']);
 		$context['file_progress_percent'] = round($context['file_offset'] / $context['total_files'] * 100, 1);

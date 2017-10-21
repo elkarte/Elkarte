@@ -1,16 +1,16 @@
-/**
+/*!
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
- *
+ * @version 1.1
+ */
+
+/**
  * This file contains javascript associated with the posting and previewing
  */
 
@@ -64,10 +64,10 @@ function previewPost()
 	var x = [];
 	x = getFields(textFields, numericFields, checkboxFields, form_name);
 
-	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=post2' + (current_board ? ';board=' + current_board : '') + (make_poll ? ';poll' : '') + ';preview;' + elk_session_var + '=' + elk_session_id + ';xml', x.join('&'), onDocSent);
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=post2' + (current_board ? ';board=' + current_board : '') + (make_poll ? ';poll' : '') + ';preview;xml', x.join('&'), onDocSent);
 
 	// Show the preview section and load it with "pending results" text, onDocSent will finish things off
-	document.getElementById('preview_section').style.display = '';
+	document.getElementById('preview_section').style.display = 'block';
 	document.getElementById('preview_subject').innerHTML = txt_preview_title;
 	document.getElementById('preview_body').innerHTML = txt_preview_fetch;
 
@@ -98,7 +98,7 @@ function previewPM()
 	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=pm;sa=send2;preview;xml', x.join('&'), onDocSent);
 
 	// Show the preview section and load it with "pending results" text, onDocSent will finish things off
-	document.getElementById('preview_section').style.display = '';
+	document.getElementById('preview_section').style.display = 'block';
 	document.getElementById('preview_subject').innerHTML = txt_preview_title;
 	document.getElementById('preview_body').innerHTML = txt_preview_fetch;
 
@@ -129,7 +129,7 @@ function previewNews()
 	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlpreview;xml', x.join('&'), onDocSent);
 
 	// Show the preview section and load it with "pending results" text, onDocSent will finish things off
-	document.getElementById('preview_section').style.display = '';
+	document.getElementById('preview_section').style.display = 'block';
 	document.getElementById('preview_subject').innerHTML = txt_preview_title;
 	document.getElementById('preview_body').innerHTML = txt_preview_fetch;
 
@@ -139,9 +139,9 @@ function previewNews()
 /**
  * Gets the form data for the selected fields so they can be posted via ajax
  *
- * @param {array} textFields
- * @param {array} numericFields
- * @param {array} checkboxFields
+ * @param {string[]} textFields
+ * @param {string[]} numericFields
+ * @param {string[]} checkboxFields
  * @param {string} form_name
  */
 function getFields(textFields, numericFields, checkboxFields, form_name)
@@ -156,13 +156,13 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 		if (textFields[i] in document.forms[form_name])
 		{
 			// Handle the editor.
-			if (textFields[i] == post_box_name && $editor_data[post_box_name] !== undefined)
+			if (textFields[i] === post_box_name && $editor_data[post_box_name] !== undefined)
 			{
-				fields[fields.length] = textFields[i] + '=' + $editor_data[post_box_name].getText().replace(/&#/g, '&#38;#').php_to8bit().php_urlencode();
+				fields[fields.length] = textFields[i] + '=' + $editor_data[post_box_name].getText().replace(/&#/g, '&#38;#').php_urlencode();
 				fields[fields.length] = 'message_mode=' + $editor_data[post_box_name].inSourceMode();
 			}
 			else
-				fields[fields.length] = textFields[i] + '=' + document.forms[form_name][textFields[i]].value.replace(/&#/g, '&#38;#').php_to8bit().php_urlencode();
+				fields[fields.length] = textFields[i] + '=' + document.forms[form_name][textFields[i]].value.replace(/&#/g, '&#38;#').php_urlencode();
 		}
 	}
 
@@ -241,12 +241,12 @@ function onDocSent(XMLDoc)
 	for (i = 0, numErrors = errors.getElementsByTagName('error').length; i < numErrors; i++)
 	{
 		errorCode = errors.getElementsByTagName('error')[i].attributes.getNamedItem("code").value;
-		if (errorCode == 'no_message' || errorCode == 'long_message')
+		if (errorCode === 'no_message' || errorCode === 'long_message')
 			error_post = true;
 		errorList += '<li id="' + error_area + '_' + errorCode + '" class="error">' + errors.getElementsByTagName('error')[i].firstChild.nodeValue + '</li>';
 	}
 
-	oError_box = $(document.getElementById(error_area));
+	var oError_box = $(document.getElementById(error_area));
 	if ($.trim(oError_box.children(error_list).html()) === '')
 		oError_box.append("<ul id='" + error_list + "'></ul>");
 
@@ -289,12 +289,8 @@ function onDocSent(XMLDoc)
 		if ('last_msg' in document.forms[form_name])
 			document.forms[form_name].last_msg.value = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('last_msg')[0].firstChild.nodeValue;
 
-		// Remove the new image from old-new replies!
-		for (i = 0; i < new_replies.length; i++)
-			document.getElementById('image_new_' + new_replies[i]).style.display = 'none';
-		new_replies = [];
-
-		var ignored_replies = [],
+		var new_replies = [],
+			ignored_replies = [],
 			ignoring = null,
 			newPosts = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('new_posts')[0] ? XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('new_posts')[0].getElementsByTagName('post') : {length: 0},
 			numNewPosts = newPosts.length;
@@ -310,7 +306,7 @@ function onDocSent(XMLDoc)
 				if (newPosts[i].getElementsByTagName("is_ignored")[0].firstChild.nodeValue !== '0')
 					ignored_replies[ignored_replies.length] = ignoring = newPosts[i].getAttribute("id");
 
-				newPostsHTML += '<div class="windowbg' + (++reply_counter % 2 === 0 ? '2' : '') + '"><div class="postarea2" id="msg' + newPosts[i].getAttribute("id") + '"><div class="keyinfo">';
+				newPostsHTML += '<div class="content' + (++reply_counter % 2 === 0 ? '2' : '') + '"><div class="postarea2" id="msg' + newPosts[i].getAttribute("id") + '"><div class="keyinfo">';
 				newPostsHTML += '<h5 class="floatleft"><span>' + txt_posted_by + '</span>&nbsp;' + newPosts[i].getElementsByTagName("poster")[0].firstChild.nodeValue + '&nbsp;-&nbsp;' + newPosts[i].getElementsByTagName("time")[0].firstChild.nodeValue;
 				newPostsHTML += ' <span class="new_posts" id="image_new_' + newPosts[i].getAttribute("id") + '">' + txt_new + '</span></h5>';
 
@@ -320,12 +316,16 @@ function onDocSent(XMLDoc)
 				newPostsHTML += '</div>';
 
 				if (ignoring)
-					newPostsHTML += '<div id="msg_' + newPosts[i].getAttribute("id") + '_ignored_prompt">' + txt_ignoring_user + '<a href="#" id="msg_' + newPosts[i].getAttribute("id") + '_ignored_link" style="display: none;">' + show_ignore_user_post + '</a></div>';
+					newPostsHTML += '<div id="msg_' + newPosts[i].getAttribute("id") + '_ignored_prompt">' + txt_ignoring_user + '<a href="#" id="msg_' + newPosts[i].getAttribute("id") + '_ignored_link" class="hide">' + show_ignore_user_post + '</a></div>';
 
 				newPostsHTML += '<div class="inner" id="msg_' + newPosts[i].getAttribute("id") + '_body">' + newPosts[i].getElementsByTagName("message")[0].firstChild.nodeValue + '</div></div></div>';
 			}
 			setOuterHTML(document.getElementById('new_replies'), newPostsHTML);
 		}
+
+		// Remove the new image from old-new replies!
+		for (i = 0; i < new_replies.length; i++)
+			document.getElementById('image_new_' + new_replies[i]).style.display = 'none';
 
 		var numIgnoredReplies = ignored_replies.length;
 		if (numIgnoredReplies !== 0)
@@ -351,14 +351,14 @@ function onDocSent(XMLDoc)
 		}
 	}
 
-	location.hash = '#' + 'preview_section';
+	$('html, body').animate({ scrollTop: $('#preview_section').offset().top }, 'slow');
 
 	// Preview video links if the feature is available
 	if ($.isFunction($.fn.linkifyvideo))
 		$().linkifyvideo(oEmbedtext, 'preview_body');
 
 	// Spoilers, Sweetie
-	$('.spoilerheader').click(function(){
+	$('.spoilerheader').on('click', function(){
 		$(this).next().children().slideToggle("fast");
 	});
 
@@ -367,6 +367,11 @@ function onDocSent(XMLDoc)
 		elk_codefix();
 	if (typeof prettyPrint === 'function')
 		prettyPrint();
+
+	// Prevent lighbox or default action on the preview
+	$('[data-lightboximage]').on('click.elk_lb', function(e) {
+		e.preventDefault();
+	});
 }
 
 /**
@@ -374,6 +379,8 @@ function onDocSent(XMLDoc)
  */
 function addPollOption()
 {
+	var pollTabIndex;
+
 	if (pollOptionNum === 0)
 	{
 		for (var i = 0, n = document.forms[form_name].elements.length; i < n; i++)
@@ -395,8 +402,11 @@ function addPollOption()
  */
 function addAttachment()
 {
-	allowed_attachments = allowed_attachments - 1;
-	current_attachment = current_attachment + 1;
+	/** global: allowed_attachments */
+	allowed_attachments -= 1;
+	/** global: current_attachment */
+	current_attachment += 1;
+
 	if (allowed_attachments <= 0)
 		return alert(txt_more_attachments_error);
 

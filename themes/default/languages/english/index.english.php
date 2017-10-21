@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; index
+// Version: 1.1; index
 
 global $forum_copyright;
 
@@ -101,6 +101,7 @@ $txt['moderate'] = 'Moderate';
 $txt['modlog_view'] = 'Moderation Log';
 $txt['mc_emailerror'] = 'Unapproved Emails';
 $txt['mc_reported_posts'] = 'Reported Posts';
+$txt['mc_reported_pms'] = 'Reported Personal Messages';
 $txt['mc_unapproved_attachments'] = 'Unapproved Attachments';
 $txt['mc_unapproved_poststopics'] = 'Unapproved Posts and Topics';
 
@@ -112,6 +113,7 @@ $txt['pm_menu_send'] = 'Send a message';
 $txt['account_short'] = 'My Account';
 // Sub menu labels
 $txt['profile'] = 'Profile';
+$txt['mydrafts'] = 'My Drafts';
 $txt['summary'] = 'Summary';
 $txt['theme'] = 'Look and Layout';
 $txt['account'] = 'Account Settings';
@@ -162,6 +164,7 @@ $txt['redirects'] = 'Redirects';
 $txt['choose_pass'] = 'Choose password';
 $txt['verify_pass'] = 'Verify password';
 $txt['position'] = 'Position';
+$txt['notify_announcements'] = 'Sign up to receive important site news by email';
 
 $txt['profile_of'] = 'View the profile of';
 $txt['total'] = 'Total';
@@ -278,10 +281,9 @@ $txt['query_command_denied_guests_msg'] = 'the command %1$s is denied on the dat
 $txt['last_edit_by'] = '<span class="lastedit">Last Edit</span>: %1$s by %2$s';
 $txt['notify_deactivate'] = 'Would you like to deactivate notification on this topic?';
 
-$txt['location'] = 'Location';
-$txt['gender'] = 'Gender';
-$txt['personal_text'] = 'Personal Text';
 $txt['date_registered'] = 'Date Registered';
+$txt['date_joined'] = 'Joined';
+$txt['date_joined_format'] = '%b %d, %Y';
 
 $txt['recent_view'] = 'View all recent posts.';
 $txt['is_recent_updated'] = '%1$s is the most recently updated topic';
@@ -291,9 +293,9 @@ $txt['female'] = 'Female';
 
 $txt['error_invalid_characters_username'] = 'Invalid character used in user name.';
 
-$txt['welcome_guest'] = 'Welcome, <strong>Guest</strong>. Please <a href="{login_url}">login</a>.';
-$txt['welcome_guest_register'] = 'Welcome to <strong>{forum_name}</strong>. Please <a href="{login_url}">login</a> or <a href="{register_url}">register</a>.';
-$txt['welcome_guest_activate'] = '<br />Did you miss your <a href="{activate_url}">activation email</a>?';
+$txt['welcome_guest'] = 'Welcome, <strong>Guest</strong>. Please <a href="{login_url}" rel="nofollow">login</a>.';
+$txt['welcome_guest_register'] = 'Welcome to <strong>{forum_name}</strong>. Please <a href="{login_url}" rel="nofollow">login</a> or <a href="{register_url} rel="nofollow"">register</a>.';
+$txt['welcome_guest_activate'] = '<br />Did you miss your <a href="{activate_url}" rel="nofollow">activation email</a>?';
 
 // @todo the following to sprintf
 $txt['hello_member'] = 'Hey,';
@@ -358,8 +360,11 @@ $txt['topic_sent'] = 'Your email has been sent successfully.';
 $txt['time_offset'] = 'Time Offset';
 $txt['or'] = 'or';
 
-$txt['mention'] = 'Mentions';
+$txt['mention'] = 'Notifications';
 $txt['notifications'] = 'Notifications';
+$txt['unread_notifications'] = 'You have %1$s unread notifications since your last visit.';
+$txt['new_from_last_notifications'] = 'You have %1$s new notifications.';
+$txt['forum_notification'] = 'Notifications from %1$s.';
 
 $txt['your_ban'] = 'Sorry %1$s, you are banned from using this forum!';
 $txt['your_ban_expires'] = 'This ban is set to expire %1$s.';
@@ -367,7 +372,9 @@ $txt['your_ban_expires_never'] = 'This ban is not set to expire.';
 $txt['ban_continue_browse'] = 'You may continue to browse the forum as a guest.';
 
 $txt['mark_as_read'] = 'Mark ALL messages as read';
+$txt['mark_as_read_confirm'] = 'Are you sure you want to mark ALL messages as read?';
 $txt['mark_these_as_read'] = 'Mark THESE messages as read';
+$txt['mark_these_as_read_confirm'] = 'Are you sure you want to mark THESE messages as read?';
 
 $txt['locked_topic'] = 'Locked Topic';
 $txt['normal_topic'] = 'Normal Topic';
@@ -511,8 +518,10 @@ $txt['split'] = 'SPLIT';
 
 $txt['delete'] = 'Delete';
 
+$txt['byte'] = 'B';
 $txt['kilobyte'] = 'KB';
 $txt['megabyte'] = 'MB';
+$txt['gigabyte'] = 'MB';
 
 $txt['more_stats'] = '[More Stats]';
 
@@ -563,7 +572,7 @@ $txt['skip_nav'] = 'Skip to main content';
 $txt['go_up'] = 'Go Up';
 $txt['go_down'] = 'Go Down';
 
-$forum_copyright = '<a href="http://www.elkarte.net" title="ElkArte Forum" target="_blank" class="new_win">powered by %1$s</a> | <a href="{credits_url}" title="Credits" target="_blank" class="new_win">credits</a>';
+$forum_copyright = '<a href="http://www.elkarte.net" title="ElkArte Forum" target="_blank" class="new_win">Powered by %1$s</a> | <a href="{credits_url}" title="Credits" target="_blank" class="new_win" rel="nofollow">Credits</a>';
 
 $txt['birthdays'] = 'Birthdays:';
 $txt['events'] = 'Events:';
@@ -601,9 +610,7 @@ $txt['moveTopic4'] = 'Change every message\'s subject';
 $txt['move_topic_unapproved_js'] = 'Warning! This topic has not yet been approved.\\n\\nIt is not recommended that you create a redirection topic unless you intend to approve the post immediately following the move.';
 $txt['movetopic_auto_board'] = '[BOARD]';
 $txt['movetopic_auto_topic'] = '[TOPIC LINK]';
-$txt['movetopic_default'] = 'This topic has been moved to [BOARD]
-
-[TOPIC LINK]';
+$txt['movetopic_default'] = 'This topic has been moved to [BOARD] - [TOPIC LINK]';
 $txt['movetopic_redirect'] = 'Redirect to the moved topic';
 $txt['movetopic_expires'] = 'Automatically remove the redirection topic';
 
@@ -616,9 +623,7 @@ $txt['split_after_and_this_post'] = 'Split topic after and including this post.'
 $txt['select_split_posts'] = 'Select posts to split.';
 
 $txt['splittopic_notification'] = 'Post a message when the topic is split';
-$txt['splittopic_default'] = 'One or more of the messages of this topic have been moved to [BOARD]
-
-[TOPIC LINK]';
+$txt['splittopic_default'] = 'One or more of the messages of this topic have been moved to [BOARD] - [TOPIC LINK]';
 $txt['splittopic_move'] = 'Move the new topic to another board';
 
 $txt['new_topic'] = 'New Topic';
@@ -825,8 +830,10 @@ $txt['hello_member_ndt'] = 'Hello';
 $txt['unapproved_posts'] = 'Unapproved Posts (Topics: %1$d, Posts: %2$d)';
 
 $txt['ajax_in_progress'] = 'Loading...';
+$txt['ajax_bad_response'] = 'Invalid response.';
 
 $txt['mod_reports_waiting'] = 'There are currently %1$d moderator reports open.';
+$txt['pm_reports_waiting'] = 'There are currently %1$d personal message reports open.';
 
 $txt['new_posts_in_category'] = 'Click to see the new posts in %1$s';
 $txt['verification'] = 'Verification';
@@ -849,7 +856,7 @@ $txt['openid'] = 'OpenID';
 
 $txt['downloads'] = 'Downloads';
 $txt['filesize'] = 'File size';
-$txt['subscribe_webslice'] = 'Subscribe to Webslice';
+$txt['subscribe_webslice'] = 'Subscribe to Webslice'; // @deprecated since 1.1
 
 // Restore topic
 $txt['restore_topic'] = 'Restore Topic';
@@ -870,9 +877,10 @@ $txt['badbehavior_blocked'] = '<a href="http://www.bad-behavior.ioerror.us/">Bad
 
 // Debug related - when $db_show_debug is true.
 $txt['debug_templates'] = 'Templates: ';
-$txt['debug_subtemplates'] = 'Sub templates: ';
+$txt['debug_subtemplates'] = 'Sub templates: '; // @deprecated since 1.1
+$txt['debug_sub_templates'] = 'Sub templates: ';
 $txt['debug_language_files'] = 'Language files: ';
-$txt['debug_stylesheets'] = 'Style sheets: ';
+$txt['debug_sheets'] = 'Style sheets: ';
 $txt['debug_javascript'] = 'Scripts: ';
 $txt['debug_files_included'] = 'Files included: ';
 $txt['debug_kb'] = 'KB.';
@@ -912,3 +920,12 @@ $txt['ok_uppercase'] = 'OK';
 $txt['admin_warning_title'] = 'Warning';
 
 $txt['via'] = 'via';
+
+$txt['like_post_stats'] = 'Like stats';
+
+$txt['otp_token'] = 'Time-based One-time Password';
+$txt['otp_enabled'] = 'Enable two factor authentication';
+$txt['invalid_otptoken'] = 'Time-based One-time Password is invalid';
+$txt['otp_used'] = 'Time-based One-time Password already used.<br /> Please wait a moment and use the next code.';
+$txt['otp_generate'] = 'Generate';
+$txt['otp_show_qr'] = 'Show QR-Code';

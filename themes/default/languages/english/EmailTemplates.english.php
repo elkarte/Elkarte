@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; EmailTemplates
+// Version: 1.1; EmailTemplates
 
 // Since all of these strings are being used in emails, numeric entities should be used.
 
@@ -27,7 +27,7 @@ $txt['scheduled_approval_email_event'] = 'The following events are awaiting appr
 	@description:
 */
 $txt['resend_activate_message_subject'] = 'Welcome to {FORUMNAME}';
-$txt['resend_activate_message_body'] = 'Thank you for registering at {FORUMNAME}. Your username is {USERNAME}. If you forget your password, you can reset it by visiting {FORGOTPASSWORDLINK}.
+$txt['resend_activate_message_body'] = 'Thank you for registering at {FORUMNAME}. Your username is {USERNAME}. If you forget your password, you can reset it by visiting {FORGOTPASSWORDLINK}
 
 Before you can login, you must first activate your account by selecting the following link:
 
@@ -105,7 +105,7 @@ This is due to the following reason: {REASON}
 $txt['admin_approve_accept_subject'] = 'Welcome to {FORUMNAME}';
 $txt['admin_approve_accept_body'] = 'Welcome, {NAME}
 
-Your account has been activated manually by the admin and you can now login and post. Your username is: {USERNAME}. If you forget your password, you can change it at {FORGOTPASSWORDLINK}.
+Your account has been activated manually by the admin and you can now login and post. Your username is: {USERNAME}. If you forget your password, you can change it at {FORGOTPASSWORDLINK}
 
 {REGARDS}';
 
@@ -364,11 +364,15 @@ Should you have any problems with activation, please visit {ACTIVATIONLINKWITHOU
 */
 $txt['forgot_password_subject'] = 'New password for {FORUMNAME}';
 $txt['forgot_password_body'] = 'Dear {REALNAME},
+
 This mail was sent because the \'forgot password\' function has been applied to your account. To set a new password, click the following link:
 {REMINDLINK}
 
 IP: {IP}
 Username: {MEMBERNAME}
+
+If you\'ve received this password-assistance email and you didn\'t request one, it\'s likely that another user entered your email address by mistake.  If you didn\'t initiate the request, don\'t worry - your account is secure, and there\'s no need for you to take any further action.
+Your privacy and security aren\'t compromised by this email.
 
 {REGARDS}';
 
@@ -509,7 +513,7 @@ You may change it after you login by going to the profile page, or by visiting t
 	@description:
 */
 $txt['register_activate_subject'] = 'Welcome to {FORUMNAME}';
-$txt['register_activate_body'] = 'Thank you for registering at {FORUMNAME}. Your username is {USERNAME}. If you forget your password, you can reset it by visiting {FORGOTPASSWORDLINK}.
+$txt['register_activate_body'] = 'Thank you for registering at {FORUMNAME}. Your username is {USERNAME}. If you forget your password, you can reset it by visiting {FORGOTPASSWORDLINK}
 
 Before you can login, you first need to activate your account. To do so, please follow this link:
 
@@ -588,7 +592,7 @@ Before you can login, the admin requires consent from your parent/guardian for y
 	@description:
 */
 $txt['register_immediate_subject'] = 'Welcome to {FORUMNAME}';
-$txt['register_immediate_body'] = 'Thank you for registering at {FORUMNAME}. Your username is {USERNAME}. If you forget your password, you may change it at {FORGOTPASSWORDLINK}.
+$txt['register_immediate_body'] = 'Thank you for registering at {FORUMNAME}. Your username is {USERNAME}. If you forget your password, you may change it at {FORGOTPASSWORDLINK}
 
 {REGARDS}';
 
@@ -622,7 +626,7 @@ You may update your profile by visiting this page after you login:
 $txt['register_pending_subject'] = 'Welcome to {FORUMNAME}';
 $txt['register_pending_body'] = 'Hello {REALNAME}, your registration request at {FORUMNAME} has been received.
 
-The username you registered with was {USERNAME}. If you forget your password, you can change it at {FORGOTPASSWORDLINK}.
+The username you registered with was {USERNAME}. If you forget your password, you can change it at {FORGOTPASSWORDLINK}
 
 Before you can login and start using the forum, your request will be reviewed and approved.  When this happens, you will receive another email from this address.
 
@@ -1025,6 +1029,65 @@ The message they sent you was:
 {MESSAGE}
 
 Reply to this Personal Message (to the sender only) here: {REPLYLINK}';
+
+/**
+	@additional_params: notify_new_buddy
+		ACTIONNAME:  The user name of the member adding as buddy.
+	@description: A notification email sent to the members that are set as buddy by someone
+*/
+$txt['notify_new_buddy_subject'] = '{ACTIONNAME} added you as buddy';
+$txt['notify_new_buddy_body'] = '{REALNAME},
+
+this email is to to inform you that {ACTIONNAME} has just has added you as buddy at {FORUMNAME}.
+
+{REGARDS}';
+$txt['notify_new_buddy_digest'] = 'You have been added as buddy by:';
+$txt['notify_new_buddy_snippet'] = '{ACTIONNAME}';
+
+/**
+	@additional_params: notify_new_likemsg
+		ACTIONNAME:  The user name of the member that liked the message.
+		MSGLINK:  The url to the message liked.
+	@description: A notification email sent to the members whose message has been liked
+*/
+$txt['notify_new_likemsg_subject'] = 'A message received a like';
+$txt['notify_new_likemsg_body'] = '{REALNAME},
+
+this email is to to inform you that {ACTIONNAME} has just has liked the message {MSGLINK} at {FORUMNAME}.
+
+{REGARDS}';
+$txt['notify_new_likemsg_digest'] = 'The following messages has been liked:';
+$txt['notify_new_likemsg_snippet'] = '{MSGLINK}';
+
+/**
+	@additional_params: notify_mentionmem
+		ACTIONNAME:  The user name of the member that mentioned someone.
+		MSGLINK:  The url to the message where someone has been mentioned.
+	@description: A notification email sent to the members mentioned by someone else in a message
+*/
+$txt['notify_mentionmem_subject'] = 'You have been mentioned';
+$txt['notify_mentionmem_body'] = '{REALNAME},
+
+this email is to to inform you that {ACTIONNAME} has just mentioned you in the message {MSGLINK} at {FORUMNAME}.
+
+{REGARDS}';
+$txt['notify_mentionmem_digest'] = 'You have been mentioned in the followin messages:';
+$txt['notify_mentionmem_snippet'] = '{MSGLINK}';
+
+/**
+	@additional_params: notify_quotedmem
+		ACTIONNAME:  The user name of the member that quoted someone's message.
+		MSGLINK:  The url to the message where someone has been quoted.
+	@description: A notification email sent to the members quoted in someone else message
+*/
+$txt['notify_quotedmem_subject'] = 'A message has been quoted';
+$txt['notify_quotedmem_body'] = '{REALNAME},
+
+this email is to to inform you that {ACTIONNAME} has just quoted one of your messages in {MSGLINK} at {FORUMNAME}.
+
+{REGARDS}';
+$txt['notify_quotedmem_digest'] = 'Your messages have been quoted in:';
+$txt['notify_quotedmem_snippet'] = '{MSGLINK}';
 
 /**
 	@additional_params: happy_birthday

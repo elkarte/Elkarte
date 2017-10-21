@@ -7,18 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.6
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Manage features and options administration page.
@@ -29,50 +24,18 @@ if (!defined('ELK'))
 class ManageFeatures_Controller extends Action_Controller
 {
 	/**
-	 * Basic feature settings form
-	 * @var Settings_Form
+	 * Pre Dispatch, called before other methods.
 	 */
-	protected $_basicSettings;
-
-	/**
-	 * Karma settings form
-	 * @var Settings_Form
-	 */
-	protected $_karmaSettings;
-
-	/**
-	 * Likes settings form
-	 * @var Settings_Form
-	 */
-	protected $_likesSettings;
-
-	/**
-	 * Layout settings form
-	 * @var Settings_Form
-	 */
-	protected $_layoutSettings;
-
-	/**
-	 * Signature settings form
-	 * @var Settings_Form
-	 */
-	protected $_signatureSettings;
-
-	/**
-	 * Mentions settings form
-	 * @var Settings_Form
-	 */
-	protected $_mentionSettings;
-
-	/**
-	 * Mentions settings form
-	 * @var Settings_Form
-	 */
-	protected $_PMSettings;
+	public function pre_dispatch()
+	{
+		// We need this in few places so it's easier to have it loaded here
+		require_once(SUBSDIR . '/ManageFeatures.subs.php');
+	}
 
 	/**
 	 * This function passes control through to the relevant tab.
 	 *
+	 * @event integrate_sa_modify_features Use to add new Configuration tabs
 	 * @see Action_Controller::action_index()
 	 * @uses Help, ManageSettings languages
 	 * @uses sub_template show_settings
@@ -84,6 +47,7 @@ class ManageFeatures_Controller extends Action_Controller
 		// Often Helpful
 		loadLanguage('Help');
 		loadLanguage('ManageSettings');
+		loadLanguage('Mentions');
 
 		// All the actions we know about
 		$subActions = array(
@@ -116,7 +80,7 @@ class ManageFeatures_Controller extends Action_Controller
 			),
 			'mention' => array(
 				'controller' => $this,
-				'function' => 'action_mentionSettings_display',
+				'function' => 'action_notificationsSettings_display',
 				'permission' => 'admin_forum'
 			),
 			'sig' => array(
@@ -184,32 +148,49 @@ class ManageFeatures_Controller extends Action_Controller
 	 * Config array for changing the basic forum settings
 	 *
 	 * - Accessed from ?action=admin;area=featuresettings;sa=basic;
+	 *
+	 * @event integrate_save_basic_settings
 	 */
 	public function action_basicSettings_display()
 	{
 		global $txt, $scripturl, $context;
 
 		// Initialize the form
-		$this->_initBasicSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// Retrieve the current config settings
-		$config_vars = $this->_basicSettings->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_basicSettings());
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			// Prevent absurd boundaries here - make it a day tops.
-			if (isset($_POST['lastActive']))
-				$_POST['lastActive'] = min((int) $_POST['lastActive'], 1440);
+			if (isset($this->_req->post->lastActive))
+				$this->_req->post->lastActive = min((int) $this->_req->post->lastActive, 1440);
 
 			call_integration_hook('integrate_save_basic_settings');
 
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 
 			writeLog();
 			redirectexit('action=admin;area=featuresettings;sa=basic');
+		}
+		if (isset($this->_req->post->cleanhives))
+		{
+			$clean_hives_result = theme()->cleanHives();
+
+			Template_Layers::instance()->removeAll();
+			loadTemplate('Json');
+			addJavascriptVar(array('txt_invalid_response' => $txt['ajax_bad_response']), true);
+			$context['sub_template'] = 'send_json';
+			$context['json_data'] = array(
+				'success' => $clean_hives_result,
+				'response' => $clean_hives_result ? $txt['clean_hives_sucess'] : $txt['clean_hives_failed']
+			);
+			return;
 		}
 
 		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=basic';
@@ -218,49 +199,47 @@ class ManageFeatures_Controller extends Action_Controller
 		// Show / hide custom jquery fields as required
 		addInlineJavascript('showhideJqueryOptions();', true);
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize basic settings form.
-	 */
-	private function _initBasicSettingsForm()
-	{
-		// We need some settings! ..ok, some work with our settings :P
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
-		// Instantiate the form
-		$this->_basicSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_basicSettings();
-
-		return $this->_basicSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
 	 * Allows modifying the global layout settings in the forum
 	 *
 	 * - Accessed through ?action=admin;area=featuresettings;sa=layout;
+	 *
+	 * @event integrate_save_layout_settings
 	 */
 	public function action_layoutSettings_display()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $scripturl, $context, $modSettings;
 
 		// Initialize the form
-		$this->_initLayoutSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// Retrieve the current config settings
-		$config_vars = $this->_layoutSettings->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_layoutSettings());
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
+			// Setting a custom frontpage, set the hook to the FrontpageInterface of the controller
+			if (!empty($this->_req->post->front_page))
+			{
+				$front_page = (string) $this->_req->post->front_page;
+				if (
+					is_callable(array($modSettings['front_page'], 'validateFrontPageOptions'))
+					&& !$front_page::validateFrontPageOptions($this->_req->post)
+				) {
+					$this->_req->post->front_page = '';
+				}
+			}
+
 			checkSession();
 
 			call_integration_hook('integrate_save_layout_settings');
 
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			writeLog();
 
 			redirectexit('action=admin;area=featuresettings;sa=layout');
@@ -269,208 +248,196 @@ class ManageFeatures_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=layout';
 		$context['settings_title'] = $txt['mods_cat_layout'];
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize the layout settings screen from features and options admin area.
-	 */
-	private function _initLayoutSettingsForm()
-	{
-		// We're working with them settings.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
-		// Instantiate the form
-		$this->_layoutSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_layoutSettings();
-
-		return $this->_layoutSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
 	 * Display configuration settings page for karma settings.
 	 *
 	 * - Accessed from ?action=admin;area=featuresettings;sa=karma;
+	 *
+	 * @event integrate_save_karma_settings
 	 */
 	public function action_karmaSettings_display()
 	{
 		global $txt, $scripturl, $context;
 
 		// Initialize the form
-		$this->_initKarmaSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// Retrieve the current config settings
-		$config_vars = $this->_karmaSettings->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_karmaSettings());
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			call_integration_hook('integrate_save_karma_settings');
 
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=featuresettings;sa=karma');
 		}
 
 		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=karma';
 		$context['settings_title'] = $txt['karma'];
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initializes the karma settings admin page.
-	 */
-	private function _initKarmaSettingsForm()
-	{
-		// We're working with them settings.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
-		// Instantiate the form
-		$this->_karmaSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_karmaSettings();
-
-		return $this->_karmaSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
 	 * Display configuration settings page for likes settings.
 	 *
 	 * - Accessed from ?action=admin;area=featuresettings;sa=likes;
+	 *
+	 * @event integrate_save_likes_settings
 	 */
 	public function action_likesSettings_display()
 	{
 		global $txt, $scripturl, $context;
 
 		// Initialize the form
-		$this->_initLikesSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// retrieve the current config settings
-		$config_vars = $this->_likesSettings->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_likesSettings());
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			call_integration_hook('integrate_save_likes_settings');
 
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=featuresettings;sa=likes');
 		}
 
 		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=likes';
 		$context['settings_title'] = $txt['likes'];
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initializes the likes settings admin page.
-	 */
-	private function _initLikesSettingsForm()
-	{
-		// We're working with them settings.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
-		// Instantiate the form
-		$this->_likesSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_likesSettings();
-
-		return $this->_likesSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
 	 * Initializes the mentions settings admin page.
 	 *
-	 * - Accessed from ?action=admin;area=featuresettings;sa=mentions;
+	 * - Accessed from ?action=admin;area=featuresettings;sa=mention;
+	 *
+	 * @event integrate_save_modify_mention_settings
 	 */
-	public function action_mentionSettings_display()
+	public function action_notificationsSettings_display()
 	{
-		global $context, $scripturl, $modSettings;
-
-		// Initialize the form
-		$this->_initMentionSettingsForm();
-
-		// Initialize it with our settings
-		$config_vars = $this->_mentionSettings->settings();
-
-		// Saving the settings?
-		if (isset($_GET['save']))
-		{
-			checkSession();
-
-			if ((!isset($_POST['mentions_dont_notify_rlike']) && !empty($modSettings['mentions_dont_notify_rlike'])) || (isset($_POST['mentions_dont_notify_rlike']) && $_POST['mentions_dont_notify_rlike'] != $modSettings['mentions_dont_notify_rlike']))
-			{
-				require_once(SUBSDIR . '/Mentions.subs.php');
-				toggleMentionsVisibility('rlike', empty($_POST['mentions_dont_notify_rlike']));
-			}
-
-			if ((!isset($_POST['mentions_buddy']) && !empty($modSettings['mentions_buddy'])) || (isset($_POST['mentions_buddy']) && $_POST['mentions_buddy'] != $modSettings['mentions_buddy']))
-			{
-				require_once(SUBSDIR . '/Mentions.subs.php');
-				toggleMentionsVisibility('buddy', !empty($_POST['mentions_buddy']));
-			}
-
-			// If mentions are enabled, the related task should be enabled as well, otherwise should be disabled.
-			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
-			toggleTaskStatusByName('user_access_mentions', !empty($_POST['mentions_enabled']));
-
-			Settings_Form::save_db($config_vars);
-			redirectexit('action=admin;area=featuresettings;sa=mention');
-		}
-
-		// Prepare the settings for display
-		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=mention';
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Retrieve and return all admin settings for mentions.
-	 */
-	private function _initMentionSettingsForm()
-	{
-		global $txt, $context;
-
-		// We're working with them settings.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
+		global $txt, $context, $scripturl, $modSettings;
 
 		loadLanguage('Mentions');
 
 		// Instantiate the form
-		$this->_mentionSettings = new Settings_Form();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_mentionSettings();
+		$settingsForm->setConfigVars($this->_notificationsSettings());
 
 		// Some context stuff
 		$context['page_title'] = $txt['mentions_settings'];
 		$context['sub_template'] = 'show_settings';
 
-		return $this->_mentionSettings->settings($config_vars);
+		// Saving the settings?
+		if (isset($this->_req->query->save))
+		{
+			checkSession();
+
+			call_integration_hook('integrate_save_modify_mention_settings');
+
+			if (empty($this->_req->post->notifications))
+			{
+				$notification_methods = serialize(array());
+			}
+			else
+			{
+				$notification_methods = serialize($this->_req->post->notifications);
+			}
+
+			require_once(SUBSDIR . '/Mentions.subs.php');
+			$enabled_mentions = array();
+			$current_settings = unserialize($modSettings['notification_methods']);
+
+			// Fist hide what was visible
+			$modules_toggle = array('enable' => array(), 'disable' => array());
+			foreach ($current_settings as $type => $val)
+			{
+				if (!isset($this->_req->post->notifications[$type]))
+				{
+					toggleMentionsVisibility($type, false);
+					$modules_toggle['disable'][] = $type;
+				}
+			}
+
+			// Then make visible what was hidden, but only if there is anything
+			if (!empty($this->_req->post->notifications))
+			{
+				foreach ($this->_req->post->notifications as $type => $val)
+				{
+					if (!isset($current_settings[$type]))
+					{
+						toggleMentionsVisibility($type, true);
+						$modules_toggle['enable'][] = $type;
+					}
+				}
+
+				$enabled_mentions = array_keys($this->_req->post->notifications);
+			}
+
+			// Let's just keep it active, there are too many reasons it should be.
+			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+			toggleTaskStatusByName('user_access_mentions', true);
+
+			// Disable or enable modules as needed
+			foreach ($modules_toggle as $action => $toggles)
+			{
+				if (!empty($toggles))
+				{
+					// The modules associated with the notification (mentionmem, likes, etc) area
+					$modules = getMentionsModules($toggles);
+
+					// The action will either be enable to disable
+					$function = $action . 'Modules';
+
+					// Something like enableModule('mentions', array('post', 'display');
+					foreach ($modules as $key => $val)
+						$function($key, $val);
+				}
+			}
+
+			updateSettings(array('enabled_mentions' => implode(',', array_unique($enabled_mentions)), 'notification_methods' => $notification_methods));
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
+			redirectexit('action=admin;area=featuresettings;sa=mention');
+		}
+
+		// Prepare the settings for display
+		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=mention';
+		$settingsForm->prepare();
 	}
 
 	/**
 	 * Display configuration settings for signatures on forum.
 	 *
 	 * - Accessed from ?action=admin;area=featuresettings;sa=sig;
+	 *
+	 * @event integrate_save_signature_settings
 	 */
 	public function action_signatureSettings_display()
 	{
 		global $context, $txt, $modSettings, $sig_start, $scripturl;
 
 		// Initialize the form
-		$this->_initSignatureSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// Retrieve the current config settings
-		$config_vars = $this->_signatureSettings->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_signatureSettings());
 
 		// Setup the template.
 		$context['page_title'] = $txt['signature_settings'];
@@ -489,237 +456,16 @@ class ManageFeatures_Controller extends Action_Controller
 		$disabledTags[] = 'footnote';
 
 		// Applying to ALL signatures?!!
-		if (isset($_GET['apply']))
+		if (isset($this->_req->query->apply))
 		{
 			// Security!
 			checkSession('get');
 
-			require_once(SUBSDIR . '/ManageFeatures.subs.php');
-			require_once(SUBSDIR . '/Members.subs.php');
 			$sig_start = time();
 
 			// This is horrid - but I suppose some people will want the option to do it.
-			$applied_sigs = isset($_GET['step']) ? (int) $_GET['step'] : 0;
-			$done = false;
-			$context['max_member'] = maxMemberID();
-
-			while (!$done)
-			{
-				$changes = array();
-				$update_sigs = getSignatureFromMembers($applied_sigs);
-
-				if (empty($update_sigs))
-					$done = true;
-
-				foreach ($update_sigs as $row)
-				{
-					// Apply all the rules we can realistically do.
-					$sig = strtr($row['signature'], array('<br />' => "\n"));
-
-					// Max characters...
-					if (!empty($sig_limits[1]))
-						$sig = Util::substr($sig, 0, $sig_limits[1]);
-
-					// Max lines...
-					if (!empty($sig_limits[2]))
-					{
-						$count = 0;
-						$str_len = strlen($sig);
-						for ($i = 0; $i < $str_len; $i++)
-						{
-							if ($sig[$i] == "\n")
-							{
-								$count++;
-								if ($count >= $sig_limits[2])
-									$sig = substr($sig, 0, $i) . strtr(substr($sig, $i), array("\n" => ' '));
-							}
-						}
-					}
-
-					if (!empty($sig_limits[7]) && preg_match_all('~\[size=([\d\.]+)(\]|px|pt|em|x-large|larger)~i', $sig, $matches) !== false)
-					{
-						// Same as parse_bbc
-						$sizes = array(1 => 0.7, 2 => 1.0, 3 => 1.35, 4 => 1.45, 5 => 2.0, 6 => 2.65, 7 => 3.95);
-
-						foreach ($matches[1] as $ind => $size)
-						{
-							$limit_broke = 0;
-
-							// Just specifying as [size=x]?
-							if (empty($matches[2][$ind]))
-							{
-								$matches[2][$ind] = 'em';
-								$size = isset($sizes[(int) $size]) ? $sizes[(int) $size] : 0;
-							}
-
-							// Attempt to allow all sizes of abuse, so to speak.
-							if ($matches[2][$ind] == 'px' && $size > $sig_limits[7])
-								$limit_broke = $sig_limits[7] . 'px';
-							elseif ($matches[2][$ind] == 'pt' && $size > ($sig_limits[7] * 0.75))
-								$limit_broke = ((int) $sig_limits[7] * 0.75) . 'pt';
-							elseif ($matches[2][$ind] == 'em' && $size > ((float) $sig_limits[7] / 14))
-								$limit_broke = ((float) $sig_limits[7] / 14) . 'em';
-							elseif ($matches[2][$ind] != 'px' && $matches[2][$ind] != 'pt' && $matches[2][$ind] != 'em' && $sig_limits[7] < 18)
-								$limit_broke = 'large';
-
-							if ($limit_broke)
-								$sig = str_replace($matches[0][$ind], '[size=' . $sig_limits[7] . 'px', $sig);
-						}
-					}
-
-					// Stupid images - this is stupidly, stupidly challenging.
-					if ((!empty($sig_limits[3]) || !empty($sig_limits[5]) || !empty($sig_limits[6])))
-					{
-						$replaces = array();
-						$img_count = 0;
-
-						// Get all BBC tags...
-						preg_match_all('~\[img(\s+width=([\d]+))?(\s+height=([\d]+))?(\s+width=([\d]+))?\s*\](?:<br />)*([^<">]+?)(?:<br />)*\[/img\]~i', $sig, $matches);
-
-						// ... and all HTML ones.
-						preg_match_all('~&lt;img\s+src=(?:&quot;)?((?:http://|ftp://|https://|ftps://).+?)(?:&quot;)?(?:\s+alt=(?:&quot;)?(.*?)(?:&quot;)?)?(?:\s?/)?&gt;~i', $sig, $matches2, PREG_PATTERN_ORDER);
-
-						// And stick the HTML in the BBC.
-						if (!empty($matches2))
-						{
-							foreach ($matches2[0] as $ind => $dummy)
-							{
-								$matches[0][] = $matches2[0][$ind];
-								$matches[1][] = '';
-								$matches[2][] = '';
-								$matches[3][] = '';
-								$matches[4][] = '';
-								$matches[5][] = '';
-								$matches[6][] = '';
-								$matches[7][] = $matches2[1][$ind];
-							}
-						}
-
-						// Try to find all the images!
-						if (!empty($matches))
-						{
-							$image_count_holder = array();
-							foreach ($matches[0] as $key => $image)
-							{
-								$width = -1; $height = -1;
-								$img_count++;
-
-								// Too many images?
-								if (!empty($sig_limits[3]) && $img_count > $sig_limits[3])
-								{
-									// If we've already had this before we only want to remove the excess.
-									if (isset($image_count_holder[$image]))
-									{
-										$img_offset = -1;
-										$rep_img_count = 0;
-										while ($img_offset !== false)
-										{
-											$img_offset = strpos($sig, $image, $img_offset + 1);
-											$rep_img_count++;
-											if ($rep_img_count > $image_count_holder[$image])
-											{
-												// Only replace the excess.
-												$sig = substr($sig, 0, $img_offset) . str_replace($image, '', substr($sig, $img_offset));
-
-												// Stop looping.
-												$img_offset = false;
-											}
-										}
-									}
-									else
-										$replaces[$image] = '';
-
-									continue;
-								}
-
-								// Does it have predefined restraints? Width first.
-								if ($matches[6][$key])
-									$matches[2][$key] = $matches[6][$key];
-
-								if ($matches[2][$key] && $sig_limits[5] && $matches[2][$key] > $sig_limits[5])
-								{
-									$width = $sig_limits[5];
-									$matches[4][$key] = $matches[4][$key] * ($width / $matches[2][$key]);
-								}
-								elseif ($matches[2][$key])
-									$width = $matches[2][$key];
-
-								// ... and height.
-								if ($matches[4][$key] && $sig_limits[6] && $matches[4][$key] > $sig_limits[6])
-								{
-									$height = $sig_limits[6];
-									if ($width != -1)
-										$width = $width * ($height / $matches[4][$key]);
-								}
-								elseif ($matches[4][$key])
-									$height = $matches[4][$key];
-
-								// If the dimensions are still not fixed - we need to check the actual image.
-								if (($width == -1 && $sig_limits[5]) || ($height == -1 && $sig_limits[6]))
-								{
-									// We'll mess up with images, who knows.
-									require_once(SUBSDIR . '/Attachments.subs.php');
-
-									$sizes = url_image_size($matches[7][$key]);
-									if (is_array($sizes))
-									{
-										// Too wide?
-										if ($sizes[0] > $sig_limits[5] && $sig_limits[5])
-										{
-											$width = $sig_limits[5];
-											$sizes[1] = $sizes[1] * ($width / $sizes[0]);
-										}
-
-										// Too high?
-										if ($sizes[1] > $sig_limits[6] && $sig_limits[6])
-										{
-											$height = $sig_limits[6];
-											if ($width == -1)
-												$width = $sizes[0];
-											$width = $width * ($height / $sizes[1]);
-										}
-										elseif ($width != -1)
-											$height = $sizes[1];
-									}
-								}
-
-								// Did we come up with some changes? If so remake the string.
-								if ($width != -1 || $height != -1)
-									$replaces[$image] = '[img' . ($width != -1 ? ' width=' . round($width) : '') . ($height != -1 ? ' height=' . round($height) : '') . ']' . $matches[7][$key] . '[/img]';
-
-								// Record that we got one.
-								$image_count_holder[$image] = isset($image_count_holder[$image]) ? $image_count_holder[$image] + 1 : 1;
-							}
-
-							if (!empty($replaces))
-								$sig = str_replace(array_keys($replaces), array_values($replaces), $sig);
-						}
-					}
-
-					// Try to fix disabled tags.
-					if (!empty($disabledTags))
-					{
-						$sig = preg_replace('~\[(?:' . implode('|', $disabledTags) . ').+?\]~i', '', $sig);
-						$sig = preg_replace('~\[/(?:' . implode('|', $disabledTags) . ')\]~i', '', $sig);
-					}
-
-					$sig = strtr($sig, array("\n" => '<br />'));
-					call_integration_hook('integrate_apply_signature_settings', array(&$sig, $sig_limits, $disabledTags));
-					if ($sig != $row['signature'])
-						$changes[$row['id_member']] = $sig;
-				}
-
-				// Do we need to delete what we have?
-				if (!empty($changes))
-				{
-					foreach ($changes as $id => $sig)
-						updateSignature($id, $sig);
-				}
-
-				$applied_sigs += 50;
-				if (!$done)
-					pauseSignatureApplySettings($applied_sigs);
-			}
+			$applied_sigs = $this->_req->getQuery('step', 'intval', 0);
+			updateAllSignatures($applied_sigs);
 
 			$settings_applied = true;
 		}
@@ -734,6 +480,8 @@ class ManageFeatures_Controller extends Action_Controller
 			'max_image_width' => isset($sig_limits[5]) ? $sig_limits[5] : 0,
 			'max_image_height' => isset($sig_limits[6]) ? $sig_limits[6] : 0,
 			'max_font_size' => isset($sig_limits[7]) ? $sig_limits[7] : 0,
+			'repetition_guests' => isset($sig_limits[8]) ? $sig_limits[8] : 0,
+			'repetition_members' => isset($sig_limits[9]) ? $sig_limits[9] : 0,
 		);
 
 		// Temporarily make each setting a modSetting!
@@ -743,44 +491,45 @@ class ManageFeatures_Controller extends Action_Controller
 		// Make sure we check the right tags!
 		$modSettings['bbc_disabled_signature_bbc'] = $disabledTags;
 
-		// We're working with them settings.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			// Clean up the tag stuff!
-			$bbcTags = array();
-			foreach (parse_bbc(false) as $tag)
-				$bbcTags[] = $tag['tag'];
+			$codes = \BBC\ParserWrapper::instance()->getCodes();
+			$bbcTags = $codes->getTags();
 
-			if (!isset($_POST['signature_bbc_enabledTags']))
-				$_POST['signature_bbc_enabledTags'] = array();
-			elseif (!is_array($_POST['signature_bbc_enabledTags']))
-				$_POST['signature_bbc_enabledTags'] = array($_POST['signature_bbc_enabledTags']);
+			if (!isset($this->_req->post->signature_bbc_enabledTags))
+				$this->_req->post->signature_bbc_enabledTags = array();
+			elseif (!is_array($this->_req->post->signature_bbc_enabledTags))
+				$this->_req->post->signature_bbc_enabledTags = array($this->_req->post->signature_bbc_enabledTags);
 
 			$sig_limits = array();
 			foreach ($context['signature_settings'] as $key => $value)
 			{
 				if ($key == 'allow_smileys')
 					continue;
-				elseif ($key == 'max_smileys' && empty($_POST['signature_allow_smileys']))
+				elseif ($key == 'max_smileys' && empty($this->_req->post->signature_allow_smileys))
 					$sig_limits[] = -1;
 				else
-					$sig_limits[] = !empty($_POST['signature_' . $key]) ? max(1, (int) $_POST['signature_' . $key]) : 0;
+				{
+					$current_key = $this->_req->getPost('signature_' . $key, 'intval');
+					$sig_limits[] = !empty($current_key) ? max(1, $current_key) : 0;
+				}
 			}
 
 			call_integration_hook('integrate_save_signature_settings', array(&$sig_limits, &$bbcTags));
 
-			$_POST['signature_settings'] = implode(',', $sig_limits) . ':' . implode(',', array_diff($bbcTags, $_POST['signature_bbc_enabledTags']));
+			$this->_req->post->signature_settings = implode(',', $sig_limits) . ':' . implode(',', array_diff($bbcTags, $this->_req->post->signature_bbc_enabledTags));
 
 			// Even though we have practically no settings let's keep the convention going!
 			$save_vars = array();
 			$save_vars[] = array('text', 'signature_settings');
 
-			Settings_Form::save_db($save_vars);
+			$settingsForm->setConfigVars($save_vars);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=featuresettings;sa=sig');
 		}
 
@@ -788,24 +537,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$context['settings_title'] = $txt['signature_settings'];
 		$context['settings_message'] = !empty($settings_applied) ? $txt['signature_settings_applied'] : sprintf($txt['signature_settings_warning'], $scripturl . '?action=admin;area=featuresettings;sa=sig;apply;' . $context['session_var'] . '=' . $context['session_id']);
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initializes signature settings form.
-	 */
-	private function _initSignatureSettingsForm()
-	{
-		// We're working with them settings.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
-		// Instantiate the form
-		$this->_signatureSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_signatureSettings();
-
-		return $this->_signatureSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -825,13 +557,13 @@ class ManageFeatures_Controller extends Action_Controller
 		$context['sub_template'] = 'show_custom_profile';
 
 		// What about standard fields they can tweak?
-		$standard_fields = array('location', 'gender', 'website', 'personal_text', 'posts', 'warning_status');
+		$standard_fields = array('website', 'posts', 'warning_status', 'date_registered');
 
 		// What fields can't you put on the registration page?
-		$context['fields_no_registration'] = array('posts', 'warning_status');
+		$context['fields_no_registration'] = array('posts', 'warning_status', 'date_registered');
 
 		// Are we saving any standard field changes?
-		if (isset($_POST['save']))
+		if (isset($this->_req->post->save))
 		{
 			checkSession();
 			validateToken('admin-scp');
@@ -840,11 +572,15 @@ class ManageFeatures_Controller extends Action_Controller
 
 			// Do the active ones first.
 			$disable_fields = array_flip($standard_fields);
-			if (!empty($_POST['active']))
+			if (!empty($this->_req->post->active))
 			{
-				foreach ($_POST['active'] as $value)
+				foreach ($this->_req->post->active as $value)
+				{
 					if (isset($disable_fields[$value]))
+					{
 						unset($disable_fields[$value]);
+					}
+				}
 			}
 
 			// What we have left!
@@ -852,11 +588,13 @@ class ManageFeatures_Controller extends Action_Controller
 
 			// Things we want to show on registration?
 			$reg_fields = array();
-			if (!empty($_POST['reg']))
+			if (!empty($this->_req->post->reg))
 			{
-				foreach ($_POST['reg'] as $value)
+				foreach ($this->_req->post->reg as $value)
+				{
 					if (in_array($value, $standard_fields) && !isset($disable_fields[$value]))
 						$reg_fields[] = $value;
+				}
 			}
 
 			// What we have left!
@@ -867,9 +605,6 @@ class ManageFeatures_Controller extends Action_Controller
 		}
 
 		createToken('admin-scp');
-
-		require_once(SUBSDIR . '/GenericList.class.php');
-		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 
 		// Create a listing for all our standard fields
 		$listOptions = array(
@@ -898,11 +633,11 @@ class ManageFeatures_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							$isChecked = $rowData[\'disabled\'] ? \'\' : \' checked="checked"\';
-							$onClickHandler = $rowData[\'can_show_register\'] ? sprintf(\'onclick="document.getElementById(\\\'reg_%1$s\\\').disabled = !this.checked;"\', $rowData[\'id\']) : \'\';
-							return sprintf(\'<input type="checkbox" name="active[]" id="active_%1$s" value="%1$s" class="input_check" %2$s %3$s />\', $rowData[\'id\'], $isChecked, $onClickHandler);
-						'),
+						'function' => function ($rowData) {
+							$isChecked = $rowData['disabled'] ? '' : ' checked="checked"';
+							$onClickHandler = $rowData['can_show_register'] ? sprintf('onclick="document.getElementById(\'reg_%1$s\').disabled = !this.checked;"', $rowData['id']) : '';
+							return sprintf('<input type="checkbox" name="active[]" id="active_%1$s" value="%1$s" class="input_check" %2$s %3$s />', $rowData['id'], $isChecked, $onClickHandler);
+						},
 						'style' => 'width: 20%;',
 						'class' => 'centertext',
 					),
@@ -913,11 +648,11 @@ class ManageFeatures_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							$isChecked = $rowData[\'on_register\'] && !$rowData[\'disabled\'] ? \' checked="checked"\' : \'\';
-							$isDisabled = $rowData[\'can_show_register\'] ? \'\' : \' disabled="disabled"\';
-							return sprintf(\'<input type="checkbox" name="reg[]" id="reg_%1$s" value="%1$s" class="input_check" %2$s %3$s />\', $rowData[\'id\'], $isChecked, $isDisabled);
-						'),
+						'function' => function ($rowData) {
+							$isChecked = $rowData['on_register'] && !$rowData['disabled'] ? ' checked="checked"' : '';
+							$isDisabled = $rowData['can_show_register'] ? '' : ' disabled="disabled"';
+							return sprintf('<input type="checkbox" name="reg[]" id="reg_%1$s" value="%1$s" class="input_check" %2$s %3$s />', $rowData['id'], $isChecked, $isDisabled);
+						},
 						'style' => 'width: 20%;',
 						'class' => 'centertext',
 					),
@@ -960,11 +695,11 @@ class ManageFeatures_Controller extends Action_Controller
 				'vieworder' => array(
 					'header' => array(
 						'value' => '',
-						'style' => 'display: none',
+						'class' => 'hide',
 					),
 					'data' => array(
 						'db' => 'vieworder',
-						'style' => 'display: none',
+						'class' => 'hide',
 					),
 					'sort' => array(
 						'default' => 'vieworder',
@@ -975,11 +710,11 @@ class ManageFeatures_Controller extends Action_Controller
 						'value' => $txt['custom_profile_fieldname'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $scripturl;
 
-							return sprintf(\'<a href="%1$s?action=admin;area=featuresettings;sa=profileedit;fid=%2$d">%3$s</a><div class="smalltext">%4$s</div>\', $scripturl, $rowData[\'id_field\'], $rowData[\'field_name\'], $rowData[\'field_desc\']);
-						'),
+							return sprintf('<a href="%1$s?action=admin;area=featuresettings;sa=profileedit;fid=%2$d">%3$s</a><div class="smalltext">%4$s</div>', $scripturl, $rowData['id_field'], $rowData['field_name'], $rowData['field_desc']);
+						},
 						'style' => 'width: 65%;',
 					),
 					'sort' => array(
@@ -992,12 +727,12 @@ class ManageFeatures_Controller extends Action_Controller
 						'value' => $txt['custom_profile_fieldtype'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $txt;
 
-							$textKey = sprintf(\'custom_profile_type_%1$s\', $rowData[\'field_type\']);
+							$textKey = sprintf('custom_profile_type_%1$s', $rowData['field_type']);
 							return isset($txt[$textKey]) ? $txt[$textKey] : $textKey;
-						'),
+						},
 						'style' => 'width: 10%;',
 					),
 					'sort' => array(
@@ -1011,10 +746,10 @@ class ManageFeatures_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							$isChecked = $rowData[\'active\'] ? \' checked="checked"\' :  \'\';
-							return sprintf(\'<input type="checkbox" name="cust[]" id="cust_%1$s" value="%1$s" class="input_check"%2$s />\', $rowData[\'id_field\'], $isChecked);
-						'),
+						'function' => function ($rowData) {
+							$isChecked = $rowData['active'] ? ' checked="checked"' : '';
+							return sprintf('<input type="checkbox" name="cust[]" id="cust_%1$s" value="%1$s" class="input_check"%2$s />', $rowData['id_field'], $isChecked);
+						},
 						'style' => 'width: 8%;',
 						'class' => 'centertext',
 					),
@@ -1028,11 +763,28 @@ class ManageFeatures_Controller extends Action_Controller
 						'value' => $txt['custom_profile_placement'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $txt;
+							$placement = 'custom_profile_placement_';
 
-							return $txt[\'custom_profile_placement_\' . (empty($rowData[\'placement\']) ? \'standard\' : ($rowData[\'placement\'] == 1 ? \'withicons\' : \'abovesignature\'))];
-						'),
+							switch ((int) $rowData['placement'])
+							{
+								case 0:
+									$placement .= 'standard';
+									break;
+								case 1:
+									$placement .= 'withicons';
+									break;
+								case 2:
+									$placement .= 'abovesignature';
+									break;
+								case 3:
+									$placement .= 'aboveicons';
+									break;
+							}
+
+							return $txt[$placement];
+						},
 						'style' => 'width: 5%;',
 					),
 					'sort' => array(
@@ -1095,22 +847,21 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context;
 
-		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 		loadTemplate('ManageFeatures');
 
 		// Sort out the context!
-		$context['fid'] = isset($_GET['fid']) ? (int) $_GET['fid'] : 0;
+		$context['fid'] = $this->_req->getQuery('fid', 'intval', 0);
 		$context[$context['admin_menu_name']]['current_subsection'] = 'profile';
 		$context['page_title'] = $context['fid'] ? $txt['custom_edit_title'] : $txt['custom_add_title'];
 		$context['sub_template'] = 'edit_profile_field';
 
-		// any errors messages to show?
-		if (isset($_GET['msg']))
+		// Any errors messages to show?
+		if (isset($this->_req->query->msg))
 		{
 			loadLanguage('Errors');
 
-			if (isset($txt['custom_option_' . $_GET['msg']]))
-				$context['custom_option__error'] = $txt['custom_option_' . $_GET['msg']];
+			if (isset($txt['custom_option_' . $this->_req->query->msg]))
+				$context['custom_option__error'] = $txt['custom_option_' . $this->_req->query->msg];
 		}
 
 		// Load the profile language for section names.
@@ -1137,6 +888,7 @@ class ManageFeatures_Controller extends Action_Controller
 				'bbc' => false,
 				'default_check' => false,
 				'default_select' => '',
+				'default_value' => '',
 				'options' => array('', '', ''),
 				'active' => true,
 				'private' => false,
@@ -1152,95 +904,114 @@ class ManageFeatures_Controller extends Action_Controller
 		addInlineJavascript('updateInputBoxes();', true);
 
 		// Are we toggling which ones are active?
-		if (isset($_POST['onoff']))
+		if (isset($this->_req->post->onoff))
 		{
 			checkSession();
 			validateToken('admin-scp');
 
 			// Enable and disable custom fields as required.
 			$enabled = array(0);
-			foreach ($_POST['cust'] as $id)
-				$enabled[] = (int) $id;
+			if(isset($this->_req->post->cust) && is_array($this->_req->post->cust)) {
+				foreach ($this->_req->post->cust as $id)
+					$enabled[] = (int) $id;
+			}
 
 			updateRenamedProfileStatus($enabled);
 		}
 		// Are we saving?
-		elseif (isset($_POST['save']))
+		elseif (isset($this->_req->post->save))
 		{
 			checkSession();
 			validateToken('admin-ecp');
 
 			// Everyone needs a name - even the (bracket) unknown...
-			if (trim($_POST['field_name']) == '')
-				redirectexit($scripturl . '?action=admin;area=featuresettings;sa=profileedit;fid=' . $_GET['fid'] . ';msg=need_name');
+			if (trim($this->_req->post->field_name) == '')
+				redirectexit($scripturl . '?action=admin;area=featuresettings;sa=profileedit;fid=' . $this->_req->query->fid . ';msg=need_name');
 
 			// Regex you say?  Do a very basic test to see if the pattern is valid
-			if (!empty($_POST['regex']) && @preg_match($_POST['regex'], 'dummy') === false)
-				redirectexit($scripturl . '?action=admin;area=featuresettings;sa=profileedit;fid=' . $_GET['fid'] . ';msg=regex_error');
+			if (!empty($this->_req->post->regex) && @preg_match($this->_req->post->regex, 'dummy') === false)
+				redirectexit($scripturl . '?action=admin;area=featuresettings;sa=profileedit;fid=' . $this->_req->query->fid . ';msg=regex_error');
 
-			$_POST['field_name'] = Util::htmlspecialchars($_POST['field_name']);
-			$_POST['field_desc'] = Util::htmlspecialchars($_POST['field_desc']);
+			$this->_req->post->field_name = $this->_req->getPost('field_name', 'Util::htmlspecialchars');
+			$this->_req->post->field_desc = $this->_req->getPost('field_desc', 'Util::htmlspecialchars');
+
+			$rows = isset($this->_req->post->rows) ? (int) $this->_req->post->rows : 4;
+			$cols = isset($this->_req->post->cols) ? (int) $this->_req->post->cols : 30;
 
 			// Checkboxes...
-			$show_reg = isset($_POST['reg']) ? (int) $_POST['reg'] : 0;
-			$show_display = isset($_POST['display']) ? 1 : 0;
-			$show_memberlist = isset($_POST['memberlist']) ? 1 : 0;
-			$bbc = isset($_POST['bbc']) ? 1 : 0;
-			$show_profile = $_POST['profile_area'];
-			$active = isset($_POST['active']) ? 1 : 0;
-			$private = isset($_POST['private']) ? (int) $_POST['private'] : 0;
-			$can_search = isset($_POST['can_search']) ? 1 : 0;
+			$show_reg = $this->_req->getPost('reg', 'intval', 0);
+			$show_display = isset($this->_req->post->display) ? 1 : 0;
+			$show_memberlist = isset($this->_req->post->memberlist) ? 1 : 0;
+			$bbc = isset($this->_req->post->bbc) ? 1 : 0;
+			$show_profile = $this->_req->post->profile_area;
+			$active = isset($this->_req->post->active) ? 1 : 0;
+			$private = $this->_req->getPost('private', 'intval', 0);
+			$can_search = isset($this->_req->post->can_search) ? 1 : 0;
 
 			// Some masking stuff...
-			$mask = isset($_POST['mask']) ? $_POST['mask'] : '';
-			if ($mask == 'regex' && isset($_POST['regex']))
-				$mask .= $_POST['regex'];
+			$mask = $this->_req->getPost('mask', 'strval', '');
+			if ($mask == 'regex' && isset($this->_req->post->regex))
+				$mask .= $this->_req->post->regex;
 
-			$field_length = isset($_POST['max_length']) ? (int) $_POST['max_length'] : 255;
-			$enclose = isset($_POST['enclose']) ? $_POST['enclose'] : '';
-			$placement = isset($_POST['placement']) ? (int) $_POST['placement'] : 0;
+			$field_length = $this->_req->getPost('max_length', 'intval', 255);
+			$enclose = $this->_req->getPost('enclose', 'strval', '');
+			$placement = $this->_req->getPost('placement', 'intval', 0);
 
 			// Select options?
 			$field_options = '';
 			$newOptions = array();
-			$default = isset($_POST['default_check']) && $_POST['field_type'] == 'check' ? 1 : '';
-			if (!empty($_POST['select_option']) && ($_POST['field_type'] == 'select' || $_POST['field_type'] == 'radio'))
+
+			// Set default
+			$default = '';
+
+			switch ($this->_req->post->field_type)
 			{
-				foreach ($_POST['select_option'] as $k => $v)
-				{
-					// Clean, clean, clean...
-					$v = Util::htmlspecialchars($v);
-					$v = strtr($v, array(',' => ''));
+				case 'check':
+					$default = isset($this->_req->post->default_check) ? 1 : '';
+					break;
+				case 'select':
+				case 'radio':
+					if (!empty($this->_req->post->select_option))
+					{
+						foreach ($this->_req->post->select_option as $k => $v)
+						{
+							// Clean, clean, clean...
+							$v = Util::htmlspecialchars($v);
+							$v = strtr($v, array(',' => ''));
 
-					// Nada, zip, etc...
-					if (trim($v) == '')
-						continue;
+							// Nada, zip, etc...
+							if (trim($v) == '')
+								continue;
 
-					// Otherwise, save it boy.
-					$field_options .= $v . ',';
+							// Otherwise, save it boy.
+							$field_options .= $v . ',';
 
-					// This is just for working out what happened with old options...
-					$newOptions[$k] = $v;
+							// This is just for working out what happened with old options...
+							$newOptions[$k] = $v;
 
-					// Is it default?
-					if (isset($_POST['default_select']) && $_POST['default_select'] == $k)
-						$default = $v;
-				}
+							// Is it default?
+							if (isset($this->_req->post->default_select) && $this->_req->post->default_select == $k)
+								$default = $v;
+						}
 
-				if (isset($_POST['default_select']) && $_POST['default_select'] == 'no_default')
-					$default = 'no_default';
+						if (isset($_POST['default_select']) && $_POST['default_select'] == 'no_default')
+							$default = 'no_default';
 
-				$field_options = substr($field_options, 0, -1);
+						$field_options = substr($field_options, 0, -1);
+					}
+					break;
+				default:
+					$default = isset($this->_req->post->default_value) ? $this->_req->post->default_value : '';
 			}
 
 			// Text area by default has dimensions
-			if ($_POST['field_type'] == 'textarea')
-				$default = (int) $_POST['rows'] . ',' . (int) $_POST['cols'];
+//			if ($this->_req->post->field_type == 'textarea')
+//				$default = (int) $this->_req->post->rows . ',' . (int) $this->_req->post->cols;
 
 			// Come up with the unique name?
 			if (empty($context['fid']))
 			{
-				$colname = Util::substr(strtr($_POST['field_name'], array(' ' => '')), 0, 6);
+				$colname = Util::substr(strtr($this->_req->post->field_name, array(' ' => '')), 0, 6);
 				preg_match('~([\w\d_-]+)~', $colname, $matches);
 
 				// If there is nothing to the name, then let's start our own - for foreign languages etc.
@@ -1251,22 +1022,48 @@ class ManageFeatures_Controller extends Action_Controller
 
 				$unique = ensureUniqueProfileField($colname, $initial_colname);
 
-				// Still not a unique colum name? Leave it up to the user, then.
+				// Still not a unique column name? Leave it up to the user, then.
 				if (!$unique)
-					fatal_lang_error('custom_option_not_unique');
+					throw new Elk_Exception('custom_option_not_unique');
+
+				// And create a new field
+				$new_field = array(
+					'col_name' => $colname,
+					'field_name' => $this->_req->post->field_name,
+					'field_desc' => $this->_req->post->field_desc,
+					'field_type' => $this->_req->post->field_type,
+					'field_length' => $field_length,
+					'field_options' => $field_options,
+					'show_reg' => $show_reg,
+					'show_display' => $show_display,
+					'show_memberlist' => $show_memberlist,
+					'show_profile' => $show_profile,
+					'private' => $private,
+					'active' => $active,
+					'default_value' => $default,
+					'rows' => $rows,
+					'cols' => $cols,
+					'can_search' => $can_search,
+					'bbc' => $bbc,
+					'mask' => $mask,
+					'enclose' => $enclose,
+					'placement' => $placement,
+					'vieworder' => list_getProfileFieldSize() + 1,
+				);
+				addProfileField($new_field);
 			}
 			// Work out what to do with the user data otherwise...
 			else
 			{
 				// Anything going to check or select is pointless keeping - as is anything coming from check!
-				if (($_POST['field_type'] == 'check' && $context['field']['type'] != 'check')
-					|| (($_POST['field_type'] == 'select' || $_POST['field_type'] == 'radio') && $context['field']['type'] != 'select' && $context['field']['type'] != 'radio')
-					|| ($context['field']['type'] == 'check' && $_POST['field_type'] != 'check'))
+				if (($this->_req->post->field_type == 'check' && $context['field']['type'] != 'check')
+					|| (($this->_req->post->field_type == 'select' || $this->_req->post->field_type == 'radio') && $context['field']['type'] != 'select' && $context['field']['type'] != 'radio')
+					|| ($context['field']['type'] == 'check' && $this->_req->post->field_type != 'check'))
 				{
 					deleteProfileFieldUserData($context['field']['colname']);
 				}
 				// Otherwise - if the select is edited may need to adjust!
-				elseif ($_POST['field_type'] == 'select' || $_POST['field_type'] == 'radio')
+				elseif ($this->_req->post->field_type == 'select' || $this->_req->post->field_type == 'radio')
 				{
 					$optionChanges = array();
 					$takenKeys = array();
@@ -1294,11 +1091,8 @@ class ManageFeatures_Controller extends Action_Controller
 					}
 				}
 				// @todo Maybe we should adjust based on new text length limits?
-			}
 
-			// Updating an existing field?
-			if ($context['fid'])
-			{
+				// And finally update an existing field
 				$field_data = array(
 					'field_length' => $field_length,
 					'show_reg' => $show_reg,
@@ -1309,52 +1103,28 @@ class ManageFeatures_Controller extends Action_Controller
 					'can_search' => $can_search,
 					'bbc' => $bbc,
 					'current_field' => $context['fid'],
-					'field_name' => $_POST['field_name'],
-					'field_desc' => $_POST['field_desc'],
-					'field_type' => $_POST['field_type'],
+					'field_name' => $this->_req->post->field_name,
+					'field_desc' => $this->_req->post->field_desc,
+					'field_type' => $this->_req->post->field_type,
 					'field_options' => $field_options,
 					'show_profile' => $show_profile,
 					'default_value' => $default,
 					'mask' => $mask,
 					'enclose' => $enclose,
 					'placement' => $placement,
+					'rows' => $rows,
+					'cols' => $cols,
 				);
 
 				updateProfileField($field_data);
 
 				// Just clean up any old selects - these are a pain!
-				if (($_POST['field_type'] == 'select' || $_POST['field_type'] == 'radio') && !empty($newOptions))
+				if (($this->_req->post->field_type == 'select' || $this->_req->post->field_type == 'radio') && !empty($newOptions))
 					deleteOldProfileFieldSelects($newOptions, $context['field']['colname']);
-			}
-			// Otherwise creating a new one
-			else
-			{
-				$new_field = array(
-					'col_name' => $colname,
-					'field_name' => $_POST['field_name'],
-					'field_desc' => $_POST['field_desc'],
-					'field_type' => $_POST['field_type'],
-					'field_length' => $field_length,
-					'field_options' => $field_options,
-					'show_reg' => $show_reg,
-					'show_display' => $show_display,
-					'show_memberlist' => $show_memberlist,
-					'show_profile' => $show_profile,
-					'private' => $private,
-					'active' => $active,
-					'default' => $default,
-					'can_search' => $can_search,
-					'bbc' => $bbc,
-					'mask' => $mask,
-					'enclose' => $enclose,
-					'placement' => $placement,
-					'vieworder' => list_getProfileFieldSize() + 1,
-				);
-				addProfileField($new_field);
 			}
 		}
 		// Deleting?
-		elseif (isset($_POST['delete']) && $context['field']['colname'])
+		elseif (isset($this->_req->post->delete) && $context['field']['colname'])
 		{
 			checkSession();
 			validateToken('admin-ecp');
@@ -1365,7 +1135,7 @@ class ManageFeatures_Controller extends Action_Controller
 		}
 
 		// Rebuild display cache etc.
-		if (isset($_POST['delete']) || isset($_POST['save']) || isset($_POST['onoff']))
+		if (isset($this->_req->post->delete) || isset($this->_req->post->save) || isset($this->_req->post->onoff))
 		{
 			checkSession();
 
@@ -1381,16 +1151,18 @@ class ManageFeatures_Controller extends Action_Controller
 	 * Editing personal messages settings
 	 *
 	 * - Accessed with ?action=admin;area=featuresettings;sa=pmsettings
+	 *
+	 * @event integrate_save_pmsettings_settings
 	 */
 	public function action_pmsettings()
 	{
 		global $txt, $scripturl, $context;
 
 		// Initialize the form
-		$this->_initPMSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// Retrieve the current config settings
-		$config_vars = $this->_PMSettings->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_pmSettings());
 
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 		loadLanguage('ManageMembers');
@@ -1398,75 +1170,46 @@ class ManageFeatures_Controller extends Action_Controller
 		$context['pm_limits'] = loadPMLimits();
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			require_once(SUBSDIR . '/Membergroups.subs.php');
 			foreach ($context['pm_limits'] as $group_id => $group)
 			{
-				if (isset($_POST['group'][$group_id]) && $_POST['group'][$group_id] != $group['max_messages'])
-					updateMembergroupProperties(array('current_group' => $group_id, 'max_messages' => $_POST['group'][$group_id]));
+				if (isset($this->_req->post->group[$group_id]) && $this->_req->post->group[$group_id] != $group['max_messages'])
+					updateMembergroupProperties(array('current_group' => $group_id, 'max_messages' => $this->_req->post->group[$group_id]));
 			}
 
 			call_integration_hook('integrate_save_pmsettings_settings');
 
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=featuresettings;sa=pmsettings');
 		}
 
 		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=pmsettings';
 		$context['settings_title'] = $txt['personal_messages'];
 
-		// We need this for the in-line permissions
-		createToken('admin-mp');
-
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initializes the personal messages settings admin page.
-	 */
-	private function _initPMSettingsForm()
-	{
-		global $context;
-
-		// We're working with them settings.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
-		$context['permissions_excluded'] = array(-1);
-
-		// Instantiate the form
-		$this->_PMSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_pmSettings();
-
-		return $this->_PMSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
 	 * Return basic feature settings.
+	 *
+	 * @event integrate_modify_basic_settings Adds to General features and Options
 	 */
 	private function _basicSettings()
 	{
-		global $txt, $modSettings, $context;
-
-		// We need to know if personal text is enabled, and if it's in the registration fields option.
-		// If admins have set it up as an on-registration thing, they can't set a default value (because it'll never be used)
-		$disabled_fields = isset($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
-		$reg_fields = isset($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array();
-		$can_personal_text = !in_array('personal_text', $disabled_fields) && !in_array('personal_text', $reg_fields);
+		global $txt;
 
 		$config_vars = array(
 				// Basic stuff, titles, permissions...
 				array('check', 'allow_guestAccess'),
 				array('check', 'enable_buddylist'),
-				array('check', 'enable_unwatch'),
 				array('check', 'allow_editDisplayName'),
 				array('check', 'allow_hideOnline'),
 				array('check', 'titlesEnable'),
-				array('text', 'default_personal_text', 'subtext' => $txt['default_personal_text_note'], 'disabled' => !$can_personal_text),
 			'',
 				// Javascript and CSS options
 				array('select', 'jquery_source', array('auto' => $txt['jquery_auto'], 'local' => $txt['jquery_local'], 'cdn' => $txt['jquery_cdn'])),
@@ -1474,11 +1217,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('text', 'jquery_version', 'postinput' => $txt['jquery_custom_after']),
 				array('check', 'jqueryui_default', 'onchange' => 'showhideJqueryOptions();'),
 				array('text', 'jqueryui_version', 'postinput' => $txt['jqueryui_custom_after']),
-				array('check', 'minify_css_js'),
-			'',
-				// SEO stuff
-				array('check', 'queryless_urls', 'subtext' => '<strong>' . $txt['queryless_urls_note'] . '</strong><br />' . ($context['server']['is_apache'] || $context['server']['is_lighttpd'] ? $txt['queryless_urls_work'] : '<span class="error">' . $txt['queryless_urls_notwork'] . '</span>')),
-				array('text', 'meta_keywords', 'subtext' => $txt['meta_keywords_note'], 'size' => 50),
+				array('check', 'minify_css_js', 'postinput' => '<a href="#" id="clean_hives" class="linkbutton">' . $txt['clean_hives'] . '</a>'),
 			'',
 				// Number formatting, timezones.
 				array('text', 'time_format'),
@@ -1525,15 +1264,18 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Return layout settings.
+	 *
+	 * @event integrate_modify_layout_settings Adds options to Configuration->Layout
 	 */
 	private function _layoutSettings()
 	{
 		global $txt;
 
-		$config_vars = array(
+		$config_vars = array_merge(getFrontPageControllers(), array(
+			'',
 				// Pagination stuff.
 				array('check', 'compactTopicPagesEnable'),
-				array('int', 'compactTopicPagesContiguous', null, $txt['contiguous_page_display'] . '<div class="smalltext">' . str_replace(' ', '&nbsp;', '"3" ' . $txt['to_display'] . ': <strong>1 ... 4 [5] 6 ... 9</strong>') . '<br />' . str_replace(' ', '&nbsp;', '"5" ' . $txt['to_display'] . ': <strong>1 ... 3 4 [5] 6 7 ... 9</strong>') . '</div>'),
+				array('int', 'compactTopicPagesContiguous', 'subtext' => str_replace(' ', '&nbsp;', '"3" ' . $txt['to_display'] . ': <strong>1 ... 4 [5] 6 ... 9</strong>') . '<br />' . str_replace(' ', '&nbsp;', '"5" ' . $txt['to_display'] . ': <strong>1 ... 3 4 [5] 6 7 ... 9</strong>')),
 				array('int', 'defaultMaxMembers'),
 				array('check', 'displayMemberNames'),
 			'',
@@ -1548,7 +1290,7 @@ class ManageFeatures_Controller extends Action_Controller
 			'',
 				// This is like debugging sorta.
 				array('check', 'timeLoadPageEnable'),
-		);
+		));
 
 		call_integration_hook('integrate_modify_layout_settings', array(&$config_vars));
 
@@ -1565,6 +1307,8 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Return karma settings.
+	 *
+	 * @event integrate_modify_karma_settings Adds to Configuration->Karma
 	 */
 	private function _karmaSettings()
 	{
@@ -1601,6 +1345,8 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Return likes settings.
+	 *
+	 * @event integrate_modify_likes_settings Adds to Configuration->Likes
 	 */
 	private function _likesSettings()
 	{
@@ -1635,16 +1381,41 @@ class ManageFeatures_Controller extends Action_Controller
 
 	/**
 	 * Return mentions settings.
+	 *
+	 * @event integrate_modify_mention_settings Adds to Configuration->Mentions
 	 */
-	private function _mentionSettings()
+	private function _notificationsSettings()
 	{
+		global $txt, $modSettings;
+
+		loadLanguage('Profile');
+		loadLanguage('UserNotifications');
+
 		// The mentions settings
 		$config_vars = array(
 			array('title', 'mentions_settings'),
-				array('check', 'mentions_enabled'),
-				array('check', 'mentions_buddy'),
-				array('check', 'mentions_dont_notify_rlike'),
+			array('check', 'mentions_enabled'),
 		);
+
+		$notification_methods = Notifications::instance()->getNotifiers();
+		$notification_types = getNotificationTypes();
+		$current_settings = unserialize($modSettings['notification_methods']);
+
+		foreach ($notification_types as $title)
+		{
+			$config_vars[] = array('title', 'setting_' . $title);
+
+			foreach ($notification_methods as $method)
+			{
+				if ($method === 'notification')
+					$text_label = $txt['setting_notify_enable_this'];
+				else
+					$text_label = $txt['notify_' . $method];
+
+				$config_vars[] = array('check', 'notifications[' . $title . '][' . $method . ']', 'text_label' => $text_label);
+				$modSettings['notifications[' . $title . '][' . $method . ']'] = !empty($current_settings[$title][$method]);
+			}
+		}
 
 		call_integration_hook('integrate_modify_mention_settings', array(&$config_vars));
 
@@ -1656,13 +1427,15 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	public function mentionSettings_search()
 	{
-		return $this->_mentionSettings();
+		return $this->_notificationsSettings();
 	}
 
 	/**
 	 * Return signature settings.
 	 *
 	 * - Used in admin center search and settings form
+	 *
+	 * @event integrate_modify_signature_settings Adds options to Signature Settings
 	 */
 	private function _signatureSettings()
 	{
@@ -1678,6 +1451,20 @@ class ManageFeatures_Controller extends Action_Controller
 				array('int', 'signature_max_font_size', 'subtext' => $txt['zero_for_no_limit']),
 				array('check', 'signature_allow_smileys', 'onclick' => 'document.getElementById(\'signature_max_smileys\').disabled = !this.checked;'),
 				array('int', 'signature_max_smileys', 'subtext' => $txt['zero_for_no_limit']),
+				array('select', 'signature_repetition_guests',
+					array(
+						$txt['signature_always'],
+						$txt['signature_onlyfirst'],
+						$txt['signature_never'],
+					),
+				),
+				array('select', 'signature_repetition_members',
+					array(
+						$txt['signature_always'],
+						$txt['signature_onlyfirst'],
+						$txt['signature_never'],
+					),
+				),
 			'',
 				// Image settings.
 				array('int', 'signature_max_images', 'subtext' => $txt['signature_max_images_note']),
@@ -1704,6 +1491,8 @@ class ManageFeatures_Controller extends Action_Controller
 	 * Return pm settings.
 	 *
 	 * - Used in admin center search and settings form
+	 *
+	 * @event integrate_modify_pmsettings_settings Adds / Modifies PM Settings
 	 */
 	private function _pmSettings()
 	{
@@ -1735,18 +1524,17 @@ class ManageFeatures_Controller extends Action_Controller
  *
  * @todo Move to subs file
  * @todo Merge with other pause functions?
- *    pausePermsSave(), pausAttachmentMaintenance(), pauseRepairProcess()
+ *    pausePermsSave(), pauseAttachmentMaintenance(), pauseRepairProcess()
  *
  * @param int $applied_sigs
+ * @throws Elk_Exception
  */
 function pauseSignatureApplySettings($applied_sigs)
 {
 	global $context, $txt, $sig_start;
 
 	// Try get more time...
-	@set_time_limit(600);
-	if (function_exists('apache_reset_timeout'))
-		@apache_reset_timeout();
+	detectServer()->setTimeLimit(600);
 
 	// Have we exhausted all the time we allowed?
 	if (time() - array_sum(explode(' ', $sig_start)) < 3)

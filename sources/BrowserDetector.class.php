@@ -7,31 +7,28 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.4
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * This class is an experiment for the job of correctly detecting browsers and
  * settings needed for them.
  *
  * What it does:
+ *
  * - Detects the following browsers
  * - Opera, Webkit, Firefox, Web_tv, Konqueror, IE, Gecko
  * - Webkit variants: Chrome, iphone, blackberry, android, safari, ipad, ipod
  * - Opera Versions: 6, 7, 8 ... 10 ... and mobile mini and mobi
- * - Firefox Versions: 1, 2, 3 .... 11 ...
- * - Chrome Versions: 1 ... 18 ...
+ * - Firefox Versions: 1, 2, 3 .... 11 ... 47 ...
+ * - Chrome Versions: 1 ... 18 ... 52 ...
  * - IE Versions: 4, 5, 5.5, 6, 7, 8, 9, 10 ... mobile and Mac
+ * - Edge Versions 10, 11 ... 14 ...
  * - Nokia
  * - Basic mobile and tablet (ipad, android and tablet PC)
  */
@@ -63,13 +60,14 @@ class Browser_Detector
 	 *
 	 * @var string
 	 */
-	private $_ua = null;
+	protected $_ua = null;
 
 	/**
 	 * The main method of this class, you know the one that does the job: detect the thing.
 	 *
 	 * What it does:
-	 *  - determines the user agent (browser) as best it can.
+	 *
+	 * - Determines the user agent (browser) as best it can.
 	 * - The method fills the instance variables _is_mobile and _is_tablet,
 	 * and the _browsers array.
 	 * - When it returns, the Browser_Detector can be queried for information on client browser.
@@ -77,7 +75,7 @@ class Browser_Detector
 	 */
 	public function detectBrowser()
 	{
-		global $context, $user_info;
+		global $context;
 
 		// Init
 		$this->_browsers = array();
@@ -86,7 +84,7 @@ class Browser_Detector
 
 		// Saves us many many calls
 		$req = request();
-		$this->_ua = $req->user_agent();
+		$this->_ua = empty($this->_ua) ? $req->user_agent() : $this->_ua;
 
 		// One at a time, one at a time, and in this order too
 		if ($this->isOpera())
@@ -105,18 +103,7 @@ class Browser_Detector
 		$this->isOperaMini();
 		$this->isOperaMobi();
 
-		// Be you robot or human?
-		if ($user_info['possibly_robot'])
-		{
-			// This isn't meant to be reliable, it's just meant to catch most bots to prevent PHPSESSID from showing up.
-			$this->_browsers['possibly_robot'] = !empty($user_info['possibly_robot']);
-
-			// Robots shouldn't be logging in or registering.  So, they aren't a bot.  Better to be wrong than sorry (or people won't be able to log in!), anyway.
-			if ((isset($_REQUEST['action']) && in_array($_REQUEST['action'], array('login', 'login2', 'register'))) || !$user_info['is_guest'])
-				$this->_browsers['possibly_robot'] = false;
-		}
-		else
-			$this->_browsers['possibly_robot'] = false;
+		$this->isPossibleRobot();
 
 		// Last step ...
 		$this->_setupBrowserPriority();
@@ -192,7 +179,7 @@ class Browser_Detector
 	}
 
 	/**
-     * Determine if the browser is konqueror or not
+	 * Determine if the browser is konqueror or not
 	 *
 	 * @return boolean true if the browser is konqueror otherwise false
 	 */
@@ -248,9 +235,37 @@ class Browser_Detector
 	}
 
 	/**
+	 * Determine if the browser is possibly a robot or not
+	 *
+	 * @return boolean true if the browser is possibly a robot otherwise false
+	 */
+	public function isPossibleRobot()
+	{
+		global $user_info;
+
+		// Be you robot or human?
+		if (!isset($this->_browsers['possibly_robot']))
+		{
+			if ($user_info['possibly_robot']) {
+				// This isn't meant to be reliable, it's just meant to catch most bots to prevent PHPSESSID from showing up.
+				$this->_browsers['possibly_robot'] = !empty($user_info['possibly_robot']);
+
+				// Robots shouldn't be logging in or registering.  So, they aren't a bot.  Better to be wrong than sorry (or people won't be able to log in!), anyway.
+				if ((isset($_REQUEST['action']) && in_array($_REQUEST['action'], array('login', 'login2', 'register'))) || !$user_info['is_guest'])
+					$this->_browsers['possibly_robot'] = false;
+			}
+			else
+				$this->_browsers['possibly_robot'] = false;
+		}
+
+		return $this->_browsers['possibly_robot'];
+	}
+
+	/**
 	 * Detect Safari / Chrome / Opera / iP[ao]d / iPhone / Android / Blackberry from webkit.
 	 *
 	 * What it does:
+	 *
 	 * - set the browser version for Safari and Chrome
 	 * - set the mobile flag for mobile based useragents
 	 */
@@ -277,25 +292,39 @@ class Browser_Detector
 		$_chrome = strpos($this->_ua, 'Chrome');
 		$_opera = strpos($this->_ua, ' OPR/');
 		$_safari = strpos($this->_ua, 'Safari');
+		$_edge = strpos($this->_ua, 'Edge');
 
-		// Chrome's ua contains Safari but Safari's ua doesn't contain Chrome, Operas contains OPR, chome and safari
+		// Chrome's ua contains Safari but Safari's ua doesn't contain Chrome, Operas contains OPR, chrome and safari
 		$this->_browsers['is_opera'] = $_opera !== false;
-		$this->_browsers['is_chrome'] = $_opera === false && $_chrome !== false && $_safari !== false;
-		$this->_browsers['is_safari'] = $_safari !== false && $_chrome === false && !$this->_browsers['is_iphone'];
+		$this->_browsers['is_chrome'] = $_opera === false && $_chrome !== false && $_safari !== false && $_edge === false;
+		$this->_browsers['is_safari'] = $_safari !== false && $_chrome === false && $_edge === false && !$this->_browsers['is_iphone'];
+		$this->_browsers['is_edge'] = $_edge !== false && $_chrome !== false && $_safari !== false;
 
-		// if Chrome, get the major version
+		// Get the major version of the browser
+		$this->_setMajorVersion();
+	}
+
+	/**
+	 * Returns the major revision number for a given ua string
+	 */
+	private function _setMajorVersion()
+	{
 		if ($this->_browsers['is_chrome'])
 		{
 			if (preg_match('~chrome[/]([0-9][0-9]?[.])~i', $this->_ua, $match) === 1)
 				$this->_browsers['is_chrome' . (int) $match[1]] = true;
 		}
-		// if Safari get its major version
+		elseif ($this->_browsers['is_edge'])
+		{
+			$this->_browsers['is_webkit'] = false;
+			if (preg_match('~edge[/]([0-9][0-9]?[.])~i', $this->_ua, $match) === 1)
+				$this->_browsers['is_edge' . (int) $match[1]] = true;
+		}
 		elseif ($this->_browsers['is_safari'])
 		{
 			if (preg_match('~version/?(.*)safari.*~i', $this->_ua, $match) === 1)
 				$this->_browsers['is_safari' . (int) trim($match[1])] = true;
 		}
-		// if Opera get its major version
 		elseif ($this->_browsers['is_opera'])
 		{
 			if (preg_match('~OPR[/]([0-9][0-9]?[.])~i', $this->_ua, $match) === 1)
@@ -311,9 +340,10 @@ class Browser_Detector
 	 * Additional IE checks and settings.
 	 *
 	 * What it does:
+	 *
 	 * - determines the version of the IE browser in use
 	 * - detects ie4 onward
-	 * - attempts to distinguish between IE and IE in compatabilty view
+	 * - attempts to distinguish between IE and IE in compatibility view
 	 */
 	private function _setupIe()
 	{
@@ -327,12 +357,13 @@ class Browser_Detector
 			$this->_browsers['is_ie' . $msie_match[1]] = true;
 		}
 
-		// "modern" ie uses trident 4=ie8, 5=ie9, 6=ie10, even in compatability view
-		if (preg_match('~Trident/([0-9.])~i', $this->_ua, $trident_match) === 1)
+		// "modern" ie uses trident 4=ie8, 5=ie9, 6=ie10, even in compatibility view
+		if (preg_match('~Trident/([4-9])\.~i', $this->_ua, $trident_match) === 1)
 		{
-			$this->_browsers['is_ie' . ((int) $trident_match[1] + 4)] = true;
+			$trident_match[1] = (int) $trident_match[1];
+			$this->_browsers['is_ie' . ($trident_match[1] + 4)] = true;
 
-			// If trident is set, see the (if any) msie tag in the user agent matches ... if not its in some compatablity view
+			// If trident is set, see the (if any) msie tag in the user agent matches ... if not its in some compatibility view
 			if (isset($msie_match[1]) && ($msie_match[1] < $trident_match[1] + 4))
 				$this->_browsers['is_ie_compat_view'] = true;
 		}
@@ -356,6 +387,7 @@ class Browser_Detector
 	 * Additional firefox checks.
 	 *
 	 * What it does:
+	 *
 	 * - Gets the version of the FF browser in use
 	 * - Considers all FF variants as FF including IceWeasel, IceCat, Shiretoko and Minefiled
 	 */
@@ -383,6 +415,7 @@ class Browser_Detector
 	 * More Opera checks if we are opera <15
 	 *
 	 * What it does:
+	 *
 	 * - checks for the version of Opera in use
 	 * - uses checks for 10 first and falls through to <9
 	 */
@@ -400,9 +433,10 @@ class Browser_Detector
 	 * Get the browser name that we will use in the <body id="this_browser">
 	 *
 	 * What it does:
+	 *
 	 * - The order of each browser in $browser_priority is important
 	 * - if you want to have id='ie6' and not id='ie' then it must appear first in the list of ie browsers
-	 * - only sets browsers that may need some help via css for compatablity
+	 * - only sets browsers that may need some help via css for compatibility
 	 */
 	private function _setupBrowserPriority()
 	{
@@ -419,6 +453,7 @@ class Browser_Detector
 				'is_ie8' => 'ie8',
 				'is_ie9' => 'ie9',
 				'is_ie' => 'ie',
+				'is_edge' => 'edge',
 				'is_firefox' => 'firefox',
 				'is_chrome' => 'chrome',
 				'is_safari' => 'safari',

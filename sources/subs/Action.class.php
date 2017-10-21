@@ -7,15 +7,14 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.2
+ * @version 1.1
  *
  */
 
 /**
  * Action class defines an action with its associated sub-actions.
- * Object-oriented controllers (with sub-actions) uses it to set
- * their action-subaction arrays, and have it call the right
- * function or method handlers.
+ * Object-oriented controllers (with sub-actions) uses it to set their action-subaction arrays, and have it call the
+ * right function or method handlers.
  *
  * Replaces the sub-actions arrays in every dispatching function.
  * (the $subactions = ... etc, and calls for $_REQUEST['sa'])
@@ -33,23 +32,23 @@ class Action
 	 *  or
 	 *    'sub_action name' => array(
 	 *    'controller' => 'controller name',
-	 *    'function' => 'method name',
-	 *    'enabled' => true/false,
-	 *    'permission' => area),
+	 *        'function' => 'method name',
+	 *        'enabled' => true/false,
+	 *        'permission' => area),
 	 *  or
 	 *    'sub_action name' => array(
-	 *    'controller object, i.e. $this',
-	 *    'method name',
-	 *    'enabled' => true/false
-	 *    'permission' => area),
+	 *        'controller object, i.e. $this',
+	 *        'method name',
+	 *        'enabled' => true/false
+	 *        'permission' => area),
 	 *  or
 	 *    'sub_action name' => array(
-	 *    'file' => 'file name',
-	 *    'dir' => 'controller file location', if not set ADMINDIR is assumed
-	 *    'controller' => 'controller name',
-	 *    'function' => 'method name',
-	 *    'enabled' => true/false,
-	 *    'permission' => area)
+	 *        'file' => 'file name',
+	 *        'dir' => 'controller file location', if not set ADMINDIR is assumed
+	 *        'controller' => 'controller name',
+	 *        'function' => 'method name',
+	 *        'enabled' => true/false,
+	 *        'permission' => area)
 	 */
 
 	/**
@@ -82,14 +81,19 @@ class Action
 
 	/**
 	 * Initialize the instance with an array of sub-actions.
-	 * Sub-actions have to be in the format expected for Action::_subActions array,
+	 *
+	 * What it does:
+	 *
+	 * - Sub-actions have to be in the format expected for Action::_subActions array,
 	 * indexed by sa.
 	 *
 	 * @param mixed[] $subactions array of know subactions
 	 * @param string $default default action if unknown sa is requested
+	 * @param string $requestParam default key to check request value, defaults to sa
+	 *
 	 * @return string
 	 */
-	public function initialize(&$subactions, $default = '')
+	public function initialize(&$subactions, $default = '', $requestParam = 'sa')
 	{
 		if ($this->_name !== null)
 			call_integration_hook('integrate_sa_' . $this->_name, array(&$subactions));
@@ -104,39 +108,42 @@ class Action
 		if (isset($subactions[$default]))
 			$this->_default = $default;
 
-		return isset($_REQUEST['sa']) && isset($this->_subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : $this->_default;
+		return isset($_REQUEST[$requestParam]) && isset($this->_subActions[$_REQUEST[$requestParam]]) ? $_REQUEST[$requestParam] : $this->_default;
 	}
 
 	/**
 	 * Call the function or method which corresponds to the given $sa parameter.
-	 * Must be a valid index in the _subActions array.
+	 *
+	 * - Must be a valid index in the _subActions array.
 	 *
 	 * @param string $sa
+	 *
+	 * @throws Elk_Exception error_sa_not_set
 	 */
 	public function dispatch($sa)
 	{
-		// for our sanity...
-		if (!key_exists($sa, $this->_subActions) || !is_array($this->_subActions[$sa]))
+		// For our sanity...
+		if (!array_key_exists($sa, $this->_subActions) || !is_array($this->_subActions[$sa]))
 		{
-			// send an error and get out of here
-			fatal_lang_error('error_sa_not_set');
+			// Send an error and get out of here
+			throw new Elk_Exception('error_sa_not_set');
 		}
 
 		$subAction = $this->_subActions[$sa];
 
-		// unless it's disabled, then we redirect to the default action
+		// Unless it's disabled, then we redirect to the default action
 		if (isset($subAction['enabled']) && !$subAction['enabled'])
 			if (!empty($this->_default))
 				$subAction = $this->_subActions[$this->_default];
 			else
-				// no dice
-				fatal_lang_error('error_sa_not_set');
+				// No dice
+				throw new Elk_Exception('error_sa_not_set');
 
-		// are you even permitted to?
+		// Are you even permitted to?
 		if (isset($subAction['permission']))
 			isAllowedTo($subAction['permission']);
 
-		// is it in a file we need to load?
+		// Is it in a file we need to load?
 		if (isset($subAction['file']))
 		{
 			if (isset($subAction['dir']))
@@ -144,42 +151,46 @@ class Action
 			else
 				require_once(ADMINDIR . '/' . $subAction['file']);
 
-			// a brand new controller... so be it.
+			// A brand new controller... so be it.
 			if (isset($subAction['controller']))
 			{
 				// 'controller'->'function'
-				$controller_name = $subAction['controller'];
-				$controller = new $controller_name();
-
-				// Starting a new controller, run pre_dispatch
-				if (method_exists($controller, 'pre_dispatch'))
-					$controller->pre_dispatch();
+				$controller = new $subAction['controller'](new Event_Manager());
+				$controller->pre_dispatch();
 
 				$controller->{$subAction['function']}();
 			}
 			elseif (isset($subAction['function']))
 			{
-				// this is just a good ole' function
+				// This is just a good ole' function
 				$subAction['function']();
 			}
 		}
 		else
 		{
-			// we still want to know if it's OOP or not. For debugging purposes. :P
+			// We still want to know if it's OOP or not. For debugging purposes. :P
 			if (isset($subAction['controller']))
 			{
-				// an OOP controller, call it over
-				$subAction['controller']->{$subAction['function']}();
+				// An OOP controller, call it over
+				if (is_object($subAction['controller']))
+					$subAction['controller']->{$subAction['function']}();
+				else
+				{
+					$controller = new $subAction['controller'](new Event_Manager());
+					$controller->pre_dispatch();
+
+					$controller->{$subAction['function']}();
+				}
 			}
 			elseif (is_array($subAction) && !isset($subAction['function']))
 			{
-				// an OOP controller, without explicit 'controller' index, lazy!
+				// An OOP controller, without explicit 'controller' index, lazy!
 				$controller = $subAction[0];
 				$controller->{$subAction[1]}();
 			}
 			else
 			{
-				// a function
+				// A function
 				if (isset($subAction['function']))
 					$subAction['function']();
 				else
@@ -190,48 +201,60 @@ class Action
 
 	/**
 	 * Return the subaction.
-	 * This method checks if $sa is enabled, and falls back to default if not.
-	 * Used only to set the context for the template.
 	 *
-	 * @param string $sa
+	 * What it does:
+	 *
+	 * - This method checks if $sa is enabled, and falls back to default if not.
+	 * - Used only to set the context for the template.
+	 *
+	 * @param string $sa The subaction to call
+	 *
+	 * @return string error_sa_not_set
+	 * @throws Elk_Exception error_sa_not_set
 	 */
 	public function subaction($sa)
 	{
 		$subAction = $this->_subActions[$sa];
 
-		// if it's disabled, then default action
+		// If it's disabled, then default action
 		if (isset($subAction['enabled']) && !$subAction['enabled'])
+		{
 			if (!empty($this->_default))
 				$sa = $this->_default;
 			else
-				// no dice
-				fatal_lang_error('error_sa_not_set');
+				// No dice
+				throw new Elk_Exception('error_sa_not_set');
+		}
 
 		return $sa;
 	}
 
 	/**
 	 * Security check: verify that the user has the permission to perform the given action.
-	 * Verifies if the user has the permission set for the given action.
-	 * Return true if no permission was set for the action.
-	 * Results in a fatal_lang_error() if the user doesn't have permission,
-	 * or this instance wasn't initialized, or the action cannot be found in it.
 	 *
-	 * @param string $sa
+	 * What it does:
+	 *
+	 * - Verifies if the user has the permission set for the given action.
+	 * - Return true if no permission was set for the action.
+	 * - Results in a fatal_lang_error() if the user doesn't have permission,
+	 * or this instance was not initialized, or the action cannot be found in it.
+	 *
+	 * @param string $sa The sub action
+	 *
+	 * @return bool error_sa_not_set
+	 * @throws Elk_Exception error_sa_not_set
 	 */
 	public function isAllowedTo($sa)
 	{
-		if (is_array($this->_subActions) && key_exists($sa, $this->_subActions))
+		if (is_array($this->_subActions) && array_key_exists($sa, $this->_subActions))
 		{
 			if (isset($this->_subActions[$sa]['permission']))
 				isAllowedTo($this->_subActions[$sa]['permission']);
+
 			return true;
 		}
 
-		// can't let you continue, sorry.
-		fatal_lang_error('error_sa_not_set');
-
-		// I said... can't.
-		trigger_error('No access...', E_USER_ERROR);
+		// Can't let you continue, sorry.
+		throw new Elk_Exception('error_sa_not_set');
 	}
 }

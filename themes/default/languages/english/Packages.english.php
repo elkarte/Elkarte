@@ -1,6 +1,6 @@
 <?php
 
-// Version: 1.0; Packages
+// Version: 1.1; Packages
 
 $txt['package_proceed'] = 'Proceed';
 $txt['package_id'] = 'ID';

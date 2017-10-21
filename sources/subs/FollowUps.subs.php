@@ -8,12 +8,9 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Retrieves all the follow-up topic for a certain message
@@ -122,7 +119,7 @@ function unlinkMessages($msg, $topic)
 /**
  * Removes all the follow-ups from the db by topics
  *
- * @param int $topics topic id
+ * @param int|int[] $topics topic id
  */
 function removeFollowUpsByTopic($topics)
 {

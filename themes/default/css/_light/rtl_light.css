@@ -40,17 +40,16 @@
 /*		$MEDIA...............Experimental media queries.
 /* ------------------------------------------------------- */
 
-
-
-
 /*	$GENERAL	*/
 /* ------------------------------------------------------- */
 body {
-	background-image: linear-gradient(to left, #333 0%, #888 50%, #333 100%);
+	background-image: linear-gradient(to left, #333333 0%, #888888 50%, #333333 100%);
 }
+
 fieldset {
-	box-shadow: inset 1px -1px 3px #fff;
+	box-shadow: inset 1px -1px 3px #FFFFFF;
 }
+
 legend {
 	background: url(../../images/selected_open.png) no-repeat scroll right center transparent;
 	cursor: pointer;
@@ -59,6 +58,7 @@ legend {
 	margin-left: 0;
 	margin-right: 15px;
 }
+
 .collapsed legend {
 	background: url(../../images/selected_rtl.png) no-repeat scroll right center transparent;
 }
@@ -77,43 +77,44 @@ legend {
 /*    .left_submit is left floated */
 /* The button_reset class may need attention too. */
 .button_submit, .right_submit, .left_submit, .button_reset,
-/* Anchors styled to look like buttons. */
-/* These have standard body text size. Can be chained with smalltext class. */
+	/* Anchors styled to look like buttons. */
+	/* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
-	border-left: 1px solid #afafaf;
-	border-right: 1px solid #bfbfbf;
-	box-shadow: -1px 1px 2px #e5e5e5;
+	border-left: 1px solid #AFAFAF;
+	border-right: 1px solid #BFBFBF;
+	box-shadow: -1px 1px 2px #E5E5E5;
 }
 
 /* Hover effects. */
 .button_submit:hover, .right_submit:hover, .left_submit:hover,
 .button_reset:hover,
 .linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
-	border-left: 1px solid #ccc;
-	border-right: 1px solid #afafaf;
-	box-shadow: -2px 1px 1px rgba(0,0,0,0.07) inset;
+	border-left: 1px solid #CCCCCC;
+	border-right: 1px solid #AFAFAF;
+	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
 
 /* @todo - Test this everywhere. */
 .standard_category {
-	box-shadow: -1px 2px 4px #eee;
+	box-shadow: -1px 2px 4px #EEEEEE;
 }
 
 /* Styles for main headers. */
 .category_header, .forum_category .category_header {
-	text-shadow: -1px 1px 0 #ebebeb;
+	text-shadow: -1px 1px 0 #EBEBEB;
 }
+
 /* Styles for subsection headers. @todo */
 .secondary_header {
-	text-shadow: -1px 1px 0 #fff;
+	text-shadow: -1px 1px 0 #FFFFFF;
 }
 
 /*	$BBC		*/
 /* ------------------------------------------------------- */
 /* Extra quote styling */
-.bbc_standard_quote, .bbc_alternate_quote, .quoteheader {
-	box-shadow: -2px 2px 2px #ddd;
+.bbc_quote, .quoteheader {
+	box-shadow: -2px 2px 2px #DDDDDD;
 }
 
 /*	$AJAX		*/
@@ -124,78 +125,87 @@ legend {
 /* Maintenance mode warning. */
 .notice {
 	font-weight: 700;
-	color: #a80000;
+	color: #A80000;
 }
+
 #search_form .input_text {
 	border-radius: 0 2px 2px 0;
-	border-right: 1px solid #ccc;
+	border-right: 1px solid #CCCCCC;
 }
-#search_form .button_submit {
+
+#search_form input[type="submit"] {
 	border-radius: 2px 0 0 2px;
 }
+
 #search_form select {
 	border-style: solid none;
 }
-.forumtitle>a {
-	text-shadow: -1px 1px 0 #fff;
+
+.forumtitle > a {
+	text-shadow: -1px 1px 0 #FFFFFF;
 }
+
 /* News section. */
-#news>h2 {
+#news > h2 {
 	float: right;
-	margin: 7px 12px 0 -4em;
-}
-#news_line, #elkFadeScroller {
-	box-shadow: -1px 2px 3px #eee;
+	margin: -2px 0 0 1em;
 }
 
 /*	$MENUS		*/
 /* ------------------------------------------------------- */
 /* Level 1 Menu bar: link or button. General styling. */
 .linklevel1, .linklevel1:link, .linklevel1:visited {
-	border-left: 1px solid #afafaf;
-	border-right: 1px solid #bfbfbf;
-	box-shadow: -1px 1px 2px #e5e5e5;
+	border-left: 1px solid #AFAFAF;
+	border-right: 1px solid #BFBFBF;
+	box-shadow: -1px 1px 2px #E5E5E5;
 }
+
 /* Level 1 button hover and focus effects. */
 .linklevel1:hover, .listlevel1:hover .linklevel1,
 .linklevel2:hover, .listlevel2:hover .linklevel2,
 .linklevel3:hover, .listlevel3:hover .linklevel3,
 #menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1,
-#menu_current_area>strong>.linklevel1 {
-	border-left: 1px solid #ccc;
-	border-right: 1px solid #afafaf;
-	box-shadow: -2px 1px 1px rgba(0,0,0,0.07) inset;
+#menu_current_area > strong > .linklevel1 {
+	border-left: 1px solid #CCCCCC;
+	border-right: 1px solid #AFAFAF;
+	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
+
 .poster li.poster_online:hover .linklevel1 {
-	border-left: 1px solid #ccc;
-	border-right: 1px solid #afafaf;
-	box-shadow: -2px 1px 1px rgba(0,0,0,0.07) inset;
+	border-left: 1px solid #CCCCCC;
+	border-right: 1px solid #AFAFAF;
+	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
+
 .poster li.poster_online .nolink {
-	border-left: 1px solid #afafaf;
-	border-right: 1px solid #bfbfbf;
-	box-shadow: -1px 1px 2px #e5e5e5;
+	border-left: 1px solid #AFAFAF;
+	border-right: 1px solid #BFBFBF;
+	box-shadow: -1px 1px 2px #E5E5E5;
 }
+
 /* Level 1 active buttons. */
 .linklevel1.active, .listlevel1:hover .active,
 #collapse_button .linklevel1, .pm_indicator {
-	border-left: 1px solid #38642e;
-	border-right: 1px solid #38642d;
-	box-shadow: -1px 1px 2px #bbb;
+	border-left: 1px solid #38642E;
+	border-right: 1px solid #38642D;
+	box-shadow: -1px 1px 2px #BBBBBB;
 }
+
 /* Hover effects for those buttons. */
-.linklevel1.active:hover,.listlevel1:hover .linklevel1.active,
+.linklevel1.active:hover, .listlevel1:hover .linklevel1.active,
 #collapse_button .linklevel1:hover, .linklevel1:hover .pm_indicator {
-	border-left: 1px solid #5aa049;
-	border-right: 1px solid #2d5024;
-	box-shadow: -1px 1px 1px rgba(0,0,0,0.3) inset;
+	border-left: 1px solid #5AA049;
+	border-right: 1px solid #2D5024;
+	box-shadow: -1px 1px 1px rgba(0, 0, 0, 0.3) inset;
 }
+
 /* Levels 2 and 3: drop menu wrapper. */
 .menulevel2, .menulevel3 {
-	border-left: 1px solid #afafaf;
-	border-right: 1px solid #bfbfbf;
-	box-shadow: -3px 3px 3px rgba(0,0,0,0.2);
+	border-left: 1px solid #AFAFAF;
+	border-right: 1px solid #BFBFBF;
+	box-shadow: -3px 3px 3px rgba(0, 0, 0, 0.2);
 }
+
 /* Tricky PM indicator. Define it carefully,
 /* just in case someone tries to use this class elsewhere. */
 .pm_indicator {
@@ -203,15 +213,18 @@ legend {
 	left: -0.4em;
 	float: right;
 	border-radius: 8px 8px 0 8px;
-	box-shadow: -2px 2px 3px rgba(0,0,0,0.25), 0 -1px 0 #3d6e32 inset;
+	box-shadow: -2px 2px 3px rgba(0, 0, 0, 0.25), 0 -1px 0 #3D6E32 inset;
 }
+
 #dropdown_menu_1 .pm_indicator {
 	margin-left: 2px;
 }
+
 /* Admin menu icons. */
-.linklevel2>img {
+.linklevel2 > img {
 	margin: 0 -4px 0 0;
 }
+
 /* Level 2: subsection indicators. */
 .listlevel2.subsections .linklevel2:after,
 #menu_sidebar .subsections .linklevel1:after,
@@ -226,26 +239,22 @@ legend {
 .board_icon {
 	float: right;
 }
-.board_key:before {
-	float: right;
-}
-.category_boards .board_icon, .board_key:before {
-	background-image: url(../../images/_light/board_icons_rtl.png);
-}
 
 /*	$LINKTREE	*/
 /* ------------------------------------------------------- */
 /* The navigation list (i.e. linktree) */
 /* Wrapper/background. */
 .navigate_section {
-	box-shadow: -1px 2px 3px #eee;
+	box-shadow: -1px 2px 3px #EEEEEE;
 }
+
 /* Color for linktree items. */
 .linktree:after {
 	box-shadow: -2px 2px 0 1px rgba(204, 204, 204, 0.9);
 }
+
 .linktree {
-	box-shadow: 0 2px 0 -1px #ccc, -3px 2px 0 -1px #ccc, -3px -1px 0 -1px #ccc;
+	box-shadow: 0 2px 0 -1px #CCCCCC, -3px 2px 0 -1px #CCCCCC, -3px -1px 0 -1px #CCCCCC;
 }
 
 /*	$BUTTONS	*/
@@ -258,7 +267,7 @@ legend {
 /* ------------------------------------------------------- */
 /* The active one */
 .buttonlist li a.active {
-	box-shadow: -1px 1px 2px #ccc;
+	box-shadow: -1px 1px 2px #CCCCCC;
 }
 
 /* The quick buttons. */
@@ -267,6 +276,7 @@ legend {
 .linklevel1.quote_button {
 	border-radius: 0 2px 2px 0;
 }
+
 /* Radius right end of the last button. */
 .linklevel1.post_options, .linklevel1.remove_button {
 	border-radius: 2px 0 0 2px;
@@ -275,21 +285,25 @@ legend {
 /*	$PAGELINKS	*/
 /* ------------------------------------------------------- */
 .pagelinks .navPages:hover, .pagelinks .current_page {
-	border-left: 1px solid #ccc;
-	border-right: 1px solid #afafaf;
-	box-shadow: -2px 1px 1px rgba(0,0,0,0.07) inset;
+	border-left: 1px solid #CCCCCC;
+	border-right: 1px solid #AFAFAF;
+	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
+
 .pagelinks :first-child {
 	border-radius: 0 2px 2px 0;
 }
+
 .pagelinks :last-child {
 	border-radius: 2px 0 0 2px;
 }
+
 /* our buddies &laquo; &raquo; */
 .small_pagelinks:before {
 	content: '\00AB';
 	float: right;
 }
+
 .small_pagelinks:after {
 	content: '\00BB';
 	float: right;
@@ -299,6 +313,7 @@ legend {
 #gotop, #gobottom {
 	border-radius: 20px 0 0 0;
 }
+
 #gobottom {
 	border-radius: 0 0 0 20px;
 }
@@ -316,33 +331,28 @@ legend {
 
 /* The board categories and newsfader - some shared styling. */
 .forum_category, .forumposts, .content_category {
-	box-shadow: -1px 2px 3px #eee;
-}
-/* @todo - Clean this up, once new classes are assigned to old windowbg stuffz. */
-.board_latest {
-	border-right: 1px solid #ccc;
-	border-left: 0;
-}
-/* The board description and who-is-viewing stuff. */
-#description_board {
-	box-shadow: -1px 2px 4px #eee;
-}
-.topic_listing {
-	box-shadow: -1px 2px 4px #eee;
-}
-.jump_to_header {
-	box-shadow: -2px 1px rgba(1,1,1,0.07) inset;
+	box-shadow: -1px 2px 3px #EEEEEE;
 }
 
-.new_some_board:before {
-	background-position: -298px -14px;
+/* @todo - Clean this up, once new classes are assigned to old windowbg stuffz. */
+.board_latest {
+	border-right: 1px solid #CCCCCC;
+	border-left: 0;
 }
-.new_none_board:before {
-	background-position: -370px -14px;
+
+/* The board description and who-is-viewing stuff. */
+#description_board {
+	box-shadow: -1px 2px 4px #EEEEEE;
 }
-.new_redirect_board:before {
-	background-position: -440px -14px;
+
+.topic_listing {
+	box-shadow: -1px 2px 4px #EEEEEE;
 }
+
+.jump_to_header {
+	box-shadow: -2px 1px rgba(1, 1, 1, 0.07) inset;
+}
+
 /* --------------------------------------------------------------------- */
 /* The following are alternative layout orders for the board index rows. */
 /* They are basic demonstrations only. Extra custom styling can be done.
@@ -432,20 +442,22 @@ legend {
 
 /* On to the posts */
 .forumposts {
-	box-shadow: -1px 2px 4px #eee;
+	box-shadow: -1px 2px 4px #EEEEEE;
 }
 
 /* @todo - Save code by amalgamating common button background declarations. */
 .poster_online .linklevel1 {
-	border-left: 1px solid #afafaf;
-	border-right: 1px solid #bfbfbf;
-	box-shadow: -1px 1px 2px #eee;
+	border-left: 1px solid #AFAFAF;
+	border-right: 1px solid #BFBFBF;
+	box-shadow: -1px 1px 2px #EEEEEE;
 }
+
 .poster_online .linklevel1:hover {
-	border-left: 1px solid #ccc;
-	border-right: 1px solid #bbb;
-	box-shadow: -1px 1px 1px rgba(0,0,0,0.07) inset;
+	border-left: 1px solid #CCCCCC;
+	border-right: 1px solid #BBBBBB;
+	box-shadow: -1px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
+
 /* Do one override here for .poster. Still saves code all round. */
 .poster_avatar .linklevel1, .poster_avatar:hover .linklevel1,
 .poster_avatar .linklevel1:focus,
@@ -453,12 +465,12 @@ legend {
 	background: none;
 	border: none;
 	box-shadow: none;
-	color: #4b863c;
+	color: #4B863C;
 }
 
 .requiredfield {
-	border-left: 1px solid #5aa049;
-	border-right: 1px solid #2d5024;
+	border-left: 1px solid #5AA049;
+	border-right: 1px solid #2D5024;
 }
 
 /*	$EDITOR		*/
@@ -467,15 +479,14 @@ legend {
 /*	$MODERATE	*/
 /* ------------------------------------------------------- */
 
-
 /* Styles for the $TABS	*/
 /* We can't control what jqueryui pollutes the DOM with, so deal with it */
 /* Styles for the profile summary tabs, or any jquery ui tabs */
 /* ---------------------------------------------------------- */
 
 .ui-tabs .ui-state-hover {
-	border-left: 1px solid #ccc;
-	border-right: 1px solid #afafaf;
+	border-left: 1px solid #CCCCCC;
+	border-right: 1px solid #AFAFAF;
 }
 
 /* $PROFILE	*/
@@ -489,23 +500,18 @@ legend {
 
 #personal_messages .capacity_bar span {
 	border-right: 0;
-	border-left: 1px solid #adadad;
+	border-left: 1px solid #ADADAD;
 }
 
 /* $CALENDAR	*/
 /* ------------------------------------------------------- */
-/* Used to indicate the current day. */
-.weekdays {
-	border-right: 0;
-	border-left: 2px solid #ddd;
-}
 
 /*	$HELP		*/
 /* ------------------------------------------------------- */
 
 /* Styles for the tooltips. */
 .tooltip {
-	box-shadow: -3px 3px 3px rgba(0,0,0,0.3);
+	box-shadow: -3px 3px 3px rgba(0, 0, 0, 0.3);
 }
 
 /*	$SEARCH		*/
@@ -518,7 +524,7 @@ legend {
 /* ------------------------------------------------------- */
 
 .errorbox {
-	background: #fee url(../../images/profile/warning_mute.png) 98% 50% no-repeat;
+	background: #FFEEEE url(../../images/profile/warning_mute.png) 99% 50% no-repeat;
 }
 
 /*	$PROGRESS	*/
@@ -528,7 +534,7 @@ legend {
 /* ------------------------------------------------------- */
 .stats.floatleft {
 	border-right: 0;
-	border-left: 1px solid #ccc;
+	border-left: 1px solid #CCCCCC;
 }
 
 /*	$MEDIA		*/
@@ -536,31 +542,37 @@ legend {
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
 	#menu_sidebar {
-		box-shadow: -3px 3px 3px rgba(0,0,0,0.3);
+		box-shadow: -3px 3px 3px rgba(0, 0, 0, 0.3);
 	}
+
 	#main_menu .linklevel1 {
 		margin-right: 0;
 		margin-left: 2px;
 	}
 }
+
 /* This one does up to 540 screens. */
 @media screen and (max-width: 33.750em) {
 	#gobottom {
 		border-radius: 0;
 	}
+
 	#gotop {
 		border-radius: 8px 0 0 0;
 	}
+
 	.board_latest {
-		border-left: auto;
-		border-right: 0;
+		border-right-width: 0;
 	}
-	.topic_listing>li {
-		box-shadow: -3px 3px 6px #e5e5e5;
+
+	.topic_listing > li {
+		box-shadow: -3px 3px 6px #E5E5E5;
 	}
-	.forumposts .windowbg, .forumposts .windowbg2 {
-		box-shadow: -3px 3px 6px #e5e5e5;
+
+	.forumposts .content {
+		box-shadow: -3px 3px 6px #E5E5E5;
 	}
+
 	.linktree:after {
 		content: "";
 	}

@@ -7,18 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Gets a list of all available message icons.
@@ -127,11 +122,10 @@ function sortMessageIconTable()
 {
 	$db = database();
 
+	$db->skip_next_error();
 	$db->query('alter_table', '
 		ALTER TABLE {db_prefix}message_icons
 		ORDER BY icon_order',
-		array(
-			'db_error_skip' => true,
-		)
+		array()
 	);
 }

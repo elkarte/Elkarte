@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; Login
+// Version: 1.1; Login
 
 // Registration agreement page.
 $txt['registration_agreement'] = 'Registration Agreement';
@@ -61,6 +61,7 @@ $txt['in_maintain_mode'] = 'This board is in Maintenance Mode.';
 // These two are used as a javascript alert; please use international characters directly, not as entities.
 $txt['register_agree'] = 'Please read and accept the agreement before registering.';
 $txt['register_passwords_differ_js'] = 'The two passwords you entered are not the same!';
+$txt['register_did_you'] = 'Did you mean';
 
 $txt['approval_after_registration'] = 'Thank you for registering. The admin must approve your registration before you may begin to use your account, you will receive an email shortly advising you of the admins decision.';
 
@@ -75,6 +76,7 @@ $txt['setting_registration_activate'] = 'Email Activation';
 $txt['setting_registration_approval'] = 'Admin Approval';
 $txt['setting_notify_new_registration'] = 'Notify administrators when a new member joins';
 $txt['setting_send_welcomeEmail'] = 'Send welcome email to new members';
+$txt['setting_show_DisplayNameOnRegistration'] = 'Allow users to enter their screen name';
 
 $txt['setting_coppaAge'] = 'Age below which to apply registration restrictions';
 $txt['setting_coppaAge_desc'] = '(Set to 0 to disable)';
@@ -137,6 +139,8 @@ $txt['authenticate_label'] = 'Authentication Method';
 $txt['authenticate_password'] = 'Password';
 $txt['authenticate_openid'] = 'OpenID';
 $txt['authenticate_openid_url'] = 'OpenID Authentication URL';
+$txt['otp_required'] = 'A Time-based One-time Password is required in order to log in!';
+$txt['disable_otp'] = 'Disable two factor authentication.';
 
 // Contact form
 $txt['admin_contact_form'] = 'Contact the admins';

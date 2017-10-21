@@ -7,18 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * ManageSearchEngines admin controller. This class handles all search engines
@@ -29,16 +24,11 @@ if (!defined('ELK'))
 class ManageSearchEngines_Controller extends Action_Controller
 {
 	/**
-	 * Search engines settings form
-	 * @var Settings_Form
+	 * Entry point for this section.
+	 *
+	 * @event integrate_sa_manage_search_engines add additonal search engine actions
+	 * @see Action_Controller::action_index()
 	 */
-	protected $_engineSettings;
-
-	/**
-	* Entry point for this section.
-	*
-	* @see Action_Controller::action_index()
-	*/
 	public function action_index()
 	{
 		global $context, $txt;
@@ -76,45 +66,33 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 	/**
 	 * This is the admin settings page for search engines.
+	 *
+	 * @event integrate_save_search_engine_settings
 	 */
 	public function action_engineSettings_display()
 	{
 		global $context, $txt, $scripturl;
 
 		// Initialize the form
-		$this->_initEngineSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_engineSettings->settings();
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
+		$settingsForm->setConfigVars($config_vars);
 
 		// Set up a message.
 		$context['settings_message'] = sprintf($txt['spider_settings_desc'], $scripturl . '?action=admin;area=logs;sa=pruning;' . $context['session_var'] . '=' . $context['session_id']);
 
-		require_once(SUBSDIR . '/SearchEngines.subs.php');
-		require_once(SUBSDIR . '/Membergroups.subs.php');
-
-		$groups = getBasicMembergroupData(array('globalmod', 'postgroups', 'protected', 'member'));
-		foreach ($groups as $row)
-		{
-			// Unfortunately, regular members have to be 1 because 0 is for disabled.
-			if ($row['id'] == 0)
-				$config_vars['spider_group'][2][1] = $row['name'];
-			else
-				$config_vars['spider_group'][2][$row['id']] = $row['name'];
-		}
-
 		// Make sure it's valid - note that regular members are given id_group = 1 which is reversed in Load.php - no admins here!
-		if (isset($_POST['spider_group']) && !isset($config_vars['spider_group'][2][$_POST['spider_group']]))
-			$_POST['spider_group'] = 0;
-
-		// We'll want this for our easy save.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
+		if (isset($this->_req->post->spider_group) && !isset($config_vars['spider_group'][2][$this->_req->post->spider_group]))
+			$this->_req->post->spider_group = 0;
 
 		// Setup the template.
 		$context['page_title'] = $txt['settings'];
 		$context['sub_template'] = 'show_settings';
 
 		// Are we saving them - are we??
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			// security checks
 			checkSession();
@@ -123,7 +101,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 			call_integration_hook('integrate_save_search_engine_settings');
 
 			// save the results!
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 
 			// make sure to rebuild the cache with updated results
 			recacheSpiderNames();
@@ -156,28 +135,13 @@ class ManageSearchEngines_Controller extends Action_Controller
 		addInlineJavascript($javascript_function, true);
 
 		// Prepare the settings...
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize the form with configuration settings for search engines
-	 */
-	private function _initEngineSettingsForm()
-	{
-		// This is really quite wanting.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
-		// Instantiate the form
-		$this->_engineSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_engineSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
 	 * Return configuration settings for search engines
+	 *
+	 * @event integrate_modify_search_engine_settings
 	 */
 	private function _settings()
 	{
@@ -189,6 +153,19 @@ class ManageSearchEngines_Controller extends Action_Controller
 			'spider_group' => array('select', 'spider_group', 'subtext' => $txt['spider_group_note'], array($txt['spider_group_none'])),
 			array('select', 'show_spider_online', array($txt['show_spider_online_no'], $txt['show_spider_online_summary'], $txt['show_spider_online_detail'], $txt['show_spider_online_detail_admin'])),
 		);
+
+		require_once(SUBSDIR . '/SearchEngines.subs.php');
+		require_once(SUBSDIR . '/Membergroups.subs.php');
+
+		$groups = getBasicMembergroupData(array('globalmod', 'postgroups', 'protected', 'member'));
+		foreach ($groups as $row)
+		{
+			// Unfortunately, regular members have to be 1 because 0 is for disabled.
+			if ($row['id'] == 0)
+				$config_vars['spider_group'][2][1] = $row['name'];
+			else
+				$config_vars['spider_group'][2][$row['id']] = $row['name'];
+		}
 
 		// Notify the integration that we're preparing to mess up with search engine settings...
 		call_integration_hook('integrate_modify_search_engine_settings', array(&$config_vars));
@@ -206,6 +183,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 	/**
 	 * View a list of all the spiders we know about.
+	 *
+	 * @event integrate_list_spider_list
 	 */
 	public function action_spiders()
 	{
@@ -221,25 +200,25 @@ class ManageSearchEngines_Controller extends Action_Controller
 		}
 
 		// Are we adding a new one?
-		if (!empty($_POST['addSpider']))
+		if (!empty($this->_req->post->addSpider))
 			return $this->action_editspiders();
 		// User pressed the 'remove selection button'.
-		elseif (!empty($_POST['removeSpiders']) && !empty($_POST['remove']) && is_array($_POST['remove']))
+		elseif (!empty($this->_req->post->removeSpiders) && !empty($this->_req->post->remove) && is_array($this->_req->post->remove))
 		{
 			checkSession();
 			validateToken('admin-ser');
 
 			// Make sure every entry is a proper integer.
-			$toRemove = array_map('intval', $_POST['remove']);
+			$toRemove = array_map('intval', $this->_req->post->remove);
 
 			// Delete them all!
 			removeSpiders($toRemove);
 
-			cache_put_data('spider_search', null, 300);
+			Cache::instance()->remove('spider_search');
 			recacheSpiderNames();
 		}
 
-		// Get the last seens.
+		// Get the last seen's.
 		$context['spider_last_seen'] = spidersLastSeen();
 
 		// Token for the ride
@@ -266,11 +245,11 @@ class ManageSearchEngines_Controller extends Action_Controller
 						'value' => $txt['spider_name'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $scripturl;
 
-							return sprintf(\'<a href="%1$s?action=admin;area=sengines;sa=editspiders;sid=%2$d">%3$s</a>\', $scripturl, $rowData[\'id_spider\'], htmlspecialchars($rowData[\'spider_name\'], ENT_COMPAT, \'UTF-8\'));
-						'),
+							return sprintf('<a href="%1$s?action=admin;area=sengines;sa=editspiders;sid=%2$d">%3$s</a>', $scripturl, $rowData['id_spider'], htmlspecialchars($rowData['spider_name'], ENT_COMPAT, 'UTF-8'));
+						},
 					),
 					'sort' => array(
 						'default' => 'spider_name',
@@ -282,11 +261,11 @@ class ManageSearchEngines_Controller extends Action_Controller
 						'value' => $txt['spider_last_seen'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $context, $txt;
 
-							return isset($context[\'spider_last_seen\'][$rowData[\'id_spider\']]) ? standardTime($context[\'spider_last_seen\'][$rowData[\'id_spider\']]) : $txt[\'spider_last_never\'];
-						'),
+							return isset($context['spider_last_seen'][$rowData['id_spider']]) ? standardTime($context['spider_last_seen'][$rowData['id_spider']]) : $txt['spider_last_never'];
+						},
 					),
 				),
 				'user_agent' => array(
@@ -339,14 +318,13 @@ class ManageSearchEngines_Controller extends Action_Controller
 					'class' => 'submitbutton',
 					'position' => 'bottom_of_list',
 					'value' => '
-						<input type="submit" name="removeSpiders" value="' . $txt['spiders_remove_selected'] . '" onclick="return confirm(\'' . $txt['spider_remove_selected_confirm'] . '\');" class="right_submit" />
+						<input type="submit" name="removeSpiders" value="' . $txt['spiders_remove_selected'] . '" onclick="return confirm(\'' . $txt['spider_remove_selected_confirm'] . '\');" />
 						<input type="submit" name="addSpider" value="' . $txt['spiders_add'] . '" class="right_submit" />
 					',
 				),
 			),
 		);
 
-		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
@@ -361,20 +339,20 @@ class ManageSearchEngines_Controller extends Action_Controller
 		global $context, $txt;
 
 		// Some standard stuff.
-		$context['id_spider'] = !empty($_GET['sid']) ? (int) $_GET['sid'] : 0;
+		$context['id_spider'] = $this->_req->getQuery('sid', 'intval', 0);
 		$context['page_title'] = $context['id_spider'] ? $txt['spiders_edit'] : $txt['spiders_add'];
 		$context['sub_template'] = 'spider_edit';
 		require_once(SUBSDIR . '/SearchEngines.subs.php');
 
 		// Are we saving?
-		if (!empty($_POST['save']))
+		if (!empty($this->_req->post->save))
 		{
 			checkSession();
 			validateToken('admin-ses');
 
 			// Check the IP range is valid.
 			$ips = array();
-			$ip_sets = explode(',', $_POST['spider_ip']);
+			$ip_sets = explode(',', $this->_req->post->spider_ip);
 			foreach ($ip_sets as $set)
 			{
 				$test = ip2range(trim($set));
@@ -384,12 +362,12 @@ class ManageSearchEngines_Controller extends Action_Controller
 			$ips = implode(',', $ips);
 
 			// Goes in as it is...
-			updateSpider($context['id_spider'], $_POST['spider_name'], $_POST['spider_agent'], $ips);
+			updateSpider($context['id_spider'], $this->_req->post->spider_name, $this->_req->post->spider_agent, $ips);
 
 			// Order by user agent length.
 			sortSpiderTable();
 
-			cache_put_data('spider_search', null, 300);
+			Cache::instance()->remove('spider_search');
 			recacheSpiderNames();
 
 			redirectexit('action=admin;area=sengines;sa=spiders');
@@ -412,6 +390,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 	/**
 	 * See what spiders have been up to.
+	 *
+	 * @event integrate_list_spider_logs
 	 */
 	public function action_logs()
 	{
@@ -422,15 +402,15 @@ class ManageSearchEngines_Controller extends Action_Controller
 		loadTemplate('ManageSearch');
 
 		// Did they want to delete some or all entries?
-		if ((!empty($_POST['delete_entries']) && isset($_POST['older'])) || !empty($_POST['removeAll']))
+		if ((!empty($this->_req->post->delete_entries) && isset($this->_req->post->older)) || !empty($this->_req->post->removeAll))
 		{
 			checkSession();
 			validateToken('admin-sl');
 
-			$since = isset($_POST['older']) ? (int) $_POST['older'] : 0;
+			$since = $this->_req->getPost('older', 'intval', 0);
 			$deleteTime = time() - ($since * 24 * 60 * 60);
 
-			// Delete the entires.
+			// Delete the entries.
 			require_once(SUBSDIR . '/SearchEngines.subs.php');
 			removeSpiderOldLogs($deleteTime);
 		}
@@ -468,9 +448,9 @@ class ManageSearchEngines_Controller extends Action_Controller
 						'value' => $txt['spider_time'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							return standardTime($rowData[\'log_time\']);
-						'),
+						'function' => function ($rowData) {
+							return standardTime($rowData['log_time']);
+						},
 					),
 					'sort' => array(
 						'default' => 'sl.id_hit DESC',
@@ -494,7 +474,6 @@ class ManageSearchEngines_Controller extends Action_Controller
 				array(
 					'position' => 'after_title',
 					'value' => $txt['spider_logs_info'],
-					'class' => 'windowbg2',
 				),
 				array(
 					'position' => 'below_table_data',
@@ -505,7 +484,6 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 		createToken('admin-sl');
 
-		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		// Now determine the actions of the URLs.
@@ -535,6 +513,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 	/**
 	 * Show the spider statistics.
+	 *
+	 * @event integrate_list_spider_stat_list
 	 */
 	public function action_stats()
 	{
@@ -551,14 +531,14 @@ class ManageSearchEngines_Controller extends Action_Controller
 		}
 
 		// Are we cleaning up some old stats?
-		if (!empty($_POST['delete_entries']) && isset($_POST['older']))
+		if (!empty($this->_req->post->delete_entries) && isset($this->_req->post->older))
 		{
 			checkSession();
 			validateToken('admin-ss');
 
-			$deleteTime = time() - (((int) $_POST['older']) * 24 * 60 * 60);
+			$deleteTime = time() - (((int) $this->_req->post->older) * 24 * 60 * 60);
 
-			// Delete the entires.
+			// Delete the entries.
 			removeSpiderOldStats($deleteTime);
 		}
 
@@ -568,7 +548,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 		$max_date = key($date_choices);
 
 		// What are we currently viewing?
-		$current_date = isset($_REQUEST['new_date']) && isset($date_choices[$_REQUEST['new_date']]) ? $_REQUEST['new_date'] : $max_date;
+		$current_date = isset($this->_req->post->new_date) && isset($date_choices[$this->_req->post->new_date]) ? $this->_req->post->new_date : $max_date;
 
 		// Prepare the HTML.
 		$date_select = '
@@ -590,7 +570,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 			</noscript>';
 
 		// If we manually jumped to a date work out the offset.
-		if (isset($_REQUEST['new_date']))
+		if (isset($this->_req->post->new_date))
 		{
 			$date_query = sprintf('%04d-%02d-01', substr($current_date, 0, 4), substr($current_date, 4));
 
@@ -664,7 +644,6 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 		createToken('admin-ss');
 
-		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_spider_stats';

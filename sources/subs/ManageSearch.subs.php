@@ -1,24 +1,19 @@
 <?php
 
 /**
- * Support functions for setting up the search features and creating search indexs
+ * Support functions for setting up the search features and creating search index's
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.10
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Checks if the message table already has a fulltext index created and returns the key name
@@ -32,25 +27,31 @@ function detectFulltextIndex()
 
 	$db = database();
 
+	// Something like 5.7.16
+	list($ver,) = explode('-', $db->db_server_version());
+
 	$request = $db->query('', '
 		SHOW INDEX
 		FROM {db_prefix}messages',
-		array(
-		)
+		array()
 	);
-	$context['fulltext_index'] = '';
+	$fulltext_index = array();
 	if ($request !== false || $db->num_rows($request) != 0)
 	{
 		while ($row = $db->fetch_assoc($request))
-			if ($row['Column_name'] == 'body' && (isset($row['Index_type']) && $row['Index_type'] == 'FULLTEXT' || isset($row['Comment']) && $row['Comment'] == 'FULLTEXT'))
-				$context['fulltext_index'][] = $row['Key_name'];
+		{
+			if ($row['Column_name'] === 'body' && (isset($row['Index_type']) && $row['Index_type'] === 'FULLTEXT' || isset($row['Comment']) && $row['Comment'] === 'FULLTEXT'))
+			{
+				$fulltext_index[] = $row['Key_name'];
+			}
+		}
 		$db->free_result($request);
 
-		if (is_array($context['fulltext_index']))
-			$context['fulltext_index'] = array_unique($context['fulltext_index']);
+		$fulltext_index = array_unique($fulltext_index);
 	}
 
 	if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
+	{
 		$request = $db->query('', '
 			SHOW TABLE STATUS
 			FROM {string:database_name}
@@ -60,7 +61,9 @@ function detectFulltextIndex()
 				'table_name' => str_replace('_', '\_', $match[2]) . 'messages',
 			)
 		);
+	}
 	else
+	{
 		$request = $db->query('', '
 			SHOW TABLE STATUS
 			LIKE {string:table_name}',
@@ -68,15 +71,45 @@ function detectFulltextIndex()
 				'table_name' => str_replace('_', '\_', $db_prefix) . 'messages',
 			)
 		);
+	}
 
 	if ($request !== false)
 	{
+		// InnoDB full-text search (FTS) is available in MySQL >=5.6.4
+		$innodb_capable = version_compare($ver, '5.6.4') >= 0;
+
 		while ($row = $db->fetch_assoc($request))
-			if ((isset($row['Type']) && strtolower($row['Type']) != 'myisam') || (isset($row['Engine']) && strtolower($row['Engine']) != 'myisam'))
+		{
+			$check1 = isset($row['Type']) && strtolower($row['Type']) !== 'myisam' && !$innodb_capable;
+			$check2 = isset($row['Engine']) && strtolower($row['Engine']) !== 'myisam' && !$innodb_capable;
+
+			if ($check1 || $check2)
+			{
 				$context['cannot_create_fulltext'] = true;
+			}
+		}
 
 		$db->free_result($request);
 	}
+
+	return $fulltext_index;
+}
+
+/**
+ * Attempts to determine the version of the Sphinx damon
+ */
+function SphinxVersion()
+{
+	$version = '0.0.0';
+
+	// Can we get the version that is running/installed?
+	@exec('searchd --help', $sphver);
+	if (!empty($sphver) && preg_match('~Sphinx (\d\.\d\.\d\d?)~', $sphver[0], $match))
+	{
+		$version = $match[1];
+	}
+
+	return $version;
 }
 
 /**
@@ -88,14 +121,15 @@ function createSphinxConfig()
 {
 	global $db_server, $db_name, $db_user, $db_passwd, $db_prefix, $modSettings;
 
-	// Set up to ouput a file to the users browser
+	$version = SphinxVersion();
+
+	// Set up to output a file to the users browser
 	while (ob_get_level() > 0)
 		@ob_end_clean();
 
 	header('Content-Encoding: none');
-	header('Pragma: ');
-	if (!isBrowser('is_gecko'))
-		header('Content-Transfer-Encoding: binary');
+	header('Pragma: no-cache');
+	header('Cache-Control: no-cache');
 	header('Connection: close');
 	header('Content-Disposition: attachment; filename="sphinx.conf"');
 	header('Content-Type: application/octet-stream');
@@ -105,6 +139,7 @@ function createSphinxConfig()
 		'length',
 		'first_message',
 		'sticky',
+		'likes',
 	);
 
 	$weight = array();
@@ -122,7 +157,8 @@ function createSphinxConfig()
 			'age' => 25,
 			'length' => 25,
 			'first_message' => 25,
-			'sticky' => 25,
+			'sticky' => 15,
+			'likes' => 10
 		);
 		$weight_total = 100;
 	}
@@ -139,7 +175,7 @@ function createSphinxConfig()
 # This is the minimum needed clean, simple, functional
 #
 # By default the location of this file would probably be:
-# /usr/local/etc/sphinx.conf
+# /usr/local/etc/sphinx.conf or /etc/sphinxsearch/sphinx.conf
 #
 
 source ', $prefix, '_source
@@ -151,6 +187,7 @@ source ', $prefix, '_source
 	sql_db				= ', $db_name, '
 	sql_port			= 3306
 	sql_query_pre		= SET NAMES utf8
+	# If you do not have query_cache enabled in my.cnf, then you can comment out the next line
 	sql_query_pre		= SET SESSION query_cache_type=OFF
 	sql_query_pre		= \
 		REPLACE INTO ', $db_prefix, 'settings (variable, value) \
@@ -166,8 +203,9 @@ source ', $prefix, '_source
 			m.id_msg, m.id_topic, m.id_board, IF(m.id_member = 0, 4294967295, m.id_member) AS id_member, m.poster_time, m.body, m.subject, \
 			t.num_replies + 1 AS num_replies, CEILING(1000000 * ( \
 				IF(m.id_msg < 0.7 * s.value, 0, (m.id_msg - 0.7 * s.value) / (0.3 * s.value)) * ' . $weight['age'] . ' + \
-				IF(t.num_replies < 200, t.num_replies / 200, 1) * ' . $weight['length'] . ' + \
+				IF(t.num_replies < 50, t.num_replies / 50, 1) * ' . $weight['length'] . ' + \
 				IF(m.id_msg = t.id_first_msg, 1, 0) * ' . $weight['first_message'] . ' + \
+				IF(t.num_likes < 20, t.num_likes / 20, 1) * ' . $weight['likes'] . ' + \
 				IF(t.is_sticky = 0, 0, 1) * ' . $weight['sticky'] . ' \
 			) / ' . $weight_total . ') AS relevance \
 		FROM ', $db_prefix, 'messages AS m, ', $db_prefix, 'topics AS t, ', $db_prefix, 'settings AS s \
@@ -178,13 +216,14 @@ source ', $prefix, '_source
 	sql_attr_uint		= id_board
 	sql_attr_uint		= id_member
 	sql_attr_timestamp	= poster_time
-	sql_attr_timestamp	= relevance
-	sql_attr_timestamp	= num_replies
+	sql_attr_uint		= relevance
+	sql_attr_uint		= num_replies
 }
 
 source ', $prefix, '_delta_source : ', $prefix, '_source
 {
 	sql_query_pre = SET NAMES utf8
+	# If you do not have query_cache enabled in my.cnf, then you can comment out the next line
 	sql_query_pre = SET SESSION query_cache_type=OFF
 	sql_query_range	= \
 		SELECT s1.value, s2.value \
@@ -231,8 +270,8 @@ searchd
 	query_log				= ', $modSettings['sphinx_log_path'], '/query.log
 	read_timeout			= 5
 	max_children			= 30
-	pid_file				= ', $modSettings['sphinx_data_path'], '/searchd.pid
-	max_matches				= ', (empty($modSettings['sphinx_max_results']) ? 2000 : (int) $modSettings['sphinx_max_results']), '
+	pid_file				= ', $modSettings['sphinx_data_path'], '/searchd.pid', version_compare($version, '2.2.3') < 0 ? '
+	max_matches				= ' . (empty($modSettings['sphinx_max_results']) ? 2000 : (int) $modSettings['sphinx_max_results']) : '', '
 }
 ';
 	obExit(false, false);
@@ -253,18 +292,18 @@ function alterFullTextIndex($table, $indexes, $add = false)
 	$indexes = is_array($indexes) ? $indexes : array($indexes);
 
 	// Make sure it's gone before creating it.
+	$db->skip_next_error();
 	$db->query('', '
 		ALTER TABLE ' . $table . '
 		DROP INDEX ' . implode(',
 		DROP INDEX ', $indexes),
-		array(
-			'db_error_skip' => true,
-		)
+		array()
 	);
 
 	if ($add)
 	{
 		foreach ($indexes as $index)
+		{
 			$db->query('', '
 				ALTER TABLE ' . $table . '
 				ADD FULLTEXT {raw:name} ({raw:name})',
@@ -272,6 +311,7 @@ function alterFullTextIndex($table, $indexes, $add = false)
 					'name' => $index
 				)
 			);
+		}
 	}
 }
 
@@ -300,7 +340,7 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 		$db_search->create_word_search($column_size_definition);
 
 		// Temporarily switch back to not using a search index.
-		if (!empty($modSettings['search_index']) && $modSettings['search_index'] == 'custom')
+		if (!empty($modSettings['search_index']) && $modSettings['search_index'] === 'custom')
 			updateSettings(array('search_index' => ''));
 
 		// Don't let simultaneous processes be updating the search index.
@@ -462,18 +502,7 @@ function removeCommonWordsFromIndex($start, $column_definition)
  */
 function drop_log_search_words()
 {
-	global $db_prefix;
+	$db_table = db_table();
 
-	$db = database();
-	$db_search = db_search();
-
-	$tables = $db->db_list_tables(false, $db_prefix . 'log_search_words');
-	if (!empty($tables))
-	{
-		$db_search->search_query('drop_words_table', '
-			DROP TABLE {db_prefix}log_search_words',
-			array(
-			)
-		);
-	}
+	$db_table->db_drop_table('{db_prefix}log_search_words');
 }

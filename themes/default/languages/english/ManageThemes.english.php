@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; ManageThemes
+// Version: 1.1; ManageThemes
 
 $txt['themeadmin_explain'] = 'Themes create the different look and feel of your forum. The Global Theme Settings section permits any site administrator to select a theme for the site default theme. Admins can also enable members to select any installed theme for their use and to enable selectable themes. The Install a New Theme section is how the site administration installs a theme.';
 $txt['themeadmin_manage'] = 'Manage and Install';
@@ -80,6 +80,7 @@ $txt['enable_news_random_name'] = 'Random:';
 $txt['enable_news_random_desc'] = 'One news shown chosen at random.';
 $txt['enable_news_fader_name'] = 'Fader:';
 $txt['enable_news_fader_desc'] = 'All the news are displayed sequentially.';
+
 $txt['show_group_key'] = 'Show group key on board index.';
 $txt['additional_options_collapsible'] = 'Enable collapsible additional post options.';
 $txt['who_display_viewing'] = 'Show who is viewing the board index and posts:';
@@ -90,16 +91,18 @@ $txt['show_stats_index'] = 'Show statistics on board index.';
 $txt['latest_members'] = 'Show latest member on board index.';
 $txt['last_modification'] = 'Show last modification date on modified posts.';
 $txt['user_avatars'] = 'Show user avatars in message view.';
-$txt['user_text'] = 'Show personal text in message view.';
-$txt['gender_images'] = 'Show gender images in message view.';
 $txt['member_list_bar'] = 'Show members list bar on board index';
 $txt['current_pos_text_img'] = 'Show current position in forum as link instead of text.';
 $txt['show_view_profile_button'] = 'Show view profile button under post.';
 $txt['enable_mark_as_read'] = 'Enable and show \'Mark as Read\' buttons.';
 $txt['header_logo_url'] = 'Logo image URL:';
 $txt['header_logo_url_desc'] = '(Leave blank to show forum name or default logo.)';
-$txt['number_recent_posts'] = 'Number of recent posts to display on board index:';
-$txt['number_recent_posts_desc'] = '(To disable the recent posts bar set this value to zero.)';
+
+$txt['recent_post_topics'] = 'Show recent posts or recent topics on board index.';
+$txt['show_recent_topics'] = 'Show recent topics';
+$txt['show_recent_posts'] = 'Show recent posts';
+$txt['number_recent_posts'] = 'Number of recent posts or topics to display on board index:';
+$txt['number_recent_posts_desc'] = '(To disable the recent posts/topics bar set this value to zero.)';
 $txt['hide_post_group'] = 'Hide post group titles for grouped members.';
 $txt['hide_post_group_desc'] = '(Enabling this will not display a member\'s post group title on the message view if they are assigned to a non-post based group.)';
 
@@ -150,8 +153,6 @@ $txt['themeadmin_edit_no_copy'] = '<em>(can\'t copy)</em>';
 $txt['themeadmin_edit_filename'] = 'Filename';
 $txt['themeadmin_edit_modified'] = 'Last Modified';
 $txt['themeadmin_edit_size'] = 'Size';
-$txt['themeadmin_edit_bytes'] = 'B';
-$txt['themeadmin_edit_kilobytes'] = 'KiB';
 $txt['themeadmin_edit_error'] = 'The file you tried to save generated the following error:';
 $txt['themeadmin_edit_on_line'] = 'Beginning on line:';
 $txt['themeadmin_edit_preview'] = 'Preview';

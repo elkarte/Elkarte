@@ -1,20 +1,20 @@
-/**
+/*!
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.6
- *
+ * @version 1.1
+ */
+
+/**
  * This file contains javascript associated with the current theme
  */
 
-$(document).ready(function() {
+$(function() {
 	// Menu drop downs
 	if (use_click_menu)
 		$('#main_menu, ul.admin_menu, ul.sidebar_menu, ul.poster, ul.quickbuttons, #sort_by').superclick({speed: 150, animation: {opacity:'show', height:'toggle'}, speedOut: 0, activeClass: 'sfhover'});
@@ -22,18 +22,18 @@ $(document).ready(function() {
 		$('#main_menu, ul.admin_menu, ul.sidebar_menu, ul.poster, ul.quickbuttons, #sort_by').superfish({delay : 300, speed: 175, hoverClass: 'sfhover'});
 
 	// Smooth scroll to top.
-	$("a[href=#top]").on("click", function(e) {
+	$("a[href='#top']").on("click", function(e) {
 		e.preventDefault();
 		$("html,body").animate({scrollTop: 0}, 1200);
 	});
 
 	// Smooth scroll to bottom.
-	$("a[href=#bot]").on("click", function(e) {
+	$("a[href='#bot']").on("click", function(e) {
 		e.preventDefault();
 
 		// Don't scroll all the way down to the footer, just the content bottom
 		var link = $('#bot'),
-		link_y = link.height();
+			link_y = link.height();
 
 		$("html,body").animate({scrollTop:link.offset().top + link_y - $(window).height()}, 1200);
 	});
@@ -52,12 +52,13 @@ $(document).ready(function() {
 	// Enable the ... page expansion
 	$('.expand_pages').expand_pages();
 
-	// Collapsabile fieldsets, pure candy
-	$(document).on('click', 'legend', function(){
+	// Collapsible fieldsets, pure candy
+	$(document).on('click', 'legend', function() {
 		$(this).siblings().slideToggle("fast");
 		$(this).parent().toggleClass("collapsed");
 	});
-	$(document).on('ready', 'legend', function () {
+
+	$('legend', function () {
 		if ($(this).data('collapsed'))
 			$(this).click();
 	});
@@ -65,6 +66,13 @@ $(document).ready(function() {
 	// Spoiler
 	$('.spoilerheader').click(function() {
 		$(this).next().children().slideToggle("fast");
+	});
+
+	// Attachment thumbnail expand on click, you can turn off this namespaced click
+	// event with $('[data-lightboximage]').off('click.elk_lb');
+	$('[data-lightboximage]').on('click.elk_lb', function(e) {
+		e.preventDefault();
+		expandThumbLB($(this).data('lightboximage'), $(this).data('lightboxmessage'));
 	});
 
 	// BBC [img] element toggle for height and width styles of an image.
@@ -81,21 +89,21 @@ $(document).ready(function() {
 			var $this = $(this);
 
 			// No saved data, then lets set it to auto
-			if ($.isEmptyObject($this.data()))
+			if ($.isEmptyObject($this.data('bbc_img')))
 			{
-				$this.data("bbc_img", {
-						width: $this.css('width'),
-						height: $this.css('height'),
-						'max-width': $this.css('max-width'),
-						'max-height': $this.css('max-height'),
+				$this.data('bbc_img', {
+					width: $this.css('width'),
+					height: $this.css('height'),
+					'max-width': $this.css('max-width'),
+					'max-height': $this.css('max-height')
 				});
 				$this.css({'width': $this.css('width') === 'auto' ? null : 'auto'});
 				$this.css({'height': $this.css('height') === 'auto' ? null : 'auto'});
 
-				// Overide default css to allow the image to expand fully, add a div to exand in
-				$this.css({'max-width': 'none'});
+				// Override default css to allow the image to expand fully, add a div to expand in
 				$this.css({'max-height': 'none'});
-				$this.wrap('<div style="overflow: auto"></div>');
+				$this.css({'max-width': '100%'});
+				$this.wrap('<div style="overflow:auto;display:inline-block;"></div>');
 			}
 			else
 			{
@@ -106,15 +114,15 @@ $(document).ready(function() {
 				$this.css({'max-height': $this.data("bbc_img")['max-height']});
 
 				// Remove the data
-				$this.removeData();
+				$this.removeData('bbc_img');
 
 				// Remove the div we added to allow the image to overflow expand in
 				$this.unwrap();
 				$this.css({'max-width': '100%'});
-
 			}
 		});
 	});
+
 	$('.hamburger_30').click(function(e) {
 		e.preventDefault();
 		var id = $(this).data('id');

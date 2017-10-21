@@ -2,30 +2,25 @@
 
 /**
  * Handles sound processing. In order to make sure the visual
- * verification is still accessible for all users, a sound clip is being addded
+ * verification is still accessible for all users, a sound clip is being added
  * that reads the letters that are being shown.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Creates a wave file that spells the letters of $word.
  * Tries the user's language first, and defaults to english.
- * Used by action_verificationcode() (Register.controller.php).
+ * Used by action=register;sa=verificationcode() (Register.controller.php).
  *
  * @param string $word
  */
@@ -33,14 +28,15 @@ function createWaveFile($word)
 {
 	global $settings, $user_info;
 
-	// Allow max 2 requests per 20 seconds.
-	if (($ip = cache_get_data('wave_file/' . $user_info['ip'], 20)) > 2 || ($ip2 = cache_get_data('wave_file/' . $user_info['ip2'], 20)) > 2)
-		die(header('HTTP/1.1 400 Bad Request'));
-	cache_put_data('wave_file/' . $user_info['ip'], $ip ? $ip + 1 : 1, 20);
-	cache_put_data('wave_file/' . $user_info['ip2'], $ip2 ? $ip2 + 1 : 1, 20);
+	$cache = Cache::instance();
 
-	// Fixate randomization for this word.
-	// @todo not sure this works as expected in 5.2+
+	// Allow max 2 requests per 20 seconds.
+	if (($ip = $cache->get('wave_file/' . $user_info['ip'], 20)) > 2 || ($ip2 = $cache->get('wave_file/' . $user_info['ip2'], 20)) > 2)
+		die(header('HTTP/1.1 400 Bad Request'));
+
+	$cache->put('wave_file/' . $user_info['ip'], $ip ? $ip + 1 : 1, 20);
+	$cache->put('wave_file/' . $user_info['ip2'], $ip2 ? $ip2 + 1 : 1, 20);
+
 	$unpacked = unpack('n', md5($word . session_id()));
 	mt_srand(end($unpacked));
 
@@ -71,8 +67,8 @@ function createWaveFile($word)
 		{
 			case 0:
 				for ($j = 0, $n = strlen($sound_letter); $j < $n; $j++)
-					for ($k = 0, $m = round(mt_rand(15, 25) / 10); $k < $m; $k++)
-						$sound_word .= $word[$i] === 's' ? $sound_letter[$j] : chr(mt_rand(max(ord($sound_letter[$j]) - 1, 0x00), min(ord($sound_letter[$j]) + 1, 0xFF)));
+				for ($k = 0, $m = round(mt_rand(15, 25) / 10); $k < $m; $k++)
+					$sound_word .= $word[$i] === 's' ? $sound_letter[$j] : chr(mt_rand(max(ord($sound_letter[$j]) - 1, 0x00), min(ord($sound_letter[$j]) + 1, 0xFF)));
 			break;
 
 			case 1:
@@ -125,10 +121,56 @@ function createWaveFile($word)
 	header('Content-Type: audio/x-wav');
 	header('Cache-Control: no-cache');
 	header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT');
-	header('Content-Length: ' . strlen($wav));
+	header('Accept-Ranges: bytes');
 
 	// Output the wav.
-	echo $wav;
+	$range = set_range(strlen($wav));
+	$length = $range[1] - $range[0] + 1;
+	$stub = substr($wav, $range[0], $length);
+	header('Content-Length: ' . strlen($stub));
+	echo $stub;
 
 	return true;
+}
+
+/**
+ * Determines the range (file substr) to return in response to a media range request
+ *
+ * - Sets the substr range if the HTTP_RANGE header is found
+ * - Returns 206 Partial Content along with Content-Range header of the chosen range
+ * - Supports single range request only
+ *
+ * @param int $file_size
+ * @return array
+ */
+function set_range($file_size)
+{
+	$range = array(0, $file_size - 1);
+
+	// A range seek request (iOS, Android Chrome, etc)
+	if (isset($_SERVER['HTTP_RANGE']))
+	{
+		preg_match('~bytes=(\d+)?-(\d+)?~', $_SERVER['HTTP_RANGE'], $matches);
+
+		// range 0-1 or range 0-123456 style
+		if ($matches[1] !== '' && !empty($matches[2]))
+		{
+			$range = array(intval($matches[1]), intval($matches[2]));
+		}
+		// range x- Last bytes of the file starting from byte x
+		elseif ($matches[1] !== '' && empty($matches[2]))
+		{
+			$range = array(intval($matches[1]), $file_size - 1);
+		}
+		// range -y Last y bytes of the file
+		elseif (empty($matches[1]) && !empty($matches[2]))
+		{
+			$range = array($file_size - intval($matches[2]), $file_size - 1);
+		}
+
+		header('HTTP/1.1 206 Partial Content');
+		header('Content-Range: bytes ' . $range[0] . '-' . $range[1] . '/' . $file_size);
+	}
+
+	return $range;
 }

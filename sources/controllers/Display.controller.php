@@ -7,25 +7,52 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.10
+ * @version 1.1
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
+ * Display_Controller class.
  * This controller is the most important and probably most accessed of all.
  * It controls topic display, with all related.
  */
-class Display_Controller
+class Display_Controller extends Action_Controller
 {
+	/**
+	 * The template layers object
+	 * @var null|object
+	 */
+	protected $_template_layers = null;
+
+	/**
+	 * The message id when in the form msg123
+	 * @var int
+	 */
+	protected $_virtual_msg = 0;
+
+	/**
+	 * The class that takes care of rendering the message icons (MessageTopicIcons)
+	 * @var null|MessageTopicIcons
+	 */
+	protected $_icon_sources = null;
+
+	/**
+	 * Show signatures?
+	 *
+	 * @var int
+	 */
+	protected $_show_signatures = 0;
+
+	/**
+	 * Start viewing the topics from ... (page, all, other)
+	 * @var int|string
+	 */
+	private $_start;
+
 	/**
 	 * Default action handler for this controller
 	 */
@@ -36,15 +63,38 @@ class Display_Controller
 	}
 
 	/**
+	 * If we are in a topic and don't have permission to approve it then duck out now.
+	 * This is an abuse of the method, but it's easier that way.
+	 *
+	 * @param string $action the function name of the current action
+	 *
+	 * @return bool
+	 * @throws Elk_Exception not_a_topic
+	 */
+	public function trackStats($action = '')
+	{
+		global $user_info, $topic, $board_info;
+
+		if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($user_info['id'] != $board_info['cur_topic_starter'] || $user_info['is_guest']))
+		{
+			throw new Elk_Exception('not_a_topic', false);
+		}
+
+		return parent::trackStats($action);
+	}
+
+	/**
 	 * The central part of the board - topic display.
 	 *
 	 * What it does:
+	 *
 	 * - This function loads the posts in a topic up so they can be displayed.
-	 * - It uses the main sub template of the Display template.
 	 * - It requires a topic, and can go to the previous or next topic from it.
 	 * - It jumps to the correct post depending on a number/time/IS_MSG passed.
 	 * - It depends on the messages_per_page, defaultMaxMessages and enableAllMessages settings.
 	 * - It is accessed by ?topic=id_topic.START.
+	 *
+	 * @uses the main sub template of the Display template.
 	 */
 	public function action_display()
 	{
@@ -52,9 +102,11 @@ class Display_Controller
 		global $options, $user_info, $board_info, $topic, $board;
 		global $attachments, $messages_request;
 
+		$this->_events->trigger('pre_load', array('_REQUEST' => &$_REQUEST, 'topic' => $topic, 'board' => &$board));
+
 		// What are you gonna display if these are empty?!
 		if (empty($topic))
-			fatal_lang_error('no_board', false);
+			throw new Elk_Exception('no_board', false);
 
 		// Load the template
 		loadTemplate('Display');
@@ -65,45 +117,42 @@ class Display_Controller
 		require_once(SUBSDIR . '/Messages.subs.php');
 
 		// Not only does a prefetch make things slower for the server, but it makes it impossible to know if they read it.
-		if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
-		{
-			@ob_end_clean();
-			header('HTTP/1.1 403 Prefetch Forbidden');
-			die;
-		}
+		stop_prefetching();
 
 		// How much are we sticking on each page?
 		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
-		$template_layers = Template_Layers::getInstance();
-		$template_layers->addEnd('messages_informations');
+		$this->_template_layers = Template_Layers::instance();
+		$this->_template_layers->addEnd('messages_informations');
 		$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
 
 		// Let's do some work on what to search index.
-		if (count($_GET) > 2)
+		if (count((array) $this->_req->query) > 2)
 		{
-			foreach ($_GET as $k => $v)
+			foreach ($this->_req->query as $k => $v)
 			{
 				if (!in_array($k, array('topic', 'board', 'start', session_name())))
 					$context['robot_no_index'] = true;
 			}
 		}
 
-		if (!empty($_REQUEST['start']) && (!is_numeric($_REQUEST['start']) || $_REQUEST['start'] % $context['messages_per_page'] != 0))
+		$this->_start = $this->_req->getQuery('start');
+		if (!empty($this->_start) && (!is_numeric($this->_start) || $this->_start % $context['messages_per_page'] !== 0))
 			$context['robot_no_index'] = true;
 
 		// Find the previous or next topic.  Make a fuss if there are no more.
-		if (isset($_REQUEST['prev_next']) && ($_REQUEST['prev_next'] == 'prev' || $_REQUEST['prev_next'] == 'next'))
+		if ($this->_req->getQuery('prev_next') === 'prev' || $this->_req->getQuery('prev_next') === 'next')
 		{
 			// No use in calculating the next topic if there's only one.
 			if ($board_info['num_topics'] > 1)
 			{
-				$includeStickies = !empty($modSettings['enableStickyTopics']);
-				$topic = $_REQUEST['prev_next'] === 'prev' ? previousTopic($topic, $board, $user_info['id'], $includeUnapproved, $includeStickies) : nextTopic($topic, $board, $user_info['id'], $includeUnapproved, $includeStickies);
+				$topic = $this->_req->query->prev_next === 'prev'
+					? previousTopic($topic, $board, $user_info['id'], $includeUnapproved)
+					: nextTopic($topic, $board, $user_info['id'], $includeUnapproved);
 				$context['current_topic'] = $topic;
 			}
 
 			// Go to the newest message on this topic.
-			$_REQUEST['start'] = 'new';
+			$this->_start = 'new';
 		}
 
 		// Add 1 to the number of views of this topic (except for robots).
@@ -127,10 +176,10 @@ class Display_Controller
 		// Load the topic details
 		$topicinfo = getTopicInfo($topic_parameters, 'all', $topic_selects, $topic_tables);
 		if (empty($topicinfo))
-			fatal_lang_error('not_a_topic', false);
+			throw new Elk_Exception('not_a_topic', false);
 
 		// Is this a moved topic that we are redirecting to?
-		if (!empty($topicinfo['id_redirect_topic']) && !isset($_GET['noredir']))
+		if (!empty($topicinfo['id_redirect_topic']) && !isset($this->_req->query->noredir))
 		{
 			markTopicsRead(array($user_info['id'], $topic, $topicinfo['id_last_msg'], 0), $topicinfo['new_from'] !== 0);
 			redirectexit('topic=' . $topicinfo['id_redirect_topic'] . '.0;redirfrom=' . $topicinfo['id_topic']);
@@ -140,38 +189,38 @@ class Display_Controller
 		$context['topic_first_message'] = $topicinfo['id_first_msg'];
 		$context['topic_last_message'] = $topicinfo['id_last_msg'];
 		$context['topic_unwatched'] = isset($topicinfo['unwatched']) ? $topicinfo['unwatched'] : 0;
-		if (isset($_GET['redirfrom']))
+		if (isset($this->_req->query->redirfrom))
 		{
-			$redir_topics = topicsList(array((int) $_GET['redirfrom']));
-			if (!empty($redir_topics[(int) $_GET['redirfrom']]))
+			$redirfrom = $this->_req->getQuery('redirfrom', 'intval');
+			$redir_topics = topicsList(array($redirfrom));
+			if (!empty($redir_topics[$redirfrom]))
 			{
-				$context['topic_redirected_from'] = $redir_topics[(int) $_GET['redirfrom']];
+				$context['topic_redirected_from'] = $redir_topics[$redirfrom];
 				$context['topic_redirected_from']['redir_href'] = $scripturl . '?topic=' . $context['topic_redirected_from']['id_topic'] . '.0;noredir';
 			}
 		}
 
+		// Did this user start the topic or not?
+		$context['user']['started'] = $user_info['id'] == $topicinfo['id_member_started'] && !$user_info['is_guest'];
+		$context['topic_starter_id'] = $topicinfo['id_member_started'];
+
+		$this->_events->trigger('topicinfo', array('topicinfo' => &$topicinfo, 'includeUnapproved' => $includeUnapproved));
+
 		// Add up unapproved replies to get real number of replies...
 		if ($modSettings['postmod_active'] && allowedTo('approve_posts'))
 			$context['real_num_replies'] += $topicinfo['unapproved_posts'] - ($topicinfo['approved'] ? 0 : 1);
-
-		// If this topic was derived from another, set the followup details
-		if (!empty($topicinfo['derived_from']))
-		{
-			require_once(SUBSDIR . '/FollowUps.subs.php');
-			$context['topic_derived_from'] = topicStartedHere($topic, $includeUnapproved);
-		}
 
 		// If this topic has unapproved posts, we need to work out how many posts the user can see, for page indexing.
 		if (!$includeUnapproved && $topicinfo['unapproved_posts'] && !$user_info['is_guest'])
 		{
 			$myUnapprovedPosts = unapprovedPosts($topic, $user_info['id']);
 
-			$context['total_visible_posts'] = $context['num_replies'] + $myUnapprovedPosts + ($topicinfo['approved'] ? 1 : 0);
+			$total_visible_posts = $context['num_replies'] + $myUnapprovedPosts + ($topicinfo['approved'] ? 1 : 0);
 		}
 		elseif ($user_info['is_guest'])
-			$context['total_visible_posts'] = $context['num_replies'] + ($topicinfo['approved'] ? 1 : 0);
+			$total_visible_posts = $context['num_replies'] + ($topicinfo['approved'] ? 1 : 0);
 		else
-			$context['total_visible_posts'] = $context['num_replies'] + $topicinfo['unapproved_posts'] + ($topicinfo['approved'] ? 1 : 0);
+			$total_visible_posts = $context['num_replies'] + $topicinfo['unapproved_posts'] + ($topicinfo['approved'] ? 1 : 0);
 
 		// When was the last time this topic was replied to?  Should we warn them about it?
 		if (!empty($modSettings['oldTopicDays']))
@@ -183,67 +232,54 @@ class Display_Controller
 			$context['oldTopicError'] = false;
 
 		// The start isn't a number; it's information about what to do, where to go.
-		if (!is_numeric($_REQUEST['start']))
+		if (!is_numeric($this->_start))
 		{
 			// Redirect to the page and post with new messages, originally by Omar Bazavilvazo.
-			if ($_REQUEST['start'] == 'new')
+			if ($this->_start === 'new')
 			{
 				// Guests automatically go to the last post.
 				if ($user_info['is_guest'])
 				{
-					$context['start_from'] = $context['total_visible_posts'] - 1;
-					$_REQUEST['start'] = $context['start_from'];
+					$context['start_from'] = $total_visible_posts - 1;
+					$this->_start = $context['start_from'];
 				}
 				else
 				{
 					// Fall through to the next if statement.
-					$_REQUEST['start'] = 'msg' . $topicinfo['new_from'];
+					$this->_start = 'msg' . $topicinfo['new_from'];
 				}
 			}
 
 			// Start from a certain time index, not a message.
-			if (substr($_REQUEST['start'], 0, 4) == 'from')
+			if (substr($this->_start, 0, 4) === 'from')
 			{
-				$timestamp = (int) substr($_REQUEST['start'], 4);
+				$timestamp = (int) substr($this->_start, 4);
 				if ($timestamp === 0)
-					$_REQUEST['start'] = 0;
+					$this->_start = 0;
 				else
 				{
 					// Find the number of messages posted before said time...
 					$context['start_from'] = countNewPosts($topic, $topicinfo, $timestamp);
-					$_REQUEST['start'] = $context['start_from'];
+					$this->_start = $context['start_from'];
 				}
 			}
 			// Link to a message...
-			elseif (substr($_REQUEST['start'], 0, 3) == 'msg')
+			elseif (substr($this->_start, 0, 3) === 'msg')
 			{
-				$virtual_msg = (int) substr($_REQUEST['start'], 3);
-				if (!$topicinfo['unapproved_posts'] && $virtual_msg >= $topicinfo['id_last_msg'])
-					$context['start_from'] = $context['total_visible_posts'] - 1;
-				elseif (!$topicinfo['unapproved_posts'] && $virtual_msg <= $topicinfo['id_first_msg'])
+				$this->_virtual_msg = (int) substr($this->_start, 3);
+				if (!$topicinfo['unapproved_posts'] && $this->_virtual_msg >= $topicinfo['id_last_msg'])
+					$context['start_from'] = $total_visible_posts - 1;
+				elseif (!$topicinfo['unapproved_posts'] && $this->_virtual_msg <= $topicinfo['id_first_msg'])
 					$context['start_from'] = 0;
 				else
 				{
 					$only_approved = $modSettings['postmod_active'] && $topicinfo['unapproved_posts'] && !allowedTo('approve_posts');
-					$context['start_from'] = countMessagesBefore($topic, $virtual_msg, false, $only_approved, !$user_info['is_guest']);
+					$context['start_from'] = countMessagesBefore($topic, $this->_virtual_msg, false, $only_approved, !$user_info['is_guest']);
 				}
 
 				// We need to reverse the start as well in this case.
-				$_REQUEST['start'] = $context['start_from'];
+				$this->_start = $context['start_from'];
 			}
-		}
-
-		// Mark the mention as read if requested
-		if (isset($_REQUEST['mentionread']) && !empty($virtual_msg))
-		{
-			require_once(CONTROLLERDIR . '/Mentions.controller.php');
-
-			$mentions = new Mentions_Controller();
-			$mentions->setData(array(
-				'id_mention' => $_REQUEST['item'],
-				'mark' => $_REQUEST['mark'],
-			));
-			$mentions->action_markread();
 		}
 
 		// Create a previous next string if the selected theme has it as a selected option.
@@ -253,37 +289,18 @@ class Display_Controller
 				'go_next' => $scripturl . '?topic=' . $topic . '.0;prev_next=next#new'
 			);
 
-		// Derived from, set the link back
-		if (!empty($context['topic_derived_from']))
-			$context['links']['derived_from'] = $scripturl . '?msg=' . $context['topic_derived_from']['derived_from'];
-
 		// Check if spellchecking is both enabled and actually working. (for quick reply.)
 		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
 		if ($context['show_spellchecking'])
 			loadJavascriptFile('spellcheck.js', array('defer' => true));
-
-		// Do we need to show the visual verification image?
-		$context['require_verification'] = !$user_info['is_moderator'] && !$user_info['is_admin'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1));
-		if ($context['require_verification'])
-		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-			$verificationOptions = array(
-				'id' => 'post',
-			);
-			$context['require_verification'] = create_control_verification($verificationOptions);
-			$context['visual_verification_id'] = $verificationOptions['id'];
-		}
 
 		// Are we showing signatures - or disabled fields?
 		$context['signature_enabled'] = substr($modSettings['signature_settings'], 0, 1) == 1;
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
 
 		// Censor the title...
-		censorText($topicinfo['subject']);
+		$topicinfo['subject'] = censor($topicinfo['subject']);
 		$context['page_title'] = $topicinfo['subject'];
-
-		// Is this topic sticky, or can it even be?
-		$topicinfo['is_sticky'] = empty($modSettings['enableStickyTopics']) ? '0' : $topicinfo['is_sticky'];
 
 		// Allow addons access to the topicinfo array
 		call_integration_hook('integrate_display_topic', array($topicinfo));
@@ -292,9 +309,9 @@ class Display_Controller
 		$context['is_marked_notify'] = false;
 
 		// Did we report a post to a moderator just now?
-		$context['report_sent'] = isset($_GET['reportsent']);
+		$context['report_sent'] = isset($this->_req->query->reportsent);
 		if ($context['report_sent'])
-			$template_layers->add('report_sent');
+			$this->_template_layers->add('report_sent');
 
 		// Let's get nosey, who is viewing this topic?
 		if (!empty($settings['display_who_viewing']))
@@ -304,37 +321,38 @@ class Display_Controller
 		}
 
 		// If all is set, but not allowed... just unset it.
-		$can_show_all = !empty($modSettings['enableAllMessages']) && $context['total_visible_posts'] > $context['messages_per_page'] && $context['total_visible_posts'] < $modSettings['enableAllMessages'];
-		if (isset($_REQUEST['all']) && !$can_show_all)
-			unset($_REQUEST['all']);
+		$can_show_all = !empty($modSettings['enableAllMessages']) && $total_visible_posts > $context['messages_per_page'] && $total_visible_posts < $modSettings['enableAllMessages'];
+		if (isset($this->_req->query->all) && !$can_show_all)
+			unset($this->_req->query->all);
 		// Otherwise, it must be allowed... so pretend start was -1.
-		elseif (isset($_REQUEST['all']))
-			$_REQUEST['start'] = -1;
+		elseif (isset($this->_req->query->all))
+			$this->_start = -1;
 
 		// Construct the page index, allowing for the .START method...
-		$context['page_index'] = constructPageIndex($scripturl . '?topic=' . $topic . '.%1$d', $_REQUEST['start'], $context['total_visible_posts'], $context['messages_per_page'], true, array('all' => $can_show_all, 'all_selected' => isset($_REQUEST['all'])));
-		$context['start'] = $_REQUEST['start'];
+		$context['page_index'] = constructPageIndex($scripturl . '?topic=' . $topic . '.%1$d', $this->_start, $total_visible_posts, $context['messages_per_page'], true, array('all' => $can_show_all, 'all_selected' => isset($this->_req->query->all)));
+		$context['start'] = $this->_start;
 
-		// This is information about which page is current, and which page we're on - in case you don't like the constructed page index. (again, wireles..)
+		// This is information about which page is current, and which page we're on - in case you don't like
+		// the constructed page index. (again, wireless..)
 		$context['page_info'] = array(
-			'current_page' => $_REQUEST['start'] / $context['messages_per_page'] + 1,
-			'num_pages' => floor(($context['total_visible_posts'] - 1) / $context['messages_per_page']) + 1,
+			'current_page' => $this->_start / $context['messages_per_page'] + 1,
+			'num_pages' => floor(($total_visible_posts - 1) / $context['messages_per_page']) + 1,
 		);
 
 		// Figure out all the link to the next/prev
 		$context['links'] += array(
-			'prev' => $_REQUEST['start'] >= $context['messages_per_page'] ? $scripturl . '?topic=' . $topic . '.' . ($_REQUEST['start'] - $context['messages_per_page']) : '',
-			'next' => $_REQUEST['start'] + $context['messages_per_page'] < $context['total_visible_posts'] ? $scripturl . '?topic=' . $topic. '.' . ($_REQUEST['start'] + $context['messages_per_page']) : '',
+			'prev' => $this->_start >= $context['messages_per_page'] ? $scripturl . '?topic=' . $topic . '.' . ($this->_start - $context['messages_per_page']) : '',
+			'next' => $this->_start + $context['messages_per_page'] < $total_visible_posts ? $scripturl . '?topic=' . $topic . '.' . ($this->_start + $context['messages_per_page']) : '',
 		);
 
 		// If they are viewing all the posts, show all the posts, otherwise limit the number.
-		if ($can_show_all && isset($_REQUEST['all']))
+		if ($can_show_all && isset($this->_req->query->all))
 		{
 			// No limit! (actually, there is a limit, but...)
 			$context['messages_per_page'] = -1;
 
 			// Set start back to 0...
-			$_REQUEST['start'] = 0;
+			$this->_start = 0;
 		}
 
 		// Build the link tree.
@@ -353,18 +371,14 @@ class Display_Controller
 		$context['is_very_hot'] = $topicinfo['num_replies'] >= $modSettings['hotTopicVeryPosts'];
 		$context['is_hot'] = $topicinfo['num_replies'] >= $modSettings['hotTopicPosts'];
 		$context['is_approved'] = $topicinfo['approved'];
-		$context['is_poll'] = $topicinfo['id_poll'] > 0 && !empty($modSettings['pollMode']) && allowedTo('poll_view');
-		determineTopicClass($context);
 
-		// Did this user start the topic or not?
-		$context['user']['started'] = $user_info['id'] == $topicinfo['id_member_started'] && !$user_info['is_guest'];
-		$context['topic_starter_id'] = $topicinfo['id_member_started'];
+		determineTopicClass($context);
 
 		// Set the topic's information for the template.
 		$context['subject'] = $topicinfo['subject'];
 		$context['num_views'] = $topicinfo['num_views'];
 		$context['num_views_text'] = $context['num_views'] == 1 ? $txt['read_one_time'] : sprintf($txt['read_many_times'], $context['num_views']);
-		$context['mark_unread_time'] = !empty($virtual_msg) ? $virtual_msg : $topicinfo['new_from'];
+		$context['mark_unread_time'] = !empty($this->_virtual_msg) ? $this->_virtual_msg : $topicinfo['new_from'];
 
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = $scripturl . '?topic=' . $topic . '.' . $context['start'];
@@ -372,84 +386,16 @@ class Display_Controller
 		// For quick reply we need a response prefix in the default forum language.
 		$context['response_prefix'] = response_prefix();
 
-		// If we want to show event information in the topic, prepare the data.
-		if (allowedTo('calendar_view') && !empty($modSettings['cal_showInTopic']) && !empty($modSettings['cal_enabled']))
-		{
-			// We need events details and all that jazz
-			require_once(SUBSDIR . '/Calendar.subs.php');
-
-			// First, try create a better time format, ignoring the "time" elements.
-			if (preg_match('~%[AaBbCcDdeGghjmuYy](?:[^%]*%[AaBbCcDdeGghjmuYy])*~', $user_info['time_format'], $matches) == 0 || empty($matches[0]))
-				$date_string = $user_info['time_format'];
-			else
-				$date_string = $matches[0];
-
-			// Get event information for this topic.
-			$events = eventInfoForTopic($topic);
-
-			$context['linked_calendar_events'] = array();
-			foreach ($events as $event)
-			{
-				// Prepare the dates for being formatted.
-				$start_date = sscanf($event['start_date'], '%04d-%02d-%02d');
-				$start_date = mktime(12, 0, 0, $start_date[1], $start_date[2], $start_date[0]);
-				$end_date = sscanf($event['end_date'], '%04d-%02d-%02d');
-				$end_date = mktime(12, 0, 0, $end_date[1], $end_date[2], $end_date[0]);
-
-				$context['linked_calendar_events'][] = array(
-					'id' => $event['id_event'],
-					'title' => $event['title'],
-					'can_edit' => allowedTo('calendar_edit_any') || ($event['id_member'] == $user_info['id'] && allowedTo('calendar_edit_own')),
-					'modify_href' => $scripturl . '?action=post;msg=' . $topicinfo['id_first_msg'] . ';topic=' . $topic . '.0;calendar;eventid=' . $event['id_event'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-					'can_export' => allowedTo('calendar_edit_any') || ($event['id_member'] == $user_info['id'] && allowedTo('calendar_edit_own')),
-					'export_href' => $scripturl . '?action=calendar;sa=ical;eventid=' . $event['id_event'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-				'start_date' => standardTime($start_date, $date_string, 'none'),
-					'start_timestamp' => $start_date,
-				'end_date' => standardTime($end_date, $date_string, 'none'),
-					'end_timestamp' => $end_date,
-					'is_last' => false
-				);
-			}
-
-			if (!empty($context['linked_calendar_events']))
-			{
-				$context['linked_calendar_events'][count($context['linked_calendar_events']) - 1]['is_last'] = true;
-				$template_layers->add('display_calendar');
-			}
-		}
-
-		// Create the poll info if it exists.
-		if ($context['is_poll'])
-		{
-			$template_layers->add('display_poll');
-			require_once(SUBSDIR . '/Poll.subs.php');
-
-			loadPollContext($topicinfo['id_poll']);
-
-			// Build the poll moderation button array.
-			$context['poll_buttons'] = array(
-				'vote' => array('test' => 'allow_return_vote', 'text' => 'poll_return_vote', 'image' => 'poll_options.png', 'lang' => true, 'url' => $scripturl . '?topic=' . $context['current_topic'] . '.' . $context['start']),
-				'results' => array('test' => 'allow_poll_view', 'text' => 'poll_results', 'image' => 'poll_results.png', 'lang' => true, 'url' => $scripturl . '?topic=' . $context['current_topic'] . '.' . $context['start'] . ';viewresults'),
-				'change_vote' => array('test' => 'allow_change_vote', 'text' => 'poll_change_vote', 'image' => 'poll_change_vote.png', 'lang' => true, 'url' => $scripturl . '?action=poll;sa=vote;topic=' . $context['current_topic'] . '.' . $context['start'] . ';poll=' . $context['poll']['id'] . ';' . $context['session_var'] . '=' . $context['session_id']),
-				'lock' => array('test' => 'allow_lock_poll', 'text' => (!$context['poll']['is_locked'] ? 'poll_lock' : 'poll_unlock'), 'image' => 'poll_lock.png', 'lang' => true, 'url' => $scripturl . '?action=lockvoting;topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
-				'edit' => array('test' => 'allow_edit_poll', 'text' => 'poll_edit', 'image' => 'poll_edit.png', 'lang' => true, 'url' => $scripturl . '?action=editpoll;topic=' . $context['current_topic'] . '.' . $context['start']),
-				'remove_poll' => array('test' => 'can_remove_poll', 'text' => 'poll_remove', 'image' => 'admin_remove_poll.png', 'lang' => true, 'custom' => 'onclick="return confirm(\'' . $txt['poll_remove_warn'] . '\');"', 'url' => $scripturl . '?action=poll;sa=remove;topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
-			);
-
-			// Allow mods to add additional buttons here
-			call_integration_hook('integrate_poll_buttons');
-		}
-
 		// Calculate the fastest way to get the messages!
 		$ascending = true;
-		$start = $_REQUEST['start'];
+		$start = $this->_start;
 		$limit = $context['messages_per_page'];
 		$firstIndex = 0;
-		if ($start >= $context['total_visible_posts'] / 2 && $context['messages_per_page'] != -1)
+		if ($start >= $total_visible_posts / 2 && $context['messages_per_page'] != -1)
 		{
 			$ascending = !$ascending;
-			$limit = $context['total_visible_posts'] <= $start + $limit ? $context['total_visible_posts'] - $start : $limit;
-			$start = $context['total_visible_posts'] <= $start + $limit ? 0 : $context['total_visible_posts'] - $start - $limit;
+			$limit = $total_visible_posts <= $start + $limit ? $total_visible_posts - $start : $limit;
+			$start = $total_visible_posts <= $start + $limit ? 0 : $total_visible_posts - $start - $limit;
 			$firstIndex = $limit - 1;
 		}
 
@@ -472,35 +418,24 @@ class Display_Controller
 		// Guests can't mark topics read or for notifications, just can't sorry.
 		if (!$user_info['is_guest'] && !empty($messages))
 		{
+			$boardseen = isset($this->_req->query->boardseen);
+
 			$mark_at_msg = max($messages);
 			if ($mark_at_msg >= $topicinfo['id_last_msg'])
 				$mark_at_msg = $modSettings['maxMsgID'];
 			if ($mark_at_msg >= $topicinfo['new_from'])
+			{
 				markTopicsRead(array($user_info['id'], $topic, $mark_at_msg, $topicinfo['unwatched']), $topicinfo['new_from'] !== 0);
+				$numNewTopics = getUnreadCountSince($board, empty($_SESSION['id_msg_last_visit']) ? 0 : $_SESSION['id_msg_last_visit']);
+
+				if (empty($numNewTopics))
+					$boardseen = true;
+			}
 
 			updateReadNotificationsFor($topic, $board);
 
-			// Have we recently cached the number of new topics in this board, and it's still a lot?
-			if (isset($_REQUEST['topicseen']) && isset($_SESSION['topicseen_cache'][$board]) && $_SESSION['topicseen_cache'][$board] > 5)
-				$_SESSION['topicseen_cache'][$board]--;
-			// Mark board as seen if this is the only new topic.
-			elseif (isset($_REQUEST['topicseen']))
-			{
-				// Use the mark read tables... and the last visit to figure out if this should be read or not.
-				$numNewTopics = getUnreadCountSince($board, empty($_SESSION['id_msg_last_visit']) ? 0 : $_SESSION['id_msg_last_visit']);
-
-				// If there're no real new topics in this board, mark the board as seen.
-				if (empty($numNewTopics))
-					$_REQUEST['boardseen'] = true;
-				else
-					$_SESSION['topicseen_cache'][$board] = $numNewTopics;
-			}
-			// Probably one less topic - maybe not, but even if we decrease this too fast it will only make us look more often.
-			elseif (isset($_SESSION['topicseen_cache'][$board]))
-				$_SESSION['topicseen_cache'][$board]--;
-
 			// Mark board as seen if we came using last post link from BoardIndex. (or other places...)
-			if (isset($_REQUEST['boardseen']))
+			if ($boardseen)
 			{
 				require_once(SUBSDIR . '/Boards.subs.php');
 				markBoardsRead($board, false, false);
@@ -515,7 +450,6 @@ class Display_Controller
 			require_once(SUBSDIR . '/Attachments.subs.php');
 
 			// Fetch attachments.
-			$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
 			if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
 				$attachments = getAttachments($messages, $includeUnapproved, 'filter_accessible_attachment', $all_posters);
 
@@ -546,7 +480,7 @@ class Display_Controller
 
 				// Initiate likes and the tooltips for likes
 				addInlineJavascript('
-				$(document).ready(function () {
+				$(function() {
 					var likePostInstance = likePosts.prototype.init({
 						oTxt: ({
 							btnText : ' . JavaScriptEscape($txt['ok_uppercase']) . ',
@@ -555,7 +489,7 @@ class Display_Controller
 						}),
 					});
 
-					$(".like_button, .unlike_button").SiteTooltip({
+					$(".like_button, .unlike_button, .likes_button").SiteTooltip({
 						hoverIntent: {
 							sensitivity: 10,
 							interval: 150,
@@ -567,19 +501,13 @@ class Display_Controller
 
 			$messages_request = loadMessageRequest($msg_selects, $msg_tables, $msg_parameters);
 
-			if (!empty($modSettings['enableFollowup']))
-			{
-				require_once(SUBSDIR . '/FollowUps.subs.php');
-				$context['follow_ups'] = followupTopics($messages, $includeUnapproved);
-			}
-
 			// Go to the last message if the given time is beyond the time of the last message.
 			if (isset($context['start_from']) && $context['start_from'] >= $topicinfo['num_replies'])
 				$context['start_from'] = $topicinfo['num_replies'];
 
 			// Since the anchor information is needed on the top of the page we load these variables beforehand.
 			$context['first_message'] = isset($messages[$firstIndex]) ? $messages[$firstIndex] : $messages[0];
-			$context['first_new_message'] = isset($context['start_from']) && $_REQUEST['start'] == $context['start_from'];
+			$context['first_new_message'] = isset($context['start_from']) && $this->_start == $context['start_from'];
 		}
 		else
 		{
@@ -597,6 +525,18 @@ class Display_Controller
 		// Set the callback.  (do you REALIZE how much memory all the messages would take?!?)
 		// This will be called from the template.
 		$context['get_message'] = array($this, 'prepareDisplayContext_callback');
+		$this->_icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
+		list ($sig_limits) = explode(':', $modSettings['signature_settings']);
+		$signature_settings = explode(',', $sig_limits);
+
+		if ($user_info['is_guest'])
+		{
+			$this->_show_signatures = !empty($signature_settings[8]) ? (int) $signature_settings[8] : 0;
+		}
+		else
+		{
+			$this->_show_signatures = !empty($signature_settings[9]) ? (int) $signature_settings[9] : 0;
+		}
 
 		// Now set all the wonderful, wonderful permissions... like moderation ones...
 		$common_permissions = array(
@@ -605,7 +545,6 @@ class Display_Controller
 			'can_sticky' => 'make_sticky',
 			'can_merge' => 'merge_any',
 			'can_split' => 'split_any',
-			'calendar_post' => 'calendar_post',
 			'can_mark_notify' => 'mark_any_notify',
 			'can_send_topic' => 'send_topic',
 			'can_send_pm' => 'pm_send',
@@ -624,8 +563,6 @@ class Display_Controller
 			'can_move' => 'move',
 			'can_lock' => 'lock',
 			'can_delete' => 'remove',
-			'can_add_poll' => 'poll_add',
-			'can_remove_poll' => 'poll_remove',
 			'can_reply' => 'post_reply',
 			'can_reply_unapproved' => 'post_unapproved_replies',
 		);
@@ -634,10 +571,6 @@ class Display_Controller
 
 		// Cleanup all the permissions with extra stuff...
 		$context['can_mark_notify'] &= !$context['user']['is_guest'];
-		$context['can_sticky'] &= !empty($modSettings['enableStickyTopics']);
-		$context['calendar_post'] &= !empty($modSettings['cal_enabled']) && (allowedTo('modify_any') || ($context['user']['started'] && allowedTo('modify_own')));
-		$context['can_add_poll'] &= !empty($modSettings['pollMode']) && $topicinfo['id_poll'] <= 0;
-		$context['can_remove_poll'] &= !empty($modSettings['pollMode']) && $topicinfo['id_poll'] > 0;
 		$context['can_reply'] &= empty($topicinfo['locked']) || allowedTo('moderate_board');
 		$context['can_reply_unapproved'] &= $modSettings['postmod_active'] && (empty($topicinfo['locked']) || allowedTo('moderate_board'));
 		$context['can_issue_warning'] &= in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']);
@@ -665,49 +598,34 @@ class Display_Controller
 		$context['can_restore_topic'] &= !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($topicinfo['id_previous_board']);
 		$context['can_restore_msg'] &= !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($topicinfo['id_previous_topic']);
 
-		$context['can_follow_up'] = !empty($modSettings['enableFollowup']) && boardsallowedto('post_new') !== array();
-
-		// Check if the draft functions are enabled and that they have permission to use them (for quick reply.)
-		$context['drafts_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft') && $context['can_reply'];
-		$context['drafts_autosave'] = !empty($context['drafts_save']) && !empty($modSettings['drafts_autosave_enabled']) && allowedTo('post_autosave_draft');
-		if (!empty($context['drafts_save']))
-			loadLanguage('Drafts');
-
-		if (!empty($context['drafts_autosave']) && empty($options['use_editor_quick_reply']))
-			loadJavascriptFile('drafts.js');
-
-		if (!empty($modSettings['mentions_enabled']))
-		{
-			$context['mentions_enabled'] = true;
-
-			// This is needed just in case someone does quick-edit... too bad it will be loaded even the member cannot do any quick-edit
-			loadJavascriptFile(array('mentioning.js'));
-
-			// Just using the plain text quick reply and not the editor
-			if (empty($options['use_editor_quick_reply']))
-				loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.min.js'));
-
-			loadCSSFile('jquery.atwho.css');
-
-			addInlineJavascript('
-			$(document).ready(function () {
-				for (var i = 0, count = all_elk_mentions.length; i < count; i++)
-					all_elk_mentions[i].oMention = new elk_mentions(all_elk_mentions[i].oOptions);
-			});');
-		}
-
 		// Load up the Quick ModifyTopic and Quick Reply scripts
 		loadJavascriptFile('topic.js');
 
-		// Auto video embeding enabled?
+		// Auto video embedding enabled?
 		if (!empty($modSettings['enableVideoEmbeding']))
 		{
 			addInlineJavascript('
-		$(document).ready(function() {
+		$(function() {
 			$().linkifyvideo(oEmbedtext);
-		});'
-			);
+		});');
 		}
+
+		// Now create the editor.
+		$editorOptions = array(
+			'id' => 'message',
+			'value' => '',
+			'labels' => array(
+				'post_button' => $txt['post'],
+			),
+			// add height and width for the editor
+			'height' => '250px',
+			'width' => '100%',
+			// We do XML preview here.
+			'preview_type' => 0,
+		);
+
+		// Trigger the prepare_context event for modules that have tied in to it
+		$this->_events->trigger('prepare_context', array('editorOptions' => &$editorOptions, 'use_quick_reply' => !empty($options['display_quick_reply'])));
 
 		// Load up the "double post" sequencing magic.
 		if (!empty($options['display_quick_reply']))
@@ -720,33 +638,12 @@ class Display_Controller
 				// Needed for the editor and message icons.
 				require_once(SUBSDIR . '/Editor.subs.php');
 
-				// Now create the editor.
-				$editorOptions = array(
-					'id' => 'message',
-					'value' => '',
-					'labels' => array(
-						'post_button' => $txt['post'],
-					),
-					// add height and width for the editor
-					'height' => '250px',
-					'width' => '100%',
-					// We do XML preview here.
-					'preview_type' => 0,
-				);
 				create_control_richedit($editorOptions);
-
-				$context['attached'] = '';
-				$context['make_poll'] = isset($_REQUEST['poll']);
-
-				// Message icons - customized icons are off?
-				$context['icons'] = getMessageIcons($board);
-
-				if (!empty($context['icons']))
-					$context['icons'][count($context['icons']) - 1]['is_last'] = true;
 			}
 		}
 
 		addJavascriptVar(array('notification_topic_notice' => $context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']), true);
+
 		if ($context['can_send_topic'])
 		{
 			addJavascriptVar(array(
@@ -760,7 +657,7 @@ class Display_Controller
 		// Build the normal button array.
 		$context['normal_buttons'] = array(
 			'reply' => array('test' => 'can_reply', 'text' => 'reply', 'image' => 'reply.png', 'lang' => true, 'url' => $scripturl . '?action=post;topic=' . $context['current_topic'] . '.' . $context['start'] . ';last_msg=' . $context['topic_last_message'], 'active' => true),
-			'notify' => array( 'test' => 'can_mark_notify', 'text' => $context['is_marked_notify'] ? 'unnotify' : 'notify', 'image' => ($context['is_marked_notify'] ? 'un' : '') . 'notify.png', 'lang' => true, 'custom' => 'onclick="return notifyButton(this);"', 'url' => $scripturl . '?action=notify;sa=' . ($context['is_marked_notify'] ? 'off' : 'on') . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
+			'notify' => array('test' => 'can_mark_notify', 'text' => $context['is_marked_notify'] ? 'unnotify' : 'notify', 'image' => ($context['is_marked_notify'] ? 'un' : '') . 'notify.png', 'lang' => true, 'custom' => 'onclick="return notifyButton(this);"', 'url' => $scripturl . '?action=notify;sa=' . ($context['is_marked_notify'] ? 'off' : 'on') . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
 			'mark_unread' => array('test' => 'can_mark_unread', 'text' => 'mark_unread', 'image' => 'markunread.png', 'lang' => true, 'url' => $scripturl . '?action=markasread;sa=topic;t=' . $context['mark_unread_time'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
 			'unwatch' => array('test' => 'can_unwatch', 'text' => ($context['topic_unwatched'] ? '' : 'un') . 'watch', 'image' => ($context['topic_unwatched'] ? '' : 'un') . 'watched.png', 'lang' => true, 'custom' => 'onclick="return unwatchButton(this);"', 'url' => $scripturl . '?action=unwatchtopic;topic=' . $context['current_topic'] . '.' . $context['start'] . ';sa=' . ($context['topic_unwatched'] ? 'off' : 'on') . ';' . $context['session_var'] . '=' . $context['session_id']),
 			'send' => array('test' => 'can_send_topic', 'text' => 'send_topic', 'image' => 'sendtopic.png', 'lang' => true, 'url' => $scripturl . '?action=emailuser;sa=sendtopic;topic=' . $context['current_topic'] . '.0', 'custom' => 'onclick="return sendtopicOverlayDiv(this.href, \'' . $txt['send_topic'] . '\');"'),
@@ -774,16 +671,17 @@ class Display_Controller
 			'lock' => array('test' => 'can_lock', 'text' => empty($context['is_locked']) ? 'set_lock' : 'set_unlock', 'image' => 'admin_lock.png', 'lang' => true, 'url' => $scripturl . '?action=topic;sa=lock;topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
 			'sticky' => array('test' => 'can_sticky', 'text' => empty($context['is_sticky']) ? 'set_sticky' : 'set_nonsticky', 'image' => 'admin_sticky.png', 'lang' => true, 'url' => $scripturl . '?action=topic;sa=sticky;topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
 			'merge' => array('test' => 'can_merge', 'text' => 'merge', 'image' => 'merge.png', 'lang' => true, 'url' => $scripturl . '?action=mergetopics;board=' . $context['current_board'] . '.0;from=' . $context['current_topic']),
-			'calendar' => array('test' => 'calendar_post', 'text' => 'calendar_link', 'image' => 'linktocal.png', 'lang' => true, 'url' => $scripturl . '?action=post;calendar;msg=' . $context['topic_first_message'] . ';topic=' . $context['current_topic'] . '.0'),
 		);
 
 		// Restore topic. eh?  No monkey business.
 		if ($context['can_restore_topic'])
 			$context['mod_buttons'][] = array('text' => 'restore_topic', 'image' => '', 'lang' => true, 'url' => $scripturl . '?action=restoretopic;topics=' . $context['current_topic'] . ';' . $context['session_var'] . '=' . $context['session_id']);
 
+		// Quick reply & modify enabled?
 		if ($context['can_reply'] && !empty($options['display_quick_reply']))
-			$template_layers->add('quickreply');
-		$template_layers->add('pages_and_buttons');
+			$this->_template_layers->add('quickreply');
+
+		$this->_template_layers->add('pages_and_buttons');
 
 		// Allow adding new buttons easily.
 		call_integration_hook('integrate_display_buttons');
@@ -792,29 +690,28 @@ class Display_Controller
 
 	/**
 	 * In-topic quick moderation.
+	 *
 	 * Accessed by ?action=quickmod2
 	 */
 	public function action_quickmod2()
 	{
-		global $topic, $board, $user_info, $context;
+		global $topic, $board, $user_info, $context, $modSettings;
 
 		// Check the session = get or post.
 		checkSession('request');
 
 		require_once(SUBSDIR . '/Messages.subs.php');
 
-		if (empty($_REQUEST['msgs']))
-			redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);
+		if (empty($this->_req->post->msgs))
+			redirectexit('topic=' . $topic . '.' . $this->_req->getQuery('start', 'intval'));
 
-		$messages = array();
-		foreach ($_REQUEST['msgs'] as $dummy)
-			$messages[] = (int) $dummy;
+		$messages = array_map('intval', $this->_req->post->msgs);
 
 		// We are restoring messages. We handle this in another place.
-		if (isset($_REQUEST['restore_selected']))
+		if (isset($this->_req->query->restore_selected))
 			redirectexit('action=restoretopic;msgs=' . implode(',', $messages) . ';' . $context['session_var'] . '=' . $context['session_id']);
 
-		if (isset($_REQUEST['split_selection']))
+		if (isset($this->_req->query->split_selection))
 		{
 			$mgsOptions = basicMessageInfo(min($messages), true);
 
@@ -844,6 +741,7 @@ class Display_Controller
 		// Get the first message in the topic - because you can't delete that!
 		$first_message = $topic_info['id_first_msg'];
 		$last_message = $topic_info['id_last_msg'];
+		$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 
 		// Delete all the messages we know they can delete. ($messages)
 		foreach ($messages as $message => $info)
@@ -855,14 +753,10 @@ class Display_Controller
 			elseif ($message == $first_message)
 				$topicGone = true;
 
-			removeMessage($message);
-
-			// Log this moderation action ;).
-			if (allowedTo('delete_any') && (!allowedTo('delete_own') || $info[1] != $user_info['id']))
-				logAction('delete', array('topic' => $topic, 'subject' => $info[0], 'member' => $info[1], 'board' => $board));
+			$remover->removeMessage($message);
 		}
 
-		redirectexit(!empty($topicGone) ? 'board=' . $board : 'topic=' . $topic . '.' . $_REQUEST['start']);
+		redirectexit(!empty($topicGone) ? 'board=' . $board : 'topic=' . $topic . '.' . (int) $this->_req->query->start);
 	}
 
 	/**
@@ -875,12 +769,13 @@ class Display_Controller
 	 */
 	public function prepareDisplayContext_callback($reset = false)
 	{
-		global $settings, $txt, $modSettings, $scripturl, $options, $user_info;
+		global $settings, $txt, $modSettings, $scripturl, $user_info;
 		global $memberContext, $context, $messages_request, $topic;
 		static $counter = null;
+		static $signature_shown = null;
 
 		// If the query returned false, bail.
-		if ($messages_request == false)
+		if ($messages_request === false)
 			return false;
 
 		// Remember which message this is.  (ie. reply #83)
@@ -896,23 +791,6 @@ class Display_Controller
 		if (!$message)
 			return false;
 
-		// $context['icon_sources'] says where each icon should come from - here we set up the ones which will always exist!
-		if (empty($context['icon_sources']))
-		{
-			require_once(SUBSDIR . '/MessageIndex.subs.php');
-			$context['icon_sources'] = MessageTopicIcons();
-		}
-
-		// Message Icon Management... check the images exist.
-		if (empty($modSettings['messageIconChecks_disable']))
-		{
-			// If the current icon isn't known, then we need to do something...
-			if (!isset($context['icon_sources'][$message['icon']]))
-				$context['icon_sources'][$message['icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $message['icon'] . '.png') ? 'images_url' : 'default_images_url';
-		}
-		elseif (!isset($context['icon_sources'][$message['icon']]))
-			$context['icon_sources'][$message['icon']] = 'images_url';
-
 		// If you're a lazy bum, you probably didn't give a subject...
 		$message['subject'] = $message['subject'] != '' ? $message['subject'] : $txt['no_subject'];
 
@@ -920,8 +798,11 @@ class Display_Controller
 		$context['can_remove_post'] |= allowedTo('delete_own') && (empty($modSettings['edit_disable_time']) || $message['poster_time'] + $modSettings['edit_disable_time'] * 60 >= time()) && $message['id_member'] == $user_info['id'];
 
 		// Have you liked this post, can you?
-		$message['you_liked'] = !empty($context['likes'][$message['id_msg']]['member']) && isset($context['likes'][$message['id_msg']]['member'][$user_info['id']]);
-		$message['use_likes'] = allowedTo('like_posts') && empty($context['is_locked']) && ($message['id_member'] != $user_info['id'] || !empty($modSettings['likeAllowSelf'])) && (empty($modSettings['likeMinPosts']) ? true : $modSettings['likeMinPosts'] <= $user_info['posts']);
+		$message['you_liked'] = !empty($context['likes'][$message['id_msg']]['member'])
+			&& isset($context['likes'][$message['id_msg']]['member'][$user_info['id']]);
+		$message['use_likes'] = allowedTo('like_posts') && empty($context['is_locked'])
+			&& ($message['id_member'] != $user_info['id'] || !empty($modSettings['likeAllowSelf']))
+			&& (empty($modSettings['likeMinPosts']) ? true : $modSettings['likeMinPosts'] <= $user_info['posts']);
 		$message['like_count'] = !empty($context['likes'][$message['id_msg']]['count']) ? $context['likes'][$message['id_msg']]['count'] : 0;
 
 		// If it couldn't load, or the user was a guest.... someday may be done with a guest table.
@@ -941,17 +822,36 @@ class Display_Controller
 			$memberContext[$message['id_member']]['can_view_profile'] = allowedTo('profile_view_any') || ($message['id_member'] == $user_info['id'] && allowedTo('profile_view_own'));
 			$memberContext[$message['id_member']]['is_topic_starter'] = $message['id_member'] == $context['topic_starter_id'];
 			$memberContext[$message['id_member']]['can_see_warning'] = !isset($context['disabled_fields']['warning_status']) && $memberContext[$message['id_member']]['warning_status'] && ($context['user']['can_mod'] || (!$user_info['is_guest'] && !empty($modSettings['warning_show']) && ($modSettings['warning_show'] > 1 || $message['id_member'] == $user_info['id'])));
+
+			if ($this->_show_signatures === 1)
+			{
+				if (empty($signature_shown[$message['id_member']]))
+				{
+					$signature_shown[$message['id_member']] = true;
+				}
+				else
+				{
+					$memberContext[$message['id_member']]['signature'] = '';
+				}
+			}
+			elseif ($this->_show_signatures === 2)
+			{
+				$memberContext[$message['id_member']]['signature'] = '';
+			}
 		}
 
 		$memberContext[$message['id_member']]['ip'] = $message['poster_ip'];
 		$memberContext[$message['id_member']]['show_profile_buttons'] = $settings['show_profile_buttons'] && (!empty($memberContext[$message['id_member']]['can_view_profile']) || (!empty($memberContext[$message['id_member']]['website']['url']) && !isset($context['disabled_fields']['website'])) || (in_array($memberContext[$message['id_member']]['show_email'], array('yes', 'yes_permission_override', 'no_through_forum'))) || $context['can_send_pm']);
 
 		// Do the censor thang.
-		censorText($message['body']);
-		censorText($message['subject']);
+		$message['body'] = censor($message['body']);
+		$message['subject'] = censor($message['subject']);
 
 		// Run BBC interpreter on the message.
-		$message['body'] = parse_bbc($message['body'], $message['smileys_enabled'], $message['id_msg']);
+		$bbc_wrapper = \BBC\ParserWrapper::instance();
+		$message['body'] = $bbc_wrapper->parseMessage($message['body'], $message['smileys_enabled']);
+
+		call_integration_hook('integrate_before_prepare_display_context', array(&$message));
 
 		// Compose the memory eat- I mean message array.
 		require_once(SUBSDIR . '/Attachments.subs.php');
@@ -963,7 +863,7 @@ class Display_Controller
 			'link' => '<a href="' . $scripturl . '?topic=' . $topic . '.msg' . $message['id_msg'] . '#msg' . $message['id_msg'] . '" rel="nofollow">' . $message['subject'] . '</a>',
 			'member' => &$memberContext[$message['id_member']],
 			'icon' => $message['icon'],
-			'icon_url' => $settings[$context['icon_sources'][$message['icon']]] . '/post/' . $message['icon'] . '.png',
+			'icon_url' => $this->_icon_sources->{$message['icon']},
 			'subject' => $message['subject'],
 			'time' => standardTime($message['poster_time']),
 			'html_time' => htmlTime($message['poster_time']),

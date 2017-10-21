@@ -1,9 +1,12 @@
-/**
+/*!
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1
+ */
+
+/**
  *
  * This file contains javascript associated with the drafts auto function as it
  * relates to an sceditor invocation
@@ -11,6 +14,9 @@
 
 (function($, window, document) {
 	'use strict';
+
+	// Editor instance
+	var editor;
 
 	function elk_Drafts(options) {
 		// All the passed options and defaults are loaded to the opts object
@@ -22,6 +28,7 @@
 
 	/**
 	 * Make the call to save this draft in the background
+	 *
 	 * - returns if nothing has changed since the last save or there is nothing to save
 	 * - updates the display to show we are saving
 	 * - loads the form data and makes the ajax request
@@ -36,53 +43,33 @@
 			this.draftCancel();
 
 		// Get the editor text, either from sceditor or from the quicktext textarea
-		var sPostdata = base.val();
+		var sPostdata = editor.val();
 
 		// Nothing to save?
 		if (isEmptyText(sPostdata))
 			return false;
 
 		// Flag that we are saving a draft
-		document.getElementById('throbber').style.display = '';
+		document.getElementById('throbber').style.display = 'inline';
 		this.opts._bInDraftMode = true;
 
-		// Get all the form elements that we want to save
-		var aSections = [
-			'topic=' + parseInt(document.forms.postmodify.elements['topic'].value),
-			'id_draft=' + (('id_draft' in document.forms.postmodify.elements) ? parseInt(document.forms.postmodify.elements['id_draft'].value) : 0),
-			'subject=' + escape(document.forms.postmodify['subject'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
-			'message=' + escape(sPostdata.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
-			'icon=' + escape(document.forms.postmodify['icon'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
-			'save_draft=true',
-			elk_session_var + '=' + elk_session_id
-		];
+		// Create a clone form to populate
+		var $aForm = $('#postmodify').clone();
 
-		// Get the locked an/or sticky values if they have been selected or set that is
-		if (this.opts.sType && this.opts.sType === 'post')
-		{
-			var oLock = document.getElementById('check_lock'),
-				oSticky = document.getElementById('check_sticky'),
-				oSmile = document.getElementById('check_smileys');
-
-			if (oLock && oLock.checked)
-				aSections[aSections.length] = 'lock=1';
-
-			if (oSticky && oSticky.checked)
-				aSections[aSections.length] = 'sticky=1';
-
-			if (oSmile && oSmile.checked)
-				aSections[aSections.length] = 'ns=1';
-		}
+		$aForm.find("textarea[name='message']").val(sPostdata.replace(/&#/g, "&#38;#"));
+		$aForm.append($('<input />').attr('name', 'save_draft').val(true));
+		$aForm.append($('<input />').attr('name', 'autosave').val(true));
 
 		// Keep track of source or wysiwyg when using the full editor
-		aSections[aSections.length] = 'message_mode=' + (base.inSourceMode() ? '1' : '0');
+		$aForm.append($('<input />').attr('name', 'message_mode').val(editor.inSourceMode() ? '1' : '0'));
 
 		// Send in the request to save the data
-		this.draftAjax(aSections, "?action=post2;board=" + this.opts.iBoard + ";xml");
+		this.draftAjax($aForm.serialize(), "?action=post2;board=" + this.opts.iBoard + ";xml");
 	};
 
 	/**
 	 * Make the call to save this PM draft in the background
+	 *
 	 * - returns if nothing has changed since the last save or there is nothing to save
 	 * - updates the display to show we are saving
 	 * - loads the form data and makes the ajax request
@@ -97,37 +84,45 @@
 		if (this.opts._bInDraftMode === true)
 			this.draftCancel();
 
+		// Get the editor data
+		var sPostdata = editor.val();
+
 		// Nothing to save
-		var sPostdata = base.val();
 		if (isEmptyText(sPostdata))
 			return false;
 
 		// Flag that we are saving the PM
-		document.getElementById('throbber').style.display = '';
+		document.getElementById('throbber').style.display = 'inline';
 		this.opts._bInDraftMode = true;
 
 		// Get the to and bcc values
 		var aTo = this.draftGetRecipient('recipient_to[]'),
 			aBcc = this.draftGetRecipient('recipient_bcc[]');
 
-		// Get the rest of the form elements that we want to save, and load them up
-		var aSections = [
-			'replied_to=' + parseInt(document.forms.pmFolder.elements['replied_to'].value),
-			'id_pm_draft=' + (('id_pm_draft' in document.forms.pmFolder.elements) ? parseInt(document.forms.pmFolder.elements['id_pm_draft'].value) : 0),
-			'subject=' + escape(document.forms.pmFolder['subject'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
-			'message=' + escape(sPostdata.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
-			'recipient_to=' + aTo,
-			'recipient_bcc=' + aBcc,
-			'save_draft=true',
-			elk_session_var + '=' + elk_session_id
-		];
+		// Clone the form, we will use this to send
+		var $aForm = $('#pmFolder').clone();
 
-		// Account for wysiwyg
-		if (this.opts.sType && this.opts.sType === 'post')
-			aSections[aSections.length] = 'message_mode=' + (base.inSourceMode() ? '1' : '0');
+		$aForm.find("textarea[name='message']").val(sPostdata.replace(/&#/g, "&#38;#"));
+		$aForm.find("input[name='subject']").val($aForm.find("input[name='subject']").val().replace(/&#/g, "&#38;#"));
+		$aForm.find("input[name='replied_to']").val(parseInt($aForm.find("input[name='replied_to']").val()));
+		if ($aForm.find("input[name='id_pm_draft']").length == 1)
+		{
+			$aForm.find("input[name='id_pm_draft']").val(parseInt($aForm.find("input[name='id_pm_draft']").val()));
+		}
+		else
+		{
+			$aForm.append($('<input />').attr('name', 'id_pm_draft').val(0));
+		}
+		$aForm.append($('<input />').attr('name', 'recipient_to').val(aTo));
+		$aForm.append($('<input />').attr('name', 'recipient_bcc').val(aBcc));
+		$aForm.append($('<input />').attr('name', 'save_draft').val(true));
+		$aForm.append($('<input />').attr('name', 'autosave').val(true));
+
+		// Keep track of source or wysiwyg when using the full editor
+		$aForm.append($('<input />').attr('name', 'message_mode').val(editor.inSourceMode() ? '1' : '0'));
 
 		// Send in (post) the document for saving
-		this.draftAjax(aSections, "?action=pm;sa=send2;xml");
+		this.draftAjax($aForm.serialize(), "?action=pm;sa=send2;xml");
 	};
 
 	/**
@@ -138,7 +133,9 @@
 	 * - hides the ajax saving icon
 	 * - turns off _bInDraftMode so another save request can fire
 	 *
-	 * @param {xml object} XMLDoc
+	 * @type {xmlCallback}
+	 * @param {string[]} post
+	 * @param {string} action
 	 */
 	elk_Drafts.prototype.draftAjax = function(post, action)
 	{
@@ -147,7 +144,7 @@
 			type: "POST",
 			dataType: 'xml',
 			url: elk_scripturl + action,
-			data: post.join("&"),
+			data: post,
 			context: this
 		})
 		.done(function(data, textStatus, jqXHR) {
@@ -180,6 +177,7 @@
 
 	/**
 	 * Function to retrieve the to and bcc values from the pseudo arrays
+	 *
 	 *  - Accounts for either a single or multiple to/bcc recipients
 	 *
 	 * @param {string} sField name of the form elements we are getting
@@ -230,17 +228,33 @@
 
 	/**
 	 * Signals that one of the post/pm/qr form buttons was pressed
-	 * Used to prevent saving an auto draft on input button (post, save, etc)
+	 *
+	 * - Used to prevent saving an auto draft on input button (post, save, etc)
 	 */
 	elk_Drafts.prototype.formCheck = function() {
 		var oInstance = this,
-			formID = $('#id_draft').closest("form").attr('id');
+			formID = $('#' + this.opts.sTextareaID).closest("form").attr('id');
+
+		// @deprecated since 1.1 - the check on #id_draft existence is for backward compatibility with 1.0
+		if ($('#id_draft').length === 0)
+		{
+			$('#' + formID).append(
+				$('<input />').attr({
+					type: 'hidden',
+					id: this.opts.sLastID,
+					name: 'id_draft',
+					value: this.opts.id_draft
+				})
+			);
+		}
 
 		// Prevent autosave on post/save selection by mouse or keyboard
-		$('#' + formID + ' .button_submit').on('mousedown', oInstance, function() {
+		var $_form_submitt =  $('#' + formID + ' .button_submit');
+		$_form_submitt.on('mousedown', oInstance, function() {
 			oInstance.opts._bInDraftMode = true;
 		});
-		$('#' + formID + ' .button_submit').on('keydown', oInstance, function() {
+
+		$_form_submitt.on('keydown', oInstance, function() {
 			oInstance.opts._bInDraftMode = true;
 		});
 	};
@@ -263,7 +277,7 @@
 
 		/**
 		 * How often we are going to save a draft in the background
-		 * @type {Integer}
+		 * @type {Number}
 		 */
 		_interval_id: null,
 
@@ -287,6 +301,7 @@
 
 	/**
 	 * Draft plugin interface to SCEditor
+	 *
 	 *  - Called from the editor as a plugin
 	 *  - Monitors events so we control the elk_draft autosaver (on/off/change)
 	 */
@@ -298,9 +313,13 @@
 		 * Initialize, called when sceditor starts and initializes plugins
 		 */
 		base.init = function() {
+			// Grab this instance for use use in oDrafts
+			editor = this;
+
 			// Init the draft instance, load in the options
 			oDrafts = new elk_Drafts(this.opts.draftOptions);
 			oDrafts.opts.bPM = oDrafts.opts.bPM ? true : false;
+			oDrafts.base = base;
 
 			// Start the autosave timer
 			if (oDrafts.opts.iFreq > 0)
@@ -342,10 +361,11 @@
 
 		/**
 		 * Informs the autosave function that some activity has occurred in the
-		 * editor window since the last save ... activity being any keypress
-		 * in the editor which we assume means they changed it
+		 * editor window since the last save ... activity being triggered whenever
+		 * the editor loses focus, something is pasted/inserted and when the user
+		 * stops typing for 1.5s or press space/return
 		 */
-		base.signalKeydownEvent = function(oEvent) {
+		base.signalValuechangedEvent = function(oEvent) {
 			// Prevent autosave when using the tab key to navigate to the submit buttons
 			if (oEvent.keyCode === 9)
 				oDrafts.opts._bInDraftMode = true;
@@ -353,5 +373,4 @@
 			oDrafts.opts._bCheckDraft = true;
 		};
 	};
-
 })(jQuery, window, document);

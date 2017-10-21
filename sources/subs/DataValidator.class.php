@@ -7,12 +7,9 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Class used to validate and transform data
@@ -134,9 +131,9 @@ class Data_Validator
 	/**
 	 * Shorthand static method for simple inline validation
 	 *
-	 * @param mixed[] $data generally $_POST data for this method
-	 * @param mixed[] $validation_rules assoicative array of field => rules
-	 * @param mixed[] $sanitation_rules assoicative array of field => rules
+	 * @param mixed[]|object $data generally $_POST data for this method
+	 * @param mixed[] $validation_rules associative array of field => rules
+	 * @param mixed[] $sanitation_rules associative array of field => rules
 	 */
 	public static function is_valid(&$data = array(), $validation_rules = array(), $sanitation_rules = array())
 	{
@@ -151,7 +148,18 @@ class Data_Validator
 
 		// Replace the data
 		if (!empty($sanitation_rules))
-			$data = $validator->_array_replace($data, $validator->validation_data());
+		{
+			// Handle cases where we have an object
+			if (is_object($data))
+			{
+				$data = array_replace((array) $data, $validator->validation_data());
+				$data = (object) $data;
+			}
+			else
+			{
+				$data = array_replace($data, $validator->validation_data());
+			}
+		}
 
 		// Return true or false on valid data
 		return $result;
@@ -160,7 +168,7 @@ class Data_Validator
 	/**
 	 * Set the validation rules that will be run against the data
 	 *
-	 * @param mixed[] $rules assoicative array of field => rule|rule|rule
+	 * @param mixed[] $rules associative array of field => rule|rule|rule
 	 */
 	public function validation_rules($rules = array())
 	{
@@ -178,7 +186,7 @@ class Data_Validator
 	/**
 	 * Sets the sanitation rules used to clean data
 	 *
-	 * @param mixed[] $rules assoicative array of field => rule|rule|rule
+	 * @param mixed[] $rules associative array of field => rule|rule|rule
 	 * @param boolean $strict
 	 */
 	public function sanitation_rules($rules = array(), $strict = false)
@@ -198,7 +206,7 @@ class Data_Validator
 
 	/**
 	 * Field Name Replacements
-	 * @param mixed[] $replacements assoicative array of field => txt string key
+	 * @param mixed[] $replacements associative array of field => txt string key
 	 */
 	public function text_replacements($replacements = array())
 	{
@@ -225,13 +233,17 @@ class Data_Validator
 	/**
 	 * Run the sanitation and validation on the data
 	 *
-	 * @param mixed[] $input associative array of data to process name => value
+	 * @param mixed[]|object $input associative array or object of data to process name => value
 	 */
 	public function validate($input)
 	{
+		// If its an object, convert it to an array
+		if (is_object($input))
+			$input = (array) $input;
+
 		// @todo this won't work, $input[$field] will be undefined
 		if (!is_array($input))
-			$input = array($input);
+			$input[$input] = array($input);
 
 		// Clean em
 		$this->_data = $this->_sanitize($input, $this->_sanitation_rules);
@@ -269,21 +281,6 @@ class Data_Validator
 			return $this->_data;
 
 		return isset($this->_data[$key]) ? $this->_data[$key] : null;
-	}
-
-	/**
-	 * array_replace is a php 5.3+ function, this is needed to support the oldies
-	 */
-	private function _array_replace()
-	{
-		$array = array();
-		$n = func_num_args();
-
-		// Union each array passed
-		while ($n-- > 0)
-			$array += func_get_arg($n);
-
-		return $array;
 	}
 
 	/**
@@ -329,7 +326,7 @@ class Data_Validator
 
 					// Defined method to use?
 					if (is_callable(array($this, $validation_method)))
-						$result = $this->$validation_method($field, $input, $validation_parameters);
+						$result = $this->{$validation_method}($field, $input, $validation_parameters);
 					// Maybe even a custom function set up like a defined one, addons can do this.
 					elseif (is_callable($validation_function) && strpos($validation_function, 'validate_') === 0 && isset($input[$field]))
 						$result = call_user_func_array($validation_function, array_merge((array) $field, (array) $input[$field], $validation_parameters_function));
@@ -365,7 +362,7 @@ class Data_Validator
 		if (!isset($input[$field]))
 			return;
 
-		// Start a new instance of the validtor to work on this sub data (csv/array)
+		// Start a new instance of the validator to work on this sub data (csv/array)
 		$sub_validator = new Data_Validator();
 
 		$fields = array();
@@ -400,12 +397,15 @@ class Data_Validator
 		if (!$result)
 		{
 			$errors = $sub_validator->validation_errors(true);
-			$this->_validation_errors[] = array(
-				'field' => $field,
-				'input' => $errors[0]['input'],
-				'function' => $errors[0]['function'],
-				'param' => $errors[0]['param'],
-			);
+			foreach ($errors as $error)
+			{
+				$this->_validation_errors[] = array(
+					'field' => $field,
+					'input' => $error['input'],
+					'function' => $error['function'],
+					'param' => $error['param'],
+				);
+			}
 		}
 
 		return $result;
@@ -450,7 +450,7 @@ class Data_Validator
 						$sanitation_method = '_sanitation_' . $match[1];
 						$sanitation_parameters = $match[2];
 						$sanitation_function = $match[1];
-						$sanitation_parameters_function = explode(',', $match[2]);
+						$sanitation_parameters_function = explode(',', defined($match[2]) ? constant($match[2]) : $match[2]);
 					}
 					// Or just a predefined rule e.g. trim
 					else
@@ -461,7 +461,7 @@ class Data_Validator
 
 					// Defined method to use?
 					if (is_callable(array($this, $sanitation_method)))
-						$input[$field] = $this->$sanitation_method($input[$field], $sanitation_parameters);
+						$input[$field] = $this->{$sanitation_method}($input[$field], $sanitation_parameters);
 					// One of our static methods or even a built in php function like strtoupper, intval, etc?
 					elseif (is_callable($sanitation_function))
 						$input[$field] = call_user_func_array($sanitation_function, array_merge((array) $input[$field], $sanitation_parameters_function));
@@ -485,7 +485,7 @@ class Data_Validator
 					else
 					{
 						// @todo fatal_error or other ? being asked to do something we don't know?
-						$input[$field] = $input[$field];
+						// results in returning $input[$field] = $input[$field];
 					}
 				}
 			}
@@ -557,7 +557,7 @@ class Data_Validator
 		global $txt;
 
 		if (empty($this->_validation_errors))
-			return;
+			return false;
 
 		loadLanguage('Validation');
 		$result = array();
@@ -591,7 +591,7 @@ class Data_Validator
 				$result[] = sprintf($txt['_validate_generic'], $field);
 		}
 
-		return $result;
+		return empty($result) ? false : $result;
 	}
 
 	/**
@@ -605,7 +605,7 @@ class Data_Validator
 	 */
 	protected function _validate_contains($field, $input, $validation_parameters = null)
 	{
-		$validation_parameters = explode(',', trim(strtolower($validation_parameters)));
+		$validation_parameters = array_map('trim', explode(',', strtolower($validation_parameters)));
 		$input[$field] = isset($input[$field]) ? $input[$field] : '';
 		$value = trim(strtolower($input[$field]));
 
@@ -986,7 +986,14 @@ class Data_Validator
 		if (!isset($input[$field]))
 			return;
 
-		if (!is_int($input[$field]))
+		$filter = filter_var($input[$field], FILTER_VALIDATE_INT);
+
+		if ($filter === false && version_compare(PHP_VERSION, 5.4, '<') && ($input[$field] === '+0' || $input[$field] === '-0'))
+		{
+			$filter = true;
+		}
+
+		if ($filter === false)
 		{
 			return array(
 				'field' => $field,
@@ -1011,7 +1018,23 @@ class Data_Validator
 		if (!isset($input[$field]))
 			return;
 
-		if (!is_bool($input[$field]))
+		$filter = filter_var($input[$field], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+		// Fixed in php 7 and later in php 5.6.27 https://bugs.php.net/bug.php?id=67167
+		if (version_compare(PHP_VERSION, '5.6.27', '>='))
+		{
+			$filter = $filter;
+		}
+		if (version_compare(PHP_VERSION, 5.4, '<') && $filter === null && ($input[$field] === false || $input[$field] === ''))
+		{
+			$filter = false;
+		}
+		if ($filter === false && is_object($input[$field]) && method_exists($input[$field], '__tostring') === false)
+		{
+			$filter = null;
+		}
+
+		if ($filter === null)
 		{
 			return array(
 				'field' => $field,
@@ -1036,7 +1059,7 @@ class Data_Validator
 		if (!isset($input[$field]))
 			return;
 
-		if (!is_float($input[$field]))
+		if (filter_var($input[$field], FILTER_VALIDATE_FLOAT) === false)
 		{
 			return array(
 				'field' => $field,
@@ -1129,6 +1152,7 @@ class Data_Validator
 	 *
 	 * Usage: '[key]' => 'php_syntax'
 	 *
+	 * @uses ParseError
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param mixed[]|null $validation_parameters array or null
@@ -1156,12 +1180,19 @@ class Data_Validator
 			// Check the validity of the syntax.
 			ob_start();
 			$errorReporting = error_reporting(0);
-			$result = @eval('
-				if (false)
-				{
-					' . preg_replace('~^(?:\s*<\\?(?:php)?|\\?>\s*$)~u', '', $input[$field]) . '
-				}
-			');
+			try
+			{
+				$result = @eval('
+					if (false)
+					{
+						' . preg_replace('~^(?:\s*<\\?(?:php)?|\\?>\s*$)~u', '', $input[$field]) . '
+					}
+				');
+			}
+			catch (ParseError $e)
+			{
+				$result = false;
+			}
 			error_reporting($errorReporting);
 			@ob_end_clean();
 		}
@@ -1235,9 +1266,8 @@ class Data_Validator
 	 * - auser@gmail.com, a.user@gmail.com, auser+big@gmail.com and a.user+gigantic@googlemail.com are same email address.
 	 *
 	 * @param string $input
-	 * @param string|null $sanitation_parameters
 	 */
-	protected function _sanitation_gmail_normalize($input, $sanitation_parameters = null)
+	protected function _sanitation_gmail_normalize($input)
 	{
 		if (!isset($input))
 			return;
@@ -1262,5 +1292,18 @@ class Data_Validator
 		}
 
 		return $local_name . '@' . $domain_name;
+	}
+
+	/**
+	 * Uses Util::htmlspecialchars to sanitize any html in the input
+	 *
+	 * @param string $input
+	 */
+	protected function _sanitation_cleanhtml($input)
+	{
+		if (!isset($input))
+			return;
+
+		return Util::htmlspecialchars($input);
 	}
 }

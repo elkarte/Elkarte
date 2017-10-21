@@ -7,18 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.8
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Get the number of mod log entries.
@@ -63,9 +58,9 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
  * Gets the moderation log entries that match the specified parameters.
  * Callback for createList() in Modlog::action_log().
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param string|null $query_string
  * @param mixed[] $query_params
  * @param int $log_type
@@ -348,13 +343,16 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 }
 
 /**
- * Mod Log Replacment Callback.
+ * Mod Log Replacement Callback.
  *
- * Our callback that does the actual replacment.
+ * Our callback that does the actual replacement.
  *
  */
 class ModLogEntriesReplacement
 {
+	public $entries;
+	public $key;
+
 	/**
 	 * Matching function to return the value in the callback
 	 *
@@ -403,7 +401,7 @@ function recentlyLogged($action, $time = 60)
 {
 	$db = database();
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_actions
 		WHERE action = {string:action}

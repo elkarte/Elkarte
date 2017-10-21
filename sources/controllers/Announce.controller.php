@@ -7,54 +7,44 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
- * Class to handle announce topic functionality.
+ * Announce_Controller class.
+ * Used to handle announce topic functionality.
  */
 class Announce_Controller extends Action_Controller
 {
 	/**
-	 * Default (sub)action for ?action=announce
-	 *
-	 * @see Action_Controller::action_index()
-	 */
-	public function action_index()
-	{
-		// Default for action=announce: action_selectgroup() function.
-		$this->action_selectgroup();
-	}
-
-	/**
 	 * Set up the context for the announce topic function (action=announce).
 	 * This function is called before the flow is redirected to action_selectgroup() or action_send().
 	 *
-	 * checks the topic announcement permissions and loads the announcement template.
-	 * requires the announce_topic permission.
-	 * uses the Announce template and Post language file.
+	 * What it does:
+	 *
+	 * - Checks the topic announcement permissions and loads the announcement template.
+	 * - Requires the announce_topic permission.
+	 *
+	 * @uses the Announce template and Post language file.
 	 */
 	public function pre_dispatch()
 	{
 		global $context, $txt, $topic;
 
+		// Permissions and session check
 		isAllowedTo('announce_topic');
-
 		validateSession();
 
+		// You need to announce something
 		if (empty($topic))
-			fatal_lang_error('topic_gone', false);
+			throw new Elk_Exception('topic_gone', false);
 
+		// Language files
 		loadLanguage('Post');
 		loadTemplate('Announce');
 
@@ -62,9 +52,24 @@ class Announce_Controller extends Action_Controller
 	}
 
 	/**
+	 * Default (sub)action for ?action=announce
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// Accessed by action=announce: action_selectgroup function.
+		$this->action_selectgroup();
+	}
+
+	/**
 	 * Allow a user to chose the membergroups to send the announcement to.
-	 * Lets the user select the membergroups that will receive the topic announcement.
-	 * Accessed by action=announce;sa=selectgroup
+	 *
+	 * What it does:
+	 *
+	 * - Lets the user select the membergroups that will receive the topic announcement.
+	 * - Accessed by action=announce;sa=selectgroup
+	 *
 	 * @uses Announce template announce sub template
 	 */
 	public function action_selectgroup()
@@ -85,44 +90,49 @@ class Announce_Controller extends Action_Controller
 		// Get the subject of the topic we're about to announce.
 		$topic_info = getTopicInfo($topic, 'message');
 		$context['topic_subject'] = $topic_info['subject'];
-		censorText($context['announce_topic']['subject']);
+		$context['announce_topic']['subject'] = censor($context['announce_topic']['subject']);
 
 		// Prepare for the template
-		$context['move'] = isset($_REQUEST['move']) ? 1 : 0;
-		$context['go_back'] = isset($_REQUEST['goback']) ? 1 : 0;
+		$context['move'] = isset($this->_req->query->move) ? 1 : 0;
+		$context['go_back'] = isset($this->_req->query->goback) ? 1 : 0;
 		$context['sub_template'] = 'announce';
 	}
 
 	/**
 	 * Send the announcement in chunks.
 	 *
-	 * splits the members to be sent a topic announcement into chunks.
-	 * composes notification messages in all languages needed.
-	 * does the actual sending of the topic announcements in chunks.
-	 * calculates a rough estimate of the percentage items sent.
-	 * Accessed by action=announce;sa=send
+	 * What it does:
+	 *
+	 * - Splits the members to be sent a topic announcement into chunks.
+	 * - Composes notification messages in all languages needed.
+	 * - Does the actual sending of the topic announcements in chunks.
+	 * - Calculates a rough estimate of the percentage items sent.
+	 * - Accessed by action=announce;sa=send
+	 *
 	 * @uses announcement template announcement_send sub template
 	 */
 	public function action_send()
 	{
-		global $topic, $board, $board_info, $context, $modSettings, $language, $scripturl;
+		global $topic, $board, $board_info, $context, $modSettings;
 
 		checkSession();
 
-		$context['start'] = empty($_REQUEST['start']) ? 0 : (int) $_REQUEST['start'];
+		$context['start'] = $this->_req->getPost('start', 'intval', 0);
 		$groups = array_merge($board_info['groups'], array(1));
 		$who = array();
 
 		// Load any supplied membergroups (from announcement_send template pause loop)
-		if (isset($_POST['membergroups']))
-			$_POST['who'] = explode(',', $_POST['membergroups']);
+		if (isset($this->_req->post->membergroups))
+			$_who = explode(',', $this->_req->post->membergroups);
+		else
+			$_who = $this->_req->post->who;
 
 		// Check that at least one membergroup was selected (set from announce sub template)
-		if (empty($_POST['who']))
-			fatal_lang_error('no_membergroup_selected');
+		if (empty($_who))
+			throw new Elk_Exception('no_membergroup_selected');
 
 		// Make sure all membergroups are integers and can access the board of the announcement.
-		foreach ($_POST['who'] as $id => $mg)
+		foreach ($_who as $id => $mg)
 			$who[$id] = in_array((int) $mg, $groups) ? (int) $mg : 0;
 
 		// Get the topic details that we are going to send
@@ -158,17 +168,54 @@ class Announce_Controller extends Action_Controller
 		{
 			logAction('announce_topic', array('topic' => $topic), 'user');
 
-			if (!empty($_REQUEST['move']) && allowedTo('move_any'))
-				redirectexit('action=movetopic;topic=' . $topic . '.0' . (empty($_REQUEST['goback']) ? '' : ';goback'));
-			elseif (!empty($_REQUEST['goback']))
+			if (!empty($this->_req->post->move) && allowedTo('move_any'))
+				redirectexit('action=movetopic;topic=' . $topic . '.0' . (empty($this->_req->post->goback) ? '' : ';goback'));
+			elseif (!empty($this->_req->post->goback))
 				redirectexit('topic=' . $topic . '.new;boardseen#new', isBrowser('ie'));
 			else
 				redirectexit('board=' . $board . '.0');
 		}
 
+		$this->_send_announcement($data['member_info'], $topic_info);
+
+		// Provide an overall indication of progress, this is not strictly correct
+		if ($data['member_count'] < $conditions['limit'])
+			$context['percentage_done'] = 100;
+		else
+			$context['percentage_done'] = round(100 * $context['start'] / $modSettings['latestMember'], 1);
+
+		// Prepare for the template
+		$context['move'] = empty($this->_req->post->move) ? 0 : 1;
+		$context['go_back'] = empty($this->_req->post->goback) ? 0 : 1;
+		$context['membergroups'] = implode(',', $who);
+		$context['topic_subject'] = $topic_info['subject'];
+		$context['sub_template'] = 'announcement_send';
+
+		// Go back to the correct language for the user ;)
+		if (!empty($modSettings['userLanguage']))
+			loadLanguage('Post');
+	}
+
+	/**
+	 * Handles the sending of an announcement.
+	 *
+	 * @param mixed[] $member_info - An array of members' data, in particular:
+	 *                 - language
+	 *                 - id
+	 *                 - email
+	 * @param mixed[] $topic_info - Some basic information about the topic.
+	 *                 It must contain:
+	 *                  - subject: the subject of the topic
+	 *                  - body: the body of the topic
+	 * @throws Elk_Exception
+	 */
+	private function _send_announcement($member_info, $topic_info)
+	{
+		global $modSettings, $language, $scripturl, $context;
+
 		// Loop through all members that'll receive an announcement in this batch.
 		$announcements = array();
-		foreach ($data['member_info'] as $row)
+		foreach ($member_info as $row)
 		{
 			$cur_language = empty($row['language']) || empty($modSettings['userLanguage']) ? $language : $row['language'];
 
@@ -178,7 +225,7 @@ class Announce_Controller extends Action_Controller
 				$replacements = array(
 					'TOPICSUBJECT' => $topic_info['subject'],
 					'MESSAGE' => $topic_info['body'],
-					'TOPICLINK' => $scripturl . '?topic=' . $topic . '.0',
+					'TOPICLINK' => $scripturl . '?topic=' . $topic_info['id_topic'] . '.0',
 				);
 
 				$emaildata = loadEmailTemplate('new_announcement', $replacements, $cur_language);
@@ -195,24 +242,9 @@ class Announce_Controller extends Action_Controller
 		}
 
 		// For each language send a different mail - low priority...
-		foreach ($announcements as $lang => $mail)
+		foreach ($announcements as $mail)
+		{
 			sendmail($mail['recipients'], $mail['subject'], $mail['body'], null, null, false, 5);
-
-		// Provide an overall indication of progress, this is not strictly correct
-		if ($data['member_count'] < $conditions['limit'])
-			$context['percentage_done'] = 100;
-		else
-			$context['percentage_done'] = round(100 * $context['start'] / $modSettings['latestMember'], 1);
-
-		// Prepare for the template
-		$context['move'] = empty($_REQUEST['move']) ? 0 : 1;
-		$context['go_back'] = empty($_REQUEST['goback']) ? 0 : 1;
-		$context['membergroups'] = implode(',', $who);
-		$context['topic_subject'] = $topic_info['subject'];
-		$context['sub_template'] = 'announcement_send';
-
-		// Go back to the correct language for the user ;)
-		if (!empty($modSettings['userLanguage']))
-			loadLanguage('Post');
+		}
 	}
 }

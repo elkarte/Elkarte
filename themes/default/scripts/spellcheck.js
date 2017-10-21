@@ -1,49 +1,47 @@
-/**
+/*!
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
- *
+ * @version 1.1
+ */
+
+/**
  * This file contains javascript associated with the spellchecking ((pspell)
  */
 
 // These are variables the popup is going to want to access...
 var spell_formname,
 	spell_fieldname,
-	spell_full;
+	spell_full,
+	mispstr;
 
 /**
  * Spell check the specified field in the specified form.
  *
- * @param {string} formName
+ * @param {string|boolean} formName
  * @param {string} fieldName
  * @param {boolean} bFull
  */
 function spellCheck(formName, fieldName, bFull)
 {
-	// Grab the (hidden) spell checking form.
-	var spellform = document.forms.spell_form;
-
 	// Register the name of the editing form for future reference.
 	spell_formname = formName;
 	spell_fieldname = fieldName;
-	spell_full = typeof(bFull) !== 'undefined' ? bFull : (typeof($editor_data) !== 'undefined' ? true : false);
+	spell_full = typeof(bFull) !== 'undefined' ? bFull : typeof($editor_data) !== 'undefined';
 
 	// This should match a word (most of the time).
-	var regexpWordMatch = /(?:<[^>]+>)|(?:\[[^ ][^\]]*\])|(?:&[^; ]+;)|(?:[^0-9\s\]\[{};:"\\|,<.>\/?`~!@#$%^&*()_+=]+)/g;
+	var regexpWordMatch = /(?:<[^>]+>)|(?:\[[^ ][^\]]*])|(?:&[^; ]+;)|(?:[^0-9\s\]\[{};:“"”\\|,<.>\/?`~!@#$%^&*()_+=]+)/g;
 
 	// These characters can appear within words.
 	var aWordCharacters = ['-', '\''];
 
 	var aWords = [],
-		aResult = [],
+		aResult,
 		sText = (spell_full) ? $editor_data[spell_fieldname].getText() : document.forms[spell_formname][spell_fieldname].value,
 		bInCode = false,
 		iOffset1,
@@ -64,17 +62,15 @@ function spellCheck(formName, fieldName, bFull)
 			iOffset2--;
 
 		// I guess there's only dashes and hyphens in this word...
-		if (iOffset1 == iOffset2)
+		if (iOffset1 === iOffset2)
 			continue;
 
 		// Ignore code blocks.
 		if (aResult[0].substr(0, 5).toLowerCase() === '[code')
 			bInCode = true;
-
 		// Glad we're out of that code block!
 		else if (bInCode && aResult[0].substr(0, 7).toLowerCase() === '[/code]')
 			bInCode = false;
-
 		// Now let's get to business.
 		else if (!bInCode && !in_array(aResult[0].charAt(0), ['[', '<']) && aResult[0].toUpperCase() !== aResult[0])
 			aWords[aWords.length] = aResult[0].substr(iOffset1, iOffset2 - iOffset1 + 1) + '|' + (iOffset1 + sText.substr(0, aResult.index).length) + '|' + (iOffset2 + sText.substr(0, aResult.index).length);
@@ -99,7 +95,6 @@ function spellCheck(formName, fieldName, bFull)
 var wordindex = -1,
 	offsetindex = 0,
 	ignoredWords = [];
-
 
 /**
  * A "misspelled word" object.
@@ -230,19 +225,16 @@ function highlightWord()
 	divptr.innerHTML = newValue.replace(/_\|_/g, '<br />');
 
 	// We could use scrollIntoView, but it's just not that great anyway.
-	var spellview_height = typeof (document.getElementById("spellview").currentStyle) !== "undefined" ? parseInt(document.getElementById("spellview").currentStyle.height) : document.getElementById("spellview").offsetHeight,
-		word_position = document.getElementById("h1").offsetTop,
-		current_position = document.getElementById("spellview").scrollTop;
+	var myElement = document.getElementById('h1'),
+		topPos = myElement.offsetTop;
 
-	// The spellview is not tall enough!  Scroll down!
-	if (spellview_height <= (word_position + current_position))
-		document.getElementById("spellview").scrollTop = word_position + current_position - spellview_height + 32;
+	document.getElementById('spellview').scrollTop = topPos - 32;
 }
 
 /**
  * Display the next misspelled word to the user and populate the suggested spellings box.
  *
- * @param {string} ignoreall
+ * @param {string|boolean} ignoreall
  */
 function nextWord(ignoreall)
 {
@@ -286,10 +278,7 @@ function nextWord(ignoreall)
 		else
 		{
 			window.opener.document.forms[spell_formname][spell_fieldname].value = mispstr;
-			if (!window.opener.spellCheckDone)
-				window.opener.document.forms[spell_formname][spell_fieldname].focus();
-			else
-				window.opener.spellCheckDone();
+			window.opener.document.forms[spell_formname][spell_fieldname].focus();
 		}
 
 		window.close();
@@ -333,16 +322,17 @@ function nextWord(ignoreall)
 }
 
 /**
- * convert characters to HTML equivalents
+ * Convert characters to HTML equivalents
  *
- * @param {string} thetext
+ * @param {string} thetext the text from the form that we will check
  */
 function htmlspecialchars(thetext)
 {
-	thetext = thetext.replace(/</g, "&lt;");
-	thetext = thetext.replace(/\>/g, "&gt;");
-	thetext = thetext.replace(/\n/g, "<br />");
-	thetext = thetext.replace(/\ \ /g, "&nbsp; ");
+	thetext = thetext
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/\n/g, "<br />")
+		.replace(/  /g, "&nbsp; ");
 
 	return thetext;
 }
@@ -383,12 +373,10 @@ function spellCheckSetText(text, editorID)
 }
 
 /**
- * Used to enable the spellcheck on the editor box, switch to text mode so the
- * spellcheck works
- *
- * @param {type} fieldName
+ * Used to enable the spell check on the editor box, switch to text mode so the
+ * spell check works
  */
-function spellCheckStart(fieldName)
+function spellCheckStart()
 {
 	if (!spellCheck)
 		return false;
@@ -398,7 +386,7 @@ function spellCheckStart(fieldName)
 	// If we're in HTML mode we need to get the non-HTML text.
 	$editor_data[post_box_name].setTextMode();
 
-	spellCheck(false, post_box_name);
+	spellCheck(false, post_box_name, true);
 
 	return true;
 }

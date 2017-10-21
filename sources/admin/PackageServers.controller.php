@@ -8,18 +8,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.10
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * PackageServers controller handles browsing, adding and removing
@@ -40,7 +35,8 @@ class PackageServers_Controller extends Action_Controller
 		loadLanguage('Packages');
 
 		// Use the PackageServers template.
-		loadTemplate('PackageServers', 'admin');
+		loadTemplate('PackageServers');
+		loadCSSFile('admin.css');
 	}
 
 	/**
@@ -49,6 +45,7 @@ class PackageServers_Controller extends Action_Controller
 	 *
 	 * - Accessed by action=admin;area=packageservers
 	 *
+	 * @event integrate_sa_package_servers
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -65,7 +62,8 @@ class PackageServers_Controller extends Action_Controller
 		loadLanguage('Packages');
 
 		// Use the PackageServers template.
-		loadTemplate('PackageServers', 'admin');
+		loadTemplate('PackageServers');
+		loadCSSFile('admin.css');
 
 		$context['page_title'] = $txt['package_servers'];
 
@@ -125,24 +123,21 @@ class PackageServers_Controller extends Action_Controller
 	 */
 	public function action_browse()
 	{
-		global $txt, $scripturl, $forum_version, $context;
+		global $txt, $scripturl, $context;
 
 		// Load our subs worker.
 		require_once(SUBSDIR . '/PackageServers.subs.php');
 
-		$server = '';
-		$url = '';
-		$name = '';
-
 		// Browsing the packages from a server
-		if (isset($_GET['server']))
+		if (isset($this->_req->query->server))
 			list($name, $url, $server) = $this->_package_server();
+
 		// Minimum required parameter did not exist so dump out.
 		else
-			fatal_lang_error('couldnt_connect', false);
+			throw new Elk_Exception('couldnt_connect', false);
 
 		// Might take some time.
-		@set_time_limit(60);
+		detectServer()->setTimeLimit(60);
 
 		// Fetch the package listing from the server and json decode
 		$listing = json_decode(fetch_web_data($url));
@@ -166,7 +161,7 @@ class PackageServers_Controller extends Action_Controller
 			foreach ($instadds as $installed_add)
 				$installed_adds[$installed_add['package_id']] = $installed_add['version'];
 
-			$the_version = strtr($forum_version, array('ElkArte ' => ''));
+			$the_version = strtr(FORUM_VERSION, array('ElkArte ' => ''));
 			if (!empty($_SESSION['version_emulate']))
 				$the_version = $_SESSION['version_emulate'];
 
@@ -217,7 +212,7 @@ class PackageServers_Controller extends Action_Controller
 							$package['can_install'] = matchPackageVersion($the_version, $for);
 						}
 					}
-
+					$package['can_install'] = true;
 					// See if this filename already exists on the server
 					$already_exists = getPackageInfo($base_name);
 					$package['download_conflict'] = is_array($already_exists) && in_array($already_exists['id'], $package['possible_ids']) && compareVersions($already_exists['version'], $package['version']) != 0;
@@ -291,13 +286,13 @@ class PackageServers_Controller extends Action_Controller
 			'license' => $thisPackage->license,
 			'hooks' => $thisPackage->allhooks,
 			'server' => array(
-				'download' => filter_var($thisPackage->server[0]->download, FILTER_VALIDATE_URL)
+				'download' => (strpos($thisPackage->server[0]->download, 'http://') === 0 || strpos($thisPackage->server[0]->download, 'https://') === 0) && filter_var($thisPackage->server[0]->download, FILTER_VALIDATE_URL)
 					? $thisPackage->server[0]->download : '',
-				'support' => filter_var($thisPackage->server[0]->support, FILTER_VALIDATE_URL)
+				'support' => (strpos($thisPackage->server[0]->support, 'http://') === 0 || strpos($thisPackage->server[0]->support, 'https://') === 0) && filter_var($thisPackage->server[0]->support, FILTER_VALIDATE_URL)
 					? $thisPackage->server[0]->support : '',
-				'bugs' => filter_var($thisPackage->server[0]->bugs, FILTER_VALIDATE_URL)
+				'bugs' => (strpos($thisPackage->server[0]->bugs, 'http://') === 0 || strpos($thisPackage->server[0]->bugs, 'https://') === 0) && filter_var($thisPackage->server[0]->bugs, FILTER_VALIDATE_URL)
 					? $thisPackage->server[0]->bugs : '',
-				'link' => filter_var($thisPackage->server[0]->url, FILTER_VALIDATE_URL)
+				'link' => (strpos($thisPackage->server[0]->url, 'http://') === 0 || strpos($thisPackage->server[0]->url, 'https://') === 0) && filter_var($thisPackage->server[0]->url, FILTER_VALIDATE_URL)
 					? $thisPackage->server[0]->url : '',
 			),
 		);
@@ -311,14 +306,14 @@ class PackageServers_Controller extends Action_Controller
 	 *
 	 * @param object $thisPackage
 	 *
-	 * @return array
+	 * @return string[]
 	 */
 	private function _assume_id($thisPackage)
 	{
 		$under = str_replace(' ', '_', $thisPackage->title);
 		$none = str_replace(' ', '', $thisPackage->title);
 
-		return array (
+		return array(
 			$thisPackage->author . ':' . $under,
 			$thisPackage->author . ':' . $none,
 			strtolower($thisPackage->author) . ':' . $under,
@@ -356,8 +351,8 @@ class PackageServers_Controller extends Action_Controller
 			// We could read the package info and see if we have a duplicate id & version, however that is
 			// not always accurate, especially when dealing with repos.  So for now just put in in no conflict mode
 			// and do the save.
-			if (isset($_GET['area'], $_GET['sa']) && $_GET['area'] == 'packageservers' && $_GET['sa'] == 'download')
-				$_REQUEST['auto'] = true;
+			if ($this->_req->getQuery('area') === 'packageservers' && $this->_req->getQuery('sa') === 'download')
+				$this->_req->query->auto = true;
 
 			return str_replace($invalid, '_', $newname) . $matches[6];
 		}
@@ -369,11 +364,12 @@ class PackageServers_Controller extends Action_Controller
 	 * Download a package.
 	 *
 	 * What it does:
+	 *
 	 * - Accessed by action=admin;area=packageservers;sa=download
 	 * - If server is set, loads json file from package server
 	 *     - requires both section and num values to validate the file to download from the json file
-	 * - If $_POST['byurl']) $_POST['filename'])) are set, will download a file from the url and save it as filename
-	 * - If just $_POST['byurl']) is set will fetch that file and save it
+	 * - If $_POST['byurl'] $_POST['filename'])) are set, will download a file from the url and save it as filename
+	 * - If just $_POST['byurl'] is set will fetch that file and save it
 	 *     - github and bitbucket master files are renamed to repo name to avoid collisions
 	 * - Files are saved to the package directory and validate to be ElkArte packages
 	 */
@@ -387,22 +383,21 @@ class PackageServers_Controller extends Action_Controller
 		$context['sub_template'] = 'downloaded';
 
 		// Security is good...
-		if (isset($_GET['server']))
+		if (isset($this->_req->query->server))
 			checkSession('get');
 		else
 			checkSession();
 
 		// To download something, we need either a valid server or url.
-		if (empty($_GET['server']) && (!empty($_GET['get']) && !empty($_POST['package'])))
-			fatal_lang_error('package_get_error_is_zero', false);
+		if (empty($this->_req->query->server) && (!empty($this->_req->query->get) && !empty($this->_req->post->package)))
+			throw new Elk_Exception('package_get_error_is_zero', false);
 
 		// Start off with nothing
-		$package_name = '';
 		$server = '';
 		$url = '';
 
 		// Download from a package server?
-		if (!empty($_GET['server']))
+		if (isset($this->_req->query->server))
 		{
 			list(, $url, $server) = $this->_package_server();
 
@@ -410,29 +405,37 @@ class PackageServers_Controller extends Action_Controller
 			$listing = json_decode(fetch_web_data($url));
 
 			// Find the requested package by section and number, make sure it matches
-			$section = $listing->{$_GET['section']};
+			$section = $this->_req->query->section;
+			$section = $listing->{$section};
 
 			// This is what they requested, yes?
-			if (basename($section[$_GET['num']]->server[0]->download) === $_GET['package'])
+			if (basename($section[$this->_req->query->num]->server[0]->download) === $this->_req->query->package)
 			{
 				// Where to download it from
-				$package_name = $this->_rename_master($section[$_GET['num']]->server[0]->download);
-				$path_url = pathinfo($section[$_GET['num']]->server[0]->download);
+				$package_id = $this->_req->query->package;
+				$package_name = $this->_rename_master($section[$this->_req->query->num]->server[0]->download);
+				$path_url = pathinfo($section[$this->_req->query->num]->server[0]->download);
 				$url = isset($path_url['dirname']) ? $path_url['dirname'] . '/' : '';
 			}
 			// Not found or some monkey business
 			else
-				fatal_lang_error('package_cant_download', false);
+				throw new Elk_Exception('package_cant_download', false);
 		}
 		// Entered a url and optional filename
-		elseif (isset($_POST['byurl']) && !empty($_POST['filename']))
-			$package_name = basename($_POST['filename']);
+		elseif (isset($this->_req->post->byurl) && !empty($this->_req->post->filename))
+		{
+			$package_id = $this->_req->post->package;
+			$package_name = basename($this->_req->post->filename);
+		}
 		// Must just be a link then
 		else
-			$package_name = $this->_rename_master($_POST['package']);
+		{
+			$package_id = $this->_req->post->package;
+			$package_name = $this->_rename_master($this->_req->post->package);
+		}
 
 		// Avoid over writing any existing package files of the same name
-		if (isset($_REQUEST['conflict']) || (isset($_REQUEST['auto']) && file_exists(BOARDDIR . '/packages/' . $package_name)))
+		if (isset($this->_req->query->conflict) || (isset($this->_req->query->auto) && file_exists(BOARDDIR . '/packages/' . $package_name)))
 		{
 			// Find the extension, change abc.tar.gz to abc_1.tar.gz...
 			if (strrpos(substr($package_name, 0, -3), '.') !== false)
@@ -452,16 +455,24 @@ class PackageServers_Controller extends Action_Controller
 		}
 
 		// First make sure it's a package.
-		$packageInfo = getPackageInfo($url . $_REQUEST['package']);
-		if (!is_array($packageInfo))
-			fatal_lang_error($packageInfo);
+		$packageInfo = getPackageInfo($url . $package_id);
 
-		// Save the package to disk as $package_name, use FTP if necessary
-		create_chmod_control(array(BOARDDIR . '/packages/' . $package_name), array('destination_url' => $scripturl . '?action=admin;area=packageservers;sa=download' . (isset($_GET['server']) ? ';server=' . $_GET['server'] : '') . (isset($_REQUEST['auto']) ? ';auto' : '') . ';package=' . $_REQUEST['package'] . (isset($_REQUEST['conflict']) ? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'], 'crash_on_error' => true));
-		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $_REQUEST['package']));
+		if (!is_array($packageInfo))
+			throw new Elk_Exception($packageInfo);
+
+		// Save the package to disk, use FTP if necessary
+		create_chmod_control(
+			array(BOARDDIR . '/packages/' . $package_name),
+			array('destination_url' => $scripturl . '?action=admin;area=packageservers;sa=download' . (isset($this->_req->query->server)
+					? ';server=' . $this->_req->query->server : '') . (isset($this->_req->query->auto)
+					? ';auto' : '') . ';package=' . $package_id . (isset($this->_req->query->conflict)
+					? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'],
+				  'crash_on_error' => true)
+		);
+		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $package_id));
 
 		// Done!  Did we get this package automatically?
-		if (preg_match('~^http://[\w_\-]+\.elkarte\.net/~', $_REQUEST['package']) == 1 && strpos($_REQUEST['package'], 'dlattach') === false && isset($_REQUEST['auto']))
+		if (preg_match('~^http://[\w_\-]+\.elkarte\.net/~', $package_id) == 1 && strpos($package_id, 'dlattach') === false && isset($this->_req->query->auto))
 			redirectexit('action=admin;area=packages;sa=install;package=' . $package_name);
 
 		// You just downloaded a addon from SERVER_NAME_GOES_HERE.
@@ -471,13 +482,13 @@ class PackageServers_Controller extends Action_Controller
 		$context['package'] = getPackageInfo($package_name);
 
 		if (!is_array($context['package']))
-			fatal_lang_error('package_cant_download', false);
+			throw new Elk_Exception('package_cant_download', false);
 
-		if ($context['package']['type'] == 'modification')
+		if ($context['package']['type'] === 'modification')
 			$context['package']['install']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">[ ' . $txt['install_mod'] . ' ]</a>';
-		elseif ($context['package']['type'] == 'avatar')
+		elseif ($context['package']['type'] === 'avatar')
 			$context['package']['install']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">[ ' . $txt['use_avatars'] . ' ]</a>';
-		elseif ($context['package']['type'] == 'language')
+		elseif ($context['package']['type'] === 'language')
 			$context['package']['install']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">[ ' . $txt['add_languages'] . ' ]</a>';
 		else
 			$context['package']['install']['link'] = '';
@@ -496,6 +507,7 @@ class PackageServers_Controller extends Action_Controller
 	 * - Reads the database to fetch the server url and name
 	 *
 	 * @return array
+	 * @throws Elk_Exception couldnt_connect
 	 */
 	private function _package_server()
 	{
@@ -504,12 +516,12 @@ class PackageServers_Controller extends Action_Controller
 		$url = '';
 		$server = '';
 
-		if (isset($_GET['server']))
+		if (isset($this->_req->query->server))
 		{
-			if ($_GET['server'] == '')
+			if ($this->_req->query->server == '')
 				redirectexit('action=admin;area=packageservers');
 
-			$server = (int) $_GET['server'];
+			$server = $this->_req->getQuery('server', 'intval');
 
 			// Query the server table to find the requested server.
 			$packageserver = fetchPackageServers($server);
@@ -518,7 +530,7 @@ class PackageServers_Controller extends Action_Controller
 
 			// If server does not exist then dump out.
 			if (empty($url))
-				fatal_lang_error('couldnt_connect', false);
+				throw new Elk_Exception('couldnt_connect', false);
 		}
 
 		return array($name, $url, $server);
@@ -539,15 +551,15 @@ class PackageServers_Controller extends Action_Controller
 		// @todo Use FTP if the packages directory is not writable.
 		// Check the file was even sent!
 		if (!isset($_FILES['package']['name']) || $_FILES['package']['name'] == '')
-			fatal_lang_error('package_upload_error_nofile');
+			throw new Elk_Exception('package_upload_error_nofile');
 		elseif (!is_uploaded_file($_FILES['package']['tmp_name']) || (ini_get('open_basedir') == '' && !file_exists($_FILES['package']['tmp_name'])))
-			fatal_lang_error('package_upload_error_failed');
+			throw new Elk_Exception('package_upload_error_failed');
 
 		// Make sure it has a sane filename.
 		$_FILES['package']['name'] = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('_', '.', ''), $_FILES['package']['name']);
 
-		if (strtolower(substr($_FILES['package']['name'], -4)) != '.zip' && strtolower(substr($_FILES['package']['name'], -4)) != '.tgz' && strtolower(substr($_FILES['package']['name'], -7)) != '.tar.gz')
-			fatal_lang_error('package_upload_error_supports', false, array('zip, tgz, tar.gz'));
+		if (strtolower(substr($_FILES['package']['name'], -4)) !== '.zip' && strtolower(substr($_FILES['package']['name'], -4)) !== '.tgz' && strtolower(substr($_FILES['package']['name'], -7)) !== '.tar.gz')
+			throw new Elk_Exception('package_upload_error_supports', false, array('zip, tgz, tar.gz'));
 
 		// We only need the filename...
 		$packageName = basename($_FILES['package']['name']);
@@ -557,7 +569,7 @@ class PackageServers_Controller extends Action_Controller
 
 		// @todo Maybe just roll it like we do for downloads?
 		if (file_exists($destination))
-			fatal_lang_error('package_upload_error_exists');
+			throw new Elk_Exception('package_upload_error_exists');
 
 		// Now move the file.
 		move_uploaded_file($_FILES['package']['tmp_name'], $destination);
@@ -573,38 +585,49 @@ class PackageServers_Controller extends Action_Controller
 			@unlink($destination);
 			loadLanguage('Errors');
 			$txt[$context['package']] = str_replace('{MANAGETHEMEURL}', $scripturl . '?action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id'] . '#theme_install', $txt[$context['package']]);
-			fatal_lang_error('package_upload_error_broken', false, $txt[$context['package']]);
+			throw new Elk_Exception('package_upload_error_broken', false, $txt[$context['package']]);
 		}
 		// Is it already uploaded, maybe?
-		elseif ($dir = @opendir(BOARDDIR . '/packages'))
+		else
 		{
-			while ($package = readdir($dir))
+			try
 			{
-				// No need to check these
-				if ($package == '.' || $package == '..' || $package == 'temp' || $package == $packageName || (!(is_dir(BOARDDIR . '/packages/' . $package) && file_exists(BOARDDIR . '/packages/' . $package . '/package-info.xml')) && substr(strtolower($package), -7) != '.tar.gz' && substr(strtolower($package), -4) != '.tgz' && substr(strtolower($package), -4) != '.zip'))
-					continue;
+				$dir = new FilesystemIterator(BOARDDIR . '/packages', FilesystemIterator::SKIP_DOTS);
 
-				// Read package info for the archive we found
-				$packageInfo = getPackageInfo($package);
-				if (!is_array($packageInfo))
-					continue;
+				$filter = new PackagesFilterIterator($dir);
+				$packages = new \IteratorIterator($filter);
 
-				// If it was already uploaded under another name don't upload it again.
-				if ($packageInfo['id'] == $context['package']['id'] && compareVersions($packageInfo['version'], $context['package']['version']) == 0)
+				foreach ($packages as $package)
 				{
-					@unlink($destination);
-					loadLanguage('Errors');
-					fatal_lang_error('package_upload_already_exists', 'general', $package);
+					// No need to check these
+					if ($package->getFilename() == $packageName)
+						continue;
+
+					// Read package info for the archive we found
+					$packageInfo = getPackageInfo($package->getFilename());
+					if (!is_array($packageInfo))
+						continue;
+
+					// If it was already uploaded under another name don't upload it again.
+					if ($packageInfo['id'] == $context['package']['id'] && compareVersions($packageInfo['version'], $context['package']['version']) == 0)
+					{
+						@unlink($destination);
+						loadLanguage('Errors');
+						throw new Elk_Exception('package_upload_already_exists', 'general', $package->getFilename());
+					}
 				}
 			}
-			closedir($dir);
+			catch (UnexpectedValueException $e)
+			{
+				// @todo for now do nothing...
+			}
 		}
 
-		if ($context['package']['type'] == 'modification')
+		if ($context['package']['type'] === 'modification')
 			$context['package']['install']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">[ ' . $txt['install_mod'] . ' ]</a>';
-		elseif ($context['package']['type'] == 'avatar')
+		elseif ($context['package']['type'] === 'avatar')
 			$context['package']['install']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">[ ' . $txt['use_avatars'] . ' ]</a>';
-		elseif ($context['package']['type'] == 'language')
+		elseif ($context['package']['type'] === 'language')
 			$context['package']['install']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">[ ' . $txt['add_languages'] . ' ]</a>';
 		else
 			$context['package']['install']['link'] = '';
@@ -630,16 +653,15 @@ class PackageServers_Controller extends Action_Controller
 		checkSession();
 
 		// If they put a slash on the end, get rid of it.
-		if (substr($_POST['serverurl'], -1) == '/')
-			$_POST['serverurl'] = substr($_POST['serverurl'], 0, -1);
+		if (substr($this->_req->post->serverurl, -1) === '/')
+			$this->_req->post->serverurl = substr($this->_req->post->serverurl, 0, -1);
 
 		// Are they both nice and clean?
-		$servername = trim(Util::htmlspecialchars($_POST['servername']));
-		$serverurl = trim(Util::htmlspecialchars($_POST['serverurl']));
+		$servername = trim(Util::htmlspecialchars($this->_req->post->servername));
+		$serverurl = trim(Util::htmlspecialchars($this->_req->post->serverurl));
 
 		// Make sure the URL has the correct prefix.
-		if (substr($serverurl, 0, 7) !== 'http://' && substr($serverurl, 0, 8) !== 'https://')
-			$serverurl = 'http://' . $serverurl;
+		$serverurl = addProtocol($serverurl, array('http://', 'https://'));
 
 		// Add it to the list of package servers.
 		addPackageServer($servername, $serverurl);
@@ -659,8 +681,8 @@ class PackageServers_Controller extends Action_Controller
 		require_once(SUBSDIR . '/PackageServers.subs.php');
 
 		// We no longer browse this server.
-		$_GET['server'] = (int) $_GET['server'];
-		deletePackageServer($_GET['server']);
+		$this->_req->query->server = (int) $this->_req->query->server;
+		deletePackageServer($this->_req->query->server);
 
 		redirectexit('action=admin;area=packageservers');
 	}
@@ -722,18 +744,17 @@ class PackageServers_Controller extends Action_Controller
 		if ($unwritable)
 		{
 			// Are they connecting to their FTP account already?
-			if (isset($_POST['ftp_username']))
+			if (isset($this->_req->post->ftp_username))
 			{
-				require_once(SUBSDIR . '/FtpConnection.class.php');
-				$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
+				$ftp = new Ftp_Connection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
 
 				if ($ftp->error === false)
 				{
 					// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
-					if (!$ftp->chdir($_POST['ftp_path']))
+					if (!$ftp->chdir($this->_req->post->ftp_path))
 					{
 						$ftp_error = $ftp->error;
-						$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $_POST['ftp_path']));
+						$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $this->_req->post->ftp_path));
 					}
 				}
 			}
@@ -744,7 +765,6 @@ class PackageServers_Controller extends Action_Controller
 				// Maybe we didn't even try yet
 				if (!isset($ftp))
 				{
-					require_once(SUBSDIR . '/FtpConnection.class.php');
 					$ftp = new Ftp_Connection(null);
 				}
 				// ...or we failed
@@ -753,18 +773,18 @@ class PackageServers_Controller extends Action_Controller
 
 				list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
 
-				if ($found_path || !isset($_POST['ftp_path']))
-					$_POST['ftp_path'] = $detect_path;
+				if ($found_path || !isset($this->_req->post->ftp_path))
+					$this->_req->post->ftp_path = $detect_path;
 
-				if (!isset($_POST['ftp_username']))
-					$_POST['ftp_username'] = $username;
+				if (!isset($this->_req->post->ftp_username))
+					$this->_req->post->ftp_username = $username;
 
 				// Fill the boxes for a FTP connection with data from the previous attempt too, if any
 				$context['package_ftp'] = array(
-					'server' => isset($_POST['ftp_server']) ? $_POST['ftp_server'] : (isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost'),
-					'port' => isset($_POST['ftp_port']) ? $_POST['ftp_port'] : (isset($modSettings['package_port']) ? $modSettings['package_port'] : '21'),
-					'username' => isset($_POST['ftp_username']) ? $_POST['ftp_username'] : (isset($modSettings['package_username']) ? $modSettings['package_username'] : ''),
-					'path' => $_POST['ftp_path'],
+					'server' => isset($this->_req->post->ftp_server) ? $this->_req->post->ftp_server : (isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost'),
+					'port' => isset($this->_req->post->ftp_port) ? $this->_req->post->ftp_port : (isset($modSettings['package_port']) ? $modSettings['package_port'] : '21'),
+					'username' => isset($this->_req->post->ftp_username) ? $this->_req->post->ftp_username : (isset($modSettings['package_username']) ? $modSettings['package_username'] : ''),
+					'path' => $this->_req->post->ftp_path,
 					'error' => empty($ftp_error) ? null : $ftp_error,
 				);
 

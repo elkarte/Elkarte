@@ -7,24 +7,41 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.10
+ * @version 1.1
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
- * ProfileAccount controller handles actions made on a user's profile.
+ * ProfileAccount_Controller Class
+ * Processes user warnings, account activation and account deletion
  */
 class ProfileAccount_Controller extends Action_Controller
 {
+	/**
+	 * Member id for the account being worked on
+	 * @var int
+	 */
+	private $_memID = 0;
+
+	/**
+	 * Holds any errors that were generated when issuing a warning
+	 * @var array
+	 */
+	private $_issueErrors = array();
+
+	/**
+	 * Called before all other methods when coming from the dispatcher or
+	 * action class.
+	 */
+	public function pre_dispatch()
+	{
+		$this->_memID = currentMemberID();
+	}
+
 	/**
 	 * Entry point for this class.
 	 *
@@ -38,35 +55,37 @@ class ProfileAccount_Controller extends Action_Controller
 
 	/**
 	 * Issue/manage an user's warning status.
-	 * @uses ProfileAccount template issueWarning sub template
+	 *
+	 * @uses template_issueWarning sub template in ProfileAccount
 	 * @uses Profile template
 	 */
 	public function action_issuewarning()
 	{
 		global $txt, $scripturl, $modSettings, $mbname, $context, $cur_profile;
 
-		$memID = currentMemberID();
-
-		// make sure the sub-template is set...
+		// Make sure the sub-template is set...
 		loadTemplate('ProfileAccount');
 		$context['sub_template'] = 'issueWarning';
+
 		// We need this because of template_load_warning_variables
 		loadTemplate('Profile');
 		loadJavascriptFile('profile.js');
+
 		// jQuery-UI FTW!
 		$modSettings['jquery_include_ui'] = true;
 		loadCSSFile('jquery.ui.slider.css');
-		loadCSSFile('jquery.ui.theme.css');
+		loadCSSFile('jquery.ui.theme.min.css');
 
 		// Get all the actual settings.
 		list ($modSettings['warning_enable'], $modSettings['user_limit']) = explode(',', $modSettings['warning_settings']);
 
-		// This stores any legitimate errors.
-		$issueErrors = array();
-
 		// Doesn't hurt to be overly cautious.
-		if (empty($modSettings['warning_enable']) || ($context['user']['is_owner'] && !$cur_profile['warning']) || !allowedTo('issue_warning'))
-			fatal_lang_error('no_access', false);
+		if (empty($modSettings['warning_enable'])
+			|| ($context['user']['is_owner'] && !$cur_profile['warning'])
+			|| !allowedTo('issue_warning'))
+		{
+			throw new Elk_Exception('no_access', false);
+		}
 
 		// Get the base (errors related) stuff done.
 		loadLanguage('Errors');
@@ -87,7 +106,7 @@ class ProfileAccount_Controller extends Action_Controller
 		if ($context['warning_limit'] > 0)
 		{
 			require_once(SUBSDIR . '/Moderation.subs.php');
-			$current_applied = warningDailyLimit($memID);
+			$current_applied = warningDailyLimit($this->_memID);
 
 			$context['min_allowed'] = max(0, $cur_profile['warning'] - $current_applied - $context['warning_limit']);
 			$context['max_allowed'] = min(100, $cur_profile['warning'] - $current_applied + $context['warning_limit']);
@@ -102,130 +121,23 @@ class ProfileAccount_Controller extends Action_Controller
 		);
 
 		// Are we saving?
-		if (isset($_POST['save']))
-		{
-			// Security is good here.
-			checkSession('post');
+		$this->_save_warning();
 
-			// This cannot be empty!
-			$_POST['warn_reason'] = isset($_POST['warn_reason']) ? trim($_POST['warn_reason']) : '';
-			if ($_POST['warn_reason'] == '' && !$context['user']['is_owner'])
-				$issueErrors[] = 'warning_no_reason';
+		// Perhaps taking a look first? Good idea that one.
+		$this->_preview_warning();
 
-			$_POST['warn_reason'] = Util::htmlspecialchars($_POST['warn_reason']);
-
-			// If the value hasn't changed it's either no JS or a real no change (Which this will pass)
-			if ($_POST['warning_level'] == 'SAME')
-				$_POST['warning_level'] = $_POST['warning_level_nojs'];
-
-			$_POST['warning_level'] = (int) $_POST['warning_level'];
-			$_POST['warning_level'] = max(0, min(100, $_POST['warning_level']));
-
-			if ($_POST['warning_level'] < $context['min_allowed'])
-				$_POST['warning_level'] = $context['min_allowed'];
-			elseif ($_POST['warning_level'] > $context['max_allowed'])
-				$_POST['warning_level'] = $context['max_allowed'];
-
-			require_once(SUBSDIR . '/Moderation.subs.php');
-
-			// Do we actually have to issue them with a PM?
-			$id_notice = 0;
-			if (!empty($_POST['warn_notify']) && empty($issueErrors))
-			{
-				$_POST['warn_sub'] = trim($_POST['warn_sub']);
-				$_POST['warn_body'] = trim($_POST['warn_body']);
-
-				if (empty($_POST['warn_sub']) || empty($_POST['warn_body']))
-					$issueErrors[] = 'warning_notify_blank';
-				// Send the PM?
-				else
-				{
-					require_once(SUBSDIR . '/PersonalMessage.subs.php');
-					$from = array(
-						'id' => 0,
-						'name' => $context['forum_name'],
-						'username' => $context['forum_name'],
-					);
-					sendpm(array('to' => array($memID), 'bcc' => array()), $_POST['warn_sub'], $_POST['warn_body'], false, $from);
-
-					// Log the notice.
-					$id_notice = logWarningNotice($_POST['warn_sub'], $_POST['warn_body']);
-				}
-			}
-
-			// Just in case - make sure notice is valid!
-			$id_notice = (int) $id_notice;
-
-			// What have we changed?
-			$level_change = $_POST['warning_level'] - $cur_profile['warning'];
-
-			// No errors? Proceed! Only log if you're not the owner.
-			if (empty($issueErrors))
-			{
-				// Log what we've done!
-				if (!$context['user']['is_owner'])
-					logWarning($memID, $cur_profile['real_name'], $id_notice, $level_change, $_POST['warn_reason']);
-
-				// Make the change.
-				updateMemberData($memID, array('warning' => $_POST['warning_level']));
-
-				// Leave a lovely message.
-				$context['profile_updated'] = $context['user']['is_owner'] ? $txt['profile_updated_own'] : $txt['profile_warning_success'];
-			}
-			else
-			{
-				// Try to remember some bits.
-				$context['warning_data'] = array(
-					'reason' => $_POST['warn_reason'],
-					'notify' => !empty($_POST['warn_notify']),
-					'notify_subject' => isset($_POST['warn_sub']) ? $_POST['warn_sub'] : '',
-					'notify_body' => isset($_POST['warn_body']) ? $_POST['warn_body'] : '',
-				);
-			}
-
-			// Show the new improved warning level.
-			$context['member']['warning'] = $_POST['warning_level'];
-		}
-
-		// Taking a look first, good idea that one.
-		if (isset($_POST['preview']))
-		{
-			$warning_body = !empty($_POST['warn_body']) ? trim(censorText($_POST['warn_body'])) : '';
-			$context['preview_subject'] = !empty($_POST['warn_sub']) ? trim(Util::htmlspecialchars($_POST['warn_sub'])) : '';
-
-			if (empty($_POST['warn_sub']) || empty($_POST['warn_body']))
-				$issueErrors[] = 'warning_notify_blank';
-
-			if (!empty($_POST['warn_body']))
-			{
-				require_once(SUBSDIR . '/Post.subs.php');
-
-				preparsecode($warning_body);
-				$warning_body = parse_bbc($warning_body, true);
-			}
-
-			// Try to remember some bits.
-			$context['warning_data'] = array(
-				'reason' => $_POST['warn_reason'],
-				'notify' => !empty($_POST['warn_notify']),
-				'notify_subject' => isset($_POST['warn_sub']) ? $_POST['warn_sub'] : '',
-				'notify_body' => isset($_POST['warn_body']) ? $_POST['warn_body'] : '',
-				'body_preview' => $warning_body,
-			);
-		}
-
-		if (!empty($issueErrors))
+		// If we have errors, lets set them for the template
+		if (!empty($this->_issueErrors))
 		{
 			// Fill in the suite of errors.
 			$context['post_errors'] = array();
-			foreach ($issueErrors as $error)
+			foreach ($this->_issueErrors as $error)
 				$context['post_errors'][] = $txt[$error];
 		}
 
 		$context['page_title'] = $txt['profile_issue_warning'];
 
 		// Let's use a generic list to get all the current warnings
-		require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		// Work our the various levels.
@@ -248,106 +160,17 @@ class ProfileAccount_Controller extends Action_Controller
 				$context['current_level'] = $limit;
 		}
 
-		// Build a list to view the warnings
-		$listOptions = array(
-			'id' => 'issued_warnings',
-			'title' => $txt['profile_viewwarning_previous_warnings'],
-			'items_per_page' => $modSettings['defaultMaxMessages'],
-			'no_items_label' => $txt['profile_viewwarning_no_warnings'],
-			'base_href' => $scripturl . '?action=profile;area=issuewarning;sa=user;u=' . $memID,
-			'default_sort_col' => 'log_time',
-			'get_items' => array(
-				'function' => 'list_getUserWarnings',
-				'params' => array(
-					$memID,
-				),
-			),
-			'get_count' => array(
-				'function' => 'list_getUserWarningCount',
-				'params' => array(
-					$memID,
-				),
-			),
-			'columns' => array(
-				'issued_by' => array(
-					'header' => array(
-						'value' => $txt['profile_warning_previous_issued'],
-						'style' => 'width: 20%;',
-					),
-					'data' => array(
-						'function' => create_function('$warning', '
-							return $warning[\'issuer\'][\'link\'];
-						'
-						),
-					),
-					'sort' => array(
-						'default' => 'lc.member_name DESC',
-						'reverse' => 'lc.member_name',
-					),
-				),
-				'log_time' => array(
-					'header' => array(
-						'value' => $txt['profile_warning_previous_time'],
-						'style' => 'width: 30%;',
-					),
-					'data' => array(
-						'db' => 'time',
-					),
-					'sort' => array(
-						'default' => 'lc.log_time DESC',
-						'reverse' => 'lc.log_time',
-					),
-				),
-				'reason' => array(
-					'header' => array(
-						'value' => $txt['profile_warning_previous_reason'],
-					),
-					'data' => array(
-						'function' => create_function('$warning', '
-							global $scripturl, $txt, $settings;
+		// Build a listing to view the previous warnings for this user
+		$this->_create_issued_warnings_list();
 
-							$ret = \'
-							<div class="floatleft">
-								\' . $warning[\'reason\'] . \'
-							</div>\';
-
-							// If a notice was sent, provide a way to view it
-							if (!empty($warning[\'id_notice\']))
-								$ret .= \'
-							<div class="floatright">
-								<a href="\' . $scripturl . \'?action=moderate;area=notice;nid=\' . $warning[\'id_notice\'] . \'" onclick="window.open(this.href, \\\'\\\', \\\'scrollbars=yes,resizable=yes,width=400,height=250\\\');return false;" target="_blank" class="new_win" title="\' . $txt[\'profile_warning_previous_notice\'] . \'"><img src="\' . $settings[\'images_url\'] . \'/filter.png" alt="" /></a>
-							</div>\';
-
-							return $ret;'),
-					),
-				),
-				'level' => array(
-					'header' => array(
-						'value' => $txt['profile_warning_previous_level'],
-						'style' => 'width: 6%;',
-					),
-					'data' => array(
-						'db' => 'counter',
-					),
-					'sort' => array(
-						'default' => 'lc.counter DESC',
-						'reverse' => 'lc.counter',
-					),
-				),
-			),
-		);
-
-		// Create the list for viewing.
-		createList($listOptions);
-
-		$warning_for_message = isset($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : false;
+		$warning_for_message = $this->_req->getQuery('msg', 'intval', false);
 		$warned_message_subject = '';
 
 		// Are they warning because of a message?
-		if (isset($_REQUEST['msg']) && 0 < (int) $_REQUEST['msg'])
+		if (!empty($warning_for_message) && $warning_for_message > 0)
 		{
 			require_once(SUBSDIR . '/Messages.subs.php');
-			$message = basicMessageInfo((int) $_REQUEST['msg']);
+			$message = basicMessageInfo($warning_for_message);
 
 			if (!empty($message))
 				$warned_message_subject = $message['subject'];
@@ -362,7 +185,7 @@ class ProfileAccount_Controller extends Action_Controller
 		foreach ($notification_templates as $row)
 		{
 			// If we're not warning for a message skip any that are.
-			if (!$warning_for_message && strpos($row['body'], '{MESSAGE}') !== false)
+			if ($warning_for_message === false && strpos($row['body'], '{MESSAGE}') !== false)
 				continue;
 
 			$context['notification_templates'][] = array(
@@ -394,6 +217,289 @@ class ProfileAccount_Controller extends Action_Controller
 	}
 
 	/**
+	 * Creates the listing of issued warnings
+	 */
+	private function _create_issued_warnings_list()
+	{
+		global $txt, $scripturl, $modSettings;
+
+		$listOptions = array(
+			'id' => 'issued_warnings',
+			'title' => $txt['profile_viewwarning_previous_warnings'],
+			'items_per_page' => $modSettings['defaultMaxMessages'],
+			'no_items_label' => $txt['profile_viewwarning_no_warnings'],
+			'base_href' => $scripturl . '?action=profile;area=issuewarning;sa=user;u=' . $this->_memID,
+			'default_sort_col' => 'log_time',
+			'get_items' => array(
+				'function' => array($this, 'list_getUserWarnings'),
+			),
+			'get_count' => array(
+				'function' => array($this, 'list_getUserWarningCount'),
+			),
+			'columns' => array(
+				'issued_by' => array(
+					'header' => array(
+						'value' => $txt['profile_warning_previous_issued'],
+						'class' => 'grid20',
+					),
+					'data' => array(
+						'function' => function ($warning)
+						{
+							return $warning['issuer']['link'];
+						},
+					),
+					'sort' => array(
+						'default' => 'lc.member_name DESC',
+						'reverse' => 'lc.member_name',
+					),
+				),
+				'log_time' => array(
+					'header' => array(
+						'value' => $txt['profile_warning_previous_time'],
+						'class' => 'grid30',
+					),
+					'data' => array(
+						'db' => 'time',
+					),
+					'sort' => array(
+						'default' => 'lc.log_time DESC',
+						'reverse' => 'lc.log_time',
+					),
+				),
+				'reason' => array(
+					'header' => array(
+						'value' => $txt['profile_warning_previous_reason'],
+					),
+					'data' => array(
+						'function' => function ($warning)
+						{
+							global $scripturl, $txt;
+
+							$ret = '
+							<div class="floatleft">
+								' . $warning['reason'] . '
+							</div>';
+
+							// If a notice was sent, provide a way to view it
+							if (!empty($warning['id_notice']))
+							{
+								$ret .= '
+							<div class="floatright">
+								<a href="' . $scripturl . '?action=moderate;area=notice;nid=' . $warning['id_notice'] . '" onclick="window.open(this.href, \'\', \'scrollbars=yes,resizable=yes,width=400,height=250\');return false;" target="_blank" class="new_win" title="' . $txt['profile_warning_previous_notice'] . '"><i class="icon icon-small i-search"></i></a>
+							</div>';
+							}
+
+							return $ret;
+
+						},
+					),
+				),
+				'level' => array(
+					'header' => array(
+						'value' => $txt['profile_warning_previous_level'],
+						'class' => 'grid8',
+					),
+					'data' => array(
+						'db' => 'counter',
+					),
+					'sort' => array(
+						'default' => 'lc.counter DESC',
+						'reverse' => 'lc.counter',
+					),
+				),
+			),
+		);
+
+		// Create the list for viewing.
+		createList($listOptions);
+	}
+
+	/**
+	 * Simply returns the total count of warnings
+	 * Callback for createList().
+	 *
+	 * @return int
+	 */
+	public function list_getUserWarningCount()
+	{
+		return list_getUserWarningCount($this->_memID);
+	}
+
+	/**
+	 * Callback for createList(). Called by action_hooks
+	 *
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
+	 */
+	public function list_getUserWarnings($start, $items_per_page, $sort)
+	{
+		return list_getUserWarnings($start, $items_per_page, $sort, $this->_memID);
+	}
+
+	/**
+	 * Prepares a warning preview
+	 */
+	private function _preview_warning()
+	{
+		global $context;
+
+		if (isset($this->_req->post->preview))
+		{
+			$warning_body = !empty($this->_req->post->warn_body) ? trim(censor($this->_req->post->warn_body)) : '';
+
+			if (empty($this->_req->post->warn_sub) || empty($this->_req->post->warn_body))
+			{
+				$this->_issueErrors[] = 'warning_notify_blank';
+			}
+
+			if (!empty($this->_req->post->warn_body))
+			{
+				require_once(SUBSDIR . '/Post.subs.php');
+
+				$bbc_parser = \BBC\ParserWrapper::instance();
+				preparsecode($warning_body);
+				$warning_body = $bbc_parser->parseNotice($warning_body);
+			}
+
+			// Try to remember some bits.
+			$context['preview_subject'] = $this->_req->getPost('warn_sub', 'trim|Util::htmlspecialchars', '');
+			$context['warning_data'] = array(
+				'reason' => $this->_req->post->warn_reason,
+				'notify' => !empty($this->_req->post->warn_notify),
+				'notify_subject' => $this->_req->getPost('warn_sub', 'trim', ''),
+				'notify_body' => $this->_req->getPost('warn_body', 'trim', ''),
+				'body_preview' => $warning_body,
+			);
+		}
+	}
+
+	/**
+	 * Does the actual issuing of a warning to a member
+	 *
+	 * What it does:
+	 *
+	 * - Validates the inputs
+	 * - Sends the warning PM if required, to the member
+	 * - Logs the action
+	 * - Updates the users data with the new warning level
+	 */
+	private function _save_warning()
+	{
+		global $txt, $context, $cur_profile;
+
+		if (isset($this->_req->post->save))
+		{
+			// Security is good here.
+			checkSession('post');
+
+			// There must be a reason, and use of flowery words is allowed.
+			$warn_reason = $this->_req->getPost('warn_reason', 'trim|Util::htmlspecialchars', '');
+			if ($warn_reason === '' && !$context['user']['is_owner'])
+			{
+				$this->_issueErrors[] = 'warning_no_reason';
+			}
+
+			// If the value hasn't changed it's either no JS or a real no change (Which this will pass)
+			if ($warn_reason === 'SAME')
+			{
+				$this->_req->post->warning_level = $this->_req->post->warning_level_nojs;
+			}
+
+			// Set and contain the level and level changes
+			$warning_level = (int) $this->_req->post->warning_level;
+			$warning_level = max(0, min(100, $warning_level));
+
+			if ($warning_level < $context['min_allowed'])
+			{
+				$warning_level = $context['min_allowed'];
+			}
+			elseif ($warning_level > $context['max_allowed'])
+			{
+				$warning_level = $context['max_allowed'];
+			}
+
+			// We need this to log moderation notices
+			require_once(SUBSDIR . '/Moderation.subs.php');
+
+			// Do we actually have to issue them with a PM?
+			$id_notice = $this->_issue_warning_pm();
+
+			// What have we changed?
+			$level_change = $warning_level - $cur_profile['warning'];
+
+			// No errors? Proceed! Only log if you're not the owner.
+			if (empty($this->_issueErrors))
+			{
+				// Log what we've done!
+				if (!$context['user']['is_owner'])
+				{
+					logWarning($this->_memID, $cur_profile['real_name'], $id_notice, $level_change, $warn_reason);
+				}
+
+				// Make the change.
+				require_once(SUBSDIR . '/Members.subs.php');
+				updateMemberData($this->_memID, array('warning' => $warning_level));
+
+				// Leave a lovely message.
+				$context['profile_updated'] = $context['user']['is_owner'] ? $txt['profile_updated_own'] : $txt['profile_warning_success'];
+			}
+			else
+			{
+				// Try to remember some bits.
+				$context['warning_data'] = array(
+					'reason' => $warn_reason,
+					'notify' => !empty($this->_req->post->warn_notify),
+					'notify_subject' => $this->_req->getPost('warn_sub', 'trim', ''),
+					'notify_body' => $this->_req->getPost('warn_body', 'trim', ''),
+				);
+			}
+
+			// Show the new improved warning level.
+			$context['member']['warning'] = $warning_level;
+		}
+	}
+
+	/**
+	 * Issue a pm to the member getting the warning
+	 *
+	 * @return int
+	 * @throws Elk_Exception
+	 */
+	private function _issue_warning_pm()
+	{
+		global $context;
+
+		$id_notice = 0;
+		if (!empty($this->_req->post->warn_notify) && empty($this->_issueErrors))
+		{
+			$warn_sub = $this->_req->getPost('warn_sub', 'trim', '');
+			$warn_body = $this->_req->getPost('warn_body', 'trim', '');
+
+			if (empty($warn_sub) || empty($warn_body))
+			{
+				$this->_issueErrors[] = 'warning_notify_blank';
+			}
+			// Send the PM?
+			else
+			{
+				require_once(SUBSDIR . '/PersonalMessage.subs.php');
+				$from = array(
+					'id' => 0,
+					'name' => $context['forum_name'],
+					'username' => $context['forum_name'],
+				);
+				sendpm(array('to' => array($this->_memID), 'bcc' => array()), $warn_sub, $warn_body, false, $from);
+
+				// Log the notice.
+				$id_notice = logWarningNotice($warn_sub, $warn_body);
+			}
+		}
+
+		return $id_notice;
+	}
+
+	/**
 	 * Present a screen to make sure the user wants to be deleted.
 	 */
 	public function action_deleteaccount()
@@ -405,6 +511,10 @@ class ProfileAccount_Controller extends Action_Controller
 		elseif (!allowedTo('profile_remove_any'))
 			isAllowedTo('profile_remove_own');
 
+		if (isset($this->_req->post->save))
+		{
+			return $this->action_deleteaccount2();
+		}
 		// Permissions for removing stuff...
 		$context['can_delete_posts'] = !$context['user']['is_owner'] && allowedTo('moderate_forum');
 
@@ -425,21 +535,25 @@ class ProfileAccount_Controller extends Action_Controller
 		global $user_info, $context, $cur_profile, $user_profile, $modSettings;
 
 		// Try get more time...
-		@set_time_limit(600);
+		detectServer()->setTimeLimit(600);
 
 		// @todo Add a way to delete pms as well?
 		if (!$context['user']['is_owner'])
+		{
 			isAllowedTo('profile_remove_any');
+		}
 		elseif (!allowedTo('profile_remove_any'))
+		{
 			isAllowedTo('profile_remove_own');
+		}
 
 		checkSession();
 
-		$memID = currentMemberID();
-
 		// Check we got here as we should have!
-		if ($cur_profile != $user_profile[$memID])
-			fatal_lang_error('no_access', false);
+		if ($cur_profile != $user_profile[$this->_memID])
+		{
+			throw new Elk_Exception('no_access', false);
+		}
 
 		$old_profile = &$cur_profile;
 
@@ -452,30 +566,30 @@ class ProfileAccount_Controller extends Action_Controller
 			// Are you allowed to administrate the forum, as they are?
 			isAllowedTo('admin_forum');
 
-			$another = isAnotherAdmin($memID);
+			$another = isAnotherAdmin($this->_memID);
 
 			if (empty($another))
-				fatal_lang_error('at_least_one_admin', 'critical');
+				throw new Elk_Exception('at_least_one_admin', 'critical');
 		}
 
 		// Do you have permission to delete others profiles, or is that your profile you wanna delete?
-		if ($memID != $user_info['id'])
+		if ($this->_memID != $user_info['id'])
 		{
 			isAllowedTo('profile_remove_any');
 
 			// Now, have you been naughty and need your posts deleting?
 			// @todo Should this check board permissions?
-			if ($_POST['remove_type'] != 'none' && allowedTo('moderate_forum'))
+			if ($this->_req->post->remove_type != 'none' && allowedTo('moderate_forum'))
 			{
 				// Include subs/Topic.subs.php - essential for this type of work!
 				require_once(SUBSDIR . '/Topic.subs.php');
 				require_once(SUBSDIR . '/Messages.subs.php');
 
 				// First off we delete any topics the member has started - if they wanted topics being done.
-				if ($_POST['remove_type'] == 'topics')
+				if ($this->_req->post->remove_type === 'topics')
 				{
 					// Fetch all topics started by this user.
-					$topicIDs = topicsStartedBy($memID);
+					$topicIDs = topicsStartedBy($this->_memID);
 
 					// Actually remove the topics.
 					// @todo This needs to check permissions, but we'll let it slide for now because of moderate_forum already being had.
@@ -483,27 +597,28 @@ class ProfileAccount_Controller extends Action_Controller
 				}
 
 				// Now delete the remaining messages.
-				removeNonTopicMessages($memID);
+				removeNonTopicMessages($this->_memID);
 			}
 
 			// Only delete this poor member's account if they are actually being booted out of camp.
-			if (isset($_POST['deleteAccount']))
-				deleteMembers($memID);
+			if (isset($this->_req->post->deleteAccount))
+				deleteMembers($this->_memID);
 		}
 		// Do they need approval to delete?
 		elseif (!empty($modSettings['approveAccountDeletion']) && !allowedTo('moderate_forum'))
 		{
 			// Setup their account for deletion ;)
-			updateMemberData($memID, array('is_activated' => 4));
+			require_once(SUBSDIR . '/Members.subs.php');
+			updateMemberData($this->_memID, array('is_activated' => 4));
+
 			// Another account needs approval...
 			updateSettings(array('unapprovedMembers' => true), true);
 		}
 		// Also check if you typed your password correctly.
 		else
 		{
-			deleteMembers($memID);
+			deleteMembers($this->_memID);
 
-			require_once(CONTROLLERDIR . '/Auth.controller.php');
 			$controller = new Auth_Controller();
 			$controller->action_logout(true);
 
@@ -513,7 +628,8 @@ class ProfileAccount_Controller extends Action_Controller
 
 	/**
 	 * Activate an account.
-	 * This function is called from the profile account actions area.
+	 *
+	 * - This function is called from the profile account actions area.
 	 */
 	public function action_activateaccount()
 	{
@@ -521,34 +637,35 @@ class ProfileAccount_Controller extends Action_Controller
 
 		isAllowedTo('moderate_forum');
 
-		$memID = currentMemberID();
-
-		if (isset($_REQUEST['save']) && isset($user_profile[$memID]['is_activated']) && $user_profile[$memID]['is_activated'] != 1)
+		if (isset($this->_req->query->save)
+			&& isset($user_profile[$this->_memID]['is_activated'])
+			&& $user_profile[$this->_memID]['is_activated'] != 1)
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
 
 			// If we are approving the deletion of an account, we do something special ;)
-			if ($user_profile[$memID]['is_activated'] == 4)
+			if ($user_profile[$this->_memID]['is_activated'] == 4)
 			{
 				deleteMembers($context['id_member']);
 				redirectexit();
 			}
 
 			// Actually update this member now, as it guarantees the unapproved count can't get corrupted.
-			approveMembers(array('members' => array($context['id_member']), 'activated_status' => $user_profile[$memID]['is_activated']));
+			approveMembers(array('members' => array($context['id_member']), 'activated_status' => $user_profile[$this->_memID]['is_activated']));
 
 			// Log what we did?
-			logAction('approve_member', array('member' => $memID), 'admin');
+			logAction('approve_member', array('member' => $this->_memID), 'admin');
 
 			// If we are doing approval, update the stats for the member just in case.
-			if (in_array($user_profile[$memID]['is_activated'], array(3, 4, 13, 14)))
+			if (in_array($user_profile[$this->_memID]['is_activated'], array(3, 4, 13, 14)))
 				updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > 1 ? $modSettings['unapprovedMembers'] - 1 : 0)));
 
 			// Make sure we update the stats too.
-			updateStats('member', false);
+			require_once(SUBSDIR . '/Members.subs.php');
+			updateMemberStats();
 		}
 
 		// Leave it be...
-		redirectexit('action=profile;u=' . $memID . ';area=summary');
+		redirectexit('action=profile;u=' . $this->_memID . ';area=summary');
 	}
 }

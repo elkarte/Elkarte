@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1
  *
  */
 
@@ -83,6 +83,7 @@ function addKarma($id_executor, $id_target, $direction)
 	);
 
 	// Change by one.
+	require_once(SUBSDIR . '/Members.subs.php');
 	updateMemberData($_REQUEST['uid'], array($direction == 1 ? 'karma_good' : 'karma_bad' => '+'));
 }
 
@@ -113,6 +114,7 @@ function updateKarma($id_executor, $id_target, $direction)
 	);
 
 	// It was recently changed the OTHER way... so... reverse it!
+	require_once(SUBSDIR . '/Members.subs.php');
 	if ($direction == 1)
 		updateMemberData($_REQUEST['uid'], array('karma_good' => '+', 'karma_bad' => '-'));
 	else

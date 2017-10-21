@@ -7,16 +7,9 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
-
-// It should be already defined in Db-type.class.php, but better have it twice
-if (!defined('DB_TYPE'))
-	define('DB_TYPE', 'PostgreSQL');
 
 /**
  * PostgreSQL implementation of DbSearch
@@ -91,7 +84,13 @@ class DbSearch_PostgreSQL implements DbSearch
 		{
 			$db_string = preg_replace('~^\s*INSERT\sIGNORE~i', 'INSERT', $db_string);
 			// Don't error on multi-insert.
-			$db_values['db_error_skip'] = true;
+			$db->skip_next_error();
+		}
+
+		// @deprecated since 1.1 - temporary measure until a proper skip_error is implemented
+		if (!empty($db_values['db_error_skip']))
+		{
+			$db->skip_next_error();
 		}
 
 		$return = $db->query('', $db_string,
@@ -110,14 +109,14 @@ class DbSearch_PostgreSQL implements DbSearch
 		global $db_prefix, $txt;
 
 		$db = database();
+		$db_table = db_table();
 
 		$table_info = array();
 
 		// In order to report the sizes correctly we need to perform vacuum (optimize) on the tables we will be using.
-		$temp_tables = $db->db_list_tables();
-		foreach ($temp_tables as $table)
-			if ($table == $db_prefix. 'messages' || $table == $db_prefix. 'log_search_words')
-				$db->db_optimize_table($table);
+		$db_table->optimize('{db_prefix}messages');
+		if ($db_table->table_exists('{db_prefix}log_search_words'))
+			$db_table->optimize('{db_prefix}log_search_words');
 
 		// PostGreSql has some hidden sizes.
 		$request = $db->query('', '
@@ -125,8 +124,8 @@ class DbSearch_PostgreSQL implements DbSearch
 			WHERE relname = {string:messages} OR relname = {string:log_search_words}
 			ORDER BY relpages DESC',
 			array(
-				'messages' => $db_prefix. 'messages',
-				'log_search_words' => $db_prefix. 'log_search_words',
+				'messages' => $db_prefix . 'messages',
+				'log_search_words' => $db_prefix . 'log_search_words',
 			)
 		);
 
@@ -142,7 +141,7 @@ class DbSearch_PostgreSQL implements DbSearch
 					// Doesn't support fulltext
 					$table_info['fulltext_length'] = $txt['not_applicable'];
 				}
-				elseif ($row['relname'] == $db_prefix. 'log_search_words')
+				elseif ($row['relname'] == $db_prefix . 'log_search_words')
 				{
 					$table_info['index_length'] = (int) $row['KB'];
 					$table_info['custom_index_length'] = (int) $row['KB'];

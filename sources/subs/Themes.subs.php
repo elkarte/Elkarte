@@ -10,12 +10,9 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.2
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Retrieve all installed themes
@@ -318,19 +315,22 @@ function loadThemesAffected($id)
  *
  * @param string $path
  * @param string $relative
+ *
+ * @return array
+ * @throws Elk_Exception error_invalid_dir
  */
 function get_file_listing($path, $relative)
 {
-	global $scripturl, $txt, $context;
+	global $scripturl, $context;
 
 	// Only files with these extensions will be deemed editable
 	$editable = 'php|pl|css|js|vbs|xml|xslt|txt|xsl|html|htm|shtm|shtml|asp|aspx|cgi|py';
 
 	// Is it even a directory?
 	if (!is_dir($path))
-		fatal_lang_error('error_invalid_dir', 'critical');
+		throw new Elk_Exception('error_invalid_dir', 'critical');
 
-	// Read this directorys contents
+	// Read this directory's contents
 	$entries = array();
 	$dir = dir($path);
 	while ($entry = $dir->read())
@@ -364,11 +364,7 @@ function get_file_listing($path, $relative)
 		// A file entry has some more checks
 		else
 		{
-			$size = filesize($path . '/' . $entry);
-			if ($size > 2048 || $size == 1024)
-				$size = comma_format($size / 1024) . ' ' . $txt['themeadmin_edit_kilobytes'];
-			else
-				$size = comma_format($size) . ' ' . $txt['themeadmin_edit_bytes'];
+			$size = byte_format(filesize($path . '/' . $entry));
 
 			$writable = is_writable($path . '/' . $entry);
 
@@ -527,6 +523,7 @@ function availableThemes($current_theme, $current_member)
 
 		// The thumbnail needs the correct path.
 		$settings['images_url'] = &$theme_data['images_url'];
+		$theme_thumbnail_href = $theme_data['images_url'] . '/thumbnail.png';
 
 		if (file_exists($theme_data['theme_dir'] . '/languages/' . $user_info['language'] . '/Settings.' . $user_info['language'] . '.php'))
 			include($theme_data['theme_dir'] . '/languages/' . $user_info['language'] . '/Settings.' . $user_info['language'] . '.php');
@@ -534,11 +531,10 @@ function availableThemes($current_theme, $current_member)
 			include($theme_data['theme_dir'] . '/languages/' . $language . '/Settings.' . $language . '.php');
 		else
 		{
-			$txt['theme_thumbnail_href'] = $theme_data['images_url'] . '/thumbnail.png';
 			$txt['theme_description'] = '';
 		}
 
-		$available_themes[$id_theme]['thumbnail_href'] = str_replace('{images_url}', $settings['images_url'], $txt['theme_thumbnail_href']);
+		$available_themes[$id_theme]['thumbnail_href'] = str_replace('{images_url}', $settings['images_url'], $theme_thumbnail_href);
 		$available_themes[$id_theme]['description'] = $txt['theme_description'];
 
 		// Are there any variants?
@@ -637,7 +633,7 @@ function removeThemeOptions($theme, $membergroups, $old_settings = '')
 	if ($theme === 'default')
 		$query_param = array('theme_operator' => '=', 'theme' => 1);
 	// All the themes that are not the default one (id_theme != 1)
-	// @todo 'non_default' would be more esplicative, though it could be confused with the one in $membergroups
+	// @todo 'non_default' would be more explicative, though it could be confused with the one in $membergroups
 	elseif ($theme === 'custom')
 		$query_param = array('theme_operator' => '!=', 'theme' => 1);
 	// If numeric means a specific theme
@@ -645,7 +641,7 @@ function removeThemeOptions($theme, $membergroups, $old_settings = '')
 		$query_param = array('theme_operator' => '=', 'theme' => (int) $theme);
 
 	// Guests means id_member = -1
-	if ($membergroups === 'guests' )
+	if ($membergroups === 'guests')
 		$query_param += array('member_operator' => '=', 'member' => -1);
 	// Members means id_member > 0
 	elseif ($membergroups === 'members')
@@ -728,6 +724,8 @@ function addThemeOptions($id_theme, $options, $value)
  * Deletes a theme from the database.
  *
  * @param int $id
+ *
+ * @throws Elk_Exception no_access
  */
 function deleteTheme($id)
 {
@@ -735,7 +733,7 @@ function deleteTheme($id)
 
 	// Make sure we never ever delete the default theme!
 	if ($id === 1)
-		fatal_lang_error('no_access', false);
+		throw new Elk_Exception('no_access', false);
 
 	$db->query('', '
 		DELETE FROM {db_prefix}themes
@@ -860,11 +858,11 @@ function deleteVariants($id)
 }
 
 /**
- * Loads all of the them variable/value pairs for a member or group of members
+ * Loads all of the theme variable/value pairs for a member or group of members
  * If supplied a variable array it will only load / return those values
  *
  * @param int|int[] $theme
- * @param int|null $memID
+ * @param int|int[]|null $memID
  * @param mixed[] $options
  * @param string[] $variables
  */
@@ -930,7 +928,7 @@ function loadBasedOnTheme($based_on, $explicit_images = false)
 			'images_url' => 'images_url',
 			'theme_dir' => 'theme_dir',
 			'based_on' => '%/' . $based_on,
-			'based_on_path' => '%' . "\\" . $based_on,
+			'based_on_path' => '%\\' . $based_on,
 		)
 	);
 	$temp = $db->fetch_assoc($request);

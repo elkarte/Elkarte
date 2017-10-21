@@ -1,36 +1,39 @@
-/**
+/*!
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.10
- * Extension functions to provide ElkArte compatibility with sceditor
+ * @version 1.1
  */
 
-(function($) {
-	var extensionMethods = {
-		addEvent: function(id, event, func) {
-			var current_event = event;
-			$('#' + id).parent().on(event, 'textarea', func);
+/** global: elk_session_var, elk_session_id, ila_filename, elk_scripturl  */
 
-			var oIframe = $('#' + id).parent().find('iframe')[0],
+/**
+ * Extension functions to provide ElkArte compatibility with sceditor
+ */
+(function ($) {
+	var extensionMethods = {
+		addEvent: function (id, event, func) {
+			var current_event = event,
+				$_id = $('#' + id);
+
+			$_id.parent().on(event, 'textarea', func);
+
+			var oIframe = $_id.parent().find('iframe')[0],
 				oIframeWindow = oIframe.contentWindow;
 
-			if (oIframeWindow !== null && oIframeWindow.document)
-			{
-				var oIframeDoc = oIframeWindow.document;
-				var oIframeBody = oIframeDoc.body;
+			if (oIframeWindow !== null && oIframeWindow.document) {
+				var oIframeDoc = oIframeWindow.document,
+					oIframeBody = oIframeDoc.body;
 
 				$(oIframeBody).on(event, func);
 			}
 		},
-		InsertText: function(text, bClear) {
+		InsertText: function (text, bClear) {
 			var bIsSource = this.inSourceMode();
 
 			if (!bIsSource)
@@ -45,34 +48,33 @@
 			if (!bIsSource)
 				this.toggleSourceMode();
 		},
-		getText: function(filter) {
+		getText: function (filter) {
 			var current_value = '';
 
 			if (this.inSourceMode())
 				current_value = this.getSourceEditorValue(false);
 			else
-				current_value  = this.getWysiwygEditorValue(filter);
+				current_value = this.getWysiwygEditorValue(filter);
 
 			return current_value;
 		},
 		appendEmoticon: function (code, emoticon) {
 			if (emoticon === '')
 				line.append($('<br />'));
-			else
-				line.append($('<img />')
+			else {
+				$img = $('<img />')
 					.attr({
 						src: emoticon.url || emoticon,
 						alt: code,
 						title: emoticon.tooltip || emoticon
 					})
-					.click(function (e) {
+					.on('click', function (e) {
 						var start = '',
 							end = '';
 
-						if (base.opts.emoticonsCompat)
-						{
+						if (base.opts.emoticonsCompat) {
 							start = '<span> ';
-							end   = ' </span>';
+							end = ' </span>';
 						}
 
 						if (base.inSourceMode())
@@ -81,42 +83,34 @@
 							base.wysiwygEditorInsertHtml(start + '<img src="' + $(this).attr("src") + '" data-sceditor-emoticon="' + $(this).attr('alt') + '" />' + end);
 
 						e.preventDefault();
-					})
-				);
+					});
+				$wrapper = $('<span class="smiley"></span>').append($img);
+				line.append($wrapper);
+			}
 		},
-		storeLastState: function (){
+		storeLastState: function () {
 			this.wasSource = this.inSourceMode();
 		},
 		setTextMode: function () {
 			if (!this.inSourceMode())
 				this.toggleSourceMode();
 		},
-		createPermanentDropDown: function() {
-			var emoticons = $.extend({}, this.opts.emoticons.dropdown),
-				popup_exists = false,
-				smiley_popup = '';
+		createPermanentDropDown: function () {
+			var emoticons = $.extend({}, this.opts.emoticons.dropdown);
 
 			base = this;
 			content = $('<div class="sceditor-insertemoticon" />');
 			line = $('<div id="sceditor-smileycontainer" />');
 
-			for (smiley_popup in this.opts.emoticons.popup)
-			{
-				popup_exists = true;
-				break;
-			}
-
 			// For any smileys that go in the more popup
-			if (popup_exists)
-			{
+			if (!$.isEmptyObject(this.opts.emoticons.popup)) {
 				this.opts.emoticons.more = this.opts.emoticons.popup;
-				moreButton = $('<div class="sceditor-more" />').text(this._('More')).click(function () {
+				moreButton = $('<div class="sceditor-more" />').text(this._('More')).on('click', function () {
 					var popup_box = $('.sceditor-smileyPopup');
 
 					if (popup_box.length > 0)
 						popup_box.fadeIn('fast');
-					else
-					{
+					else {
 						var emoticons = $.extend({}, base.opts.emoticons.popup),
 							titlebar = $('<div class="category_header sceditor-popup-grip"/>');
 
@@ -126,40 +120,42 @@
 						// create our popup, title bar, smiles, then the close button
 						popupContent.append(titlebar);
 
+						// Add in all the smileys / lines
 						$.each(emoticons, base.appendEmoticon);
 						if (line.children().length > 0)
 							popupContent.append(line);
 
-						closeButton = $('<div id="sceditor-popup-close" />').text('[' + base._('Close') + ']').click(function () {
+						closeButton = $('<div id="sceditor-popup-close" />').text('[' + base._('Close') + ']').on('click', function () {
 							$(".sceditor-smileyPopup").fadeOut('fast');
 						});
 
-						if (typeof closeButton !== "undefined")
+						if (typeof closeButton !== 'undefined')
 							popupContent.append(closeButton);
 
 						// IE needs unselectable attr to stop it from unselecting the text in the editor.
 						// The editor can cope if IE does unselect the text it's just not nice.
-						if (base.ieUnselectable !== false)
-						{
+						if (base.ieUnselectable !== false) {
 							content = $(content);
-							content.find(':not(input,textarea)').filter(function() {return this.nodeType === 1;}).attr('unselectable', 'on');
+							content.find(':not(input,textarea)').filter(function () {
+								return this.nodeType === 1;
+							}).attr('unselectable', 'on');
 						}
 
-						popupContent = $('<div class="sceditor-dropdown sceditor-smileyPopup" />').append(popupContent);
-						$dropdown = popupContent.appendTo('body');
+						// Show the smiley popup
+						$dropdown = $('<div class="sceditor-dropdown sceditor-smileyPopup" />')
+							.append(popupContent)
+							.appendTo($('body'))
+							.css({
+								"top": $(window).height() * 0.2,
+								"left": $(window).width() * 0.5 - (popupContent.find('#sceditor-popup-smiley').width() / 2)
+							});
 						dropdownIgnoreLastClick = true;
-
-						// position it on the screen
-						$dropdown.css({
-							"top": $(window).height() * 0.2,
-							"left": $(window).width() * 0.5 - ($dropdown.find('#sceditor-popup-smiley').width() / 2)
-						});
 
 						// Allow the smiley window to be moved about
 						$('.sceditor-smileyPopup').draggable({handle: '.sceditor-popup-grip'});
 
 						// stop clicks within the dropdown from being handled
-						$dropdown.click(function (e) {
+						$dropdown.on('click', function (e) {
 							e.stopPropagation();
 						});
 					}
@@ -175,7 +171,7 @@
 			$(".sceditor-toolbar").append(content);
 
 			// Show the more button on the editor if we have more
-			if (typeof moreButton !== "undefined")
+			if (typeof moreButton !== 'undefined')
 				content.append(moreButton);
 		}
 	};
@@ -185,10 +181,10 @@
 
 /**
  * ElkArte unique commands to add to the toolbar, when a button
- * with the same name is selected, it will trigger these defiintions
+ * with the same name is selected, it will trigger these definitions
  *
- * tooltip - the hover text, this is the name in the editors.xxxx.php file
- * txtExec - this is the text to insert before and after the cursor or seleted text
+ * tooltip - the hover text, this is the name in the editors.(language).php file
+ * txtExec - this is the text to insert before and after the cursor or selected text
  *           when in the plain text part of the editor
  * exec - this is called when in the wizzy part of the editor to insert text or html tags
  * state - this is used to determine if a button should be shown as active or not
@@ -196,27 +192,20 @@
  * Adds Tt, Pre, Spoiler, Footnote commands
  */
 $.sceditor.command
-	.set('space', {
-	})
-	.set('source', {
-		state: function() {
-			return true;
-		}
-	})
+	.set('space', {})
 	.set('spoiler', {
-		state: function() {
+		state: function () {
 			var currentNode = this.currentNode(),
 				currentRange = this.getRangeHelper();
 
 			// We don't have a node since we don't render the tag in the wizzy editor
 			// however we can spot check to see if the cursor is inside the tags.
-			if (currentRange.selectedRange())
-			{
+			if (currentRange.selectedRange()) {
 				var end = currentRange.selectedRange().startOffset,
 					text = $(currentNode).text();
 
-				// Left and right text from the cursor positon and tag positions
-				var	left = text.substr(0, end),
+				// Left and right text from the cursor position and tag positions
+				var left = text.substr(0, end),
 					right = text.substr(end),
 					l1 = left.lastIndexOf("[spoiler]"),
 					l2 = left.lastIndexOf("[/spoiler]"),
@@ -237,20 +226,19 @@ $.sceditor.command
 		tooltip: 'Insert Spoiler'
 	})
 	.set('footnote', {
-		state: function() {
+		state: function () {
 			var currentNode = this.currentNode(),
 				currentRange = this.getRangeHelper();
 
 			// We don't have an html node since we don't render the tag in the editor
-			// but we can do a spot check to see if the cursor is placed bewtwee plain tags.  This
+			// but we can do a spot check to see if the cursor is placed between plain tags.  This
 			// will miss with nested tags but its nicer than nothing.
-			if (currentRange.selectedRange())
-			{
+			if (currentRange.selectedRange()) {
 				var end = currentRange.selectedRange().startOffset,
 					text = $(currentNode).text();
 
-				// Left and right text from the cursor positon and tag positions
-				var	left = text.substr(0, end),
+				// Left and right text from the cursor position and tag positions
+				var left = text.substr(0, end),
 					right = text.substr(end),
 					l1 = left.lastIndexOf("[footnote]"),
 					l2 = left.lastIndexOf("[/footnote]"),
@@ -271,7 +259,7 @@ $.sceditor.command
 		tooltip: 'Insert Footnote'
 	})
 	.set('tt', {
-		state: function() {
+		state: function () {
 			var currentNode = this.currentNode();
 
 			return $(currentNode).is('span.tt') || $(currentNode).parents('span.tt').length > 0 ? 1 : 0;
@@ -284,22 +272,19 @@ $.sceditor.command
 			if (!$(currentNode).is('span.tt') && $(currentNode).parents('span.tt').length === 0)
 				editor.insert('<span class="tt">', '</span>', false);
 			// Remove a TT span if in one and its empty
-			else if ($(currentNode).is('span.tt') && $(currentNode).text().length === 1)
-			{
+			else if ($(currentNode).is('span.tt') && $(currentNode).text().length === 1) {
 				$(currentNode).replaceWith('');
 				editor.insert('<span> ', '</span>', false);
 			}
 			// Escape from this one then
 			else if (!$(currentNode).is('span.tt') && $(currentNode).parents('span.tt').length > 0)
 				editor.insert('<span> ', '</span>', false);
-
-			return;
 		},
 		txtExec: ['[tt]', '[/tt]'],
 		tooltip: 'Teletype'
 	})
 	.set('pre', {
-		state: function() {
+		state: function () {
 			var currentNode = this.currentNode();
 
 			return $(currentNode).is('pre') || $(currentNode).parents('pre').length > 0 ? 1 : 0;
@@ -311,8 +296,7 @@ $.sceditor.command
 			if (!$(currentNode).is('pre') && $(currentNode).parents('pre').length === 0)
 				editor.insert('<pre>', '</pre>', false);
 			// In a pre node and selected pre again, lets try to end it and escape
-			else if (!$(currentNode).is('pre') && $(currentNode).parents('pre').length > 0)
-			{
+			else if (!$(currentNode).is('pre') && $(currentNode).parents('pre').length > 0) {
 				var rangerhelper = this.getRangeHelper(),
 					firstblock = rangerhelper.getFirstBlockParent(),
 					sceditor = $("#" + post_box_name).sceditor("instance"),
@@ -325,8 +309,6 @@ $.sceditor.command
 				rangerhelper.restoreRange();
 				editor.focus();
 			}
-			else
-				return;
 		},
 		txtExec: ['[pre]', '[/pre]'],
 		tooltip: 'Preformatted Text'
@@ -340,17 +322,10 @@ $.sceditor.command
 		txtExec: ['[list]\n[li]', '[/li]\n[li][/li]\n[/list]']
 	})
 	.set('orderedlist', {
-		txtExec:  ['[list type=decimal]\n[li]', '[/li]\n[li][/li]\n[/list]']
+		txtExec: ['[list type=decimal]\n[li]', '[/li]\n[li][/li]\n[/list]']
 	})
 	.set('table', {
 		txtExec: ['[table]\n[tr]\n[td]', '[/td]\n[/tr]\n[/table]']
-	})
-	.set('splittag', {
-		txtExec: function() {
-			oSplitTags = new elk_SplitTags();
-			oSplitTags.split();
-		},
-		tooltip: "Split Tag"
 	});
 
 /**
@@ -378,6 +353,81 @@ $.sceditor.plugins.bbcode.bbcode
 		format: '[pre]{0}[/pre]',
 		html: '<pre>{0}</pre>'
 	})
+	.set('member', {
+		isInline: true,
+		format: function (element, content) {
+			return '[member=' + element.attr('data-mention') + ']' + content.replace('@', '') + '[/member]';
+		},
+		html: function (token, attrs, content) {
+			if (typeof attrs.defaultattr === 'undefined' || attrs.defaultattr.length === 0)
+				attrs.defaultattr = content;
+
+			return '<a href="' + elk_scripturl + '?action=profile;u=' + attrs.defaultattr + '" class="mention" data-mention="' + attrs.defaultattr + '">@' + content.replace('@', '') + '</a>';
+		}
+	})
+	.set('me', {
+		tags: {
+			me: {
+				'data-me' : null
+			}
+		},
+		isInline: true,
+		quoteType: $.sceditor.BBCodeParser.QuoteType.always,
+		format: function (element, content) {
+			return '[me=' + element.attr('data-me') + ']' + content.replace(element.attr('data-me') + ' ', '') + '[/me]';
+		},
+		html: function (token, attrs, content) {
+			if (typeof attrs.defaultattr === 'undefined' || attrs.defaultattr.length === 0)
+				attrs.defaultattr = '';
+
+			return '<me data-me="' + attrs.defaultattr + '">' + attrs.defaultattr + ' ' + content + '</me>';
+		}
+	})
+	.set('attachurl', {
+		allowsEmpty: false,
+		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
+		format: function (element, content) {
+			return '[attachurl]' + content + '[/attachurl]';
+		},
+		html: function (token, attrs, content) {
+			// @todo new action to return real filename?
+			return '<a href="' + elk_scripturl + '?action=dlattach;attach=' + content + ';' + elk_session_var + '=' + elk_session_id + '" data-ila="' + content + '">(<i class="icon i-paperclip"></i>&nbsp;' + ila_filename + ')</a>';
+		}
+	})
+	.set('attach', {
+		allowsEmpty: false,
+		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
+		format: function (element, content) {
+			var	attribs = '',
+				params = function(names) {
+					names.forEach(function(name) {
+						if (element.attr(name))
+							attribs += ' ' + name + '=' + element.attr(name);
+						else if (element.style[name])
+							attribs += ' ' + name + '=' + element.style[name];
+					});
+				};
+
+			params(['width', 'height', 'align']);
+			return '[attach' + attribs + ']' + content + '[/attach]';
+		},
+		html: function (token, attrs, content) {
+			var attribs = '',
+				align = '',
+				params = function(names) {
+					names.forEach(function(name) {
+						if (typeof attrs[name] !== 'undefined')
+							attribs += ' ' + name + '=' + attrs[name];
+					});
+				};
+
+			params(['width', 'height', 'align']);
+			if (typeof attrs.align !== 'undefined')
+				align = ' class="img_bbc float' + attrs.align + '"';
+
+			return '<img' + attribs + align + ' src="' + elk_scripturl + '?action=dlattach;attach=' + content + ';thumb;' + elk_session_var + '=' + elk_session_id + '" data-ila="' + content + '" />';
+		}
+	})
 	.set('center', {
 		tags: {
 			center: null
@@ -401,37 +451,29 @@ $.sceditor.plugins.bbcode.bbcode
 		},
 		isInline: false,
 		allowedChildren: ['#', '#newline'],
-		format: function(element, content) {
+		format: function (element, content) {
 			var from = '';
 
-			if ($(element[0]).hasClass('php'))
-				return '[php]' + content.replace('&#91;', '[') + '[/php]';
-
-			if ($(element).children("cite:first").length === 1)
-			{
-				from = $(element).children("cite:first").text().trim();
-				$(element).attr({'from': from.php_htmlspecialchars()});
+			if (element.children("cite:first").length === 1) {
+				from = element.children("cite:first").text().trim();
+				element.attr({'from': from.php_htmlspecialchars()});
 				from = '=' + from;
-				content = '';
-				$(element).children("cite:first").remove();
-				content = this.elementToBbcode($(element));
+				element.children("cite:first").remove();
+				content = this.elementToBbcode(element);
 			}
-			else
-			{
-				if (typeof $(element).attr('from') !== "undefined")
-				{
-					from = '=' + $(element).attr('from').php_unhtmlspecialchars();
-				}
+			else if (typeof element.attr('from') !== 'undefined') {
+				from = '=' + element.attr('from').php_unhtmlspecialchars();
 			}
 
 			return '[code' + from + ']' + content.replace('&#91;', '[') + '[/code]';
 		},
-		quoteType: function(element) {
+		quoteType: function (element) {
 			return element;
 		},
-		html: function(element, attrs, content) {
+		html: function (element, attrs, content) {
 			var from = '';
-			if (typeof attrs.defaultattr !== "undefined")
+
+			if (typeof attrs.defaultattr !== 'undefined')
 				from = '<cite>' + attrs.defaultattr + '</cite>';
 
 			return '<code>' + from + content.replace('[', '&#91;') + '</code>';
@@ -443,30 +485,25 @@ $.sceditor.plugins.bbcode.bbcode
 			cite: null
 		},
 		isInline: false,
-		format: function(element, content) {
+		format: function (element, content) {
 			var author = '',
 				date = '',
-				link = '',
-				$elm = $(element);
+				link = '';
 
 			if (element[0].tagName.toLowerCase() === 'cite')
 				return '';
-
-			if ($elm.attr('author'))
-				author = ' author=' + $elm.attr('author').php_unhtmlspecialchars();
-			if ($elm.attr('date'))
-				date = ' date=' + $elm.attr('date');
-			if ($elm.attr('link'))
-				link = ' link=' + $elm.attr('link');
+			if (element.attr('author'))
+				author = ' author=' + element.attr('author').php_unhtmlspecialchars();
+			if (element.attr('date'))
+				date = ' date=' + element.attr('date');
+			if (element.attr('link'))
+				link = ' link=' + element.attr('link');
 			if (author === '' && date === '' && link !== '')
-				link = '=' + $elm.attr('link');
+				link = '=' + element.attr('link');
 
 			return '[quote' + author + date + link + ']' + content + '[/quote]';
 		},
-		attrs: function () {
-			return ['author', 'date', 'link'];
-		},
-		html: function(element, attrs, content) {
+		html: function (element, attrs, content) {
 			var attr_author = '',
 				sAuthor = '',
 				attr_date = '',
@@ -475,14 +512,12 @@ $.sceditor.plugins.bbcode.bbcode
 				sLink = '';
 
 			// Author tag in the quote ?
-			if (typeof attrs.author !== "undefined")
-			{
+			if (typeof attrs.author !== 'undefined') {
 				attr_author = attrs.author;
 				sAuthor = bbc_quote_from + ': ' + attr_author;
 			}
 			// Done as [quote=someone]
-			else if (typeof attrs.defaultattr !== "undefined")
-			{
+			else if (typeof attrs.defaultattr !== 'undefined') {
 				// Convert it to an author tag
 				attr_link = attrs.defaultattr;
 				sLink = attr_link.substr(0, 7) === 'http://' ? attr_link : elk_scripturl + '?' + attr_link;
@@ -490,10 +525,8 @@ $.sceditor.plugins.bbcode.bbcode
 			}
 
 			// Links could be in the form: link=topic=71.msg201#msg201 that would fool javascript, so we need a workaround
-			for (var key in attrs)
-			{
-				if (key.substr(0, 4) === 'link' && attrs.hasOwnProperty(key))
-				{
+			for (var key in attrs) {
+				if (key.substr(0, 4) === 'link' && attrs.hasOwnProperty(key)) {
 					attr_link = key.length > 4 ? key.substr(5) + '=' + attrs[key] : attrs[key];
 
 					sLink = attr_link.substr(0, 7) === 'http://' ? attr_link : elk_scripturl + '?' + attr_link;
@@ -502,8 +535,7 @@ $.sceditor.plugins.bbcode.bbcode
 			}
 
 			// A date perhaps
-			if (typeof attrs.date !== "undefined")
-			{
+			if (typeof attrs.date !== 'undefined') {
 				attr_date = attrs.date;
 				sDate = '<date timestamp="' + attr_date + '">' + new Date(attrs.date * 1000) + '</date>';
 			}
@@ -527,38 +559,44 @@ $.sceditor.plugins.bbcode.bbcode
 		},
 		allowsEmpty: true,
 		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
-		format: function(element, content) {
+		format: function (element, content) {
 			var attribs = '',
-				$elm = $(element),
-				style = function(name) {
-					return element.style ? element.style[name] : null;
+				params = function (names) {
+					names.forEach(function (name) {
+						if (element.attr(name))
+							attribs += ' ' + name + '=' + element.attr(name);
+						else if (element[0].style[name])
+							attribs += ' ' + name + '=' + element[0].style[name];
+					});
 				};
 
 			// check if this is an emoticon image
-			if (typeof element.attr('data-sceditor-emoticon') !== "undefined")
+			if (typeof element.attr('data-sceditor-emoticon') !== 'undefined')
 				return content;
 
-			// only add the parameters that are specified
-			if (element.attr('width') || style('width'))
-				attribs += " width=" + $elm.width();
-			if (element.attr('height') || style('height'))
-				attribs += " height=" + $elm.height();
-			if (element.attr('alt'))
-				attribs += ' alt="' + element.attr('alt') + '"';
+			// check if this is an ILA ?
+			if (element.attr('data-ila'))
+			{
+				params(['width', 'height', 'align']);
+				return '[attach' + attribs + ']' + element.attr('data-ila') + '[/attach]';
+			}
 
+			// normal image then
+			params(['width', 'height', 'title', 'alt']);
 			return '[img' + attribs + ']' + element.attr('src') + '[/img]';
 		},
-		html: function(token, attrs, content) {
-			var attribs = '';
 
-			// handle [img alt=alt width=123 height=123]url[/img]
-			if (typeof attrs.width !== "undefined")
-				attribs += ' width="' + attrs.width + '"';
-			if (typeof attrs.height !== "undefined")
-				attribs += ' height="' + attrs.height + '"';
-			if (typeof attrs.alt !== "undefined")
-				attribs += ' alt="' + attrs.alt + '"';
+		html: function (token, attrs, content) {
+			var attribs = '',
+				params = function (names) {
+					names.forEach(function (name) {
+						if (typeof attrs[name] !== 'undefined')
+							attribs += ' ' + name + '="' + attrs[name] + '"';
+					});
+				};
 
+			// handle [img alt=alt title=title width=123 height=123]url[/img]
+			params(['width', 'height', 'alt', 'title']);
 			return '<img' + attribs + ' src="' + content + '" />';
 		}
 	})
@@ -567,7 +605,7 @@ $.sceditor.plugins.bbcode.bbcode
 		isInline: false,
 		skipLastLineBreak: true,
 		allowedChildren: ['#', '*', 'li'],
-		html: function(element, attrs, content) {
+		html: function (element, attrs, content) {
 			var style = '',
 				code = 'ul';
 
@@ -605,5 +643,31 @@ $.sceditor.plugins.bbcode.bbcode
 		skipLastLineBreak: true,
 		format: '[list type=decimal]{0}[/list]',
 		html: '<ol>{0}</ol>'
-	}
-);
+	})
+	.set('url', {
+		allowsEmpty: true,
+		tags: {
+			a: {
+				href: null
+			}
+		},
+		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
+		format: function (element, content) {
+			var url = element.attr('href');
+
+			// return the type of link we are currently dealing with
+			if (url.substr(0, 7) === 'mailto:')
+				return '[email="' + url.substr(7) + '"]' + content + '[/email]';
+			if (typeof element.attr('data-mention') !== 'undefined')
+				return '[member=' + element.attr('data-mention') + ']' + content.replace('@', '') + '[/member]';
+			if (typeof element.attr('data-ila') !== 'undefined')
+				return '[attachurl]' + element.attr('data-ila') + '[/attachurl]';
+
+			return '[url=' + url + ']' + content + '[/url]';
+		},
+		html: function (token, attrs, content) {
+			attrs.defaultattr = $.sceditor.escapeEntities(attrs.defaultattr, true) || content;
+
+			return '<a href="' + $.sceditor.escapeUriScheme(attrs.defaultattr) + '" class="mention">' + content + '</a>';
+		}
+	});

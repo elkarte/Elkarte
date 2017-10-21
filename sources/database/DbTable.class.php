@@ -10,22 +10,39 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
- * This is used to create a table without worrying about schema compatabilities
+ * This is used to create a table without worrying about schema compatibilities
  * across supported database systems.
  */
 abstract class DbTable
 {
 	/**
+	 * We need a way to interact with the database
+	 * @var Database
+	 */
+	protected $_db = null;
+
+	/**
+	 * Array of table names we don't allow to be removed by addons.
+	 * @var array
+	 */
+	protected $_reservedTables = null;
+
+	/**
+	 * Keeps a (reverse) log of changes to the table structure, to be undone.
+	 * This is used by Packages admin installation/uninstallation/upgrade.
+	 *
+	 * @var array
+	 */
+	protected $_package_log = null;
+
+	/**
 	 * This function can be used to create a table without worrying about schema
-	 *  compatabilities across supported database systems.
+	 *  compatibilities across supported database systems.
 	 *  - If the table exists will, by default, do nothing.
 	 *  - Builds table with columns as passed to it - at least one column must be sent.
 	 *  The columns array should have one sub-array for each column - these sub arrays contain:
@@ -54,7 +71,7 @@ abstract class DbTable
 	 * @param string $if_exists default 'ignore'
 	 * @param string $error default 'fatal'
 	 */
-	public abstract function db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal');
+	abstract public function db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal');
 
 	/**
 	 * Drop a table.
@@ -63,7 +80,7 @@ abstract class DbTable
 	 * @param mixed[] $parameters default array()
 	 * @param string $error default 'fatal'
 	 */
-	public abstract function db_drop_table($table_name, $parameters = array(), $error = 'fatal');
+	abstract public function db_drop_table($table_name, $parameters = array(), $error = 'fatal');
 
 	/**
 	 * This function adds a column.
@@ -74,7 +91,7 @@ abstract class DbTable
 	 * @param string $if_exists default 'update'
 	 * @param string $error default 'fatal'
 	 */
-	public abstract function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal');
+	abstract public function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal');
 
 	/**
 	 * Removes a column.
@@ -84,7 +101,7 @@ abstract class DbTable
 	 * @param mixed[] $parameters default array()
 	 * @param string $error default 'fatal'
 	 */
-	public abstract function db_remove_column($table_name, $column_name, $parameters = array(), $error = 'fatal');
+	abstract public function db_remove_column($table_name, $column_name, $parameters = array(), $error = 'fatal');
 
 	/**
 	 * Change a column.
@@ -95,7 +112,7 @@ abstract class DbTable
 	 * @param mixed[] $parameters default array()
 	 * @param string $error default 'fatal'
 	 */
-	public abstract function db_change_column($table_name, $old_column, $column_info, $parameters = array(), $error = 'fatal');
+	abstract public function db_change_column($table_name, $old_column, $column_info, $parameters = array(), $error = 'fatal');
 
 	/**
 	 * Add an index.
@@ -106,7 +123,7 @@ abstract class DbTable
 	 * @param string $if_exists default 'update'
 	 * @param string $error default 'fatal'
 	 */
-	public abstract function db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update', $error = 'fatal');
+	abstract public function db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update', $error = 'fatal');
 
 	/**
 	 * Remove an index.
@@ -116,7 +133,7 @@ abstract class DbTable
 	 * @param mixed[] $parameters default array()
 	 * @param string $error default 'fatal'
 	 */
-	public abstract function db_remove_index($table_name, $index_name, $parameters = array(), $error = 'fatal');
+	abstract public function db_remove_index($table_name, $index_name, $parameters = array(), $error = 'fatal');
 
 	/**
 	 * Get the schema formatted name for a type.
@@ -125,7 +142,7 @@ abstract class DbTable
 	 * @param int|null $type_size
 	 * @param boolean $reverse
 	 */
-	public abstract function db_calculate_type($type_name, $type_size = null, $reverse = false);
+	abstract public function db_calculate_type($type_name, $type_size = null, $reverse = false);
 
 	/**
 	 * Get table structure.
@@ -133,7 +150,7 @@ abstract class DbTable
 	 * @param string $table_name
 	 * @param mixed[] $parameters default array()
 	 */
-	public abstract function db_table_structure($table_name, $parameters = array());
+	abstract public function db_table_structure($table_name, $parameters = array());
 
 	/**
 	 * Return column information for a table.
@@ -143,7 +160,7 @@ abstract class DbTable
 	 * @param mixed[] $parameters default array()
 	 * @return mixed
 	 */
-	public abstract function db_list_columns($table_name, $detail = false, $parameters = array());
+	abstract public function db_list_columns($table_name, $detail = false, $parameters = array());
 
 	/**
 	 * Get index information.
@@ -153,19 +170,53 @@ abstract class DbTable
 	 * @param mixed[] $parameters
 	 * @return mixed
 	 */
-	public abstract function db_list_indexes($table_name, $detail = false, $parameters = array());
+	abstract public function db_list_indexes($table_name, $detail = false, $parameters = array());
 
 	/**
-	 * Alter table.
+	 * Optimize a table
+	 *
+	 * @param string $table - the table to be optimized
+	 * @return int
+	 */
+	abstract public function optimize($table);
+
+	/**
+	 * A very simple wrapper around the ALTER TABLE SQL statement.
 	 *
 	 * @param string $table_name
-	 * @param mixed[] $columns
+	 * @param string $statement
 	 */
-	public function db_alter_table($table_name, $columns)
+	protected function _alter_table($table_name, $statement)
 	{
-		// Not implemented by default.
-		// Only SQLite needed it.
-		return;
+		return $this->_db->query('', '
+			ALTER TABLE ' . $table_name . '
+			' . $statement,
+			array(
+				'security_override' => true,
+			)
+		);
+	}
+
+	/**
+	 * Finds a column by name in a table and returns some info.
+	 *
+	 * @param string $table_name
+	 * @param string $column_name
+	 * @return mixed[]|false
+	 */
+	protected function _get_column_info($table_name, $column_name)
+	{
+		$columns = $this->db_list_columns($table_name, true);
+
+		foreach ($columns as $column)
+		{
+			if ($column_name == $column['name'])
+			{
+				return $column;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -173,6 +224,33 @@ abstract class DbTable
 	 */
 	public function package_log()
 	{
-		return;
+		return $this->_package_log;
+	}
+
+	/**
+	 * Checks if a table exists
+	 *
+	 * @param string $table_name
+	 * @return bool
+	 */
+	public function table_exists($table_name)
+	{
+		// Grab ourselves one o'these.
+		$db = database();
+
+		$filter = $db->db_list_tables(false, $table_name);
+		return !empty($filter);
+	}
+
+	/**
+	 * Checks if a column exists in a table
+	 *
+	 * @param string $table_name
+	 * @param string $column_name
+	 * @return bool
+	 */
+	public function column_exists($table_name, $column_name)
+	{
+		return $this->_get_column_info($table_name, $column_name) !== false;
 	}
 }

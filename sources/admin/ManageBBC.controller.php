@@ -7,12 +7,9 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * ManageBBC controller handles administration options for BBC tags.
@@ -22,28 +19,20 @@ if (!defined('ELK'))
 class ManageBBC_Controller extends Action_Controller
 {
 	/**
-	 * BBC settings form
-	 *
-	 * @var Settings_Form
-	 */
-	protected $_bbcSettings;
-
-	/**
 	 * The BBC admin area
 	 *
 	 * What it does:
+	 *
 	 * - This method is the entry point for index.php?action=admin;area=postsettings;sa=bbc
 	 * and it calls a function based on the sub-action, here only display.
 	 * - requires admin_forum permissions
 	 *
+	 * @event integrate_sa_manage_bbc Used to add more sub actions
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
 		global $context, $txt;
-
-		// We're working with them settings here.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		$subActions = array(
 			'display' => array(
@@ -69,6 +58,7 @@ class ManageBBC_Controller extends Action_Controller
 	 *
 	 * - This method handles displaying and changing which BBC tags are enabled on the forum.
 	 *
+	 * @event integrate_save_bbc_settings called during the save action
 	 * @uses Admin template, edit_bbc_settings sub-template.
 	 */
 	public function action_bbcSettings_display()
@@ -76,43 +66,41 @@ class ManageBBC_Controller extends Action_Controller
 		global $context, $txt, $modSettings, $scripturl;
 
 		// Initialize the form
-		$this->_initBBCSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_bbcSettings->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Make sure a nifty javascript will enable/disable checkboxes, according to BBC globally set or not.
 		addInlineJavascript('
 			toggleBBCDisabled(\'disabledBBC\', ' . (empty($modSettings['enableBBC']) ? 'true' : 'false') . ');', true);
 
-		// We'll need this forprepare_db() and save_db()
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		// Make sure we check the right tags!
 		$modSettings['bbc_disabled_disabledBBC'] = empty($modSettings['disabledBBC']) ? array() : explode(',', $modSettings['disabledBBC']);
 
 		// Save page
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			// Security: make a pass through all tags and fix them as necessary
-			$bbcTags = array();
-			foreach (parse_bbc(false) as $tag)
-				$bbcTags[] = $tag['tag'];
+			$codes = \BBC\ParserWrapper::instance()->getCodes();
+			$bbcTags = $codes->getTags();
 
-			if (!isset($_POST['disabledBBC_enabledTags']))
-				$_POST['disabledBBC_enabledTags'] = array();
-			elseif (!is_array($_POST['disabledBBC_enabledTags']))
-				$_POST['disabledBBC_enabledTags'] = array($_POST['disabledBBC_enabledTags']);
+			if (!isset($this->_req->post->disabledBBC_enabledTags))
+				$this->_req->post->disabledBBC_enabledTags = array();
+			elseif (!is_array($this->_req->post->disabledBBC_enabledTags))
+				$this->_req->post->disabledBBC_enabledTags = array($this->_req->post->disabledBBC_enabledTags);
 
 			// Work out what is actually disabled!
-			$_POST['disabledBBC'] = implode(',', array_diff($bbcTags, $_POST['disabledBBC_enabledTags']));
+			$this->_req->post->disabledBBC = implode(',', array_diff($bbcTags, $this->_req->post->disabledBBC_enabledTags));
 
 			// Notify addons and integrations
 			call_integration_hook('integrate_save_bbc_settings', array($bbcTags));
 
 			// Save the result
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 
 			// And we're out of here!
 			redirectexit('action=admin;area=postsettings;sa=bbc');
@@ -124,25 +112,13 @@ class ManageBBC_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=postsettings;save;sa=bbc';
 		$context['settings_title'] = $txt['manageposts_bbc_settings_title'];
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initializes the form with the current BBC settings of the forum.
-	 */
-	private function _initBBCSettingsForm()
-	{
-		// Instantiate the form
-		$this->_bbcSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_bbcSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
 	 * Return the BBC settings of the forum.
+	 *
+	 * @event integrate_modify_bbc_settings used to add more options to config vars
 	 */
 	private function _settings()
 	{

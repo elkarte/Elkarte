@@ -7,12 +7,9 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.3
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Loads failed emails from the database
@@ -22,11 +19,11 @@ if (!defined('ELK'))
  *
  * @package Maillist
  * @param int $id
- * @param int $start
- * @param int $chunk_size
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  */
-function list_maillist_unapproved($id = 0, $start = 0, $chunk_size = 0, $sort = '')
+function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sort = '')
 {
 	global $txt, $boardurl, $user_info;
 
@@ -50,21 +47,21 @@ function list_maillist_unapproved($id = 0, $start = 0, $chunk_size = 0, $sort = 
 		$approve_query = ' AND 0';
 
 	if ($id === 0)
-		$where_query = 'id_email > {int:id} AND (({query_see_board}' . $approve_query . ') OR e.id_board = -1)';
+		$where_query = 'e.id_email > {int:id} AND (({query_see_board}' . $approve_query . ') OR e.id_board = -1)';
 	else
-		$where_query = 'id_email = {int:id} AND (({query_see_board}' . $approve_query . ') OR e.id_board = -1)';
+		$where_query = 'e.id_email = {int:id} AND (({query_see_board}' . $approve_query . ') OR e.id_board = -1)';
 
 	// Load them errors
 	$request = $db->query('', '
-		SELECT e.id_email, e.error, e.data_id, e.subject, e.id_message, e.email_from, e.message_type, e.message, e.id_board
+		SELECT e.id_email, e.error, e.message_key, e.subject, e.message_id, e.email_from, e.message_type, e.message, e.id_board
 		FROM {db_prefix}postby_emails_error e
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = e.id_board)
 		WHERE ' . $where_query . '
 		ORDER BY {raw:sort}
-		' . ((!empty($chunk_size)) ? 'LIMIT {int:offset}, {int:limit} ' : 'LIMIT 1'),
+		' . ((!empty($items_per_page)) ? 'LIMIT {int:offset}, {int:limit} ' : 'LIMIT 1'),
 		array(
 			'offset' => $start,
-			'limit' => $chunk_size,
+			'limit' => $items_per_page,
 			'sort' => $sort,
 			'id' => $id,
 		)
@@ -75,9 +72,9 @@ function list_maillist_unapproved($id = 0, $start = 0, $chunk_size = 0, $sort = 
 			'id_email' => $row['id_email'],
 			'error' => $txt[$row['error'] . '_short'],
 			'error_code' => $row['error'],
-			'key' => $row['data_id'],
+			'key' => $row['message_key'],
 			'subject' => $row['subject'],
-			'message' => $row['id_message'],
+			'message' => $row['message_id'],
 			'from' => $row['email_from'],
 			'type' => $row['message_type'],
 			'body' => $row['message'],
@@ -91,9 +88,9 @@ function list_maillist_unapproved($id = 0, $start = 0, $chunk_size = 0, $sort = 
 
 		// Build a link to the topic or message in case someone wants to take a look at that thread
 		if ($row['message_type'] === 't')
-			$postemail[$i]['link'] = $boardurl . '?topic=' . $row['id_message'];
+			$postemail[$i]['link'] = $boardurl . '?topic=' . $row['message_id'];
 		elseif ($row['message_type'] === 'm')
-			$postemail[$i]['link'] = $boardurl . '?msg=' . $row['id_message'];
+			$postemail[$i]['link'] = $boardurl . '?msg=' . $row['message_id'];
 		elseif ($row['message_type'] === 'p')
 			$postemail[$i]['subject'] = $txt['private'];
 
@@ -114,8 +111,6 @@ function list_maillist_count_unapproved()
 	global $user_info;
 
 	$db = database();
-
-	$total = 0;
 
 	// Where can they approve items?
 	$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
@@ -172,13 +167,13 @@ function maillist_delete_error_entry($id)
  * - Style defines if it will load parsers or filters
  *
  * @package Maillist
- * @param int $start
- * @param int $chunk_size
- * @param string $sort
- * @param int $id
- * @param string $style
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
+ * @param int $id If fetching a specific item, 0 for all
+ * @param string $style = filter Filter to fetch filters or parsers for parsers
  */
-function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style = 'filter')
+function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $style = 'filter')
 {
 	$db = database();
 
@@ -196,10 +191,10 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 		WHERE id_filter' . (($id == 0) ? ' > {int:id}' : ' = {int:id}') . '
 			AND filter_style = {string:style}
 		ORDER BY {raw:sort}, filter_type ASC, filter_order ASC
-		' . ((!empty($chunk_size)) ? 'LIMIT {int:offset}, {int:limit} ' : ''),
+		' . ((!empty($items_per_page)) ? 'LIMIT {int:offset}, {int:limit} ' : ''),
 		array(
 			'offset' => $start,
-			'limit' => $chunk_size,
+			'limit' => $items_per_page,
 			'sort' => $sort,
 			'id' => $id,
 			'style' => $style
@@ -235,8 +230,6 @@ function list_count_filter_parser($id, $style)
 {
 	$db = database();
 
-	$total = 0;
-
 	// Get the total filter count, needed for pages
 	$request = $db->query('', '
 		SELECT
@@ -261,9 +254,12 @@ function list_count_filter_parser($id, $style)
  * - It will load only that filter/parser
  *
  * @package Maillist
- * @param int $id
+ *
+ * @param int    $id
  * @param string $style parser or filter
+ *
  * @return array of filters/parsers
+ * @throws Elk_Exception email_error_no_filter
  */
 function maillist_load_filter_parser($id, $style)
 {
@@ -286,7 +282,7 @@ function maillist_load_filter_parser($id, $style)
 
 	// Check that the filter does exist
 	if (empty($row))
-		fatal_lang_error('email_error_no_filter');
+		throw new Elk_Exception('email_error_no_filter');
 
 	return $row;
 }
@@ -378,9 +374,7 @@ function maillist_templates($template_type, $subject = null)
 
 	$db = database();
 
-	$notification_templates = array();
-
-	$request = $db->query('', '
+	return $db->fetchQueryCallback('
 		SELECT recipient_name AS template_title, body
 		FROM {db_prefix}log_comments
 		WHERE comment_type = {string:tpltype}
@@ -389,23 +383,20 @@ function maillist_templates($template_type, $subject = null)
 			'tpltype' => $template_type,
 			'generic' => 0,
 			'current_member' => $user_info['id'],
-		)
+		),
+		function ($row) use ($subject)
+		{
+			$template = array(
+				'title' => $row['template_title'],
+				'body' => $row['body'],
+			);
+
+			if ($subject !== null)
+				$template['subject'] = $subject;
+
+			return $template;
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$template = array(
-			'title' => $row['template_title'],
-			'body' => $row['body'],
-		);
-
-		if ($subject !== null)
-			$template['subject'] = $subject;
-
-		$notification_templates[] = $template;
-	}
-	$db->free_result($request);
-
-	return $notification_templates;
 }
 
 /**
@@ -421,7 +412,8 @@ function log_email($sent)
 	$db->insert('ignore',
 		'{db_prefix}postby_emails',
 		array(
-			'id_email' => 'string', 'time_sent' => 'int', 'email_to' => 'string'
+			'message_key' => 'string', 'message_type' => 'string',
+			'message_id' => 'string', 'time_sent' => 'int', 'email_to' => 'string'
 		),
 		$sent,
 		array('id_email')
@@ -435,7 +427,7 @@ function log_email($sent)
  * - Called by Xmlcontroller as part of drag sort event
  *
  * @package Maillist
- * @param string $replace constucted as WHEN fieldname=value THEN new viewvalue WHEN .....
+ * @param string $replace constructed as WHEN fieldname=value THEN new viewvalue WHEN .....
  * @param int[] $filters list of ids in the WHEN clause to keep from updating the entire table
  */
 function updateParserFilterOrder($replace, $filters)

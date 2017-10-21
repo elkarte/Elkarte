@@ -2,24 +2,19 @@
 
 /**
  * This file provides utility functions and db function for the profile functions,
- * notably, but not exclusivly, deals with custom profile fields
+ * notably, but not exclusively, deals with custom profile fields
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.6
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Loads the signature from 50 members per request
@@ -41,7 +36,7 @@ function getSignatureFromMembers($start_member)
 			AND id_group != {int:admin_group}
 			AND FIND_IN_SET({int:admin_group}, additional_groups) = 0',
 		array(
-			'admin_group' => 1,
+			'admin_group' => 11,
 		)
 	);
 	while ($result = $db->fetch_assoc($request))
@@ -61,16 +56,266 @@ function getSignatureFromMembers($start_member)
  */
 function updateSignature($id_member, $signature)
 {
+	require_once(SUBSDIR . '/Members.subs.php');
 	updateMemberData($id_member, array('signature' => $signature));
+}
+
+/**
+ * Update all signatures given a new set of constraints
+ *
+ * @param int $applied_sigs
+ * @throws Elk_Exception
+ */
+function updateAllSignatures($applied_sigs)
+{
+	global $context, $sig_start, $modSettings;
+
+	require_once(SUBSDIR . '/Members.subs.php');
+	$sig_start = time();
+
+	// This is horrid - but I suppose some people will want the option to do it.
+	$done = false;
+	$context['max_member'] = maxMemberID();
+
+	// Load all the signature settings.
+	list ($sig_limits, $sig_bbc) = explode(':', $modSettings['signature_settings']);
+	$sig_limits = explode(',', $sig_limits);
+	$disabledTags = !empty($sig_bbc) ? explode(',', $sig_bbc) : array();
+
+	// @todo temporary since it does not work, and seriously why would you do this?
+	$disabledTags[] = 'footnote';
+
+	while (!$done)
+	{
+		// No changed signatures yet
+		$changes = array();
+
+		// Get a group of member signatures, 50 at a clip
+		$update_sigs = getSignatureFromMembers($applied_sigs);
+
+		if (empty($update_sigs))
+			$done = true;
+
+		foreach ($update_sigs as $row)
+		{
+			// Apply all the rules we can realistically do.
+			$sig = strtr($row['signature'], array('<br />' => "\n"));
+
+			// Max characters...
+			if (!empty($sig_limits[1]))
+				$sig = Util::substr($sig, 0, $sig_limits[1]);
+
+			// Max lines...
+			if (!empty($sig_limits[2]))
+			{
+				$count = 0;
+				$str_len = strlen($sig);
+				for ($i = 0; $i < $str_len; $i++)
+				{
+					if ($sig[$i] == "\n")
+					{
+						$count++;
+						if ($count >= $sig_limits[2])
+							$sig = substr($sig, 0, $i) . strtr(substr($sig, $i), array("\n" => ' '));
+					}
+				}
+			}
+
+			// Max text size
+			if (!empty($sig_limits[7]) && preg_match_all('~\[size=([\d\.]+)?(px|pt|em|x-large|larger)?~i', $sig, $matches) !== false && isset($matches[2]))
+			{
+				// Same as parse_bbc
+				$sizes = array(1 => 0.7, 2 => 1.0, 3 => 1.35, 4 => 1.45, 5 => 2.0, 6 => 2.65, 7 => 3.95);
+
+				foreach ($matches[1] as $ind => $size)
+				{
+					$limit_broke = 0;
+
+					// Just specifying as [size=x]?
+					if (empty($matches[2][$ind]))
+					{
+						$matches[2][$ind] = 'em';
+						$size = isset($sizes[(int) $size]) ? $sizes[(int) $size] : 0;
+					}
+
+					// Attempt to allow all sizes of abuse, so to speak.
+					if ($matches[2][$ind] == 'px' && $size > $sig_limits[7])
+						$limit_broke = $sig_limits[7] . 'px';
+					elseif ($matches[2][$ind] == 'pt' && $size > ($sig_limits[7] * 0.75))
+						$limit_broke = ((int) $sig_limits[7] * 0.75) . 'pt';
+					elseif ($matches[2][$ind] == 'em' && $size > ((float) $sig_limits[7] / 16))
+						$limit_broke = ((float) $sig_limits[7] / 16) . 'em';
+					elseif ($matches[2][$ind] != 'px' && $matches[2][$ind] != 'pt' && $matches[2][$ind] != 'em' && $sig_limits[7] < 18)
+						$limit_broke = 'large';
+
+					if ($limit_broke)
+						$sig = str_replace($matches[0][$ind], '[size=' . $sig_limits[7] . 'px', $sig);
+				}
+			}
+
+			// Stupid images - this is stupidly, stupidly challenging.
+			if ((!empty($sig_limits[3]) || !empty($sig_limits[5]) || !empty($sig_limits[6])))
+			{
+				$replaces = array();
+				$img_count = 0;
+
+				// Get all BBC tags...
+				preg_match_all('~\[img(\s+width=([\d]+))?(\s+height=([\d]+))?(\s+width=([\d]+))?\s*\](?:<br />)*([^<">]+?)(?:<br />)*\[/img\]~i', $sig, $matches);
+
+				// ... and all HTML ones.
+				preg_match_all('~&lt;img\s+src=(?:&quot;)?((?:http://|ftp://|https://|ftps://).+?)(?:&quot;)?(?:\s+alt=(?:&quot;)?(.*?)(?:&quot;)?)?(?:\s?/)?&gt;~i', $sig, $matches2, PREG_PATTERN_ORDER);
+
+				// And stick the HTML in the BBC.
+				if (!empty($matches2))
+				{
+					foreach ($matches2[0] as $ind => $dummy)
+					{
+						$matches[0][] = $matches2[0][$ind];
+						$matches[1][] = '';
+						$matches[2][] = '';
+						$matches[3][] = '';
+						$matches[4][] = '';
+						$matches[5][] = '';
+						$matches[6][] = '';
+						$matches[7][] = $matches2[1][$ind];
+					}
+				}
+
+				// Try to find all the images!
+				if (!empty($matches))
+				{
+					$image_count_holder = array();
+					foreach ($matches[0] as $key => $image)
+					{
+						$width = -1;
+						$height = -1;
+						$img_count++;
+
+						// Too many images?
+						if (!empty($sig_limits[3]) && $img_count > $sig_limits[3])
+						{
+							// If we've already had this before we only want to remove the excess.
+							if (isset($image_count_holder[$image]))
+							{
+								$img_offset = -1;
+								$rep_img_count = 0;
+								while ($img_offset !== false)
+								{
+									$img_offset = strpos($sig, $image, $img_offset + 1);
+									$rep_img_count++;
+									if ($rep_img_count > $image_count_holder[$image])
+									{
+										// Only replace the excess.
+										$sig = substr($sig, 0, $img_offset) . str_replace($image, '', substr($sig, $img_offset));
+
+										// Stop looping.
+										$img_offset = false;
+									}
+								}
+							}
+							else
+								$replaces[$image] = '';
+
+							continue;
+						}
+
+						// Does it have predefined restraints? Width first.
+						if ($matches[6][$key])
+							$matches[2][$key] = $matches[6][$key];
+
+						if ($matches[2][$key] && $sig_limits[5] && $matches[2][$key] > $sig_limits[5])
+						{
+							$width = $sig_limits[5];
+							$matches[4][$key] = $matches[4][$key] * ($width / $matches[2][$key]);
+						}
+						elseif ($matches[2][$key])
+							$width = $matches[2][$key];
+
+						// ... and height.
+						if ($matches[4][$key] && $sig_limits[6] && $matches[4][$key] > $sig_limits[6])
+						{
+							$height = $sig_limits[6];
+							if ($width != -1)
+								$width = $width * ($height / $matches[4][$key]);
+						}
+						elseif ($matches[4][$key])
+							$height = $matches[4][$key];
+
+						// If the dimensions are still not fixed - we need to check the actual image.
+						if (($width == -1 && $sig_limits[5]) || ($height == -1 && $sig_limits[6]))
+						{
+							// We'll mess up with images, who knows.
+							require_once(SUBSDIR . '/Attachments.subs.php');
+
+							$sizes = url_image_size($matches[7][$key]);
+							if (is_array($sizes))
+							{
+								// Too wide?
+								if ($sizes[0] > $sig_limits[5] && $sig_limits[5])
+								{
+									$width = $sig_limits[5];
+									$sizes[1] = $sizes[1] * ($width / $sizes[0]);
+								}
+
+								// Too high?
+								if ($sizes[1] > $sig_limits[6] && $sig_limits[6])
+								{
+									$height = $sig_limits[6];
+									if ($width == -1)
+										$width = $sizes[0];
+									$width = $width * ($height / $sizes[1]);
+								}
+								elseif ($width != -1)
+									$height = $sizes[1];
+							}
+						}
+
+						// Did we come up with some changes? If so remake the string.
+						if ($width != -1 || $height != -1)
+							$replaces[$image] = '[img' . ($width != -1 ? ' width=' . round($width) : '') . ($height != -1 ? ' height=' . round($height) : '') . ']' . $matches[7][$key] . '[/img]';
+
+						// Record that we got one.
+						$image_count_holder[$image] = isset($image_count_holder[$image]) ? $image_count_holder[$image] + 1 : 1;
+					}
+
+					if (!empty($replaces))
+						$sig = str_replace(array_keys($replaces), array_values($replaces), $sig);
+				}
+			}
+
+			// Try to fix disabled tags.
+			if (!empty($disabledTags))
+			{
+				$sig = preg_replace('~\[(?:' . implode('|', $disabledTags) . ').+?\]~i', '', $sig);
+				$sig = preg_replace('~\[/(?:' . implode('|', $disabledTags) . ')\]~i', '', $sig);
+			}
+
+			$sig = strtr($sig, array("\n" => '<br />'));
+			call_integration_hook('integrate_apply_signature_settings', array(&$sig, $sig_limits, $disabledTags));
+			if ($sig != $row['signature'])
+				$changes[$row['id_member']] = $sig;
+		}
+
+		// Do we need to delete what we have?
+		if (!empty($changes))
+		{
+			foreach ($changes as $id => $sig)
+				updateSignature($id, $sig);
+		}
+
+		$applied_sigs += 50;
+		if (!$done)
+			pauseSignatureApplySettings($applied_sigs);
+	}
 }
 
 /**
  * Callback for createList() in displaying profile fields
  * Can be used to load standard or custom fields by setting the $standardFields flag
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param boolean $standardFields
  */
 function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
@@ -83,8 +328,8 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 
 	if ($standardFields)
 	{
-		$standard_fields = array('location', 'gender', 'website', 'personal_text', 'posts', 'warning_status');
-		$fields_no_registration = array('posts', 'warning_status');
+		$standard_fields = array('website', 'posts', 'warning_status', 'date_registered');
+		$fields_no_registration = array('posts', 'warning_status', 'date_registered');
 		$disabled_fields = isset($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
 		$registration_fields = isset($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array();
 
@@ -101,7 +346,8 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 	{
 		// Load all the fields.
 		$request = $db->query('', '
-			SELECT id_field, col_name, field_name, field_desc, field_type, active, placement, vieworder
+			SELECT 
+				id_field, col_name, field_name, field_desc, field_type, active, placement, vieworder
 			FROM {db_prefix}custom_fields
 			ORDER BY {raw:sort}, vieworder ASC
 			LIMIT {int:start}, {int:items_per_page}',
@@ -112,7 +358,9 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
+		{
 			$list[$row['id_field']] = $row;
+		}
 		$db->free_result($request);
 	}
 
@@ -155,7 +403,7 @@ function getProfileField($id_field)
 		SELECT
 			id_field, col_name, field_name, field_desc, field_type, field_length, field_options,
 			show_reg, show_display, show_memberlist, show_profile, private, active, default_value, can_search,
-			bbc, mask, enclose, placement, vieworder
+			bbc, mask, enclose, placement, vieworder, rows, cols
 		FROM {db_prefix}custom_fields
 		WHERE id_field = {int:current_field}',
 		array(
@@ -164,14 +412,6 @@ function getProfileField($id_field)
 	);
 	while ($row = $db->fetch_assoc($request))
 	{
-		if ($row['field_type'] == 'textarea')
-			@list ($rows, $cols) = explode(',', $row['default_value']);
-		else
-		{
-			$rows = 3;
-			$cols = 30;
-		}
-
 		$field = array(
 			'name' => $row['field_name'],
 			'desc' => $row['field_desc'],
@@ -182,12 +422,13 @@ function getProfileField($id_field)
 			'memberlist' => $row['show_memberlist'],
 			'type' => $row['field_type'],
 			'max_length' => $row['field_length'],
-			'rows' => $rows,
-			'cols' => $cols,
+			'rows' => $row['rows'],
+			'cols' => $row['cols'],
 			'bbc' => $row['bbc'] ? true : false,
 			'default_check' => $row['field_type'] == 'check' && $row['default_value'] ? true : false,
 			'default_select' => $row['field_type'] == 'select' || $row['field_type'] == 'radio' ? $row['default_value'] : '',
 			'show_nodefault' => $row['field_type'] == 'select' || $row['field_type'] == 'radio',
+			'default_value' => $row['default_value'],
 			'options' => strlen($row['field_options']) > 1 ? explode(',', $row['field_options']) : array('', '', ''),
 			'active' => $row['active'],
 			'private' => $row['private'],
@@ -216,7 +457,7 @@ function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
 	$db = database();
 	// Make sure this is unique.
 	// @todo This may not be the most efficient way to do this.
-	for ($i = 0; !$unique && $i < 9; $i ++)
+	for ($i = 0; !$unique && $i < 9; $i++)
 	{
 		$request = $db->query('', '
 			SELECT id_field
@@ -301,7 +542,8 @@ function updateProfileField($field_data)
 			show_profile = {string:show_profile}, private = {int:private},
 			active = {int:active}, default_value = {string:default_value},
 			can_search = {int:can_search}, bbc = {int:bbc}, mask = {string:mask},
-			enclose = {string:enclose}, placement = {int:placement}
+			enclose = {string:enclose}, placement = {int:placement}, rows = {int:rows},
+			cols = {int:cols}
 		WHERE id_field = {int:current_field}',
 		array(
 			'field_length' => $field_data['field_length'],
@@ -322,6 +564,8 @@ function updateProfileField($field_data)
 			'mask' => $field_data['mask'],
 			'enclose' => $field_data['enclose'],
 			'placement' => $field_data['placement'],
+			'rows' => $field_data['rows'],
+			'cols' => $field_data['cols'],
 		)
 	);
 }
@@ -330,7 +574,7 @@ function updateProfileField($field_data)
  * Updates the viewing order for profile fields
  * Done as a CASE WHEN one two three ELSE 0 END in place of many updates
  *
- * @param string $replace constucted as WHEN fieldname=value THEN new viewvalue WHEN .....
+ * @param string $replace constructed as WHEN fieldname=value THEN new viewvalue WHEN .....
  */
 function updateProfileFieldOrder($replace)
 {
@@ -382,14 +626,16 @@ function addProfileField($field)
 			'field_type' => 'string', 'field_length' => 'string', 'field_options' => 'string',
 			'show_reg' => 'int', 'show_display' => 'int', 'show_memberlist' => 'int', 'show_profile' => 'string',
 			'private' => 'int', 'active' => 'int', 'default_value' => 'string', 'can_search' => 'int',
-			'bbc' => 'int', 'mask' => 'string', 'enclose' => 'string', 'placement' => 'int', 'vieworder' => 'int'
+			'bbc' => 'int', 'mask' => 'string', 'enclose' => 'string', 'placement' => 'int', 'vieworder' => 'int',
+			'rows' => 'int', 'cols' => 'int'
 		),
 		array(
 			$field['col_name'], $field['field_name'], $field['field_desc'],
 			$field['field_type'], $field['field_length'], $field['field_options'],
 			$field['show_reg'], $field['show_display'], $field['show_memberlist'], $field['show_profile'],
-			$field['private'], $field['active'], $field['default'], $field['can_search'],
-			$field['bbc'], $field['mask'], $field['enclose'], $field['placement'], $field['vieworder']
+			$field['private'], $field['active'], $field['default_value'], $field['can_search'],
+			$field['bbc'], $field['mask'], $field['enclose'], $field['placement'], $field['vieworder'],
+			$field['rows'], $field['cols']
 		),
 		array('id_field')
 	);
@@ -441,7 +687,7 @@ function updateDisplayCache()
 {
 	$db = database();
 
-	$request = $db->query('', '
+	$fields = $db->fetchQueryCallback('
 		SELECT col_name, field_name, field_type, bbc, enclose, placement, vieworder
 		FROM {db_prefix}custom_fields
 		WHERE show_display = {int:is_displayed}
@@ -454,21 +700,172 @@ function updateDisplayCache()
 			'active' => 1,
 			'not_owner_only' => 2,
 			'not_admin_only' => 3,
-		)
+		),
+		function ($row)
+		{
+			return array(
+				'colname' => strtr($row['col_name'], array('|' => '', ';' => '')),
+				'title' => strtr($row['field_name'], array('|' => '', ';' => '')),
+				'type' => $row['field_type'],
+				'bbc' => $row['bbc'] ? 1 : 0,
+				'placement' => !empty($row['placement']) ? $row['placement'] : 0,
+				'enclose' => !empty($row['enclose']) ? $row['enclose'] : '',
+			);
+		}
 	);
 
-	$fields = array();
+	updateSettings(array('displayFields' => serialize($fields)));
+}
+
+/**
+ * Loads all the custom fields in the system, active or not
+ */
+function loadAllCustomFields()
+{
+	$db = database();
+
+	// Get the names of any custom fields.
+	$request = $db->query('', '
+		SELECT
+			col_name, field_name, bbc
+		FROM {db_prefix}custom_fields',
+		array(
+		)
+	);
+	$custom_field_titles = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$fields[] = array(
-			'colname' => strtr($row['col_name'], array('|' => '', ';' => '')),
-			'title' => strtr($row['field_name'], array('|' => '', ';' => '')),
-			'type' => $row['field_type'],
-			'bbc' => $row['bbc'] ? 1 : 0,
-			'placement' => !empty($row['placement']) ? $row['placement'] : 0,
-			'enclose' => !empty($row['enclose']) ? $row['enclose'] : '',
+		$custom_field_titles['customfield_' . $row['col_name']] = array(
+			'title' => $row['field_name'],
+			'parse_bbc' => $row['bbc'],
 		);
 	}
 	$db->free_result($request);
-	updateSettings(array('displayFields' => serialize($fields)));
+
+	return $custom_field_titles;
+}
+
+/**
+ * Load all the available mention types
+ *
+ * What it does:
+ *
+ * - Scans teh subs\MentionType directory for files
+ * - Calls its getType method
+ *
+ * @return array
+ */
+function getNotificationTypes()
+{
+	Elk_Autoloader::instance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
+
+	$glob = new GlobIterator(SUBSDIR . '/MentionType/*Mention.php', FilesystemIterator::SKIP_DOTS);
+	$types = array();
+
+	// For each file found, call its getType method
+	foreach ($glob as $file)
+	{
+		$class_name = '\\ElkArte\\sources\\subs\\MentionType\\' . preg_replace('~([^^])((?<=)[A-Z](?=[a-z]))~', '$1_$2', $file->getBasename('.php'));
+		$types[] = $class_name::getType();
+	}
+
+	return $types;
+}
+
+/**
+ * Returns the modules for the given mentions
+ *
+ * What it does:
+ *
+ * - Calls each modules static function ::getModules
+ * - Called from ManageFeatures.controller as part of notification settings
+ *
+ * @param string[] $enabled_mentions
+ *
+ * @return array
+ */
+function getMentionsModules($enabled_mentions)
+{
+	$modules = array();
+
+	foreach ($enabled_mentions as $mention)
+	{
+		$class_name = '\\ElkArte\\sources\\subs\\MentionType\\' . ucfirst($mention) . '_Mention';
+		$modules = $class_name::getModules($modules);
+	}
+
+	return $modules;
+}
+
+/**
+ * Loads available frontpage controllers for selection in the look/layout area of the ACP
+ *
+ * What it does:
+ *
+ * - Scans controllerdir and addonsdir for .controller.php fils
+ * - Checks if found files have a static frontPageOptions method
+ *
+ * @return array
+ */
+function getFrontPageControllers()
+{
+	global $txt;
+
+	$classes = array();
+
+	$glob = new GlobIterator(CONTROLLERDIR . '/*.controller.php', FilesystemIterator::SKIP_DOTS);
+	$classes += scanFileSystemForControllers($glob);
+
+	$glob = new GlobIterator(ADDONSDIR . '/*/controllers/*.controller.php', FilesystemIterator::SKIP_DOTS);
+	$classes += scanFileSystemForControllers($glob, '\\ElkArte\\Addon\\');
+
+	$config_vars = array(array('select', 'front_page', $classes));
+	array_unshift($config_vars[0][2], $txt['default']);
+
+	foreach (array_keys($classes) as $class_name)
+	{
+		$options = $class_name::frontPageOptions();
+		if (!empty($options))
+			$config_vars = array_merge($config_vars, $options);
+	}
+
+	return $config_vars;
+}
+
+/**
+ *
+ * @param GlobIterator $iterator
+ * @param string $namespace
+ *
+ * @return array
+ */
+function scanFileSystemForControllers($iterator, $namespace = '')
+{
+	global $txt;
+
+	$types = array();
+
+	foreach ($iterator as $file)
+	{
+		$class_name = $namespace . preg_replace('~([^^])((?<=)[A-Z](?=[a-z]))~', '$1_$2', $file->getBasename('.controller.php')) . '_Controller';
+
+		if (!class_exists($class_name))
+		{
+			$class_name = $file->getBasename('.controller.php') . '_Controller';
+
+			if (!class_exists($class_name))
+				continue;
+		}
+
+		if (is_subclass_of($class_name, 'Action_Controller') && $class_name::canFrontPage())
+		{
+			// Temporary
+			if (!isset($txt[$class_name]))
+				continue;
+
+			$types[$class_name] = $txt[$class_name];
+		}
+	}
+
+	return $types;
 }

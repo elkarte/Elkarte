@@ -7,73 +7,69 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.7
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Create a menu.
  *
  * @param mixed[] $menuData the menu array
+ *  - Possible indexes:
+ * 	- Menu name with named indexes as follows:
+ *     - string $title       => Section title
+ *     - bool $enabled       => Is the section enabled / shown
+ *     - array $areas        => Array of areas within this menu section, see below
+ *     - array $permission   => Permission required to access the whole section
+ *
+ *  - $areas sub array from above, named indexes as follows:
+ *     - array $permission  => Array of permissions to determine who can access this area
+ *     - string $label      => Optional text string for link (Otherwise $txt[$index] will be used)
+ *     - string $controller => Name of controller required for this area
+ *     - string $function   => Method in controller to call when area is selected
+ *     - string $icon       => File name of an icon to use on the menu, if using a class set as transparent.png
+ *     - string $class      => CSS class name to apply to the icon img, used to apply a sprite icon
+ *     - string $custom_url => URL to call for this menu item
+ *     - bool $enabled      => Should this area even be enabled / accessible?
+ *     - bool $hidden       => If the area is visible in the menu
+ *     - string $select     => If set, references another area
+ *     - array $subsections => Array of subsections for this menu area, see below
+ *
+ *  - $subsections sub array from $areas above, unnamed indexes interpreted as follows, single named index 'enabled'
+ *     - string 0           => Label for this subsection
+ *     - array 1            => Array of permissions to check for this subsection.
+ *     - bool 2             => Is this the default subaction - if not set for any will default to first...
+ *     - bool enabled       => Enabled or not
+ *     - array active       => Set the button active for other subsections.
+ *     - string url         => Custom url for the subsection
  * @param mixed[] $menuOptions an array of options that can be used to override some default behaviours.
- *   It can accept the following indexes:
- *    - action                    => overrides the default action
- *    - current_area              => overrides the current area
- *    - extra_url_parameters      => an array or pairs or parameters to be added to the url
- *    - disable_url_session_check => (boolean) if true the session var/id are omitted from the url
- *    - base_url                  => an alternative base url
- *    - menu_type                 => alternative menu types?
- *    - can_toggle_drop_down      => (boolean) if the menu can "toggle"
- *    - template_name             => an alternative template to load (instead of Generic)
- *    - layer_name                => alternative layer name for the menu
+ *  - Possible indexes:
+ *     - action                    => overrides the default action
+ *     - current_area              => overrides the current area
+ *     - extra_url_parameters      => an array or pairs or parameters to be added to the url
+ *     - disable_url_session_check => (boolean) if true the session var/id are omitted from the url
+ *     - base_url                  => an alternative base url
+ *     - menu_type                 => alternative menu types?
+ *     - can_toggle_drop_down      => (boolean) if the menu can "toggle"
+ *     - template_name             => an alternative template to load (instead of Generic)
+ *     - layer_name                => alternative layer name for the menu
+ *     - hook                      => hook name to call integrate_ . 'hook name' . '_areas'
+ *     - default_include_dir       => directory to include for function support
  * @return mixed[]|false
+ * @throws Elk_Exception
  */
 function createMenu($menuData, $menuOptions = array())
 {
 	global $context, $settings, $options, $txt, $scripturl, $user_info;
 
+	$_req = HttpReq::instance();
+
 	// Work out where we should get our images from.
 	$context['menu_image_path'] = file_exists($settings['theme_dir'] . '/images/admin/change_menu.png') ? $settings['images_url'] . '/admin' : $settings['default_images_url'] . '/admin';
-
-	/**
-	 * Note menuData is array of form:
-	 *
-	 * Possible fields:
-	 *  For Section:
-	 *    string $title:     Section title.
-	 *    bool $enabled:     Should section be shown?
-	 *    array $areas:      Array of areas within this section.
-	 *    array $permission: Permission required to access the whole section.
-
-	 *  For Areas:
-	 *    array $permission:  Array of permissions to determine who can access this area.
-	 *    string $label:      Optional text string for link (Otherwise $txt[$index] will be used)
-	 *    string $file:       Name of source file required for this area.
-	 *    string $function:   Function to call when area is selected.
-	 *    string $custom_url: URL to use for this menu item.
-	 *    string $icon:       File name of an icon to use on the menu, if using the sprite class, set as transparent.png
-	 *    string $class:      Class name to apply to the icon img, used to apply a sprite icon
-	 *    bool $enabled:      Should this area even be accessible?
-	 *    bool $hidden:       Should this area be visible?
-	 *    string $select:     If set this item will not be displayed - instead the item indexed here shall be.
-	 *    array $subsections: Array of subsections from this area.
-	 *
-	 *  For Subsections:
-	 *    string 0:     Text label for this subsection.
-	 *    array 1:      Array of permissions to check for this subsection.
-	 *    bool 2:       Is this the default subaction - if not set for any will default to first...
-	 *    bool enabled: Bool to say whether this should be enabled or not.
-	 *    array active: Set the button active for other subsections.
-	 */
 
 	// Every menu gets a unique ID, these are shown in first in, first out order.
 	$context['max_menu_id'] = isset($context['max_menu_id']) ? $context['max_menu_id'] + 1 : 1;
@@ -90,8 +86,8 @@ function createMenu($menuData, $menuOptions = array())
 	$menu_context['current_action'] = isset($menuOptions['action']) ? $menuOptions['action'] : $context['current_action'];
 
 	// What is the current area selected?
-	if (isset($menuOptions['current_area']) || isset($_REQUEST['area']))
-		$menu_context['current_area'] = isset($menuOptions['current_area']) ? $menuOptions['current_area'] : $_REQUEST['area'];
+	if (isset($menuOptions['current_area']) || isset($_req->query->area))
+		$menu_context['current_area'] = isset($menuOptions['current_area']) ? $menuOptions['current_area'] : $_req->query->area;
 
 	// Build a list of additional parameters that should go in the URL.
 	$menu_context['extra_parameters'] = '';
@@ -119,7 +115,7 @@ function createMenu($menuData, $menuOptions = array())
 			// The profile menu has slightly different permissions
 			if (is_array($section['permission']) && isset($section['permission']['own'], $section['permission']['any']))
 			{
-				if (empty($area['permission'][$permission_set]) || !allowedTo($section['permission'][$permission_set]))
+				if (empty($section['permission'][$permission_set]) || !allowedTo($section['permission'][$permission_set]))
 					continue;
 			}
 			elseif (!allowedTo($section['permission']))
@@ -130,7 +126,7 @@ function createMenu($menuData, $menuOptions = array())
 		foreach ($section['areas'] as $area_id => $area)
 		{
 			// Can we do this?
-			if (!isset($area['enabled']) || $area['enabled'] != false)
+			if (!isset($area['enabled']) || $area['enabled'] !== false)
 			{
 				// Has permission check?
 				if (!empty($area['permission']))
@@ -197,7 +193,7 @@ function createMenu($menuData, $menuOptions = array())
 							{
 								if ((empty($sub[1]) || allowedTo($sub[1])) && (!isset($sub['enabled']) || !empty($sub['enabled'])))
 								{
-									if ($first_sa == null)
+									if ($first_sa === null)
 										$first_sa = $sa;
 
 									$menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$sa] = array('label' => $sub[0]);
@@ -216,10 +212,10 @@ function createMenu($menuData, $menuOptions = array())
 											$first_sa = $sa;
 
 										// Is this the current subsection?
-										if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == $sa)
+										if (isset($_req->query->sa) && $_req->query->sa == $sa)
 											$menu_context['current_subsection'] = $sa;
 
-										elseif (isset($sub['active']) && isset($_REQUEST['sa']) && in_array($_REQUEST['sa'], $sub['active']))
+										elseif (isset($sub['active']) && isset($_req->query->sa) && in_array($_req->query->sa, $sub['active']))
 											$menu_context['current_subsection'] = $sa;
 
 										// Otherwise is it the default?
@@ -328,7 +324,7 @@ function createMenu($menuData, $menuOptions = array())
 	// Almost there - load the template and add to the template layers.
 	loadTemplate(isset($menuOptions['template_name']) ? $menuOptions['template_name'] : 'GenericMenu');
 	$menu_context['layer_name'] = (isset($menuOptions['layer_name']) ? $menuOptions['layer_name'] : 'generic_menu') . $menuOptions['menu_type'];
-	Template_Layers::getInstance()->add($menu_context['layer_name']);
+	Template_Layers::instance()->add($menu_context['layer_name']);
 
 	// Check we had something - for sanity sake.
 	if (empty($include_data))
@@ -359,22 +355,19 @@ function destroyMenu($menu_id = 'last')
 	if (!isset($context[$menu_name]))
 		return false;
 
-	Template_Layers::getInstance()->remove($context[$menu_name]['layer_name']);
+	Template_Layers::instance()->remove($context[$menu_name]['layer_name']);
 
 	unset($context[$menu_name]);
 }
 
 /**
  * Call the function or method for the selected menu item.
- * $selectedMenu is the array of menu information,
- *  with the format as retrieved from createMenu()
+ * $selectedMenu is the array of menu information, with the format as retrieved from createMenu()
  *
- * If $selectedMenu['controller'] is set, then it is a class,
- * and $selectedMenu['function'] will be a method of it.
- * If it is not set, then $selectedMenu['function'] is
- * simply a function to call.
+ * If $selectedMenu['controller'] is set, then it is a class, and $selectedMenu['function'] will be a method of it.
+ * If it is not set, then $selectedMenu['function'] is simply a function to call.
  *
- * @param mixed[] $selectedMenu
+ * @param array|string $selectedMenu
  */
 function callMenu($selectedMenu)
 {
@@ -385,11 +378,10 @@ function callMenu($selectedMenu)
 	{
 		// 'controller' => 'ManageAttachments_Controller'
 		// 'function' => 'action_avatars'
-		$controller = new $selectedMenu['controller']();
+		$controller = new $selectedMenu['controller'](new Event_Manager());
 
 		// always set up the environment
-		if (method_exists($controller, 'pre_dispatch'))
-			$controller->pre_dispatch();
+		$controller->pre_dispatch();
 		// and go!
 		$controller->{$selectedMenu['function']}();
 	}
@@ -398,4 +390,275 @@ function callMenu($selectedMenu)
 		// a single function name... call it over!
 		$selectedMenu['function']();
 	}
+}
+
+/**
+ * Loads up all the default menu entries available.
+ *
+ * @return array
+ */
+function loadDefaultMenuButtons()
+{
+	global $scripturl, $txt, $context, $user_info, $modSettings;
+
+	$buttons = array(
+		'home' => array(
+			'title' => $txt['community'],
+			'href' => $scripturl,
+			'data-icon' => 'i-home',
+			'show' => true,
+			'sub_buttons' => array(
+				'help' => array(
+					'title' => $txt['help'],
+					'href' => $scripturl . '?action=help',
+					'show' => true,
+				),
+				'search' => array(
+					'title' => $txt['search'],
+					'href' => $scripturl . '?action=search',
+					'show' => $context['allow_search'],
+				),
+				'calendar' => array(
+					'title' => $txt['calendar'],
+					'href' => $scripturl . '?action=calendar',
+					'show' => $context['allow_calendar'],
+				),
+				'memberlist' => array(
+					'title' => $txt['members_title'],
+					'href' => $scripturl . '?action=memberlist',
+					'show' => $context['allow_memberlist'],
+				),
+				'recent' => array(
+					'title' => $txt['recent_posts'],
+					'href' => $scripturl . '?action=recent',
+					'show' => true,
+				),
+				'like_stats' => array(
+					'title' => $txt['like_post_stats'],
+					'href' => $scripturl . '?action=likes;sa=likestats',
+					'show' => allowedTo('like_posts_stats'),
+				),
+				'contact' => array(
+					'title' => $txt['contact'],
+					'href' => $scripturl . '?action=register;sa=contact',
+					'show' => $user_info['is_guest'] && !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] == 'menu',
+				),
+			),
+		)
+	);
+
+	// Will change title correctly if user is either a mod or an admin.
+	// Button highlighting works properly too (see current action stuffz).
+	if ($context['allow_admin'])
+	{
+		$buttons['admin'] = array(
+			'title' => $context['current_action'] !== 'moderate' ? $txt['admin'] : $txt['moderate'],
+			'counter' => 'grand_total',
+			'href' => $scripturl . '?action=admin',
+			'data-icon' => 'i-cog',
+			'show' => true,
+			'sub_buttons' => array(
+				'admin_center' => array(
+					'title' => $txt['admin_center'],
+					'href' => $scripturl . '?action=admin',
+					'show' => $context['allow_admin'],
+				),
+				'featuresettings' => array(
+					'title' => $txt['modSettings_title'],
+					'href' => $scripturl . '?action=admin;area=featuresettings',
+					'show' => allowedTo('admin_forum'),
+				),
+				'packages' => array(
+					'title' => $txt['package'],
+					'href' => $scripturl . '?action=admin;area=packages',
+					'show' => allowedTo('admin_forum'),
+				),
+				'permissions' => array(
+					'title' => $txt['edit_permissions'],
+					'href' => $scripturl . '?action=admin;area=permissions',
+					'show' => allowedTo('manage_permissions'),
+				),
+				'errorlog' => array(
+					'title' => $txt['errlog'],
+					'href' => $scripturl . '?action=admin;area=logs;sa=errorlog;desc',
+					'show' => allowedTo('admin_forum') && !empty($modSettings['enableErrorLogging']),
+				),
+				'moderate_sub' => array(
+					'title' => $txt['moderate'],
+					'counter' => 'grand_total',
+					'href' => $scripturl . '?action=moderate',
+					'show' => $context['allow_moderation_center'],
+					'sub_buttons' => array(
+						'reports' => array(
+							'title' => $txt['mc_reported_posts'],
+							'counter' => 'reports',
+							'href' => $scripturl . '?action=moderate;area=reports',
+							'show' => !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
+						),
+						'modlog' => array(
+							'title' => $txt['modlog_view'],
+							'href' => $scripturl . '?action=moderate;area=modlog',
+							'show' => !empty($modSettings['modlog_enabled']) && !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
+						),
+						'attachments' => array(
+							'title' => $txt['mc_unapproved_attachments'],
+							'counter' => 'attachments',
+							'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
+							'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
+						),
+						'poststopics' => array(
+							'title' => $txt['mc_unapproved_poststopics'],
+							'counter' => 'postmod',
+							'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
+							'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
+						),
+						'postbyemail' => array(
+							'title' => $txt['mc_emailerror'],
+							'counter' => 'emailmod',
+							'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
+							'show' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
+						),
+					),
+				),
+			),
+		);
+	}
+	else
+	{
+		$buttons['admin'] = array(
+			'title' => $txt['moderate'],
+			'counter' => 'grand_total',
+			'href' => $scripturl . '?action=moderate',
+			'data-icon' => 'i-cog',
+			'show' => $context['allow_moderation_center'],
+			'sub_buttons' => array(
+				'reports' => array(
+					'title' => $txt['mc_reported_posts'],
+					'counter' => 'reports',
+					'href' => $scripturl . '?action=moderate;area=reports',
+					'show' => !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
+				),
+				'modlog' => array(
+					'title' => $txt['modlog_view'],
+					'href' => $scripturl . '?action=moderate;area=modlog',
+					'show' => !empty($modSettings['modlog_enabled']) && !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
+				),
+				'attachments' => array(
+					'title' => $txt['mc_unapproved_attachments'],
+					'counter' => 'attachments',
+					'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
+					'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
+				),
+				'poststopics' => array(
+					'title' => $txt['mc_unapproved_poststopics'],
+					'counter' => 'postmod',
+					'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
+					'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
+				),
+				'postbyemail' => array(
+					'title' => $txt['mc_emailerror'],
+					'counter' => 'emailmod',
+					'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
+					'show' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
+				),
+			),
+		);
+	}
+
+	$buttons += array(
+		'profile' => array(
+			'title' => !empty($modSettings['displayMemberNames']) ? $user_info['name'] : $txt['account_short'],
+			'href' => $scripturl . '?action=profile',
+			'data-icon' => 'i-account',
+			'show' => $context['allow_edit_profile'],
+			'sub_buttons' => array(
+				'account' => array(
+					'title' => $txt['account'],
+					'href' => $scripturl . '?action=profile;area=account',
+					'show' => allowedTo(array('profile_identity_any', 'profile_identity_own', 'manage_membergroups')),
+				),
+				'drafts' => array(
+					'title' => $txt['mydrafts'],
+					'href' => $scripturl . '?action=profile;area=showdrafts',
+					'show' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft'),
+				),
+				'forumprofile' => array(
+					'title' => $txt['forumprofile'],
+					'href' => $scripturl . '?action=profile;area=forumprofile',
+					'show' => allowedTo(array('profile_extra_any', 'profile_extra_own')),
+				),
+				'theme' => array(
+					'title' => $txt['theme'],
+					'href' => $scripturl . '?action=profile;area=theme',
+					'show' => allowedTo(array('profile_extra_any', 'profile_extra_own', 'profile_extra_any')),
+				),
+				'logout' => array(
+					'title' => $txt['logout'],
+					'href' => $scripturl . '?action=logout',
+					'show' => !$user_info['is_guest'],
+				),
+			),
+		),
+		// @todo Look at doing something here, to provide instant access to inbox when using click menus.
+		// @todo A small pop-up anchor seems like the obvious way to handle it. ;)
+		'pm' => array(
+			'title' => $txt['pm_short'],
+			'counter' => 'unread_messages',
+			'href' => $scripturl . '?action=pm',
+			'data-icon' => ($context['user']['unread_messages'] ? 'i-envelope' : 'i-envelope-blank'),
+			'show' => $context['allow_pm'],
+			'sub_buttons' => array(
+				'pm_read' => array(
+					'title' => $txt['pm_menu_read'],
+					'href' => $scripturl . '?action=pm',
+					'show' => allowedTo('pm_read'),
+				),
+				'pm_send' => array(
+					'title' => $txt['pm_menu_send'],
+					'href' => $scripturl . '?action=pm;sa=send',
+					'show' => allowedTo('pm_send'),
+				),
+			),
+		),
+		'mentions' => array(
+			'title' => $txt['mention'],
+			'counter' => 'mentions',
+			'href' => $scripturl . '?action=mentions',
+			'data-icon' => ($context['user']['mentions'] ? 'i-bell' : 'i-bell-blank'),
+			'show' => !$user_info['is_guest'] && !empty($modSettings['mentions_enabled']),
+		),
+		// The old language string made no sense, and was too long.
+		// "New posts" is better, because there are probably a pile
+		// of old unread posts, and they wont be reached from this button.
+		'unread' => array(
+			'title' => $txt['view_unread_category'],
+			'href' => $scripturl . '?action=unread',
+			'data-icon' => 'i-comments',
+			'show' => !$user_info['is_guest'],
+		),
+		// The old language string made no sense, and was too long.
+		// "New replies" is better, because there are "updated topics"
+		// that the user has never posted in and doesn't care about.
+		'unreadreplies' => array(
+			'title' => $txt['view_replies_category'],
+			'href' => $scripturl . '?action=unreadreplies',
+			'data-icon' => 'i-comments-blank',
+			'show' => !$user_info['is_guest'],
+		),
+		'login' => array(
+			'title' => $txt['login'],
+			'href' => $scripturl . '?action=login',
+			'data-icon' => 'i-sign-in',
+			'show' => $user_info['is_guest'],
+		),
+
+		'register' => array(
+			'title' => $txt['register'],
+			'href' => $scripturl . '?action=register',
+			'data-icon' => 'i-register',
+			'show' => $user_info['is_guest'] && $context['can_register'],
+		),
+	);
+
+	return $buttons;
 }

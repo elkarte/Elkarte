@@ -7,18 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.4
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * ManageScheduledTasks admin Controller: handles the scheduled task pages
@@ -35,6 +30,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	 * based on the sub-action.
 	 * - Everything here requires admin_forum permission.
 	 *
+	 * @event integrate_sa_manage_scheduled_tasks
 	 * @uses ManageScheduledTasks template file
 	 * @uses ManageScheduledTasks language file
 	 *
@@ -85,6 +81,8 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	/**
 	 * List all the scheduled task in place on the forum.
 	 *
+	 * @event integrate_autotask_include (depreciated since 1.1)
+	 * @event integrate_list_scheduled_tasks
 	 * @uses ManageScheduledTasks template, view_scheduled_tasks sub-template
 	 */
 	public function action_tasks()
@@ -100,15 +98,17 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		$context['page_title'] = $txt['maintain_tasks'];
 
 		// Saving changes?
-		if (isset($_REQUEST['save']) && isset($_POST['enable_task']))
+		if (isset($this->_req->post->save) && isset($this->_req->post->enable_task))
 		{
 			checkSession();
 
 			// Enable and disable as required.
 			$enablers = array(0);
-			foreach ($_POST['enable_task'] as $id => $enabled)
+			foreach ($this->_req->post->enable_task as $id => $enabled)
+			{
 				if ($enabled)
 					$enablers[] = (int) $id;
+			}
 
 			// Do the update!
 			updateTaskStatus($enablers);
@@ -118,18 +118,18 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		}
 
 		// Want to run any of the tasks?
-		if (isset($_REQUEST['run']) && isset($_POST['run_task']))
+		if (isset($this->_req->post->run) && isset($this->_req->post->run_task))
 		{
 			// Lets figure out which ones they want to run.
 			$tasks = array();
-			foreach ($_POST['run_task'] as $task => $dummy)
+			foreach ($this->_req->post->run_task as $task => $dummy)
 				$tasks[] = (int) $task;
 
 			// Load up the tasks.
 			$nextTasks = loadTasks($tasks);
 
 			// Lets get it on!
-			require_once(SUBSDIR . '/ScheduledTask.class.php');
+			// @deprecated since 1.1
 			call_integration_include_hook('integrate_autotask_include');
 
 			ignore_user_abort(true);
@@ -161,7 +161,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 					'data' => array(
 						'sprintf' => array(
 							'format' => '
-								<a class="linkbutton" href="' . $scripturl . '?action=admin;area=scheduledtasks;sa=taskedit;tid=%1$d" title="' . $txt['scheduled_task_edit'] . ' %2$s"><i class="fa fa-pencil-square-o"></i> %2$s</a><br /><span class="smalltext">%3$s</span>',
+								<a class="linkbutton" href="' . $scripturl . '?action=admin;area=scheduledtasks;sa=taskedit;tid=%1$d" title="' . $txt['scheduled_task_edit'] . ' %2$s"><i class="icon icon-small i-pencil"></i> %2$s</a><br /><span class="smalltext">%3$s</span>',
 							'params' => array(
 								'id' => false,
 								'name' => false,
@@ -236,16 +236,14 @@ class ManageScheduledTasks_Controller extends Action_Controller
 				array(
 					'position' => 'after_title',
 					'value' => $txt['scheduled_tasks_time_offset'],
-					'class' => 'windowbg2',
 				),
 			),
 		);
 
-		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'view_scheduled_tasks';
-		$context['tasks_were_run'] = isset($_GET['done']);
+		$context['tasks_were_run'] = isset($this->_req->query->done);
 
 		// If we had any errors, place them in context as well
 		if (isset($_SESSION['st_error']))
@@ -274,18 +272,18 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
 		// Cleaning...
-		if (!isset($_GET['tid']))
-			fatal_lang_error('no_access', false);
-		$_GET['tid'] = (int) $_GET['tid'];
+		if (!isset($this->_req->query->tid))
+			throw new Elk_Exception('no_access', false);
+		$this->_req->query->tid = (int) $this->_req->query->tid;
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 			validateToken('admin-st');
 
 			// Do we have a valid offset?
-			preg_match('~(\d{1,2}):(\d{1,2})~', $_POST['offset'], $matches);
+			preg_match('~(\d{1,2}):(\d{1,2})~', $this->_req->post->offset, $matches);
 
 			// If a half is empty then assume zero offset!
 			if (!isset($matches[2]) || $matches[2] > 59)
@@ -297,30 +295,30 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			$offset = $matches[1] * 3600 + $matches[2] * 60 - date('Z');
 
 			// The other time bits are simple!
-			$interval = max((int) $_POST['regularity'], 1);
-			$unit = in_array(substr($_POST['unit'], 0, 1), array('m', 'h', 'd', 'w')) ? substr($_POST['unit'], 0, 1) : 'd';
+			$interval = max((int) $this->_req->post->regularity, 1);
+			$unit = in_array(substr($this->_req->post->unit, 0, 1), array('m', 'h', 'd', 'w')) ? substr($this->_req->post->unit, 0, 1) : 'd';
 
 			// Don't allow one minute intervals.
-			if ($interval == 1 && $unit == 'm')
+			if ($interval == 1 && $unit === 'm')
 				$interval = 2;
 
 			// Is it disabled?
-			$disabled = !isset($_POST['enabled']) ? 1 : 0;
+			$disabled = !isset($this->_req->post->enabled) ? 1 : 0;
 
 			// Do the update!
-			$_GET['tid'] = (int) $_GET['tid'];
-			updateTask($_GET['tid'], $disabled, $offset, $interval, $unit);
+			$this->_req->query->tid = (int) $this->_req->query->tid;
+			updateTask($this->_req->query->tid, $disabled, $offset, $interval, $unit);
 
 			// Check the next event.
-			calculateNextTrigger($_GET['tid'], true);
+			calculateNextTrigger($this->_req->query->tid, true);
 
 			// Return to the main list.
 			redirectexit('action=admin;area=scheduledtasks');
 		}
 
 		// Load the task, understand? Que? Que?
-		$_GET['tid'] = (int) $_GET['tid'];
-		$context['task'] = loadTaskDetails($_GET['tid']);
+		$this->_req->query->tid = (int) $this->_req->query->tid;
+		$context['task'] = loadTaskDetails($this->_req->query->tid);
 
 		createToken('admin-st');
 	}
@@ -340,7 +338,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		loadLanguage('ManageScheduledTasks');
 
 		// Empty the log?
-		if (!empty($_POST['removeAll']))
+		if (!empty($this->_req->post->removeAll))
 		{
 			checkSession();
 			validateToken('admin-tl');
@@ -354,7 +352,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			'items_per_page' => 30,
 			'title' => $txt['scheduled_log'],
 			'no_items_label' => $txt['scheduled_log_empty'],
-			'base_href' => $context['admin_area'] == 'scheduledtasks' ? $scripturl . '?action=admin;area=scheduledtasks;sa=tasklog' : $scripturl . '?action=admin;area=logs;sa=tasklog',
+			'base_href' => $context['admin_area'] === 'scheduledtasks' ? $scripturl . '?action=admin;area=scheduledtasks;sa=tasklog' : $scripturl . '?action=admin;area=logs;sa=tasklog',
 			'default_sort_col' => 'date',
 			'get_items' => array(
 				'function' => array($this, 'list_getTaskLogEntries'),
@@ -376,9 +374,9 @@ class ManageScheduledTasks_Controller extends Action_Controller
 						'value' => $txt['scheduled_log_time_run'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							return standardTime($rowData[\'time_run\'], true);
-						'),
+						'function' => function ($rowData) {
+							return standardTime($rowData['time_run'], true);
+						},
 					),
 					'sort' => array(
 						'default' => 'lst.id_log DESC',
@@ -407,16 +405,16 @@ class ManageScheduledTasks_Controller extends Action_Controller
 						'value' => $txt['scheduled_log_completed'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							global $settings, $txt;
+						'function' => function ($rowData) {
+							global $txt;
 
-							return \'<img src="\' . $settings[\'images_url\'] . \'/admin/complete_\' . ($rowData[\'task_completed\'] ? \'success\' : \'fail\') . \'.png" alt="\' . sprintf($txt[$rowData[\'task_completed\'] ? \'maintain_done\' : \'maintain_fail\'], $rowData[\'name\']) . \'" />\';
-						'),
+							return '<i class="icon ' . ($rowData['task_completed'] ? 'i-check' : 'i-fail') . '" title="' . sprintf($txt[$rowData['task_completed'] ? 'maintain_done' : 'maintain_fail'], $rowData['name']) . '" />';
+						},
 					),
 				),
 			),
 			'form' => array(
-				'href' => $context['admin_area'] == 'scheduledtasks' ? $scripturl . '?action=admin;area=scheduledtasks;sa=tasklog' : $scripturl . '?action=admin;area=logs;sa=tasklog',
+				'href' => $context['admin_area'] === 'scheduledtasks' ? $scripturl . '?action=admin;area=scheduledtasks;sa=tasklog' : $scripturl . '?action=admin;area=logs;sa=tasklog',
 				'token' => 'admin-tl',
 			),
 			'additional_rows' => array(
@@ -428,14 +426,12 @@ class ManageScheduledTasks_Controller extends Action_Controller
 				array(
 					'position' => 'after_title',
 					'value' => $txt['scheduled_tasks_time_offset'],
-					'class' => 'windowbg2',
 				),
 			),
 		);
 
 		createToken('admin-tl');
 
-		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
@@ -458,9 +454,9 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	/**
 	 * Callback function for createList() in action_log().
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 */
 	public function list_getTaskLogEntries($start, $items_per_page, $sort)
 	{

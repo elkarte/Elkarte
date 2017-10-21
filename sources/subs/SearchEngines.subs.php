@@ -7,18 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Do we think the current user is a spider?
@@ -38,7 +33,9 @@ function spiderCheck()
 	$_SESSION['robot_check'] = time();
 
 	// We cache the spider data for five minutes if we can.
-	if (($spider_data = cache_get_data('spider_search', 300)) === null)
+	$spider_data = array();
+	$cache = Cache::instance();
+	if (!$cache->getVar($spider_data, 'spider_search', 300))
 	{
 		$request = $db->query('', '
 			SELECT id_spider, user_agent, ip_info
@@ -47,13 +44,12 @@ function spiderCheck()
 			array(
 			)
 		);
-		$spider_data = array();
 		while ($row = $db->fetch_assoc($request))
 			$spider_data[] = $row;
 		$db->free_result($request);
 
 		// Save it in the cache
-		cache_put_data('spider_search', $spider_data, 300);
+		$cache->put('spider_search', $spider_data, 300);
 	}
 
 	if (empty($spider_data))
@@ -98,7 +94,7 @@ function spiderCheck()
 			break;
 	}
 
-	// If this is low server tracking then log the spider here as oppossed to the main logging function.
+	// If this is low server tracking then log the spider here as opposed to the main logging function.
 	if (!empty($modSettings['spider_mode']) && $modSettings['spider_mode'] == 1 && !empty($_SESSION['id_robot']))
 		logSpider();
 
@@ -154,8 +150,7 @@ function logSpider()
 	{
 		if ($modSettings['spider_mode'] > 2)
 		{
-			$req = request();
-			$url = $_GET + array('USER_AGENT' => $req->user_agent());
+			$url = $_GET;
 			if (isset($context['session_var']))
 				unset($url['sesc'], $url[$context['session_var']]);
 			else
@@ -244,7 +239,7 @@ function consolidateSpiderStats()
 }
 
 /**
- * Recache spider names.
+ * Re cache spider names.
  *
  * @package SearchEngines
  */
@@ -267,7 +262,7 @@ function recacheSpiderNames()
 }
 
 /**
- * Sort the search engine table by user agent name to avoid misidentification of engine.
+ * Sort the search engine table by user agent name to avoid misidentifying of engine.
  *
  * @package SearchEngines
  * @deprecated since 1.0 - the ordering is done in the query, probably not needed
@@ -276,13 +271,12 @@ function sortSpiderTable()
 {
 	$db = database();
 
+	$db->skip_next_error();
 	// Order the table by user_agent length.
 	$db->query('alter_table', '
 		ALTER TABLE {db_prefix}spiders
 		ORDER BY LENGTH(user_agent) DESC',
-		array(
-			'db_error_skip' => true,
-		)
+		array()
 	);
 }
 
@@ -291,9 +285,9 @@ function sortSpiderTable()
  * (used by createList() callbacks)
  *
  * @package SearchEngines
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  */
 function getSpiders($start, $items_per_page, $sort)
 {
@@ -368,13 +362,14 @@ function getNumSpiders()
 
 /**
  * Retrieve spider logs within the specified limits.
- * (used by createList() callbacks)
+ *
+ * - (used by createList() callbacks)
  *
  * @package SearchEngines
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
- * @return array
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
+ * @return array An array of spider hits
  */
 function getSpiderLogs($start, $items_per_page, $sort)
 {
@@ -402,7 +397,7 @@ function getSpiderLogs($start, $items_per_page, $sort)
  * (used by createList() callbacks)
  *
  * @package SearchEngines
- * @return int
+ * @return int The number of rows in the log_spider_hits table
  */
 function getNumSpiderLogs()
 {
@@ -426,10 +421,9 @@ function getNumSpiderLogs()
  * (used by createList() callbacks)
  *
  * @package SearchEngines
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
- * @return array
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  */
 function getSpiderStats($start, $items_per_page, $sort)
 {
@@ -458,7 +452,7 @@ function getSpiderStats($start, $items_per_page, $sort)
  *
  * @package SearchEngines
  * @param int|null $time (optional) if specified counts only the entries before that date
- * @return int
+ * @return int The number of rows in the log_spider_stats table
  */
 function getNumSpiderStats($time = null)
 {
@@ -488,7 +482,7 @@ function removeSpiderOldLogs($time)
 {
 	$db = database();
 
-	// Delete the entires.
+	// Delete the entries.
 	$db->query('', '
 		DELETE FROM {db_prefix}log_spider_hits
 		WHERE log_time < {int:delete_period}',
@@ -508,7 +502,7 @@ function removeSpiderOldStats($time)
 {
 	$db = database();
 
-	// Delete the entires.
+	// Delete the entries.
 	$db->query('', '
 		DELETE FROM {db_prefix}log_spider_stats
 		WHERE last_seen < {int:delete_period}',

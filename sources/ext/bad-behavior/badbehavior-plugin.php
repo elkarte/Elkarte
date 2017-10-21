@@ -10,12 +10,15 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.5
+ * @version 1.1
  *
  */
 
+// This die was left on purpose, because BB is special
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 define('BB2_CWD', dirname(__FILE__));
 
@@ -147,7 +150,7 @@ function bb2_email()
  */
 function bb2_insert($settings, $package, $key)
 {
-	global $user_info, $sc;
+	global $user_info;
 
 	// Logging not enabled
 	if (!$settings['logging'])
@@ -161,7 +164,7 @@ function bb2_insert($settings, $package, $key)
 	$server_protocol = bb2_db_escape($package['server_protocol']);
 	$user_agent = bb2_db_escape($package['user_agent']);
 	$member_id = (int) !empty($user_info['id']) ? $user_info['id'] : 0;
-	$session = !empty($sc) ? (string) $sc : '';
+	$session = !empty($_SESSION['session_value']) ? (string) $_SESSION['session_value'] : '';
 
 	// Prepare the headers etc for db insertion
 	// We are passed at least
@@ -348,10 +351,10 @@ function bb2_insert_stats($force = false)
 	if ($force || $settings['display_stats'])
 	{
 		// Get the blocked count for the last 7 days ... cache this as well
-		if (($bb2_blocked = cache_get_data('bb2_blocked', 900)) === null)
+		if (!Cache::instance()->getVar($bb2_blocked, 'bb2_blocked', 900))
 		{
 			$bb2_blocked = bb2_db_query('SELECT COUNT(*) FROM {db_prefix}log_badbehavior WHERE `valid` NOT LIKE \'00000000\'');
-			cache_put_data('bb2_blocked', $bb2_blocked, 900);
+			Cache::instance()->put('bb2_blocked', $bb2_blocked, 900);
 		}
 
 		if ($bb2_blocked !== false)

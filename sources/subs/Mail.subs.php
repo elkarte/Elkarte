@@ -8,18 +8,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.7
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * This function sends an email to the specified recipient(s).
@@ -51,7 +46,17 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	$maillist = !empty($modSettings['maillist_enabled']) && $from_wrapper !== null && $message_id !== null && $priority < 4 && empty($modSettings['mail_no_message_id']);
 
 	// Line breaks need to be \r\n only in windows or for SMTP.
-	$line_break = !empty($context['server']['is_windows']) || !$use_sendmail ? "\r\n" : "\n";
+	$line_break = detectServer()->is('windows') || !$use_sendmail ? "\r\n" : "\n";
+
+	if ($message_id !== null && isset($message_id[0]) && in_array($message_id[0], array('m', 'p', 't')))
+	{
+		$message_type = $message_id[0];
+		$message_id = substr($message_id, 1);
+	}
+	else
+	{
+		$message_type = 'm';
+	}
 
 	// So far so good.
 	$mail_result = true;
@@ -75,7 +80,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 
 		// Call this function recursively for the hotmail addresses.
 		if (!empty($hotmail_to))
-			$mail_result = sendmail($hotmail_to, $subject, $message, $from, $message_id, $send_html, $priority, true, $is_private, $from_wrapper, $reference);
+			$mail_result = sendmail($hotmail_to, $subject, $message, $from, $message_type . $message_id, $send_html, $priority, true, $is_private, $from_wrapper, $reference);
 
 		// The remaining addresses no longer need the fix.
 		$hotmail_fix = false;
@@ -124,7 +129,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 		$from_name = '"' . $from_name . '"';
 
 	// Construct the from / replyTo mail headers, based on if we showing a users name
-	if ($from_wrapper != null)
+	if ($from_wrapper !== null)
 	{
 		$headers = 'From: ' . $from_name . ' <' . $from_wrapper . '>' . $line_break;
 
@@ -140,8 +145,11 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 		$headers .= ($from !== null && strpos($from, '@') !== false) ? 'Reply-To: <' . $from . '>' . $line_break : '';
 	}
 
+	// We'll need this later for the envelope fix, too, so keep it
+	$return_path = (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']));
+
 	// Return path, date, mailer
-	$headers .= 'Return-Path: ' . (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])) . $line_break;
+	$headers .= 'Return-Path: ' . $return_path . $line_break;
 	$headers .= 'Date: ' . gmdate('D, d M Y H:i:s') . ' -0000' . $line_break;
 	$headers .= 'X-Mailer: ELK' . $line_break;
 
@@ -154,7 +162,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 
 		// Indicate its a list server to avoid spam tagging and to help client filters
 		// http://www.ietf.org/rfc/rfc2369.txt
-		$headers .= 'List-Id: <' . (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])). '>' . $line_break;
+		$headers .= 'List-Id: <' . (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])) . '>' . $line_break;
 		$headers .= 'List-Unsubscribe: <' . $boardurl . '/index.php?action=profile;area=notification>' . $line_break;
 		$headers .= 'List-Owner: <mailto:' . (!empty($modSettings['maillist_sitename_help']) ? $modSettings['maillist_sitename_help'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])) . '> (' . (!empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $context['forum_name']) . ')' . $line_break;
 	}
@@ -211,7 +219,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 
 	// Are we using the mail queue, if so this is where we butt in...
 	if (!empty($modSettings['mail_queue']) && $priority != 0)
-		return AddMailQueue(false, $to_array, $subject, $message, $headers, $send_html, $priority, $is_private, $message_id);
+		return AddMailQueue(false, $to_array, $subject, $message, $headers, $send_html, $priority, $is_private, $message_type . $message_id);
 	// If it's a priority mail, send it now - note though that this should NOT be used for sending many at once.
 	elseif (!empty($modSettings['mail_queue']) && !empty($modSettings['mail_period_limit']))
 	{
@@ -240,11 +248,15 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 		{
 			$unq_id = '';
 			$unq_head = '';
+			$unq_head_array = array();
 
 			// If we are using the post by email functions, then we generate "reply to mail" security keys
 			if ($maillist)
 			{
-				$unq_head = md5($boardurl . microtime() . rand()) . '-' . $message_id;
+				$unq_head_array[0] = md5($boardurl . microtime() . rand());
+				$unq_head_array[1] = $message_type;
+				$unq_head_array[2] = $message_id;
+				$unq_head = $unq_head_array[0] . '-' . $unq_head_array[2];
 				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
 				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 				$message = mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break);
@@ -252,26 +264,34 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 			elseif (empty($modSettings['mail_no_message_id']))
 				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . md5($boardurl . microtime()) . '-' . $message_id . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 
-			if (!mail(strtr($to, array("\r" => '', "\n" => '')), $subject, $message, $headers . $unq_id))
+			// This is frequently not set, or not set according to the needs of PBE and bounce detection
+			// We have to use ini_set, since "-f <address>" doesn't work on windows systems, so we need both
+			$old_return = ini_set('sendmail_from', $return_path);
+			if (!mail(strtr($to, array("\r" => '', "\n" => '')), $subject, $message, $headers . $unq_id, '-f ' . $return_path))
 			{
-				log_error(sprintf($txt['mail_send_unable'], $to));
+				Errors::instance()->log_error(sprintf($txt['mail_send_unable'], $to));
 				$mail_result = false;
 			}
 			else
 			{
-				// keep our post via email log
+				// Keep our post via email log
 				if (!empty($unq_head))
-					$sent[] = array($unq_head, time(), $to);
+				{
+					$unq_head_array[] = time();
+					$unq_head_array[] = $to;
+					$sent[] = $unq_head_array;
+				}
 
-				// track total emails sent
+				// Track total emails sent
 				if (!empty($modSettings['trackStats']))
 					trackStats(array('email' => '+'));
 			}
 
+			// Put it back
+			ini_set('sendmail_from', $old_return);
+
 			// Wait, wait, I'm still sending here!
-			@set_time_limit(300);
-			if (function_exists('apache_reset_timeout'))
-				@apache_reset_timeout();
+			detectServer()->setTimeLimit(300);
 		}
 
 		// Log each email that we sent so they can be replied to
@@ -283,7 +303,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	}
 	else
 		// SMTP protocol it is
-		$mail_result = $mail_result && smtp_mail($to_array, $subject, $message, $headers, $priority, $message_id);
+		$mail_result = $mail_result && smtp_mail($to_array, $subject, $message, $headers, $priority, $message_type . $message_id);
 
 	// Clear out the stat cache.
 	trackStats();
@@ -403,6 +423,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
  * Prepare text strings for sending as email body or header.
  *
  * What it does:
+ *
  * - In case there are higher ASCII characters in the given string, this
  * function will attempt the transport method 'quoted-printable'.
  * - Otherwise the transport method '7bit' is used.
@@ -527,6 +548,16 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 
 	$modSettings['smtp_host'] = trim($modSettings['smtp_host']);
 
+	if ($message_id !== null && isset($message_id[0]) && in_array($message_id[0], array('m', 'p', 't')))
+	{
+		$message_type = $message_id[0];
+		$message_id = substr($message_id, 1);
+	}
+	else
+	{
+		$message_type = 'm';
+	}
+
 	// Try POP3 before SMTP?
 	// @todo There's no interface for this yet.
 	if ($modSettings['mail_type'] == 2 && $modSettings['smtp_username'] != '' && $modSettings['smtp_password'] != '')
@@ -555,13 +586,13 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 		if (substr($modSettings['smtp_host'], 0, 4) == 'ssl:' && (empty($modSettings['smtp_port']) || $modSettings['smtp_port'] == 25))
 		{
 			if ($socket = fsockopen($modSettings['smtp_host'], 465, $errno, $errstr, 3))
-				log_error($txt['smtp_port_ssl']);
+				Errors::instance()->log_error($txt['smtp_port_ssl']);
 		}
 
 		// Unable to connect!  Don't show any error message, but just log one and try to continue anyway.
 		if (!$socket)
 		{
-			log_error($txt['smtp_no_connect'] . ': ' . $errno . ' : ' . $errstr);
+			Errors::instance()->log_error($txt['smtp_no_connect'] . ': ' . $errno . ' : ' . $errstr);
 			return false;
 		}
 	}
@@ -577,6 +608,13 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 		// EHLO could be understood to mean encrypted hello...
 		if (server_parse('EHLO ' . $modSettings['smtp_host'], $socket, null) == '250')
 		{
+			if (!empty($modSettings['smtp_starttls']))
+			{
+				server_parse('STARTTLS', $socket, null);
+				stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+				server_parse('EHLO ' . $modSettings['smtp_host'], $socket, null);
+			}
+
 			if (!server_parse('AUTH LOGIN', $socket, '334'))
 				return false;
 			// Send the username and password, encoded.
@@ -611,12 +649,16 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 		// the keys are must unique for every mail you see
 		$unq_id = '';
 		$unq_head = '';
+		$unq_head_array = array();
 
 		// Using the post by email functions, and not a digest (priority 4)
 		// then generate "reply to mail" keys and place them in the message
 		if (!empty($modSettings['maillist_enabled']) && $message_id !== null && $priority != 4)
 		{
-			$unq_head = md5($scripturl . microtime() . rand()) . '-' . $message_id;
+			$unq_head_array[0] = md5($scripturl . microtime() . rand());
+			$unq_head_array[1] = $message_type;
+			$unq_head_array[2] = $message_id;
+			$unq_head = $unq_head_array[0] . '-' . $unq_head_array[1] . $unq_head_array[2];
 			$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
 			$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 			$message = mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break);
@@ -656,12 +698,14 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 
 		// Keep our post via email log
 		if (!empty($unq_head))
-			$sent[] = array($unq_head, time(), $mail_to);
+		{
+			$unq_head_array[] = time();
+			$unq_head_array[] = $mail_to;
+			$sent[] = $unq_head_array;
+		}
 
 		// Almost done, almost done... don't stop me just yet!
-		@set_time_limit(300);
-		if (function_exists('apache_reset_timeout'))
-			@apache_reset_timeout();
+		detectServer()->setTimeLimit(300);
 	}
 
 	// say our goodbyes
@@ -704,7 +748,7 @@ function server_parse($message, $socket, $response)
 		if (!($server_response = fgets($socket, 256)))
 		{
 			// @todo Change this message to reflect that it may mean bad user/password/server issues/etc.
-			log_error($txt['smtp_bad_response']);
+			Errors::instance()->log_error($txt['smtp_bad_response']);
 			return false;
 		}
 
@@ -713,7 +757,7 @@ function server_parse($message, $socket, $response)
 
 	if (substr($server_response, 0, 3) != $response)
 	{
-		log_error($txt['smtp_error'] . $server_response);
+		Errors::instance()->log_error($txt['smtp_error'] . $server_response);
 		return false;
 	}
 
@@ -757,12 +801,18 @@ function mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break)
  * Load a template from EmailTemplates language file.
  *
  * @package Mail
- * @param string $template
- * @param mixed[] $replacements
- * @param string $lang = ''
- * @param bool $loadLang = true
+ *
+ * @param string   $template
+ * @param mixed[]  $replacements
+ * @param string   $lang = ''
+ * @param bool     $loadLang = true
+ * @param string[] $suffixes - Additional suffixes to find and return
+ * @param string[] $additional_files - Additional language files to load
+ *
+ * @return array
+ * @throws Elk_Exception email_no_template
  */
-function loadEmailTemplate($template, $replacements = array(), $lang = '', $loadLang = true)
+function loadEmailTemplate($template, $replacements = array(), $lang = '', $loadLang = true, $suffixes = array(), $additional_files = array())
 {
 	global $txt, $mbname, $scripturl, $settings, $boardurl, $modSettings;
 
@@ -772,15 +822,26 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 		loadLanguage('EmailTemplates', $lang);
 		if (!empty($modSettings['maillist_enabled']))
 			loadLanguage('MaillistTemplates', $lang);
+
+		if (!empty($additional_files))
+		{
+			foreach ($additional_files as $file)
+				loadLanguage($file, $lang);
+		}
 	}
 
 	if (!isset($txt[$template . '_subject']) || !isset($txt[$template . '_body']))
-		fatal_lang_error('email_no_template', 'template', array($template));
+		throw new Elk_Exception('email_no_template', 'template', array($template));
 
 	$ret = array(
 		'subject' => $txt[$template . '_subject'],
 		'body' => $txt[$template . '_body'],
 	);
+	if (!empty($suffixes))
+	{
+		foreach ($suffixes as $key)
+			$ret[$key] = $txt[$template . '_' . $key];
+	}
 
 	// Add in the default replacements.
 	$replacements += array(
@@ -806,12 +867,12 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 	}
 
 	// Do the variable replacements.
-	$ret['subject'] = str_replace($find, $replace, $ret['subject']);
-	$ret['body'] = str_replace($find, $replace, $ret['body']);
-
-	// Now deal with the {USER.variable} items.
-	$ret['subject'] = preg_replace_callback('~{USER.([^}]+)}~', 'user_info_callback', $ret['subject']);
-	$ret['body'] = preg_replace_callback('~{USER.([^}]+)}~', 'user_info_callback', $ret['body']);
+	foreach ($ret as $key => $val)
+	{
+		$val = str_replace($find, $replace, $val);
+		// Now deal with the {USER.variable} items.
+		$ret[$key] = preg_replace_callback('~{USER.([^}]+)}~', 'user_info_callback', $val);
+	}
 
 	// Finally return the email to the caller so they can send it out.
 	return $ret;
@@ -852,6 +913,8 @@ function prepareMailingForPreview()
 	// We might need this in a bit
 	$cleanLatestMember = empty($context['send_html']) || $context['send_pm'] ? un_htmlspecialchars($modSettings['latestRealName']) : $modSettings['latestRealName'];
 
+	$bbc_parser = \BBC\ParserWrapper::instance();
+
 	foreach ($processing as $key => $post)
 	{
 		$context[$key] = !empty($_REQUEST[$post]) ? $_REQUEST[$post] : '';
@@ -868,7 +931,7 @@ function prepareMailingForPreview()
 		{
 			$enablePostHTML = $modSettings['enablePostHTML'];
 			$modSettings['enablePostHTML'] = $context['send_html'];
-			$context[$key] = parse_bbc($context[$key]);
+			$context[$key] = $bbc_parser->parseEmail($context[$key]);
 			$modSettings['enablePostHTML'] = $enablePostHTML;
 		}
 
@@ -920,9 +983,9 @@ function user_info_callback($matches)
  * This function grabs the mail queue items from the database, according to the params given.
  *
  * @package Mail
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @return array
  */
 function list_getMailQueue($start, $items_per_page, $sort)
@@ -931,7 +994,7 @@ function list_getMailQueue($start, $items_per_page, $sort)
 
 	$db = database();
 
-	$request = $db->query('', '
+	return $db->fetchQueryCallback('
 		SELECT
 			id_mail, time_sent, recipient, priority, private, subject
 		FROM {db_prefix}mail_queue
@@ -941,20 +1004,16 @@ function list_getMailQueue($start, $items_per_page, $sort)
 			'start' => $start,
 			'sort' => $sort,
 			'items_per_page' => $items_per_page,
-		)
+		),
+		function ($row) use ($txt)
+		{
+			// Private PM/email subjects and similar shouldn't be shown in the mailbox area.
+			if (!empty($row['private']))
+				$row['subject'] = $txt['personal_message'];
+
+			return $row;
+		}
 	);
-	$mails = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Private PM/email subjects and similar shouldn't be shown in the mailbox area.
-		if (!empty($row['private']))
-			$row['subject'] = $txt['personal_message'];
-
-		$mails[] = $row;
-	}
-	$db->free_result($request);
-
-	return $mails;
 }
 
 /**
@@ -1159,35 +1218,34 @@ function updateNextSendTime()
 function emailsInfo($number)
 {
 	$db = database();
+	$ids = array();
+	$emails = array();
 
 	// Get the next $number emails, with all that's to know about them and one more.
-	$request = $db->query('', '
+	$db->fetchQueryCallback('
 		SELECT /*!40001 SQL_NO_CACHE */ id_mail, recipient, body, subject, headers, send_html, time_sent, priority, private, message_id
 		FROM {db_prefix}mail_queue
 		ORDER BY priority ASC, id_mail ASC
 		LIMIT ' . $number,
 		array(
-		)
+		),
+		function ($row) use(&$ids, &$emails)
+		{
+			// Just get the data and go.
+			$ids[] = $row['id_mail'];
+			$emails[] = array(
+				'to' => $row['recipient'],
+				'body' => $row['body'],
+				'subject' => $row['subject'],
+				'headers' => $row['headers'],
+				'send_html' => $row['send_html'],
+				'time_sent' => $row['time_sent'],
+				'priority' => $row['priority'],
+				'private' => $row['private'],
+				'message_id' => $row['message_id'],
+			);
+		}
 	);
-	$ids = array();
-	$emails = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Just get the data and go.
-		$ids[] = $row['id_mail'];
-		$emails[] = array(
-			'to' => $row['recipient'],
-			'body' => $row['body'],
-			'subject' => $row['subject'],
-			'headers' => $row['headers'],
-			'send_html' => $row['send_html'],
-			'time_sent' => $row['time_sent'],
-			'priority' => $row['priority'],
-			'private' => $row['private'],
-			'message_id' => $row['message_id'],
-		);
-	}
-	$db->free_result($request);
 
 	return array($ids, $emails);
 }
@@ -1199,14 +1257,14 @@ function emailsInfo($number)
  * - If batch size is not set, will determine a size such that it sends in 1/2 the period (buffer)
  *
  * @package Mail
- * @param int|false $batch_size = false the number to send each loop
+ * @param int|bool $batch_size = false the number to send each loop
  * @param boolean $override_limit = false bypassing our limit flaf
  * @param boolean $force_send = false
  * @return boolean
  */
 function reduceMailQueue($batch_size = false, $override_limit = false, $force_send = false)
 {
-	global $modSettings, $context, $webmaster_email, $scripturl;
+	global $modSettings, $webmaster_email, $scripturl;
 
 	// Do we have another script to send out the queue?
 	if (!empty($modSettings['mail_queue_use_cron']) && empty($force_send))
@@ -1239,6 +1297,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 	require_once(SUBSDIR . '/Maillist.subs.php');
 
 	// Set the delay for the next sending
+	$delay = 0;
 	if (!$override_limit)
 	{
 		// Update next send time for our mail queue, if there was something to update. Otherwise bail out :P
@@ -1267,7 +1326,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 			// If this is likely one of the last cycles for this period, then send any remaining quota
 			if (($mail_time - (time() - 60)) < $delay * 2)
 				$batch_size = $modSettings['mail_period_limit'] - $mail_number;
-			// Some batch sizes may need to be adusted to fit as we approach the end
+			// Some batch sizes may need to be adjusted to fit as we approach the end
 			elseif ($mail_number + $batch_size > $modSettings['mail_period_limit'])
 				$batch_size = $modSettings['mail_period_limit'] - $mail_number;
 
@@ -1303,10 +1362,22 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 	$use_sendmail = empty($modSettings['mail_type']) || $modSettings['smtp_host'] == '';
 
 	// Line breaks need to be \r\n only in windows or for SMTP.
-	$line_break = !empty($context['server']['is_windows']) || !$use_sendmail ? "\r\n" : "\n";
+	$line_break = detectServer()->is('windows') || !$use_sendmail ? "\r\n" : "\n";
 
 	foreach ($emails as $key => $email)
 	{
+		// So that we have it, just in case it's really needed - see #2245
+		$email['body_fail'] = $email['body'];
+		if ($email['message_id'] !== null && isset($email['message_id'][0]) && in_array($email['message_id'][0], array('m', 'p', 't')))
+		{
+			$email['message_type'] = $email['message_id'][0];
+			$email['message_id'] = substr($email['message_id'], 1);
+		}
+		else
+		{
+			$email['message_type'] = 'm';
+		}
+
 		// Use the right mail resource
 		if ($use_sendmail)
 		{
@@ -1319,14 +1390,20 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 				$email['headers'] = strtr($email['headers'], array("\r" => ''));
 			}
 
+			// See the assignment 10 lines before this and #2245 - repeated here for the strtr
+			$email['body_fail'] = $email['body'];
 			$need_break = substr($email['headers'], -1) === "\n" || substr($email['headers'], -1) === "\r" ? false : true;
 
 			// Create our unique reply to email header if this message needs one
 			$unq_id = '';
 			$unq_head = '';
+			$unq_head_array = array();
 			if (!empty($modSettings['maillist_enabled']) && $email['message_id'] !== null && strpos($email['headers'], 'List-Id: <') !== false)
 			{
-				$unq_head = md5($scripturl . microtime() . rand()) . '-' . $email['message_id'];
+				$unq_head_array[0] = md5($scripturl . microtime() . rand());
+				$unq_head_array[1] = $email['message_type'];
+				$unq_head_array[2] = $email['message_id'];
+				$unq_head = $unq_head_array[0] . '-' . $unq_head_array[1] . $unq_head_array[2];
 				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
 				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 				$email['body'] = mail_insert_key($email['body'], $unq_head, $encoded_unq_head, $line_break);
@@ -1346,12 +1423,10 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 				trackStats(array('email' => '+'));
 
 			// Try to stop a timeout, this would be bad...
-			@set_time_limit(300);
-			if (function_exists('apache_reset_timeout'))
-				@apache_reset_timeout();
+			detectServer()->setTimeLimit(300);
 		}
 		else
-			$result = smtp_mail(array($email['to']), $email['subject'], $email['body'], $email['headers'], $email['priority'], $email['message_id']);
+			$result = smtp_mail(array($email['to']), $email['subject'], $email['body'], $email['headers'], $email['priority'], $email['message_type'] . $email['message_id']);
 
 		// Hopefully it sent?
 		if (!$result)

@@ -1,28 +1,71 @@
+sudo: required
 language: php
-php:
-  - "5.5"
-  - "5.4"
-  - "5.3"
+dist: trusty
 
-env:
-  - DB=mysql
-  - DB=postgres
+matrix:
+  include:
+    - php: 5.4
+      env:
+        - DB=mysql-5.6
+        - WEBTESTS=false
+        - COVERAGE=false
+    - php: 5.6
+      env:
+        - DB=mysql-5.6
+        - WEBTESTS=true
+        - COVERAGE=true
+    - php: 7.1
+      env:
+        - DB=mysql-5.7
+        - WEBTESTS=false
+        - COVERAGE=false
+    - php: 5.4
+      env:
+        - DB=postgres-9.3
+        - WEBTESTS=false
+        - COVERAGE=false
+    - php: 5.6
+      env:
+        - DB=postgres-9.4
+        - WEBTESTS=false
+        - COVERAGE=true
+    - php: 7.1
+      env:
+        - DB=postgres-9.5
+        - WEBTESTS=false
+        - COVERAGE=false
+    - php: 5.6
+      env:
+        - DB=mariadb-10.0
+        - WEBTESTS=false
+        - COVERAGE=false
+      addons:
+        mariadb: '10.0'
+  fast_finish: true
 
-script: php /var/www/tests/travis-ci_testing.php
+addons:
+  firefox: "50.0"
 
+services:
+  memcached
+
+# Prepare the server (PHP, Apache, PHPUnit, APCu etc)
+install:
+  - chmod +x tests/travis-ci/*.sh
+  - tests/travis-ci/setup-server.sh $DB $TRAVIS_PHP_VERSION $WEBTESTS $COVERAGE
+
+# Install ElkArte
 before_script:
-  - cp ./install/Settings* ./
-  # Packages installation
-  - sudo apt-get update
-  - sudo apt-get install -y --force-yes apache2 libapache2-mod-php5 php5-mysql php5-sqlite php5-pgsql
-  # Apache webserver configuration
-  - echo "Alias /behat $(pwd)/web" | sudo tee -a /etc/apache2/sites-available/default
-  - sudo mv * /var/www/
-  - sudo a2enmod rewrite
-  - sudo /etc/init.d/apache2 restart
-  - if [[ "$DB" == "postgres" ]]; then psql -c "DROP DATABASE IF EXISTS hello_world_test;" -U postgres; fi
-  - if [[ "$DB" == "postgres" ]]; then psql -c "create database hello_world_test;" -U postgres; fi
-  - if [[ "$DB" == "mysql" ]]; then mysql -e "DROP DATABASE IF EXISTS hello_world_test;" -uroot; fi
-  - if [[ "$DB" == "mysql" ]]; then mysql -e "create database IF NOT EXISTS hello_world_test;" -uroot; fi
-  - if [[ "$DB" == "mysql" ]]; then sudo php /var/www/tests/travis-ci/setup_mysql.php; fi
-  - if [[ "$DB" == "postgres" ]]; then sudo php /var/www/tests/travis-ci/setup_pgsql.php; fi
+  - tests/travis-ci/setup-elkarte.sh $DB $TRAVIS_PHP_VERSION $WEBTESTS $COVERAGE
+
+# Run the PHPUnit tests
+script:
+  - /var/www/tests/travis-ci/setup-script.sh $DB $TRAVIS_PHP_VERSION $WEBTESTS $COVERAGE
+
+# Send coverage reports
+after_script:
+  - /var/www/tests/travis-ci/setup-results.sh $DB $TRAVIS_PHP_VERSION $WEBTESTS $COVERAGE
+
+# Output screen shots, error logs etc
+after_failure:
+  - /var/www/tests/travis-ci/setup-failure.sh $DB $TRAVIS_PHP_VERSION $WEBTESTS $COVERAGE

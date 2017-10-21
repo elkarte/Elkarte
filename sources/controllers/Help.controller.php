@@ -7,24 +7,28 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
- * Class to handle the help page and boxes
+ * Help_Controller Class
+ * Handles the help page and boxes
  */
 class Help_Controller extends Action_Controller
 {
+	/**
+	 * Pre Dispatch, called before other methods.  Loads integration hooks.
+	 */
+	public function pre_dispatch()
+	{
+		Hooks::instance()->loadIntegrationsSettings();
+	}
+
 	/**
 	 * Default action handler: just help.
 	 *
@@ -38,8 +42,12 @@ class Help_Controller extends Action_Controller
 
 	/**
 	 * Prepares the help page.
-	 * Uses Help template and Manual language file.
-	 * It is accessed by ?action=help.
+	 *
+	 * What it does:
+	 *
+	 * - It is accessed by ?action=help.
+	 *
+	 * @uses Help template and Manual language file.
 	 */
 	public function action_help()
 	{
@@ -78,10 +86,12 @@ class Help_Controller extends Action_Controller
 
 	/**
 	 * Show boxes with more detailed help on items, when the user clicks on their help icon.
-	 * It handles both administrative or user help.
-	 * Data: $_GET['help'] parameter, it holds what string to display
+	 *
+	 * What it does
+	 * - It handles both administrative or user help.
+	 * - Data: $_GET['help'] parameter, it holds what string to display
 	 * and where to get the string from. ($helptxt or $txt)
-	 * It is accessed via ?action=quickhelp;help=?.
+	 * - It is accessed via ?action=quickhelp;help=?.
 	 *
 	 * @uses ManagePermissions language file, if the help starts with permissionhelp.
 	 * @uses Help template, 'popup' sub-template.
@@ -90,13 +100,13 @@ class Help_Controller extends Action_Controller
 	{
 		global $txt, $helptxt, $context, $scripturl;
 
-		if (!isset($_GET['help']) || !is_string($_GET['help']))
-			fatal_lang_error('no_access', false);
+		if (!isset($this->_req->query->help) || !is_string($this->_req->query->help))
+			throw new Elk_Exception('no_access', false);
 
 		if (!isset($helptxt))
 			$helptxt = array();
 
-		$help_str = Util::htmlspecialchars($_GET['help']);
+		$help_str = Util::htmlspecialchars($this->_req->query->help);
 
 		// Load the admin help language file and template.
 		loadLanguage('Help');
@@ -115,7 +125,7 @@ class Help_Controller extends Action_Controller
 		$context['page_title'] = $context['forum_name'] . ' - ' . $txt['help'];
 
 		// Only show the 'popup' sub-template, no layers.
-		Template_Layers::getInstance()->removeAll();
+		Template_Layers::instance()->removeAll();
 		$context['sub_template'] = 'popup';
 
 		$helps = explode('+', $help_str);

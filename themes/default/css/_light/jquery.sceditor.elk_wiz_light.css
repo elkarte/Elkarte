@@ -1,22 +1,38 @@
+/* INTRODUCTION
+/* This is the ElkArte css used when the editor is in wysiwyg mode.
+/* ------------------------------------------------------- */
 html, body, p, code:before, table {
 	margin: 0;
 	padding: 0;
-	color: #444;
+	color: #444444;
 }
+
 html {
 	overflow: auto;
 	height: 100%;
 	-webkit-overflow-scrolling: touch;
 }
+
 body {
 	position: relative;
 	overflow: auto;
 	min-height: 100%;
 	word-wrap: break-word;
 }
+
 [contenteditable="true"] {
-	font: 87.5%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", Arial, sans-serif;
+	font: 87.5%/150% "Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Droid Sans", "Helvetica Neue", "Trebuchet MS", Arial, sans-serif;
 }
+
+a, a:link, a:visited {
+	text-decoration: none;
+}
+
+a:hover, a.new_win:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
 ul, ol {
 	margin-top: 0;
 	margin-bottom: 0;
@@ -25,81 +41,138 @@ ul, ol {
 }
 
 table, td {
-	min-width: 1em;
-	border: 1px dotted #000;
+	min-width: 2em;
+	border: 1px dotted #000000;
 	empty-cells: show;
+}
+
+code, code:before {
+	display: block;
+	text-align: left;
 }
 
 code:before {
 	position: absolute;
-	content: 'Code:';
 	top: -1.7em;
 	left: 0;
-	font-size: 1.2em;
-	text-align: left;
+	content: 'Code:';
+	font-size: 1em;
 }
+
 code {
-	margin-top: 1.5em;
 	position: relative;
-	background: #f3f3f3;
-	border: 1px solid #dfdfdf;
-	white-space: pre;
+	margin-top: 1.5em;
 	padding: .25em;
+	border: 1px solid #DFDFDF;
+	border-top: 2px solid #BBBBBB;
+	border-bottom: 3px solid #AAAAAA;
+	background: #F3F3F3;
+	white-space: pre;
+	font-size: 0.9em;
 	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
-	font-size: 0.7em;
-	border-top: 2px solid #bbb;
-	border-bottom: 3px solid #aaa;
-	display: block;
 }
+
 blockquote {
 	overflow: auto;
 	margin: 0 0 1em 0;
 	padding: 6px 10px;
-	box-shadow: 2px 2px 2px #ddd;
-	border: 1px solid #ccc;
-	background: #fff;
+	border: 1px solid #CCCCCC;
+	background: #FFFFFF;
+	box-shadow: 2px 2px 2px #DDDDDD;
 }
+
 blockquote cite, code cite {
-	border-bottom: none;
-	background: #fff;
-	color: #555;
-	font-size: 0.786em;
-	padding: 0 0 4px;
 	display: block;
+	padding: 0 0 4px;
+	border-bottom: none;
+	background: #FFFFFF;
+	color: #555555;
+	font-size: 0.786em;
 }
+
 code cite {
 	position: relative;
-	top: -1.9em;
-	font-size: 1.3em;
-	margin-left: 2.7em;
-	margin-bottom: -1.5em;
+	top: -1.7em;
+	margin-left: 3em;
+	font-size: 1.07em;
+	padding: 0;
+	line-height: 1.3em;
 }
+
 /* Will correctly colour down to seventh level of nested quotes in editor. Can be extended easily enough. */
-body>blockquote, body>blockquote>blockquote, body>blockquote>blockquote>blockquote>blockquote,
-body>blockquote>blockquote>blockquote>blockquote>blockquote>blockquote {
-	background: #fff;
+body > blockquote, body > blockquote > blockquote, body > blockquote > blockquote > blockquote > blockquote,
+body > blockquote > blockquote > blockquote > blockquote > blockquote > blockquote {
+	background: #FFFFFF;
 }
-body>blockquote>blockquote>cite, body>blockquote>blockquote>blockquote>blockquote>cite,
-body>blockquote>blockquote>blockquote>blockquote>blockquote>blockquote>cite {
-	background: #fff;
+
+body > blockquote > blockquote > cite, body > blockquote > blockquote > blockquote > blockquote > cite,
+body > blockquote > blockquote > blockquote > blockquote > blockquote > blockquote > cite {
+	background: #FFFFFF;
 }
+
 blockquote cite a:link, blockquote cite a:visited {
+	color: #555555;
 	text-decoration: none;
-	color: #555;
 }
+
 div {
-	min-height: 1em; /*height:auto !important; height: 1em;*/
+	min-height: 1em;
 }
+
 h1, h2, h3, h4, h5, h6 {
-	padding: 0; margin: 0;
+	margin: 0;
+	padding: 0;
 }
+
 aside:before {
 	content: "[*]";
 	vertical-align: super;
 	font-size: .8em;
 }
+
 aside {
 	display: inline;
-	color: #50aa3a;
+	color: #50AA3A;
 	font-weight: 700;
+}
+
+.bbc_img {
+	max-width: 100%;
+	border: 0;
+}
+
+.floatright {
+	float: right;
+}
+
+.floatleft {
+	float: left;
+}
+
+.floatcenter {
+	margin: 0 auto;
+	display: block;
+}
+
+.icon {
+	display: inline-block;
+	margin: 0 .25em;
+	width: 1.25em;
+	height: auto;
+	vertical-align: middle;
+	line-height: 1.25em;
+}
+
+.i-paperclip::before {
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23828282' viewBox='0 0 32 32'%3E%3Cpath d='M20.807 10.22l-2.03-2.03-10.15 10.15c-1.682 1.68-1.682 4.407 0 6.088s4.408 1.68 6.09 0l12.18-12.178c2.804-2.802 2.804-7.346 0-10.148-2.802-2.803-7.347-2.803-10.15 0L3.96 14.89c-.01.008-.02.017-.027.025-3.91 3.91-3.91 10.245 0 14.153 3.908 3.908 10.246 3.908 14.156 0 .006-.01.013-.018.023-.027v.004l8.73-8.728-2.03-2.03-8.73 8.728c-.01.008-.018.018-.026.026-2.785 2.782-7.313 2.782-10.097 0-2.782-2.784-2.782-7.31 0-10.094l.03-.026v-.003L18.78 4.13c1.678-1.678 4.41-1.678 6.09 0s1.678 4.412 0 6.09L12.69 22.398c-.56.56-1.47.56-2.03 0-.56-.56-.56-1.47 0-2.03L20.81 10.22z'/%3E%3C/svg%3E");
+}
+
+me:before {
+	content: "\270c";
+	font-size: 1.25em;
+	line-height: 1em;
+}
+
+me {
+	color: #50AA3A;
 }

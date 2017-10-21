@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; Maillist
+// Version: 1.1; Maillist
 
 // Email posting errors
 $txt['error_locked'] = 'This topic has been locked and can no longer be replied to';
@@ -41,6 +41,9 @@ $txt['error_in_maintenance_mode_short'] = 'In Maintenance';
 $txt['error_email_notenabled_short'] = 'Not Enabled';
 $txt['error_email_notenabled'] = 'The post by email function was not enabled, the email could not be processed';
 $txt['error_permission'] = 'The poster does not have post by email permissions on this board';
+$txt['error_permission_short'] = 'No permissions';
+$txt['error_bounced'] = 'The message was refused by the destination mail server';
+$txt['error_bounced_short'] = 'The message could not be delivered';
 
 // Maillist page items
 $txt['ml_admin_configuration'] = 'Maillist Configuration';
@@ -55,6 +58,11 @@ $txt['pbe_post_enabled'] = 'Allow posting to the forum by Email';
 $txt['pbe_pm_enabled'] = 'Allow replying to PMs by Email';
 $txt['pbe_no_mod_notices'] = 'Turn off moderation notices';
 $txt['pbe_no_mod_notices_desc'] = 'Do not send notifications of moved, locked, deleted, merged, etc.  These consume your email quota with no real purpose';
+$txt['pbe_bounce_detect'] = 'Turn on automatic bounce detection';
+$txt['pbe_bounce_detect_desc'] = 'Attempt to identify mail bounces and disable further notifications';
+$txt['pbe_bounce_record'] = 'Record bounce messages in failed mail after auto processing';
+$txt['pbe_bounce_record_desc'] = 'Bounce messages will always be recorded if Bounce Detection is disabled';
+
 $txt['saved'] = 'Information Saved';
 
 // General Sending Settings
@@ -110,6 +118,7 @@ $txt['maillist_newtopic_change'] = 'Allow the starting of a new topic by changin
 $txt['maillist_newtopic_needsapproval'] = 'Require New Topic approval';
 $txt['maillist_newtopic_needsapproval_desc'] = 'Require all new topics sent by email to be approved before they are posted to prevent email spoofing';
 $txt['recommended'] = 'This is recommended';
+$txt['experimental'] = 'This functionality is experimental';
 $txt['receiving_address'] = 'Receiving email addresses';
 $txt['receiving_board'] = 'Board to post new messages to';
 $txt['reply_add_more'] = 'Add another address';
@@ -250,7 +259,7 @@ $txt['ml_bounce_template_desc'] = 'Use this page to fill in the details of the t
 $txt['ml_bounce_template_title'] = 'Template Title';
 $txt['ml_bounce_template_title_desc'] = 'A name for use in the template selection list';
 $txt['ml_bounce_template_body'] = 'Template Content';
-$txt['ml_bounce_template_body_desc'] = 'The content of the bounced message. Note that you can use the following shortcuts in this template:<ul style="margin-top: 0px;"><li>{MEMBER} - Member Name.</li><li>{FORUMNAME} - Forum Name.</li><li>{FORUMNAMESHORT} - Short name for the site.</li><li>{ERROR} - The error that the email generated.</li><li>{SUBJECT} - The subject of the email that failed.</li><li>{SCRIPTURL} - Web address of the forum.</li><li>{EMAILREGARDS} - Maillist email sign-off.</li><li>{REGARDS} - Standard forum sign-off.</li></ul>';
+$txt['ml_bounce_template_body_desc'] = 'The content of the bounced message. Note that you can use the following shortcuts in this template:<ul><li>{MEMBER} - Member Name.</li><li>{FORUMNAME} - Forum Name.</li><li>{FORUMNAMESHORT} - Short name for the site.</li><li>{ERROR} - The error that the email generated.</li><li>{SUBJECT} - The subject of the email that failed.</li><li>{SCRIPTURL} - Web address of the forum.</li><li>{EMAILREGARDS} - Maillist email sign-off.</li><li>{REGARDS} - Standard forum sign-off.</li></ul>';
 $txt['ml_bounce_template_personal'] = 'Personal Template';
 $txt['ml_bounce_template_personal_desc'] = 'If you select this option only you will be able to see, edit and use this template, otherwise all moderators will be able to use it.';
 $txt['ml_bounce_template_error_no_title'] = 'You must set a descriptive title.';

@@ -7,25 +7,20 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.10
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Retrieve a list and several other statistics of the users currently online.
  *
  * - Used by the board index and SSI.
  * - Also returns the membergroups of the users that are currently online.
- * - (optionally) hides members that chose to hide their online presense.
+ * - (optionally) hides members that chose to hide their online presence.
  *
  * @package Members
  * @param mixed[] $membersOnlineOptions
@@ -59,7 +54,9 @@ function getMembersOnlineStats($membersOnlineOptions)
 		trigger_error('Sort method for getMembersOnlineStats() function is not allowed', E_USER_NOTICE);
 
 	// Get it from the cache and send it back.
-	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] > 1 && ($temp = cache_get_data('membersOnlineStats-' . $membersOnlineOptions['sort'], 240)) !== null)
+	$temp = array();
+	$cache = Cache::instance();
+	if ($cache->levelHigherThan(1) && $cache->getVar($temp, 'membersOnlineStats-' . $membersOnlineOptions['sort'], 240))
 		return filter_members_online($temp, empty($membersOnlineOptions['reverse_sort']) ? 'ksort' : 'krsort');
 
 	// Initialize the array that'll be returned later on.
@@ -176,7 +173,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 	// Hidden and non-hidden members make up all online members.
 	$membersOnlineStats['num_users_online'] = count($membersOnlineStats['users_online']) + $membersOnlineStats['num_users_hidden'] - (isset($modSettings['show_spider_online']) && $modSettings['show_spider_online'] > 1 ? count($spider_finds) : 0);
 
-	cache_put_data('membersOnlineStats-' . $membersOnlineOptions['sort'], $membersOnlineStats, 240);
+	Cache::instance()->put('membersOnlineStats-' . $membersOnlineOptions['sort'], $membersOnlineStats, 240);
 
 	return filter_members_online($membersOnlineStats, empty($membersOnlineOptions['reverse_sort']) ? 'ksort' : 'krsort');
 }
@@ -193,8 +190,6 @@ function getMembersOnlineStats($membersOnlineOptions)
  */
 function filter_members_online($membersOnlineStats, $sortFunction)
 {
-	global $modSettings;
-
 	foreach ($membersOnlineStats['users_online'] as $key => $row)
 	{
 		if (allowedTo('moderate_forum') === false && $row['hidden'])

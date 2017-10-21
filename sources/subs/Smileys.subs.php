@@ -7,18 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Validates, if a smiley already exists
@@ -189,7 +184,9 @@ function updateSmiley($param)
  * Get detailed smiley information
  *
  * @param int $id
+ *
  * @return array
+ * @throws Elk_Exception smiley_not_found
  */
 function getSmiley($id)
 {
@@ -204,7 +201,7 @@ function getSmiley($id)
 		)
 	);
 	if ($db->num_rows($request) != 1)
-		fatal_lang_error('smiley_not_found');
+		throw new Elk_Exception('smiley_not_found');
 	$current_smiley = $db->fetch_assoc($request);
 	$db->free_result($request);
 
@@ -405,7 +402,7 @@ function logPackageInstall($param)
 		'{db_prefix}log_packages',
 		array(
 			'filename' => 'string', 'name' => 'string', 'package_id' => 'string', 'version' => 'string',
-			'id_member_installed' => 'int', 'member_installed' => 'string','time_installed' => 'int',
+			'id_member_installed' => 'int', 'member_installed' => 'string', 'time_installed' => 'int',
 			'install_state' => 'int', 'failed_steps' => 'string', 'themes_installed' => 'string',
 			'member_removed' => 'int', 'db_changes' => 'string', 'credits' => 'string',
 		),
@@ -453,13 +450,12 @@ function sortSmileyTable()
 {
 	$db = database();
 
+	$db->skip_next_error();
 	// Order the table by code length.
 	$db->query('alter_table', '
 		ALTER TABLE {db_prefix}smileys
 		ORDER BY LENGTH(code) DESC',
-		array(
-			'db_error_skip' => true,
-		)
+		array()
 	);
 }
 
@@ -467,9 +463,9 @@ function sortSmileyTable()
  * Callback function for createList().
  * Lists all smiley sets.
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  */
 function list_getSmileySets($start, $items_per_page, $sort)
 {
@@ -527,9 +523,9 @@ function list_getNumSmileySets()
 /**
  * Callback function for createList().
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  */
 function list_getSmileys($start, $items_per_page, $sort)
 {

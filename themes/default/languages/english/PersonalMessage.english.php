@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; PersonalMessage
+// Version: 1.1; PersonalMessage
 
 $txt['pm_inbox'] = 'Personal Messages Index';
 $txt['pm_add'] = 'Add';

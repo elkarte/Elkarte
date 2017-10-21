@@ -1,21 +1,18 @@
 <?php
 
 /**
- * Legacy utility functions, such as to handle multi byte strings
+ * Utility functions, such as to handle multi byte strings
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.10
+ * @version 1.1
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
- * Legacy utility functions, such as to handle multi byte strings
+ * Utility functions, such as to handle multi byte strings
  * Note: some of these might be deprecated or removed in the future.
  */
 class Util
@@ -43,7 +40,7 @@ class Util
 	 * Optionally performs an entity_fix to null any invalid character entities from the string
 	 *
 	 * @param string $string
-	 * @param string $quote_style
+	 * @param int $quote_style integer or constant representation of one
 	 * @param string $charset only UTF-8 allowed
 	 * @param bool $double true will allow double encoding, false will not encode existing html entities,
 	 */
@@ -65,7 +62,8 @@ class Util
 	/**
 	 * Trims tabs, newlines, carriage returns, spaces, vertical tabs and null bytes
 	 * and any number of space characters from the start and end of a string
-	 * Optionally performs an entity_fix to null any invalid character entities from the string
+	 *
+	 * - Optionally performs an entity_fix to null any invalid character entities from the string
 	 *
 	 * @param string $string
 	 */
@@ -86,7 +84,8 @@ class Util
 
 	/**
 	 * Perform a strpos search on a multi-byte string
-	 * Optionally performs an entity_fix to null any invalid character entities from the string before the search
+	 *
+	 * - Optionally performs an entity_fix to null any invalid character entities from the string before the search
 	 *
 	 * @param string $haystack what to search in
 	 * @param string $needle what is being looked for
@@ -137,7 +136,8 @@ class Util
 
 	/**
 	 * Perform a substr operation on multi-byte strings
-	 * Optionally performs an entity_fix to null any invalid character entities from the string before the operation
+	 *
+	 * - Optionally performs an entity_fix to null any invalid character entities from the string before the operation
 	 *
 	 * @param string $string
 	 * @param string $start
@@ -157,7 +157,8 @@ class Util
 
 	/**
 	 * Converts a multi-byte string to lowercase
-	 * prefers to use mb_ functions if available, otherwise will use charset substitution tables
+	 *
+	 * - Prefers to use mb_ functions if available, otherwise will use charset substitution tables
 	 *
 	 * @param string $string
 	 */
@@ -174,7 +175,8 @@ class Util
 
 	/**
 	 * Converts a multi-byte string to uppercase
-	 * prefers to use mb_ functions if available, otherwise will use charset substitution tables
+	 *
+	 * Prefers to use mb_ functions if available, otherwise will use charset substitution tables
 	 *
 	 * @param string $string
 	 */
@@ -191,8 +193,9 @@ class Util
 
 	/**
 	 * Cuts off a multi-byte string at a certain length
-	 * Optionally performs an entity_fix to null any invalid character entities from the string prior to the length check
-	 * Use this when the number of actual characters (&nbsp; = 6 not 1) must be <= length not the displayable,
+	 *
+	 * - Optionally performs an entity_fix to null any invalid character entities from the string prior to the length check
+	 * - Use this when the number of actual characters (&nbsp; = 6 not 1) must be <= length not the displayable,
 	 * for example db field compliance to avoid overflow
 	 *
 	 * @param string $string
@@ -208,7 +211,7 @@ class Util
 		if (empty($modSettings['disableEntityCheck']))
 			$string = preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $string);
 
-		preg_match('~^(' . $ent_list . '|.){' . Util::strlen(substr($string, 0, $length)) . '}~u', $string, $matches);
+		preg_match('~^(' . $ent_list . '|.){' . self::strlen(substr($string, 0, $length)) . '}~u', $string, $matches);
 		$string = $matches[0];
 		while (strlen($string) > $length)
 			$string = preg_replace('~(?:' . $ent_list . '|.)$~u', '', $string);
@@ -220,44 +223,45 @@ class Util
 	 * Shorten a string of text
 	 *
 	 * What it does:
-	 * - shortens a text string to a given visual length
-	 * - considers certain html entities as 1 in length, &amp; &nbsp; etc
-	 * - optionally adds ending ellipsis that honor length or are appended
-	 * - optionally attempts to break the string on a word boundary approximately at the allowed length
-	 * - if using cutword and the resulting length is < len minus buffer then it is truncated to length plus an ellipsis.
-	 * - respects internationalization characters, html spacing and entities as one character.
-	 * - returns the shortened string.
-	 * - does not account for html tags, ie <b>test</b> is 11 characters not 4
 	 *
-	 * @param string $string
-	 * @param int $length
+	 * - Shortens a text string to a given visual length
+	 * - Considers certain html entities as 1 in length, &amp; &nbsp; etc
+	 * - Optionally adds ending ellipsis that honor length or are appended
+	 * - Optionally attempts to break the string on a word boundary approximately at the allowed length
+	 * - If using cutword and the resulting length is < len minus buffer then it is truncated to length plus an ellipsis.
+	 * - Respects internationalization characters, html spacing and entities as one character.
+	 * - Returns the shortened string.
+	 * - Does not account for html tags, ie <b>test</b> is 11 characters not 4
+	 *
+	 * @param string $string The string to shorten
+	 * @param int $length The length to cut the string to
 	 * @param bool $cutword try to cut at a word boundary
 	 * @param string $ellipsis characters to add at the end of a cut string
-	 * @param bool $exact set true to include ellipsis in the allowed lenght, false will append instead
+	 * @param bool $exact set true to include ellipsis in the allowed length, false will append instead
 	 * @param int $buffer maximum length underflow to allow when cutting on a word boundary
 	 */
 	public static function shorten_text($string, $length = 384, $cutword = false, $ellipsis = '...', $exact = true, $buffer = 12)
 	{
 		// Does len include the ellipsis or are the ellipsis appended
-		$ending = !empty($ellipsis) && $exact ? Util::strlen($ellipsis) : 0;
+		$ending = !empty($ellipsis) && $exact ? self::strlen($ellipsis) : 0;
 
 		// If its to long, cut it down to size
-		if (Util::strlen($string) > $length)
+		if (self::strlen($string) > $length)
 		{
 			// Try to cut on a word boundary
 			if ($cutword)
 			{
-				$string = Util::substr($string, 0, $length - $ending);
-				$space_pos = Util::strpos($string, ' ', 0, true);
+				$string = self::substr($string, 0, $length - $ending);
+				$space_pos = self::strpos($string, ' ', 0, true);
 
 				// Always one clown in the audience who likes long words or not using the spacebar
 				if (!empty($space_pos) && ($length - $space_pos <= $buffer))
-					$string = Util::substr($string, 0, $space_pos);
+					$string = self::substr($string, 0, $space_pos);
 
 				$string = rtrim($string) . ($ellipsis ? $ellipsis : '');
 			}
 			else
-				$string = Util::substr($string, 0, $length - $ending) . ($ellipsis ? $ellipsis : '');
+				$string = self::substr($string, 0, $length - $ending) . ($ellipsis ? $ellipsis : '');
 		}
 
 		return $string;
@@ -278,11 +282,11 @@ class Util
 	public static function shorten_html($string, $length = 384, $ellipsis = '...', $exact = true)
 	{
 		// If its shorter than the maximum length, while accounting for html tags, simply return
-		if (Util::strlen(preg_replace('~<.*?>~', '', $string)) <= $length)
+		if (self::strlen(preg_replace('~<.*?>~', '', $string)) <= $length)
 			return $string;
 
 		// Start off empty
-		$total_length = $exact ? Util::strlen($ellipsis) : 0;
+		$total_length = $exact ? self::strlen($ellipsis) : 0;
 		$open_tags = array();
 		$truncate = '';
 
@@ -312,14 +316,14 @@ class Util
 			$truncate .= $tag[1];
 
 			// Calculate the length of the actual tag content, accounts for html entities as a single characters
-			$content_length = Util::strlen($tag[3]);
+			$content_length = self::strlen($tag[3]);
 
 			// Have we exceeded the allowed length limit, only add in what we are allowed
 			if ($content_length + $total_length > $length)
 			{
 				// The number of characters which we can still return
 				$remaining = $length - $total_length;
-				$truncate .= Util::substr($tag[3], 0, $remaining);
+				$truncate .= self::substr($tag[3], 0, $remaining);
 				break;
 			}
 			// Still room to go so add the tag content and continue
@@ -335,13 +339,13 @@ class Util
 		}
 
 		// Our truncated string up to the last space
-		$space_pos = Util::strpos($truncate, ' ', 0, true);
+		$space_pos = self::strpos($truncate, ' ', 0, true);
 		$space_pos = empty($space_pos) ? $length : $space_pos;
-		$truncate_check = Util::substr($truncate, 0, $space_pos);
+		$truncate_check = self::substr($truncate, 0, $space_pos);
 
 		// Make sure this would not cause a cut in the middle of a tag
-		$lastOpenTag = (int) Util::strpos($truncate_check, '<', 0, true);
-		$lastCloseTag = (int) Util::strpos($truncate_check, '>', 0, true);
+		$lastOpenTag = (int) self::strpos($truncate_check, '<', 0, true);
+		$lastCloseTag = (int) self::strpos($truncate_check, '>', 0, true);
 		if ($lastOpenTag > $lastCloseTag)
 		{
 			// Find the last full open tag in our truncated string, its what was being cut
@@ -349,12 +353,12 @@ class Util
 			$last_tag = array_pop($lastTagMatches[0]);
 
 			// Set the space to just after the last tag
-			$space_pos = Util::strpos($truncate, $last_tag, 0, true) + strlen($last_tag);
+			$space_pos = self::strpos($truncate, $last_tag, 0, true) + strlen($last_tag);
 			$space_pos = empty($space_pos) ? $length : $space_pos;
 		}
 
 		// Look at what we are going to cut off the end of our truncated string
-		$bits = Util::substr($truncate, $space_pos);
+		$bits = self::substr($truncate, $space_pos);
 
 		// Does it cut a tag off, if so we need to know so it can be added back at the cut point
 		preg_match_all('~<\/([a-z]+)>~', $bits, $dropped_tags, PREG_SET_ORDER);
@@ -376,7 +380,7 @@ class Util
 		}
 
 		// Cut it
-		$truncate = Util::substr($truncate, 0, $space_pos);
+		$truncate = self::substr($truncate, 0, $space_pos);
 
 		// Dot dot dot
 		$truncate .= $ellipsis;
@@ -395,7 +399,7 @@ class Util
 	 */
 	public static function ucfirst($string)
 	{
-		return Util::strtoupper(Util::substr($string, 0, 1)) . Util::substr($string, 1);
+		return self::strtoupper(self::substr($string, 0, 1)) . self::substr($string, 1);
 	}
 
 	/**
@@ -407,7 +411,7 @@ class Util
 	{
 		$words = preg_split('~([\s\r\n\t]+)~', $string, -1, PREG_SPLIT_DELIM_CAPTURE);
 		for ($i = 0, $n = count($words); $i < $n; $i += 2)
-			$words[$i] = Util::ucfirst($words[$i]);
+			$words[$i] = self::ucfirst($words[$i]);
 		return implode('', $words);
 	}
 
@@ -436,36 +440,10 @@ class Util
 	}
 
 	/**
-	 * Adds slashes to the array/variable.
-	 * What it does:
-	 * - returns the var, as an array or string, with escapes as required.
-	 * - importantly escapes all keys and values!
-	 * - calls itself recursively if necessary.
-	 *
-	 * @todo not used, consider removing
-	 * @deprecated since 1.0
-	 *
-	 * @param mixed[]|string $var
-	 * @return array|string
-	 */
-	public static function escapestring_recursive($var)
-	{
-		if (!is_array($var))
-			return addslashes($var);
-
-		// Reindex the array with slashes.
-		$new_var = array();
-
-		// Add slashes to every element, even the indexes!
-		foreach ($var as $k => $v)
-			$new_var[addslashes($k)] = Util::escapestring_recursive($v);
-
-		return $new_var;
-	}
-
-	/**
 	 * Remove slashes recursively.
+	 *
 	 * What it does:
+	 *
 	 * - removes slashes, recursively, from the array or string var.
 	 * - effects both keys and values of arrays.
 	 * - calls itself recursively to handle arrays of arrays.
@@ -494,7 +472,9 @@ class Util
 
 	/**
 	 * Removes url stuff from the array/variable.
+	 *
 	 * What it does:
+	 *
 	 * - takes off url encoding (%20, etc.) from the array or string var.
 	 * - importantly, does it to keys too!
 	 * - calls itself recursively if there are any sub arrays.
@@ -523,7 +503,9 @@ class Util
 
 	/**
 	 * Unescapes any array or variable.
+	 *
 	 * What it does:
+	 *
 	 * - unescapes, recursively, from the array or string var.
 	 * - effects both keys and values of arrays.
 	 * - calls itself recursively to handle arrays of arrays.
@@ -554,6 +536,7 @@ class Util
 	/**
 	 * Wrappers for unserialize
 	 * What it does:
+	 *
 	 * - if using PHP < 7 it will use ext/safe_unserialize
 	 * - if using PHP > 7 will use the built in unserialize
 	 *
@@ -563,7 +546,7 @@ class Util
 	 *                          additionally, it doesn't allow to use the option:
 	 *                            allowed_classes => true
 	 *                          that is reverted to false.
-	 * @return array|string
+	 * @return mixed
 	 */
 	public static function unserialize($string, $options = array())
 	{

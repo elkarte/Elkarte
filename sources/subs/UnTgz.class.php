@@ -7,12 +7,9 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.3
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Utility class to un gzip + un tar package files
@@ -56,13 +53,13 @@ class UnTgz
 	protected $_crc_check = false;
 
 	/**
-	 * The currnt crc value of the data
+	 * The current crc value of the data
 	 * @var string|int
 	 */
 	protected $_crc;
 
 	/**
-	 * The claimied size of the data in the tarball
+	 * The claimed size of the data in the tarball
 	 * @var int
 	 */
 	protected $_size;
@@ -124,11 +121,13 @@ class UnTgz
 	/**
 	 * Class initialization, passes variables, loads dependencies
 	 *
-	 * @param string $data
-	 * @param string $destination
-	 * @param bool|string $single_file
-	 * @param bool $overwrite
+	 * @param string        $data
+	 * @param string        $destination
+	 * @param bool|string   $single_file
+	 * @param bool          $overwrite
 	 * @param null|string[] $files_to_extract
+	 *
+	 * @throws Elk_Exception package_no_zlib
 	 */
 	public function __construct($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 	{
@@ -141,7 +140,7 @@ class UnTgz
 
 		// This class sorta needs gzinflate!
 		if (!function_exists('gzinflate'))
-			fatal_lang_error('package_no_zlib', 'critical');
+			throw new Elk_Exception('package_no_zlib', 'critical');
 
 		// Make sure we have this loaded.
 		loadLanguage('Packages');
@@ -149,7 +148,7 @@ class UnTgz
 		// Likely to need this
 		require_once(SUBSDIR . '/Package.subs.php');
 
-		// The destination needs exist and be writeable or we are doomed
+		// The destination needs exist and be writable or we are doomed
 		umask(0);
 		if ($this->destination !== null && !file_exists($this->destination) && !$this->single_file)
 			mktree($this->destination, 0777);
@@ -158,12 +157,12 @@ class UnTgz
 	/**
 	 * Class controller, calls the ungzip / untar functions in required order
 	 *
-	 * @return boolean|mixed[]
+	 * @return boolean|array
 	 */
 	public function read_tgz_data()
 	{
 		// Snif test that this is a .tgz tar.gz file
-		if (empty($this->_header) && $this->check_valid_tgz() == false)
+		if (empty($this->_header) && $this->check_valid_tgz() === false)
 			return false;
 
 		// The tgz information for this archive
@@ -206,13 +205,14 @@ class UnTgz
 		$this->_header = unpack('H2a/H2b/Ct/Cf/Vmtime/Cxtra/Cos', substr($this->data, 0, 10));
 
 		// The IDentification number, gzip must be 1f8b
-		return !(strtolower($this->_header['a'] . $this->_header['b']) !== '1f8b');
+		return strtolower($this->_header['a'] . $this->_header['b']) === '1f8b';
 	}
 
 	/**
 	 * Reads the archive file header
 	 *
 	 * What it does:
+	 *
 	 * - validates that the file is a tar.gz
 	 * - validates that its compressed with deflate
 	 * - processes header information so we can set the start of archive data

@@ -8,26 +8,24 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.8
+ * @version 1.1
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
- * Who Controller
+ * Who_Controller Class
+ * I woke up in a Soho doorway A policeman knew my name He said "You can go sleep at home
+ * tonight If you can get up and walk away"
  */
 class Who_Controller extends Action_Controller
 {
 	/**
-	 * Default action of this class.
+	 * Default action of this class
+	 *
 	 * Accessed with ?action=who
 	 */
 	public function action_index()
@@ -38,12 +36,15 @@ class Who_Controller extends Action_Controller
 
 	/**
 	 * Who's online, and what are they doing?
-	 * This function prepares the who's online data for the Who template.
-	 * It requires the who_view permission.
-	 * It is enabled with the who_enabled setting.
-	 * It is accessed via ?action=who.
 	 *
-	 * @uses Who template, main sub-template
+	 * What it does:
+	 *
+	 * - This function prepares the who's online data for the Who template.
+	 * - It requires the who_view permission.
+	 * - It is enabled with the who_enabled setting.
+	 * - It is accessed via ?action=who.
+	 *
+	 * @uses  template_whos_online() sub-template in Who.template
 	 * @uses Who language file.
 	 */
 	public function action_who()
@@ -55,7 +56,7 @@ class Who_Controller extends Action_Controller
 
 		// You can't do anything if this is off.
 		if (empty($modSettings['who_enabled']))
-			fatal_lang_error('who_off', false);
+			throw new Elk_Exception('who_off', false);
 
 		// Load the 'Who' template.
 		loadTemplate('Who');
@@ -78,6 +79,7 @@ class Who_Controller extends Action_Controller
 			'user' => $txt['who_user'],
 			'time' => $txt['who_time'],
 		);
+
 		$context['show_methods'] = array(
 			'all' => $txt['who_show_all'],
 			'members' => $txt['who_show_members_only'],
@@ -91,14 +93,14 @@ class Who_Controller extends Action_Controller
 			$show_methods['guests'] = '(lo.id_member = 0 AND lo.id_spider = 0)';
 			$context['show_methods']['spiders'] = $txt['who_show_spiders_only'];
 		}
-		elseif (empty($modSettings['show_spider_online']) && isset($_SESSION['who_online_filter']) && $_SESSION['who_online_filter'] == 'spiders')
+		elseif (empty($modSettings['show_spider_online']) && isset($_SESSION['who_online_filter']) && $_SESSION['who_online_filter'] === 'spiders')
 			unset($_SESSION['who_online_filter']);
 
 		// Does the user prefer a different sort direction?
-		if (isset($_REQUEST['sort']) && isset($sort_methods[$_REQUEST['sort']]))
+		if (isset($this->_req->query->sort) && isset($sort_methods[$this->_req->query->sort]))
 		{
-			$context['sort_by'] = $_SESSION['who_online_sort_by'] = $_REQUEST['sort'];
-			$sort_method = $sort_methods[$_REQUEST['sort']];
+			$context['sort_by'] = $_SESSION['who_online_sort_by'] = $this->_req->query->sort;
+			$sort_method = $sort_methods[$this->_req->query->sort];
 		}
 		// Did we set a preferred sort order earlier in the session?
 		elseif (isset($_SESSION['who_online_sort_by']))
@@ -113,21 +115,21 @@ class Who_Controller extends Action_Controller
 			$sort_method = 'lo.log_time';
 		}
 
-		$context['sort_direction'] = isset($_REQUEST['asc']) || (isset($_REQUEST['sort_dir']) && $_REQUEST['sort_dir'] == 'asc') ? 'up' : 'down';
+		$context['sort_direction'] = isset($this->_req->query->asc) || ($this->_req->getQuery('sort_dir', 'trim', '') === 'asc') ? 'up' : 'down';
 
 		$conditions = array();
 		if (!allowedTo('moderate_forum'))
-			$conditions[] = '(IFNULL(mem.show_online, 1) = 1)';
+			$conditions[] = '(COALESCE(mem.show_online, 1) = 1)';
 
 		// Fallback to top filter?
-		if (isset($_REQUEST['submit_top']) && isset($_REQUEST['show_top']))
-			$_REQUEST['show'] = $_REQUEST['show_top'];
+		if (isset($this->_req->post->submit_top, $this->_req->post->show_top))
+			$this->_req->post->show = $this->_req->post->show_top;
 
 		// Does the user wish to apply a filter?
-		if (isset($_REQUEST['show']) && isset($show_methods[$_REQUEST['show']]))
+		if (isset($this->_req->post->show) && isset($show_methods[$this->_req->post->show]))
 		{
-			$context['show_by'] = $_SESSION['who_online_filter'] = $_REQUEST['show'];
-			$conditions[] = $show_methods[$_REQUEST['show']];
+			$context['show_by'] = $_SESSION['who_online_filter'] = $this->_req->post->show;
+			$conditions[] = $show_methods[$this->_req->post->show];
 		}
 		// Perhaps we saved a filter earlier in the session?
 		elseif (isset($_SESSION['who_online_filter']))
@@ -141,11 +143,12 @@ class Who_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Members.subs.php');
 		$totalMembers = countMembersOnline($conditions);
 
+		$start = $this->_req->get('start', 'intval');
 		// Prepare some page index variables.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=who;sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';asc' : '') . ';show=' . $context['show_by'], $_REQUEST['start'], $totalMembers, $modSettings['defaultMaxMembers']);
-		$context['start'] = $_REQUEST['start'];
+		$context['page_index'] = constructPageIndex($scripturl . '?action=who;sort=' . $context['sort_by'] . ($context['sort_direction'] === 'up' ? ';asc' : '') . ';show=' . $context['show_by'], $start, $totalMembers, $modSettings['defaultMaxMembers']);
+		$context['start'] = $start;
 		$context['sub_template'] = 'whos_online';
-		Template_Layers::getInstance()->add('whos_selection');
+		Template_Layers::instance()->add('whos_selection');
 
 		// Look for people online, provided they don't mind if you see they are.
 		$members = onlineMembers($conditions, $sort_method, $context['sort_direction'], $context['start']);
@@ -197,6 +200,7 @@ class Who_Controller extends Action_Controller
 		if (!empty($modSettings['show_spider_online']) && ($modSettings['show_spider_online'] == 2 || allowedTo('admin_forum')) && !empty($modSettings['spider_name_cache']))
 		{
 			foreach (unserialize($modSettings['spider_name_cache']) as $id => $name)
+			{
 				$spiderContext[$id] = array(
 					'id' => 0,
 					'name' => $name,
@@ -206,6 +210,7 @@ class Who_Controller extends Action_Controller
 					'email' => $name,
 					'is_guest' => true
 				);
+			}
 		}
 
 		require_once(SUBSDIR . '/Who.subs.php');
@@ -244,9 +249,11 @@ class Who_Controller extends Action_Controller
 
 	/**
 	 * It prepares credit and copyright information for the credits page or the admin page.
-	 * Accessed by ?action=who;sa=credits
+	 *
+	 * - Accessed by ?action=who;sa=credits
+	 *
 	 * @uses Who language file
-	 * @uses Who template, credits sub template
+	 * @uses template_credits() sub template in Who.template,
 	 */
 	public function action_credits()
 	{

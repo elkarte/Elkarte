@@ -8,18 +8,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.8
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * ManagePaid controller, administration controller for paid subscriptions.
@@ -29,20 +24,16 @@ if (!defined('ELK'))
 class ManagePaid_Controller extends Action_Controller
 {
 	/**
-	 * Paid subscriptions settings form.
-	 * @var Settings_Form
-	 */
-	protected $_paidSettings;
-
-	/**
 	 * The main entrance point for the 'Paid Subscription' screen,
 	 *
 	 * What it does:
+	 *
 	 * - calling the right function based on the given sub-action.
 	 * - It defaults to sub-action 'view'.
 	 * - Accessed from ?action=admin;area=paidsubscribe.
 	 * - It requires admin_forum permission for admin based actions.
 	 *
+	 * @event integrate_sa_manage_subscriptions
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -95,7 +86,7 @@ class ManagePaid_Controller extends Action_Controller
 		);
 
 		// Default the sub-action to 'view subscriptions', but only if they have already set things up..
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (!empty($modSettings['paid_currency_symbol']) ? 'view' : 'settings');
+		$subAction = isset($this->_req->query->sa) && isset($subActions[$this->_req->query->sa]) ? $this->_req->query->sa : (!empty($modSettings['paid_currency_symbol']) ? 'view' : 'settings');
 
 		// Load in the subActions, call integrate_sa_manage_subscriptions
 		$action->initialize($subActions, 'settings');
@@ -114,30 +105,21 @@ class ManagePaid_Controller extends Action_Controller
 	 * - i.e. modify which payment methods are to be used.
 	 * - It requires the moderate_forum permission
 	 * - Accessed from ?action=admin;area=paidsubscribe;sa=settings.
+	 *
+	 * @event integrate_save_subscription_settings
 	 */
 	public function action_paidSettings_display()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt, $scripturl, $modSettings;
 
 		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 
 		// Initialize the form
-		$this->_init_paidSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_paidSettings->settings();
-
-		// Now load all the other gateway settings.
-		$gateways = loadPaymentGateways();
-		foreach ($gateways as $gateway)
-		{
-			$gatewayClass = new $gateway['display_class']();
-			$setting_data = $gatewayClass->getGatewaySettings();
-			if (!empty($setting_data))
-			{
-				$config_vars[] = array('title', $gatewayClass->title, 'text_label' => (isset($txt['paidsubs_gateway_title_' . $gatewayClass->title]) ? $txt['paidsubs_gateway_title_' . $gatewayClass->title] : $gatewayClass->title));
-				$config_vars = array_merge($config_vars, $setting_data);
-			}
-		}
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
+		$settingsForm->setConfigVars($config_vars);
 
 		// Some important context stuff
 		$context['page_title'] = $txt['settings'];
@@ -154,16 +136,15 @@ class ManagePaid_Controller extends Action_Controller
 		toggleCurrencyOther();', true);
 
 		// Saving the settings?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			call_integration_hook('integrate_save_subscription_settings');
 
 			// Check that the entered email addresses are valid
-			if (!empty($_POST['paid_email_to']))
+			if (!empty($this->_req->post->paid_email_to))
 			{
-				require_once(SUBSDIR . '/DataValidator.class.php');
 				$validator = new Data_Validator();
 
 				// Some cleaning and some rules
@@ -172,12 +153,12 @@ class ManagePaid_Controller extends Action_Controller
 				$validator->input_processing(array('paid_email_to' => 'csv'));
 				$validator->text_replacements(array('paid_email_to' => $txt['paid_email_to']));
 
-				if ($validator->validate($_POST))
-					$_POST['paid_email_to'] = $validator->paid_email_to;
+				if ($validator->validate($this->_req->post))
+					$this->_req->post->paid_email_to = $validator->validation_data('paid_email_to');
 				else
 				{
-					// Thats not an email, lets set it back in the form to be fixed and let them know its wrong
-					$config_vars[1]['value'] = $_POST['paid_email_to'];
+					// That's not an email, lets set it back in the form to be fixed and let them know its wrong
+					$modSettings['paid_email_to'] = $this->_req->post->paid_email_to;
 					$context['error_type'] = 'minor';
 					$context['settings_message'] = array();
 					foreach ($validator->validation_errors() as $id => $error)
@@ -189,42 +170,29 @@ class ManagePaid_Controller extends Action_Controller
 			if (empty($context['error_type']))
 			{
 				// Sort out the currency stuff.
-				if ($_POST['paid_currency'] != 'other')
+				if ($this->_req->post->paid_currency !== 'other')
 				{
-					$_POST['paid_currency_code'] = $_POST['paid_currency'];
-					$_POST['paid_currency_symbol'] = $txt[$_POST['paid_currency'] . '_symbol'];
+					$this->_req->post->paid_currency_code = $this->_req->post->paid_currency;
+					$this->_req->post->paid_currency_symbol = $txt[$this->_req->post->paid_currency . '_symbol'];
 				}
-				$_POST['paid_currency_code'] = trim($_POST['paid_currency_code']);
+				$this->_req->post->paid_currency_code = trim($this->_req->post->paid_currency_code);
 
 				unset($config_vars['dummy_currency']);
-				Settings_Form::save_db($config_vars);
+				$settingsForm->setConfigVars($config_vars);
+				$settingsForm->setConfigValues((array) $this->_req->post);
+				$settingsForm->save();
 				redirectexit('action=admin;area=paidsubscribe;sa=settings');
 			}
 		}
 
 		// Prepare the settings...
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Retrieve subscriptions settings and initialize the form.
-	 */
-	private function _init_paidSettingsForm()
-	{
-		// We're working with them settings here.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
-		// Instantiate the form
-		$this->_paidSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_paidSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
 	 * Retrieve subscriptions settings.
+	 *
+	 * @event integrate_modify_subscription_settings
 	 */
 	private function _settings()
 	{
@@ -246,6 +214,20 @@ class ManagePaid_Controller extends Action_Controller
 				array('check', 'paidsubs_test', 'subtext' => $txt['paidsubs_test_desc'], 'onclick' => 'return document.getElementById(\'paidsubs_test\').checked ? confirm(\'' . $txt['paidsubs_test_confirm'] . '\') : true;'),
 		);
 
+		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
+		// Now load all the other gateway settings.
+		$gateways = loadPaymentGateways();
+		foreach ($gateways as $gateway)
+		{
+			$gatewayClass = new $gateway['display_class']();
+			$setting_data = $gatewayClass->getGatewaySettings();
+			if (!empty($setting_data))
+			{
+				$config_vars[] = array('title', $gatewayClass->title, 'text_label' => (isset($txt['paidsubs_gateway_title_' . $gatewayClass->title]) ? $txt['paidsubs_gateway_title_' . $gatewayClass->title] : $gatewayClass->title));
+				$config_vars = array_merge($config_vars, $setting_data);
+			}
+		}
+
 		call_integration_hook('integrate_modify_subscription_settings', array(&$config_vars));
 
 		return $config_vars;
@@ -262,8 +244,12 @@ class ManagePaid_Controller extends Action_Controller
 	/**
 	 * View a list of all the current subscriptions
 	 *
+	 * What it does:
+	 *
 	 * - Requires the admin_forum permission.
 	 * - Accessed from ?action=admin;area=paidsubscribe;sa=view.
+	 *
+	 * @event integrate_list_subscription_list
 	 */
 	public function action_view()
 	{
@@ -271,7 +257,7 @@ class ManagePaid_Controller extends Action_Controller
 
 		// Not made the settings yet?
 		if (empty($modSettings['paid_currency_symbol']))
-			fatal_lang_error('paid_not_set_currency', false, array($scripturl . '?action=admin;area=paidsubscribe;sa=settings'));
+			throw new Elk_Exception('paid_not_set_currency', false, array($scripturl . '?action=admin;area=paidsubscribe;sa=settings'));
 
 		// Some basic stuff.
 		$context['page_title'] = $txt['paid_subs_view'];
@@ -284,16 +270,16 @@ class ManagePaid_Controller extends Action_Controller
 			'items_per_page' => 20,
 			'base_href' => $scripturl . '?action=admin;area=paidsubscribe;sa=view',
 			'get_items' => array(
-				'function' => create_function('', '
+				'function' => function () {
 					global $context;
-					return $context[\'subscriptions\'];
-				'),
+					return $context['subscriptions'];
+				},
 			),
 			'get_count' => array(
-				'function' => create_function('', '
+				'function' => function () {
 					global $context;
-					return count($context[\'subscriptions\']);
-				'),
+					return count($context['subscriptions']);
+				},
 			),
 			'no_items_label' => $txt['paid_none_yet'],
 			'columns' => array(
@@ -303,11 +289,11 @@ class ManagePaid_Controller extends Action_Controller
 						'style' => 'width: 30%;',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $scripturl;
 
-							return sprintf(\'<a href="%1$s?action=admin;area=paidsubscribe;sa=viewsub;sid=%2$s">%3$s</a>\', $scripturl, $rowData[\'id\'], $rowData[\'name\']);
-						'),
+							return sprintf('<a href="%1$s?action=admin;area=paidsubscribe;sa=viewsub;sid=%2$s">%3$s</a>', $scripturl, $rowData['id'], $rowData['name']);
+						},
 					),
 				),
 				'cost' => array(
@@ -315,11 +301,11 @@ class ManagePaid_Controller extends Action_Controller
 						'value' => $txt['paid_cost'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $txt;
 
-							return $rowData[\'flexible\'] ? \'<em>\' . $txt[\'flexible\'] . \'</em>\' : $rowData[\'cost\'] . \' / \' . $rowData[\'length\'];
-						'),
+							return $rowData['flexible'] ? '<em>' . $txt['flexible'] . '</em>' : $rowData['cost'] . ' / ' . $rowData['length'];
+						},
 					),
 				),
 				'pending' => array(
@@ -352,11 +338,11 @@ class ManagePaid_Controller extends Action_Controller
 						'value' => $txt['paid_is_active'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $txt;
 
-							return \'<span class="\' . ($rowData[\'active\'] ? \'success\' : \'alert\') . \'">\' . ($rowData[\'active\'] ? $txt[\'yes\'] : $txt[\'no\']) . \'</span>\';
-						'),
+							return '<span class="' . ($rowData['active'] ? 'success' : 'alert') . '">' . ($rowData['active'] ? $txt['yes'] : $txt['no']) . '</span>';
+						},
 					),
 				),
 				'subscribers' => array(
@@ -364,11 +350,11 @@ class ManagePaid_Controller extends Action_Controller
 						'value' => $txt['subscribers'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							global $scripturl, $txt, $settings;
+						'function' => function ($rowData) {
+							global $scripturl, $txt;
 
-							return \'<a href="\' . $scripturl . \'?action=admin;area=paidsubscribe;sa=viewsub;sid=\' . $rowData[\'id\'] . \'"><img title="\' . $txt[\'view\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/members.png" alt="*" /></a>\';
-						'),
+							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=viewsub;sid=' . $rowData['id'] . '"><i class="icon i-view" title="' . $txt['view'] . '"></i></a>';
+						},
 						'class' => 'centertext',
 					),
 				),
@@ -377,11 +363,11 @@ class ManagePaid_Controller extends Action_Controller
 						'value' => $txt['modify'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							global $txt, $scripturl, $settings;
+						'function' => function ($rowData) {
+							global $txt, $scripturl;
 
-							return \'<a href="\' . $scripturl . \'?action=admin;area=paidsubscribe;sa=modify;sid=\' . $rowData[\'id\'] . \'"><img title="\' . $txt[\'modify\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/modify_inline.png" alt="*" /></a>\';
-						'),
+							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modify;sid=' . $rowData['id'] . '"><i class="icon i-modify" title="' . $txt['modify'] . '"></i></a>';
+						},
 						'class' => 'centertext',
 					),
 				),
@@ -390,11 +376,11 @@ class ManagePaid_Controller extends Action_Controller
 						'value' => $txt['remove']
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							global $txt, $scripturl, $settings;
+						'function' => function ($rowData) {
+							global $txt, $scripturl;
 
-							return \'<a href="\' . $scripturl . \'?action=admin;area=paidsubscribe;sa=modify;delete;sid=\' . $rowData[\'id\'] . \'"><img title="\' . $txt[\'delete\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="*" /></a>\';
-						'),
+							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modify;delete;sid=' . $rowData['id'] . '"><i class="icon i-delete" title="' . $txt['delete'] . '"></i></a>';
+						},
 						'class' => 'centertext',
 					),
 				),
@@ -410,7 +396,6 @@ class ManagePaid_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
@@ -421,6 +406,9 @@ class ManagePaid_Controller extends Action_Controller
 	 * Adding, editing and deleting subscriptions.
 	 *
 	 * - Accessed from ?action=admin;area=paidsubscribe;sa=modify.
+	 *
+	 * @event integrate_delete_subscription passed ID of deletion
+	 * @event integrate_save_subscription
 	 */
 	public function action_modify()
 	{
@@ -428,15 +416,15 @@ class ManagePaid_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 
-		$context['sub_id'] = isset($_REQUEST['sid']) ? (int) $_REQUEST['sid'] : 0;
-		$context['action_type'] = $context['sub_id'] ? (isset($_REQUEST['delete']) ? 'delete' : 'edit') : 'add';
+		$context['sub_id'] = isset($this->_req->query->sid) ? (int) $this->_req->query->sid : 0;
+		$context['action_type'] = $context['sub_id'] ? (isset($this->_req->query->delete) ? 'delete' : 'edit') : 'add';
 
 		// Setup the template.
-		$context['sub_template'] = $context['action_type'] == 'delete' ? 'delete_subscription' : 'modify_subscription';
+		$context['sub_template'] = $context['action_type'] === 'delete' ? 'delete_subscription' : 'modify_subscription';
 		$context['page_title'] = $txt['paid_' . $context['action_type'] . '_subscription'];
 
 		// Delete it?
-		if (isset($_POST['delete_confirm']) && isset($_REQUEST['delete']))
+		if (isset($this->_req->post->delete_confirm) && isset($this->_req->query->delete))
 		{
 			checkSession();
 			validateToken('admin-pmsd');
@@ -449,30 +437,30 @@ class ManagePaid_Controller extends Action_Controller
 		}
 
 		// Saving?
-		if (isset($_POST['save']))
+		if (isset($this->_req->post->save))
 		{
 			checkSession();
 			validateToken('admin-pms');
 
 			// Some cleaning...
-			$isActive = isset($_POST['active']) ? 1 : 0;
-			$isRepeatable = isset($_POST['repeatable']) ? 1 : 0;
-			$allowpartial = isset($_POST['allow_partial']) ? 1 : 0;
-			$reminder = isset($_POST['reminder']) ? (int) $_POST['reminder'] : 0;
-			$emailComplete = strlen($_POST['emailcomplete']) > 10 ? trim($_POST['emailcomplete']) : '';
+			$isActive = max($this->_req->getPost('active', 'intval', 0), 1);
+			$isRepeatable = max($this->_req->getPost('repeatable', 'intval', 0), 1);
+			$allowPartial = max($this->_req->getPost('allow_partial', 'intval', 0), 1);
+			$reminder = max($this->_req->getPost('reminder', 'intval', 0), 1);
+			$emailComplete = strlen($this->_req->post->emailcomplete) > 10 ? trim($this->_req->post->emailcomplete) : '';
 
 			// Is this a fixed one?
-			if ($_POST['duration_type'] == 'fixed')
+			if ($this->_req->post->duration_type === 'fixed')
 			{
 				// Clean the span.
-				$span = $_POST['span_value'] . $_POST['span_unit'];
+				$span = $this->_req->post->span_value . $this->_req->post->span_unit;
 
 				// Sort out the cost.
-				$cost = array('fixed' => sprintf('%01.2f', strtr($_POST['cost'], ',', '.')));
+				$cost = array('fixed' => sprintf('%01.2f', strtr($this->_req->post->cost, ',', '.')));
 
 				// There needs to be something.
-				if (empty($_POST['span_value']) || empty($_POST['cost']))
-					fatal_lang_error('paid_no_cost_value');
+				if (empty($this->_req->post->span_value) || empty($this->_req->post->cost))
+					throw new Elk_Exception('paid_no_cost_value');
 			}
 			// Flexible is harder but more fun ;)
 			else
@@ -480,37 +468,40 @@ class ManagePaid_Controller extends Action_Controller
 				$span = 'F';
 
 				$cost = array(
-					'day' => sprintf('%01.2f', strtr($_POST['cost_day'], ',', '.')),
-					'week' => sprintf('%01.2f', strtr($_POST['cost_week'], ',', '.')),
-					'month' => sprintf('%01.2f', strtr($_POST['cost_month'], ',', '.')),
-					'year' => sprintf('%01.2f', strtr($_POST['cost_year'], ',', '.')),
+					'day' => sprintf('%01.2f', strtr($this->_req->post->cost_day, ',', '.')),
+					'week' => sprintf('%01.2f', strtr($this->_req->post->cost_week, ',', '.')),
+					'month' => sprintf('%01.2f', strtr($this->_req->post->cost_month, ',', '.')),
+					'year' => sprintf('%01.2f', strtr($this->_req->post->cost_year, ',', '.')),
 				);
 
-				if (empty($_POST['cost_day']) && empty($_POST['cost_week']) && empty($_POST['cost_month']) && empty($_POST['cost_year']))
-					fatal_lang_error('paid_all_freq_blank');
+				if (empty($this->_req->post->cost_day) && empty($this->_req->post->cost_week) && empty($this->_req->post->cost_month) && empty($this->_req->post->cost_year))
+					throw new Elk_Exception('paid_all_freq_blank');
 			}
+
 			$cost = serialize($cost);
 
 			// Yep, time to do additional groups.
-			$addgroups = array();
-			if (!empty($_POST['addgroup']))
-				foreach ($_POST['addgroup'] as $id => $dummy)
-					$addgroups[] = (int) $id;
-			$addgroups = implode(',', $addgroups);
+			$addGroups = array();
+			if (!empty($this->_req->post->addgroup))
+			{
+				foreach ($this->_req->post->addgroup as $id => $dummy)
+					$addGroups[] = (int) $id;
+			}
+			$addGroups = implode(',', $addGroups);
 
 			// Is it new?!
-			if ($context['action_type'] == 'add')
+			if ($context['action_type'] === 'add')
 			{
 				$insert = array(
-					'name' => $_POST['name'],
-					'desc' => $_POST['desc'],
+					'name' => $this->_req->post->name,
+					'desc' => $this->_req->post->desc,
 					'isActive' => $isActive,
 					'span' => $span,
 					'cost' => $cost,
-					'prim_group' => $_POST['prim_group'],
-					'addgroups' => $addgroups,
+					'prim_group' => $this->_req->post->prim_group,
+					'addgroups' => $addGroups,
 					'isRepeatable' => $isRepeatable,
-					'allowpartial' => $allowpartial,
+					'allowpartial' => $allowPartial,
 					'emailComplete' => $emailComplete,
 					'reminder' => $reminder,
 				);
@@ -524,29 +515,29 @@ class ManagePaid_Controller extends Action_Controller
 
 				$update = array(
 					'is_active' => $isActive,
-					'id_group' => !empty($_POST['prim_group']) ? $_POST['prim_group'] : 0,
+					'id_group' => !empty($this->_req->post->prim_group) ? $this->_req->post->prim_group : 0,
 					'repeatable' => $isRepeatable,
-					'allow_partial' => $allowpartial,
+					'allow_partial' => $allowPartial,
 					'reminder' => $reminder,
 					'current_subscription' => $context['sub_id'],
-					'name' => $_POST['name'],
-					'desc' => $_POST['desc'],
+					'name' => $this->_req->post->name,
+					'desc' => $this->_req->post->desc,
 					'length' => $span,
 					'cost' => $cost,
-					'additional_groups' => !empty($addgroups) ? $addgroups : '',
+					'additional_groups' => !empty($addGroups) ? $addGroups : '',
 					'email_complete' => $emailComplete,
 				);
 
 				updateSubscription($update, $ignore_active);
 			}
 
-			call_integration_hook('integrate_save_subscription', array(($context['action_type'] == 'add' ? $sub_id : $context['sub_id']), $_POST['name'], $_POST['desc'], $isActive, $span, $cost, $_POST['prim_group'], $addgroups, $isRepeatable, $allowpartial, $emailComplete, $reminder));
+			call_integration_hook('integrate_save_subscription', array(($context['action_type'] === 'add' ? $sub_id : $context['sub_id']), $this->_req->post->name, $this->_req->post->desc, $isActive, $span, $cost, $this->_req->post->prim_group, $addGroups, $isRepeatable, $allowPartial, $emailComplete, $reminder));
 
 			redirectexit('action=admin;area=paidsubscribe;view');
 		}
 
 		// Defaults.
-		if ($context['action_type'] == 'add')
+		if ($context['action_type'] === 'add')
 		{
 			$context['sub'] = array(
 				'name' => '',
@@ -582,15 +573,19 @@ class ManagePaid_Controller extends Action_Controller
 		$context['groups'] = getBasicMembergroupData(array('permission'));
 
 		// This always happens.
-		createToken($context['action_type'] == 'delete' ? 'admin-pmsd' : 'admin-pms');
+		createToken($context['action_type'] === 'delete' ? 'admin-pmsd' : 'admin-pms');
 	}
 
 	/**
 	 * View all the users subscribed to a particular subscription.
 	 *
+	 * What it does:
+	 *
 	 * - Requires the admin_forum permission.
 	 * - Accessed from ?action=admin;area=paidsubscribe;sa=viewsub.
 	 * - Subscription ID is required, in the form of $_GET['sid'].
+	 *
+	 * @event integrate_list_subscribed_users_list
 	 */
 	public function action_viewsub()
 	{
@@ -602,14 +597,14 @@ class ManagePaid_Controller extends Action_Controller
 		$context['page_title'] = $txt['viewing_users_subscribed'];
 
 		// ID of the subscription.
-		$context['sub_id'] = (int) $_REQUEST['sid'];
+		$context['sub_id'] = (int) $this->_req->query->sid;
 
 		// Load the subscription information.
 		$context['subscription'] = getSubscriptionDetails($context['sub_id']);
 
 		// Are we searching for people?
-		$search_string = isset($_POST['ssearch']) && !empty($_POST['sub_search']) ? ' AND IFNULL(mem.real_name, {string:guest}) LIKE {string:search}' : '';
-		$search_vars = empty($_POST['sub_search']) ? array() : array('search' => '%' . $_POST['sub_search'] . '%', 'guest' => $txt['guest']);
+		$search_string = isset($this->_req->post->ssearch) && !empty($this->_req->post->sub_search) ? ' AND COALESCE(mem.real_name, {string:guest}) LIKE {string:search}' : '';
+		$search_vars = empty($this->_req->post->sub_search) ? array() : array('search' => '%' . $this->_req->post->sub_search . '%', 'guest' => $txt['guest']);
 
 		$listOptions = array(
 			'id' => 'subscribed_users_list',
@@ -641,11 +636,11 @@ class ManagePaid_Controller extends Action_Controller
 						'style' => 'width: 20%;',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $txt, $scripturl;
 
-							return $rowData[\'id_member\'] == 0 ? $txt[\'guest\'] : \'<a href="\' . $scripturl . \'?action=profile;u=\' . $rowData[\'id_member\'] . \'">\' . $rowData[\'name\'] . \'</a>\';
-						'),
+							return $rowData['id_member'] == 0 ? $txt['guest'] : '<a href="' . $scripturl . '?action=profile;u=' . $rowData['id_member'] . '">' . $rowData['name'] . '</a>';
+						},
 					),
 					'sort' => array(
 						'default' => 'name',
@@ -713,11 +708,11 @@ class ManagePaid_Controller extends Action_Controller
 						'value' => $txt['edit_subscriber'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function ($rowData) {
 							global $txt, $scripturl;
 
-							return \'<a href="\' . $scripturl . \'?action=admin;area=paidsubscribe;sa=modifyuser;lid=\' . $rowData[\'id\'] . \'">\' . $txt[\'modify\'] . \'</a>\';
-						'),
+							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modifyuser;lid=' . $rowData['id'] . '">' . $txt['modify'] . '</a>';
+						},
 						'class' => 'centertext',
 					),
 				),
@@ -727,9 +722,9 @@ class ManagePaid_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							return \'<input type="checkbox" name="delsub[\' . $rowData[\'id\'] . \']" class="input_check" />\';
-						'),
+						'function' => function ($rowData) {
+							return '<input type="checkbox" name="delsub[' . $rowData['id'] . ']" class="input_check" />';
+						},
 						'class' => 'centertext',
 					),
 				),
@@ -758,7 +753,6 @@ class ManagePaid_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
@@ -776,7 +770,7 @@ class ManagePaid_Controller extends Action_Controller
 	 */
 	public function getSubscribedUserCount($id_sub, $search_string, $search_vars)
 	{
-	   return list_getSubscribedUserCount($id_sub, $search_string, $search_vars);
+		return list_getSubscribedUserCount($id_sub, $search_string, $search_vars);
 	}
 
 	/**
@@ -784,9 +778,9 @@ class ManagePaid_Controller extends Action_Controller
 	 *
 	 * - Callback for createList()
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param int $id_sub
 	 * @param string $search_string
 	 * @param mixed[] $search_vars
@@ -808,8 +802,8 @@ class ManagePaid_Controller extends Action_Controller
 		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 		loadSubscriptions();
 
-		$context['log_id'] = isset($_REQUEST['lid']) ? (int) $_REQUEST['lid'] : 0;
-		$context['sub_id'] = isset($_REQUEST['sid']) ? (int) $_REQUEST['sid'] : 0;
+		$context['log_id'] = $this->_req->getQuery('lid', 'intval', 0);
+		$context['sub_id'] = $this->_req->getQuery('sid', 'intval', 0);
 		$context['action_type'] = $context['log_id'] ? 'edit' : 'add';
 
 		// Setup the template.
@@ -822,37 +816,37 @@ class ManagePaid_Controller extends Action_Controller
 			$context['sub_id'] = validateSubscriptionID($context['log_id']);
 
 		if (!isset($context['subscriptions'][$context['sub_id']]))
-			fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		$context['current_subscription'] = $context['subscriptions'][$context['sub_id']];
 
 		// Searching?
-		if (isset($_POST['ssearch']))
+		if (isset($this->_req->post->ssearch))
 			return $this->action_viewsub();
 		// Saving?
-		elseif (isset($_REQUEST['save_sub']))
+		elseif (isset($this->_req->post->save_sub))
 		{
 			checkSession();
 
 			// Work out the dates...
-			$starttime = mktime($_POST['hour'], $_POST['minute'], 0, $_POST['month'], $_POST['day'], $_POST['year']);
-			$endtime = mktime($_POST['hourend'], $_POST['minuteend'], 0, $_POST['monthend'], $_POST['dayend'], $_POST['yearend']);
+			$starttime = mktime($this->_req->post->hour, $this->_req->post->minute, 0, $this->_req->post->month, $this->_req->post->day, $this->_req->post->year);
+			$endtime = mktime($this->_req->post->hourend, $this->_req->post->minuteend, 0, $this->_req->post->monthend, $this->_req->post->dayend, $this->_req->post->yearend);
 
 			// Status.
-			$status = $_POST['status'];
+			$status = $this->_req->post->status;
 
 			// New one?
 			if (empty($context['log_id']))
 			{
 				// Find the user...
 				require_once(SUBSDIR . '/Members.subs.php');
-				$member = getMemberByName($_POST['name']);
+				$member = getMemberByName($this->_req->post->name);
 
 				if (empty($member))
-					fatal_lang_error('error_member_not_found');
+					throw new Elk_Exception('error_member_not_found');
 
 				if (alreadySubscribed($context['sub_id'], $member['id_member']))
-					fatal_lang_error('member_already_subscribed');
+					throw new Elk_Exception('member_already_subscribed');
 
 				// Actually put the subscription in place.
 				if ($status == 1)
@@ -899,27 +893,27 @@ class ManagePaid_Controller extends Action_Controller
 			redirectexit('action=admin;area=paidsubscribe;sa=viewsub;sid=' . $context['sub_id']);
 		}
 		// Deleting?
-		elseif (isset($_REQUEST['delete']) || isset($_REQUEST['finished']))
+		elseif (isset($this->_req->post->delete) || isset($this->_req->post->finished))
 		{
 			checkSession();
 
 			// Do the actual deletes!
-			if (!empty($_REQUEST['delsub']))
+			if (!empty($this->_req->post->delsub))
 			{
 				$toDelete = array();
-				foreach ($_REQUEST['delsub'] as $id => $dummy)
+				foreach ($this->_req->post->delsub as $id => $dummy)
 					$toDelete[] = (int) $id;
 
 				$deletes = prepareDeleteSubscriptions($toDelete);
 
 				foreach ($deletes as $id_subscribe => $id_member)
-					removeSubscription($id_subscribe, $id_member, isset($_REQUEST['delete']));
+					removeSubscription($id_subscribe, $id_member, isset($this->_req->post->delete));
 			}
 			redirectexit('action=admin;area=paidsubscribe;sa=viewsub;sid=' . $context['sub_id']);
 		}
 
 		// Default attributes.
-		if ($context['action_type'] == 'add')
+		if ($context['action_type'] === 'add')
 		{
 			$context['sub'] = array(
 				'id' => 0,
@@ -944,12 +938,12 @@ class ManagePaid_Controller extends Action_Controller
 			$context['sub']['start']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['sub']['start']['month'] == 12 ? 1 : $context['sub']['start']['month'] + 1, 0, $context['sub']['start']['month'] == 12 ? $context['sub']['start']['year'] + 1 : $context['sub']['start']['year']));
 			$context['sub']['end']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['sub']['end']['month'] == 12 ? 1 : $context['sub']['end']['month'] + 1, 0, $context['sub']['end']['month'] == 12 ? $context['sub']['end']['year'] + 1 : $context['sub']['end']['year']));
 
-			if (isset($_GET['uid']))
+			if (isset($this->_req->query->uid))
 			{
 				require_once(SUBSDIR . '/Members.subs.php');
 
 				// Get the latest activated member's display name.
-				$result = getBasicMemberData((int) $_GET['uid']);
+				$result = getBasicMemberData((int) $this->_req->query->uid);
 				$context['sub']['username'] = $result['real_name'];
 			}
 			else
@@ -960,7 +954,7 @@ class ManagePaid_Controller extends Action_Controller
 		{
 			$row = getPendingSubscriptions($context['log_id']);
 			if (empty($row))
-				fatal_lang_error('no_access', false);
+				throw new Elk_Exception('no_access', false);
 
 			// Any pending payments?
 			$context['pending_payments'] = array();
@@ -970,12 +964,12 @@ class ManagePaid_Controller extends Action_Controller
 				foreach ($pending_details as $id => $pending)
 				{
 					// Only this type need be displayed.
-					if ($pending[3] == 'payback')
+					if ($pending[3] === 'payback')
 					{
 						// Work out what the options were.
 						$costs = Util::unserialize($context['current_subscription']['real_cost']);
 
-						if ($context['current_subscription']['real_length'] == 'F')
+						if ($context['current_subscription']['real_length'] === 'F')
 						{
 							foreach ($costs as $duration => $cost)
 							{
@@ -995,16 +989,16 @@ class ManagePaid_Controller extends Action_Controller
 				}
 
 				// Check if we are adding/removing any.
-				if (isset($_GET['pending']))
+				if (isset($this->_req->query->pending))
 				{
 					foreach ($pending_details as $id => $pending)
 					{
 						// Found the one to action?
-						if ($_GET['pending'] == $id && $pending[3] == 'payback' && isset($context['pending_payments'][$id]))
+						if ($this->_req->query->pending == $id && $pending[3] === 'payback' && isset($context['pending_payments'][$id]))
 						{
 							// Flexible?
-							if (isset($_GET['accept']))
-								addSubscription($context['current_subscription']['id'], $row['id_member'], $context['current_subscription']['real_length'] == 'F' ? strtoupper(substr($pending[2], 0, 1)) : 0);
+							if (isset($this->_req->query->accept))
+								addSubscription($context['current_subscription']['id'], $row['id_member'], $context['current_subscription']['real_length'] === 'F' ? strtoupper(substr($pending[2], 0, 1)) : 0);
 							unset($pending_details[$id]);
 
 							$new_details = serialize($pending_details);

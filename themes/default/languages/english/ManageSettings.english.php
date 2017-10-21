@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; ManageSettings
+// Version: 1.1; ManageSettings
 
 $txt['modSettings_desc'] = 'This page allows you to change the settings of features and basic options in your forum.  Please see the <a href="%1$s">theme settings</a> for more options.  Click the help icons for more information about a setting.';
 $txt['security_settings_desc'] = 'This page allows you to set options specifically related to the security and moderation of your forum, including anti-spam options.';
@@ -13,7 +13,6 @@ $txt['allow_editDisplayName'] = 'Allow users to edit their displayed name';
 $txt['allow_hideOnline'] = 'Allow non-administrators to hide their online status';
 $txt['titlesEnable'] = 'Enable custom titles';
 $txt['enable_buddylist'] = 'Enable buddy/ignore lists';
-$txt['enable_unwatch'] = 'Enable unwatching of topics';
 $txt['default_personal_text'] = 'Default personal text';
 $txt['default_personal_text_note'] = 'Personal text to assign to newly registered members.';
 $txt['time_format'] = 'Default time format';
@@ -26,7 +25,6 @@ $txt['lastActive'] = 'User online time threshold';
 $txt['trackStats'] = 'Track daily statistics';
 $txt['hitStats'] = 'Track daily page views (must have stats enabled)';
 $txt['enableCompressedOutput'] = 'Enable compressed output';
-$txt['disableTemplateEval'] = 'Disable evaluation of templates';
 $txt['databaseSession_enable'] = 'Use database driven sessions';
 $txt['databaseSession_loose'] = 'Allow browsers to go back to cached pages';
 $txt['databaseSession_lifetime'] = 'Seconds before an unused session timeout';
@@ -56,6 +54,7 @@ $txt['admin_session_lifetime'] = 'Number of minutes an admin session stays activ
 $txt['auto_admin_session'] = 'Automatically start an admin session on logon';
 $txt['securityDisable'] = 'Disable administration security';
 $txt['securityDisable_moderate'] = 'Disable moderation security';
+$txt['enableOTP'] = 'Enable two factor authentication (Time-based One-time Passwords)';
 $txt['send_validation_onChange'] = 'Require reactivation after email change';
 $txt['approveAccountDeletion'] = 'Require admin approval when member deletes account';
 $txt['autoOptMaxOnline'] = 'Maximum users online when optimizing';
@@ -72,12 +71,15 @@ $txt['jqueryui_default'] = 'Specify a version of jQueryUI to use with ElkArte';
 $txt['jquery_custom_after'] = 'Local copy looks for jquery-<strong>X.XX.X</strong>.min.js';
 $txt['jqueryui_custom_after'] = 'Local copy looks for jquery-ui-<strong>X.XX.X</strong>.min.js';
 $txt['minify_css_js'] = 'Minify Javascript and CSS files';
+$txt['clean_hives'] = 'Clear hive cache';
+$txt['clean_hives_sucess'] = 'CSS and JS hives successfully deleted.';
+$txt['clean_hives_failed'] = 'A problem occured, hives have not been deleted.';
 $txt['enable_contactform'] = 'Enable contact form';
 $txt['contact_form_disabled'] = 'Disabled';
 $txt['contact_form_registration'] = 'Show only at registration';
 $txt['contact_form_menu'] = 'Show in the menu';
 $txt['queryless_urls'] = 'Search engine friendly URLs';
-$txt['queryless_urls_note'] = 'Apache/Lighttpd only';
+$txt['queryless_urls_note'] = 'Apache/Lighttpd/Nginx only';
 $txt['queryless_urls_work'] = 'This feature will work on your server.';
 $txt['queryless_urls_notwork'] = 'This feature will not work on your server.';
 $txt['enableReportPM'] = 'Enable reporting of personal messages';
@@ -85,7 +87,7 @@ $txt['antispam_PM'] = 'Personal Message Limits';
 $txt['max_pm_recipients'] = 'Maximum number of recipients allowed in a personal message';
 $txt['max_pm_recipients_note'] = '(0 for no limit, admins are exempt)';
 $txt['compactTopicPagesEnable'] = 'Limit number of displayed page links';
-$txt['contiguous_page_display'] = 'Contiguous pages to display';
+$txt['compactTopicPagesContiguous'] = 'Contiguous pages to display';
 $txt['to_display'] = 'to display';
 $txt['todayMod'] = 'Enable shorthand date display';
 $txt['today_disabled'] = 'Disabled';
@@ -99,8 +101,6 @@ $txt['displayMemberNames'] = 'Display the member\'s name instead of "My Account"
 $txt['timeLoadPageEnable'] = 'Display time taken to create every page';
 $txt['disableHostnameLookup'] = 'Disable hostname lookups';
 $txt['who_enabled'] = 'Enable who\'s online list';
-$txt['meta_keywords'] = 'Meta keywords associated with forum';
-$txt['meta_keywords_note'] = 'For search engines. Leave blank for default.';
 $txt['settings_error'] = 'Warning: Updating of Settings.php failed, the settings cannot be saved.';
 $txt['core_settings_saved'] = 'The settings were successfully saved';
 
@@ -122,15 +122,7 @@ $txt['likeRestrictAdmins'] = 'Restrict administrators to limits';
 $txt['likeAllowSelf'] = 'Allow members to like their own posts';
 $txt['likeDisplayLimit'] = 'Set the maximum number of "liked by" names to display in the topic view, 0 for no limit, -1 to disable';
 
-$txt['caching_information'] = 'ElkArte supports caching through the use of accelerators. The currently supported accelerators include:
-<ul class="bbc_list">
-	<li>APC</li>
-	<li>eAccelerator</li>
-	<li>Turck MMCache</li>
-	<li>Memcached</li>
-	<li>Zend Platform/Performance Suite (Not Zend Optimizer)</li>
-	<li>XCache</li>
-</ul>
+$txt['caching_information'] = 'ElkArte supports caching of user data (such as query results) through the use of accelerators. The currently supported accelerators include: {supported_accelerators}
 Caching will work best if you have PHP compiled with one of the above optimizers, or have memcache available. If you do not have any optimizer installed file based caching will be used.';
 $txt['detected_accelerators'] = 'The following accelerators have been detected: <strong class="success">%1$s</strong>';
 
@@ -139,21 +131,15 @@ $txt['cache_off'] = 'No caching';
 $txt['cache_level1'] = 'Level 1 Caching (Recommended)';
 $txt['cache_level2'] = 'Level 2 Caching';
 $txt['cache_level3'] = 'Level 3 Caching (Not Recommended)';
-$txt['cache_memcached'] = 'Memcache settings';
+$txt['cache_memcached'] = 'Memcached settings';
+$txt['cache_memcache'] = 'Memcache settings';
+$txt['cache_memcached_servers'] = '<br />Added servers:<ul class="bbc_list"><li>';
 $txt['cache_accelerator'] = 'Caching Accelerator';
 $txt['cache_uid'] = 'Cache Accelerator Userid';
 $txt['cache_password'] = 'Cache Accelerator Password';
-$txt['default_cache'] = 'File based caching';
-$txt['apc_cache'] = 'APC';
-$txt['eAccelerator_cache'] = 'eAccelerator';
-$txt['mmcache_cache'] = 'Turck MMCache';
-$txt['memcached_cache'] = 'Memcached';
-$txt['zend_cache'] = 'Zend Platform/Performance Suite';
-$txt['xcache_cache'] = 'XCache';
-$txt['cache_conflict'] = 'You are using PHP\'s opcache with ElkArte\'s file based caching.  For best results you should blacklist ElkArte\'s cache directory (' . CACHEDIR . '/*) using the opcache.blacklist_filename directive.';
 
 $txt['loadavg_warning'] = '<span class="error">Please note: the settings below are to be edited with care. Setting any of them too low may render your forum <strong>unusable</strong>! The current load average is <strong>%01.2f</strong></span>';
-$txt['loadavg_enable'] = 'Enable load balancing by load averages';
+$txt['loadavg_enable'] = 'Enable load management by load averages';
 $txt['loadavg_auto_opt'] = 'Threshold to disabling automatic database optimization';
 $txt['loadavg_search'] = 'Threshold to disabling search';
 $txt['loadavg_allunread'] = 'Threshold to disabling all unread topics';
@@ -162,8 +148,8 @@ $txt['loadavg_show_posts'] = 'Threshold to disabling showing user posts';
 $txt['loadavg_userstats'] = 'Threshold to disabling showing user statistics';
 $txt['loadavg_bbc'] = 'Threshold to disabling BBC formatting when showing posts';
 $txt['loadavg_forum'] = 'Threshold to disabling the forum <strong>completely</strong>';
-$txt['loadavg_disabled_windows'] = '<span class="error">Load balancing support is not available on Windows.</span>';
-$txt['loadavg_disabled_conf'] = '<span class="error">Load balancing support is disabled by your host configuration.</span>';
+$txt['loadavg_disabled_windows'] = '<span class="error">Load management is not available on Windows.</span>';
+$txt['loadavg_disabled_conf'] = '<span class="error">Load reporting is disabled by your host configuration.</span>';
 
 $txt['setting_password_strength'] = 'Required strength for user passwords';
 $txt['setting_password_strength_low'] = 'Low - 4 character minimum';
@@ -268,6 +254,11 @@ $txt['signature_settings_desc'] = 'Use the settings on this page to decide how m
 $txt['signature_settings_warning'] = 'Note that settings are not applied to existing signatures by default.<br /><a class="button_submit" href="%1$s">Run the process now</a>';
 $txt['signature_settings_applied'] = 'The updated rules have been applied to the existing signatures.';
 $txt['signature_enable'] = 'Enable signatures';
+$txt['signature_repetition_guests'] = 'Show signatures to guests:';
+$txt['signature_repetition_members'] = 'Show signatures to members:';
+$txt['signature_always'] = 'Always';
+$txt['signature_onlyfirst'] = 'Only the first of each member';
+$txt['signature_never'] = 'Never';
 $txt['signature_max_length'] = 'Maximum allowed characters';
 $txt['signature_max_lines'] = 'Maximum amount of lines';
 $txt['signature_max_images'] = 'Maximum image count';
@@ -336,6 +327,7 @@ $txt['custom_edit_options_desc'] = 'Leave option box blank to remove. Radio butt
 $txt['custom_edit_options_more'] = 'More';
 $txt['custom_edit_options_no_default'] = 'Do not set a default value.';
 $txt['custom_edit_default'] = 'Default State';
+$txt['custom_edit_default_value'] = 'Default Value';
 $txt['custom_edit_active'] = 'Active';
 $txt['custom_edit_active_desc'] = 'If not selected this field will not be shown to anyone.';
 $txt['custom_edit_privacy'] = 'Privacy';
@@ -359,10 +351,12 @@ $txt['custom_edit_placement'] = 'Choose Placement';
 $txt['custom_edit_placement_standard'] = 'Standard (with title)';
 $txt['custom_edit_placement_withicons'] = 'With Icons';
 $txt['custom_edit_placement_abovesignature'] = 'Above Signature';
+$txt['custom_edit_placement_aboveicons'] = 'Above Icons (no title)';
 $txt['custom_profile_placement'] = 'Placement';
 $txt['custom_profile_placement_standard'] = 'Standard';
 $txt['custom_profile_placement_withicons'] = 'With Icons';
 $txt['custom_profile_placement_abovesignature'] = 'Above Signature';
+$txt['custom_profile_placement_aboveicons'] = 'Above Icons';
 
 // Use numeric entities in the string below!
 $txt['custom_edit_delete_sure'] = 'Are you sure you wish to delete this field? All related user data will be lost!';

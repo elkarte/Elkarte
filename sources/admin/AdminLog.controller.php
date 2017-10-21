@@ -7,17 +7,15 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Admin logs controller.
  *
  * What it does:
+ *
  * - This class manages logs, and forwards to display, pruning,
  * and other actions on logs.
  *
@@ -26,57 +24,44 @@ if (!defined('ELK'))
 class AdminLog_Controller extends Action_Controller
 {
 	/**
-	 * Pruning Settings form
-	 * @var Settings_Form
-	 */
-	protected $_pruningSettings;
-
-	/**
 	 * This method decides which log to load.
 	 * Accessed by ?action=admin;area=logs
+	 *
+	 * @event integrate_sa_manage_logs used to add additional log viewing functions, passed subActions array
+	 * @uses _initPruningSettingsForm
 	 */
 	public function action_index()
 	{
 		global $context, $txt, $scripturl, $modSettings;
 
-		// We're working with them settings here.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		// These are the logs they can load.
-		$log_functions = array(
+		$subActions = array(
 			'errorlog' => array(
-				'file' => 'ManageErrors.controller.php',
 				'function' => 'action_index',
 				'controller' => 'ManageErrors_Controller'),
 			'adminlog' => array(
-				'file' => 'Modlog.controller.php',
 				'function' => 'action_log',
 				'controller' => 'Modlog_Controller'),
 			'modlog' => array(
-				'file' => 'Modlog.controller.php',
 				'function' => 'action_log',
 				'controller' => 'Modlog_Controller',
 				'disabled' => !in_array('ml', $context['admin_features'])),
 			'badbehaviorlog' => array(
-				'file' => 'BadBehavior.controller.php',
 				'function' => 'action_log',
 				'disabled' => empty($modSettings['badbehavior_enabled']),
 				'controller' => 'BadBehavior_Controller'),
 			'banlog' => array(
-				'file' => 'ManageBans.controller.php',
 				'function' => 'action_log',
 				'controller' => 'ManageBans_Controller'),
 			'spiderlog' => array(
-				'file' => 'ManageSearchEngines.controller.php',
 				'function' => 'action_logs',
 				'controller' => 'ManageSearchEngines_Controller'),
 			'tasklog' => array(
-				'file' => 'ManageScheduledTasks.controller.php',
 				'function' => 'action_log',
 				'controller' => 'ManageScheduledTasks_Controller'),
 			'pruning' => array(
-				'init' => '_initPruningSettingsForm',
-				'display' => 'action_pruningSettings_display'),
+				'controller' => $this,
+				'function' => 'action_pruningSettings_display'),
 		);
 
 		// Setup the tabs.
@@ -113,50 +98,27 @@ class AdminLog_Controller extends Action_Controller
 			),
 		);
 
-		// Give integration a way to add items
-		call_integration_hook('integrate_manage_logs', array(&$log_functions));
-
-		$sub_action = isset($_REQUEST['sa']) && isset($log_functions[$_REQUEST['sa']]) && empty($log_functions[$_REQUEST['sa']]['disabled']) ? $_REQUEST['sa'] : 'errorlog';
-
 		// If it's not got a sa set it must have come here for first time, pretend error log should be reversed.
-		if (!isset($_REQUEST['sa']))
-			$_REQUEST['desc'] = true;
+		if (!isset($this->_req->query->sa))
+			$this->_req->query->desc = true;
 
-		// figure out what to call
-		if (isset($log_functions[$sub_action]['file']))
-		{
-			// different file
-			require_once(ADMINDIR . '/' . $log_functions[$sub_action]['file']);
-		}
+		// Set up the action control
+		$action = new Action('manage_logs');
 
-		if (isset($log_functions[$sub_action]['controller']))
-		{
-			// if we have an object oriented controller, call its method
-			$controller = new $log_functions[$sub_action]['controller']();
-			$controller->{$log_functions[$sub_action]['function']}();
-		}
-		elseif (isset($log_functions[$sub_action]['function']))
-		{
-			// procedural: call the function
-			$log_functions[$sub_action]['function']();
-		}
-		else
-		{
-			// our own method then
+		// By default do the basic settings, call integrate_sa_manage_logs
+		$subAction = $action->initialize($subActions, 'errorlog');
 
-			// initialize the form
-			$this->{$log_functions[$sub_action]['init']}();
-
-			// call the action handler
-			// this is hardcoded now, to be fixed
-			$this->{$log_functions[$sub_action]['display']}();
-		}
+		// Call the right function for this sub-action.
+		$action->dispatch($subAction);
 	}
 
 	/**
 	 * Allow to edit the settings on the pruning screen.
 	 *
-	 * Uses the _pruningSettings form.
+	 * @event integrate_prune_settings add additonal settings to the auto pruning display.  If you add any
+	 * additional logs make sure to add them at the end.  Additionally, make sure you add them to the
+	 * weekly scheduled task.
+	 * @uses _pruningSettings form.
 	 */
 	public function action_pruningSettings_display()
 	{
@@ -167,12 +129,16 @@ class AdminLog_Controller extends Action_Controller
 
 		$context['page_title'] = $txt['pruning_title'];
 
-		$config_vars = $this->_pruningSettings->settings();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+
+		// Initialize settings
+		$config_vars = $this->_settings();
+		$settingsForm->setConfigVars($config_vars);
 
 		call_integration_hook('integrate_prune_settings');
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
@@ -180,7 +146,7 @@ class AdminLog_Controller extends Action_Controller
 				array('text', 'pruningOptions')
 			);
 
-			if (!empty($_POST['pruningOptions']))
+			if (!empty($this->_req->post->pruningOptions))
 			{
 				$vals = array();
 				foreach ($config_vars as $index => $dummy)
@@ -188,14 +154,16 @@ class AdminLog_Controller extends Action_Controller
 					if (!is_array($dummy) || $index == 'pruningOptions')
 						continue;
 
-					$vals[] = empty($_POST[$dummy[1]]) || $_POST[$dummy[1]] < 0 ? 0 : (int) $_POST[$dummy[1]];
+					$vals[] = empty($this->_req->post->{$dummy[1]}) || $this->_req->post->{$dummy[1]} < 0 ? 0 : $this->_req->getPost($dummy[1], 'intval');
 				}
 				$_POST['pruningOptions'] = implode(',', $vals);
 			}
 			else
 				$_POST['pruningOptions'] = '';
 
-			Settings_Form::save_db($savevar);
+			$settingsForm->setConfigVars($savevar);
+			$settingsForm->setConfigValues((array) $_POST);
+			$settingsForm->save();
 			redirectexit('action=admin;area=logs;sa=pruning');
 		}
 
@@ -205,25 +173,11 @@ class AdminLog_Controller extends Action_Controller
 
 		// Get the actual values
 		if (!empty($modSettings['pruningOptions']))
-			@list ($modSettings['pruneErrorLog'], $modSettings['pruneModLog'], $modSettings['pruneBanLog'], $modSettings['pruneReportLog'], $modSettings['pruneScheduledTaskLog'], $modSettings['pruneBadbehaviorLog'], $modSettings['pruneSpiderHitLog']) = explode(',', $modSettings['pruningOptions']);
+			list ($modSettings['pruneErrorLog'], $modSettings['pruneModLog'], $modSettings['pruneBanLog'], $modSettings['pruneReportLog'], $modSettings['pruneScheduledTaskLog'], $modSettings['pruneBadbehaviorLog'], $modSettings['pruneSpiderHitLog']) = array_pad(explode(',', $modSettings['pruningOptions']), 7, 0);
 		else
 			$modSettings['pruneErrorLog'] = $modSettings['pruneModLog'] = $modSettings['pruneBanLog'] = $modSettings['pruneReportLog'] = $modSettings['pruneScheduledTaskLog'] = $modSettings['pruneBadbehaviorLog'] = $modSettings['pruneSpiderHitLog'] = 0;
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initializes the _pruningSettings form.
-	 */
-	private function _initPruningSettingsForm()
-	{
-		// instantiate the form
-		$this->_pruningSettings = new Settings_Form();
-
-		// Initialize settings
-		$config_vars = $this->_settings();
-
-		return $this->_pruningSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**

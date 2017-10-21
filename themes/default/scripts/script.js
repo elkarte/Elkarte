@@ -1,16 +1,16 @@
-/**
+/*!
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.5
- *
+ * @version 1.1
+ */
+
+/**
  * This file contains javascript utility functions
  */
 
@@ -42,8 +42,9 @@ if (!('getElementsByClassName' in document))
 /**
  * Load an XML document using XMLHttpRequest.
  *
+ * @callback xmlCallback
  * @param {string} sUrl
- * @param {string} funcCallback
+ * @param {function} funcCallback
  */
 function getXMLDocument(sUrl, funcCallback)
 {
@@ -105,68 +106,9 @@ function sendXMLDocument(sUrl, sContent, funcCallback)
 
 /**
  * All of our specialized string handling functions are defined here
- * php_to8bit, php_strtr, php_strtolower, php_urlencode, php_htmlspecialchars
+ * php_strtr, php_strtolower, php_urlencode, php_htmlspecialchars
  * php_unhtmlspecialchars, php_addslashes, removeEntities, easyReplace
  */
-
-/**
- * Convert a UTF8 string to an 8 bit representation
- *
- * - Simulate php utf8_encode function
- * - Surrogate handling leveraged from php.js which is licensed under the MIT licenses.
- */
-String.prototype.php_to8bit = function () {
-	var sReturn = '',
-		iStart = 0,
-		iEnd = 0,
-		iTextLen = this.length;
-
-	for (var i = 0; i < iTextLen; i++)
-	{
-		// Character code (UTF 16)
-		var cc = this.charCodeAt(i),
-			sUtf8enc = null;
-
-		// Simple Ascii
-		if (cc < 128)
-			iEnd++;
-		// Simple two Byte
-		else if (cc < 2048)
-			sUtf8enc = String.fromCharCode((192 | cc >> 6), (128 | cc & 63));
-		// Simple three Byte if not a surrogate pair
-		else if ((cc & 0xF800) !== 0xD800)
-			sUtf8enc = String.fromCharCode((224 | cc >> 12), (128 | cc >> 6 & 63), (128 | cc & 63));
-		else
-		{
-			// Character code for the next Byte
-			var cc2 = this.charCodeAt(++i);
-
-			// Valid surrogate pairs must have matched lead and trail
-			if ((cc & 0xFC00) !== 0xD800 || (cc2 & 0xFC00) !== 0xDC00)
-				sUtf8enc = String.fromCharCode((224 | 65533 >> 12), (128 | 65533 >> 6 & 63), (128 | 65533 & 63));
-			else
-			{
-				cc = ((cc & 0x3FF) << 10) + (cc2 & 0x3FF) + 0x10000;
-				sUtf8enc = String.fromCharCode(240 | cc >> 18, (128 | cc >> 12 & 63), (128 | cc >> 6 & 63), (128 | cc & 63));
-			}
-		}
-
-		// Had to encode the character?
-		if (sUtf8enc !== null)
-		{
-			if (iEnd > iStart)
-				sReturn += this.slice(iStart, iEnd);
-
-			sReturn += sUtf8enc;
-			iStart = iEnd = i + 1;
-		}
-	}
-
-	if (iEnd > iStart)
-		sReturn += this.slice(iStart, iTextLen);
-
-	return sReturn;
-};
 
 /**
  * Character-level replacement function.
@@ -197,7 +139,7 @@ String.prototype.php_strtolower = function ()
  */
 String.prototype.php_urlencode = function()
 {
-	return escape(this).replace(/\+/g, '%2b').replace('*', '%2a').replace('/', '%2f').replace('@', '%40');
+	return encodeURIComponent(this).replace(/!/g, '%21').replace(/'/g, '%27').replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/\*/g, '%2A').replace(/%20/g, '+');
 };
 
 /**
@@ -249,8 +191,10 @@ String.prototype.easyReplace = function (oReplacements)
 {
 	var sResult = this;
 
-	for (var sSearch in oReplacements)
+	for (var sSearch in oReplacements) {
+		sSearch = sSearch.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 		sResult = sResult.replace(new RegExp('%' + sSearch + '%', 'g'), oReplacements[sSearch]);
+	}
 
 	return sResult;
 };
@@ -258,8 +202,8 @@ String.prototype.easyReplace = function (oReplacements)
 /**
  * Simulate php str_repeat function
  *
- * @param {type} sString
- * @param {type} iTime
+ * @param {string} sString
+ * @param {int} iTime
  */
 function php_str_repeat(sString, iTime)
 {
@@ -298,15 +242,15 @@ function reqWin(desktopURL, alternateWidth, alternateHeight, noScrollbars)
  * Open a overlay div on the screen
  *
  * @param {string} desktopURL
- * @param {string} sHeader
- * @param {string} sIcon
+ * @param {string} [sHeader]
+ * @param {string} [sIcon]
  */
 function reqOverlayDiv(desktopURL, sHeader, sIcon)
 {
 	// Set up our div details
-	var sAjax_indicator = '<div class="centertext"><i class="fa fa-spinner fa-spin fa-2x"></i></div>';
+	var sAjax_indicator = '<div class="centertext"><i class="icon icon-spin icon-big i-spinner"></i></div>';
 
-	sIcon = elk_images_url + '/' + (typeof(sIcon) === 'string' ? sIcon : 'helptopics.png');
+	sIcon = typeof(sIcon) === 'string' ? sIcon : 'i-help';
 	sHeader = typeof(sHeader) === 'string' ? sHeader : help_popup_heading_text;
 
 	// Create the div that we are going to load
@@ -346,18 +290,23 @@ function smc_Popup(oOptions)
 // Show the popup div & prepare the close events
 smc_Popup.prototype.show = function ()
 {
-	var popup_class = 'popup_window ' + (this.opt.custom_class ? this.opt.custom_class : 'description');
-	var icon = this.opt.icon ? '<img src="' + this.opt.icon + '" class="icon" alt="" /> ' : '';
+	var popup_class = 'popup_window ' + (this.opt.custom_class ? this.opt.custom_class : 'content'),
+		icon = this.opt.icon ? '<i class="icon ' + this.opt.icon + ' icon-top"></i> ' : '';
+
+	// Todo: opt.icon should be a string referencing the desired icon. Will require changing all callers.
 
 	// Create the div that will be shown - max-height added here - essential anyway,
 	// so better here than in the CSS.
 	// Mind you, I still haven't figured out why it should be essential. Cargo cult coding FTW. :P
 	// Create the div that will be shown
-	$('body').append('<div id="' + this.popup_id + '" class="popup_container"><div class="' + popup_class + '" style="max-height: none;"><h3 class="popup_heading"><a href="javascript:void(0);" class="hide_popup" title="Close"></a>' + icon + this.opt.heading + '</h3><div class="popup_content">' + this.opt.content + '</div></div></div>');
+	$('body').append('<div id="' + this.popup_id + '" class="popup_container"><div class="' + popup_class + '" style="max-height: none;"><h3 class="popup_heading"><a href="javascript:void(0);" class="hide_popup icon i-close" title="Close"></a>' + icon + this.opt.heading + '</h3><div class="popup_content">' + this.opt.content + '</div></div></div>');
 
 	// Show it
 	this.popup_body = $('#' + this.popup_id).children('.popup_window');
 	this.popup_body.parent().fadeIn(300);
+
+	// Let the css know its now available
+	this.popup_body.addClass("in");
 
 	// Trigger hide on escape or mouse click
 	var popup_instance = this;
@@ -370,7 +319,7 @@ smc_Popup.prototype.show = function ()
 			popup_instance.hide();
 	});
 
-	$('#' + this.popup_id).find('.hide_popup').click(function (){ return popup_instance.hide(); });
+	$('#' + this.popup_id).find('.hide_popup').on('click', function (){ return popup_instance.hide(); });
 
 	return false;
 };
@@ -443,10 +392,7 @@ function isEmptyText(theField)
 	while (theValue.length > 0 && (theValue.charAt(theValue.length - 1) === ' ' || theValue.charAt(theValue.length - 1) === '\t'))
 		theValue = theValue.substring(0, theValue.length - 1);
 
-	if (theValue === '')
-		return true;
-	else
-		return false;
+	return theValue === '';
 }
 
 // Only allow form submission ONCE.
@@ -487,8 +433,8 @@ function getInnerHTML(oElement)
 /**
  * Set the "outer" HTML of an element.
  *
- * @param {type} oElement
- * @param {type} sToValue
+ * @param {HTMLElement} oElement
+ * @param {string} sToValue
  */
 function setOuterHTML(oElement, sToValue)
 {
@@ -506,7 +452,7 @@ function setOuterHTML(oElement, sToValue)
  * Checks for variable in theArray, returns true or false
  *
  * @param {string} variable
- * @param {array} theArray
+ * @param {string[]} theArray
  */
 function in_array(variable, theArray)
 {
@@ -521,7 +467,7 @@ function in_array(variable, theArray)
  * Checks for variable in theArray and returns the array key
  *
  * @param {string} variable
- * @param {array} theArray
+ * @param {Array.} theArray
  */
 function array_search(variable, theArray)
 {
@@ -535,7 +481,7 @@ function array_search(variable, theArray)
 /**
  * Find a specific radio button in its group and select it.
  *
- * @param {type} oRadioGroup
+ * @param {HTMLInputElement} oRadioGroup
  * @param {type} sName
  */
 function selectRadioByName(oRadioGroup, sName)
@@ -550,6 +496,14 @@ function selectRadioByName(oRadioGroup, sName)
 	return false;
 }
 
+/**
+ * Selects all the form objects with a single click
+ *
+ * @param {object} oInvertCheckbox
+ * @param {object} oForm
+ * @param {string} sMask
+ * @param {string} sValue
+ */
 function selectAllRadio(oInvertCheckbox, oForm, sMask, sValue)
 {
 	for (var i = 0; i < oForm.length; i++)
@@ -560,10 +514,10 @@ function selectAllRadio(oInvertCheckbox, oForm, sMask, sValue)
 /**
  * Invert all check boxes at once by clicking a single checkbox.
  *
- * @param {type} oInvertCheckbox
- * @param {type} oForm
- * @param {type} sMask
- * @param {type} bIgnoreDisabled
+ * @param {object} oInvertCheckbox
+ * @param {HTMLFormElement} oForm
+ * @param {string} [sMask]
+ * @param {boolean} [bIgnoreDisabled]
  */
 function invertAll(oInvertCheckbox, oForm, sMask, bIgnoreDisabled)
 {
@@ -580,7 +534,6 @@ function invertAll(oInvertCheckbox, oForm, sMask, bIgnoreDisabled)
 /**
  * Keep the session alive - always!
  */
-var lastKeepAliveCheck = new Date().getTime();
 function elk_sessionKeepAlive()
 {
 	var curTime = new Date().getTime();
@@ -602,8 +555,8 @@ window.setTimeout(function() {elk_sessionKeepAlive();}, 1200000);
  *
  * @param {string} option name being set
  * @param {string} value of the option
- * @param {string} theme its being set or null for all
- * @param {string} additional_vars to use in the url request that will be sent
+ * @param {string|null} theme its being set or null for all
+ * @param {string|null} additional_vars to use in the url request that will be sent
  */
 function elk_setThemeOption(option, value, theme, additional_vars)
 {
@@ -623,7 +576,7 @@ function elk_setThemeOption(option, value, theme, additional_vars)
  */
 function hashLoginPassword(doForm, cur_session_id, token)
 {
-	// Don't have our hash lib availalbe?
+	// Don't have our hash lib available?
 	if (typeof(hex_sha256) === 'undefined')
 		return;
 
@@ -683,11 +636,11 @@ function hashModeratePassword(doForm, username, cur_session_id, token)
  * Shows the page numbers by clicking the dots (in compact view).
  * @todo @DEPRECATED it is not used. If we don't care about compatibility it can be removed
  *
- * @param {type} spanNode
- * @param {type} baseURL
- * @param {type} firstPage
- * @param {type} lastPage
- * @param {type} perPage
+ * @param {HTMLElement} spanNode
+ * @param {string} baseURL
+ * @param {int} firstPage
+ * @param {int} lastPage
+ * @param {int} perPage
  */
 function expandPages(spanNode, baseURL, firstPage, lastPage, perPage)
 {
@@ -821,8 +774,8 @@ elk_Toggle.prototype.init = function()
 			if (typeof(oImage) === 'object' && oImage !== null)
 			{
 				// Display the image in case it was hidden.
-				if (oImage.style.display === 'none')
-					oImage.style.display = '';
+				if (getComputedStyle(oImage).getPropertyValue("display") === 'none')
+					oImage.style.display = 'inline';
 
 				oImage.instanceRef = this;
 				oImage.onclick = function () {this.instanceRef.toggle();this.blur();};
@@ -842,10 +795,11 @@ elk_Toggle.prototype.init = function()
 			if (typeof(oContainer) === 'object' && oContainer !== null)
 			{
 				// Display the image in case it was hidden.
-				if (oContainer.style.display === 'none')
-					oContainer.style.display = '';
+				if (getComputedStyle(oContainer).getPropertyValue("display") === 'none')
+					oContainer.style.display = 'block';
 
 				oContainer.instanceRef = this;
+
 				oContainer.onclick = function () {
 					this.instanceRef.toggle();
 					this.blur();
@@ -864,8 +818,8 @@ elk_Toggle.prototype.init = function()
 			if (typeof(oLink) === 'object' && oLink !== null)
 			{
 				// Display the link in case it was hidden.
-				if (oLink.style.display === 'none')
-					oLink.style.display = '';
+				if (getComputedStyle(oLink).getPropertyValue("display") === 'none')
+					oLink.style.display = 'inline-block';
 
 				oLink.instanceRef = this;
 				oLink.onclick = function () {
@@ -878,7 +832,12 @@ elk_Toggle.prototype.init = function()
 	}
 };
 
-// Collapse or expand the section.
+/**
+ * Collapse or expand the section.
+ *
+ * @param {boolean} bCollapse
+ * @param {boolean} [bInit]
+ */
 elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 {
 	var i = 0,
@@ -886,7 +845,7 @@ elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 		oContainer;
 
 	// Default bInit to false.
-	bInit = typeof(bInit) === 'undefined' ? false : true;
+	bInit = typeof(bInit) !== 'undefined';
 
 	// Handle custom function hook before collapse.
 	if (!bInit && bCollapse && 'funcOnBeforeCollapse' in this.opt)
@@ -987,7 +946,7 @@ elk_Toggle.prototype.toggle = function()
 /**
  * Creates and shows or hides the sites ajax in progress indicator
  *
- * @param {type} turn_on
+ * @param {boolean} turn_on
  * @returns {undefined}
  */
 function ajax_indicator(turn_on)
@@ -1047,7 +1006,7 @@ function create_ajax_indicator_ele()
  * Creates and event listener object for a given object
  * Object events can then be added with addEventListener
  *
- * @param {type} oTarget
+ * @param {HTMLElement} oTarget
  */
 function createEventListener(oTarget)
 {
@@ -1079,8 +1038,6 @@ function createEventListener(oTarget)
 
 /**
  * This function will retrieve the contents needed for the jump to boxes.
- *
- * @param {type} elem
  */
 function grabJumpToContent() {
 	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=jumpto;xml', onJumpReceived);
@@ -1091,7 +1048,7 @@ function grabJumpToContent() {
 /**
  * Callback function for loading the jumpto box
  *
- * @param {object} XMLDoc
+ * @param {object} oXMLDoc
  */
 function onJumpReceived(oXMLDoc) {
 	var aBoardsAndCategories = [],
@@ -1167,7 +1124,7 @@ JumpTo.prototype.showSelect = function ()
 		sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
 
 	if (sChildLevelPrefix !== '')
-		sChildLevelPrefix = sChildLevelPrefix + this.opt.sBoardPrefix;
+		sChildLevelPrefix += this.opt.sBoardPrefix;
 
 	document.getElementById(this.opt.sContainerId).innerHTML = this.opt.sJumpToTemplate.replace(/%select_id%/, this.opt.sContainerId + '_select').replace(/%dropdown_list%/, '<select ' + (this.opt.bDisabled === true ? 'disabled="disabled" ' : '') + (this.opt.sClassName !== undefined ? 'class="' + this.opt.sClassName + '" ' : '') + 'name="' + (this.opt.sCustomName !== undefined ? this.opt.sCustomName : this.opt.sContainerId + '_select') + '" id="' + this.opt.sContainerId + '_select"><option value="' + (this.opt.bNoRedirect !== undefined && this.opt.bNoRedirect === true ? this.opt.iCurBoardId : '?board=' + this.opt.iCurBoardId + '.0') + '">' + sChildLevelPrefix + this.opt.sCurBoardName.removeEntities() + '</option></select>&nbsp;' + (this.opt.sGoButtonLabel !== undefined ? '<input type="button" class="button_submit" value="' + this.opt.sGoButtonLabel + '" onclick="window.location.href = \'' + elk_prepareScriptUrl(elk_scripturl) + 'board=' + this.opt.iCurBoardId + '.0\';" />' : ''));
 	this.dropdownList = document.getElementById(this.opt.sContainerId + '_select');
@@ -1208,32 +1165,25 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 				sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
 
 			if (sChildLevelPrefix !== '')
-				sChildLevelPrefix = sChildLevelPrefix + this.opt.sBoardPrefix;
+				sChildLevelPrefix += this.opt.sBoardPrefix;
 		}
 
 		oOption = document.createElement('option');
 		oText = document.createElement('span');
-		oText.innerHTML = (aBoardsAndCategories[i].isCategory ? this.opt.sCatPrefix : sChildLevelPrefix) + aBoardsAndCategories[i].name;
+		oText.innerHTML = sChildLevelPrefix + aBoardsAndCategories[i].name;
 
-		// Applying a category class to this option?
-		if (aBoardsAndCategories[i].isCategory && this.opt.sCatClass)
-			oOption.className = this.opt.sCatClass;
-
-		if (!aBoardsAndCategories[i].isCategory && aBoardsAndCategories[i].id === this.opt.iCurBoardId)
+		if (aBoardsAndCategories[i].id === this.opt.iCurBoardId)
 			oOption.selected = 'selected';
 
 		oOption.appendChild(oText);
 
 		if (!this.opt.bNoRedirect)
 		{
-			oOption.value = aBoardsAndCategories[i].isCategory ? '#c' + aBoardsAndCategories[i].id : '?board=' + aBoardsAndCategories[i].id + '.0';
+			oOption.value = '?board=' + aBoardsAndCategories[i].id + '.0';
 		}
 		else
 		{
-			if (aBoardsAndCategories[i].isCategory)
-				oOption.disabled = 'disabled';
-			else
-				oOption.value = aBoardsAndCategories[i].id;
+			oOption.value = aBoardsAndCategories[i].id;
 		}
 
 		oOptgroupFragment.appendChild(oOption);
@@ -1312,7 +1262,7 @@ IconList.prototype.initIcons = function ()
 {
 	for (var i = document.images.length - 1, iPrefixLength = this.opt.sIconIdPrefix.length; i >= 0; i--)
 		if (document.images[i].id.substr(0, iPrefixLength) === this.opt.sIconIdPrefix)
-			setOuterHTML(document.images[i], '<div title="' + this.opt.sLabelIconList + '" onclick="' + this.opt.sBackReference + '.openPopup(this, ' + document.images[i].id.substr(iPrefixLength) + ')" onmouseover="' + this.opt.sBackReference + '.onBoxHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onBoxHover(this, false)" style="background: ' + this.opt.sBoxBackground + '; cursor: pointer; padding: 0 2px; margin: 0 auto; vertical-align: top"><img src="' + document.images[i].src + '" alt="' + document.images[i].alt + '" id="' + document.images[i].id + '" style="vertical-align: top; margin: 0 auto; padding: ' + (is_ie ? '0 2px' : '0 2px') + ';" /></div>');
+			setOuterHTML(document.images[i], '<div title="' + this.opt.sLabelIconList + '" onclick="' + this.opt.sBackReference + '.openPopup(this, ' + document.images[i].id.substr(iPrefixLength) + ')" onmouseover="' + this.opt.sBackReference + '.onBoxHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onBoxHover(this, false)" style="background: ' + this.opt.sBoxBackground + '; cursor: pointer; padding: 2px; margin: 0 auto; vertical-align: top"><img src="' + document.images[i].src + '" alt="' + document.images[i].alt + '" id="' + document.images[i].id + '" style="vertical-align: top; margin: 0 auto; padding: 0 2px;" /></div>');
 };
 
 // Event for the mouse hovering over the original icon.
@@ -1561,47 +1511,32 @@ function elkSelectText(oCurElement, bActOnElement)
  * A function needed to discern HTML entities from non-western characters.
  *
  * @param {string} sFormName
- * @param {array} aElementNames
+ * @param {Array.} aElementNames
  * @param {string} sMask
  */
-function smc_saveEntities(sFormName, aElementNames, sMask)
-{
+function smc_saveEntities(sFormName, aElementNames, sMask) {
 	var i = 0,
 		n = 0;
 
-	if (typeof(sMask) === 'string')
-	{
-		for (i = 0, n = document.forms[sFormName].elements.length; i < n; i++)
-			if (document.forms[sFormName].elements[i].id.substr(0, sMask.length) == sMask)
+	if (typeof(sMask) === 'string') {
+		for (i = 0, n = document.forms[sFormName].elements.length; i < n; i++) {
+			if (document.forms[sFormName].elements[i].id.substr(0, sMask.length) === sMask) {
 				aElementNames[aElementNames.length] = document.forms[sFormName].elements[i].name;
+			}
+		}
 	}
 
-	for (i = 0, n = aElementNames.length; i < n; i++)
-	{
-		if (aElementNames[i] in document.forms[sFormName])
-			document.forms[sFormName][aElementNames[i]].value = document.forms[sFormName][aElementNames[i]].value.replace(/&#/g, '&#38;#');
-	}
-}
-
-/**
- * Make sure the window backgrounds (zebra stripes) are correct for lists.
- *
- * @param {type} oList
- */
-function applyWindowClasses(oList)
-{
-	var bAlternate = false;
-
-	oListItems = oList.getElementsByTagName("li");
-
-	for (var i = 0; i < oListItems.length; i++)
-	{
-		// Skip dummies.
-		if (oListItems[i].id === "")
-			continue;
-
-		oListItems[i].className = "windowbg" + (bAlternate ? "2" : "");
-		bAlternate = !bAlternate;
+	for (i = 0, n = aElementNames.length; i < n; i++) {
+		if (aElementNames[i] in document.forms[sFormName]) {
+			// Handle the editor.
+			if (typeof post_box_name !== 'undefined' && aElementNames[i] === post_box_name && $editor_data[post_box_name] !== undefined) {
+				document.forms[sFormName][aElementNames[i]].value = $editor_data[post_box_name].val().replace(/&#/g, '&#38;#');
+				$editor_data[post_box_name].val(document.forms[sFormName][aElementNames[i]].value);
+			}
+			else {
+				document.forms[sFormName][aElementNames[i]].value = document.forms[sFormName][aElementNames[i]].value.replace(/&#/g, '&#38;#');
+			}
+		}
 	}
 }
 
@@ -1629,7 +1564,7 @@ function pollOptions()
  * Generate the number of days in a given month for a given year
  * Used to populate the day pulldown in the calendar
  *
- * @param {type} offset
+ * @param {int} [offset] optional
  */
 function generateDays(offset)
 {
@@ -1684,7 +1619,7 @@ function initSearch()
  * Checks or unchecks the list of available boards
  *
  * @param {type} ids
- * @param {string} aFormID
+ * @param {string} aFormName
  * @param {string} sInputName
  */
 function selectBoards(ids, aFormName, sInputName)
@@ -1728,18 +1663,18 @@ function expandCollapse(id, icon, speed)
 	if (icon)
 		$('#' + icon).attr("src", elk_images_url + (oId.is(":hidden") !== true ? "/selected.png" : "/selected_open.png"));
 
-	// Open or collaspe the content id
+	// Open or collapse the content id
 	oId.slideToggle(speed);
 }
 
 /**
  * Highlight a selection box by adding the highlight2 class
  *
- * @param string container_id
+ * @param {string} container_id
  */
 function initHighlightSelection(container_id)
 {
-	$('#' + container_id + ' [name="def_language"]').click(function (ev) {
+	$('#' + container_id + ' [name="def_language"]').on('click', function (ev) {
 		$('#' + container_id + ' .standard_row').removeClass('highlight2');
 		$(this).parent().parent().addClass('highlight2');
 	});
@@ -1747,6 +1682,10 @@ function initHighlightSelection(container_id)
 
 /**
  * Auto submits a paused form, such as a maintenance task
+ *
+ * @param {int} countdown
+ * @param {string} txt_message
+ * @param {string} [formName=autoSubmit]
  */
 function doAutoSubmit(countdown, txt_message, formName)
 {

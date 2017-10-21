@@ -5,13 +5,11 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.7
+ * @version 1.1
  *
  */
 
@@ -26,8 +24,8 @@ function template_mlsearch_above()
 	<form id="mlsearch" action="' . $scripturl . '?action=memberlist;sa=search" method="post" accept-charset="UTF-8">
 		<ul class="floatright">
 			<li>
-				<input id="mlsearch_input" onfocus="toggle_mlsearch_opt();" type="text" name="search" value="' . $context['old_search_value'] . '" class="input_text" placeholder="' . $txt['search'] . '" />&nbsp;
-				<input type="submit" name="search2" value="' . $txt['search'] . '" class="button_submit" />
+				<input id="mlsearch_input" class="input_text" onfocus="toggle_mlsearch_opt();" type="text" name="search" value="' . $context['old_search_value'] . '" placeholder="' . $txt['mlist_search'] . '" />
+				<button type="submit" name="search2" class="with_select"><i class="icon i-search icon-shade"></i></button>
 				<ul id="mlsearch_options" class="nojs">';
 
 	foreach ($context['search_fields'] as $id => $title)
@@ -35,7 +33,7 @@ function template_mlsearch_above()
 		$extra .= '
 					<li class="mlsearch_option">
 						<label for="fields-' . $id . '">
-							<input type="checkbox" name="fields[]" id="fields-' . $id . '" value="' . $id . '" ' . (in_array($id, $context['search_defaults']) ? 'checked="checked"' : '') . ' class="input_check" />' . $title . '
+							<input type="checkbox" name="fields[]" id="fields-' . $id . '" value="' . $id . '" ' . (in_array($id, $context['search_defaults']) ? 'checked="checked"' : '') . ' />' . $title . '
 						</label>
 					</li>';
 	}
@@ -49,10 +47,10 @@ function template_mlsearch_above()
 	template_pagesection('memberlist_buttons', 'right', array('extra' => $extra));
 
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		// Removes the nojs class to properly style the dropdown according to js availability
 		$(\'#mlsearch_options\').removeClass(\'nojs\');
-	// ]]></script>';
+	</script>';
 }
 
 /**
@@ -60,7 +58,7 @@ function template_mlsearch_above()
  */
 function template_memberlist()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $txt;
 
 	echo '
 	<div id="memberlist">
@@ -83,12 +81,21 @@ function template_memberlist()
 	foreach ($context['columns'] as $key => $column)
 	{
 		$table_span += isset($column['colspan']) ? $column['colspan'] : 1;
+		switch ($key)
+		{
+			case 'posts':
+			case 'date_registered':
+				$sorticon = 'numeric';
+				break;
+			default:
+				$sorticon = 'alpha';
+		}
 
 		// This is a selected column, so underline it or some such.
 		if ($column['selected'])
 			echo '
 					<div class="' . $column['class'] . '">
-						<a href="' . $column['href'] . '" rel="nofollow">' . $column['label'] . '</a><img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />
+						<a href="' . $column['href'] . '">' . $column['label'] . '<i class="icon icon-small i-sort-' . $sorticon . '-' . $context['sort_direction'] . '"></i></a>
 					</div>';
 		// This is just some column... show the link and be done with it.
 		else
@@ -127,13 +134,11 @@ function template_memberlist()
 
 					if ($column == 'online')
 					{
-						echo '
-						', $context['can_send_pm'] ? '<a href="' . $member['online']['href'] . '" title="' . $member['online']['text'] . '">' : '', $settings['use_image_buttons'] ? '<img src="' . $member['online']['image_href'] . '" alt="' . $member['online']['text'] . '" />' : $member['online']['label'], $context['can_send_pm'] ? '</a>' : '';
+						echo template_member_online($member);
 					}
 					elseif ($column == 'email_address')
 					{
-						echo '
-					', $member['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $member['name'] . '" /></a>';
+						echo template_member_email($member);
 					}
 					else
 						echo '
@@ -175,10 +180,8 @@ function template_memberlist()
  */
 function template_mlsearch_below()
 {
-	global $context, $scripturl, $txt;
-
 	// Show the page numbers again. (makes 'em easier to find!)
-	template_pagesection(false, false);
+	template_pagesection();
 
 	echo '
 	</div>';

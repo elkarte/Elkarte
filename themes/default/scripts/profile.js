@@ -1,20 +1,20 @@
-/**
+/*!
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.6
- *
+ * @version 1.1
+ */
+
+/**
  * This file contains javascript associated with the user profile
  */
 
-$(document).ready(function() {
+$(function() {
 	// Profile options changing karma
 	$('#karma_good, #karma_bad').keyup(function() {
 		var good = parseInt($('#karma_good').val()),
@@ -22,7 +22,35 @@ $(document).ready(function() {
 
 		$('#karmaTotal').text((isNaN(good) ? 0 : good) - (isNaN(bad) ? 0 : bad));
 	});
+	$('.toggle_notify').change(function() {
+		if (this.checked)
+			$('#' + this.id + '_method').fadeIn('fast');
+		else
+			$('#' + this.id + '_method').fadeOut('fast');
+	}).change();
 });
+
+/**
+ * Profile tabs (summary, recent, buddy), for use with jqueryUI
+ */
+function start_tabs() {
+	$("#tabs").tabs({
+		// Called before tab content is loaded with href
+		beforeLoad: function (event, ui) {
+			// The ubiquitous ajax spinner
+			ui.panel.html('<div class="centertext"><i class="icon icon-spin icon-big i-spinner"></i></div>');
+
+			// Ajax call failed to retrieve content
+			ui.jqXHR.fail(function () {
+				ui.panel.html('<div></div>');
+				if ('console' in window) {
+					window.console.info(event);
+					window.console.info(ui);
+				}
+			});
+		}
+	});
+}
 
 /**
  * Function to detect the time offset and populate the offset box
@@ -78,12 +106,13 @@ function calcCharLeft()
 		else
 			document.getElementById("signatureLeft").className = "";
 
-		if (currentChars > maxLength && !$("#profile_error").is(":visible"))
+		var $_profile_error = $("#profile_error");
+		if (currentChars > maxLength && !$_profile_error.is(":visible"))
 			ajax_getSignaturePreview(false);
-		else if (currentChars <= maxLength && $("#profile_error").is(":visible"))
+		else if (currentChars <= maxLength && $_profile_error.is(":visible"))
 		{
-			$("#profile_error").css({display:"none"});
-			$("#profile_error").html('');
+			$_profile_error.css({display:"none"});
+			$_profile_error.html('');
 		}
 	}
 
@@ -106,24 +135,27 @@ function ajax_getSignaturePreview(showPreview)
 	})
 	.done(function(request) {
 		var i = 0;
+
 		if (showPreview)
 		{
-			var signatures = new Array("current", "preview");
+			var signatures = ["current", "preview"];
 			for (i = 0; i < signatures.length; i++)
 			{
-				$("#" + signatures[i] + "_signature").css({display:""});
-				$("#" + signatures[i] + "_signature_display").css({display:""}).html($(request).find('[type="' + signatures[i] + '"]').text() + '<hr />');
+				$("#" + signatures[i] + "_signature").css({display:"block"});
+				$("#" + signatures[i] + "_signature_display").css({display:"block"}).html($(request).find('[type="' + signatures[i] + '"]').text() + '<hr />');
 			}
 
-			$('.spoilerheader').click(function(){
+			$('.spoilerheader').on('click', function(){
 				$(this).next().children().slideToggle("fast");
 			});
 		}
 
+		var $_profile_error = $("#profile_error");
+
 		if ($(request).find("error").text() !== '')
 		{
-			if (!$("#profile_error").is(":visible"))
-				$("#profile_error").css({display: "", position: "fixed", top: 0, left: 0, width: "100%", 'z-index': '100'});
+			if (!$_profile_error.is(":visible"))
+				$_profile_error.css({display: "", position: "fixed", top: 0, left: 0, width: "100%", 'z-index': '100'});
 
 			var errors = $(request).find('[type="error"]'),
 				errors_html = '<span>' + $(request).find('[type="errors_occurred"]').text() + '</span><ul>';
@@ -136,9 +168,10 @@ function ajax_getSignaturePreview(showPreview)
 		}
 		else
 		{
-			$("#profile_error").css({display:"none"});
-			$("#profile_error").html('');
+			$_profile_error.css({display:"none"});
+			$_profile_error.html('');
 		}
+
 		return false;
 	});
 
@@ -163,7 +196,7 @@ function changeSel(selected)
 		file.style.display = "inline";
 		file.disabled = false;
 
-		for (i = file.length; i >= 0; i = i - 1)
+		for (i = file.length; i >= 0; i -= 1)
 			file.options[i] = null;
 
 		for (i = 0; i < files.length; i++)
@@ -216,11 +249,11 @@ function init_avatars()
 // Show the right avatar based on what radio button they just selected
 function swap_avatar()
 {
-	$('#avatar_choices input').each(function() {
+	$('#avatar_choices').find('input').each(function() {
 		var choice_id = $(this).attr('id');
 
 		if ($(this).is(':checked'))
-			$('#' + choice_id.replace('_choice', '')).css({display: ''});
+			$('#' + choice_id.replace('_choice', '')).css({display: 'block'});
 		else
 			$('#' + choice_id.replace('_choice', '')).css({display: 'none'});
 	});
@@ -236,7 +269,7 @@ function showAvatar()
 	if (file.selectedIndex === -1)
 		return;
 
-	oAvatar = document.getElementById("avatar");
+	var oAvatar = document.getElementById("avatar");
 
 	oAvatar.src = avatardir + file.options[file.selectedIndex].value;
 	oAvatar.alt = file.options[file.selectedIndex].text;
@@ -257,7 +290,7 @@ function previewExternalAvatar(src)
 	oSid.src = src;
 
 	// Create an in-memory element to measure the real size of the image
-	$('<img />').load(function() {
+	$('<img />').on('load', function() {
 		if (refuse_too_large && ((maxWidth !== 0 && this.width > maxWidth) || (maxHeight !== 0 && this.height > maxHeight)))
 			$('#avatar_external').addClass('error');
 		else
@@ -266,7 +299,7 @@ function previewExternalAvatar(src)
 }
 
 /**
- * Disable notification boxes as required.  This is in response to slecting the
+ * Disable notification boxes as required.  This is in response to selecting the
  * notify user checkbox in the issue a warning screen
  */
 function modifyWarnNotify()
@@ -276,10 +309,10 @@ function modifyWarnNotify()
 	document.getElementById('warn_sub').disabled = disable;
 	document.getElementById('warn_body').disabled = disable;
 	document.getElementById('warn_temp').disabled = disable;
-	document.getElementById('new_template_link').style.display = disable ? 'none' : '';
-	document.getElementById('preview_button').style.display = disable ? 'none' : '';
+	document.getElementById('new_template_link').style.display = disable ? 'none' : 'inline-block';
+	document.getElementById('preview_button').style.display = disable ? 'none' : 'inline-block';
 
-	$("#preview_button").click(function() {
+	$("#preview_button").on('click', function() {
 		$.ajax({
 			type: "POST",
 			url: elk_scripturl + "?action=xmlpreview;xml",
@@ -292,46 +325,57 @@ function modifyWarnNotify()
 			context: document.body
 		})
 		.done(function(request) {
-			$("#box_preview").show();
-			$("#body_preview").html($(request).find('body').text());
+			var $_preview = $("#box_preview"),
+				$_profile_error = $("#profile_error");
+
+			$_preview.show();
+			$_preview.html($(request).find('body').text());
 
 			if ($(request).find("error").text() !== '')
 			{
-				$("#profile_error").show();
-				var errors_html = '<span>' + $("#profile_error").find("span").html() + '</span>' + '<ul class="list_errors">';
-				var errors = $(request).find('error').each(function() {
+				$_profile_error.show();
+				var errors_html = '<span>' + $_profile_error.find("span").html() + '</span>' + '<ul class="list_errors">';
+
+				$(request).find('error').each(function() {
 					errors_html += '<li>' + $(this).text() + '</li>';
 				});
 				errors_html += '</ul>';
-
-				$("#profile_error").html(errors_html);
+				$_profile_error.html(errors_html);
+				$('html, body').animate({ scrollTop: $_profile_error.offset().top }, 'slow');
 			}
 			else
 			{
-				$("#profile_error").hide();
+				$_profile_error.hide();
 				$("#error_list").html('');
+				$('html, body').animate({ scrollTop: $("#box_preview").offset().top }, 'slow');
 			}
 
 			return false;
 		});
+
 		return false;
 	});
 }
 
 /**
- * onclick function, triggerd in response to slecting + or - in the warning screen
+ * onclick function, triggered in response to selecting + or - in the warning screen
  * Increases the warning level by a defined amount
  *
- * @param {int} amount
+ * @param {string} sliderID
+ * @param {string} levelID
+ * @param {int[]} levels
  */
 function initWarnSlider(sliderID, levelID, levels)
 {
-	$("#" + sliderID).slider({
+	var $_levelID = $("#" + levelID),
+		$_sliderID = $("#" + sliderID);
+
+	$_sliderID.slider({
 		range: "min",
 		min: 0,
 		max: 100,
 		slide: function(event, ui) {
-			$("#" + levelID).val(ui.value);
+			$_levelID .val(ui.value);
 
 			$(this).removeClass("watched moderated muted");
 
@@ -343,7 +387,7 @@ function initWarnSlider(sliderID, levelID, levels)
 				$(this).addClass("watched");
 		},
 		change: function(event, ui) {
-			$("#" + levelID).val(ui.value);
+			$_levelID .val(ui.value);
 
 			$(this).removeClass("watched moderated muted");
 
@@ -354,13 +398,13 @@ function initWarnSlider(sliderID, levelID, levels)
 			else if (ui.value >= levels[1])
 				$(this).addClass("watched");
 		}
-	}).slider("value", $("#" + levelID).val());
+	}).slider("value", $_levelID .val());
 
 	// Just in case someone wants to type, let's keep the two in synch
-	$("#" + levelID).keyup(function() {
+	$_levelID .keyup(function() {
 		var val = Math.max(0, Math.min(100, $(this).val()));
 
-		$("#" + sliderID).slider("value", val);
+		$_sliderID.slider("value", val);
 	});
 }
 

@@ -8,18 +8,15 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.5
+ * @version 1.1
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
+use ElkArte\Errors\ErrorContext;
 
 /**
  * ManageRegistration admin controller: handles the registration pages
@@ -34,18 +31,13 @@ if (!defined('ELK'))
 class ManageRegistration_Controller extends Action_Controller
 {
 	/**
-	 * Registration settings form
-	 * @var Settings_Form
-	 */
-	protected $_registerSettings;
-
-	/**
-	 * Entrance point for the registration center, it checks permisions and forwards
+	 * Entrance point for the registration center, it checks permissions and forwards
 	 * to the right method based on the subaction.
 	 *
 	 * - Accessed by ?action=admin;area=regcenter.
 	 * - Requires either the moderate_forum or the admin_forum permission.
 	 *
+	 * @event integrate_sa_manage_registrations add new registration sub actions
 	 * @uses Login language file
 	 * @uses Register template.
 	 * @see Action_Controller::action_index()
@@ -63,19 +55,23 @@ class ManageRegistration_Controller extends Action_Controller
 			'register' => array(
 				'controller' => $this,
 				'function' => 'action_register',
-				'permission' => 'moderate_forum'),
+				'permission' => 'moderate_forum',
+			),
 			'agreement' => array(
 				'controller' => $this,
 				'function' => 'action_agreement',
-				'permission' => 'admin_forum'),
+				'permission' => 'admin_forum',
+			),
 			'reservednames' => array(
 				'controller' => $this,
 				'function' => 'action_reservednames',
-				'permission' => 'admin_forum'),
+				'permission' => 'admin_forum',
+			),
 			'settings' => array(
 				'controller' => $this,
 				'function' => 'action_registerSettings_display',
-				'permission' => 'admin_forum'),
+				'permission' => 'admin_forum',
+			),
 		);
 
 		// Action controller
@@ -126,46 +122,63 @@ class ManageRegistration_Controller extends Action_Controller
 	{
 		global $txt, $context, $scripturl, $user_info;
 
-		if (!empty($_POST['regSubmit']))
+		if (!empty($this->_req->post->regSubmit))
 		{
 			checkSession();
 			validateToken('admin-regc');
 
-			foreach ($_POST as $key => $dummy)
-				if (!is_array($_POST[$key]))
-					$_POST[$key] = htmltrim__recursive(str_replace(array("\n", "\r"), '', $_POST[$key]));
+			// @todo move this to a filter/sanitation class
+			foreach ($this->_req->post as $key => $value)
+				if (!is_array($value))
+					$this->_req->post[$key] = htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
+
+			// Generate a password
+			if (empty($this->_req->post->password) || !is_string($this->_req->post->password) || trim($this->_req->post->password) === '')
+			{
+				$tokenizer = new Token_Hash();
+				$password = $tokenizer->generate_hash(14);
+			}
+			else
+			{
+				$password = $this->_req->post->password;
+			}
 
 			$regOptions = array(
 				'interface' => 'admin',
-				'username' => $_POST['user'],
-				'email' => $_POST['email'],
-				'password' => $_POST['password'],
-				'password_check' => $_POST['password'],
+				'username' => $this->_req->post->user,
+				'email' => $this->_req->post->email,
+				'password' => $password,
+				'password_check' => $password,
 				'check_reserved_name' => true,
 				'check_password_strength' => true,
 				'check_email_ban' => false,
-				'send_welcome_email' => isset($_POST['emailPassword']) || empty($_POST['password']),
-				'require' => isset($_POST['emailActivate']) ? 'activation' : 'nothing',
-				'memberGroup' => empty($_POST['group']) || !allowedTo('manage_membergroups') ? 0 : (int) $_POST['group'],
+				'send_welcome_email' => isset($this->_req->post->emailPassword),
+				'require' => isset($this->_req->post->emailActivate) ? 'activation' : 'nothing',
+				'memberGroup' => empty($this->_req->post->group) || !allowedTo('manage_membergroups') ? 0 : (int) $this->_req->post->group,
+				'ip' => '127.0.0.1',
+				'ip2' => '127.0.0.1',
+				'auth_method' => 'password',
 			);
 
 			require_once(SUBSDIR . '/Members.subs.php');
-			$reg_errors = Error_Context::context('register', 0);
+			$reg_errors = ErrorContext::context('register', 0);
 			$memberID = registerMember($regOptions, 'register');
 
 			// If there are "important" errors and you are not an admin: log the first error
 			// Otherwise grab all of them and don't log anything
 			$error_severity = $reg_errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
 			foreach ($reg_errors->prepareErrors($error_severity) as $error)
-				fatal_error($error, $error_severity === null ? false : 'general');
+			{
+				throw new Elk_Exception($error, $error_severity === null ? false : 'general');
+			}
 
 			if (!empty($memberID))
 			{
 				$context['new_member'] = array(
 					'id' => $memberID,
-					'name' => $_POST['user'],
+					'name' => $this->_req->post->user,
 					'href' => $scripturl . '?action=profile;u=' . $memberID,
-					'link' => '<a href="' . $scripturl . '?action=profile;u=' . $memberID . '">' . $_POST['user'] . '</a>',
+					'link' => '<a href="' . $scripturl . '?action=profile;u=' . $memberID . '">' . $this->_req->post->user . '</a>',
 				);
 				$context['registration_done'] = sprintf($txt['admin_register_done'], $context['new_member']['link']);
 			}
@@ -176,22 +189,41 @@ class ManageRegistration_Controller extends Action_Controller
 		{
 			require_once(SUBSDIR . '/Membergroups.subs.php');
 			if (allowedTo('admin_forum'))
+			{
 				$includes = array('admin', 'globalmod', 'member');
+			}
 			else
+			{
 				$includes = array('globalmod', 'member', 'custom');
+			}
 
 			$groups = array();
 			$membergroups = getBasicMembergroupData($includes, array('hidden', 'protected'));
 			foreach ($membergroups as $membergroup)
+			{
 				$groups[$membergroup['id']] = $membergroup['name'];
+			}
 
 			$context['member_groups'] = $groups;
 		}
 		else
+		{
 			$context['member_groups'] = array();
+		}
 
 		// Basic stuff.
-		addInlineJavascript('disableAutoComplete();', true);
+		loadJavascriptFile('mailcheck.min.js');
+		addInlineJavascript('disableAutoComplete();
+		$("input[type=email]").on("blur", function(event) {
+			$(this).mailcheck({
+				suggested: function(element, suggestion) {
+				  	$("#suggestion").html("' . $txt['register_did_you'] . ' <b><i>" + suggestion.full + "</b></i>");
+				},
+				empty: function(element) {
+				  	$("#suggestion").html("");
+				}
+			});
+		});', true);
 		$context['sub_template'] = 'admin_register';
 		$context['page_title'] = $txt['registration_center'];
 		createToken('admin-regc');
@@ -228,28 +260,33 @@ class ManageRegistration_Controller extends Action_Controller
 		{
 			if (file_exists(BOARDDIR . '/agreement.' . $lang['filename'] . '.txt'))
 			{
-				$context['editable_agreements']['.' . $lang['filename']] = $lang['name'];
+				$context['editable_agreements'][$lang['filename']] = $lang['name'];
+
 				// Are we editing this?
-				if (isset($_POST['agree_lang']) && $_POST['agree_lang'] == '.' . $lang['filename'])
-					$context['current_agreement'] = '.' . $lang['filename'];
+				if (isset($this->_req->post->agree_lang) && $this->_req->post->agree_lang === $lang['filename'])
+				{
+					$context['current_agreement'] = $lang['filename'];
+					break;
+				}
 			}
 		}
 
-		if (isset($_POST['save']) && isset($_POST['agreement']))
+		$agreement = new \Agreement($context['current_agreement']);
+
+		if (isset($this->_req->post->save) && isset($this->_req->post->agreement))
 		{
 			checkSession();
 			validateToken('admin-rega');
 
 			// Off it goes to the agreement file.
-			$fp = fopen(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt', 'w');
-			fwrite($fp, str_replace("\r", '', $_POST['agreement']));
-			fclose($fp);
+			$agreement->save($this->_req->post->agreement);
 
-			updateSettings(array('requireAgreement' => !empty($_POST['requireAgreement']), 'checkboxAgreement' => !empty($_POST['checkboxAgreement'])));
+			updateSettings(array('requireAgreement' => !empty($this->_req->post->requireAgreement), 'checkboxAgreement' => !empty($this->_req->post->checkboxAgreement)));
 		}
 
-		$context['agreement'] = file_exists(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt') ? htmlspecialchars(file_get_contents(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt'), ENT_COMPAT, 'UTF-8') : '';
-		$context['warning'] = is_writable(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt') ? '' : $txt['agreement_not_writable'];
+		$context['agreement'] = Util::htmlspecialchars($agreement->getPlainText(false));
+
+		$context['warning'] = $agreement->isWritable() ? '' : $txt['agreement_not_writable'];
 		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
 		$context['checkbox_agreement'] = !empty($modSettings['checkboxAgreement']);
 
@@ -271,18 +308,18 @@ class ManageRegistration_Controller extends Action_Controller
 		global $txt, $context, $modSettings;
 
 		// Submitting new reserved words.
-		if (!empty($_POST['save_reserved_names']))
+		if (!empty($this->_req->post->save_reserved_names))
 		{
 			checkSession();
 			validateToken('admin-regr');
 
 			// Set all the options....
 			updateSettings(array(
-				'reserveWord' => (isset($_POST['matchword']) ? '1' : '0'),
-				'reserveCase' => (isset($_POST['matchcase']) ? '1' : '0'),
-				'reserveUser' => (isset($_POST['matchuser']) ? '1' : '0'),
-				'reserveName' => (isset($_POST['matchname']) ? '1' : '0'),
-				'reserveNames' => str_replace("\r", '', $_POST['reserved'])
+				'reserveWord' => (isset($this->_req->post->matchword) ? '1' : '0'),
+				'reserveCase' => (isset($this->_req->post->matchcase) ? '1' : '0'),
+				'reserveUser' => (isset($this->_req->post->matchuser) ? '1' : '0'),
+				'reserveName' => (isset($this->_req->post->matchname) ? '1' : '0'),
+				'reserveNames' => str_replace("\r", '', $this->_req->post->reserved)
 			));
 		}
 
@@ -307,34 +344,38 @@ class ManageRegistration_Controller extends Action_Controller
 	 * - General registration settings and Coppa compliance settings.
 	 * - Accessed by ?action=admin;area=regcenter;sa=settings.
 	 * - Requires the admin_forum permission.
+	 *
+	 * @event integrate_save_registration_settings
 	 */
 	public function action_registerSettings_display()
 	{
 		global $txt, $context, $scripturl, $modSettings;
 
 		// Initialize the form
-		$this->_init_registerSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_registerSettings->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Setup the template
 		$context['sub_template'] = 'show_settings';
 		$context['page_title'] = $txt['registration_center'];
 
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			// Are there some contacts missing?
-			if (!empty($_POST['coppaAge']) && !empty($_POST['coppaType']) && empty($_POST['coppaPost']) && empty($_POST['coppaFax']))
-				fatal_lang_error('admin_setting_coppa_require_contact');
+			if (!empty($this->_req->post->coppaAge) && !empty($this->_req->post->coppaType) && empty($this->_req->post->coppaPost) && empty($this->_req->post->coppaFax))
+				throw new Elk_Exception('admin_setting_coppa_require_contact');
 
 			// Post needs to take into account line breaks.
-			$_POST['coppaPost'] = str_replace("\n", '<br />', empty($_POST['coppaPost']) ? '' : $_POST['coppaPost']);
+			$this->_req->post->coppaPost = str_replace("\n", '<br />', empty($this->_req->post->coppaPost) ? '' : $this->_req->post->coppaPost);
 
 			call_integration_hook('integrate_save_registration_settings');
 
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 
 			redirectexit('action=admin;area=regcenter;sa=settings');
 		}
@@ -359,44 +400,30 @@ class ManageRegistration_Controller extends Action_Controller
 		// Turn the postal address into something suitable for a textbox.
 		$modSettings['coppaPost'] = !empty($modSettings['coppaPost']) ? preg_replace('~<br ?/?' . '>~', "\n", $modSettings['coppaPost']) : '';
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize settings form with the configuration settings for new members registration.
-	 */
-	private function _init_registerSettingsForm()
-	{
-		// This is really quite wanting.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
-		// Instantiate the form
-		$this->_registerSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_registerSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
 	 * Return configuration settings for new members registration.
+	 *
+	 * @event integrate_modify_registration_settings
 	 */
 	private function _settings()
 	{
 		global $txt;
 
 		$config_vars = array(
-				array('select', 'registration_method', array($txt['setting_registration_standard'], $txt['setting_registration_activate'], $txt['setting_registration_approval'], $txt['setting_registration_disabled'])),
-				array('check', 'enableOpenID'),
-				array('check', 'notify_new_registration'),
-				array('check', 'send_welcomeEmail'),
+			array('select', 'registration_method', array($txt['setting_registration_standard'], $txt['setting_registration_activate'], $txt['setting_registration_approval'], $txt['setting_registration_disabled'])),
+			array('check', 'enableOpenID'),
+			array('check', 'notify_new_registration'),
+			array('check', 'send_welcomeEmail'),
+			array('check', 'show_DisplayNameOnRegistration'),
 			'',
-				array('int', 'coppaAge', 'subtext' => $txt['setting_coppaAge_desc'], 'onchange' => 'checkCoppa();', 'onkeyup' => 'checkCoppa();'),
-				array('select', 'coppaType', array($txt['setting_coppaType_reject'], $txt['setting_coppaType_approval']), 'onchange' => 'checkCoppa();'),
-				array('large_text', 'coppaPost', 'subtext' => $txt['setting_coppaPost_desc']),
-				array('text', 'coppaFax'),
-				array('text', 'coppaPhone'),
+			array('int', 'coppaAge', 'subtext' => $txt['setting_coppaAge_desc'], 'onchange' => 'checkCoppa();', 'onkeyup' => 'checkCoppa();'),
+			array('select', 'coppaType', array($txt['setting_coppaType_reject'], $txt['setting_coppaType_approval']), 'onchange' => 'checkCoppa();'),
+			array('large_text', 'coppaPost', 'subtext' => $txt['setting_coppaPost_desc']),
+			array('text', 'coppaFax'),
+			array('text', 'coppaPhone'),
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well

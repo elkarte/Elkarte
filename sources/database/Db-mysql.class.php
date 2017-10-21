@@ -14,12 +14,9 @@
  * copyright:	2004-2011, GreyWyvern - All rights reserved.
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.4
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 // Let's define the name of the class so that we will be able to use it in the instantiations
 if (!defined('DB_TYPE'))
@@ -28,27 +25,14 @@ if (!defined('DB_TYPE'))
 /**
  * SQL database class, implements database class to control mysql functions
  */
-class Database_MySQL implements Database
+class Database_MySQL extends Database_Abstract
 {
 	/**
 	 * Holds current instance of the class
+	 *
 	 * @var Database_MySQL
 	 */
 	private static $_db = null;
-
-	/**
-	 * Current connetcion to the database
-	 * @var resource
-	 */
-	private $_connection = null;
-
-	/**
-	 * Private constructor.
-	 */
-	private function __construct()
-	{
-		// Objects should be created through initiate().
-	}
 
 	/**
 	 * Initializes a database connection.
@@ -61,7 +45,8 @@ class Database_MySQL implements Database
 	 * @param string $db_prefix
 	 * @param mixed[] $db_options
 	 *
-	 * @return resource
+	 * @return mysqli|null
+	 * @throws Elk_Exception
 	 */
 	public static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
@@ -89,7 +74,7 @@ class Database_MySQL implements Database
 			if (!empty($db_options['non_fatal']))
 				return null;
 			else
-				display_db_error();
+				Errors::instance()->display_db_error();
 		}
 
 		// This makes it possible to automatically change the sql_mode and autocommit if needed.
@@ -105,6 +90,13 @@ class Database_MySQL implements Database
 		self::$_db->query('', '
 			SET NAMES UTF8',
 			array(
+			)
+		);
+		// Sorry to change your config, but this may be a pain for the time being...
+		self::$_db->query('', '
+			SET sql_mode = {string:empty}',
+			array(
+				'empty' => ''
 			)
 		);
 
@@ -127,161 +119,17 @@ class Database_MySQL implements Database
 	}
 
 	/**
-	 * Callback for preg_replace_callback on the query.
-	 * It allows to replace on the fly a few pre-defined strings, for convenience ('query_see_board', 'query_wanna_see_board'), with
-	 * their current values from $user_info.
-	 * In addition, it performs checks and sanitization on the values sent to the database.
-	 *
-	 * @param mixed[] $matches
-	 */
-	public function replacement__callback($matches)
-	{
-		global $db_callback, $user_info, $db_prefix;
-
-		list ($values, $connection) = $db_callback;
-
-		// Connection gone???  This should *never* happen at this point, yet it does :'(
-		if (!is_object($connection))
-			display_db_error();
-
-		if ($matches[1] === 'db_prefix')
-			return $db_prefix;
-
-		if ($matches[1] === 'query_see_board')
-			return $user_info['query_see_board'];
-
-		if ($matches[1] === 'query_wanna_see_board')
-			return $user_info['query_wanna_see_board'];
-
-		if (!isset($matches[2]))
-			$this->error_backtrace('Invalid value inserted or no type specified.', '', E_USER_ERROR, __FILE__, __LINE__);
-
-		if (!isset($values[$matches[2]]))
-			$this->error_backtrace('The database value you\'re trying to insert does not exist: ' . htmlspecialchars($matches[2], ENT_COMPAT, 'UTF-8'), '', E_USER_ERROR, __FILE__, __LINE__);
-
-		$replacement = $values[$matches[2]];
-
-		switch ($matches[1])
-		{
-			case 'int':
-				if (!is_numeric($replacement) || (string) $replacement !== (string) (int) $replacement)
-					$this->error_backtrace('Wrong value type sent to the database. Integer expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-				return (string) (int) $replacement;
-			break;
-
-			case 'string':
-			case 'text':
-				$replacement = $this->_clean_4byte_chars($replacement);
-
-				return sprintf('\'%1$s\'', mysqli_real_escape_string($connection, $replacement));
-			break;
-
-			case 'array_int':
-				if (is_array($replacement))
-				{
-					if (empty($replacement))
-						$this->error_backtrace('Database error, given array of integer values is empty. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-
-					foreach ($replacement as $key => $value)
-					{
-						if (!is_numeric($value) || (string) $value !== (string) (int) $value)
-							$this->error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-
-						$replacement[$key] = (string) (int) $value;
-					}
-
-					return implode(', ', $replacement);
-				}
-				else
-					$this->error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-
-			break;
-
-			case 'array_string':
-				if (is_array($replacement))
-				{
-					if (empty($replacement))
-						$this->error_backtrace('Database error, given array of string values is empty. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-
-					foreach ($replacement as $key => $value)
-					{
-						$value = $this->_clean_4byte_chars($value);
-						$replacement[$key] = sprintf('\'%1$s\'', mysqli_real_escape_string($connection, $value));
-					}
-
-					return implode(', ', $replacement);
-				}
-				else
-					$this->error_backtrace('Wrong value type sent to the database. Array of strings expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-			break;
-
-			case 'date':
-				if (preg_match('~^(\d{4})-([0-1]?\d)-([0-3]?\d)$~', $replacement, $date_matches) === 1)
-					return sprintf('\'%04d-%02d-%02d\'', $date_matches[1], $date_matches[2], $date_matches[3]);
-				else
-					$this->error_backtrace('Wrong value type sent to the database. Date expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-			break;
-
-			case 'float':
-				if (!is_numeric($replacement))
-					$this->error_backtrace('Wrong value type sent to the database. Floating point number expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-				return (string) (float) $replacement;
-			break;
-
-			case 'identifier':
-				// Backticks inside identifiers are supported as of MySQL 4.1. We don't need them for Elk.
-				return '`' . strtr($replacement, array('`' => '', '.' => '')) . '`';
-			break;
-
-			case 'raw':
-				return $replacement;
-			break;
-
-			default:
-				$this->error_backtrace('Undefined type used in the database query. (' . $matches[1] . ':' . $matches[2] . ')', '', false, __FILE__, __LINE__);
-			break;
-		}
-	}
-
-	/**
-	 * Just like the db_query, escape and quote a string, but not executing the query.
-	 *
-	 * @param string $db_string
-	 * @param mixed[] $db_values
-	 * @param resource|null $connection = null
-	 */
-	public function quote($db_string, $db_values, $connection = null)
-	{
-		global $db_callback;
-
-		// Only bother if there's something to replace.
-		if (strpos($db_string, '{') !== false)
-		{
-			// This is needed by the callback function.
-			$db_callback = array($db_values, $connection === null ? $this->_connection : $connection);
-
-			// Do the quoting and escaping
-			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', array($this, 'replacement__callback'), $db_string);
-
-			// Clear this global variable.
-			$db_callback = array();
-		}
-
-		return $db_string;
-	}
-
-	/**
 	 * Do a query.  Takes care of errors too.
 	 *
 	 * @param string $identifier
 	 * @param string $db_string
 	 * @param mixed[]|false $db_values = array()
-	 * @param resource|false|null $connection = null
+	 * @param mysqli_result|false|null $connection = null
+	 * @throws Elk_Exception
 	 */
 	public function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
-		global $db_cache, $db_count, $db_show_debug, $time_start;
-		global $db_unbuffered, $db_callback, $modSettings;
+		global $db_show_debug, $time_start, $modSettings;
 
 		// Comments that are allowed in a query are preg_removed.
 		static $allowed_comments_from = array(
@@ -301,7 +149,7 @@ class Database_MySQL implements Database
 		$connection = $connection === null ? $this->_connection : $connection;
 
 		// One more query....
-		$db_count = !isset($db_count) ? 1 : $db_count + 1;
+		$this->_query_count++;
 
 		if (empty($modSettings['disableQueryCheck']) && strpos($db_string, '\'') !== false && empty($db_values['security_override']))
 			$this->error_backtrace('Hacking attempt...', 'Illegal character (\') used in query...', true, __FILE__, __LINE__);
@@ -319,39 +167,41 @@ class Database_MySQL implements Database
 
 		if (empty($db_values['security_override']) && (!empty($db_values) || strpos($db_string, '{db_prefix}') !== false))
 		{
-			// Pass some values to the global space for use in the callback function.
-			$db_callback = array($db_values, $connection);
+			// Store these values for use in the callback function.
+			$this->_db_callback_values = $db_values;
+			$this->_db_callback_connection = $connection;
 
 			// Inject the values passed to this function.
 			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', array($this, 'replacement__callback'), $db_string);
 
-			// This shouldn't be residing in global space any longer.
-			$db_callback = array();
+			// No need for them any longer.
+			$this->_db_callback_values = array();
+			$this->_db_callback_connection = null;
 		}
 
 		// Debugging.
-		if (isset($db_show_debug) && $db_show_debug === true)
+		if ($db_show_debug === true)
 		{
+			$debug = Debug::instance();
+
 			// Get the file and line number this function was called.
 			list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
 
-			// Initialize $db_cache if not already initialized.
-			if (!isset($db_cache))
-				$db_cache = array();
-
 			if (!empty($_SESSION['debug_redirect']))
 			{
-				$db_cache = array_merge($_SESSION['debug_redirect'], $db_cache);
-				$db_count = count($db_cache) + 1;
+				$debug->merge_db($_SESSION['debug_redirect']);
+				// @todo this may be off by 1
+				$this->_query_count += count($_SESSION['debug_redirect']);
 				$_SESSION['debug_redirect'] = array();
 			}
 
 			// Don't overload it.
 			$st = microtime(true);
-			$db_cache[$db_count]['q'] = $db_count < 50 ? $db_string : '...';
-			$db_cache[$db_count]['f'] = $file;
-			$db_cache[$db_count]['l'] = $line;
-			$db_cache[$db_count]['s'] = array_sum(explode(' ', $st)) - array_sum(explode(' ', $time_start));
+			$db_cache = array();
+			$db_cache['q'] = $this->_query_count < 50 ? $db_string : '...';
+			$db_cache['f'] = $file;
+			$db_cache['l'] = $line;
+			$db_cache['s'] = $st - $time_start;
 		}
 
 		// First, we clean strings out of the query, reduce whitespace, lowercase, and trim - so we can check it over.
@@ -373,7 +223,7 @@ class Database_MySQL implements Database
 					$pos2 = strpos($db_string, '\\', $pos + 1);
 					if ($pos1 === false)
 						break;
-					elseif ($pos2 == false || $pos2 > $pos1)
+					elseif ($pos2 === false || $pos2 > $pos1)
 					{
 						$pos = $pos1;
 						break;
@@ -402,17 +252,34 @@ class Database_MySQL implements Database
 				$this->error_backtrace('Hacking attempt...', 'Hacking attempt...' . "\n" . $db_string, E_USER_ERROR, __FILE__, __LINE__);
 		}
 
-		if (empty($db_unbuffered))
+		if ($this->_unbuffered === false)
 			$ret = @mysqli_query($connection, $db_string);
 		else
 			$ret = @mysqli_query($connection, $db_string, MYSQLI_USE_RESULT);
 
-		if ($ret === false && empty($db_values['db_error_skip']))
+		// @deprecated since 1.1 - use skip_next_error method
+		if (!empty($db_values['db_error_skip']))
+		{
+			$this->_skip_error = true;
+		}
+
+		if ($ret === false && $this->_skip_error === false)
+		{
 			$ret = $this->error($db_string, $connection);
+		}
+
+		// Revert not to skip errors
+		if ($this->_skip_error === true)
+		{
+			$this->_skip_error = false;
+		}
 
 		// Debugging.
-		if (isset($db_show_debug) && $db_show_debug === true)
-			$db_cache[$db_count]['t'] = microtime(true) - $st;
+		if ($db_show_debug === true)
+		{
+			$db_cache['t'] = microtime(true) - $st;
+			$debug->db_query($db_cache);
+		}
 
 		return $ret;
 	}
@@ -421,7 +288,7 @@ class Database_MySQL implements Database
 	 * Checks if the string contains any 4byte chars and if so,
 	 * converts them into HTML entities.
 	 *
-	 * This is necessary because MySQL utf8 doesn't knw how to store such
+	 * This is necessary because MySQL utf8 doesn't know how to store such
 	 * characters and would generate an error any time one is used.
 	 * The 4byte chars are used by emoji
 	 *
@@ -476,7 +343,7 @@ class Database_MySQL implements Database
 	 * http://www.greywyvern.com/code/php/utf8_html.phps
 	 *
 	 * @param string $c
-	 * @return string|false
+	 * @return integer|false
 	 */
 	private function _uniord($c)
 	{
@@ -499,7 +366,7 @@ class Database_MySQL implements Database
 	/**
 	 * Affected rows from previous operation.
 	 *
-	 * @param resource|null $connection
+	 * @param mysqli|null $connection
 	 */
 	public function affected_rows($connection = null)
 	{
@@ -511,7 +378,7 @@ class Database_MySQL implements Database
 	 *
 	 * @param string $table
 	 * @param string|null $field = null
-	 * @param resource|null $connection = null
+	 * @param mysqli|null $connection = null
 	 */
 	public function insert_id($table, $field = null, $connection = null)
 	{
@@ -520,11 +387,11 @@ class Database_MySQL implements Database
 	}
 
 	/**
-	 * Fetch a row from the resultset given as parameter.
+	 * Fetch a row from the result set given as parameter.
 	 * MySQL implementation doesn't use $counter parameter.
 	 *
-	 * @param resource $result
-	 * @param boolean $counter = false
+	 * @param mysqli_result $result
+	 * @param integer|bool $counter = false
 	 */
 	public function fetch_row($result, $counter = false)
 	{
@@ -535,7 +402,7 @@ class Database_MySQL implements Database
 	/**
 	 * Free the resultset.
 	 *
-	 * @param resource $result
+	 * @param mysqli_result $result
 	 */
 	public function free_result($result)
 	{
@@ -546,7 +413,7 @@ class Database_MySQL implements Database
 	/**
 	 * Get the number of rows in the result.
 	 *
-	 * @param resource $result
+	 * @param mysqli_result $result
 	 */
 	public function num_rows($result)
 	{
@@ -555,9 +422,9 @@ class Database_MySQL implements Database
 	}
 
 	/**
-	 * Get the number of fields in the resultset.
+	 * Get the number of fields in the result set.
 	 *
-	 * @param resource $request
+	 * @param mysqli_result $request
 	 */
 	public function num_fields($request)
 	{
@@ -567,7 +434,7 @@ class Database_MySQL implements Database
 	/**
 	 * Reset the internal result pointer.
 	 *
-	 * @param resource $request
+	 * @param mysqli_result $request
 	 * @param integer $counter
 	 */
 	public function data_seek($request, $counter)
@@ -580,7 +447,7 @@ class Database_MySQL implements Database
 	 * Do a transaction.
 	 *
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
-	 * @param resource|null $connection = null
+	 * @param mysqli|null $connection = null
 	 */
 	public function db_transaction($type = 'commit', $connection = null)
 	{
@@ -600,7 +467,7 @@ class Database_MySQL implements Database
 	/**
 	 * Return last error string from the database server
 	 *
-	 * @param resource|null $connection = null
+	 * @param mysqli|null $connection = null
 	 */
 	public function last_error($connection = null)
 	{
@@ -615,13 +482,15 @@ class Database_MySQL implements Database
 	 * Database error.
 	 * Backtrace, log, try to fix.
 	 *
-	 * @param string $db_string
-	 * @param resource|null $connection = null
+	 * @param string      $db_string
+	 * @param mysqli|null $connection = null
+	 *
+	 * @return bool
+	 * @throws Elk_Exception
 	 */
 	public function error($db_string, $connection = null)
 	{
-		global $txt, $context, $webmaster_email, $modSettings;
-		global $db_last_error, $db_persist;
+		global $txt, $context, $webmaster_email, $modSettings, $db_persist;
 		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
 
 		// Get the file and line numbers.
@@ -656,28 +525,34 @@ class Database_MySQL implements Database
 				$_SESSION['query_command_denied'][$command] = $query_error;
 
 				// Let the admin know there is a command denied issue
-				if (function_exists('log_error'))
-					log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
+				if (class_exists('Errors'))
+				{
+					Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
+				}
 
 				return false;
 			}
 		}
 
 		// Log the error.
-		if ($query_errno != 1213 && $query_errno != 1205 && function_exists('log_error'))
-			log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
+		if ($query_errno != 1213 && $query_errno != 1205 && class_exists('Errors'))
+		{
+			Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
+		}
 
 		// Database error auto fixing ;).
-		if (function_exists('cache_get_data') && (!isset($modSettings['autoFixDatabase']) || $modSettings['autoFixDatabase'] == '1'))
+		if (function_exists('Cache::instance()->get') && (!isset($modSettings['autoFixDatabase']) || $modSettings['autoFixDatabase'] == '1'))
 		{
+			$db_last_error = db_last_error();
+
 			// Force caching on, just for the error checking.
 			$old_cache = isset($modSettings['cache_enable']) ? $modSettings['cache_enable'] : null;
 			$modSettings['cache_enable'] = '1';
 
-			if (($temp = cache_get_data('db_last_error', 600)) !== null)
-				$db_last_error = max(@$db_last_error, $temp);
+			if (Cache::instance()->getVar($temp, 'db_last_error', 600))
+				$db_last_error = max($db_last_error, $temp);
 
-			if (@$db_last_error < time() - 3600 * 24 * 3)
+			if ($db_last_error < time() - 3600 * 24 * 3)
 			{
 				// We know there's a problem... but what?  Try to auto detect.
 				if ($query_errno == 1030 && strpos($query_error, ' 127 ') !== false)
@@ -716,18 +591,21 @@ class Database_MySQL implements Database
 			if (!empty($fix_tables))
 			{
 				// subs/Admin.subs.php for updateDbLastError(), subs/Mail.subs.php for sendmail().
+				// @todo this should go somewhere else, not into the db-mysql layer I think
 				require_once(SUBSDIR . '/Admin.subs.php');
 				require_once(SUBSDIR . '/Mail.subs.php');
 
 				// Make a note of the REPAIR...
-				cache_put_data('db_last_error', time(), 600);
-				if (($temp = cache_get_data('db_last_error', 600)) === null)
+				Cache::instance()->put('db_last_error', time(), 600);
+				if (!Cache::instance()->getVar($temp, 'db_last_error', 600))
 					updateDbLastError(time());
 
 				// Attempt to find and repair the broken table.
 				foreach ($fix_tables as $table)
+				{
 					$this->query('', "
 						REPAIR TABLE $table", false, false);
+				}
 
 				// And send off an email!
 				sendmail($webmaster_email, $txt['database_error'], $txt['tried_to_repair']);
@@ -806,11 +684,11 @@ class Database_MySQL implements Database
 		if (allowedTo('admin_forum'))
 			$context['error_message'] .= '<br /><br />' . sprintf($txt['database_error_versions'], $modSettings['elkVersion']);
 
-		if (allowedTo('admin_forum') && isset($db_show_debug) && $db_show_debug === true)
+		if (allowedTo('admin_forum') && $db_show_debug === true)
 			$context['error_message'] .= '<br /><br />' . nl2br($db_string);
 
 		// It's already been logged... don't log it again.
-		fatal_error($context['error_message'], false);
+		throw new Elk_Exception($context['error_message'], false);
 	}
 
 	/**
@@ -822,7 +700,8 @@ class Database_MySQL implements Database
 	 * @param mixed[] $data
 	 * @param mixed[] $keys
 	 * @param bool $disable_trans = false
-	 * @param resource|null $connection = null
+	 * @param mysqli|null $connection = null
+	 * @throws Elk_Exception
 	 */
 	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
@@ -834,12 +713,12 @@ class Database_MySQL implements Database
 		if (empty($data))
 			return;
 
-		// Replace the prefix holder with the actual prefix.
-		$table = str_replace('{db_prefix}', $db_prefix, $table);
-
 		// Inserting data as a single row can be done as a single array.
 		if (!is_array($data[array_rand($data)]))
 			$data = array($data);
+
+		// Replace the prefix holder with the actual prefix.
+		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
 		// Create the mold for a single row insert.
 		$insertData = '(';
@@ -859,11 +738,15 @@ class Database_MySQL implements Database
 		// Here's where the variables are injected to the query.
 		$insertRows = array();
 		foreach ($data as $dataRow)
+		{
 			$insertRows[] = $this->quote($insertData, $this->_array_combine($indexed_columns, $dataRow), $connection);
+		}
 
 		// Determine the method of insertion.
-		$queryTitle = $method == 'replace' ? 'REPLACE' : ($method == 'ignore' ? 'INSERT IGNORE' : 'INSERT');
+		$queryTitle = $method === 'replace' ? 'REPLACE' : ($method == 'ignore' ? 'INSERT IGNORE' : 'INSERT');
 
+		$skip_error = $table === $db_prefix . 'log_errors';
+		$this->_skip_error = $skip_error;
 		// Do the insert.
 		$this->query('', '
 			' . $queryTitle . ' INTO ' . $table . '(`' . implode('`, `', $indexed_columns) . '`)
@@ -872,109 +755,9 @@ class Database_MySQL implements Database
 				', $insertRows),
 			array(
 				'security_override' => true,
-				'db_error_skip' => $table === $db_prefix . 'log_errors',
 			),
 			$connection
 		);
-	}
-
-	/**
-	 * This function combines the keys and values of the data passed to db::insert.
-	 *
-	 * @param mixed[] $keys
-	 * @param mixed[] $values
-	 * @return mixed[]
-	 */
-	private function _array_combine($keys, $values)
-	{
-		$is_numeric = array_filter(array_keys($values), 'is_numeric');
-		if ($is_numeric)
-			return array_combine($keys, $values);
-		else
-		{
-			$combined = array();
-			foreach ($keys as $key)
-			{
-				if (isset($values[$key]))
-					$combined[$key] = $values[$key];
-			}
-
-			// @todo should throws an E_WARNING if count($combined) != count($keys)
-			return $combined;
-		}
-	}
-
-	/**
-	 * This function tries to work out additional error information from a back trace.
-	 *
-	 * @param string $error_message
-	 * @param string $log_message
-	 * @param string|boolean $error_type
-	 * @param string|null $file
-	 * @param integer|null $line
-	 */
-	public function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
-	{
-		if (empty($log_message))
-			$log_message = $error_message;
-
-		foreach (debug_backtrace() as $step)
-		{
-			// Found it?
-			if (!method_exists($this, $step['function']) && !in_array(substr($step['function'], 0, 7), array('elk_db_', 'preg_re', 'db_erro', 'call_us')))
-			{
-				$log_message .= '<br />Function: ' . $step['function'];
-				break;
-			}
-
-			if (isset($step['line']))
-			{
-				$file = $step['file'];
-				$line = $step['line'];
-			}
-		}
-
-		// A special case - we want the file and line numbers for debugging.
-		if ($error_type == 'return')
-			return array($file, $line);
-
-		// Is always a critical error.
-		if (function_exists('log_error'))
-			log_error($log_message, 'critical', $file, $line);
-
-		if (function_exists('fatal_error'))
-		{
-			fatal_error($error_message, false);
-
-			// Cannot continue...
-			exit;
-		}
-		elseif ($error_type)
-			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''), $error_type);
-		else
-			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''));
-	}
-
-	/**
-	 * Escape the LIKE wildcards so that they match the character and not the wildcard.
-	 *
-	 * @param string $string
-	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
-	 */
-	public function escape_wildcard_string($string, $translate_human_wildcards = false)
-	{
-		$replacements = array(
-			'%' => '\%',
-			'_' => '\_',
-			'\\' => '\\\\',
-		);
-
-		if ($translate_human_wildcards)
-			$replacements += array(
-				'*' => '%',
-			);
-
-		return strtr($string, $replacements);
 	}
 
 	/**
@@ -990,7 +773,7 @@ class Database_MySQL implements Database
 	/**
 	 * Returns whether the database system supports ignore.
 	 *
-	 * @return true
+	 * @return boolean
 	 */
 	public function support_ignore()
 	{
@@ -1005,6 +788,7 @@ class Database_MySQL implements Database
 	 * @param bool $new_table
 	 *
 	 * @return string the query to insert the data back in, or an empty string if the table was empty.
+	 * @throws Elk_Exception
 	 */
 	public function insert_sql($tableName, $new_table = false)
 	{
@@ -1018,7 +802,6 @@ class Database_MySQL implements Database
 			$start = 0;
 		}
 
-		$data = '';
 		$tableName = str_replace('{db_prefix}', $db_prefix, $tableName);
 
 		// This will be handy...
@@ -1082,6 +865,7 @@ class Database_MySQL implements Database
 	 * @param string $tableName - the table
 	 *
 	 * @return string - the CREATE statement as string
+	 * @throws Elk_Exception
 	 */
 	public function db_table_sql($tableName)
 	{
@@ -1189,21 +973,15 @@ class Database_MySQL implements Database
 	}
 
 	/**
-	 * This function lists all tables in the database.
-	 * The listing could be filtered according to $filter.
-	 *
-	 * @param string|false $db_name_str string holding the database name, or false, default false
-	 * @param string|false $filter string to filter by, or false, default false
-	 *
-	 * @return string[] an array of table names. (strings)
+	 * {@inheritdoc}
 	 */
 	public function db_list_tables($db_name_str = false, $filter = false)
 	{
 		global $db_name;
 
-		$db_name_str = $db_name_str == false ? $db_name : $db_name_str;
+		$db_name_str = $db_name_str === false ? $db_name : $db_name_str;
 		$db_name_str = trim($db_name_str);
-		$filter = $filter == false ? '' : ' LIKE \'' . $filter . '\'';
+		$filter = $filter === false ? '' : ' LIKE \'' . $filter . '\'';
 
 		$request = $this->query('', '
 			SHOW TABLES
@@ -1216,89 +994,32 @@ class Database_MySQL implements Database
 		);
 		$tables = array();
 		while ($row = $this->fetch_row($request))
+		{
 			$tables[] = $row[0];
+		}
 		$this->free_result($request);
 
 		return $tables;
 	}
 
 	/**
-	 * This function optimizes a table.
+	 * Backup $table_name to $backup_table.
 	 *
-	 * @param string $table - the table to be optimized
-	 *
-	 * @return int how much it was gained
-	 */
-	public function db_optimize_table($table)
-	{
-		global $db_prefix;
-
-		$table = str_replace('{db_prefix}', $db_prefix, $table);
-
-		// Get how much overhead there is.
-		$request = $this->query('', '
-			SHOW TABLE STATUS LIKE {string:table_name}',
-			array(
-				'table_name' => str_replace('_', '\_', $table),
-			)
-		);
-		$row = $this->fetch_assoc($request);
-		$this->free_result($request);
-
-		// Optimize tables that will benefit from this operation.  We don't know what users may
-		// have "tweaked" in their installation nor what addons may have installed we simply check
-		if (isset($row['Engine']) && $row['Engine'] === 'MyISAM')
-		{
-			$data_before = isset($row['Data_free']) ? $row['Data_free'] : 0;
-			$request = $this->query('', '
-				OPTIMIZE TABLE `{raw:table}`',
-				array(
-					'table' => $table,
-				)
-			);
-			if (!$request)
-				return -1;
-
-			// Check again to see what we have saved
-			$request = $this->query('', '
-				SHOW TABLE STATUS LIKE {string:table}',
-				array(
-					'table' => str_replace('_', '\_', $table),
-				)
-			);
-			$row = $this->fetch_assoc($request);
-			$this->free_result($request);
-
-			// Savings for this table
-			$total_change = isset($row['Data_free']) && $data_before > $row['Data_free'] ? $data_before / 1024 : 0;
-		}
-		else
-			$total_change = 0;
-
-		return $total_change;
-	}
-
-	/**
-	 * Backup $table to $backup_table.
-	 *
-	 * @param string $table
+	 * @param string $table_name
 	 * @param string $backup_table
 	 *
 	 * @return resource - the request handle to the table creation query
+	 * @throws Elk_Exception
 	 */
-	public function db_backup_table($table, $backup_table)
+	public function db_backup_table($table_name, $backup_table)
 	{
 		global $db_prefix;
 
-		$table = str_replace('{db_prefix}', $db_prefix, $table);
+		$table = str_replace('{db_prefix}', $db_prefix, $table_name);
 
 		// First, get rid of the old table.
-		$this->query('', '
-			DROP TABLE IF EXISTS {raw:backup_table}',
-			array(
-				'backup_table' => $backup_table,
-			)
-		);
+		$db_table = db_table();
+		$db_table->db_drop_table($backup_table);
 
 		// Can we do this the quick way?
 		$result = $this->query('', '
@@ -1418,6 +1139,7 @@ class Database_MySQL implements Database
 	 * Get the version number.
 	 *
 	 * @return string - the version
+	 * @throws Elk_Exception
 	 */
 	public function db_server_version()
 	{
@@ -1459,7 +1181,9 @@ class Database_MySQL implements Database
 	 */
 	public function escape_string($string)
 	{
-		return addslashes($string);
+		$string = $this->_clean_4byte_chars($string);
+
+		return mysqli_real_escape_string($this->_connection, $string);
 	}
 
 	/**
@@ -1467,8 +1191,8 @@ class Database_MySQL implements Database
 	 * The mysql implementation simply delegates to mysqli_fetch_assoc().
 	 * It ignores $counter parameter.
 	 *
-	 * @param resource $request
-	 * @param int|false $counter = false
+	 * @param mysqli_result $request
+	 * @param int|bool $counter = false
 	 */
 	public function fetch_assoc($request, $counter = false)
 	{
@@ -1478,7 +1202,7 @@ class Database_MySQL implements Database
 	/**
 	 * Return server info.
 	 *
-	 * @param resource|null $connection
+	 * @param mysqli|null $connection
 	 *
 	 * @return string
 	 */
@@ -1493,7 +1217,8 @@ class Database_MySQL implements Database
 	/**
 	 *  Get the version number.
 	 *
-	 *  @return string - the version
+	 * @return string - the version
+	 * @throws Elk_Exception
 	 */
 	public function db_client_version()
 	{
@@ -1512,7 +1237,7 @@ class Database_MySQL implements Database
 	 * Select database.
 	 *
 	 * @param string|null $dbName = null
-	 * @param resource|null $connection = null
+	 * @param mysqli|null $connection = null
 	 */
 	public function select_db($dbName = null, $connection = null)
 	{
@@ -1523,21 +1248,20 @@ class Database_MySQL implements Database
 	}
 
 	/**
-	 * Retrieve the connection object
-	 *
-	 * @return resource
-	 */
-	public function connection()
-	{
-		// find it, find it
-		return $this->_connection;
-	}
-
-	/**
 	 * Returns a reference to the existing instance
 	 */
 	public static function db()
 	{
 		return self::$_db;
+	}
+
+	/**
+	 * Finds out if the connection is still valid.
+	 *
+	 * @param mysqli|null $connection = null
+	 */
+	public function validConnection($connection = null)
+	{
+		return is_object($connection);
 	}
 }

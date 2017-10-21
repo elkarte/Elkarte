@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; ManageBoards
+// Version: 1.1; ManageBoards
 
 $txt['boards_and_cats'] = 'Manage Boards and Categories';
 $txt['order'] = 'Order';
@@ -14,7 +14,7 @@ $txt['boardConfirm'] = 'Do you really want to delete this board?';
 $txt['catEdit'] = 'Edit Category';
 $txt['collapse_enable'] = 'Collapsible';
 $txt['collapse_desc'] = 'Allow users to collapse this category';
-$txt['catModify'] = '(modify)';
+$txt['catModify'] = '[modify]';
 
 $txt['mboards_order_after'] = 'After ';
 $txt['mboards_order_first'] = 'In first place';
@@ -45,7 +45,7 @@ $txt['mboards_delete_cancel'] = 'Cancel';
 
 $txt['mboards_category'] = 'Category';
 $txt['mboards_description'] = 'Description';
-$txt['mboards_description_desc'] = 'A short description of your board.';
+$txt['mboards_description_desc'] = 'A short description of your board.<br />You may use BBC to format your description.';
 $txt['mboards_groups'] = 'Allowed Groups';
 $txt['mboards_groups_desc'] = 'Groups allowed to access this board.<br /><em>Note: if the member is in any group or post group checked, they will have access to this board.</em>';
 $txt['mboards_groups_regular_members'] = 'This group contains all members that have no primary group set.';

@@ -7,18 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Edit the position and properties of a category.
@@ -183,6 +178,7 @@ function createCategory($catOptions)
  *
  * @param int[] $categories
  * @param integer|null $moveBoardsTo = null
+ * @throws Elk_Exception
  */
 function deleteCategories($categories, $moveBoardsTo = null)
 {
@@ -251,9 +247,9 @@ function deleteCategories($categories, $moveBoardsTo = null)
  * allows three changes to the status: 'expand', 'collapse' and 'toggle'.
  * if check_collapsable is set, only category allowed to be collapsed, will be collapsed.
  *
- * @param integer[] $categories
+ * @param int[] $categories
  * @param string $new_status
- * @param integer[]|null $members = null
+ * @param int[]|null $members = null
  * @param bool $check_collapsable = true
  */
 function collapseCategories($categories, $new_status, $members = null, $check_collapsable = true)
@@ -299,8 +295,8 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 			'insert' => array(),
 			'remove' => array(),
 		);
-		$request = $db->query('', '
-			SELECT mem.id_member, c.id_cat, IFNULL(cc.id_cat, 0) AS is_collapsed, c.can_collapse
+		$db->fetchQueryCallback('
+			SELECT mem.id_member, c.id_cat, COALESCE(cc.id_cat, 0) AS is_collapsed, c.can_collapse
 			FROM {db_prefix}members AS mem
 				INNER JOIN {db_prefix}categories AS c ON (c.id_cat IN ({array_int:category_list}))
 				LEFT JOIN {db_prefix}collapsed_categories AS cc ON (cc.id_cat = c.id_cat AND cc.id_member = mem.id_member)
@@ -309,16 +305,15 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 			array(
 				'category_list' => $categories,
 				'member_list' => $members,
-			)
+			),
+			function ($row) use (&$updates, $check_collapsable)
+			{
+				if (empty($row['is_collapsed']) && (!empty($row['can_collapse']) || !$check_collapsable))
+					$updates['insert'][] = array($row['id_member'], $row['id_cat']);
+				elseif (!empty($row['is_collapsed']))
+					$updates['remove'][] = '(id_member = ' . $row['id_member'] . ' AND id_cat = ' . $row['id_cat'] . ')';
+			}
 		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			if (empty($row['is_collapsed']) && (!empty($row['can_collapse']) || !$check_collapsable))
-				$updates['insert'][] = array($row['id_member'], $row['id_cat']);
-			elseif (!empty($row['is_collapsed']))
-				$updates['remove'][] = '(id_member = ' . $row['id_member'] . ' AND id_cat = ' . $row['id_cat'] . ')';
-		}
-		$db->free_result($request);
 
 		// Collapse the ones that were originally expanded...
 		if (!empty($updates['insert']))

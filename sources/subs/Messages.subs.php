@@ -10,18 +10,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.8
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Get message and attachments data, for a message ID.
@@ -46,7 +41,7 @@ function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
 		SELECT
 			m.id_member, m.modified_time, m.modified_name, m.smileys_enabled, m.body,
 			m.poster_name, m.poster_email, m.subject, m.icon, m.approved,
-			IFNULL(a.size, -1) AS filesize, a.filename, a.id_attach,
+			COALESCE(a.size, -1) AS filesize, a.filename, a.id_attach,
 			a.approved AS attachment_approved, t.id_member_started AS id_member_poster,
 			m.poster_time, log.id_action
 		FROM {db_prefix}messages AS m
@@ -93,6 +88,8 @@ function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
  * @param int $id_msg
  * @param boolean $override_permissions
  * @param boolean $detailed
+ *
+ * @return mixed[]|false array of message details or false if no message found.
  */
 function basicMessageInfo($id_msg, $override_permissions = false, $detailed = false)
 {
@@ -111,7 +108,7 @@ function basicMessageInfo($id_msg, $override_permissions = false, $detailed = fa
 		FROM {db_prefix}messages AS m' . ($override_permissions === true ? '' : '
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . ($detailed === false ? '' : '
 			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)') . '
-		WHERE id_msg = {int:message}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
+		WHERE id_msg = {int:message}' . (empty($modSettings['postmod_active']) || allowedTo('approve_posts') ? '' : '
 			AND m.approved = 1') . '
 		LIMIT 1',
 		array(
@@ -126,11 +123,60 @@ function basicMessageInfo($id_msg, $override_permissions = false, $detailed = fa
 }
 
 /**
+ * Get some basic info of a certain message, good to create a quote.
+ * Very similar to many other queries, though slightly different.
+ * Uses {query_see_board} and the 'moderate_board' permission
+ *
+ * @param int $id_msg
+ * @param bool $modify
+ * @todo why it doesn't take into account post moderation?
+ */
+function quoteMessageInfo($id_msg, $modify)
+{
+	global $user_info;
+
+	if (empty($id_msg))
+		return false;
+
+	$db = database();
+
+	require_once(SUBSDIR . '/Post.subs.php');
+
+	$moderate_boards = boardsAllowedTo('moderate_board');
+
+	$request = $db->query('', '
+		SELECT COALESCE(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.body, m.id_topic, m.subject,
+			m.id_board, m.id_member, m.approved
+		FROM {db_prefix}messages AS m
+			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
+		WHERE m.id_msg = {int:id_msg}' . ($modify || (!empty($moderate_boards) && $moderate_boards[0] == 0) ? '' : '
+			AND (t.locked = {int:not_locked}' . (empty($moderate_boards) ? '' : ' OR b.id_board IN ({array_int:moderation_board_list})') . ')') . '
+		LIMIT 1',
+		array(
+			'current_member' => $user_info['id'],
+			'moderation_board_list' => $moderate_boards,
+			'id_msg' => $id_msg,
+			'not_locked' => 0,
+		)
+	);
+
+	$messageInfo = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	return $messageInfo;
+}
+
+/**
  * Checks permissions to modify a message.
  * This function will give a fatal error if the current user
  * doesn't have permissions to modify the message.
  *
  * @param int $message
+ *
+ * @return array|bool
+ * @throws Elk_Exception modify_post_time_passed
  */
 function checkMessagePermissions($message)
 {
@@ -140,7 +186,7 @@ function checkMessagePermissions($message)
 	{
 		// Give an extra five minutes over the disable time threshold, so they can type - assuming the post is public.
 		if ($message['approved'] && !empty($modSettings['edit_disable_time']) && $message['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
-			fatal_lang_error('modify_post_time_passed', false);
+			throw new Elk_Exception('modify_post_time_passed', false);
 		elseif ($message['id_member_poster'] == $user_info['id'] && !allowedTo('modify_own'))
 			isAllowedTo('modify_replies');
 		else
@@ -192,7 +238,7 @@ function prepareMessageContext($message)
 	}
 
 	// Show an "approve" box if the user can approve it, and the message isn't approved.
-	if (! $message['message']['approved'] && !$context['show_approval'])
+	if (!$message['message']['approved'] && !$context['show_approval'])
 		$context['show_approval'] = allowedTo('approve_posts');
 }
 
@@ -201,6 +247,7 @@ function prepareMessageContext($message)
  * first messages of a topic
  *
  * @param int $memID The member id
+ * @throws Elk_Exception
  */
 function removeNonTopicMessages($memID)
 {
@@ -219,9 +266,7 @@ function removeNonTopicMessages($memID)
 	// This could take a while... but ya know it's gonna be worth it in the end.
 	while ($row = $db->fetch_assoc($request))
 	{
-		if (function_exists('apache_reset_timeout'))
-			@apache_reset_timeout();
-
+		detectServer()->setTimeLimit(300);
 		removeMessage($row['id_msg']);
 	}
 	$db->free_result($request);
@@ -236,467 +281,14 @@ function removeNonTopicMessages($memID)
  *
  * @param int $message The message id
  * @param bool $decreasePostCount if true users' post count will be reduced
+ * @throws Elk_Exception
  */
 function removeMessage($message, $decreasePostCount = true)
 {
-	global $board, $modSettings, $user_info;
+	global $modSettings;
 
-	$db = database();
-
-	if (empty($message) || !is_numeric($message))
-		return false;
-
-	$request = $db->query('', '
-		SELECT
-			m.id_member, m.icon, m.poster_time, m.subject,' . (empty($modSettings['search_custom_index_config']) ? '' : ' m.body,') . '
-			m.approved, t.id_topic, t.id_first_msg, t.id_last_msg, t.num_replies, t.id_board,
-			t.id_member_started AS id_member_poster,
-			b.count_posts
-		FROM {db_prefix}messages AS m
-			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-		WHERE m.id_msg = {int:id_msg}
-		LIMIT 1',
-		array(
-			'id_msg' => $message,
-		)
-	);
-	if ($db->num_rows($request) == 0)
-		return false;
-	$row = $db->fetch_assoc($request);
-	$db->free_result($request);
-
-	if (empty($board) || $row['id_board'] != $board)
-	{
-		$delete_any = boardsAllowedTo('delete_any');
-
-		if (!in_array(0, $delete_any) && !in_array($row['id_board'], $delete_any))
-		{
-			$delete_own = boardsAllowedTo('delete_own');
-			$delete_own = in_array(0, $delete_own) || in_array($row['id_board'], $delete_own);
-			$delete_replies = boardsAllowedTo('delete_replies');
-			$delete_replies = in_array(0, $delete_replies) || in_array($row['id_board'], $delete_replies);
-
-			if ($row['id_member'] == $user_info['id'])
-			{
-				if (!$delete_own)
-				{
-					if ($row['id_member_poster'] == $user_info['id'])
-					{
-						if (!$delete_replies)
-							fatal_lang_error('cannot_delete_replies', 'permission');
-					}
-					else
-						fatal_lang_error('cannot_delete_own', 'permission');
-				}
-				elseif (($row['id_member_poster'] != $user_info['id'] || !$delete_replies) && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
-					fatal_lang_error('modify_post_time_passed', false);
-			}
-			elseif ($row['id_member_poster'] == $user_info['id'])
-			{
-				if (!$delete_replies)
-					fatal_lang_error('cannot_delete_replies', 'permission');
-			}
-			else
-				fatal_lang_error('cannot_delete_any', 'permission');
-		}
-
-		// Can't delete an unapproved message, if you can't see it!
-		if ($modSettings['postmod_active'] && !$row['approved'] && $row['id_member'] != $user_info['id'] && !(in_array(0, $delete_any) || in_array($row['id_board'], $delete_any)))
-		{
-			$approve_posts = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
-			if (!in_array(0, $approve_posts) && !in_array($row['id_board'], $approve_posts))
-				return false;
-		}
-	}
-	else
-	{
-		// Check permissions to delete this message.
-		if ($row['id_member'] == $user_info['id'])
-		{
-			if (!allowedTo('delete_own'))
-			{
-				if ($row['id_member_poster'] == $user_info['id'] && !allowedTo('delete_any'))
-					isAllowedTo('delete_replies');
-				elseif (!allowedTo('delete_any'))
-					isAllowedTo('delete_own');
-			}
-			elseif (!allowedTo('delete_any') && ($row['id_member_poster'] != $user_info['id'] || !allowedTo('delete_replies')) && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
-				fatal_lang_error('modify_post_time_passed', false);
-		}
-		elseif ($row['id_member_poster'] == $user_info['id'] && !allowedTo('delete_any'))
-			isAllowedTo('delete_replies');
-		else
-			isAllowedTo('delete_any');
-
-		if ($modSettings['postmod_active'] && !$row['approved'] && $row['id_member'] != $user_info['id'] && !allowedTo('delete_own'))
-			isAllowedTo('approve_posts');
-	}
-
-	// Delete the *whole* topic, but only if the topic consists of one message.
-	if ($row['id_first_msg'] == $message)
-	{
-		if (empty($board) || $row['id_board'] != $board)
-		{
-			$remove_any = boardsAllowedTo('remove_any');
-			$remove_any = in_array(0, $remove_any) || in_array($row['id_board'], $remove_any);
-			if (!$remove_any)
-			{
-				$remove_own = boardsAllowedTo('remove_own');
-				$remove_own = in_array(0, $remove_own) || in_array($row['id_board'], $remove_own);
-			}
-
-			if ($row['id_member'] != $user_info['id'] && !$remove_any)
-				fatal_lang_error('cannot_remove_any', 'permission');
-			elseif (!$remove_any && !$remove_own)
-				fatal_lang_error('cannot_remove_own', 'permission');
-		}
-		else
-		{
-			// Check permissions to delete a whole topic.
-			if ($row['id_member'] != $user_info['id'])
-				isAllowedTo('remove_any');
-			elseif (!allowedTo('remove_any'))
-				isAllowedTo('remove_own');
-		}
-
-		// ...if there is only one post.
-		if (!empty($row['num_replies']))
-			fatal_lang_error('delFirstPost', false);
-
-		// This needs to be included for topic functions
-		require_once(SUBSDIR . '/Topic.subs.php');
-
-		removeTopics($row['id_topic']);
-		return true;
-	}
-
-	// Deleting a recycled message can not lower anyone's post count.
-	if ($row['icon'] == 'recycled')
-		$decreasePostCount = false;
-
-	// This is the last post, update the last post on the board.
-	if ($row['id_last_msg'] == $message)
-	{
-		// Find the last message, set it, and decrease the post count.
-		$request = $db->query('', '
-			SELECT id_msg, id_member
-			FROM {db_prefix}messages
-			WHERE id_topic = {int:id_topic}
-				AND id_msg != {int:id_msg}
-			ORDER BY ' . ($modSettings['postmod_active'] ? 'approved DESC, ' : '') . 'id_msg DESC
-			LIMIT 1',
-			array(
-				'id_topic' => $row['id_topic'],
-				'id_msg' => $message,
-			)
-		);
-		$row2 = $db->fetch_assoc($request);
-		$db->free_result($request);
-
-		$db->query('', '
-			UPDATE {db_prefix}topics
-			SET
-				id_last_msg = {int:id_last_msg},
-				id_member_updated = {int:id_member_updated}' . (!$modSettings['postmod_active'] || $row['approved'] ? ',
-				num_replies = CASE WHEN num_replies = {int:no_replies} THEN 0 ELSE num_replies - 1 END' : ',
-				unapproved_posts = CASE WHEN unapproved_posts = {int:no_unapproved} THEN 0 ELSE unapproved_posts - 1 END') . '
-			WHERE id_topic = {int:id_topic}',
-			array(
-				'id_last_msg' => $row2['id_msg'],
-				'id_member_updated' => $row2['id_member'],
-				'no_replies' => 0,
-				'no_unapproved' => 0,
-				'id_topic' => $row['id_topic'],
-			)
-		);
-	}
-	// Only decrease post counts.
-	else
-		$db->query('', '
-			UPDATE {db_prefix}topics
-			SET ' . ($row['approved'] ? '
-				num_replies = CASE WHEN num_replies = {int:no_replies} THEN 0 ELSE num_replies - 1 END' : '
-				unapproved_posts = CASE WHEN unapproved_posts = {int:no_unapproved} THEN 0 ELSE unapproved_posts - 1 END') . '
-			WHERE id_topic = {int:id_topic}',
-			array(
-				'no_replies' => 0,
-				'no_unapproved' => 0,
-				'id_topic' => $row['id_topic'],
-			)
-		);
-
-	// Default recycle to false.
-	$recycle = false;
-
-	// If recycle topics has been set, make a copy of this message in the recycle board.
-	// Make sure we're not recycling messages that are already on the recycle board.
-	if (!empty($modSettings['recycle_enable']) && $row['id_board'] != $modSettings['recycle_board'] && $row['icon'] != 'recycled')
-	{
-		// Check if the recycle board exists and if so get the read status.
-		$request = $db->query('', '
-			SELECT (IFNULL(lb.id_msg, 0) >= b.id_msg_updated) AS is_seen, id_last_msg
-			FROM {db_prefix}boards AS b
-				LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
-			WHERE b.id_board = {int:recycle_board}',
-			array(
-				'current_member' => $user_info['id'],
-				'recycle_board' => $modSettings['recycle_board'],
-			)
-		);
-		if ($db->num_rows($request) == 0)
-			fatal_lang_error('recycle_no_valid_board');
-		list ($isRead, $last_board_msg) = $db->fetch_row($request);
-		$db->free_result($request);
-
-		// Is there an existing topic in the recycle board to group this post with?
-		$request = $db->query('', '
-			SELECT id_topic, id_first_msg, id_last_msg
-			FROM {db_prefix}topics
-			WHERE id_previous_topic = {int:id_previous_topic}
-				AND id_board = {int:recycle_board}',
-			array(
-				'id_previous_topic' => $row['id_topic'],
-				'recycle_board' => $modSettings['recycle_board'],
-			)
-		);
-		list ($id_recycle_topic, $first_topic_msg, $last_topic_msg) = $db->fetch_row($request);
-		$db->free_result($request);
-
-		// Insert a new topic in the recycle board if $id_recycle_topic is empty.
-		if (empty($id_recycle_topic))
-			$db->insert('',
-				'{db_prefix}topics',
-				array(
-					'id_board' => 'int', 'id_member_started' => 'int', 'id_member_updated' => 'int', 'id_first_msg' => 'int',
-					'id_last_msg' => 'int', 'unapproved_posts' => 'int', 'approved' => 'int', 'id_previous_topic' => 'int',
-				),
-				array(
-					$modSettings['recycle_board'], $row['id_member'], $row['id_member'], $message,
-					$message, 0, 1, $row['id_topic'],
-				),
-				array('id_topic')
-			);
-
-		// Capture the ID of the new topic...
-		$topicID = empty($id_recycle_topic) ? $db->insert_id('{db_prefix}topics', 'id_topic') : $id_recycle_topic;
-
-		// If the topic creation went successful, move the message.
-		if ($topicID > 0)
-		{
-			$db->query('', '
-				UPDATE {db_prefix}messages
-				SET
-					id_topic = {int:id_topic},
-					id_board = {int:recycle_board},
-					icon = {string:recycled},
-					approved = {int:is_approved}
-				WHERE id_msg = {int:id_msg}',
-				array(
-					'id_topic' => $topicID,
-					'recycle_board' => $modSettings['recycle_board'],
-					'id_msg' => $message,
-					'recycled' => 'recycled',
-					'is_approved' => 1,
-				)
-			);
-
-			// Take any reported posts with us...
-			$db->query('', '
-				UPDATE {db_prefix}log_reported
-				SET
-					id_topic = {int:id_topic},
-					id_board = {int:recycle_board}
-				WHERE id_msg = {int:id_msg}',
-				array(
-					'id_topic' => $topicID,
-					'recycle_board' => $modSettings['recycle_board'],
-					'id_msg' => $message,
-				)
-			);
-
-			// Mark recycled topic as read.
-			if (!$user_info['is_guest'])
-			{
-				require_once(SUBSDIR . '/Topic.subs.php');
-				markTopicsRead(array($user_info['id'], $topicID, $modSettings['maxMsgID'], 0), true);
-			}
-
-			// Mark recycle board as seen, if it was marked as seen before.
-			if (!empty($isRead) && !$user_info['is_guest'])
-			{
-				require_once(SUBSDIR . '/Boards.subs.php');
-				markBoardsRead($modSettings['recycle_board']);
-			}
-
-			// Add one topic and post to the recycle bin board.
-			$db->query('', '
-				UPDATE {db_prefix}boards
-				SET
-					num_topics = num_topics + {int:num_topics_inc},
-					num_posts = num_posts + 1' .
-						($message > $last_board_msg ? ', id_last_msg = {int:id_merged_msg}' : '') . '
-				WHERE id_board = {int:recycle_board}',
-				array(
-					'num_topics_inc' => empty($id_recycle_topic) ? 1 : 0,
-					'recycle_board' => $modSettings['recycle_board'],
-					'id_merged_msg' => $message,
-				)
-			);
-
-			// Lets increase the num_replies, and the first/last message ID as appropriate.
-			if (!empty($id_recycle_topic))
-				$db->query('', '
-					UPDATE {db_prefix}topics
-					SET num_replies = num_replies + 1' .
-						($message > $last_topic_msg ? ', id_last_msg = {int:id_merged_msg}' : '') .
-						($message < $first_topic_msg ? ', id_first_msg = {int:id_merged_msg}' : '') . '
-					WHERE id_topic = {int:id_recycle_topic}',
-					array(
-						'id_recycle_topic' => $id_recycle_topic,
-						'id_merged_msg' => $message,
-					)
-				);
-
-			// Make sure this message isn't getting deleted later on.
-			$recycle = true;
-
-			// Make sure we update the search subject index.
-			updateSubjectStats($topicID, $row['subject']);
-		}
-
-		// If it wasn't approved don't keep it in the queue.
-		if (!$row['approved'])
-			$db->query('', '
-				DELETE FROM {db_prefix}approval_queue
-				WHERE id_msg = {int:id_msg}
-					AND id_attach = {int:id_attach}',
-				array(
-					'id_msg' => $message,
-					'id_attach' => 0,
-				)
-			);
-	}
-
-	$db->query('', '
-		UPDATE {db_prefix}boards
-		SET ' . ($row['approved'] ? '
-			num_posts = CASE WHEN num_posts = {int:no_posts} THEN 0 ELSE num_posts - 1 END' : '
-			unapproved_posts = CASE WHEN unapproved_posts = {int:no_unapproved} THEN 0 ELSE unapproved_posts - 1 END') . '
-		WHERE id_board = {int:id_board}',
-		array(
-			'no_posts' => 0,
-			'no_unapproved' => 0,
-			'id_board' => $row['id_board'],
-		)
-	);
-
-	// If the poster was registered and the board this message was on incremented
-	// the member's posts when it was posted, decrease his or her post count.
-	if (!empty($row['id_member']) && $decreasePostCount && empty($row['count_posts']) && $row['approved'])
-		updateMemberData($row['id_member'], array('posts' => '-'));
-
-	// Only remove posts if they're not recycled.
-	if (!$recycle)
-	{
-		// Update the like counts
-		require_once(SUBSDIR . '/Likes.subs.php');
-		decreaseLikeCounts($message);
-
-		// Remove the likes!
-		$db->query('', '
-			DELETE FROM {db_prefix}message_likes
-			WHERE id_msg = {int:id_msg}',
-			array(
-				'id_msg' => $message,
-			)
-		);
-
-		// Remove the mentions!
-		$db->query('', '
-			DELETE FROM {db_prefix}log_mentions
-			WHERE id_msg = {int:id_msg}',
-			array(
-				'id_msg' => $message,
-			)
-		);
-
-		// Remove the message!
-		$db->query('', '
-			DELETE FROM {db_prefix}messages
-			WHERE id_msg = {int:id_msg}',
-			array(
-				'id_msg' => $message,
-			)
-		);
-
-		if (!empty($modSettings['search_custom_index_config']))
-		{
-			$customIndexSettings = Util::unserialize($modSettings['search_custom_index_config']);
-			$words = text2words($row['body'], $customIndexSettings['bytes_per_word'], true);
-			if (!empty($words))
-				$db->query('', '
-					DELETE FROM {db_prefix}log_search_words
-					WHERE id_word IN ({array_int:word_list})
-						AND id_msg = {int:id_msg}',
-					array(
-						'word_list' => $words,
-						'id_msg' => $message,
-					)
-				);
-		}
-
-		// Delete attachment(s) if they exist.
-		require_once(SUBSDIR . '/ManageAttachments.subs.php');
-		$attachmentQuery = array(
-			'attachment_type' => 0,
-			'id_msg' => $message,
-		);
-		removeAttachments($attachmentQuery);
-
-		// Delete follow-ups too
-		require_once(SUBSDIR . '/FollowUps.subs.php');
-
-		// If it is an entire topic
-		if ($row['id_first_msg'] == $message)
-		{
-			$db->query('', '
-				DELETE FROM {db_prefix}follow_ups
-				WHERE follow_ups IN ({array_int:topics})',
-				array(
-					'topics' => $row['id_topic'],
-				)
-			);
-		}
-
-		// Allow mods to remove message related data of their own (likes, maybe?)
-		call_integration_hook('integrate_remove_message', array($message));
-	}
-
-	// Update the pesky statistics.
-	updateMessageStats();
-	updateStats('topic');
-	updateSettings(array(
-		'calendar_updated' => time(),
-	));
-
-	// And now to update the last message of each board we messed with.
-	require_once(SUBSDIR . '/Post.subs.php');
-	if ($recycle)
-		updateLastMessages(array($row['id_board'], $modSettings['recycle_board']));
-	else
-		updateLastMessages($row['id_board']);
-
-	// Close any moderation reports for this message.
-	require_once(SUBSDIR . '/Moderation.subs.php');
-	$updated_reports = updateReportsStatus($message, 'close', 1);
-	if ($updated_reports != 0)
-	{
-		updateSettings(array('last_mod_report_action' => time()));
-		recountOpenReports();
-	}
-
-	return false;
+	$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
+	$remover->removeMessage($message, $decreasePostCount, true);
 }
 
 /**
@@ -835,7 +427,7 @@ function nextMessage($id_msg, $id_topic)
  * @param int $id_topic the id of the topic
  * @param mixed[] $params an (optional) array of params, includes:
  *      - 'not_in' => array - of messages to exclude
- *      - 'include' => array - of messages to explicitely include
+ *      - 'include' => array - of messages to explicitly include
  *      - 'only_approved' => true/false - include or exclude the unapproved messages
  *      - 'limit' => mixed - the number of values to return (if false, no limits applied)
  * @todo very similar to selectMessages in Topics.subs.php
@@ -884,7 +476,7 @@ function messageAt($start, $id_topic, $params = array())
 /**
  * Finds an open report for a certain message if it exists and increase the
  * number of reports for that message, otherwise it creates one
-
+ *
  * @param mixed[] $message array of several message details (id_msg, id_topic, etc.)
  * @param string $poster_comment the comment made by the reporter
  *
@@ -899,10 +491,12 @@ function recordReport($message, $poster_comment)
 		SELECT id_report, ignore_all
 		FROM {db_prefix}log_reported
 		WHERE id_msg = {int:id_msg}
+			AND type = {string:type}
 			AND (closed = {int:not_closed} OR ignore_all = {int:ignored})
 		ORDER BY ignore_all DESC',
 		array(
 			'id_msg' => $message['id_msg'],
+			'type' => isset($message['type']) ? $message['type'] : 'msg',
 			'not_closed' => 0,
 			'ignored' => 1,
 		)
@@ -917,6 +511,7 @@ function recordReport($message, $poster_comment)
 
 	// Already reported? My god, we could be dealing with a real rogue here...
 	if (!empty($id_report))
+	{
 		$db->query('', '
 			UPDATE {db_prefix}log_reported
 			SET num_reports = num_reports + 1, time_updated = {int:current_time}
@@ -926,6 +521,7 @@ function recordReport($message, $poster_comment)
 				'id_report' => $id_report,
 			)
 		);
+	}
 	// Otherwise, we shall make one!
 	else
 	{
@@ -938,10 +534,12 @@ function recordReport($message, $poster_comment)
 				'id_msg' => 'int', 'id_topic' => 'int', 'id_board' => 'int', 'id_member' => 'int', 'membername' => 'string',
 				'subject' => 'string', 'body' => 'string', 'time_started' => 'int', 'time_updated' => 'int',
 				'num_reports' => 'int', 'closed' => 'int',
+				'type' => 'string-5', 'time_message' => 'int'
 			),
 			array(
 				$message['id_msg'], $message['id_topic'], $message['id_board'], $message['id_poster'], $message['real_name'],
-				$message['subject'], $message['body'] , time(), time(), 1, 0,
+				$message['subject'], $message['body'], time(), time(), 1, 0,
+				$message['type'], isset($message['time_message']) ? $message['time_message'] : 0
 			),
 			array('id_report')
 		);
@@ -970,8 +568,9 @@ function recordReport($message, $poster_comment)
 
 /**
  * Count the new posts for a specific topic
+ *
  * @param int $topic
- * @param int $topicinfo
+ * @param array $topicinfo
  * @param int $timestamp
  * @return int
  */
@@ -996,6 +595,7 @@ function countNewPosts($topic, $topicinfo, $timestamp)
 	);
 	list ($start) = $db->fetch_row($request);
 	$db->free_result($request);
+
 	return $start;
 }
 
@@ -1006,12 +606,11 @@ function countNewPosts($topic, $topicinfo, $timestamp)
  * @param string[] $msg_tables
  * @param mixed[] $msg_parameters
  * @param mixed[] $optional
- * @return A request object
+ *
+ * @return resource A request object
  */
 function loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $optional = array())
 {
-	global $options;
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -1025,7 +624,7 @@ function loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $optiona
 			' . (!empty($msg_tables) ? implode("\n\t\t\t", $msg_tables) : '') . '
 		WHERE m.id_msg IN ({array_int:message_list})
 			' . (!empty($optional['additional_conditions']) ? $optional['additional_conditions'] : '') . '
-		ORDER BY m.id_msg' . (empty($options['view_newest_first']) ? '' : ' DESC'),
+		ORDER BY m.id_msg',
 		$msg_parameters
 	);
 
@@ -1153,7 +752,7 @@ function mailFromMessage($id_msg)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT IFNULL(mem.email_address, m.poster_email) AS email_address, IFNULL(mem.real_name, m.poster_name) AS real_name, IFNULL(mem.id_member, 0) AS id_member, hide_email
+		SELECT COALESCE(mem.email_address, m.poster_email) AS email_address, COALESCE(mem.real_name, m.poster_name) AS real_name, COALESCE(mem.id_member, 0) AS id_member, hide_email
 		FROM {db_prefix}messages AS m
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 		WHERE m.id_msg = {int:id_msg}',
@@ -1171,7 +770,6 @@ function mailFromMessage($id_msg)
  * This function changes the total number of messages,
  * and the highest message id by id_msg - which can be
  * parameters 1 and 2, respectively.
- * Used by updateStats('message').
  *
  * @param bool|null $increment = null If true and $max_msg_id != null, then increment the total messages by one, otherwise recount all messages and get the max message id
  * @param int|null $max_msg_id = null, Only used if $increment === true
@@ -1211,7 +809,6 @@ function updateMessageStats($increment = null, $max_msg_id = null)
  * This function updates the log_search_subjects in the event of a topic being
  * moved, removed or split. It is being sent the topic id, and optionally
  * the new subject.
- * Used by updateStats('subject').
  *
  * @param int $id_topic
  * @param string|null $subject

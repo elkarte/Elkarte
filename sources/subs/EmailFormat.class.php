@@ -7,12 +7,9 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.7
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Attempts, though an outrageous set of assumptions, to reflow/format an email message
@@ -24,7 +21,7 @@ if (!defined('ELK'))
  * Joins lines back together, where needed, to undo the 78 - 80 char wrap in email
  *
  * Really this is built on a house of cards and should generally be viewed
- * as an unfortante evil if you want a post to *not* look like its an email.
+ * as an unfortunate evil if you want a post to *not* look like its an email.
  * It's always the innocent bystanders who suffer most.
  *
  * Load class
@@ -32,7 +29,7 @@ if (!defined('ELK'))
  *  - $formatter = new Email_Format();
  *
  * Make the call, accepts a string of data and returns it formatted
- * - $body = $formatter->reflow($body, '', $html);
+ * - $body = $formatter->reflow($body);
  *
  * @package Maillist
  */
@@ -101,13 +98,13 @@ class Email_Format
 
 	/**
 	 * Extra items to removed, defined in the acp
-	 * @var string[]
+	 * @var string
 	 */
 	private $_maillist_leftover_remove = null;
 
 	/**
 	 * Items that may indicate the start of a signature line, defined in the acp
-	 * @var string[]
+	 * @var string
 	 */
 	private $_maillist_sig_keys = null;
 
@@ -128,14 +125,14 @@ class Email_Format
 	/**
 	 * Main routine, calls the need functions in the order needed
 	 *
-	 * - Returns a formated string
+	 * - Returns a formatted string
 	 *
 	 * @param string $data
-	 * @param boolean $html
 	 * @param string $real_name
 	 * @param string $charset
+	 * @param bool $bbc_br
 	 */
-	public function reflow($data, $html = false, $real_name = '', $charset = 'UTF-8', $bbc_br = true)
+	public function reflow($data, $real_name = '', $charset = 'UTF-8', $bbc_br = true)
 	{
 		global $modSettings;
 
@@ -159,6 +156,7 @@ class Email_Format
 	 * in a quote (&depth) code (&depth) or list (bbc or plain) etc.
 	 *
 	 * @param string $data
+	 * @param boolean $bbc_br
 	 */
 	private function _prep_data($data, $bbc_br)
 	{
@@ -263,7 +261,8 @@ class Email_Format
 			// Previous line ended in a break already
 			elseif (isset($this->_body_array[$i - 1]['content']) && substr(trim($this->_body_array[$i - 1]['content']), -4) == '[br]')
 			{
-				$this->_body_array[$i]['content'] = $this->_body_array[$i]['content'];
+				// Nothing to do then
+				 $this->_body_array[$i]['content'] .= '';
 			}
 			// OK, we can't seem to think of other obvious reasons this should not be on the same line
 			// and these numbers are quite frankly subjective, but so is how we got here, final "check"
@@ -281,7 +280,7 @@ class Email_Format
 					// If the previous short line did not end in a period or it did and the next line does not start
 					// with a capital and passes para check then it wraps
 					if ((substr($this->_body_array[$i - 1]['content'], -1) !== '.') || (substr($this->_body_array[$i - 1]['content'], -1) === '.' && $para_check < $this->_para_check && ($this->_body_array[$i]['content'][0] !== strtoupper($this->_body_array[$i]['content'][0]))))
-						$this->_body_array[$i]['content'] = $this->_body_array[$i]['content'];
+						$this->_body_array[$i]['content'] .= '';
 					else
 						$this->_body_array[$i]['content'] = "\n" . $this->_body_array[$i]['content'];
 				}
@@ -289,7 +288,7 @@ class Email_Format
 					$this->_body_array[$i]['content'] = "\n" . $this->_body_array[$i]['content'];
 				// A very short line (but not a empty one) followed by a very long line
 				elseif (isset($this->_body_array[$i - 1]) && !empty($this->_body_array[$i - 1]['content']) && $para_check > $this->_sig_longline && $this->_body_array[$i - 1]['length'] < 3)
-					$this->_body_array[$i]['content'] = $this->_body_array[$i]['content'];
+					$this->_body_array[$i]['content'] .= '';
 				else
 					$this->_body_array[$i]['content'] = "\n\n" . $this->_body_array[$i]['content'];
 			}

@@ -8,34 +8,32 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.7
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Check if the user is who he/she says he is.
  *
  * What it does:
+ *
  * - This function makes sure the user is who they claim to be by requiring a
  * password to be typed in every hour.
  * - This check can be turned on and off by the securityDisable setting.
  * - Uses the adminLogin() function of subs/Auth.subs.php if they need to login,
  * which saves all request (POST and GET) data.
  *
+ * @event integrate_validateSession Called at start of validateSession
  * @param string $type = admin
+ * @throws Elk_Exception
  */
 function validateSession($type = 'admin')
 {
-	global $modSettings, $user_info, $user_settings;
+	global $modSettings, $user_settings;
 
 	// Guests are not welcome here.
 	is_not_guest();
@@ -46,38 +44,41 @@ function validateSession($type = 'admin')
 	$type = in_array($type, $types) || $type == 'moderate' ? $type : 'admin';
 
 	// Set the lifetime for our admin session. Default is ten minutes.
-	$refreshTime = 600;
+	$refreshTime = 10;
 
 	if (isset($modSettings['admin_session_lifetime']))
 	{
 		// Maybe someone is paranoid or mistakenly misconfigured the param? Give them at least 5 minutes.
 		if ($modSettings['admin_session_lifetime'] < 5)
-			$refreshTime = 300;
+			$refreshTime = 5;
 
 		// A whole day should be more than enough..
 		elseif ($modSettings['admin_session_lifetime'] > 14400)
-			$refreshTime = 86400;
+			$refreshTime = 14400;
 
 		// We are between our internal min and max. Let's keep the board owner's value.
 		else
-			$refreshTime = $modSettings['admin_session_lifetime'] * 60;
+			$refreshTime = $modSettings['admin_session_lifetime'];
 	}
 
 	// If we're using XML give an additional ten minutes grace as an admin can't log on in XML mode.
 	if (isset($_GET['xml']))
-		$refreshTime += 600;
+		$refreshTime += 10;
+
+	$refreshTime = $refreshTime * 60;
 
 	// Is the security option off?
+	// @todo remove the exception (means update the db as well)
 	if (!empty($modSettings['securityDisable' . ($type != 'admin' ? '_' . $type : '')]))
-		return;
+		return true;
 
 	// If their admin or moderator session hasn't expired yet, let it pass, let the admin session trump a moderation one as well
 	if ((!empty($_SESSION[$type . '_time']) && $_SESSION[$type . '_time'] + $refreshTime >= time()) || (!empty($_SESSION['admin_time']) && $_SESSION['admin_time'] + $refreshTime >= time()))
-		return;
+		return true;
 
 	require_once(SUBSDIR . '/Auth.subs.php');
 
-	// Comming from the login screen
+	// Coming from the login screen
 	if (isset($_POST[$type . '_pass']) || isset($_POST[$type . '_hash_pass']))
 	{
 		checkSession();
@@ -86,34 +87,15 @@ function validateSession($type = 'admin')
 		// Hashed password, ahoy!
 		if (isset($_POST[$type . '_hash_pass']) && strlen($_POST[$type . '_hash_pass']) === 64)
 		{
-			// Allow integration to verify the password
-			$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($user_info['username'], $_POST[$type . '_hash_pass'], true)), true);
-
-			$password = $_POST[$type . '_hash_pass'];
-			if ($good_password || validateLoginPassword($password, $user_info['passwd']))
-			{
-				$_SESSION[$type . '_time'] = time();
-				unset($_SESSION['request_referer']);
-
-				return;
-			}
+			if (checkPassword($type, true))
+				return true;
 		}
 
 		// Posting the password... check it.
-		if (isset($_POST[$type. '_pass']) && str_replace('*', '', $_POST[$type. '_pass']) !== '')
+		if (isset($_POST[$type . '_pass']) && str_replace('*', '', $_POST[$type . '_pass']) !== '')
 		{
-			// Give integrated systems a chance to verify this password
-			$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($user_info['username'], $_POST[$type . '_pass'], false)), true);
-
-			// Password correct?
-			$password = $_POST[$type . '_pass'];
-			if ($good_password || validateLoginPassword($password, $user_info['passwd'], $user_info['username']))
-			{
-				$_SESSION[$type . '_time'] = time();
-				unset($_SESSION['request_referer']);
-
-				return;
-			}
+			if (checkPassword($type))
+				return true;
 		}
 	}
 
@@ -126,7 +108,8 @@ function validateSession($type = 'admin')
 
 		$_SESSION[$type . '_time'] = time();
 		unset($_SESSION['request_referer']);
-		return;
+
+		return true;
 	}
 
 	// Better be sure to remember the real referer
@@ -138,19 +121,56 @@ function validateSession($type = 'admin')
 	// Need to type in a password for that, man.
 	if (!isset($_GET['xml']))
 		adminLogin($type);
-	else
-		return 'session_verify_fail';
+
+	return 'session_verify_fail';
+}
+
+/**
+ * Validates a supplied password is correct
+ *
+ * What it does:
+ *
+ * - Uses integration function to verify password is enabled
+ * - Uses validateLoginPassword to check using standard ElkArte methods
+ *
+ * @event integrate_verify_password allows integration to verify the password
+ * @param string $type
+ * @param bool $hash if the supplied password is in _hash_pass
+ *
+ * @return bool
+ */
+function checkPassword($type, $hash = false)
+{
+	global $user_info;
+
+	$password = $_POST[$type . ($hash ? '_hash_pass' : '_pass')];
+
+	// Allow integration to verify the password
+	$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($user_info['username'], $password, $hash ? true : false)), true);
+
+	// Password correct?
+	if ($good_password || validateLoginPassword($password, $user_info['passwd'], $hash ? '' : $user_info['username']))
+	{
+		$_SESSION[$type . '_time'] = time();
+		unset($_SESSION['request_referer']);
+
+		return true;
+	}
+
+	return false;
 }
 
 /**
  * Require a user who is logged in. (not a guest.)
  *
  * What it does:
+ *
  * - Checks if the user is currently a guest, and if so asks them to login with a message telling them why.
  * - Message is what to tell them when asking them to login.
  *
  * @param string $message = ''
  * @param boolean $is_fatal = true
+ * @throws Elk_Exception
  */
 function is_not_guest($message = '', $is_fatal = true)
 {
@@ -175,14 +195,16 @@ function is_not_guest($message = '', $is_fatal = true)
 		loadTheme();
 
 	// Never redirect to an attachment
-	if (strpos($_SERVER['REQUEST_URL'], 'dlattach') === false)
+	if (validLoginUrl($_SERVER['REQUEST_URL']))
+	{
 		$_SESSION['login_url'] = $_SERVER['REQUEST_URL'];
+	}
 
 	// Load the Login template and language file.
 	loadLanguage('Login');
 
 	// Apparently we're not in a position to handle this now. Let's go to a safer location for now.
-	if (!Template_Layers::getInstance()->hasLayers())
+	if (!Template_Layers::instance()->hasLayers())
 	{
 		$_SESSION['login_url'] = $scripturl . '?' . $_SERVER['QUERY_STRING'];
 		redirectexit('action=login');
@@ -200,6 +222,7 @@ function is_not_guest($message = '', $is_fatal = true)
 	// Use the kick_guest sub template...
 	$context['kick_message'] = $message;
 	$context['page_title'] = $txt['login'];
+	$context['default_password'] = '';
 
 	obExit();
 
@@ -211,11 +234,14 @@ function is_not_guest($message = '', $is_fatal = true)
  * Apply restrictions for banned users. For example, disallow access.
  *
  * What it does:
+ *
  * - If the user is banned, it dies with an error.
  * - Caches this information for optimization purposes.
  * - Forces a recheck if force_check is true.
  *
  * @param bool $forceCheck = false
+ *
+ * @throws Elk_Exception
  */
 function is_not_banned($forceCheck = false)
 {
@@ -285,31 +311,32 @@ function is_not_banned($forceCheck = false)
 				'cannot_post',
 				'cannot_register',
 			);
-			$request = $db->query('', '
+			$db->fetchQueryCallback('
 				SELECT bi.id_ban, bi.email_address, bi.id_member, bg.cannot_access, bg.cannot_register,
-					bg.cannot_post, bg.cannot_login, bg.reason, IFNULL(bg.expire_time, 0) AS expire_time
+					bg.cannot_post, bg.cannot_login, bg.reason, COALESCE(bg.expire_time, 0) AS expire_time
 				FROM {db_prefix}ban_items AS bi
 					INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group AND (bg.expire_time IS NULL OR bg.expire_time > {int:current_time}))
 				WHERE
 					(' . implode(' OR ', $ban_query) . ')',
-				$ban_query_vars
-			);
-			// Store every type of ban that applies to you in your session.
-			while ($row = $db->fetch_assoc($request))
-			{
-				foreach ($restrictions as $restriction)
-					if (!empty($row[$restriction]))
+				$ban_query_vars,
+				function ($row) use($user_info, $restrictions, &$flag_is_activated)
+				{
+					// Store every type of ban that applies to you in your session.
+					foreach ($restrictions as $restriction)
 					{
-						$_SESSION['ban'][$restriction]['reason'] = $row['reason'];
-						$_SESSION['ban'][$restriction]['ids'][] = $row['id_ban'];
-						if (!isset($_SESSION['ban']['expire_time']) || ($_SESSION['ban']['expire_time'] != 0 && ($row['expire_time'] == 0 || $row['expire_time'] > $_SESSION['ban']['expire_time'])))
-							$_SESSION['ban']['expire_time'] = $row['expire_time'];
+						if (!empty($row[$restriction]))
+						{
+							$_SESSION['ban'][$restriction]['reason'] = $row['reason'];
+							$_SESSION['ban'][$restriction]['ids'][] = $row['id_ban'];
+							if (!isset($_SESSION['ban']['expire_time']) || ($_SESSION['ban']['expire_time'] != 0 && ($row['expire_time'] == 0 || $row['expire_time'] > $_SESSION['ban']['expire_time'])))
+								$_SESSION['ban']['expire_time'] = $row['expire_time'];
 
-						if (!$user_info['is_guest'] && $restriction == 'cannot_access' && ($row['id_member'] == $user_info['id'] || $row['email_address'] == $user_info['email']))
-							$flag_is_activated = true;
+							if (!$user_info['is_guest'] && $restriction == 'cannot_access' && ($row['id_member'] == $user_info['id'] || $row['email_address'] == $user_info['email']))
+								$flag_is_activated = true;
+						}
 					}
-			}
-			$db->free_result($request);
+				}
+			);
 		}
 
 		// Mark the cannot_access and cannot_post bans as being 'hit'.
@@ -332,7 +359,7 @@ function is_not_banned($forceCheck = false)
 		foreach ($bans as $key => $value)
 			$bans[$key] = (int) $value;
 
-		$request = $db->query('', '
+		$db->fetchQueryCallback('
 			SELECT bi.id_ban, bg.reason
 			FROM {db_prefix}ban_items AS bi
 				INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group)
@@ -344,14 +371,13 @@ function is_not_banned($forceCheck = false)
 				'cannot_access' => 1,
 				'ban_list' => $bans,
 				'current_time' => time(),
-			)
+			),
+			function ($row)
+			{
+				$_SESSION['ban']['cannot_access']['ids'][] = $row['id_ban'];
+				$_SESSION['ban']['cannot_access']['reason'] = $row['reason'];
+			}
 		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			$_SESSION['ban']['cannot_access']['ids'][] = $row['id_ban'];
-			$_SESSION['ban']['cannot_access']['reason'] = $row['reason'];
-		}
-		$db->free_result($request);
 
 		// My mistake. Next time better.
 		if (!isset($_SESSION['ban']['cannot_access']))
@@ -370,7 +396,6 @@ function is_not_banned($forceCheck = false)
 		// We don't wanna see you!
 		if (!$user_info['is_guest'])
 		{
-			require_once(CONTROLLERDIR . '/Auth.controller.php');
 			$controller = new Auth_Controller();
 			$controller->action_logout(true, false);
 		}
@@ -407,22 +432,14 @@ function is_not_banned($forceCheck = false)
 		writeLog(true);
 
 		// You banned, sucka!
-		fatal_error(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_access']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_access']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']), 'user');
-
-		// If we get here, something's gone wrong.... but let's try anyway.
-		trigger_error('Hacking attempt...', E_USER_ERROR);
+		throw new Elk_Exception(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_access']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_access']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']), 'user');
 	}
 	// You're not allowed to log in but yet you are. Let's fix that.
 	elseif (isset($_SESSION['ban']['cannot_login']) && !$user_info['is_guest'])
 	{
 		// We don't wanna see you!
-		$db->query('', '
-			DELETE FROM {db_prefix}log_online
-			WHERE id_member = {int:current_member}',
-			array(
-				'current_member' => $user_info['id'],
-			)
-		);
+		require_once(SUBSDIR . '/Logging.subs.php');
+		deleteMemberLogOnline();
 
 		// 'Log' the user out.  Can't have any funny business... (save the name!)
 		$old_name = isset($user_info['name']) && $user_info['name'] != '' ? $user_info['name'] : $txt['guest_title'];
@@ -452,12 +469,11 @@ function is_not_banned($forceCheck = false)
 		writeLog(true);
 
 		// Log them out
-		require_once(CONTROLLERDIR . '/Auth.controller.php');
 		$controller = new Auth_Controller();
 		$controller->action_logout(true, false);
 
 		// Tell them thanks
-		fatal_error(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_login']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_login']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']) . '<br />' . $txt['ban_continue_browse'], 'user');
+		throw new Elk_Exception(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_login']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_login']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']) . '<br />' . $txt['ban_continue_browse'], 'user');
 	}
 
 	// Fix up the banning permissions.
@@ -469,7 +485,11 @@ function is_not_banned($forceCheck = false)
  * Fix permissions according to ban status.
  *
  * What it does:
+ *
  * - Applies any states of banning by removing permissions the user cannot have.
+ *
+ * @event integrate_post_ban_permissions Allows to update denied permissions
+ * @event integrate_warn_permissions Allows changing of permissions for users on warning moderate
  * @package Bans
  */
 function banPermissions()
@@ -504,7 +524,7 @@ function banPermissions()
 			'remove_own', 'remove_any',
 			'post_unapproved_topics', 'post_unapproved_replies_own', 'post_unapproved_replies_any',
 		);
-		Template_Layers::getInstance()->addAfter('admin_warning', 'body');
+		Template_Layers::instance()->addAfter('admin_warning', 'body');
 
 		call_integration_hook('integrate_post_ban_permissions', array(&$denied_permissions));
 		$user_info['permissions'] = array_diff($user_info['permissions'], $denied_permissions);
@@ -542,11 +562,17 @@ function banPermissions()
 
 	// Now that we have the mod cache taken care of lets setup a cache for the number of mod reports still open
 	if (isset($_SESSION['rc']) && $_SESSION['rc']['time'] > $modSettings['last_mod_report_action'] && $_SESSION['rc']['id'] == $user_info['id'])
+	{
 		$context['open_mod_reports'] = $_SESSION['rc']['reports'];
+		if (allowedTo('admin_forum'))
+		{
+			$context['open_pm_reports'] = $_SESSION['rc']['pm_reports'];
+		}
+	}
 	elseif ($_SESSION['mc']['bq'] != '0=1')
 	{
 		require_once(SUBSDIR . '/Moderation.subs.php');
-		recountOpenReports();
+		recountOpenReports(true, allowedTo('admin_forum'));
 	}
 	else
 		$context['open_mod_reports'] = 0;
@@ -556,6 +582,7 @@ function banPermissions()
  * Log a ban in the database.
  *
  * What it does:
+ *
  * - Log the current user in the ban logs.
  * - Increment the hit counters for the specified ban ID's (if any.)
  *
@@ -596,6 +623,7 @@ function log_ban($ban_ids = array(), $email = null)
  * Checks if a given email address might be banned.
  *
  * What it does:
+ *
  * - Check if a given email is banned.
  * - Performs an immediate ban if the turns turns out positive.
  *
@@ -603,6 +631,8 @@ function log_ban($ban_ids = array(), $email = null)
  * @param string $email
  * @param string $restriction
  * @param string $error
+ *
+ * @throws Elk_Exception
  */
 function isBannedEmail($email, $restriction, $error)
 {
@@ -653,14 +683,14 @@ function isBannedEmail($email, $restriction, $error)
 		log_ban($_SESSION['ban']['cannot_access']['ids']);
 		$_SESSION['ban']['last_checked'] = time();
 
-		fatal_error(sprintf($txt['your_ban'], $txt['guest_title']) . $_SESSION['ban']['cannot_access']['reason'], false);
+		throw new Elk_Exception(sprintf($txt['your_ban'], $txt['guest_title']) . $_SESSION['ban']['cannot_access']['reason'], false);
 	}
 
 	if (!empty($ban_ids))
 	{
 		// Log this ban for future reference.
 		log_ban($ban_ids, $email);
-		fatal_error($error . $ban_reason, false);
+		throw new Elk_Exception($error . $ban_reason, false);
 	}
 }
 
@@ -668,6 +698,7 @@ function isBannedEmail($email, $restriction, $error)
  * Make sure the user's correct session was passed, and they came from here.
  *
  * What it does:
+ *
  * - Checks the current session, verifying that the person is who he or she should be.
  * - Also checks the referrer to make sure they didn't get sent here.
  * - Depends on the disableCheckUA setting, which is usually missing.
@@ -676,12 +707,14 @@ function isBannedEmail($email, $restriction, $error)
  *
  * @param string $type = 'post' (post, get, request)
  * @param string $from_action = ''
- * @param bool $is_fatal = true
+ * @param bool   $is_fatal = true
+ *
  * @return string the error message if is_fatal is false.
+ * @throws Elk_Exception
  */
 function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 {
-	global $sc, $modSettings, $boardurl;
+	global $modSettings, $boardurl;
 
 	// We'll work out user agent checks
 	$req = request();
@@ -690,14 +723,14 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	if ($type == 'post')
 	{
 		$check = isset($_POST[$_SESSION['session_var']]) ? $_POST[$_SESSION['session_var']] : (empty($modSettings['strictSessionCheck']) && isset($_POST['sc']) ? $_POST['sc'] : null);
-		if ($check !== $sc)
+		if ($check !== $_SESSION['session_value'])
 			$error = 'session_timeout';
 	}
 	// How about $_GET['sesc']?
 	elseif ($type === 'get')
 	{
 		$check = isset($_GET[$_SESSION['session_var']]) ? $_GET[$_SESSION['session_var']] : (empty($modSettings['strictSessionCheck']) && isset($_GET['sesc']) ? $_GET['sesc'] : null);
-		if ($check !== $sc)
+		if ($check !== $_SESSION['session_value'])
 			$error = 'session_verify_fail';
 	}
 	// Or can it be in either?
@@ -705,7 +738,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	{
 		$check = isset($_GET[$_SESSION['session_var']]) ? $_GET[$_SESSION['session_var']] : (empty($modSettings['strictSessionCheck']) && isset($_GET['sesc']) ? $_GET['sesc'] : (isset($_POST[$_SESSION['session_var']]) ? $_POST[$_SESSION['session_var']] : (empty($modSettings['strictSessionCheck']) && isset($_POST['sc']) ? $_POST['sc'] : null)));
 
-		if ($check !== $sc)
+		if ($check !== $_SESSION['session_value'])
 			$error = 'session_verify_fail';
 	}
 
@@ -714,12 +747,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 		$error = 'session_verify_fail';
 
 	// Make sure a page with session check requirement is not being prefetched.
-	if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
-	{
-		@ob_end_clean();
-		header('HTTP/1.1 403 Forbidden');
-		die;
-	}
+	stop_prefetching();
 
 	// Check the referring site - it should be the same server at least!
 	if (isset($_SESSION['request_referer']))
@@ -781,7 +809,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 			die;
 		}
 		else
-			fatal_lang_error($error, isset($log_error) ? 'user' : false, isset($sprintf) ? $sprintf : array());
+			throw new Elk_Exception($error, isset($log_error) ? 'user' : false, isset($sprintf) ? $sprintf : array());
 	}
 	// A session error occurred, return the error to the calling function.
 	else
@@ -792,46 +820,32 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 }
 
 /**
- * Check if a specific confirm parameter was given.
- *
- * @param string $action
- */
-function checkConfirm($action)
-{
-	global $modSettings;
-
-	$req = request();
-
-	if (isset($_GET['confirm']) && isset($_SESSION['confirm_' . $action]) && md5($_GET['confirm'] . $req->user_agent()) === $_SESSION['confirm_' . $action])
-		return true;
-	else
-	{
-		$token = md5(mt_rand() . session_id() . (string) microtime() . $modSettings['rand_seed']);
-		$_SESSION['confirm_' . $action] = md5($token . $req->user_agent());
-
-		return $token;
-	}
-}
-
-/**
  * Lets give you a token of our appreciation.
  *
- * @param string $action
- * @param string $type = 'post'
- * @return string[] array of token var and token
+ * What it does:
+ *
+ * - Creates a one time use form token
+ *
+ * @param string $action The specific site action that a token will be generated for
+ * @param string $type = 'post' If the token will be returned via post or get
+ *
+ * @return string[] array of token var, time, csrf, token
  */
 function createToken($action, $type = 'post')
 {
-	global $modSettings, $context;
+	global $context;
 
-	// we need user agent
+	// Generate a new token token_var pair
+	$tokenizer = new Token_Hash();
+	$token_var = $tokenizer->generate_hash(rand(7, 12));
+	$token = $tokenizer->generate_hash(32);
+
+	// We need user agent and the client IP
 	$req = request();
+	$csrf_hash = hash('sha1', $token . $req->client_ip() . $req->user_agent());
 
-	$token = md5(mt_rand() . session_id() . (string) microtime() . $modSettings['rand_seed'] . $type);
-	$token_var = substr(preg_replace('~^\d+~', '', md5(mt_rand() . (string) microtime() . mt_rand())), 0, rand(7, 12));
-
-	$_SESSION['token'][$type . '-' . $action] = array($token_var, md5($token . $req->user_agent()), time(), $token);
-
+	// Save the session token and make it available to the forms
+	$_SESSION['token'][$type . '-' . $action] = array($token_var, $csrf_hash, time(), $token);
 	$context[$action . '_token'] = $token;
 	$context[$action . '_token_var'] = $token_var;
 
@@ -841,42 +855,57 @@ function createToken($action, $type = 'post')
 /**
  * Only patrons with valid tokens can ride this ride.
  *
+ * What it does:
+ *
+ * - Validates that the received token is correct
+ * - 1. The token exists in session.
+ * - 2. The {$type} variable should exist.
+ * - 3. We concatenate the variable we received with the user agent
+ * - 4. Match that result against what is in the session.
+ * - 5. If it matches, success, otherwise we fallout.
+ *
  * @param string $action
  * @param string $type = 'post' (get, request, or post)
- * @param bool $reset = true
- * @param bool $fatal if true a fatal_lang_error is issued for invalid tokens, otherwise false is returned
- * @return boolean except for $action == 'login' where the token is returned
+ * @param bool   $reset = true Reset the token on failure
+ * @param bool   $fatal if true a fatal_lang_error is issued for invalid tokens, otherwise false is returned
+ *
+ * @return bool except for $action == 'login' where the token is returned
+ * @throws Elk_Exception token_verify_fail
  */
 function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 {
-	$type = $type == 'get' || $type == 'request' ? $type : 'post';
+	$type = ($type === 'get' || $type === 'request') ? $type : 'post';
 	$token_index = $type . '-' . $action;
 
-	// Logins are special: the token is used to has the password with javascript before POST it
+	// Logins are special: the token is used to have the password with javascript before POST it
 	if ($action == 'login')
 	{
 		if (isset($_SESSION['token'][$token_index]))
 		{
 			$return = $_SESSION['token'][$token_index][3];
 			unset($_SESSION['token'][$token_index]);
+
 			return $return;
 		}
 		else
 			return '';
 	}
 
-	// This nasty piece of code validates a token.
-	// 1. The token exists in session.
-	// 2. The {$type} variable should exist.
-	// 3. We concatenate the variable we received with the user agent
-	// 4. Match that result against what is in the session.
-	// 5. If it matches, success, otherwise we fallout.
+	if (!isset($_SESSION['token'][$token_index]))
+		return false;
 
-	// we use user agent
+	// We need the user agent and client IP
 	$req = request();
-	if (isset($_SESSION['token'][$token_index], $GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$token_index][0]]) && md5($GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$token_index][0]] . $req->user_agent()) === $_SESSION['token'][$token_index][1])
+
+	// Shortcut
+	$passed_token_var = isset($GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$token_index][0]]) ? $GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$token_index][0]] : null;
+	$csrf_hash = hash('sha1', $passed_token_var . $req->client_ip() . $req->user_agent());
+
+	// Checked what was passed in combination with the user agent
+	if (isset($_SESSION['token'][$token_index], $passed_token_var)
+		&& $csrf_hash === $_SESSION['token'][$token_index][1])
 	{
-		// Invalidate this token now.
+		// Consume the token, let them pass
 		unset($_SESSION['token'][$token_index]);
 
 		return true;
@@ -892,17 +921,17 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 		createToken($action, $type);
 
 		if ($fatal)
-			fatal_lang_error('token_verify_fail', false);
-		else
-			return false;
+			throw new Elk_Exception('token_verify_fail', false);
 	}
-	// Remove this token as its useless
+	// You don't get a new token
 	else
+	{
+		// Explicitly remove this token
 		unset($_SESSION['token'][$token_index]);
 
-	// Randomly check if we should remove some older tokens.
-	if (mt_rand(0, 138) == 23)
+		// Remove older tokens.
 		cleanTokens();
+	}
 
 	return false;
 }
@@ -911,7 +940,8 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
  * Removes old unused tokens from session
  *
  * What it does:
- * - defaults to 3 hours before a token is considered expired
+ *
+ * - Defaults to 3 hours before a token is considered expired
  * - if $complete = true will remove all tokens
  *
  * @param bool $complete = false
@@ -940,6 +970,7 @@ function cleanTokens($complete = false, $suffix = '')
  * Check whether a form has been submitted twice.
  *
  * What it does:
+ *
  * - Registers a sequence number for a form.
  * - Checks whether a submitted sequence number is registered in the current session.
  * - Depending on the value of is_fatal shows an error or returns true or false.
@@ -947,9 +978,12 @@ function cleanTokens($complete = false, $suffix = '')
  * - Frees a sequence number without checking if action == 'free'.
  *
  * @param string $action
- * @param bool $is_fatal = true
+ * @param bool   $is_fatal = true
+ *
+ * @return bool
+ * @throws Elk_Exception error_form_already_submitted
  */
-function checkSubmitOnce($action, $is_fatal = true)
+function checkSubmitOnce($action, $is_fatal = false)
 {
 	global $context;
 
@@ -959,9 +993,10 @@ function checkSubmitOnce($action, $is_fatal = true)
 	// Register a form number and store it in the session stack. (use this on the page that has the form.)
 	if ($action == 'register')
 	{
-		$context['form_sequence_number'] = 0;
+		$tokenizer = new Token_Hash();
+		$context['form_sequence_number'] = '';
 		while (empty($context['form_sequence_number']) || in_array($context['form_sequence_number'], $_SESSION['forms']))
-			$context['form_sequence_number'] = mt_rand(1, 16000000);
+			$context['form_sequence_number'] = $tokenizer->generate_hash();
 	}
 	// Check whether the submitted number can be found in the session.
 	elseif ($action == 'check')
@@ -970,11 +1005,12 @@ function checkSubmitOnce($action, $is_fatal = true)
 			return true;
 		elseif (!in_array($_REQUEST['seqnum'], $_SESSION['forms']))
 		{
-			$_SESSION['forms'][] = (int) $_REQUEST['seqnum'];
+			// Mark this one as used
+			$_SESSION['forms'][] = (string) $_REQUEST['seqnum'];
 			return true;
 		}
 		elseif ($is_fatal)
-			fatal_lang_error('error_form_already_submitted', false);
+			throw new Elk_Exception('error_form_already_submitted', false);
 		else
 			return false;
 	}
@@ -989,11 +1025,13 @@ function checkSubmitOnce($action, $is_fatal = true)
  * This function checks whether the user is allowed to do permission. (ie. post_new.)
  *
  * What it does:
+ *
  * - If boards parameter is specified, checks those boards instead of the current one (if applicable).
  * - Always returns true if the user is an administrator.
  *
  * @param string[]|string $permission permission
  * @param int[]|int|null $boards array of board IDs, a single id or null
+ *
  * @return boolean if the user can do the permission
  */
 function allowedTo($permission, $boards = null)
@@ -1070,13 +1108,16 @@ function allowedTo($permission, $boards = null)
  * This function returns fatal error if the user doesn't have the respective permission.
  *
  * What it does:
+ *
  * - Uses allowedTo() to check if the user is allowed to do permission.
  * - Checks the passed boards or current board for the permission.
  * - If they are not, it loads the Errors language file and shows an error using $txt['cannot_' . $permission].
  * - If they are a guest and cannot do it, this calls is_not_guest().
  *
- * @param string[]|string $permission array of or single string, of persmission to check
- * @param int[]|null $boards = null
+ * @param string[]|string $permission array of or single string, of permissions to check
+ * @param int[]|null      $boards = null
+ *
+ * @throws Elk_Exception
  */
 function isAllowedTo($permission, $boards = null)
 {
@@ -1116,10 +1157,7 @@ function isAllowedTo($permission, $boards = null)
 		$_GET['topic'] = '';
 		writeLog(true);
 
-		fatal_lang_error('cannot_' . $error_permission, false);
-
-		// Getting this far is a really big problem, but let's try our best to prevent any cases...
-		trigger_error('Hacking attempt...', E_USER_ERROR);
+		throw new Elk_Exception('cannot_' . $error_permission, false);
 	}
 
 	// If you're doing something on behalf of some "heavy" permissions, validate your session.
@@ -1132,9 +1170,10 @@ function isAllowedTo($permission, $boards = null)
  * Return the boards a user has a certain (board) permission on. (array(0) if all.)
  *
  * What it does:
- * - returns a list of boards on which the user is allowed to do the specified permission.
- * - returns an array with only a 0 in it if the user has permission to do this on every board.
- * - returns an empty array if he or she cannot do this on any board.
+ *
+ * - Returns a list of boards on which the user is allowed to do the specified permission.
+ * - Returns an array with only a 0 in it if the user has permission to do this on every board.
+ * - Returns an empty array if he or she cannot do this on any board.
  * - If check_access is true will also make sure the group has proper access to that board.
  *
  * @param string[]|string $permissions array of permission names to check access against
@@ -1237,6 +1276,8 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 /**
  * Returns whether an email address should be shown and how.
  *
+ * What it does:
+ *
  * Possible outcomes are:
  * - 'yes': show the full email address
  * - 'yes_permission_override': show the full email address, either you
@@ -1247,6 +1288,7 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
  *
  * @param bool $userProfile_hideEmail
  * @param int $userProfile_id
+ *
  * @return string (yes, yes_permission_override, no_through_forum, no)
  */
 function showEmailAddress($userProfile_hideEmail, $userProfile_id)
@@ -1274,12 +1316,20 @@ function showEmailAddress($userProfile_hideEmail, $userProfile_id)
 }
 
 /**
- * This function attempts to protect from spammed messages and the like.
+ * This function attempts to protect from carrying out specific actions repeatedly.
  *
+ * What it does:
+ *
+ * - Checks if a user is trying specific actions faster than a given minimum wait threshold.
  * - The time taken depends on error_type - generally uses the modSetting.
+ * - Generates a fatal message when triggered, suspending execution.
  *
- * @param string $error_type used also as a $txt index. (not an actual string.)
+ * @event integrate_spam_protection Allows to update action wait timeOverrides
+ * @param string  $error_type used also as a $txt index. (not an actual string.)
  * @param boolean $fatal is the spam check a fatal error on failure
+ *
+ * @return bool|int|mixed
+ * @throws Elk_Exception
  */
 function spamProtection($error_type, $fatal = true)
 {
@@ -1331,8 +1381,7 @@ function spamProtection($error_type, $fatal = true)
 		// Spammer!  You only have to wait a *few* seconds!
 		if ($fatal)
 		{
-			fatal_lang_error($error_type . '_WaitTime_broken', false, array($timeLimit));
-			return true;
+			throw new Elk_Exception($error_type . '_WaitTime_broken', false, array($timeLimit));
 		}
 		else
 			return $timeLimit;
@@ -1346,10 +1395,12 @@ function spamProtection($error_type, $fatal = true)
  * A generic function to create a pair of index.php and .htaccess files in a directory
  *
  * @param string $path the (absolute) directory path
- * @param boolean $attachments if the directory is an attachments directory or not
+ * @param boolean $allow_localhost if access should be allowed to localhost
+ * @param string $files (optional, default '*') parameter for the Files tag
+ *
  * @return string|boolean on success error string if anything fails
  */
-function secureDirectory($path, $attachments = false)
+function secureDirectory($path, $allow_localhost = false, $files = '*')
 {
 	if (empty($path))
 		return 'empty_path';
@@ -1360,7 +1411,7 @@ function secureDirectory($path, $attachments = false)
 	$directoryname = basename($path);
 
 	$errors = array();
-	$close = empty($attachments) ? '
+	$close = empty($allow_localhost) ? '
 </Files>' : '
 	Allow from localhost
 </Files>
@@ -1374,7 +1425,7 @@ RemoveHandler .php .php3 .phtml .cgi .fcgi .pl .fpl .shtml';
 		$fh = @fopen($path . '/.htaccess', 'w');
 		if ($fh)
 		{
-			fwrite($fh, '<Files *>
+			fwrite($fh, '<Files ' . $files . '>
 	Order Deny,Allow
 	Deny from all' . $close);
 			fclose($fh);
@@ -1419,9 +1470,12 @@ else
 /**
  * Helper function that puts together a ban query for a given ip
  *
+ * What it does:
+ *
  * - Builds the query for ipv6, ipv4 or 255.255.255.255 depending on whats supplied
  *
  * @param string $fullip An IP address either IPv6 or not
+ *
  * @return string A SQL condition
  */
 function constructBanQueryIP($fullip)
@@ -1460,6 +1514,7 @@ function constructBanQueryIP($fullip)
  * Decide if we are going to enable bad behavior scanning for this user
  *
  * What it does:
+ *
  * - Admins and Moderators get a free pass
  * - Optionally existing users with post counts over a limit are bypassed
  * - Others get a humane frisking
@@ -1497,11 +1552,16 @@ function loadBadBehavior()
 /**
  * This protects against brute force attacks on a member's password.
  *
- * - Importantly, even if the password was right we DON'T TELL THEM!
+ * What it does:
  *
- * @param int $id_member
- * @param string|false $password_flood_value = false or string joined on |'s
- * @param boolean $was_correct = false
+ * - Importantly, even if the password was right we DON'T TELL THEM!
+ * - Allows 5 attempts every 10 seconds
+ *
+ * @param int         $id_member
+ * @param string|bool $password_flood_value = false or string joined on |'s
+ * @param boolean     $was_correct = false
+ *
+ * @throws Elk_Exception no_access
  */
 function validatePasswordFlood($id_member, $password_flood_value = false, $was_correct = false)
 {
@@ -1523,7 +1583,7 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 		redirectexit();
 
 		// Probably not needed, but still make sure...
-		fatal_lang_error('no_access', false);
+		throw new Elk_Exception('no_access', false);
 	}
 
 	// Let's just initialize to something (and 0 is better than nothing)
@@ -1546,9 +1606,10 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 
 	// Broken the law?
 	if ($number_tries > 5)
-		fatal_lang_error('login_threshold_brute_fail', 'critical');
+		throw new Elk_Exception('login_threshold_brute_fail', 'critical');
 
 	// Otherwise set the members data. If they correct on their first attempt then we actually clear it, otherwise we set it!
+	require_once(SUBSDIR . '/Members.subs.php');
 	updateMemberData($id_member, array('passwd_flood' => $was_correct && $number_tries == 1 ? '' : $time_stamp . '|' . $number_tries));
 }
 
@@ -1579,6 +1640,8 @@ function frameOptionsHeader($override = null)
 /**
  * This adds additional security headers that may prevent browsers from doing something they should not
  *
+ * What it does:
+ *
  * - X-XSS-Protection header - This header enables the Cross-site scripting (XSS) filter
  * built into most recent web browsers. It's usually enabled by default, so the role of this
  * header is to re-enable the filter for this particular website if it was disabled by the user.
@@ -1595,4 +1658,103 @@ function securityOptionsHeader($override = null)
 		header('X-XSS-Protection: 1');
 		header('X-Content-Type-Options: nosniff');
 	}
+}
+
+/**
+ * Stop some browsers pre fetching activity to reduce server load
+ */
+function stop_prefetching()
+{
+	if (isset($_SERVER['HTTP_X_PURPOSE']) && in_array($_SERVER['HTTP_X_PURPOSE'], array('preview', 'instant'))
+		|| (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] === 'prefetch'))
+	{
+		@ob_end_clean();
+		header('HTTP/1.1 403 Forbidden');
+		die;
+	}
+}
+
+/**
+ * Check if the admin's session is active
+ *
+ * @return bool
+ */
+function isAdminSessionActive()
+{
+	global $modSettings;
+
+	return empty($modSettings['securityDisable']) && (isset($_SESSION['admin_time']) && $_SESSION['admin_time'] + ($modSettings['admin_session_lifetime'] * 60) > time());
+}
+
+/**
+ * Check if security files exist
+ *
+ * If files are found, populate $context['security_controls_files']:
+ * * 'title'	- $txt['security_risk']
+ * * 'errors'	- An array of strings with the key being the filename and the value an error with the filename in it
+ *
+ * @event integrate_security_files Allows to add / modify to security files array
+ *
+ * @return bool
+ */
+function checkSecurityFiles()
+{
+	global $txt, $context;
+
+	$has_files = false;
+
+	$securityFiles = array('install.php', 'upgrade.php', 'convert.php', 'repair_paths.php', 'repair_settings.php', 'Settings.php~', 'Settings_bak.php~');
+	call_integration_hook('integrate_security_files', array(&$securityFiles));
+
+	foreach ($securityFiles as $securityFile)
+	{
+		if (file_exists(BOARDDIR . '/' . $securityFile))
+		{
+			$has_files = true;
+
+			$context['security_controls_files']['title'] = $txt['security_risk'];
+			$context['security_controls_files']['errors'][$securityFile] = sprintf($txt['not_removed'], $securityFile);
+
+			if ($securityFile == 'Settings.php~' || $securityFile == 'Settings_bak.php~')
+			{
+				$context['security_controls_files']['errors'][$securityFile] .= '<span class="smalltext">' . sprintf($txt['not_removed_extra'], $securityFile, substr($securityFile, 0, -1)) . '</span>';
+			}
+		}
+	}
+
+	return $has_files;
+}
+
+/**
+ * The login URL should not redirect to certain areas (attachments, js actions, etc)
+ * this function does these checks and return if the URL is valid or not.
+ *
+ * @param string $url - The URL to validate
+ * @param bool $match_board - If true tries to match board|topic in the URL as well
+ * @return bool
+ */
+function validLoginUrl($url, $match_board = false)
+{
+	if (empty($url))
+	{
+		return false;
+	}
+
+	if (substr($url, 0, 7) !== 'http://' && substr($url, 0, 8) !== 'https://')
+	{
+		return false;
+	}
+
+	$invalid_strings = array('dlattach' => '~(board|topic)[=,]~', 'jslocale' => '', 'login' => '');
+	call_integration_hook('integrate_validLoginUrl', array(&$invalid_strings));
+
+	foreach ($invalid_strings as $invalid_string => $valid_match)
+	{
+		if (strpos($url, $invalid_string) !== false || ($match_board === true && !empty($valid_match) && preg_match($valid_match, $url) == 0))
+		{
+			return false;
+		}
+	}
+
+	return true;
 }

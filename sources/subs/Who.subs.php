@@ -7,12 +7,9 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.8
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Checks, who is viewing a topic or board
@@ -120,7 +117,7 @@ function formatViewers($id, $type)
 /**
  * This function reads from the database the addons credits,
  * and returns them in an array for display in credits section of the site.
- * The addons copyright, license, title informations are those saved from <license>
+ * The addons copyright, license, title information are those saved from <license>
  * and <credits> tags in package.xml.
  *
  * @return array
@@ -131,11 +128,13 @@ function addonsCredits()
 
 	$db = database();
 
-	if (($credits = cache_get_data('addons_credits', 86400)) === null)
+	$cache = Cache::instance();
+	$credits = array();
+	if (!$cache->getVar($credits, 'addons_credits', 86400))
 	{
-		$credits = array();
 		$request = $db->query('substring', '
-			SELECT version, name, credits
+			SELECT 
+				version, name, credits
 			FROM {db_prefix}log_packages
 			WHERE install_state = {int:installed_adds}
 				AND credits != {string:empty}
@@ -148,7 +147,6 @@ function addonsCredits()
 				'empty' => '',
 			)
 		);
-
 		while ($row = $db->fetch_assoc($request))
 		{
 			$credit_info = Util::unserialize($row['credits']);
@@ -158,11 +156,12 @@ function addonsCredits()
 			$version = $txt['credits_version'] . '' . $row['version'];
 			$title = (empty($credit_info['title']) ? $row['name'] : Util::htmlspecialchars($credit_info['title'])) . ': ' . $version;
 
-			// build this one out and stash it away
+			// Build this one out and stash it away
 			$name = empty($credit_info['url']) ? $title : '<a href="' . $credit_info['url'] . '">' . $title . '</a>';
 			$credits[] = $name . (!empty($license) ? ' | ' . $license : '') . (!empty($copyright) ? ' | ' . $copyright : '');
 		}
-		cache_put_data('addons_credits', $credits, 86400);
+
+		$cache->put('addons_credits', $credits, 86400);
 	}
 
 	return $credits;
@@ -183,8 +182,9 @@ function addonsCredits()
  * add a list of possible permissions to the $allowedActions array, using ACTION as the key.
  *
  * @param mixed[]|string $urls a single url (string) or an array of arrays, each inner array being (serialized request data, id_member)
- * @param string|false $preferred_prefix = false
+ * @param string|bool $preferred_prefix = false
  * @return mixed[]|string an array of descriptions if you passed an array, otherwise the string describing their current location.
+ * @throws Elk_Exception
  */
 function determineActions($urls, $preferred_prefix = false)
 {
@@ -380,7 +380,7 @@ function determineActions($urls, $preferred_prefix = false)
 		// Maybe the action is integrated into another system?
 		if (count($integrate_actions = call_integration_hook('integrate_whos_online', array($actions))) > 0)
 		{
-			// Try each integraion hook with this url and see if they can fill in the details
+			// Try each integration hook with this url and see if they can fill in the details
 			foreach ($integrate_actions as $integrate_action)
 			{
 				if (!empty($integrate_action))
@@ -481,7 +481,8 @@ function prepareCreditsData()
 	$credits['credits_software_graphics'] = array(
 		'graphics' => array(
 			'<a href="http://p.yusukekamiyamane.com/">Fugue Icons</a> | &copy; 2012 Yusuke Kamiyamane | These icons are licensed under a Creative Commons Attribution 3.0 License',
-			'<a href="http://www.oxygen-icons.org/">Oxygen Icons</a> | These icons are licensed under <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>',
+			'<a href="https://icomoon.io">IcoMoon Free Icons</a> | These icons are licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY-SA 4.0</a>',
+			'<a href="http://www.oxygen-icons.org/">Oxygen Icons</a> | These icons are licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>',
 		),
 		'fonts' => array(
 			'<a href="http://openfontlibrary.org/en/font/architect-s-daughter">Architect\'s Daughter</a> | &copy; 2010 <a href="http://kimberlygeswein.com/">Kimberly Geswein</a> | This font is licensed under the SIL Open Font License, Version 1.1',
@@ -500,13 +501,16 @@ function prepareCreditsData()
 			'<a href="http://pajhome.org.uk/crypt/md5">Javascript Crypt</a> | &copy; Angel Marin, Paul Johnston | Licensed under <a href="http://opensource.org/licenses/BSD-3-Clause">The BSD License</a>',
 			'<a href="http://jquery.org/">JQuery</a> | &copy; jQuery Foundation and other contributors | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="http://jqueryui.com/">JQuery UI</a> | &copy; jQuery Foundation and other contributors | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
-			'<a href="http://crisp.tweakblogs.net/blog/6861/jsmin%2B-version-14.html">JSMinPlus</a> | Licensed under <a href="http://opensource.org/licenses/MPL-1.1">Mozilla_Public_License, Version 1.1</a>',
+			'<a href="https://github.com/tchwork/jsqueeze">Jsqueeze</a> &copy Nicolas Grekas| Licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>',
+			'<a href="https://github.com/mailcheck">MailCheck</a> | &copy; Received Inc | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="http://www.openwall.com/phpass/">PH Pass</a> | Author: Solar Designer | Placed in the public domain</a>',
 			'<a href="http://www.sceditor.com/">SCEditor</a> | &copy; Sam Clarke | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="http://sourceforge.net/projects/simplehtmldom/">Simple HTML DOM</a> | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="http://www.simplemachines.org/">Simple Machines</a> | &copy; Simple Machines | Licensed under <a href="http://www.simplemachines.org/about/smf/license.php">The BSD License</a>',
 			'<a href="http://users.tpg.com.au/j_birch/plugins/superfish/">Superfish</a> | &copy; Joel Birch | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="https://github.com/tubalmartin/YUI-CSS-compressor-PHP-port">YUI-CSS compressor (PHP port)</a> | &copy; Yahoo! Inc | Licensed under <a href="http://opensource.org/licenses/BSD-3-Clause">The BSD License</a>',
+			'<a href="http://lab.ejci.net/favico.js/">favico.js</a> | &copy; Miroslav Magda | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
+			'<a href="https://github.com/ttsvetko/HTML5-Desktop-Notifications">HTML5 Desktop Notifications</a> | &copy; Tsvetan Tsvetkov | Licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>',
 		),
 	);
 
@@ -518,6 +522,6 @@ function prepareCreditsData()
 	call_integration_hook('integrate_credits', array(&$credits));
 
 	// Copyright information
-	$credits['copyrights']['elkarte'] = '&copy; 2012 - 2014 ElkArte Forum contributors';
+	$credits['copyrights']['elkarte'] = '&copy; 2012 - 2017 ElkArte Forum contributors';
 	return $credits;
 }

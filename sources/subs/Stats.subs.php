@@ -11,18 +11,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Return the number of currently online members.
@@ -200,7 +195,7 @@ function topBoards($limit = null, $read_status = false)
 
 	$boards_result = $db->query('', '
 		SELECT b.id_board, b.name, b.num_posts, b.num_topics' . ($read_status ? ',' . (!$user_info['is_guest'] ? ' 1 AS is_read' : '
-			(IFNULL(lb.id_msg, 0) >= b.id_last_msg) AS is_read') : '') . '
+			(COALESCE(lb.id_msg, 0) >= b.id_last_msg) AS is_read') : '') . '
 		FROM {db_prefix}boards AS b' . ($read_status ? '
 			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})' : '') . '
 		WHERE {query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
@@ -315,7 +310,7 @@ function topTopicReplies($limit = null)
 	while ($row_topic_reply = $db->fetch_assoc($topic_reply_result))
 	{
 		// Build out this topics details for controller use
-		censorText($row_topic_reply['subject']);
+		$row_topic_reply['subject'] = censor($row_topic_reply['subject']);
 		$top_topics_replies[$row_topic_reply['id_topic']] = array(
 			'id' => $row_topic_reply['id_topic'],
 			'board' => array(
@@ -336,7 +331,7 @@ function topTopicReplies($limit = null)
 	}
 	$db->free_result($topic_reply_result);
 
-	// Calculate the percentages and final formating of the number
+	// Calculate the percentages and final formatting of the number
 	foreach ($top_topics_replies as $i => $topic)
 	{
 		$top_topics_replies[$i]['post_percent'] = round(($topic['num_replies'] * 100) / $max_num_replies);
@@ -411,7 +406,7 @@ function topTopicViews($limit = null)
 	while ($row_topic_views = $db->fetch_assoc($topic_view_result))
 	{
 		// Build the topic result array
-		censorText($row_topic_views['subject']);
+		$row_topic_views['subject'] = censor($row_topic_views['subject']);
 		$top_topics_views[$row_topic_views['id_topic']] = array(
 			'id' => $row_topic_views['id_topic'],
 			'board' => array(
@@ -432,7 +427,7 @@ function topTopicViews($limit = null)
 	}
 	$db->free_result($topic_view_result);
 
-	// Percentages and final formattting
+	// Percentages and final formatting
 	foreach ($top_topics_views as $i => $topic)
 	{
 		$top_topics_views[$i]['post_percent'] = round(($topic['num_views'] * 100) / $max_num_views);
@@ -454,9 +449,10 @@ function topTopicStarter()
 	global $modSettings, $scripturl;
 
 	$db = database();
+	$members = array();
 
 	// Try to cache this when possible, because it's a little unavoidably slow.
-	if (($members = cache_get_data('stats_top_starters', 360)) == null)
+	if (!Cache::instance()->getVar($members, 'stats_top_starters', 360) || empty($members))
 	{
 		$request = $db->query('', '
 			SELECT id_member_started, COUNT(*) AS hits
@@ -474,7 +470,7 @@ function topTopicStarter()
 			$members[$row['id_member_started']] = $row['hits'];
 		$db->free_result($request);
 
-		cache_put_data('stats_top_starters', $members, 360);
+		Cache::instance()->put('stats_top_starters', $members, 360);
 	}
 
 	if (empty($members))
@@ -511,7 +507,7 @@ function topTopicStarter()
 	}
 	$db->free_result($members_result);
 
-	// Finish of with the determing the percentages
+	// Finish of with the determining the percentages
 	foreach ($top_starters as $i => $topic)
 	{
 		$top_starters[$i]['post_percent'] = round(($topic['num_topics'] * 100) / $max_num_topics);
@@ -537,7 +533,7 @@ function topTimeOnline()
 	$max_members = isset($modSettings['stats_limit']) ? $modSettings['stats_limit'] : 10;
 
 	// Do we have something cached that will help speed this up?
-	$temp = cache_get_data('stats_total_time_members', 600);
+	$temp = Cache::instance()->get('stats_total_time_members', 600);
 
 	// Get the member data, sorted by total time logged in
 	$members_result = $db->query('', '
@@ -595,7 +591,7 @@ function topTimeOnline()
 
 	// Cache the ones we found for a bit, just so we don't have to look again.
 	if ($temp !== $temp2)
-		cache_put_data('stats_total_time_members', $temp2, 600);
+		Cache::instance()->put('stats_total_time_members', $temp2, 600);
 
 	return $top_time_online;
 }
@@ -912,7 +908,7 @@ function UserStatsPostingTime($memID)
 	// Find the times when the users posts
 	$result = $db->query('user_activity_by_time', '
 		SELECT
-			HOUR(FROM_UNIXTIME(poster_time + {int:time_offset})) AS hour,
+			HOUR(FROM_UNIXTIME(poster_time + {float:time_offset})) AS hour,
 			COUNT(*) AS post_count
 		FROM {db_prefix}messages
 		WHERE id_member = {int:current_member}' . ($modSettings['totalMessages'] > 100000 ? '

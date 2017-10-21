@@ -5,7 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.10
+ * @version 1.1
  *
  */
 
@@ -33,11 +33,11 @@ function template_list_groups_collapsible($group = 'default_groups_list')
 
 	foreach ($current_group_list['member_groups'] as $group)
 	{
-		$all_selected &= $group['status'] == 'on';
+		$all_selected &= $group['status'] === 'on';
 		echo '
 				<li>
-					<input type="checkbox" id="', $current_group_list['id'], '_', $group['id'], '" name="', $current_group_list['id'], '[', $group['id'], ']" value="on"', $group['status'] == 'on' ? ' checked="checked"' : '', ' class="input_check" />
-					<label for="', $current_group_list['id'], '_', $group['id'], '"', $group['is_postgroup'] ? ' style="font-style: italic;"' : '', '>', $group['name'], '</label> <em>(', $group['member_count'], ')</em>
+					<input type="checkbox" id="', $current_group_list['id'], '_', $group['id'], '" name="', $current_group_list['id'], '[', $group['id'], ']" value="on"', $group['status'] == 'on' ? ' checked="checked"' : '', ' />
+					<label for="', $current_group_list['id'], '_', $group['id'], '"', $group['is_postgroup'] ? ' class="em"' : '', '>', $group['name'], '</label> <em>(', $group['member_count'], ')</em>
 				</li>';
 	}
 
@@ -57,6 +57,8 @@ function template_list_groups_collapsible($group = 'default_groups_list')
  * @param string $label
  * @param string $extra
  * @param boolean $all
+ *
+ * @return string as echoed output
  */
 function template_select_boards($name, $label = '', $extra = '', $all = false)
 {
@@ -80,7 +82,7 @@ function template_select_boards($name, $label = '', $extra = '', $all = false)
 
 		foreach ($category['boards'] as $board)
 			echo '
-			<option value="', $board['id'], '"', !empty($board['selected']) ? ' selected="selected"' : '', !empty($context['current_board']) && $board['id'] == $context['current_board'] && $context['boards_current_disabled'] ? ' disabled="disabled"' : '', '>', $board['child_level'] > 0 ? str_repeat('&#8195;', $board['child_level'] - 1) . '&#8195;' . (isBrowser('ie8') ? '&#187;' : '&#10148;') : '', $board['name'], '</option>';
+			<option value="', $board['id'], '"', !empty($board['selected']) ? ' selected="selected"' : '', !empty($context['current_board']) && $board['id'] == $context['current_board'] && $context['boards_current_disabled'] ? ' disabled="disabled"' : '', '>', $board['child_level'] > 0 ? str_repeat('&#8195;', $board['child_level'] - 1) . '&#8195;&#10148;' : '', $board['name'], '</option>';
 		echo '
 		</optgroup>';
 	}

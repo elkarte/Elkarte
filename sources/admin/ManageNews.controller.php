@@ -7,18 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.5
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * ManageNews controller, for news administration screens.
@@ -28,20 +23,28 @@ if (!defined('ELK'))
 class ManageNews_Controller extends Action_Controller
 {
 	/**
-	 * News settings form.
-	 * @var Settings_Form
+	 * Members specifically being included in a newsletter
+	 * @var array
 	 */
-	protected $_newsSettings;
+	protected $_members = array();
+
+	/**
+	 * Members specifically being excluded from a newsletter
+	 * @var array
+	 */
+	protected $_exclude_members = array();
 
 	/**
 	 * The news dispatcher / delegator
 	 *
 	 * What it does:
+	 *
 	 * - This is the entrance point for all News and Newsletter screens.
 	 * - Called by ?action=admin;area=news.
 	 * - It does the permission checks, and calls the appropriate function
 	 * based on the requested sub-action.
 	 *
+	 * @event integrate_sa_manage_news used to add new subactions
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -94,16 +97,15 @@ class ManageNews_Controller extends Action_Controller
 			),
 		);
 
-		// Default to sub action 'editnews' or 'mailingmembers' or 'settings' depending on permissions.
 		// Give integration its shot via integrate_sa_manage_news
 		$subAction = $action->initialize($subActions, (allowedTo('edit_news') ? 'editnews' : (allowedTo('send_mail') ? 'mailingmembers' : 'settings')));
 
-		// Some bits for the tempalte
+		// Some bits for the template
 		$context['page_title'] = $txt['news_title'];
 		$context['sub_action'] = $subAction;
 
 		// Force the right area...
-		if (substr($subAction, 0, 7) == 'mailing')
+		if (substr($subAction, 0, 7) === 'mailing')
 			$context[$context['admin_menu_name']]['current_subsection'] = 'mailingmembers';
 
 		// Call the right function for this sub-action.
@@ -114,11 +116,14 @@ class ManageNews_Controller extends Action_Controller
 	 * Let the administrator(s) edit the news items for the forum.
 	 *
 	 * What it does:
+	 *
 	 * - It writes an entry into the moderation log.
 	 * - This function uses the edit_news administration area.
 	 * - Called by ?action=admin;area=news.
 	 * - Requires the edit_news permission.
 	 * - Can be accessed with ?action=admin;sa=editnews.
+	 *
+	 * @event integrate_list_news_lists
 	 */
 	public function action_editnews()
 	{
@@ -127,7 +132,7 @@ class ManageNews_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Post.subs.php');
 
 		// The 'remove selected' button was pressed.
-		if (!empty($_POST['delete_selection']) && !empty($_POST['remove']))
+		if (!empty($this->_req->post->delete_selection) && !empty($this->_req->post->remove))
 		{
 			checkSession();
 
@@ -136,7 +141,7 @@ class ManageNews_Controller extends Action_Controller
 
 			// Remove the items that were selected.
 			foreach ($temp_news as $i => $news)
-				if (in_array($i, $_POST['remove']))
+				if (in_array($i, $this->_req->post->remove))
 					unset($temp_news[$i]);
 
 			// Update the database.
@@ -145,30 +150,29 @@ class ManageNews_Controller extends Action_Controller
 			logAction('news');
 		}
 		// The 'Save' button was pressed.
-		elseif (!empty($_POST['save_items']))
+		elseif (!empty($this->_req->post->save_items))
 		{
 			checkSession();
 
-			foreach ($_POST['news'] as $i => $news)
+			foreach ($this->_req->post->news as $i => $news)
 			{
 				if (trim($news) == '')
-					unset($_POST['news'][$i]);
+					unset($this->_req->post->news[$i]);
 				else
 				{
-					$_POST['news'][$i] = Util::htmlspecialchars($_POST['news'][$i], ENT_QUOTES);
-					preparsecode($_POST['news'][$i]);
+					$this->_req->post->news[$i] = Util::htmlspecialchars($this->_req->post->news[$i], ENT_QUOTES);
+					preparsecode($this->_req->post->news[$i]);
 				}
 			}
 
 			// Send the new news to the database.
-			updateSettings(array('news' => implode("\n", $_POST['news'])));
+			updateSettings(array('news' => implode("\n", $this->_req->post->news)));
 
 			// Log this into the moderation log.
 			logAction('news');
 		}
 
 		// We're going to want this for making our list.
-		require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/News.subs.php');
 
 		$context['page_title'] = $txt['admin_edit_news'];
@@ -185,11 +189,11 @@ class ManageNews_Controller extends Action_Controller
 						'value' => $txt['admin_edit_news'],
 					),
 					'data' => array(
-						'function' => create_function('$news', '
-							return \'<textarea class="" id="data_\' . $news[\'id\'] . \'" rows="3" name="news[]">\' . $news[\'unparsed\'] . \'</textarea>
+						'function' => function ($news) {
+							return '<textarea class="" id="data_' . $news['id'] . '" rows="3" name="news[]">' . $news['unparsed'] . '</textarea>
 								<br />
-								<div id="preview_\' . $news[\'id\'] . \'"></div>\';
-						'),
+								<div id="preview_' . $news['id'] . '"></div>';
+						},
 						'class' => 'newsarea',
 					),
 				),
@@ -198,9 +202,9 @@ class ManageNews_Controller extends Action_Controller
 						'value' => $txt['preview'],
 					),
 					'data' => array(
-						'function' => create_function('$news', '
-							return \'<div id="box_preview_\' . $news[\'id\'] . \'">\' . $news[\'parsed\'] . \'</div>\';
-						'),
+						'function' => function ($news) {
+							return '<div id="box_preview_' . $news['id'] . '">' . $news['parsed'] . '</div>';
+						},
 						'class' => 'newspreview',
 					),
 				),
@@ -210,12 +214,12 @@ class ManageNews_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$news', '
-							if (is_numeric($news[\'id\']))
-								return \'<input type="checkbox" name="remove[]" value="\' . $news[\'id\'] . \'" class="input_check" />\';
+						'function' => function ($news) {
+							if (is_numeric($news['id']))
+								return '<input type="checkbox" name="remove[]" value="' . $news['id'] . '" class="input_check" />';
 							else
-								return \'\';
-						'),
+								return '';
+						},
 						'class' => 'centertext',
 					),
 				),
@@ -231,21 +235,21 @@ class ManageNews_Controller extends Action_Controller
 					'position' => 'bottom_of_list',
 					'class' => 'submitbutton',
 					'value' => '
-					<input type="submit" name="save_items" value="' . $txt['save'] . '" class="right_submit" />
-					<input type="submit" name="delete_selection" value="' . $txt['editnews_remove_selected'] . '" onclick="return confirm(\'' . $txt['editnews_remove_confirm'] . '\');" class="right_submit" />
-					<span id="moreNewsItems_link" style="display: none;">
+					<input type="submit" name="save_items" value="' . $txt['save'] . '" />
+					<input type="submit" name="delete_selection" value="' . $txt['editnews_remove_selected'] . '" onclick="return confirm(\'' . $txt['editnews_remove_confirm'] . '\');" />
+					<span id="moreNewsItems_link" class="hide">
 						<a class="linkbutton" href="javascript:void(0);" onclick="addAnotherNews(); return false;">' . $txt['editnews_clickadd'] . '</a>
 					</span>',
 				),
 			),
 			'javascript' => '
 			document.getElementById(\'list_news_lists_last\').style.display = "none";
-			document.getElementById("moreNewsItems_link").style.display = "";
+			document.getElementById("moreNewsItems_link").style.display = "inline";
 			var last_preview = 0;
-			var txt_preview = ' . javaScriptEscape($txt['preview']) . ';
-			var txt_news_error_no_news = ' . javaScriptEscape($txt['news_error_no_news']) . ';
+			var txt_preview = ' . JavaScriptEscape($txt['preview']) . ';
+			var txt_news_error_no_news = ' . JavaScriptEscape($txt['news_error_no_news']) . ';
 
-			$(document).ready(function () {
+			$(function() {
 				$("div[id ^= \'preview_\']").each(function () {
 					var preview_id = $(this).attr(\'id\').split(\'_\')[1];
 					if (last_preview < preview_id)
@@ -267,6 +271,7 @@ class ManageNews_Controller extends Action_Controller
 	 * This function allows a user to select the membergroups to send their mailing to.
 	 *
 	 * What it does:
+	 *
 	 * - Called by ?action=admin;area=news;sa=mailingmembers.
 	 * - Requires the send_mail permission.
 	 * - Form is submitted to ?action=admin;area=news;mailingcompose.
@@ -336,6 +341,7 @@ class ManageNews_Controller extends Action_Controller
 	 * Shows a form to edit a forum mailing and its recipients.
 	 *
 	 * What it does:
+	 *
 	 * - Called by ?action=admin;area=news;sa=mailingcompose.
 	 * - Requires the send_mail permission.
 	 * - Form is submitted to ?action=admin;area=news;sa=mailingsend.
@@ -349,8 +355,8 @@ class ManageNews_Controller extends Action_Controller
 		// Setup the template!
 		$context['page_title'] = $txt['admin_newsletters'];
 		$context['sub_template'] = 'email_members_compose';
-		$context['subject'] = !empty($_POST['subject']) ? $_POST['subject'] : $context['forum_name'] . ': ' . htmlspecialchars($txt['subject'], ENT_COMPAT, 'UTF-8');
-		$context['message'] = !empty($_POST['message']) ? $_POST['message'] : htmlspecialchars($txt['message'] . "\n\n" . replaceBasicActionUrl($txt['regards_team']) . "\n\n" . '{$board_url}', ENT_COMPAT, 'UTF-8');
+		$context['subject'] = !empty($this->_req->post->subject) ? $this->_req->post->subject : $context['forum_name'] . ': ' . htmlspecialchars($txt['subject'], ENT_COMPAT, 'UTF-8');
+		$context['message'] = !empty($this->_req->post->message) ? $this->_req->post->message : htmlspecialchars($txt['message'] . "\n\n" . replaceBasicActionUrl($txt['regards_team']) . "\n\n" . '{$board_url}', ENT_COMPAT, 'UTF-8');
 
 		// Needed for the WYSIWYG editor.
 		require_once(SUBSDIR . '/Editor.subs.php');
@@ -371,69 +377,26 @@ class ManageNews_Controller extends Action_Controller
 		if (isset($context['preview']))
 		{
 			require_once(SUBSDIR . '/Mail.subs.php');
-			$context['recipients']['members'] = !empty($_POST['members']) ? explode(',', $_POST['members']) : array();
-			$context['recipients']['exclude_members'] = !empty($_POST['exclude_members']) ? explode(',', $_POST['exclude_members']) : array();
-			$context['recipients']['groups'] = !empty($_POST['groups']) ? explode(',', $_POST['groups']) : array();
-			$context['recipients']['exclude_groups'] = !empty($_POST['exclude_groups']) ? explode(',', $_POST['exclude_groups']) : array();
-			$context['recipients']['emails'] = !empty($_POST['emails']) ? explode(';', $_POST['emails']) : array();
-			$context['email_force'] = !empty($_POST['email_force']) ? 1 : 0;
-			$context['total_emails'] = !empty($_POST['total_emails']) ? (int) $_POST['total_emails'] : 0;
-			$context['max_id_member'] = !empty($_POST['max_id_member']) ? (int) $_POST['max_id_member'] : 0;
-			$context['send_pm'] = !empty($_POST['send_pm']) ? 1 : 0;
-			$context['send_html'] = !empty($_POST['send_html']) ? '1' : '0';
+			$context['recipients']['members'] = !empty($this->_req->post->members) ? explode(',', $this->_req->post->members) : array();
+			$context['recipients']['exclude_members'] = !empty($this->_req->post->exclude_members) ? explode(',', $this->_req->post->exclude_members) : array();
+			$context['recipients']['groups'] = !empty($this->_req->post->groups) ? explode(',', $this->_req->post->groups) : array();
+			$context['recipients']['exclude_groups'] = !empty($this->_req->post->exclude_groups) ? explode(',', $this->_req->post->exclude_groups) : array();
+			$context['recipients']['emails'] = !empty($this->_req->post->emails) ? explode(';', $this->_req->post->emails) : array();
+			$context['email_force'] = $this->_req->getPost('email_force', 'intval', 0);
+			$context['total_emails'] = $this->_req->getPost('total_emails', 'intval', 0);
+			$context['max_id_member'] = $this->_req->getPost('max_id_member', 'intval', 0);
+			$context['send_pm'] = $this->_req->getPost('send_pm', 'intval', 0);
+			$context['send_html'] = $this->_req->getPost('send_html', 'intval', 0);
 
-			return prepareMailingForPreview();
+			prepareMailingForPreview();
+			return null;
 		}
 
-		// Start by finding any members!
-		$toClean = array();
-		if (!empty($_POST['members']))
-			$toClean[] = 'members';
+		// Start by finding any manually entered members!
+		$this->_toClean();
 
-		if (!empty($_POST['exclude_members']))
-			$toClean[] = 'exclude_members';
-
-		if (!empty($toClean))
-		{
-			require_once(SUBSDIR . '/Auth.subs.php');
-			foreach ($toClean as $type)
-			{
-				// Remove the quotes.
-				$_POST[$type] = strtr((string) $_POST[$type], array('\\"' => '"'));
-
-				preg_match_all('~"([^"]+)"~', $_POST[$type], $matches);
-				$_POST[$type] = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_POST[$type]))));
-
-				foreach ($_POST[$type] as $index => $member)
-				{
-					if (strlen(trim($member)) > 0)
-						$_POST[$type][$index] = Util::htmlspecialchars(Util::strtolower(trim($member)));
-					else
-						unset($_POST[$type][$index]);
-				}
-
-				// Find the members
-				$_POST[$type] = implode(',', array_keys(findMembers($_POST[$type])));
-			}
-		}
-
-		if (isset($_POST['member_list']) && is_array($_POST['member_list']))
-		{
-			$members = array();
-			foreach ($_POST['member_list'] as $member_id)
-				$members[] = (int) $member_id;
-
-			$_POST['members'] = implode(',', $members);
-		}
-
-		if (isset($_POST['exclude_member_list']) && is_array($_POST['exclude_member_list']))
-		{
-			$members = array();
-			foreach ($_POST['exclude_member_list'] as $member_id)
-				$members[] = (int) $member_id;
-
-			$_POST['exclude_members'] = implode(',', $members);
-		}
+		// Add in any members chosen from the auto select dropdown.
+		$this->_toAddOrExclude();
 
 		// Clean the other vars.
 		$this->action_mailingsend(true);
@@ -466,15 +429,88 @@ class ManageNews_Controller extends Action_Controller
 		$context['total_emails'] = count($context['recipients']['emails']);
 		$context['max_id_member'] = maxMemberID();
 
+		// Make sure to fully load the array with the form choices
+		$context['recipients']['members'] = array_merge($this->_members, $context['recipients']['members']);
+		$context['recipients']['exclude_members'] = array_merge($this->_exclude_members, $context['recipients']['exclude_members']);
+
 		// Clean up the arrays.
 		$context['recipients']['members'] = array_unique($context['recipients']['members']);
 		$context['recipients']['exclude_members'] = array_unique($context['recipients']['exclude_members']);
 	}
 
 	/**
+	 * Members may have been chosen via autoselection pulldown for both Add or Exclude
+	 * this will process them and combine them to any manually added ones.
+	 */
+	private function _toAddOrExclude()
+	{
+		// Members selected (via auto select) to specifically get the newsletter
+		if (isset($this->_req->post->member_list) && is_array($this->_req->post->member_list))
+		{
+			$members = array();
+			foreach ($this->_req->post->member_list as $member_id)
+				$members[] = (int) $member_id;
+
+			$this->_members = array_unique(array_merge($this->_members, $members));
+		}
+
+		// Members selected (via auto select) to specifically not get the newsletter
+		if (isset($this->_req->post->exclude_member_list) && is_array($this->_req->post->exclude_member_list))
+		{
+			$members = array();
+			foreach ($this->_req->post->exclude_member_list as $member_id)
+				$members[] = (int) $member_id;
+
+			$this->_exclude_members = array_unique(array_merge($this->_exclude_members, $members));
+		}
+	}
+
+	/**
+	 * If they did not use auto select function on the include/exclude members then
+	 * we need to look them up from the supplied "one","two" string
+	 */
+	private function _toClean()
+	{
+		$toClean = array();
+		if (!empty($this->_req->post->members))
+			$toClean['_members'] = 'members';
+
+		if (!empty($this->_req->post->exclude_members))
+			$toClean['_exclude_members'] = 'exclude_members';
+
+		// Manual entries found?
+		if (!empty($toClean))
+		{
+			require_once(SUBSDIR . '/Auth.subs.php');
+			foreach ($toClean as $key => $type)
+			{
+				// Remove the quotes.
+				$temp = strtr((string) $this->_req->post->{$type}, array('\\"' => '"'));
+
+				// Break it up in to an array for processing
+				preg_match_all('~"([^"]+)"~', $this->_req->post->{$type}, $matches);
+				$temp = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $temp))));
+
+				// Clean the valid ones, drop the mangled ones
+				foreach ($temp as $index => $member)
+				{
+					if (strlen(trim($member)) > 0)
+						$temp[$index] = Util::htmlspecialchars(Util::strtolower(trim($member)));
+					else
+						unset($temp[$index]);
+				}
+
+				// Find the members
+				$this->{$key} = array_keys(findMembers($temp));
+			}
+		}
+	}
+
+	/**
 	 * Handles the sending of the forum mailing in batches.
 	 *
 	 * What it does:
+	 *
 	 * - Called by ?action=admin;area=news;sa=mailingsend
 	 * - Requires the send_mail permission.
 	 * - Redirects to itself when more batches need to be sent.
@@ -482,21 +518,22 @@ class ManageNews_Controller extends Action_Controller
 	 *
 	 * @uses the ManageNews template and email_members_send sub template.
 	 * @param bool $clean_only = false; if set, it will only clean the variables, put them in context, then return.
+	 * @throws Elk_Exception
 	 */
 	public function action_mailingsend($clean_only = false)
 	{
 		global $txt, $context, $scripturl, $modSettings, $user_info;
 
 		// A nice successful screen if you did it
-		if (isset($_REQUEST['success']))
+		if (isset($this->_req->query->success))
 		{
 			$context['sub_template'] = 'email_members_succeeded';
 			loadTemplate('ManageNews');
-			return;
+			return null;
 		}
 
 		// If just previewing we prepare a message and return it for viewing
-		if (isset($_POST['preview']))
+		if (isset($this->_req->post->preview))
 		{
 			$context['preview'] = true;
 			return $this->action_mailingcompose();
@@ -507,19 +544,19 @@ class ManageNews_Controller extends Action_Controller
 		$num_at_once = empty($modSettings['mail_queue']) ? 60 : 1000;
 
 		// If by PM's I suggest we half the above number.
-		if (!empty($_POST['send_pm']))
+		if (!empty($this->_req->post->send_pm))
 			$num_at_once /= 2;
 
 		checkSession();
 
 		// Where are we actually to?
-		$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
-		$context['email_force'] = !empty($_POST['email_force']) ? 1 : 0;
-		$context['send_pm'] = !empty($_POST['send_pm']) ? 1 : 0;
-		$context['total_emails'] = !empty($_POST['total_emails']) ? (int) $_POST['total_emails'] : 0;
-		$context['max_id_member'] = !empty($_POST['max_id_member']) ? (int) $_POST['max_id_member'] : 0;
-		$context['send_html'] = !empty($_POST['send_html']) ? 1 : 0;
-		$context['parse_html'] = !empty($_POST['parse_html']) ? 1 : 0;
+		$context['start'] = $this->_req->getPost('start', 'intval', 0);
+		$context['email_force'] = $this->_req->getPost('email_force', 'intval', 0);
+		$context['total_emails'] = $this->_req->getPost('total_emails', 'intval', 0);
+		$context['max_id_member'] = $this->_req->getPost('max_id_member', 'intval', 0);
+		$context['send_pm'] = $this->_req->getPost('send_pm', 'intval', 0);
+		$context['send_html'] = $this->_req->getPost('send_html', 'intval', 0);
+		$context['parse_html'] = $this->_req->getPost('parse_html', 'intval', 0);
 
 		// Create our main context.
 		$context['recipients'] = array(
@@ -531,9 +568,9 @@ class ManageNews_Controller extends Action_Controller
 		);
 
 		// Have we any excluded members?
-		if (!empty($_POST['exclude_members']))
+		if (!empty($this->_req->post->exclude_members))
 		{
-			$members = explode(',', $_POST['exclude_members']);
+			$members = explode(',', $this->_req->post->exclude_members);
 			foreach ($members as $member)
 			{
 				if ($member >= $context['start'])
@@ -542,9 +579,9 @@ class ManageNews_Controller extends Action_Controller
 		}
 
 		// What about members we *must* do?
-		if (!empty($_POST['members']))
+		if (!empty($this->_req->post->members))
 		{
-			$members = explode(',', $_POST['members']);
+			$members = explode(',', $this->_req->post->members);
 			foreach ($members as $member)
 			{
 				if ($member >= $context['start'])
@@ -553,41 +590,41 @@ class ManageNews_Controller extends Action_Controller
 		}
 
 		// Cleaning groups is simple - although deal with both checkbox and commas.
-		if (isset($_POST['groups']))
+		if (isset($this->_req->post->groups))
 		{
-			if (is_array($_POST['groups']))
+			if (is_array($this->_req->post->groups))
 			{
-				foreach ($_POST['groups'] as $group => $dummy)
+				foreach ($this->_req->post->groups as $group => $dummy)
 					$context['recipients']['groups'][] = (int) $group;
 			}
-			elseif (trim($_POST['groups']) != '')
+			elseif (trim($this->_req->post->groups) != '')
 			{
-				$groups = explode(',', $_POST['groups']);
+				$groups = explode(',', $this->_req->post->groups);
 				foreach ($groups as $group)
 					$context['recipients']['groups'][] = (int) $group;
 			}
 		}
 
 		// Same for excluded groups
-		if (isset($_POST['exclude_groups']))
+		if (isset($this->_req->post->exclude_groups))
 		{
-			if (is_array($_POST['exclude_groups']))
+			if (is_array($this->_req->post->exclude_groups))
 			{
-				foreach ($_POST['exclude_groups'] as $group => $dummy)
+				foreach ($this->_req->post->exclude_groups as $group => $dummy)
 					$context['recipients']['exclude_groups'][] = (int) $group;
 			}
-			elseif (trim($_POST['exclude_groups']) != '')
+			elseif (trim($this->_req->post->exclude_groups) != '')
 			{
-				$groups = explode(',', $_POST['exclude_groups']);
+				$groups = explode(',', $this->_req->post->exclude_groups);
 				foreach ($groups as $group)
 					$context['recipients']['exclude_groups'][] = (int) $group;
 			}
 		}
 
 		// Finally - emails!
-		if (!empty($_POST['emails']))
+		if (!empty($this->_req->post->emails))
 		{
-			$addressed = array_unique(explode(';', strtr($_POST['emails'], array("\n" => ';', "\r" => ';', ',' => ';'))));
+			$addressed = array_unique(explode(';', strtr($this->_req->post->emails, array("\n" => ';', "\r" => ';', ',' => ';'))));
 			foreach ($addressed as $curmem)
 			{
 				$curmem = trim($curmem);
@@ -598,7 +635,7 @@ class ManageNews_Controller extends Action_Controller
 
 		// If we're only cleaning drop out here.
 		if ($clean_only)
-			return;
+			return null;
 
 		// Some functions we will need
 		require_once(SUBSDIR . '/Mail.subs.php');
@@ -606,18 +643,18 @@ class ManageNews_Controller extends Action_Controller
 			require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
 		// We are relying too much on writing to superglobals...
-		$base_subject = !empty($_POST['subject']) ? $_POST['subject'] : '';
-		$base_message = !empty($_POST['message']) ? $_POST['message'] : '';
+		$base_subject = $this->_req->getPost('subject', 'strval', '');
+		$base_message = $this->_req->getPost('message', 'strval', '');
 
 		// Save the message and its subject in $context
 		$context['subject'] = htmlspecialchars($base_subject, ENT_COMPAT, 'UTF-8');
 		$context['message'] = htmlspecialchars($base_message, ENT_COMPAT, 'UTF-8');
 
 		// Prepare the message for sending it as HTML
-		if (!$context['send_pm'] && !empty($_POST['send_html']))
+		if (!$context['send_pm'] && !empty($this->_req->post->send_html))
 		{
 			// Prepare the message for HTML.
-			if (!empty($_POST['parse_html']))
+			if (!empty($this->_req->post->parse_html))
 				$base_message = str_replace(array("\n", '  '), array('<br />' . "\n", '&nbsp; '), $base_message);
 
 			// This is here to prevent spam filters from tagging this as spam.
@@ -648,14 +685,14 @@ class ManageNews_Controller extends Action_Controller
 		);
 
 		// We might need this in a bit
-		$cleanLatestMember = empty($_POST['send_html']) || $context['send_pm'] ? un_htmlspecialchars($modSettings['latestRealName']) : $modSettings['latestRealName'];
+		$cleanLatestMember = empty($this->_req->post->send_html) || $context['send_pm'] ? un_htmlspecialchars($modSettings['latestRealName']) : $modSettings['latestRealName'];
 
 		// Replace in all the standard things.
 		$base_message = str_replace($variables,
 			array(
-				!empty($_POST['send_html']) ? '<a href="' . $scripturl . '">' . $scripturl . '</a>' : $scripturl,
+				!empty($this->_req->post->send_html) ? '<a href="' . $scripturl . '">' . $scripturl . '</a>' : $scripturl,
 				standardTime(forum_time(), false),
-				!empty($_POST['send_html']) ? '<a href="' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . '">' . $cleanLatestMember . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . ']' . $cleanLatestMember . '[/url]' : $cleanLatestMember),
+				!empty($this->_req->post->send_html) ? '<a href="' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . '">' . $cleanLatestMember . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . ']' . $cleanLatestMember . '[/url]' : $cleanLatestMember),
 				$modSettings['latestMember'],
 				$cleanLatestMember
 			), $base_message);
@@ -693,12 +730,12 @@ class ManageNews_Controller extends Action_Controller
 
 			$to_member = array(
 				$email,
-				!empty($_POST['send_html']) ? '<a href="mailto:' . $email . '">' . $email . '</a>' : $email,
+				!empty($this->_req->post->send_html) ? '<a href="mailto:' . $email . '">' . $email . '</a>' : $email,
 				'??',
 				$email
 			);
 
-			sendmail($email, str_replace($from_member, $to_member, $base_subject), str_replace($from_member, $to_member, $base_message), null, null, !empty($_POST['send_html']), 5);
+			sendmail($email, str_replace($from_member, $to_member, $base_subject), str_replace($from_member, $to_member, $base_message), null, null, !empty($this->_req->post->send_html), 5);
 
 			// Done another...
 			$i++;
@@ -732,14 +769,14 @@ class ManageNews_Controller extends Action_Controller
 
 			if (!empty($context['recipients']['members']))
 			{
-				$sendQuery .= ($sendQuery == '(' ? '' : ' OR ') . 'mem.id_member IN ({array_int:members})';
+				$sendQuery .= ($sendQuery === '(' ? '' : ' OR ') . 'mem.id_member IN ({array_int:members})';
 				$sendParams['members'] = $context['recipients']['members'];
 			}
 
 			$sendQuery .= ')';
 
 			// If we've not got a query then we must be done!
-			if ($sendQuery == '()')
+			if ($sendQuery === '()')
 				redirectexit('action=admin');
 
 			// Anything to exclude?
@@ -779,13 +816,13 @@ class ManageNews_Controller extends Action_Controller
 					continue;
 
 				// We might need this
-				$cleanMemberName = empty($_POST['send_html']) || $context['send_pm'] ? un_htmlspecialchars($row['real_name']) : $row['real_name'];
+				$cleanMemberName = empty($this->_req->post->send_html) || $context['send_pm'] ? un_htmlspecialchars($row['real_name']) : $row['real_name'];
 
 				// Replace the member-dependant variables
 				$message = str_replace($from_member,
 					array(
 						$row['email_address'],
-						!empty($_POST['send_html']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $cleanMemberName . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $row['id_member'] . ']' . $cleanMemberName . '[/url]' : $cleanMemberName),
+						!empty($this->_req->post->send_html) ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $cleanMemberName . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $row['id_member'] . ']' . $cleanMemberName . '[/url]' : $cleanMemberName),
 						$row['id_member'],
 						$cleanMemberName,
 					), $base_message);
@@ -800,7 +837,7 @@ class ManageNews_Controller extends Action_Controller
 
 				// Send the actual email - or a PM!
 				if (!$context['send_pm'])
-					sendmail($row['email_address'], $subject, $message, null, null, !empty($_POST['send_html']), 5);
+					sendmail($row['email_address'], $subject, $message, null, null, !empty($this->_req->post->send_html), 5);
 				else
 					sendpm(array('to' => array($row['id_member']), 'bcc' => array()), $subject, $message);
 			}
@@ -835,9 +872,11 @@ class ManageNews_Controller extends Action_Controller
 	 * Set general news and newsletter settings and permissions.
 	 *
 	 * What it does:
+	 *
 	 * - Called by ?action=admin;area=news;sa=settings.
 	 * - Requires the forum_admin permission.
 	 *
+	 * @event integrate_save_news_settings save new news settings
 	 * @uses ManageNews template, news_settings sub-template.
 	 */
 	public function action_newsSettings_display()
@@ -845,58 +884,40 @@ class ManageNews_Controller extends Action_Controller
 		global $context, $txt, $scripturl;
 
 		// Initialize the form
-		$this->_initNewsSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_newsSettings->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Add some javascript at the bottom...
 		addInlineJavascript('
 			document.getElementById("xmlnews_maxlen").disabled = !document.getElementById("xmlnews_enable").checked;
 			document.getElementById("xmlnews_limit").disabled = !document.getElementById("xmlnews_enable").checked;', true);
 
+		// Wrap it all up nice and warm...
 		$context['page_title'] = $txt['admin_edit_news'] . ' - ' . $txt['settings'];
 		$context['sub_template'] = 'show_settings';
-
-		// Wrap it all up nice and warm...
 		$context['post_url'] = $scripturl . '?action=admin;area=news;save;sa=settings';
-		$context['permissions_excluded'] = array(-1);
 
 		// Saving the settings?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			call_integration_hook('integrate_save_news_settings');
 
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=news;sa=settings');
 		}
 
-		// We need this for the in-line permissions
-		createToken('admin-mp');
-
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize the news settings screen in admin area for the forum.
-	 */
-	private function _initNewsSettingsForm()
-	{
-		// We're working with them settings here.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
-		// Instantiate the form
-		$this->_newsSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_newsSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
 	 * Get the settings of the forum related to news.
+	 *
+	 * @event integrate_modify_news_settings add new news settings
 	 */
 	private function _settings()
 	{
@@ -915,7 +936,7 @@ class ManageNews_Controller extends Action_Controller
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_news_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_news_settings');
 
 		return $config_vars;
 	}

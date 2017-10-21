@@ -7,18 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.5
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * ManagePosts controller handles all the administration settings for topics and posts.
@@ -28,43 +23,34 @@ if (!defined('ELK'))
 class ManagePosts_Controller extends Action_Controller
 {
 	/**
-	 * Posts settings form
-	 * @var Settings_Form
-	 */
-	protected $_postSettings;
-
-	/**
 	 * The main entrance point for the 'Posts and topics' screen.
 	 *
 	 * What it does:
+	 *
 	 * - Like all others, it checks permissions, then forwards to the right function
 	 * based on the given sub-action.
 	 * - Defaults to sub-action 'posts'.
 	 * - Accessed from ?action=admin;area=postsettings.
 	 * - Requires (and checks for) the admin_forum permission.
 	 *
+	 * @event integrate_sa_manage_posts used to add new subactions
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
 		global $context, $txt;
 
-		// We're working with them settings here.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		$subActions = array(
 			'posts' => array(
 				$this, 'action_postSettings_display', 'permission' => 'admin_forum'),
 			'bbc' => array(
 				'function' => 'action_index',
-				'file' => 'ManageBBC.controller.php',
 				'controller' => 'ManageBBC_Controller',
 				'permission' => 'admin_forum'),
 			'censor' => array(
 				$this, 'action_censor', 'permission' => 'admin_forum'),
 			'topics' => array(
 				'function' => 'action_index',
-				'file' => 'ManageTopics.controller.php',
 				'controller' => 'ManageTopics_Controller',
 				'permission' => 'admin_forum'),
 		);
@@ -112,13 +98,15 @@ class ManagePosts_Controller extends Action_Controller
 	 * - Requires the admin_forum permission.
 	 * - Accessed from ?action=admin;area=postsettings;sa=censor.
 	 *
+	 * @event integrate_save_censors
+	 * @event integrate_censors
 	 * @uses the Admin template and the edit_censored sub template.
 	 */
 	public function action_censor()
 	{
 		global $txt, $modSettings, $context;
 
-		if (!empty($_POST['save_censor']))
+		if (!empty($this->_req->post->save_censor))
 		{
 			// Make sure censoring is something they can do.
 			checkSession();
@@ -128,30 +116,34 @@ class ManagePosts_Controller extends Action_Controller
 			$censored_proper = array();
 
 			// Rip it apart, then split it into two arrays.
-			if (isset($_POST['censortext']))
+			if (isset($this->_req->post->censortext))
 			{
-				$_POST['censortext'] = explode("\n", strtr($_POST['censortext'], array("\r" => '')));
+				$this->_req->post->censortext = explode("\n", strtr($this->_req->post->censortext, array("\r" => '')));
 
-				foreach ($_POST['censortext'] as $c)
-					list ($censored_vulgar[], $censored_proper[]) = array_pad(explode('=', trim($c)), 2, '');
-			}
-			elseif (isset($_POST['censor_vulgar'], $_POST['censor_proper']))
-			{
-				if (is_array($_POST['censor_vulgar']))
+				foreach ($this->_req->post->censortext as $c)
 				{
-					foreach ($_POST['censor_vulgar'] as $i => $value)
+					list ($censored_vulgar[], $censored_proper[]) = array_pad(explode('=', trim($c)), 2, '');
+				}
+			}
+			elseif (isset($this->_req->post->censor_vulgar, $this->_req->post->censor_proper))
+			{
+				if (is_array($this->_req->post->censor_vulgar))
+				{
+					foreach ($this->_req->post->censor_vulgar as $i => $value)
 					{
-						if (trim(strtr($value, '*', ' ')) == '')
-							unset($_POST['censor_vulgar'][$i], $_POST['censor_proper'][$i]);
+						if (trim(strtr($value, '*', ' ')) === '')
+						{
+							unset($this->_req->post->censor_vulgar[$i], $this->_req->post->censor_proper[$i]);
+						}
 					}
 
-					$censored_vulgar = $_POST['censor_vulgar'];
-					$censored_proper = $_POST['censor_proper'];
+					$censored_vulgar = $this->_req->post->censor_vulgar;
+					$censored_proper = $this->_req->post->censor_proper;
 				}
 				else
 				{
-					$censored_vulgar = explode("\n", strtr($_POST['censor_vulgar'], array("\r" => '')));
-					$censored_proper = explode("\n", strtr($_POST['censor_proper'], array("\r" => '')));
+					$censored_vulgar = explode("\n", strtr($this->_req->post->censor_vulgar, array("\r" => '')));
+					$censored_proper = explode("\n", strtr($this->_req->post->censor_proper, array("\r" => '')));
 				}
 			}
 
@@ -159,9 +151,9 @@ class ManagePosts_Controller extends Action_Controller
 			$updates = array(
 				'censor_vulgar' => implode("\n", $censored_vulgar),
 				'censor_proper' => implode("\n", $censored_proper),
-				'censorWholeWord' => empty($_POST['censorWholeWord']) ? '0' : '1',
-				'censorIgnoreCase' => empty($_POST['censorIgnoreCase']) ? '0' : '1',
-				'allow_no_censored' => empty($_POST['allow_no_censored']) ? '0' : '1',
+				'censorWholeWord' => empty($this->_req->post->censorWholeWord) ? '0' : '1',
+				'censorIgnoreCase' => empty($this->_req->post->censorIgnoreCase) ? '0' : '1',
+				'allow_no_censored' => empty($this->_req->post->allow_no_censored) ? '0' : '1',
 			);
 
 			call_integration_hook('integrate_save_censors', array(&$updates));
@@ -170,13 +162,14 @@ class ManagePosts_Controller extends Action_Controller
 		}
 
 		// Testing a word to see how it will be censored?
-		if (isset($_POST['censortest']))
+		$pre_censor = '';
+		if (isset($this->_req->post->censortest))
 		{
 			require_once(SUBSDIR . '/Post.subs.php');
-			$censorText = htmlspecialchars($_POST['censortest'], ENT_QUOTES, 'UTF-8');
+			$censorText = htmlspecialchars($this->_req->post->censortest, ENT_QUOTES, 'UTF-8');
 			preparsecode($censorText);
 			$pre_censor = $censorText;
-			$context['censor_test'] = strtr(censorText($censorText), array('"' => '&quot;'));
+			$context['censor_test'] = strtr(censor($censorText), array('"' => '&quot;'));
 		}
 
 		// Set everything up for the template to do its thang.
@@ -187,23 +180,29 @@ class ManagePosts_Controller extends Action_Controller
 		for ($i = 0, $n = count($censor_vulgar); $i < $n; $i++)
 		{
 			if (empty($censor_vulgar[$i]))
+			{
 				continue;
+			}
 
 			// Skip it, it's either spaces or stars only.
-			if (trim(strtr($censor_vulgar[$i], '*', ' ')) == '')
+			if (trim(strtr($censor_vulgar[$i], '*', ' ')) === '')
+			{
 				continue;
+			}
 
-			$context['censored_words'][htmlspecialchars(trim($censor_vulgar[$i]))] = isset($censor_proper[$i]) ? htmlspecialchars($censor_proper[$i], ENT_COMPAT, 'UTF-8') : '';
+			$context['censored_words'][htmlspecialchars(trim($censor_vulgar[$i]))] = isset($censor_proper[$i])
+				? htmlspecialchars($censor_proper[$i], ENT_COMPAT, 'UTF-8')
+				: '';
 		}
 
 		call_integration_hook('integrate_censors');
 		createToken('admin-censor');
 
 		// Using ajax?
-		if (isset($_REQUEST['xml'], $_POST['censortest']))
+		if (isset($this->_req->query->xml, $this->_req->post->censortest))
 		{
 			// Clear the templates
-			$template_layers = Template_Layers::getInstance();
+			$template_layers = Template_Layers::instance();
 			$template_layers->removeAll();
 
 			// Send back a response
@@ -211,7 +210,7 @@ class ManagePosts_Controller extends Action_Controller
 			$context['sub_template'] = 'send_json';
 			$context['json_data'] = array(
 				'result' => true,
-				'censor' => $pre_censor . ' <i class="fa fa-arrow-circle-right"></i> ' . $context['censor_test'],
+				'censor' => $pre_censor . ' <i class="icon i-chevron-circle-right"></i> ' . $context['censor_test'],
 				'token_val' => $context['admin-censor_token_var'],
 				'token' => $context['admin-censor_token'],
 			);
@@ -229,47 +228,58 @@ class ManagePosts_Controller extends Action_Controller
 	 * - Requires the admin_forum permission.
 	 * - Accessed from ?action=admin;area=postsettings;sa=posts.
 	 *
+	 * @event integrate_save_post_settings
 	 * @uses Admin template, edit_post_settings sub-template.
 	 */
 	public function action_postSettings_display()
 	{
-		global $context, $txt, $modSettings, $scripturl, $db_type;
+		global $context, $txt, $modSettings, $scripturl;
 
 		// Initialize the form
-		$this->_initPostSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_postSettings->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Setup the template.
 		$context['page_title'] = $txt['manageposts_settings'];
 		$context['sub_template'] = 'show_settings';
 
 		// Are we saving them - are we??
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			// If we're changing the message length (and we are using MySQL) let's check the column is big enough.
-			if (isset($_POST['max_messageLength']) && $_POST['max_messageLength'] != $modSettings['max_messageLength'] && $db_type == 'mysql')
+			if (isset($this->_req->post->max_messageLength) && $this->_req->post->max_messageLength != $modSettings['max_messageLength'] && DB_TYPE === 'MySQL')
 			{
 				require_once(SUBSDIR . '/Maintenance.subs.php');
 				$colData = getMessageTableColumns();
 				foreach ($colData as $column)
-					if ($column['name'] == 'body')
+				{
+					if ($column['name'] === 'body')
+					{
 						$body_type = $column['type'];
+					}
+				}
 
-				if (isset($body_type) && ($_POST['max_messageLength'] > 65535 || $_POST['max_messageLength'] == 0) && $body_type == 'text')
-					fatal_lang_error('convert_to_mediumtext', false, array($scripturl . '?action=admin;area=maintain;sa=database'));
+				if (isset($body_type) && ($this->_req->post->max_messageLength > 65535 || $this->_req->post->max_messageLength == 0) && $body_type === 'text')
+				{
+					throw new Elk_Exception('convert_to_mediumtext', false, array($scripturl . '?action=admin;area=maintain;sa=database'));
+				}
 
 			}
 
 			// If we're changing the post preview length let's check its valid
-			if (!empty($_POST['preview_characters']))
-				$_POST['preview_characters'] = (int) min(max(0, $_POST['preview_characters']), 512);
+			if (!empty($this->_req->post->preview_characters))
+			{
+				$this->_req->post->preview_characters = (int) min(max(0, $this->_req->post->preview_characters), 512);
+			}
 
 			call_integration_hook('integrate_save_post_settings');
 
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=postsettings;sa=posts');
 		}
 
@@ -278,25 +288,13 @@ class ManagePosts_Controller extends Action_Controller
 		$context['settings_title'] = $txt['manageposts_settings'];
 
 		// Prepare the settings...
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize postSettings form with admin configuration settings for posts.
-	 */
-	private function _initPostSettingsForm()
-	{
-		// Instantiate the form
-		$this->_postSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_postSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
 	 * Return admin configuration settings for posts.
+	 *
+	 * @event integrate_modify_post_settings
 	 */
 	private function _settings()
 	{
@@ -304,25 +302,25 @@ class ManagePosts_Controller extends Action_Controller
 
 		// Initialize it with our settings
 		$config_vars = array(
-				// Simple post options...
-				array('check', 'removeNestedQuotes'),
-				array('check', 'enableVideoEmbeding'),
-				array('check', 'enableCodePrettify'),
-				// Note show the warning as read if pspell not installed!
-				array('check', 'enableSpellChecking', 'postinput' => (function_exists('pspell_new') ? $txt['enableSpellChecking_warning'] : '<span class="error">' . $txt['enableSpellChecking_error'] . '</span>')),
+			// Simple post options...
+			array('check', 'removeNestedQuotes'),
+			array('check', 'enableVideoEmbeding'),
+			array('check', 'enableCodePrettify'),
+			// Note show the warning as read if pspell not installed!
+			array('check', 'enableSpellChecking', 'postinput' => (function_exists('pspell_new') ? $txt['enableSpellChecking_warning'] : '<span class="error">' . $txt['enableSpellChecking_error'] . '</span>')),
 			'',
-				// Posting limits...
-				array('int', 'max_messageLength', 'subtext' => $txt['max_messageLength_zero'], 'postinput' => $txt['manageposts_characters']),
-				array('int', 'topicSummaryPosts', 'postinput' => $txt['manageposts_posts']),
+			// Posting limits...
+			array('int', 'max_messageLength', 'subtext' => $txt['max_messageLength_zero'], 'postinput' => $txt['manageposts_characters']),
+			array('int', 'topicSummaryPosts', 'postinput' => $txt['manageposts_posts']),
 			'',
-				// Posting time limits...
-				array('int', 'spamWaitTime', 'postinput' => $txt['manageposts_seconds']),
-				array('int', 'edit_wait_time', 'postinput' => $txt['manageposts_seconds']),
-				array('int', 'edit_disable_time', 'subtext' => $txt['edit_disable_time_zero'], 'postinput' => $txt['manageposts_minutes']),
+			// Posting time limits...
+			array('int', 'spamWaitTime', 'postinput' => $txt['manageposts_seconds']),
+			array('int', 'edit_wait_time', 'postinput' => $txt['manageposts_seconds']),
+			array('int', 'edit_disable_time', 'subtext' => $txt['edit_disable_time_zero'], 'postinput' => $txt['manageposts_minutes']),
 			'',
-				// First & Last message preview lengths
-				array('select', 'message_index_preview', array($txt['message_index_preview_off'], $txt['message_index_preview_first'], $txt['message_index_preview_last'])),
-				array('int', 'preview_characters', 'subtext' => $txt['preview_characters_zero'], 'postinput' => $txt['preview_characters_units']),
+			// First & Last message preview lengths
+			array('select', 'message_index_preview', array($txt['message_index_preview_off'], $txt['message_index_preview_first'], $txt['message_index_preview_last'])),
+			array('int', 'preview_characters', 'subtext' => $txt['preview_characters_zero'], 'postinput' => $txt['preview_characters_units']),
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well

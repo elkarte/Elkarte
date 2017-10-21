@@ -7,34 +7,48 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Admin controller class.
  *
  * What it does:
+ *
  * - This class handles the first general admin screens: home,
  * - Handles admin area search actions and end admin session.
  *
  * @package Admin
  */
+
 class Admin_Controller extends Action_Controller
 {
+	/**
+	 * @var string[] areas to find current installed status and installed version
+	 */
+	private $_checkFor = array('gd', 'imagick', 'db_server', 'php', 'server',
+							  'zend', 'apc', 'memcache', 'memcached', 'xcache', 'opcache');
+
+	/**
+	 * Pre Dispatch, called before other methods.
+	 *
+	 * - Loads integration hooks
+	 */
+	public function pre_dispatch()
+	{
+		Hooks::instance()->loadIntegrationsSettings();
+	}
+
 	/**
 	 * The main admin handling function.
 	 *
 	 * What it does:
+	 *
 	 * - It initialises all the basic context required for the admin center.
 	 * - It passes execution onto the relevant admin section.
 	 * - If the passed section is not found it shows the admin home page.
@@ -42,14 +56,15 @@ class Admin_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		global $txt, $context, $scripturl, $modSettings, $settings;
+		global $context, $modSettings;
 
 		// Make sure the administrator has a valid session...
 		validateSession();
 
 		// Load the language and templates....
 		loadLanguage('Admin');
-		loadTemplate('Admin', 'admin');
+		loadTemplate('Admin');
+		loadCSSFile('admin.css');
 		loadJavascriptFile('admin.js', array(), 'admin_script');
 
 		// The Admin functions require Jquery UI ....
@@ -59,8 +74,40 @@ class Admin_Controller extends Action_Controller
 		$context['robot_no_index'] = true;
 
 		// Need these to do much
+		require_once(SUBSDIR . '/Admin.subs.php');
+
+		// Actually create the menu!
+		$admin_include_data = $this->loadMenu();
+		$this->buildLinktree($admin_include_data);
+
+		// Now - finally - call the right place!
+		if (isset($admin_include_data['file']))
+			require_once($admin_include_data['file']);
+
+		callMenu($admin_include_data);
+	}
+
+	/**
+	 * Load the admin_areas array
+	 *
+	 * What it does:
+	 *
+	 * - Creates the admin menu
+	 * - Allows integrations to add/edit menu with addMenu event and integrate_admin_include
+	 *
+	 * @event integrate_admin_include used add files to include for administration
+	 * @event addMenu passed admin area area, allows active modules registered to this event to add items to the admin menu,
+	 * @event integrate_admin_areas passed admin area area, used to add items to the admin menu
+	 *
+	 * @return false|mixed[]
+	 * @throws Elk_Exception no_access
+	 */
+	private function loadMenu()
+	{
+		global $txt, $context, $scripturl, $modSettings, $settings;
+
+		// Need these to do much
 		require_once(SUBSDIR . '/Menu.subs.php');
-		require_once(SUBSDIR . '/Action.class.php');
 
 		// Define the menu structure - see subs/Menu.subs.php for details!
 		$admin_areas = array(
@@ -84,10 +131,9 @@ class Admin_Controller extends Action_Controller
 					),
 					'maillist' => array(
 						'label' => $txt['mail_center'],
-						'file' => 'ManageMaillist.controller.php',
 						'controller' => 'ManageMaillist_Controller',
 						'function' => 'action_index',
-						'icon' => 'mail.png',
+						'icon' => 'transparent.png',
 						'class' => 'admin_img_mail',
 						'permission' => array('approve_emails', 'admin_forum'),
 						'enabled' => in_array('pe', $context['admin_features']),
@@ -101,7 +147,6 @@ class Admin_Controller extends Action_Controller
 					),
 					'news' => array(
 						'label' => $txt['news_title'],
-						'file' => 'ManageNews.controller.php',
 						'controller' => 'ManageNews_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -115,7 +160,6 @@ class Admin_Controller extends Action_Controller
 					),
 					'packages' => array(
 						'label' => $txt['package'],
-						'file' => 'Packages.controller.php',
 						'controller' => 'Packages_Controller',
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
@@ -132,7 +176,6 @@ class Admin_Controller extends Action_Controller
 					),
 					'packageservers' => array(
 						'label' => $txt['package_servers'],
-						'file' => 'PackageServers.controller.php',
 						'controller' => 'PackageServers_Controller',
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
@@ -162,7 +205,6 @@ class Admin_Controller extends Action_Controller
 				'areas' => array(
 					'corefeatures' => array(
 						'label' => $txt['core_settings_title'],
-						'file' => 'CoreFeatures.controller.php',
 						'controller' => 'CoreFeatures_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -170,7 +212,6 @@ class Admin_Controller extends Action_Controller
 					),
 					'featuresettings' => array(
 						'label' => $txt['modSettings_title'],
-						'file' => 'ManageFeatures.controller.php',
 						'controller' => 'ManageFeatures_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -188,7 +229,6 @@ class Admin_Controller extends Action_Controller
 					),
 					'serversettings' => array(
 						'label' => $txt['admin_server_settings'],
-						'file' => 'ManageServer.controller.php',
 						'controller' => 'ManageServer_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -198,13 +238,12 @@ class Admin_Controller extends Action_Controller
 							'database' => array($txt['database_paths_settings']),
 							'cookie' => array($txt['cookies_sessions_settings']),
 							'cache' => array($txt['caching_settings']),
-							'loads' => array($txt['load_balancing_settings']),
+							'loads' => array($txt['loadavg_settings']),
 							'phpinfo' => array($txt['phpinfo_settings']),
 						),
 					),
 					'securitysettings' => array(
 						'label' => $txt['admin_security_moderation'],
-						'file' => 'ManageSecurity.controller.php',
 						'controller' => 'ManageSecurity_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -218,7 +257,6 @@ class Admin_Controller extends Action_Controller
 					),
 					'theme' => array(
 						'label' => $txt['theme_admin'],
-						'file' => 'ManageThemes.controller.php',
 						'controller' => 'ManageThemes_Controller',
 						'function' => 'action_index',
 						'custom_url' => $scripturl . '?action=admin;area=theme',
@@ -235,7 +273,6 @@ class Admin_Controller extends Action_Controller
 					),
 					'current_theme' => array(
 						'label' => $txt['theme_current_settings'],
-						'file' => 'ManageThemes.controller.php',
 						'controller' => 'ManageThemes_Controller',
 						'function' => 'action_index',
 						'custom_url' => $scripturl . '?action=admin;area=theme;sa=list;th=' . $settings['theme_id'],
@@ -244,7 +281,6 @@ class Admin_Controller extends Action_Controller
 					),
 					'languages' => array(
 						'label' => $txt['language_configuration'],
-						'file' => 'ManageLanguages.controller.php',
 						'controller' => 'ManageLanguages_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -257,7 +293,6 @@ class Admin_Controller extends Action_Controller
 					),
 					'addonsettings' => array(
 						'label' => $txt['admin_modifications'],
-						'file' => 'AddonSettings.controller.php',
 						'controller' => 'AddonSettings_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -274,7 +309,6 @@ class Admin_Controller extends Action_Controller
 				'areas' => array(
 					'manageboards' => array(
 						'label' => $txt['admin_boards'],
-						'file' => 'ManageBoards.controller.php',
 						'controller' => 'ManageBoards_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -288,7 +322,6 @@ class Admin_Controller extends Action_Controller
 					),
 					'postsettings' => array(
 						'label' => $txt['manageposts'],
-						'file' => 'ManagePosts.controller.php',
 						'controller' => 'ManagePosts_Controller',
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
@@ -301,9 +334,16 @@ class Admin_Controller extends Action_Controller
 							'topics' => array($txt['manageposts_topic_settings']),
 						),
 					),
+					'bbc' => array(
+						'label' => $txt['bbc_manage'],
+						'controller' => 'ManageBBC_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_smiley',
+						'permission' => array('manage_bbc'),
+					),
 					'smileys' => array(
 						'label' => $txt['smileys_manage'],
-						'file' => 'ManageSmileys.controller.php',
 						'controller' => 'ManageSmileys_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -320,7 +360,6 @@ class Admin_Controller extends Action_Controller
 					),
 					'manageattachments' => array(
 						'label' => $txt['attachments_avatars'],
-						'file' => 'ManageAttachments.controller.php',
 						'controller' => 'ManageAttachments_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -336,7 +375,6 @@ class Admin_Controller extends Action_Controller
 					),
 					'managesearch' => array(
 						'label' => $txt['manage_search'],
-						'file' => 'ManageSearch.controller.php',
 						'controller' => 'ManageSearch_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -349,30 +387,6 @@ class Admin_Controller extends Action_Controller
 							'settings' => array($txt['settings']),
 						),
 					),
-					'managecalendar' => array(
-						'label' => $txt['manage_calendar'],
-						'file' => 'ManageCalendar.controller.php',
-						'controller' => 'ManageCalendar_Controller',
-						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_calendar',
-						'permission' => array('admin_forum'),
-						'enabled' => in_array('cd', $context['admin_features']),
-						'subsections' => array(
-							'holidays' => array($txt['manage_holidays'], 'admin_forum', 'enabled' => !empty($modSettings['cal_enabled'])),
-							'settings' => array($txt['calendar_settings'], 'admin_forum'),
-						),
-					),
-					'managedrafts' => array(
-						'label' => $txt['manage_drafts'],
-						'file' => 'ManageDrafts.controller.php',
-						'controller' => 'ManageDrafts_Controller',
-						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_logs',
-						'permission' => array('admin_forum'),
-						'enabled' => in_array('dr', $context['admin_features']),
-					),
 				),
 			),
 			'members' => array(
@@ -381,7 +395,6 @@ class Admin_Controller extends Action_Controller
 				'areas' => array(
 					'viewmembers' => array(
 						'label' => $txt['admin_users'],
-						'file' => 'ManageMembers.controller.php',
 						'controller' => 'ManageMembers_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -394,7 +407,6 @@ class Admin_Controller extends Action_Controller
 					),
 					'membergroups' => array(
 						'label' => $txt['admin_groups'],
-						'file' => 'ManageMembergroups.controller.php',
 						'controller' => 'ManageMembergroups_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -408,7 +420,6 @@ class Admin_Controller extends Action_Controller
 					),
 					'permissions' => array(
 						'label' => $txt['edit_permissions'],
-						'file' => 'ManagePermissions.controller.php',
 						'controller' => 'ManagePermissions_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -424,7 +435,6 @@ class Admin_Controller extends Action_Controller
 					),
 					'ban' => array(
 						'label' => $txt['ban_title'],
-						'file' => 'ManageBans.controller.php',
 						'controller' => 'ManageBans_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -439,7 +449,6 @@ class Admin_Controller extends Action_Controller
 					),
 					'regcenter' => array(
 						'label' => $txt['registration_center'],
-						'file' => 'ManageRegistration.controller.php',
 						'controller' => 'ManageRegistration_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -455,7 +464,6 @@ class Admin_Controller extends Action_Controller
 					'sengines' => array(
 						'label' => $txt['search_engines'],
 						'enabled' => in_array('sp', $context['admin_features']),
-						'file' => 'ManageSearchEngines.controller.php',
 						'controller' => 'ManageSearchEngines_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -471,7 +479,6 @@ class Admin_Controller extends Action_Controller
 					'paidsubscribe' => array(
 						'label' => $txt['paid_subscriptions'],
 						'enabled' => in_array('ps', $context['admin_features']),
-						'file' => 'ManagePaid.controller.php',
 						'controller' => 'ManagePaid_Controller',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_paid',
@@ -490,7 +497,6 @@ class Admin_Controller extends Action_Controller
 				'areas' => array(
 					'maintain' => array(
 						'label' => $txt['maintain_title'],
-						'file' => 'Maintenance.controller.php',
 						'controller' => 'Maintenance_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -506,7 +512,6 @@ class Admin_Controller extends Action_Controller
 					),
 					'logs' => array(
 						'label' => $txt['logs'],
-						'file' => 'AdminLog.controller.php',
 						'controller' => 'AdminLog_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -524,7 +529,6 @@ class Admin_Controller extends Action_Controller
 					),
 					'scheduledtasks' => array(
 						'label' => $txt['maintain_tasks'],
-						'file' => 'ManageScheduledTasks.controller.php',
 						'controller' => 'ManageScheduledTasks_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -536,7 +540,6 @@ class Admin_Controller extends Action_Controller
 					),
 					'mailqueue' => array(
 						'label' => $txt['mailqueue_title'],
-						'file' => 'ManageMail.controller.php',
 						'controller' => 'ManageMail_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -549,7 +552,6 @@ class Admin_Controller extends Action_Controller
 					'reports' => array(
 						'enabled' => in_array('rg', $context['admin_features']),
 						'label' => $txt['generate_reports'],
-						'file' => 'Reports.controller.php',
 						'controller' => 'Reports_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -557,7 +559,6 @@ class Admin_Controller extends Action_Controller
 					),
 					'repairboards' => array(
 						'label' => $txt['admin_repair'],
-						'file' => 'RepairBoards.controller.php',
 						'controller' => 'RepairBoards_Controller',
 						'function' => 'action_repairboards',
 						'select' => 'maintain',
@@ -566,6 +567,8 @@ class Admin_Controller extends Action_Controller
 				),
 			),
 		);
+
+		$this->_events->trigger('addMenu', array('admin_areas' => &$admin_areas));
 
 		// Any files to include for administration?
 		call_integration_include_hook('integrate_admin_include');
@@ -577,8 +580,29 @@ class Admin_Controller extends Action_Controller
 		unset($admin_areas);
 
 		// Nothing valid?
-		if ($admin_include_data == false)
-			fatal_lang_error('no_access', false);
+		if ($admin_include_data === false)
+		{
+			throw new Elk_Exception('no_access', false);
+		}
+
+		// Make a note of the Unique ID for this menu.
+		$context['admin_menu_id'] = $context['max_menu_id'];
+		$context['admin_menu_name'] = 'menu_data_' . $context['admin_menu_id'];
+
+		// Where in the admin are we?
+		$context['admin_area'] = $admin_include_data['current_area'];
+
+		return $admin_include_data;
+	}
+
+	/**
+	 * Builds out the navigation link tree for the admin area
+	 *
+	 * @param array $admin_include_data
+	 */
+	private function buildLinktree($admin_include_data)
+	{
+		global $txt, $context, $scripturl;
 
 		// Build the link tree.
 		$context['linktree'][] = array(
@@ -597,25 +621,13 @@ class Admin_Controller extends Action_Controller
 				'url' => $scripturl . '?action=admin;area=' . $admin_include_data['current_area'] . ';sa=' . $admin_include_data['current_subsection'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 				'name' => $admin_include_data['subsections'][$admin_include_data['current_subsection']][0],
 			);
-
-		// Make a note of the Unique ID for this menu.
-		$context['admin_menu_id'] = $context['max_menu_id'];
-		$context['admin_menu_name'] = 'menu_data_' . $context['admin_menu_id'];
-
-		// Where in the admin are we?
-		$context['admin_area'] = $admin_include_data['current_area'];
-
-		// Now - finally - call the right place!
-		if (isset($admin_include_data['file']))
-			require_once($admin_include_data['file']);
-
-		callMenu($admin_include_data);
 	}
 
 	/**
 	 * The main administration section.
 	 *
 	 * What it does:
+	 *
 	 * - It prepares all the data necessary for the administration front page.
 	 * - It uses the Admin template along with the admin sub template.
 	 * - It requires the moderate_forum, manage_membergroups, manage_bans,
@@ -626,11 +638,10 @@ class Admin_Controller extends Action_Controller
 	 */
 	public function action_home()
 	{
-		global $forum_version, $txt, $scripturl, $context, $user_info, $settings;
+		global $txt, $scripturl, $context, $user_info, $settings;
 
 		// We need a little help
 		require_once(SUBSDIR . '/Membergroups.subs.php');
-		require_once(SUBSDIR . '/Admin.subs.php');
 
 		// You have to be able to do at least one of the below to see this page.
 		isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
@@ -644,25 +655,10 @@ class Admin_Controller extends Action_Controller
 
 		// This makes it easier to get the latest news with your time format.
 		$context['time_format'] = urlencode($user_info['time_format']);
-		$context['forum_version'] = $forum_version;
+		$context['forum_version'] = FORUM_VERSION;
 
 		// Get a list of current server versions.
-		$checkFor = array(
-			'gd',
-			'imagick',
-			'db_server',
-			'mmcache',
-			'eaccelerator',
-			'zend',
-			'apc',
-			'memcache',
-			'xcache',
-			'opcache',
-			'php',
-			'server',
-		);
-		$context['current_versions'] = getServerVersions($checkFor);
-
+		$context['current_versions'] = getServerVersions($this->_checkFor);
 		$context['can_admin'] = allowedTo('admin_forum');
 		$context['sub_template'] = 'admin';
 		$context['page_title'] = $txt['admin_center'];
@@ -682,13 +678,14 @@ class Admin_Controller extends Action_Controller
 	 * The credits section in admin panel.
 	 *
 	 * What it does:
+	 *
 	 * - Determines the current level of support functions from the server, such as
-	 * current level of caching engine or graphics librayrs installed.
+	 * current level of caching engine or graphics library's installed.
 	 * - Accessed by ?action=admin;area=credits
 	 */
 	public function action_credits()
 	{
-		global $forum_version, $txt, $scripturl, $context, $user_info, $modSettings;
+		global $txt, $scripturl, $context, $user_info;
 
 		// We need a little help from our friends
 		require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -716,25 +713,10 @@ class Admin_Controller extends Action_Controller
 
 		// This makes it easier to get the latest news with your time format.
 		$context['time_format'] = urlencode($user_info['time_format']);
-		$context['forum_version'] = $forum_version;
+		$context['forum_version'] = FORUM_VERSION;
 
 		// Get a list of current server versions.
-		$checkFor = array(
-			'gd',
-			'imagick',
-			'db_server',
-			'mmcache',
-			'eaccelerator',
-			'zend',
-			'apc',
-			'memcache',
-			'xcache',
-			'opcache',
-			'php',
-			'server',
-		);
-		$context['current_versions'] = getServerVersions($checkFor);
-
+		$context['current_versions'] = getServerVersions($this->_checkFor);
 		$context['can_admin'] = allowedTo('admin_forum');
 		$context['sub_template'] = 'credits';
 		$context['page_title'] = $txt['support_credits_title'];
@@ -754,6 +736,14 @@ class Admin_Controller extends Action_Controller
 
 	/**
 	 * This function allocates out all the search stuff.
+	 *
+	 * What it does:
+	 *
+	 * - Accessed with /index.php?action=admin;area=search[;search_type=x]
+	 * - Sets up an array of applicable sub-actions (search types) and the function that goes with each
+	 * - Search type specified by "search_type" request variable (either from a
+	 * form or from the query string) Defaults to 'internal'
+	 * 	Calls the appropriate sub action based on the search_type
 	 */
 	public function action_search()
 	{
@@ -782,12 +772,12 @@ class Admin_Controller extends Action_Controller
 
 		// Setup for the template
 		$context['search_type'] = $subAction;
-		$context['search_term'] = isset($_REQUEST['search_term']) ? Util::htmlspecialchars($_REQUEST['search_term'], ENT_QUOTES) : '';
+		$context['search_term'] = $this->_req->getPost('search_term', 'trim|Util::htmlspecialchars[ENT_QUOTES]');
 		$context['sub_template'] = 'admin_search_results';
 		$context['page_title'] = $txt['admin_search_results'];
 
 		// You did remember to enter something to search for, otherwise its easy
-		if (trim($context['search_term']) == '')
+		if ($context['search_term'] === '')
 			$context['search_results'] = array();
 		else
 			$action->dispatch($subAction);
@@ -795,31 +785,43 @@ class Admin_Controller extends Action_Controller
 
 	/**
 	 * A complicated but relatively quick internal search.
+	 *
+	 * What it does:
+	 *
+	 * - Can be accessed with /index.php?action=admin;sa=search;search_term=x) or
+	 * from the admin search form ("Task/Setting" option)
+	 * - Polls the controllers for their configuration settings
+	 * - Calls integrate_admin_search to allow addons to add search configs
+	 * - Loads up the "Help" language file and all of the "Manage" language files
+	 * - Loads up information about each item it found for the template
+	 *
+	 * @event integrate_admin_search Allows integration to add areas to the internal admin search
+	 * @event search Allows active modules registered to search to add settings for internal search
 	 */
 	public function action_search_internal()
 	{
-		global $context, $txt, $helptxt, $scripturl;
+		global $context, $txt;
 
 		// Try to get some more memory.
-		setMemoryLimit('128M');
+		detectServer()->setMemoryLimit('128M');
 
 		// Load a lot of language files.
 		$language_files = array(
-			'Help', 'ManageMail', 'ManageSettings', 'ManageCalendar', 'ManageBoards', 'ManagePaid', 'ManagePermissions', 'Search',
-			'Login', 'ManageSmileys', 'Maillist',
+			'Help', 'ManageMail', 'ManageSettings', 'ManageBoards', 'ManagePaid', 'ManagePermissions', 'Search',
+			'Login', 'ManageSmileys', 'Maillist', 'Mentions'
 		);
 
 		// All the files we need to include.
 		$include_files = array(
 			'AddonSettings.controller', 'AdminLog.controller', 'CoreFeatures.controller',
 			'ManageAttachments.controller', 'ManageAvatars.controller', 'ManageBBC.controller',
-			'ManageBoards.controller', 'ManageCalendar.controller', 'ManageDrafts.controller',
+			'ManageBoards.controller',
 			'ManageFeatures.controller', 'ManageLanguages.controller', 'ManageMail.controller',
 			'ManageNews.controller', 'ManagePaid.controller', 'ManagePermissions.controller',
 			'ManagePosts.controller', 'ManageRegistration.controller', 'ManageSearch.controller',
 			'ManageSearchEngines.controller', 'ManageSecurity.controller', 'ManageServer.controller',
 			'ManageSmileys.controller', 'ManageTopics.controller', 'ManageMaillist.controller',
-			'ManageMembergroups.controller',
+			'ManageMembergroups.controller'
 		);
 
 		// This is a special array of functions that contain setting data
@@ -838,8 +840,6 @@ class Admin_Controller extends Action_Controller
 			array('settings_search', 'area=manageattachments;sa=avatars', 'ManageAvatars_Controller'),
 			array('settings_search', 'area=postsettings;sa=bbc', 'ManageBBC_Controller'),
 			array('settings_search', 'area=manageboards;sa=settings', 'ManageBoards_Controller'),
-			array('settings_search', 'area=managecalendar;sa=settings', 'ManageCalendar_Controller'),
-			array('settings_search', 'area=managedrafts', 'ManageDrafts_Controller'),
 			array('settings_search', 'area=languages;sa=settings', 'ManageLanguages_Controller'),
 			array('settings_search', 'area=mailqueue;sa=settings', 'ManageMail_Controller'),
 			array('settings_search', 'area=maillist;sa=emailsettings', 'ManageMaillist_Controller'),
@@ -864,101 +864,23 @@ class Admin_Controller extends Action_Controller
 			array('settings_search', 'area=postsettings;sa=topics', 'ManageTopics_Controller'),
 		);
 
+		// Allow integration to add settings to search
 		call_integration_hook('integrate_admin_search', array(&$language_files, &$include_files, &$settings_search));
 
-		loadLanguage(implode('+', $language_files));
-
-		foreach ($include_files as $file)
-			require_once(ADMINDIR . '/' . $file . '.php');
-
-		/* This is the huge array that defines everything ... it's items are formatted as follows:
-			0 = Language index (Can be array of indexes) to search through for this setting.
-			1 = URL for this indexes page.
-			2 = Help index for help associated with this item (If different from 0)
-		*/
-
-		$search_data = array(
-			// All the major sections of the forum.
-			'sections' => array(
-			),
-			'settings' => array(
-				array('COPPA', 'area=regcenter;sa=settings'),
-				array('CAPTCHA', 'area=securitysettings;sa=spam'),
-			),
-		);
-
-		// Go through the admin menu structure trying to find suitably named areas!
-		foreach ($context[$context['admin_menu_name']]['sections'] as $section)
-		{
-			foreach ($section['areas'] as $menu_key => $menu_item)
-			{
-				$search_data['sections'][] = array($menu_item['label'], 'area=' . $menu_key);
-				if (!empty($menu_item['subsections']))
-					foreach ($menu_item['subsections'] as $key => $sublabel)
-					{
-						if (isset($sublabel['label']))
-							$search_data['sections'][] = array($sublabel['label'], 'area=' . $menu_key . ';sa=' . $key);
-					}
-			}
-		}
-
-		foreach ($settings_search as $setting_area)
-		{
-			// Get a list of their variables.
-			if (isset($setting_area[2]))
-			{
-				// an OOP controller: get the settings from the settings method.
-				$controller = new $setting_area[2]();
-				$config_vars = $controller->{$setting_area[0]}();
-			}
-			else
-			{
-				// a good ole' procedural controller: get the settings from the function.
-				$config_vars = $setting_area[0](true);
-			}
-
-			foreach ($config_vars as $var)
-				if (!empty($var[1]) && !in_array($var[0], array('permissions', 'switch', 'warning')))
-					$search_data['settings'][] = array($var[(isset($var[2]) && in_array($var[2], array('file', 'db'))) ? 0 : 1], $setting_area[1]);
-		}
-
-		$context['page_title'] = $txt['admin_search_results'];
-		$context['search_results'] = array();
+		// Allow active modules to add settings for internal search
+		$this->_events->trigger('search', array('language_files' => &$language_files, 'include_files' => &$include_files, 'settings_search' => &$settings_search));
 
 		// Go through all the search data trying to find this text!
 		$search_term = strtolower(un_htmlspecialchars($context['search_term']));
-		foreach ($search_data as $section => $data)
-		{
-			foreach ($data as $item)
-			{
-				$found = false;
-				if (!is_array($item[0]))
-					$item[0] = array($item[0]);
-				foreach ($item[0] as $term)
-				{
-					if (stripos($term, $search_term) !== false || (isset($txt[$term]) && stripos($txt[$term], $search_term) !== false) || (isset($txt['setting_' . $term]) && stripos($txt['setting_' . $term], $search_term) !== false))
-					{
-						$found = $term;
-						break;
-					}
-				}
 
-				if ($found)
-				{
-					// Format the name - and remove any descriptions the entry may have.
-					$name = isset($txt[$found]) ? $txt[$found] : (isset($txt['setting_' . $found]) ? $txt['setting_' . $found] : $found);
-					$name = preg_replace('~<(?:div|span)\sclass="smalltext">.+?</(?:div|span)>~', '', $name);
+		$search = new AdminSettings_Search($language_files, $include_files, $settings_search);
+		$search->initSearch($context['admin_menu_name'], array(
+			array('COPPA', 'area=regcenter;sa=settings'),
+			array('CAPTCHA', 'area=securitysettings;sa=spam'),
+		));
 
-					if (!empty($name))
-						$context['search_results'][] = array(
-							'url' => (substr($item[1], 0, 4) == 'area' ? $scripturl . '?action=admin;' . $item[1] : $item[1]) . ';' . $context['session_var'] . '=' . $context['session_id'] . ((substr($item[1], 0, 4) == 'area' && $section == 'settings' ? '#' . $item[0][0] : '')),
-							'name' => $name,
-							'type' => $section,
-							'help' => Util::shorten_text(isset($item[2]) ? strip_tags($helptxt[$item[2]]) : (isset($helptxt[$found]) ? strip_tags($helptxt[$found]) : ''), 255),
-						);
-				}
-			}
-		}
+		$context['page_title'] = $txt['admin_search_results'];
+		$context['search_results'] = $search->doSearch($search_term);
 	}
 
 	/**
@@ -968,19 +890,27 @@ class Admin_Controller extends Action_Controller
 	{
 		global $context;
 
-		require_once(ADMINDIR . '/ManageMembers.controller.php');
-
+		// @todo once Action.class is changed
 		$_REQUEST['sa'] = 'query';
-		$_POST['membername'] = un_htmlspecialchars($context['search_term']);
-		$_POST['types'] = '';
 
-		$managemembers = new ManageMembers_Controller();
+		// Set the query values
+		$this->_req->post->sa = 'query';
+		$this->_req->post->membername = un_htmlspecialchars($context['search_term']);
+		$this->_req->post->types = '';
+
+		$managemembers = new ManageMembers_Controller(new Event_manager());
+		$managemembers->pre_dispatch();
 		$managemembers->action_index();
 	}
 
 	/**
 	 * This file allows the user to search the wiki documentation
 	 * for a little help.
+	 *
+	 * What it does:
+	 *
+	 * - Creates an exception since GitHub does not yet support API wiki searches so the connection
+	 * will fail.
 	 */
 	public function action_search_doc()
 	{
@@ -1006,21 +936,22 @@ class Admin_Controller extends Action_Controller
 		$search_results = fetch_web_data($context['doc_apiurl'] . '?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=' . $postVars);
 
 		// If we didn't get any xml back we are in trouble - perhaps the doc site is overloaded?
-		if (!$search_results || preg_match('~<' . '\?xml\sversion="\d+\.\d+"\?>\s*(<api>.+?</api>)~is', $search_results, $matches) != true)
-			fatal_lang_error('cannot_connect_doc_site');
+		if (!$search_results || preg_match('~<' . '\?xml\sversion="\d+\.\d+"\?' . '>\s*(<api>.+?</api>)~is', $search_results, $matches) !== 1)
+			throw new Elk_Exception('cannot_connect_doc_site');
 
-		$search_results = $matches[1];
+		$search_results = !empty($matches[1]) ? $matches[1] : '';
 
 		// Otherwise we simply walk through the XML and stick it in context for display.
 		$context['search_results'] = array();
-		require_once(SUBSDIR . '/XmlArray.class.php');
 
 		// Get the results loaded into an array for processing!
 		$results = new Xml_Array($search_results, false);
 
 		// Move through the api layer.
 		if (!$results->exists('api'))
-			fatal_lang_error('cannot_connect_doc_site');
+		{
+			throw new Elk_Exception('cannot_connect_doc_site');
+		}
 
 		// Are there actually some results?
 		if ($results->exists('api/query/search/p'))
@@ -1048,9 +979,11 @@ class Admin_Controller extends Action_Controller
 		// Clean any admin tokens as well.
 		cleanTokens(false, '-admin');
 
-		if (isset($_GET['redir']) && isset($_SERVER['HTTP_REFERER']))
+		if (isset($this->_req->query->redir, $this->_req->server->HTTP_REFERER))
+		{
 			redirectexit($_SERVER['HTTP_REFERER']);
-		else
-			redirectexit();
+		}
+
+		redirectexit();
 	}
 }

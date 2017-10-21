@@ -7,12 +7,9 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.7
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Converts a string of HTML to BBC
@@ -204,7 +201,7 @@ class Html_2_BBC
 	 * For a given node, checks if it is anywhere nested inside of a code block
 	 * - Prevents converting anything that's inside a code block
 	 *
-	 * @param object $node current dom node being worked on
+	 * @param DOMNode|object $node current dom node being worked on
 	 * @param boolean $parser internal or external parser
 	 */
 	private static function _has_parent_code($node, $parser)
@@ -230,7 +227,7 @@ class Html_2_BBC
 	/**
 	 * Traverse each node to its base, then convert tags to bbc on the way back out
 	 *
-	 * @param object $node
+	 * @param DOMNode|object $node
 	 */
 	private function _convert_childNodes($node)
 	{
@@ -255,7 +252,7 @@ class Html_2_BBC
 	/**
 	 * Convert the supplied node into its bbc equivalent
 	 *
-	 * @param object $node
+	 * @param DOMNode|object $node
 	 */
 	private function _convert_to_bbc($node)
 	{
@@ -432,7 +429,7 @@ class Html_2_BBC
 	 * html: <abbr title="Hyper Text Markup Language">HTML</abbr>
 	 * bbc:  [abbr=Hyper Text Markup Language]HTML[/abbr]
 	 *
-	 * @param object $node
+	 * @param DOMNode|object $node
 	 */
 	private function _convert_abbr($node)
 	{
@@ -453,7 +450,7 @@ class Html_2_BBC
 	 * html: <a href='http://somesite.com' title='Title'>Awesome Site</a>
 	 * bbc: [url=http://somesite.com]Awesome Site[/url]
 	 *
-	 * @param object $node
+	 * @param DOMNode|object $node
 	 */
 	private function _convert_anchor($node)
 	{
@@ -518,7 +515,7 @@ class Html_2_BBC
 	 * html: <bdo dir="rtl">Some text</bdo>
 	 * bbc: [bdo=rtl]Some Text[/bdo]
 	 *
-	 * @param object $node
+	 * @param DOMNode|object $node
 	 */
 	private function _convert_bdo($node)
 	{
@@ -536,7 +533,7 @@ class Html_2_BBC
 	/**
 	 * Converts code tags to bbc block code
 	 *
-	 * @param object $node
+	 * @param DOMNode|object $node
 	 */
 	private function _convert_code($node)
 	{
@@ -579,7 +576,7 @@ class Html_2_BBC
 	 * html: <font size="3" color="red">This is some text!</font>
 	 * bbc: [color=red][size=12pt]This is some text![/size][/color]
 	 *
-	 * @param object $node
+	 * @param DOMNode|object $node
 	 */
 	private function _convert_font($node)
 	{
@@ -599,7 +596,7 @@ class Html_2_BBC
 			$blocks[0] = '[size=' . $size . ']' . $blocks[0] . '[/size]';
 		}
 		if (!empty($face))
-			$blocks[0]  = '[font=' . strtolower($face). ']' . $blocks[0] . '[/font]';
+			$blocks[0]  = '[font=' . strtolower($face) . ']' . $blocks[0] . '[/font]';
 		if (!empty($color))
 			$blocks[0]  = '[color=' . strtolower($color) . ']' . $blocks[0] . '[/color]';
 
@@ -631,7 +628,7 @@ class Html_2_BBC
 	 * html: <img src='source' alt='alt' title='title' />
 	 * bbc: [img]src[/img]
 	 *
-	 * @param object $node
+	 * @param DOMNode|object $node
 	 */
 	private function _convert_image($node)
 	{
@@ -693,7 +690,7 @@ class Html_2_BBC
 	 * html: <span style="font-weight: bold;">Some Text</span>
 	 * bbc: [b]Some Text[/b]
 	 *
-	 * @param object $node
+	 * @param DOMNode|object $node
 	 */
 	private function _convert_styles($node)
 	{
@@ -770,7 +767,7 @@ class Html_2_BBC
 	 * html: <td colspan="2">Some Text</td>
 	 * bbc: [td]Some Text[/td][td][/td]
 	 *
-	 * @param object $node
+	 * @param DOMNode|object $node
 	 */
 	private function _convert_table_cell($node)
 	{
@@ -800,36 +797,9 @@ class Html_2_BBC
 	}
 
 	/**
-	 * Helper function for getting a node object
-	 *
-	 * @param object $node
-	 * @param int $item
-	 */
-	private function _get_item($node, $item)
-	{
-		if ($this->_parser)
-			return $node->item($item);
-		else
-			return $node[$item];
-	}
-
-	/**
-	 * Helper function for getting a node length
-	 *
-	 * @param object $node
-	 */
-	private function _get_length($node)
-	{
-		if ($this->_parser)
-			return $node->length;
-		else
-			return count($node);
-	}
-
-	/**
 	 * Helper function for getting a node value
 	 *
-	 * @param object $node
+	 * @param DOMNode|object $node
 	 */
 	private function _get_value($node)
 	{
@@ -845,7 +815,7 @@ class Html_2_BBC
 	/**
 	 * Helper function for getting a node name
 	 *
-	 * @param object $node
+	 * @param DOMNode|object $node
 	 */
 	private function _get_name($node)
 	{
@@ -861,7 +831,7 @@ class Html_2_BBC
 	/**
 	 * Gets the inner html of a node
 	 *
-	 * @param object $node
+	 * @param DOMNode|object $node
 	 * @return string
 	 */
 	private function _get_innerHTML($node)
@@ -882,7 +852,7 @@ class Html_2_BBC
 	/**
 	 * Gets the outer html of a node
 	 *
-	 * @param object $node
+	 * @param DOMNode|object $node
 	 */
 	private function _get_outerHTML($node)
 	{

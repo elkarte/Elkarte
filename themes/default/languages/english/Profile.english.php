@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; Profile
+// Version: 1.1; Profile
 
 $txt['no_profile_edit'] = 'You are not allowed to change this person\'s profile.';
 $txt['website_title'] = 'Website title';
@@ -101,6 +101,7 @@ $txt['notify_settings'] = 'Notification Settings:';
 $txt['notify_save'] = 'Save settings';
 $txt['notify_important_email'] = 'Receive forum newsletters, announcements and important notifications by email.';
 $txt['notify_regularity'] = 'For topics and boards I\'ve requested notification on, notify me';
+$txt['notify_regularity_none'] = 'Never';
 $txt['notify_regularity_instant'] = 'Instantly';
 $txt['notify_regularity_first_only'] = 'Instantly - but only for the first unread reply';
 $txt['notify_regularity_daily'] = 'Daily';
@@ -116,6 +117,19 @@ $txt['notify_send_type_nothing'] = 'Nothing at all';
 $txt['notify_send_body'] = 'When sending notifications of a reply to a topic, send the post in the email (but please don\'t reply to these emails.)';
 $txt['notify_send_body_pbe'] = 'When sending email notifications, send the full text of the post in the email';
 $txt['notify_send_body_pbe_post'] = '<strong>NOT</strong> available with Daily / Weekly summary';
+
+$txt['notify_method'] = 'Notification and:';
+$txt['notify_notification'] = 'no email (only mention/alert)';
+$txt['notify_email'] = 'Immediate email';
+$txt['notify_email_daily'] = 'Daily email';
+$txt['notify_email_weekly'] = 'Weekly email';
+
+$txt['notify_type_likemsg'] = 'Notify when one of your messages is liked';
+$txt['notify_type_mentionmem'] = 'Notify when you are @mentioned';
+$txt['notify_type_rlikemsg'] = 'Notify when a like is removed from one of your messages';
+$txt['notify_type_buddy'] = 'Notify when someone adds you as buddy';
+$txt['notify_type_quotedmem'] = 'Notify when someone quotes one of your messages';
+$txt['notify_type_mailfail'] = 'Notify when email notifications are disabled (mention only)';
 
 $txt['notifications_topics'] = 'Current Topic Notifications';
 $txt['notifications_topics_none'] = 'You are not currently receiving any notifications from topics.';
@@ -162,6 +176,7 @@ $txt['profileInfo'] = 'Profile Info';
 $txt['showPosts'] = 'Show Posts';
 $txt['showPosts_help'] = 'This section allows you to view all posts made by this member. Note that you can only see posts made in areas you currently have access to.';
 $txt['showMessages'] = 'Messages';
+$txt['showGeneric_help'] = 'This section allows you to view all %1$s made by this member. Note that you can only see %1$s made in areas you currently have access to.';
 $txt['showTopics'] = 'Topics';
 $txt['showUnwatched'] = 'Unwatched topics';
 $txt['showAttachments'] = 'Attachments';
@@ -498,3 +513,6 @@ $txt['trackEdit_action_member_name'] = 'Username';
 $txt['trackEdit_action_email_address'] = 'Email Address';
 $txt['trackEdit_action_id_group'] = 'Primary Membergroup';
 $txt['trackEdit_action_additional_groups'] = 'Additional Membergroups';
+
+$txt['otp_enabled_help'] = 'Enabling this will add a second factor (one time password) for authentication.';
+$txt['otp_token_help'] = 'This generates a secret token for Time-based One-time Password apps such as Authy or Google Authenticator. Once the secret was generated use the your favorite authenticator app and scan the qrcode.<ul><li><a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en">Google Authenticator for Android</a></li><li><a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8">Google Authenticator for IOS (Apple)</a></li></ul>';

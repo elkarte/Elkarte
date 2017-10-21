@@ -7,18 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.7
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Reads the custom profile fields table and gets all items that were defined
@@ -69,8 +64,8 @@ function ml_CustomProfile()
 			// Build the sort queries.
 			if ($row['field_type'] != 'check')
 				$context['custom_profile_fields']['columns'][$curField]['sort'] = array(
-					'down' => 'LENGTH(cfd' . $curField . '.value) > 0 ASC, IFNULL(cfd' . $curField . '.value, 1=1) DESC, cfd' . $curField . '.value DESC',
-					'up' => 'LENGTH(cfd' . $curField . '.value) > 0 DESC, IFNULL(cfd' . $curField . '.value, 1=1) ASC, cfd' . $curField . '.value ASC'
+					'down' => 'LENGTH(cfd' . $curField . '.value) > 0 ASC, COALESCE(cfd' . $curField . '.value, 1=1) DESC, cfd' . $curField . '.value DESC',
+					'up' => 'LENGTH(cfd' . $curField . '.value) > 0 DESC, COALESCE(cfd' . $curField . '.value, 1=1) ASC, cfd' . $curField . '.value ASC'
 				);
 			else
 				$context['custom_profile_fields']['columns'][$curField]['sort'] = array(
@@ -335,6 +330,8 @@ function printMemberListRows($request)
 	// Load all the members for display.
 	loadMemberData($members);
 
+	$bbc_parser = \BBC\ParserWrapper::instance();
+
 	$context['members'] = array();
 	foreach ($members as $member)
 	{
@@ -347,7 +344,7 @@ function printMemberListRows($request)
 		$context['members'][$member]['real_name'] = $context['members'][$member]['link'];
 		$context['members'][$member]['avatar'] = '<a href="' . $context['members'][$member]['href'] . '">' . $context['members'][$member]['avatar']['image'] . '</a>';
 		$context['members'][$member]['email_address'] = $context['members'][$member]['email'];
-		$context['members'][$member]['website_url'] = $context['members'][$member]['website']['url'] != '' ? '<a href="' . $context['members'][$member]['website']['url'] . '" target="_blank" class="new_win"><img src="' . $settings['images_url'] . '/profile/www.png" alt="' . $context['members'][$member]['website']['title'] . '" title="' . $context['members'][$member]['website']['title'] . '" /></a>' : '';
+		$context['members'][$member]['website_url'] = $context['members'][$member]['website']['url'] != '' ? '<a href="' . $context['members'][$member]['website']['url'] . '" target="_blank" class="new_win"><i class="icon i-website" title="' . $context['members'][$member]['website']['title'] . '" title="' . $context['members'][$member]['website']['title'] . '"></i></a>' : '';
 		$context['members'][$member]['id_group'] = empty($context['members'][$member]['group']) ? $context['members'][$member]['post_group'] : $context['members'][$member]['group'];
 		$context['members'][$member]['date_registered'] = $context['members'][$member]['registered'];
 
@@ -376,7 +373,7 @@ function printMemberListRows($request)
 
 				// Anything else to make it look "nice"
 				if ($column['bbc'])
-					$context['members'][$member]['options'][$curField] = strip_tags(parse_bbc($context['members'][$member]['options'][$curField]));
+					$context['members'][$member]['options'][$curField] = strip_tags($bbc_parser->parseCustomFields($context['members'][$member]['options'][$curField]));
 				elseif ($column['type'] === 'check')
 					$context['members'][$member]['options'][$curField] = $context['members'][$member]['options'][$curField] == 0 ? $txt['no'] : $txt['yes'];
 			}

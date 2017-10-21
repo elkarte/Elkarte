@@ -7,12 +7,9 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Removes the given language from all members..
@@ -51,6 +48,7 @@ function list_getNumLanguages()
  * Fetch the actual language information.
  *
  * What it does:
+ *
  * - Callback for $listOptions['get_items']['function'] in action_edit.
  * - Determines which languages are available by looking for the "index.{language}.php" file.
  * - Also figures out how many users are using a particular language.
@@ -143,7 +141,7 @@ function cleanLangString($string, $to_display = true)
 		$str_len = strlen($string);
 		for ($i = 0; $i < $str_len; $i++)
 		{
-			// Handle ecapes first.
+			// Handle escapes first.
 			if ($string[$i] == '\\')
 			{
 				// Toggle the escape.
@@ -209,7 +207,7 @@ function cleanLangString($string, $to_display = true)
 					// @todo Do better than this, please!
 					$new_string .= '{%' . $matches[1] . '%}';
 
-					// We're not going to reparse this.
+					// We're not going to re-parse this.
 					$i += strlen($matches[1]) - 1;
 				}
 
@@ -344,14 +342,13 @@ function cleanLangString($string, $to_display = true)
  */
 function list_getLanguagesList()
 {
-	global $forum_version, $context, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	// We're going to use this URL.
 	// @todo no we are not, this needs to be changed - again
-	$url = 'http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ElkArte ' => '')));
+	$url = 'http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, array('ElkArte ' => '')));
 
 	// Load the class file and stick it into an array.
-	require_once(SUBSDIR . '/XmlArray.class.php');
 	$language_list = new Xml_Array(fetch_web_data($url), true);
 
 	// Check that the site responded and that the language exists.
@@ -386,12 +383,20 @@ function list_getLanguagesList()
 	}
 }
 
+/**
+ * Finds installed language files of type lang
+ *
+ * @param string $lang
+ *
+ * @return array|bool
+ */
 function findPossiblePackages($lang)
 {
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_install, filename
+		SELECT 
+			id_install, filename
 		FROM {db_prefix}log_packages
 		WHERE package_id LIKE {string:contains_lang}
 			AND install_state = {int:installed}',
@@ -400,7 +405,7 @@ function findPossiblePackages($lang)
 			'installed' => 1,
 		)
 	);
-
+	$file_name = '';
 	if ($db->num_rows($request) > 0)
 	{
 		list ($pid, $file_name) = $db->fetch_row($request);

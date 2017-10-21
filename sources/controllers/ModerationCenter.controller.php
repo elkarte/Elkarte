@@ -7,27 +7,22 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.8
+ * @version 1.1
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
- * Moderation Center Controller
+ * ModerationCenter_Controller Class
+ * Provides overview of moderation items to the team
  */
 class ModerationCenter_Controller extends Action_Controller
 {
 	/**
 	 * Holds function array to pass to callMenu to call the right moderation area
-	 *
 	 * @var array
 	 */
 	private $_mod_include_data;
@@ -51,6 +46,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 	/**
 	 * Prepare menu, make checks, load files, and create moderation menu.
+	 *
 	 * This can be called from the class, or from outside, to
 	 * set up moderation menu.
 	 */
@@ -75,11 +71,11 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// Load the language, and the template.
 		loadLanguage('ModerationCenter');
-		loadTemplate(false, 'admin');
+		loadCSSFile('admin.css');
 
 		if (!empty($options['admin_preferences']))
 		{
-			$context['admin_preferences'] = serializeToJson($options['admin_preferences'], function($array_form) {
+			$context['admin_preferences'] = serializeToJson($options['admin_preferences'], function ($array_form) {
 				global $context;
 
 				$context['admin_preferences'] = $array_form;
@@ -140,8 +136,6 @@ class ModerationCenter_Controller extends Action_Controller
 					'modlog' => array(
 						'label' => $txt['modlog_view'],
 						'enabled' => !empty($modSettings['modlog_enabled']) && $context['can_moderate_boards'],
-						'file' => 'Modlog.controller.php',
-						'dir' => ADMINDIR,
 						'controller' => 'Modlog_Controller',
 						'function' => 'action_log',
 						'icon' => 'transparent.png',
@@ -168,7 +162,6 @@ class ModerationCenter_Controller extends Action_Controller
 					'postmod' => array(
 						'label' => $txt['mc_unapproved_posts'] . (!empty($mod_counts['postmod']) ? ' [' . $mod_counts['postmod'] . ']' : ''),
 						'enabled' => $context['can_moderate_approvals'],
-						'file' => 'PostModeration.controller.php',
 						'controller' => 'PostModeration_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -182,8 +175,6 @@ class ModerationCenter_Controller extends Action_Controller
 					'emailmod' => array(
 						'label' => $txt['mc_emailerror'] . (!empty($mod_counts['emailmod']) ? ' [' . $mod_counts['emailmod'] . ']' : ''),
 						'enabled' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
-						'file' => 'ManageMaillist.controller.php',
-						'dir' => ADMINDIR,
 						'function' => 'UnapprovedEmails',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_mail',
@@ -192,7 +183,6 @@ class ModerationCenter_Controller extends Action_Controller
 					'attachmod' => array(
 						'label' => $txt['mc_unapproved_attachments'] . (!empty($mod_counts['attachments']) ? ' [' . $mod_counts['attachments'] . ']' : ''),
 						'enabled' => $context['can_moderate_approvals'],
-						'file' => 'PostModeration.controller.php',
 						'controller' => 'PostModeration_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -208,6 +198,16 @@ class ModerationCenter_Controller extends Action_Controller
 						'class' => 'admin_img_reports',
 						'subsections' => array(
 							'open' => array($txt['mc_reportedp_active'] . (!empty($mod_counts['reports']) ? ' [' . $mod_counts['reports'] . ']' : '')),
+							'closed' => array($txt['mc_reportedp_closed']),
+						),
+					),
+					'pm_reports' => array(
+						'label' => $txt['mc_reported_pms'] . (!empty($mod_counts['pm_reports']) ? ' [' . $mod_counts['pm_reports'] . ']' : ''),
+						'enabled' => $user_info['is_admin'],
+						'controller' => 'ModerationCenter_Controller',
+						'function' => 'action_reportedPosts',
+						'subsections' => array(
+							'open' => array($txt['mc_reportedp_active']),
 							'closed' => array($txt['mc_reportedp_closed']),
 						),
 					),
@@ -231,7 +231,6 @@ class ModerationCenter_Controller extends Action_Controller
 					),
 					'groups' => array(
 						'label' => $txt['mc_group_requests'] . (!empty($mod_counts['groupreq']) ? ' [' . $mod_counts['groupreq'] . ']' : ''),
-						'file' => 'Groups.controller.php',
 						'controller' => 'Groups_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -241,7 +240,6 @@ class ModerationCenter_Controller extends Action_Controller
 					'members' => array(
 						'enabled' => allowedTo('moderate_forum'),
 						'label' => $txt['mc_member_requests'] . (!empty($mod_counts['memberreq']) ? ' [' . $mod_counts['memberreq'] . ']' : ''),
-						'file' => 'ManageMembers.controller.php',
 						'controller' => 'ManageMembers_Controller',
 						'function' => 'action_approve',
 						'icon' => 'transparent.png',
@@ -250,7 +248,6 @@ class ModerationCenter_Controller extends Action_Controller
 					),
 					'viewgroups' => array(
 						'label' => $txt['mc_view_groups'],
-						'file' => 'Groups.controller.php',
 						'controller' => 'Groups_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -275,8 +272,8 @@ class ModerationCenter_Controller extends Action_Controller
 		unset($moderation_areas);
 
 		// We got something - didn't we? DIDN'T WE!
-		if ($mod_include_data == false)
-			fatal_lang_error('no_access', false);
+		if ($mod_include_data === false)
+			throw new Elk_Exception('no_access', false);
 
 		// Retain the ID information in case required by a subaction.
 		$context['moderation_menu_id'] = $context['max_menu_id'];
@@ -386,25 +383,28 @@ class ModerationCenter_Controller extends Action_Controller
 		global $txt, $context;
 
 		// What notice have they asked to view
-		$id_notice = isset($_GET['nid']) ? (int) $_GET['nid'] : 0;
+		$id_notice = $this->_req->getQuery('nid', 'intval', 0);
 		$notice = moderatorNotice($id_notice);
 
 		// legit?
 		if (empty($notice) || !$context['can_moderate_boards'])
-			fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		list ($context['notice_body'], $context['notice_subject']) = $notice;
 
-		$context['notice_body'] = parse_bbc($context['notice_body'], false);
+		$parser = \BBC\ParserWrapper::instance();
+
+		$context['notice_body'] = $parser->parseNotice($context['notice_body']);
 		$context['page_title'] = $txt['show_notice'];
 		$context['sub_template'] = 'show_notice';
-		Template_Layers::getInstance()->removeAll();
 
+		Template_Layers::instance()->removeAll();
 		loadTemplate('ModerationCenter');
 	}
 
 	/**
-	 * Browse all the reported posts...
+	 * Browse all the reported posts.
+	 *
 	 * @todo this needs to be given its own file?
 	 */
 	public function action_reportedPosts()
@@ -421,74 +421,88 @@ class ModerationCenter_Controller extends Action_Controller
 			'description' => $txt['mc_reported_posts_desc'],
 		);
 
-		// This comes under the umbrella of moderating posts.
-		if ($user_info['mod_cache']['bq'] == '0=1')
-			isAllowedTo('moderate_forum');
-
-		// Are they wanting to view a particular report?
-		if (!empty($_REQUEST['report']))
-			return $this->action_modReport();
-
 		// Set up the comforting bits...
 		$context['page_title'] = $txt['mc_reported_posts'];
 		$context['sub_template'] = 'reported_posts';
 
+		// This comes under the umbrella of moderating posts.
+		if ($user_info['mod_cache']['bq'] === '0=1')
+			isAllowedTo('moderate_forum');
+
+		// Are they wanting to view a particular report?
+		if (!empty($this->_req->query->report))
+			return $this->action_modReport();
+
+		// This should not be needed...
+		$show_pms = false;
+		if ($context['admin_area'] === 'pm_reports')
+		{
+			$show_pms = true;
+			isAllowedTo('admin_forum');
+
+			// Put the open and closed options into tabs, because we can...
+			$context[$context['moderation_menu_name']]['tab_data'] = array(
+				'title' => $txt['mc_reported_pms'],
+				'help' => '',
+				'description' => $txt['mc_reported_pms_desc'],
+			);
+			$context['page_title'] = $txt['mc_reported_pms'];
+		}
+
 		// Are we viewing open or closed reports?
-		$context['view_closed'] = isset($_GET['sa']) && $_GET['sa'] == 'closed' ? 1 : 0;
+		$context['view_closed'] = $this->_req->getQuery('sa') === 'closed' ? 1 : 0;
 
 		// Are we doing any work?
-		if ((isset($_GET['ignore']) || isset($_GET['close'])) && isset($_GET['rid']))
+		if ((isset($this->_req->query->ignore) || isset($this->_req->query->close)) && isset($this->_req->query->rid))
 		{
 			checkSession('get');
-			$_GET['rid'] = (int) $_GET['rid'];
+			$rid = $this->_req->getQuery('rid', 'intval');
 
 			// Update the report...
-			if (isset($_GET['ignore']))
-				updateReportsStatus((int) $_GET['rid'], 'ignore', (int) $_GET['ignore']);
-			elseif (isset($_GET['close']))
-				updateReportsStatus((int) $_GET['rid'], 'close', (int) $_GET['close']);
+			if (isset($this->_req->query->ignore))
+				updateReportsStatus($rid, 'ignore', (int) $this->_req->query->ignore);
+			elseif (isset($this->_req->query->close))
+				updateReportsStatus($rid, 'close', (int) $this->_req->query->close);
 
 			// Time to update.
 			updateSettings(array('last_mod_report_action' => time()));
-			recountOpenReports();
+			recountOpenReports(true, $show_pms);
 		}
-		elseif (isset($_POST['close']) && isset($_POST['close_selected']))
+		elseif (isset($this->_req->post->close) && isset($this->_req->post->close_selected))
 		{
 			checkSession('post');
 
 			// All the ones to update...
-			$toClose = array();
-			foreach ($_POST['close'] as $rid)
-				$toClose[] = (int) $rid;
-
+			$toClose = array_map('intval', $this->_req->post->close);
 			if (!empty($toClose))
 			{
 				updateReportsStatus($toClose, 'close', 1);
 
 				// Time to update.
 				updateSettings(array('last_mod_report_action' => time()));
-				recountOpenReports();
+				recountOpenReports(true, $show_pms);
 			}
 		}
 
 		// How many entries are we viewing?
-		$context['total_reports'] = totalReports($context['view_closed']);
+		$context['total_reports'] = totalReports($context['view_closed'], $show_pms);
 
 		// So, that means we can page index, yes?
-		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=reports' . ($context['view_closed'] ? ';sa=closed' : ''), $_GET['start'], $context['total_reports'], 10);
-		$context['start'] = $_GET['start'];
+		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=' . $context['admin_area'] . ($context['view_closed'] ? ';sa=closed' : ''), $this->_req->query->start, $context['total_reports'], 10);
+		$context['start'] = $this->_req->query->start;
 
 		// By George, that means we in a position to get the reports, golly good.
-		$context['reports'] = getModReports($context['view_closed'], $context['start'], 10);
+		$context['reports'] = getModReports($context['view_closed'], $context['start'], 10, $show_pms);
 		$report_ids = array_keys($context['reports']);
 		$report_boards_ids = array();
+		$bbc_parser = \BBC\ParserWrapper::instance();
 		foreach ($context['reports'] as $row)
 		{
 			$context['reports'][$row['id_report']] = array(
 				'board' => $row['id_board'],
 				'id' => $row['id_report'],
 				'topic_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
-				'report_href' => $scripturl . '?action=moderate;area=reports;report=' . $row['id_report'],
+				'report_href' => $scripturl . '?action=moderate;area=' . $context['admin_area'] . ';report=' . $row['id_report'],
 				'author' => array(
 					'id' => $row['id_author'],
 					'name' => $row['author_name'],
@@ -499,7 +513,7 @@ class ModerationCenter_Controller extends Action_Controller
 				'time_started' => standardTime($row['time_started']),
 				'last_updated' => standardTime($row['time_updated']),
 				'subject' => $row['subject'],
-				'body' => parse_bbc($row['body']),
+				'body' => $bbc_parser->parseReport($row['body']),
 				'num_reports' => $row['num_reports'],
 				'closed' => $row['closed'],
 				'ignore' => $row['ignore_all'],
@@ -510,16 +524,16 @@ class ModerationCenter_Controller extends Action_Controller
 						'value' => $row['id_report'],
 					),
 					'details' => array(
-						'href' => $scripturl . '?action=moderate;area=reports;report=' . $row['id_report'],
+						'href' => $scripturl . '?action=moderate;area=' . $context['admin_area'] . ';report=' . $row['id_report'],
 						'text' => $txt['mc_reportedp_details'],
 					),
 					'ignore' => array(
-						'href' => $scripturl . '?action=moderate;area=reports' . ($context['view_closed'] ? ';sa=closed' : '') . ';ignore=' . ((int) !$row['ignore_all']) . ';rid=' . $row['id_report'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+						'href' => $scripturl . '?action=moderate;area=' . $context['admin_area'] . '' . ($context['view_closed'] ? ';sa=closed' : '') . ';ignore=' . ((int) !$row['ignore_all']) . ';rid=' . $row['id_report'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 						'text' => $row['ignore_all'] ? $txt['mc_reportedp_unignore'] : $txt['mc_reportedp_ignore'],
 						'custom' => $row['ignore_all'] ? '' : 'onclick="return confirm(' . JavaScriptEscape($txt['mc_reportedp_ignore_confirm']) . ');"',
 					),
 					'close' => array(
-						'href' => $scripturl . '?action=moderate;area=reports' . ($context['view_closed'] ? ';sa=closed' : '') . ';close=' . ((int) !$row['closed']) . ';rid=' . $row['id_report'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+						'href' => $scripturl . '?action=moderate;area=' . $context['admin_area'] . '' . ($context['view_closed'] ? ';sa=closed' : '') . ';close=' . ((int) !$row['closed']) . ';rid=' . $row['id_report'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 						'text' => $context['view_closed'] ? $txt['mc_reportedp_open'] : $txt['mc_reportedp_close'],
 					),
 				),
@@ -608,7 +622,7 @@ class ModerationCenter_Controller extends Action_Controller
 			list ($show_reports, $mod_blocks, $pref_binary) = explode('|', $user_settings['mod_prefs']);
 
 		// Are we saving?
-		if (isset($_POST['save']))
+		if (isset($this->_req->post->save))
 		{
 			checkSession('post');
 			validateToken('mod-set');
@@ -627,8 +641,8 @@ class ModerationCenter_Controller extends Action_Controller
 
 			// Do blocks first!
 			$mod_blocks = '';
-			if (!empty($_POST['mod_homepage']))
-				foreach ($_POST['mod_homepage'] as $k => $v)
+			if (!empty($this->_req->post->mod_homepage))
+				foreach ($this->_req->post->mod_homepage as $k => $v)
 				{
 					// Make sure they can add this...
 					if (isset($context['homepage_blocks'][$k]))
@@ -638,19 +652,20 @@ class ModerationCenter_Controller extends Action_Controller
 			// Now check other options!
 			$pref_binary = 0;
 
-			if ($context['can_moderate_approvals'] && !empty($_POST['mod_notify_approval']))
+			if ($context['can_moderate_approvals'] && !empty($this->_req->post->mod_notify_approval))
 				$pref_binary |= 4;
 
 			if ($context['can_moderate_boards'])
 			{
-				if (!empty($_POST['mod_notify_report']))
-					$pref_binary |= ($_POST['mod_notify_report'] == 2 ? 1 : 2);
+				if (!empty($this->_req->post->mod_notify_report))
+					$pref_binary |= ($this->_req->post->mod_notify_report == 2 ? 1 : 2);
 
-				$show_reports = !empty($_POST['mod_show_reports']) ? 1 : 0;
+				$show_reports = !empty($this->_req->post->mod_show_reports) ? 1 : 0;
 			}
 
 			// Put it all together.
 			$mod_prefs = $show_reports . '|' . $mod_blocks . '|' . $pref_binary;
+			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($user_info['id'], array('mod_prefs' => $mod_prefs));
 		}
 
@@ -668,7 +683,7 @@ class ModerationCenter_Controller extends Action_Controller
 	/**
 	 * Edit a warning template.
 	 *
-	 * @uses sub template warn_template
+	 * @uses template_warn_template()
 	 */
 	public function action_modifyWarningTemplate()
 	{
@@ -677,7 +692,7 @@ class ModerationCenter_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Moderation.subs.php');
 		loadJavascriptFile('admin.js', array(), 'admin_scripts');
 
-		$context['id_template'] = isset($_REQUEST['tid']) ? (int) $_REQUEST['tid'] : 0;
+		$context['id_template'] = $this->_req->getQuery('tid', 'intval', 0);
 		$context['is_edit'] = $context['id_template'];
 
 		// Standard template things.
@@ -698,7 +713,7 @@ class ModerationCenter_Controller extends Action_Controller
 			modLoadTemplate($context['id_template']);
 
 		// Wait, we are saving?
-		if (isset($_POST['save']))
+		if (isset($this->_req->post->save))
 		{
 			checkSession('post');
 			validateToken('mod-wt');
@@ -707,8 +722,8 @@ class ModerationCenter_Controller extends Action_Controller
 			require_once(SUBSDIR . '/Post.subs.php');
 
 			// Bit of cleaning!
-			$template_body = trim($_POST['template_body']);
-			$template_title = trim($_POST['template_title']);
+			$template_body = trim($this->_req->post->template_body);
+			$template_title = trim($this->_req->post->template_title);
 
 			// Need something in both boxes.
 			if (!empty($template_body) && !empty($template_title))
@@ -723,7 +738,7 @@ class ModerationCenter_Controller extends Action_Controller
 				$template_body = strtr($template_body, array('<br />' => "\n"));
 
 				// Is this personal?
-				$recipient_id = !empty($_POST['make_personal']) ? $user_info['id'] : 0;
+				$recipient_id = !empty($this->_req->post->make_personal) ? $user_info['id'] : 0;
 
 				// If we are this far it's save time.
 				if ($context['is_edit'])
@@ -755,7 +770,7 @@ class ModerationCenter_Controller extends Action_Controller
 				$context['warning_errors'] = array();
 				$context['template_data']['title'] = !empty($template_title) ? $template_title : '';
 				$context['template_data']['body'] = !empty($template_body) ? $template_body : $txt['mc_warning_template_body_default'];
-				$context['template_data']['personal'] = !empty($_POST['make_personal']);
+				$context['template_data']['personal'] = !empty($this->_req->post->make_personal);
 
 				if (empty($template_title))
 					$context['warning_errors'][] = $txt['mc_warning_template_error_no_title'];
@@ -769,44 +784,53 @@ class ModerationCenter_Controller extends Action_Controller
 	}
 
 	/**
-	 * Get details about the moderation report...
-	 * specified in $_REQUEST['report'].
+	 * Get details about the moderation report
+	 *
+	 * - report is specified in the url param report.
 	 */
 	public function action_modReport()
 	{
 		global $context, $scripturl, $txt;
 
 		// Have to at least give us something
-		if (empty($_REQUEST['report']))
-			fatal_lang_error('mc_no_modreport_specified');
+		$report = $this->_req->getQuery('report', 'intval', 0);
+		if (empty($report))
+			throw new Elk_Exception('mc_no_modreport_specified');
 
-		// Integers only please
-		$report = (int) $_REQUEST['report'];
+		// This should not be needed...
+		$show_pms = false;
+		if ($context['admin_area'] === 'pm_reports')
+		{
+			$show_pms = true;
+			isAllowedTo('admin_forum');
+		}
 
 		// Get the report details, need this so we can limit access to a particular board
-		$row = modReportDetails($report);
+		$row = modReportDetails($report, $show_pms);
 
 		// So did we find anything?
 		if ($row === false)
-			fatal_lang_error('mc_no_modreport_found');
+			throw new Elk_Exception('mc_no_modreport_found');
 
 		// Woohoo we found a report and they can see it!  Bad news is we have more work to do
 		// If they are adding a comment then... add a comment.
-		if (isset($_POST['add_comment']) && !empty($_POST['mod_comment']))
+		if (isset($this->_req->post->add_comment) && !empty($this->_req->post->mod_comment))
 		{
 			checkSession();
 
-			$newComment = trim(Util::htmlspecialchars($_POST['mod_comment']));
+			$newComment = trim(Util::htmlspecialchars($this->_req->post->mod_comment));
 
 			// In it goes.
 			if (!empty($newComment))
 			{
 				addReportComment($report, $newComment);
 
-				// Redirect to prevent double submittion.
-				redirectexit($scripturl . '?action=moderate;area=reports;report=' . $report);
+				// Redirect to prevent double submission.
+				redirectexit($scripturl . '?action=moderate;area=' . $context['admin_area'] . ';report=' . $report);
 			}
 		}
+
+		$bbc_parser = \BBC\ParserWrapper::instance();
 
 		$context['report'] = array(
 			'id' => $row['id_report'],
@@ -815,7 +839,7 @@ class ModerationCenter_Controller extends Action_Controller
 			'message_id' => $row['id_msg'],
 			'message_href' => $scripturl . '?msg=' . $row['id_msg'],
 			'message_link' => '<a href="' . $scripturl . '?msg=' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
-			'report_href' => $scripturl . '?action=moderate;area=reports;report=' . $row['id_report'],
+			'report_href' => $scripturl . '?action=moderate;area=' . $context['admin_area'] . ';' . $context['admin_area'] . '=' . $row['id_report'],
 			'author' => array(
 				'id' => $row['id_author'],
 				'name' => $row['author_name'],
@@ -827,7 +851,7 @@ class ModerationCenter_Controller extends Action_Controller
 			'time_started' => standardTime($row['time_started']),
 			'last_updated' => standardTime($row['time_updated']),
 			'subject' => $row['subject'],
-			'body' => parse_bbc($row['body']),
+			'body' => $bbc_parser->parseReport($row['body']),
 			'num_reports' => $row['num_reports'],
 			'closed' => $row['closed'],
 			'ignore' => $row['ignore_all']
@@ -859,7 +883,7 @@ class ModerationCenter_Controller extends Action_Controller
 		{
 			$context['report']['mod_comments'][] = array(
 				'id' => $row['id_comment'],
-				'message' => parse_bbc($row['body']),
+				'message' => $bbc_parser->parseReport($row['body']),
 				'time' => standardTime($row['log_time']),
 				'html_time' => htmlTime($row['log_time']),
 				'timestamp' => forum_time(true, $row['log_time']),
@@ -874,7 +898,6 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// What have the other moderators done to this message?
 		require_once(SUBSDIR . '/Modlog.subs.php');
-		require_once(SUBSDIR . '/GenericList.class.php');
 		loadLanguage('Modlog');
 
 		// This is all the information from the moderation log.
@@ -883,7 +906,7 @@ class ModerationCenter_Controller extends Action_Controller
 			'title' => $txt['mc_modreport_modactions'],
 			'items_per_page' => 15,
 			'no_items_label' => $txt['modlog_no_entries_found'],
-			'base_href' => $scripturl . '?action=moderate;area=reports;report=' . $context['report']['id'],
+			'base_href' => $scripturl . '?action=moderate;area=' . $context['admin_area'] . ';report=' . $context['report']['id'],
 			'default_sort_col' => 'time',
 			'get_items' => array(
 				'function' => 'list_getModLogEntries',
@@ -980,7 +1003,19 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// Finally we are done :P
 		loadTemplate('ModerationCenter');
-		$context['page_title'] = sprintf($txt['mc_viewmodreport'], $context['report']['subject'], $context['report']['author']['name']);
+		if ($context['admin_area'] === 'pm_reports')
+		{
+			$context['page_title'] = sprintf($txt['mc_view_pmreport'], $context['report']['author']['name']);
+			$context['section_title'] = sprintf($txt['mc_view_pmreport'], $context['report']['author']['link']);
+			$context['section_descripion'] = sprintf($txt['mc_pmreport_summary'], $context['report']['num_reports'], $context['report']['last_updated']);
+		}
+		else
+		{
+			$context['page_title'] = sprintf($txt['mc_viewmodreport'], $context['report']['subject'], $context['report']['author']['name']);
+			$context['section_title'] = sprintf($txt['mc_viewmodreport'], $context['report']['message_link'], $context['report']['author']['link']);
+			$context['section_descripion'] = sprintf($txt['mc_modreport_summary'], $context['report']['num_reports'], $context['report']['last_updated']);
+		}
+
 		$context['sub_template'] = 'viewmodreport';
 	}
 
@@ -993,8 +1028,8 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// Some important context!
 		$context['page_title'] = $txt['mc_watched_users_title'];
-		$context['view_posts'] = isset($_GET['sa']) && $_GET['sa'] == 'post';
-		$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
+		$context['view_posts'] = isset($this->_req->query->sa) && $this->_req->query->sa === 'post';
+		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
 
 		loadTemplate('ModerationCenter');
 
@@ -1009,24 +1044,24 @@ class ModerationCenter_Controller extends Action_Controller
 		);
 
 		// First off - are we deleting?
-		if (!empty($_REQUEST['delete']))
+		if (!empty($this->_req->query->delete) || !empty($this->_req->post->delete))
 		{
-			checkSession(!is_array($_REQUEST['delete']) ? 'get' : 'post');
+			checkSession(isset($this->_req->query->delete) ? 'get' : 'post');
 
+			// Clicked on remove or using checkboxes to multi delete
 			$toDelete = array();
-			if (!is_array($_REQUEST['delete']))
-				$toDelete[] = (int) $_REQUEST['delete'];
+			if (isset($this->_req->query->delete))
+				$toDelete[] = (int) $this->_req->query->delete;
 			else
-				foreach ($_REQUEST['delete'] as $did)
-					$toDelete[] = (int) $did;
+				$toDelete = array_map('intval', $this->_req->post->delete);
 
 			if (!empty($toDelete))
 			{
-				require_once(SUBSDIR . '/Messages.subs.php');
+				$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 
 				// If they don't have permission we'll let it error - either way no chance of a security slip here!
 				foreach ($toDelete as $did)
-					removeMessage($did);
+					$remover->removeMessage($did);
 			}
 		}
 
@@ -1050,8 +1085,6 @@ class ModerationCenter_Controller extends Action_Controller
 			else
 				$approve_query = ' AND 1=0';
 		}
-
-		require_once(SUBSDIR . '/GenericList.class.php');
 
 		// This is all the information required for a watched user listing.
 		$listOptions = array(
@@ -1100,11 +1133,11 @@ class ModerationCenter_Controller extends Action_Controller
 						'value' => $txt['mc_watched_users_warning'],
 					),
 					'data' => array(
-						'function' => create_function('$member', '
+						'function' => function ($member) {
 							global $scripturl;
 
-							return allowedTo(\'issue_warning\') ? \'<a href="\' . $scripturl . \'?action=profile;area=issuewarning;u=\' . $member[\'id\'] . \'">\' . $member[\'warning\'] . \'%</a>\' : $member[\'warning\'] . \'%\';
-						'),
+							return allowedTo('issue_warning') ? '<a href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $member['id'] . '">' . $member['warning'] . '%</a>' : $member['warning'] . '%';
+						},
 					),
 					'sort' => array(
 						'default' => 'warning',
@@ -1146,14 +1179,14 @@ class ModerationCenter_Controller extends Action_Controller
 						'value' => $txt['mc_watched_users_last_post'],
 					),
 					'data' => array(
-						'function' => create_function('$member', '
+						'function' => function ($member) {
 							global $scripturl;
 
-							if ($member[\'last_post_id\'])
-								return \'<a href="\' . $scripturl . \'?msg=\' . $member[\'last_post_id\'] . \'">\' . $member[\'last_post\'] . \'</a>\';
+							if ($member['last_post_id'])
+								return '<a href="' . $scripturl . '?msg=' . $member['last_post_id'] . '">' . $member['last_post'] . '</a>';
 							else
-								return $member[\'last_post\'];
-						'),
+								return $member['last_post'];
+						},
 					),
 				),
 			),
@@ -1181,9 +1214,9 @@ class ModerationCenter_Controller extends Action_Controller
 			$listOptions['columns'] = array(
 				'posts' => array(
 					'data' => array(
-						'function' => create_function('$post', '
+						'function' => function ($post) {
 							return template_user_watch_post_callback($post);
-						'),
+						},
 					),
 				),
 			);
@@ -1206,14 +1239,13 @@ class ModerationCenter_Controller extends Action_Controller
 		// Setup context as always.
 		$context['page_title'] = $txt['mc_warning_log_title'];
 
-		require_once(SUBSDIR . '/GenericList.class.php');
 		require_once(SUBSDIR . '/Moderation.subs.php');
 		loadLanguage('Modlog');
 
 		// If we're coming in from a search, get the variables.
-		if (!empty($_REQUEST['params']) && empty($_REQUEST['is_search']))
+		if (!empty($this->_req->post->params) && empty($this->_req->post->is_search))
 		{
-			$search_params = base64_decode(strtr($_REQUEST['params'], array(' ' => '+')));
+			$search_params = base64_decode(strtr($this->_req->post->params, array(' ' => '+')));
 			$search_params = @json_decode($search_params);
 		}
 
@@ -1224,16 +1256,16 @@ class ModerationCenter_Controller extends Action_Controller
 		);
 
 		// Setup the allowed quick search type
-		$context['order'] = isset($_REQUEST['sort']) && isset($searchTypes[$_REQUEST['sort']]) ? $_REQUEST['sort'] : 'member';
-		$context['url_start'] = '?action=moderate;area=warnings;sa=log;sort='.  $context['order'];
+		$context['order'] = isset($this->_req->query->sort) && isset($searchTypes[$this->_req->query->sort]) ? $this->_req->query->sort : 'member';
+		$context['url_start'] = '?action=moderate;area=warnings;sa=log;sort=' . $context['order'];
 
-		if (!isset($search_params['string']) || (!empty($_REQUEST['search']) && $search_params['string'] != $_REQUEST['search']))
-			$search_params_string = empty($_REQUEST['search']) ? '' : $_REQUEST['search'];
+		if (!isset($search_params['string']) || (!empty($this->_req->post->search) && $search_params['string'] != $this->_req->post->search))
+			$search_params_string = empty($this->_req->post->search) ? '' : $this->_req->post->search;
 		else
 			$search_params_string = $search_params['string'];
 
-		if (isset($_REQUEST['search_type']) || empty($search_params['type']) || !isset($searchTypes[$search_params['type']]))
-			$search_params_type = isset($_REQUEST['search_type']) && isset($searchTypes[$_REQUEST['search_type']]) ? $_REQUEST['search_type'] : (isset($searchTypes[$context['order']]) ? $context['order'] : 'member');
+		if (isset($this->_req->post->search_type) || empty($search_params['type']) || !isset($searchTypes[$search_params['type']]))
+			$search_params_type = isset($this->_req->post->search_type) && isset($searchTypes[$this->_req->post->search_type]) ? $this->_req->post->search_type : (isset($searchTypes[$context['order']]) ? $context['order'] : 'member');
 		else
 			$search_params_type = $search_params['type'];
 
@@ -1316,19 +1348,20 @@ class ModerationCenter_Controller extends Action_Controller
 						'value' => $txt['profile_warning_previous_reason'],
 					),
 					'data' => array(
-						'function' => create_function('$warning', '
-							global $scripturl, $settings, $txt;
+						'function' => function ($warning) {
+							global $scripturl, $txt;
 
-							$output = \'
+							$output = '
 								<div class="floatleft">
-									\' . $warning[\'reason\'] . \'
-								</div>\';
+									' . $warning['reason'] . '
+								</div>';
 
-							if (!empty($warning[\'id_notice\']))
-								$output .= \'
-									<a href="\' . $scripturl . \'?action=moderate;area=notice;nid=\' . $warning[\'id_notice\'] . \'" onclick="window.open(this.href, \\\'\\\', \\\'scrollbars=yes,resizable=yes,width=480,height=320\\\');return false;" target="_blank" class="new_win" title="\' . $txt[\'profile_warning_previous_notice\'] . \'"><img src="\' . $settings[\'default_images_url\'] . \'/filter.png" alt="\' . $txt[\'profile_warning_previous_notice\'] . \'" /></a>\';
+							// If a notice was sent, provide a link to it
+							if (!empty($warning['id_notice']))
+								$output .= '
+									<a href="' . $scripturl . '?action=moderate;area=notice;nid=' . $warning['id_notice'] . '" onclick="window.open(this.href, \'\', \'scrollbars=yes,resizable=yes,width=480,height=320\');return false;" target="_blank" class="new_win" title="' . $txt['profile_warning_previous_notice'] . '"><i class="icon icon-small i-search" title"' . $txt['profile_warning_previous_notice'] . '"></i></a>';
 							return $output;
-						'),
+						},
 					),
 				),
 				'points' => array(
@@ -1354,11 +1387,9 @@ class ModerationCenter_Controller extends Action_Controller
 					'class' => 'submitbutton',
 					'position' => 'below_table_data',
 					'value' => '
-						<div id="quick_log_search">
-							' . $txt['modlog_search'] . ' (' . $txt['modlog_by'] . ': ' . $context['search']['label'] . ')
-							<input type="text" name="search" size="18" value="' . Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
-							<input type="submit" name="is_search" value="' . $txt['modlog_go'] . '" class="button_submit" />
-						</div>',
+						' . $txt['modlog_search'] . ' (' . $txt['modlog_by'] . ': ' . $context['search']['label'] . ')
+						<input type="text" name="search" size="18" value="' . Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
+						<input type="submit" name="is_search" value="' . $txt['modlog_go'] . '" />',
 				),
 			),
 		);
@@ -1372,6 +1403,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 	/**
 	 * View all the custom warning templates.
+	 *
 	 *  - Shows all the templates in the system
 	 *  - Provides for actions to add or delete them
 	 */
@@ -1382,21 +1414,22 @@ class ModerationCenter_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Moderation.subs.php');
 
 		// Submitting a new one?
-		if (isset($_POST['add']))
-			return $this->action_modifyWarningTemplate();
+		if (isset($this->_req->post->add))
+		{
+			$this->action_modifyWarningTemplate();
+			return true;
+		}
 		// Deleting and existing one
-		elseif (isset($_POST['delete']) && !empty($_POST['deltpl']))
+		elseif (isset($this->_req->post->delete) && !empty($this->_req->post->deltpl))
 		{
 			checkSession('post');
 			validateToken('mod-wt');
 
-			removeWarningTemplate($_POST['deltpl']);
+			removeWarningTemplate($this->_req->post->deltpl);
 		}
 
 		// Setup context as always.
 		$context['page_title'] = $txt['mc_warning_templates_title'];
-
-		require_once(SUBSDIR . '/GenericList.class.php');
 
 		// This is all the information required for a watched user listing.
 		$listOptions = array(
@@ -1462,9 +1495,9 @@ class ModerationCenter_Controller extends Action_Controller
 						'style' => 'width: 4%;text-align: center;',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							return \'<input type="checkbox" name="deltpl[]" value="\' . $rowData[\'id_comment\'] . \'" class="input_check" />\';
-						'),
+						'function' => function ($rowData) {
+							return '<input type="checkbox" name="deltpl[]" value="' . $rowData['id_comment'] . '" class="input_check" />';
+						},
 						'class' => 'centertext',
 					),
 				),
@@ -1498,8 +1531,6 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		require_once(SUBSDIR . '/Action.class.php');
-
 		// Some of this stuff is overseas, so to speak.
 		loadTemplate('ModerationCenter');
 		loadLanguage('Profile');
@@ -1524,11 +1555,13 @@ class ModerationCenter_Controller extends Action_Controller
 	}
 
 	/**
-	 * Callback for createList().
-	 * @todo $approve_query is not used
-	 * @param string $approve_query
+	 * Callback for createList() for watched users
+	 *
+	 * - returns count
+	 *
+	 * @uses watchedUserCount()
 	 */
-	public function list_getWatchedUserCount($approve_query)
+	public function list_getWatchedUserCount()
 	{
 		global $modSettings;
 
@@ -1536,23 +1569,23 @@ class ModerationCenter_Controller extends Action_Controller
 	}
 
 	/**
-	 * Callback for createList().
+	 * Callback for createList() used in watched users
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
-	 * @param string $approve_query
-	 * @param string $dummy
+	 * @uses watchedUsers()
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 */
-	public function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
+	public function list_getWatchedUsers($start, $items_per_page, $sort)
 	{
 		// Find all our watched users
-		return watchedUsers($start, $items_per_page, $sort, $approve_query, $dummy);
+		return watchedUsers($start, $items_per_page, $sort);
 	}
 
 	/**
 	 * Callback for createList().
 	 *
+	 * @uses watchedUserPostsCount()
 	 * @param string $approve_query
 	 */
 	public function list_getWatchedUserPostsCount($approve_query)
@@ -1565,9 +1598,10 @@ class ModerationCenter_Controller extends Action_Controller
 	/**
 	 * Callback for createList().
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @uses watchedUserPosts()
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param string $approve_query
 	 * @param int[] $delete_boards
 	 */
@@ -1580,9 +1614,10 @@ class ModerationCenter_Controller extends Action_Controller
 	/**
 	 * Callback for createList() to get all the templates of a type from the system
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @uses warningTemplates()
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param string $template_type type of template to load
 	 */
 	public function list_getWarningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
@@ -1593,6 +1628,7 @@ class ModerationCenter_Controller extends Action_Controller
 	/**
 	 * Callback for createList() to get the number of templates of a type in the system
 	 *
+	 * @uses warningTemplateCount()
 	 * @param string $template_type
 	 */
 	public function list_getWarningTemplateCount($template_type = 'warntpl')
@@ -1602,12 +1638,13 @@ class ModerationCenter_Controller extends Action_Controller
 
 	/**
 	 * Callback for createList()
-	 * Used to get all issued warnings in the system
-	 * Uses warnings function in moderation.subs
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * - Used to get all issued warnings in the system
+	 * @uses warnings() function in moderation.subs
+	 *
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param string $query_string
 	 * @param mixed[] $query_params
 	 */
@@ -1618,8 +1655,9 @@ class ModerationCenter_Controller extends Action_Controller
 
 	/**
 	 * Callback for createList()
-	 * Get the total count of all current warnings
-	 * Uses warningCount function in moderation.subs
+	 *
+	 * - Get the total count of all current warnings
+	 * @uses warningCount() function in moderation.subs
 	 *
 	 * @param string $query_string
 	 * @param mixed[] $query_params
@@ -1638,7 +1676,7 @@ class ModerationCenter_Controller extends Action_Controller
 		global $context, $user_info;
 
 		// Make sure they can even moderate someone!
-		if ($user_info['mod_cache']['gq'] == '0=1')
+		if ($user_info['mod_cache']['gq'] === '0=1')
 			return 'group_requests_block';
 
 		$context['group_requests'] = groupRequests();
@@ -1669,15 +1707,18 @@ class ModerationCenter_Controller extends Action_Controller
 		$watched_users = basicWatchedUsers();
 
 		$context['watched_users'] = array();
-		foreach ($watched_users as $user)
+		if (is_array($watched_users) || is_object($watched_users))
 		{
-			$context['watched_users'][] = array(
-				'id' => $user['id_member'],
-				'name' => $user['real_name'],
-				'link' => '<a href="' . $scripturl . '?action=profile;u=' . $user['id_member'] . '">' . $user['real_name'] . '</a>',
-				'href' => $scripturl . '?action=profile;u=' . $user['id_member'],
-				'last_login' => !empty($user['last_login']) ? standardTime($user['last_login']) : '',
-			);
+			foreach ($watched_users as $user)
+			{
+				$context['watched_users'][] = array(
+					'id' => $user['id_member'],
+					'name' => $user['real_name'],
+					'link' => '<a href="' . $scripturl . '?action=profile;u=' . $user['id_member'] . '">' . $user['real_name'] . '</a>',
+					'href' => $scripturl . '?action=profile;u=' . $user['id_member'],
+					'last_login' => !empty($user['last_login']) ? standardTime($user['last_login']) : '',
+				);
+			}
 		}
 
 		return 'watched_users';
@@ -1708,6 +1749,7 @@ class ModerationCenter_Controller extends Action_Controller
 			'memberreq' => '?action=admin;area=viewmembers;sa=browse;type=approve',
 			'groupreq' => '?action=moderate;area=groups;sa=requests',
 			'reports' => '?action=moderate;area=reports;sa=open',
+			'pm_reports' => '?action=moderate;area=pm_reports;sa=open',
 		);
 
 		return 'action_required';
@@ -1721,11 +1763,11 @@ class ModerationCenter_Controller extends Action_Controller
 		global $context, $scripturl, $txt, $user_info;
 
 		// Are we saving a note?
-		if (isset($_POST['makenote']) && isset($_POST['new_note']))
+		if (isset($this->_req->post->makenote) && isset($this->_req->post->new_note))
 		{
 			checkSession();
 
-			$new_note = Util::htmlspecialchars(trim($_POST['new_note']));
+			$new_note = Util::htmlspecialchars(trim($this->_req->post->new_note));
 
 			// Make sure they actually entered something.
 			if (!empty($new_note) && $new_note !== $txt['mc_click_add_note'])
@@ -1734,8 +1776,8 @@ class ModerationCenter_Controller extends Action_Controller
 				addModeratorNote($user_info['id'], $user_info['name'], $new_note);
 
 				// Clear the cache.
-				cache_put_data('moderator_notes', null, 240);
-				cache_put_data('moderator_notes_total', null, 240);
+				Cache::instance()->remove('moderator_notes');
+				Cache::instance()->remove('moderator_notes_total');
 			}
 
 			// Redirect otherwise people can resubmit.
@@ -1743,19 +1785,19 @@ class ModerationCenter_Controller extends Action_Controller
 		}
 
 		// Bye... bye...
-		if (isset($_GET['notes']) && isset($_GET['delete']) && is_numeric($_GET['delete']))
+		if (isset($this->_req->query->notes) && isset($this->_req->query->delete) && is_numeric($this->_req->query->delete))
 		{
 			checkSession('get');
 
 			// Just checkin'!
-			$id_delete = (int) $_GET['delete'];
+			$id_delete = (int) $this->_req->query->delete;
 
 			// Lets delete it.
 			removeModeratorNote($id_delete);
 
 			// Clear the cache.
-			cache_put_data('moderator_notes', null, 240);
-			cache_put_data('moderator_notes_total', null, 240);
+			Cache::instance()->remove('moderator_notes');
+			Cache::instance()->remove('moderator_notes_total');
 
 			redirectexit('action=moderate');
 		}
@@ -1764,12 +1806,14 @@ class ModerationCenter_Controller extends Action_Controller
 		$moderator_notes_total = countModeratorNotes();
 
 		// Grab the current notes. We can only use the cache for the first page of notes.
-		$offset = isset($_GET['notes']) && isset($_GET['start']) ? $_GET['start'] : 0;
+		$offset = isset($this->_req->query->notes) && isset($this->_req->query->start) ? $this->_req->query->start : 0;
 		$moderator_notes = moderatorNotes($offset);
 
 		// Lets construct a page index.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=index;notes', $_GET['start'], $moderator_notes_total, 10);
-		$context['start'] = $_GET['start'];
+		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=index;notes', $this->_req->query->start, $moderator_notes_total, 10);
+		$context['start'] = $this->_req->query->start;
+
+		$bbc_parser = \BBC\ParserWrapper::instance();
 
 		$context['notes'] = array();
 		foreach ($moderator_notes as $note)
@@ -1782,7 +1826,7 @@ class ModerationCenter_Controller extends Action_Controller
 				'time' => standardTime($note['log_time']),
 				'html_time' => htmlTime($note['log_time']),
 				'timestamp' => forum_time(true, $note['log_time']),
-				'text' => parse_bbc($note['body']),
+				'text' => $bbc_parser->parseReport($note['body']),
 				'delete_href' => $scripturl . '?action=moderate;area=index;notes;delete=' . $note['id_note'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 			);
 		}
@@ -1797,19 +1841,19 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $context, $user_info, $scripturl;
 
-		if ($user_info['mod_cache']['bq'] == '0=1')
+		if ($user_info['mod_cache']['bq'] === '0=1')
 			return 'reported_posts_block';
 
 		$context['reported_posts'] = array();
 
-		$reported_posts = reportedPosts();
+		$reported_posts = reportedPosts(false);
 		foreach ($reported_posts as $i => $row)
 		{
 			$context['reported_posts'][] = array(
 				'id' => $row['id_report'],
 				'alternate' => $i % 2,
 				'topic_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
-				'report_href' => $scripturl . '?action=moderate;area=reports;report=' . $row['id_report'],
+				'report_href' => $scripturl . '?action=moderate;area=' . $context['admin_area'] . ';report=' . $row['id_report'],
 				'author' => array(
 					'id' => $row['id_author'],
 					'name' => $row['author_name'],

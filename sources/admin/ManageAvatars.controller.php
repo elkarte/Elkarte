@@ -7,12 +7,9 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.2
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * This is the avatars administration controller class.
@@ -24,21 +21,16 @@ if (!defined('ELK'))
 class ManageAvatars_Controller extends Action_Controller
 {
 	/**
-	 * Avatars settings form
-	 *
-	 * @var Settings_Form
-	 */
-	protected $_avatarSettings;
-
-	/**
 	 * The Avatars admin area
 	 *
 	 * What it does:
+	 *
 	 * - This method is the entry point for index.php?action=admin;area=manageattachments;sa=avatars
 	 * - It calls a function based on the sub-action.
 	 * - Is called from ManageAttachments.controller.php
 	 * - requires manage_attachments permissions
 	 *
+	 * @event integrate_sa_manage_avatars
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
@@ -47,9 +39,6 @@ class ManageAvatars_Controller extends Action_Controller
 
 		// You have to be able to moderate the forum to do this.
 		isAllowedTo('manage_attachments');
-
-		// We're working with them settings here.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		$subActions = array(
 			'display' => array($this, 'action_avatarSettings_display')
@@ -74,6 +63,7 @@ class ManageAvatars_Controller extends Action_Controller
 	 *
 	 * - Called by index.php?action=admin;area=manageattachments;sa=avatars.
 	 *
+	 * @event integrate_save_avatar_settings
 	 * @uses 'avatars' sub-template.
 	 */
 	public function action_avatarSettings_display()
@@ -81,57 +71,41 @@ class ManageAvatars_Controller extends Action_Controller
 		global $txt, $context, $scripturl;
 
 		// Initialize the form
-		$this->_initAvatarSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_avatarSettings->settings();
+		// Initialize settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Saving avatar settings?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			call_integration_hook('integrate_save_avatar_settings');
 
 			// Disable if invalid values would result
-			if (isset($_POST['custom_avatar_enabled']) && $_POST['custom_avatar_enabled'] == 1 && (empty($_POST['custom_avatar_dir']) || empty($_POST['custom_avatar_url'])))
-				$_POST['custom_avatar_enabled'] = 0;
+			if (isset($this->_req->post->custom_avatar_enabled) && $this->_req->post->custom_avatar_enabled == 1 && (empty($this->_req->post->custom_avatar_dir) || empty($this->_req->post->custom_avatar_url)))
+				$this->_req->post->custom_avatar_enabled = 0;
 
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=manageattachments;sa=avatars');
 		}
 
 		// Attempt to figure out if the admin is trying to break things.
 		$context['settings_save_onclick'] = 'return document.getElementById(\'custom_avatar_enabled\').value == 1 && (document.getElementById(\'custom_avatar_dir\').value == \'\' || document.getElementById(\'custom_avatar_url\').value == \'\') ? confirm(\'' . $txt['custom_avatar_check_empty'] . '\') : true;';
 
-		// We need this for the in-line permissions
-		createToken('admin-mp');
-
 		// Prepare the context.
 		$context['post_url'] = $scripturl . '?action=admin;area=manageattachments;save;sa=avatars';
-		Settings_Form::prepare_db($config_vars);
+		$settingsForm->prepare();
 
 		$context['sub_template'] = 'show_settings';
 	}
 
 	/**
-	 * This method retrieves and returns avatar settings.
-	 *
-	 * - It also returns the avatar-related permission profile_set_avatar.
-	 * - Initializes the avatarSettings form.
-	 */
-	private function _initAvatarSettingsForm()
-	{
-		// Instantiate the form
-		$this->_avatarSettings = new Settings_Form();
-
-		// Initialize settings
-		$config_vars = $this->_settings();
-
-		return $this->_avatarSettings->settings($config_vars);
-	}
-
-	/**
 	 * This method retrieves and returns the settings.
+	 *
+	 * @event integrate_modify_avatar_settings
 	 */
 	private function _settings()
 	{
@@ -167,7 +141,7 @@ class ManageAvatars_Controller extends Action_Controller
 			array('title', 'avatar_external'),
 				array('check', 'avatar_external_enabled'),
 				array('check', 'avatar_download_external', 0, 'onchange' => 'fUpdateStatus();'),
-			array('title','gravatar'),
+			array('title', 'gravatar'),
 				array('check', 'avatar_gravatar_enabled'),
 				array('select', 'gravatar_rating',
 					array(
@@ -177,7 +151,7 @@ class ManageAvatars_Controller extends Action_Controller
 						'x' => 'x',
 					),
 				),
-			// Uploadable avatars?
+			// Upload-able avatars?
 			array('title', 'avatar_upload'),
 				array('check', 'avatar_upload_enabled'),
 			array('title', 'avatar_resize_options'),

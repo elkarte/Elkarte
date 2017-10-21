@@ -7,21 +7,16 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
- * Gets all of the files in a directory and its chidren directories
+ * Gets all of the files in a directory and its children directories
  *
  * @package AddonSettings
  * @param string $dir_path
@@ -31,20 +26,24 @@ function get_files_recursive($dir_path)
 {
 	$files = array();
 
-	if ($dh = opendir($dir_path))
+	try
 	{
-		while (($file = readdir($dh)) !== false)
+		$iterator = new RecursiveIteratorIterator(
+			new RecursiveDirectoryIterator($dir_path, RecursiveDirectoryIterator::SKIP_DOTS),
+			RecursiveIteratorIterator::SELF_FIRST,
+			RecursiveIteratorIterator::CATCH_GET_CHILD
+		);
+
+		foreach ($iterator as $file)
 		{
-			if ($file != '.' && $file != '..')
-			{
-				if (is_dir($dir_path . '/' . $file))
-					$files = array_merge($files, get_files_recursive($dir_path . '/' . $file));
-				else
-					$files[] = array('dir' => $dir_path, 'name' => $file);
-			}
+			if ($file->isFile())
+				$files[] = array('dir' => $file->getPath(), 'name' => $file->getFilename());
 		}
 	}
-	closedir($dh);
+	catch (UnexpectedValueException $e)
+	{
+		// @todo, give them a prize
+	}
 
 	return $files;
 }
@@ -53,18 +52,19 @@ function get_files_recursive($dir_path)
  * Callback function for the integration hooks list (list_integration_hooks)
  *
  * What it does:
+ *
  * - Gets all of the hooks in the system and their status
  * - Would be better documented if Ema was not lazy
  *
  * @package AddonSettings
- * @param int $start
- * @param int $per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @return array
  */
-function list_integration_hooks_data($start, $per_page, $sort)
+function list_integration_hooks_data($start, $items_per_page, $sort)
 {
-	global $txt, $context, $scripturl, $modSettings;
+	global $txt, $context, $scripturl;
 
 	require_once(SUBSDIR . '/Package.subs.php');
 
@@ -79,7 +79,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
 			if (is_file($file['dir'] . '/' . $file['name']) && substr($file['name'], -4) === '.php')
 			{
 				$fp = fopen($file['dir'] . '/' . $file['name'], 'rb');
-				$fc = strtr(fread($fp, filesize($file['dir'] . '/' . $file['name'])), array("\r" => '', "\n" => ''));
+				$fc = strtr(fread($fp, max(filesize($file['dir'] . '/' . $file['name']), 1)), array("\r" => '', "\n" => ''));
 				fclose($fp);
 
 				foreach ($temp_hooks as $hook => $functions)
@@ -213,7 +213,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
 				$exploded = explode('|', $function);
 
 				$temp_data[] = array(
-					'id' => 'hookid_' . $id++,
+					'id' => 'hookid_' . ($id++),
 					'hook_name' => $hook,
 					'function_name' => $function,
 					'real_function' => $exploded[0],
@@ -223,7 +223,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
 					'status' => $hook_exists ? ($enabled ? 'allow' : 'moderate') : 'deny',
 					'img_text' => $txt['hooks_' . ($hook_exists ? ($enabled ? 'active' : 'disabled') : 'missing')],
 					'enabled' => $enabled,
-					'can_be_disabled' => !empty($modSettings['handlinghooks_enabled']) && !isset($hook_status[$hook][$function]['enabled']),
+					'can_be_disabled' => false,
 				);
 
 				// Build the array of sort to values
@@ -242,7 +242,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
 	{
 		if (++$counter < $start)
 			continue;
-		elseif ($counter == $start + $per_page)
+		elseif ($counter == $start + $items_per_page)
 			break;
 
 		$hooks_data[] = $data;
@@ -255,6 +255,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
  * Simply returns the total count of integration hooks
  *
  * What it does:
+ *
  * - used by createList() as a callback to determine the number of hooks in
  * use in the system
  *
@@ -279,6 +280,7 @@ function integration_hooks_count($filter = false)
  * Parses modSettings to create integration hook array
  *
  * What it does:
+ *
  * - used by createList() callbacks
  *
  * @package AddonSettings

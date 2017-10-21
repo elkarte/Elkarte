@@ -7,17 +7,15 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Delete all or some of the entries in the bad behavior log.
  *
  * What it does:
+ *
  * - It applies any necessary filters to deletion.
  * - It attempts to TRUNCATE the table to reset the auto_increment.
  * - Redirects back to the badbehavior log when done.
@@ -71,7 +69,8 @@ function deleteBadBehavior($type, $filter)
  * Get the number of badbehavior log entries.
  *
  * What it does:
- * - Will take in to acount any current filter value in its count result
+ *
+ * - Will take in to account any current filter value in its count result
  *
  * @package BadBehavior
  * @param mixed[] $filter
@@ -99,9 +98,9 @@ function getBadBehaviorLogEntryCount($filter)
  * Gets the badbehavior log entries that match the specified parameters.
  *
  * @package BadBehavior
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param string|mixed[]|null $filter
  */
 function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')

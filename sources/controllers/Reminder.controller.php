@@ -7,21 +7,17 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.10
+ * @version 1.1
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
- * Reminder Controller handles sending out reminders, and checking the secret answer and question.
+ * Reminder_Controller Class
+ * Handles sending out reminders, and checking the secret answer and question.
  */
 class Reminder_Controller extends Action_Controller
 {
@@ -43,7 +39,8 @@ class Reminder_Controller extends Action_Controller
 
 	/**
 	 * Default action for reminder.
-	 * @uses reminder sub template
+	 *
+	 * @uses template_reminder() sub template
 	 */
 	public function action_index()
 	{
@@ -57,48 +54,45 @@ class Reminder_Controller extends Action_Controller
 
 	/**
 	 * Pick a reminder type.
+	 *
 	 * Accessed by sa=picktype
 	 */
 	public function action_picktype()
 	{
 		global $context, $txt, $scripturl, $user_info, $webmaster_email, $language, $modSettings;
 
+		// Security
 		checkSession();
 		validateToken('remind');
-		createToken('remind');
-
 		require_once(SUBSDIR . '/Auth.subs.php');
 
 		// No where params just yet
 		$where_params = array();
 		$where = '';
 
-		// Clean them up
-		$_POST['user'] = isset($_POST['user']) ? Util::htmlspecialchars($_POST['user']) : '';
-		$_REQUEST['uid'] = (int) isset($_REQUEST['uid']) ? $_REQUEST['uid'] : 0;
-
 		// Coming with a known ID?
-		if (!empty($_REQUEST['uid']))
+		if (!empty($this->_req->post->uid))
 		{
 			$where = 'id_member = {int:id_member}';
-			$where_params['id_member'] = (int) $_REQUEST['uid'];
+			$where_params['id_member'] = (int) $this->_req->post->uid;
 		}
-		elseif ($_POST['user'] != '')
+		elseif ($this->_req->getPost('user') !== '')
 		{
 			$where = 'member_name = {string:member_name}';
-			$where_params['member_name'] = $_POST['user'];
-			$where_params['email_address'] = $_POST['user'];
+			$where_params['member_name'] = $this->_req->getPost('user', 'trim|Util::htmlspecialchars[ENT_QUOTES]');
+			$where_params['email_address'] = $this->_req->getPost('user', 'trim|Util::htmlspecialchars[ENT_QUOTES]');
 		}
 
 		// You must enter a username/email address.
 		if (empty($where))
-			fatal_lang_error('username_no_exist', false);
+			throw new Elk_Exception('username_no_exist', false);
 
 		// Make sure we are not being slammed
 		// Don't call this if you're coming from the "Choose a reminder type" page - otherwise you'll likely get an error
-		if (!isset($_POST['reminder_type']) || !in_array($_POST['reminder_type'], array('email', 'secret')))
+		if (!isset($this->_req->post->reminder_type) || !in_array($this->_req->post->reminder_type, array('email', 'secret')))
 			spamProtection('remind');
 
+		// Find this member
 		$member = findUser($where, $where_params);
 
 		$context['account_type'] = !empty($member['openid_uri']) ? 'openid' : 'password';
@@ -107,22 +101,23 @@ class Reminder_Controller extends Action_Controller
 		if ($member['is_activated'] != 1)
 		{
 			// Awaiting approval...
-			if (trim($member['validation_code']) == '')
-				fatal_error($txt['registration_not_approved'] . ' <a href="' . $scripturl . '?action=activate;user=' . $_POST['user'] . '">' . $txt['here'] . '</a>.', false);
+			if (trim($member['validation_code']) === '')
+				throw new Elk_Exception($txt['registration_not_approved'] . ' <a class="linkbutton" href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_req->post->user . '">' . $txt['here'] . '</a>.', false);
 			else
-				fatal_error($txt['registration_not_activated'] . ' <a href="' . $scripturl . '?action=activate;user=' . $_POST['user'] . '">' . $txt['here'] . '</a>.', false);
+				throw new Elk_Exception($txt['registration_not_activated'] . ' <a class="linkbutton" href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_req->post->user . '">' . $txt['here'] . '</a>.', false);
 		}
 
 		// You can't get emailed if you have no email address.
 		$member['email_address'] = trim($member['email_address']);
-		if ($member['email_address'] == '')
-			fatal_error($txt['no_reminder_email'] . '<br />' . $txt['send_email'] . ' <a href="mailto:' . $webmaster_email . '">webmaster</a> ' . $txt['to_ask_password'] . '.');
+		if ($member['email_address'] === '')
+			throw new Elk_Exception($txt['no_reminder_email'] . '<br />' . $txt['send_email'] . ' <a href="mailto:' . $webmaster_email . '">webmaster</a> ' . $txt['to_ask_password'] . '.');
 
 		// If they have no secret question then they can only get emailed the item, or they are requesting the email, send them an email.
-		if (empty($member['secret_question']) || (isset($_POST['reminder_type']) && $_POST['reminder_type'] == 'email'))
+		if (empty($member['secret_question'])
+			|| ($this->_req->getPost('reminder_type') === 'email'))
 		{
 			// Randomly generate a new password, with only alpha numeric characters that is a max length of 10 chars.
-			$password = generateValidationCode();
+			$password = generateValidationCode(14);
 
 			require_once(SUBSDIR . '/Mail.subs.php');
 			$replacements = array(
@@ -140,20 +135,24 @@ class Reminder_Controller extends Action_Controller
 			sendmail($member['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
 
 			if (empty($member['openid_uri']))
+			{
 				// Set the password in the database.
-				updateMemberData($member['id_member'], array('validation_code' => substr(md5($password), 0, 10)));
+				require_once(SUBSDIR . '/Members.subs.php');
+				updateMemberData($member['id_member'], array('validation_code' => substr(hash('sha256', $password), 0, 10)));
+			}
 
 			// Set up the template.
 			$context['sub_template'] = 'sent';
 
-			// Dont really.
-			return;
+			// Don't really.
+			return null;
 		}
 		// Otherwise are ready to answer the question?
-		elseif (isset($_POST['reminder_type']) && $_POST['reminder_type'] == 'secret')
+		elseif (isset($this->_req->post->reminder_type) && $this->_req->post->reminder_type === 'secret')
 			return secretAnswerInput();
 
 		// No we're here setup the context for template number 2!
+		createToken('remind');
 		$context['sub_template'] = 'reminder_pick';
 		$context['current_member'] = array(
 			'id' => $member['id_member'],
@@ -162,7 +161,8 @@ class Reminder_Controller extends Action_Controller
 	}
 
 	/**
-	 * Set your new password
+	 * Set your new password after you asked for a reset link
+	 *
 	 * sa=setpassword
 	 */
 	public function action_setpassword()
@@ -172,15 +172,15 @@ class Reminder_Controller extends Action_Controller
 		loadLanguage('Login');
 
 		// You need a code!
-		if (!isset($_REQUEST['code']))
-			fatal_lang_error('no_access', false);
+		if (!isset($this->_req->query->code))
+			throw new Elk_Exception('no_access', false);
 
 		// Fill the context array.
 		$context += array(
 			'page_title' => $txt['reminder_set_password'],
 			'sub_template' => 'set_password',
-			'code' => Util::htmlspecialchars($_REQUEST['code']),
-			'memID' => (int) $_REQUEST['u']
+			'code' => Util::htmlspecialchars($this->_req->query->code),
+			'memID' => (int) $this->_req->query->u
 		);
 
 		// Some extra js is needed
@@ -192,6 +192,7 @@ class Reminder_Controller extends Action_Controller
 
 	/**
 	 * Handle the password change.
+	 *
 	 * sa=setpassword2
 	 */
 	public function action_setpassword2()
@@ -201,53 +202,58 @@ class Reminder_Controller extends Action_Controller
 		checkSession();
 		validateToken('remind-sp');
 
-		if (empty($_POST['u']) || !isset($_POST['passwrd1']) || !isset($_POST['passwrd2']))
-			fatal_lang_error('no_access', false);
+		if (empty($this->_req->post->u) || !isset($this->_req->post->passwrd1, $this->_req->post->passwrd2))
+			throw new Elk_Exception('no_access', false);
 
-		$_POST['u'] = (int) $_POST['u'];
+		if ($this->_req->post->passwrd1 != $this->_req->post->passwrd2)
+			throw new Elk_Exception('passwords_dont_match', false);
 
-		if ($_POST['passwrd1'] != $_POST['passwrd2'])
-			fatal_lang_error('passwords_dont_match', false);
+		if ($this->_req->post->passwrd1 === '')
+			throw new Elk_Exception('no_password', false);
 
-		if ($_POST['passwrd1'] == '')
-			fatal_lang_error('no_password', false);
+		$member_id = $this->_req->getPost('u', 'intval', -1);
+		$code = $this->_req->getPost('code', 'trim', '');
 
 		loadLanguage('Login');
 
 		// Get the code as it should be from the database.
 		require_once(SUBSDIR . '/Members.subs.php');
-		$member = getBasicMemberData((int) $_POST['u'], array('authentication' => true));
+		$member = getBasicMemberData($member_id, array('authentication' => true));
 
 		// Does this user exist at all? Is he activated? Does he have a validation code?
-		if (empty($member) || $member['is_activated'] != 1 || $member['validation_code'] == '')
-			fatal_lang_error('invalid_userid', false);
+		if (empty($member) || $member['is_activated'] != 1 || $member['validation_code'] === '')
+			throw new Elk_Exception('invalid_userid', false);
 
-		// Is the password actually valid?
+		// Is the password actually valid to the forums rules?
 		require_once(SUBSDIR . '/Auth.subs.php');
-		$passwordError = validatePassword($_POST['passwrd1'], $member['member_name'], array($member['email_address']));
+		$passwordError = validatePassword($this->_req->post->passwrd1, $member['member_name'], array($member['email_address']));
 
 		// What - it's not?
-		if ($passwordError != null)
-			fatal_lang_error('profile_error_password_' . $passwordError, false);
+		if ($passwordError !== null)
+			throw new Elk_Exception('profile_error_password_' . $passwordError, false);
 
 		// Quit if this code is not right.
-		if (empty($_POST['code']) || substr($member['validation_code'], 0, 10) !== substr(md5($_POST['code']), 0, 10))
+		if (empty($code) || $member['validation_code'] !== substr(hash('sha256', $code), 0, 10))
 		{
 			// Stop brute force attacks like this.
-			validatePasswordFlood($_POST['u'], $member['passwd_flood'], false);
+			validatePasswordFlood($member_id, $member['passwd_flood'], false);
 
-			fatal_error($txt['invalid_activation_code'], false);
+			throw new Elk_Exception($txt['invalid_activation_code'], false);
 		}
 
 		// Just in case, flood control.
-		validatePasswordFlood($_POST['u'], $member['passwd_flood'], true);
+		validatePasswordFlood($member_id, $member['passwd_flood'], true);
 
 		// User validated.  Update the database!
 		require_once(SUBSDIR . '/Auth.subs.php');
-		$sha_passwd = $_POST['passwrd1'];
-		updateMemberData($_POST['u'], array('validation_code' => '', 'passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true)));
+		$sha_passwd = $this->_req->post->passwrd1;
+		require_once(SUBSDIR . '/Members.subs.php');
+		if (isset($this->_req->post->otp))
+			updateMemberData($member_id, array('validation_code' => '', 'passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true), 'enable_otp' => 0));
+		else
+			updateMemberData($member_id, array('validation_code' => '', 'passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true)));
 
-		call_integration_hook('integrate_reset_pass', array($member['member_name'], $member['member_name'], $_POST['passwrd1']));
+		call_integration_hook('integrate_reset_pass', array($member['member_name'], $member['member_name'], $this->_req->post->passwrd1));
 
 		loadTemplate('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
@@ -255,7 +261,7 @@ class Reminder_Controller extends Action_Controller
 			'page_title' => $txt['reminder_password_set'],
 			'sub_template' => 'login',
 			'default_username' => $member['member_name'],
-			'default_password' => $_POST['passwrd1'],
+			'default_password' => $this->_req->post->passwrd1,
 			'never_expire' => false,
 			'description' => $txt['reminder_password_set']
 		);
@@ -274,22 +280,22 @@ class Reminder_Controller extends Action_Controller
 		validateToken('remind-sai');
 
 		// Hacker?  How did you get this far without an email or username?
-		if (empty($_REQUEST['uid']))
-			fatal_lang_error('username_no_exist', false);
+		if (empty($this->_req->post->uid))
+			throw new Elk_Exception('username_no_exist', false);
 
 		loadLanguage('Login');
 
 		// Get the information from the database.
 		require_once(SUBSDIR . '/Members.subs.php');
-		$member = getBasicMemberData((int) $_REQUEST['uid'], array('authentication' => true));
+		$member = getBasicMemberData((int) $this->_req->post->uid, array('authentication' => true));
 		if (empty($member))
-			fatal_lang_error('username_no_exist', false);
+			throw new Elk_Exception('username_no_exist', false);
 
 		// Check if the secret answer is correct.
-		if ($member['secret_question'] == '' || $member['secret_answer'] == '' || md5($_POST['secret_answer']) !== $member['secret_answer'])
+		if ($member['secret_question'] === '' || $member['secret_answer'] === '' || md5($this->_req->post->secret_answer) !== $member['secret_answer'])
 		{
-			log_error(sprintf($txt['reminder_error'], $member['member_name']), 'user');
-			fatal_lang_error('incorrect_answer', false);
+			Errors::instance()->log_error(sprintf($txt['reminder_error'], $member['member_name']), 'user');
+			throw new Elk_Exception('incorrect_answer', false);
 		}
 
 		// If it's OpenID this is where the music ends.
@@ -301,27 +307,28 @@ class Reminder_Controller extends Action_Controller
 		}
 
 		// You can't use a blank one!
-		if (strlen(trim($_POST['passwrd1'])) === 0)
-			fatal_lang_error('no_password', false);
+		if (strlen(trim($this->_req->post->passwrd1)) === 0)
+			throw new Elk_Exception('no_password', false);
 
 		// They have to be the same too.
-		if ($_POST['passwrd1'] != $_POST['passwrd2'])
-			fatal_lang_error('passwords_dont_match', false);
+		if ($this->_req->post->passwrd1 != $this->_req->post->passwrd2)
+			throw new Elk_Exception('passwords_dont_match', false);
 
 		// Make sure they have a strong enough password.
 		require_once(SUBSDIR . '/Auth.subs.php');
-		$passwordError = validatePassword($_POST['passwrd1'], $member['member_name'], array($member['email_address']));
+		$passwordError = validatePassword($this->_req->post->passwrd1, $member['member_name'], array($member['email_address']));
 
 		// Invalid?
-		if ($passwordError != null)
-			fatal_lang_error('profile_error_password_' . $passwordError, false);
+		if ($passwordError !== null)
+			throw new Elk_Exception('profile_error_password_' . $passwordError, false);
 
 		// Alright, so long as 'yer sure.
 		require_once(SUBSDIR . '/Auth.subs.php');
-		$sha_passwd = $_POST['passwrd1'];
+		$sha_passwd = $this->_req->post->passwrd1;
+		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberData($member['id_member'], array('passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true)));
 
-		call_integration_hook('integrate_reset_pass', array($member['member_name'], $member['member_name'], $_POST['passwrd1']));
+		call_integration_hook('integrate_reset_pass', array($member['member_name'], $member['member_name'], $this->_req->post->passwrd1));
 
 		// Tell them it went fine.
 		loadTemplate('Login');
@@ -330,7 +337,7 @@ class Reminder_Controller extends Action_Controller
 			'page_title' => $txt['reminder_password_set'],
 			'sub_template' => 'login',
 			'default_username' => $member['member_name'],
-			'default_password' => $_POST['passwrd1'],
+			'default_password' => $this->_req->post->passwrd1,
 			'never_expire' => false,
 			'description' => $txt['reminder_password_set']
 		);
@@ -352,20 +359,20 @@ function secretAnswerInput()
 	loadLanguage('Login');
 
 	// Check they entered something...
-	if (empty($_REQUEST['uid']))
-		fatal_lang_error('username_no_exist', false);
+	if (empty($_POST['uid']))
+		throw new Elk_Exception('username_no_exist', false);
 
 	// Get the stuff....
 	require_once(SUBSDIR . '/Members.subs.php');
-	$member = getBasicMemberData((int) $_REQUEST['uid'], array('authentication' => true));
+	$member = getBasicMemberData((int) $_POST['uid'], array('authentication' => true));
 	if (empty($member))
-		fatal_lang_error('username_no_exist', false);
+		throw new Elk_Exception('username_no_exist', false);
 
 	$context['account_type'] = !empty($member['openid_uri']) ? 'openid' : 'password';
 
 	// If there is NO secret question - then throw an error.
-	if (trim($member['secret_question']) == '')
-		fatal_lang_error('registration_no_secret_question', false);
+	if (trim($member['secret_question']) === '')
+		throw new Elk_Exception('registration_no_secret_question', false);
 
 	// Ask for the answer...
 	$context['remind_user'] = $member['id_member'];
@@ -376,4 +383,6 @@ function secretAnswerInput()
 	loadJavascriptFile('register.js');
 
 	createToken('remind-sai');
+
+	return true;
 }

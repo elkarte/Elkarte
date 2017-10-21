@@ -7,18 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Retrieve a list of all boards plus more details
@@ -33,7 +28,7 @@ function reportsBoardsList()
 	// Go through each board!
 	$request = $db->query('', '
 		SELECT b.id_board, b.name, b.num_posts, b.num_topics, b.count_posts, b.member_groups, b.override_theme, b.id_profile, b.deny_member_groups,
-			c.name AS cat_name, IFNULL(par.name, {string:text_none}) AS parent_name, IFNULL(th.value, {string:text_none}) AS theme_name
+			c.name AS cat_name, COALESCE(par.name, {string:text_none}) AS parent_name, COALESCE(th.value, {string:text_none}) AS theme_name
 		FROM {db_prefix}boards AS b
 			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
 			LEFT JOIN {db_prefix}boards AS par ON (par.id_board = b.id_parent)
@@ -54,7 +49,7 @@ function reportsBoardsList()
 /**
  * Fetch membergroups names and ids
  *
- * @param string $group_clause a string used as WHERE cluase in the query
+ * @param string $group_clause a string used as WHERE clause in the query
  * @param int[] $query_groups an array of group ids
  */
 function allMembergroups($group_clause, $query_groups = array())
@@ -93,7 +88,7 @@ function allMembergroups($group_clause, $query_groups = array())
  * Boards profiles and related permissions
  *
  * @param int[] $profiles a list of board profile ids
- * @param string $group_clause a string used as WHERE cluase in the query
+ * @param string $group_clause a string used as WHERE clause in the query
  * @param int[] $query_groups an array of group ids
  */
 function boardPermissions($profiles, $group_clause, $query_groups)
@@ -177,7 +172,7 @@ function allMembergroupsBoardAccess()
 /**
  * Boards profiles and related permissions based on groups
  *
- * @param string $group_clause a string used as WHERE cluase in the query
+ * @param string $group_clause a string used as WHERE clause in the query
  * @param int[] $query_groups an array of group ids
  */
 function boardPermissionsByGroup($group_clause, $query_groups)

@@ -1,18 +1,32 @@
-/**
+/*!
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
- *
+ * @version 1.1
+ */
+
+/**
  * Handle the JavaScript surrounding the admin and moderation center.
  */
+
+/**
+ * We like the globals cuz they is good to us
+ */
+
+/** global: previewTimeout, origText, valid, warningMessage, previewData, refreshPreviewCache, add_answer_template */
+/** global: txt_add_another_answer, last_preview, txt_preview, elk_scripturl, txt_news_error_no_news, oThumbnails, elk_smiley_url */
+/** global: db_vis, database_changes_area, elk_session_var, package_ftp_test, package_ftp_test_connection, package_ftp_test_failed */
+/** global: onNewFolderReceived, elk_session_id, membersSwap, elk_images_url, maintain_members_choose, maintain_members_all */
+/** global: reattribute_confirm, reattribute_confirm_email, reattribute_confirm_username, oModeratorSuggest, permission_profiles */
+/** global: txt_save, txt_permissions_profile_rename, ajax_notification_cancel_text, txt_theme_remove_confirm, XMLHttpRequest */
+/** global: theme_id, frames, editFilename, txt_ban_name_empty, txt_ban_restriction_empty, ElkInfoBar, txt_invalid_response */
+/** global: feature_on_text, feature_off_text, core_settings_generic_error, startOptID, add_question_template, question_last_blank */
+/** global: ourLanguageVersions, ourVersions, txt_add_another_answer, txt_permissions_commit, Image */
 
 /**
  * Admin index class with the following methods
@@ -36,7 +50,7 @@ function elk_AdminIndex(oOptions)
 	this.init();
 }
 
-// Initialize the admin index to handle annoucment, currentversion and updates
+// Initialize the admin index to handle announcement, current version and updates
 elk_AdminIndex.prototype.init = function ()
 {
 	window.adminIndexInstanceRef = this;
@@ -288,7 +302,7 @@ elk_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 {
 	var aVersions = [],
 		aParts = [],
-		aCompare = new Array(sCurrent, sTarget),
+		aCompare = [sCurrent, sTarget],
 		aDevConvert = {'dev': 0, 'alpha': 1, 'beta': 2, 'rc': 3};
 
 	for (var i = 0; i < 2; i++)
@@ -412,15 +426,23 @@ elk_ViewVersions.prototype.determineVersions = function ()
 	// for each file in the detailed-version.js
 	for (var sFilename in window.ourVersions)
 	{
-		sCurVersionType = '';
+		if (!window.ourVersions.hasOwnProperty(sFilename))
+			continue;
 
 		if (!document.getElementById('our' + sFilename))
 			continue;
+
+		sCurVersionType = '';
 
 		sinstalledVersion = document.getElementById('your' + sFilename).innerHTML;
 
 		for (var sVersionType in oLowVersion)
 		{
+			if (!oLowVersion.hasOwnProperty(sVersionType))
+			{
+				continue;
+			}
+
 			if (sFilename.substr(0, sVersionType.length) === sVersionType)
 			{
 				sCurVersionType = sVersionType;
@@ -483,9 +505,9 @@ elk_ViewVersions.prototype.determineVersions = function ()
 	}
 
 	// Set the column titles based on the files each contain
-	for (var i = 0, n = sSections.length; i < n; i++)
+	for (i = 0, n = sSections.length; i < n; i++)
 	{
-		if (sSections[i] == 'Templates')
+		if (sSections[i] === 'Templates')
 			continue;
 
 		document.getElementById('your' + sSections[i]).innerHTML = oLowVersion[sSections[i]] ? oLowVersion[sSections[i]] : oHighYour[sSections[i]];
@@ -510,7 +532,7 @@ elk_ViewVersions.prototype.determineVersions = function ()
  */
 function addNewWord()
 {
-	setOuterHTML(document.getElementById('moreCensoredWords'), '<div class="censorWords"><input type="text" name="censor_vulgar[]" size="30" class="input_text" /> <i class="fa  fa-arrow-circle-right"></i> <input type="text" name="censor_proper[]" size="30" class="input_text" /><' + '/div><div id="moreCensoredWords"><' + '/div>');
+	setOuterHTML(document.getElementById('moreCensoredWords'), '<div class="censorWords"><input type="text" name="censor_vulgar[]" size="30" class="input_text" /> <i class="icon i-chevron-circle-right"></i> <input type="text" name="censor_proper[]" size="30" class="input_text" /><' + '/div><div id="moreCensoredWords"><' + '/div>');
 }
 
 /**
@@ -545,9 +567,9 @@ function updateInputBoxes()
 		stdInput = ['text', 'email', 'url', 'color', 'date'],
 		stdSelect = ['select'];
 
-	var bIsStd = (stdInput.indexOf(curType) !== -1) ? true : false,
-		bIsText = (stdText.indexOf(curType) !== -1) ? true : false,
-		bIsSelect = (stdSelect.indexOf(curType) !== -1) ? true : false;
+	var bIsStd = (stdInput.indexOf(curType) !== -1),
+		bIsText = (stdText.indexOf(curType) !== -1),
+		bIsSelect = (stdSelect.indexOf(curType) !== -1);
 
 	// Only Text like fields can see a max length input
 	document.getElementById("max_length_dt").style.display = bIsText ? "" : "none";
@@ -560,6 +582,10 @@ function updateInputBoxes()
 	// Text like fields can be styled with bbc
 	document.getElementById("bbc_dt").style.display = bIsText ? "" : "none";
 	document.getElementById("bbc_dd").style.display = bIsText ? "" : "none";
+
+	// And given defaults
+	document.getElementById("defaultval_dt").style.display = bIsText ? "" : "none";
+	document.getElementById("defaultval_dd").style.display = bIsText ? "" : "none";
 
 	// Selects and radio can support a list of options
 	document.getElementById("options_dt").style.display = curType === "select" || curType === "radio" ? "" : "none";
@@ -576,7 +602,7 @@ function updateInputBoxes()
 	// And text and select fields are searchable
 	document.getElementById("can_search_dt").style.display = bIsText || bIsSelect ? "" : "none";
 	document.getElementById("can_search_dd").style.display = bIsText || bIsSelect ? "" : "none";
-	
+
 	// Moving to a non searchable field, be sure searchable is unselected.
 	if (!bIsText && !bIsSelect)
 		document.getElementById("can_search_dd").checked = false;
@@ -598,7 +624,7 @@ function updateInputBoxes()
  */
 function addOption()
 {
-	setOuterHTML(document.getElementById("addopt"), '<br /><input type="radio" name="default_select" value="' + startOptID + '" id="' + startOptID + '" class="input_radio" /><input type="text" name="select_option[' + startOptID + ']" value="" class="input_text" /><span id="addopt"></span>');
+	setOuterHTML(document.getElementById("addopt"), '<br /><input type="radio" name="default_select" value="' + startOptID + '" id="' + startOptID + '" /><input type="text" name="select_option[' + startOptID + ']" value="" class="input_text" /><span id="addopt"></span>');
 	startOptID++;
 }
 
@@ -620,7 +646,7 @@ function addAnotherQuestion()
 /**
  * Every question should have an answer, even if its a lie
  *
- * @param {string} elem
+ * @param {HTMLElement} elem
  * @param {string} question_name
  */
 function addAnotherAnswer(elem, question_name)
@@ -694,7 +720,8 @@ function addAnotherSearch(txt_name, txt_url, txt_word_sep)
  */
 function addAnotherNews()
 {
-	var $new_item = $("#list_news_lists_last").clone();
+	var last = $("#list_news_lists_last"),
+		$new_item = last.clone();
 
 	last_preview++;
 	$new_item.attr('id', 'list_news_lists_' + last_preview);
@@ -702,7 +729,7 @@ function addAnotherNews()
 	$new_item.find('#preview_last').attr('id', 'preview_' + last_preview);
 	$new_item.find('#box_preview_last').attr('id', 'box_preview_' + last_preview);
 
-	$("#list_news_lists_last").before($new_item);
+	last.before($new_item);
 	$new_item.toggle();
 	make_preview_btn(last_preview);
 }
@@ -716,7 +743,7 @@ function make_preview_btn (preview_id)
 {
 	var $id = $("#preview_" + preview_id);
 
-	$id.text(txt_preview).click(function () {
+	$id.text(txt_preview).on('click', function () {
 		$.ajax({
 			type: "POST",
 			url: elk_scripturl + "?action=xmlpreview;xml",
@@ -779,13 +806,13 @@ function toggleDuration(toChange)
 function calculateNewValues()
 {
 	var total = 0;
-	for (var i = 1; i <= 6; i++)
+	for (var i = 1; i <= 7; i++)
 	{
 		total += parseInt(document.getElementById('weight' + i + '_val').value);
 	}
 
 	document.getElementById('weighttotal').innerHTML = total;
-	for (i = 1; i <= 6; i++)
+	for (i = 1; i <= 7; i++)
 	{
 		document.getElementById('weight' + i).innerHTML = (Math.round(1000 * parseInt(document.getElementById('weight' + i + '_val').value) / total) / 10) + '%';
 	}
@@ -796,16 +823,16 @@ function calculateNewValues()
  */
 function switchType()
 {
-	document.getElementById("ul_settings").style.display = document.getElementById("method-existing").checked ? "none" : "";
-	document.getElementById("ex_settings").style.display = document.getElementById("method-upload").checked ? "none" : "";
+	document.getElementById("ul_settings").style.display = document.getElementById("method-existing").checked ? "none" : "block";
+	document.getElementById("ex_settings").style.display = document.getElementById("method-upload").checked ? "none" : "block";
 }
 
 /**
- * Toggle visibility of smiley set should the user want differnt images in a set (add smiley)
+ * Toggle visibility of smiley set should the user want different images in a set (add smiley)
  */
 function swapUploads()
 {
-	document.getElementById("uploadMore").style.display = document.getElementById("uploadSmiley").disabled ? "none" : "";
+	document.getElementById("uploadMore").style.display = document.getElementById("uploadSmiley").disabled ? "none" : "block";
 	document.getElementById("uploadSmiley").disabled = !document.getElementById("uploadSmiley").disabled;
 }
 
@@ -858,7 +885,7 @@ function testFTP()
 
 	var sPostData = "";
 	for (var i = 0; i < 5; i++)
-		sPostData = sPostData + (sPostData.length === 0 ? "" : "&") + oPostData[i] + "=" + escape(document.getElementById(oPostData[i]).value);
+		sPostData = sPostData + (sPostData.length === 0 ? "" : "&") + oPostData[i] + "=" + document.getElementById(oPostData[i]).value.php_urlencode();
 
 	// Post the data out.
 	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=packages;sa=ftptest;xml;' + elk_session_var + '=' + elk_session_id, sPostData, testFTPResults);
@@ -882,7 +909,7 @@ function generateFTPTest()
 	// create our test button to call testFTP on click
 	var ftpTest = document.createElement("input");
 	ftpTest.type = "button";
-	ftpTest.className = "right_submit";
+	ftpTest.className = "submit";
 	ftpTest.onclick = testFTP;
 
 	// Set the button value based on which form we are on
@@ -896,6 +923,8 @@ function generateFTPTest()
 		ftpTest.value = package_ftp_test_connection;
 		document.getElementById("test_ftp_placeholder_full").appendChild(ftpTest);
 	}
+
+	return true;
 }
 
 /**
@@ -954,12 +983,10 @@ function expandFolder(folderIdent, folderReal)
 	{
 		return false;
 	}
+
 	// Otherwise we need to get the wicked thing.
-	else
-	{
-		ajax_indicator(true);
-		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=packages;onlyfind=' + escape(folderReal) + ';sa=perms;xml;' + elk_session_var + '=' + elk_session_id, onNewFolderReceived);
-	}
+	ajax_indicator(true);
+	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=packages;onlyfind=' + folderReal.php_urlencode() + ';sa=perms;xml;' + elk_session_var + '=' + elk_session_id, onNewFolderReceived);
 
 	return false;
 }
@@ -982,9 +1009,31 @@ function dynamicExpandFolder()
  */
 function select_in_category(operation, brd_list)
 {
-	for (var brd in brd_list)
+	for (var brd in brd_list) {
+		if (!brd_list.hasOwnProperty(brd))
+			continue;
+
 		document.getElementById(operation + '_brd' + brd_list[brd]).checked = true;
+	}
 }
+
+/**
+ * Server Settings > Caching, toggles input fields on/off as appropriate for
+ * a given cache engine selection
+ */
+$(function() {
+	$('#cache_accelerator').change(function() {
+		// Hide all the settings
+		$('#cache_accelerator').find('option').each(function() {
+			$('[id^=' + $(this).val() + '_]').hide();
+		});
+
+		// Show the settings of the selected engine
+		$('[id^=' + $(this).val() + '_]').show();
+	})
+	// Trigger a change action so that the form is properly initialized
+	.change();
+});
 
 /**
  * Server Settings > Caching, toggles input fields on/off as appropriate for
@@ -999,7 +1048,7 @@ function toggleCache ()
 		cacheconfirm = $('#cache_password_confirm').parent();
 
 	// Show the memcache server box only if memcache has been selected
-	if (cache_type.value !== "memcached")
+	if (cache_type.value.substr(0, 8) !== "memcache")
 	{
 		memcache.slideUp();
 		memcache.prev().slideUp(100);
@@ -1064,7 +1113,7 @@ function hideGlobalCookies()
 		$("#globalCookies").parent().slideUp();
 	}
 
-	// Global selected means we need to reveil the domain input box
+	// Global selected means we need to reveal the domain input box
 	if (bUseGlobal)
 	{
 		$("#setting_globalCookiesDomain").closest("dt").slideDown();
@@ -1123,9 +1172,9 @@ function toggleBaseDir ()
 
 
 /**
- * Called from purgeinactive users maintance task, used to show or hide
+ * Called from purgeinactive users maintenance task, used to show or hide
  * the membergroup list.  If collapsed will select all the member groups if expanded
- * unslect them so the user can choose.
+ * unselect them so the user can choose.
  */
 function swapMembers()
 {
@@ -1180,7 +1229,7 @@ function checkAttributeValidity()
 		warningMessage = warningMessage.replace(/%type%/, '', reattribute_confirm_username).replace(/%find%/, document.getElementById('from_name').value);
 	}
 
-	document.getElementById('do_attribute').disabled = valid ? false : true;
+	document.getElementById('do_attribute').disabled = !valid;
 
 	// Keep checking for a valid form so we can activate the submit button
 	setTimeout(function() {checkAttributeValidity();}, 500);
@@ -1189,34 +1238,7 @@ function checkAttributeValidity()
 }
 
 /**
- * Function for showing which boards to prune in an otherwise hidden list.
- * Used by topic maintenance task, will select all boards when collapsed or allow
- * specific boards to be chosen when expanded
- */
-function swapRot()
-{
-	rotSwap = !rotSwap;
-
-	// Toggle icon
-	document.getElementById("rotIcon").src = elk_images_url + (rotSwap ? "/selected_open.png" : "/selected.png");
-	document.getElementById("rotText").innerHTML = rotSwap ? maintain_old_choose : maintain_old_all;
-
-	// Toggle panel
-	$("#rotPanel").slideToggle(300);
-
-	// Toggle checkboxes
-	var rotPanel = document.getElementById("rotPanel"),
-		oBoardCheckBoxes = rotPanel.getElementsByTagName("input");
-
-	for (var i = 0; i < oBoardCheckBoxes.length; i++)
-	{
-		if (oBoardCheckBoxes[i].type.toLowerCase() === "checkbox")
-			oBoardCheckBoxes[i].checked = !rotSwap;
-	}
-}
-
-/**
- * Enable/disable fields when transfering attachments
+ * Enable/disable fields when transferring attachments
  *
  * @returns {undefined}
  */
@@ -1227,8 +1249,8 @@ function transferAttachOptions()
 		toSelect = document.getElementById("to"),
 		toValue = parseInt(toSelect.options[toSelect.selectedIndex].value, 10);
 
-		toSelect.disabled = autoValue !== 0 ? true : false;
-		autoSelect.disabled = toValue !== 0 ?  true : false;
+		toSelect.disabled = autoValue !== 0;
+		autoSelect.disabled = toValue !== 0;
 }
 
 /**
@@ -1267,8 +1289,6 @@ function showhideSearchMethod()
 /**
  * Used in manageFeatures to show / hide custom level input elements based on the checkbox choices
  * Will show or hide the jquery and jqueryui custom input fields for admins that like to roll the dice
- *
- * @param {boolean} isChecked
  */
 function showhideJqueryOptions()
 {
@@ -1307,7 +1327,7 @@ function showhideJqueryOptions()
 
 /**
  * Used in manageMembergroups to enable disable form elements based on allowable choices
- * If post based group is selected, it will disable moderation selection, visability, group description
+ * If post based group is selected, it will disable moderation selection, visibility, group description
  * and enable post count input box
  *
  * @param {boolean} isChecked
@@ -1333,7 +1353,7 @@ function swapPostGroup(isChecked)
 
 	// Disable the moderator autosuggest box as well
 	if (typeof(oModeratorSuggest) !== 'undefined')
-		oModeratorSuggest.oTextHandle.disabled = isChecked ? true : false;
+		oModeratorSuggest.oTextHandle.disabled = !!isChecked;
 }
 
 /**
@@ -1353,22 +1373,27 @@ function ajax_getTemplatePreview()
 		context: document.body
 	})
 	.done(function(request) {
-		$("#box_preview").css({display:""});
+		$("#box_preview").css({display:"block"});
 		$("#template_preview").html($(request).find('body').text());
+
+		var $_errors = $("#errors");
 		if ($(request).find("error").text() !== '')
 		{
-			$("#errors").css({display:""});
+			$_errors.css({display:"block"});
+
 			var errors_html = '',
-				errors = $(request).find('error').each(function() {
+			errors = $(request).find('error').each(function() {
 				errors_html += $(this).text() + '<br />';
 			});
 
 			$(document).find("#error_list").html(errors_html);
+			$('html, body').animate({ scrollTop: $_errors.offset().top }, 'slow');
 		}
 		else
 		{
-			$("#errors").css({display:"none"});
+			$_errors.css({display:"none"});
 			$("#error_list").html('');
+			$('html, body').animate({ scrollTop: $("#box_preview").offset().top }, 'slow');
 		}
 
 		return false;
@@ -1383,10 +1408,10 @@ function ajax_getTemplatePreview()
  */
 function initEditProfileBoards()
 {
-	$('.edit_all_board_profiles').click(function(e) {
+	$('.edit_all_board_profiles').on('click', function(e) {
 		e.preventDefault();
 
-		$('.edit_board').click();
+		$('.edit_board').off('click.elkarte');
 	});
 
 	$('.edit_board').show().on('click.elkarte', function(e) {
@@ -1422,17 +1447,18 @@ function initEditProfileBoards()
 			.attr('name', 'save_changes')
 			.attr('value', txt_save)
 		);
-		$icon.off('click.elkarte').click(function(e) {
+		$icon.off('click.elkarte').on('click', function(e) {
 			e.preventDefault();
 			if ($(this).hasClass('changed'))
-				$('input[name="save_changes"]').click();
+				$('input[name="save_changes"]').off('click');
 		});
 	});
 }
 
 /**
- * Creates the image and attach the even to convert the name of the permission
+ * Creates the image and attaches the event to convert the name of the permission
  * profile into an input to change its name and back.
+ *
  * It also removes the "Rename all" and "Remove Selected" buttons
  * and the "Delete" column for consistency
  */
@@ -1444,14 +1470,16 @@ function initEditPermissionProfiles()
 	$('.rename_profile').each(function() {
 		var $this_profile = $(this);
 
-		$this_profile.after($('<a class="js-ed edit_board" />').attr('href', '#').click(function(ev) {
+		$this_profile.after($('<a class="js-ed edit_board" />').attr('href', '#').on('click', function(ev) {
 			ev.preventDefault();
 
 			// If we have already created the cancel let's skip it
 			if (!run_once)
 			{
+				var $cancel;
+
 				run_once = true;
-				$cancel = $('<a class="js-ed-rm linkbutton" />').click(function(ev) {
+				$cancel = $('<a class="js-ed-rm linkbutton" />').on('click', function(ev) {
 					ev.preventDefault();
 
 					// js-ed is hopefully a class introduced by this function only
@@ -1490,7 +1518,7 @@ function initEditPermissionProfiles()
  */
 function initDeleteThemes()
 {
-	$(".delete_theme").bind("click", function (event) {
+	$(".delete_theme").on("click", function (event) {
 		event.preventDefault();
 		var theme_id = $(this).data("theme_id"),
 			base_url = $(this).attr("href"),
@@ -1557,7 +1585,7 @@ function navigatePreview(url)
 		if (myDoc.responseText !== null && myDoc.status === 200)
 		{
 			previewData = myDoc.responseText;
-			document.getElementById('css_preview_box').style.display = "";
+			document.getElementById('css_preview_box').style.display = "block";
 
 			// Revert to the theme they actually use ;).
 			var tempImage = new Image();
@@ -1575,7 +1603,7 @@ function navigatePreview(url)
 		url = url.substr(0, url.indexOf("#"));
 	}
 
-	myDoc.open("GET", url + (url.indexOf("?") === -1 ? "?" : ";") + 'theme=', theme_id + anchor, true);
+	myDoc.open("GET", url + (url.indexOf("?") === -1 ? "?" : ";") + 'theme=' + theme_id + anchor, true);
 	myDoc.send(null);
 }
 
@@ -1628,7 +1656,8 @@ function refreshPreview(check)
 	{
 		var data = previewData,
 			preview_sheet = document.forms.stylesheetForm.entire_file.value,
-			stylesheetMatch = new RegExp('<link rel="stylesheet"[^>]+href="[^"]+' + editFilename + '[^>]*>');
+			stylesheetMatch = new RegExp('<link rel="stylesheet"[^>]+href="[^"]+' + editFilename + '[^>]*>'),
+			iframe;
 
 		// Replace the paths for images.
 		preview_sheet = preview_sheet.replace(/url\(\.\.\/images/gi, "url(" + elk_images_url);
@@ -1688,6 +1717,8 @@ function confirmBan(aForm)
 		alert(txt_ban_restriction_empty);
 		return false;
 	}
+
+	return true;
 }
 
 // Enable/disable some fields when working with bans.
@@ -1701,7 +1732,7 @@ var fUpdateStatus = function ()
 
 /**
  * Used when setting up subscriptions, used to toggle the currency code divs
- * based on which currencys are chosen.
+ * based on which currencies are chosen.
  */
 function toggleCurrencyOther()
 {
@@ -1748,15 +1779,17 @@ function ajax_getEmailTemplatePreview()
 		context: document.body
 	})
 	.done(function(request) {
-		// Show the preivew section, populated with the response
-		$("#preview_section").css({display: ""});
-		$("#template_preview").html($(request).find('body').text());
+		// Show the preview section, populated with the response
+		$("#preview_section").css({display: "block"});
+		$("#preview_body").html($(request).find('body').text());
 		$("#preview_subject").html($(request).find('subject').text());
 
 		// Any error we need to let them know about?
 		if ($(request).find("error").text() !== '')
 		{
-			var errors_html = '';
+			var errors_html = '',
+				$_errors = $("#errors"),
+				errors;
 
 			// Build the error string
 			errors = $(request).find('error').each(function() {
@@ -1765,17 +1798,17 @@ function ajax_getEmailTemplatePreview()
 
 			// Add it to the error div, set the class level, and show it
 			$(document).find("#error_list").html(errors_html);
-			$("#errors").css({display: ""});
-			$("#errors").attr('class', parseInt($(request).find('errors').attr('serious')) === 0 ? 'warningbox' : 'errorbox');
-
-			// Navigate to the preview
-			location.hash = '#' + 'preview_section';
+			$_errors.css({display: ""});
+			$_errors.attr('class', parseInt($(request).find('errors').attr('serious')) === 0 ? 'warningbox' : 'errorbox');
 		}
 		else
 		{
 			$("#errors").css({display: "none"});
 			$("#error_list").html('');
 		}
+
+		// Navigate to the preview
+		$('html, body').animate({ scrollTop: $('#preview_section').offset().top }, 'slow');
 
 		return false;
 	});
@@ -1800,7 +1833,7 @@ function ajax_getCensorPreview()
 	.done(function(request) {
 		if (request.result === true) {
 			// Show the censored text section, populated with the response
-			$("#censor_result").css({display: ""}).html(request.censor);
+			$("#censor_result").css({display: "block"}).html(request.censor);
 
 			// Update the token
 			$("#token").attr({name:request.token_val, value:request.token});
@@ -1812,3 +1845,162 @@ function ajax_getCensorPreview()
 
 	return false;
 }
+
+/**
+ * Used to show/hide sub options for the various notifications
+ * action=admin;area=featuresettings;sa=mention
+ */
+$(function() {
+	var $headers = $("#mention").find("input[id^='notifications'][id$='[notification]']");
+
+	$headers.change(function() {
+		var $top = $(this).closest('dl'),
+			$hparent = $(this).parent();
+
+		if (this.checked)
+		{
+			$top.find('dt:not(:first-child)').fadeIn();
+			$top.find('dd:not(:nth-child(2))').each(function() {
+				$(this).fadeIn();
+				$(this).find('input').prop('disabled', false);
+			});
+		}
+		else
+		{
+			$top.find('dt:not(:first-child)').hide();
+			$top.find('dd:not(:nth-child(2))').each(function() {
+				$(this).hide();
+				$(this).find('input').prop('disabled', true);
+			});
+		}
+
+		$hparent.show();
+		$hparent.prev().show();
+	});
+
+	$headers.change();
+});
+
+/**
+ * Ajax function to clear CSS and JS hives.  Called from action=admin;area=featuresettings;sa=basic
+ * Remove Hives button.
+ */
+$(function() {
+	$('#clean_hives').on('click', function () {
+		var infoBar = new ElkInfoBar('bar_clean_hives');
+
+		$.ajax({
+			type: 'POST',
+			dataType: 'json',
+			url: elk_scripturl + "?action=admin;area=featuresettings;sa=basic;xml;api=json",
+			data: {
+				cleanhives: true
+			}
+		})
+		.done(function(request) {
+			infoBar.changeText(request.response);
+
+			if (request.success === true) {
+				infoBar.isSuccess();
+			}
+			else {
+				infoBar.isError();
+			}
+		})
+		.fail(function(request) {
+			infoBar.isError();
+			infoBar.changeText(txt_invalid_response);
+		})
+		.always(function(request) {
+			infoBar.showBar();
+		});
+
+		return false;
+	});
+});
+
+/**
+ * Enable / disable "core" features of the software. Called from action=admin;area=corefeatures
+ */
+$(function() {
+	if ($('#core_features').length === 0)
+	{
+		return;
+	}
+
+	$(".core_features_hide").css('display', 'none');
+	$(".core_features_img").show().css({'cursor': 'pointer'}).each(function() {
+		var sImageText = $(this).hasClass('on') ? feature_on_text : feature_off_text;
+		$(this).attr({ title: sImageText, alt: sImageText });
+	});
+	$("#core_features_submit").css('display', 'none');
+
+	if (!token_name)
+		token_name = $("#core_features_token").attr("name");
+
+	if (!token_value)
+		token_value = $("#core_features_token").attr("value");
+
+	// Attach our action to the core features power button
+	$(".core_features_img").click(function() {
+		var cc = $(this),
+			cf = $(this).attr("id").substring(7),
+			imgs = new Array(elk_images_url + "/admin/switch_off.png", elk_images_url + "/admin/switch_on.png"),
+			new_state = !$("#feature_" + cf).attr("checked"),
+			ajax_infobar = new ElkInfoBar('core_features_bar', {error_class: 'errorbox', success_class: 'successbox'}),
+			data;
+
+		$("#feature_" + cf).attr("checked", new_state);
+
+		data = {save: "save", feature_id: cf};
+		data[$("#core_features_session").attr("name")] = $("#core_features_session").val();
+		data[token_name] = token_value;
+
+		$(".core_features_status_box").each(function(){
+			data[$(this).attr("name")] = !$(this).attr("checked") ? 0 : 1;
+		});
+
+		// Launch AJAX request.
+		$.ajax({
+			// The link we are accessing.
+			url: elk_scripturl + "?action=xmlhttp;sa=corefeatures;xml",
+
+			// The type of request.
+			type: "post",
+
+			// The type of data that is getting returned.
+			data: data
+		})
+		.done(function(request) {
+			if ($(request).find("errors").find("error").length !== 0)
+			{
+				ajax_infobar.isError();
+				ajax_infobar.changeText($(request).find("errors").find("error").text()).showBar();
+			}
+			else if ($(request).find("elk").length !== 0)
+			{
+				$("#feature_link_" + cf).html($(request).find("corefeatures").find("corefeature").text());
+				cc.attr({
+					"src": imgs[new_state ? 1 : 0],
+					"title": new_state ? feature_on_text : feature_off_text,
+					"alt": new_state ? feature_on_text : feature_off_text
+				});
+				$("#feature_link_" + cf).fadeOut().fadeIn();
+				ajax_infobar.isSuccess();
+				var message = $(request).find("messages").find("message").text();
+				ajax_infobar.changeText(message).showBar();
+
+				token_name = $(request).find("tokens").find('[type="token"]').text();
+				token_value = $(request).find("tokens").find('[type="token_var"]').text();
+			}
+			else
+			{
+				ajax_infobar.isError();
+				ajax_infobar.changeText(core_settings_generic_error).showBar();
+			}
+		})
+		.fail(function(error) {
+			ajax_infobar.changeText(error).showBar();
+		});
+	});
+});

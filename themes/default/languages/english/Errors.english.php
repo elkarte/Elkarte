@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; Errors
+// Version: 1.1; Errors
 
 $txt['no_access'] = 'Sorry, we can\'t let you access this section. We can\'t even tell you if it exists. You\'re welcome to visit the main page and choose your way from there.';
 $txt['not_guests'] = 'Sorry, this action is not available to guests.';
@@ -124,6 +124,7 @@ $txt['cannot_view_attachments'] = 'It seems that you are not allowed to download
 $txt['cannot_view_mlist'] = 'You can\'t view the member list because you don\'t have permission to.';
 $txt['cannot_view_stats'] = 'You aren\'t allowed to view the forum statistics.';
 $txt['cannot_who_view'] = 'Sorry - you don\'t have the proper permissions to view the Who\'s Online list.';
+$txt['cannot_like_posts_stats'] = 'Sorry - you don\'t have the proper permissions to view the Like posts stats.';
 
 $txt['no_theme'] = ' We can\'t find that theme.';
 $txt['theme_dir_wrong'] = 'The default theme\'s directory is wrong, please correct it by clicking this text.';
@@ -369,6 +370,7 @@ $txt['ignoreboards_disallowed'] = 'The option to ignore boards has not been enab
 
 $txt['mboards_delete_error'] = 'No category selected.';
 $txt['mboards_delete_board_error'] = 'No board selected.';
+$txt['mboards_delete_board_has_posts'] = 'Selected board still has posts and/or topics.';
 
 $txt['mboards_parent_own_child_error'] = 'You can not make a parent its own child.';
 $txt['mboards_board_own_child_error'] = 'You can not make a board its own child.';
@@ -425,3 +427,5 @@ $txt['error_sa_not_set'] = 'The Sub-action you requested is not defined';
 
 // Drag / Drop sort errors
 $txt['no_sortable_items'] = 'No sortable items were found';
+
+$txt['error_invalid_notification_id'] = 'An addons is trying to register a notification method with an existing ID. ID lower than 5 are protected and cannot be used by addons, if the ID is higher, than two addons may be sharing the same ID.';

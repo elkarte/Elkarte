@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1
  *
  */
 
@@ -22,11 +22,12 @@
  * @param string $db_prefix
  * @param mixed[] $db_options
  * @param string $db_type
- * @return null
+ * @return resource
  */
 function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array(), $db_type = 'mysql')
 {
 	require_once(SOURCEDIR . '/database/Db.php');
+	require_once(SOURCEDIR . '/database/Db-abstract.class.php');
 	require_once(SOURCEDIR . '/database/Db-' . $db_type . '.class.php');
 
 	return call_user_func_array(array('Database_' . DB_TYPE, 'initiate'), array($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options));
@@ -34,12 +35,10 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
 
 /**
  * Extend the database functionality.
- *
- * @param string $type = 'extra'
  */
-function db_extend($type = 'extra')
+function db_extend()
 {
-	// this can be removed.
+	// @todo this can be removed.
 }
 
 /**
@@ -56,16 +55,18 @@ function database()
  * This function retrieves an existing instance of DbTable
  * and returns it.
  *
+ * @param object|null $db - A database object (e.g. Database_MySQL or Database_PostgreSQL)
  * @return DbTable
  */
-function db_table()
+function db_table($db = null)
 {
-	global $db_type;
+	if ($db === null)
+		$db = database();
 
 	require_once(SOURCEDIR . '/database/DbTable.class.php');
-	require_once(SOURCEDIR . '/database/DbTable-' . $db_type . '.php');
+	require_once(SOURCEDIR . '/database/DbTable-' . strtolower(DB_TYPE) . '.php');
 
-	return call_user_func(array('DbTable_' . DB_TYPE, 'db_table'));
+	return call_user_func(array('DbTable_' . DB_TYPE, 'db_table'), $db);
 }
 
 /**
@@ -77,10 +78,8 @@ function db_table()
  */
 function db_search()
 {
-	global $db_type;
-
 	require_once(SOURCEDIR . '/database/DbSearch.php');
-	require_once(SOURCEDIR . '/database/DbSearch-' . $db_type . '.php');
+	require_once(SOURCEDIR . '/database/DbSearch-' . strtolower(DB_TYPE) . '.php');
 
 	return call_user_func(array('DbSearch_' . DB_TYPE, 'db_search'));
 }

@@ -7,22 +7,26 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This file contains code by:
- * copyright:	2012 Simple Machines Forum contributors (http://www.simplemachines.org)
+ * This file contains code covered by:
+ * copyright:	2012 Simple Machines Forum (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.8
+ * @version 1.1
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
- * OpenID controller.
+ * OpenID_Controller Class.
+ * Controls openID verification process
  */
 class OpenID_Controller extends Action_Controller
 {
+	/**
+	 * Can't say, you see, its a secret
+	 * @var string
+	 */
+	private $_secret = '';
+
 	/**
 	 * Forward to the right action.
 	 *
@@ -41,72 +45,68 @@ class OpenID_Controller extends Action_Controller
 	{
 		global $modSettings, $context, $user_settings;
 
+		// Is OpenID even enabled?
+		if (empty($modSettings['enableOpenID']))
+			throw new Elk_Exception('no_access', false);
+
+		// The OpenID provider did not respond with the OpenID mode? Throw an error..
+		if (!isset($this->_req->query->openid_mode))
+			throw new Elk_Exception('openid_return_no_mode', false);
+
+		// @todo Check for error status!
+		if ($this->_req->query->openid_mode !== 'id_res')
+			throw new Elk_Exception('openid_not_resolved');
+
 		// We'll need our subs.
 		require_once(SUBSDIR . '/OpenID.subs.php');
 
-		// Is OpenID even enabled?
-		if (empty($modSettings['enableOpenID']))
-			fatal_lang_error('no_access', false);
-
-		// The OpenID provider did not respond with the OpenID mode? Throw an error..
-		if (!isset($_GET['openid_mode']))
-			fatal_lang_error('openid_return_no_mode', false);
-
-		// @todo Check for error status!
-		if ($_GET['openid_mode'] != 'id_res')
-			fatal_lang_error('openid_not_resolved');
-
-		// this has annoying habit of removing the + from the base64 encoding.  So lets put them back.
+		// This has annoying habit of removing the + from the base64 encoding.  So lets put them back.
 		foreach (array('openid_assoc_handle', 'openid_invalidate_handle', 'openid_sig', 'sf') as $key)
-			if (isset($_GET[$key]))
-				$_GET[$key] = str_replace(' ', '+', $_GET[$key]);
+		{
+			if (isset($this->_req->query->{$key}))
+			{
+				$this->_req->query->{$key} = str_replace(' ', '+', $this->_req->query->{$key});
+			}
+		}
 
 		$openID = new OpenID();
 
 		// Did they tell us to remove any associations?
-		if (!empty($_GET['openid_invalidate_handle']))
-			$openID->removeAssociation($_GET['openid_invalidate_handle']);
+		if (!empty($this->_req->query->openid_invalidate_handle))
+			$openID->removeAssociation($this->_req->query->openid_invalidate_handle);
 
 		// Get the OpenID server info.
-		$server_info = $openID->getServerInfo($_GET['openid_identity']);
+		$server_info = $openID->getServerInfo($this->_req->query->openid_identity);
 
 		// Get the association data.
-		$assoc = $openID->getAssociation($server_info['server'], $_GET['openid_assoc_handle'], true);
+		$assoc = $openID->getAssociation($server_info['server'], $this->_req->query->openid_assoc_handle, true);
 		if ($assoc === null)
-			fatal_lang_error('openid_no_assoc');
-
-		$secret = base64_decode($assoc['secret']);
-		$signed = explode(',', $_GET['openid_signed']);
-		$verify_str = '';
-
-		foreach ($signed as $sign)
-			$verify_str .= $sign . ':' . strtr($_GET['openid_' . str_replace('.', '_', $sign)], array('&amp;' => '&')) . "\n";
-
-		$verify_str = base64_encode(hash_hmac('sha1', $verify_str, $secret, true));
+			throw new Elk_Exception('openid_no_assoc');
 
 		// Verify the OpenID signature.
-		if ($verify_str != $_GET['openid_sig'])
-			fatal_lang_error('openid_sig_invalid', 'critical');
+		if (!$this->_verify_string($assoc['secret']))
+			throw new Elk_Exception('openid_sig_invalid', 'critical');
 
-		if (!isset($_SESSION['openid']['saved_data'][$_GET['t']]))
-			fatal_lang_error('openid_load_data');
+		if (!isset($_SESSION['openid']['saved_data'][$this->_req->query->t]))
+			throw new Elk_Exception('openid_load_data');
 
-		$openid_uri = $_SESSION['openid']['saved_data'][$_GET['t']]['openid_uri'];
-		$modSettings['cookieTime'] = $_SESSION['openid']['saved_data'][$_GET['t']]['cookieTime'];
+		$openid_uri = $_SESSION['openid']['saved_data'][$this->_req->query->t]['openid_uri'];
+		$modSettings['cookieTime'] = $_SESSION['openid']['saved_data'][$this->_req->query->t]['cookieTime'];
 
 		if (empty($openid_uri))
-			fatal_lang_error('openid_load_data');
+			throw new Elk_Exception('openid_load_data');
 
 		// Any save fields to restore?
-		$context['openid_save_fields'] = isset($_GET['sf']) ? json_decode(base64_decode($_GET['sf']), true) : array();
-		$context['openid_claimed_id'] = $_GET['openid_claimed_id'];
+		$openid_save_fields = isset($this->_req->query->sf) ? json_decode(base64_decode($this->_req->query->sf), true) : array();
+		$context['openid_claimed_id'] = $this->_req->query->openid_claimed_id;
 
 		// Is there a user with this OpenID_uri?
 		$member_found = memberByOpenID($context['openid_claimed_id']);
 
-		if (empty($member_found) && isset($_GET['sa']) && $_GET['sa'] == 'change_uri' && !empty($_SESSION['new_openid_uri']) && $_SESSION['new_openid_uri'] == $context['openid_claimed_id'])
+		if (empty($member_found) && $this->_req->getQuery('sa') === 'change_uri' && !empty($_SESSION['new_openid_uri']) && $_SESSION['new_openid_uri'] == $context['openid_claimed_id'])
 		{
 			// Update the member.
+			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($user_settings['id_member'], array('openid_uri' => $context['openid_claimed_id']));
 
 			unset($_SESSION['new_openid_uri']);
@@ -125,33 +125,40 @@ class OpenID_Controller extends Action_Controller
 				'verified' => true,
 				'openid_uri' => $context['openid_claimed_id'],
 			);
-			if (isset($_GET['openid_sreg_nickname']))
-				$_SESSION['openid']['nickname'] = $_GET['openid_sreg_nickname'];
-			if (isset($_GET['openid_sreg_email']))
-				$_SESSION['openid']['email'] = $_GET['openid_sreg_email'];
-			if (isset($_GET['openid_sreg_dob']))
-				$_SESSION['openid']['dob'] = $_GET['openid_sreg_dob'];
-			if (isset($_GET['openid_sreg_gender']))
-				$_SESSION['openid']['gender'] = $_GET['openid_sreg_gender'];
+
+			if (isset($this->_req->query->openid_sreg_nickname))
+				$_SESSION['openid']['nickname'] = $this->_req->query->openid_sreg_nickname;
+			if (isset($this->_req->query->openid_sreg_email))
+				$_SESSION['openid']['email'] = $this->_req->query->openid_sreg_email;
+			if (isset($this->_req->query->openid_sreg_dob))
+				$_SESSION['openid']['dob'] = $this->_req->query->openid_sreg_dob;
 
 			// Were we just verifying the registration state?
-			if (isset($_GET['sa']) && $_GET['sa'] == 'register2')
+			if (isset($this->_req->query->sa) && $this->_req->query->sa === 'register2')
 			{
-				require_once(CONTROLLERDIR . '/Register.controller.php');
-				$controller = new Register_Controller();
-				return $controller->action_register2(true);
+				// Did we save some open ID fields?
+				if (!empty($openid_save_fields))
+				{
+					foreach ($openid_save_fields as $id => $value)
+						$this->_req->post->{$id} = $value;
+				}
+
+				$controller = new Register_Controller(new Event_Manager());
+				$controller->pre_dispatch();
+				$controller->do_register(true);
+				return null;
 			}
 			else
 				redirectexit('action=register');
 		}
-		elseif (isset($_GET['sa']) && $_GET['sa'] == 'revalidate' && $user_settings['openid_uri'] == $openid_uri)
+		elseif (isset($this->_req->query->sa) && $this->_req->query->sa === 'revalidate' && $user_settings['openid_uri'] == $openid_uri)
 		{
 			$_SESSION['openid_revalidate_time'] = time();
 
 			// Restore the get data.
 			require_once(SUBSDIR . '/Auth.subs.php');
-			$_SESSION['openid']['saved_data'][$_GET['t']]['get']['openid_restore_post'] = $_GET['t'];
-			$query_string = construct_query_string($_SESSION['openid']['saved_data'][$_GET['t']]['get']);
+			$_SESSION['openid']['saved_data'][$this->_req->query->t]['get']['openid_restore_post'] = $this->_req->query->t;
+			$query_string = construct_query_string($_SESSION['openid']['saved_data'][$this->_req->query->t]['get']);
 
 			redirectexit($query_string);
 		}
@@ -159,10 +166,13 @@ class OpenID_Controller extends Action_Controller
 		{
 			$user_settings = $member_found;
 
-			// @Todo: this seems outdated?
-			$user_settings['passwd'] = sha1(strtolower($user_settings['member_name']) . $secret);
-			$user_settings['password_salt'] = substr(md5(mt_rand()), 0, 4);
+			// Generate an ElkArte hash for the db to protect this account
+			$user_settings['passwd'] = validateLoginPassword($this->_secret, '', $user_settings['member_name'], true);
 
+			$tokenizer = new Token_Hash();
+			$user_settings['password_salt'] = $tokenizer->generate_hash(4);
+
+			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($user_settings['id_member'], array('passwd' => $user_settings['passwd'], 'password_salt' => $user_settings['password_salt']));
 
 			// Cleanup on Aisle 5.
@@ -171,15 +181,36 @@ class OpenID_Controller extends Action_Controller
 				'openid_uri' => $context['openid_claimed_id'],
 			);
 
-			require_once(CONTROLLERDIR . '/Auth.controller.php');
-
 			// Activation required?
 			if (!checkActivation())
-				return;
+				return false;
 
 			// Finally do the login.
 			doLogin();
 		}
+	}
+
+	/**
+	 * Compares the association with the signatures received from the server
+	 *
+	 * @param string $raw_secret - The association stored in the database
+	 */
+	private function _verify_string($raw_secret)
+	{
+		$this->_secret = base64_decode($raw_secret);
+		$signed = explode(',', $this->_req->query->openid_signed);
+		$verify_str = '';
+
+		foreach ($signed as $sign)
+		{
+			$sign_key = 'openid_' . str_replace('.', '_', $sign);
+			$verify_str .= $sign . ':' . strtr($this->_req->query->{$sign_key}, array('&amp;' => '&')) . "\n";
+		}
+
+		$verify_str = base64_encode(hash_hmac('sha1', $verify_str, $this->_secret, true));
+
+		// Verify the OpenID signature.
+		return $verify_str == $this->_req->query->openid_sig;
 	}
 
 	/**
@@ -189,11 +220,7 @@ class OpenID_Controller extends Action_Controller
 	{
 		global $scripturl, $modSettings;
 
-		@ob_end_clean();
-		if (!empty($modSettings['enableCompressedOutput']))
-			ob_start('ob_gzhandler');
-		else
-			ob_start();
+		obStart(!empty($modSettings['enableCompressedOutput']));
 
 		header('Content-Type: application/xrds+xml');
 		echo '<?xml version="1.0" encoding="UTF-8"?' . '>';

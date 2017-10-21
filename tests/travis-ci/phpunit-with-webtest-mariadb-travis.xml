@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit backupGlobals="true"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         syntaxCheck="false"
+         verbose="true"
+         bootstrap="/var/www/tests/travis-ci/bootstrap.php">
+
+  <testsuites>
+      <testsuite name="ElkArte Web Tests">
+          <directory suffix="Web.php">/var/www/tests</directory>
+      </testsuite>
+      <testsuite name="ElkArte Unit Tests">
+          <directory suffix="Test.php">/var/www/tests</directory>
+      </testsuite>
+      <testsuite name="ElkArte Basic Tests">
+          <directory suffix="Basic.php">/var/www/tests</directory>
+      </testsuite>
+  </testsuites>
+
+  <listeners>
+      <listener class="PHPUnit_Extensions_Selenium2TestCase_ScreenshotListener">
+          <arguments>
+              <string>/var/www/screenshots</string>
+          </arguments>
+      </listener>
+  </listeners>
+
+  <logging>
+     <log type="coverage-clover" target="/tmp/coverage.xml"/>
+     <log type="coverage-text" target="php://stdout" />
+  </logging>
+
+  <filter>
+      <whitelist addUncoveredFilesFromWhitelist="true">
+          <directory suffix=".php">/var/www/sources</directory>
+          <exclude>
+              <directory suffix=".php">/var/www/sources/ext</directory>
+          </exclude>
+      </whitelist>
+  </filter>
+
+  <php>
+      <const name="DBTYPE" value="MySQL"/>
+      <const name="PHPUNIT_SELENIUM" value="true"/>
+      <const name="PHPUNIT_TESTSUITE" value="true"/>
+  </php>
+</phpunit>

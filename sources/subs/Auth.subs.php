@@ -7,23 +7,19 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.8
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Sets the login cookie and session based on the id_member and password passed.
  *
  * What it does:
+ *
  * - password should be already encrypted with the cookie salt.
  * - logs the user out if id_member is zero.
  * - sets the cookie and session to last the number of seconds specified by cookie_length.
@@ -129,6 +125,7 @@ function setLoginCookie($cookie_length, $id, $password = '')
  * Get the domain and path for the cookie
  *
  * What it does:
+ *
  * - normally, local and global should be the localCookies and globalCookies settings, respectively.
  * - uses boardurl to determine these two things.
  *
@@ -169,12 +166,14 @@ function url_parts($local, $global)
  * Question the verity of the admin by asking for his or her password.
  *
  * What it does:
+ *
  * - loads Login.template.php and uses the admin_login sub template.
  * - sends data to template so the admin is sent on to the page they
  *   wanted if their password is correct, otherwise they can try again.
  *
  * @package Authorization
  * @param string $type = 'admin'
+ * @throws Elk_Exception
  */
 function adminLogin($type = 'admin')
 {
@@ -195,7 +194,7 @@ function adminLogin($type = 'admin')
 		// log some info along with it! referer, user agent
 		$req = request();
 		$txt['security_wrong'] = sprintf($txt['security_wrong'], isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $txt['unknown'], $req->user_agent(), $user_info['ip']);
-		log_error($txt['security_wrong'], 'critical');
+		Errors::instance()->log_error($txt['security_wrong'], 'critical');
 
 		if (isset($_POST[$type . '_hash_pass']))
 			unset($_POST[$type . '_hash_pass']);
@@ -302,12 +301,13 @@ function construct_query_string($get)
  * Finds members by email address, username, or real name.
  *
  * What it does:
+ *
  * - searches for members whose username, display name, or e-mail address match the given pattern of array names.
  * - searches only buddies if buddies_only is set.
  *
  * @package Authorization
  * @param string[]|string $names
- * @param bool $use_wildcards = false, accepts wildcards ? and * in the patern if true
+ * @param bool $use_wildcards = false, accepts wildcards ? and * in the pattern if true
  * @param bool $buddies_only = false,
  * @param int $max = 500 retrieves a maximum of max members, if passed
  * @return array containing information about the matching members
@@ -348,7 +348,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 
 	if ($use_wildcards || $maybe_email)
 		$email_condition = '
-			OR (' . $email_condition . 'email_address ' . $comparison . ' \'' . implode( '\') OR (' . $email_condition . ' email_address ' . $comparison . ' \'', $names) . '\')';
+			OR (' . $email_condition . 'email_address ' . $comparison . ' \'' . implode('\') OR (' . $email_condition . ' email_address ' . $comparison . ' \'', $names) . '\')';
 	else
 		$email_condition = '';
 
@@ -367,8 +367,8 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 		LIMIT {int:limit}',
 		array(
 			'buddy_list' => $user_info['buddies'],
-			'member_name_search' => $member_name . ' ' . $comparison . ' \'' . implode( '\' OR ' . $member_name . ' ' . $comparison . ' \'', $names) . '\'',
-			'real_name_search' => $real_name . ' ' . $comparison . ' \'' . implode( '\' OR ' . $real_name . ' ' . $comparison . ' \'', $names) . '\'',
+			'member_name_search' => $member_name . ' ' . $comparison . ' \'' . implode('\' OR ' . $member_name . ' ' . $comparison . ' \'', $names) . '\'',
+			'real_name_search' => $real_name . ' ' . $comparison . ' \'' . implode('\' OR ' . $real_name . ' ' . $comparison . ' \'', $names) . '\'',
 			'email_condition' => $email_condition,
 			'limit' => $max,
 		)
@@ -394,6 +394,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
  * Generates a random password for a user and emails it to them.
  *
  * What it does:
+ *
  * - called by ProfileOptions controller when changing someone's username.
  * - checks the validity of the new username.
  * - generates and sets a new password for the given user.
@@ -401,8 +402,11 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
  * - if username is not set, only a new password is generated and sent.
  *
  * @package Authorization
- * @param int $memID
+ *
+ * @param int         $memID
  * @param string|null $username = null
+ *
+ * @throws Elk_Exception
  */
 function resetPassword($memID, $username = null)
 {
@@ -426,23 +430,27 @@ function resetPassword($memID, $username = null)
 	}
 
 	// Generate a random password.
+	$tokenizer = new Token_Hash();
+	$newPassword = $tokenizer->generate_hash(14);
+
+	// Create a db hash for the generated password
 	require_once(EXTDIR . '/PasswordHash.php');
 	$t_hasher = new PasswordHash(8, false);
-	$newPassword = substr(preg_replace('/\W/', '', md5(mt_rand())), 0, 10);
 	$newPassword_sha256 = hash('sha256', strtolower($user) . $newPassword);
 	$db_hash = $t_hasher->HashPassword($newPassword_sha256);
 
 	// Do some checks on the username if needed.
+	require_once(SUBSDIR . '/Members.subs.php');
 	if ($username !== null)
 	{
-		$errors = Error_Context::context('reset_pwd', 0);
+		$errors = ElkArte\Errors\ErrorContext::context('reset_pwd', 0);
 		validateUsername($memID, $user, 'reset_pwd');
 
 		// If there are "important" errors and you are not an admin: log the first error
 		// Otherwise grab all of them and don't log anything
 		$error_severity = $errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
 		foreach ($errors->prepareErrors($error_severity) as $error)
-			fatal_error($error, $error_severity === null ? false : 'general');
+			throw new Elk_Exception($error, $error_severity === null ? false : 'general');
 
 		// Update the database...
 		updateMemberData($memID, array('member_name' => $user, 'passwd' => $db_hash));
@@ -471,16 +479,17 @@ function resetPassword($memID, $username = null)
  * @package Authorization
  * @param int $memID
  * @param string $username
- * @param string $error_context
+ * @param string $ErrorContext
  * @param boolean $check_reserved_name
  * @param boolean $fatal pass through to isReservedName
  * @return string
+ * @throws Elk_Exception
  */
-function validateUsername($memID, $username, $error_context = 'register', $check_reserved_name = true, $fatal = true)
+function validateUsername($memID, $username, $ErrorContext = 'register', $check_reserved_name = true, $fatal = true)
 {
 	global $txt;
 
-	$errors = Error_Context::context($error_context, 0);
+	$errors = ElkArte\Errors\ErrorContext::context($ErrorContext, 0);
 
 	// Don't use too long a name.
 	if (Util::strlen($username) > 25)
@@ -509,6 +518,7 @@ function validateUsername($memID, $username, $error_context = 'register', $check
  * Checks whether a password meets the current forum rules
  *
  * What it does:
+ *
  * - called when registering/choosing a password.
  * - checks the password obeys the current forum settings for password strength.
  * - if password checking is enabled, will check that none of the words in restrict_in appear in the password.
@@ -557,6 +567,7 @@ function validatePassword($password, $username, $restrict_in = array())
  * Checks whether an entered password is correct for the user
  *
  * What it does:
+ *
  * - called when logging in or whenever a password needs to be validated for a user
  * - used to generate a new hash for the db, used during registration or any password changes
  * - if a non SHA256 password is sent, will generate one with SHA256(user + password) and return it in password
@@ -582,9 +593,6 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
 	// Get an instance of the hasher
 	$hasher = new PasswordHash($hash_cost_log2, $hash_portable);
 
-	// Guilty until we know otherwise
-	$passhash = false;
-
 	// If the password is not 64 characters, lets make it a (SHA-256)
 	if (strlen($password) !== 64)
 		$password = hash('sha256', Util::strtolower($user) . un_htmlspecialchars($password));
@@ -594,7 +602,7 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
 	{
 		$passhash = $hasher->HashPassword($password);
 
-		// Something is not right, we can not generate a valid hash thats <20 characters
+		// Something is not right, we can not generate a valid hash that's <20 characters
 		if (strlen($passhash) < 20)
 			$passhash = false;
 	}
@@ -611,6 +619,7 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
  * Quickly find out what moderation authority this user has
  *
  * What it does:
+ *
  * - builds the moderator, group and board level querys for the user
  * - stores the information on the current users moderation powers in $user_info['mod_cache'] and $_SESSION['mc']
  *
@@ -627,18 +636,18 @@ function rebuildModCache()
 
 	if ($group_query == '0=1')
 	{
-		$request = $db->query('', '
+		$groups = $db->fetchQueryCallback('
 			SELECT id_group
 			FROM {db_prefix}group_moderators
 			WHERE id_member = {int:current_member}',
 			array(
 				'current_member' => $user_info['id'],
-			)
+			),
+			function ($row)
+			{
+				return $row['id_group'];
+			}
 		);
-		$groups = array();
-		while ($row = $db->fetch_assoc($request))
-			$groups[] = $row['id_group'];
-		$db->free_result($request);
 
 		if (empty($groups))
 			$group_query = '0=1';
@@ -717,52 +726,6 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
 }
 
 /**
- * Set the passed users online or not, in the online log table
- *
- * @package Authorization
- * @param int[]|int $ids ids of the member(s) to log
- * @param bool $on = false if true, add the user(s) to online log, if false, remove 'em
- */
-function logOnline($ids, $on = false)
-{
-	$db = database();
-
-	if (!is_array($ids))
-		$ids = array($ids);
-
-	if (empty($on))
-	{
-		// set the user(s) out of log_online
-		$db->query('', '
-			DELETE FROM {db_prefix}log_online
-			WHERE id_member IN ({array_int:members})',
-			array(
-				'members' => $ids,
-			)
-		);
-	}
-}
-
-/**
- * Delete expired/outdated session from log_online
- *
- * @package Authorization
- * @param string $session
- */
-function deleteOnline($session)
-{
-	$db = database();
-
-	$db->query('', '
-		DELETE FROM {db_prefix}log_online
-		WHERE session = {string:session}',
-		array(
-			'session' => $session,
-		)
-	);
-}
-
-/**
  * This functions determines whether this is the first login of the given user.
  *
  * @package Authorization
@@ -778,13 +741,16 @@ function isFirstLogin($id_member)
 }
 
 /**
- * Search for a member by given criterias
+ * Search for a member by given criteria
  *
  * @package Authorization
- * @param string $where
+ *
+ * @param string  $where
  * @param mixed[] $where_params array of values to used in the where statement
- * @param bool $fatal
- * @return boolean
+ * @param bool    $fatal
+ *
+ * @return array of members data or false on failure
+ * @throws Elk_Exception no_user_with_email
  */
 function findUser($where, $where_params, $fatal = true)
 {
@@ -816,7 +782,7 @@ function findUser($where, $where_params, $fatal = true)
 		if ($db->num_rows($request) == 0)
 		{
 			if ($fatal)
-				fatal_lang_error('no_user_with_email', false);
+				throw new Elk_Exception('no_user_with_email', false);
 			else
 				return false;
 		}
@@ -833,19 +799,22 @@ function findUser($where, $where_params, $fatal = true)
  *
  * @package Authorization
  * @param string $email
+ * @param string|null $username
  * @return boolean
  */
-function userByEmail($email)
+function userByEmail($email, $username = null)
 {
 	$db = database();
 
 	$request = $db->query('', '
 		SELECT id_member
 		FROM {db_prefix}members
-		WHERE email_address = {string:email_address}
+		WHERE email_address = {string:email_address}' . ($username === null ? '' : '
+			OR email_address = {string:username}') . '
 		LIMIT 1',
 		array(
 			'email_address' => $email,
+			'username' => $username,
 		)
 	);
 
@@ -859,23 +828,13 @@ function userByEmail($email)
  * Generate a random validation code.
  *
  * @package Authorization
+ * @param int $length the number of characters to return
  */
-function generateValidationCode()
+function generateValidationCode($length = 10)
 {
-	global $modSettings;
+	$tokenizer = new Token_Hash();
 
-	$db = database();
-
-	$request = $db->query('get_random_number', '
-		SELECT RAND()',
-		array(
-		)
-	);
-
-	list ($dbRand) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	return substr(preg_replace('/\W/', '', sha1(microtime() . mt_rand() . $dbRand . $modSettings['rand_seed'])), 0, 10);
+	return $tokenizer->generate_hash((int) $length);
 }
 
 /**
@@ -894,7 +853,7 @@ function loadExistingMember($name, $is_id = false)
 	{
 		$request = $db->query('', '
 			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
-				openid_uri, passwd_flood
+				openid_uri, passwd_flood, otp_secret, enable_otp, otp_used
 			FROM {db_prefix}members
 			WHERE id_member = {int:id_member}
 			LIMIT 1',
@@ -908,7 +867,7 @@ function loadExistingMember($name, $is_id = false)
 		// Try to find the user, assuming a member_name was passed...
 		$request = $db->query('', '
 			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
-				openid_uri, passwd_flood
+				openid_uri, passwd_flood, otp_secret, enable_otp, otp_used
 			FROM {db_prefix}members
 			WHERE ' . (defined('DB_CASE_SENSITIVE') ? 'LOWER(member_name) = LOWER({string:user_name})' : 'member_name = {string:user_name}') . '
 			LIMIT 1',
@@ -923,7 +882,7 @@ function loadExistingMember($name, $is_id = false)
 
 			$request = $db->query('', '
 				SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt, openid_uri,
-				passwd_flood
+				passwd_flood, otp_secret, enable_otp, otp_used
 				FROM {db_prefix}members
 				WHERE email_address = {string:user_name}
 				LIMIT 1',

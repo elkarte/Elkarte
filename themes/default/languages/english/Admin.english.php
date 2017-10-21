@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; Admin
+// Version: 1.1; Admin
 
 $txt['admin_boards'] = 'Boards';
 $txt['admin_back_to'] = 'Back to admin panel';
@@ -50,9 +50,22 @@ $txt['admin_checkbox_agreement'] = 'Show a checkbox for the agreement in registr
 $txt['admin_agreement_default'] = 'Default';
 $txt['admin_agreement_select_language'] = 'Language to edit';
 $txt['admin_agreement_select_language_change'] = 'Change';
+
 $txt['admin_delete_members'] = 'Delete Selected Members';
+$txt['admin_change_primary_membergroup'] = 'Change primary member group';
+$txt['admin_change_secondary_membergroup'] = 'Change/add additional member group';
+$txt['confirm_remove_membergroup'] = 'Selecting this all the membergroups will be removed! Are you sure?';
+$txt['confirm_change_primary_membergroup'] = 'Are you sure you want to change the primary group of the selected members?';
+$txt['confirm_change_secondary_membergroup'] = 'Are you sure you want to change the additional group of the selected members?';
+$txt['admin_ban_usernames'] = 'Ban by usernames';
+$txt['admin_ban_useremails'] = 'Ban by email addresses';
+$txt['admin_ban_userips'] = 'Ban by IPs';
+$txt['admin_ban_usernames_and_emails'] = 'Ban by usernames and email addresses';
+$txt['admin_ban_name'] = 'Mass-user Ban';
+$txt['remove_groups'] = 'Remove all groups';
+
 $txt['admin_repair'] = 'Repair All boards and topics';
-$txt['admin_main_welcome'] = 'This is your &quot;%1$s&quot;.  From here, you can edit settings, maintain your forum, view logs, install packages, manage themes, and many other things.<br /><br />If you have any trouble, please look at the &quot;Support &amp; Credits&quot; page.  If the information there doesn\'t help you, feel free to <a href="http://www.elkarte.net/index.php" target="_blank" class="new_win">look to us for help</a> with the problem.<br />You may also find answers to your questions or problems by clicking the <img src="%3$s/helptopics.png" alt="%2$s" title="%2$s" /> symbols for more information on the related functions.';
+$txt['admin_main_welcome'] = 'This is your &quot;%1$s&quot;.  From here, you can edit settings, maintain your forum, view logs, install packages, manage themes, and many other things.<br /><br />If you have any trouble, please look at the &quot;Support &amp; Credits&quot; page.  If the information there doesn\'t help you, feel free to <a href="http://www.elkarte.net/index.php" target="_blank" class="new_win">look to us for help</a> with the problem.<br />You may also find answers to your questions or problems by clicking the <i class="helpicon i-help"><s>Help</s></i> symbols for more information on the related functions.';
 $txt['admin_news_desc'] = 'Please place one news item per box. BBC tags, such as <span>[b]</span>, <span>[i]</span> and <span>[u]</span> are allowed in your news, as well as smileys. Clear a news item\'s text box to remove it.';
 $txt['administrators'] = 'Forum Administrators';
 $txt['admin_reserved_desc'] = 'Reserved names will keep members from registering certain user names or using these words in their displayed names. Choose the options you wish to use from the bottom before submitting.';
@@ -63,7 +76,6 @@ $txt['admin_check_user'] = 'Check user name.';
 $txt['admin_check_display'] = 'Check display name.';
 $txt['admin_newsletter_send'] = 'You can email anyone from this page. The email addresses of the selected member groups should appear below, but you may remove or add any email addresses you wish. Be sure that each address is separated in this fashion: \'address1; address2\'.';
 $txt['admin_fader_delay'] = 'Fading delay between items for the news fader';
-$txt['admin_bbc'] = 'Show BBC Buttons on Posting and PM Send Pages.';
 $txt['zero_for_no_limit'] = '(0 for no limit)';
 $txt['zero_to_disable'] = '(0 to disable)';
 
@@ -124,6 +136,10 @@ $txt['viewmembers_online'] = 'Last Online';
 
 $txt['smileys_manage'] = 'Smileys and Message Icons';
 $txt['smileys_manage_info'] = 'Install new smiley sets, add smileys to existing sets or manage your message icons.';
+
+$txt['bbc_manage'] = 'Bulletin Board Codes (BBC)';
+$txt['bbc_manage_info'] = 'Add, remove, and edit bulletin board codes.';
+
 $txt['package_info'] = 'Install, download and upload Modification packages; check File Permissions and FTP settings.';
 $txt['theme_admin'] = 'Theme Management';
 $txt['theme_admin_info'] = 'Install new themes, select themes that are available for your users and set or reset theme options.';
@@ -387,6 +403,11 @@ $txt['attachmentThumbHeight'] = 'Maximum height of thumbnails';
 $txt['attachment_thumbnail_settings'] = 'Thumbnail Settings';
 $txt['attachment_security_settings'] = 'Attachment security settings';
 
+$txt['attachment_inline_title'] = 'Inline attachment settings';
+$txt['attachment_inline_enabled'] = 'Enable the display of in line attachments';
+$txt['attachment_inline_basicmenu'] = 'Only show basic menu';
+$txt['attachment_inline_quotes'] = 'Check to enable display of in line attachments in quotes';
+
 $txt['attach_dir_does_not_exist'] = 'Does Not Exist';
 $txt['attach_dir_not_writable'] = 'Not Writable';
 $txt['attach_dir_files_missing'] = 'Files Missing (<a href="{repair_url}">Repair</a>)';
@@ -607,9 +628,9 @@ $txt['bbcTagsToUse'] = 'Enabled BBC tags';
 $txt['bbcTagsToUse_select'] = 'Select the tags allowed to be used';
 $txt['bbcTagsToUse_select_all'] = 'Select all tags';
 
-$txt['enableStickyTopics'] = 'Enable pinned topics';
 $txt['enableParticipation'] = 'Enable participation icons';
 $txt['enableFollowup'] = 'Enable followups';
+$txt['enable_unwatch'] = 'Enable unwatching of topics';
 $txt['oldTopicDays'] = 'Time before topic is warned as old on reply';
 $txt['oldTopicDays_zero'] = '0 to disable';
 $txt['defaultMaxTopics'] = 'Number of topics per page in the message index';
@@ -631,7 +652,8 @@ $txt['general_settings'] = 'General';
 $txt['database_paths_settings'] = 'Database and Paths';
 $txt['cookies_sessions_settings'] = 'Cookies and Sessions';
 $txt['caching_settings'] = 'Caching';
-$txt['load_balancing_settings'] = 'Load Balancing';
+$txt['loadavg'] = 'Server Load';
+$txt['loadavg_settings'] = 'Load Management';
 $txt['phpinfo_settings'] = 'PHP Info';
 $txt['phpinfo_localsettings'] = 'Local Settings';
 $txt['phpinfo_defaultsettings'] = 'Default Settings';
@@ -686,7 +708,6 @@ $txt['badbehavior_title'] = 'Bad Behavior';
 $txt['mods_cat_modifications_misc'] = 'Miscellaneous';
 $txt['mods_cat_layout'] = 'Layout';
 $txt['karma'] = 'Karma';
-$txt['mentions_settings_desc'] = 'Mentioning allow members of your community to be alerted when they are @mentioned in a post, added as a buddy or if one of their posts is liked by another member.';
 $txt['moderation_settings_short'] = 'Moderation';
 $txt['signature_settings_short'] = 'Signatures';
 $txt['custom_profile_shorttitle'] = 'Profile Fields';
@@ -694,7 +715,7 @@ $txt['pruning_title'] = 'Log Pruning';
 
 $txt['core_settings_activation_message'] = 'The feature {core_feature} has been activated, click on the title to configure it';
 $txt['core_settings_deactivation_message'] = 'The feature {core_feature} has been deactivated';
-$txt['core_settings_generic_error'] = 'An unforeseen error occurred, please reload the page and try again';
+$txt['core_settings_generic_error'] = 'An error occurred, please reload the page and try again.';
 
 $txt['boardsEdit'] = 'Modify Boards';
 $txt['mboards_new_cat'] = 'Create new category';
@@ -745,11 +766,9 @@ $txt['hooks_field_included_file'] = 'Included file';
 $txt['hooks_field_file_name'] = 'File Name';
 $txt['hooks_field_hook_exists'] = 'Status';
 $txt['hooks_active'] = 'Exists';
-$txt['hooks_disabled'] = 'Disabled';
+$txt['hooks_disabled'] = 'Disabled'; //@deprecated since 1.1 - it's no more possible to disable hooks
 $txt['hooks_missing'] = 'Not found';
 $txt['hooks_no_hooks'] = 'There are currently no hooks in the system.';
-$txt['hooks_button_remove'] = 'Remove';
-$txt['hooks_disable_instructions'] = 'Click on the status icon to enable or disable the hook';
 $txt['hooks_disable_legend'] = 'Legend';
 $txt['hooks_disable_legend_exists'] = 'the hook exists and is active';
 $txt['hooks_disable_legend_disabled'] = 'the hook exists but has been disabled';
@@ -766,3 +785,11 @@ $txt['words_sep'] = 'Words separator';
 
 $txt['admin_order_title'] = 'Ordering Error';
 $txt['admin_order_error'] = 'An unknown error occurred while processing your request';
+
+// Known controllers that can work on the front page
+$txt['default'] = 'Default';
+$txt['front_page'] = 'Select the action to show on the front page:';
+
+$txt['BoardIndex_Controller'] = 'Board Index';
+$txt['MessageIndex_Controller'] = 'Content of a board';
+$txt['message_index_frontpage'] = 'Select the board to show on the front page:';

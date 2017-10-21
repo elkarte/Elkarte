@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; MaillistTemplates
+// Version: 1.1; MaillistTemplates
 
 // Do not translate anything that is between {}, they are used as replacement variables and MUST remain exactly how they are.
 // 		Additionally do not translate the @additioinal_params: line or the variable names in the lines that follow it.  You may

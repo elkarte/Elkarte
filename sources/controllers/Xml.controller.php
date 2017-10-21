@@ -7,19 +7,26 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
- * Xml controller receives XMLhttp requests of various types.
- * (jump to, message and group icons, core features)
+ * Xml_Controller Class
+ *
+ * Receives XMLhttp requests of various types such as
+ * jump to, message and group icons, core features, drag and drop ordering
  */
 class Xml_Controller extends Action_Controller
 {
+	/**
+	 * {@inheritdoc }
+	 */
+	public function trackStats($action = '')
+	{
+		return false;
+	}
+
 	/**
 	 * Main dispatcher for action=xmlhttp.
 	 *
@@ -28,7 +35,6 @@ class Xml_Controller extends Action_Controller
 	public function action_index()
 	{
 		loadTemplate('Xml');
-		require_once(SUBSDIR . '/Action.class.php');
 
 		$subActions = array(
 			'jumpto' => array('controller' => $this, 'function' => 'action_jumpto'),
@@ -48,7 +54,7 @@ class Xml_Controller extends Action_Controller
 
 		// Act a bit special for XML, probably never see it anyway :P
 		if (empty($subAction))
-			fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		// Off we go then, (it will check permissions)
 		$action->dispatch($subAction);
@@ -73,7 +79,9 @@ class Xml_Controller extends Action_Controller
 		{
 			$context['categories'][$id_cat]['name'] = un_htmlspecialchars(strip_tags($cat['name']));
 			foreach ($cat['boards'] as $id_board => $board)
+			{
 				$context['categories'][$id_cat]['boards'][$id_board]['name'] = un_htmlspecialchars(strip_tags($board['name']));
+			}
 		}
 
 		$context['sub_template'] = 'jump_to';
@@ -87,8 +95,8 @@ class Xml_Controller extends Action_Controller
 		global $context, $board;
 
 		require_once(SUBSDIR . '/Editor.subs.php');
-		$context['icons'] = getMessageIcons($board);
 
+		$context['icons'] = getMessageIcons($board);
 		$context['sub_template'] = 'message_icons';
 	}
 
@@ -106,18 +114,18 @@ class Xml_Controller extends Action_Controller
 		$icons = array();
 
 		// Get all the available member group icons
-		$files = scandir($directory);
-		foreach ($files as $id => $file)
+		$files = new FilesystemIterator($directory, FilesystemIterator::SKIP_DOTS);
+		foreach ($files as $file)
 		{
-			if ($file === 'blank.png')
+			if ($file->getFilename() === 'blank.png')
 				continue;
 
-			if (in_array(strtolower(pathinfo($file, PATHINFO_EXTENSION)), $allowedTypes))
+			if (in_array(strtolower($file->getExtension()), $allowedTypes))
 			{
-				$icons[$id] = array(
-					'value' => $file,
+				$icons[] = array(
+					'value' => $file->getFilename(),
 					'name' => '',
-					'url' => $settings['images_url'] . '/group_icons/' .  $file,
+					'url' => $settings['images_url'] . '/group_icons/' . $file->getFilename(),
 					'is_last' => false,
 				);
 			}
@@ -138,6 +146,7 @@ class Xml_Controller extends Action_Controller
 
 		// Just in case, maybe we don't need it
 		loadLanguage('Errors');
+		loadLanguage('Admin');
 
 		// We need (at least) this to ensure that mod files are included
 		call_integration_include_hook('integrate_admin_include');
@@ -145,26 +154,29 @@ class Xml_Controller extends Action_Controller
 		$errors = array();
 		$returns = array();
 		$tokens = array();
+		$feature_title = '';
 
 		// You have to be allowed to do this of course
 		$validation = validateSession();
-		if (empty($validation))
+		if ($validation === true)
 		{
-			require_once(ADMINDIR . '/CoreFeatures.controller.php');
-			$controller = new CoreFeatures_Controller();
+			$controller = new CoreFeatures_Controller(new Event_Manager());
+			$controller->pre_dispatch();
 			$result = $controller->action_index();
 
 			// Load up the core features of the system
-			if (empty($result))
+			if ($result === true)
 			{
-				$id = isset($_POST['feature_id']) ? $_POST['feature_id'] : '';
+				$id = $this->_req->getPost('feature_id', 'trim', '');
 
 				// The feature being enabled does exist, no messing about
 				if (!empty($id) && isset($context['features'][$id]))
 				{
 					$feature = $context['features'][$id];
+					$feature_id = 'feature_' . $id;
+					$feature_title = (!empty($this->_req->post->{$feature_id}) && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']);
 					$returns[] = array(
-						'value' => (!empty($_POST['feature_' . $id]) && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']),
+						'value' => $feature_title,
 					);
 
 					createToken('admin-core', 'post');
@@ -188,14 +200,23 @@ class Xml_Controller extends Action_Controller
 		}
 		// Failed session validation I'm afraid
 		else
-			$errors[] = array('value' => $txt[$validation]);
+			$errors[] = array('value' => isset($txt[$validation]) ? $txt[$validation] : $txt['error_occurred']);
 
 		// Return the response to the calling program
 		$context['sub_template'] = 'generic_xml';
+		addJavascriptVar(array('core_settings_generic_error' => $txt['core_settings_generic_error']), true);
+
+		$message = str_replace('{core_feature}', $feature_title, !empty($feature_id) && !empty($this->_req->post->{$feature_id}) ? $txt['core_settings_activation_message'] : $txt['core_settings_deactivation_message']);
 		$context['xml_data'] = array(
 			'corefeatures' => array(
 				'identifier' => 'corefeature',
 				'children' => $returns,
+			),
+			'messages' => array(
+				'identifier' => 'message',
+				'children' => array(array(
+					'value' => $message
+				)),
 			),
 			'tokens' => array(
 				'identifier' => 'token',
@@ -226,20 +247,21 @@ class Xml_Controller extends Action_Controller
 		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 
 		// You have to be allowed to do this
-		$validation_token = validateToken('admin-sort', 'post', true, false);
+		$validation_token = validateToken('admin-sort', 'post', false, false);
 		$validation_session = validateSession();
 
-		if (empty($validation_session) && $validation_token === true)
+		if ($validation_session === true && $validation_token === true)
 		{
 			// No questions that we are reordering
-			if (isset($_POST['order']) && $_POST['order'] == 'reorder')
+			if ($this->_req->getPost('order', 'trim', '') === 'reorder')
 			{
 				$view_order = 1;
 				$replace = '';
 
 				// The field ids arrive in 1-n view order ...
-				foreach ($_POST['list_custom_profile_fields'] as $id)
+				foreach ($this->_req->post->list_custom_profile_fields as $id)
 				{
+					$id = (int) $id;
 					$replace .= '
 						WHEN id_field = ' . $id . ' THEN ' . $view_order++;
 				}
@@ -317,23 +339,23 @@ class Xml_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Boards.subs.php');
 
 		// Validating that you can do this is always a good idea
-		$validation_token = validateToken('admin-sort', 'post', true, false);
+		$validation_token = validateToken('admin-sort', 'post', false, false);
 		$validation_session = validateSession();
 
-		if (empty($validation_session) && $validation_token === true)
+		if ($validation_session === true && $validation_token === true)
 		{
 			// No question that we are doing some board reordering
-			if (isset($_POST['order']) && $_POST['order'] === 'reorder' && isset($_POST['moved']))
+			if ($this->_req->getPost('order', 'trim', '') === 'reorder' && isset($this->_req->post->moved))
 			{
 				$list_order = 0;
 				$moved_key = 0;
 
 				// What board was drag and dropped?
-				list (, $board_moved,) = explode(',', $_POST['moved']);
+				list (, $board_moved,) = explode(',', $this->_req->post->moved);
 				$board_moved = (int) $board_moved;
 
 				// The board ids arrive in 1-n view order ...
-				foreach ($_POST['cbp'] as $id)
+				foreach ($this->_req->post->cbp as $id)
 				{
 					list ($category, $board, $childof) = explode(',', $id);
 
@@ -462,8 +484,11 @@ class Xml_Controller extends Action_Controller
 
 	/**
 	 * Reorders the smileys from a drag/drop event
-	 * Will move them from post to popup location and visa-versa
-	 * Will move them to new rows
+	 *
+	 * What it does:
+	 *
+	 * - Will move them from post to popup location and visa-versa
+	 * - Will move them to new rows
 	 */
 	public function action_smileyorder()
 	{
@@ -480,28 +505,29 @@ class Xml_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Smileys.subs.php');
 
 		// You have to be allowed to do this
-		$validation_token = validateToken('admin-sort', 'post', true, false);
+		$validation_token = validateToken('admin-sort', 'post', false, false);
 		$validation_session = validateSession();
-		if (empty($validation_session) && $validation_token === true)
+
+		if ($validation_session === true && $validation_token === true)
 		{
 			// Valid posting
-			if (isset($_POST['order']) && $_POST['order'] == 'reorder')
+			if ($this->_req->getPost('order', 'trim', '') === 'reorder')
 			{
 				// Get the details on the moved smile
-				list (, $smile_moved) = explode('_', $_POST['moved']);
+				list (, $smile_moved) = explode('_', $this->_req->post->moved);
 				$smile_moved = (int) $smile_moved;
 				$smile_moved_details = getSmiley($smile_moved);
 
 				// Check if we moved rows or locations
 				$smile_received_location = null;
 				$smile_received_row = null;
-				if (!empty($_POST['received']))
+				if (!empty($this->_req->post->received))
 				{
 					$displayTypes = array(
 						'postform' => 0,
 						'popup' => 2
 					);
-					list ($smile_received_location, $smile_received_row) = explode('|', $_POST['received']);
+					list ($smile_received_location, $smile_received_row) = explode('|', $this->_req->post->received);
 					$smile_received_location = $displayTypes[substr($smile_received_location, 7)];
 				}
 
@@ -513,7 +539,7 @@ class Xml_Controller extends Action_Controller
 					$moved_key = 0;
 					$smiley_tree = array();
 
-					foreach ($_POST['smile'] as $smile_id)
+					foreach ($this->_req->post->smile as $smile_id)
 					{
 						$smiley_tree[] = $smile_id;
 
@@ -566,8 +592,8 @@ class Xml_Controller extends Action_Controller
 						}
 
 						// Clear the cache, its stale now
-						cache_put_data('parsing_smileys', null, 480);
-						cache_put_data('posting_smileys', null, 480);
+						Cache::instance()->remove('parsing_smileys');
+						Cache::instance()->remove('posting_smileys');
 						$order[] = array('value' => $txt['smileys_moved_done']);
 					}
 				}
@@ -634,22 +660,22 @@ class Xml_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Maillist.subs.php');
 
 		// You have to be allowed to do this
-		$validation_token = validateToken('admin-sort', 'post', true, false);
+		$validation_token = validateToken('admin-sort', 'post', false, false);
 		$validation_session = validateSession();
 
-		if (empty($validation_session) && $validation_token === true)
+		if ($validation_session === true && $validation_token === true)
 		{
 			// No questions that we are reordering
-			if (isset($_POST['order'], $_POST['list_sort_email_fp']) && $_POST['order'] == 'reorder')
+			if (isset($this->_req->post->order, $this->_req->post->list_sort_email_fp) && $this->_req->post->order === 'reorder')
 			{
 				$filters = array();
 				$filter_order = 1;
 				$replace = '';
 
 				// The field ids arrive in 1-n view order ...
-				foreach ($_POST['list_sort_email_fp'] as $id)
+				foreach ($this->_req->post->list_sort_email_fp as $id)
 				{
-					$filters[] = $id;
+					$filters[] = (int) $id;
 					$replace .= '
 						WHEN id_filter = ' . $id . ' THEN ' . $filter_order++;
 				}
@@ -713,7 +739,7 @@ class Xml_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		// Initilize
+		// Initialize
 		$context['xml_data'] = array();
 		$errors = array();
 		$order = array();
@@ -724,13 +750,13 @@ class Xml_Controller extends Action_Controller
 		require_once(SUBSDIR . '/MessageIcons.subs.php');
 
 		// You have to be allowed to do this
-		$validation_token = validateToken('admin-sort', 'post', true, false);
+		$validation_token = validateToken('admin-sort', 'post', false, false);
 		$validation_session = validateSession();
 
-		if (empty($validation_session) && $validation_token === true)
+		if ($validation_session === true && $validation_token === true)
 		{
 			// No questions that we are reordering
-			if (isset($_POST['order']) && $_POST['order'] == 'reorder')
+			if ($this->_req->getPost('order', 'trim', '') === 'reorder')
 			{
 				// Get the current list of icons.
 				$message_icons = fetchMessageIconsDetails();
@@ -739,7 +765,7 @@ class Xml_Controller extends Action_Controller
 				$iconInsert = array();
 
 				// The field ids arrive in 1-n view order, so we simply build an update array
-				foreach ($_POST['list_message_icon_list'] as $id)
+				foreach ($this->_req->post->list_message_icon_list as $id)
 				{
 						$iconInsert[] = array($id, $message_icons[$id]['board_id'], $message_icons[$id]['title'], $message_icons[$id]['filename'], $view_order);
 						$view_order++;

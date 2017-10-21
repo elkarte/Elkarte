@@ -7,22 +7,17 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.4
+ * @version 1.1
  *
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
- * News Controller
+ * News Controller class
  */
 class News_Controller extends Action_Controller
 {
@@ -39,6 +34,19 @@ class News_Controller extends Action_Controller
 	private $_limit;
 
 	/**
+	 * {@inheritdoc }
+	 */
+	public function trackStats($action = '')
+	{
+		if ($action === 'action_showfeed')
+		{
+			return false;
+		}
+
+		return parent::trackStats($action);
+	}
+
+	/**
 	 * Dispatcher. Forwards to the action to execute.
 	 *
 	 * @see Action_Controller::action_index()
@@ -53,23 +61,30 @@ class News_Controller extends Action_Controller
 	 * Outputs xml data representing recent information or a profile.
 	 *
 	 * What it does:
+	 *
 	 * - Can be passed 4 subactions which decide what is output:
-	 *   'recent' for recent posts,
-	 *   'news' for news topics,
-	 *   'members' for recently registered members,
-	 *   'profile' for a member's profile.
+	 *     * 'recent' for recent posts,
+	 *     * 'news' for news topics,
+	 *     * 'members' for recently registered members,
+	 *     * 'profile' for a member's profile.
 	 * - To display a member's profile, a user id has to be given. (;u=1) e.g. ?action=.xml;sa=profile;u=1;type=atom
-	 * - Outputs an rss feed instead of a proprietary one if the 'type' $_GET
-	 * parameter is 'rss' or 'rss2'.
+	 * - Outputs an feed based on the the 'type'
+	 * 	   * parameter is 'rss', 'rss2', 'rdf', 'atom'.
+	 * - Several sub action options are respected
+	 *     * limit=x - display the "x" most recent posts
+	 *     * board=y - display only the recent posts from board "y"
+	 *     * boards=x,y,z - display only the recent posts from the specified boards
+	 *     * c=x or c=x,y,z - display only the recent posts from boards in the specified category/categories
+	 *     * action=.xml;sa=recent;board=2;limit=10
 	 * - Accessed via ?action=.xml
 	 * - Does not use any templates, sub templates, or template layers.
+	 * - Use ;debug to view output for debugging feeds
 	 *
 	 * @uses Stats language file.
 	 */
 	public function action_showfeed()
 	{
-		global $board, $board_info, $context, $scripturl, $boardurl, $txt, $modSettings, $user_info;
-		global $forum_version, $cdata_override, $settings;
+		global $board, $board_info, $context, $txt, $modSettings, $user_info;
 
 		// If it's not enabled, die.
 		if (empty($modSettings['xmlnews_enable']))
@@ -80,7 +95,7 @@ class News_Controller extends Action_Controller
 
 		// Default to latest 5.  No more than whats defined in the ACP or 255
 		$limit = empty($modSettings['xmlnews_limit']) ? 5 : min($modSettings['xmlnews_limit'], 255);
-		$this->_limit = empty($_GET['limit']) || (int) $_GET['limit'] < 1 ? $limit : min((int) $_GET['limit'], $limit);
+		$this->_limit = empty($this->_req->query->limit) || (int) $this->_req->query->limit < 1 ? $limit : min((int) $this->_req->query->limit, $limit);
 
 		// Handle the cases where a board, boards, or category is asked for.
 		$this->_query_this_board = '1=1';
@@ -88,15 +103,15 @@ class News_Controller extends Action_Controller
 			'highest' => 'm.id_msg <= b.id_last_msg',
 		);
 
-		if (!empty($_REQUEST['c']) && empty($board))
+		// Specifying specific categories only?
+		if (!empty($this->_req->query->c) && empty($board))
 		{
-			$categories = array_map('intval', explode(',', $_REQUEST['c']));
+			$categories = array_map('intval', explode(',', $this->_req->query->c));
 
 			if (count($categories) == 1)
 			{
 				require_once(SUBSDIR . '/Categories.subs.php');
 				$feed_title = categoryName($categories[0]);
-
 				$feed_title = ' - ' . strip_tags($feed_title);
 			}
 
@@ -112,17 +127,18 @@ class News_Controller extends Action_Controller
 			if ($total_cat_posts > 100 && $total_cat_posts > $modSettings['totalMessages'] / 15)
 				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 400 - $this->_limit * 5);
 		}
-		elseif (!empty($_REQUEST['boards']))
+		// Maybe they only want to see feeds form some certain boards?
+		elseif (!empty($this->_req->query->boards))
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
-			$query_boards = array_map('intval', explode(',', $_REQUEST['boards']));
+			$query_boards = array_map('intval', explode(',', $this->_req->query->boards));
 
 			$boards_data = fetchBoardsInfo(array('boards' => $query_boards), array('selects' => 'detailed'));
 
 			// Either the board specified doesn't exist or you have no access.
 			$num_boards = count($boards_data);
 			if ($num_boards == 0)
-				fatal_lang_error('no_board');
+				throw new Elk_Exception('no_board');
 
 			$total_posts = 0;
 			$boards = array_keys($boards_data);
@@ -140,6 +156,7 @@ class News_Controller extends Action_Controller
 			if ($total_posts > 100 && $total_posts > $modSettings['totalMessages'] / 12)
 				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 500 - $this->_limit * 5);
 		}
+		// Just a single board
 		elseif (!empty($board))
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
@@ -150,7 +167,7 @@ class News_Controller extends Action_Controller
 			$this->_query_this_board = 'b.id_board = ' . $board;
 
 			// Try to look through just a few messages, if at all possible.
-			if ($boards_data[$board]['num_posts'] > 80 && $boards_data[$board]['num_posts'] > $modSettings['totalMessages'] / 10)
+			if ($boards_data[(int) $board]['num_posts'] > 80 && $boards_data[(int) $board]['num_posts'] > $modSettings['totalMessages'] / 10)
 				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 600 - $this->_limit * 5);
 		}
 		else
@@ -160,8 +177,10 @@ class News_Controller extends Action_Controller
 			$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 100 - $this->_limit * 5);
 		}
 
-		// If format isn't set, rss2 is default
-		$xml_format = isset($_GET['type']) && in_array($_GET['type'], array('rss', 'rss2', 'atom', 'rdf', 'webslice')) ? $_GET['type'] : 'rss2';
+		// If format isn't set, or is wrong, rss2 is default
+		$xml_format = $this->_req->getQuery('type', 'trim', 'rss2');
+		if (!in_array($xml_format, array('rss', 'rss2', 'atom', 'rdf')))
+			$xml_format = 'rss2';
 
 		// List all the different types of data they can pull.
 		$subActions = array(
@@ -174,174 +193,77 @@ class News_Controller extends Action_Controller
 		// Easy adding of sub actions
 		call_integration_hook('integrate_xmlfeeds', array(&$subActions));
 
-		$subAction = isset($_GET['sa']) && isset($subActions[$_GET['sa']]) ? $_GET['sa'] : 'recent';
-
-		// Webslices doesn't do everything (yet? ever?) so for now only recent posts is allowed in that format
-		if ($xml_format == 'webslice' && $subAction != 'recent')
-			$xml_format = 'rss2';
-		// If this is webslices we kinda cheat - we allow a template that we call direct for the HTML, and we override the CDATA.
-		elseif ($xml_format == 'webslice')
-		{
-			$context['user'] += $user_info;
-			$cdata_override = true;
-			loadTemplate('Xml');
-		}
+		$subAction = isset($this->_req->query->sa) && isset($subActions[$this->_req->query->sa]) ? $this->_req->query->sa : 'recent';
 
 		// We only want some information, not all of it.
-		$cachekey = array($xml_format, $_GET['action'], $this->_limit, $subAction);
+		$cachekey = array($xml_format, $this->_req->query->action, $this->_limit, $subAction);
 		foreach (array('board', 'boards', 'c') as $var)
 		{
-			if (isset($_REQUEST[$var]))
-				$cachekey[] = $_REQUEST[$var];
+			if (isset($this->_req->query->{$var}))
+				$cachekey[] = $this->_req->query->{$var};
 		}
 
 		$cachekey = md5(serialize($cachekey) . (!empty($this->_query_this_board) ? $this->_query_this_board : ''));
 		$cache_t = microtime(true);
+		$cache = Cache::instance();
 
 		// Get the associative array representing the xml.
-		if (!empty($modSettings['cache_enable']) && (!$user_info['is_guest'] || $modSettings['cache_enable'] >= 3))
-			$xml = cache_get_data('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, 240);
+		if (!$user_info['is_guest'] || $cache->levelHigherThan(2))
+			$xml = $cache->get('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, 240);
 
 		if (empty($xml))
 		{
 			$xml = $this->{$subActions[$subAction][0]}($xml_format);
 
-			if (!empty($modSettings['cache_enable']) && (($user_info['is_guest'] && $modSettings['cache_enable'] >= 3)
-			|| (!$user_info['is_guest'] && (microtime(true) - $cache_t > 0.2))))
-				cache_put_data('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, $xml, 240);
+			if ($cache->isEnabled() && (($user_info['is_guest'] && $cache->levelHigherThan(2)) || (!$user_info['is_guest'] && (microtime(true) - $cache_t > 0.2))))
+				$cache->put('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, $xml, 240);
 		}
 
-		$feed_title = encode_special(strip_tags(un_htmlspecialchars($context['forum_name']) . (isset($feed_title) ? $feed_title : '')));
+		$context['feed_title'] = encode_special(strip_tags(un_htmlspecialchars($context['forum_name']) . (isset($feed_title) ? $feed_title : '')));
+
+		// We send a feed with recent posts, and alerts for PMs for logged in users
+		$context['recent_posts_data'] = $xml;
+		$context['xml_format'] = $xml_format;
+
+		obStart(!empty($modSettings['enableCompressedOutput']));
 
 		// This is an xml file....
-		@ob_end_clean();
-		if (!empty($modSettings['enableCompressedOutput']))
-			ob_start('ob_gzhandler');
-		else
-			ob_start();
-
-		if (isset($_REQUEST['debug']))
+		if (isset($this->_req->query->debug))
 			header('Content-Type: text/xml; charset=UTF-8');
-		elseif ($xml_format == 'rss' || $xml_format == 'rss2' || $xml_format == 'webslice')
+		elseif ($xml_format === 'rss' || $xml_format === 'rss2')
 			header('Content-Type: application/rss+xml; charset=UTF-8');
-		elseif ($xml_format == 'atom')
+		elseif ($xml_format === 'atom')
 			header('Content-Type: application/atom+xml; charset=UTF-8');
-		elseif ($xml_format == 'rdf')
+		elseif ($xml_format === 'rdf')
 			header('Content-Type: ' . (isBrowser('ie') ? 'text/xml' : 'application/rdf+xml') . '; charset=UTF-8');
 
-		// First, output the xml header.
-		echo '<?xml version="1.0" encoding="UTF-8"?' . '>';
+		loadTemplate('Xml');
+		Template_Layers::instance()->removeAll();
 
 		// Are we outputting an rss feed or one with more information?
-		if ($xml_format == 'rss' || $xml_format == 'rss2')
+		if ($xml_format === 'rss' || $xml_format === 'rss2')
 		{
-			// Start with an RSS 2.0 header.
-			echo '
-	<rss version=', $xml_format == 'rss2' ? '"2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"' : '"0.92"', ' xml:lang="', strtr($txt['lang_locale'], '_', '-'), '">
-		<channel>
-			<title>', $feed_title, '</title>
-			<link>', $scripturl, '</link>
-			<description><![CDATA[', un_htmlspecialchars(strip_tags($txt['xml_rss_desc'])), ']]></description>
-			<generator>ElkArte</generator>
-			<ttl>30</ttl>
-			<image>
-				<url>', $settings['default_theme_url'], '/images/logo.png</url>
-				<title>', $feed_title, '</title>
-				<link>', $scripturl, '</link>
-			</image>';
-
-			// Output all of the associative array, start indenting with 2 tabs, and name everything "item".
-			dumpTags($xml, 2, 'item', $xml_format);
-
-			// Output the footer of the xml.
-			echo '
-		</channel>
-	</rss>';
+			$context['sub_template'] = 'feedrss';
 		}
-		elseif ($xml_format == 'webslice')
-		{
-			// Format specification http://msdn.microsoft.com/en-us/library/cc304073%28VS.85%29.aspx
-			// Known browsers to support webslices: IE8, IE9, Firefox with Webchunks addon.
-			// It uses RSS 2.
-
-			// We send a feed with recent posts, and alerts for PMs for logged in users
-			$context['recent_posts_data'] = $xml;
-			$context['can_pm_read'] = allowedTo('pm_read');
-
-			// This always has RSS 2
-			echo '
-	<rss version="2.0" xmlns:mon="http://www.microsoft.com/schemas/rss/monitoring/2007" xml:lang="', strtr($txt['lang_locale'], '_', '-'), '">
-		<channel>
-			<title>', $feed_title, ' - ', $txt['recent_posts'], '</title>
-			<link>', $scripturl, '?action=recent</link>
-			<description><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></description>
-			<item>
-				<title>', $feed_title, ' - ', $txt['recent_posts'], '</title>
-				<link>', $scripturl, '?action=recent</link>
-				<description><![CDATA[
-					', template_webslice_header_above(), '
-					', template_webslice_recent_posts(), '
-				]]></description>
-			</item>
-		</channel>
-	</rss>';
-		}
-		elseif ($xml_format == 'atom')
+		elseif ($xml_format === 'atom')
 		{
 			$url_parts = array();
 			foreach (array('board', 'boards', 'c') as $var)
-				if (isset($_REQUEST[$var]))
-					$url_parts[] = $var . '=' . (is_array($_REQUEST[$var]) ? implode(',', $_REQUEST[$var]) : $_REQUEST[$var]);
+			{
+				if (isset($this->_req->query->{$var}))
+				{
+					$url_parts[] = $var . '=' . (is_array($this->_req->query->{$var}) ? implode(',', $this->_req->query->{$var}) : $this->_req->query->{$var});
+				}
+			}
 
-			echo '
-	<feed xmlns="http://www.w3.org/2005/Atom">
-		<title>', $feed_title, '</title>
-		<link rel="alternate" type="text/html" href="', $scripturl, '" />
-		<link rel="self" type="application/rss+xml" href="', $scripturl, '?type=atom;action=.xml', !empty($url_parts) ? ';' . implode(';', $url_parts) : '', '" />
-		<id>', $scripturl, '</id>
-		<icon>', $boardurl, '/favicon.ico</icon>
-
-		<updated>', gmstrftime('%Y-%m-%dT%H:%M:%SZ'), '</updated>
-		<subtitle><![CDATA[', strip_tags(un_htmlspecialchars($txt['xml_rss_desc'])), ']]></subtitle>
-		<generator uri="http://www.elkarte.net" version="', strtr($forum_version, array('ElkArte' => '')), '">ElkArte</generator>
-		<author>
-			<name>', strip_tags(un_htmlspecialchars($context['forum_name'])), '</name>
-		</author>';
-
-			dumpTags($xml, 2, 'entry', $xml_format);
-
-			echo '
-	</feed>';
+			$context['url_parts'] = !empty($url_parts) ? implode(';', $url_parts) : '';
+			$context['sub_template'] = 'feedatom';
 		}
 		// rdf by default
 		else
 		{
-			echo '
-	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://purl.org/rss/1.0/">
-		<channel rdf:about="', $scripturl, '">
-			<title>', $feed_title, '</title>
-			<link>', $scripturl, '</link>
-			<description><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></description>
-			<items>
-				<rdf:Seq>';
-
-			foreach ($xml as $item)
-				echo '
-					<rdf:li rdf:resource="', $item['link'], '" />';
-
-			echo '
-				</rdf:Seq>
-			</items>
-		</channel>
-	';
-
-			dumpTags($xml, 1, 'item', $xml_format);
-
-			echo '
-	</rdf:RDF>';
+			$context['sub_template'] = 'rdf';
 		}
-
-		obExit(false);
 	}
 
 	/**
@@ -355,6 +277,7 @@ class News_Controller extends Action_Controller
 	{
 		global $scripturl;
 
+		// Not allowed, then you get nothing
 		if (!allowedTo('view_mlist'))
 			return array();
 
@@ -368,7 +291,7 @@ class News_Controller extends Action_Controller
 		foreach ($members as $member)
 		{
 			// Make the data look rss-ish.
-			if ($xml_format == 'rss' || $xml_format == 'rss2')
+			if ($xml_format === 'rss' || $xml_format === 'rss2')
 				$data[] = array(
 					'title' => cdata_parse($member['real_name']),
 					'link' => $scripturl . '?action=profile;u=' . $member['id_member'],
@@ -376,12 +299,12 @@ class News_Controller extends Action_Controller
 					'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $member['date_registered']),
 					'guid' => $scripturl . '?action=profile;u=' . $member['id_member'],
 				);
-			elseif ($xml_format == 'rdf')
+			elseif ($xml_format === 'rdf')
 				$data[] = array(
 					'title' => cdata_parse($member['real_name']),
 					'link' => $scripturl . '?action=profile;u=' . $member['id_member'],
 				);
-			elseif ($xml_format == 'atom')
+			elseif ($xml_format === 'atom')
 				$data[] = array(
 					'title' => cdata_parse($member['real_name']),
 					'link' => $scripturl . '?action=profile;u=' . $member['id_member'],
@@ -419,20 +342,22 @@ class News_Controller extends Action_Controller
 
 		// Prepare it for the feed in the format chosen (rss, atom, etc)
 		$data = array();
+		$bbc_parser = \BBC\ParserWrapper::instance();
+
 		foreach ($results as $row)
 		{
 			// Limit the length of the message, if the option is set.
 			if (!empty($modSettings['xmlnews_maxlen']) && Util::strlen(str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
 				$row['body'] = strtr(Util::shorten_text(str_replace('<br />', "\n", $row['body']), $modSettings['xmlnews_maxlen'], true), array("\n" => '<br />'));
 
-			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// Dirty mouth?
-			censorText($row['body']);
-			censorText($row['subject']);
+			$row['body'] = censor($row['body']);
+			$row['subject'] = censor($row['subject']);
 
 			// Being news, this actually makes sense in rss format.
-			if ($xml_format == 'rss' || $xml_format == 'rss2')
+			if ($xml_format === 'rss' || $xml_format === 'rss2')
 			{
 				$data[] = array(
 					'title' => cdata_parse($row['subject']),
@@ -446,14 +371,14 @@ class News_Controller extends Action_Controller
 				);
 
 				// Add the poster name on if we are rss2
-				if ($xml_format == 'rss2')
+				if ($xml_format === 'rss2')
 				{
 					$data[count($data) - 1]['dc:creator'] = $row['poster_name'];
 					unset($data[count($data) - 1]['author']);
 				}
 			}
 			// RDF Format anyone
-			elseif ($xml_format == 'rdf')
+			elseif ($xml_format === 'rdf')
 			{
 				$data[] = array(
 					'title' => cdata_parse($row['subject']),
@@ -462,7 +387,7 @@ class News_Controller extends Action_Controller
 				);
 			}
 			// Atom feed
-			elseif ($xml_format == 'atom')
+			elseif ($xml_format === 'atom')
 			{
 				$data[] = array(
 					'title' => cdata_parse($row['subject']),
@@ -523,20 +448,22 @@ class News_Controller extends Action_Controller
 
 		// Loop on the results and prepare them in the format requested
 		$data = array();
+		$bbc_parser = \BBC\ParserWrapper::instance();
+
 		foreach ($results as $row)
 		{
 			// Limit the length of the message, if the option is set.
 			if (!empty($modSettings['xmlnews_maxlen']) && Util::strlen(str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
 				$row['body'] = strtr(Util::shorten_text(str_replace('<br />', "\n", $row['body']), $modSettings['xmlnews_maxlen'], true), array("\n" => '<br />'));
 
-			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// You can't say that
-			censorText($row['body']);
-			censorText($row['subject']);
+			$row['body'] = censor($row['body']);
+			$row['subject'] = censor($row['subject']);
 
 			// Doesn't work as well as news, but it kinda does..
-			if ($xml_format == 'rss' || $xml_format == 'rss2')
+			if ($xml_format === 'rss' || $xml_format === 'rss2')
 			{
 				$data[] = array(
 					'title' => $row['subject'],
@@ -550,13 +477,13 @@ class News_Controller extends Action_Controller
 				);
 
 				// Add the poster name on if we are rss2
-				if ($xml_format == 'rss2')
+				if ($xml_format === 'rss2')
 				{
 					$data[count($data) - 1]['dc:creator'] = $row['poster_name'];
 					unset($data[count($data) - 1]['author']);
 				}
 			}
-			elseif ($xml_format == 'rdf')
+			elseif ($xml_format === 'rdf')
 			{
 				$data[] = array(
 					'title' => $row['subject'],
@@ -564,7 +491,7 @@ class News_Controller extends Action_Controller
 					'description' => cdata_parse($row['body']),
 				);
 			}
-			elseif ($xml_format == 'atom')
+			elseif ($xml_format === 'atom')
 			{
 				$data[] = array(
 					'title' => $row['subject'],
@@ -629,11 +556,11 @@ class News_Controller extends Action_Controller
 		global $scripturl, $memberContext, $user_profile, $modSettings, $user_info;
 
 		// You must input a valid user....
-		if (empty($_GET['u']) || loadMemberData((int) $_GET['u']) === false)
+		if (empty($this->_req->query->u) || loadMemberData((int) $this->_req->query->u) === false)
 			return array();
 
 		// Make sure the id is a number and not "I like trying to hack the database".
-		$uid = (int) $_GET['u'];
+		$uid = (int) $this->_req->query->u;
 
 		// Load the member's contextual information!
 		if (!loadMemberContext($uid) || !allowedTo('profile_view_any'))
@@ -644,7 +571,8 @@ class News_Controller extends Action_Controller
 		// No feed data yet
 		$data = array();
 
-		if ($xml_format == 'rss' || $xml_format == 'rss2')
+		if ($xml_format === 'rss' || $xml_format === 'rss2')
+		{
 			$data = array(array(
 				'title' => cdata_parse($profile['name']),
 				'link' => $scripturl . '?action=profile;u=' . $profile['id'],
@@ -653,13 +581,17 @@ class News_Controller extends Action_Controller
 				'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $user_profile[$profile['id']]['date_registered']),
 				'guid' => $scripturl . '?action=profile;u=' . $profile['id'],
 			));
-		elseif ($xml_format == 'rdf')
+		}
+		elseif ($xml_format === 'rdf')
+		{
 			$data = array(array(
 				'title' => cdata_parse($profile['name']),
 				'link' => $scripturl . '?action=profile;u=' . $profile['id'],
 				'description' => cdata_parse(isset($profile['group']) ? $profile['group'] : $profile['post_group']),
 			));
-		elseif ($xml_format == 'atom')
+		}
+		elseif ($xml_format === 'atom')
+		{
 			$data[] = array(
 				'title' => cdata_parse($profile['name']),
 				'link' => $scripturl . '?action=profile;u=' . $profile['id'],
@@ -674,6 +606,7 @@ class News_Controller extends Action_Controller
 				'id' => $scripturl . '?action=profile;u=' . $profile['id'],
 				'logo' => !empty($profile['avatar']) ? $profile['avatar']['url'] : '',
 			);
+		}
 		else
 		{
 			$data = array(
@@ -688,9 +621,6 @@ class News_Controller extends Action_Controller
 			);
 
 			// Everything below here might not be set, and thus maybe shouldn't be displayed.
-			if ($profile['gender']['name'] != '')
-				$data['gender'] = cdata_parse($profile['gender']['name']);
-
 			if ($profile['avatar']['name'] != '')
 				$data['avatar'] = $profile['avatar']['url'];
 
@@ -700,12 +630,6 @@ class News_Controller extends Action_Controller
 
 			if ($profile['signature'] != '')
 				$data['signature'] = cdata_parse($profile['signature']);
-
-			if ($profile['blurb'] != '')
-				$data['blurb'] = cdata_parse($profile['blurb']);
-
-			if ($profile['location'] != '')
-				$data['location'] = cdata_parse($profile['location']);
 
 			if ($profile['title'] != '')
 				$data['title'] = cdata_parse($profile['title']);
@@ -745,30 +669,32 @@ class News_Controller extends Action_Controller
 
 /**
  * Called from dumpTags to convert data to xml
- * Finds urls for local site and santizes them
+ * Finds urls for local site and sanitizes them
  *
  * @param string $val
  */
 function fix_possible_url($val)
 {
-	global $modSettings, $context, $scripturl;
+	global $modSettings, $scripturl;
 
 	if (substr($val, 0, strlen($scripturl)) != $scripturl)
 		return $val;
 
 	call_integration_hook('integrate_fix_url', array(&$val));
 
-	if (empty($modSettings['queryless_urls']) || ($context['server']['is_cgi'] && ini_get('cgi.fix_pathinfo') == 0 && @get_cfg_var('cgi.fix_pathinfo') == 0) || (!$context['server']['is_apache'] && !$context['server']['is_lighttpd']))
-		return $val;
+	if (!empty($modSettings['queryless_urls']) && detectServer()->supportRewrite())
+	{
+		$val = preg_replace_callback('~^' . preg_quote($scripturl, '~') . '\?((?:board|topic)=[^#"]+)(#[^"]*)?$~', 'fix_possible_url_callback', $val);
+	}
 
-	$val = preg_replace_callback('~^' . preg_quote($scripturl, '~') . '\?((?:board|topic)=[^#"]+)(#[^"]*)?$~', 'fix_possible_url_callback', $val);
 	return $val;
 }
 
 /**
  * Callback function for the preg_replace_callback in fix_possible_url
- * Invoked when queryless_urls are enabled and the system supports them
- * Updated URLs to be of "queryless" style
+ *
+ * - Invoked when queryless_urls are enabled and the system supports them
+ * - Updated URLs to be of "queryless" style
  *
  * @param mixed[] $matches
  */
@@ -780,8 +706,8 @@ function fix_possible_url_callback($matches)
 }
 
 /**
- * For highest feed compatibility, some special characters should be provided 
- * as character entities and not html entities 
+ * For highest feed compatibility, some special characters should be provided
+ * as character entities and not html entities
  *
  * @param string $data
  */
@@ -791,7 +717,7 @@ function encode_special($data)
 }
 
 /**
- * Ensures supplied data is properly encpsulated in cdata xml tags
+ * Ensures supplied data is properly encapsulated in cdata xml tags
  * Called from action_xmlprofile in News.controller.php
  *
  * @param string $data
@@ -832,25 +758,25 @@ function cdata_parse($data, $ns = '')
 		if ($pos >= $n)
 			break;
 
-		if (Util::substr($data, $pos, 1) == '<')
+		if (Util::substr($data, $pos, 1) === '<')
 		{
 			$pos2 = Util::strpos($data, '>', $pos);
 			if ($pos2 === false)
 				$pos2 = $n;
 
-			if (Util::substr($data, $pos + 1, 1) == '/')
+			if (Util::substr($data, $pos + 1, 1) === '/')
 				$cdata .= ']]></' . $ns . ':' . Util::substr($data, $pos + 2, $pos2 - $pos - 1) . '<![CDATA[';
 			else
 				$cdata .= ']]><' . $ns . ':' . Util::substr($data, $pos + 1, $pos2 - $pos) . '<![CDATA[';
 
 			$pos = $pos2 + 1;
 		}
-		elseif (Util::substr($data, $pos, 1) == ']')
+		elseif (Util::substr($data, $pos, 1) === ']')
 		{
 			$cdata .= ']]>&#093;<![CDATA[';
 			$pos++;
 		}
-		elseif (Util::substr($data, $pos, 1) == '&')
+		elseif (Util::substr($data, $pos, 1) === '&')
 		{
 			$pos2 = Util::strpos($data, ';', $pos);
 
@@ -859,7 +785,7 @@ function cdata_parse($data, $ns = '')
 
 			$ent = Util::substr($data, $pos + 1, $pos2 - $pos - 1);
 
-			if (Util::substr($data, $pos + 1, 1) == '#')
+			if (Util::substr($data, $pos + 1, 1) === '#')
 				$cdata .= ']]>' . Util::substr($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';
 			elseif (in_array($ent, array('amp', 'lt', 'gt', 'quot')))
 				$cdata .= ']]>' . Util::substr($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';
@@ -875,67 +801,20 @@ function cdata_parse($data, $ns = '')
 
 /**
  * Formats data retrieved in other functions into xml format.
- * Additionally formats data based on the specific format passed.
- * This function is recursively called to handle sub arrays of data.
-
+ *
+ * - Additionally formats data based on the specific format passed.
+ * - This function is recursively called to handle sub arrays of data.
+ *
+ * @deprecated since 1.1 - use template_xml_news instead
+ *
  * @param mixed[] $data the array to output as xml data
  * @param int $i the amount of indentation to use.
  * @param string|null $tag if specified, it will be used instead of the keys of data.
  * @param string $xml_format  one of rss, rss2, rdf, atom
+ * @throws Elk_Exception
  */
 function dumpTags($data, $i, $tag = null, $xml_format = 'rss')
 {
-	// For every array in the data...
-	foreach ($data as $key => $val)
-	{
-		// Skip it, it's been set to null.
-		if ($val === null)
-			continue;
-
-		// If a tag was passed, use it instead of the key.
-		$key = isset($tag) ? $tag : $key;
-
-		// First let's indent!
-		echo "\n", str_repeat("\t", $i);
-
-		// Grr, I hate kludges... almost worth doing it properly, here, but not quite.
-		if ($xml_format == 'atom' && $key == 'link')
-		{
-			echo '<link rel="alternate" type="text/html" href="', fix_possible_url($val), '" />';
-			continue;
-		}
-
-		// If it's empty/0/nothing simply output an empty tag.
-		if ($val == '')
-			echo '<', $key, ' />';
-		elseif ($xml_format == 'atom' && $key == 'category')
-			echo '<', $key, ' term="', $val, '" />';
-		else
-		{
-			// Beginning tag.
-			if ($xml_format == 'rdf' && $key == 'item' && isset($val['link']))
-			{
-				echo '<', $key, ' rdf:about="', fix_possible_url($val['link']), '">';
-				echo "\n", str_repeat("\t", $i + 1);
-				echo '<dc:format>text/html</dc:format>';
-			}
-			elseif ($xml_format == 'atom' && $key == 'summary')
-				echo '<', $key, ' type="html">';
-			else
-				echo '<', $key, '>';
-
-			if (is_array($val))
-			{
-				// An array.  Dump it, and then indent the tag.
-				dumpTags($val, $i + 1, null, $xml_format);
-				echo "\n", str_repeat("\t", $i), '</', $key, '>';
-			}
-			// A string with returns in it.... show this as a multiline element.
-			elseif (strpos($val, "\n") !== false || strpos($val, '<br />') !== false)
-				echo "\n", fix_possible_url($val), "\n", str_repeat("\t", $i), '</', $key, '>';
-			// A simple string.
-			else
-				echo fix_possible_url($val), '</', $key, '>';
-		}
-	}
+	loadTemplate('Xml');
+	template_xml_news($data, $i, $tag, $xml_format);
 }

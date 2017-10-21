@@ -7,14 +7,12 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
+ * Jslocale_Controller class.
  * This file is called via ?action=jslocale;sa=sceditor to load in a list of
  * language strings for the editor
  */
@@ -27,6 +25,14 @@ class Jslocale_Controller extends Action_Controller
 	private $_file_data = null;
 
 	/**
+	 * {@inheritdoc }
+	 */
+	public function trackStats($action = '')
+	{
+		return false;
+	}
+
+	/**
 	 * The default action for the class
 	 */
 	public function action_index()
@@ -36,8 +42,8 @@ class Jslocale_Controller extends Action_Controller
 	}
 
 	/**
-	* Creates the javascript code for localization of the editor (SCEditor)
-	*/
+	 * Creates the javascript code for localization of the editor (SCEditor)
+	 */
 	public function action_sceditor()
 	{
 		global $txt, $editortxt;
@@ -51,11 +57,11 @@ class Jslocale_Controller extends Action_Controller
 		$this->_file_data = '(function ($) {
 		\'use strict\';
 
-		$.sceditor.locale[' . javaScriptEscape($txt['lang_locale']) . '] = {';
+		$.sceditor.locale[' . JavaScriptEscape($txt['lang_locale']) . '] = {';
 
 		foreach ($editortxt as $key => $val)
 			$this->_file_data .= '
-			' . javaScriptEscape($key) . ': ' . javaScriptEscape($val) . ',';
+			' . JavaScriptEscape($key) . ': ' . JavaScriptEscape($val) . ',';
 
 		$this->_file_data .= '
 			dateFormat: "day.month.year"
@@ -65,8 +71,40 @@ class Jslocale_Controller extends Action_Controller
 		$this->_sendFile();
 	}
 
+	public function action_agreement_api()
+	{
+		global $context, $modSettings;
+
+		$langs = getLanguages();
+		$lang = $this->_req->post->lang;
+
+		Template_Layers::instance()->removeAll();
+		loadTemplate('Json');
+		$context['sub_template'] = 'send_json';
+		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
+
+		if (isset($langs[$lang]))
+		{
+			// If you have to agree to the agreement, it needs to be fetched from the file.
+			$agreement = new \Agreement($lang);
+			try
+			{
+				$context['json_data'] = $agreement->getParsedText();
+			}
+			catch (\Elk_Exception $e)
+			{
+				$context['json_data'] = $e->getMessage();
+			}
+		}
+		else
+		{
+			$context['json_data'] = '';
+		}
+	}
+
 	/**
 	 * Handy shortcut to prepare the "system"
+	 *
 	 * @param string $language_file
 	 */
 	private function _prepareLocale($language_file)
@@ -76,14 +114,10 @@ class Jslocale_Controller extends Action_Controller
 		if (!empty($language_file))
 			loadLanguage($language_file);
 
-		Template_Layers::getInstance()->removeAll();
+		Template_Layers::instance()->removeAll();
 
 		// Lets make sure we aren't going to output anything nasty.
-		@ob_end_clean();
-		if (!empty($modSettings['enableCompressedOutput']))
-			ob_start('ob_gzhandler');
-		else
-			ob_start();
+		obStart(!empty($modSettings['enableCompressedOutput']));
 	}
 
 	/**

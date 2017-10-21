@@ -7,29 +7,32 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
- * Karma_Controller class, can give good or bad karma so watch out!
+ * Karma_Controller class,
+ * Can give good or bad karma so watch out!
  *
  * @package Karma
  */
 class Karma_Controller extends Action_Controller
 {
+	/**
+	 * Pre Dispatch, called before other methods.  Loads integration hooks.
+	 */
+	public function pre_dispatch()
+	{
+		Hooks::instance()->loadIntegrationsSettings();
+	}
 
 	/**
-	 * Default entry point, in case action methods aren't directly
+	 * Default entry point, in case action methods are not directly
 	 * called. Simply forward to applaud.
 	 *
 	 * @see Action_Controller::action_index()
@@ -42,16 +45,19 @@ class Karma_Controller extends Action_Controller
 
 	/**
 	 * Modify a user's karma.
-	 * It redirects back to the referrer afterward, whether by javascript or the passed parameters.
-	 * Requires the karma_edit permission, and that the user isn't a guest.
-	 * It depends on the karmaMode, karmaWaitTime, and karmaTimeRestrictAdmins settings.
-	 * It is accessed via ?action=karma, sa=smite or sa=applaud.
+	 *
+	 * What it does:
+	 *
+	 * - It redirects back to the referrer afterward, whether by javascript or the passed parameters.
+	 * - Requires the karma_edit permission, and that the user isn't a guest.
+	 * - It depends on the karmaMode, karmaWaitTime, and karmaTimeRestrictAdmins settings.
+	 * - It is accessed via ?action=karma, sa=smite or sa=applaud.
 	 */
 	public function action_applaud()
 	{
 		global $user_info;
 
-		$id_target = !empty($_REQUEST['uid']) ? (int) $_REQUEST['uid'] : 0;
+		$id_target = $this->_req->getQuery('uid', 'intval', 0);
 
 		// Start off with no change in karma.
 		$action = $this->_prepare_karma($id_target);
@@ -73,13 +79,13 @@ class Karma_Controller extends Action_Controller
 			$this->_redirect_karma();
 
 		// The user ID _must_ be a number, no matter what.
-		$id_target = !empty($_REQUEST['uid']) ? (int) $_REQUEST['uid'] : 0;
+		$id_target = $this->_req->getQuery('uid', 'intval', 0);
 
 		// Start off with no change in karma.
 		$action = $this->_prepare_karma($id_target);
 
 		// Give em a wack and run away
-		$this->_give_karma($user_info['id'], $_REQUEST['uid'], $action, -1);
+		$this->_give_karma($user_info['id'], $this->_req->query->uid, $action, -1);
 		$this->_redirect_karma();
 	}
 
@@ -90,6 +96,8 @@ class Karma_Controller extends Action_Controller
 	 * @param int $id_target who is getting the action
 	 * @param int $action applaud or smite
 	 * @param int $dir
+	 *
+	 * @throws Elk_Exception karma_wait_time
 	 */
 	private function _give_karma($id_executor, $id_target, $action, $dir)
 	{
@@ -102,7 +110,7 @@ class Karma_Controller extends Action_Controller
 		{
 			// If you are gonna try to repeat.... don't allow it.
 			if ($action == $dir)
-				fatal_lang_error('karma_wait_time', false, array($modSettings['karmaWaitTime'], ($modSettings['karmaWaitTime'] == 1 ? strtolower($txt['hour']) : $txt['hours'])));
+				throw new Elk_Exception('karma_wait_time', false, array($modSettings['karmaWaitTime'], ($modSettings['karmaWaitTime'] == 1 ? strtolower($txt['hour']) : $txt['hours'])));
 
 			updateKarma($id_executor, $id_target, $dir);
 		}
@@ -112,7 +120,9 @@ class Karma_Controller extends Action_Controller
 	 * Makes sure that a user can perform the karma action
 	 *
 	 * @param int $id_target
-	 * @return integer
+	 *
+	 * @return int
+	 * @throws Elk_Exception feature_disabled
 	 */
 	private function _prepare_karma($id_target)
 	{
@@ -120,7 +130,7 @@ class Karma_Controller extends Action_Controller
 
 		// If the mod is disabled, show an error.
 		if (empty($modSettings['karmaMode']))
-			fatal_lang_error('feature_disabled', true);
+			throw new Elk_Exception('feature_disabled', true);
 
 		// If you're a guest or can't do this, blow you off...
 		is_not_guest();
@@ -135,11 +145,11 @@ class Karma_Controller extends Action_Controller
 		// @todo Should this be dropped in favor of post group permissions?
 		// Should this apply to the member you are smiting/applauding?
 		if (!$user_info['is_admin'] && $user_info['posts'] < $modSettings['karmaMinPosts'])
-			fatal_lang_error('not_enough_posts_karma', true, array($modSettings['karmaMinPosts']));
+			throw new Elk_Exception('not_enough_posts_karma', true, array($modSettings['karmaMinPosts']));
 
 		// And you can't modify your own, punk! (use the profile if you need to.)
 		if (empty($id_target) || $id_target == $user_info['id'])
-			fatal_lang_error('cant_change_own_karma', false);
+			throw new Elk_Exception('cant_change_own_karma', false);
 
 		// Delete any older items from the log so we can get the go ahead or not
 		clearKarma($modSettings['karmaWaitTime']);
@@ -165,10 +175,10 @@ class Karma_Controller extends Action_Controller
 
 		// Figure out where to go back to.... the topic?
 		if (!empty($topic))
-			redirectexit('topic=' . $topic . '.' . $_REQUEST['start'] . '#msg' . (int) $_REQUEST['m']);
+			redirectexit('topic=' . $topic . '.' . $this->_req->start . '#msg' . $this->_req->get('m', 'intval'));
 		// Hrm... maybe a personal message?
 		elseif (isset($_REQUEST['f']))
-			redirectexit('action=pm;f=' . $_REQUEST['f'] . ';start=' . $_REQUEST['start'] . (isset($_REQUEST['l']) ? ';l=' . (int) $_REQUEST['l'] : '') . (isset($_REQUEST['pm']) ? '#' . (int) $_REQUEST['pm'] : ''));
+			redirectexit('action=pm;f=' . $_REQUEST['f'] . ';start=' . $this->_req->start . (isset($_REQUEST['l']) ? ';l=' . $this->_req->get('l', 'intval') : '') . (isset($_REQUEST['pm']) ? '#' . $this->_req->get('pm', 'intval') : ''));
 		// JavaScript as a last resort.
 		else
 		{
@@ -176,9 +186,9 @@ class Karma_Controller extends Action_Controller
 <html ', $context['right_to_left'] ? 'dir="rtl"' : '', '>
 	<head>
 		<title>...</title>
-		<script><!-- // --><![CDATA[
+		<script>
 			history.go(-1);
-		// ]]></script>
+		</script>
 	</head>
 	<body>&laquo;</body>
 </html>';

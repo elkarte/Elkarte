@@ -5,13 +5,11 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
 
@@ -24,32 +22,30 @@ function template_report_type()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=reports" method="post" accept-charset="UTF-8">
-			<div id="generate_reports_type">
-				<h2 class="category_header">', $txt['generate_reports_type'], '</h2>
-				<div class="windowbg">
-					<div class="content">
-						<dl class="generate_report">';
+		<form class="admin_form_wrapper" action="', $scripturl, '?action=admin;area=reports" method="post" accept-charset="UTF-8">
+			<h2 class="category_header">', $txt['generate_reports_type'], '</h2>
+			<div class="content">
+				<dl class="settings">';
 
 	// Go through each type of report they can run.
 	foreach ($context['report_types'] as $type)
 	{
 		echo '
-							<dt>
-								<input type="radio" id="rt_', $type['id'], '" name="rt" value="', $type['id'], '"', $type['is_first'] ? ' checked="checked"' : '', ' class="input_radio" />
-								<strong><label for="rt_', $type['id'], '">', $type['title'], '</label></strong>
-							</dt>';
+					<dt>
+						<input type="radio" id="rt_', $type['id'], '" name="rt" value="', $type['id'], '"', $type['is_first'] ? ' checked="checked"' : '', ' />
+						<label for="rt_', $type['id'], '">', $type['title'], '</label>
+					</dt>';
 
 		if (isset($type['description']))
 			echo '
-							<dd>', $type['description'], '</dd>';
+					<dd>', $type['description'], '</dd>';
 	}
 
 	echo '
-						</dl>
-						<input type="submit" name="continue" value="', $txt['generate_reports_continue'], '" class="right_submit" />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					</div>
+				</dl>
+				<div class="submitbutton">
+					<input type="submit" name="continue" value="', $txt['generate_reports_continue'], '" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>
 			</div>
 		</form>
@@ -92,15 +88,14 @@ function template_generate_report()
 
 		// Now do each row!
 		$row_number = 0;
-		$alternate = false;
 		foreach ($table['data'] as $row)
 		{
 			if ($row_number == 0 && !empty($table['shading']['top']))
 				echo '
-				<tr class="windowbg table_caption">';
+				<tr class="table_caption">';
 			else
 				echo '
-				<tr class="', !empty($row[0]['separator']) ? 'category_header' : ($alternate ? 'windowbg' : 'windowbg2'), '" style="vertical-align: top;">';
+				<tr class="', !empty($row[0]['separator']) ? 'category_header' : '', '">';
 
 			// Now do each column.
 			$column_number = 0;
@@ -120,12 +115,12 @@ function template_generate_report()
 				// Shaded?
 				if ($column_number == 0 && !empty($table['shading']['left']))
 					echo '
-					<td class="table_caption" style="text-align:', $table['align']['shaded'], $table['width']['shaded'] != 'auto' ? ';width:' . $table['width']['shaded'] . 'px;"' : '"', '>
+					<td class="table_caption ', $table['align']['shaded'], 'text" style="', $table['width']['shaded'] != 'auto' ? 'width:' . $table['width']['shaded'] . 'px;"' : '"', '>
 						', $data['v'] == $table['default_value'] ? '' : ($data['v'] . (empty($data['v']) ? '' : ':')), '
 					</td>';
 				else
 					echo '
-					<td style="text-align:', $table['align']['normal'], $table['width']['normal'] != 'auto' ? ';width:' . $table['width']['normal'] . '' : '', !empty($data['style']) ? ';' . $data['style'] . '"' : '"', '>
+					<td class="', $table['align']['normal'], 'text" style="', $table['width']['normal'] != 'auto' ? 'width:' . $table['width']['normal'] . 'px' : '', !empty($data['style']) ? ';' . $data['style'] . '"' : '"', '>
 						', $data['v'], '
 					</td>';
 
@@ -136,7 +131,6 @@ function template_generate_report()
 				</tr>';
 
 			$row_number++;
-			$alternate = !$alternate;
 		}
 
 		echo '
@@ -190,16 +184,15 @@ function template_print()
 				</tr>';
 
 		// Now do each row!
-		$alternate = false;
 		$row_number = 0;
 		foreach ($table['data'] as $row)
 		{
 			if ($row_number == 0 && !empty($table['shading']['top']))
 				echo '
-				<tr class="secondary_header" style="vertical-align: top;">';
+				<tr class="secondary_header">';
 			else
 				echo '
-				<tr class="', $alternate ? 'windowbg' : 'windowbg2', '" style="vertical-align: top;">';
+				<tr>';
 
 			// Now do each column!!
 			$column_number = 0;
@@ -209,7 +202,7 @@ function template_print()
 				if (!empty($data['separator']) && $column_number == 0)
 				{
 					echo '
-					<td colspan="', $table['column_count'], '" class="category_header">
+					<td class="category_header" colspan="', $table['column_count'], '">
 						<strong>', $data['v'], ':</strong>
 					</td>';
 					break;
@@ -218,12 +211,12 @@ function template_print()
 				// Shaded?
 				if ($column_number == 0 && !empty($table['shading']['left']))
 					echo '
-					<td class="secondary_header" style="text-align:', $table['align']['shaded'], $table['width']['shaded'] != 'auto' ? ';width:' . $table['width']['shaded'] . '"' : '"', '>
+					<td class="secondary_header ', $table['align']['shaded'], 'text" style="', $table['width']['shaded'] != 'auto' ? 'width:' . $table['width']['shaded'] . 'px"' : '"', '>
 						', $data['v'] == $table['default_value'] ? '' : ($data['v'] . (empty($data['v']) ? '' : ':')), '
 					</td>';
 				else
 					echo '
-					<td style="text-align:', $table['align']['normal'], $table['width']['normal'] != 'auto' ? ';width:' . $table['width']['normal'] : '', !empty($data['style']) ? ';' . $data['style'] . '"' : '"', '>
+					<td class="', $table['align']['normal'], 'text" style="', $table['width']['normal'] != 'auto' ? 'width:' . $table['width']['normal'] . 'px' : '', !empty($data['style']) ? ';' . $data['style'] . '"' : '"', '>
 						', $data['v'], '
 					</td>';
 
@@ -234,12 +227,11 @@ function template_print()
 				</tr>';
 
 			$row_number++;
-			$alternate = !$alternate;
 		}
 
 		echo '
 			</table>
-		</div><br />';
+		</div>';
 	}
 }
 

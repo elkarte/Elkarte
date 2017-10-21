@@ -8,18 +8,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * This class fetches all the stuff needed to build a list of boards
@@ -122,7 +117,7 @@ class Boards_List
 			'get_moderators' => true,
 		), $options);
 
-		$this->_options['avatars_on_indexes'] = !empty($settings['avatars_on_indexes']);
+		$this->_options['avatars_on_indexes'] = !empty($settings['avatars_on_indexes']) && $settings['avatars_on_indexes'] !== 2;
 
 		$this->_images_url = $settings['images_url'] . '/' . $context['theme_variant_url'];
 		$this->_scripturl = $scripturl;
@@ -166,7 +161,7 @@ class Boards_List
 	 */
 	public function getBoards()
 	{
-		global $txt;
+		global $txt, $modSettings;
 
 		// Find all boards and categories, as well as related information.
 		$result_boards = $this->_db->query('boardindex_fetch_boards', '
@@ -175,13 +170,13 @@ class Boards_List
 				b.id_board, b.name AS board_name, b.description,
 				CASE WHEN b.redirect != {string:blank_string} THEN 1 ELSE 0 END AS is_redirect,
 				b.num_posts, b.num_topics, b.unapproved_posts, b.unapproved_topics, b.id_parent,
-				IFNULL(m.poster_time, 0) AS poster_time, IFNULL(mem.member_name, m.poster_name) AS poster_name,
-				m.subject, m.id_topic, IFNULL(mem.real_name, m.poster_name) AS real_name,
+				COALESCE(m.poster_time, 0) AS poster_time, COALESCE(mem.member_name, m.poster_name) AS poster_name,
+				m.subject, m.id_topic, COALESCE(mem.real_name, m.poster_name) AS real_name,
 				' . ($this->_user['is_guest'] ? ' 1 AS is_read, 0 AS new_from,' : '
-				(IFNULL(lb.id_msg, 0) >= b.id_msg_updated) AS is_read, IFNULL(lb.id_msg, -1) + 1 AS new_from,' . ($this->_options['include_categories'] ? '
-				c.can_collapse, IFNULL(cc.id_member, 0) AS is_collapsed,' : '')) . '
-				IFNULL(mem.id_member, 0) AS id_member, mem.avatar, m.id_msg' . ($this->_options['avatars_on_indexes'] ? ',
-				IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, mem.email_address' : '') . '
+				(COALESCE(lb.id_msg, 0) >= b.id_msg_updated) AS is_read, COALESCE(lb.id_msg, -1) + 1 AS new_from,' . ($this->_options['include_categories'] ? '
+				c.can_collapse, COALESCE(cc.id_member, 0) AS is_collapsed,' : '')) . '
+				COALESCE(mem.id_member, 0) AS id_member, mem.avatar, m.id_msg' . ($this->_options['avatars_on_indexes'] ? ',
+				COALESCE(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, mem.email_address' : '') . '
 			FROM {db_prefix}boards AS b' . ($this->_options['include_categories'] ? '
 				LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)' : '') . '
 				LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = b.id_last_msg)
@@ -200,6 +195,8 @@ class Boards_List
 			)
 		);
 
+		$bbc_parser = \BBC\ParserWrapper::instance();
+
 		// Run through the categories and boards (or only boards)....
 		while ($row_board = $this->_db->fetch_assoc($result_boards))
 		{
@@ -214,6 +211,7 @@ class Boards_List
 				// Haven't set this category yet.
 				if (empty($this->_categories[$row_board['id_cat']]))
 				{
+					$cat_name = $row_board['cat_name'];
 					$this->_categories[$row_board['id_cat']] = array(
 						'id' => $row_board['id_cat'],
 						'name' => $row_board['cat_name'],
@@ -221,11 +219,13 @@ class Boards_List
 						'can_collapse' => isset($row_board['can_collapse']) && $row_board['can_collapse'] == 1,
 						'collapse_href' => isset($row_board['can_collapse']) ? $this->_scripturl . '?action=collapse;c=' . $row_board['id_cat'] . ';sa=' . ($row_board['is_collapsed'] > 0 ? 'expand;' : 'collapse;') . $this->_session_url . '#c' . $row_board['id_cat'] : '',
 						'collapse_image' => isset($row_board['can_collapse']) ? '<img src="' . $this->_images_url . ($row_board['is_collapsed'] > 0 ? 'expand.png" alt="+"' : 'collapse.png" alt="-"') . ' />' : '',
-						'href' => $this->_scripturl . '#c' . $row_board['id_cat'],
+						'href' => $this->_scripturl . $modSettings['default_forum_action'] . '#c' . $row_board['id_cat'],
 						'boards' => array(),
 						'new' => false
 					);
-					$this->_categories[$row_board['id_cat']]['link'] = '<a id="c' . $row_board['id_cat'] . '"></a>' . (!$this->_user['is_guest'] ? '<a href="' . $this->_scripturl . '?action=unread;c='. $row_board['id_cat'] . '" title="' . sprintf($txt['new_posts_in_category'], strip_tags($row_board['cat_name'])) . '">' . $row_board['cat_name'] . '</a>' : $row_board['cat_name']);
+					$this->_categories[$row_board['id_cat']]['link'] = '<a id="c' . $row_board['id_cat'] . '"></a>' . (!$this->_user['is_guest']
+							? '<a href="' . $this->_scripturl . '?action=unread;c=' . $row_board['id_cat'] . '" title="' . sprintf($txt['new_posts_in_category'], strip_tags($row_board['cat_name'])) . '">' . $cat_name . '</a>'
+							: $cat_name);
 				}
 
 				// If this board has new posts in it (and isn't the recycle bin!) then the category is new.
@@ -249,12 +249,12 @@ class Boards_List
 				// Is this a new board, or just another moderator?
 				if (!isset($this->_current_boards[$row_board['id_board']]))
 				{
-
 					$this->_current_boards[$row_board['id_board']] = array(
 						'new' => empty($row_board['is_read']),
 						'id' => $row_board['id_board'],
 						'name' => $row_board['board_name'],
-						'description' => $row_board['description'],
+						'description' => $bbc_parser->parseBoard($row_board['description']),
+						'raw_description' => $row_board['description'],
 						'moderators' => array(),
 						'link_moderators' => array(),
 						'children' => array(),
@@ -281,7 +281,8 @@ class Boards_List
 				$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']] = array(
 					'id' => $row_board['id_board'],
 					'name' => $row_board['board_name'],
-					'description' => $row_board['description'],
+					'description' => $bbc_parser->parseBoard($row_board['description']),
+					'raw_description' => $row_board['description'],
 					'new' => empty($row_board['is_read']) && $row_board['poster_name'] != '',
 					'topics' => $row_board['num_topics'],
 					'posts' => $row_board['num_posts'],
@@ -342,7 +343,7 @@ class Boards_List
 				continue;
 
 			// Prepare the subject, and make sure it's not too long.
-			censorText($row_board['subject']);
+			$row_board['subject'] = censor($row_board['subject']);
 			$row_board['short_subject'] = Util::shorten_text($row_board['subject'], $this->_subject_length);
 			$this_last_post = array(
 				'id' => $row_board['id_msg'],
@@ -410,7 +411,7 @@ class Boards_List
 	}
 
 	/**
-	 * Returns the array containing the "latest post" informations
+	 * Returns the array containing the "latest post" information
 	 *
 	 * @return array
 	 */
@@ -430,11 +431,12 @@ class Boards_List
 		global $txt;
 
 		$boards = array_keys($this->_boards);
+		$mod_cached = array();
 
-		if (($mod_cached = cache_get_data('localmods_' . md5(implode(',', $boards)), 3600)) === null)
+		if (!Cache::instance()->getVar($mod_cached, 'localmods_' . md5(implode(',', $boards)), 3600))
 		{
-			$mod_req = $this->_db->query('', '
-				SELECT mods.id_board, IFNULL(mods_mem.id_member, 0) AS id_moderator, mods_mem.real_name AS mod_real_name
+			$mod_cached = $this->_db->fetchQuery('
+				SELECT mods.id_board, COALESCE(mods_mem.id_member, 0) AS id_moderator, mods_mem.real_name AS mod_real_name
 				FROM {db_prefix}moderators AS mods
 					LEFT JOIN {db_prefix}members AS mods_mem ON (mods_mem.id_member = mods.id_member)
 				WHERE mods.id_board IN ({array_int:id_boards})',
@@ -442,11 +444,7 @@ class Boards_List
 					'id_boards' => $boards,
 				)
 			);
-			$mod_cached = array();
-			while($row_mods = $this->_db->fetch_assoc($mod_req))
-				$mod_cached[] = $row_mods;
-			$this->_db->free_result($mod_req);
-			cache_put_data('localmods_' . md5(implode(',', $boards)), $mod_cached, 3600);
+			Cache::instance()->put('localmods_' . md5(implode(',', $boards)), $mod_cached, 3600);
 		}
 
 		foreach ($mod_cached as $row_mods)

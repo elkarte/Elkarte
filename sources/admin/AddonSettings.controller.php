@@ -7,18 +7,16 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * AddonSettings controller handles administration settings added
  * in the common area for all addons in admin panel.
  *
  * What it does:
+ *
  *  - Some addons will define their own areas, but for simple cases,
  * when you have only a setting or two, this area will allow you
  * to hook into it seamlessly, and your additions will be sent
@@ -29,12 +27,6 @@ if (!defined('ELK'))
  */
 class AddonSettings_Controller extends Action_Controller
 {
-	/**
-	 * General addon settings form.
-	 * @var Settings_Form
-	 */
-	protected $_addonSettings;
-
 	/**
 	 * This, my friend, is for all the authors of addons out there.
 	 *
@@ -82,45 +74,20 @@ class AddonSettings_Controller extends Action_Controller
 
 	/**
 	 * If you have a general mod setting to add stick it here.
+	 *
+	 * @event integrate_save_general_mod_settings allows for special processing needs during save operations
+	 * for addons added to Addon Settings area
 	 */
 	public function action_addonSettings_display()
 	{
-		// Initialize the form
-		$this->_initAddonSettingsForm();
-
-		// Initialize settings
-		$config_vars = $this->_addonSettings->settings();
-
-		// Saving?
-		if (isset($_GET['save']))
-		{
-			checkSession();
-
-			call_integration_hook('integrate_save_general_mod_settings');
-
-			Settings_Form::save_db($config_vars);
-
-			redirectexit('action=admin;area=addonsettings;sa=general');
-		}
-
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize the customSettings form with any custom admin settings for or from addons.
-	 */
-	public function _initAddonSettingsForm()
-	{
 		global $context, $txt, $scripturl;
 
-		// We're working with them settings.
-		require_once(SUBSDIR . '/SettingsForm.class.php');
-
 		// instantiate the form
-		$this->_addonSettings = new Settings_Form();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// initialize it with our existing settings. If any.
 		$config_vars = $this->_settings();
+		$settingsForm->setConfigVars($config_vars);
 
 		if (empty($config_vars))
 		{
@@ -131,11 +98,26 @@ class AddonSettings_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=addonsettings;save;sa=general';
 		$context['settings_title'] = $txt['mods_cat_modifications_misc'];
 
-		return $this->_addonSettings->settings($config_vars);
+		// Saving?
+		if (isset($this->_req->query->save))
+		{
+			checkSession();
+
+			call_integration_hook('integrate_save_general_mod_settings');
+
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
+
+			redirectexit('action=admin;area=addonsettings;sa=general');
+		}
+
+		$settingsForm->prepare();
 	}
 
 	/**
 	 * Retrieve any custom admin settings for or from addons.
+	 *
+	 * @event integrate_general_mod_settings allows adding new settings for addons in the generic Addons Settings
 	 */
 	private function _settings()
 	{
@@ -161,6 +143,8 @@ class AddonSettings_Controller extends Action_Controller
 	 *
 	 * @param mixed[] $subActions An array containing all possible subactions.
 	 * @param string $defaultAction the default action to be called if no valid subaction was found.
+	 *
+	 * @throws Elk_Exception
 	 */
 	public function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')
 	{
@@ -175,16 +159,16 @@ class AddonSettings_Controller extends Action_Controller
 		$context['sub_template'] = 'show_settings';
 
 		// By default do the basic settings.
-		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
-			$_REQUEST['sa'] = $_REQUEST['sa'];
+		if (isset($this->_req->query->sa, $subActions[$this->_req->query->sa]))
+			$sa = $this->_req->query->sa;
 		elseif (!empty($defaultAction))
-			$_REQUEST['sa'] = $defaultAction;
+			$sa = $defaultAction;
 		else
 		{
 			$keys = array_keys($subActions);
-			$_REQUEST['sa'] = array_pop($keys);
+			$sa = array_pop($keys);
 		}
 
-		$context['sub_action'] = $_REQUEST['sa'];
+		$context['sub_action'] = $sa;
 	}
 }

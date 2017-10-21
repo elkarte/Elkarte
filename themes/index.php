@@ -1,5 +1,7 @@
 <?php
 
+namespace Themes;
+
 // This file is here solely to protect your Themes directory.
 
 // Look for Settings.php....

@@ -8,22 +8,17 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
- * Calendar_Controller class, displays the calendar for the site and
- * provides for its navigation
+ * Calendar_Controller class
+ * Displays the calendar for the site and provides for its navigation
  */
 class Calendar_Controller extends Action_Controller
 {
@@ -40,13 +35,15 @@ class Calendar_Controller extends Action_Controller
 
 	/**
 	 * Show the calendar.
-	 * It loads the specified month's events, holidays, and birthdays.
-	 * It requires the calendar_view permission.
-	 * It depends on the cal_enabled setting, and many of the other cal_ settings.
-	 * It uses the calendar_start_day theme option. (Monday/Sunday)
-	 * It uses the main sub template in the Calendar template.
-	 * It goes to the month and year passed in 'month' and 'year' by get or post.
-	 * It is accessed through ?action=calendar.
+	 *
+	 * - It loads the specified month's events, holidays, and birthdays.
+	 * - It requires the calendar_view permission.
+	 * - It depends on the cal_enabled setting, and many of the other cal_ settings.
+	 * - It uses the calendar_start_day theme option. (Monday/Sunday)
+	 * - It goes to the month and year passed in 'month' and 'year' by get or post.
+	 * - It is accessed through ?action=calendar.
+	 *
+	 * @uses the main sub template in the Calendar template.
 	 */
 	public function action_calendar()
 	{
@@ -60,7 +57,7 @@ class Calendar_Controller extends Action_Controller
 
 		// You can't do anything if the calendar is off.
 		if (empty($modSettings['cal_enabled']))
-			fatal_lang_error('calendar_off', false);
+			throw new Elk_Exception('calendar_off', false);
 
 		// Set the page title to mention the calendar ;).
 		$context['page_title'] = $txt['calendar'];
@@ -68,6 +65,8 @@ class Calendar_Controller extends Action_Controller
 
 		// Is this a week view?
 		$context['view_week'] = isset($_GET['viewweek']);
+		$context['cal_minyear'] = $modSettings['cal_minyear'];
+		$context['cal_maxyear'] = date('Y') + $modSettings['cal_limityear'];
 
 		// Don't let search engines index weekly calendar pages.
 		if ($context['view_week'])
@@ -86,18 +85,16 @@ class Calendar_Controller extends Action_Controller
 
 		// Make sure the year and month are in valid ranges.
 		if ($curPage['month'] < 1 || $curPage['month'] > 12)
-			fatal_lang_error('invalid_month', false);
+			throw new Elk_Exception('invalid_month', false);
 
-		if ($curPage['year'] < $modSettings['cal_minyear'] || $curPage['year'] > $modSettings['cal_maxyear'])
-			fatal_lang_error('invalid_year', false);
+		if ($curPage['year'] < $context['cal_minyear'] || $curPage['year'] > $context['cal_maxyear'])
+			throw new Elk_Exception('invalid_year', false);
 
 		// If we have a day clean that too.
 		if ($context['view_week'])
 		{
-			// Note $isValid is -1 < PHP 5.1
-			$isValid = mktime(0, 0, 0, $curPage['month'], $curPage['day'], $curPage['year']);
-			if ($curPage['day'] > 31 || !$isValid || $isValid == -1)
-				fatal_lang_error('invalid_day', false);
+			if ($curPage['day'] > 31 || !mktime(0, 0, 0, $curPage['month'], $curPage['day'], $curPage['year']))
+				throw new Elk_Exception('invalid_day', false);
 		}
 
 		// Load all the context information needed to show the calendar grid.
@@ -128,11 +125,11 @@ class Calendar_Controller extends Action_Controller
 		$context['calendar_grid_current'] = getCalendarGrid($curPage['month'], $curPage['year'], $calendarOptions);
 
 		// Only show previous month if it isn't pre-January of the min-year
-		if ($context['calendar_grid_current']['previous_calendar']['year'] > $modSettings['cal_minyear'] || $curPage['month'] != 1)
+		if ($context['calendar_grid_current']['previous_calendar']['year'] > $context['cal_minyear'] || $curPage['month'] != 1)
 			$context['calendar_grid_prev'] = getCalendarGrid($context['calendar_grid_current']['previous_calendar']['month'], $context['calendar_grid_current']['previous_calendar']['year'], $calendarOptions);
 
 		// Only show next month if it isn't post-December of the max-year
-		if ($context['calendar_grid_current']['next_calendar']['year'] < $modSettings['cal_maxyear'] || $curPage['month'] != 12)
+		if ($context['calendar_grid_current']['next_calendar']['year'] < $context['cal_maxyear'] || $curPage['month'] != 12)
 			$context['calendar_grid_next'] = getCalendarGrid($context['calendar_grid_current']['next_calendar']['month'], $context['calendar_grid_current']['next_calendar']['year'], $calendarOptions);
 
 		// Basic template stuff.
@@ -166,7 +163,12 @@ class Calendar_Controller extends Action_Controller
 
 		// Build the calendar button array.
 		$context['calendar_buttons'] = array(
-			'post_event' => array('test' => 'can_post', 'text' => 'calendar_post_event', 'image' => 'calendarpe.png', 'lang' => true, 'url' => $scripturl . '?action=calendar;sa=post;month=' . $context['current_month'] . ';year=' . $context['current_year'] . ';' . $context['session_var'] . '=' . $context['session_id']),
+			'post_event' => array(
+				'test' => 'can_post',
+				'text' => 'calendar_post_event',
+				'image' => 'calendarpe.png',
+				'lang' => true, 'url' => $scripturl . '?action=calendar;sa=post;month=' . $context['current_month'] . ';year=' . $context['current_year'] . ';' . $context['session_var'] . '=' . $context['session_id']
+			),
 		);
 
 		// Allow mods to add additional buttons here
@@ -176,16 +178,16 @@ class Calendar_Controller extends Action_Controller
 	/**
 	 * This function processes posting/editing/deleting a calendar event.
 	 *
-	 *  - calls action_post() function if event is linked to a post.
-	 *  - calls insertEvent() to insert the event if not linked to post.
+	 *  - Calls action_post() function if event is linked to a post.
+	 *  - Calls insertEvent() to insert the event if not linked to post.
+	 *  - It requires the calendar_post permission to use.
+	 *  - It is accessed with ?action=calendar;sa=post.
 	 *
-	 * It requires the calendar_post permission to use.
-	 * It uses the event_post sub template in the Calendar template.
-	 * It is accessed with ?action=calendar;sa=post.
+	 * @uses the event_post sub template in the Calendar template.
 	 */
 	public function action_post()
 	{
-		global $context, $txt, $user_info, $scripturl, $modSettings, $topic;
+		global $context, $txt, $user_info, $modSettings;
 
 		// You need to view what you're doing :P
 		isAllowedTo('calendar_view');
@@ -193,102 +195,32 @@ class Calendar_Controller extends Action_Controller
 		// Well - can they post?
 		isAllowedTo('calendar_post');
 
-		// We need this for all kinds of useful functions.
-		require_once(SUBSDIR . '/Calendar.subs.php');
-
 		// Cast this for safety...
 		$event_id = isset($_REQUEST['eventid']) ? (int) $_REQUEST['eventid'] : null;
 
 		// Submitting?
 		if (isset($_POST[$context['session_var']], $event_id))
 		{
-			checkSession();
-
-			// Validate the post...
-			if (!isset($_POST['link_to_board']))
-				validateEventPost();
-
-			// If you're not allowed to edit any events, you have to be the poster.
-			if ($event_id > 0 && !allowedTo('calendar_edit_any'))
-				isAllowedTo('calendar_edit_' . (!empty($user_info['id']) && getEventPoster($event_id) == $user_info['id'] ? 'own' : 'any'));
-
-			// New - and directing?
-			if ($event_id == -1 && isset($_POST['link_to_board']))
-			{
-				$_REQUEST['calendar'] = 1;
-				require_once(CONTROLLERDIR . '/Post.controller.php');
-				$controller = new Post_Controller();
-				return $controller->action_post();
-			}
-			// New...
-			elseif ($event_id == -1)
-			{
-				$eventOptions = array(
-					'id_board' => 0,
-					'id_topic' => 0,
-					'title' => Util::substr($_REQUEST['evtitle'], 0, 100),
-					'member' => $user_info['id'],
-					'start_date' => sprintf('%04d-%02d-%02d', $_POST['year'], $_POST['month'], $_POST['day']),
-					'span' => isset($_POST['span']) && $_POST['span'] > 0 ? min((int) $modSettings['cal_maxspan'], (int) $_POST['span'] - 1) : 0,
-				);
-				insertEvent($eventOptions);
-			}
-			// Deleting...
-			elseif (isset($_REQUEST['deleteevent']))
-				removeEvent($event_id);
-			// ... or just update it?
-			else
-			{
-				// There could be already a topic you are not allowed to modify
-				if (!allowedTo('post_new') && empty($modSettings['disableNoPostingCalendarEdits']))
-					$eventProperties = getEventProperties($event_id, true);
-
-				$eventOptions = array(
-					'title' => Util::substr($_REQUEST['evtitle'], 0, 100),
-					'span' => empty($modSettings['cal_allowspan']) || empty($_POST['span']) || $_POST['span'] == 1 || empty($modSettings['cal_maxspan']) || $_POST['span'] > $modSettings['cal_maxspan'] ? 0 : min((int) $modSettings['cal_maxspan'], (int) $_POST['span'] - 1),
-					'start_date' => strftime('%Y-%m-%d', mktime(0, 0, 0, (int) $_REQUEST['month'], (int) $_REQUEST['day'], (int) $_REQUEST['year'])),
-					'id_board' => isset($eventProperties['id_board']) ? (int) $eventProperties['id_board'] : 0,
-					'id_topic' => isset($eventProperties['id_topic']) ? (int) $eventProperties['id_topic'] : 0,
-				);
-
-				modifyEvent($event_id, $eventOptions);
-			}
-
-			// No point hanging around here now...
-			redirectexit($scripturl . '?action=calendar;month=' . $_POST['month'] . ';year=' . $_POST['year']);
+			return $this->action_save();
 		}
 
 		// If we are not enabled... we are not enabled.
 		if (empty($modSettings['cal_allow_unlinked']) && empty($event_id))
 		{
 			$_REQUEST['calendar'] = 1;
-			require_once(CONTROLLERDIR . '/Post.controller.php');
-			$controller = new Post_Controller();
-			return $controller->action_post();
+			return $this->_returnToPost();
 		}
 
-		// New?
-		if (!isset($event_id))
+		$event = new Calendar_Event($event_id, $modSettings);
+
+		$context['event'] = $event->load($_REQUEST, $user_info['id']);
+
+		if ($event->isNew())
 		{
-			$today = getdate();
-
-			$context['event'] = array(
-				'boards' => array(),
-				'board' => 0,
-				'new' => 1,
-				'eventid' => -1,
-				'year' => isset($_REQUEST['year']) ? $_REQUEST['year'] : $today['year'],
-				'month' => isset($_REQUEST['month']) ? $_REQUEST['month'] : $today['mon'],
-				'day' => isset($_REQUEST['day']) ? $_REQUEST['day'] : $today['mday'],
-				'title' => '',
-				'span' => 1,
-			);
-			$context['event']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['event']['month'] == 12 ? 1 : $context['event']['month'] + 1, 0, $context['event']['month'] == 12 ? $context['event']['year'] + 1 : $context['event']['year']));
-
 			// Get list of boards that can be posted in.
 			$boards = boardsAllowedTo('post_new');
 			if (empty($boards))
-				fatal_lang_error('cannot_post_new', 'permission');
+				throw new Elk_Exception('cannot_post_new', 'permission');
 
 			// Load the list of boards and categories in the context.
 			require_once(SUBSDIR . '/Boards.subs.php');
@@ -299,64 +231,131 @@ class Calendar_Controller extends Action_Controller
 			);
 			$context += getBoardList($boardListOptions);
 		}
-		else
-		{
-			// Reload the event after making changes
-			$context['event'] = getEventProperties($event_id);
-
-			if ($context['event'] === false)
-				fatal_lang_error('no_access', false);
-
-			// If it has a board, then they should be editing it within the topic.
-			if (!empty($context['event']['topic']['id']) && !empty($context['event']['topic']['first_msg']))
-			{
-				// We load the board up, for a check on the board access rights...
-				$topic = $context['event']['topic']['id'];
-				loadBoard();
-			}
-
-			// Make sure the user is allowed to edit this event.
-			if ($context['event']['member'] != $user_info['id'])
-				isAllowedTo('calendar_edit_any');
-			elseif (!allowedTo('calendar_edit_any'))
-				isAllowedTo('calendar_edit_own');
-		}
 
 		// Template, sub template, etc.
 		loadTemplate('Calendar');
 		$context['sub_template'] = 'unlinked_event_post';
 
-		$context['page_title'] = isset($event_id) ? $txt['calendar_edit'] : $txt['calendar_post_event'];
+		$context['cal_minyear'] = $modSettings['cal_minyear'];
+		$context['cal_maxyear'] = date('Y') + $modSettings['cal_limityear'];
+		$context['page_title'] = $event->isNew() ? $txt['calendar_edit'] : $txt['calendar_post_event'];
 		$context['linktree'][] = array(
 			'name' => $context['page_title'],
 		);
 	}
 
 	/**
+	 * Takes care of the saving process.
+	 * Not yet used directly, but through Calendar_Controller::action_post
+	 */
+	public function action_save()
+	{
+		global $modSettings, $user_info, $scripturl;
+
+		checkSession();
+
+		// Cast this for safety...
+		$event_id = $this->_req->get('eventid', 'intval');
+
+		$event = new Calendar_Event($event_id, $modSettings);
+
+		// Validate the post...
+		$save_data = array();
+		if (!isset($_POST['link_to_board']))
+		{
+			try
+			{
+				$save_data = $event->validate($_POST);
+			}
+			catch (Elk_Exception $e)
+			{
+				$e->fatalLangError();
+			}
+		}
+
+		// If you're not allowed to edit any events, you have to be the poster.
+		if (!$event->isNew() && !allowedTo('calendar_edit_any'))
+			isAllowedTo('calendar_edit_' . ($event->isStarter($user_info['id']) ? 'own' : 'any'));
+
+		// New - and directing?
+		if ($event->isNew() && isset($_POST['link_to_board']))
+		{
+			$_REQUEST['calendar'] = 1;
+			return $this->_returnToPost();
+		}
+
+		// New...
+		if ($event->isNew())
+		{
+			$event->insert($save_data, $user_info['id']);
+		}
+		elseif (isset($_REQUEST['deleteevent']))
+		{
+			$event->remove();
+		}
+		else
+		{
+			$event->update($save_data);
+		}
+
+		// No point hanging around here now...
+		redirectexit($scripturl . '?action=calendar;month=' . $this->_req->get('month', 'intval') . ';year=' . $this->_req->get('year', 'intval'));
+	}
+
+	/**
+	 * Shortcut to instantiate the Post_Controller
+	 *
+	 * What it does:
+	 *  - require_once modules of the controller (not addons because these are
+	 *    always all require'd by the dispatcher),
+	 *  - Creates the event manager and registers addons and modules,
+	 *  - Instantiate the controller
+	 *  - Runs pre_dispatch
+	 * @return The return of the action_post.
+	 */
+	protected function _returnToPost()
+	{
+		$controller = new Post_Controller(new Event_Manager());
+		$hook = $controller->getHook();
+		$controller->pre_dispatch();
+		$function_name = 'action_post';
+
+		call_integration_hook('integrate_action_' . $hook . '_before', array($function_name));
+
+		$result = $controller->{$function_name}();
+
+		call_integration_hook('integrate_action_' . $hook . '_after', array($function_name));
+
+		return $result;
+	}
+
+	/**
 	 * This function offers up a download of an event in iCal 2.0 format.
 	 *
-	 * follows the conventions in RFC5546 http://tools.ietf.org/html/rfc5546
-	 * sets events as all day events since we don't have hourly events
-	 * will honor and set multi day events
-	 * sets a sequence number if the event has been modified.
-	 * Accessed by action=calendar;sa=ical
+	 * What it does:
+	 *
+	 * - Follows the conventions in RFC5546 http://tools.ietf.org/html/rfc5546
+	 * - Sets events as all day events since we don't have hourly events
+	 * - Will honor and set multi day events
+	 * - Sets a sequence number if the event has been modified.
+	 * - Accessed by action=calendar;sa=ical
 	 *
 	 * @todo .... allow for week or month export files as well?
 	 */
 	public function action_ical()
 	{
-		global $forum_version, $modSettings, $webmaster_email, $mbname;
+		global $modSettings;
 
 		// What do you think you export?
 		isAllowedTo('calendar_view');
 
 		// You can't export if the calendar export feature is off.
 		if (empty($modSettings['cal_export']))
-			fatal_lang_error('calendar_export_off', false);
+			throw new Elk_Exception('calendar_export_off', false);
 
 		// Goes without saying that this is required.
 		if (!isset($_REQUEST['eventid']))
-			fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		// This is kinda wanted.
 		require_once(SUBSDIR . '/Calendar.subs.php');
@@ -365,65 +364,16 @@ class Calendar_Controller extends Action_Controller
 		$event = getEventProperties($_REQUEST['eventid']);
 
 		if ($event === false)
-			fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
-		// Check the title isn't too long - iCal requires some formatting if so.
-		$title = str_split($event['title'], 30);
-		foreach ($title as $id => $line)
-		{
-			if ($id != 0)
-				$title[$id] = ' ' . $title[$id];
-			$title[$id] .= "\n";
-		}
-
-		// Format the dates.
-		$datestamp = date('Ymd\THis\Z', time());
-		$datestart = $event['year'] . ($event['month'] < 10 ? '0' . $event['month'] : $event['month']) . ($event['day'] < 10 ? '0' . $event['day'] : $event['day']);
-
-		// Do we have a event that spans several days?
-		if ($event['span'] > 1)
-		{
-			$dateend = strtotime($event['year'] . '-' . ($event['month'] < 10 ? '0' . $event['month'] : $event['month']) . '-' . ($event['day'] < 10 ? '0' . $event['day'] : $event['day']));
-			$dateend += ($event['span'] - 1) * 86400;
-			$dateend = date('Ymd', $dateend);
-		}
-
-		// This is what we will be sending later
-		$filecontents = '';
-		$filecontents .= 'BEGIN:VCALENDAR' . "\n";
-		$filecontents .= 'METHOD:PUBLISH' . "\n";
-		$filecontents .= 'PRODID:-//ElkArteCommunity//ElkArte ' . (empty($forum_version) ? 2.0 : strtr($forum_version, array('ElkArte ' => ''))) . '//EN' . "\n";
-		$filecontents .= 'VERSION:2.0' . "\n";
-		$filecontents .= 'BEGIN:VEVENT' . "\n";
-		$filecontents .= 'ORGANIZER;CN="' . $event['realname'] . '":MAILTO:' . $webmaster_email . "\n";
-		$filecontents .= 'DTSTAMP:' . $datestamp . "\n";
-		$filecontents .= 'DTSTART;VALUE=DATE:' . $datestart . "\n";
-
-		// more than one day
-		if ($event['span'] > 1)
-			$filecontents .= 'DTEND;VALUE=DATE:' . $dateend . "\n";
-
-		// event has changed? advance the sequence for this UID
-		if ($event['sequence'] > 0)
-			$filecontents .= 'SEQUENCE:' . $event['sequence'] . "\n";
-
-		$filecontents .= 'SUMMARY:' . implode('', $title);
-		$filecontents .= 'UID:' . $event['eventid'] . '@' . str_replace(' ', '-', $mbname) . "\n";
-		$filecontents .= 'END:VEVENT' . "\n";
-		$filecontents .= 'END:VCALENDAR';
+		$filecontents = build_ical_content($event);
 
 		// Send some standard headers.
-		@ob_end_clean();
-		if (!empty($modSettings['enableCompressedOutput']))
-			ob_start('ob_gzhandler');
-		else
-			ob_start();
+		obStart(!empty($modSettings['enableCompressedOutput']));
 
 		// Send the file headers
-		header('Pragma: ');
+		header('Pragma: no-cache');
 		header('Cache-Control: no-cache');
-		if (!isBrowser('gecko'))
-			header('Content-Transfer-Encoding: binary');
 		header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT');
 		header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . 'GMT');
 		header('Accept-Ranges: bytes');

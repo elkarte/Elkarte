@@ -2,24 +2,19 @@
 
 /**
  * This file contains those functions specific to the various verification controls
- * used to challange users, and hopefully robots as well.
+ * used to challenge users, and hopefully robots as well.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.8
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Simple function that loads and returns all the verification controls known to Elk
@@ -42,13 +37,16 @@ function loadVerificationControls()
  * Create a anti-bot verification control?
  *
  * @param mixed[] $verificationOptions
- * @param bool $do_test = false
+ * @param bool    $do_test = false If we are validating the input to a verification control
+ *
+ * @return array|bool
+ * @throws Elk_Exception no_access
  */
 function create_control_verification(&$verificationOptions, $do_test = false)
 {
 	global $context;
 
-	// We need to remember this because when failing the page is realoaded and the
+	// We need to remember this because when failing the page is reloaded and the
 	// code must remain the same (unless it has to change)
 	static $all_instances = array();
 
@@ -57,11 +55,13 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	$isNew = !isset($context['controls']['verification'][$verificationOptions['id']]);
 
 	if ($isNew)
+	{
 		$context['controls']['verification'][$verificationOptions['id']] = array(
 			'id' => $verificationOptions['id'],
 			'max_errors' => isset($verificationOptions['max_errors']) ? $verificationOptions['max_errors'] : 3,
 			'render' => false,
 		);
+	}
 	$thisVerification = &$context['controls']['verification'][$verificationOptions['id']];
 
 	if (!isset($_SESSION[$verificationOptions['id'] . '_vv']))
@@ -92,7 +92,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	elseif (!$isNew && !$do_test)
 		return true;
 
-	$verification_errors = Error_Context::context($verificationOptions['id']);
+	$verification_errors = ElkArte\Errors\ErrorContext::context($verificationOptions['id']);
 	$increase_error_count = false;
 
 	// Start with any testing.
@@ -100,7 +100,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	{
 		// This cannot happen!
 		if (!isset($_SESSION[$verificationOptions['id'] . '_vv']['count']))
-			fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		foreach ($instances as $instance)
 		{
@@ -204,7 +204,7 @@ interface Verification_Controls
 	public function doTest();
 
 	/**
-	 * If the control has a visable location on the template or if its hidden
+	 * If the control has a visible location on the template or if its hidden
 	 *
 	 * @return boolean
 	 */
@@ -224,14 +224,14 @@ interface Verification_Controls
 class Verification_Controls_Captcha implements Verification_Controls
 {
 	/**
-	 * Holds the $verificationOptions passed to the constuctor
+	 * Holds the $verificationOptions passed to the constructor
 	 *
 	 * @var array
 	 */
 	private $_options = null;
 
 	/**
-	 * If we are actualy displaying the captcha image
+	 * If we are actually displaying the captcha image
 	 *
 	 * @var boolean
 	 */
@@ -266,7 +266,7 @@ class Verification_Controls_Captcha implements Verification_Controls
 	private $_tested = false;
 
 	/**
-	 * If the GD libary is available for use
+	 * If the GD library is available for use
 	 *
 	 * @var boolean
 	 */
@@ -305,6 +305,7 @@ class Verification_Controls_Captcha implements Verification_Controls
 	 *
 	 * @param boolean $isNew
 	 * @param boolean $force_refresh
+	 * @throws Elk_Exception
 	 */
 	public function showVerification($isNew, $force_refresh = true)
 	{
@@ -320,7 +321,7 @@ class Verification_Controls_Captcha implements Verification_Controls
 
 		$this->_tested = false;
 
-		// Requesting a new challange, build the image link, seed the JS
+		// Requesting a new challenge, build the image link, seed the JS
 		if ($isNew)
 		{
 			$this->_show_captcha = !empty($this->_options['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($this->_options['override_visual']));
@@ -328,7 +329,7 @@ class Verification_Controls_Captcha implements Verification_Controls
 			if ($this->_show_captcha)
 			{
 				$this->_text_value = '';
-				$this->_image_href = $scripturl . '?action=verificationcode;vid=' . $this->_options['id'] . ';rand=' . md5(mt_rand());
+				$this->_image_href = $scripturl . '?action=register;sa=verificationcode;vid=' . $this->_options['id'] . ';rand=' . md5(mt_rand());
 			}
 		}
 
@@ -380,7 +381,7 @@ class Verification_Controls_Captcha implements Verification_Controls
 	}
 
 	/**
-	 * Peform the test, make people do it again and robots pass :P
+	 * Perform the test, make people do it again and robots pass :P
 	 * @return string|boolean
 	 */
 	public function doTest()
@@ -395,7 +396,8 @@ class Verification_Controls_Captcha implements Verification_Controls
 
 	/**
 	 * Required by the interface, returns true for Captcha display
-	 * @return true
+	 *
+	 * @return bool
 	 */
 	public function hasVisibleTemplate()
 	{
@@ -412,7 +414,7 @@ class Verification_Controls_Captcha implements Verification_Controls
 		global $txt, $scripturl, $modSettings;
 
 		// Generate a sample registration image.
-		$verification_image = $scripturl . '?action=verificationcode;rand=' . md5(mt_rand());
+		$verification_image = $scripturl . '?action=register;sa=verificationcode;rand=' . md5(mt_rand());
 
 		// Visual verification.
 		$config_vars = array(
@@ -487,7 +489,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	private $_questionIDs = null;
 
 	/**
-	 * Number of challange questions to use
+	 * Number of challenge questions to use
 	 *
 	 * @var int
 	 */
@@ -501,7 +503,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	private $_questions_language = null;
 
 	/**
-	 * Questions that can be used given what available (trys to account for lanaguges)
+	 * Questions that can be used given what available (try's to account for languages)
 	 *
 	 * @var int[]
 	 */
@@ -527,7 +529,7 @@ class Verification_Controls_Questions implements Verification_Controls
 
 	/**
 	 * Show the question to the user
-	 * Trys to account for lanaguges
+	 * Try's to account for languages
 	 *
 	 * @param boolean $isNew
 	 * @param boolean $force_refresh
@@ -610,6 +612,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	 * Get things ready for the template
 	 *
 	 * @return mixed[]
+	 * @throws Elk_Exception
 	 */
 	public function prepareContext()
 	{
@@ -620,11 +623,13 @@ class Verification_Controls_Questions implements Verification_Controls
 		$questions = $this->_loadAntispamQuestions(array('type' => 'id_question', 'value' => $this->_questionIDs));
 		$asked_questions = array();
 
+		$parser = \BBC\ParserWrapper::instance();
+
 		foreach ($questions as $row)
 		{
 			$asked_questions[] = array(
 				'id' => $row['id_question'],
-				'q' => parse_bbc($row['question']),
+				'q' => $parser->parseVerificationControls($row['question']),
 				'is_error' => !empty($this->_incorrectQuestions) && in_array($row['id_question'], $this->_incorrectQuestions),
 				// Remember a previous submission?
 				'a' => isset($_REQUEST[$this->_options['id'] . '_vv'], $_REQUEST[$this->_options['id'] . '_vv']['q'], $_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) ? Util::htmlspecialchars($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) : '',
@@ -639,14 +644,15 @@ class Verification_Controls_Questions implements Verification_Controls
 	}
 
 	/**
-	 * Perfom the test to see if the answer is correct
+	 * Performs the test to see if the answer is correct
 	 *
-	 * @return string|boolean
+	 * @return bool|string
+	 * @throws Elk_Exception no_access
 	 */
 	public function doTest()
 	{
 		if ($this->_number_questions && (!isset($_SESSION[$this->_options['id'] . '_vv']['q']) || !isset($_REQUEST[$this->_options['id'] . '_vv']['q'])))
-			fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 
 		if (!$this->_verifyAnswers())
 			return 'wrong_verification_answer';
@@ -655,9 +661,9 @@ class Verification_Controls_Questions implements Verification_Controls
 	}
 
 	/**
-	 * Required by the interface, returns true for question challanges
+	 * Required by the interface, returns true for question challenges
 	 *
-	 * @return true
+	 * @return boolean
 	 */
 	public function hasVisibleTemplate()
 	{
@@ -676,10 +682,12 @@ class Verification_Controls_Questions implements Verification_Controls
 		// Load any question and answers!
 		$filter = null;
 		if (isset($_GET['language']))
+		{
 			$filter = array(
 				'type' => 'language',
 				'value' => $_GET['language'],
 			);
+		}
 		$context['question_answers'] = $this->_loadAntispamQuestions($filter);
 		$languages = getLanguages();
 
@@ -789,11 +797,13 @@ class Verification_Controls_Questions implements Verification_Controls
 		global $modSettings;
 
 		$db = database();
+		$cache = Cache::instance();
 
-		if (($modSettings['question_id_cache'] = cache_get_data('verificationQuestionIds', 300)) == null)
+		if (!$cache->getVar($modSettings['question_id_cache'], 'verificationQuestionIds', 300) || !$modSettings['question_id_cache'])
 		{
 			$request = $db->query('', '
-				SELECT id_question, language
+				SELECT 
+					id_question, language
 				FROM {db_prefix}antispam_questions',
 				array()
 			);
@@ -802,15 +812,14 @@ class Verification_Controls_Questions implements Verification_Controls
 				$modSettings['question_id_cache'][$row['language']][] = $row['id_question'];
 			$db->free_result($request);
 
-			if (!empty($modSettings['cache_enable']))
-				cache_put_data('verificationQuestionIds', $modSettings['question_id_cache'], 300);
+			$cache->put('verificationQuestionIds', $modSettings['question_id_cache'], 300);
 		}
 	}
 
 	/**
 	 * Loads all the available antispam questions, or a subset based on a filter
 	 *
-	 * @param mixed[]|null $filter if specified it myst be an array with two indexes:
+	 * @param array|null $filter if specified it myst be an array with two indexes:
 	 *              - 'type' => a valid filter, it can be 'language' or 'id_question'
 	 *              - 'value' => the value of the filter (i.e. the language)
 	 */
@@ -826,7 +835,8 @@ class Verification_Controls_Questions implements Verification_Controls
 		// Load any question and answers!
 		$question_answers = array();
 		$request = $db->query('', '
-			SELECT id_question, question, answer, language
+			SELECT 
+				id_question, question, answer, language
 			FROM {db_prefix}antispam_questions' . ($filter === null || !isset($available_filters[$filter['type']]) ? '' : '
 			WHERE ' . $available_filters[$filter['type']]),
 			array(
@@ -870,7 +880,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	 *
 	 * @param int $id
 	 * @param string $question
-	 * @param string $answers
+	 * @param string[] $answers
 	 * @param string $language
 	 */
 	private function _update($id, $question, $answers, $language)

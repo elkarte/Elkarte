@@ -5,13 +5,11 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1
  *
  */
 
@@ -35,8 +33,7 @@ function template_profile_above()
 		addInlineJavascript('disableAutoComplete();', true);
 
 	// If an error occurred while trying to save previously, give the user a clue!
-	echo '
-					', template_error_message();
+	template_error_message();
 
 	// If the profile was update successfully, let the user know this.
 	if (!empty($context['profile_updated']))
@@ -57,11 +54,11 @@ function template_showDrafts()
 		template_pagesection();
 
 	echo '
-		<div id="profilecenter">
+		<div id="recentposts" class="profile_center">
 			<form action="', $scripturl, '?action=profile;u=' . $context['member']['id'] . ';area=showdrafts;delete" method="post" accept-charset="UTF-8" name="draftForm" id="draftForm" >
 				<h2 class="category_header">
 					<span class="floatright">
-						<input type="checkbox" onclick="invertAll(this, this.form, \'delete[]\');" class="input_check" />
+						<input type="checkbox" onclick="invertAll(this, this.form, \'delete[]\');" />
 					</span>
 					', $txt['drafts'], '
 				</h2>';
@@ -86,7 +83,7 @@ function template_showDrafts()
 				$draft['title'] .= '<img src="' . $settings['images_url'] . '/icons/quick_lock.png" alt="' . $txt['locked_topic'] . '" title="' . $txt['locked_topic'] . '" />';
 
 			$draft['date'] = '&#171; <strong>' . $txt['draft_saved_on'] . ':</strong> ' . ($draft['age'] > 0 ? sprintf($txt['draft_days_ago'], $draft['age']) : $draft['time']) . (!empty($draft['remaining']) ? ', ' . sprintf($txt['draft_retain'], $draft['remaining']) : '') . ' &#187;';
-			$draft['class'] = $draft['alternate'] === 0 ? 'windowbg2' : 'windowbg';
+			$draft['class'] = 'content';
 
 			template_simple_message($draft);
 		}
@@ -95,19 +92,12 @@ function template_showDrafts()
 	// Show page numbers
 	if (!empty($context['drafts']))
 	{
-		echo '
-				<div class="flow_auto">
-					<div class="floatleft">';
-
-		template_pagesection();
-
-		echo '
-					</div>
-					<div class="additional_row below_table_data">
-						<input type="submit" name="delete_selected" value="' . $txt['quick_mod_remove'] . '" class="right_submit" onclick="return confirm(' . JavaScriptEscape($txt['draft_remove_selected'] . '?') . ');" />
-						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
-					</div>
-				</div>';
+		template_pagesection(false, '', array('extra' => '
+			<div class="floatright">
+				<input type="submit" name="delete_selected" value="' . $txt['quick_mod_remove'] . '" class="right_submit" onclick="return confirm(' . JavaScriptEscape($txt['draft_remove_selected'] . '?') . ');" />
+				<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
+			</div>'
+		));
 	}
 
 	echo '
@@ -122,19 +112,16 @@ function template_profile_save()
 {
 	global $context, $txt;
 
-	echo '
-					<hr class="clear" />';
-
 	// Only show the password box if it's actually needed.
 	if ($context['require_password'])
 		echo '
-					<dl>
+					<dl class="clear">
 						<dt>
-							<strong', isset($context['modify_error']['bad_password']) || isset($context['modify_error']['no_password']) ? ' class="error"' : '', '><label for="oldpasswrd">', $txt['current_password'], '</label>: </strong><br />
+							<span', isset($context['modify_error']['bad_password']) || isset($context['modify_error']['no_password']) ? ' class="error"' : '', '><label for="oldpasswrd">', $txt['current_password'], '</label>: </span><br />
 							<span class="smalltext">', $txt['required_security_reasons'], '</span>
 						</dt>
 						<dd>
-							<input type="password" id="oldpasswrd" name="oldpasswrd" size="20" style="margin-right: 4ex;" class="input_password" placeholder="', $txt['current_password'], '" />
+							<input type="password" id="oldpasswrd" name="oldpasswrd" size="20" class="input_password" placeholder="', $txt['current_password'], '" />
 						</dd>
 					</dl>';
 
@@ -145,8 +132,15 @@ function template_profile_save()
 		echo '
 						<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
 
+	// The button shouldn't say "Change profile" unless we're changing the profile...
+	if (!empty($context['submit_button_text']))
+		echo '
+						<input type="submit" name="save" value="', $context['submit_button_text'], '" />';
+	else
+		echo '
+						<input type="submit" name="save" value="', $txt['change_profile'], '" />';
+
 	echo '
-						<input type="submit" value="', $txt['change_profile'], '" class="button_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="u" value="', $context['id_member'], '" />
 						<input type="hidden" name="sa" value="', $context['menu_item_selected'], '" />
@@ -161,7 +155,7 @@ function template_error_message()
 	global $context, $txt;
 
 	echo '
-		<div class="errorbox" ', empty($context['post_errors']) ? 'style="display:none" ' : '', 'id="profile_error">';
+		<div id="profile_error" class="errorbox', empty($context['post_errors']) ? ' hide"' : '"', '>';
 
 	if (!empty($context['post_errors']))
 	{

@@ -7,27 +7,24 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.3
+ * @version 1.1
  *
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Utility class to unzip package files
  *
- * if destination is null
- * - returns a list of files in the archive.
+ * If destination is null
+ * - Returns a list of files in the archive.
  *
- * if single_file is true
- * - returns the contents of the file specified by destination, if it exists, or false.
- * - destination can start with * and / to signify that the file may come from any directory.
- * - destination should not begin with a / if single_file is true.
- * - overwrites existing files with newer modification times if and only if overwrite is true.
- * - creates the destination directory if it doesn't exist, and is is specified.
- * - requires zlib support be built into PHP.
- * - returns an array of the files extracted on success
+ * If single_file is true
+ * - Returns the contents of the file specified by destination, if it exists, or false.
+ * - Destination can start with * and / to signify that the file may come from any directory.
+ * - Destination should not begin with a / if single_file is true.
+ * - Overwrites existing files with newer modification times if and only if overwrite is true.
+ * - Creates the destination directory if it doesn't exist, and is is specified.
+ * - Requires zlib support be built into PHP.
+ * - Returns an array of the files extracted on success
  */
 class UnZip
 {
@@ -124,11 +121,13 @@ class UnZip
 	/**
 	 * Class initialization, passes variables, loads dependencies
 	 *
-	 * @param string $data
-	 * @param string $destination
-	 * @param bool|string $single_file
-	 * @param bool $overwrite
+	 * @param string        $data
+	 * @param string        $destination
+	 * @param bool|string   $single_file
+	 * @param bool          $overwrite
 	 * @param null|string[] $files_to_extract
+	 *
+	 * @throws Elk_Exception package_no_zlib
 	 */
 	public function __construct($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 	{
@@ -141,7 +140,7 @@ class UnZip
 
 		// This function sorta needs gzinflate!
 		if (!function_exists('gzinflate'))
-			fatal_lang_error('package_no_zlib', 'critical');
+			throw new Elk_Exception('package_no_zlib', 'critical');
 
 		// Make sure we have this loaded.
 		loadLanguage('Packages');
@@ -149,7 +148,7 @@ class UnZip
 		// Likely to need this
 		require_once(SUBSDIR . '/Package.subs.php');
 
-		// The destination needs exist and be writeable or we are doomed
+		// The destination needs exist and be writable or we are doomed
 		umask(0);
 		if ($this->destination !== null && !file_exists($this->destination) && !$this->single_file)
 			mktree($this->destination, 0777);
@@ -166,7 +165,7 @@ class UnZip
 		if ($this->check_valid_zip() === false)
 			return false;
 
-		// The the overall zip information for this archive
+		// The overall zip information for this archive
 		$this->_read_endof_cdr();
 
 		// Load the actual CDR as defined by offset in the ecdr record
@@ -217,15 +216,15 @@ class UnZip
 	 *  - Read so we can find the actual central directory record for processing.
 	 *
 	 * Signature Definition:
-	 * - end of central dir signature: 4 bytes, always(0x06054b50)
-	 * - number of this disk: 2 bytes
-	 * - number of the disk with the start of the central directory: 2 bytes
-	 * - total number of entries in the central dir on this disk: 2 bytes
-	 * - total number of entries in the central dir: 2 bytes
-	 * - size of the central directory: 4 bytes
-	 * - offset of start of central directory with respect to the starting disk number: 4 bytes
-	 * - zipfile comment length: 2 bytes
-	 * - zipfile comment (variable size)
+	 * - End of central dir signature: 4 bytes, always(0x06054b50)
+	 * - Number of this disk: 2 bytes
+	 * - Number of the disk with the start of the central directory: 2 bytes
+	 * - Total number of entries in the central dir on this disk: 2 bytes
+	 * - Total number of entries in the central dir: 2 bytes
+	 * - Size of the central directory: 4 bytes
+	 * - Offset of start of central directory with respect to the starting disk number: 4 bytes
+	 * - Zipfile comment length: 2 bytes
+	 * - Zipfile comment (variable size)
 	 */
 	private function _read_endof_cdr()
 	{
@@ -244,28 +243,29 @@ class UnZip
 	 * Used to process the actual CDR record
 	 *
 	 * What it does:
-	 * - is a repeated sequence of [file header] . . .  until the end of central dir record.
-	 * - relative offset, used so we can find the actual data entry for each file in the archive
-	 * - validates the number of found files in the CDR matches what the ECDR record claims
+	 *
+	 * - Is a repeated sequence of [file header] . . .  until the end of central dir record.
+	 * - Relative offset, used so we can find the actual data entry for each file in the archive
+	 * - Validates the number of found files in the CDR matches what the ECDR record claims
 	 *
 	 * Signature Definition:
-	 * - central file header signature: 4 bytes always(0x02014b50)
-	 * - version made by: 2 bytes
-	 * - version needed to extract: 2 bytes
-	 * - general purpose bit flag: 2 bytes
-	 * - compression method: 2 bytes
-	 * - last mod file time: 2 bytes
-	 * - last mod file date: 2 bytes
-	 * - crc-32: 4 bytes
-	 * - compressed size: 4 bytes
-	 * - uncompressed size: 4 bytes
-	 * - filename length: 2 bytes
-	 * - extra field length: 2 bytes
-	 * - file comment length: 2 bytes
-	 * - disk number start: 2 bytes
-	 * - internal file attributes: 2 bytes
-	 * - external file attributes: 4 bytes
-	 * - relative offset of local header: 4 bytes
+	 * - Central file header signature: 4 bytes always(0x02014b50)
+	 * - Version made by: 2 bytes
+	 * - Version needed to extract: 2 bytes
+	 * - General purpose bit flag: 2 bytes
+	 * - Compression method: 2 bytes
+	 * - Last mod file time: 2 bytes
+	 * - Last mod file date: 2 bytes
+	 * - CRC-32: 4 bytes
+	 * - Compressed size: 4 bytes
+	 * - Uncompressed size: 4 bytes
+	 * - Filename length: 2 bytes
+	 * - Extra field length: 2 bytes
+	 * - File comment length: 2 bytes
+	 * - Disk number start: 2 bytes
+	 * - Internal file attributes: 2 bytes
+	 * - External file attributes: 4 bytes
+	 * - Relative offset of local header: 4 bytes
 	 */
 	private function _load_file_headers()
 	{
@@ -275,7 +275,6 @@ class UnZip
 		// Each header will be proceeded by the central directory file header signature which is always \x50\x4b\x01\x02
 		while (substr($this->_data_cdr, $pointer, 4) === "\x50\x4b\x01\x02")
 		{
-			$temp = array();
 			$i++;
 
 			// Extract all file standard length information for this record, its the 42 bytes following the signature
@@ -372,24 +371,25 @@ class UnZip
 	 * Reads the local header, [local file header + file data + data_descriptor]
 	 *
 	 * What it does:
+	 *
 	 * - Unpacks the local file header, 26 bytes after the signature
 	 * - Updates certain CDR fields based on the variable length data found
 	 * - Sets the compressed data in to the array for processing
 	 *
 	 * Signature Definition:
-	 * - local file header signature: 4 bytes, always (0x04034b50)
-	 * - version needed to extract: 2 bytes
-	 * - general purpose bit flag: 2 bytes
-	 * - compression method: 2 bytes
-	 * - last mod file time: 2 bytes
-	 * - last mod file date: 2 bytes
-	 * - crc-32: 4 bytes
-	 * - compressed size: 4 bytes
-	 * - uncompressed size: 4 bytes
-	 * - filename length: 2 bytes
-	 * - extra field length: 2 bytes
-	 * - filename (variable size)
-	 * - extra field (variable size)
+	 * - Local file header signature: 4 bytes, always (0x04034b50)
+	 * - Version needed to extract: 2 bytes
+	 * - General purpose bit flag: 2 bytes
+	 * - Compression method: 2 bytes
+	 * - Last mod file time: 2 bytes
+	 * - Last mod file date: 2 bytes
+	 * - CRC-32: 4 bytes
+	 * - Compressed size: 4 bytes
+	 * - Uncompressed size: 4 bytes
+	 * - Filename length: 2 bytes
+	 * - Extra field length: 2 bytes
+	 * - Filename (variable size)
+	 * - Extra field (variable size)
 	 */
 	private function _read_local_header()
 	{
@@ -431,7 +431,7 @@ class UnZip
 	 * Does the actual writing of the file
 	 *
 	 * - Writes the extracted file to disk or if we are extracting a single file
-	 * - it returns the extracted data
+	 * - It returns the extracted data
 	 */
 	private function _write_this_file()
 	{
@@ -456,7 +456,7 @@ class UnZip
 		// Write it out then
 		if ($this->_skip === true)
 			return;
-		elseif (!empty($this->_found ))
+		elseif (!empty($this->_found))
 			$this->_check_crc();
 		elseif ($this->_skip === false && $this->_found === false && $this->_check_crc())
 			package_put_contents($this->destination . '/' . $this->_filename, $this->_file_info['data']);
@@ -466,14 +466,15 @@ class UnZip
 	 * Alters processing based on the general purpose flag bits
 	 *
 	 * What it does:
-	 * - if bit 1 is set the file is protected, so it returns an empty one
-	 * - if bit 3 is set then the data descriptor is read and processed
+	 *
+	 * - If bit 1 is set the file is protected, so it returns an empty one
+	 * - If bit 3 is set then the data descriptor is read and processed
 	 *
 	 * The data descriptor, if it exists, is structured as
-	 * - local header signature: 4 bytes, optional (0x08074b50)
-	 * - crc-32: 4 bytes
-	 * - compressed size: 4 bytes
-	 * - uncompressed size: 4 bytes
+	 * - Local header signature: 4 bytes, optional (0x08074b50)
+	 * - CRC-32: 4 bytes
+	 * - Compressed size: 4 bytes
+	 * - Uncompressed size: 4 bytes
 	 *
 	 * This descriptor exists only if bit 3 of the general purpose bit flag is set.
 	 * It is byte aligned and immediately follows the last byte of compressed data.
