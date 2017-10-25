@@ -177,6 +177,15 @@ class ManageAttachments_Controller extends Action_Controller
 		{
 			checkSession();
 
+			if (!empty($this->_req->post->attachmentEnable))
+			{
+				enableModules('attachments', array('post'));
+			}
+			else
+			{
+				disableModules('attachments', array('post'));
+			}
+
 			// Changing the attachment upload directory
 			if (isset($this->_req->post->attachmentUploadDir))
 			{
