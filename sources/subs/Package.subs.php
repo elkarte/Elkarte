@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -1542,7 +1542,7 @@ function deltree($dir, $delete_dir = true)
 		{
 			$ftp_file = strtr($dir, array($_SESSION['pack_ftp']['root'] => ''));
 
-			if ($entryname->getPathname()->isWritable())
+			if (!is_writable($dir . '/'))
 				$package_ftp->chmod($ftp_file, 0777);
 
 			$package_ftp->unlink($ftp_file);

@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -245,7 +245,7 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 	if (!checkGD() && !checkImagick())
 		return false;
 
-	if (!file_exists($source))
+	if (!file_exists($source) && substr($source, 0, 7) !== 'http://' && substr($source, 0, 8) !== 'https://')
 	{
 		return false;
 	}

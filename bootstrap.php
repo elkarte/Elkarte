@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -296,6 +296,15 @@ if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && $use
 	obExit(null, true);
 }
 
+if (!empty($modSettings['front_page']) && is_callable(array($modSettings['front_page'], 'frontPageHook')))
+{
+	$modSettings['default_forum_action'] = '?action=forum;';
+}
+else
+{
+	$modSettings['default_forum_action'] = '';
+}
+
 // Load the stuff like the menu bar, etc.
 if (isset($ssi_layers))
 {
@@ -309,15 +318,6 @@ if (isset($ssi_layers))
 }
 else
 {
-	if (!empty($modSettings['front_page']) && is_callable(array($modSettings['front_page'], 'frontPageHook')))
-	{
-		$modSettings['default_forum_action'] = '?action=forum;';
-	}
-	else
-	{
-		$modSettings['default_forum_action'] = '';
-	}
-
 	setupThemeContext();
 }
 
