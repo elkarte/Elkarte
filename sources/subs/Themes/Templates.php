@@ -274,7 +274,7 @@ class Templates
 			// Do we want the English version of language file as fallback?
 			if (empty($modSettings['disable_language_fallback']) && $lang != 'english')
 			{
-				$this->loadLanguageFiles($template, 'english', false);
+				$this->loadLanguageFiles([$template], 'english', false);
 			}
 
 			// Try to find the language file.
