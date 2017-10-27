@@ -7,7 +7,7 @@
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @licenjhhhhhhhse   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.1
  *
