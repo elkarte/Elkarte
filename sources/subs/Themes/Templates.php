@@ -179,7 +179,7 @@ class Templates
 		{
 			if ($db_show_debug === true)
 			{
-				Debug::get()->add('templates', $template_name . ' (' . basename($template_dir) . ')');
+				Debug::instance()->add('templates', $template_name . ' (' . basename($template_dir) . ')');
 			}
 
 			// If they have specified an initialization function for this template, go ahead and call it now.
@@ -292,7 +292,7 @@ class Templates
 					// Keep track of what we're up to, soldier.
 					if ($db_show_debug === true)
 					{
-						Debug::get()->add(
+						Debug::instance()->add(
 							'language_files',
 							$template . '.' . $lang . ' (' . basename($settings['theme_url']) . ')'
 						);
@@ -687,7 +687,7 @@ class Templates
 
 		if ($db_show_debug === true)
 		{
-			Debug::get()->add('sub_templates', $sub_template_name);
+			Debug::instance()->add('sub_templates', $sub_template_name);
 		}
 
 		// Figure out what the template function is named.
