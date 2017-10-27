@@ -473,13 +473,13 @@ class Display_Controller extends Action_Controller
 
 				// ajax controller for likes
 				loadJavascriptFile('like_posts.js', array('defer' => true));
-				addJavascriptVar(array(
+				theme()->addJavascriptVar(array(
 					'likemsg_are_you_sure' => JavaScriptEscape($txt['likemsg_are_you_sure']),
 				));
 				theme()->getTemplates()->loadLanguageFile('Errors');
 
 				// Initiate likes and the tooltips for likes
-				addInlineJavascript('
+				theme()-addInlineJavascript('
 				$(function() {
 					var likePostInstance = likePosts.prototype.init({
 						oTxt: ({
@@ -604,7 +604,7 @@ class Display_Controller extends Action_Controller
 		// Auto video embedding enabled?
 		if (!empty($modSettings['enableVideoEmbeding']))
 		{
-			addInlineJavascript('
+			theme()-addInlineJavascript('
 		$(function() {
 			$().linkifyvideo(oEmbedtext);
 		});');
@@ -642,11 +642,11 @@ class Display_Controller extends Action_Controller
 			}
 		}
 
-		addJavascriptVar(array('notification_topic_notice' => $context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']), true);
+		theme()->addJavascriptVar(array('notification_topic_notice' => $context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']), true);
 
 		if ($context['can_send_topic'])
 		{
-			addJavascriptVar(array(
+			theme()->addJavascriptVar(array(
 				'sendtopic_cancel' => $txt['modify_cancel'],
 				'sendtopic_back' => $txt['back'],
 				'sendtopic_close' => $txt['find_close'],

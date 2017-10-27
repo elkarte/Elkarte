@@ -1544,7 +1544,7 @@ function loadBadBehavior()
 		if ($bb_run === true)
 		{
 			$bb2_results = bb2_start(bb2_read_settings());
-			addInlineJavascript(bb2_insert_head());
+			theme()-addInlineJavascript(bb2_insert_head());
 		}
 	}
 }

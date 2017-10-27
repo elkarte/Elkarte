@@ -690,7 +690,7 @@ function template_control_chmod()
 	</script>';
 
 	// Make sure the button gets generated last.
-	addInlineJavascript('
+	theme()-addInlineJavascript('
 		generateFTPTest();', true);
 }
 

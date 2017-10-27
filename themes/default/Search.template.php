@@ -146,7 +146,7 @@ function template_searchform()
 				</form>';
 
 	// And now all the JS to make this work
-	addInlineJavascript('
+	theme()-addInlineJavascript('
 		createEventListener(window);
 		window.addEventListener("load", initSearch, false);
 
@@ -410,7 +410,7 @@ function template_results()
 			<div class="floatright" id="search_jump_to">&nbsp;</div>';
 
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']) && $context['can_move'])
-		addInlineJavascript('
+		theme()-addInlineJavascript('
 		aJumpTo[aJumpTo.length] = new JumpTo({
 			sContainerId: "quick_mod_jump_to",
 			sClassName: "qaction",
@@ -425,7 +425,7 @@ function template_results()
 			sCustomName: "move_to"
 		});', true);
 
-	addInlineJavascript('
+	theme()-addInlineJavascript('
 		aJumpTo[aJumpTo.length] = new JumpTo({
 			sContainerId: "search_jump_to",
 			sJumpToTemplate: "<label class=\"smalltext\" for=\"%select_id%\">' . $context['jump_to']['label'] . ':<" + "/label> %dropdown_list%",

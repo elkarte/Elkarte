@@ -405,13 +405,13 @@ class Recent_Controller extends Action_Controller
 
 		// ajax controller for likes
 		loadJavascriptFile('like_posts.js', array('defer' => true));
-		addJavascriptVar(array(
+		theme()->addJavascriptVar(array(
 			'likemsg_are_you_sure' => JavaScriptEscape($txt['likemsg_are_you_sure']),
 		));
 		theme()->getTemplates()->loadLanguageFile('Errors');
 
 		// Initiate likes and the tooltips for likes
-		addInlineJavascript('
+		theme()-addInlineJavascript('
 			$(function() {
 				var likePostInstance = likePosts.prototype.init({
 					oTxt: ({

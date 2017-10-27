@@ -351,7 +351,7 @@ function template_edit_group()
 		</form>
 	</div>';
 
-	addInlineJavascript('
+	theme()-addInlineJavascript('
 		aIconLists[aIconLists.length] = new IconList({
 			sBackReference: "aIconLists[" + aIconLists.length + "]",
 			sIconIdPrefix: "msg_icon_",
@@ -399,12 +399,12 @@ function template_edit_group()
 			]
 		});';
 
-		addInlineJavascript($js, true);
+		theme()-addInlineJavascript($js, true);
 	}
 
 	// If post based is selected, disable moderation selection, visability, group description and enable post count,
 	if ($context['group']['allow_post_group'])
-		addInlineJavascript('swapPostGroup(' . ($context['group']['is_post_group'] ? 'true' : 'false') . ');', true);
+		theme()-addInlineJavascript('swapPostGroup(' . ($context['group']['is_post_group'] ? 'true' : 'false') . ');', true);
 }
 
 /**
@@ -676,7 +676,7 @@ function template_group_members()
 	</div>';
 
 	if (!empty($context['group']['assignable']))
-		addInlineJavascript('
+		theme()-addInlineJavascript('
 		var oAddMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
 			sSessionId: elk_session_id,

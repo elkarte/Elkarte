@@ -176,7 +176,7 @@ class Register_Controller extends Action_Controller
 		$context['sub_template'] = $current_step == 1 ? 'registration_agreement' : 'registration_form';
 		$context['page_title'] = $current_step == 1 ? $txt['registration_agreement'] : $txt['registration_form'];
 		loadJavascriptFile(array('register.js', 'mailcheck.min.js'));
-		addInlineJavascript('disableAutoComplete();
+		theme()-addInlineJavascript('disableAutoComplete();
 		$("input[type=email]").on("blur", function(event) {
 			$(this).mailcheck({
 				suggested: function(element, suggestion) {
@@ -1185,7 +1185,7 @@ class Register_Controller extends Action_Controller
 		else
 		{
 			loadJavascriptFile('mailcheck.min.js');
-			addInlineJavascript('disableAutoComplete();
+			theme()-addInlineJavascript('disableAutoComplete();
 			$("input[type=email]").on("blur", function(event) {
 				$(this).mailcheck({
 					suggested: function(element, suggestion) {

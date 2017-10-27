@@ -113,7 +113,7 @@ class Drafts_Display_Module extends ElkArte\sources\modules\Abstract_Module
 				else
 				{
 					loadJavascriptFile('drafts.js');
-					addInlineJavascript('
+					theme()-addInlineJavascript('
 				var oDraftAutoSave = new elk_DraftAutoSave({
 					sSelf: \'oDraftAutoSave\',
 					sLastNote: \'draft_lastautosave\',

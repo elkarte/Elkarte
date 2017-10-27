@@ -400,7 +400,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// Off to the template we go
 		$context['sub_template'] = 'list_themes';
-		addJavascriptVar(array('txt_theme_remove_confirm' => $txt['theme_remove_confirm']), true);
+		theme()->addJavascriptVar(array('txt_theme_remove_confirm' => $txt['theme_remove_confirm']), true);
 		$context['reset_dir'] = realpath(BOARDDIR . '/themes');
 		$context['reset_url'] = $boardurl . '/themes';
 
@@ -1554,7 +1554,7 @@ class ManageThemes_Controller extends Action_Controller
 	{
 		global $context, $settings;
 
-		addJavascriptVar(array(
+		theme()->addJavascriptVar(array(
 			'previewData' => '',
 			'previewTimeout' => '',
 			'refreshPreviewCache' => '',
@@ -1775,7 +1775,7 @@ class ManageThemes_Controller extends Action_Controller
 				$context['sub_template'] = 'edit_template';
 			elseif ($is_css)
 			{
-				addJavascriptVar(array(
+				theme()->addJavascriptVar(array(
 					'previewData' => '\'\'',
 					'previewTimeout' => '\'\'',
 					'refreshPreviewCache' => '\'\'',

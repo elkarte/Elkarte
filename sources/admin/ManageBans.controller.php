@@ -499,13 +499,13 @@ class ManageBans_Controller extends Action_Controller
 		$context['sub_template'] = 'ban_edit';
 
 		// A couple of text strings we *may* need
-		addJavascriptVar(array(
+		theme()->addJavascriptVar(array(
 			'txt_ban_name_empty' => $txt['ban_name_empty'],
 			'txt_ban_restriction_empty' => $txt['ban_restriction_empty']), true
 		);
 
 		// And a bit of javascript to enable/disable some fields
-		addInlineJavascript('addLoadEvent(fUpdateStatus);', true);
+		theme()-addInlineJavascript('addLoadEvent(fUpdateStatus);', true);
 	}
 
 	/**

@@ -132,7 +132,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 		$javascript_function .= '
 			}
 			disableFields();';
-		addInlineJavascript($javascript_function, true);
+		theme()-addInlineJavascript($javascript_function, true);
 
 		// Prepare the settings...
 		$settingsForm->prepare();

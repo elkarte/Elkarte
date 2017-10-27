@@ -405,7 +405,7 @@ class ProfileOptions_Controller extends Action_Controller
 			setupProfileContext($fields['fields'], $fields['hook']);
 
 			loadJavascriptFile('qrcode.js');
-			addInlineJavascript('
+			theme()-addInlineJavascript('
 				var secret = document.getElementById("otp_secret").value;
 
 				if (secret)

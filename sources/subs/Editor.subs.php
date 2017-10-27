@@ -148,7 +148,7 @@ function create_control_richedit($editorOptions)
 
 		// JS makes the editor go round
 		loadJavascriptFile(array('jquery.sceditor.bbcode.min.js', 'jquery.sceditor.elkarte.js', 'post.js', 'splittag.plugin.js', 'undo.plugin.min.js', 'dropAttachments.js'));
-		addJavascriptVar(array(
+		theme()->addJavascriptVar(array(
 			'post_box_name' => $editorOptions['id'],
 			'elk_smileys_url' => $settings['smileys_url'],
 			'bbc_quote_from' => $txt['quote_from'],
@@ -471,7 +471,7 @@ function create_control_richedit($editorOptions)
 	{
 		theme()->getTemplates()->loadLanguageFile('Errors');
 
-		addInlineJavascript('
+		theme()-addInlineJavascript('
 	error_txts[\'no_subject\'] = ' . JavaScriptEscape($txt['error_no_subject']) . ';
 	error_txts[\'no_message\'] = ' . JavaScriptEscape($txt['error_no_message']) . ';
 

@@ -247,7 +247,7 @@ class ManageServer_Controller extends Action_Controller
 			redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
 		}
 
-		addInlineJavascript('
+		theme()-addInlineJavascript('
 		// Initial state
 		hideGlobalCookies();
 
@@ -298,7 +298,7 @@ class ManageServer_Controller extends Action_Controller
 		theme()->getLayers()->add('clean_cache_button');
 
 		// Some javascript to enable / disable certain settings if the option is not selected
-		addInlineJavascript('
+		theme()-addInlineJavascript('
 			var cache_type = document.getElementById(\'cache_accelerator\');
 
 			createEventListener(cache_type);

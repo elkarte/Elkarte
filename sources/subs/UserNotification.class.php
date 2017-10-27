@@ -91,7 +91,7 @@ class User_Notification extends AbstractModel
 			}
 		}
 
-		addInlineJavascript('
+		theme()-addInlineJavascript('
 			$(function() {
 				ElkNotifier.add(new ElkFavicon({
 					number: ' . $number . ',
@@ -107,7 +107,7 @@ class User_Notification extends AbstractModel
 	protected function _addDesktopNotifications()
 	{
 		loadJavascriptFile('desktop-notify.js');
-		addInlineJavascript('
+		theme()-addInlineJavascript('
 			$(function() {
 				ElkNotifier.add(new ElkDesktop(
 					{\'icon\': $(\'head\').find("link[rel=\'shortcut icon\']").attr("href")}

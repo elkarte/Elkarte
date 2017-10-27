@@ -204,7 +204,7 @@ class Xml_Controller extends Action_Controller
 
 		// Return the response to the calling program
 		$context['sub_template'] = 'generic_xml';
-		addJavascriptVar(array('core_settings_generic_error' => $txt['core_settings_generic_error']), true);
+		theme()->addJavascriptVar(array('core_settings_generic_error' => $txt['core_settings_generic_error']), true);
 
 		$message = str_replace('{core_feature}', $feature_title, !empty($feature_id) && !empty($this->_req->post->{$feature_id}) ? $txt['core_settings_activation_message'] : $txt['core_settings_deactivation_message']);
 		$context['xml_data'] = array(

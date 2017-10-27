@@ -503,7 +503,7 @@ class Unread_Controller extends Action_Controller
 
 		if ($this->_is_topics)
 		{
-			addJavascriptVar(array(
+			theme()->addJavascriptVar(array(
 				'txt_mark_as_read_confirm' => $txt['mark_these_as_read_confirm']
 			), true);
 
@@ -534,7 +534,7 @@ class Unread_Controller extends Action_Controller
 		}
 		elseif (!$this->_is_topics && isset($topics_to_mark))
 		{
-			addJavascriptVar(array(
+			theme()->addJavascriptVar(array(
 				'txt_mark_as_read_confirm' => $txt['mark_these_as_read_confirm']
 			), true);
 

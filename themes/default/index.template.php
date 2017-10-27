@@ -512,7 +512,7 @@ function template_menu()
 				</nav>';
 
 	// Define the upper_section toggle in javascript.
-	addInlineJavascript('
+	theme()-addInlineJavascript('
 					var oMainHeaderToggle = new elk_Toggle({
 						bToggleEnabled: true,
 						bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['upshrink']) ? 'false' : 'true') . ',
@@ -784,7 +784,7 @@ function template_news_fader()
 			</li>
 		</ul>';
 
-	addInlineJavascript('
+	theme()-addInlineJavascript('
 		$(\'#elkFadeScroller\').Elk_NewsFader(' . (empty($settings['newsfader_time']) ? '' : '{\'iFadeDelay\': ' . $settings['newsfader_time'] . '}') . ');', true);
 }
 

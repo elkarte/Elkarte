@@ -122,7 +122,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// To make tabs work, we need jQueryUI
 		$modSettings['jquery_include_ui'] = true;
-		addInlineJavascript('start_tabs();', true);
+		theme()-addInlineJavascript('start_tabs();', true);
 		loadCSSFile('jquery.ui.tabs.css');
 	}
 

@@ -666,7 +666,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Auto video embedding enabled, someone may have a link in a PM
 		if (!empty($messages_request) && !empty($modSettings['enableVideoEmbeding']))
 		{
-			addInlineJavascript('
+			theme()-addInlineJavascript('
 		$(function() {
 			$().linkifyvideo(oEmbedtext);
 		});', true
@@ -2051,7 +2051,7 @@ class PersonalMessage_Controller extends Action_Controller
 			$js_groups = json_encode($context['groups']);
 
 			// Oh my, we have a lot of text strings for this
-			addJavascriptVar(array(
+			theme()->addJavascriptVar(array(
 				'criteriaNum' => 0,
 				'actionNum' => 0,
 				'groups' => $js_groups,
