@@ -1281,7 +1281,14 @@ function attachDirStatus($dir, $expected_files)
 
 	// Count the files with a glob, easier and less time consuming
 	$glob = new GlobIterator($dir . '/*.elk', FilesystemIterator::SKIP_DOTS);
-	$num_files = $glob->count();
+	try
+	{
+		$num_files = $glob->count();
+	}
+	catch (\LogicException $e)
+	{
+		$num_files = count(iterator_to_array($glob));
+	}
 
 	if ($num_files < $expected_files)
 		return array('files_missing', true, $num_files);
