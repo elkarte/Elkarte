@@ -252,7 +252,7 @@ class Attachment_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Graphics.subs.php');
 		if ($text === null)
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			$text = $txt['attachment_not_found'];
 		}
 

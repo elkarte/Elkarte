@@ -253,7 +253,7 @@ function elk_main()
 		// Load the current theme.  (note that ?theme=1 will also work, may be used for guest theming.)
 		if ($dispatcher->needTheme())
 		{
-			loadTheme();
+			new ElkArte\Themes\ThemeLoader();
 
 			// Load BadBehavior before we go much further
 			loadBadBehavior();

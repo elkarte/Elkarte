@@ -701,7 +701,7 @@ class Mentions_Controller extends Action_Controller
 
 		// If everything is fine, let's include our helper functions and prepare for the fun!
 		require_once(SUBSDIR . '/Mentions.subs.php');
-		loadLanguage('Mentions');
+		theme()->getTemplates()->loadLanguageFile('Mentions');
 
 		return true;
 	}

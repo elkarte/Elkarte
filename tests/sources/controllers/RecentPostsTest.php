@@ -47,7 +47,7 @@ class TestRecentPosts extends PHPUnit_Framework_TestCase
 			'all' => '<span></span>',
 		);
 
-		loadTheme();
+		new ElkArte\Themes\ThemeLoader();
 	}
 
 	/**

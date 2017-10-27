@@ -77,7 +77,7 @@ loadSession();
 loadUserSettings();
 loadBoard();
 loadPermissions();
-loadTheme();
+new ElkArte\Themes\ThemeLoader();
 
 // It should be added to the install and upgrade scripts.
 // But since the converters need to be updated also. This is easier.

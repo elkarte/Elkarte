@@ -14,7 +14,7 @@ class TestBBCHTML extends PHPUnit_Framework_TestCase
 		$GLOBALS['modSettings']['user_access_mentions'] = array();
 		$GLOBALS['modSettings']['enablePostHTML'] = 1;
 
-		loadTheme();
+		new ElkArte\Themes\ThemeLoader();
 
 		// Standard testcases
 		$this->bbcTestCases = array(

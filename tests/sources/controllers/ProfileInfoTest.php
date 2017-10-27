@@ -46,7 +46,7 @@ class TestProfileInfo extends PHPUnit_Framework_TestCase
 			'all' => '<span></span>',
 		);
 
-		loadTheme();
+		new ElkArte\Themes\ThemeLoader();
 		theme()->getTemplates()->loadLanguageFile('Profile', 'english', true, true);
 	}
 

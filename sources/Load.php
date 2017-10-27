@@ -495,7 +495,7 @@ function loadBoard()
 		else
 		{
 			loadPermissions();
-			loadTheme();
+			new ElkArte\Themes\ThemeLoader();
 			throw new Elk_Exception('topic_gone', false);
 		}
 	}
@@ -687,7 +687,7 @@ function loadBoard()
 	{
 		// The permissions and theme need loading, just to make sure everything goes smoothly.
 		loadPermissions();
-		loadTheme();
+		new ElkArte\Themes\ThemeLoader();
 
 		$_GET['board'] = '';
 		$_GET['topic'] = '';
@@ -1803,7 +1803,7 @@ function getLanguages($use_cache = true)
 	{
 		// If we don't have our theme information yet, lets get it.
 		if (empty($settings['default_theme_dir']))
-			loadTheme(0, false);
+			new ElkArte\Themes\ThemeLoader(0, false);
 
 		// Default language directories to try.
 		$language_directories = array(

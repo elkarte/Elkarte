@@ -192,7 +192,7 @@ function is_not_guest($message = '', $is_fatal = true)
 
 	// Attempt to detect if they came from dlattach.
 	if (ELK != 'SSI' && empty($context['theme_loaded']))
-		loadTheme();
+		new ElkArte\Themes\ThemeLoader();
 
 	// Never redirect to an attachment
 	if (validLoginUrl($_SERVER['REQUEST_URL']))
