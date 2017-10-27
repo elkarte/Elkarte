@@ -4,7 +4,7 @@ dist: trusty
 
 matrix:
   include:
-    - php: 5.4
+    - php: 5.5
       env:
         - DB=mysql-5.6
         - WEBTESTS=false
@@ -19,7 +19,7 @@ matrix:
         - DB=mysql-5.7
         - WEBTESTS=false
         - COVERAGE=false
-    - php: 5.4
+    - php: 5.5
       env:
         - DB=postgres-9.3
         - WEBTESTS=false

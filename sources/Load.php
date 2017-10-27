@@ -785,7 +785,7 @@ function loadPermissions()
 	{
 		// Get the general permissions.
 		$request = $db->query('', '
-			SELECT 
+			SELECT
 				permission, add_deny
 			FROM {db_prefix}permissions
 			WHERE id_group IN ({array_int:member_groups})
@@ -816,7 +816,7 @@ function loadPermissions()
 			throw new Elk_Exception('no_board');
 
 		$request = $db->query('', '
-			SELECT 
+			SELECT
 				permission, add_deny
 			FROM {db_prefix}board_permissions
 			WHERE (id_group IN ({array_int:member_groups})
@@ -1230,7 +1230,7 @@ function detectBrowser()
  * - loads default JS variables for use in every theme
  * - loads default JS scripts for use in every theme
  *
- * @deprecated use the theme object
+ * @deprecated since 2.0; use the theme object
  *
  * @param int $id_theme = 0
  * @param bool $initialize = true
@@ -1349,7 +1349,7 @@ function determineSmileySet($user_smiley_set, $known_smiley_sets)
 /**
  * This loads the bare minimum data.
  *
- * @deprecated use the theme object
+ * @deprecated since 2.0; use the theme object
  *
  * - Needed by scheduled tasks,
  * - Needed by any other code that needs language files before the forum (the theme) is loaded.
@@ -1370,7 +1370,7 @@ function loadEssentialThemeData()
  *   loading of style sheets with this function is deprecated, use loadCSSFile instead
  * - if $settings['template_dirs'] is empty, it delays the loading of the template
  *
- * @deprecated use the theme object
+ * @deprecated since 2.0; use the theme object
  *
  * @uses the requireTemplate() function to actually load the file.
  * @param string|false $template_name
@@ -1382,6 +1382,16 @@ function loadEssentialThemeData()
  */
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
+	$debug = '<br><br>';
+	foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1] as $var => $$val)
+	{
+		$debug .= $var . ': ' . $val . '<br>';
+	}
+	Errors::instance()->log_error(sprintf(
+		'%s is deprecated, use %s instead.%s',
+		'loadTemplate().',
+		'theme()->getTemplates()->load().',
+		$debug) ,'deprecated');
 	return theme()->getTemplates()->load($template_name, $style_sheets, $fatal);
 }
 
@@ -1394,7 +1404,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  * - if ?debug is in the query string, shows administrators a marker after every sub template
  * for debugging purposes.
  *
- * @deprecated use the theme object
+ * @deprecated since 2.0; use the theme object
  *
  * @param string $sub_template_name
  * @param bool|string $fatal = false
@@ -1619,7 +1629,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 /**
  * Add a Javascript variable for output later (for feeding text strings and similar to JS)
  *
- * @deprecated use the theme object
+ * @deprecated since 2.0; use the theme object
  *
  * @param mixed[] $vars array of vars to include in the output done as 'varname' => 'var value'
  * @param bool $escape = false, whether or not to escape the value
@@ -1638,7 +1648,7 @@ function addJavascriptVar($vars, $escape = false)
  *   or for scripts that require help from PHP/whatever, this can be useful.
  * - all code added with this function is added to the same <script> tag so do make sure your JS is clean!
  *
- * @deprecated use the theme object
+ * @deprecated since 2.0; use the theme object
  *
  * @param string $javascript
  * @param bool $defer = false, define if the script should load in <head> or before the closing <html> tag
@@ -1653,7 +1663,7 @@ function addInlineJavascript($javascript, $defer = false)
  *
  * - Tries the current and default themes as well as the user and global languages.
  *
- * @deprecated use the theme object
+ * @deprecated since 2.0; use the theme object
  *
  * @param string $template_name
  * @param string $lang = ''

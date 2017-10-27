@@ -43,7 +43,7 @@ then
     memcached -p 11213 -d
 
     # Phpunit and support
-    if [ "$SHORT_PHP" == "5.4" -o "$SHORT_PHP" == "5.3" ]
+    if [ "$SHORT_PHP" == "5.5" ]
     then
         # need prior version of phpunit for php 5.5 and below
         composer require phpunit/phpunit-selenium:~2.0 phpunit/dbunit:1.4.* phpunit/phpunit:~4.8

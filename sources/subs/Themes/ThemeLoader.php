@@ -234,7 +234,7 @@ class ThemeLoader
 		$settings['actual_theme_dir'] = $settings['theme_dir'];
 
 		// Set the name of the default theme to something PHP will recognize.
-		$themeName = basename($settings['theme_dir'])  == 'default'
+		$themeName = basename($settings['theme_dir']) == 'default'
 			? 'DefaultTheme'
 			: ucfirst(basename($settings['theme_dir']));
 

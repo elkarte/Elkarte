@@ -149,6 +149,15 @@ class Errors extends \AbstractModel
 	/**
 	 * Log an error to the error log if the error logging is enabled.
 	 *
+	 * Available error types:
+	 * - generaal
+	 * - critical
+	 * - database
+	 * - undefined_vars
+	 * - template
+	 * - user
+	 * - deprecated
+	 *
 	 * - filename and line should be __FILE__ and __LINE__, respectively.
 	 *
 	 * Example use:
