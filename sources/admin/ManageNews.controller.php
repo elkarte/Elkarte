@@ -890,7 +890,7 @@ class ManageNews_Controller extends Action_Controller
 		$settingsForm->setConfigVars($this->_settings());
 
 		// Add some javascript at the bottom...
-		theme()-addInlineJavascript('
+		theme()->addInlineJavascript('
 			document.getElementById("xmlnews_maxlen").disabled = !document.getElementById("xmlnews_enable").checked;
 			document.getElementById("xmlnews_limit").disabled = !document.getElementById("xmlnews_enable").checked;', true);
 

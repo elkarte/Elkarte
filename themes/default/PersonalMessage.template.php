@@ -634,7 +634,7 @@ function template_search()
 		</fieldset>';
 
 		// And now some javascript for the advanced label toggling
-		theme()-addInlineJavascript('
+		theme()->addInlineJavascript('
 			createEventListener(window);
 			window.addEventListener("load", initSearch, false);
 
@@ -671,7 +671,7 @@ function template_search()
 	}
 
 	// And the JS to make the advanced / basic form work
-	theme()-addInlineJavascript('
+	theme()->addInlineJavascript('
 		// Set the search style
 		document.getElementById(\'advanced\').value = "' . (empty($context['minmax_preferences']['pmsearch']) ? '1' : '0') . '";
 
@@ -991,7 +991,7 @@ function template_send()
 
 	// Code for showing and hiding drafts
 	if (!empty($context['drafts']))
-		theme()-addInlineJavascript('
+		theme()->addInlineJavascript('
 		var oSwapDraftOptions = new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['pmdraft']) ? 'false' : 'true') . ',

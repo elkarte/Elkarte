@@ -444,7 +444,7 @@ function template_add_new_attachments()
 
 	if (!empty($context['attachments']['ila_enabled']))
 	{
-		theme()-addInlineJavascript('
+		theme()->addInlineJavascript('
 		var IlaDropEvents = {
 			UploadSuccess: function($button, data) {
 				var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
@@ -462,12 +462,12 @@ function template_add_new_attachments()
 	}
 	else
 	{
-		theme()-addInlineJavascript('
+		theme()->addInlineJavascript('
 		var IlaDropEvents = {};', true);
 	}
 
 	// Load up the drag and drop attachment magic
-	theme()-addInlineJavascript('
+	theme()->addInlineJavascript('
 	var dropAttach = new dragDropAttachment({
 		board: ' . $context['current_board'] . ',
 		allowedExtensions: ' . JavaScriptEscape($context['attachments']['allowed_extensions']) . ',
@@ -523,7 +523,7 @@ function template_load_drafts_below()
 					</div>';
 
 	// Code for showing and hiding drafts
-	theme()-addInlineJavascript('
+	theme()->addInlineJavascript('
 			var oSwapDraftOptions = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['draft']) ? 'false' : 'true') . ',
@@ -712,7 +712,7 @@ function template_postarea_below()
 
 	// Code for showing and hiding additional options.
 	if (!empty($settings['additional_options_collapsible']))
-		theme()-addInlineJavascript('
+		theme()->addInlineJavascript('
 			var oSwapAdditionalOptions = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['post']) ? 'false' : 'true') . ',

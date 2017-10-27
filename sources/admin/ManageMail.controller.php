@@ -286,7 +286,7 @@ class ManageMail_Controller extends Action_Controller
 			}' . (!$is_last ? ',' : '');
 		}
 
-		theme()-addInlineJavascript($javascript . '
+		theme()->addInlineJavascript($javascript . '
 		};
 		function fetch_birthday_preview()
 		{

@@ -580,7 +580,7 @@ class Theme extends BaseTheme
 			loadCSSFile('prettify.css');
 			loadJavascriptFile('prettify.min.js', array('defer' => true));
 
-			theme()-addInlineJavascript('
+			theme()->addInlineJavascript('
 			$(function() {
 				prettyPrint();
 			});', true);
@@ -596,7 +596,7 @@ class Theme extends BaseTheme
 
 		if (!empty($modSettings['enableVideoEmbeding']))
 		{
-			theme()-addInlineJavascript('
+			theme()->addInlineJavascript('
 			var oEmbedtext = ({
 				preview_image : ' . JavaScriptEscape($txt['preview_image']) . ',
 				ctp_video : ' . JavaScriptEscape($txt['ctp_video']) . ',
@@ -638,7 +638,7 @@ class Theme extends BaseTheme
 			$type = empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time() ? 'task' : 'mailq';
 			$ts = $type === 'mailq' ? $modSettings['mail_next_send'] : $modSettings['next_task_time'];
 
-			theme()-addInlineJavascript('
+			theme()->addInlineJavascript('
 		function elkAutoTask()
 		{
 			var tempImage = new Image();
@@ -658,7 +658,7 @@ class Theme extends BaseTheme
 		// Relative times?
 		if (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2)
 		{
-			theme()-addInlineJavascript('
+			theme()->addInlineJavascript('
 			var oRttime = ({
 				referenceTime : ' . forum_time() * 1000 . ',
 				now : ' . JavaScriptEscape($txt['rt_now']) . ',
@@ -800,7 +800,7 @@ class Theme extends BaseTheme
 		// Add the PM popup here instead. Theme authors can still override it simply by editing/removing the 'fPmPopup' in the array.
 		if ($context['show_pm_popup'])
 		{
-			theme()-addInlineJavascript('
+			theme()->addInlineJavascript('
 			$(function() {
 				new smc_Popup({
 					heading: ' . JavaScriptEscape($txt['show_personal_messages_heading']) . ',

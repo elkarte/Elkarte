@@ -122,7 +122,7 @@ function setupProfileContext($fields, $hook = '')
 			if (!empty($cur_field['js_submit']))
 				$context['profile_onsubmit_javascript'] .= $cur_field['js_submit'];
 			if (!empty($cur_field['js']))
-				theme()-addInlineJavascript($cur_field['js']);
+				theme()->addInlineJavascript($cur_field['js']);
 			if (!empty($cur_field['js_load']))
 				loadJavascriptFile($cur_field['js_load']);
 

@@ -411,7 +411,7 @@ class Recent_Controller extends Action_Controller
 		theme()->getTemplates()->loadLanguageFile('Errors');
 
 		// Initiate likes and the tooltips for likes
-		theme()-addInlineJavascript('
+		theme()->addInlineJavascript('
 			$(function() {
 				var likePostInstance = likePosts.prototype.init({
 					oTxt: ({

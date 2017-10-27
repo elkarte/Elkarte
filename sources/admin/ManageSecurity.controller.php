@@ -227,7 +227,7 @@ class ManageSecurity_Controller extends Action_Controller
 
 		// Some minor javascript for the guest post setting.
 		if ($modSettings['posts_require_captcha'])
-			theme()-addInlineJavascript('document.getElementById(\'guests_require_captcha\').disabled = true;', true);
+			theme()->addInlineJavascript('document.getElementById(\'guests_require_captcha\').disabled = true;', true);
 
 		$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=spam';
 		$context['settings_title'] = $txt['antispam_Settings'];

@@ -471,7 +471,7 @@ function create_control_richedit($editorOptions)
 	{
 		theme()->getTemplates()->loadLanguageFile('Errors');
 
-		theme()-addInlineJavascript('
+		theme()->addInlineJavascript('
 	error_txts[\'no_subject\'] = ' . JavaScriptEscape($txt['error_no_subject']) . ';
 	error_txts[\'no_message\'] = ' . JavaScriptEscape($txt['error_no_message']) . ';
 

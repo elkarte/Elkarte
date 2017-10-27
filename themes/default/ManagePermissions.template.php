@@ -141,7 +141,7 @@ function template_permission_index()
 			</div>';
 
 		// Javascript for the advanced stuff.
-		theme()-addInlineJavascript('
+		theme()->addInlineJavascript('
 		var oPermissionsPanelToggle = new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ' . (empty($context['admin_preferences']['app']) ? 'false' : 'true') . ',

@@ -1536,7 +1536,7 @@ class ManageMaillist_Controller extends Action_Controller
 		foreach ($board_list as $board_id => $board_name)
 			$script .= $i++ . ': {id:' . $board_id . ', name:' . JavaScriptEscape($board_name) . '},';
 
-		theme()-addInlineJavascript('
+		theme()->addInlineJavascript('
 		var sEmailParent = \'add_more_email_placeholder\',
 			oEmailOptionsdt = {size: \'50\', name: \'emailfrom[]\', class: \'input_text\'},
 			oEmailOptionsdd = {size: \'1\', type: \'select\', name: \'boardto[]\', class: \'input_select\'},

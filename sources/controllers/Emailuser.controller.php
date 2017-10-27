@@ -488,7 +488,7 @@ class Emailuser_Controller extends Action_Controller
 		theme()->getTemplates()->loadLanguageFile('Errors');
 		theme()->getTemplates()->load('Emailuser');
 
-		theme()-addInlineJavascript('
+		theme()->addInlineJavascript('
 		error_txts[\'post_too_long\'] = ' . JavaScriptEscape($txt['error_post_too_long']) . ';
 
 		var report_errors = new errorbox_handler({

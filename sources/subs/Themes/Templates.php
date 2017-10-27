@@ -257,15 +257,9 @@ class Templates
 			$this->loadEssentialThemeData();
 		}
 
-		$fix_arrays = false;
 		// For each file open it up and write it out!
 		foreach ($template_name as $template)
 		{
-			if ($template === 'index')
-			{
-				$fix_arrays = true;
-			}
-
 			if (!$force_reload && isset($already_loaded[$template]) && $already_loaded[$template] == $lang)
 			{
 				return $lang;

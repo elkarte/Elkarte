@@ -781,7 +781,7 @@ class ManageBoards_Controller extends Action_Controller
 		$settingsForm->setConfigVars($this->_settings());
 
 		// Add some javascript stuff for the recycle box.
-		theme()-addInlineJavascript('
+		theme()->addInlineJavascript('
 				document.getElementById("recycle_board").disabled = !document.getElementById("recycle_enable").checked;', true);
 
 		// Get the needed template bits

@@ -441,7 +441,7 @@ class Verification_Controls_Captcha implements Verification_Controls
 		if ($this->_use_graphic_library)
 		{
 			loadJavascriptFile('jquery.captcha.js');
-			theme()-addInlineJavascript('
+			theme()->addInlineJavascript('
 		$(\'#visual_verification_type\').Elk_Captcha({
 			\'imageURL\': ' . JavaScriptEscape($verification_image) . ',
 			\'useLibrary\': true,

@@ -30,7 +30,7 @@ function template_profile_above()
 
 	// Prevent browssers from auto completing fields when viewing/editing other members profiles
 	if (!$context['user']['is_owner'])
-		theme()-addInlineJavascript('disableAutoComplete();', true);
+		theme()->addInlineJavascript('disableAutoComplete();', true);
 
 	// If an error occurred while trying to save previously, give the user a clue!
 	template_error_message();

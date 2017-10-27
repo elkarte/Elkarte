@@ -346,7 +346,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 				// Does this gateway have any javascript?
 				if (!empty($fields['javascript']))
 				{
-					theme()-addInlineJavascript($fields['javascript'], true);
+					theme()->addInlineJavascript($fields['javascript'], true);
 				}
 			}
 		}

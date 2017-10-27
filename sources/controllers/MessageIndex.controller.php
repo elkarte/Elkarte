@@ -44,7 +44,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 	{
 		parent::frontPageOptions();
 
-		theme()-addInlineJavascript('
+		theme()->addInlineJavascript('
 			$(\'#front_page\').on(\'change\', function() {
 				var $base = $(\'#message_index_frontpage\').parent();
 				if ($(this).val() == \'MessageIndex_Controller\')

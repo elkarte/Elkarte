@@ -283,7 +283,7 @@ function template_pick_boards($form_name, $input_names = 'brd', $select_all = tr
 						</div>';
 
 		// And now all the JS to make this work
-		theme()-addInlineJavascript('
+		theme()->addInlineJavascript('
 		// Some javascript for the advanced board select toggling
 		var oAdvancedPanelToggle = new elk_Toggle({
 			bToggleEnabled: true,

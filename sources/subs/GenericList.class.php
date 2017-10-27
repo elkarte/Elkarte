@@ -463,7 +463,7 @@ class Generic_List
 	protected function prepareJavascript()
 	{
 		if (isset($this->listOptions['javascript']))
-			theme()-addInlineJavascript($this->listOptions['javascript'], true);
+			theme()->addInlineJavascript($this->listOptions['javascript'], true);
 	}
 
 	/**

@@ -119,7 +119,7 @@ function template_email_members()
 	</div>';
 
 	// This is some javascript for the simple/advanced toggling and member suggest
-	theme()-addInlineJavascript('
+	theme()->addInlineJavascript('
 		var oAdvancedPanelToggle = new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ' . (empty($context['admin_preferences']['apn']) ? 'false' : 'true') . ',
@@ -277,7 +277,7 @@ function template_email_members_compose()
 			<input type="hidden" name="', $key, '" value="', implode(($key == 'emails' ? ';' : ','), $values), '" />';
 
 	// The vars used to preview a newsletter without loading a new page, used by post.js previewControl()
-	theme()-addInlineJavascript('
+	theme()->addInlineJavascript('
 		var form_name = "newsmodify",
 			preview_area = "news",
 			txt_preview_title = "' . $txt['preview_title'] . '",

@@ -226,7 +226,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 		}
 
 		// Some javascript to enable / disable the frequency input box
-		theme()-addInlineJavascript('
+		theme()->addInlineJavascript('
 			var autosave = document.getElementById(\'drafts_autosave_enabled\');
 
 			createEventListener(autosave);

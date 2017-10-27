@@ -666,7 +666,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Auto video embedding enabled, someone may have a link in a PM
 		if (!empty($messages_request) && !empty($modSettings['enableVideoEmbeding']))
 		{
-			theme()-addInlineJavascript('
+			theme()->addInlineJavascript('
 		$(function() {
 			$().linkifyvideo(oEmbedtext);
 		});', true

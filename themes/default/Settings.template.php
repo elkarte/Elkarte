@@ -279,7 +279,7 @@ function template_settings()
 		),
 	);
 
-	theme()-addInlineJavascript('
+	theme()->addInlineJavascript('
 		// Hide the option first
 		$("#dt_newsfader_time, #dd_newsfader_time").hide();
 
