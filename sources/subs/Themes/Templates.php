@@ -691,7 +691,7 @@ class Templates
 		}
 		elseif ($fatal !== 'ignore')
 		{
-			die(Errors::instance()->log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load the %s sub template!',
+			throw new BadFunctionCallException(Errors::instance()->log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load the %s sub template!',
 				(string) $sub_template_name), 'template'));
 		}
 	}
