@@ -33,7 +33,7 @@ class Theme extends BaseTheme
 	 *
 	 * @return array Theme settings
 	 */
-	function getSetings()
+	function getSettings()
 	{
 		return array(
 			/*

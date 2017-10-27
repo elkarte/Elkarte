@@ -382,7 +382,7 @@ class ThemeLoader
 		$settings['avatars_on_indexes'] = 0;
 
 		// Initialize the theme.
-		$settings = array_merge($settings, theme()->getSetings());
+		$settings = array_merge($settings, theme()->getSettings());
 
 		// Load the basic layers
 		theme()->loadDefaultLayers();

@@ -133,7 +133,7 @@ abstract class Theme
 	 *
 	 * @return array Theme settings
 	 */
-	abstract public function getSetings();
+	abstract public function getSettings();
 
 	/**
 	 * @return ElkArte\Theme\TemplateLayers
