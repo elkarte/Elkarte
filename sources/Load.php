@@ -1339,7 +1339,7 @@ function loadEssentialThemeData()
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
 	$debug = '<br><br>';
-	foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1] as $var => $$val)
+	foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1] as $var => $val)
 	{
 		$debug .= $var . ': ' . $val . '<br>';
 	}
