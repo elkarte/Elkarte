@@ -7,7 +7,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.1
  */
 
 /**
@@ -867,6 +867,8 @@ function expandThumbLB(thumbID, messageID) {
 	var link = document.getElementById('link_' + thumbID),
 		siblings = $('a[data-lightboxmessage="' + messageID + '"]'),
 		navigation = [],
+		xDown = null,
+		yDown = null,
 		$elk_expand_icon = $('<span id="elk_lb_expand"></span>'),
 		$elk_lightbox = $('#elk_lightbox'),
 		$elk_lb_content = $('#elk_lb_content'),
@@ -885,6 +887,8 @@ function expandThumbLB(thumbID, messageID) {
 			$('html, body').removeClass('elk_lb_no_scrolling');
 			$(window).off('resize.lb');
 			$(window).off('keydown.lb');
+			$(window).off('touchstart.lb');
+			$(window).off('touchmove.lb');
 		},
 		openLightbox = function () {
 			// Load and open an image in the lightbox
@@ -999,6 +1003,42 @@ function expandThumbLB(thumbID, messageID) {
 			$_elk_lb_content.css({'height': window.innerHeight * 0.85, 'width': window.innerWidth * 0.9});
 		else
 			$('#elk_lb_img').css({'max-height': window.innerHeight * 0.9, 'max-width': window.innerWidth * 0.8});
+	});
+
+	// Swipe navigation start, record press x/y
+	$(window).on('touchstart.lb', function (event) {
+		xDown = event.originalEvent.touches[0].clientX;
+		yDown = event.originalEvent.touches[0].clientY;
+	});
+
+	// Swipe navigation left / right detection
+	$(window).on('touchmove.lb', function(event) {
+		// No known start point ?
+		if (!xDown || !yDown)
+			return;
+
+		// Where are we now
+		var xUp = event.originalEvent.touches[0].clientX,
+			yUp = event.originalEvent.touches[0].clientY,
+			xDiff = xDown - xUp,
+			yDiff = yDown - yUp;
+
+		// Moved enough to know what direction they are swiping
+		if (Math.abs(xDiff) > Math.abs(yDiff)) {
+			if (xDiff > 0) {
+				// Swipe left
+				prevNav();
+				navLightbox();
+			} else {
+				// Swipe right
+				nextNav();
+				navLightbox();
+			}
+		}
+
+		// Reset values
+		xDown = null;
+		yDown = null;
 	});
 
 	return false;
