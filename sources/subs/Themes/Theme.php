@@ -100,6 +100,7 @@ abstract class Theme
 	 */
 	public function __construct($id)
 	{
+		$this->id = $id;
 		$this->layers = new TemplateLayers;
 		$this->templates = new Templates;
 
