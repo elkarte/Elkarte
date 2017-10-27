@@ -583,7 +583,7 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 	if (!XMLDoc || !XMLDoc.getElementsByTagName('elk')[0])
 	{
 		// Mozilla will nicely tell us what's wrong.
-		if (XMLDoc.childNodes.length > 0 && XMLDoc.firstChild.nodeName === 'parsererror')
+		if (typeof XMLDoc.childNodes !== 'undefined' &&  XMLDoc.childNodes.length > 0 && XMLDoc.firstChild.nodeName === 'parsererror')
 		{
 			oErrordiv = document.getElementById('error_box');
 			oErrordiv.innerHTML = XMLDoc.firstChild.textContent;
