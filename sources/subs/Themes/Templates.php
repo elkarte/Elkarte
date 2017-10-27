@@ -239,7 +239,7 @@ class Templates
 	 *
 	 * @return string The language actually loaded.
 	 */
-	function loadLanguageFiles(array $template_name, $lang = '', $fatal = true, $force_reload = false)
+	public function loadLanguageFiles(array $template_name, $lang = '', $fatal = true, $force_reload = false)
 	{
 		global $user_info, $language, $settings, $modSettings;
 		global $db_show_debug, $txt;
@@ -330,7 +330,7 @@ class Templates
 	 * - Needed by scheduled tasks,
 	 * - Needed by any other code that needs language files before the forum (the theme) is loaded.
 	 */
-	function loadEssentialThemeData()
+	public function loadEssentialThemeData()
 	{
 		global $settings, $modSettings, $mbname, $context;
 
@@ -390,7 +390,7 @@ class Templates
 	 *
 	 * @return string The language actually loaded.
 	 */
-	function loadLanguageFile($template_name, $lang = '', $fatal = true, $force_reload = false)
+	public function loadLanguageFile($template_name, $lang = '', $fatal = true, $force_reload = false)
 	{
 		return $this->loadLanguageFiles(explode('+', $template_name), $lang, $fatal, $force_reload);
 	}
