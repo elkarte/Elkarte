@@ -1279,50 +1279,6 @@ function loadUserContext()
 }
 
 /**
- * Called if the detected URL is not the same as boardurl but is a common
- * variation in which case it updates key system variables so it works.
- *
- * @param string $detected_url
- */
-function fixThemeUrls($detected_url)
-{
-	global $boardurl, $scripturl, $settings, $modSettings, $context, $board_info;
-
-	// Caching is good ;).
-	$oldurl = $boardurl;
-
-	// Fix $boardurl and $scripturl.
-	$boardurl = $detected_url;
-	$scripturl = strtr($scripturl, array($oldurl => $boardurl));
-	$_SERVER['REQUEST_URL'] = strtr($_SERVER['REQUEST_URL'], array($oldurl => $boardurl));
-
-	// Fix the theme urls...
-	$settings['theme_url'] = strtr($settings['theme_url'], array($oldurl => $boardurl));
-	$settings['default_theme_url'] = strtr($settings['default_theme_url'], array($oldurl => $boardurl));
-	$settings['actual_theme_url'] = strtr($settings['actual_theme_url'], array($oldurl => $boardurl));
-	$settings['images_url'] = strtr($settings['images_url'], array($oldurl => $boardurl));
-	$settings['default_images_url'] = strtr($settings['default_images_url'], array($oldurl => $boardurl));
-	$settings['actual_images_url'] = strtr($settings['actual_images_url'], array($oldurl => $boardurl));
-
-	// And just a few mod settings :).
-	$modSettings['smileys_url'] = strtr($modSettings['smileys_url'], array($oldurl => $boardurl));
-	$modSettings['avatar_url'] = strtr($modSettings['avatar_url'], array($oldurl => $boardurl));
-
-	// Clean up after loadBoard().
-	if (isset($board_info['moderators']))
-	{
-		foreach ($board_info['moderators'] as $k => $dummy)
-		{
-			$board_info['moderators'][$k]['href'] = strtr($dummy['href'], array($oldurl => $boardurl));
-			$board_info['moderators'][$k]['link'] = strtr($dummy['link'], array('"' . $oldurl => '"' . $boardurl));
-		}
-	}
-
-	foreach ($context['linktree'] as $k => $dummy)
-		$context['linktree'][$k]['url'] = strtr($dummy['url'], array($oldurl => $boardurl));
-}
-
-/**
  * Determine the current user's smiley set
  *
  * @param mixed[] $user_smiley_set
