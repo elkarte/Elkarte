@@ -314,12 +314,6 @@ class Templates
 			}
 		}
 
-		// @fixme: Remove this.
-		if ($fix_arrays)
-		{
-			fix_calendar_text();
-		}
-
 		// Return the language actually loaded.
 		return $lang;
 	}
