@@ -82,7 +82,7 @@ class AdminDebug_Controller extends Action_Controller
 		$layers = theme()->getLayers();
 		$layers->removeAll();
 		$layers->add('html');
-		loadTemplate('Admin');
+		theme()->getTemplates()->load('Admin');
 
 		$context['sub_template'] = 'viewquery';
 		$context['queries_data'] = $debug->viewQueries($query_id);

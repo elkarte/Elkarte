@@ -220,7 +220,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 		//We need this, really..
 		require_once(SUBSDIR . '/Calendar.subs.php');
 
-		loadTemplate('ManageCalendar');
+		theme()->getTemplates()->load('ManageCalendar');
 
 		$context['is_new'] = !isset($this->_req->query->holiday);
 		$context['cal_minyear'] = $modSettings['cal_minyear'];

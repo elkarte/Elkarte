@@ -46,7 +46,7 @@ class Announce_Controller extends Action_Controller
 
 		// Language files
 		theme()->getTemplates()->loadLanguageFile('Post');
-		loadTemplate('Announce');
+		theme()->getTemplates()->load('Announce');
 
 		$context['page_title'] = $txt['announce_topic'];
 	}

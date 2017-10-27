@@ -56,7 +56,7 @@ class Reports_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 
 		// Let's get our things running...
-		loadTemplate('Reports');
+		theme()->getTemplates()->load('Reports');
 		theme()->getTemplates()->loadLanguageFile('Reports');
 
 		$context['page_title'] = $txt['generate_reports'];

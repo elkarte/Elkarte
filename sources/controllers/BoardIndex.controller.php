@@ -59,7 +59,7 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 	{
 		global $txt, $user_info, $modSettings, $context, $settings, $scripturl;
 
-		loadTemplate('BoardIndex');
+		theme()->getTemplates()->load('BoardIndex');
 
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = $scripturl;

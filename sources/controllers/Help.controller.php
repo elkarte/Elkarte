@@ -53,7 +53,7 @@ class Help_Controller extends Action_Controller
 	{
 		global $scripturl, $context, $txt;
 
-		loadTemplate('Help');
+		theme()->getTemplates()->load('Help');
 		theme()->getTemplates()->loadLanguageFile('Manual');
 
 		// We need to know where our wiki is.
@@ -116,7 +116,7 @@ class Help_Controller extends Action_Controller
 			theme()->getTemplates()->loadLanguageFile('ManagePermissions');
 
 		// Load our template
-		loadTemplate('Help');
+		theme()->getTemplates()->load('Help');
 
 		// Allow addons to load their own language file here.
 		call_integration_hook('integrate_quickhelp');

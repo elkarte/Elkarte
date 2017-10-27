@@ -102,7 +102,7 @@ class ManageAttachments_Controller extends Action_Controller
 		isAllowedTo('manage_attachments');
 
 		// Setup the template stuff we'll probably need.
-		loadTemplate('ManageAttachments');
+		theme()->getTemplates()->load('ManageAttachments');
 
 		// If they want to delete attachment(s), delete them. (otherwise fall through..)
 		$subActions = array(
@@ -589,7 +589,7 @@ class ManageAttachments_Controller extends Action_Controller
 	{
 		global $context, $modSettings;
 
-		loadTemplate('ManageAttachments');
+		theme()->getTemplates()->load('ManageAttachments');
 		$context['sub_template'] = 'maintenance';
 
 		// We need our attachments directories...

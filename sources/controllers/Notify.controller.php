@@ -62,7 +62,7 @@ class Notify_Controller extends Action_Controller
 		if (empty($this->_req->query->sa))
 		{
 			// Load the template, but only if it is needed.
-			loadTemplate('Notify');
+			theme()->getTemplates()->load('Notify');
 
 			// Find out if they have notification set for this topic already.
 			$context['notification_set'] = hasTopicNotification($user_info['id'], $topic);
@@ -97,7 +97,7 @@ class Notify_Controller extends Action_Controller
 	{
 		global $topic, $txt, $scripturl, $context, $user_info;
 
-		loadTemplate('Xml');
+		theme()->getTemplates()->load('Xml');
 
 		theme()->getLayers()->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
@@ -190,7 +190,7 @@ class Notify_Controller extends Action_Controller
 		if (empty($this->_req->query->sa))
 		{
 			// We're gonna need the notify template...
-			loadTemplate('Notify');
+			theme()->getTemplates()->load('Notify');
 
 			// Find out if they have notification set for this board already.
 			$context['notification_set'] = hasBoardNotification($user_info['id'], $board);
@@ -226,7 +226,7 @@ class Notify_Controller extends Action_Controller
 	{
 		global $scripturl, $txt, $board, $user_info, $context;
 
-		loadTemplate('Xml');
+		theme()->getTemplates()->load('Xml');
 
 		theme()->getLayers()->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
@@ -328,7 +328,7 @@ class Notify_Controller extends Action_Controller
 	{
 		global $user_info, $topic, $modSettings, $txt, $context, $scripturl;
 
-		loadTemplate('Xml');
+		theme()->getTemplates()->load('Xml');
 
 		theme()->getLayers()->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';

@@ -71,7 +71,7 @@ class Memberlist_Controller extends Action_Controller
 		// Make sure they can view the memberlist.
 		isAllowedTo('view_mlist');
 
-		loadTemplate('Memberlist');
+		theme()->getTemplates()->load('Memberlist');
 		$context['sub_template'] = 'memberlist';
 		theme()->getLayers()->add('mlsearch');
 

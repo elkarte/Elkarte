@@ -38,7 +38,7 @@ class ManageLanguages_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		loadTemplate('ManageLanguages');
+		theme()->getTemplates()->load('ManageLanguages');
 		theme()->getTemplates()->loadLanguageFile('ManageSettings');
 
 		$subActions = array(

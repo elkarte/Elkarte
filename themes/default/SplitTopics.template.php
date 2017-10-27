@@ -18,7 +18,7 @@
  */
 function template_SplitTopics_init()
 {
-	loadTemplate('GenericHelpers');
+	theme()->getTemplates()->load('GenericHelpers');
 }
 
 /**

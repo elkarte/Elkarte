@@ -34,7 +34,7 @@ class Xml_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		loadTemplate('Xml');
+		theme()->getTemplates()->load('Xml');
 
 		$subActions = array(
 			'jumpto' => array('controller' => $this, 'function' => 'action_jumpto'),

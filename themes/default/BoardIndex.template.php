@@ -18,7 +18,7 @@
  */
 function template_BoardIndex_init()
 {
-	loadTemplate('GenericBoards');
+	theme()->getTemplates()->load('GenericBoards');
 }
 
 /**

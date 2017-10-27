@@ -18,7 +18,7 @@
  */
 function template_PersonalMessage_init()
 {
-	loadTemplate('GenericMessages');
+	theme()->getTemplates()->load('GenericMessages');
 }
 
 /**

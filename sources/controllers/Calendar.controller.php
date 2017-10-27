@@ -53,7 +53,7 @@ class Calendar_Controller extends Action_Controller
 		isAllowedTo('calendar_view');
 
 		// This is gonna be needed...
-		loadTemplate('Calendar');
+		theme()->getTemplates()->load('Calendar');
 
 		// You can't do anything if the calendar is off.
 		if (empty($modSettings['cal_enabled']))
@@ -233,7 +233,7 @@ class Calendar_Controller extends Action_Controller
 		}
 
 		// Template, sub template, etc.
-		loadTemplate('Calendar');
+		theme()->getTemplates()->load('Calendar');
 		$context['sub_template'] = 'unlinked_event_post';
 
 		$context['cal_minyear'] = $modSettings['cal_minyear'];

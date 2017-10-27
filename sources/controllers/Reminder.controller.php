@@ -31,7 +31,7 @@ class Reminder_Controller extends Action_Controller
 		global $txt, $context;
 
 		theme()->getTemplates()->loadLanguageFile('Profile');
-		loadTemplate('Reminder');
+		theme()->getTemplates()->load('Reminder');
 
 		$context['page_title'] = $txt['authentication_reminder'];
 		$context['robot_no_index'] = true;
@@ -255,7 +255,7 @@ class Reminder_Controller extends Action_Controller
 
 		call_integration_hook('integrate_reset_pass', array($member['member_name'], $member['member_name'], $this->_req->post->passwrd1));
 
-		loadTemplate('Login');
+		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context += array(
 			'page_title' => $txt['reminder_password_set'],
@@ -331,7 +331,7 @@ class Reminder_Controller extends Action_Controller
 		call_integration_hook('integrate_reset_pass', array($member['member_name'], $member['member_name'], $this->_req->post->passwrd1));
 
 		// Tell them it went fine.
-		loadTemplate('Login');
+		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context += array(
 			'page_title' => $txt['reminder_password_set'],

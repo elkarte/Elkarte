@@ -434,7 +434,7 @@ function saveDraft($draft, $check_last_save = false)
 		if (!empty($id_draft))
 		{
 			theme()->getTemplates()->loadLanguageFile('Drafts');
-			loadTemplate('Xml');
+			theme()->getTemplates()->load('Xml');
 			$context['sub_template'] = 'xml_draft';
 			$context['id_draft'] = $id_draft;
 			$context['draft_saved_on'] = $draft_info['poster_time'];
@@ -512,7 +512,7 @@ function savePMDraft($recipientList, $draft, $check_last_save = false)
 		// Send something back to the javascript caller
 		if (!empty($id_pm_draft))
 		{
-			loadTemplate('Xml');
+			theme()->getTemplates()->load('Xml');
 			$context['sub_template'] = 'xml_draft';
 			$context['id_draft'] = $id_pm_draft;
 			$context['draft_saved_on'] = $draft_info['poster_time'];
@@ -564,7 +564,7 @@ function savePMDraft($recipientList, $draft, $check_last_save = false)
 	// if we were called from the autosave function, send something back
 	if (!empty($id_pm_draft) && $check_last_save && !$post_errors->hasError('session_timeout'))
 	{
-		loadTemplate('Xml');
+		theme()->getTemplates()->load('Xml');
 		$context['sub_template'] = 'xml_draft';
 		$context['id_draft'] = $id_pm_draft;
 		$context['draft_saved_on'] = time();

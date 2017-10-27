@@ -18,7 +18,7 @@
  */
 function template_Profile_init()
 {
-	loadTemplate('GenericMessages');
+	theme()->getTemplates()->load('GenericMessages');
 }
 
 /**

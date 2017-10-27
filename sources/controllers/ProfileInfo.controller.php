@@ -99,7 +99,7 @@ class ProfileInfo_Controller extends Action_Controller
 		if (!loadMemberContext($this->_memID) || !isset($memberContext[$this->_memID]))
 			throw new Elk_Exception('not_a_user', false);
 
-		loadTemplate('ProfileInfo');
+		theme()->getTemplates()->load('ProfileInfo');
 
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = $scripturl . '?action=profile;u=' . $this->_memID;
@@ -445,7 +445,7 @@ class ProfileInfo_Controller extends Action_Controller
 		$action_title = array('messages' => 'Messages', 'attach' => 'Attachments', 'topics' => 'Topics', 'unwatchedtopics' => 'Unwatched');
 		$action_title = isset($action_title[$action]) ? $action_title[$action] : 'Posts';
 
-		loadTemplate('ProfileInfo');
+		theme()->getTemplates()->load('ProfileInfo');
 
 		// Create the tabs for the template.
 		$context[$context['profile_menu_name']]['tab_data'] = array(
@@ -930,7 +930,7 @@ class ProfileInfo_Controller extends Action_Controller
 		if (!empty($modSettings['loadavg_userstats']) && $modSettings['current_load'] >= $modSettings['loadavg_userstats'])
 			throw new Elk_Exception('loadavg_userstats_disabled', false);
 
-		loadTemplate('ProfileInfo');
+		theme()->getTemplates()->load('ProfileInfo');
 
 		// General user statistics.
 		$timeDays = floor($user_profile[$this->_memID]['total_time_logged_in'] / 86400);
@@ -983,8 +983,8 @@ class ProfileInfo_Controller extends Action_Controller
 
 		theme()->getTemplates()->loadLanguageFile('ManagePermissions');
 		theme()->getTemplates()->loadLanguageFile('Admin');
-		loadTemplate('ManageMembers');
-		loadTemplate('ProfileInfo');
+		theme()->getTemplates()->load('ManageMembers');
+		theme()->getTemplates()->load('ProfileInfo');
 
 		// Load all the permission profiles.
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
@@ -1062,10 +1062,10 @@ class ProfileInfo_Controller extends Action_Controller
 		if (!allowedTo('issue_warning') && (empty($modSettings['warning_show']) || ($modSettings['warning_show'] == 1 && !$context['user']['is_owner'])))
 			throw new Elk_Exception('no_access', false);
 
-		loadTemplate('ProfileInfo');
+		theme()->getTemplates()->load('ProfileInfo');
 
 		// We need this because of template_load_warning_variables
-		loadTemplate('Profile');
+		theme()->getTemplates()->load('Profile');
 
 		// Make sure things which are disabled stay disabled.
 		$modSettings['warning_watch'] = !empty($modSettings['warning_watch']) ? $modSettings['warning_watch'] : 110;
@@ -1170,7 +1170,7 @@ class ProfileInfo_Controller extends Action_Controller
 		checkSession('get');
 
 		// Need the ProfileInfo template
-		loadTemplate('ProfileInfo');
+		theme()->getTemplates()->load('ProfileInfo');
 
 		// Prep for a buddy check
 		$this->_register_summarytabs();
@@ -1204,7 +1204,7 @@ class ProfileInfo_Controller extends Action_Controller
 		$this->_define_user_values();
 
 		// The block templates are here
-		loadTemplate('ProfileInfo');
+		theme()->getTemplates()->load('ProfileInfo');
 		$context['sub_template'] = 'profile_blocks';
 		$context['profile_blocks'] = array();
 

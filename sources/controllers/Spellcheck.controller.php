@@ -67,7 +67,7 @@ class Spellcheck_Controller extends Action_Controller
 		$this->_events->trigger('prepare_spellcheck', array('$this->known_words' => &$this->known_words));
 
 		theme()->getTemplates()->loadLanguageFile('Post');
-		loadTemplate('Post');
+		theme()->getTemplates()->load('Post');
 
 		// Okay, this looks funny, but it actually fixes a weird bug.
 		ob_start();

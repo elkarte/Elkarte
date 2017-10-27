@@ -104,7 +104,7 @@ class Generic_List
 		theme()->getTemplates()->loadLanguageFile('Errors');
 
 		// Load the template
-		loadTemplate('GenericList');
+		theme()->getTemplates()->load('GenericList');
 	}
 
 	/**

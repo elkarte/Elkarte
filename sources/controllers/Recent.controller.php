@@ -143,7 +143,7 @@ class Recent_Controller extends Action_Controller
 		$context['page_index'] = constructPageIndex($this->_base_url, $this->_start, min(100, $this->_total_posts), 10, !empty($this->_flex_start));
 
 		// Rest of the items for the template
-		loadTemplate('Recent');
+		theme()->getTemplates()->load('Recent');
 		$context['page_title'] = $txt['recent_posts'];
 		$context['sub_template'] = 'recent';
 		$quote_enabled = empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']));

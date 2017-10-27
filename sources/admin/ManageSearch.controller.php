@@ -44,7 +44,7 @@ class ManageSearch_Controller extends Action_Controller
 		global $context, $txt;
 
 		theme()->getTemplates()->loadLanguageFile('Search');
-		loadTemplate('ManageSearch');
+		theme()->getTemplates()->load('ManageSearch');
 
 		$subActions = array(
 			'settings' => array($this, 'action_searchSettings_display', 'permission' => 'admin_forum'),

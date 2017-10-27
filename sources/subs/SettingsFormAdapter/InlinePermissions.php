@@ -247,7 +247,7 @@ class InlinePermissions extends Adapter
 	{
 		global $context, $txt;
 
-		loadTemplate('ManagePermissions');
+		theme()->getTemplates()->load('ManagePermissions');
 		theme()->getTemplates()->loadLanguageFile('ManagePermissions');
 
 		// Load the names for guests

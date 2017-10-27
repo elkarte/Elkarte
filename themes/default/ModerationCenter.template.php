@@ -18,7 +18,7 @@
  */
 function template_ModerationCenter_init()
 {
-	loadTemplate('GenericMessages');
+	theme()->getTemplates()->load('GenericMessages');
 }
 
 /**

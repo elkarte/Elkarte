@@ -147,7 +147,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 			redirectexit($board_info['redirect']);
 		}
 
-		loadTemplate('MessageIndex');
+		theme()->getTemplates()->load('MessageIndex');
 		loadJavascriptFile('topic.js');
 
 		$bbc = \BBC\ParserWrapper::instance();

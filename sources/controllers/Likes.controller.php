@@ -196,7 +196,7 @@ class Likes_Controller extends Action_Controller
 		global $context, $txt;
 
 		// Make room for ajax
-		loadTemplate('Json');
+		theme()->getTemplates()->load('Json');
 		$context['sub_template'] = 'send_json';
 
 		// No errors, build the new button tag
@@ -687,7 +687,7 @@ class Likes_Controller extends Action_Controller
 		// Load the required files
 		theme()->getTemplates()->loadLanguageFile('LikePosts');
 		loadJavascriptFile('like_posts.js');
-		loadTemplate('LikePostsStats');
+		theme()->getTemplates()->load('LikePostsStats');
 
 		// Template and tab data
 		$context['page_title'] = $txt['like_post_stats'];

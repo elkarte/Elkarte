@@ -109,7 +109,7 @@ class Display_Controller extends Action_Controller
 			throw new Elk_Exception('no_board', false);
 
 		// Load the template
-		loadTemplate('Display');
+		theme()->getTemplates()->load('Display');
 		$context['sub_template'] = 'messages';
 
 		// And the topic functions

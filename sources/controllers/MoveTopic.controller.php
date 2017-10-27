@@ -108,7 +108,7 @@ class MoveTopic_Controller extends Action_Controller
 		}
 
 		// Set up for the template
-		loadTemplate('MoveTopic');
+		theme()->getTemplates()->load('MoveTopic');
 		$this->_prep_template();
 	}
 

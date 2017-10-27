@@ -79,7 +79,7 @@ class Jslocale_Controller extends Action_Controller
 		$lang = $this->_req->post->lang;
 
 		Template_Layers::instance()->removeAll();
-		loadTemplate('Json');
+		theme()->getTemplates()->load('Json');
 		$context['sub_template'] = 'send_json';
 		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
 

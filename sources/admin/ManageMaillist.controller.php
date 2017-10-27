@@ -37,7 +37,7 @@ class ManageMaillist_Controller extends Action_Controller
 		global $context, $txt;
 
 		// Template & language
-		loadTemplate('Maillist');
+		theme()->getTemplates()->load('Maillist');
 		theme()->getTemplates()->loadLanguageFile('Maillist');
 
 		// All the functions available
@@ -972,7 +972,7 @@ class ManageMaillist_Controller extends Action_Controller
 
 		// Load and show
 		$settingsForm->prepare();
-		loadTemplate('Admin');
+		theme()->getTemplates()->load('Admin');
 		loadCSSFile('admin.css');
 		$context['sub_template'] = 'show_settings';
 	}
@@ -1367,7 +1367,7 @@ class ManageMaillist_Controller extends Action_Controller
 
 		// prep it, load it, show it
 		$settingsForm->prepare();
-		loadTemplate('Admin');
+		theme()->getTemplates()->load('Admin');
 		loadCSSFile('admin.css');
 		$context['sub_template'] = 'show_settings';
 	}
@@ -1429,7 +1429,7 @@ class ManageMaillist_Controller extends Action_Controller
 
 		// Templates and language
 		theme()->getTemplates()->loadLanguageFile('Admin');
-		loadTemplate('Admin');
+		theme()->getTemplates()->load('Admin');
 		loadCSSFile('admin.css');
 
 		// Load any existing email => board values used for new topic creation

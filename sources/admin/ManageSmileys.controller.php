@@ -39,7 +39,7 @@ class ManageSmileys_Controller extends Action_Controller
 		global $context, $txt, $modSettings;
 
 		theme()->getTemplates()->loadLanguageFile('ManageSmileys');
-		loadTemplate('ManageSmileys');
+		theme()->getTemplates()->load('ManageSmileys');
 
 		$subActions = array(
 			'addsmiley' => array($this, 'action_addsmiley', 'enabled' => !empty($modSettings['smiley_enable']), 'permission' => 'manage_smileys'),
@@ -1615,7 +1615,7 @@ class ManageSmileys_Controller extends Action_Controller
 			$context['uninstalling'] = false;
 			$context['is_installed'] = false;
 			$context['package_name'] = $smileyInfo['name'];
-			loadTemplate('Packages');
+			theme()->getTemplates()->load('Packages');
 		}
 		// Do the actual install
 		else

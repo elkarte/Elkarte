@@ -18,7 +18,7 @@
  */
 function template_Post_init()
 {
-	loadTemplate('GenericHelpers');
+	theme()->getTemplates()->load('GenericHelpers');
 }
 
 /**

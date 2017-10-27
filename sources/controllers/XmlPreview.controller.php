@@ -50,7 +50,7 @@ class XmlPreview_Controller extends Action_Controller
 			return;
 
 		// Set up the template and default sub-template.
-		loadTemplate('Xml');
+		theme()->getTemplates()->load('Xml');
 		$context['sub_template'] = 'generic_xml';
 
 		// A preview it is then

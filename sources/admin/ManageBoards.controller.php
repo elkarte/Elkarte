@@ -135,7 +135,7 @@ class ManageBoards_Controller extends Action_Controller
 	{
 		global $txt, $context, $cat_tree, $boards, $boardList, $scripturl;
 
-		loadTemplate('ManageBoards');
+		theme()->getTemplates()->load('ManageBoards');
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 
@@ -286,7 +286,7 @@ class ManageBoards_Controller extends Action_Controller
 	{
 		global $txt, $context, $cat_tree, $boardList, $boards;
 
-		loadTemplate('ManageBoards');
+		theme()->getTemplates()->load('ManageBoards');
 		require_once(SUBSDIR . '/Boards.subs.php');
 		getBoardTree();
 
@@ -446,7 +446,7 @@ class ManageBoards_Controller extends Action_Controller
 	{
 		global $txt, $context, $cat_tree, $boards, $boardList, $modSettings;
 
-		loadTemplate('ManageBoards');
+		theme()->getTemplates()->load('ManageBoards');
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
 		getBoardTree();
@@ -785,7 +785,7 @@ class ManageBoards_Controller extends Action_Controller
 				document.getElementById("recycle_board").disabled = !document.getElementById("recycle_enable").checked;', true);
 
 		// Get the needed template bits
-		loadTemplate('ManageBoards');
+		theme()->getTemplates()->load('ManageBoards');
 		$context['page_title'] = $txt['boards_and_cats'] . ' - ' . $txt['settings'];
 		$context['sub_template'] = 'show_settings';
 		$context['post_url'] = $scripturl . '?action=admin;area=manageboards;save;sa=settings';

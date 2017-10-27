@@ -38,7 +38,7 @@ class PostModeration_Controller extends Action_Controller
 	{
 		// @todo We'll shift these later bud.
 		theme()->getTemplates()->loadLanguageFile('ModerationCenter');
-		loadTemplate('ModerationCenter');
+		theme()->getTemplates()->load('ModerationCenter');
 
 		// Allowed sub-actions, you know the drill by now!
 		$subActions = array(

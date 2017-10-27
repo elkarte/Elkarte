@@ -105,7 +105,7 @@ class Attachment_Controller extends Action_Controller
 		// Set up the template details
 		$template_layers = theme()->getLayers();
 		$template_layers->removeAll();
-		loadTemplate('Json');
+		theme()->getTemplates()->load('Json');
 		$context['sub_template'] = 'send_json';
 
 		// Make sure the session is still valid
@@ -184,7 +184,7 @@ class Attachment_Controller extends Action_Controller
 		// Prepare the template so we can respond with json
 		$template_layers = theme()->getLayers();
 		$template_layers->removeAll();
-		loadTemplate('Json');
+		theme()->getTemplates()->load('Json');
 		$context['sub_template'] = 'send_json';
 
 		// Make sure the session is valid

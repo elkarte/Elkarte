@@ -40,7 +40,7 @@ class MergeTopics_Controller extends Action_Controller
 		global $context;
 
 		// Load the template....
-		loadTemplate('MergeTopics');
+		theme()->getTemplates()->load('MergeTopics');
 
 		$subActions = array(
 			'done' => array($this, 'action_mergeDone'),
@@ -198,7 +198,7 @@ class MergeTopics_Controller extends Action_Controller
 		if (!empty($topics))
 		{
 			isAllowedTo('merge_any', $merger->boards);
-			loadTemplate('MergeTopics');
+			theme()->getTemplates()->load('MergeTopics');
 		}
 
 		// Get the boards a user is allowed to merge in.

@@ -69,7 +69,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		if (!isset($this->_req->query->xml))
 		{
-			loadTemplate('PersonalMessage');
+			theme()->getTemplates()->load('PersonalMessage');
 		}
 
 		$this->_events->trigger('pre_dispatch', array('xml' => isset($this->_req->query->xml)));
@@ -726,7 +726,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Load in some text and template dependencies
 		theme()->getTemplates()->loadLanguageFile('PersonalMessage');
-		loadTemplate('PersonalMessage');
+		theme()->getTemplates()->load('PersonalMessage');
 
 		// Set the template we will use
 		$context['sub_template'] = 'send';
@@ -1792,7 +1792,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Load up the profile template, its where PM settings are located
 		theme()->getTemplates()->loadLanguageFile('Profile');
-		loadTemplate('Profile');
+		theme()->getTemplates()->load('Profile');
 
 		// We want them to submit back to here.
 		$context['profile_custom_submit_url'] = $scripturl . '?action=pm;sa=settings;save';

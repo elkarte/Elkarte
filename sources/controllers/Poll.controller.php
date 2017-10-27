@@ -257,7 +257,7 @@ class Poll_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Poll.subs.php');
 
 		theme()->getTemplates()->loadLanguageFile('Post');
-		loadTemplate('Poll');
+		theme()->getTemplates()->load('Poll');
 		loadJavascriptFile('post.js', array(), 'post_scripts');
 
 		$context['sub_template'] = 'poll_edit';
@@ -747,7 +747,7 @@ class Poll_Controller extends Action_Controller
 	{
 		global $context, $board, $db_show_debug;
 
-		loadTemplate('Poll');
+		theme()->getTemplates()->load('Poll');
 		theme()->getTemplates()->loadLanguageFile('Post');
 		theme()->getLayers()->removeAll();
 

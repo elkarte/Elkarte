@@ -214,7 +214,7 @@ class Topic_Controller extends Action_Controller
 		}
 
 		// Lets "output" all that info.
-		loadTemplate('Printpage');
+		theme()->getTemplates()->load('Printpage');
 		$template_layers->add('print');
 		$context['sub_template'] = 'print_page';
 		$context['board_name'] = $board_info['name'];

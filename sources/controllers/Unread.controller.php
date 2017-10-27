@@ -129,7 +129,7 @@ class Unread_Controller extends Action_Controller
 		);
 
 		// Prepare the template
-		loadTemplate('Recent');
+		theme()->getTemplates()->load('Recent');
 		$context['sub_template'] = 'unread';
 		$context['unread_header_title'] = $this->_action_unread ? ($context['showing_all_topics'] ? $txt['unread_topics_all'] : $txt['unread_topics_visit']) : $txt['unread_replies'];
 		$template_layers = theme()->getLayers();

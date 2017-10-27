@@ -48,7 +48,7 @@ class BadBehavior_Controller extends Action_Controller
 
 		// Templates, etc...
 		theme()->getTemplates()->loadLanguageFile('BadBehaviorlog');
-		loadTemplate('BadBehavior');
+		theme()->getTemplates()->load('BadBehavior');
 
 		// Functions we will need
 		require_once(SUBSDIR . '/BadBehavior.subs.php');

@@ -60,7 +60,7 @@ class CoreFeatures_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Admin.subs.php');
 
-		loadTemplate('CoreFeatures');
+		theme()->getTemplates()->load('CoreFeatures');
 
 		$core_features = $this->settings();
 

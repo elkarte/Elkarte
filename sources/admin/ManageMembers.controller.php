@@ -55,7 +55,7 @@ class ManageMembers_Controller extends Action_Controller
 
 		// Load the essentials.
 		theme()->getTemplates()->loadLanguageFile('ManageMembers');
-		loadTemplate('ManageMembers');
+		theme()->getTemplates()->load('ManageMembers');
 
 		$subActions = array(
 			'all' => array(

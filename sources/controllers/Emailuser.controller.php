@@ -35,7 +35,7 @@ class Emailuser_Controller extends Action_Controller
 		$context['robot_no_index'] = true;
 
 		// Load the template.
-		loadTemplate('Emailuser');
+		theme()->getTemplates()->load('Emailuser');
 	}
 
 	/**
@@ -113,7 +113,7 @@ class Emailuser_Controller extends Action_Controller
 	{
 		global $topic, $modSettings, $txt, $context, $scripturl;
 
-		loadTemplate('Xml');
+		theme()->getTemplates()->load('Xml');
 
 		theme()->getLayers()->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
@@ -486,7 +486,7 @@ class Emailuser_Controller extends Action_Controller
 		// Show the inputs for the comment, etc.
 		theme()->getTemplates()->loadLanguageFile('Post');
 		theme()->getTemplates()->loadLanguageFile('Errors');
-		loadTemplate('Emailuser');
+		theme()->getTemplates()->load('Emailuser');
 
 		addInlineJavascript('
 		error_txts[\'post_too_long\'] = ' . JavaScriptEscape($txt['error_post_too_long']) . ';

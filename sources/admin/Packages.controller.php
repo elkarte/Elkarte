@@ -96,7 +96,7 @@ class Packages_Controller extends Action_Controller
 
 		// Load all the basic stuff.
 		theme()->getTemplates()->loadLanguageFile('Packages');
-		loadTemplate('Packages');
+		theme()->getTemplates()->load('Packages');
 		loadCSSFile('admin.css');
 		$context['page_title'] = $txt['package'];
 
@@ -1037,7 +1037,7 @@ class Packages_Controller extends Action_Controller
 		create_chmod_control(array(), array('force_find_error' => true));
 
 		// Deal with the template stuff.
-		loadTemplate('Xml');
+		theme()->getTemplates()->load('Xml');
 		$context['sub_template'] = 'generic_xml';
 		theme()->getLayers()->removeAll();
 
@@ -1483,7 +1483,7 @@ class Packages_Controller extends Action_Controller
 		// Is this actually xml?
 		if (isset($this->_req->query->xml))
 		{
-			loadTemplate('Xml');
+			theme()->getTemplates()->load('Xml');
 			$context['sub_template'] = 'generic_xml';
 			theme()->getLayers()->removeAll();
 		}

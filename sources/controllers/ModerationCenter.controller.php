@@ -315,7 +315,7 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $txt, $context, $user_settings;
 
-		loadTemplate('ModerationCenter');
+		theme()->getTemplates()->load('ModerationCenter');
 		loadJavascriptFile('admin.js', array(), 'admin_scripts');
 
 		$context['page_title'] = $txt['moderation_center'];
@@ -399,7 +399,7 @@ class ModerationCenter_Controller extends Action_Controller
 		$context['sub_template'] = 'show_notice';
 
 		theme()->getLayers()->removeAll();
-		loadTemplate('ModerationCenter');
+		theme()->getTemplates()->load('ModerationCenter');
 	}
 
 	/**
@@ -411,7 +411,7 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $txt, $context, $scripturl, $user_info;
 
-		loadTemplate('ModerationCenter');
+		theme()->getTemplates()->load('ModerationCenter');
 		require_once(SUBSDIR . '/Moderation.subs.php');
 
 		// Put the open and closed options into tabs, because we can...
@@ -586,7 +586,7 @@ class ModerationCenter_Controller extends Action_Controller
 		global $context, $txt, $user_settings, $user_info;
 
 		// Some useful context stuff.
-		loadTemplate('ModerationCenter');
+		theme()->getTemplates()->load('ModerationCenter');
 		$context['page_title'] = $txt['mc_settings'];
 		$context['sub_template'] = 'moderation_settings';
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
@@ -1002,7 +1002,7 @@ class ModerationCenter_Controller extends Action_Controller
 			$context[$context['moderation_menu_name']]['current_subsection'] = 'closed';
 
 		// Finally we are done :P
-		loadTemplate('ModerationCenter');
+		theme()->getTemplates()->load('ModerationCenter');
 		if ($context['admin_area'] === 'pm_reports')
 		{
 			$context['page_title'] = sprintf($txt['mc_view_pmreport'], $context['report']['author']['name']);
@@ -1031,7 +1031,7 @@ class ModerationCenter_Controller extends Action_Controller
 		$context['view_posts'] = isset($this->_req->query->sa) && $this->_req->query->sa === 'post';
 		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
 
-		loadTemplate('ModerationCenter');
+		theme()->getTemplates()->load('ModerationCenter');
 
 		// Get some key settings!
 		$modSettings['warning_watch'] = empty($modSettings['warning_watch']) ? 1 : $modSettings['warning_watch'];
@@ -1532,7 +1532,7 @@ class ModerationCenter_Controller extends Action_Controller
 		global $context, $txt;
 
 		// Some of this stuff is overseas, so to speak.
-		loadTemplate('ModerationCenter');
+		theme()->getTemplates()->load('ModerationCenter');
 		theme()->getTemplates()->loadLanguageFile('Profile');
 
 		$subActions = array(

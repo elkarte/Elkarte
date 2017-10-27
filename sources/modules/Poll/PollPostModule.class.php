@@ -171,7 +171,7 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 			$destination .= ';poll';
 			$page_title = $txt['new_poll'];
 			$context['make_poll'] = true;
-			loadTemplate('Poll');
+			theme()->getTemplates()->load('Poll');
 			$template_layers->add('poll_edit');
 
 			// Are we starting a poll? if set the poll icon as selected if its available

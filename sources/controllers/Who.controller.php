@@ -59,7 +59,7 @@ class Who_Controller extends Action_Controller
 			throw new Elk_Exception('who_off', false);
 
 		// Load the 'Who' template.
-		loadTemplate('Who');
+		theme()->getTemplates()->load('Who');
 		theme()->getTemplates()->loadLanguageFile('Who');
 
 		// Sort out... the column sorting.
@@ -264,7 +264,7 @@ class Who_Controller extends Action_Controller
 
 		$context += prepareCreditsData();
 
-		loadTemplate('Who');
+		theme()->getTemplates()->load('Who');
 		$context['sub_template'] = 'credits';
 		$context['robot_no_index'] = true;
 		$context['page_title'] = $txt['credits'];

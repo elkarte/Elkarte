@@ -107,7 +107,7 @@ class Templates
 	}
 
 	/**
-	 * <b>Internal function! Do not use it, use loadTemplate instead</b>
+	 * <b>Internal function! Do not use it, use theme()->getTemplates()->load instead</b>
 	 *
 	 * What it does:
 	 * - Loads a template file with the name template_name from the current, default, or base theme.
@@ -143,7 +143,7 @@ class Templates
 		// Any specific template style sheets to load?
 		if (!empty($style_sheets))
 		{
-			trigger_error('Use of loadTemplate to add style sheets to the head is deprecated.', E_USER_DEPRECATED);
+			trigger_error('Use of theme()->getTemplates()->load to add style sheets to the head is deprecated.', E_USER_DEPRECATED);
 			$sheets = [];
 			foreach ($style_sheets as $sheet)
 			{

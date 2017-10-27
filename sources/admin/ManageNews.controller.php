@@ -51,7 +51,7 @@ class ManageNews_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		loadTemplate('ManageNews');
+		theme()->getTemplates()->load('ManageNews');
 
 		// Format: 'sub-action' => array('function', 'permission')
 		$subActions = array(
@@ -528,7 +528,7 @@ class ManageNews_Controller extends Action_Controller
 		if (isset($this->_req->query->success))
 		{
 			$context['sub_template'] = 'email_members_succeeded';
-			loadTemplate('ManageNews');
+			theme()->getTemplates()->load('ManageNews');
 			return null;
 		}
 

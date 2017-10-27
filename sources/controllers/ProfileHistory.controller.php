@@ -204,7 +204,7 @@ class ProfileHistory_Controller extends Action_Controller
 				$context['members_in_range'][$row['id_member']] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
 		}
 
-		loadTemplate('ProfileHistory');
+		theme()->getTemplates()->load('ProfileHistory');
 		$context['sub_template'] = 'trackActivity';
 	}
 
@@ -220,8 +220,8 @@ class ProfileHistory_Controller extends Action_Controller
 		// Can the user do this?
 		isAllowedTo('moderate_forum');
 
-		loadTemplate('Profile');
-		loadTemplate('ProfileHistory');
+		theme()->getTemplates()->load('Profile');
+		theme()->getTemplates()->load('ProfileHistory');
 		theme()->getTemplates()->loadLanguageFile('Profile');
 
 		if ($this->_memID == 0)

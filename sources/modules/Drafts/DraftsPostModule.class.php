@@ -234,7 +234,7 @@ class Drafts_Post_Module extends ElkArte\sources\modules\Abstract_Module
 				// If we were called from the autosave function, send something back
 				if (!empty($context['id_draft']) && isset($_REQUEST['xml']) && !$post_errors->hasError('session_timeout'))
 				{
-					loadTemplate('Xml');
+					theme()->getTemplates()->load('Xml');
 					$context['sub_template'] = 'xml_draft';
 					$context['draft_saved_on'] = time();
 					obExit();

@@ -360,7 +360,7 @@ class Mentions_Controller extends Action_Controller
 		if (empty($modSettings['usernotif_favicon_enable']) && empty($modSettings['usernotif_desktop_enable']))
 			die();
 
-		loadTemplate('Json');
+		theme()->getTemplates()->load('Json');
 		$context['sub_template'] = 'send_json';
 		$template_layers = theme()->getLayers();
 		$template_layers->removeAll();

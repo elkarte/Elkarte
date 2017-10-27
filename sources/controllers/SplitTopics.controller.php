@@ -62,7 +62,7 @@ class SplitTopics_Controller extends Action_Controller
 
 		// Load up the "dependencies" - the template, getMsgMemberID().
 		if (!isset($this->_req->query->xml))
-			loadTemplate('SplitTopics');
+			theme()->getTemplates()->load('SplitTopics');
 
 		// Need some utilities to deal with topics
 		require_once(SUBSDIR . '/Boards.subs.php');

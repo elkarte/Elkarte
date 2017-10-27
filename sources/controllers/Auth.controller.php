@@ -65,7 +65,7 @@ class Auth_Controller extends Action_Controller
 
 		// Load the Login template/language file.
 		theme()->getTemplates()->loadLanguageFile('Login');
-		loadTemplate('Login');
+		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context['sub_template'] = 'login';
 
@@ -140,7 +140,7 @@ class Auth_Controller extends Action_Controller
 		theme()->getTemplates()->loadLanguageFile('Login');
 
 		// Load the template stuff
-		loadTemplate('Login');
+		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context['sub_template'] = 'login';
 
@@ -474,7 +474,7 @@ class Auth_Controller extends Action_Controller
 		global $txt, $context;
 
 		theme()->getTemplates()->loadLanguageFile('Login');
-		loadTemplate('Login');
+		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		createToken('login');
 
@@ -500,7 +500,7 @@ class Auth_Controller extends Action_Controller
 		global $txt, $mtitle, $mmessage, $context;
 
 		theme()->getTemplates()->loadLanguageFile('Login');
-		loadTemplate('Login');
+		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		createToken('login');
 

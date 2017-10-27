@@ -39,7 +39,7 @@ class ManageBans_Controller extends Action_Controller
 	{
 		global $context, $txt, $scripturl;
 
-		loadTemplate('ManageBans');
+		theme()->getTemplates()->load('ManageBans');
 		require_once(SUBSDIR . '/Bans.subs.php');
 
 		$subActions = array(

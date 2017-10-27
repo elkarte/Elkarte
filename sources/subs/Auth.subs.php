@@ -180,7 +180,7 @@ function adminLogin($type = 'admin')
 	global $context, $txt, $user_info;
 
 	theme()->getTemplates()->loadLanguageFile('Admin');
-	loadTemplate('Login');
+	theme()->getTemplates()->load('Login');
 	loadJavascriptFile('sha256.js', array('defer' => true));
 
 	// Validate what type of session check this is.

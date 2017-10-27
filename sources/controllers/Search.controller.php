@@ -128,7 +128,7 @@ class Search_Controller extends Action_Controller
 		// Don't load this in XML mode.
 		if (!isset($_REQUEST['xml']))
 		{
-			loadTemplate('Search');
+			theme()->getTemplates()->load('Search');
 			$context['sub_template'] = 'searchform';
 			loadJavascriptFile('suggest.js', array('defer' => true));
 		}
@@ -284,7 +284,7 @@ class Search_Controller extends Action_Controller
 
 		theme()->getTemplates()->loadLanguageFile('Search');
 		if (!isset($_REQUEST['xml']))
-			loadTemplate('Search');
+			theme()->getTemplates()->load('Search');
 		// If we're doing XML we need to use the results template regardless really.
 		else
 			$context['sub_template'] = 'results';

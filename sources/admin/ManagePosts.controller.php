@@ -206,7 +206,7 @@ class ManagePosts_Controller extends Action_Controller
 			$template_layers->removeAll();
 
 			// Send back a response
-			loadTemplate('Json');
+			theme()->getTemplates()->load('Json');
 			$context['sub_template'] = 'send_json';
 			$context['json_data'] = array(
 				'result' => true,

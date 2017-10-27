@@ -66,7 +66,7 @@ class ManageErrors_Controller extends Action_Controller
 
 		// Templates, etc...
 		theme()->getTemplates()->loadLanguageFile('Maintenance');
-		loadTemplate('Errors');
+		theme()->getTemplates()->load('Errors');
 
 		// Set up any filters chosen
 		$filter = $this->_setupFiltering();
@@ -319,7 +319,7 @@ class ManageErrors_Controller extends Action_Controller
 			'file' => strtr($file, array('"' => '\\"')),
 		);
 
-		loadTemplate('Errors');
+		theme()->getTemplates()->load('Errors');
 		theme()->getLayers()->removeAll();
 		$context['sub_template'] = 'show_file';
 	}

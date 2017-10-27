@@ -48,7 +48,7 @@ class ManageRegistration_Controller extends Action_Controller
 
 		// Loading, always loading.
 		theme()->getTemplates()->loadLanguageFile('Login');
-		loadTemplate('Register');
+		theme()->getTemplates()->load('Register');
 		loadJavascriptFile('register.js');
 
 		$subActions = array(
