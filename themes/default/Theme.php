@@ -175,7 +175,7 @@ class Theme extends BaseTheme
 
 		foreach ($this->getLayers()->prepareContext() as $layer)
 		{
-			theme()->getTemplates()->loadSubTemplate($layer . '_above', 'ignore');
+			$this->getTemplates()->loadSubTemplate($layer . '_above', 'ignore');
 		}
 
 		if (isset($settings['use_default_images']) && $settings['use_default_images'] === 'defaults' && isset($settings['default_template']))
@@ -580,7 +580,7 @@ class Theme extends BaseTheme
 			loadCSSFile('prettify.css');
 			loadJavascriptFile('prettify.min.js', array('defer' => true));
 
-			theme()->addInlineJavascript('
+			$this->addInlineJavascript('
 			$(function() {
 				prettyPrint();
 			});', true);
@@ -596,7 +596,7 @@ class Theme extends BaseTheme
 
 		if (!empty($modSettings['enableVideoEmbeding']))
 		{
-			theme()->addInlineJavascript('
+			$this->addInlineJavascript('
 			var oEmbedtext = ({
 				preview_image : ' . JavaScriptEscape($txt['preview_image']) . ',
 				ctp_video : ' . JavaScriptEscape($txt['ctp_video']) . ',
@@ -638,7 +638,7 @@ class Theme extends BaseTheme
 			$type = empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time() ? 'task' : 'mailq';
 			$ts = $type === 'mailq' ? $modSettings['mail_next_send'] : $modSettings['next_task_time'];
 
-			theme()->addInlineJavascript('
+			$this->addInlineJavascript('
 		function elkAutoTask()
 		{
 			var tempImage = new Image();
@@ -658,7 +658,7 @@ class Theme extends BaseTheme
 		// Relative times?
 		if (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2)
 		{
-			theme()->addInlineJavascript('
+			$this->addInlineJavascript('
 			var oRttime = ({
 				referenceTime : ' . forum_time() * 1000 . ',
 				now : ' . JavaScriptEscape($txt['rt_now']) . ',
@@ -800,7 +800,7 @@ class Theme extends BaseTheme
 		// Add the PM popup here instead. Theme authors can still override it simply by editing/removing the 'fPmPopup' in the array.
 		if ($context['show_pm_popup'])
 		{
-			theme()->addInlineJavascript('
+			$this->addInlineJavascript('
 			$(function() {
 				new smc_Popup({
 					heading: ' . JavaScriptEscape($txt['show_personal_messages_heading']) . ',
@@ -829,9 +829,9 @@ class Theme extends BaseTheme
 
 		if (empty($settings['theme_version']))
 		{
-			theme()->addJavascriptVar(array('elk_scripturl' => '\'' . $scripturl . '\''));
+			$this->addJavascriptVar(array('elk_scripturl' => '\'' . $scripturl . '\''));
 		}
-		theme()->addJavascriptVar(array('elk_forum_action' => '\'' . substr($modSettings['default_forum_action'], 1, -1) . '\''));
+		$this->addJavascriptVar(array('elk_forum_action' => '\'' . substr($modSettings['default_forum_action'], 1, -1) . '\''));
 
 		if (!isset($context['page_title']))
 		{
@@ -1152,14 +1152,14 @@ class Theme extends BaseTheme
 		// Output is fully XML
 		if (isset($_REQUEST['xml']))
 		{
-			theme()->getTemplates()->loadLanguageFile('index+Addons');
+			$this->getTemplates()->loadLanguageFile('index+Addons');
 			$this->getTemplates()->load('Xml');
 			$this->getLayers()->removeAll();
 		}
 		// These actions don't require the index template at all.
 		elseif (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $simpleActions))
 		{
-			theme()->getTemplates()->loadLanguageFile('index+Addons');
+			$this->getTemplates()->loadLanguageFile('index+Addons');
 			$this->getLayers()->removeAll();
 		}
 		else
@@ -1180,7 +1180,7 @@ class Theme extends BaseTheme
 
 			// ...and attempt to load their associated language files.
 			$required_files = implode('+', array_merge($templates, array('Addons')));
-			theme()->getTemplates()->loadLanguageFile($required_files, '', false);
+			$this->getTemplates()->loadLanguageFile($required_files, '', false);
 
 			// Custom template layers?
 			if (isset($settings['theme_layers']))

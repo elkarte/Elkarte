@@ -258,7 +258,7 @@ function elk_main()
 			// Load BadBehavior before we go much further
 			loadBadBehavior();
 
-			// The parser is not a DIC just yet
+			// The parser is not an object just yet
 			loadBBCParsers();
 		}
 		// Otherwise don't require the entire theme to be loaded.

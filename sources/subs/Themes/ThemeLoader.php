@@ -23,8 +23,21 @@ class ThemeLoader
 	/** @var int The id of the theme being used */
 	private $id;
 
+	/** @var Theme The current theme. */
+	private $theme;
+
 	/**
-	 * Get the id of a theme
+	 * Resolves the ID of a theme.
+	 *
+	 * The identifier can be specified in:
+	 * - a GET variable
+	 * - the session
+	 * - user's prefrences
+	 * - board
+	 * - forum default
+	 *
+	 * In addition, the ID is verified against a comma-seperated list of
+	 * known good themes. This check is skipped if the user is an admin.
 	 *
 	 * @return int Theme ID to load
 	 */
@@ -242,10 +255,18 @@ class ThemeLoader
 		require_once($settings['theme_dir'] . '/Theme.php');
 		$class = 'ElkArte\\Themes\\' . $themeName . '\\Theme';
 		$theme = new $class($this->id);
-		$context['theme_instance'] = $theme;
+		$this->theme = $context['theme_instance'] = $theme;
 
 		// Reload the templates
-		theme()->getTemplates()->reloadDirectories($settings);
+		$this->theme->getTemplates()->reloadDirectories($settings);
+	}
+
+	/**
+	 * @return Theme the current theme
+	 */
+	public function getTheme()
+	{
+		return $this->theme;
 	}
 
 	/**
@@ -329,10 +350,9 @@ class ThemeLoader
 			$context['minmax_preferences'] = ['upshrink' => $_COOKIE['upshrink']];
 		}
 
-		// @todo when are these set before loadTheme(0, true)?
 		$this->loadThemeContext();
 
-		// @todo These really don't belong in loadTheme() since they are more general than the theme.
+		// @todo These really don't belong here since they are more general than the theme.
 		$context['forum_name'] = $mbname;
 		$context['forum_name_html_safe'] = $context['forum_name'];
 
@@ -378,10 +398,10 @@ class ThemeLoader
 		$settings['avatars_on_indexes'] = 0;
 
 		// Initialize the theme.
-		$settings = array_merge($settings, theme()->getSettings());
+		$settings = array_merge($settings, $this->theme->getSettings());
 
 		// Load the basic layers
-		theme()->loadDefaultLayers();
+		$this->theme->loadDefaultLayers();
 
 		// Call initialization theme integration functions.
 		call_integration_hook('integrate_init_theme', [$this->id, &$settings]);
@@ -395,13 +415,13 @@ class ThemeLoader
 		// Any theme-related strings that need to be loaded?
 		if (!empty($settings['require_theme_strings']))
 		{
-			theme()->getTemplates()->loadLanguageFile('ThemeStrings', '', false);
+			$this->theme->getTemplates()->loadLanguageFile('ThemeStrings', '', false);
 		}
 
 		// We allow theme variants, because we're cool.
 		if (!empty($settings['theme_variants']))
 		{
-			theme()->loadThemeVariant();
+			$this->theme->loadThemeVariant();
 		}
 
 		// A bit lonely maybe, though I think it should be set up *after* the theme variants detection
@@ -448,7 +468,7 @@ class ThemeLoader
 			];
 		}
 
-		theme()->loadThemeJavascript();
+		$this->theme->loadThemeJavascript();
 
 		\Hooks::instance()->newPath(['$themedir' => $settings['theme_dir']]);
 
