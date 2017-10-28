@@ -386,6 +386,14 @@ class Site_Dispatcher
 	}
 
 	/**
+	 * @return Action_Controller
+	 */
+	public function getController()
+	{
+		return $this->_controller;
+	}
+
+	/**
 	 * Returns the current action for the system
 	 *
 	 * @return string
