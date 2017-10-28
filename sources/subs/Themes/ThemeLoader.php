@@ -337,8 +337,6 @@ class ThemeLoader
 		$context['session_id'] = $_SESSION['session_value'];
 		$context['forum_name'] = $mbname;
 		$context['forum_name_html_safe'] = $context['forum_name'];
-		$context['current_action'] = isset($_REQUEST['action']) ? $_REQUEST['action'] : null;
-		$context['current_subaction'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : null;
 
 		// Set some permission related settings.
 		if ($user_info['is_guest'] && !empty($modSettings['enableVBStyleLogin']))

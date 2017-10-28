@@ -176,9 +176,9 @@ class Site_Dispatcher
 	 */
 	public function __construct(HttpReq $_req)
 	{
-		$this->action = $_req->getQuery('action', 'trim|strval', '');
+		$context['current_action'] = $this->action = $_req->getQuery('action', 'trim|strval', '');
 		$this->area = $_req->getQuery('area', 'trim|strval', '');
-		$this->subAction = $_req->getQuery('sa', 'trim|strval', '');
+		$context['current_subaction'] = $this->subAction = $_req->getQuery('sa', 'trim|strval', '');
 		$this->_default_action = $this->getFrontPage();
 		$this->determineDefaultAction();
 
