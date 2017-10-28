@@ -38,7 +38,7 @@ class Birthdayemails implements Scheduled_Task_Interface
 		$db = database();
 
 		// Need this in order to load the language files.
-		loadEssentialThemeData();
+		theme()->getTemplates()->loadEssentialThemeData();
 
 		// Going to need this to send the emails.
 		require_once(SUBSDIR . '/Mail.subs.php');

@@ -2203,7 +2203,7 @@ function returnMimeThumb($file_ext, $url = false)
 
 	if (empty($settings))
 	{
-		loadEssentialThemeData();
+		theme()->getTemplates()->loadEssentialThemeData();
 	}
 
 	// Return the mine thumbnail if it exists or just the default

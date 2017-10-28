@@ -85,7 +85,7 @@ class Paid_Subscriptions implements Scheduled_Task_Interface
 			{
 				// Need the below for theme()->getTemplates()->loadLanguageFile to work!
 				require_once(SUBSDIR . '/Mail.subs.php');
-				loadEssentialThemeData();
+				theme()->getTemplates()->loadEssentialThemeData();
 			}
 
 			$subs_reminded[] = $row['id_sublog'];

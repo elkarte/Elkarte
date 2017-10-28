@@ -174,7 +174,7 @@ class Approval_Notification implements Scheduled_Task_Interface
 		require_once(SUBSDIR . '/Mail.subs.php');
 
 		// Need the below for theme()->getTemplates()->loadLanguageFile to work!
-		loadEssentialThemeData();
+		theme()->getTemplates()->loadEssentialThemeData();
 
 		$current_language = '';
 

@@ -55,7 +55,7 @@ class Daily_Digest implements Scheduled_Task_Interface
 
 		// We'll want this...
 		require_once(SUBSDIR . '/Mail.subs.php');
-		loadEssentialThemeData();
+		theme()->getTemplates()->loadEssentialThemeData();
 
 		// If the maillist function is on then so is the enhanced digest
 		$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['pbe_digest_enabled']);
