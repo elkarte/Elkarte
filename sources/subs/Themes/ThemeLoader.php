@@ -333,8 +333,6 @@ class ThemeLoader
 		$this->loadThemeContext();
 
 		// @todo These really don't belong in loadTheme() since they are more general than the theme.
-		$context['session_var'] = $_SESSION['session_var'];
-		$context['session_id'] = $_SESSION['session_value'];
 		$context['forum_name'] = $mbname;
 		$context['forum_name_html_safe'] = $context['forum_name'];
 

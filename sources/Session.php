@@ -26,7 +26,7 @@
  */
 function loadSession()
 {
-	global $modSettings, $boardurl, $sc;
+	global $modSettings, $boardurl, $sc, $context;
 
 	// Attempt to change a few PHP settings.
 	@ini_set('session.use_cookies', true);
@@ -111,5 +111,10 @@ function loadSession()
 		$_SESSION['session_var'] = substr(preg_replace('~^\d+~', '', $tokenizer->generate_hash(16, session_id())), 0, rand(7, 12));
 	}
 
+	// For injection into hidden form fields...
+	$context['session_var'] = $_SESSION['session_var'];
+	$context['session_id'] = $_SESSION['session_value'];
+
+	// @todo find where this is used and fix the reference!
 	$sc = $_SESSION['session_value'];
 }
