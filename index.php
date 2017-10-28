@@ -229,7 +229,7 @@ function elk_main()
 	global $modSettings, $context;
 
 	// A safer way to work with our form globals
-	// @todo Use a DIC
+	// @todo Use dependency injection
 	$_req = HttpReq::instance();
 
 	// What shall we do?
