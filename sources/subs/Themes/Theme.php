@@ -29,12 +29,12 @@ abstract class Theme
 	protected $id;
 
 	/**
-	 * @var \ElkArte\Theme\Templates
+	 * @var Templates
 	 */
 	private $templates;
 
 	/**
-	 * @var \ElkArte\Theme\TemplateLayers
+	 * @var TemplateLayers
 	 */
 	private $layers;
 
