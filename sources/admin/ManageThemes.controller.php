@@ -557,7 +557,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// Let the theme take care of the settings.
 		theme()->getTemplates()->load('Settings');
-		loadSubTemplate('options');
+		theme()->getTemplates()->loadSubTemplate('options');
 
 		// Set up for the template
 		$context['sub_template'] = 'set_options';
@@ -670,7 +670,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// Let the theme take care of the settings.
 		theme()->getTemplates()->load('Settings');
-		loadSubTemplate('settings');
+		theme()->getTemplates()->loadSubTemplate('settings');
 
 		// Load the variants separately...
 		$settings['theme_variants'] = array();

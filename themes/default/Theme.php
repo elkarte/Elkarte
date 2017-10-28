@@ -175,7 +175,7 @@ class Theme extends BaseTheme
 
 		foreach ($this->getLayers()->prepareContext() as $layer)
 		{
-			loadSubTemplate($layer . '_above', 'ignore');
+			theme()->getTemplates()->loadSubTemplate($layer . '_above', 'ignore');
 		}
 
 		if (isset($settings['use_default_images']) && $settings['use_default_images'] === 'defaults' && isset($settings['default_template']))

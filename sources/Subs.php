@@ -903,7 +903,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	if ($do_footer)
 	{
 		// Show the footer.
-		loadSubTemplate(isset($context['sub_template']) ? $context['sub_template'] : 'main');
+		theme()->getTemplates()->loadSubTemplate(isset($context['sub_template']) ? $context['sub_template'] : 'main');
 
 		// Just so we don't get caught in an endless loop of errors from the footer...
 		if (!$footer_done)

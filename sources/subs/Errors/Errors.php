@@ -320,7 +320,7 @@ class Errors extends \AbstractModel
 			if (!empty($ssi_on_error_method) && $ssi_on_error_method !== true && is_callable($ssi_on_error_method))
 				call_user_func($ssi_on_error_method);
 			elseif (empty($ssi_on_error_method) || $ssi_on_error_method !== true)
-				loadSubTemplate('fatal_error');
+				theme()->getTemplates()->loadSubTemplate('fatal_error');
 
 			// No layers?
 			if (empty($ssi_on_error_method) || $ssi_on_error_method !== true)
