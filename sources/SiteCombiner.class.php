@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.1
  */
 
 /**
@@ -394,9 +394,9 @@ class Site_Combiner
 		// Save the hive, or a nest, or a conglomeration. Like it was grown
 		$this->_archive_name = 'hive-' . sha1($this->_archive_filenames) . $type;
 
-		// Create a unique cache stale for this hive ?12345
+		// Create a unique cache stale for this hive ?x12345
 		if (!empty($this->_stales))
-			$this->_archive_stale = '?' . hash('crc32', implode(' ', $this->_stales));
+			$this->_archive_stale = '?x' . hash('crc32b', implode(' ', $this->_stales));
 	}
 
 	/**
