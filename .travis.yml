@@ -42,6 +42,12 @@ matrix:
       addons:
         mariadb: '10.0'
   fast_finish: true
+  allow_failures:
+    - php: 5.6
+      env:
+        - DB=mysql-5.6
+        - WEBTESTS=true
+        - COVERAGE=true
 
 addons:
   firefox: "50.0"
