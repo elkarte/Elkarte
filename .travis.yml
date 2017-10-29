@@ -42,6 +42,8 @@ matrix:
       addons:
         mariadb: '10.0'
   fast_finish: true
+  allow_failures:
+    - env: WEBTESTS=true
 
 addons:
   firefox: "50.0"
