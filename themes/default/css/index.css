@@ -718,7 +718,7 @@ em, .em {
 #creator dt strong, .settings label,
 .popup_heading {
 	font-weight: 600;
-	font-family: "Segoe UI Semibold", "Segoe UI", "Helvetica Neue Medium", "Helvetica Neue", serif;
+	font-family: "Segoe UI Semibold", "Segoe UI", "Helvetica Neue Medium", -apple-system, BlinkMacSystemFont, "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Droid Sans", "Helvetica Neue", "Trebuchet MS", Arial, sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
