@@ -1192,7 +1192,7 @@ class Theme extends BaseTheme
 				$layers = array('html', 'body');
 			}
 
-			$template_layers = \ElkArte\Themes\TemplateLayers::getInstance(true);
+			$template_layers = \ElkArte\Themes\TemplateLayers::instance(true);
 			foreach ($layers as $layer)
 			{
 				$template_layers->addBegin($layer);

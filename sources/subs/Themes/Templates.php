@@ -785,7 +785,7 @@ class Templates
 	 *
 	 * @return Templates
 	 */
-	public static function getInstance()
+	public static function instance()
 	{
 		return theme()->getTemplates();
 	}

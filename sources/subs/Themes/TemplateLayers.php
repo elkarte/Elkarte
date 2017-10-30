@@ -18,7 +18,7 @@ use Priority;
 /**
  * Class used to manage template layers
  *
- * An instance of the class can be retrieved with the static method getInstance
+ * An instance of the class can be retrieved with the static method instance
  */
 class TemplateLayers extends Priority
 {
@@ -220,7 +220,7 @@ class TemplateLayers extends Priority
 	 *
 	 * @return ElkArte\Theme\TemplateLayers instance of the class
 	 */
-	public static function getInstance($error_safe = false)
+	public static function instance($error_safe = false)
 	{
 		if (self::$_instance === null)
 		{
