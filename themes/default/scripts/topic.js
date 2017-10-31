@@ -958,6 +958,11 @@ function expandThumbLB(thumbID, messageID) {
 		navigation[navigation.length] = $(this).data('lightboximage');
 	});
 
+	// We should always have at least the thumbID
+	if (navigation.length === 0) {
+		navigation[navigation.length] = thumbID;
+	}
+
 	// Load and show the initial lightbox container div
 	ajaxIndicatorOn();
 	$elk_lightbox.fadeIn(200);
