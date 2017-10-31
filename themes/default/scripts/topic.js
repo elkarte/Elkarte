@@ -941,6 +941,8 @@ function expandThumbLB(thumbID, messageID) {
 				});
 				$('#elk_lb_img').removeAttr('style');
 				$elk_expand_icon.hide();
+				$(window).off('keydown.lb');
+				$(window).off('touchmove.lb');
 			});
 		};
 
@@ -957,6 +959,11 @@ function expandThumbLB(thumbID, messageID) {
 	siblings.each(function () {
 		navigation[navigation.length] = $(this).data('lightboximage');
 	});
+
+	// We should always have at least the thumbID
+	if (navigation.length === 0) {
+		navigation[navigation.length] = thumbID;
+	}
 
 	// Load and show the initial lightbox container div
 	ajaxIndicatorOn();
