@@ -134,15 +134,8 @@ class Site_Dispatcher
 		global $modSettings;
 
 		$modSettings['default_forum_action'] = '';
-		if (
-			!empty($modSettings['front_page'])
-			&& is_callable(array($modSettings['front_page'], 'frontPageHook'))
-		) {
-			$modSettings['default_forum_action'] = '?action=forum;';
-			call_user_func_array(array($modSettings['front_page'], 'frontPageHook'), array(&$this->_default_action));
-		}
 
-		// For old time's sake.
+		// Let's integrate front pages from 1.0.x for old time's sake.
 		$default_action = array(
 			'controller' => 'BoardIndex_Controller',
 			'function' => 'action_boardindex'
@@ -155,6 +148,14 @@ class Site_Dispatcher
 		{
 			$modSettings['default_forum_action'] = '?action=forum;';
 			$this->_default_action = $default_action;
+		}
+				
+		if (
+			!empty($modSettings['front_page'])
+			&& is_callable(array($modSettings['front_page'], 'frontPageHook'))
+		) {
+			$modSettings['default_forum_action'] = '?action=forum;';
+			call_user_func_array(array($modSettings['front_page'], 'frontPageHook'), array(&$this->_default_action));
 		}
 
 		return $this->_default_action;
@@ -260,7 +261,7 @@ class Site_Dispatcher
 		// Is it in the action list?
 		if (isset($this->actionArray[$this->action]))
 		{
-			// Compatibility.
+			// Compatibility with 1.0.x.
 			if (isset($this->actionArray[$this->action][2]))
 			{
 				$path = in_array($_GET['action'], $adminActions) ? ADMINDIR : CONTROLLERDIR;
