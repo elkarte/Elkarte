@@ -5,7 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -32,6 +32,7 @@ class Ila_Integrate
 		return array(
 			array('integrate_additional_bbc', 'Ila_Integrate::integrate_additional_bbc'),
 			array('integrate_before_prepare_display_context', 'Ila_Integrate::integrate_before_prepare_display_context'),
+			array('integrate_post_bbc_parser', 'Ila_Integrate::integrate_post_parser')
 		);
 	}
 
@@ -49,13 +50,26 @@ class Ila_Integrate
 	}
 
 	/**
+	 * After parse is done, we need to sub in the message id for proper lightbox navigation
+	 *
+	 * @param string $message
+	 */
+	public static function integrate_post_parser(&$message)
+	{
+		global $context;
+
+		$lighbox_message = 'data-lightboxmessage="' . (!empty($context['id_msg']) ? $context['id_msg'] : '0') . '"';
+		$message = str_replace('data-lightboxmessage="0"', $lighbox_message, $message);
+	}
+
+	/**
 	 * - Adds in new BBC code tags for use with inline images
 	 *
 	 * @param mixed[] $additional_bbc
 	 */
 	public static function integrate_additional_bbc(&$additional_bbc)
 	{
-		global $scripturl, $modSettings;
+		global $scripturl, $modSettings, $context;
 
 		// Generally we don't want to render inside of these tags ...
 		$disallow = array(
@@ -94,7 +108,7 @@ class Ila_Integrate
 						\BBC\Codes::PARAM_ATTR_MATCH => '(right|left|center)',
 					),
 				),
-				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1{width}{height}" alt="" class="bbc_img {align}" /></a>',
+				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1{width}{height}" alt="" class="bbc_img {align}" /></a>',
 				\BBC\Codes::ATTR_VALIDATE => self::validate_options(),
 				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
@@ -122,7 +136,7 @@ class Ila_Integrate
 						\BBC\Codes::PARAM_ATTR_MATCH => '(right|left|center)',
 					),
 				),
-				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1{height}{width}" alt="" class="bbc_img {align}" /></a>',
+				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1{height}{width}" alt="" class="bbc_img {align}" /></a>',
 				\BBC\Codes::ATTR_VALIDATE => self::validate_options(),
 				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
@@ -141,7 +155,7 @@ class Ila_Integrate
 						\BBC\Codes::PARAM_ATTR_MATCH => '(right|left|center)',
 					),
 				),
-				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1;thumb" alt="" class="bbc_img {align}" /></a>',
+				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1;thumb" alt="" class="bbc_img {align}" /></a>',
 				\BBC\Codes::ATTR_VALIDATE => self::validate_options(),
 				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
@@ -297,12 +311,10 @@ class Ila_Integrate
 	 */
 	public static function validate_url()
 	{
-		global $user_info, $scripturl;
+		global $user_info, $scripturl, $context;
 
-		return function (&$tag, &$data, $disabled) use ($user_info, $scripturl)
+		return function (&$tag, &$data, $disabled) use ($user_info, $scripturl, &$context)
 		{
-			global $context;
-
 			$num = $data;
 			$attachment = false;
 
@@ -345,12 +357,10 @@ class Ila_Integrate
 	 */
 	public static function validate_plain()
 	{
-		global $user_info, $scripturl;
+		global $user_info, $scripturl, $context;
 
-		return function (&$tag, &$data, $disabled) use ($user_info, $scripturl)
+		return function (&$tag, &$data, $disabled) use ($user_info, $scripturl, &$context)
 		{
-			global $context;
-
 			$num = $data;
 			$is_image = array();
 			$preview = strpos($data, 'post_tmp_' . $user_info['id']);
@@ -367,7 +377,7 @@ class Ila_Integrate
 			// An image will get the light box treatment
 			if (!empty($is_image['is_image']) || $preview !== false)
 			{
-				$data = '<a id="link_' . $num . '" data-lightboximage="' . $num . '" href="' . $scripturl . '?action=dlattach;attach=' . $num . ';image' . '"><img src="' . $scripturl . '?action=dlattach;attach=' . $num . ';thumb" alt="" class="bbc_img" /></a>';
+				$data = '<a id="link_' . $num . '" data-lightboximage="' . $num . '" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=' . $num . ';image' . '"><img src="' . $scripturl . '?action=dlattach;attach=' . $num . ';thumb" alt="" class="bbc_img" /></a>';
 			}
 			else
 			{
@@ -398,12 +408,10 @@ class Ila_Integrate
 	 */
 	public static function validate_options()
 	{
-		global $user_info;
+		global $user_info, $scripturl, $context;
 
-		return function (&$tag, &$data, $disabled) use ($user_info)
+		return function (&$tag, &$data, $disabled) use ($user_info, $scripturl, &$context)
 		{
-			global $context;
-
 			// Not a preview, then sanitize the attach id
 			if (strpos($data, 'post_tmp_' . $user_info['id']) === false)
 			{
