@@ -69,7 +69,7 @@ class Ila_Integrate
 	 */
 	public static function integrate_additional_bbc(&$additional_bbc)
 	{
-		global $scripturl, $modSettings, $context;
+		global $scripturl, $modSettings;
 
 		// Generally we don't want to render inside of these tags ...
 		$disallow = array(
@@ -79,6 +79,10 @@ class Ila_Integrate
 			'html' => 1,
 			'php' => 1,
 		);
+
+		// Why enable it to disable the tags, oh well
+		$disabledBBC = empty($modSettings['disabledBBC']) ? array() : explode(',', $modSettings['disabledBBC']);
+		$disableAttach = in_array('attach', $disabledBBC);
 
 		// Want to see them in quotes eh?
 		if (!empty($modSettings['attachment_inline_quotes']))
@@ -109,7 +113,7 @@ class Ila_Integrate
 					),
 				),
 				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1{width}{height}" alt="" class="bbc_img {align}" /></a>',
-				\BBC\Codes::ATTR_VALIDATE => self::validate_options(),
+				\BBC\Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_options(),
 				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
 				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
@@ -137,7 +141,7 @@ class Ila_Integrate
 					),
 				),
 				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1{height}{width}" alt="" class="bbc_img {align}" /></a>',
-				\BBC\Codes::ATTR_VALIDATE => self::validate_options(),
+				\BBC\Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_options(),
 				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
 				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
@@ -156,7 +160,7 @@ class Ila_Integrate
 					),
 				),
 				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1;thumb" alt="" class="bbc_img {align}" /></a>',
-				\BBC\Codes::ATTR_VALIDATE => self::validate_options(),
+				\BBC\Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_options(),
 				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
 				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
@@ -168,7 +172,7 @@ class Ila_Integrate
 				\BBC\Codes::ATTR_TAG => 'attach',
 				\BBC\Codes::ATTR_TYPE => \BBC\Codes::TYPE_UNPARSED_CONTENT,
 				\BBC\Codes::ATTR_CONTENT => '$1',
-				\BBC\Codes::ATTR_VALIDATE => self::validate_plain(),
+				\BBC\Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_plain(),
 				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
 				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
