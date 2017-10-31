@@ -941,6 +941,8 @@ function expandThumbLB(thumbID, messageID) {
 				});
 				$('#elk_lb_img').removeAttr('style');
 				$elk_expand_icon.hide();
+				$(window).off('keydown.lb');
+				$(window).off('touchmove.lb');
 			});
 		};
 
