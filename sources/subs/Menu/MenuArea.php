@@ -7,76 +7,58 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version   1.1
+ * @version 1.1
  *
  */
 
 namespace ElkArte\Menu;
 
-class MenuArea
+class MenuArea extends MenuItem
 {
-	/** @var string[] $permission Array of permissions to determine who can access this area. */
-	public $permission = [];
-
-	/** @var string $label Optional text string for link (Otherwise $txt[$index] will be used) */
-	public $label = '';
-
-	/** @var string $counter Index of counter specified in the menu options. */
-	public $counter = '';
-
 	/** @var callable $function Function to call when area is selected. */
-	public $function;
-
-	/** @var string $custom_url URL to use for this menu item. */
-	public $custom_url = '';
+	protected $function;
 
 	/** @var string $icon File name of an icon to use on the menu, if using the sprite class, set as transparent.png */
-	public $icon = '';
+	protected $icon = '';
 
 	/** @var string $controller URL to use for this menu item. */
-	public $controller = '';
+	protected $controller = '';
 
 	/** @var string $select References another area to be highlighted while this one is active */
 	public $select = '';
 
 	/** @var string $class Class name to apply to the icon img, used to apply a sprite icon */
-	public $class = '';
+	protected $class = '';
 
 	/** @var bool $enabled Should this area even be accessible? */
-	public $enabled = true;
+	protected $enabled = true;
 
 	/** @var bool $hidden Should this area be visible? */
-	public $hidden = false;
+	protected $hidden = false;
 
-	/** @var array $subsections Array of subsections from this area. */
-	public $subsections = [];
+	/** @var MenuSubsection[] $subsections Array of subsections from this area. */
+	private $subsections = [];
 
 	/**
 	 * @param array $arr
 	 *
 	 * @return MenuArea
 	 */
-	public static function buildFromArray(array $arr)
+	protected function buildMoreFromArray(array $arr)
 	{
-		$area = new self;
-		$vars = get_object_vars($area);
-		foreach (array_replace(
-					$vars,
-					array_intersect_key($arr, $vars)
-				) as $var => $val)
+		if (isset($arr['custom_url']))
 		{
-			$area->{$var} = $val;
+			$this->setUrl($arr['custom_url']);
 		}
-
 		if (isset($arr['subsections']))
 		{
 			foreach ($arr['subsections'] as $var => $subsection)
 			{
-				$area->addSubsection($var, $subsection);
+				$this->addSubsection($var, $subsection);
 			}
 		}
 
-		return $area;
+		return $this;
 	}
 
 	/**
@@ -88,66 +70,6 @@ class MenuArea
 	public function addSubsection($id, MenuSubsection $subsection)
 	{
 		$this->subsections[$id] = $subsection;
-
-		return $this;
-	}
-
-	/**
-	 * @return string[]
-	 */
-	public function getPermission()
-	{
-		return $this->permission;
-	}
-
-	/**
-	 * @param string[] $permission
-	 *
-	 * @return MenuArea
-	 */
-	public function setPermission($permission)
-	{
-		$this->permission = $permission;
-
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getLabel()
-	{
-		return $this->label;
-	}
-
-	/**
-	 * @param string $label
-	 *
-	 * @return MenuArea
-	 */
-	public function setLabel($label)
-	{
-		$this->label = $label;
-
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getCounter()
-	{
-		return $this->counter;
-	}
-
-	/**
-	 * @param string $counter
-	 *
-	 * @return MenuArea
-	 */
-	public function setCounter($counter)
-	{
-		$this->counter = $counter;
 
 		return $this;
 	}
@@ -168,26 +90,6 @@ class MenuArea
 	public function setFunction($function)
 	{
 		$this->function = $function;
-
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getCustomUrl()
-	{
-		return $this->custom_url;
-	}
-
-	/**
-	 * @param string $custom_url
-	 *
-	 * @return MenuArea
-	 */
-	public function setCustomUrl($custom_url)
-	{
-		$this->custom_url = $custom_url;
 
 		return $this;
 	}
@@ -275,26 +177,6 @@ class MenuArea
 	/**
 	 * @return boolean
 	 */
-	public function isEnabled()
-	{
-		return $this->enabled;
-	}
-
-	/**
-	 * @param boolean $enabled
-	 *
-	 * @return MenuArea
-	 */
-	public function setEnabled($enabled)
-	{
-		$this->enabled = $enabled;
-
-		return $this;
-	}
-
-	/**
-	 * @return boolean
-	 */
 	public function isHidden()
 	{
 		return $this->hidden;
@@ -314,6 +196,14 @@ class MenuArea
 
 	/**
 	 * @return array
+	 */
+	public function toArray()
+	{
+		return get_object_vars($this);
+	}
+
+	/**
+	 * @return MenuSubsection[]
 	 */
 	public function getSubsections()
 	{

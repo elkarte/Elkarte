@@ -34,7 +34,7 @@ function template_generic_menu_sidebar_above()
 	{
 		// Show the section header - and pump up the line spacing for readability.
 		echo '
-			<h2 class="category_header">', $section['title'], '</h2>
+			<h2 class="category_header">', $section['label'], '</h2>
 			<ul class="sidebar_menu">';
 
 		// For every area of this section show a link to that area (bold if it's currently selected.)
@@ -124,7 +124,7 @@ function template_generic_menu_dropdown_above()
 	{
 		echo '
 					<li class="listlevel1', !empty($section['areas']) ? ' subsections" aria-haspopup="true"' : '"', '>
-						<a class="linklevel1', !empty($section['selected']) ? ' active' : '', '" href="', $section['url'], $menu_context['extra_parameters'], '">', $section['title'], '</a>
+						<a class="linklevel1', !empty($section['selected']) ? ' active' : '', '" href="', $section['url'], $menu_context['extra_parameters'], '">', $section['label'], '</a>
 						<ul class="menulevel2">';
 
 		// For every area of this section show a link to that area (bold if it's currently selected.)
@@ -217,38 +217,11 @@ function template_generic_menu_tabs(&$menu_context)
 		{
 			foreach ($context['tabs'] as $id => $tab)
 			{
-				// Can this not be accessed?
-				if (!empty($tab['disabled']))
-				{
-					$tab_context['tabs'][$id]['disabled'] = true;
-					continue;
-				}
-
-				// Did this not even exist - or do we not have a label?
-				if (!isset($tab_context['tabs'][$id]))
-					$tab_context['tabs'][$id] = array('label' => $tab['label']);
-				elseif (!isset($tab_context['tabs'][$id]['label']))
-					$tab_context['tabs'][$id]['label'] = $tab['label'];
-
-				// Has a custom URL defined in the main admin structure?
-				if (isset($tab['url']) && !isset($tab_context['tabs'][$id]['url']))
-					$tab_context['tabs'][$id]['url'] = $tab['url'];
-
-				// Any additional parameters for the url?
-				if (isset($tab['add_params']) && !isset($tab_context['tabs'][$id]['add_params']))
-					$tab_context['tabs'][$id]['add_params'] = $tab['add_params'];
+				$tab_context['tabs'][$id] = array_replace($tab, $tab_context['tabs'][$id]);
 
 				// Has it been deemed selected?
 				if (!empty($tab['selected']))
-					$tab_context['tabs'][$id]['selected'] = true;
-
-				// Does it have its own help?
-				if (!empty($tab['help']))
-					$tab_context['tabs'][$id]['help'] = $tab['help'];
-
-				// Is this the last one?
-				if (!empty($tab['is_last']) && !isset($tab_context['override_last']))
-					$tab_context['tabs'][$id]['is_last'] = true;
+					$selected_tab = $tab_context['tabs'][$id];
 			}
 		}
 
@@ -256,27 +229,19 @@ function template_generic_menu_tabs(&$menu_context)
 						<h3 class="floatleft">';
 
 		// Show an icon and/or a help item?
-		if (!empty($selected_tab['icon']) || !empty($tab_context['icon']) || !empty($selected_tab['help']) || !empty($tab_context['help']) || !empty($selected_tab['class']) || !empty($tab_context['class']))
-		{
-			if (!empty($selected_tab['icon']) || !empty($tab_context['icon']))
-				echo '
+		if (!empty($selected_tab['icon']) || !empty($tab_context['icon']))
+			echo '
 						<img src="', $settings['images_url'], '/icons/', !empty($selected_tab['icon']) ? $selected_tab['icon'] : $tab_context['icon'], '" alt="" class="icon" />';
-			elseif (!empty($selected_tab['class']) || !empty($tab_context['class']))
-				echo '
+		elseif (!empty($selected_tab['class']) || !empty($tab_context['class']))
+			echo '
 						<span class="hdicon cat_img_', !empty($selected_tab['class']) ? $selected_tab['class'] : $tab_context['class'], '"></span>';
 
-			if (!empty($selected_tab['help']) || !empty($tab_context['help']))
-				echo '
-						<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=', !empty($selected_tab['help']) ? $selected_tab['help'] : $tab_context['help'], '" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>';
-
+		if (!empty($selected_tab['help']) || !empty($tab_context['help']))
 			echo '
-						', $tab_context['title'];
-		}
-		else
-			echo '
-						', $tab_context['title'];
+						<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=', !empty($selected_tab['help']) ? $selected_tab['help'] : $tab_context['help'], '" onclick="return reqOverlayDiv(this.href);" label="', $txt['help'], '"></a>';
 
 		echo '
+						', $tab_context['title'], '
 						</h3>';
 
 		// The function is in Admin.template.php, but since this template is used elsewhere,
@@ -287,7 +252,6 @@ function template_generic_menu_tabs(&$menu_context)
 					</div>';
 	}
 
-	// Shall we use the tabs? Yes, it's the only known way!
 	if (!empty($selected_tab['description']) || !empty($tab_context['description']))
 		echo '
 					<p class="description">

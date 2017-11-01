@@ -14,9 +14,13 @@ class TestAdminSearch extends \PHPUnit\Framework\TestCase
 	/**
 	 * Cleans up the environment after running a test.
 	 */
-	public function __destruct()
+	protected function tearDown()
 	{
 		\ElkArte\User::$info->permissions = array();
+		global $context, $user_info;
+
+		$user_info['permissions'] = array();
+		unset($context['search_term'], $context['search_results']);
 	}
 
 	/**
@@ -66,6 +70,7 @@ class TestAdminSearch extends \PHPUnit\Framework\TestCase
 
 		$context['search_term'] = 'enable';
 		$this->controller->action_search_internal();
+		destroyMenu('last');
 
 		return array_map(function ($search_result)
 			{
