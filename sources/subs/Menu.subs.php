@@ -77,8 +77,9 @@ function destroyMenu($menu_id = 'last')
  */
 function callMenu($selectedMenu)
 {
-	$menu = new Menu();
-	$menu->callMenu($selectedMenu);
+	$action = new Action();
+	$action->initialize(['action' => $selectedMenu]);
+	$action->dispatch('action');
 }
 
 /**
