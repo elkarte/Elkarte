@@ -27,8 +27,8 @@ class MenuArea
     /** @var callable $function Function to call when area is selected. */
     public $function;
 
-    /** @var string $custom_url URL to use for this menu item. */
-    public $custom_url = '';
+	/** @var string $custom_url URL to use for this menu item. */
+	public $custom_url = '';
 
     /** @var string $icon File name of an icon to use on the menu, if using the sprite class, set as transparent.png */
     public $icon = '';
