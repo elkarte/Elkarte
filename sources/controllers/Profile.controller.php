@@ -586,11 +586,11 @@ class Profile_Controller extends Action_Controller
 			);
 		}
 
-		if (!empty($this->_profile_include_data['current_subsection']) && $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']][0] != $this->_profile_include_data['label'])
+		if (!empty($this->_profile_include_data['current_subsection']) && $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']]->label != $this->_profile_include_data['label'])
 		{
 			$context['linktree'][] = array(
 				'url' => $scripturl . '?action=profile' . ($this->_memID != $user_info['id'] ? ';u=' . $this->_memID : '') . ';area=' . $this->_profile_include_data['current_area'] . ';sa=' . $this->_profile_include_data['current_subsection'],
-				'name' => $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']][0],
+				'name' => $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']]->label,
 			);
 		}
 	}
