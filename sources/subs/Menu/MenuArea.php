@@ -61,9 +61,9 @@ class MenuArea
 		$area = new self;
 		$vars = get_object_vars($area);
 		foreach (array_replace(
-			         $vars,
-			         array_intersect_key($arr, $vars)
-		         ) as $var => $val)
+					$vars,
+					array_intersect_key($arr, $vars)
+				) as $var => $val)
 		{
 			$area->{$var} = $val;
 		}
@@ -90,5 +90,233 @@ class MenuArea
 		$this->subsections[$id] = $subsection;
 
 		return $this;
+	}
+
+	/**
+	 * @return string[]
+	 */
+	public function getPermission()
+	{
+		return $this->permission;
+	}
+
+	/**
+	 * @param string[] $permission
+	 *
+	 * @return MenuArea
+	 */
+	public function setPermission($permission)
+	{
+		$this->permission = $permission;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getLabel()
+	{
+		return $this->label;
+	}
+
+	/**
+	 * @param string $label
+	 *
+	 * @return MenuArea
+	 */
+	public function setLabel($label)
+	{
+		$this->label = $label;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCounter()
+	{
+		return $this->counter;
+	}
+
+	/**
+	 * @param string $counter
+	 *
+	 * @return MenuArea
+	 */
+	public function setCounter($counter)
+	{
+		$this->counter = $counter;
+
+		return $this;
+	}
+
+	/**
+	 * @return callable
+	 */
+	public function getFunction()
+	{
+		return $this->function;
+	}
+
+	/**
+	 * @param callable $function
+	 *
+	 * @return MenuArea
+	 */
+	public function setFunction($function)
+	{
+		$this->function = $function;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCustomUrl()
+	{
+		return $this->custom_url;
+	}
+
+	/**
+	 * @param string $custom_url
+	 *
+	 * @return MenuArea
+	 */
+	public function setCustomUrl($custom_url)
+	{
+		$this->custom_url = $custom_url;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getIcon()
+	{
+		return $this->icon;
+	}
+
+	/**
+	 * @param string $icon
+	 *
+	 * @return MenuArea
+	 */
+	public function setIcon($icon)
+	{
+		$this->icon = $icon;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getController()
+	{
+		return $this->controller;
+	}
+
+	/**
+	 * @param string $controller
+	 *
+	 * @return MenuArea
+	 */
+	public function setController($controller)
+	{
+		$this->controller = $controller;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getSelect()
+	{
+		return $this->select;
+	}
+
+	/**
+	 * @param string $select
+	 *
+	 * @return MenuArea
+	 */
+	public function setSelect($select)
+	{
+		$this->select = $select;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getClass()
+	{
+		return $this->class;
+	}
+
+	/**
+	 * @param string $class
+	 *
+	 * @return MenuArea
+	 */
+	public function setClass($class)
+	{
+		$this->class = $class;
+
+		return $this;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isEnabled()
+	{
+		return $this->enabled;
+	}
+
+	/**
+	 * @param boolean $enabled
+	 *
+	 * @return MenuArea
+	 */
+	public function setEnabled($enabled)
+	{
+		$this->enabled = $enabled;
+
+		return $this;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isHidden()
+	{
+		return $this->hidden;
+	}
+
+	/**
+	 * @param boolean $hidden
+	 *
+	 * @return MenuArea
+	 */
+	public function setHidden($hidden)
+	{
+		$this->hidden = $hidden;
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getSubsections()
+	{
+		return $this->subsections;
 	}
 }
