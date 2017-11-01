@@ -133,6 +133,23 @@ class Site_Dispatcher
 	{
 		global $modSettings;
 
+		$modSettings['default_forum_action'] = '';
+
+		// Let's integrate front pages from 1.0.x for old time's sake.
+		$default_action = array(
+			'controller' => 'BoardIndex_Controller',
+			'function' => 'action_boardindex'
+		);
+
+		// Reminder: hooks need to account for multiple addons setting this hook.
+		call_integration_hook('integrate_action_frontpage', array(&$default_action));
+
+		if ($this->_default_action == $default_action)
+		{
+			$modSettings['default_forum_action'] = '?action=forum;';
+			$this->_default_action = $default_action;
+		}
+				
 		if (
 			!empty($modSettings['front_page'])
 			&& is_callable(array($modSettings['front_page'], 'frontPageHook'))
@@ -140,10 +157,7 @@ class Site_Dispatcher
 			$modSettings['default_forum_action'] = '?action=forum;';
 			call_user_func_array(array($modSettings['front_page'], 'frontPageHook'), array(&$this->_default_action));
 		}
-		else
-		{
-			$modSettings['default_forum_action'] = '';
-		}
+
 		return $this->_default_action;
 	}
 
@@ -236,14 +250,25 @@ class Site_Dispatcher
 	 */
 	protected function determineAction()
 	{
+		// To try to stay backwardss compatible...
+		$adminActions = array();
+
 		// Allow to extend or change $actionArray through a hook
 		// Format:
 		// $_GET['action'] => array($class, $method)
-		call_integration_hook('integrate_actions', array(&$this->actionArray));
+		call_integration_hook('integrate_actions', array(&$this->actionArray, &$adminActions));
 
 		// Is it in the action list?
 		if (isset($this->actionArray[$this->action]))
 		{
+			// Compatibility with 1.0.x.
+			if (isset($this->actionArray[$this->action][2]))
+			{
+				$path = in_array($_GET['action'], $adminActions) ? ADMINDIR : CONTROLLERDIR;
+				require_once($path . '/' . $this->actionArray[$this->action][0]);
+				array_shift($this->actionArray[$this->action]);
+			}
+
 			$this->_controller_name = $this->actionArray[$this->action][0];
 
 			// If the method is coded in, use it
@@ -271,6 +296,11 @@ class Site_Dispatcher
 		// The file and function weren't found yet?
 		if (empty($this->_controller_name) || empty($this->_function_name))
 		{
+			// Support legacy integrations.
+			if (isset($this->_default_action['file']))
+			{
+				require_once($this->_default_action['file']);
+			}
 			// We still haven't found what we're looking for...
 			$this->_controller_name = $this->_default_action['controller'];
 			$this->_function_name = $this->_default_action['function'];
@@ -293,6 +323,11 @@ class Site_Dispatcher
 		{
 			$this->_controller_name = $this->_default_action['controller'];
 			$this->_function_name = $this->_default_action['function'];
+			// Support legacy integrations.
+			if (isset($this->_default_action['file']))
+			{
+				require_once($this->_default_action['file']);
+			}
 		}
 	}
 
