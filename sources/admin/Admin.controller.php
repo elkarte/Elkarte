@@ -616,10 +616,10 @@ class Admin_Controller extends Action_Controller
 				'name' => $admin_include_data['label'],
 			);
 
-		if (!empty($admin_include_data['current_subsection']) && $admin_include_data['subsections'][$admin_include_data['current_subsection']]->label != $admin_include_data['label'])
+		if (!empty($admin_include_data['current_subsection']) && $admin_include_data['subsections'][$admin_include_data['current_subsection']]->getLabel() != $admin_include_data['label'])
 			$context['linktree'][] = array(
 				'url' => $scripturl . '?action=admin;area=' . $admin_include_data['current_area'] . ';sa=' . $admin_include_data['current_subsection'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-				'name' => $admin_include_data['subsections'][$admin_include_data['current_subsection']]->label,
+				'name' => $admin_include_data['subsections'][$admin_include_data['current_subsection']]->getLabel(),
 			);
 	}
 
