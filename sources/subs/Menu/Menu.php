@@ -703,37 +703,4 @@ Class Menu
 
 		unset($context[$menu_name]);
 	}
-
-	/**
-	 * Call the function or method for the selected menu item.
-	 * $selectedMenu is the array of menu information, with the format as retrieved from createMenu()
-	 *
-	 * If $selectedMenu ['controller'] is set, then it is a class, and $selectedMenu['function'] will be a method of it.
-	 * If it is not set, then $selectedMenu ['function'] is simply a function to call.
-	 *
-	 * @param array|bool $selectedMenu
-	 */
-	public function callMenu($selectedMenu)
-	{
-		// Always be safe
-		if (empty($selectedMenu) || empty($selectedMenu['function'])) {
-			throw new Elk_Exception('no_access');
-		}
-
-		// We use only selectedMenu ['function'] and selectedMenu ['controller'] if the latter is set.
-		if (!empty($selectedMenu['controller'])) {
-			// 'controller' => 'ManageAttachments_Controller'
-			// 'function' => 'action_avatars'
-			$controller = new $selectedMenu['controller'](new \Event_Manager());
-
-			// Always set up the environment
-			$controller->pre_dispatch();
-
-			// and go!
-			$controller->{$selectedMenu['function']}();
-		} else {
-			// A single function name or Closure... call it over!
-			$selectedMenu['function']();
-		}
-	}
 }

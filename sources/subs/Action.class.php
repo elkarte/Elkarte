@@ -31,7 +31,7 @@ class Action
 	 *    'function' => 'function name'),
 	 *  or
 	 *    'sub_action name' => array(
-	 *    'controller' => 'controller name',
+	 *        'controller' => 'controller name',
 	 *        'function' => 'method name',
 	 *        'enabled' => true/false,
 	 *        'permission' => area),
@@ -93,7 +93,7 @@ class Action
 	 *
 	 * @return string
 	 */
-	public function initialize(&$subactions, $default = '', $requestParam = 'sa')
+	public function initialize($subactions, $default = '', $requestParam = 'sa')
 	{
 		if ($this->_name !== null)
 			call_integration_hook('integrate_sa_' . $this->_name, array(&$subactions));
