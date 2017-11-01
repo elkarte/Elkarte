@@ -40,13 +40,16 @@ class MenuSection
 		$section = new self;
 		$vars = get_object_vars($section);
 		foreach (array_replace(
-					 $vars,
-					 array_intersect_key($arr, $vars)
-				 ) as $var => $val) {
+			         $vars,
+			         array_intersect_key($arr, $vars)
+		         ) as $var => $val)
+		{
 			$section->{$var} = $val;
 		}
-		if (isset($arr['areas'])) {
-			foreach ($arr['areas'] as $var => $area) {
+		if (isset($arr['areas']))
+		{
+			foreach ($arr['areas'] as $var => $area)
+			{
 				$section->addArea($var, $area);
 			}
 		}

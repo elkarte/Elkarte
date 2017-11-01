@@ -46,9 +46,10 @@ class MenuSubsection
 		$subsection = new self;
 		$vars = get_object_vars($subsection);
 		foreach (array_replace(
-					 $vars,
-					 array_intersect_key($arr, $vars)
-				 ) as $var => $val) {
+			         $vars,
+			         array_intersect_key($arr, $vars)
+		         ) as $var => $val)
+		{
 			$subsection->{$var} = $val;
 		}
 		$subsection->label = $arr[0];
