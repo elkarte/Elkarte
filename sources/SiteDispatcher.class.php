@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -149,11 +149,10 @@ class Site_Dispatcher
 			$modSettings['default_forum_action'] = '?action=forum;';
 			$this->_default_action = $default_action;
 		}
-				
-		if (
-			!empty($modSettings['front_page'])
-			&& is_callable(array($modSettings['front_page'], 'frontPageHook'))
-		) {
+
+		if (!empty($modSettings['front_page'])
+			&& is_callable(array($modSettings['front_page'], 'frontPageHook')))
+		{
 			$modSettings['default_forum_action'] = '?action=forum;';
 			call_user_func_array(array($modSettings['front_page'], 'frontPageHook'), array(&$this->_default_action));
 		}
