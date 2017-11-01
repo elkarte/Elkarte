@@ -102,9 +102,9 @@ Class Menu
 		$this->req = \HttpReq::instance();
 
 		// Work out where we should get our menu images from.
-		$context['menu_image_path'] = file_exists($settings['theme_dir'].'/images/admin/change_menu.png')
-			? $settings['images_url'].'/admin'
-			: $settings['default_images_url'].'/admin';
+		$context['menu_image_path'] = file_exists($settings['theme_dir'] . '/images/admin/change_menu.png')
+			? $settings['images_url'] . '/admin'
+			: $settings['default_images_url'] . '/admin';
 
 		// Every menu gets a unique ID, these are shown in first in, first out order.
 		$this->max_menu_id = isset($context['max_menu_id']) ? $context['max_menu_id']++ : 1;
@@ -214,7 +214,7 @@ Class Menu
 		if (!empty($this->menuOptions['hook']))
 		{
 			call_integration_hook(
-				'integrate_'.$this->menuOptions['hook'].'_areas',
+				'integrate_' . $this->menuOptions['hook'] . '_areas',
 				[&$this->menuData, &$this->menuOptions]
 			);
 		}
@@ -257,14 +257,14 @@ Class Menu
 		{
 			foreach ($this->menuOptions['extra_url_parameters'] as $key => $value)
 			{
-				$this->menu_context['extra_parameters'] .= ';'.$key.'='.$value;
+				$this->menu_context['extra_parameters'] .= ';' . $key . '=' . $value;
 			}
 		}
 
 		// Only include the session ID in the URL if it's strictly necessary.
 		if (empty($this->menuOptions['disable_url_session_check']))
 		{
-			$this->menu_context['extra_parameters'] .= ';'.$context['session_var'].'='.$context['session_id'];
+			$this->menu_context['extra_parameters'] .= ';' . $context['session_var'] . '=' . $context['session_id'];
 		}
 	}
 
@@ -421,8 +421,8 @@ Class Menu
 
 		$this->menu_context['sections'][$section_id] = [
 			'id' => $section_id,
-			'title' => ($section->title ?: $txt[$section_id]).$counter,
-			'url' => $this->menu_context['base_url'].$this->menu_context['extra_parameters'],
+			'title' => ($section->title ?: $txt[$section_id]) . $counter,
+			'url' => $this->menu_context['base_url'] . $this->menu_context['extra_parameters'],
 		];
 	}
 
@@ -454,7 +454,7 @@ Class Menu
 	private function setAreaUrl($section_id, $area_id, $area)
 	{
 		$area->url = $this->menu_context['sections'][$section_id]['areas'][$area_id]['url'] =
-			$area->custom_url ?: $this->menu_context['base_url'].';area='.$area_id.$this->menu_context['extra_parameters'];
+			$area->custom_url ?: $this->menu_context['base_url'] . ';area=' . $area_id . $this->menu_context['extra_parameters'];
 	}
 
 	/**
@@ -468,7 +468,7 @@ Class Menu
 		if (isset($area->icon))
 		{
 			$this->menu_context['sections'][$section_id]['areas'][$area_id]['icon'] =
-				'<img '.(isset($area->class) ? 'class="'.$area->class.'" ' : 'style="background: none"').' src="'.$context['menu_image_path'].'/'.$area->icon.'" alt="" />&nbsp;&nbsp;';
+				'<img ' . (isset($area->class) ? 'class="' . $area->class . '" ' : 'style="background: none"') . ' src="' . $context['menu_image_path'] . '/' . $area->icon . '" alt="" />&nbsp;&nbsp;';
 		}
 		else
 		{
@@ -531,7 +531,7 @@ Class Menu
 	private function setSubsSectionUrl($section_id, $area_id, $sa, $sub)
 	{
 		$sub->url = $this->menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$sa]['url'] =
-			$sub->url ?: $this->menu_context['base_url'].';area='.$area_id.';sa='.$sa.$this->menu_context['extra_parameters'];
+			$sub->url ?: $this->menu_context['base_url'] . ';area=' . $area_id . ';sa=' . $sa . $this->menu_context['extra_parameters'];
 	}
 
 	/**
@@ -588,7 +588,7 @@ Class Menu
 		// Should we use a custom base url, or use the default?
 		$this->menu_context['base_url'] = isset($this->menuOptions['base_url'])
 			? $this->menuOptions['base_url']
-			: $scripturl.'?action='.$this->menu_context['current_action'];
+			: $scripturl . '?action=' . $this->menu_context['current_action'];
 	}
 
 	/**
@@ -686,7 +686,7 @@ Class Menu
 		// What type of menu is this, dropdown or sidebar
 		if (empty($this->menuOptions['menu_type']))
 		{
-			$this->menuOptions['menu_type'] = '_'.(empty($options['use_sidebar_menu']) ? 'dropdown' : 'sidebar');
+			$this->menuOptions['menu_type'] = '_' . (empty($options['use_sidebar_menu']) ? 'dropdown' : 'sidebar');
 			$this->menu_context['can_toggle_drop_down'] =
 				!$user_info['is_guest'] && isset($settings['theme_version']) && $settings['theme_version'] >= 2.0;
 		}
@@ -698,13 +698,13 @@ Class Menu
 		// Almost there - load the template and add to the template layers.
 		loadTemplate(isset($this->menuOptions['template_name']) ? $this->menuOptions['template_name'] : 'GenericMenu');
 		$this->menu_context['layer_name'] =
-			(isset($this->menuOptions['layer_name']) ? $this->menuOptions['layer_name'] : 'generic_menu').$this->menuOptions['menu_type'];
+			(isset($this->menuOptions['layer_name']) ? $this->menuOptions['layer_name'] : 'generic_menu') . $this->menuOptions['menu_type'];
 		theme()->getLayers()->add($this->menu_context['layer_name']);
 
 		// Set it all to context for template consumption
 		$context['max_menu_id'] = $this->max_menu_id;
 		$context['current_subaction'] = $this->current_subaction;
-		$context['menu_data_'.$this->max_menu_id] = $this->menu_context;
+		$context['menu_data_' . $this->max_menu_id] = $this->menu_context;
 	}
 
 	/**
@@ -719,9 +719,9 @@ Class Menu
 		global $context;
 
 		$menu_name =
-			$menu_id === 'last' && isset($context['max_menu_id'], $context['menu_data_'.$context['max_menu_id']])
-				? 'menu_data_'.$context['max_menu_id']
-				: 'menu_data_'.$menu_id;
+			$menu_id === 'last' && isset($context['max_menu_id'], $context['menu_data_' . $context['max_menu_id']])
+				? 'menu_data_' . $context['max_menu_id']
+				: 'menu_data_' . $menu_id;
 
 		if (!isset($context[$menu_name]))
 		{
