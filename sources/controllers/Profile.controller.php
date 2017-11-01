@@ -60,12 +60,6 @@ class Profile_Controller extends Action_Controller
 	private $_memID = 0;
 
 	/**
-	 * Holds the create menu object
-	 * @var object
-	 */
-	private $_menu;
-
-	/**
 	 * Called before all other methods when coming from the dispatcher or
 	 * action class.
 	 */
@@ -187,7 +181,7 @@ class Profile_Controller extends Action_Controller
 		if (isset($this->_profile_include_data['file']))
 			require_once($this->_profile_include_data['file']);
 
-		$this->_menu->callMenu($this->_profile_include_data);
+		callMenu($this->_profile_include_data);
 
 		// Set the page title if it's not already set...
 		if (!isset($context['page_title']))
@@ -509,14 +503,8 @@ class Profile_Controller extends Action_Controller
 			'default_include_dir' => CONTROLLERDIR,
 		);
 
-		// Setup the profile menu
-		$this->_menu = Menu::instance();
-		$this->_menu->addOptions($menuOptions);
-		$this->_menu->addAreas($profile_areas);
-
-		// Create the menu, calling integrate_profile_areas at the start
-		$this->_profile_include_data = $this->_menu->prepareMenu();
-		$this->_menu->setContext();
+		// Actually create the menu!
+		$this->_profile_include_data = createMenu($profile_areas, $menuOptions);
 		unset($profile_areas);
 	}
 

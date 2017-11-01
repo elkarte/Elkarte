@@ -568,23 +568,15 @@ class Admin_Controller extends Action_Controller
 			),
 		);
 
-		// Any menu items that Modules want to add
-		$this->_getModulesMenu($admin_areas);
+		$this->_events->trigger('addMenu', array('admin_areas' => &$admin_areas));
 
 		// Any files to include for administration?
 		call_integration_include_hook('integrate_admin_include');
 
-		// Set our menu options
 		$menuOptions = array('hook' => 'admin', 'default_include_dir' => ADMINDIR);
 
-		// Setup the menu
-		$menu = Menu::instance();
-		$menu->addOptions($menuOptions);
-		$menu->addAreas($admin_areas);
-
-		// Create the menu, calling integrate_admin_areas at the start
-		$admin_include_data = $menu->prepareMenu();
-		$menu->setContext();
+		// Actually create the menu!
+		$admin_include_data = createMenu($admin_areas, $menuOptions);
 		unset($admin_areas);
 
 		// Nothing valid?
