@@ -404,7 +404,7 @@ Class Menu
 		$this->menu_context['sections'][$section_id] = [
 			'id' => $section_id,
 			'title' => ($section->title ?: $txt[$section_id]).$counter,
-			'url' => $this->menu_context['base_url'],
+			'url' => $this->menu_context['base_url'].$this->menu_context['extra_parameters'],
 		];
 	}
 
@@ -434,8 +434,8 @@ Class Menu
 	 */
 	private function setAreaUrl($section_id, $area_id, $area)
 	{
-		$this->menu_context['sections'][$section_id]['areas'][$area_id]['url'] =
-			$area->custom_url ?: $this->menu_context['base_url'].';area='.$area_id;
+		$area->url = $this->menu_context['sections'][$section_id]['areas'][$area_id]['url'] =
+			$area->custom_url ?: $this->menu_context['base_url'].';area='.$area_id.$this->menu_context['extra_parameters'];
 	}
 
 	/**
@@ -494,13 +494,6 @@ Class Menu
 						true;
 				}
 			}
-
-			// Set which one is selected in the group.
-			if (!empty($this->menu_context['sections'][$section_id]['areas'][$area_id]['subsections'])) {
-				if ($this->menu_context['current_area'] == $area_id && !isset($this->menu_context['current_subsection'])) {
-					$this->menu_context['current_subsection'] = $first_sa;
-				}
-			}
 		}
 	}
 
@@ -509,10 +502,8 @@ Class Menu
 	 */
 	private function setSubsSectionUrl($section_id, $area_id, $sa, $sub)
 	{
-		// Custom URL?
-		if (isset($sub->url)) {
-			$this->menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$sa]['url'] = $sub->url;
-		}
+		$sub->url = $this->menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$sa]['url'] =
+			$sub->url ?: $this->menu_context['base_url'].';area='.$area_id.';sa='.$sa.$this->menu_context['extra_parameters'];
 	}
 
 	/**
@@ -535,7 +526,7 @@ Class Menu
 			if (
 				$sa_check == $sa
 				|| (isset($sa_check) && in_array($sa_check, $sub->active, true))
-				|| (!isset($this->menu_context['current_subsection']) && $sub->default)
+				|| (!isset($this->menu_context['current_subsection']) && ($sub->default || $first_sa == $sa))
 			) {
 				$this->menu_context['current_subsection'] = $sa;
 			}
@@ -550,7 +541,7 @@ Class Menu
 	private function determineCurrentAction()
 	{
 		// Ensure we have a current subaction defined
-		if (!isset($this->current_subaction) && isset($this->menu_context['current_subsection'])) {
+		if (isset($this->menu_context['current_subsection'])) {
 			$this->current_subaction = $this->menu_context['current_subsection'];
 		}
 	}

@@ -50,15 +50,11 @@ function template_generic_menu_sidebar_above()
 			// Is this the current area, or just some area?
 			if ($i == $menu_context['current_area'])
 			{
-				echo '
-					<strong><a class="linklevel1" href="', isset($area['url']) ? $area['url'] : $menu_context['base_url'] . ';area=' . $i, $menu_context['extra_parameters'], '">', $area['label'], '</a></strong>';
-
 				if (empty($context['tabs']))
 					$context['tabs'] = isset($area['subsections']) ? $area['subsections'] : array();
 			}
-			else
-				echo '
-					<a class="linklevel1" href="', isset($area['url']) ? $area['url'] : $menu_context['base_url'] . ';area=' . $i, $menu_context['extra_parameters'], '">', $area['label'], '</a>';
+			echo '
+					<a class="linklevel1', !empty($area['selected']) ? ' chosen' : '', '" href="', $area['url'], '">', $area['label'], '</a>';
 
 			// Are there any subsections?
 			if (!empty($area['subsections']))
@@ -71,11 +67,9 @@ function template_generic_menu_sidebar_above()
 					if (!empty($sub['disabled']))
 						continue;
 
-					$url = isset($sub['url']) ? $sub['url'] : (isset($area['url']) ? $area['url'] : $menu_context['base_url'] . ';area=' . $i) . ';sa=' . $sa;
-
 					echo '
 						<li class="listlevel2">
-							<a class="linklevel2', !empty($sub['selected']) ? ' chosen' : '', '" href="', $url, $menu_context['extra_parameters'], '">', $sub['label'], '</a>
+							<a class="linklevel2', !empty($sub['selected']) ? ' chosen' : '', '" href="', $sub['url'], '">', $sub['label'], '</a>
 						</li>';
 				}
 
@@ -145,7 +139,7 @@ function template_generic_menu_dropdown_above()
 							<li class="listlevel2', !empty($area['subsections']) ? ' subsections" aria-haspopup="true"' : '"', '>';
 
 			echo '
-								<a class="linklevel2', !empty($area['selected']) ? ' chosen' : '', '" href="', (isset($area['url']) ? $area['url'] : $menu_context['base_url'] . ';area=' . $i), $menu_context['extra_parameters'], '">', $area['icon'], $area['label'], '</a>';
+								<a class="linklevel2', !empty($area['selected']) ? ' chosen' : '', '" href="', $area['url'], '">', $area['icon'], $area['label'], '</a>';
 
 			// Is this the current area, or just some area?
 			if (!empty($area['selected']) && empty($context['tabs']))
@@ -162,11 +156,9 @@ function template_generic_menu_dropdown_above()
 					if (!empty($sub['disabled']))
 						continue;
 
-					$url = isset($sub['url']) ? $sub['url'] : (isset($area['url']) ? $area['url'] : $menu_context['base_url'] . ';area=' . $i) . ';sa=' . $sa;
-
 					echo '
 									<li class="listlevel3">
-										<a class="linklevel3', !empty($sub['selected']) ? ' chosen ' : '', '" href="', $url, $menu_context['extra_parameters'], '">', $sub['label'], '</a>
+										<a class="linklevel3', !empty($sub['selected']) ? ' chosen ' : '', '" href="', $sub['url'], '">', $sub['label'], '</a>
 									</li>';
 				}
 
@@ -247,8 +239,8 @@ function template_generic_menu_tabs(&$menu_context)
 					$tab_context['tabs'][$id]['add_params'] = $tab['add_params'];
 
 				// Has it been deemed selected?
-				if (!empty($tab['is_selected']))
-					$tab_context['tabs'][$id]['is_selected'] = true;
+				if (!empty($tab['selected']))
+					$tab_context['tabs'][$id]['selected'] = true;
 
 				// Does it have its own help?
 				if (!empty($tab['help']))
@@ -257,16 +249,6 @@ function template_generic_menu_tabs(&$menu_context)
 				// Is this the last one?
 				if (!empty($tab['is_last']) && !isset($tab_context['override_last']))
 					$tab_context['tabs'][$id]['is_last'] = true;
-			}
-
-			// Find the selected tab
-			foreach ($tab_context['tabs'] as $sa => $tab)
-			{
-				if (!empty($tab['is_selected']) || (isset($menu_context['current_subsection']) && $menu_context['current_subsection'] == $sa))
-				{
-					$selected_tab = $tab;
-					$tab_context['tabs'][$sa]['is_selected'] = true;
-				}
 			}
 		}
 
@@ -324,15 +306,9 @@ function template_generic_menu_tabs(&$menu_context)
 			if (!empty($tab['disabled']))
 				continue;
 
-			if (!empty($tab['is_selected']))
-				echo '
+			echo '
 						<li class="listlevel1">
-							<a class="linklevel1 active" href="', isset($tab['url']) ? $tab['url'] : $menu_context['base_url'] . ';area=' . $menu_context['current_area'] . ';sa=' . $sa, $menu_context['extra_parameters'], isset($tab['add_params']) ? $tab['add_params'] : '', '">', $tab['label'], '</a>
-						</li>';
-			else
-				echo '
-						<li class="listlevel1">
-							<a class="linklevel1" href="', isset($tab['url']) ? $tab['url'] : $menu_context['base_url'] . ';area=' . $menu_context['current_area'] . ';sa=' . $sa, $menu_context['extra_parameters'], isset($tab['add_params']) ? $tab['add_params'] : '', '">', $tab['label'], '</a>
+							<a class="linklevel1', !empty($tab['selected']) ? ' active' : '', '" href="', $tab['url'], isset($tab['add_params']) ? $tab['add_params'] : '', '">', $tab['label'], '</a>
 						</li>';
 		}
 
