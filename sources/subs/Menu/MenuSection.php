@@ -40,9 +40,9 @@ class MenuSection
 		$section = new self;
 		$vars = get_object_vars($section);
 		foreach (array_replace(
-			         $vars,
-			         array_intersect_key($arr, $vars)
-		         ) as $var => $val)
+					$vars,
+					array_intersect_key($arr, $vars)
+				) as $var => $val)
 		{
 			$section->{$var} = $val;
 		}
@@ -68,5 +68,93 @@ class MenuSection
 		$this->areas[$id] = $area;
 
 		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTitle()
+	{
+		return $this->title;
+	}
+
+	/**
+	 * @param string $title
+	 *
+	 * @return MenuSection
+	 */
+	public function setTitle($title)
+	{
+		$this->title = $title;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCounter()
+	{
+		return $this->counter;
+	}
+
+	/**
+	 * @param string $counter
+	 *
+	 * @return MenuSection
+	 */
+	public function setCounter($counter)
+	{
+		$this->counter = $counter;
+
+		return $this;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isEnabled()
+	{
+		return $this->enabled;
+	}
+
+	/**
+	 * @param boolean $enabled
+	 *
+	 * @return MenuSection
+	 */
+	public function setEnabled($enabled)
+	{
+		$this->enabled = $enabled;
+
+		return $this;
+	}
+
+	/**
+	 * @return string[]
+	 */
+	public function getPermission()
+	{
+		return $this->permission;
+	}
+
+	/**
+	 * @param string[] $permission
+	 *
+	 * @return MenuSection
+	 */
+	public function setPermission($permission)
+	{
+		$this->permission = $permission;
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getAreas()
+	{
+		return $this->areas;
 	}
 }
