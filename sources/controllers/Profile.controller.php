@@ -663,7 +663,7 @@ class Profile_Controller extends Action_Controller
 
 				saveProfileFields($fields['fields'], $fields['hook']);
 			}
-			else
+			elseif (empty($post_errors))
 			{
 				// @todo yes this is also ugly, but saveProfileChanges needs to be updated first
 				$_POST = (array) $this->_req->post;
