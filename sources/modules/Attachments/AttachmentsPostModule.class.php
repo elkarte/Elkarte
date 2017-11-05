@@ -157,7 +157,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 				{
 					foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 					{
-						if (strpos($attachID, 'post_tmp_' . $user_info['id']) !== false)
+						if (strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') !== false)
 							@unlink($attachment['tmp_name']);
 					}
 					$this->_attach_errors->addError('temp_attachments_gone');
@@ -172,7 +172,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 						// See if any files still exist before showing the warning message and the files attached.
 						foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 						{
-							if (strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
+							if (strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') === false)
 								continue;
 
 							if (file_exists($attachment['tmp_name']))
@@ -195,7 +195,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 						// Compile a list of the files to show the user.
 						$file_list = array();
 						foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
-							if (strpos($attachID, 'post_tmp_' . $user_info['id']) !== false)
+							if (strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') !== false)
 								$file_list[] = $attachment['name'];
 
 						$_SESSION['temp_attachments']['post']['files'] = $file_list;
@@ -224,7 +224,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 						break;
 
 					// Initial errors (such as missing directory), we can recover
-					if ($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
+					if ($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') === false)
 						continue;
 
 					if ($attachID === 'initial_error')
@@ -362,7 +362,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 			$keep_ids = array();
 			foreach ($_POST['attach_del'] as $dummy)
 			{
-				if (strpos($dummy, 'post_tmp_' . $user_info['id']) !== false)
+				if (strpos($dummy, 'post_tmp_' . $user_info['id'] . '_') !== false)
 					$keep_temp[] = $dummy;
 				else
 					$keep_ids[] = (int) $dummy;
@@ -372,7 +372,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 			{
 				foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 				{
-					if ((isset($_SESSION['temp_attachments']['post']['files'], $attachment['name']) && in_array($attachment['name'], $_SESSION['temp_attachments']['post']['files'])) || in_array($attachID, $keep_temp) || strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
+					if ((isset($_SESSION['temp_attachments']['post']['files'], $attachment['name']) && in_array($attachment['name'], $_SESSION['temp_attachments']['post']['files'])) || in_array($attachID, $keep_temp) || strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') === false)
 						continue;
 
 					unset($_SESSION['temp_attachments'][$attachID]);
@@ -422,7 +422,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 			{
-				if ($attachID !== 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
+				if ($attachID !== 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') === false)
 					continue;
 
 				// If there was an initial error just show that message.

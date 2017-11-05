@@ -2543,10 +2543,10 @@ function package_create_backup($id = 'backup')
  * @param string $url
  * @param string $post_data = ''
  * @param bool $keep_alive = false
- * @param int $redirection_level = 2
+ * @param int $redirection_level = 3
  * @return string
  */
-function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection_level = 2)
+function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection_level = 3)
 {
 	global $webmaster_email;
 	static $keep_alive_dom = null, $keep_alive_fp = null;
@@ -2642,7 +2642,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		$response = fgets($fp, 768);
 
 		// Redirect in case this location is permanently or temporarily moved.
-		if ($redirection_level < 5 && preg_match('~^HTTP/\S+\s+30[127]~i', $response) === 1)
+		if ($redirection_level < 6 && preg_match('~^HTTP/\S+\s+30[127]~i', $response) === 1)
 		{
 			$location = '';
 			while (!feof($fp) && trim($header = fgets($fp, 4096)) != '')

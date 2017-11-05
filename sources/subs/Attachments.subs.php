@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -412,7 +412,7 @@ function processAttachments($id_msg = null)
 		{
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 			{
-				if (strpos($attachID, 'post_tmp_' . $user_info['id']) !== false)
+				if (strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') !== false)
 					@unlink($attachment['tmp_name']);
 			}
 

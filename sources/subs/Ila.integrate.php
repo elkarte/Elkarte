@@ -323,7 +323,7 @@ class Ila_Integrate
 			$attachment = false;
 
 			// Not a preview, then sanitize the attach id and determine the details
-			if (strpos($data, 'post_tmp_' . $user_info['id']) === false)
+			if (strpos($data, 'post_tmp_' . $user_info['id'] . '_') === false)
 			{
 				require_once(SUBSDIR . '/Attachments.subs.php');
 
@@ -367,7 +367,7 @@ class Ila_Integrate
 		{
 			$num = $data;
 			$is_image = array();
-			$preview = strpos($data, 'post_tmp_' . $user_info['id']);
+			$preview = strpos($data, 'post_tmp_' . $user_info['id'] . '_');
 
 			// Not a preview, then sanitize the attach id and determine the actual type
 			if ($preview === false)
@@ -417,7 +417,7 @@ class Ila_Integrate
 		return function (&$tag, &$data, $disabled) use ($user_info, $scripturl, &$context)
 		{
 			// Not a preview, then sanitize the attach id
-			if (strpos($data, 'post_tmp_' . $user_info['id']) === false)
+			if (strpos($data, 'post_tmp_' . $user_info['id'] . '_') === false)
 			{
 				$data = (int) $data;
 			}

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -298,7 +298,7 @@ class Attachment_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Temporary attachment, special case...
-		if (isset($this->_req->query->attach) && strpos($this->_req->query->attach, 'post_tmp_' . $user_info['id']) !== false)
+		if (isset($this->_req->query->attach) && strpos($this->_req->query->attach, 'post_tmp_' . $user_info['id'] . '_') !== false)
 		{
 			$this->action_tmpattach();
 			return;
