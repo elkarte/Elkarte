@@ -454,7 +454,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 						if (!empty($attachmentOptions['thumb']))
 							$this->_saved_attach_id[] = $attachmentOptions['thumb'];
 
-						$msgOptions['body'] = preg_replace('~\[attach(.*?)\]' . $attachID . '\[\/attach\]~', '[attach$1]' . $attachmentOptions['id'] . '[/attach]', $msgOptions['body']);
+						$msgOptions['body'] = preg_replace('~\[attach(.*?)\]' . $attachID . '\[\/attach\]~', '[attach$1]' . $attachment['public_attachid'] . '[/attach]', $msgOptions['body']);
 					}
 				}
 				// We have errors on this file, build out the issues for display to the user

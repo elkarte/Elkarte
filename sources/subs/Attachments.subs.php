@@ -481,6 +481,7 @@ function processAttachments($id_msg = null)
 				'name' => htmlspecialchars(basename($_FILES['attachment']['name'][$n]), ENT_COMPAT, 'UTF-8'),
 				'tmp_name' => $destName,
 				'attachid' => $attachID,
+				'public_attachid' =>  md5(mt_rand()),
 				'size' => $_FILES['attachment']['size'][$n],
 				'type' => $_FILES['attachment']['type'][$n],
 				'id_folder' => $modSettings['currentAttachmentUploadDir'],
