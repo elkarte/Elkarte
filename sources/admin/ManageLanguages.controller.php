@@ -38,8 +38,8 @@ class ManageLanguages_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		loadTemplate('ManageLanguages');
-		loadLanguage('ManageSettings');
+		theme()->getTemplates()->load('ManageLanguages');
+		theme()->getTemplates()->loadLanguageFile('ManageSettings');
 
 		$subActions = array(
 			'edit' => array($this, 'action_edit', 'permission' => 'admin_forum'),
@@ -296,7 +296,7 @@ class ManageLanguages_Controller extends Action_Controller
 		// @todo for the moment there is no facility to download packages, so better kill it here
 		throw new Elk_Exception('no_access', false);
 
-		loadLanguage('ManageSettings');
+		theme()->getTemplates()->loadLanguageFile('ManageSettings');
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// Clearly we need to know what to request.
@@ -528,7 +528,7 @@ class ManageLanguages_Controller extends Action_Controller
 
 			// Are we going to need more language stuff?
 			if (!empty($context['still_not_writable']))
-				loadLanguage('Packages');
+				theme()->getTemplates()->loadLanguageFile('Packages');
 		}
 
 		// This is the list for the main files.
@@ -621,7 +621,7 @@ class ManageLanguages_Controller extends Action_Controller
 		global $settings, $context, $txt, $modSettings, $language, $scripturl;
 
 		require_once(SUBSDIR . '/Language.subs.php');
-		loadLanguage('ManageSettings');
+		theme()->getTemplates()->loadLanguageFile('ManageSettings');
 
 		// Select the languages tab.
 		$context['menu_data_' . $context['admin_menu_id']]['current_subsection'] = 'edit';

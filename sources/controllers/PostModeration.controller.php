@@ -37,8 +37,8 @@ class PostModeration_Controller extends Action_Controller
 	public function action_index()
 	{
 		// @todo We'll shift these later bud.
-		loadLanguage('ModerationCenter');
-		loadTemplate('ModerationCenter');
+		theme()->getTemplates()->loadLanguageFile('ModerationCenter');
+		theme()->getTemplates()->load('ModerationCenter');
 
 		// Allowed sub-actions, you know the drill by now!
 		$subActions = array(

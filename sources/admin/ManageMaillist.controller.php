@@ -37,8 +37,8 @@ class ManageMaillist_Controller extends Action_Controller
 		global $context, $txt;
 
 		// Template & language
-		loadTemplate('Maillist');
-		loadLanguage('Maillist');
+		theme()->getTemplates()->load('Maillist');
+		theme()->getTemplates()->loadLanguageFile('Maillist');
 
 		// All the functions available
 		$subActions = array(
@@ -972,7 +972,7 @@ class ManageMaillist_Controller extends Action_Controller
 
 		// Load and show
 		$settingsForm->prepare();
-		loadTemplate('Admin');
+		theme()->getTemplates()->load('Admin');
 		loadCSSFile('admin.css');
 		$context['sub_template'] = 'show_settings';
 	}
@@ -1367,7 +1367,7 @@ class ManageMaillist_Controller extends Action_Controller
 
 		// prep it, load it, show it
 		$settingsForm->prepare();
-		loadTemplate('Admin');
+		theme()->getTemplates()->load('Admin');
 		loadCSSFile('admin.css');
 		$context['sub_template'] = 'show_settings';
 	}
@@ -1428,8 +1428,8 @@ class ManageMaillist_Controller extends Action_Controller
 			$context['settings_message'] = $txt['saved'];
 
 		// Templates and language
-		loadLanguage('Admin');
-		loadTemplate('Admin');
+		theme()->getTemplates()->loadLanguageFile('Admin');
+		theme()->getTemplates()->load('Admin');
 		loadCSSFile('admin.css');
 
 		// Load any existing email => board values used for new topic creation
@@ -1536,7 +1536,7 @@ class ManageMaillist_Controller extends Action_Controller
 		foreach ($board_list as $board_id => $board_name)
 			$script .= $i++ . ': {id:' . $board_id . ', name:' . JavaScriptEscape($board_name) . '},';
 
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 		var sEmailParent = \'add_more_email_placeholder\',
 			oEmailOptionsdt = {size: \'50\', name: \'emailfrom[]\', class: \'input_text\'},
 			oEmailOptionsdd = {size: \'1\', type: \'select\', name: \'boardto[]\', class: \'input_select\'},

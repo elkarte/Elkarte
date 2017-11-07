@@ -143,7 +143,7 @@ class Recent_Controller extends Action_Controller
 		$context['page_index'] = constructPageIndex($this->_base_url, $this->_start, min(100, $this->_total_posts), 10, !empty($this->_flex_start));
 
 		// Rest of the items for the template
-		loadTemplate('Recent');
+		theme()->getTemplates()->load('Recent');
 		$context['page_title'] = $txt['recent_posts'];
 		$context['sub_template'] = 'recent';
 		$quote_enabled = empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']));
@@ -405,13 +405,13 @@ class Recent_Controller extends Action_Controller
 
 		// ajax controller for likes
 		loadJavascriptFile('like_posts.js', array('defer' => true));
-		addJavascriptVar(array(
+		theme()->addJavascriptVar(array(
 			'likemsg_are_you_sure' => JavaScriptEscape($txt['likemsg_are_you_sure']),
 		));
-		loadLanguage('Errors');
+		theme()->getTemplates()->loadLanguageFile('Errors');
 
 		// Initiate likes and the tooltips for likes
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 			$(function() {
 				var likePostInstance = likePosts.prototype.init({
 					oTxt: ({

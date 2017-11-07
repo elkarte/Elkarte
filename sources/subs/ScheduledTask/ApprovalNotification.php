@@ -173,8 +173,8 @@ class Approval_Notification implements Scheduled_Task_Interface
 		// Get the mailing stuff.
 		require_once(SUBSDIR . '/Mail.subs.php');
 
-		// Need the below for loadLanguage to work!
-		loadEssentialThemeData();
+		// Need the below for theme()->getTemplates()->loadLanguageFile to work!
+		theme()->getTemplates()->loadEssentialThemeData();
 
 		$current_language = '';
 
@@ -185,7 +185,7 @@ class Approval_Notification implements Scheduled_Task_Interface
 
 			// Load the language file as required.
 			if (empty($current_language) || $current_language != $member['language'])
-				$current_language = loadLanguage('EmailTemplates', $member['language'], false);
+				$current_language = theme()->getTemplates()->loadLanguageFile('EmailTemplates', $member['language'], false);
 
 			// Loop through each notice...
 			foreach ($notices as $board => $notice)

@@ -293,17 +293,18 @@ Class Elk_Testing_Setup
 			);
 		}
 
-		require_once(SUBSDIR . '/Members.subs.php');
-		updateMemberStats();
+		// @todo Do we really need to update stats cn testing mode? Comented for now...
+		//~ require_once(SUBSDIR . '/Members.subs.php');
+		//~ updateMemberStats();
 
-		require_once(SUBSDIR . '/Messages.subs.php');
-		updateMessageStats();
+		//~ require_once(SUBSDIR . '/Messages.subs.php');
+		//~ updateMessageStats();
 
-		require_once(SUBSDIR . '/Topic.subs.php');
-		updateTopicStats();
+		//~ require_once(SUBSDIR . '/Topic.subs.php');
+		//~ updateTopicStats();
 
-		loadLanguage('Install');
-		updateSubjectStats(1, htmlspecialchars($txt['default_topic_subject']));
+		//~ theme()->getTemplates()->loadLanguageFile('Install');
+		//~ updateSubjectStats(1, htmlspecialchars($txt['default_topic_subject']));
 	}
 }
 

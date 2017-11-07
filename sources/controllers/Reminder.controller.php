@@ -30,8 +30,8 @@ class Reminder_Controller extends Action_Controller
 	{
 		global $txt, $context;
 
-		loadLanguage('Profile');
-		loadTemplate('Reminder');
+		theme()->getTemplates()->loadLanguageFile('Profile');
+		theme()->getTemplates()->load('Reminder');
 
 		$context['page_title'] = $txt['authentication_reminder'];
 		$context['robot_no_index'] = true;
@@ -169,7 +169,7 @@ class Reminder_Controller extends Action_Controller
 	{
 		global $txt, $context;
 
-		loadLanguage('Login');
+		theme()->getTemplates()->loadLanguageFile('Login');
 
 		// You need a code!
 		if (!isset($this->_req->query->code))
@@ -214,7 +214,7 @@ class Reminder_Controller extends Action_Controller
 		$member_id = $this->_req->getPost('u', 'intval', -1);
 		$code = $this->_req->getPost('code', 'trim', '');
 
-		loadLanguage('Login');
+		theme()->getTemplates()->loadLanguageFile('Login');
 
 		// Get the code as it should be from the database.
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -255,7 +255,7 @@ class Reminder_Controller extends Action_Controller
 
 		call_integration_hook('integrate_reset_pass', array($member['member_name'], $member['member_name'], $this->_req->post->passwrd1));
 
-		loadTemplate('Login');
+		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context += array(
 			'page_title' => $txt['reminder_password_set'],
@@ -283,7 +283,7 @@ class Reminder_Controller extends Action_Controller
 		if (empty($this->_req->post->uid))
 			throw new Elk_Exception('username_no_exist', false);
 
-		loadLanguage('Login');
+		theme()->getTemplates()->loadLanguageFile('Login');
 
 		// Get the information from the database.
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -331,7 +331,7 @@ class Reminder_Controller extends Action_Controller
 		call_integration_hook('integrate_reset_pass', array($member['member_name'], $member['member_name'], $this->_req->post->passwrd1));
 
 		// Tell them it went fine.
-		loadTemplate('Login');
+		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context += array(
 			'page_title' => $txt['reminder_password_set'],
@@ -356,7 +356,7 @@ function secretAnswerInput()
 	checkSession();
 
 	// Strings for the register auto javascript clever stuffy wuffy.
-	loadLanguage('Login');
+	theme()->getTemplates()->loadLanguageFile('Login');
 
 	// Check they entered something...
 	if (empty($_POST['uid']))

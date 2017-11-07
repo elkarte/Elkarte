@@ -102,7 +102,7 @@ class ManageAttachments_Controller extends Action_Controller
 		isAllowedTo('manage_attachments');
 
 		// Setup the template stuff we'll probably need.
-		loadTemplate('ManageAttachments');
+		theme()->getTemplates()->load('ManageAttachments');
 
 		// If they want to delete attachment(s), delete them. (otherwise fall through..)
 		$subActions = array(
@@ -162,7 +162,7 @@ class ManageAttachments_Controller extends Action_Controller
 		// Initialize settings
 		$settingsForm->setConfigVars($this->_settings());
 
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 	var storing_type = document.getElementById(\'automanage_attachments\'),
 		base_dir = document.getElementById(\'use_subdirectories_for_attachments\');
 
@@ -589,7 +589,7 @@ class ManageAttachments_Controller extends Action_Controller
 	{
 		global $context, $modSettings;
 
-		loadTemplate('ManageAttachments');
+		theme()->getTemplates()->load('ManageAttachments');
 		$context['sub_template'] = 'maintenance';
 
 		// We need our attachments directories...
@@ -732,9 +732,9 @@ class ManageAttachments_Controller extends Action_Controller
 				// And change the message to reflect this.
 				if (!empty($messages))
 				{
-					loadLanguage('index', $language, true);
+					theme()->getTemplates()->loadLanguageFile('index', $language, true);
 					setRemovalNotice($messages, $txt['attachment_delete_admin']);
-					loadLanguage('index', $user_info['language'], true);
+					theme()->getTemplates()->loadLanguageFile('index', $user_info['language'], true);
 				}
 			}
 		}

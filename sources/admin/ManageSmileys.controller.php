@@ -38,8 +38,8 @@ class ManageSmileys_Controller extends Action_Controller
 	{
 		global $context, $txt, $modSettings;
 
-		loadLanguage('ManageSmileys');
-		loadTemplate('ManageSmileys');
+		theme()->getTemplates()->loadLanguageFile('ManageSmileys');
+		theme()->getTemplates()->load('ManageSmileys');
 
 		$subActions = array(
 			'addsmiley' => array($this, 'action_addsmiley', 'enabled' => !empty($modSettings['smiley_enable']), 'permission' => 'manage_smileys'),
@@ -1447,8 +1447,8 @@ class ManageSmileys_Controller extends Action_Controller
 		checkSession('request');
 
 		// One of these two may be necessary
-		loadLanguage('Errors');
-		loadLanguage('Packages');
+		theme()->getTemplates()->loadLanguageFile('Errors');
+		theme()->getTemplates()->loadLanguageFile('Packages');
 
 		require_once(SUBSDIR . '/Smileys.subs.php');
 		require_once(SUBSDIR . '/Package.subs.php');
@@ -1615,7 +1615,7 @@ class ManageSmileys_Controller extends Action_Controller
 			$context['uninstalling'] = false;
 			$context['is_installed'] = false;
 			$context['package_name'] = $smileyInfo['name'];
-			loadTemplate('Packages');
+			theme()->getTemplates()->load('Packages');
 		}
 		// Do the actual install
 		else

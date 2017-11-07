@@ -59,7 +59,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 		global $context, $txt;
 
 		// Everything's gonna need this.
-		loadLanguage('ManageCalendar');
+		theme()->getTemplates()->loadLanguageFile('ManageCalendar');
 
 		// Default text.
 		$context['explain_text'] = $txt['calendar_desc'];
@@ -220,7 +220,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 		//We need this, really..
 		require_once(SUBSDIR . '/Calendar.subs.php');
 
-		loadTemplate('ManageCalendar');
+		theme()->getTemplates()->load('ManageCalendar');
 
 		$context['is_new'] = !isset($this->_req->query->holiday);
 		$context['cal_minyear'] = $modSettings['cal_minyear'];
@@ -295,7 +295,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 		$context['sub_template'] = 'show_settings';
 
 		// Lets start off with the permission blocks collapsed
-		addInlineJavascript('var legend = $(\'legend\');
+		theme()->addInlineJavascript('var legend = $(\'legend\');
 			legend.siblings().slideToggle("fast");
 			legend.parent().toggleClass("collapsed")', true);
 

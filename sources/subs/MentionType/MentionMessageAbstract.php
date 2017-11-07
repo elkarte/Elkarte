@@ -216,7 +216,7 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 		if (!empty($lang_files) && $lang !== $user_info['language'])
 		{
 			foreach ($lang_files as $file)
-				loadLanguage($file);
+				theme()->getTemplates()->loadLanguageFile($file);
 		}
 
 		return $langtxt;

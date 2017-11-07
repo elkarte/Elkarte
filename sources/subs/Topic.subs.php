@@ -2343,7 +2343,7 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 
 	// Should be in the boardwide language.
 	if ($user_info['language'] != $language)
-		loadLanguage('index', $language);
+		theme()->getTemplates()->loadLanguageFile('index', $language);
 
 	preparsecode($reason);
 

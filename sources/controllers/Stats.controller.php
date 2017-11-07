@@ -86,8 +86,8 @@ class Stats_Controller extends Action_Controller
 		}
 
 		// Stats it is
-		loadLanguage('Stats');
-		loadTemplate('Stats');
+		theme()->getTemplates()->loadLanguageFile('Stats');
+		theme()->getTemplates()->load('Stats');
 		loadJavascriptFile('stats.js');
 
 		// Build the link tree......

@@ -18,7 +18,7 @@
  */
 function template_Recent_init()
 {
-	loadTemplate('GenericMessages');
+	theme()->getTemplates()->load('GenericMessages');
 }
 
 /**

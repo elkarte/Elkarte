@@ -59,7 +59,7 @@ class RepairBoards_Controller extends Action_Controller
 		$context[$context['admin_menu_name']]['current_subsection'] = 'general';
 
 		// Load the language file.
-		loadLanguage('Maintenance');
+		theme()->getTemplates()->loadLanguageFile('Maintenance');
 
 		// Make sure the tabs stay nice.
 		$context[$context['admin_menu_name']]['tab_data'] = array(

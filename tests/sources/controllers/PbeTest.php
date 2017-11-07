@@ -18,7 +18,7 @@ class TestPBE extends PHPUnit_Framework_TestCase
 		require_once(SUBSDIR . '/EmailParse.class.php');
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 
-		loadLanguage('Maillist');
+		theme()->getTemplates()->loadLanguageFile('Maillist');
 
 		$this->_email = 'Return-Path: <noreply@elkarte.net>
 Delivered-To: <drwho@tardis.com>

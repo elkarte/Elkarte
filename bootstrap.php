@@ -271,7 +271,7 @@ loadUserSettings();
 loadPermissions();
 
 // Load the current or SSI theme. (just use $ssi_theme = id_theme;)
-loadTheme(isset($ssi_theme) ? (int) $ssi_theme : 0);
+new ElkArte\Themes\ThemeLoader(isset($ssi_theme) ? (int) $ssi_theme : 0);
 
 // Load BadBehavior functions
 loadBadBehavior();

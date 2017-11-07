@@ -35,13 +35,6 @@ class Elk_Exception extends Exception
 	protected $sprintf = array();
 
 	/**
-	 * The $txt index of the error message.
-	 *
-	 * @var string
-	 */
-	protected $index_message = '';
-
-	/**
 	 * Elk_Exception constructor.
 	 * Extended exception rules because we need more stuff
 	 *
@@ -53,26 +46,15 @@ class Elk_Exception extends Exception
 	 * @param int $code
 	 * @param Exception|null $previous
 	 */
-	public function __construct($message, $log = 'general', $sprintf = array(), $code = 0, Exception $previous = null)
+	public function __construct($message, $log = false, $sprintf = array(), $code = 0, Exception $previous = null)
 	{
 		global $txt;
 
 		$this->log = $log;
 		$this->sprintf = $sprintf;
 
-		$this->index_message = $this->loadMessage($message);
-
-		if (isset($txt[$this->index_message]))
-		{
-			$real_message = $txt[$this->index_message];
-		}
-		else
-		{
-			$real_message = $this->index_message;
-		}
-
 		// Make sure everything is assigned properly
-		parent::__construct($real_message, $code, $previous);
+		parent::__construct($this->loadMessage($message), $code, $previous);
 	}
 
 	/**
@@ -83,7 +65,7 @@ class Elk_Exception extends Exception
 	 * - A plain text message
 	 * - An array with the following structure:
 	 *		array(
-	 *			0 => language to load (use loadLanguage)
+	 *			0 => language to load (use theme()->getTemplates()->loadLanguageFile)
 	 *			1 => index of $txt
 	 *		)
 	 * - A namespaced index in the form:
@@ -91,7 +73,7 @@ class Elk_Exception extends Exception
 	 *   - a "language" followed by a "dot" followed by the "index"
 	 *   - "language" can be any character matched by \w
 	 *   - "index" can be anything
-	 * - "language" is loaded by loadLanguage.
+	 * - "language" is loaded by theme()->getTemplates()->loadLanguageFile.
 	 *
 	 * @return string[]
 	 */
@@ -119,8 +101,6 @@ class Elk_Exception extends Exception
 			}
 		}
 
-		loadLanguage($language);
-
 		return array($msg, $language);
 	}
 
@@ -137,10 +117,9 @@ class Elk_Exception extends Exception
 		global $txt;
 
 		list ($msg, $lang) = $this->parseMessage($message);
+		theme()->getTemplates()->loadLanguageFile($lang);
+		$msg = !isset($txt[$msg]) ? $msg : vsprintf($txt[$msg], $this->sprintf);
 		$this->logMessage($message, $lang);
-		loadLanguage($lang);
-
-		$msg = !isset($txt[$msg]) ? $msg : (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
 
 		return $msg;
 	}
@@ -154,25 +133,27 @@ class Elk_Exception extends Exception
 	 */
 	protected function logMessage($msg, $lang)
 	{
-		global $user_info, $language, $txt;
+		global $language, $txt, $user_info;
 
 		// Don't need to reload the language file if both the user and
 		// the forum share the same language.
 		if ($language !== $user_info['language'])
-			loadLanguage($lang, $language);
+			theme()->getTemplates()->loadLanguageFile($lang, $language);
 
 		if ($this->log !== false)
 		{
-			$msg = !isset($txt[$msg]) ? $msg : (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
+			$msg = !isset($txt[$msg]) ? $msg : vsprintf($txt[$msg], $this->sprintf);
 			E::instance()->log_error($msg, $this->log, $this->getFile(), $this->getLine());
 		}
 	}
 
 	/**
 	 * Calls fatal_lang_error and ends the execution of the script.
+	 *
+	 * @DEPRECATED
 	 */
 	public function fatalLangError()
 	{
-		E::instance()->fatal_lang_error($this->index_message, $this->log, $this->sprintf);
+		E::instance()->fatal_lang_error($this->message, $this->log, $this->sprintf);
 	}
 }

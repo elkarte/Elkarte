@@ -77,7 +77,7 @@ loadSession();
 loadUserSettings();
 loadBoard();
 loadPermissions();
-loadTheme();
+new ElkArte\Themes\ThemeLoader();
 
 // It should be added to the install and upgrade scripts.
 // But since the converters need to be updated also. This is easier.
@@ -87,7 +87,7 @@ updateSettings(array(
 ));
 
 // Basic language is good to have for functional tests
-loadLanguage('index+Errors');
+theme()->getTemplates()->loadLanguageFile('index+Errors');
 
 // If we are running functional tests as well
 if (defined('PHPUNIT_SELENIUM'))

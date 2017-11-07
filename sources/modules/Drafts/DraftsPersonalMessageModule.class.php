@@ -59,7 +59,7 @@ class Drafts_PersonalMessage_Module extends ElkArte\sources\modules\Abstract_Mod
 	{
 		global $modSettings, $context;
 
-		loadLanguage('Drafts');
+		theme()->getTemplates()->loadLanguageFile('Drafts');
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
 		// Are PM drafts enabled?
@@ -179,7 +179,7 @@ class Drafts_PersonalMessage_Module extends ElkArte\sources\modules\Abstract_Mod
 		}
 
 		// We haz drafts
-		loadLanguage('Drafts');
+		theme()->getTemplates()->loadLanguageFile('Drafts');
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
 		// Load the draft and add it to a object container
@@ -213,7 +213,7 @@ class Drafts_PersonalMessage_Module extends ElkArte\sources\modules\Abstract_Mod
 		}
 
 		// We haz drafts
-		loadLanguage('Drafts');
+		theme()->getTemplates()->loadLanguageFile('Drafts');
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
 		// Load all the drafts for this user that meet the criteria
@@ -277,7 +277,7 @@ class Drafts_PersonalMessage_Module extends ElkArte\sources\modules\Abstract_Mod
 				}';
 
 			loadJavascriptFile('drafts.plugin.js', array('defer' => true));
-			loadLanguage('Post');
+			theme()->getTemplates()->loadLanguageFile('Post');
 
 			// Our not so concise shortcut line
 			if (!isset($context['shortcuts_text']))

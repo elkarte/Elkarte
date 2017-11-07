@@ -90,7 +90,7 @@ class News_Controller extends Action_Controller
 		if (empty($modSettings['xmlnews_enable']))
 			obExit(false);
 
-		loadLanguage('Stats');
+		theme()->getTemplates()->loadLanguageFile('Stats');
 		$txt['xml_rss_desc'] = replaceBasicActionUrl($txt['xml_rss_desc']);
 
 		// Default to latest 5.  No more than whats defined in the ACP or 255
@@ -237,8 +237,8 @@ class News_Controller extends Action_Controller
 		elseif ($xml_format === 'rdf')
 			header('Content-Type: ' . (isBrowser('ie') ? 'text/xml' : 'application/rdf+xml') . '; charset=UTF-8');
 
-		loadTemplate('Xml');
-		Template_Layers::instance()->removeAll();
+		theme()->getTemplates()->load('Xml');
+		theme()->getLayers()->removeAll();
 
 		// Are we outputting an rss feed or one with more information?
 		if ($xml_format === 'rss' || $xml_format === 'rss2')
@@ -815,6 +815,6 @@ function cdata_parse($data, $ns = '')
  */
 function dumpTags($data, $i, $tag = null, $xml_format = 'rss')
 {
-	loadTemplate('Xml');
+	theme()->getTemplates()->load('Xml');
 	template_xml_news($data, $i, $tag, $xml_format);
 }

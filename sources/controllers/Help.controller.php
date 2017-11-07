@@ -53,8 +53,8 @@ class Help_Controller extends Action_Controller
 	{
 		global $scripturl, $context, $txt;
 
-		loadTemplate('Help');
-		loadLanguage('Manual');
+		theme()->getTemplates()->load('Help');
+		theme()->getTemplates()->loadLanguageFile('Manual');
 
 		// We need to know where our wiki is.
 		$context['wiki_url'] = 'https://github.com/elkarte/Elkarte/wiki';
@@ -109,14 +109,14 @@ class Help_Controller extends Action_Controller
 		$help_str = Util::htmlspecialchars($this->_req->query->help);
 
 		// Load the admin help language file and template.
-		loadLanguage('Help');
+		theme()->getTemplates()->loadLanguageFile('Help');
 
 		// Load permission specific help
 		if (substr($help_str, 0, 14) == 'permissionhelp')
-			loadLanguage('ManagePermissions');
+			theme()->getTemplates()->loadLanguageFile('ManagePermissions');
 
 		// Load our template
-		loadTemplate('Help');
+		theme()->getTemplates()->load('Help');
 
 		// Allow addons to load their own language file here.
 		call_integration_hook('integrate_quickhelp');
@@ -125,7 +125,7 @@ class Help_Controller extends Action_Controller
 		$context['page_title'] = $context['forum_name'] . ' - ' . $txt['help'];
 
 		// Only show the 'popup' sub-template, no layers.
-		Template_Layers::instance()->removeAll();
+		theme()->getLayers()->removeAll();
 		$context['sub_template'] = 'popup';
 
 		$helps = explode('+', $help_str);

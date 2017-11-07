@@ -101,10 +101,10 @@ class Generic_List
 		$this->listOptions = $listOptions;
 
 		// Be ready for those pesky errors
-		loadLanguage('Errors');
+		theme()->getTemplates()->loadLanguageFile('Errors');
 
 		// Load the template
-		loadTemplate('GenericList');
+		theme()->getTemplates()->load('GenericList');
 	}
 
 	/**
@@ -463,7 +463,7 @@ class Generic_List
 	protected function prepareJavascript()
 	{
 		if (isset($this->listOptions['javascript']))
-			addInlineJavascript($this->listOptions['javascript'], true);
+			theme()->addInlineJavascript($this->listOptions['javascript'], true);
 	}
 
 	/**

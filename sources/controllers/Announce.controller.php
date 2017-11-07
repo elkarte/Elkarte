@@ -45,8 +45,8 @@ class Announce_Controller extends Action_Controller
 			throw new Elk_Exception('topic_gone', false);
 
 		// Language files
-		loadLanguage('Post');
-		loadTemplate('Announce');
+		theme()->getTemplates()->loadLanguageFile('Post');
+		theme()->getTemplates()->load('Announce');
 
 		$context['page_title'] = $txt['announce_topic'];
 	}
@@ -193,7 +193,7 @@ class Announce_Controller extends Action_Controller
 
 		// Go back to the correct language for the user ;)
 		if (!empty($modSettings['userLanguage']))
-			loadLanguage('Post');
+			theme()->getTemplates()->loadLanguageFile('Post');
 	}
 
 	/**

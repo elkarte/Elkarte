@@ -122,7 +122,7 @@ function setupProfileContext($fields, $hook = '')
 			if (!empty($cur_field['js_submit']))
 				$context['profile_onsubmit_javascript'] .= $cur_field['js_submit'];
 			if (!empty($cur_field['js']))
-				addInlineJavascript($cur_field['js']);
+				theme()->addInlineJavascript($cur_field['js']);
 			if (!empty($cur_field['js_load']))
 				loadJavascriptFile($cur_field['js_load']);
 
@@ -874,7 +874,7 @@ function loadProfileFields($force_reload = false)
 			'preload' => function () {
 				global $context, $user_info;
 
-				loadLanguage('Settings');
+				theme()->getTemplates()->loadLanguageFile('Settings');
 
 				// Can they disable censoring?
 				$context['allow_no_censored'] = false;
@@ -1665,7 +1665,7 @@ function profileSendActivation()
 	$context['user']['is_guest'] = true;
 
 	// Send them to the done-with-registration-login screen.
-	loadTemplate('Register');
+	theme()->getTemplates()->load('Register');
 
 	$context['page_title'] = $txt['profile'];
 	$context['sub_template'] = 'after';
@@ -1721,7 +1721,7 @@ function profileLoadSignatureData()
 		$validation = profileValidateSignature($signature);
 		if (empty($context['post_errors']))
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['post_errors'] = array();
 		}
 
@@ -2137,7 +2137,7 @@ function profileSaveAvatarData(&$value)
 	$valid_https = isset($_POST['userpicpersonal']) && substr($_POST['userpicpersonal'], 0, 8) === 'https://' && strlen($_POST['userpicpersonal']) > 8;
 	if ($value === 'external' && !empty($modSettings['avatar_external_enabled']) && ($valid_http || $valid_https) && !empty($modSettings['avatar_download_external']))
 	{
-		loadLanguage('Post');
+		theme()->getTemplates()->loadLanguageFile('Post');
 		if (!is_writable($uploadDir))
 			throw new Elk_Exception('attachments_no_write', 'critical');
 
@@ -2247,14 +2247,14 @@ function profileSaveAvatarData(&$value)
 			{
 				if (!is_writable($uploadDir))
 				{
-					loadLanguage('Post');
+					theme()->getTemplates()->loadLanguageFile('Post');
 					throw new Elk_Exception('attachments_no_write', 'critical');
 				}
 
 				$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, null, null, true);
 				if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $new_avatar_name))
 				{
-					loadLanguage('Post');
+					theme()->getTemplates()->loadLanguageFile('Post');
 					throw new Elk_Exception('attach_timeout', 'critical');
 				}
 
@@ -2382,7 +2382,7 @@ function profileSaveAvatarData(&$value)
 				$destinationPath = $uploadDir . '/' . (empty($file_hash) ? $destName : $cur_profile['id_attach'] . '_' . $file_hash . '.elk');
 				if (!rename($_FILES['attachment']['tmp_name'], $destinationPath))
 				{
-					loadLanguage('Post');
+					theme()->getTemplates()->loadLanguageFile('Post');
 					// I guess a man can try.
 					removeAttachments(array('id_member' => $memID));
 					throw new Elk_Exception('attach_timeout', 'critical');
@@ -3091,7 +3091,7 @@ function getMemberGeneralPermissions($curGroups)
 	global $txt;
 
 	$db = database();
-	loadLanguage('ManagePermissions');
+	theme()->getTemplates()->loadLanguageFile('ManagePermissions');
 
 	// Get all general permissions.
 	$request = $db->query('', '
@@ -3157,7 +3157,7 @@ function getMemberBoardPermissions($memID, $curGroups, $board = null)
 	global $txt;
 
 	$db = database();
-	loadLanguage('ManagePermissions');
+	theme()->getTemplates()->loadLanguageFile('ManagePermissions');
 
 	$request = $db->query('', '
 		SELECT

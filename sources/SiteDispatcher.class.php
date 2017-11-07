@@ -176,13 +176,14 @@ class Site_Dispatcher
 	 */
 	public function __construct(HttpReq $_req)
 	{
-		$this->action = $_req->getQuery('action', 'trim|strval', '');
+		global $context;
+
+		$context['current_action'] = $this->action = $_req->getQuery('action', 'trim|strval', '');
 		$this->area = $_req->getQuery('area', 'trim|strval', '');
-		$this->subAction = $_req->getQuery('sa', 'trim|strval', '');
+		$context['current_subaction'] = $this->subAction = $_req->getQuery('sa', 'trim|strval', '');
 		$this->_default_action = $this->getFrontPage();
 		$this->determineDefaultAction();
 
-		// Now this return won't be cool, but lets do it
 		if (empty($this->_controller_name))
 		{
 			$this->determineAction();
@@ -382,6 +383,14 @@ class Site_Dispatcher
 	public function trackStats()
 	{
 		return $this->_controller->trackStats($this->_function_name);
+	}
+
+	/**
+	 * @return Action_Controller
+	 */
+	public function getController()
+	{
+		return $this->_controller;
 	}
 
 	/**

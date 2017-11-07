@@ -64,8 +64,8 @@ class Auth_Controller extends Action_Controller
 			redirectexit();
 
 		// Load the Login template/language file.
-		loadLanguage('Login');
-		loadTemplate('Login');
+		theme()->getTemplates()->loadLanguageFile('Login');
+		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context['sub_template'] = 'login';
 
@@ -137,10 +137,10 @@ class Auth_Controller extends Action_Controller
 		elseif (!empty($_POST['cookielength']) && ($_POST['cookielength'] >= 1 && $_POST['cookielength'] <= 525600))
 			$modSettings['cookieTime'] = (int) $_POST['cookielength'];
 
-		loadLanguage('Login');
+		theme()->getTemplates()->loadLanguageFile('Login');
 
 		// Load the template stuff
-		loadTemplate('Login');
+		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context['sub_template'] = 'login';
 
@@ -473,8 +473,8 @@ class Auth_Controller extends Action_Controller
 	{
 		global $txt, $context;
 
-		loadLanguage('Login');
-		loadTemplate('Login');
+		theme()->getTemplates()->loadLanguageFile('Login');
+		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		createToken('login');
 
@@ -499,8 +499,8 @@ class Auth_Controller extends Action_Controller
 	{
 		global $txt, $mtitle, $mmessage, $context;
 
-		loadLanguage('Login');
-		loadTemplate('Login');
+		theme()->getTemplates()->loadLanguageFile('Login');
+		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		createToken('login');
 

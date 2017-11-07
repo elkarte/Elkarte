@@ -41,8 +41,8 @@ class ManagePaid_Controller extends Action_Controller
 		global $context, $txt, $modSettings;
 
 		// Load the required language and template.
-		loadLanguage('ManagePaid');
-		loadTemplate('ManagePaid');
+		theme()->getTemplates()->loadLanguageFile('ManagePaid');
+		theme()->getTemplates()->load('ManagePaid');
 
 		$subActions = array(
 			'modify' => array(
@@ -132,7 +132,7 @@ class ManagePaid_Controller extends Action_Controller
 		$context['settings_title'] = $txt['settings'];
 
 		// We want javascript for our currency options.
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 		toggleCurrencyOther();', true);
 
 		// Saving the settings?

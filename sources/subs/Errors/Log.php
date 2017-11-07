@@ -12,6 +12,10 @@
 
 namespace ElkArte\Errors;
 
+use Elk_Exception;
+use ElkArte\Theme\TemplateLayers;
+use AbstractModel;
+
 /**
  * Class to handle all forum errors and exceptions
  */

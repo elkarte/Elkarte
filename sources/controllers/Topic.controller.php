@@ -187,7 +187,7 @@ class Topic_Controller extends Action_Controller
 		}
 
 		// Clean out the template layers
-		$template_layers = Template_Layers::instance();
+		$template_layers = theme()->getLayers();
 		$template_layers->removeAll();
 
 		// Get the topic starter information.
@@ -206,7 +206,7 @@ class Topic_Controller extends Action_Controller
 		// @todo this code is almost the same as the one in Display.controller.php
 		if ($topicinfo['id_poll'] > 0 && !empty($modSettings['pollMode']) && allowedTo('poll_view'))
 		{
-			loadLanguage('Post');
+			theme()->getTemplates()->loadLanguageFile('Post');
 			require_once(SUBSDIR . '/Poll.subs.php');
 
 			loadPollContext($topicinfo['id_poll']);
@@ -214,7 +214,7 @@ class Topic_Controller extends Action_Controller
 		}
 
 		// Lets "output" all that info.
-		loadTemplate('Printpage');
+		theme()->getTemplates()->load('Printpage');
 		$template_layers->add('print');
 		$context['sub_template'] = 'print_page';
 		$context['board_name'] = $board_info['name'];

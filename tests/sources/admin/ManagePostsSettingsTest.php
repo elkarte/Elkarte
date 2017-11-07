@@ -10,7 +10,7 @@ class TestManagePostsSettings extends PHPUnit_Framework_TestCase
 	 */
 	function setUp()
 	{
-		loadLanguage('Admin', 'english', true, true);
+		theme()->getTemplates()->loadLanguageFile('Admin', 'english', true, true);
 	}
 
 	/**

@@ -196,7 +196,7 @@ class Mentions_Controller extends Action_Controller
 		is_not_guest();
 
 		require_once(SUBSDIR . '/Mentions.subs.php');
-		loadLanguage('Mentions');
+		theme()->getTemplates()->loadLanguageFile('Mentions');
 
 		$this->_buildUrl();
 
@@ -360,9 +360,9 @@ class Mentions_Controller extends Action_Controller
 		if (empty($modSettings['usernotif_favicon_enable']) && empty($modSettings['usernotif_desktop_enable']))
 			die();
 
-		loadTemplate('Json');
+		theme()->getTemplates()->load('Json');
 		$context['sub_template'] = 'send_json';
-		$template_layers = Template_Layers::instance();
+		$template_layers = theme()->getLayers();
 		$template_layers->removeAll();
 		require_once(SUBSDIR . '/Mentions.subs.php');
 
@@ -421,7 +421,7 @@ class Mentions_Controller extends Action_Controller
 		$totalMentions = countUserMentions($all, $type);
 		$mentions = array();
 		$round = 0;
-		loadLanguage('Mentions');
+		theme()->getTemplates()->loadLanguageFile('Mentions');
 
 		$this->_registerEvents($type);
 
@@ -594,7 +594,7 @@ class Mentions_Controller extends Action_Controller
 					changeMentionStatus($this->_validator->id_mention, $this->_known_status['deleted']);
 					break;
 				case 'readall':
-					loadLanguage('Mentions');
+				theme()->getTemplates()->loadLanguageFile('Mentions');
 					$mentions = $this->list_loadMentions((int) $this->_page, $this->_items_per_page, $this->_sort, $this->_all, $this->_type);
 					$this->_markMentionsRead($mentions);
 					break;
@@ -701,7 +701,7 @@ class Mentions_Controller extends Action_Controller
 
 		// If everything is fine, let's include our helper functions and prepare for the fun!
 		require_once(SUBSDIR . '/Mentions.subs.php');
-		loadLanguage('Mentions');
+		theme()->getTemplates()->loadLanguageFile('Mentions');
 
 		return true;
 	}

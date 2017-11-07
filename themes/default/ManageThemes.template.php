@@ -227,7 +227,7 @@ function template_list_themes()
 			</div>
 		</form>
 	</div>';
-	addInlineJavascript('
+	theme()->addInlineJavascript('
 		initDeleteThemes();', true);
 }
 

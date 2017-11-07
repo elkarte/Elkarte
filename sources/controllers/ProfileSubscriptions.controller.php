@@ -60,8 +60,8 @@ class ProfileSubscriptions_Controller extends Action_Controller
 		global $context, $txt;
 
 		// Load the paid template anyway.
-		loadTemplate('ManagePaid');
-		loadLanguage('ManagePaid');
+		theme()->getTemplates()->load('ManagePaid');
+		theme()->getTemplates()->loadLanguageFile('ManagePaid');
 
 		$memID = currentMemberID();
 		$context['member']['id'] = $memID;
@@ -346,7 +346,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 				// Does this gateway have any javascript?
 				if (!empty($fields['javascript']))
 				{
-					addInlineJavascript($fields['javascript'], true);
+					theme()->addInlineJavascript($fields['javascript'], true);
 				}
 			}
 		}

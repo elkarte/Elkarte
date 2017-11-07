@@ -30,7 +30,7 @@ class Draft_Controller extends Post_Controller
 	public function pre_dispatch()
 	{
 		// Language and helper functions
-		loadLanguage('Drafts');
+		theme()->getTemplates()->loadLanguageFile('Drafts');
 		require_once(SUBSDIR . '/Drafts.subs.php');
 		require_once(SUBSDIR . '/Profile.subs.php');
 

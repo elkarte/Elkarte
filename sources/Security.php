@@ -192,7 +192,7 @@ function is_not_guest($message = '', $is_fatal = true)
 
 	// Attempt to detect if they came from dlattach.
 	if (ELK != 'SSI' && empty($context['theme_loaded']))
-		loadTheme();
+		new ElkArte\Themes\ThemeLoader();
 
 	// Never redirect to an attachment
 	if (validLoginUrl($_SERVER['REQUEST_URL']))
@@ -201,10 +201,10 @@ function is_not_guest($message = '', $is_fatal = true)
 	}
 
 	// Load the Login template and language file.
-	loadLanguage('Login');
+	theme()->getTemplates()->loadLanguageFile('Login');
 
 	// Apparently we're not in a position to handle this now. Let's go to a safer location for now.
-	if (!Template_Layers::instance()->hasLayers())
+	if (!theme()->getLayers()->hasLayers())
 	{
 		$_SESSION['login_url'] = $scripturl . '?' . $_SERVER['QUERY_STRING'];
 		redirectexit('action=login');
@@ -213,7 +213,7 @@ function is_not_guest($message = '', $is_fatal = true)
 		return false;
 	else
 	{
-		loadTemplate('Login');
+		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 		$context['sub_template'] = 'kick_guest';
 		$context['robot_no_index'] = true;
@@ -524,7 +524,7 @@ function banPermissions()
 			'remove_own', 'remove_any',
 			'post_unapproved_topics', 'post_unapproved_replies_own', 'post_unapproved_replies_any',
 		);
-		Template_Layers::instance()->addAfter('admin_warning', 'body');
+		theme()->getLayers()->addAfter('admin_warning', 'body');
 
 		call_integration_hook('integrate_post_ban_permissions', array(&$denied_permissions));
 		$user_info['permissions'] = array_diff($user_info['permissions'], $denied_permissions);
@@ -1147,7 +1147,7 @@ function isAllowedTo($permission, $boards = null)
 		// If they are a guest, show a login. (because the error might be gone if they do!)
 		if ($user_info['is_guest'])
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			is_not_guest($txt['cannot_' . $error_permission]);
 		}
 
@@ -1544,7 +1544,7 @@ function loadBadBehavior()
 		if ($bb_run === true)
 		{
 			$bb2_results = bb2_start(bb2_read_settings());
-			addInlineJavascript(bb2_insert_head());
+			theme()->addInlineJavascript(bb2_insert_head());
 		}
 	}
 }

@@ -29,7 +29,7 @@ function getServerVersions($checkFor)
 
 	$db = database();
 
-	loadLanguage('Admin');
+	theme()->getTemplates()->loadLanguageFile('Admin');
 
 	$versions = array();
 

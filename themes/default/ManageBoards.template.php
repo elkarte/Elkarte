@@ -675,7 +675,7 @@ function template_modify_board()
 			]
 		});';
 
-	addInlineJavascript($js, true);
+	theme()->addInlineJavascript($js, true);
 
 	// Javascript for deciding what to show.
 	echo '

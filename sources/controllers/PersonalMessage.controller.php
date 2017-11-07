@@ -64,12 +64,12 @@ class PersonalMessage_Controller extends Action_Controller
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
 		// Templates, language, javascripts
-		loadLanguage('PersonalMessage');
+		theme()->getTemplates()->loadLanguageFile('PersonalMessage');
 		loadJavascriptFile(array('PersonalMessage.js', 'suggest.js'));
 
 		if (!isset($this->_req->query->xml))
 		{
-			loadTemplate('PersonalMessage');
+			theme()->getTemplates()->load('PersonalMessage');
 		}
 
 		$this->_events->trigger('pre_dispatch', array('xml' => isset($this->_req->query->xml)));
@@ -384,7 +384,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Set the template for this area and add the profile layer.
 		if (!isset($this->_req->query->xml))
 		{
-			$template_layers = Template_Layers::instance();
+			$template_layers = theme()->getLayers();
 			$template_layers->add('pm');
 		}
 	}
@@ -429,7 +429,7 @@ class PersonalMessage_Controller extends Action_Controller
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
 
 		// Set the template layers we need
-		$template_layers = Template_Layers::instance();
+		$template_layers = theme()->getLayers();
 		$template_layers->addAfter('subject_list', 'pm');
 
 		$labelQuery = $context['folder'] !== 'sent' ? '
@@ -666,7 +666,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Auto video embedding enabled, someone may have a link in a PM
 		if (!empty($messages_request) && !empty($modSettings['enableVideoEmbeding']))
 		{
-			addInlineJavascript('
+			theme()->addInlineJavascript('
 		$(function() {
 			$().linkifyvideo(oEmbedtext);
 		});', true
@@ -675,7 +675,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		if (!empty($messages_request) && !empty($context['show_delete']))
 		{
-			Template_Layers::instance()->addEnd('pm_pages_and_buttons');
+			theme()->getLayers()->addEnd('pm_pages_and_buttons');
 		}
 
 		// Set up the page index.
@@ -725,8 +725,8 @@ class PersonalMessage_Controller extends Action_Controller
 		global $txt, $scripturl, $modSettings, $context, $user_info;
 
 		// Load in some text and template dependencies
-		loadLanguage('PersonalMessage');
-		loadTemplate('PersonalMessage');
+		theme()->getTemplates()->loadLanguageFile('PersonalMessage');
+		theme()->getTemplates()->load('PersonalMessage');
 
 		// Set the template we will use
 		$context['sub_template'] = 'send';
@@ -950,7 +950,7 @@ class PersonalMessage_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Auth.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
 
-		loadLanguage('PersonalMessage', '', false);
+		theme()->getTemplates()->loadLanguageFile('PersonalMessage', '', false);
 
 		// Extract out the spam settings - it saves database space!
 		list ($modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']) = explode(',', $modSettings['pm_spam_settings']);
@@ -1791,8 +1791,8 @@ class PersonalMessage_Controller extends Action_Controller
 		$cur_profile = $user_profile[$user_info['id']];
 
 		// Load up the profile template, its where PM settings are located
-		loadLanguage('Profile');
-		loadTemplate('Profile');
+		theme()->getTemplates()->loadLanguageFile('Profile');
+		theme()->getTemplates()->load('Profile');
 
 		// We want them to submit back to here.
 		$context['profile_custom_submit_url'] = $scripturl . '?action=pm;sa=settings;save';
@@ -1939,7 +1939,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 				if (!isset($messagesToSend[$cur_language]))
 				{
-					loadLanguage('PersonalMessage', $cur_language, false);
+					theme()->getTemplates()->loadLanguageFile('PersonalMessage', $cur_language, false);
 
 					// Make the body.
 					$report_body = str_replace(array('{REPORTER}', '{SENDER}'), array(un_htmlspecialchars($user_info['name']), $memberFromName), $txt['pm_report_pm_user_sent']);
@@ -1972,7 +1972,7 @@ class PersonalMessage_Controller extends Action_Controller
 			// Give the user their own language back!
 			if (!empty($modSettings['userLanguage']))
 			{
-				loadLanguage('PersonalMessage', '', false);
+				theme()->getTemplates()->loadLanguageFile('PersonalMessage', '', false);
 			}
 
 			// Leave them with a template.
@@ -2051,7 +2051,7 @@ class PersonalMessage_Controller extends Action_Controller
 			$js_groups = json_encode($context['groups']);
 
 			// Oh my, we have a lot of text strings for this
-			addJavascriptVar(array(
+			theme()->addJavascriptVar(array(
 				'criteriaNum' => 0,
 				'actionNum' => 0,
 				'groups' => $js_groups,
@@ -2883,7 +2883,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Load the error text strings if there were errors in the search.
 		if (!empty($context['search_errors']))
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['search_errors']['messages'] = array();
 			foreach ($context['search_errors'] as $search_error => $dummy)
 			{

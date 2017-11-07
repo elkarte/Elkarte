@@ -122,8 +122,8 @@ class ManageThemes_Controller extends Action_Controller
 		}
 
 		// Load the important language files...
-		loadLanguage('ManageThemes');
-		loadLanguage('Settings');
+		theme()->getTemplates()->loadLanguageFile('ManageThemes');
+		theme()->getTemplates()->loadLanguageFile('Settings');
 
 		// No guests in here.
 		is_not_guest();
@@ -195,16 +195,16 @@ class ManageThemes_Controller extends Action_Controller
 	{
 		global $txt, $context, $user_info;
 
-		loadTemplate('Xml');
+		theme()->getTemplates()->load('Xml');
 
 		// Remove any template layers that may have been created, this is XML!
-		Template_Layers::instance()->removeAll();
+		theme()->getLayers()->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		// No guests in here.
 		if ($user_info['is_guest'])
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['not_guests']
@@ -234,7 +234,7 @@ class ManageThemes_Controller extends Action_Controller
 			$this->{$subActions[$this->_req->query->sa]}();
 		else
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['error_sa_not_set']
@@ -260,7 +260,7 @@ class ManageThemes_Controller extends Action_Controller
 	{
 		global $context, $modSettings;
 
-		loadLanguage('Admin');
+		theme()->getTemplates()->loadLanguageFile('Admin');
 
 		// Saving?
 		if (isset($this->_req->post->save))
@@ -298,7 +298,7 @@ class ManageThemes_Controller extends Action_Controller
 		// If we aren't submitting - that is, if we are about to...
 		else
 		{
-			loadTemplate('ManageThemes');
+			theme()->getTemplates()->load('ManageThemes');
 			$context['sub_template'] = 'manage_themes';
 
 			// Make our known themes a little easier to work with.
@@ -335,7 +335,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// Load in the helpers we need
 		require_once(SUBSDIR . '/Themes.subs.php');
-		loadLanguage('Admin');
+		theme()->getTemplates()->loadLanguageFile('Admin');
 
 		if (isset($this->_req->query->th))
 			return $this->action_setthemesettings();
@@ -374,7 +374,7 @@ class ManageThemes_Controller extends Action_Controller
 			redirectexit('action=admin;area=theme;sa=list;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
-		loadTemplate('ManageThemes');
+		theme()->getTemplates()->load('ManageThemes');
 
 		$context['themes'] = installedThemes();
 
@@ -400,7 +400,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// Off to the template we go
 		$context['sub_template'] = 'list_themes';
-		addJavascriptVar(array('txt_theme_remove_confirm' => $txt['theme_remove_confirm']), true);
+		theme()->addJavascriptVar(array('txt_theme_remove_confirm' => $txt['theme_remove_confirm']), true);
 		$context['reset_dir'] = realpath(BOARDDIR . '/themes');
 		$context['reset_url'] = $boardurl . '/themes';
 
@@ -442,7 +442,7 @@ class ManageThemes_Controller extends Action_Controller
 				if (empty($v['theme_dir']) || (!file_exists($v['theme_dir'] . '/Settings.template.php') && empty($v['num_members'])))
 					unset($context['themes'][$k]);
 
-			loadTemplate('ManageThemes');
+			theme()->getTemplates()->load('ManageThemes');
 			$context['sub_template'] = 'reset_list';
 
 			createToken('admin-stor', 'request');
@@ -549,15 +549,15 @@ class ManageThemes_Controller extends Action_Controller
 		$old_id = $settings['theme_id'];
 		$old_settings = $settings;
 
-		loadTheme($theme, false);
-		loadLanguage('Profile');
+		new ElkArte\Themes\ThemeLoader($theme, false);
+		theme()->getTemplates()->loadLanguageFile('Profile');
 
 		// @todo Should we just move these options so they are no longer theme dependant?
-		loadLanguage('PersonalMessage');
+		theme()->getTemplates()->loadLanguageFile('PersonalMessage');
 
 		// Let the theme take care of the settings.
-		loadTemplate('Settings');
-		loadSubTemplate('options');
+		theme()->getTemplates()->load('Settings');
+		theme()->getTemplates()->loadSubTemplate('options');
 
 		// Set up for the template
 		$context['sub_template'] = 'set_options';
@@ -607,10 +607,10 @@ class ManageThemes_Controller extends Action_Controller
 		}
 
 		// Restore the existing theme.
-		loadTheme($old_id, false);
+		new ElkArte\Themes\ThemeLoader($old_id, false);
 		$settings = $old_settings;
 
-		loadTemplate('ManageThemes');
+		theme()->getTemplates()->load('ManageThemes');
 		createToken('admin-sto');
 	}
 
@@ -646,7 +646,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// Select the best fitting tab.
 		$context[$context['admin_menu_name']]['current_subsection'] = 'list';
-		loadLanguage('Admin');
+		theme()->getTemplates()->loadLanguageFile('Admin');
 
 		// Fetch the smiley sets...
 		$sets = explode(',', 'none,' . $modSettings['smiley_sets_known']);
@@ -660,17 +660,17 @@ class ManageThemes_Controller extends Action_Controller
 		$old_id = $settings['theme_id'];
 		$old_settings = $settings;
 
-		loadTheme($theme, false);
+		new ElkArte\Themes\ThemeLoader($theme, false);
 
 		// Also load the actual themes language file - in case of special settings.
-		loadLanguage('Settings', '', true, true);
+		theme()->getTemplates()->loadLanguageFile('Settings', '', true, true);
 
 		// And the custom language strings...
-		loadLanguage('ThemeStrings', '', false, true);
+		theme()->getTemplates()->loadLanguageFile('ThemeStrings', '', false, true);
 
 		// Let the theme take care of the settings.
-		loadTemplate('Settings');
-		loadSubTemplate('settings');
+		theme()->getTemplates()->load('Settings');
+		theme()->getTemplates()->loadSubTemplate('settings');
 
 		// Load the variants separately...
 		$settings['theme_variants'] = array();
@@ -783,7 +783,7 @@ class ManageThemes_Controller extends Action_Controller
 		}
 
 		// Restore the current theme.
-		loadTheme($old_id, false);
+		new ElkArte\Themes\ThemeLoader($old_id, false);
 
 		$settings = $old_settings;
 
@@ -791,7 +791,7 @@ class ManageThemes_Controller extends Action_Controller
 		if (function_exists('template_init'))
 			$settings += template_init();
 
-		loadTemplate('ManageThemes');
+		theme()->getTemplates()->load('ManageThemes');
 
 		// We like Kenny better than Token.
 		createToken('admin-sts');
@@ -861,7 +861,7 @@ class ManageThemes_Controller extends Action_Controller
 		// Validate what was sent
 		if (checkSession('get', '', false))
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['session_verify_fail'],
@@ -873,7 +873,7 @@ class ManageThemes_Controller extends Action_Controller
 		// Not just any John Smith can send in a api request
 		if (!allowedTo('admin_forum'))
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['cannot_admin_forum'],
@@ -884,7 +884,7 @@ class ManageThemes_Controller extends Action_Controller
 		// Even if you are John Smith, you still need a ticket
 		if (!validateToken('admin-tr', 'request', true, false))
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['token_verify_fail'],
@@ -899,7 +899,7 @@ class ManageThemes_Controller extends Action_Controller
 		// You can't delete the default theme!
 		if ($theme == 1)
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
 				'text' => $txt['no_access'],
@@ -959,8 +959,8 @@ class ManageThemes_Controller extends Action_Controller
 		if (!$modSettings['theme_allow'] && $settings['disable_user_variant'] && !allowedTo('admin_forum'))
 			throw new Elk_Exception('no_access', false);
 
-		loadLanguage('Profile');
-		loadTemplate('ManageThemes');
+		theme()->getTemplates()->loadLanguageFile('Profile');
+		theme()->getTemplates()->load('ManageThemes');
 
 		// Build the link tree.
 		$context['linktree'][] = array(
@@ -1137,7 +1137,7 @@ class ManageThemes_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Themes.subs.php');
 		require_once(SUBSDIR . '/Package.subs.php');
 
-		loadTemplate('ManageThemes');
+		theme()->getTemplates()->load('ManageThemes');
 
 		// Passed an ID, then the install is complete, lets redirect and show them
 		if (isset($this->_req->query->theme_id))
@@ -1497,7 +1497,7 @@ class ManageThemes_Controller extends Action_Controller
 	{
 		global $context;
 
-		loadTemplate('ManageThemes');
+		theme()->getTemplates()->load('ManageThemes');
 
 		// We'll work hard with them themes!
 		require_once(SUBSDIR . '/Themes.subs.php');
@@ -1554,7 +1554,7 @@ class ManageThemes_Controller extends Action_Controller
 	{
 		global $context, $settings;
 
-		addJavascriptVar(array(
+		theme()->addJavascriptVar(array(
 			'previewData' => '',
 			'previewTimeout' => '',
 			'refreshPreviewCache' => '',
@@ -1757,7 +1757,7 @@ class ManageThemes_Controller extends Action_Controller
 		// Session timed out.
 		else
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 
 			// Notify the template of trouble
 			$context['session_error'] = true;
@@ -1775,7 +1775,7 @@ class ManageThemes_Controller extends Action_Controller
 				$context['sub_template'] = 'edit_template';
 			elseif ($is_css)
 			{
-				addJavascriptVar(array(
+				theme()->addJavascriptVar(array(
 					'previewData' => '\'\'',
 					'previewTimeout' => '\'\'',
 					'refreshPreviewCache' => '\'\'',
@@ -1807,7 +1807,7 @@ class ManageThemes_Controller extends Action_Controller
 	{
 		global $context, $scripturl;
 
-		loadTemplate('ManageThemes');
+		theme()->getTemplates()->load('ManageThemes');
 
 		// We'll work hard with them themes!
 		require_once(SUBSDIR . '/Themes.subs.php');
@@ -1870,7 +1870,7 @@ class ManageThemes_Controller extends Action_Controller
 	{
 		global $context;
 
-		loadTemplate('ManageThemes');
+		theme()->getTemplates()->load('ManageThemes');
 
 		// We'll work hard with them themes!
 		require_once(SUBSDIR . '/Themes.subs.php');
@@ -1922,7 +1922,7 @@ class ManageThemes_Controller extends Action_Controller
 	{
 		global $context, $settings;
 
-		loadTemplate('ManageThemes');
+		theme()->getTemplates()->load('ManageThemes');
 		require_once(SUBSDIR . '/Themes.subs.php');
 
 		$context[$context['admin_menu_name']]['current_subsection'] = 'edit';

@@ -115,7 +115,7 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 
 		if ($context['can_add_poll'])
 		{
-			addJavascriptVar(array(
+			theme()->addJavascriptVar(array(
 				'poll_remove' => $txt['poll_remove'],
 				'poll_add' => $txt['add_poll']), true);
 		}
@@ -158,8 +158,8 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 *
 	 * @param string $destination
 	 * @param string $page_title
-	 * @param Template_Layers $template_layers
 	 * @throws Elk_Exception
+	 * @param ElkArte\Theme\TemplateLayers $template_layers
 	 */
 	public function finalize_post_form(&$destination, &$page_title, $template_layers)
 	{
@@ -171,7 +171,7 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 			$destination .= ';poll';
 			$page_title = $txt['new_poll'];
 			$context['make_poll'] = true;
-			loadTemplate('Poll');
+			theme()->getTemplates()->load('Poll');
 			$template_layers->add('poll_edit');
 
 			// Are we starting a poll? if set the poll icon as selected if its available

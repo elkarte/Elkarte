@@ -20,7 +20,7 @@
  */
 function template_MergeTopics_init()
 {
-	loadTemplate('GenericHelpers');
+	theme()->getTemplates()->load('GenericHelpers');
 }
 
 /**

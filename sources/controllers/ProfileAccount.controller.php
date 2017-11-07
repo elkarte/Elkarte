@@ -64,11 +64,11 @@ class ProfileAccount_Controller extends Action_Controller
 		global $txt, $scripturl, $modSettings, $mbname, $context, $cur_profile;
 
 		// Make sure the sub-template is set...
-		loadTemplate('ProfileAccount');
+		theme()->getTemplates()->load('ProfileAccount');
 		$context['sub_template'] = 'issueWarning';
 
 		// We need this because of template_load_warning_variables
-		loadTemplate('Profile');
+		theme()->getTemplates()->load('Profile');
 		loadJavascriptFile('profile.js');
 
 		// jQuery-UI FTW!
@@ -88,7 +88,7 @@ class ProfileAccount_Controller extends Action_Controller
 		}
 
 		// Get the base (errors related) stuff done.
-		loadLanguage('Errors');
+		theme()->getTemplates()->loadLanguageFile('Errors');
 		$context['custom_error_title'] = $txt['profile_warning_errors_occurred'];
 
 		// Make sure things which are disabled stay disabled.
@@ -523,7 +523,7 @@ class ProfileAccount_Controller extends Action_Controller
 		$context['page_title'] = $txt['deleteAccount'] . ': ' . $cur_profile['real_name'];
 
 		// make sure the sub-template is set...
-		loadTemplate('ProfileAccount');
+		theme()->getTemplates()->load('ProfileAccount');
 		$context['sub_template'] = 'deleteAccount';
 	}
 

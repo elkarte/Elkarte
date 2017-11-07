@@ -18,7 +18,7 @@
  */
 function template_Display_init()
 {
-	loadTemplate('GenericMessages');
+	theme()->getTemplates()->load('GenericMessages');
 }
 
 /**

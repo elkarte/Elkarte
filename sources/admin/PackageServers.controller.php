@@ -32,10 +32,10 @@ class PackageServers_Controller extends Action_Controller
 	public function pre_dispatch()
 	{
 		// Use the Packages language file. (split servers?)
-		loadLanguage('Packages');
+		theme()->getTemplates()->loadLanguageFile('Packages');
 
 		// Use the PackageServers template.
-		loadTemplate('PackageServers');
+		theme()->getTemplates()->load('PackageServers');
 		loadCSSFile('admin.css');
 	}
 
@@ -59,10 +59,10 @@ class PackageServers_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// Use the Packages language file. (split servers?)
-		loadLanguage('Packages');
+		theme()->getTemplates()->loadLanguageFile('Packages');
 
 		// Use the PackageServers template.
-		loadTemplate('PackageServers');
+		theme()->getTemplates()->load('PackageServers');
 		loadCSSFile('admin.css');
 
 		$context['page_title'] = $txt['package_servers'];
@@ -583,7 +583,7 @@ class PackageServers_Controller extends Action_Controller
 		if (!is_array($context['package']))
 		{
 			@unlink($destination);
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			$txt[$context['package']] = str_replace('{MANAGETHEMEURL}', $scripturl . '?action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id'] . '#theme_install', $txt[$context['package']]);
 			throw new Elk_Exception('package_upload_error_broken', false, $txt[$context['package']]);
 		}
@@ -612,7 +612,7 @@ class PackageServers_Controller extends Action_Controller
 					if ($packageInfo['id'] == $context['package']['id'] && compareVersions($packageInfo['version'], $context['package']['version']) == 0)
 					{
 						@unlink($destination);
-						loadLanguage('Errors');
+						theme()->getTemplates()->loadLanguageFile('Errors');
 						throw new Elk_Exception('package_upload_already_exists', 'general', $package->getFilename());
 					}
 				}

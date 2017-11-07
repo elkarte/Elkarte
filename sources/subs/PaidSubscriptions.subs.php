@@ -432,7 +432,7 @@ function loadSubscriptions()
 		return;
 
 	// Make sure this is loaded, just in case.
-	loadLanguage('ManagePaid');
+	theme()->getTemplates()->loadLanguageFile('ManagePaid');
 
 	$request = $db->query('', '
 		SELECT

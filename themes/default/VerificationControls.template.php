@@ -95,7 +95,7 @@ function template_verification_control_captcha($verify_id, $verify_context)
 					<input type="text" id="', $verify_id, '_vv[code]" name="', $verify_id, '_vv[code]" value="', !empty($verify_context['text_value']) ? $verify_context['text_value'] : '', '" size="30" tabindex="', $context['tabindex']++, '" class="', $verify_context['is_error'] ? 'border_error ' : '', 'input_text" />
 				</div>';
 
-	addInlineJavascript('
+	theme()->addInlineJavascript('
 		$(\'.playsound, .refreshimage\').Elk_Captcha({
 			\'uniqueID\': ' . JavaScriptEscape($verify_id) . ',
 			\'imageURL\': ' . JavaScriptEscape($verify_context['image_href']) . ',

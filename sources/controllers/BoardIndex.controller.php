@@ -59,11 +59,11 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 	{
 		global $txt, $user_info, $modSettings, $context, $settings, $scripturl;
 
-		loadTemplate('BoardIndex');
+		theme()->getTemplates()->load('BoardIndex');
 
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = $scripturl;
-		Template_Layers::instance()->add('boardindex_outer');
+		theme()->getLayers()->add('boardindex_outer');
 
 		// Do not let search engines index anything if there is a random thing in $_GET.
 		if (!empty($this->_req->query))
@@ -139,7 +139,7 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 
 		$this->_events->trigger('post_load', array('callbacks' => &$context['info_center_callbacks']));
 
-		addJavascriptVar(array(
+		theme()->addJavascriptVar(array(
 			'txt_mark_as_read_confirm' => $txt['mark_as_read_confirm']
 		), true);
 
@@ -158,7 +158,7 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 		call_integration_hook('integrate_mark_read_button');
 		if (!empty($context['info_center_callbacks']))
 		{
-			Template_Layers::instance()->add('info_center');
+			theme()->getLayers()->add('info_center');
 		}
 	}
 

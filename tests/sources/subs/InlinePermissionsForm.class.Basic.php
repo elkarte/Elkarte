@@ -18,7 +18,7 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 	{
 		global $user_info;
 
-		loadLanguage('Admin', 'english', true, true);
+		theme()->getTemplates()->loadLanguageFile('Admin', 'english', true, true);
 
 		// Elevate the user.
 		$user_info['permissions'][] = 'manage_permissions';

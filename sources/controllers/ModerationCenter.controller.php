@@ -70,7 +70,7 @@ class ModerationCenter_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Menu.subs.php');
 
 		// Load the language, and the template.
-		loadLanguage('ModerationCenter');
+		theme()->getTemplates()->loadLanguageFile('ModerationCenter');
 		loadCSSFile('admin.css');
 
 		if (!empty($options['admin_preferences']))
@@ -315,7 +315,7 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $txt, $context, $user_settings;
 
-		loadTemplate('ModerationCenter');
+		theme()->getTemplates()->load('ModerationCenter');
 		loadJavascriptFile('admin.js', array(), 'admin_scripts');
 
 		$context['page_title'] = $txt['moderation_center'];
@@ -398,8 +398,8 @@ class ModerationCenter_Controller extends Action_Controller
 		$context['page_title'] = $txt['show_notice'];
 		$context['sub_template'] = 'show_notice';
 
-		Template_Layers::instance()->removeAll();
-		loadTemplate('ModerationCenter');
+		theme()->getLayers()->removeAll();
+		theme()->getTemplates()->load('ModerationCenter');
 	}
 
 	/**
@@ -411,7 +411,7 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $txt, $context, $scripturl, $user_info;
 
-		loadTemplate('ModerationCenter');
+		theme()->getTemplates()->load('ModerationCenter');
 		require_once(SUBSDIR . '/Moderation.subs.php');
 
 		// Put the open and closed options into tabs, because we can...
@@ -586,7 +586,7 @@ class ModerationCenter_Controller extends Action_Controller
 		global $context, $txt, $user_settings, $user_info;
 
 		// Some useful context stuff.
-		loadTemplate('ModerationCenter');
+		theme()->getTemplates()->load('ModerationCenter');
 		$context['page_title'] = $txt['mc_settings'];
 		$context['sub_template'] = 'moderation_settings';
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
@@ -898,7 +898,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// What have the other moderators done to this message?
 		require_once(SUBSDIR . '/Modlog.subs.php');
-		loadLanguage('Modlog');
+		theme()->getTemplates()->loadLanguageFile('Modlog');
 
 		// This is all the information from the moderation log.
 		$listOptions = array(
@@ -1002,7 +1002,7 @@ class ModerationCenter_Controller extends Action_Controller
 			$context[$context['moderation_menu_name']]['current_subsection'] = 'closed';
 
 		// Finally we are done :P
-		loadTemplate('ModerationCenter');
+		theme()->getTemplates()->load('ModerationCenter');
 		if ($context['admin_area'] === 'pm_reports')
 		{
 			$context['page_title'] = sprintf($txt['mc_view_pmreport'], $context['report']['author']['name']);
@@ -1031,7 +1031,7 @@ class ModerationCenter_Controller extends Action_Controller
 		$context['view_posts'] = isset($this->_req->query->sa) && $this->_req->query->sa === 'post';
 		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
 
-		loadTemplate('ModerationCenter');
+		theme()->getTemplates()->load('ModerationCenter');
 
 		// Get some key settings!
 		$modSettings['warning_watch'] = empty($modSettings['warning_watch']) ? 1 : $modSettings['warning_watch'];
@@ -1240,7 +1240,7 @@ class ModerationCenter_Controller extends Action_Controller
 		$context['page_title'] = $txt['mc_warning_log_title'];
 
 		require_once(SUBSDIR . '/Moderation.subs.php');
-		loadLanguage('Modlog');
+		theme()->getTemplates()->loadLanguageFile('Modlog');
 
 		// If we're coming in from a search, get the variables.
 		if (!empty($this->_req->post->params) && empty($this->_req->post->is_search))
@@ -1532,8 +1532,8 @@ class ModerationCenter_Controller extends Action_Controller
 		global $context, $txt;
 
 		// Some of this stuff is overseas, so to speak.
-		loadTemplate('ModerationCenter');
-		loadLanguage('Profile');
+		theme()->getTemplates()->load('ModerationCenter');
+		theme()->getTemplates()->loadLanguageFile('Profile');
 
 		$subActions = array(
 			'log' => array($this, 'action_viewWarningLog'),

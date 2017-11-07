@@ -109,7 +109,7 @@ class Display_Controller extends Action_Controller
 			throw new Elk_Exception('no_board', false);
 
 		// Load the template
-		loadTemplate('Display');
+		theme()->getTemplates()->load('Display');
 		$context['sub_template'] = 'messages';
 
 		// And the topic functions
@@ -121,7 +121,7 @@ class Display_Controller extends Action_Controller
 
 		// How much are we sticking on each page?
 		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
-		$this->_template_layers = Template_Layers::instance();
+		$this->_template_layers = theme()->getLayers();
 		$this->_template_layers->addEnd('messages_informations');
 		$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
 
@@ -473,13 +473,13 @@ class Display_Controller extends Action_Controller
 
 				// ajax controller for likes
 				loadJavascriptFile('like_posts.js', array('defer' => true));
-				addJavascriptVar(array(
+				theme()->addJavascriptVar(array(
 					'likemsg_are_you_sure' => JavaScriptEscape($txt['likemsg_are_you_sure']),
 				));
-				loadLanguage('Errors');
+				theme()->getTemplates()->loadLanguageFile('Errors');
 
 				// Initiate likes and the tooltips for likes
-				addInlineJavascript('
+				theme()->addInlineJavascript('
 				$(function() {
 					var likePostInstance = likePosts.prototype.init({
 						oTxt: ({
@@ -604,7 +604,7 @@ class Display_Controller extends Action_Controller
 		// Auto video embedding enabled?
 		if (!empty($modSettings['enableVideoEmbeding']))
 		{
-			addInlineJavascript('
+			theme()->addInlineJavascript('
 		$(function() {
 			$().linkifyvideo(oEmbedtext);
 		});');
@@ -642,11 +642,11 @@ class Display_Controller extends Action_Controller
 			}
 		}
 
-		addJavascriptVar(array('notification_topic_notice' => $context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']), true);
+		theme()->addJavascriptVar(array('notification_topic_notice' => $context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']), true);
 
 		if ($context['can_send_topic'])
 		{
-			addJavascriptVar(array(
+			theme()->addJavascriptVar(array(
 				'sendtopic_cancel' => $txt['modify_cancel'],
 				'sendtopic_back' => $txt['back'],
 				'sendtopic_close' => $txt['find_close'],

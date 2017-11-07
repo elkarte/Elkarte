@@ -45,9 +45,9 @@ class ManageFeatures_Controller extends Action_Controller
 		global $context, $txt, $settings, $scripturl;
 
 		// Often Helpful
-		loadLanguage('Help');
-		loadLanguage('ManageSettings');
-		loadLanguage('Mentions');
+		theme()->getTemplates()->loadLanguageFile('Help');
+		theme()->getTemplates()->loadLanguageFile('ManageSettings');
+		theme()->getTemplates()->loadLanguageFile('Mentions');
 
 		// All the actions we know about
 		$subActions = array(
@@ -182,9 +182,9 @@ class ManageFeatures_Controller extends Action_Controller
 		{
 			$clean_hives_result = theme()->cleanHives();
 
-			Template_Layers::instance()->removeAll();
-			loadTemplate('Json');
-			addJavascriptVar(array('txt_invalid_response' => $txt['ajax_bad_response']), true);
+			theme()->getLayers()->removeAll();
+			theme()->getTemplates()->load('Json');
+			theme()->addJavascriptVar(array('txt_invalid_response' => $txt['ajax_bad_response']), true);
 			$context['sub_template'] = 'send_json';
 			$context['json_data'] = array(
 				'success' => $clean_hives_result,
@@ -197,7 +197,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$context['settings_title'] = $txt['mods_cat_features'];
 
 		// Show / hide custom jquery fields as required
-		addInlineJavascript('showhideJqueryOptions();', true);
+		theme()->addInlineJavascript('showhideJqueryOptions();', true);
 
 		$settingsForm->prepare();
 	}
@@ -332,7 +332,7 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $txt, $context, $scripturl, $modSettings;
 
-		loadLanguage('Mentions');
+		theme()->getTemplates()->loadLanguageFile('Mentions');
 
 		// Instantiate the form
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
@@ -444,7 +444,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$context['sub_template'] = 'show_settings';
 
 		// Disable the max smileys option if we don't allow smileys at all!
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 			document.getElementById(\'signature_max_smileys\').disabled = !document.getElementById(\'signature_allow_smileys\').checked;', true);
 
 		// Load all the signature settings.
@@ -552,7 +552,7 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context;
 
-		loadTemplate('ManageFeatures');
+		theme()->getTemplates()->load('ManageFeatures');
 		$context['page_title'] = $txt['custom_profile_title'];
 		$context['sub_template'] = 'show_custom_profile';
 
@@ -847,7 +847,7 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context;
 
-		loadTemplate('ManageFeatures');
+		theme()->getTemplates()->load('ManageFeatures');
 
 		// Sort out the context!
 		$context['fid'] = $this->_req->getQuery('fid', 'intval', 0);
@@ -858,14 +858,14 @@ class ManageFeatures_Controller extends Action_Controller
 		// Any errors messages to show?
 		if (isset($this->_req->query->msg))
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 
 			if (isset($txt['custom_option_' . $this->_req->query->msg]))
 				$context['custom_option__error'] = $txt['custom_option_' . $this->_req->query->msg];
 		}
 
 		// Load the profile language for section names.
-		loadLanguage('Profile');
+		theme()->getTemplates()->loadLanguageFile('Profile');
 
 		// Load up the profile field, if one was supplied
 		if ($context['fid'])
@@ -900,8 +900,8 @@ class ManageFeatures_Controller extends Action_Controller
 			);
 
 		// All the javascript for this page... everything else is in admin.js
-		addJavascriptVar(array('startOptID' => count($context['field']['options'])));
-		addInlineJavascript('updateInputBoxes();', true);
+		theme()->addJavascriptVar(array('startOptID' => count($context['field']['options'])));
+		theme()->addInlineJavascript('updateInputBoxes();', true);
 
 		// Are we toggling which ones are active?
 		if (isset($this->_req->post->onoff))
@@ -1165,7 +1165,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$settingsForm->setConfigVars($this->_pmSettings());
 
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
-		loadLanguage('ManageMembers');
+		theme()->getTemplates()->loadLanguageFile('ManageMembers');
 
 		$context['pm_limits'] = loadPMLimits();
 
@@ -1388,8 +1388,8 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $txt, $modSettings;
 
-		loadLanguage('Profile');
-		loadLanguage('UserNotifications');
+		theme()->getTemplates()->loadLanguageFile('Profile');
+		theme()->getTemplates()->loadLanguageFile('UserNotifications');
 
 		// The mentions settings
 		$config_vars = array(

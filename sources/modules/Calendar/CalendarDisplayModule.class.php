@@ -105,7 +105,7 @@ class Calendar_Display_Module extends ElkArte\sources\modules\Abstract_Module
 			if (!empty($context['linked_calendar_events']))
 			{
 				$context['linked_calendar_events'][count($context['linked_calendar_events']) - 1]['is_last'] = true;
-				Template_Layers::instance()->add('display_calendar');
+				theme()->getLayers()->add('display_calendar');
 			}
 		}
 	}

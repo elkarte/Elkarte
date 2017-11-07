@@ -39,7 +39,7 @@ class ManageBans_Controller extends Action_Controller
 	{
 		global $context, $txt, $scripturl;
 
-		loadTemplate('ManageBans');
+		theme()->getTemplates()->load('ManageBans');
 		require_once(SUBSDIR . '/Bans.subs.php');
 
 		$subActions = array(
@@ -322,7 +322,7 @@ class ManageBans_Controller extends Action_Controller
 		$ban_group_id = isset($context['ban']['id']) ? $context['ban']['id'] : $this->_req->getQuery('bg', 'intval', 0);
 
 		// Template needs this to show errors using javascript
-		loadLanguage('Errors');
+		theme()->getTemplates()->loadLanguageFile('Errors');
 		createToken('admin-bet');
 		$context['form_url'] = $scripturl . '?action=admin;area=ban;sa=edit';
 
@@ -499,13 +499,13 @@ class ManageBans_Controller extends Action_Controller
 		$context['sub_template'] = 'ban_edit';
 
 		// A couple of text strings we *may* need
-		addJavascriptVar(array(
+		theme()->addJavascriptVar(array(
 			'txt_ban_name_empty' => $txt['ban_name_empty'],
 			'txt_ban_restriction_empty' => $txt['ban_restriction_empty']), true
 		);
 
 		// And a bit of javascript to enable/disable some fields
-		addInlineJavascript('addLoadEvent(fUpdateStatus);', true);
+		theme()->addInlineJavascript('addLoadEvent(fUpdateStatus);', true);
 	}
 
 	/**

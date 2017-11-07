@@ -42,8 +42,8 @@ class ManageMembergroups_Controller extends Action_Controller
 		global $context, $txt;
 
 		// Language and template stuff, the usual.
-		loadLanguage('ManageMembers');
-		loadTemplate('ManageMembergroups');
+		theme()->getTemplates()->loadLanguageFile('ManageMembers');
+		theme()->getTemplates()->load('ManageMembergroups');
 
 		$subActions = array(
 			'add' => array(
@@ -453,7 +453,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		$context['allow_protected'] = allowedTo('admin_forum');
 
 		if (!empty($modSettings['deny_boards_access']))
-			loadLanguage('ManagePermissions');
+			theme()->getTemplates()->loadLanguageFile('ManagePermissions');
 
 		$context['groups'] = getBasicMembergroupData(array('globalmod'), array(), 'min_posts, id_group != {int:global_mod_group}, group_name');
 
@@ -512,7 +512,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		$current_group = array();
 
 		if (!empty($modSettings['deny_boards_access']))
-			loadLanguage('ManagePermissions');
+			theme()->getTemplates()->loadLanguageFile('ManagePermissions');
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 

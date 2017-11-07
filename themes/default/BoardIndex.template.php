@@ -18,7 +18,7 @@
  */
 function template_BoardIndex_init()
 {
-	loadTemplate('GenericBoards');
+	theme()->getTemplates()->load('GenericBoards');
 }
 
 /**
@@ -140,7 +140,7 @@ function template_info_center_below()
 	</aside>';
 
 	// Info center collapse object.
-	addInlineJavascript('
+	theme()->addInlineJavascript('
 		var oInfoCenterToggle = new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['info']) ? 'false' : 'true') . ',

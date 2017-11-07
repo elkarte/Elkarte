@@ -95,8 +95,8 @@ class Packages_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 
 		// Load all the basic stuff.
-		loadLanguage('Packages');
-		loadTemplate('Packages');
+		theme()->getTemplates()->loadLanguageFile('Packages');
+		theme()->getTemplates()->load('Packages');
 		loadCSSFile('admin.css');
 		$context['page_title'] = $txt['package'];
 
@@ -1037,9 +1037,9 @@ class Packages_Controller extends Action_Controller
 		create_chmod_control(array(), array('force_find_error' => true));
 
 		// Deal with the template stuff.
-		loadTemplate('Xml');
+		theme()->getTemplates()->load('Xml');
 		$context['sub_template'] = 'generic_xml';
-		Template_Layers::instance()->removeAll();
+		theme()->getLayers()->removeAll();
 
 		// Define the return data, this is simple.
 		$context['xml_data'] = array(
@@ -1174,7 +1174,7 @@ class Packages_Controller extends Action_Controller
 		$context['operations']['replace'] = $bbc_parser->parsePackage('[code=' . $txt[$operation_text] . ']' . $context['operations']['replace'] . '[/code]');
 
 		// No layers
-		Template_Layers::instance()->removeAll();
+		theme()->getLayers()->removeAll();
 		$context['sub_template'] = 'view_operations';
 	}
 
@@ -1483,9 +1483,9 @@ class Packages_Controller extends Action_Controller
 		// Is this actually xml?
 		if (isset($this->_req->query->xml))
 		{
-			loadTemplate('Xml');
+			theme()->getTemplates()->load('Xml');
 			$context['sub_template'] = 'generic_xml';
-			Template_Layers::instance()->removeAll();
+			theme()->getLayers()->removeAll();
 		}
 	}
 

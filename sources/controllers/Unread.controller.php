@@ -129,10 +129,10 @@ class Unread_Controller extends Action_Controller
 		);
 
 		// Prepare the template
-		loadTemplate('Recent');
+		theme()->getTemplates()->load('Recent');
 		$context['sub_template'] = 'unread';
 		$context['unread_header_title'] = $this->_action_unread ? ($context['showing_all_topics'] ? $txt['unread_topics_all'] : $txt['unread_topics_visit']) : $txt['unread_replies'];
-		$template_layers = Template_Layers::instance();
+		$template_layers = theme()->getLayers();
 		$template_layers->add($context['sub_template']);
 
 		$this->_is_topics = $this->_action_unread;
@@ -503,7 +503,7 @@ class Unread_Controller extends Action_Controller
 
 		if ($this->_is_topics)
 		{
-			addJavascriptVar(array(
+			theme()->addJavascriptVar(array(
 				'txt_mark_as_read_confirm' => $txt['mark_these_as_read_confirm']
 			), true);
 
@@ -534,7 +534,7 @@ class Unread_Controller extends Action_Controller
 		}
 		elseif (!$this->_is_topics && isset($topics_to_mark))
 		{
-			addJavascriptVar(array(
+			theme()->addJavascriptVar(array(
 				'txt_mark_as_read_confirm' => $txt['mark_these_as_read_confirm']
 			), true);
 

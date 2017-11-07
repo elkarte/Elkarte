@@ -16,7 +16,7 @@ class TestBBC extends PHPUnit_Framework_TestCase
 		global $modSettings;
 		$modSettings['user_access_mentions'] = array();
 
-		loadTheme();
+		new ElkArte\Themes\ThemeLoader();
 
 		// Standard testcases
 		$this->bbcTestCases = array(

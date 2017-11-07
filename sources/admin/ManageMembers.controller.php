@@ -54,8 +54,8 @@ class ManageMembers_Controller extends Action_Controller
 		global $txt, $scripturl, $context, $modSettings;
 
 		// Load the essentials.
-		loadLanguage('ManageMembers');
-		loadTemplate('ManageMembers');
+		theme()->getTemplates()->loadLanguageFile('ManageMembers');
+		theme()->getTemplates()->load('ManageMembers');
 
 		$subActions = array(
 			'all' => array(
@@ -1094,7 +1094,7 @@ class ManageMembers_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// We also need to the login languages here - for emails.
-		loadLanguage('Login');
+		theme()->getTemplates()->loadLanguageFile('Login');
 
 		// Start off clean
 		$this->conditions = array();

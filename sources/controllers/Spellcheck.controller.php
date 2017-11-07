@@ -66,8 +66,8 @@ class Spellcheck_Controller extends Action_Controller
 		// A list of "words" we know about but pspell doesn't.
 		$this->_events->trigger('prepare_spellcheck', array('$this->known_words' => &$this->known_words));
 
-		loadLanguage('Post');
-		loadTemplate('Post');
+		theme()->getTemplates()->loadLanguageFile('Post');
+		theme()->getTemplates()->load('Post');
 
 		// Okay, this looks funny, but it actually fixes a weird bug.
 		ob_start();
@@ -106,7 +106,7 @@ class Spellcheck_Controller extends Action_Controller
 			);';
 
 		// And instruct the template system to just show the spellcheck sub template.
-		$this->_template_layers = Template_Layers::instance();
+		$this->_template_layers = theme()->getLayers();
 		$this->_template_layers->removeAll();
 		$context['sub_template'] = 'spellcheck';
 	}

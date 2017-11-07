@@ -119,8 +119,8 @@ class Register_Controller extends Action_Controller
 		if (isset($this->_req->post->show_contact))
 			redirectexit('action=register;sa=contact');
 
-		loadLanguage('Login');
-		loadTemplate('Register');
+		theme()->getTemplates()->loadLanguageFile('Login');
+		theme()->getTemplates()->load('Register');
 
 		// Do we need them to agree to the registration agreement, first?
 		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
@@ -131,7 +131,7 @@ class Register_Controller extends Action_Controller
 		if (!empty($modSettings['show_DisplayNameOnRegistration']))
 		{
 			$context['insert_display_name'] = true;
-			loadLanguage('Profile');
+			theme()->getTemplates()->loadLanguageFile('Profile');
 		}
 		else
 		{
@@ -163,7 +163,7 @@ class Register_Controller extends Action_Controller
 				// Are they saying they're under age, while under age registration is disabled?
 				if (empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
 				{
-					loadLanguage('Login');
+					theme()->getTemplates()->loadLanguageFile('Login');
 					throw new Elk_Exception('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
 				}
 			}
@@ -176,7 +176,7 @@ class Register_Controller extends Action_Controller
 		$context['sub_template'] = $current_step == 1 ? 'registration_agreement' : 'registration_form';
 		$context['page_title'] = $current_step == 1 ? $txt['registration_agreement'] : $txt['registration_form'];
 		loadJavascriptFile(array('register.js', 'mailcheck.min.js'));
-		addInlineJavascript('disableAutoComplete();
+		theme()->addInlineJavascript('disableAutoComplete();
 		$("input[type=email]").on("blur", function(event) {
 			$(this).mailcheck({
 				suggested: function(element, suggestion) {
@@ -211,7 +211,7 @@ class Register_Controller extends Action_Controller
 		if (empty($context['agreement']))
 		{
 			// No file found or a blank file, log the error so the admin knows there is a problem!
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			Errors::instance()->log_error($txt['registration_agreement_missing'], 'critical');
 			throw new Elk_Exception('registration_disabled', false);
 		}
@@ -295,7 +295,7 @@ class Register_Controller extends Action_Controller
 		// Are they under age, and under age users are banned?
 		if (!empty($modSettings['coppaAge']) && empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
 		{
-			loadLanguage('Login');
+			theme()->getTemplates()->loadLanguageFile('Login');
 			throw new Elk_Exception('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
 		}
 
@@ -306,7 +306,7 @@ class Register_Controller extends Action_Controller
 		// Failing that, check the time limit for excessive speed.
 		if (time() - $_SESSION['register']['timenow'] < $_SESSION['register']['limit'])
 		{
-			loadLanguage('Login');
+			theme()->getTemplates()->loadLanguageFile('Login');
 			$reg_errors->addError('too_quickly');
 		}
 
@@ -519,7 +519,7 @@ class Register_Controller extends Action_Controller
 		// Basic template variable setup.
 		elseif (!empty($modSettings['registration_method']))
 		{
-			loadTemplate('Register');
+			theme()->getTemplates()->load('Register');
 
 			$context += array(
 				'page_title' => $txt['register'],
@@ -705,8 +705,8 @@ class Register_Controller extends Action_Controller
 		if (!empty($modSettings['registration_fields']))
 		{
 			// Setup some important context.
-			loadLanguage('Profile');
-			loadTemplate('Profile');
+			theme()->getTemplates()->loadLanguageFile('Profile');
+			theme()->getTemplates()->load('Profile');
 
 			$context['user']['is_owner'] = true;
 
@@ -749,8 +749,8 @@ class Register_Controller extends Action_Controller
 		if (!empty($user_info['id']))
 			redirectexit();
 
-		loadLanguage('Login');
-		loadTemplate('Login');
+		theme()->getTemplates()->loadLanguageFile('Login');
+		theme()->getTemplates()->load('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 
 		// Need a user id to activate
@@ -944,7 +944,7 @@ class Register_Controller extends Action_Controller
 			}
 			elseif ($this->_row['validation_code'] === '')
 			{
-				loadLanguage('Profile');
+				theme()->getTemplates()->loadLanguageFile('Profile');
 				throw new Elk_Exception($txt['registration_not_approved'] . ' <a href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_row['member_name'] . '">' . $txt['here'] . '</a>.', false);
 			}
 
@@ -967,8 +967,8 @@ class Register_Controller extends Action_Controller
 	{
 		global $context, $modSettings, $txt;
 
-		loadLanguage('Login');
-		loadTemplate('Register');
+		theme()->getTemplates()->loadLanguageFile('Login');
+		theme()->getTemplates()->load('Register');
 
 		// No User ID??
 		if (!isset($this->_req->query->member))
@@ -993,7 +993,7 @@ class Register_Controller extends Action_Controller
 			{
 				// Shortcut for producing underlines.
 				$context['ul'] = '<span class="underline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>';
-				Template_Layers::instance()->removeAll();
+				theme()->getLayers()->removeAll();
 				$context['sub_template'] = 'coppa_form';
 				$context['page_title'] = replaceBasicActionUrl($txt['coppa_form_title']);
 				$context['coppa_body'] = str_replace(array('{PARENT_NAME}', '{CHILD_NAME}', '{USER_NAME}'), array($context['ul'], $context['ul'], $member['member_name']), replaceBasicActionUrl($txt['coppa_form_body']));
@@ -1055,12 +1055,12 @@ class Register_Controller extends Action_Controller
 		// Show a window that will play the verification code (play sound)
 		elseif (isset($this->_req->query->sound))
 		{
-			loadLanguage('Login');
-			loadTemplate('Register');
+			theme()->getTemplates()->loadLanguageFile('Login');
+			theme()->getTemplates()->load('Register');
 
 			$context['verification_sound_href'] = $scripturl . '?action=register;sa=verificationcode;rand=' . md5(mt_rand()) . ($verification_id ? ';vid=' . $verification_id : '') . ';format=.wav';
 			$context['sub_template'] = 'verification_sound';
-			Template_Layers::instance()->removeAll();
+			theme()->getLayers()->removeAll();
 
 			obExit();
 		}
@@ -1114,8 +1114,8 @@ class Register_Controller extends Action_Controller
 		if (!$user_info['is_guest'] || empty($modSettings['enable_contactform']) || $modSettings['enable_contactform'] === 'disabled')
 			redirectexit();
 
-		loadLanguage('Login');
-		loadTemplate('Register');
+		theme()->getTemplates()->loadLanguageFile('Login');
+		theme()->getTemplates()->load('Register');
 
 		// Submitted the contact form?
 		if (isset($this->_req->post->send))
@@ -1128,7 +1128,7 @@ class Register_Controller extends Action_Controller
 
 			// No errors, yet.
 			$context['errors'] = array();
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 
 			// Could they get the right send topic verification code?
 			require_once(SUBSDIR . '/VerificationControls.class.php');
@@ -1185,7 +1185,7 @@ class Register_Controller extends Action_Controller
 		else
 		{
 			loadJavascriptFile('mailcheck.min.js');
-			addInlineJavascript('disableAutoComplete();
+			theme()->addInlineJavascript('disableAutoComplete();
 			$("input[type=email]").on("blur", function(event) {
 				$(this).mailcheck({
 					suggested: function(element, suggestion) {
@@ -1216,7 +1216,7 @@ class Register_Controller extends Action_Controller
 		global $context;
 
 		// This is XML!
-		loadTemplate('Xml');
+		theme()->getTemplates()->load('Xml');
 		$context['sub_template'] = 'check_username';
 		$context['checked_username'] = isset($this->_req->query->username) ? un_htmlspecialchars($this->_req->query->username) : '';
 		$context['valid_username'] = true;

@@ -62,8 +62,8 @@ class Admin_Controller extends Action_Controller
 		validateSession();
 
 		// Load the language and templates....
-		loadLanguage('Admin');
-		loadTemplate('Admin');
+		theme()->getTemplates()->loadLanguageFile('Admin');
+		theme()->getTemplates()->load('Admin');
 		loadCSSFile('admin.css');
 		loadJavascriptFile('admin.js', array(), 'admin_script');
 
@@ -708,7 +708,7 @@ class Admin_Controller extends Action_Controller
 			'help' => '',
 			'description' => '',
 		);
-		loadLanguage('Who');
+		theme()->getTemplates()->loadLanguageFile('Who');
 		$context += prepareCreditsData();
 
 		// This makes it easier to get the latest news with your time format.

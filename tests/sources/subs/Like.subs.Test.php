@@ -48,6 +48,8 @@ class TestLikes extends PHPUnit_Framework_TestCase
 
 		// Keep id of the new topic.
 		$this->id_topic = $topicOptions['id'];
+		// Hey now, force a reload, we still rely on globals!
+		theme()->getTemplates()->loadLanguageFile('Errors', 'english', true, true);
 	}
 
 	/**

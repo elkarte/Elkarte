@@ -47,8 +47,8 @@ class ManageRegistration_Controller extends Action_Controller
 		global $context, $txt;
 
 		// Loading, always loading.
-		loadLanguage('Login');
-		loadTemplate('Register');
+		theme()->getTemplates()->loadLanguageFile('Login');
+		theme()->getTemplates()->load('Register');
 		loadJavascriptFile('register.js');
 
 		$subActions = array(
@@ -213,7 +213,7 @@ class ManageRegistration_Controller extends Action_Controller
 
 		// Basic stuff.
 		loadJavascriptFile('mailcheck.min.js');
-		addInlineJavascript('disableAutoComplete();
+		theme()->addInlineJavascript('disableAutoComplete();
 		$("input[type=email]").on("blur", function(event) {
 			$(this).mailcheck({
 				suggested: function(element, suggestion) {
@@ -384,7 +384,7 @@ class ManageRegistration_Controller extends Action_Controller
 		$context['settings_title'] = $txt['settings'];
 
 		// Define some javascript for COPPA.
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 			function checkCoppa()
 			{
 				var coppaDisabled = document.getElementById(\'coppaAge\').value == 0;

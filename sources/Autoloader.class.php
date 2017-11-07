@@ -440,7 +440,7 @@ class Elk_Autoloader
 					}
 				}
 				break;
-			// All the rest, like Browser_Detector, Template_Layers, Site_Dispatcher ...
+			// All the rest, like Browser_Detector, ElkArte\Theme\TemplateLayers, Site_Dispatcher ...
 			default:
 				$this->_file_name = $this->_givenname . $this->_surname;
 

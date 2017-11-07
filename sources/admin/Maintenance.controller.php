@@ -71,8 +71,8 @@ class Maintenance_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 
 		// Need something to talk about?
-		loadLanguage('Maintenance');
-		loadTemplate('Maintenance');
+		theme()->getTemplates()->loadLanguageFile('Maintenance');
+		theme()->getTemplates()->load('Maintenance');
 
 		// This uses admin tabs - as it should!
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -253,8 +253,8 @@ class Maintenance_Controller extends Action_Controller
 			$context['suggested_method'] = 'plain_text';
 		}
 
-		loadTemplate('Packages');
-		loadLanguage('Packages');
+		theme()->getTemplates()->load('Packages');
+		theme()->getTemplates()->loadLanguageFile('Packages');
 
 		// $context['package_ftp'] may be set action_backup_display when an error occur
 		if (!isset($context['package_ftp']))
@@ -392,7 +392,7 @@ class Maintenance_Controller extends Action_Controller
 		// @todo Hacky!
 		$txt['choose_board'] = $txt['maintain_old_all'];
 		$context['boards_check_all'] = true;
-		loadTemplate('GenericBoards');
+		theme()->getTemplates()->load('GenericBoards');
 
 		$context['topics_actions'] = array(
 			'pruneold' => array(
@@ -1086,7 +1086,7 @@ class Maintenance_Controller extends Action_Controller
 		// If we had an error...
 		if ($ftp->error !== false)
 		{
-			loadLanguage('Packages');
+			theme()->getTemplates()->loadLanguageFile('Packages');
 			$ftp_error = $ftp->last_message === null ? (isset($txt['package_ftp_' . $ftp->error]) ? $txt['package_ftp_' . $ftp->error] : '') : $ftp->last_message;
 
 			// Fill the boxes for a FTP connection with data from the previous attempt

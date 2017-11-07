@@ -64,7 +64,7 @@ abstract class Mention_BoardAccess_Abstract extends Mention_Message_Abstract
 		// Do the permissions checks and replace inappropriate messages
 		require_once(SUBSDIR . '/Boards.subs.php');
 		// @todo find a better place?
-		loadLanguage('Mentions');
+		theme()->getTemplates()->loadLanguageFile('Mentions');
 
 		$removed = false;
 		$accessibleBoards = accessibleBoards($boards);

@@ -662,7 +662,7 @@ class Database_MySQL extends Database_Abstract
 				else
 				{
 					if (!isset($txt['mysql_error_space']))
-						loadLanguage('Errors');
+						theme()->getTemplates()->loadLanguageFile('Errors');
 
 					$query_error .= !isset($txt['mysql_error_space']) ? ' - check database storage space.' : $txt['mysql_error_space'];
 				}

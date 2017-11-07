@@ -38,7 +38,7 @@ class Birthdayemails implements Scheduled_Task_Interface
 		$db = database();
 
 		// Need this in order to load the language files.
-		loadEssentialThemeData();
+		theme()->getTemplates()->loadEssentialThemeData();
 
 		// Going to need this to send the emails.
 		require_once(SUBSDIR . '/Mail.subs.php');
@@ -83,7 +83,7 @@ class Birthdayemails implements Scheduled_Task_Interface
 		foreach ($birthdays as $lang => $recps)
 		{
 			// We need to do some shuffling to make this work properly.
-			loadLanguage('EmailTemplates', $lang);
+			theme()->getTemplates()->loadLanguageFile('EmailTemplates', $lang);
 			$txt['emails']['happy_birthday']['subject'] = $txtBirthdayEmails[$greeting . '_subject'];
 			$txt['emails']['happy_birthday']['body'] = $txtBirthdayEmails[$greeting . '_body'];
 

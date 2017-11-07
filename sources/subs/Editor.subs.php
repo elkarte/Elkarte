@@ -34,7 +34,7 @@ function getMessageIcons($board_id)
 
 	if (empty($modSettings['messageIcons_enable']))
 	{
-		loadLanguage('Post');
+		theme()->getTemplates()->loadLanguageFile('Post');
 
 		$icons = array(
 			array('value' => 'xx', 'name' => $txt['standard']),
@@ -121,7 +121,7 @@ function create_control_richedit($editorOptions)
 	$db = database();
 
 	// Load the Post language file... for the moment at least.
-	loadLanguage('Post');
+	theme()->getTemplates()->loadLanguageFile('Post');
 
 	// Every control must have a ID!
 	assert(isset($editorOptions['id']));
@@ -141,14 +141,14 @@ function create_control_richedit($editorOptions)
 			$context['drafts_autosave_frequency'] = empty($modSettings['drafts_autosave_frequency']) ? 30000 : $modSettings['drafts_autosave_frequency'] * 1000;
 
 		// This really has some WYSIWYG stuff.
-		loadTemplate('GenericControls');
+		theme()->getTemplates()->load('GenericControls');
 		loadCSSFile('jquery.sceditor.css');
 		if (!empty($context['theme_variant']) && file_exists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/jquery.sceditor.elk' . $context['theme_variant'] . '.css'))
 			loadCSSFile($context['theme_variant'] . '/jquery.sceditor.elk' . $context['theme_variant'] . '.css');
 
 		// JS makes the editor go round
 		loadJavascriptFile(array('jquery.sceditor.bbcode.min.js', 'jquery.sceditor.elkarte.js', 'post.js', 'splittag.plugin.js', 'undo.plugin.min.js', 'dropAttachments.js'));
-		addJavascriptVar(array(
+		theme()->addJavascriptVar(array(
 			'post_box_name' => $editorOptions['id'],
 			'elk_smileys_url' => $settings['smileys_url'],
 			'bbc_quote_from' => $txt['quote_from'],
@@ -469,9 +469,9 @@ function create_control_richedit($editorOptions)
 
 	if (!empty($editorOptions['live_errors']))
 	{
-		loadLanguage('Errors');
+		theme()->getTemplates()->loadLanguageFile('Errors');
 
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 	error_txts[\'no_subject\'] = ' . JavaScriptEscape($txt['error_no_subject']) . ';
 	error_txts[\'no_message\'] = ' . JavaScriptEscape($txt['error_no_message']) . ';
 

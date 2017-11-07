@@ -33,8 +33,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		loadLanguage('Search');
-		loadTemplate('ManageSearch');
+		theme()->getTemplates()->loadLanguageFile('Search');
+		theme()->getTemplates()->load('ManageSearch');
 
 		$subActions = array(
 			'editspiders' => array($this, 'action_editspiders', 'permission' => 'admin_forum'),
@@ -132,7 +132,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 		$javascript_function .= '
 			}
 			disableFields();';
-		addInlineJavascript($javascript_function, true);
+		theme()->addInlineJavascript($javascript_function, true);
 
 		// Prepare the settings...
 		$settingsForm->prepare();
@@ -398,8 +398,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 		global $context, $txt, $scripturl, $modSettings;
 
 		// Load the template and language just incase.
-		loadLanguage('Search');
-		loadTemplate('ManageSearch');
+		theme()->getTemplates()->loadLanguageFile('Search');
+		theme()->getTemplates()->load('ManageSearch');
 
 		// Did they want to delete some or all entries?
 		if ((!empty($this->_req->post->delete_entries) && isset($this->_req->post->older)) || !empty($this->_req->post->removeAll))

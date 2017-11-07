@@ -28,7 +28,7 @@ class Post_Controller extends Action_Controller
 	/** @var null|ErrorContext The post (messages) errors object */
 	protected $_post_errors = null;
 
-	/** @var null|Template_Layers The template layers object */
+	/** @var null|ElkArte\Theme\TemplateLayers The template layers object */
 	protected $_template_layers = null;
 
 	/** @var array An array of attributes of the topic (if not new) */
@@ -49,7 +49,7 @@ class Post_Controller extends Action_Controller
 	public function pre_dispatch()
 	{
 		$this->_post_errors = ErrorContext::context('post', 1);
-		$this->_template_layers = Template_Layers::instance();
+		$this->_template_layers = theme()->getLayers();
 
 		$this->preparse = \BBC\PreparseCode::instance();
 
@@ -148,8 +148,8 @@ class Post_Controller extends Action_Controller
 	{
 		global $context;
 
-		loadLanguage('Post');
-		loadLanguage('Errors');
+		theme()->getTemplates()->loadLanguageFile('Post');
+		theme()->getTemplates()->loadLanguageFile('Errors');
 
 		$context['robot_no_index'] = true;
 		$this->_template_layers->add('postarea');
@@ -630,7 +630,7 @@ class Post_Controller extends Action_Controller
 		// Finally, load the template.
 		if (!isset($_REQUEST['xml']))
 		{
-			loadTemplate('Post');
+			theme()->getTemplates()->load('Post');
 			$context['sub_template'] = 'post_page';
 		}
 	}
@@ -688,7 +688,7 @@ class Post_Controller extends Action_Controller
 			return $this->action_post();
 
 		require_once(SUBSDIR . '/Boards.subs.php');
-		loadLanguage('Post');
+		theme()->getTemplates()->loadLanguageFile('Post');
 
 		// Trigger the prepare_save_post event
 		$this->_events->trigger('prepare_save_post', array('topic_info' => &$topic_info));
@@ -755,7 +755,7 @@ class Post_Controller extends Action_Controller
 			// If the number of replies has changed, if the setting is enabled, go back to action_post() - which handles the error.
 			if (empty($options['no_new_reply_warning']) && isset($_POST['last_msg']) && $topic_info['id_last_msg'] > $_POST['last_msg'])
 			{
-				addInlineJavascript('
+				theme()->addInlineJavascript('
 					$(function() {
 						$("html,body").scrollTop($(\'.category_header:visible:first\').offset().top);
 					});'
@@ -964,7 +964,7 @@ class Post_Controller extends Action_Controller
 		// Any mistakes?
 		if ($this->_post_errors->hasErrors())
 		{
-			addInlineJavascript('
+			theme()->addInlineJavascript('
 				$(function() {
 					$("html,body").scrollTop($(\'.category_header:visible:first\').offset().top);
 				});'
@@ -1153,7 +1153,7 @@ class Post_Controller extends Action_Controller
 	{
 		global $user_info, $context;
 
-		loadLanguage('Post');
+		theme()->getTemplates()->loadLanguageFile('Post');
 
 		// Where we going if we need to?
 		$context['post_box_name'] = isset($_GET['pb']) ? $_GET['pb'] : '';

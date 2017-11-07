@@ -1329,7 +1329,7 @@ function template_callback_question_answer_list()
 			<a href="#" onclick="addAnotherQuestion(); return false;">&#171; ', $txt['setup_verification_add_more'], ' &#187;</a>
 		</dt><dd></dd>';
 
-	addInlineJavascript('
+	theme()->addInlineJavascript('
 				document.getElementById(\'add_more_link_div\').style.display = \'block\';
 				var question_last_blank = ' . $count . ';
 				var txt_add_another_answer = ' . JavaScriptEscape('&#171; ' . $txt['setup_verification_add_more_answers'] . ' &#187;') . ';
@@ -1582,7 +1582,7 @@ function template_callback_external_search_engines()
 		</dt>
 		<dd></dd>';
 
-	addInlineJavascript('
+	theme()->addInlineJavascript('
 				document.getElementById(\'add_more_link_div\').style.display = \'block\';', true);
 }
 

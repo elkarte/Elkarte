@@ -20,6 +20,7 @@
 namespace ElkArte\Errors;
 
 use Elk_Exception;
+use AbstractModel;
 
 /**
  * Class to handle all forum errors and exceptions
@@ -148,6 +149,15 @@ class Errors extends \AbstractModel
 	/**
 	 * Log an error to the error log if the error logging is enabled.
 	 *
+	 * Available error types:
+	 * - generaal
+	 * - critical
+	 * - database
+	 * - undefined_vars
+	 * - template
+	 * - user
+	 * - deprecated
+	 *
 	 * - filename and line should be __FILE__ and __LINE__, respectively.
 	 *
 	 * Example use:
@@ -209,7 +219,7 @@ class Errors extends \AbstractModel
 	{
 		global $user_info, $language, $txt;
 
-		loadLanguage('Errors', $language);
+		theme()->getTemplates()->loadLanguageFile('Errors', $language);
 
 		$reload_lang_file = $language != $user_info['language'];
 
@@ -218,7 +228,7 @@ class Errors extends \AbstractModel
 
 		// Load the language file, only if it needs to be reloaded
 		if ($reload_lang_file)
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 
 		// Return the message to make things simpler.
 		return $error_message;
@@ -285,7 +295,7 @@ class Errors extends \AbstractModel
 
 		// Maybe they came from dlattach or similar?
 		if (ELK !== 'SSI' && empty($context['theme_loaded']))
-			loadTheme();
+			new \ElkArte\Themes\ThemeLoader();
 
 		// Don't bother indexing errors mate...
 		$context['robot_no_index'] = true;
@@ -297,8 +307,9 @@ class Errors extends \AbstractModel
 		$context['page_title'] = empty($context['page_title']) ? $context['error_title'] : $context['page_title'];
 
 		// Load the template and set the sub template.
-		loadTemplate('Errors');
+		theme()->getTemplates()->load('Errors');
 		$context['sub_template'] = 'fatal_error';
+		theme()->getLayers()->isError();
 
 		if (class_exists('Template_Layers'))
 			\Template_Layers::instance()->isError();
@@ -309,7 +320,7 @@ class Errors extends \AbstractModel
 			if (!empty($ssi_on_error_method) && $ssi_on_error_method !== true && is_callable($ssi_on_error_method))
 				call_user_func($ssi_on_error_method);
 			elseif (empty($ssi_on_error_method) || $ssi_on_error_method !== true)
-				loadSubTemplate('fatal_error');
+				theme()->getTemplates()->loadSubTemplate('fatal_error');
 
 			// No layers?
 			if (empty($ssi_on_error_method) || $ssi_on_error_method !== true)

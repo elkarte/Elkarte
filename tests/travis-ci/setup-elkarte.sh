@@ -42,15 +42,15 @@ then
     memcached -p 11212 -d
     memcached -p 11213 -d
 
-	# Phpunit and support
-	if [ "$SHORT_PHP" == "5.4" -o "$SHORT_PHP" == "5.3" ]
-	then
-		# need prior version of phpunit for php 5.5 and below
-		composer require phpunit/phpunit-selenium:~2.0 phpunit/dbunit:1.4.* phpunit/phpunit:~4.8
-	    composer install --no-interaction --no-suggest --no-dev
-	else
-	    composer install --no-interaction --no-suggest
-	fi
+    # Phpunit and support
+    if [ "$SHORT_PHP" == "5.5" ]
+    then
+        # need prior version of phpunit for php 5.5 and below
+        composer require phpunit/phpunit-selenium:~2.0 phpunit/dbunit:1.4.* phpunit/phpunit:~4.8
+        composer install --no-interaction --no-suggest --no-dev
+    else
+        composer install --no-interaction --no-suggest
+    fi
 
     # Copy phpunit_coverage.php into the webserver's document root directory.
     if [ "$COVERAGE" == "true" ]; then cp /var/www/vendor/phpunit/phpunit-selenium/PHPUnit/Extensions/SeleniumCommon/phpunit_coverage.php /var/www; fi

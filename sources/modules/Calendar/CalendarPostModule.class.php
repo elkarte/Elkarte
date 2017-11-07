@@ -63,7 +63,7 @@ class Calendar_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 */
 	public function prepare_post()
 	{
-		Template_Layers::instance()->addAfter('make_event', 'postarea');
+		theme()->getLayers()->addAfter('make_event', 'postarea');
 	}
 
 	/**

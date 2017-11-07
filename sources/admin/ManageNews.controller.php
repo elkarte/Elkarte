@@ -51,7 +51,7 @@ class ManageNews_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		loadTemplate('ManageNews');
+		theme()->getTemplates()->load('ManageNews');
 
 		// Format: 'sub-action' => array('function', 'permission')
 		$subActions = array(
@@ -402,7 +402,7 @@ class ManageNews_Controller extends Action_Controller
 		$this->action_mailingsend(true);
 
 		// We need a couple strings from the email template file
-		loadLanguage('EmailTemplates');
+		theme()->getTemplates()->loadLanguageFile('EmailTemplates');
 		require_once(SUBSDIR . '/News.subs.php');
 
 		// Get a list of all full banned users.  Use their Username and email to find them.
@@ -528,7 +528,7 @@ class ManageNews_Controller extends Action_Controller
 		if (isset($this->_req->query->success))
 		{
 			$context['sub_template'] = 'email_members_succeeded';
-			loadTemplate('ManageNews');
+			theme()->getTemplates()->load('ManageNews');
 			return null;
 		}
 
@@ -890,7 +890,7 @@ class ManageNews_Controller extends Action_Controller
 		$settingsForm->setConfigVars($this->_settings());
 
 		// Add some javascript at the bottom...
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 			document.getElementById("xmlnews_maxlen").disabled = !document.getElementById("xmlnews_enable").checked;
 			document.getElementById("xmlnews_limit").disabled = !document.getElementById("xmlnews_enable").checked;', true);
 

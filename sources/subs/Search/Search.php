@@ -270,7 +270,7 @@ class Search
 		if (!$this->_searchAPI || (!$this->_searchAPI->isValid()) || !matchPackageVersion($this->_forum_version, $this->_searchAPI->min_elk_version . '-' . $this->_searchAPI->version_compatible))
 		{
 			// Log the error.
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			\Errors::instance()->log_error(sprintf($txt['search_api_not_compatible'], $fqcn), 'critical');
 
 			$this->_searchAPI = new \ElkArte\Search\API\Standard;

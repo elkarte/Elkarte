@@ -183,7 +183,7 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
 		}
 	}
 
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 			var hook_name_header = document.getElementById(\'header_list_integration_hooks_hook_name\');
 			hook_name_header.innerHTML += ' . JavaScriptEscape('
 				<select onchange="window.location = \'' . $scripturl . '?action=admin;area=maintain;sa=hooks\' + (this.value ? \';filter=\' + this.value : \'\');">

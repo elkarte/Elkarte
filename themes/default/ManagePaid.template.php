@@ -335,7 +335,7 @@ function template_modify_user_subscription()
 			</div>
 		</form>';
 
-	addInlineJavascript('
+	theme()->addInlineJavascript('
 		var oAddMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
 			sSessionId: elk_session_id,

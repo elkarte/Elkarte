@@ -44,7 +44,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 	{
 		parent::frontPageOptions();
 
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 			$(\'#front_page\').on(\'change\', function() {
 				var $base = $(\'#message_index_frontpage\').parent();
 				if ($(this).val() == \'MessageIndex_Controller\')
@@ -147,7 +147,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 			redirectexit($board_info['redirect']);
 		}
 
-		loadTemplate('MessageIndex');
+		theme()->getTemplates()->load('MessageIndex');
 		loadJavascriptFile('topic.js');
 
 		$bbc = \BBC\ParserWrapper::instance();
@@ -155,7 +155,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 		$context['name'] = $board_info['name'];
 		$context['sub_template'] = 'topic_listing';
 		$context['description'] = $bbc->parseBoard($board_info['description']);
-		$template_layers = Template_Layers::instance();
+		$template_layers = theme()->getLayers();
 
 		// How many topics do we have in total?
 		$board_info['total_topics'] = allowedTo('approve_posts') ? $board_info['num_topics'] + $board_info['unapproved_topics'] : $board_info['num_topics'] + $board_info['unapproved_user_topics'];
@@ -454,7 +454,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 		$context['no_topic_listing'] = !empty($context['boards']) && empty($context['topics']) && !$context['can_post_new'];
 		$template_layers->add('topic_listing');
 
-		addJavascriptVar(array('notification_board_notice' => $context['is_marked_notify'] ? $txt['notification_disable_board'] : $txt['notification_enable_board']), true);
+		theme()->addJavascriptVar(array('notification_board_notice' => $context['is_marked_notify'] ? $txt['notification_disable_board'] : $txt['notification_enable_board']), true);
 
 		// Build the message index button array.
 		$context['normal_buttons'] = array(
@@ -462,7 +462,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 			'notify' => array('test' => 'can_mark_notify', 'text' => $context['is_marked_notify'] ? 'unnotify' : 'notify', 'image' => ($context['is_marked_notify'] ? 'un' : '') . 'notify.png', 'lang' => true, 'custom' => 'onclick="return notifyboardButton(this);"', 'url' => $scripturl . '?action=notifyboard;sa=' . ($context['is_marked_notify'] ? 'off' : 'on') . ';board=' . $context['current_board'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
 		);
 
-		addJavascriptVar(array(
+		theme()->addJavascriptVar(array(
 			'txt_mark_as_read_confirm' => $txt['mark_these_as_read_confirm']
 		), true);
 

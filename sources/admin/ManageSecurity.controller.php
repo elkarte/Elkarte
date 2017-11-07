@@ -34,8 +34,8 @@ class ManageSecurity_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		loadLanguage('Help');
-		loadLanguage('ManageSettings');
+		theme()->getTemplates()->loadLanguageFile('Help');
+		theme()->getTemplates()->loadLanguageFile('ManageSettings');
 
 		$subActions = array(
 			'general' => array($this, 'action_securitySettings_display', 'permission' => 'admin_forum'),
@@ -227,7 +227,7 @@ class ManageSecurity_Controller extends Action_Controller
 
 		// Some minor javascript for the guest post setting.
 		if ($modSettings['posts_require_captcha'])
-			addInlineJavascript('document.getElementById(\'guests_require_captcha\').disabled = true;', true);
+			theme()->addInlineJavascript('document.getElementById(\'guests_require_captcha\').disabled = true;', true);
 
 		$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=spam';
 		$context['settings_title'] = $txt['antispam_Settings'];
@@ -248,7 +248,7 @@ class ManageSecurity_Controller extends Action_Controller
 		$settingsForm->setConfigVars($this->_bbSettings());
 
 		// Our callback templates are here
-		loadTemplate('BadBehavior');
+		theme()->getTemplates()->load('BadBehavior');
 
 		// Any errors to display?
 		if ($context['invalid_badbehavior_httpbl_key'])
@@ -309,7 +309,7 @@ class ManageSecurity_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=badbehavior';
 
 		// Javascript vars for the "add more xyz" buttons in the callback forms
-		addJavascriptVar(array(
+		theme()->addJavascriptVar(array(
 			'sUrlParent' => '\'add_more_url_placeholder\'',
 			'oUrlOptionsdt' => '{name: \'badbehavior_url_wl_desc[]\', class: \'input_text\'}',
 			'oUrlOptionsdd' => '{name: \'badbehavior_url_wl[]\', class: \'input_text\'}',

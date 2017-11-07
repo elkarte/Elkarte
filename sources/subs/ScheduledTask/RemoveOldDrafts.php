@@ -42,7 +42,7 @@ class Remove_Old_Drafts implements Scheduled_Task_Interface
 		$drafts = array();
 
 		// We need this for language items
-		loadEssentialThemeData();
+		theme()->getTemplates()->loadEssentialThemeData();
 
 		// Find all of the old drafts
 		$request = $db->query('', '

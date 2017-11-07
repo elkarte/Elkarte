@@ -60,7 +60,7 @@ class CoreFeatures_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Admin.subs.php');
 
-		loadTemplate('CoreFeatures');
+		theme()->getTemplates()->load('CoreFeatures');
 
 		$core_features = $this->settings();
 
@@ -109,7 +109,7 @@ class CoreFeatures_Controller extends Action_Controller
 			'help' => '',
 			'description' => $txt['core_settings_desc'],
 		);
-		addJavascriptVar(array(
+		theme()->addJavascriptVar(array(
 			'token_name' => '',
 			'token_value' => '',
 			'feature_on_text' => $txt['core_settings_switch_off'],
@@ -359,8 +359,8 @@ class CoreFeatures_Controller extends Action_Controller
 		// You need to be an admin to edit settings!
 		isAllowedTo('admin_forum');
 
-		loadLanguage('Help');
-		loadLanguage('ManageSettings');
+		theme()->getTemplates()->loadLanguageFile('Help');
+		theme()->getTemplates()->loadLanguageFile('ManageSettings');
 
 		$context['sub_template'] = 'show_settings';
 

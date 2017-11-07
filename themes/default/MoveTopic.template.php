@@ -18,7 +18,7 @@
  */
 function template_MoveTopic_init()
 {
-	loadTemplate('GenericHelpers');
+	theme()->getTemplates()->load('GenericHelpers');
 }
 
 /**

@@ -15,7 +15,9 @@
  *
  */
 
-namespace Themes\DefaultTheme;
+namespace ElkArte\Themes\DefaultTheme;
+
+use ElkArte\Themes\Theme as BaseTheme;
 
 /**
  * Class Theme
@@ -24,8 +26,103 @@ namespace Themes\DefaultTheme;
  *
  * @package Themes\DefaultTheme
  */
-class Theme extends \Theme
+class Theme extends BaseTheme
 {
+	/**
+	 * Initialize the template... mainly little settings.
+	 *
+	 * @return array Theme settings
+	 */
+	public function getSettings()
+	{
+		return array(
+			/*
+			 * Specifies whether images from default theme shall be
+			 * fetched instead of the current theme when using
+			 * templates from the default theme.
+			 *
+			 * - if this is 'always', images from the default theme will be used.
+			 * - if this is 'defaults', images from the default theme will only be used with default templates.
+			 * - if this is 'never' or isn't set at all, images from the default theme will not be used.
+			 *
+			 * This doesn't apply when custom templatees are being
+			 * used; nor does it apply to the dafult theme.
+			 */
+			'use_default_images' => 'never',
+
+			/*
+			 * The version this template/theme is for. This should
+			 * be the version of the forum it was created for.
+			 */
+			'theme_version' => '1.0',
+
+			/*
+			 * Whether this theme requires the optional theme strings
+			 * file to be loaded. (ThemeStrings.[language].php)
+			 */
+			'require_theme_strings' => false,
+
+			/*
+			 * Specify the color variants. Each variant has its own
+			 * directory, where additional CSS files may be loaded.
+			 *
+			 * Example:
+			 * - index_light.css is loaded when index.css is needed.
+			 */
+			'theme_variants' => array(
+				'light',
+				'besocial',
+			),
+
+			/*
+			 * Provides avatars for use on various indexes.
+			 *
+			 * Possible values:
+			 * - 0 or not set, no avatars are available
+			 * - 1 avatar of the poster of the last message
+			 * - 2 avatar of the poster of the first message
+			 * - 3 both avatars
+			 *
+			 * Since grabbing the avatar requires some work, it is
+			 * better to set the variable to a sensible value
+			 * depending on the needs of the theme.
+			 */
+			'avatars_on_indexes' => 1,
+
+			/*
+			 * This is used in the main menus to create a number next
+			 * to the title of the menu to indicate the number of
+			 * unread messages, moderation reports, etc. You can
+			 * style each menu level indicator as desired.
+			 */
+			'menu_numeric_notice' => array(
+				// Top level menu entries
+				0 => ' <span class="pm_indicator">%1$s</span>',
+				// First dropdown
+				1 => ' <span>[<strong>%1$s</strong>]</span>',
+				// Second level dropdown
+				2 => ' <span>[<strong>%1$s</strong>]</span>',
+			),
+
+			// This slightly more complex array, instead, will deal with page indexes as frequently requested by Ant :P
+			// Oh no you don't. :D This slightly less complex array now has cleaner markup. :P
+			// @todo - God it's still ugly though. Can't we just have links where we need them, without all those spans?
+			// How do we get anchors only, where they will work? Spans and strong only where necessary?
+			'page_index_template' => array(
+				'base_link' => '<li class="linavPages"><a class="navPages" href="{base_link}" role="menuitem">%2$s</a></li>',
+				'previous_page' => '<span class="previous_page" role="menuitem">{prev_txt}</span>',
+				'current_page' => '<li class="linavPages"><strong class="current_page" role="menuitem">%1$s</strong></li>',
+				'next_page' => '<span class="next_page" role="menuitem">{next_txt}</span>',
+				'expand_pages' => '<li class="linavPages expand_pages" role="menuitem" {custom}> <a href="#">...</a> </li>',
+				'all' => '<span class="linavPages all_pages" role="menuitem">{all_txt}</span>',
+			),
+
+			// @todo find a better place if we are going to create a notifications template
+			'mentions' => array(
+				'mentioner_template' => '<a href="{mem_url}" class="mentionavatar">{avatar_img}{mem_name}</a>',
+			)
+		);
+	}
 	/**
 	 * This is the only template included in the sources.
 	 */
@@ -76,9 +173,9 @@ class Theme extends \Theme
 			}
 		}
 
-		foreach ($this->layers->prepareContext() as $layer)
+		foreach ($this->getLayers()->prepareContext() as $layer)
 		{
-			loadSubTemplate($layer . '_above', 'ignore');
+			$this->getTemplates()->loadSubTemplate($layer . '_above', 'ignore');
 		}
 
 		if (isset($settings['use_default_images']) && $settings['use_default_images'] === 'defaults' && isset($settings['default_template']))
@@ -151,9 +248,9 @@ class Theme extends \Theme
 			$settings['theme_dir'] = $settings['actual_theme_dir'];
 		}
 
-		foreach ($this->layers->reverseLayers() as $layer)
+		foreach ($this->getLayers()->reverseLayers() as $layer)
 		{
-			$this->templates->loadSubTemplate($layer . '_below', 'ignore');
+			$this->getTemplates()->loadSubTemplate($layer . '_below', 'ignore');
 		}
 	}
 
@@ -483,7 +580,7 @@ class Theme extends \Theme
 			loadCSSFile('prettify.css');
 			loadJavascriptFile('prettify.min.js', array('defer' => true));
 
-			addInlineJavascript('
+			$this->addInlineJavascript('
 			$(function() {
 				prettyPrint();
 			});', true);
@@ -499,7 +596,7 @@ class Theme extends \Theme
 
 		if (!empty($modSettings['enableVideoEmbeding']))
 		{
-			addInlineJavascript('
+			$this->addInlineJavascript('
 			var oEmbedtext = ({
 				preview_image : ' . JavaScriptEscape($txt['preview_image']) . ',
 				ctp_video : ' . JavaScriptEscape($txt['ctp_video']) . ',
@@ -541,7 +638,7 @@ class Theme extends \Theme
 			$type = empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time() ? 'task' : 'mailq';
 			$ts = $type === 'mailq' ? $modSettings['mail_next_send'] : $modSettings['next_task_time'];
 
-			addInlineJavascript('
+			$this->addInlineJavascript('
 		function elkAutoTask()
 		{
 			var tempImage = new Image();
@@ -561,7 +658,7 @@ class Theme extends \Theme
 		// Relative times?
 		if (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2)
 		{
-			addInlineJavascript('
+			$this->addInlineJavascript('
 			var oRttime = ({
 				referenceTime : ' . forum_time() * 1000 . ',
 				now : ' . JavaScriptEscape($txt['rt_now']) . ',
@@ -703,7 +800,7 @@ class Theme extends \Theme
 		// Add the PM popup here instead. Theme authors can still override it simply by editing/removing the 'fPmPopup' in the array.
 		if ($context['show_pm_popup'])
 		{
-			addInlineJavascript('
+			$this->addInlineJavascript('
 			$(function() {
 				new smc_Popup({
 					heading: ' . JavaScriptEscape($txt['show_personal_messages_heading']) . ',
@@ -732,9 +829,9 @@ class Theme extends \Theme
 
 		if (empty($settings['theme_version']))
 		{
-			addJavascriptVar(array('elk_scripturl' => '\'' . $scripturl . '\''));
+			$this->addJavascriptVar(array('elk_scripturl' => '\'' . $scripturl . '\''));
 		}
-		addJavascriptVar(array('elk_forum_action' => '\'' . substr($modSettings['default_forum_action'], 1, -1) . '\''));
+		$this->addJavascriptVar(array('elk_forum_action' => '\'' . substr($modSettings['default_forum_action'], 1, -1) . '\''));
 
 		if (!isset($context['page_title']))
 		{
@@ -1055,19 +1152,15 @@ class Theme extends \Theme
 		// Output is fully XML
 		if (isset($_REQUEST['xml']))
 		{
-			loadLanguage('index+Addons');
-
-			// @todo added because some $settings in template_init are necessary even in
-			// xml mode. Maybe move template_init to a settings file?
-			$this->templates->load('index');
-			$this->templates->load('Xml');
-			$this->layers->removeAll();
+			$this->getTemplates()->loadLanguageFile('index+Addons');
+			$this->getTemplates()->load('Xml');
+			$this->getLayers()->removeAll();
 		}
 		// These actions don't require the index template at all.
 		elseif (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $simpleActions))
 		{
-			loadLanguage('index+Addons');
-			$this->layers->removeAll();
+			$this->getTemplates()->loadLanguageFile('index+Addons');
+			$this->getLayers()->removeAll();
 		}
 		else
 		{
@@ -1083,11 +1176,11 @@ class Theme extends \Theme
 
 			// Load each template...
 			foreach ($templates as $template)
-				$this->templates->load($template);
+				$this->getTemplates()->load($template);
 
 			// ...and attempt to load their associated language files.
 			$required_files = implode('+', array_merge($templates, array('Addons')));
-			loadLanguage($required_files, '', false);
+			$this->getTemplates()->loadLanguageFile($required_files, '', false);
 
 			// Custom template layers?
 			if (isset($settings['theme_layers']))
@@ -1099,7 +1192,7 @@ class Theme extends \Theme
 				$layers = array('html', 'body');
 			}
 
-			$template_layers = \Template_Layers::instance(true);
+			$template_layers = \ElkArte\Themes\TemplateLayers::instance(true);
 			foreach ($layers as $layer)
 			{
 				$template_layers->addBegin($layer);

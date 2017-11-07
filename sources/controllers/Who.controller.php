@@ -59,8 +59,8 @@ class Who_Controller extends Action_Controller
 			throw new Elk_Exception('who_off', false);
 
 		// Load the 'Who' template.
-		loadTemplate('Who');
-		loadLanguage('Who');
+		theme()->getTemplates()->load('Who');
+		theme()->getTemplates()->loadLanguageFile('Who');
 
 		// Sort out... the column sorting.
 		$sort_methods = array(
@@ -148,7 +148,7 @@ class Who_Controller extends Action_Controller
 		$context['page_index'] = constructPageIndex($scripturl . '?action=who;sort=' . $context['sort_by'] . ($context['sort_direction'] === 'up' ? ';asc' : '') . ';show=' . $context['show_by'], $start, $totalMembers, $modSettings['defaultMaxMembers']);
 		$context['start'] = $start;
 		$context['sub_template'] = 'whos_online';
-		Template_Layers::instance()->add('whos_selection');
+		theme()->getLayers()->add('whos_selection');
 
 		// Look for people online, provided they don't mind if you see they are.
 		$members = onlineMembers($conditions, $sort_method, $context['sort_direction'], $context['start']);
@@ -260,11 +260,11 @@ class Who_Controller extends Action_Controller
 		global $context, $txt;
 
 		require_once(SUBSDIR . '/Who.subs.php');
-		loadLanguage('Who');
+		theme()->getTemplates()->loadLanguageFile('Who');
 
 		$context += prepareCreditsData();
 
-		loadTemplate('Who');
+		theme()->getTemplates()->load('Who');
 		$context['sub_template'] = 'credits';
 		$context['robot_no_index'] = true;
 		$context['page_title'] = $txt['credits'];

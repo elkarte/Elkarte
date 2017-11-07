@@ -40,8 +40,8 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		loadLanguage('ManageScheduledTasks');
-		loadTemplate('ManageScheduledTasks');
+		theme()->getTemplates()->loadLanguageFile('ManageScheduledTasks');
+		theme()->getTemplates()->load('ManageScheduledTasks');
 
 		$subActions = array(
 			'taskedit' => array($this, 'action_edit', 'permission' => 'admin_forum'),
@@ -335,7 +335,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
 		// Lets load the language just in case we are outside the Scheduled area.
-		loadLanguage('ManageScheduledTasks');
+		theme()->getTemplates()->loadLanguageFile('ManageScheduledTasks');
 
 		// Empty the log?
 		if (!empty($this->_req->post->removeAll))

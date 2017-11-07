@@ -56,8 +56,8 @@ class Reports_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 
 		// Let's get our things running...
-		loadTemplate('Reports');
-		loadLanguage('Reports');
+		theme()->getTemplates()->load('Reports');
+		theme()->getTemplates()->loadLanguageFile('Reports');
 
 		$context['page_title'] = $txt['generate_reports'];
 
@@ -120,7 +120,7 @@ class Reports_Controller extends Action_Controller
 			// Are we disabling the other layers - print friendly for example?
 			if ($reportTemplates[$set_template]['layers'] !== null)
 			{
-				$template_layers = Template_Layers::instance();
+				$template_layers = theme()->getLayers();
 				$template_layers->removeAll();
 				foreach ($reportTemplates[$set_template]['layers'] as $layer)
 					$template_layers->add($layer);
@@ -177,7 +177,7 @@ class Reports_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		require_once(SUBSDIR . '/Reports.subs.php');
 
-		loadLanguage('ManagePermissions');
+		theme()->getTemplates()->loadLanguageFile('ManagePermissions');
 		loadPermissionProfiles();
 
 		// Get every moderator.

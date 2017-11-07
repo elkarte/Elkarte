@@ -495,7 +495,7 @@ function loadBoard()
 		else
 		{
 			loadPermissions();
-			loadTheme();
+			new ElkArte\Themes\ThemeLoader();
 			throw new Elk_Exception('topic_gone', false);
 		}
 	}
@@ -687,7 +687,7 @@ function loadBoard()
 	{
 		// The permissions and theme need loading, just to make sure everything goes smoothly.
 		loadPermissions();
-		loadTheme();
+		new ElkArte\Themes\ThemeLoader();
 
 		$_GET['board'] = '';
 		$_GET['topic'] = '';
@@ -712,7 +712,7 @@ function loadBoard()
 		}
 		elseif ($user_info['is_guest'])
 		{
-			loadLanguage('Errors');
+			theme()->getTemplates()->loadLanguageFile('Errors');
 			is_not_guest($txt['topic_gone']);
 		}
 		else
@@ -785,7 +785,7 @@ function loadPermissions()
 	{
 		// Get the general permissions.
 		$request = $db->query('', '
-			SELECT 
+			SELECT
 				permission, add_deny
 			FROM {db_prefix}permissions
 			WHERE id_group IN ({array_int:member_groups})
@@ -816,7 +816,7 @@ function loadPermissions()
 			throw new Elk_Exception('no_board');
 
 		$request = $db->query('', '
-			SELECT 
+			SELECT
 				permission, add_deny
 			FROM {db_prefix}board_permissions
 			WHERE (id_group IN ({array_int:member_groups})
@@ -1216,205 +1216,6 @@ function detectBrowser()
 }
 
 /**
- * Get the id of a theme
- *
- * @param int $id_theme
- * @return int
- */
-function getThemeId($id_theme = 0)
-{
-	global $modSettings, $user_info, $board_info, $ssi_theme;
-
-	// The theme was specified by parameter.
-	if (!empty($id_theme))
-		$id_theme = (int) $id_theme;
-	// The theme was specified by REQUEST.
-	elseif (!empty($_REQUEST['theme']) && (!empty($modSettings['theme_allow']) || allowedTo('admin_forum')))
-	{
-		$id_theme = (int) $_REQUEST['theme'];
-		$_SESSION['id_theme'] = $id_theme;
-	}
-	// The theme was specified by REQUEST... previously.
-	elseif (!empty($_SESSION['id_theme']) && (!empty($modSettings['theme_allow']) || allowedTo('admin_forum')))
-		$id_theme = (int) $_SESSION['id_theme'];
-	// The theme is just the user's choice. (might use ?board=1;theme=0 to force board theme.)
-	elseif (!empty($user_info['theme']) && !isset($_REQUEST['theme']) && (!empty($modSettings['theme_allow']) || allowedTo('admin_forum')))
-		$id_theme = $user_info['theme'];
-	// The theme was specified by the board.
-	elseif (!empty($board_info['theme']))
-		$id_theme = $board_info['theme'];
-	// The theme is the forum's default.
-	else
-		$id_theme = $modSettings['theme_guests'];
-
-	call_integration_hook('integrate_customize_theme_id', array(&$id_theme));
-
-	// Verify the id_theme... no foul play.
-	// Always allow the board specific theme, if they are overriding.
-	if (!empty($board_info['theme']) && $board_info['override_theme'])
-		$id_theme = $board_info['theme'];
-	// If they have specified a particular theme to use with SSI allow it to be used.
-	elseif (!empty($ssi_theme) && $id_theme == $ssi_theme)
-		$id_theme = (int) $id_theme;
-	elseif (!empty($modSettings['knownThemes']) && !allowedTo('admin_forum'))
-	{
-		$themes = explode(',', $modSettings['knownThemes']);
-		if (!in_array($id_theme, $themes))
-			$id_theme = $modSettings['theme_guests'];
-		else
-			$id_theme = (int) $id_theme;
-	}
-	else
-		$id_theme = (int) $id_theme;
-
-	return $id_theme;
-}
-
-/**
- * Load in the theme variables for a given theme / member combination
- *
- * @param int $id_theme
- * @param int $member
- *
- * @return array
- */
-function getThemeData($id_theme, $member)
-{
-	global $modSettings, $boardurl;
-
-	$cache = Cache::instance();
-
-	// Do we already have this members theme data and specific options loaded (for aggressive cache settings)
-	$temp = array();
-	if ($cache->levelHigherThan(1) && $cache->getVar($temp, 'theme_settings-' . $id_theme . ':' . $member, 60) && time() - 60 > $modSettings['settings_updated'])
-	{
-		$themeData = $temp;
-		$flag = true;
-	}
-	// Or do we just have the system wide theme settings cached
-	elseif ($cache->getVar($temp, 'theme_settings-' . $id_theme, 90) && time() - 60 > $modSettings['settings_updated'])
-		$themeData = $temp + array($member => array());
-	// Nothing at all then
-	else
-		$themeData = array(-1 => array(), 0 => array(), $member => array());
-
-	if (empty($flag))
-	{
-		$db = database();
-
-		// Load variables from the current or default theme, global or this user's.
-		$result = $db->query('', '
-			SELECT variable, value, id_member, id_theme
-			FROM {db_prefix}themes
-			WHERE id_member' . (empty($themeData[0]) ? ' IN (-1, 0, {int:id_member})' : ' = {int:id_member}') . '
-				AND id_theme' . ($id_theme == 1 ? ' = {int:id_theme}' : ' IN ({int:id_theme}, 1)'),
-			array(
-				'id_theme' => $id_theme,
-				'id_member' => $member,
-			)
-		);
-
-		$immutable_theme_data = array('actual_theme_url', 'actual_images_url', 'base_theme_dir', 'base_theme_url', 'default_images_url', 'default_theme_dir', 'default_theme_url', 'default_template', 'images_url', 'number_recent_posts', 'smiley_sets_default', 'theme_dir', 'theme_id', 'theme_layers', 'theme_templates', 'theme_url');
-
-		// Pick between $settings and $options depending on whose data it is.
-		while ($row = $db->fetch_assoc($result))
-		{
-			// There are just things we shouldn't be able to change as members.
-			if ($row['id_member'] != 0 && in_array($row['variable'], $immutable_theme_data))
-				continue;
-
-			// If this is the theme_dir of the default theme, store it.
-			if (in_array($row['variable'], array('theme_dir', 'theme_url', 'images_url')) && $row['id_theme'] == '1' && empty($row['id_member']))
-				$themeData[0]['default_' . $row['variable']] = $row['value'];
-
-			// If this isn't set yet, is a theme option, or is not the default theme..
-			if (!isset($themeData[$row['id_member']][$row['variable']]) || $row['id_theme'] != '1')
-				$themeData[$row['id_member']][$row['variable']] = substr($row['variable'], 0, 5) == 'show_' ? $row['value'] == '1' : $row['value'];
-		}
-		$db->free_result($result);
-
-		if (file_exists($themeData[0]['default_theme_dir'] . '/cache') && is_writable($themeData[0]['default_theme_dir'] . '/cache'))
-		{
-			$themeData[0]['default_theme_cache_dir'] = $themeData[0]['default_theme_dir'] . '/cache';
-			$themeData[0]['default_theme_cache_url'] = $themeData[0]['default_theme_url'] . '/cache';
-		}
-		else
-		{
-			$themeData[0]['default_theme_cache_dir'] = CACHEDIR;
-			$themeData[0]['default_theme_cache_url'] = $boardurl . '/cache';
-		}
-
-		// Set the defaults if the user has not chosen on their own
-		if (!empty($themeData[-1]))
-		{
-			foreach ($themeData[-1] as $k => $v)
-			{
-				if (!isset($themeData[$member][$k]))
-					$themeData[$member][$k] = $v;
-			}
-		}
-
-		// If being aggressive we save the site wide and member theme settings
-		if ($cache->levelHigherThan(1))
-			$cache->put('theme_settings-' . $id_theme . ':' . $member, $themeData, 60);
-		// Only if we didn't already load that part of the cache...
-		elseif (!isset($temp))
-			$cache->put('theme_settings-' . $id_theme, array(-1 => $themeData[-1], 0 => $themeData[0]), 90);
-	}
-
-	return $themeData;
-}
-
-/**
- * Initialize a theme for use
- *
- * @param int $id_theme
- */
-function initTheme($id_theme = 0)
-{
-	global $user_info, $settings, $options, $context;
-
-	// Validate / fetch the themes id
-	$id_theme = getThemeId($id_theme);
-
-	// Need to know who we are loading the theme for
-	$member = empty($user_info['id']) ? -1 : $user_info['id'];
-
-	// Load in the theme variables for them
-	$themeData = getThemeData($id_theme, $member);
-	$settings = $themeData[0];
-	$options = $themeData[$member];
-
-	$settings['theme_id'] = $id_theme;
-	$settings['actual_theme_url'] = $settings['theme_url'];
-	$settings['actual_images_url'] = $settings['images_url'];
-	$settings['actual_theme_dir'] = $settings['theme_dir'];
-
-	// Reload the templates
-	Templates::instance()->reloadDirectories($settings);
-
-	// Setup the default theme file. In the future, this won't exist and themes will just have to extend it if they want
-	require_once($settings['default_theme_dir'] . '/Theme.php');
-	$default_theme_instance = new \Themes\DefaultTheme\Theme(1);
-
-	// Check if there is a Theme file
-	if ($id_theme != 1 && !empty($settings['theme_dir']) && file_exists($settings['theme_dir'] . '/Theme.php'))
-	{
-		require_once($settings['theme_dir'] . '/Theme.php');
-
-		$class = '\\Themes\\' . basename(ucfirst($settings['theme_dir'])) . 'Theme\\Theme';
-
-		$theme = new $class($id_theme);
-
-		$context['theme_instance'] = $theme;
-	}
-	else
-	{
-		$context['theme_instance'] = $default_theme_instance;
-	}
-}
-
-/**
  * Load a theme, by ID.
  *
  * What it does:
@@ -1429,289 +1230,14 @@ function initTheme($id_theme = 0)
  * - loads default JS variables for use in every theme
  * - loads default JS scripts for use in every theme
  *
- * @event integrate_init_theme used to call initialization theme integration functions and
- * change / update $settings
- * @event integrate_theme_include allows to include files at this point
- * @event integrate_load_theme calls functions after theme is loaded
+ * @deprecated since 2.0; use the theme object
+ *
  * @param int $id_theme = 0
  * @param bool $initialize = true
  */
 function loadTheme($id_theme = 0, $initialize = true)
 {
-	global $user_info, $user_settings;
-	global $txt, $scripturl, $mbname, $modSettings;
-	global $context, $settings, $options;
-
-	initTheme($id_theme);
-
-	if (!$initialize)
-		return;
-
-	loadThemeUrls();
-
-	loadUserContext();
-
-	// Set up some additional interface preference context
-	if (!empty($options['admin_preferences']))
-	{
-		$context['admin_preferences'] = serializeToJson($options['admin_preferences'], function ($array_form) {
-			global $context;
-
-			$context['admin_preferences'] = $array_form;
-			require_once(SUBSDIR . '/Admin.subs.php');
-			updateAdminPreferences();
-		});
-	}
-	else
-	{
-		$context['admin_preferences'] = array();
-	}
-
-	if (!$user_info['is_guest'])
-	{
-		if (!empty($options['minmax_preferences']))
-		{
-			$context['minmax_preferences'] = serializeToJson($options['minmax_preferences'], function ($array_form) {
-				global $settings, $user_info;
-
-				// Update the option.
-				require_once(SUBSDIR . '/Themes.subs.php');
-				updateThemeOptions(array($settings['theme_id'], $user_info['id'], 'minmax_preferences', json_encode($array_form)));
-			});
-		}
-		else
-		{
-			$context['minmax_preferences'] = array();
-		}
-	}
-	// Guest may have collapsed the header, check the cookie to prevent collapse jumping
-	elseif ($user_info['is_guest'] && isset($_COOKIE['upshrink']))
-		$context['minmax_preferences'] = array('upshrink' => $_COOKIE['upshrink']);
-
-	// Load the basic layers
-	theme()->loadDefaultLayers();
-
-	// @todo when are these set before loadTheme(0, true)?
-	loadThemeContext();
-
-	// @todo These really don't belong in loadTheme() since they are more general than the theme.
-	$context['session_var'] = $_SESSION['session_var'];
-	$context['session_id'] = $_SESSION['session_value'];
-	$context['forum_name'] = $mbname;
-	$context['forum_name_html_safe'] = $context['forum_name'];
-	$context['current_action'] = isset($_REQUEST['action']) ? $_REQUEST['action'] : null;
-	$context['current_subaction'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : null;
-
-	// Set some permission related settings.
-	if ($user_info['is_guest'] && !empty($modSettings['enableVBStyleLogin']))
-	{
-		$context['show_login_bar'] = true;
-		$context['theme_header_callbacks'][] = 'login_bar';
-		loadJavascriptFile('sha256.js', array('defer' => true));
-	}
-
-	// This determines the server... not used in many places, except for login fixing.
-	detectServer();
-
-	// Detect the browser. This is separated out because it's also used in attachment downloads
-	detectBrowser();
-
-	// Set the top level linktree up.
-	array_unshift($context['linktree'], array(
-		'url' => $scripturl,
-		'name' => $context['forum_name']
-	));
-
-	// Just some mobile-friendly settings
-	if ($context['browser_body_id'] == 'mobile')
-	{
-		// Disable the preview text.
-		$modSettings['message_index_preview'] = 0;
-		// Force the usage of click menu instead of a hover menu.
-		$options['use_click_menu'] = 1;
-		// No space left for a sidebar
-		$options['use_sidebar_menu'] = false;
-		// Disable the search dropdown.
-		$modSettings['search_dropdown'] = false;
-	}
-
-	if (!isset($txt))
-		$txt = array();
-
-	// Defaults in case of odd things
-	$settings['avatars_on_indexes'] = 0;
-
-	// Initialize the theme.
-	if (function_exists('template_init'))
-		$settings = array_merge($settings, template_init());
-
-	// Call initialization theme integration functions.
-	call_integration_hook('integrate_init_theme', array($id_theme, &$settings));
-
-	// Guests may still need a name.
-	if ($context['user']['is_guest'] && empty($context['user']['name']))
-		$context['user']['name'] = $txt['guest_title'];
-
-	// Any theme-related strings that need to be loaded?
-	if (!empty($settings['require_theme_strings']))
-		loadLanguage('ThemeStrings', '', false);
-
-	theme()->loadSupportCSS();
-
-	// We allow theme variants, because we're cool.
-	if (!empty($settings['theme_variants']))
-	{
-		theme()->loadThemeVariant();
-	}
-
-	// A bit lonely maybe, though I think it should be set up *after* the theme variants detection
-	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] . 'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
-	$context['right_to_left'] = !empty($txt['lang_rtl']);
-
-	// Allow overriding the board wide time/number formats.
-	if (empty($user_settings['time_format']) && !empty($txt['time_format']))
-		$user_info['time_format'] = $txt['time_format'];
-
-	if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'always')
-	{
-		$settings['theme_url'] = $settings['default_theme_url'];
-		$settings['images_url'] = $settings['default_images_url'];
-		$settings['theme_dir'] = $settings['default_theme_dir'];
-	}
-
-	// Make a special URL for the language.
-	$settings['lang_images_url'] = $settings['images_url'] . '/' . (!empty($txt['image_lang']) ? $txt['image_lang'] : $user_info['language']);
-
-	// RTL languages require an additional stylesheet.
-	if ($context['right_to_left'])
-		loadCSSFile('rtl.css');
-
-	if (!empty($context['theme_variant']) && $context['right_to_left'])
-		loadCSSFile($context['theme_variant'] . '/rtl' . $context['theme_variant'] . '.css');
-
-	// This allows us to change the way things look for the admin.
-	$context['admin_features'] = isset($modSettings['admin_features']) ? explode(',', $modSettings['admin_features']) : array('cd,cp,k,w,rg,ml,pm');
-
-	if (!empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']))
-		$context['newsfeed_urls'] = array(
-			'rss' => $scripturl . '?action=.xml;type=rss2;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5),
-			'atom' => $scripturl . '?action=.xml;type=atom;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5)
-		);
-
-	theme()->loadThemeJavascript();
-
-	Hooks::instance()->newPath(array('$themedir' => $settings['theme_dir']));
-
-	// Any files to include at this point?
-	call_integration_include_hook('integrate_theme_include');
-
-	// Call load theme integration functions.
-	call_integration_hook('integrate_load_theme');
-
-	// We are ready to go.
-	$context['theme_loaded'] = true;
-}
-
-/**
- * Detects url and checks against expected boardurl
- *
- * Attempts to correct improper URL's
- */
-function loadThemeUrls()
-{
-	global $scripturl, $boardurl, $modSettings;
-
-	// Check to see if they're accessing it from the wrong place.
-	if (isset($_SERVER['HTTP_HOST']) || isset($_SERVER['SERVER_NAME']))
-	{
-		$detected_url = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 'https://' : 'http://';
-		$detected_url .= empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST'];
-		$temp = preg_replace('~/' . basename($scripturl) . '(/.+)?$~', '', strtr(dirname($_SERVER['PHP_SELF']), '\\', '/'));
-		if ($temp != '/')
-			$detected_url .= $temp;
-	}
-
-	if (isset($detected_url) && $detected_url != $boardurl)
-	{
-		// Try #1 - check if it's in a list of alias addresses.
-		if (!empty($modSettings['forum_alias_urls']))
-		{
-			$aliases = explode(',', $modSettings['forum_alias_urls']);
-			foreach ($aliases as $alias)
-			{
-				// Rip off all the boring parts, spaces, etc.
-				if ($detected_url == trim($alias) || strtr($detected_url, array('http://' => '', 'https://' => '')) == trim($alias))
-					$do_fix = true;
-			}
-		}
-
-		// Hmm... check #2 - is it just different by a www?  Send them to the correct place!!
-		if (empty($do_fix) && strtr($detected_url, array('://' => '://www.')) == $boardurl && (empty($_GET) || count($_GET) == 1) && ELK != 'SSI')
-		{
-			// Okay, this seems weird, but we don't want an endless loop - this will make $_GET not empty ;).
-			if (empty($_GET))
-				redirectexit('wwwRedirect');
-			else
-			{
-				if (key($_GET) !== 'wwwRedirect')
-					redirectexit('wwwRedirect;' . key($_GET) . '=' . current($_GET));
-			}
-		}
-
-		// #3 is just a check for SSL...
-		if (strtr($detected_url, array('https://' => 'http://')) == $boardurl)
-			$do_fix = true;
-
-		// Okay, #4 - perhaps it's an IP address?  We're gonna want to use that one, then. (assuming it's the IP or something...)
-		if (!empty($do_fix) || preg_match('~^http[s]?://(?:[\d\.:]+|\[[\d:]+\](?::\d+)?)(?:$|/)~', $detected_url) == 1)
-		{
-			fixThemeUrls($detected_url);
-		}
-	}
-}
-
-/**
- * Loads various theme related settings into context and sets system wide theme defaults
- */
-function loadThemeContext()
-{
-	global $context, $settings, $modSettings, $txt;
-
-	// Some basic information...
-	$init = array(
-		'html_headers' => '',
-		'links' => array(),
-		'css_files' => array(),
-		'javascript_files' => array(),
-		'css_rules' => array(),
-		'javascript_inline' => array('standard' => array(), 'defer' => array()),
-		'javascript_vars' => array(),
-	);
-	foreach ($init as $area => $value)
-	{
-		$context[$area] = isset($context[$area]) ? $context[$area] : $value;
-	}
-
-	// Set a couple of bits for the template.
-	$context['right_to_left'] = !empty($txt['lang_rtl']);
-	$context['tabindex'] = 1;
-
-	$context['theme_variant'] = '';
-	$context['theme_variant_url'] = '';
-
-	$context['menu_separator'] = !empty($settings['use_image_buttons']) ? ' ' : ' | ';
-	$context['can_register'] = empty($modSettings['registration_method']) || $modSettings['registration_method'] != 3;
-
-	foreach (array('theme_header', 'upper_content') as $call)
-	{
-		if (!isset($context[$call . '_callbacks']))
-		{
-			$context[$call . '_callbacks'] = array();
-		}
-	}
-
-	// This allows sticking some HTML on the page output - useful for controls.
-	$context['insert_after_template'] = '';
+	new ElkArte\Themes\ThemeLoader($id_theme, $initialize);
 }
 
 /**
@@ -1753,50 +1279,6 @@ function loadUserContext()
 }
 
 /**
- * Called if the detected URL is not the same as boardurl but is a common
- * variation in which case it updates key system variables so it works.
- *
- * @param string $detected_url
- */
-function fixThemeUrls($detected_url)
-{
-	global $boardurl, $scripturl, $settings, $modSettings, $context, $board_info;
-
-	// Caching is good ;).
-	$oldurl = $boardurl;
-
-	// Fix $boardurl and $scripturl.
-	$boardurl = $detected_url;
-	$scripturl = strtr($scripturl, array($oldurl => $boardurl));
-	$_SERVER['REQUEST_URL'] = strtr($_SERVER['REQUEST_URL'], array($oldurl => $boardurl));
-
-	// Fix the theme urls...
-	$settings['theme_url'] = strtr($settings['theme_url'], array($oldurl => $boardurl));
-	$settings['default_theme_url'] = strtr($settings['default_theme_url'], array($oldurl => $boardurl));
-	$settings['actual_theme_url'] = strtr($settings['actual_theme_url'], array($oldurl => $boardurl));
-	$settings['images_url'] = strtr($settings['images_url'], array($oldurl => $boardurl));
-	$settings['default_images_url'] = strtr($settings['default_images_url'], array($oldurl => $boardurl));
-	$settings['actual_images_url'] = strtr($settings['actual_images_url'], array($oldurl => $boardurl));
-
-	// And just a few mod settings :).
-	$modSettings['smileys_url'] = strtr($modSettings['smileys_url'], array($oldurl => $boardurl));
-	$modSettings['avatar_url'] = strtr($modSettings['avatar_url'], array($oldurl => $boardurl));
-
-	// Clean up after loadBoard().
-	if (isset($board_info['moderators']))
-	{
-		foreach ($board_info['moderators'] as $k => $dummy)
-		{
-			$board_info['moderators'][$k]['href'] = strtr($dummy['href'], array($oldurl => $boardurl));
-			$board_info['moderators'][$k]['link'] = strtr($dummy['link'], array('"' . $oldurl => '"' . $boardurl));
-		}
-	}
-
-	foreach ($context['linktree'] as $k => $dummy)
-		$context['linktree'][$k]['url'] = strtr($dummy['url'], array($oldurl => $boardurl));
-}
-
-/**
  * Determine the current user's smiley set
  *
  * @param mixed[] $user_smiley_set
@@ -1823,48 +1305,14 @@ function determineSmileySet($user_smiley_set, $known_smiley_sets)
 /**
  * This loads the bare minimum data.
  *
+ * @deprecated since 2.0; use the theme object
+ *
  * - Needed by scheduled tasks,
  * - Needed by any other code that needs language files before the forum (the theme) is loaded.
  */
 function loadEssentialThemeData()
 {
-	global $settings, $modSettings, $mbname, $context;
-
-	$db = database();
-
-	// Get all the default theme variables.
-	$db->fetchQueryCallback('
-		SELECT id_theme, variable, value
-		FROM {db_prefix}themes
-		WHERE id_member = {int:no_member}
-			AND id_theme IN (1, {int:theme_guests})',
-		array(
-			'no_member' => 0,
-			'theme_guests' => $modSettings['theme_guests'],
-		),
-		function ($row)
-		{
-			global $settings;
-
-			$settings[$row['variable']] = $row['value'];
-
-			// Is this the default theme?
-			if (in_array($row['variable'], array('theme_dir', 'theme_url', 'images_url')) && $row['id_theme'] == '1')
-				$settings['default_' . $row['variable']] = $row['value'];
-		}
-	);
-
-	// Check we have some directories setup.
-	if (!Templates::instance()->hasDirectories())
-	{
-		Templates::instance()->reloadDirectories($settings);
-	}
-
-	// Assume we want this.
-	$context['forum_name'] = $mbname;
-	$context['forum_name_html_safe'] = $context['forum_name'];
-
-	loadLanguage('index+Addons');
+	return theme()->getTemplates()->loadEssentialThemeData();
 }
 
 /**
@@ -1878,6 +1326,8 @@ function loadEssentialThemeData()
  *   loading of style sheets with this function is deprecated, use loadCSSFile instead
  * - if $settings['template_dirs'] is empty, it delays the loading of the template
  *
+ * @deprecated since 2.0; use the theme object
+ *
  * @uses the requireTemplate() function to actually load the file.
  * @param string|false $template_name
  * @param string[]|string $style_sheets any style sheets to load with the template
@@ -1888,7 +1338,17 @@ function loadEssentialThemeData()
  */
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
-	return Templates::instance()->load($template_name, $style_sheets, $fatal);
+	$debug = '<br><br>';
+	foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1] as $var => $val)
+	{
+		$debug .= $var . ': ' . $val . '<br>';
+	}
+	Errors::instance()->log_error(sprintf(
+		'%s is deprecated, use %s instead.%s',
+		'loadTemplate().',
+		'theme()->getTemplates()->load().',
+		$debug) ,'deprecated');
+	return theme()->getTemplates()->load($template_name, $style_sheets, $fatal);
 }
 
 /**
@@ -1900,6 +1360,8 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  * - if ?debug is in the query string, shows administrators a marker after every sub template
  * for debugging purposes.
  *
+ * @deprecated since 2.0; use the theme object
+ *
  * @param string $sub_template_name
  * @param bool|string $fatal = false
  * - $fatal = true is for templates that shouldn't get a 'pretty' error screen
@@ -1908,7 +1370,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  */
 function loadSubTemplate($sub_template_name, $fatal = false)
 {
-	Templates::instance()->loadSubTemplate($sub_template_name, $fatal);
+	theme()->getTemplates()->loadSubTemplate($sub_template_name, $fatal);
 
 	return true;
 }
@@ -2123,6 +1585,8 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 /**
  * Add a Javascript variable for output later (for feeding text strings and similar to JS)
  *
+ * @deprecated since 2.0; use the theme object
+ *
  * @param mixed[] $vars array of vars to include in the output done as 'varname' => 'var value'
  * @param bool $escape = false, whether or not to escape the value
  */
@@ -2140,6 +1604,8 @@ function addJavascriptVar($vars, $escape = false)
  *   or for scripts that require help from PHP/whatever, this can be useful.
  * - all code added with this function is added to the same <script> tag so do make sure your JS is clean!
  *
+ * @deprecated since 2.0; use the theme object
+ *
  * @param string $javascript
  * @param bool $defer = false, define if the script should load in <head> or before the closing <html> tag
  */
@@ -2153,6 +1619,8 @@ function addInlineJavascript($javascript, $defer = false)
  *
  * - Tries the current and default themes as well as the user and global languages.
  *
+ * @deprecated since 2.0; use the theme object
+ *
  * @param string $template_name
  * @param string $lang = ''
  * @param bool $fatal = true
@@ -2161,116 +1629,13 @@ function addInlineJavascript($javascript, $defer = false)
  */
 function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload = false)
 {
-	global $user_info, $language, $settings, $modSettings;
-	global $db_show_debug, $txt;
-	static $already_loaded = array();
-
-	// Default to the user's language.
-	if ($lang == '')
-		$lang = isset($user_info['language']) ? $user_info['language'] : $language;
-
-	if (!$force_reload && isset($already_loaded[$template_name]) && $already_loaded[$template_name] == $lang)
-		return $lang;
-
-	// Do we want the English version of language file as fallback?
-	if (empty($modSettings['disable_language_fallback']) && $lang != 'english')
-		loadLanguage($template_name, 'english', false);
-
-	// Make sure we have $settings - if not we're in trouble and need to find it!
-	if (empty($settings['default_theme_dir']))
-		loadEssentialThemeData();
-
-	// What theme are we in?
-	$theme_name = basename($settings['theme_url']);
-	if (empty($theme_name))
-		$theme_name = 'unknown';
-
-	$fix_arrays = false;
-	// For each file open it up and write it out!
-	foreach (explode('+', $template_name) as $template)
-	{
-		if ($template === 'index')
-			$fix_arrays = true;
-
-		// Obviously, the current theme is most important to check.
-		$attempts = array(
-			array($settings['theme_dir'], $template, $lang, $settings['theme_url']),
-			array($settings['theme_dir'], $template, $language, $settings['theme_url']),
-		);
-
-		// Do we have a base theme to worry about?
-		if (isset($settings['base_theme_dir']))
-		{
-			$attempts[] = array($settings['base_theme_dir'], $template, $lang, $settings['base_theme_url']);
-			$attempts[] = array($settings['base_theme_dir'], $template, $language, $settings['base_theme_url']);
-		}
-
-		// Fall back on the default theme if necessary.
-		$attempts[] = array($settings['default_theme_dir'], $template, $lang, $settings['default_theme_url']);
-		$attempts[] = array($settings['default_theme_dir'], $template, $language, $settings['default_theme_url']);
-
-		// Fall back on the English language if none of the preferred languages can be found.
-		if (!in_array('english', array($lang, $language)))
-		{
-			$attempts[] = array($settings['theme_dir'], $template, 'english', $settings['theme_url']);
-			$attempts[] = array($settings['default_theme_dir'], $template, 'english', $settings['default_theme_url']);
-		}
-
-		$templates = Templates::instance();
-
-		// Try to find the language file.
-		$found = false;
-		foreach ($attempts as $k => $file)
-		{
-			if (file_exists($file[0] . '/languages/' . $file[2] . '/' . $file[1] . '.' . $file[2] . '.php'))
-			{
-				// Include it!
-				$templates->templateInclude($file[0] . '/languages/' . $file[2] . '/' . $file[1] . '.' . $file[2] . '.php');
-
-				// Note that we found it.
-				$found = true;
-
-				break;
-			}
-			// @deprecated since 1.0 - old way of archiving language files, all in one directory
-			elseif (file_exists($file[0] . '/languages/' . $file[1] . '.' . $file[2] . '.php'))
-			{
-				// Include it!
-				$templates->templateInclude($file[0] . '/languages/' . $file[1] . '.' . $file[2] . '.php');
-
-				// Note that we found it.
-				$found = true;
-
-				break;
-			}
-		}
-
-		// That couldn't be found!  Log the error, but *try* to continue normally.
-		if (!$found && $fatal)
-		{
-			Errors::instance()->log_error(sprintf($txt['theme_language_error'], $template_name . '.' . $lang, 'template'));
-			break;
-		}
-	}
-
-	if ($fix_arrays)
-		fix_calendar_text();
-
-	// Keep track of what we're up to soldier.
-	if ($db_show_debug === true)
-	{
-		Debug::instance()->add('language_files', $template_name . '.' . $lang . ' (' . $theme_name . ')');
-	}
-
-	// Remember what we have loaded, and in which language.
-	$already_loaded[$template_name] = $lang;
-
-	// Return the language actually loaded.
-	return $lang;
+	return theme()->getTemplates()->loadLanguageFile($template_name, $lang, $fatal, $force_reload);
 }
 
 /**
  * Loads / Sets arrays for use in date display
+ *
+ * @todo Move to language file
  */
 function fix_calendar_text()
 {
@@ -2438,7 +1803,7 @@ function getLanguages($use_cache = true)
 	{
 		// If we don't have our theme information yet, lets get it.
 		if (empty($settings['default_theme_dir']))
-			loadTheme(0, false);
+			new ElkArte\Themes\ThemeLoader(0, false);
 
 		// Default language directories to try.
 		$language_directories = array(
@@ -2790,7 +2155,7 @@ function doSecurityChecks()
 
 	// Finally, let's show the layer.
 	if ($show_warnings || !empty($context['warning_controls']))
-		\Template_Layers::instance()->addAfter('admin_warning', 'body');
+		\theme()->getLayers()->addAfter('admin_warning', 'body');
 }
 
 /**

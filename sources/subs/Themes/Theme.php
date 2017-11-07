@@ -11,6 +11,8 @@
  *
  */
 
+namespace ElkArte\Themes;
+
 /**
  * Class Theme
  */
@@ -27,65 +29,63 @@ abstract class Theme
 	protected $id;
 
 	/**
-	 * Holds the Templates instance
 	 * @var Templates
 	 */
-	protected $templates;
+	private $templates;
+
+	/**
+	 * @var TemplateLayers
+	 */
+	private $layers;
+
+	/**
+	 * @var array
+	 */
+	protected $html_headers = [];
+
+	/**
+	 * @var array
+	 */
+	protected $links = [];
+
+	/**
+	 * All of the JS files to include
+	 * @var array
+	 */
+	protected $js_files = [];
+
+	/**
+	 * Any inline JS to output
+	 * @var array
+	 */
+	protected $js_inline = [
+		'standard' => [],
+		'defer' => [],
+	];
+
+	/**
+	 * JS variables to output
+	 * @var array
+	 */
+	protected $js_vars = [];
+
+	/**
+	 * Inline CSS
+	 * @var array
+	 */
+	protected $css_rules = [];
+
+	/**
+	 * CSS files
+	 * @var array
+	 */
+	protected $css_files = [];
 
 	/**
 	 * Holds base actions that we do not want crawled / indexed
 	 * @var string[]
 	 */
 	protected $no_index_actions = array();
-
-	/**
-	 * Holds the Template_Layers instance
-	 * @var Template_Layers
-	 */
-	protected $layers;
-
-	/**
-	 * @var array
-	 */
-	protected $html_headers = array();
-
-	/**
-	 * @var array
-	 */
-	protected $links = array();
-
-	/**
-	 * All of the JS files to include
-	 * @var array
-	 */
-	protected $js_files = array();
-
-	/**
-	 * Any inline JS to output
-	 * @var array
-	 */
-	protected $js_inline = array(
-		'standard' => array(),
-		'defer' => array()
-	);
-
-	/**
-	 * JS variables to output
-	 * @var array
-	 */
-	protected $js_vars = array();
-
-	/**
-	 * Inline CSS
-	 * @var array
-	 */
-	protected $css_rules = array();
-
-	/**
-	 * CSS files
-	 * @var array
-	 */
-	protected $css_files = array();
 
 	/**
 	 * Right to left language support
@@ -100,30 +100,63 @@ abstract class Theme
 	 */
 	public function __construct($id)
 	{
-		$this->layers = Template_Layers::instance();
-		$this->templates = Templates::instance();
 		$this->id = $id;
+		$this->layers = new TemplateLayers;
+		$this->templates = new Templates;
 
 		$this->css_files = &$GLOBALS['context']['css_files'];
 		$this->js_files = &$GLOBALS['context']['js_files'];
 		$this->css_rules = &$GLOBALS['context']['css_rules'];
 		if (empty($this->css_rules))
 		{
-			$this->css_rules = array(
+			$this->css_rules = [
 				'all' => '',
-				'media' => array(),
-			);
+				'media' => [],
+			];
 		}
+		$this->no_index_actions = array(
+			'profile',
+			'search',
+			'calendar',
+			'memberlist',
+			'help',
+			'who',
+			'stats',
+			'login',
+			'reminder',
+			'register',
+			'verificationcode',
+			'contact'
+		);
+	}
+	/**
+	 * Initialize the template... mainly little settings.
+	 *
+	 * @return array Theme settings
+	 */
+	abstract public function getSettings();
 
-		$this->no_index_actions = array('profile', 'search', 'calendar', 'memberlist', 'help', 'who', 'stats',
-			'login', 'reminder', 'register', 'verificationcode', 'contact');
+	/**
+	 * @return ElkArte\Theme\TemplateLayers
+	 */
+	public function getLayers()
+	{
+		return $this->layers;
+	}
+
+	/**
+	 * @return ElkArte\Theme\Templates
+	 */
+	public function getTemplates()
+	{
+		return $this->templates;
 	}
 
 	/**
 	 * Add a Javascript variable for output later (for feeding text strings and similar to JS)
 	 *
-	 * @param mixed[] $vars array of vars to include in the output done as 'varname' => 'var value'
-	 * @param bool $escape = false, whether or not to escape the value
+	 * @param mixed[] $vars   array of vars to include in the output done as 'varname' => 'var value'
+	 * @param bool    $escape = false, whether or not to escape the value
 	 */
 	public function addJavascriptVar($vars, $escape = false)
 	{
@@ -133,13 +166,15 @@ abstract class Theme
 		}
 
 		foreach ($vars as $key => $value)
+		{
 			$this->js_vars[$key] = !empty($escape) ? JavaScriptEscape($value) : $value;
+		}
 	}
 
 	/**
 	 * Add a CSS rule to a style tag in head.
 	 *
-	 * @param string $rules the CSS rule/s
+	 * @param string      $rules the CSS rule/s
 	 * @param null|string $media = null, the media query the rule belongs to
 	 */
 	public function addCSSRules($rules, $media = null)
@@ -207,13 +242,12 @@ abstract class Theme
 	 * Add a block of inline Javascript code to be executed later
 	 *
 	 * What it does:
-	 *
 	 * - only use this if you have to, generally external JS files are better, but for very small scripts
 	 *   or for scripts that require help from PHP/whatever, this can be useful.
 	 * - all code added with this function is added to the same <script> tag so do make sure your JS is clean!
 	 *
 	 * @param string $javascript
-	 * @param bool $defer = false, define if the script should load in <head> or before the closing <html> tag
+	 * @param bool   $defer = false, define if the script should load in <head> or before the closing <html> tag
 	 */
 	public function addInlineJavascript($javascript, $defer = false)
 	{
