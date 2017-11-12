@@ -637,9 +637,10 @@ class UpgradeInstructions_upgrade_1_1
 
 						if (count($vals) === 2 && $rows && $cols)
 						{
+							// The fully-qualified name for rows is here because it's a reserved word in Mariadb 10.2.4+ and quoting would be different for MySQL/Mariadb and PSQL
 							$db->query('', '
 								UPDATE {db_prefix}custom_fields 
-								SET rows=' . $rows . ' , cols=' . $cols . ' 
+								SET {db_prefix}custom_fields.rows=' . $rows . ' , cols=' . $cols . '
 								WHERE id_field=' . $row['id_field']);
 						}
 					}
