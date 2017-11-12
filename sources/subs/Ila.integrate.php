@@ -185,7 +185,7 @@ class Ila_Integrate
 				\BBC\Codes::ATTR_TYPE => \BBC\Codes::TYPE_UNPARSED_CONTENT,
 				\BBC\Codes::ATTR_CONTENT => '$1',
 				\BBC\Codes::ATTR_VALIDATE => self::validate_url(),
-				\BBC\Codes::ATTR_DISALLOW_PARENTS => array('code' => 1, 'nobbc' => 1, 'php' => 1),
+				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
 				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
 				\BBC\Codes::ATTR_AUTOLINK => false,
@@ -319,6 +319,11 @@ class Ila_Integrate
 
 		return function (&$tag, &$data, $disabled) use ($user_info, $scripturl, &$context)
 		{
+			if (isset($disabled['attach']))
+			{
+				return $data;
+			}
+
 			$num = $data;
 			$attachment = false;
 
@@ -365,6 +370,11 @@ class Ila_Integrate
 
 		return function (&$tag, &$data, $disabled) use ($user_info, $scripturl, &$context)
 		{
+			if (isset($disabled['attach']))
+			{
+				return $data;
+			}
+
 			$num = $data;
 			$is_image = array();
 			$preview = strpos($data, 'post_tmp_' . $user_info['id'] . '_');
