@@ -249,7 +249,7 @@ class Site_Dispatcher
 	 */
 	protected function determineAction()
 	{
-		// To try to stay backwardss compatible...
+		// To try to stay backwards compatible...
 		$adminActions = array();
 
 		// Allow to extend or change $actionArray through a hook
