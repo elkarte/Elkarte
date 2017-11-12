@@ -802,7 +802,7 @@ function getMentionsModules($enabled_mentions)
  *
  * What it does:
  *
- * - Scans controllerdir and addonsdir for .controller.php fils
+ * - Scans controllerdir and addonsdir for .controller.php files
  * - Checks if found files have a static frontPageOptions method
  *
  * @return array
