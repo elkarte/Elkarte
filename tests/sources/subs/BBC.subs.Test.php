@@ -15,6 +15,7 @@ class TestBBC extends PHPUnit_Framework_TestCase
 	{
 		global $modSettings;
 		$modSettings['user_access_mentions'] = array();
+		$modSettings['enablePostHTML'] = 1;
 
 		loadTheme();
 
@@ -431,6 +432,12 @@ Should be an empty line in between.',
 				'URL link',
 				'http://www.elkarte.net/',
 				'<a href="http://www.elkarte.net/" class="bbc_link" target="_blank">http://www.elkarte.net/</a>',
+			),
+			array(
+				'Test italic coming from the db ref #3054',
+				'&lt;i&gt;
+',
+				'<i><br /></i>',
 			),
 		);
 
