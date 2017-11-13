@@ -1123,6 +1123,23 @@ class Codes
 	}
 
 	/**
+	 * Restore a disabled tag
+	 *
+	 * @param $tag
+	 *
+	 * @return bool
+	 */
+	public function restore($tag)
+	{
+		if (isset($this->disabled[$tag]))
+		{
+			unset($this->disabled[$tag]);
+		}
+
+		return !isset($this->disabled[$tag]);
+	}
+
+	/**
 	 * Set the tags that will be parsed
 	 *
 	 * @param $parse_tags
