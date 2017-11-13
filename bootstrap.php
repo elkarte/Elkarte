@@ -15,8 +15,17 @@
  *
  */
 
+/**
+ * Class Bootstrap
+ *
+ * This takes care of the initial loading and feeding of Elkarte from
+ * either SSI or Index
+ */
 class Bootstrap
 {
+	/**
+	 * Bootstrap constructor.
+	 */
 	public function __construct()
 	{
 		// Bootstrap only once.
@@ -25,21 +34,25 @@ class Bootstrap
 			return true;
 		}
 
-		// We're going to want a few globals... these are all set later.
+		// We're going to want a few globals
 		global $time_start, $ssi_error_reporting, $db_show_debug;
 
 		// Your on the clock
 		$time_start = microtime(true);
 
-		// Unless settings tells us otherwise
+		// Unless settings.php tells us otherwise
 		$db_show_debug = false;
 
 		// Report errors but not depreciated ones
 		$ssi_error_reporting = error_reporting(E_ALL | E_STRICT & ~8192);
 
+		// Get the things needed for ALL modes
 		$this->bringUpBasics();
 	}
 
+	/**
+	 * Calls the various initialization functions in the needed order
+	 */
 	public function bringUpBasics()
 	{
 		$this->setConstants();
@@ -54,19 +67,26 @@ class Bootstrap
 		$this->bringUp();
 	}
 
+	/**
+	 * Set the core constants, you know the ones we often forget to
+	 * update on new releases.
+	 */
 	private function setConstants()
 	{
 		// First things first, but not necessarily in that order.
-		define(ELK, '1');
-		define(ELKBOOT, '1');
+		define('ELK', '1');
+		define('ELKBOOT', '1');
 
 		// The software version
-		define(FORUM_VERSION, 'ElkArte 1.1');
+		define('FORUM_VERSION', 'ElkArte 1.1');
 
 		// Shortcut for the browser cache stale
-		define(CACHE_STALE, '?R110');
+		define('CACHE_STALE', '?R110');
 	}
 
+	/**
+	 * Get initial resource usage
+	 */
 	private function setRusage()
 	{
 		global $rusage_start;
@@ -83,6 +103,9 @@ class Bootstrap
 		}
 	}
 
+	/**
+	 * If they glo, they need to be cleaned.
+	 */
 	private function clearGloballs()
 	{
 		// We don't need no globals. (a bug in "old" versions of PHP)
@@ -95,6 +118,9 @@ class Bootstrap
 		}
 	}
 
+	/**
+	 * Loads the settings values into the global space
+	 */
 	private function loadSettingsFile()
 	{
 		// All those wonderful things found in settings
@@ -137,6 +163,10 @@ class Bootstrap
 		}
 	}
 
+	/**
+	 * Validate the paths set in Settings.php, correct as needed and move
+	 * them to constants.
+	 */
 	private function validatePaths()
 	{
 		global $boarddir, $sourcedir, $cachedir, $extdir, $languagedir;
@@ -146,6 +176,7 @@ class Bootstrap
 		{
 			$boarddir = __DIR__;
 		}
+
 		if (!file_exists($sourcedir . '/SiteDispatcher.class.php') && file_exists($boarddir . '/sources'))
 		{
 			$sourcedir = $boarddir . '/sources';
@@ -168,19 +199,21 @@ class Bootstrap
 		}
 
 		// Time to forget about variables and go with constants!
-		// Shortcut for the browser cache stale
-		DEFINE('BOARDDIR', $boarddir);
-		DEFINE('CACHEDIR', $cachedir);
-		DEFINE('EXTDIR', $extdir);
-		DEFINE('LANGUAGEDIR', $languagedir);
-		DEFINE('SOURCEDIR', $sourcedir);
-		DEFINE('ADMINDIR', $sourcedir . '/admin');
-		DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
-		DEFINE('SUBSDIR', $sourcedir . '/subs');
-		DEFINE('ADDONSDIR', $boarddir . '/addons');
+		define('BOARDDIR', $boarddir);
+		define('CACHEDIR', $cachedir);
+		define('EXTDIR', $extdir);
+		define('LANGUAGEDIR', $languagedir);
+		define('SOURCEDIR', $sourcedir);
+		define('ADMINDIR', $sourcedir . '/admin');
+		define('CONTROLLERDIR', $sourcedir . '/controllers');
+		define('SUBSDIR', $sourcedir . '/subs');
+		define('ADDONSDIR', $boarddir . '/addons');
 		unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
 	}
 
+	/**
+	 * We require access to several important files, so load them upfront
+	 */
 	private function loadDependants()
 	{
 		// Files we cannot live without.
@@ -193,16 +226,22 @@ class Bootstrap
 		require_once(SUBSDIR . '/Cache.subs.php');
 	}
 
+	/**
+	 * The autoloader will take care most requests for files
+	 */
 	private function loadAutoloader()
 	{
 		// Initialize the class Autoloader
 		require_once(SOURCEDIR . '/Autoloader.class.php');
-		$autoloder = Elk_Autoloader::instance();
-		$autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
-		$autoloder->register(SOURCEDIR, '\\ElkArte');
-		$autoloder->register(SOURCEDIR . '/subs/BBC', '\\BBC');
+		$autoloader = Elk_Autoloader::instance();
+		$autoloader->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
+		$autoloader->register(SOURCEDIR, '\\ElkArte');
+		$autoloader->register(SOURCEDIR . '/subs/BBC', '\\BBC');
 	}
 
+	/**
+	 * Check if we are in maintance mode, if so end here.
+	 */
 	private function checkMaintance()
 	{
 		global $maintenance, $ssi_maintenance_off;
@@ -214,6 +253,10 @@ class Bootstrap
 		}
 	}
 
+	/**
+	 * If you like lots of debug information in error messages and below the footer
+	 * then set $db_show_debug to true in settings.  Don't do this on a production site.
+	 */
 	private function setDebug()
 	{
 		global $db_show_debug, $rusage_start;
@@ -225,6 +268,9 @@ class Bootstrap
 		}
 	}
 
+	/**
+	 * Time to see what has been requested, by whom and dispatch it to the proper handler
+	 */
 	private function bringUp()
 	{
 		global $context;
@@ -251,21 +297,23 @@ class Bootstrap
 		elk_seed_generator();
 	}
 
+	/**
+	 * If you are running SSI standalone, you need to call this function after bootstrap is
+	 * initialized.
+	 *
+	 * @throws \Elk_Exception
+	 */
 	public function ssi_main()
 	{
 		global $ssi_layers, $ssi_theme, $ssi_gzip, $ssi_ban, $ssi_guest_access;
 		global $modSettings, $context, $sc, $board, $topic, $user_info, $txt;
 
 		// Check on any hacking attempts.
-		if (isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS']))
+		if (isset($_REQUEST['ssi_theme']) && (int) $_REQUEST['ssi_theme'] === (int) $ssi_theme)
 		{
 			die('No access...');
 		}
-		elseif (isset($_REQUEST['ssi_theme']) && (int) $_REQUEST['ssi_theme'] == (int) $ssi_theme)
-		{
-			die('No access...');
-		}
-		elseif (isset($_COOKIE['ssi_theme']) && (int) $_COOKIE['ssi_theme'] == (int) $ssi_theme)
+		elseif (isset($_COOKIE['ssi_theme']) && (int) $_COOKIE['ssi_theme'] === (int) $ssi_theme)
 		{
 			die('No access...');
 		}
@@ -274,6 +322,7 @@ class Bootstrap
 			die('No access...');
 		}
 
+		// Yeah right
 		if (isset($_REQUEST['context']))
 		{
 			die('No access...');
@@ -388,7 +437,7 @@ class Bootstrap
 		$req = request();
 
 		// Make sure they didn't muss around with the settings... but only if it's not cli.
-		if (isset($_SERVER['REMOTE_ADDR']) && session_id() == '')
+		if (isset($_SERVER['REMOTE_ADDR']) && session_id() === '')
 		{
 			trigger_error($txt['ssi_session_broken'], E_USER_NOTICE);
 		}
