@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -18,7 +18,7 @@ error_reporting(0);
 // Being run as a cron job
 if (!defined('ELK'))
 {
-	require_once(__DIR__ . '/bootstrap.php');
+	require_once(__DIR__ . '/SSI.php');
 	postbyemail_imap();
 
 	// Need to keep the cli clean on return
