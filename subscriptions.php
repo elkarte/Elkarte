@@ -21,8 +21,12 @@ $ssi_guest_access = true;
 if (!file_exists(dirname(__FILE__) . '/bootstrap.php'))
 	die('Unable to initialize');
 
+require_once(dirname(__FILE__) . '/bootstrap.php');
+new Bootstrap();
+
+global $txt, $modSettings, $context;
+
 // Need lots of help
-require_once(dirname(__FILE__) . '/SSI.php');
 require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 require_once(SUBSDIR . '/Admin.subs.php');
 require_once(SUBSDIR . '/Members.subs.php');

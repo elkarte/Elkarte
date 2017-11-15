@@ -26,8 +26,9 @@ if (!defined('STDIN'))
 // Any output here is not good, it will be bounced as email
 error_reporting(0);
 
-// Need SSI to do much
-require_once(dirname(__FILE__) . '/SSI.php');
+// Need to bootstrap the system to do much
+require_once(dirname(__FILE__) . '/bootstrap.php');
+new Bootstrap();
 
 // No need to ID the server if we fall on our face :)
 $_SERVER['SERVER_SOFTWARE'] = '';
