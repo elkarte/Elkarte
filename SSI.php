@@ -61,9 +61,9 @@ if (!defined('ELKBOOT'))
 
 	require_once(dirname(__FILE__) . '/bootstrap.php');
 	$bootstrap = new Bootstrap();
-	$bootstrap->ssi_main();
 }
 
+// The globals that were created during the bootstrap process
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
 global $boardurl, $webmaster_email, $cookiename;
 global $db_type, $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send;

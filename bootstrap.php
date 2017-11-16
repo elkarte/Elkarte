@@ -25,8 +25,13 @@ class Bootstrap
 {
 	/**
 	 * Bootstrap constructor.
+	 *
+	 * @param bool $standalone
+	 *  - true to boot outside of elkarte
+	 *  - false to bootstrap the main elkarte site.
+	 * @throws \Elk_Exception
 	 */
-	public function __construct()
+	public function __construct($standalone = true)
 	{
 		// Bootstrap only once.
 		if (defined('ELKBOOT'))
@@ -34,7 +39,7 @@ class Bootstrap
 			return true;
 		}
 
-		// We're going to want a few globals
+		// We're going to set a few globals
 		global $time_start, $ssi_error_reporting, $db_show_debug;
 
 		// Your on the clock
@@ -48,6 +53,12 @@ class Bootstrap
 
 		// Get the things needed for ALL modes
 		$this->bringUpBasics();
+
+		// Going to run from the side entrance and not directly from inside elkarte
+		if ($standalone)
+		{
+			$this->ssi_main();
+		}
 	}
 
 	/**
@@ -309,24 +320,7 @@ class Bootstrap
 		global $modSettings, $context, $sc, $board, $topic, $user_info, $txt;
 
 		// Check on any hacking attempts.
-		if (isset($_REQUEST['ssi_theme']) && (int) $_REQUEST['ssi_theme'] === (int) $ssi_theme)
-		{
-			die('No access...');
-		}
-		elseif (isset($_COOKIE['ssi_theme']) && (int) $_COOKIE['ssi_theme'] === (int) $ssi_theme)
-		{
-			die('No access...');
-		}
-		elseif (isset($_REQUEST['ssi_layers'], $ssi_layers) && (@get_magic_quotes_gpc() ? stripslashes($_REQUEST['ssi_layers']) : $_REQUEST['ssi_layers']) == $ssi_layers)
-		{
-			die('No access...');
-		}
-
-		// Yeah right
-		if (isset($_REQUEST['context']))
-		{
-			die('No access...');
-		}
+		$this->_validRequestCheck();
 
 		// Gzip output? (because it must be boolean and true, this can't be hacked.)
 		if (isset($ssi_gzip) && $ssi_gzip === true && detectServer()->outPutCompressionEnabled())
@@ -446,6 +440,33 @@ class Bootstrap
 		if (!isset($_SESSION['USER_AGENT']) && (!isset($_GET['ssi_function']) || $_GET['ssi_function'] !== 'pollVote'))
 		{
 			$_SESSION['USER_AGENT'] = $req->user_agent();
+		}
+	}
+
+	/**
+	 * Used to ensure SSI requests are valid and not a probing attempt
+	 */
+	private function _validRequestCheck()
+	{
+		global $ssi_theme, $ssi_layers;
+
+		if (isset($_REQUEST['ssi_theme']) && (int) $_REQUEST['ssi_theme'] === (int) $ssi_theme)
+		{
+			die('No access...');
+		}
+		elseif (isset($_COOKIE['ssi_theme']) && (int) $_COOKIE['ssi_theme'] === (int) $ssi_theme)
+		{
+			die('No access...');
+		}
+		elseif (isset($_REQUEST['ssi_layers'], $ssi_layers) && (@get_magic_quotes_gpc() ? stripslashes($_REQUEST['ssi_layers']) : $_REQUEST['ssi_layers']) == $ssi_layers)
+		{
+			die('No access...');
+		}
+
+		// Yeah right
+		if (isset($_REQUEST['context']))
+		{
+			die('No access...');
 		}
 	}
 }

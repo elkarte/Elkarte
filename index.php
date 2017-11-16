@@ -19,7 +19,7 @@
 
 // Bootstrap the system
 require_once(dirname(__FILE__) . '/bootstrap.php');
-new Bootstrap();
+new Bootstrap(false);
 
 // Turn on output buffering if it isn't already on (via php.ini for example)
 if (!ob_get_level())
