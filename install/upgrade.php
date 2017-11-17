@@ -1658,7 +1658,7 @@ function parse_sql($filename)
 				echo ' +++ ' . $upcontext['current_debug_item_name'];
 			}
 
-			$action['function']($db_wrapper, $db_table_wrapper);
+			$action['function']();
 
 			// Small step - only if we're actually doing stuff.
 			if ($do_current)
