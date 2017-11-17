@@ -700,32 +700,35 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Converting gender data',
 				'function' => function ($db, $db_table)
 				{
-					$result = $db->query('', '
-						SELECT id_member, gender 
-						FROM {db_prefix}members
-						WHERE gender != ""');
-					while ($row = $db->fetch_assoc($result))
+					if ($db_table->column_exists('{db_prefix}members', 'gender') === true)
 					{
-						$gender = 'undisclosed';
-
-						switch ($row['gender'])
+						$result = $db->query('', '
+							SELECT id_member, gender
+							FROM {db_prefix}members
+							WHERE gender != ""');
+						while ($row = $db->fetch_assoc($result))
 						{
-							case 1:
-								$gender = 'male';
-								break;
-							case 2:
-								$gender = 'female';
-								break;
-						}
+							$gender = 'undisclosed';
 
-						$db->insert('replace',
-							'{db_prefix}custom_fields_data',
-							array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
-							array(
-								array($row['id_member'], 'cust_gender', $gender),
-							),
-							'id_member'
-						);
+							switch ($row['gender'])
+							{
+								case 1:
+									$gender = 'male';
+									break;
+								case 2:
+									$gender = 'female';
+									break;
+							}
+
+							$db->insert('replace',
+								'{db_prefix}custom_fields_data',
+								array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
+								array(
+									array($row['id_member'], 'cust_gender', $gender),
+								),
+								'id_member'
+							);
+						}
 					}
 				}
 			),
@@ -733,20 +736,23 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Converting location',
 				'function' => function ($db, $db_table)
 				{
-					$result = $db->query('', '
-						SELECT id_member, location 
-						FROM {db_prefix}members
-						WHERE location != ""');
-					while ($row = $db->fetch_assoc($result))
+					if ($db_table->column_exists('{db_prefix}members', 'location') === true)
 					{
-						$db->insert('replace',
-							'{db_prefix}custom_fields_data',
-							array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
-							array(
-								array($row['id_member'], 'cust_locate', $row['location']),
-							),
-							'id_member'
-						);
+						$result = $db->query('', '
+							SELECT id_member, location
+							FROM {db_prefix}members
+							WHERE location != ""');
+						while ($row = $db->fetch_assoc($result))
+						{
+							$db->insert('replace',
+								'{db_prefix}custom_fields_data',
+								array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
+								array(
+									array($row['id_member'], 'cust_locate', $row['location']),
+								),
+								'id_member'
+							);
+						}
 					}
 				}
 			),
@@ -754,20 +760,23 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Converting personal text',
 				'function' => function ($db, $db_table)
 				{
-					$result = $db->query('', '
-						SELECT id_member, personal_text 
-						FROM {db_prefix}members
-						WHERE personal_text != ""');
-					while ($row = $db->fetch_assoc($result))
+					if ($db_table->column_exists('{db_prefix}members', 'personal_text') === true)
 					{
-						$db->insert('replace',
-							'{db_prefix}custom_fields_data',
-							array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
-							array(
-								array($row['id_member'], 'cust_blurb', $row['personal_text']),
-							),
-							'id_member'
-						);
+						$result = $db->query('', '
+							SELECT id_member, personal_text
+							FROM {db_prefix}members
+							WHERE personal_text != ""');
+						while ($row = $db->fetch_assoc($result))
+						{
+							$db->insert('replace',
+								'{db_prefix}custom_fields_data',
+								array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
+								array(
+									array($row['id_member'], 'cust_blurb', $row['personal_text']),
+								),
+								'id_member'
+							);
+						}
 					}
 				}
 			),
