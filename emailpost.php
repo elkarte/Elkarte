@@ -15,7 +15,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -26,8 +26,9 @@ if (!defined('STDIN'))
 // Any output here is not good
 error_reporting(0);
 
-// Need SSI to do much
+// Need to bootstrap to do much
 require_once(__DIR__ . '/bootstrap.php');
+new Bootstrap();
 
 // No need to ID the server if we fall on our face :)
 $_SERVER['SERVER_SOFTWARE'] = '';
