@@ -1,5 +1,5 @@
 <?php
-// Version: 1.1; Like posts
+// Version: 1.1; LikePosts
 
 global $txt;
 
