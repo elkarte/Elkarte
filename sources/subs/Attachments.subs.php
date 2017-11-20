@@ -607,8 +607,24 @@ function getTempAttachById($attach_id)
 {
 	global $modSettings, $user_info;
 
+	$attach_real_id = null;
+
+	foreach ($_SESSION['temp_attachments'] as $attachID => $val)
+	{
+		if ($val['public_attachid'] === $attach_id)
+		{
+			$attach_real_id = $attachID;
+			break;
+		}
+	}
+
+	if (empty($attach_real_id))
+	{
+		throw new \Exception('no_access');
+	}
+
 	// The common name form is "post_tmp_123_0ac9a0b1fc18604e8704084656ed5f09"
-	$id_attach = preg_replace('~[^0-9a-zA-Z_]~', '', $attach_id);
+	$id_attach = preg_replace('~[^0-9a-zA-Z_]~', '', $attach_real_id);
 
 	// Permissions: only temporary attachments
 	if (substr($id_attach, 0, 8) !== 'post_tmp')
@@ -627,9 +643,9 @@ function getTempAttachById($attach_id)
 
 	$attach_dir = $dirs[$modSettings['currentAttachmentUploadDir']];
 
-	if (file_exists($attach_dir . '/' . $attach_id) && isset($_SESSION['temp_attachments'][$attach_id]))
+	if (file_exists($attach_dir . '/' . $attach_real_id) && isset($_SESSION['temp_attachments'][$attach_real_id]))
 	{
-		return $_SESSION['temp_attachments'][$attach_id];
+		return $_SESSION['temp_attachments'][$attach_real_id];
 	}
 
 	throw new \Exception('no_access');
