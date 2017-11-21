@@ -235,11 +235,12 @@ function imageMemoryCheck($sizes)
  * @param int $max_width The maximum allowed width
  * @param int $max_height The maximum allowed height
  * @param int $preferred_format Used by Imagick/resizeImage
+ * @param bool $force_resize Always resize the image (force scale up)
  * @param bool $strip Allow IM to remove exif data as GD always will
  *
  * @return boolean Whether the thumbnail creation was successful.
  */
-function resizeImageFile($source, $destination, $max_width, $max_height, $preferred_format = 0, $strip = false)
+function resizeImageFile($source, $destination, $max_width, $max_height, $preferred_format = 0, $strip = false, $force_resize = true)
 {
 	// Nothing to do without GD or IM
 	if (!checkGD() && !checkImagick())
@@ -301,14 +302,14 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 	// A known and supported format?
 	if (checkImagick() && isset($default_formats[$sizes[2]]))
 	{
-		return resizeImage(null, $destination, null, null, $max_width, $max_height, true, $preferred_format, $strip);
+		return resizeImage(null, $destination, null, null, $max_width, $max_height, $force_resize, $preferred_format, $strip);
 	}
 	elseif (checkGD() && isset($default_formats[$sizes[2]]) && function_exists('imagecreatefrom' . $default_formats[$sizes[2]]))
 	{
 		$imagecreatefrom = 'imagecreatefrom' . $default_formats[$sizes[2]];
 		if ($src_img = @$imagecreatefrom($destination))
 		{
-			return resizeImage($src_img, $destination, imagesx($src_img), imagesy($src_img), $max_width === null ? imagesx($src_img) : $max_width, $max_height === null ? imagesy($src_img) : $max_height, true, $preferred_format);
+			return resizeImage($src_img, $destination, imagesx($src_img), imagesy($src_img), $max_width === null ? imagesx($src_img) : $max_width, $max_height === null ? imagesy($src_img) : $max_height, $force_resize, $preferred_format, $strip);
 		}
 	}
 
@@ -375,8 +376,8 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 			$src_height = empty($src_height) ? $imagick->getImageHeight() : $src_height;
 
 			// The behavior of bestfit changed in Imagick 3.0.0 and it will now scale up, we prevent that
-			$dest_width = empty($max_width) ? $src_width : min($max_width, $src_width);
-			$dest_height = empty($max_height) ? $src_height : min($max_height, $src_height);
+			$dest_width = empty($max_width) ? $src_width : ($force_resize ? $max_width : min($max_width, $src_width));
+			$dest_height = empty($max_height) ? $src_height : ($force_resize ? $max_height :  min($max_height, $src_height));
 
 			// Set jpeg image quality to 80
 			if ($default_formats[$preferred_format] === 'jpeg')
