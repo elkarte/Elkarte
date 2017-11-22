@@ -202,9 +202,9 @@ class Attachment_Controller extends Action_Controller
 			$result = false;
 			if (!empty($_SESSION['temp_attachments']))
 			{
-				$attachId = $this->getAttachmentIdFromPublic($this->_req->post->attachid);
-
 				require_once(SUBSDIR . '/Attachments.subs.php');
+
+				$attachId = getAttachmentIdFromPublic($this->_req->post->attachid);
 
 				$result = removeTempAttachById($attachId);
 				if ($result === true)
@@ -669,17 +669,5 @@ class Attachment_Controller extends Action_Controller
 
 		// Try to buy some time...
 		detectServer()->setTimeLimit(600);
-	}
-
-	protected function getAttachmentIdFromPublic($public_attachid)
-	{
-		foreach ($_SESSION['temp_attachments'] as $key => $val)
-		{
-			if ($val['public_attachid'] === $public_attachid)
-			{
-				return $key;
-			}
-		}
-		return null;
 	}
 }

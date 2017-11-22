@@ -2234,3 +2234,22 @@ function returnMimeThumb($file_ext, $url = false)
 
 	return $filename;
 }
+
+/**
+ * Finds in $_SESSION['temp_attachments'] an attachment id from its public id
+ *
+ * @param string $public_attachid
+ *
+ * @return string
+ */
+function getAttachmentIdFromPublic($public_attachid)
+{
+	foreach ($_SESSION['temp_attachments'] as $key => $val)
+	{
+		if ($val['public_attachid'] === $public_attachid)
+		{
+			return $key;
+		}
+	}
+	return '';
+}

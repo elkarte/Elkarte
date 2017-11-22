@@ -158,7 +158,9 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 					foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 					{
 						if (strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') !== false)
+						{
 							@unlink($attachment['tmp_name']);
+						}
 					}
 					$this->_attach_errors->addError('temp_attachments_gone');
 					$_SESSION['temp_attachments'] = array();
@@ -358,14 +360,18 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 		// First check to see if they are trying to delete any current attachments.
 		if (isset($_POST['attach_del']))
 		{
+			require_once(SUBSDIR . '/Attachments.subs.php');
 			$keep_temp = array();
 			$keep_ids = array();
+
 			foreach ($_POST['attach_del'] as $dummy)
 			{
-				if (strpos($dummy, 'post_tmp_' . $user_info['id'] . '_') !== false)
-					$keep_temp[] = $dummy;
+				$attachID = getAttachmentIdFromPublic($dummy);
+
+				if (strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') !== false)
+					$keep_temp[] = $attachID;
 				else
-					$keep_ids[] = (int) $dummy;
+					$keep_ids[] = (int) $attachID;
 			}
 
 			if (isset($_SESSION['temp_attachments']))
@@ -459,7 +465,9 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 				}
 				// We have errors on this file, build out the issues for display to the user
 				else
+				{
 					@unlink($attachment['tmp_name']);
+				}
 			}
 			unset($_SESSION['temp_attachments']);
 		}
