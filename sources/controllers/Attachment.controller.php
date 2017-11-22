@@ -420,7 +420,7 @@ class Attachment_Controller extends Action_Controller
 		$eTag = '"' . substr($id_attach . $real_filename . @filemtime($filename), 0, 64) . '"';
 		$use_compression = !empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java'));
 		$disposition = !isset($this->_req->query->image) ? 'attachment' : 'inline';
-		$do_cache = false === (!isset($this->_req->query->image) && in_array($file_ext, array('gif', 'jpg', 'bmp', 'png', 'jpeg', 'tiff')));
+		$do_cache = false === (!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '');
 
 		// Make sure the mime type warrants an inline display.
 		if (isset($this->_req->query->image) && !empty($mime_type) && strpos($mime_type, 'image/') !== 0)
@@ -429,7 +429,7 @@ class Attachment_Controller extends Action_Controller
 			$mime_type = '';
 		}
 		// Does this have a mime type?
-		elseif (empty($mime_type) || !(isset($this->_req->query->image) || !in_array($file_ext, array('jpg', 'gif', 'jpeg', 'x-ms-bmp', 'png', 'psd', 'tiff', 'iff'))))
+		elseif (empty($mime_type) || !(isset($this->_req->query->image) || getValidMimeImageType($file_ext) === ''))
 		{
 			$mime_type = '';
 			if (isset($this->_req->query->image))
@@ -554,7 +554,7 @@ class Attachment_Controller extends Action_Controller
 
 		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
 		$use_compression = !empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java'));
-		$do_cache = false === (!isset($this->_req->query->image) && in_array($file_ext, array('gif', 'jpg', 'bmp', 'png', 'jpeg', 'tiff')));
+		$do_cache = false === (!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '');
 
 		$this->_send_headers($filename, $eTag, $mime_type, $use_compression, 'inline', $real_filename, $do_cache);
 
