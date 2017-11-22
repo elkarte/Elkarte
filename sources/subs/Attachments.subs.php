@@ -2246,7 +2246,7 @@ function getAttachmentIdFromPublic($public_attachid)
 {
 	foreach ($_SESSION['temp_attachments'] as $key => $val)
 	{
-		if ($val['public_attachid'] === $public_attachid)
+		if (isset($val['public_attachid']) && $val['public_attachid'] === $public_attachid)
 		{
 			return $key;
 		}
