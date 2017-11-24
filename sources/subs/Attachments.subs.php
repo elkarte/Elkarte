@@ -2268,7 +2268,7 @@ function getAttachmentIdFromPublic($public_attachid)
 {
 	if (empty($_SESSION['temp_attachments']))
 	{
-		return '';
+		return $public_attachid;
 	}
 
 	foreach ($_SESSION['temp_attachments'] as $key => $val)
@@ -2278,7 +2278,7 @@ function getAttachmentIdFromPublic($public_attachid)
 			return $key;
 		}
 	}
-	return '';
+	return $public_attachid;
 }
 
 /**
