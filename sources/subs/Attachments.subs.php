@@ -609,6 +609,11 @@ function getTempAttachById($attach_id)
 
 	$attach_real_id = null;
 
+	if (empty($_SESSION['temp_attachments']))
+	{
+		throw new \Exception('no_access');
+	}
+
 	foreach ($_SESSION['temp_attachments'] as $attachID => $val)
 	{
 		if ($val['public_attachid'] === $attach_id)
@@ -2261,6 +2266,11 @@ function returnMimeThumb($file_ext, $url = false)
  */
 function getAttachmentIdFromPublic($public_attachid)
 {
+	if (empty($_SESSION['temp_attachments']))
+	{
+		return '';
+	}
+
 	foreach ($_SESSION['temp_attachments'] as $key => $val)
 	{
 		if (isset($val['public_attachid']) && $val['public_attachid'] === $public_attachid)
