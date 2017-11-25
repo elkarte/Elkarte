@@ -56,6 +56,10 @@ function recountOpenReports($flush = true, $count_pms = false)
 	}
 	$db->free_result($request);
 
+	if ($count_pms !== true)
+	{
+		$open_reports['pm'] = 0;
+	}
 	$_SESSION['rc'] = array(
 		'id' => $user_info['id'],
 		'time' => time(),
@@ -63,19 +67,16 @@ function recountOpenReports($flush = true, $count_pms = false)
 		'pm_reports' => $open_reports['pm'],
 	);
 
-	$context['open_mod_reports'] = $open_reports['msg'];
 	// Safety net, even though this (and the above)  should not be done here at all.
-	if ($count_pms)
-	{
-		$context['open_pm_reports'] = $open_reports['pm'];
-	}
+	$context['open_mod_reports'] = $open_reports['msg'];
+	$context['open_pm_reports'] = $open_reports['pm'];
 
 	if ($flush)
 	{
 		Cache::instance()->remove('num_menu_errors');
 	}
 
-	return $count_pms ? $open_reports : $open_reports['msg'];
+	return $open_reports;
 }
 
 /**
