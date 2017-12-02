@@ -85,7 +85,10 @@ class Bootstrap
 	private function setConstants()
 	{
 		// First things first, but not necessarily in that order.
-		define('ELK', '1');
+		if (!defined('ELK'))
+		{
+			define('ELK', '1');
+		}
 		define('ELKBOOT', '1');
 
 		// The software version
