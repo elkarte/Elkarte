@@ -256,6 +256,7 @@ function getFileVersions(&$versionOptions)
 	if ($settings['theme_id'] != 1)
 		$directories += array('template_versions' => $settings['theme_dir']);
 	readFileVersions($version_info, $directories, 'template.php');
+	readFileVersions($version_info, $directories, 'Theme.php');
 
 	// Load up all the files in the default language directory and sort by language.
 	// @todo merge this loop into readFileVersions
