@@ -82,10 +82,19 @@ foreach (array('admin', 'controllers', 'database', 'subs') as $type)
 	{
 		if ($new_version == $ver)
 		{
-			$update_files[] = $type . $file;
+			$update_files[] = str_replace('subssubs', 'subs', $type . $file);
 		}
 		fwrite($handle, "\t'{$type}{$file}': '{$ver}',\n");
 	}
+}
+
+foreach ($version_info['file_versions_modules'] as $file => $ver)
+{
+	if ($new_version == $ver)
+	{
+		$update_files[] = 'sources' . $file;
+	}
+	fwrite($handle, "\t'{$type}{$file}': '{$ver}',\n");
 }
 
 foreach ($version_info['file_versions'] as $file => $ver)
@@ -166,7 +175,17 @@ function getFilesChanged($from, $to)
 	$list = array();
 	foreach ($files as $file)
 	{
+		if ($file[0] === '.')
+		{
+			continue;
+		}
+
 		if (strpos($file, 'install') !== false)
+		{
+			continue;
+		}
+
+		if (strpos($file, 'release_tools') !== false)
 		{
 			continue;
 		}
@@ -217,9 +236,9 @@ function getFilesChanged($from, $to)
 			continue;
 		}
 
-		if ($file === 'subscriptions.php')
+		if ($file === 'subscriptions.php' || $file === 'bootstrap.php' || $file === 'email_imap_cron.php' || $file === 'emailpost.php' || $file === 'emailtopic.php')
 		{
-			$list[] = 'sourcessubscriptions.php';
+			$list[] = 'sources' . $file;
 			continue;
 		}
 
