@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -399,11 +399,12 @@ function getProfileField($id_field)
 
 	$field = array();
 
+	// The fully-qualified name for rows is here because it's a reserved word in Mariadb 10.2.4+ and quoting would be different for MySQL/Mariadb and PSQL
 	$request = $db->query('', '
 		SELECT
 			id_field, col_name, field_name, field_desc, field_type, field_length, field_options,
 			show_reg, show_display, show_memberlist, show_profile, private, active, default_value, can_search,
-			bbc, mask, enclose, placement, vieworder, rows, cols
+			bbc, mask, enclose, placement, vieworder, {db_prefix}custom_fields.rows, cols
 		FROM {db_prefix}custom_fields
 		WHERE id_field = {int:current_field}',
 		array(
@@ -532,6 +533,7 @@ function updateProfileField($field_data)
 {
 	$db = database();
 
+	// The fully-qualified name for rows is here because it's a reserved word in Mariadb 10.2.4+ and quoting would be different for MySQL/Mariadb and PSQL
 	$db->query('', '
 		UPDATE {db_prefix}custom_fields
 		SET
@@ -542,7 +544,7 @@ function updateProfileField($field_data)
 			show_profile = {string:show_profile}, private = {int:private},
 			active = {int:active}, default_value = {string:default_value},
 			can_search = {int:can_search}, bbc = {int:bbc}, mask = {string:mask},
-			enclose = {string:enclose}, placement = {int:placement}, rows = {int:rows},
+			enclose = {string:enclose}, placement = {int:placement}, {db_prefix}custom_fields.rows = {int:rows},
 			cols = {int:cols}
 		WHERE id_field = {int:current_field}',
 		array(
@@ -802,7 +804,7 @@ function getMentionsModules($enabled_mentions)
  *
  * What it does:
  *
- * - Scans controllerdir and addonsdir for .controller.php fils
+ * - Scans controllerdir and addonsdir for .controller.php files
  * - Checks if found files have a static frontPageOptions method
  *
  * @return array

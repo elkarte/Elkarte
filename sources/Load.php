@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -2825,9 +2825,16 @@ function serializeToJson($variable, $save_callback = null)
 	$array_form = json_decode($variable, true);
 
 	// decoding failed, let's try with unserialize
-	if ($array_form === null)
+	if (!is_array($array_form))
 	{
-		$array_form = Util::unserialize($variable);
+		try
+		{
+			$array_form = Util::unserialize($variable);
+		}
+		catch (\Exception $e)
+		{
+			$array_form = false;
+		}
 
 		// If unserialize fails as well, let's just store an empty array
 		if ($array_form === false)

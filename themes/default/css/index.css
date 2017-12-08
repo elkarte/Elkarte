@@ -718,7 +718,7 @@ em, .em {
 #creator dt strong, .settings label,
 .popup_heading {
 	font-weight: 600;
-	font-family: "Segoe UI Semibold", "Segoe UI", "Helvetica Neue Medium", "Helvetica Neue", serif;
+	font-family: "Segoe UI Semibold", "Segoe UI", "Helvetica Neue Medium", -apple-system, BlinkMacSystemFont, "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Droid Sans", "Helvetica Neue", "Trebuchet MS", Arial, sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
@@ -2647,8 +2647,8 @@ img.new_posts {
 /* Message index icons and topic status */
 .topicicon:before {
 	display: inline-block;
-	width: 18px;
-	height: 16px;
+	width: 1.3em;
+	height: 1.15em;
 	content: "";
 	vertical-align: middle;
 }
@@ -2659,7 +2659,7 @@ img.new_posts {
 }
 
 .fred.i-profile::before {
-	max-width: 12px;
+	max-width: .8em;
 }
 
 /* sticky / locked icons for the upper right of the div */
@@ -2671,9 +2671,9 @@ img.new_posts {
 .locked_row.sticky_row .topic_info .topic_name:before {
 	display: block;
 	float: right;
-	margin-right: -16px;
-	width: 16px;
-	height: 16px;
+	margin-right: -1.15em;
+	width: 1.15em;
+	height: 1.15em;
 	content: "";
 }
 
@@ -3217,7 +3217,6 @@ img.new_posts {
 #elk_lb_expand:before {
 	content: "\21D7";
 	font-size: 2em;
-	color: #CCCCCC;
 }
 
 .elk_lb_no_scrolling {

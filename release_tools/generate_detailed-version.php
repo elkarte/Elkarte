@@ -58,13 +58,13 @@ $changed_files_list = getFilesChanged('master', $new_release);
 $update_files = array();
 
 // Now we need to grab the current version of the script from index.php
-$index = file_get_contents(BOARDDIR . '/index.php');
+$index = file_get_contents(BOARDDIR . '/bootstrap.php');
 $index_lines = explode("\n", $index);
 foreach ($index_lines as $line)
 {
-	if (strpos($line, 'const FORUM_VERSION') !== false)
+	if (strpos($line, 'define(\'FORUM_VERSION') !== false)
 	{
-		preg_match('~\'(ElkArte .*)\';$~', $line, $matches);
+		preg_match('~\'(ElkArte .*)\'\);$~', $line, $matches);
 		$forum_version = $matches[1];
 		break;
 	}
@@ -82,10 +82,19 @@ foreach (array('admin', 'controllers', 'database', 'subs') as $type)
 	{
 		if ($new_version == $ver)
 		{
-			$update_files[] = $type . $file;
+			$update_files[] = str_replace('subssubs', 'subs', $type . $file);
 		}
 		fwrite($handle, "\t'{$type}{$file}': '{$ver}',\n");
 	}
+}
+
+foreach ($version_info['file_versions_modules'] as $file => $ver)
+{
+	if ($new_version == $ver)
+	{
+		$update_files[] = 'sources' . $file;
+	}
+	fwrite($handle, "\t'{$type}{$file}': '{$ver}',\n");
 }
 
 foreach ($version_info['file_versions'] as $file => $ver)
@@ -166,7 +175,17 @@ function getFilesChanged($from, $to)
 	$list = array();
 	foreach ($files as $file)
 	{
+		if ($file[0] === '.')
+		{
+			continue;
+		}
+
 		if (strpos($file, 'install') !== false)
+		{
+			continue;
+		}
+
+		if (strpos($file, 'release_tools') !== false)
 		{
 			continue;
 		}
@@ -217,9 +236,9 @@ function getFilesChanged($from, $to)
 			continue;
 		}
 
-		if ($file === 'subscriptions.php')
+		if ($file === 'subscriptions.php' || $file === 'bootstrap.php' || $file === 'email_imap_cron.php' || $file === 'emailpost.php' || $file === 'emailtopic.php')
 		{
-			$list[] = 'sourcessubscriptions.php';
+			$list[] = 'sources' . $file;
 			continue;
 		}
 

@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -820,7 +820,7 @@ function pbe_email_attachments($pbe, $email_message)
 	foreach ($attachments as $attachID => $attachment)
 	{
 		// If there were any errors we just skip that file
-		if (($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $pbe['profile']['id_member']) === false) || ($attachID == 'initial_error' || !empty($attachment['errors'])))
+		if (($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $pbe['profile']['id_member'] . '_') === false) || ($attachID == 'initial_error' || !empty($attachment['errors'])))
 		{
 			@unlink($attachment['tmp_name']);
 			continue;

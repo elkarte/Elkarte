@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -90,7 +90,7 @@ class Announce_Controller extends Action_Controller
 		// Get the subject of the topic we're about to announce.
 		$topic_info = getTopicInfo($topic, 'message');
 		$context['topic_subject'] = $topic_info['subject'];
-		$context['announce_topic']['subject'] = censor($context['announce_topic']['subject']);
+		$context['topic_subject'] = censor($context['topic_subject']);
 
 		// Prepare for the template
 		$context['move'] = isset($this->_req->query->move) ? 1 : 0;
