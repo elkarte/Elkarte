@@ -580,7 +580,7 @@ Should be an empty line in between.',
 	 */
 	public function testBBcode()
 	{
-		$parsers = \BBC\ParserWrapper::getInstance();
+		$parsers = \BBC\ParserWrapper::instance();
 		foreach ($this->bbcTestCases as $testcase)
 		{
 			$name = $testcase[0];
@@ -598,7 +598,7 @@ Should be an empty line in between.',
 	 */
 	public function testInvalidBBcode()
 	{
-		$parsers = \BBC\ParserWrapper::getInstance();
+		$parsers = \BBC\ParserWrapper::instance();
 		foreach ($this->bbcInvalidTestCases as $testcase)
 		{
 			$name = 'Broken ' . $testcase[0];
