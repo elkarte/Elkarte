@@ -1,5 +1,5 @@
 <?php
-// Version: 1.1; notifications
+// Version: 1.1; UserNotifications
 
 $txt['usernotif_title'] = 'User Notifications Settings';
 $txt['usernotif_desktop_enable'] = 'Enable desktop notifications';

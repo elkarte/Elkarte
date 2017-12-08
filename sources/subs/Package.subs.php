@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -1542,7 +1542,7 @@ function deltree($dir, $delete_dir = true)
 		{
 			$ftp_file = strtr($dir, array($_SESSION['pack_ftp']['root'] => ''));
 
-			if ($entryname->getPathname()->isWritable())
+			if (!is_writable($dir . '/'))
 				$package_ftp->chmod($ftp_file, 0777);
 
 			$package_ftp->unlink($ftp_file);
@@ -2543,10 +2543,10 @@ function package_create_backup($id = 'backup')
  * @param string $url
  * @param string $post_data = ''
  * @param bool $keep_alive = false
- * @param int $redirection_level = 2
+ * @param int $redirection_level = 3
  * @return string
  */
-function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection_level = 2)
+function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection_level = 3)
 {
 	global $webmaster_email;
 	static $keep_alive_dom = null, $keep_alive_fp = null;
@@ -2617,7 +2617,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		// I want this, from there, and I'm not going to be bothering you for more (probably.)
 		if (empty($post_data))
 		{
-			fwrite($fp, 'GET ' . ($match[6] !== '/' ? str_replace(' ', '%20', $match[6]) : '') . ' HTTP/1.0' . "\r\n");
+			fwrite($fp, 'GET ' . ($match[6] !== '/' ? str_replace(' ', '%20', $match[6]) : '/') . ' HTTP/1.1' . "\r\n");
 			fwrite($fp, 'Host: ' . $match[3] . (empty($match[5]) ? ($match[2] ? ':443' : '') : ':' . $match[5]) . "\r\n");
 			fwrite($fp, 'User-Agent: PHP/ELK' . "\r\n");
 			if ($keep_alive)
@@ -2627,7 +2627,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		}
 		else
 		{
-			fwrite($fp, 'POST ' . ($match[6] !== '/' ? $match[6] : '') . ' HTTP/1.0' . "\r\n");
+			fwrite($fp, 'POST ' . ($match[6] !== '/' ? $match[6] : '') . ' HTTP/1.1' . "\r\n");
 			fwrite($fp, 'Host: ' . $match[3] . (empty($match[5]) ? ($match[2] ? ':443' : '') : ':' . $match[5]) . "\r\n");
 			fwrite($fp, 'User-Agent: PHP/ELK' . "\r\n");
 			if ($keep_alive)
@@ -2642,7 +2642,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		$response = fgets($fp, 768);
 
 		// Redirect in case this location is permanently or temporarily moved.
-		if ($redirection_level < 3 && preg_match('~^HTTP/\S+\s+30[127]~i', $response) === 1)
+		if ($redirection_level < 6 && preg_match('~^HTTP/\S+\s+30[127]~i', $response) === 1)
 		{
 			$location = '';
 			while (!feof($fp) && trim($header = fgets($fp, 4096)) != '')

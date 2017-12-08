@@ -12,7 +12,7 @@
  * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  * license:        BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -55,9 +55,21 @@ $ssi_on_error_method = false;
 // $ssi_guest_access = false;
 
 // We are in Elk, but from the side-entrance.
-const ELK = 'SSI';
+if (!defined('ELKBOOT'))
+{
+	define('ELK', 'SSI');
 
-require_once(dirname(__FILE__) . '/bootstrap.php');
+	require_once(dirname(__FILE__) . '/bootstrap.php');
+	$bootstrap = new Bootstrap();
+}
+
+// The globals that were created during the bootstrap process
+global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
+global $boardurl, $webmaster_email, $cookiename;
+global $db_type, $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send;
+global $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
+global $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
+global $boarddir, $sourcedir, $db_show_debug, $ssi_error_reporting;
 
 // Have the ability to easily add functions to SSI.
 call_integration_hook('integrate_SSI');
