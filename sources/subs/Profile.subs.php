@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -182,10 +182,11 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		$where .= ' AND show_profile = {string:area}';
 
 	// Load all the relevant fields - and data.
+	// The fully-qualified name for rows is here because it's a reserved word in Mariadb 10.2.4+ and quoting would be different for MySQL/Mariadb and PSQL
 	$request = $db->query('', '
 		SELECT
 			col_name, field_name, field_desc, field_type, show_reg, field_length, field_options,
-			default_value, bbc, enclose, placement, mask, vieworder, rows, cols
+			default_value, bbc, enclose, placement, mask, vieworder, {db_prefix}custom_fields.rows, cols
 		FROM {db_prefix}custom_fields
 		WHERE ' . $where . '
 		ORDER BY vieworder ASC',

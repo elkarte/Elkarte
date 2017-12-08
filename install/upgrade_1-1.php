@@ -27,7 +27,7 @@
  * array(
  *     array(
  *         'debug_title' => 'A string representing a title shown when debugging',
- *         'function' => function($db, $db_table) { // Code },
+ *         'function' => function() { // Code },
  *     ),
  *     [...],
  * );
@@ -53,15 +53,15 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Remove any old file left and check if the table is empty...',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
 					updateSettings(array('detailed-version.js' => 'https://elkarte.github.io/Elkarte/site/detailed-version.js'));
 
-					if ($db_table->table_exists('{db_prefix}admin_info_files'))
+					if ($this->table->table_exists('{db_prefix}admin_info_files'))
 					{
 						foreach (array('current-version.js', 'detailed-version.js', 'latest-news.js', 'latest-smileys.js', 'latest-versions.txt') as $file)
 						{
-							$db->query('', '
+							$this->db->query('', '
 							DELETE FROM {db_prefix}admin_info_files
 							WHERE filename = {string:current_file}',
 								array(
@@ -69,7 +69,7 @@ class UpgradeInstructions_upgrade_1_1
 								)
 							);
 						}
-						$request = $db->query('', '
+						$request = $this->db->query('', '
 							SELECT COUNT(*)
 							FROM {db_prefix}admin_info_files',
 							array()
@@ -77,10 +77,10 @@ class UpgradeInstructions_upgrade_1_1
 						if ($request)
 						{
 							// Drop it only if it is empty
-							list ($count) = (int) $db->fetch_row($request);
+							list ($count) = (int) $this->db->fetch_row($request);
 							if ($count == 0)
 							{
-								$db_table->db_drop_table('{db_prefix}admin_info_files');
+								$this->table->db_drop_table('{db_prefix}admin_info_files');
 							}
 						}
 					}
@@ -99,9 +99,9 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Adding new two factor columns to members table...',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
-					$db_table->db_add_column('{db_prefix}members',
+					$this->table->db_add_column('{db_prefix}members',
 						array(
 							'name' => 'otp_secret',
 							'type' => 'varchar',
@@ -111,7 +111,7 @@ class UpgradeInstructions_upgrade_1_1
 						array(),
 						'ignore'
 					);
-					$db_table->db_add_column('{db_prefix}members',
+					$this->table->db_add_column('{db_prefix}members',
 						array(
 							'name' => 'enable_otp',
 							'type' => 'tinyint',
@@ -121,7 +121,7 @@ class UpgradeInstructions_upgrade_1_1
 						array(),
 						'ignore'
 					);
-					$db_table->db_add_column('{db_prefix}members',
+					$this->table->db_add_column('{db_prefix}members',
 						array(
 							'name' => 'otp_used',
 							'type' => 'int',
@@ -146,9 +146,9 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Adding new tables for notifications...',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
-					$db_table->db_create_table('{db_prefix}pending_notifications',
+					$this->table->db_create_table('{db_prefix}pending_notifications',
 						array(
 							array('name' => 'notification_type', 'type' => 'varchar', 'size' => 10),
 							array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -163,7 +163,7 @@ class UpgradeInstructions_upgrade_1_1
 						'ignore'
 					);
 
-					$db_table->db_create_table('{db_prefix}notifications_pref',
+					$this->table->db_create_table('{db_prefix}notifications_pref',
 						array(
 							array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 							array('name' => 'notification_level', 'type' => 'tinyint', 'size' => 1, 'default' => 1),
@@ -194,9 +194,9 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Separate mentions visibility from accessibility...',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
-					$db_table->db_add_column('{db_prefix}log_mentions',
+					$this->table->db_add_column('{db_prefix}log_mentions',
 						array(
 							'name' => 'is_accessible',
 							'type' => 'tinyint',
@@ -205,7 +205,7 @@ class UpgradeInstructions_upgrade_1_1
 						)
 					);
 
-					$db_table->db_change_column('{db_prefix}log_mentions',
+					$this->table->db_change_column('{db_prefix}log_mentions',
 						'mention_type',
 						array(
 							'type' => 'varchar',
@@ -217,24 +217,24 @@ class UpgradeInstructions_upgrade_1_1
 			),
 			array(
 				'debug_title' => 'Update mention logs...',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
 					global $modSettings;
 
-					$db->query('', '
+					$this->db->query('', '
 						UPDATE {db_prefix}log_mentions
 						SET is_accessible = CASE WHEN status < 0 THEN 0 ELSE 1 END',
 						array()
 					);
 
-					$db->query('', '
+					$this->db->query('', '
 						UPDATE {db_prefix}log_mentions
 						SET status = -(status + 1)
 						WHERE status < 0',
 						array()
 					);
 
-					$db->query('', '
+					$this->db->query('', '
 						UPDATE {db_prefix}log_mentions
 						SET mention_type = {string:to}
 						WHERE mention_type = {string:from}',
@@ -244,7 +244,7 @@ class UpgradeInstructions_upgrade_1_1
 						)
 					);
 
-					$db->query('', '
+					$this->db->query('', '
 						UPDATE {db_prefix}log_mentions
 						SET mention_type = {string:to}
 						WHERE mention_type = {string:from}',
@@ -254,7 +254,7 @@ class UpgradeInstructions_upgrade_1_1
 						)
 					);
 
-					$db->query('', '
+					$this->db->query('', '
 						UPDATE {db_prefix}log_mentions
 						SET mention_type = {string:to}
 						WHERE mention_type = {string:from}',
@@ -282,7 +282,7 @@ class UpgradeInstructions_upgrade_1_1
 							$enabled_mentions = array_diff($enabled_mentions, array($toggle));
 						}
 
-						$db->query('', '
+						$this->db->query('', '
 							INSERT IGNORE INTO {db_prefix}notifications_pref
 								(id_member, mention_type, notification_level)
 							SELECT id_member, {string:mention_type}, {int:level}
@@ -298,9 +298,9 @@ class UpgradeInstructions_upgrade_1_1
 			),
 			array(
 				'debug_title' => 'Make mentions generic and not message-centric...',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
-					$db_table->db_change_column('{db_prefix}log_mentions', 'id_msg',
+					$this->table->db_change_column('{db_prefix}log_mentions', 'id_msg',
 						array(
 							'name' => 'id_target',
 						)
@@ -320,7 +320,7 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Converts settings to modules...',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
 					global $modSettings;
 
@@ -372,12 +372,12 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Splitting email_id into it\'s components in postby_emails...',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
-					if ($db_table->column_exists('{db_prefix}postby_emails', 'message_key') === false)
+					if ($this->table->column_exists('{db_prefix}postby_emails', 'message_key') === false)
 					{
 						// Add the new columns
-						$db_table->db_add_column('{db_prefix}postby_emails',
+						$this->table->db_add_column('{db_prefix}postby_emails',
 							array(
 								'name' => 'message_key',
 								'type' => 'varchar',
@@ -387,7 +387,7 @@ class UpgradeInstructions_upgrade_1_1
 							array(),
 							'ignore'
 						);
-						$db_table->db_add_column('{db_prefix}postby_emails',
+						$this->table->db_add_column('{db_prefix}postby_emails',
 							array(
 								'name' => 'message_type',
 								'type' => 'varchar',
@@ -397,7 +397,7 @@ class UpgradeInstructions_upgrade_1_1
 							array(),
 							'ignore'
 						);
-						$db_table->db_add_column('{db_prefix}postby_emails',
+						$this->table->db_add_column('{db_prefix}postby_emails',
 							array(
 								'name' => 'message_id',
 								'type' => 'mediumint',
@@ -409,7 +409,7 @@ class UpgradeInstructions_upgrade_1_1
 						);
 
 						// Move the data from the single column to the new three
-						$db->query('',
+						$this->db->query('',
 							'UPDATE {db_prefix}postby_emails
 							SET
 								message_key = SUBSTRING(id_email FROM 1 FOR 32),
@@ -418,26 +418,26 @@ class UpgradeInstructions_upgrade_1_1
 						);
 
 						// Do the cleanup
-						$db_table->db_remove_column('{db_prefix}postby_emails', 'id_email');
-						$db_table->db_remove_index('{db_prefix}postby_emails', 'id_email');
-						$db_table->db_add_index('{db_prefix}postby_emails', array('name' => 'id_email', 'columns' => array('message_key', 'message_type', 'message_id'), 'type' => 'primary'));
+						$this->table->db_remove_column('{db_prefix}postby_emails', 'id_email');
+						$this->table->db_remove_index('{db_prefix}postby_emails', 'id_email');
+						$this->table->db_add_index('{db_prefix}postby_emails', array('name' => 'id_email', 'columns' => array('message_key', 'message_type', 'message_id'), 'type' => 'primary'));
 					}
 				}
 			),
 			array(
 				'debug_title' => 'Naming consistency for postby_emails_error table columns...',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
-					if ($db_table->column_exists('{db_prefix}postby_emails_error', 'data_id') === true)
+					if ($this->table->column_exists('{db_prefix}postby_emails_error', 'data_id') === true)
 					{
 						// Rename some columns
-						$db_table->db_change_column('{db_prefix}postby_emails_error',
+						$this->table->db_change_column('{db_prefix}postby_emails_error',
 							'data_id',
 							array(
 								'name' => 'message_key',
 							)
 						);
-						$db_table->db_change_column('{db_prefix}postby_emails_error',
+						$this->table->db_change_column('{db_prefix}postby_emails_error',
 							'id_message',
 							array(
 								'name' => 'message_id',
@@ -448,10 +448,10 @@ class UpgradeInstructions_upgrade_1_1
 			),
 			array(
 				'debug_title' => 'Updating PBE filter/parser table columns...',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
 					// Filter type was 5 now needs to be 6
-					$db_table->db_change_column('{db_prefix}postby_emails_filters',
+					$this->table->db_change_column('{db_prefix}postby_emails_filters',
 						'filter_style',
 						array(
 							'type' => 'char',
@@ -460,7 +460,7 @@ class UpgradeInstructions_upgrade_1_1
 						)
 					);
 					// Update any filte to filter, and parse to parser
-					$db->query('', '
+					$this->db->query('', '
 						UPDATE {db_prefix}postby_emails_filters
 						SET filter_style = {string:to}
 						WHERE filter_style = {string:from}',
@@ -469,7 +469,7 @@ class UpgradeInstructions_upgrade_1_1
 							'to' => 'filter'
 						)
 					);
-					$db->query('', '
+					$this->db->query('', '
 						UPDATE {db_prefix}postby_emails_filters
 						SET filter_style = {string:to}
 						WHERE filter_style = {string:from}',
@@ -493,11 +493,11 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Adding new columns for PM reporting...',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
-					if ($db_table->column_exists('{db_prefix}log_reported', 'type') === false)
+					if ($this->table->column_exists('{db_prefix}log_reported', 'type') === false)
 					{
-						$db_table->db_add_column('{db_prefix}log_reported',
+						$this->table->db_add_column('{db_prefix}log_reported',
 							array(
 								'name' => 'type',
 								'type' => 'varchar',
@@ -507,7 +507,7 @@ class UpgradeInstructions_upgrade_1_1
 							array(),
 							'ignore'
 						);
-						$db_table->db_add_column('{db_prefix}log_reported',
+						$this->table->db_add_column('{db_prefix}log_reported',
 							array(
 								'name' => 'time_message',
 								'type' => 'int',
@@ -517,8 +517,8 @@ class UpgradeInstructions_upgrade_1_1
 							array(),
 							'ignore'
 						);
-						$db_table->db_remove_index('{db_prefix}log_reported', 'id_msg');
-						$db_table->db_add_index('{db_prefix}log_reported', array('name' => 'msg_type', 'columns' => array('type', 'id_msg'), 'type' => 'key'));
+						$this->table->db_remove_index('{db_prefix}log_reported', 'id_msg');
+						$this->table->db_add_index('{db_prefix}log_reported', array('name' => 'msg_type', 'columns' => array('type', 'id_msg'), 'type' => 'key'));
 					}
 				}
 			)
@@ -535,9 +535,9 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Converting IP columns to varchar instead of int...',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
-					$columns = $db_table->db_list_columns('{db_prefix}log_online', true);
+					$columns = $this->table->db_list_columns('{db_prefix}log_online', true);
 
 					$column_name = 'ip';
 
@@ -549,10 +549,10 @@ class UpgradeInstructions_upgrade_1_1
 						}
 					}
 
-					$db->query('', '
+					$this->db->query('', '
 						TRUNCATE TABLE {db_prefix}log_online');
 
-					$db_table->db_change_column('{db_prefix}log_online',
+					$this->table->db_change_column('{db_prefix}log_online',
 						$column_name,
 						array(
 							'type' => 'varchar',
@@ -575,9 +575,9 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Changing the pm count column to mediumint.',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
-					$db_table->db_change_column('{db_prefix}members',
+					$this->table->db_change_column('{db_prefix}members',
 						'personal_messages',
 						array(
 							'type' => 'mediumint',
@@ -600,9 +600,9 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Adding new custom field columns',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
-					$db_table->db_add_column('{db_prefix}custom_fields',
+					$this->table->db_add_column('{db_prefix}custom_fields',
 						array(
 							'name' => 'rows',
 							'type' => 'smallint',
@@ -610,7 +610,7 @@ class UpgradeInstructions_upgrade_1_1
 							'default' => 4
 						)
 					);
-					$db_table->db_add_column('{db_prefix}custom_fields',
+					$this->table->db_add_column('{db_prefix}custom_fields',
 						array(
 							'name' => 'cols',
 							'type' => 'smallint',
@@ -622,14 +622,14 @@ class UpgradeInstructions_upgrade_1_1
 			),
 			array(
 				'debug_title' => 'Populating new custom field columns where needed',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
-					$result = $db->query('', '
+					$result = $this->db->query('', '
 						SELECT id_field, default_value 
 						FROM {db_prefix}custom_fields 
 						WHERE field_type="textarea"');
 
-					while ($row = $db->fetch_assoc($result))
+					while ($row = $this->db->fetch_assoc($result))
 					{
 						$vals = explode(',', $row['default_value']);
 						$rows = (int) $vals[0];
@@ -637,9 +637,10 @@ class UpgradeInstructions_upgrade_1_1
 
 						if (count($vals) === 2 && $rows && $cols)
 						{
-							$db->query('', '
+							// The fully-qualified name for rows is here because it's a reserved word in Mariadb 10.2.4+ and quoting would be different for MySQL/Mariadb and PSQL
+							$this->db->query('', '
 								UPDATE {db_prefix}custom_fields 
-								SET rows=' . $rows . ' , cols=' . $cols . ' 
+								SET {db_prefix}custom_fields.rows=' . $rows . ' , cols=' . $cols . '
 								WHERE id_field=' . $row['id_field']);
 						}
 					}
@@ -647,9 +648,9 @@ class UpgradeInstructions_upgrade_1_1
 			),
 			array(
 				'debug_title' => 'Inserting custom fields for gender/location/personal text',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
-					$db->insert('replace',
+					$this->db->insert('replace',
 						'{db_prefix}custom_fields',
 						array('col_name' => 'string', 'field_name' => 'string', 'field_desc' => 'string', 'field_type' => 'string', 'field_length' => 'int', 'field_options' => 'string', 'mask' => 'string', 'show_reg' => 'int', 'show_display' => 'int', 'show_profile' => 'string', 'private' => 'int', 'active' => 'int', 'bbc' => 'int', 'can_search' => 'int', 'default_value' => 'string', 'enclose' => 'string', 'placement' => 'int', 'rows' => 'int', 'cols' => 'int'),
 						array(
@@ -663,33 +664,33 @@ class UpgradeInstructions_upgrade_1_1
 			),
 			array(
 				'debug_title' => 'Updating icon custom fields',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
-					$result = $db->query('', '
+					$result = $this->db->query('', '
 						SELECT id_field, col_name 
 						FROM {db_prefix}custom_fields 
 						WHERE placement = 1');
-					while ($row = $db->fetch_assoc($result))
+					while ($row = $this->db->fetch_assoc($result))
 					{
 						switch ($row['col_name'])
 						{
 							case 'cust_skye':
-								$db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a href="skype:{INPUT}?call" class="icon i-skype icon-big" title="Skype call {INPUT}"><s>Skype call {INPUT}</s></a>\' WHERE id_field=' . $row['id_field']);
+								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a href="skype:{INPUT}?call" class="icon i-skype icon-big" title="Skype call {INPUT}"><s>Skype call {INPUT}</s></a>\' WHERE id_field=' . $row['id_field']);
 								break;
 							case 'cust_fbook':
-								$db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a target="_blank" href="https://www.facebook.com/{INPUT}" class="icon i-facebook icon-big" title="Facebook"><s>Facebook</s></a>\' WHERE id_field=' . $row['id_field']);
+								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a target="_blank" href="https://www.facebook.com/{INPUT}" class="icon i-facebook icon-big" title="Facebook"><s>Facebook</s></a>\' WHERE id_field=' . $row['id_field']);
 								break;
 							case 'cust_twitt':
-								$db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a target="_blank" href="https://www.twitter.com/{INPUT}" class="icon i-twitter icon-big" title="Twitter Profile"><s>Twitter Profile</s></a>\' WHERE id_field=' . $row['id_field']);
+								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a target="_blank" href="https://www.twitter.com/{INPUT}" class="icon i-twitter icon-big" title="Twitter Profile"><s>Twitter Profile</s></a>\' WHERE id_field=' . $row['id_field']);
 								break;
 							case 'cust_linked':
-								$db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a href="{INPUT}" class="icon i-linkedin icon-big" title="Linkedin Profile"><s>Linkedin Profile</s></a>\' WHERE id_field=' . $row['id_field']);
+								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a href="{INPUT}" class="icon i-linkedin icon-big" title="Linkedin Profile"><s>Linkedin Profile</s></a>\' WHERE id_field=' . $row['id_field']);
 								break;
 							case 'cust_gplus':
-								$db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a target="_blank" href="{INPUT}" class="icon i-google-plus icon-big" title="G+ Profile"><s>G+ Profile</s></a>\' WHERE id_field=' . $row['id_field']);
+								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a target="_blank" href="{INPUT}" class="icon i-google-plus icon-big" title="G+ Profile"><s>G+ Profile</s></a>\' WHERE id_field=' . $row['id_field']);
 								break;
 							case 'cust_icq':
-								$db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a class="icq" href="//www.icq.com/people/{INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>\' WHERE id_field=' . $row['id_field']);
+								$this->db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a class="icq" href="//www.icq.com/people/{INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>\' WHERE id_field=' . $row['id_field']);
 								break;
 						}
 					}
@@ -697,76 +698,85 @@ class UpgradeInstructions_upgrade_1_1
 			),
 			array(
 				'debug_title' => 'Converting gender data',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
-					$result = $db->query('', '
-						SELECT id_member, gender 
-						FROM {db_prefix}members
-						WHERE gender != ""');
-					while ($row = $db->fetch_assoc($result))
+					if ($this->table->column_exists('{db_prefix}members', 'gender') === true)
 					{
-						$gender = 'undisclosed';
-
-						switch ($row['gender'])
+						$result = $this->db->query('', '
+							SELECT id_member, gender
+							FROM {db_prefix}members
+							WHERE gender != ""');
+						while ($row = $this->db->fetch_assoc($result))
 						{
-							case 1:
-								$gender = 'male';
-								break;
-							case 2:
-								$gender = 'female';
-								break;
-						}
+							$gender = 'undisclosed';
 
-						$db->insert('replace',
-							'{db_prefix}custom_fields_data',
-							array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
-							array(
-								array($row['id_member'], 'cust_gender', $gender),
-							),
-							'id_member'
-						);
+							switch ($row['gender'])
+							{
+								case 1:
+									$gender = 'male';
+									break;
+								case 2:
+									$gender = 'female';
+									break;
+							}
+
+							$this->db->insert('replace',
+								'{db_prefix}custom_fields_data',
+								array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
+								array(
+									array($row['id_member'], 'cust_gender', $gender),
+								),
+								'id_member'
+							);
+						}
 					}
 				}
 			),
 			array(
 				'debug_title' => 'Converting location',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
-					$result = $db->query('', '
-						SELECT id_member, location 
-						FROM {db_prefix}members
-						WHERE location != ""');
-					while ($row = $db->fetch_assoc($result))
+					if ($this->table->column_exists('{db_prefix}members', 'location') === true)
 					{
-						$db->insert('replace',
-							'{db_prefix}custom_fields_data',
-							array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
-							array(
-								array($row['id_member'], 'cust_locate', $row['location']),
-							),
-							'id_member'
-						);
+						$result = $this->db->query('', '
+							SELECT id_member, location
+							FROM {db_prefix}members
+							WHERE location != ""');
+						while ($row = $this->db->fetch_assoc($result))
+						{
+							$this->db->insert('replace',
+								'{db_prefix}custom_fields_data',
+								array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
+								array(
+									array($row['id_member'], 'cust_locate', $row['location']),
+								),
+								'id_member'
+							);
+						}
 					}
 				}
 			),
 			array(
 				'debug_title' => 'Converting personal text',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
-					$result = $db->query('', '
-						SELECT id_member, personal_text 
-						FROM {db_prefix}members
-						WHERE personal_text != ""');
-					while ($row = $db->fetch_assoc($result))
+					if ($this->table->column_exists('{db_prefix}members', 'personal_text') === true)
 					{
-						$db->insert('replace',
-							'{db_prefix}custom_fields_data',
-							array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
-							array(
-								array($row['id_member'], 'cust_blurb', $row['personal_text']),
-							),
-							'id_member'
-						);
+						$result = $this->db->query('', '
+							SELECT id_member, personal_text
+							FROM {db_prefix}members
+							WHERE personal_text != ""');
+						while ($row = $this->db->fetch_assoc($result))
+						{
+							$this->db->insert('replace',
+								'{db_prefix}custom_fields_data',
+								array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
+								array(
+									array($row['id_member'], 'cust_blurb', $row['personal_text']),
+								),
+								'id_member'
+							);
+						}
 					}
 				}
 			),
@@ -783,11 +793,11 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Adding new columns...',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
-					if ($db_table->column_exists('{db_prefix}user_drafts', 'is_usersaved') === false)
+					if ($this->table->column_exists('{db_prefix}user_drafts', 'is_usersaved') === false)
 					{
-						$db_table->db_add_column('{db_prefix}user_drafts',
+						$this->table->db_add_column('{db_prefix}user_drafts',
 							array(
 								'name' => 'is_usersaved',
 								'type' => 'tinyint',
@@ -813,9 +823,9 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Altering column to varchar(255)...',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
-					$db_table->db_change_column('{db_prefix}attachments',
+					$this->table->db_change_column('{db_prefix}attachments',
 						'mime_type',
 						array(
 							'type' => 'varchar',
@@ -838,7 +848,7 @@ class UpgradeInstructions_upgrade_1_1
 		return array(
 			array(
 				'debug_title' => 'Adjusting cal_maxyear/cal_limityear...',
-				'function' => function ($db, $db_table)
+				'function' => function()
 				{
 					updateSettings(array(
 						'cal_maxyear' => '2030',

@@ -514,5 +514,5 @@ $txt['trackEdit_action_email_address'] = 'Email Address';
 $txt['trackEdit_action_id_group'] = 'Primary Membergroup';
 $txt['trackEdit_action_additional_groups'] = 'Additional Membergroups';
 
-$txt['otp_enabled_help'] = 'Enabling this will add a second factor (one time password) for authentication.';
-$txt['otp_token_help'] = 'This generates a secret token for Time-based One-time Password apps such as Authy or Google Authenticator. Once the secret was generated use the your favorite authenticator app and scan the qrcode.<ul><li><a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en">Google Authenticator for Android</a></li><li><a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8">Google Authenticator for IOS (Apple)</a></li></ul>';
+$txt['otp_enabled_help'] = 'Enabling this will add a second factor (one-time password) for authentication.';
+$txt['otp_token_help'] = 'This generates a secret token for time-based one-time password  apps such as Authy or Google Authenticator. Once the secret was generated use your favorite authenticator app and scan the qrcode.<ul><li><a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en">Google Authenticator for Android</a></li><li><a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8">Google Authenticator for IOS (Apple)</a></li></ul>';

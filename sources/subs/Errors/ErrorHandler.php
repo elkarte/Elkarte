@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -219,11 +219,12 @@ final class ErrorHandler extends Errors
 		// Showing the errors, lets make it look decent
 		if ($db_show_debug === true && allowedTo('admin_forum'))
 		{
-			$msg = 'PHP Fatal error:  Uncaught exception \'%s\' with message \'%s\' in %s:%s<br />Stack trace:<br />%s<br />  thrown in %s on line %s';
+			$msg = '<strong>%s</strong><br />PHP Fatal error:  Uncaught exception \'%s\' with message \'%s\' in %s:%s<br />Stack trace:<br />%s<br />  thrown in %s on line %s';
 
 			// write tracelines into main template
 			return sprintf(
 				$msg,
+				$this->error_string,
 				get_class($exception),
 				$exception->getMessage(),
 				$exception->getFile(),

@@ -10,7 +10,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -117,9 +117,10 @@ class HtmlParser
 			$diff = substr_count($data, '&lt;' . $tag . '&gt;') - substr_count($data, '&lt;/' . $tag . '&gt;');
 			$data = strtr($data, array('&lt;' . $tag . '&gt;' => '<' . $tag . '>', '&lt;/' . $tag . '&gt;' => '</' . $tag . '>'));
 
+			// Stray open tags, close them all!
 			if ($diff > 0)
 			{
-				$data = substr($data, 0, -1) . str_repeat('</' . $tag . '>', $diff) . substr($data, -1);
+				$data = $data . str_repeat('</' . $tag . '>', $diff);
 			}
 		}
 

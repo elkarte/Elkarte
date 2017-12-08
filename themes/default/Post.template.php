@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -326,14 +326,14 @@ function template_additional_options_below()
 		echo '
 					<h3 id="postAdditionalOptionsHeader" class="category_header panel_toggle">
 							<i id="postMoreExpand" class="chevricon i-chevron-', empty($context['minmax_preferences']['post']) ? 'up' : 'down', ' hide" title="', $txt['hide'], '"></i>
-						<a href="#" id="postMoreExpandLink">', $context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt'], '</a>
+						<a href="#" id="postMoreExpandLink">', !empty($context['attachments']) && $context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt'], '</a>
 					</h3>';
 
 	echo '
 					<div id="', empty($settings['additional_options_collapsible']) ? 'postAdditionalOptionsNC"' : 'postAdditionalOptions"', empty($settings['additional_options_collapsible']) || empty($context['minmax_preferences']['post']) ? '' : ' class="hide"', '>';
 
 	// Is the user allowed to post or if this post already has attachments on it give them the boxes.
-	if ($context['attachments']['can']['post'] || !empty($context['attachments']['current']))
+	if (!empty($context['attachments']) && ($context['attachments']['can']['post'] || !empty($context['attachments']['current'])))
 		$context['attachments']['template']();
 
 	// Display the check boxes for all the standard options - if they are available to the user!
@@ -737,8 +737,8 @@ function template_postarea_below()
 				aSwapLinks: [
 					{
 						sId: \'postMoreExpandLink\',
-						msgExpanded: ' . JavaScriptEscape($context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt']) . ',
-						msgCollapsed: ' . JavaScriptEscape($context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt']) . '
+						msgExpanded: ' . JavaScriptEscape(!empty($context['attachments']) && $context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt']) . ',
+						msgCollapsed: ' . JavaScriptEscape(!empty($context['attachments']) && $context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt']) . '
 					}
 				],
 				oThemeOptions: {

@@ -10,7 +10,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -1120,6 +1120,23 @@ class Codes
 		$this->disabled[$tag] = $tag;
 
 		return isset($this->disabled[$tag]);
+	}
+
+	/**
+	 * Restore a disabled tag
+	 *
+	 * @param $tag
+	 *
+	 * @return bool
+	 */
+	public function restore($tag)
+	{
+		if (isset($this->disabled[$tag]))
+		{
+			unset($this->disabled[$tag]);
+		}
+
+		return !isset($this->disabled[$tag]);
 	}
 
 	/**

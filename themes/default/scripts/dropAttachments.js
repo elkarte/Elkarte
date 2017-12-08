@@ -448,11 +448,13 @@
 		*/
 		runAttachmentQueue = function() {
 			if (attachmentQueue.length > 0 && uploadInProgress === false) {
-				var currentData = attachmentQueue[0];
+				setTimeout(function () {
+					var currentData = attachmentQueue[0];
 
-				uploadInProgress = true;
-				sendFileToServer(currentData.formData, currentData.statusInstance, currentData.fileSize, currentData.fileName);
-				attachmentQueue.splice(0, 1);
+					uploadInProgress = true;
+					sendFileToServer(currentData.formData, currentData.statusInstance, currentData.fileSize, currentData.fileName);
+					attachmentQueue.splice(0, 1);
+				}, 200);
 			}
 		},
 

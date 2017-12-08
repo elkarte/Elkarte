@@ -46,7 +46,6 @@ class TestBBCHTML extends PHPUnit_Framework_TestCase
 	 */
 	public function testBBHTML()
 	{
-		$GLOBALS['modSettings']['enablePostHTML'] = 1;
 
 		$parser = new \BBC\HtmlParser;
 

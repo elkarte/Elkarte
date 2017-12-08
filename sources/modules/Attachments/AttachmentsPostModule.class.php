@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -157,8 +157,10 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 				{
 					foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 					{
-						if (strpos($attachID, 'post_tmp_' . $user_info['id']) !== false)
+						if (strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') !== false)
+						{
 							@unlink($attachment['tmp_name']);
+						}
 					}
 					$this->_attach_errors->addError('temp_attachments_gone');
 					$_SESSION['temp_attachments'] = array();
@@ -172,7 +174,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 						// See if any files still exist before showing the warning message and the files attached.
 						foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 						{
-							if (strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
+							if (strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') === false)
 								continue;
 
 							if (file_exists($attachment['tmp_name']))
@@ -195,7 +197,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 						// Compile a list of the files to show the user.
 						$file_list = array();
 						foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
-							if (strpos($attachID, 'post_tmp_' . $user_info['id']) !== false)
+							if (strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') !== false)
 								$file_list[] = $attachment['name'];
 
 						$_SESSION['temp_attachments']['post']['files'] = $file_list;
@@ -224,7 +226,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 						break;
 
 					// Initial errors (such as missing directory), we can recover
-					if ($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
+					if ($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') === false)
 						continue;
 
 					if ($attachID === 'initial_error')
@@ -358,21 +360,25 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 		// First check to see if they are trying to delete any current attachments.
 		if (isset($_POST['attach_del']))
 		{
+			require_once(SUBSDIR . '/Attachments.subs.php');
 			$keep_temp = array();
 			$keep_ids = array();
+
 			foreach ($_POST['attach_del'] as $dummy)
 			{
-				if (strpos($dummy, 'post_tmp_' . $user_info['id']) !== false)
-					$keep_temp[] = $dummy;
+				$attachID = getAttachmentIdFromPublic($dummy);
+
+				if (strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') !== false)
+					$keep_temp[] = $attachID;
 				else
-					$keep_ids[] = (int) $dummy;
+					$keep_ids[] = (int) $attachID;
 			}
 
 			if (isset($_SESSION['temp_attachments']))
 			{
 				foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 				{
-					if ((isset($_SESSION['temp_attachments']['post']['files'], $attachment['name']) && in_array($attachment['name'], $_SESSION['temp_attachments']['post']['files'])) || in_array($attachID, $keep_temp) || strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
+					if ((isset($_SESSION['temp_attachments']['post']['files'], $attachment['name']) && in_array($attachment['name'], $_SESSION['temp_attachments']['post']['files'])) || in_array($attachID, $keep_temp) || strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') === false)
 						continue;
 
 					unset($_SESSION['temp_attachments'][$attachID]);
@@ -422,7 +428,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 			{
-				if ($attachID !== 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
+				if ($attachID !== 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') === false)
 					continue;
 
 				// If there was an initial error just show that message.
@@ -454,12 +460,14 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 						if (!empty($attachmentOptions['thumb']))
 							$this->_saved_attach_id[] = $attachmentOptions['thumb'];
 
-						$msgOptions['body'] = str_replace('[attach]' . $attachID . '[/attach]', '[attach]' . $attachmentOptions['id'] . '[/attach]', $msgOptions['body']);
+						$msgOptions['body'] = preg_replace('~\[attach(.*?)\]' . $attachment['public_attachid'] . '\[\/attach\]~', '[attach$1]' . $attachmentOptions['id'] . '[/attach]', $msgOptions['body']);
 					}
 				}
 				// We have errors on this file, build out the issues for display to the user
 				else
+				{
 					@unlink($attachment['tmp_name']);
+				}
 			}
 			unset($_SESSION['temp_attachments']);
 		}
