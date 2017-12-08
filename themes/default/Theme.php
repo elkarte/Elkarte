@@ -747,7 +747,7 @@ class Theme extends \Theme
 		// 1.0 backward compatibility: if you already put the icon in the theme dir
 		// use that one, otherwise the default
 		// @deprecated since 1.1
-		if (file_exists($scripturl . '/mobile.png'))
+		if (file_exists(BOARDDIR . '/mobile.png'))
 		{
 			$context['favicon'] = $scripturl . '/mobile.png';
 		}
