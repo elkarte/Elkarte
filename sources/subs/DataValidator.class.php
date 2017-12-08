@@ -1015,16 +1015,6 @@ class Data_Validator
 
 		$filter = filter_var($input[$field], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
 
-		// Fixed in php 7 and later in php 5.6.27 https://bugs.php.net/bug.php?id=67167
-		if (version_compare(PHP_VERSION, '5.6.27', '>='))
-		{
-			$filter = $filter;
-		}
-		if ($filter === false && is_object($input[$field]) && method_exists($input[$field], '__tostring') === false)
-		{
-			$filter = null;
-		}
-
 		if ($filter === null)
 		{
 			return array(

@@ -68,14 +68,7 @@ fi
 # Setup cache engines for elkarte cache testing
 if [ "$COVERAGE" == "true" ]
 then
-    if [ "$SHORT_PHP" == "5.3" -o "$SHORT_PHP" == "5.4" ]
-    then
-        sudo apt-get -qq --allow-downgrades install php5-xcache php5-apcu
-        printf "extension=xcache.so\nxcache.size=64M\nxcache.var_size=16M\nxcache.test=On" > xcache.ini
-        phpenv config-add xcache.ini
-        printf "extension=apc.so\napc.enabled=1" > 5.3.ini
-        phpenv config-add 5.3.ini
-    elif [ "$SHORT_PHP" == "7.0" -o "$SHORT_PHP" == "7.1" ]
+    if [ "$SHORT_PHP" == "7.0" -o "$SHORT_PHP" == "7.1" ]
     then
         printf "\n"| pecl install -f apcu
     else
