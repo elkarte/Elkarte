@@ -36,7 +36,7 @@ Contributions to documentation are licensed under [CC-by-SA 3](http://creativeco
 
 ## Requirements
 
-* PHP version 5.5 or newer
+* PHP version 7.1 or newer
 * MySQL 5 and newer OR PostgreSQL 9.1 and newer
 
 On the client side, ElkArte will run & look good with its responsive theme in just about any modern browser, smartphone or tablet.
