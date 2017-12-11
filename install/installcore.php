@@ -26,6 +26,6 @@ function getUpgradeFiles()
 		array('upgrade_1-0.php', '1.0', '1.0'),
 		array('upgrade_1-0_' . $db_type . '.php', '1.0', '1.0'),
 		array('upgrade_1-1.php', '1.1', CURRENT_VERSION),
-		array('upgrade_1-1_' . $db_type . '.php', '1.1 RC 2', CURRENT_VERSION),
+		array('upgrade_1-1_' . $db_type . '.php', '1.1', CURRENT_VERSION),
 	);
 }
