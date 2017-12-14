@@ -645,6 +645,7 @@ class Menu
 		theme()->getLayers()->add($this->menuOptions['layer_name']);
 
 		// Set it all to context for template consumption
+		$this->menu_context['layer_name'] = $this->menuOptions['layer_name'];
 		$this->menu_context['can_toggle_drop_down'] = $this->menuOptions['can_toggle_drop_down'];
 		$context['max_menu_id'] = $this->max_menu_id;
 		$context['current_subaction'] = $this->current_subaction;
