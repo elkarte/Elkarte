@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version   2.0 dev
  *
  */
 
@@ -15,7 +15,7 @@ namespace ElkArte\Menu;
 
 class MenuArea extends MenuItem
 {
-	/** @var callable $function Function to call when area is selected. */
+	/** @var callable $function function to call when area is selected. */
 	protected $function;
 
 	/** @var string $icon File name of an icon to use on the menu, if using the sprite class, set as transparent.png */

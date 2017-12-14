@@ -5,7 +5,7 @@ use ElkArte\Menu\MenuArea;
 use ElkArte\Menu\MenuSection;
 use ElkArte\Menu\MenuSubsection;
 
-abstract class BaseMenuTest extends PHPUnit_Framework_TestCase
+abstract class BaseMenuTest extends \PHPUnit\Framework\TestCase
 {
 	public function testMenu()
 	{

@@ -567,8 +567,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 .linklevel1:hover, .listlevel1:hover .linklevel1,
 .linklevel2:hover, .listlevel2:hover .linklevel2,
 .linklevel3:hover, .listlevel3:hover .linklevel3,
-#menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1,
-#menu_current_area > strong > .linklevel1 {
+#menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1 {
 	text-decoration: none;
 	color: #555555;
 	border-color: #CCCCCC;
@@ -821,7 +820,8 @@ a.active {
 	border-color: transparent;
 }
 
-#menu_sidebar .linklevel1:hover, #menu_sidebar .linklevel1:focus, #menu_current_area .linklevel1,
+#menu_sidebar .linklevel1:hover, #menu_sidebar .linklevel1:focus,
+#menu_sidebar .linklevel1.chosen,
 #menu_sidebar .linklevel2:hover, #menu_sidebar .linklevel2:focus {
 	text-decoration: none;
 	color: black;
@@ -829,7 +829,7 @@ a.active {
 	background: gainsboro;
 }
 
-#menu_current_area .linklevel1 {
+#menu_sidebar .linklevel1.chosen {
 	font-weight: bold;
 }
 

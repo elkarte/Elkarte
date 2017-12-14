@@ -45,7 +45,7 @@ function template_generic_menu_sidebar_above()
 				continue;
 
 			echo '
-				<li class="listlevel1', !empty($area['subsections']) ? ' subsections"  aria-haspopup="true"' : '"', ' ', ($i == $menu_context['current_area']) ? 'id="menu_current_area"' : '', '>
+				<li class="listlevel1', !empty($area['subsections']) ? ' subsections"  aria-haspopup="true"' : '"', '>
 					<a class="linklevel1', !empty($area['selected']) ? ' chosen' : '', '" href="', $area['url'], '">', $area['label'], '</a>';
 
 			// Are there any subsections?
@@ -54,7 +54,7 @@ function template_generic_menu_sidebar_above()
 				echo '
 					<ul class="menulevel2">';
 
-				foreach ($area['subsections'] as $sa => $sub)
+				foreach ($area['subsections'] as $sub)
 				{
 					if (!empty($sub['disabled']))
 						continue;
@@ -84,7 +84,7 @@ function template_generic_menu_sidebar_above()
 
 	// If there are any "tabs" setup, this is the place to shown them.
 	if (empty($context['force_disable_tabs']))
-		template_generic_menu_tabs($menu_context);
+		template_generic_menu_tabs($menu_context['tab_data']);
 }
 
 /**
@@ -121,16 +121,14 @@ function template_generic_menu_dropdown_above()
 
 		// For every area of this section show a link to that area (bold if it's currently selected.)
 		// @todo Code for additional_items class was deprecated and has been removed. Suggest following up in Sources if required.
-		foreach ($section['areas'] as $i => $area)
+		foreach ($section['areas'] as $area)
 		{
 			// Not supposed to be printed?
 			if (empty($area['label']))
 				continue;
 
 			echo '
-							<li class="listlevel2', !empty($area['subsections']) ? ' subsections" aria-haspopup="true"' : '"', '>';
-
-			echo '
+							<li class="listlevel2', !empty($area['subsections']) ? ' subsections" aria-haspopup="true"' : '"', '>
 								<a class="linklevel2', !empty($area['selected']) ? ' chosen' : '', '" href="', $area['url'], '">', $area['icon'], $area['label'], '</a>';
 
 			// Are there any subsections?
@@ -139,7 +137,7 @@ function template_generic_menu_dropdown_above()
 				echo '
 								<ul class="menulevel3">';
 
-				foreach ($area['subsections'] as $sa => $sub)
+				foreach ($area['subsections'] as $sub)
 				{
 					if (!empty($sub['disabled']))
 						continue;
@@ -171,7 +169,7 @@ function template_generic_menu_dropdown_above()
 				<div id="admin_content">';
 
 	// It's possible that some pages have their own tabs they wanna force...
-	template_generic_menu_tabs($menu_context);
+	template_generic_menu_tabs($menu_context['tab_data']);
 }
 
 /**
@@ -186,14 +184,11 @@ function template_generic_menu_dropdown_below()
 /**
  * Some code for showing a tabbed view.
  *
- * @param integer $menu_context
+ * @param array $tab_context
  */
-function template_generic_menu_tabs(&$menu_context)
+function template_generic_menu_tabs($tab_context)
 {
-	global $context, $settings, $scripturl, $txt;
-
-	// Handy shortcut.
-	$tab_context = &$menu_context['tab_data'];
+	global $settings, $scripturl, $txt;
 
 	if (!empty($tab_context['title']))
 	{
@@ -239,7 +234,7 @@ function template_generic_menu_tabs(&$menu_context)
 		echo '
 					<ul id="adm_submenus">';
 
-		foreach ($tab_context['tabs'] as $sa => $tab)
+		foreach ($tab_context['tabs'] as $tab)
 		{
 			if (!empty($tab['disabled']))
 				continue;

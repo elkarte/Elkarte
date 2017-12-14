@@ -8,8 +8,8 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * license:    BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.1.1
  *
@@ -121,6 +121,11 @@ function destroyMenu($menu_id = 'last'): bool
 function callMenu(array $selectedMenu): void
 {
 	global $context;
+
+	if ($context['user']['is_owner'] && isset($selectedMenu['permission']))
+	{
+		unset($selectedMenu['permission']);
+	}
 
 	$action = new Action();
 	$action->initialize(['action' => $selectedMenu]);
