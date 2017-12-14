@@ -30,7 +30,7 @@ class MenuSubsection extends MenuItem
 	{
 		$this->label = $arr[0];
 		$this->permission = isset($arr[1]) ? (array) $arr[1] : [];
-		$this->default = isset($arr[2]) ? $arr[2] : false;
+		$this->default = isset($arr[2]) ? (bool) $arr[2] : false;
 
 		return $this;
 	}
