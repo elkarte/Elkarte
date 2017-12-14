@@ -163,10 +163,13 @@ class Menu
 		$tab_context = &$context['menu_data_' . $this->max_menu_id]['tab_data'];
 
 		// Tabs are really just subactions.
-		$tab_context['tabs'] = array_replace_recursive($tab_context['tabs'], $this->menu_context['sections'][$this->menu_context['current_section']]['areas'][$this->current_area]['subsections']);
+		if (isset($tab_context['tabs'], $this->menu_context['sections'][$this->menu_context['current_section']]['areas'][$this->current_area]['subsections']))
+		{
+			$tab_context['tabs'] = array_replace_recursive($tab_context['tabs'], $this->menu_context['sections'][$this->menu_context['current_section']]['areas'][$this->current_area]['subsections']);
 
-		// Has it been deemed selected?
-		$tab_context = array_merge($tab_context, $tab_context['tabs'][$this->current_subaction]);
+			// Has it been deemed selected?
+			$tab_context = array_merge($tab_context, $tab_context['tabs'][$this->current_subaction]);
+		}
 	}
 
 	/**
