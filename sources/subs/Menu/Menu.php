@@ -95,7 +95,7 @@ class Menu
 		$this->req = $req ?: HttpReq::instance();
 
 		// Every menu gets a unique ID, these are shown in first in, first out order.
-		$this->max_menu_id = isset($context['max_menu_id']) ? $context['max_menu_id'] + 1 : 1;
+		$this->max_menu_id = ($context['max_menu_id'] ?? 0) + 1;
 
 		// This will be all the data for this menu
 		$this->menu_context = [];
@@ -104,7 +104,7 @@ class Menu
 		$this->permission_set = !empty($context['user']['is_owner']) ? 'own' : 'any';
 
 		// We may have a current subaction
-		$this->current_subaction = isset($context['current_subaction']) ? $context['current_subaction'] : null;
+		$this->current_subaction = $context['current_subaction'] ?? null;
 	}
 
 	/**
@@ -168,17 +168,10 @@ class Menu
 		global $context;
 
 		// What is the general action of this menu i.e. $scripturl?action=XYZ.
-		$this->menu_context['current_action'] = isset($this->menuOptions['action'])
-			? $this->menuOptions['action']
-			: $context['current_action'];
+		$this->menu_context['current_action'] = $this->menuOptions['action'] ?? $context['current_action'];
 
 		// What is the current area selected?
-		if (isset($this->menuOptions['area']) || isset($this->req->query->area))
-		{
-			$this->current_area = isset($this->menuOptions['area'])
-				? $this->menuOptions['area']
-				: $this->req->query->area;
-		}
+		$this->current_area = $_req->getQuery('area', 'trim|strval', $this->menuOptions['area'] ?? '')
 
 		$this->buildAdditionalParams();
 		$this->buildTemplateVars();
@@ -557,9 +550,8 @@ class Menu
 		global $scripturl;
 
 		// Should we use a custom base url, or use the default?
-		$this->menu_context['base_url'] = isset($this->menuOptions['base_url'])
-			? $this->menuOptions['base_url']
-			: $scripturl . '?action=' . $this->menu_context['current_action'];
+		$this->menu_context['base_url'] =
+			$this->menuOptions['base_url'] ?? $scripturl . '?action=' . $this->menu_context['current_action'];
 	}
 
 	/**
@@ -629,10 +621,8 @@ class Menu
 		$this->menuOptions['can_toggle_drop_down'] =
 			!$user_info['is_guest'] || !empty($this->menuOptions['can_toggle_drop_down']);
 
-		$this->menuOptions['template_name'] =
-			isset($this->menuOptions['template_name']) ? $this->menuOptions['template_name'] : 'GenericMenu';
-		$this->menuOptions['layer_name'] =
-			(isset($this->menuOptions['layer_name']) ? $this->menuOptions['layer_name'] : 'generic_menu') . '_' . $this->menuOptions['menu_type'];
+		$this->menuOptions['template_name'] = $this->menuOptions['template_name'] ?? 'GenericMenu';
+		$this->menuOptions['layer_name'] = ($this->menuOptions['layer_name'] ?? 'generic_menu') . '_' . $this->menuOptions['menu_type'];
 	}
 
 	/**
