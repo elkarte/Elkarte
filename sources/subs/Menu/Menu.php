@@ -91,7 +91,7 @@ class Menu
 	 */
 	public function __construct(HttpReq $req = null)
 	{
-		global $context, $settings;
+		global $context;
 
 		// Access to post/get data
 		$this->req = $req ?: HttpReq::instance();
@@ -210,8 +210,6 @@ class Menu
 	 */
 	protected function processMenuData(): void
 	{
-		global $settings;
-
 		// Now setup the context correctly.
 		foreach ($this->menuData as $section_id => $section)
 		{
@@ -362,7 +360,7 @@ class Menu
 	 */
 	private function parseCounter(MenuItem $obj, int $idx): string
 	{
-		global $txt, $settings;
+		global $settings;
 
 		$counter = '';
 		if (isset($this->menuOptions['counters']) && !empty($this->menuOptions['counters'][$obj->getCounter()]))
@@ -470,8 +468,6 @@ class Menu
 	 */
 	protected function processAreaSubsections(string $section_id, string $area_id, MenuArea $area): void
 	{
-		global $settings, $context;
-
 		// If there are subsections for this menu item
 		if (!empty($area->getSubsections()))
 		{
