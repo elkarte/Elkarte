@@ -24,9 +24,9 @@ class MenuSubsection extends MenuItem
 	/**
 	 * @param array $arr
 	 *
-	 * @return MenuSection
+	 * @return MenuSubsection
 	 */
-	protected function buildMoreFromArray(array $arr)
+	protected function buildMoreFromArray(array $arr): MenuSubsection
 	{
 		$this->label = $arr[0];
 		$this->permission = isset($arr[1]) ? (array) $arr[1] : [];
@@ -38,7 +38,7 @@ class MenuSubsection extends MenuItem
 	/**
 	 * @return boolean
 	 */
-	public function isDefault()
+	public function isDefault(): bool
 	{
 		return $this->default;
 	}
@@ -48,7 +48,7 @@ class MenuSubsection extends MenuItem
 	 *
 	 * @return MenuSubsection
 	 */
-	public function setDefault($default)
+	public function setDefault(bool $default): MenuSubsection
 	{
 		$this->default = $default;
 
@@ -58,7 +58,7 @@ class MenuSubsection extends MenuItem
 	/**
 	 * @return string[]
 	 */
-	public function getActive()
+	public function getActive(): array
 	{
 		return $this->active;
 	}
@@ -68,7 +68,7 @@ class MenuSubsection extends MenuItem
 	 *
 	 * @return MenuSubsection
 	 */
-	public function setActive($active)
+	public function setActive(array $active): MenuSubsection
 	{
 		$this->active = $active;
 

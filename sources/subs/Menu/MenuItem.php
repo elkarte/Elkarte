@@ -35,7 +35,7 @@ abstract class MenuItem
 	 *
 	 * @return MenuItem
 	 */
-	public static function buildFromArray(array $arr)
+	public static function buildFromArray(array $arr): MenuItem
 	{
 		$obj = new static;
 		$arr['permission'] = isset($arr['permission']) ? (array) $arr['permission'] : [];
@@ -55,7 +55,7 @@ abstract class MenuItem
 	/**
 	 * @return string
 	 */
-	public function getLabel()
+	public function getLabel(): string
 	{
 		return $this->label;
 	}
@@ -63,9 +63,9 @@ abstract class MenuItem
 	/**
 	 * @param string $label
 	 *
-	 * @return MenuSubsection
+	 * @return MenuItem
 	 */
-	public function setLabel($label)
+	public function setLabel(string $label): MenuItem
 	{
 		$this->label = $label;
 
@@ -75,7 +75,7 @@ abstract class MenuItem
 	/**
 	 * @return string
 	 */
-	public function getCounter()
+	public function getCounter(): string
 	{
 		return $this->counter;
 	}
@@ -83,9 +83,9 @@ abstract class MenuItem
 	/**
 	 * @param string $counter
 	 *
-	 * @return MenuSubsection
+	 * @return MenuItem
 	 */
-	public function setCounter($counter)
+	public function setCounter(string $counter): MenuItem
 	{
 		$this->counter = $counter;
 
@@ -95,7 +95,7 @@ abstract class MenuItem
 	/**
 	 * @return string
 	 */
-	public function getUrl()
+	public function getUrl(): string
 	{
 		return $this->url;
 	}
@@ -103,9 +103,9 @@ abstract class MenuItem
 	/**
 	 * @param string $url
 	 *
-	 * @return MenuSubsection
+	 * @return MenuItem
 	 */
-	public function setUrl($url)
+	public function setUrl(string $url): MenuItem
 	{
 		$this->url = $url;
 
@@ -115,7 +115,7 @@ abstract class MenuItem
 	/**
 	 * @return string[]
 	 */
-	public function getPermission()
+	public function getPermission(): array
 	{
 		return $this->permission;
 	}
@@ -123,9 +123,9 @@ abstract class MenuItem
 	/**
 	 * @param string[] $permission
 	 *
-	 * @return MenuSubsection
+	 * @return MenuItem
 	 */
-	public function setPermission(array $permission)
+	public function setPermission(array $permission): MenuItem
 	{
 		$this->permission = $permission;
 
@@ -135,7 +135,7 @@ abstract class MenuItem
 	/**
 	 * @return boolean
 	 */
-	public function isEnabled()
+	public function isEnabled(): bool
 	{
 		return $this->enabled;
 	}
@@ -143,9 +143,9 @@ abstract class MenuItem
 	/**
 	 * @param boolean $enabled
 	 *
-	 * @return MenuSubsection
+	 * @return MenuItem
 	 */
-	public function setEnabled($enabled)
+	public function setEnabled(bool $enabled): MenuItem
 	{
 		$this->enabled = $enabled;
 

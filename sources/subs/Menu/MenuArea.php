@@ -36,7 +36,7 @@ class MenuArea extends MenuItem
 	/** @var bool $hidden Should this area be visible? */
 	protected $hidden = false;
 
-	/** @var MenuSubsection[] $subsections Array of subsections from this area. */
+	/** @var array $subsections Array of subsections from this area. */
 	private $subsections = [];
 
 	/**
@@ -44,7 +44,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	protected function buildMoreFromArray(array $arr)
+	protected function buildMoreFromArray(array $arr): MenuArea
 	{
 		if (isset($arr['custom_url']))
 		{
@@ -67,7 +67,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return $this
 	 */
-	public function addSubsection($id, MenuSubsection $subsection)
+	public function addSubsection(string $id, MenuSubsection $subsection): MenuArea
 	{
 		$this->subsections[$id] = $subsection;
 
@@ -87,7 +87,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setFunction($function)
+	public function setFunction($function): MenuArea
 	{
 		$this->function = $function;
 
@@ -97,7 +97,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return string
 	 */
-	public function getIcon()
+	public function getIcon(): string
 	{
 		return $this->icon;
 	}
@@ -107,7 +107,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setIcon($icon)
+	public function setIcon(string $icon): MenuArea
 	{
 		$this->icon = $icon;
 
@@ -117,7 +117,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return string
 	 */
-	public function getController()
+	public function getController(): string
 	{
 		return $this->controller;
 	}
@@ -127,7 +127,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setController($controller)
+	public function setController(string $controller): MenuArea
 	{
 		$this->controller = $controller;
 
@@ -137,7 +137,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return string
 	 */
-	public function getSelect()
+	public function getSelect(): string
 	{
 		return $this->select;
 	}
@@ -147,7 +147,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setSelect($select)
+	public function setSelect(string $select): MenuArea
 	{
 		$this->select = $select;
 
@@ -157,7 +157,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return string
 	 */
-	public function getClass()
+	public function getClass(): string
 	{
 		return $this->class;
 	}
@@ -167,7 +167,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setClass($class)
+	public function setClass(string $class): MenuArea
 	{
 		$this->class = $class;
 
@@ -177,7 +177,7 @@ class MenuArea extends MenuItem
 	/**
 	 * @return boolean
 	 */
-	public function isHidden()
+	public function isHidden(): bool
 	{
 		return $this->hidden;
 	}
@@ -187,7 +187,7 @@ class MenuArea extends MenuItem
 	 *
 	 * @return MenuArea
 	 */
-	public function setHidden($hidden)
+	public function setHidden(bool $hidden): MenuArea
 	{
 		$this->hidden = $hidden;
 
@@ -197,15 +197,15 @@ class MenuArea extends MenuItem
 	/**
 	 * @return array
 	 */
-	public function toArray()
+	public function toArray(): array
 	{
 		return get_object_vars($this);
 	}
 
 	/**
-	 * @return MenuSubsection[]
+	 * @return array
 	 */
-	public function getSubsections()
+	public function getSubsections(): array
 	{
 		return $this->subsections;
 	}

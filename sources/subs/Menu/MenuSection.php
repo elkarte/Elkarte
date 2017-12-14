@@ -15,7 +15,7 @@ namespace ElkArte\Menu;
 
 class MenuSection extends MenuItem
 {
-	/** @var MenuArea[] $areas Array of areas within this section. */
+	/** @var array $areas Array of areas within this section. */
 	private $areas = [];
 
 	/**
@@ -23,7 +23,7 @@ class MenuSection extends MenuItem
 	 *
 	 * @return MenuSection
 	 */
-	protected function buildMoreFromArray(array $arr)
+	protected function buildMoreFromArray(array $arr): MenuSection
 	{
 		if (isset($arr['title']))
 		{
@@ -46,7 +46,7 @@ class MenuSection extends MenuItem
 	 *
 	 * @return $this
 	 */
-	public function addArea($id, MenuArea $area)
+	public function addArea(string $id, MenuArea $area): MenuSection
 	{
 		$this->areas[$id] = $area;
 
@@ -54,9 +54,9 @@ class MenuSection extends MenuItem
 	}
 
 	/**
-	 * @return MenuArea[]
+	 * @return array
 	 */
-	public function getAreas()
+	public function getAreas(): array
 	{
 		return $this->areas;
 	}
