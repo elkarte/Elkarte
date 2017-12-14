@@ -34,6 +34,8 @@ use ElkArte\Menu\MenuSubsection;
  */
 function createMenu(array $menuData, array $menuOptions = []): array
 {
+	global $context;
+
 	$menu = new Menu();
 	$menu->addOptions($menuOptions);
 	foreach ($menuData as $section_id => $section)
@@ -57,6 +59,7 @@ function createMenu(array $menuData, array $menuOptions = []): array
 	}
 	$include_data = $menu->prepareMenu();
 	$menu->setContext();
+	$context['menu_data_' . $context['max_menu_id']]['object'] = $menu;
 
 	return $include_data;
 }
@@ -117,9 +120,12 @@ function destroyMenu($menu_id = 'last'): bool
  */
 function callMenu(array $selectedMenu): void
 {
+	global $context;
+
 	$action = new Action();
 	$action->initialize(['action' => $selectedMenu]);
 	$action->dispatch('action');
+	$context['menu_data_' . $context['max_menu_id']]['object']->prepareTabData();
 }
 
 /**
