@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.1
  *
  */
 
@@ -19,14 +19,16 @@ use ElkArte\Menu\MenuSubsection;
 /**
  * Create a menu.
  *
- * @depreciated since 1.1 use MenuCreate.class
+ * @depreciated since 2.0 use the menu object
+ *
+ * developers don't remove this until 3.0-dev
  *
  * @param array $menuData
  * @param array $menuOptions
  *
  * @return array
  */
-function createMenu($menuData, $menuOptions = [])
+function createMenu(array $menuData, array $menuOptions = []): array
 {
 	$menu = new Menu();
 	$menu->addOptions($menuOptions);
@@ -58,13 +60,15 @@ function createMenu($menuData, $menuOptions = [])
 /**
  * Delete a menu.
  *
- * @depreciated since 1.1 use MenuCreate.class
+ * @depreciated since 2.0 use the menu object
+ *
+ * developers don't remove this until 3.0-dev
  *
  * @param string $menu_id
  *
  * @return boolean
  */
-function destroyMenu($menu_id = 'last')
+function destroyMenu($menu_id = 'last'): bool
 {
 	global $context;
 
@@ -101,11 +105,13 @@ function destroyMenu($menu_id = 'last')
 /**
  * Call the function or method for the selected menu item.
  *
- * @depreciated since 1.1 use MenuCreate.class
+ * @depreciated since 2.0 use the menu object
+ *
+ * developers don't remove this until 3.0-dev
  *
  * @param array $selectedMenu
  */
-function callMenu($selectedMenu)
+function callMenu(array $selectedMenu): void
 {
 	$action = new Action();
 	$action->initialize(['action' => $selectedMenu]);
@@ -117,7 +123,7 @@ function callMenu($selectedMenu)
  *
  * @return array
  */
-function loadDefaultMenuButtons()
+function loadDefaultMenuButtons(): array
 {
 	global $scripturl, $txt, $context, $user_info, $modSettings;
 
@@ -156,7 +162,7 @@ function loadDefaultMenuButtons()
 				'like_stats' => [
 					'title' => $txt['like_post_stats'],
 					'href' => $scripturl . '?action=likes;sa=likestats',
-					'show' => allowedTo('like_posts_stats'),
+					'show' => !empty($modSettings['likes_enabled']) && allowedTo('like_posts_stats'),
 				],
 				'contact' => [
 					'title' => $txt['contact'],
