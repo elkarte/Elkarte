@@ -173,7 +173,7 @@ class Menu
 		$this->menu_context['current_action'] = $this->menuOptions['action'] ?? $context['current_action'];
 
 		// What is the current area selected?
-		$this->current_area = $_req->getQuery('area', 'trim|strval', $this->menuOptions['area'] ?? '')
+		$this->current_area = $this->req->getQuery('area', 'trim|strval', $this->menuOptions['area'] ?? '');
 
 		$this->buildAdditionalParams();
 		$this->buildTemplateVars();
