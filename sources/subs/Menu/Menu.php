@@ -15,7 +15,7 @@
  *
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace ElkArte\Menu;
 
@@ -165,7 +165,10 @@ class Menu
 		// Tabs are really just subactions.
 		if (isset($tab_context['tabs'], $this->menu_context['sections'][$this->menu_context['current_section']]['areas'][$this->current_area]['subsections']))
 		{
-			$tab_context['tabs'] = array_replace_recursive($tab_context['tabs'], $this->menu_context['sections'][$this->menu_context['current_section']]['areas'][$this->current_area]['subsections']);
+			$tab_context['tabs'] = array_replace_recursive(
+				$tab_context['tabs'],
+				$this->menu_context['sections'][$this->menu_context['current_section']]['areas'][$this->current_area]['subsections']
+			);
 
 			// Has it been deemed selected?
 			$tab_context = array_merge($tab_context, $tab_context['tabs'][$this->current_subaction]);
@@ -653,7 +656,8 @@ class Menu
 			!$user_info['is_guest'] || !empty($this->menuOptions['can_toggle_drop_down']);
 
 		$this->menuOptions['template_name'] = $this->menuOptions['template_name'] ?? 'GenericMenu';
-		$this->menuOptions['layer_name'] = ($this->menuOptions['layer_name'] ?? 'generic_menu') . '_' . $this->menuOptions['menu_type'];
+		$this->menuOptions['layer_name'] =
+			($this->menuOptions['layer_name'] ?? 'generic_menu') . '_' . $this->menuOptions['menu_type'];
 	}
 
 	/**
