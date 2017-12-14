@@ -437,7 +437,7 @@ class Menu
 	 */
 	private function setAreaContext(string $section_id, string $area_id, MenuArea $area): void
 	{
-		global $txt, $settings;
+		global $txt;
 
 		$this->menu_context['sections'][$section_id]['areas'][$area_id] = [
 			'label' => ($area->getLabel() ?: $txt[$area_id]) . $this->parseCounter($area, 1),
@@ -469,7 +469,7 @@ class Menu
 	 */
 	private function setAreaIcon(string $section_id, string $area_id, MenuArea $area): void
 	{
-		global $context, $settings;
+		global $settings;
 
 		// Work out where we should get our menu images from.
 		$image_path = file_exists($settings['theme_dir'] . '/images/admin/change_menu.png')
@@ -503,32 +503,32 @@ class Menu
 		if (!empty($area->getSubsections()))
 		{
 			$this->menu_context['sections'][$section_id]['areas'][$area_id]['subsections'] = [];
-			$first_sa = '';
+			$first_sub_id = '';
 
 			// For each subsection process the options
-			foreach ($area->getSubsections() as $sa => $sub)
+			foreach ($area->getSubsections() as $sub_id => $sub)
 			{
 				if ($this->checkPermissions($sub) && $sub->isEnabled())
 				{
-					$this->menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$sa] = [
+					$this->menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$sub_id] = [
 						'label' => $sub->getLabel() . $this->parseCounter($sub, 2),
 					];
 
-					$this->setSubsSectionUrl($section_id, $area_id, $sa, $sub);
+					$this->setSubsSectionUrl($section_id, $area_id, $sub_id, $sub);
 
 					if ($this->current_area == $area_id)
 					{
-						if (empty($first_sa))
+						if (empty($first_sub_id))
 						{
-							$first_sa = $sa;
+							$first_sub_id = $sub_id;
 						}
-						$this->setCurrentSubSection($sa, $sub);
+						$this->setCurrentSubSection($sub_id, $sub);
 					}
 				}
 				else
 				{
 					// Mark it as disabled...
-					$this->menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$sa]['disabled'] =
+					$this->menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$sub_id]['disabled'] =
 						true;
 				}
 			}
@@ -536,7 +536,7 @@ class Menu
 			// Is this the current subsection?
 			if (empty($this->current_subaction))
 			{
-				$this->current_subaction = $first_sa;
+				$this->current_subaction = $first_sub_id;
 			}
 		}
 	}
@@ -544,35 +544,35 @@ class Menu
 	/**
 	 * @param string         $section_id
 	 * @param string         $area_id
-	 * @param string         $sa
+	 * @param string         $sub_id
 	 * @param MenuSubsection $sub
 	 */
-	private function setSubsSectionUrl(string $section_id, string $area_id, string $sa, MenuSubsection $sub): void
+	private function setSubsSectionUrl(string $section_id, string $area_id, string $sub_id, MenuSubsection $sub): void
 	{
 		$sub->setUrl(
-			$this->menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$sa]['url'] =
+			$this->menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$sub_id]['url'] =
 				$sub->getUrl(
-				) ?: $this->menu_context['base_url'] . ';area=' . $area_id . ';sa=' . $sa . $this->menu_context['extra_parameters']
+				) ?: $this->menu_context['base_url'] . ';area=' . $area_id . ';sa=' . $sub_id . $this->menu_context['extra_parameters']
 		);
 	}
 
 	/**
 	 * Set the current subsection
 	 *
-	 * @param string         $sa
+	 * @param string         $sub_id
 	 * @param MenuSubsection $sub
 	 */
-	private function setCurrentSubSection(string $sa, MenuSubsection $sub): void
+	private function setCurrentSubSection(string $sub_id, MenuSubsection $sub): void
 	{
 		// Is this the current subsection?
-		$sa_check = $this->req->getQuery('sa', 'trim', null);
+		$sub_id_check = $this->req->getQuery('sa', 'trim', null);
 		if (
-			$sa_check == $sa
-			|| in_array($sa_check, $sub->getActive(), true)
+			$sub_id_check == $sub_id
+			|| in_array($sub_id_check, $sub->getActive(), true)
 			|| empty($this->current_subaction) && $sub->isDefault()
 		)
 		{
-			$this->current_subaction = $sa;
+			$this->current_subaction = $sub_id;
 		}
 	}
 
