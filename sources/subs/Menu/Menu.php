@@ -22,7 +22,7 @@ use HttpReq;
 /**
  * This class implements a standard way of creating menus
  */
-Class Menu
+class Menu
 {
 	/**
 	 * Instance of HttpReq
