@@ -7,6 +7,10 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
+ * This file contains code covered by:
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
  * @version 1.1.1
  *
  */
@@ -159,16 +163,16 @@ function loadDefaultMenuButtons(): array
 					'href' => $scripturl . '?action=recent',
 					'show' => true,
 				],
-				'like_stats' => [
+				'like_stats' => array(
 					'title' => $txt['like_post_stats'],
 					'href' => $scripturl . '?action=likes;sa=likestats',
 					'show' => !empty($modSettings['likes_enabled']) && allowedTo('like_posts_stats'),
-				],
-				'contact' => [
+				),
+				'contact' => array(
 					'title' => $txt['contact'],
 					'href' => $scripturl . '?action=register;sa=contact',
 					'show' => $user_info['is_guest'] && !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] == 'menu',
-				],
+				),
 			],
 		],
 	];
