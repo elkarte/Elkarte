@@ -349,7 +349,7 @@ final class Request
 	}
 
 	/**
-	 * Clean the request variables - add html entities to GET and slashes if magic_quotes_gpc is Off.
+	 * Clean the request variables - add html entities to GET.
 	 *
 	 * What it does:
 	 *
