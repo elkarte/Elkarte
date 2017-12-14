@@ -142,6 +142,31 @@ class Menu
 			'current_section' => !empty($this->menu_context['current_section']) ? $this->menu_context['current_section'] : '',
 			'current_subsection' => $this->current_subaction,
 		];
+
+	}
+
+	/**
+	 * Prepares tabs for the template.
+	 *
+	 * This should be called after the area is dispatched, because areas
+	 * are usually in their own file. Those files, once dispatched to, hold
+	 * some data for the tabs which must be specially combined with subaction
+	 * data for everything to work properly.
+	 *
+	 * Seems complicated, yes.
+	 */
+	public function prepareTabData(): void
+	{
+		global $context;
+
+		// Handy shortcut.
+		$tab_context = &$context['menu_data_' . $this->max_menu_id]['tab_data'];
+
+		// Tabs are really just subactions.
+		$tab_context['tabs'] = array_replace_recursive($tab_context['tabs'], $this->menu_context['sections'][$this->menu_context['current_section']]['areas'][$this->current_area]['subsections']);
+
+		// Has it been deemed selected?
+		$tab_context = array_merge($tab_context, $tab_context['tabs'][$this->current_subaction]);
 	}
 
 	/**

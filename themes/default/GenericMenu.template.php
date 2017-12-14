@@ -45,15 +45,7 @@ function template_generic_menu_sidebar_above()
 				continue;
 
 			echo '
-				<li class="listlevel1', !empty($area['subsections']) ? ' subsections"  aria-haspopup="true"' : '"', ' ', ($i == $menu_context['current_area']) ? 'id="menu_current_area"' : '', '>';
-
-			// Is this the current area, or just some area?
-			if ($i == $menu_context['current_area'])
-			{
-				if (empty($context['tabs']))
-					$context['tabs'] = isset($area['subsections']) ? $area['subsections'] : array();
-			}
-			echo '
+				<li class="listlevel1', !empty($area['subsections']) ? ' subsections"  aria-haspopup="true"' : '"', ' ', ($i == $menu_context['current_area']) ? 'id="menu_current_area"' : '', '>
 					<a class="linklevel1', !empty($area['selected']) ? ' chosen' : '', '" href="', $area['url'], '">', $area['label'], '</a>';
 
 			// Are there any subsections?
@@ -141,10 +133,6 @@ function template_generic_menu_dropdown_above()
 			echo '
 								<a class="linklevel2', !empty($area['selected']) ? ' chosen' : '', '" href="', $area['url'], '">', $area['icon'], $area['label'], '</a>';
 
-			// Is this the current area, or just some area?
-			if (!empty($area['selected']) && empty($context['tabs']))
-				$context['tabs'] = isset($area['subsections']) ? $area['subsections'] : array();
-
 			// Are there any subsections?
 			if (!empty($area['subsections']))
 			{
@@ -210,35 +198,21 @@ function template_generic_menu_tabs(&$menu_context)
 	if (!empty($tab_context['title']))
 	{
 		echo '
-					<div class="category_header">';
-
-		// Exactly how many tabs do we have?
-		if (!empty($context['tabs']))
-		{
-			foreach ($context['tabs'] as $id => $tab)
-			{
-				$tab_context['tabs'][$id] = array_replace($tab, $tab_context['tabs'][$id]);
-
-				// Has it been deemed selected?
-				if (!empty($tab['selected']))
-					$selected_tab = $tab_context['tabs'][$id];
-			}
-		}
-
-		echo '
+					<div class="category_header">
 						<h3 class="floatleft">';
 
 		// Show an icon and/or a help item?
-		if (!empty($selected_tab['icon']) || !empty($tab_context['icon']))
+		if (!empty($tab_context['icon']))
 			echo '
-						<img src="', $settings['images_url'], '/icons/', !empty($selected_tab['icon']) ? $selected_tab['icon'] : $tab_context['icon'], '" alt="" class="icon" />';
-		elseif (!empty($selected_tab['class']) || !empty($tab_context['class']))
-			echo '
-						<span class="hdicon cat_img_', !empty($selected_tab['class']) ? $selected_tab['class'] : $tab_context['class'], '"></span>';
+						<img src="', $settings['images_url'], '/icons/', $tab_context['icon'], '" alt="" class="icon" />';
 
-		if (!empty($selected_tab['help']) || !empty($tab_context['help']))
+		elseif (!empty($tab_context['class']))
 			echo '
-						<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=', !empty($selected_tab['help']) ? $selected_tab['help'] : $tab_context['help'], '" onclick="return reqOverlayDiv(this.href);" label="', $txt['help'], '"></a>';
+						<span class="hdicon cat_img_', $tab_context['class'], '"></span>';
+
+		if (!empty($tab_context['help']))
+			echo '
+						<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=', $tab_context['help'], '" onclick="return reqOverlayDiv(this.href);" label="', $txt['help'], '"></a>';
 
 		echo '
 						', $tab_context['title'], '
@@ -252,10 +226,10 @@ function template_generic_menu_tabs(&$menu_context)
 					</div>';
 	}
 
-	if (!empty($selected_tab['description']) || !empty($tab_context['description']))
+	if (!empty($tab_context['description']))
 		echo '
 					<p class="description">
-						', !empty($selected_tab['description']) ? $selected_tab['description'] : $tab_context['description'], '
+						', $tab_context['description'], '
 					</p>';
 
 	// Print out all the items in this tab (if any).
@@ -272,7 +246,7 @@ function template_generic_menu_tabs(&$menu_context)
 
 			echo '
 						<li class="listlevel1">
-							<a class="linklevel1', !empty($tab['selected']) ? ' active' : '', '" href="', $tab['url'], isset($tab['add_params']) ? $tab['add_params'] : '', '">', $tab['label'], '</a>
+							<a class="linklevel1', !empty($tab['selected']) ? ' active' : '', '" href="', $tab['url'], $tab['add_params'] ?? '', '">', $tab['label'], '</a>
 						</li>';
 		}
 
