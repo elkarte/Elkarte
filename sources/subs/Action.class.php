@@ -46,10 +46,10 @@ class Action
 	/**
 	 * Constructor!
 	 *
-	 * @param string $name   Hook name
-	 * @param        HttpReq Access to post/get data
+	 * @param string  $name Hook name
+	 * @param HttpReq $req  Access to post/get data
 	 */
-	public function __construct(string $name = null, HttpReq $req = null)
+	public function __construct(string $name = '', HttpReq $req = null)
 	{
 		$this->_name = $name;
 		$this->req = $req ?: HttpReq::instance();
@@ -58,7 +58,8 @@ class Action
 	/**
 	 * Initialize the instance with an array of sub-actions.
 	 *
-	 * @param mixed[] $subActions   array of known subactions
+	 * @param array  $subActions    array of known subactions
+	 *
 	 *                              The accepted array format is:
 	 *                              'sub_action name' => 'function name',
 	 *                              or
@@ -82,16 +83,19 @@ class Action
 	 *                              'function' => 'method name',
 	 *                              'enabled' => true/false,
 	 *                              'permission' => area)
-	 * @param string  $default      default action if unknown sa is requested
-	 * @param string  $requestParam key to check HTTP GET value, defaults to `sa`
+	 *
+	 *                              If `enabled` is not present, it is aassumed to be true.
+	 *
+	 * @param string $default       default action if unknown sa is requested
+	 * @param string $requestParam  key to check HTTP GET value, defaults to `sa`
 	 *
 	 * @event  integrate_sa_ the name specified in the constructor is appended to this
 	 *
 	 * @return string
 	 */
-	public function initialize(array $subActions, string $default = null, string $requestParam = 'sa'): string
+	public function initialize(array $subActions, string $default = '', string $requestParam = 'sa'): string
 	{
-		if ($this->_name !== null)
+		if ($this->_name !== '')
 		{
 			call_integration_hook('integrate_sa_' . $this->_name, [&$subActions]);
 		}
@@ -100,7 +104,10 @@ class Action
 			$subActions,
 			function ($subAction)
 			{
-				return !empty($subAction['enabled']);
+				return
+					!isset($subAction['enabled'])
+					|| isset($subAction['enabled'])
+					&& $subAction['enabled'] == true;
 			}
 		);
 
@@ -119,7 +126,7 @@ class Action
 	 */
 	public function dispatch(string $sub_id): void
 	{
-		$subAction = $this->_subActions[$sub_id] ?? $this->_default;
+		$subAction = $this->_subActions[$sub_id] ?? $this->_subActions[$this->_default];
 		$this->isAllowedTo($sub_id);
 
 		// Start off by assuming that this is a callable of some kind.
@@ -132,7 +139,7 @@ class Action
 		}
 
 		// Calling a method within a controller?
-		if (isset($subAction['controller']))
+		if (isset($subAction['controller'], $subAction['function']))
 		{
 			// Instance of a class
 			if (is_object($subAction['controller']))
@@ -141,8 +148,7 @@ class Action
 			}
 			else
 			{
-				// 'controller' => 'ManageAttachments_Controller'
-				// 'function' => 'action_avatars'
+				// Pointer to a controller to load
 				$controller = new $subAction['controller'](new Event_Manager());
 
 				// always set up the environment
@@ -150,7 +156,12 @@ class Action
 			}
 
 			// Modify the call accordingly
-			$call = [$controller, $call];
+			$call = [$controller, $subAction['function']];
+		}
+		// Callable directly within the array? Discard invalid entries.
+		elseif (isset($subAction[0], $subAction[1]))
+		{
+			$call = [$subAction[0], $subAction[1]];
 		}
 
 		call_user_func($call);

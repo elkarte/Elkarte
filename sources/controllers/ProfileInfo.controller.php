@@ -70,7 +70,7 @@ class ProfileInfo_Controller extends Action_Controller
 		$subActions = array(
 			'buddies' => array($this, 'action_profile_buddies'),
 			'recent' => array($this, 'action_profile_recent'),
-			'summary' => array('file' => 'Profile.controller.php', 'dir' => CONTROLLERDIR, 'controller' => 'Profile_Controller', 'function' => 'action_index'),
+			'summary' => array('controller' => 'Profile_Controller', 'function' => 'action_index'),
 		);
 
 		// Action control
