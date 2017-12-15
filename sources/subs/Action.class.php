@@ -23,33 +23,6 @@
 class Action
 {
 	/**
-	 * Array of sub-actions.
-	 * The accepted array format is:
-	 *    'sub_action name' => 'function name',
-	 *  or
-	 *    'sub_action name' => array(
-	 *    'function' => 'function name'),
-	 *  or
-	 *    'sub_action name' => array(
-	 *        'controller' => 'controller name',
-	 *        'function' => 'method name',
-	 *        'enabled' => true/false,
-	 *        'permission' => area),
-	 *  or
-	 *    'sub_action name' => array(
-	 *        'controller object, i.e. $this',
-	 *        'method name',
-	 *        'enabled' => true/false
-	 *        'permission' => area),
-	 *  or
-	 *    'sub_action name' => array(
-	 *        'controller' => 'controller name',
-	 *        'function' => 'method name',
-	 *        'enabled' => true/false,
-	 *        'permission' => area)
-	 */
-
-	/**
 	 * All the subactions we understand
 	 * @var array
 	 */
@@ -85,14 +58,34 @@ class Action
 	/**
 	 * Initialize the instance with an array of sub-actions.
 	 *
-	 * What it does:
-	 *
-	 * - Sub-actions have to be in the format expected for Action::_subActions array,
-	 * indexed by sa.
-	 *
 	 * @param mixed[] $subActions   array of known subactions
+	 *                              The accepted array format is:
+	 *                              'sub_action name' => 'function name',
+	 *                              or
+	 *                              'sub_action name' => array(
+	 *                              'function' => 'function name'),
+	 *                              or
+	 *                              'sub_action name' => array(
+	 *                              'controller' => 'controller name',
+	 *                              'function' => 'method name',
+	 *                              'enabled' => true/false,
+	 *                              'permission' => area),
+	 *                              or
+	 *                              'sub_action name' => array(
+	 *                              'controller object, i.e. $this',
+	 *                              'method name',
+	 *                              'enabled' => true/false
+	 *                              'permission' => area),
+	 *                              or
+	 *                              'sub_action name' => array(
+	 *                              'controller' => 'controller name',
+	 *                              'function' => 'method name',
+	 *                              'enabled' => true/false,
+	 *                              'permission' => area)
 	 * @param string  $default      default action if unknown sa is requested
-	 * @param string  $requestParam default key to check request value, defaults to sa
+	 * @param string  $requestParam key to check HTTP GET value, defaults to `sa`
+	 *
+	 * @event  integrate_sa_ the name specified in the constructor is appended to this
 	 *
 	 * @return string
 	 */
@@ -119,8 +112,8 @@ class Action
 	/**
 	 * Call the function or method for the selected subaction.
 	 *
-	 * Both the controller and the method are set up in the subactions array. If a controller
-	 * is not specified, the function is assumed to be a regular callable.
+	 * Both the controller and the method are set up in the subactions array. If a
+	 * controller is not specified, the function is assumed to be a regular callable.
 	 *
 	 * @param string $sub_id a valid index in the subactions array
 	 */
@@ -130,12 +123,12 @@ class Action
 		$this->isAllowedTo($sub_id);
 
 		// Start off by assuming that this is a callable of some kind.
-		$call = [$subAction];
+		$call = $subAction;
 
 		if (isset($subAction['function']))
 		{
 			// This is just a good ole' function
-			$call = [$subAction['function']];
+			$call = $subAction['function'];
 		}
 
 		// Calling a method within a controller?
@@ -157,21 +150,15 @@ class Action
 			}
 
 			// Modify the call accordingly
-			$call = [$controller] + $call;
+			$call = [$controller, $call];
 		}
 
 		call_user_func($call);
 	}
 
 	/**
-	 * Security check: verify that the user has the permission to perform the given action.
-	 *
-	 * What it does:
-	 *
-	 * - Verifies if the user has the permission set for the given action.
-	 * - Return true if no permission was set for the action.
-	 * - Results in a fatal_lang_error() if the user doesn't have permission,
-	 * or this instance was not initialized, or the action cannot be found in it.
+	 * Security check: verify that the user has the permission to perform the
+	 * given action, and throw an error otherwise.
 	 *
 	 * @param string $sub_id The sub action
 	 *
