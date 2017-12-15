@@ -43,8 +43,6 @@ class Action
 	 *        'permission' => area),
 	 *  or
 	 *    'sub_action name' => array(
-	 *        'file' => 'file name',
-	 *        'dir' => 'controller file location', if not set ADMINDIR is assumed
 	 *        'controller' => 'controller name',
 	 *        'function' => 'method name',
 	 *        'enabled' => true/false,
@@ -101,7 +99,9 @@ class Action
 	public function initialize(array $subActions, string $default = null, string $requestParam = 'sa'): string
 	{
 		if ($this->_name !== null)
-			call_integration_hook('integrate_sa_' . $this->_name, [&$subActions])
+		{
+			call_integration_hook('integrate_sa_' . $this->_name, [&$subActions]);
+		}
 
 		$this->_subActions = array_filter(
 			$subActions,
@@ -111,7 +111,7 @@ class Action
 			}
 		);
 
-			$this->_default = $default ?: key($this->_subActions);
+		$this->_default = $default ?: key($this->_subActions);
 
 		return $this->req->getQuery($requestParam, 'trim|strval', $this->_default);
 	}
@@ -132,6 +132,12 @@ class Action
 		// Start off by assuming that this is a callable of some kind.
 		$call = [$subAction];
 
+		if (isset($subAction['function']))
+		{
+			// This is just a good ole' function
+			$call = [$subAction['function']];
+		}
+
 		// Calling a method within a controller?
 		if (isset($subAction['controller']))
 		{
@@ -151,12 +157,7 @@ class Action
 			}
 
 			// Modify the call accordingly
-			$call = [$controller, $subAction['function']];
-		}
-		elseif (isset($subAction['function']))
-		{
-			// This is just a good ole' function
-			$call = $subAction['function'];
+			$call = [$controller] + $call;
 		}
 
 		call_user_func($call);
