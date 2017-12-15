@@ -615,7 +615,7 @@ class ProfileAccount_Controller extends Action_Controller
 		{
 			deleteMembers($this->_memID);
 
-			$controller = new Auth_Controller();
+			$controller = new Auth_Controller(new Event_manager());
 			$controller->action_logout(true);
 
 			redirectexit();
