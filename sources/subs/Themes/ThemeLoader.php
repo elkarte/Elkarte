@@ -536,10 +536,9 @@ class ThemeLoader
 				}
 				else
 				{
-					list ($k, $v) = each($_GET);
-					if ($k != 'wwwRedirect')
+					if (key($_GET) !== 'wwwRedirect')
 					{
-						redirectexit('wwwRedirect;' . $k . '=' . $v);
+						redirectexit('wwwRedirect;' . key($_GET) . '=' . current($_GET));
 					}
 				}
 			}
