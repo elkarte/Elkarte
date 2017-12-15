@@ -1042,10 +1042,7 @@ $(function() {
 function toggleCache ()
 {
 	var memcache = $('#cache_memcached').parent(),
-		cachedir = $('#cachedir').parent(),
-		cacheuid = $('#cache_uid').parent(),
-		cachepassword = $('#cache_password').parent(),
-		cacheconfirm = $('#cache_password_confirm').parent();
+		cachedir = $('#cachedir').parent();
 
 	// Show the memcache server box only if memcache has been selected
 	if (cache_type.value.substr(0, 8) !== "memcache")
@@ -1069,26 +1066,6 @@ function toggleCache ()
 	{
 		cachedir.slideUp(100);
 		cachedir.prev().slideUp(100);
-	}
-
-	// right now only xcache needs the uid/password
-	if (cache_type.value === "xcache")
-	{
-		cacheuid.slideDown(100);
-		cacheuid.prev().slideDown(100);
-		cachepassword.slideDown(100);
-		cachepassword.prev().slideDown(100);
-		cacheconfirm.slideDown(100);
-		cacheconfirm.prev().slideDown(100);
-	}
-	else
-	{
-		cacheuid.slideUp(100);
-		cacheuid.prev().slideUp(100);
-		cachepassword.slideUp(100);
-		cachepassword.prev().slideUp(100);
-		cacheconfirm.slideUp(100);
-		cacheconfirm.prev().slideUp(100);
 	}
 }
 
