@@ -509,9 +509,10 @@ class Templates
 					BOARDDIR => '',
 					strtr(BOARDDIR, '\\', '/') => '',
 				]));
-			if (empty($error) && ini_get('track_errors') && !empty($php_errormsg))
+			$last_error = error_get_last();
+			if (empty($error) && ini_get('track_errors') && !empty($last_error['message']))
 			{
-				$error = $php_errormsg;
+				$error = $last_error['message'];
 			}
 			elseif (empty($error))
 			{
