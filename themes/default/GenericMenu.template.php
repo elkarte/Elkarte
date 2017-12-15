@@ -84,7 +84,7 @@ function template_generic_menu_sidebar_above()
 
 	// If there are any "tabs" setup, this is the place to shown them.
 	if (empty($context['force_disable_tabs']))
-		template_generic_menu_tabs($menu_context);
+		template_generic_menu_tabs($menu_context['tab_data']);
 }
 
 /**
@@ -169,7 +169,7 @@ function template_generic_menu_dropdown_above()
 				<div id="admin_content">';
 
 	// It's possible that some pages have their own tabs they wanna force...
-	template_generic_menu_tabs($menu_context);
+	template_generic_menu_tabs($menu_context['tab_data']);
 }
 
 /**
@@ -184,14 +184,11 @@ function template_generic_menu_dropdown_below()
 /**
  * Some code for showing a tabbed view.
  *
- * @param integer $menu_context
+ * @param array $tab_context
  */
-function template_generic_menu_tabs(&$menu_context)
+function template_generic_menu_tabs($tab_context)
 {
 	global $settings, $scripturl, $txt;
-
-	// Handy shortcut.
-	$tab_context = &$menu_context['tab_data'];
 
 	if (!empty($tab_context['title']))
 	{
