@@ -718,36 +718,7 @@ function flopImageGD($image, $sizes)
  */
 function flipImageGD($image, $sizes, $axis = 'vertical')
 {
-	// If the built in function (php 5.5) is available, use it
-	if (function_exists('imageflip'))
-	{
-		imageflip($image, $axis === 'vertical' ? IMG_FLIP_VERTICAL : IMG_FLIP_HORIZONTAL);
-	}
-	// Pixel mapping then
-	else
-	{
-		$new = imagecreatetruecolor($sizes[0], $sizes[1]);
-		imagealphablending($new, false);
-		imagesavealpha($new, true);
-
-		if ($axis === 'vertical')
-		{
-			for ($y = 0; $y < $sizes[1]; $y++)
-			{
-				imagecopy($new, $image, 0, $y, 0, $sizes[1] - $y - 1, $sizes[0], 1);
-			}
-		}
-		else
-		{
-			for ($x = 0; $x < $sizes[0]; $x++)
-			{
-				imagecopy($new, $image, $x, 0, $sizes[0] - $x - 1, 0, 1, $sizes[1]);
-			}
-		}
-
-		$image = $new;
-		unset($new);
-	}
+	imageflip($image, $axis === 'vertical' ? IMG_FLIP_VERTICAL : IMG_FLIP_HORIZONTAL);
 
 	return $image;
 }

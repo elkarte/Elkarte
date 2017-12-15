@@ -129,9 +129,6 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			$nextTasks = loadTasks($tasks);
 
 			// Lets get it on!
-			// @deprecated since 1.1
-			call_integration_include_hook('integrate_autotask_include');
-
 			ignore_user_abort(true);
 
 			foreach ($nextTasks as $task_id => $taskname)

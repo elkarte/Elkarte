@@ -349,7 +349,7 @@ final class Request
 	}
 
 	/**
-	 * Clean the request variables - add html entities to GET and slashes if magic_quotes_gpc is Off.
+	 * Clean the request variables - add html entities to GET.
 	 *
 	 * What it does:
 	 *
@@ -408,9 +408,6 @@ final class Request
 	 */
 	private function _checkExit()
 	{
-		// Reject magic_quotes_sybase='on'.
-		$this->_checkMagicQuotes();
-
 		// Save some memory.. (since we don't use these anyway.)
 		unset($GLOBALS['HTTP_POST_VARS'], $GLOBALS['HTTP_POST_VARS']);
 		unset($GLOBALS['HTTP_POST_FILES'], $GLOBALS['HTTP_POST_FILES']);
@@ -457,25 +454,6 @@ final class Request
 		{
 			if (is_numeric($key))
 				unset($_COOKIE[$key]);
-		}
-	}
-
-	/**
-	 * No magic quotes allowed.
-	 *
-	 * - depreciated in 5.3 and done in 5.4
-	 */
-	private function _checkMagicQuotes()
-	{
-		if (version_compare(PHP_VERSION, '5.4.0', '<'))
-		{
-			// Reject magic_quotes_sybase='on'.
-			if (ini_get('magic_quotes_sybase') || strtolower(ini_get('magic_quotes_sybase')) == 'on')
-				throw new Elk_Exception('magic_quotes_sybase=on was detected: your host is using an unsecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.', false);
-
-			// Reject magic_quotes_gpc='on'.
-			if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc() != 0)
-				throw new Elk_Exception('magic_quotes_gpc=on was detected: your host is using an unsecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.', false);
 		}
 	}
 

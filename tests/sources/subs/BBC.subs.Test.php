@@ -580,13 +580,14 @@ Should be an empty line in between.',
 	 */
 	public function testBBcode()
 	{
+		$parsers = \BBC\ParserWrapper::instance();
 		foreach ($this->bbcTestCases as $testcase)
 		{
 			$name = $testcase[0];
 			$test = $testcase[1];
 			$expected = $testcase[2];
 
-			$result = parse_bbc($test);
+			$result = $parsers->parseMessage($test, 1);
 
 			$this->assertEquals($expected, $result, $name);
 		}
@@ -597,12 +598,13 @@ Should be an empty line in between.',
 	 */
 	public function testInvalidBBcode()
 	{
+		$parsers = \BBC\ParserWrapper::instance();
 		foreach ($this->bbcInvalidTestCases as $testcase)
 		{
 			$name = 'Broken ' . $testcase[0];
 			$test = $testcase[1];
 
-			$result = parse_bbc($test);
+			$result = $parsers->parseMessage($test, 1);
 
 			$this->assertEquals($test, $result, $name);
 		}

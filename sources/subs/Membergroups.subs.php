@@ -2017,8 +2017,6 @@ function deleteGroupRequests($groups)
  * This function updates those members who match post-based
  * membergroups in the database (restricted by parameter $members).
  *
- * - Used by updateStats('postgroups').
- *
  * @package Membergroups
  * @param int[]|null $members = null The members to update, null if all
  * @param string[]|null $parameter2 = null

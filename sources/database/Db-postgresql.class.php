@@ -302,12 +302,6 @@ class Database_PostgreSQL extends Database_Abstract
 
 		$this->_db_last_result = @pg_query($connection, $db_string);
 
-		// @deprecated since 1.1 - use skip_next_error method
-		if (!empty($db_values['db_error_skip']))
-		{
-			$this->_skip_error = true;
-		}
-
 		if ($this->_db_last_result === false && !$this->_skip_error)
 		{
 			$this->error($db_string, $connection);

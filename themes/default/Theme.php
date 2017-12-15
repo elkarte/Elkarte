@@ -621,7 +621,7 @@ class Theme extends BaseTheme
 		if (isBrowser('possibly_robot'))
 		{
 			// @todo Maybe move this somewhere better?!
-			$controller = new \ScheduledTasks_Controller();
+			$controller = new \ScheduledTasks_Controller(new \Event_Manager());
 
 			// What to do, what to do?!
 			if (empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())
@@ -841,16 +841,12 @@ class Theme extends BaseTheme
 		// Set some specific vars.
 		$context['page_title_html_safe'] = \Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
 
-		// 1.0 backward compatibility: if you already put the icon in the theme dir
-		// use that one, otherwise the default
-		// @deprecated since 1.1
-		if (file_exists(BOARDDIR . '/mobile.png'))
+		$context['favicon'] = $scripturl . '/mobile.png';
+
+		// Load a custom CSS file?
+		if (file_exists($settings['theme_dir'] . '/css/custom.css'))
 		{
-			$context['favicon'] = $scripturl . '/mobile.png';
-		}
-		else
-		{
-			$context['favicon'] = $settings['images_url'] . '/mobile.png';
+			loadCSSFile('custom.css');
 		}
 
 		// Since it's nice to have avatars all of the same size, and in some cases the size detection may fail,

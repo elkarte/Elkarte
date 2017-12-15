@@ -1315,14 +1315,6 @@ function createSalvageArea()
 		$salvageBoardID = $db->insert_id('{db_prefix}boards', 'id_board');
 	}
 
-	// @deprecated since 1.0 - the ordering is done in the query, probably not needed
-	$db->query('alter_table', '
-		ALTER TABLE {db_prefix}boards
-		ORDER BY board_order',
-		array(
-		)
-	);
-
 	// Restore the user's language.
 	theme()->getTemplates()->loadLanguageFile('Admin');
 }

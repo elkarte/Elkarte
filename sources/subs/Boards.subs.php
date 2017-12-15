@@ -750,15 +750,6 @@ function reorderBoards()
 					)
 				);
 	}
-
-	// Sort the records of the boards table on the board_order value.
-	$db->skip_next_error();
-	$db->query('alter_table', '
-		ALTER TABLE {db_prefix}boards
-		ORDER BY board_order',
-		array(
-		)
-	);
 }
 
 /**
@@ -1889,10 +1880,10 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
  * @param int[]|int $boards an array of board IDs (it accepts a single board too).
  * NOTE: the $boards param is deprecated since 1.1 - The param is passed by ref in 1.0 and the result
  * is returned through the param itself, starting from 1.1 the expected behaviour
- * is that the result is returned. The pass-by-ref is kept for backward compatibility.
- * @return int[]
+ * is that the result is returned.
+ * @return bool|int[]
  */
-function addChildBoards(&$boards)
+function addChildBoards($boards)
 {
 	$db = database();
 

@@ -70,7 +70,7 @@ class TestProfileInfo extends PHPUnit_Framework_TestCase
 	{
 		global $context, $modSettings;
 
-		$controller = new ProfileInfo_Controller();
+		$controller = new ProfileInfo_Controller(new Event_Manager());
 		$controller->pre_dispatch();
 		$controller->action_index();
 

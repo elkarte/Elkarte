@@ -90,8 +90,7 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 
 		if (!empty($indexOptions['include_avatars']))
 		{
-			// Double equal comparison for 1 because it is backward compatible with 1.0 where the value was true/false
-			if ($indexOptions['include_avatars'] == 1 || $indexOptions['include_avatars'] === 3)
+			if ($indexOptions['include_avatars'] === 1 || $indexOptions['include_avatars'] === 3)
 			{
 				$indexOptions['custom_selects'] = array_merge($indexOptions['custom_selects'], array('meml.avatar', 'COALESCE(a.id_attach, 0) AS id_attach', 'a.filename', 'a.attachment_type', 'meml.email_address'));
 				$indexOptions['custom_joins'] = array_merge($indexOptions['custom_joins'], array('LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = ml.id_member AND a.id_member != 0)'));
@@ -201,41 +200,4 @@ function topicsParticipation($id_member, $topic_ids)
 	$db->free_result($result);
 
 	return $topics;
-}
-
-/**
- * This simple function returns the message topic icon array.
- * @deprecated since 1.1 - use the MessageTopicIcons class instead
- */
-function MessageTopicIcons()
-{
-	// Setup the default topic icons...
-	$stable_icons = array(
-		'xx',
-		'thumbup',
-		'thumbdown',
-		'exclamation',
-		'question',
-		'lamp',
-		'smiley',
-		'angry',
-		'cheesy',
-		'grin',
-		'sad',
-		'wink',
-		'poll',
-		'moved',
-		'recycled',
-		'wireless',
-		'clip'
-	);
-
-	// Allow addons to add to the message icon array
-	call_integration_hook('integrate_messageindex_icons', array(&$stable_icons));
-
-	$icon_sources = array();
-	foreach ($stable_icons as $icon)
-		$icon_sources[$icon] = 'images_url';
-
-	return $icon_sources;
 }

@@ -77,13 +77,6 @@ function initialize_inputs()
 	if (function_exists('session_start'))
 		@session_start();
 
-	// Reject magic_quotes_sybase='on'.
-	if (ini_get('magic_quotes_sybase') || strtolower(ini_get('magic_quotes_sybase')) == 'on')
-		die('magic_quotes_sybase=on was detected: your host is using an insecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.');
-
-	if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc() != 0)
-		die('magic_quotes_gpc=on was detected: your host is using an insecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.');
-
 	// Add slashes, as long as they aren't already being added.
 	foreach ($_POST as $k => $v)
 	{

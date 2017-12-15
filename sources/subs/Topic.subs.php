@@ -1908,13 +1908,6 @@ function setTopicAttribute($topic, $attributes)
 	$update = array();
 	foreach ($attributes as $key => $attr)
 	{
-		// @deprecated since 1.1 - kept for backward compatibility
-		if ($key == 'sticky')
-		{
-			$key = 'is_sticky';
-			$attributes['is_sticky'] = $attr;
-		}
-
 		$attributes[$key] = (int) $attr;
 		$update[] = '
 				' . $key . ' = {int:' . $key . '}';

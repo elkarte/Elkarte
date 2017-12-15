@@ -92,10 +92,6 @@ elseif (basename($_SERVER['PHP_SELF']) === 'SSI.php')
 }
 
 error_reporting($ssi_error_reporting);
-if (function_exists('set_magic_quotes_runtime'))
-{
-	@set_magic_quotes_runtime($ssi_magic_quotes_runtime);
-}
 
 return true;
 
@@ -1413,12 +1409,6 @@ function ssi_showPoll($topicID = null, $output_method = 'echo')
 	{
 		return array();
 	}
-
-	// For "compatibility" sake
-	// @deprecated since 1.0
-	$context['poll']['allow_vote'] = $context['allow_vote'];
-	$context['poll']['allow_view_results'] = $context['allow_poll_view'];
-	$context['poll']['topic'] = $topicID;
 
 	if ($output_method !== 'echo')
 	{
