@@ -1240,8 +1240,7 @@ a.bbc_link {
 .linklevel1:hover, .listlevel1:hover .linklevel1,
 .linklevel2:hover, .listlevel2:hover .linklevel2,
 .linklevel3:hover, .listlevel3:hover .linklevel3,
-#menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1,
-#menu_current_area > strong > .linklevel1 {
+#menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1 {
 	border: 1px solid;
 	text-decoration: none;
 }
@@ -1426,7 +1425,7 @@ a.bbc_link {
 /* Levels 2 and 3: highlighting of current section */
 /* @todo - Should probably be applied to main menu as well, for consistency. */
 .linklevel2.chosen, .linklevel3.chosen,
-#menu_current_area .linklevel1 {
+#menu_sidebar .linklevel1.chosen {
 	font-weight: 700;
 }
 

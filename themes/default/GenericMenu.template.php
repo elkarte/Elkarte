@@ -45,7 +45,7 @@ function template_generic_menu_sidebar_above()
 				continue;
 
 			echo '
-				<li class="listlevel1', !empty($area['subsections']) ? ' subsections"  aria-haspopup="true"' : '"', ' ', ($i == $menu_context['current_area']) ? 'id="menu_current_area"' : '', '>
+				<li class="listlevel1', !empty($area['subsections']) ? ' subsections"  aria-haspopup="true"' : '"', '>
 					<a class="linklevel1', !empty($area['selected']) ? ' chosen' : '', '" href="', $area['url'], '">', $area['label'], '</a>';
 
 			// Are there any subsections?
