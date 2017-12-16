@@ -459,6 +459,24 @@ class Errors extends \AbstractModel
 	}
 
 	/**
+	 * Small utility function for simplify logging of deprecated functions
+	 * in the development phase of 2.0.
+	 */
+	public function log_deprecated($function, $replacement)
+	{
+		$debug = '<br><br>';
+		foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1] as $var => $val)
+		{
+			$debug .= $var . ': ' . $val . '<br>';
+		}
+		$this->log_error(sprintf(
+			'%s is deprecated, use %s instead.%s',
+			$function,
+			$replacement,
+			$debug) ,'deprecated');
+	}
+
+	/**
 	 * Small utility function for fatal error pages, sets the headers.
 	 *
 	 * - Used by display_db_error(), display_loadavg_error(),
