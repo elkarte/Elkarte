@@ -36,28 +36,26 @@ class Bootstrap
 		// Bootstrap only once.
 		if (defined('ELKBOOT'))
 		{
-			return true;
-		}
+			// We're going to set a few globals
+			global $time_start, $ssi_error_reporting, $db_show_debug;
 
-		// We're going to set a few globals
-		global $time_start, $ssi_error_reporting, $db_show_debug;
+			// Your on the clock
+			$time_start = microtime(true);
 
-		// Your on the clock
-		$time_start = microtime(true);
+			// Unless settings.php tells us otherwise
+			$db_show_debug = false;
 
-		// Unless settings.php tells us otherwise
-		$db_show_debug = false;
+			// Report errors but not depreciated ones
+			$ssi_error_reporting = error_reporting(E_ALL | E_STRICT & ~8192);
 
-		// Report errors but not depreciated ones
-		$ssi_error_reporting = error_reporting(E_ALL | E_STRICT & ~8192);
+			// Get the things needed for ALL modes
+			$this->bringUpBasics();
 
-		// Get the things needed for ALL modes
-		$this->bringUpBasics();
-
-		// Going to run from the side entrance and not directly from inside elkarte
-		if ($standalone)
-		{
-			$this->ssi_main();
+			// Going to run from the side entrance and not directly from inside elkarte
+			if ($standalone)
+			{
+				$this->ssi_main();
+			}
 		}
 	}
 
