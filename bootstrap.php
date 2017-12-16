@@ -66,7 +66,7 @@ class Bootstrap
 	{
 		$this->setConstants();
 		$this->setRusage();
-		$this->clearGloballs();
+		$this->clearGlobals();
 		$this->loadSettingsFile();
 		$this->validatePaths();
 		$this->loadDependants();
@@ -118,7 +118,7 @@ class Bootstrap
 	/**
 	 * If they glo, they need to be cleaned.
 	 */
-	private function clearGloballs()
+	private function clearGlobals()
 	{
 		// We don't need no globals. (a bug in "old" versions of PHP)
 		foreach (array('db_character_set', 'cachedir') as $variable)
