@@ -34,7 +34,7 @@ class Bootstrap
 	public function __construct($standalone = true)
 	{
 		// Bootstrap only once.
-		if (defined('ELKBOOT'))
+		if (!defined('ELKBOOT'))
 		{
 			// We're going to set a few globals
 			global $time_start, $ssi_error_reporting, $db_show_debug;
@@ -46,7 +46,7 @@ class Bootstrap
 			$db_show_debug = false;
 
 			// Report errors but not depreciated ones
-			$ssi_error_reporting = error_reporting(E_ALL | E_STRICT & ~8192);
+			$ssi_error_reporting = error_reporting(E_ALL | E_STRICT & ~E_DEPRECATED);
 
 			// Get the things needed for ALL modes
 			$this->bringUpBasics();
@@ -453,7 +453,7 @@ class Bootstrap
 
 		// Check on any hacking attempts.
 		if (
-			|| isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS'])
+			isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS'])
 			|| isset($_REQUEST['ssi_theme']) && (int) $_REQUEST['ssi_theme'] == (int) $ssi_them
 			|| isset($_COOKIE['ssi_theme']) && (int) $_COOKIE['ssi_theme'] == (int) $ssi_theme
 			|| isset($_REQUEST['ssi_layers'], $ssi_layers) && $_REQUEST['ssi_layers'] == $ssi_layers
