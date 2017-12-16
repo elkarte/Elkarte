@@ -69,15 +69,6 @@ function reloadSettings()
 
 		$modSettings['warning_enable'] = $modSettings['warning_settings'][0];
 
-		// @deprecated since 1.1.0 - Just in case the upgrade script was run before B3
-		if (empty($modSettings['cal_limityear']))
-		{
-			$modSettings['cal_limityear'] = 10;
-			updateSettings(array(
-				'cal_limityear' => 10
-			));
-		}
-
 		$cache->put('modSettings', $modSettings, 90);
 	}
 
