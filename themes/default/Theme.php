@@ -886,12 +886,6 @@ class Theme extends BaseTheme
 		{
 			loadCSSFile('custom.css', array('fallback' => false));
 		}
-
-		// Load font Awesome fonts, @deprecated in 1.1 and will be removed in 2.0
-		if (!empty($settings['require_font-awesome']) || !empty($modSettings['require_font-awesome']))
-		{
-			loadCSSFile('font-awesome.min.css');
-		}
 	}
 
 	/**
