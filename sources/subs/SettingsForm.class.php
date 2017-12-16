@@ -137,20 +137,11 @@ class Settings_Form
 	 * It will put them in Settings.php or in the settings table
 	 * according to the adapter specified in the constructor.
 	 *
-	 * May read from $_POST to retain backwards compatibility.
-	 * Some older controller may have modified this superglobal,
-	 * and HttpReq does not contain the newly modified information.
 	 */
 	public function save()
 	{
 		validateToken('admin-ssc');
 
-		// Retain backwards compatibility
-		$configValues = $this->getConfigValues();
-		if (empty($configValues))
-		{
-			$this->setConfigValues($_POST);
-		}
 		$this->adapter->save();
 	}
 }
