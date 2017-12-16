@@ -199,21 +199,18 @@ class Search
 		$this->_db = database();
 		$this->_db_search = db_search();
 
+		$this->_db_search->skip_next_error();
 		// Remove any temporary search tables that may exist
 		$this->_db_search->search_query('drop_tmp_log_search_messages', '
-			DROP TABLE IF EXISTS {db_prefix}tmp_log_search_messages',
-			array(
-				'db_error_skip' => true,
-			)
+			DROP TABLE IF EXISTS {db_prefix}tmp_log_search_messages'
 		);
 
+		$this->_db_search->skip_next_error();
 		$this->_db_search->search_query('drop_tmp_log_search_topics', '
-			DROP TABLE IF EXISTS {db_prefix}tmp_log_search_topics',
-			array(
-				'db_error_skip' => true,
-			)
+			DROP TABLE IF EXISTS {db_prefix}tmp_log_search_topics'
 		);
 
+		$this->_db_search->skip_next_error();
 		// Create new temporary table(s) (if we can) to store preliminary results in.
 		$this->_createTemporary = $this->_db_search->search_query('create_tmp_log_search_messages', '
 			CREATE TEMPORARY TABLE {db_prefix}tmp_log_search_messages (
@@ -221,19 +218,18 @@ class Search
 				PRIMARY KEY (id_msg)
 			) ENGINE=MEMORY',
 			array(
-				'string_zero' => '0',
-				'db_error_skip' => true,
+				'string_zero' => '0'
 			)
 		) !== false;
 
+		$this->_db_search->skip_next_error();
 		$this->_db_search->search_query('create_tmp_log_search_topics', '
 			CREATE TEMPORARY TABLE {db_prefix}tmp_log_search_topics (
 				id_topic mediumint(8) unsigned NOT NULL default {string:string_zero},
 				PRIMARY KEY (id_topic)
 			) ENGINE=MEMORY',
 			array(
-				'string_zero' => '0',
-				'db_error_skip' => true,
+				'string_zero' => '0'
 			)
 		);
 	}
