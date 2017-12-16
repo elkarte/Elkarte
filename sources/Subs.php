@@ -1133,19 +1133,6 @@ function setupMenuContext()
 }
 
 /**
- * Generate a random seed and ensure it's stored in settings.
- * @deprecated
- */
-function elk_seed_generator()
-{
-	global $modSettings;
-
-	// Change the seed.
-	if (mt_rand(1, 250) == 69 || empty($modSettings['rand_seed']))
-		updateSettings(array('rand_seed' => mt_rand()));
-}
-
-/**
  * Process functions of an integration hook.
  *
  * What it does:
