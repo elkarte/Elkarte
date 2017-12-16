@@ -46,7 +46,7 @@ class Bootstrap
 			$db_show_debug = false;
 
 			// Report errors but not depreciated ones
-			$ssi_error_reporting = error_reporting(E_ALL | E_STRICT & ~E_DEPRECATED);
+			$ssi_error_reporting = error_reporting(E_ALL & ~E_DEPRECATED);
 
 			// Get the things needed for ALL modes
 			$this->bringUpBasics();
