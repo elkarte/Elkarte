@@ -125,6 +125,15 @@ class Settings_Form
 		return $this->adapter;
 	}
 
+	/**
+	 * This method reaads the settings and prepares them for
+	 * display within the template.
+	 *
+	 * It will read either Settings.php or the settings table
+	 * according to the adapter specified in the constructor.
+	 *
+	 * Creates the token `admin-ssc`
+	 */
 	public function prepare()
 	{
 		createToken('admin-ssc');
@@ -137,6 +146,7 @@ class Settings_Form
 	 * It will put them in Settings.php or in the settings table
 	 * according to the adapter specified in the constructor.
 	 *
+	 * Validates the token `admin-ssc`
 	 */
 	public function save()
 	{
