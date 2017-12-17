@@ -55,11 +55,9 @@ elk_AdminIndex.prototype.init = function ()
 {
 	window.adminIndexInstanceRef = this;
 
-	var fHandlePageLoaded = function () {
+	window.addEventListener("load", function () {
 		window.adminIndexInstanceRef.loadAdminIndex();
-	};
-
-	window.addEventListener("load", fHandlePageLoaded);
+	});
 };
 
 elk_AdminIndex.prototype.loadAdminIndex = function ()
@@ -270,10 +268,9 @@ elk_ViewVersions.prototype.init = function ()
 {
 	// Load this on loading of the page.
 	window.viewVersionsInstanceRef = this;
-	var fHandlePageLoaded = function () {
+	window.addEventListener("load", function () {
 		window.viewVersionsInstanceRef.loadViewVersions();
-	};
-	window.addEventListener("load", fHandlePageLoaded);
+	});
 };
 
 // Load all the file versions
