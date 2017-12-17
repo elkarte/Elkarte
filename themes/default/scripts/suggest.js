@@ -356,10 +356,10 @@ smc_AutoSuggest.prototype.addItemLink = function (sItemId, sItemName, bFromSubmi
 	this.iItemCount ++;
 
 	// If there's a callback then call it.
-	if ('oCallback' in this && 'onBeforeAddItem' in this.oCallback && typeof(this.oCallback.onBeforeAddItem) === 'string')
+	if (typeof(this.oCallback.onBeforeAddItem) === 'function')
 	{
 		// If it returns false the item must not be added.
-		if (!eval(this.oCallback.onBeforeAddItem + '(' + this.opt.sSelf + ', \'' + sItemId + '\');'))
+		if (!this.oCallback.onBeforeAddItem.call(this, sItemId))
 			return;
 	}
 
@@ -369,8 +369,8 @@ smc_AutoSuggest.prototype.addItemLink = function (sItemId, sItemName, bFromSubmi
 	this.oItemList.appendChild(oNewDiv);
 
 	// If there's a registered callback, call it.
-	if ('oCallback' in this && 'onAfterAddItem' in this.oCallback && typeof(this.oCallback.onAfterAddItem) === 'string')
-		eval(this.oCallback.onAfterAddItem + '(' + this.opt.sSelf + ', \'' + oNewDiv.id + '\', ' + this.iItemCount + ');');
+	if (typeof(this.oCallback.onAfterAddItem) === 'function')
+		this.oCallback.onAfterAddItem.call(this, oNewDiv.id);
 
 	// Clear the div a bit.
 	this.removeLastSearchString();
@@ -396,8 +396,8 @@ smc_AutoSuggest.prototype.deleteAddedItem = function (sItemId)
 		this.iItemCount --;
 
 		// If there's a registered callback, call it.
-		if ('oCallback' in this && 'onAfterDeleteItem' in this.oCallback && typeof(this.oCallback.onAfterDeleteItem) === 'string')
-			eval(this.oCallback.onAfterDeleteItem + '(' + this.opt.sSelf + ', ' + this.iItemCount + ');');
+		if (typeof(this.oCallback.onAfterDeleteItem) === 'function')
+			this.oCallback.onAfterDeleteItem.call(this);
 	}
 
 	return false;
@@ -531,10 +531,10 @@ smc_AutoSuggest.prototype.onSuggestionReceived = function (oXMLDoc)
 smc_AutoSuggest.prototype.autoSuggestUpdate = function ()
 {
 	// If there's a callback then call it.
-	if ('onBeforeUpdate' in this.oCallback && typeof(this.oCallback.onBeforeUpdate) === 'string')
+	if (typeof(this.oCallback.onBeforeUpdate) === 'function')
 	{
 		// If it returns false the item must not be added.
-		if (!eval(this.oCallback.onBeforeUpdate + '(' + this.opt.sSelf + ');'))
+		if (!this.oCallback.onBeforeUpdate.call(this))
 			return false;
 	}
 
