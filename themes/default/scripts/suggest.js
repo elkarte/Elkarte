@@ -58,7 +58,7 @@ function smc_AutoSuggest(oOptions)
 	this.oXmlRequestHandle = null;
 
 	// Just make sure the page is loaded before calling the init.
-	window.addEventListener("load", this.opt.sSelf + '.init();');
+	window.addEventListener("load", this.init.bind(this));
 }
 
 // Initialize our autosuggest object, adds events and containers to the element we monitor
@@ -81,11 +81,11 @@ smc_AutoSuggest.prototype.init = function()
 	this.oTextHandle.autocomplete = 'off';
 
 	// Set up all the event monitoring
-	this.oTextHandle.onkeydown = this.handleKey;
-	this.oTextHandle.onkeyup = this.autoSuggestUpdate;
-	this.oTextHandle.onchange = this.autoSuggestUpdate;
-	this.oTextHandle.onblur = this.autoSuggestHide;
-	this.oTextHandle.onfocus = this.autoSuggestUpdate;
+	this.oTextHandle.onkeydown = this.handleKey.bind(this);
+	this.oTextHandle.onkeyup = this.autoSuggestUpdate.bind(this);
+	this.oTextHandle.onchange = this.autoSuggestUpdate.bind(this);
+	this.oTextHandle.onblur = this.autoSuggestHide.bind(this);
+	this.oTextHandle.onfocus = this.autoSuggestUpdate.bind(this);
 
 	// Adding items to a list, then we need a place to insert them
 	if (this.bItemList)
@@ -407,7 +407,7 @@ smc_AutoSuggest.prototype.deleteAddedItem = function (sItemId)
 smc_AutoSuggest.prototype.autoSuggestHide = function ()
 {
 	// Delay to allow events to propagate through....
-	this.oHideTimer = setTimeout(this.opt.sSelf + '.autoSuggestActualHide();', 250);
+	this.oHideTimer = setTimeout(this.autoSuggestActualHide.bind(this), 250);
 };
 
 // Do the actual hiding after a timeout.
