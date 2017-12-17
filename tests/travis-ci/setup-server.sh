@@ -4,7 +4,7 @@
 # Install php-fpm Apache mod
 # Configure and start Apache
 # Install database tables as needed
-# Build APCu and Xcache as needed
+# Build APCu as needed
 
 set -e
 set +x
@@ -66,30 +66,7 @@ then
 fi
 
 # Setup cache engines for elkarte cache testing
-if [ "$COVERAGE" == "true" ]
-then
-    if [ "$SHORT_PHP" == "7.0" -o "$SHORT_PHP" == "7.1" ]
-    then
-        printf "\n"| pecl install -f apcu
-    else
-        # Build APCu
-        printf "\n"| pecl install -f channel://pecl.php.net/APCu-4.0.10
-
-        # Build Xcache
-        wget http://xcache.lighttpd.net/pub/Releases/3.2.0/xcache-3.2.0.tar.gz
-        tar xf xcache-3.2.0.tar.gz
-        cd xcache-3.2.0
-        phpize
-        ./configure
-        make --quiet
-        make --quiet install
-        cd ../
-        rm -r xcache-3.2.0
-        rm xcache-3.2.0.tar.gz
-        printf "extension=xcache.so\nxcache.size=64M\nxcache.var_size=16M\nxcache.test=On" > xcache.ini
-        phpenv config-add xcache.ini
-    fi
-fi
+printf "\n"| pecl install -f apcu
 
 # Configure apache modules
 sudo a2enmod rewrite actions fastcgi alias

@@ -588,7 +588,7 @@ class ManageServer_Controller extends Action_Controller
 			}
 		}
 
-		// Notify the integration that we're preparing to mess up with cache settings...
+		// Notify the integration that we're preparing to mess with cache settings...
 		call_integration_hook('integrate_modify_cache_settings', array(&$config_vars));
 
 		return $config_vars;

@@ -194,7 +194,6 @@ class Cache
 	 * - It may "miss" so shouldn't be depended on
 	 * - Uses the cache engine chosen in the ACP and saved in settings.php
 	 * - It supports:
-	 *   - Xcache: http://xcache.lighttpd.net/wiki/XcacheApi
 	 *   - memcache: http://www.php.net/memcache
 	 *   - memcached: http://www.php.net/memcached
 	 *   - APC: http://www.php.net/apc
@@ -505,17 +504,10 @@ class Cache
 	{
 		if (self::$_instance === null)
 		{
-			global $cache_accelerator, $cache_enable, $cache_uid, $cache_password, $cache_memcached;
+			global $cache_accelerator, $cache_enable, $cache_memcached;
 
 			$options = array();
-			if ($cache_accelerator === 'xcache')
-			{
-				$options = array(
-					'cache_uid' => $cache_uid,
-					'cache_password' => $cache_password,
-				);
-			}
-			elseif (substr($cache_accelerator, 0, 8) === 'memcache')
+			if (substr($cache_accelerator, 0, 8) === 'memcache')
 			{
 				$options = array(
 					'servers' => explode(',', $cache_memcached),

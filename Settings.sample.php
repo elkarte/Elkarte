@@ -134,18 +134,6 @@ $db_error_send = 0;
 $cache_accelerator = '';
 
 /**
- * Cache accelerator userid, needed by some engines in order to clear the cache
- * @var string
- */
-$cache_uid = '';
-
-/**
- * Cache accelerator password for when connecting to clear the cache
- * @var string
- */
-$cache_password = '';
-
-/**
  * The level at which you would like to cache. Between 0 (off) through 3 (cache a lot).
  * @var int
  */
