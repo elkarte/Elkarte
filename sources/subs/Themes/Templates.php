@@ -777,17 +777,4 @@ class Templates
 	{
 		return $this->templates;
 	}
-
-	/**
-	 * Find and return Templates instance if it exists,
-	 * or create a new instance
-	 *
-	 * @deprecated use the theme object
-	 *
-	 * @return Templates
-	 */
-	public static function instance()
-	{
-		return theme()->getTemplates();
-	}
 }
