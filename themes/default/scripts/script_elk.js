@@ -81,7 +81,7 @@ function toggleButtonAJAX(btn, confirmation_msg_variable, onSuccessCallback)
 
 				// Replaces the confirmation var text with the new one from the response to allow swapping on/off
 				if (typeof (confirm_text) !== 'undefined')
-					eval(confirmation_msg_variable + '= \'' + confirm_text.replace(/[\\']/g, '\\$&') + '\'');
+					confirmation_msg_variable = confirm_text.replace(/[\\']/g, '\\$&');
 			});
 		}
 		else
