@@ -152,8 +152,7 @@ function template_email_members()
 			}
 		});
 
-		var oMemberSuggest = new smc_AutoSuggest({
-			sSelf: \'oMemberSuggest\',
+		new smc_AutoSuggest({
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
 			sSuggestId: \'members\',
@@ -167,8 +166,7 @@ function template_email_members()
 			aListItems: []
 		});
 
-		var oExcludeMemberSuggest = new smc_AutoSuggest({
-			sSelf: \'oExcludeMemberSuggest\',
+		new smc_AutoSuggest({
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
 			sSuggestId: \'exclude_members\',

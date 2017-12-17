@@ -258,8 +258,7 @@ function template_maintain_members()
 	</div>
 
 	<script>
-		var oAttributeMemberSuggest = new smc_AutoSuggest({
-			sSelf: \'oAttributeMemberSuggest\',
+		new smc_AutoSuggest({
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
 			sSuggestId: \'attributeMember\',

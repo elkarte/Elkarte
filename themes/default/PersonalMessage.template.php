@@ -387,7 +387,7 @@ function template_subject_list()
 {
 	global $context, $settings, $txt, $scripturl;
 
-	echo '										
+	echo '
 					<table class="table_grid">
 						<thead>
 							<tr class="table_head">
@@ -1041,8 +1041,7 @@ function template_send()
 
 	echo '
 		<script>
-			var oPersonalMessageSend = new elk_PersonalMessageSend({
-				sSelf: \'oPersonalMessageSend\',
+			new elk_PersonalMessageSend({
 				sSessionId: elk_session_id,
 				sSessionVar: elk_session_var,
 				sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',

@@ -374,8 +374,7 @@ function template_edit_group()
 	if ($context['group']['id'] != 3 && $context['group']['id'] != 4)
 	{
 		$js = '
-		var oModeratorSuggest = new smc_AutoSuggest({
-			sSelf: \'oModeratorSuggest\',
+		new smc_AutoSuggest({
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
 			sSuggestId: \'group_moderators\',
@@ -677,8 +676,7 @@ function template_group_members()
 
 	if (!empty($context['group']['assignable']))
 		theme()->addInlineJavascript('
-		var oAddMemberSuggest = new smc_AutoSuggest({
-			sSelf: \'oAddMemberSuggest\',
+		new smc_AutoSuggest({
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
 			sSuggestId: \'to_suggest\',

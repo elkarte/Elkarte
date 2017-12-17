@@ -150,8 +150,7 @@ function template_searchform()
 		createEventListener(window);
 		window.addEventListener("load", initSearch, false);
 
-		var oAddMemberSuggest = new smc_AutoSuggest({
-			sSelf: \'oAddMemberSuggest\',
+		new smc_AutoSuggest({
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
 			sControlId: \'userspec\',

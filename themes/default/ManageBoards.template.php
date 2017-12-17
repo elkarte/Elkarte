@@ -650,8 +650,7 @@ function template_modify_board()
 	</div>';
 
 	$js = '
-		var oModeratorSuggest = new smc_AutoSuggest({
-			sSelf: \'oModeratorSuggest\',
+		new smc_AutoSuggest({
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
 			sSuggestId: \'moderators\',
