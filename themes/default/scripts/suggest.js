@@ -80,14 +80,12 @@ smc_AutoSuggest.prototype.init = function()
 	this.oTextHandle.name = 'dummy_' + Math.floor(Math.random() * 1000000);
 	this.oTextHandle.autocomplete = 'off';
 
-	this.oTextHandle.instanceRef = this;
-
 	// Set up all the event monitoring
-	this.oTextHandle.onkeydown = function (oEvent) {return this.instanceRef.handleKey(oEvent);};
-	this.oTextHandle.onkeyup = function (oEvent) {return this.instanceRef.autoSuggestUpdate(oEvent);};
-	this.oTextHandle.onchange = function (oEvent) {return this.instanceRef.autoSuggestUpdate(oEvent);};
-	this.oTextHandle.onblur = function (oEvent) {return this.instanceRef.autoSuggestHide(oEvent);};
-	this.oTextHandle.onfocus = function (oEvent) {return this.instanceRef.autoSuggestUpdate(oEvent);};
+	this.oTextHandle.onkeydown = this.handleKey;
+	this.oTextHandle.onkeyup = this.autoSuggestUpdate;
+	this.oTextHandle.onchange = this.autoSuggestUpdate;
+	this.oTextHandle.onblur = this.autoSuggestHide;
+	this.oTextHandle.onfocus = this.autoSuggestUpdate;
 
 	// Adding items to a list, then we need a place to insert them
 	if (this.bItemList)
@@ -307,14 +305,14 @@ smc_AutoSuggest.prototype.positionDiv = function()
 };
 
 // Do something after clicking an item.
-smc_AutoSuggest.prototype.itemClicked = function(oCurElement)
+smc_AutoSuggest.prototype.itemClicked = function(oEvent)
 {
 	// Is there a div that we are populating?
 	if (this.bItemList)
-		this.addItemLink(oCurElement.sItemId, oCurElement.innerHTML);
+		this.addItemLink(oEvent.target.sItemId, oEvent.target.innerHTML);
 	// Otherwise clear things down.
 	else
-		this.oTextHandle.value = oCurElement.innerHTML.php_unhtmlspecialchars();
+		this.oTextHandle.value = oEvent.target.innerHTML.php_unhtmlspecialchars();
 
 	this.oRealTextHandle.value = this.oTextHandle.value;
 	this.autoSuggestActualHide();
@@ -469,10 +467,15 @@ smc_AutoSuggest.prototype.populateDiv = function(aResults)
 		this.oSuggestDivHandle.appendChild(oNewDivHandle);
 
 		// Attach some events to it so we can do stuff.
-		oNewDivHandle.instanceRef = this;
-		oNewDivHandle.onmouseover = function (oEvent) {this.instanceRef.itemMouseOver(this);};
-		oNewDivHandle.onmouseout = function (oEvent) {this.instanceRef.itemMouseOut(this);};
-		oNewDivHandle.onclick = function (oEvent) {this.instanceRef.itemClicked(this);};
+		oNewDivHandle.onmouseover = function (oEvent)
+		{
+			this.className = 'auto_suggest_item_hover';
+		};
+		oNewDivHandle.onmouseout = function (oEvent)
+		{
+			oEvent.target.className = 'auto_suggest_item';
+		};
+		oNewDivHandle.onclick = this.itemClicked.bind(this);
 
 		aNewDisplayData[i] = oNewDivHandle;
 	}
@@ -480,19 +483,6 @@ smc_AutoSuggest.prototype.populateDiv = function(aResults)
 	this.aDisplayData = aNewDisplayData;
 
 	return true;
-};
-
-// Refocus the element, set the class name on mouse over
-smc_AutoSuggest.prototype.itemMouseOver = function (oCurElement)
-{
-	this.oSelectedDiv = oCurElement;
-	oCurElement.className = 'auto_suggest_item_hover';
-};
-
-// Onfocus the element, set the classname back on mouse out
-smc_AutoSuggest.prototype.itemMouseOut = function (oCurElement)
-{
-	oCurElement.className = 'auto_suggest_item';
 };
 
 // Callback function for the XML request, should contain the list of users that match
