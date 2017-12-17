@@ -473,7 +473,7 @@ smc_AutoSuggest.prototype.populateDiv = function(aResults)
 		};
 		oNewDivHandle.onmouseout = function (oEvent)
 		{
-			oEvent.target.className = 'auto_suggest_item';
+			this.className = 'auto_suggest_item';
 		};
 		oNewDivHandle.onclick = this.itemClicked.bind(this);
 
