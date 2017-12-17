@@ -578,7 +578,7 @@ function template_welcome_message()
 				}
 				document.getElementById(\'contbutt\').disabled = 0;
 			}
-			addLoadEvent(ourCurrentVersion);
+			window.addEventListener("load", ourCurrentVersion);
 
 			// This checks that the script file even exists!
 			if (typeof(elkSelectText) == \'undefined\')

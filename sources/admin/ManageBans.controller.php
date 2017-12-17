@@ -505,7 +505,7 @@ class ManageBans_Controller extends Action_Controller
 		);
 
 		// And a bit of javascript to enable/disable some fields
-		theme()->addInlineJavascript('addLoadEvent(fUpdateStatus);', true);
+		theme()->addInlineJavascript('window.addEventListener("load", fUpdateStatus);', true);
 	}
 
 	/**

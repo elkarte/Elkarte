@@ -1403,32 +1403,13 @@ function elk_prepareScriptUrl(sUrl)
 /**
  * Load Event function, adds new events to the window onload control
  *
- * @param {object} fNewOnload function object or string to call
+ * @param {object} fNewOnload function object to call
+ *
+ * @deprecated aince 2.0; use window.addEventListener("load", fNewOnload)
  */
-var aOnloadEvents = [];
 function addLoadEvent(fNewOnload)
 {
-	// If there's no event set, just set this one
-	if (typeof(fNewOnload) === 'function' && (!('onload' in window) || typeof(window.onload) !== 'function'))
-		window.onload = fNewOnload;
-	// If there's just one event, setup the array.
-	else if (aOnloadEvents.length === 0)
-	{
-		aOnloadEvents[0] = window.onload;
-		aOnloadEvents[1] = fNewOnload;
-		window.onload = function() {
-			for (var i = 0, n = aOnloadEvents.length; i < n; i++)
-			{
-				if (typeof(aOnloadEvents[i]) === 'function')
-					aOnloadEvents[i]();
-				else if (typeof(aOnloadEvents[i]) === 'string')
-					eval(aOnloadEvents[i]);
-			}
-		};
-	}
-	// This isn't the first event function, add it to the list.
-	else
-		aOnloadEvents[aOnloadEvents.length] = fNewOnload;
+	window.addEventListener("load", fNewOnload);
 }
 
 /**

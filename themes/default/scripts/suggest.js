@@ -58,7 +58,7 @@ function smc_AutoSuggest(oOptions)
 	this.oXmlRequestHandle = null;
 
 	// Just make sure the page is loaded before calling the init.
-	addLoadEvent(this.opt.sSelf + '.init();');
+	window.addEventListener("load", this.opt.sSelf + '.init();');
 }
 
 // Initialize our autosuggest object, adds events and containers to the element we monitor
