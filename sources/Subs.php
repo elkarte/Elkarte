@@ -158,7 +158,7 @@ function removeSettings($toRemove)
  */
 function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flexible_start = false, $show = array())
 {
-	global $modSettings, $context, $txt, $settings;
+	global $modSettings, $context, $txt, $settings, $scripturl;
 
 	// Save whether $start was less than 0 or not.
 	$start = (int) $start;
@@ -217,7 +217,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the ... after the first page.  (prev page 1 >...< 6 7 [8] 9 10 ... 15 next page)
 		if ($start > $num_per_page * ($PageContiguous + 1))
-			$pageindex .= str_replace('{custom}', 'data-baseurl="' . htmlspecialchars(JavaScriptEscape(($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d')), ENT_COMPAT, 'UTF-8') . '" data-perpage="' . $num_per_page . '" data-firstpage="' . $num_per_page . '" data-lastpage="' . ($start - $num_per_page * $PageContiguous) . '"', $settings['page_index_template']['expand_pages']);
+			$pageindex .= str_replace('{custom}', 'data-baseurl="' . htmlspecialchars(JavaScriptEscape(strtr($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d'), array($scripturl => '')), ENT_COMPAT, 'UTF-8') . '" data-perpage="' . $num_per_page . '" data-firstpage="' . $num_per_page . '" data-lastpage="' . ($start - $num_per_page * $PageContiguous) . '"', $settings['page_index_template']['expand_pages']);
 
 		// Show the pages before the current one. (prev page 1 ... >6 7< [8] 9 10 ... 15 next page)
 		for ($nCont = $PageContiguous; $nCont >= 1; $nCont--)
@@ -244,7 +244,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the '...' part near the end. (prev page 1 ... 6 7 [8] 9 10 >...< 15 next page)
 		if ($start + $num_per_page * ($PageContiguous + 1) < $tmpMaxPages)
-			$pageindex .= str_replace('{custom}', 'data-baseurl="' . htmlspecialchars(JavaScriptEscape(($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d')), ENT_COMPAT, 'UTF-8') . '" data-perpage="' . $num_per_page . '" data-firstpage="' . ($start + $num_per_page * ($PageContiguous + 1)) . '" data-lastpage="' . $tmpMaxPages . '"', $settings['page_index_template']['expand_pages']);
+			$pageindex .= str_replace('{custom}', 'data-baseurl="' . htmlspecialchars(JavaScriptEscape(strtr($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d'), array($scripturl => '')), ENT_COMPAT, 'UTF-8') . '" data-perpage="' . $num_per_page . '" data-firstpage="' . ($start + $num_per_page * ($PageContiguous + 1)) . '" data-lastpage="' . $tmpMaxPages . '"', $settings['page_index_template']['expand_pages']);
 
 		// Show the last number in the list. (prev page 1 ... 6 7 [8] 9 10 ... >15<  next page)
 		if ($start + $num_per_page * $PageContiguous < $tmpMaxPages)

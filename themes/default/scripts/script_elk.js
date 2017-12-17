@@ -853,10 +853,9 @@ function setBoardIds() {
 				firstPage = $element.data('firstpage'),
 				lastPage = $element.data('lastpage'),
 				rawBaseurl = $element.data('baseurl'),
-				baseurl = eval($element.data('baseurl')),
-				first;
-
-			var i = 0,
+				baseurl = elk_scripturl + $element.data('baseurl'),
+				first,
+				i = 0,
 				oldLastPage = 0,
 				perPageLimit = 10;
 
