@@ -35,7 +35,7 @@ $_SERVER['SERVER_SOFTWARE'] = '';
 $_SERVER['SERVER_NAME'] = '';
 
 // Our mail controller
-$controller = new Emailpost_Controller();
+$controller = new Emailpost_Controller(new Event_manager());
 $controller->action_pbe_topic();
 
 // Always exit as successful

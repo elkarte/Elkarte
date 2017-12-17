@@ -396,7 +396,7 @@ function is_not_banned($forceCheck = false)
 		// We don't wanna see you!
 		if (!$user_info['is_guest'])
 		{
-			$controller = new Auth_Controller();
+			$controller = new Auth_Controller(new Event_manager());
 			$controller->action_logout(true, false);
 		}
 
@@ -469,7 +469,7 @@ function is_not_banned($forceCheck = false)
 		writeLog(true);
 
 		// Log them out
-		$controller = new Auth_Controller();
+		$controller = new Auth_Controller(new Event_manager());
 		$controller->action_logout(true, false);
 
 		// Tell them thanks

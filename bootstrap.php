@@ -398,7 +398,7 @@ class Bootstrap
 		// Do we allow guests in here?
 		if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && basename($_SERVER['PHP_SELF']) !== 'SSI.php')
 		{
-			$controller = new Auth_Controller();
+			$controller = new Auth_Controller(new Event_manager());
 			$controller->action_kickguest();
 			obExit(null, true);
 		}
