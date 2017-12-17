@@ -47,7 +47,7 @@ function smc_AutoSuggest(oOptions)
 	// Are there any items that should be added in advance?
 	this.aListItems = 'aListItems' in this.opt ? this.opt.aListItems : [];
 
-	this.sItemTemplate = 'sItemTemplate' in this.opt ? this.opt.sItemTemplate : '<input type="hidden" name="%post_name%[]" value="%item_id%" /><a href="%item_href%" class="extern" onclick="window.open(this.href, \'_blank\'); return false;">%item_name%</a>&nbsp;<img src="%images_url%/pm_recipient_delete.png" alt="%delete_text%" title="%delete_text%" onclick="return %self%.deleteAddedItem(%item_id%)" />';
+	this.sItemTemplate = 'sItemTemplate' in this.opt ? this.opt.sItemTemplate : '<input type="hidden" name="%post_name%[]" value="%item_id%" /><a href="%item_href%" class="extern" onclick="window.open(this.href, \'_blank\'); return false;">%item_name%</a>&nbsp;<img src="%images_url%/pm_recipient_delete.png" alt="%delete_text%" title="%delete_text%" />';
 	this.sTextDeleteItem = 'sTextDeleteItem' in this.opt ? this.opt.sTextDeleteItem : '';
 	this.oCallback = {};
 	this.bDoAutoAdd = false;
@@ -365,7 +365,9 @@ smc_AutoSuggest.prototype.addItemLink = function (sItemId, sItemName, bFromSubmi
 
 	var oNewDiv = document.createElement('div');
 	oNewDiv.id = 'suggest_' + this.opt.sSuggestId + '_' + sItemId;
-	oNewDiv.innerHTML = this.sItemTemplate.replace(/%post_name%/g, this.opt.sPostName).replace(/%item_id%/g, sItemId).replace(/%item_href%/g, elk_prepareScriptUrl(elk_scripturl) + this.opt.sURLMask.replace(/%item_id%/g, sItemId)).replace(/%item_name%/g, sItemName).replace(/%images_url%/g, elk_images_url).replace(/%self%/g, this.opt.sSelf).replace(/%delete_text%/g, this.sTextDeleteItem);
+	oNewDiv.innerHTML = this.sItemTemplate.replace(/%post_name%/g, this.opt.sPostName).replace(/%item_id%/g, sItemId).replace(/%item_href%/g, elk_prepareScriptUrl(elk_scripturl) + this.opt.sURLMask.replace(/%item_id%/g, sItemId)).replace(/%item_name%/g, sItemName).replace(/%images_url%/g, elk_images_url).replace(/%delete_text%/g, this.sTextDeleteItem);
+
+	oNewDiv.getElementsByTagName('img')[0].addEventListener("click", this.deleteAddedItem.bind(this));
 	this.oItemList.appendChild(oNewDiv);
 
 	// If there's a registered callback, call it.
@@ -383,14 +385,14 @@ smc_AutoSuggest.prototype.addItemLink = function (sItemId, sItemName, bFromSubmi
 };
 
 // Delete an item that has been added, if at all?
-smc_AutoSuggest.prototype.deleteAddedItem = function (sItemId)
+smc_AutoSuggest.prototype.deleteAddedItem = function (oEvent)
 {
-	var oDiv = document.getElementById('suggest_' + this.opt.sSuggestId + '_' + sItemId);
+	var oDiv = oEvent.target.parentNode;
 
 	// Remove the div if it exists.
 	if (typeof(oDiv) === 'object' && oDiv !== null)
 	{
-		oDiv.parentNode.removeChild(document.getElementById('suggest_' + this.opt.sSuggestId + '_' + sItemId));
+		this.oItemList.removeChild(oDiv);
 
 		// Decrease the internal item count.
 		this.iItemCount --;
