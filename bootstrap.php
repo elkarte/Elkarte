@@ -34,30 +34,28 @@ class Bootstrap
 	public function __construct($standalone = true)
 	{
 		// Bootstrap only once.
-		if (defined('ELKBOOT'))
+		if (!defined('ELKBOOT'))
 		{
-			return true;
-		}
+			// We're going to set a few globals
+			global $time_start, $ssi_error_reporting, $db_show_debug;
 
-		// We're going to set a few globals
-		global $time_start, $ssi_error_reporting, $db_show_debug;
+			// Your on the clock
+			$time_start = microtime(true);
 
-		// Your on the clock
-		$time_start = microtime(true);
+			// Unless settings.php tells us otherwise
+			$db_show_debug = false;
 
-		// Unless settings.php tells us otherwise
-		$db_show_debug = false;
+			// Report errors but not depreciated ones
+			$ssi_error_reporting = error_reporting(E_ALL & ~E_DEPRECATED);
 
-		// Report errors but not depreciated ones
-		$ssi_error_reporting = error_reporting(E_ALL | E_STRICT & ~8192);
+			// Get the things needed for ALL modes
+			$this->bringUpBasics();
 
-		// Get the things needed for ALL modes
-		$this->bringUpBasics();
-
-		// Going to run from the side entrance and not directly from inside elkarte
-		if ($standalone)
-		{
-			$this->ssi_main();
+			// Going to run from the side entrance and not directly from inside elkarte
+			if ($standalone)
+			{
+				$this->ssi_main();
+			}
 		}
 	}
 
@@ -68,7 +66,7 @@ class Bootstrap
 	{
 		$this->setConstants();
 		$this->setRusage();
-		$this->clearGloballs();
+		$this->clearGlobals();
 		$this->loadSettingsFile();
 		$this->validatePaths();
 		$this->loadDependants();
@@ -120,7 +118,7 @@ class Bootstrap
 	/**
 	 * If they glo, they need to be cleaned.
 	 */
-	private function clearGloballs()
+	private function clearGlobals()
 	{
 		// We don't need no globals. (a bug in "old" versions of PHP)
 		foreach (array('db_character_set', 'cachedir') as $variable)
@@ -454,25 +452,12 @@ class Bootstrap
 		global $ssi_theme, $ssi_layers;
 
 		// Check on any hacking attempts.
-		if (isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS']))
-		{
-			die('No access...');
-		}
-		elseif (isset($_REQUEST['ssi_theme']) && (int) $_REQUEST['ssi_theme'] == (int) $ssi_theme)
-		{
-			die('No access...');
-		}
-		elseif (isset($_COOKIE['ssi_theme']) && (int) $_COOKIE['ssi_theme'] == (int) $ssi_theme)
-		{
-			die('No access...');
-		}
-		elseif (isset($_REQUEST['ssi_layers'], $ssi_layers) && $_REQUEST['ssi_layers'] == $ssi_layers)
-		{
-			die('No access...');
-		}
-
-		// Yeah right
-		if (isset($_REQUEST['context']))
+		if (
+			isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS'])
+			|| isset($_REQUEST['ssi_theme']) && (int) $_REQUEST['ssi_theme'] == (int) $ssi_theme
+			|| isset($_COOKIE['ssi_theme']) && (int) $_COOKIE['ssi_theme'] == (int) $ssi_theme
+			|| isset($_REQUEST['ssi_layers'], $ssi_layers) && $_REQUEST['ssi_layers'] == $ssi_layers
+			|| isset($_REQUEST['context']))
 		{
 			die('No access...');
 		}

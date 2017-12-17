@@ -561,9 +561,8 @@ class ManageServer_Controller extends Action_Controller
 		foreach ($detected as $key => $value)
 		{
 			$detected_names[] = $value->title();
-			$supported = $value->isAvailable();
 
-			if (!empty($supported))
+			if (!empty($value->isAvailable()))
 				$detected_supported[$key] = $value->title();
 		}
 
