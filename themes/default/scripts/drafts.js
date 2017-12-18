@@ -41,29 +41,24 @@ elk_DraftAutoSave.prototype.init = function()
 		this.interval_id = setInterval(this.draftSave.bind(this), this.opt.iFreq);
 
 		// Set up the text area events
-		this.oDraftHandle.instanceRef = this;
-		this.oDraftHandle.onblur = function(oEvent) {
-			return this.instanceRef.draftBlur();
-		};
-		this.oDraftHandle.onfocus = function(oEvent) {
-			return this.instanceRef.draftFocus();
-		};
+		this.oDraftHandle.onblur =  this.draftBlur.bind(this);
+		this.oDraftHandle.onfocus = this.draftFocus.bind(this);
 		this.oDraftHandle.onkeydown = function(oEvent) {
 			// Don't let tabbing to the buttons trigger autosave event
 			if (oEvent.keyCode === 9)
-				this.instanceRef.bInDraftMode = true;
+				this.bInDraftMode = true;
 
-			return this.instanceRef.draftKeypress();
-		};
+			return this.draftKeypress().bind(this);
+		}.bind(this);
 
 		// Prevent autosave when selecting post/save by mouse or keyboard
 		var $_button = $('#postmodify').find('.button_submit');
-		$_button .on('mousedown', this.oDraftHandle.instanceRef, function() {
+		$_button .on('mousedown', this, function() {
 			this.bInDraftMode = true;
-		});
-		$_button .on('onkeypress', this.oDraftHandle.instanceRef, function() {
+		}.bind(this));
+		$_button .on('onkeypress', this, function() {
 			this.bInDraftMode = true;
-		});
+		}.bind(this));
 	}
 };
 
