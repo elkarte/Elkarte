@@ -27,7 +27,7 @@ function elk_DraftAutoSave(oOptions)
 	this.sLastSaved = '';
 	this.bCheckDraft = false;
 
-	addLoadEvent(this.opt.sSelf + '.init();');
+	window.addEventListener("load", this.init.bind(this));
 }
 
 /**
@@ -38,7 +38,7 @@ elk_DraftAutoSave.prototype.init = function()
 	if (this.opt.iFreq > 0)
 	{
 		// Start the autosaver timer
-		this.interval_id = setInterval(this.opt.sSelf + '.draftSave();', this.opt.iFreq);
+		this.interval_id = setInterval(this.draftSave.bind(this), this.opt.iFreq);
 
 		// Set up the text area events
 		this.oDraftHandle.instanceRef = this;
@@ -92,7 +92,7 @@ elk_DraftAutoSave.prototype.draftBlur = function()
 elk_DraftAutoSave.prototype.draftFocus = function()
 {
 	if (this.interval_id === "")
-		this.interval_id = setInterval(this.opt.sSelf + '.draftSave();', this.opt.iFreq);
+		this.interval_id = setInterval(this.draftSave.bind(this), this.opt.iFreq);
 };
 
 /**
