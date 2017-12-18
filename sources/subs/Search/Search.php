@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0-dev
  *
  */
 
@@ -195,7 +195,7 @@ class Search
 	public function __construct()
 	{
 		$this->_search_version = strtr('ElkArte 1+1', array('+' => '.', '=' => ' '));
-		$this->_forum_version = 'ElkArte 1.1';
+		$this->_forum_version = 'ElkArte 2.0-dev';
 		$this->_db = database();
 		$this->_db_search = db_search();
 
