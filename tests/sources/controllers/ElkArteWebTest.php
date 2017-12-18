@@ -15,7 +15,7 @@
  * It extends PHPUnit_Extensions_Selenium2TestCase and provides additional functions
  * as well as sets up the common environments for all tests
  */
-abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
+abstract class ElkArteWebTest extends \PHPUnit_Extensions_Selenium2TestCase
 {
 	protected $coverageScriptUrl = 'http://127.0.0.1/phpunit_coverage.php';
 	protected $captureScreenshotOnFailure = true;
@@ -24,8 +24,9 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 	protected $height = 1024;
 	protected $adminuser = 'test_admin';
 	protected $adminpass = 'test_admin_pwd';
-	protected $browser = 'firefox';
+	protected $browser = 'htmlunit';
 	protected $port = 4444;
+	protected $keysHolder;
 
 	/**
 	 * You must provide a setUp() method for Selenium2TestCase
@@ -36,7 +37,9 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 	protected function setUp()
 	{
 		// Set the browser to be used by Selenium, it must be available on localhost
+		$this->keysHolder = new PHPUnit_Extensions_Selenium2TestCase_KeysHolder();
 		$this->setBrowser($this->browser);
+		$this->setDesiredCapabilities(array('javascript_enabled' => true, 'javascript' => 1));
 		$this->setPort($this->port);
 		$this->setBrowserUrl('http://127.0.0.1/');
 
