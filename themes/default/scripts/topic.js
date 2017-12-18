@@ -733,7 +733,7 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 		// Add the 'remove selected items' button.
 		if (this.opt.bCanRemove)
 			elk_addButton(this.opt.sButtonStrip, this.opt.bUseImageButton, {
-				sId: this.opt.sSelf + '_remove_button',
+				sId: 'remove_button',
 				sText: this.opt.sRemoveButtonLabel,
 				sImage: this.opt.sRemoveButtonImage,
 				sUrl: '#',
@@ -745,7 +745,7 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 		// Add the 'restore selected items' button.
 		if (this.opt.bCanRestore)
 			elk_addButton(this.opt.sButtonStrip, this.opt.bUseImageButton, {
-				sId: this.opt.sSelf + '_restore_button',
+				sId: 'restore_button',
 				sText: this.opt.sRestoreButtonLabel,
 				sImage: this.opt.sRestoreButtonImage,
 				sUrl: '#',
@@ -757,7 +757,7 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 		// Add the 'split selected items' button.
 		if (this.opt.bCanSplit)
 			elk_addButton(this.opt.sButtonStrip, this.opt.bUseImageButton, {
-				sId: this.opt.sSelf + '_split_button',
+				sId: 'split_button',
 				sText: this.opt.sSplitButtonLabel,
 				sImage: this.opt.sSplitButtonImage,
 				sUrl: '#',
@@ -776,24 +776,24 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 	// Show the number of messages selected in each of the buttons.
 	if (this.opt.bCanRemove && !this.opt.bUseImageButton)
 	{
-		document.getElementById(this.opt.sSelf + '_remove_button_text').innerHTML = this.opt.sRemoveButtonLabel + ' [' + this.iNumSelected + ']';
-		document.getElementById(this.opt.sSelf + '_remove_button').style.display = this.iNumSelected < 1 ? "none" : "";
+		oButtonStrip.getElementById('remove_button_text').innerHTML = this.opt.sRemoveButtonLabel + ' [' + this.iNumSelected + ']';
+		oButtonStrip.getElementById('remove_button').style.display = this.iNumSelected < 1 ? "none" : "";
 	}
 
 	if (this.opt.bCanRestore && !this.opt.bUseImageButton)
 	{
-		document.getElementById(this.opt.sSelf + '_restore_button_text').innerHTML = this.opt.sRestoreButtonLabel + ' [' + this.iNumSelected + ']';
-		document.getElementById(this.opt.sSelf + '_restore_button').style.display = this.iNumSelected < 1 ? "none" : "";
+		oButtonStrip.getElementById('restore_button_text').innerHTML = this.opt.sRestoreButtonLabel + ' [' + this.iNumSelected + ']';
+		oButtonStrip.getElementById('restore_button').style.display = this.iNumSelected < 1 ? "none" : "";
 	}
 
 	if (this.opt.bCanSplit && !this.opt.bUseImageButton)
 	{
-		document.getElementById(this.opt.sSelf + '_split_button_text').innerHTML = this.opt.sSplitButtonLabel + ' [' + this.iNumSelected + ']';
-		document.getElementById(this.opt.sSelf + '_split_button').style.display = this.iNumSelected < 1 ? "none" : "";
+		oButtonStrip.getElementById('split_button_text').innerHTML = this.opt.sSplitButtonLabel + ' [' + this.iNumSelected + ']';
+		oButtonStrip.getElementById('split_button').style.display = this.iNumSelected < 1 ? "none" : "";
 	}
 
 	// Try to restore the correct position.
-	var aItems = document.getElementById(this.opt.sButtonStrip).getElementsByTagName('span');
+	var aItems = oButtonStrip.getElementsByTagName('span');
 	if (aItems.length > 3)
 	{
 		if (this.iNumSelected < 1)
