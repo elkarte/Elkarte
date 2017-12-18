@@ -27,7 +27,10 @@ class TestAdminSearch extends PHPUnit_Framework_TestCase
 	 */
 	public function testBeforeSearchSettings()
 	{
+		global $context;
+
 		$this->settingsProvider();
+		$this->assertNotEmpty($context['search_results']);
 	}
 
 	/**
