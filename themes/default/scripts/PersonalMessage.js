@@ -63,11 +63,10 @@ elk_PersonalMessageSend.prototype.init = function()
 
 		// Make the link show the BCC control.
 		var oBccLink = document.getElementById(this.opt.sBccLinkId);
-		oBccLink.instanceRef = this;
 		oBccLink.onclick = function() {
-			this.instanceRef.showBcc();
+			this.showBcc();
 			return false;
-		};
+		}.bind(this);
 	}
 
 	var oToControl = document.getElementById(this.opt.sToControlId);

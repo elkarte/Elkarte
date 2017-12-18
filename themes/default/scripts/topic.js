@@ -40,14 +40,11 @@ function QuickModifyTopic(oOptions)
 // Used to initialise the object event handlers
 QuickModifyTopic.prototype.init = function ()
 {
-	// Attach some events to it so we can respond to actions
-	this.oTopicModHandle.instanceRef = this;
-
 	// Detect and act on keypress
-	this.oTopicModHandle.onkeydown = function (oEvent) {return this.instanceRef.modify_topic_keypress(oEvent);};
+	this.oTopicModHandle.onkeydown = this.modify_topic_keypress.bind(this);
 
 	// Used to detect when we've stopped editing.
-	this.oTopicModHandle.onclick = function (oEvent) {return this.instanceRef.modify_topic_click(oEvent);};
+	this.oTopicModHandle.onclick = this.modify_topic_click.bind(this);
 };
 
 // called from the double click in the div
@@ -133,9 +130,8 @@ QuickModifyTopic.prototype.modify_topic_show_edit = function (subject)
 	this.oCurSubjectDiv.innerHTML = '<input type="text" name="subject" value="' + subject + '" size="60" style="width: 95%;" maxlength="80" class="input_text" autocomplete="off" /><input type="hidden" name="topic" value="' + this.iCurTopicId + '" /><input type="hidden" name="msg" value="' + this.sCurMessageId.substr(4) + '" />';
 
 	// Attach mouse over and out events to this new div
-	this.oCurSubjectDiv.instanceRef = this;
-	this.oCurSubjectDiv.onmouseout = function (oEvent) {return this.instanceRef.modify_topic_mouseout(oEvent);};
-	this.oCurSubjectDiv.onmouseover = function (oEvent) {return this.instanceRef.modify_topic_mouseover(oEvent);};
+	this.oCurSubjectDiv.onmouseout = this.modify_topic_mouseout.bind(this);
+	this.oCurSubjectDiv.onmouseover = this.modify_topic_mouseover.bind(this);
 };
 
 // Yup that's right, save it
@@ -695,10 +691,7 @@ InTopicModeration.prototype.init = function()
 		oCheckbox.className = 'input_check';
 		oCheckbox.name = 'msgs[]';
 		oCheckbox.value = this.opt.aMessageIds[i];
-		oCheckbox.instanceRef = this;
-		oCheckbox.onclick = function () {
-			this.instanceRef.handleClick(this);
-		};
+		oCheckbox.onclick = this.handleClick(oCheckbox).bind(this);
 
 		// Append it to the container
 		var oCheckboxContainer = document.getElementById(this.opt.sCheckboxContainerMask + this.opt.aMessageIds[i]);

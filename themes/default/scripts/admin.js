@@ -408,12 +408,10 @@ elk_ViewVersions.prototype.determineVersions = function ()
 		oSectionLink = document.getElementById(sSections[i] + '-link');
 		if (typeof(oSectionLink) === 'object' && oSectionLink !== null)
 		{
-			oSectionLink.instanceRef = this;
-			oSectionLink.sSection = sSections[i];
-			oSectionLink.onclick = function () {
-				this.instanceRef.swapOption(this, this.sSection);
+			oSectionLink.onclick = function (oEvent) {
+				this.swapOption(oEvent.target, oEvent.target.id.split('-')[0]);
 				return false;
-			};
+			}.bind(this);
 		}
 	}
 
