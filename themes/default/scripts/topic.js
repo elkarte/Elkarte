@@ -737,7 +737,9 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 				sText: this.opt.sRemoveButtonLabel,
 				sImage: this.opt.sRemoveButtonImage,
 				sUrl: '#',
-				sCustom: ' onclick="return ' + this.opt.sSelf + '.handleSubmit(\'remove\')"'
+				aEvents: [
+					['click', this.handleSubmit('remove').bind(this)
+				]
 			});
 
 		// Add the 'restore selected items' button.
@@ -747,7 +749,9 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 				sText: this.opt.sRestoreButtonLabel,
 				sImage: this.opt.sRestoreButtonImage,
 				sUrl: '#',
-				sCustom: ' onclick="return ' + this.opt.sSelf + '.handleSubmit(\'restore\')"'
+				aEvents: [
+					['click', this.handleSubmit('restore').bind(this)
+				]
 			});
 
 		// Add the 'split selected items' button.
@@ -757,7 +761,9 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 				sText: this.opt.sSplitButtonLabel,
 				sImage: this.opt.sSplitButtonImage,
 				sUrl: '#',
-				sCustom: ' onclick="return ' + this.opt.sSelf + '.handleSubmit(\'split\')"'
+				aEvents: [
+					['click', this.handleSubmit('split').bind(this)
+				]
 			});
 
 		// Adding these buttons once should be enough.
