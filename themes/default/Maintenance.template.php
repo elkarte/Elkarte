@@ -264,7 +264,7 @@ function template_maintain_members()
 			sSuggestId: \'attributeMember\',
 			sControlId: \'to\',
 			sSearchType: \'member\',
-			sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
+			sTextDeleteItem: ', JavaScriptEscape($txt['autosuggest_delete_item']), ',
 			bItemList: false
 		});
 	</script>';

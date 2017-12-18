@@ -659,7 +659,7 @@ function template_modify_board()
 			bItemList: true,
 			sPostName: \'moderator_list\',
 			sURLMask: \'action=profile;u=%item_id%\',
-			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
+			sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
 			sItemListContainerId: \'moderator_container\',
 			aListItems: [';
 

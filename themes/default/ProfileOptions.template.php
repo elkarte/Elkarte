@@ -128,7 +128,7 @@ function template_editBuddies()
 			sSuggestId: \'new_buddy\',
 			sControlId: \'new_buddy\',
 			sSearchType: \'member\',
-			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
+			sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
 			bItemList: false
 		});', true);
 }
@@ -226,7 +226,7 @@ function template_editIgnoreList()
 			sSuggestId: \'new_ignore\',
 			sControlId: \'new_ignore\',
 			sSearchType: \'member\',
-			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
+			sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
 			bItemList: false
 		});', true);
 }

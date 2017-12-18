@@ -1044,7 +1044,7 @@ function template_send()
 			new elk_PersonalMessageSend({
 				sSessionId: elk_session_id,
 				sSessionVar: elk_session_var,
-				sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
+				sTextDeleteItem: ', JavaScriptEscape($txt['autosuggest_delete_item']), ',
 				sToControlId: \'to_control\',
 				aToRecipients: [';
 
