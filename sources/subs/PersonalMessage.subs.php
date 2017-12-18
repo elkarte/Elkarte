@@ -1899,6 +1899,7 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
 			// Read and replied to status for this message
 			$message_replied[$row['id_pm']] = $row['is_read'] & 2;
 			$message_unread[$row['id_pm']] = $row['is_read'] == 0;
+			$message_labels[$row['id_pm']] = array();
 
 			$row['labels'] = $row['labels'] == '' ? array() : explode(',', $row['labels']);
 			foreach ($row['labels'] as $v)
