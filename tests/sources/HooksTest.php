@@ -4,7 +4,7 @@
  * TestCase class for hooks adding/removing/other stuff
  * @backupGlobals disabled
  */
-class TestHooks extends PHPUnit_Framework_TestCase
+class TestHooks extends \PHPUnit\Framework\TestCase
 {
 	/**
 	 * Name of the hook used for testing

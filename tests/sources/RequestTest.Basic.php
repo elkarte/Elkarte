@@ -5,7 +5,7 @@
  *
  * Without SSI: test Request methods as self-containing.
  */
-class TestRequest extends PHPUnit_Framework_TestCase
+class TestRequest extends \PHPUnit\Framework\TestCase
 {
 	/**
 	 * Prepare what is necessary to use in these tests.

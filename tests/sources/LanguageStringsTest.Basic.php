@@ -3,7 +3,7 @@
 /**
  * TestCase class for language files integrity
  */
-class TestLanguageStrings extends PHPUnit_Framework_TestCase
+class TestLanguageStrings extends \PHPUnit\Framework\TestCase
 {
 	/**
 	 * Prepare what is necessary to use in these tests.

@@ -6,7 +6,7 @@
  * WARNING. These tests work directly with the local database. Don't run
  * them if you need to keep your data untouched!
  */
-class TestMentions extends PHPUnit_Framework_TestCase
+class TestMentions extends \PHPUnit\Framework\TestCase
 {
 	protected $_posterOptions = null;
 

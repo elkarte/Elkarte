@@ -9,7 +9,7 @@
  * force to check that all expected subactions are still routed, and
  * update it.
  */
-class DispatcherTest extends PHPUnit_Framework_TestCase
+class DispatcherTest extends \PHPUnit\Framework\TestCase
 {
 	/**
 	 * Tests automagical routing to an action

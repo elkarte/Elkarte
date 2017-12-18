@@ -6,7 +6,7 @@
  * WARNING. These tests work directly with the local database. Don't run
  * them if you need to keep your data untouched!
  */
-class TestPoll extends PHPUnit_Framework_TestCase
+class TestPoll extends \PHPUnit\Framework\TestCase
 {
 	/**
 	 * Prepare some test data, to use in these tests.

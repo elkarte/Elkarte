@@ -3,7 +3,7 @@
 /**
  * TestCase class for the censorText function
  */
-class CensoringTest extends PHPUnit_Framework_TestCase
+class CensoringTest extends \PHPUnit\Framework\TestCase
 {
 	protected $tests;
 

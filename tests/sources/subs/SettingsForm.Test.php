@@ -1,6 +1,6 @@
 <?php
 
-class TestSettingsForm extends PHPUnit_Framework_TestCase
+class TestSettingsForm extends \PHPUnit\Framework\TestCase
 {
 	protected $configVars = array();
 	protected $permissionResults = array();

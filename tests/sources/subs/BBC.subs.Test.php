@@ -1,6 +1,6 @@
 <?php
 
-class TestBBC extends PHPUnit_Framework_TestCase
+class TestBBC extends \PHPUnit\Framework\TestCase
 {
 	protected $bbcTestCases;
 	protected $bbcInvalidTestCases;

@@ -1,6 +1,6 @@
 <?php
 
-class TestHTML2Md extends PHPUnit_Framework_TestCase
+class TestHTML2Md extends \PHPUnit\Framework\TestCase
 {
 	protected $mdTestCases = array();
 	protected $restore_txt = false;
