@@ -3,7 +3,7 @@
 /**
  * TestCase class for tables present
  */
-class TestDatabase extends PHPUnit_Framework_TestCase
+class TestDatabase extends \PHPUnit\Framework\TestCase
 {
 	/**
 	 * Prepare what is necessary to use in these tests.

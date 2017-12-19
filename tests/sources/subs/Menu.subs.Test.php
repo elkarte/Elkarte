@@ -3,7 +3,7 @@
 /**
  * TestCase class for menu subs.
  */
-class TestMenuSubs extends PHPUnit_Framework_TestCase
+class TestMenuSubs extends \PHPUnit\Framework\TestCase
 {
 	protected $test_areas;
 	protected $test_options;

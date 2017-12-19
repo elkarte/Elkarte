@@ -3,7 +3,7 @@
 /**
  * TestCase class for manage posts settings
  */
-class TestManagePostsSettings extends PHPUnit_Framework_TestCase
+class TestManagePostsSettings extends \PHPUnit\Framework\TestCase
 {
 	/**
 	 * Initialize or add whatever necessary for these tests

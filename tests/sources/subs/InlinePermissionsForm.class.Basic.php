@@ -1,6 +1,6 @@
 <?php
 
-class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
+class TestInlinePermissionsForm extends \PHPUnit\Framework\TestCase
 {
 	protected $permissionsForm;
 	protected $permissionsObject;

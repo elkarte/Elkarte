@@ -8,7 +8,7 @@ use ElkArte\Errors\ErrorContext;
  * WARNING. These tests work directly with the local database. Don't run
  * them if you need to keep your data untouched!
  */
-class TestMembers extends PHPUnit_Framework_TestCase
+class TestMembers extends \PHPUnit\Framework\TestCase
 {
 	private $memberID = null;
 

@@ -3,7 +3,7 @@
 /**
  * TestCase class for the Profile Info Controller
  */
-class TestMessageIndex extends PHPUnit_Framework_TestCase
+class TestMessageIndex extends \PHPUnit\Framework\TestCase
 {
 	/**
 	 * Initialize or add whatever necessary for these tests

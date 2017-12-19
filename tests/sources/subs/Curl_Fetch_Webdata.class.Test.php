@@ -1,6 +1,6 @@
 <?php
 
-class TestCurl_Fetch_Webdata extends PHPUnit_Framework_TestCase
+class TestCurl_Fetch_Webdata extends \PHPUnit\Framework\TestCase
 {
 	protected $curl_fetch_testcases = array();
 	protected $curl_post_testcases = array();

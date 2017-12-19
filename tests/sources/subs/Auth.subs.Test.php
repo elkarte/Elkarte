@@ -1,6 +1,6 @@
 <?php
 
-class TestAuthsubs extends PHPUnit_Framework_TestCase
+class TestAuthsubs extends \PHPUnit\Framework\TestCase
 {
 	protected $passwd = 'test_admin_pwd';
 	protected $user = 'test_admin';

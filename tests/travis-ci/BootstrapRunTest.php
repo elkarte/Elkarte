@@ -1,6 +1,6 @@
 <?php
 
-class BootstrapRunTest extends PHPUnit_Framework_TestCase
+class BootstrapRunTest extends \PHPUnit\Framework\TestCase
 {
 	/**
 	 * Verifies the bootstrap run until the end.

@@ -16,7 +16,7 @@ class MockMemcached extends ElkArte\sources\subs\CacheMethod\Memcached
 /**
  * TestCase class for caching classes.
  */
-class TestCache extends PHPUnit_Framework_TestCase
+class TestCache extends \PHPUnit\Framework\TestCase
 {
 	private $_cache_obj = null;
 

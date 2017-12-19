@@ -26,7 +26,7 @@ class TestManageMembers_Controller extends ElkArteWebTest
 				'memberGroup' => 2,
 			);
 
-			// Will show sh: 1: sendmail: not found in the console
+			// Will show sh: 1: sendmail: not found in the travis console
 			registerMember($regOptions);
 			$_SESSION['just_registered'] = 0;
 		}
@@ -44,8 +44,17 @@ class TestManageMembers_Controller extends ElkArteWebTest
 		$this->assertContains($mname, $this->byCssSelector('#list_approve_list_0')->text());
 		$this->clickit('#list_approve_list_0 input');
 		$this->clickit('select[name=todo] option[value=' . $el . ']');
-		$this->assertContains('all selected members?', $this->alertText());
-		$this->acceptAlert();
+
+		// htmlunit does not seem to work with the alert code
+		if (in_array($this->browser, array('firefox', 'chrome')))
+		{
+			$this->assertContains('all selected members?', $this->alertText());
+			$this->acceptAlert();
+		}
+		else
+		{
+			$this->keys($this->keysHolder->specialKey('ENTER'));
+		}
 	}
 
 	public function testApproveMember()

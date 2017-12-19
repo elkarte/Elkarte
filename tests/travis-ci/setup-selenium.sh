@@ -5,6 +5,16 @@
 set -e
 set +x
 
+# Access passed params from travis.yml
+DB=$1
+TRAVIS_PHP_VERSION=$2
+WEBTESTS=$3
+COVERAGE=$4
+
+# Common names
+SHORT_DB=${DB%%-*}
+SHORT_PHP=${TRAVIS_PHP_VERSION:0:3}
+
 # Some vars to make this easy to change
 WEBTESTS_HUB_URL='http://127.0.0.1:4444'
 WEBTESTS_JAR=/usr/share/selenium/selenium-server-standalone.jar
@@ -18,42 +28,27 @@ GECKODRIVER_TAR=/tmp/geckodriver.tar.gz
 CHROMEDRIVER_DOWNLOAD_URL=https://chromedriver.storage.googleapis.com/2.9/chromedriver_linux64.zip
 CHROMEDRIVER_ZIP=/tmp/chromedriver.zip
 
-# If selenium is not available, get it
-if [ ! -f "$WEBTESTS_JAR" ]
+# If this is a web test run then we need to enable selenium
+if [ "$WEBTESTS" == "true" ]
 then
+	echo "Downloading Selenium Server"
     sudo mkdir -p $(dirname "$WEBTESTS_JAR")
     sudo wget -nv -O "$WEBTESTS_JAR" "$WEBTESTS_DOWNLOAD_URL"
+
+    # Start Selenium
+    export DISPLAY=:99.0
+    sudo xvfb-run --server-args="-screen 0 1280x1024x24" java -jar "$WEBTESTS_JAR" > /tmp/selenium.log &
+    wget --retry-connrefused --tries=120 --waitretry=3 --output-file=/dev/null "$WEBTESTS_HUB_URL/wd/hub/status" -O /dev/null
+
+    # Test to see if the selenium server really did start
+    if [ ! $? -eq 0 ]
+    then
+        echo "Selenium Failed"
+    else
+        echo "Selenium Success"
+    fi
+
+    # Setup a directory to hold screenshots of failed tests
+    sudo mkdir /var/www/screenshots
+    sudo chmod 777 /var/www/screenshots
 fi
-
-# Fetch gecko driver for use in selenium
-if [ ! -f "/usr/bin/geckodriver" ]
-then
-    echo "Downloading geckodriver"
-    sudo wget -nv -O "$GECKODRIVER_TAR" "$GECKODRIVER_DOWNLOAD_URL"
-    sudo tar -xvf "$GECKODRIVER_TAR" -C "/usr/bin/"
-fi
-
-# Fetch chrome driver for use in selenium
-if [ ! -f "/usr/bin/chromedriver" ]
-then
-    echo "Downloading chromedriver"
-    sudo wget -nv -O "$CHROMEDRIVER_ZIP" "$CHROMEDRIVER_DOWNLOAD_URL"
-    sudo unzip "$CHROMEDRIVER_ZIP"
-    sudo mv chromedriver /usr/bin
-fi
-
-# Start Selenium, select gecko or chrome driver
-export DISPLAY=:99.0
-sudo xvfb-run java -Dwebdriver.geckodriver.bin=/usr/bin/geckodriver -jar "$WEBTESTS_JAR" > /tmp/selenium.log &
-wget --retry-connrefused --tries=120 --waitretry=3 --output-file=/dev/null "$WEBTESTS_HUB_URL/wd/hub/status" -O /dev/null
-
-# Test to see if the selenium server really did start
-if [ ! $? -eq 0 ]
-then
-    echo "Selenium Failed"
-else
-    echo "Selenium Success"
-fi
-
-# Setup a directory to hold screenshots of failed tests
-sudo mkdir /var/www/screenshots && chmod 777 /var/www/screenshots

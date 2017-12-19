@@ -6,7 +6,7 @@
  * WARNING. These tests work directly with the local database. Don't run
  * them if you need to keep your data untouched!
  */
-class TestPoll extends PHPUnit_Framework_TestCase
+class TestPoll extends \PHPUnit\Framework\TestCase
 {
 	/**
 	 * Prepare some test data, to use in these tests.
@@ -181,7 +181,6 @@ class TestPoll extends PHPUnit_Framework_TestCase
 		// Link the poll to the topic.
 		associatedPoll($this->id_topic, $id_poll);
 
-		// Modify it. Hmm... we haz no modify function :P
-		// @todo
+		$this->assertTrue(!empty($id_poll));
 	}
 }

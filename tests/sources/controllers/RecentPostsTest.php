@@ -3,7 +3,7 @@
 /**
  * TestCase class for recent posts
  */
-class TestRecentPosts extends PHPUnit_Framework_TestCase
+class TestRecentPosts extends \PHPUnit\Framework\TestCase
 {
 	/**
 	 * Initialize or add whatever necessary for these tests

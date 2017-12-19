@@ -3,7 +3,7 @@
 /**
  * TestCase class for the Calendar_Event class.
  */
-class TestCalendar_Event extends PHPUnit_Framework_TestCase
+class TestCalendar_Event extends \PHPUnit\Framework\TestCase
 {
 	/**
 	 * To avoid duplicated function declarations, we need an empty Calendar.subs.php

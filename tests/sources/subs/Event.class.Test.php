@@ -3,7 +3,7 @@
 /**
  * TestCase class for Event class.
  */
-class TestEvent extends PHPUnit_Framework_TestCase
+class TestEvent extends \PHPUnit\Framework\TestCase
 {
 	public function testEmpty()
 	{

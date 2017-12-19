@@ -6,7 +6,7 @@ require_once(SUBSDIR . '/Logging.subs.php');
  * TestCase class for logging
  * @backupGlobals disabled
  */
-class TestLogging extends PHPUnit_Framework_TestCase
+class TestLogging extends \PHPUnit\Framework\TestCase
 {
 	/**
 	 * Prepare what is necessary to use in these tests.

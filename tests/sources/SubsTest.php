@@ -4,7 +4,7 @@
  * TestCase class for (ideally) all the functions in the Subs.php file
  * that do not fit in any other test
  */
-class TestSubs extends PHPUnit_Framework_TestCase
+class TestSubs extends \PHPUnit\Framework\TestCase
 {
 	/**
 	 * Prepare what is necessary to use in these tests.
