@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 2.0-dev
+ * @version 2.0 dev
  *
  */
 
@@ -19,7 +19,7 @@
  * Class representing an xml array.
  *
  * Reads in xml, allows you to access it simply.
- * Version 2.0-dev.
+ * Version 2.0 dev.
  */
 class Xml_Array
 {
