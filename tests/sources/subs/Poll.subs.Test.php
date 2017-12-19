@@ -181,7 +181,6 @@ class TestPoll extends \PHPUnit\Framework\TestCase
 		// Link the poll to the topic.
 		associatedPoll($this->id_topic, $id_poll);
 
-		// Modify it. Hmm... we haz no modify function :P
-		// @todo
+		$this->assertTrue(!empty($id_poll));
 	}
 }
