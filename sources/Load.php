@@ -69,15 +69,6 @@ function reloadSettings()
 
 		$modSettings['warning_enable'] = $modSettings['warning_settings'][0];
 
-		// @deprecated since 1.1.0 - Just in case the upgrade script was run before B3
-		if (empty($modSettings['cal_limityear']))
-		{
-			$modSettings['cal_limityear'] = 10;
-			updateSettings(array(
-				'cal_limityear' => 10
-			));
-		}
-
 		$cache->put('modSettings', $modSettings, 90);
 	}
 
@@ -1227,6 +1218,7 @@ function detectBrowser()
  */
 function loadTheme($id_theme = 0, $initialize = true)
 {
+	Errors::instance()->log_deprecated('loadTheme()', 'ElkArte\Themes\ThemeLoader.');
 	new ElkArte\Themes\ThemeLoader($id_theme, $initialize);
 }
 
@@ -1302,6 +1294,7 @@ function determineSmileySet($user_smiley_set, $known_smiley_sets)
  */
 function loadEssentialThemeData()
 {
+	Errors::instance()->log_deprecated('loadEssentialThemeData()', 'theme()->getTemplates()->loadEssentialThemeData().');
 	return theme()->getTemplates()->loadEssentialThemeData();
 }
 
@@ -1328,16 +1321,7 @@ function loadEssentialThemeData()
  */
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
-	$debug = '<br><br>';
-	foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1] as $var => $val)
-	{
-		$debug .= $var . ': ' . $val . '<br>';
-	}
-	Errors::instance()->log_error(sprintf(
-		'%s is deprecated, use %s instead.%s',
-		'loadTemplate().',
-		'theme()->getTemplates()->load().',
-		$debug) ,'deprecated');
+	Errors::instance()->log_deprecated('loadTemplate()', 'theme()->getTemplates()->load().');
 	return theme()->getTemplates()->load($template_name, $style_sheets, $fatal);
 }
 
@@ -1360,6 +1344,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  */
 function loadSubTemplate($sub_template_name, $fatal = false)
 {
+	Errors::instance()->log_deprecated('loadSubTemplate()', 'theme()->getTemplates()->loadSubTemplate().');
 	theme()->getTemplates()->loadSubTemplate($sub_template_name, $fatal);
 
 	return true;
@@ -1582,6 +1567,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
  */
 function addJavascriptVar($vars, $escape = false)
 {
+	Errors::instance()->log_deprecated('addJavascriptVar()', 'theme()->getTemplates()->addJavascriptVar().');
 	theme()->addJavascriptVar($vars, $escape);
 }
 
@@ -1601,6 +1587,7 @@ function addJavascriptVar($vars, $escape = false)
  */
 function addInlineJavascript($javascript, $defer = false)
 {
+	Errors::instance()->log_deprecated('addInlineJavascript()', 'theme()->getTemplates()->addInlineJavascript().');
 	theme()->addInlineJavascript($javascript, $defer);
 }
 
@@ -1619,6 +1606,7 @@ function addInlineJavascript($javascript, $defer = false)
  */
 function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload = false)
 {
+	Errors::instance()->log_deprecated('loadLanguage()', 'theme()->getTemplates()->loadLanguageFile().');
 	return theme()->getTemplates()->loadLanguageFile($template_name, $lang, $fatal, $force_reload);
 }
 

@@ -23,6 +23,12 @@ class DbSearch_MySQL implements DbSearch
 	private static $_search = null;
 
 	/**
+	 * The way to skip a database error
+	 * @var boolean
+	 */
+	protected $_skip_error = false;
+
+	/**
 	 * This method will tell you whether this database type supports this search type.
 	 *
 	 * @param string $search_type
@@ -46,8 +52,22 @@ class DbSearch_MySQL implements DbSearch
 	{
 		$db = database();
 
+		if ($this->_skip_error === true)
+		{
+			$db->skip_next_error();
+			$this->_skip_error = false;
+		}
+
 		// Simply delegate to the database adapter method.
 		return $db->query($identifier, $db_string, $db_values, $connection);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function skip_next_error()
+	{
+		$this->_skip_error = true;
 	}
 
 	/**

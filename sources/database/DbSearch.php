@@ -44,6 +44,12 @@ interface DbSearch
 	public function create_word_search($size);
 
 	/**
+	 * Sets the class not to return the error in case of failures
+	 * just for the "next" query.
+	 */
+	public function skip_next_error();
+
+	/**
 	 * Static method that allows to retrieve or create an instance of this class.
 	 */
 	public static function db_search();

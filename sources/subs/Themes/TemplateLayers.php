@@ -209,26 +209,4 @@ class TemplateLayers extends Priority
 	{
 		$this->_is_error = true;
 	}
-
-	/**
-	 * Find and return ElkArte\Theme\TemplateLayers instance if it exists,
-	 * or create a new instance if it didn't already exist.
-	 *
-	 * @deprecated use the theme object
-	 *
-	 * @param boolean $error_safe if error mode is on or off
-	 *
-	 * @return ElkArte\Theme\TemplateLayers instance of the class
-	 */
-	public static function instance($error_safe = false)
-	{
-		if (self::$_instance === null)
-		{
-			self::$_instance = theme()->getLayers();
-		}
-
-		self::$_error_safe = $error_safe;
-
-		return theme()->getLayers();
-	}
 }

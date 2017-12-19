@@ -851,34 +851,28 @@ function moveTopics($topics, $toBoard, $log = false)
  * Called after a topic is moved to update $board_link and $topic_link to point
  * to new location
  *
- * @param null|int $move_from The board the topic belongs to
- * @param null|int $id_board The "current" board
- * @param null|int $id_topic The topic id
+ * @param int $move_from The board the topic belongs to
+ * @param int $id_board The "current" board
+ * @param int $id_topic The topic id
  *
  * @return bool
  * @throws Elk_Exception topic_already_moved
  */
-function moveTopicConcurrence($move_from = null, $id_board = null, $id_topic = null)
+function moveTopicConcurrence($move_from, $id_board, $id_topic)
 {
 	global $scripturl;
-	// @deprecated since 1.1
-	global $board, $topic;
 
 	$db = database();
 
-	// @deprecated since 1.1
-	if ($move_from === null && isset($_GET['current_board']))
-		$move_from = (int) $_GET['current_board'];
-	if ($id_board === null && !empty($board))
-		$id_board = $board;
-	if ($id_topic === null && !empty($topic))
-		$id_topic = $topic;
-
 	if (empty($move_from) || empty($id_board) || empty($id_topic))
+	{
 		return true;
+	}
 
 	if ($move_from == $id_board)
+	{
 		return true;
+	}
 	else
 	{
 		$request = $db->query('', '

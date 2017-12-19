@@ -470,9 +470,6 @@ function modifyBoard($board_id, &$boardOptions)
 		updateSettings(array('settings_updated' => time()));
 	}
 
-	if (isset($boardOptions['move_to']))
-		reorderBoards();
-
 	clean_cache('data');
 
 	if (empty($boardOptions['dont_log']))
@@ -715,41 +712,6 @@ function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 	// Let's do some serious logging.
 	foreach ($boards_to_remove as $id_board)
 		logAction('delete_board', array('boardname' => $boards[$id_board]['name']), 'admin');
-
-	reorderBoards();
-}
-
-/**
- * Put all boards in the right order and sorts the records of the boards table.
- *
- * - Used by modifyBoard(), deleteBoards(), modifyCategory(), and deleteCategories() functions
- *
- * @deprecated since 1.0 - the ordering is done in the query, probably not needed
- */
-function reorderBoards()
-{
-	global $cat_tree, $boardList, $boards;
-
-	$db = database();
-
-	getBoardTree();
-
-	// Set the board order for each category.
-	$board_order = 0;
-	foreach ($cat_tree as $catID => $dummy)
-	{
-		foreach ($boardList[$catID] as $boardID)
-			if ($boards[$boardID]['order'] != ++$board_order)
-				$db->query('', '
-					UPDATE {db_prefix}boards
-					SET board_order = {int:new_order}
-					WHERE id_board = {int:selected_board}',
-					array(
-						'new_order' => $board_order,
-						'selected_board' => $boardID,
-					)
-				);
-	}
 }
 
 /**

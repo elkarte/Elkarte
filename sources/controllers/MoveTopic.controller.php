@@ -179,7 +179,7 @@ class MoveTopic_Controller extends Action_Controller
 	 */
 	private function _prep_template()
 	{
-		global $context, $txt, $scripturl, $user_info, $language;
+		global $context, $txt, $scripturl, $user_info, $language, $board;
 
 		$context['is_approved'] = $this->_topic_info['approved'];
 		$context['subject'] = $this->_topic_info['subject'];
@@ -211,7 +211,9 @@ class MoveTopic_Controller extends Action_Controller
 
 		// We will need this
 		if (isset($this->_req->query->current_board))
-			moveTopicConcurrence((int) $this->_req->query->current_board);
+		{
+			moveTopicConcurrence((int) $this->_req->query->current_board, $board, $this->_topic);
+		}
 
 		// Register this form and get a sequence number in $context.
 		checkSubmitOnce('register');
@@ -265,7 +267,7 @@ class MoveTopic_Controller extends Action_Controller
 	 */
 	private function _check_access_2()
 	{
-		global $user_info;
+		global $user_info, $board;
 
 		if (empty($this->_topic))
 			throw new Elk_Exception('no_access', false);
@@ -281,7 +283,9 @@ class MoveTopic_Controller extends Action_Controller
 		// We will need this
 		require_once(SUBSDIR . '/Topic.subs.php');
 		if (isset($this->_req->query->current_board))
-			moveTopicConcurrence((int) $this->_req->query->current_board);
+		{
+			moveTopicConcurrence((int) $this->_req->query->current_board, $board, $this->_topic);
+		}
 
 		// Make sure this form hasn't been submitted before.
 		checkSubmitOnce('check');

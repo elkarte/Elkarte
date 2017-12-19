@@ -886,12 +886,6 @@ class Theme extends BaseTheme
 		{
 			loadCSSFile('custom.css', array('fallback' => false));
 		}
-
-		// Load font Awesome fonts, @deprecated in 1.1 and will be removed in 2.0
-		if (!empty($settings['require_font-awesome']) || !empty($modSettings['require_font-awesome']))
-		{
-			loadCSSFile('font-awesome.min.css');
-		}
 	}
 
 	/**
@@ -1188,7 +1182,7 @@ class Theme extends BaseTheme
 				$layers = array('html', 'body');
 			}
 
-			$template_layers = \ElkArte\Themes\TemplateLayers::instance(true);
+			$template_layers = $this->getLayers();
 			foreach ($layers as $layer)
 			{
 				$template_layers->addBegin($layer);

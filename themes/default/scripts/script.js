@@ -417,13 +417,6 @@ function submitThisOnce(oControl, bReadOnly)
 	return !elk_formSubmitted;
 }
 
-// @deprecated since 1.0 - innerHTML is supported everywhere.
-function setInnerHTML(oElement, sToValue)
-{
-	if (oElement)
-		oElement.innerHTML = sToValue;
-}
-
 function getInnerHTML(oElement)
 {
 	if (oElement)
