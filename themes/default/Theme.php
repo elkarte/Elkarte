@@ -352,10 +352,12 @@ class Theme extends BaseTheme
 	/**
 	 * Deletes the hives (aggregated CSS and JS files) previously created.
 	 *
-	 * @param string $type = 'all' Filters the types of hives (valid values:
+	 * @param string $type           = 'all' Filters the types of hives (valid values:
 	 *                               * 'all'
 	 *                               * 'css'
 	 *                               * 'js'
+	 *
+	 * @return bool
 	 */
 	public function cleanHives($type = 'all')
 	{
@@ -1155,34 +1157,20 @@ class Theme extends BaseTheme
 		else
 		{
 			// Custom templates to load, or just default?
-			if (isset($settings['theme_templates']))
-			{
-				$templates = explode(',', $settings['theme_templates']);
-			}
-			else
-			{
-				$templates = array('index');
-			}
+			$templates = isset($settings['theme_templates']) ? explode(',', $settings['theme_templates']) : ['index'];
 
 			// Load each template...
 			foreach ($templates as $template)
 				$this->getTemplates()->load($template);
 
 			// ...and attempt to load their associated language files.
-			$required_files = implode('+', array_merge($templates, array('Addons')));
-			$this->getTemplates()->loadLanguageFile($required_files, '', false);
+			$this->getTemplates()->loadLanguageFiles(array_merge($templates, ['Addons']), '', false);
 
 			// Custom template layers?
-			if (isset($settings['theme_layers']))
-			{
-				$layers = explode(',', $settings['theme_layers']);
-			}
-			else
-			{
-				$layers = array('html', 'body');
-			}
+			$layers = isset($settings['theme_layers']) ? explode(',', $settings['theme_layers']) : ['html', 'body'];
 
 			$template_layers = $this->getLayers();
+			$template_layers->setErrorSafeLayers($layers);
 			foreach ($layers as $layer)
 			{
 				$template_layers->addBegin($layer);
