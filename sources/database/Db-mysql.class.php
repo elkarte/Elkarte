@@ -14,7 +14,7 @@
  * copyright:	2004-2011, GreyWyvern - All rights reserved.
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 

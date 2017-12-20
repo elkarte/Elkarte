@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title> &lt;&lt; :: ElkArte SSI.php 1.1 :: &gt;&gt; </title>
+		<title> &lt;&lt; :: ElkArte SSI.php 2.0 dev :: &gt;&gt; </title>
 	</head>
 	<body style="font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt;">
 			<h1>ElkArte SSI.php Functions</h1>
-			Current Version 1.1<br />
+			Current Version 2.0 dev<br />
 			<br />
 			This file is used to demonstrate the capabilities of SSI.php using SHTML include functions.<br />
 			The examples the include tag, then the results of it. Examples are separated by horizontal rules.<br />

@@ -1,7 +1,7 @@
 {
 	"name": "elkarte/elkarte",
 	"description": "ElkArte Forum Software application",
-	"version": "1.1.0-RC1",
+	"version": "2.0 dev",
 	"type": "project",
 	"keywords": ["elkarte", "forum"],
 	"homepage": "http://www.elkarte.net",

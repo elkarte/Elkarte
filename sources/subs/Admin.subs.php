@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.1
+ * @version 2.0 dev
  *
  * This file contains functions that are specifically done by administrators.
  *
