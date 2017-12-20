@@ -703,11 +703,11 @@ InTopicModeration.prototype.init = function()
 // They clicked a checkbox in a message so we show the button options to them
 InTopicModeration.prototype.handleClick = function(oCheckbox)
 {
+	var oButtonStrip = document.getElementById(this.opt.sButtonStrip),
+		oButtonStripDisplay = document.getElementById(this.opt.sButtonStripDisplay);
+
 	if (!this.bButtonsShown && this.opt.sButtonStripDisplay)
 	{
-		var oButtonStrip = document.getElementById(this.opt.sButtonStrip),
-			oButtonStripDisplay = document.getElementById(this.opt.sButtonStripDisplay);
-
 		// Make sure it can go somewhere.
 		if (typeof(oButtonStripDisplay) === 'object' && oButtonStripDisplay !== null)
 			oButtonStripDisplay.style.display = "";
@@ -731,7 +731,7 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 				sImage: this.opt.sRemoveButtonImage,
 				sUrl: '#',
 				aEvents: [
-					['click', this.handleSubmit('remove').bind(this)
+					['click', this.handleSubmit('remove').bind(this)]
 				]
 			});
 
@@ -743,7 +743,7 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 				sImage: this.opt.sRestoreButtonImage,
 				sUrl: '#',
 				aEvents: [
-					['click', this.handleSubmit('restore').bind(this)
+					['click', this.handleSubmit('restore').bind(this)]
 				]
 			});
 
@@ -755,7 +755,7 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 				sImage: this.opt.sSplitButtonImage,
 				sUrl: '#',
 				aEvents: [
-					['click', this.handleSubmit('split').bind(this)
+					['click', this.handleSubmit('split').bind(this)]
 				]
 			});
 

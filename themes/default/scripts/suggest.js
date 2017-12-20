@@ -469,11 +469,11 @@ smc_AutoSuggest.prototype.populateDiv = function(aResults)
 		this.oSuggestDivHandle.appendChild(oNewDivHandle);
 
 		// Attach some events to it so we can do stuff.
-		oNewDivHandle.onmouseover = function (oEvent)
+		oNewDivHandle.onmouseover = function ()
 		{
 			this.className = 'auto_suggest_item_hover';
 		};
-		oNewDivHandle.onmouseout = function (oEvent)
+		oNewDivHandle.onmouseout = function ()
 		{
 			this.className = 'auto_suggest_item';
 		};

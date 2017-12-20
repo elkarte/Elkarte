@@ -80,6 +80,7 @@ function toggleButtonAJAX(btn, confirmation_msg_variable, onSuccessCallback)
 					$(this).attr('href', url[0].firstChild.nodeValue.removeEntities());
 
 				// Replaces the confirmation var text with the new one from the response to allow swapping on/off
+				// @todo this appears to be the start of a confirmation dialog... needs finished.
 				if (typeof (confirm_text) !== 'undefined')
 					confirmation_msg_variable = confirm_text.replace(/[\\']/g, '\\$&');
 			});

@@ -383,7 +383,7 @@ function template_edit_group()
 			bItemList: true,
 			sPostName: \'moderator_list\',
 			sURLMask: \'action=profile;u=%item_id%\',
-			sTextDeleteItem: ' . ', JavaScriptEscape($txt['autosuggest_delete_item']), ' . ',
+			sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
 			sItemListContainerId: \'moderator_container\',
 			aListItems: [';
 

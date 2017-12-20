@@ -83,7 +83,7 @@ elk_PersonalMessageSend.prototype.init = function()
 		sItemListContainerId: 'to_item_list_container',
 		aListItems: this.opt.aToRecipients
 	});
-	this.oToAutoSuggest.registerCallback('onBeforeAddItem', this.callbackAddItem.bind(this);
+	this.oToAutoSuggest.registerCallback('onBeforeAddItem', this.callbackAddItem.bind(this));
 
 	this.oBccAutoSuggest = new smc_AutoSuggest({
 		sSessionId: this.opt.sSessionId,
@@ -98,7 +98,7 @@ elk_PersonalMessageSend.prototype.init = function()
 		sItemListContainerId: 'bcc_item_list_container',
 		aListItems: this.opt.aBccRecipients
 	});
-	this.oBccAutoSuggest.registerCallback('onBeforeAddItem', this.callbackAddItem.bind(this);
+	this.oBccAutoSuggest.registerCallback('onBeforeAddItem', this.callbackAddItem.bind(this));
 };
 
 // Show the bbc fields
