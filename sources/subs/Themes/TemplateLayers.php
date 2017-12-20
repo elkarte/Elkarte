@@ -25,7 +25,7 @@ class TemplateLayers extends Priority
 	/**
 	 * Layers not removed in case of errors
 	 */
-	private $_error_safe_layers = null;
+	private $_error_safe_layers = [];
 
 	/**
 	 * Are we handling an error?
@@ -34,93 +34,19 @@ class TemplateLayers extends Priority
 	private $_is_error = false;
 
 	/**
-	 * The layers added when this is true will be used in the error screen
+	 * @return string[]
 	 */
-	private static $_error_safe = false;
-
-	/**
-	 * Instance of the class
-	 */
-	private static $_instance = null;
-
-	/**
-	 * Add a new layer to the pile
-	 *
-	 * @param string   $layer    name of a layer
-	 * @param int|null $priority an integer defining the priority of the layer.
-	 */
-	public function add($layer, $priority = null)
+	public function getErrorSafeLayers()
 	{
-		parent::add($layer, $priority);
-
-		if (self::$_error_safe)
-		{
-			$this->_error_safe_layers[] = $layer;
-		}
+		return $this->_error_safe_layers;
 	}
 
 	/**
-	 * Add a layer to the pile before another existing layer
-	 *
-	 * @param string $layer     the name of a layer
-	 * @param string $following the name of the layer before which $layer must be added
+	 * @param string[] $error_safe_layers
 	 */
-	public function addBefore($layer, $following)
+	public function setErrorSafeLayers(array $error_safe_layers)
 	{
-		parent::addBefore($layer, $following);
-
-		if (self::$_error_safe)
-		{
-			$this->_error_safe_layers[] = $layer;
-		}
-	}
-
-	/**
-	 * Add a layer to the pile after another existing layer
-	 *
-	 * @param string $layer    the name of a layer
-	 * @param string $previous the name of the layer after which $layer must be added
-	 */
-	public function addAfter($layer, $previous)
-	{
-		parent::addAfter($layer, $previous);
-
-		if (self::$_error_safe)
-		{
-			$this->_error_safe_layers[] = $layer;
-		}
-	}
-
-	/**
-	 * Add a layer at the end of the pile
-	 *
-	 * @param string   $layer    name of a layer
-	 * @param int|null $priority an integer defining the priority of the layer.
-	 */
-	public function addEnd($layer, $priority = null)
-	{
-		parent::addEnd($layer, $priority);
-
-		if (self::$_error_safe)
-		{
-			$this->_error_safe_layers[] = $layer;
-		}
-	}
-
-	/**
-	 * Add a layer at the beginning of the pile
-	 *
-	 * @param string   $layer    name of a layer
-	 * @param int|null $priority an integer defining the priority of the layer.
-	 */
-	public function addBegin($layer, $priority = null)
-	{
-		parent::addBegin($layer, $priority);
-
-		if (self::$_error_safe)
-		{
-			$this->_error_safe_layers[] = $layer;
-		}
+		$this->_error_safe_layers = $error_safe_layers;
 	}
 
 	/**
