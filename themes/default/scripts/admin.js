@@ -55,11 +55,9 @@ elk_AdminIndex.prototype.init = function ()
 {
 	window.adminIndexInstanceRef = this;
 
-	var fHandlePageLoaded = function () {
+	window.addEventListener("load", function () {
 		window.adminIndexInstanceRef.loadAdminIndex();
-	};
-
-	addLoadEvent(fHandlePageLoaded);
+	});
 };
 
 elk_AdminIndex.prototype.loadAdminIndex = function ()
@@ -270,10 +268,9 @@ elk_ViewVersions.prototype.init = function ()
 {
 	// Load this on loading of the page.
 	window.viewVersionsInstanceRef = this;
-	var fHandlePageLoaded = function () {
+	window.addEventListener("load", function () {
 		window.viewVersionsInstanceRef.loadViewVersions();
-	};
-	addLoadEvent(fHandlePageLoaded);
+	});
 };
 
 // Load all the file versions
@@ -411,12 +408,10 @@ elk_ViewVersions.prototype.determineVersions = function ()
 		oSectionLink = document.getElementById(sSections[i] + '-link');
 		if (typeof(oSectionLink) === 'object' && oSectionLink !== null)
 		{
-			oSectionLink.instanceRef = this;
-			oSectionLink.sSection = sSections[i];
-			oSectionLink.onclick = function () {
-				this.instanceRef.swapOption(this, this.sSection);
+			oSectionLink.onclick = function (oEvent) {
+				this.swapOption(oEvent.target, oEvent.target.id.split('-')[0]);
 				return false;
-			};
+			}.bind(this);
 		}
 	}
 

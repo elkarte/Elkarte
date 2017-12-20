@@ -185,14 +185,13 @@ function template_ban_edit()
 	if (!empty($context['use_autosuggest']))
 		echo '
 	<script>
-		var oAddMemberSuggest = new smc_AutoSuggest({
-			sSelf: \'oAddMemberSuggest\',
+		new smc_AutoSuggest({
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
 			sSuggestId: \'user\',
 			sControlId: \'user\',
 			sSearchType: \'member\',
-			sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
+			sTextDeleteItem: ', JavaScriptEscape($txt['autosuggest_delete_item']), ',
 			bItemList: false
 		});
 
@@ -266,14 +265,13 @@ function template_ban_edit_trigger()
 	</div>
 
 	<script>
-		var oAddMemberSuggest = new smc_AutoSuggest({
-			sSelf: \'oAddMemberSuggest\',
+		new smc_AutoSuggest({
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
 			sSuggestId: \'username\',
 			sControlId: \'user\',
 			sSearchType: \'member\',
-			sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
+			sTextDeleteItem: ', JavaScriptEscape($txt['autosuggest_delete_item']), ',
 			bItemList: false
 		});
 

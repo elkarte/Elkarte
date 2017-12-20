@@ -40,14 +40,11 @@ function QuickModifyTopic(oOptions)
 // Used to initialise the object event handlers
 QuickModifyTopic.prototype.init = function ()
 {
-	// Attach some events to it so we can respond to actions
-	this.oTopicModHandle.instanceRef = this;
-
 	// Detect and act on keypress
-	this.oTopicModHandle.onkeydown = function (oEvent) {return this.instanceRef.modify_topic_keypress(oEvent);};
+	this.oTopicModHandle.onkeydown = this.modify_topic_keypress.bind(this);
 
 	// Used to detect when we've stopped editing.
-	this.oTopicModHandle.onclick = function (oEvent) {return this.instanceRef.modify_topic_click(oEvent);};
+	this.oTopicModHandle.onclick = this.modify_topic_click.bind(this);
 };
 
 // called from the double click in the div
@@ -133,9 +130,8 @@ QuickModifyTopic.prototype.modify_topic_show_edit = function (subject)
 	this.oCurSubjectDiv.innerHTML = '<input type="text" name="subject" value="' + subject + '" size="60" style="width: 95%;" maxlength="80" class="input_text" autocomplete="off" /><input type="hidden" name="topic" value="' + this.iCurTopicId + '" /><input type="hidden" name="msg" value="' + this.sCurMessageId.substr(4) + '" />';
 
 	// Attach mouse over and out events to this new div
-	this.oCurSubjectDiv.instanceRef = this;
-	this.oCurSubjectDiv.onmouseout = function (oEvent) {return this.instanceRef.modify_topic_mouseout(oEvent);};
-	this.oCurSubjectDiv.onmouseover = function (oEvent) {return this.instanceRef.modify_topic_mouseover(oEvent);};
+	this.oCurSubjectDiv.onmouseout = this.modify_topic_mouseout.bind(this);
+	this.oCurSubjectDiv.onmouseover = this.modify_topic_mouseover.bind(this);
 };
 
 // Yup that's right, save it
@@ -695,10 +691,7 @@ InTopicModeration.prototype.init = function()
 		oCheckbox.className = 'input_check';
 		oCheckbox.name = 'msgs[]';
 		oCheckbox.value = this.opt.aMessageIds[i];
-		oCheckbox.instanceRef = this;
-		oCheckbox.onclick = function () {
-			this.instanceRef.handleClick(this);
-		};
+		oCheckbox.onclick = this.handleClick(oCheckbox).bind(this);
 
 		// Append it to the container
 		var oCheckboxContainer = document.getElementById(this.opt.sCheckboxContainerMask + this.opt.aMessageIds[i]);
@@ -710,11 +703,11 @@ InTopicModeration.prototype.init = function()
 // They clicked a checkbox in a message so we show the button options to them
 InTopicModeration.prototype.handleClick = function(oCheckbox)
 {
+	var oButtonStrip = document.getElementById(this.opt.sButtonStrip),
+		oButtonStripDisplay = document.getElementById(this.opt.sButtonStripDisplay);
+
 	if (!this.bButtonsShown && this.opt.sButtonStripDisplay)
 	{
-		var oButtonStrip = document.getElementById(this.opt.sButtonStrip),
-			oButtonStripDisplay = document.getElementById(this.opt.sButtonStripDisplay);
-
 		// Make sure it can go somewhere.
 		if (typeof(oButtonStripDisplay) === 'object' && oButtonStripDisplay !== null)
 			oButtonStripDisplay.style.display = "";
@@ -733,31 +726,37 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 		// Add the 'remove selected items' button.
 		if (this.opt.bCanRemove)
 			elk_addButton(this.opt.sButtonStrip, this.opt.bUseImageButton, {
-				sId: this.opt.sSelf + '_remove_button',
+				sId: 'remove_button',
 				sText: this.opt.sRemoveButtonLabel,
 				sImage: this.opt.sRemoveButtonImage,
 				sUrl: '#',
-				sCustom: ' onclick="return ' + this.opt.sSelf + '.handleSubmit(\'remove\')"'
+				aEvents: [
+					['click', this.handleSubmit('remove').bind(this)]
+				]
 			});
 
 		// Add the 'restore selected items' button.
 		if (this.opt.bCanRestore)
 			elk_addButton(this.opt.sButtonStrip, this.opt.bUseImageButton, {
-				sId: this.opt.sSelf + '_restore_button',
+				sId: 'restore_button',
 				sText: this.opt.sRestoreButtonLabel,
 				sImage: this.opt.sRestoreButtonImage,
 				sUrl: '#',
-				sCustom: ' onclick="return ' + this.opt.sSelf + '.handleSubmit(\'restore\')"'
+				aEvents: [
+					['click', this.handleSubmit('restore').bind(this)]
+				]
 			});
 
 		// Add the 'split selected items' button.
 		if (this.opt.bCanSplit)
 			elk_addButton(this.opt.sButtonStrip, this.opt.bUseImageButton, {
-				sId: this.opt.sSelf + '_split_button',
+				sId: 'split_button',
 				sText: this.opt.sSplitButtonLabel,
 				sImage: this.opt.sSplitButtonImage,
 				sUrl: '#',
-				sCustom: ' onclick="return ' + this.opt.sSelf + '.handleSubmit(\'split\')"'
+				aEvents: [
+					['click', this.handleSubmit('split').bind(this)]
+				]
 			});
 
 		// Adding these buttons once should be enough.
@@ -770,24 +769,24 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 	// Show the number of messages selected in each of the buttons.
 	if (this.opt.bCanRemove && !this.opt.bUseImageButton)
 	{
-		document.getElementById(this.opt.sSelf + '_remove_button_text').innerHTML = this.opt.sRemoveButtonLabel + ' [' + this.iNumSelected + ']';
-		document.getElementById(this.opt.sSelf + '_remove_button').style.display = this.iNumSelected < 1 ? "none" : "";
+		oButtonStrip.getElementById('remove_button_text').innerHTML = this.opt.sRemoveButtonLabel + ' [' + this.iNumSelected + ']';
+		oButtonStrip.getElementById('remove_button').style.display = this.iNumSelected < 1 ? "none" : "";
 	}
 
 	if (this.opt.bCanRestore && !this.opt.bUseImageButton)
 	{
-		document.getElementById(this.opt.sSelf + '_restore_button_text').innerHTML = this.opt.sRestoreButtonLabel + ' [' + this.iNumSelected + ']';
-		document.getElementById(this.opt.sSelf + '_restore_button').style.display = this.iNumSelected < 1 ? "none" : "";
+		oButtonStrip.getElementById('restore_button_text').innerHTML = this.opt.sRestoreButtonLabel + ' [' + this.iNumSelected + ']';
+		oButtonStrip.getElementById('restore_button').style.display = this.iNumSelected < 1 ? "none" : "";
 	}
 
 	if (this.opt.bCanSplit && !this.opt.bUseImageButton)
 	{
-		document.getElementById(this.opt.sSelf + '_split_button_text').innerHTML = this.opt.sSplitButtonLabel + ' [' + this.iNumSelected + ']';
-		document.getElementById(this.opt.sSelf + '_split_button').style.display = this.iNumSelected < 1 ? "none" : "";
+		oButtonStrip.getElementById('split_button_text').innerHTML = this.opt.sSplitButtonLabel + ' [' + this.iNumSelected + ']';
+		oButtonStrip.getElementById('split_button').style.display = this.iNumSelected < 1 ? "none" : "";
 	}
 
 	// Try to restore the correct position.
-	var aItems = document.getElementById(this.opt.sButtonStrip).getElementsByTagName('span');
+	var aItems = oButtonStrip.getElementsByTagName('span');
 	if (aItems.length > 3)
 	{
 		if (this.iNumSelected < 1)

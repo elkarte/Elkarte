@@ -123,7 +123,7 @@ function template_messages()
 		// Show the message anchor and a "new" anchor if this message is new.
 		if ($message['id'] != $context['first_message'] && ($message['first_new']))
 			echo '
-				<a id="new">&nbsp;</a>	
+				<a id="new">&nbsp;</a>
 				<hr class="new_post_separator" />';
 
 		echo '
@@ -572,7 +572,6 @@ function template_quickreply_below()
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $context['can_remove_post'])
 		echo '
 				var oInTopicModeration = new InTopicModeration({
-					sSelf: \'oInTopicModeration\',
 					sCheckboxContainerMask: \'in_topic_mod_check_\',
 					aMessageIds: [\'', implode('\', \'', $removableMessageIDs), '\'],
 					sSessionId: elk_session_id,

@@ -122,14 +122,13 @@ function template_editBuddies()
 
 	// Initialize the autosuggest object
 	theme()->addInlineJavascript('
-		var oAddBuddySuggest = new smc_AutoSuggest({
-			sSelf: \'oAddBuddySuggest\',
+		new smc_AutoSuggest({
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
 			sSuggestId: \'new_buddy\',
 			sControlId: \'new_buddy\',
 			sSearchType: \'member\',
-			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
+			sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
 			bItemList: false
 		});', true);
 }
@@ -221,14 +220,13 @@ function template_editIgnoreList()
 	</form>';
 
 	theme()->addInlineJavascript('
-		var oAddIgnoreSuggest = new smc_AutoSuggest({
-			sSelf: \'oAddIgnoreSuggest\',
+		new smc_AutoSuggest({
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
 			sSuggestId: \'new_ignore\',
 			sControlId: \'new_ignore\',
 			sSearchType: \'member\',
-			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
+			sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
 			bItemList: false
 		});', true);
 }

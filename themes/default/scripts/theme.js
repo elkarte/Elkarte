@@ -162,5 +162,10 @@ function elk_addButton(sButtonStripId, bUseImage, oOptions)
 		oNewButton.id = oOptions.sId;
 	oNewButton.innerHTML = '<a class="linklevel1" href="' + oOptions.sUrl + '" ' + ('sCustom' in oOptions ? oOptions.sCustom : '') + '><span class="last"' + ('sId' in oOptions ? ' id="' + oOptions.sId + '_text"': '') + '>' + oOptions.sText + '</span></a>';
 
+	if (oOptions.aEvents)
+		oOptions.aEvents.forEach(function(e) {
+			oNewButton.addEventListener(e[0], e[1]);
+		});
+
 	oButtonStripList.appendChild(oNewButton);
 }
