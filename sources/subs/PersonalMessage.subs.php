@@ -81,6 +81,7 @@ function loadPMLabels($labels)
 			'not_deleted' => 0,
 		)
 	);
+	$labels = array();
 	while ($row = $db->fetch_assoc($result))
 	{
 		$this_labels = explode(',', $row['labels']);
