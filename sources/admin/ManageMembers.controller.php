@@ -86,9 +86,6 @@ class ManageMembers_Controller extends Action_Controller
 		// Default to sub action 'all', needed for the tabs array below
 		$subAction = $action->initialize($subActions, 'all');
 
-		// You can't pass!
-		$action->isAllowedTo($subAction);
-
 		// Get counts on every type of activation - for sections and filtering alike.
 		require_once(SUBSDIR . '/Members.subs.php');
 
