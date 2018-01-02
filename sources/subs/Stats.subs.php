@@ -247,96 +247,70 @@ function topBoards($limit = null, $read_status = false)
  *
  * - x is configurable via $modSettings['stats_limit'].
  *
- * @param int|null $limit if not supplied, defaults to 10
+ * @param int $limit if not supplied, defaults to 10
  * @return array
  */
-function topTopicReplies($limit = null)
+function topTopicReplies($limit = 10)
 {
 	global $modSettings, $scripturl;
 
 	$db = database();
 
 	// If there is a default setting, let's not retrieve something bigger
-	if (isset($modSettings['stats_limit']))
-		$limit = empty($limit) ? $modSettings['stats_limit'] : ($limit < $modSettings['stats_limit'] ? $limit : $modSettings['stats_limit']);
-	// Otherwise, fingers crossed and let's grab what is asked
-	else
-		$limit = empty($limit) ? 10 : $limit;
+	$limit = min($limit, $modSettings['stats_limit'] ?? 10);
 
-	// Are you on a larger forum?  If so, let's try to limit the number of topics we search through.
-	if ($modSettings['totalMessages'] > 100000)
-	{
-		$request = $db->query('', '
-			SELECT id_topic
-			FROM {db_prefix}topics
-			WHERE num_replies != {int:no_replies}' . ($modSettings['postmod_active'] ? '
-				AND approved = {int:is_approved}' : '') . '
-			ORDER BY num_replies DESC
-			LIMIT 100',
-			array(
-				'no_replies' => 0,
-				'is_approved' => 1,
-			)
-		);
-		$topic_ids = array();
-		while ($row = $db->fetch_assoc($request))
-			$topic_ids[] = $row['id_topic'];
-		$db->free_result($request);
-	}
-	else
-		$topic_ids = array();
+	// Using the wrong alias here so that we can use {query_see_board}.
+	$request = $db->query('', '
+		SELECT id_topic, num_replies
+		FROM {db_prefix}topics AS b
+		WHERE {query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+			AND b.id_board != {int:recycle_board}' : '') . '
+			AND num_replies != {int:no_replies}' . ($modSettings['postmod_active'] ? '
+			AND approved = {int:is_approved}' : ''),
+		array(
+			'no_replies' => 0,
+			'is_approved' => 1,
+			'recycle_board' => $modSettings['recycle_board'],
+		)
+	);
+	$topic_ids = array();
+	while ($row = $db->fetch_row($request))
+		$topic_ids[$row[0]] = $row[1];
+	$db->free_result($request);
+	arsort($topic_ids);
+	$topic_ids = array_slice($topic_ids, 0, $limit, true);
+	$max_num_replies = max($topic_ids);
 
-	// Find the top x topics by number of replys
+	// Find the top x topics by number of replies
 	$topic_reply_result = $db->query('', '
-		SELECT m.subject, t.num_replies, t.num_views, t.id_board, t.id_topic, b.name
+		SELECT m.subject, t.num_replies, t.num_views, t.id_board, t.id_topic
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-			AND b.id_board != {int:recycle_board}' : '') . ')
-		WHERE {query_see_board}' . (!empty($topic_ids) ? '
-			AND t.id_topic IN ({array_int:topic_list})' : ($modSettings['postmod_active'] ? '
-			AND t.approved = {int:is_approved}' : '')) . '
-		ORDER BY t.num_replies DESC
-		LIMIT {int:topic_replies}',
+		WHERE t.id_topic IN ({array_int:topic_list})',
 		array(
 			'topic_list' => $topic_ids,
-			'recycle_board' => $modSettings['recycle_board'],
-			'is_approved' => 1,
-			'topic_replies' => $limit,
 		)
 	);
 	$top_topics_replies = array();
-	$max_num_replies = 1;
 	while ($row_topic_reply = $db->fetch_assoc($topic_reply_result))
 	{
 		// Build out this topics details for controller use
-		$row_topic_reply['subject'] = censor($row_topic_reply['subject']);
 		$top_topics_replies[$row_topic_reply['id_topic']] = array(
 			'id' => $row_topic_reply['id_topic'],
-			'board' => array(
-				'id' => $row_topic_reply['id_board'],
-				'name' => $row_topic_reply['name'],
-				'href' => $scripturl . '?board=' . $row_topic_reply['id_board'] . '.0',
-				'link' => '<a href="' . $scripturl . '?board=' . $row_topic_reply['id_board'] . '.0">' . $row_topic_reply['name'] . '</a>'
-			),
-			'subject' => $row_topic_reply['subject'],
-			'num_replies' => $row_topic_reply['num_replies'],
+			'subject' => censor($row_topic_reply['subject']),
+			'num_replies' => comma_format($row_topic_reply['num_replies']),
+			'post_percent' => round(($row_topic_reply['num_replies'] * 100) / $max_num_replies),
 			'num_views' => $row_topic_reply['num_views'],
 			'href' => $scripturl . '?topic=' . $row_topic_reply['id_topic'] . '.0',
 			'link' => '<a href="' . $scripturl . '?topic=' . $row_topic_reply['id_topic'] . '.0">' . $row_topic_reply['subject'] . '</a>'
 		);
-
-		if ($max_num_replies < $row_topic_reply['num_replies'])
-			$max_num_replies = $row_topic_reply['num_replies'];
 	}
 	$db->free_result($topic_reply_result);
 
-	// Calculate the percentages and final formatting of the number
-	foreach ($top_topics_replies as $i => $topic)
-	{
-		$top_topics_replies[$i]['post_percent'] = round(($topic['num_replies'] * 100) / $max_num_replies);
-		$top_topics_replies[$i]['num_replies'] = comma_format($top_topics_replies[$i]['num_replies']);
-	}
+	// @todo dedupe this
+	usort($top_topics_replies, function ($a, $b) {
+		return $b['num_replies'] <=> $a['num_replies'];
+	});
 
 	return $top_topics_replies;
 }
