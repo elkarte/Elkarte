@@ -161,6 +161,9 @@ class Database_PostgreSQL extends Database_Abstract
 			'profile_board_stats' => array(
 				'~COUNT\(\*\) \/ MAX\(b.num_posts\)~' => 'CAST(COUNT(*) AS DECIMAL) / CAST(b.num_posts AS DECIMAL)',
 			),
+			'case_insensitive_like' => array(
+				'~LIKE~' => 'ILIKE',
+			),
 		);
 
 		if (isset($replacements[$identifier]))

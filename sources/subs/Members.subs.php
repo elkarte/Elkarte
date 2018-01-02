@@ -885,7 +885,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	$checkName = strtr($name, array('_' => '\\_', '%' => '\\%'));
 
 	// Make sure they don't want someone else's name.
-	$request = $db->query('', '
+	$request = $db->query('case_insensitive_like', '
 		SELECT id_member
 		FROM {db_prefix}members
 		WHERE ' . (empty($current_ID_MEMBER) ? '' : 'id_member != {int:current_member}
@@ -905,7 +905,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	}
 
 	// Does name case insensitive match a member group name?
-	$request = $db->query('', '
+	$request = $db->query('case_insensitive_like', '
 		SELECT id_group
 		FROM {db_prefix}membergroups
 		WHERE {raw:group_name} LIKE {string:check_name}
