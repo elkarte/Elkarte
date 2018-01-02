@@ -149,9 +149,6 @@ class Database_PostgreSQL extends Database_Abstract
 			'attach_download_increase' => array(
 				'~LOW_PRIORITY~' => '',
 			),
-			'boardindex_fetch_boards' => array(
-				'~COALESCE\(lb.id_msg, 0\) >= b.id_msg_updated~' => 'CASE WHEN COALESCE(lb.id_msg, 0) >= b.id_msg_updated THEN 1 ELSE 0 END',
-			),
 			'get_random_number' => array(
 				'~RAND~' => 'RANDOM',
 			),

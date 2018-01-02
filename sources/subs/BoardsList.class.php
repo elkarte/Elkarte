@@ -173,7 +173,7 @@ class Boards_List
 				COALESCE(m.poster_time, 0) AS poster_time, COALESCE(mem.member_name, m.poster_name) AS poster_name,
 				m.subject, m.id_topic, COALESCE(mem.real_name, m.poster_name) AS real_name,
 				' . ($this->_user['is_guest'] ? ' 1 AS is_read, 0 AS new_from,' : '
-				(COALESCE(lb.id_msg, 0) >= b.id_msg_updated) AS is_read, COALESCE(lb.id_msg, -1) + 1 AS new_from,' . ($this->_options['include_categories'] ? '
+				(CASE WHEN COALESCE(lb.id_msg, 0) >= b.id_msg_updated THEN 1 ELSE 0 END) AS is_read, COALESCE(lb.id_msg, -1) + 1 AS new_from,' . ($this->_options['include_categories'] ? '
 				c.can_collapse, COALESCE(cc.id_member, 0) AS is_collapsed,' : '')) . '
 				COALESCE(mem.id_member, 0) AS id_member, mem.avatar, m.id_msg' . ($this->_options['avatars_on_indexes'] ? ',
 				COALESCE(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, mem.email_address' : '') . '
