@@ -365,7 +365,7 @@ function template_action_statPanel()
 		foreach ($context['posts_by_time'] as $time_of_day)
 		{
 			echo '
-					<li', $time_of_day['is_last'] ? ' class="last"' : '', '>
+					<li>
 						<div class="bar" style="padding-top: ', ((int) (100 - $time_of_day['relative_percent'])), 'px;" title="', sprintf($txt['statPanel_activityTime_posts'], $time_of_day['posts'], $time_of_day['posts_percent']), '">
 							<div style="height: ', (int) $time_of_day['relative_percent'], 'px;">
 								<span>', sprintf($txt['statPanel_activityTime_posts'], $time_of_day['posts'], $time_of_day['posts_percent']), '</span>

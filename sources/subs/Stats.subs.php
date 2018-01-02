@@ -871,69 +871,58 @@ function UserStatsPostingTime($memID)
 {
 	global $user_info, $modSettings;
 
+	$maxPosts = 0;
+	$totalPosts = 0;
+	$posts_by_time = array();
+	$hours = array();
+	for ($hour = 0; $hour < 24; $hour++)
+	{
+		$posts_by_time[$hour] = array(
+			'hour' => $hour,
+			'hour_format' => stripos($user_info['time_format'], '%p') === false ? $hour : date('g a', mktime($hour)),
+			'posts' => 0,
+			'posts_percent' => 0,
+			'relative_percent' => 0,
+		);
+	}
+
 	$db = database();
 
 	// Find the times when the users posts
-	$result = $db->query('user_activity_by_time', '
+	$result = $db->query('', '
 		SELECT
-			HOUR(FROM_UNIXTIME(poster_time + {float:time_offset})) AS hour,
-			COUNT(*) AS post_count
+			poster_time
 		FROM {db_prefix}messages
 		WHERE id_member = {int:current_member}' . ($modSettings['totalMessages'] > 100000 ? '
-			AND id_topic > {int:top_ten_thousand_topics}' : '') . '
-		GROUP BY hour',
+			AND id_topic > {int:top_ten_thousand_topics}' : ''),
 		array(
 			'current_member' => $memID,
 			'top_ten_thousand_topics' => $modSettings['totalTopics'] - 10000,
-			'time_offset' => (($user_info['time_offset'] + $modSettings['time_offset']) * 3600),
 		)
 	);
-	$maxPosts = 0;
-	$realPosts = 0;
-	$posts_by_time = array();
-	while ($row = $db->fetch_assoc($result))
+	while (list ($poster_time) = $db->fetch_row($result))
 	{
 		// Cast as an integer to remove the leading 0.
-		$row['hour'] = (int) $row['hour'];
+		$hour = (int) standardTime($poster_time, '%H');
 
-		$maxPosts = max($row['post_count'], $maxPosts);
-		$realPosts += $row['post_count'];
+		if (!isset($hours[$hour]))
+			$hours[$hour] = 0;
 
-		// When they post, hour by hour
-		$posts_by_time[$row['hour']] = array(
-			'hour' => $row['hour'],
-			'hour_format' => stripos($user_info['time_format'], '%p') === false ? $row['hour'] : date('g a', mktime($row['hour'])),
-			'posts' => $row['post_count'],
-			'posts_percent' => 0,
-			'is_last' => $row['hour'] == 23,
-		);
+		$hours[$hour]++;
 	}
 	$db->free_result($result);
+	$maxPosts = max($hours);
+	$totalPosts = array_sum($hours);
 
-	// Clean it up some more
-	if ($maxPosts > 0)
+	foreach ($hours as $hour => $num)
 	{
-		for ($hour = 0; $hour < 24; $hour++)
-		{
-			if (!isset($posts_by_time[$hour]))
-				$posts_by_time[$hour] = array(
-					'hour' => $hour,
-					'hour_format' => stripos($user_info['time_format'], '%p') === false ? $hour : date('g a', mktime($hour)),
-					'posts' => 0,
-					'posts_percent' => 0,
-					'relative_percent' => 0,
-					'is_last' => $hour == 23,
-				);
-			else
-			{
-				$posts_by_time[$hour]['posts_percent'] = round(($posts_by_time[$hour]['posts'] * 100) / $realPosts);
-				$posts_by_time[$hour]['relative_percent'] = round(($posts_by_time[$hour]['posts'] * 100) / $maxPosts);
-			}
-		}
+		// When they post, hour by hour
+		$posts_by_time[$hour] = array_merge($posts_by_time[$hour], array(
+			'posts' => comma_format($num),
+			'posts_percent' => round(($num * 100) / $totalPosts),
+			'relative_percent' => round(($num * 100) / $maxPosts),
+		));
 	}
-
-	// Put it in the right order.
-	ksort($posts_by_time);
 
 	return $posts_by_time;
 }
