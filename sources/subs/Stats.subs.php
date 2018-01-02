@@ -450,6 +450,8 @@ function topTopicStarter()
 
 	$db = database();
 	$members = array();
+	$top_starters = array();
+	$max_num_topics = 1;
 
 	// Try to cache this when possible, because it's a little unavoidably slow.
 	if (!Cache::instance()->getVar($members, 'stats_top_starters', 360) || empty($members))
@@ -458,61 +460,53 @@ function topTopicStarter()
 			SELECT id_member_started, COUNT(*) AS hits
 			FROM {db_prefix}topics' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 			WHERE id_board != {int:recycle_board}' : '') . '
-			GROUP BY id_member_started
-			ORDER BY hits DESC
-			LIMIT 20',
+			GROUP BY id_member_started',
 			array(
 				'recycle_board' => $modSettings['recycle_board'],
 			)
 		);
 		$members = array();
-		while ($row = $db->fetch_assoc($request))
-			$members[$row['id_member_started']] = $row['hits'];
+		while ($row = $db->fetch_row($request))
+			$members[$row[0]] = $row[1];
 		$db->free_result($request);
+		arsort($members);
+		$members = array_slice($members, 0, $modSettings['stats_limit'] ?? 10, true);
 
 		Cache::instance()->put('stats_top_starters', $members, 360);
 	}
+	$max_num_topics = max($members);
 
 	if (empty($members))
 		$members = array(0 => 0);
 
 	// Find the top starters of topics
-	$members_result = $db->query('top_topic_starters', '
+	$members_result = $db->query('7', '
 		SELECT id_member, real_name
 		FROM {db_prefix}members
-		WHERE id_member IN ({array_int:member_list})
-		ORDER BY FIND_IN_SET(id_member, {string:top_topic_posters})
-		LIMIT {int:topic_starter}',
+		WHERE id_member IN ({array_int:member_list})',
 		array(
 			'member_list' => array_keys($members),
-			'top_topic_posters' => implode(',', array_keys($members)),
-			'topic_starter' => isset($modSettings['stats_limit']) ? $modSettings['stats_limit'] : 10,
 		)
 	);
-	$top_starters = array();
-	$max_num_topics = 1;
 	while ($row_members = $db->fetch_assoc($members_result))
 	{
 		// Our array of spammers, er topic starters !
-		$top_starters[] = array(
+		$top_starters[$row_members['id_member']] = array(
 			'name' => $row_members['real_name'],
 			'id' => $row_members['id_member'],
-			'num_topics' => $members[$row_members['id_member']],
+			'num_topics' => comma_format($members[$row_members['id_member']]),
+			'post_percent' => round(($members[$row_members['id_member']] * 100) / $max_num_topics),
 			'href' => $scripturl . '?action=profile;u=' . $row_members['id_member'],
 			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row_members['id_member'] . '">' . $row_members['real_name'] . '</a>'
 		);
 
-		if ($max_num_topics < $members[$row_members['id_member']])
-			$max_num_topics = $members[$row_members['id_member']];
 	}
 	$db->free_result($members_result);
 
-	// Finish of with the determining the percentages
-	foreach ($top_starters as $i => $topic)
-	{
-		$top_starters[$i]['post_percent'] = round(($topic['num_topics'] * 100) / $max_num_topics);
-		$top_starters[$i]['num_topics'] = comma_format($top_starters[$i]['num_topics']);
-	}
+	// Even spammers must be orderly.
+	uksort($top_starters, function ($a, $b) use ($members) {
+		return $members[$b] <=> $members[$a];
+	});
 
 	return $top_starters;
 }
