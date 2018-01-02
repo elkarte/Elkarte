@@ -146,9 +146,6 @@ class Database_PostgreSQL extends Database_Abstract
 			'attach_download_increase' => array(
 				'~LOW_PRIORITY~' => '',
 			),
-			'get_random_number' => array(
-				'~RAND~' => 'RANDOM',
-			),
 			'insert_log_search_topics' => array(
 				'~NOT RLIKE~' => '!~',
 			),
