@@ -166,8 +166,8 @@ class Boards_List
 		// Find all boards and categories, as well as related information.
 		$result_boards = $this->_db->query('boardindex_fetch_boards', '
 			SELECT' . ($this->_options['include_categories'] ? '
-				c.id_cat, c.name AS cat_name,' : '') . '
-				b.id_board, b.name AS board_name, b.description,
+				c.id_cat, c.name AS cat_name, c.cat_order,' : '') . '
+				b.id_board, b.name AS board_name, b.description, b.board_order,
 				CASE WHEN b.redirect != {string:blank_string} THEN 1 ELSE 0 END AS is_redirect,
 				b.num_posts, b.num_topics, b.unapproved_posts, b.unapproved_topics, b.id_parent,
 				COALESCE(m.poster_time, 0) AS poster_time, COALESCE(mem.member_name, m.poster_name) AS poster_name,
@@ -186,8 +186,7 @@ class Boards_List
 				LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member AND a.id_member != 0)' : '') . '
 			WHERE {query_see_board}' . (empty($this->_options['countChildPosts']) ? (empty($this->_options['base_level']) ? '' : '
 				AND b.child_level >= {int:child_level}') : '
-				AND b.child_level BETWEEN ' . $this->_options['base_level'] . ' AND ' . ($this->_options['base_level'] + 1)) . '
-			ORDER BY' . ($this->_options['include_categories'] ? ' c.cat_order,' : '') . ' b.board_order',
+				AND b.child_level BETWEEN ' . $this->_options['base_level'] . ' AND ' . ($this->_options['base_level'] + 1)),
 			array(
 				'current_member' => $this->_user['id'],
 				'child_level' => $this->_options['base_level'],
@@ -215,6 +214,7 @@ class Boards_List
 					$this->_categories[$row_board['id_cat']] = array(
 						'id' => $row_board['id_cat'],
 						'name' => $row_board['cat_name'],
+						'order' => $row_board['cat_order'],
 						'is_collapsed' => isset($row_board['can_collapse']) && $row_board['can_collapse'] == 1 && $row_board['is_collapsed'] > 0,
 						'can_collapse' => isset($row_board['can_collapse']) && $row_board['can_collapse'] == 1,
 						'collapse_href' => isset($row_board['can_collapse']) ? $this->_scripturl . '?action=collapse;c=' . $row_board['id_cat'] . ';sa=' . ($row_board['is_collapsed'] > 0 ? 'expand;' : 'collapse;') . $this->_session_url . '#c' . $row_board['id_cat'] : '',
@@ -253,6 +253,7 @@ class Boards_List
 						'new' => empty($row_board['is_read']),
 						'id' => $row_board['id_board'],
 						'name' => $row_board['board_name'],
+						'order' => $row_board['board_order'],
 						'description' => $bbc_parser->parseBoard($row_board['description']),
 						'raw_description' => $row_board['description'],
 						'moderators' => array(),
@@ -281,6 +282,7 @@ class Boards_List
 				$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']] = array(
 					'id' => $row_board['id_board'],
 					'name' => $row_board['board_name'],
+					'order' => $row_board['board_order'],
 					'description' => $bbc_parser->parseBoard($row_board['description']),
 					'raw_description' => $row_board['description'],
 					'new' => empty($row_board['is_read']) && $row_board['poster_name'] != '',
@@ -391,13 +393,21 @@ class Boards_List
 			{
 				$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']]['last_post'] = $this_last_post;
 
+				// @todo dedupe this
+				uasort($this->_current_boards[$row_board['id_parent']]['children'], function ($a, $b) {
+					return $a['order'] <=> $b['order'];
+				});
+
 				// If there are no posts in this board, it really can't be new...
 				$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']]['new'] &= $row_board['poster_name'] != '';
 			}
 			// No last post for this board?  It's not new then, is it..?
 			elseif ($row_board['poster_name'] == '')
 				$this->_current_boards[$row_board['id_board']]['new'] = false;
-
+				// @todo dedupe this
+				uasort($this->_current_boards, function ($a, $b) {
+					return $a['order'] <=> $b['order'];
+				});
 			// Determine a global most recent topic.
 			if ($this->_options['set_latest_post'] && !empty($row_board['poster_time']) && $row_board['poster_time'] > $this->_latest_post['timestamp'] && !$ignoreThisBoard)
 				$this->_latest_post = &$this->_current_boards[$isChild ? $row_board['id_parent'] : $row_board['id_board']]['last_post'];
@@ -406,6 +416,11 @@ class Boards_List
 
 		if ($this->_options['get_moderators'] && !empty($this->_boards))
 			$this->_getBoardModerators();
+
+		// @todo dedupe this
+		usort($this->_categories, function ($a, $b) {
+			return $a['order'] <=> $b['order'];
+		});
 
 		return $this->_options['include_categories'] ? $this->_categories : $this->_current_boards;
 	}
