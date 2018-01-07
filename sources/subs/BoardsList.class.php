@@ -186,10 +186,11 @@ class Boards_List
 				LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member AND a.id_member != 0)' : '') . '
 			WHERE {query_see_board}' . (empty($this->_options['countChildPosts']) ? (empty($this->_options['base_level']) ? '' : '
 				AND b.child_level >= {int:child_level}') : '
-				AND b.child_level BETWEEN ' . $this->_options['base_level'] . ' AND ' . ($this->_options['base_level'] + 1)),
+				AND b.child_level BETWEEN {int:child_level} AND {int:upper_level}'),
 			array(
 				'current_member' => $this->_user['id'],
 				'child_level' => $this->_options['base_level'],
+				'upper_level' => $this->_options['base_level'] + 1,
 				'blank_string' => '',
 			)
 		);
