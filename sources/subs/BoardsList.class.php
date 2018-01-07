@@ -111,7 +111,7 @@ class Boards_List
 		$this->_options = array_merge(array(
 			'include_categories' => false,
 			'countChildPosts' => false,
-			'base_level' => false,
+			'base_level' => 0,
 			'parent_id' => 0,
 			'set_latest_post' => false,
 			'get_moderators' => true,
