@@ -425,7 +425,6 @@ function topTopicStarter()
 	$db = database();
 	$members = array();
 	$top_starters = array();
-	$max_num_topics = 1;
 
 	// Try to cache this when possible, because it's a little unavoidably slow.
 	if (!Cache::instance()->getVar($members, 'stats_top_starters', 360) || empty($members))
@@ -439,7 +438,6 @@ function topTopicStarter()
 				'recycle_board' => $modSettings['recycle_board'],
 			)
 		);
-		$members = array();
 		while ($row = $db->fetch_row($request))
 			$members[$row[0]] = $row[1];
 		$db->free_result($request);
@@ -871,8 +869,6 @@ function UserStatsPostingTime($memID)
 {
 	global $user_info, $modSettings;
 
-	$maxPosts = 0;
-	$totalPosts = 0;
 	$posts_by_time = array();
 	$hours = array();
 	for ($hour = 0; $hour < 24; $hour++)
