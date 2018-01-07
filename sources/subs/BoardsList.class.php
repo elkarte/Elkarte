@@ -405,10 +405,12 @@ class Boards_List
 			// No last post for this board?  It's not new then, is it..?
 			elseif ($row_board['poster_name'] == '')
 				$this->_current_boards[$row_board['id_board']]['new'] = false;
-				// @todo dedupe this
-				uasort($this->_current_boards, function ($a, $b) {
-					return $a['order'] <=> $b['order'];
-				});
+
+			// @todo dedupe this
+			uasort($this->_current_boards, function ($a, $b) {
+				return $a['order'] <=> $b['order'];
+			});
+
 			// Determine a global most recent topic.
 			if ($this->_options['set_latest_post'] && !empty($row_board['poster_time']) && $row_board['poster_time'] > $this->_latest_post['timestamp'] && !$ignoreThisBoard)
 				$this->_latest_post = &$this->_current_boards[$isChild ? $row_board['id_parent'] : $row_board['id_board']]['last_post'];
