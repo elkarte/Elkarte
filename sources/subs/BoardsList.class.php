@@ -164,7 +164,7 @@ class Boards_List
 		global $txt, $modSettings;
 
 		// Find all boards and categories, as well as related information.
-		$result_boards = $this->_db->query('boardindex_fetch_boards', '
+		$result_boards = $this->_db->fetchQuery('
 			SELECT' . ($this->_options['include_categories'] ? '
 				c.id_cat, c.name AS cat_name, c.cat_order,' : '') . '
 				b.id_board, b.name AS board_name, b.description, b.board_order,
@@ -195,10 +195,15 @@ class Boards_List
 			)
 		);
 
+		///
+		usort($result_boards, function ($a, $b) {
+			return $a['board_order'] <=> $b['board_order'];
+		});
+
 		$bbc_parser = \BBC\ParserWrapper::instance();
 
 		// Run through the categories and boards (or only boards)....
-		while ($row_board = $this->_db->fetch_assoc($result_boards))
+		foreach ($result_boards as $row_board)
 		{
 			// Perhaps we are ignoring this board?
 			$ignoreThisBoard = in_array($row_board['id_board'], $this->_user['ignoreboards']);
@@ -254,7 +259,6 @@ class Boards_List
 						'new' => empty($row_board['is_read']),
 						'id' => $row_board['id_board'],
 						'name' => $row_board['board_name'],
-						'order' => $row_board['board_order'],
 						'description' => $bbc_parser->parseBoard($row_board['description']),
 						'raw_description' => $row_board['description'],
 						'moderators' => array(),
@@ -283,7 +287,6 @@ class Boards_List
 				$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']] = array(
 					'id' => $row_board['id_board'],
 					'name' => $row_board['board_name'],
-					'order' => $row_board['board_order'],
 					'description' => $bbc_parser->parseBoard($row_board['description']),
 					'raw_description' => $row_board['description'],
 					'new' => empty($row_board['is_read']) && $row_board['poster_name'] != '',
@@ -394,11 +397,6 @@ class Boards_List
 			{
 				$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']]['last_post'] = $this_last_post;
 
-				// @todo dedupe this
-				uasort($this->_current_boards[$row_board['id_parent']]['children'], function ($a, $b) {
-					return $a['order'] <=> $b['order'];
-				});
-
 				// If there are no posts in this board, it really can't be new...
 				$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']]['new'] &= $row_board['poster_name'] != '';
 			}
@@ -406,21 +404,14 @@ class Boards_List
 			elseif ($row_board['poster_name'] == '')
 				$this->_current_boards[$row_board['id_board']]['new'] = false;
 
-			// @todo dedupe this
-			uasort($this->_current_boards, function ($a, $b) {
-				return $a['order'] <=> $b['order'];
-			});
-
 			// Determine a global most recent topic.
 			if ($this->_options['set_latest_post'] && !empty($row_board['poster_time']) && $row_board['poster_time'] > $this->_latest_post['timestamp'] && !$ignoreThisBoard)
 				$this->_latest_post = &$this->_current_boards[$isChild ? $row_board['id_parent'] : $row_board['id_board']]['last_post'];
 		}
-		$this->_db->free_result($result_boards);
 
 		if ($this->_options['get_moderators'] && !empty($this->_boards))
 			$this->_getBoardModerators();
 
-		// @todo dedupe this
 		usort($this->_categories, function ($a, $b) {
 			return $a['order'] <=> $b['order'];
 		});
