@@ -46,6 +46,7 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 		'custom_joins' => array(),
 	), $indexOptions);
 
+	// Fetch topic list in the order we want.
 	$request = $db->query('', '
 		SELECT t.id_topic
 		FROM {db_prefix}topics AS t' . ($sort_by === 'last_poster' ? '
@@ -119,7 +120,7 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 			)
 		);
 
-		// Lets take the results
+		// Now we fill the above array, maintaining index asssociation.
 		while ($row = $db->fetch_assoc($request))
 			$topics[$row['id_topic']] = $row;
 
