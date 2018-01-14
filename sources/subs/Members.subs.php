@@ -885,7 +885,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	$checkName = strtr($name, array('_' => '\\_', '%' => '\\%'));
 
 	// Make sure they don't want someone else's name.
-	$request = $db->query('case_insensitive_like', '
+	$request = $db->query('', '
 		SELECT id_member
 		FROM {db_prefix}members
 		WHERE ' . (empty($current_ID_MEMBER) ? '' : 'id_member != {int:current_member}
@@ -895,7 +895,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 			'real_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(real_name)' : 'real_name',
 			'member_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(member_name)' : 'member_name',
 			'current_member' => $current_ID_MEMBER,
-			'check_name' => $checkName,
+			'check_name' => defined('DB_CASE_SENSITIVE') ? Util::strtolower($checkName) : $checkName,
 		)
 	);
 	if ($db->num_rows($request) > 0)
@@ -905,14 +905,14 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	}
 
 	// Does name case insensitive match a member group name?
-	$request = $db->query('case_insensitive_like', '
+	$request = $db->query('', '
 		SELECT id_group
 		FROM {db_prefix}membergroups
 		WHERE {raw:group_name} LIKE {string:check_name}
 		LIMIT 1',
 		array(
 			'group_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(group_name)' : 'group_name',
-			'check_name' => $checkName,
+			'check_name' => defined('DB_CASE_SENSITIVE') ? Util::strtolower($checkName) : $checkName,
 		)
 	);
 	if ($db->num_rows($request) > 0)
