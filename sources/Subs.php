@@ -454,7 +454,9 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 	// Windows requires a slightly different language code identifier (LCID).
 	// https://msdn.microsoft.com/en-us/library/cc233982.aspx
 	if ($is_win)
+	{
 		$txt['lang_locale'] = strtr($txt['lang_locale'], '_', '-');
+	}
 
 	if (setlocale(LC_TIME, $txt['lang_locale']))
 	{
