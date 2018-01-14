@@ -613,22 +613,21 @@ class Database_PostgreSQL extends Database_Abstract
 
 			$inserted_results = 0;
 			$skip_error = $method == 'ignore' || $table === $db_prefix . 'log_errors';
-			foreach ($insertRows as $entry)
-			{
-				$this->_skip_error = $skip_error;
+			$this->_skip_error = $skip_error;
 
-				// Do the insert.
-				$this->query('', '
-					INSERT INTO ' . $table . '("' . implode('", "', $indexed_columns) . '")
-					VALUES
-						' . $entry,
-					array(
-						'security_override' => true,
-					),
-					$connection
-				);
-				$inserted_results += (!$this->_db_last_result ? 0 : pg_affected_rows($this->_db_last_result));
-			}
+			// Do the insert.
+			$this->query('', '
+				INSERT INTO ' . $table . '("' . implode('", "', $indexed_columns) . '")
+				VALUES
+				' . implode(',
+				', $insertRows),
+				array(
+					'security_override' => true,
+				),
+				$connection
+			);
+			$inserted_results += (!$this->_db_last_result ? 0 : pg_affected_rows($this->_db_last_result));
+
 			if (isset($db_replace_result))
 				$this->_db_replace_result = $db_replace_result + $inserted_results;
 		}
