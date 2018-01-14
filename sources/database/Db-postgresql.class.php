@@ -129,9 +129,6 @@ class Database_PostgreSQL extends Database_Abstract
 
 		// Special queries that need processing.
 		$replacements = array(
-			'alter_table' => array(
-				'~(.+)~' => '',
-			),
 			'ban_suggest_error_ips' => array(
 				'~RLIKE~' => '~',
 				'~\\.~' => '\.',
