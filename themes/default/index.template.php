@@ -238,7 +238,7 @@ function template_body_above()
 
 	echo '
 				<span id="logobox">
-					<img id="logo" src="', $context['header_logo_url_html_safe'], '" alt="', $context['forum_name_html_safe'], '" title="', $context['forum_name_html_safe'], '" />', empty($settings['site_slogan']) ? '' : '
+					', empty($settings['site_slogan']) ? '<img id="logo" src="' . $context['header_logo_url_html_safe'] . '" alt="' . $context['forum_name_html_safe'] . '" title="' . $context['forum_name_html_safe'] . '" />' : '
 					<span id="siteslogan">' . $settings['site_slogan'] . '</span>', '
 				</span>
 			</h1>';
