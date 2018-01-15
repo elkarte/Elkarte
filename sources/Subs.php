@@ -401,11 +401,11 @@ function byte_format($number)
 function standardTime($log_time, $show_today = true, $offset_type = false)
 {
 	global $user_info, $txt, $modSettings;
-	static $non_twelve_hour, $support_e = null;
+	static $non_twelve_hour, $is_win = null;
 
-	if ($support_e === null)
+	if ($is_win === null)
 	{
-		$support_e = detectServer()->is('windows');
+		$is_win = detectServer()->is('windows');
 	}
 
 	// Offset the time.
@@ -451,6 +451,13 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 
 	$str = !is_bool($show_today) ? $show_today : $user_info['time_format'];
 
+	// Windows requires a slightly different language code identifier (LCID).
+	// https://msdn.microsoft.com/en-us/library/cc233982.aspx
+	if ($is_win)
+	{
+		$txt['lang_locale'] = strtr($txt['lang_locale'], '_', '-');
+	}
+
 	if (setlocale(LC_TIME, $txt['lang_locale']))
 	{
 		if (!isset($non_twelve_hour))
@@ -474,7 +481,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 	}
 
 	// Windows doesn't support %e; on some versions, strftime fails altogether if used, so let's prevent that.
-	if ($support_e && strpos($str, '%e') !== false)
+	if ($is_win && strpos($str, '%e') !== false)
 		$str = str_replace('%e', ltrim(strftime('%d', $time), '0'), $str);
 
 	// Format any other characters..
