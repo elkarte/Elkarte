@@ -247,96 +247,70 @@ function topBoards($limit = null, $read_status = false)
  *
  * - x is configurable via $modSettings['stats_limit'].
  *
- * @param int|null $limit if not supplied, defaults to 10
+ * @param int $limit if not supplied, defaults to 10
  * @return array
  */
-function topTopicReplies($limit = null)
+function topTopicReplies($limit = 10)
 {
 	global $modSettings, $scripturl;
 
 	$db = database();
 
 	// If there is a default setting, let's not retrieve something bigger
-	if (isset($modSettings['stats_limit']))
-		$limit = empty($limit) ? $modSettings['stats_limit'] : ($limit < $modSettings['stats_limit'] ? $limit : $modSettings['stats_limit']);
-	// Otherwise, fingers crossed and let's grab what is asked
-	else
-		$limit = empty($limit) ? 10 : $limit;
+	$limit = min($limit, $modSettings['stats_limit'] ?? 10);
 
-	// Are you on a larger forum?  If so, let's try to limit the number of topics we search through.
-	if ($modSettings['totalMessages'] > 100000)
-	{
-		$request = $db->query('', '
-			SELECT id_topic
-			FROM {db_prefix}topics
-			WHERE num_replies != {int:no_replies}' . ($modSettings['postmod_active'] ? '
-				AND approved = {int:is_approved}' : '') . '
-			ORDER BY num_replies DESC
-			LIMIT 100',
-			array(
-				'no_replies' => 0,
-				'is_approved' => 1,
-			)
-		);
-		$topic_ids = array();
-		while ($row = $db->fetch_assoc($request))
-			$topic_ids[] = $row['id_topic'];
-		$db->free_result($request);
-	}
-	else
-		$topic_ids = array();
+	// Using the wrong alias here so that we can use {query_see_board}.
+	$request = $db->query('', '
+		SELECT id_topic, num_replies
+		FROM {db_prefix}topics AS b
+		WHERE {query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+			AND b.id_board != {int:recycle_board}' : '') . '
+			AND num_replies != {int:no_replies}' . ($modSettings['postmod_active'] ? '
+			AND approved = {int:is_approved}' : ''),
+		array(
+			'no_replies' => 0,
+			'is_approved' => 1,
+			'recycle_board' => $modSettings['recycle_board'],
+		)
+	);
+	$topic_ids = array();
+	while ($row = $db->fetch_row($request))
+		$topic_ids[$row[0]] = $row[1];
+	$db->free_result($request);
+	arsort($topic_ids);
+	$topic_ids = array_slice($topic_ids, 0, $limit, true);
+	$max_num_replies = max($topic_ids);
 
-	// Find the top x topics by number of replys
+	// Find the top x topics by number of replies
 	$topic_reply_result = $db->query('', '
-		SELECT m.subject, t.num_replies, t.num_views, t.id_board, t.id_topic, b.name
+		SELECT m.subject, t.num_replies, t.num_views, t.id_board, t.id_topic
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-			AND b.id_board != {int:recycle_board}' : '') . ')
-		WHERE {query_see_board}' . (!empty($topic_ids) ? '
-			AND t.id_topic IN ({array_int:topic_list})' : ($modSettings['postmod_active'] ? '
-			AND t.approved = {int:is_approved}' : '')) . '
-		ORDER BY t.num_replies DESC
-		LIMIT {int:topic_replies}',
+		WHERE t.id_topic IN ({array_int:topic_list})',
 		array(
 			'topic_list' => $topic_ids,
-			'recycle_board' => $modSettings['recycle_board'],
-			'is_approved' => 1,
-			'topic_replies' => $limit,
 		)
 	);
 	$top_topics_replies = array();
-	$max_num_replies = 1;
 	while ($row_topic_reply = $db->fetch_assoc($topic_reply_result))
 	{
 		// Build out this topics details for controller use
-		$row_topic_reply['subject'] = censor($row_topic_reply['subject']);
 		$top_topics_replies[$row_topic_reply['id_topic']] = array(
 			'id' => $row_topic_reply['id_topic'],
-			'board' => array(
-				'id' => $row_topic_reply['id_board'],
-				'name' => $row_topic_reply['name'],
-				'href' => $scripturl . '?board=' . $row_topic_reply['id_board'] . '.0',
-				'link' => '<a href="' . $scripturl . '?board=' . $row_topic_reply['id_board'] . '.0">' . $row_topic_reply['name'] . '</a>'
-			),
-			'subject' => $row_topic_reply['subject'],
-			'num_replies' => $row_topic_reply['num_replies'],
+			'subject' => censor($row_topic_reply['subject']),
+			'num_replies' => comma_format($row_topic_reply['num_replies']),
+			'post_percent' => round(($row_topic_reply['num_replies'] * 100) / $max_num_replies),
 			'num_views' => $row_topic_reply['num_views'],
 			'href' => $scripturl . '?topic=' . $row_topic_reply['id_topic'] . '.0',
 			'link' => '<a href="' . $scripturl . '?topic=' . $row_topic_reply['id_topic'] . '.0">' . $row_topic_reply['subject'] . '</a>'
 		);
-
-		if ($max_num_replies < $row_topic_reply['num_replies'])
-			$max_num_replies = $row_topic_reply['num_replies'];
 	}
 	$db->free_result($topic_reply_result);
 
-	// Calculate the percentages and final formatting of the number
-	foreach ($top_topics_replies as $i => $topic)
-	{
-		$top_topics_replies[$i]['post_percent'] = round(($topic['num_replies'] * 100) / $max_num_replies);
-		$top_topics_replies[$i]['num_replies'] = comma_format($top_topics_replies[$i]['num_replies']);
-	}
+	// @todo dedupe this
+	usort($top_topics_replies, function ($a, $b) {
+		return $b['num_replies'] <=> $a['num_replies'];
+	});
 
 	return $top_topics_replies;
 }
@@ -450,6 +424,7 @@ function topTopicStarter()
 
 	$db = database();
 	$members = array();
+	$top_starters = array();
 
 	// Try to cache this when possible, because it's a little unavoidably slow.
 	if (!Cache::instance()->getVar($members, 'stats_top_starters', 360) || empty($members))
@@ -458,61 +433,52 @@ function topTopicStarter()
 			SELECT id_member_started, COUNT(*) AS hits
 			FROM {db_prefix}topics' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 			WHERE id_board != {int:recycle_board}' : '') . '
-			GROUP BY id_member_started
-			ORDER BY hits DESC
-			LIMIT 20',
+			GROUP BY id_member_started',
 			array(
 				'recycle_board' => $modSettings['recycle_board'],
 			)
 		);
-		$members = array();
-		while ($row = $db->fetch_assoc($request))
-			$members[$row['id_member_started']] = $row['hits'];
+		while ($row = $db->fetch_row($request))
+			$members[$row[0]] = $row[1];
 		$db->free_result($request);
+		arsort($members);
+		$members = array_slice($members, 0, $modSettings['stats_limit'] ?? 10, true);
 
 		Cache::instance()->put('stats_top_starters', $members, 360);
 	}
+	$max_num_topics = max($members);
 
 	if (empty($members))
 		$members = array(0 => 0);
 
 	// Find the top starters of topics
-	$members_result = $db->query('top_topic_starters', '
+	$members_result = $db->query('7', '
 		SELECT id_member, real_name
 		FROM {db_prefix}members
-		WHERE id_member IN ({array_int:member_list})
-		ORDER BY FIND_IN_SET(id_member, {string:top_topic_posters})
-		LIMIT {int:topic_starter}',
+		WHERE id_member IN ({array_int:member_list})',
 		array(
 			'member_list' => array_keys($members),
-			'top_topic_posters' => implode(',', array_keys($members)),
-			'topic_starter' => isset($modSettings['stats_limit']) ? $modSettings['stats_limit'] : 10,
 		)
 	);
-	$top_starters = array();
-	$max_num_topics = 1;
 	while ($row_members = $db->fetch_assoc($members_result))
 	{
 		// Our array of spammers, er topic starters !
-		$top_starters[] = array(
+		$top_starters[$row_members['id_member']] = array(
 			'name' => $row_members['real_name'],
 			'id' => $row_members['id_member'],
-			'num_topics' => $members[$row_members['id_member']],
+			'num_topics' => comma_format($members[$row_members['id_member']]),
+			'post_percent' => round(($members[$row_members['id_member']] * 100) / $max_num_topics),
 			'href' => $scripturl . '?action=profile;u=' . $row_members['id_member'],
 			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row_members['id_member'] . '">' . $row_members['real_name'] . '</a>'
 		);
 
-		if ($max_num_topics < $members[$row_members['id_member']])
-			$max_num_topics = $members[$row_members['id_member']];
 	}
 	$db->free_result($members_result);
 
-	// Finish of with the determining the percentages
-	foreach ($top_starters as $i => $topic)
-	{
-		$top_starters[$i]['post_percent'] = round(($topic['num_topics'] * 100) / $max_num_topics);
-		$top_starters[$i]['num_topics'] = comma_format($top_starters[$i]['num_topics']);
-	}
+	// Even spammers must be orderly.
+	uksort($top_starters, function ($a, $b) use ($members) {
+		return $members[$b] <=> $members[$a];
+	});
 
 	return $top_starters;
 }
@@ -903,69 +869,56 @@ function UserStatsPostingTime($memID)
 {
 	global $user_info, $modSettings;
 
+	$posts_by_time = array();
+	$hours = array();
+	for ($hour = 0; $hour < 24; $hour++)
+	{
+		$posts_by_time[$hour] = array(
+			'hour' => $hour,
+			'hour_format' => stripos($user_info['time_format'], '%p') === false ? $hour : date('g a', mktime($hour)),
+			'posts' => 0,
+			'posts_percent' => 0,
+			'relative_percent' => 0,
+		);
+	}
+
 	$db = database();
 
 	// Find the times when the users posts
-	$result = $db->query('user_activity_by_time', '
+	$result = $db->query('', '
 		SELECT
-			HOUR(FROM_UNIXTIME(poster_time + {float:time_offset})) AS hour,
-			COUNT(*) AS post_count
+			poster_time
 		FROM {db_prefix}messages
 		WHERE id_member = {int:current_member}' . ($modSettings['totalMessages'] > 100000 ? '
-			AND id_topic > {int:top_ten_thousand_topics}' : '') . '
-		GROUP BY hour',
+			AND id_topic > {int:top_ten_thousand_topics}' : ''),
 		array(
 			'current_member' => $memID,
 			'top_ten_thousand_topics' => $modSettings['totalTopics'] - 10000,
-			'time_offset' => (($user_info['time_offset'] + $modSettings['time_offset']) * 3600),
 		)
 	);
-	$maxPosts = 0;
-	$realPosts = 0;
-	$posts_by_time = array();
-	while ($row = $db->fetch_assoc($result))
+	while (list ($poster_time) = $db->fetch_row($result))
 	{
 		// Cast as an integer to remove the leading 0.
-		$row['hour'] = (int) $row['hour'];
+		$hour = (int) standardTime($poster_time, '%H');
 
-		$maxPosts = max($row['post_count'], $maxPosts);
-		$realPosts += $row['post_count'];
+		if (!isset($hours[$hour]))
+			$hours[$hour] = 0;
 
-		// When they post, hour by hour
-		$posts_by_time[$row['hour']] = array(
-			'hour' => $row['hour'],
-			'hour_format' => stripos($user_info['time_format'], '%p') === false ? $row['hour'] : date('g a', mktime($row['hour'])),
-			'posts' => $row['post_count'],
-			'posts_percent' => 0,
-			'is_last' => $row['hour'] == 23,
-		);
+		$hours[$hour]++;
 	}
 	$db->free_result($result);
+	$maxPosts = max($hours);
+	$totalPosts = array_sum($hours);
 
-	// Clean it up some more
-	if ($maxPosts > 0)
+	foreach ($hours as $hour => $num)
 	{
-		for ($hour = 0; $hour < 24; $hour++)
-		{
-			if (!isset($posts_by_time[$hour]))
-				$posts_by_time[$hour] = array(
-					'hour' => $hour,
-					'hour_format' => stripos($user_info['time_format'], '%p') === false ? $hour : date('g a', mktime($hour)),
-					'posts' => 0,
-					'posts_percent' => 0,
-					'relative_percent' => 0,
-					'is_last' => $hour == 23,
-				);
-			else
-			{
-				$posts_by_time[$hour]['posts_percent'] = round(($posts_by_time[$hour]['posts'] * 100) / $realPosts);
-				$posts_by_time[$hour]['relative_percent'] = round(($posts_by_time[$hour]['posts'] * 100) / $maxPosts);
-			}
-		}
+		// When they post, hour by hour
+		$posts_by_time[$hour] = array_merge($posts_by_time[$hour], array(
+			'posts' => comma_format($num),
+			'posts_percent' => round(($num * 100) / $totalPosts),
+			'relative_percent' => round(($num * 100) / $maxPosts),
+		));
 	}
-
-	// Put it in the right order.
-	ksort($posts_by_time);
 
 	return $posts_by_time;
 }

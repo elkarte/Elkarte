@@ -74,6 +74,10 @@ function modifyCategory($category_id, $catOptions)
 						'current_category' => $cat,
 					)
 				);
+
+		// If the category order changed, so did the board order.
+		require_once(SUBSDIR . '/Boards.subs.php');
+		reorderBoards();
 	}
 
 	if (isset($catOptions['cat_name']))
@@ -232,6 +236,9 @@ function deleteCategories($categories, $moveBoardsTo = null)
 	// Log what we've done.
 	foreach ($categories as $category)
 		logAction('delete_cat', array('catname' => $cat_tree[$category]['node']['name']), 'admin');
+
+	// Get all boards back into the right order.
+	reorderBoards();
 }
 
 /**

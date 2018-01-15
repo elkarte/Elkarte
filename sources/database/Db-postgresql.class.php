@@ -129,9 +129,6 @@ class Database_PostgreSQL extends Database_Abstract
 
 		// Special queries that need processing.
 		$replacements = array(
-			'alter_table' => array(
-				'~(.+)~' => '',
-			),
 			'ban_suggest_error_ips' => array(
 				'~RLIKE~' => '~',
 				'~\\.~' => '\.',
@@ -143,17 +140,8 @@ class Database_PostgreSQL extends Database_Abstract
 			'consolidate_spider_stats' => array(
 				'~MONTH\(log_time\), DAYOFMONTH\(log_time\)~' => 'MONTH(CAST(CAST(log_time AS abstime) AS timestamp)), DAYOFMONTH(CAST(CAST(log_time AS abstime) AS timestamp))',
 			),
-			'display_get_post_poster' => array(
-				'~GROUP BY id_msg\s+HAVING~' => 'AND',
-			),
 			'attach_download_increase' => array(
 				'~LOW_PRIORITY~' => '',
-			),
-			'boardindex_fetch_boards' => array(
-				'~COALESCE\(lb.id_msg, 0\) >= b.id_msg_updated~' => 'CASE WHEN COALESCE(lb.id_msg, 0) >= b.id_msg_updated THEN 1 ELSE 0 END',
-			),
-			'get_random_number' => array(
-				'~RAND~' => 'RANDOM',
 			),
 			'insert_log_search_topics' => array(
 				'~NOT RLIKE~' => '!~',
@@ -166,12 +154,6 @@ class Database_PostgreSQL extends Database_Abstract
 			),
 			'pm_conversation_list' => array(
 				'~ORDER\\s+BY\\s+\\{raw:sort\\}~' => 'ORDER BY ' . (isset($db_values['sort']) ? ($db_values['sort'] === 'pm.id_pm' ? 'MAX(pm.id_pm)' : $db_values['sort']) : ''),
-			),
-			'top_topic_starters' => array(
-				'~ORDER BY FIND_IN_SET\(id_member,(.+?)\)~' => 'ORDER BY STRPOS(\',\' || $1 || \',\', \',\' || id_member|| \',\')',
-			),
-			'unread_replies' => array(
-				'~SELECT\\s+DISTINCT\\s+t.id_topic~' => 'SELECT t.id_topic, {raw:sort}',
 			),
 			'profile_board_stats' => array(
 				'~COUNT\(\*\) \/ MAX\(b.num_posts\)~' => 'CAST(COUNT(*) AS DECIMAL) / CAST(b.num_posts AS DECIMAL)',
@@ -628,22 +610,21 @@ class Database_PostgreSQL extends Database_Abstract
 
 			$inserted_results = 0;
 			$skip_error = $method == 'ignore' || $table === $db_prefix . 'log_errors';
-			foreach ($insertRows as $entry)
-			{
-				$this->_skip_error = $skip_error;
+			$this->_skip_error = $skip_error;
 
-				// Do the insert.
-				$this->query('', '
-					INSERT INTO ' . $table . '("' . implode('", "', $indexed_columns) . '")
-					VALUES
-						' . $entry,
-					array(
-						'security_override' => true,
-					),
-					$connection
-				);
-				$inserted_results += (!$this->_db_last_result ? 0 : pg_affected_rows($this->_db_last_result));
-			}
+			// Do the insert.
+			$this->query('', '
+				INSERT INTO ' . $table . '("' . implode('", "', $indexed_columns) . '")
+				VALUES
+				' . implode(',
+				', $insertRows),
+				array(
+					'security_override' => true,
+				),
+				$connection
+			);
+			$inserted_results += (!$this->_db_last_result ? 0 : pg_affected_rows($this->_db_last_result));
+
 			if (isset($db_replace_result))
 				$this->_db_replace_result = $db_replace_result + $inserted_results;
 		}

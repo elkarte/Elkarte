@@ -403,7 +403,7 @@ class Unread
 		else
 		{
 			$request = $this->_db->query('unread_replies', '
-				SELECT DISTINCT t.id_topic
+				SELECT t.id_topic, ' . $this->_sort_query . '
 				FROM {db_prefix}topics AS t
 					INNER JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic AND m.id_member = {int:current_member})' . (strpos($this->_sort_query, 'ms.') === false ? '' : '
 					INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)') . (strpos($this->_sort_query, 'mems.') === false ? '' : '

@@ -773,7 +773,7 @@ class Search
 
 			// Retrieve a list of possible members.
 			$request = $this->_db->query('', '
-				SELECT 
+				SELECT
 					id_member
 				FROM {db_prefix}members
 				WHERE {raw:match_possible_users}',
@@ -846,7 +846,7 @@ class Search
 		if (!empty($this->_search_params['topic']))
 		{
 			$request = $this->_db->query('', '
-				SELECT 
+				SELECT
 					b.id_board
 				FROM {db_prefix}topics AS t
 					INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
@@ -1194,7 +1194,7 @@ class Search
 				$count = 0;
 				foreach ($this->_excludedPhrases as $phrase)
 				{
-					$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:excluded_phrases_' . $count . '}';
+					$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? 'LIKE' : 'RLIKE') . ' {string:excluded_phrases_' . $count . '}';
 					$subject_query_params['excluded_phrases_' . ($count++)] = $this->_searchAPI->prepareWord($phrase, $this->noRegexp());
 				}
 			}
@@ -1498,7 +1498,7 @@ class Search
 	{
 		// Load the posters...
 		$request = $this->_db->query('', '
-			SELECT 
+			SELECT
 				id_member
 			FROM {db_prefix}messages
 			WHERE id_member != {int:no_member}
@@ -1678,8 +1678,8 @@ class Search
 				$count = 0;
 				foreach ($this->_excludedPhrases as $phrase)
 				{
-					$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:exclude_phrase_' . $count . '}';
-					$subject_query['where'][] = 'm.body NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:exclude_phrase_' . $count . '}';
+					$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? 'LIKE' : 'RLIKE') . ' {string:exclude_phrase_' . $count . '}';
+					$subject_query['where'][] = 'm.body NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? 'LIKE' : 'RLIKE') . ' {string:exclude_phrase_' . $count . '}';
 					$subject_query['params']['exclude_phrase_' . ($count++)] = $this->_searchAPI->prepareWord($phrase, $this->noRegexp());
 				}
 			}

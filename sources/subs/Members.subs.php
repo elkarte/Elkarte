@@ -895,7 +895,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 			'real_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(real_name)' : 'real_name',
 			'member_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(member_name)' : 'member_name',
 			'current_member' => $current_ID_MEMBER,
-			'check_name' => $checkName,
+			'check_name' => defined('DB_CASE_SENSITIVE') ? Util::strtolower($checkName) : $checkName,
 		)
 	);
 	if ($db->num_rows($request) > 0)
@@ -912,7 +912,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 		LIMIT 1',
 		array(
 			'group_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(group_name)' : 'group_name',
-			'check_name' => $checkName,
+			'check_name' => defined('DB_CASE_SENSITIVE') ? Util::strtolower($checkName) : $checkName,
 		)
 	);
 	if ($db->num_rows($request) > 0)
