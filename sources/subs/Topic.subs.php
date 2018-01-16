@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -851,34 +851,28 @@ function moveTopics($topics, $toBoard, $log = false)
  * Called after a topic is moved to update $board_link and $topic_link to point
  * to new location
  *
- * @param null|int $move_from The board the topic belongs to
- * @param null|int $id_board The "current" board
- * @param null|int $id_topic The topic id
+ * @param int $move_from The board the topic belongs to
+ * @param int $id_board The "current" board
+ * @param int $id_topic The topic id
  *
  * @return bool
  * @throws Elk_Exception topic_already_moved
  */
-function moveTopicConcurrence($move_from = null, $id_board = null, $id_topic = null)
+function moveTopicConcurrence($move_from, $id_board, $id_topic)
 {
 	global $scripturl;
-	// @deprecated since 1.1
-	global $board, $topic;
 
 	$db = database();
 
-	// @deprecated since 1.1
-	if ($move_from === null && isset($_GET['current_board']))
-		$move_from = (int) $_GET['current_board'];
-	if ($id_board === null && !empty($board))
-		$id_board = $board;
-	if ($id_topic === null && !empty($topic))
-		$id_topic = $topic;
-
 	if (empty($move_from) || empty($id_board) || empty($id_topic))
+	{
 		return true;
+	}
 
 	if ($move_from == $id_board)
+	{
 		return true;
+	}
 	else
 	{
 		$request = $db->query('', '
@@ -1908,13 +1902,6 @@ function setTopicAttribute($topic, $attributes)
 	$update = array();
 	foreach ($attributes as $key => $attr)
 	{
-		// @deprecated since 1.1 - kept for backward compatibility
-		if ($key == 'sticky')
-		{
-			$key = 'is_sticky';
-			$attributes['is_sticky'] = $attr;
-		}
-
 		$attributes[$key] = (int) $attr;
 		$update[] = '
 				' . $key . ' = {int:' . $key . '}';
@@ -2175,12 +2162,11 @@ function getTopicsPostsAndPoster($topic, $limit, $sort)
 		'all_posters' => array(),
 	);
 
-	$request = $db->query('display_get_post_poster', '
+	$request = $db->query('', '
 		SELECT id_msg, id_member, approved
 		FROM {db_prefix}messages
 		WHERE id_topic = {int:current_topic}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-		GROUP BY id_msg
-		HAVING (approved = {int:is_approved}' . ($user_info['is_guest'] ? '' : ' OR id_member = {int:current_member}') . ')') . '
+			AND (approved = {int:is_approved}' . ($user_info['is_guest'] ? '' : ' OR id_member = {int:current_member}') . ')') . '
 		ORDER BY id_msg ' . ($sort ? '' : 'DESC') . ($limit['messages_per_page'] == -1 ? '' : '
 		LIMIT ' . $limit['start'] . ', ' . $limit['offset']),
 		array(

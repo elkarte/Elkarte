@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -383,9 +383,7 @@ class Recent_Controller extends Action_Controller
 		if (!empty($modSettings['likes_enabled']))
 		{
 			// Just the message id please
-			$messages = array_map(function ($element) {
-				return (int) $element['id'];
-			}, $messages);
+			$messages = array_column($messages, 'id');
 
 			require_once(SUBSDIR . '/Likes.subs.php');
 			$likes = loadLikes($messages, true);

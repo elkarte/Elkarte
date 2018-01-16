@@ -1350,6 +1350,10 @@ div.bbc_footnotes .meaction {
 	border-color: #CCCCCC;
 }
 
+#elk_lb_expand:before {
+	color: #CCCCCC;
+}
+
 .new_post_separator {
 	display: block;
 }

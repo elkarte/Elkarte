@@ -7,7 +7,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  */
 
 /**
@@ -417,13 +417,6 @@ function submitThisOnce(oControl, bReadOnly)
 	return !elk_formSubmitted;
 }
 
-// @deprecated since 1.0 - innerHTML is supported everywhere.
-function setInnerHTML(oElement, sToValue)
-{
-	if (oElement)
-		oElement.innerHTML = sToValue;
-}
-
 function getInnerHTML(oElement)
 {
 	if (oElement)
@@ -630,41 +623,6 @@ function hashModeratePassword(doForm, username, cur_session_id, token)
 
 	doForm.moderate_hash_pass.value = hex_sha256(username.php_strtolower() + doForm.moderate_pass.value);
 	doForm.moderate_pass.value = doForm.moderate_pass.value.replace(/./g, '*');
-}
-
-/**
- * Shows the page numbers by clicking the dots (in compact view).
- * @todo @DEPRECATED it is not used. If we don't care about compatibility it can be removed
- *
- * @param {HTMLElement} spanNode
- * @param {string} baseURL
- * @param {int} firstPage
- * @param {int} lastPage
- * @param {int} perPage
- */
-function expandPages(spanNode, baseURL, firstPage, lastPage, perPage)
-{
-	var replacement = '',
-		i = 0,
-		oldLastPage = 0,
-		perPageLimit = 50;
-
-	// Prevent too many pages to be loaded at once.
-	if ((lastPage - firstPage) / perPage > perPageLimit)
-	{
-		oldLastPage = lastPage;
-		lastPage = firstPage + perPageLimit * perPage;
-	}
-
-	// Calculate the new pages.
-	for (i = firstPage; i < lastPage; i += perPage)
-		replacement += '<a class="navPages" href="' + baseURL.replace(/%1\$d/, i).replace(/%%/g, '%') + '">' + (1 + i / perPage) + '</a> ';
-
-	if (oldLastPage > 0)
-		replacement += '<span class="expand_pages" role="menuitem" onclick="expandPages(this, \'' + baseURL + '\', ' + lastPage + ', ' + oldLastPage + ', ' + perPage + ');"> ... </span> ';
-
-	// Replace the dots by the new page links.
-	setOuterHTML(spanNode, replacement);
 }
 
 /**
@@ -1438,32 +1396,13 @@ function elk_prepareScriptUrl(sUrl)
 /**
  * Load Event function, adds new events to the window onload control
  *
- * @param {object} fNewOnload function object or string to call
+ * @param {object} fNewOnload function object to call
+ *
+ * @deprecated aince 2.0; use window.addEventListener("load", fNewOnload)
  */
-var aOnloadEvents = [];
 function addLoadEvent(fNewOnload)
 {
-	// If there's no event set, just set this one
-	if (typeof(fNewOnload) === 'function' && (!('onload' in window) || typeof(window.onload) !== 'function'))
-		window.onload = fNewOnload;
-	// If there's just one event, setup the array.
-	else if (aOnloadEvents.length === 0)
-	{
-		aOnloadEvents[0] = window.onload;
-		aOnloadEvents[1] = fNewOnload;
-		window.onload = function() {
-			for (var i = 0, n = aOnloadEvents.length; i < n; i++)
-			{
-				if (typeof(aOnloadEvents[i]) === 'function')
-					aOnloadEvents[i]();
-				else if (typeof(aOnloadEvents[i]) === 'string')
-					eval(aOnloadEvents[i]);
-			}
-		};
-	}
-	// This isn't the first event function, add it to the list.
-	else
-		aOnloadEvents[aOnloadEvents.length] = fNewOnload;
+	window.addEventListener("load", fNewOnload);
 }
 
 /**

@@ -11,7 +11,7 @@
  * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  * license:    BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  *
  * Adding options to one of the setting screens isn't hard.
@@ -71,6 +71,11 @@ class Settings_Form
 	const FILE_ADAPTER = 'ElkArte\\sources\\subs\\SettingsFormAdapter\\File';
 
 	/**
+	 * @var ElkArte\sources\subs\SettingsFormAdapter\Adapter
+	 */
+	private $adapter;
+
+	/**
 	 * @return array
 	 */
 	public function getConfigVars()
@@ -103,11 +108,6 @@ class Settings_Form
 	}
 
 	/**
-	 * @var ElkArte\sources\subs\SettingsFormAdapter\Adapter
-	 */
-	private $adapter;
-
-	/**
 	 * @param string|null $adapter Will default to the file adapter if none is specified.
 	 */
 	public function __construct($adapter = null)
@@ -126,38 +126,18 @@ class Settings_Form
 	}
 
 	/**
-	 * @deprecated since 1.1
+	 * This method reaads the settings and prepares them for
+	 * display within the template.
+	 *
+	 * It will read either Settings.php or the settings table
+	 * according to the adapter specified in the constructor.
+	 *
+	 * Creates the token `admin-ssc`
 	 */
-	public function prepare_file()
-	{
-		if (!$this->adapter instanceof ElkArte\sources\subs\SettingsFormAdapter\File)
-		{
-			$this->adapter = new ElkArte\sources\subs\SettingsFormAdapter\File;
-		}
-		$this->prepare();
-	}
-
 	public function prepare()
 	{
 		createToken('admin-ssc');
 		$this->adapter->prepare();
-	}
-
-	/**
-	 * Helper method, it sets up the context for database settings.
-	 *
-	 * @deprecated since 1.1
-	 *
-	 * @param mixed[] $configVars
-	 */
-	public static function prepare_db(array $configVars)
-	{
-		global $modSettings;
-
-		$settingsForm = new self(self::DB_ADAPTER);
-		$settingsForm->setConfigVars($configVars);
-		$settingsForm->setConfigValues($modSettings);
-		$settingsForm->prepare();
 	}
 
 	/**
@@ -166,101 +146,12 @@ class Settings_Form
 	 * It will put them in Settings.php or in the settings table
 	 * according to the adapter specified in the constructor.
 	 *
-	 * May read from $_POST to retain backwards compatibility.
-	 * Some older controller may have modified this superglobal,
-	 * and HttpReq does not contain the newly modified information.
+	 * Validates the token `admin-ssc`
 	 */
 	public function save()
 	{
 		validateToken('admin-ssc');
 
-		// Retain backwards compatibility
-		$configValues = $this->getConfigValues();
-		if (empty($configValues))
-		{
-			$this->setConfigValues($_POST);
-		}
 		$this->adapter->save();
-	}
-
-	/**
-	 * Helper method for saving settings.
-	 *
-	 * Uses $_POST because the controller may have modified this superglobal,
-	 * and HttpReq does not contain the newly modified information.
-	 *
-	 * @deprecated since 1.1
-	 *
-	 * @param mixed[] $configVars
-	 */
-	public static function save_file(array $configVars)
-	{
-		$settingsForm = new self;
-		$settingsForm->setConfigVars($configVars);
-		$settingsForm->setConfigValues($_POST);
-		$settingsForm->save();
-	}
-
-	/**
-	 * Helper method for saving database settings.
-	 *
-	 * Uses $_POST because the controller may have modified it,
-	 * and HttpReq does not contain the newly modified information.
-	 *
-	 * @deprecated since 1.1
-	 *
-	 * @param array        $configVars
-	 * @param array|object $configValues
-	 */
-	public static function save_db(array $configVars, $configValues = array())
-	{
-		// Just look away if you have a weak stomach
-		if ($configValues !== null)
-		{
-			$configValues = array_replace($_POST, (array) $configValues);
-		}
-		else
-		{
-			$configValues = $_POST;
-		}
-		$settingsForm = new self(self::DB_ADAPTER);
-		$settingsForm->setConfigVars($configVars);
-		$settingsForm->setConfigValues($configValues);
-		$settingsForm->save();
-	}
-
-	/**
-	 * Method which retrieves or sets new configuration variables.
-	 *
-	 * If the $configVars parameter is sent, the method tries to update
-	 * the internal configuration of the Settings_Form instance.
-	 *
-	 * If the $configVars parameter is not sent (is null), the method
-	 * simply returns the current configuration set.
-	 *
-	 *  The array is formed of:
-	 *  - either, variable name, description, type (constant), size/possible values, helptext.
-	 *  - either, an empty string for a horizontal rule.
-	 *  - or, a string for a titled section.
-	 *
-	 * @deprecated since 1.1
-	 *
-	 * @param mixed[]|null $configVars = null array of config vars, if null the method returns the current
-	 *                                  configuration
-	 */
-	public function settings(array $configVars = null)
-	{
-		if (is_null($configVars))
-		{
-			// Simply return the config vars we have
-			return $this->adapter->getConfigVars();
-		}
-		else
-		{
-			// We got presents :P
-			$this->adapter->setConfigVars(is_array($configVars) ? $configVars : array($configVars));
-
-			return $this->adapter->getConfigVars();
-		}
 	}
 }

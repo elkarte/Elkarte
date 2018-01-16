@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -154,7 +154,7 @@ class Attachment_Controller extends Action_Controller
 					{
 						$resp_data = array(
 							'name' => $val['name'],
-							'attachid' => $attachID,
+							'attachid' => $val['public_attachid'],
 							'size' => $val['size']
 						);
 					}
@@ -204,7 +204,9 @@ class Attachment_Controller extends Action_Controller
 			{
 				require_once(SUBSDIR . '/Attachments.subs.php');
 
-				$result = removeTempAttachById($this->_req->post->attachid);
+				$attachId = getAttachmentIdFromPublic($this->_req->post->attachid);
+
+				$result = removeTempAttachById($attachId);
 				if ($result === true)
 				{
 					$context['json_data'] = array('result' => true);
@@ -298,7 +300,7 @@ class Attachment_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Temporary attachment, special case...
-		if (isset($this->_req->query->attach) && strpos($this->_req->query->attach, 'post_tmp_' . $user_info['id']) !== false)
+		if (isset($this->_req->query->attach) && strpos($this->_req->query->attach, 'post_tmp_' . $user_info['id'] . '_') !== false)
 		{
 			$this->action_tmpattach();
 			return;
@@ -418,7 +420,7 @@ class Attachment_Controller extends Action_Controller
 		$eTag = '"' . substr($id_attach . $real_filename . @filemtime($filename), 0, 64) . '"';
 		$use_compression = !empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java'));
 		$disposition = !isset($this->_req->query->image) ? 'attachment' : 'inline';
-		$do_cache = false === (!isset($this->_req->query->image) && in_array($file_ext, array('gif', 'jpg', 'bmp', 'png', 'jpeg', 'tiff')));
+		$do_cache = false === (!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '');
 
 		// Make sure the mime type warrants an inline display.
 		if (isset($this->_req->query->image) && !empty($mime_type) && strpos($mime_type, 'image/') !== 0)
@@ -427,7 +429,7 @@ class Attachment_Controller extends Action_Controller
 			$mime_type = '';
 		}
 		// Does this have a mime type?
-		elseif (empty($mime_type) || !(isset($this->_req->query->image) || !in_array($file_ext, array('jpg', 'gif', 'jpeg', 'x-ms-bmp', 'png', 'psd', 'tiff', 'iff'))))
+		elseif (empty($mime_type) || !(isset($this->_req->query->image) || getValidMimeImageType($file_ext) === ''))
 		{
 			$mime_type = '';
 			if (isset($this->_req->query->image))
@@ -552,7 +554,7 @@ class Attachment_Controller extends Action_Controller
 
 		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
 		$use_compression = !empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java'));
-		$do_cache = false === (!isset($this->_req->query->image) && in_array($file_ext, array('gif', 'jpg', 'bmp', 'png', 'jpeg', 'tiff')));
+		$do_cache = false === (!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '');
 
 		$this->_send_headers($filename, $eTag, $mime_type, $use_compression, 'inline', $real_filename, $do_cache);
 

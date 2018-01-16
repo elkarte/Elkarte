@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -1209,7 +1209,6 @@ class Install_Controller
 
 		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberStats();
-		require_once(SUBSDIR . '/Messages.subs.php');
 		updateMessageStats();
 		require_once(SUBSDIR . '/Topic.subs.php');
 		updateTopicStats();
@@ -1225,7 +1224,9 @@ class Install_Controller
 		);
 
 		if ($db->num_rows($request) > 0)
-			updateStats('subject', 1, htmlspecialchars($txt['default_topic_subject']));
+		{
+			updateSubjectStats(1, htmlspecialchars($txt['default_topic_subject']));
+		}
 		$db->free_result($request);
 
 		// Sanity check that they loaded earlier!

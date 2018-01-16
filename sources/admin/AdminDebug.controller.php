@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -86,16 +86,5 @@ class AdminDebug_Controller extends Action_Controller
 
 		$context['sub_template'] = 'viewquery';
 		$context['queries_data'] = $debug->viewQueries($query_id);
-	}
-
-	/**
-	 * Get admin information from the database.
-	 * Accessed by ?action=viewadminfile.
-	 *
-	 * @deprecated since 1.1 - the action has been removed
-	 */
-	public function action_viewadminfile()
-	{
-		throw new Elk_Exception('no_access', false);
 	}
 }

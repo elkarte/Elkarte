@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -22,8 +22,33 @@ namespace ElkArte\sources\subs\SessionHandler;
  *
  * @package ElkArte\sources\subs\SessionHandler
  */
-class DatabaseHandler extends SessionHandler
+class DatabaseHandler extends \SessionHandler
 {
+	/**
+	 * The database object
+	 * @var database
+	 */
+	protected $_db = null;
+
+	/**
+	 * The modSettings
+	 * @var object
+	 */
+	protected $_modSettings = array();
+
+	/**
+	 * Make "global" items available to the class
+	 *
+	 * @param object|null $db
+	 */
+	public function __construct($db = null)
+	{
+		global $modSettings;
+
+		$this->_db = $db ?: database();
+		$this->_modSettings = new \ElkArte\ValuesContainer($modSettings ?: array());
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */

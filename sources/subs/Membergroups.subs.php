@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -1204,35 +1204,6 @@ function getMaxGroupID()
 /**
  * Adds a new group to the membergroups table.
  *
- * @deprecated since 1.1 RC2 - use createMembergroup instead
- *
- * @package Membergroups
- * @param int $id_group
- * @param string $groupname
- * @param int $minposts
- * @param string $type
- */
-function addMembergroup($id_group, $groupname, $minposts, $type)
-{
-	$db = database();
-
-	$db->insert('',
-		'{db_prefix}membergroups',
-		array(
-			'id_group' => 'int', 'description' => 'string', 'group_name' => 'string-80', 'min_posts' => 'int',
-			'icons' => 'string', 'online_color' => 'string', 'group_type' => 'int',
-		),
-		array(
-			$id_group, '', Util::htmlspecialchars($groupname, ENT_QUOTES), $minposts,
-			'1#icon.png', '', $type,
-		),
-		array('id_group')
-	);
-}
-
-/**
- * Adds a new group to the membergroups table.
- *
  * @package Membergroups
  * @param string $groupname
  * @param int $minposts
@@ -2016,8 +1987,6 @@ function deleteGroupRequests($groups)
 /**
  * This function updates those members who match post-based
  * membergroups in the database (restricted by parameter $members).
- *
- * - Used by updateStats('postgroups').
  *
  * @package Membergroups
  * @param int[]|null $members = null The members to update, null if all

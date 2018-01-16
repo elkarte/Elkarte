@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -271,9 +271,7 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 
 		$context['poll']['question'] = isset($_REQUEST['question']) ? Util::htmlspecialchars(trim($_REQUEST['question'])) : '';
 
-		$context['choices'] = $context['poll']['choices'] = array();
-		// @deprecated since 1.1 - backward compatibility with 1.0
-		$context['choices'] &= $context['poll']['choices'];
+		$context['poll']['choices'] = array();
 		$choice_id = 0;
 
 		$_POST['options'] = empty($_POST['options']) ? array() : htmlspecialchars__recursive($_POST['options']);

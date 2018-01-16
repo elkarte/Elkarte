@@ -5,7 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -32,6 +32,7 @@ class Ila_Integrate
 		return array(
 			array('integrate_additional_bbc', 'Ila_Integrate::integrate_additional_bbc'),
 			array('integrate_before_prepare_display_context', 'Ila_Integrate::integrate_before_prepare_display_context'),
+			array('integrate_post_bbc_parser', 'Ila_Integrate::integrate_post_parser')
 		);
 	}
 
@@ -46,6 +47,19 @@ class Ila_Integrate
 		return array(
 			array('integrate_modify_attachment_settings', 'Ila_Integrate::integrate_modify_attachment_settings'),
 		);
+	}
+
+	/**
+	 * After parse is done, we need to sub in the message id for proper lightbox navigation
+	 *
+	 * @param string $message
+	 */
+	public static function integrate_post_parser(&$message)
+	{
+		global $context;
+
+		$lighbox_message = 'data-lightboxmessage="' . (!empty($context['id_msg']) ? $context['id_msg'] : '0') . '"';
+		$message = str_replace('data-lightboxmessage="0"', $lighbox_message, $message);
 	}
 
 	/**
@@ -65,6 +79,10 @@ class Ila_Integrate
 			'html' => 1,
 			'php' => 1,
 		);
+
+		// Why enable it to disable the tags, oh well
+		$disabledBBC = empty($modSettings['disabledBBC']) ? array() : explode(',', $modSettings['disabledBBC']);
+		$disableAttach = in_array('attach', $disabledBBC);
 
 		// Want to see them in quotes eh?
 		if (!empty($modSettings['attachment_inline_quotes']))
@@ -94,8 +112,8 @@ class Ila_Integrate
 						\BBC\Codes::PARAM_ATTR_MATCH => '(right|left|center)',
 					),
 				),
-				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1{width}{height}" alt="" class="bbc_img {align}" /></a>',
-				\BBC\Codes::ATTR_VALIDATE => self::validate_options(),
+				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1{width}{height}" alt="" class="bbc_img {align}" /></a>',
+				\BBC\Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_options(),
 				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
 				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
@@ -122,8 +140,8 @@ class Ila_Integrate
 						\BBC\Codes::PARAM_ATTR_MATCH => '(right|left|center)',
 					),
 				),
-				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1{height}{width}" alt="" class="bbc_img {align}" /></a>',
-				\BBC\Codes::ATTR_VALIDATE => self::validate_options(),
+				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1{height}{width}" alt="" class="bbc_img {align}" /></a>',
+				\BBC\Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_options(),
 				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
 				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
@@ -141,8 +159,8 @@ class Ila_Integrate
 						\BBC\Codes::PARAM_ATTR_MATCH => '(right|left|center)',
 					),
 				),
-				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1;thumb" alt="" class="bbc_img {align}" /></a>',
-				\BBC\Codes::ATTR_VALIDATE => self::validate_options(),
+				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1;thumb" alt="" class="bbc_img {align}" /></a>',
+				\BBC\Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_options(),
 				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
 				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
@@ -154,7 +172,7 @@ class Ila_Integrate
 				\BBC\Codes::ATTR_TAG => 'attach',
 				\BBC\Codes::ATTR_TYPE => \BBC\Codes::TYPE_UNPARSED_CONTENT,
 				\BBC\Codes::ATTR_CONTENT => '$1',
-				\BBC\Codes::ATTR_VALIDATE => self::validate_plain(),
+				\BBC\Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_plain(),
 				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
 				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
@@ -167,7 +185,7 @@ class Ila_Integrate
 				\BBC\Codes::ATTR_TYPE => \BBC\Codes::TYPE_UNPARSED_CONTENT,
 				\BBC\Codes::ATTR_CONTENT => '$1',
 				\BBC\Codes::ATTR_VALIDATE => self::validate_url(),
-				\BBC\Codes::ATTR_DISALLOW_PARENTS => array('code' => 1, 'nobbc' => 1, 'php' => 1),
+				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
 				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
 				\BBC\Codes::ATTR_AUTOLINK => false,
@@ -297,17 +315,20 @@ class Ila_Integrate
 	 */
 	public static function validate_url()
 	{
-		global $user_info, $scripturl;
+		global $user_info, $scripturl, $context;
 
-		return function (&$tag, &$data, $disabled) use ($user_info, $scripturl)
+		return function (&$tag, &$data, $disabled) use ($user_info, $scripturl, &$context)
 		{
-			global $context;
+			if (isset($disabled['attach']))
+			{
+				return $data;
+			}
 
 			$num = $data;
 			$attachment = false;
 
 			// Not a preview, then sanitize the attach id and determine the details
-			if (strpos($data, 'post_tmp_' . $user_info['id']) === false)
+			if (strpos($data, 'post_tmp_' . $user_info['id'] . '_') === false)
 			{
 				require_once(SUBSDIR . '/Attachments.subs.php');
 
@@ -345,15 +366,18 @@ class Ila_Integrate
 	 */
 	public static function validate_plain()
 	{
-		global $user_info, $scripturl;
+		global $user_info, $scripturl, $context;
 
-		return function (&$tag, &$data, $disabled) use ($user_info, $scripturl)
+		return function (&$tag, &$data, $disabled) use ($user_info, $scripturl, &$context)
 		{
-			global $context;
+			if (isset($disabled['attach']))
+			{
+				return $data;
+			}
 
 			$num = $data;
 			$is_image = array();
-			$preview = strpos($data, 'post_tmp_' . $user_info['id']);
+			$preview = strpos($data, 'post_tmp_' . $user_info['id'] . '_');
 
 			// Not a preview, then sanitize the attach id and determine the actual type
 			if ($preview === false)
@@ -367,7 +391,7 @@ class Ila_Integrate
 			// An image will get the light box treatment
 			if (!empty($is_image['is_image']) || $preview !== false)
 			{
-				$data = '<a id="link_' . $num . '" data-lightboximage="' . $num . '" href="' . $scripturl . '?action=dlattach;attach=' . $num . ';image' . '"><img src="' . $scripturl . '?action=dlattach;attach=' . $num . ';thumb" alt="" class="bbc_img" /></a>';
+				$data = '<a id="link_' . $num . '" data-lightboximage="' . $num . '" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=' . $num . ';image' . '"><img src="' . $scripturl . '?action=dlattach;attach=' . $num . ';thumb" alt="" class="bbc_img" /></a>';
 			}
 			else
 			{
@@ -398,14 +422,12 @@ class Ila_Integrate
 	 */
 	public static function validate_options()
 	{
-		global $user_info;
+		global $user_info, $scripturl, $context;
 
-		return function (&$tag, &$data, $disabled) use ($user_info)
+		return function (&$tag, &$data, $disabled) use ($user_info, $scripturl, &$context)
 		{
-			global $context;
-
 			// Not a preview, then sanitize the attach id
-			if (strpos($data, 'post_tmp_' . $user_info['id']) === false)
+			if (strpos($data, 'post_tmp_' . $user_info['id'] . '_') === false)
 			{
 				$data = (int) $data;
 			}

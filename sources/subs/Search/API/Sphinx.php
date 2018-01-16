@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -35,7 +35,7 @@ class Sphinx extends SearchAPI
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
 	 * @var string
 	 */
-	public $version_compatible = 'ElkArte 1.1';
+	public $version_compatible = 'ElkArte 2.0 dev';
 
 	/**
 	 * This won't work with versions of ElkArte less than this.
@@ -81,26 +81,6 @@ class Sphinx extends SearchAPI
 		}
 
 		parent::__construct();
-	}
-
-	/**
-	 * Check whether the method can be performed by this API.
-	 *
-	 * @deprecated since 1.1 - check that the method is callable
-	 *
-	 * @param string $methodName The search method
-	 * @param mixed[]|null $query_params Parameters for the query
-	 */
-	public function supportsMethod($methodName, $query_params = null)
-	{
-		switch ($methodName)
-		{
-			case 'searchQuery':
-				// Search can be performed, but not for 'subject only' query.
-				return !$query_params['subject_only'];
-			default:
-				return is_callable(array($this, $methodName));
-		}
 	}
 
 	/**

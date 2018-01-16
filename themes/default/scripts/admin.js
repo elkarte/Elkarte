@@ -7,7 +7,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  */
 
 /**
@@ -55,11 +55,9 @@ elk_AdminIndex.prototype.init = function ()
 {
 	window.adminIndexInstanceRef = this;
 
-	var fHandlePageLoaded = function () {
+	window.addEventListener("load", function () {
 		window.adminIndexInstanceRef.loadAdminIndex();
-	};
-
-	addLoadEvent(fHandlePageLoaded);
+	});
 };
 
 elk_AdminIndex.prototype.loadAdminIndex = function ()
@@ -270,10 +268,9 @@ elk_ViewVersions.prototype.init = function ()
 {
 	// Load this on loading of the page.
 	window.viewVersionsInstanceRef = this;
-	var fHandlePageLoaded = function () {
+	window.addEventListener("load", function () {
 		window.viewVersionsInstanceRef.loadViewVersions();
-	};
-	addLoadEvent(fHandlePageLoaded);
+	});
 };
 
 // Load all the file versions
@@ -411,12 +408,10 @@ elk_ViewVersions.prototype.determineVersions = function ()
 		oSectionLink = document.getElementById(sSections[i] + '-link');
 		if (typeof(oSectionLink) === 'object' && oSectionLink !== null)
 		{
-			oSectionLink.instanceRef = this;
-			oSectionLink.sSection = sSections[i];
-			oSectionLink.onclick = function () {
-				this.instanceRef.swapOption(this, this.sSection);
+			oSectionLink.onclick = function (oEvent) {
+				this.swapOption(oEvent.target, oEvent.target.id.split('-')[0]);
 				return false;
-			};
+			}.bind(this);
 		}
 	}
 
@@ -1042,10 +1037,7 @@ $(function() {
 function toggleCache ()
 {
 	var memcache = $('#cache_memcached').parent(),
-		cachedir = $('#cachedir').parent(),
-		cacheuid = $('#cache_uid').parent(),
-		cachepassword = $('#cache_password').parent(),
-		cacheconfirm = $('#cache_password_confirm').parent();
+		cachedir = $('#cachedir').parent();
 
 	// Show the memcache server box only if memcache has been selected
 	if (cache_type.value.substr(0, 8) !== "memcache")
@@ -1069,26 +1061,6 @@ function toggleCache ()
 	{
 		cachedir.slideUp(100);
 		cachedir.prev().slideUp(100);
-	}
-
-	// right now only xcache needs the uid/password
-	if (cache_type.value === "xcache")
-	{
-		cacheuid.slideDown(100);
-		cacheuid.prev().slideDown(100);
-		cachepassword.slideDown(100);
-		cachepassword.prev().slideDown(100);
-		cacheconfirm.slideDown(100);
-		cacheconfirm.prev().slideDown(100);
-	}
-	else
-	{
-		cacheuid.slideUp(100);
-		cacheuid.prev().slideUp(100);
-		cachepassword.slideUp(100);
-		cachepassword.prev().slideUp(100);
-		cacheconfirm.slideUp(100);
-		cacheconfirm.prev().slideUp(100);
 	}
 }
 

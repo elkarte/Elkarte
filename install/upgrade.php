@@ -9,7 +9,7 @@
  * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  * license:    BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -464,11 +464,6 @@ function loadEssentialData()
 {
 	global $db_character_set, $db_type, $modSettings;
 
-	// Do the non-SSI stuff...
-	if (function_exists('set_magic_quotes_runtime'))
-	{
-		@set_magic_quotes_runtime(0);
-	}
 	error_reporting(E_ALL);
 
 	if (!defined('ELK'))
@@ -1658,7 +1653,7 @@ function parse_sql($filename)
 				echo ' +++ ' . $upcontext['current_debug_item_name'];
 			}
 
-			$action['function']($db_wrapper, $db_table_wrapper);
+			$action['function']();
 
 			// Small step - only if we're actually doing stuff.
 			if ($do_current)

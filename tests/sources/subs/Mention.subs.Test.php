@@ -6,7 +6,7 @@
  * WARNING. These tests work directly with the local database. Don't run
  * them if you need to keep your data untouched!
  */
-class TestMentions extends PHPUnit_Framework_TestCase
+class TestMentions extends \PHPUnit\Framework\TestCase
 {
 	protected $_posterOptions = null;
 
@@ -168,8 +168,11 @@ class TestMentions extends PHPUnit_Framework_TestCase
 	 */
 	public function testReadMention()
 	{
+		global $modSettings;
+
+		$mentioning = new Mentioning(database(), new Data_Validator, $modSettings['enabled_mentions']);
 		// Mark mention 2 as read
-		$result = changeMentionStatus(2, 1);
+		$result = $mentioning->markread(2);
 
 		$this->assertTrue($result);
 	}

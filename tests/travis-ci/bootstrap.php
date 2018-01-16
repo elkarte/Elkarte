@@ -9,7 +9,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -72,7 +72,16 @@ cleanRequest();
 loadDatabase();
 Hooks::init(database(), Debug::instance());
 reloadSettings();
-elk_seed_generator();
+/**
+ * This next line is pointless, but without that tests fail in postgre.
+ * I don't know why, so I'll opne an issue, but for the moment,
+ * just for the sake of dropping the deprecated code and move on i'll
+ * leave this updateSettings here.
+ */
+updateSettings(array('something' => 123));
+/**
+ * End of pointless line
+ */
 loadSession();
 loadUserSettings();
 loadBoard();

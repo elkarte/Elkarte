@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -110,7 +110,7 @@ class Pbe_Imap extends AbstractModel
 		if (!empty($emails))
 		{
 			// Initialize Emailpost controller
-			$controller = new Emailpost_Controller();
+			$controller = new Emailpost_Controller(new Event_manager());
 
 			// Make sure we work from the oldest to the newest message
 			sort($emails);

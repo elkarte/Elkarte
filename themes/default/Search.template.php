@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -150,8 +150,7 @@ function template_searchform()
 		createEventListener(window);
 		window.addEventListener("load", initSearch, false);
 
-		var oAddMemberSuggest = new smc_AutoSuggest({
-			sSelf: \'oAddMemberSuggest\',
+		new smc_AutoSuggest({
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
 			sControlId: \'userspec\',

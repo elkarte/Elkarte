@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -110,22 +110,5 @@ function addMessageIcon($icon)
 		array('id_board' => 'int', 'title' => 'string-80', 'filename' => 'string-80', 'icon_order' => 'int'),
 		$icon,
 		array('id_icon')
-	);
-}
-
-/**
- * Sort the message icons table.
- *
- * @deprecated since 1.0 - the ordering is done in the query, probably not needed
- */
-function sortMessageIconTable()
-{
-	$db = database();
-
-	$db->skip_next_error();
-	$db->query('alter_table', '
-		ALTER TABLE {db_prefix}message_icons
-		ORDER BY icon_order',
-		array()
 	);
 }

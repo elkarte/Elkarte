@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -21,6 +21,12 @@ class DbSearch_MySQL implements DbSearch
 	 * @var DbSearch_MySQL
 	 */
 	private static $_search = null;
+
+	/**
+	 * The way to skip a database error
+	 * @var boolean
+	 */
+	protected $_skip_error = false;
 
 	/**
 	 * This method will tell you whether this database type supports this search type.
@@ -46,8 +52,22 @@ class DbSearch_MySQL implements DbSearch
 	{
 		$db = database();
 
+		if ($this->_skip_error === true)
+		{
+			$db->skip_next_error();
+			$this->_skip_error = false;
+		}
+
 		// Simply delegate to the database adapter method.
 		return $db->query($identifier, $db_string, $db_values, $connection);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function skip_next_error()
+	{
+		$this->_skip_error = true;
 	}
 
 	/**

@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 2.0 dev
  */
 
 namespace ElkArte\Search\API;
@@ -81,20 +81,6 @@ abstract class SearchAPI
 	protected function _getMinWordLength()
 	{
 		return 3;
-	}
-
-	/**
-	 * Method to check whether the method can be performed by the API.
-	 *
-	 * @deprecated since 1.1 - check that the method is callable
-	 *
-	 * @param string $methodName
-	 * @param string|null $query_params
-	 * @return boolean
-	 */
-	public function supportsMethod($methodName, $query_params = null)
-	{
-		return is_callable(array($this, $methodName));
 	}
 
 	/**

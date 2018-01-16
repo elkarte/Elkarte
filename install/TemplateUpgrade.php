@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -578,7 +578,7 @@ function template_welcome_message()
 				}
 				document.getElementById(\'contbutt\').disabled = 0;
 			}
-			addLoadEvent(ourCurrentVersion);
+			window.addEventListener("load", ourCurrentVersion);
 
 			// This checks that the script file even exists!
 			if (typeof(elkSelectText) == \'undefined\')

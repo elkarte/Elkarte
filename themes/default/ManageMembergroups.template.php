@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -374,8 +374,7 @@ function template_edit_group()
 	if ($context['group']['id'] != 3 && $context['group']['id'] != 4)
 	{
 		$js = '
-		var oModeratorSuggest = new smc_AutoSuggest({
-			sSelf: \'oModeratorSuggest\',
+		new smc_AutoSuggest({
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
 			sSuggestId: \'group_moderators\',
@@ -677,8 +676,7 @@ function template_group_members()
 
 	if (!empty($context['group']['assignable']))
 		theme()->addInlineJavascript('
-		var oAddMemberSuggest = new smc_AutoSuggest({
-			sSelf: \'oAddMemberSuggest\',
+		new smc_AutoSuggest({
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,
 			sSuggestId: \'to_suggest\',
@@ -686,7 +684,7 @@ function template_group_members()
 			sSearchType: \'member\',
 			sPostName: \'member_add\',
 			sURLMask: \'action=profile;u=%item_id%\',
-			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
+			sTextDeleteItem: ' . JavaScriptEscape($txt['autosuggest_delete_item']) . ',
 			bItemList: true,
 			sItemListContainerId: \'toAddItemContainer\'
 		});', true);

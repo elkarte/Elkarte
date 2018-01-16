@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -111,7 +111,7 @@ class Boards_List
 		$this->_options = array_merge(array(
 			'include_categories' => false,
 			'countChildPosts' => false,
-			'base_level' => false,
+			'base_level' => 0,
 			'parent_id' => 0,
 			'set_latest_post' => false,
 			'get_moderators' => true,
@@ -164,16 +164,16 @@ class Boards_List
 		global $txt, $modSettings;
 
 		// Find all boards and categories, as well as related information.
-		$result_boards = $this->_db->query('boardindex_fetch_boards', '
+		$result_boards = $this->_db->fetchQuery('
 			SELECT' . ($this->_options['include_categories'] ? '
-				c.id_cat, c.name AS cat_name,' : '') . '
-				b.id_board, b.name AS board_name, b.description,
+				c.id_cat, c.name AS cat_name, c.cat_order,' : '') . '
+				b.id_board, b.name AS board_name, b.description, b.board_order,
 				CASE WHEN b.redirect != {string:blank_string} THEN 1 ELSE 0 END AS is_redirect,
 				b.num_posts, b.num_topics, b.unapproved_posts, b.unapproved_topics, b.id_parent,
 				COALESCE(m.poster_time, 0) AS poster_time, COALESCE(mem.member_name, m.poster_name) AS poster_name,
 				m.subject, m.id_topic, COALESCE(mem.real_name, m.poster_name) AS real_name,
 				' . ($this->_user['is_guest'] ? ' 1 AS is_read, 0 AS new_from,' : '
-				(COALESCE(lb.id_msg, 0) >= b.id_msg_updated) AS is_read, COALESCE(lb.id_msg, -1) + 1 AS new_from,' . ($this->_options['include_categories'] ? '
+				(CASE WHEN COALESCE(lb.id_msg, 0) >= b.id_msg_updated THEN 1 ELSE 0 END) AS is_read, COALESCE(lb.id_msg, -1) + 1 AS new_from,' . ($this->_options['include_categories'] ? '
 				c.can_collapse, COALESCE(cc.id_member, 0) AS is_collapsed,' : '')) . '
 				COALESCE(mem.id_member, 0) AS id_member, mem.avatar, m.id_msg' . ($this->_options['avatars_on_indexes'] ? ',
 				COALESCE(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, mem.email_address' : '') . '
@@ -186,19 +186,24 @@ class Boards_List
 				LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member AND a.id_member != 0)' : '') . '
 			WHERE {query_see_board}' . (empty($this->_options['countChildPosts']) ? (empty($this->_options['base_level']) ? '' : '
 				AND b.child_level >= {int:child_level}') : '
-				AND b.child_level BETWEEN ' . $this->_options['base_level'] . ' AND ' . ($this->_options['base_level'] + 1)) . '
-			ORDER BY' . ($this->_options['include_categories'] ? ' c.cat_order,' : '') . ' b.board_order',
+				AND b.child_level BETWEEN {int:child_level} AND {int:upper_level}'),
 			array(
 				'current_member' => $this->_user['id'],
 				'child_level' => $this->_options['base_level'],
+				'upper_level' => $this->_options['base_level'] + 1,
 				'blank_string' => '',
 			)
 		);
 
+		///
+		usort($result_boards, function ($a, $b) {
+			return $a['board_order'] <=> $b['board_order'];
+		});
+
 		$bbc_parser = \BBC\ParserWrapper::instance();
 
 		// Run through the categories and boards (or only boards)....
-		while ($row_board = $this->_db->fetch_assoc($result_boards))
+		foreach ($result_boards as $row_board)
 		{
 			// Perhaps we are ignoring this board?
 			$ignoreThisBoard = in_array($row_board['id_board'], $this->_user['ignoreboards']);
@@ -215,6 +220,7 @@ class Boards_List
 					$this->_categories[$row_board['id_cat']] = array(
 						'id' => $row_board['id_cat'],
 						'name' => $row_board['cat_name'],
+						'order' => $row_board['cat_order'],
 						'is_collapsed' => isset($row_board['can_collapse']) && $row_board['can_collapse'] == 1 && $row_board['is_collapsed'] > 0,
 						'can_collapse' => isset($row_board['can_collapse']) && $row_board['can_collapse'] == 1,
 						'collapse_href' => isset($row_board['can_collapse']) ? $this->_scripturl . '?action=collapse;c=' . $row_board['id_cat'] . ';sa=' . ($row_board['is_collapsed'] > 0 ? 'expand;' : 'collapse;') . $this->_session_url . '#c' . $row_board['id_cat'] : '',
@@ -402,10 +408,13 @@ class Boards_List
 			if ($this->_options['set_latest_post'] && !empty($row_board['poster_time']) && $row_board['poster_time'] > $this->_latest_post['timestamp'] && !$ignoreThisBoard)
 				$this->_latest_post = &$this->_current_boards[$isChild ? $row_board['id_parent'] : $row_board['id_board']]['last_post'];
 		}
-		$this->_db->free_result($result_boards);
 
 		if ($this->_options['get_moderators'] && !empty($this->_boards))
 			$this->_getBoardModerators();
+
+		usort($this->_categories, function ($a, $b) {
+			return $a['order'] <=> $b['order'];
+		});
 
 		return $this->_options['include_categories'] ? $this->_categories : $this->_current_boards;
 	}

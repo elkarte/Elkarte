@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -607,7 +607,7 @@ class Register_Controller extends Action_Controller
 			// But we might want some of them if the admin asks for them.
 			$reg_fields = explode(',', $modSettings['registration_fields']);
 
-			$exclude_fields = array();
+			$exclude_fields = [];
 
 			// Website is a little different
 			if (!in_array('website', $reg_fields))

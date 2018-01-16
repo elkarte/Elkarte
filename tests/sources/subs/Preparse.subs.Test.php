@@ -1,6 +1,6 @@
 <?php
 
-class PrepaseBBC extends PHPUnit_Framework_TestCase
+class PrepaseBBC extends \PHPUnit\Framework\TestCase
 {
 	/**
 	 * Prepare what is necessary to use in these tests.

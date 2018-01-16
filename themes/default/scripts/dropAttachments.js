@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 2.0 dev
  */
 
 /**
@@ -32,8 +32,6 @@
 			topic = 0,
 			oTxt = {},
 			errorMsg = '',
-			// @deprecated since 1.1 - here just for backward compatibility
-			fileDisplayTemplate = '<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="control icon i-close"></div></div>',
 			oEvents = {},
 			$str,
 
@@ -67,9 +65,7 @@
 				filesUploadedSuccessfully = [];
 				if (typeof params.topic !== 'undefined')
 					topic = params.topic;
-				if (typeof params.fileDisplayTemplate !== 'undefined')
-					fileDisplayTemplate = params.fileDisplayTemplate;
-				$str = $(fileDisplayTemplate);
+				$str = $(params.fileDisplayTemplate);
 				board = params.board;
 				oTxt = params.oTxt;
 				if (typeof params.existingSelector !== 'undefined')
@@ -448,11 +444,13 @@
 		*/
 		runAttachmentQueue = function() {
 			if (attachmentQueue.length > 0 && uploadInProgress === false) {
-				var currentData = attachmentQueue[0];
+				setTimeout(function () {
+					var currentData = attachmentQueue[0];
 
-				uploadInProgress = true;
-				sendFileToServer(currentData.formData, currentData.statusInstance, currentData.fileSize, currentData.fileName);
-				attachmentQueue.splice(0, 1);
+					uploadInProgress = true;
+					sendFileToServer(currentData.formData, currentData.statusInstance, currentData.fileSize, currentData.fileName);
+					attachmentQueue.splice(0, 1);
+				}, 200);
 			}
 		},
 

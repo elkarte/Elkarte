@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -1363,12 +1363,6 @@ class Email_Parse
 		// No iconv or a false response from it
 		if (!function_exists('iconv') || ($string === false))
 		{
-			// PHP (some 5.4 versions) mishandles //TRANSLIT//IGNORE and returns false: see https://bugs.php.net/bug.php?id=61484
-			if ($string === false)
-			{
-				$string = $string_save;
-			}
-
 			if (function_exists('mb_convert_encoding'))
 			{
 				// Replace unknown characters with a space

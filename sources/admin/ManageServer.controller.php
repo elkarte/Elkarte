@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -561,9 +561,8 @@ class ManageServer_Controller extends Action_Controller
 		foreach ($detected as $key => $value)
 		{
 			$detected_names[] = $value->title();
-			$supported = $value->isAvailable();
 
-			if (!empty($supported))
+			if (!empty($value->isAvailable()))
 				$detected_supported[$key] = $value->title();
 		}
 
@@ -589,7 +588,7 @@ class ManageServer_Controller extends Action_Controller
 			}
 		}
 
-		// Notify the integration that we're preparing to mess up with cache settings...
+		// Notify the integration that we're preparing to mess with cache settings...
 		call_integration_hook('integrate_modify_cache_settings', array(&$config_vars));
 
 		return $config_vars;

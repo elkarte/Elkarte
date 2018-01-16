@@ -1,6 +1,6 @@
 <?php
 
-class TestBBC extends PHPUnit_Framework_TestCase
+class TestBBC extends \PHPUnit\Framework\TestCase
 {
 	protected $bbcTestCases;
 	protected $bbcInvalidTestCases;
@@ -15,6 +15,7 @@ class TestBBC extends PHPUnit_Framework_TestCase
 	{
 		global $modSettings;
 		$modSettings['user_access_mentions'] = array();
+		$modSettings['enablePostHTML'] = 1;
 
 		new ElkArte\Themes\ThemeLoader();
 
@@ -432,6 +433,12 @@ Should be an empty line in between.',
 				'http://www.elkarte.net/',
 				'<a href="http://www.elkarte.net/" class="bbc_link" target="_blank">http://www.elkarte.net/</a>',
 			),
+			array(
+				'Test italic coming from the db ref #3054',
+				'&lt;i&gt;
+',
+				'<i><br /></i>',
+			),
 		);
 
 		// These are bbc that will not be converted to an html tag
@@ -573,13 +580,14 @@ Should be an empty line in between.',
 	 */
 	public function testBBcode()
 	{
+		$parsers = \BBC\ParserWrapper::instance();
 		foreach ($this->bbcTestCases as $testcase)
 		{
 			$name = $testcase[0];
 			$test = $testcase[1];
 			$expected = $testcase[2];
 
-			$result = parse_bbc($test);
+			$result = $parsers->parseMessage($test, 1);
 
 			$this->assertEquals($expected, $result, $name);
 		}
@@ -590,12 +598,13 @@ Should be an empty line in between.',
 	 */
 	public function testInvalidBBcode()
 	{
+		$parsers = \BBC\ParserWrapper::instance();
 		foreach ($this->bbcInvalidTestCases as $testcase)
 		{
 			$name = 'Broken ' . $testcase[0];
 			$test = $testcase[1];
 
-			$result = parse_bbc($test);
+			$result = $parsers->parseMessage($test, 1);
 
 			$this->assertEquals($test, $result, $name);
 		}

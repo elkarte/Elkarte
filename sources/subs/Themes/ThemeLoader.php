@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -536,10 +536,9 @@ class ThemeLoader
 				}
 				else
 				{
-					list ($k, $v) = each($_GET);
-					if ($k != 'wwwRedirect')
+					if (key($_GET) !== 'wwwRedirect')
 					{
-						redirectexit('wwwRedirect;' . $k . '=' . $v);
+						redirectexit('wwwRedirect;' . key($_GET) . '=' . current($_GET));
 					}
 				}
 			}

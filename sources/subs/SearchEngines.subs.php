@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -259,25 +259,6 @@ function recacheSpiderNames()
 	$db->free_result($request);
 
 	updateSettings(array('spider_name_cache' => serialize($spiders)));
-}
-
-/**
- * Sort the search engine table by user agent name to avoid misidentifying of engine.
- *
- * @package SearchEngines
- * @deprecated since 1.0 - the ordering is done in the query, probably not needed
- */
-function sortSpiderTable()
-{
-	$db = database();
-
-	$db->skip_next_error();
-	// Order the table by user_agent length.
-	$db->query('alter_table', '
-		ALTER TABLE {db_prefix}spiders
-		ORDER BY LENGTH(user_agent) DESC',
-		array()
-	);
 }
 
 /**

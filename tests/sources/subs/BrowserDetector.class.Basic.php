@@ -1,6 +1,6 @@
 <?php
 
-class TestBrowser extends PHPUnit_Framework_TestCase
+class TestBrowser extends \PHPUnit\Framework\TestCase
 {
 	protected $browser_testcases = array();
 

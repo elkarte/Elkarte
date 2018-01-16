@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -988,11 +988,6 @@ class Data_Validator
 
 		$filter = filter_var($input[$field], FILTER_VALIDATE_INT);
 
-		if ($filter === false && version_compare(PHP_VERSION, 5.4, '<') && ($input[$field] === '+0' || $input[$field] === '-0'))
-		{
-			$filter = true;
-		}
-
 		if ($filter === false)
 		{
 			return array(
@@ -1019,20 +1014,6 @@ class Data_Validator
 			return;
 
 		$filter = filter_var($input[$field], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-
-		// Fixed in php 7 and later in php 5.6.27 https://bugs.php.net/bug.php?id=67167
-		if (version_compare(PHP_VERSION, '5.6.27', '>='))
-		{
-			$filter = $filter;
-		}
-		if (version_compare(PHP_VERSION, 5.4, '<') && $filter === null && ($input[$field] === false || $input[$field] === ''))
-		{
-			$filter = false;
-		}
-		if ($filter === false && is_object($input[$field]) && method_exists($input[$field], '__tostring') === false)
-		{
-			$filter = null;
-		}
 
 		if ($filter === null)
 		{

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -363,8 +363,6 @@ class ManageCalendarModule_Controller extends Action_Controller
 			'',
 				// Dates of calendar...
 				array('int', 'cal_minyear'),
-				// cal_maxyear kept for compatibility purposes
-// 				array('int', 'cal_maxyear'),
 			'',
 				// Calendar spanning...
 				array('check', 'cal_allowspan'),

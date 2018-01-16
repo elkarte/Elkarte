@@ -1,6 +1,6 @@
 <?php
 
-class TestDataValidator extends PHPUnit_Framework_TestCase
+class TestDataValidator extends \PHPUnit\Framework\TestCase
 {
 	/**
 	 * Prepare what is necessary to use in these tests.
@@ -164,7 +164,6 @@ class TestDataValidator extends PHPUnit_Framework_TestCase
 		 */
 		return array(
 			array('foo', null),
-			// Fixed as of PHP 5.4.
 			array(false, false),
 			array('baz', null),
 			array(array(1,2), null),
@@ -188,7 +187,6 @@ class TestDataValidator extends PHPUnit_Framework_TestCase
 			array('0.0', null),
 			array('4.2', null),
 			array('0', false),
-			// Fixed as of PHP 5.4.
 			array('', false),
 			array(array(), null),
 

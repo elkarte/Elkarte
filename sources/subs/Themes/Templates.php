@@ -11,7 +11,7 @@
  * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  * license:   BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -509,9 +509,10 @@ class Templates
 					BOARDDIR => '',
 					strtr(BOARDDIR, '\\', '/') => '',
 				]));
-			if (empty($error) && ini_get('track_errors') && !empty($php_errormsg))
+			$last_error = error_get_last();
+			if (empty($error) && ini_get('track_errors') && !empty($last_error['message']))
 			{
-				$error = $php_errormsg;
+				$error = $last_error['message'];
 			}
 			elseif (empty($error))
 			{
@@ -775,18 +776,5 @@ class Templates
 	public function getIncludedTemplates()
 	{
 		return $this->templates;
-	}
-
-	/**
-	 * Find and return Templates instance if it exists,
-	 * or create a new instance
-	 *
-	 * @deprecated use the theme object
-	 *
-	 * @return Templates
-	 */
-	public static function instance()
-	{
-		return theme()->getTemplates();
 	}
 }

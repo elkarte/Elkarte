@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -456,6 +456,24 @@ class Errors extends \AbstractModel
 	</html>';
 
 		$this->terminate();
+	}
+
+	/**
+	 * Small utility function for simplify logging of deprecated functions
+	 * in the development phase of 2.0.
+	 */
+	public function log_deprecated($function, $replacement)
+	{
+		$debug = '<br><br>';
+		foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1] as $var => $val)
+		{
+			$debug .= $var . ': ' . $val . '<br>';
+		}
+		$this->log_error(sprintf(
+			'%s is deprecated, use %s instead.%s',
+			$function,
+			$replacement,
+			$debug) ,'deprecated');
 	}
 
 	/**

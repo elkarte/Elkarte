@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -387,7 +387,7 @@ function template_subject_list()
 {
 	global $context, $settings, $txt, $scripturl;
 
-	echo '										
+	echo '
 					<table class="table_grid">
 						<thead>
 							<tr class="table_head">
@@ -1041,11 +1041,10 @@ function template_send()
 
 	echo '
 		<script>
-			var oPersonalMessageSend = new elk_PersonalMessageSend({
-				sSelf: \'oPersonalMessageSend\',
+			new elk_PersonalMessageSend({
 				sSessionId: elk_session_id,
 				sSessionVar: elk_session_var,
-				sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
+				sTextDeleteItem: ', JavaScriptEscape($txt['autosuggest_delete_item']), ',
 				sToControlId: \'to_control\',
 				aToRecipients: [';
 

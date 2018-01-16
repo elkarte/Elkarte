@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -396,7 +396,7 @@ function is_not_banned($forceCheck = false)
 		// We don't wanna see you!
 		if (!$user_info['is_guest'])
 		{
-			$controller = new Auth_Controller();
+			$controller = new Auth_Controller(new Event_manager());
 			$controller->action_logout(true, false);
 		}
 
@@ -469,7 +469,7 @@ function is_not_banned($forceCheck = false)
 		writeLog(true);
 
 		// Log them out
-		$controller = new Auth_Controller();
+		$controller = new Auth_Controller(new Event_manager());
 		$controller->action_logout(true, false);
 
 		// Tell them thanks
@@ -1178,7 +1178,10 @@ function isAllowedTo($permission, $boards = null)
  *
  * @param string[]|string $permissions array of permission names to check access against
  * @param bool $check_access = true
- * @param bool $simple = true
+ * @param bool $simple = true Set $simple to true to use this function in compatibility mode
+ *             otherwise, the resultant array becomes split into the multiple
+ *             permissions that were passed. Other than that, it's just the normal
+ *             state of play that you're used to.
  */
 function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 {
@@ -1189,13 +1192,6 @@ function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 	// Arrays are nice, most of the time.
 	if (!is_array($permissions))
 		$permissions = array($permissions);
-
-	/*
-	 * Set $simple to true to use this function in compatibility mode
-	 * Otherwise, the resultant array becomes split into the multiple
-	 * permissions that were passed. Other than that, it's just the normal
-	 * state of play that you're used to.
-	 */
 
 	// I am the master, the master of the universe!
 	if ($user_info['is_admin'])

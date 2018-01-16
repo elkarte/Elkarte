@@ -3,7 +3,7 @@
 /**
  * TestCase class for basic PBE functions
  */
-class TestPBE extends PHPUnit_Framework_TestCase
+class TestPBE extends \PHPUnit\Framework\TestCase
 {
 	protected $_email;
 

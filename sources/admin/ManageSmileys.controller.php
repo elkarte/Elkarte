@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -137,10 +137,6 @@ class ManageSmileys_Controller extends Action_Controller
 			checkSession();
 
 			$this->_req->post->smiley_sets_default = $this->_req->getPost('smiley_sets_default', 'trim|strval', 'default');
-
-			// Make sure that the smileys are in the right order after enabling them.
-			if (isset($this->_req->post->smiley_enable))
-				sortSmileyTable();
 
 			call_integration_hook('integrate_save_smiley_settings');
 
@@ -832,9 +828,6 @@ class ManageSmileys_Controller extends Action_Controller
 					);
 					updateSmiley($param);
 				}
-
-				// Sort all smiley codes for more accurate parsing (longest code first).
-				sortSmileyTable();
 			}
 
 			$this->clearSmileyCache();
@@ -927,20 +920,13 @@ class ManageSmileys_Controller extends Action_Controller
 							'value' => $txt['smileys_location'],
 						),
 						'data' => array(
-							'function' => function ($rowData) {
-								global $txt;
-
-								if (empty($rowData['hidden']))
-									return $txt['smileys_location_form'];
-								elseif ($rowData['hidden'] == 1)
-									return $txt['smileys_location_hidden'];
-								else
-									return $txt['smileys_location_popup'];
+							'function' => function ($rowData) use ($smiley_locations) {
+								return $smiley_locations[$rowData['hidden']];
 							},
 						),
 						'sort' => array(
-							'default' => 'FIND_IN_SET(hidden, \'' . implode(',', array_keys($smiley_locations)) . '\')',
-							'reverse' => 'FIND_IN_SET(hidden, \'' . implode(',', array_keys($smiley_locations)) . '\') DESC',
+							'default' => 'hidden',
+							'reverse' => 'hidden DESC',
 						),
 					),
 					'tooltip' => array(
@@ -1213,9 +1199,6 @@ class ManageSmileys_Controller extends Action_Controller
 				if (!empty($iconInsert_new))
 					addMessageIcon($iconInsert_new);
 			}
-
-			// Sort by order, so it is quicker :)
-			sortMessageIconTable();
 
 			// Unless we're adding a new thing, we'll escape
 			if (!isset($this->_req->post->add))
@@ -1720,9 +1703,6 @@ class ManageSmileys_Controller extends Action_Controller
 		if (!empty($new_smileys))
 		{
 			addSmiley($new_smileys);
-
-			// Make sure the smiley codes are still in the right order.
-			sortSmileyTable();
 
 			$this->clearSmileyCache();
 		}

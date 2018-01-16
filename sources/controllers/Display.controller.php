@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -848,6 +848,7 @@ class Display_Controller extends Action_Controller
 		$message['subject'] = censor($message['subject']);
 
 		// Run BBC interpreter on the message.
+		$context['id_msg'] = $message['id_msg'];
 		$bbc_wrapper = \BBC\ParserWrapper::instance();
 		$message['body'] = $bbc_wrapper->parseMessage($message['body'], $message['smileys_enabled']);
 

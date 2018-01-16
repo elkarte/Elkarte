@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -192,9 +192,6 @@ class Topic_Util
 					'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
 					'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['bname'] . '</a>'
 				);
-
-				// @deprecated since 1.0 - better have the sprintf in the template because using html here is bad
-				$topics[$row['id_topic']]['first_post']['started_by'] = sprintf($txt['topic_started_by_in'], '<strong>' . $topics[$row['id_topic']]['first_post']['member']['link'] . '</strong>', '<em>' . $topics[$row['id_topic']]['board']['link'] . '</em>');
 			}
 
 			if (!empty($row['avatar']) || !empty($row['id_attach']))

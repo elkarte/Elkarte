@@ -3,7 +3,7 @@
 /**
  * TestCase class for file integrity
  */
-class TestFiles extends PHPUnit_Framework_TestCase
+class TestFiles extends \PHPUnit\Framework\TestCase
 {
 	protected $_ourFiles = array();
 

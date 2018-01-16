@@ -14,7 +14,7 @@
  * copyright:	2004-2011, GreyWyvern - All rights reserved.
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -256,12 +256,6 @@ class Database_MySQL extends Database_Abstract
 			$ret = @mysqli_query($connection, $db_string);
 		else
 			$ret = @mysqli_query($connection, $db_string, MYSQLI_USE_RESULT);
-
-		// @deprecated since 1.1 - use skip_next_error method
-		if (!empty($db_values['db_error_skip']))
-		{
-			$this->_skip_error = true;
-		}
 
 		if ($ret === false && $this->_skip_error === false)
 		{

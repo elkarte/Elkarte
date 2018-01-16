@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -28,7 +28,7 @@ class Standard extends SearchAPI
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
 	 * @var string
 	 */
-	public $version_compatible = 'ElkArte 1.1';
+	public $version_compatible = 'ElkArte 2.0 dev';
 
 	/**
 	 * This won't work with versions of ElkArte less than this.

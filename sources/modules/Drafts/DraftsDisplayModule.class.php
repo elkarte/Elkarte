@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -114,8 +114,7 @@ class Drafts_Display_Module extends ElkArte\sources\modules\Abstract_Module
 				{
 					loadJavascriptFile('drafts.js');
 					theme()->addInlineJavascript('
-				var oDraftAutoSave = new elk_DraftAutoSave({
-					sSelf: \'oDraftAutoSave\',
+				new elk_DraftAutoSave({
 					sLastNote: \'draft_lastautosave\',
 					sTextareaID: \'message\',
 					sLastID: \'id_draft\',

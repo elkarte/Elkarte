@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -511,10 +511,6 @@ class ProfileAccount_Controller extends Action_Controller
 		elseif (!allowedTo('profile_remove_any'))
 			isAllowedTo('profile_remove_own');
 
-		if (isset($this->_req->post->save))
-		{
-			return $this->action_deleteaccount2();
-		}
 		// Permissions for removing stuff...
 		$context['can_delete_posts'] = !$context['user']['is_owner'] && allowedTo('moderate_forum');
 
@@ -619,7 +615,7 @@ class ProfileAccount_Controller extends Action_Controller
 		{
 			deleteMembers($this->_memID);
 
-			$controller = new Auth_Controller();
+			$controller = new Auth_Controller(new Event_manager());
 			$controller->action_logout(true);
 
 			redirectexit();

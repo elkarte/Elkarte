@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -350,6 +350,15 @@ class ManageFeatures_Controller extends Action_Controller
 			checkSession();
 
 			call_integration_hook('integrate_save_modify_mention_settings');
+
+			if (!empty($this->_req->post->mentions_enabled))
+			{
+				enableModules('mentions', array('post', 'display'));
+			}
+			else
+			{
+				disableModules('mentions', array('post', 'display'));
+			}
 
 			if (empty($this->_req->post->notifications))
 			{

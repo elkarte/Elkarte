@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  * This file contains functions that are specifically done by administrators.
  *
@@ -212,25 +212,51 @@ function getFileVersions(&$versionOptions)
 		readFileVersions($version_info, array('file_versions' => BOARDDIR), 'SSI.php');
 
 	// Do the paid subscriptions handler?
-	if (!empty($versionOptions['include_subscriptions']) && file_exists(BOARDDIR . '/subscriptions.php'))
-		readFileVersions($version_info, array('file_versions' => BOARDDIR), 'subscriptions.php');
+	if (!empty($versionOptions['include_subscriptions']))
+	{
+		foreach (array(
+			'subscriptions.php',
+			'bootstrap.php',
+			'email_imap_cron.php',
+			'emailpost.php',
+			'emailtopic.php') as $file)
+		{
+			if (file_exists(BOARDDIR . '/' . $file))
+			{
+				readFileVersions($version_info, array('file_versions' => BOARDDIR), $file);
+			}
+		}
+	}
 
-	// Load all the files in the sources and its sub directory's
+	// Load all the files in the sources and its sub directories
 	$directories = array(
 		'file_versions' => SOURCEDIR,
 		'file_versions_admin' => ADMINDIR,
 		'file_versions_controllers' => CONTROLLERDIR,
 		'file_versions_database' => SOURCEDIR . '/database',
-		'file_versions_subs' => SUBSDIR,
 		'file_versions_lib' => EXTDIR
 	);
 	readFileVersions($version_info, $directories, '.php');
+	$directories = array(
+		'file_versions_subs' => SUBSDIR,
+		'file_versions_modules' => SOURCEDIR . '/modules',
+	);
+	readFileVersions($tmp_version_info, $directories, '.php', true);
 
+	foreach ($tmp_version_info['file_versions_subs'] as $key => $val)
+	{
+		$version_info['file_versions_subs'][str_replace($directories['file_versions_subs'] . DIRECTORY_SEPARATOR, 'subs', $key)] = $val;
+	}
+	foreach ($tmp_version_info['file_versions_modules'] as $key => $val)
+	{
+		$version_info['file_versions_modules'][str_replace($directories['file_versions_modules'], 'modules', $key)] = $val;
+	}
 	// Load all the files in the default template directory - and the current theme if applicable.
 	$directories = array('default_template_versions' => $settings['default_theme_dir']);
 	if ($settings['theme_id'] != 1)
 		$directories += array('template_versions' => $settings['theme_dir']);
 	readFileVersions($version_info, $directories, 'template.php');
+	readFileVersions($version_info, $directories, 'Theme.php');
 
 	// Load up all the files in the default language directory and sort by language.
 	// @todo merge this loop into readFileVersions
@@ -297,8 +323,9 @@ function getFileVersions(&$versionOptions)
  * @param mixed[] $version_info -
  * @param string[] $directories - an array of directories to loop
  * @param string $pattern - how the name of the files should end
+ * @param bool $recursive - if scan recursively the directories
  */
-function readFileVersions(&$version_info, $directories, $pattern)
+function readFileVersions(&$version_info, $directories, $pattern, $recursive = false)
 {
 	// The comment looks roughly like... that.
 	$version_regex = '~\*\s@version\s+(.+)[\s]{2}~i';
@@ -308,27 +335,53 @@ function readFileVersions(&$version_info, $directories, $pattern)
 
 	foreach ($directories as $type => $dirname)
 	{
-		$this_dir = dir($dirname);
-		while ($entry = $this_dir->read())
+		if ($recursive === true)
 		{
-			if (substr($entry, $ext_offset) == $pattern && !is_dir($dirname . '/' . $entry))
+			$iter = new RecursiveIteratorIterator(
+				new RecursiveDirectoryIterator($dirname, RecursiveDirectoryIterator::SKIP_DOTS),
+				RecursiveIteratorIterator::CHILD_FIRST,
+				RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
+			);
+		}
+		else
+		{
+			$iter = new IteratorIterator(new DirectoryIterator($dirname));
+		}
+
+		foreach ($iter as $dir)
+		{
+			if ($dir->isDir())
 			{
-				if (!is_writable($dirname . '/' . $entry))
+				continue;
+			}
+			$entry = $dir->getFilename();
+
+			if (substr($entry, $ext_offset) == $pattern)
+			{
+				if ($dir->isWritable() === false)
 				{
 					continue;
 				}
 				// Read the first 768 bytes from the file.... enough for the header.
-				$header = file_get_contents($dirname . '/' . $entry, false, null, 0, 768);
+				$header = file_get_contents($dir->getPathname(), false, null, 0, 768);
+
+				if ($recursive === true)
+				{
+					$entry_key = $dir->getPathname();
+				}
+				else
+				{
+					$entry_key = $entry;
+				}
 
 				// Look for the version comment in the file header.
 				if (preg_match($version_regex, $header, $match) == 1)
-					$version_info[$type][$entry] = $match[1];
+					$version_info[$type][$entry_key] = $match[1];
 				// It wasn't found, but the file was... show a $unknown_version.
 				else
-					$version_info[$type][$entry] = $unknown_version;
+					$version_info[$type][$entry_key] = $unknown_version;
 			}
 		}
-		$this_dir->close();
 	}
 }
 

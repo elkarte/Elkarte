@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -56,24 +56,7 @@ class Token_Hash
 	 */
 	private function _state_seed()
 	{
-		// PHP >= 7
-		if (is_callable('random_bytes'))
-		{
-			$this->random_state = bin2hex(random_bytes(8));
-		}
-		// If openssl is installed, let it create a character code
-		elseif (function_exists('openssl_random_pseudo_bytes') && (substr(PHP_OS, 0, 3) !== 'WIN' || version_compare(PHP_VERSION, '5.3.4', '>=')))
-		{
-			$this->random_state = bin2hex(openssl_random_pseudo_bytes(8));
-		}
-		else
-		{
-			// Just use uniqid as a seed
-			$this->random_state = uniqid('', true);
-
-			// Use the trailing 16 characters
-			$this->random_state = substr(str_replace(array(' ', '.'), '', $this->random_state), -16);
-		}
+		$this->random_state = bin2hex(random_bytes(8));
 	}
 
 	/**

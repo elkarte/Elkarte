@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -663,7 +663,7 @@ class Profile_Controller extends Action_Controller
 
 				saveProfileFields($fields['fields'], $fields['hook']);
 			}
-			else
+			elseif (empty($post_errors))
 			{
 				// @todo yes this is also ugly, but saveProfileChanges needs to be updated first
 				$_POST = (array) $this->_req->post;

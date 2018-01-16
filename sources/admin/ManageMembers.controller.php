@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -85,9 +85,6 @@ class ManageMembers_Controller extends Action_Controller
 
 		// Default to sub action 'all', needed for the tabs array below
 		$subAction = $action->initialize($subActions, 'all');
-
-		// You can't pass!
-		$action->isAllowedTo($subAction);
 
 		// Get counts on every type of activation - for sections and filtering alike.
 		require_once(SUBSDIR . '/Members.subs.php');

@@ -11,7 +11,7 @@
  * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  * license:    BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -111,6 +111,9 @@ class PreparseCode
 
 		// Font tags with multiple fonts (copy&paste in the WYSIWYG by some browsers).
 		$this->message = preg_replace_callback('~\[font=([^\]]*)\](.*?(?:\[/font\]))~s', array($this, '_preparsecode_font_callback'), $this->message);
+
+		// Allow integration to do further processing on protected code block message
+		call_integration_hook('integrate_preparse_tokenized_code', array(&$this->message, $previewing, $this->code_blocks));
 
 		// Put it back together!
 		$this->_restoreCodeBlocks();

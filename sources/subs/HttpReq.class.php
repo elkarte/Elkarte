@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -92,7 +92,7 @@ class HttpReq
 
 		// Make the superglobals available as R/W properties
 		$this->cookie = new ArrayObject($_COOKIE, ArrayObject::ARRAY_AS_PROPS);
-		if (isset($_SESSION))
+		if (session_status() === PHP_SESSION_ACTIVE)
 		{
 			$this->session = new ArrayObject($_SESSION, ArrayObject::ARRAY_AS_PROPS);
 		}

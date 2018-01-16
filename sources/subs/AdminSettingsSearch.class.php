@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -238,7 +238,7 @@ class AdminSettings_Search
 			if (isset($setting_area[2]))
 			{
 				// an OOP controller: get the settings from the settings method.
-				$controller = new $setting_area[2]();
+				$controller = new $setting_area[2](new \Event_Manager());
 				$controller->pre_dispatch();
 				$config_vars = $controller->{$setting_area[0]}();
 			}

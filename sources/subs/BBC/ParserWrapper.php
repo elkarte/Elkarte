@@ -6,7 +6,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -386,7 +386,7 @@ final class ParserWrapper
 		{
 			$additional_bbc = array();
 			call_integration_hook('integrate_additional_bbc', array(&$additional_bbc));
-			$this->codes = new Codes($additional_bbc, $this->disabled);
+			$this->codes = new Codes($additional_bbc, array_keys($this->disabled));
 		}
 
 		return $this->codes;

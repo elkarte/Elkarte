@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -21,6 +21,12 @@ class DbSearch_PostgreSQL implements DbSearch
 	 * @var DbSearch_PostgreSQL
 	 */
 	private static $_search = null;
+
+	/**
+	 * The way to skip a database error
+	 * @var boolean
+	 */
+	protected $_skip_error = false;
 
 	/**
 	 * This function will tell you whether this database type supports this search type.
@@ -84,13 +90,13 @@ class DbSearch_PostgreSQL implements DbSearch
 		{
 			$db_string = preg_replace('~^\s*INSERT\sIGNORE~i', 'INSERT', $db_string);
 			// Don't error on multi-insert.
-			$db->skip_next_error();
+			$this->_skip_error = true;
 		}
 
-		// @deprecated since 1.1 - temporary measure until a proper skip_error is implemented
-		if (!empty($db_values['db_error_skip']))
+		if ($this->_skip_error === true)
 		{
 			$db->skip_next_error();
+			$this->_skip_error = false;
 		}
 
 		$return = $db->query('', $db_string,
@@ -98,6 +104,14 @@ class DbSearch_PostgreSQL implements DbSearch
 		);
 
 		return $return;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function skip_next_error()
+	{
+		$this->_skip_error = true;
 	}
 
 	/**

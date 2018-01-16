@@ -9,22 +9,9 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
-
-/**
- * @deprecated since 1.0
- */
-function template_sendbody()
-{
-	global $context;
-
-	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
-<elk>
-	<message view="', $context['view'], '">', cleanXml($context['message']), '</message>
-</elk>';
-}
 
 /**
  * Returns the text of a post in response to a quote request for loading into the current editing text box

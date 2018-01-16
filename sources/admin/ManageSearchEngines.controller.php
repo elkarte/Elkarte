@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -363,9 +363,6 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 			// Goes in as it is...
 			updateSpider($context['id_spider'], $this->_req->post->spider_name, $this->_req->post->spider_agent, $ips);
-
-			// Order by user agent length.
-			sortSpiderTable();
 
 			Cache::instance()->remove('spider_search');
 			recacheSpiderNames();

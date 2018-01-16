@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 /**
@@ -200,19 +200,6 @@ function getElkTables()
 			$tables[] = array('table_name' => $table);
 
 	return $tables;
-}
-
-/**
- * Wrapper function for db_optimize_table
- *
- * @package Maintenance
- * @param string $tablename
- */
-function optimizeTable($tablename)
-{
-	$db_table = db_table();
-
-	return $db_table->optimize($tablename);
 }
 
 /**

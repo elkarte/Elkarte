@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -123,7 +123,7 @@ function template_messages()
 		// Show the message anchor and a "new" anchor if this message is new.
 		if ($message['id'] != $context['first_message'] && ($message['first_new']))
 			echo '
-				<a id="new">&nbsp;</a>	
+				<a id="new">&nbsp;</a>
 				<hr class="new_post_separator" />';
 
 		echo '
@@ -222,7 +222,7 @@ function template_messages()
 								<a href="#" ', !empty($options['use_click_menu']) ? '' : 'onclick="event.stopPropagation();return false;" ', 'class="linklevel1 post_options">', $txt['post_options'], '
 							</a>';
 
-		if ($message['can_modify'] || $message['can_remove'] || $context['can_follow_up'] || ($context['can_split'] && !empty($context['real_num_replies'])) || $context['can_restore_msg'] || $message['can_approve'] || $message['can_unapprove'] || $context['can_report_moderator'])
+		if ($message['can_modify'] || $message['can_remove'] || !empty($context['can_follow_up']) || ($context['can_split'] && !empty($context['real_num_replies'])) || $context['can_restore_msg'] || $message['can_approve'] || $message['can_unapprove'] || $context['can_report_moderator'])
 		{
 			// Show them the other options they may have in a nice pulldown
 			echo '
@@ -243,7 +243,7 @@ function template_messages()
 									</li>';
 
 			// Can they quote to a new topic? @todo - This needs rethinking for GUI layout.
-			if ($context['can_follow_up'])
+			if (!empty($context['can_follow_up']))
 				echo '
 									<li class="listlevel2">
 										<a href="', $scripturl, '?action=post;board=', $context['current_board'], ';quote=', $message['id'], ';followup=', $message['id'], '" class="linklevel2 quotetonew_button">', $txt['quote_new'], '</a>
@@ -572,7 +572,6 @@ function template_quickreply_below()
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $context['can_remove_post'])
 		echo '
 				var oInTopicModeration = new InTopicModeration({
-					sSelf: \'oInTopicModeration\',
 					sCheckboxContainerMask: \'in_topic_mod_check_\',
 					aMessageIds: [\'', implode('\', \'', $removableMessageIDs), '\'],
 					sSessionId: elk_session_id,

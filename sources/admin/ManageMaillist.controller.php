@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -323,7 +323,7 @@ class ManageMaillist_Controller extends Action_Controller
 					$data = $temp_email[0]['body'];
 
 					// Read/parse this message for viewing
-					$controller = new Emailpost_Controller();
+					$controller = new Emailpost_Controller(new Event_manager());
 					$result = $controller->action_pbe_preview($data);
 					$text = isset($result['body']) ? $result['body'] : '';
 					$email_to = isset($result['to']) ? $result['to'] : '';
@@ -429,7 +429,7 @@ class ManageMaillist_Controller extends Action_Controller
 
 					// Lets TRY AGAIN to make a post!
 					include_once(CONTROLLERDIR . '/Emailpost.controller.php');
-					$controller = new Emailpost_Controller();
+					$controller = new Emailpost_Controller(new Event_manager());
 					$text = $controller->action_pbe_post($data, $force, $key);
 
 					// Assuming all went well, remove this entry and file since we are done.

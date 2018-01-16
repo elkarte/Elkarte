@@ -3,7 +3,7 @@
 /**
  * TestCase class for the admin search
  */
-class TestAdminSearch extends PHPUnit_Framework_TestCase
+class TestAdminSearch extends \PHPUnit\Framework\TestCase
 {
 	/**
 	 * @var Action_Controller
@@ -28,7 +28,10 @@ class TestAdminSearch extends PHPUnit_Framework_TestCase
 	 */
 	public function testBeforeSearchSettings()
 	{
+		global $context;
+
 		$this->settingsProvider();
+		$this->assertNotEmpty($context['search_results']);
 	}
 
 	/**

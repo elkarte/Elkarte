@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -233,8 +233,7 @@ class Unread
 
 		if (!empty($include_avatars))
 		{
-			// Double equal comparison for 1 because it is backward compatible with 1.0 where the value was true/false
-			if ($include_avatars == 1 || $include_avatars === 3)
+			if ($include_avatars === 1 || $include_avatars === 3)
 			{
 				$custom_selects = array('meml.avatar', 'COALESCE(a.id_attach, 0) AS id_attach', 'a.filename', 'a.attachment_type', 'meml.email_address');
 				$custom_joins = array('LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = ml.id_member AND a.id_member != 0)');
@@ -404,7 +403,7 @@ class Unread
 		else
 		{
 			$request = $this->_db->query('unread_replies', '
-				SELECT DISTINCT t.id_topic
+				SELECT t.id_topic, ' . $this->_sort_query . '
 				FROM {db_prefix}topics AS t
 					INNER JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic AND m.id_member = {int:current_member})' . (strpos($this->_sort_query, 'ms.') === false ? '' : '
 					INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)') . (strpos($this->_sort_query, 'mems.') === false ? '' : '
@@ -451,8 +450,7 @@ class Unread
 
 		if (!empty($include_avatars))
 		{
-			// Double equal comparison for 1 because it is backward compatible with 1.0 where the value was true/false
-			if ($include_avatars == 1 || $include_avatars === 3)
+			if ($include_avatars === 1 || $include_avatars === 3)
 			{
 				$custom_selects = array('meml.avatar', 'COALESCE(a.id_attach, 0) AS id_attach', 'a.filename', 'a.attachment_type', 'meml.email_address');
 				$custom_joins = array('LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = ml.id_member AND a.id_member != 0)');

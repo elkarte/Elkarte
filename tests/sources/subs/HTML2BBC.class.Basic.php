@@ -1,6 +1,6 @@
 <?php
 
-class TestHTML2BBC extends PHPUnit_Framework_TestCase
+class TestHTML2BBC extends \PHPUnit\Framework\TestCase
 {
 	/**
 	 * Prepare what is necessary to use in these tests.

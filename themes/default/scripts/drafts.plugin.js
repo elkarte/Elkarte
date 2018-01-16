@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 2.0 dev
  */
 
 /**
@@ -234,19 +234,6 @@
 	elk_Drafts.prototype.formCheck = function() {
 		var oInstance = this,
 			formID = $('#' + this.opts.sTextareaID).closest("form").attr('id');
-
-		// @deprecated since 1.1 - the check on #id_draft existence is for backward compatibility with 1.0
-		if ($('#id_draft').length === 0)
-		{
-			$('#' + formID).append(
-				$('<input />').attr({
-					type: 'hidden',
-					id: this.opts.sLastID,
-					name: 'id_draft',
-					value: this.opts.id_draft
-				})
-			);
-		}
 
 		// Prevent autosave on post/save selection by mouse or keyboard
 		var $_form_submitt =  $('#' + formID + ' .button_submit');

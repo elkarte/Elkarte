@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -1089,25 +1089,7 @@ class Html_2_Md
 	{
 		if ($this->_parser)
 		{
-			if (version_compare(PHP_VERSION, '5.3.6') >= 0)
-			{
-				return htmlspecialchars_decode($this->doc->saveHTML($node));
-			}
-			else
-			{
-				// @todo remove when 5.3.6 min
-				$doc = new DOMDocument();
-				$doc->appendChild($doc->importNode($node, true));
-				$html = $doc->saveHTML();
-
-				// We just want the html of the inserted node, it *may* be wrapped
-				$html = $this->_returnBodyText($html);
-
-				// Clean it up
-				$html = rtrim($html, "\n");
-
-				return html_entity_decode(htmlspecialchars_decode($html, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
-			}
+			return htmlspecialchars_decode($this->doc->saveHTML($node));
 		}
 		else
 		{

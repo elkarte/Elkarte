@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -28,7 +28,7 @@ use ErrorException;
 final class ErrorHandler extends Errors
 {
 	/** @var int Mask for errors that are fatal and will halt */
-	protected $fatalErrors = 0;
+	protected $fatalErrors = E_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_CORE_ERROR | E_PARSE;
 
 	/** @var string The error string from $e->getMessage() */
 	private $error_string;
@@ -48,9 +48,6 @@ final class ErrorHandler extends Errors
 	public function __construct()
 	{
 		parent::__construct();
-
-		// Build the bitwise mask
-		$this->fatalErrors = E_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_CORE_ERROR | E_PARSE;
 
 		// Register the class handlers to the PHP handler functions
 		set_error_handler(array($this, 'error_handler'));
@@ -219,11 +216,12 @@ final class ErrorHandler extends Errors
 		// Showing the errors, lets make it look decent
 		if ($db_show_debug === true && allowedTo('admin_forum'))
 		{
-			$msg = 'PHP Fatal error:  Uncaught exception \'%s\' with message \'%s\' in %s:%s<br />Stack trace:<br />%s<br />  thrown in %s on line %s';
+			$msg = '<strong>%s</strong><br />PHP Fatal error:  Uncaught exception \'%s\' with message \'%s\' in %s:%s<br />Stack trace:<br />%s<br />  thrown in %s on line %s';
 
 			// write tracelines into main template
 			return sprintf(
 				$msg,
+				$this->error_string,
 				get_class($exception),
 				$exception->getMessage(),
 				$exception->getFile(),

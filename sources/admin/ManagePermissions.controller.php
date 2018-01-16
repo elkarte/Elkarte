@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -177,9 +177,6 @@ class ManagePermissions_Controller extends Action_Controller
 		if (!empty($this->_req->query->pid))
 			$this->_pid = (int) $this->_req->query->pid;
 
-		// Needed for <5.4 due to lack of $this support in closures
-		$_pid = isset($this->_pid) ? $this->_pid : null;
-
 		// We can modify any permission set apart from the read only, reply only and no polls ones as they are redefined.
 		$context['can_modify'] = empty($this->_pid) || $this->_pid == 1 || $this->_pid > 4;
 
@@ -294,11 +291,11 @@ class ManagePermissions_Controller extends Action_Controller
 						'class' => 'grid17',
 					),
 					'data' => array(
-						'function' => function ($rowData) use ($_pid) {
+						'function' => function ($rowData) {
 							global $scripturl, $txt;
 
 							if ($rowData['id_group'] != 1)
-								return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . '' . (isset($_pid) ? ';pid=' . $_pid : '') . '">' . $txt['membergroups_modify'] . '</a>';
+								return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . '' . (isset($this->_id) ? ';pid=' . $this->_id : '') . '">' . $txt['membergroups_modify'] . '</a>';
 
 							return '';
 						},

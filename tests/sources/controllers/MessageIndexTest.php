@@ -3,7 +3,7 @@
 /**
  * TestCase class for the Profile Info Controller
  */
-class TestMessageIndex extends PHPUnit_Framework_TestCase
+class TestMessageIndex extends \PHPUnit\Framework\TestCase
 {
 	/**
 	 * Initialize or add whatever necessary for these tests
@@ -76,7 +76,7 @@ class TestMessageIndex extends PHPUnit_Framework_TestCase
 	{
 		global $context, $board_info;
 
-		$controller = new MessageIndex_Controller();
+		$controller = new MessageIndex_Controller(new Event_Manager());
 		$controller->pre_dispatch();
 		$controller->action_index();
 

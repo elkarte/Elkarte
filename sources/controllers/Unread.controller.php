@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -507,7 +507,7 @@ class Unread_Controller extends Action_Controller
 				'txt_mark_as_read_confirm' => $txt['mark_these_as_read_confirm']
 			), true);
 
-			$context['recent_buttons'] = array(
+			$recent_buttons = array(
 				'markread' => array(
 					'text' => !empty($context['no_board_limits']) ? 'mark_as_read' : 'mark_read_short',
 					'image' => 'markread.png',
@@ -519,7 +519,7 @@ class Unread_Controller extends Action_Controller
 
 			if ($context['showCheckboxes'])
 			{
-				$context['recent_buttons']['markselectread'] = array(
+				$recent_buttons['markselectread'] = array(
 					'text' => 'quick_mod_markread',
 					'image' => 'markselectedread.png',
 					'lang' => true,
@@ -529,7 +529,7 @@ class Unread_Controller extends Action_Controller
 
 			if (!empty($context['topics']) && !$context['showing_all_topics'])
 			{
-				$context['recent_buttons']['readall'] = array('text' => 'unread_topics_all', 'image' => 'markreadall.png', 'lang' => true, 'url' => $scripturl . '?action=unread;all' . $context['querystring_board_limits'], 'active' => true);
+				$recent_buttons['readall'] = array('text' => 'unread_topics_all', 'image' => 'markreadall.png', 'lang' => true, 'url' => $scripturl . '?action=unread;all' . $context['querystring_board_limits'], 'active' => true);
 			}
 		}
 		elseif (!$this->_is_topics && isset($topics_to_mark))
@@ -538,7 +538,7 @@ class Unread_Controller extends Action_Controller
 				'txt_mark_as_read_confirm' => $txt['mark_these_as_read_confirm']
 			), true);
 
-			$context['recent_buttons'] = array(
+			$recent_buttons = array(
 				'markread' => array(
 					'text' => 'mark_these_as_read',
 					'image' => 'markread.png',
@@ -549,7 +549,7 @@ class Unread_Controller extends Action_Controller
 
 			if ($context['showCheckboxes'])
 			{
-				$context['recent_buttons']['markselectread'] = array(
+				$recent_buttons['markselectread'] = array(
 					'text' => 'quick_mod_markread',
 					'image' => 'markselectedread.png',
 					'lang' => true,
@@ -559,14 +559,9 @@ class Unread_Controller extends Action_Controller
 		}
 
 		// Allow mods to add additional buttons here
-		/**
-		 * @deprecated in order to maintain backward compatibility the buttons are
-		 * loaded into $context.
-		 * Starting from 2.0 this should be changed to a local variable and passed to the hook
-		 */
-		call_integration_hook('integrate_recent_buttons', array(&$context['recent_buttons']));
+		call_integration_hook('integrate_recent_buttons', array(&$recent_buttons));
 
-		return $context['recent_buttons'];
+		return $recent_buttons;
 	}
 
 	/**

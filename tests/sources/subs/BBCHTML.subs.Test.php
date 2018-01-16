@@ -1,6 +1,6 @@
 <?php
 
-class TestBBCHTML extends PHPUnit_Framework_TestCase
+class TestBBCHTML extends \PHPUnit\Framework\TestCase
 {
 	protected $bbcTestCases;
 
@@ -46,7 +46,6 @@ class TestBBCHTML extends PHPUnit_Framework_TestCase
 	 */
 	public function testBBHTML()
 	{
-		$GLOBALS['modSettings']['enablePostHTML'] = 1;
 
 		$parser = new \BBC\HtmlParser;
 

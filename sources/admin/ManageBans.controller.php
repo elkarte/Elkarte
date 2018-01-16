@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -505,7 +505,7 @@ class ManageBans_Controller extends Action_Controller
 		);
 
 		// And a bit of javascript to enable/disable some fields
-		theme()->addInlineJavascript('addLoadEvent(fUpdateStatus);', true);
+		theme()->addInlineJavascript('window.addEventListener("load", fUpdateStatus);', true);
 	}
 
 	/**

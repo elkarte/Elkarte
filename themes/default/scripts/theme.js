@@ -7,7 +7,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  */
 
 /**
@@ -161,6 +161,11 @@ function elk_addButton(sButtonStripId, bUseImage, oOptions)
 	if ('sId' in oOptions)
 		oNewButton.id = oOptions.sId;
 	oNewButton.innerHTML = '<a class="linklevel1" href="' + oOptions.sUrl + '" ' + ('sCustom' in oOptions ? oOptions.sCustom : '') + '><span class="last"' + ('sId' in oOptions ? ' id="' + oOptions.sId + '_text"': '') + '>' + oOptions.sText + '</span></a>';
+
+	if (oOptions.aEvents)
+		oOptions.aEvents.forEach(function(e) {
+			oNewButton.addEventListener(e[0], e[1]);
+		});
 
 	oButtonStripList.appendChild(oNewButton);
 }

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -195,25 +195,22 @@ class Search
 	public function __construct()
 	{
 		$this->_search_version = strtr('ElkArte 1+1', array('+' => '.', '=' => ' '));
-		$this->_forum_version = 'ElkArte 1.1';
+		$this->_forum_version = 'ElkArte 2.0 dev';
 		$this->_db = database();
 		$this->_db_search = db_search();
 
+		$this->_db_search->skip_next_error();
 		// Remove any temporary search tables that may exist
 		$this->_db_search->search_query('drop_tmp_log_search_messages', '
-			DROP TABLE IF EXISTS {db_prefix}tmp_log_search_messages',
-			array(
-				'db_error_skip' => true,
-			)
+			DROP TABLE IF EXISTS {db_prefix}tmp_log_search_messages'
 		);
 
+		$this->_db_search->skip_next_error();
 		$this->_db_search->search_query('drop_tmp_log_search_topics', '
-			DROP TABLE IF EXISTS {db_prefix}tmp_log_search_topics',
-			array(
-				'db_error_skip' => true,
-			)
+			DROP TABLE IF EXISTS {db_prefix}tmp_log_search_topics'
 		);
 
+		$this->_db_search->skip_next_error();
 		// Create new temporary table(s) (if we can) to store preliminary results in.
 		$this->_createTemporary = $this->_db_search->search_query('create_tmp_log_search_messages', '
 			CREATE TEMPORARY TABLE {db_prefix}tmp_log_search_messages (
@@ -221,19 +218,18 @@ class Search
 				PRIMARY KEY (id_msg)
 			) ENGINE=MEMORY',
 			array(
-				'string_zero' => '0',
-				'db_error_skip' => true,
+				'string_zero' => '0'
 			)
 		) !== false;
 
+		$this->_db_search->skip_next_error();
 		$this->_db_search->search_query('create_tmp_log_search_topics', '
 			CREATE TEMPORARY TABLE {db_prefix}tmp_log_search_topics (
 				id_topic mediumint(8) unsigned NOT NULL default {string:string_zero},
 				PRIMARY KEY (id_topic)
 			) ENGINE=MEMORY',
 			array(
-				'string_zero' => '0',
-				'db_error_skip' => true,
+				'string_zero' => '0'
 			)
 		);
 	}
@@ -777,7 +773,7 @@ class Search
 
 			// Retrieve a list of possible members.
 			$request = $this->_db->query('', '
-				SELECT 
+				SELECT
 					id_member
 				FROM {db_prefix}members
 				WHERE {raw:match_possible_users}',
@@ -850,7 +846,7 @@ class Search
 		if (!empty($this->_search_params['topic']))
 		{
 			$request = $this->_db->query('', '
-				SELECT 
+				SELECT
 					b.id_board
 				FROM {db_prefix}topics AS t
 					INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
@@ -1198,7 +1194,7 @@ class Search
 				$count = 0;
 				foreach ($this->_excludedPhrases as $phrase)
 				{
-					$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:excluded_phrases_' . $count . '}';
+					$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? 'LIKE' : 'RLIKE') . ' {string:excluded_phrases_' . $count . '}';
 					$subject_query_params['excluded_phrases_' . ($count++)] = $this->_searchAPI->prepareWord($phrase, $this->noRegexp());
 				}
 			}
@@ -1502,7 +1498,7 @@ class Search
 	{
 		// Load the posters...
 		$request = $this->_db->query('', '
-			SELECT 
+			SELECT
 				id_member
 			FROM {db_prefix}messages
 			WHERE id_member != {int:no_member}
@@ -1682,8 +1678,8 @@ class Search
 				$count = 0;
 				foreach ($this->_excludedPhrases as $phrase)
 				{
-					$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:exclude_phrase_' . $count . '}';
-					$subject_query['where'][] = 'm.body NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:exclude_phrase_' . $count . '}';
+					$subject_query['where'][] = 'm.subject NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? 'LIKE' : 'RLIKE') . ' {string:exclude_phrase_' . $count . '}';
+					$subject_query['where'][] = 'm.body NOT ' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? 'LIKE' : 'RLIKE') . ' {string:exclude_phrase_' . $count . '}';
 					$subject_query['params']['exclude_phrase_' . ($count++)] = $this->_searchAPI->prepareWord($phrase, $this->noRegexp());
 				}
 			}

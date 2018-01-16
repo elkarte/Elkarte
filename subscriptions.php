@@ -12,17 +12,21 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
 // Start things rolling by getting the forum alive...
 $ssi_guest_access = true;
 if (!file_exists(dirname(__FILE__) . '/bootstrap.php'))
-	die('Cannot find bootstrap.php');
+	die('Unable to initialize');
+
+require_once(dirname(__FILE__) . '/bootstrap.php');
+new Bootstrap();
+
+global $txt, $modSettings, $context;
 
 // Need lots of help
-require_once(dirname(__FILE__) . '/bootstrap.php');
 require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 require_once(SUBSDIR . '/Admin.subs.php');
 require_once(SUBSDIR . '/Members.subs.php');

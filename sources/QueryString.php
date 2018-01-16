@@ -12,12 +12,12 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
 /**
- * Clean the request variables - add html entities to GET and slashes if magic_quotes_gpc is Off.
+ * Clean the request variables - add html entities to GET.
  *
  * What it does:
  *

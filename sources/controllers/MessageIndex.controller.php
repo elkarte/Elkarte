@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -664,7 +664,9 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 						break;
 					case 'move':
 						if (isset($this->_req->query->current_board))
-							moveTopicConcurrence((int) $this->_req->query->current_board);
+						{
+							moveTopicConcurrence((int) $this->_req->query->current_board, $board, $row['id_topic']);
+						}
 
 						// $moveCache[0] is the topic, $moveCache[1] is the board to move to.
 						$moveCache[1][$row['id_topic']] = (int) (isset($this->_req->post->move_tos[$row['id_topic']]) ? $this->_req->post->move_tos[$row['id_topic']] : $this->_req->post->move_to);

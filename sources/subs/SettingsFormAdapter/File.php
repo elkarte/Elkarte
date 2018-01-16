@@ -11,7 +11,7 @@
  * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  * license:    BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -242,7 +242,6 @@ class File extends Db
 		$config_passwords = array(
 			'db_passwd',
 			'ssi_db_passwd',
-			'cache_password',
 		);
 
 		// All the strings to write.
@@ -261,9 +260,9 @@ class File extends Db
 			'ssi_db_user',
 			'cache_accelerator',
 			'cache_memcached',
-			'cache_uid',
 		);
 
+		// These need HTML encoded. Be sure they all exist in $config_strs!
 		$safe_strings = array(
 			'mtitle',
 			'mmessage',

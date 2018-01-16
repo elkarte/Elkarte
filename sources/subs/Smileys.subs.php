@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -438,25 +438,6 @@ function getMaxSmileyOrder()
 	$db->free_result($request);
 
 	return $smiley_order;
-}
-
-/**
- * This function sorts the smiley table by code length,
- * it is needed as MySQL withdrew support for functions in order by.
- *
- * @deprecated since 1.0 - the ordering is done in the query, probably not needed
- */
-function sortSmileyTable()
-{
-	$db = database();
-
-	$db->skip_next_error();
-	// Order the table by code length.
-	$db->query('alter_table', '
-		ALTER TABLE {db_prefix}smileys
-		ORDER BY LENGTH(code) DESC',
-		array()
-	);
 }
 
 /**

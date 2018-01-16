@@ -7,8 +7,8 @@ matrix:
     - php: 7.1
       env:
         - DB=mysql-5.7
-        - WEBTESTS=false
-        - COVERAGE=false
+        - WEBTESTS=true
+        - COVERAGE=true
     - php: 7.1
       env:
         - DB=postgres-9.5
@@ -23,9 +23,6 @@ matrix:
         mariadb: '10.0'
   fast_finish: true
 
-addons:
-  firefox: "50.0"
-
 services:
   memcached
 
@@ -33,6 +30,7 @@ services:
 install:
   - chmod +x tests/travis-ci/*.sh
   - tests/travis-ci/setup-server.sh $DB $TRAVIS_PHP_VERSION $WEBTESTS $COVERAGE
+  - tests/travis-ci/setup-selenium.sh $DB $TRAVIS_PHP_VERSION $WEBTESTS $COVERAGE
 
 # Install ElkArte
 before_script:

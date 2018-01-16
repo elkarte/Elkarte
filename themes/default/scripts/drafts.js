@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 2.0 dev
  */
 
 /**
@@ -27,7 +27,7 @@ function elk_DraftAutoSave(oOptions)
 	this.sLastSaved = '';
 	this.bCheckDraft = false;
 
-	addLoadEvent(this.opt.sSelf + '.init();');
+	window.addEventListener("load", this.init.bind(this));
 }
 
 /**
@@ -38,32 +38,27 @@ elk_DraftAutoSave.prototype.init = function()
 	if (this.opt.iFreq > 0)
 	{
 		// Start the autosaver timer
-		this.interval_id = setInterval(this.opt.sSelf + '.draftSave();', this.opt.iFreq);
+		this.interval_id = setInterval(this.draftSave.bind(this), this.opt.iFreq);
 
 		// Set up the text area events
-		this.oDraftHandle.instanceRef = this;
-		this.oDraftHandle.onblur = function(oEvent) {
-			return this.instanceRef.draftBlur();
-		};
-		this.oDraftHandle.onfocus = function(oEvent) {
-			return this.instanceRef.draftFocus();
-		};
+		this.oDraftHandle.onblur =  this.draftBlur.bind(this);
+		this.oDraftHandle.onfocus = this.draftFocus.bind(this);
 		this.oDraftHandle.onkeydown = function(oEvent) {
 			// Don't let tabbing to the buttons trigger autosave event
 			if (oEvent.keyCode === 9)
-				this.instanceRef.bInDraftMode = true;
+				this.bInDraftMode = true;
 
-			return this.instanceRef.draftKeypress();
-		};
+			return this.draftKeypress().bind(this);
+		}.bind(this);
 
 		// Prevent autosave when selecting post/save by mouse or keyboard
 		var $_button = $('#postmodify').find('.button_submit');
-		$_button .on('mousedown', this.oDraftHandle.instanceRef, function() {
+		$_button .on('mousedown', this, function() {
 			this.bInDraftMode = true;
-		});
-		$_button .on('onkeypress', this.oDraftHandle.instanceRef, function() {
+		}.bind(this));
+		$_button .on('onkeypress', this, function() {
 			this.bInDraftMode = true;
-		});
+		}.bind(this));
 	}
 };
 
@@ -92,7 +87,7 @@ elk_DraftAutoSave.prototype.draftBlur = function()
 elk_DraftAutoSave.prototype.draftFocus = function()
 {
 	if (this.interval_id === "")
-		this.interval_id = setInterval(this.opt.sSelf + '.draftSave();', this.opt.iFreq);
+		this.interval_id = setInterval(this.draftSave.bind(this), this.opt.iFreq);
 };
 
 /**
@@ -154,20 +149,6 @@ elk_DraftAutoSave.prototype.onDraftDone = function(XMLDoc)
 	// If it is not valid then clean up
 	if (!XMLDoc || !XMLDoc.getElementsByTagName('draft')[0])
 		return this.draftCancel();
-
-	// @deprecated since 1.1 - the check on #id_draft existence is for backward compatibility with 1.0
-	if ($('#id_draft').length === 0)
-	{
-		var formID = $('#' + this.opt.sTextareaID).closest("form").attr('id');
-		$('#' + formID).append(
-			$('<input />').attr({
-				type: 'hidden',
-				id: this.opt.sLastID,
-				name: 'id_draft',
-				value: this.opt.id_draft
-			})
-		);
-	}
 
 	// Grab the returned draft id and saved time from the response
 	this.sCurDraftId = XMLDoc.getElementsByTagName('draft')[0].getAttribute('id');

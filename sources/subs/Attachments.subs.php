@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -412,7 +412,7 @@ function processAttachments($id_msg = null)
 		{
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 			{
-				if (strpos($attachID, 'post_tmp_' . $user_info['id']) !== false)
+				if (strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') !== false)
 					@unlink($attachment['tmp_name']);
 			}
 
@@ -481,6 +481,7 @@ function processAttachments($id_msg = null)
 				'name' => htmlspecialchars(basename($_FILES['attachment']['name'][$n]), ENT_COMPAT, 'UTF-8'),
 				'tmp_name' => $destName,
 				'attachid' => $attachID,
+				'public_attachid' => 'post_tmp_' . $user_info['id'] . '_' . md5(mt_rand()),
 				'size' => $_FILES['attachment']['size'][$n],
 				'type' => $_FILES['attachment']['type'][$n],
 				'id_folder' => $modSettings['currentAttachmentUploadDir'],
@@ -606,8 +607,29 @@ function getTempAttachById($attach_id)
 {
 	global $modSettings, $user_info;
 
+	$attach_real_id = null;
+
+	if (empty($_SESSION['temp_attachments']))
+	{
+		throw new \Exception('no_access');
+	}
+
+	foreach ($_SESSION['temp_attachments'] as $attachID => $val)
+	{
+		if ($val['public_attachid'] === $attach_id)
+		{
+			$attach_real_id = $attachID;
+			break;
+		}
+	}
+
+	if (empty($attach_real_id))
+	{
+		throw new \Exception('no_access');
+	}
+
 	// The common name form is "post_tmp_123_0ac9a0b1fc18604e8704084656ed5f09"
-	$id_attach = preg_replace('~[^0-9a-zA-Z_]~', '', $attach_id);
+	$id_attach = preg_replace('~[^0-9a-zA-Z_]~', '', $attach_real_id);
 
 	// Permissions: only temporary attachments
 	if (substr($id_attach, 0, 8) !== 'post_tmp')
@@ -626,9 +648,9 @@ function getTempAttachById($attach_id)
 
 	$attach_dir = $dirs[$modSettings['currentAttachmentUploadDir']];
 
-	if (file_exists($attach_dir . '/' . $attach_id) && isset($_SESSION['temp_attachments'][$attach_id]))
+	if (file_exists($attach_dir . '/' . $attach_real_id) && isset($_SESSION['temp_attachments'][$attach_real_id]))
 	{
-		return $_SESSION['temp_attachments'][$attach_id];
+		return $_SESSION['temp_attachments'][$attach_real_id];
 	}
 
 	throw new \Exception('no_access');
@@ -710,19 +732,6 @@ function attachmentChecks($attachID)
 	if (!empty($error))
 		throw new Elk_Exception('attach_check_nag', 'debug', array($error));
 
-	// These are the only valid image types.
-	$validImageTypes = array(
-		1 => 'gif',
-		2 => 'jpeg',
-		3 => 'png',
-		5 => 'psd',
-		6 => 'bmp',
-		7 => 'tiff',
-		8 => 'tiff',
-		9 => 'jpeg',
-		14 => 'iff'
-	);
-
 	// Just in case this slipped by the first checks, we stop it here and now
 	if ($_SESSION['temp_attachments'][$attachID]['size'] == 0)
 	{
@@ -732,8 +741,9 @@ function attachmentChecks($attachID)
 
 	// First, the dreaded security check. Sorry folks, but this should't be avoided
 	$size = elk_getimagesize($_SESSION['temp_attachments'][$attachID]['tmp_name']);
+	$valid_mime = getValidMimeImageType($size[2]);
 
-	if (isset($validImageTypes[$size[2]]))
+	if ($valid_mime !== '')
 	{
 		require_once(SUBSDIR . '/Graphics.subs.php');
 		if (!checkImageContents($_SESSION['temp_attachments'][$attachID]['tmp_name'], !empty($modSettings['attachment_image_paranoid'])))
@@ -753,9 +763,10 @@ function attachmentChecks($attachID)
 
 			if (!(empty($size)) && ($size[2] !== $old_format))
 			{
-				if (isset($validImageTypes[$size[2]]))
+				$valid_mime = getValidMimeImageType($size[2]);
+				if ($valid_mime !== '')
 				{
-					$_SESSION['temp_attachments'][$attachID]['type'] = 'image/' . $validImageTypes[$size[2]];
+					$_SESSION['temp_attachments'][$attachID]['type'] = $valid_mime;
 				}
 			}
 		}
@@ -892,19 +903,6 @@ function createAttachment(&$attachmentOptions)
 
 	require_once(SUBSDIR . '/Graphics.subs.php');
 
-	// These are the only valid image types.
-	$validImageTypes = array(
-		1 => 'gif',
-		2 => 'jpeg',
-		3 => 'png',
-		5 => 'psd',
-		6 => 'bmp',
-		7 => 'tiff',
-		8 => 'tiff',
-		9 => 'jpeg',
-		14 => 'iff'
-	);
-
 	// If this is an image we need to set a few additional parameters.
 	$size = elk_getimagesize($attachmentOptions['tmp_name']);
 	list ($attachmentOptions['width'], $attachmentOptions['height']) = $size;
@@ -914,10 +912,14 @@ function createAttachment(&$attachmentOptions)
 	{
 		// Got a proper mime type?
 		if (!empty($size['mime']))
+		{
 			$attachmentOptions['mime_type'] = $size['mime'];
+		}
 		// Otherwise a valid one?
-		elseif (isset($validImageTypes[$size[2]]))
-			$attachmentOptions['mime_type'] = 'image/' . $validImageTypes[$size[2]];
+		else
+		{
+			$attachmentOptions['mime_type'] = getValidMimeImageType($size[2]);
+		}
 	}
 
 	// It is possible we might have a MIME type that isn't actually an image but still have a size.
@@ -990,12 +992,13 @@ function createAttachment(&$attachmentOptions)
 			list ($thumb_width, $thumb_height) = $size;
 
 			if (!empty($size['mime']))
+			{
 				$thumb_mime = $size['mime'];
-			elseif (isset($validImageTypes[$size[2]]))
-				$thumb_mime = 'image/' . $validImageTypes[$size[2]];
-			// Lord only knows how this happened...
+			}
 			else
-				$thumb_mime = '';
+			{
+				$thumb_mime = getValidMimeImageType($size[2]);
+			}
 
 			$thumb_filename = $attachmentOptions['name'] . '_thumb';
 			$thumb_size = filesize($attachmentOptions['destination'] . '_thumb');
@@ -1140,7 +1143,9 @@ function getAttachmentFromTopic($id_attach, $id_topic)
 
 	$attachmentData = array();
 	if ($db->num_rows($request) != 0)
+	{
 		$attachmentData = $db->fetch_row($request);
+	}
 	$db->free_result($request);
 
 	return $attachmentData;
@@ -1166,6 +1171,10 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
 	// Make sure this attachment is on this board.
 	$request = $db->query('', '
 		SELECT th.id_folder, th.filename, th.file_hash, th.fileext, th.id_attach, th.attachment_type, th.mime_type,
+			a.id_folder AS attach_id_folder, a.filename AS attach_filename,
+			a.file_hash AS attach_file_hash, a.fileext AS attach_fileext,
+			a.id_attach AS attach_id_attach, a.attachment_type AS attach_attachment_type,
+			a.mime_type AS attach_mime_type,
 		 	a.approved, m.id_member
 		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg AND m.id_topic = {int:current_topic})
@@ -1180,7 +1189,38 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
 	$attachmentData = array();
 	if ($db->num_rows($request) != 0)
 	{
-		$attachmentData = $db->fetch_row($request);
+		$fetch = $db->fetch_assoc($request);
+
+		// If there is a hash then the thumbnail exists
+		if (!empty($fetch['file_hash']))
+		{
+			$attachmentData = array(
+				$fetch['id_folder'],
+				$fetch['filename'],
+				$fetch['file_hash'],
+				$fetch['fileext'],
+				$fetch['id_attach'],
+				$fetch['attachment_type'],
+				$fetch['mime_type'],
+				$fetch['approved'],
+				$fetch['id_member'],
+			);
+		}
+		// otherwise $modSettings['attachmentThumbnails'] may be (or was) off, so original file
+		elseif (getValidMimeImageType($fetch['attach_mime_type']) !== '')
+		{
+			$attachmentData = array(
+				$fetch['attach_id_folder'],
+				$fetch['attach_filename'],
+				$fetch['attach_file_hash'],
+				$fetch['attach_fileext'],
+				$fetch['attach_id_attach'],
+				$fetch['attach_attachment_type'],
+				$fetch['attach_mime_type'],
+				$fetch['approved'],
+				$fetch['id_member'],
+			);
+		}
 	}
 	$db->free_result($request);
 
@@ -1333,7 +1373,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 		if (rename($tempName, $destName))
 		{
 			list ($width, $height) = elk_getimagesize($destName);
-			$mime_type = 'image/' . $ext;
+			$mime_type = getValidMimeImageType($ext);
 
 			// Write filesize in the database.
 			$db->query('', '
@@ -1606,30 +1646,6 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null, $
 }
 
 /**
- * Get all avatars information... as long as they're in default directory still?
- * Not currently used
- *
- * @deprecated since 1.0
- *
- * @return mixed[] avatars information
- */
-function getAvatarsDefault()
-{
-	$db = database();
-
-	return $db->fetchQuery('
-		SELECT id_attach, id_folder, id_member, filename, file_hash
-		FROM {db_prefix}attachments
-		WHERE attachment_type = {int:attachment_type}
-			AND id_member > {int:guest_id_member}',
-		array(
-			'attachment_type' => 0,
-			'guest_id_member' => 0,
-		)
-	);
-}
-
-/**
  * Recursive function to retrieve server-stored avatar files
  *
  * @package Attachments
@@ -1697,7 +1713,7 @@ function getServerStoredAvatars($directory, $level)
 		$extension = substr(strrchr($line, '.'), 1);
 
 		// Make sure it is an image.
-		if (strcasecmp($extension, 'gif') != 0 && strcasecmp($extension, 'jpg') != 0 && strcasecmp($extension, 'jpeg') != 0 && strcasecmp($extension, 'png') != 0 && strcasecmp($extension, 'bmp') != 0)
+		if (getValidMimeImageType($extension) === '')
 			continue;
 
 		$result[] = array(
@@ -1740,17 +1756,16 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 		list ($attachment['thumb_width'], $attachment['thumb_height']) = $size;
 		$thumb_size = filesize($filename . '_thumb');
 
-		// These are the only valid image types.
-		$validImageTypes = array(1 => 'gif', 2 => 'jpeg', 3 => 'png', 5 => 'psd', 6 => 'bmp', 7 => 'tiff', 8 => 'tiff', 9 => 'jpeg', 14 => 'iff');
-
-		// What about the extension?
-		$thumb_ext = isset($validImageTypes[$size[2]]) ? $validImageTypes[$size[2]] : '';
-
 		// Figure out the mime type.
 		if (!empty($size['mime']))
+		{
 			$thumb_mime = $size['mime'];
+		}
 		else
-			$thumb_mime = 'image/' . $thumb_ext;
+		{
+			$thumb_mime = getValidMimeImageType($size[2]);
+		}
+		$thumb_ext = substr($thumb_mime, strpos($thumb_mime, '/') + 1);
 
 		$thumb_filename = $filename . '_thumb';
 		$thumb_hash = getAttachmentFilename($thumb_filename, 0, null, true);
@@ -2216,4 +2231,78 @@ function returnMimeThumb($file_ext, $url = false)
 	$filename = $location . '/images/mime_images/' . $file_ext . '.png';
 
 	return $filename;
+}
+
+/**
+ * Finds in $_SESSION['temp_attachments'] an attachment id from its public id
+ *
+ * @param string $public_attachid
+ *
+ * @return string
+ */
+function getAttachmentIdFromPublic($public_attachid)
+{
+	if (empty($_SESSION['temp_attachments']))
+	{
+		return $public_attachid;
+	}
+
+	foreach ($_SESSION['temp_attachments'] as $key => $val)
+	{
+		if (isset($val['public_attachid']) && $val['public_attachid'] === $public_attachid)
+		{
+			return $key;
+		}
+	}
+	return $public_attachid;
+}
+
+/**
+ * From either a mime type, an extension or an IMAGETYPE_* constant
+ * returns a valid image mime type
+ *
+ * @param string $mime
+ *
+ * @return string
+ */
+function getValidMimeImageType($mime)
+{
+	// These are the only valid image types.
+	static $validImageTypes = array(
+		-1 => 'jpg',
+		// Starting from here are the IMAGETYPE_* constants
+		1 => 'gif',
+		2 => 'jpeg',
+		3 => 'png',
+		5 => 'psd',
+		6 => 'bmp',
+		7 => 'tiff',
+		8 => 'tiff',
+		9 => 'jpeg',
+		14 => 'iff'
+	);
+
+	if ((int) $mime > 0)
+	{
+		$ext = isset($validImageTypes[$mime]) ? $validImageTypes[$mime] : '';
+	}
+	elseif (strpos($mime, '/'))
+	{
+		$ext = substr($mime, strpos($mime, '/') + 1);
+	}
+	else
+	{
+		$ext = $mime;
+	}
+	$ext = strtolower($ext);
+
+	foreach ($validImageTypes as $valid_ext)
+	{
+		if ($valid_ext === $ext)
+		{
+			return 'image/' . $ext;
+		}
+	}
+
+	return '';
 }

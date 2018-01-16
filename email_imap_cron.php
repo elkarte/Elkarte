@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -19,6 +19,7 @@ error_reporting(0);
 if (!defined('ELK'))
 {
 	require_once(__DIR__ . '/bootstrap.php');
+	new Bootstrap();
 	postbyemail_imap();
 
 	// Need to keep the cli clean on return

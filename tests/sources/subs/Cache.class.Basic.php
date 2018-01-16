@@ -16,7 +16,7 @@ class MockMemcached extends ElkArte\sources\subs\CacheMethod\Memcached
 /**
  * TestCase class for caching classes.
  */
-class TestCache extends PHPUnit_Framework_TestCase
+class TestCache extends \PHPUnit\Framework\TestCase
 {
 	private $_cache_obj = null;
 
@@ -62,26 +62,6 @@ class TestCache extends PHPUnit_Framework_TestCase
 	{
 		$this->_cache_obj = new MockMemcached(array('servers' => array('localhost', 'localhost:11212', 'localhost:11213')));
 		$this->assertCount(3, $this->_cache_obj->getNumServers());
-		$this->doCacheTests();
-	}
-
-	/**
-	 * Testing Xcache
-	 */
-	public function testXcache()
-	{
-		$this->_cache_obj = new ElkArte\sources\subs\CacheMethod\Xcache(array('cache_uid' => 'mOo', 'cache_password' => 'test'));
-
-		/*
-		 * Xcache may not be loaded, so skip this test. The developer has
-		 * not updated it for PHP 7. Also, since it conflicts with APC
-		 * (NOT APCu), this test won't work in PHP 5.3.
-		 */
-		if (!$this->_cache_obj->isAvailable())
-		{
-			$this->markTestSkipped('Xcache is not loaded; skipping this test method');
-		}
-
 		$this->doCacheTests();
 	}
 

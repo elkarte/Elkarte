@@ -651,7 +651,6 @@ $txt['smtp_error'] = 'Ran into problems sending Mail. Error: ';
 $txt['mail_send_unable'] = 'Unable to send mail to the email address \'%1$s\'';
 
 $txt['mlist_search'] = 'Search For Members';
-$txt['mlist_search_again'] = 'Search again'; // @deprecated since 1.0.4
 $txt['mlist_search_email'] = 'Search by email address';
 $txt['mlist_search_group'] = 'Search by position';
 $txt['mlist_search_name'] = 'Search by name';
@@ -856,7 +855,6 @@ $txt['openid'] = 'OpenID';
 
 $txt['downloads'] = 'Downloads';
 $txt['filesize'] = 'File size';
-$txt['subscribe_webslice'] = 'Subscribe to Webslice'; // @deprecated since 1.1
 
 // Restore topic
 $txt['restore_topic'] = 'Restore Topic';
@@ -877,7 +875,6 @@ $txt['badbehavior_blocked'] = '<a href="http://www.bad-behavior.ioerror.us/">Bad
 
 // Debug related - when $db_show_debug is true.
 $txt['debug_templates'] = 'Templates: ';
-$txt['debug_subtemplates'] = 'Sub templates: '; // @deprecated since 1.1
 $txt['debug_sub_templates'] = 'Sub templates: ';
 $txt['debug_language_files'] = 'Language files: ';
 $txt['debug_sheets'] = 'Style sheets: ';

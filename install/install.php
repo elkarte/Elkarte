@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -76,13 +76,6 @@ function initialize_inputs()
 		@ini_set('session.save_handler', 'files');
 	if (function_exists('session_start'))
 		@session_start();
-
-	// Reject magic_quotes_sybase='on'.
-	if (ini_get('magic_quotes_sybase') || strtolower(ini_get('magic_quotes_sybase')) == 'on')
-		die('magic_quotes_sybase=on was detected: your host is using an insecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.');
-
-	if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc() != 0)
-		die('magic_quotes_gpc=on was detected: your host is using an insecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.');
 
 	// Add slashes, as long as they aren't already being added.
 	foreach ($_POST as $k => $v)

@@ -1,6 +1,6 @@
 <?php
 
-class TestUtilclass extends PHPUnit_Framework_TestCase
+class TestUtilclass extends \PHPUnit\Framework\TestCase
 {
 	protected $string = '';
 

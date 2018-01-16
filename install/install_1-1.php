@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -2526,8 +2526,6 @@ class InstallInstructions_install_1_1
 				array('max_image_height', '0'),
 				array('onlineEnable', '0'),
 				array('cal_enabled', '0'),
-				// cal_maxyear kept for compatibility purposes
-				array('cal_maxyear', '2030'),
 				array('cal_limityear', '10'),
 				array('cal_minyear', date('Y') - 4),
 				array('cal_daysaslink', '0'),

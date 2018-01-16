@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -135,10 +135,6 @@ function create_control_richedit($editorOptions)
 
 		// Some general stuff.
 		$settings['smileys_url'] = $context['user']['smiley_path'];
-
-		// @deprecated since 1.1
-		if (!isset($context['drafts_autosave_frequency']) && !empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-			$context['drafts_autosave_frequency'] = empty($modSettings['drafts_autosave_frequency']) ? 30000 : $modSettings['drafts_autosave_frequency'] * 1000;
 
 		// This really has some WYSIWYG stuff.
 		theme()->getTemplates()->load('GenericControls');
@@ -454,10 +450,6 @@ function create_control_richedit($editorOptions)
 				$modSettings['jquery_include_ui'] = true;
 		}
 	}
-
-	// Set a flag so the sub template knows what to do...
-	// @deprecated since 1.1 - the option was removed, let's keep the variable just to avoid potential undefined indexes.
-	$context['show_bbc'] = true;
 
 	// Switch the URLs back... now we're back to whatever the main sub template is.  (like folder in PersonalMessage.)
 	if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'defaults' && isset($settings['default_template']))

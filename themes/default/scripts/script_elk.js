@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 2.0 dev
  */
 
 /**
@@ -80,8 +80,9 @@ function toggleButtonAJAX(btn, confirmation_msg_variable, onSuccessCallback)
 					$(this).attr('href', url[0].firstChild.nodeValue.removeEntities());
 
 				// Replaces the confirmation var text with the new one from the response to allow swapping on/off
+				// @todo this appears to be the start of a confirmation dialog... needs finished.
 				if (typeof (confirm_text) !== 'undefined')
-					eval(confirmation_msg_variable + '= \'' + confirm_text.replace(/[\\']/g, '\\$&') + '\'');
+					confirmation_msg_variable = confirm_text.replace(/[\\']/g, '\\$&');
 			});
 		}
 		else
@@ -853,10 +854,9 @@ function setBoardIds() {
 				firstPage = $element.data('firstpage'),
 				lastPage = $element.data('lastpage'),
 				rawBaseurl = $element.data('baseurl'),
-				baseurl = eval($element.data('baseurl')),
-				first;
-
-			var i = 0,
+				baseurl = elk_scripturl + $element.data('baseurl'),
+				first,
+				i = 0,
 				oldLastPage = 0,
 				perPageLimit = 10;
 

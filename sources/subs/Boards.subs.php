@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -723,14 +723,14 @@ function deleteBoards($boards_to_remove, $moveChildrenTo = null)
  * Put all boards in the right order and sorts the records of the boards table.
  *
  * - Used by modifyBoard(), deleteBoards(), modifyCategory(), and deleteCategories() functions
- *
- * @deprecated since 1.0 - the ordering is done in the query, probably not needed
  */
 function reorderBoards()
 {
 	global $cat_tree, $boardList, $boards;
 
 	$db = database();
+	$update_query = '';
+	$update_params = [];
 
 	getBoardTree();
 
@@ -739,25 +739,34 @@ function reorderBoards()
 	foreach ($cat_tree as $catID => $dummy)
 	{
 		foreach ($boardList[$catID] as $boardID)
+		{
 			if ($boards[$boardID]['order'] != ++$board_order)
-				$db->query('', '
-					UPDATE {db_prefix}boards
-					SET board_order = {int:new_order}
-					WHERE id_board = {int:selected_board}',
-					array(
-						'new_order' => $board_order,
-						'selected_board' => $boardID,
-					)
+			{
+				$update_query .= sprintf(
+					'
+				WHEN {int:selected_board%1$d} THEN {int:new_order%1$d}',
+					$boardID
 				);
+
+				$update_params = array_merge(
+					$update_params,
+					[
+						'new_order' . $boardID => $board_order,
+						'selected_board' . $boardID => $boardID,
+					]
+				);
+			}
+		}
 	}
 
-	// Sort the records of the boards table on the board_order value.
-	$db->skip_next_error();
-	$db->query('alter_table', '
-		ALTER TABLE {db_prefix}boards
-		ORDER BY board_order',
-		array(
-		)
+	$db->query(
+		'',
+		'
+		UPDATE {db_prefix}boards
+			SET
+				board_order = CASE id_board ' . $update_query . '
+					END',
+		$update_params
 	);
 }
 
@@ -1889,10 +1898,10 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
  * @param int[]|int $boards an array of board IDs (it accepts a single board too).
  * NOTE: the $boards param is deprecated since 1.1 - The param is passed by ref in 1.0 and the result
  * is returned through the param itself, starting from 1.1 the expected behaviour
- * is that the result is returned. The pass-by-ref is kept for backward compatibility.
- * @return int[]
+ * is that the result is returned.
+ * @return bool|int[]
  */
-function addChildBoards(&$boards)
+function addChildBoards($boards)
 {
 	$db = database();
 
@@ -1907,7 +1916,7 @@ function addChildBoards(&$boards)
 	}
 
 	$request = $db->query('', '
-		SELECT 
+		SELECT
 			b.id_board, b.id_parent
 		FROM {db_prefix}boards AS b
 		WHERE {query_see_board}

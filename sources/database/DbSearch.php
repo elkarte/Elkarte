@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 2.0 dev
  *
  */
 
@@ -42,6 +42,12 @@ interface DbSearch
 	 * @return void
 	 */
 	public function create_word_search($size);
+
+	/**
+	 * Sets the class not to return the error in case of failures
+	 * just for the "next" query.
+	 */
+	public function skip_next_error();
 
 	/**
 	 * Static method that allows to retrieve or create an instance of this class.
