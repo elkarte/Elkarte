@@ -11,11 +11,11 @@
  * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  * license:   BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version   2.0 dev
  *
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ElkArte\Menu;
 
@@ -26,68 +26,40 @@ use HttpReq;
  */
 class Menu
 {
-	/**
-	 * Instance of HttpReq
-	 * @var HttpReq
-	 */
+	/** @var HttpReq */
 	protected $req;
 
-	/**
-	 * Will hold the created $context
-	 * @var array
-	 */
+	/** @var array Will hold the created $context */
 	protected $menu_context = [];
 
-	/**
-	 * Used for profile menu for own / any
-	 * @var string
-	 */
+	/** @var string Used for profile menu for own / any */
 	protected $permission_set;
 
-	/**
-	 * If we found the menu item selected
-	 * @var bool
-	 */
+	/** @var bool If we found the menu item selected */
 	protected $found_section = false;
 
-	/**
-	 * If we can't find the selection, we pick for them
-	 * @var string
-	 */
+	/** @var string Current area */
 	protected $current_area = '';
 
-	/**
-	 * The current subaction of the system
-	 * @var string
-	 */
+	/** @var null|string The current subaction of the system */
 	protected $current_subaction = '';
 
-	/**
-	 * Will hold the selected menu data that is returned to the caller
-	 * @var array
-	 */
+	/** @var array Will hold the selected menu data that is returned to the caller */
 	private $include_data = [];
 
-	/**
-	 * Unique menu number
-	 * @var int
-	 */
-	private $max_menu_id;
+	/** @var int Unique menu number */
+	private $max_menu_id = 0;
 
-	/**
-	 * Holds menu options set by AddOptions
-	 * @var array
-	 */
+	/** @var array  Holds menu options set by AddOptions */
 	public $menuOptions = [];
 
-	/**
-	 * Holds menu definition structure set by AddAreas
-	 * @var array
-	 */
+	/** @var array  Holds menu definition structure set by AddAreas */
 	public $menuData = [];
 
 	/**
 	 * Initial processing for the menu
+	 *
+	 * @param HttpReq|null $req
 	 */
 	public function __construct(HttpReq $req = null)
 	{
@@ -137,12 +109,11 @@ class Menu
 
 		// Finally - return information on the selected item.
 		return $this->include_data + [
-			'current_action' => $this->menu_context['current_action'],
-			'current_area' => $this->current_area,
-			'current_section' => !empty($this->menu_context['current_section']) ? $this->menu_context['current_section'] : '',
-			'current_subsection' => $this->current_subaction,
-		];
-
+				'current_action' => $this->menu_context['current_action'],
+				'current_area' => $this->current_area,
+				'current_section' => !empty($this->menu_context['current_section']) ? $this->menu_context['current_section'] : '',
+				'current_subsection' => $this->current_subaction,
+			];
 	}
 
 	/**
@@ -287,6 +258,9 @@ class Menu
 	/**
 	 * Checks if the area has a label or not
 	 *
+	 * @param string   $area_id
+	 * @param MenuArea $area
+	 *
 	 * @return bool
 	 */
 	private function areaHasLabel(string $area_id, MenuArea $area): bool
@@ -396,8 +370,10 @@ class Menu
 		$counter = '';
 		if (isset($this->menuOptions['counters']) && !empty($this->menuOptions['counters'][$obj->getCounter()]))
 		{
-			$counter =
-				sprintf($settings['menu_numeric_notice'][$idx], $this->menuOptions['counters'][$obj->getCounter()]);
+			$counter = sprintf(
+				$settings['menu_numeric_notice'][$idx],
+				$this->menuOptions['counters'][$obj->getCounter()]
+			);
 		}
 
 		return $counter;
@@ -584,8 +560,11 @@ class Menu
 		global $scripturl;
 
 		// Should we use a custom base url, or use the default?
-		$this->menu_context['base_url'] =
-			$this->menuOptions['base_url'] ?? $scripturl . '?action=' . $this->menu_context['current_action'];
+		$this->menu_context['base_url'] = $this->menuOptions['base_url'] ?? sprintf(
+				'$s?action=$d',
+				$scripturl,
+				$this->menu_context['current_action']
+			);
 	}
 
 	/**
@@ -644,6 +623,9 @@ class Menu
 		return $this;
 	}
 
+	/**
+	 * The theme needs some love, too.
+	 */
 	private function buildTemplateVars(): void
 	{
 		global $user_info, $options;
