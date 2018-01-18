@@ -122,6 +122,11 @@ function callMenu(array $selectedMenu): void
 {
 	global $context;
 
+	if ($context['user']['is_owner'] && isset($selectedMenu['permission']))
+	{
+		unset($selectedMenu['permission']);
+	}
+
 	$action = new Action();
 	$action->initialize(['action' => $selectedMenu]);
 	$action->dispatch('action');
