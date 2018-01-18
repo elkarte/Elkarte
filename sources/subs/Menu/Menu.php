@@ -499,19 +499,10 @@ class Menu
 
 				if ($this->currentArea == $areaId)
 				{
-					if (empty($firstSubId))
-					{
-						$firstSubId = $subId;
-					}
 					$this->setCurrentSubSection($subId, $sub);
 				}
 			}
-
-			// Is this the current subsection?
-			if (empty($this->currentSubaction))
-			{
-				$this->currentSubaction = $firstSubId;
-			}
+			$this->setDefaultSubSection($areaId, key($subSections));
 		}
 	}
 
@@ -547,6 +538,20 @@ class Menu
 		)
 		{
 			$this->currentSubaction = $subId;
+		}
+	}
+
+	/**
+	 * Ensures that the current subsection is set.
+	 *
+	 * @param string $areaId
+	 * @param string $firstSubId
+	 */
+	private function setDefaultSubSection(string $areaId, string $firstSubId): void
+	{
+		if ($this->currentArea == $areaId && empty($this->currentSubaction))
+		{
+			$this->currentSubaction = $firstSubId;
 		}
 	}
 
