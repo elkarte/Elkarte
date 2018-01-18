@@ -27,29 +27,29 @@ class MenuOptions
 	/** @var string $action                    => overrides the default action */
 	private $action='';
 
-	/** @var string $current_area              => overrides the current area */
-	private $current_area='';
+	/** @var string $currentArea              => overrides the current area */
+	private $currentArea='';
 
-	/** @var array $extra_url_parameters      => an array or pairs or parameters to be added to the url */
-	private $extra_url_parameters=[];
+	/** @var array $extraUrlParameters      => an array or pairs or parameters to be added to the url */
+	private $extraUrlParameters=[];
 
-	/** @var boolean $disable_url_session_check => (boolean) if true the session var/id are omitted from the url */
-	private $disable_url_session_check=false;
+	/** @var boolean $disableUrlSessionCheck => (boolean) if true the session var/id are omitted from the url */
+	private $disableUrlSessionCheck=false;
 
-	/** @var string $base_url                  => an alternative base url */
-	private $base_url='';
+	/** @var string $baseUrl                  => an alternative base url */
+	private $baseUrl='';
 
-	/** @var string $menu_type                 => alternative menu types? */
-	private $menu_type='';
+	/** @var string $menuType                 => alternative menu types? */
+	private $menuType='';
 
-	/** @var boolean $can_toggle_drop_down      => (boolean) if the menu can "toggle" */
-	private $can_toggle_drop_down=true;
+	/** @var boolean $canToggleDropDown      => (boolean) if the menu can "toggle" */
+	private $canToggleDropDown=true;
 
-	/** @var string $template_name             => an alternative template to load (instead of Generic) */
-	private $template_name='GenericMenu';
+	/** @var string $templateName             => an alternative template to load (instead of Generic) */
+	private $templateName='GenericMenu';
 
-	/** @var string $layer_name                => alternative layer name for the menu */
-	private $layer_name='generic_menu';
+	/** @var string $layerName                => alternative layer name for the menu */
+	private $layerName='generic_menu';
 
 	/** @var array $hook                      => hook name to call integrate_ . 'hook name' . '_areas' */
 	private $counters=[];
@@ -75,15 +75,15 @@ class MenuOptions
 	 */
 	public function getCurrentArea(): string
 	{
-		return $this->current_area;
+		return $this->currentArea;
 	}
 
 	/**
-	 * @param string $current_area
+	 * @param string $currentArea
 	 */
-	public function setCurrentArea(string $current_area)
+	public function setCurrentArea(string $currentArea)
 	{
-		$this->current_area = $current_area;
+		$this->currentArea = $currentArea;
 	}
 
 	/**
@@ -91,15 +91,15 @@ class MenuOptions
 	 */
 	public function getExtraUrlParameters(): array
 	{
-		return $this->extra_url_parameters;
+		return $this->extraUrlParameters;
 	}
 
 	/**
-	 * @param array $extra_url_parameters
+	 * @param array $extraUrlParameters
 	 */
-	public function setExtraUrlParameters(array $extra_url_parameters)
+	public function setExtraUrlParameters(array $extraUrlParameters)
 	{
-		$this->extra_url_parameters = $extra_url_parameters;
+		$this->extraUrlParameters = $extraUrlParameters;
 	}
 
 	/**
@@ -107,15 +107,15 @@ class MenuOptions
 	 */
 	public function isUrlSessionCheckDisabled(): bool
 	{
-		return $this->disable_url_session_check;
+		return $this->disableUrlSessionCheck;
 	}
 
 	/**
-	 * @param bool $disable_url_session_check
+	 * @param bool $disableUrlSessionCheck
 	 */
-	public function setDisableUrlSessionCheck(bool $disable_url_session_check)
+	public function setDisableUrlSessionCheck(bool $disableUrlSessionCheck)
 	{
-		$this->disable_url_session_check = $disable_url_session_check;
+		$this->disableUrlSessionCheck = $disableUrlSessionCheck;
 	}
 
 	/**
@@ -123,15 +123,15 @@ class MenuOptions
 	 */
 	public function getBaseUrl(): string
 	{
-		return $this->base_url;
+		return $this->baseUrl;
 	}
 
 	/**
-	 * @param string $base_url
+	 * @param string $baseUrl
 	 */
-	public function setBaseUrl(string $base_url)
+	public function setBaseUrl(string $baseUrl)
 	{
-		$this->base_url = $base_url;
+		$this->baseUrl = $baseUrl;
 	}
 
 	/**
@@ -139,15 +139,15 @@ class MenuOptions
 	 */
 	public function getMenuType(): string
 	{
-		return $this->menu_type;
+		return $this->menuType;
 	}
 
 	/**
-	 * @param string $menu_type
+	 * @param string $menuType
 	 */
-	public function setMenuType(string $menu_type)
+	public function setMenuType(string $menuType)
 	{
-		$this->menu_type = $menu_type;
+		$this->menuType = $menuType;
 	}
 
 	/**
@@ -155,15 +155,15 @@ class MenuOptions
 	 */
 	public function isDropDownToggleable(): bool
 	{
-		return $this->can_toggle_drop_down;
+		return $this->canToggleDropDown;
 	}
 
 	/**
-	 * @param bool $can_toggle_drop_down
+	 * @param bool $canToggleDropDown
 	 */
-	public function setCanToggleDropDown(bool $can_toggle_drop_down)
+	public function setCanToggleDropDown(bool $canToggleDropDown)
 	{
-		$this->can_toggle_drop_down = $can_toggle_drop_down;
+		$this->canToggleDropDown = $canToggleDropDown;
 	}
 
 	/**
@@ -171,15 +171,15 @@ class MenuOptions
 	 */
 	public function getTemplateName(): string
 	{
-		return $this->template_name;
+		return $this->templateName;
 	}
 
 	/**
-	 * @param string $template_name
+	 * @param string $templateName
 	 */
-	public function setTemplateName(string $template_name)
+	public function setTemplateName(string $templateName)
 	{
-		$this->template_name = $template_name;
+		$this->templateName = $templateName;
 	}
 
 	/**
@@ -187,15 +187,15 @@ class MenuOptions
 	 */
 	public function getLayerName(): string
 	{
-		return $this->layer_name;
+		return $this->layerName;
 	}
 
 	/**
-	 * @param string $layer_name
+	 * @param string $layerName
 	 */
-	public function setLayerName(string $layer_name)
+	public function setLayerName(string $layerName)
 	{
-		$this->layer_name = $layer_name;
+		$this->layerName = $layerName;
 	}
 
 	/**
@@ -281,16 +281,16 @@ class MenuOptions
 			$arr[$context['session_var']]=$context['session_id'];
 		}
 
-		$extra_url_parameters = '';
-			foreach ($this->extra_url_parameters as $key => $value)
+		$extraUrlParameters = '';
+			foreach ($this->extraUrlParameters as $key => $value)
 			{
-				$extra_url_parameters .= sprintf(
+				$extraUrlParameters .= sprintf(
 				';%s=%s',
 				$key,
 				$value
 			);
 			}
 
-		return $extra_url_parameters;
+		return $extraUrlParameters;
 	}
 }
