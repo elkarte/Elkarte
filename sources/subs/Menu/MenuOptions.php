@@ -24,35 +24,35 @@ namespace ElkArte\Menu;
  */
 class MenuOptions
 {
-	/** @var string $action                    => overrides the default action */
-	private $action='';
+	/** @var string $action => overrides the default action */
+	private $action = '';
 
-	/** @var string $currentArea              => overrides the current area */
-	private $currentArea='';
+	/** @var string $currentArea => overrides the current area */
+	private $currentArea = '';
 
-	/** @var array $extraUrlParameters      => an array or pairs or parameters to be added to the url */
-	private $extraUrlParameters=[];
+	/** @var array $extraUrlParameters => an array or pairs or parameters to be added to the url */
+	private $extraUrlParameters = [];
 
 	/** @var boolean $disableUrlSessionCheck => (boolean) if true the session var/id are omitted from the url */
-	private $disableUrlSessionCheck=false;
+	private $disableUrlSessionCheck = false;
 
-	/** @var string $baseUrl                  => an alternative base url */
-	private $baseUrl='';
+	/** @var string $baseUrl => an alternative base url */
+	private $baseUrl = '';
 
-	/** @var string $menuType                 => alternative menu types? */
-	private $menuType='';
+	/** @var string $menuType => alternative menu types? */
+	private $menuType = '';
 
-	/** @var boolean $canToggleDropDown      => (boolean) if the menu can "toggle" */
-	private $canToggleDropDown=true;
+	/** @var boolean $canToggleDropDown => (boolean) if the menu can "toggle" */
+	private $canToggleDropDown = true;
 
-	/** @var string $templateName             => an alternative template to load (instead of Generic) */
-	private $templateName='GenericMenu';
+	/** @var string $templateName => an alternative template to load (instead of Generic) */
+	private $templateName = 'GenericMenu';
 
-	/** @var string $layerName                => alternative layer name for the menu */
-	private $layerName='generic_menu';
+	/** @var string $layerName => alternative layer name for the menu */
+	private $layerName = 'generic_menu';
 
-	/** @var array $hook                      => hook name to call integrate_ . 'hook name' . '_areas' */
-	private $counters=[];
+	/** @var array $hook => hook name to call integrate_ . 'hook name' . '_areas' */
+	private $counters = [];
 
 	/**
 	 * @return string
@@ -257,13 +257,15 @@ class MenuOptions
 	{
 		global $context, $scripturl;
 
-		$this->setAction($this->getAction()?:$context['current_action']);
+		$this->setAction($this->getAction() ?: $context['current_action']);
 
-		$this->setBaseUrl($this->getBaseUrl()?:sprintf(
+		$this->setBaseUrl(
+			$this->getBaseUrl() ?: sprintf(
 				'%s?action=%s',
 				$scripturl,
 				$this->getAction()
-			));
+			)
+		);
 	}
 
 	/**
@@ -278,18 +280,18 @@ class MenuOptions
 		// Only include the session ID in the URL if it's strictly necessary.
 		if (empty($this->isUrlSessionCheckDisabled()))
 		{
-			$arr[$context['session_var']]=$context['session_id'];
+			$arr[$context['session_var']] = $context['session_id'];
 		}
 
 		$extraUrlParameters = '';
-			foreach ($arr as $key => $value)
-			{
-				$extraUrlParameters .= sprintf(
+		foreach ($arr as $key => $value)
+		{
+			$extraUrlParameters .= sprintf(
 				';%s=%s',
 				$key,
 				$value
 			);
-			}
+		}
 
 		return $extraUrlParameters;
 	}

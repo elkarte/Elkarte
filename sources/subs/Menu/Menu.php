@@ -89,7 +89,7 @@ class Menu
 	 */
 	public function prepareMenu(): array
 	{
-		 // Build URLs first.
+		// Build URLs first.
 		$this->menuContext['base_url'] = $this->menuOptions->getBaseUrl();
 		$this->menuContext['current_action'] = $this->menuOptions->getAction();
 		$this->currentArea = $this->req->getQuery('area', 'trim|strval', $this->menuOptions->getCurrentArea());
@@ -417,29 +417,29 @@ class Menu
 	 */
 	protected function processAreaSubsections(string $sectionId, string $areaId, MenuArea $area): void
 	{
-			$this->menuContext['sections'][$sectionId]['areas'][$areaId]['subsections'] = [];
+		$this->menuContext['sections'][$sectionId]['areas'][$areaId]['subsections'] = [];
 
-			// For each subsection process the options
-			$subSections = array_filter(
-				$area->getSubsections(),
-				function ($sub) {
-					return $this->checkPermissions($sub) && $sub->isEnabled();
-				}
-			);
-			foreach ($subSections as $subId => $sub)
-			{
-				$this->menuContext['sections'][$sectionId]['areas'][$areaId]['subsections'][$subId] = [
-					'label' => $sub->getLabel() . $this->parseCounter($sub, 2),
-				];
-
-				$this->setSubsSectionUrl($sectionId, $areaId, $subId, $sub);
-
-				if ($this->currentArea == $areaId)
-				{
-					$this->setCurrentSubSection($subId, $sub);
-				}
+		// For each subsection process the options
+		$subSections = array_filter(
+			$area->getSubsections(),
+			function ($sub) {
+				return $this->checkPermissions($sub) && $sub->isEnabled();
 			}
-			$this->setDefaultSubSection($areaId, $subSections);
+		);
+		foreach ($subSections as $subId => $sub)
+		{
+			$this->menuContext['sections'][$sectionId]['areas'][$areaId]['subsections'][$subId] = [
+				'label' => $sub->getLabel() . $this->parseCounter($sub, 2),
+			];
+
+			$this->setSubsSectionUrl($sectionId, $areaId, $subId, $sub);
+
+			if ($this->currentArea == $areaId)
+			{
+				$this->setCurrentSubSection($subId, $sub);
+			}
+		}
+		$this->setDefaultSubSection($areaId, $subSections);
 	}
 
 	/**
