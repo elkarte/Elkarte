@@ -239,13 +239,13 @@ class MenuOptions
 	 */
 	private function buildTemplateVars(): void
 	{
-		global $userInfo, $options;
+		global $user_info, $options;
 
 		if (empty($this->getMenuType()))
 		{
 			$this->setMenuType(empty($options['use_sidebar_menu']) ? 'dropdown' : 'sidebar');
 		}
-		$this->setCanToggleDropDown(!$userInfo['is_guest'] && $this->isDropDownToggleable());
+		$this->setCanToggleDropDown(!$user_info['is_guest'] && $this->isDropDownToggleable());
 
 		$this->setLayerName($this->getLayerName() . '_' . $this->getMenuType());
 	}
