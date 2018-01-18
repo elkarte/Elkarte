@@ -221,12 +221,13 @@ class MenuOptions
 	 */
 	public static function buildFromArray(array $arr): MenuOptions
 	{
-		foreach (array_replace(
-					$vars = get_object_vars($obj = new self),
-					array_intersect_key($arr, $vars)
-				) as $var => $val)
+		$obj = new self;
+		foreach ($arr as $var => $val)
 		{
-			$obj->{'set' . str_replace('_', '', ucwords($var, '_'))}($val);
+			if (is_callable([$obj, $call = 'set' . str_replace('_', '', ucwords($var, '_'))]))
+			{
+				$obj->{$call}($val);
+			}
 		}
 		$obj->buildBaseUrl();
 		$obj->buildTemplateVars();
