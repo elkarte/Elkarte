@@ -475,11 +475,7 @@ class Menu
 	 */
 	protected function processAreaSubsections(string $sectionId, string $areaId, MenuArea $area): void
 	{
-		// If there are subsections for this menu item
-		if (!empty($area->getSubsections()))
-		{
 			$this->menuContext['sections'][$sectionId]['areas'][$areaId]['subsections'] = [];
-			$firstSubId = '';
 
 			// For each subsection process the options
 			$subSections = array_filter(
@@ -488,7 +484,6 @@ class Menu
 					return $this->checkPermissions($sub) && $sub->isEnabled();
 				}
 			);
-			/** @var string $subId */
 			foreach ($subSections as $subId => $sub)
 			{
 				$this->menuContext['sections'][$sectionId]['areas'][$areaId]['subsections'][$subId] = [
@@ -502,8 +497,7 @@ class Menu
 					$this->setCurrentSubSection($subId, $sub);
 				}
 			}
-			$this->setDefaultSubSection($areaId, key($subSections));
-		}
+			$this->setDefaultSubSection($areaId, $subSections);
 	}
 
 	/**
@@ -545,13 +539,13 @@ class Menu
 	 * Ensures that the current subsection is set.
 	 *
 	 * @param string $areaId
-	 * @param string $firstSubId
+	 * @param array  $subSections
 	 */
-	private function setDefaultSubSection(string $areaId, string $firstSubId): void
+	private function setDefaultSubSection(string $areaId, array $subSections): void
 	{
 		if ($this->currentArea == $areaId && empty($this->currentSubaction))
 		{
-			$this->currentSubaction = $firstSubId;
+			$this->currentSubaction = key($subSections) ?? '';
 		}
 	}
 
