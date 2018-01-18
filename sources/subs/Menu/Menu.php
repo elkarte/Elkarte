@@ -50,11 +50,11 @@ class Menu
 	/** @var int Unique menu number */
 	private $maxMenuId = 0;
 
-	/** @var array  Holds menu options set by AddOptions */
-	public $menuOptions = [];
+	/** @var MenuOptions  Holds menu options */
+	private $menuOptions;
 
-	/** @var array  Holds menu definition structure set by AddAreas */
-	public $menuData = [];
+	/** @var array  Holds menu definition structure set by addSection */
+	private $menuData = [];
 
 	/**
 	 * Initial processing for the menu
@@ -89,22 +89,23 @@ class Menu
 	 */
 	public function prepareMenu(): array
 	{
-		// Process the menu Options
-		$this->processMenuOptions();
+		 // Build URLs first.
+		$this->menuContext['base_url'] = $this->menuOptions->getBaseUrl();
+		$this->menuContext['current_action'] = $this->menuOptions->getAction();
+		$this->currentArea = $this->req->getQuery('area', 'trim|strval', $this->menuOptions->getCurrentArea());
+		$this->menuContext['extra_parameters'] = $this->menuOptions->buildAdditionalParams();
 
-		// Check the menus urls
-		$this->setBaseUrl();
-
-		// Process the menu Data
+		// Process the loopy menu data.
 		$this->processMenuData();
 
-		// Check the menus urls
+		// Here is some activity.
 		$this->setActiveButtons();
 
-		// Make sure we created some awesome sauce
-		if (!$this->validateData())
+		// Make sure we created some awesome sauce.
+		if (empty($this->includeData))
 		{
-			throw new \Elk_Exception('no_access', false);
+			// No valid areas -- reject!
+			throw new \Elk_Exception('no_access');
 		}
 
 		// Finally - return information on the selected item.
@@ -147,65 +148,6 @@ class Menu
 	}
 
 	/**
-	 * Performs a sanity check that a menu was created successfully
-	 *
-	 *   - If it fails to find valid data, will reset max_menu_id and any menu context created
-	 *
-	 * @return bool
-	 */
-	private function validateData(): bool
-	{
-		if (empty($this->menuContext['sections']))
-		{
-			return false;
-		}
-
-		// Check we had something - for sanity sake.
-		return !empty($this->includeData);
-	}
-
-	/**
-	 * Process the array of MenuOptions passed to the class
-	 */
-	protected function processMenuOptions(): void
-	{
-		global $context;
-
-		// What is the general action of this menu i.e. $scripturl?action=XYZ.
-		$this->menuContext['current_action'] = $this->menuOptions['action'] ?? $context['current_action'];
-
-		// What is the current area selected?
-		$this->currentArea = $this->req->getQuery('area', 'trim|strval', $this->menuOptions['area'] ?? '');
-
-		$this->buildAdditionalParams();
-		$this->buildTemplateVars();
-	}
-
-	/**
-	 * Build the menuOption additional parameters for use in the url
-	 */
-	private function buildAdditionalParams(): void
-	{
-		global $context;
-
-		$this->menuContext['extra_parameters'] = '';
-
-		if (!empty($this->menuOptions['extra_url_parameters']))
-		{
-			foreach ($this->menuOptions['extra_url_parameters'] as $key => $value)
-			{
-				$this->menuContext['extra_parameters'] .= ';' . $key . '=' . $value;
-			}
-		}
-
-		// Only include the session ID in the URL if it's strictly necessary.
-		if (empty($this->menuOptions['disable_url_session_check']))
-		{
-			$this->menuContext['extra_parameters'] .= ';' . $context['session_var'] . '=' . $context['session_id'];
-		}
-	}
-
-	/**
 	 * Process the menuData array passed to the class
 	 *
 	 *   - Only processes areas that are enabled and that the user has permissions
@@ -229,7 +171,7 @@ class Menu
 	/**
 	 * Determines if the user has the permissions to access the section/area
 	 *
-	 * If said item did not provide any permission to check, full
+	 * If said item did not provide any permission to check, fullly
 	 * unfettered access is assumed.
 	 *
 	 * The profile areas are a bit different in that each permission is
@@ -244,7 +186,7 @@ class Menu
 		if (!empty($obj->getPermission()))
 		{
 			// The profile menu has slightly different permissions
-			if (is_array($obj->getPermission()) && isset($obj->getPermission()['own'], $obj->getPermission()['any']))
+			if (isset($obj->getPermission()['own'], $obj->getPermission()['any']))
 			{
 				return allowedTo($obj->getPermission()[$this->permissionSet]);
 			}
@@ -368,11 +310,11 @@ class Menu
 		global $settings;
 
 		$counter = '';
-		if (isset($this->menuOptions['counters']) && !empty($this->menuOptions['counters'][$obj->getCounter()]))
+		if (!empty($this->menuOptions->getCounters()[$obj->getCounter()]))
 		{
 			$counter = sprintf(
 				$settings['menu_numeric_notice'][$idx],
-				$this->menuOptions['counters'][$obj->getCounter()]
+				$this->menuOptions->getCounters()[$obj->getCounter()]
 			);
 		}
 
@@ -552,21 +494,6 @@ class Menu
 	/**
 	 * Checks and updates base and section urls
 	 */
-	private function setBaseUrl(): void
-	{
-		global $scripturl;
-
-		// Should we use a custom base url, or use the default?
-		$this->menuContext['base_url'] = $this->menuOptions['base_url'] ?? sprintf(
-				'%s?action=%s',
-				$scripturl,
-				$this->menuContext['current_action']
-			);
-	}
-
-	/**
-	 * Checks and updates base and section urls
-	 */
 	private function setActiveButtons(): void
 	{
 		// If there are sections quickly goes through all the sections to check if the base menu has an url
@@ -604,7 +531,7 @@ class Menu
 	 */
 	public function addOptions(array $menuOptions): void
 	{
-		$this->menuOptions = array_merge($this->menuOptions, $menuOptions);
+		$this->menuOptions = MenuOptions::buildFromArray($menuOptions);
 	}
 
 	/**
@@ -621,25 +548,6 @@ class Menu
 	}
 
 	/**
-	 * The theme needs some love, too.
-	 */
-	private function buildTemplateVars(): void
-	{
-		global $userInfo, $options;
-
-		if (empty($this->menuOptions['menu_type']))
-		{
-			$this->menuOptions['menu_type'] = empty($options['use_sidebar_menu']) ? 'dropdown' : 'sidebar';
-		}
-		$this->menuOptions['can_toggle_drop_down'] =
-			!$userInfo['is_guest'] || !empty($this->menuOptions['can_toggle_drop_down']);
-
-		$this->menuOptions['template_name'] = $this->menuOptions['template_name'] ?? 'GenericMenu';
-		$this->menuOptions['layer_name'] =
-			($this->menuOptions['layer_name'] ?? 'generic_menu') . '_' . $this->menuOptions['menu_type'];
-	}
-
-	/**
 	 * Finalizes items so the computed menu can be used
 	 *
 	 * What it does:
@@ -652,12 +560,12 @@ class Menu
 		global $context;
 
 		// Almost there - load the template and add to the template layers.
-		theme()->getTemplates()->load($this->menuOptions['template_name']);
-		theme()->getLayers()->add($this->menuOptions['layer_name']);
+		theme()->getTemplates()->load($this->menuOptions->getTemplateName());
+		theme()->getLayers()->add($this->menuOptions->getLayerName());
 
 		// Set it all to context for template consumption
-		$this->menuContext['layer_name'] = $this->menuOptions['layer_name'];
-		$this->menuContext['can_toggle_drop_down'] = $this->menuOptions['can_toggle_drop_down'];
+		$this->menuContext['layer_name'] = $this->menuOptions->getLayerName();
+		$this->menuContext['can_toggle_drop_down'] = $this->menuOptions->isDropDownToggleable();
 		$context['max_menu_id'] = $this->maxMenuId;
 		$context['current_subaction'] = $this->currentSubaction;
 		$this->menuContext['current_subsection'] = $this->currentSubaction;

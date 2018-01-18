@@ -143,6 +143,7 @@ class MenuTest extends BaseMenuTest
 {
 	private $req;
 	private $sections = [];
+	private $options = [];
 	private $menuObjects = [];
 
 	protected function setUp()
@@ -289,7 +290,8 @@ class MenuTest extends BaseMenuTest
 
 	public function addOptions($menuOptions)
 	{
-		$this->menuObjects[count($this->menuObjects) - 1]->addOptions($menuOptions);
+		$this->options = array_merge($this->options, $menuOptions);
+		$this->menuObjects[count($this->menuObjects) - 1]->addOptions($this->options);
 	}
 
 	public function prepareMenu()
