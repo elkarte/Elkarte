@@ -282,7 +282,7 @@ class MenuOptions
 		}
 
 		$extraUrlParameters = '';
-			foreach ($this->extraUrlParameters as $key => $value)
+			foreach ($arr as $key => $value)
 			{
 				$extraUrlParameters .= sprintf(
 				';%s=%s',
