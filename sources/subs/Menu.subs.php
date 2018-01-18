@@ -122,7 +122,7 @@ function callMenu(array $selectedMenu): void
 {
 	global $context;
 
-	if ($context['user']['is_owner'] && isset($selectedMenu['permission']))
+	if (!empty($context['user']['is_owner']) && isset($selectedMenu['permission']))
 	{
 		unset($selectedMenu['permission']);
 	}
