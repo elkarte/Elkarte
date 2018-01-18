@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace ElkArte\Menu;
 
+use Elk_Exception;
 use HttpReq;
 
 /**
@@ -85,7 +86,7 @@ class Menu
 	 * Create a menu
 	 *
 	 * @return array
-	 * @throws \Elk_Exception
+	 * @throws Elk_Exception
 	 */
 	public function prepareMenu(): array
 	{
@@ -105,7 +106,7 @@ class Menu
 		if (empty($this->includeData))
 		{
 			// No valid areas -- reject!
-			throw new \Elk_Exception('no_access');
+			throw new Elk_Exception('no_access');
 		}
 
 		// Finally - return information on the selected item.
