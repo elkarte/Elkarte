@@ -92,7 +92,7 @@ class Menu
 		// Build URLs first.
 		$this->menuContext['base_url'] = $this->menuOptions->getBaseUrl();
 		$this->menuContext['current_action'] = $this->menuOptions->getAction();
-		$this->currentArea = $this->req->getQuery('area', 'trim|strval', $this->menuOptions->getCurrentArea());
+		$this->currentArea = $this->req->getQuery('area', 'trim|strval', $this->menuOptions->getArea());
 		$this->menuContext['extra_parameters'] = $this->menuOptions->buildAdditionalParams();
 
 		// Process the loopy menu data.

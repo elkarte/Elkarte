@@ -27,8 +27,8 @@ class MenuOptions
 	/** @var string $action => overrides the default action */
 	private $action = '';
 
-	/** @var string $currentArea => overrides the current area */
-	private $currentArea = '';
+	/** @var string $area => overrides the current area */
+	private $area = '';
 
 	/** @var array $extraUrlParameters => an array or pairs or parameters to be added to the url */
 	private $extraUrlParameters = [];
@@ -73,17 +73,17 @@ class MenuOptions
 	/**
 	 * @return string
 	 */
-	public function getCurrentArea(): string
+	public function getArea(): string
 	{
-		return $this->currentArea;
+		return $this->area;
 	}
 
 	/**
-	 * @param string $currentArea
+	 * @param string $area
 	 */
-	public function setCurrentArea(string $currentArea)
+	public function setArea(string $area)
 	{
-		$this->currentArea = $currentArea;
+		$this->area = $area;
 	}
 
 	/**
