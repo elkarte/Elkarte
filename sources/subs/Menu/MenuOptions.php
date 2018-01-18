@@ -279,7 +279,7 @@ class MenuOptions
 		$arr = $this->getExtraUrlParameters();
 
 		// Only include the session ID in the URL if it's strictly necessary.
-		if (empty($this->isUrlSessionCheckDisabled()))
+		if (!$this->isUrlSessionCheckDisabled())
 		{
 			$arr[$context['session_var']] = $context['session_id'];
 		}
