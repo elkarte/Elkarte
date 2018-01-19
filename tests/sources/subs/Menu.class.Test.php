@@ -19,10 +19,9 @@ abstract class BaseMenuTest extends \PHPUnit\Framework\TestCase
 		$this->assertArrayNotHasKey('section3', $result['sections']);
 		$this->assertCount(3, $result['sections']);
 		$this->assertCount(1, $result['sections']['section2']['areas']);
-		$this->assertCount(4, $result['sections']['section2']['areas']['area3']['subsections']);
-
-		$this->assertTrue($result['sections']['section2']['areas']['area3']['subsections']['sub3']['disabled']);
+		$this->assertCount(3, $result['sections']['section2']['areas']['area3']['subsections']);
 		$this->assertArrayNotHasKey('area2', $result['sections']['section2']['areas']);
+		$this->assertArrayNotHasKey('sub3', $result['sections']['section2']['areas']['area3']['subsections']);
 	}
 
 	/**

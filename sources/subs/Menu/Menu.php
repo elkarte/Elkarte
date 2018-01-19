@@ -83,6 +83,9 @@ class Menu
 
 		// We may have a current subaction
 		$this->currentSubaction = $context['current_subaction'] ?? null;
+
+		// Would you like fries with that?
+		$this->menuOptions = new MenuOptions;
 	}
 
 	/**
