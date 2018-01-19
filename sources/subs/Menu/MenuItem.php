@@ -8,11 +8,17 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version   2.0 dev
- *
  */
 
 namespace ElkArte\Menu;
 
+/**
+ * Class MenuItem
+ *
+ * This class implements a standard way of creating menus
+ *
+ * @package ElkArte\Menu
+ */
 abstract class MenuItem
 {
 	/** @var string $label Text label for this subsection. */
