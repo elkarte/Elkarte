@@ -8,11 +8,17 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version   2.0 dev
- *
  */
 
 namespace ElkArte\Menu;
 
+/**
+ * Class MenuArea
+ *
+ * This class implements a standard way of creating menus
+ *
+ * @package ElkArte\Menu
+ */
 class MenuArea extends MenuItem
 {
 	/** @var callable $function function to call when area is selected. */

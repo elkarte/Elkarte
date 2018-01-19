@@ -12,7 +12,6 @@
  * license:   BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version   2.0 dev
- *
  */
 
 declare(strict_types=1);
@@ -20,38 +19,42 @@ declare(strict_types=1);
 namespace ElkArte\Menu;
 
 /**
+ * Class MenuOptions
+ *
  * This class implements a standard way of creating menus
+ *
+ * @package ElkArte\Menu
  */
 class MenuOptions
 {
-	/** @var string $action => overrides the default action */
+	/** @var string $action overrides the default action */
 	private $action = '';
 
-	/** @var string $area => overrides the current area */
+	/** @var string $area overrides the current area */
 	private $area = '';
 
-	/** @var array $extraUrlParameters => an array or pairs or parameters to be added to the url */
+	/** @var array $extraUrlParameters an array or pairs or parameters to be added to the url */
 	private $extraUrlParameters = [];
 
-	/** @var boolean $disableUrlSessionCheck => (boolean) if true the session var/id are omitted from the url */
+	/** @var boolean $disableUrlSessionCheck if true the session var/id are omitted from the url */
 	private $disableUrlSessionCheck = false;
 
-	/** @var string $baseUrl => an alternative base url */
+	/** @var string $baseUrl an alternative base url */
 	private $baseUrl = '';
 
-	/** @var string $menuType => alternative menu types? */
+	/** @var string $menuType alternative menu type to replace the usual sidebar/dropdown. */
 	private $menuType = '';
 
-	/** @var boolean $canToggleDropDown => (boolean) if the menu can "toggle" */
+	/** @var boolean $canToggleDropDown if the menu can toggle between sidebar and dropdown. */
 	private $canToggleDropDown = true;
 
-	/** @var string $templateName => an alternative template to load (instead of Generic) */
+	/** @var string $templateName an alternative template to load (instead of Generic) */
 	private $templateName = 'GenericMenu';
 
-	/** @var string $layerName => alternative layer name for the menu */
+	/** @var string $layerName alternative layer name for the menu */
 	private $layerName = 'generic_menu';
 
-	/** @var array $hook => hook name to call integrate_ . 'hook name' . '_areas' */
+	/** @var array $counters All the counters to be used for a menu. See Menu::parseCounter() */
 	private $counters = [];
 
 	/**
@@ -215,7 +218,11 @@ class MenuOptions
 	}
 
 	/**
-	 * @param array $arr
+	 * Add an array of options for a menu.
+	 *
+	 * @param array $arr Options as an array. Keys should match properties
+	 *                   of MenuOptions and can be either in snake_case or in camelCase,
+	 *                   depending on your style.
 	 *
 	 * @return MenuOptions
 	 */
@@ -271,6 +278,8 @@ class MenuOptions
 
 	/**
 	 * Build the additional parameters for use in the url
+	 *
+	 * @return string
 	 */
 	public function buildAdditionalParams(): string
 	{
