@@ -8,11 +8,17 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version   2.0 dev
- *
  */
 
 namespace ElkArte\Menu;
 
+/**
+ * Class MenuSubsection
+ *
+ * This class implements a standard way of creating menus
+ *
+ * @package ElkArte\Menu
+ */
 class MenuSubsection extends MenuItem
 {
 	/** @var bool $default Is this the default subaction - if not set for any will default to first... */

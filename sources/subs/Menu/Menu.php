@@ -12,7 +12,6 @@
  * license:   BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version   2.0 dev
- *
  */
 
 declare(strict_types=1);
@@ -23,7 +22,11 @@ use Elk_Exception;
 use HttpReq;
 
 /**
+ * Class Menu
+ *
  * This class implements a standard way of creating menus
+ *
+ * @package ElkArte\Menu
  */
 class Menu
 {
@@ -515,20 +518,8 @@ class Menu
 	/**
 	 * Add the base menu options for this menu
 	 *
-	 * @param array $menuOptions an array of options that can be used to override some default behaviours.
-	 *                           It can accept the following indexes:
-	 *                           - action                    => overrides the default action
-	 *                           - current_area              => overrides the current area
-	 *                           - extra_url_parameters      => an array or pairs or parameters to be added to the url
-	 *                           - disable_url_session_check => (boolean) if true the session var/id are omitted from
-	 *                           the url
-	 *                           - base_url                  => an alternative base url
-	 *                           - menu_type                 => alternative menu types?
-	 *                           - can_toggle_drop_down      => (boolean) if the menu can "toggle"
-	 *                           - template_name             => an alternative template to load (instead of Generic)
-	 *                           - layer_name                => alternative layer name for the menu
-	 *                           - hook                      => hook name to call integrate_ . 'hook name' . '_areas'
-	 *                           - default_include_dir       => directory to include for function support
+	 * @param array $menuOptions an array of options that can be used to override some default
+	 *                           behaviours. See MenuOptions for details.
 	 */
 	public function addOptions(array $menuOptions): void
 	{
