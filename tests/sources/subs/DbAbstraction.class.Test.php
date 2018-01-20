@@ -9,20 +9,14 @@ class TestDbAbstraction extends \PHPUnit\Framework\TestCase
 	 */
 	public function setUp()
 	{
-		require_once(SOURCEDIR . '/database/Boards.subs.php');
-		require_once('/var/www/tests/sources/subs/Db-DummyMy.class.php');
-		require_once('/var/www/tests/sources/subs/Db-DummyPg.class.php');
-		$this->_dummy_dbs = array(
-			'mysql' => new Database_DummyMy::initiate('', '', '', '', 'a_prefix'),
-			'psql' => new Database_DummyPg::initiate('', '', '', '', 'a_prefix'),
-		);
+		$this->_dummy_dbs = database();
 
 		$this->tests = array(
 			array(
 				'test' => '{string_case_sensitive:a_string}',
 				'results' => array(
-					'mysql' => 'BINARY \'a_string\'',
-					'psql' => '\'a_string\'',
+					'MySQL' => 'BINARY \'a_string\'',
+					'PostgreSQL' => '\'a_string\'',
 				)
 			)
 		);
@@ -32,11 +26,8 @@ class TestDbAbstraction extends \PHPUnit\Framework\TestCase
 	{
 		foreach ($this->tests as $test)
 		{
-			foreach ($test['results'] as $db => $result)
-			{
-				$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', array($this->_dummy_dbs[$db], 'replacement__callback'), $test['test']);
-				$this->assertEquals($db_string, $result, 'Wrong replacement for ' . $db . ' on test ' . $test['test']);
-			}
+			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', array($this->_dummy_dbs[DB_TYPE], 'replacement__callback'), $test['test']);
+			$this->assertEquals($db_string, $test['results'][DB_TYPE], 'Wrong replacement for ' . DB_TYPE . ' on test ' . $test['test']);
 		}
 	}
 }
