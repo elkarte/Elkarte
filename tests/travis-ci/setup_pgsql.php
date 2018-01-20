@@ -35,7 +35,7 @@ class DbTable_PostgreSQL_Install extends DbTable_PostgreSQL
 	 *
 	 * @param object $db - A Database_PostgreSQL object
 	 */
-	private function __construct($db)
+	protected function __construct($db)
 	{
 		global $db_prefix;
 

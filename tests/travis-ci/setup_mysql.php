@@ -34,7 +34,7 @@ class DbTable_MySQL_Install extends DbTable_MySQL
 	 *
 	 * @param object $db - A Database_MySQL object
 	 */
-	private function __construct($db)
+	protected function __construct($db)
 	{
 		global $db_prefix;
 
