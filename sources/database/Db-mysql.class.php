@@ -1286,4 +1286,31 @@ class Database_MySQL extends Database_Abstract
 	{
 		return is_object($connection);
 	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected function _replaceStringCaseSensitive($replacement)
+	{
+		return 'BINARY ' . $this->_replaceString($replacement);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected function _replaceStringCaseInsensitive($replacement)
+	{
+		return $this->_replaceString($replacement);
+	}
+
+	/**
+	 * Casts the column to LOWER(column_name) for replacement__callback.
+	 *
+	 * @param mixed $replacement
+	 * @return string
+	 */
+	protected function _replaceColumnCaseInsensitive($replacement)
+	{
+		return $replacement;
+	}
 }

@@ -352,10 +352,7 @@ class ManageMembers_Controller extends Action_Controller
 					// Replace the wildcard characters ('*' and '?') into MySQL ones.
 					$parameter = strtolower(strtr(Util::htmlspecialchars($search_params[$param_name], ENT_QUOTES), array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_')));
 
-					if (defined('DB_CASE_SENSITIVE'))
-						$query_parts[] = '(LOWER(' . implode(') LIKE {string:' . $param_name . '_normal} OR LOWER(', $param_info['db_fields']) . ') LIKE {string:' . $param_name . '_normal})';
-					else
-						$query_parts[] = '(' . implode(' LIKE {string:' . $param_name . '_normal} OR ', $param_info['db_fields']) . ' LIKE {string:' . $param_name . '_normal})';
+					$query_parts[] = '({column_case_insensitive:' . implode(' LIKE {string_case_insensitive:' . $param_name . '_normal} OR {column_case_insensitive:', $param_info['db_fields']) . '} LIKE {string_case_insensitive:' . $param_name . '_normal})';
 
 					$where_params[$param_name . '_normal'] = '%' . $parameter . '%';
 				}

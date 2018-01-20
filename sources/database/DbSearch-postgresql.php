@@ -14,7 +14,7 @@
 /**
  * PostgreSQL implementation of DbSearch
  */
-class DbSearch_PostgreSQL implements DbSearch
+class DbSearch_PostgreSQL extends DbSearch_Abstract
 {
 	/**
 	 * This instance of the search
@@ -23,49 +23,19 @@ class DbSearch_PostgreSQL implements DbSearch
 	private static $_search = null;
 
 	/**
-	 * The way to skip a database error
-	 * @var boolean
+	 * Everything starts here... more or less
 	 */
-	protected $_skip_error = false;
-
-	/**
-	 * This function will tell you whether this database type supports this search type.
-	 *
-	 * @param string $search_type
-	 *
-	 * @return bool
-	 */
-	public function search_support($search_type)
+	public function __construct()
 	{
-		$supported_types = array('custom');
-
-		return in_array($search_type, $supported_types);
+		$this->_supported_types = array('custom');
 	}
 
 	/**
-	 * Compute and execute the correct query for search.
-	 * Returns the result of executing the query.
-	 *
-	 * @param string $identifier
-	 * @param string $db_string
-	 * @param mixed[] $db_values default array()
-	 * @param resource|null $connection
+	 * {@inheritDoc}
 	 */
 	public function search_query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
-		$db = database();
-
 		$replacements = array(
-			'create_tmp_log_search_topics' => array(
-				'~mediumint\(\d\)~i' => 'int',
-				'~unsigned~i' => '',
-				'~ENGINE=MEMORY~i' => '',
-			),
-			'create_tmp_log_search_messages' => array(
-				'~mediumint\(\d\)~i' => 'int',
-				'~unsigned~i' => '',
-				'~ENGINE=MEMORY~i' => '',
-			),
 			'drop_tmp_log_search_topics' => array(
 				'~IF\sEXISTS~i' => '',
 			),
@@ -87,7 +57,9 @@ class DbSearch_PostgreSQL implements DbSearch
 		);
 
 		if (isset($replacements[$identifier]))
+		{
 			$db_string = preg_replace(array_keys($replacements[$identifier]), array_values($replacements[$identifier]), $db_string);
+		}
 		elseif (preg_match('~^\s*INSERT\sIGNORE~i', $db_string) != 0)
 		{
 			$db_string = preg_replace('~^\s*INSERT\sIGNORE~i', 'INSERT', $db_string);
@@ -95,30 +67,11 @@ class DbSearch_PostgreSQL implements DbSearch
 			$this->_skip_error = true;
 		}
 
-		if ($this->_skip_error === true)
-		{
-			$db->skip_next_error();
-			$this->_skip_error = false;
-		}
-
-		$return = $db->query('', $db_string,
-			$db_values, $connection
-		);
-
-		return $return;
+		return parent::search_query('', $db_string, $db_values, $connection);
 	}
 
 	/**
 	 * {@inheritDoc}
-	 */
-	public function skip_next_error()
-	{
-		$this->_skip_error = true;
-	}
-
-	/**
-	 * Returns some basic info about the {db_prefix}messages table
-	 * Used in ManageSearch.controller.php in the page to select the index method
 	 */
 	public function membersTableInfo()
 	{
@@ -132,7 +85,9 @@ class DbSearch_PostgreSQL implements DbSearch
 		// In order to report the sizes correctly we need to perform vacuum (optimize) on the tables we will be using.
 		$db_table->optimize('{db_prefix}messages');
 		if ($db_table->table_exists('{db_prefix}log_search_words'))
+		{
 			$db_table->optimize('{db_prefix}log_search_words');
+		}
 
 		// PostGreSql has some hidden sizes.
 		$request = $db->query('', '
@@ -166,6 +121,7 @@ class DbSearch_PostgreSQL implements DbSearch
 			$db->free_result($request);
 		}
 		else
+		{
 			// Didn't work for some reason...
 			$table_info = array(
 				'data_length' => $txt['not_applicable'],
@@ -173,32 +129,17 @@ class DbSearch_PostgreSQL implements DbSearch
 				'fulltext_length' => $txt['not_applicable'],
 				'custom_index_length' => $txt['not_applicable'],
 			);
+		}
 
 		return $table_info;
 	}
 
 	/**
-	 * Make a custom word index.
-	 *
-	 * @param string $size
+	 * {@inheritDoc}
 	 */
-	public function create_word_search($size)
+	public function create_word_search($type, $size = 10)
 	{
-		$db = database();
-
-		$size = 'int';
-
-		$db->query('', '
-			CREATE TABLE {db_prefix}log_search_words (
-				id_word {raw:size} NOT NULL default {string:string_zero},
-				id_msg int NOT NULL default {string:string_zero},
-				PRIMARY KEY (id_word, id_msg)
-			)',
-			array(
-				'size' => $size,
-				'string_zero' => '0',
-			)
-		);
+		parent::create_word_search->db_create_table('int', 10);
 	}
 
 	/**
