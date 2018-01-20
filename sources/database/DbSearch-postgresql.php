@@ -56,11 +56,6 @@ class DbSearch_PostgreSQL implements DbSearch
 		$db = database();
 
 		$replacements = array(
-			'create_tmp_log_search_topics' => array(
-				'~mediumint\(\d\)~i' => 'int',
-				'~unsigned~i' => '',
-				'~ENGINE=MEMORY~i' => '',
-			),
 			'create_tmp_log_search_messages' => array(
 				'~mediumint\(\d\)~i' => 'int',
 				'~unsigned~i' => '',
@@ -199,6 +194,20 @@ class DbSearch_PostgreSQL implements DbSearch
 				'string_zero' => '0',
 			)
 		);
+	}
+
+	/**
+	 * Create a temporary table.
+	 * A wrapper around DbTable::db_create_table setting the 'temporary' parameter.
+	 *
+	 * @param string $table_name
+	 * @param mixed[] $columns in the format specified.
+	 * @param mixed[] $indexes default array(), in the format specified.
+	 */
+	public function createTemporaryTable($name, $columns, $indexes)
+	{
+		$db_table = db_table();
+		return $db_table->db_create_table($name, $columns, $indexes, array('temporary' => true);
 	}
 
 	/**

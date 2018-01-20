@@ -223,13 +223,19 @@ class Search
 		) !== false;
 
 		$this->_db_search->skip_next_error();
-		$this->_db_search->search_query('create_tmp_log_search_topics', '
-			CREATE TEMPORARY TABLE {db_prefix}tmp_log_search_topics (
-				id_topic mediumint(8) unsigned NOT NULL default {string:string_zero},
-				PRIMARY KEY (id_topic)
-			) ENGINE=MEMORY',
+		$this->_db_search->createTemporaryTable('{db_prefix}tmp_log_search_topics',
 			array(
-				'string_zero' => '0'
+				array(
+					'name' => 'id_topic'
+					'type' => 'mediumint',
+					'unsigned' => true,
+					'size' => 8,
+					'default' => 0
+				)
+			),
+			array(
+				'columns' => array('id_topic'),
+				'type' => 'primary'
 			)
 		);
 	}

@@ -92,7 +92,14 @@ class DbTable_MySQL extends DbTable
 		}
 
 		// Righty - let's do the damn thing!
-		$table_query = 'CREATE TABLE ' . $table_name . "\n" . '(';
+		if (empty($parameters['temporary']))
+		{
+			$table_query = 'CREATE TABLE ' . $table_name . "\n" . '(';
+		}
+		else
+		{
+			$table_query = 'CREATE TEMPORARY TABLE ' . $table_name . "\n" . '(';
+		}
 		foreach ($columns as $column)
 			$table_query .= "\n\t" . $this->_db_create_query_column($column) . ',';
 
@@ -117,6 +124,11 @@ class DbTable_MySQL extends DbTable
 			$table_query = substr($table_query, 0, -1);
 
 		$table_query .= ') DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci';
+
+		if (!empty($parameters['temporary']))
+		{
+			$table_query .= ' ENGINE=MEMORY';
+		}
 
 		// Create the table!
 		$this->_db->query('', $table_query,

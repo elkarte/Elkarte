@@ -175,6 +175,20 @@ class DbSearch_MySQL implements DbSearch
 	}
 
 	/**
+	 * Create a temporary table.
+	 * A wrapper around DbTable::db_create_table setting the 'temporary' parameter.
+	 *
+	 * @param string $table_name
+	 * @param mixed[] $columns in the format specified.
+	 * @param mixed[] $indexes default array(), in the format specified.
+	 */
+	public function createTemporaryTable($name, $columns, $indexes)
+	{
+		$db_table = db_table();
+		return $db_table->db_create_table($name, $columns, $indexes, array('temporary' => true);
+	}
+
+	/**
 	 * Static method that allows to retrieve or create an instance of this class.
 	 */
 	public static function db_search()

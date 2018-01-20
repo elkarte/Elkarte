@@ -93,7 +93,15 @@ class DbTable_PostgreSQL extends DbTable
 
 		// If we've got this far - good news - no table exists. We can build our own!
 		$this->_db->db_transaction('begin');
-		$table_query = 'CREATE TABLE ' . $table_name . "\n" . '(';
+
+		if (empty($parameters['temporary']))
+		{
+			$table_query = 'CREATE TABLE ' . $table_name . "\n" . '(';
+		}
+		else
+		{
+			$table_query = 'CREATE TEMPORARY TABLE ' . $table_name . "\n" . '(';
+		}
 		foreach ($columns as $column)
 		{
 			// If we have an auto increment do it!
