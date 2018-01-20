@@ -56,11 +56,6 @@ class DbSearch_PostgreSQL implements DbSearch
 		$db = database();
 
 		$replacements = array(
-			'create_tmp_log_search_messages' => array(
-				'~mediumint\(\d\)~i' => 'int',
-				'~unsigned~i' => '',
-				'~ENGINE=MEMORY~i' => '',
-			),
 			'drop_tmp_log_search_topics' => array(
 				'~IF\sEXISTS~i' => '',
 			),

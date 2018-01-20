@@ -212,13 +212,20 @@ class Search
 
 		$this->_db_search->skip_next_error();
 		// Create new temporary table(s) (if we can) to store preliminary results in.
-		$this->_createTemporary = $this->_db_search->search_query('create_tmp_log_search_messages', '
-			CREATE TEMPORARY TABLE {db_prefix}tmp_log_search_messages (
-				id_msg int(10) unsigned NOT NULL default {string:string_zero},
-				PRIMARY KEY (id_msg)
-			) ENGINE=MEMORY',
+		$this->_createTemporary = $this->_db_search->createTemporaryTable(
+			'{db_prefix}tmp_log_search_messages',
 			array(
-				'string_zero' => '0'
+				array(
+					'name' => 'id_msg',
+					'type' => 'int',
+					'size' => 10,
+					'unsigned' => true,
+					'default' => 0,
+				)
+			),
+			array(
+				'columns' => 'id_msg',
+				'type' => 'primary'
 			)
 		) !== false;
 
