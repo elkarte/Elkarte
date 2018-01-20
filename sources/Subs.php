@@ -732,7 +732,6 @@ function redirectexit_callback($matches)
  * @param bool $from_index = false If we're coming from index.php
  * @param bool $from_fatal_error = false If we are exiting due to a fatal error
  *
- * @throws Elk_Exception
  */
 function obExit($header = null, $do_footer = null, $from_index = false, $from_fatal_error = false)
 {

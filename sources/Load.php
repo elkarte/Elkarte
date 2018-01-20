@@ -1312,12 +1312,12 @@ function loadEssentialThemeData()
  * @deprecated since 2.0; use the theme object
  *
  * @uses the requireTemplate() function to actually load the file.
+ *
  * @param string|false $template_name
  * @param string[]|string $style_sheets any style sheets to load with the template
  * @param bool $fatal = true if fatal is true, dies with an error message if the template cannot be found
  *
  * @return boolean|null
- * @throws Elk_Exception
  */
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
@@ -1340,7 +1340,6 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  * @param bool|string $fatal = false
  * - $fatal = true is for templates that shouldn't get a 'pretty' error screen
  * - $fatal = 'ignore' to skip
- * @throws Elk_Exception
  */
 function loadSubTemplate($sub_template_name, $fatal = false)
 {

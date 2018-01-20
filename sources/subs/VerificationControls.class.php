@@ -305,7 +305,6 @@ class Verification_Controls_Captcha implements Verification_Controls
 	 *
 	 * @param boolean $isNew
 	 * @param boolean $force_refresh
-	 * @throws Elk_Exception
 	 */
 	public function showVerification($isNew, $force_refresh = true)
 	{
@@ -612,7 +611,6 @@ class Verification_Controls_Questions implements Verification_Controls
 	 * Get things ready for the template
 	 *
 	 * @return mixed[]
-	 * @throws Elk_Exception
 	 */
 	public function prepareContext()
 	{

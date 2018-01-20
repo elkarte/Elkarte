@@ -122,7 +122,6 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * @param bool $show_additional_options
 	 * @param int $board
 	 * @param int $topic
-	 * @throws Elk_Exception
 	 */
 	public function finalize_post_form(&$show_additional_options, $board, $topic)
 	{

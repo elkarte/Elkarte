@@ -61,7 +61,6 @@ class Database_PostgreSQL extends Database_Abstract
 	 * @param mixed[] $db_options
 	 *
 	 * @return resource
-	 * @throws Elk_Exception
 	 */
 	public static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
