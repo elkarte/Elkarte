@@ -1340,6 +1340,8 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  * @param bool|string $fatal = false
  * - $fatal = true is for templates that shouldn't get a 'pretty' error screen
  * - $fatal = 'ignore' to skip
+ *
+ * @return bool
  */
 function loadSubTemplate($sub_template_name, $fatal = false)
 {
@@ -1766,6 +1768,8 @@ function getBoardParents($id_parent)
  * Attempt to reload our known languages.
  *
  * @param bool $use_cache = true
+ *
+ * @return array
  */
 function getLanguages($use_cache = true)
 {

@@ -753,6 +753,8 @@ class Packages_Controller extends Action_Controller
 	 *
 	 * @param string[] $a
 	 * @param string[] $b
+	 *
+	 * @return int
 	 */
 	private function _sort_table_first($a, $b)
 	{
@@ -1711,6 +1713,8 @@ class Packages_Controller extends Action_Controller
 	 * Recursive counts all the directory's under a given path
 	 *
 	 * @param string $dir
+	 *
+	 * @return int
 	 */
 	public function count_directories__recursive($dir)
 	{
@@ -1750,10 +1754,12 @@ class Packages_Controller extends Action_Controller
 	 * - Determines if the package has been installed or not
 	 *
 	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page  The number of items to show per page
+	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
 	 * @param string $params 'type' type of package
 	 * @param bool $installed
+	 *
+	 * @return mixed
 	 * @throws Elk_Exception
 	 */
 	public function list_packages($start, $items_per_page, $sort, $params, $installed)

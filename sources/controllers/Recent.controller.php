@@ -372,6 +372,8 @@ class Recent_Controller extends Action_Controller
 	 * Loads the likes for the set of recent messages
 	 *
 	 * @param array $messages
+	 *
+	 * @return array|int[]
 	 */
 	private function _getLikes($messages)
 	{

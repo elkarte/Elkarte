@@ -266,9 +266,12 @@ function recacheSpiderNames()
  * (used by createList() callbacks)
  *
  * @package SearchEngines
+ *
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
+ *
+ * @return array
  */
 function getSpiders($start, $items_per_page, $sort)
 {
@@ -402,9 +405,12 @@ function getNumSpiderLogs()
  * (used by createList() callbacks)
  *
  * @package SearchEngines
+ *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
+ *
+ * @return array
  */
 function getSpiderStats($start, $items_per_page, $sort)
 {

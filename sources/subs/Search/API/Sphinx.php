@@ -139,6 +139,8 @@ class Sphinx extends SearchAPI
 	 * @param string[] $excluded_words
 	 * @param int[] $participants
 	 * @param string[] $search_results
+	 *
+	 * @return int|mixed
 	 */
 	public function searchQuery($search_params, $search_words, $excluded_words, &$participants, &$search_results)
 	{
@@ -312,6 +314,8 @@ class Sphinx extends SearchAPI
 	 *
 	 * @param string $sphinx_term
 	 * @param \SphinxClient $sphinx_client
+	 *
+	 * @return mixed|null|string|string[]
 	 */
 	private function _cleanWordSphinx($sphinx_term, $sphinx_client)
 	{

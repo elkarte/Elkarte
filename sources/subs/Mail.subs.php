@@ -496,7 +496,10 @@ function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $
  * - Callback function of preg_replace_callback, used just for hotmail address
  *
  * @package Mail
+ *
  * @param mixed[] $match
+ *
+ * @return mixed|string
  */
 function entityConvert($match)
 {
@@ -520,7 +523,10 @@ function entityConvert($match)
  * Callback for the preg_replace in mimespecialchars
  *
  * @package Mail
+ *
  * @param mixed[] $match
+ *
+ * @return string
  */
 function mimespecialchars_callback($match)
 {
@@ -771,10 +777,13 @@ function server_parse($message, $socket, $response)
  * - safety net for clients that strip out the message-id and in-reply-to headers
  *
  * @package Mail
+ *
  * @param string $message
  * @param string $unq_head
  * @param string $encoded_unq_head
  * @param string $line_break
+ *
+ * @return mixed|null|string|string[]
  */
 function mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break)
 {

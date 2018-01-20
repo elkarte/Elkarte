@@ -570,6 +570,8 @@ class Auth_Controller extends Action_Controller
 	 * party hash satisfy whats in the db passwd field
 	 *
 	 * @param mixed[] $user_settings
+	 *
+	 * @return array
 	 */
 	private function _other_passwords($user_settings)
 	{

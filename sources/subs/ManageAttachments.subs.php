@@ -22,7 +22,10 @@
  * Approve an attachment, or maybe even more - no permission check!
  *
  * @package Attachments
+ *
  * @param int[] $attachments
+ *
+ * @return int
  */
 function approveAttachments($attachments)
 {
@@ -337,7 +340,10 @@ function getAttachmentCount()
  * How many attachments we have in a certain folder.
  *
  * @package Attachments
+ *
  * @param string $folder
+ *
+ * @return
  */
 function getFolderAttachmentCount($folder)
 {
@@ -442,8 +448,11 @@ function removeOrphanAttachments($attach_ids)
  * Set or retrieve the size of an attachment.
  *
  * @package Attachments
+ *
  * @param int $attach_id
  * @param int|null $filesize = null
+ *
+ * @return bool|int|null
  */
 function attachment_filesize($attach_id, $filesize = null)
 {
@@ -485,8 +494,11 @@ function attachment_filesize($attach_id, $filesize = null)
  * Set or retrieve the ID of the folder where an attachment is stored on disk.
  *
  * @package Attachments
+ *
  * @param int $attach_id
  * @param int|null $folder_id = null
+ *
+ * @return bool|int|null
  */
 function attachment_folder($attach_id, $folder_id = null)
 {
@@ -555,9 +567,12 @@ function maxNoThumb()
  * - If $fix_errors is set to true it will attempt to remove the thumbnail from disk
  *
  * @package Attachments
+ *
  * @param int $start
  * @param boolean $fix_errors
  * @param string[] $to_fix
+ *
+ * @return array
  */
 function findOrphanThumbnails($start, $fix_errors, $to_fix)
 {
@@ -624,9 +639,12 @@ function findOrphanThumbnails($start, $fix_errors, $to_fix)
  * - If $fix_errors is set to true it will attempt to remove the thumbnail from disk
  *
  * @package Attachments
+ *
  * @param int $start
  * @param boolean $fix_errors
  * @param string[] $to_fix
+ *
+ * @return array
  */
 function findParentsOrphanThumbnails($start, $fix_errors, $to_fix)
 {
@@ -674,9 +692,12 @@ function findParentsOrphanThumbnails($start, $fix_errors, $to_fix)
  * - remove DB entries if the file can not be found.
  *
  * @package Attachments
+ *
  * @param int $start
  * @param boolean $fix_errors
  * @param string[] $to_fix
+ *
+ * @return array
  */
 function repairAttachmentData($start, $fix_errors, $to_fix)
 {
@@ -809,9 +830,12 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
  * - If $fix_errors is set, it will
  *
  * @package Attachments
+ *
  * @param int $start
  * @param boolean $fix_errors
  * @param string[] $to_fix
+ *
+ * @return array
  */
 function findOrphanAvatars($start, $fix_errors, $to_fix)
 {
@@ -873,9 +897,12 @@ function findOrphanAvatars($start, $fix_errors, $to_fix)
  * Finds attachments that are not used in any message
  *
  * @package Attachments
+ *
  * @param int $start
  * @param boolean $fix_errors
  * @param string[] $to_fix
+ *
+ * @return array
  */
 function findOrphanAttachments($start, $fix_errors, $to_fix)
 {
@@ -976,8 +1003,11 @@ function maxAttachment()
  * Check multiple attachments IDs against the database.
  *
  * @package Attachments
+ *
  * @param int[] $attachments
  * @param string $approve_query
+ *
+ * @return array
  */
 function validateAttachments($attachments, $approve_query)
 {
@@ -1010,7 +1040,10 @@ function validateAttachments($attachments, $approve_query)
  * Finds an attachments parent topic/message and returns the values in an array
  *
  * @package Attachments
+ *
  * @param int $attachment
+ *
+ * @return int
  */
 function attachmentBelongsTo($attachment)
 {
@@ -1269,8 +1302,11 @@ function list_getAttachDirs()
  * of the status key, if that status key signifies an error, and the file count.
  *
  * @package Attachments
+ *
  * @param string $dir
  * @param int $expected_files
+ *
+ * @return array
  */
 function attachDirStatus($dir, $expected_files)
 {
@@ -1359,7 +1395,10 @@ function list_getBaseDirs()
  * - Callback function for createList()
  *
  * @package Attachments
+ *
  * @param string $browse_type can be one of 'avatars' or not. (in which case they're attachments)
+ *
+ * @return
  */
 function list_getNumFiles($browse_type)
 {
@@ -1407,10 +1446,13 @@ function list_getNumFiles($browse_type)
  * - Callback function for createList()
  *
  * @package Attachments
+ *
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param string $browse_type can be on eof 'avatars' or ... not. :P
+ *
+ * @return array
  */
 function list_getFiles($start, $items_per_page, $sort, $browse_type)
 {
@@ -1505,7 +1547,10 @@ function currentAttachDirProperties()
  * Get files and size from the current attachments dir
  *
  * @package Attachments
+ *
  * @param string $dir
+ *
+ * @return array
  */
 function attachDirProperties($dir)
 {
@@ -1583,6 +1628,8 @@ function moveAvatars()
  * @param string $from source location
  * @param int $start
  * @param int $limit
+ *
+ * @return array
  */
 function findAttachmentsToMove($from, $start, $limit)
 {
@@ -1686,7 +1733,10 @@ function attachmentsOfMessage($id_msg, $unapproved = false)
  * Counts attachments for the given folder.
  *
  * @package Attachments
+ *
  * @param int $id_folder
+ *
+ * @return
  */
 function countAttachmentsInFolders($id_folder)
 {

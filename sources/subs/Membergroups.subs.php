@@ -612,6 +612,7 @@ function cache_getMembergroupList()
  * Helper function to generate a list of membergroups for display.
  *
  * @package Membergroups
+ *
  * @param int $start not used
  * @param int $items_per_page not used
  * @param string $sort An SQL query indicating how to sort the results
@@ -622,6 +623,8 @@ function cache_getMembergroupList()
  * @param bool $aggregate
  * @param bool $count_permissions
  * @param int|null $pid - profile id
+ *
+ * @return array
  */
 function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type, $user_id, $include_hidden, $include_all = false, $aggregate = false, $count_permissions = false, $pid = null)
 {
@@ -971,9 +974,12 @@ function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable
  * Uses membergroupsById to return the group information of a single group
  *
  * @package Membergroups
+ *
  * @param int $group_id
  * @param bool $detailed
  * @param bool $assignable
+ *
+ * @return bool|mixed
  */
 function membergroupById($group_id, $detailed = false, $assignable = false)
 {

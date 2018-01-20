@@ -805,6 +805,8 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
  * @param mixed[] $row
  * @param boolean $maillist
  * @param boolean $email_perm
+ *
+ * @return bool
  * @throws Elk_Exception
  */
 function validateNotificationAccess($row, $maillist, &$email_perm = true)
@@ -859,6 +861,8 @@ function validateNotificationAccess($row, $maillist, &$email_perm = true)
  *
  * @param string[]|string $notification_types
  * @param int[]|int $members
+ *
+ * @return array
  */
 function getUsersNotificationsPreferences($notification_types, $members)
 {
@@ -963,6 +967,8 @@ function saveUserNotificationsPreferences($member, $notification_data)
  *
  * @param string[] $possible_methods The array of notifications ('type' => 'level')
  * @param string $type The type of notification (mentionmem, likemsg, etc.)
+ *
+ * @return array
  */
 function filterNotificationMethods($possible_methods, $type)
 {
@@ -986,6 +992,8 @@ function filterNotificationMethods($possible_methods, $type)
  * type of notification.
  *
  * @param string $type The type of notification (mentionmem, likemsg, etc.)
+ *
+ * @return array
  */
 function getConfiguredNotificationMethods($type)
 {

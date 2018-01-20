@@ -319,10 +319,13 @@ function alterFullTextIndex($table, $indexes, $add = false)
  * Creates a custom search index
  *
  * @package Search
+ *
  * @param int $start
  * @param int $messages_per_batch
  * @param string $column_size_definition
  * @param mixed[] $index_settings array containing specifics of what to create e.g. bytes per word
+ *
+ * @return array
  */
 function createSearchIndex($start, $messages_per_batch, $column_size_definition, $index_settings)
 {
@@ -441,8 +444,11 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
  * Removes common stop words from the index as they inhibit search performance
  *
  * @package Search
+ *
  * @param int $start
  * @param mixed[] $column_definition
+ *
+ * @return array
  */
 function removeCommonWordsFromIndex($start, $column_definition)
 {

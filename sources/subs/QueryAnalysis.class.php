@@ -119,6 +119,8 @@ class Query_Analysis
 	 * Fix query indentation
 	 *
 	 * @param string $query_data - The query string
+	 *
+	 * @return string
 	 */
 	protected function _normalize_query_indent($query_data)
 	{

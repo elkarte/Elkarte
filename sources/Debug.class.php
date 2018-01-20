@@ -365,6 +365,8 @@ class Debug
 	 * page load and allows to EXPLAIN them
 	 *
 	 * @param integer $query_id the id of the query to EXPLAIN, if -1 no queries are explained
+	 *
+	 * @return array
 	 */
 	public function viewQueries($query_id)
 	{

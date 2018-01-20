@@ -117,9 +117,12 @@ class User_Notification extends AbstractModel
 
 	/**
 	 * Validates if a setting exists.
+	 *
 	 * @todo Really needed?
 	 *
 	 * @param string $key modSettings key
+	 *
+	 * @return bool
 	 */
 	protected function settingExists($key)
 	{
@@ -167,6 +170,8 @@ class User_Notification extends AbstractModel
 	 * Validates the input when saving the settings.
 	 *
 	 * @param array|object $post An array containing the settings (usually $_POST)
+	 *
+	 * @return array|object
 	 */
 	public function validate($post)
 	{

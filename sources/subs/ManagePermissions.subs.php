@@ -1024,9 +1024,12 @@ function fetchPermissions($id_group)
  * Fetches board permissions from the given group.
  *
  * @package Permissions
+ *
  * @param int $id_group
  * @param string $permission_type
  * @param int $profile_id
+ *
+ * @return array
  */
 function fetchBoardPermissions($id_group, $permission_type, $profile_id)
 {

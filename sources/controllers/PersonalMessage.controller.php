@@ -2939,6 +2939,8 @@ class PersonalMessage_Controller extends Action_Controller
 	 * - Callback function used in $body_highlighted
 	 *
 	 * @param string[] $matches
+	 *
+	 * @return string
 	 */
 	private function _highlighted_callback($matches)
 	{
@@ -2954,6 +2956,8 @@ class PersonalMessage_Controller extends Action_Controller
  *
  * @param string $type
  * @param boolean $reset
+ *
+ * @return array
  */
 function preparePMContext_callback($type = 'subject', $reset = false)
 {

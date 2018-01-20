@@ -122,8 +122,11 @@ function resizeMessageTableBody($type)
  * Detects messages, which exceed the max message size
  *
  * @package Maintenance
+ *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
+ *
+ * @return array
  */
 function detectExceedingMessages($start, $increment)
 {
@@ -297,7 +300,10 @@ function recountUnapprovedMessages($start, $increment)
  * - Allowed parameters: num_posts, num_topics, unapproved_posts, unapproved_topics
  *
  * @package Maintenance
+ *
  * @param string $column
+ *
+ * @return bool
  */
 function resetBoardsCounter($column)
 {

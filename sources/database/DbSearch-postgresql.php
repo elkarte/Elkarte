@@ -32,6 +32,8 @@ class DbSearch_PostgreSQL implements DbSearch
 	 * This function will tell you whether this database type supports this search type.
 	 *
 	 * @param string $search_type
+	 *
+	 * @return bool
 	 */
 	public function search_support($search_type)
 	{

@@ -496,6 +496,8 @@ class Unread_Controller extends Action_Controller
 	 *
 	 * @param string $topics_to_mark - An array of topic ids properly formatted
 	 *               into a string to use in an URL
+	 *
+	 * @return array
 	 */
 	private function _buttonsArray($topics_to_mark)
 	{

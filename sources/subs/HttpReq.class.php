@@ -181,6 +181,8 @@ class HttpReq
 	 *     - $this->req->foo is loose and will trigger this method, return foo as its a found key in GET
 	 *
 	 * @param string $key
+	 *
+	 * @return mixed|null
 	 */
 	public function __get($key)
 	{
@@ -205,6 +207,8 @@ class HttpReq
 	 * @param string $name The key name of the value to return
 	 * @param string|null $sanitize a comma separated list of sanitation rules to apply
 	 * @param mixed|null $default default value to return if key value is not found
+	 *
+	 * @return mixed
 	 */
 	public function get($name, $sanitize = null, $default = null)
 	{
@@ -228,6 +232,8 @@ class HttpReq
 	 * - checks in order of param, get, post
 	 *
 	 * @param string $key
+	 *
+	 * @return bool
 	 */
 	public function __isset($key)
 	{
@@ -248,6 +254,8 @@ class HttpReq
 	 * Alias to __isset()
 	 *
 	 * @param string $key
+	 *
+	 * @return bool
 	 */
 	public function is_set($key)
 	{
@@ -264,6 +272,8 @@ class HttpReq
 	 * @param string $name The key name of the value to return
 	 * @param string|null $sanitize a comma separated list of sanitation rules to apply
 	 * @param mixed|null $default default value to return if key value is not found
+	 *
+	 * @return mixed
 	 */
 	public function getQuery($name = '', $sanitize = null, $default = null)
 	{
@@ -288,6 +298,8 @@ class HttpReq
 	 * @param string $name The key name of the value to return
 	 * @param string|null $sanitize a comma separated list of sanitation rules to apply
 	 * @param mixed|null $default default value to return if key value is not found
+	 *
+	 * @return mixed
 	 */
 	public function getPost($name = '', $sanitize = null, $default = null)
 	{
@@ -309,6 +321,8 @@ class HttpReq
 	 *
 	 * @param string $name the name of the value to return
 	 * @param mixed|null $default default value to return if key value is not found
+	 *
+	 * @return mixed|null
 	 */
 	public function getCookie($name = '', $default = null)
 	{
@@ -327,6 +341,8 @@ class HttpReq
 	 *
 	 * @param string $name the name of the value to return
 	 * @param mixed|null $default default value to return if key value is not found
+	 *
+	 * @return mixed|null
 	 */
 	public function getSession($name = '', $default = null)
 	{
@@ -343,6 +359,8 @@ class HttpReq
 	 *
 	 * @param string $name the key name in the _param array
 	 * @param string|null $sanitize comma separated list of rules
+	 *
+	 * @return mixed|mixed[]|null
 	 */
 	public function cleanValue($name, $sanitize = null)
 	{

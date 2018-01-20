@@ -101,6 +101,8 @@ class Xml_Array
 	 *
 	 * @param string $path - the path to the element to fetch
 	 * @param bool $get_elements - whether to include elements
+	 *
+	 * @return bool|string
 	 */
 	public function fetch($path, $get_elements = false)
 	{
@@ -338,6 +340,8 @@ class Xml_Array
 	 *   print_r($xml->to_array());
 	 *
 	 * @param string|null $path the path to output.
+	 *
+	 * @return array|bool|string
 	 */
 	public function to_array($path = null)
 	{
@@ -363,6 +367,8 @@ class Xml_Array
 	 * Parse data into an array. (privately used...)
 	 *
 	 * @param string $data to parse
+	 *
+	 * @return array
 	 */
 	protected function _parse($data)
 	{
@@ -517,6 +523,8 @@ class Xml_Array
 	 *
 	 * @param mixed[] $array
 	 * @param null|integer $indent
+	 *
+	 * @return string
 	 */
 	protected function _xml($array, $indent)
 	{
@@ -569,6 +577,8 @@ class Xml_Array
 	 * Return an element as an array
 	 *
 	 * @param mixed[] $array An array of data
+	 *
+	 * @return array|string
 	 */
 	protected function _array($array)
 	{
@@ -595,6 +605,8 @@ class Xml_Array
 	 * Parse out CDATA tags. (htmlspecialchars them...)
 	 *
 	 * @param string $data The data with CDATA tags
+	 *
+	 * @return string
 	 */
 	protected function _to_cdata($data)
 	{
@@ -632,6 +644,8 @@ class Xml_Array
 	 * Turn the CDATAs back to normal text.
 	 *
 	 * @param string $data The data with CDATA tags
+	 *
+	 * @return string
 	 */
 	protected function _from_cdata($data)
 	{
@@ -649,6 +663,8 @@ class Xml_Array
 	 * Callback for the preg_replace in _from_cdata
 	 *
 	 * @param mixed[] $match An array of data
+	 *
+	 * @return string
 	 */
 	protected function _from_cdata_callback($match)
 	{
@@ -659,6 +675,8 @@ class Xml_Array
 	 * Given an array, return the text from that array. (recursive and privately used.)
 	 *
 	 * @param string[]|string $array An array of data
+	 *
+	 * @return string
 	 */
 	protected function _fetch($array)
 	{
@@ -692,6 +710,8 @@ class Xml_Array
 	 * @param string $path The path
 	 * @param int $level How far deep into the array we should go
 	 * @param bool $no_error Whether or not to ignore errors
+	 *
+	 * @return array|bool|mixed|mixed[]
 	 */
 	protected function _path($array, $path, $level, $no_error = false)
 	{

@@ -58,6 +58,8 @@ class Agreement
 	 * then it may return the english version.
 	 *
 	 * @param boolean $fallback if fallback to the English version (default true).
+	 *
+	 * @return bool|string
 	 */
 	public function getPlainText($fallback = true)
 	{
@@ -85,6 +87,8 @@ class Agreement
 	 * then it may return the english version.
 	 *
 	 * @param boolean $fallback if fallback to the English version (default true).
+	 *
+	 * @return string
 	 */
 	public function getParsedText($fallback = true)
 	{

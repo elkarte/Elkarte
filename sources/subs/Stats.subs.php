@@ -675,6 +675,8 @@ function getDailyStats($condition_string, $condition_parameters = array())
  * - Does not count topics that are in the recycle board
  *
  * @param int $memID
+ *
+ * @return
  */
 function UserStatsTopicsStarted($memID)
 {
@@ -706,6 +708,8 @@ function UserStatsTopicsStarted($memID)
  * - Does not count topics that are in the recycle board
  *
  * @param int $memID
+ *
+ * @return
  */
 function UserStatsPollsStarted($memID)
 {
@@ -737,6 +741,8 @@ function UserStatsPollsStarted($memID)
  * they may no longer have access on.
  *
  * @param int $memID
+ *
+ * @return
  */
 function UserStatsPollsVoted($memID)
 {
@@ -764,6 +770,8 @@ function UserStatsPollsVoted($memID)
  *
  * @param int $memID
  * @param int $limit
+ *
+ * @return array
  */
 function UserStatsMostPostedBoard($memID, $limit = 10)
 {
@@ -815,6 +823,8 @@ function UserStatsMostPostedBoard($memID, $limit = 10)
  *
  * @param int $memID
  * @param int $limit
+ *
+ * @return array
  */
 function UserStatsMostActiveBoard($memID, $limit = 10)
 {
@@ -864,6 +874,8 @@ function UserStatsMostActiveBoard($memID, $limit = 10)
  * - Returns array with some basic stats of post percent per hour
  *
  * @param int $memID
+ *
+ * @return array
  */
 function UserStatsPostingTime($memID)
 {

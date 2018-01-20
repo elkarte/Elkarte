@@ -260,7 +260,10 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
  * use in the system
  *
  * @package AddonSettings
+ *
  * @param boolean $filter
+ *
+ * @return int
  */
 function integration_hooks_count($filter = false)
 {

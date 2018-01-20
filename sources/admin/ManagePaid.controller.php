@@ -767,6 +767,8 @@ class ManagePaid_Controller extends Action_Controller
 	 * @param int $id_sub
 	 * @param string $search_string
 	 * @param mixed[] $search_vars
+	 *
+	 * @return
 	 */
 	public function getSubscribedUserCount($id_sub, $search_string, $search_vars)
 	{
@@ -779,11 +781,13 @@ class ManagePaid_Controller extends Action_Controller
 	 * - Callback for createList()
 	 *
 	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page  The number of items to show per page
+	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
 	 * @param int $id_sub
 	 * @param string $search_string
 	 * @param mixed[] $search_vars
+	 *
+	 * @return array
 	 */
 	public function getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $search_string, $search_vars)
 	{

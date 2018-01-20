@@ -88,6 +88,8 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * @param array $topic_attributes
 	 * @param int $topic
 	 * @param int $board
+	 *
+	 * @return bool
 	 * @throws Elk_Exception
 	 */
 	public function prepare_context($topic_attributes, $topic, $board)

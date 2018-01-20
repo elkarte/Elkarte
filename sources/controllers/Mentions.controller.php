@@ -360,6 +360,8 @@ class Mentions_Controller extends Action_Controller
 	 *
 	 * @param bool $all : if true counts all the mentions, otherwise only the unread
 	 * @param string $type : the type of mention
+	 *
+	 * @return mixed
 	 */
 	public function list_getMentionCount($all, $type)
 	{
@@ -375,6 +377,8 @@ class Mentions_Controller extends Action_Controller
 	 * @param string $sort which direction are we showing this
 	 * @param bool $all : if true load all the mentions or type, otherwise only the unread
 	 * @param string $type : the type of mention
+	 *
+	 * @return array
 	 */
 	public function list_loadMentions($start, $limit, $sort, $all, $type)
 	{

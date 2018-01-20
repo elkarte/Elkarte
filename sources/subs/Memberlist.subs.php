@@ -89,6 +89,8 @@ function ml_CustomProfile()
  *   - Pointers are later used to limit the member data retrieval
  *
  * @param int $cache_step_size
+ *
+ * @return array
  */
 function ml_memberCache($cache_step_size)
 {
@@ -155,6 +157,8 @@ function ml_memberCount()
  * Get all all the members who's name starts below a given letter
  *
  * @param string $start single letter to start with
+ *
+ * @return string
  */
 function ml_alphaStart($start)
 {

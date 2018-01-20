@@ -134,6 +134,8 @@ final class ErrorContext
 	 * of the array, or the result of getName)
 	 *
 	 * @param mixed|mixed[] $error error code
+	 *
+	 * @return mixed|mixed[]
 	 */
 	protected function getErrorName($error)
 	{
@@ -164,6 +166,8 @@ final class ErrorContext
 	 * array of strings, being the second element of the array)
 	 *
 	 * @param mixed|mixed[] $error error code
+	 *
+	 * @return null
 	 */
 	protected function getErrorValue($error)
 	{
@@ -189,7 +193,10 @@ final class ErrorContext
 	 * Return an array of errors of a certain severity.
 	 *
 	 * @todo is it needed at all?
+	 *
 	 * @param string|int|null $severity the severity level wanted. If null returns all the errors
+	 *
+	 * @return array|bool|mixed
 	 */
 	public function getErrors($severity = null)
 	{
@@ -236,6 +243,8 @@ final class ErrorContext
 	 * Check if a particular error exists.
 	 *
 	 * @param string $errors the error
+	 *
+	 * @return bool
 	 */
 	public function hasError($errors)
 	{
@@ -281,6 +290,8 @@ final class ErrorContext
 	 * - If severity is null the function returns all the errors
 	 *
 	 * @param string|null $severity the severity level wanted
+	 *
+	 * @return array
 	 */
 	public function prepareErrors($severity = null)
 	{

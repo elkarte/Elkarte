@@ -300,6 +300,8 @@ class Notifications extends AbstractModel
 	 * @param string[] $notification_frequencies
 	 * @param string $notification_type
 	 * @param int[] $members
+	 *
+	 * @return array
 	 */
 	protected function _getNotificationPreferences($notification_frequencies, $notification_type, $members)
 	{

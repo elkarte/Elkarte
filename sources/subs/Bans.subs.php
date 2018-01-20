@@ -232,7 +232,10 @@ function removeBanLogs($ids = array())
  * This function validates the ban triggers
  *
  * @package Bans
+ *
  * @param mixed[] $triggers
+ *
+ * @return array
  */
 function validateTriggers(&$triggers)
 {
@@ -981,7 +984,10 @@ function updateBanMembers()
  *
  * @package Bans
  * @uses getBasicMemberData
+ *
  * @param int $id
+ *
+ * @return array
  */
 function getMemberData($id)
 {
@@ -1046,9 +1052,12 @@ function list_getBanTriggers($start, $items_per_page, $sort, $trigger_type)
  * - Checks banning by ip, hostname, email or member id
  *
  * @package Bans
+ *
  * @param int $memID
  * @param string $hostname
  * @param string $email
+ *
+ * @return array
  */
 function BanCheckUser($memID, $hostname = '', $email = '')
 {
@@ -1164,9 +1173,12 @@ function list_getNumBanTriggers($trigger_type)
  * - no permissions checks are done
  *
  * @package Bans
+ *
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
+ *
+ * @return array
  */
 function list_getBanLogEntries($start, $items_per_page, $sort)
 {
@@ -1399,7 +1411,10 @@ function list_getNumBanItems()
  * Load other IPs the given member has used on forum while posting.
  *
  * @package Bans
+ *
  * @param int $member_id
+ *
+ * @return array
  */
 function banLoadAdditionalIPsMember($member_id)
 {
@@ -1429,7 +1444,10 @@ function banLoadAdditionalIPsMember($member_id)
  * Load other IPs the given member has received errors logged while they were using them.
  *
  * @package Bans
+ *
  * @param int $member_id
+ *
+ * @return array
  */
 function banLoadAdditionalIPsError($member_id)
 {
@@ -1482,8 +1500,11 @@ function banLoadAdditionalIPs($member_id)
  * Fetches ban details
  *
  * @package Bans
+ *
  * @param int[]|int $ban_ids
  * @param int|bool $ban_group
+ *
+ * @return array
  */
 function banDetails($ban_ids, $ban_group = false)
 {
@@ -1520,7 +1541,10 @@ function banDetails($ban_ids, $ban_group = false)
  * removed so it can be logged
  *
  * @package Bans
+ *
  * @param mixed[] $ban_details
+ *
+ * @return array
  */
 function banLogItems($ban_details)
 {

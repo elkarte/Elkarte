@@ -46,6 +46,8 @@ class Emailpost_Controller extends Action_Controller
 	 * @param string|null $data used to supply a full headers+body email
 	 * @param boolean $force used to override common failure errors
 	 * @param string|null $key used to supply a lost key
+	 *
+	 * @return bool
 	 * @throws Elk_Exception
 	 */
 	public function action_pbe_post($data = null, $force = false, $key = null)
@@ -222,6 +224,8 @@ class Emailpost_Controller extends Action_Controller
 	 * - Accessed through emailtopic.
 	 *
 	 * @param string|null $data used to supply a full body+headers email
+	 *
+	 * @return bool
 	 * @throws Elk_Exception
 	 */
 	public function action_pbe_topic($data = null)
@@ -392,9 +396,12 @@ class Emailpost_Controller extends Action_Controller
  * - returns true if successful or false for any number of failures
  *
  * @package Maillist
+ *
  * @param mixed[] $pbe array of all pbe user_info values
  * @param Email_Parse $email_message
  * @param mixed[] $topic_info
+ *
+ * @return bool
  * @throws Elk_Exception
  */
 function pbe_create_post($pbe, $email_message, $topic_info)
@@ -494,9 +501,12 @@ function pbe_create_post($pbe, $email_message, $topic_info)
  *
  * @uses sendpm to do the actual "sending"
  * @package Maillist
+ *
  * @param mixed[] $pbe array of pbe 'user_info' values
  * @param Email_Parse $email_message
  * @param mixed[] $pm_info
+ *
+ * @return bool
  * @throws Elk_Exception
  */
 function pbe_create_pm($pbe, $email_message, $pm_info)
@@ -551,9 +561,12 @@ function pbe_create_pm($pbe, $email_message, $pm_info)
  *
  * @uses createPost to do the actual "posting"
  * @package Maillist
+ *
  * @param mixed[] $pbe array of pbe 'user_info' values
  * @param Email_Parse $email_message
  * @param mixed[] $board_info
+ *
+ * @return bool
  * @throws Elk_Exception
  */
 function pbe_create_topic($pbe, $email_message, $board_info)
@@ -664,9 +677,12 @@ function pbe_create_topic($pbe, $email_message, $board_info)
  * - Formats the email response so it looks structured and not chopped up (via pbe_fix_email_body)
  *
  * @package Maillist
+ *
  * @param boolean $html
  * @param Email_Parse $email_message
  * @param mixed[] $pbe
+ *
+ * @return mixed|null|string|string[]
  */
 function pbe_load_text(&$html, $email_message, $pbe)
 {

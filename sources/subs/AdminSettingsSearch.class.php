@@ -227,6 +227,7 @@ class AdminSettings_Search
 	 *                )
 	 *
 	 * @todo move to subs?
+	 * @return array
 	 */
 	private function _load_settings($settings_search)
 	{

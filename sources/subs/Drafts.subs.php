@@ -188,11 +188,14 @@ function modify_post_draft($draft)
  * - Draft id must match the type selected (post or pm)
  *
  * @package Drafts
+ *
  * @param int $id_draft - specific draft number to get from the db
  * @param int $uid - member id who created the draft
  * @param int $type - 0 for post and 1 for pm
  * @param int $drafts_keep_days - number of days to consider a draft is still valid
  * @param bool $check - validate the draft is by the user, true by default
+ *
+ * @return bool
  */
 function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = true)
 {
@@ -237,11 +240,14 @@ function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = 
  * - Optionally can load just the drafts for a specific topic (post) or reply (pm)
  *
  * @package Drafts
+ *
  * @param int $member_id - user id to get drafts for
  * @param int $draft_type - 0 for post, 1 for pm
  * @param int|bool $topic - if set, load drafts for that specific topic / pm
  * @param string $order - optional parameter to order the results
  * @param string $limit - optional parameter to limit the number returned 0,15
+ *
+ * @return array
  */
 function load_user_drafts($member_id, $draft_type = 0, $topic = false, $order = '', $limit = '')
 {
@@ -281,9 +287,12 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $order = 
  * - If supplied an array of drafts will attempt to remove all of them
  *
  * @package Drafts
+ *
  * @param int[]|int $id_draft
  * @param int $member_id
  * @param bool $check
+ *
+ * @return bool
  */
 function deleteDrafts($id_draft, $member_id = -1, $check = true)
 {
@@ -356,8 +365,11 @@ function draftsCount($member_id, $draft_type = 0)
  * @package Drafts
  * @todo this is the same as whats in PersonalMessage.controller, when that gets refactored
  * this should go away and use the refactored PM subs
+ *
  * @param int[] $allRecipients
  * @param mixed[] $recipient_ids
+ *
+ * @return array
  */
 function draftsRecipients($allRecipients, $recipient_ids)
 {
@@ -385,7 +397,10 @@ function draftsRecipients($allRecipients, $recipient_ids)
  * Get all drafts older than x days
  *
  * @package Drafts
+ *
  * @param int $days
+ *
+ * @return array
  */
 function getOldDrafts($days)
 {
@@ -492,9 +507,12 @@ function saveDraft($draft, $check_last_save = false)
  * - Determines if this is a new or and update to an existing pm draft
  *
  * @package Drafts
+ *
  * @param mixed[] $recipientList
  * @param mixed[] $draft
  * @param boolean $check_last_save
+ *
+ * @return bool|void
  * @throws Elk_Exception
  */
 function savePMDraft($recipientList, $draft, $check_last_save = false)
@@ -582,10 +600,13 @@ function savePMDraft($recipientList, $draft, $check_last_save = false)
  * - Optionally loads the draft in to context or superglobal for loading in to the form
  *
  * @package Drafts
+ *
  * @param int $id_draft - draft to load
  * @param int $type - type of draft
  * @param bool $check - validate the user
  * @param bool $load - load it for use in a form
+ *
+ * @return bool
  */
 function loadDraft($id_draft, $type = 0, $check = true, $load = false)
 {

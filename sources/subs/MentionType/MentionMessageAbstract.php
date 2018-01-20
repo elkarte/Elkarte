@@ -47,6 +47,8 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 	 * just a dummy to cover mentions that don't need to register anything.
 	 *
 	 * @param string $controller The name of the controller initializing the system
+	 *
+	 * @return array
 	 */
 	public static function getEvents($controller)
 	{

@@ -123,6 +123,8 @@ class Curl_Fetch_Webdata
 	 *
 	 * @param string $url the site we are going to fetch
 	 * @param mixed[]|string $post_data data to send in the curl request as post data
+	 *
+	 * @return Curl_Fetch_Webdata
 	 */
 	public function get_url_data($url, $post_data = array())
 	{
@@ -148,6 +150,8 @@ class Curl_Fetch_Webdata
 	 *
 	 * @param string $url site to fetch
 	 * @param bool $redirect flag to indicate if this was a redirect request or not
+	 *
+	 * @return bool
 	 */
 	private function _curlRequest($url, $redirect = false)
 	{
@@ -208,6 +212,8 @@ class Curl_Fetch_Webdata
 	 *
 	 * @param string $last_url URL where we went to
 	 * @param string $new_url URL where we were redirected to
+	 *
+	 * @return string
 	 */
 	private function _getRedirectURL($last_url = '', $new_url = '')
 	{
@@ -234,6 +240,8 @@ class Curl_Fetch_Webdata
 	 * - Called as ->result('body') to just return the page source of the result
 	 *
 	 * @param string $area used to return an area such as body, header, error
+	 *
+	 * @return string
 	 */
 	public function result($area = '')
 	{
@@ -255,6 +263,8 @@ class Curl_Fetch_Webdata
 	 * - Call as ->result_raw() for everything.
 	 *
 	 * @param int|string $response_number
+	 *
+	 * @return string|string[]
 	 */
 	public function result_raw($response_number = '')
 	{
@@ -276,6 +286,8 @@ class Curl_Fetch_Webdata
 	 * - Drops vars with @ since we don't support sending files (uploading)
 	 *
 	 * @param mixed[] $post_data
+	 *
+	 * @return mixed[]|string
 	 */
 	private function _buildPostData($post_data)
 	{
@@ -354,6 +366,8 @@ class Curl_Fetch_Webdata
 	 *
 	 * @param object $cr Not used but passed by the cURL agent
 	 * @param string $header The headers received
+	 *
+	 * @return int
 	 */
 	private function _headerCallback($cr, $header)
 	{

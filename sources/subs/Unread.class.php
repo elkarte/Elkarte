@@ -175,6 +175,8 @@ class Unread
 	 *
 	 * @param bool $first_login - If this is the first login of the user
 	 * @param int $id_msg_last_visit - highest id_msg found during the last visit
+	 *
+	 * @return int
 	 */
 	public function numUnreads($first_login = false, $id_msg_last_visit = 0)
 	{

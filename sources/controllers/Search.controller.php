@@ -802,6 +802,8 @@ class Search_Controller extends Action_Controller
 	 * Callback function used in $body_highlighted
 	 *
 	 * @param string[] $matches
+	 *
+	 * @return string
 	 */
 	private function _highlighted_callback($matches)
 	{
@@ -900,6 +902,8 @@ class Search_Controller extends Action_Controller
 	 * Fills the empty spaces in an array with the default values for search params
 	 *
 	 * @param mixed[] $array
+	 *
+	 * @return mixed[]
 	 */
 	private function _fill_default_search_params($array)
 	{

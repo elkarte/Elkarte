@@ -279,8 +279,11 @@ class Errors extends \AbstractModel
 	 * It is called by Errors::fatal_error() and Errors::fatal_lang_error().
 	 *
 	 * @uses Errors template, fatal_error sub template
+	 *
 	 * @param string $error_message
 	 * @param string $error_code string or int code
+	 *
+	 * @return bool
 	 * @throws \Elk_Exception
 	 */
 	final protected function _setup_fatal_ErrorContext($error_message, $error_code)

@@ -672,6 +672,8 @@ class News_Controller extends Action_Controller
  * Finds urls for local site and sanitizes them
  *
  * @param string $val
+ *
+ * @return null|string|string[]
  */
 function fix_possible_url($val)
 {
@@ -697,6 +699,8 @@ function fix_possible_url($val)
  * - Updated URLs to be of "queryless" style
  *
  * @param mixed[] $matches
+ *
+ * @return string
  */
 function fix_possible_url_callback($matches)
 {
@@ -710,6 +714,8 @@ function fix_possible_url_callback($matches)
  * as character entities and not html entities
  *
  * @param string $data
+ *
+ * @return string
  */
 function encode_special($data)
 {
@@ -722,6 +728,8 @@ function encode_special($data)
  *
  * @param string $data
  * @param string $ns
+ *
+ * @return string
  */
 function cdata_parse($data, $ns = '')
 {

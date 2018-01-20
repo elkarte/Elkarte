@@ -76,6 +76,8 @@ abstract class Database_Abstract implements Database
 	 * sent to the database.
 	 *
 	 * @param mixed[] $matches
+	 *
+	 * @return mixed|string
 	 * @throws Elk_Exception
 	 */
 	public function replacement__callback($matches)
@@ -137,6 +139,8 @@ abstract class Database_Abstract implements Database
 	 * @param string $db_string
 	 * @param mixed[] $db_values
 	 * @param mysqli|postgre|null $connection = null
+	 *
+	 * @return null|string|string[]
 	 */
 	public function quote($db_string, $db_values, $connection = null)
 	{
@@ -416,6 +420,8 @@ abstract class Database_Abstract implements Database
 	 *
 	 * @param string $string
 	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
+	 *
+	 * @return string
 	 */
 	public function escape_wildcard_string($string, $translate_human_wildcards = false)
 	{
@@ -476,6 +482,8 @@ abstract class Database_Abstract implements Database
 	 * Finds out if the connection is still valid.
 	 *
 	 * @param mysqli|postgre|null $connection = null
+	 *
+	 * @return bool
 	 */
 	public function validConnection($connection = null)
 	{

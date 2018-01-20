@@ -558,6 +558,8 @@ class Likes_Controller extends Action_Controller
 	 *
 	 * @param int $memberID
 	 * @param boolean $given
+	 *
+	 * @return
 	 */
 	public function list_getLikesCount($memberID, $given)
 	{
@@ -569,6 +571,8 @@ class Likes_Controller extends Action_Controller
 	 * Returns the number of likes a message has received
 	 *
 	 * @param int $messageID
+	 *
+	 * @return int
 	 */
 	public function list_getMessageLikeCount($messageID)
 	{
@@ -580,9 +584,11 @@ class Likes_Controller extends Action_Controller
 	 * Returns a list of liked posts for a member
 	 *
 	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page  The number of items to show per page
+	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
 	 * @param int $memberID
+	 *
+	 * @return array
 	 */
 	public function list_loadLikesPosts($start, $items_per_page, $sort, $memberID)
 	{
@@ -595,9 +601,11 @@ class Likes_Controller extends Action_Controller
 	 * Returns a list of received likes based on posts
 	 *
 	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page  The number of items to show per page
+	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
 	 * @param int $memberID
+	 *
+	 * @return array
 	 */
 	public function list_loadLikesReceived($start, $items_per_page, $sort, $memberID)
 	{
@@ -610,9 +618,11 @@ class Likes_Controller extends Action_Controller
 	 * Returns a list of members that liked a post
 	 *
 	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page  The number of items to show per page
+	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
 	 * @param int $messageID
+	 *
+	 * @return array
 	 */
 	public function list_loadPostLikers($start, $items_per_page, $sort, $messageID)
 	{

@@ -146,7 +146,8 @@ function removeSettings($toRemove)
  *   settings to decide how to display the menu.
  *
  * @example is available near the function definition.
- * @example $pageindex = constructPageIndex($scripturl . '?board=' . $board, $_REQUEST['start'], $num_messages, $maxindex, true);
+ * @example $pageindex = constructPageIndex($scripturl . '?board=' . $board, $_REQUEST['start'], $num_messages,
+ *     $maxindex, true);
  *
  * @param string $base_url The base URL to be used for each link.
  * @param int &$start The start position, by reference. If this is not a multiple
@@ -155,6 +156,8 @@ function removeSettings($toRemove)
  * @param int $num_per_page The number of items to be displayed on a given page.
  * @param bool $flexible_start = false Use "url.page" instead of "url;start=page"
  * @param mixed[] $show associative array of option => boolean paris
+ *
+ * @return string
  */
 function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flexible_start = false, $show = array())
 {
@@ -397,6 +400,8 @@ function byte_format($number)
  *   false shows the date, a string can force a date format to use %b %d, %Y
  * @param string|bool $offset_type = false If false, uses both user time offset and forum offset.
  *   If 'forum', uses only the forum offset. Otherwise no offset is applied.
+ *
+ * @return string
  */
 function standardTime($log_time, $show_today = true, $offset_type = false)
 {
@@ -706,6 +711,8 @@ function redirectexit($setLocation = '', $refresh = false)
  * - Evoked by enabling queryless_urls for systems that support that function
  *
  * @param mixed[] $matches results from the calling preg
+ *
+ * @return string
  */
 function redirectexit_callback($matches)
 {
@@ -863,6 +870,8 @@ function determineTopicClass(&$topic_context)
  * Sets up the basic theme context stuff.
  *
  * @param bool $forceload = false
+ *
+ * @return
  */
 function setupThemeContext($forceload = false)
 {
@@ -1105,6 +1114,8 @@ function host_from_ip($ip)
  *     - if encrypt = true this is the maximum number of bytes to use in integer hashes (for searching)
  *     - if encrypt = false this is the maximum number of letters in each word
  * @param bool $encrypt = false Used for custom search indexes to return an int[] array representing the words
+ *
+ * @return array
  */
 function text2words($text, $max_chars = 20, $encrypt = false)
 {
@@ -1418,6 +1429,8 @@ function currentContext($messages_request, $reset = false)
  * @param string $where adding before or after
  * @param bool $assoc if the array is a assoc array with named keys or a basic index array
  * @param bool $strict search for identical elements, this means it will also check the types of the needle.
+ *
+ * @return array|mixed[]
  */
 function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = true, $strict = false)
 {
@@ -1739,7 +1752,9 @@ function removeBr($string)
  *
  * - Wrapper function for detectBrowser
  *
- * @param string $browser  the browser we are checking for.
+ * @param string $browser the browser we are checking for.
+ *
+ * @return bool
  */
 function isBrowser($browser)
 {
@@ -1765,6 +1780,8 @@ function isBrowser($browser)
  *
  * @param string $text
  * @param bool $force = false
+ *
+ * @return string
  */
 function censor($text, $force = false)
 {

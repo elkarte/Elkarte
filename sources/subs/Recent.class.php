@@ -135,6 +135,8 @@ class Recent_Class
 	 *
 	 * @param int $start - position to start the query
 	 * @param int $limit - number of entries to grab from the database
+	 *
+	 * @return bool
 	 */
 	public function findRecentMessages($start, $limit = 10)
 	{
@@ -172,6 +174,8 @@ class Recent_Class
 	 *                     ...
 	 *                   )
 	 *                 )
+	 *
+	 * @return array
 	 */
 	public function getRecentPosts($start, $permissions)
 	{

@@ -139,6 +139,8 @@ class Sphinxql extends SearchAPI
 	 * @param string[] $excluded_words Words to exclude, not used in this API
 	 * @param int[] $participants
 	 * @param string[] $search_results
+	 *
+	 * @return int
 	 */
 	public function searchQuery($search_params, $search_words, $excluded_words, &$participants, &$search_results)
 	{

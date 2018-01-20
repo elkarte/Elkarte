@@ -71,6 +71,8 @@ class MessagesDelete
 	 * topics to restore (see MessagesDelete::restoreTopics)
 	 *
 	 * @param int[] $msgs_id Messages to restore
+	 *
+	 * @return array|void
 	 * @throws Elk_Exception
 	 */
 	public function restoreMessages($msgs_id)

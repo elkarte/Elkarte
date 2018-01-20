@@ -126,8 +126,11 @@ function list_getLanguages()
  * This function cleans language entries to/from display.
  *
  * @package Languages
+ *
  * @param string $string
  * @param boolean $to_display
+ *
+ * @return null|string|string[]
  */
 function cleanLangString($string, $to_display = true)
 {

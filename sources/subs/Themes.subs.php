@@ -83,6 +83,8 @@ function themeDirectory($id_theme)
  * Retrieve theme URL
  *
  * @param int $id_theme id of the theme
+ *
+ * @return
  */
 function themeUrl($id_theme)
 {
@@ -111,6 +113,8 @@ function themeUrl($id_theme)
  *
  * @param mixed[] $indexes
  * @param mixed[] $value_data
+ *
+ * @return array
  */
 function validateThemeName($indexes, $value_data)
 {
@@ -215,6 +219,8 @@ function getCustomThemes()
  * Returns all named and installed themes paths as an array of theme name => path
  *
  * @param int[] $theme_list
+ *
+ * @return array
  */
 function getThemesPathbyID($theme_list = array())
 {
@@ -255,6 +261,8 @@ function getThemesPathbyID($theme_list = array())
  * (minimum data)
  *
  * @param int[] $knownThemes available themes
+ *
+ * @return array
  */
 function loadThemes($knownThemes)
 {
@@ -288,6 +296,8 @@ function loadThemes($knownThemes)
  * Load all themes that a package is installed in
  *
  * @param int $id id of the package we are checking
+ *
+ * @return array
  */
 function loadThemesAffected($id)
 {
@@ -416,6 +426,8 @@ function countConfiguredGuestOptions()
  *
  * @param int $current_theme
  * @param int $current_member
+ *
+ * @return array
  */
 function availableThemes($current_theme, $current_member)
 {
@@ -865,6 +877,8 @@ function deleteVariants($id)
  * @param int|int[]|null $memID
  * @param mixed[] $options
  * @param string[] $variables
+ *
+ * @return array|mixed[]
  */
 function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variables = array())
 {

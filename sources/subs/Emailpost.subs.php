@@ -26,8 +26,11 @@
  * @uses Html2BBC.class.php for the html to bbc conversion
  * @uses markdown.php for text to html conversions
  * @package Maillist
+ *
  * @param string $text
  * @param boolean $html
+ *
+ * @return mixed|null|string|string[]
  */
 function pbe_email_to_bbc($text, $html)
 {
@@ -122,9 +125,12 @@ function pbe_run_parsers($text)
  *
  * @uses EmailFormat.class.php
  * @package Maillist
+ *
  * @param string $body
  * @param string $real_name
  * @param string $charset character set of the text
+ *
+ * @return mixed|null|string|string[]
  */
 function pbe_fix_email_body($body, $real_name = '', $charset = 'UTF-8')
 {
@@ -167,8 +173,11 @@ function pbe_fix_email_body($body, $real_name = '', $charset = 'UTF-8')
  * text > quotes the inner which is confusing to all
  *
  * @package Maillist
+ *
  * @param string $body
  * @param boolean $html
+ *
+ * @return mixed|string
  */
 function pbe_fix_email_quotes($body, $html)
 {
@@ -281,8 +290,11 @@ function pbe_fix_email_quotes($body, $html)
  * - Called by pbe_fix_email_quotes
  *
  * @package Maillist
+ *
  * @param string $string
  * @param boolean $update
+ *
+ * @return int
  */
 function pbe_email_quote_depth(&$string, $update = true)
 {
@@ -390,7 +402,10 @@ function pbe_parse_email_message(&$body)
  * - Apply all filters to a message
  *
  * @package Maillist
+ *
  * @param string $text
+ *
+ * @return mixed|null|string|string[]
  */
 function pbe_filter_email_message($text)
 {
@@ -436,8 +451,11 @@ function pbe_filter_email_message($text)
  * - Recursively calls itself till no more tags are found
  *
  * @package Maillist
+ *
  * @param string $text
  * @param boolean $check if true will return if there tags were found
+ *
+ * @return bool|string
  */
 function pbe_clean_email_subject($text, $check = false)
 {
@@ -484,7 +502,10 @@ function pbe_clean_email_subject($text, $check = false)
  * - Looks for email client original message tags and converts them to bbc quotes
  *
  * @package Maillist
+ *
  * @param string $body
+ *
+ * @return null|string|string[]
  */
 function pbe_fix_client_quotes($body)
 {
@@ -617,8 +638,11 @@ function pbe_check_moderation(&$pbe)
  * - can choose to approve the email with the corrections
  *
  * @package Maillist
+ *
  * @param string $error
  * @param Email_Parse $email_message
+ *
+ * @return bool
  * @throws Elk_Exception
  */
 function pbe_emailError($error, $email_message)
@@ -757,8 +781,11 @@ function pbe_emailError($error, $email_message)
  * - calls createAttachment to store them
  *
  * @package Maillist
+ *
  * @param mixed[] $pbe
  * @param Email_Parse $email_message
+ *
+ * @return array
  * @throws Elk_Exception
  */
 function pbe_email_attachments($pbe, $email_message)
@@ -861,7 +888,10 @@ function pbe_email_attachments($pbe, $email_message)
  * - Returns the board number in which the new topic must go
  *
  * @package Maillist
+ *
  * @param Email_Parse $email_address
+ *
+ * @return int
  */
 function pbe_find_board_number($email_address)
 {
@@ -1073,6 +1103,8 @@ function pbe_disable_user_notify($email_message)
  * handled back in the main function
  *
  * @param string[] $matches array of matches from the regex in the preg_replace
+ *
+ * @return string
  */
 function quote_callback($matches)
 {
@@ -1089,6 +1121,8 @@ function quote_callback($matches)
  * handled back in the main function
  *
  * @param string[] $matches array of matches from the regex in the preg_replace
+ *
+ * @return string
  */
 function quote_callback_2($matches)
 {
@@ -1113,7 +1147,10 @@ function quote_callback_2($matches)
  * - pbe['user_info']['groups']
  *
  * @package Maillist
+ *
  * @param string $email
+ *
+ * @return array|bool
  */
 function query_load_user_info($email)
 {
@@ -1281,7 +1318,10 @@ function query_sender_wrapper($from)
  * - Returns all keys sent to a user in date order
  *
  * @package Maillist
+ *
  * @param string $email email address to lookup
+ *
+ * @return array
  */
 function query_user_keys($email)
 {
@@ -1343,9 +1383,12 @@ function query_key_owner($email_message)
  * - If found returns the message subject
  *
  * @package Maillist
+ *
  * @param int $message_id
  * @param string $message_type
  * @param string $email
+ *
+ * @return bool|string
  */
 function query_load_subject($message_id, $message_type, $email)
 {
@@ -1439,9 +1482,12 @@ function query_load_subject($message_id, $message_type, $email)
  * - Returns array with the topic or PM details
  *
  * @package Maillist
+ *
  * @param string $message_type
  * @param int $message_id
  * @param mixed[] $pbe
+ *
+ * @return array|bool
  */
 function query_load_message($message_type, $message_id, $pbe)
 {
@@ -1520,7 +1566,10 @@ function query_load_message($message_type, $message_id, $pbe)
  * Loads the board_id for where a given message resides
  *
  * @package Maillist
+ *
  * @param int $message_id
+ *
+ * @return int
  */
 function query_load_board($message_id)
 {
@@ -1576,9 +1625,12 @@ function query_load_board_details($board_id, $pbe)
  * - Mainly used to determine a users notify settings
  *
  * @package Maillist
+ *
  * @param int $id_member
  * @param int $id_theme
  * @param mixed[] $board_info
+ *
+ * @return array
  */
 function query_get_theme($id_member, $id_theme, $board_info)
 {

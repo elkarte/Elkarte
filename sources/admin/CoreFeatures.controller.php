@@ -447,6 +447,8 @@ class CoreFeatures_Controller extends Action_Controller
 	 *
 	 * @param mixed[] $core_features - The array of all the core features, as
 	 *                returned by $this->settings()
+	 *
+	 * @return array
 	 */
 	protected function _prepare_corefeatures($core_features)
 	{

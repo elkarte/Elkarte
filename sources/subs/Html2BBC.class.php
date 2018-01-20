@@ -203,6 +203,8 @@ class Html_2_BBC
 	 *
 	 * @param DOMNode|object $node current dom node being worked on
 	 * @param boolean $parser internal or external parser
+	 *
+	 * @return bool
 	 */
 	private static function _has_parent_code($node, $parser)
 	{
@@ -430,6 +432,8 @@ class Html_2_BBC
 	 * bbc:  [abbr=Hyper Text Markup Language]HTML[/abbr]
 	 *
 	 * @param DOMNode|object $node
+	 *
+	 * @return string
 	 */
 	private function _convert_abbr($node)
 	{
@@ -451,6 +455,8 @@ class Html_2_BBC
 	 * bbc: [url=http://somesite.com]Awesome Site[/url]
 	 *
 	 * @param DOMNode|object $node
+	 *
+	 * @return string
 	 */
 	private function _convert_anchor($node)
 	{
@@ -516,6 +522,8 @@ class Html_2_BBC
 	 * bbc: [bdo=rtl]Some Text[/bdo]
 	 *
 	 * @param DOMNode|object $node
+	 *
+	 * @return string
 	 */
 	private function _convert_bdo($node)
 	{
@@ -534,6 +542,8 @@ class Html_2_BBC
 	 * Converts code tags to bbc block code
 	 *
 	 * @param DOMNode|object $node
+	 *
+	 * @return string
 	 */
 	private function _convert_code($node)
 	{
@@ -577,6 +587,8 @@ class Html_2_BBC
 	 * bbc: [color=red][size=12pt]This is some text![/size][/color]
 	 *
 	 * @param DOMNode|object $node
+	 *
+	 * @return string
 	 */
 	private function _convert_font($node)
 	{
@@ -610,6 +622,8 @@ class Html_2_BBC
 	 *
 	 * @param int $level
 	 * @param string $content
+	 *
+	 * @return string
 	 */
 	private function _convert_header($level, $content)
 	{
@@ -629,6 +643,8 @@ class Html_2_BBC
 	 * bbc: [img]src[/img]
 	 *
 	 * @param DOMNode|object $node
+	 *
+	 * @return mixed|string
 	 */
 	private function _convert_image($node)
 	{
@@ -691,6 +707,8 @@ class Html_2_BBC
 	 * bbc: [b]Some Text[/b]
 	 *
 	 * @param DOMNode|object $node
+	 *
+	 * @return string
 	 */
 	private function _convert_styles($node)
 	{
@@ -768,6 +786,8 @@ class Html_2_BBC
 	 * bbc: [td]Some Text[/td][td][/td]
 	 *
 	 * @param DOMNode|object $node
+	 *
+	 * @return string
 	 */
 	private function _convert_table_cell($node)
 	{
@@ -800,6 +820,8 @@ class Html_2_BBC
 	 * Helper function for getting a node value
 	 *
 	 * @param DOMNode|object $node
+	 *
+	 * @return string
 	 */
 	private function _get_value($node)
 	{
@@ -816,6 +838,8 @@ class Html_2_BBC
 	 * Helper function for getting a node name
 	 *
 	 * @param DOMNode|object $node
+	 *
+	 * @return string
 	 */
 	private function _get_name($node)
 	{
@@ -853,6 +877,8 @@ class Html_2_BBC
 	 * Gets the outer html of a node
 	 *
 	 * @param DOMNode|object $node
+	 *
+	 * @return
 	 */
 	private function _get_outerHTML($node)
 	{
@@ -871,6 +897,8 @@ class Html_2_BBC
 	 * $style['width'] = '150px'
 	 *
 	 * @param string $style
+	 *
+	 * @return array
 	 */
 	private function _get_style_values($style)
 	{
@@ -896,6 +924,8 @@ class Html_2_BBC
 	 * Looks for double html encoding items and continues to decode until fixed
 	 *
 	 * @param string $text
+	 *
+	 * @return mixed
 	 */
 	private function _recursive_decode($text)
 	{

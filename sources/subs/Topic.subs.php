@@ -1444,6 +1444,8 @@ function removeOldTopics(array $boards, $delete_type, $exclude_stickies, $older_
  * Retrieve all topics started by the given member.
  *
  * @param int $memberID
+ *
+ * @return array
  */
 function topicsStartedBy($memberID)
 {
@@ -1583,9 +1585,11 @@ function countMessagesBefore($id_topic, $id_msg, $include_current = false, $only
  *
  * @param int $topic
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param mixed[] $messages
  * @param bool $only_approved
+ *
+ * @return array|mixed[]
  */
 function selectMessages($topic, $start, $items_per_page, $messages = array(), $only_approved = false)
 {
@@ -1649,6 +1653,8 @@ function selectMessages($topic, $start, $items_per_page, $messages = array(), $o
  *
  * @param int $topic
  * @param string $render defaults to print style rendering for parse_bbc
+ *
+ * @return array
  */
 function topicMessages($topic, $render = 'print')
 {
@@ -1705,6 +1711,8 @@ function topicMessages($topic, $render = 'print')
  * Will only return approved attachments
  *
  * @param int[] $id_messages
+ *
+ * @return array
  */
 function messagesAttachments($id_messages)
 {
@@ -2012,6 +2020,8 @@ function topicUserAttributes($id_topic, $user)
  * Retrieve some details about the topic
  *
  * @param int[] $topics an array of topic id
+ *
+ * @return array
  */
 function topicsDetails($topics)
 {
@@ -2102,6 +2112,8 @@ function getLoggedTopics($member, $topics)
  * Returns a list of topics ids and their subjects
  *
  * @param int[] $topic_ids
+ *
+ * @return array
  */
 function topicsList($topic_ids)
 {
@@ -2254,6 +2266,8 @@ function approveMessages($messages, $messageDetails, $type = 'replies')
  * @param int[] $topics array of topics ids
  * @param bool $approve = true
  * @param bool $log if true logs the action.
+ *
+ * @return bool|void
  * @throws Elk_Exception
  */
 function approveTopics($topics, $approve = true, $log = false)
@@ -2836,6 +2850,8 @@ function topicNotifications($start, $items_per_page, $sort, $memID)
  * Used to update users posts counts when topics are moved or are deleted.
  *
  * @param int $id_topic topic id to work with
+ *
+ * @return array
  */
 function postersCount($id_topic)
 {

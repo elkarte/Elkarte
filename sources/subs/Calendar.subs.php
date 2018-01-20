@@ -1018,7 +1018,10 @@ function getEventProperties($event_id, $calendar_only = false)
  * Fetch and event that may be linked to a topic
  *
  * @package Calendar
+ *
  * @param int $id_topic
+ *
+ * @return array
  */
 function eventInfoForTopic($id_topic)
 {
@@ -1209,6 +1212,8 @@ function getHoliday($id_holiday)
  *                  - realname
  *                  - sequence
  *                  - eventid
+ *
+ * @return string
  */
 function build_ical_content($event)
 {

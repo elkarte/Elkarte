@@ -199,6 +199,8 @@ class Ftp_Connection
 	 * Reads the response to the command from the server
 	 *
 	 * @param string[]|string $desired string or array of acceptable return values
+	 *
+	 * @return bool
 	 */
 	public function check_response($desired)
 	{

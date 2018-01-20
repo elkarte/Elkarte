@@ -766,6 +766,8 @@ class Display_Controller extends Action_Controller
 	 * useful for showing an index before or after the posts.
 	 *
 	 * @param bool $reset default false.
+	 *
+	 * @return array
 	 */
 	public function prepareDisplayContext_callback($reset = false)
 	{

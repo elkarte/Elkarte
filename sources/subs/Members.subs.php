@@ -1146,12 +1146,15 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
  * Gets a listing of members, Callback for createList().
  *
  * @package Members
+ *
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param string $where
  * @param mixed[] $where_params
  * @param boolean $get_duplicates
+ *
+ * @return array
  */
 function list_getMembers($start, $items_per_page, $sort, $where, $where_params = array(), $get_duplicates = false)
 {
@@ -1184,8 +1187,11 @@ function list_getMembers($start, $items_per_page, $sort, $where, $where_params =
  * Gets the number of members, Callback for createList().
  *
  * @package Members
+ *
  * @param string $where
  * @param mixed[] $where_params
+ *
+ * @return
  */
 function list_getNumMembers($where, $where_params = array())
 {
@@ -1218,7 +1224,10 @@ function list_getNumMembers($where, $where_params = array())
  * Find potential duplicate registration members based on the same IP address
  *
  * @package Members
+ *
  * @param mixed[] $members
+ *
+ * @return bool
  */
 function populateDuplicateMembers(&$members)
 {
@@ -1331,10 +1340,13 @@ function populateDuplicateMembers(&$members)
  * Find members with a given IP (first, second, exact or "relaxed")
  *
  * @package Members
+ *
  * @param string|string[] $ip1 An IP or an array of IPs
  * @param string $match (optional, default 'exact') if the match should be exact
  *                of "relaxed" (using LIKE)
  * @param bool $ip2 (optional, default false) If the query should check IP2 as well
+ *
+ * @return array
  */
 function membersByIP($ip1, $match = 'exact', $ip2 = false)
 {
@@ -1389,7 +1401,10 @@ function membersByIP($ip1, $match = 'exact', $ip2 = false)
  * Find out if there is another admin than the given user.
  *
  * @package Members
+ *
  * @param int $memberID ID of the member, to compare with.
+ *
+ * @return
  */
 function isAnotherAdmin($memberID)
 {
@@ -1416,11 +1431,14 @@ function isAnotherAdmin($memberID)
  * This function retrieves a list of member ids based on a set of conditions
  *
  * @package Members
+ *
  * @param mixed[]|string $query see prepareMembersByQuery
  * @param mixed[] $query_params see prepareMembersByQuery
  * @param bool $details if true returns additional member details (name, email, ip, etc.)
  *             false will only return an array of member id's that match the conditions
  * @param bool $only_active see prepareMembersByQuery
+ *
+ * @return array
  */
 function membersBy($query, $query_params, $details = false, $only_active = true)
 {
@@ -1461,9 +1479,12 @@ function membersBy($query, $query_params, $details = false, $only_active = true)
  * Counts the number of members based on conditions
  *
  * @package Members
+ *
  * @param string[]|string $query see prepareMembersByQuery
  * @param mixed[] $query_params see prepareMembersByQuery
  * @param boolean $only_active see prepareMembersByQuery
+ *
+ * @return
  */
 function countMembersBy($query, $query_params, $only_active = true)
 {
@@ -1488,6 +1509,7 @@ function countMembersBy($query, $query_params, $only_active = true)
  * Builds the WHERE clause for the functions countMembersBy and membersBy
  *
  * @package Members
+ *
  * @param mixed[]|string $query can be an array of "type" of conditions,
  *             or a string used as raw query
  *             or a string that represents one of the built-in conditions
@@ -1497,6 +1519,8 @@ function countMembersBy($query, $query_params, $only_active = true)
  *             'order' used raw in ORDER BY
  *             others passed as query params
  * @param bool $only_active only fetch active members
+ *
+ * @return bool|mixed|mixed[]|string
  */
 function prepareMembersByQuery($query, &$query_params, $only_active = true)
 {
@@ -1581,7 +1605,10 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
  * - It is used in personal messages reporting.
  *
  * @package Members
+ *
  * @param int $id_admin = 0 if requested, only data about a specific admin is retrieved
+ *
+ * @return array
  */
 function admins($id_admin = 0)
 {
@@ -1771,8 +1798,11 @@ function getMemberByName($name, $flexible = false)
  * - Optionally will only search/find the member in a buddy list
  *
  * @package Members
+ *
  * @param string $search string to search real_name for like finds
  * @param int[]|null $buddies
+ *
+ * @return array
  */
 function getMember($search, $buddies = array())
 {
@@ -1912,11 +1942,14 @@ function retrieveMemberData($conditions)
  * Activate members
  *
  * @package Members
+ *
  * @param mixed[] $conditions associative array holding the conditions for the WHERE clause of the query.
  * Possible keys:
  * - activated_status (boolean) must be present
  * - time_before (integer)
  * - members (array of integers)
+ *
+ * @return int
  */
 function approveMembers($conditions)
 {
@@ -2143,7 +2176,10 @@ function memberExists($url)
  * Find the most recent members
  *
  * @package Members
+ *
  * @param int $limit
+ *
+ * @return array
  */
 function recentMembers($limit)
 {
@@ -2265,7 +2301,10 @@ function getConcernedMembers($groups, $where, $change_groups = false)
  * Determine if the current user ($user_info) can contact another user ($who)
  *
  * @package Members
+ *
  * @param int $who The id of the user to contact
+ *
+ * @return bool
  */
 function canContact($who)
 {
@@ -2582,6 +2621,8 @@ function updateMemberData($members, $data)
  *
  * @param string $ip_string raw value to use in where clause
  * @param string $ip_var
+ *
+ * @return array
  */
 function loadMembersIPs($ip_string, $ip_var)
 {

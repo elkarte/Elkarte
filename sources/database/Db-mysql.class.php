@@ -125,6 +125,8 @@ class Database_MySQL extends Database_Abstract
 	 * @param string $db_string
 	 * @param mixed[]|false $db_values = array()
 	 * @param mysqli_result|false|null $connection = null
+	 *
+	 * @return bool|mysqli_result
 	 * @throws Elk_Exception
 	 */
 	public function query($identifier, $db_string, $db_values = array(), $connection = null)
@@ -361,6 +363,8 @@ class Database_MySQL extends Database_Abstract
 	 * Affected rows from previous operation.
 	 *
 	 * @param mysqli|null $connection
+	 *
+	 * @return int
 	 */
 	public function affected_rows($connection = null)
 	{
@@ -373,6 +377,8 @@ class Database_MySQL extends Database_Abstract
 	 * @param string $table
 	 * @param string|null $field = null
 	 * @param mysqli|null $connection = null
+	 *
+	 * @return int|string
 	 */
 	public function insert_id($table, $field = null, $connection = null)
 	{
@@ -386,6 +392,8 @@ class Database_MySQL extends Database_Abstract
 	 *
 	 * @param mysqli_result $result
 	 * @param integer|bool $counter = false
+	 *
+	 * @return array|null
 	 */
 	public function fetch_row($result, $counter = false)
 	{
@@ -408,6 +416,8 @@ class Database_MySQL extends Database_Abstract
 	 * Get the number of rows in the result.
 	 *
 	 * @param mysqli_result $result
+	 *
+	 * @return int
 	 */
 	public function num_rows($result)
 	{
@@ -419,6 +429,8 @@ class Database_MySQL extends Database_Abstract
 	 * Get the number of fields in the result set.
 	 *
 	 * @param mysqli_result $request
+	 *
+	 * @return int
 	 */
 	public function num_fields($request)
 	{
@@ -430,6 +442,8 @@ class Database_MySQL extends Database_Abstract
 	 *
 	 * @param mysqli_result $request
 	 * @param integer $counter
+	 *
+	 * @return bool
 	 */
 	public function data_seek($request, $counter)
 	{
@@ -442,6 +456,8 @@ class Database_MySQL extends Database_Abstract
 	 *
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
 	 * @param mysqli|null $connection = null
+	 *
+	 * @return bool|mysqli_result
 	 */
 	public function db_transaction($type = 'commit', $connection = null)
 	{
@@ -462,6 +478,8 @@ class Database_MySQL extends Database_Abstract
 	 * Return last error string from the database server
 	 *
 	 * @param mysqli|null $connection = null
+	 *
+	 * @return string
 	 */
 	public function last_error($connection = null)
 	{
@@ -758,6 +776,8 @@ class Database_MySQL extends Database_Abstract
 	 * Unescape an escaped string!
 	 *
 	 * @param string $string
+	 *
+	 * @return string
 	 */
 	public function unescape_string($string)
 	{
@@ -1172,6 +1192,8 @@ class Database_MySQL extends Database_Abstract
 	 * Escape string for the database input
 	 *
 	 * @param string $string
+	 *
+	 * @return string
 	 */
 	public function escape_string($string)
 	{
@@ -1187,6 +1209,8 @@ class Database_MySQL extends Database_Abstract
 	 *
 	 * @param mysqli_result $request
 	 * @param int|bool $counter = false
+	 *
+	 * @return array|null
 	 */
 	public function fetch_assoc($request, $counter = false)
 	{
@@ -1232,6 +1256,8 @@ class Database_MySQL extends Database_Abstract
 	 *
 	 * @param string|null $dbName = null
 	 * @param mysqli|null $connection = null
+	 *
+	 * @return bool
 	 */
 	public function select_db($dbName = null, $connection = null)
 	{
@@ -1253,6 +1279,8 @@ class Database_MySQL extends Database_Abstract
 	 * Finds out if the connection is still valid.
 	 *
 	 * @param mysqli|null $connection = null
+	 *
+	 * @return bool
 	 */
 	public function validConnection($connection = null)
 	{

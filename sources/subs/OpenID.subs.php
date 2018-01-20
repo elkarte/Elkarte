@@ -291,6 +291,8 @@ class OpenID
 	 * Fix the URI to a canonical form
 	 *
 	 * @param string $uri
+	 *
+	 * @return string
 	 */
 	public function canonize($uri)
 	{
@@ -330,6 +332,8 @@ class OpenID
 	 * - It generates them if they're not stored or $regenerate parameter is true.
 	 *
 	 * @param bool $regenerate
+	 *
+	 * @return array
 	 * @throws Elk_Exception
 	 */
 	public function get_keys($regenerate)
@@ -523,6 +527,8 @@ function long_to_binary($value)
  *
  * @param int $num1
  * @param int $num2
+ *
+ * @return string
  */
 function binary_xor($num1, $num2)
 {

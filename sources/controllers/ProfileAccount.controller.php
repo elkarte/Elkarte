@@ -331,6 +331,8 @@ class ProfileAccount_Controller extends Action_Controller
 	 * @param int $start The item to start with (for pagination purposes)
 	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
+	 *
+	 * @return array
 	 */
 	public function list_getUserWarnings($start, $items_per_page, $sort)
 	{

@@ -104,6 +104,8 @@ class Mentioning extends AbstractModel
 	 * @param ElkArte\sources\subs\MentionType\Mention_Type_Interface $mention_obj The object that knows how to store
 	 *  the mention in the database
 	 * @param mixed[] $data must contain uid, type and msg at a minimum
+	 *
+	 * @return bool
 	 */
 	public function create($mention_obj, $data)
 	{
@@ -136,6 +138,8 @@ class Mentioning extends AbstractModel
 	 * actual insert.
 	 *
 	 * @param mixed[] $data must contain uid, type and msg at a minimum
+	 *
+	 * @return array|mixed[]
 	 */
 	protected function _prepareData($data)
 	{

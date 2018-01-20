@@ -130,8 +130,11 @@ function setLoginCookie($cookie_length, $id, $password = '')
  * - uses boardurl to determine these two things.
  *
  * @package Authorization
+ *
  * @param bool $local
  * @param bool $global
+ *
+ * @return array
  */
 function url_parts($local, $global)
 {
@@ -573,10 +576,13 @@ function validatePassword($password, $username, $restrict_in = array())
  * - if a non SHA256 password is sent, will generate one with SHA256(user + password) and return it in password
  *
  * @package Authorization
+ *
  * @param string $password user password if not already 64 characters long will be SHA256 with the user name
  * @param string $hash hash as generated from a SHA256 password
  * @param string $user user name only required if creating a SHA-256 password
  * @param boolean $returnhash flag to determine if we are returning a hash suitable for the database
+ *
+ * @return bool|string
  */
 function validateLoginPassword(&$password, $hash, $user = '', $returnhash = false)
 {
@@ -701,6 +707,7 @@ function rebuildModCache()
  * The same thing as setcookie but allows for integration hook
  *
  * @package Authorization
+ *
  * @param string $name
  * @param string $value = ''
  * @param int $expire = 0
@@ -708,6 +715,8 @@ function rebuildModCache()
  * @param string $domain = ''
  * @param boolean|null $secure = false
  * @param boolean|null $httponly = null
+ *
+ * @return bool
  */
 function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = '', $secure = null, $httponly = null)
 {
@@ -729,7 +738,10 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
  * This functions determines whether this is the first login of the given user.
  *
  * @package Authorization
+ *
  * @param int $id_member the id of the member to check for
+ *
+ * @return bool
  */
 function isFirstLogin($id_member)
 {
@@ -828,7 +840,10 @@ function userByEmail($email, $username = null)
  * Generate a random validation code.
  *
  * @package Authorization
+ *
  * @param int $length the number of characters to return
+ *
+ * @return string
  */
 function generateValidationCode($length = 10)
 {

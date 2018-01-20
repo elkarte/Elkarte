@@ -1152,6 +1152,8 @@ function saveProfileFields($fields, $hook)
  *
  * @param string $email
  * @param int $memID = 0
+ *
+ * @return bool|string
  */
 function profileValidateEmail($email, $memID = 0)
 {
@@ -1899,6 +1901,8 @@ function profileReloadUser()
  * Validate the signature
  *
  * @param string $value
+ *
+ * @return bool|string
  */
 function profileValidateSignature(&$value)
 {
@@ -2519,9 +2523,11 @@ function profileSaveGroups(&$value)
  * Returns an array of them
  *
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param int $memID the member ID
+ *
+ * @return array
  */
 function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 {
@@ -2596,11 +2602,13 @@ function list_getUserWarningCount($memID)
  * (used by createList() callback and others)
  *
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param int[] $boardsAllowed
  * @param integer $memID
  * @param int[]|null|boolean $exclude_boards
+ *
+ * @return array
  */
 function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID, $exclude_boards = null)
 {
@@ -2720,9 +2728,11 @@ function getNumAttachments($boardsAllowed, $memID)
  * (used by createList() callbacks)
  *
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param int $memID
+ *
+ * @return array
  */
 function getUnwatchedBy($start, $items_per_page, $sort, $memID)
 {
@@ -2888,6 +2898,8 @@ function count_user_topics($memID, $board = null)
  *
  * @param int $memID
  * @param int|null $board
+ *
+ * @return array
  */
 function findMinMaxUserMessage($memID, $board = null)
 {
@@ -2923,6 +2935,8 @@ function findMinMaxUserMessage($memID, $board = null)
  *
  * @param int $memID
  * @param int|null $board
+ *
+ * @return array
  */
 function findMinMaxUserTopic($memID, $board = null)
 {
@@ -2963,6 +2977,8 @@ function findMinMaxUserTopic($memID, $board = null)
  * @param string|null $range_limit
  * @param boolean $reverse
  * @param int|null $board
+ *
+ * @return array
  */
 function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = false, $board = null)
 {
@@ -3028,6 +3044,8 @@ function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = f
  * @param string $range_limit
  * @param boolean $reverse
  * @param int|null $board
+ *
+ * @return array
  */
 function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = false, $board = null)
 {
@@ -3084,6 +3102,8 @@ function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = 
  * Loads the permissions that are given to a member group or set of groups
  *
  * @param int[] $curGroups
+ *
+ * @return array
  */
 function getMemberGeneralPermissions($curGroups)
 {
@@ -3150,6 +3170,8 @@ function getMemberGeneralPermissions($curGroups)
  * @param int $memID
  * @param int[] $curGroups
  * @param int|null $board
+ *
+ * @return array
  */
 function getMemberBoardPermissions($memID, $curGroups, $board = null)
 {
@@ -3215,6 +3237,8 @@ function getMemberBoardPermissions($memID, $curGroups, $board = null)
  * Retrieves (most of) the IPs used by a certain member in his messages and errors
  *
  * @param int $memID the id of the member
+ *
+ * @return array
  */
 function getMembersIPs($memID)
 {
@@ -3294,6 +3318,8 @@ function getMembersIPs($memID)
  *
  * @param string[] $ips a list of IP addresses
  * @param int $memID the id of the "current" member (maybe it could be retrieved with currentMemberID)
+ *
+ * @return array
  */
 function getMembersInRange($ips, $memID)
 {
@@ -3356,6 +3382,8 @@ function getMembersInRange($ips, $memID)
  * settings.
  *
  * @param int $member_id the id of a member
+ *
+ * @return array
  */
 function getMemberNotificationsProfile($member_id)
 {

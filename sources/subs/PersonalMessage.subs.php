@@ -60,7 +60,9 @@ function loadMessageLimit()
  * Loads the count of messages on a per label basis.
  *
  * @param $labels mixed[] array of labels that we are calculating the message count
+ *
  * @package PersonalMessage
+ * @return mixed[]
  */
 function loadPMLabels($labels)
 {
@@ -927,8 +929,11 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
  * - 'start' - start id, if any
  *
  * @package PersonalMessage
+ *
  * @param mixed[] $pm_options options for loading
  * @param int $id_member id member
+ *
+ * @return array
  */
 function loadPMs($pm_options, $id_member)
 {
@@ -1088,8 +1093,11 @@ function loadPMs($pm_options, $id_member)
  * How many PMs have you sent lately?
  *
  * @package PersonalMessage
+ *
  * @param int $id_member id member
  * @param int $time time interval (in seconds)
+ *
+ * @return
  */
 function pmCount($id_member, $time)
 {
@@ -1311,7 +1319,10 @@ function toggleNewPM($id_member, $new = false)
  * Load the PM limits for each group or for a specified group
  *
  * @package PersonalMessage
+ *
  * @param int|bool $id_group (optional) the id of a membergroup
+ *
+ * @return array
  */
 function loadPMLimits($id_group = false)
 {
@@ -1343,7 +1354,10 @@ function loadPMLimits($id_group = false)
  * Retrieve the discussion one or more PMs belong to
  *
  * @package PersonalMessage
+ *
  * @param int[] $id_pms
+ *
+ * @return array
  */
 function getDiscussions($id_pms)
 {
@@ -1370,7 +1384,10 @@ function getDiscussions($id_pms)
  * Return all the PMs belonging to one or more discussions
  *
  * @package PersonalMessage
+ *
  * @param int[] $pm_heads array of pm id head nodes
+ *
+ * @return array
  */
 function getPmsFromDiscussion($pm_heads)
 {
@@ -1739,9 +1756,12 @@ function setPMRepliedStatus($id_member, $replied_to)
  * - Used to load the conversation view of a PM
  *
  * @package PersonalMessage
+ *
  * @param int $head id of the head pm of the conversation
  * @param mixed[] $recipients
  * @param string $folder the current folder we are working in
+ *
+ * @return array
  */
 function loadConversationList($head, &$recipients, $folder = '')
 {
@@ -1795,7 +1815,10 @@ function loadConversationList($head, &$recipients, $folder = '')
  * unread message.
  *
  * @package PersonalMessage
+ *
  * @param int[] $pms array of pm ids to search
+ *
+ * @return array
  */
 function loadConversationUnreadStatus($pms)
 {
@@ -1860,10 +1883,13 @@ function loadConversationUnreadStatus($pms)
  * - If optional search parameter is set to true will return message first label, useful for linking
  *
  * @package PersonalMessage
+ *
  * @param int[] $all_pms
  * @param mixed[] $recipients
  * @param string $folder
  * @param boolean $search
+ *
+ * @return array
  */
 function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = false)
 {
@@ -1988,7 +2014,10 @@ function loadPMMessageRequest($display_pms, $sort_by_query, $sort_by, $descendin
  * Simple function to validate that a PM was sent to the current user
  *
  * @package PersonalMessage
+ *
  * @param int $pmsg id of the pm we are checking
+ *
+ * @return bool
  */
 function checkPMReceived($pmsg)
 {
@@ -2018,8 +2047,11 @@ function checkPMReceived($pmsg)
  * Loads a pm by ID for use as a quoted pm in a new message
  *
  * @package PersonalMessage
+ *
  * @param int $pmsg
  * @param boolean $isReceived
+ *
+ * @return bool
  */
 function loadPMQuote($pmsg, $isReceived)
 {
@@ -2058,8 +2090,11 @@ function loadPMQuote($pmsg, $isReceived)
  * - Will optionally count the number of bcc recipients and return that count
  *
  * @package PersonalMessage
+ *
  * @param int $pmsg
  * @param boolean $bcc_count
+ *
+ * @return array
  */
 function loadPMRecipientsAll($pmsg, $bcc_count = false)
 {
@@ -2200,12 +2235,15 @@ function numPMSeachResults($userQuery, $labelQuery, $timeQuery, $searchQuery, $s
  * Gets all the matching message ids, senders and head pm nodes, using standard search only (No caching and the like!)
  *
  * @package PersonalMessage
+ *
  * @param string $userQuery raw query, used if we are searching for specific users
  * @param string $labelQuery raw query, used if we are searching only specific labels
  * @param string $timeQuery raw query, used if we are limiting results to time periods
  * @param string $searchQuery raw query, the actual thing you are searching for in the subject and/or body
  * @param mixed[] $searchq_parameters value parameters used in the above query
  * @param mixed[] $search_params additional search parameters, like sort and direction
+ *
+ * @return array
  */
 function loadPMSearchMessages($userQuery, $labelQuery, $timeQuery, $searchQuery, $searchq_parameters, $search_params)
 {
@@ -2251,8 +2289,11 @@ function loadPMSearchMessages($userQuery, $labelQuery, $timeQuery, $searchQuery,
  * conversation.  This will set the root head id to each of the node heads
  *
  * @package PersonalMessage
+ *
  * @param int[] $head_pms array of pm ids that were found in the id_pm_head col
  * during the initial search
+ *
+ * @return array
  */
 function loadPMSearchHeads($head_pms)
 {
@@ -2289,8 +2330,11 @@ function loadPMSearchHeads($head_pms)
  * Loads the actual details of the PM's that were found during the search stage
  *
  * @package PersonalMessage
+ *
  * @param int[] $foundMessages array of found message id's
  * @param mixed[] $search_params as specified in the form, here used for sorting
+ *
+ * @return array
  */
 function loadPMSearchResults($foundMessages, $search_params)
 {

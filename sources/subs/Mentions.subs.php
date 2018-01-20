@@ -16,9 +16,12 @@
  * callback for createList in action_list of Mentions_Controller
  *
  * @package Mentions
+ *
  * @param bool $all : if true counts all the mentions, otherwise only the unread
  * @param string[]|string $type : the type of the mention can be a string or an array of strings.
  * @param string|null $id_member : the id of the member the counts are for, defaults to user_info['id']
+ *
+ * @return mixed
  */
 function countUserMentions($all = false, $type = '', $id_member = null)
 {
@@ -64,11 +67,14 @@ function countUserMentions($all = false, $type = '', $id_member = null)
  * callback for createList in action_list of Mentions_Controller
  *
  * @package Mentions
+ *
  * @param int $start Query starts sending results from here
  * @param int $limit Number of mentions returned
  * @param string $sort Sorting
  * @param bool $all if show all mentions or only unread ones
  * @param string[]|string $type : the type of the mention can be a string or an array of strings.
+ *
+ * @return array
  */
 function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 {
@@ -117,7 +123,10 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
  * Doesn't check permissions, access, anything. It just deletes everything.
  *
  * @package Mentions
+ *
  * @param int[] $id_mentions the mention ids
+ *
+ * @return bool
  */
 function removeMentions($id_mentions)
 {
@@ -250,9 +259,12 @@ function toggleMentionsAccessibility($mentions, $access)
  * - Called from the validation class
  *
  * @package Mentions
+ *
  * @param string $field
  * @param mixed[] $input
  * @param string|null $validation_parameters
+ *
+ * @return array|void
  */
 function validate_ownmention($field, $input, $validation_parameters = null)
 {

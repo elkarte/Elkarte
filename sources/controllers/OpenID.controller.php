@@ -194,6 +194,8 @@ class OpenID_Controller extends Action_Controller
 	 * Compares the association with the signatures received from the server
 	 *
 	 * @param string $raw_secret - The association stored in the database
+	 *
+	 * @return bool
 	 */
 	private function _verify_string($raw_secret)
 	{

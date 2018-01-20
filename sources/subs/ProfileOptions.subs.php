@@ -75,6 +75,8 @@ function getBuddiesID($buddies, $adding = true)
  *
  * @param int[] $current_groups
  * @param int $memID
+ *
+ * @return array
  */
 function loadMembergroupsJoin($current_groups, $memID)
 {
@@ -168,6 +170,8 @@ function checkMembergroupChange($group_id)
  *
  * @param int $group_id
  * @param int $memID
+ *
+ * @return bool
  */
 function logMembergroupRequest($group_id, $memID)
 {
