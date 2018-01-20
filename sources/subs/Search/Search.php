@@ -200,17 +200,6 @@ class Search
 		$this->_db_search = db_search();
 
 		$this->_db_search->skip_next_error();
-		// Remove any temporary search tables that may exist
-		$this->_db_search->search_query('drop_tmp_log_search_messages', '
-			DROP TABLE IF EXISTS {db_prefix}tmp_log_search_messages'
-		);
-
-		$this->_db_search->skip_next_error();
-		$this->_db_search->search_query('drop_tmp_log_search_topics', '
-			DROP TABLE IF EXISTS {db_prefix}tmp_log_search_topics'
-		);
-
-		$this->_db_search->skip_next_error();
 		// Create new temporary table(s) (if we can) to store preliminary results in.
 		$this->_createTemporary = $this->_db_search->createTemporaryTable(
 			'{db_prefix}tmp_log_search_messages',

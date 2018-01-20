@@ -106,16 +106,20 @@ abstract class DbTable
 	 * @param string $table_name
 	 * @param mixed[] $columns in the format specified.
 	 * @param mixed[] $indexes default array(), in the format specified.
-	 * @param mixed[] $parameters default array()
-	 * @param string $if_exists default 'ignore'
-	 * @param string $error default 'fatal'
+	 * @param mixed[] $parameters default array(
+	 *                  'if_exists' => 'ignore',
+	 *                  'temporary' => false,
+	 *                )
 	 */
-	public function db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore')
+	public function db_create_table($table_name, $columns, $indexes = array(), $parameters = array())
 	{
-		$real_prefix = $this->_real_prefix();
+		$parameters = array_merge(array(
+			'if_exists' => 'ignore',
+			'temporary' => false,
+		), $parameters);
 
 		// With or without the database name, the fullname looks like this.
-		$full_table_name = str_replace('{db_prefix}', $real_prefix, $table_name);
+		$full_table_name = str_replace('{db_prefix}', $this->_real_prefix(), $table_name);
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// First - no way do we touch our tables.
@@ -129,16 +133,20 @@ abstract class DbTable
 		if ($this->table_exists($full_table_name))
 		{
 			// This is a sad day... drop the table? If not, return false (error) by default.
-			if ($if_exists == 'overwrite')
+			if ($parameters['if_exists'] === 'overwrite')
+			{
 				$this->db_drop_table($table_name);
+			}
 			else
-				return $if_exists == 'ignore';
+			{
+				return $parameters['if_exists'] === 'ignore';
+			}
 		}
 
 		// If we've got this far - good news - no table exists. We can build our own!
 		$this->_db->db_transaction('begin');
 
-		if (empty($parameters['temporary']))
+		if ($parameters['temporary'] === true)
 		{
 			$table_query = 'CREATE TABLE ' . $table_name . "\n" . '(';
 		}

@@ -101,6 +101,9 @@ class DbSearch_Abstract implements DbSearch
 	public function createTemporaryTable($name, $columns, $indexes)
 	{
 		$db_table = db_table();
-		return $db_table->db_create_table($name, $columns, $indexes, array('temporary' => true);
+		return $db_table->db_create_table($name, $columns, $indexes, array(
+			'temporary' => true,
+			'if_exists' => 'overwrite'
+		));
 	}
 }
