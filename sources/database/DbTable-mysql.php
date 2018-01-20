@@ -56,7 +56,7 @@ class DbTable_MySQL extends DbTable
 	/**
 	 * {@inheritdoc }
 	 */
-	protected function _create_query_indexes($indexes)
+	protected function _create_query_indexes($indexes, $table_name)
 	{
 		// Loop through the indexes next...
 		$index_query = '';

@@ -69,10 +69,11 @@ class DbTable_PostgreSQL extends DbTable
 	/**
 	 * {@inheritdoc }
 	 */
-	protected function _create_query_indexes($indexes)
+	protected function _create_query_indexes($indexes, $table_name)
 	{
 		// Loop through the indexes next...
 		$this->_indexes = array();
+		$table_query = '';
 		foreach ($indexes as $index)
 		{
 			$index['columns'] = $this->_clean_indexes($index['columns']);
@@ -89,7 +90,7 @@ class DbTable_PostgreSQL extends DbTable
 				$this->_indexes[] = 'CREATE ' . (isset($index['type']) && $index['type'] == 'unique' ? 'UNIQUE' : '') . ' INDEX ' . $table_name . '_' . $index['name'] . ' ON ' . $table_name . ' (' . $columns . ')';
 			}
 		}
-		return '';
+		return $table_query;
 	}
 
 	/**

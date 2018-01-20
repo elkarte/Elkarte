@@ -159,7 +159,7 @@ abstract class DbTable
 			$table_query .= "\n\t" . $this->_db_create_query_column($column, $table_name) . ',';
 		}
 
-		$table_query .= $this->_create_query_indexes($indexes);
+		$table_query .= $this->_create_query_indexes($indexes, $table_name);
 
 		// No trailing commas!
 		if (substr($table_query, -1) == ',')
@@ -201,9 +201,10 @@ abstract class DbTable
 	 * to prepare for the indexes creation
 	 *
 	 * @param string[] $indexes
+	 * @param string $table_name
 	 * @return string
 	 */
-	abstract protected function _create_query_indexes($indexes);
+	abstract protected function _create_query_indexes($indexes, $table_name);
 
 	/**
 	 * In certain cases it is necessary to create the indexes of a
