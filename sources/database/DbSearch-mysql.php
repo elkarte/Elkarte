@@ -14,7 +14,7 @@
 /**
  * MySQL implementation of DbSearch
  */
-class DbSearch_MySQL implements DbSearch
+class DbSearch_MySQL extends DbSearch_Abstract
 {
 	/**
 	 * This instance of the search
@@ -23,58 +23,24 @@ class DbSearch_MySQL implements DbSearch
 	private static $_search = null;
 
 	/**
-	 * The way to skip a database error
-	 * @var boolean
+	 * Everything starts here... more or less
 	 */
-	protected $_skip_error = false;
-
-	/**
-	 * This method will tell you whether this database type supports this search type.
-	 *
-	 * @param string $search_type
-	 *
-	 * @return bool
-	 */
-	public function search_support($search_type)
+	public function __construct()
 	{
-		$supported_types = array('fulltext');
-
-		return in_array($search_type, $supported_types);
-	}
-
-	/**
-	 * Execute the appropriate query for the search.
-	 *
-	 * @param string $identifier
-	 * @param string $db_string
-	 * @param mixed[] $db_values
-	 * @param resource|null $connection
-	 */
-	public function search_query($identifier, $db_string, $db_values = array(), $connection = null)
-	{
-		$db = database();
-
-		if ($this->_skip_error === true)
-		{
-			$db->skip_next_error();
-			$this->_skip_error = false;
-		}
-
-		// Simply delegate to the database adapter method.
-		return $db->query($identifier, $db_string, $db_values, $connection);
+		$this->_supported_types = array('fulltext');
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function skip_next_error()
+	public function search_query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
-		$this->_skip_error = true;
+		// Simply delegate to the database adapter method.
+		return parent::search_query('', $db_string, $db_values, $connection);
 	}
 
 	/**
-	 * Returns some basic info about the {db_prefix}messages table
-	 * Used in ManageSearch.controller.php in the page to select the index method
+	 * {@inheritDoc}
 	 */
 	public function membersTableInfo()
 	{
@@ -85,6 +51,7 @@ class DbSearch_MySQL implements DbSearch
 		$table_info = array();
 
 		if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
+		{
 			$request = $db->query('', '
 				SHOW TABLE STATUS
 				FROM {string:database_name}
@@ -94,7 +61,9 @@ class DbSearch_MySQL implements DbSearch
 					'table_name' => str_replace('_', '\_', $match[2]) . 'messages',
 				)
 			);
+		}
 		else
+		{
 			$request = $db->query('', '
 				SHOW TABLE STATUS
 				LIKE {string:table_name}',
@@ -102,6 +71,7 @@ class DbSearch_MySQL implements DbSearch
 					'table_name' => str_replace('_', '\_', $db_prefix) . 'messages',
 				)
 			);
+		}
 
 		if ($request !== false && $db->num_rows($request) == 1)
 		{
@@ -146,46 +116,29 @@ class DbSearch_MySQL implements DbSearch
 	}
 
 	/**
-	 * Method for the custom word index table.
-	 *
-	 * @param string $size
+	 * {@inheritDoc}
 	 */
-	public function create_word_search($size)
-	{
-		$db = database();
-
-		if ($size == 'small')
-			$size = 'smallint(5)';
-		elseif ($size == 'medium')
-			$size = 'mediumint(8)';
-		else
-			$size = 'int(10)';
-
-		$db->query('', '
-			CREATE TABLE {db_prefix}log_search_words (
-				id_word {raw:size} unsigned NOT NULL default {string:string_zero},
-				id_msg int(10) unsigned NOT NULL default {string:string_zero},
-				PRIMARY KEY (id_word, id_msg)
-			) ENGINE=InnoDB',
-			array(
-				'string_zero' => '0',
-				'size' => $size,
-			)
-		);
-	}
-
-	/**
-	 * Create a temporary table.
-	 * A wrapper around DbTable::db_create_table setting the 'temporary' parameter.
-	 *
-	 * @param string $table_name
-	 * @param mixed[] $columns in the format specified.
-	 * @param mixed[] $indexes default array(), in the format specified.
-	 */
-	public function createTemporaryTable($name, $columns, $indexes)
+	public function create_word_search($type, $size = 10)
 	{
 		$db_table = db_table();
-		return $db_table->db_create_table($name, $columns, $indexes, array('temporary' => true);
+
+		if ($size == 'small')
+		{
+			$type = 'smallint';
+			$size = 5;
+		}
+		elseif ($size == 'medium')
+		{
+			$type = 'mediumint';
+			$size = 8;
+		}
+		else
+		{
+			$type = 'int';
+			$size = 10;
+		}
+
+		parent::create_word_search->db_create_table($type, $size);
 	}
 
 	/**
