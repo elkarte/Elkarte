@@ -55,11 +55,10 @@ function validateDuplicateSmiley($code, $current = null)
 	$request = $db->query('', '
 		SELECT id_smiley
 		FROM {db_prefix}smileys
-		WHERE code = {raw:mysql_binary_type} {string:smiley_code}' . (!isset($current) ? '' : '
+		WHERE code = {string_case_sensitive:smiley_code}' . (!isset($current) ? '' : '
 			AND id_smiley != {int:current_smiley}'),
 		array(
 			'current_smiley' => $current,
-			'mysql_binary_type' => $db->db_title() == 'MySQL' ? 'BINARY' : '',
 			'smiley_code' => $code,
 		)
 	);

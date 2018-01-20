@@ -97,6 +97,9 @@ abstract class Database_Abstract implements Database
 		if ($matches[1] === 'query_wanna_see_board')
 			return $user_info['query_wanna_see_board'];
 
+		if ($matches[1] === 'column_case_insensitive')
+			return $this->_replaceColumnCaseInsensitive($matches[2]);
+
 		if (!isset($matches[2]))
 			$this->error_backtrace('Invalid value inserted or no type specified.', '', E_USER_ERROR, __FILE__, __LINE__);
 
@@ -112,10 +115,16 @@ abstract class Database_Abstract implements Database
 			case 'string':
 			case 'text':
 				return $this->_replaceString($replacement);
+			case 'string_case_sensitive':
+				return $this->_replaceStringCaseSensitive($replacement);
+			case 'string_case_insensitive':
+				return $this->_replaceStringCaseInsensitive($replacement);
 			case 'array_int':
 				return $this->_replaceArrayInt($matches[2], $replacement);
 			case 'array_string':
 				return $this->_replaceArrayString($matches[2], $replacement);
+			case 'array_string_case_insensitive':
+				return $this->_replaceArrayStringCaseInsensitive($matches[2], $replacement);
 			case 'date':
 				return $this->_replaceDate($matches[2], $replacement);
 			case 'float':
@@ -287,6 +296,40 @@ abstract class Database_Abstract implements Database
 	}
 
 	/**
+	 * Casts values to string for replacement__callback and in the DBMS that
+	 * require this solution makes it so that the comparison will be case sensitive.
+	 *
+	 * @param mixed $replacement
+	 * @return string
+	 */
+	protected function _replaceStringCaseSensitive($replacement)
+	{
+		return $this->_replaceString($replacement);
+	}
+
+	/**
+	 * Casts values to LOWER(string) for replacement__callback.
+	 *
+	 * @param mixed $replacement
+	 * @return string
+	 */
+	protected function _replaceStringCaseInsensitive($replacement)
+	{
+		return 'LOWER(' . $this->_replaceString($replacement) . ')';
+	}
+
+	/**
+	 * Casts the column to LOWER(column_name) for replacement__callback.
+	 *
+	 * @param mixed $replacement
+	 * @return string
+	 */
+	protected function _replaceColumnCaseInsensitive($replacement)
+	{
+		return 'LOWER(' . $replacement . ')';
+	}
+
+	/**
 	 * Tests and casts arrays of strings for replacement__callback.
 	 *
 	 * @param string $identifier
@@ -299,10 +342,45 @@ abstract class Database_Abstract implements Database
 		if (is_array($replacement))
 		{
 			if (empty($replacement))
+			{
 				$this->error_backtrace('Database error, given array of string values is empty. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+			}
 
 			foreach ($replacement as $key => $value)
+			{
 				$replacement[$key] = sprintf('\'%1$s\'', $this->escape_string($value));
+			}
+
+			return implode(', ', $replacement);
+		}
+		else
+		{
+			$this->error_backtrace('Wrong value type sent to the database. Array of strings expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+		}
+	}
+
+	/**
+	 * Tests and casts to LOWER(column_name) (if needed) arrays of strings
+	 * for replacement__callback.
+	 *
+	 * @param string $identifier
+	 * @param mixed[] $replacement
+	 * @return string
+	 * @throws Elk_Exception
+	 */
+	protected function _replaceArrayStringCaseInsensitive($identifier, $replacement)
+	{
+		if (is_array($replacement))
+		{
+			if (empty($replacement))
+			{
+				$this->error_backtrace('Database error, given array of string values is empty. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+			}
+
+			foreach ($replacement as $key => $value)
+			{
+				$replacement[$key] = $this->_replaceStringCaseInsensitive($value);
+			}
 
 			return implode(', ', $replacement);
 		}

@@ -356,8 +356,8 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 		$email_condition = '';
 
 	// Get the case of the columns right - but only if we need to as things like MySQL will go slow needlessly otherwise.
-	$member_name = defined('DB_CASE_SENSITIVE') ? 'LOWER(member_name)' : 'member_name';
-	$real_name = defined('DB_CASE_SENSITIVE') ? 'LOWER(real_name)' : 'real_name';
+	$member_name = '{column_case_insensitive:member_name}';
+	$real_name = '{column_case_insensitive:real_name}';
 
 	// Search by username, display name, and email address.
 	$request = $db->query('', '
@@ -884,10 +884,10 @@ function loadExistingMember($name, $is_id = false)
 			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
 				openid_uri, passwd_flood, otp_secret, enable_otp, otp_used
 			FROM {db_prefix}members
-			WHERE ' . (defined('DB_CASE_SENSITIVE') ? 'LOWER(member_name) = LOWER({string:user_name})' : 'member_name = {string:user_name}') . '
+			WHERE {column_case_insensitive:member_name} = {string_case_insensitive:user_name}
 			LIMIT 1',
 			array(
-				'user_name' => defined('DB_CASE_SENSITIVE') ? strtolower($name) : $name,
+				'user_name' => $name,
 			)
 		);
 		// Didn't work. Try it as an email address.

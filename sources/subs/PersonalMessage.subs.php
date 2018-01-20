@@ -567,14 +567,18 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 			SELECT
 				id_member, member_name
 			FROM {db_prefix}members
-			WHERE ' . (defined('DB_CASE_SENSITIVE') ? 'LOWER(member_name)' : 'member_name') . ' IN ({array_string:usernames})',
+			WHERE {column_case_insensitive:member_name} IN ({array_string_case_insensitive:usernames})',
 			array(
 				'usernames' => array_keys($usernames),
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
+		{
 			if (isset($usernames[Util::strtolower($row['member_name'])]))
+			{
 				$usernames[Util::strtolower($row['member_name'])] = $row['id_member'];
+			}
+		}
 		$db->free_result($request);
 
 		// Replace the usernames with IDs. Drop usernames that couldn't be found.
@@ -586,7 +590,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 					continue;
 
 				if (!empty($usernames[$member]))
+				{
 					$recipients[$rec_type][$id] = $usernames[$member];
+				}
 				else
 				{
 					$log['failed'][$id] = sprintf($txt['pm_error_user_not_found'], $recipients[$rec_type][$id]);
