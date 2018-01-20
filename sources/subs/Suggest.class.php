@@ -46,7 +46,7 @@ class Suggest
 	/**
 	 * Search for a member - by real_name or member_name by default.
 	 *
-	 * @return string
+	 * @return array
 	 */
 	public function member()
 	{

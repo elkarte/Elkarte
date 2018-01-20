@@ -1002,7 +1002,7 @@ class Database_MySQL extends Database_Abstract
 	 * @param string $table_name
 	 * @param string $backup_table
 	 *
-	 * @return resource - the request handle to the table creation query
+	 * @return bool|mysqli_result - the request handle to the table creation query
 	 * @throws Elk_Exception
 	 */
 	public function db_backup_table($table_name, $backup_table)

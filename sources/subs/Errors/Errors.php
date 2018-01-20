@@ -461,6 +461,9 @@ class Errors extends \AbstractModel
 	/**
 	 * Small utility function for simplify logging of deprecated functions
 	 * in the development phase of 2.0.
+	 *
+	 * @param $function
+	 * @param $replacement
 	 */
 	public function log_deprecated($function, $replacement)
 	{

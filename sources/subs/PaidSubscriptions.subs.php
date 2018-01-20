@@ -925,7 +925,7 @@ function alreadySubscribed($id_sub, $id_member)
  *
  * @param int $log_id
  *
- * @return int
+ * @return array
  * @throws Elk_Exception no_access
  */
 function getSubscriptionStatus($log_id)

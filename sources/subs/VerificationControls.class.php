@@ -406,7 +406,7 @@ class Verification_Controls_Captcha implements Verification_Controls
 	/**
 	 * Configuration settings for the admin template
 	 *
-	 * @return string
+	 * @return array
 	 */
 	public function settings()
 	{

@@ -174,6 +174,7 @@ class Action
 	 * @param string $sub_id The sub action
 	 *
 	 * @return bool
+	 * @throws Elk_Exception
 	 */
 	protected function isAllowedTo(string $sub_id): bool
 	{

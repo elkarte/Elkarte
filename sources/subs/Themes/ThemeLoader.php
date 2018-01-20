@@ -39,7 +39,7 @@ class ThemeLoader
 	 * In addition, the ID is verified against a comma-seperated list of
 	 * known good themes. This check is skipped if the user is an admin.
 	 *
-	 * @return int Theme ID to load
+	 * @return void Theme ID to load
 	 */
 	private function getThemeId()
 	{

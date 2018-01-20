@@ -68,7 +68,8 @@ class PayPal_Display
 	 * @param int $value amount of the transaction
 	 * @param string $period length of the transaction
 	 * @param string $return_url
-	 * @return string
+	 *
+	 * @return array
 	 */
 	public function fetchGatewayFields($unique_id, $sub_data, $value, $period, $return_url)
 	{
@@ -192,11 +193,15 @@ class PayPal_Payment
 	 * Post the IPN data received back to paypal for validation
 	 *
 	 * - Sends the complete unaltered message back to PayPal.
-	 * - The message must contain the same fields in the same order and be encoded in the same way as the original message
-	 * - PayPal will respond back with a single word, which is either VERIFIED if the message originated with PayPal or INVALID
+	 * - The message must contain the same fields in the same order and be encoded in the same way as the original
+	 * message
+	 * - PayPal will respond back with a single word, which is either VERIFIED if the message originated with PayPal or
+	 * INVALID
 	 * - If valid returns the subscription and member IDs we are going to process if it passes
 	 *
-	 * @return string
+	 * @return array
+	 * @throws Elk_Exception
+	 * @throws Elk_Exception
 	 */
 	public function precheck()
 	{

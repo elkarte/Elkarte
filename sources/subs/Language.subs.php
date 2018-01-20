@@ -338,7 +338,7 @@ function cleanLangString($string, $to_display = true)
  * - Will return a subset if searching, otherwise all available
  *
  * @package Languages
- * @return string
+ * @return array
  */
 function list_getLanguagesList()
 {

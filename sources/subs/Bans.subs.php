@@ -777,9 +777,11 @@ function range2ip($low, $high)
  * - optimized for the database.
  *
  * @package Bans
+ *
  * @param int[] $ip_array array of ip array ints
  * @param string $fullip
- * @return boolean
+ *
+ * @return array
  */
 function validateIPBan($ip_array, $fullip = '')
 {

@@ -213,7 +213,8 @@ function getSmiley($id)
  *
  * @param int $location
  * @param int $id
- * @return integer
+ *
+ * @return array
  */
 function getSmileyPosition($location, $id)
 {
