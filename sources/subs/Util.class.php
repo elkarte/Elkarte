@@ -46,7 +46,7 @@ class Util
 	 * @param string $charset only UTF-8 allowed
 	 * @param bool $double true will allow double encoding, false will not encode existing html entities,
 	 *
-	 * @return null|string|string[]
+	 * @return string
 	 */
 	public static function htmlspecialchars($string, $quote_style = ENT_COMPAT, $charset = 'UTF-8', $double = false)
 	{
@@ -71,7 +71,7 @@ class Util
 	 *
 	 * @param string $string
 	 *
-	 * @return null|string|string[]
+	 * @return string
 	 */
 	public static function htmltrim($string)
 	{
@@ -98,7 +98,7 @@ class Util
 	 * @param int $offset where to start, assumed 0
 	 * @param bool $right set to true to mimic strrpos functions
 	 *
-	 * @return bool|false|int|string
+	 * @return bool|mixed
 	 */
 	public static function strpos($haystack, $needle, $offset = 0, $right = false)
 	{
@@ -172,7 +172,7 @@ class Util
 	 *
 	 * @param string $string
 	 *
-	 * @return mixed|null|string|string[]
+	 * @return string
 	 */
 	public static function strtolower($string)
 	{
@@ -192,7 +192,7 @@ class Util
 	 *
 	 * @param string $string
 	 *
-	 * @return mixed|null|string|string[]
+	 * @return string
 	 */
 	public static function strtoupper($string)
 	{
@@ -216,7 +216,7 @@ class Util
 	 * @param string $string
 	 * @param int $length
 	 *
-	 * @return null|string|string[]
+	 * @return string
 	 */
 	public static function truncate($string, $length)
 	{
