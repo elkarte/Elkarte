@@ -377,7 +377,7 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 
 			// The behavior of bestfit changed in Imagick 3.0.0 and it will now scale up, we prevent that
 			$dest_width = empty($max_width) ? $src_width : ($force_resize ? $max_width : min($max_width, $src_width));
-			$dest_height = empty($max_height) ? $src_height : ($force_resize ? $max_height :  min($max_height, $src_height));
+			$dest_height = empty($max_height) ? $src_height : ($force_resize ? $max_height : min($max_height, $src_height));
 
 			// Set jpeg image quality to 80
 			if ($default_formats[$preferred_format] === 'jpeg')

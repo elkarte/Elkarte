@@ -473,7 +473,7 @@ class Errors extends \AbstractModel
 			'%s is deprecated, use %s instead.%s',
 			$function,
 			$replacement,
-			$debug) ,'deprecated');
+			$debug), 'deprecated');
 	}
 
 	/**
