@@ -27,13 +27,13 @@ class DbTable_PostgreSQL extends DbTable
 	 * Holds this instance of the table interface
 	 * @var DbTable_PostgreSQL
 	 */
-	private static $_tbl = null;
+	protected static $_tbl = null;
 
 	/**
 	 * Any index to create when a table is created
 	 * @var string[]
 	 */
-	private $_indexes = array();
+	protected $_indexes = array();
 
 	/**
 	 * {@inheritdoc }
@@ -625,7 +625,7 @@ class DbTable_PostgreSQL extends DbTable
 	 *
 	 * @return string
 	 */
-	private function _db_create_query_column($column, $table_name)
+	protected function _db_create_query_column($column, $table_name)
 	{
 		// If we have an auto increment do it!
 		if (!empty($column['auto']))

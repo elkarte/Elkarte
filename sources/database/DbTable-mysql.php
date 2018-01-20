@@ -27,7 +27,7 @@ class DbTable_MySQL extends DbTable
 	 * Holds this instance of the table interface
 	 * @var DbTable_MySQL
 	 */
-	private static $_tbl = null;
+	protected static $_tbl = null;
 
 	/**
 	 * {@inheritdoc }
@@ -430,7 +430,7 @@ class DbTable_MySQL extends DbTable
 	 *
 	 * @return string
 	 */
-	private function _db_create_query_column($column, $table_name)
+	protected function _db_create_query_column($column, $table_name)
 	{
 		// Auto increment is easy here!
 		if (!empty($column['auto']))
