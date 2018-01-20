@@ -84,7 +84,7 @@ class Database_PostgreSQL extends Database_Abstract
 			if (!empty($db_options['non_fatal']))
 				return null;
 			else
-				Errors::instance()->display_db_error();
+				Errors::instance()->display_db_error('Database_PostgreSQL::initiate');
 		}
 
 		self::$_db->_connection = $connection;

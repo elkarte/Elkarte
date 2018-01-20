@@ -86,7 +86,7 @@ abstract class Database_Abstract implements Database
 
 		// Connection gone???  This should *never* happen at this point, yet it does :'(
 		if (!$this->validConnection($this->_db_callback_connection))
-			Errors::instance()->display_db_error();
+			Errors::instance()->display_db_error('Database_Abstract::replacement__callback');
 
 		if ($matches[1] === 'db_prefix')
 			return $db_prefix;

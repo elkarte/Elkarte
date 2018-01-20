@@ -74,7 +74,7 @@ class Database_MySQL extends Database_Abstract
 			if (!empty($db_options['non_fatal']))
 				return null;
 			else
-				Errors::instance()->display_db_error();
+				Errors::instance()->display_db_error('Database_MySQL::initiate');
 		}
 
 		// This makes it possible to automatically change the sql_mode and autocommit if needed.
