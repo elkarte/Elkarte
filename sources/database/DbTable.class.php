@@ -27,6 +27,12 @@ abstract class DbTable
 	protected $_db = null;
 
 	/**
+	 * The forum tables prefix
+	 * @var string
+	 */
+	protected $_db_prefix = null;
+
+	/**
 	 * Array of table names we don't allow to be removed by addons.
 	 * @var array
 	 */
@@ -39,6 +45,39 @@ abstract class DbTable
 	 * @var array
 	 */
 	protected $_package_log = null;
+
+	/**
+	 * DbTable::construct
+	 *
+	 * @param object $db - An implementation of the abstract DbTable
+	 */
+	protected function __construct($db, $db_prefix)
+	{
+		$this->_db_prefix = $db_prefix;
+
+		// We won't do any remove on these
+		$this->_reservedTables = array('admin_info_files', 'approval_queue', 'attachments', 'ban_groups', 'ban_items',
+			'board_permissions', 'boards', 'calendar', 'calendar_holidays', 'categories', 'collapsed_categories',
+			'custom_fields', 'group_moderators', 'log_actions', 'log_activity', 'log_banned', 'log_boards',
+			'log_digest', 'log_errors', 'log_floodcontrol', 'log_group_requests', 'log_karma', 'log_mark_read',
+			'log_notify', 'log_online', 'log_packages', 'log_polls', 'log_reported', 'log_reported_comments',
+			'log_scheduled_tasks', 'log_search_messages', 'log_search_results', 'log_search_subjects',
+			'log_search_topics', 'log_topics', 'mail_queue', 'membergroups', 'members', 'message_icons',
+			'messages', 'moderators', 'package_servers', 'permission_profiles', 'permissions', 'personal_messages',
+			'pm_recipients', 'poll_choices', 'polls', 'scheduled_tasks', 'sessions', 'settings', 'smileys',
+			'themes', 'topics');
+
+		foreach ($this->_reservedTables as $k => $table_name)
+		{
+			$this->_reservedTables[$k] = strtolower($this->_db_prefix . $table_name);
+		}
+
+		// let's be sure.
+		$this->_package_log = array();
+
+		// This executes queries and things
+		$this->_db = $db;
+	}
 
 	/**
 	 * This function can be used to create a table without worrying about schema
@@ -71,8 +110,114 @@ abstract class DbTable
 	 * @param string $if_exists default 'ignore'
 	 * @param string $error default 'fatal'
 	 */
-	abstract public function db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal');
+	public function db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal')
+	{
+		$real_prefix = $this->_real_prefix();
 
+		// With or without the database name, the fullname looks like this.
+		$full_table_name = str_replace('{db_prefix}', $real_prefix, $table_name);
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
+
+		// First - no way do we touch our tables.
+		if (in_array(strtolower($table_name), $this->_reservedTables))
+			return false;
+
+		// Log that we'll want to remove this on uninstall.
+		$this->_package_log[] = array('remove_table', $table_name);
+
+		// This... my friends... is a function in a half - let's start by checking if the table exists!
+		if ($this->table_exists($full_table_name))
+		{
+			// This is a sad day... drop the table? If not, return false (error) by default.
+			if ($if_exists == 'overwrite')
+				$this->db_drop_table($table_name);
+			else
+				return $if_exists == 'ignore';
+		}
+
+		// If we've got this far - good news - no table exists. We can build our own!
+		$this->_db->db_transaction('begin');
+
+		if (empty($parameters['temporary']))
+		{
+			$table_query = 'CREATE TABLE ' . $table_name . "\n" . '(';
+		}
+		else
+		{
+			$table_query = 'CREATE TEMPORARY TABLE ' . $table_name . "\n" . '(';
+		}
+		foreach ($columns as $column)
+		{
+			$table_query .= "\n\t" . $this->_db_create_query_column($column, $table_name) . ',';
+		}
+
+		$table_query .= $this->_create_query_indexes($indexes);
+
+		// No trailing commas!
+		if (substr($table_query, -1) == ',')
+			$table_query = substr($table_query, 0, -1);
+
+		$table_query .= $this->_close_table_query($parameters['temporary']);
+
+		// Create the table!
+		$this->_db->query('', $table_query,
+			array(
+				'security_override' => true,
+			)
+		);
+
+		// And the indexes... if any
+		$this->_build_indexes();
+
+		// Go, go power rangers!
+		$this->_db->db_transaction('commit');
+
+		return true;
+	}
+
+	/**
+	 * Strips out the table name, we might not need it in some cases
+	 */
+	abstract protected function _real_prefix();
+
+	/**
+	 * Adds the closing "touch" to the CREATE TABLE query
+	 *
+	 * @param bool $temporary - If the table is temporary
+	 * @return string
+	 */
+	abstract protected function _close_table_query($temporary);
+
+	/**
+	 * It is mean to parse the indexes array of a db_create_table function
+	 * to prepare for the indexes creation
+	 *
+	 * @param string[] $indexes
+	 * @return string
+	 */
+	abstract protected function _create_query_indexes($indexes);
+
+	/**
+	 * In certain cases it is necessary to create the indexes of a
+	 * newly created table with new queries after the table has been created.
+	 *
+	 * @param string[] $indexes
+	 * @return string
+	 */
+	protected function _build_indexes()
+	{
+		return;
+	}
+
+	/**
+	 * Clean the indexes strings (e.g. PostgreSQL doesn't support max length)
+	 *
+	 * @param string[] $columns
+	 */
+	protected function _clean_indexes($columns)
+	{
+		return $columns;
+	}
 	/**
 	 * Drop a table.
 	 *

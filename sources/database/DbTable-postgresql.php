@@ -30,114 +30,52 @@ class DbTable_PostgreSQL extends DbTable
 	private static $_tbl = null;
 
 	/**
-	 * DbTable_PostgreSQL::construct
-	 *
-	 * @param object $db - A Database_PostgreSQL object
+	 * Any index to create when a table is created
+	 * @var string[]
 	 */
-	private function __construct($db)
+	private $_indexes = array();
+
+	/**
+	 * {@inheritdoc }
+	 */
+	protected function _real_prefix()
 	{
-		global $db_prefix;
-
-		// We won't do any remove on these
-		$this->_reservedTables = array('admin_info_files', 'approval_queue', 'attachments', 'ban_groups', 'ban_items',
-			'board_permissions', 'boards', 'calendar', 'calendar_holidays', 'categories', 'collapsed_categories',
-			'custom_fields', 'group_moderators', 'log_actions', 'log_activity', 'log_banned', 'log_boards',
-			'log_digest', 'log_errors', 'log_floodcontrol', 'log_group_requests', 'log_karma', 'log_mark_read',
-			'log_notify', 'log_online', 'log_packages', 'log_polls', 'log_reported', 'log_reported_comments',
-			'log_scheduled_tasks', 'log_search_messages', 'log_search_results', 'log_search_subjects',
-			'log_search_topics', 'log_topics', 'mail_queue', 'membergroups', 'members', 'message_icons',
-			'messages', 'moderators', 'package_servers', 'permission_profiles', 'permissions', 'personal_messages',
-			'pm_recipients', 'poll_choices', 'polls', 'scheduled_tasks', 'sessions', 'settings', 'smileys',
-			'themes', 'topics');
-
-		foreach ($this->_reservedTables as $k => $table_name)
-			$this->_reservedTables[$k] = strtolower($db_prefix . $table_name);
-
-		// let's be sure.
-		$this->_package_log = array();
-
-		// This executes queries and things
-		$this->_db = $db;
+		return preg_match('~^("?)(.+?)\\1\\.(.*?)$~', $this->_db_prefix, $match) === 1 ? $match[3] : $this->_db_prefix;
 	}
 
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal')
+	protected function _build_indexes()
 	{
-		global $db_prefix;
-
-		// Strip out the table name, we might not need it in some cases
-		$real_prefix = preg_match('~^("?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
-
-		// With or without the database name, the fullname looks like this.
-		$full_table_name = str_replace('{db_prefix}', $real_prefix, $table_name);
-		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
-
-		// First - no way do we touch our tables.
-		if (in_array(strtolower($table_name), $this->_reservedTables))
-			return false;
-
-		// Log that we'll want to remove this on uninstall.
-		$this->_package_log[] = array('remove_table', $table_name);
-
-		// This... my friends... is a function in a half - let's start by checking if the table exists!
-		if ($this->table_exists($full_table_name))
+		foreach ($this->_indexes as $query)
 		{
-			// This is a sad day... drop the table? If not, return false (error) by default.
-			if ($if_exists == 'overwrite')
-				$this->db_drop_table($table_name);
-			else
-				return $if_exists == 'ignore';
+			$this->_db->query('', $query,
+				array(
+					'security_override' => true,
+				)
+			);
 		}
+	}
 
-		// If we've got this far - good news - no table exists. We can build our own!
-		$this->_db->db_transaction('begin');
+	/**
+	 * {@inheritdoc }
+	 */
+	protected function _close_table_query($temporary)
+	{
+		return ')';
+	}
 
-		if (empty($parameters['temporary']))
-		{
-			$table_query = 'CREATE TABLE ' . $table_name . "\n" . '(';
-		}
-		else
-		{
-			$table_query = 'CREATE TEMPORARY TABLE ' . $table_name . "\n" . '(';
-		}
-		foreach ($columns as $column)
-		{
-			// If we have an auto increment do it!
-			if (!empty($column['auto']))
-			{
-				$this->_db->query('', '
-					CREATE SEQUENCE ' . $table_name . '_seq',
-					array(
-						'security_override' => true,
-					)
-				);
-				$default = 'default nextval(\'' . $table_name . '_seq\')';
-			}
-			elseif (isset($column['default']) && $column['default'] !== null)
-				$default = 'default \'' . $this->_db->escape_string($column['default']) . '\'';
-			else
-				$default = '';
-
-			// Sort out the size...
-			$column['size'] = isset($column['size']) && is_numeric($column['size']) ? $column['size'] : null;
-			list ($type, $size) = $this->db_calculate_type($column['type'], $column['size']);
-			if ($size !== null)
-				$type = $type . '(' . $size . ')';
-
-			// Now just put it together!
-			$table_query .= "\n\t\"" . $column['name'] . '" ' . $type . ' ' . (!empty($column['null']) ? '' : 'NOT NULL') . ' ' . $default . ',';
-		}
-
-		// Loop through the indexes a sec...
-		$index_queries = array();
+	/**
+	 * {@inheritdoc }
+	 */
+	protected function _create_query_indexes($indexes)
+	{
+		// Loop through the indexes next...
+		$this->_indexes = array();
 		foreach ($indexes as $index)
 		{
-			// MySQL supports a length argument, postgre no
-			foreach ($index['columns'] as $id => $col)
-				if (strpos($col, '(') !== false)
-					$index['columns'][$id] = substr($col, 0, strpos($col, '('));
+			$index['columns'] = $this->_clean_indexes($index['columns']);
 
 			$columns = implode(',', $index['columns']);
 
@@ -148,36 +86,26 @@ class DbTable_PostgreSQL extends DbTable
 			{
 				if (empty($index['name']))
 					$index['name'] = implode('_', $index['columns']);
-				$index_queries[] = 'CREATE ' . (isset($index['type']) && $index['type'] == 'unique' ? 'UNIQUE' : '') . ' INDEX ' . $table_name . '_' . $index['name'] . ' ON ' . $table_name . ' (' . $columns . ')';
+				$this->_indexes[] = 'CREATE ' . (isset($index['type']) && $index['type'] == 'unique' ? 'UNIQUE' : '') . ' INDEX ' . $table_name . '_' . $index['name'] . ' ON ' . $table_name . ' (' . $columns . ')';
 			}
 		}
+		return '';
+	}
 
-		// No trailing commas!
-		if (substr($table_query, -1) == ',')
-			$table_query = substr($table_query, 0, -1);
-
-		$table_query .= ')';
-
-		// Create the table!
-		$this->_db->query('', $table_query,
-			array(
-				'security_override' => true,
-			)
-		);
-		// And the indexes...
-		foreach ($index_queries as $query)
+	/**
+	 * {@inheritdoc }
+	 */
+	protected function _clean_indexes($columns)
+	{
+		// MySQL supports a length argument, postgre no
+		foreach ($columns as $id => $col)
 		{
-			$this->_db->query('', $query,
-				array(
-					'security_override' => true,
-				)
-			);
+			if (strpos($col, '(') !== false)
+			{
+				$columns[$id] = substr($col, 0, strpos($col, '('));
+			}
 		}
-
-		// Go, go power rangers!
-		$this->_db->db_transaction('commit');
-
-		return true;
+		return $columns;
 	}
 
 	/**
@@ -185,14 +113,12 @@ class DbTable_PostgreSQL extends DbTable
 	 */
 	public function db_drop_table($table_name, $parameters = array(), $error = 'fatal')
 	{
-		global $db_prefix;
-
 		// After stripping away the database name, this is what's left.
-		$real_prefix = preg_match('~^("?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
+		$real_prefix = preg_match('~^("?)(.+?)\\1\\.(.*?)$~', $this->_db_prefix, $match) === 1 ? $match[3] : $this->_db_prefix;
 
 		// Get some aliases.
 		$full_table_name = str_replace('{db_prefix}', $real_prefix, $table_name);
-		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// God no - dropping one of these = bad.
 		if (in_array(strtolower($table_name), $this->_reservedTables))
@@ -238,9 +164,7 @@ class DbTable_PostgreSQL extends DbTable
 	 */
 	public function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
 	{
-		global $db_prefix;
-
-		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// Log that we will want to uninstall this!
 		$this->_package_log[] = array('remove_column', $table_name, $column_info['name']);
@@ -279,9 +203,7 @@ class DbTable_PostgreSQL extends DbTable
 	 */
 	public function db_remove_column($table_name, $column_name, $parameters = array(), $error = 'fatal')
 	{
-		global $db_prefix;
-
-		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// Does it exist?
 		$column = $this->_get_column_info($table_name, $column_name);
@@ -311,9 +233,7 @@ class DbTable_PostgreSQL extends DbTable
 	 */
 	public function db_change_column($table_name, $old_column, $column_info, $parameters = array(), $error = 'fatal')
 	{
-		global $db_prefix;
-
-		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// Check it does exist!
 		$old_info = $this->_get_column_info($table_name, $old_column);
@@ -422,9 +342,7 @@ class DbTable_PostgreSQL extends DbTable
 	 */
 	public function db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
 	{
-		global $db_prefix;
-
-		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// No columns = no index.
 		if (empty($index_info['columns']))
@@ -490,9 +408,7 @@ class DbTable_PostgreSQL extends DbTable
 	 */
 	public function db_remove_index($table_name, $index_name, $parameters = array(), $error = 'fatal')
 	{
-		global $db_prefix;
-
-		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// Better exist!
 		$indexes = $this->db_list_indexes($table_name, true);
@@ -579,9 +495,7 @@ class DbTable_PostgreSQL extends DbTable
 	 */
 	public function db_table_structure($table_name, $parameters = array())
 	{
-		global $db_prefix;
-
-		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		return array(
 			'name' => $table_name,
@@ -595,9 +509,7 @@ class DbTable_PostgreSQL extends DbTable
 	 */
 	public function db_list_columns($table_name, $detail = false, $parameters = array())
 	{
-		global $db_prefix;
-
-		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		$result = $this->_db->query('', '
 			SELECT column_name, column_default, is_nullable, data_type, character_maximum_length
@@ -653,9 +565,7 @@ class DbTable_PostgreSQL extends DbTable
 	 */
 	public function db_list_indexes($table_name, $detail = false, $parameters = array())
 	{
-		global $db_prefix;
-
-		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		$result = $this->_db->query('', '
 			SELECT CASE WHEN i.indisprimary THEN 1 ELSE 0 END AS is_primary,
@@ -708,13 +618,47 @@ class DbTable_PostgreSQL extends DbTable
 	}
 
 	/**
+	 * Creates a query for a column
+	 *
+	 * @param mixed[] $column
+	 * @param string $table_name
+	 *
+	 * @return string
+	 */
+	private function _db_create_query_column($column, $table_name)
+	{
+		// If we have an auto increment do it!
+		if (!empty($column['auto']))
+		{
+			$this->_db->query('', '
+				CREATE SEQUENCE ' . $table_name . '_seq',
+				array(
+					'security_override' => true,
+				)
+			);
+			$default = 'default nextval(\'' . $table_name . '_seq\')';
+		}
+		elseif (isset($column['default']) && $column['default'] !== null)
+			$default = 'default \'' . $this->_db->escape_string($column['default']) . '\'';
+		else
+			$default = '';
+
+		// Sort out the size...
+		$column['size'] = isset($column['size']) && is_numeric($column['size']) ? $column['size'] : null;
+		list ($type, $size) = $this->db_calculate_type($column['type'], $column['size']);
+		if ($size !== null)
+			$type = $type . '(' . $size . ')';
+
+		// Now just put it together!
+		return '"' . $column['name'] . '" ' . $type . ' ' . (!empty($column['null']) ? '' : 'NOT NULL') . ' ' . $default;
+	}
+
+	/**
 	 * {@inheritdoc }
 	 */
 	public function optimize($table)
 	{
-		global $db_prefix;
-
-		$table = str_replace('{db_prefix}', $db_prefix, $table);
+		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
 
 		$request = $this->_db->query('', '
 			VACUUM ANALYZE {raw:table}',
@@ -745,12 +689,16 @@ class DbTable_PostgreSQL extends DbTable
 	/**
 	 * Static method that allows to retrieve or create an instance of this class.
 	 * @param object $db - A Database_PostgreSQL object
+	 * @param string $db_prefix - The tables prefix
 	 * @return DbTable_PostgreSQL - A DbTable_PostgreSQL object
 	 */
-	public static function db_table($db)
+	public static function db_table($db, $db_prefix)
 	{
 		if (is_null(self::$_tbl))
-			self::$_tbl = new DbTable_PostgreSQL($db);
+		{
+			self::$_tbl = new DbTable_PostgreSQL($db, $db_prefix);
+		}
+
 		return self::$_tbl;
 	}
 }

@@ -60,13 +60,15 @@ function database()
  */
 function db_table($db = null)
 {
+	global $db_prefix;
+
 	if ($db === null)
 		$db = database();
 
 	require_once(SOURCEDIR . '/database/DbTable.class.php');
 	require_once(SOURCEDIR . '/database/DbTable-' . strtolower(DB_TYPE) . '.php');
 
-	return call_user_func(array('DbTable_' . DB_TYPE, 'db_table'), $db);
+	return call_user_func(array('DbTable_' . DB_TYPE, 'db_table'), $db, $db_prefix);
 }
 
 /**
