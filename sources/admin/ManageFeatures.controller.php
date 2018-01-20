@@ -920,7 +920,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 			// Enable and disable custom fields as required.
 			$enabled = array(0);
-			if(isset($this->_req->post->cust) && is_array($this->_req->post->cust)) {
+			if (isset($this->_req->post->cust) && is_array($this->_req->post->cust)) {
 				foreach ($this->_req->post->cust as $id)
 					$enabled[] = (int) $id;
 			}

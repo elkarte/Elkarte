@@ -1671,11 +1671,11 @@ function addProtocol($url, $protocols = array())
 	}
 	else
 	{
-		$pattern = '~^(' . implode('|', array_map(function ($val) {return preg_quote($val, '~');}, $protocols)) . ')~i';
+		$pattern = '~^(' . implode('|', array_map(function ($val) {return preg_quote($val, '~'); }, $protocols)) . ')~i';
 	}
 
 	$found = false;
-	$url = preg_replace_callback($pattern, function($match) use (&$found) {
+	$url = preg_replace_callback($pattern, function ($match) use (&$found) {
 		$found = true;
 
 		return strtolower($match[0]);

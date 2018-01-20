@@ -61,7 +61,7 @@ class ProfileOptions_Controller extends Action_Controller
 			'forumprofile' => array(
 				'fields' => array(
 					'avatar_choice', 'hr',
-					'bday1', 'usertitle','hr',
+					'bday1', 'usertitle', 'hr',
 					'signature', 'hr',
 					'karma_good', 'hr',
 					'website_title', 'website_url',

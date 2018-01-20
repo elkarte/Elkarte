@@ -1208,7 +1208,7 @@ class BBCParser
 		// If we have footnotes, add them in at the end of the message
 		if (!empty($fn_num))
 		{
-			$this->message .=  $this->smiley_marker . '<div class="bbc_footnotes">' . implode('', $this->fn_content) . '</div>' . $this->smiley_marker;
+			$this->message .= $this->smiley_marker . '<div class="bbc_footnotes">' . implode('', $this->fn_content) . '</div>' . $this->smiley_marker;
 		}
 	}
 
