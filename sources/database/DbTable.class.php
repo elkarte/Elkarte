@@ -110,7 +110,7 @@ abstract class DbTable
 	 * @param string $if_exists default 'ignore'
 	 * @param string $error default 'fatal'
 	 */
-	public function db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal')
+	public function db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore')
 	{
 		$real_prefix = $this->_real_prefix();
 
@@ -223,9 +223,8 @@ abstract class DbTable
 	 *
 	 * @param string $table_name
 	 * @param mixed[] $parameters default array()
-	 * @param string $error default 'fatal'
 	 */
-	abstract public function db_drop_table($table_name, $parameters = array(), $error = 'fatal');
+	abstract public function db_drop_table($table_name, $parameters = array());
 
 	/**
 	 * This function adds a column.
@@ -234,9 +233,8 @@ abstract class DbTable
 	 * @param mixed[] $column_info with column information
 	 * @param mixed[] $parameters default array()
 	 * @param string $if_exists default 'update'
-	 * @param string $error default 'fatal'
 	 */
-	abstract public function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal');
+	abstract public function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update');
 
 	/**
 	 * Removes a column.
@@ -244,9 +242,8 @@ abstract class DbTable
 	 * @param string $table_name
 	 * @param string $column_name
 	 * @param mixed[] $parameters default array()
-	 * @param string $error default 'fatal'
 	 */
-	abstract public function db_remove_column($table_name, $column_name, $parameters = array(), $error = 'fatal');
+	abstract public function db_remove_column($table_name, $column_name, $parameters = array());
 
 	/**
 	 * Change a column.
@@ -255,9 +252,8 @@ abstract class DbTable
 	 * @param string $old_column
 	 * @param mixed[] $column_info
 	 * @param mixed[] $parameters default array()
-	 * @param string $error default 'fatal'
 	 */
-	abstract public function db_change_column($table_name, $old_column, $column_info, $parameters = array(), $error = 'fatal');
+	abstract public function db_change_column($table_name, $old_column, $column_info, $parameters = array());
 
 	/**
 	 * Add an index.
@@ -266,9 +262,8 @@ abstract class DbTable
 	 * @param mixed[] $index_info
 	 * @param mixed[] $parameters default array()
 	 * @param string $if_exists default 'update'
-	 * @param string $error default 'fatal'
 	 */
-	abstract public function db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update', $error = 'fatal');
+	abstract public function db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update');
 
 	/**
 	 * Remove an index.
@@ -276,9 +271,8 @@ abstract class DbTable
 	 * @param string $table_name
 	 * @param string $index_name
 	 * @param mixed[] $parameters default array()
-	 * @param string $error default 'fatal'
 	 */
-	abstract public function db_remove_index($table_name, $index_name, $parameters = array(), $error = 'fatal');
+	abstract public function db_remove_index($table_name, $index_name, $parameters = array());
 
 	/**
 	 * Get the schema formatted name for a type.

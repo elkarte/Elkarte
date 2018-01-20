@@ -111,7 +111,7 @@ class DbTable_PostgreSQL extends DbTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_drop_table($table_name, $parameters = array(), $error = 'fatal')
+	public function db_drop_table($table_name, $parameters = array())
 	{
 		// After stripping away the database name, this is what's left.
 		$real_prefix = preg_match('~^("?)(.+?)\\1\\.(.*?)$~', $this->_db_prefix, $match) === 1 ? $match[3] : $this->_db_prefix;
@@ -162,7 +162,7 @@ class DbTable_PostgreSQL extends DbTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
+	public function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update')
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
@@ -201,7 +201,7 @@ class DbTable_PostgreSQL extends DbTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_remove_column($table_name, $column_name, $parameters = array(), $error = 'fatal')
+	public function db_remove_column($table_name, $column_name, $parameters = array())
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
@@ -231,7 +231,7 @@ class DbTable_PostgreSQL extends DbTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_change_column($table_name, $old_column, $column_info, $parameters = array(), $error = 'fatal')
+	public function db_change_column($table_name, $old_column, $column_info, $parameters = array())
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
@@ -340,7 +340,7 @@ class DbTable_PostgreSQL extends DbTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
+	public function db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update')
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
@@ -406,7 +406,7 @@ class DbTable_PostgreSQL extends DbTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_remove_index($table_name, $index_name, $parameters = array(), $error = 'fatal')
+	public function db_remove_index($table_name, $index_name, $parameters = array())
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
