@@ -16,9 +16,12 @@
  * the request, such as being a narcissist
  *
  * @package Likes
+ *
  * @param int $id_liker - user_id of the liker/disliker
  * @param mixed $liked_message - message array that is being worked on
  * @param string $direction - + for like - for unlike a previous liked one
+ *
+ * @return bool
  */
 function likePost($id_liker, $liked_message, $direction)
 {
@@ -44,8 +47,11 @@ function likePost($id_liker, $liked_message, $direction)
  * If prepare is true, will also prep the array for template use
  *
  * @package Likes
+ *
  * @param int[]|int $messages
  * @param bool $prepare
+ *
+ * @return array|int[]
  */
 function loadLikes($messages, $prepare = true)
 {
@@ -166,7 +172,10 @@ function clearLikes($likeWaitTime)
  * - returns true if they can like again, or false if they have to wait a bit
  *
  * @package Likes
+ *
  * @param int $id_liker
+ *
+ * @return bool
  */
 function lastLikeOn($id_liker)
 {
@@ -296,8 +305,11 @@ function increaseTopicLikes($id_topic, $direction)
  * have received a like (not the total likes received)
  *
  * @package Likes
+ *
  * @param int $memberID
  * @param boolean $given
+ *
+ * @return
  */
 function likesCount($memberID, $given = true)
 {
@@ -332,10 +344,13 @@ function likesCount($memberID, $given = true)
  * Used for action=profile;area=showlikes;sa=given
  *
  * @package Likes
+ *
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param int $memberID
+ *
+ * @return array
  */
 function likesPostsGiven($start, $items_per_page, $sort, $memberID)
 {
@@ -381,10 +396,13 @@ function likesPostsGiven($start, $items_per_page, $sort, $memberID)
  * Used by action=profile;area=showlikes;sa=received
  *
  * @package Likes
+ *
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param int $memberID
+ *
+ * @return array
  */
 function likesPostsReceived($start, $items_per_page, $sort, $memberID)
 {
@@ -427,11 +445,14 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
  * Function to load all of the likers of a message
  *
  * @package Likes
+ *
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param int $messageID
  * @param bool $simple
+ *
+ * @return array
  */
 function postLikers($start, $items_per_page, $sort, $messageID, $simple = true)
 {
@@ -484,7 +505,10 @@ function postLikers($start, $items_per_page, $sort, $messageID, $simple = true)
  * Function to get the number of likes for a message
  *
  * @package Likes
+ *
  * @param int $message
+ *
+ * @return int
  */
 function messageLikeCount($message)
 {
@@ -513,7 +537,9 @@ function messageLikeCount($message)
  * Function to get most liked messages
  *
  * @param int $limit the number of top liked messages to fetch
+ *
  * @package Likes
+ * @return array
  */
 function dbMostLikedMessage($limit = 10)
 {
@@ -611,7 +637,9 @@ function dbMostLikedMessage($limit = 10)
  *
  * @param int $topic the topic_id we are going to look for liked posts within
  * @param int $limit the maximum number of liked posts to return
+ *
  * @package Likes
+ * @return array
  */
 function dbMostLikedMessagesByTopic($topic, $limit = 5)
 {
@@ -694,10 +722,13 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
  * - Can still be gamed but what can you do
  *
  * @package Likes
+ *
  * @param null|int $board - An optional board id to find most liked topics in.
  *  If omitted, {query_wanna_see_board} is used to return the most liked topics in the boards
  * they can see
  * @param int $limit - Optional, number of topics to return (default 10).
+ *
+ * @return array
  */
 function dbMostLikedTopic($board = null, $limit = 10)
 {
@@ -831,7 +862,10 @@ function dbMostLikedBoard()
  * Function to get most liked members
  *
  * @package Likes
+ *
  * @param int $limit the number of most liked members to return
+ *
+ * @return array
  */
 function dbMostLikesReceivedUser($limit = 10)
 {
@@ -954,7 +988,10 @@ function dbMostLikedPostsByUser($id_member, $limit = 10)
  * Function to get most likes giving user
  *
  * @package Likes
+ *
  * @param int $limit the number of members to return
+ *
+ * @return array
  */
 function dbMostLikesGivenUser($limit = 10)
 {

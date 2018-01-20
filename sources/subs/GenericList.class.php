@@ -87,7 +87,6 @@ class Generic_List
 	 * Loads the options in to this instance
 	 *
 	 * @param array $listOptions
-	 * @throws Elk_Exception
 	 */
 	public function __construct(array $listOptions)
 	{

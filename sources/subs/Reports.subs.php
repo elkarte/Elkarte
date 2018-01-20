@@ -51,6 +51,8 @@ function reportsBoardsList()
  *
  * @param string $group_clause a string used as WHERE clause in the query
  * @param int[] $query_groups an array of group ids
+ *
+ * @return array
  */
 function allMembergroups($group_clause, $query_groups = array())
 {
@@ -90,6 +92,8 @@ function allMembergroups($group_clause, $query_groups = array())
  * @param int[] $profiles a list of board profile ids
  * @param string $group_clause a string used as WHERE clause in the query
  * @param int[] $query_groups an array of group ids
+ *
+ * @return array
  */
 function boardPermissions($profiles, $group_clause, $query_groups)
 {
@@ -174,6 +178,8 @@ function allMembergroupsBoardAccess()
  *
  * @param string $group_clause a string used as WHERE clause in the query
  * @param int[] $query_groups an array of group ids
+ *
+ * @return array
  */
 function boardPermissionsByGroup($group_clause, $query_groups)
 {

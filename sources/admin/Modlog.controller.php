@@ -297,11 +297,13 @@ class Modlog_Controller extends Action_Controller
 	 * Uses list_getModLogEntries in modlog subs
 	 *
 	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page  The number of items to show per page
+	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
 	 * @param string $query_string
 	 * @param mixed[] $query_params
 	 * @param int $log_type
+	 *
+	 * @return array
 	 */
 	public function getModLogEntries($start, $items_per_page, $sort, $query_string, $query_params, $log_type)
 	{
@@ -317,6 +319,8 @@ class Modlog_Controller extends Action_Controller
 	 * @param string $query_string
 	 * @param mixed[] $query_params
 	 * @param int $log_type
+	 *
+	 * @return
 	 */
 	public function getModLogEntryCount($query_string, $query_params, $log_type)
 	{

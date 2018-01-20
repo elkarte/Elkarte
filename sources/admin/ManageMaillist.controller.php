@@ -836,6 +836,8 @@ class ManageMaillist_Controller extends Action_Controller
 	 *
 	 * @param int $id 0 for all of a certain style
 	 * @param string $style one of filter or parser
+	 *
+	 * @return
 	 */
 	public function count_filter_parser($id, $style)
 	{
@@ -852,6 +854,8 @@ class ManageMaillist_Controller extends Action_Controller
 	 * @param string $sort A string indicating how to sort the results
 	 * @param int $id
 	 * @param string $style
+	 *
+	 * @return array
 	 */
 	public function load_filter_parser($start, $items_per_page, $sort, $id, $style)
 	{
@@ -1875,8 +1879,10 @@ class ManageMaillist_Controller extends Action_Controller
 	 * - Callback for createList()
 	 *
 	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page  The number of items to show per page
+	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
+	 *
+	 * @return array
 	 */
 	public function list_getBounceTemplates($start, $items_per_page, $sort)
 	{
@@ -1902,6 +1908,8 @@ class ManageMaillist_Controller extends Action_Controller
 	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
 	 * @param int $id = 0
+	 *
+	 * @return array
 	 */
 	public function list_maillist_unapproved($start, $items_per_page, $sort = '', $id = 0)
 	{

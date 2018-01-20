@@ -109,6 +109,8 @@ class Authorize_Display
 	 *
 	 * @param int $key
 	 * @param string $data
+	 *
+	 * @return string
 	 */
 	private function _md5_hmac($key, $data)
 	{

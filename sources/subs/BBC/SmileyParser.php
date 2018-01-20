@@ -56,6 +56,8 @@ class SmileyParser
 	 * Enables/disabled the smiley parsing
 	 *
 	 * @param bool $toggle
+	 *
+	 * @return SmileyParser
 	 */
 	public function setEnabled($toggle)
 	{
@@ -102,6 +104,8 @@ class SmileyParser
 	 *   - Doesn't return anything, but rather modifies message directly.
 	 *
 	 * @param string $message
+	 *
+	 * @return null|string|string[]
 	 */
 	public function parseBlock($message)
 	{

@@ -510,7 +510,10 @@ function autoRotateImage($image_name)
  *
  * @package Graphics
  * @uses GD
+ *
  * @param string $image_name full location of the file
+ *
+ * @return bool
  */
 function autoRotateImageWithGD($image_name)
 {
@@ -589,7 +592,10 @@ function autoRotateImageWithGD($image_name)
  * - Writes the update image back to $image_name
  *
  * @uses Imagick
+ *
  * @param string $image_name
+ *
+ * @return bool
  */
 function autoRotateImageWithIM($image_name)
 {

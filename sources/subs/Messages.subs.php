@@ -27,6 +27,8 @@
  * @param int $id_msg
  * @param int $id_topic = 0
  * @param int $attachment_type = 0
+ *
+ * @return array|bool
  */
 function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
 {
@@ -129,7 +131,9 @@ function basicMessageInfo($id_msg, $override_permissions = false, $detailed = fa
  *
  * @param int $id_msg
  * @param bool $modify
+ *
  * @todo why it doesn't take into account post moderation?
+ * @return bool
  */
 function quoteMessageInfo($id_msg, $modify)
 {
@@ -375,6 +379,8 @@ function canAccessMessage($id_msg, $check_approval = true)
  * @param int $id_msg origin message id
  * @param int $id_topic topic
  * @param bool $next = true if true, it increases the pointer, otherwise it decreases it
+ *
+ * @return
  */
 function messagePointer($id_msg, $id_topic, $next = true)
 {
@@ -403,6 +409,8 @@ function messagePointer($id_msg, $id_topic, $next = true)
  *
  * @param int $id_msg
  * @param int $id_topic
+ *
+ * @return
  */
 function previousMessage($id_msg, $id_topic)
 {
@@ -414,6 +422,8 @@ function previousMessage($id_msg, $id_topic)
  *
  * @param int $id_msg
  * @param int $id_topic
+ *
+ * @return
  */
 function nextMessage($id_msg, $id_topic)
 {
@@ -430,7 +440,9 @@ function nextMessage($id_msg, $id_topic)
  *      - 'include' => array - of messages to explicitly include
  *      - 'only_approved' => true/false - include or exclude the unapproved messages
  *      - 'limit' => mixed - the number of values to return (if false, no limits applied)
+ *
  * @todo very similar to selectMessages in Topics.subs.php
+ * @return array
  */
 function messageAt($start, $id_topic, $params = array())
 {
@@ -480,6 +492,7 @@ function messageAt($start, $id_topic, $params = array())
  * @param mixed[] $message array of several message details (id_msg, id_topic, etc.)
  * @param string $poster_comment the comment made by the reporter
  *
+ * @return bool
  */
 function recordReport($message, $poster_comment)
 {
@@ -713,6 +726,8 @@ function determineRemovableMessages($topic, $messages, $allowed_all)
  * @param int $topic
  * @param bool $include_unapproved
  * @param int[] $selection
+ *
+ * @return array
  */
 function countSplitMessages($topic, $include_unapproved, $selection = array())
 {

@@ -56,6 +56,8 @@ abstract class Mention_BoardAccess_Abstract extends Mention_Message_Abstract
 	 * @param int[] $boards Array of board ids
 	 * @param mixed[] $mentions
 	 * @param int[] $unset_keys Array of board ids
+	 *
+	 * @return bool
 	 */
 	protected function _validateAccess($boards, &$mentions, $unset_keys)
 	{

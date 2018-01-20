@@ -175,6 +175,8 @@ class Elk_Autoloader
 	 * Callback for the spl_autoload_register, loads the requested class
 	 *
 	 * @param string $class
+	 *
+	 * @return bool
 	 */
 	public function elk_autoloader($class)
 	{
@@ -233,6 +235,8 @@ class Elk_Autoloader
 	 * Resolves a class name to an autoload name
 	 *
 	 * @param string $class - Name of class to autoload
+	 *
+	 * @return bool
 	 */
 	private function _string_to_class($class)
 	{

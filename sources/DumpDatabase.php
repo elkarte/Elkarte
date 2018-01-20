@@ -200,6 +200,8 @@ function DumpDatabase2()
  * Dummy/helper function, it simply returns the string passed as argument
  *
  * @param string $string - string to uncompress
+ *
+ * @return string
  */
 function un_compressed($string = '')
 {

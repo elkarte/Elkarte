@@ -739,6 +739,8 @@ function newTable($title = '', $default_value = '', $shading = 'all', $width_nor
  *
  * @param mixed[] $inc_data
  * @param int|null $custom_table = null
+ *
+ * @return bool
  */
 function addData($inc_data, $custom_table = null)
 {

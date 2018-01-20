@@ -60,6 +60,8 @@ function cache_put_data($key, $value, $ttl = 120)
  *
  * @param string $key
  * @param int $ttl = 120
+ *
+ * @return bool|null
  */
 function cache_get_data($key, $ttl = 120)
 {

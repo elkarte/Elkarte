@@ -137,7 +137,7 @@ abstract class Theme
 	abstract public function getSettings();
 
 	/**
-	 * @return ElkArte\Theme\TemplateLayers
+	 * @return TemplateLayers
 	 */
 	public function getLayers()
 	{
@@ -145,7 +145,7 @@ abstract class Theme
 	}
 
 	/**
-	 * @return ElkArte\Theme\Templates
+	 * @return Templates
 	 */
 	public function getTemplates()
 	{

@@ -253,6 +253,8 @@ class Email_Parse
 	 * Loads an email message from the database
 	 *
 	 * @param int $id id of the email to retrieve from the failed log
+	 *
+	 * @return string
 	 */
 	private function _query_load_email($id)
 	{
@@ -1319,6 +1321,8 @@ class Email_Parse
 	 * @param string $string
 	 * @param string $encoding
 	 * @param string $charset
+	 *
+	 * @return bool|null|string|string[]
 	 */
 	private function _decode_string($string, $encoding, $charset = '')
 	{
@@ -1347,6 +1351,8 @@ class Email_Parse
 	 * @param string $string
 	 * @param string $from
 	 * @param string $to
+	 *
+	 * @return null|string|string[]
 	 */
 	private function _charset_convert($string, $from, $to)
 	{

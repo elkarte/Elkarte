@@ -18,7 +18,7 @@
  * @param int $id_board board to build the topic listing for
  * @param int $id_member who we are building it for so we don't show unapproved topics
  * @param int $start where to start from
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort_by how to sort the results asc/desc
  * @param string $sort_column which value we sort by
  * @param mixed[] $indexOptions
@@ -29,6 +29,8 @@
  *     'ascending' => ASC or DESC for the sort
  *     'fake_ascending' =>
  *     'custom_selects' => loads additional values from the tables used in the query, for addon use
+ *
+ * @return array
  */
 function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sort_by, $sort_column, $indexOptions)
 {
@@ -158,6 +160,8 @@ function messageIndexSort()
  *
  * @param int $id_member member to check
  * @param int[] $topic_ids array of topics ids to check for participation
+ *
+ * @return array
  */
 function topicsParticipation($id_member, $topic_ids)
 {

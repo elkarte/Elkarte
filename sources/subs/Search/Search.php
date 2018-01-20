@@ -364,6 +364,8 @@ class Search
 	 * Builds the search array
 	 *
 	 * @param bool - Force splitting of strings enclosed in double quotes
+	 *
+	 * @return 0|array
 	 */
 	public function searchArray($search_simple_fulltext = false)
 	{
@@ -433,7 +435,9 @@ class Search
 	 * - Prevents redundancy with blacklisted words
 	 *
 	 * @param string[] $matches
-	 * @param string[]  $phraseArray
+	 * @param string[] $phraseArray
+	 *
+	 * @return string[]
 	 */
 	private function _checkExcludePhrase($matches, $phraseArray)
 	{
@@ -460,6 +464,8 @@ class Search
 	 * - Prevents excluding blacklisted words since it is redundant
 	 *
 	 * @param string[] $wordArray
+	 *
+	 * @return string[]
 	 */
 	private function _checkExcludeWord($wordArray)
 	{

@@ -295,6 +295,8 @@ function ob_sessrewrite($buffer)
  * Callback function for the Rewrite URLs preg_replace_callback
  *
  * @param mixed[] $matches
+ *
+ * @return string
  */
 function buffer_callback($matches)
 {

@@ -17,11 +17,14 @@
 
 /**
  * Returns how many people are subscribed to a paid subscription.
+ *
  * @todo refactor away
  *
  * @param int $id_sub
  * @param string $search_string
  * @param mixed[] $search_vars = array()
+ *
+ * @return
  */
 function list_getSubscribedUserCount($id_sub, $search_string, $search_vars = array())
 {
@@ -49,14 +52,17 @@ function list_getSubscribedUserCount($id_sub, $search_string, $search_vars = arr
 
 /**
  * Return the subscribed users list, for the given parameters.
+ *
  * @todo refactor outta here
  *
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param int $id_sub
  * @param string $search_string
  * @param mixed[] $search_vars
+ *
+ * @return array
  */
 function list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $search_string, $search_vars = array())
 {
@@ -541,6 +547,8 @@ function loadSubscriptions()
  *
  * @param int $memID id of the member
  * @param mixed[] $active_subscriptions array of active subscriptions they can have
+ *
+ * @return array
  */
 function loadMemberSubscriptions($memID, $active_subscriptions)
 {
@@ -586,6 +594,8 @@ function loadMemberSubscriptions($memID, $active_subscriptions)
  * Find all members with an active subscription to a specific item
  *
  * @param int $sub_id id of the subscription we are looking for
+ *
+ * @return array
  */
 function loadAllSubsctiptions($sub_id)
 {
@@ -925,7 +935,7 @@ function alreadySubscribed($id_sub, $id_member)
  *
  * @param int $log_id
  *
- * @return int
+ * @return array
  * @throws Elk_Exception no_access
  */
 function getSubscriptionStatus($log_id)

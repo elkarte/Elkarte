@@ -417,6 +417,7 @@ class Cache
 
 	/**
 	 * @var bool If the result of the last get was a miss
+	 * @return bool
 	 */
 	public function isMiss()
 	{

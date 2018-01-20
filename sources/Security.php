@@ -28,7 +28,10 @@
  * which saves all request (POST and GET) data.
  *
  * @event integrate_validateSession Called at start of validateSession
+ *
  * @param string $type = admin
+ *
+ * @return bool|string
  * @throws Elk_Exception
  */
 function validateSession($type = 'admin')
@@ -170,6 +173,8 @@ function checkPassword($type, $hash = false)
  *
  * @param string $message = ''
  * @param boolean $is_fatal = true
+ *
+ * @return bool
  * @throws Elk_Exception
  */
 function is_not_guest($message = '', $is_fatal = true)
@@ -1182,6 +1187,8 @@ function isAllowedTo($permission, $boards = null)
  *             otherwise, the resultant array becomes split into the multiple
  *             permissions that were passed. Other than that, it's just the normal
  *             state of play that you're used to.
+ *
+ * @return array
  */
 function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 {

@@ -25,6 +25,8 @@
  * @param boolean $count_pms Default false, if false returns the number of message
  *                           reports, if true sets $context['open_pm_reports'] and
  *                           returns the both number of open PM and message reports
+ *
+ * @return array
  */
 function recountOpenReports($flush = true, $count_pms = false)
 {
@@ -137,6 +139,8 @@ function recountUnapprovedPosts($approve_query = null)
  * How many failed emails (that they can see) do we have?
  *
  * @param string|null $approve_query
+ *
+ * @return int
  */
 function recountFailedEmails($approve_query = null)
 {
@@ -169,6 +173,8 @@ function recountFailedEmails($approve_query = null)
  *
  * @param int $status
  * @param bool $show_pms
+ *
+ * @return
  */
 function totalReports($status = 0, $show_pms = false)
 {
@@ -239,6 +245,8 @@ function updateReportsStatus($reports_id, $property = 'close', $status = 0)
  *  - Members awaiting approval (activation, deletion, group requests)
  *
  * @param int|null $brd
+ *
+ * @return mixed
  */
 function loadModeratorMenuCounts($brd = null)
 {
@@ -468,9 +476,11 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
  * (used by createList() callbacks)
  *
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param string $template_type type of template to load
+ *
+ * @return array
  */
 function warningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
 {
@@ -519,6 +529,8 @@ function warningTemplates($start, $items_per_page, $sort, $template_type = 'warn
  *  (used by createList() callbacks)
  *
  * @param string $template_type
+ *
+ * @return
  */
 function warningTemplateCount($template_type = 'warntpl')
 {
@@ -549,10 +561,12 @@ function warningTemplateCount($template_type = 'warntpl')
  * Callback for createList() in ModerationCenter_Controller::action_viewWarningLog().
  *
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param string|null $query_string
  * @param mixed[] $query_params
+ *
+ * @return array
  */
 function warnings($start, $items_per_page, $sort, $query_string = '', $query_params = array())
 {
@@ -723,6 +737,8 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
  *
  * @param int $id_report
  * @param bool $show_pms
+ *
+ * @return bool
  */
 function modReportDetails($id_report, $show_pms = false)
 {
@@ -766,6 +782,7 @@ function modReportDetails($id_report, $show_pms = false)
  * @param bool $show_pms
  *
  * @todo move to createList?
+ * @return array
  */
 function getModReports($status = 0, $start = 0, $limit = 10, $show_pms = false)
 {
@@ -804,6 +821,8 @@ function getModReports($status = 0, $start = 0, $limit = 10, $show_pms = false)
  * Grabs all the comments made by the reporters to a set of reports
  *
  * @param int[] $id_reports an array of report ids
+ *
+ * @return array
  */
 function getReportsUserComments($id_reports)
 {
@@ -835,6 +854,8 @@ function getReportsUserComments($id_reports)
  * Retrieve all the comments made by the moderators to a certain report
  *
  * @param int $id_report the id of a report
+ *
+ * @return array
  */
 function getReportModeratorsComments($id_report)
 {
@@ -945,8 +966,10 @@ function watchedUserCount($warning_watch = 0)
  * (used by createList() callbacks).
  *
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
+ *
+ * @return array
  */
 function watchedUsers($start, $items_per_page, $sort)
 {
@@ -1084,10 +1107,12 @@ function watchedUserPostsCount($approve_query, $warning_watch)
  * (used by createList() callbacks).
  *
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param string $approve_query
  * @param int[] $delete_boards
+ *
+ * @return array
  */
 function watchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards)
 {
@@ -1386,6 +1411,8 @@ function addReportComment($report, $newComment)
  * Get the list of current notes in the moderation center "shoutbox"
  *
  * @param int $offset
+ *
+ * @return array
  */
 function moderatorNotes($offset)
 {
@@ -1424,6 +1451,8 @@ function moderatorNotes($offset)
  * Gets a warning notice by id that was sent to a user.
  *
  * @param int $id_notice
+ *
+ * @return array
  */
 function moderatorNotice($id_notice)
 {
@@ -1454,6 +1483,8 @@ function moderatorNotice($id_notice)
  * Make sure the "current user" (uses $user_info) cannot go outside of the limit for the day.
  *
  * @param int $member The member we are going to issue the warning to
+ *
+ * @return
  */
 function warningDailyLimit($member)
 {
@@ -1497,6 +1528,8 @@ function warningDailyLimit($member)
  *                 to perform a certain action (return of boardsAllowedTo)
  * @param int $start start of the query LIMIT
  * @param int $limit number of elements to return (default 10)
+ *
+ * @return array
  */
 function getUnapprovedPosts($approve_query, $current_view, $boards_allowed, $start, $limit = 10)
 {

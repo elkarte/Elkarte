@@ -21,7 +21,10 @@
  * Get a list of versions that are currently installed on the server.
  *
  * @package Admin
+ *
  * @param string[] $checkFor
+ *
+ * @return array
  */
 function getServerVersions($checkFor)
 {

@@ -59,7 +59,9 @@ final class ErrorHandler extends Errors
 	 *
 	 * @param int $error_level
 	 * @param bool $isException
+	 *
 	 * @rerurn string
+	 * @return string
 	 */
 	private function set_error_name($error_level, $isException)
 	{
@@ -102,6 +104,8 @@ final class ErrorHandler extends Errors
 	 * @param string $error_string
 	 * @param string $file
 	 * @param int $line
+	 *
+	 * @return bool
 	 * @throws Elk_Exception
 	 */
 	public function error_handler($error_level, $error_string, $file, $line)
@@ -208,6 +212,8 @@ final class ErrorHandler extends Errors
 	 * @param \Exception|\Throwable $exception
 	 *
 	 * $return string The fully parsed error message
+	 *
+	 * @return string
 	 */
 	private function _prepareErrorDisplay($exception)
 	{
@@ -241,6 +247,8 @@ final class ErrorHandler extends Errors
 	 * @param \Exception|\Throwable $exception
 	 *
 	 * $return string The fully parsed stack trace
+	 *
+	 * @return array
 	 */
 	private function parseTrace($exception)
 	{

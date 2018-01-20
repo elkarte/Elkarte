@@ -96,6 +96,8 @@ class Server extends \ArrayObject
 	 *
 	 * @param int $time_limit The time limit
 	 * @param bool $server_reset whether to reset the server timer or not
+	 *
+	 * @return string
 	 */
 	public function setTimeLimit($time_limit, $server_reset = true)
 	{

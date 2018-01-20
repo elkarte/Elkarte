@@ -131,6 +131,8 @@ class Email_Format
 	 * @param string $real_name
 	 * @param string $charset
 	 * @param bool $bbc_br
+	 *
+	 * @return string
 	 */
 	public function reflow($data, $real_name = '', $charset = 'UTF-8', $bbc_br = true)
 	{
@@ -391,6 +393,8 @@ class Email_Format
 	 * Checks if a string is the potentially the start of a signature line
 	 *
 	 * @param int $i
+	 *
+	 * @return bool
 	 */
 	private function _in_sig($i)
 	{
@@ -449,6 +453,8 @@ class Email_Format
 	 * like 1) 1. a) b.
 	 *
 	 * @param string $var
+	 *
+	 * @return bool
 	 */
 	private function _in_plainlist($var)
 	{

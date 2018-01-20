@@ -493,6 +493,8 @@ class DbTable_MySQL extends DbTable
 	 * Creates a query for a column
 	 *
 	 * @param mixed[] $column
+	 *
+	 * @return string
 	 */
 	private function _db_create_query_column($column)
 	{

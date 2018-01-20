@@ -185,6 +185,8 @@ class Pbe_Imap extends AbstractModel
 	 * Retrieves and composes and email (headers+message) from and imap inbox
 	 *
 	 * @param int $email_uid - The email id
+	 *
+	 * @return string
 	 */
 	protected function _fetch_email($email_uid)
 	{

@@ -60,6 +60,8 @@ class MessageTopicIcons extends ElkArte\ValuesContainer
 	 * Return the icon specified by idx, or the default icon for invalid names
 	 *
 	 * @param int|string $idx
+	 *
+	 * @return
 	 */
 	public function __get($idx)
 	{

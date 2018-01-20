@@ -135,7 +135,10 @@ function automanage_attachments_check_directory()
  * - Places an .htaccess in new directories for security
  *
  * @package Attachments
+ *
  * @param string $updir
+ *
+ * @return bool
  */
 function automanage_attachments_create_directory($updir)
 {
@@ -310,8 +313,11 @@ function get_directory_tree_elements($directory)
  * - Gets the directory w/o drive letter for windows
  *
  * @package Attachments
+ *
  * @param string[] $tree
  * @param int $count
+ *
+ * @return bool|mixed|string
  */
 function attachments_init_dir(&$tree, &$count)
 {
@@ -567,8 +573,11 @@ function processAttachments($id_msg = null)
  * Deletes a temporary attachment from the $_SESSION (and the filesystem)
  *
  * @package Attachments
+ *
  * @param string $attach_id the temporary name generated when a file is uploaded
  *               and used in $_SESSION to help identify the attachment itself
+ *
+ * @return bool|string
  */
 function removeTempAttachById($attach_id)
 {
@@ -665,7 +674,10 @@ function getTempAttachById($attach_id)
  * created by PHP during the file upload.
  *
  * @package Attachments
+ *
  * @param int $attachID
+ *
+ * @return array
  */
 function attachmentUploadChecks($attachID)
 {
@@ -893,7 +905,10 @@ function attachmentChecks($attachID)
  * - Creates a thumbnail if the file is an image and the option enabled.
  *
  * @package Attachments
+ *
  * @param mixed[] $attachmentOptions associative array of options
+ *
+ * @return bool
  */
 function createAttachment(&$attachmentOptions)
 {
@@ -1076,7 +1091,10 @@ function createAttachment(&$attachmentOptions)
  * - Must return the same values and in the same order as getAttachmentFromTopic()
  *
  * @package Attachments
+ *
  * @param int $id_attach
+ *
+ * @return array
  */
 function getAvatar($id_attach)
 {
@@ -1116,12 +1134,16 @@ function getAvatar($id_attach)
  * What it does:
  *
  * - This includes a check of the topic
- * - it only returns the attachment if it's indeed attached to a message in the topic given as parameter, and query_see_board...
+ * - it only returns the attachment if it's indeed attached to a message in the topic given as parameter, and
+ * query_see_board...
  * - Must return the same values and in the same order as getAvatar()
  *
  * @package Attachments
+ *
  * @param int $id_attach
  * @param int $id_topic
+ *
+ * @return array
  */
 function getAttachmentFromTopic($id_attach, $id_topic)
 {
@@ -1157,12 +1179,16 @@ function getAttachmentFromTopic($id_attach, $id_topic)
  * What it does:
  *
  * - This includes a check of the topic
- * - it only returns the attachment if it's indeed attached to a message in the topic given as parameter, and query_see_board...
+ * - it only returns the attachment if it's indeed attached to a message in the topic given as parameter, and
+ * query_see_board...
  * - Must return the same values and in the same order as getAvatar()
  *
  * @package Attachments
+ *
  * @param int $id_attach
  * @param int $id_topic
+ *
+ * @return array
  */
 function getAttachmentThumbFromTopic($id_attach, $id_topic)
 {
@@ -1597,10 +1623,13 @@ function getAvatarPathID()
  *  - This does not check permissions.
  *
  * @package Attachments
+ *
  * @param int[] $messages array of messages ids
  * @param bool $includeUnapproved = false
  * @param string|null $filter name of a callback function
  * @param mixed[] $all_posters
+ *
+ * @return array
  */
 function getAttachments($messages, $includeUnapproved = false, $filter = null, $all_posters = array())
 {
@@ -1994,8 +2023,11 @@ function approved_attach_sort($a, $b)
  *  - the viewer is not the poster of the message where the attachment is
  *
  * @package Attachments
+ *
  * @param mixed[] $attachment_info
  * @param mixed[] $all_posters
+ *
+ * @return bool
  */
 function filter_accessible_attachment($attachment_info, $all_posters)
 {
@@ -2008,10 +2040,13 @@ function filter_accessible_attachment($attachment_info, $all_posters)
  * Older attachments may still use this function.
  *
  * @package Attachments
+ *
  * @param string $filename
  * @param int $attachment_id
  * @param string|null $dir
  * @param boolean $new
+ *
+ * @return null|string|string[]
  */
 function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $new = false)
 {
@@ -2087,6 +2122,8 @@ function bindMessageAttachments($id_msg, $attachment_ids)
  * @param string|null $dir Which directory it should be in (null to use current)
  * @param bool $new If this is a new attachment, if so just returns a hash
  * @param string $file_hash The file hash
+ *
+ * @return null|string|string[]
  */
 function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = false, $file_hash = '')
 {

@@ -305,7 +305,8 @@ class Verification_Controls_Captcha implements Verification_Controls
 	 *
 	 * @param boolean $isNew
 	 * @param boolean $force_refresh
-	 * @throws Elk_Exception
+	 *
+	 * @return bool
 	 */
 	public function showVerification($isNew, $force_refresh = true)
 	{
@@ -407,7 +408,7 @@ class Verification_Controls_Captcha implements Verification_Controls
 	/**
 	 * Configuration settings for the admin template
 	 *
-	 * @return string
+	 * @return array
 	 */
 	public function settings()
 	{
@@ -612,7 +613,6 @@ class Verification_Controls_Questions implements Verification_Controls
 	 * Get things ready for the template
 	 *
 	 * @return mixed[]
-	 * @throws Elk_Exception
 	 */
 	public function prepareContext()
 	{
@@ -822,6 +822,8 @@ class Verification_Controls_Questions implements Verification_Controls
 	 * @param array|null $filter if specified it myst be an array with two indexes:
 	 *              - 'type' => a valid filter, it can be 'language' or 'id_question'
 	 *              - 'value' => the value of the filter (i.e. the language)
+	 *
+	 * @return array
 	 */
 	private function _loadAntispamQuestions($filter = null)
 	{
@@ -1002,6 +1004,8 @@ class Verification_Controls_EmptyField implements Verification_Controls
 	 *
 	 * @param boolean $isNew
 	 * @param boolean $force_refresh
+	 *
+	 * @return bool
 	 */
 	public function showVerification($isNew, $force_refresh = true)
 	{

@@ -51,6 +51,8 @@ class AttachmentErrorContext
 	 *
 	 * @param string $id
 	 * @param string $name
+	 *
+	 * @return bool
 	 */
 	public function addAttach($id, $name)
 	{
@@ -75,6 +77,8 @@ class AttachmentErrorContext
 	 * Sets the active attach (errors are "attached" to that)
 	 *
 	 * @param string|null $id A valid attachment, if invalid it defaults to 'generic'
+	 *
+	 * @return AttachmentErrorContext
 	 */
 	public function activate($id = null)
 	{
@@ -127,6 +131,8 @@ class AttachmentErrorContext
 	 *
 	 * @param string|null $attachID
 	 * @param int|null $severity the severity level
+	 *
+	 * @return bool
 	 */
 	public function hasErrors($attachID = null, $severity = null)
 	{
@@ -156,6 +162,8 @@ class AttachmentErrorContext
 	 *
 	 * @param string $error_code the code of the error
 	 * @param string|null $attachID
+	 *
+	 * @return bool
 	 */
 	public function hasError($error_code, $attachID = null)
 	{
@@ -192,6 +200,8 @@ class AttachmentErrorContext
 	 * - If severity is null the function returns all the errors
 	 *
 	 * @param int|null $severity = null the severity level wanted
+	 *
+	 * @return array
 	 */
 	public function prepareErrors($severity = null)
 	{

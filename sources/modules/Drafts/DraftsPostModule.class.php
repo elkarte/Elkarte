@@ -195,6 +195,7 @@ class Drafts_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * Does the actual saving of a Draft to the DB
 	 *
 	 * @throws Controller_Redirect_Exception
+	 * @throws Elk_Exception
 	 */
 	public function before_save_post()
 	{

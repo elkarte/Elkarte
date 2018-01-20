@@ -64,7 +64,8 @@ class twoCheckOut_Display
 	 * @param int $value amount of the transaction
 	 * @param string $period length of the transaction
 	 * @param string $return_url
-	 * @return string
+	 *
+	 * @return array
 	 */
 	public function fetchGatewayFields($unique_id, $sub_data, $value, $period, $return_url)
 	{

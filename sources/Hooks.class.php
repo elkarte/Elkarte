@@ -116,6 +116,8 @@ final class Hooks
 	 * Splits up strings from $modSettings into functions and files to include.
 	 *
 	 * @param string $hook_calls
+	 *
+	 * @return array
 	 */
 	protected function _prepare_hooks($hook_calls)
 	{
@@ -283,6 +285,8 @@ final class Hooks
 	 *
 	 * @param string $basepath
 	 * @param string $ext
+	 *
+	 * @return array
 	 */
 	public function discoverIntegrations($basepath, $ext = '.integrate.php')
 	{

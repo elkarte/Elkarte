@@ -58,6 +58,8 @@ class Calendar_Event
 	 * and permissions.
 	 *
 	 * @param array $event The options may come from a form
+	 *
+	 * @return array
 	 * @throws Elk_Exception
 	 */
 	public function validate($event)

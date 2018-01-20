@@ -156,7 +156,9 @@ class Permissions
 	 * This function updates the permissions of any groups based on the given groups.
 	 *
 	 * @param mixed[]|int $parents (array or int) group or groups whose children are to be updated
-	 * @param int|null    $profile = null an int or null for the customized profile, if any
+	 * @param int|null $profile = null an int or null for the customized profile, if any
+	 *
+	 * @return bool
 	 */
 	public function updateChild($parents, $profile = null)
 	{

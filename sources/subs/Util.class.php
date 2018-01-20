@@ -23,6 +23,8 @@ class Util
 	 * Converts invalid / disallowed / out of range entities to nulls
 	 *
 	 * @param string $string
+	 *
+	 * @return string
 	 */
 	public static function entity_fix($string)
 	{
@@ -43,6 +45,8 @@ class Util
 	 * @param int $quote_style integer or constant representation of one
 	 * @param string $charset only UTF-8 allowed
 	 * @param bool $double true will allow double encoding, false will not encode existing html entities,
+	 *
+	 * @return string
 	 */
 	public static function htmlspecialchars($string, $quote_style = ENT_COMPAT, $charset = 'UTF-8', $double = false)
 	{
@@ -66,6 +70,8 @@ class Util
 	 * - Optionally performs an entity_fix to null any invalid character entities from the string
 	 *
 	 * @param string $string
+	 *
+	 * @return string
 	 */
 	public static function htmltrim($string)
 	{
@@ -91,6 +97,8 @@ class Util
 	 * @param string $needle what is being looked for
 	 * @param int $offset where to start, assumed 0
 	 * @param bool $right set to true to mimic strrpos functions
+	 *
+	 * @return bool|mixed
 	 */
 	public static function strpos($haystack, $needle, $offset = 0, $right = false)
 	{
@@ -142,6 +150,8 @@ class Util
 	 * @param string $string
 	 * @param string $start
 	 * @param int|null $length
+	 *
+	 * @return string
 	 */
 	public static function substr($string, $start, $length = null)
 	{
@@ -161,6 +171,8 @@ class Util
 	 * - Prefers to use mb_ functions if available, otherwise will use charset substitution tables
 	 *
 	 * @param string $string
+	 *
+	 * @return string
 	 */
 	public static function strtolower($string)
 	{
@@ -179,6 +191,8 @@ class Util
 	 * Prefers to use mb_ functions if available, otherwise will use charset substitution tables
 	 *
 	 * @param string $string
+	 *
+	 * @return string
 	 */
 	public static function strtoupper($string)
 	{
@@ -194,12 +208,15 @@ class Util
 	/**
 	 * Cuts off a multi-byte string at a certain length
 	 *
-	 * - Optionally performs an entity_fix to null any invalid character entities from the string prior to the length check
+	 * - Optionally performs an entity_fix to null any invalid character entities from the string prior to the length
+	 * check
 	 * - Use this when the number of actual characters (&nbsp; = 6 not 1) must be <= length not the displayable,
 	 * for example db field compliance to avoid overflow
 	 *
 	 * @param string $string
 	 * @param int $length
+	 *
+	 * @return string
 	 */
 	public static function truncate($string, $length)
 	{
@@ -228,7 +245,8 @@ class Util
 	 * - Considers certain html entities as 1 in length, &amp; &nbsp; etc
 	 * - Optionally adds ending ellipsis that honor length or are appended
 	 * - Optionally attempts to break the string on a word boundary approximately at the allowed length
-	 * - If using cutword and the resulting length is < len minus buffer then it is truncated to length plus an ellipsis.
+	 * - If using cutword and the resulting length is < len minus buffer then it is truncated to length plus an
+	 * ellipsis.
 	 * - Respects internationalization characters, html spacing and entities as one character.
 	 * - Returns the shortened string.
 	 * - Does not account for html tags, ie <b>test</b> is 11 characters not 4
@@ -239,6 +257,8 @@ class Util
 	 * @param string $ellipsis characters to add at the end of a cut string
 	 * @param bool $exact set true to include ellipsis in the allowed length, false will append instead
 	 * @param int $buffer maximum length underflow to allow when cutting on a word boundary
+	 *
+	 * @return string
 	 */
 	public static function shorten_text($string, $length = 384, $cutword = false, $ellipsis = '...', $exact = true, $buffer = 12)
 	{
@@ -396,6 +416,8 @@ class Util
 	 * Converts the first character of a multi-byte string to uppercase
 	 *
 	 * @param string $string
+	 *
+	 * @return string
 	 */
 	public static function ucfirst($string)
 	{
@@ -406,6 +428,8 @@ class Util
 	 * Converts the first character of each work in a multi-byte string to uppercase
 	 *
 	 * @param string $string
+	 *
+	 * @return string
 	 */
 	public static function ucwords($string)
 	{
@@ -419,6 +443,8 @@ class Util
 	 * Returns the length of multi-byte string
 	 *
 	 * @param string $string
+	 *
+	 * @return int
 	 */
 	public static function strlen($string)
 	{

@@ -538,6 +538,8 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
  * @param string $dummy2
  * @param string $dummy3
  * @param boolean $do_change
+ *
+ * @return array
  */
 function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
 {
@@ -597,9 +599,12 @@ function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
  * Use FTP functions to work with a package download/install
  *
  * @package Packages
+ *
  * @param string $destination_url
  * @param string[]|null $files = none
  * @param bool $return = false
+ *
+ * @return null|string[]
  * @throws Elk_Exception
  */
 function packageRequireFTP($destination_url, $files = null, $return = false)
@@ -2427,7 +2432,10 @@ function package_crypt($pass)
  * as planned.
  *
  * @package Packages
+ *
  * @param string $id
+ *
+ * @return bool
  */
 function package_create_backup($id = 'backup')
 {
@@ -2793,7 +2801,10 @@ function setPackageState($id, $install_id)
  * Checks if a package is installed, and if so returns its version level
  *
  * @package Packages
+ *
  * @param string $id
+ *
+ * @return
  */
 function checkPackageDependency($id)
 {
@@ -2875,7 +2886,10 @@ function setPackagesAsUninstalled()
  * Validates that the remote url is one of our known package servers
  *
  * @package Packages
+ *
  * @param string $remote_url
+ *
+ * @return bool
  */
 function isAuthorizedServer($remote_url)
 {

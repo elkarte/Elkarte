@@ -18,10 +18,13 @@
  * - If supplied a specific ID will load only that failed email
  *
  * @package Maillist
+ *
  * @param int $id
  * @param int $start The item to start with (for pagination purposes)
  * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
+ *
+ * @return array
  */
 function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sort = '')
 {
@@ -167,11 +170,14 @@ function maillist_delete_error_entry($id)
  * - Style defines if it will load parsers or filters
  *
  * @package Maillist
+ *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param int $id If fetching a specific item, 0 for all
  * @param string $style = filter Filter to fetch filters or parsers for parsers
+ *
+ * @return array
  */
 function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $style = 'filter')
 {
@@ -223,8 +229,11 @@ function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $s
  * - If ID is a valid positive integer, it will return 1 and exit.
  *
  * @package Maillist
+ *
  * @param int $id
  * @param string $style
+ *
+ * @return
  */
 function list_count_filter_parser($id, $style)
 {
@@ -365,8 +374,11 @@ function enable_maillist_imap_cron($switch)
  * Load in the custom (public and this users private) email templates
  *
  * @package Maillist
+ *
  * @param string $template_type - the type of template (e.g. 'bounce', 'warntpl', etc.)
  * @param string|null $subject - A subject for the template
+ *
+ * @return array
  */
 function maillist_templates($template_type, $subject = null)
 {

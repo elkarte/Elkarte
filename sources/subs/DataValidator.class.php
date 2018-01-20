@@ -112,6 +112,8 @@ class Data_Validator
 	 * Allow reading otherwise inaccessible data values
 	 *
 	 * @param string $property key name of array value to return
+	 *
+	 * @return mixed|null
 	 */
 	public function __get($property)
 	{
@@ -122,6 +124,8 @@ class Data_Validator
 	 * Allow testing data values for empty/isset
 	 *
 	 * @param string $property key name of array value to return
+	 *
+	 * @return bool
 	 */
 	public function __isset($property)
 	{
@@ -134,6 +138,8 @@ class Data_Validator
 	 * @param mixed[]|object $data generally $_POST data for this method
 	 * @param mixed[] $validation_rules associative array of field => rules
 	 * @param mixed[] $sanitation_rules associative array of field => rules
+	 *
+	 * @return bool
 	 */
 	public static function is_valid(&$data = array(), $validation_rules = array(), $sanitation_rules = array())
 	{
@@ -169,6 +175,8 @@ class Data_Validator
 	 * Set the validation rules that will be run against the data
 	 *
 	 * @param mixed[] $rules associative array of field => rule|rule|rule
+	 *
+	 * @return mixed[]
 	 */
 	public function validation_rules($rules = array())
 	{
@@ -188,6 +196,8 @@ class Data_Validator
 	 *
 	 * @param mixed[] $rules associative array of field => rule|rule|rule
 	 * @param boolean $strict
+	 *
+	 * @return mixed[]
 	 */
 	public function sanitation_rules($rules = array(), $strict = false)
 	{
@@ -206,7 +216,10 @@ class Data_Validator
 
 	/**
 	 * Field Name Replacements
+	 *
 	 * @param mixed[] $replacements associative array of field => txt string key
+	 *
+	 * @return mixed[]
 	 */
 	public function text_replacements($replacements = array())
 	{
@@ -221,6 +234,8 @@ class Data_Validator
 	 * csv or array
 	 *
 	 * @param string[] $datatype csv or array processing for the field
+	 *
+	 * @return string[]
 	 */
 	public function input_processing($datatype = array())
 	{
@@ -234,6 +249,8 @@ class Data_Validator
 	 * Run the sanitation and validation on the data
 	 *
 	 * @param mixed[]|object $input associative array or object of data to process name => value
+	 *
+	 * @return bool
 	 */
 	public function validate($input)
 	{
@@ -260,6 +277,8 @@ class Data_Validator
 	 *    - array returns just error messages of those fields
 	 *    - string returns just that error message
 	 *    - default is all error message(s)
+	 *
+	 * @return array|bool|mixed[]
 	 */
 	public function validation_errors($raw = false)
 	{
@@ -273,7 +292,10 @@ class Data_Validator
 
 	/**
 	 * Return the validation data, all or a specific key
+	 *
 	 * @param integer|string|null $key int or string
+	 *
+	 * @return mixed|mixed[]|null
 	 */
 	public function validation_data($key = null)
 	{
@@ -288,6 +310,8 @@ class Data_Validator
 	 *
 	 * @param mixed[] $input
 	 * @param mixed[] $ruleset
+	 *
+	 * @return bool
 	 */
 	private function _validate($input, $ruleset)
 	{
@@ -356,6 +380,8 @@ class Data_Validator
 	 * @param mixed[] $input
 	 * @param string $field
 	 * @param string $rules
+	 *
+	 * @return bool|void
 	 */
 	private function _validate_recursive($input, $field, $rules)
 	{
@@ -501,6 +527,8 @@ class Data_Validator
 	 * @param mixed[] $input
 	 * @param string $field
 	 * @param string $rules
+	 *
+	 * @return mixed
 	 */
 	private function _sanitize_recursive($input, $field, $rules)
 	{
@@ -551,6 +579,8 @@ class Data_Validator
 	 * Process any errors and return the error strings
 	 *
 	 * @param mixed[]|boolean $keys
+	 *
+	 * @return array|bool
 	 */
 	private function _get_error_messages($keys)
 	{
@@ -602,6 +632,8 @@ class Data_Validator
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param string|null $validation_parameters array or null
+	 *
+	 * @return array|void
 	 */
 	protected function _validate_contains($field, $input, $validation_parameters = null)
 	{
@@ -628,6 +660,8 @@ class Data_Validator
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param string|null $validation_parameters array or null
+	 *
+	 * @return array|void
 	 */
 	protected function _validate_notequal($field, $input, $validation_parameters = null)
 	{
@@ -658,6 +692,8 @@ class Data_Validator
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param string|null $validation_parameters array or null
+	 *
+	 * @return array|void
 	 */
 	protected function _validate_limits($field, $input, $validation_parameters = null)
 	{
@@ -695,6 +731,8 @@ class Data_Validator
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param mixed[]|null $validation_parameters array or null
+	 *
+	 * @return array|void
 	 */
 	protected function _validate_without($field, $input, $validation_parameters = null)
 	{
@@ -724,6 +762,8 @@ class Data_Validator
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param mixed[]|null $validation_parameters array or null
+	 *
+	 * @return array|void
 	 */
 	protected function _validate_required($field, $input, $validation_parameters = null)
 	{
@@ -746,6 +786,8 @@ class Data_Validator
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param mixed[]|null $validation_parameters array or null
+	 *
+	 * @return array|void
 	 */
 	protected function _validate_valid_email($field, $input, $validation_parameters = null)
 	{
@@ -777,6 +819,8 @@ class Data_Validator
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param mixed[]|null $validation_parameters array or null
+	 *
+	 * @return array|void
 	 */
 	protected function _validate_max_length($field, $input, $validation_parameters = null)
 	{
@@ -802,6 +846,8 @@ class Data_Validator
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param mixed[]|null $validation_parameters array or null
+	 *
+	 * @return array|void
 	 */
 	protected function _validate_min_length($field, $input, $validation_parameters = null)
 	{
@@ -827,6 +873,8 @@ class Data_Validator
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param mixed[]|null $validation_parameters array or null
+	 *
+	 * @return array|void
 	 */
 	protected function _validate_length($field, $input, $validation_parameters = null)
 	{
@@ -852,6 +900,8 @@ class Data_Validator
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param mixed[]|null $validation_parameters array or null
+	 *
+	 * @return array|void
 	 */
 	protected function _validate_alpha($field, $input, $validation_parameters = null)
 	{
@@ -879,6 +929,8 @@ class Data_Validator
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param mixed[]|null $validation_parameters array or null
+	 *
+	 * @return array|void
 	 */
 	protected function _validate_alpha_numeric($field, $input, $validation_parameters = null)
 	{
@@ -905,6 +957,8 @@ class Data_Validator
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param mixed[]|null $validation_parameters array or null
+	 *
+	 * @return array|void
 	 */
 	protected function _validate_alpha_dash($field, $input, $validation_parameters = null)
 	{
@@ -930,6 +984,8 @@ class Data_Validator
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param mixed[]|null $validation_parameters array or null
+	 *
+	 * @return array|void
 	 */
 	protected function _validate_isarray($field, $input, $validation_parameters = null)
 	{
@@ -955,6 +1011,8 @@ class Data_Validator
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param mixed[]|null $validation_parameters array or null
+	 *
+	 * @return array|void
 	 */
 	protected function _validate_numeric($field, $input, $validation_parameters = null)
 	{
@@ -980,6 +1038,8 @@ class Data_Validator
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param mixed[]|null $validation_parameters array or null
+	 *
+	 * @return array|void
 	 */
 	protected function _validate_integer($field, $input, $validation_parameters = null)
 	{
@@ -1007,6 +1067,8 @@ class Data_Validator
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param mixed[]|null $validation_parameters array or null
+	 *
+	 * @return array|void
 	 */
 	protected function _validate_boolean($field, $input, $validation_parameters = null)
 	{
@@ -1034,6 +1096,8 @@ class Data_Validator
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param mixed[]|null $validation_parameters array or null
+	 *
+	 * @return array|void
 	 */
 	protected function _validate_float($field, $input, $validation_parameters = null)
 	{
@@ -1059,6 +1123,8 @@ class Data_Validator
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param mixed[]|null $validation_parameters array or null
+	 *
+	 * @return array|void
 	 */
 	protected function _validate_valid_url($field, $input, $validation_parameters = null)
 	{
@@ -1084,6 +1150,8 @@ class Data_Validator
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param mixed[]|null $validation_parameters array or null
+	 *
+	 * @return array|void
 	 */
 	protected function _validate_valid_ipv6($field, $input, $validation_parameters = null)
 	{
@@ -1109,6 +1177,8 @@ class Data_Validator
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param mixed[]|null $validation_parameters array or null
+	 *
+	 * @return array|void
 	 */
 	protected function _validate_valid_ip($field, $input, $validation_parameters = null)
 	{
@@ -1134,9 +1204,12 @@ class Data_Validator
 	 * Usage: '[key]' => 'php_syntax'
 	 *
 	 * @uses ParseError
+	 *
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param mixed[]|null $validation_parameters array or null
+	 *
+	 * @return array|void
 	 */
 	protected function _validate_php_syntax($field, $input, $validation_parameters = null)
 	{
@@ -1200,6 +1273,8 @@ class Data_Validator
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param mixed[]|null $validation_parameters array or null
+	 *
+	 * @return array|bool|void
 	 */
 	protected function _validate_valid_color($field, $input, $validation_parameters = null)
 	{
@@ -1244,9 +1319,12 @@ class Data_Validator
 	 * - Gmail user can use @googlemail.com instead of @gmail.com
 	 * - Gmail ignores all characters after a + (plus sign) in the username
 	 * - Gmail ignores all . (dots) in username
-	 * - auser@gmail.com, a.user@gmail.com, auser+big@gmail.com and a.user+gigantic@googlemail.com are same email address.
+	 * - auser@gmail.com, a.user@gmail.com, auser+big@gmail.com and a.user+gigantic@googlemail.com are same email
+	 * address.
 	 *
 	 * @param string $input
+	 *
+	 * @return string|void
 	 */
 	protected function _sanitation_gmail_normalize($input)
 	{
@@ -1279,6 +1357,8 @@ class Data_Validator
 	 * Uses Util::htmlspecialchars to sanitize any html in the input
 	 *
 	 * @param string $input
+	 *
+	 * @return null|string|string[]|void
 	 */
 	protected function _sanitation_cleanhtml($input)
 	{

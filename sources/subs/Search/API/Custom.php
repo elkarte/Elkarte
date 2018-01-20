@@ -139,6 +139,8 @@ class Custom extends SearchAPI
 	 *
 	 * @param mixed[] $words An array of words
 	 * @param mixed[] $search_data An array of search data
+	 *
+	 * @return resource
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{

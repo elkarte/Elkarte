@@ -17,6 +17,8 @@
  *
  * @param int[] $messages int array of message ids to work on
  * @param boolean $include_approved
+ *
+ * @return array
  */
 function followupTopics($messages, $include_approved = false)
 {
@@ -48,6 +50,8 @@ function followupTopics($messages, $include_approved = false)
  *
  * @param int $topic id of the original topic the threads were started from
  * @param boolean $include_approved
+ *
+ * @return array
  */
 function topicStartedHere($topic, $include_approved = false)
 {

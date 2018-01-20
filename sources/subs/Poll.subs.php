@@ -197,6 +197,8 @@ function pollInfo($id_poll, $ignore_permissions = true)
  * to topic $topicID.
  *
  * @param int $topicID the topic with an associated poll.
+ *
+ * @return bool
  */
 function pollInfoForTopic($topicID)
 {
@@ -275,6 +277,8 @@ function topicFromPoll($pollID)
  *
  * @param int $id_poll The id of the poll to query
  * @param int $id_member The id of the member
+ *
+ * @return array
  */
 function pollOptionsForMember($id_poll, $id_member)
 {
@@ -308,6 +312,8 @@ function pollOptionsForMember($id_poll, $id_member)
  * It censors the label in the result array.
  *
  * @param int $id_poll The id of the poll to load its options
+ *
+ * @return array
  */
 function pollOptions($id_poll)
 {
@@ -511,6 +517,8 @@ function deletePollOptions($id_poll, $id_options)
  * for the poll associated with the $id_topic.
  *
  * @param int $id_topic The id of the topic
+ *
+ * @return array
  */
 function pollStarters($id_topic)
 {

@@ -465,6 +465,8 @@ class BBCParser
 	 * Parse the HTML in a string
 	 *
 	 * @param string $data
+	 *
+	 * @return string
 	 */
 	protected function parseHTML($data)
 	{
@@ -475,6 +477,8 @@ class BBCParser
 	 * Parse URIs and email addresses in a string to url and email BBC tags to be parsed by the BBC parser
 	 *
 	 * @param string $data
+	 *
+	 * @return null|string|string[]
 	 */
 	protected function autoLink($data)
 	{
@@ -1400,6 +1404,8 @@ class BBCParser
 	 *
 	 * @param string $data
 	 * @param array $tag
+	 *
+	 * @return string
 	 */
 	protected function recursiveParser($data, array $tag)
 	{

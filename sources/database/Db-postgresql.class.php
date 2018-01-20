@@ -61,7 +61,6 @@ class Database_PostgreSQL extends Database_Abstract
 	 * @param mixed[] $db_options
 	 *
 	 * @return resource
-	 * @throws Elk_Exception
 	 */
 	public static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
@@ -312,6 +311,8 @@ class Database_PostgreSQL extends Database_Abstract
 	 * Affected rows from previous operation.
 	 *
 	 * @param resource|null $result
+	 *
+	 * @return int
 	 */
 	public function affected_rows($result = null)
 	{
@@ -329,6 +330,8 @@ class Database_PostgreSQL extends Database_Abstract
 	 * @param string $table
 	 * @param string|null $field = null
 	 * @param resource|null $connection = null
+	 *
+	 * @return bool|mixed
 	 * @throws Elk_Exception
 	 */
 	public function insert_id($table, $field = null, $connection = null)
@@ -361,6 +364,8 @@ class Database_PostgreSQL extends Database_Abstract
 	 *
 	 * @param resource $request
 	 * @param integer|bool $counter = false
+	 *
+	 * @return array
 	 */
 	public function fetch_row($request, $counter = false)
 	{
@@ -392,6 +397,8 @@ class Database_PostgreSQL extends Database_Abstract
 	 * Get the number of rows in the result.
 	 *
 	 * @param resource $result
+	 *
+	 * @return int
 	 */
 	public function num_rows($result)
 	{
@@ -403,6 +410,8 @@ class Database_PostgreSQL extends Database_Abstract
 	 * Get the number of fields in the resultset.
 	 *
 	 * @param resource $request
+	 *
+	 * @return int
 	 */
 	public function num_fields($request)
 	{
@@ -414,6 +423,8 @@ class Database_PostgreSQL extends Database_Abstract
 	 *
 	 * @param boolean $request
 	 * @param integer $counter
+	 *
+	 * @return bool
 	 */
 	public function data_seek($request, $counter)
 	{
@@ -429,6 +440,8 @@ class Database_PostgreSQL extends Database_Abstract
 	 *
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
 	 * @param resource|null $connection = null
+	 *
+	 * @return bool|resource
 	 */
 	public function db_transaction($type = 'commit', $connection = null)
 	{
@@ -455,6 +468,8 @@ class Database_PostgreSQL extends Database_Abstract
 	 * Return last error string from the database server
 	 *
 	 * @param resource|null $connection = null
+	 *
+	 * @return string
 	 */
 	public function last_error($connection = null)
 	{
@@ -637,6 +652,8 @@ class Database_PostgreSQL extends Database_Abstract
 	 * Unescape an escaped string!
 	 *
 	 * @param string $string
+	 *
+	 * @return string
 	 */
 	public function unescape_string($string)
 	{
@@ -959,6 +976,8 @@ class Database_PostgreSQL extends Database_Abstract
 	 * Escape string for the database input
 	 *
 	 * @param string $string
+	 *
+	 * @return string
 	 */
 	public function escape_string($string)
 	{
@@ -970,6 +989,8 @@ class Database_PostgreSQL extends Database_Abstract
 	 *
 	 * @param resource $request
 	 * @param int|bool $counter = false
+	 *
+	 * @return array
 	 */
 	public function fetch_assoc($request, $counter = false)
 	{
@@ -1036,6 +1057,8 @@ class Database_PostgreSQL extends Database_Abstract
 	 * Finds out if the connection is still valid.
 	 *
 	 * @param postgre|null $connection = null
+	 *
+	 * @return bool
 	 */
 	public function validConnection($connection = null)
 	{

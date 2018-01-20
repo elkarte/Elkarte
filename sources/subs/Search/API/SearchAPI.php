@@ -109,6 +109,8 @@ abstract class SearchAPI
 	 * @param bool $no_regexp - If true or $modSettings['search_match_words']
 	 *              is empty, uses % at the beginning and end of the string,
 	 *              otherwise returns a regular expression
+	 *
+	 * @return string
 	 */
 	public function prepareWord($phrase, $no_regexp)
 	{

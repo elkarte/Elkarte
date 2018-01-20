@@ -48,6 +48,8 @@ class HtmlParser
 	 * Calls the functions to parse the handful of allowable HTML tags
 	 *
 	 * @param $data
+	 *
+	 * @return string
 	 */
 	public function parse($data)
 	{
@@ -80,6 +82,8 @@ class HtmlParser
 	 * Convert <a tags to [url
 	 *
 	 * @param $data
+	 *
+	 * @return null|string|string[]
 	 */
 	protected function anchorTags($data)
 	{
@@ -93,6 +97,8 @@ class HtmlParser
 	 * Converts self closing HTML to appropriate BBC tag
 	 *
 	 * @param $data
+	 *
+	 * @return mixed
 	 */
 	protected function emptyTags($data)
 	{
@@ -109,6 +115,8 @@ class HtmlParser
 	 * Converts simple closable tags to equivalent BBC codes
 	 *
 	 * @param $data
+	 *
+	 * @return string
 	 */
 	protected function closableTags($data)
 	{
@@ -131,6 +139,8 @@ class HtmlParser
 	 * Converts <img tags to [IMG bbc code while handing height and width attributes
 	 *
 	 * @param $data
+	 *
+	 * @return string
 	 */
 	protected function imageTags($data)
 	{

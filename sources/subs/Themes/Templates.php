@@ -77,6 +77,7 @@ class Templates
 	 *                                      be found
 	 *
 	 * @return boolean|null
+	 * @throws Elk_Exception
 	 */
 	public function load($template_name, $style_sheets = [], $fatal = true)
 	{

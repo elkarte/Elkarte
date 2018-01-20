@@ -100,6 +100,8 @@ function getLastPosts($latestPostOptions)
  * Callback-function for the cache for getLastPosts().
  *
  * @param mixed[] $latestPostOptions
+ *
+ * @return array
  */
 function cache_getLastPosts($latestPostOptions)
 {
@@ -123,6 +125,8 @@ function cache_getLastPosts($latestPostOptions)
  *
  * @param mixed[] $messages
  * @param int $start
+ *
+ * @return array
  */
 function prepareRecentPosts($messages, $start)
 {
@@ -274,6 +278,8 @@ function earliest_msg()
  * Callback-function for the cache for getLastTopics().
  *
  * @param mixed[] $latestTopicOptions
+ *
+ * @return array
  */
 function cache_getLastTopics($latestTopicOptions)
 {

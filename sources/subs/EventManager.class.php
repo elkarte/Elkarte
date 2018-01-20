@@ -70,6 +70,8 @@ class Event_Manager
 	 *
 	 * @param string $position The "identifier" of the event, such as prepare_post
 	 * @param mixed[] $args The arguments passed to the methods registered
+	 *
+	 * @return bool
 	 */
 	public function trigger($position, $args = array())
 	{

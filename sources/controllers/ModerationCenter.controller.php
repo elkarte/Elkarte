@@ -1572,9 +1572,12 @@ class ModerationCenter_Controller extends Action_Controller
 	 * Callback for createList() used in watched users
 	 *
 	 * @uses watchedUsers()
+	 *
 	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page  The number of items to show per page
+	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
+	 *
+	 * @return array
 	 */
 	public function list_getWatchedUsers($start, $items_per_page, $sort)
 	{
@@ -1586,7 +1589,10 @@ class ModerationCenter_Controller extends Action_Controller
 	 * Callback for createList().
 	 *
 	 * @uses watchedUserPostsCount()
+	 *
 	 * @param string $approve_query
+	 *
+	 * @return int
 	 */
 	public function list_getWatchedUserPostsCount($approve_query)
 	{
@@ -1599,11 +1605,14 @@ class ModerationCenter_Controller extends Action_Controller
 	 * Callback for createList().
 	 *
 	 * @uses watchedUserPosts()
+	 *
 	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page  The number of items to show per page
+	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
 	 * @param string $approve_query
 	 * @param int[] $delete_boards
+	 *
+	 * @return array
 	 */
 	public function list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards)
 	{
@@ -1615,10 +1624,13 @@ class ModerationCenter_Controller extends Action_Controller
 	 * Callback for createList() to get all the templates of a type from the system
 	 *
 	 * @uses warningTemplates()
+	 *
 	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page  The number of items to show per page
+	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
 	 * @param string $template_type type of template to load
+	 *
+	 * @return array
 	 */
 	public function list_getWarningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
 	{
@@ -1629,7 +1641,10 @@ class ModerationCenter_Controller extends Action_Controller
 	 * Callback for createList() to get the number of templates of a type in the system
 	 *
 	 * @uses warningTemplateCount()
+	 *
 	 * @param string $template_type
+	 *
+	 * @return
 	 */
 	public function list_getWarningTemplateCount($template_type = 'warntpl')
 	{
@@ -1640,13 +1655,16 @@ class ModerationCenter_Controller extends Action_Controller
 	 * Callback for createList()
 	 *
 	 * - Used to get all issued warnings in the system
+	 *
 	 * @uses warnings() function in moderation.subs
 	 *
 	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page  The number of items to show per page
+	 * @param int $items_per_page The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
 	 * @param string $query_string
 	 * @param mixed[] $query_params
+	 *
+	 * @return array
 	 */
 	public function list_getWarnings($start, $items_per_page, $sort, $query_string, $query_params)
 	{
@@ -1657,10 +1675,13 @@ class ModerationCenter_Controller extends Action_Controller
 	 * Callback for createList()
 	 *
 	 * - Get the total count of all current warnings
+	 *
 	 * @uses warningCount() function in moderation.subs
 	 *
 	 * @param string $query_string
 	 * @param mixed[] $query_params
+	 *
+	 * @return int
 	 */
 	public function list_getWarningCount($query_string, $query_params)
 	{

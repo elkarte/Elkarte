@@ -111,6 +111,8 @@ class Autolink
 	 * Parse links and emails in the data
 	 *
 	 * @param string $data
+	 *
+	 * @return null|string|string[]
 	 */
 	public function parse($data)
 	{
@@ -157,6 +159,8 @@ class Autolink
 	 * - Have to get rid of the @ problems some things cause... stupid email addresses.
 	 *
 	 * @param $data
+	 *
+	 * @return string
 	 */
 	public function parseLinks($data)
 	{
@@ -200,6 +204,8 @@ class Autolink
 	 * Search and replace plain email address with bbc [email][/email]
 	 *
 	 * @param string $data
+	 *
+	 * @return null|string|string[]
 	 */
 	public function parseEmails($data)
 	{

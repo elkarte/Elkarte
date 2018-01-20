@@ -22,6 +22,8 @@
  * @param string|null $query_string
  * @param mixed[] $query_params
  * @param int $log_type
+ *
+ * @return
  */
 function list_getModLogEntryCount($query_string = '', $query_params = array(), $log_type = 1)
 {
@@ -59,11 +61,13 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
  * Callback for createList() in Modlog::action_log().
  *
  * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ * @param int $items_per_page The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param string|null $query_string
  * @param mixed[] $query_params
  * @param int $log_type
+ *
+ * @return array
  */
 function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '', $query_params = array(), $log_type = 1)
 {
@@ -357,6 +361,8 @@ class ModLogEntriesReplacement
 	 * Matching function to return the value in the callback
 	 *
 	 * @param string[] $matches
+	 *
+	 * @return string
 	 */
 	public function callback($matches)
 	{
@@ -396,6 +402,8 @@ function deleteLogAction($id_log, $time, $delete = null)
  *
  * @param string $action Name of the action
  * @param int $time Timeframe since the last time the action has been performed
+ *
+ * @return bool
  */
 function recentlyLogged($action, $time = 60)
 {

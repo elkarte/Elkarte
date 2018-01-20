@@ -137,6 +137,8 @@ class Site_Combiner
 	 *
 	 * @param mixed[] $files array created by loadjavascriptfile function
 	 * @param bool $do_defered true when coming from footer area, false for header
+	 *
+	 * @return bool|string
 	 */
 	public function site_js_combine($files, $do_defered)
 	{
@@ -197,6 +199,8 @@ class Site_Combiner
 	 * Combine css files in to a single file
 	 *
 	 * @param string[] $files
+	 *
+	 * @return bool|string
 	 */
 	public function site_css_combine($files)
 	{
@@ -282,6 +286,8 @@ class Site_Combiner
 	 * Deletes hives from the cache based on extension.
 	 *
 	 * @param string $ext
+	 *
+	 * @return bool
 	 */
 	protected function _removeHives($ext)
 	{
@@ -335,6 +341,8 @@ class Site_Combiner
 	 * - file
 	 * - url
 	 * - stale (optional)
+	 *
+	 * @return bool
 	 */
 	private function _addFile($options)
 	{

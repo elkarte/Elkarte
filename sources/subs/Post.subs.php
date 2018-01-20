@@ -37,7 +37,10 @@ function preparsecode(&$message, $previewing = false)
  * This is very simple, and just removes things done by preparsecode.
  *
  * @package Posts
+ *
  * @param string $message
+ *
+ * @return null|string|string[]
  */
 function un_preparsecode($message)
 {
@@ -54,9 +57,12 @@ function un_preparsecode($message)
  * - Mandatory parameters are set.
  *
  * @package Posts
+ *
  * @param mixed[] $msgOptions
  * @param mixed[] $topicOptions
  * @param mixed[] $posterOptions
+ *
+ * @return bool
  * @throws Elk_Exception
  */
 function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
@@ -416,9 +422,12 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
  * Modifying a post...
  *
  * @package Posts
+ *
  * @param mixed[] $msgOptions
  * @param mixed[] $topicOptions
  * @param mixed[] $posterOptions
+ *
+ * @return bool
  * @throws Elk_Exception
  */
 function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
@@ -563,8 +572,11 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
  * Approve (or not) some posts... without permission checks...
  *
  * @package Posts
+ *
  * @param int|int[] $msgs - array of message ids
  * @param bool $approve = true
+ *
+ * @return bool|void
  * @throws Elk_Exception
  */
 function approvePosts($msgs, $approve = true)
@@ -812,8 +824,11 @@ function approvePosts($msgs, $approve = true)
  * and is not automatically updated upon other changes.
  *
  * @package Posts
+ *
  * @param int[]|int $setboards
  * @param int $id_msg = 0
+ *
+ * @return bool
  * @throws Elk_Exception
  */
 function updateLastMessages($setboards, $id_msg = 0)

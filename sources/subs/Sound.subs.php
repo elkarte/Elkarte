@@ -23,6 +23,8 @@
  * Used by action=register;sa=verificationcode() (Register.controller.php).
  *
  * @param string $word
+ *
+ * @return bool
  */
 function createWaveFile($word)
 {

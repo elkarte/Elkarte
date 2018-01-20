@@ -36,8 +36,11 @@ function clearKarma($karmaWaitTime)
  * Last action this user has done
  *
  * @package Karma
+ *
  * @param int $id_executor
  * @param int $id_target
+ *
+ * @return null
  */
 function lastActionOn($id_executor, $id_target)
 {

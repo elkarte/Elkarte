@@ -1350,8 +1350,11 @@ function getBoardNotificationsCount($memID)
  * - The function doesn't guarantee the boards are properly sorted
  *
  * @package Boards
+ *
  * @param int[]|null $id_parents array of ints representing board ids
  * @param int[]|null $id_boards
+ *
+ * @return array
  */
 function accessibleBoards($id_boards = null, $id_parents = null)
 {
@@ -1407,8 +1410,11 @@ function accessibleBoards($id_boards = null, $id_parents = null)
  * Returns the boards the current user wants to see.
  *
  * @package Boards
+ *
  * @param string $see_board either 'query_see_board' or 'query_wanna_see_board'
  * @param bool $hide_recycle is tru the recycle bin is not returned
+ *
+ * @return array
  */
 function wantedBoards($see_board, $hide_recycle = true)
 {
@@ -1700,10 +1706,13 @@ function getBoardProperties($idboard)
  * Fetch the number of posts in an array of boards based on board IDs or category IDs
  *
  * @package Boards
+ *
  * @param int[]|null $boards an array of board IDs
  * @param int[]|null $categories an array of category IDs
  * @param bool $wanna_see_board if true uses {query_wanna_see_board}, otherwise {query_see_board}
  * @param bool $include_recycle if false excludes any results from the recycle board (if enabled)
+ *
+ * @return array
  */
 function boardsPosts($boards, $categories, $wanna_see_board = false, $include_recycle = true)
 {
@@ -1781,6 +1790,7 @@ function sumRecentPosts()
  * Returns information of a set of boards based on board IDs or category IDs
  *
  * @package Boards
+ *
  * @param mixed[]|string $conditions is an associative array that holds the board or the cat IDs
  *              'categories' => an array of category IDs (it accepts a single ID too)
  *              'boards' => an array of board IDs (it accepts a single ID too)
@@ -1791,12 +1801,14 @@ function sumRecentPosts()
  *                           Allowed values: 'name', 'posts', 'detailed', 'permissions', 'reports';
  *                           default: 'name';
  *                           see the function for details on the fields associated to each value
- *              'override_permissions' => (bool) if true doesn't use neither {query_wanna_see_board} nor {query_see_board} (default false)
+ *              'override_permissions' => (bool) if true doesn't use neither {query_wanna_see_board} nor
+ *     {query_see_board} (default false)
  *              'wanna_see_board' => (bool) if true uses {query_wanna_see_board}, otherwise {query_see_board}
  *              'include_recycle' => (bool) recycle board is included (default true)
  *              'include_redirects' => (bool) redirects are included (default true)
  *
  * @todo unify the two queries?
+ * @return array
  */
 function fetchBoardsInfo($conditions = 'all', $params = array())
 {

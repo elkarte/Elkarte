@@ -91,6 +91,8 @@ class Log extends \AbstractModel
 	 * @param int $start The item to start with (for pagination purposes)
 	 * @param string $sort_direction DESC or ASC results
 	 * @param array|null $filter
+	 *
+	 * @return array
 	 */
 	public function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 	{
@@ -168,6 +170,8 @@ class Log extends \AbstractModel
 	 *
 	 * @param array|null $filter
 	 * @param string|null $sort
+	 *
+	 * @return array
 	 */
 	public function fetchErrorsByType($filter = null, $sort = null)
 	{

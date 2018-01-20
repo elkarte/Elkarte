@@ -185,6 +185,8 @@ class Fulltext extends SearchAPI
 	 *
 	 * @param mixed[] $words Words to index
 	 * @param mixed[] $search_data
+	 *
+	 * @return resource
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{

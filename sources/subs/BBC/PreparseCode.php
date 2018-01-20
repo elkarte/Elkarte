@@ -709,6 +709,8 @@ class PreparseCode
 	 * This is very simple, and just removes things done by preparsecode.
 	 *
 	 * @param string $message
+	 *
+	 * @return null|string|string[]
 	 */
 	public function un_preparsecode($message)
 	{
@@ -730,6 +732,8 @@ class PreparseCode
 	 * Ensure tags inside of nobbc do not get parsed by converting the markers to html entities
 	 *
 	 * @param string[] $matches
+	 *
+	 * @return string
 	 */
 	private function _preparsecode_nobbc_callback($matches)
 	{
@@ -740,6 +744,8 @@ class PreparseCode
 	 * Use only the primary (first) font face when multiple are supplied
 	 *
 	 * @param string[] $matches
+	 *
+	 * @return string
 	 */
 	private function _preparsecode_font_callback($matches)
 	{
@@ -753,6 +759,8 @@ class PreparseCode
 	 * Takes a tag and changes it to lowercase
 	 *
 	 * @param string[] $matches
+	 *
+	 * @return string
 	 */
 	private function _preparsecode_lowertags_callback($matches)
 	{
@@ -763,6 +771,8 @@ class PreparseCode
 	 * Ensure image tags do not load anything by themselves (security)
 	 *
 	 * @param string[] $matches
+	 *
+	 * @return string
 	 */
 	private function _fixTags_img_callback($matches)
 	{
