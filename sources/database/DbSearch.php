@@ -64,7 +64,7 @@ interface DbSearch
 	 * @param mixed[] $columns in the format specified.
 	 * @param mixed[] $indexes default array(), in the format specified.
 	 */
-	public function createTemporaryTable();
+	public function createTemporaryTable($name, $columns, $indexes);
 
 	/**
 	 * Static method that allows to retrieve or create an instance of this class.

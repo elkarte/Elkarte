@@ -105,7 +105,7 @@ if (class_exists('DbTable_MySQL'))
 		*
 		* @param object $db - A Database_MySQL object
 		*/
-		private function __construct($db, $db_prefix)
+		protected function __construct($db, $db_prefix)
 		{
 			// We are doing install, of course we want to do any remove on these
 			$this->_reservedTables = array();
@@ -214,11 +214,11 @@ if (class_exists('DbTable_MySQL'))
 		* @param object $db - A Database_MySQL object
 		* @return object - A DbTable_MySQL_Install object
 		*/
-		public static function db_table($db)
+		public static function db_table($db, $db_prefix)
 		{
 			if (is_null(self::$_tbl_inst))
 			{
-				self::$_tbl_inst = new DbTable_MySQL_Install($db);
+				self::$_tbl_inst = new DbTable_MySQL_Install($db, $db_prefix);
 			}
 
 			return self::$_tbl_inst;
@@ -237,7 +237,7 @@ if (class_exists('DbTable_PostgreSQL'))
 		*
 		* @param object $db - A DbTable_PostgreSQL object
 		*/
-		private function __construct($db, $db_prefix)
+		protected function __construct($db, $db_prefix)
 		{
 			// We are doing install, of course we want to do any remove on these
 			$this->_reservedTables = array();
@@ -349,11 +349,11 @@ if (class_exists('DbTable_PostgreSQL'))
 		 *
 		* @return object - A DbTable_PostgreSQL_Install object
 		*/
-		public static function db_table($db)
+		public static function db_table($db, $db_prefix)
 		{
 			if (is_null(self::$_tbl_inst))
 			{
-				self::$_tbl_inst = new DbTable_PostgreSQL_Install($db);
+				self::$_tbl_inst = new DbTable_PostgreSQL_Install($db, $db_prefix);
 			}
 
 			return self::$_tbl_inst;
