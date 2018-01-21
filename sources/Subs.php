@@ -30,8 +30,6 @@
  *
  * @param mixed[] $changeArray An associative array of what we're changing in 'setting' => 'value' format
  * @param bool $update Use an UPDATE query instead of a REPLACE query
- *
- * @todo: add debugging features, $debug isn't used
  */
 function updateSettings($changeArray, $update = false)
 {
