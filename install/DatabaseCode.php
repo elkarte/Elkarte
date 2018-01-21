@@ -105,7 +105,7 @@ if (class_exists('DbTable_MySQL'))
 		*
 		* @param object $db - A Database_MySQL object
 		*/
-		private function __construct($db)
+		private function __construct($db, $db_prefix)
 		{
 			// We are doing install, of course we want to do any remove on these
 			$this->_reservedTables = array();
@@ -115,6 +115,7 @@ if (class_exists('DbTable_MySQL'))
 
 			// This executes queries and things
 			$this->_db = $db;
+			$this->_db_prefix = $db_prefix;
 		}
 
 		/**
@@ -236,7 +237,7 @@ if (class_exists('DbTable_PostgreSQL'))
 		*
 		* @param object $db - A DbTable_PostgreSQL object
 		*/
-		private function __construct($db)
+		private function __construct($db, $db_prefix)
 		{
 			// We are doing install, of course we want to do any remove on these
 			$this->_reservedTables = array();
@@ -246,6 +247,7 @@ if (class_exists('DbTable_PostgreSQL'))
 
 			// This executes queries and things
 			$this->_db = $db;
+			$this->_db_prefix = $db_prefix;
 		}
 
 		/**

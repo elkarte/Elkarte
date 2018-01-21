@@ -35,7 +35,7 @@ class DbTable_PostgreSQL_Install extends DbTable_PostgreSQL
 	 *
 	 * @param object $db - A Database_PostgreSQL object
 	 */
-	protected function __construct($db)
+	protected function __construct($db, $db_prefix)
 	{
 		global $db_prefix;
 
@@ -52,6 +52,7 @@ class DbTable_PostgreSQL_Install extends DbTable_PostgreSQL
 
 		// This executes queries and things
 		$this->_db = $db;
+		$this->_db_prefix = $db_prefix;
 	}
 
 	/**
@@ -60,11 +61,11 @@ class DbTable_PostgreSQL_Install extends DbTable_PostgreSQL
 	 * @param object $db - A Database_PostgreSQL object
 	 * @return object - A DbTable_PostgreSQL object
 	 */
-	public static function db_table($db)
+	public static function db_table($db, $db_prefix)
 	{
 		if (is_null(self::$_tbl_inst))
 		{
-			self::$_tbl_inst = new DbTable_PostgreSQL_Install($db);
+			self::$_tbl_inst = new DbTable_PostgreSQL_Install($db, $db_prefix);
 		}
 
 		return self::$_tbl_inst;
@@ -91,7 +92,7 @@ class Elk_Testing_psql extends Elk_Testing_Setup
 		// Start the database interface
 		Database_PostgreSQL::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd, $this->_db_prefix);
 		$this->_db = Database_PostgreSQL::db();
-		$this->_db_table = DbTable_PostgreSQL_Install::db_table($this->_db);
+		$this->_db_table = DbTable_PostgreSQL_Install::db_table($this->_db, $this->_db_prefix);
 
 		$modSettings['disableQueryCheck'] = 1;
 		// Load the postgre install sql queries

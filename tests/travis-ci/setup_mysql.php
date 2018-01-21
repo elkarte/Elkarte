@@ -34,7 +34,7 @@ class DbTable_MySQL_Install extends DbTable_MySQL
 	 *
 	 * @param object $db - A Database_MySQL object
 	 */
-	protected function __construct($db)
+	protected function __construct($db, $db_prefix)
 	{
 		global $db_prefix;
 
@@ -51,6 +51,7 @@ class DbTable_MySQL_Install extends DbTable_MySQL
 
 		// This executes queries and things
 		$this->_db = $db;
+		$this->_db_prefix = $db_prefix;
 	}
 
 	/**
@@ -60,11 +61,11 @@ class DbTable_MySQL_Install extends DbTable_MySQL
 	 *
 	 * @return object - A DbTable_MySQL object
 	 */
-	public static function db_table($db)
+	public static function db_table($db, $db_prefix)
 	{
 		if (is_null(self::$_tbl_inst))
 		{
-			self::$_tbl_inst = new DbTable_MySQL_Install($db);
+			self::$_tbl_inst = new DbTable_MySQL_Install($db, $db_prefix);
 		}
 
 		return self::$_tbl_inst;
@@ -98,7 +99,7 @@ class Elk_Testing_mysql extends Elk_Testing_Setup
 		// Start the database interface
 		Database_MySQL::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd, $this->_db_prefix);
 		$this->_db = Database_MySQL::db();
-		$this->_db_table = DbTable_MySQL_Install::db_table($this->_db);
+		$this->_db_table = DbTable_MySQL_Install::db_table($this->_db, $this->_db_prefix);
 
 		// Load the mysql install queries
 		$this->load_queries(BOARDDIR . '/install/install_' . DB_SCRIPT_VERSION . '.php');
