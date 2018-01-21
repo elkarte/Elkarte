@@ -138,7 +138,7 @@ class DbSearch_MySQL extends DbSearch_Abstract
 			$size = 10;
 		}
 
-		parent::create_word_search->db_create_table($type, $size);
+		parent::create_word_search($type, $size);
 	}
 
 	/**

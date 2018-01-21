@@ -139,7 +139,7 @@ class DbSearch_PostgreSQL extends DbSearch_Abstract
 	 */
 	public function create_word_search($type, $size = 10)
 	{
-		parent::create_word_search->db_create_table('int', 10);
+		parent::create_word_search('int', 10);
 	}
 
 	/**
