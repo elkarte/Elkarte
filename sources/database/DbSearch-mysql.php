@@ -120,8 +120,6 @@ class DbSearch_MySQL extends DbSearch_Abstract
 	 */
 	public function create_word_search($type, $size = 10)
 	{
-		$db_table = db_table();
-
 		if ($size == 'small')
 		{
 			$type = 'smallint';

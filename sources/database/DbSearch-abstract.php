@@ -72,6 +72,7 @@ abstract class DbSearch_Abstract implements DbSearch
 	 */
 	public function create_word_search($type, $size = 10)
 	{
+		$db_table = db_table();
 		$db_table->db_create_table('{db_prefix}log_search_words',
 			array(
 				array(
