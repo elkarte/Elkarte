@@ -1208,6 +1208,7 @@ class Install_Controller
 		}
 
 		require_once(SUBSDIR . '/Members.subs.php');
+		require_once(SUBSDIR . '/Messages.subs.php');
 		updateMemberStats();
 		updateMessageStats();
 		require_once(SUBSDIR . '/Topic.subs.php');
