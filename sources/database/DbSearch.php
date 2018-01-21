@@ -39,7 +39,7 @@ interface DbSearch
 	 * Returns some basic info about the {db_prefix}messages table
 	 * Used in ManageSearch.controller.php in the page to select the index method
 	 */
-	public function membersTableInfo($size);
+	public function membersTableInfo();
 
 	/**
 	 * Method for the custom word index table.
