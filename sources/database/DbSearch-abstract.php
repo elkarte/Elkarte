@@ -14,7 +14,7 @@
 /**
  * The common base for the implementation of DbSearch
  */
-class DbSearch_Abstract implements DbSearch
+abstract class DbSearch_Abstract implements DbSearch
 {
 	/**
 	 * The supported search methods
