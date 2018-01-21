@@ -222,7 +222,7 @@ class Search
 		$this->_db_search->createTemporaryTable('{db_prefix}tmp_log_search_topics',
 			array(
 				array(
-					'name' => 'id_topic'
+					'name' => 'id_topic',
 					'type' => 'mediumint',
 					'unsigned' => true,
 					'size' => 8,
