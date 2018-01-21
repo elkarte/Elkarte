@@ -19,7 +19,31 @@ class TestDbAbstraction extends \PHPUnit\Framework\TestCase
 					'MySQL' => 'BINARY \'a_string\'',
 					'PostgreSQL' => '\'a_string\'',
 				)
-			)
+			),
+			array(
+				'string_test' => '{string_case_insensitive:a_string}',
+				'params_test' => array('a_string' => 'a_string'),
+				'results' => array(
+					'MySQL' => '\'a_string\'',
+					'PostgreSQL' => 'LOWER(\'a_string\')',
+				)
+			),
+			array(
+				'string_test' => '{array_string_case_insensitive:a_string}',
+				'params_test' => array('a_string' => array('a_string', 'another_string')),
+				'results' => array(
+					'MySQL' => '\'a_string\', \'another_string\'',
+					'PostgreSQL' => 'LOWER(\'a_string\'), LOWER(\'another_string\')',
+				)
+			),
+			array(
+				'string_test' => '{column_case_insensitive:a_string}',
+				'params_test' => array('a_string' => array('a_string', 'another_string')),
+				'results' => array(
+					'MySQL' => 'a_string',
+					'PostgreSQL' => 'LOWER(a_string)',
+				)
+			),
 		);
 	}
 
