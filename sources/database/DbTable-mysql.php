@@ -62,6 +62,11 @@ class DbTable_MySQL extends DbTable
 		$index_query = '';
 		foreach ($indexes as $index)
 		{
+			if (empty($index))
+			{
+				continue;
+			}
+
 			$index['columns'] = $this->_clean_indexes($index['columns']);
 
 			$columns = implode(',', $index['columns']);
