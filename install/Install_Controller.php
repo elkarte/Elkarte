@@ -555,7 +555,7 @@ class Install_Controller
 			require_once(SOURCEDIR . '/database/Database.subs.php');
 
 			// Attempt a connection.
-			$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, array('non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
+			$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
 			$db = database();
 
 			// No dice?  Let's try adding the prefix they specified, just in case they misread the instructions ;)
@@ -563,7 +563,7 @@ class Install_Controller
 			{
 				$db_error = $db->last_error();
 
-				$db_connection = elk_db_initiate($db_server, $db_name, $_POST['db_prefix'] . $db_user, $db_passwd, array('non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
+				$db_connection = elk_db_initiate($db_server, $db_name, $_POST['db_prefix'] . $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
 				if ($db_connection !== null)
 				{
 					$db_user = $_POST['db_prefix'] . $db_user;

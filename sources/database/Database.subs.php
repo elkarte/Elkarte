@@ -19,18 +19,19 @@
  * @param string $db_name
  * @param string $db_user
  * @param string $db_passwd
+ * @param string $db_prefix
  * @param mixed[] $db_options
  * @param string $db_type
  *
  * @return resource
  */
-function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_options = array(), $db_type = 'mysql')
+function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array(), $db_type = 'mysql')
 {
 	require_once(SOURCEDIR . '/database/Db.php');
 	require_once(SOURCEDIR . '/database/Db-abstract.class.php');
 	require_once(SOURCEDIR . '/database/Db-' . $db_type . '.class.php');
 
-	return call_user_func(array('Database_' . DB_TYPE, 'initiate'), $db_server, $db_name, $db_user, $db_passwd, $db_options);
+	return call_user_func_array(array('Database_' . DB_TYPE, 'initiate'), array($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options));
 }
 
 /**

@@ -57,11 +57,12 @@ class Database_PostgreSQL extends Database_Abstract
 	 * @param string $db_name
 	 * @param string $db_user
 	 * @param string $db_passwd
+	 * @param string $db_prefix
 	 * @param mixed[] $db_options
 	 *
 	 * @return resource
 	 */
-	public static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_options = array())
+	public static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
 		// initialize the instance... if not done already!
 		if (self::$_db === null)
