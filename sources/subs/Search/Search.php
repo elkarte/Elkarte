@@ -213,8 +213,11 @@ class Search
 				)
 			),
 			array(
-				'columns' => 'id_msg',
-				'type' => 'primary'
+				array(
+					'name' => 'id_msg',
+					'columns' => array('id_msg'),
+					'type' => 'primary'
+				)
 			)
 		) !== false;
 
@@ -230,8 +233,11 @@ class Search
 				)
 			),
 			array(
-				'columns' => array('id_topic'),
-				'type' => 'primary'
+				array(
+					'name' => 'id_topic',
+					'columns' => array('id_topic'),
+					'type' => 'primary'
+				)
 			)
 		);
 	}
