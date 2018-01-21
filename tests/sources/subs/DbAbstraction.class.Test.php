@@ -9,11 +9,12 @@ class TestDbAbstraction extends \PHPUnit\Framework\TestCase
 	 */
 	public function setUp()
 	{
-		$this->_dummy_dbs = database();
+		$this->_dummy_db = database();
 
 		$this->tests = array(
 			array(
-				'test' => '{string_case_sensitive:a_string}',
+				'string_test' => '{string_case_sensitive:a_string}',
+				'params_test' => array('a_string' => 'a_string'),
 				'results' => array(
 					'MySQL' => 'BINARY \'a_string\'',
 					'PostgreSQL' => '\'a_string\'',
@@ -26,8 +27,8 @@ class TestDbAbstraction extends \PHPUnit\Framework\TestCase
 	{
 		foreach ($this->tests as $test)
 		{
-			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', array($this->_dummy_dbs[DB_TYPE], 'replacement__callback'), $test['test']);
-			$this->assertEquals($db_string, $test['results'][DB_TYPE], 'Wrong replacement for ' . DB_TYPE . ' on test ' . $test['test']);
+			$db_string = $this->_dummy_db->quote($test['string_test'], $test['params_test']);
+			$this->assertEquals($db_string, $test['results'][DB_TYPE], 'Wrong replacement for ' . DB_TYPE . ' on test ' . $test['string_test']);
 		}
 	}
 }
