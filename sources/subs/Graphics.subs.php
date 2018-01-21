@@ -544,7 +544,7 @@ function autoRotateImageWithGD($image_name)
 			break;
 		// 2 Mirror image, Normal orientation
 		case 2:
-			$source = flopImageGD($source, $sizes);
+			$source = flopImageGD($source);
 			break;
 		// 3 Normal image, rotated 180
 		case 3:
@@ -552,11 +552,11 @@ function autoRotateImageWithGD($image_name)
 			break;
 		// 4 Mirror image, rotated 180
 		case 4:
-			$source = flipImageGD($source, $sizes);
+			$source = flipImageGD($source);
 			break;
 		// 5 Mirror image, rotated 90 CCW
 		case 5:
-			$source = flopImageGD($source, $sizes);
+			$source = flopImageGD($source);
 			$source = rotateImageGD($source, 90);
 			break;
 		// 6 Normal image, rotated 90 CCW
@@ -565,7 +565,7 @@ function autoRotateImageWithGD($image_name)
 			break;
 		// 7 Mirror image, rotated 90 CW
 		case 7:
-			$source = flopImageGD($source, $sizes);
+			$source = flopImageGD($source);
 			$source = rotateImageGD($source, -90);
 			break;
 		// 8 Normal image, rotated 90 CW
@@ -700,29 +700,27 @@ function rotateImageGD($image, $degrees)
  * Flop an image using GD functions by copying top to bottom / flop
  *
  * @param resource $image
- * @param array $sizes populated with getimagesize results
  *
+ * @return resource
  * @package Graphics
  * @uses GD
- * @return resource
  */
-function flopImageGD($image, $sizes)
+function flopImageGD($image)
 {
-	return flipImageGD($image, $sizes, 'horizontal');
+	return flipImageGD($image, 'horizontal');
 }
 
 /**
  * Flip an image using GD function by copying top to bottom / flip vertical
  *
  * @param resource $image
- * @param array $sizes populated with getimagesize results
  * @param string $axis vertical for flip about vertical otherwise horizontal flip
  *
+ * @return resource
  * @package Graphics
  * @uses GD
- * @return resource
  */
-function flipImageGD($image, $sizes, $axis = 'vertical')
+function flipImageGD($image, $axis = 'vertical')
 {
 	imageflip($image, $axis === 'vertical' ? IMG_FLIP_VERTICAL : IMG_FLIP_HORIZONTAL);
 

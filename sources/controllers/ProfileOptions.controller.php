@@ -876,14 +876,16 @@ class ProfileOptions_Controller extends Action_Controller
 	 * @uses template_ignoreboards()
 	 * @param int $start The item to start with (for pagination purposes)
 	 * @param int $items_per_page  The number of items to show per page
+	 *
 	 * @param string $sort A string indicating how to sort the results
 	 * @param int $memID id_member
+	 *
 	 * @return mixed[] array of board notifications
 	 */
 	public function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 	{
 		// Return boards you see and their notification status for the list
-		return boardNotifications($start, $items_per_page, $sort, $memID);
+		return boardNotifications($sort, $memID);
 	}
 
 	/**

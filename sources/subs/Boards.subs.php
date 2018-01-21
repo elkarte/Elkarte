@@ -2049,13 +2049,13 @@ function decrementBoard($id_board, $values)
  * - (used by createList() callbacks)
  *
  * @package Boards
- * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
+ *
  * @param string $sort A string indicating how to sort the results
  * @param int $memID id_member
+ *
  * @return array
  */
-function boardNotifications($start, $items_per_page, $sort, $memID)
+function boardNotifications($sort, $memID)
 {
 	global $scripturl, $user_info, $modSettings;
 

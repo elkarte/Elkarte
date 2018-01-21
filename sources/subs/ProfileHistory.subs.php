@@ -193,14 +193,12 @@ function getLoginCount($where, $where_vars = array())
  *
  * Callback for trackLogins data.
  *
- * @param int $start The item to start with (for pagination purposes)
- * @param int $items_per_page  The number of items to show per page
- * @param string $sort A string indicating how to sort the results
  * @param string $where
  * @param mixed[] $where_vars array of values used in the where statement
+ *
  * @return mixed[] an array of messages
  */
-function getLogins($start, $items_per_page, $sort, $where, $where_vars = array())
+function getLogins($where, $where_vars = array())
 {
 	$db = database();
 

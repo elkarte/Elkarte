@@ -516,7 +516,7 @@ function load_database()
 		require_once(SOURCEDIR . '/database/DbTable-' . $db_type . '.php');
 		require_once(__DIR__ . '/DatabaseCode.php');
 
-		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'port' => $db_port), $db_type);
+		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, array('persist' => $db_persist, 'port' => $db_port), $db_type);
 	}
 
 	return database();

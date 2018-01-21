@@ -96,7 +96,7 @@ class Elk_Testing_mysql extends Elk_Testing_Setup
 		printf("MySQL server version: %s\n", mysqli_get_server_info($link));
 
 		// Start the database interface
-		Database_MySQL::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd, $this->_db_prefix);
+		Database_MySQL::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd);
 		$this->_db = Database_MySQL::db();
 		$this->_db_table = DbTable_MySQL_Install::db_table($this->_db);
 
