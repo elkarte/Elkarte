@@ -103,7 +103,7 @@ abstract class DbSearch_Abstract implements DbSearch
 		$db_table = db_table();
 		return $db_table->db_create_table($name, $columns, $indexes, array(
 			'temporary' => true,
-			'if_exists' => 'overwrite'
+			'if_exists' => 'force_drop'
 		));
 	}
 }

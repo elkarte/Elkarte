@@ -130,7 +130,11 @@ abstract class DbTable
 		$this->_package_log[] = array('remove_table', $table_name);
 
 		// This... my friends... is a function in a half - let's start by checking if the table exists!
-		if ($this->table_exists($full_table_name))
+		if ($parameters['if_exists'] === 'force_drop')
+		{
+			$this->db_drop_table($table_name, true);
+		}
+		elseif ($this->table_exists($full_table_name))
 		{
 			// This is a sad day... drop the table? If not, return false (error) by default.
 			if ($parameters['if_exists'] === 'overwrite')

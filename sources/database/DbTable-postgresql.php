@@ -112,7 +112,7 @@ class DbTable_PostgreSQL extends DbTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_drop_table($table_name, $parameters = array())
+	public function db_drop_table($table_name, $force = false)
 	{
 		// After stripping away the database name, this is what's left.
 		$real_prefix = preg_match('~^("?)(.+?)\\1\\.(.*?)$~', $this->_db_prefix, $match) === 1 ? $match[3] : $this->_db_prefix;
@@ -126,8 +126,12 @@ class DbTable_PostgreSQL extends DbTable
 			return false;
 
 		// Does it exist?
-		if ($this->table_exists($full_table_name))
+		if ($force === true || $this->table_exists($full_table_name))
 		{
+			if ($force === true)
+			{
+				$this->_db->skip_next_error();
+			}
 			// We can then drop the table.
 			$this->_db->db_transaction('begin');
 
