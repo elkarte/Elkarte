@@ -33,7 +33,7 @@ abstract class DbSearch_Abstract implements DbSearch
 	 */
 	public function search_support($search_type)
 	{
-		return in_array($search_type, $this->$_supported_types);
+		return in_array($search_type, $this->_supported_types);
 	}
 
 	/**
