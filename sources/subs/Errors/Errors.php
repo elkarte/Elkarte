@@ -19,8 +19,6 @@
 
 namespace ElkArte\Errors;
 
-use Elk_Exception;
-use AbstractModel;
 
 /**
  * Class to handle all forum errors and exceptions
