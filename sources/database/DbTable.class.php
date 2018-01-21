@@ -146,7 +146,7 @@ abstract class DbTable
 		// If we've got this far - good news - no table exists. We can build our own!
 		$this->_db->db_transaction('begin');
 
-		if ($parameters['temporary'] === true)
+		if ($parameters['temporary'] !== true)
 		{
 			$table_query = 'CREATE TABLE ' . $table_name . "\n" . '(';
 		}
