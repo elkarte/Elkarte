@@ -19,6 +19,7 @@ namespace ElkArte\Errors;
 
 use Elk_Exception;
 use ErrorException;
+use Throwable;
 
 /**
  * Class to handle our custom error handlers for PHP, hence its final status.
@@ -50,8 +51,8 @@ final class ErrorHandler extends Errors
 		parent::__construct();
 
 		// Register the class handlers to the PHP handler functions
-		set_error_handler(array($this, 'error_handler'));
-		set_exception_handler(array($this, 'exception_handler'));
+		set_error_handler([$this, 'error_handler']);
+		set_exception_handler([$this, 'exception_handler']);
 	}
 
 	/**
@@ -62,7 +63,7 @@ final class ErrorHandler extends Errors
 	 *
 	 * @rerurn string
 	 */
-	private function set_error_name($error_level, $isException)
+	private function set_error_name(int $error_level, bool $isException): string
 	{
 		switch ($error_level)
 		{
@@ -121,8 +122,10 @@ final class ErrorHandler extends Errors
 			return true;
 		}
 
-		// Throw it as an ErrorException so that our exception handler deals with it.
-		$this->exception_handler(new ErrorException($error_string, $error_level, $error_level, $file, $line));
+		// Send it as an ErrorException so that our exception handler deals with it.
+		$this->exception_handler(
+			new ErrorException($error_string, $error_level, $error_level, $file, $line)
+		);
 
 		// Don't execute PHP internal error handler.
 		return true;
@@ -138,33 +141,32 @@ final class ErrorHandler extends Errors
 	 *
 	 * @throws Elk_Exception
 	 */
-	public function exception_handler($e)
+	public function exception_handler(Throwable $e)
 	{
 		// Prepare the error details for the log
 		$isException = !$e instanceof ErrorException;
 		$this->error_string = $e->getMessage();
 		$this->error_level = $e->getCode();
 		$this->error_name = $this->set_error_name($this->error_level, $isException);
-		$error_type = stripos($this->error_string, 'undefined') !== false ? 'undefined_vars' : 'general';
-		$err_file = htmlspecialchars($e->getFile());
-		$err_line = $e->getLine();
 
 		// Showing the errors? Format them to look decent
 		$message = $this->_prepareErrorDisplay($e);
 
+		// Let's give integrations a chance to output a bit differently
+		call_integration_hook('integrate_output_error', [$e]);
+
 		// Elk_Exception handles its own logging.
 		if (!$e instanceof Elk_Exception)
 		{
-			$this->log_error($this->error_name . ': ' . $this->error_string, $error_type, $err_file, $err_line);
-		}
-
-		// Let's give integrations a chance to output a bit differently
-		call_integration_hook('integrate_output_error', array($e));
-
-		// Dying on these errors only causes MORE problems (blank pages!)
-		if ($err_file === 'Unknown')
-		{
-			return;
+			$this->log_error(
+				$this->error_name . ': ' . $this->error_string,
+				stripos(
+					$this->error_string,
+					'undefined'
+				) !== false ? 'undefined_vars' : 'general',
+				$e->getFile(),
+				$e->getLine()
+			);
 		}
 
 		// If this is an E_ERROR, E_USER_ERROR, E_WARNING, or E_USER_WARNING.... die.  Violently so.
@@ -193,7 +195,7 @@ final class ErrorHandler extends Errors
 	 *
 	 * @param string $message
 	 */
-	private function _displayDebug($message)
+	private function _displayDebug(string $message): void
 	{
 		global $db_show_debug;
 
@@ -225,7 +227,7 @@ final class ErrorHandler extends Errors
 	 *
 	 * @return string
 	 */
-	private function _prepareErrorDisplay($exception)
+	private function _prepareErrorDisplay(Throwable $exception): string
 	{
 		global $db_show_debug;
 
@@ -262,7 +264,7 @@ final class ErrorHandler extends Errors
 	 *
 	 * @return array
 	 */
-	private function parseTrace($exception)
+	private function parseTrace(Throwable $exception): array
 	{
 		$result = [];
 		$key = 0;
