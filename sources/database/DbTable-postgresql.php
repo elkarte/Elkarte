@@ -114,11 +114,8 @@ class DbTable_PostgreSQL extends DbTable
 	 */
 	public function db_drop_table($table_name, $force = false)
 	{
-		// After stripping away the database name, this is what's left.
-		$real_prefix = preg_match('~^("?)(.+?)\\1\\.(.*?)$~', $this->_db_prefix, $match) === 1 ? $match[3] : $this->_db_prefix;
-
 		// Get some aliases.
-		$full_table_name = str_replace('{db_prefix}', $real_prefix, $table_name);
+		$full_table_name = str_replace('{db_prefix}', $this->_real_prefix(), $table_name);
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// God no - dropping one of these = bad.
