@@ -264,30 +264,61 @@ final class ErrorHandler extends Errors
 	 */
 	private function parseTrace($exception)
 	{
-		$traceline = '#%s %s(%s): %s(%s)';
-		$trace = $exception->getTrace();
-		foreach ($trace as $key => $stackPoint)
-		{
-			// convert arguments to their type
-			$trace[$key]['args'] = array_map('gettype', isset($trace[$key]['args']) ? $trace[$key]['args'] : array());
-		}
-
-		$result = array();
+		$result = [];
 		$key = 0;
-		foreach ($trace as $key => $stackPoint)
+		foreach ($exception->getTrace() as $key => $stackPoint)
 		{
-			$result[] = sprintf(
-				$traceline,
-				$key,
-				!empty($stackPoint['file']) ? $stackPoint['file'] : '',
-				!empty($stackPoint['line']) ? $stackPoint['line'] : '',
-				!empty($stackPoint['function']) ? $stackPoint['function'] : '',
-				implode(', ', $stackPoint['args'])
+			$result[] = strtr(
+				sprintf(
+					'#%d. %s(%s): %s(%s)',
+					$key,
+					$stackPoint['file'] ?? '',
+					$stackPoint['line'] ?? '',
+					(isset($stackPoint['class']) ? $stackPoint['class'] . $stackPoint['type'] : '') . $stackPoint['function'] ?? '[internal function]',
+					implode(', ', $this->getTraceArgs($stackPoint))
+				),
+				['(): ' => '']
 			);
 		}
 		// trace always ends with {main}
 		$result[] = '#' . (++$key) . ' {main}';
 
 		return $result;
+	}
+
+	/**
+	 * Advanced gettype().
+	 *
+	 * - Shows the full class name if argument is an object.
+	 * - Shows the resource type if argument is a resource.
+	 * - Uses gettype() for all other types.
+	 *
+	 * @param array $stackPoint
+	 *
+	 * @return array
+	 */
+	private function getTraceArgs(array $stackPoint): array
+	{
+		$args = [];
+		if (isset($stackPoint['args']))
+		{
+			foreach ($stackPoint['args'] as $arg)
+			{
+				if (is_object($arg))
+				{
+					$args[] = get_class($arg);
+				}
+				elseif (is_resource($arg))
+				{
+					$args[] = get_resource_type($arg);
+				}
+				else
+				{
+					$args[] = gettype($arg);
+				}
+			}
+		}
+
+		return $args;
 	}
 }
