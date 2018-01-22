@@ -40,6 +40,12 @@ abstract class Database_Abstract implements Database
 	protected $_skip_error = false;
 
 	/**
+	 * The tables prefix
+	 * @var string
+	 */
+	protected $_db_prefix = '';
+
+	/**
 	 * MySQL supports unbuffered queries, this remembers if we are running an
 	 * unbuffered or not
 	 * @var boolean
@@ -82,14 +88,14 @@ abstract class Database_Abstract implements Database
 	 */
 	public function replacement__callback($matches)
 	{
-		global $user_info, $db_prefix;
+		global $user_info;
 
 		// Connection gone???  This should *never* happen at this point, yet it does :'(
 		if (!$this->validConnection($this->_db_callback_connection))
 			Errors::instance()->display_db_error('Database_Abstract::replacement__callback');
 
 		if ($matches[1] === 'db_prefix')
-			return $db_prefix;
+			return $this->_db_prefix;
 
 		if ($matches[1] === 'query_see_board')
 			return $user_info['query_see_board'];

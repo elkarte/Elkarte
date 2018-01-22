@@ -73,6 +73,8 @@ class Database_PostgreSQL extends Database_Abstract
 		else
 			$db_port = '';
 
+		$this->_db_prefix = $db_prefix;
+
 		if (!empty($db_options['persist']))
 			$connection = @pg_pconnect('host=' . $db_server . $db_port . ' dbname=' . $db_name . ' user=\'' . $db_user . '\' password=\'' . $db_passwd . '\'');
 		else
@@ -336,9 +338,7 @@ class Database_PostgreSQL extends Database_Abstract
 	 */
 	public function insert_id($table, $field = null, $connection = null)
 	{
-		global $db_prefix;
-
-		$table = str_replace('{db_prefix}', $db_prefix, $table);
+		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
 
 		$connection = $connection === null ? $this->_connection : $connection;
 
@@ -544,8 +544,6 @@ class Database_PostgreSQL extends Database_Abstract
 	 */
 	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
-		global $db_prefix;
-
 		$connection = $connection === null ? $this->_connection : $connection;
 
 		// With nothing to insert, simply return.
@@ -557,7 +555,7 @@ class Database_PostgreSQL extends Database_Abstract
 			$data = array($data);
 
 		// Replace the prefix holder with the actual prefix.
-		$table = str_replace('{db_prefix}', $db_prefix, $table);
+		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
 
 		$priv_trans = false;
 		if ((count($data) > 1 || $method == 'replace') && !$this->_in_transaction && !$disable_trans)
@@ -624,7 +622,7 @@ class Database_PostgreSQL extends Database_Abstract
 				$insertRows[] = $this->quote($insertData, $this->_array_combine($indexed_columns, $dataRow), $connection);
 
 			$inserted_results = 0;
-			$skip_error = $method == 'ignore' || $table === $db_prefix . 'log_errors';
+			$skip_error = $method == 'ignore' || $table === $this->_db_prefix . 'log_errors';
 			$this->_skip_error = $skip_error;
 
 			// Do the insert.
@@ -682,8 +680,6 @@ class Database_PostgreSQL extends Database_Abstract
 	 */
 	public function insert_sql($tableName, $new_table = false)
 	{
-		global $db_prefix;
-
 		static $start = 0, $num_rows, $fields, $limit;
 
 		if ($new_table)
@@ -693,7 +689,7 @@ class Database_PostgreSQL extends Database_Abstract
 		}
 
 		$data = '';
-		$tableName = str_replace('{db_prefix}', $db_prefix, $tableName);
+		$tableName = str_replace('{db_prefix}', $this->_db_prefix, $tableName);
 
 		// This will be handy...
 		$crlf = "\r\n";
@@ -761,9 +757,7 @@ class Database_PostgreSQL extends Database_Abstract
 	 */
 	public function db_table_sql($tableName)
 	{
-		global $db_prefix;
-
-		$tableName = str_replace('{db_prefix}', $db_prefix, $tableName);
+		$tableName = str_replace('{db_prefix}', $this->_db_prefix, $tableName);
 
 		// This will be needed...
 		$crlf = "\r\n";
@@ -892,9 +886,7 @@ class Database_PostgreSQL extends Database_Abstract
 	 */
 	public function db_backup_table($table, $backup_table)
 	{
-		global $db_prefix;
-
-		$table = str_replace('{db_prefix}', $db_prefix, $table);
+		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
 
 		// Do we need to drop it first?
 		$db_table = db_table();

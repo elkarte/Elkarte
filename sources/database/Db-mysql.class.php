@@ -62,6 +62,8 @@ class Database_MySQL extends Database_Abstract
 		else
 			$db_port = 0;
 
+		$this->_db_prefix = $db_prefix;
+
 		// Select the database. Maybe.
 		if (empty($db_options['dont_select_db']))
 			$connection = @mysqli_connect((!empty($db_options['persist']) ? 'p:' : '') . $db_server, $db_user, $db_passwd, $db_name, $db_port);
@@ -717,8 +719,6 @@ class Database_MySQL extends Database_Abstract
 	 */
 	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
-		global $db_prefix;
-
 		$connection = $connection === null ? $this->_connection : $connection;
 
 		// With nothing to insert, simply return.
@@ -730,7 +730,7 @@ class Database_MySQL extends Database_Abstract
 			$data = array($data);
 
 		// Replace the prefix holder with the actual prefix.
-		$table = str_replace('{db_prefix}', $db_prefix, $table);
+		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
 
 		// Create the mold for a single row insert.
 		$insertData = '(';
@@ -757,7 +757,7 @@ class Database_MySQL extends Database_Abstract
 		// Determine the method of insertion.
 		$queryTitle = $method === 'replace' ? 'REPLACE' : ($method == 'ignore' ? 'INSERT IGNORE' : 'INSERT');
 
-		$skip_error = $table === $db_prefix . 'log_errors';
+		$skip_error = $table === $this->_db_prefix . 'log_errors';
 		$this->_skip_error = $skip_error;
 		// Do the insert.
 		$this->query('', '
@@ -806,8 +806,6 @@ class Database_MySQL extends Database_Abstract
 	 */
 	public function insert_sql($tableName, $new_table = false)
 	{
-		global $db_prefix;
-
 		static $start = 0, $num_rows, $fields, $limit;
 
 		if ($new_table)
@@ -816,7 +814,7 @@ class Database_MySQL extends Database_Abstract
 			$start = 0;
 		}
 
-		$tableName = str_replace('{db_prefix}', $db_prefix, $tableName);
+		$tableName = str_replace('{db_prefix}', $this->_db_prefix, $tableName);
 
 		// This will be handy...
 		$crlf = "\r\n";
@@ -883,9 +881,7 @@ class Database_MySQL extends Database_Abstract
 	 */
 	public function db_table_sql($tableName)
 	{
-		global $db_prefix;
-
-		$tableName = str_replace('{db_prefix}', $db_prefix, $tableName);
+		$tableName = str_replace('{db_prefix}', $this->_db_prefix, $tableName);
 
 		// This will be needed...
 		$crlf = "\r\n";
@@ -1027,9 +1023,7 @@ class Database_MySQL extends Database_Abstract
 	 */
 	public function db_backup_table($table_name, $backup_table)
 	{
-		global $db_prefix;
-
-		$table = str_replace('{db_prefix}', $db_prefix, $table_name);
+		$table = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// First, get rid of the old table.
 		$db_table = db_table();
