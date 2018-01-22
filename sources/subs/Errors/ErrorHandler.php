@@ -8,8 +8,8 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * license:        BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -61,7 +61,6 @@ final class ErrorHandler extends Errors
 	 * @param bool $isException
 	 *
 	 * @rerurn string
-	 * @return string
 	 */
 	private function set_error_name($error_level, $isException)
 	{
@@ -69,22 +68,22 @@ final class ErrorHandler extends Errors
 		{
 			case E_USER_ERROR:
 				$type = 'Fatal Error';
-			break;
+				break;
 			case E_USER_WARNING:
 			case E_WARNING:
 				$type = 'Warning';
-			break;
+				break;
 			case E_USER_NOTICE:
 			case E_NOTICE:
 			case @E_STRICT:
 				$type = 'Notice';
-			break;
+				break;
 			case @E_RECOVERABLE_ERROR:
 				$type = 'Catchable';
-			break;
+				break;
 			default:
 				$type = 'Unknown Error';
-			break;
+				break;
 		}
 
 		if ($isException)
@@ -136,6 +135,7 @@ final class ErrorHandler extends Errors
 	 *
 	 * @param \Exception|\Throwable $e The error. Since the code shall work with php 5 and 7
 	 *                                 we cannot type-hint the function parameter.
+	 *
 	 * @throws Elk_Exception
 	 */
 	public function exception_handler($e)
@@ -154,18 +154,24 @@ final class ErrorHandler extends Errors
 
 		// Elk_Exception handles its own logging.
 		if (!$e instanceof Elk_Exception)
+		{
 			$this->log_error($this->error_name . ': ' . $this->error_string, $error_type, $err_file, $err_line);
+		}
 
 		// Let's give integrations a chance to output a bit differently
-		call_integration_hook('integrate_output_error', array($message, $error_type, $this->error_level, $err_file, $err_line));
+		call_integration_hook('integrate_output_error', array($e));
 
 		// Dying on these errors only causes MORE problems (blank pages!)
 		if ($err_file === 'Unknown')
+		{
 			return;
+		}
 
 		// If this is an E_ERROR, E_USER_ERROR, E_WARNING, or E_USER_WARNING.... die.  Violently so.
 		if ($this->error_level & $this->fatalErrors || $this->error_level % 255 === E_WARNING || $isException)
+		{
 			$this->_setup_fatal_ErrorContext($message, $this->error_level);
+		}
 		else
 		{
 			// Display debug information?
@@ -176,7 +182,9 @@ final class ErrorHandler extends Errors
 
 		// We should NEVER get to this point.  Any fatal error MUST quit, or very bad things can happen.
 		if ($this->error_level & $this->fatalErrors)
+		{
 			$this->terminate('Hacking attempt...');
+		}
 	}
 
 	/**
@@ -196,7 +204,9 @@ final class ErrorHandler extends Errors
 			{
 				$temporary = ob_get_contents();
 				if (substr($temporary, -2) === '="')
+				{
 					echo '"';
+				}
 			}
 
 			// Debugging!  This should look like a PHP error message.
@@ -238,7 +248,9 @@ final class ErrorHandler extends Errors
 			);
 		}
 		else
+		{
 			return $this->error_string;
+		}
 	}
 
 	/**
