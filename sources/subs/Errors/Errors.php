@@ -326,9 +326,6 @@ class Errors extends \AbstractModel
 		$context['sub_template'] = 'fatal_error';
 		theme()->getLayers()->isError();
 
-		if (class_exists('Template_Layers'))
-			\Template_Layers::instance()->isError();
-
 		// If this is SSI, what do they want us to do?
 		if (ELK === 'SSI')
 		{
