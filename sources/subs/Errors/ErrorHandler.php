@@ -61,7 +61,7 @@ final class ErrorHandler extends Errors
 	 * @param int $error_level
 	 * @param bool $isException
 	 *
-	 * @rerurn string
+	 * @return string
 	 */
 	private function set_error_name(int $error_level, bool $isException): string
 	{
@@ -98,7 +98,11 @@ final class ErrorHandler extends Errors
 	/**
 	 * Handler for standard error messages, standard PHP error handler replacement.
 	 *
+	 * - Checks first if self::USE_DEFAULT is set to true and returns accordingly. Useful
+	 * if you have specified your own custom error handler.
 	 * - Converts notices, warnings, and other errors into exceptions.
+	 * - Only does so if $error_level matches with error_reporting.
+	 * - Dies if $error_level is a known fatal error.
 	 *
 	 * @param int $error_level
 	 * @param string $error_string
@@ -134,10 +138,9 @@ final class ErrorHandler extends Errors
 	/**
 	 * Handler for exceptions and standard PHP errors
 	 *
-	 * - It dies with fatal_error() if the error_level matches with error_reporting.
+	 * - Only does so if the error_level matches with error_reporting.
 	 *
-	 * @param \Exception|\Throwable $e The error. Since the code shall work with php 5 and 7
-	 *                                 we cannot type-hint the function parameter.
+	 * @param Throwable $e
 	 *
 	 * @throws Elk_Exception
 	 */
@@ -221,11 +224,9 @@ final class ErrorHandler extends Errors
 	 *
 	 * Shows the stack trace if in debug mode and user is admin.
 	 *
-	 * @param \Exception|\Throwable $exception
+	 * @param Throwable $exception
 	 *
-	 * $return string The fully parsed error message
-	 *
-	 * @return string
+	 * @return string The fully parsed error message
 	 */
 	private function _prepareErrorDisplay(Throwable $exception): string
 	{
@@ -258,11 +259,9 @@ final class ErrorHandler extends Errors
 	/**
 	 * Builds the stack trace for display.
 	 *
-	 * @param \Exception|\Throwable $exception
+	 * @param Throwable $exception
 	 *
-	 * $return string The fully parsed stack trace
-	 *
-	 * @return array
+	 * @return array The fully parsed stack trace
 	 */
 	private function parseTrace(Throwable $exception): array
 	{
