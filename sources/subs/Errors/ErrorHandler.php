@@ -76,10 +76,10 @@ final class ErrorHandler extends Errors
 				break;
 			case E_USER_NOTICE:
 			case E_NOTICE:
-			case @E_STRICT:
+			case E_STRICT:
 				$type = 'Notice';
 				break;
-			case @E_RECOVERABLE_ERROR:
+			case E_RECOVERABLE_ERROR:
 				$type = 'Catchable';
 				break;
 			default:
