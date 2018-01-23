@@ -504,20 +504,7 @@ class Templates
 		global $context, $txt, $scripturl, $modSettings, $boardurl;
 		global $maintenance, $mtitle, $mmessage;
 
-		@ob_end_clean();
-		if (!empty($modSettings['enableCompressedOutput']))
-		{
-			ob_start('ob_gzhandler');
-		}
-		else
-		{
-			ob_start();
-		}
-
-		if (isset($_GET['debug']))
-		{
-			header('Content-Type: application/xhtml+xml; charset=UTF-8');
-		}
+		obStart();
 
 		// Don't cache error pages!!
 		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
