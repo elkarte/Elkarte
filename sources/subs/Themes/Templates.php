@@ -28,24 +28,28 @@ class Templates
 {
 	/**
 	 * Template directory's that we will be searching for the sheets
+	 *
 	 * @var array
 	 */
 	public $dirs = [];
 
 	/**
 	 * Template sheets that have not loaded
+	 *
 	 * @var array
 	 */
 	protected $delayed = [];
 
 	/**
 	 * Holds the file that are in the include list
+	 *
 	 * @var array
 	 */
 	protected $templates = [];
 
 	/**
 	 * Tracks if the default index.css has been loaded
+	 *
 	 * @var bool
 	 */
 	protected $default_loaded = false;
@@ -63,23 +67,25 @@ class Templates
 	 * Load a template - if the theme doesn't include it, use the default.
 	 *
 	 * What it does:
-	 * - Loads a template file with the name template_name from the current, default, or base theme.
+	 * - Loads a template file with the name template_name from the current, default, or
+	 * base theme.
 	 * - Detects a wrong default theme directory and tries to work around it.
 	 * - Can be used to only load style sheets by using false as the template name
-	 *   loading of style sheets with this function is deprecated, use loadCSSFile instead
+	 *   loading of style sheets with this function is deprecated, use loadCSSFile
+	 * instead
 	 * - If $this->dirs is empty, it delays the loading of the template
 	 *
 	 * @uses $this->requireTemplate() to actually load the file.
 	 *
-	 * @param string|false    $template_name
+	 * @param string|false $template_name
 	 * @param string[]|string $style_sheets any style sheets to load with the template
-	 * @param bool            $fatal        = true if fatal is true, dies with an error message if the template cannot
-	 *                                      be found
+	 * @param bool $fatal = true if fatal is true, dies with an error message if the
+	 *     template cannot be found
 	 *
 	 * @return boolean|null
 	 * @throws Elk_Exception
 	 */
-	public function load($template_name, $style_sheets = [], $fatal = true)
+	public function load($template_name, $style_sheets = [], $fatal = true): ?bool
 	{
 		// If we don't know yet the default theme directory, let's wait a bit.
 		if (empty($this->dirs))
@@ -90,7 +96,7 @@ class Templates
 				$fatal,
 			];
 
-			return;
+			return null;
 		}
 		// If instead we know the default theme directory and we have delayed something, it's time to process
 		elseif (!empty($this->delayed))
@@ -104,29 +110,30 @@ class Templates
 			$this->delayed = [];
 		}
 
-		$this->requireTemplate($template_name, $style_sheets, $fatal);
+		return $this->requireTemplate($template_name, $style_sheets, $fatal);
 	}
 
 	/**
 	 * <b>Internal function! Do not use it, use theme()->getTemplates()->load instead</b>
 	 *
 	 * What it does:
-	 * - Loads a template file with the name template_name from the current, default, or base theme.
+	 * - Loads a template file with the name template_name from the current, default, or
+	 * base theme.
 	 * - Detects a wrong default theme directory and tries to work around it.
 	 * - Can be used to only load style sheets by using false as the template name
 	 *  loading of style sheets with this function is deprecated, use loadCSSFile instead
 	 *
 	 * @uses $this->templateInclude() to include the file.
 	 *
-	 * @param string|false    $template_name
+	 * @param string|false $template_name
 	 * @param string[]|string $style_sheets any style sheets to load with the template
-	 * @param bool            $fatal        = true if fatal is true, dies with an error message if the template cannot
-	 *                                      be found
+	 * @param bool $fatal = true if fatal is true, dies with an error message if the
+	 *     template cannot be found
 	 *
-	 * @return bool|null
+	 * @return bool
 	 * @throws Elk_Exception theme_template_error
 	 */
-	protected function requireTemplate($template_name, $style_sheets, $fatal)
+	protected function requireTemplate($template_name, $style_sheets, $fatal): bool
 	{
 		global $context, $settings, $txt, $scripturl, $db_show_debug;
 
@@ -144,14 +151,18 @@ class Templates
 		// Any specific template style sheets to load?
 		if (!empty($style_sheets))
 		{
-			trigger_error('Use of theme()->getTemplates()->load to add style sheets to the head is deprecated.', E_USER_DEPRECATED);
+			trigger_error(
+				'Use of theme()->getTemplates()->load to add style sheets to the head is deprecated.',
+				E_USER_DEPRECATED
+			);
 			$sheets = [];
 			foreach ($style_sheets as $sheet)
 			{
 				$sheets[] = stripos('.css', $sheet) !== false ? $sheet : $sheet . '.css';
 				if ($sheet == 'admin' && !empty($context['theme_variant']))
 				{
-					$sheets[] = $context['theme_variant'] . '/admin' . $context['theme_variant'] . '.css';
+					$sheets[] =
+						$context['theme_variant'] . '/admin' . $context['theme_variant'] . '.css';
 				}
 			}
 
@@ -171,7 +182,10 @@ class Templates
 			if (file_exists($template_dir . '/' . $template_name . '.template.php'))
 			{
 				$loaded = true;
-				$this->templateInclude($template_dir . '/' . $template_name . '.template.php', true);
+				$this->templateInclude(
+					$template_dir . '/' . $template_name . '.template.php',
+					true
+				);
 				break;
 			}
 		}
@@ -180,7 +194,10 @@ class Templates
 		{
 			if ($db_show_debug === true)
 			{
-				Debug::instance()->add('templates', $template_name . ' (' . basename($template_dir) . ')');
+				Debug::instance()->add(
+					'templates',
+					$template_name . ' (' . basename($template_dir) . ')'
+				);
 			}
 
 			// If they have specified an initialization function for this template, go ahead and call it now.
@@ -190,7 +207,9 @@ class Templates
 			}
 		}
 		// Hmmm... doesn't exist?!  I don't suppose the directory is wrong, is it?
-		elseif (!file_exists($settings['default_theme_dir']) && file_exists(BOARDDIR . '/themes/default'))
+		elseif (!file_exists($settings['default_theme_dir']) && file_exists(
+				BOARDDIR . '/themes/default'
+			))
 		{
 			$settings['default_theme_dir'] = BOARDDIR . '/themes/default';
 			$this->addDirectory($settings['default_theme_dir']);
@@ -201,7 +220,8 @@ class Templates
 
 				if (!isset($context['security_controls_files']['title']))
 				{
-					$context['security_controls_files']['title'] = $txt['generic_warning'];
+					$context['security_controls_files']['title'] =
+						$txt['generic_warning'];
 				}
 
 				$context['security_controls_files']['errors']['theme_dir'] =
@@ -213,12 +233,20 @@ class Templates
 		// Cause an error otherwise.
 		elseif ($template_name !== 'Errors' && $template_name !== 'index' && $fatal)
 		{
-			throw new Elk_Exception('theme_template_error', 'template', [(string) $template_name]);
+			throw new Elk_Exception(
+				'theme_template_error',
+				'template',
+				[(string) $template_name]
+			);
 		}
 		elseif ($fatal)
 		{
-			throw new Elk_Exception(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load themes/default/%s.template.php!',
-				(string) $template_name), 'template');
+			throw new Elk_Exception(
+				sprintf(
+					isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load themes/default/%s.template.php!',
+					(string) $template_name
+				), 'template'
+			);
 		}
 		else
 		{
@@ -234,14 +262,18 @@ class Templates
 	 * - Tries the current and default themes as well as the user and global languages.
 	 *
 	 * @param string[] $template_name
-	 * @param string   $lang         = ''
-	 * @param bool     $fatal        = true
-	 * @param bool     $force_reload = false
+	 * @param string $lang = ''
+	 * @param bool $fatal = true
+	 * @param bool $force_reload = false
 	 *
 	 * @return string The language actually loaded.
 	 */
-	public function loadLanguageFiles(array $template_name, $lang = '', $fatal = true, $force_reload = false)
-	{
+	public function loadLanguageFiles(
+		array $template_name,
+		$lang = '',
+		$fatal = true,
+		$force_reload = false
+	) {
 		global $user_info, $language, $settings, $modSettings;
 		global $db_show_debug, $txt;
 		static $already_loaded = [];
@@ -276,7 +308,10 @@ class Templates
 			$found = false;
 			foreach ($this->dirs as $template_dir)
 			{
-				if (file_exists($file = $template_dir . '/languages/' . $lang . '/' . $template . '.' . $lang . '.php'))
+				if (file_exists(
+					$file =
+						$template_dir . '/languages/' . $lang . '/' . $template . '.' . $lang . '.php'
+				))
 				{
 					// Include it!
 					$this->templateInclude($file);
@@ -289,7 +324,9 @@ class Templates
 					{
 						Debug::instance()->add(
 							'language_files',
-							$template . '.' . $lang . ' (' . basename($settings['theme_url']) . ')'
+							$template . '.' . $lang . ' (' . basename(
+								$settings['theme_url']
+							) . ')'
 						);
 					}
 
@@ -303,8 +340,13 @@ class Templates
 			// That couldn't be found!  Log the error, but *try* to continue normally.
 			if (!$found && $fatal)
 			{
-				Errors::instance()->log_error(sprintf($txt['theme_language_error'], $template_name . '.' . $lang,
-					'template'));
+				Errors::instance()->log_error(
+					sprintf(
+						$txt['theme_language_error'],
+						$template_name . '.' . $lang,
+						'template'
+					)
+				);
 				break;
 			}
 		}
@@ -317,7 +359,8 @@ class Templates
 	 * This loads the bare minimum data.
 	 *
 	 * - Needed by scheduled tasks,
-	 * - Needed by any other code that needs language files before the forum (the theme) is loaded.
+	 * - Needed by any other code that needs language files before the forum (the theme)
+	 * is loaded.
 	 */
 	public function loadEssentialThemeData()
 	{
@@ -326,7 +369,8 @@ class Templates
 		$db = database();
 
 		// Get all the default theme variables.
-		$db->fetchQueryCallback('
+		$db->fetchQueryCallback(
+			'
 			SELECT id_theme, variable, value
 			FROM {db_prefix}themes
 			WHERE id_member = {int:no_member}
@@ -335,18 +379,20 @@ class Templates
 				'no_member' => 0,
 				'theme_guests' => $modSettings['theme_guests'],
 			],
-			function ($row)
-			{
+			function ($row) {
 				global $settings;
 
 				$settings[$row['variable']] = $row['value'];
 
 				// Is this the default theme?
-				if (in_array($row['variable'], [
-						'theme_dir',
-						'theme_url',
-						'images_url',
-					]) && $row['id_theme'] == '1'
+				if (in_array(
+						$row['variable'],
+						[
+							'theme_dir',
+							'theme_url',
+							'images_url',
+						]
+					) && $row['id_theme'] == '1'
 				)
 				{
 					$settings['default_' . $row['variable']] = $row['value'];
@@ -373,19 +419,29 @@ class Templates
 	 * - Tries the current and default themes as well as the user and global languages.
 	 *
 	 * @param string $template_name
-	 * @param string $lang         = ''
-	 * @param bool   $fatal        = true
-	 * @param bool   $force_reload = false
+	 * @param string $lang = ''
+	 * @param bool $fatal = true
+	 * @param bool $force_reload = false
 	 *
 	 * @return string The language actually loaded.
 	 */
-	public function loadLanguageFile($template_name, $lang = '', $fatal = true, $force_reload = false)
-	{
-		return $this->loadLanguageFiles(explode('+', $template_name), $lang, $fatal, $force_reload);
+	public function loadLanguageFile(
+		$template_name,
+		$lang = '',
+		$fatal = true,
+		$force_reload = false
+	) {
+		return $this->loadLanguageFiles(
+			explode('+', $template_name),
+			$lang,
+			$fatal,
+			$force_reload
+		);
 	}
 
 	/**
-	 * Load the template/language file using eval or require? (with eval we can show an error message!)
+	 * Load the template/language file using eval or require? (with eval we can show an
+	 * error message!)
 	 *
 	 * What it does:
 	 * - Loads the template or language file specified by filename.
@@ -394,7 +450,7 @@ class Templates
 	 * - Attempts to detect the error and line, and show detailed information.
 	 *
 	 * @param string $filename
-	 * @param bool   $once = false, if true only includes the file once (like include_once)
+	 * @param bool $once = false, if true only includes the file once (like include_once)
 	 */
 	public function templateInclude($filename, $once = false)
 	{
@@ -471,7 +527,8 @@ class Templates
 				'It seems something has gone sour on the forum with the template system.  This problem should only be temporary, so please come back later and try again.  If you continue to see this message, please contact the administrator.<br /><br />You can also try <a href="javascript:location.reload();">refreshing this page</a>.';
 			$txt['template_parse_error_details'] =
 				'There was a problem loading the <span style="font-family: monospace;"><strong>%1$s</strong></span> template or language file.  Please check the syntax and try again - remember, single quotes (<span style="font-family: monospace;">\'</span>) often have to be escaped with a slash (<span style="font-family: monospace;">\\</span>).  To see more specific error information from PHP, try <a href="%2$s%1$s" class="extern">accessing the file directly</a>.<br /><br />You may want to try to <a href="javascript:location.reload();">refresh this page</a> or <a href="%3$s">use the default theme</a>.';
-			$txt['template_parse_undefined'] = 'An undefined error occurred during the parsing of this template';
+			$txt['template_parse_undefined'] =
+				'An undefined error occurred during the parsing of this template';
 		}
 
 		// First, let's get the doctype and language information out of the way.
@@ -527,24 +584,43 @@ class Templates
 	</head>
 	<body>
 		<h3>', $txt['template_parse_error'], '</h3>
-		', sprintf($txt['template_parse_error_details'], strtr($filename, [
-				BOARDDIR => '',
-				strtr(BOARDDIR, '\\', '/') => '',
-			]), $boardurl, $scripturl . '?theme=1');
+		', sprintf(
+				$txt['template_parse_error_details'],
+				strtr(
+					$filename,
+					[
+						BOARDDIR => '',
+						strtr(BOARDDIR, '\\', '/') => '',
+					]
+				),
+				$boardurl,
+				$scripturl . '?theme=1'
+			);
 
 			if (!empty($error))
 			{
 				echo '
 		<hr />
 
-		<div style="margin: 0 20px;"><span style="font-family: monospace;">', strtr(strtr($error, [
-					'<strong>' . BOARDDIR => '<strong>...',
-					'<strong>' . strtr(BOARDDIR, '\\', '/') => '<strong>...',
-				]), '\\', '/'), '</span></div>';
+		<div style="margin: 0 20px;"><span style="font-family: monospace;">', strtr(
+					strtr(
+						$error,
+						[
+							'<strong>' . BOARDDIR => '<strong>...',
+							'<strong>' . strtr(BOARDDIR, '\\', '/') => '<strong>...',
+						]
+					),
+					'\\',
+					'/'
+				), '</span></div>';
 			}
 
 			// I know, I know... this is VERY COMPLICATED.  Still, it's good.
-			if (preg_match('~ <strong>(\d+)</strong><br( /)?' . '>$~i', $error, $match) != 0)
+			if (preg_match(
+					'~ <strong>(\d+)</strong><br( /)?' . '>$~i',
+					$error,
+					$match
+				) != 0)
 			{
 				$data = file($filename);
 				$data2 = highlight_php_code(implode('', $data));
@@ -553,11 +629,19 @@ class Templates
 				// Fix the PHP code stuff...
 				if (!isBrowser('gecko'))
 				{
-					$data2 = str_replace("\t", '<span style="white-space: pre;">' . "\t" . '</span>', $data2);
+					$data2 = str_replace(
+						"\t",
+						'<span style="white-space: pre;">' . "\t" . '</span>',
+						$data2
+					);
 				}
 				else
 				{
-					$data2 = str_replace('<pre style="display: inline;">' . "\t" . '</pre>', "\t", $data2);
+					$data2 = str_replace(
+						'<pre style="display: inline;">' . "\t" . '</pre>',
+						"\t",
+						$data2
+					);
 				}
 
 				// Now we get to work around a bug in PHP where it doesn't escape <br />s!
@@ -592,7 +676,11 @@ class Templates
 				{
 					if (strpos($data2[$line2], '<') !== false)
 					{
-						if (preg_match('~(<[^/>]+>)[^<]*$~', $data2[$line2], $color_match) != 0)
+						if (preg_match(
+								'~(<[^/>]+>)[^<]*$~',
+								$data2[$line2],
+								$color_match
+							) != 0)
 						{
 							$last_line = $color_match[1];
 						}
@@ -608,14 +696,24 @@ class Templates
 						echo '</pre><div style="background: #ffb0b5;"><pre style="margin: 0;">';
 					}
 
-					echo '<span style="color: black;">', sprintf('%' . strlen($n) . 's', $line), ':</span> ';
+					echo '<span style="color: black;">', sprintf(
+						'%' . strlen($n) . 's',
+						$line
+					), ':</span> ';
 					if (isset($data2[$line]) && $data2[$line] != '')
 					{
-						echo substr($data2[$line], 0, 2) == '</' ? preg_replace('~^</[^>]+>~', '',
-							$data2[$line]) : $last_line . $data2[$line];
+						echo substr($data2[$line], 0, 2) == '</' ? preg_replace(
+							'~^</[^>]+>~',
+							'',
+							$data2[$line]
+						) : $last_line . $data2[$line];
 					}
 
-					if (isset($data2[$line]) && preg_match('~(<[^/>]+>)[^<]*$~', $data2[$line], $color_match) != 0)
+					if (isset($data2[$line]) && preg_match(
+							'~(<[^/>]+>)[^<]*$~',
+							$data2[$line],
+							$color_match
+						) != 0)
 					{
 						$last_line = $color_match[1];
 						echo '</', substr($last_line, 1, 4), '>';
@@ -654,13 +752,14 @@ class Templates
 	 * Load a sub-template.
 	 *
 	 * What it does:
-	 * - loads the sub template specified by sub_template_name, which must be in an already-loaded template.
-	 * - if ?debug is in the query string, shows administrators a marker after every sub template
-	 * for debugging purposes.
+	 * - loads the sub template specified by sub_template_name, which must be in an
+	 * already-loaded template.
+	 * - if ?debug is in the query string, shows administrators a marker after every sub
+	 * template for debugging purposes.
 	 *
 	 * @todo get rid of reading $_REQUEST directly
 	 *
-	 * @param string      $sub_template_name
+	 * @param string $sub_template_name
 	 * @param bool|string $fatal = false, $fatal = true is for templates that
 	 *                           shouldn't get a 'pretty' error screen 'ignore' to skip
 	 *
@@ -670,31 +769,40 @@ class Templates
 	{
 		global $txt, $db_show_debug;
 
-		if ($sub_template_name === false)
+		if (!empty($sub_template_name))
 		{
-			return;
-		}
+			if ($db_show_debug === true)
+			{
+				Debug::instance()->add('sub_templates', $sub_template_name);
+			}
 
-		if ($db_show_debug === true)
-		{
-			Debug::instance()->add('sub_templates', $sub_template_name);
-		}
+			// Figure out what the template function is named.
+			$theme_function = 'template_' . $sub_template_name;
 
-		// Figure out what the template function is named.
-		$theme_function = 'template_' . $sub_template_name;
-
-		if (function_exists($theme_function))
-		{
-			$theme_function();
-		}
-		elseif ($fatal === false)
-		{
-			throw new Elk_Exception('theme_template_error', 'template', [(string) $sub_template_name]);
-		}
-		elseif ($fatal !== 'ignore')
-		{
-			throw new BadFunctionCallException(Errors::instance()->log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load the %s sub template!',
-				(string) $sub_template_name), 'template'));
+			if (function_exists($theme_function))
+			{
+				$theme_function();
+			}
+			elseif ($fatal === false)
+			{
+				throw new Elk_Exception(
+					'theme_template_error',
+					'template',
+					[(string) $sub_template_name]
+				);
+			}
+			elseif ($fatal !== 'ignore')
+			{
+				throw new BadFunctionCallException(
+					Errors::instance()->log_error(
+						sprintf(
+							isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load the %s sub template!',
+							(string) $sub_template_name
+						),
+						'template'
+					)
+				);
+			}
 		}
 	}
 
