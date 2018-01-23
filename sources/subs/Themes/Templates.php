@@ -21,6 +21,8 @@ use BadFunctionCallException;
 use Debug;
 use Elk_Exception;
 use ElkArte\Errors\Errors;
+use Error;
+use Generator;
 
 
 /**
@@ -479,27 +481,29 @@ class Templates
 		// Load it if we find it
 		$file_found = file_exists($filename);
 
-		if ($once && $file_found)
+		try
 		{
-			require_once($filename);
-		}
-		elseif ($file_found)
+			if ($once && $file_found)
+			{
+				require_once($filename);
+			}
+			elseif ($file_found)
+			{
+				require($filename);
+			}
+		} catch (Error $e)
 		{
-			require($filename);
-		}
-
-		if ($file_found !== true)
-		{
-			$this->templateNotFound($filename);
+			$this->templateNotFound($e);
 		}
 	}
 
 	/**
-	 * Displays an error when a template is not found or has syntax errors preventing its loading
+	 * Displays an error when a template is not found or has syntax errors preventing its
+	 * loading
 	 *
-	 * @param string $filename
+	 * @param Error $e
 	 */
-	protected function templateNotFound($filename)
+	protected function templateNotFound(Error $e)
 	{
 		global $context, $txt, $scripturl, $modSettings, $boardurl;
 		global $maintenance, $mtitle, $mmessage;
@@ -552,23 +556,7 @@ class Templates
 		}
 		else
 		{
-			require_once(SUBSDIR . '/Package.subs.php');
-
-			$error = fetch_web_data($boardurl . strtr($filename, [
-					BOARDDIR => '',
-					strtr(BOARDDIR, '\\', '/') => '',
-				]));
-			$last_error = error_get_last();
-			if (empty($error) && ini_get('track_errors') && !empty($last_error['message']))
-			{
-				$error = $last_error['message'];
-			}
-			elseif (empty($error))
-			{
-				$error = $txt['template_parse_undefined'];
-			}
-
-			$error = strtr($error, ['<b>' => '<strong>', '</b>' => '</strong>']);
+			$error = $e->getMessage();
 
 			echo '
 		<title>', $txt['template_parse_error'], '</title>
@@ -578,7 +566,7 @@ class Templates
 		', sprintf(
 				$txt['template_parse_error_details'],
 				strtr(
-					$filename,
+					$e->getFile(),
 					[
 						BOARDDIR => '',
 						strtr(BOARDDIR, '\\', '/') => '',
@@ -606,130 +594,7 @@ class Templates
 				), '</span></div>';
 			}
 
-			// I know, I know... this is VERY COMPLICATED.  Still, it's good.
-			if (preg_match(
-					'~ <strong>(\d+)</strong><br( /)?' . '>$~i',
-					$error,
-					$match
-				) != 0)
-			{
-				$data = file($filename);
-				$data2 = highlight_php_code(implode('', $data));
-				$data2 = preg_split('~\<br( /)?\>~', $data2);
-
-				// Fix the PHP code stuff...
-				if (!isBrowser('gecko'))
-				{
-					$data2 = str_replace(
-						"\t",
-						'<span style="white-space: pre;">' . "\t" . '</span>',
-						$data2
-					);
-				}
-				else
-				{
-					$data2 = str_replace(
-						'<pre style="display: inline;">' . "\t" . '</pre>',
-						"\t",
-						$data2
-					);
-				}
-
-				// Now we get to work around a bug in PHP where it doesn't escape <br />s!
-				$j = -1;
-				foreach ($data as $line)
-				{
-					$j++;
-
-					if (substr_count($line, '<br />') == 0)
-					{
-						continue;
-					}
-
-					$n = substr_count($line, '<br />');
-					for ($i = 0; $i < $n; $i++)
-					{
-						$data2[$j] .= '&lt;br /&gt;' . $data2[$j + $i + 1];
-						unset($data2[$j + $i + 1]);
-					}
-					$j += $n;
-				}
-				$data2 = array_values($data2);
-				array_unshift($data2, '');
-
-				echo '
-		<div style="margin: 2ex 20px; width: 96%; overflow: auto;"><pre style="margin: 0;">';
-
-				// Figure out what the color coding was before...
-				$line = max($match[1] - 9, 1);
-				$last_line = '';
-				for ($line2 = $line - 1; $line2 > 1; $line2--)
-				{
-					if (strpos($data2[$line2], '<') !== false)
-					{
-						if (preg_match(
-								'~(<[^/>]+>)[^<]*$~',
-								$data2[$line2],
-								$color_match
-							) != 0)
-						{
-							$last_line = $color_match[1];
-						}
-						break;
-					}
-				}
-
-				// Show the relevant lines...
-				for ($n = min($match[1] + 4, count($data2) + 1); $line <= $n; $line++)
-				{
-					if ($line == $match[1])
-					{
-						echo '</pre><div style="background: #ffb0b5;"><pre style="margin: 0;">';
-					}
-
-					echo '<span style="color: black;">', sprintf(
-						'%' . strlen($n) . 's',
-						$line
-					), ':</span> ';
-					if (isset($data2[$line]) && $data2[$line] != '')
-					{
-						echo substr($data2[$line], 0, 2) == '</' ? preg_replace(
-							'~^</[^>]+>~',
-							'',
-							$data2[$line]
-						) : $last_line . $data2[$line];
-					}
-
-					if (isset($data2[$line]) && preg_match(
-							'~(<[^/>]+>)[^<]*$~',
-							$data2[$line],
-							$color_match
-						) != 0)
-					{
-						$last_line = $color_match[1];
-						echo '</', substr($last_line, 1, 4), '>';
-					}
-					elseif ($last_line != '' && strpos($data2[$line], '<') !== false)
-					{
-						$last_line = '';
-					}
-					elseif ($last_line != '' && $data2[$line] != '')
-					{
-						echo '</', substr($last_line, 1, 4), '>';
-					}
-
-					if ($line == $match[1])
-					{
-						echo '</pre></div><pre style="margin: 0;">';
-					}
-					else
-					{
-						echo "\n";
-					}
-				}
-
-				echo '</pre></div>';
-			}
+			$this->printLines($e);
 
 			echo '
 	</body>
@@ -737,6 +602,84 @@ class Templates
 		}
 
 		die;
+	}
+
+	/**
+	 * Highlights PHP syntax.
+	 *
+	 * @param string $file Name of file to highlight.
+	 * @param int $min Minimum line numer to return.
+	 * @param int $max Maximum line numer to return.
+	 *
+	 * @used-by printLines() Prints syntax for template files with errors.
+	 * @uses    highlight_file() Highlights syntax.
+	 *
+	 * @return Generator Highlighted lines ranging from $min to $max.
+	 */
+	public function getHighlightedLinesFromFile(
+		string $file,
+		int $min,
+		int $max
+	): Generator {
+		foreach (preg_split(
+			         '~\<br( /)?\>~',
+			         highlight_file($file, true)
+		         ) as $line => $content)
+		{
+			if ($line >= $min && $line <= $max)
+			{
+				yield  $line + 1 => $content;
+			}
+		}
+	}
+
+	/**
+	 * Print lines from the file with the error.
+	 *
+	 * @uses getHighlightedLinesFromFile() Highlights syntax.
+	 *
+	 * @param Error $e
+	 */
+	private function printLines(Error $e): void
+	{
+		if (allowedTo('admin_forum'))
+		{
+			$data = $this->getHighlightedLinesFromFile(
+				$e->getFile(),
+				max($e->getLine() - 9, 1),
+				min($e->getLine() + 4, count(file($e->getFile())) + 1)
+			);
+
+			echo '
+		<div style="margin: 2ex 20px; width: 96%; overflow: auto;"><pre style="margin: 0;">';
+
+			// Show the relevant lines...
+			foreach ($data as $line => $content)
+			{
+				if ($line == $e->getLine())
+				{
+					echo '<div style="background: #fee;">';
+				}
+
+				echo '<span style="color: black;">', sprintf(
+					'%d',
+					$line
+				), ':</span> ';
+
+				echo $content;
+
+				if ($line == $e->getLine())
+				{
+					echo '</div>';
+				}
+				else
+				{
+					echo "\n";
+				}
+			}
+
+			echo '</pre></div>';
+		}
 	}
 
 	/**
