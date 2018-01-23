@@ -726,7 +726,13 @@ class Templates
 
 			if (function_exists($theme_function))
 			{
-				$theme_function();
+				try
+				{
+					$theme_function();
+				} catch (Error $e)
+				{
+					$this->templateNotFound($e);
+				}
 			}
 			elseif ($fatal === false)
 			{
