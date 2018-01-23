@@ -17,7 +17,11 @@
 
 namespace ElkArte\Themes;
 
+use BadFunctionCallException;
 use Debug;
+use Elk_Exception;
+use ElkArte\Errors\Errors;
+
 
 /**
  * Class Templates
