@@ -530,7 +530,18 @@ class Templates
 		echo '<!DOCTYPE html>
 <html ', !empty($context['right_to_left']) ? 'dir="rtl"' : '', '>
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />';
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<style>
+			body {
+				color: #222;
+				background-color: #FAFAFA;
+				font-family: Verdana, arial, helvetica, serif;
+				font-size: small;
+			}
+			a {
+				color: #49643D;
+			}
+		</style>';
 
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
 		{
