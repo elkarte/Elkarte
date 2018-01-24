@@ -505,8 +505,8 @@ class Templates
 	 */
 	protected function templateNotFound(Error $e)
 	{
-		global $context, $txt, $scripturl, $modSettings, $boardurl;
 		global $maintenance, $mtitle, $mmessage;
+		global $context, $txt, $scripturl, $boardurl;
 
 		obStart();
 
