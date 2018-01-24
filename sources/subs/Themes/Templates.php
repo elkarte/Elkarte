@@ -538,6 +538,7 @@ class Templates
 				font-size: small;
 			}
 			a {color: #49643D;}
+			.curline {background: #ffe; display: inline-block;}
 			.lineno {color:#222; -webkit-user-select: none;-moz-user-select: none; -ms-user-select: none;user-select: none;}
 		</style>';
 
@@ -640,10 +641,18 @@ class Templates
 	{
 		if (allowedTo('admin_forum'))
 		{
-			$data = $this->getHighlightedLinesFromFile(
-				$e->getFile(),
-				max($e->getLine() - 9, 1),
-				min($e->getLine() + 4, count(file($e->getFile())) + 1)
+			$data = iterator_to_array(
+				$this->getHighlightedLinesFromFile(
+					$e->getFile(),
+					max($e->getLine() - 9, 1),
+					min($e->getLine() + 4, count(file($e->getFile())) + 1)
+				)
+			);
+
+			// Mark the offending line.
+			$data[$e->getLine()] = sprintf(
+				'<div class="curline">%s</div>',
+				$data[$e->getLine()]
 			);
 
 			echo '
@@ -652,26 +661,12 @@ class Templates
 			// Show the relevant lines...
 			foreach ($data as $line => $content)
 			{
-				if ($line == $e->getLine())
-				{
-					echo '<div style="background: #fee;">';
-				}
-
 				printf(
 					'<span class="lineno">%d:</span> ',
 					$line
 				);
 
-				echo $content;
-
-				if ($line == $e->getLine())
-				{
-					echo '</div>';
-				}
-				else
-				{
-					echo "\n";
-				}
+				echo $content, "\n";
 			}
 
 			echo '</pre></div>';
