@@ -574,23 +574,20 @@ class Templates
 				$scripturl . '?theme=1'
 			);
 
-			if (!empty($error))
-			{
-				echo '
+			echo '
 		<hr />
 
 		<div style="margin: 0 20px;"><span style="font-family: monospace;">', strtr(
-					strtr(
-						$error,
-						[
-							'<strong>' . BOARDDIR => '<strong>...',
-							'<strong>' . strtr(BOARDDIR, '\\', '/') => '<strong>...',
-						]
-					),
-					'\\',
-					'/'
-				), '</span></div>';
-			}
+				strtr(
+					$error,
+					[
+						'<strong>' . BOARDDIR => '<strong>...',
+						'<strong>' . strtr(BOARDDIR, '\\', '/') => '<strong>...',
+					]
+				),
+				'\\',
+				'/'
+			), '</span></div>';
 
 			$this->printLines($e);
 
