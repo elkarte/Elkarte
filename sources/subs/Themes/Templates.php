@@ -505,7 +505,6 @@ class Templates
 	 */
 	protected function templateNotFound(Error $e)
 	{
-		global $maintenance, $mtitle, $mmessage;
 		global $context, $txt, $scripturl, $boardurl;
 
 		obStart();
@@ -542,18 +541,7 @@ class Templates
 			.lineno {color:#222; -webkit-user-select: none;-moz-user-select: none; -ms-user-select: none;user-select: none;}
 		</style>';
 
-		if (!empty($maintenance) && !allowedTo('admin_forum'))
-		{
-			echo '
-		<title>', $mtitle, '</title>
-	</head>
-	<body>
-		<h3>', $mtitle, '</h3>
-		', $mmessage, '
-	</body>
-</html>';
-		}
-		elseif (!allowedTo('admin_forum'))
+		if (!allowedTo('admin_forum'))
 		{
 			echo '
 		<title>', $txt['template_parse_error'], '</title>
