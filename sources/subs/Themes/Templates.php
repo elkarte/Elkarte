@@ -538,9 +538,8 @@ class Templates
 				font-family: Verdana, arial, helvetica, serif;
 				font-size: small;
 			}
-			a {
-				color: #49643D;
-			}
+			a {color: #49643D;}
+			.lineno {color:#222; -webkit-user-select: none;-moz-user-select: none; -ms-user-select: none;user-select: none;}
 		</style>';
 
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
@@ -631,7 +630,8 @@ class Templates
 		string $file,
 		int $min,
 		int $max
-	): Generator {
+	): Generator
+	{
 		foreach (preg_split(
 			         '~\<br( /)?\>~',
 			         highlight_file($file, true)
@@ -639,7 +639,7 @@ class Templates
 		{
 			if ($line >= $min && $line <= $max)
 			{
-				yield  $line + 1 => $content;
+				yield $line + 1 => $content;
 			}
 		}
 	}
@@ -672,10 +672,10 @@ class Templates
 					echo '<div style="background: #fee;">';
 				}
 
-				echo '<span style="color: black;">', sprintf(
-					'%d',
+				printf(
+					'<span class="lineno">%d:</span> ',
 					$line
-				), ':</span> ';
+				);
 
 				echo $content;
 
