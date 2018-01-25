@@ -142,7 +142,7 @@ class DbTable_MySQL extends DbTable
 
 		// Now add the thing!
 		$this->_alter_table($table_name, '
-			ADD ' . $this->_db_create_query_column($column_info) . (empty($column_info['auto']) ? '' : ' primary key'));
+			ADD ' . $this->_db_create_query_column($column_info, $table_name) . (empty($column_info['auto']) ? '' : ' primary key'));
 
 		return true;
 	}
@@ -199,7 +199,7 @@ class DbTable_MySQL extends DbTable
 			$column_info['unsigned'] = '';
 
 		$this->_alter_table($table_name, '
-			CHANGE COLUMN `' . $old_column . '` ' . $this->_db_create_query_column($column_info));
+			CHANGE COLUMN `' . $old_column . '` ' . $this->_db_create_query_column($column_info, $table_name));
 	}
 
 	/**
