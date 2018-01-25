@@ -688,19 +688,19 @@ class Database_MySQL extends Database_Abstract
 		// Show an error message, if possible.
 		$context['error_title'] = $txt['database_error'];
 		if (allowedTo('admin_forum'))
-			$context['error_message'] = nl2br($query_error) . '<br />' . $txt['file'] . ': ' . $file . '<br />' . $txt['line'] . ': ' . $line;
+			$message = nl2br($query_error) . '<br />' . $txt['file'] . ': ' . $file . '<br />' . $txt['line'] . ': ' . $line;
 		else
-			$context['error_message'] = $txt['try_again'];
+			$message = $txt['try_again'];
 
 		// Add database version that we know of, for the admin to know. (and ask for support)
 		if (allowedTo('admin_forum'))
-			$context['error_message'] .= '<br /><br />' . sprintf($txt['database_error_versions'], $modSettings['elkVersion']);
+			$message .= '<br /><br />' . sprintf($txt['database_error_versions'], $modSettings['elkVersion']);
 
 		if (allowedTo('admin_forum') && $db_show_debug === true)
-			$context['error_message'] .= '<br /><br />' . nl2br($db_string);
+			$message .= '<br /><br />' . nl2br($db_string);
 
 		// It's already been logged... don't log it again.
-		throw new Elk_Exception($context['error_message'], false);
+		throw new Elk_Exception($message, false);
 	}
 
 	/**
