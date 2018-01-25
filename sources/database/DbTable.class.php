@@ -235,9 +235,10 @@ abstract class DbTable
 	 * Drop a table.
 	 *
 	 * @param string $table_name
-	 * @param mixed[] $parameters default array()
+	 * @param bool $force If forcing the drop or not. Useful in case of temporary
+	 *                    tables that may not be detected as existing.
 	 */
-	abstract public function db_drop_table($table_name, $parameters = array());
+	abstract public function db_drop_table($table_name, $force = false);
 
 	/**
 	 * This function adds a column.
