@@ -1191,7 +1191,7 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
 			'current_topic' => $id_topic,
 		)
 	);
-	$attachmentData = array();
+	$attachmentData = array_fill(0, 9, '');
 	if ($db->num_rows($request) != 0)
 	{
 		$fetch = $db->fetch_assoc($request);
