@@ -54,15 +54,13 @@ class Database_MySQL extends Database_Abstract
 
 		// Initialize the instance... if not done already!
 		if (self::$_db === null)
-			self::$_db = new self();
+			self::$_db = new self($db_prefix);
 
 		// Non-standard port
 		if (!empty($db_options['port']))
 			$db_port = (int) $db_options['port'];
 		else
 			$db_port = 0;
-
-		$this->_db_prefix = $db_prefix;
 
 		// Select the database. Maybe.
 		if (empty($db_options['dont_select_db']))

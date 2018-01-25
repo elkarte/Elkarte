@@ -68,9 +68,9 @@ abstract class Database_Abstract implements Database
 	/**
 	 * Private constructor.
 	 */
-	protected function __construct()
+	protected function __construct($db_prefix)
 	{
-		// Objects should be created through initiate().
+		$this->_db_prefix = $db_prefix;
 	}
 
 	/**

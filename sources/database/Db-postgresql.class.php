@@ -66,14 +66,12 @@ class Database_PostgreSQL extends Database_Abstract
 	{
 		// initialize the instance... if not done already!
 		if (self::$_db === null)
-			self::$_db = new self();
+			self::$_db = new self($db_prefix);
 
 		if (!empty($db_options['port']))
 			$db_port = ' port=' . (int) $db_options['port'];
 		else
 			$db_port = '';
-
-		$this->_db_prefix = $db_prefix;
 
 		if (!empty($db_options['persist']))
 			$connection = @pg_pconnect('host=' . $db_server . $db_port . ' dbname=' . $db_name . ' user=\'' . $db_user . '\' password=\'' . $db_passwd . '\'');
