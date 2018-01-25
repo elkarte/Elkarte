@@ -616,6 +616,11 @@ function getTempAttachById($attach_id)
 
 	foreach ($_SESSION['temp_attachments'] as $attachID => $val)
 	{
+		if ($attachID === 'post')
+		{
+			continue;
+		}
+
 		if ($val['public_attachid'] === $attach_id)
 		{
 			$attach_real_id = $attachID;
