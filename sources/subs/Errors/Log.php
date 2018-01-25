@@ -162,13 +162,11 @@ class Log extends \AbstractModel
 			);
 			if (!empty($row['file']) && !empty($row['line']))
 			{
-				// Eval'd files rarely point to the right location and cause havoc for linking, so don't link them.
-				$linkfile = strpos($row['file'], 'eval') === false || strpos($row['file'], '?') === false; // De Morgan's Law.  Want this true unless both are present.
 				$log['errors'][$row['id_error']]['file'] = array(
 					'file' => $row['file'],
 					'line' => $row['line'],
-					'href' => $scripturl . '?action=admin;area=logs;sa=errorlog;activity=file;file=' . base64_encode($row['file']) . ';line=' . $row['line'],
-					'link' => $linkfile ? '<a href="' . $scripturl . '?action=admin;area=logs;sa=errorlog;activity=file;file=' . base64_encode($row['file']) . ';line=' . $row['line'] . '" onclick="return reqWin(this.href, 600, 480, false);">' . $row['file'] . '</a>' : $row['file'],
+					'href' => $scripturl . '?action=admin;area=logs;sa=errorlog;activity=file;err=' . $row['id_error'],
+					'link' => '<a href="' . $scripturl . '?action=admin;area=logs;sa=errorlog;activity=file;err=' . $row['id_error'] . '" onclick="return reqWin(this.href, 600, 480, false);">' . $row['file'] . '</a>',
 					'search' => base64_encode($row['file']),
 				);
 			}

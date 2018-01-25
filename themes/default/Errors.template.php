@@ -224,23 +224,33 @@ function template_show_file()
 	<head>
 		<title>', $context['file_data']['file'], '</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/admin.css', CACHE_STALE, '" />
+		<style>
+			body {
+				color: #222;
+				background-color: #FAFAFA;
+				font-family: Verdana, arial, helvetica, serif;
+				font-size: small;
+			}
+			a {color: #49643D;}
+			.curline {background: #ffe; display: inline-block; font-weight: bold;}
+			.lineno {color:#222;}
+		</style>
 	</head>
 	<body>
-		<table id="errorfile_table" class="table_grid">';
+		<div style="overflow: auto;"><pre style="margin: 0;">';
 
-	foreach ($context['file_data']['contents'] as $index => $line)
+	foreach ($context['file_data']['contents'] as $line => $content)
 	{
-		$line_num = $index + $context['file_data']['min'];
-		echo '
-			<tr', $line_num == $context['file_data']['target'] ? ' class="current"' : '', '>
-				<td class="linenumber">', $line_num, ':</td>
-				<td class="linetext">', $line, '</td>
-			</tr>';
+		printf(
+			'<span class="lineno">%d:</span> ',
+			$line
+		);
+
+		echo $content, "\n";
 	}
 
 	echo '
-		</table>
+		</pre></div>
 	</body>
 </html>';
 }
