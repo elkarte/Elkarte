@@ -48,7 +48,7 @@ interface DbSearch
 	 * @param int $size
 	 * @return void
 	 */
-	public function create_word_search($type, $size);
+	public function create_word_search($type, $size = 10);
 
 	/**
 	 * Sets the class not to return the error in case of failures
