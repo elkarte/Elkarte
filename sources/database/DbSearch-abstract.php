@@ -64,7 +64,7 @@ abstract class DbSearch_Abstract implements DbSearch
 	/**
 	 * {@inheritDoc}
 	 */
-	public abstract function membersTableInfo();
+	abstract public function membersTableInfo();
 
 
 	/**
