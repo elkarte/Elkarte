@@ -60,7 +60,7 @@ interface DbSearch
 	 * Create a temporary table.
 	 * A wrapper around DbTable::db_create_table setting the 'temporary' parameter.
 	 *
-	 * @param string $table_name
+	 * @param string $name
 	 * @param mixed[] $columns in the format specified.
 	 * @param mixed[] $indexes default array(), in the format specified.
 	 */
