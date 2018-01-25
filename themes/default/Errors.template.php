@@ -206,7 +206,6 @@ function template_error_log()
 
 	echo '
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-el_token_var'], '" value="', $context['admin-el_token'], '" />
 				</div>
 			</div>
