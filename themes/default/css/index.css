@@ -523,6 +523,13 @@ em, .em {
 	word-break: break-all;
 }
 
+.nosel {
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
 /* Styles for main headers. */
 .category_header, .forum_category .category_header {
 	padding: 4px 10px 2px 10px;

@@ -107,19 +107,19 @@ function template_error_log()
 					<td>
 						<ul class="error_who">
 							<li>
-								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=id_member;value=', $error['member']['id'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_member'], '" class="icon i-search"></a>
+								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=id_member;value=', $error['member']['id'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_member'], '" class="nosel icon i-search"></a>
 								<span>
 									<strong>', $error['member']['link'], '</strong>
 								</span>
 							</li>
 							<li>
-								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? '' : ';desc', $context['has_filter'] ? $context['filter']['href'] : '', '" title="', $txt['reverse_direction'], '"><i class="icon icon-small i-sort-numeric-', $context['sort_direction'], '" title="', $txt['reverse_direction'], '"></i></a>
+								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? '' : ';desc', $context['has_filter'] ? $context['filter']['href'] : '', '" title="', $txt['reverse_direction'], '"><i class="nosel icon icon-small i-sort-numeric-', $context['sort_direction'], '" title="', $txt['reverse_direction'], '"></i></a>
 								<span>
 									', $error['time'], '
 								</span>
 							</li>
 							<li>
-								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=ip;value=', $error['member']['ip'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_ip'], '" class="icon i-search"></a>
+								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=ip;value=', $error['member']['ip'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_ip'], '" class="nosel icon i-search"></a>
 								<span>
 									<strong><a href="', $scripturl, '?action=trackip;searchip=', $error['member']['ip'], '">', $error['member']['ip'], '</a></strong>
 								</span>
@@ -131,20 +131,20 @@ function template_error_log()
 		if ($error['member']['session'] != '')
 			echo '
 							<li>
-								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=session;value=', $error['member']['session'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_session'], '" class="icon i-search"></a>
+								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=session;value=', $error['member']['session'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_session'], '" class="nosel icon i-search"></a>
 								<span>
 									', $error['member']['session'], '
 								</span>
 							</li>';
 		echo '
 							<li>
-								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=error_type;value=', $error['error_type']['type'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_type'], '" class="icon i-search"></a>
+								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=error_type;value=', $error['error_type']['type'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_type'], '" class="nosel icon i-search"></a>
 								<span>
 									', $txt['error_type'], ': ', $error['error_type']['name'], '
 								</span>
 							</li>
 							<li>
-								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=message;value=', $error['message']['href'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_message'], '" class="icon i-search"></a>
+								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=message;value=', $error['message']['href'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_message'], '" class="nosel icon i-search"></a>
 								<span>', $error['message']['html'], '</span>
 							</li>';
 
@@ -153,7 +153,7 @@ function template_error_log()
 
 						<ul class="error_where">
 							<li>
-								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=url;value=', $error['url']['href'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_url'], '" class="icon i-search"></a>
+								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=url;value=', $error['url']['href'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_url'], '" class="nosel icon i-search"></a>
 								<span>
 									<a href="', $error['url']['html'], '">', $error['url']['html'], '</a>
 								</span>
@@ -164,7 +164,7 @@ function template_error_log()
 			echo '
 						<ul class="error_where">
 							<li>
-								<a class="scope" href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=file;value=', $error['file']['search'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_file'], '" class="icon i-search"></a>
+								<a class="scope" href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=file;value=', $error['file']['search'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_file'], '" class="nosel icon i-search"></a>
 								<span>
 									', $txt['file'], ': ', $error['file']['link'], '<br />
 									', $txt['line'], ': ', $error['file']['line'], '
