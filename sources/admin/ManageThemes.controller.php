@@ -1355,7 +1355,7 @@ class ManageThemes_Controller extends Action_Controller
 		$theme_values = loadThemeOptionsInto(1, 0, array(), array('theme_templates', 'theme_layers'));
 
 		// Lets add a theme_info.xml to this theme.
-		write_theme_info($this->_req->query->copy, $modSettings['elkVersion'], $this->theme_dir, $theme_values);
+		write_theme_info($this->_req->post->copy, $modSettings['elkVersion'], $this->theme_dir, $theme_values);
 	}
 
 	/**
