@@ -845,11 +845,7 @@ class Theme extends BaseTheme
 
 		$context['favicon'] = $scripturl . '/mobile.png';
 
-		// Load a custom CSS file?
-		if (file_exists($settings['theme_dir'] . '/css/custom.css'))
-		{
-			loadCSSFile('custom.css');
-		}
+		$this->loadSupportCSS();
 
 		// Since it's nice to have avatars all of the same size, and in some cases the size detection may fail,
 		// let's add the css in any case
@@ -886,7 +882,7 @@ class Theme extends BaseTheme
 		// Load a base theme custom CSS file?
 		if (file_exists($settings['theme_dir'] . '/css/custom.css'))
 		{
-			loadCSSFile('custom.css', array('fallback' => false));
+			loadCSSFile('custom.css');
 		}
 	}
 
