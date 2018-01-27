@@ -96,7 +96,7 @@ function template_error_log()
 	if (count($context['errors']) == 0)
 		echo '
 				<tr>
-					<td class="centertext" colspan="2">', $txt['errlog_no_entries'], '</td>
+					<td class="centertext" colspan="3">', $txt['errlog_no_entries'], '</td>
 				</tr>';
 
 	// We have some errors, show them...
