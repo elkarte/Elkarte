@@ -1706,10 +1706,6 @@ a.help .icon {
 	border-bottom: none;
 }
 
-#error_log, .error_where {
-    border-top-color: #CCCCCC !important;
-}
-
 /* -------------------------------------------------------
  *	$MEDIA
  * -------------------------------------------------------
