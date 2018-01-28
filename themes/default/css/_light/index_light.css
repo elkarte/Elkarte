@@ -1437,6 +1437,11 @@ div.bbc_footnotes .meaction {
 	background: #F0F0F0;
 }
 
+.statusbar .insertoverlay {
+	background-color: #FAFAFA;
+	border-color: #A9CCD1;
+}
+
 .progressBar {
 	border-color: #DDDDDD;
 }

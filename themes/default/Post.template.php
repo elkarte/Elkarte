@@ -448,7 +448,8 @@ function template_add_new_attachments()
 		var IlaDropEvents = {
 			UploadSuccess: function($button, data) {
 				var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
-					trigger: $(\'<div class="share icon i-share" />\')
+					trigger: $(\'<div class="share icon i-share" />\'),
+					lang: {thumb: ' . JavaScriptEscape($txt['ila_option1']) . ', full: ' . JavaScriptEscape($txt['ila_option4']) . ', cust: ' . JavaScriptEscape($txt['ila_option5']) . '}
 				});
 				inlineAttach.addInterface($button, data.attachid);
 			},

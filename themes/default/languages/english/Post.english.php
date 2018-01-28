@@ -185,6 +185,8 @@ $txt['ila_title'] = 'End-of-post expandable thumbnail ';
 $txt['ila_option1'] = 'Thumbnail';
 $txt['ila_option2'] = 'Text link';
 $txt['ila_option3'] = 'Short text link';
+$txt['ila_option4'] = 'Full size';
+$txt['ila_option5'] = 'Custom size';
 $txt['ila_confirm_removal'] = 'Are you sure you want to remove permanently this attachment?';
 /*
 $txt['ila_thereare'] = 'There are only';
