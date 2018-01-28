@@ -1560,21 +1560,18 @@ var ElkNotifier = new ElkNotifications();
 			inlineSelector: '.inline_insert',
 			data: 'attachid',
 			addAfter: 'label',
-			lang: {
-				full: 'full',
-				thumb: 'thumb',
-				cust: 'cust'
-			}
+			template: ''
 		}, opt);
 
 		var listAttachs = [],
 			init = function (opt) {
 			},
 			addInterface = function ($before, attachId) {
-				var $trigger, $container = $('<div class="container" />');
+				var $trigger, $container = $('<div class="container" />'), $over;
 
-				if (typeof opt.trigger !== 'undefined')
+				if (typeof opt.trigger !== 'undefined') {
 					$trigger = opt.trigger.clone();
+				}
 				else {
 					$trigger = $('<a />');
 
@@ -1586,70 +1583,90 @@ var ElkNotifier = new ElkNotifications();
 				$trigger.on('click', function (e) {
 					e.preventDefault();
 
-					var $over = $('<div class="insertoverlay" />').hide();
-					var $opt_thumb = $('<label />').append($('<input type="radio" />')
-								.prop('checked', true)
-								.attr('name', 'imgmode')
-								.on('change', function(e) {
-									$cust_cont.slideUp();
-								})).append(opt.lang.thumb),
-					    $opt_full = $('<label />').append($('<input type="radio" />')
-								.attr('name', 'imgmode')
-								.on('change', function(e) {
-									$cust_cont.slideUp();
-								})).append(opt.lang.full),
-					    $opt_cust = $('<label />').append($('<input type="radio" />').attr('name', 'imgmode')
-								.attr('name', 'imgmode')
-								.on('change', function(e) {
-									$cust_cont.slideDown();
-								})).append(opt.lang.cust);
-					var $cust_cont = $('<div class="container" />');
-					var $slider = $('<input type="range" class="range" />')
-						.attr('min', '100')
-						.attr('max', '500');
-					var $visual = $('<input type="text" class="text" />')
-						.attr('disabled', 'disabled')
-						.val('100px');
-					var $confirm = $('<input type="button" class="button" />').attr('value', 'insert');
-					$slider.on('input', function () {
-						var val = $(this).val()
-						$visual.val(val + 'px');
+					if ($over != undefined) {
+						$(document).trigger('click.ila_insert');
+						return;
+					}
+
+					$over = $(opt.template).hide();
+					var firstLi = false,
+					    $tabs = $over.find("ul[data-group='tabs'] li");
+					$tabs.each(function(k, v) {
+						$(this).on('click', function(e) {
+							e.preventDefault();
+							e.stopPropagation();
+
+							$tabs.each(function(k, v) {
+								$(this).removeClass('active');
+							});
+							var toShow = $(this).data('tab');
+							$(this).addClass('active');
+							$over.find('.container').each(function(k, v) {
+								if ($(this).data('visual') == toShow) {
+									$(this).show();
+								}
+								else {
+									$(this).hide();
+								}
+							});
+						});
+						if (firstLi == false) {
+							$(this).click();
+							firstLi = true;
+						}
 					});
-					$confirm.on('click', function() {
+					$over.find('*').on('click', function(e) {
+						e.stopPropagation();
+					});
+					$over.find("input[data-size='thumb']").on('change', function(e) {
+						$over.find('.customsize').slideUp();
+					})
+					.prop('checked', true)
+					.change();
+					$over.find("input[data-size='full']").on('change', function(e) {
+						$over.find('.customsize').slideUp();
+					});
+					$over.find("input[data-size='cust']").on('change', function(e) {
+						$over.find('.customsize').slideDown();
+					});
+					$over.find(".range").on('input', function () {
+						var val = $(this).val()
+						$over.find(".visualizesize").val(val + 'px');
+					}).trigger('input');
+					$over.find("input[data-align='none']").prop('checked', true);
+
+					$over.find('.button').on('click', function() {
 						var ila_text = '[attach';
-						if ($opt_thumb.find('input').is(':checked')) {
+						if ($over.find("input[data-size='thumb']").is(':checked')) {
 							ila_text = ila_text + ' type=thumb';
 						}
-						if ($opt_cust.find('input').is(':checked')) {
+						if ($over.find("input[data-size='cust']").is(':checked')) {
 							var w = $slider.val();
 							if (w > 10) {
 								ila_text = ila_text + ' width=' + w;
 							}
 						}
+
+						$over.find(".container[data-visual='align'] input").each(function (k, v) {
+							if ($(this).is(':checked')) {
+								if ($(this).data('align') != 'none') {
+									ila_text = ila_text + ' align=' + $(this).data('align');
+									return;
+								}
+							}
+						});
+
 						ila_text = ila_text + ']' + attachId + '[/attach]';
 						$editor_data[editor].insertText(ila_text, false, true);
-						$over.fadeOut(function() {
-							$over.remove();
-						});
-						$(document).off('click.ila_insert');
+						$(document).trigger('click.ila_insert');
 					});
-					$over.on('click', function (e) {
-						e.stopPropagation();
-					});
-					$cust_cont.append($slider);
-					$cust_cont.append($visual);
-					$cust_cont.hide();
 
-					$over.append($opt_thumb);
-					$over.append($opt_full);
-					$over.append($opt_cust);
-					$over.append($cust_cont);
-					$over.append($confirm);
 					$container.append($over);
 					$over.fadeIn(function() {
 						$(document).on('click.ila_insert', function() {
 							$over.fadeOut(function() {
 								$over.remove();
+								$over = undefined;
 							});
 							$(document).off('click.ila_insert');
 						});

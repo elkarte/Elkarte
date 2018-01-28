@@ -3633,12 +3633,22 @@ ul.post_options li {
 	border-radius: 4px;
 	z-index: 1000;
 }
+.insertoverlay .tabs li {
+	display: inline-block;
+	width: 50%;
+	text-align: center;
+	border-bottom: 1px solid green;
+	cursor: pointer;
+}
+.insertoverlay .tabs li.active {
+	background-color: #E4E4E4;
+}
 
 .statusbar .insertoverlay label {
 	display: block;
 }
 
-.statusbar .insertoverlay .text,
+.statusbar .insertoverlay .visualizesize,
 .statusbar .insertoverlay .range {
 	max-width: 45%;
 	margin-top: 0.5em;
@@ -3652,15 +3662,16 @@ ul.post_options li {
 	display: block;
 }
 
-.statusbar .insertoverlay .text {
+.statusbar .insertoverlay .visualizesize {
 	float: right;
 }
 
 .statusbar .insertoverlay .button {
-	float: right;
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
-	margin-left: 0.25em;
+	position: absolute;
+	left: 2.5em;
+	top: -2em;
+	margin: 0;
+	font-weight: bold;
 }
 
 .info {

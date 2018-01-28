@@ -167,30 +167,16 @@ class Ila_Integrate
 				\BBC\Codes::ATTR_PARAM => array(
 					'type' => array(
 						\BBC\Codes::PARAM_ATTR_OPTIONAL => true,
-						\BBC\Codes::PARAM_ATTR_VALUE => '$1',
+						\BBC\Codes::PARAM_ATTR_VALUE => ';$1',
 						\BBC\Codes::PARAM_ATTR_MATCH => '(thumb|image)',
 					),
-				),
-				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1;{type}" alt="" class="bbc_img " /></a>',
-				\BBC\Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_options(),
-				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
-				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
-				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
-				\BBC\Codes::ATTR_AUTOLINK => false,
-				\BBC\Codes::ATTR_LENGTH => 6,
-			),
-			// Just an align ?
-			array(
-				\BBC\Codes::ATTR_TAG => 'attach',
-				\BBC\Codes::ATTR_TYPE => \BBC\Codes::TYPE_UNPARSED_CONTENT,
-				\BBC\Codes::ATTR_PARAM => array(
 					'align' => array(
 						\BBC\Codes::PARAM_ATTR_OPTIONAL => true,
 						\BBC\Codes::PARAM_ATTR_VALUE => 'float$1',
 						\BBC\Codes::PARAM_ATTR_MATCH => '(right|left|center)',
 					),
 				),
-				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1;thumb" alt="" class="bbc_img {align}" /></a>',
+				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1{type}" alt="asd" class="bbc_img {align}" /></a>',
 				\BBC\Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_options(),
 				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
