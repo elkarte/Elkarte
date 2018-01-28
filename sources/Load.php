@@ -1590,7 +1590,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		loadCSSFile($context['theme_variant'] . '/rtl' . $context['theme_variant'] . '.css');
 
 	// This allows us to change the way things look for the admin.
-	$context['admin_features'] = isset($modSettings['admin_features']) ? explode(',', $modSettings['admin_features']) : array('cd,cp,k,w,rg,ml,pm');
+	$context['admin_features'] = explode(',', isset($modSettings['admin_features']) ? $modSettings['admin_features'] : 'cd,cp,k,w,rg,ml,pm');
 
 	if (!empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']))
 		$context['newsfeed_urls'] = array(
