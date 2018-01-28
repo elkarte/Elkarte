@@ -77,6 +77,8 @@ class Database_MySQL extends Database_Abstract
 				Errors::instance()->display_db_error();
 		}
 
+		self::$_db->_connection = $connection;
+
 		// This makes it possible to automatically change the sql_mode and autocommit if needed.
 		if (isset($mysql_set_mode) && $mysql_set_mode === true)
 			self::$_db->query('', 'SET sql_mode = \'\', AUTOCOMMIT = 1',
@@ -84,19 +86,10 @@ class Database_MySQL extends Database_Abstract
 			false
 		);
 
-		self::$_db->_connection = $connection;
-
 		// Few databases still have not set UTF-8 as their default input charset
 		self::$_db->query('', '
 			SET NAMES UTF8',
 			array(
-			)
-		);
-		// Sorry to change your config, but this may be a pain for the time being...
-		self::$_db->query('', '
-			SET sql_mode = {string:empty}',
-			array(
-				'empty' => ''
 			)
 		);
 
