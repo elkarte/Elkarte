@@ -3627,18 +3627,25 @@ ul.post_options li {
 
 .statusbar .insertoverlay {
 	position: absolute;
-	width: 10em;
+	min-width: 10em;
 	padding: 0.2em;
 	border: 1px solid;
 	border-radius: 4px;
 	z-index: 1000;
 }
+.insertoverlay .tabs {
+	display: block;
+	white-space: nowrap;
+	display: flex;
+	justify-content: space-between;
+}
 .insertoverlay .tabs li {
 	display: inline-block;
-	width: 50%;
+	padding: 0 0.5em;
 	text-align: center;
-	border-bottom: 1px solid green;
+	border-bottom: 1px solid;
 	cursor: pointer;
+	flex-grow: 1;
 }
 .insertoverlay .tabs li.active {
 	background-color: #E4E4E4;

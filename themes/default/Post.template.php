@@ -452,25 +452,23 @@ function template_add_new_attachments()
 					template: ' . JavaScriptEscape('<div class="insertoverlay">
 						<input type="button" class="button" value="insert">
 						<ul data-group="tabs" class="tabs">
-							<li data-tab="size">size</li><li data-tab="align">align</li>
+							<li data-tab="size">' . $txt['ila_opt_size'] . '</li><li data-tab="align">' . $txt['ila_opt_align'] . '</li>
 						</ul>
 						<div class="container" data-visual="size">
-							<label><input data-size="thumb" type="radio" name="imgmode">Thumbnail</label>
-							<label><input data-size="full" type="radio" name="imgmode">Full size</label>
-							<label><input data-size="cust" type="radio" name="imgmode">Custom size</label>
+							<label><input data-size="thumb" type="radio" name="imgmode">' . $txt['ila_opt_size_thumb'] . '</label>
+							<label><input data-size="full" type="radio" name="imgmode">' . $txt['ila_opt_size_full'] . '</label>
+							<label><input data-size="cust" type="radio" name="imgmode">' . $txt['ila_opt_size_cust'] . '</label>
 							<div class="customsize">
-								<input type="range" class="range" min="100" max="500">
-								<input type="text" class="visualizesize" disabled="disabled">
+								<input type="range" class="range" min="100" max="500"><input type="text" class="visualizesize" disabled="disabled">
 							</div>
 						</div>
 						<div class="container" data-visual="align">
-							<label><input data-align="none" type="radio" name="align">none</label>
-							<label><input data-align="left" type="radio" name="align">left</label>
-							<label><input data-align="center" type="radio" name="align">center</label>
-							<label><input data-align="right" type="radio" name="align">right</label>
+							<label><input data-align="none" type="radio" name="align">' . $txt['ila_opt_align_none'] . '</label>
+							<label><input data-align="left" type="radio" name="align">' . $txt['ila_opt_align_left'] . '</label>
+							<label><input data-align="center" type="radio" name="align">' . $txt['ila_opt_align_center'] . '</label>
+							<label><input data-align="right" type="radio" name="align">' . $txt['ila_opt_align_right'] . '</label>
 						</div>
 					</div>') . '
-					// lang: {thumb: ' . JavaScriptEscape($txt['ila_option1']) . ', full: ' . JavaScriptEscape($txt['ila_option4']) . ', cust: ' . JavaScriptEscape($txt['ila_option5']) . '}
 				});
 				inlineAttach.addInterface($button, data.attachid);
 			},

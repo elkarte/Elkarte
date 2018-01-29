@@ -1281,6 +1281,10 @@ a.active {
 	border-color: #A9CCD1;
 }
 
+.insertoverlay .tabs li {
+	border-color: #008000;
+}
+
 .progressBar {
 	border-color: #DDDDDD;
 }

@@ -1564,26 +1564,30 @@ var ElkNotifier = new ElkNotifications();
 		}, opt);
 
 		var listAttachs = [],
-			init = function (opt) {
-			},
+			init = function (opt) {},
 			addInterface = function ($before, attachId) {
 				var $trigger, $container = $('<div class="container" />'), $over;
 
-				if (typeof opt.trigger !== 'undefined') {
+				if (typeof opt.trigger !== 'undefined')
+				{
 					$trigger = opt.trigger.clone();
 				}
-				else {
+				else
+				{
 					$trigger = $('<a />');
 
 					if (typeof opt.triggerClass !== 'undefined')
+					{
 						$trigger.addClass(opt.triggerClass);
+					}
 				}
 
 				$container.append($trigger);
 				$trigger.on('click', function (e) {
 					e.preventDefault();
 
-					if ($over != undefined) {
+					if ($over != undefined)
+					{
 						$(document).trigger('click.ila_insert');
 						return;
 					}
@@ -1591,6 +1595,9 @@ var ElkNotifier = new ElkNotifications();
 					$over = $(opt.template).hide();
 					var firstLi = false,
 					    $tabs = $over.find("ul[data-group='tabs'] li");
+					/*
+					 * Behaviours (onSomething)
+					 */
 					$tabs.each(function(k, v) {
 						$(this).on('click', function(e) {
 							e.preventDefault();
@@ -1602,27 +1609,25 @@ var ElkNotifier = new ElkNotifications();
 							var toShow = $(this).data('tab');
 							$(this).addClass('active');
 							$over.find('.container').each(function(k, v) {
-								if ($(this).data('visual') == toShow) {
+								if ($(this).data('visual') == toShow)
+								{
 									$(this).show();
 								}
-								else {
+								else
+								{
 									$(this).hide();
 								}
 							});
 						});
-						if (firstLi == false) {
+						if (firstLi == false)
+						{
 							$(this).click();
 							firstLi = true;
 						}
 					});
-					$over.find('*').on('click', function(e) {
-						e.stopPropagation();
-					});
 					$over.find("input[data-size='thumb']").on('change', function(e) {
 						$over.find('.customsize').slideUp();
-					})
-					.prop('checked', true)
-					.change();
+					});
 					$over.find("input[data-size='full']").on('change', function(e) {
 						$over.find('.customsize').slideUp();
 					});
@@ -1633,23 +1638,28 @@ var ElkNotifier = new ElkNotifications();
 						var val = $(this).val()
 						$over.find(".visualizesize").val(val + 'px');
 					}).trigger('input');
-					$over.find("input[data-align='none']").prop('checked', true);
 
 					$over.find('.button').on('click', function() {
 						var ila_text = '[attach';
-						if ($over.find("input[data-size='thumb']").is(':checked')) {
+						if ($over.find("input[data-size='thumb']").is(':checked'))
+						{
 							ila_text = ila_text + ' type=thumb';
 						}
-						if ($over.find("input[data-size='cust']").is(':checked')) {
+						if ($over.find("input[data-size='cust']").is(':checked'))
+						{
 							var w = $slider.val();
-							if (w > 10) {
+							// Doesn't really matter that much, but just to ensure it's not 1
+							if (w > 10)
+							{
 								ila_text = ila_text + ' width=' + w;
 							}
 						}
 
 						$over.find(".container[data-visual='align'] input").each(function (k, v) {
-							if ($(this).is(':checked')) {
-								if ($(this).data('align') != 'none') {
+							if ($(this).is(':checked'))
+							{
+								if ($(this).data('align') != 'none')
+								{
 									ila_text = ila_text + ' align=' + $(this).data('align');
 									return;
 								}
@@ -1659,6 +1669,18 @@ var ElkNotifier = new ElkNotifications();
 						ila_text = ila_text + ']' + attachId + '[/attach]';
 						$editor_data[editor].insertText(ila_text, false, true);
 						$(document).trigger('click.ila_insert');
+					});
+					// Prevents removing the element to disappear when clicking on
+					// anything because of the click.ila_insert event
+					$over.find('*').on('click', function(e) {
+						e.stopPropagation();
+					});
+
+					/*
+					 * Initialization
+					 */
+					$over.find('.container label:first-child input').each(function(k, v) {
+						$(this).change().prop('checked', true);
 					});
 
 					$container.append($over);
