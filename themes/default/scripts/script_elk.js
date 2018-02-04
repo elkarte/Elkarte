@@ -1647,7 +1647,7 @@ var ElkNotifier = new ElkNotifications();
 						}
 						if ($over.find("input[data-size='cust']").is(':checked'))
 						{
-							var w = $slider.val();
+							var w = $over.find('.range').val();
 							// Doesn't really matter that much, but just to ensure it's not 1
 							if (w > 10)
 							{

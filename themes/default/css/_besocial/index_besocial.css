@@ -1285,6 +1285,11 @@ a.active {
 	border-color: #008000;
 }
 
+.statusbar .insertoverlay .button {
+	background: #008000;
+	color: #FAFAFA;
+}
+
 .progressBar {
 	border-color: #DDDDDD;
 }
