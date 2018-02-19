@@ -1617,7 +1617,7 @@ class ModerationCenter_Controller extends Action_Controller
 	public function list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards)
 	{
 		// Watched users posts
-		return watchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards);
+		return watchedUserPosts($start, $items_per_page, $approve_query, $delete_boards);
 	}
 
 	/**

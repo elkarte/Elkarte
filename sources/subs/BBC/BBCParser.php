@@ -855,7 +855,6 @@ class BBCParser
 
 		if (isset($tag[Codes::ATTR_VALIDATE]))
 		{
-			//$tag[Codes::ATTR_VALIDATE]($tag, $data, $this->bbc->getDisabled());
 			$this->filterData($tag, $data);
 		}
 
@@ -921,7 +920,6 @@ class BBCParser
 		// Validation for my parking, please!
 		if (isset($tag[Codes::ATTR_VALIDATE]))
 		{
-			//$tag[Codes::ATTR_VALIDATE]($tag, $data, $this->bbc->getDisabled());
 			$this->filterData($tag, $data);
 		}
 
@@ -977,7 +975,6 @@ class BBCParser
 
 		if (isset($tag[Codes::ATTR_VALIDATE]))
 		{
-			//$tag[Codes::ATTR_VALIDATE]($tag, $data, $this->bbc->getDisabled());
 			$this->filterData($tag, $data);
 		}
 
@@ -1013,7 +1010,6 @@ class BBCParser
 
 		if (isset($tag[Codes::ATTR_VALIDATE]))
 		{
-			//$tag[Codes::ATTR_VALIDATE]($tag, $data, $this->bbc->getDisabled());
 			$this->filterData($tag, $data);
 		}
 
@@ -1078,7 +1074,6 @@ class BBCParser
 		// Validation for my parking, please!
 		if (isset($tag[Codes::ATTR_VALIDATE]))
 		{
-			//$tag[Codes::ATTR_VALIDATE]($tag, $data, $this->bbc->getDisabled());
 			$this->filterData($tag, $data);
 		}
 
@@ -1690,13 +1685,13 @@ class BBCParser
 	}
 
 	/**
-	 * This is just so I can profile it.
+	 * This calls Codes::ATTR_VALIDATE.
 	 *
 	 * @param array $tag
 	 * @param $data
 	 */
 	protected function filterData(array $tag, &$data)
 	{
-		$tag[Codes::ATTR_VALIDATE]($tag, $data, $this->bbc->getDisabled());
+		$tag[Codes::ATTR_VALIDATE]($data, $this->bbc->getDisabled());
 	}
 }

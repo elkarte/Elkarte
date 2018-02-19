@@ -23,7 +23,7 @@ class Suggest_Controller extends Action_Controller
 	/**
 	 * {@inheritdoc }
 	 */
-	public function trackStats($action = '')
+	public function trackStats()
 	{
 		return false;
 	}

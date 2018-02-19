@@ -22,6 +22,7 @@
  * @param string $db_prefix
  * @param mixed[] $db_options
  * @param string $db_type
+ *
  * @return resource
  */
 function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array(), $db_type = 'mysql')
@@ -31,14 +32,6 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
 	require_once(SOURCEDIR . '/database/Db-' . $db_type . '.class.php');
 
 	return call_user_func_array(array('Database_' . DB_TYPE, 'initiate'), array($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options));
-}
-
-/**
- * Extend the database functionality.
- */
-function db_extend()
-{
-	// @todo this can be removed.
 }
 
 /**

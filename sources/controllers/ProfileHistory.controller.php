@@ -722,12 +722,13 @@ class ProfileHistory_Controller extends Action_Controller
 	 * @param string $sort A string indicating how to sort the results
 	 * @param string $where
 	 * @param mixed[] $where_vars array of values used in the where statement
+	 *
 	 * @return mixed[] an array of messages
 	 */
 	public function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = array())
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
-		$logins = getLogins($start, $items_per_page, $sort, $where, $where_vars);
+		$logins = getLogins($where, $where_vars);
 
 		return $logins;
 	}

@@ -317,7 +317,7 @@ class Ila_Integrate
 	{
 		global $user_info, $scripturl, $context;
 
-		return function (&$tag, &$data, $disabled) use ($user_info, $scripturl, &$context)
+		return function (&$data, $disabled) use ($user_info, $scripturl, &$context)
 		{
 			if (isset($disabled['attach']))
 			{
@@ -368,7 +368,7 @@ class Ila_Integrate
 	{
 		global $user_info, $scripturl, $context;
 
-		return function (&$tag, &$data, $disabled) use ($user_info, $scripturl, &$context)
+		return function (&$data, $disabled) use ($user_info, $scripturl, &$context)
 		{
 			if (isset($disabled['attach']))
 			{
@@ -424,7 +424,7 @@ class Ila_Integrate
 	{
 		global $user_info, $scripturl, $context;
 
-		return function (&$tag, &$data, $disabled) use ($user_info, $scripturl, &$context)
+		return function (&$data) use ($user_info, $scripturl, &$context)
 		{
 			// Not a preview, then sanitize the attach id
 			if (strpos($data, 'post_tmp_' . $user_info['id'] . '_') === false)

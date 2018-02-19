@@ -153,7 +153,7 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 		{
 			foreach ($members as $member)
 			{
-				$langstrings = $this->_loadStringsByTemplate($template, $keys, $members, $members_data, $lang_files, $replacements);
+				$langstrings = $this->_loadStringsByTemplate($template, $members, $members_data, $lang_files, $replacements);
 				$replacements['REALNAME'] = $members_data[$member]['real_name'];
 
 				$return[] = array(
@@ -186,15 +186,15 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 	 * Retrieves the strings from the $txt variable.
 	 *
 	 * @param string $template An email template to load
-	 * @param string[] $keys Pair values to match the $txt indexes to subject and body
 	 * @param int[] $users
 	 * @param mixed[] $users_data Should at least contain the lngfile index
 	 * @param string[] $lang_files Language files to load (optional)
 	 * @param string[] $replacements Additional replacements for the loadEmailTemplate function (optional)
+	 *
 	 * @return mixed[]
 	 * @throws \Elk_Exception
 	 */
-	protected function _loadStringsByTemplate($template, $keys, $users, $users_data, $lang_files = array(), $replacements = array())
+	protected function _loadStringsByTemplate($template, $users, $users_data, $lang_files = array(), $replacements = array())
 	{
 		global $user_info;
 

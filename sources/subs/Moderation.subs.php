@@ -1108,13 +1108,12 @@ function watchedUserPostsCount($approve_query, $warning_watch)
  *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $items_per_page The number of items to show per page
- * @param string $sort A string indicating how to sort the results
  * @param string $approve_query
  * @param int[] $delete_boards
  *
  * @return array
  */
-function watchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards)
+function watchedUserPosts($start, $items_per_page, $approve_query, $delete_boards)
 {
 	global $scripturl, $modSettings;
 
