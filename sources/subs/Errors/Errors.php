@@ -380,7 +380,7 @@ class Errors extends \AbstractModel
 	 * - It is used only if there's no way to connect to the database.
 	 * - It stops further execution of the script.
 	 */
-	public function display_db_error()
+	public function display_db_error($additional_msg = '')
 	{
 		global $mbname, $maintenance, $webmaster_email, $db_error_send;
 
@@ -423,7 +423,8 @@ class Errors extends \AbstractModel
 		</head>
 		<body>
 			<h3>Connection Problems</h3>
-			Sorry, we were unable to connect to the database.  This may be caused by the server being busy.  Please try again later.
+			Sorry, we were unable to connect to the database.  This may be caused by the server being busy.  Please try again later.<br>
+			' . $additional_msg . '
 		</body>
 	</html>';
 

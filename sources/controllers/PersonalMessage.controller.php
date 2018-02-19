@@ -2662,7 +2662,9 @@ class PersonalMessage_Controller extends Action_Controller
 			$members = membersBy('member_names', array('member_names' => $possible_users));
 
 			foreach ($possible_users as $key => $possible_user)
-				$this->_searchq_parameters ['guest_user_name_implode_' . $key] = defined('DB_CASE_SENSITIVE') ? strtolower($possible_user) : $possible_user;
+			{
+				$this->_searchq_parameters['guest_user_name_implode_' . $key] = '{string_case_insensitive:' . $possible_user . '}';
+			}
 
 			// Simply do nothing if there are too many members matching the criteria.
 			if (count($members) > $maxMembersToSearch)
@@ -2674,11 +2676,13 @@ class PersonalMessage_Controller extends Action_Controller
 				if ($context['folder'] === 'inbox')
 				{
 					$uq = array();
-					$name = defined('DB_CASE_SENSITIVE') ? 'LOWER(pm.from_name)' : 'pm.from_name';
+					$name = '{column_case_insensitive:pm.from_name}';
 					foreach (array_keys($possible_users) as $key)
+					{
 						$uq[] = 'AND pm.id_member_from = 0 AND (' . $name . ' LIKE {string:guest_user_name_implode_' . $key . '})';
+					}
 					$userQuery = implode(' ', $uq);
-					$this->_searchq_parameters ['pm_from_name'] = defined('DB_CASE_SENSITIVE') ? 'LOWER(pm.from_name)' : 'pm.from_name';
+					$this->_searchq_parameters['pm_from_name'] = $name;
 				}
 				else
 				{
@@ -2695,7 +2699,7 @@ class PersonalMessage_Controller extends Action_Controller
 				if ($context['folder'] === 'inbox')
 				{
 					$uq = array();
-					$name = defined('DB_CASE_SENSITIVE') ? 'LOWER(pm.from_name)' : 'pm.from_name';
+					$name = '{column_case_insensitive:pm.from_name}';
 
 					foreach (array_keys($possible_users) as $key)
 						$uq[] = 'AND (pm.id_member_from IN ({array_int:member_list}) OR (pm.id_member_from = 0 AND (' . $name . ' LIKE {string:guest_user_name_implode_' . $key . '})))';
@@ -2707,8 +2711,8 @@ class PersonalMessage_Controller extends Action_Controller
 					$userQuery = 'AND (pmr.id_member IN ({array_int:member_list}))';
 				}
 
-				$this->_searchq_parameters ['pm_from_name'] = defined('DB_CASE_SENSITIVE') ? 'LOWER(pm.from_name)' : 'pm.from_name';
-				$this->_searchq_parameters ['member_list'] = $memberlist;
+				$this->_searchq_parameters['pm_from_name'] = '{column_case_insensitive:pm.from_name}';
+				$this->_searchq_parameters['member_list'] = $memberlist;
 			}
 		}
 

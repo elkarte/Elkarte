@@ -476,10 +476,9 @@ class Memberlist_Controller extends Action_Controller
 			else
 				$condition = '';
 
-			if (defined('DB_CASE_SENSITIVE'))
+			foreach ($fields as $key => $field)
 			{
-				foreach ($fields as $key => $field)
-					$fields[$key] = 'LOWER(' . $field . ')';
+				$fields[$key] = '{column_case_insensitive:' . $field . '}';
 			}
 
 			$customJoin = array();
@@ -511,7 +510,7 @@ class Memberlist_Controller extends Action_Controller
 				redirectexit('action=memberlist');
 
 			$validFields = array_unique($validFields);
-			$query = $search == '' ? '= {string:blank_string}' : (defined('DB_CASE_SENSITIVE') ? 'LIKE LOWER({string:search})' : 'LIKE {string:search}');
+			$query = $search == '' ? '= {string:blank_string}' : ('LIKE {string_case_insensitive:search}');
 			$where = implode(' ' . $query . ' OR ', $fields) . ' ' . $query . $condition;
 
 			// Find the members from the database.

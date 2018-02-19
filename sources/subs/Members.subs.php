@@ -889,13 +889,11 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 		SELECT id_member
 		FROM {db_prefix}members
 		WHERE ' . (empty($current_ID_MEMBER) ? '' : 'id_member != {int:current_member}
-			AND ') . '({raw:real_name} LIKE {string:check_name} OR {raw:member_name} LIKE {string:check_name})
+			AND ') . '({column_case_insensitive:real_name} LIKE {string_case_insensitive:check_name} OR {column_case_insensitive:member_name} LIKE {string:check_name})
 		LIMIT 1',
 		array(
-			'real_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(real_name)' : 'real_name',
-			'member_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(member_name)' : 'member_name',
 			'current_member' => $current_ID_MEMBER,
-			'check_name' => defined('DB_CASE_SENSITIVE') ? Util::strtolower($checkName) : $checkName,
+			'check_name' => $checkName,
 		)
 	);
 	if ($db->num_rows($request) > 0)
@@ -908,11 +906,10 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	$request = $db->query('', '
 		SELECT id_group
 		FROM {db_prefix}membergroups
-		WHERE {raw:group_name} LIKE {string:check_name}
+		WHERE {column_case_insensitive:group_name} LIKE {string_case_insensitive:check_name}
 		LIMIT 1',
 		array(
-			'group_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(group_name)' : 'group_name',
-			'check_name' => defined('DB_CASE_SENSITIVE') ? Util::strtolower($checkName) : $checkName,
+			'check_name' => $checkName,
 		)
 	);
 	if ($db->num_rows($request) > 0)
@@ -1532,8 +1529,8 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
 
 			foreach ($members['member_names'] as $key => $param)
 			{
-				$mem_query[] = (defined('DB_CASE_SENSITIVE') ? 'LOWER(real_name)' : 'real_name') . ' LIKE {string:member_names_' . $key . '}';
-				$members['member_names_' . $key] = defined('DB_CASE_SENSITIVE') ? strtolower($param) : $param;
+				$mem_query[] = '{column_case_insensitive:real_name} LIKE {string_case_insensitive:member_names_' . $key . '}';
+				$members['member_names_' . $key] = $param;
 			}
 			return implode("\n\t\t\tOR ", $mem_query);
 		},
@@ -1775,13 +1772,11 @@ function getMemberByName($name, $flexible = false)
 	$request = $db->query('', '
 		SELECT id_member, id_group
 		FROM {db_prefix}members
-		WHERE {raw:real_name} LIKE {string:name}' . ($flexible ? '
-			OR {raw:member_name} LIKE {string:name}' : '') . '
+		WHERE {column_case_insensitive:real_name} LIKE {string_case_insensitive:name}' . ($flexible ? '
+			OR {column_case_insensitive:member_name} LIKE {string_case_insensitive:name}' : '') . '
 		LIMIT 1',
 		array(
 			'name' => Util::strtolower($name),
-			'real_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(real_name)' : 'real_name',
-			'member_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(member_name)' : 'member_name',
 		)
 	);
 	if ($db->num_rows($request) == 0)
@@ -1818,15 +1813,14 @@ function getMember($search, $buddies = array())
 	$xml_data['items']['children'] = $db->fetchQueryCallback('
 		SELECT id_member, real_name
 		FROM {db_prefix}members
-		WHERE {raw:real_name} LIKE {string:search}' . (!empty($buddies) ? '
+		WHERE {column_case_insensitive:real_name} LIKE {string_case_insensitive:search}' . (!empty($buddies) ? '
 			AND id_member IN ({array_int:buddy_list})' : '') . '
 			AND is_activated IN ({array_int:activation_status})
 		ORDER BY LENGTH(real_name), real_name
 		LIMIT {int:limit}',
 		array(
-			'real_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(real_name)' : 'real_name',
 			'buddy_list' => $buddies,
-			'search' => Util::strtolower($search),
+			'search' => $search,
 			'activation_status' => array(1, 12),
 			'limit' => Util::strlen($search) <= 2 ? 100 : 200,
 		),

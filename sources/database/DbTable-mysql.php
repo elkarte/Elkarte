@@ -27,128 +27,84 @@ class DbTable_MySQL extends DbTable
 	 * Holds this instance of the table interface
 	 * @var DbTable_MySQL
 	 */
-	private static $_tbl = null;
+	protected static $_tbl = null;
 
 	/**
-	 * DbTable_MySQL::construct
-	 *
-	 * @param object $db - A Database_MySQL object
+	 * {@inheritdoc }
 	 */
-	private function __construct($db)
+	protected function _real_prefix()
 	{
-		global $db_prefix;
-
-		// We won't do any remove on these
-		$this->_reservedTables = array('admin_info_files', 'approval_queue', 'attachments', 'ban_groups', 'ban_items',
-			'board_permissions', 'boards', 'calendar', 'calendar_holidays', 'categories', 'collapsed_categories',
-			'custom_fields', 'group_moderators', 'log_actions', 'log_activity', 'log_banned', 'log_boards',
-			'log_digest', 'log_errors', 'log_floodcontrol', 'log_group_requests', 'log_karma', 'log_mark_read',
-			'log_notify', 'log_online', 'log_packages', 'log_polls', 'log_reported', 'log_reported_comments',
-			'log_scheduled_tasks', 'log_search_messages', 'log_search_results', 'log_search_subjects',
-			'log_search_topics', 'log_topics', 'mail_queue', 'membergroups', 'members', 'message_icons',
-			'messages', 'moderators', 'package_servers', 'permission_profiles', 'permissions', 'personal_messages',
-			'pm_recipients', 'poll_choices', 'polls', 'scheduled_tasks', 'sessions', 'settings', 'smileys',
-			'themes', 'topics');
-
-		foreach ($this->_reservedTables as $k => $table_name)
-			$this->_reservedTables[$k] = strtolower($db_prefix . $table_name);
-
-		// let's be sure.
-		$this->_package_log = array();
-
-		// This executes queries and things
-		$this->_db = $db;
+		return preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $this->_db_prefix, $match) === 1 ? $match[3] : $this->_db_prefix;
 	}
 
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal')
+	protected function _close_table_query($temporary)
 	{
-		global $db_prefix;
 
-		// Strip out the table name, we might not need it in some cases
-		$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
+		$close_string = ') DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci';
 
-		// With or without the database name, the fullname looks like this.
-		$full_table_name = str_replace('{db_prefix}', $real_prefix, $table_name);
-		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
-
-		// First - no way do we touch our tables.
-		if (in_array(strtolower($table_name), $this->_reservedTables))
-			return false;
-
-		// Log that we'll want to remove this on uninstall.
-		$this->_package_log[] = array('remove_table', $table_name);
-
-		// Slightly easier on MySQL than the others...
-		if ($this->table_exists($full_table_name))
+		if ($temporary === true)
 		{
-			// This is a sad day... drop the table? If not, return false (error) by default.
-			if ($if_exists == 'overwrite')
-				$this->db_drop_table($table_name);
-			else
-				return $if_exists == 'ignore';
+			$close_string .= ' ENGINE=MEMORY';
 		}
 
-		// Righty - let's do the damn thing!
-		$table_query = 'CREATE TABLE ' . $table_name . "\n" . '(';
-		foreach ($columns as $column)
-			$table_query .= "\n\t" . $this->_db_create_query_column($column) . ',';
+		return $close_string;
+	}
 
+	/**
+	 * {@inheritdoc }
+	 */
+	protected function _create_query_indexes($indexes, $table_name)
+	{
 		// Loop through the indexes next...
+		$index_query = '';
 		foreach ($indexes as $index)
 		{
+			if (empty($index))
+			{
+				continue;
+			}
+
+			$index['columns'] = $this->_clean_indexes($index['columns']);
+
 			$columns = implode(',', $index['columns']);
 
-			// Is it the primary?
+			// Primary goes in the table...
 			if (isset($index['type']) && $index['type'] == 'primary')
-				$table_query .= "\n\t" . 'PRIMARY KEY (' . $columns . '),';
+				$index_query .= "\n\t" . 'PRIMARY KEY (' . $columns . '),';
 			else
 			{
 				if (empty($index['name']))
 					$index['name'] = implode('_', $index['columns']);
-				$table_query .= "\n\t" . (isset($index['type']) && $index['type'] == 'unique' ? 'UNIQUE' : 'KEY') . ' ' . $index['name'] . ' (' . $columns . '),';
+				$index_query .= "\n\t" . (isset($index['type']) && $index['type'] == 'unique' ? 'UNIQUE' : 'KEY') . ' ' . $index['name'] . ' (' . $columns . '),';
 			}
 		}
-
-		// No trailing commas!
-		if (substr($table_query, -1) == ',')
-			$table_query = substr($table_query, 0, -1);
-
-		$table_query .= ') DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci';
-
-		// Create the table!
-		$this->_db->query('', $table_query,
-			array(
-				'security_override' => true,
-			)
-		);
-
-		return true;
+		return $index_query;
 	}
 
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_drop_table($table_name, $parameters = array(), $error = 'fatal')
+	public function db_drop_table($table_name, $force = false)
 	{
-		global $db_prefix;
-
-		// After stripping away the database name, this is what's left.
-		$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
-
 		// Get some aliases.
-		$full_table_name = str_replace('{db_prefix}', $real_prefix, $table_name);
-		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
+		$full_table_name = str_replace('{db_prefix}', $this->_real_prefix(), $table_name);
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// God no - dropping one of these = bad.
 		if (in_array(strtolower($table_name), $this->_reservedTables))
 			return false;
 
 		// Does it exist?
-		if ($this->table_exists($full_table_name))
+		if ($force === true || $this->table_exists($full_table_name))
 		{
+			if ($force === true)
+			{
+				$this->_db->skip_next_error();
+			}
+
 			$query = 'DROP TABLE ' . $table_name;
 			$this->_db->query('',
 				$query,
@@ -167,11 +123,9 @@ class DbTable_MySQL extends DbTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
+	public function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update')
 	{
-		global $db_prefix;
-
-		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// Log that we will want to uninstall this!
 		$this->_package_log[] = array('remove_column', $table_name, $column_info['name']);
@@ -188,7 +142,7 @@ class DbTable_MySQL extends DbTable
 
 		// Now add the thing!
 		$this->_alter_table($table_name, '
-			ADD ' . $this->_db_create_query_column($column_info) . (empty($column_info['auto']) ? '' : ' primary key'));
+			ADD ' . $this->_db_create_query_column($column_info, $table_name) . (empty($column_info['auto']) ? '' : ' primary key'));
 
 		return true;
 	}
@@ -196,11 +150,9 @@ class DbTable_MySQL extends DbTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_remove_column($table_name, $column_name, $parameters = array(), $error = 'fatal')
+	public function db_remove_column($table_name, $column_name, $parameters = array())
 	{
-		global $db_prefix;
-
-		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// Does it exist?
 		$column = $this->_get_column_info($table_name, $column_name);
@@ -219,11 +171,9 @@ class DbTable_MySQL extends DbTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_change_column($table_name, $old_column, $column_info, $parameters = array(), $error = 'fatal')
+	public function db_change_column($table_name, $old_column, $column_info, $parameters = array())
 	{
-		global $db_prefix;
-
-		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// Check it does exist!
 		$old_info = $this->_get_column_info($table_name, $old_column);
@@ -249,17 +199,15 @@ class DbTable_MySQL extends DbTable
 			$column_info['unsigned'] = '';
 
 		$this->_alter_table($table_name, '
-			CHANGE COLUMN `' . $old_column . '` ' . $this->_db_create_query_column($column_info));
+			CHANGE COLUMN `' . $old_column . '` ' . $this->_db_create_query_column($column_info, $table_name));
 	}
 
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
+	public function db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update')
 	{
-		global $db_prefix;
-
-		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// No columns = no index.
 		if (empty($index_info['columns']))
@@ -311,11 +259,9 @@ class DbTable_MySQL extends DbTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_remove_index($table_name, $index_name, $parameters = array(), $error = 'fatal')
+	public function db_remove_index($table_name, $index_name, $parameters = array())
 	{
-		global $db_prefix;
-
-		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// Better exist!
 		$indexes = $this->db_list_indexes($table_name, true);
@@ -360,9 +306,7 @@ class DbTable_MySQL extends DbTable
 	 */
 	public function db_table_structure($table_name, $parameters = array())
 	{
-		global $db_prefix;
-
-		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		return array(
 			'name' => $table_name,
@@ -376,9 +320,7 @@ class DbTable_MySQL extends DbTable
 	 */
 	public function db_list_columns($table_name, $detail = false, $parameters = array())
 	{
-		global $db_prefix;
-
-		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		$result = $this->_db->query('', '
 			SHOW FIELDS
@@ -439,9 +381,7 @@ class DbTable_MySQL extends DbTable
 	 */
 	public function db_list_indexes($table_name, $detail = false, $parameters = array())
 	{
-		global $db_prefix;
-
-		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		$result = $this->_db->query('', '
 			SHOW KEYS
@@ -493,10 +433,11 @@ class DbTable_MySQL extends DbTable
 	 * Creates a query for a column
 	 *
 	 * @param mixed[] $column
+	 * @param string $table_name
 	 *
 	 * @return string
 	 */
-	private function _db_create_query_column($column)
+	protected function _db_create_query_column($column, $table_name)
 	{
 		// Auto increment is easy here!
 		if (!empty($column['auto']))
@@ -527,9 +468,7 @@ class DbTable_MySQL extends DbTable
 	 */
 	public function optimize($table)
 	{
-		global $db_prefix;
-
-		$table = str_replace('{db_prefix}', $db_prefix, $table);
+		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
 
 		// Get how much overhead there is.
 		$request = $this->_db->query('', '
@@ -578,12 +517,16 @@ class DbTable_MySQL extends DbTable
 	 * Static method that allows to retrieve or create an instance of this class.
 	 *
 	 * @param object $db - A Database_MySQL object
+	 * @param string $db_prefix - The tables prefix
 	 * @return DbTable_MySQL - A DbTable_MySQL object
 	 */
-	public static function db_table($db)
+	public static function db_table($db, $db_prefix)
 	{
 		if (is_null(self::$_tbl))
-			self::$_tbl = new DbTable_MySQL($db);
+		{
+			self::$_tbl = new DbTable_MySQL($db, $db_prefix);
+		}
+
 		return self::$_tbl;
 	}
 }

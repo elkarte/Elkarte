@@ -36,18 +36,35 @@ interface DbSearch
 	public function search_support($search_type);
 
 	/**
+	 * Returns some basic info about the {db_prefix}messages table
+	 * Used in ManageSearch.controller.php in the page to select the index method
+	 */
+	public function membersTableInfo();
+
+	/**
 	 * Method for the custom word index table.
 	 *
-	 * @param string $size
+	 * @param string $type
+	 * @param int $size
 	 * @return void
 	 */
-	public function create_word_search($size);
+	public function create_word_search($type, $size = 10);
 
 	/**
 	 * Sets the class not to return the error in case of failures
 	 * just for the "next" query.
 	 */
 	public function skip_next_error();
+
+	/**
+	 * Create a temporary table.
+	 * A wrapper around DbTable::db_create_table setting the 'temporary' parameter.
+	 *
+	 * @param string $name
+	 * @param mixed[] $columns in the format specified.
+	 * @param mixed[] $indexes default array(), in the format specified.
+	 */
+	public function createTemporaryTable($name, $columns, $indexes);
 
 	/**
 	 * Static method that allows to retrieve or create an instance of this class.
