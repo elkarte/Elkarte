@@ -3219,6 +3219,40 @@ img.new_posts {
 	font-size: 2em;
 }
 
+#elk_lb_next {
+	position: absolute;
+	top: 50%;
+	right: -3%;
+	display: inline-block;
+	width: 2em;
+	height: 2em;
+	border: 2px solid;
+	border-radius: 4px;
+	line-height: 2em;
+}
+
+#elk_lb_next:before {
+	content: "\2192";
+	font-size: 2em;
+}
+
+#elk_lb_prev {
+	position: absolute;
+	top: 50%;
+	left: -3%;
+	display: inline-block;
+	width: 2em;
+	height: 2em;
+	border: 2px solid;
+	border-radius: 4px;
+	line-height: 2em;
+}
+
+#elk_lb_prev:before {
+	content: "\2190";
+	font-size: 2em;
+}
+
 .elk_lb_no_scrolling {
 	overflow: hidden;
 }
