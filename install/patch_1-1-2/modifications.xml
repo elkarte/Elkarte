@@ -1,0 +1,1445 @@
+<?xml version="1.0"?>
+<!DOCTYPE modification SYSTEM "http://www.elkarte.net/site/modification">
+<modification xmlns="http://www.elkarte.net/site/modification" xmlns:elk="http://www.elkarte.net/">
+
+	<id>Elkarte Contributors:ElkArte_112_patch</id>
+	<version>1.0</version>
+	<file name="SOURCEDIR/Load.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.1
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.2
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		loadCSSFile($context['theme_variant'] . '/rtl' . $context['theme_variant'] . '.css');
+
+	// This allows us to change the way things look for the admin.
+	$context['admin_features'] = isset($modSettings['admin_features']) ? explode(',', $modSettings['admin_features']) : array('cd,cp,k,w,rg,ml,pm');
+
+	if (!empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']))
+		$context['newsfeed_urls'] = array(]]></search>
+			<add><![CDATA[		loadCSSFile($context['theme_variant'] . '/rtl' . $context['theme_variant'] . '.css');
+
+	// This allows us to change the way things look for the admin.
+	$context['admin_features'] = explode(',', isset($modSettings['admin_features']) ? $modSettings['admin_features'] : 'cd,cp,k,w,rg,ml,pm');
+
+	if (!empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']))
+		$context['newsfeed_urls'] = array(]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			}
+			else
+			{
+				$cache_staler = '';
+				$params['basename'] = $filename;
+			}
+			$this_id = empty($id) ? strtr(basename($filename), '?', '_') : $id;]]></search>
+			<add><![CDATA[			}
+			else
+			{
+				$cache_staler = $staler_string;
+				$params['basename'] = $filename;
+			}
+			$this_id = empty($id) ? strtr(basename($filename), '?', '_') : $id;]]></add>
+		</operation>
+	</file>
+	<file name="ADMINDIR/ManageThemes.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1
+ *
+ *
+ * @todo Update this for the new package manager?]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.2
+ *
+ *
+ * @todo Update this for the new package manager?]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		$theme_values = loadThemeOptionsInto(1, 0, array(), array('theme_templates', 'theme_layers'));
+
+		// Lets add a theme_info.xml to this theme.
+		write_theme_info($this->_req->query->copy, $modSettings['elkVersion'], $this->theme_dir, $theme_values);
+	}
+
+	/**]]></search>
+			<add><![CDATA[		$theme_values = loadThemeOptionsInto(1, 0, array(), array('theme_templates', 'theme_layers'));
+
+		// Lets add a theme_info.xml to this theme.
+		write_theme_info($this->_req->post->copy, $modSettings['elkVersion'], $this->theme_dir, $theme_values);
+	}
+
+	/**]]></add>
+		</operation>
+	</file>
+	<file name="BOARDDIR/Db-mysql.class.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2004-2011, GreyWyvern - All rights reserved.
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2004-2011, GreyWyvern - All rights reserved.
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.2
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[				Errors::instance()->display_db_error();
+		}
+
+		// This makes it possible to automatically change the sql_mode and autocommit if needed.
+		if (isset($mysql_set_mode) && $mysql_set_mode === true)
+			self::$_db->query('', 'SET sql_mode = \'\', AUTOCOMMIT = 1',]]></search>
+			<add><![CDATA[				Errors::instance()->display_db_error();
+		}
+
+		self::$_db->_connection = $connection;
+
+		// This makes it possible to automatically change the sql_mode and autocommit if needed.
+		if (isset($mysql_set_mode) && $mysql_set_mode === true)
+			self::$_db->query('', 'SET sql_mode = \'\', AUTOCOMMIT = 1',]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			false
+		);
+
+		self::$_db->_connection = $connection;
+
+		// Few databases still have not set UTF-8 as their default input charset
+		self::$_db->query('', '
+			SET NAMES UTF8',
+			array(
+			)
+		);
+		// Sorry to change your config, but this may be a pain for the time being...
+		self::$_db->query('', '
+			SET sql_mode = {string:empty}',
+			array(
+				'empty' => ''
+			)
+		);
+
+		return $connection;
+	}]]></search>
+			<add><![CDATA[			false
+		);
+
+		// Few databases still have not set UTF-8 as their default input charset
+		self::$_db->query('', '
+			SET NAMES UTF8',
+			array(
+			)
+		);
+
+		return $connection;
+	}]]></add>
+		</operation>
+	</file>
+	<file name="BOARDDIR/AttachmentsPostModule.class.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.1
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.2
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[						// Compile a list of the files to show the user.
+						$file_list = array();
+						foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
+							if (strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') !== false)
+								$file_list[] = $attachment['name'];
+
+						$_SESSION['temp_attachments']['post']['files'] = $file_list;
+						$file_list = '<div class="attachments">' . implode('<br />', $file_list) . '</div>';]]></search>
+			<add><![CDATA[						// Compile a list of the files to show the user.
+						$file_list = array();
+						foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
+						{
+							if (strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') !== false)
+							{
+								$file_list[] = $attachment['name'];
+							}
+						}
+
+						$_SESSION['temp_attachments']['post']['files'] = $file_list;
+						$file_list = '<div class="attachments">' . implode('<br />', $file_list) . '</div>';]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[					$context['attachments']['current'][] = array(
+						'name' => '<span class="underline">' . htmlspecialchars($attachment['name'], ENT_COMPAT, 'UTF-8') . '</span>',
+						'size' => $attachment['size'],
+						'id' => $attachID,
+						'unchecked' => false,
+						'approved' => 1,
+					);]]></search>
+			<add><![CDATA[					$context['attachments']['current'][] = array(
+						'name' => '<span class="underline">' . htmlspecialchars($attachment['name'], ENT_COMPAT, 'UTF-8') . '</span>',
+						'size' => $attachment['size'],
+						'id' => $attachment['public_attachid'],
+						'unchecked' => false,
+						'approved' => 1,
+					);]]></add>
+		</operation>
+	</file>
+	<file name="SUBSDIR/Attachments.subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.1
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.2
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+	foreach ($_SESSION['temp_attachments'] as $attachID => $val)
+	{
+		if ($val['public_attachid'] === $attach_id)
+		{
+			$attach_real_id = $attachID;]]></search>
+			<add><![CDATA[
+	foreach ($_SESSION['temp_attachments'] as $attachID => $val)
+	{
+		if ($attachID === 'post')
+		{
+			continue;
+		}
+
+		if ($val['public_attachid'] === $attach_id)
+		{
+			$attach_real_id = $attachID;]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			'current_topic' => $id_topic,
+		)
+	);
+	$attachmentData = array();
+	if ($db->num_rows($request) != 0)
+	{
+		$fetch = $db->fetch_assoc($request);]]></search>
+			<add><![CDATA[			'current_topic' => $id_topic,
+		)
+	);
+	$attachmentData = array_fill(0, 9, '');
+	if ($db->num_rows($request) != 0)
+	{
+		$fetch = $db->fetch_assoc($request);]]></add>
+		</operation>
+	</file>
+	<file name="SUBSDIR/Auth.subs.php">
+		<operation>
+			<search position="replace"><![CDATA[			$names[$i] = strtr($names[$i], array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '\'' => '&#039;'));
+		else
+			$names[$i] = strtr($names[$i], array('\'' => '&#039;'));
+	}
+
+	// What are we using to compare?]]></search>
+			<add><![CDATA[			$names[$i] = strtr($names[$i], array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '\'' => '&#039;'));
+		else
+			$names[$i] = strtr($names[$i], array('\'' => '&#039;'));
+		$names[$i] = $db->quote('{string:name}', array('name' => $names[$i]));
+	}
+
+	// What are we using to compare?]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+	if ($use_wildcards || $maybe_email)
+		$email_condition = '
+			OR (' . $email_condition . 'email_address ' . $comparison . ' \'' . implode('\') OR (' . $email_condition . ' email_address ' . $comparison . ' \'', $names) . '\')';
+	else
+		$email_condition = '';
+]]></search>
+			<add><![CDATA[
+	if ($use_wildcards || $maybe_email)
+		$email_condition = '
+			OR (' . $email_condition . 'email_address ' . $comparison . ' ' . implode( ') OR (' . $email_condition . ' email_address ' . $comparison . ' ', $names) . ')';
+	else
+		$email_condition = '';
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		LIMIT {int:limit}',
+		array(
+			'buddy_list' => $user_info['buddies'],
+			'member_name_search' => $member_name . ' ' . $comparison . ' \'' . implode('\' OR ' . $member_name . ' ' . $comparison . ' \'', $names) . '\'',
+			'real_name_search' => $real_name . ' ' . $comparison . ' \'' . implode('\' OR ' . $real_name . ' ' . $comparison . ' \'', $names) . '\'',
+			'email_condition' => $email_condition,
+			'limit' => $max,
+		)]]></search>
+			<add><![CDATA[		LIMIT {int:limit}',
+		array(
+			'buddy_list' => $user_info['buddies'],
+			'member_name_search' => $member_name . ' ' . $comparison . ' ' . implode( ' OR ' . $member_name . ' ' . $comparison . ' ', $names) . '',
+			'real_name_search' => $real_name . ' ' . $comparison . ' ' . implode( ' OR ' . $real_name . ' ' . $comparison . ' ', $names) . '',
+			'email_condition' => $email_condition,
+			'limit' => $max,
+		)]]></add>
+		</operation>
+	</file>
+	<file name="SUBSDIR/Ila.integrate.php">
+		<operation>
+			<search position="replace"><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.1.1
+ *
+ */
+]]></search>
+			<add><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.1.2
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[				\BBC\Codes::ATTR_AUTOLINK => false,
+				\BBC\Codes::ATTR_LENGTH => 6,
+			),
+			// Just an align ?
+			array(
+				\BBC\Codes::ATTR_TAG => 'attach',
+				\BBC\Codes::ATTR_TYPE => \BBC\Codes::TYPE_UNPARSED_CONTENT,
+				\BBC\Codes::ATTR_PARAM => array(
+					'align' => array(
+						\BBC\Codes::PARAM_ATTR_OPTIONAL => true,
+						\BBC\Codes::PARAM_ATTR_VALUE => 'float$1',
+						\BBC\Codes::PARAM_ATTR_MATCH => '(right|left|center)',
+					),
+				),
+				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1;thumb" alt="" class="bbc_img {align}" /></a>',
+				\BBC\Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_options(),
+				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
+				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
+				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
+				\BBC\Codes::ATTR_AUTOLINK => false,
+				\BBC\Codes::ATTR_LENGTH => 6,
+			),
+			// Just a simple attach
+			array(
+				\BBC\Codes::ATTR_TAG => 'attach',
+				\BBC\Codes::ATTR_TYPE => \BBC\Codes::TYPE_UNPARSED_CONTENT,
+				\BBC\Codes::ATTR_CONTENT => '$1',
+				\BBC\Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_plain(),
+				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
+				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
+				\BBC\Codes::ATTR_BLOCK_LEVEL => false,]]></search>
+			<add><![CDATA[				\BBC\Codes::ATTR_AUTOLINK => false,
+				\BBC\Codes::ATTR_LENGTH => 6,
+			),
+			// Just a simple attach
+			array(
+				\BBC\Codes::ATTR_TAG => 'attach',
+				\BBC\Codes::ATTR_TYPE => \BBC\Codes::TYPE_UNPARSED_CONTENT,
+				\BBC\Codes::ATTR_CONTENT => '$1',
+				\BBC\Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_plain(),
+				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
+				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
+				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
+				\BBC\Codes::ATTR_AUTOLINK => false,
+				\BBC\Codes::ATTR_LENGTH => 6,
+			),
+			// Just an align ?
+			array(
+				\BBC\Codes::ATTR_TAG => 'attach',
+				\BBC\Codes::ATTR_TYPE => \BBC\Codes::TYPE_UNPARSED_CONTENT,
+				\BBC\Codes::ATTR_PARAM => array(
+					'type' => array(
+						\BBC\Codes::PARAM_ATTR_OPTIONAL => true,
+						\BBC\Codes::PARAM_ATTR_VALUE => ';$1',
+						\BBC\Codes::PARAM_ATTR_MATCH => '(thumb|image)',
+					),
+					'align' => array(
+						\BBC\Codes::PARAM_ATTR_OPTIONAL => true,
+						\BBC\Codes::PARAM_ATTR_VALUE => 'float$1',
+						\BBC\Codes::PARAM_ATTR_MATCH => '(right|left|center)',
+					),
+				),
+				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1{type}" alt="asd" class="bbc_img {align}" /></a>',
+				\BBC\Codes::ATTR_VALIDATE => $disableAttach ? null : self::validate_options(),
+				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
+				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
+				\BBC\Codes::ATTR_BLOCK_LEVEL => false,]]></add>
+		</operation>
+	</file>
+	<file name="SUBSDIR/Mentions.subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.1
+ *
+ */
+]]></search>
+			<add><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.1.2
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			SELECT COUNT(*) AS c
+			FROM {db_prefix}log_mentions
+			WHERE status = {int:status}
+				AND id_member = {int:member}',
+			array(
+				'status' => 0,
+				'member' => $id_member
+			)
+		);]]></search>
+			<add><![CDATA[			SELECT COUNT(*) AS c
+			FROM {db_prefix}log_mentions
+			WHERE status = {int:status}
+				AND id_member = {int:member}
+				AND is_accessible = {int:has_access}',
+			array(
+				'status' => 0,
+				'has_access' => 1,
+				'member' => $id_member
+			)
+		);]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			FROM {db_prefix}log_mentions
+			WHERE status = {int:status}
+				AND log_time > {int:last_seen}
+				AND id_member = {int:member}',
+			array(
+				'status' => 0,
+				'last_seen' => $timestamp,
+				'member' => $id_member
+			)]]></search>
+			<add><![CDATA[			FROM {db_prefix}log_mentions
+			WHERE status = {int:status}
+				AND log_time > {int:last_seen}
+				AND id_member = {int:member}
+				AND is_accessible = {int:has_access}',
+			array(
+				'status' => 0,
+				'has_access' => 1,
+				'last_seen' => $timestamp,
+				'member' => $id_member
+			)]]></add>
+		</operation>
+	</file>
+	<file name="SUBSDIR/PersonalMessage.subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.2
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			'not_deleted' => 0,
+		)
+	);
+	while ($row = $db->fetch_assoc($result))
+	{
+		$this_labels = explode(',', $row['labels']);]]></search>
+			<add><![CDATA[			'not_deleted' => 0,
+		)
+	);
+	$labels = array();
+	while ($row = $db->fetch_assoc($result))
+	{
+		$this_labels = explode(',', $row['labels']);]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			'pm_list' => $all_pms,
+		)
+	);
+	$message_labels = array();
+	$message_replied = array();
+	$message_unread = array();
+	$message_first_label = array();]]></search>
+			<add><![CDATA[			'pm_list' => $all_pms,
+		)
+	);
+
+	$message_labels = array();
+	foreach ($all_pms as $pmid)
+	{
+		$message_labels[$pmid] = array();
+	}
+	$message_replied = array();
+	$message_unread = array();
+	$message_first_label = array();]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			// Read and replied to status for this message
+			$message_replied[$row['id_pm']] = $row['is_read'] & 2;
+			$message_unread[$row['id_pm']] = $row['is_read'] == 0;
+
+			$row['labels'] = $row['labels'] == '' ? array() : explode(',', $row['labels']);
+			foreach ($row['labels'] as $v)]]></search>
+			<add><![CDATA[			// Read and replied to status for this message
+			$message_replied[$row['id_pm']] = $row['is_read'] & 2;
+			$message_unread[$row['id_pm']] = $row['is_read'] == 0;
+			$message_labels[$row['id_pm']] = array();
+
+			$row['labels'] = $row['labels'] == '' ? array() : explode(',', $row['labels']);
+			foreach ($row['labels'] as $v)]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/Post.template.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.1
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.2
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		var IlaDropEvents = {
+			UploadSuccess: function($button, data) {
+				var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
+					trigger: $(\'<div class="share icon i-share" />\')
+				});
+				inlineAttach.addInterface($button, data.attachid);
+			},]]></search>
+			<add><![CDATA[		var IlaDropEvents = {
+			UploadSuccess: function($button, data) {
+				var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
+					trigger: $(\'<div class="share icon i-share" />\'),
+					template: ' . JavaScriptEscape('<div class="insertoverlay">
+						<input type="button" class="button" value="insert">
+						<ul data-group="tabs" class="tabs">
+							<li data-tab="size">' . $txt['ila_opt_size'] . '</li><li data-tab="align">' . $txt['ila_opt_align'] . '</li>
+						</ul>
+						<div class="container" data-visual="size">
+							<label><input data-size="thumb" type="radio" name="imgmode">' . $txt['ila_opt_size_thumb'] . '</label>
+							<label><input data-size="full" type="radio" name="imgmode">' . $txt['ila_opt_size_full'] . '</label>
+							<label><input data-size="cust" type="radio" name="imgmode">' . $txt['ila_opt_size_cust'] . '</label>
+							<div class="customsize">
+								<input type="range" class="range" min="100" max="500"><input type="text" class="visualizesize" disabled="disabled">
+							</div>
+						</div>
+						<div class="container" data-visual="align">
+							<label><input data-align="none" type="radio" name="align">' . $txt['ila_opt_align_none'] . '</label>
+							<label><input data-align="left" type="radio" name="align">' . $txt['ila_opt_align_left'] . '</label>
+							<label><input data-align="center" type="radio" name="align">' . $txt['ila_opt_align_center'] . '</label>
+							<label><input data-align="right" type="radio" name="align">' . $txt['ila_opt_align_right'] . '</label>
+						</div>
+					</div>') . '
+				});
+				inlineAttach.addInterface($button, data.attachid);
+			},]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/Theme.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * license:      BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.1
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * license:      BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.2
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		}
+
+		// Use this hook to work with Javascript files and vars pre output
+		call_integration_hook('pre_javascript_output');
+
+		// Load in the JS files
+		if (!empty($this->js_files))]]></search>
+			<add><![CDATA[		}
+
+		// Use this hook to work with Javascript files and vars pre output
+		call_integration_hook('pre_javascript_output', array($do_deferred));
+
+		// Load in the JS files
+		if (!empty($this->js_files))]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/css/_besocial/index_besocial.css">
+		<operation>
+			<search position="replace"><![CDATA[	border-color: #fff;
+}
+
+#elk_lb_expand {
+	border-color: #CCCCCC;
+}
+
+#elk_lb_expand:before {
+	color: #BBBBBB;
+}
+]]></search>
+			<add><![CDATA[	border-color: #fff;
+}
+
+#elk_lb_expand,
+#elk_lb_next,
+#elk_lb_prev {
+	border-color: #CCCCCC;
+}
+
+#elk_lb_expand:before,
+#elk_lb_next:before,
+#elk_lb_prev:before {
+	color: #BBBBBB;
+}
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	background: #EEEEEE;
+}
+
+.progressBar {
+	border-color: #DDDDDD;
+}]]></search>
+			<add><![CDATA[	background: #EEEEEE;
+}
+
+.statusbar .insertoverlay {
+	background-color: #FAFAFA;
+	border-color: #A9CCD1;
+}
+
+.insertoverlay .tabs li {
+	border-color: #008000;
+}
+
+.statusbar .insertoverlay .button {
+	background: #008000;
+	color: #FAFAFA;
+}
+
+.progressBar {
+	border-color: #DDDDDD;
+}]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/css/_light/index_light.css">
+		<operation>
+			<search position="replace"><![CDATA[	border-color: #fff;
+}
+
+#elk_lb_expand {
+	border-color: #CCCCCC;
+}
+
+#elk_lb_expand:before {
+	color: #CCCCCC;
+}
+]]></search>
+			<add><![CDATA[	border-color: #fff;
+}
+
+#elk_lb_expand,
+#elk_lb_next,
+#elk_lb_prev {
+	border-color: #CCCCCC;
+}
+
+#elk_lb_expand:before,
+#elk_lb_next:before,
+#elk_lb_prev:before {
+	color: #CCCCCC;
+}
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	background: #F0F0F0;
+}
+
+.progressBar {
+	border-color: #DDDDDD;
+}]]></search>
+			<add><![CDATA[	background: #F0F0F0;
+}
+
+.statusbar .insertoverlay {
+	background-color: #FAFAFA;
+	border-color: #A9CCD1;
+}
+
+.insertoverlay .tabs li {
+	border-color: #008000;
+}
+
+.statusbar .insertoverlay .button {
+	background: #008000;
+	color: #FAFAFA;
+}
+
+.progressBar {
+	border-color: #DDDDDD;
+}]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/css/index.css">
+		<operation>
+			<search position="replace"><![CDATA[	font-size: 2em;
+}
+
+.elk_lb_no_scrolling {
+	overflow: hidden;
+}]]></search>
+			<add><![CDATA[	font-size: 2em;
+}
+
+#elk_lb_next {
+	position: absolute;
+	top: 50%;
+	right: -3%;
+	display: inline-block;
+	width: 2em;
+	height: 2em;
+	border: 2px solid;
+	border-radius: 4px;
+	line-height: 2em;
+}
+
+#elk_lb_next:before {
+	content: "\2192";
+	font-size: 2em;
+}
+
+#elk_lb_prev {
+	position: absolute;
+	top: 50%;
+	left: -3%;
+	display: inline-block;
+	width: 2em;
+	height: 2em;
+	border: 2px solid;
+	border-radius: 4px;
+	line-height: 2em;
+}
+
+#elk_lb_prev:before {
+	content: "\2190";
+	font-size: 2em;
+}
+
+.elk_lb_no_scrolling {
+	overflow: hidden;
+}]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	position: relative;
+}
+
+.drop_area .mobile {
+	display: none;
+}
+
+.progress_tracker {
+	overflow: hidden;
+	width: 97%;
+}
+
+.statusbar {
+	overflow: hidden;
+	padding: 5px;
+	border-top: 1px solid;
+	border-bottom: 1px solid;
+}
+
+.info {
+	position: relative;
+	display: inline-block;]]></search>
+			<add><![CDATA[	position: relative;
+}
+
+.drop_area_fileselect_text input {
+	overflow-y: hidden;
+}
+
+.drop_area .mobile {
+	display: none;
+}
+
+.progress_tracker {
+	width: 97%;
+}
+
+.statusbar {
+	position: relative;
+	padding: 5px;
+	border-top: 1px solid;
+	border-bottom: 1px solid;
+}
+
+.statusbar .container {
+	position: relative;
+	display: inline-block;
+}
+
+.statusbar .insertoverlay {
+	position: absolute;
+	min-width: 10em;
+	padding: 0.2em;
+	border: 1px solid;
+	border-radius: 4px;
+	z-index: 1000;
+}
+.insertoverlay .tabs {
+	display: block;
+	white-space: nowrap;
+	display: flex;
+	justify-content: space-between;
+}
+.insertoverlay .tabs li {
+	display: inline-block;
+	padding: 0 0.5em;
+	text-align: center;
+	border-bottom: 1px solid;
+	cursor: pointer;
+	flex-grow: 1;
+}
+.insertoverlay .tabs li.active {
+	background-color: #E4E4E4;
+}
+
+.statusbar .insertoverlay label {
+	display: block;
+}
+
+.statusbar .insertoverlay .visualizesize,
+.statusbar .insertoverlay .range {
+	max-width: 45%;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+	margin-left: 1%;
+	margin-right: 1%;
+	display: inline-block;
+}
+
+.statusbar .insertoverlay .container {
+	display: block;
+}
+
+.statusbar .insertoverlay .visualizesize {
+	float: right;
+}
+
+.statusbar .insertoverlay .button {
+	position: absolute;
+	left: 2.5em;
+	top: -2em;
+	margin: 0;
+	font-weight: bold;
+}
+
+.info {
+	position: relative;
+	display: inline-block;]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[}
+
+#postAttachment2 {
+	overflow: hidden;
+}
+
+#postAttachment2 dd {]]></search>
+			<add><![CDATA[}
+
+#postAttachment2 {
+/* 	overflow: hidden; */
+}
+
+#postAttachment2 dd {]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	.popup_container .popup_window {
+		width: 95%;
+	}
+
+	/*.listlevel1#button_profile .linklevel1 {
+		min-width: 0.5em;]]></search>
+			<add><![CDATA[	.popup_container .popup_window {
+		width: 95%;
+	}
+	.statusbar .insertoverlay .range {
+		max-width: 90%;
+	}
+	.statusbar .insertoverlay .button {
+		float: none;
+	}
+	.statusbar .insertoverlay .range,
+	.statusbar .insertoverlay .text,
+	.statusbar .insertoverlay .button {
+		margin: 1em auto;
+		display: block;
+	}
+
+	/*.listlevel1#button_profile .linklevel1 {
+		min-width: 0.5em;]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		padding: 4px;
+	}
+
+	#confirm_buttons input[type="submit"] {
+		max-height: none;
+		height: inherit;]]></search>
+			<add><![CDATA[		padding: 4px;
+	}
+
+	.statusbar .container {
+		position: absolute;
+		display: inline-block;
+	}
+
+	.statusbar .insertoverlay {
+		margin-left: -10em;
+	}
+
+	.statusbar .insertoverlay .container {
+		position: relative;
+	}
+	.statusbar .insertoverlay label {
+		padding-top: 0.5em;
+	}
+	.statusbar .insertoverlay .container input {
+		display: block;
+		float: none;
+	}
+
+	#confirm_buttons input[type="submit"] {
+		max-height: none;
+		height: inherit;]]></add>
+		</operation>
+	</file>
+	<file name="LANGUAGEDIR/ManageThemes.english.php">
+		<operation>
+			<search position="replace"><![CDATA[$txt['theme_variants_user_disable'] = 'Disable user variant selection.';
+
+$txt['site_slogan'] = 'Site slogan:';
+$txt['site_slogan_desc'] = '(Add your own text for a slogan here. It will replace the default logo.)';
+$txt['header_layout'] = 'Header layout:';
+$txt['header_layout_desc'] = '(This setting allows you to select one of three layouts for the header.)';
+$txt['header_layout_default_name'] = 'Default:';]]></search>
+			<add><![CDATA[$txt['theme_variants_user_disable'] = 'Disable user variant selection.';
+
+$txt['site_slogan'] = 'Site slogan:';
+$txt['site_slogan_desc'] = '(Add your own text for a slogan here.)';
+$txt['header_layout'] = 'Header layout:';
+$txt['header_layout_desc'] = '(This setting allows you to select one of three layouts for the header.)';
+$txt['header_layout_default_name'] = 'Default:';]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+// Strings for the variants
+$txt['variant_light'] = 'ElkArte Light';
+$txt['variant_besocial'] = 'ElkArte Be Social!';]]></search>
+			<add><![CDATA[
+// Strings for the variants
+$txt['variant_light'] = 'ElkArte Light';
+$txt['variant_besocial'] = 'ElkArte Be Social!';]]></add>
+		</operation>
+	</file>
+	<file name="LANGUAGEDIR/Post.english.php">
+		<operation>
+			<search position="replace"><![CDATA[// Post settings (when I implement the post interface)
+$txt['ila_insert'] = 'Insert Attachment %1$d in the message';
+$txt['ila_title'] = 'End-of-post expandable thumbnail ';
+$txt['ila_option1'] = 'Thumbnail';
+$txt['ila_option2'] = 'Text link';
+$txt['ila_option3'] = 'Short text link';
+$txt['ila_confirm_removal'] = 'Are you sure you want to remove permanently this attachment?';
+/*
+$txt['ila_thereare'] = 'There are only';]]></search>
+			<add><![CDATA[// Post settings (when I implement the post interface)
+$txt['ila_insert'] = 'Insert Attachment %1$d in the message';
+$txt['ila_title'] = 'End-of-post expandable thumbnail ';
+$txt['ila_opt_size'] = 'Size';
+$txt['ila_opt_align'] = 'Alignment';
+$txt['ila_opt_size_thumb'] = 'Thumbnail';
+$txt['ila_option2'] = 'Text link';
+$txt['ila_option3'] = 'Short text link';
+$txt['ila_opt_size_full'] = 'Full size';
+$txt['ila_opt_size_cust'] = 'Custom size';
+$txt['ila_opt_align_none'] = 'None';
+$txt['ila_opt_align_left'] = 'Left';
+$txt['ila_opt_align_right'] = 'Right';
+$txt['ila_opt_align_center'] = 'Center';
+$txt['ila_confirm_removal'] = 'Are you sure you want to remove permanently this attachment?';
+/*
+$txt['ila_thereare'] = 'There are only';]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/scripts/elk_jquery_plugins.js">
+		<operation>
+			<search position="replace"><![CDATA[
+		if ($news.length > 1)
+		{
+			$.extend(settings, options);
+			$news.hide();
+			$news.eq(0).fadeIn(settings.iFadeSpeed);
+]]></search>
+			<add><![CDATA[
+		if ($news.length > 1)
+		{
+			settings = $.extend(settings, options);
+			$news.hide();
+			$news.eq(0).fadeIn(settings.iFadeSpeed);
+]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/scripts/jquery.captcha.js">
+		<operation>
+			<search position="replace"><![CDATA[			'admin': false
+		};
+
+		$.extend(settings, options);
+
+		return this.each(function() {
+			$this = $(this);]]></search>
+			<add><![CDATA[			'admin': false
+		};
+
+		settings = $.extend(settings, options);
+
+		return this.each(function() {
+			$this = $(this);]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/scripts/jquery.sceditor.elkarte.js">
+		<operation>
+			<search position="replace"><![CDATA[		allowsEmpty: false,
+		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
+		format: function (element, content) {
+			var	attribs = '',
+				params = function(names) {
+					names.forEach(function(name) {]]></search>
+			<add><![CDATA[		allowsEmpty: false,
+		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
+		format: function (element, content) {
+			/**
+			 * This function is not used because no specific html tag is associated,
+			 * instead the 'img'.format takes care of finding the ILA images and process
+			 * them accordingly to return the [attach] tag.
+			 */
+			var	attribs = '',
+				params = function(names) {
+					names.forEach(function(name) {]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[					});
+				};
+
+			params(['width', 'height', 'align']);
+			return '[attach' + attribs + ']' + content + '[/attach]';
+		},
+		html: function (token, attrs, content) {
+			var attribs = '',
+				align = '',
+				params = function(names) {
+					names.forEach(function(name) {
+						if (typeof attrs[name] !== 'undefined')
+							attribs += ' ' + name + '=' + attrs[name];
+					});
+				};
+
+			params(['width', 'height', 'align']);
+			if (typeof attrs.align !== 'undefined')
+				align = ' class="img_bbc float' + attrs.align + '"';
+
+			return '<img' + attribs + align + ' src="' + elk_scripturl + '?action=dlattach;attach=' + content + ';thumb;' + elk_session_var + '=' + elk_session_id + '" data-ila="' + content + '" />';
+		}
+	})
+	.set('center', {]]></search>
+			<add><![CDATA[					});
+				};
+
+			params(['width', 'height', 'align', 'type']);
+
+			return '[attach' + attribs + ']' + content + '[/attach]';
+		},
+		html: function (token, attrs, content) {
+			var attribs = ''
+				align = '',
+				thumb = '',
+				params = function(names) {
+					names.forEach(function(name) {
+						if (typeof attrs[name] !== 'undefined') {
+							attribs += ' ' + name + '=' + attrs[name];
+						}
+					});
+				};
+
+			params(['width', 'height', 'align', 'type']);
+			a_attribs = attribs;
+			if (typeof attrs.align !== 'undefined')
+			{
+				align = ' class="img_bbc float' + attrs.align + '"';
+			}
+			if (typeof attrs.type !== 'undefined')
+			{
+				thumb = ';' + attrs.type;
+			}
+
+			return '<img' + attribs + align + ' src="' + elk_scripturl + '?action=dlattach;attach=' + content + thumb + ';' + elk_session_var + '=' + elk_session_id + '" data-ila="' + content + '" />';
+		}
+	})
+	.set('center', {]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			// check if this is an ILA ?
+			if (element.attr('data-ila'))
+			{
+				params(['width', 'height', 'align']);
+				return '[attach' + attribs + ']' + element.attr('data-ila') + '[/attach]';
+			}
+]]></search>
+			<add><![CDATA[			// check if this is an ILA ?
+			if (element.attr('data-ila'))
+			{
+				params(['width', 'height', 'align', 'type']);
+				return '[attach' + attribs + ']' + element.attr('data-ila') + '[/attach]';
+			}
+]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/scripts/script_elk.js">
+		<operation>
+			<search position="replace"><![CDATA[	var ElkInlineAttachments = (function (selector, editor, opt) {
+		'use strict';
+
+		$.extend(opt, {inlineSelector: '.inline_insert', data: 'attachid', addAfter: 'label'});
+
+		var listAttachs = [],
+			init = function (opt) {
+			},
+			addInterface = function ($before, attachId) {
+				var $trigger;
+
+				if (typeof opt.trigger !== 'undefined')
+					$trigger = opt.trigger.clone();
+				else {
+					$trigger = $('<a />');
+
+					if (typeof opt.triggerClass !== 'undefined')
+						$trigger.addClass(opt.triggerClass);
+				}
+
+				$trigger.on('click', function (e) {
+					e.preventDefault();
+
+					var ila_text = '[attach]' + attachId + '[/attach]';
+					$editor_data[editor].insertText(ila_text, false, true);
+				}).attr('id', 'inline_attach_' + attachId)
+					.data('attachid', attachId);
+
+				$before.after($trigger);
+				listAttachs.push($trigger);
+			},
+			removeAttach = function (attachId) {]]></search>
+			<add><![CDATA[	var ElkInlineAttachments = (function (selector, editor, opt) {
+		'use strict';
+
+		opt = $.extend({
+			inlineSelector: '.inline_insert',
+			data: 'attachid',
+			addAfter: 'label',
+			template: ''
+		}, opt);
+
+		var listAttachs = [],
+			init = function (opt) {},
+			addInterface = function ($before, attachId) {
+				var $trigger, $container = $('<div class="container" />'), $over;
+
+				if (typeof opt.trigger !== 'undefined')
+				{
+					$trigger = opt.trigger.clone();
+				}
+				else
+				{
+					$trigger = $('<a />');
+
+					if (typeof opt.triggerClass !== 'undefined')
+					{
+						$trigger.addClass(opt.triggerClass);
+					}
+				}
+
+				$container.append($trigger);
+				$trigger.on('click', function (e) {
+					e.preventDefault();
+
+					if ($over != undefined)
+					{
+						$(document).trigger('click.ila_insert');
+						return;
+					}
+
+					$over = $(opt.template).hide();
+					var firstLi = false,
+					    $tabs = $over.find("ul[data-group='tabs'] li");
+					/*
+					 * Behaviours (onSomething)
+					 */
+					$tabs.each(function(k, v) {
+						$(this).on('click', function(e) {
+							e.preventDefault();
+							e.stopPropagation();
+
+							$tabs.each(function(k, v) {
+								$(this).removeClass('active');
+							});
+							var toShow = $(this).data('tab');
+							$(this).addClass('active');
+							$over.find('.container').each(function(k, v) {
+								if ($(this).data('visual') == toShow)
+								{
+									$(this).show();
+								}
+								else
+								{
+									$(this).hide();
+								}
+							});
+						});
+						if (firstLi == false)
+						{
+							$(this).click();
+							firstLi = true;
+						}
+					});
+					$over.find("input[data-size='thumb']").on('change', function(e) {
+						$over.find('.customsize').slideUp();
+					});
+					$over.find("input[data-size='full']").on('change', function(e) {
+						$over.find('.customsize').slideUp();
+					});
+					$over.find("input[data-size='cust']").on('change', function(e) {
+						$over.find('.customsize').slideDown();
+					});
+					$over.find(".range").on('input', function () {
+						var val = $(this).val()
+						$over.find(".visualizesize").val(val + 'px');
+					}).trigger('input');
+
+					$over.find('.button').on('click', function() {
+						var ila_text = '[attach';
+						if ($over.find("input[data-size='thumb']").is(':checked'))
+						{
+							ila_text = ila_text + ' type=thumb';
+						}
+						if ($over.find("input[data-size='cust']").is(':checked'))
+						{
+							var w = $over.find('.range').val();
+							// Doesn't really matter that much, but just to ensure it's not 1
+							if (w > 10)
+							{
+								ila_text = ila_text + ' width=' + w;
+							}
+						}
+
+						$over.find(".container[data-visual='align'] input").each(function (k, v) {
+							if ($(this).is(':checked'))
+							{
+								if ($(this).data('align') != 'none')
+								{
+									ila_text = ila_text + ' align=' + $(this).data('align');
+									return;
+								}
+							}
+						});
+
+						ila_text = ila_text + ']' + attachId + '[/attach]';
+						$editor_data[editor].insertText(ila_text, false, true);
+						$(document).trigger('click.ila_insert');
+					});
+					// Prevents removing the element to disappear when clicking on
+					// anything because of the click.ila_insert event
+					$over.find('*').on('click', function(e) {
+						e.stopPropagation();
+					});
+
+					/*
+					 * Initialization
+					 */
+					$over.find('.container label:first-child input').each(function(k, v) {
+						$(this).change().prop('checked', true);
+					});
+
+					$container.append($over);
+					$over.fadeIn(function() {
+						$(document).on('click.ila_insert', function() {
+							$over.fadeOut(function() {
+								$over.remove();
+								$over = undefined;
+							});
+							$(document).off('click.ila_insert');
+						});
+					});
+				}).attr('id', 'inline_attach_' + attachId)
+					.data('attachid', attachId);
+
+				$before.after($container);
+				listAttachs.push($trigger);
+			},
+			removeAttach = function (attachId) {]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/scripts/topic.js">
+		<operation>
+			<search position="replace"><![CDATA[		xDown = null,
+		yDown = null,
+		$elk_expand_icon = $('<span id="elk_lb_expand"></span>'),
+		$elk_lightbox = $('#elk_lightbox'),
+		$elk_lb_content = $('#elk_lb_content'),
+		ajaxIndicatorOn = function () {]]></search>
+			<add><![CDATA[		xDown = null,
+		yDown = null,
+		$elk_expand_icon = $('<span id="elk_lb_expand"></span>'),
+		$elk_next_icon = $('<span id="elk_lb_next"></span>'),
+		$elk_prev_icon = $('<span id="elk_lb_prev"></span>'),
+		$elk_lightbox = $('#elk_lightbox'),
+		$elk_lb_content = $('#elk_lb_content'),
+		ajaxIndicatorOn = function () {]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		closeLightbox = function () {
+			// Close the lightbox and remove handlers
+			$elk_expand_icon.off('click');
+			$elk_lightbox.hide();
+			$elk_lb_content.html('').removeAttr('style').removeClass('expand');
+			$('html, body').removeClass('elk_lb_no_scrolling');]]></search>
+			<add><![CDATA[		closeLightbox = function () {
+			// Close the lightbox and remove handlers
+			$elk_expand_icon.off('click');
+			$elk_next_icon.off('click');
+			$elk_prev_icon.off('click');
+			$elk_lightbox.hide();
+			$elk_lb_content.html('').removeAttr('style').removeClass('expand');
+			$('html, body').removeClass('elk_lb_no_scrolling');]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[						'max-height': Math.floor(screenHeight) + 'px'
+					});
+
+					$elk_lb_content.html($(this)).append($elk_expand_icon);
+
+					ajaxIndicatorOff();
+				})]]></search>
+			<add><![CDATA[						'max-height': Math.floor(screenHeight) + 'px'
+					});
+
+					$elk_lb_content.html($(this)).append($elk_expand_icon)
+					.append($elk_next_icon).append($elk_prev_icon);
+
+					ajaxIndicatorOff();
+				})]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			$elk_lb_content.html('').removeAttr('style').removeClass('expand');
+			ajaxIndicatorOn();
+			$elk_expand_icon.off('click');
+			link = document.getElementById('link_' + thumbID);
+			openLightbox();
+			expandLightbox();]]></search>
+			<add><![CDATA[			$elk_lb_content.html('').removeAttr('style').removeClass('expand');
+			ajaxIndicatorOn();
+			$elk_expand_icon.off('click');
+			$elk_next_icon.off('click');
+			$elk_prev_icon.off('click');
+			link = document.getElementById('link_' + thumbID);
+			openLightbox();
+			expandLightbox();]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[				$(window).off('keydown.lb');
+				$(window).off('touchmove.lb');
+			});
+		};
+
+	// Create the lightbox container only if needed]]></search>
+			<add><![CDATA[				$(window).off('keydown.lb');
+				$(window).off('touchmove.lb');
+			});
+			$elk_next_icon.on('click', function (event) {
+				event.preventDefault();
+				event.stopPropagation();
+				nextNav();
+				navLightbox();
+			});
+			$elk_prev_icon.on('click', function (event) {
+				event.preventDefault();
+				event.stopPropagation();
+				prevNav();
+				navLightbox();
+			});
+		};
+
+	// Create the lightbox container only if needed]]></add>
+		</operation>
+	</file>
+</modification>
