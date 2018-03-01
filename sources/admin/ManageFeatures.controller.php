@@ -878,10 +878,13 @@ class ManageFeatures_Controller extends Action_Controller
 
 		// Load up the profile field, if one was supplied
 		if ($context['fid'])
+		{
 			$context['field'] = getProfileField($context['fid']);
+		}
 
 		// Setup the default values as needed.
 		if (empty($context['field']))
+		{
 			$context['field'] = array(
 				'name' => '',
 				'colname' => '???',
@@ -907,6 +910,7 @@ class ManageFeatures_Controller extends Action_Controller
 				'enclose' => '',
 				'placement' => 0,
 			);
+		}
 
 		// All the javascript for this page... everything else is in admin.js
 		addJavascriptVar(array('startOptID' => count($context['field']['options'])));
@@ -1000,7 +1004,9 @@ class ManageFeatures_Controller extends Action_Controller
 
 							// Is it default?
 							if (isset($this->_req->post->default_select) && $this->_req->post->default_select == $k)
+							{
 								$default = $v;
+							}
 						}
 
 						if (isset($_POST['default_select']) && $_POST['default_select'] == 'no_default')

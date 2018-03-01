@@ -1016,27 +1016,27 @@ dl.themes_list dd {
 Adjusts display of wording and selections to one line.
 ----------------------------------------------------------------*/
 #admin_form_wrapper .theme_options dt {
-    float: left;
-    clear: both;
-    margin: 0 0 10px 0;
-    padding: 0;
-    width: 55%;
+	float: left;
+	clear: both;
+	margin: 0 0 10px 0;
+	padding: 0;
+	width: 55%;
 }
 
 #admin_form_wrapper .theme_options dd {
-    float: right;
-    overflow: auto;
-    margin: 0 0 3px 0;
-    padding: 0;
-    width: 45%;
-    min-height: 2em;
+	float: right;
+	overflow: auto;
+	margin: 0 0 3px 0;
+	padding: 0;
+	width: 45%;
+	min-height: 2em;
 }
 
 #admin_form_wrapper .input_check, .input_radio {
-    border: none;
-    background: none;
-    vertical-align: top;
-    margin: 0 2px 4px 4px;
+	border: none;
+	background: none;
+	vertical-align: top;
+	margin: 0 2px 4px 4px;
 }
 
 /* alternate row colors on Modify Themes,Copy a template */

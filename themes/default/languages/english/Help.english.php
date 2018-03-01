@@ -594,6 +594,7 @@ $helptxt['field_show_enclosed'] = 'Encloses the user input between some text or 
 		You can use the following variables:<br />
 		<ul class="normallist">
 			<li>{INPUT} - The input specified by the user.</li>
+			<li>{KEY} - The key specified for a certain value of select box or radio buttons in the admin panel. Usually to use in case of localization or use in CSS of Javascript elements (e.g. as class name).</li>
 			<li>{SCRIPTURL} - Web address of forum.</li>
 			<li>{IMAGES_URL} - URI of the images directory of the user\'s current theme.</li>
 			<li>{DEFAULT_IMAGES_URL} - URI of the images directory of the default theme.</li>
