@@ -986,7 +986,15 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
-			$user_profile[$row['id_member']]['options'][$row['variable']] = $row['value'];
+		{
+			$value = json_decode($row['value'], true);
+			if ($value === null)
+			{
+				$value = array($row['value'], $row['value']);
+			}
+			$user_profile[$row['id_member']]['options'][$row['variable'] . '_key'] = $value[0];
+			$user_profile[$row['id_member']]['options'][$row['variable']] = $value[1];
+		}
 		$db->free_result($request);
 	}
 
@@ -1183,12 +1191,19 @@ function loadMemberContext($user, $display_custom_fields = false)
 
 			// Enclosing the user input within some other text?
 			if (!empty($custom['enclose']))
-				$value = strtr($custom['enclose'], array(
+			{
+				$replacements = array(
 					'{SCRIPTURL}' => $scripturl,
 					'{IMAGES_URL}' => $settings['images_url'],
 					'{DEFAULT_IMAGES_URL}' => $settings['default_images_url'],
 					'{INPUT}' => $value,
-				));
+				);
+				if (in_array($row['field_type'], array('radio', 'select')))
+				{
+					$replacements['{KEY}'] = $profile['options'][$custom['colname'] . '_key'];
+				}
+				$value = strtr($custom['enclose'], $replacements);
+			}
 
 			$memberContext[$user]['custom_fields'][] = array(
 				'title' => $custom['title'],

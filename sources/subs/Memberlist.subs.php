@@ -364,12 +364,20 @@ function printMemberListRows($request)
 
 				// Should it be enclosed for display?
 				if (!empty($column['enclose']) && !empty($context['members'][$member]['options'][$curField]))
-					$context['members'][$member]['options'][$curField] = strtr($column['enclose'], array(
+				{
+
+					$replacements = array(
 						'{SCRIPTURL}' => $scripturl,
 						'{IMAGES_URL}' => $settings['images_url'],
 						'{DEFAULT_IMAGES_URL}' => $settings['default_images_url'],
 						'{INPUT}' => $context['members'][$member]['options'][$curField],
-					));
+					);
+					if (in_array($column['type'], array('radio', 'select')))
+					{
+						$replacements['{KEY}'] = $context['members'][$member]['options'][$curField . '_key'];
+					}
+					$context['members'][$member]['options'][$curField] = strtr($column['enclose'], $replacements);
+				}
 
 				// Anything else to make it look "nice"
 				if ($column['bbc'])

@@ -179,17 +179,22 @@ function template_edit_profile_field()
 							<span class="smalltext">', $txt['custom_edit_options_desc'], '</span>
 						</dt>
 						<dd id="options_dd">
-							<div>';
+							<div id="cust_fields_multiselect">
+								<p><span>', $txt['languages_default'], '</span><span>', $txt['custom_edit_key'], '</span><span>', $txt['custom_edit_value'], '</span></p>';
 
 	if (!empty($context['field']['show_nodefault']))
 	{
 		echo '
-								<input type="radio" name="default_select" value="no_default"', $context['field']['default_select'] == 'no_default' ? ' checked="checked"' : '', ' class="input_radio" /><label>' . $txt['custom_edit_options_no_default'] . '</label><br />';
+								<p><span><input type="radio" name="default_select" value="no_default"', $context['field']['default_select'] == 'no_default' ? ' checked="checked"' : '', ' class="input_radio" /></span><span><label>' . $txt['custom_edit_options_no_default'] . '</label></span></p>';
 	}
 
 	foreach ($context['field']['options'] as $k => $option)
+	{
 		echo '
-							', $k == 0 ? '' : '<br />', '<input type="radio" name="default_select" value="', $k, '"', $context['field']['default_select'] == $option ? ' checked="checked"' : '', ' /><input type="text" name="select_option[', $k, ']" value="', $option, '" class="input_text" />';
+							<p><span><input type="radio" name="default_select" value="', $k, '"', $context['field']['default_select'] == $option ? ' checked="checked"' : '', ' /></span>
+							<span><input type="text" name="select_key[', $k, ']" value="', $k, '" class="input_text" /></span>
+							<span><input type="text" name="select_option[', $k, ']" value="', $option, '" class="input_text" /></span></p>';
+	}
 
 	echo '
 							<span id="addopt"></span>

@@ -208,7 +208,14 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		{
 			$value = Util::htmlspecialchars($custom_fields[$row['col_name']]);
 			if (in_array($row['field_type'], array('select', 'radio')))
-				$value = ($options = explode(',', $row['field_options'])) && isset($options[$value]) ? $options[$value] : '';
+			{
+				$options = json_decode($row['field_options'], true);
+				if ($options === null)
+				{
+					$options = explode(',', $row['field_options']);
+				}
+				$value = ($options) && isset($options[$value]) ? $options[$value] : '';
+			}
 		}
 
 		// HTML for the input form.
@@ -225,11 +232,17 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		elseif ($row['field_type'] === 'select')
 		{
 			$input_html = '<select id="' . $row['col_name'] . '" name="customfield[' . $row['col_name'] . ']"><option value=""' . ($row['default_value'] === 'no_default' ? ' selected="selected"' : '') . '></option>';
-			$options = explode(',', $row['field_options']);
+			$options = json_decode($row['field_options'], true);
+			if ($options === null)
+			{
+				$options = explode(',', $row['field_options']);
+			}
+
 			foreach ($options as $k => $v)
 			{
 				$true = ($value == $v);
 				$input_html .= '<option value="' . $k . '"' . ($true ? ' selected="selected"' : '') . '>' . $v . '</option>';
+				$key = $k;
 				if ($true)
 					$output_html = $v;
 			}
@@ -240,11 +253,17 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		elseif ($row['field_type'] === 'radio')
 		{
 			$input_html = '<fieldset>';
-			$options = explode(',', $row['field_options']);
+			$options = json_decode($row['field_options'], true);
+			if ($options === null)
+			{
+				$options = explode(',', $row['field_options']);
+			}
+
 			foreach ($options as $k => $v)
 			{
 				$true = ($value == $v);
 				$input_html .= '<label for="customfield_' . $row['col_name'] . '_' . $k . '"><input type="radio" name="customfield[' . $row['col_name'] . ']" class="input_radio" id="customfield_' . $row['col_name'] . '_' . $k . '" value="' . $k . '" ' . ($true ? 'checked="checked"' : '') . ' />' . $v . '</label><br />';
+				$key = $k;
 				if ($true)
 					$output_html = $v;
 			}
@@ -270,12 +289,19 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 
 		// Enclosing the user input within some other text?
 		if (!empty($row['enclose']) && !empty($output_html))
-			$output_html = strtr($row['enclose'], array(
+		{
+			$replacements = array(
 				'{SCRIPTURL}' => $scripturl,
 				'{IMAGES_URL}' => $settings['images_url'],
 				'{DEFAULT_IMAGES_URL}' => $settings['default_images_url'],
 				'{INPUT}' => $output_html,
-			));
+			);
+			if (in_array($row['field_type'], array('radio', 'select')))
+			{
+				$replacements['{KEY}'] = $key;
+			}
+			$output_html = strtr($row['enclose'], $replacements);
+		}
 
 		$context['custom_fields'][] = array(
 			'name' => $row['field_name'],
@@ -1527,10 +1553,17 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 		elseif ($row['field_type'] === 'select' || $row['field_type'] === 'radio')
 		{
 			$value = $row['default_value'];
-			foreach (explode(',', $row['field_options']) as $k => $v)
+			$options = json_decode($row['field_options'], true);
+			if ($options === null)
+			{
+				$options = explode(',', $row['field_options']);
+			}
+			foreach ($options as $k => $v)
 			{
 				if (isset($_POST['customfield'][$row['col_name']]) && $_POST['customfield'][$row['col_name']] == $k)
-					$value = $v;
+				{
+					$value = json_encode(array($k => $v));
+				}
 			}
 		}
 		// Otherwise some form of text!
@@ -1573,7 +1606,16 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 			);
 
 			$changes[] = array($row['col_name'], $value, $memID);
-			$user_profile[$memID]['options'][$row['col_name']] = $value;
+			if ($row['field_type'] === 'select' || $row['field_type'] === 'radio')
+			{
+				$value = json_decode($value, true);
+				$user_profile[$memID]['options'][$row['col_name'] . '_key'] = $value[0];
+				$user_profile[$memID]['options'][$row['col_name']] = $value[1];
+			}
+			else
+			{
+				$user_profile[$memID]['options'][$row['col_name']] = $value;
+			}
 		}
 	}
 	$db->free_result($request);

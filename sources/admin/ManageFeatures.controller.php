@@ -878,10 +878,13 @@ class ManageFeatures_Controller extends Action_Controller
 
 		// Load up the profile field, if one was supplied
 		if ($context['fid'])
+		{
 			$context['field'] = getProfileField($context['fid']);
+		}
 
 		// Setup the default values as needed.
 		if (empty($context['field']))
+		{
 			$context['field'] = array(
 				'name' => '',
 				'colname' => '???',
@@ -907,6 +910,7 @@ class ManageFeatures_Controller extends Action_Controller
 				'enclose' => '',
 				'placement' => 0,
 			);
+		}
 
 		// All the javascript for this page... everything else is in admin.js
 		addJavascriptVar(array('startOptID' => count($context['field']['options'])));
@@ -982,31 +986,43 @@ class ManageFeatures_Controller extends Action_Controller
 				case 'radio':
 					if (!empty($this->_req->post->select_option))
 					{
+						$field_options_array = array();
 						foreach ($this->_req->post->select_option as $k => $v)
 						{
 							// Clean, clean, clean...
 							$v = Util::htmlspecialchars($v);
 							$v = strtr($v, array(',' => ''));
+							if (!empty($this->_req->post->select_key[$k]))
+							{
+								$key = Util::htmlspecialchars($this->_req->post->select_key[$k]);
+								$key = trim(strtr($key, array(',' => '')));
+								if ($key == '')
+								{
+									$key = $k;
+								}
+							}
 
 							// Nada, zip, etc...
 							if (trim($v) == '')
 								continue;
 
 							// Otherwise, save it boy.
-							$field_options .= $v . ',';
+							$field_options_array[$key] = $v;
 
 							// This is just for working out what happened with old options...
 							$newOptions[$k] = $v;
 
 							// Is it default?
 							if (isset($this->_req->post->default_select) && $this->_req->post->default_select == $k)
+							{
 								$default = $v;
+							}
 						}
 
 						if (isset($_POST['default_select']) && $_POST['default_select'] == 'no_default')
 							$default = 'no_default';
 
-						$field_options = substr($field_options, 0, -1);
+						$field_options = json_encode($field_options_array);
 					}
 					break;
 				default:

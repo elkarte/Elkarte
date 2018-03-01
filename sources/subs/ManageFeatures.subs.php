@@ -412,7 +412,14 @@ function getProfileField($id_field)
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
-	{
+{
+		$field_options = json_decode($row['field_options'], true);
+		// Fallback to support transition from comma-separed values to json encoded
+		if ($field_options === null)
+		{
+			$field_options = strlen($row['field_options']) > 1 ? explode(',', $row['field_options']) : array('', '', '');
+		}
+
 		$field = array(
 			'name' => $row['field_name'],
 			'desc' => $row['field_desc'],
@@ -430,7 +437,7 @@ function getProfileField($id_field)
 			'default_select' => $row['field_type'] == 'select' || $row['field_type'] == 'radio' ? $row['default_value'] : '',
 			'show_nodefault' => $row['field_type'] == 'select' || $row['field_type'] == 'radio',
 			'default_value' => $row['default_value'],
-			'options' => strlen($row['field_options']) > 1 ? explode(',', $row['field_options']) : array('', '', ''),
+			'options' => $field_options,
 			'active' => $row['active'],
 			'private' => $row['private'],
 			'can_search' => $row['can_search'],
