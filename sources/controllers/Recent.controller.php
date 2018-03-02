@@ -15,11 +15,13 @@
  *
  */
 
+use ElkArte\sources\Frontpage_Interface;
+
 /**
  * Recent_Controller Class
  * Retrieve information about recent posts
  */
-class Recent_Controller extends Action_Controller
+class Recent_Controller extends Action_Controller implements Frontpage_Interface
 {
 	/**
 	 * The object that will retrieve the data
@@ -62,6 +64,20 @@ class Recent_Controller extends Action_Controller
 	 * @var bool
 	 */
 	private $_flex_start = false;
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function frontPageHook(&$default_action)
+	{
+		add_integration_function('integrate_menu_buttons', 'MessageIndex_Controller::addForumButton', '', false);
+		add_integration_function('integrate_current_action', 'MessageIndex_Controller::fixCurrentAction', '', false);
+
+		$default_action = array(
+			'controller' => 'Recent_Controller',
+			'function' => 'action_recent'
+		);
+	}
 
 	/**
 	 * Called before any other action method in this class.
