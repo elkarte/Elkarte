@@ -4,6 +4,46 @@
 
 	<id>Elkarte Contributors:ElkArte_112_patch</id>
 	<version>1.0</version>
+	<file name="BOARDDIR/bootstrap.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.1
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.2
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		define('ELKBOOT', '1');
+
+		// The software version
+		define('FORUM_VERSION', 'ElkArte 1.1.1');
+
+		// Shortcut for the browser cache stale
+		define('CACHE_STALE', '?R111');
+	}
+
+	/**]]></search>
+			<add><![CDATA[		define('ELKBOOT', '1');
+
+		// The software version
+		define('FORUM_VERSION', 'ElkArte 1.1.2');
+
+		// Shortcut for the browser cache stale
+		define('CACHE_STALE', '?R112');
+	}
+
+	/**]]></add>
+		</operation>
+	</file>
 	<file name="SOURCEDIR/Load.php">
 		<operation>
 			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
@@ -86,6 +126,41 @@
 	}
 
 	/**]]></add>
+		</operation>
+	</file>
+	<file name="CONTROLLERDIR/Recent.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.2
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	 */
+	public function pre_dispatch()
+	{
+		// Guests can't have unread things, we don't know anything about them.
+		is_not_guest();
+
+		// Prefetching + lots of MySQL work = bad mojo.
+		stop_prefetching();
+]]></search>
+			<add><![CDATA[	 */
+	public function pre_dispatch()
+	{
+		// Prefetching + lots of MySQL work = bad mojo.
+		stop_prefetching();
+]]></add>
 		</operation>
 	</file>
 	<file name="SOURCEDIR/database/Db-mysql.class.php">
@@ -267,6 +342,22 @@
 		</operation>
 	</file>
 	<file name="SUBSDIR/Auth.subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.2
+ *
+ */
+]]></add>
+		</operation>
 		<operation>
 			<search position="replace"><![CDATA[			$names[$i] = strtr($names[$i], array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '\'' => '&#039;'));
 		else
