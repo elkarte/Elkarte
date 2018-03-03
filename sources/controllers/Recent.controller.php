@@ -71,9 +71,6 @@ class Recent_Controller extends Action_Controller
 	 */
 	public function pre_dispatch()
 	{
-		// Guests can't have unread things, we don't know anything about them.
-		is_not_guest();
-
 		// Prefetching + lots of MySQL work = bad mojo.
 		stop_prefetching();
 
