@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.2
  *
  */
 
@@ -1321,7 +1321,7 @@ class Search
 		}
 
 		// We building an index?
-		if (is_callable(array($this->_searchAPI, 'prepareWord')))
+		if (is_callable(array($this->_searchAPI, 'indexedWordQuery')))
 		{
 			$indexedResults = $this->_prepare_word_index($id_search, $maxMessageResults);
 

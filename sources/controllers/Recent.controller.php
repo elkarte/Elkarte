@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.2
  *
  */
 
@@ -71,9 +71,6 @@ class Recent_Controller extends Action_Controller
 	 */
 	public function pre_dispatch()
 	{
-		// Guests can't have unread things, we don't know anything about them.
-		is_not_guest();
-
 		// Prefetching + lots of MySQL work = bad mojo.
 		stop_prefetching();
 

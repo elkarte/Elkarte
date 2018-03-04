@@ -1355,11 +1355,15 @@ div.bbc_footnotes .meaction {
 	border-color: #fff;
 }
 
-#elk_lb_expand {
+#elk_lb_expand,
+#elk_lb_next,
+#elk_lb_prev {
 	border-color: #CCCCCC;
 }
 
-#elk_lb_expand:before {
+#elk_lb_expand:before,
+#elk_lb_next:before,
+#elk_lb_prev:before {
 	color: #CCCCCC;
 }
 
