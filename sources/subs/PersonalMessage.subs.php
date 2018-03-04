@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.2
  *
  */
 
@@ -1884,7 +1884,12 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
 			'pm_list' => $all_pms,
 		)
 	);
+
 	$message_labels = array();
+	foreach ($all_pms as $pmid)
+	{
+		$message_labels[$pmid] = array();
+	}
 	$message_replied = array();
 	$message_unread = array();
 	$message_first_label = array();

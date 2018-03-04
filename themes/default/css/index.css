@@ -3635,20 +3635,84 @@ ul.post_options li {
 	position: relative;
 }
 
+.drop_area_fileselect_text input {
+	overflow-y: hidden;
+}
+
 .drop_area .mobile {
 	display: none;
 }
 
 .progress_tracker {
-	overflow: hidden;
 	width: 97%;
 }
 
 .statusbar {
-	overflow: hidden;
+	position: relative;
 	padding: 5px;
 	border-top: 1px solid;
 	border-bottom: 1px solid;
+}
+
+.statusbar .container {
+	position: relative;
+	display: inline-block;
+}
+
+.statusbar .insertoverlay {
+	position: absolute;
+	min-width: 10em;
+	padding: 0.2em;
+	border: 1px solid;
+	border-radius: 4px;
+	z-index: 1000;
+}
+.insertoverlay .tabs {
+	display: block;
+	white-space: nowrap;
+	display: flex;
+	justify-content: space-between;
+}
+.insertoverlay .tabs li {
+	display: inline-block;
+	padding: 0 0.5em;
+	text-align: center;
+	border-bottom: 1px solid;
+	cursor: pointer;
+	flex-grow: 1;
+}
+.insertoverlay .tabs li.active {
+	background-color: #E4E4E4;
+}
+
+.statusbar .insertoverlay label {
+	display: block;
+}
+
+.statusbar .insertoverlay .visualizesize,
+.statusbar .insertoverlay .range {
+	max-width: 45%;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+	margin-left: 1%;
+	margin-right: 1%;
+	display: inline-block;
+}
+
+.statusbar .insertoverlay .container {
+	display: block;
+}
+
+.statusbar .insertoverlay .visualizesize {
+	float: right;
+}
+
+.statusbar .insertoverlay .button {
+	position: absolute;
+	left: 2.5em;
+	top: -2em;
+	margin: 0;
+	font-weight: bold;
 }
 
 .info {
@@ -3709,7 +3773,7 @@ ul.post_options li {
 }
 
 #postAttachment2 {
-	overflow: hidden;
+/* 	overflow: hidden; */
 }
 
 #postAttachment2 dd {
@@ -5953,6 +6017,18 @@ a > i {
 	.popup_container .popup_window {
 		width: 95%;
 	}
+	.statusbar .insertoverlay .range {
+		max-width: 90%;
+	}
+	.statusbar .insertoverlay .button {
+		float: none;
+	}
+	.statusbar .insertoverlay .range,
+	.statusbar .insertoverlay .text,
+	.statusbar .insertoverlay .button {
+		margin: 1em auto;
+		display: block;
+	}
 
 	/*.listlevel1#button_profile .linklevel1 {
 		min-width: 0.5em;
@@ -6618,6 +6694,26 @@ a > i {
 
 	#postMoreOptions, #postAttachment2 {
 		padding: 4px;
+	}
+
+	.statusbar .container {
+		position: absolute;
+		display: inline-block;
+	}
+
+	.statusbar .insertoverlay {
+		margin-left: -10em;
+	}
+
+	.statusbar .insertoverlay .container {
+		position: relative;
+	}
+	.statusbar .insertoverlay label {
+		padding-top: 0.5em;
+	}
+	.statusbar .insertoverlay .container input {
+		display: block;
+		float: none;
 	}
 
 	#confirm_buttons input[type="submit"] {
