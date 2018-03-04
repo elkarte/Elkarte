@@ -288,6 +288,36 @@
 					);]]></add>
 		</operation>
 	</file>
+	<file name="SUBSDIR/Search/Search.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.2
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+		// We building an index?
+		if (is_callable(array($this->_searchAPI, 'prepareWord')))
+		{
+]]></search>
+			<add><![CDATA[
+		// We building an index?
+		if (is_callable(array($this->_searchAPI, 'indexedWordQuery')))
+		{
+]]></add>
+		</operation>
+	</file>
 	<file name="SUBSDIR/Attachments.subs.php">
 		<operation>
 			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
