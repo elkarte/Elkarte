@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.2
  *
  *
  * @todo Update this for the new package manager?
@@ -1355,7 +1355,7 @@ class ManageThemes_Controller extends Action_Controller
 		$theme_values = loadThemeOptionsInto(1, 0, array(), array('theme_templates', 'theme_layers'));
 
 		// Lets add a theme_info.xml to this theme.
-		write_theme_info($this->_req->query->copy, $modSettings['elkVersion'], $this->theme_dir, $theme_values);
+		write_theme_info($this->_req->post->copy, $modSettings['elkVersion'], $this->theme_dir, $theme_values);
 	}
 
 	/**

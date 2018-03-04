@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.1
+ * @version 1.1.2
  *
  */
 
@@ -197,8 +197,12 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 						// Compile a list of the files to show the user.
 						$file_list = array();
 						foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
+						{
 							if (strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') !== false)
+							{
 								$file_list[] = $attachment['name'];
+							}
+						}
 
 						$_SESSION['temp_attachments']['post']['files'] = $file_list;
 						$file_list = '<div class="attachments">' . implode('<br />', $file_list) . '</div>';
@@ -276,7 +280,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 					$context['attachments']['current'][] = array(
 						'name' => '<span class="underline">' . htmlspecialchars($attachment['name'], ENT_COMPAT, 'UTF-8') . '</span>',
 						'size' => $attachment['size'],
-						'id' => $attachID,
+						'id' => $attachment['public_attachid'],
 						'unchecked' => false,
 						'approved' => 1,
 					);

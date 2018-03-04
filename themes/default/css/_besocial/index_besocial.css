@@ -1177,11 +1177,15 @@ a.active {
 	border-color: #fff;
 }
 
-#elk_lb_expand {
+#elk_lb_expand,
+#elk_lb_next,
+#elk_lb_prev {
 	border-color: #CCCCCC;
 }
 
-#elk_lb_expand:before {
+#elk_lb_expand:before,
+#elk_lb_next:before,
+#elk_lb_prev:before {
 	color: #BBBBBB;
 }
 
@@ -1274,6 +1278,20 @@ a.active {
 	border-top-color: #A9CCD1;
 	border-bottom-color: #A9CCD1;
 	background: #EEEEEE;
+}
+
+.statusbar .insertoverlay {
+	background-color: #FAFAFA;
+	border-color: #A9CCD1;
+}
+
+.insertoverlay .tabs li {
+	border-color: #008000;
+}
+
+.statusbar .insertoverlay .button {
+	background: #008000;
+	color: #FAFAFA;
 }
 
 .progressBar {

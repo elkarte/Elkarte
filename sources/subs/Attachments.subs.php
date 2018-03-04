@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.1
+ * @version 1.1.2
  *
  */
 
@@ -616,6 +616,11 @@ function getTempAttachById($attach_id)
 
 	foreach ($_SESSION['temp_attachments'] as $attachID => $val)
 	{
+		if ($attachID === 'post')
+		{
+			continue;
+		}
+
 		if ($val['public_attachid'] === $attach_id)
 		{
 			$attach_real_id = $attachID;
@@ -1186,7 +1191,7 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
 			'current_topic' => $id_topic,
 		)
 	);
-	$attachmentData = array();
+	$attachmentData = array_fill(0, 9, '');
 	if ($db->num_rows($request) != 0)
 	{
 		$fetch = $db->fetch_assoc($request);

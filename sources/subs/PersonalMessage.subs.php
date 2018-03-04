@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.2
  *
  */
 
@@ -81,6 +81,7 @@ function loadPMLabels($labels)
 			'not_deleted' => 0,
 		)
 	);
+	$labels = array();
 	while ($row = $db->fetch_assoc($result))
 	{
 		$this_labels = explode(',', $row['labels']);
@@ -1883,7 +1884,12 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
 			'pm_list' => $all_pms,
 		)
 	);
+
 	$message_labels = array();
+	foreach ($all_pms as $pmid)
+	{
+		$message_labels[$pmid] = array();
+	}
 	$message_replied = array();
 	$message_unread = array();
 	$message_first_label = array();
@@ -1899,6 +1905,7 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
 			// Read and replied to status for this message
 			$message_replied[$row['id_pm']] = $row['is_read'] & 2;
 			$message_unread[$row['id_pm']] = $row['is_read'] == 0;
+			$message_labels[$row['id_pm']] = array();
 
 			$row['labels'] = $row['labels'] == '' ? array() : explode(',', $row['labels']);
 			foreach ($row['labels'] as $v)
