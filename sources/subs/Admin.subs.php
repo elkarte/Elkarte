@@ -345,7 +345,7 @@ function readFileVersions(&$version_info, $directories, $pattern, $recursive = f
 		}
 		else
 		{
-			$iter = new IteratorIterator(new DirectoryIterator($dirname));
+			$iter = new IteratorIterator(new FilesystemIterator($dirname));
 		}
 
 		foreach ($iter as $dir)
