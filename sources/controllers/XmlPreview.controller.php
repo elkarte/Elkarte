@@ -19,7 +19,7 @@ class XmlPreview_Controller extends Action_Controller
 	/**
 	 * {@inheritdoc }
 	 */
-	public function trackStats()
+	public function trackStats($action = '')
 	{
 		return false;
 	}
