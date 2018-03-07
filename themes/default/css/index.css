@@ -3692,10 +3692,7 @@ ul.post_options li {
 .statusbar .insertoverlay .visualizesize,
 .statusbar .insertoverlay .range {
 	max-width: 45%;
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
-	margin-left: 1%;
-	margin-right: 1%;
+	margin-top: 0.5em 1%;
 	display: inline-block;
 }
 
