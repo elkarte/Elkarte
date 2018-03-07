@@ -55,7 +55,7 @@ $txt['theme_variants_default'] = 'Default theme variant:';
 $txt['theme_variants_user_disable'] = 'Disable user variant selection.';
 
 $txt['site_slogan'] = 'Site slogan:';
-$txt['site_slogan_desc'] = '(Add your own text for a slogan here. It will replace the default logo.)';
+$txt['site_slogan_desc'] = '(Add your own text for a slogan here.)';
 $txt['header_layout'] = 'Header layout:';
 $txt['header_layout_desc'] = '(This setting allows you to select one of three layouts for the header.)';
 $txt['header_layout_default_name'] = 'Default:';

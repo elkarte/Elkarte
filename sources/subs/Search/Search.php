@@ -1331,7 +1331,7 @@ class Search
 		}
 
 		// We building an index?
-		if (is_callable(array($this->_searchAPI, 'prepareWord')))
+		if (is_callable(array($this->_searchAPI, 'indexedWordQuery')))
 		{
 			$indexedResults = $this->_prepare_word_index($id_search, $maxMessageResults);
 

@@ -448,7 +448,27 @@ function template_add_new_attachments()
 		var IlaDropEvents = {
 			UploadSuccess: function($button, data) {
 				var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
-					trigger: $(\'<div class="share icon i-share" />\')
+					trigger: $(\'<div class="share icon i-share" />\'),
+					template: ' . JavaScriptEscape('<div class="insertoverlay">
+						<input type="button" class="button" value="insert">
+						<ul data-group="tabs" class="tabs">
+							<li data-tab="size">' . $txt['ila_opt_size'] . '</li><li data-tab="align">' . $txt['ila_opt_align'] . '</li>
+						</ul>
+						<div class="container" data-visual="size">
+							<label><input data-size="thumb" type="radio" name="imgmode">' . $txt['ila_opt_size_thumb'] . '</label>
+							<label><input data-size="full" type="radio" name="imgmode">' . $txt['ila_opt_size_full'] . '</label>
+							<label><input data-size="cust" type="radio" name="imgmode">' . $txt['ila_opt_size_cust'] . '</label>
+							<div class="customsize">
+								<input type="range" class="range" min="100" max="500"><input type="text" class="visualizesize" disabled="disabled">
+							</div>
+						</div>
+						<div class="container" data-visual="align">
+							<label><input data-align="none" type="radio" name="align">' . $txt['ila_opt_align_none'] . '</label>
+							<label><input data-align="left" type="radio" name="align">' . $txt['ila_opt_align_left'] . '</label>
+							<label><input data-align="center" type="radio" name="align">' . $txt['ila_opt_align_center'] . '</label>
+							<label><input data-align="right" type="radio" name="align">' . $txt['ila_opt_align_right'] . '</label>
+						</div>
+					</div>') . '
 				});
 				inlineAttach.addInterface($button, data.attachid);
 			},

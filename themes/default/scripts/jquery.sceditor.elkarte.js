@@ -398,6 +398,11 @@ $.sceditor.plugins.bbcode.bbcode
 		allowsEmpty: false,
 		quoteType: $.sceditor.BBCodeParser.QuoteType.never,
 		format: function (element, content) {
+			/**
+			 * This function is not used because no specific html tag is associated,
+			 * instead the 'img'.format takes care of finding the ILA images and process
+			 * them accordingly to return the [attach] tag.
+			 */
 			var	attribs = '',
 				params = function(names) {
 					names.forEach(function(name) {
@@ -408,24 +413,34 @@ $.sceditor.plugins.bbcode.bbcode
 					});
 				};
 
-			params(['width', 'height', 'align']);
+			params(['width', 'height', 'align', 'type']);
+
 			return '[attach' + attribs + ']' + content + '[/attach]';
 		},
 		html: function (token, attrs, content) {
-			var attribs = '',
+			var attribs = ''
 				align = '',
+				thumb = '',
 				params = function(names) {
 					names.forEach(function(name) {
-						if (typeof attrs[name] !== 'undefined')
+						if (typeof attrs[name] !== 'undefined') {
 							attribs += ' ' + name + '=' + attrs[name];
+						}
 					});
 				};
 
-			params(['width', 'height', 'align']);
+			params(['width', 'height', 'align', 'type']);
+			a_attribs = attribs;
 			if (typeof attrs.align !== 'undefined')
+			{
 				align = ' class="img_bbc float' + attrs.align + '"';
+			}
+			if (typeof attrs.type !== 'undefined')
+			{
+				thumb = ';' + attrs.type;
+			}
 
-			return '<img' + attribs + align + ' src="' + elk_scripturl + '?action=dlattach;attach=' + content + ';thumb;' + elk_session_var + '=' + elk_session_id + '" data-ila="' + content + '" />';
+			return '<img' + attribs + align + ' src="' + elk_scripturl + '?action=dlattach;attach=' + content + thumb + ';' + elk_session_var + '=' + elk_session_id + '" data-ila="' + content + '" />';
 		}
 	})
 	.set('center', {
@@ -577,7 +592,7 @@ $.sceditor.plugins.bbcode.bbcode
 			// check if this is an ILA ?
 			if (element.attr('data-ila'))
 			{
-				params(['width', 'height', 'align']);
+				params(['width', 'height', 'align', 'type']);
 				return '[attach' + attribs + ']' + element.attr('data-ila') + '[/attach]';
 			}
 

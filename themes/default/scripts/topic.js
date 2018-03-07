@@ -865,6 +865,8 @@ function expandThumbLB(thumbID, messageID) {
 		xDown = null,
 		yDown = null,
 		$elk_expand_icon = $('<span id="elk_lb_expand"></span>'),
+		$elk_next_icon = $('<span id="elk_lb_next"></span>'),
+		$elk_prev_icon = $('<span id="elk_lb_prev"></span>'),
 		$elk_lightbox = $('#elk_lightbox'),
 		$elk_lb_content = $('#elk_lb_content'),
 		ajaxIndicatorOn = function () {
@@ -877,6 +879,8 @@ function expandThumbLB(thumbID, messageID) {
 		closeLightbox = function () {
 			// Close the lightbox and remove handlers
 			$elk_expand_icon.off('click');
+			$elk_next_icon.off('click');
+			$elk_prev_icon.off('click');
 			$elk_lightbox.hide();
 			$elk_lb_content.html('').removeAttr('style').removeClass('expand');
 			$('html, body').removeClass('elk_lb_no_scrolling');
@@ -897,7 +901,8 @@ function expandThumbLB(thumbID, messageID) {
 						'max-height': Math.floor(screenHeight) + 'px'
 					});
 
-					$elk_lb_content.html($(this)).append($elk_expand_icon);
+					$elk_lb_content.html($(this)).append($elk_expand_icon)
+					.append($elk_next_icon).append($elk_prev_icon);
 
 					ajaxIndicatorOff();
 				})
@@ -922,6 +927,8 @@ function expandThumbLB(thumbID, messageID) {
 			$elk_lb_content.html('').removeAttr('style').removeClass('expand');
 			ajaxIndicatorOn();
 			$elk_expand_icon.off('click');
+			$elk_next_icon.off('click');
+			$elk_prev_icon.off('click');
 			link = document.getElementById('link_' + thumbID);
 			openLightbox();
 			expandLightbox();
@@ -938,6 +945,18 @@ function expandThumbLB(thumbID, messageID) {
 				$elk_expand_icon.hide();
 				$(window).off('keydown.lb');
 				$(window).off('touchmove.lb');
+			});
+			$elk_next_icon.on('click', function (event) {
+				event.preventDefault();
+				event.stopPropagation();
+				nextNav();
+				navLightbox();
+			});
+			$elk_prev_icon.on('click', function (event) {
+				event.preventDefault();
+				event.stopPropagation();
+				prevNav();
+				navLightbox();
 			});
 		};
 

@@ -1512,7 +1512,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 			}
 			else
 			{
-				$cache_staler = '';
+				$cache_staler = $staler_string;
 				$params['basename'] = $filename;
 			}
 			$this_id = empty($id) ? strtr(basename($filename), '?', '_') : $id;

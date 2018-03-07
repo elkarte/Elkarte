@@ -402,7 +402,7 @@ class Theme extends BaseTheme
 		}
 
 		// Use this hook to work with Javascript files and vars pre output
-		call_integration_hook('pre_javascript_output');
+		call_integration_hook('pre_javascript_output', array($do_deferred));
 
 		// Load in the JS files
 		if (!empty($this->js_files))
