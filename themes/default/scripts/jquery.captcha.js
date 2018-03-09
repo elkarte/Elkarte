@@ -27,7 +27,7 @@
 			'admin': false
 		};
 
-		$.extend(settings, options);
+		settings = $.extend(settings, options);
 
 		return this.each(function() {
 			$this = $(this);

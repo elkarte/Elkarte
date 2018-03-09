@@ -712,7 +712,7 @@
 
 		if ($news.length > 1)
 		{
-			$.extend(settings, options);
+			settings = $.extend(settings, options);
 			$news.hide();
 			$news.eq(0).fadeIn(settings.iFadeSpeed);
 

@@ -457,8 +457,8 @@ class ThemeLoader
 		}
 
 		// This allows us to change the way things look for the admin.
-		$context['admin_features'] = isset($modSettings['admin_features']) ? explode(',',
-			$modSettings['admin_features']) : ['cd,cp,k,w,rg,ml,pm'];
+		$context['admin_features'] = explode(',', isset($modSettings['admin_features']) ?
+			$modSettings['admin_features'] : 'cd,cp,k,w,rg,ml,pm');
 
 		if (!empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']))
 		{

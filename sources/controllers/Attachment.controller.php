@@ -33,7 +33,7 @@ class Attachment_Controller extends Action_Controller
 	/**
 	 * {@inheritdoc }
 	 */
-	public function needTheme()
+	public function needTheme($action = '')
 	{
 		global $modSettings, $user_info, $maintenance;
 

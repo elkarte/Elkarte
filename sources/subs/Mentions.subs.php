@@ -386,9 +386,11 @@ function getNewMentions($id_member, $timestamp)
 			SELECT COUNT(*) AS c
 			FROM {db_prefix}log_mentions
 			WHERE status = {int:status}
-				AND id_member = {int:member}',
+				AND id_member = {int:member}
+				AND is_accessible = {int:has_access}',
 			array(
 				'status' => 0,
+				'has_access' => 1,
 				'member' => $id_member
 			)
 		);
@@ -400,9 +402,11 @@ function getNewMentions($id_member, $timestamp)
 			FROM {db_prefix}log_mentions
 			WHERE status = {int:status}
 				AND log_time > {int:last_seen}
-				AND id_member = {int:member}',
+				AND id_member = {int:member}
+				AND is_accessible = {int:has_access}',
 			array(
 				'status' => 0,
+				'has_access' => 1,
 				'last_seen' => $timestamp,
 				'member' => $id_member
 			)
