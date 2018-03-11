@@ -403,7 +403,7 @@ class Search_Controller extends Action_Controller
 
 		// One or more search errors? Go back to the first search screen.
 		if (!empty($context['search_errors']))
-			$this->action_search();
+			return $this->action_search();
 
 		// Spam me not, Spam-a-lot?
 		if (empty($_SESSION['last_ss']) || $_SESSION['last_ss'] != $this->_search->param('search'))
@@ -441,7 +441,7 @@ class Search_Controller extends Action_Controller
 					if (empty($num_res))
 					{
 						$context['search_errors']['query_not_specific_enough'] = true;
-						$this->action_search();
+						return $this->action_search();
 					}
 
 					$_SESSION['search_cache']['num_results'] = $num_res;
