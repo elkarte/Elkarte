@@ -291,11 +291,8 @@ class Search_Controller extends Action_Controller
 		// Are you allowed?
 		isAllowedTo('search_posts');
 
-		$this->_search = new \ElkArte\Search\Search();
+		$this->_search = new \ElkArte\Search\Search($humungousTopicPosts, $maxMessageResults);
 		$this->_search->setWeights($this->_weight_factors, $this->_weight, $this->_weight_total);
-
-		// Load up the search API we are going to use.
-		$searchAPI = $this->_search->findSearchAPI();
 
 		if (isset($_REQUEST['params']))
 			$this->_search->searchParamsFromString($_REQUEST['params']);
@@ -330,8 +327,6 @@ class Search_Controller extends Action_Controller
 			if (isset($context['search_errors']['search_string_small_words'], $context['search_errors']['invalid_search_string']))
 				unset($context['search_errors']['invalid_search_string']);
 		}
-
-		$searchWords = $this->_search->searchWords();
 
 		// *** Spell checking?
 		if (!empty($modSettings['enableSpellChecking']) && function_exists('pspell_new'))
@@ -410,63 +405,7 @@ class Search_Controller extends Action_Controller
 		// Store the last search string to allow pages of results to be browsed.
 		$_SESSION['last_ss'] = $this->_search->param('search');
 
-		// *** Reserve an ID for caching the search results.
-		$query_params = $this->_search->getParams();
-
-		// Can this search rely on the API given the parameters?
-		if (is_callable(array($searchAPI, 'searchQuery')))
-		{
-			$participants = array();
-			$searchArray = array();
-			$num_results = $searchAPI->searchQuery($query_params, $searchWords, $this->_search->getExcludedIndexWords(), $participants, $searchArray);
-		}
-		// Update the cache if the current search term is not yet cached.
-		else
-		{
-			$this->_search_cache = new \ElkArte\Search\Cache\Session();
-
-			if ($this->_search_cache->existsWithParams($context['params']) === false)
-			{
-				$search_id = $this->_search_cache->increaseId($modSettings['search_pointer'] ?? 0);
-				// Store the new id right off.
-				updateSettings([
-					'search_pointer' => $search_id
-				]);
-
-				// Clear the previous cache of the final results cache.
-				$this->_search->clearCacheResults($search_id);
-
-				if ($this->_search->param('subject_only'))
-				{
-					$num_res = $this->_search->getSubjectResults(
-						$search_id, $humungousTopicPosts
-					);
-				}
-				else
-				{
-					$num_res = $this->_search->getResults(
-						$search_id, $humungousTopicPosts, $maxMessageResults
-					);
-					if (empty($num_res))
-					{
-						$context['search_errors']['query_not_specific_enough'] = true;
-						return $this->action_search();
-					}
-				}
-
-				$this->_search_cache->setNumResults($num_res);
-			}
-
-			// *** Retrieve the results to be shown on the page
-			$participants = $this->_search->addRelevance(
-				$context['topics'],
-				$search_id,
-				(int) $_REQUEST['start'],
-				$modSettings['search_results_per_page']
-			);
-
-			$num_results = $this->_search_cache->getNumResults();
-		}
+		$this->_search->searchQuery();
 
 		if (!empty($context['topics']))
 		{
@@ -504,6 +443,8 @@ class Search_Controller extends Action_Controller
 			// If we want to know who participated in what then load this now.
 			if (!empty($modSettings['enableParticipation']) && !$user_info['is_guest'])
 			{
+				$participants = $this->_search->getParticipants();
+
 				require_once(SUBSDIR . '/MessageIndex.subs.php');
 				$topics_participated_in = topicsParticipation($user_info['id'], array_keys($participants));
 
@@ -513,12 +454,11 @@ class Search_Controller extends Action_Controller
 		}
 
 		// Now that we know how many results to expect we can start calculating the page numbers.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=search;sa=results;params=' . $context['params'], $_REQUEST['start'], $num_results, $modSettings['search_results_per_page'], false);
+		$context['page_index'] = constructPageIndex($scripturl . '?action=search;sa=results;params=' . $context['params'], $_REQUEST['start'], $this->_search->getNumResults(), $modSettings['search_results_per_page'], false);
 
 		// Consider the search complete!
 		Cache::instance()->remove('search_start:' . ($user_info['is_guest'] ? $user_info['ip'] : $user_info['id']));
 
-		$context['key_words'] = &$searchArray;
 		$context['sub_template'] = 'results';
 		$context['page_title'] = $txt['search_results'];
 		$context['get_topics'] = array($this, 'prepareSearchContext_callback');
@@ -590,6 +530,8 @@ class Search_Controller extends Action_Controller
 		$message['first_subject'] = censor($message['first_subject']);
 		$message['last_subject'] = censor($message['last_subject']);
 
+		$searchArray = $this->_search->getSearchArray();
+
 		// Shorten this message if necessary.
 		if ($context['compact'])
 		{
@@ -603,13 +545,15 @@ class Search_Controller extends Action_Controller
 
 			if (Util::strlen($message['body']) > $charLimit)
 			{
-				if (empty($context['key_words']))
+				if (empty($searchArray))
+				{
 					$message['body'] = Util::substr($message['body'], 0, $charLimit) . '<strong>...</strong>';
+				}
 				else
 				{
 					$matchString = '';
 					$force_partial_word = false;
-					foreach ($context['key_words'] as $keyword)
+					foreach ($searchArray as $keyword)
 					{
 						$keyword = un_htmlspecialchars($keyword);
 						$keyword = preg_replace_callback('~(&amp;#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', strtr($keyword, array('\\\'' => '\'', '&' => '&amp;')));
@@ -744,7 +688,7 @@ class Search_Controller extends Action_Controller
 			call_integration_hook('integrate_quick_mod_actions_search');
 		}
 
-		foreach ($context['key_words'] as $query)
+		foreach ($searchArray as $query)
 		{
 			// Fix the international characters in the keyword too.
 			$query = un_htmlspecialchars($query);

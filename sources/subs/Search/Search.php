@@ -187,17 +187,43 @@ class Search
 	private $_createTemporary = true;
 
 	/**
+	 * 
+	 * @var int
+	 */
+	public $humungousTopicPosts = 0;
+
+	/**
+	 * 
+	 * @var int
+	 */
+	public $maxMessageResults = 0;
+
+	/**
+	 * 
+	 * @var int
+	 */
+	protected $_num_results = 0;
+
+	/**
+	 * 
+	 * @var mixed[]
+	 */
+	protected $_participants = [];
+
+	/**
 	 * Constructor
 	 * Easy enough, initialize the database objects (generic db and search db)
 	 *
 	 * @package Search
 	 */
-	public function __construct()
+	public function __construct($humungousTopicPosts, $maxMessageResults)
 	{
 		$this->_search_version = strtr('ElkArte 1+1', array('+' => '.', '=' => ' '));
 		$this->_forum_version = 'ElkArte 2.0 dev';
 		$this->_db = database();
 		$this->_db_search = db_search();
+		$this->humungousTopicPosts = $humungousTopicPosts;
+		$this->maxMessageResults = $maxMessageResults;
 
 		$this->_db_search->skip_next_error();
 		// Create new temporary table(s) (if we can) to store preliminary results in.
@@ -433,6 +459,11 @@ class Search
 
 		$this->_searchArray = array_slice(array_unique($this->_searchArray), 0, 10);
 
+		return $this->_searchArray;
+	}
+
+	public function getSearchArray()
+	{
 		return $this->_searchArray;
 	}
 
@@ -1587,6 +1618,32 @@ class Search
 	public function noMessages($messages_request)
 	{
 		return $this->_db->num_rows($messages_request) == 0;
+	}
+
+	public function searchQuery()
+	{
+		$searchAPI = $this->findSearchAPI();
+// 		$participants = array();
+		$searchArray = array();
+
+		$this->_num_results = $searchAPI->searchQuery(
+			$this->getParams(),
+			$this->searchWords(),
+			$this->getExcludedIndexWords(),
+			$this->_participants,
+			$searchArray,
+			$this
+		);
+	}
+
+	public function getNumResults()
+	{
+		return $this->_num_results;
+	}
+
+	public function getParticipants()
+	{
+		return $this->_participants;
 	}
 
 	/**

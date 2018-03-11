@@ -23,7 +23,7 @@ namespace ElkArte\Search\API;
  *
  * @package Search
  */
-class Custom extends SearchAPI
+class Custom extends Standard
 {
 	/**
 	 *This is the last version of ElkArte that this was tested on, to protect against API changes.

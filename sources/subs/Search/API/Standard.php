@@ -41,4 +41,59 @@ class Standard extends SearchAPI
 	 * @var boolean
 	 */
 	public $is_supported = true;
+
+	/**
+	 * 
+	 * @var object
+	 */
+	protected $_search_cache = null;
+
+	public function searchQuery($search_params, $search_words, $excluded_words, &$participants, &$search_results, $search)
+	{
+		global $context, $modSettings;
+
+		$this->_search_cache = new \ElkArte\Search\Cache\Session();
+
+		if ($this->_search_cache->existsWithParams($context['params']) === false)
+		{
+			$search_id = $this->_search_cache->increaseId($modSettings['search_pointer'] ?? 0);
+			// Store the new id right off.
+			updateSettings([
+				'search_pointer' => $search_id
+			]);
+
+			// Clear the previous cache of the final results cache.
+			$search->clearCacheResults($search_id);
+
+			if ($search->param('subject_only'))
+			{
+				$num_res = $search->getSubjectResults(
+					$search_id, $search->humungousTopicPosts
+				);
+			}
+			else
+			{
+				$num_res = $search->getResults(
+					$search_id, $search->humungousTopicPosts, $search->maxMessageResults
+				);
+				if (empty($num_res))
+				{
+					$context['search_errors']['query_not_specific_enough'] = true;
+					return $this->action_search();
+				}
+			}
+
+			$this->_search_cache->setNumResults($num_res);
+		}
+
+		// *** Retrieve the results to be shown on the page
+		$participants = $search->addRelevance(
+			$context['topics'],
+			$search_id,
+			(int) $_REQUEST['start'],
+			$modSettings['search_results_per_page']
+		);
+
+		return $this->_search_cache->getNumResults();
+	}
 }

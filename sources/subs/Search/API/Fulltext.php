@@ -22,7 +22,7 @@ namespace ElkArte\Search\API;
  *
  * @package Search
  */
-class Fulltext extends SearchAPI
+class Fulltext extends Standard
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
