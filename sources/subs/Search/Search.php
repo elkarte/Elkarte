@@ -365,13 +365,13 @@ class Search
 	 * @param mixed[] $weight - weight for each factor
 	 * @param int $weight_total - som of all the weights
 	 */
-	public function setWeights($weight_factors, $weight, $weight_total)
+	public function setWeights($weight)
 	{
-		$this->_weight_factors = $weight_factors;
+		$this->_weight_factors = $weight->getFactors();
 
-		$this->_weight = $weight;
+		$this->_weight = $weight->getWeight();
 
-		$this->_weight_total = $weight_total;
+		$this->_weight_total = $weight->getTotal();
 	}
 
 	/**
