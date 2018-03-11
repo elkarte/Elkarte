@@ -401,7 +401,7 @@ class Search_Controller extends Action_Controller
 
 		// One or more search errors? Go back to the first search screen.
 		if (!empty($context['search_errors']))
-			$this->action_search();
+			return $this->action_search();
 
 		// Spam me not, Spam-a-lot?
 		if (empty($_SESSION['last_ss']) || $_SESSION['last_ss'] != $this->_search->param('search'))
@@ -423,33 +423,49 @@ class Search_Controller extends Action_Controller
 		// Update the cache if the current search term is not yet cached.
 		else
 		{
-			$update_cache = empty($_SESSION['search_cache']) || ($_SESSION['search_cache']['params'] != $context['params']);
-			if ($update_cache)
+			$this->_search_cache = new \ElkArte\Search\Cache\Session();
+
+			if ($this->_search_cache->existsWithParams($context['params']) === false)
 			{
-				$this->_increase_pointer();
+				$search_id = $this->_search_cache->increaseId($modSettings['search_pointer'] ?? 0);
+				// Store the new id right off.
+				updateSettings([
+					'search_pointer' => $search_id
+				]);
 
 				// Clear the previous cache of the final results cache.
-				$this->_search->clearCacheResults($_SESSION['search_cache']['id_search']);
+				$this->_search->clearCacheResults($search_id);
 
 				if ($this->_search->param('subject_only'))
-					$_SESSION['search_cache']['num_results'] = $this->_search->getSubjectResults($_SESSION['search_cache']['id_search'], $humungousTopicPosts);
+				{
+					$num_res = $this->_search->getSubjectResults(
+						$search_id, $humungousTopicPosts
+					);
+				}
 				else
 				{
-					$num_res = $this->_search->getResults($_SESSION['search_cache']['id_search'], $humungousTopicPosts, $maxMessageResults);
+					$num_res = $this->_search->getResults(
+						$search_id, $humungousTopicPosts, $maxMessageResults
+					);
 					if (empty($num_res))
 					{
 						$context['search_errors']['query_not_specific_enough'] = true;
-						$this->action_search();
+						return $this->action_search();
 					}
-
-					$_SESSION['search_cache']['num_results'] = $num_res;
 				}
+
+				$this->_search_cache->setNumResults($num_res);
 			}
 
 			// *** Retrieve the results to be shown on the page
-			$participants = $this->_search->addRelevance($context['topics'], $_SESSION['search_cache']['id_search'], (int) $_REQUEST['start'], $modSettings['search_results_per_page']);
+			$participants = $this->_search->addRelevance(
+				$context['topics'],
+				$search_id,
+				(int) $_REQUEST['start'],
+				$modSettings['search_results_per_page']
+			);
 
-			$num_results = $_SESSION['search_cache']['num_results'];
+			$num_results = $this->_search_cache->getNumResults();
 		}
 
 		if (!empty($context['topics']))
@@ -930,28 +946,5 @@ class Search_Controller extends Action_Controller
 			$array['sort'] = 'relevance';
 
 		return $array;
-	}
-
-	/**
-	 * Increase the search pointer by 1.
-	 *
-	 * - The maximum value is 255, so when it becomes bigger, the pointer is reset to 0.
-	 */
-	private function _increase_pointer()
-	{
-		global $modSettings, $context;
-
-		// Increase the pointer...
-		$modSettings['search_pointer'] = empty($modSettings['search_pointer']) ? 0 : (int) $modSettings['search_pointer'];
-
-		// ...and store it right off.
-		updateSettings(array('search_pointer' => $modSettings['search_pointer'] >= 255 ? 0 : $modSettings['search_pointer'] + 1));
-
-		// As long as you don't change the parameters, the cache result is yours.
-		$_SESSION['search_cache'] = array(
-			'id_search' => $modSettings['search_pointer'],
-			'num_results' => -1,
-			'params' => $context['params'],
-			);
 	}
 }
