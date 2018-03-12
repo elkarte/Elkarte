@@ -384,7 +384,15 @@ class Search_Controller extends Action_Controller
 		// Store the last search string to allow pages of results to be browsed.
 		$_SESSION['last_ss'] = $this->_search->param('search');
 
-		$this->_search->searchQuery();
+		try
+		{
+			$context['topics'] = $this->_search->searchQuery();
+		}
+		catch (\Exception $e)
+		{
+			$context['search_errors'][$e->getMessage()] = true;
+			return $this->action_search();
+		}
 
 		if (!empty($context['topics']))
 		{

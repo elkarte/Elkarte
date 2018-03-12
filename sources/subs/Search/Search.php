@@ -1623,10 +1623,9 @@ class Search
 	public function searchQuery()
 	{
 		$searchAPI = $this->findSearchAPI();
-// 		$participants = array();
 		$searchArray = array();
 
-		$this->_num_results = $searchAPI->searchQuery(
+		return $searchAPI->searchQuery(
 			$this->getParams(),
 			$this->searchWords(),
 			$this->getExcludedIndexWords(),

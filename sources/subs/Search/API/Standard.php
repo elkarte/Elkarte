@@ -78,22 +78,23 @@ class Standard extends SearchAPI
 				);
 				if (empty($num_res))
 				{
-					$context['search_errors']['query_not_specific_enough'] = true;
-					return $this->action_search();
+					throw new \Exception('query_not_specific_enough');
 				}
 			}
 
 			$this->_search_cache->setNumResults($num_res);
 		}
 
+		$topics = array();
 		// *** Retrieve the results to be shown on the page
 		$participants = $search->addRelevance(
-			$context['topics'],
+			$topics,
 			$search_id,
 			(int) $_REQUEST['start'],
 			$modSettings['search_results_per_page']
 		);
+		$this->_num_results = $this->_search_cache->getNumResults();
 
-		return $this->_search_cache->getNumResults();
+		return $topics;
 	}
 }
