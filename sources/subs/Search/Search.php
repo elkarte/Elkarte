@@ -216,7 +216,7 @@ class Search
 	 *
 	 * @package Search
 	 */
-	public function __construct($humungousTopicPosts, $maxMessageResults)
+	public function __construct($humungousTopicPosts = 0, $maxMessageResults = 0)
 	{
 		$this->_search_version = strtr('ElkArte 1+1', array('+' => '.', '=' => ' '));
 		$this->_forum_version = 'ElkArte 2.0 dev';
@@ -1445,8 +1445,7 @@ class Search
 		// Did we either get some indexed results, or otherwise did not do an indexed query?
 		if (!empty($indexedResults) || !is_callable(array($this->_searchAPI, 'indexedWordQuery')))
 		{
-			$relevance = $this->_build_relevance($main_query['weights']);
-			$main_query['select']['relevance'] = $relevance;
+			$main_query['select']['relevance'] = $this->_build_relevance($main_query['weights']);
 			$num_results += $this->_build_search_results_log($main_query, 'insert_log_search_results_no_index');
 		}
 
