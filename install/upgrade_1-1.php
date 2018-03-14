@@ -202,7 +202,9 @@ class UpgradeInstructions_upgrade_1_1
 							'type' => 'tinyint',
 							'size' => 1,
 							'default' => 0
-						)
+						),
+						array(),
+						'ignore'
 					);
 
 					$this->table->db_change_column('{db_prefix}log_mentions',
@@ -608,7 +610,9 @@ class UpgradeInstructions_upgrade_1_1
 							'type' => 'smallint',
 							'size' => 5,
 							'default' => 4
-						)
+						),
+						array(),
+						'ignore'
 					);
 					$this->table->db_add_column('{db_prefix}custom_fields',
 						array(
@@ -616,7 +620,9 @@ class UpgradeInstructions_upgrade_1_1
 							'type' => 'smallint',
 							'size' => 5,
 							'default' => 30
-						)
+						),
+						array(),
+						'ignore'
 					);
 				}
 			),
