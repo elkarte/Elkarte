@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.3
  *
  */
 
@@ -244,9 +244,9 @@ class ProfileOptions_Controller extends Action_Controller
 				require_once(SUBSDIR . '/ProfileOptions.subs.php');
 				$new_buddiesArray = getBuddiesID($new_buddies);
 				$old_buddiesArray = explode(',', $user_profile[$this->_memID]['buddy_list']);
-
 				// Now update the current users buddy list.
-				$user_profile[$this->_memID]['buddy_list'] = implode(',', array_unique(array_merge($new_buddiesArray, $old_buddiesArray)));
+				$user_profile[$this->_memID]['buddy_list'] = implode(',', array_filter(array_unique(array_merge($new_buddiesArray, $old_buddiesArray))));
+
 				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData($this->_memID, array('buddy_list' => $user_profile[$this->_memID]['buddy_list']));
 			}
