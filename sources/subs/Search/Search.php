@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.2
+ * @version 1.1.3
  *
  */
 
@@ -1134,8 +1134,8 @@ class Search
 			$subject_query = array(
 				'from' => '{db_prefix}topics AS t',
 				'inner_join' => array(),
-				'left_join' => array(),
-				'where' => array(),
+				'left_join' => array('{db_prefix}boards AS b ON b.id_board = t.id_board'),
+				'where' => array('{query_see_board}'),
 			);
 
 			if ($modSettings['postmod_active'])
@@ -1259,8 +1259,8 @@ class Search
 			'inner_join' => array(
 				'{db_prefix}messages AS m ON (m.id_topic = t.id_topic)'
 			),
-			'left_join' => array(),
-			'where' => array(),
+			'left_join' => array('{db_prefix}boards AS b ON b.id_board = t.id_board'),
+			'where' => array('{query_see_board}'),
 			'group_by' => array(),
 			'parameters' => array(
 				'min_msg' => $this->_minMsg,
@@ -1424,8 +1424,10 @@ class Search
 				'inner_join' => array(
 					'{db_prefix}' . ($this->_createTemporary ? 'tmp_' : '') . 'log_search_topics AS lst ON (lst.id_topic = t.id_topic)'
 				),
+				'left_join' => array('{db_prefix}boards AS b ON b.id_board = t.id_board'),
 				'where' => array(
 					$this->_createTemporary ? '1=1' : 'lst.id_search = {int:id_search}',
+					'{query_see_board}',
 				),
 				'parameters' => array(
 					'id_search' => $id_search,
@@ -1615,8 +1617,8 @@ class Search
 			$subject_query = array(
 				'from' => '{db_prefix}topics AS t',
 				'inner_join' => array(),
-				'left_join' => array(),
-				'where' => array(),
+				'left_join' => array('{db_prefix}boards AS b ON b.id_board = t.id_board'),
+				'where' => array('{query_see_board}'),
 				'params' => array(),
 			);
 
