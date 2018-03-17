@@ -28,7 +28,7 @@ class VerificationControls
 	/**
 	 * Simple function that find and returns all the verification controls known to Elk
 	 */
-	protected function loadFSControls()
+	protected static function loadFSControls()
 	{
 		$glob = new \GlobIterator(SUBSDIR . '/VerificationControl/*.php', \FilesystemIterator::SKIP_DOTS);
 		$foundControls = array();
@@ -48,9 +48,9 @@ class VerificationControls
 		return $foundControls;
 	}
 
-	public function discoverControls(&$config_vars = null)
+	public static function discoverControls(&$config_vars = null)
 	{
-		$known_verifications = $this->loadFSControls();
+		$known_verifications = self::loadFSControls();
 		$working_verifications = array();
 
 		foreach ($known_verifications as $verification)
@@ -76,7 +76,7 @@ class VerificationControls
 			}
 			catch (\Error $e)
 			{
-			
+				// track the error?
 			}
 		}
 		$to_update = json_encode($working_verifications);
@@ -89,7 +89,7 @@ class VerificationControls
 	{
 		if (empty($settings['known_verifications']))
 		{
-			$settings['known_verifications'] = $this->discoverControls();
+			$settings['known_verifications'] = self::discoverControls();
 		}
 		$this->_known_verifications = json_decode($settings['known_verifications']);
 		$this->_verification_options = $verificationOptions;

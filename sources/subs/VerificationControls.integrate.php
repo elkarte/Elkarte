@@ -39,7 +39,6 @@ class VerificationControls_Integrate
 
 	public static function integrate_spam_settings(&$config_vars)
 	{
-		$verification = new VerificationControls();
-		$verification->discoverControls($config_vars);
+		VerificationControls::discoverControls($config_vars);
 	}
 }
