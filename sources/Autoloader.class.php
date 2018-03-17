@@ -325,9 +325,6 @@ class Elk_Autoloader
 	{
 		switch ($this->_givenname)
 		{
-			case 'VerificationControls':
-				$this->_file_name = SUBSDIR . '/VerificationControls.class.php';
-				break;
 			case 'AdminSettings':
 				$this->_file_name = SUBSDIR . '/AdminSettingsSearch.class.php';
 				break;

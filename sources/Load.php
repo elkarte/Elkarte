@@ -1588,7 +1588,7 @@ function addJavascriptVar($vars, $escape = false)
  */
 function addInlineJavascript($javascript, $defer = false)
 {
-	Errors::instance()->log_deprecated('addInlineJavascript()', 'theme()->getTemplates()->addInlineJavascript().');
+	Errors::instance()->log_deprecated('addInlineJavascript()', 'theme()->addInlineJavascript().');
 	theme()->addInlineJavascript($javascript, $defer);
 }
 
