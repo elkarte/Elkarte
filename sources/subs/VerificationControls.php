@@ -112,6 +112,7 @@ class VerificationControls
 	public function test($verification_errors)
 	{
 		$increase_error_count = false;
+		$force_refresh = false;
 
 		// This cannot happen!
 		if (!isset($this->_sessionVal['count']))
