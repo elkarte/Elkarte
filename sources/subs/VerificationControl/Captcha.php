@@ -101,12 +101,7 @@ class Captcha implements ControlInterface
 	}
 
 	/**
-	 * Show a verification captcha
-	 *
-	 * @param boolean $isNew
-	 * @param boolean $force_refresh
-	 *
-	 * @return bool
+	 * {@inheritdoc }
 	 */
 	public function showVerification($sessionVal, $isNew, $force_refresh = true)
 	{
@@ -141,9 +136,7 @@ class Captcha implements ControlInterface
 	}
 
 	/**
-	 * Build the string that will be used to build the captcha
-	 *
-	 * @param boolean $refresh
+	 * {@inheritdoc }
 	 */
 	public function createTest($sessionVal, $refresh = true)
 	{
@@ -165,7 +158,7 @@ class Captcha implements ControlInterface
 	}
 
 	/**
-	 * Prepare the captcha for the template
+	 * {@inheritdoc }
 	 */
 	public function prepareContext($sessionVal)
 	{
@@ -182,8 +175,7 @@ class Captcha implements ControlInterface
 	}
 
 	/**
-	 * Perform the test, make people do it again and robots pass :P
-	 * @return string|boolean
+	 * {@inheritdoc }
 	 */
 	public function doTest($sessionVal)
 	{
@@ -196,9 +188,7 @@ class Captcha implements ControlInterface
 	}
 
 	/**
-	 * Required by the interface, returns true for Captcha display
-	 *
-	 * @return bool
+	 * {@inheritdoc }
 	 */
 	public function hasVisibleTemplate()
 	{
@@ -206,9 +196,7 @@ class Captcha implements ControlInterface
 	}
 
 	/**
-	 * Configuration settings for the admin template
-	 *
-	 * @return array
+	 * {@inheritdoc }
 	 */
 	public function settings()
 	{

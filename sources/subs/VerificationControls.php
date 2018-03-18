@@ -18,6 +18,16 @@
 
 namespace ElkArte\sources\subs;
 
+/**
+ * Class VerificationControls
+ *
+ * - Takes care of create the verification controls, do the tests, etc.
+ * - Assumes the controls are available under /sources/subs/VerificationControl
+ *   and implement \ElkArte\sources\subs\VerificationControl\ControlInterface
+ * - It also provides a static method to load the available verifications (admin)
+ *
+ * @package ElkArte
+ */
 class VerificationControls
 {
 	protected $_known_verifications = array();
@@ -26,28 +36,43 @@ class VerificationControls
 	protected $_sessionVal = null;
 
 	/**
-	 * Simple function that find and returns all the verification controls known to Elk
+	 * Obviously the entry point of verification
+	 *
+	 * @param SessionIndex $sessionVal
+	 * @param mixed[] $settings Basically $modSettings
+	 * @param mixed[] $verificationOptions
+	 * @param bool $isNew If the control was initialized before
+	 * @param bool $force_refresh If the controls should be re-initialized
 	 */
-	protected static function loadFSControls()
+	public function __construct(SessionIndex $sessionVal, $settings = array(), $verificationOptions = array(), $isNew = false, $force_refresh = false)
 	{
-		$glob = new \GlobIterator(SUBSDIR . '/VerificationControl/*.php', \FilesystemIterator::SKIP_DOTS);
-		$foundControls = array();
-
-		foreach ($glob as $file)
+		if (empty($settings['known_verifications']))
 		{
-			if (strpos($file->getBasename('.php'), 'Interface') === false)
+			$settings['known_verifications'] = self::discoverControls();
+		}
+		$this->_known_verifications = json_decode($settings['known_verifications']);
+		$this->_verification_options = $verificationOptions;
+		$this->_verification_options['render'] = false;
+		$this->_sessionVal = $sessionVal;
+
+		foreach ($this->_known_verifications as $verification)
+		{
+			$class_name = '\\ElkArte\\sources\\subs\\VerificationControl\\' . $verification;
+			$current_instance = new $class_name($verificationOptions);
+
+			// If there is anything to show, otherwise forget it
+			if ($current_instance->showVerification($this->_sessionVal, $isNew, $force_refresh))
 			{
-				$foundControls[] = $file->getBasename('.php');
+				$this->_verification_instances[$verification] = $current_instance;
 			}
 		}
-
-		// Let integration add some more controls
-		// @deprecated since 2.0 dev - remove before final
-		call_integration_hook('integrate_control_verification', array(&$foundControls));
-
-		return $foundControls;
 	}
 
+	/**
+	 * This method returns the verification controls found in the file system
+	 *
+	 * @param mixed[] $config_vars
+	 */
 	public static function discoverControls(&$config_vars = null)
 	{
 		$known_verifications = self::loadFSControls();
@@ -85,30 +110,34 @@ class VerificationControls
 		return $to_update;
 	}
 
-	public function __construct($sessionVal, $settings = array(), $verificationOptions = array(), $isNew = false, $force_refresh = false)
+	/**
+	 * Simple function that find and returns all the verification controls known to Elk
+	 */
+	protected static function loadFSControls()
 	{
-		if (empty($settings['known_verifications']))
-		{
-			$settings['known_verifications'] = self::discoverControls();
-		}
-		$this->_known_verifications = json_decode($settings['known_verifications']);
-		$this->_verification_options = $verificationOptions;
-		$this->_verification_options['render'] = false;
-		$this->_sessionVal = $sessionVal;
+		$glob = new \GlobIterator(SUBSDIR . '/VerificationControl/*.php', \FilesystemIterator::SKIP_DOTS);
+		$foundControls = array();
 
-		foreach ($this->_known_verifications as $verification)
+		foreach ($glob as $file)
 		{
-			$class_name = '\\ElkArte\\sources\\subs\\VerificationControl\\' . $verification;
-			$current_instance = new $class_name($verificationOptions);
-
-			// If there is anything to show, otherwise forget it
-			if ($current_instance->showVerification($this->_sessionVal, $isNew, $force_refresh))
+			if (strpos($file->getBasename('.php'), 'Interface') === false)
 			{
-				$this->_verification_instances[$verification] = $current_instance;
+				$foundControls[] = $file->getBasename('.php');
 			}
 		}
+
+		// Let integration add some more controls
+		// @deprecated since 2.0 dev - remove before final
+		call_integration_hook('integrate_control_verification', array(&$foundControls));
+
+		return $foundControls;
 	}
 
+	/**
+	 * Runs the tests and populates the errors (if any)
+	 *
+	 * @param \ElkArte\Errors\ErrorContext $verification_errors
+	 */
 	public function test($verification_errors)
 	{
 		$increase_error_count = false;
@@ -150,6 +179,11 @@ class VerificationControls
 		return $force_refresh;
 	}
 
+	/**
+	 * Instantiate the verification controls
+	 *
+	 * @param bool $force_refresh If the controls should be re-initialized
+	 */
 	public function create($force_refresh = false)
 	{
 
@@ -172,6 +206,9 @@ class VerificationControls
 		);
 	}
 
+	/**
+	 * Is there any control to show?
+	 */
 	public function hasControls()
 	{
 		return count($this->_verification_instances) !== 0;

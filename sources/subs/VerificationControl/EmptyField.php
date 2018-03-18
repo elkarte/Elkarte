@@ -93,13 +93,7 @@ class EmptyField implements ControlInterface
 	}
 
 	/**
-	 * Returns if we are showing this verification control or not
-	 * Build the control if we are
-	 *
-	 * @param boolean $isNew
-	 * @param boolean $force_refresh
-	 *
-	 * @return bool
+	 * {@inheritdoc }
 	 */
 	public function showVerification($sessionVal, $isNew, $force_refresh = true)
 	{
@@ -120,9 +114,7 @@ class EmptyField implements ControlInterface
 	}
 
 	/**
-	 * Create the name data for the empty field that will be added to the template
-	 *
-	 * @param boolean $refresh
+	 * {@inheritdoc }
 	 */
 	public function createTest($sessionVal, $refresh = true)
 	{
@@ -146,8 +138,7 @@ class EmptyField implements ControlInterface
 	}
 
 	/**
-	 * Values passed to the template inside of GenericControls
-	 * Use the values to adjust how the control does or does not appear
+	 * {@inheritdoc }
 	 */
 	public function prepareContext($sessionVal)
 	{
@@ -168,7 +159,7 @@ class EmptyField implements ControlInterface
 	}
 
 	/**
-	 * Run the test on the returned value and return pass or fail
+	 * {@inheritdoc }
 	 */
 	public function doTest($sessionVal)
 	{
@@ -181,9 +172,7 @@ class EmptyField implements ControlInterface
 	}
 
 	/**
-	 * Not used, just returns false for empty field verifications
-	 *
-	 * @return false
+	 * {@inheritdoc }
 	 */
 	public function hasVisibleTemplate()
 	{
@@ -199,7 +188,7 @@ class EmptyField implements ControlInterface
 	}
 
 	/**
-	 * Callback for this verification control options, which is on or off
+	 * {@inheritdoc }
 	 */
 	public function settings()
 	{

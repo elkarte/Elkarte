@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file contains those functions specific to the various verification controls
- * used to challenge users, and hopefully robots as well.
+ * This file contains the integration functions that start the
+ * verification controls.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -18,12 +18,15 @@
 
 use ElkArte\sources\subs\VerificationControls;
 
+/**
+ * Class VerificationControls_Integrate
+ *
+ * - Injects the verification controls settings in the appropriate admin page.
+ *
+ * @package ElkArte
+ */
 class VerificationControls_Integrate
 {
-	protected $_known_verifications = array();
-	protected $_verification_options = array();
-	protected $_verification_instances = array();
-
 	/**
 	 * Register ACP config hooks for setting values
 	 *
@@ -37,6 +40,9 @@ class VerificationControls_Integrate
 		);
 	}
 
+	/**
+	 * Appends the configurations to $config_vars
+	 */
 	public static function integrate_spam_settings(&$config_vars)
 	{
 		VerificationControls::discoverControls($config_vars);

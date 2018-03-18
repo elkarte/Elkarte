@@ -76,13 +76,7 @@ class Questions implements ControlInterface
 	}
 
 	/**
-	 * Show the question to the user
-	 * Try's to account for languages
-	 *
-	 * @param boolean $isNew
-	 * @param boolean $force_refresh
-	 *
-	 * @return boolean
+	 * {@inheritdoc }
 	 */
 	public function showVerification($sessionVal, $isNew, $force_refresh = true)
 	{
@@ -127,9 +121,7 @@ class Questions implements ControlInterface
 	}
 
 	/**
-	 * Prepare the Q&A test/list for this request
-	 *
-	 * @param boolean $refresh
+	 * {@inheritdoc }
 	 */
 	public function createTest($sessionVal, $refresh = true)
 	{
@@ -157,9 +149,7 @@ class Questions implements ControlInterface
 	}
 
 	/**
-	 * Get things ready for the template
-	 *
-	 * @return mixed[]
+	 * {@inheritdoc }
 	 */
 	public function prepareContext($sessionVal)
 	{
@@ -191,10 +181,7 @@ class Questions implements ControlInterface
 	}
 
 	/**
-	 * Performs the test to see if the answer is correct
-	 *
-	 * @return bool|string
-	 * @throws Elk_Exception no_access
+	 * {@inheritdoc }
 	 */
 	public function doTest($sessionVal)
 	{
@@ -208,9 +195,7 @@ class Questions implements ControlInterface
 	}
 
 	/**
-	 * Required by the interface, returns true for question challenges
-	 *
-	 * @return boolean
+	 * {@inheritdoc }
 	 */
 	public function hasVisibleTemplate()
 	{
@@ -218,9 +203,7 @@ class Questions implements ControlInterface
 	}
 
 	/**
-	 * Admin panel interface to manage the anti spam question area
-	 *
-	 * @return mixed[]
+	 * {@inheritdoc }
 	 */
 	public function settings()
 	{
