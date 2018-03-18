@@ -209,7 +209,7 @@ function bb2_insert($settings, $package, $key)
 
 	// Add it
 	return "INSERT INTO {db_prefix}log_badbehavior
-		(`ip`, `date`, `request_method`, `request_uri`, `server_protocol`, `http_headers`, `user_agent`, `request_entity`, `valid`, `id_member`, `session`) VALUES
+		(ip, date, request_method, request_uri, server_protocol, http_headers, user_agent, request_entity, valid, id_member, session) VALUES
 		('$ip', '$date', '$request_method', '$request_uri', '$server_protocol', '$headers', '$user_agent', '$request_entity', '$key', '$member_id' , '$session')";
 }
 
@@ -353,7 +353,7 @@ function bb2_insert_stats($force = false)
 		// Get the blocked count for the last 7 days ... cache this as well
 		if (!Cache::instance()->getVar($bb2_blocked, 'bb2_blocked', 900))
 		{
-			$bb2_blocked = bb2_db_query('SELECT COUNT(*) FROM {db_prefix}log_badbehavior WHERE `valid` NOT LIKE \'00000000\'');
+			$bb2_blocked = bb2_db_query('SELECT COUNT(*) FROM {db_prefix}log_badbehavior WHERE valid NOT LIKE \'00000000\'');
 			Cache::instance()->put('bb2_blocked', $bb2_blocked, 900);
 		}
 
