@@ -384,7 +384,9 @@ class Search_Controller extends Action_Controller
 
 		try
 		{
-			$context['topics'] = $this->_search->searchQuery();
+			$context['topics'] = $this->_search->searchQuery(
+				new \ElkArte\Search\SearchApi(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '')
+			);
 		}
 		catch (\Exception $e)
 		{

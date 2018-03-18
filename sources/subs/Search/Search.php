@@ -25,17 +25,17 @@ use \ElkArte\Search\SearchParams;
 class Search
 {
 	/**
+	 * This is the forum version but is repeated due to some people
+	 * rewriting FORUM_VERSION.
+	 */
+	const FORUM_VERSION = 'ElkArte 2.0 dev';
+
+	/**
 	 * This is the minimum version of ElkArte that an API could have been written
 	 * for to work.
 	 * (strtr to stop accidentally updating version on release)
 	 */
 	private $_search_version = '';
-
-	/**
-	 * This is the forum version but is repeated due to some people
-	 * rewriting FORUM_VERSION.
-	 */
-	private $_forum_version = '';
 
 	/**
 	 * $_search_params will carry all settings that differ from the default search parameters.
@@ -185,7 +185,6 @@ class Search
 	public function __construct($humungousTopicPosts = 0, $maxMessageResults = 0)
 	{
 		$this->_search_version = strtr('ElkArte 1+1', array('+' => '.', '=' => ' '));
-		$this->_forum_version = 'ElkArte 2.0 dev';
 		$this->_db = database();
 		$this->_db_search = db_search();
 		$this->humungousTopicPosts = $humungousTopicPosts;
@@ -232,47 +231,6 @@ class Search
 				)
 			)
 		);
-	}
-
-	/**
-	 * Creates a search API and returns the object.
-	 *
-	 * @param string $searchClass
-	 *
-	 * @return API\Standard|null|object
-	 */
-	public function findSearchAPI($searchClass = '')
-	{
-		global $modSettings, $txt;
-
-		require_once(SUBSDIR . '/Package.subs.php');
-		\Elk_Autoloader::instance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
-
-		// Load up the search API we are going to use.
-		if (empty($searchClass))
-		{
-			$searchClass = !empty($modSettings['search_index']) ? $modSettings['search_index'] : 'standard';
-		}
-
-		// Try to initialize the API
-		$fqcn = '\\ElkArte\\Search\\API\\' . ucfirst($searchClass);
-		if (class_exists($fqcn) && is_a($fqcn, 'ElkArte\\Search\\API\\SearchAPI', true))
-		{
-			// Create an instance of the search API and check it is valid for this version of the software.
-			$this->_searchAPI = new $fqcn;
-		}
-
-		// An invalid Search API? Log the error and set it to use the standard API
-		if (!$this->_searchAPI || (!$this->_searchAPI->isValid()) || !matchPackageVersion($this->_forum_version, $this->_searchAPI->min_elk_version . '-' . $this->_searchAPI->version_compatible))
-		{
-			// Log the error.
-			theme()->getTemplates()->loadLanguageFile('Errors');
-			\Errors::instance()->log_error(sprintf($txt['search_api_not_compatible'], $fqcn), 'critical');
-
-			$this->_searchAPI = new \ElkArte\Search\API\Standard;
-		}
-
-		return $this->_searchAPI;
 	}
 
 	/**
@@ -1220,9 +1178,9 @@ class Search
 		return $this->_db->num_rows($messages_request) == 0;
 	}
 
-	public function searchQuery()
+	public function searchQuery($searchAPI)
 	{
-		$searchAPI = $this->findSearchAPI();
+		$this->_searchAPI = $searchAPI;
 		$searchArray = array();
 
 		return $searchAPI->searchQuery(

@@ -406,10 +406,8 @@ class TopicsMerge
 		$response_prefix = response_prefix();
 
 		// If there's a search index that needs updating, update it...
-		$search = new \ElkArte\Search\Search;
-		$searchAPI = $search->findSearchAPI();
-		if (is_callable(array($searchAPI, 'topicMerge')))
-			$searchAPI->topicMerge($id_topic, $this->_topics, $affected_msgs, empty($enforce_subject) ? null : array($response_prefix, $target_subject));
+		$searchAPI = new \ElkArte\Search\SearchApi(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '');
+		$searchAPI->topicMerge($id_topic, $this->_topics, $affected_msgs, empty($enforce_subject) ? null : array($response_prefix, $target_subject));
 	}
 
 	/**
