@@ -17,6 +17,8 @@
 
 namespace ElkArte\Search;
 
+use \ElkArte\Search\SearchParams;
+
 /**
  * Actually do the searches
  */
@@ -79,30 +81,6 @@ class Search
 	private $_memberlist = array();
 
 	/**
-	 * Message "age" via ID, given bounds, needed to calculate relevance
-	 * @var int
-	 */
-	private $_recentMsg = 0;
-
-	/**
-	 * The minimum message id we will search, needed to calculate relevance
-	 * @var int
-	 */
-	private $_minMsgID = 0;
-
-	/**
-	 * Needed to calculate relevance
-	 * @var int
-	 */
-	private $_minMsg = 0;
-
-	/**
-	 * The maximum message ID we will search, needed to calculate relevance
-	 * @var int
-	 */
-	private $_maxMsgID = 0;
-
-	/**
 	 * If we are performing a boolean or simple search
 	 * @var bool
 	 */
@@ -149,18 +127,6 @@ class Search
 	 * @var array
 	 */
 	private $_blacklisted_words = array();
-
-	/**
-	 * The db query for brd's
-	 * @var string
-	 */
-	private $_boardQuery = '';
-
-	/**
-	 * the db query for members
-	 * @var string
-	 */
-	private $_userQuery = '';
 
 	/**
 	 * The weights to associate to various areas for relevancy
@@ -336,8 +302,8 @@ class Search
 	public function getParams()
 	{
 		return array_merge($this->_search_params, array(
-			'min_msg_id' => (int) $this->_minMsgID,
-			'max_msg_id' => (int) $this->_maxMsgID,
+			'min_msg_id' => (int) $this->_searchParams->_minMsgID,
+			'max_msg_id' => (int) $this->_searchParams->_maxMsgID,
 			'memberlist' => $this->_memberlist,
 		));
 	}
@@ -372,6 +338,18 @@ class Search
 		$this->_weight = $weight->getWeight();
 
 		$this->_weight_total = $weight->getTotal();
+	}
+
+	public function setParams(SearchParams $paramObject)
+	{
+		$this->_searchParams = $paramObject;
+		$this->_search_params = $this->_searchParams->get();
+
+		// Unfortunately, searching for words like this is going to be slow, so we're blacklisting them.
+		// @todo Setting to add more here?
+		// @todo Maybe only blacklist if they are the only word, or "any" is used?
+		$this->_blacklisted_words = array('img', 'url', 'quote', 'www', 'http', 'the', 'is', 'it', 'are', 'if');
+		call_integration_hook('integrate_search_blacklisted_words', array(&$this->_blacklisted_words));
 	}
 
 	/**
@@ -629,6 +607,14 @@ class Search
 	}
 
 	/**
+	 * Tell me, do I want to see the full message or just a piece?
+	 */
+	public function isCompact()
+	{
+		return empty($this->_search_params['show_complete']);
+	}
+
+	/**
 	 * Encodes search params ($this->_search_params) in an URL-compatible way
 	 *
 	 * @param array $search build param index with specific search term (did you mean?)
@@ -637,392 +623,7 @@ class Search
 	 */
 	public function compileURLparams($search = array())
 	{
-		$temp_params = $this->_search_params;
-		$encoded = array();
-
-		if (!empty($search))
-		{
-			$temp_params['search'] = implode(' ', $search);
-		}
-
-		// *** Encode all search params
-		// All search params have been checked, let's compile them to a single string... made less simple by PHP 4.3.9 and below.
-		if (isset($temp_params['brd']))
-		{
-			$temp_params['brd'] = implode(',', $temp_params['brd']);
-		}
-
-		foreach ($temp_params as $k => $v)
-			$encoded[] = $k . '|\'|' . $v;
-
-		if (!empty($encoded))
-		{
-			// Due to old IE's 2083 character limit, we have to compress long search strings
-			$params = @gzcompress(implode('|"|', $encoded));
-
-			// Gzcompress failed, use try non-gz
-			if (empty($params))
-			{
-				$params = implode('|"|', $encoded);
-			}
-
-			// Base64 encode, then replace +/= with uri safe ones that can be reverted
-			$encoded = str_replace(array('+', '/', '='), array('-', '_', '.'), base64_encode($params));
-		}
-		else
-		{
-			$encoded = '';
-		}
-
-		return $encoded;
-	}
-
-	/**
-	 * Extract search params from a string
-	 *
-	 * @param string $string - the string containing encoded search params
-	 */
-	public function searchParamsFromString($string)
-	{
-		// Due to IE's 2083 character limit, we have to compress long search strings
-		$temp_params = base64_decode(str_replace(array('-', '_', '.'), array('+', '/', '='), $string));
-
-		// Test for gzuncompress failing
-		$temp_params2 = @gzuncompress($temp_params);
-		$temp_params = explode('|"|', (!empty($temp_params2) ? $temp_params2 : $temp_params));
-
-		foreach ($temp_params as $i => $data)
-		{
-			list($k, $v) = array_pad(explode('|\'|', $data), 2, '');
-			$this->_search_params[$k] = $v;
-		}
-
-		if (isset($this->_search_params['brd']))
-		{
-			$this->_search_params['brd'] = empty($this->_search_params['brd']) ? array() : explode(',', $this->_search_params['brd']);
-		}
-	}
-
-	/**
-	 * Merge search params extracted with Search::searchParamsFromString
-	 * with those present in the $param array (usually $_REQUEST['params'])
-	 *
-	 * @param mixed[] $params - An array of search parameters
-	 * @param int     $recentPercentage - A coefficient to calculate the lowest
-	 *                message id to start search from
-	 * @param int     $maxMembersToSearch - The maximum number of members to consider
-	 *                when multiple are found
-	 *
-	 * @throws \Elk_Exception topic_gone
-	 */
-	public function mergeSearchParams($params, $recentPercentage, $maxMembersToSearch)
-	{
-		global $user_info, $modSettings, $context;
-
-		// Store whether simple search was used (needed if the user wants to do another query).
-		if (!isset($this->_search_params['advanced']))
-		{
-			$this->_search_params['advanced'] = empty($params['advanced']) ? 0 : 1;
-		}
-
-		// 1 => 'allwords' (default, don't set as param) / 2 => 'anywords'.
-		if (!empty($this->_search_params['searchtype']) || (!empty($params['searchtype']) && $params['searchtype'] == 2))
-		{
-			$this->_search_params['searchtype'] = 2;
-		}
-
-		// Minimum age of messages. Default to zero (don't set param in that case).
-		if (!empty($this->_search_params['minage']) || (!empty($params['minage']) && $params['minage'] > 0))
-		{
-			$this->_search_params['minage'] = !empty($this->_search_params['minage']) ? (int) $this->_search_params['minage'] : (int) $params['minage'];
-		}
-
-		// Maximum age of messages. Default to infinite (9999 days: param not set).
-		if (!empty($this->_search_params['maxage']) || (!empty($params['maxage']) && $params['maxage'] < 9999))
-		{
-			$this->_search_params['maxage'] = !empty($this->_search_params['maxage']) ? (int) $this->_search_params['maxage'] : (int) $params['maxage'];
-		}
-
-		// Searching a specific topic?
-		if (!empty($params['topic']) || (!empty($params['search_selection']) && $params['search_selection'] === 'topic'))
-		{
-			$this->_search_params['topic'] = empty($params['search_selection']) ? (int) $params['topic'] : (isset($params['sd_topic']) ? (int) $params['sd_topic'] : '');
-			$this->_search_params['show_complete'] = true;
-		}
-		elseif (!empty($this->_search_params['topic']))
-		{
-			$this->_search_params['topic'] = (int) $this->_search_params['topic'];
-		}
-
-		if (!empty($this->_search_params['minage']) || !empty($this->_search_params['maxage']))
-		{
-			$request = $this->_db->query('', '
-				SELECT ' . (empty($this->_search_params['maxage']) ? '0, ' : 'COALESCE(MIN(id_msg), -1), ') . (empty($this->_search_params['minage']) ? '0' : 'COALESCE(MAX(id_msg), -1)') . '
-				FROM {db_prefix}messages
-				WHERE 1=1' . ($modSettings['postmod_active'] ? '
-					AND approved = {int:is_approved_true}' : '') . (empty($this->_search_params['minage']) ? '' : '
-					AND poster_time <= {int:timestamp_minimum_age}') . (empty($this->_search_params['maxage']) ? '' : '
-					AND poster_time >= {int:timestamp_maximum_age}'),
-				array(
-					'timestamp_minimum_age' => empty($this->_search_params['minage']) ? 0 : time() - 86400 * $this->_search_params['minage'],
-					'timestamp_maximum_age' => empty($this->_search_params['maxage']) ? 0 : time() - 86400 * $this->_search_params['maxage'],
-					'is_approved_true' => 1,
-				)
-			);
-			list ($this->_minMsgID, $this->_maxMsgID) = $this->_db->fetch_row($request);
-			if ($this->_minMsgID < 0 || $this->_maxMsgID < 0)
-			{
-				$context['search_errors']['no_messages_in_time_frame'] = true;
-			}
-			$this->_db->free_result($request);
-		}
-
-		// Default the user name to a wildcard matching every user (*).
-		if (!empty($this->_search_params['userspec']) || (!empty($params['userspec']) && $params['userspec'] != '*'))
-		{
-			$this->_search_params['userspec'] = isset($this->_search_params['userspec']) ? $this->_search_params['userspec'] : $params['userspec'];
-		}
-
-		// If there's no specific user, then don't mention it in the main query.
-		if (empty($this->_search_params['userspec']))
-		{
-			$this->_userQuery = '';
-		}
-		else
-		{
-			$userString = strtr(\Util::htmlspecialchars($this->_search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
-			$userString = strtr($userString, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_'));
-
-			preg_match_all('~"([^"]+)"~', $userString, $matches);
-			$possible_users = array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $userString)));
-
-			for ($k = 0, $n = count($possible_users); $k < $n; $k++)
-			{
-				$possible_users[$k] = trim($possible_users[$k]);
-
-				if (strlen($possible_users[$k]) == 0)
-				{
-					unset($possible_users[$k]);
-				}
-			}
-
-			// Create a list of database-escaped search names.
-			$realNameMatches = array();
-			foreach ($possible_users as $possible_user)
-				$realNameMatches[] = $this->_db->quote(
-					'{string:possible_user}',
-					array(
-						'possible_user' => $possible_user
-					)
-				);
-
-			// Retrieve a list of possible members.
-			$request = $this->_db->query('', '
-				SELECT
-					id_member
-				FROM {db_prefix}members
-				WHERE {raw:match_possible_users}',
-				array(
-					'match_possible_users' => 'real_name LIKE ' . implode(' OR real_name LIKE ', $realNameMatches),
-				)
-			);
-
-			// Simply do nothing if there're too many members matching the criteria.
-			if ($this->_db->num_rows($request) > $maxMembersToSearch)
-			{
-				$this->_userQuery = '';
-			}
-			elseif ($this->_db->num_rows($request) == 0)
-			{
-				$this->_userQuery = $this->_db->quote(
-					'm.id_member = {int:id_member_guest} AND ({raw:match_possible_guest_names})',
-					array(
-						'id_member_guest' => 0,
-						'match_possible_guest_names' => 'm.poster_name LIKE ' . implode(' OR m.poster_name LIKE ', $realNameMatches),
-					)
-				);
-			}
-			else
-			{
-				while ($row = $this->_db->fetch_assoc($request))
-				{
-					$this->_memberlist[] = $row['id_member'];
-				}
-
-				$this->_userQuery = $this->_db->quote(
-					'(m.id_member IN ({array_int:matched_members}) OR (m.id_member = {int:id_member_guest} AND ({raw:match_possible_guest_names})))',
-					array(
-						'matched_members' => $this->_memberlist,
-						'id_member_guest' => 0,
-						'match_possible_guest_names' => 'm.poster_name LIKE ' . implode(' OR m.poster_name LIKE ', $realNameMatches),
-					)
-				);
-			}
-			$this->_db->free_result($request);
-		}
-
-		// Ensure that boards are an array of integers (or nothing).
-		if (!empty($this->_search_params['brd']) && is_array($this->_search_params['brd']))
-		{
-			$query_boards = array_map('intval', $this->_search_params['brd']);
-		}
-		elseif (!empty($params['brd']) && is_array($params['brd']))
-		{
-			$query_boards = array_map('intval', $params['brd']);
-		}
-		elseif (!empty($params['brd']))
-		{
-			$query_boards = array_map('intval', explode(',', $params['brd']));
-		}
-		elseif (!empty($params['search_selection']) && $params['search_selection'] === 'board' && !empty($params['sd_brd']) && is_array($params['sd_brd']))
-		{
-			$query_boards = array_map('intval', $params['sd_brd']);
-		}
-		elseif (!empty($params['search_selection']) && $params['search_selection'] === 'board' && isset($params['sd_brd']) && (int) $params['sd_brd'] !== 0)
-		{
-			$query_boards = array((int) $params['sd_brd']);
-		}
-		else
-		{
-			$query_boards = array();
-		}
-
-		// Special case for boards: searching just one topic?
-		if (!empty($this->_search_params['topic']))
-		{
-			$request = $this->_db->query('', '
-				SELECT
-					b.id_board
-				FROM {db_prefix}topics AS t
-					INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-				WHERE t.id_topic = {int:search_topic_id}
-					AND {query_see_board}' . ($modSettings['postmod_active'] ? '
-					AND t.approved = {int:is_approved_true}' : '') . '
-				LIMIT 1',
-				array(
-					'search_topic_id' => $this->_search_params['topic'],
-					'is_approved_true' => 1,
-				)
-			);
-
-			if ($this->_db->num_rows($request) == 0)
-			{
-				throw new \Elk_Exception('topic_gone', false);
-			}
-
-			$this->_search_params['brd'] = array();
-			list ($this->_search_params['brd'][0]) = $this->_db->fetch_row($request);
-			$this->_db->free_result($request);
-		}
-		// Select all boards you've selected AND are allowed to see.
-		elseif ($user_info['is_admin'] && (!empty($this->_search_params['advanced']) || !empty($query_boards)))
-		{
-			$this->_search_params['brd'] = $query_boards;
-		}
-		else
-		{
-			require_once(SUBSDIR . '/Boards.subs.php');
-			$this->_search_params['brd'] = array_keys(fetchBoardsInfo(array('boards' => $query_boards), array('include_recycle' => false, 'include_redirects' => false, 'wanna_see_board' => empty($this->_search_params['advanced']))));
-
-			// This error should pro'bly only happen for hackers.
-			if (empty($this->_search_params['brd']))
-			{
-				$context['search_errors']['no_boards_selected'] = true;
-			}
-		}
-
-		if (count($this->_search_params['brd']) != 0)
-		{
-			foreach ($this->_search_params['brd'] as $k => $v)
-				$this->_search_params['brd'][$k] = (int) $v;
-
-			// If we've selected all boards, this parameter can be left empty.
-			require_once(SUBSDIR . '/Boards.subs.php');
-			$num_boards = countBoards();
-
-			if (count($this->_search_params['brd']) == $num_boards)
-			{
-				$this->_boardQuery = '';
-			}
-			elseif (count($this->_search_params['brd']) == $num_boards - 1 && !empty($modSettings['recycle_board']) && !in_array($modSettings['recycle_board'], $this->_search_params['brd']))
-			{
-				$this->_boardQuery = '!= ' . $modSettings['recycle_board'];
-			}
-			else
-			{
-				$this->_boardQuery = 'IN (' . implode(', ', $this->_search_params['brd']) . ')';
-			}
-		}
-		else
-		{
-			$this->_boardQuery = '';
-		}
-
-		$this->_search_params['show_complete'] = !empty($this->_search_params['show_complete']) || !empty($params['show_complete']);
-		$this->_search_params['subject_only'] = !empty($this->_search_params['subject_only']) || !empty($params['subject_only']);
-
-		// Get the sorting parameters right. Default to sort by relevance descending.
-		$sort_columns = array(
-			'relevance',
-			'num_replies',
-			'id_msg',
-		);
-
-		// Allow integration to add additional sort columns
-		call_integration_hook('integrate_search_sort_columns', array(&$sort_columns));
-
-		if (empty($this->_search_params['sort']) && !empty($params['sort']))
-		{
-			list ($this->_search_params['sort'], $this->_search_params['sort_dir']) = array_pad(explode('|', $params['sort']), 2, '');
-		}
-
-		$this->_search_params['sort'] = !empty($this->_search_params['sort']) && in_array($this->_search_params['sort'], $sort_columns) ? $this->_search_params['sort'] : 'relevance';
-
-		if (!empty($this->_search_params['topic']) && $this->_search_params['sort'] === 'num_replies')
-		{
-			$this->_search_params['sort'] = 'id_msg';
-		}
-
-		// Sorting direction: descending unless stated otherwise.
-		$this->_search_params['sort_dir'] = !empty($this->_search_params['sort_dir']) && $this->_search_params['sort_dir'] === 'asc' ? 'asc' : 'desc';
-
-		// Determine some values needed to calculate the relevance.
-		$this->_minMsg = (int) ((1 - $recentPercentage) * $modSettings['maxMsgID']);
-		$this->_recentMsg = $modSettings['maxMsgID'] - $this->_minMsg;
-
-		// *** Parse the search query
-		call_integration_hook('integrate_search_params', array(&$this->_search_params));
-
-		// Unfortunately, searching for words like this is going to be slow, so we're blacklisting them.
-		// @todo Setting to add more here?
-		// @todo Maybe only blacklist if they are the only word, or "any" is used?
-		$this->_blacklisted_words = array('img', 'url', 'quote', 'www', 'http', 'the', 'is', 'it', 'are', 'if');
-		call_integration_hook('integrate_search_blacklisted_words', array(&$this->_blacklisted_words));
-
-		// What are we searching for?
-		if (empty($this->_search_params['search']))
-		{
-			if (isset($_GET['search']))
-			{
-				$this->_search_params['search'] = un_htmlspecialchars($_GET['search']);
-			}
-			elseif (isset($_POST['search']))
-			{
-				$this->_search_params['search'] = $_POST['search'];
-			}
-			else
-			{
-				$this->_search_params['search'] = '';
-			}
-		}
-	}
-
-	/**
-	 * Tell me, do I want to see the full message or just a piece?
-	 */
-	public function isCompact()
-	{
-		return empty($this->_search_params['show_complete']);
+		return $this->_searchParams->compileURL($search);
 	}
 
 	/**
@@ -1206,10 +807,10 @@ class Search
 				$subject_query_params['subject_words_' . $numTables . '_wild'] = '%' . $subjectWord . '%';
 			}
 
-			if (!empty($this->_userQuery))
+			if (!empty($this->_searchParams->_userQuery))
 			{
 				$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_topic = t.id_topic)';
-				$subject_query['where'][] = $this->_userQuery;
+				$subject_query['where'][] = $this->_searchParams->_userQuery;
 			}
 
 			if (!empty($this->_search_params['topic']))
@@ -1217,19 +818,19 @@ class Search
 				$subject_query['where'][] = 't.id_topic = ' . $this->_search_params['topic'];
 			}
 
-			if (!empty($this->_minMsgID))
+			if (!empty($this->_searchParams->_minMsgID))
 			{
-				$subject_query['where'][] = 't.id_first_msg >= ' . $this->_minMsgID;
+				$subject_query['where'][] = 't.id_first_msg >= ' . $this->_searchParams->_minMsgID;
 			}
 
-			if (!empty($this->_maxMsgID))
+			if (!empty($this->_searchParams->_maxMsgID))
 			{
-				$subject_query['where'][] = 't.id_last_msg <= ' . $this->_maxMsgID;
+				$subject_query['where'][] = 't.id_last_msg <= ' . $this->_searchParams->_maxMsgID;
 			}
 
-			if (!empty($this->_boardQuery))
+			if (!empty($this->_searchParams->_boardQuery))
 			{
-				$subject_query['where'][] = 't.id_board ' . $this->_boardQuery;
+				$subject_query['where'][] = 't.id_board ' . $this->_searchParams->_boardQuery;
 			}
 
 			if (!empty($this->_excludedPhrases))
@@ -1249,14 +850,14 @@ class Search
 				'id_search' => '{int:id_search}',
 				'id_topic' => 't.id_topic',
 				'relevance' => $this->_build_relevance(),
-				'id_msg' => empty($this->_userQuery) ? 't.id_first_msg' : 'm.id_msg',
+				'id_msg' => empty($this->_searchParams->_userQuery) ? 't.id_first_msg' : 'm.id_msg',
 				'num_matches' => 1,
 			);
 
 			$subject_query['parameters'] = array_merge($subject_query_params, array(
 				'id_search' => $id_search,
-				'min_msg' => $this->_minMsg,
-				'recent_message' => $this->_recentMsg,
+				'min_msg' => $this->_searchParams->_minMsg,
+				'recent_message' => $this->_searchParams->_recentMsg,
 				'huge_topic_posts' => $humungousTopicPosts,
 				'is_approved' => 1,
 				'limit' => empty($modSettings['search_max_results']) ? 0 : $modSettings['search_max_results'] - $numSubjectResults,
@@ -1304,8 +905,8 @@ class Search
 			'where' => array(),
 			'group_by' => array(),
 			'parameters' => array(
-				'min_msg' => $this->_minMsg,
-				'recent_message' => $this->_recentMsg,
+				'min_msg' => $this->_searchParams->_minMsg,
+				'recent_message' => $this->_searchParams->_recentMsg,
 				'huge_topic_posts' => $humungousTopicPosts,
 				'is_approved' => 1,
 				'limit' => $modSettings['search_max_results'],
@@ -1410,10 +1011,10 @@ class Search
 				$main_query['where'][] = count($orWhere) > 1 ? '(' . implode(' OR ', $orWhere) . ')' : $orWhere[0];
 			}
 
-			if (!empty($this->_userQuery))
+			if (!empty($this->_searchParams->_userQuery))
 			{
 				$main_query['where'][] = '{raw:user_query}';
-				$main_query['parameters']['user_query'] = $this->_userQuery;
+				$main_query['parameters']['user_query'] = $this->_searchParams->_userQuery;
 			}
 
 			if (!empty($this->_search_params['topic']))
@@ -1422,22 +1023,22 @@ class Search
 				$main_query['parameters']['topic'] = $this->param('topic');
 			}
 
-			if (!empty($this->_minMsgID))
+			if (!empty($this->_searchParams->_minMsgID))
 			{
 				$main_query['where'][] = 'm.id_msg >= {int:min_msg_id}';
-				$main_query['parameters']['min_msg_id'] = $this->_minMsgID;
+				$main_query['parameters']['min_msg_id'] = $this->_searchParams->_minMsgID;
 			}
 
-			if (!empty($this->_maxMsgID))
+			if (!empty($this->_searchParams->_maxMsgID))
 			{
 				$main_query['where'][] = 'm.id_msg <= {int:max_msg_id}';
-				$main_query['parameters']['max_msg_id'] = $this->_maxMsgID;
+				$main_query['parameters']['max_msg_id'] = $this->_searchParams->_maxMsgID;
 			}
 
-			if (!empty($this->_boardQuery))
+			if (!empty($this->_searchParams->_boardQuery))
 			{
 				$main_query['where'][] = 'm.id_board {raw:board_query}';
-				$main_query['parameters']['board_query'] = $this->_boardQuery;
+				$main_query['parameters']['board_query'] = $this->_searchParams->_boardQuery;
 			}
 		}
 		call_integration_hook('integrate_main_search_query', array(&$main_query));
@@ -1469,8 +1070,8 @@ class Search
 				),
 				'parameters' => array(
 					'id_search' => $id_search,
-					'min_msg' => $this->_minMsg,
-					'recent_message' => $this->_recentMsg,
+					'min_msg' => $this->_searchParams->_minMsg,
+					'recent_message' => $this->_searchParams->_recentMsg,
 					'huge_topic_posts' => $humungousTopicPosts,
 					'limit' => empty($modSettings['search_max_results']) ? 0 : $modSettings['search_max_results'] - $num_results,
 				),
@@ -1710,11 +1311,11 @@ class Search
 				}
 			}
 
-			if (!empty($this->_userQuery))
+			if (!empty($this->_searchParams->_userQuery))
 			{
 				$subject_query['inner_join'][] = '{db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)';
 				$subject_query['where'][] = '{raw:user_query}';
-				$subject_query['params']['user_query'] = $this->_userQuery;
+				$subject_query['params']['user_query'] = $this->_searchParams->_userQuery;
 			}
 
 			if (!empty($this->_search_params['topic']))
@@ -1723,22 +1324,22 @@ class Search
 				$subject_query['params']['topic'] = $this->param('topic');
 			}
 
-			if (!empty($this->_minMsgID))
+			if (!empty($this->_searchParams->_minMsgID))
 			{
 				$subject_query['where'][] = 't.id_first_msg >= {int:min_msg_id}';
-				$subject_query['params']['min_msg_id'] = $this->_minMsgID;
+				$subject_query['params']['min_msg_id'] = $this->_searchParams->_minMsgID;
 			}
 
-			if (!empty($this->_maxMsgID))
+			if (!empty($this->_searchParams->_maxMsgID))
 			{
 				$subject_query['where'][] = 't.id_last_msg <= {int:max_msg_id}';
-				$subject_query['params']['max_msg_id'] = $this->_maxMsgID;
+				$subject_query['params']['max_msg_id'] = $this->_searchParams->_maxMsgID;
 			}
 
-			if (!empty($this->_boardQuery))
+			if (!empty($this->_searchParams->_boardQuery))
 			{
 				$subject_query['where'][] = 't.id_board {raw:board_query}';
-				$subject_query['params']['board_query'] = $this->_boardQuery;
+				$subject_query['params']['board_query'] = $this->_searchParams->_boardQuery;
 			}
 
 			if (!empty($this->_excludedPhrases))
@@ -1858,11 +1459,11 @@ class Search
 					'params' => array(
 						'id_search' => !$this->_createTemporary ? $id_search : 0,
 						'excluded_words' => $this->_excludedWords,
-						'user_query' => !empty($this->_userQuery) ? $this->_userQuery : '',
-						'board_query' => !empty($this->_boardQuery) ? $this->_boardQuery : '',
+						'user_query' => !empty($this->_searchParams->_userQuery) ? $this->_searchParams->_userQuery : '',
+						'board_query' => !empty($this->_searchParams->_boardQuery) ? $this->_searchParams->_boardQuery : '',
 						'topic' => !empty($this->_search_params['topic']) ? $this->param('topic') : 0,
-						'min_msg_id' => (int) $this->_minMsgID,
-						'max_msg_id' => (int) $this->_maxMsgID,
+						'min_msg_id' => (int) $this->_searchParams->_minMsgID,
+						'max_msg_id' => (int) $this->_searchParams->_maxMsgID,
 						'excluded_phrases' => $this->_excludedPhrases,
 						'excluded_index_words' => $this->_excludedIndexWords,
 						'excluded_subject_words' => $this->_excludedSubjectWords,

@@ -143,10 +143,9 @@ class Search_Controller extends Action_Controller
 		if ($this->_search === null && isset($_REQUEST['params']))
 		{
 			Elk_Autoloader::instance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
-			$this->_search = new \ElkArte\Search\Search();
-			$this->_search->searchParamsFromString($_REQUEST['params']);
+			$search_params = new \ElkArte\Search\SearchParams($_REQUEST['params'] ?? '');
 
-			$context['search_params'] = $this->_search->getParams();
+			$context['search_params'] = $search_params->get();
 		}
 
 		if (isset($_REQUEST['search']))
@@ -272,11 +271,10 @@ class Search_Controller extends Action_Controller
 
 		$this->_search = new \ElkArte\Search\Search($humungousTopicPosts, $maxMessageResults);
 		$this->_search->setWeights(new \ElkArte\Search\WeightFactors($modSettings, $user_info['is_admin']));
+		$search_params = new \ElkArte\Search\SearchParams($_REQUEST['params'] ?? '');
+		$search_params->merge($_REQUEST, $recentPercentage, $maxMembersToSearch);
+		$this->_search->setParams($search_params);
 
-		if (isset($_REQUEST['params']))
-			$this->_search->searchParamsFromString($_REQUEST['params']);
-
-		$this->_search->mergeSearchParams($_REQUEST, $recentPercentage, $maxMembersToSearch);
 		$context['compact'] = $this->_search->isCompact();
 
 		// Nothing??
