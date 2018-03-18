@@ -47,11 +47,10 @@ class Verification_Display_Module extends ElkArte\sources\modules\Abstract_Modul
 		global $context;
 
 		// Do we need to show the visual verification image?
-		require_once(SUBSDIR . '/VerificationControls.class.php');
 		$verificationOptions = array(
 			'id' => 'post',
 		);
-		$context['require_verification'] = create_control_verification($verificationOptions);
+		$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions);
 		$context['visual_verification_id'] = $verificationOptions['id'];
 	}
 }
