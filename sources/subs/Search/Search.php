@@ -177,6 +177,12 @@ class Search
 	protected $_participants = [];
 
 	/**
+	 *
+	 * @var null|\ElkArte\Search\SearchParams
+	 */
+	protected $_searchParams = null;
+
+	/**
 	 * Constructor
 	 * Easy enough, initialize the database objects (generic db and search db)
 	 *
@@ -262,7 +268,7 @@ class Search
 		return array_merge($this->_search_params, array(
 			'min_msg_id' => (int) $this->_searchParams->_minMsgID,
 			'max_msg_id' => (int) $this->_searchParams->_maxMsgID,
-			'memberlist' => $this->_memberlist,
+			'memberlist' => $this->_searchParams->_memberlist,
 		));
 	}
 
@@ -287,7 +293,7 @@ class Search
 	 *
 	 * @param \ElkArte\Search\WeightFactors $weight
 	 */
-	public function setWeights($weight)
+	public function setWeights(\ElkArte\Search\WeightFactors $weight)
 	{
 		$this->_weight_factors = $weight->getFactors();
 
@@ -1191,9 +1197,14 @@ class Search
 		);
 	}
 
+	/**
+	 * Returns the number of results obtained from the query.
+	 *
+	 * @return int
+	 */
 	public function getNumResults()
 	{
-		return $this->_num_results;
+		return $this->_searchAPI->getNumResults();
 	}
 
 	public function getParticipants()

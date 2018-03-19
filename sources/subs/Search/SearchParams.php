@@ -73,6 +73,18 @@ class SearchParams
 	public $_recentMsg = 0;
 
 	/**
+	 *
+	 * @var int[]
+	 */
+	public $_memberlist = [];
+
+	/**
+	 *
+	 * @var null|Object
+	 */
+	protected $_db = null;
+
+	/**
 	 * Constructor
 	 *
 	 * @package Search

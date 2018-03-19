@@ -91,6 +91,16 @@ class SearchApi
 	}
 
 	/**
+	 * Returns the number of results obtained from the query.
+	 *
+	 * @return int
+	 */
+	public function getNumResults()
+	{
+		$this->_searchAPI->getNumResults();
+	}
+
+	/**
 	 * Creates a search API and returns the object.
 	 *
 	 * @param string $searchClass

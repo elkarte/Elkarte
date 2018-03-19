@@ -2393,7 +2393,7 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
  */
 function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 {
-	global $txt;
+	global $txt, $modSettings;
 
 	$db = database();
 

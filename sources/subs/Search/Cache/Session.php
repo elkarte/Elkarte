@@ -68,6 +68,11 @@ class Session
 		$this->_num_results = (int) $num_results;
 	}
 
+	/**
+	 * Returns the number of results obtained from the query.
+	 *
+	 * @return int
+	 */
 	public function getNumResults()
 	{
 		return $this->_num_results;

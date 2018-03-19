@@ -380,6 +380,8 @@ class TopicsMerge
 	 */
 	protected function _updateStats($affected_msgs, $id_topic, $target_subject, $enforce_subject)
 	{
+		global $modSettings;
+
 		// Cycle through each board...
 		foreach ($this->_boardTotals as $id_board => $stats)
 			decrementBoard($id_board, $stats);
