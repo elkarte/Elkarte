@@ -285,9 +285,7 @@ class Search
 	/**
 	 * Set the weight factors
 	 *
-	 * @param mixed[] $weight_factors
-	 * @param mixed[] $weight - weight for each factor
-	 * @param int $weight_total - som of all the weights
+	 * @param \ElkArte\Search\WeightFactors $weight
 	 */
 	public function setWeights($weight)
 	{
