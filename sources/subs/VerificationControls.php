@@ -50,7 +50,7 @@ class VerificationControls
 		{
 			$settings['known_verifications'] = self::discoverControls();
 		}
-		$this->_known_verifications = json_decode($settings['known_verifications']);
+		$this->_known_verifications = json_decode($settings['known_verifications'], true);
 		$this->_verification_options = $verificationOptions;
 		$this->_verification_options['render'] = false;
 		$this->_sessionVal = $sessionVal;

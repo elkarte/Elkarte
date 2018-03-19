@@ -67,7 +67,7 @@ class Questions implements ControlInterface
 	/**
 	 * Filters to use to load the questions
 	 *
-	 * @var null|string[]
+	 * @var null|\ElkArte\ValuesContainer
 	 */
 	private $_filter = null;
 
