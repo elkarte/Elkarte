@@ -268,7 +268,7 @@ class Questions implements ControlInterface
 		// Saving them?
 		if (isset($_GET['save']))
 		{
-			$count_questions = $this->_saveSettings($_POST['question'], $_POST['answer'], $_POST['language'], $_POST['qa_verification_number']);
+			$count_questions = $this->_saveSettings($_POST['question'], $_POST['answer'], $_POST['language']);
 
 			if (empty($count_questions) || $_POST['qa_verification_number'] > $count_questions)
 			{
@@ -293,7 +293,7 @@ class Questions implements ControlInterface
 	 * @param string[] $save_question
 	 * @return boolean
 	 */
-	protected function _saveSettings($save_question, $save_answer, $save_language, $save_qa_verification_number)
+	protected function _saveSettings($save_question, $save_answer, $save_language)
 	{
 		$existing_question_answers = $this->_loadAntispamQuestions();
 
