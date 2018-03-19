@@ -53,6 +53,7 @@ class Standard extends SearchAPI
 		global $context, $modSettings;
 
 		$this->_search_cache = new \ElkArte\Search\Cache\Session();
+		$search_id = 0;
 
 		if ($this->_search_cache->existsWithParams($context['params']) === false)
 		{
