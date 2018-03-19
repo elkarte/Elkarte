@@ -176,7 +176,7 @@ class ManageSearch_Controller extends Action_Controller
 	 */
 	private function _settings()
 	{
-		global $txt;
+		global $txt, $modSettings;
 
 		// What are we editing anyway?
 		$config_vars = array(
