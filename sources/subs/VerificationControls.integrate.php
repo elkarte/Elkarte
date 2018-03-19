@@ -97,7 +97,7 @@ class VerificationControls_Integrate
 		// Start with any testing.
 		if ($do_test)
 		{
-			$force_refresh = $instances->test($verification_errors);
+			$force_refresh = $instances->test($verification_errors, $max_errors);
 		}
 
 		// Are we refreshing then?
