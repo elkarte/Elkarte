@@ -282,9 +282,10 @@ class Sphinxql extends SearchAPI
 		}
 
 		$participants = array();
+		$topics = array();
 		foreach (array_slice(array_keys($cached_results['matches']), (int) $_REQUEST['start'], $modSettings['search_results_per_page']) as $msgID)
 		{
-			$context['topics'][$msgID] = $cached_results['matches'][$msgID];
+			$topics[$msgID] = $cached_results['matches'][$msgID];
 			$participants[$cached_results['matches'][$msgID]['id']] = false;
 		}
 
@@ -294,8 +295,9 @@ class Sphinxql extends SearchAPI
 		{
 			$search_results = array_merge($search_results, $search_words[$orIndex]['subject_words']);
 		}
+		$this->_num_results = $cached_results['num_results'];
 
-		return $cached_results['num_results'];
+		return $topics;
 	}
 
 	/**
