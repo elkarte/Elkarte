@@ -48,6 +48,17 @@ class Standard extends SearchAPI
 	 */
 	protected $_search_cache = null;
 
+	/**
+	 * Wrapper for searchQuery of the SearchAPI
+	 * @param mixed[] $search_params
+	 * @param string[] $search_words
+	 * @param string[] $excluded_words
+	 * @param bool[] $participants
+	 * @param string[] $search_results
+	 * @param \ElkArte\Search\Search $search
+	 *
+	 * @return mixed[]
+	 */
 	public function searchQuery($search_params, $search_words, $excluded_words, &$participants, &$search_results, $search)
 	{
 		global $context, $modSettings;

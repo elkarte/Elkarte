@@ -40,6 +40,13 @@ class SearchApi
 		$this->load($current_index);
 	}
 
+	/**
+	 * Wrapper for postCreated of the SearchAPI
+	 *
+	 * @param mixed[] $msgOptions
+	 * @param mixed[] $topicOptions
+	 * @param mixed[] $posterOptions
+	 */
 	public function postCreated($msgOptions, $topicOptions, $posterOptions)
 	{
 		if (is_callable(array($this->_searchAPI, 'postCreated')))
@@ -48,6 +55,13 @@ class SearchApi
 		}
 	}
 
+	/**
+	 * Wrapper for postModified of the SearchAPI
+	 *
+	 * @param mixed[] $msgOptions
+	 * @param mixed[] $topicOptions
+	 * @param mixed[] $posterOptions
+	 */
 	public function postModified($msgOptions, $topicOptions, $posterOptions)
 	{
 		if (is_callable(array($this->_searchAPI, 'postModified')))
@@ -56,6 +70,12 @@ class SearchApi
 		}
 	}
 
+	/**
+	 * Wrapper for topicSplit of the SearchAPI
+	 *
+	 * @param int $split2_ID_TOPIC
+	 * @param int[] $splitMessages
+	 */
 	public function topicSplit($split2_ID_TOPIC, $splitMessages)
 	{
 		if (is_callable(array($this->_searchAPI, 'topicSplit')))
@@ -64,6 +84,14 @@ class SearchApi
 		}
 	}
 
+	/**
+	 * Wrapper for topicMerge of the SearchAPI
+	 *
+	 * @param int $id_topic
+	 * @param mixed[] $topics
+	 * @param int[] $affected_msgs
+	 * @param string $subject
+	 */
 	public function topicMerge($id_topic, $topics, $affected_msgs, $subject)
 	{
 		if (is_callable(array($this->_searchAPI, 'topicMerge')))
@@ -72,6 +100,11 @@ class SearchApi
 		}
 	}
 
+	/**
+	 * Wrapper for searchSettings of the SearchAPI
+	 *
+	 * @param mixed[] $config_vars
+	 */
 	public function searchSettings(&$config_vars)
 	{
 		if (is_callable(array($this->_searchAPI, 'searchSettings')))
@@ -80,11 +113,27 @@ class SearchApi
 		}
 	}
 
+	/**
+	 * Wrapper for searchQuery of the SearchAPI
+	 * @param mixed[] $search_params
+	 * @param string[] $search_words
+	 * @param string[] $excluded_words
+	 * @param bool[] $participants
+	 * @param string[] $search_results
+	 * @param \ElkArte\Search\Search $search
+	 *
+	 * @return mixed[]
+	 */
 	public function searchQuery($search_params, $search_words, $excluded_words, &$participants, &$search_results, $search)
 	{
 		return $this->_searchAPI->searchQuery($search_params, $search_words, $excluded_words, $participants, $search_results, $search);
 	}
 
+	/**
+	 * Wrapper for prepareWord of the SearchAPI
+	 *
+	 * @return string
+	 */
 	public function prepareWord($phrase, $no_regexp)
 	{
 		return $this->_searchAPI->prepareWord($phrase, $no_regexp);
@@ -97,15 +146,13 @@ class SearchApi
 	 */
 	public function getNumResults()
 	{
-		$this->_searchAPI->getNumResults();
+		return $this->_searchAPI->getNumResults();
 	}
 
 	/**
 	 * Creates a search API and returns the object.
 	 *
 	 * @param string $searchClass
-	 *
-	 * @return API\Standard|null|object
 	 */
 	protected function load($searchClass = '')
 	{

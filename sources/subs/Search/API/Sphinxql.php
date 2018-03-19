@@ -132,15 +132,7 @@ class Sphinxql extends SearchAPI
 	}
 
 	/**
-	 * This has it's own custom search.
-	 *
-	 * @param mixed[] $search_params
-	 * @param mixed[] $search_words Words to search
-	 * @param string[] $excluded_words Words to exclude, not used in this API
-	 * @param int[] $participants
-	 * @param string[] $search_results
-	 *
-	 * @return int
+	 * {@inheritdoc }
 	 */
 	public function searchQuery($search_params, $search_words, $excluded_words, &$participants, &$search_results)
 	{
