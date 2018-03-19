@@ -130,7 +130,7 @@ class WeightFactors
 	{
 		foreach ($factors as $weight_factor => $value)
 		{
-			$this->_weight[$weight_factor] = (int) ($this->_input_weights['search_weight_' . $weight_factor] ?? 0);
+			$this->_weight[$weight_factor] = (int) ($weights['search_weight_' . $weight_factor] ?? 0);
 			$this->_weight_total += $this->_weight[$weight_factor];
 		}
 	}
