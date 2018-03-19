@@ -2,6 +2,8 @@
 
 namespace ElkArte\Search\Cache;
 
+use \ElkArte\sources\subs\SessionIndex;
+
 class Session
 {
 	protected $_id_search = 0;
@@ -19,11 +21,11 @@ class Session
 
 	public function __destruct()
 	{
-		$_SESSION[$this->_session_index] = array(
+		new SessionIndex($this->_session_index, array(
 			'id_search' => $this->_id_search,
 			'num_results' => $this->_num_results,
 			'params' => $this->_params,
-		);
+		));
 	}
 
 	public function getId()

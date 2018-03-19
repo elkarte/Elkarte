@@ -99,7 +99,7 @@ class SearchApi
 	 */
 	protected function load($searchClass = '')
 	{
-		global $modSettings, $txt;
+		global $txt;
 
 		require_once(SUBSDIR . '/Package.subs.php');
 		\Elk_Autoloader::instance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
