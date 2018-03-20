@@ -794,3 +794,4 @@ $txt['BoardIndex_Controller'] = 'Board Index';
 $txt['MessageIndex_Controller'] = 'Content of a board';
 $txt['message_index_frontpage'] = 'Select the board to show on the front page:';
 $txt['Recent_Controller'] = 'Recent posts';
+$txt['recent_frontpage'] = 'Number of messages to show:';
