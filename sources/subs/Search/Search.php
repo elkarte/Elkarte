@@ -46,9 +46,9 @@ class Search
 
 	/**
 	 * Holds the words and phrases to be searched on
-	 * @var array
+	 * @var \ElkArte\Search\SearchArray
 	 */
-	private $_searchArray = array();
+	private $_searchArray = null;
 
 	/**
 	 * Holds instance of the search api in use such as ElkArte\Search\API\Standard_Search
@@ -69,22 +69,10 @@ class Search
 	private $_db_search = null;
 
 	/**
-	 * Holds words that will not be search on to inform the user they were skipped
-	 * @var array
-	 */
-	private $_ignored = array();
-
-	/**
 	 * Searching for posts from a specific user(s)
 	 * @var array
 	 */
 	private $_memberlist = array();
-
-	/**
-	 * If we are performing a boolean or simple search
-	 * @var bool
-	 */
-	private $_no_regexp = false;
 
 	/**
 	 * Builds the array of words for use in the db query
@@ -97,12 +85,6 @@ class Search
 	 * @var array
 	 */
 	private $_excludedIndexWords = array();
-
-	/**
-	 * Words not be be found in the search results (-word)
-	 * @var array
-	 */
-	private $_excludedWords = array();
 
 	/**
 	 * Words not be be found in the subject (-word)
@@ -121,12 +103,6 @@ class Search
 	 * @var bool
 	 */
 	private $_foundBlackListedWords = false;
-
-	/**
-	 * Words we do not search due to length or common terms
-	 * @var array
-	 */
-	private $_blacklisted_words = array();
 
 	/**
 	 * The weights to associate to various areas for relevancy
@@ -277,7 +253,7 @@ class Search
 	 */
 	public function getIgnored()
 	{
-		return $this->_ignored;
+		return $this->_searchArray->getIgnored();
 	}
 
 	/**
@@ -302,7 +278,7 @@ class Search
 		$this->_weight_total = $weight->getTotal();
 	}
 
-	public function setParams(SearchParams $paramObject)
+	public function setParams(SearchParams $paramObject, $search_simple_fulltext = false)
 	{
 		$this->_searchParams = $paramObject;
 		$this->_search_params = $this->_searchParams->get();
@@ -310,8 +286,10 @@ class Search
 		// Unfortunately, searching for words like this is going to be slow, so we're blacklisting them.
 		// @todo Setting to add more here?
 		// @todo Maybe only blacklist if they are the only word, or "any" is used?
-		$this->_blacklisted_words = array('img', 'url', 'quote', 'www', 'http', 'the', 'is', 'it', 'are', 'if');
-		call_integration_hook('integrate_search_blacklisted_words', array(&$this->_blacklisted_words));
+		$blacklisted_words = array('img', 'url', 'quote', 'www', 'http', 'the', 'is', 'it', 'are', 'if');
+		call_integration_hook('integrate_search_blacklisted_words', array(&$blacklisted_words));
+
+		$this->_searchArray = new \ElkArte\Search\SearchArray($this->param('search'), $blacklisted_words, $search_simple_fulltext);
 	}
 
 	/**
@@ -321,7 +299,7 @@ class Search
 	 */
 	public function noRegexp()
 	{
-		return $this->_no_regexp;
+		return $this->_searchArray->getNoRegexp();
 	}
 
 	/**
@@ -331,137 +309,12 @@ class Search
 	 */
 	public function foundBlackListedWords()
 	{
-		return $this->_foundBlackListedWords;
-	}
-
-	/**
-	 * Builds the search array
-	 *
-	 * @param bool - Force splitting of strings enclosed in double quotes
-	 *
-	 * @return 0|array
-	 */
-	public function searchArray($search_simple_fulltext = false)
-	{
-		// Change non-word characters into spaces.
-		$stripped_query = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', $this->param('search'));
-
-		// Make the query lower case. It's gonna be case insensitive anyway.
-		$stripped_query = un_htmlspecialchars(\Util::strtolower($stripped_query));
-
-		// This option will do fulltext searching in the most basic way.
-		if ($search_simple_fulltext)
-		{
-			$stripped_query = strtr($stripped_query, array('"' => ''));
-		}
-
-		$this->_no_regexp = preg_match('~&#(?:\d{1,7}|x[0-9a-fA-F]{1,6});~', $stripped_query) === 1;
-
-		// Extract phrase parts first (e.g. some words "this is a phrase" some more words.)
-		preg_match_all('/(?:^|\s)([-]?)"([^"]+)"(?:$|\s)/', $stripped_query, $matches, PREG_PATTERN_ORDER);
-		$phraseArray = $matches[2];
-
-		// Remove the phrase parts and extract the words.
-		$wordArray = preg_replace('~(?:^|\s)(?:[-]?)"(?:[^"]+)"(?:$|\s)~u', ' ', $this->param('search'));
-		$wordArray = explode(' ', \Util::htmlspecialchars(un_htmlspecialchars($wordArray), ENT_QUOTES));
-
-		// A minus sign in front of a word excludes the word.... so...
-		// .. first, we check for things like -"some words", but not "-some words".
-		$phraseArray = $this->_checkExcludePhrase($matches[1], $phraseArray);
-
-		// Now we look for -test, etc.... normaller.
-		$wordArray = $this->_checkExcludeWord($wordArray);
-
-		// The remaining words and phrases are all included.
-		$this->_searchArray = array_merge($phraseArray, $wordArray);
-
-		// Trim everything and make sure there are no words that are the same.
-		foreach ($this->_searchArray as $index => $value)
-		{
-			// Skip anything practically empty.
-			if (($this->_searchArray[$index] = trim($value, '-_\' ')) === '')
-			{
-				unset($this->_searchArray[$index]);
-			}
-			// Skip blacklisted words. Make sure to note we skipped them in case we end up with nothing.
-			elseif (in_array($this->_searchArray[$index], $this->_blacklisted_words))
-			{
-				$this->_foundBlackListedWords = true;
-				unset($this->_searchArray[$index]);
-			}
-			// Don't allow very, very short words.
-			elseif (\Util::strlen($value) < 2)
-			{
-				$this->_ignored[] = $value;
-				unset($this->_searchArray[$index]);
-			}
-		}
-
-		$this->_searchArray = array_slice(array_unique($this->_searchArray), 0, 10);
-
-		return $this->_searchArray;
+		return $this->_searchArray->foundBlackListedWords();
 	}
 
 	public function getSearchArray()
 	{
-		return $this->_searchArray;
-	}
-
-	/**
-	 * Looks for phrases that should be excluded from results
-	 *
-	 * - Check for things like -"some words", but not "-some words"
-	 * - Prevents redundancy with blacklisted words
-	 *
-	 * @param string[] $matches
-	 * @param string[] $phraseArray
-	 *
-	 * @return string[]
-	 */
-	private function _checkExcludePhrase($matches, $phraseArray)
-	{
-		foreach ($matches as $index => $word)
-		{
-			if ($word === '-')
-			{
-				if (($word = trim($phraseArray[$index], '-_\' ')) !== '' && !in_array($word, $this->_blacklisted_words))
-				{
-					$this->_excludedWords[] = $word;
-				}
-
-				unset($phraseArray[$index]);
-			}
-		}
-
-		return $phraseArray;
-	}
-
-	/**
-	 * Looks for words that should be excluded in the results (-word)
-	 *
-	 * - Look for -test, etc
-	 * - Prevents excluding blacklisted words since it is redundant
-	 *
-	 * @param string[] $wordArray
-	 *
-	 * @return string[]
-	 */
-	private function _checkExcludeWord($wordArray)
-	{
-		foreach ($wordArray as $index => $word)
-		{
-			if (strpos(trim($word), '-') === 0)
-			{
-				if (($word = trim($word, '-_\' ')) !== '' && !in_array($word, $this->_blacklisted_words))
-				{
-					$this->_excludedWords[] = $word;
-				}
-
-				unset($wordArray[$index]);
-			}
-		}
-
-		return $wordArray;
+		return $this->_searchArray->getSearchArray();
 	}
 
 	/**
@@ -478,23 +331,25 @@ class Search
 
 		$orParts = array();
 		$this->_searchWords = array();
+		$searchArray = $this->getSearchArray();
+		$excludedWords = $this->_searchArray->getExcludedWords();
 
 		// All words/sentences must match.
-		if (!empty($this->_searchArray) && empty($this->_search_params['searchtype']))
+		if (!empty($searchArray) && empty($this->_search_params['searchtype']))
 		{
-			$orParts[0] = $this->_searchArray;
+			$orParts[0] = $searchArray;
 		}
 		// Any word/sentence must match.
 		else
 		{
-			foreach ($this->_searchArray as $index => $value)
+			foreach ($searchArray as $index => $value)
 				$orParts[$index] = array($value);
 		}
 
 		// Make sure the excluded words are in all or-branches.
 		foreach ($orParts as $orIndex => $andParts)
 		{
-			foreach ($this->_excludedWords as $word)
+			foreach ($excludedWords as $word)
 			{
 				$orParts[$orIndex][] = $word;
 			}
@@ -514,13 +369,13 @@ class Search
 			// Sort the indexed words (large words -> small words -> excluded words).
 			if (is_callable(array($this->_searchAPI, 'searchSort')))
 			{
-				$this->_searchAPI->setExcludedWords($this->_excludedWords);
+				$this->_searchAPI->setExcludedWords($excludedWords);
 				usort($orParts[$orIndex], array($this->_searchAPI, 'searchSort'));
 			}
 
 			foreach ($orParts[$orIndex] as $word)
 			{
-				$is_excluded = in_array($word, $this->_excludedWords);
+				$is_excluded = in_array($word, $excludedWords);
 				$this->_searchWords[$orIndex]['all_words'][] = $word;
 				$subjectWords = text2words($word);
 
@@ -615,15 +470,15 @@ class Search
 		error_reporting($old);
 		@ob_end_clean();
 
+		if (empty($pspell_link))
+		{
+			return;
+		}
+
 		$did_you_mean = array('search' => array(), 'display' => array());
 		$found_misspelling = false;
-		foreach ($this->_searchArray as $word)
+		foreach ($this->_searchArray->getSearchArray() as $word)
 		{
-			if (empty($pspell_link))
-			{
-				continue;
-			}
-
 			// Don't check phrases.
 			if (preg_match('~^\w+$~', $word) === 0)
 			{
@@ -679,7 +534,7 @@ class Search
 		{
 			// Don't spell check excluded words, but add them still...
 			$temp_excluded = array('search' => array(), 'display' => array());
-			foreach ($this->_excludedWords as $word)
+			foreach ($this->_searchArray->getExcludedWords() as $word)
 			{
 				if (preg_match('~^\w+$~', $word) == 0)
 				{
@@ -949,13 +804,14 @@ class Search
 		{
 			$orWhere = array();
 			$count = 0;
+			$excludedWords = $this->_searchArray->getExcludedWords();
 			foreach ($this->_searchWords as $words)
 			{
 				$where = array();
 				foreach ($words['all_words'] as $regularWord)
 				{
-					$where[] = 'm.body' . (in_array($regularWord, $this->_excludedWords) ? ' NOT' : '') . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:all_word_body_' . $count . '}';
-					if (in_array($regularWord, $this->_excludedWords))
+					$where[] = 'm.body' . (in_array($regularWord, $excludedWords) ? ' NOT' : '') . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:all_word_body_' . $count . '}';
+					if (in_array($regularWord, $excludedWords))
 					{
 						$where[] = 'm.subject NOT' . (empty($modSettings['search_match_words']) || $this->noRegexp() ? ' LIKE ' : ' RLIKE ') . '{string:all_word_body_' . $count . '}';
 					}
@@ -1411,6 +1267,7 @@ class Search
 				)
 			);
 		}
+		$excludedWords = $this->_searchArray->getExcludedWords();
 
 		foreach ($this->_searchWords as $words)
 		{
@@ -1425,7 +1282,7 @@ class Search
 					'indexed_results' => $indexedResults,
 					'params' => array(
 						'id_search' => !$this->_createTemporary ? $id_search : 0,
-						'excluded_words' => $this->_excludedWords,
+						'excluded_words' => $excludedWords,
 						'user_query' => !empty($this->_searchParams->_userQuery) ? $this->_searchParams->_userQuery : '',
 						'board_query' => !empty($this->_searchParams->_boardQuery) ? $this->_searchParams->_boardQuery : '',
 						'topic' => !empty($this->_search_params['topic']) ? $this->param('topic') : 0,

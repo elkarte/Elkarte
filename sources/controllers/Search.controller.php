@@ -273,7 +273,7 @@ class Search_Controller extends Action_Controller
 		$this->_search->setWeights(new \ElkArte\Search\WeightFactors($modSettings, $user_info['is_admin']));
 		$search_params = new \ElkArte\Search\SearchParams($_REQUEST['params'] ?? '');
 		$search_params->merge($_REQUEST, $recentPercentage, $maxMembersToSearch);
-		$this->_search->setParams($search_params);
+		$this->_search->setParams($search_params, !empty($modSettings['search_simple_fulltext']));
 
 		$context['compact'] = $this->_search->isCompact();
 
