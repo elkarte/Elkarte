@@ -239,7 +239,6 @@ class Search_Controller extends Action_Controller
 	{
 		global $scripturl, $modSettings, $txt, $settings;
 		global $user_info, $context, $options, $messages_request, $boards_can;
-		global $participants;
 
 		// No, no, no... this is a bit hard on the server, so don't you go prefetching it!
 		stop_prefetching();
@@ -427,17 +426,7 @@ class Search_Controller extends Action_Controller
 			if ($this->_search->noMessages($messages_request))
 				$context['topics'] = array();
 
-			// If we want to know who participated in what then load this now.
-			if (!empty($modSettings['enableParticipation']) && !$user_info['is_guest'])
-			{
-				$participants = $this->_search->getParticipants();
-
-				require_once(SUBSDIR . '/MessageIndex.subs.php');
-				$topics_participated_in = topicsParticipation($user_info['id'], array_keys($participants));
-
-				foreach ($topics_participated_in as $topic)
-					$participants[$topic['id_topic']] = true;
-			}
+			$this->_prepareParticipants(!empty($modSettings['enableParticipation']), $user_info['is_guest'] ? $user_info['id'] : 0);
 		}
 
 		// Now that we know how many results to expect we can start calculating the page numbers.
@@ -455,6 +444,21 @@ class Search_Controller extends Action_Controller
 			'label' => addslashes(un_htmlspecialchars($txt['jump_to'])),
 			'board_name' => addslashes(un_htmlspecialchars($txt['select_destination'])),
 		);
+	}
+
+	protected function _prepareParticipants($participationEnabled, $user_id)
+	{
+		// If we want to know who participated in what then load this now.
+		if ($participationEnabled === true && $user_id !== 0)
+		{
+			$this->_participants = $this->_search->getParticipants();
+
+			require_once(SUBSDIR . '/MessageIndex.subs.php');
+			$topics_participated_in = topicsParticipation($user_id, array_keys($this->_participants));
+
+			foreach ($topics_participated_in as $topic)
+				$this->_participants[$topic['id_topic']] = true;
+		}
 	}
 
 	/**
@@ -477,7 +481,7 @@ class Search_Controller extends Action_Controller
 	{
 		global $txt, $modSettings, $scripturl, $user_info;
 		global $memberContext, $context, $options, $messages_request;
-		global $boards_can, $participants;
+		global $boards_can;
 
 		// Remember which message this is.  (ie. reply #83)
 		static $counter = null;
@@ -589,7 +593,7 @@ class Search_Controller extends Action_Controller
 			'is_poll' => !empty($modSettings['pollMode']) && $message['id_poll'] > 0,
 			'is_hot' => !empty($modSettings['useLikesNotViews']) ? $message['num_likes'] >= $modSettings['hotTopicPosts'] : $message['num_replies'] >= $modSettings['hotTopicPosts'],
 			'is_very_hot' => !empty($modSettings['useLikesNotViews']) ? $message['num_likes'] >= $modSettings['hotTopicVeryPosts'] : $message['num_replies'] >= $modSettings['hotTopicVeryPosts'],
-			'posted_in' => !empty($participants[$message['id_topic']]),
+			'posted_in' => !empty($this->_participants[$message['id_topic']]),
 			'views' => $message['num_views'],
 			'replies' => $message['num_replies'],
 			'tests' => array(
