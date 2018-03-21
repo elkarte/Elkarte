@@ -326,29 +326,7 @@ class Search_Controller extends Action_Controller
 
 		$context['search_params'] = $this->_fill_default_search_params($context['search_params']);
 
-		// Do we have captcha enabled?
-		if ($user_info['is_guest'] && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']) && (empty($_SESSION['last_ss']) || $_SESSION['last_ss'] != $this->_search->param('search')))
-		{
-			// If we come from another search box tone down the error...
-			if (!isset($_REQUEST['search_vv']))
-				$context['search_errors']['need_verification_code'] = true;
-			else
-			{
-				$verificationOptions = array(
-					'id' => 'search',
-				);
-				$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions, true);
-
-				if (is_array($context['require_verification']))
-				{
-					foreach ($context['require_verification'] as $error)
-						$context['search_errors'][$error] = true;
-				}
-				// Don't keep asking for it - they've proven themselves worthy.
-				else
-					$_SESSION['ss_vv_passed'] = true;
-			}
-		}
+		$this->_controlVerifications();
 
 		$context['params'] = $this->_search->compileURLparams();
 
@@ -444,6 +422,37 @@ class Search_Controller extends Action_Controller
 			'label' => addslashes(un_htmlspecialchars($txt['jump_to'])),
 			'board_name' => addslashes(un_htmlspecialchars($txt['select_destination'])),
 		);
+	}
+
+	protected function _controlVerifications()
+	{
+		global $user_info, $modSettings, $context;
+
+		// Do we have captcha enabled?
+		if ($user_info['is_guest'] && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']) && (empty($_SESSION['last_ss']) || $_SESSION['last_ss'] != $this->_search->param('search')))
+		{
+			// If we come from another search box tone down the error...
+			if (!isset($_REQUEST['search_vv']))
+			{
+				$context['search_errors']['need_verification_code'] = true;
+			}
+			else
+			{
+				$verificationOptions = array(
+					'id' => 'search',
+				);
+				$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions, true);
+
+				if (is_array($context['require_verification']))
+				{
+					foreach ($context['require_verification'] as $error)
+						$context['search_errors'][$error] = true;
+				}
+				// Don't keep asking for it - they've proven themselves worthy.
+				else
+					$_SESSION['ss_vv_passed'] = true;
+			}
+		}
 	}
 
 	protected function _prepareParticipants($participationEnabled, $user_id)
