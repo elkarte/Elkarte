@@ -45,6 +45,12 @@ abstract class SearchAPI
 	protected $_excludedWords = array();
 
 	/**
+	 * 
+	 * @var int
+	 */
+	protected $_num_results = 0;
+
+	/**
 	 * What words are banned?
 	 * @var array
 	 */
@@ -100,6 +106,14 @@ abstract class SearchAPI
 	public function setExcludedWords($words)
 	{
 		$this->_excludedWords = $words;
+	}
+
+	/**
+	 * Number of results?
+	 */
+	public function getNumResults()
+	{
+		return $this->_num_results;
 	}
 
 	/**
