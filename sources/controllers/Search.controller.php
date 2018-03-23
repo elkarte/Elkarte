@@ -286,7 +286,7 @@ class Search_Controller extends Action_Controller
 		// Build the search array
 		// $modSettings ['search_simple_fulltext'] is an hidden setting that will
 		// do fulltext searching in the most basic way.
-		$searchArray = $this->_search->searchArray(!empty($modSettings['search_simple_fulltext']));
+		$searchArray = $this->_search->getSearchArray();
 
 		// This is used to remember words that will be ignored (because too short usually)
 		$context['search_ignored'] = $this->_search->getIgnored();
@@ -415,6 +415,7 @@ class Search_Controller extends Action_Controller
 
 		$context['sub_template'] = 'results';
 		$context['page_title'] = $txt['search_results'];
+		$context['topic_starter_id'] = 0;
 		$context['get_topics'] = array($this, 'prepareSearchContext_callback');
 		$this->_icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
 
@@ -595,68 +596,28 @@ class Search_Controller extends Action_Controller
 		// Do we have quote tag enabled?
 		$quote_enabled = empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']));
 
-		$output = array_merge($context['topics'][$message['id_msg']], array(
-			'id' => $message['id_topic'],
-			'is_sticky' => !empty($message['is_sticky']),
-			'is_locked' => !empty($message['locked']),
-			'is_poll' => !empty($modSettings['pollMode']) && $message['id_poll'] > 0,
-			'is_hot' => !empty($modSettings['useLikesNotViews']) ? $message['num_likes'] >= $modSettings['hotTopicPosts'] : $message['num_replies'] >= $modSettings['hotTopicPosts'],
-			'is_very_hot' => !empty($modSettings['useLikesNotViews']) ? $message['num_likes'] >= $modSettings['hotTopicVeryPosts'] : $message['num_replies'] >= $modSettings['hotTopicVeryPosts'],
-			'posted_in' => !empty($this->_participants[$message['id_topic']]),
-			'views' => $message['num_views'],
-			'replies' => $message['num_replies'],
-			'tests' => array(
-				'can_reply' => in_array($message['id_board'], $boards_can['post_reply_any']) || in_array(0, $boards_can['post_reply_any']),
-				'can_quote' => (in_array($message['id_board'], $boards_can['post_reply_any']) || in_array(0, $boards_can['post_reply_any'])) && $quote_enabled,
-				'can_mark_notify' => in_array($message['id_board'], $boards_can['mark_any_notify']) || in_array(0, $boards_can['mark_any_notify']) && !$context['user']['is_guest'],
-			),
-			'first_post' => array(
-				'id' => $message['first_msg'],
-				'time' => standardTime($message['first_poster_time']),
-				'html_time' => htmlTime($message['first_poster_time']),
-				'timestamp' => forum_time(true, $message['first_poster_time']),
-				'subject' => $message['first_subject'],
-				'href' => $scripturl . '?topic=' . $message['id_topic'] . '.0',
-				'link' => '<a href="' . $scripturl . '?topic=' . $message['id_topic'] . '.0">' . $message['first_subject'] . '</a>',
-				'icon' => $message['first_icon'],
-				'icon_url' => $this->_icon_sources->{$message['first_icon']},
-				'member' => array(
-					'id' => $message['first_member_id'],
-					'name' => $message['first_member_name'],
-					'href' => !empty($message['first_member_id']) ? $scripturl . '?action=profile;u=' . $message['first_member_id'] : '',
-					'link' => !empty($message['first_member_id']) ? '<a href="' . $scripturl . '?action=profile;u=' . $message['first_member_id'] . '" title="' . $txt['profile_of'] . ' ' . $message['first_member_name'] . '">' . $message['first_member_name'] . '</a>' : $message['first_member_name']
-				)
-			),
-			'last_post' => array(
-				'id' => $message['last_msg'],
-				'time' => standardTime($message['last_poster_time']),
-				'html_time' => htmlTime($message['last_poster_time']),
-				'timestamp' => forum_time(true, $message['last_poster_time']),
-				'subject' => $message['last_subject'],
-				'href' => $scripturl . '?topic=' . $message['id_topic'] . ($message['num_replies'] == 0 ? '.0' : '.msg' . $message['last_msg']) . '#msg' . $message['last_msg'],
-				'link' => '<a href="' . $scripturl . '?topic=' . $message['id_topic'] . ($message['num_replies'] == 0 ? '.0' : '.msg' . $message['last_msg']) . '#msg' . $message['last_msg'] . '">' . $message['last_subject'] . '</a>',
-				'icon' => $message['last_icon'],
-				'icon_url' => $this->_icon_sources->{$message['last_icon']},
-				'member' => array(
-					'id' => $message['last_member_id'],
-					'name' => $message['last_member_name'],
-					'href' => !empty($message['last_member_id']) ? $scripturl . '?action=profile;u=' . $message['last_member_id'] : '',
-					'link' => !empty($message['last_member_id']) ? '<a href="' . $scripturl . '?action=profile;u=' . $message['last_member_id'] . '" title="' . $txt['profile_of'] . ' ' . $message['last_member_name'] . '">' . $message['last_member_name'] . '</a>' : $message['last_member_name']
-				)
-			),
-			'board' => array(
-				'id' => $message['id_board'],
-				'name' => $message['board_name'],
-				'href' => $scripturl . '?board=' . $message['id_board'] . '.0',
-				'link' => '<a href="' . $scripturl . '?board=' . $message['id_board'] . '.0">' . $message['board_name'] . '</a>'
-			),
-			'category' => array(
-				'id' => $message['id_cat'],
-				'name' => $message['cat_name'],
-				'href' => $scripturl . $modSettings['default_forum_action'] . '#c' . $message['id_cat'],
-				'link' => '<a href="' . $scripturl . $modSettings['default_forum_action'] . '#c' . $message['id_cat'] . '">' . $message['cat_name'] . '</a>'
-			)
-		));
+		$output_pre = Topic_Util::prepareContext(array($message))[$message['id_topic']];
+
+		$output = array_merge($context['topics'][$message['id_msg']], $output_pre);
+
+		$output['posted_in'] = !empty($this->_participants[$message['id_topic']]);
+		$output['tests'] = array(
+			'can_reply' => in_array($message['id_board'], $boards_can['post_reply_any']) || in_array(0, $boards_can['post_reply_any']),
+			'can_quote' => (in_array($message['id_board'], $boards_can['post_reply_any']) || in_array(0, $boards_can['post_reply_any'])) && $quote_enabled,
+			'can_mark_notify' => in_array($message['id_board'], $boards_can['mark_any_notify']) || in_array(0, $boards_can['mark_any_notify']) && !$context['user']['is_guest'],
+		);
+		$output['board'] = array(
+			'id' => $message['id_board'],
+			'name' => $message['board_name'],
+			'href' => $scripturl . '?board=' . $message['id_board'] . '.0',
+			'link' => '<a href="' . $scripturl . '?board=' . $message['id_board'] . '.0">' . $message['board_name'] . '</a>'
+		);
+		$output['category'] = array(
+			'id' => $message['id_cat'],
+			'name' => $message['cat_name'],
+			'href' => $scripturl . $modSettings['default_forum_action'] . '#c' . $message['id_cat'],
+			'link' => '<a href="' . $scripturl . $modSettings['default_forum_action'] . '#c' . $message['id_cat'] . '">' . $message['cat_name'] . '</a>'
+		);
 
 		determineTopicClass($output);
 
