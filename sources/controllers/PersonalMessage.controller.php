@@ -424,7 +424,6 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Set up some basic template stuff.
 		$context['from_or_to'] = $context['folder'] !== 'sent' ? 'from' : 'to';
-		$context['get_pmessage'] = 'preparePMContext_callback';
 		$context['signature_enabled'] = substr($modSettings['signature_settings'], 0, 1) == 1;
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
 
@@ -635,12 +634,12 @@ class PersonalMessage_Controller extends Action_Controller
 				foreach (array_reverse($pms) as $pm)
 					$orderBy[] = 'pm.id_pm = ' . $pm;
 
-				// Separate query for these bits, preparePMContext_callback will use it as required
+				// Separate query for these bits, the callback will use it as required
 				$subjects_request = loadPMSubjectRequest($pms, $orderBy);
 			}
 
 			// Execute the load message query if a message has been chosen and let
-			// preparePMContext_callback fetch the results.  Otherwise just show the pm selection list
+			// the callback fetch the results.  Otherwise just show the pm selection list
 			if (empty($pmsg) && empty($pmID) && $context['display_mode'] != 0)
 			{
 				$messages_request = false;
@@ -655,6 +654,16 @@ class PersonalMessage_Controller extends Action_Controller
 			$messages_request = false;
 		}
 
+		Elk_Autoloader::instance()->register(SUBSDIR . '/MessagesCallback', '\\ElkArte\\sources\\subs\\MessagesCallback');
+
+		$bodyParser = new \ElkArte\sources\subs\MessagesCallback\BodyParser\Normal(array(), false);
+		$renderer = new \ElkArte\sources\subs\MessagesCallback\PmRenderer($messages_request, $bodyParser);
+		$srenderer = new \ElkArte\sources\subs\MessagesCallback\PmRenderer($subjects_request, $bodyParser);
+
+		$context['get_pmessage'] = array($renderer, 'getContext');
+		$context['get_psubject'] = array($srenderer, 'getContext');
+
+		$context['topic_starter_id'] = 0;
 		// Prepare some items for the template
 		$context['can_send_pm'] = allowedTo('pm_send');
 		$context['can_send_email'] = allowedTo('send_email_to_members');
@@ -2949,194 +2958,4 @@ class PersonalMessage_Controller extends Action_Controller
 	{
 		return isset($matches[2]) && $matches[2] == $matches[1] ? stripslashes($matches[1]) : '<strong class="highlight">' . $matches[1] . '</strong>';
 	}
-}
-
-/**
- * Get a personal message for the template. (used to save memory.)
- *
- * - This is a callback function that will fetch the actual results, as needed, of a previously run
- * subject (loadPMSubjectRequest) or message (loadPMMessageRequest) query.
- *
- * @param string $type
- * @param boolean $reset
- *
- * @return array
- */
-function preparePMContext_callback($type = 'subject', $reset = false)
-{
-	global $txt, $scripturl, $modSettings, $settings, $context, $memberContext, $recipients, $user_info;
-	global $subjects_request, $messages_request;
-	static $counter = null, $temp_pm_selected = null;
-
-	// We need this
-	$db = database();
-
-	// Count the current message number....
-	if ($counter === null || $reset)
-	{
-		$counter = $context['start'];
-	}
-
-	if ($temp_pm_selected === null)
-	{
-		$temp_pm_selected = isset($_SESSION['pm_selected']) ? $_SESSION['pm_selected'] : array();
-		$_SESSION['pm_selected'] = array();
-	}
-
-	// If we're in non-boring view do something exciting!
-	if ($context['display_mode'] != 0 && $subjects_request && $type === 'subject')
-	{
-		$subject = $db->fetch_assoc($subjects_request);
-		if (!$subject)
-		{
-			$db->free_result($subjects_request);
-
-			return false;
-		}
-
-		// Make sure we have a subject
-		$subject['subject'] = $subject['subject'] === '' ? $txt['no_subject'] : $subject['subject'];
-		$subject['subject'] = censor($subject['subject']);
-
-		$output = array(
-			'id' => $subject['id_pm'],
-			'member' => array(
-				'id' => $subject['id_member_from'],
-				'name' => $subject['from_name'],
-				'link' => $subject['not_guest'] ? '<a href="' . $scripturl . '?action=profile;u=' . $subject['id_member_from'] . '">' . $subject['from_name'] . '</a>' : $subject['from_name'],
-			),
-			'recipients' => &$recipients[$subject['id_pm']],
-			'subject' => $subject['subject'],
-			'time' => standardTime($subject['msgtime']),
-			'html_time' => htmlTime($subject['msgtime']),
-			'timestamp' => forum_time(true, $subject['msgtime']),
-			'number_recipients' => count($recipients[$subject['id_pm']]['to']),
-			'labels' => &$context['message_labels'][$subject['id_pm']],
-			'fully_labeled' => count($context['message_labels'][$subject['id_pm']]) == count($context['labels']),
-			'is_replied_to' => &$context['message_replied'][$subject['id_pm']],
-			'is_unread' => &$context['message_unread'][$subject['id_pm']],
-			'is_selected' => !empty($temp_pm_selected) && in_array($subject['id_pm'], $temp_pm_selected),
-		);
-
-		// In conversation view we need to indicate on the subject listing if any message inside of
-		// that conversation is unread, not just if the latest is unread.
-		if ($context['display_mode'] == 2 && isset($context['conversation_unread'][$output['id']]))
-		{
-			$output['is_unread'] = true;
-		}
-
-		return $output;
-	}
-
-	// Bail if it's false, ie. no messages.
-	if ($messages_request === false)
-	{
-		return false;
-	}
-
-	// Reset the data?
-	if ($reset === true)
-	{
-		return $db->data_seek($messages_request, 0);
-	}
-
-	// Get the next one... bail if anything goes wrong.
-	$message = $db->fetch_assoc($messages_request);
-	if (!$message)
-	{
-		if ($type != 'subject')
-		{
-			$db->free_result($messages_request);
-		}
-
-		return false;
-	}
-
-	// Use '(no subject)' if none was specified.
-	$message['subject'] = $message['subject'] === '' ? $txt['no_subject'] : $message['subject'];
-
-	// Load the message's information - if it's not there, load the guest information.
-	if (!loadMemberContext($message['id_member_from'], true))
-	{
-		$memberContext[$message['id_member_from']]['name'] = $message['from_name'];
-		$memberContext[$message['id_member_from']]['id'] = 0;
-
-		// Sometimes the forum sends messages itself (Warnings are an example) - in this case don't label it from a guest.
-		$memberContext[$message['id_member_from']]['group'] = $message['from_name'] == $context['forum_name'] ? '' : $txt['guest_title'];
-		$memberContext[$message['id_member_from']]['link'] = $message['from_name'];
-		$memberContext[$message['id_member_from']]['email'] = '';
-		$memberContext[$message['id_member_from']]['show_email'] = showEmailAddress(true, 0);
-		$memberContext[$message['id_member_from']]['is_guest'] = true;
-	}
-	else
-	{
-		$memberContext[$message['id_member_from']]['can_view_profile'] = allowedTo('profile_view_any') || ($message['id_member_from'] == $user_info['id'] && allowedTo('profile_view_own'));
-		$memberContext[$message['id_member_from']]['can_see_warning'] = !isset($context['disabled_fields']['warning_status']) && $memberContext[$message['id_member_from']]['warning_status'] && ($context['user']['can_mod'] || (!empty($modSettings['warning_show']) && ($modSettings['warning_show'] > 1 || $message['id_member_from'] == $user_info['id'])));
-	}
-
-	$memberContext[$message['id_member_from']]['show_profile_buttons'] = $settings['show_profile_buttons'] && (!empty($memberContext[$message['id_member_from']]['can_view_profile']) || (!empty($memberContext[$message['id_member_from']]['website']['url']) && !isset($context['disabled_fields']['website'])) || (in_array($memberContext[$message['id_member_from']]['show_email'], array('yes', 'yes_permission_override', 'no_through_forum'))) || $context['can_send_pm']);
-
-	// Censor all the important text...
-	$message['body'] = censor($message['body']);
-	$message['subject'] = censor($message['subject']);
-
-	// Run BBC interpreter on the message.
-	$bbc_parser = \BBC\ParserWrapper::instance();
-	$message['body'] = $bbc_parser->parsePM($message['body']);
-
-	// Return the array.
-	$output = array(
-		'alternate' => $counter % 2,
-		'id' => $message['id_pm'],
-		'member' => &$memberContext[$message['id_member_from']],
-		'subject' => $message['subject'],
-		'time' => standardTime($message['msgtime']),
-		'html_time' => htmlTime($message['msgtime']),
-		'timestamp' => forum_time(true, $message['msgtime']),
-		'counter' => $counter,
-		'body' => $message['body'],
-		'recipients' => &$recipients[$message['id_pm']],
-		'number_recipients' => count($recipients[$message['id_pm']]['to']),
-		'labels' => &$context['message_labels'][$message['id_pm']],
-		'fully_labeled' => count($context['message_labels'][$message['id_pm']]) == count($context['labels']),
-		'is_replied_to' => &$context['message_replied'][$message['id_pm']],
-		'is_unread' => &$context['message_unread'][$message['id_pm']],
-		'is_selected' => !empty($temp_pm_selected) && in_array($message['id_pm'], $temp_pm_selected),
-		'is_message_author' => $message['id_member_from'] == $user_info['id'],
-		'can_report' => !empty($modSettings['enableReportPM']),
-		'can_see_ip' => allowedTo('moderate_forum') || ($message['id_member_from'] == $user_info['id'] && !empty($user_info['id'])),
-	);
-
-	$context['additional_pm_drop_buttons'] = array();
-
-	// Can they report this message
-	if (!empty($output['can_report']) && $context['folder'] !== 'sent' && $output['member']['id'] != $user_info['id'])
-	{
-		$context['additional_pm_drop_buttons']['warn_button'] = array(
-			'href' => $scripturl . '?action=pm;sa=report;l=' . $context['current_label_id'] . ';pmsg=' . $output['id'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-			'text' => $txt['pm_report_to_admin']
-		);
-	}
-
-	// Or mark it as unread
-	if (empty($output['is_unread']) && $context['folder'] !== 'sent' && $output['member']['id'] != $user_info['id'])
-	{
-		$context['additional_pm_drop_buttons']['restore_button'] = array(
-			'href' => $scripturl . '?action=pm;sa=markunread;l=' . $context['current_label_id'] . ';pmsg=' . $output['id'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-			'text' => $txt['pm_mark_unread']
-		);
-	}
-
-	// Or give / take karma for a PM
-	if (!empty($output['member']['karma']['allow']))
-	{
-		$output['member']['karma'] += array(
-			'applaud_url' => $scripturl . '?action=karma;sa=applaud;uid=' . $output['member']['id'] . ';f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '') . ';pm=' . $output['id'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-			'smite_url' => $scripturl . '?action=karma;sa=smite;uid=' . $output['member']['id'] . ';f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '') . ';pm=' . $output['id'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-		);
-	}
-
-	$counter++;
-
-	return $output;
 }

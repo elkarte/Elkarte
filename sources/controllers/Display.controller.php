@@ -522,13 +522,7 @@ class Display_Controller extends Action_Controller
 			'child_level' => $board_info['child_level'],
 		);
 
-		// Set the callback.  (do you REALIZE how much memory all the messages would take?!?)
-		// This will be called from the template.
-		$context['get_message'] = array($this, 'prepareDisplayContext_callback');
 		$this->_icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
-		list ($sig_limits) = explode(':', $modSettings['signature_settings']);
-		$signature_settings = explode(',', $sig_limits);
-
 		if ($user_info['is_guest'])
 		{
 			$this->_show_signatures = !empty($signature_settings[8]) ? (int) $signature_settings[8] : 0;
@@ -537,6 +531,21 @@ class Display_Controller extends Action_Controller
 		{
 			$this->_show_signatures = !empty($signature_settings[9]) ? (int) $signature_settings[9] : 0;
 		}
+
+		Elk_Autoloader::instance()->register(SUBSDIR . '/MessagesCallback', '\\ElkArte\\sources\\subs\\MessagesCallback');
+
+		// Set the callback.  (do you REALIZE how much memory all the messages would take?!?)
+		// This will be called from the template.
+		$bodyParser = new \ElkArte\sources\subs\MessagesCallback\BodyParser\Normal(array(), false);
+		$opt = new \ElkArte\ValuesContainer([
+			'icon_sources' => $this->_icon_sources,
+			'show_signatures' => $this->_show_signatures,
+		]);
+		$renderer = new \ElkArte\sources\subs\MessagesCallback\DisplayRenderer($messages_request, $bodyParser, $opt);
+
+		$context['get_message'] = array($renderer, 'getContext');
+		list ($sig_limits) = explode(':', $modSettings['signature_settings']);
+		$signature_settings = explode(',', $sig_limits);
 
 		// Now set all the wonderful, wonderful permissions... like moderation ones...
 		$common_permissions = array(
@@ -757,162 +766,5 @@ class Display_Controller extends Action_Controller
 		}
 
 		redirectexit(!empty($topicGone) ? 'board=' . $board : 'topic=' . $topic . '.' . (int) $this->_req->query->start);
-	}
-
-	/**
-	 * Callback for the message display.
-	 * It actually gets and prepares the message context.
-	 * This method will start over from the beginning if reset is set to true, which is
-	 * useful for showing an index before or after the posts.
-	 *
-	 * @param bool $reset default false.
-	 *
-	 * @return array
-	 */
-	public function prepareDisplayContext_callback($reset = false)
-	{
-		global $settings, $txt, $modSettings, $scripturl, $user_info;
-		global $memberContext, $context, $messages_request, $topic;
-		static $counter = null;
-		static $signature_shown = null;
-
-		// If the query returned false, bail.
-		if ($messages_request === false)
-			return false;
-
-		// Remember which message this is.  (ie. reply #83)
-		if ($counter === null || $reset)
-			$counter = $context['start'];
-
-		// Start from the beginning...
-		if ($reset)
-			return currentContext($messages_request, $reset);
-
-		// Attempt to get the next message.
-		$message = currentContext($messages_request);
-		if (!$message)
-			return false;
-
-		// If you're a lazy bum, you probably didn't give a subject...
-		$message['subject'] = $message['subject'] != '' ? $message['subject'] : $txt['no_subject'];
-
-		// Are you allowed to remove at least a single reply?
-		$context['can_remove_post'] |= allowedTo('delete_own') && (empty($modSettings['edit_disable_time']) || $message['poster_time'] + $modSettings['edit_disable_time'] * 60 >= time()) && $message['id_member'] == $user_info['id'];
-
-		// Have you liked this post, can you?
-		$message['you_liked'] = !empty($context['likes'][$message['id_msg']]['member'])
-			&& isset($context['likes'][$message['id_msg']]['member'][$user_info['id']]);
-		$message['use_likes'] = allowedTo('like_posts') && empty($context['is_locked'])
-			&& ($message['id_member'] != $user_info['id'] || !empty($modSettings['likeAllowSelf']))
-			&& (empty($modSettings['likeMinPosts']) ? true : $modSettings['likeMinPosts'] <= $user_info['posts']);
-		$message['like_count'] = !empty($context['likes'][$message['id_msg']]['count']) ? $context['likes'][$message['id_msg']]['count'] : 0;
-
-		// If it couldn't load, or the user was a guest.... someday may be done with a guest table.
-		if (!loadMemberContext($message['id_member'], true))
-		{
-			// Notice this information isn't used anywhere else....
-			$memberContext[$message['id_member']]['name'] = $message['poster_name'];
-			$memberContext[$message['id_member']]['id'] = 0;
-			$memberContext[$message['id_member']]['group'] = $txt['guest_title'];
-			$memberContext[$message['id_member']]['link'] = $message['poster_name'];
-			$memberContext[$message['id_member']]['email'] = $message['poster_email'];
-			$memberContext[$message['id_member']]['show_email'] = showEmailAddress(true, 0);
-			$memberContext[$message['id_member']]['is_guest'] = true;
-		}
-		else
-		{
-			$memberContext[$message['id_member']]['can_view_profile'] = allowedTo('profile_view_any') || ($message['id_member'] == $user_info['id'] && allowedTo('profile_view_own'));
-			$memberContext[$message['id_member']]['is_topic_starter'] = $message['id_member'] == $context['topic_starter_id'];
-			$memberContext[$message['id_member']]['can_see_warning'] = !isset($context['disabled_fields']['warning_status']) && $memberContext[$message['id_member']]['warning_status'] && ($context['user']['can_mod'] || (!$user_info['is_guest'] && !empty($modSettings['warning_show']) && ($modSettings['warning_show'] > 1 || $message['id_member'] == $user_info['id'])));
-
-			if ($this->_show_signatures === 1)
-			{
-				if (empty($signature_shown[$message['id_member']]))
-				{
-					$signature_shown[$message['id_member']] = true;
-				}
-				else
-				{
-					$memberContext[$message['id_member']]['signature'] = '';
-				}
-			}
-			elseif ($this->_show_signatures === 2)
-			{
-				$memberContext[$message['id_member']]['signature'] = '';
-			}
-		}
-
-		$memberContext[$message['id_member']]['ip'] = $message['poster_ip'];
-		$memberContext[$message['id_member']]['show_profile_buttons'] = $settings['show_profile_buttons'] && (!empty($memberContext[$message['id_member']]['can_view_profile']) || (!empty($memberContext[$message['id_member']]['website']['url']) && !isset($context['disabled_fields']['website'])) || (in_array($memberContext[$message['id_member']]['show_email'], array('yes', 'yes_permission_override', 'no_through_forum'))) || $context['can_send_pm']);
-
-		// Do the censor thang.
-		$message['body'] = censor($message['body']);
-		$message['subject'] = censor($message['subject']);
-
-		// Run BBC interpreter on the message.
-		$context['id_msg'] = $message['id_msg'];
-		$bbc_wrapper = \BBC\ParserWrapper::instance();
-		$message['body'] = $bbc_wrapper->parseMessage($message['body'], $message['smileys_enabled']);
-
-		call_integration_hook('integrate_before_prepare_display_context', array(&$message));
-
-		// Compose the memory eat- I mean message array.
-		require_once(SUBSDIR . '/Attachments.subs.php');
-		$output = array(
-			'attachment' => loadAttachmentContext($message['id_msg']),
-			'alternate' => $counter % 2,
-			'id' => $message['id_msg'],
-			'href' => $scripturl . '?topic=' . $topic . '.msg' . $message['id_msg'] . '#msg' . $message['id_msg'],
-			'link' => '<a href="' . $scripturl . '?topic=' . $topic . '.msg' . $message['id_msg'] . '#msg' . $message['id_msg'] . '" rel="nofollow">' . $message['subject'] . '</a>',
-			'member' => &$memberContext[$message['id_member']],
-			'icon' => $message['icon'],
-			'icon_url' => $this->_icon_sources->{$message['icon']},
-			'subject' => $message['subject'],
-			'time' => standardTime($message['poster_time']),
-			'html_time' => htmlTime($message['poster_time']),
-			'timestamp' => forum_time(true, $message['poster_time']),
-			'counter' => $counter,
-			'modified' => array(
-				'time' => standardTime($message['modified_time']),
-				'html_time' => htmlTime($message['modified_time']),
-				'timestamp' => forum_time(true, $message['modified_time']),
-				'name' => $message['modified_name']
-			),
-			'body' => $message['body'],
-			'new' => empty($message['is_read']),
-			'approved' => $message['approved'],
-			'first_new' => isset($context['start_from']) && $context['start_from'] == $counter,
-			'is_ignored' => !empty($modSettings['enable_buddylist']) && in_array($message['id_member'], $context['user']['ignoreusers']),
-			'is_message_author' => $message['id_member'] == $user_info['id'],
-			'can_approve' => !$message['approved'] && $context['can_approve'],
-			'can_unapprove' => !empty($modSettings['postmod_active']) && $context['can_approve'] && $message['approved'],
-			'can_modify' => (!$context['is_locked'] || allowedTo('moderate_board')) && (allowedTo('modify_any') || (allowedTo('modify_replies') && $context['user']['started']) || (allowedTo('modify_own') && $message['id_member'] == $user_info['id'] && (empty($modSettings['edit_disable_time']) || !$message['approved'] || $message['poster_time'] + $modSettings['edit_disable_time'] * 60 > time()))),
-			'can_remove' => allowedTo('delete_any') || (allowedTo('delete_replies') && $context['user']['started']) || (allowedTo('delete_own') && $message['id_member'] == $user_info['id'] && (empty($modSettings['edit_disable_time']) || $message['poster_time'] + $modSettings['edit_disable_time'] * 60 > time())),
-			'can_see_ip' => allowedTo('moderate_forum') || ($message['id_member'] == $user_info['id'] && !empty($user_info['id'])),
-			'can_like' => $message['use_likes'] && !$message['you_liked'],
-			'can_unlike' => $message['use_likes'] && $message['you_liked'],
-			'like_counter' => $message['like_count'],
-			'likes_enabled' => !empty($modSettings['likes_enabled']) && ($message['use_likes'] || ($message['like_count'] != 0)),
-			'classes' => array(),
-		);
-
-		if (!empty($output['modified']['name']))
-			$output['modified']['last_edit_text'] = sprintf($txt['last_edit_by'], $output['modified']['time'], $output['modified']['name'], standardTime($output['modified']['timestamp']));
-
-		if (!empty($output['member']['karma']['allow']))
-		{
-			$output['member']['karma'] += array(
-				'applaud_url' => $scripturl . '?action=karma;sa=applaud;uid=' . $output['member']['id'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';m=' . $output['id'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-				'smite_url' => $scripturl . '?action=karma;sa=smite;uid=' . $output['member']['id'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';m=' . $output['id'] . ';' . $context['session_var'] . '=' . $context['session_id']
-			);
-		}
-
-		call_integration_hook('integrate_prepare_display_context', array(&$output, &$message));
-
-		$output['classes'] = implode(' ', $output['classes']);
-
-		$counter++;
-
-		return $output;
 	}
 }

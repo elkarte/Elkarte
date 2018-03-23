@@ -415,9 +415,22 @@ class Search_Controller extends Action_Controller
 
 		$context['sub_template'] = 'results';
 		$context['page_title'] = $txt['search_results'];
-		$context['topic_starter_id'] = 0;
-		$context['get_topics'] = array($this, 'prepareSearchContext_callback');
+
+		Elk_Autoloader::instance()->register(SUBSDIR . '/MessagesCallback', '\\ElkArte\\sources\\subs\\MessagesCallback');
+
 		$this->_icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
+
+		// Set the callback.  (do you REALIZE how much memory all the messages would take?!?)
+		// This will be called from the template.
+		$bodyParser = new \ElkArte\sources\subs\MessagesCallback\BodyParser\Normal($this->_search->getSearchArray(), empty($modSettings['search_method']));
+		$opt = new \ElkArte\ValuesContainer([
+			'icon_sources' => $this->_icon_sources,
+			'show_signatures' => false,
+		]);
+		$renderer = new \ElkArte\sources\subs\MessagesCallback\SearchRenderer($messages_request, $bodyParser, $opt);
+
+		$context['topic_starter_id'] = 0;
+		$context['get_topics'] = array($renderer, 'getContext');
 
 		$context['jump_to'] = array(
 			'label' => addslashes(un_htmlspecialchars($txt['jump_to'])),
@@ -469,264 +482,6 @@ class Search_Controller extends Action_Controller
 			foreach ($topics_participated_in as $topic)
 				$this->_participants[$topic['id_topic']] = true;
 		}
-	}
-
-	/**
-	 * Callback to return messages - saves memory.
-	 *
-	 * @todo Fix this, update it, whatever... from Display.controller.php mainly.
-	 * Note that the call to loadAttachmentContext() doesn't work:
-	 * this function doesn't fulfill the pre-condition to fill $attachments global...
-	 * So all it does is to fallback and return.
-	 *
-	 * What it does:
-	 *
-	 * - Callback function for the results sub template.
-	 * - Loads the necessary contextual data to show a search result.
-	 *
-	 * @param boolean $reset = false
-	 * @return array of messages that match the search
-	 */
-	public function prepareSearchContext_callback($reset = false)
-	{
-		global $txt, $modSettings, $scripturl, $user_info;
-		global $memberContext, $context, $options, $messages_request;
-		global $boards_can;
-
-		// Remember which message this is.  (ie. reply #83)
-		static $counter = null;
-		if ($counter === null || $reset)
-			$counter = $_REQUEST['start'] + 1;
-
-		// Start from the beginning...
-		if ($reset)
-			return currentContext($messages_request, $reset);
-
-		// Attempt to get the next in line
-		$message = currentContext($messages_request);
-		if (!$message)
-			return false;
-
-		// Can't have an empty subject can we?
-		$message['subject'] = $message['subject'] != '' ? $message['subject'] : $txt['no_subject'];
-
-		$message['first_subject'] = $message['first_subject'] != '' ? $message['first_subject'] : $txt['no_subject'];
-		$message['last_subject'] = $message['last_subject'] != '' ? $message['last_subject'] : $txt['no_subject'];
-
-		// If it couldn't load, or the user was a guest.... someday may be done with a guest table.
-		if (!loadMemberContext($message['id_member']))
-		{
-			// Notice this information isn't used anywhere else.... *cough guest table cough*.
-			$memberContext[$message['id_member']]['name'] = $message['poster_name'];
-			$memberContext[$message['id_member']]['id'] = 0;
-			$memberContext[$message['id_member']]['group'] = $txt['guest_title'];
-			$memberContext[$message['id_member']]['link'] = $message['poster_name'];
-			$memberContext[$message['id_member']]['email'] = $message['poster_email'];
-		}
-		$memberContext[$message['id_member']]['ip'] = $message['poster_ip'];
-
-		// Do the censor thang...
-		$message['body'] = censor($message['body']);
-		$message['subject'] = censor($message['subject']);
-		$message['first_subject'] = censor($message['first_subject']);
-		$message['last_subject'] = censor($message['last_subject']);
-
-		$searchArray = $this->_search->getSearchArray();
-
-		// Shorten this message if necessary.
-		if ($context['compact'])
-		{
-			// Set the number of characters before and after the searched keyword.
-			$charLimit = 50;
-
-			$message['body'] = strtr($message['body'], array("\n" => ' ', '<br />' => "\n"));
-			$bbc_parser = \BBC\ParserWrapper::instance();
-			$message['body'] = $bbc_parser->parseMessage($message['body'], $message['smileys_enabled']);
-			$message['body'] = strip_tags(strtr($message['body'], array('</div>' => '<br />', '</li>' => '<br />')), '<br>');
-
-			if (Util::strlen($message['body']) > $charLimit)
-			{
-				if (empty($searchArray))
-				{
-					$message['body'] = Util::substr($message['body'], 0, $charLimit) . '<strong>...</strong>';
-				}
-				else
-				{
-					$matchString = '';
-					$force_partial_word = false;
-					foreach ($searchArray as $keyword)
-					{
-						$keyword = un_htmlspecialchars($keyword);
-						$keyword = preg_replace_callback('~(&amp;#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', strtr($keyword, array('\\\'' => '\'', '&' => '&amp;')));
-						if (preg_match('~[\'\.,/@%&;:(){}\[\]_\-+\\\\]$~', $keyword) != 0 || preg_match('~^[\'\.,/@%&;:(){}\[\]_\-+\\\\]~', $keyword) != 0)
-							$force_partial_word = true;
-						$matchString .= strtr(preg_quote($keyword, '/'), array('\*' => '.+?')) . '|';
-					}
-					$matchString = un_htmlspecialchars(substr($matchString, 0, -1));
-
-					$message['body'] = un_htmlspecialchars(strtr($message['body'], array('&nbsp;' => ' ', '<br />' => "\n", '&#91;' => '[', '&#93;' => ']', '&#58;' => ':', '&#64;' => '@')));
-
-					if (empty($modSettings['search_method']) || $force_partial_word)
-						preg_match_all('/([^\s\W]{' . $charLimit . '}[\s\W]|[\s\W].{0,' . $charLimit . '}?|^)(' . $matchString . ')(.{0,' . $charLimit . '}[\s\W]|[^\s\W]{0,' . $charLimit . '})/isu', $message['body'], $matches);
-					else
-						preg_match_all('/([^\s\W]{' . $charLimit . '}[\s\W]|[\s\W].{0,' . $charLimit . '}?[\s\W]|^)(' . $matchString . ')([\s\W].{0,' . $charLimit . '}[\s\W]|[\s\W][^\s\W]{0,' . $charLimit . '})/isu', $message['body'], $matches);
-
-					$message['body'] = '';
-					foreach ($matches[0] as $match)
-					{
-						$match = strtr(htmlspecialchars($match, ENT_QUOTES, 'UTF-8'), array("\n" => '&nbsp;'));
-						$message['body'] .= '<strong>&hellip;&hellip;</strong>&nbsp;' . $match . '&nbsp;<strong>&hellip;&hellip;</strong>';
-					}
-				}
-
-				// Re-fix the international characters.
-				$message['body'] = preg_replace_callback('~(&amp;#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', $message['body']);
-			}
-		}
-		else
-		{
-			// Run BBC interpreter on the message.
-			$bbc_parser = \BBC\ParserWrapper::instance();
-			$message['body'] = $bbc_parser->parseMessage($message['body'], $message['smileys_enabled']);
-		}
-
-		// Make sure we don't end up with a practically empty message body.
-		$message['body'] = preg_replace('~^(?:&nbsp;)+$~', '', $message['body']);
-
-		// Do we have quote tag enabled?
-		$quote_enabled = empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']));
-
-		$output_pre = Topic_Util::prepareContext(array($message))[$message['id_topic']];
-
-		$output = array_merge($context['topics'][$message['id_msg']], $output_pre);
-
-		$output['posted_in'] = !empty($this->_participants[$message['id_topic']]);
-		$output['tests'] = array(
-			'can_reply' => in_array($message['id_board'], $boards_can['post_reply_any']) || in_array(0, $boards_can['post_reply_any']),
-			'can_quote' => (in_array($message['id_board'], $boards_can['post_reply_any']) || in_array(0, $boards_can['post_reply_any'])) && $quote_enabled,
-			'can_mark_notify' => in_array($message['id_board'], $boards_can['mark_any_notify']) || in_array(0, $boards_can['mark_any_notify']) && !$context['user']['is_guest'],
-		);
-		$output['board'] = array(
-			'id' => $message['id_board'],
-			'name' => $message['board_name'],
-			'href' => $scripturl . '?board=' . $message['id_board'] . '.0',
-			'link' => '<a href="' . $scripturl . '?board=' . $message['id_board'] . '.0">' . $message['board_name'] . '</a>'
-		);
-		$output['category'] = array(
-			'id' => $message['id_cat'],
-			'name' => $message['cat_name'],
-			'href' => $scripturl . $modSettings['default_forum_action'] . '#c' . $message['id_cat'],
-			'link' => '<a href="' . $scripturl . $modSettings['default_forum_action'] . '#c' . $message['id_cat'] . '">' . $message['cat_name'] . '</a>'
-		);
-
-		determineTopicClass($output);
-
-		if ($output['posted_in'])
-			$output['class'] = 'my_' . $output['class'];
-
-		$body_highlighted = $message['body'];
-		$subject_highlighted = $message['subject'];
-
-		if (!empty($options['display_quick_mod']))
-		{
-			$started = $output['first_post']['member']['id'] == $user_info['id'];
-
-			$output['quick_mod'] = array(
-				'lock' => in_array(0, $boards_can['lock_any']) || in_array($output['board']['id'], $boards_can['lock_any']) || ($started && (in_array(0, $boards_can['lock_own']) || in_array($output['board']['id'], $boards_can['lock_own']))),
-				'sticky' => (in_array(0, $boards_can['make_sticky']) || in_array($output['board']['id'], $boards_can['make_sticky'])),
-				'move' => in_array(0, $boards_can['move_any']) || in_array($output['board']['id'], $boards_can['move_any']) || ($started && (in_array(0, $boards_can['move_own']) || in_array($output['board']['id'], $boards_can['move_own']))),
-				'remove' => in_array(0, $boards_can['remove_any']) || in_array($output['board']['id'], $boards_can['remove_any']) || ($started && (in_array(0, $boards_can['remove_own']) || in_array($output['board']['id'], $boards_can['remove_own']))),
-			);
-
-			$context['can_lock'] |= $output['quick_mod']['lock'];
-			$context['can_sticky'] |= $output['quick_mod']['sticky'];
-			$context['can_move'] |= $output['quick_mod']['move'];
-			$context['can_remove'] |= $output['quick_mod']['remove'];
-			$context['can_merge'] |= in_array($output['board']['id'], $boards_can['merge_any']);
-			$context['can_markread'] = $context['user']['is_logged'];
-
-			$context['qmod_actions'] = array('remove', 'lock', 'sticky', 'move', 'markread');
-			call_integration_hook('integrate_quick_mod_actions_search');
-		}
-
-		foreach ($searchArray as $query)
-		{
-			// Fix the international characters in the keyword too.
-			$query = un_htmlspecialchars($query);
-			$query = trim($query, '\*+');
-			$query = strtr(Util::htmlspecialchars($query), array('\\\'' => '\''));
-
-			$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu', array($this, '_highlighted_callback'), $body_highlighted);
-			$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $subject_highlighted);
-		}
-
-		require_once(SUBSDIR . '/Attachments.subs.php');
-		$output['matches'][] = array(
-			'id' => $message['id_msg'],
-			'attachment' => loadAttachmentContext($message['id_msg']),
-			'alternate' => $counter % 2,
-			'member' => &$memberContext[$message['id_member']],
-			'icon' => $message['icon'],
-			'icon_url' => $this->_icon_sources->{$message['icon']},
-			'subject' => $message['subject'],
-			'subject_highlighted' => $subject_highlighted,
-			'time' => standardTime($message['poster_time']),
-			'html_time' => htmlTime($message['poster_time']),
-			'timestamp' => forum_time(true, $message['poster_time']),
-			'counter' => $counter,
-			'modified' => array(
-				'time' => standardTime($message['modified_time']),
-				'html_time' => htmlTime($message['modified_time']),
-				'timestamp' => forum_time(true, $message['modified_time']),
-				'name' => $message['modified_name']
-			),
-			'body' => $message['body'],
-			'body_highlighted' => $body_highlighted,
-			'start' => 'msg' . $message['id_msg']
-		);
-		$counter++;
-
-		if (!$context['compact'])
-		{
-			$output['buttons'] = array(
-				// Can we request notification of topics?
-				'notify' => array(
-					'href' => $scripturl . '?action=notify;topic=' . $output['id'] . '.msg' . $message['id_msg'],
-					'text' => $txt['notify'],
-					'test' => 'can_mark_notify',
-				),
-				// If they *can* reply?
-				'reply' => array(
-					'href' => $scripturl . '?action=post;topic=' . $output['id'] . '.msg' . $message['id_msg'],
-					'text' => $txt['reply'],
-					'test' => 'can_reply',
-				),
-				// If they *can* quote?
-				'quote' => array(
-					'href' => $scripturl . '?action=post;topic=' . $output['id'] . '.msg' . $message['id_msg'] . ';quote=' . $message['id_msg'],
-					'text' => $txt['quote'],
-					'test' => 'can_quote',
-				),
-			);
-		}
-
-		call_integration_hook('integrate_search_message_context', array($counter, &$output));
-
-		return $output;
-	}
-
-	/**
-	 * Used to highlight body text with strings that match the search term
-	 *
-	 * Callback function used in $body_highlighted
-	 *
-	 * @param string[] $matches
-	 *
-	 * @return string
-	 */
-	private function _highlighted_callback($matches)
-	{
-		return isset($matches[2]) && $matches[2] == $matches[1] ? stripslashes($matches[1]) : '<span class="highlight">' . $matches[1] . '</span>';
 	}
 
 	/**

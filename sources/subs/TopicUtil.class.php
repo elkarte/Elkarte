@@ -184,6 +184,7 @@ class Topic_Util
 				'likes' => comma_format($row['num_likes']),
 				'approved' => $row['approved'] ?? 1,
 				'unapproved_posts' => !empty($row['unapproved_posts']) ? $row['unapproved_posts'] : 0,
+				'classes' => array(),
 			);
 
 			if (!empty($row['id_board']))

@@ -731,7 +731,7 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 				sImage: this.opt.sRemoveButtonImage,
 				sUrl: '#',
 				aEvents: [
-					['click', this.handleSubmit('remove').bind(this)]
+					['click', function () {this.handleSubmit('remove').bind(this)}]
 				]
 			});
 
@@ -743,7 +743,7 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 				sImage: this.opt.sRestoreButtonImage,
 				sUrl: '#',
 				aEvents: [
-					['click', this.handleSubmit('restore').bind(this)]
+					['click', function () {this.handleSubmit('restore').bind(this)}]
 				]
 			});
 
@@ -755,7 +755,7 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 				sImage: this.opt.sSplitButtonImage,
 				sUrl: '#',
 				aEvents: [
-					['click', this.handleSubmit('split').bind(this)]
+					['click', function () {this.handleSubmit('split').bind(this)}]
 				]
 			});
 

@@ -83,7 +83,8 @@ function loadPMLabels($labels)
 			'not_deleted' => 0,
 		)
 	);
-	$labels = array();
+
+// 	$labels = array();
 	while ($row = $db->fetch_assoc($result))
 	{
 		$this_labels = explode(',', $row['labels']);
@@ -1973,7 +1974,8 @@ function loadPMSubjectRequest($pms, $orderBy)
 	$subjects_request = $db->query('', '
 		SELECT
 			pm.id_pm, pm.subject, pm.id_member_from, pm.msgtime, COALESCE(mem.real_name, pm.from_name) AS from_name,
-			COALESCE(mem.id_member, 0) AS not_guest
+			COALESCE(mem.id_member, 0) AS not_guest,
+			{string:empty} as body, {int:smileys_enabled} as smileys_enabled
 		FROM {db_prefix}personal_messages AS pm
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = pm.id_member_from)
 		WHERE pm.id_pm IN ({array_int:pm_list})
@@ -1981,6 +1983,9 @@ function loadPMSubjectRequest($pms, $orderBy)
 		LIMIT ' . count($pms),
 		array(
 			'pm_list' => $pms,
+			'empty' => '',
+			'smileys_enabled' => 1,
+			'from_time' => 0,
 		)
 	);
 
@@ -2006,7 +2011,8 @@ function loadPMMessageRequest($display_pms, $sort_by_query, $sort_by, $descendin
 
 	$messages_request = $db->query('', '
 		SELECT
-			pm.id_pm, pm.subject, pm.id_member_from, pm.body, pm.msgtime, pm.from_name
+			pm.id_pm, pm.subject, pm.id_member_from, pm.body, pm.msgtime, pm.from_name,
+			{int:smileys_enabled} as smileys_enabled
 		FROM {db_prefix}personal_messages AS pm' . ($folder == 'sent' ? '
 			LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)' : '') . ($sort_by == 'name' ? '
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = {raw:id_member})' : '') . '
@@ -2017,6 +2023,7 @@ function loadPMMessageRequest($display_pms, $sort_by_query, $sort_by, $descendin
 		array(
 			'display_pms' => $display_pms,
 			'id_member' => $folder == 'sent' ? 'pmr.id_member' : 'pm.id_member_from',
+			'smileys_enabled' => 1,
 		)
 	);
 
