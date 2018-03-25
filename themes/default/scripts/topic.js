@@ -769,20 +769,20 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 	// Show the number of messages selected in each of the buttons.
 	if (this.opt.bCanRemove && !this.opt.bUseImageButton)
 	{
-		oButtonStrip.getElementById('remove_button_text').innerHTML = this.opt.sRemoveButtonLabel + ' [' + this.iNumSelected + ']';
-		oButtonStrip.getElementById('remove_button').style.display = this.iNumSelected < 1 ? "none" : "";
+		oButtonStrip.querySelector('#remove_button_text').innerHTML = this.opt.sRemoveButtonLabel + ' [' + this.iNumSelected + ']';
+		oButtonStrip.querySelector('#remove_button').style.display = this.iNumSelected < 1 ? "none" : "";
 	}
 
 	if (this.opt.bCanRestore && !this.opt.bUseImageButton)
 	{
-		oButtonStrip.getElementById('restore_button_text').innerHTML = this.opt.sRestoreButtonLabel + ' [' + this.iNumSelected + ']';
-		oButtonStrip.getElementById('restore_button').style.display = this.iNumSelected < 1 ? "none" : "";
+		oButtonStrip.querySelector('#restore_button_text').innerHTML = this.opt.sRestoreButtonLabel + ' [' + this.iNumSelected + ']';
+		oButtonStrip.querySelector('#restore_button').style.display = this.iNumSelected < 1 ? "none" : "";
 	}
 
 	if (this.opt.bCanSplit && !this.opt.bUseImageButton)
 	{
-		oButtonStrip.getElementById('split_button_text').innerHTML = this.opt.sSplitButtonLabel + ' [' + this.iNumSelected + ']';
-		oButtonStrip.getElementById('split_button').style.display = this.iNumSelected < 1 ? "none" : "";
+		oButtonStrip.querySelector('#split_button_text').innerHTML = this.opt.sSplitButtonLabel + ' [' + this.iNumSelected + ']';
+		oButtonStrip.querySelector('#split_button').style.display = this.iNumSelected < 1 ? "none" : "";
 	}
 
 	// Try to restore the correct position.
