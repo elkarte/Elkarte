@@ -691,7 +691,7 @@ InTopicModeration.prototype.init = function()
 		oCheckbox.className = 'input_check';
 		oCheckbox.name = 'msgs[]';
 		oCheckbox.value = this.opt.aMessageIds[i];
-		oCheckbox.onclick = this.handleClick(oCheckbox).bind(this);
+		oCheckbox.onclick = this.handleClick.bind(this, oCheckbox);
 
 		// Append it to the container
 		var oCheckboxContainer = document.getElementById(this.opt.sCheckboxContainerMask + this.opt.aMessageIds[i]);
@@ -731,7 +731,7 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 				sImage: this.opt.sRemoveButtonImage,
 				sUrl: '#',
 				aEvents: [
-					['click', this.handleSubmit('remove').bind(this)]
+					['click', this.handleSubmit.bind(this, 'remove')]
 				]
 			});
 
@@ -743,7 +743,7 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 				sImage: this.opt.sRestoreButtonImage,
 				sUrl: '#',
 				aEvents: [
-					['click', this.handleSubmit('restore').bind(this)]
+					['click', this.handleSubmit.bind(this, 'restore')]
 				]
 			});
 
@@ -755,7 +755,7 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 				sImage: this.opt.sSplitButtonImage,
 				sUrl: '#',
 				aEvents: [
-					['click', this.handleSubmit('split').bind(this)]
+					['click', this.handleSubmit.bind(this, 'split')]
 				]
 			});
 
