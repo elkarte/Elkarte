@@ -691,7 +691,7 @@ InTopicModeration.prototype.init = function()
 		oCheckbox.className = 'input_check';
 		oCheckbox.name = 'msgs[]';
 		oCheckbox.value = this.opt.aMessageIds[i];
-		oCheckbox.onclick = this.handleClick(oCheckbox).bind(this);
+		oCheckbox.onclick = this.handleClick.bind(this, oCheckbox);
 
 		// Append it to the container
 		var oCheckboxContainer = document.getElementById(this.opt.sCheckboxContainerMask + this.opt.aMessageIds[i]);
@@ -731,7 +731,7 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 				sImage: this.opt.sRemoveButtonImage,
 				sUrl: '#',
 				aEvents: [
-					['click', this.handleSubmit('remove').bind(this)]
+					['click', this.handleSubmit.bind(this, 'remove')]
 				]
 			});
 
@@ -743,7 +743,7 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 				sImage: this.opt.sRestoreButtonImage,
 				sUrl: '#',
 				aEvents: [
-					['click', this.handleSubmit('restore').bind(this)]
+					['click', this.handleSubmit.bind(this, 'restore')]
 				]
 			});
 
@@ -755,7 +755,7 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 				sImage: this.opt.sSplitButtonImage,
 				sUrl: '#',
 				aEvents: [
-					['click', this.handleSubmit('split').bind(this)]
+					['click', this.handleSubmit.bind(this, 'split')]
 				]
 			});
 
@@ -769,20 +769,20 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 	// Show the number of messages selected in each of the buttons.
 	if (this.opt.bCanRemove && !this.opt.bUseImageButton)
 	{
-		oButtonStrip.getElementById('remove_button_text').innerHTML = this.opt.sRemoveButtonLabel + ' [' + this.iNumSelected + ']';
-		oButtonStrip.getElementById('remove_button').style.display = this.iNumSelected < 1 ? "none" : "";
+		oButtonStrip.querySelector('#remove_button_text').innerHTML = this.opt.sRemoveButtonLabel + ' [' + this.iNumSelected + ']';
+		oButtonStrip.querySelector('#remove_button').style.display = this.iNumSelected < 1 ? "none" : "";
 	}
 
 	if (this.opt.bCanRestore && !this.opt.bUseImageButton)
 	{
-		oButtonStrip.getElementById('restore_button_text').innerHTML = this.opt.sRestoreButtonLabel + ' [' + this.iNumSelected + ']';
-		oButtonStrip.getElementById('restore_button').style.display = this.iNumSelected < 1 ? "none" : "";
+		oButtonStrip.querySelector('#restore_button_text').innerHTML = this.opt.sRestoreButtonLabel + ' [' + this.iNumSelected + ']';
+		oButtonStrip.querySelector('#restore_button').style.display = this.iNumSelected < 1 ? "none" : "";
 	}
 
 	if (this.opt.bCanSplit && !this.opt.bUseImageButton)
 	{
-		oButtonStrip.getElementById('split_button_text').innerHTML = this.opt.sSplitButtonLabel + ' [' + this.iNumSelected + ']';
-		oButtonStrip.getElementById('split_button').style.display = this.iNumSelected < 1 ? "none" : "";
+		oButtonStrip.querySelector('#split_button_text').innerHTML = this.opt.sSplitButtonLabel + ' [' + this.iNumSelected + ']';
+		oButtonStrip.querySelector('#split_button').style.display = this.iNumSelected < 1 ? "none" : "";
 	}
 
 	// Try to restore the correct position.
