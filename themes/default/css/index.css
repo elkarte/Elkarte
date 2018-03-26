@@ -2975,6 +2975,13 @@ img.new_posts {
 .listlevel2.warning img, .listlevel2.poster_ip img {
 	padding: 0 4px;
 }
+.listlevel2.poster_ip .help {
+	max-width: 50%;
+	overflow: hidden;
+	word-wrap: normal;
+	vertical-align: middle;
+	text-overflow: ellipsis;
+}
 
 .avatar {
 	max-width: 13em;
