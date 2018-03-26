@@ -1,5 +1,5 @@
 <?php if (!defined('BB2_CWD')) die("I said no cheating!");
-define('BB2_VERSION', "2.2.19");
+define('BB2_VERSION', "2.2.20");
 
 // Bad Behavior entry point is bb2_start()
 // If you're reading this, you are probably lost.
@@ -98,7 +98,7 @@ function bb2_start($settings)
 
 	// Reconstruct the HTTP entity, if present.
 	$request_entity = array();
-	if (!strcasecmp($_SERVER['REQUEST_METHOD'], "POST") || !strcasecmp($_SERVER['REQUEST_METHOD'], "PUT")) {
+	if (isset($_SERVER['REQUEST_METHOD']) && (!strcasecmp($_SERVER['REQUEST_METHOD'], "POST") || !strcasecmp($_SERVER['REQUEST_METHOD'], "PUT"))) {
 		foreach ($_POST as $h => $v) {
 			if (is_array($v)) {
 				# Workaround, see Bug #12
