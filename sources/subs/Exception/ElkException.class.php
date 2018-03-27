@@ -136,9 +136,16 @@ class Elk_Exception extends Exception
 	{
 		global $txt;
 
-		list ($msg, $lang) = $this->parseMessage($message);
-		$this->logMessage($message, $lang);
-		loadLanguage($lang);
+		try
+		{
+			list ($msg, $lang) = $this->parseMessage($message);
+			$this->logMessage($message, $lang);
+			loadLanguage($lang);
+		}
+		catch (\Exception $e)
+		{
+			E::instance()->display_minimal_error($message);
+		}
 
 		$msg = !isset($txt[$msg]) ? $msg : (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
 
