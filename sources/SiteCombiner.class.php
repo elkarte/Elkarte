@@ -341,6 +341,11 @@ class Site_Combiner
 		if (isset($options['dir']))
 		{
 			$filename = $options['dir'] . $options['basename'];
+			if (file_exists($filename) === false)
+			{
+				return false;
+			}
+
 			$this->_combine_files[$options['basename']] = array(
 				'file' => $filename,
 				'basename' => $options['basename'],
