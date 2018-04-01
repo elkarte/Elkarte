@@ -295,6 +295,13 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 			$output_html = strtr($row['enclose'], $replacements);
 		}
 
+		$context['custom_fields_required'] = $context['custom_fields_required'] || $row['show_reg'];
+		$valid_areas = array('register', 'account', 'forumprofile', 'theme');
+
+		if (!in_array($area, $valid_areas) && ($value === '' || $value === 'no_default'))
+		{
+			continue;
+		}
 		$context['custom_fields'][] = array(
 			'name' => $row['field_name'],
 			'desc' => $row['field_desc'],
@@ -308,7 +315,6 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 			'field_length' => $row['field_length'],
 			'mask' => $row['mask'],
 		);
-		$context['custom_fields_required'] = $context['custom_fields_required'] || $row['show_reg'];
 	}
 
 	$db->free_result($request);
