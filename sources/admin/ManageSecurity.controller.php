@@ -432,20 +432,6 @@ class ManageSecurity_Controller extends Action_Controller
 		if (!$modSettings['postmod_active'])
 			unset($config_vars['moderate']);
 
-// 		require_once(SUBSDIR . '/VerificationControls.class.php');
-// 		$known_verifications = new VerificationControlsIntegrate();
-
-// 		foreach ($known_verifications as $verification)
-// 		{
-// 			$class_name = 'Verification_Controls_' . ucfirst($verification);
-// 			$current_instance = new $class_name();
-// 
-// 			$new_settings = $current_instance->settings();
-// 			if (!empty($new_settings) && is_array($new_settings))
-// 				foreach ($new_settings as $new_setting)
-// 				$config_vars[] = $new_setting;
-// 		}
-
 		// @todo: it may be removed, it may stay, the two hooks may have different functions
 		call_integration_hook('integrate_spam_settings', array(&$config_vars));
 
