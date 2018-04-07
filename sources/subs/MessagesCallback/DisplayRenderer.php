@@ -1,15 +1,39 @@
 <?php
 
+/**
+ * Part of the files dealing with preparing the content for display posts
+ * via callbacks (Display, PM, Search).
+ *
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * This file contains code covered by:
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 2.0 dev
+ *
+ */
+
 namespace ElkArte\sources\subs\MessagesCallback;
 
 use \ElkArte\sources\subs\MessagesCallback\BodyParser\BodyParserInterface;
 use \ElkArte\ValuesContainer;
 
+/**
+ * DisplayRenderer
+ * The class prepares the details of a message so that they can be used
+ * to display it in the template.
+ */
 class DisplayRenderer extends Renderer
 {
 	const BEFORE_PREPARE_HOOK = 'integrate_before_prepare_display_context';
 	const CONTEXT_HOOK = 'integrate_prepare_display_context';
 
+	/**
+	 * {@inheritdoc }
+	 */
 	protected function _setupPermissions()
 	{
 		global $context, $modSettings, $user_info;
@@ -26,6 +50,9 @@ class DisplayRenderer extends Renderer
 		$this->_this_message['like_count'] = !empty($context['likes'][$this->_this_message['id_msg']]['count']) ? $context['likes'][$this->_this_message['id_msg']]['count'] : 0;
 	}
 
+	/**
+	 * {@inheritdoc }
+	 */
 	protected function _adjustAllMembers()
 	{
 		global $memberContext, $settings, $context;
@@ -38,6 +65,9 @@ class DisplayRenderer extends Renderer
 		$context['id_msg'] = $this->_this_message['id_msg'] ?? '';
 	}
 
+	/**
+	 * {@inheritdoc }
+	 */
 	protected function _buildOutputArray()
 	{
 		global $scripturl, $topic, $context, $modSettings, $user_info, $txt;

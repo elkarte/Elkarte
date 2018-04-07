@@ -1,21 +1,49 @@
 <?php
 
+/**
+ * Part of the files dealing with preparing the content for display posts
+ * via callbacks (Display, PM, Search).
+ *
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * This file contains code covered by:
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 2.0 dev
+ *
+ */
+
 namespace ElkArte\sources\subs\MessagesCallback;
 
 use \ElkArte\sources\subs\MessagesCallback\BodyParser\BodyParserInterface;
 use \ElkArte\ValuesContainer;
 
+/**
+ * SearchRenderer
+ *
+ * Used by the Search_Controller to prepare the search results.
+ */
 class SearchRenderer extends Renderer
 {
 	const BEFORE_PREPARE_HOOK = 'integrate_before_prepare_search_context';
 	const CONTEXT_HOOK = 'integrate_prepare_search_context';
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public function __construct($request, BodyParserInterface $bodyParser, ValuesContainer $opt = null)
 	{
 		parent::__construct($request, $bodyParser, $opt);
 
 		require_once(SUBSDIR . '/Attachments.subs.php');
 	}
+
+	/**
+	 * {@inheritdoc }
+	 */
 	protected function _setupPermissions()
 	{
 		global $txt;
@@ -24,10 +52,16 @@ class SearchRenderer extends Renderer
 		$this->_this_message['last_subject'] = $this->_this_message['last_subject'] != '' ? $this->_this_message['last_subject'] : $txt['no_subject'];
 	}
 
+	/**
+	 * {@inheritdoc }
+	 */
 	protected function _adjustMemberContext()
 	{
 	}
 
+	/**
+	 * {@inheritdoc }
+	 */
 	protected function _adjustAllMembers()
 	{
 		global $memberContext;
@@ -38,6 +72,9 @@ class SearchRenderer extends Renderer
 		$this->_this_message['last_subject'] = censor($this->_this_message['last_subject']);
 	}
 
+	/**
+	 * {@inheritdoc }
+	 */
 	protected function _buildOutputArray()
 	{
 		global $modSettings, $context, $scripturl, $options, $user_info, $memberContext;

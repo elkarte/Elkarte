@@ -1,17 +1,46 @@
 <?php
 
+/**
+ * Part of the files dealing with preparing the content for display posts
+ * via callbacks (Display, PM, Search).
+ *
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * This file contains code covered by:
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 2.0 dev
+ *
+ */
+
 namespace ElkArte\sources\subs\MessagesCallback;
 
 use \ElkArte\sources\subs\MessagesCallback\BodyParser\BodyParserInterface;
 use \ElkArte\ValuesContainer;
 
+/**
+ * PmRenderer
+ *
+ * Used by the PersonalMessage_Controller to prepare both the subjects (for
+ * the list of messages in the index) and the bodies of the PMs.
+ */
 class PmRenderer extends Renderer
 {
 	const BEFORE_PREPARE_HOOK = 'integrate_before_prepare_pm_context';
 	const CONTEXT_HOOK = 'integrate_prepare_pm_context';
 
+	/**
+	 * Array of selected personal messages
+	 * @var int[]
+	 */
 	protected $_temp_pm_selected = null;
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public function __construct($request, BodyParserInterface $bodyParser, ValuesContainer $opt = null)
 	{
 		parent::__construct($request, $bodyParser, $opt);
@@ -26,10 +55,16 @@ class PmRenderer extends Renderer
 		$_SESSION['pm_selected'] = array();
 	}
 
+	/**
+	 * {@inheritdoc }
+	 */
 	protected function _setupPermissions()
 	{
 	}
 
+	/**
+	 * {@inheritdoc }
+	 */
 	protected function _adjustGuestContext()
 	{
 		global $memberContext, $context;
@@ -45,6 +80,9 @@ class PmRenderer extends Renderer
 		$memberContext[$this->_this_message['id_member_from']]['email'] = '';
 	}
 
+	/**
+	 * {@inheritdoc }
+	 */
 	protected function _adjustAllMembers()
 	{
 		global $memberContext, $context, $settings;
@@ -52,6 +90,9 @@ class PmRenderer extends Renderer
 		$memberContext[$this->_this_message['id_member_from']]['show_profile_buttons'] = $settings['show_profile_buttons'] && (!empty($memberContext[$this->_this_message['id_member_from']]['can_view_profile']) || (!empty($memberContext[$this->_this_message['id_member_from']]['website']['url']) && !isset($context['disabled_fields']['website'])) || (in_array($memberContext[$this->_this_message['id_member_from']]['show_email'], array('yes', 'yes_permission_override', 'no_through_forum'))) || $context['can_send_pm']);
 	}
 
+	/**
+	 * {@inheritdoc }
+	 */
 	protected function _buildOutputArray()
 	{
 		global $recipients, $context, $user_info, $modSettings, $scripturl, $txt;

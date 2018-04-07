@@ -1,14 +1,57 @@
 <?php
 
+/**
+ * Part of the files dealing with preparing the content for display posts
+ * via callbacks (Display, PM, Search).
+ *
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * This file contains code covered by:
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 2.0 dev
+ *
+ */
+
 namespace ElkArte\sources\subs\MessagesCallback\BodyParser;
 
+/**
+ * Compact
+ * A body parser that cuts the text to a certain length and highlight the words
+ * passed to the constructor.
+ */
 class Compact implements BodyParserInterface
 {
+	/**
+	 * An array of words that can be highlighted in the message (somehow)
+	 * @var string[]
+	 */
 	protected $_searchArray = array();
+
+	/**
+	 * If there is something to highlight or not
+	 * @var bool
+	 */
 	protected $_highlight = false;
+
+	/**
+	 * The BBCode parser
+	 * @var Object
+	 */
 	protected $_bbc_parser = null;
+
+	/**
+	 * If highlight should happen on whole rods or part of them
+	 * @var bool
+	 */
 	protected $_use_partial_words = false;
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public function __construct($highlight, $use_partial_words)
 	{
 		$this->_searchArray = $highlight;
@@ -17,11 +60,17 @@ class Compact implements BodyParserInterface
 		$this->_bbc_parser = \BBC\ParserWrapper::instance();
 	}
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public function getSearchArray()
 	{
 		return $this->_searchArray;
 	}
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public function prepare($body, $smileys_enabled)
 	{
 		// Set the number of characters before and after the searched keyword.

@@ -1,21 +1,92 @@
 <?php
 
+/**
+ * Part of the files dealing with preparing the content for display posts
+ * via callbacks (Display, PM, Search).
+ *
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * This file contains code covered by:
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 2.0 dev
+ *
+ */
+
 namespace ElkArte\sources\subs\MessagesCallback;
 
 use \ElkArte\sources\subs\MessagesCallback\BodyParser\BodyParserInterface;
 use \ElkArte\ValuesContainer;
 
+/**
+ * Renderer
+ *
+ * The common skeleton to display content via callback.
+ * Classes extending this abstract should declare two constants:
+ *   - BEFORE_PREPARE_HOOK
+ *   - CONTEXT_HOOK
+ * that will be strings used as hook names.
+ */
 abstract class Renderer
 {
+	/**
+	 * The request object
+	 * @var Object
+	 */
 	protected $_dbRequest = null;
+
+	/**
+	 * The parser that will convert the body
+	 * @var BodyParserInterface
+	 */
 	protected $_bodyParser = null;
+
+	/**
+	 * The database object
+	 * @var Object
+	 */
 	protected $_db = null;
+
+	/**
+	 * Some options
+	 * @var ValuesContainer
+	 */
 	protected $_options = null;
+
+	/**
+	 * Position tracker, to know where we are into the request
+	 * @var int
+	 */
 	protected $_counter = 0;
+
+	/**
+	 * Should we show the signature of this message?
+	 * @var bool
+	 */
 	protected $_signature_shown = null;
+
+	/**
+	 * The current message being prepared
+	 * @var mixed[]
+	 */
 	protected $_this_message = null;
+
+	/**
+	 * Index mapping, to normalize certain indexes across requests
+	 * @var ValuesContainer
+	 */
 	protected $_idx_mapper = array();
 
+	/**
+	 * Starts everything.
+	 *
+	 * @param Object $request
+	 * @param BodyParserInterface $bodyParser
+	 * @param ValuesContainer $opt
+	 */
 	public function __construct($request, BodyParserInterface $bodyParser, ValuesContainer $opt = null)
 	{
 		$this->_dbRequest = $request;
@@ -41,6 +112,14 @@ abstract class Renderer
 		}
 	}
 
+	/**
+	 * The main part: reads the DB resource and returns the complex array
+	 * for a certain message.
+	 *
+	 * @param bool $reset
+	 *
+	 * @return bool|mixed[]
+	 */
 	public function getContext($reset = false)
 	{
 		global $settings, $txt, $modSettings, $scripturl, $user_info;
@@ -78,7 +157,7 @@ abstract class Renderer
 		// If you're a lazy bum, you probably didn't give a subject...
 		$this->_this_message['subject'] = $this->_this_message['subject'] != '' ? $this->_this_message['subject'] : $txt['no_subject'];
 
-		$this->_setupPermissions($this->_this_message);
+		$this->_setupPermissions();
 
 		$id_member = $this->_this_message[$this->_idx_mapper->id_member];
 
@@ -111,10 +190,6 @@ abstract class Renderer
 		$this->_counter++;
 
 		return $output;
-	}
-
-	protected function _adjustAllMembers()
-	{
 	}
 
 	/**
@@ -155,8 +230,17 @@ abstract class Renderer
 		return true;
 	}
 
+	/**
+	 * Utility function, it shall be implemented by the extending class.
+	 * Run just before loadMemberContext is executed.
+	 */
 	protected abstract function _setupPermissions();
 
+	/**
+	 * Utility function, it can be overridden to alter something just after the
+	 * members' data have been loaded from the database.
+	 * Run only if loadMemberContext succeeded.
+	 */
 	protected function _adjustGuestContext()
 	{
 		global $memberContext, $txt;
@@ -173,6 +257,11 @@ abstract class Renderer
 		$memberContext[$member_id]['is_guest'] = true;
 	}
 
+	/**
+	 * Utility function, it can be overridden to alter something just after the
+	 * members data have been set.
+	 * Run only if loadMemberContext failed.
+	 */
 	protected function _adjustMemberContext()
 	{
 		global $memberContext, $txt, $user_info, $context, $modSettings;
@@ -200,6 +289,27 @@ abstract class Renderer
 		}
 	}
 
+	/**
+	 * Utility function, it can be overridden to alter something just after either
+	 * the members or the guests data have been loaded from the database.
+	 * Run both if loadMemberContext succeeded or failed.
+	 */
+	protected function _adjustAllMembers()
+	{
+	}
+
+	/**
+	 * The most important bit that differentiate the various implementations.
+	 * It is supposed to prepare the $output array with all the information
+	 * needed by the template to properly render the message.
+	 *
+	 * The method of the class extending this abstract may run
+	 * parent::_buildOutputArray()
+	 * as first statement in order to have a starting point and
+	 * some commonly used content for the array.
+	 *
+	 * @return mixed[]
+	 */
 	protected function _buildOutputArray()
 	{
 		global $user_info, $memberContext;
