@@ -22,24 +22,28 @@ class AttachmentErrorContext
 {
 	/**
 	 * Holds our static instance of the class
+	 *
 	 * @var object
 	 */
 	private static $_context = null;
 
 	/**
 	 * Holds all of the attachment ids
+	 *
 	 * @var array
 	 */
 	private $_attachs = null;
 
 	/**
 	 * Holds any errors found
+	 *
 	 * @var ErrorContext|null
 	 */
 	private $_generic_error = null;
 
 	/**
 	 * Holds if the error is generic of specific to an attachment
+	 *
 	 * @var string
 	 */
 	private $_active_attach = null;
@@ -59,14 +63,17 @@ class AttachmentErrorContext
 		if (empty($id) || empty($name))
 		{
 			$this->activate();
+
 			return false;
 		}
 
 		if (!isset($this->_attachs[$id]))
+		{
 			$this->_attachs[$id] = array(
 				'name' => $name,
 				'error' => ErrorContext::context($id, 1),
 			);
+		}
 
 		$this->activate($id);
 
@@ -83,9 +90,13 @@ class AttachmentErrorContext
 	public function activate($id = null)
 	{
 		if (empty($id) || !isset($this->_attachs[$id]))
+		{
 			$this->_active_attach = 'generic';
+		}
 		else
+		{
 			$this->_active_attach = $id;
+		}
 
 		return $this;
 	}
@@ -99,14 +110,19 @@ class AttachmentErrorContext
 	public function addError($error, $lang_file = null)
 	{
 		if (empty($error))
+		{
 			return;
+		}
 
 		if ($this->_active_attach == 'generic')
 		{
 			if (!isset($this->_attachs[$this->_active_attach]))
+			{
 				$this->_generic_error = ErrorContext::context('attach_generic_error', 1);
+			}
 
 			$this->_generic_error->addError($error, $lang_file);
+
 			return;
 		}
 
@@ -121,7 +137,9 @@ class AttachmentErrorContext
 	public function removeError($error)
 	{
 		if (empty($error))
+		{
 			return;
+		}
 
 		$this->_attachs[$this->_active_attach]['error']->removeError($error);
 	}
@@ -137,23 +155,34 @@ class AttachmentErrorContext
 	public function hasErrors($attachID = null, $severity = null)
 	{
 		if ($this->_generic_error !== null)
+		{
 			if ($this->_generic_error->hasErrors($severity))
+			{
 				return true;
+			}
+		}
 
 		if (!empty($this->_attachs))
 		{
 			if ($attachID !== null)
 			{
 				if (isset($this->_attachs[$attachID]))
+				{
 					return $this->_attachs[$attachID]['error']->hasErrors($severity);
+				}
 			}
 			else
 			{
 				foreach ($this->_attachs as $attach)
+				{
 					if ($attach['error']->hasErrors($severity))
+					{
 						return true;
+					}
+				}
 			}
 		}
+
 		return false;
 	}
 
@@ -186,10 +215,13 @@ class AttachmentErrorContext
 				foreach ($this->_attachs as $attach)
 				{
 					if ($attach['error']->hasError($error_code))
+					{
 						return true;
+					}
 				}
 			}
 		}
+
 		return false;
 	}
 
@@ -210,11 +242,13 @@ class AttachmentErrorContext
 		$returns = array();
 
 		if ($this->_generic_error !== null)
+		{
 			$returns['attach_generic'] = array(
 				'errors' => $this->_generic_error->prepareErrors($severity),
 				'type' => $this->getErrorType(),
 				'title' => $txt['attach_error_title'],
 			);
+		}
 
 		if (!empty($this->_attachs))
 		{
@@ -251,7 +285,9 @@ class AttachmentErrorContext
 	public static function context()
 	{
 		if (self::$_context === null)
+		{
 			self::$_context = new self();
+		}
 
 		return self::$_context;
 	}

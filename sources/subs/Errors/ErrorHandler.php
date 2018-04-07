@@ -8,8 +8,8 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * license:        BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -19,6 +19,7 @@ namespace ElkArte\Errors;
 
 use Elk_Exception;
 use ErrorException;
+use Throwable;
 
 /**
  * Class to handle our custom error handlers for PHP, hence its final status.
@@ -50,8 +51,8 @@ final class ErrorHandler extends Errors
 		parent::__construct();
 
 		// Register the class handlers to the PHP handler functions
-		set_error_handler(array($this, 'error_handler'));
-		set_exception_handler(array($this, 'exception_handler'));
+		set_error_handler([$this, 'error_handler']);
+		set_exception_handler([$this, 'exception_handler']);
 	}
 
 	/**
@@ -60,31 +61,30 @@ final class ErrorHandler extends Errors
 	 * @param int $error_level
 	 * @param bool $isException
 	 *
-	 * @rerurn string
 	 * @return string
 	 */
-	private function set_error_name($error_level, $isException)
+	private function set_error_name(int $error_level, bool $isException): string
 	{
 		switch ($error_level)
 		{
 			case E_USER_ERROR:
 				$type = 'Fatal Error';
-			break;
+				break;
 			case E_USER_WARNING:
 			case E_WARNING:
 				$type = 'Warning';
-			break;
+				break;
 			case E_USER_NOTICE:
 			case E_NOTICE:
-			case @E_STRICT:
+			case E_STRICT:
 				$type = 'Notice';
-			break;
-			case @E_RECOVERABLE_ERROR:
+				break;
+			case E_RECOVERABLE_ERROR:
 				$type = 'Catchable';
-			break;
+				break;
 			default:
 				$type = 'Unknown Error';
-			break;
+				break;
 		}
 
 		if ($isException)
@@ -98,7 +98,11 @@ final class ErrorHandler extends Errors
 	/**
 	 * Handler for standard error messages, standard PHP error handler replacement.
 	 *
+	 * - Checks first if self::USE_DEFAULT is set to true and returns accordingly. Useful
+	 * if you have specified your own custom error handler.
 	 * - Converts notices, warnings, and other errors into exceptions.
+	 * - Only does so if $error_level matches with error_reporting.
+	 * - Dies if $error_level is a known fatal error.
 	 *
 	 * @param int $error_level
 	 * @param string $error_string
@@ -122,8 +126,10 @@ final class ErrorHandler extends Errors
 			return true;
 		}
 
-		// Throw it as an ErrorException so that our exception handler deals with it.
-		$this->exception_handler(new ErrorException($error_string, $error_level, $error_level, $file, $line));
+		// Send it as an ErrorException so that our exception handler deals with it.
+		$this->exception_handler(
+			new ErrorException($error_string, $error_level, $error_level, $file, $line)
+		);
 
 		// Don't execute PHP internal error handler.
 		return true;
@@ -132,40 +138,45 @@ final class ErrorHandler extends Errors
 	/**
 	 * Handler for exceptions and standard PHP errors
 	 *
-	 * - It dies with fatal_error() if the error_level matches with error_reporting.
+	 * - Only does so if the error_level matches with error_reporting.
 	 *
-	 * @param \Exception|\Throwable $e The error. Since the code shall work with php 5 and 7
-	 *                                 we cannot type-hint the function parameter.
+	 * @param Throwable $e
+	 *
 	 * @throws Elk_Exception
 	 */
-	public function exception_handler($e)
+	public function exception_handler(Throwable $e)
 	{
 		// Prepare the error details for the log
 		$isException = !$e instanceof ErrorException;
 		$this->error_string = $e->getMessage();
 		$this->error_level = $e->getCode();
 		$this->error_name = $this->set_error_name($this->error_level, $isException);
-		$error_type = stripos($this->error_string, 'undefined') !== false ? 'undefined_vars' : 'general';
-		$err_file = htmlspecialchars($e->getFile());
-		$err_line = $e->getLine();
 
 		// Showing the errors? Format them to look decent
 		$message = $this->_prepareErrorDisplay($e);
 
+		// Let's give integrations a chance to output a bit differently
+		call_integration_hook('integrate_output_error', [$e]);
+
 		// Elk_Exception handles its own logging.
 		if (!$e instanceof Elk_Exception)
-			$this->log_error($this->error_name . ': ' . $this->error_string, $error_type, $err_file, $err_line);
-
-		// Let's give integrations a chance to output a bit differently
-		call_integration_hook('integrate_output_error', array($message, $error_type, $this->error_level, $err_file, $err_line));
-
-		// Dying on these errors only causes MORE problems (blank pages!)
-		if ($err_file === 'Unknown')
-			return;
+		{
+			$this->log_error(
+				$this->error_name . ': ' . $this->error_string,
+				stripos(
+					$this->error_string,
+					'undefined'
+				) !== false ? 'undefined_vars' : 'general',
+				$e->getFile(),
+				$e->getLine()
+			);
+		}
 
 		// If this is an E_ERROR, E_USER_ERROR, E_WARNING, or E_USER_WARNING.... die.  Violently so.
 		if ($this->error_level & $this->fatalErrors || $this->error_level % 255 === E_WARNING || $isException)
+		{
 			$this->_setup_fatal_ErrorContext($message, $this->error_level);
+		}
 		else
 		{
 			// Display debug information?
@@ -176,7 +187,9 @@ final class ErrorHandler extends Errors
 
 		// We should NEVER get to this point.  Any fatal error MUST quit, or very bad things can happen.
 		if ($this->error_level & $this->fatalErrors)
+		{
 			$this->terminate('Hacking attempt...');
+		}
 	}
 
 	/**
@@ -185,7 +198,7 @@ final class ErrorHandler extends Errors
 	 *
 	 * @param string $message
 	 */
-	private function _displayDebug($message)
+	private function _displayDebug(string $message): void
 	{
 		global $db_show_debug;
 
@@ -196,7 +209,9 @@ final class ErrorHandler extends Errors
 			{
 				$temporary = ob_get_contents();
 				if (substr($temporary, -2) === '="')
+				{
 					echo '"';
+				}
 			}
 
 			// Debugging!  This should look like a PHP error message.
@@ -209,25 +224,26 @@ final class ErrorHandler extends Errors
 	 *
 	 * Shows the stack trace if in debug mode and user is admin.
 	 *
-	 * @param \Exception|\Throwable $exception
+	 * @param Throwable $exception
 	 *
-	 * $return string The fully parsed error message
-	 *
-	 * @return string
+	 * @return string The fully parsed error message
 	 */
-	private function _prepareErrorDisplay($exception)
+	private function _prepareErrorDisplay(Throwable $exception): string
 	{
 		global $db_show_debug;
 
 		// Showing the errors, lets make it look decent
 		if ($db_show_debug === true && allowedTo('admin_forum'))
 		{
-			$msg = '<strong>%s</strong><br />PHP Fatal error:  Uncaught exception \'%s\' with message \'%s\' in %s:%s<br />Stack trace:<br />%s<br />  thrown in %s on line %s';
+			$msg =
+				<<<'MSG'
+PHP Fatal error:  Uncaught exception '%s' with message '%s' in %s:%s<br />
+Stack trace:<br />%s<br />  thrown in %s on line %s
+MSG;
 
-			// write tracelines into main template
+			// write trace lines into main template
 			return sprintf(
 				$msg,
-				$this->error_string,
 				get_class($exception),
 				$exception->getMessage(),
 				$exception->getFile(),
@@ -238,44 +254,75 @@ final class ErrorHandler extends Errors
 			);
 		}
 		else
+		{
 			return $this->error_string;
+		}
 	}
 
 	/**
 	 * Builds the stack trace for display.
 	 *
-	 * @param \Exception|\Throwable $exception
+	 * @param Throwable $exception
 	 *
-	 * $return string The fully parsed stack trace
-	 *
-	 * @return array
+	 * @return array The fully parsed stack trace
 	 */
-	private function parseTrace($exception)
+	private function parseTrace(Throwable $exception): array
 	{
-		$traceline = '#%s %s(%s): %s(%s)';
-		$trace = $exception->getTrace();
-		foreach ($trace as $key => $stackPoint)
-		{
-			// convert arguments to their type
-			$trace[$key]['args'] = array_map('gettype', isset($trace[$key]['args']) ? $trace[$key]['args'] : array());
-		}
-
-		$result = array();
+		$result = [];
 		$key = 0;
-		foreach ($trace as $key => $stackPoint)
+		foreach ($exception->getTrace() as $key => $stackPoint)
 		{
-			$result[] = sprintf(
-				$traceline,
-				$key,
-				!empty($stackPoint['file']) ? $stackPoint['file'] : '',
-				!empty($stackPoint['line']) ? $stackPoint['line'] : '',
-				!empty($stackPoint['function']) ? $stackPoint['function'] : '',
-				implode(', ', $stackPoint['args'])
+			$result[] = strtr(
+				sprintf(
+					'#%d. %s(%s): %s(%s)',
+					$key,
+					$stackPoint['file'] ?? '',
+					$stackPoint['line'] ?? '',
+					(isset($stackPoint['class']) ? $stackPoint['class'] . $stackPoint['type'] : '') . $stackPoint['function'] ?? '[internal function]',
+					implode(', ', $this->getTraceArgs($stackPoint))
+				),
+				['(): ' => '']
 			);
 		}
 		// trace always ends with {main}
 		$result[] = '#' . (++$key) . ' {main}';
 
 		return $result;
+	}
+
+	/**
+	 * Advanced gettype().
+	 *
+	 * - Shows the full class name if argument is an object.
+	 * - Shows the resource type if argument is a resource.
+	 * - Uses gettype() for all other types.
+	 *
+	 * @param array $stackPoint
+	 *
+	 * @return array
+	 */
+	private function getTraceArgs(array $stackPoint): array
+	{
+		$args = [];
+		if (isset($stackPoint['args']))
+		{
+			foreach ($stackPoint['args'] as $arg)
+			{
+				if (is_object($arg))
+				{
+					$args[] = get_class($arg);
+				}
+				elseif (is_resource($arg))
+				{
+					$args[] = get_resource_type($arg);
+				}
+				else
+				{
+					$args[] = gettype($arg);
+				}
+			}
+		}
+
+		return $args;
 	}
 }

@@ -434,6 +434,10 @@ em, .em {
 	width: 49.5% !important;
 }
 
+.grid60 {
+	width: 60%;
+}
+
 /* -------------------------------------------------------
  *	$COMMON
  * -------------------------------------------------------
@@ -521,6 +525,13 @@ em, .em {
 
 .wordbreak {
 	word-break: break-all;
+}
+
+.nosel {
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
 }
 
 /* Styles for main headers. */

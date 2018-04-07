@@ -64,12 +64,12 @@ class Elk_Exception extends Exception
 	 * - The index of $txt string
 	 * - A plain text message
 	 * - An array with the following structure:
-	 *		array(
-	 *			0 => language to load (use theme()->getTemplates()->loadLanguageFile)
-	 *			1 => index of $txt
-	 *		)
+	 *        array(
+	 *            0 => language to load (use theme()->getTemplates()->loadLanguageFile)
+	 *            1 => index of $txt
+	 *        )
 	 * - A namespaced index in the form:
-	 * 	 - language.index
+	 *     - language.index
 	 *   - a "language" followed by a "dot" followed by the "index"
 	 *   - "language" can be any character matched by \w
 	 *   - "index" can be anything
@@ -138,7 +138,9 @@ class Elk_Exception extends Exception
 		// Don't need to reload the language file if both the user and
 		// the forum share the same language.
 		if ($language !== $user_info['language'])
+		{
 			theme()->getTemplates()->loadLanguageFile($lang, $language);
+		}
 
 		if ($this->log !== false)
 		{

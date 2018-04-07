@@ -10,15 +10,14 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * license:        BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\Errors;
-
 
 /**
  * Class to handle all forum errors and exceptions
@@ -103,7 +102,9 @@ class Errors extends \AbstractModel
 
 		// Just so we know what board error messages are from.
 		if (isset($_POST['board']) && !isset($_GET['board']))
+		{
 			$query_string .= ($query_string == '' ? 'board=' : ';board=') . $_POST['board'];
+		}
 
 		return $query_string;
 	}
@@ -125,16 +126,21 @@ class Errors extends \AbstractModel
 
 		// Just in case there's no id_member or IP set yet.
 		if (empty($user_info['id']))
+		{
 			$user_info['id'] = 0;
+		}
 		if (empty($user_info['ip']))
+		{
 			$user_info['ip'] = '';
+		}
 
 		// Don't log the same error countless times, as we can get in a cycle of depression...
 		$error_info = array($user_info['id'], time(), $user_info['ip'], $query_string, $error_message, isset($_SESSION['session_value']) ? (string) $_SESSION['session_value'] : 'no_session_data', $error_type, $file, $line);
 		if (empty($last_error) || $last_error != $error_info)
 		{
 			// Insert the error into the database.
-			$this->_db->insert('',
+			$this->_db->insert(
+				'',
 				'{db_prefix}log_errors',
 				array('id_member' => 'int', 'log_time' => 'int', 'ip' => 'string-16', 'url' => 'string-65534', 'message' => 'string-65534', 'session' => 'string', 'error_type' => 'string', 'file' => 'string-255', 'line' => 'int'),
 				$error_info,
@@ -172,7 +178,9 @@ class Errors extends \AbstractModel
 	{
 		// Check if error logging is actually on.
 		if (empty($this->_modSettings['enableErrorLogging']))
+		{
 			return $error_message;
+		}
 
 		// Basically, htmlspecialchars it minus &. (for entities!)
 		$error_message = strtr($error_message, array('<' => '&lt;', '>' => '&gt;', '"' => '&quot;'));
@@ -226,7 +234,9 @@ class Errors extends \AbstractModel
 
 		// Load the language file, only if it needs to be reloaded
 		if ($reload_lang_file)
+		{
 			theme()->getTemplates()->loadLanguageFile('Errors');
+		}
 
 		// Return the message to make things simpler.
 		return $error_message;
@@ -240,7 +250,7 @@ class Errors extends \AbstractModel
 	 * - This function stops execution and displays an error message.
 	 * - It logs the error message if $log is specified.
 	 *
-	 * @param string         $error
+	 * @param string $error
 	 * @param string|boolean $log defaults to 'general' false will skip logging, true will use general
 	 *
 	 * @throws \Elk_Exception
@@ -262,9 +272,9 @@ class Errors extends \AbstractModel
 	 * - uses Errors language file and applies the $sprintf information if specified.
 	 * - the information is logged if log is specified.
 	 *
-	 * @param string         $error
+	 * @param string $error
 	 * @param string|boolean $log defaults to 'general' false will skip logging, true will use general
-	 * @param string[]       $sprintf defaults to empty array()
+	 * @param string[] $sprintf defaults to empty array()
 	 *
 	 * @throws \Elk_Exception
 	 */
@@ -292,11 +302,15 @@ class Errors extends \AbstractModel
 		// Attempt to prevent a recursive loop.
 		++$level;
 		if ($level > 1)
+		{
 			return false;
+		}
 
 		// Maybe they came from dlattach or similar?
 		if (ELK !== 'SSI' && empty($context['theme_loaded']))
+		{
 			new \ElkArte\Themes\ThemeLoader();
+		}
 
 		// Don't bother indexing errors mate...
 		$context['robot_no_index'] = true;
@@ -312,20 +326,23 @@ class Errors extends \AbstractModel
 		$context['sub_template'] = 'fatal_error';
 		theme()->getLayers()->isError();
 
-		if (class_exists('Template_Layers'))
-			\Template_Layers::instance()->isError();
-
 		// If this is SSI, what do they want us to do?
 		if (ELK === 'SSI')
 		{
 			if (!empty($ssi_on_error_method) && $ssi_on_error_method !== true && is_callable($ssi_on_error_method))
+			{
 				call_user_func($ssi_on_error_method);
+			}
 			elseif (empty($ssi_on_error_method) || $ssi_on_error_method !== true)
+			{
 				theme()->getTemplates()->loadSubTemplate('fatal_error');
+			}
 
 			// No layers?
 			if (empty($ssi_on_error_method) || $ssi_on_error_method !== true)
+			{
 				$this->terminate();
+			}
 		}
 
 		// We want whatever for the header, and a footer. (footer includes sub template!)
@@ -356,6 +373,7 @@ class Errors extends \AbstractModel
 		$this->_set_fatal_error_headers();
 
 		if (!empty($maintenance))
+		{
 			echo '<!DOCTYPE html>
 	<html>
 		<head>
@@ -367,6 +385,7 @@ class Errors extends \AbstractModel
 			', $mmessage, '
 		</body>
 	</html>';
+		}
 
 		$this->terminate();
 	}
@@ -399,7 +418,9 @@ class Errors extends \AbstractModel
 
 		$temp = '';
 		if ($cache->getVar($temp, 'db_last_error', 600))
+		{
 			$db_last_error = max($db_last_error, $temp);
+		}
 
 		// Perhaps we want to notify by mail that there was a this->_db error
 		if ($db_last_error < time() - 3600 * 24 * 3 && empty($maintenance) && !empty($db_error_send))
@@ -407,7 +428,9 @@ class Errors extends \AbstractModel
 			// Try using shared memory if possible.
 			$cache->put('db_last_error', time(), 600);
 			if (!$cache->getVar($temp, 'db_last_error', 600))
+			{
 				logLastDatabaseError();
+			}
 
 			// Language files aren't loaded yet :'(
 			$db_error = $this->_db->last_error($this->_db->connection());
@@ -474,11 +497,15 @@ class Errors extends \AbstractModel
 		{
 			$debug .= $var . ': ' . $val . '<br>';
 		}
-		$this->log_error(sprintf(
-			'%s is deprecated, use %s instead.%s',
-			$function,
-			$replacement,
-			$debug), 'deprecated');
+		$this->log_error(
+			sprintf(
+				'%s is deprecated, use %s instead.%s',
+				$function,
+				$replacement,
+				$debug
+			),
+			'deprecated'
+		);
 	}
 
 	/**

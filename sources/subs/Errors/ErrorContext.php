@@ -73,16 +73,22 @@ final class ErrorContext
 	private function __construct($id = 'default', $default_severity = null)
 	{
 		if (!empty($id))
+		{
 			$this->_name = $id;
+		}
 
 		// Initialize severity levels... waiting for details!
 		$this->_severity_levels = array(self::MINOR, self::SERIOUS);
 
 		// Initialize default severity (not sure this is needed)
 		if ($default_severity === null || !in_array($default_severity, $this->_severity_levels))
+		{
 			$this->_default_severity = self::MINOR;
+		}
 		else
+		{
 			$this->_default_severity = $default_severity;
+		}
 
 		$this->_errors = array();
 	}
@@ -105,7 +111,9 @@ final class ErrorContext
 		}
 
 		if (!empty($lang_file) && !isset($this->_language_files[$lang_file]))
+		{
 			$this->_language_files[$lang_file] = false;
+		}
 	}
 
 	/**
@@ -122,9 +130,13 @@ final class ErrorContext
 			foreach ($this->_errors as $severity => $errors)
 			{
 				if (array_key_exists($name, $errors))
+				{
 					unset($this->_errors[$severity][$name]);
+				}
 				if (empty($this->_errors[$severity]))
+				{
 					unset($this->_errors[$severity]);
+				}
 			}
 		}
 	}
@@ -201,42 +213,60 @@ final class ErrorContext
 	public function getErrors($severity = null)
 	{
 		if ($severity !== null && in_array($severity, $this->_severity_levels) && !empty($this->_errors[$severity]))
+		{
 			return $this->_errors[$severity];
+		}
 		elseif ($severity === null && !empty($this->_errors))
+		{
 			return $this->_errors;
+		}
 		else
+		{
 			return false;
+		}
 	}
 
 	/**
 	 * Return an error based on the id of the error set when adding the error itself.
 	 *
 	 * @param mixed|mixed[] $error error code
+	 *
 	 * @return null|mixed whatever the error is (string, object, array), noll if not found
 	 */
 	public function getError($error = null)
 	{
 		$name = $this->getErrorName($error);
 		if (isset($this->_errors[$name]))
+		{
 			return $this->_errors[$name];
+		}
 		else
+		{
 			return null;
+		}
 	}
 
 	/**
 	 * Returns if there are errors or not.
 	 *
 	 * @param string|null $severity the severity level wanted. If null returns all the errors
+	 *
 	 * @return bool
 	 */
 	public function hasErrors($severity = null)
 	{
 		if ($severity !== null && in_array($severity, $this->_severity_levels))
+		{
 			return !empty($this->_errors[$severity]);
+		}
 		elseif ($severity === null)
+		{
 			return !empty($this->_errors);
+		}
 		else
+		{
 			return false;
+		}
 	}
 
 	/**
@@ -278,7 +308,9 @@ final class ErrorContext
 		foreach ($levels as $level)
 		{
 			if (!empty($this->_errors[$level]))
+			{
 				return $level;
+			}
 		}
 
 		return $level;
@@ -298,7 +330,9 @@ final class ErrorContext
 		global $txt;
 
 		if (empty($this->_errors))
+		{
 			return array();
+		}
 
 		$this->_loadLang();
 
@@ -309,10 +343,14 @@ final class ErrorContext
 		if ($severity === null)
 		{
 			foreach ($this->_errors as $err)
+			{
 				$errors = array_merge($errors, $err);
+			}
 		}
 		elseif (in_array($severity, $this->_severity_levels) && !empty($this->_errors[$severity]))
+		{
 			$errors = $this->_errors[$severity];
+		}
 
 		foreach ($errors as $error_val)
 		{
@@ -349,7 +387,9 @@ final class ErrorContext
 
 		// Any custom one?
 		if (!empty($this->_language_files))
+		{
 			foreach ($this->_language_files as $language => $loaded)
+			{
 				if (!$loaded)
 				{
 					theme()->getTemplates()->loadLanguageFile($language);
@@ -357,6 +397,8 @@ final class ErrorContext
 					// Remember this file has been loaded already
 					$this->_language_files[$language] = true;
 				}
+			}
+		}
 	}
 
 	/**
@@ -365,15 +407,20 @@ final class ErrorContext
 	 *
 	 * @param string $id
 	 * @param int|null $default_severity
+	 *
 	 * @return ErrorContext
 	 */
 	public static function context($id = 'default', $default_severity = null)
 	{
 		if (self::$_contexts === null)
+		{
 			self::$_contexts = array();
+		}
 
 		if (!array_key_exists($id, self::$_contexts))
+		{
 			self::$_contexts[$id] = new self($id, $default_severity);
+		}
 
 		return self::$_contexts[$id];
 	}
