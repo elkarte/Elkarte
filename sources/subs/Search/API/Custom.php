@@ -134,6 +134,11 @@ class Custom extends Standard
 		}
 	}
 
+	public function useWordIndex()
+	{
+		return true;
+	}
+
 	/**
 	 * Search for indexed words.
 	 *

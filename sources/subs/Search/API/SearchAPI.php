@@ -117,6 +117,50 @@ abstract class SearchAPI
 	}
 
 	/**
+	 * Callback function for usort used to sort the fulltext results.
+	 *
+	 * - In the standard search ordering is not needed, so only 0 is returned.
+	 *
+	 * @param string $a Word A
+	 * @param string $b Word B
+	 *
+	 * @return int An integer indicating how the words should be sorted (-1, 0 1)
+	 */
+	public function searchSort($a, $b)
+	{
+		return 0;
+	}
+
+	/**
+	 * Do we have to do some work with the words we are searching for to prepare them?
+	 *
+	 * @param string $word A word to index
+	 * @param mixed[] $wordsSearch The Search words
+	 * @param string[] $wordsExclude Words to exclude
+	 * @param boolean $isExcluded
+	 */
+	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
+	{
+	}
+
+	/**
+	 * If the current API can use a word index.
+	 *
+	 * @return bool
+	 */
+	abstract public function useWordIndex();
+
+	/**
+	 * Search for indexed words.
+	 *
+	 * @param mixed[] $words An array of words
+	 * @param mixed[] $search_data An array of search data
+	 *
+	 * @return resource
+	 */
+	abstract public function indexedWordQuery($words, $search_data);
+
+	/**
 	 * Escape words passed by the client
 	 *
 	 * @param string $phrase - The string to escape

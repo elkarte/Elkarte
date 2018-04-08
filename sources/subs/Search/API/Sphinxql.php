@@ -292,6 +292,11 @@ class Sphinxql extends SearchAPI
 		return $topics;
 	}
 
+	public function useWordIndex()
+	{
+		return false;
+	}
+
 	/**
 	 * Constructs a binary mode query to pass back to sphinx
 	 *

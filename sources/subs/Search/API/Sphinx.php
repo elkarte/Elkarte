@@ -303,6 +303,11 @@ class Sphinx extends SearchAPI
 		return $topics;
 	}
 
+	public function useWordIndex()
+	{
+		return false;
+	}
+
 	/**
 	 * Clean up a search word/phrase/term for Sphinx.
 	 *

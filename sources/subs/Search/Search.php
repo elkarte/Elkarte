@@ -281,7 +281,7 @@ class Search
 	public function setParams(SearchParams $paramObject, $search_simple_fulltext = false)
 	{
 		$this->_searchParams = $paramObject;
-		$this->_search_params = $this->_searchParams->get();
+		$this->_search_params = new \ElkArte\ValuesContainer($this->_searchParams->get());
 
 		// Unfortunately, searching for words like this is going to be slow, so we're blacklisting them.
 		// @todo Setting to add more here?
@@ -289,7 +289,7 @@ class Search
 		$blacklisted_words = array('img', 'url', 'quote', 'www', 'http', 'the', 'is', 'it', 'are', 'if');
 		call_integration_hook('integrate_search_blacklisted_words', array(&$blacklisted_words));
 
-		$this->_searchArray = new \ElkArte\Search\SearchArray($this->param('search'), $blacklisted_words, $search_simple_fulltext);
+		$this->_searchArray = new \ElkArte\Search\SearchArray($this->_search_params->search, $blacklisted_words, $search_simple_fulltext);
 	}
 
 	/**
@@ -366,12 +366,9 @@ class Search
 				'complex_words' => array(),
 			);
 
+			$this->_searchAPI->setExcludedWords($excludedWords);
 			// Sort the indexed words (large words -> small words -> excluded words).
-			if (is_callable(array($this->_searchAPI, 'searchSort')))
-			{
-				$this->_searchAPI->setExcludedWords($excludedWords);
-				usort($orParts[$orIndex], array($this->_searchAPI, 'searchSort'));
-			}
+			usort($orParts[$orIndex], array($this->_searchAPI, 'searchSort'));
 
 			foreach ($orParts[$orIndex] as $word)
 			{
@@ -394,10 +391,7 @@ class Search
 				}
 
 				// Have we got indexes to prepare?
-				if (is_callable(array($this->_searchAPI, 'prepareIndexes')))
-				{
-					$this->_searchAPI->prepareIndexes($word, $this->_searchWords[$orIndex], $this->_excludedIndexWords, $is_excluded);
-				}
+				$this->_searchAPI->prepareIndexes($word, $this->_searchWords[$orIndex], $this->_excludedIndexWords, $is_excluded);
 			}
 
 			// Search_force_index requires all AND parts to have at least one fulltext word.
@@ -406,7 +400,7 @@ class Search
 				$context['search_errors']['query_not_specific_enough'] = true;
 				break;
 			}
-			elseif ($this->param('subject_only') && empty($this->_searchWords[$orIndex]['subject_words']) && empty($this->_excludedSubjectWords))
+			elseif ($this->_search_params->subject_only && empty($this->_searchWords[$orIndex]['subject_words']) && empty($this->_excludedSubjectWords))
 			{
 				$context['search_errors']['query_not_specific_enough'] = true;
 				break;
@@ -586,6 +580,7 @@ class Search
 	{
 		global $modSettings;
 
+		$numSubjectResults = 0;
 		// We do this to try and avoid duplicate keys on databases not supporting INSERT IGNORE.
 		foreach ($this->_searchWords as $words)
 		{
@@ -690,7 +685,7 @@ class Search
 			}
 		}
 
-		return empty($numSubjectResults) ? 0 : $numSubjectResults;
+		return $numSubjectResults;
 	}
 
 	/**
@@ -757,7 +752,7 @@ class Search
 			if (!empty($this->_search_params['topic']))
 			{
 				$main_query['where'][] = 't.id_topic = {int:topic}';
-				$main_query['parameters']['topic'] = $this->param('topic');
+				$main_query['parameters']['topic'] = $this->_search_params->topic;
 			}
 
 			if (!empty($this->_search_params['show_complete']))
@@ -780,7 +775,7 @@ class Search
 		}
 
 		// We building an index?
-		if (is_callable(array($this->_searchAPI, 'indexedWordQuery')))
+		if ($this->_searchAPI->useWordIndex())
 		{
 			$indexedResults = $this->_prepare_word_index($id_search, $maxMessageResults);
 
@@ -838,7 +833,7 @@ class Search
 			if (!empty($this->_search_params['topic']))
 			{
 				$main_query['where'][] = 'm.id_topic = {int:topic}';
-				$main_query['parameters']['topic'] = $this->param('topic');
+				$main_query['parameters']['topic'] = $this->_search_params->topic;
 			}
 
 			if (!empty($this->_searchParams->_minMsgID))
@@ -862,7 +857,7 @@ class Search
 		call_integration_hook('integrate_main_search_query', array(&$main_query));
 
 		// Did we either get some indexed results, or otherwise did not do an indexed query?
-		if (!empty($indexedResults) || !is_callable(array($this->_searchAPI, 'indexedWordQuery')))
+		if (!empty($indexedResults) || $this->_searchAPI->useWordIndex() === false)
 		{
 			$main_query['select']['relevance'] = $this->_build_relevance($main_query['weights']);
 			$num_results += $this->_build_search_results_log($main_query, 'insert_log_search_results_no_index');
@@ -920,16 +915,16 @@ class Search
 		// *** Retrieve the results to be shown on the page
 		$participants = array();
 		$request = $this->_db_search->search_query('', '
-			SELECT ' . (empty($this->_search_params['topic']) ? 'lsr.id_topic' : $this->param('topic') . ' AS id_topic') . ', lsr.id_msg, lsr.relevance, lsr.num_matches
-			FROM {db_prefix}log_search_results AS lsr' . ($this->param('sort') === 'num_replies' ? '
+			SELECT ' . (empty($this->_search_params['topic']) ? 'lsr.id_topic' : $this->_search_params->topic . ' AS id_topic') . ', lsr.id_msg, lsr.relevance, lsr.num_matches
+			FROM {db_prefix}log_search_results AS lsr' . ($this->_search_params->sort === 'num_replies' ? '
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = lsr.id_topic)' : '') . '
 			WHERE lsr.id_search = {int:id_search}
 			ORDER BY {raw:sort} {raw:sort_dir}
 			LIMIT {int:start}, {int:limit}',
 			array(
 				'id_search' => $id_search,
-				'sort' => $this->param('sort'),
-				'sort_dir' => $this->param('sort_dir'),
+				'sort' => $this->_search_params->sort,
+				'sort_dir' => $this->_search_params->sort_dir,
 				'start' => $start,
 				'limit' => $limit,
 			)
@@ -1152,7 +1147,7 @@ class Search
 			if (!empty($this->_search_params['topic']))
 			{
 				$subject_query['where'][] = 't.id_topic = {int:topic}';
-				$subject_query['params']['topic'] = $this->param('topic');
+				$subject_query['params']['topic'] = $this->_search_params->topic;
 			}
 
 			if (!empty($this->_searchParams->_minMsgID))
@@ -1293,7 +1288,7 @@ class Search
 						'excluded_words' => $excludedWords,
 						'user_query' => !empty($this->_searchParams->_userQuery) ? $this->_searchParams->_userQuery : '',
 						'board_query' => !empty($this->_searchParams->_boardQuery) ? $this->_searchParams->_boardQuery : '',
-						'topic' => !empty($this->_search_params['topic']) ? $this->param('topic') : 0,
+						'topic' => (int) $this->_search_params->topic,
 						'min_msg_id' => (int) $this->_searchParams->_minMsgID,
 						'max_msg_id' => (int) $this->_searchParams->_maxMsgID,
 						'excluded_phrases' => $this->_excludedPhrases,

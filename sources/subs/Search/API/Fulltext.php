@@ -178,6 +178,11 @@ class Fulltext extends Standard
 		}
 	}
 
+	public function useWordIndex()
+	{
+		return true;
+	}
+
 	/**
 	 * Fulltext::indexedWordQuery()
 	 *

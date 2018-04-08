@@ -109,4 +109,13 @@ class Standard extends SearchAPI
 
 		return $topics;
 	}
+
+	public function useWordIndex()
+	{
+		return false;
+	}
+
+	public function indexedWordQuery($words, $search_data)
+	{
+	}
 }
