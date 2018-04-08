@@ -317,6 +317,11 @@ class Search
 		return $this->_searchArray->getSearchArray();
 	}
 
+	public function getExcludedWords()
+	{
+		return $this->_searchArray->getExcludedWords();
+	}
+
 	/**
 	 * Builds the array of words for the query
 	 */
@@ -435,120 +440,6 @@ class Search
 	public function compileURLparams($search = array())
 	{
 		return $this->_searchParams->compileURL($search);
-	}
-
-	/**
-	 * Setup spellchecking suggestions and load them into the two variable
-	 * passed by ref
-	 *
-	 * @param string $suggestion_display - the string to display in the template
-	 * @param string $suggestion_param - a param string to be used in a url
-	 * @param string $display_highlight - a template to enclose in each suggested word
-	 */
-	public function loadSuggestions(&$suggestion_display = '', &$suggestion_param = '', $display_highlight = '')
-	{
-		global $txt;
-
-		// Windows fix.
-		ob_start();
-		$old = error_reporting(0);
-
-		pspell_new('en');
-		$pspell_link = pspell_new($txt['lang_dictionary'], $txt['lang_spelling'], '', 'utf-8', PSPELL_FAST | PSPELL_RUN_TOGETHER);
-
-		if (!$pspell_link)
-		{
-			$pspell_link = pspell_new('en', '', '', '', PSPELL_FAST | PSPELL_RUN_TOGETHER);
-		}
-
-		error_reporting($old);
-		@ob_end_clean();
-
-		if (empty($pspell_link))
-		{
-			return;
-		}
-
-		$did_you_mean = array('search' => array(), 'display' => array());
-		$found_misspelling = false;
-		foreach ($this->_searchArray->getSearchArray() as $word)
-		{
-			// Don't check phrases.
-			if (preg_match('~^\w+$~', $word) === 0)
-			{
-				$did_you_mean['search'][] = '"' . $word . '"';
-				$did_you_mean['display'][] = '&quot;' . \Util::htmlspecialchars($word) . '&quot;';
-				continue;
-			}
-			// For some strange reason spell check can crash PHP on decimals.
-			elseif (preg_match('~\d~', $word) === 1)
-			{
-				$did_you_mean['search'][] = $word;
-				$did_you_mean['display'][] = \Util::htmlspecialchars($word);
-				continue;
-			}
-			elseif (pspell_check($pspell_link, $word))
-			{
-				$did_you_mean['search'][] = $word;
-				$did_you_mean['display'][] = \Util::htmlspecialchars($word);
-				continue;
-			}
-
-			$suggestions = pspell_suggest($pspell_link, $word);
-			foreach ($suggestions as $i => $s)
-			{
-				// Search is case insensitive.
-				if (\Util::strtolower($s) == \Util::strtolower($word))
-				{
-					unset($suggestions[$i]);
-				}
-				// Plus, don't suggest something the user thinks is rude!
-				elseif ($suggestions[$i] != censor($s))
-				{
-					unset($suggestions[$i]);
-				}
-			}
-
-			// Anything found?  If so, correct it!
-			if (!empty($suggestions))
-			{
-				$suggestions = array_values($suggestions);
-				$did_you_mean['search'][] = $suggestions[0];
-				$did_you_mean['display'][] = str_replace('{word}', \Util::htmlspecialchars($suggestions[0]), $display_highlight);
-				$found_misspelling = true;
-			}
-			else
-			{
-				$did_you_mean['search'][] = $word;
-				$did_you_mean['display'][] = \Util::htmlspecialchars($word);
-			}
-		}
-
-		if ($found_misspelling)
-		{
-			// Don't spell check excluded words, but add them still...
-			$temp_excluded = array('search' => array(), 'display' => array());
-			foreach ($this->_searchArray->getExcludedWords() as $word)
-			{
-				if (preg_match('~^\w+$~', $word) == 0)
-				{
-					$temp_excluded['search'][] = '-"' . $word . '"';
-					$temp_excluded['display'][] = '-&quot;' . \Util::htmlspecialchars($word) . '&quot;';
-				}
-				else
-				{
-					$temp_excluded['search'][] = '-' . $word;
-					$temp_excluded['display'][] = '-' . \Util::htmlspecialchars($word);
-				}
-			}
-
-			$did_you_mean['search'] = array_merge($did_you_mean['search'], $temp_excluded['search']);
-			$did_you_mean['display'] = array_merge($did_you_mean['display'], $temp_excluded['display']);
-
-			// Provide the potential correct spelling term in the param
-			$suggestion_param = $this->compileURLparams($did_you_mean['search']);
-			$suggestion_display = implode(' ', $did_you_mean['display']);
-		}
 	}
 
 	/**
