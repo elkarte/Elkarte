@@ -32,6 +32,12 @@ class SearchRenderer extends Renderer
 	const CONTEXT_HOOK = 'integrate_prepare_search_context';
 
 	/**
+	 * 
+	 * @var mixed[]
+	 */
+	protected $_participants = [];
+
+	/**
 	 * {@inheritdoc }
 	 */
 	public function __construct($request, BodyParserInterface $bodyParser, ValuesContainer $opt = null)
@@ -39,6 +45,14 @@ class SearchRenderer extends Renderer
 		parent::__construct($request, $bodyParser, $opt);
 
 		require_once(SUBSDIR . '/Attachments.subs.php');
+	}
+
+	/**
+	 * @param mixed[] $participants
+	 */
+	public function setParticipants($participants)
+	{
+		$this->_participants = $participants;
 	}
 
 	/**
@@ -77,7 +91,7 @@ class SearchRenderer extends Renderer
 	 */
 	protected function _buildOutputArray()
 	{
-		global $modSettings, $context, $scripturl, $options, $user_info, $memberContext;
+		global $modSettings, $context, $scripturl, $options, $user_info, $memberContext, $txt;
 		global $boards_can;
 
 		// Make sure we don't end up with a practically empty message body.

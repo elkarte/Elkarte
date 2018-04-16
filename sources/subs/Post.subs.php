@@ -380,7 +380,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	}
 
 	// If there's a custom search index, it may need updating...
-	$searchAPI = new \ElkArte\Search\SearchApi(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '');
+	$searchAPI = new \ElkArte\Search\SearchApiWrapper(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '');
 	$searchAPI->postCreated($msgOptions, $topicOptions, $posterOptions);
 
 	// Increase the post counter for the user that created the post.
@@ -534,7 +534,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	}
 
 	// If there's a custom search index, it needs to be modified...
-	$searchAPI = new \ElkArte\Search\SearchApi(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '');
+	$searchAPI = new \ElkArte\Search\SearchApiWrapper(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '');
 	$searchAPI->postModified($msgOptions, $topicOptions, $posterOptions);
 
 	if (isset($msgOptions['subject']))

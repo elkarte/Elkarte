@@ -70,7 +70,7 @@ class Sphinxql extends SearchAPI
 	/**
 	 * Nothing to do ...
 	 */
-	public function __construct()
+	public function __construct($config, $searchParams)
 	{
 		// Is this database supported?
 		if (!in_array(DB_TYPE, $this->supported_databases))
@@ -80,7 +80,7 @@ class Sphinxql extends SearchAPI
 			return;
 		}
 
-		parent::__construct();
+		parent::__construct($config, $searchParams);
 	}
 
 	/**
@@ -112,14 +112,16 @@ class Sphinxql extends SearchAPI
 	}
 
 	/**
-	 * Do we have to do some work with the words we are searching for to prepare them?
-	 *
-	 * @param string $word word(s) to index
-	 * @param mixed[] $wordsSearch The Search words
-	 * @param string[] $wordsExclude Words to exclude
-	 * @param boolean $isExcluded
+	 * {@inheritdoc }
 	 */
-	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
+	public function indexedWordQuery($words, $search_data)
+	{
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)
 	{
 		$subwords = text2words($word, null, false);
 
@@ -134,7 +136,7 @@ class Sphinxql extends SearchAPI
 	/**
 	 * {@inheritdoc }
 	 */
-	public function searchQuery($search_params, $search_words, $excluded_words, &$participants, &$search_results)
+	public function searchQuery($search_words, $excluded_words, &$participants, &$search_results)
 	{
 		global $user_info, $context, $modSettings;
 
@@ -153,10 +155,10 @@ class Sphinxql extends SearchAPI
 
 			// Compile different options for our query
 			$index = (!empty($modSettings['sphinx_index_prefix']) ? $modSettings['sphinx_index_prefix'] : 'elkarte') . '_index';
-			$query = 'SELECT *' . (empty($search_params['topic']) ? ', COUNT(*) num' : '') . ', WEIGHT() weights, (weights + (relevance/10)) rank FROM ' . $index;
+			$query = 'SELECT *' . (empty($this->_searchParams->topic) ? ', COUNT(*) num' : '') . ', WEIGHT() weights, (weights + (relevance/10)) rank FROM ' . $index;
 
 			// Construct the (binary mode & |) query.
-			$where_match = $this->_constructQuery($search_params['search']);
+			$where_match = $this->_constructQuery($this->_searchParams->search);
 
 			// Nothing to search, return zero results
 			if (trim($where_match) === '')
@@ -164,7 +166,7 @@ class Sphinxql extends SearchAPI
 				return 0;
 			}
 
-			if ($search_params['subject_only'])
+			if ($this->_searchParams->subject_only)
 			{
 				$where_match = '@subject ' . $where_match;
 			}
@@ -173,21 +175,21 @@ class Sphinxql extends SearchAPI
 
 			// Set the limits based on the search parameters.
 			$extra_where = array();
-			if (!empty($search_params['min_msg_id']) || !empty($search_params['max_msg_id']))
+			if (!empty($this->_searchParams->_minMsgID) || !empty($this->_searchParams->_maxMsgID))
 			{
-				$extra_where[] = 'id >= ' . $search_params['min_msg_id'] . ' AND id <= ' . (empty($search_params['max_msg_id']) ? (int) $modSettings['maxMsgID'] : $search_params['max_msg_id']);
+				$extra_where[] = 'id >= ' . $this->_searchParams->_minMsgID . ' AND id <= ' . (empty($this->_searchParams->_maxMsgID) ? (int) $modSettings['maxMsgID'] : $this->_searchParams->_maxMsgID);
 			}
-			if (!empty($search_params['topic']))
+			if (!empty($this->_searchParams->topic))
 			{
-				$extra_where[] = 'id_topic = ' . (int) $search_params['topic'];
+				$extra_where[] = 'id_topic = ' . (int) $this->_searchParams->topic;
 			}
-			if (!empty($search_params['brd']))
+			if (!empty($this->_searchParams->brd))
 			{
-				$extra_where[] = 'id_board IN (' . implode(',', $search_params['brd']) . ')';
+				$extra_where[] = 'id_board IN (' . implode(',', $this->_searchParams->brd) . ')';
 			}
-			if (!empty($search_params['memberlist']))
+			if (!empty($this->_searchParams->_memberlist))
 			{
-				$extra_where[] = 'id_member IN (' . implode(',', $search_params['memberlist']) . ')';
+				$extra_where[] = 'id_member IN (' . implode(',', $this->_searchParams->_memberlist) . ')';
 			}
 			if (!empty($extra_where))
 			{
@@ -195,17 +197,17 @@ class Sphinxql extends SearchAPI
 			}
 
 			// Put together a sort string; besides the main column sort (relevance, id_topic, or num_replies)
-			$search_params['sort_dir'] = strtoupper($search_params['sort_dir']);
-			$sphinx_sort = $search_params['sort'] === 'id_msg' ? 'id_topic' : $search_params['sort'];
+			$this->_searchParams->sort_dir = strtoupper($this->_searchParams->sort_dir);
+			$sphinx_sort = $this->_searchParams->sort === 'id_msg' ? 'id_topic' : $this->_searchParams->sort;
 
 			// Add secondary sorting based on relevance value (if not the main sort method) and age
-			$sphinx_sort .= ' ' . $search_params['sort_dir'] . ($search_params['sort'] === 'relevance' ? '' : ', relevance DESC') . ', poster_time DESC';
+			$sphinx_sort .= ' ' . $this->_searchParams->sort_dir . ($this->_searchParams->sort === 'relevance' ? '' : ', relevance DESC') . ', poster_time DESC';
 
 			// Replace relevance with the returned rank value, rank uses sphinx weight + our own computed field weight relevance
 			$sphinx_sort = str_replace('relevance ', 'rank ', $sphinx_sort);
 
 			// Grouping by topic id makes it return only one result per topic, so don't set that for in-topic searches
-			if (empty($search_params['topic']))
+			if (empty($this->_searchParams->topic))
 			{
 				// In the topic, base weights is the best ORDER BY param as relevance/rank is topic level
 				$query .= ' GROUP BY id_topic WITHIN GROUP ORDER BY ' . str_replace('rank ', 'weights ', $sphinx_sort);
@@ -245,7 +247,7 @@ class Sphinxql extends SearchAPI
 			{
 				while ($match = mysqli_fetch_assoc($request))
 				{
-					if (empty($search_params['topic']))
+					if (empty($this->_searchParams->topic))
 					{
 						$num = isset($match['num']) ? $match['num'] : (isset($match['@count']) ? $match['@count'] : 0);
 					}

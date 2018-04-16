@@ -20,12 +20,13 @@ namespace ElkArte\Search;
 /**
  * Actually do the searches
  */
-class SearchParams
+class SearchParams extends \ElkArte\ValuesContainer
 {
 	/**
 	 * $_search_params will carry all settings that differ from the default search parameters.
 	 *
 	 * That way, the URLs involved in a search page will be kept as short as possible.
+	 * @var string[]
 	 */
 	protected $_search_params = array();
 
@@ -33,8 +34,9 @@ class SearchParams
 	 * $_search_params will carry all settings that differ from the default search parameters.
 	 *
 	 * That way, the URLs involved in a search page will be kept as short as possible.
+	 * @var string
 	 */
-	protected $_search_string = array();
+	protected $_search_string = '';
 
 	/**
 	 * the db query for members
@@ -96,6 +98,7 @@ class SearchParams
 		$this->_db = database();
 		$this->_search_string = $string;
 		$this->prepare();
+		$this->data = &$this->_search_params;
 	}
 
 	/**

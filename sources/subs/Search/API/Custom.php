@@ -52,7 +52,7 @@ class Custom extends Standard
 	/**
 	 * Custom::__construct()
 	 */
-	public function __construct()
+	public function __construct($config, $searchParams)
 	{
 		global $modSettings;
 
@@ -66,6 +66,7 @@ class Custom extends Standard
 		if (empty($modSettings['search_custom_index_config']))
 			return;
 
+		parent::__construct($config, $searchParams);
 		$this->indexSettings = \Util::unserialize($modSettings['search_custom_index_config']);
 
 		$this->bannedWords = empty($modSettings['search_stopwords']) ? array() : explode(',', $modSettings['search_stopwords']);
@@ -101,14 +102,9 @@ class Custom extends Standard
 	}
 
 	/**
-	 * Do we have to do some work with the words we are searching for to prepare them?
-	 *
-	 * @param string $word A word to index
-	 * @param mixed[] $wordsSearch The Search words
-	 * @param string[] $wordsExclude Words to exclude
-	 * @param boolean $isExcluded
+	 * {@inheritdoc }
 	 */
-	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
+	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)
 	{
 		global $modSettings;
 

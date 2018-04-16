@@ -20,7 +20,7 @@ namespace ElkArte\Search;
 /**
  * Actually do the searches
  */
-class SearchApi
+class SearchApiWrapper
 {
 	const DEFAULT_API = 'standard';
 
@@ -35,9 +35,13 @@ class SearchApi
 	 *
 	 * @package Search
 	 */
-	public function __construct($current_index)
+	public function __construct($config, $searchParams = null)
 	{
-		$this->load($current_index);
+		if (!is_object($config))
+		{
+			$config = new \ElkArte\ValuesContainer((array) $config);
+		}
+		$this->load($config->search_index, $config, $searchParams);
 	}
 
 	/**
@@ -90,7 +94,7 @@ class SearchApi
 	 * @param int $id_topic
 	 * @param mixed[] $topics
 	 * @param int[] $affected_msgs
-	 * @param string $subject
+	 * @param string[] $subject array($response_prefix, $target_subject)
 	 */
 	public function topicMerge($id_topic, $topics, $affected_msgs, $subject)
 	{
@@ -115,18 +119,16 @@ class SearchApi
 
 	/**
 	 * Wrapper for searchQuery of the SearchAPI
-	 * @param mixed[] $search_params
 	 * @param string[] $search_words
 	 * @param string[] $excluded_words
 	 * @param bool[] $participants
 	 * @param string[] $search_results
-	 * @param \ElkArte\Search\Search $search
 	 *
 	 * @return mixed[]
 	 */
-	public function searchQuery($search_params, $search_words, $excluded_words, &$participants, &$search_results, $search)
+	public function searchQuery($search_words, $excluded_words, &$participants, &$search_results)
 	{
-		return $this->_searchAPI->searchQuery($search_params, $search_words, $excluded_words, $participants, $search_results, $search);
+		return $this->_searchAPI->searchQuery($search_words, $excluded_words, $participants, $search_results);
 	}
 
 	/**
@@ -137,6 +139,82 @@ class SearchApi
 	public function prepareWord($phrase, $no_regexp)
 	{
 		return $this->_searchAPI->prepareWord($phrase, $no_regexp);
+	}
+
+	/**
+	 * Wrapper for setExcludedPhrases of the SearchAPI
+	 *
+	 * @param string[] $phrases An array of phrases to exclude
+	 */
+	public function setExcludedPhrases($phrase)
+	{
+		$this->_searchAPI->setExcludedPhrases($phrase);
+	}
+
+	/**
+	 * Wrapper for setExcludedWords of the SearchAPI
+	 *
+	 * @param string[] $words An array of words to exclude
+	 */
+	public function setExcludedWords($words)
+	{
+		$this->_searchAPI->setExcludedWords($words);
+	}
+
+	/**
+	 * Wrapper for setSearchArray of the SearchAPI
+	 *
+	 * @param \ElkArte\Search\SearchArray $searchArray
+	 */
+	public function setSearchArray(\ElkArte\Search\SearchArray $searchArray)
+	{
+		$this->_searchAPI->setSearchArray($searchArray);
+	}
+
+	/**
+	 * Wrapper for prepareIndexes of the SearchAPI
+	 *
+	 * @param string $word
+	 * @param string $wordsSearch
+	 * @param string $wordsExclude
+	 * @param string $isExcluded
+	 * @param string $excludedSubjectWords
+	 */
+	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)
+	{
+		$this->_searchAPI->prepareIndexes($word, $wordsSearch, $wordsExclude, $isExcluded, $excludedSubjectWords);
+	}
+
+	/**
+	 * Wrapper for searchSort of the SearchAPI
+	 *
+	 * @param string $a Word A
+	 * @param string $b Word B
+	 * @return int An integer indicating how the words should be sorted (-1, 0 1)
+	 */
+	public function searchSort($a, $b)
+	{
+		return $this->_searchAPI->searchSort($a, $b);
+	}
+
+	/**
+	 * Wrapper for setWeightFactors of the SearchAPI
+	 *
+	 * @param \ElkArte\Search\WeightFactors $weights
+	 */
+	public function setWeightFactors(\ElkArte\Search\WeightFactors $weights)
+	{
+		$this->_searchAPI->setWeightFactors($weights);
+	}
+
+	/**
+	 * Wrapper for useTemporary of the SearchAPI
+	 *
+	 * @param bool $use
+	 */
+	public function useTemporary($use = false)
+	{
+		$this->_searchAPI->useTemporary($use);
 	}
 
 	/**
@@ -153,13 +231,13 @@ class SearchApi
 	 * Creates a search API and returns the object.
 	 *
 	 * @param string $searchClass
+	 * @param \ElkArte\ValuesContainer $config
 	 */
-	protected function load($searchClass = '')
+	protected function load($searchClass, $config, $searchParams)
 	{
 		global $txt;
 
 		require_once(SUBSDIR . '/Package.subs.php');
-		\Elk_Autoloader::instance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 
 		// Load up the search API we are going to use.
 		if (empty($searchClass))
@@ -168,11 +246,11 @@ class SearchApi
 		}
 
 		// Try to initialize the API
-		$fqcn = 'API\\' . ucfirst($searchClass);
-		if (class_exists($fqcn) && is_a($fqcn, 'API\\SearchAPI', true))
+		$fqcn = '\\ElkArte\\Search\\API\\' . ucfirst($searchClass);
+		if (class_exists($fqcn) && is_a($fqcn, '\\ElkArte\\Search\\API\\SearchAPI', true))
 		{
 			// Create an instance of the search API and check it is valid for this version of the software.
-			$this->_searchAPI = new $fqcn;
+			$this->_searchAPI = new $fqcn($config, $searchParams);
 		}
 
 		// An invalid Search API? Log the error and set it to use the standard API
@@ -182,7 +260,7 @@ class SearchApi
 			theme()->getTemplates()->loadLanguageFile('Errors');
 			\Errors::instance()->log_error(sprintf($txt['search_api_not_compatible'], $fqcn), 'critical');
 
-			$this->_searchAPI = new API\Standard;
+			$this->_searchAPI = new API\Standard($config, $searchParams);
 		}
 	}
 }

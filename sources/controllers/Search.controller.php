@@ -36,6 +36,12 @@ class Search_Controller extends Action_Controller
 	protected $_icon_sources = null;
 
 	/**
+	 *
+	 * @var mixed[]
+	 */
+	protected $_participants = [];
+
+	/**
 	 * Called before any other action method in this class.
 	 *
 	 * - If coming from the quick reply allows to route to the proper action
@@ -67,6 +73,7 @@ class Search_Controller extends Action_Controller
 		{
 			throw new Elk_Exception('loadavg_search_disabled', false);
 		}
+		Elk_Autoloader::instance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 	}
 
 	/**
@@ -142,7 +149,6 @@ class Search_Controller extends Action_Controller
 		// If you got back from search;sa=results by using the linktree, you get your original search parameters back.
 		if ($this->_search === null && isset($_REQUEST['params']))
 		{
-			Elk_Autoloader::instance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 			$search_params = new \ElkArte\Search\SearchParams($_REQUEST['params'] ?? '');
 
 			$context['search_params'] = $search_params->get();
@@ -245,8 +251,10 @@ class Search_Controller extends Action_Controller
 
 		// These vars don't require an interface, they're just here for tweaking.
 		$recentPercentage = 0.30;
+		// Message length used to tweak messages relevance of the results
 		$humungousTopicPosts = 200;
 		$maxMembersToSearch = 500;
+		// Maximum number of results
 		$maxMessageResults = empty($modSettings['search_max_results']) ? 0 : $modSettings['search_max_results'] * 5;
 
 		// Start with no errors.
@@ -268,7 +276,7 @@ class Search_Controller extends Action_Controller
 		// Are you allowed?
 		isAllowedTo('search_posts');
 
-		$this->_search = new \ElkArte\Search\Search($humungousTopicPosts, $maxMessageResults);
+		$this->_search = new \ElkArte\Search\Search();
 		$this->_search->setWeights(new \ElkArte\Search\WeightFactors($modSettings, $user_info['is_admin']));
 		$search_params = new \ElkArte\Search\SearchParams($_REQUEST['params'] ?? '');
 		$search_params->merge($_REQUEST, $recentPercentage, $maxMembersToSearch);
@@ -310,11 +318,11 @@ class Search_Controller extends Action_Controller
 			$context['did_you_mean'] = '';
 			$context['did_you_mean_params'] = '';
 			// @todo maybe move the html to a $settings
-			$this->_search->loadSuggestions($context['did_you_mean'], $context['did_you_mean_params'], '<em><strong>{word}</strong></em>');
+			$this->loadSuggestions($context['did_you_mean'], $context['did_you_mean_params'], '<em><strong>{word}</strong></em>');
 		}
 
 		// Let the user adjust the search query, should they wish?
-		$context['search_params'] = $this->_search->getParams();
+		$context['search_params'] = (array) $this->_search->getSearchParams(true);
 		if (isset($context['search_params']['search']))
 			$context['search_params']['search'] = Util::htmlspecialchars($context['search_params']['search']);
 		if (isset($context['search_params']['userspec']))
@@ -361,8 +369,14 @@ class Search_Controller extends Action_Controller
 
 		try
 		{
+			$search_config = new \ElkArte\ValuesContainer(array(
+				'humungousTopicPosts' => $humungousTopicPosts,
+				'maxMessageResults' => $maxMessageResults,
+				'search_index' => !empty($modSettings['search_index']) ? $modSettings['search_index'] : '',
+				'banned_words' => empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']),
+			));
 			$context['topics'] = $this->_search->searchQuery(
-				new \ElkArte\Search\SearchApi(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '')
+				new \ElkArte\Search\SearchApiWrapper($search_config, $this->_search->getSearchParams())
 			);
 		}
 		catch (\Exception $e)
@@ -428,6 +442,7 @@ class Search_Controller extends Action_Controller
 			'show_signatures' => false,
 		]);
 		$renderer = new \ElkArte\sources\subs\MessagesCallback\SearchRenderer($messages_request, $bodyParser, $opt);
+		$renderer->setParticipants($this->_participants);
 
 		$context['topic_starter_id'] = 0;
 		$context['get_topics'] = array($renderer, 'getContext');

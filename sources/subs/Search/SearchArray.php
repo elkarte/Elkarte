@@ -65,6 +65,13 @@ class SearchArray
 	private $_ignored = array();
 
 	/**
+	 * $_search_params will carry all settings that differ from the default search parameters.
+	 *
+	 * That way, the URLs involved in a search page will be kept as short as possible.
+	 */
+	protected $_search_string = array();
+
+	/**
 	 * Usual constructor that does what any constructor does.
 	 *
 	 * @param string $search_string
@@ -82,7 +89,7 @@ class SearchArray
 	/**
 	 * Builds the search array
 	 *
-	 * @return 0|array
+	 * @return array
 	 */
 	protected function searchArray()
 	{

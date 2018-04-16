@@ -149,7 +149,7 @@ abstract class Renderer
 			$this->_currentContext();
 		}
 
-		if (!$this->_this_message)
+		if (empty($this->_this_message))
 		{
 			return false;
 		}
@@ -234,7 +234,7 @@ abstract class Renderer
 	 * Utility function, it shall be implemented by the extending class.
 	 * Run just before loadMemberContext is executed.
 	 */
-	protected abstract function _setupPermissions();
+	abstract protected function _setupPermissions();
 
 	/**
 	 * Utility function, it can be overridden to alter something just after the

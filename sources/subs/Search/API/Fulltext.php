@@ -63,7 +63,7 @@ class Fulltext extends Standard
 	/**
 	 * Fulltext::__construct()
 	 */
-	public function __construct()
+	public function __construct($config, $searchParams)
 	{
 		global $modSettings;
 
@@ -75,6 +75,7 @@ class Fulltext extends Standard
 			return;
 		}
 
+		parent::__construct($config, $searchParams);
 		$this->bannedWords = empty($modSettings['search_banned_words']) ? array() : explode(',', $modSettings['search_banned_words']);
 		$this->min_word_length = $this->_getMinWordLength();
 	}
@@ -133,16 +134,9 @@ class Fulltext extends Standard
 	}
 
 	/**
-	 * Fulltext::prepareIndexes()
-	 *
-	 * Do we have to do some work with the words we are searching for to prepare them?
-	 *
-	 * @param string $word A word to index
-	 * @param mixed[] $wordsSearch The Search words
-	 * @param string[] $wordsExclude Words to exclude
-	 * @param boolean $isExcluded If the $wordsSearch are those to exclude
+	 * {@inheritdoc }
 	 */
-	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
+	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)
 	{
 		global $modSettings;
 

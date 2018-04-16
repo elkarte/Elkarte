@@ -521,6 +521,8 @@ class Display_Controller extends Action_Controller
 			'board_name' => htmlspecialchars(strtr(strip_tags($board_info['name']), array('&amp;' => '&')), ENT_COMPAT, 'UTF-8'),
 			'child_level' => $board_info['child_level'],
 		);
+		list ($sig_limits) = explode(':', $modSettings['signature_settings']);
+		$signature_settings = explode(',', $sig_limits);
 
 		$this->_icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
 		if ($user_info['is_guest'])
@@ -544,8 +546,6 @@ class Display_Controller extends Action_Controller
 		$renderer = new \ElkArte\sources\subs\MessagesCallback\DisplayRenderer($messages_request, $bodyParser, $opt);
 
 		$context['get_message'] = array($renderer, 'getContext');
-		list ($sig_limits) = explode(':', $modSettings['signature_settings']);
-		$signature_settings = explode(',', $sig_limits);
 
 		// Now set all the wonderful, wonderful permissions... like moderation ones...
 		$common_permissions = array(

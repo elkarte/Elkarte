@@ -194,7 +194,7 @@ class ManageSearch_Controller extends Action_Controller
 		);
 
 		// Perhaps the search method wants to add some settings?
-		$searchAPI = new \ElkArte\Search\SearchApi(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '');
+		$searchAPI = new \ElkArte\Search\SearchApiWrapper(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '');
 		$searchAPI->searchSettings($config_vars);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
