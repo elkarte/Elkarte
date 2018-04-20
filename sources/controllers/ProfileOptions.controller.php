@@ -412,8 +412,8 @@ class ProfileOptions_Controller extends Action_Controller
 				{
 					var qrcode = new QRCode("qrcode", {
 						text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + secret,
-						width: 80,
-						height: 80,
+						width: 100,
+						height: 100,
 						colorDark : "#000000",
 						colorLight : "#ffffff",
 					});
@@ -438,8 +438,8 @@ class ProfileOptions_Controller extends Action_Controller
 
 					var qrcode = new QRCode("qrcode", {
 						text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + text,
-						width: 80,
-						height: 80,
+						width: 100,
+						height: 100,
 						colorDark: "#000000",
 						colorLight: "#ffffff",
 					});
