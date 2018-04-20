@@ -485,15 +485,15 @@ class PackageServers_Controller extends Action_Controller
 			throw new Elk_Exception('package_cant_download', false);
 
 		if ($context['package']['type'] === 'modification')
-			$context['package']['install']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">[ ' . $txt['install_mod'] . ' ]</a>';
+			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['install_mod'] . '</a>';
 		elseif ($context['package']['type'] === 'avatar')
-			$context['package']['install']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">[ ' . $txt['use_avatars'] . ' ]</a>';
+			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['use_avatars'] . '</a>';
 		elseif ($context['package']['type'] === 'language')
-			$context['package']['install']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">[ ' . $txt['add_languages'] . ' ]</a>';
+			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['add_languages'] . '</a>';
 		else
 			$context['package']['install']['link'] = '';
 
-		$context['package']['list_files']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=list;package=' . $context['package']['filename'] . '">[ ' . $txt['list_files'] . ' ]</a>';
+		$context['package']['list_files']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=list;package=' . $context['package']['filename'] . '">' . $txt['list_files'] . '</a>';
 
 		// Free a little bit of memory...
 		unset($context['package']['xml']);
@@ -624,15 +624,15 @@ class PackageServers_Controller extends Action_Controller
 		}
 
 		if ($context['package']['type'] === 'modification')
-			$context['package']['install']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">[ ' . $txt['install_mod'] . ' ]</a>';
+			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['install_mod'] . '</a>';
 		elseif ($context['package']['type'] === 'avatar')
-			$context['package']['install']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">[ ' . $txt['use_avatars'] . ' ]</a>';
+			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['use_avatars'] . '</a>';
 		elseif ($context['package']['type'] === 'language')
-			$context['package']['install']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">[ ' . $txt['add_languages'] . ' ]</a>';
+			$context['package']['install']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">' . $txt['add_languages'] . '</a>';
 		else
 			$context['package']['install']['link'] = '';
 
-		$context['package']['list_files']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=list;package=' . $context['package']['filename'] . '">[ ' . $txt['list_files'] . ' ]</a>';
+		$context['package']['list_files']['link'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=list;package=' . $context['package']['filename'] . '">' . $txt['list_files'] . '</a>';
 
 		unset($context['package']['xml']);
 
