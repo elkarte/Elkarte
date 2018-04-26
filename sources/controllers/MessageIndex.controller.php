@@ -583,6 +583,10 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 			foreach ($this->_req->post->topics as $topic)
 				$actions[(int) $topic] = $this->_req->post->qaction;
 		}
+		else
+		{
+			$actions = $this->_req->actions;
+		}
 
 		// Weird... how'd you get here?
 		if (empty($actions))
