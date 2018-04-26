@@ -323,15 +323,18 @@
 }
 
 /* Gender icons are all from Font Awesome */
+.i-cust_gender_2::before,
 .i-female::before {
 	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='black' stroke-width='9em' fill='%23ff80c8' viewBox='0 0 3584 3584'%3E%3Cpath d='M2816 1152q0 442-295 769t-729 375v520h448q28 0 46 18t18 46v128q0 28-18 46t-46 18h-448v448q0 28-18 46t-46 18h-128q-28 0-46-18t-18-46v-448h-448q-28 0-46-18t-18-46v-128q0-28 18-46t46-18h448v-520q-300-32-543-206t-372-448-105-584q22-268 161-498t364-376 491-176q340-38 638 108t472 424 174 612z m-2048 0q0 370 263 633t633 263 633-263 263-633-263-633-633-263-633 263-263 633z'/%3E%3C/svg%3E");
 }
 
+.i-cust_gender_1::before,
 .i-male::before {
 	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='black' stroke-width='9em' fill='%2380c8ff' viewBox='0 0 3584 3584'%3E%3Cpath d='M3200 256q52 0 90 38t38 90v832q0 28-18 46t-46 18h-128q-28 0-46-18t-18-46v-524l-764 766q252 312 252 718 0 234-91 447t-246 368-368 246-447 91-447-91-368-246-246-368-91-447 91-447 246-368 368-246 447-91q406 0 718 252l764-764h-522q-28 0-46-18t-18-46v-128q0-28 18-46t46-18h832z m-1792 2816q370 0 633-263t263-633-263-633-633-263-633 263-263 633 263 633 633 263z'/%3E%3C/svg%3E");
 }
 
 /* Was mercury */
+.i-cust_gender_4::before,
 .i-nonbinary::before {
 	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='black' stroke-width='9em' fill='%23ffb780' viewBox='0 0 3584 3584'%3E%3Cpath d='M2172 632q290 144 467 421t177 611q0 442-295 769t-729 375v264h192q28 0 46 18t18 46v128q0 28-18 46t-46 18h-192v192q0 28-18 46t-46 18h-128q-28 0-46-18t-18-46v-192h-192q-28 0-46-18t-18-46v-128q0-28 18-46t46-18h192v-264q-434-48-729-375t-295-769q0-334 177-611t467-421q-330-192-456-546-12-32 7-59t53-27h138q42 0 58 40 88 212 280 342t428 130 428-130 280-342q16-40 74-40h122q34 0 53 27t7 59q-126 354-456 546z m-508 1928q370 0 633-263t263-633-263-633-633-263-633 263-263 633 263 633 633 263z'/%3E%3C/svg%3E");
 }
@@ -342,16 +345,19 @@
 }
 
 /* Was transgender-alt */
+.i-cust_gender_5::before,
 .i-transgendered::before {
 	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='black' stroke-width='9em' fill='%23523366' viewBox='0 0 3584 3584'%3E%3Cpath d='M2560 64q0-28 18-46t46-18h576q52 0 90 38t38 90v576q0 28-18 46t-46 18h-128q-28 0-46-18t-18-46v-268l-508 510q252 316 252 718 0 442-295 769t-729 375v264h192q28 0 46 18t18 46v128q0 28-18 46t-46 18h-192v192q0 28-18 46t-46 18h-128q-28 0-46-18t-18-46v-192h-192q-28 0-46-18t-18-46v-128q0-28 18-46t46-18h192v-264q-434-48-729-375t-295-769q0-402 252-718l-104-106-202 222q-18 20-44 21t-46-15l-96-88q-20-16-21-43t17-47l210-230-222-224v268q0 28-18 46t-46 18h-128q-28 0-46-18t-18-46v-576q0-52 38-90t90-38h576q28 0 46 18t18 46v128q0 28-18 46t-46 18h-266l212 214 172-188q18-20 44-21t46 15l96 88q20 16 21 43t-17 47l-180 198 114 112q316-252 718-252t718 252l510-508h-268q-28 0-46-18t-18-46v-128z m-896 2496q370 0 633-263t263-633-263-633-633-263-633 263-263 633 263 633 633 263z'/%3E%3C/svg%3E");
 }
 
 /* Was neuter */
+.i-cust_gender_3::before,
 .i-genderless::before {
 	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='black' stroke-width='6em' fill='%23b3ff80' viewBox='0 0 3584 3584'%3E%3Cpath d='M2816 1152q0 442-295 769t-729 375v1224q0 28-18 46t-46 18h-128q-28 0-46-18t-18-46v-1224q-434-48-729-375t-295-769q0-234 91-447t246-368 368-246 447-91 447 91 368 246 246 368 91 447z m-1152 896q370 0 633-263t263-633-263-633-633-263-633 263-263 633 263 633 633 263z'/%3E%3C/svg%3E");
 }
 
 /* Was genderless */
+.i-cust_gender_0::before,
 .i-undisclosed::before {
 	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='black' stroke-width='4em' stroke-dasharray='9em,9em' fill='transparent' viewBox='0 0 3584 3584'%3E%3Cpath d='M3328 1792q0 418-206 771t-559 559-771 206-771-206-559-559-206-771 206-771 559-559 771-206 771 206 559 559 206 771z'/%3E%3C/svg%3E");
 }

@@ -978,15 +978,29 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	if (!empty($new_loaded_ids) && !empty($user_info['id']) && $set !== 'minimal' && (in_array('cp', $context['admin_features'])))
 	{
 		$request = $db->query('', '
-			SELECT id_member, variable, value
-			FROM {db_prefix}custom_fields_data
+			SELECT cfd.id_member, cfd.variable, cfd.value, cf.field_options, cf.field_type
+			FROM {db_prefix}custom_fields_data AS cfd
+			JOIN {db_prefix}custom_fields AS cf ON (cf.col_name = cfd.variable)
 			WHERE id_member' . (count($new_loaded_ids) == 1 ? ' = {int:loaded_ids}' : ' IN ({array_int:loaded_ids})'),
 			array(
 				'loaded_ids' => count($new_loaded_ids) == 1 ? $new_loaded_ids[0] : $new_loaded_ids,
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
+		{
+			if (!empty($row['field_options']))
+			{
+				$field_options = explode(',', $row['field_options']);
+				$key = (int) array_search($row['value'], $field_options);
+			}
+			else
+			{
+				$key = 0;
+			}
+
+			$user_profile[$row['id_member']]['options'][$row['variable'] . '_key'] = $row['variable'] . '_' . $key;
 			$user_profile[$row['id_member']]['options'][$row['variable']] = $row['value'];
+		}
 		$db->free_result($request);
 	}
 
@@ -1183,12 +1197,20 @@ function loadMemberContext($user, $display_custom_fields = false)
 
 			// Enclosing the user input within some other text?
 			if (!empty($custom['enclose']))
-				$value = strtr($custom['enclose'], array(
+			{
+				$replacements = array(
 					'{SCRIPTURL}' => $scripturl,
 					'{IMAGES_URL}' => $settings['images_url'],
 					'{DEFAULT_IMAGES_URL}' => $settings['default_images_url'],
 					'{INPUT}' => $value,
-				));
+				);
+
+				if (in_array($custom['type'], array('radio', 'select')))
+				{
+					$replacements['{KEY}'] = $profile['options'][$custom['colname'] . '_key'];
+				}
+				$value = strtr($custom['enclose'], $replacements);
+			}
 
 			$memberContext[$user]['custom_fields'][] = array(
 				'title' => $custom['title'],

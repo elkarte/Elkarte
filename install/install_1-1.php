@@ -815,7 +815,7 @@ class InstallInstructions_install_1_1
 					'bbc' => 0,
 					'can_search' => 0,
 					'default_value' => 'undisclosed',
-					'enclose' => '<i class="icon i-{INPUT}" title="{INPUT}"><s>{INPUT}</s></i>',
+					'enclose' => '<i class="icon i-{KEY}" title="{INPUT}"><s>{INPUT}</s></i>',
 					'placement' => 0,
 					'rows' => 0,
 					'cols' => 0
