@@ -7,7 +7,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.4
  */
 
 /** global: elk_session_var, elk_session_id, ila_filename, elk_scripturl  */
@@ -561,7 +561,7 @@ $.sceditor.plugins.bbcode.bbcode
 			else
 				sAuthor += sDate !== '' ? ' ' + bbc_search_on : '';
 
-			content = '<blockquote author="' + attr_author + '" link="' + attr_link + '" date="' + attr_date + '"><cite>' + sAuthor + ' ' + sDate + '</cite>' + content + '</blockquote>';
+			content = '<blockquote author="' + attr_author + '" link="' + attr_link + '" date="' + attr_date + '"><cite>' + sAuthor + ' ' + sDate + '</cite>' + content + '</blockquote>&nbsp;';
 
 			return content;
 		}
