@@ -920,7 +920,7 @@ function template_member_email($member, $text = false)
  * Sometimes we only get a message id.
  *
  * @param      $id
- * @param bool $member
+ * @param bool|mixed[] $member
  *
  * @return string
  */
@@ -932,7 +932,14 @@ function template_msg_email($id, $member = false)
 	{
 		if ($member === false || $member['show_email'] != 'no')
 		{
-			return '<a href="' . $scripturl . '?action=emailuser;sa=email;msg=' . $id . '" class="icon i-envelope-o' . (($member !== false && $member['online']['is_online']) ? '' : '-blank') . '" title="' . $txt['email'] . '"><s>' . $txt['email'] . '</s></a>';
+			if (empty($member['id']))
+			{
+				return '<a href="' . $scripturl . '?action=emailuser;sa=email;msg=' . $id . '" class="icon i-envelope-o' . (($member !== false && $member['online']['is_online']) ? '' : '-blank') . '" title="' . $txt['email'] . '"><s>' . $txt['email'] . '</s></a>';
+			}
+			else
+			{
+				return '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" class="icon i-envelope-o' . (($member !== false && $member['online']['is_online']) ? '' : '-blank') . '" title="' . $txt['email'] . '"><s>' . $txt['email'] . '</s></a>';
+			}
 		}
 		else
 		{
