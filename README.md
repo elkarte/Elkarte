@@ -16,6 +16,7 @@ Contributions to documentation are licensed under [CC-by-SA 3](http://creativeco
 [![Open Issues](http://img.shields.io/github/issues/elkarte/Elkarte.svg?style=flat)](https://github.com/elkarte/Elkarte/issues)
 [![Current Release](https://img.shields.io/github/release/elkarte/ElkArte.svg?style=flat)](https://github.com/elkarte/ElkArte/releases)
 [![License](http://img.shields.io/badge/License-BSD-green.svg?style=flat)](http://opensource.org/licenses/BSD-3-Clause)
+<a href="https://www.browserstack.com"><img src="https://www.sakaiproject.org/sites/default/files/pictures/Browserstack%20logo.svg" alt="@BrowserStack" height="20"></a>
 
 ## A small taste of new ElkArte features
 * @Mentioning users including notifications
