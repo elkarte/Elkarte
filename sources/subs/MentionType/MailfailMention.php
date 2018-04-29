@@ -35,7 +35,7 @@ class Mailfail_Mention extends Mention_BoardAccess_Abstract
 		$keys = array('subject' => 'notify_mailfail_' . $lang_data['subject'], 'body' => 'notify_mailfail_' . $lang_data['body']);
 
 		$replacements = array(
-			'ACTIONNAME' => $this->_task['notifier_data']['name'],
+			'ACTIONNAME' => $this->_task['source_data']['notifier_data']['name'],
 			'MSGLINK' => replaceBasicActionUrl('{script_url}?msg=' . $this->_task->id_target),
 		);
 
