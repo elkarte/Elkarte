@@ -29,16 +29,11 @@ class Mailfail_Mention extends Mention_BoardAccess_Abstract
 
 	/**
 	 * {@inheritdoc }
+	 * No need to send emails, because we have just disabled email notifications
+	 * for this user.
 	 */
 	public function getNotificationBody($lang_data, $members)
 	{
-		$keys = array('subject' => 'notify_mailfail_' . $lang_data['subject'], 'body' => 'notify_mailfail_' . $lang_data['body']);
-
-		$replacements = array(
-			'ACTIONNAME' => $this->_task['source_data']['notifier_data']['name'],
-			'MSGLINK' => replaceBasicActionUrl('{script_url}?msg=' . $this->_task->id_target),
-		);
-
-		return $this->_getNotificationStrings('notify_mailfail', $keys, $members, $this->_task, array(), $replacements);
+		return $this->_getNotificationStrings('', array('subject' => static::$_type, 'body' => static::$_type), $members, $this->_task);
 	}
 }
