@@ -37,6 +37,7 @@ class SearchApiWrapper
 	 */
 	public function __construct($config, $searchParams = null)
 	{
+		\Elk_Autoloader::instance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 		if (!is_object($config))
 		{
 			$config = new \ElkArte\ValuesContainer((array) $config);
