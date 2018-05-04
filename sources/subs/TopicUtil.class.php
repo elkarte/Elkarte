@@ -47,7 +47,7 @@ class Topic_Util
 		$messages_per_page = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
 		$topicseen = $topicseen ? ';topicseen' : '';
 
-		$icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
+		$icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir'], $topics_info);
 
 		$parser = \BBC\ParserWrapper::instance();
 
