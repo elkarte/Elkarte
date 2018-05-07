@@ -2066,7 +2066,10 @@ function dieGif($expired = false)
 	{
 		if (empty($filename))
 		{
-			ob_clean();
+			if (ob_get_level() > 0)
+			{
+				ob_clean();
+			}
 		}
 		else
 		{

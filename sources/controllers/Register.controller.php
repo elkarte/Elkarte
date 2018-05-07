@@ -119,6 +119,12 @@ class Register_Controller extends Action_Controller
 		if (isset($this->_req->post->show_contact))
 			redirectexit('action=register;sa=contact');
 
+		// If we have language support enabled then they need to be loaded
+		if ($this->_load_language_support())
+		{
+			redirectexit('action=register');
+		}
+
 		loadLanguage('Login');
 		loadTemplate('Register');
 
@@ -215,9 +221,6 @@ class Register_Controller extends Action_Controller
 			Errors::instance()->log_error($txt['registration_agreement_missing'], 'critical');
 			throw new Elk_Exception('registration_disabled', false);
 		}
-
-		// If we have language support enabled then they need to be loaded
-		$this->_load_language_support();
 
 		// Any custom or standard profile fields we want filled in during registration?
 		$this->_load_profile_fields();
@@ -654,10 +657,11 @@ class Register_Controller extends Action_Controller
 	 * - If language support is enabled, loads whats available
 	 * - Verifies the users choice is available
 	 * - Sets in in context / session
+	 * @return bool true if the language was changed, false if not.
 	 */
 	private function _load_language_support()
 	{
-		global $context, $modSettings, $language;
+		global $context, $modSettings, $language, $user_info;
 
 		// Language support enabled
 		if (!empty($modSettings['userLanguage']))
@@ -668,6 +672,10 @@ class Register_Controller extends Action_Controller
 			if (isset($this->_req->post->lngfile) && isset($languages[$this->_req->post->lngfile]))
 			{
 				$_SESSION['language'] = $this->_req->post->lngfile;
+				if ($_SESSION['language'] !== $user_info['language'])
+				{
+					return true;
+				}
 			}
 
 			// No selected, or not found, use the site default
@@ -685,6 +693,7 @@ class Register_Controller extends Action_Controller
 				}
 			}
 		}
+		return false;
 	}
 
 	/**
