@@ -106,7 +106,7 @@ class Filebased extends Cache_Method_Abstract
 			{
 				$value = json_decode(substr(file_get_contents(CACHEDIR . '/' . $fName), 7, -2));
 
-				if ($value->expiration < time())
+				if ($value === null || $value->expiration < time())
 				{
 					@unlink(CACHEDIR . '/' . $fName);
 					$return = null;
