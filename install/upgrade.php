@@ -644,7 +644,7 @@ function action_welcomeLogin()
 	}
 
 	// Do a quick version spot check.
-	$temp = substr(@implode('', @file(BOARDDIR . '/index.php')), 0, 4096);
+	$temp = substr(@implode('', @file(BOARDDIR . '/bootstrap.php')), 0, 4096);
 	preg_match('~\*\s@version\s+(.+)~i', $temp, $match);
 	if (empty($match[1]) || compareVersions(trim(str_replace('Release Candidate', 'RC', $match[1])), CURRENT_VERSION) != 0)
 	{
@@ -1890,7 +1890,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 	}
 
 	// Do a quick version spot check.
-	$temp = substr(@implode('', @file(BOARDDIR . '/index.php')), 0, 4096);
+	$temp = substr(@implode('', @file(BOARDDIR . '/bootstrap.php')), 0, 4096);
 	preg_match('~\*\s@version\s+(.+)~i', $temp, $match);
 	if (empty($match[1]) || $match[1] != CURRENT_VERSION)
 	{
