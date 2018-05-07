@@ -411,7 +411,7 @@
 
 					// Posts from the topic itself
 					for (var j = 0, topiclen =  data[i].msg_data.length; j < topiclen; j++) {
-						msgUrl = topicUrl + '.msg' +  data[i].msg_data[j].id_msg;
+						msgUrl = topicUrl + '.msg' +  data[i].msg_data[j].id_msg + '#msg' + data[i].msg_data[j].id_msg;
 
 						htmlContent += '' +
 							'   <div class="content forumposts">' +
