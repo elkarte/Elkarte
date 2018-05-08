@@ -230,7 +230,7 @@ function template_topic_listing()
 						<span class="board_avatar"><a href="#"></a></span>';
 
 			echo '
-						<a class="topicicon i-last_post', '" href="', $topic['last_post']['href'], '" title="', $txt['last_post'], '"></a>
+						<a class="topicicon i-last_post" href="', $topic['last_post']['href'], '" title="', $txt['last_post'], '"></a>
 						', $topic['last_post']['html_time'], '<br />
 						', $txt['by'], ' ', $topic['last_post']['member']['link'], '
 					</p>
