@@ -111,7 +111,7 @@ class Cache
 	public function __destruct()
 	{
 		$cached = $this->get('_cached_keys');
-		if ($cached === null)
+		if (is_array($cached) === false)
 		{
 			$cached = array();
 		}
