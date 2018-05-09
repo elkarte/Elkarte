@@ -23,6 +23,15 @@
 class Notify_Controller extends Action_Controller
 {
 	/**
+	 * Pre Dispatch, called before other methods, used to load common needs.
+	 */
+	public function pre_dispatch()
+	{
+		// Our topic functions are here
+		require_once(SUBSDIR . '/Topic.subs.php');
+	}
+
+	/**
 	 * Dispatch to the right action.
 	 *
 	 * @see Action_Controller::action_index()
@@ -153,9 +162,6 @@ class Notify_Controller extends Action_Controller
 	private function _toggle_topic_notification()
 	{
 		global $user_info, $topic;
-
-		// Our topic functions are here
-		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Attempt to turn notifications on/off.
 		setTopicNotification($user_info['id'], $topic, $this->_req->query->sa === 'on');
@@ -383,9 +389,6 @@ class Notify_Controller extends Action_Controller
 	private function _toggle_topic_watch()
 	{
 		global $user_info, $topic;
-
-		// Our topic functions are here
-		require_once(SUBSDIR . '/Topic.subs.php');
 
 		setTopicWatch($user_info['id'], $topic, $this->_req->query->sa === 'on');
 	}
