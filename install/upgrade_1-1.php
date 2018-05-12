@@ -865,4 +865,34 @@ class UpgradeInstructions_upgrade_1_1
 			)
 		);
 	}
+
+	public function agreement_logging_title()
+	{
+		return 'Introducing the logging of accepted agreement...';
+	}
+
+	public function agreement_logging()
+	{
+		return array(
+			array(
+				'debug_title' => 'Creating the table...',
+				'function' => function()
+				{
+					$this->table->db_create_table('{db_prefix}log_agreement_accept',
+						array(
+							array('name' => 'agreement_date',   'type' => 'date', 'default' => '0001-01-01'),
+							array('name' => 'id_member',     'type' => 'mediumint', 'size' => 10, 'unsigned' => true, 'default' => 0),
+							array('name' => 'accepted_date', 'type' => 'date', 'default' => '0001-01-01'),
+							array('name' => 'accepted_ip',   'type' => 'varchar', 'size' => 255, 'default' => ''),
+						),
+						array(
+							array('name' => 'modify_date', 'columns' => array('modify_date', 'id_member'), 'type' => 'primary'),
+						),
+						array(),
+						'ignore'
+					);
+				}
+			)
+		);
+	}
 }

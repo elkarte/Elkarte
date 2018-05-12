@@ -271,6 +271,7 @@ class ManageRegistration_Controller extends Action_Controller
 			}
 		}
 
+		$context['warning'] = '';
 		$agreement = new \Agreement($context['current_agreement']);
 
 		if (isset($this->_req->post->save) && isset($this->_req->post->agreement))
@@ -279,14 +280,25 @@ class ManageRegistration_Controller extends Action_Controller
 			validateToken('admin-rega');
 
 			// Off it goes to the agreement file.
-			$agreement->save($this->_req->post->agreement);
+			$success = $agreement->save($this->_req->post->agreement, !empty($this->_req->post->checkboxAcceptAgreement));
+			if (!empty($this->_req->post->checkboxAcceptAgreement))
+			{
+				if ($success === false)
+				{
+					$context['warning'] .= $txt['agreement_backup_not_writable'] . '<br />';
+				}
+				else
+				{
+					updateSettings(array('agreementRevision' => $success));
+				}
+			}
 
 			updateSettings(array('requireAgreement' => !empty($this->_req->post->requireAgreement), 'checkboxAgreement' => !empty($this->_req->post->checkboxAgreement)));
 		}
 
 		$context['agreement'] = Util::htmlspecialchars($agreement->getPlainText(false));
 
-		$context['warning'] = $agreement->isWritable() ? '' : $txt['agreement_not_writable'];
+		$context['warning'] .= $agreement->isWritable() ? '' : $txt['agreement_not_writable'];
 		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
 		$context['checkbox_agreement'] = !empty($modSettings['checkboxAgreement']);
 

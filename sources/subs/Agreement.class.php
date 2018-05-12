@@ -26,13 +26,26 @@ class Agreement
 	protected $_language = '';
 
 	/**
+	 * The directory where backups are stored
+	 *
+	 * @var string
+	 */
+	protected $_backup_dir = '';
+
+	/**
 	 * Everything starts here.
 	 *
 	 * @param string $language the wanted language of the agreement.
+	 * @param string $backup_dir where to store the backup of the agreements.
 	 */
-	public function __construct($language)
+	public function __construct($language, $backup_dir = null)
 	{
 		$this->_language = strtr($language, array('.' => ''));
+		if ($backup_dir === null || file_exists($backup_dir) === false)
+		{
+			$backup_dir = BOARDDIR . '/packages/backups/agreements';
+		}
+		$this->_backup_dir = $backup_dir;
 	}
 
 	/**
@@ -41,13 +54,26 @@ class Agreement
 	 * If the language passed to the class is empty, then it uses agreement.txt.
 	 *
 	 * @param string $text the language of the agreement we want.
+	 * @param bool $update_backup if store a copy of the text of the agreements.
 	 */
-	public function save($text)
+	public function save($text, $update_backup = false)
 	{
+		$backup_id = '';
+		if ($update_backup === true)
+		{
+			$backup_id = strftime('%Y-%m-%d', forum_time(false));
+			if ($this->_createBackup($backup_id) === false)
+			{
+				$backup_id = false;
+			}
+		}
+
 		// Off it goes to the agreement file.
 		$fp = fopen(BOARDDIR . '/agreement' . $this->normalizeLanguage() . '.txt', 'w');
 		fwrite($fp, str_replace("\r", '', $text));
 		fclose($fp);
+
+		return $backup_id;
 	}
 
 	/**
@@ -113,5 +139,30 @@ class Agreement
 	protected function normalizeLanguage()
 	{
 		return $this->_language === '' ? '' : '.' . $this->_language;
+	}
+
+	/**
+	 * Creates a full backup of all the agreements.
+	 *
+	 * @param string $backup_id the name of the directory of the backup
+	 * @return bool true if successful, false if failes to create the directory
+	 */
+	protected function _createBackup($backup_id)
+	{
+		$destination = $this->_backup_dir . '/' . $backup_id . '/';
+		if (file_exists($this->_backup_dir) === false)
+		{
+			mkdir($this->_backup_dir);
+		}
+		if (mkdir($destination) === false)
+		{
+			return false;
+		}
+		$glob = new GlobIterator(BOARDDIR . '/agreement*.txt', FilesystemIterator::SKIP_DOTS);
+		foreach ($glob as $file)
+		{
+			copy($file->getPathname(), $destination . $file->getBasename());
+		}
+		return true;
 	}
 }

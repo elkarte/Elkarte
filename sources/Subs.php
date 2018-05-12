@@ -926,6 +926,21 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	// Need user agent
 	$req = request();
 
+	setOldUrl();
+
+	// For session check verification.... don't switch browsers...
+	$_SESSION['USER_AGENT'] = $req->user_agent();
+
+	// Hand off the output to the portal, etc. we're integrated with.
+	call_integration_hook('integrate_exit', array($do_footer));
+
+	// Don't exit if we're coming from index.php; that will pass through normally.
+	if (!$from_index)
+		exit;
+}
+
+function setOldUrl($index = 'old_url')
+{
 	// Remember this URL in case someone doesn't like sending HTTP_REFERER.
 	$invalid_old_url = array(
 		'action=dlattach',
@@ -945,17 +960,9 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 		}
 	}
 	if ($make_old === true)
-		$_SESSION['old_url'] = $_SERVER['REQUEST_URL'];
-
-	// For session check verification.... don't switch browsers...
-	$_SESSION['USER_AGENT'] = $req->user_agent();
-
-	// Hand off the output to the portal, etc. we're integrated with.
-	call_integration_hook('integrate_exit', array($do_footer));
-
-	// Don't exit if we're coming from index.php; that will pass through normally.
-	if (!$from_index)
-		exit;
+	{
+		$_SESSION[$index] = $_SERVER['REQUEST_URL'];
+	}
 }
 
 /**
@@ -2108,5 +2115,41 @@ function obStart($use_compression = false)
 	{
 		ob_start();
 		header('Content-Encoding: none');
+	}
+}
+
+function checkAcceptedAgreement($id_member, $agreement_date)
+{
+	global $context, $txt;
+
+	$db = database();
+
+	$accepted = $db->fetchQuery('
+		SELECT 1
+		FROM {db_prefix}log_agreement_accept
+		WHERE agreement_date = {date:agreement_date}
+			AND id_member = {int:id_member}',
+		array(
+			'id_member' => $id_member,
+			'agreement_date' => $agreement_date,
+		)
+	);
+
+	if (empty($accepted))
+	{
+		setOldUrl('agreement_url_redirect');
+		redirectexit('action=register;sa=agreement', true);
+	}
+	if (!empty($_SESSION['agreement_accepted']))
+	{
+		// This loadLanguage is needed here because the check is done way too early in the process.
+		// As a stop-gap it's fine, but in future versions it should be fixed somehow.
+		loadLanguage('index');
+		$_SESSION['agreement_accepted'] = null;
+		$context['accepted_agreement'] = array(
+			'errors' => array(
+				'accepted_agreement' => $txt['agreement_accepted']
+			)
+		);
 	}
 }

@@ -430,6 +430,14 @@ function loadUserSettings()
 	else
 		$user_info['query_wanna_see_board'] = '(' . $user_info['query_see_board'] . ' AND b.id_board NOT IN (' . implode(',', $user_info['ignoreboards']) . '))';
 
+	if ($user_info['is_guest'] === false)
+	{
+		$http_request = HttpReq::instance();
+		if (!empty($modSettings['agreementRevision']) && !empty($modSettings['requireAgreement']) && in_array($http_request->query->action, array('reminder', 'register')) === false)
+		{
+			checkAcceptedAgreement($id_member, $modSettings['agreementRevision']);
+		}
+	}
 	call_integration_hook('integrate_user_info');
 }
 

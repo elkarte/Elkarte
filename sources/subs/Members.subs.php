@@ -2607,3 +2607,27 @@ function loadMembersIPs($ip_string, $ip_var)
 
 	return $ips;
 }
+
+function registerAgreementAccepted($id_member, $ip, $agreement_version)
+{
+	$db = database();
+
+	$db->insert('',
+		'{db_prefix}log_agreement_accept',
+		array(
+			'agreement_date' => 'date',
+			'id_member' => 'int',
+			'accepted_date' => 'date',
+			'accepted_ip' => 'string-255',
+		),
+		array(
+			array(
+				'agreement_date' => $agreement_version,
+				'id_member' => $id_member,
+				'accepted_date' => strftime('%Y-%m-%d', forum_time(false)),
+				'accepted_ip' => $ip,
+			)
+		),
+		array('agreement_date', 'id_member')
+	);
+}

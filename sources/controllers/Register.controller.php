@@ -108,6 +108,13 @@ class Register_Controller extends Action_Controller
 	{
 		global $txt, $context, $modSettings, $user_info, $scripturl;
 
+		// If we are here only to accept the agreement, then let's do that.
+		if (isset($this->_req->post->accept_agreement))
+		{
+			$this->action_agreement();
+			return;
+		}
+
 		// If this user is an admin - redirect them to the admin registration page.
 		if (allowedTo('moderate_forum') && !$user_info['is_guest'])
 			redirectexit('action=admin;area=regcenter;sa=register');
@@ -1239,5 +1246,47 @@ class Register_Controller extends Action_Controller
 		validateUsername(0, $context['checked_username'], 'valid_username', true, false);
 
 		$context['valid_username'] = !$errors->hasErrors();
+	}
+
+	public function action_agreement()
+	{
+		global $context, $user_info, $modSettings;
+
+		if (isset($this->_req->post->accept_agreement))
+		{
+			require_once(SUBSDIR . '/Members.subs.php');
+			registerAgreementAccepted($user_info['id'], $user_info['ip'], empty($modSettings['agreementRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
+			$_SESSION['agreement_accepted'] = true;
+			if (isset($_SESSION['agreement_url_redirect']))
+			{
+				redirectexit($_SESSION['agreement_url_redirect']);
+			}
+		}
+		elseif (isset($this->_req->post->no_accept))
+		{
+			// This should lead to the account deletion page
+		}
+		else
+		{
+			$context['sub_template'] = 'registration_agreement';
+		}
+
+		loadLanguage('Login');
+		loadLanguage('Profile');
+		loadTemplate('Register');
+		// If you have to agree to the agreement, it needs to be fetched from the file.
+		$agreement = new \Agreement($user_info['language']);
+		$context['agreement'] = $agreement->getParsedText();
+
+		$context['show_coppa'] = !empty($modSettings['coppaAge']);
+		$context['show_contact_button'] = !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] === 'registration';
+		// Under age restrictions?
+		if ($context['show_coppa'])
+		{
+			$context['skip_coppa'] = false;
+			$context['coppa_agree_above'] = sprintf($txt[($context['require_agreement'] ? 'agreement_' : '') . 'agree_coppa_above'], $modSettings['coppaAge']);
+			$context['coppa_agree_below'] = sprintf($txt[($context['require_agreement'] ? 'agreement_' : '') . 'agree_coppa_below'], $modSettings['coppaAge']);
+		}
+		createToken('register');
 	}
 }

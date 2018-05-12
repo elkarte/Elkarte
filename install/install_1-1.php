@@ -1153,6 +1153,23 @@ class InstallInstructions_install_1_1
 		);
 	}
 
+	public function table_log_agreement_accept()
+	{
+		return $this->table->db_create_table('{db_prefix}log_agreement_accept',
+			array(
+				array('name' => 'agreement_date',   'type' => 'date', 'default' => '0001-01-01'),
+				array('name' => 'id_member',     'type' => 'mediumint', 'size' => 10, 'unsigned' => true, 'default' => 0),
+				array('name' => 'accepted_date', 'type' => 'date', 'default' => '0001-01-01'),
+				array('name' => 'accepted_ip',   'type' => 'varchar', 'size' => 255, 'default' => ''),
+			),
+			array(
+				array('name' => 'modify_date', 'columns' => array('modify_date', 'id_member'), 'type' => 'primary'),
+			),
+			array(),
+			'ignore'
+		);
+	}
+
 	public function table_log_badbehavior()
 	{
 		return $this->table->db_create_table('{db_prefix}log_badbehavior',

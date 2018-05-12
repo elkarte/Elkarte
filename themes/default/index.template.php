@@ -402,6 +402,19 @@ function template_uc_news_fader()
 }
 
 /**
+ * All your data are belong to us (cit.)
+ */
+function template_uc_agreement_accepted()
+{
+	global $txt;
+
+	echo '
+			<div id="agreement">
+				<h2>', $txt['agreement_accepted'], '</h2>
+			</div>';
+}
+
+/**
  * Section down the page, before closing body
  */
 function template_body_below()
@@ -793,6 +806,21 @@ function template_show_error($error_id)
 
 	echo '
 					</div>';
+}
+
+function template_uc_generic_infobox()
+{
+	global $context;
+
+	if (empty($context['generic_infobox']))
+	{
+		return;
+	}
+
+	foreach ($context['generic_infobox'] as $key)
+	{
+		template_show_error($key);
+	}
 }
 
 /**

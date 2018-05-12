@@ -60,6 +60,8 @@ function template_registration_agreement()
 	else
 		echo '
 				<input type="submit" name="accept_agreement" value="', $txt['agreement_agree'], '" />';
+	echo '
+				<input type="submit" name="no_accept" value="', $txt['agreement_no_agree'], '" />';
 
 	if ($context['show_contact_button'])
 		echo '
@@ -764,12 +766,14 @@ function template_edit_agreement()
 	// Show the actual agreement in an oversized text box.
 	echo '
 					<p class="agreement">
-						<textarea cols="70" rows="10" name="agreement" id="agreement">', $context['agreement'], '</textarea>
+						<textarea rows="10" name="agreement" id="agreement">', $context['agreement'], '</textarea>
 					</p>
 					<p>
 						<label for="requireAgreement"><input type="checkbox" name="requireAgreement" id="requireAgreement"', $context['require_agreement'] ? ' checked="checked"' : '', ' tabindex="', $context['tabindex']++, '" value="1" /> ', $txt['admin_agreement'], '.</label>
 						<br />
 						<label for="checkboxAgreement"><input type="checkbox" name="checkboxAgreement" id="checkboxAgreement"', $context['checkbox_agreement'] ? ' checked="checked"' : '', ' tabindex="', $context['tabindex']++, '" value="1" /> ', $txt['admin_checkbox_agreement'], '.</label>
+						<br />
+						<label for="checkboxAcceptAgreement"><input type="checkbox" name="checkboxAcceptAgreement" id="checkboxAcceptAgreement" checked="checked" tabindex="', $context['tabindex']++, '" value="1" /> ', $txt['admin_checkbox_accept_agreement'], '.</label>
 					</p>
 					<div class="submitbutton" >
 						<input type="submit" name="save" value="', $txt['save'], '" tabindex="', $context['tabindex']++, '" />
