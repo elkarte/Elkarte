@@ -435,7 +435,10 @@ function loadUserSettings()
 		$http_request = HttpReq::instance();
 		if (!empty($modSettings['agreementRevision']) && !empty($modSettings['requireAgreement']) && in_array($http_request->query->action, array('reminder', 'register')) === false)
 		{
-			checkAcceptedAgreement($id_member, $modSettings['agreementRevision']);
+			if ($http_request->query->action !== 'profile' || $http_request->area !== 'deleteaccount')
+			{
+				checkAcceptedAgreement($id_member, $modSettings['agreementRevision']);
+			}
 		}
 	}
 	call_integration_hook('integrate_user_info');

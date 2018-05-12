@@ -109,7 +109,7 @@ class Register_Controller extends Action_Controller
 		global $txt, $context, $modSettings, $user_info, $scripturl;
 
 		// If we are here only to accept the agreement, then let's do that.
-		if (isset($this->_req->post->accept_agreement))
+		if (isset($this->_req->post->accept_agreement) || isset($this->_req->post->no_accept))
 		{
 			$this->action_agreement();
 			return;
@@ -1264,7 +1264,7 @@ class Register_Controller extends Action_Controller
 		}
 		elseif (isset($this->_req->post->no_accept))
 		{
-			// This should lead to the account deletion page
+			redirectexit('action=profile;area=deleteaccount');
 		}
 		else
 		{
