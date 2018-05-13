@@ -68,6 +68,12 @@ function template_registration_agreement()
 				<br /><br />
 				<input type="submit" name="show_contact" value="', $txt['contact'], '" />';
 
+	if (!empty($context['register_subaction']))
+	{
+		echo '
+				<input type="hidden" name="sa" value="', $context['register_subaction'], '" />';
+	}
+
 	echo '
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			<input type="hidden" name="', $context['register_token_var'], '" value="', $context['register_token'], '" />

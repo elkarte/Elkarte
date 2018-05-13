@@ -158,7 +158,7 @@ class Agreement
 			)
 		);
 
-		return empty($accepted);
+		return !empty($accepted);
 	}
 
 	/**

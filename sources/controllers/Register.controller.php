@@ -84,6 +84,7 @@ class Register_Controller extends Action_Controller
 			'verificationcode' => array($this, 'action_verificationcode'),
 			'coppa' => array($this, 'action_coppa'),
 			'agrelang' => array($this, 'action_agrelang'),
+			'agreement' => array($this, 'action_agreement'),
 		);
 
 		// Setup the action handler
@@ -107,13 +108,6 @@ class Register_Controller extends Action_Controller
 	public function action_register()
 	{
 		global $txt, $context, $modSettings, $user_info, $scripturl;
-
-		// If we are here only to accept the agreement, then let's do that.
-		if (isset($this->_req->post->accept_agreement) || isset($this->_req->post->no_accept))
-		{
-			$this->action_agreement();
-			return;
-		}
 
 		// If this user is an admin - redirect them to the admin registration page.
 		if (allowedTo('moderate_forum') && !$user_info['is_guest'])
@@ -1269,6 +1263,7 @@ class Register_Controller extends Action_Controller
 		else
 		{
 			$context['sub_template'] = 'registration_agreement';
+			$context['register_subaction'] = 'agreement';
 		}
 
 		loadLanguage('Login');
