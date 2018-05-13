@@ -172,7 +172,7 @@ function template_credits()
 		if ($context['can_admin'] && isset($version['more']))
 		{
 			echo
-			' <a href="', $scripturl, $version['more'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['version_check_more'], '</a>';
+			' <a class="linkbutton" href="', $scripturl, $version['more'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['version_check_more'], '</a>';
 		}
 
 		echo '
