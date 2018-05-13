@@ -443,9 +443,15 @@ class Browser_Detector
 		global $context;
 
 		if ($this->_is_mobile && !$this->_is_tablet)
+		{
 			$context['browser_body_id'] = 'mobile';
+			$this->_browsers['is_mobile'] = true;
+		}
 		elseif ($this->_is_tablet)
+		{
 			$context['browser_body_id'] = 'tablet';
+			$this->_browsers['is_tablet'] = true;
+		}
 		else
 		{
 			// Add in any specific detection conversions here if you want a special body id e.g. 'is_opera9' => 'opera9'
