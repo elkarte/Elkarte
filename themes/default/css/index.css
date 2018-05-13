@@ -58,7 +58,7 @@
 	/* Next limits maximum width on wide screens. */
 	/* Sized in em, since some people require larger text. */
 	/* For ease of reading, content really should not be too wide. */
-	max-width: 90em;
+	max-width: 150em;
 }
 
 /* -------------------------------------------------------
@@ -638,7 +638,7 @@ em, .em {
 
 .generic_list_wrapper .additional_row {
 	margin: 0;
-	padding: 10px 0 0;
+	padding: 10px 0 1px;
 	border-radius: 0;
 }
 
@@ -1561,7 +1561,7 @@ a.bbc_link {
 }
 
 #main_content_section .navigate_section {
-	margin: 12px 0 6px 0;
+	margin: 1em 0 .5em 0;
 }
 
 .linktree {
@@ -1573,10 +1573,7 @@ a.bbc_link {
 	font-size: 0.929em;
 	line-height: 2em;
 	border-bottom: 1px solid;
-}
-
-.linktree:first-child a {
-	height: 2em;
+	min-height: 2.1em;
 }
 
 .linktree:last-child {
@@ -3677,7 +3674,6 @@ ul.post_options li {
 	z-index: 1000;
 }
 .insertoverlay .tabs {
-	display: block;
 	white-space: nowrap;
 	display: flex;
 	justify-content: space-between;
@@ -3689,9 +3685,6 @@ ul.post_options li {
 	border-bottom: 1px solid;
 	cursor: pointer;
 	flex-grow: 1;
-}
-.insertoverlay .tabs li.active {
-	background-color: #E4E4E4;
 }
 
 .statusbar .insertoverlay label {
@@ -3749,8 +3742,8 @@ ul.post_options li {
 
 .postattach_thumb {
 	display: inline-block;
-	max-width: 50px;
-	max-height: 50px;
+	width: 50px;
+	height: 50px;
 	vertical-align: middle;
 }
 
