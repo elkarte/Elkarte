@@ -437,7 +437,26 @@ function loadUserSettings()
 		{
 			if ($http_request->query->action !== 'profile' || $http_request->area !== 'deleteaccount')
 			{
-				checkAcceptedAgreement($id_member, $modSettings['agreementRevision']);
+				$agreement = new Agreement($user_info['language']);
+				if (false === $agreement->checkAccepted($id_member, $modSettings['agreementRevision']))
+				{
+					
+					setOldUrl('agreement_url_redirect');
+					redirectexit('action=register;sa=agreement', true);
+				}
+
+				if (!empty($_SESSION['agreement_accepted']))
+				{
+					// This loadLanguage is needed here because the check is done way too early in the process.
+					// As a stop-gap it's fine, but in future versions it should be fixed somehow.
+					loadLanguage('index');
+					$_SESSION['agreement_accepted'] = null;
+					$context['accepted_agreement'] = array(
+						'errors' => array(
+							'accepted_agreement' => $txt['agreement_accepted']
+						)
+					);
+				}
 			}
 		}
 	}

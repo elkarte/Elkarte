@@ -2117,39 +2117,3 @@ function obStart($use_compression = false)
 		header('Content-Encoding: none');
 	}
 }
-
-function checkAcceptedAgreement($id_member, $agreement_date)
-{
-	global $context, $txt;
-
-	$db = database();
-
-	$accepted = $db->fetchQuery('
-		SELECT 1
-		FROM {db_prefix}log_agreement_accept
-		WHERE agreement_date = {date:agreement_date}
-			AND id_member = {int:id_member}',
-		array(
-			'id_member' => $id_member,
-			'agreement_date' => $agreement_date,
-		)
-	);
-
-	if (empty($accepted))
-	{
-		setOldUrl('agreement_url_redirect');
-		redirectexit('action=register;sa=agreement', true);
-	}
-	if (!empty($_SESSION['agreement_accepted']))
-	{
-		// This loadLanguage is needed here because the check is done way too early in the process.
-		// As a stop-gap it's fine, but in future versions it should be fixed somehow.
-		loadLanguage('index');
-		$_SESSION['agreement_accepted'] = null;
-		$context['accepted_agreement'] = array(
-			'errors' => array(
-				'accepted_agreement' => $txt['agreement_accepted']
-			)
-		);
-	}
-}

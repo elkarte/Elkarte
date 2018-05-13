@@ -33,6 +33,13 @@ class Agreement
 	protected $_backup_dir = '';
 
 	/**
+	 * The database object
+	 *
+	 * @var Object
+	 */
+	protected $_db = null;
+
+	/**
 	 * Everything starts here.
 	 *
 	 * @param string $language the wanted language of the agreement.
@@ -46,6 +53,7 @@ class Agreement
 			$backup_dir = BOARDDIR . '/packages/backups/agreements';
 		}
 		$this->_backup_dir = $backup_dir;
+		$this->_db = database();
 	}
 
 	/**
@@ -129,6 +137,28 @@ class Agreement
 		$filename = BOARDDIR . '/agreement' . $this->normalizeLanguage() . '.txt';
 
 		return file_exists($filename) && is_writable($filename);
+	}
+
+	/**
+	 * Test if the user accepted the current agreement or not.
+	 *
+	 * @param int $id_member The id of the member
+	 * @param string $agreement_date The date of the agreement
+	 */
+	public function checkAccepted($id_member, $agreement_date)
+	{
+		$accepted = $this->_db->fetchQuery('
+			SELECT 1
+			FROM {db_prefix}log_agreement_accept
+			WHERE agreement_date = {date:agreement_date}
+				AND id_member = {int:id_member}',
+			array(
+				'id_member' => $id_member,
+				'agreement_date' => $agreement_date,
+			)
+		);
+
+		return empty($accepted);
 	}
 
 	/**
