@@ -71,7 +71,10 @@ class MessageTopicIcons extends ElkArte\ValuesContainer
 		$this->_loadStableIcons();
 
 		// Merge in additional ones
-		$this->_stable_icons = array_merge($this->_stable_icons, array_column($custom, 'first_icon'));
+		$custom_icons = array_map(function($element) {
+			return $element['first_icon'];
+		}, $custom);
+		$this->_stable_icons = array_merge($this->_stable_icons, $custom_icons);
 
 		$this->_loadIcons();
 	}
