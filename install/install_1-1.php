@@ -2484,7 +2484,6 @@ class InstallInstructions_install_1_1
 				array('likeMinPosts', '5'),
 				array('karmaMode', '0'),
 				array('karmaTimeRestrictAdmins', '1'),
-				array('enablePreviousNext', '1'),
 				array('pollMode', '1'),
 				array('modules_display', 'mentions,poll,verification,random'),
 				array('modules_post', 'mentions,poll,attachments,verification,random'),

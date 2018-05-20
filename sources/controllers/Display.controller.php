@@ -283,11 +283,10 @@ class Display_Controller extends Action_Controller
 		}
 
 		// Create a previous next string if the selected theme has it as a selected option.
-		if ($modSettings['enablePreviousNext'])
-			$context['links'] += array(
-				'go_prev' => $scripturl . '?topic=' . $topic . '.0;prev_next=prev#new',
-				'go_next' => $scripturl . '?topic=' . $topic . '.0;prev_next=next#new'
-			);
+		$context['links'] += array(
+			'go_prev' => $scripturl . '?topic=' . $topic . '.0;prev_next=prev#new',
+			'go_next' => $scripturl . '?topic=' . $topic . '.0;prev_next=next#new'
+		);
 
 		// Check if spellchecking is both enabled and actually working. (for quick reply.)
 		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
