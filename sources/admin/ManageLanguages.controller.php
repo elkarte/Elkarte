@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.4
  *
  */
 
@@ -783,7 +783,7 @@ class ManageLanguages_Controller extends Action_Controller
 			fwrite($fp, $current_data);
 			fclose($fp);
 
-			if (function_exists('opcache_invalidate'))
+			if ($this->_checkOpcache())
 				opcache_invalidate($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php');
 
 			$madeSave = true;
@@ -990,7 +990,7 @@ class ManageLanguages_Controller extends Action_Controller
 				fwrite($fp, strtr($file_contents, array("\r" => '')));
 				fclose($fp);
 
-				if (function_exists('opcache_invalidate'))
+				if ($this->_checkOpcache())
 					opcache_invalidate($current_file);
 
 				$madeSave = true;
@@ -1060,6 +1060,16 @@ class ManageLanguages_Controller extends Action_Controller
 
 		// Fill the config array in contextual data for the template.
 		$settingsForm->prepare();
+	}
+
+	/**
+	 * Checks if the Zend Opcahce is installed, active and cmd functions available.
+	 *
+	 * @return bool
+	 */
+	private function _checkOpcache()
+	{
+		return (extension_loaded('Zend OPcache') && ini_get('opcache.enable') && stripos(BOARDDIR, ini_get('opcache.restrict_api')) !== 0);
 	}
 
 	/**

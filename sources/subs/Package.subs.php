@@ -2816,7 +2816,7 @@ function checkPackageDependency($id)
 			'current_package' => $id,
 		)
 	);
-	while ($row = $db->fetch_row($request));
+	while ($row = $db->fetch_row($request))
 		list ($version) = $row;
 	$db->free_result($request);
 

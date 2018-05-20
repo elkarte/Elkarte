@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.4
  *
  */
 
@@ -671,7 +671,7 @@ function saveFileSettings($config_vars, $settingsArray)
 	}
 	fclose($fp);
 
-	if (function_exists('opcache_invalidate'))
+	if (extension_loaded('Zend OPcache') && ini_get('opcache.enable') && stripos(BOARDDIR, ini_get('opcache.restrict_api')) !== 0)
 		opcache_invalidate(TMP_BOARDDIR . '/Settings.php', true);
 
 	return true;

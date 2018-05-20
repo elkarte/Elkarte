@@ -63,12 +63,15 @@ define('HDOM_INFO_ENDSPACE',7);
 define('DEFAULT_TARGET_CHARSET', 'UTF-8');
 define('DEFAULT_BR_TEXT', "\r\n");
 define('DEFAULT_SPAN_TEXT', " ");
+if (!defined('MAX_FILE_SIZE'))
+{
 define('MAX_FILE_SIZE', 600000);
+}
 // helper functions
 // -----------------------------------------------------------------------------
 // get html dom from file
 // $maxlen is defined in the code as PHP_STREAM_COPY_ALL which is defined as -1.
-function file_get_html($url, $use_include_path = false, $context=null, $offset = -1, $maxLen=-1, $lowercase = true, $forceTagsClosed=true, $target_charset = DEFAULT_TARGET_CHARSET, $stripRN=true, $defaultBRText=DEFAULT_BR_TEXT, $defaultSpanText=DEFAULT_SPAN_TEXT)
+function file_get_html($url, $use_include_path = false, $context=null, $offset=0, $maxLen=-1, $lowercase = true, $forceTagsClosed=true, $target_charset = DEFAULT_TARGET_CHARSET, $stripRN=true, $defaultBRText=DEFAULT_BR_TEXT, $defaultSpanText=DEFAULT_SPAN_TEXT)
 {
 	// We DO force the tags to be terminated.
 	$dom = new simple_html_dom(null, $lowercase, $forceTagsClosed, $target_charset, $stripRN, $defaultBRText, $defaultSpanText);
@@ -955,8 +958,8 @@ class simple_html_dom_node
 	}
 
 	// camel naming conventions
-	function getAllAttributes() {return $this->attr;}
-	function getAttribute($name) {return $this->__get($name);}
+    function getAllAttributes() {return array_map('html_entity_decode', $this->attr);}
+    function getAttribute($name) {return html_entity_decode($this->__get($name));}
 	function setAttribute($name, $value) {$this->__set($name, $value);}
 	function hasAttribute($name) {return $this->__isset($name);}
 	function removeAttribute($name) {$this->__set($name, null);}
@@ -1739,4 +1742,3 @@ class simple_html_dom
 	function loadFile() {$args = func_get_args();$this->load_file($args);}
 }
 
-?>

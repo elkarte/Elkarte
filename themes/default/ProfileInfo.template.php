@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.4
  *
  */
 
@@ -405,10 +405,12 @@ function template_action_statPanel()
 		// Draw a bar for every board.
 		foreach ($context['popular_boards'] as $board)
 		{
+			$position = intval(((int) $board['posts_percent'] / 5)) * 20;
+
 			echo '
 						<dt>', $board['link'], '</dt>
 						<dd>
-							<div class="profile_pie" style="background-position: -', ((int) ($board['posts_percent'] / 5) * 20), 'px 0;" title="', sprintf($txt['statPanel_topBoards_memberposts'], $board['posts'], $board['total_posts_member'], $board['posts_percent']), '">
+							<div class="profile_pie" style="background-position: -', $position, 'px 0;" title="', sprintf($txt['statPanel_topBoards_memberposts'], $board['posts'], $board['total_posts_member'], $board['posts_percent']), '">
 								', sprintf($txt['statPanel_topBoards_memberposts'], $board['posts'], $board['total_posts_member'], $board['posts_percent']), '
 							</div>
 							<span>', empty($context['hide_num_posts']) ? $board['posts'] : '', '</span>
@@ -439,10 +441,12 @@ function template_action_statPanel()
 		// Draw a bar for every board.
 		foreach ($context['board_activity'] as $activity)
 		{
+			$position = intval(((int) $activity['percent'] / 5)) * 20;
+
 			echo '
 						<dt>', $activity['link'], '</dt>
 						<dd>
-							<div class="profile_pie" style="background-position: -', ((int) ($activity['percent'] / 5) * 20), 'px 0;" title="', sprintf($txt['statPanel_topBoards_posts'], $activity['posts'], $activity['total_posts'], $activity['posts_percent']), '">
+							<div class="profile_pie" style="background-position: -', $position, 'px 0;" title="', sprintf($txt['statPanel_topBoards_posts'], $activity['posts'], $activity['total_posts'], $activity['posts_percent']), '">
 								', sprintf($txt['statPanel_topBoards_posts'], $activity['posts'], $activity['total_posts'], $activity['posts_percent']), '
 							</div>
 							<span>', $activity['percent'], '%</span>
