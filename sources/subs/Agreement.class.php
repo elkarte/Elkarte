@@ -33,6 +33,27 @@ class Agreement
 	protected $_backup_dir = '';
 
 	/**
+	 * The name of the file where the agreement is stored
+	 *
+	 * @var string
+	 */
+	protected $_file_name = 'agreement';
+
+	/**
+	 * The name of the directory where the backup will be saved
+	 *
+	 * @var string
+	 */
+	protected $_backupdir_name = 'agreements';
+
+	/**
+	 * The name of the log table
+	 *
+	 * @var string
+	 */
+	protected $_log_table_name = '{db_prefix}log_agreement_accept';
+
+	/**
 	 * The database object
 	 *
 	 * @var Object
@@ -50,7 +71,7 @@ class Agreement
 		$this->_language = strtr($language, array('.' => ''));
 		if ($backup_dir === null || file_exists($backup_dir) === false)
 		{
-			$backup_dir = BOARDDIR . '/packages/backups/agreements';
+			$backup_dir = BOARDDIR . '/packages/backups/' . $this->_backupdir_name;
 		}
 		$this->_backup_dir = $backup_dir;
 		$this->_db = database();
@@ -77,7 +98,7 @@ class Agreement
 		}
 
 		// Off it goes to the agreement file.
-		$fp = fopen(BOARDDIR . '/agreement' . $this->normalizeLanguage() . '.txt', 'w');
+		$fp = fopen(BOARDDIR . '/' . $this->_file_name . $this->normalizeLanguage() . '.txt', 'w');
 		fwrite($fp, str_replace("\r", '', $text));
 		fclose($fp);
 
@@ -96,13 +117,13 @@ class Agreement
 	public function getPlainText($fallback = true)
 	{
 		// Have we got a localized one?
-		if (file_exists(BOARDDIR . '/agreement' . $this->normalizeLanguage() . '.txt'))
+		if (file_exists(BOARDDIR . '/' . $this->_file_name . $this->normalizeLanguage() . '.txt'))
 		{
-			$agreement = file_get_contents(BOARDDIR . '/agreement' . $this->normalizeLanguage() . '.txt');
+			$agreement = file_get_contents(BOARDDIR . '/' . $this->_file_name . $this->normalizeLanguage() . '.txt');
 		}
-		elseif ($fallback === true && file_exists(BOARDDIR . '/agreement.txt'))
+		elseif ($fallback === true && file_exists(BOARDDIR . '/' . $this->_file_name . '.txt'))
 		{
-			$agreement = file_get_contents(BOARDDIR . '/agreement.txt');
+			$agreement = file_get_contents(BOARDDIR . '/' . $this->_file_name . '.txt');
 		}
 		else
 		{
@@ -134,7 +155,7 @@ class Agreement
 	 */
 	public function isWritable()
 	{
-		$filename = BOARDDIR . '/agreement' . $this->normalizeLanguage() . '.txt';
+		$filename = BOARDDIR . '/' . $this->_file_name . $this->normalizeLanguage() . '.txt';
 
 		return file_exists($filename) && is_writable($filename);
 	}
@@ -143,22 +164,46 @@ class Agreement
 	 * Test if the user accepted the current agreement or not.
 	 *
 	 * @param int $id_member The id of the member
-	 * @param string $agreement_date The date of the agreement
+	 * @param string $version The date of the agreement
 	 */
-	public function checkAccepted($id_member, $agreement_date)
+	public function checkAccepted($id_member, $version)
 	{
 		$accepted = $this->_db->fetchQuery('
 			SELECT 1
-			FROM {db_prefix}log_agreement_accept
-			WHERE agreement_date = {date:agreement_date}
+			FROM ' . $this->_log_table_name . '
+			WHERE version = {date:version}
 				AND id_member = {int:id_member}',
 			array(
 				'id_member' => $id_member,
-				'agreement_date' => $agreement_date,
+				'version' => $version,
 			)
 		);
 
 		return !empty($accepted);
+	}
+
+	public function accept($id_member, $ip, $version)
+	{
+		$db = database();
+
+		$db->insert('',
+			$this->_log_table_name,
+			array(
+				'version' => 'date',
+				'id_member' => 'int',
+				'accepted_date' => 'date',
+				'accepted_ip' => 'string-255',
+			),
+			array(
+				array(
+					'version' => $version,
+					'id_member' => $id_member,
+					'accepted_date' => strftime('%Y-%m-%d', forum_time(false)),
+					'accepted_ip' => $ip,
+				)
+			),
+			array('version', 'id_member')
+		);
 	}
 
 	/**
@@ -188,7 +233,7 @@ class Agreement
 		{
 			return false;
 		}
-		$glob = new GlobIterator(BOARDDIR . '/agreement*.txt', FilesystemIterator::SKIP_DOTS);
+		$glob = new GlobIterator(BOARDDIR . '/' . $this->_file_name . '*.txt', FilesystemIterator::SKIP_DOTS);
 		foreach ($glob as $file)
 		{
 			copy($file->getPathname(), $destination . $file->getBasename());

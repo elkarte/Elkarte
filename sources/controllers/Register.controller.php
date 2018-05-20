@@ -1248,8 +1248,9 @@ class Register_Controller extends Action_Controller
 
 		if (isset($this->_req->post->accept_agreement))
 		{
-			require_once(SUBSDIR . '/Members.subs.php');
-			registerAgreementAccepted($user_info['id'], $user_info['ip'], empty($modSettings['agreementRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
+			$agreement = new Agreement($user_info['language']);
+			$agreement->accept($user_info['id'], $user_info['ip'], empty($modSettings['agreementRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
+
 			$_SESSION['agreement_accepted'] = true;
 			if (isset($_SESSION['agreement_url_redirect']))
 			{

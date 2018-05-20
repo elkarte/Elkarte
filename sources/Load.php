@@ -433,9 +433,9 @@ function loadUserSettings()
 	if ($user_info['is_guest'] === false)
 	{
 		$http_request = HttpReq::instance();
-		if (!empty($modSettings['agreementRevision']) && !empty($modSettings['requireAgreement']) && in_array($http_request->query->action, array('reminder', 'register')) === false)
+		if (!empty($modSettings['agreementRevision']) && !empty($modSettings['requireAgreement']) && in_array($http_request->action, array('reminder', 'register')) === false)
 		{
-			if ($http_request->query->action !== 'profile' || $http_request->area !== 'deleteaccount')
+			if ($http_request->action !== 'profile' || $http_request->area !== 'deleteaccount')
 			{
 				$agreement = new Agreement($user_info['language']);
 				if (false === $agreement->checkAccepted($id_member, $modSettings['agreementRevision']))
@@ -443,19 +443,6 @@ function loadUserSettings()
 					
 					setOldUrl('agreement_url_redirect');
 					redirectexit('action=register;sa=agreement', true);
-				}
-
-				if (!empty($_SESSION['agreement_accepted']))
-				{
-					// This loadLanguage is needed here because the check is done way too early in the process.
-					// As a stop-gap it's fine, but in future versions it should be fixed somehow.
-					loadLanguage('index');
-					$_SESSION['agreement_accepted'] = null;
-					$context['accepted_agreement'] = array(
-						'errors' => array(
-							'accepted_agreement' => $txt['agreement_accepted']
-						)
-					);
 				}
 			}
 		}
@@ -1649,6 +1636,18 @@ function loadTheme($id_theme = 0, $initialize = true)
 			'rss' => $scripturl . '?action=.xml;type=rss2;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5),
 			'atom' => $scripturl . '?action=.xml;type=atom;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5)
 		);
+
+	if (!empty($_SESSION['agreement_accepted']))
+	{
+		// This loadLanguage is needed here because the check is done way too early in the process.
+		// As a stop-gap it's fine, but in future versions it should be fixed somehow.
+		$_SESSION['agreement_accepted'] = null;
+		$context['accepted_agreement'] = array(
+			'errors' => array(
+				'accepted_agreement' => $txt['agreement_accepted']
+			)
+		);
+	}
 
 	theme()->loadThemeJavascript();
 
