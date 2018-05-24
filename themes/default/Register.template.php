@@ -733,8 +733,8 @@ function template_edit_agreement()
 
 	// Just a big box to edit the text file ;).
 	echo '
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=regcenter" method="post" accept-charset="UTF-8">
-			<h2 class="category_header">', $txt['registration_agreement'], '</h2>';
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=regcenter" method="post" accept-charset="UTF-8" onsubmit="return confirmAgreement(', javaScriptEscape($txt['confirm_request_accept_agreement']), ');">
+			<h2 class="category_header">', $context['page_title'], '</h2>';
 
 	// Warning for if the file isn't writable.
 	if (!empty($context['warning']))
@@ -775,15 +775,22 @@ function template_edit_agreement()
 						<textarea rows="10" name="agreement" id="agreement">', $context['agreement'], '</textarea>
 					</p>
 					<p>
-						<label for="requireAgreement"><input type="checkbox" name="requireAgreement" id="requireAgreement"', $context['require_agreement'] ? ' checked="checked"' : '', ' tabindex="', $context['tabindex']++, '" value="1" /> ', $txt['admin_agreement'], '.</label>
+						<label for="requireAgreement"><input type="checkbox" name="requireAgreement" id="requireAgreement"', $context['require_agreement'] ? ' checked="checked"' : '', ' tabindex="', $context['tabindex']++, '" value="1" /> ', $txt['admin_agreement'], '.</label>';
+
+	if (!empty($context['agreement_show_options']))
+	{
+		echo '
 						<br />
-						<label for="checkboxAgreement"><input type="checkbox" name="checkboxAgreement" id="checkboxAgreement"', $context['checkbox_agreement'] ? ' checked="checked"' : '', ' tabindex="', $context['tabindex']++, '" value="1" /> ', $txt['admin_checkbox_agreement'], '.</label>
+						<label for="checkboxAgreement"><input type="checkbox" name="checkboxAgreement" id="checkboxAgreement"', $context['checkbox_agreement'] ? ' checked="checked"' : '', ' tabindex="', $context['tabindex']++, '" value="1" /> ', $txt['admin_checkbox_agreement'], '.</label>';
+	}
+
+	echo '
 						<br />
-						<label for="checkboxAcceptAgreement"><input type="checkbox" name="checkboxAcceptAgreement" id="checkboxAcceptAgreement" checked="checked" tabindex="', $context['tabindex']++, '" value="1" /> ', $txt['admin_checkbox_accept_agreement'], '.</label>
+						<label for="checkboxAcceptAgreement"><input type="checkbox" name="checkboxAcceptAgreement" id="checkboxAcceptAgreement" tabindex="', $context['tabindex']++, '" value="1" /> ', $txt['admin_checkbox_accept_agreement'], '.</label>
 					</p>
 					<div class="submitbutton" >
 						<input type="submit" name="save" value="', $txt['save'], '" tabindex="', $context['tabindex']++, '" />
-						<input type="hidden" name="sa" value="agreement" />
+						<input type="hidden" name="sa" value="', $context['subaction'], '" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="', $context['admin-rega_token_var'], '" value="', $context['admin-rega_token'], '" />
 					</div>

@@ -84,6 +84,7 @@ class Register_Controller extends Action_Controller
 			'verificationcode' => array($this, 'action_verificationcode'),
 			'coppa' => array($this, 'action_coppa'),
 			'agrelang' => array($this, 'action_agrelang'),
+			'privacypol' => array($this, 'action_privacypol'),
 			'agreement' => array($this, 'action_agreement'),
 		);
 
@@ -1283,6 +1284,49 @@ class Register_Controller extends Action_Controller
 			$context['coppa_agree_above'] = sprintf($txt[($context['require_agreement'] ? 'agreement_' : '') . 'agree_coppa_above'], $modSettings['coppaAge']);
 			$context['coppa_agree_below'] = sprintf($txt[($context['require_agreement'] ? 'agreement_' : '') . 'agree_coppa_below'], $modSettings['coppaAge']);
 		}
+		createToken('register');
+	}
+
+	public function action_privacypol()
+	{
+		global $context, $user_info, $modSettings;
+
+		$policy = new \PrivacyPolicy($user_info['language']);
+
+		if (isset($this->_req->post->accept_agreement))
+		{
+			$policy->accept($user_info['id'], $user_info['ip'], empty($modSettings['privacyPolicyRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacyPolicyRevision']);
+
+			$_SESSION['privacypolicy_accepted'] = true;
+			if (isset($_SESSION['privacypolicy_url_redirect']))
+			{
+				redirectexit($_SESSION['privacypolicy_url_redirect']);
+			}
+		}
+		elseif (isset($this->_req->post->no_accept))
+		{
+			redirectexit('action=profile;area=deleteaccount');
+		}
+		else
+		{
+			$context['sub_template'] = 'registration_agreement';
+			$context['register_subaction'] = 'privacypol';
+		}
+
+		loadLanguage('Login');
+		loadLanguage('Profile');
+		loadTemplate('Register');
+
+		$txt['agreement_agree'] = $txt['policy_agree'];
+		$txt['agreement_no_agree'] = $txt['policy_no_agree'];
+
+		// If you have to agree to the privacy policy, it needs to be fetched from the file.
+		$context['agreement'] = $policy->getParsedText();
+
+		$context['show_coppa'] = false;
+		$context['skip_coppa'] = true;
+		$context['show_contact_button'] = !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] === 'registration';
+
 		createToken('register');
 	}
 }

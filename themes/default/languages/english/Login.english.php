@@ -29,6 +29,7 @@ $txt['only_members_can_access'] = 'Only registered members are allowed to access
 $txt['login_below'] = 'Please login below.';
 $txt['login_below_or_register'] = 'Please login below or <a href="%1$s">register an account</a> with %2$s';
 $txt['checkbox_agreement'] = 'I accept the registration agreement';
+$txt['confirm_request_accept_agreement'] = 'Are you sure you want to force all the users to accept the agreement?';
 
 $txt['login_hash_error'] = 'Password security has recently been upgraded.<br />Please enter your password again.';
 

@@ -47,10 +47,13 @@ $txt['admin_image_text'] = 'Show buttons as images instead of text';
 $txt['admin_credits'] = 'Credits';
 $txt['admin_agreement'] = 'Show and require agreement letter when registering';
 $txt['admin_checkbox_agreement'] = 'Show a checkbox for the agreement in registration form instead of a full page';
-$txt['admin_checkbox_accept_agreement'] = 'Force members to accept the agreement at the next login';
+$txt['admin_checkbox_accept_agreement'] = 'Force all members to accept the agreement at the next visit to the forum';
 $txt['admin_agreement_default'] = 'Default';
 $txt['admin_agreement_select_language'] = 'Language to edit';
 $txt['admin_agreement_select_language_change'] = 'Change';
+
+$txt['admin_privacypol'] = 'Require to accept the privacy policy when registering';
+$txt['admin_checkbox_accept_privacypol'] = 'Force all members to accept the privacy policy at the next visit to the forum';
 
 $txt['admin_delete_members'] = 'Delete Selected Members';
 $txt['admin_change_primary_membergroup'] = 'Change primary member group';
@@ -88,6 +91,8 @@ $txt['database_password'] = 'Database Password';
 $txt['database_name'] = 'Database Name';
 $txt['registration_agreement'] = 'Registration Agreement';
 $txt['registration_agreement_desc'] = 'This agreement is shown when a user registers an account on this forum and has to be accepted before users can continue registration.';
+$txt['privacy_policy'] = 'Privacy Policy';
+$txt['privacy_policy_desc'] = 'This privacy policy is shown when a user registers an account on this forum and can be made mandatory before users can continue registration.';
 $txt['database_prefix'] = 'Database Tables Prefix';
 $txt['errors_list'] = 'Listing of forum errors';
 $txt['errors_found'] = 'The following errors are fouling up your forum';
@@ -126,6 +131,8 @@ $txt['live'] = 'Latest Software Updates';
 $txt['remove_all'] = 'Clear Log';
 $txt['agreement_not_writable'] = 'Warning - agreement.txt is not writable, any changes you make will NOT be saved.';
 $txt['agreement_backup_not_writable'] = 'Warning - the backup directory in forum_root/packages/backup cannot be created.';
+$txt['privacypol_not_writable'] = 'Warning - privacypol.txt is not writable, any changes you make will NOT be saved.';
+$txt['privacypol_backup_not_writable'] = 'Warning - the backup directory in forum_root/packages/backup cannot be created.';
 
 $txt['version_check_desc'] = 'This shows you the versions of your installation\'s files versus those of the latest version. If any of these files are out of date, you should download and upgrade to the latest version at our <a href="https://github.com/elkarte/Elkarte/wiki/downloads" target="_blank" class="new_win">ElkArte Site</a>.';
 $txt['version_check_more'] = '(more detailed)';

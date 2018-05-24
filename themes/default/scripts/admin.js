@@ -2004,3 +2004,10 @@ $(function() {
 		});
 	});
 });
+
+function confirmAgreement(text) {
+	if ($('#checkboxAcceptAgreement').is(':checked')) {
+		return confirm(text);
+	}
+	return true;
+}

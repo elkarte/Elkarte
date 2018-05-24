@@ -90,7 +90,7 @@ class Agreement
 		$backup_id = '';
 		if ($update_backup === true)
 		{
-			$backup_id = strftime('%Y-%m-%d', forum_time(false));
+			$backup_id = $this->_backupId();
 			if ($this->_createBackup($backup_id) === false)
 			{
 				$backup_id = false;
@@ -171,7 +171,7 @@ class Agreement
 		$accepted = $this->_db->fetchQuery('
 			SELECT 1
 			FROM ' . $this->_log_table_name . '
-			WHERE version = {date:version}
+			WHERE version = {string:version}
 				AND id_member = {int:id_member}',
 			array(
 				'id_member' => $id_member,
@@ -189,7 +189,7 @@ class Agreement
 		$db->insert('',
 			$this->_log_table_name,
 			array(
-				'version' => 'date',
+				'version' => 'string-20',
 				'id_member' => 'int',
 				'accepted_date' => 'date',
 				'accepted_ip' => 'string-255',
@@ -214,6 +214,21 @@ class Agreement
 	protected function normalizeLanguage()
 	{
 		return $this->_language === '' ? '' : '.' . $this->_language;
+	}
+
+	protected function _backupId()
+	{
+		$backup_id = strftime('%Y-%m-%d', forum_time(false));
+		$counter = '';
+		$merger = '';
+
+		while (file_exists($this->_backup_dir . '/' . $backup_id . $merger . $counter . '/') === true)
+		{
+			$counter++;
+			$merger = '_';
+		}
+
+		return $backup_id . $merger . $counter;
 	}
 
 	/**
