@@ -5233,7 +5233,7 @@ a.help .icon {
 	border: 1px solid;
 }
 
-#agreement_box {
+#agreement_box, #privacypol_box {
 	overflow-y: scroll;
 	margin-bottom: 2em;
 	padding: 8px;

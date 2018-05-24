@@ -21,34 +21,54 @@ function template_registration_agreement()
 	global $context, $scripturl, $txt;
 
 	echo '
-		<form action="', $scripturl, '?action=register" method="post" accept-charset="UTF-8" id="registration">
-			<h2 class="category_header">', $txt['registration_agreement'];
+		<form action="', $scripturl, '?action=register" method="post" accept-charset="UTF-8" id="registration">';
 
 	if (!empty($context['languages']))
 	{
 		if (count($context['languages']) === 1)
+		{
 			foreach ($context['languages'] as $lang_key => $lang_val)
+			{
 				echo '
 				<input type="hidden" name="lngfile" value="', $lang_key, '" />';
+			}
+		}
 		else
 		{
 			echo '
 				<select onchange="this.form.submit()" class="floatright" name="lngfile">';
 
 			foreach ($context['languages'] as $lang_key => $lang_val)
+			{
 				echo '
 					<option value="', $lang_key, '"', empty($lang_val['selected']) ? '' : ' selected="selected"', '>', $lang_val['name'], '</option>';
+			}
 
 			echo '
 				</select>';
 		}
 	}
 
-	echo '
-			</h2>
+	if (!empty($context['agreement']))
+	{
+		echo '
+			<h2 class="category_header">', $txt['registration_agreement'], '</h2>
 			<div class="well">
 				<p>', $context['agreement'], '</p>
-			</div>
+			</div>';
+	}
+
+	if (!empty($context['privacy_policy']))
+	{
+		echo '
+			<h2 class="category_header">', $txt['registration_privacy_policy'], '
+			</h2>
+			<div class="well">
+				<p>', $context['privacy_policy'], '</p>
+			</div>';
+	}
+
+	echo '
 			<div id="confirm_buttons" class="submitbutton centertext">';
 
 	// Age restriction in effect?
@@ -410,11 +430,23 @@ function template_registration_form()
 			<fieldset class="content">
 				<div id="agreement_box">
 					', $context['agreement'], '
-				</div>';
+				</div>
+				<label for="checkbox_agreement">
+					<input type="checkbox" name="checkbox_agreement" id="checkbox_agreement" value="1"', ($context['registration_passed_agreement'] ? ' checked="checked"' : ''), ' tabindex="', $context['tabindex']++, '" />
+					', $txt['checkbox_agreement'], '
+				</label>
+				<div id="privacypol_box">
+					', $context['privacy_policy'], '
+				</div>
+				<label for="checkbox_privacypol">
+					<input type="checkbox" name="checkbox_privacypol" id="checkbox_privacypol" value="1"', ($context['registration_passed_privacypol'] ? ' checked="checked"' : ''), ' tabindex="', $context['tabindex']++, '" />
+					', $txt['checkbox_privacypol'], '
+				</label>';
 
 		if (!empty($context['languages']))
 		{
 			echo '
+				<br />
 				<select id="agreement_lang" class="input_select">';
 			foreach ($context['languages'] as $key => $val)
 			{
@@ -425,10 +457,6 @@ function template_registration_form()
 				</select>';
 		}
 		echo '
-				<label for="checkbox_agreement">
-					<input type="checkbox" name="checkbox_agreement" id="checkbox_agreement" value="1"', ($context['registration_passed_agreement'] ? ' checked="checked"' : ''), ' tabindex="', $context['tabindex']++, '" />
-					', $txt['checkbox_agreement'], '
-				</label>
 			</fieldset>';
 	}
 
@@ -437,17 +465,23 @@ function template_registration_form()
 
 	// Age restriction in effect?
 	if ((!$context['require_agreement'] || $context['checkbox_agreement']) && $context['show_coppa'])
+	{
 		echo '
 				<input type="submit" name="accept_agreement" value="', $context['coppa_agree_above'], '" />
 				<br /><br />
 				<input type="submit" name="accept_agreement_coppa" value="', $context['coppa_agree_below'], '" />';
+	}
 	else
+	{
 		echo '
 				<input type="submit" name="regSubmit" value="', $txt['register'], '" tabindex="', $context['tabindex']++, '" />';
+	}
 
 	if ($context['show_contact_button'])
+	{
 		echo '
 				<input type="submit" name="show_contact" value="', $txt['contact'], '" />';
+	}
 
 	echo '
 			</div>

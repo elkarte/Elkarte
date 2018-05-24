@@ -133,7 +133,9 @@ class Register_Controller extends Action_Controller
 		// Do we need them to agree to the registration agreement, first?
 		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
 		$context['checkbox_agreement'] = !empty($modSettings['checkboxAgreement']);
+		$context['require_privacypol'] = !empty($modSettings['requirePrivacypolicy']);
 		$context['registration_passed_agreement'] = !empty($_SESSION['registration_agreed']);
+		$context['registration_passed_privacypol'] = !empty($_SESSION['registration_privacypolicy']);
 		$context['show_coppa'] = !empty($modSettings['coppaAge']);
 		$context['show_contact_button'] = !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] === 'registration';
 		if (!empty($modSettings['show_DisplayNameOnRegistration']))
@@ -161,6 +163,7 @@ class Register_Controller extends Action_Controller
 		if ($current_step == 1 && (isset($this->_req->post->accept_agreement) || isset($this->_req->post->accept_agreement_coppa)))
 		{
 			$context['registration_passed_agreement'] = $_SESSION['registration_agreed'] = true;
+			$context['registration_passed_privacypol'] = $_SESSION['registration_privacypolicy'] = true;
 			$current_step = 2;
 
 			// Skip the coppa procedure if the user says he's old enough.
@@ -223,6 +226,23 @@ class Register_Controller extends Action_Controller
 			Errors::instance()->log_error($txt['registration_agreement_missing'], 'critical');
 			throw new Elk_Exception('registration_disabled', false);
 		}
+
+		if (!empty($context['require_privacypol']))
+		{
+			$privacypol = new \PrivacyPolicy($user_info['language']);
+			$context['privacy_policy'] = $privacypol->getParsedText();
+
+			if (empty($context['privacy_policy']))
+			{
+				// No file found or a blank file, log the error so the admin knows there is a problem!
+				loadLanguage('Errors');
+				Errors::instance()->log_error($txt['registration_privacy_policy_missing'], 'critical');
+				throw new Elk_Exception('registration_disabled', false);
+			}
+		}
+
+		// If we have language support enabled then they need to be loaded
+		$this->_load_language_support();
 
 		// Any custom or standard profile fields we want filled in during registration?
 		$this->_load_profile_fields();
@@ -287,6 +307,13 @@ class Register_Controller extends Action_Controller
 
 		// Well, if you don't agree, you can't register.
 		if (!empty($modSettings['requireAgreement']) && empty($_SESSION['registration_agreed']))
+			redirectexit();
+
+		if (!empty($modSettings['requireAgreement']) && !empty($modSettings['requirePrivacypolicy']) && !empty($this->_req->post->checkbox_privacypol))
+			$_SESSION['registration_privacypolicy'] = true;
+
+		// Well, if you don't agree, you can't register.
+		if (!empty($modSettings['requireAgreement']) && !empty($modSettings['requirePrivacypolicy']) && empty($_SESSION['registration_privacypolicy']))
 			redirectexit();
 
 		// Make sure they came from *somewhere*, have a session.
@@ -491,6 +518,16 @@ class Register_Controller extends Action_Controller
 		$regOptions['ip'] = $user_info['ip'];
 		$regOptions['ip2'] = $req->ban_ip();
 		$memberID = registerMember($regOptions, 'register');
+
+		$lang = !empty($modSettings['userLanguage']) ? $modSettings['userLanguage'] : 'english';
+		$agreement = new Agreement($lang);
+		$agreement->accept($memberID, $user_info['ip'], empty($modSettings['agreementRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
+
+		if (!empty($modSettings['requirePrivacypolicy']))
+		{
+			$policy = new \PrivacyPolicy($lang);
+			$policy->accept($memberID, $user_info['ip'], empty($modSettings['privacyPolicyRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacyPolicyRevision']);
+		}
 
 		// If there are "important" errors and you are not an admin: log the first error
 		// Otherwise grab all of them and don't log anything
@@ -1245,7 +1282,7 @@ class Register_Controller extends Action_Controller
 
 	public function action_agreement()
 	{
-		global $context, $user_info, $modSettings;
+		global $context, $user_info, $modSettings, $txt;
 
 		if (isset($this->_req->post->accept_agreement))
 		{
@@ -1274,6 +1311,7 @@ class Register_Controller extends Action_Controller
 		// If you have to agree to the agreement, it needs to be fetched from the file.
 		$agreement = new \Agreement($user_info['language']);
 		$context['agreement'] = $agreement->getParsedText();
+		$context['page_title'] = $txt['registration_agreement'];
 
 		$context['show_coppa'] = !empty($modSettings['coppaAge']);
 		$context['show_contact_button'] = !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] === 'registration';
@@ -1289,7 +1327,7 @@ class Register_Controller extends Action_Controller
 
 	public function action_privacypol()
 	{
-		global $context, $user_info, $modSettings;
+		global $context, $user_info, $modSettings, $txt;
 
 		$policy = new \PrivacyPolicy($user_info['language']);
 
@@ -1319,6 +1357,8 @@ class Register_Controller extends Action_Controller
 
 		$txt['agreement_agree'] = $txt['policy_agree'];
 		$txt['agreement_no_agree'] = $txt['policy_no_agree'];
+		$txt['registration_agreement'] = $txt['registration_privacy_policy'];
+		$context['page_title'] = $txt['registration_agreement'];
 
 		// If you have to agree to the privacy policy, it needs to be fetched from the file.
 		$context['agreement'] = $policy->getParsedText();

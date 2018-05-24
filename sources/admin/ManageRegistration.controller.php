@@ -381,14 +381,13 @@ class ManageRegistration_Controller extends Action_Controller
 				}
 			}
 
-			updateSettings(array('requirePrivacypolicy' => !empty($this->_req->post->requireAgreement), 'checkboxPrivacypolicy' => !empty($this->_req->post->checkboxAgreement)));
+			updateSettings(array('requirePrivacypolicy' => !empty($this->_req->post->requireAgreement)));
 		}
 
 		$context['agreement'] = Util::htmlspecialchars($privacypol->getPlainText(false));
 
 		$context['warning'] .= $privacypol->isWritable() ? '' : $txt['privacypol_not_writable'];
 		$context['require_agreement'] = !empty($modSettings['requirePrivacypolicy']);
-		$context['checkbox_agreement'] = !empty($modSettings['checkboxPrivacypolicy']);
 
 		$context['sub_template'] = 'edit_agreement';
 		$context['subaction'] = 'privacypol';
