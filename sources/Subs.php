@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.3
+ * @version 1.1.4
  *
  */
 
@@ -2058,23 +2058,10 @@ function theme()
  */
 function dieGif($expired = false)
 {
-	// The following logging is just for debug, it should be removed before final
-	// or at least once the bug is fixes #2391
-	$filename = '';
-	$linenum = '';
-	if (headers_sent($filename, $linenum))
+	// The following is an attempt at stopping the behavior identified in #2391
+	if (function_exists('fastcgi_finish_request'))
 	{
-		if (empty($filename))
-		{
-			if (ob_get_level() > 0)
-			{
-				ob_clean();
-			}
-		}
-		else
-		{
-			Errors::instance()->log_error('Headers already sent in ' . $filename . ' at line ' . $linenum);
-		}
+		die();
 	}
 
 	if ($expired === true)
