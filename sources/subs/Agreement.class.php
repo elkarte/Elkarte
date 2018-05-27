@@ -90,17 +90,29 @@ class Agreement
 		$backup_id = '';
 		if ($update_backup === true)
 		{
-			$backup_id = $this->_backupId();
-			if ($this->_createBackup($backup_id) === false)
-			{
-				$backup_id = false;
-			}
+			$backup_id = $this->storeBackup();
 		}
 
 		// Off it goes to the agreement file.
 		$fp = fopen(BOARDDIR . '/' . $this->_file_name . $this->normalizeLanguage() . '.txt', 'w');
 		fwrite($fp, str_replace("\r", '', $text));
 		fclose($fp);
+
+		return $backup_id;
+	}
+
+	/**
+	 * Creates a backup of the current version of the agreement/s.
+	 *
+	 * @return string|bool the backup_id if successful, false if creating the backup fails
+	 */
+	public function storeBackup()
+	{
+		$backup_id = $this->_backupId();
+		if ($this->_createBackup($backup_id) === false)
+		{
+			$backup_id = false;
+		}
 
 		return $backup_id;
 	}
@@ -242,9 +254,9 @@ class Agreement
 		$destination = $this->_backup_dir . '/' . $backup_id . '/';
 		if (file_exists($this->_backup_dir) === false)
 		{
-			mkdir($this->_backup_dir);
+			@mkdir($this->_backup_dir);
 		}
-		if (mkdir($destination) === false)
+		if (@mkdir($destination) === false)
 		{
 			return false;
 		}

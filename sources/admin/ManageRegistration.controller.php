@@ -377,7 +377,7 @@ class ManageRegistration_Controller extends Action_Controller
 				}
 				else
 				{
-					updateSettings(array('agreementRevision' => $success));
+					updateSettings(array('privacypolicyRevision' => $success));
 				}
 			}
 

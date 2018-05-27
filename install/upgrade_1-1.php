@@ -905,6 +905,26 @@ class UpgradeInstructions_upgrade_1_1
 						'ignore'
 					);
 				}
+			),
+			array(
+				'debug_title' => 'Preparing first status...',
+				'function' => function()
+				{
+					// Better safe, than sorry, just in case the autoloader doesn't cope well with the upgrade
+					require_once(SUBSDIR . '/Agreement.class.php');
+					require_once(SUBSDIR . '/PrivacyPolicy.class.php');
+
+					$agreement = new \Agreement('english');
+					$success = $agreement->storeBackup();
+					updateSettings(array('agreementRevision' => $success));
+
+					if (file_exists(BOARDDIR . '/privacypolicy.txt'))
+					{
+						$privacypol = new \PrivacyPolicy('english');
+						$success = $privacypol->storeBackup();
+						updateSettings(array('privacypolicyRevision' => $success));
+					}
+				}
 			)
 		);
 	}
