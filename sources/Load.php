@@ -433,16 +433,33 @@ function loadUserSettings()
 	if ($user_info['is_guest'] === false)
 	{
 		$http_request = HttpReq::instance();
-		if (!empty($modSettings['agreementRevision']) && !empty($modSettings['requireAgreement']) && in_array($http_request->action, array('reminder', 'register')) === false)
+		if (!empty($modSettings['force_accept_agreement']))
 		{
-			if ($http_request->action !== 'profile' || $http_request->area !== 'deleteaccount')
+			if (!empty($modSettings['agreementRevision']) && !empty($modSettings['requireAgreement']) && in_array($http_request->action, array('reminder', 'register')) === false)
 			{
-				$agreement = new Agreement($user_info['language']);
-				if (false === $agreement->checkAccepted($id_member, $modSettings['agreementRevision']))
+				if ($http_request->action !== 'profile' || $http_request->area !== 'deleteaccount')
 				{
-					
-					setOldUrl('agreement_url_redirect');
-					redirectexit('action=register;sa=agreement', true);
+					$agreement = new \Agreement($user_info['language']);
+					if (false === $agreement->checkAccepted($id_member, $modSettings['agreementRevision']))
+					{
+						setOldUrl('agreement_url_redirect');
+						redirectexit('action=register;sa=agreement', true);
+					}
+				}
+			}
+		}
+		if (!empty($modSettings['force_accept_privacy_policy']))
+		{
+			if (!empty($modSettings['privacypolicyRevision']) && !empty($modSettings['requirePrivacypolicy']) && in_array($http_request->action, array('reminder', 'register')) === false)
+			{
+				if ($http_request->action !== 'profile' || $http_request->area !== 'deleteaccount')
+				{
+					$privacypol = new \PrivacyPolicy($user_info['language']);
+					if (false === $privacypol->checkAccepted($id_member, $modSettings['agreementRevision']))
+					{
+						setOldUrl('agreement_url_redirect');
+						redirectexit('action=register;sa=agreement', true);
+					}
 				}
 			}
 		}

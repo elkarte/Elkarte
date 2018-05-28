@@ -81,6 +81,8 @@ $txt['setting_registration_standard'] = 'Immediate Registration';
 $txt['setting_registration_activate'] = 'Email Activation';
 $txt['setting_registration_approval'] = 'Admin Approval';
 $txt['setting_notify_new_registration'] = 'Notify administrators when a new member joins';
+$txt['setting_force_accept_agreement'] = 'Force members to accept the registration agreement when changed';
+$txt['force_accept_privacy_policy'] = 'Force members to accept the privacy policy when changed';
 $txt['setting_send_welcomeEmail'] = 'Send welcome email to new members';
 $txt['setting_show_DisplayNameOnRegistration'] = 'Allow users to enter their screen name';
 

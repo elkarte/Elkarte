@@ -520,6 +520,8 @@ class ManageRegistration_Controller extends Action_Controller
 			array('select', 'registration_method', array($txt['setting_registration_standard'], $txt['setting_registration_activate'], $txt['setting_registration_approval'], $txt['setting_registration_disabled'])),
 			array('check', 'enableOpenID'),
 			array('check', 'notify_new_registration'),
+			array('check', 'force_accept_agreement'),
+			array('check', 'force_accept_privacy_policy'),
 			array('check', 'send_welcomeEmail'),
 			array('check', 'show_DisplayNameOnRegistration'),
 			'',
