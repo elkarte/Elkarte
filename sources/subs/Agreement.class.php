@@ -198,7 +198,7 @@ class Agreement
 	{
 		$db = database();
 
-		$db->insert('',
+		$db->insert('ignore',
 			$this->_log_table_name,
 			array(
 				'version' => 'string-20',

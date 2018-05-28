@@ -1294,6 +1294,10 @@ class Register_Controller extends Action_Controller
 			{
 				redirectexit($_SESSION['agreement_url_redirect']);
 			}
+			else
+			{
+				redirectexit();
+			}
 		}
 		elseif (isset($this->_req->post->no_accept))
 		{
@@ -1339,6 +1343,10 @@ class Register_Controller extends Action_Controller
 			if (isset($_SESSION['privacypolicy_url_redirect']))
 			{
 				redirectexit($_SESSION['privacypolicy_url_redirect']);
+			}
+			else
+			{
+				redirectexit();
 			}
 		}
 		elseif (isset($this->_req->post->no_accept))

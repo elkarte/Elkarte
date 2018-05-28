@@ -402,19 +402,6 @@ function template_uc_news_fader()
 }
 
 /**
- * All your data are belong to us (cit.)
- */
-function template_uc_agreement_accepted()
-{
-	global $txt;
-
-	echo '
-			<div id="agreement">
-				<h2>', $txt['agreement_accepted'], '</h2>
-			</div>';
-}
-
-/**
  * Section down the page, before closing body
  */
 function template_body_below()

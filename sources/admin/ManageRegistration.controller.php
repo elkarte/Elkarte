@@ -321,8 +321,8 @@ class ManageRegistration_Controller extends Action_Controller
 	 * Allows the administrator to edit the privacy policy, and choose whether
 	 * it should be shown or not.
 	 *
-	 * - It writes and saves the privacy policy to the privacypol.txt file.
-	 * - Accessed by ?action=admin;area=regcenter;sa=privacypol.
+	 * - It writes and saves the privacy policy to the privacypolicy.txt file.
+	 * - Accessed by ?action=admin;area=regcenter;sa=privacypol
 	 * - Requires the admin_forum permission.
 	 *
 	 * @uses Admin template and the edit_agreement sub template.
@@ -332,7 +332,7 @@ class ManageRegistration_Controller extends Action_Controller
 		// I hereby agree not to be a lazy bum.
 		global $txt, $context, $modSettings;
 
-		// By default we look at privacypol.txt.
+		// By default we look at privacypolicy.txt.
 		$context['current_agreement'] = '';
 
 		// Is there more than one to edit?
@@ -346,7 +346,7 @@ class ManageRegistration_Controller extends Action_Controller
 		// Try to figure out if we have more agreements.
 		foreach ($languages as $lang)
 		{
-			if (file_exists(BOARDDIR . '/privacypol.' . $lang['filename'] . '.txt'))
+			if (file_exists(BOARDDIR . '/privacypolicy.' . $lang['filename'] . '.txt'))
 			{
 				$context['editable_agreements'][$lang['filename']] = $lang['name'];
 
@@ -395,6 +395,7 @@ class ManageRegistration_Controller extends Action_Controller
 		// These overrides are here to be able to reuse the template in a simple way without having to change much.
 		$txt['admin_agreement'] = $txt['admin_privacypol'];
 		$txt['admin_checkbox_accept_agreement'] = $txt['admin_checkbox_accept_privacypol'];
+		$txt['confirm_request_accept_agreement'] = $txt['confirm_request_accept_privacy_policy'];
 
 		createToken('admin-rega');
 	}

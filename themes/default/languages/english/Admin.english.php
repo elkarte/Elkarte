@@ -52,7 +52,7 @@ $txt['admin_agreement_default'] = 'Default';
 $txt['admin_agreement_select_language'] = 'Language to edit';
 $txt['admin_agreement_select_language_change'] = 'Change';
 
-$txt['admin_privacypol'] = 'Require to accept the privacy policy when registering';
+$txt['admin_privacypol'] = 'Show and require accepting the privacy policy when registering';
 $txt['admin_checkbox_accept_privacypol'] = 'Force all members to accept this new version of the privacy policy at the next visit to the forum';
 
 $txt['admin_delete_members'] = 'Delete Selected Members';
@@ -129,9 +129,9 @@ $txt['attachmentdir_files_not_set'] = 'No directory file limit is currently set'
 $txt['attachment_delete_admin'] = '[attachment deleted by admin]';
 $txt['live'] = 'Latest Software Updates';
 $txt['remove_all'] = 'Clear Log';
-$txt['agreement_not_writable'] = 'Warning - agreement.txt is not writable, any changes you make will NOT be saved.';
+$txt['agreement_not_writable'] = 'Warning - agreement.txt is not writable any changes you make will NOT be saved.';
 $txt['agreement_backup_not_writable'] = 'Warning - the backup directory in forum_root/packages/backup cannot be created.';
-$txt['privacypol_not_writable'] = 'Warning - privacypol.txt is not writable, any changes you make will NOT be saved.';
+$txt['privacypol_not_writable'] = 'Warning - privacypolicy.txt is not writable any changes you make will NOT be saved.';
 $txt['privacypol_backup_not_writable'] = 'Warning - the backup directory in forum_root/packages/backup cannot be created.';
 
 $txt['version_check_desc'] = 'This shows you the versions of your installation\'s files versus those of the latest version. If any of these files are out of date, you should download and upgrade to the latest version at our <a href="https://github.com/elkarte/Elkarte/wiki/downloads" target="_blank" class="new_win">ElkArte Site</a>.';

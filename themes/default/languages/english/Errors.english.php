@@ -429,4 +429,4 @@ $txt['error_sa_not_set'] = 'The Sub-action you requested is not defined';
 // Drag / Drop sort errors
 $txt['no_sortable_items'] = 'No sortable items were found';
 
-$txt['error_invalid_notification_id'] = 'An addons is trying to register a notification method with an existing ID. ID lower than 5 are protected and cannot be used by addons, if the ID is higher, than two addons may be sharing the same ID.';
+$txt['error_invalid_notification_id'] = 'An addon is trying to register a notification method with an existing ID. IDs lower than 5 are protected and cannot be used by addons. If the ID is higher, then two addons may be sharing the same ID.';

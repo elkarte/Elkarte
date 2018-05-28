@@ -455,10 +455,10 @@ function loadUserSettings()
 				if ($http_request->action !== 'profile' || $http_request->area !== 'deleteaccount')
 				{
 					$privacypol = new \PrivacyPolicy($user_info['language']);
-					if (false === $privacypol->checkAccepted($id_member, $modSettings['agreementRevision']))
+					if (false === $privacypol->checkAccepted($id_member, $modSettings['privacypolicyRevision']))
 					{
 						setOldUrl('agreement_url_redirect');
-						redirectexit('action=register;sa=agreement', true);
+						redirectexit('action=register;sa=privacypol', true);
 					}
 				}
 			}
@@ -1656,12 +1656,20 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	if (!empty($_SESSION['agreement_accepted']))
 	{
-		// This loadLanguage is needed here because the check is done way too early in the process.
-		// As a stop-gap it's fine, but in future versions it should be fixed somehow.
 		$_SESSION['agreement_accepted'] = null;
 		$context['accepted_agreement'] = array(
 			'errors' => array(
 				'accepted_agreement' => $txt['agreement_accepted']
+			)
+		);
+	}
+
+	if (!empty($_SESSION['privacypolicy_accepted']))
+	{
+		$_SESSION['privacypolicy_accepted'] = null;
+		$context['accepted_agreement'] = array(
+			'errors' => array(
+				'accepted_privacy_policy' => $txt['privacypolicy_accepted']
 			)
 		);
 	}
