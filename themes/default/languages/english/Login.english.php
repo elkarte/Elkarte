@@ -34,7 +34,7 @@ $txt['login_below_or_register'] = 'Please login below or <a href="%1$s">register
 $txt['checkbox_agreement'] = 'I accept the registration agreement';
 $txt['checkbox_privacypol'] = 'I accept the privacy policy';
 $txt['confirm_request_accept_agreement'] = 'Are you sure you want to force all members to accept the agreement?';
-$txt['confirm_request_accept_privacy_policy'] = 'Are you sure you want to force all members to accept the prvacy policy?';
+$txt['confirm_request_accept_privacy_policy'] = 'Are you sure you want to force all members to accept the privacy policy?';
 
 $txt['login_hash_error'] = 'Password security has recently been upgraded.<br />Please enter your password again.';
 
