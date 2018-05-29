@@ -262,7 +262,7 @@ class ManageAttachments_Controller extends Action_Controller
 		$context['attachmentUploadDir'] = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
 
 		// First time here?
-		if (empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && count($modSettings['attachmentUploadDir']) == 1)
+		if (empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && (is_array($modSettings['attachmentUploadDir']) && count($modSettings['attachmentUploadDir']) == 1))
 			$modSettings['attachmentUploadDir'] = $modSettings['attachmentUploadDir'][1];
 
 		// If not set, show a default path for the base directory
