@@ -795,6 +795,21 @@ function template_show_error($error_id)
 					</div>';
 }
 
+function template_uc_generic_infobox()
+{
+	global $context;
+
+	if (empty($context['generic_infobox']))
+	{
+		return;
+	}
+
+	foreach ($context['generic_infobox'] as $key)
+	{
+		template_show_error($key);
+	}
+}
+
 /**
  * Another used and abused piece of template that can be found everywhere
  *

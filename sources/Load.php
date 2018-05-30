@@ -430,6 +430,40 @@ function loadUserSettings()
 	else
 		$user_info['query_wanna_see_board'] = '(' . $user_info['query_see_board'] . ' AND b.id_board NOT IN (' . implode(',', $user_info['ignoreboards']) . '))';
 
+	if ($user_info['is_guest'] === false)
+	{
+		$http_request = HttpReq::instance();
+		if (!empty($modSettings['force_accept_agreement']))
+		{
+			if (!empty($modSettings['agreementRevision']) && !empty($modSettings['requireAgreement']) && in_array($http_request->action, array('reminder', 'register')) === false)
+			{
+				if ($http_request->action !== 'profile' || $http_request->area !== 'deleteaccount')
+				{
+					$agreement = new \Agreement($user_info['language']);
+					if (false === $agreement->checkAccepted($id_member, $modSettings['agreementRevision']))
+					{
+						setOldUrl('agreement_url_redirect');
+						redirectexit('action=register;sa=agreement', true);
+					}
+				}
+			}
+		}
+		if (!empty($modSettings['force_accept_privacy_policy']))
+		{
+			if (!empty($modSettings['privacypolicyRevision']) && !empty($modSettings['requirePrivacypolicy']) && in_array($http_request->action, array('reminder', 'register')) === false)
+			{
+				if ($http_request->action !== 'profile' || $http_request->area !== 'deleteaccount')
+				{
+					$privacypol = new \PrivacyPolicy($user_info['language']);
+					if (false === $privacypol->checkAccepted($id_member, $modSettings['privacypolicyRevision']))
+					{
+						setOldUrl('agreement_url_redirect');
+						redirectexit('action=register;sa=privacypol', true);
+					}
+				}
+			}
+		}
+	}
 	call_integration_hook('integrate_user_info');
 }
 
@@ -1619,6 +1653,26 @@ function loadTheme($id_theme = 0, $initialize = true)
 			'rss' => $scripturl . '?action=.xml;type=rss2;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5),
 			'atom' => $scripturl . '?action=.xml;type=atom;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5)
 		);
+
+	if (!empty($_SESSION['agreement_accepted']))
+	{
+		$_SESSION['agreement_accepted'] = null;
+		$context['accepted_agreement'] = array(
+			'errors' => array(
+				'accepted_agreement' => $txt['agreement_accepted']
+			)
+		);
+	}
+
+	if (!empty($_SESSION['privacypolicy_accepted']))
+	{
+		$_SESSION['privacypolicy_accepted'] = null;
+		$context['accepted_agreement'] = array(
+			'errors' => array(
+				'accepted_privacy_policy' => $txt['privacypolicy_accepted']
+			)
+		);
+	}
 
 	theme()->loadThemeJavascript();
 

@@ -86,6 +86,9 @@ $txt['openid_secret_reminder'] = 'Please enter your answer to the question below
 $txt['reminder_openid_is'] = 'The OpenID identity associated with your account is:<br />&nbsp;&nbsp;&nbsp;&nbsp;<strong>%1$s</strong><br /><br />Please make a note of this for future reference.';
 $txt['reminder_continue'] = 'Continue';
 
+$txt['accept_agreement_title'] = 'Accept agreement';
+$txt['agreement_accepted_title'] = 'Continue';
+
 $txt['current_theme'] = 'Current Theme';
 $txt['change'] = 'Change Theme';
 $txt['theme_forum_default'] = 'Forum or Board Default';
