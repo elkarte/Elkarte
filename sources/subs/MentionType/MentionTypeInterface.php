@@ -75,6 +75,8 @@ interface Mention_Type_Interface
 	 * @param string|null $time optional value to set the time of the mention, defaults to now
 	 * @param int|null $status optional value to set a status, defaults to 0
 	 * @param bool|null $is_accessible optional if the mention is accessible to the user
+	 *
+	 * @return int[] An array of members id
 	 */
 	public function insert($member_from, $members_to, $target, $time = null, $status = null, $is_accessible = null);
 
