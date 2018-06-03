@@ -787,15 +787,15 @@ strong, .bbc_strong {
 }
 
 .bbc_img.floatleft {
-	padding-right: .25em;
+	padding: .1em .75em .1em 0;
 }
 
 .bbc_img.floatright {
-	padding-left: .25em;
+	padding: .1em 0 .1em .75em;
 }
 
 .bbc_img.floatcenter {
-	padding: 0 .25em;
+	padding: .5em .25em;
 }
 
 .bbc_table {
