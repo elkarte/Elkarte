@@ -69,7 +69,7 @@ class Rlikemsg_Mention extends Mention_BoardAccess_Abstract
 	{
 		if ($this->_task['source_data']['rlike_notif'])
 		{
-			parent::insert($member_from, $members_to, $target, $time, $status, $is_accessible);
+			return parent::insert($member_from, $members_to, $target, $time, $status, $is_accessible);
 		}
 		else
 		{
@@ -91,6 +91,8 @@ class Rlikemsg_Mention extends Mention_BoardAccess_Abstract
 					'unread' => 0,
 				)
 			);
+
+			return array();
 		}
 	}
 }

@@ -26,9 +26,12 @@ if (!defined('STDIN'))
 // Any output here is not good
 error_reporting(0);
 
+global $ssi_guest_access;
+
 // Need to bootstrap to do much
 require_once(__DIR__ . '/bootstrap.php');
-new Bootstrap();
+$ssi_guest_access = true;
+new Bootstrap(true);
 
 // No need to ID the server if we fall on our face :)
 $_SERVER['SERVER_SOFTWARE'] = '';

@@ -526,7 +526,7 @@ class Register_Controller extends Action_Controller
 		if (!empty($modSettings['requirePrivacypolicy']))
 		{
 			$policy = new \PrivacyPolicy($lang);
-			$policy->accept($memberID, $user_info['ip'], empty($modSettings['privacyPolicyRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacyPolicyRevision']);
+			$policy->accept($memberID, $user_info['ip'], empty($modSettings['privacypolicyRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacypolicyRevision']);
 		}
 
 		// If there are "important" errors and you are not an admin: log the first error
@@ -1337,7 +1337,7 @@ class Register_Controller extends Action_Controller
 
 		if (isset($this->_req->post->accept_agreement))
 		{
-			$policy->accept($user_info['id'], $user_info['ip'], empty($modSettings['privacyPolicyRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacyPolicyRevision']);
+			$policy->accept($user_info['id'], $user_info['ip'], empty($modSettings['privacypolicyRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacypolicyRevision']);
 
 			$_SESSION['privacypolicy_accepted'] = true;
 			if (isset($_SESSION['privacypolicy_url_redirect']))
