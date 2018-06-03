@@ -60,7 +60,7 @@ if (!defined('ELKBOOT'))
 	define('ELK', 'SSI');
 
 	require_once(dirname(__FILE__) . '/bootstrap.php');
-	$bootstrap = new Bootstrap();
+	$bootstrap = new Bootstrap(true);
 }
 
 // The globals that were created during the bootstrap process

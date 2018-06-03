@@ -18,8 +18,11 @@ error_reporting(0);
 // Being run as a cron job
 if (!defined('ELK'))
 {
+	global $ssi_guest_access;
+
 	require_once(__DIR__ . '/bootstrap.php');
-	new Bootstrap();
+	$ssi_guest_access = true;
+	new Bootstrap(true);
 	postbyemail_imap();
 
 	// Need to keep the cli clean on return
