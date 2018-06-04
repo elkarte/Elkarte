@@ -876,7 +876,7 @@ a.bbc_link {
 	display: inline-block;
 	overflow: hidden;
 	max-width: 100%;
-	vertical-align: middle;
+	vertical-align: top;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	word-wrap: normal;
