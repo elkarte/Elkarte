@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.4
  *
  */
 
@@ -140,7 +140,7 @@ class Unread
 			$this->_recent_log_topics_unread_tempTable();
 		else
 		{
-			$board = !empty($this->_query_parameters['boards'][0]) ? $this->_query_parameters['boards'][0] : 0;
+			$board = !empty($this->_query_parameters['boards'][0]) && count($this->_query_parameters['boards']) === 1 ? $this->_query_parameters['boards'][0] : 0;
 
 			$this->_unreadreplies_tempTable($board);
 		}
