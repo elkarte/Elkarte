@@ -767,7 +767,7 @@ function template_edit_agreement()
 
 	// Just a big box to edit the text file ;).
 	echo '
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=regcenter" method="post" accept-charset="UTF-8" onsubmit="return confirmAgreement(', javaScriptEscape($txt['confirm_request_accept_agreement']), ');">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=regcenter" method="post" accept-charset="UTF-8" onsubmit="return confirmAgreement(', JavaScriptEscape($txt['confirm_request_accept_agreement']), ');">
 			<h2 class="category_header">', $context['page_title'], '</h2>';
 
 	// Warning for if the file isn't writable.
