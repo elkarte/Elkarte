@@ -210,6 +210,11 @@ function getFilesChanged($from, $to)
 			continue;
 		}
 
+		if (strpos($file, 'docs/') !== false)
+		{
+			continue;
+		}
+
 		if (strpos($file, '/images') !== false)
 		{
 			continue;
@@ -225,7 +230,17 @@ function getFilesChanged($from, $to)
 			continue;
 		}
 
+		if (strpos($file, '.txt') !== false)
+		{
+			continue;
+		}
+
 		if ($file === 'index.php')
+		{
+			continue;
+		}
+
+		if ($file === 'ssi_examples.php')
 		{
 			continue;
 		}
