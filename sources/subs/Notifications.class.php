@@ -235,7 +235,7 @@ class Notifications extends AbstractModel
 		$last_id = $obj->getLastId();
 		foreach ($bodies as $body)
 		{
-			if (in_array($this->_to_actually_mention[$task['notification_type']], $body['id_member_to']))
+			if (in_array($body['id_member_to'], $this->_to_actually_mention[$task['notification_type']]))
 			{
 				sendmail($body['email_address'], $body['subject'], $body['body'], null, $last_id);
 			}
@@ -253,7 +253,7 @@ class Notifications extends AbstractModel
 	{
 		foreach ($bodies as $body)
 		{
-			if (in_array($this->_to_actually_mention[$task['notification_type']], $body['id_member_to']))
+			if (in_array($body['id_member_to'], $this->_to_actually_mention[$task['notification_type']]))
 			{
 				$this->_insert_delayed(array(
 					$task['notification_type'],
