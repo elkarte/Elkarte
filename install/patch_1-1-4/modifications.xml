@@ -2115,6 +2115,22 @@ class Recent_Controller extends Action_Controller implements Frontpage_Interface
 	</file>
 	<file name="SUBSDIR/Attachments.subs.php">
 		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.2
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.1.4
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[ * @param int $old_id_thumb = 0
  * @return array The updated information
  */
