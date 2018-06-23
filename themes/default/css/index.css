@@ -1661,10 +1661,12 @@ a.bbc_link {
 
 /* The quick buttons. */
 .quickbuttons {
-	clear: both;
 	margin: 8px 0 6px 0;
 	padding-top: .5em;
 	text-align: right;
+}
+nav > .quickbuttons {
+	clear: both;
 }
 
 .quickbuttons li {
