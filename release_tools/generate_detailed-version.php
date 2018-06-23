@@ -230,6 +230,11 @@ function getFilesChanged($from, $to)
 			continue;
 		}
 
+		if (strpos($file, 'packages') !== false)
+		{
+			continue;
+		}
+
 		if (strpos($file, '.txt') !== false)
 		{
 			continue;
