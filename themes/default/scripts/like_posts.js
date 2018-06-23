@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.4
  */
 
 /**
@@ -411,7 +411,7 @@
 
 					// Posts from the topic itself
 					for (var j = 0, topiclen =  data[i].msg_data.length; j < topiclen; j++) {
-						msgUrl = topicUrl + '.msg' +  data[i].msg_data[j].id_msg;
+						msgUrl = topicUrl + '.msg' +  data[i].msg_data[j].id_msg + '#msg' + data[i].msg_data[j].id_msg;
 
 						htmlContent += '' +
 							'   <div class="content forumposts">' +

@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.4
  *
  */
 
@@ -104,6 +104,8 @@ class Mentioning extends AbstractModel
 	 * @param ElkArte\sources\subs\MentionType\Mention_Type_Interface $mention_obj The object that knows how to store
 	 *  the mention in the database
 	 * @param mixed[] $data must contain uid, type and msg at a minimum
+	 *
+	 * @return int[]
 	 */
 	public function create($mention_obj, $data)
 	{
@@ -113,22 +115,22 @@ class Mentioning extends AbstractModel
 
 		// Common checks to determine if we can go on
 		if (!$this->_isValid())
-			return false;
+			return array();
 
 		// Cleanup, validate and remove the invalid values (0 and $user_info['id'])
 		$id_targets = array_diff(array_map('intval', array_unique($this->_validator->uid)), array(0, $user_info['id']));
 
 		if (empty($id_targets))
-			return false;
+			return array();
 
 		$mention_obj->setDb($this->_db);
-		$mention_obj->insert($user_info['id'], $id_targets, $this->_validator->msg, $this->_validator->log_time, $this->_data['status']);
+		$actually_mentioned = $mention_obj->insert($user_info['id'], $id_targets, $this->_validator->msg, $this->_validator->log_time, $this->_data['status']);
 
 		// Update the member mention count
-		foreach ($id_targets as $id_target)
+		foreach ($actually_mentioned as $id_target)
 			$this->_updateMenuCount($this->_data['status'], $id_target);
 
-		return true;
+		return $actually_mentioned;
 	}
 
 	/**

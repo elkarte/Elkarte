@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.2
+ * @version 1.1.4
  *
  */
 
@@ -81,7 +81,6 @@ function loadPMLabels($labels)
 			'not_deleted' => 0,
 		)
 	);
-	$labels = array();
 	while ($row = $db->fetch_assoc($result))
 	{
 		$this_labels = explode(',', $row['labels']);

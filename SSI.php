@@ -12,7 +12,7 @@
  * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  * license:        BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.1
+ * @version 1.1.4
  *
  */
 
@@ -60,7 +60,7 @@ if (!defined('ELKBOOT'))
 	define('ELK', 'SSI');
 
 	require_once(dirname(__FILE__) . '/bootstrap.php');
-	$bootstrap = new Bootstrap();
+	$bootstrap = new Bootstrap(true);
 }
 
 // The globals that were created during the bootstrap process
@@ -681,9 +681,9 @@ function ssi_topBoards($num_top = 10, $output_method = 'echo')
 	echo '
 		<table class="ssi_table">
 			<tr>
-				<th class="lefttext">', $txt['board'], '</th>
-				<th class="righttext">', $txt['board_topics'], '</th>
-				<th class="righttext">', $txt['posts'], '</th>
+				<th>', $txt['board'], '</th>
+				<th class="centertext">', $txt['board_topics'], '</th>
+				<th class="centertext">', $txt['posts'], '</th>
 			</tr>';
 
 	foreach ($boards as $board)
@@ -691,8 +691,8 @@ function ssi_topBoards($num_top = 10, $output_method = 'echo')
 		echo '
 			<tr>
 				<td>', $board['new'] ? ' <a href="' . $board['href'] . '"><span class="new_posts">' . $txt['new'] . '</span></a> ' : '', $board['link'], '</td>
-				<td class="righttext">', $board['num_topics'], '</td>
-				<td class="righttext">', $board['num_posts'], '</td>
+				<td class="centertext">', $board['num_topics'], '</td>
+				<td class="centertext">', $board['num_posts'], '</td>
 			</tr>';
 	}
 
@@ -742,8 +742,8 @@ function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'ec
 		<table class="top_topic ssi_table">
 			<tr>
 				<th class="link"></th>
-				<th class="views">', $txt['views'], '</th>
-				<th class="num_replies">', $txt['replies'], '</th>
+				<th class="centertext views">', $txt['views'], '</th>
+				<th class="centertext num_replies">', $txt['replies'], '</th>
 			</tr>';
 
 	foreach ($topics as $topic)
@@ -753,8 +753,8 @@ function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'ec
 				<td class="link">
 					', $topic['link'], '
 				</td>
-				<td class="views">', $topic['num_views'], '</td>
-				<td class="num_replies">', $topic['num_replies'], '</td>
+				<td class="centertext views">', $topic['num_views'], '</td>
+				<td class="centertext num_replies">', $topic['num_replies'], '</td>
 			</tr>';
 	}
 
@@ -1224,7 +1224,9 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 			INNER JOIN {db_prefix}topics AS t ON (t.id_poll = p.id_poll' . ($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') . ')
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)' . ($topPollInstead ? '
 			INNER JOIN {db_prefix}poll_choices AS pc ON (pc.id_poll = p.id_poll)' : '') . '
-			LEFT JOIN {db_prefix}log_polls AS lp ON (lp.id_poll = p.id_poll AND lp.id_member > {int:no_member} AND lp.id_member = {int:current_member})
+			LEFT JOIN {db_prefix}log_polls AS lp ON (lp.id_poll = p.id_poll 
+				AND lp.id_member > {int:no_member} 
+				AND lp.id_member = {int:current_member})
 		WHERE p.voting_locked = {int:voting_opened}
 			AND (p.expire_time = {int:no_expiration} OR {int:current_time} < p.expire_time)
 			AND ' . ($user_info['is_guest'] ? 'p.guest_vote = {int:guest_vote_allowed}' : 'lp.id_choice IS NULL') . '
@@ -1249,7 +1251,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 	$db->free_result($request);
 
 	// This user has voted on all the polls.
-	if ($row === false)
+	if (empty($row))
 	{
 		return array();
 	}
@@ -2166,12 +2168,12 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 
 	// Give them the default.
 	echo '
-		<table class="ssi_downloads" cellpadding="2">
+		<table class="ssi_table">
 			<tr>
-				<th align="left">', $txt['file'], '</th>
-				<th align="left">', $txt['posted_by'], '</th>
-				<th align="left">', $txt['downloads'], '</th>
-				<th align="left">', $txt['filesize'], '</th>
+				<th>', $txt['file'], '</th>
+				<th>', $txt['posted_by'], '</th>
+				<th class="centertext">', $txt['downloads'], '</th>
+				<th>', $txt['filesize'], '</th>
 			</tr>';
 
 	foreach ($attachments as $attach)
@@ -2180,7 +2182,7 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 			<tr>
 				<td>', $attach['file']['link'], '</td>
 				<td>', $attach['member']['link'], '</td>
-				<td align="center">', $attach['file']['downloads'], '</td>
+				<td class="centertext">', $attach['file']['downloads'], '</td>
 				<td>', $attach['file']['filesize'], '</td>
 			</tr>';
 	}

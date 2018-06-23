@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.4
  *
  */
 
@@ -87,9 +87,18 @@ class Jslocale_Controller extends Action_Controller
 		{
 			// If you have to agree to the agreement, it needs to be fetched from the file.
 			$agreement = new \Agreement($lang);
+			if (!empty($modSettings['requirePrivacypolicy']))
+			{
+				$privacypol = new \PrivacyPolicy($lang);
+			}
+			$context['json_data'] = array('agreement' => '', 'privacypol' => '');
 			try
 			{
-				$context['json_data'] = $agreement->getParsedText();
+				$context['json_data']['agreement'] = $agreement->getParsedText();
+				if (!empty($modSettings['requirePrivacypolicy']))
+				{
+					$context['json_data']['privacypol'] = $privacypol->getParsedText();
+				}
 			}
 			catch (\Elk_Exception $e)
 			{

@@ -1289,6 +1289,10 @@ a.active {
 	border-color: #008000;
 }
 
+.insertoverlay .tabs li.active {
+	background-color: #E4E4E4;
+}
+
 .statusbar .insertoverlay .button {
 	background: #008000;
 	color: #FAFAFA;

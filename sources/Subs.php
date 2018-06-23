@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.3
+ * @version 1.1.4
  *
  */
 
@@ -926,6 +926,21 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	// Need user agent
 	$req = request();
 
+	setOldUrl();
+
+	// For session check verification.... don't switch browsers...
+	$_SESSION['USER_AGENT'] = $req->user_agent();
+
+	// Hand off the output to the portal, etc. we're integrated with.
+	call_integration_hook('integrate_exit', array($do_footer));
+
+	// Don't exit if we're coming from index.php; that will pass through normally.
+	if (!$from_index)
+		exit;
+}
+
+function setOldUrl($index = 'old_url')
+{
 	// Remember this URL in case someone doesn't like sending HTTP_REFERER.
 	$invalid_old_url = array(
 		'action=dlattach',
@@ -945,17 +960,9 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 		}
 	}
 	if ($make_old === true)
-		$_SESSION['old_url'] = $_SERVER['REQUEST_URL'];
-
-	// For session check verification.... don't switch browsers...
-	$_SESSION['USER_AGENT'] = $req->user_agent();
-
-	// Hand off the output to the portal, etc. we're integrated with.
-	call_integration_hook('integrate_exit', array($do_footer));
-
-	// Don't exit if we're coming from index.php; that will pass through normally.
-	if (!$from_index)
-		exit;
+	{
+		$_SESSION[$index] = $_SERVER['REQUEST_URL'];
+	}
 }
 
 /**
@@ -2058,20 +2065,10 @@ function theme()
  */
 function dieGif($expired = false)
 {
-	// The following logging is just for debug, it should be removed before final
-	// or at least once the bug is fixes #2391
-	$filename = '';
-	$linenum = '';
-	if (headers_sent($filename, $linenum))
+	// The following is an attempt at stopping the behavior identified in #2391
+	if (function_exists('fastcgi_finish_request'))
 	{
-		if (empty($filename))
-		{
-			ob_clean();
-		}
-		else
-		{
-			Errors::instance()->log_error('Headers already sent in ' . $filename . ' at line ' . $linenum);
-		}
+		die();
 	}
 
 	if ($expired === true)

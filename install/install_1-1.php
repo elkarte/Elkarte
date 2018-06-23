@@ -815,7 +815,7 @@ class InstallInstructions_install_1_1
 					'bbc' => 0,
 					'can_search' => 0,
 					'default_value' => 'undisclosed',
-					'enclose' => '<i class="icon i-{INPUT}" title="{INPUT}"><s>{INPUT}</s></i>',
+					'enclose' => '<i class="icon i-{KEY}" title="{INPUT}"><s>{INPUT}</s></i>',
 					'placement' => 0,
 					'rows' => 0,
 					'cols' => 0
@@ -1147,6 +1147,23 @@ class InstallInstructions_install_1_1
 			array(
 				array('name' => 'date',    'columns' => array('date'), 'type' => 'primary'),
 				array('name' => 'most_on', 'columns' => array('most_on'), 'type' => 'key'),
+			),
+			array(),
+			'ignore'
+		);
+	}
+
+	public function table_log_agreement_accept()
+	{
+		return $this->table->db_create_table('{db_prefix}log_agreement_accept',
+			array(
+				array('name' => 'version',       'type' => 'varchar', 'size' => 20, 'default' => ''),
+				array('name' => 'id_member',     'type' => 'mediumint', 'size' => 10, 'unsigned' => true, 'default' => 0),
+				array('name' => 'accepted_date', 'type' => 'date', 'default' => '0001-01-01'),
+				array('name' => 'accepted_ip',   'type' => 'varchar', 'size' => 255, 'default' => ''),
+			),
+			array(
+				array('name' => 'version', 'columns' => array('version', 'id_member'), 'type' => 'primary'),
 			),
 			array(),
 			'ignore'
@@ -2398,6 +2415,23 @@ class InstallInstructions_install_1_1
 			),
 			array(
 				array('name' => 'id_filter', 'columns' => array('id_filter'), 'type' => 'primary'),
+			),
+			array(),
+			'ignore'
+		);
+	}
+
+	public function table_log_privacy_policy_accept()
+	{
+		return $this->table->db_create_table('{db_prefix}log_privacy_policy_accept',
+			array(
+				array('name' => 'version',       'type' => 'varchar', 'size' => 20, 'default' => ''),
+				array('name' => 'id_member',     'type' => 'mediumint', 'size' => 10, 'unsigned' => true, 'default' => 0),
+				array('name' => 'accepted_date', 'type' => 'date', 'default' => '0001-01-01'),
+				array('name' => 'accepted_ip',   'type' => 'varchar', 'size' => 255, 'default' => ''),
+			),
+			array(
+				array('name' => 'version', 'columns' => array('version', 'id_member'), 'type' => 'primary'),
 			),
 			array(),
 			'ignore'

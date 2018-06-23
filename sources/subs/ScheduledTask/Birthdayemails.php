@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.4
  *
  */
 
@@ -84,8 +84,8 @@ class Birthdayemails implements Scheduled_Task_Interface
 		{
 			// We need to do some shuffling to make this work properly.
 			loadLanguage('EmailTemplates', $lang);
-			$txt['emails']['happy_birthday']['subject'] = $txtBirthdayEmails[$greeting . '_subject'];
-			$txt['emails']['happy_birthday']['body'] = $txtBirthdayEmails[$greeting . '_body'];
+			$txt['happy_birthday_subject'] = $txtBirthdayEmails[$greeting . '_subject'];
+			$txt['happy_birthday_body'] = $txtBirthdayEmails[$greeting . '_body'];
 
 			foreach ($recps as $recp)
 			{

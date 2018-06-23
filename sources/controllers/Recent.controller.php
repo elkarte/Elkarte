@@ -11,15 +11,17 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.2
+ * @version 1.1.4
  *
  */
+
+use ElkArte\sources\Frontpage_Interface;
 
 /**
  * Recent_Controller Class
  * Retrieve information about recent posts
  */
-class Recent_Controller extends Action_Controller
+class Recent_Controller extends Action_Controller implements Frontpage_Interface
 {
 	/**
 	 * The object that will retrieve the data
@@ -64,6 +66,51 @@ class Recent_Controller extends Action_Controller
 	private $_flex_start = false;
 
 	/**
+	 * Number of posts per page
+	 * @var int
+	 */
+	private $_num_per_page = 10;
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function frontPageHook(&$default_action)
+	{
+		add_integration_function('integrate_menu_buttons', 'MessageIndex_Controller::addForumButton', '', false);
+		add_integration_function('integrate_current_action', 'MessageIndex_Controller::fixCurrentAction', '', false);
+
+		$default_action = array(
+			'controller' => 'Recent_Controller',
+			'function' => 'action_recent_front'
+		);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function frontPageOptions()
+	{
+		parent::frontPageOptions();
+
+		addInlineJavascript('
+			$(\'#front_page\').on(\'change\', function() {
+				var $base = $(\'#recent_frontpage\').parent();
+				if ($(this).val() == \'Recent_Controller\')
+				{
+					$base.fadeIn();
+					$base.prev().fadeIn();
+				}
+				else
+				{
+					$base.fadeOut();
+					$base.prev().fadeOut();
+				}
+			}).change();', true);
+
+		return array(array('int', 'recent_frontpage'));
+	}
+
+	/**
 	 * Called before any other action method in this class.
 	 *
 	 * - Allows for initializations, such as default values or
@@ -105,6 +152,24 @@ class Recent_Controller extends Action_Controller
 	}
 
 	/**
+	 * Intended entry point for recent controller class.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_recent_front()
+	{
+		global $modSettings;
+
+		if (isset($modSettings['recent_frontpage']))
+		{
+			$this->_num_per_page = $modSettings['recent_frontpage'];
+		}
+
+		// Figure out what action to do, thinking, thinking ...
+		$this->action_recent();
+	}
+
+	/**
 	 * Find the ten most recent posts.
 	 *
 	 * Accessed by action=recent.
@@ -137,7 +202,7 @@ class Recent_Controller extends Action_Controller
 			$this->_grabber->setEarliestMsg(max(0, $modSettings['maxMsgID'] - $this->_maxMsgID[0] - $this->_start * $this->_maxMsgID[1]));
 
 		// Set up the pageindex
-		$context['page_index'] = constructPageIndex($this->_base_url, $this->_start, min(100, $this->_total_posts), 10, !empty($this->_flex_start));
+		$context['page_index'] = constructPageIndex($this->_base_url, $this->_start, min(100, $this->_total_posts), $this->_num_per_page, !empty($this->_flex_start));
 
 		// Rest of the items for the template
 		loadTemplate('Recent');
@@ -152,7 +217,7 @@ class Recent_Controller extends Action_Controller
 		);
 
 		// Nothing here... Or at least, nothing you can see...
-		if (!$this->_grabber->findRecentMessages($this->_start, 10))
+		if (!$this->_grabber->findRecentMessages($this->_start, $this->_num_per_page))
 		{
 			$context['posts'] = array();
 		}
@@ -343,7 +408,7 @@ class Recent_Controller extends Action_Controller
 		$this->_grabber->setBoards($board);
 
 		// If this board has a significant number of posts in it...
-		if ($this->_total_posts > 80 && $this->_total_posts > $modSettings['totalMessages'] / 10)
+		if ($this->_total_posts > 80 && $this->_total_posts > $modSettings['totalMessages'] / $this->_num_per_page)
 			$this->_maxMsgID = array(600, 10);
 
 		$this->_base_url = $scripturl . '?action=recent;board=' . $board . '.%1$d';

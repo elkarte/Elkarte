@@ -12,17 +12,19 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.1
+ * @version 1.1.4
  *
  */
 
 // Start things rolling by getting the forum alive...
-$ssi_guest_access = true;
 if (!file_exists(dirname(__FILE__) . '/bootstrap.php'))
 	die('Unable to initialize');
 
+global $ssi_guest_access;
+
 require_once(dirname(__FILE__) . '/bootstrap.php');
-new Bootstrap();
+$ssi_guest_access = true;
+new Bootstrap(true);
 
 global $txt, $modSettings, $context;
 

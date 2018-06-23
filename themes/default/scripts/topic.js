@@ -916,6 +916,7 @@ function expandThumbLB(thumbID, messageID) {
 					setTimeout(function () {
 						ajaxIndicatorOff();
 						closeLightbox();
+						window.location = link.href;
 					}, 1500);
 				});
 		},

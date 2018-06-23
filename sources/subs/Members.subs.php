@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.4
  *
  */
 
@@ -2606,4 +2606,28 @@ function loadMembersIPs($ip_string, $ip_var)
 	ksort($ips);
 
 	return $ips;
+}
+
+function registerAgreementAccepted($id_member, $ip, $agreement_version)
+{
+	$db = database();
+
+	$db->insert('',
+		'{db_prefix}log_agreement_accept',
+		array(
+			'version' => 'date',
+			'id_member' => 'int',
+			'accepted_date' => 'date',
+			'accepted_ip' => 'string-255',
+		),
+		array(
+			array(
+				'version' => $agreement_version,
+				'id_member' => $id_member,
+				'accepted_date' => strftime('%Y-%m-%d', forum_time(false)),
+				'accepted_ip' => $ip,
+			)
+		),
+		array('version', 'id_member')
+	);
 }

@@ -5,12 +5,12 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.3
+ * @version 1.1.4
  *
  */
 
 // Version Constants
-const CURRENT_VERSION = '1.1.3';
+const CURRENT_VERSION = '1.1.4';
 const CURRENT_LANG_VERSION = '1.1';
 const DB_SCRIPT_VERSION = '1-1';
 const REQUIRED_PHP_VERSION = '5.3.3';

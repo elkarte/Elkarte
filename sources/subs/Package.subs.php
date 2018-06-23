@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.1
+ * @version 1.1.4
  *
  */
 
@@ -2816,7 +2816,7 @@ function checkPackageDependency($id)
 			'current_package' => $id,
 		)
 	);
-	while ($row = $db->fetch_row($request));
+	while ($row = $db->fetch_row($request))
 		list ($version) = $row;
 	$db->free_result($request);
 

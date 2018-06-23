@@ -5,7 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.2
+ * @version 1.1.4
  *
  */
 
@@ -371,9 +371,9 @@ class Ila_Integrate
 	 */
 	public static function validate_plain()
 	{
-		global $user_info, $scripturl, $context;
+		global $user_info, $scripturl, $context, $modSettings;
 
-		return function (&$tag, &$data, $disabled) use ($user_info, $scripturl, &$context)
+		return function (&$tag, &$data, $disabled) use ($user_info, $scripturl, &$context, $modSettings)
 		{
 			if (isset($disabled['attach']))
 			{
@@ -396,7 +396,8 @@ class Ila_Integrate
 			// An image will get the light box treatment
 			if (!empty($is_image['is_image']) || $preview !== false)
 			{
-				$data = '<a id="link_' . $num . '" data-lightboximage="' . $num . '" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=' . $num . ';image' . '"><img src="' . $scripturl . '?action=dlattach;attach=' . $num . ';thumb" alt="" class="bbc_img" /></a>';
+				$type = !empty($modSettings['attachmentThumbnails']) ? ';thumb' : '';
+				$data = '<a id="link_' . $num . '" data-lightboximage="' . $num . '" data-lightboxmessage="0" href="' . $scripturl . '?action=dlattach;attach=' . $num . ';image' . '"><img src="' . $scripturl . '?action=dlattach;attach=' . $num . $type . '" alt="" class="bbc_img" /></a>';
 			}
 			else
 			{

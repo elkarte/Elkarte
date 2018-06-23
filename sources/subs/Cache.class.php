@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.4
  *
  */
 
@@ -111,7 +111,7 @@ class Cache
 	public function __destruct()
 	{
 		$cached = $this->get('_cached_keys');
-		if ($cached === null)
+		if (is_array($cached) === false)
 		{
 			$cached = array();
 		}

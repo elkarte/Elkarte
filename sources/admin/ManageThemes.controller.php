@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.2
+ * @version 1.1.4
  *
  *
  * @todo Update this for the new package manager?
@@ -1716,7 +1716,7 @@ class ManageThemes_Controller extends Action_Controller
 				fwrite($fp, $entire_file);
 				fclose($fp);
 
-				if (function_exists('opcache_invalidate'))
+				if ($this->_checkOpcache())
 					opcache_invalidate($theme_dir . '/' . $_REQUEST['filename']);
 
 				// We're done here.
@@ -1792,6 +1792,16 @@ class ManageThemes_Controller extends Action_Controller
 
 			return;
 		}
+	}
+
+	/**
+	 * Checks if  Zend Opcache is installed, active and its cmd functions available.
+	 *
+	 * @return bool
+	 */
+	private function _checkOpcache()
+	{
+		return (extension_loaded('Zend OPcache') && ini_get('opcache.enable') && stripos(BOARDDIR, ini_get('opcache.restrict_api')) !== 0);
 	}
 
 	/**
@@ -1945,7 +1955,7 @@ class ManageThemes_Controller extends Action_Controller
 			fwrite($fp, file_get_contents($filename));
 			fclose($fp);
 
-			if (function_exists('opcache_invalidate'))
+			if ($this->_checkOpcache())
 				opcache_invalidate($filename);
 
 			redirectexit('action=admin;area=theme;th=' . $context['theme_id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=copy');
@@ -1963,7 +1973,7 @@ class ManageThemes_Controller extends Action_Controller
 			fwrite($fp, file_get_contents($filename));
 			fclose($fp);
 
-			if (function_exists('opcache_invalidate'))
+			if ($this->_checkOpcache())
 				opcache_invalidate($filename);
 
 			redirectexit('action=admin;area=theme;th=' . $context['theme_id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=copy');

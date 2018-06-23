@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.4
  *
  */
 
@@ -1152,6 +1152,8 @@ function decreaseLikeCounts($messages)
 	}
 
 	// Update the totals for these members
+	require_once(SUBSDIR . '/Members.subs.php');
+
 	foreach ($update_given as $id_member => $total)
 		updateMemberData($id_member, array('likes_given' => (int) $total));
 

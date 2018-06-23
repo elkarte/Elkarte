@@ -11,7 +11,7 @@
  * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  * license:      BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.2
+ * @version 1.1.4
  *
  */
 
@@ -459,6 +459,11 @@ class Theme extends \Theme
 		if (!empty($context['new_version_updates']))
 		{
 			template_show_error('new_version_updates');
+		}
+
+		if (!empty($context['accepted_agreement']))
+		{
+			template_show_error('accepted_agreement');
 		}
 
 		// Any special notices to remind the admin about?

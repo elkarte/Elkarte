@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.2
+ * @version 1.1.4
  *
  */
 
@@ -1768,7 +1768,7 @@ function getServerStoredAvatars($directory, $level)
  * @param int $old_id_thumb = 0
  * @return array The updated information
  */
-function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb = 0)
+function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb = 0, $real_filename = '')
 {
 	global $modSettings;
 
@@ -1796,7 +1796,7 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 		}
 		$thumb_ext = substr($thumb_mime, strpos($thumb_mime, '/') + 1);
 
-		$thumb_filename = $filename . '_thumb';
+		$thumb_filename = (!empty($real_filename) ? $real_filename : $filename) . '_thumb';
 		$thumb_hash = getAttachmentFilename($thumb_filename, 0, null, true);
 
 		$db = database();
@@ -1939,7 +1939,7 @@ function loadAttachmentContext($id_msg)
 				if (empty($attachment['id_thumb']) || $attachment['thumb_width'] > $modSettings['attachmentThumbWidth'] || $attachment['thumb_height'] > $modSettings['attachmentThumbHeight'] || ($attachment['thumb_width'] < $modSettings['attachmentThumbWidth'] && $attachment['thumb_height'] < $modSettings['attachmentThumbHeight']))
 				{
 					$filename = getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder'], false, $attachment['file_hash']);
-					$attachment = array_merge($attachment, updateAttachmentThumbnail($filename, $attachment['id_attach'], $id_msg, $attachment['id_thumb']));
+					$attachment = array_merge($attachment, updateAttachmentThumbnail($filename, $attachment['id_attach'], $id_msg, $attachment['id_thumb'], $attachment['filename']));
 				}
 
 				// Only adjust dimensions on successful thumbnail creation.
