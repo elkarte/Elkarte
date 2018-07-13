@@ -707,7 +707,7 @@ InTopicModeration.prototype.init = function()
 		// Append it to the container
 		var oCheckboxContainer = document.getElementById(this.opt.sCheckboxContainerMask + this.opt.aMessageIds[i]);
 		oCheckboxContainer.appendChild(oCheckbox);
-		oCheckboxContainer.style.display = '';
+		oCheckboxContainer.style.display = 'inline';
 	}
 };
 
