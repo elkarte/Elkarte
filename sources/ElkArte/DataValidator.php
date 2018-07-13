@@ -1223,7 +1223,7 @@ class DataValidator
 		$tokens = @token_get_all($input[$field]);
 		foreach ($tokens as $token)
 		{
-			if ($token === '{')
+			if ($token === '{' || (isset($token[1]) && $token[1] === '${'))
 				$level++;
 			elseif ($token === '}')
 				$level--;
