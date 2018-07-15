@@ -759,10 +759,13 @@ function reorderBoards()
 		}
 	}
 
-	$db->query(
-		'',
-		'
-		UPDATE {db_prefix}boards
+	if (empty($update_query))
+	{
+		return;
+	}
+
+	$db->query('',
+		'UPDATE {db_prefix}boards
 			SET
 				board_order = CASE id_board ' . $update_query . '
 					END',
