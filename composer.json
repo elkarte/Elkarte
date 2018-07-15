@@ -29,7 +29,8 @@
 	"require-dev": {
 		"phpunit/phpunit-selenium": "~4.1",
 		"phpunit/dbunit": "~3.0",
-		"phpunit/phpunit": "6.4.4"
+		"phpunit/phpunit": "6.4.4",
+		"myclabs/deep-copy": "1.8.0"
 	},
 	"autoload": {
 		"files": ["sources/Autoloader.class.php"],
