@@ -70,7 +70,7 @@ class Sphinx extends SearchAPI
 	/**
 	 * Check we support this db, set banned words
 	 */
-	public function __construct()
+	public function __construct($config, $searchParams)
 	{
 		// Is this database supported?
 		if (!in_array(DB_TYPE, $this->supported_databases))
@@ -80,7 +80,7 @@ class Sphinx extends SearchAPI
 			return;
 		}
 
-		parent::__construct();
+		parent::__construct($config, $searchParams);
 	}
 
 	/**
@@ -112,14 +112,16 @@ class Sphinx extends SearchAPI
 	}
 
 	/**
-	 * Do we have to do some work with the words we are searching for to prepare them?
-	 *
-	 * @param string Word(s) to index
-	 * @param mixed[] $wordsSearch The Search words
-	 * @param string[] $wordsExclude Words to exclude
-	 * @param boolean $isExcluded
+	 * {@inheritdoc }
 	 */
-	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
+	public function indexedWordQuery($words, $search_data)
+	{
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded, $excludedSubjectWords)
 	{
 		$subwords = text2words($word, null, false);
 
@@ -132,21 +134,13 @@ class Sphinx extends SearchAPI
 	}
 
 	/**
-	 * This has it's own custom search.
-	 *
-	 * @param mixed[] $search_params
-	 * @param mixed[] $search_words
-	 * @param string[] $excluded_words
-	 * @param int[] $participants
-	 * @param string[] $search_results
-	 *
-	 * @return int|mixed
+	 * {@inheritdoc }
 	 */
-	public function searchQuery($search_params, $search_words, $excluded_words, &$participants, &$search_results)
+	public function searchQuery($search_words, $excluded_words, &$participants, &$search_results)
 	{
 		global $user_info, $context, $modSettings;
 
-		if (!$search_params['subject_only'])
+		if (!$this->_searchParams->subject_only)
 		{
 			return 0;
 		}
@@ -164,17 +158,17 @@ class Sphinx extends SearchAPI
 			$mySphinx->SetLimits(0, (int) $modSettings['sphinx_max_results'], (int) $modSettings['sphinx_max_results']);
 
 			// Put together a sort string; besides the main column sort (relevance, id_topic, or num_replies),
-			$search_params['sort_dir'] = strtoupper($search_params['sort_dir']);
-			$sphinx_sort = $search_params['sort'] === 'id_msg' ? 'id_topic' : $search_params['sort'];
+			$this->_searchParams->sort_dir = strtoupper($this->_searchParams->sort_dir);
+			$sphinx_sort = $this->_searchParams->sort === 'id_msg' ? 'id_topic' : $this->_searchParams->sort;
 
 			// Add secondary sorting based on relevance value (if not the main sort method) and age
-			$sphinx_sort .= ' ' . $search_params['sort_dir'] . ($search_params['sort'] === 'relevance' ? '' : ', relevance DESC') . ', poster_time DESC';
+			$sphinx_sort .= ' ' . $this->_searchParams->sort_dir . ($this->_searchParams->sort === 'relevance' ? '' : ', relevance DESC') . ', poster_time DESC';
 
 			// Include the engines weight values in the group sort
-			$sphinx_sort = str_replace('relevance ', '@weight ' . $search_params['sort_dir'] . ', relevance ', $sphinx_sort);
+			$sphinx_sort = str_replace('relevance ', '@weight ' . $this->_searchParams->sort_dir . ', relevance ', $sphinx_sort);
 
 			// Grouping by topic id makes it return only one result per topic, so don't set that for in-topic searches
-			if (empty($search_params['topic']))
+			if (empty($this->_searchParams->topic))
 			{
 				$mySphinx->SetGroupBy('id_topic', SPH_GROUPBY_ATTR, $sphinx_sort);
 			}
@@ -186,24 +180,24 @@ class Sphinx extends SearchAPI
 			$mySphinx->SetFieldWeights(array('subject' => !empty($modSettings['search_weight_subject']) ? $modSettings['search_weight_subject'] * 10 : 100, 'body' => 100));
 
 			// Set the limits based on the search parameters.
-			if (!empty($search_params['min_msg_id']) || !empty($search_params['max_msg_id']))
+			if (!empty($this->_searchParams->min_msg_id) || !empty($this->_searchParams->max_msg_id))
 			{
-				$mySphinx->SetIDRange($search_params['min_msg_id'], empty($search_params['max_msg_id']) ? (int) $modSettings['maxMsgID'] : $search_params['max_msg_id']);
+				$mySphinx->SetIDRange($this->_searchParams->min_msg_id, empty($this->_searchParams->max_msg_id) ? (int) $modSettings['maxMsgID'] : $this->_searchParams->max_msg_id);
 			}
 
-			if (!empty($search_params['topic']))
+			if (!empty($this->_searchParams->topic))
 			{
-				$mySphinx->SetFilter('id_topic', array((int) $search_params['topic']));
+				$mySphinx->SetFilter('id_topic', array((int) $this->_searchParams->topic));
 			}
 
-			if (!empty($search_params['brd']))
+			if (!empty($this->_searchParams->brd))
 			{
-				$mySphinx->SetFilter('id_board', $search_params['brd']);
+				$mySphinx->SetFilter('id_board', $this->_searchParams->brd);
 			}
 
-			if (!empty($search_params['memberlist']))
+			if (!empty($this->_searchParams->_memberlist))
 			{
-				$mySphinx->SetFilter('id_member', $search_params['memberlist']);
+				$mySphinx->SetFilter('id_member', $this->_searchParams->_memberlist);
 			}
 
 			// Construct the (binary mode & |) query while accounting for excluded words
@@ -231,7 +225,7 @@ class Sphinx extends SearchAPI
 			$query = count($orResults) === 1 ? $orResults[0] : '(' . implode(') | (', $orResults) . ')';
 
 			// Subject only searches need to be specified.
-			if ($search_params['subject_only'])
+			if ($this->_searchParams->subject_only)
 			{
 				$query = '@(subject) ' . $query;
 			}
@@ -240,7 +234,7 @@ class Sphinx extends SearchAPI
 			$mode = SPH_MATCH_ALL;
 
 			// Over two words and searching for any (since we build a binary string, this will never get set)
-			if (substr_count($query, ' ') > 1 && (!empty($search_params['searchtype']) && $search_params['searchtype'] == 2))
+			if (substr_count($query, ' ') > 1 && (!empty($this->_searchParams->searchtype) && $this->_searchParams->searchtype == 2))
 			{
 				$mode = SPH_MATCH_ANY;
 			}
@@ -282,7 +276,7 @@ class Sphinx extends SearchAPI
 					$cached_results['matches'][$msgID] = array(
 						'id' => $match['attrs']['id_topic'],
 						'relevance' => round($match['attrs']['@count'] + $match['attrs']['relevance'] / 5000, 1) . '%',
-						'num_matches' => empty($search_params['topic']) ? $match['attrs']['@count'] : 0,
+						'num_matches' => empty($this->_searchParams->topic) ? $match['attrs']['@count'] : 0,
 						'matches' => array(),
 					);
 				}
@@ -293,9 +287,10 @@ class Sphinx extends SearchAPI
 		}
 
 		$participants = array();
+		$topics = array();
 		foreach (array_slice(array_keys($cached_results['matches']), (int) $_REQUEST['start'], $modSettings['search_results_per_page']) as $msgID)
 		{
-			$context['topics'][$msgID] = $cached_results['matches'][$msgID];
+			$topics[$msgID] = $cached_results['matches'][$msgID];
 			$participants[$cached_results['matches'][$msgID]['id']] = false;
 		}
 
@@ -305,8 +300,14 @@ class Sphinx extends SearchAPI
 		{
 			$search_results = array_merge($search_results, $search_words[$orIndex]['subject_words']);
 		}
+		$this->_num_results = $cached_results['num_results'];
 
-		return $cached_results['num_results'];
+		return $topics;
+	}
+
+	public function useWordIndex()
+	{
+		return false;
 	}
 
 	/**

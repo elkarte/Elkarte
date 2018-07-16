@@ -65,6 +65,13 @@ class Questions implements ControlInterface
 	private $_incorrectQuestions = null;
 
 	/**
+	 * Filters to use to load the questions
+	 *
+	 * @var null|\ElkArte\ValuesContainer
+	 */
+	private $_filter = null;
+
+	/**
 	 * On your mark
 	 *
 	 * @param mixed[]|null $verificationOptions override_qs,
@@ -72,7 +79,10 @@ class Questions implements ControlInterface
 	public function __construct($verificationOptions = null)
 	{
 		if (!empty($verificationOptions))
+		{
 			$this->_options = $verificationOptions;
+		}
+		$this->_filter = new \ElkArte\ValuesContainer();
 	}
 
 	/**
@@ -88,7 +98,9 @@ class Questions implements ControlInterface
 
 			// If we want questions do we have a cache of all the IDs?
 			if (!empty($this->_number_questions) && empty($modSettings['question_id_cache']))
+			{
 				$this->_refreshQuestionsCache();
+			}
 
 			// Let's deal with languages
 			// First thing we need to know what language the user wants and if there is at least one question
@@ -99,10 +111,14 @@ class Questions implements ControlInterface
 			{
 				// Not even in the forum default? What the heck are you doing?!
 				if (empty($modSettings['question_id_cache'][$language]))
+				{
 					$this->_number_questions = 0;
+				}
 				// Fall back to the default
 				else
+				{
 					$this->_questions_language = $language;
+				}
 			}
 
 			// Do we have enough questions?
@@ -113,7 +129,9 @@ class Questions implements ControlInterface
 				$this->_questionIDs = array();
 
 				if ($isNew || $force_refresh)
+				{
 					$this->createTest($sessionVal, $force_refresh);
+				}
 			}
 		}
 
@@ -135,17 +153,27 @@ class Questions implements ControlInterface
 
 			// Pick some random IDs
 			if ($this->_number_questions == 1)
+			{
 				$this->_questionIDs[] = $this->_possible_questions[array_rand($this->_possible_questions, $this->_number_questions)];
+			}
 			else
+			{
 				foreach (array_rand($this->_possible_questions, $this->_number_questions) as $index)
+				{
 					$this->_questionIDs[] = $this->_possible_questions[$index];
+				}
+			}
 		}
 		// Same questions as before.
 		else
+		{
 			$this->_questionIDs = !empty($sessionVal['q']) ? $sessionVal['q'] : array();
+		}
 
 		if (empty($this->_questionIDs) && !$refresh)
+		{
 			$this->createTest($sessionVal, true);
+		}
 	}
 
 	/**
@@ -156,8 +184,9 @@ class Questions implements ControlInterface
 		theme()->getTemplates()->load('VerificationControls');
 
 		$sessionVal['q'] = array();
+		$this->_filter = new \ElkArte\ValuesContainer(array('type' => 'id_question', 'value' => $this->_questionIDs));
 
-		$questions = $this->_loadAntispamQuestions(array('type' => 'id_question', 'value' => $this->_questionIDs));
+		$questions = $this->_loadAntispamQuestions();
 		$asked_questions = array();
 
 		$parser = \BBC\ParserWrapper::instance();
@@ -186,10 +215,14 @@ class Questions implements ControlInterface
 	public function doTest($sessionVal)
 	{
 		if ($this->_number_questions && (!isset($sessionVal['q']) || !isset($_REQUEST[$this->_options['id'] . '_vv']['q'])))
+		{
 			throw new Elk_Exception('no_access', false);
+		}
 
 		if (!$this->_verifyAnswers($sessionVal))
+		{
 			return 'wrong_verification_answer';
+		}
 
 		return true;
 	}
@@ -210,15 +243,13 @@ class Questions implements ControlInterface
 		global $txt, $context, $language;
 
 		// Load any question and answers!
-		$filter = null;
 		if (isset($_GET['language']))
 		{
-			$filter = array(
+			$this->_filter = new \ElkArte\ValuesContainer(array(
 				'type' => 'language',
 				'value' => $_GET['language'],
-			);
+			));
 		}
-		$context['question_answers'] = $this->_loadAntispamQuestions($filter);
 		$languages = getLanguages();
 
 		// Languages dropdown only if we have more than a lang installed, otherwise is plain useless
@@ -226,65 +257,26 @@ class Questions implements ControlInterface
 		{
 			$context['languages'] = $languages;
 			foreach ($context['languages'] as &$lang)
+			{
 				if ($lang['filename'] === $language)
+				{
 					$lang['selected'] = true;
+				}
+			}
 		}
 
 		// Saving them?
 		if (isset($_GET['save']))
 		{
-			// Handle verification questions.
-			$questionInserts = array();
-			$count_questions = 0;
-
-			foreach ($_POST['question'] as $id => $question)
-			{
-				$question = trim(\Util::htmlspecialchars($question, ENT_COMPAT));
-				$answers = array();
-				$question_lang = isset($_POST['language'][$id]) && isset($languages[$_POST['language'][$id]]) ? $_POST['language'][$id] : $language;
-				if (!empty($_POST['answer'][$id]))
-					foreach ($_POST['answer'][$id] as $answer)
-					{
-						$answer = trim(\Util::strtolower(\Util::htmlspecialchars($answer, ENT_COMPAT)));
-						if ($answer != '')
-							$answers[] = $answer;
-					}
-
-				// Already existed?
-				if (isset($context['question_answers'][$id]))
-				{
-					$count_questions++;
-
-					// Changed?
-					if ($question == '' || empty($answers))
-					{
-						$this->_delete($id);
-						$count_questions--;
-					}
-					else
-						$this->_update($id, $question, $answers, $question_lang);
-				}
-				// It's so shiney and new!
-				elseif ($question != '' && !empty($answers))
-				{
-					$questionInserts[] = array(
-						'question' => $question,
-						// @todo: remotely possible that the serialized value is longer than 65535 chars breaking the update/insertion
-						'answer' => serialize($answers),
-						'language' => $question_lang,
-					);
-					$count_questions++;
-				}
-			}
-
-			// Any questions to insert?
-			if (!empty($questionInserts))
-				$this->_insert($questionInserts);
+			$count_questions = $this->_saveSettings($_POST['question'], $_POST['answer'], $_POST['language']);
 
 			if (empty($count_questions) || $_POST['qa_verification_number'] > $count_questions)
+			{
 				$_POST['qa_verification_number'] = $count_questions;
-
+			}
 		}
+
+		$context['question_answers'] = $this->_loadAntispamQuestions();
 
 		return array(
 			// Clever Thomas, who is looking sheepy now? Not I, the mighty sword swinger did say.
@@ -296,14 +288,82 @@ class Questions implements ControlInterface
 	}
 
 	/**
+	 * Prepares the questions coming from the UI to be saved into the database.
+	 *
+	 * @param string[] $save_question
+	 * @return boolean
+	 */
+	protected function _saveSettings($save_question, $save_answer, $save_language)
+	{
+		$existing_question_answers = $this->_loadAntispamQuestions();
+
+		// Handle verification questions.
+		$questionInserts = array();
+		$count_questions = 0;
+
+		foreach ($save_question as $id => $question)
+		{
+			$question = trim(\Util::htmlspecialchars($question, ENT_COMPAT));
+			$answers = array();
+			$question_lang = isset($save_language[$id]) && isset($languages[$save_language[$id]]) ? $save_language[$id] : $language;
+			if (!empty($save_answer[$id]))
+			{
+				foreach ($save_answer[$id] as $answer)
+				{
+					$answer = trim(\Util::strtolower(\Util::htmlspecialchars($answer, ENT_COMPAT)));
+					if ($answer != '')
+						$answers[] = $answer;
+				}
+			}
+
+			// Already existed?
+			if (isset($existing_question_answers[$id]))
+			{
+				$count_questions++;
+
+				// Changed?
+				if ($question == '' || empty($answers))
+				{
+					$this->_delete($id);
+					$count_questions--;
+				}
+				else
+				{
+					$this->_update($id, $question, $answers, $question_lang);
+				}
+			}
+			// It's so shiney and new!
+			elseif ($question != '' && !empty($answers))
+			{
+				$questionInserts[] = array(
+					'question' => $question,
+					// @todo: remotely possible that the serialized value is longer than 65535 chars breaking the update/insertion
+					'answer' => serialize($answers),
+					'language' => $question_lang,
+				);
+				$count_questions++;
+			}
+		}
+
+		// Any questions to insert?
+		if (!empty($questionInserts))
+		{
+			$this->_insert($questionInserts);
+		}
+
+		return $count_questions;
+	}
+
+	/**
 	 * Checks if an the answers to anti-spam questions are correct
 	 *
 	 * @return boolean
 	 */
 	private function _verifyAnswers($sessionVal)
 	{
+		$this->_filter = new \ElkArte\ValuesContainer(array('type' => 'id_question', 'value' => $sessionVal['q']));
 		// Get the answers and see if they are all right!
-		$questions = $this->_loadAntispamQuestions(array('type' => 'id_question', 'value' => $sessionVal['q']));
+		$questions = $this->_loadAntispamQuestions();
 		$this->_incorrectQuestions = array();
 		foreach ($questions as $row)
 		{
@@ -349,30 +409,28 @@ class Questions implements ControlInterface
 	/**
 	 * Loads all the available antispam questions, or a subset based on a filter
 	 *
-	 * @param array|null $filter if specified it myst be an array with two indexes:
-	 *              - 'type' => a valid filter, it can be 'language' or 'id_question'
-	 *              - 'value' => the value of the filter (i.e. the language)
-	 *
 	 * @return array
 	 */
-	private function _loadAntispamQuestions($filter = null)
+	private function _loadAntispamQuestions()
 	{
 		$db = database();
 
-		$available_filters = array(
-			'language' => 'language = {string:current_filter}',
-			'id_question' => 'id_question IN ({array_int:current_filter})',
-		);
+		$available_filters = new \ElkArte\ValuesContainer(array(
+			'language' => '
+			WHERE language = {string:current_filter}',
+			'id_question' => '
+			WHERE id_question IN ({array_int:current_filter})',
+		));
+		$condition = (string) $available_filters[$this->_filter['type']];
 
 		// Load any question and answers!
 		$question_answers = array();
 		$request = $db->query('', '
 			SELECT 
 				id_question, question, answer, language
-			FROM {db_prefix}antispam_questions' . ($filter === null || !isset($available_filters[$filter['type']]) ? '' : '
-			WHERE ' . $available_filters[$filter['type']]),
+			FROM {db_prefix}antispam_questions' . $condition,
 			array(
-				'current_filter' => $filter['value'],
+				'current_filter' => $this->_filter['value'],
 			)
 		);
 		while ($row = $db->fetch_assoc($request))

@@ -50,7 +50,7 @@ class VerificationControls
 		{
 			$settings['known_verifications'] = self::discoverControls();
 		}
-		$this->_known_verifications = json_decode($settings['known_verifications']);
+		$this->_known_verifications = json_decode($settings['known_verifications'], true);
 		$this->_verification_options = $verificationOptions;
 		$this->_verification_options['render'] = false;
 		$this->_sessionVal = $sessionVal;
@@ -137,8 +137,9 @@ class VerificationControls
 	 * Runs the tests and populates the errors (if any)
 	 *
 	 * @param \ElkArte\Errors\ErrorContext $verification_errors
+	 * @param int $max_errors
 	 */
-	public function test($verification_errors)
+	public function test($verification_errors, $max_errors)
 	{
 		$increase_error_count = false;
 		$force_refresh = false;
@@ -167,7 +168,7 @@ class VerificationControls
 				$this->_sessionVal['errors'] = 0;
 			}
 			// Too many errors?
-			elseif ($this->_sessionVal['errors'] > $thisVerification['max_errors'])
+			elseif ($this->_sessionVal['errors'] > $max_errors)
 			{
 				$force_refresh = true;
 			}

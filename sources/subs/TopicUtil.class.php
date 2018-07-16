@@ -118,6 +118,8 @@ class Topic_Util
 				$url_fragment = ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['id_last_msg']) . $topicseen . '#new';
 			}
 
+			$row['new_from'] = $row['new_from'] ?? 0;
+
 			// And build the array.
 			$topics[$row['id_topic']] = array(
 				'id' => $row['id_topic'],
@@ -134,7 +136,7 @@ class Topic_Util
 					'html_time' => htmlTime($row['first_poster_time']),
 					'timestamp' => forum_time(true, $row['first_poster_time']),
 					'subject' => $row['first_subject'],
-					'preview' => trim($row['first_body']),
+					'preview' => isset($row['first_body']) ? trim($row['first_body']) : '',
 					'icon' => $row['first_icon'],
 					'icon_url' => $icon_sources->{$row['first_icon']},
 					'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0' . $topicseen,
@@ -153,7 +155,7 @@ class Topic_Util
 					'html_time' => htmlTime($row['last_poster_time']),
 					'timestamp' => forum_time(true, $row['last_poster_time']),
 					'subject' => $row['last_subject'],
-					'preview' => trim($row['last_body']),
+					'preview' => isset($row['last_body']) ? trim($row['last_body']) : '',
 					'icon' => $row['last_icon'],
 					'icon_url' => $icon_sources->{$row['last_icon']},
 					'href' => $scripturl . '?topic=' . $row['id_topic'] . $url_fragment,
@@ -180,8 +182,9 @@ class Topic_Util
 				'replies' => comma_format($row['num_replies']),
 				'views' => comma_format($row['num_views']),
 				'likes' => comma_format($row['num_likes']),
-				'approved' => $row['approved'],
+				'approved' => $row['approved'] ?? 1,
 				'unapproved_posts' => !empty($row['unapproved_posts']) ? $row['unapproved_posts'] : 0,
+				'classes' => array(),
 			);
 
 			if (!empty($row['id_board']))

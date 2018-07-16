@@ -2393,7 +2393,7 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
  */
 function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 {
-	global $txt;
+	global $txt, $modSettings;
 
 	$db = database();
 
@@ -2631,10 +2631,8 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	sendNotifications($split1_ID_TOPIC, 'split');
 
 	// If there's a search index that needs updating, update it...
-	$search = new \ElkArte\Search\Search;
-	$searchAPI = $search->findSearchAPI();
-	if (is_callable(array($searchAPI, 'topicSplit')))
-		$searchAPI->topicSplit($split2_ID_TOPIC, $splitMessages);
+	$searchAPI = new \ElkArte\Search\SearchApiWrapper(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '');
+	$searchAPI->topicSplit($split2_ID_TOPIC, $splitMessages);
 
 	// Return the ID of the newly created topic.
 	return $split2_ID_TOPIC;
