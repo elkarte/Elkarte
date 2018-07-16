@@ -1396,11 +1396,10 @@ class PersonalMessage_Controller extends Action_Controller
 		$context['require_verification'] = !$user_info['is_admin'] && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'];
 		if ($context['require_verification'] && !isset($this->_req->query->xml))
 		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
 				'id' => 'pm',
 			);
-			$context['require_verification'] = create_control_verification($verificationOptions);
+			$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions);
 			$context['visual_verification_id'] = $verificationOptions['id'];
 		}
 

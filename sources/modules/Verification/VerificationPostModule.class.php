@@ -32,8 +32,6 @@ class Verification_Post_Module extends ElkArte\sources\modules\Abstract_Module
 		// Using controls and this users is the lucky recipient of them?
 		if (!$user_info['is_admin'] && !$user_info['is_moderator'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
 		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-
 			return array(
 				array('post_errors', array('Verification_Post_Module', 'post_errors'), array('_post_errors')),
 				array('prepare_save_post', array('Verification_Post_Module', 'prepare_save_post'), array('_post_errors')),
@@ -57,7 +55,7 @@ class Verification_Post_Module extends ElkArte\sources\modules\Abstract_Module
 		$verificationOptions = array(
 			'id' => 'post',
 		);
-		$context['require_verification'] = create_control_verification($verificationOptions);
+		$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions);
 		$context['visual_verification_id'] = $verificationOptions['id'];
 
 		// If they came from quick reply, and have to enter verification details, give them some notice.
@@ -79,7 +77,7 @@ class Verification_Post_Module extends ElkArte\sources\modules\Abstract_Module
 		$verificationOptions = array(
 			'id' => 'post',
 		);
-		$context['require_verification'] = create_control_verification($verificationOptions, true);
+		$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions, true);
 
 		if (is_array($context['require_verification']))
 		{

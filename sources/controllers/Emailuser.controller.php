@@ -477,11 +477,10 @@ class Emailuser_Controller extends Action_Controller
 		$context['require_verification'] = $user_info['is_guest'] && !empty($modSettings['guests_report_require_captcha']);
 		if ($context['require_verification'])
 		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
 				'id' => 'report',
 			);
-			$context['require_verification'] = create_control_verification($verificationOptions);
+			$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions);
 			$context['visual_verification_id'] = $verificationOptions['id'];
 		}
 
@@ -567,11 +566,10 @@ class Emailuser_Controller extends Action_Controller
 		// Could they get the right verification code?
 		if ($user_info['is_guest'] && !empty($modSettings['guests_report_require_captcha']))
 		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
 				'id' => 'report',
 			);
-			$context['require_verification'] = create_control_verification($verificationOptions, true);
+			$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions, true);
 
 			if (is_array($context['require_verification']))
 			{

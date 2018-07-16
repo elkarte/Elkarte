@@ -149,12 +149,11 @@ class Search_Controller extends Action_Controller
 		if ($context['require_verification'])
 		{
 			// Build a verification control for the form
-			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
 				'id' => 'search',
 			);
 
-			$context['require_verification'] = create_control_verification($verificationOptions);
+			$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions);
 			$context['visual_verification_id'] = $verificationOptions['id'];
 		}
 
@@ -364,11 +363,10 @@ class Search_Controller extends Action_Controller
 				$context['search_errors']['need_verification_code'] = true;
 			else
 			{
-				require_once(SUBSDIR . '/VerificationControls.class.php');
 				$verificationOptions = array(
 					'id' => 'search',
 				);
-				$context['require_verification'] = create_control_verification($verificationOptions, true);
+				$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions, true);
 
 				if (is_array($context['require_verification']))
 				{
