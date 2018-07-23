@@ -2335,3 +2335,56 @@ function getValidMimeImageType($mime)
 
 	return '';
 }
+
+/**
+ * This function returns the mimeType of a file using the best means available
+ *
+ * @param string $filename
+ * @return bool|mixed|string
+ */
+function get_finfo_mime($filename)
+{
+	$mimeType = false;
+
+	// Check only existing readable files
+	if (!file_exists($filename) || !is_readable($filename))
+	{
+		return $mimeType;
+	}
+
+	// Try finfo, this is the preferred way
+	if (function_exists('finfo_open'))
+	{
+		$finfo = finfo_open(FILEINFO_MIME);
+		$mimeType = finfo_file($finfo, $filename);
+		finfo_close($finfo);
+	}
+	// No finfo? What? lets try the old mime_content_type
+	elseif (function_exists('mime_content_type'))
+	{
+		$mimeType = mime_content_type($filename);
+	}
+	// Try using an exec call
+	elseif (function_exists('exec'))
+	{
+		$mimeType = @exec("/usr/bin/file -i -b $filename");
+	}
+
+	// Still nothing? We should at least be able to get images correct
+	if (empty($mimeType))
+	{
+		$imageData = elk_getimagesize($filename, 'none');
+		if (!empty($imageData['mime']))
+		{
+			$mimeType = $imageData['mime'];
+		}
+	}
+
+	// Account for long responses like text/plain; charset=us-ascii
+	if (!empty($mimeType) && strpos($mimeType, ';'))
+	{
+		list($mimeType,) = explode(';', $mimeType);
+	}
+
+	return $mimeType;
+}
