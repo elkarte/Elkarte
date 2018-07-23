@@ -353,6 +353,12 @@ class HttpReq
 		// To the validator
 		$this->_dataValidator->validation_rules(array());
 		$this->_dataValidator->sanitation_rules(array($name => $sanitize));
+
+		if (is_array($this->_param[$name]))
+		{
+			$this->_dataValidator->input_processing(array($name => 'array'));
+		}
+
 		$this->_dataValidator->validate($this->_param);
 
 		// Return the clean value
