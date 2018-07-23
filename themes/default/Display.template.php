@@ -841,7 +841,7 @@ function template_pages_and_buttons_below()
  */
 function template_display_attachments($message, $ignoring)
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt, $scripturl, $modSettings;
 
 	echo '
 							<footer id="msg_', $message['id'], '_footer" class="attachments', $ignoring ? ' hide"' : '"', '>';
@@ -880,6 +880,8 @@ function template_display_attachments($message, $ignoring)
 				echo '
 											<img class="attachment_image" src="', $attachment['href'], ';image" alt="" style="max-width:100%; max-height:' . $attachment['height'] . 'px;"/>';
 		}
+		elseif (!empty($modSettings['attachmentShowImages']))
+			echo '							<img class="attachment_image" src="', $attachment['href'], ';thumb" alt="" style="max-width:' . $modSettings['attachmentThumbWidth'] . 'px; max-height:' . $modSettings['attachmentThumbHeight'] . 'px;" />';
 
 		echo '
 											<a href="', $attachment['href'], '" class="attachment_name">
