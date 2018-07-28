@@ -287,3 +287,7 @@
 	background-color: #EEEEEE !important;
 	border-color: green !important;
 }
+
+.sortable_smiley {
+	border-bottom-color: #CCCCCC;
+}
