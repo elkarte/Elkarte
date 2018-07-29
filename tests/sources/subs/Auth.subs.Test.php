@@ -31,7 +31,7 @@ class TestAuthsubs extends PHPUnit_Framework_TestCase
 	 *
 	 * @runInSeparateProcess
 	 */
-	public function test_login_cookie()
+	public function blocked_test_login_cookie()
 	{
 		global $cookiename, $context, $user_profile;
 
