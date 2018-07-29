@@ -1268,6 +1268,11 @@ Adjusts display of wording and selections to one line.
 	padding: 0 6px;
 }
 
+.sortable_smiley {
+	border-bottom: 1px solid;
+	margin-top: 3px;
+}
+
 .pagelink, .current_page, .expand_pages {
 	border: 0;
 	background-color: transparent;

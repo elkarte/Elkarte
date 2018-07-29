@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.5
  *
  */
 
@@ -353,6 +353,12 @@ class HttpReq
 		// To the validator
 		$this->_dataValidator->validation_rules(array());
 		$this->_dataValidator->sanitation_rules(array($name => $sanitize));
+
+		if (is_array($this->_param[$name]))
+		{
+			$this->_dataValidator->input_processing(array($name => 'array'));
+		}
+
 		$this->_dataValidator->validate($this->_param);
 
 		// Return the clean value

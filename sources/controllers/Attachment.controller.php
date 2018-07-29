@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.1
+ * @version 1.1.5
  *
  */
 
@@ -360,7 +360,6 @@ class Attachment_Controller extends Action_Controller
 					$attachment[5] = 0;
 
 					// return mime type ala mimetype extension
-					$finfo = finfo_open(FILEINFO_MIME_TYPE);
 					$check = returnMimeThumb($full_attach[3]);
 
 					if ($check !== false)
@@ -383,14 +382,13 @@ class Attachment_Controller extends Action_Controller
 						$filename = $attachmentUploadDir[$modSettings['currentAttachmentUploadDir']] . '/' . $attachment[1];
 					}
 
-					if (file_exists($filename) && substr(finfo_file($finfo, $filename), 0, 5) !== 'image')
+					if (substr(get_finfo_mime($filename), 0, 5) !== 'image')
 					{
 						$attachment[3] = 'png';
 						$attachment[6] = 'image/png';
 						$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
 					}
 
-					finfo_close($finfo);
 				}
 			}
 		}
@@ -541,16 +539,13 @@ class Attachment_Controller extends Action_Controller
 		$resize = true;
 
 		// Return mime type ala mimetype extension
-		$finfo = finfo_open(FILEINFO_MIME_TYPE);
-
-		if (substr(finfo_file($finfo, $filename), 0, 5) !== 'image')
+		if (substr(get_finfo_mime($filename), 0, 5) !== 'image')
 		{
 			$checkMime = returnMimeThumb($file_ext);
 			$mime_type = 'image/png';
 			$resize = false;
 			$filename = $checkMime;
 		}
-		finfo_close($finfo);
 
 		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
 		$use_compression = !empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java'));
