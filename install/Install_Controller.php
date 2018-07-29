@@ -917,9 +917,7 @@ class Install_Controller
 		$can_alter_table = $db->query('', "
 			ALTER TABLE {$db_prefix}log_digest
 			ORDER BY id_topic",
-			array(
-				'security_override' => true
-			)
+			array()
 		) === false;
 
 		if (!empty($databases[$db_type]['alter_support']) && $can_alter_table)

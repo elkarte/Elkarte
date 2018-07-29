@@ -640,7 +640,7 @@ function action_welcomeLogin()
 	// Do they have ALTER privileges?
 	$db->skip_next_error();
 	if (!empty($databases[$db_type]['alter_support'])
-		&& $db->query('', '	ALTER TABLE {db_prefix}log_digest ORDER BY id_topic', array('security_override' => true)) === false)
+		&& $db->query('', '	ALTER TABLE {db_prefix}log_digest ORDER BY id_topic', array()) === false)
 	{
 		return throw_error('The ' . $databases[$db_type]['name'] . ' user you have set in Settings.php does not have proper privileges.<br /><br />Please ask your host to give this user the ALTER, CREATE, and DROP privileges.');
 	}
@@ -1880,7 +1880,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 
 	$db->skip_next_error();
 	if (!empty($databases[$db_type]['alter_support'])
-		&& $db->query('', '	ALTER TABLE {db_prefix}log_digest ORDER BY id_topic', array('security_override' => true)) === false)
+		&& $db->query('', '	ALTER TABLE {db_prefix}log_digest ORDER BY id_topic', array()) === false)
 	{
 		print_error('Error: The ' . $databases[$db_type]['name'] . ' account in Settings.php does not have sufficient privileges.', true);
 	}
