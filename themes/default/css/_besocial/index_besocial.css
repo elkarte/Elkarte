@@ -1803,6 +1803,14 @@ a.help .icon {
 		border-color: transparent;
 	}
 
+	#main_menu .linklevel1.active .icon-menu {
+		border-color: #43A8DA;
+	}
+
+	#main_menu .linklevel1 .icon-menu:hover {
+		background: #F4F4F4;
+	}
+
 	.statistics .flow_hidden, .statistics .floatleft {
 		border: none;
 	}
