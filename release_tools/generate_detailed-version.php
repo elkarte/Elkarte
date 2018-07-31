@@ -235,7 +235,7 @@ function getFilesChanged($from, $to)
 			continue;
 		}
 
-		if (strpos($file, '.txt') !== false)
+		if (strpos($file, '.txt') !== false || strpos($file, '.json') !== false)
 		{
 			continue;
 		}
