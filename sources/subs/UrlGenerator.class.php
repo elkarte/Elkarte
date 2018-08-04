@@ -32,8 +32,6 @@ class Url_Generator
 			'scripturl' => '',
 		), $options);
 
-		require_once(SUBSDIR . '/UrlGenerator/AbstractUrlGenerator.php');
-		require_once(SUBSDIR . '/UrlGenerator/Standard.php');
 		$this->register(new Standard());
 	}
 
@@ -51,7 +49,7 @@ class Url_Generator
 		else
 		{
 			$class = '\\ElkArte\\UrlGenerator\\' . $name;
-			require_once(SUBSDIR . '/UrlGenerator/' . ucfirst($type) . '.php');
+
 			$generator = new $class();
 		}
 
