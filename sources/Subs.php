@@ -1879,3 +1879,8 @@ function obStart($use_compression = false)
 		header('Content-Encoding: none');
 	}
 }
+
+function getUrl($type, $params)
+{
+	return Url_Generator::instance()->get($type, $params);
+}

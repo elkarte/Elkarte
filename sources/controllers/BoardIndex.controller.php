@@ -150,7 +150,7 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 				'image' => 'markread.png',
 				'lang' => true,
 				'custom' => 'onclick="return markallreadButton(this);"',
-				'url' => $scripturl . '?action=markasread;sa=all;bi;' . $context['session_var'] . '=' . $context['session_id']
+				'url' => getUrl('action', array('action' => 'markasread', 'sa' => 'all', 'bi', $context['session_var'] => $context['session_id']))
 			),
 		);
 
