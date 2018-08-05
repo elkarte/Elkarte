@@ -1884,3 +1884,8 @@ function getUrl($type, $params)
 {
 	return Url_Generator::instance()->get($type, $params);
 }
+
+function getUrlQuery($type, $params)
+{
+	return Url_Generator::instance()->getQuery($type, $params);
+}

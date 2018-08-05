@@ -73,13 +73,19 @@ class Url_Generator
 
 	public function get($type, $params)
 	{
+		$url = $this->getQuery(($type, $params);
+
+		return $this->_append_base($url);
+	}
+
+	public function getQuery($type, $params)
+	{
 		if (isset($this->_generators[$type]) === false)
 		{
 			$type = 'standard';
 		}
 
-		$url = str_replace($this->_search, $this->_replace, $this->_generators[$type]->generate($params));
-		return $this->_append_base($url);
+		return str_replace($this->_search, $this->_replace, $this->_generators[$type]->generate($params));
 	}
 
 	protected function _append_base($args)
