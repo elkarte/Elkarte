@@ -23,6 +23,8 @@ class Url_Generator
 
 	protected $_config = array();
 	protected $_generators = array();
+	protected $_search = array();
+	protected $_replace = array();
 
 	private function __construct($options)
 	{
@@ -30,9 +32,19 @@ class Url_Generator
 			'queryless' => false,
 			'frendly' => false,
 			'scripturl' => '',
+			'replacements' => array(),
 		), $options);
 
 		$this->register(new Standard());
+		$this->updateReplacements($this->_config['replacements']);
+	}
+
+	public function updateReplacements($replacements)
+	{
+		$this->_config['replacements'] = array_merge($this->_config['replacements'], $replacements);
+
+		$this->_search = array_keys($this->_config['replacements']);
+		$this->_replace = array_values($this->_config['replacements']);
 	}
 
 	public function register($generator)
@@ -66,7 +78,7 @@ class Url_Generator
 			$type = 'standard';
 		}
 
-		$url = $this->_generators[$type]->generate($params);
+		$url = str_replace($this->_search, $this->_replace, $this->_generators[$type]->generate($params));
 		return $this->_append_base($url);
 	}
 
@@ -82,11 +94,11 @@ class Url_Generator
 
 	public static function instance()
 	{
-		global $scripturl;
+		global $scripturl, $context;
 
 		if (self::$_instance === null)
 		{
-			self::$_instance = new Url_Generator(array('scripturl' => $scripturl));
+			self::$_instance = new Url_Generator(array('scripturl' => $scripturl, 'replacements' => array('{session_data}' => $context['session_var'] . '=' . $context['session_id'])));
 		}
 
 		return self::$_instance;

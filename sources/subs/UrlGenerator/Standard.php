@@ -23,10 +23,14 @@ class Standard extends Abstract_Url_Generator
 		$args = array();
 		foreach ($params as $k => $v)
 		{
-			if (!is_int($k))
-				$args[] = $k . '=' . $v;
-			else
+			if (is_int($k))
+			{
 				$args[] = $v;
+			}
+			else
+			{
+				$args[] = $k . '=' . $v;
+			}
 		}
 
 		return implode($this->_separator, $args);
