@@ -831,9 +831,9 @@ class Theme extends BaseTheme
 
 		if (empty($settings['theme_version']))
 		{
-			$this->addJavascriptVar(array('elk_scripturl' => '\'' . $scripturl . '\''));
+			$this->addJavascriptVar(array('elk_scripturl' => $scripturl), true);
 		}
-		$this->addJavascriptVar(array('elk_forum_action' => '\'' . substr($modSettings['default_forum_action'], 1, -1) . '\''));
+		$this->addJavascriptVar(array('elk_forum_action' =>  getUrlQuery('action', $modSettings['default_forum_action'])), true);
 
 		if (!isset($context['page_title']))
 		{

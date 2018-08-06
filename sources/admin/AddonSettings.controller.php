@@ -95,7 +95,7 @@ class AddonSettings_Controller extends Action_Controller
 			$context['settings_message'] = '<div class="centertext">' . $txt['modification_no_misc_settings'] . '</div>';
 		}
 
-		$context['post_url'] = $scripturl . '?action=admin;area=addonsettings;save;sa=general';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'addonsettings', 'sa' => 'general', 'save']);
 		$context['settings_title'] = $txt['mods_cat_modifications_misc'];
 
 		// Saving?

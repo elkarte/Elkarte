@@ -71,7 +71,7 @@ class AdminLog_Controller extends Action_Controller
 			'description' => $txt['maintain_info'],
 			'tabs' => array(
 				'errorlog' => array(
-					'url' => $scripturl . '?action=admin;area=logs;sa=errorlog;desc',
+					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog', 'desc']),
 					'description' => sprintf($txt['errlog_desc'], $txt['remove']),
 				),
 				'adminlog' => array(
@@ -167,7 +167,7 @@ class AdminLog_Controller extends Action_Controller
 			redirectexit('action=admin;area=logs;sa=pruning');
 		}
 
-		$context['post_url'] = $scripturl . '?action=admin;area=logs;save;sa=pruning';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'pruning', 'save']);
 		$context['settings_title'] = $txt['pruning_title'];
 		$context['sub_template'] = 'show_settings';
 

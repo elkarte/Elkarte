@@ -259,7 +259,7 @@ class Admin_Controller extends Action_Controller
 						'label' => $txt['theme_admin'],
 						'controller' => 'ManageThemes_Controller',
 						'function' => 'action_index',
-						'custom_url' => $scripturl . '?action=admin;area=theme',
+						'custom_url' => getUrl('admin', ['action' => 'admin', 'area' => 'theme']),
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_themes',
 						'subsections' => array(
@@ -275,7 +275,7 @@ class Admin_Controller extends Action_Controller
 						'label' => $txt['theme_current_settings'],
 						'controller' => 'ManageThemes_Controller',
 						'function' => 'action_index',
-						'custom_url' => $scripturl . '?action=admin;area=theme;sa=list;th=' . $settings['theme_id'],
+						'custom_url' => ,
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_current_theme',
 					),
@@ -517,14 +517,14 @@ class Admin_Controller extends Action_Controller
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_logs',
 						'subsections' => array(
-							'errorlog' => array($txt['errlog'], 'admin_forum', 'enabled' => !empty($modSettings['enableErrorLogging']), 'url' => $scripturl . '?action=admin;area=logs;sa=errorlog;desc'),
+							'errorlog' => array($txt['errlog'], 'admin_forum', 'enabled' => !empty($modSettings['enableErrorLogging']), 'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog', 'desc'])),
 							'adminlog' => array($txt['admin_log'], 'admin_forum', 'enabled' => in_array('ml', $context['admin_features'])),
 							'modlog' => array($txt['moderation_log'], 'admin_forum', 'enabled' => in_array('ml', $context['admin_features'])),
 							'banlog' => array($txt['ban_log'], 'manage_bans'),
 							'spiderlog' => array($txt['spider_logs'], 'admin_forum', 'enabled' => in_array('sp', $context['admin_features'])),
 							'tasklog' => array($txt['scheduled_log'], 'admin_forum'),
-							'badbehaviorlog' => array($txt['badbehavior_log'], 'admin_forum', 'enabled' => !empty($modSettings['badbehavior_enabled']), 'url' => $scripturl . '?action=admin;area=logs;sa=badbehaviorlog;desc'),
-							'pruning' => array($txt['pruning_title'], 'admin_forum'),
+							'badbehaviorlog' => array($txt['badbehavior_log'], 'admin_forum', 'enabled' => !empty($modSettings['badbehavior_enabled']), 'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'badbehaviorlog', 'desc']),
+							'pruning' => array($txt['pruning_title'], 'admin_forum')),
 						),
 					),
 					'scheduledtasks' => array(
@@ -606,19 +606,19 @@ class Admin_Controller extends Action_Controller
 
 		// Build the link tree.
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=admin',
+			'url' => getUrl('admin', ['action' => 'admin']),
 			'name' => $txt['admin_center'],
 		);
 
 		if (isset($admin_include_data['current_area']) && $admin_include_data['current_area'] != 'index')
 			$context['linktree'][] = array(
-				'url' => $scripturl . '?action=admin;area=' . $admin_include_data['current_area'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => $admin_include_data['current_area'], '{session_data}']),
 				'name' => $admin_include_data['label'],
 			);
 
 		if (!empty($admin_include_data['current_subsection']) && $admin_include_data['subsections'][$admin_include_data['current_subsection']][0] != $admin_include_data['label'])
 			$context['linktree'][] = array(
-				'url' => $scripturl . '?action=admin;area=' . $admin_include_data['current_area'] . ';sa=' . $admin_include_data['current_subsection'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => $admin_include_data['current_area'], 'sa' => $admin_include_data['current_subsection'], '{session_data}']),
 				'name' => $admin_include_data['subsections'][$admin_include_data['current_subsection']][0],
 			);
 	}
@@ -650,7 +650,7 @@ class Admin_Controller extends Action_Controller
 		if (listMembergroupMembers_Href($context['administrators'], 1, 32) && allowedTo('manage_membergroups'))
 		{
 			// Add a 'more'-link if there are more than 32.
-			$context['more_admins_link'] = '<a href="' . $scripturl . '?action=moderate;area=viewgroups;sa=members;group=1">' . $txt['more'] . '</a>';
+			$context['more_admins_link'] = '<a href="' . getUrl('moderate', ['action' => 'moderate', 'area' => 'viewgroups', 'sa' => 'members', 'group' => 1]) . '">' . $txt['more'] . '</a>';
 		}
 
 		// This makes it easier to get the latest news with your time format.
@@ -699,7 +699,7 @@ class Admin_Controller extends Action_Controller
 		if (listMembergroupMembers_Href($context['administrators'], 1, 32) && allowedTo('manage_membergroups'))
 		{
 			// Add a 'more'-link if there are more than 32.
-			$context['more_admins_link'] = '<a href="' . $scripturl . '?action=moderate;area=viewgroups;sa=members;group=1">' . $txt['more'] . '</a>';
+			$context['more_admins_link'] = '<a href="' . getUrl('moderate', ['action' => 'moderate', 'area' => 'viewgroups', 'sa' => 'members', 'group' => 1]) . '">' . $txt['more'] . '</a>';
 		}
 
 		// Load credits.

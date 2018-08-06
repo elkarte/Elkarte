@@ -646,7 +646,7 @@ function loadBoard()
 		$context['linktree'] = array_merge(
 			$context['linktree'],
 			array(array(
-				'url' => $scripturl . $modSettings['default_forum_action'] . '#c' . $board_info['cat']['id'],
+				'url' => getUrl('action', $modSettings['default_forum_action']) . '#c' . $board_info['cat']['id'],
 				'name' => $board_info['cat']['name']
 			)),
 			array_reverse($board_info['parent_boards']),

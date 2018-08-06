@@ -119,8 +119,8 @@ class SearchRenderer extends Renderer
 		$output['category'] = array(
 			'id' => $this->_this_message['id_cat'],
 			'name' => $this->_this_message['cat_name'],
-			'href' => $scripturl . $modSettings['default_forum_action'] . '#c' . $this->_this_message['id_cat'],
-			'link' => '<a href="' . $scripturl . $modSettings['default_forum_action'] . '#c' . $this->_this_message['id_cat'] . '">' . $this->_this_message['cat_name'] . '</a>'
+			'href' => getUrl('action', $modSettings['default_forum_action']) . '#c' . $this->_this_message['id_cat'],
+			'link' => '<a href="' . getUrl('action', $modSettings['default_forum_action']) . '#c' . $this->_this_message['id_cat'] . '">' . $this->_this_message['cat_name'] . '</a>'
 		);
 
 		determineTopicClass($output);

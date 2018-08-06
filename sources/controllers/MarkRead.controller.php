@@ -175,7 +175,7 @@ class MarkRead_Controller extends Action_Controller
 
 		if (!empty($modSettings['default_forum_action']))
 		{
-			return substr($modSettings['default_forum_action'], 1);
+			return getUrlQuery('action', $modSettings['default_forum_action']);
 		}
 		else
 		{
