@@ -25,6 +25,10 @@ class Standard extends Abstract_Url_Generator
 		{
 			if (is_int($k))
 			{
+				if (empty($v))
+				{
+					continue;
+				}
 				$args[] = $v;
 			}
 			else
