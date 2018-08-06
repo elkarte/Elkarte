@@ -73,7 +73,7 @@ class Url_Generator
 
 	public function get($type, $params)
 	{
-		$url = $this->getQuery(($type, $params);
+		$url = $this->getQuery($type, $params);
 
 		return $this->_append_base($url);
 	}

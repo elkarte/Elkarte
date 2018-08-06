@@ -275,7 +275,7 @@ class Admin_Controller extends Action_Controller
 						'label' => $txt['theme_current_settings'],
 						'controller' => 'ManageThemes_Controller',
 						'function' => 'action_index',
-						'custom_url' => ,
+						'custom_url' => getUrl('admin', ['action' => 'admin', 'area' => 'theme', 'sa' => 'list', 'th' => $settings['theme_id']]),
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_current_theme',
 					),
