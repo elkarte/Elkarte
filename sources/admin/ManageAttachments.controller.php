@@ -154,7 +154,7 @@ class ManageAttachments_Controller extends Action_Controller
 	 */
 	public function action_attachSettings_display()
 	{
-		global $modSettings, $scripturl, $context;
+		global $modSettings, $context;
 
 		// initialize the form
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
@@ -242,7 +242,7 @@ class ManageAttachments_Controller extends Action_Controller
 			redirectexit('action=admin;area=manageattachments;sa=attachments');
 		}
 
-		$context['post_url'] = $scripturl . '?action=admin;area=manageattachments;save;sa=attachments';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachments', 'save']);
 		$settingsForm->prepare();
 
 		$context['sub_template'] = 'show_settings';
@@ -255,7 +255,7 @@ class ManageAttachments_Controller extends Action_Controller
 	 */
 	private function _settings()
 	{
-		global $modSettings, $txt, $scripturl, $context;
+		global $modSettings, $txt, $context;
 
 		// Get the current attachment directory.
 		$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
@@ -277,13 +277,13 @@ class ManageAttachments_Controller extends Action_Controller
 			$context['valid_basedirectory'] = true;
 
 		// A bit of razzle dazzle with the $txt strings. :)
-		$txt['basedirectory_for_attachments_warning'] = str_replace('{attach_repair_url}', $scripturl . '?action=admin;area=manageattachments;sa=attachpaths', $txt['basedirectory_for_attachments_warning']);
-		$txt['attach_current_dir_warning'] = str_replace('{attach_repair_url}', $scripturl . '?action=admin;area=manageattachments;sa=attachpaths', $txt['attach_current_dir_warning']);
+		$txt['basedirectory_for_attachments_warning'] = str_replace('{attach_repair_url}', getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachpaths']), $txt['basedirectory_for_attachments_warning']);
+		$txt['attach_current_dir_warning'] = str_replace('{attach_repair_url}', getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachpaths']), $txt['attach_current_dir_warning']);
 
 		$txt['attachment_path'] = $context['attachmentUploadDir'];
 		$txt['basedirectory_for_attachments_path'] = isset($modSettings['basedirectory_for_attachments']) ? $modSettings['basedirectory_for_attachments'] : '';
 		$txt['use_subdirectories_for_attachments_note'] = empty($modSettings['attachment_basedirectories']) || empty($modSettings['use_subdirectories_for_attachments']) ? $txt['use_subdirectories_for_attachments_note'] : '';
-		$txt['attachmentUploadDir_multiple_configure'] = '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=manageattachments;sa=attachpaths">' . $txt['attachmentUploadDir_multiple_configure'] . '</a>';
+		$txt['attachmentUploadDir_multiple_configure'] = '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachpaths']) . '">' . $txt['attachmentUploadDir_multiple_configure'] . '</a>';
 		$txt['attach_current_dir'] = empty($modSettings['automanage_attachments']) ? $txt['attach_current_dir'] : $txt['attach_last_dir'];
 		$txt['attach_current_dir_warning'] = $txt['attach_current_dir'] . $txt['attach_current_dir_warning'];
 		$txt['basedirectory_for_attachments_warning'] = $txt['basedirectory_for_attachments_current'] . $txt['basedirectory_for_attachments_warning'];
@@ -382,7 +382,7 @@ class ManageAttachments_Controller extends Action_Controller
 	 */
 	public function action_browse()
 	{
-		global $context, $txt, $scripturl, $modSettings;
+		global $context, $txt, $modSettings;
 
 		// Attachments or avatars?
 		$context['browse_type'] = isset($this->_req->query->avatars) ? 'avatars' : (isset($this->_req->query->thumbs) ? 'thumbs' : 'attachments');
@@ -392,7 +392,7 @@ class ManageAttachments_Controller extends Action_Controller
 			'id' => 'attach_browse',
 			'title' => $txt['attachment_manager_browse_files'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
-			'base_href' => $scripturl . '?action=admin;area=manageattachments;sa=browse' . ($context['browse_type'] === 'avatars' ? ';avatars' : ($context['browse_type'] === 'thumbs' ? ';thumbs' : '')),
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'browse']) . ($context['browse_type'] === 'avatars' ? ';avatars' : ($context['browse_type'] === 'thumbs' ? ';thumbs' : '')),
 			'default_sort_col' => 'name',
 			'no_items_label' => $txt['attachment_manager_' . ($context['browse_type'] === 'avatars' ? 'avatars' : ($context['browse_type'] === 'thumbs' ? 'thumbs' : 'attachments')) . '_no_entries'],
 			'get_items' => array(
@@ -415,7 +415,7 @@ class ManageAttachments_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $modSettings, $context, $scripturl;
+							global $modSettings, $context;
 
 							$link = '<a href="';
 
@@ -425,11 +425,11 @@ class ManageAttachments_Controller extends Action_Controller
 
 							// By default avatars are downloaded almost as attachments.
 							elseif ($context['browse_type'] == 'avatars')
-								$link .= sprintf('%1$s?action=dlattach;type=avatar;attach=%2$d', $scripturl, $rowData['id_attach']);
+								$link .= getUrl('attach', ['action' => 'dlattach', 'type' => 'avatar', 'attach' => (int) $rowData['id_attach']]);
 
 							// Normal attachments are always linked to a topic ID.
 							else
-								$link .= sprintf('%1$s?action=dlattach;topic=%2$d.0;attach=%3$d', $scripturl, $rowData['id_topic'], $rowData['id_attach']);
+								$link .= getUrl('attach', ['action' => 'dlattach', 'topic' => ((int) $rowData['id_topic']) . '.0', 'attach' => (int) $rowData['id_attach']]);
 
 							$link .= '"';
 
@@ -473,15 +473,13 @@ class ManageAttachments_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $scripturl;
-
 							// In case of an attachment, return the poster of the attachment.
 							if (empty($rowData['id_member']))
 								return htmlspecialchars($rowData['poster_name'], ENT_COMPAT, 'UTF-8');
 
 							// Otherwise it must be an avatar, return the link to the owner of it.
 							else
-								return sprintf('<a href="%1$s?action=profile;u=%2$d">%3$s</a>', $scripturl, $rowData['id_member'], $rowData['poster_name']);
+								return '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => (int) $rowData['id_member'], 'name' => $rowData['poster_name']]) . '">' . $rowData['poster_name'] . '</a>';
 						},
 					),
 					'sort' => array(
@@ -496,14 +494,14 @@ class ManageAttachments_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $txt, $context, $scripturl;
+							global $txt, $context;
 
 							// The date the message containing the attachment was posted or the owner of the avatar was active.
 							$date = empty($rowData['poster_time']) ? $txt['never'] : standardTime($rowData['poster_time']);
 
 							// Add a link to the topic in case of an attachment.
 							if ($context['browse_type'] !== 'avatars')
-								$date .= sprintf('<br />%1$s <a href="%2$s?topic=%3$d.msg%4$d#msg%4$d">%5$s</a>', $txt['in'], $scripturl, $rowData['id_topic'], $rowData['id_msg'], $rowData['subject']);
+								$date .= '<br />' . $txt['in'] . ' <a href="' . getUrl('topic', ['topic' => ((int) $rowData['id_topic']) '.msg' . ((int) $rowData['id_msg']), 'subject' => $rowData['subject']]) . '#msg' . (int) $rowData['id_msg'] . '">' . $rowData['subject'] . '</a>';
 
 							return $date;
 							},
@@ -544,7 +542,7 @@ class ManageAttachments_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=manageattachments;sa=remove' . ($context['browse_type'] === 'avatars' ? ';avatars' : ($context['browse_type'] === 'thumbs' ? ';thumbs' : '')),
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'remove', ($context['browse_type'] === 'avatars' ? 'avatars' : ($context['browse_type'] === 'thumbs' ? 'thumbs' : ''))]),
 				'include_sort' => true,
 				'include_start' => true,
 				'hidden_fields' => array(
@@ -561,17 +559,17 @@ class ManageAttachments_Controller extends Action_Controller
 				'show_on' => 'top',
 				'links' => array(
 					array(
-						'href' => $scripturl . '?action=admin;area=manageattachments;sa=browse',
+						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'browse']),
 						'is_selected' => $context['browse_type'] === 'attachments',
 						'label' => $txt['attachment_manager_attachments']
 					),
 					array(
-						'href' => $scripturl . '?action=admin;area=manageattachments;sa=browse;avatars',
+						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'browse', 'avatars']),
 						'is_selected' => $context['browse_type'] === 'avatars',
 						'label' => $txt['attachment_manager_avatars']
 					),
 					array(
-						'href' => $scripturl . '?action=admin;area=manageattachments;sa=browse;thumbs',
+						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'browse', 'thumbs']),
 						'is_selected' => $context['browse_type'] === 'thumbs',
 						'label' => $txt['attachment_manager_thumbs']
 					),
@@ -1033,7 +1031,7 @@ class ManageAttachments_Controller extends Action_Controller
 	 */
 	public function action_attachpaths()
 	{
-		global $modSettings, $scripturl, $context, $txt;
+		global $modSettings, $context, $txt;
 
 		// Since this needs to be done eventually.
 		if (!is_array($modSettings['attachmentUploadDir']))
@@ -1374,7 +1372,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 		$listOptions = array(
 			'id' => 'attach_paths',
-			'base_href' => $scripturl . '?action=admin;area=manageattachments;sa=attachpaths;' . $context['session_var'] . '=' . $context['session_id'],
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachpaths', '{sesstion_data}']),
 			'title' => $txt['attach_paths'],
 			'get_items' => array(
 				'function' => 'list_getAttachDirs',
@@ -1433,7 +1431,7 @@ class ManageAttachments_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=manageattachments;sa=attachpaths;' . $context['session_var'] . '=' . $context['session_id'],
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachpaths', '{sesstion_data}']),
 			),
 			'additional_rows' => array(
 				array(
@@ -1463,7 +1461,7 @@ class ManageAttachments_Controller extends Action_Controller
 		{
 			$listOptions2 = array(
 				'id' => 'base_paths',
-				'base_href' => $scripturl . '?action=admin;area=manageattachments;sa=attachpaths;' . $context['session_var'] . '=' . $context['session_id'],
+				'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachpaths', '{sesstion_data}']),
 				'title' => $txt['attach_base_paths'],
 				'get_items' => array(
 					'function' => 'list_getBaseDirs',
@@ -1511,7 +1509,7 @@ class ManageAttachments_Controller extends Action_Controller
 					),
 				),
 				'form' => array(
-					'href' => $scripturl . '?action=admin;area=manageattachments;sa=attachpaths;' . $context['session_var'] . '=' . $context['session_id'],
+					'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachpaths', '{sesstion_data}']),
 				),
 				'additional_rows' => array(
 					array(
