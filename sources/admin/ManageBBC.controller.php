@@ -63,7 +63,7 @@ class ManageBBC_Controller extends Action_Controller
 	 */
 	public function action_bbcSettings_display()
 	{
-		global $context, $txt, $modSettings, $scripturl;
+		global $context, $txt, $modSettings;
 
 		// Initialize the form
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
@@ -109,7 +109,7 @@ class ManageBBC_Controller extends Action_Controller
 		// Make sure the template stuff is ready now...
 		$context['sub_template'] = 'show_settings';
 		$context['page_title'] = $txt['manageposts_bbc_settings_title'];
-		$context['post_url'] = $scripturl . '?action=admin;area=postsettings;save;sa=bbc';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'postsettings', 'sa' => 'bbc', 'save']);
 		$context['settings_title'] = $txt['manageposts_bbc_settings_title'];
 
 		$settingsForm->prepare();
