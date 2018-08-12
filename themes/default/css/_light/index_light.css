@@ -2105,8 +2105,12 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 		background: transparent;
 	}
 
-	#main_menu .linklevel1.active, #main_menu .linklevel1.active:hover {
-		border: none;
+	#main_menu .linklevel1.active .icon-menu {
+		border-color: #5BA048;
+	}
+
+	#main_menu .linklevel1 .icon-menu:hover {
+		background: #F4F4F4;
 	}
 }
 

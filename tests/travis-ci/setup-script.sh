@@ -27,7 +27,7 @@ COVER=""
 WEB=""
 if [ "$COVERAGE" != "true" -o "${TRAVIS_PULL_REQUEST}" == "false" ]; then COVER="--no-coverage"; fi
 if [ "$WEBTESTS" == "true" ]; then WEB="-with-webtest"; fi
-CONFIG="--configuration /var/www/tests/travis-ci/phpunit${WEB}-${SHORT_DB}-travis.xml ${COVER}"
+CONFIG="--debug --verbose --configuration /var/www/tests/travis-ci/phpunit${WEB}-${SHORT_DB}-travis.xml ${COVER}"
 
 # Run PHPUnit tests for the site
 /var/www/vendor/bin/phpunit ${CONFIG}

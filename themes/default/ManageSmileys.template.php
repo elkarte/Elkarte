@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.5
  *
  */
 
@@ -374,12 +374,18 @@ function template_setorder()
 
 		foreach ($location['rows'] as $key => $row)
 		{
-			if (!empty($context['move_smiley']))
-				echo '
-				<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;location=', $location['id'], ';source=', $context['move_smiley'], ';row=', $row[0]['row'], ';reorder=1;', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/smiley_select_spot.png" alt="', $txt['smileys_move_here'], '" /></a>';
-
 			echo '
 				<ul id="smiley_' . $location['id'] . '|' . $key . '" class="sortable_smiley">';
+
+			if (!empty($context['move_smiley']))
+			{
+				echo '
+					<li>
+						<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;location=', $location['id'], ';source=', $context['move_smiley'], ';row=', $row[0]['row'], ';reorder=1;', $context['session_var'], '=', $context['session_id'], '">
+							<img src="', $settings['images_url'], '/smiley_select_spot.png" alt="', $txt['smileys_move_here'], '" />
+						</a>
+					</li>';
+			}
 
 			foreach ($row as $smiley)
 			{
@@ -417,7 +423,10 @@ function template_setorder()
 	}
 
 	echo '
-	</div>
+	</div>';
+
+	if (empty($context['move_smiley']))
+		echo '
 	<script>
 		$().elkSortable({
 			sa: "smileyorder",

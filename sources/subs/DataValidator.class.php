@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.5
  *
  */
 
@@ -1167,7 +1167,7 @@ class Data_Validator
 		$tokens = @token_get_all($input[$field]);
 		foreach ($tokens as $token)
 		{
-			if ($token === '{')
+			if ($token === '{' || (isset($token[1]) && $token[1] === '${'))
 				$level++;
 			elseif ($token === '}')
 				$level--;

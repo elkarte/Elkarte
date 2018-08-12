@@ -116,3 +116,7 @@ a.help .icon {
 	border-bottom: 1px solid transparent;
 	border-top: 1px solid transparent;
 }
+
+.sortable_smiley {
+	border-bottom-color: #CCCCCC;
+}
