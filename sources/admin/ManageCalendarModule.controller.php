@@ -102,7 +102,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 	 */
 	public function action_holidays()
 	{
-		global $scripturl, $txt, $context;
+		global $txt, $context;
 
 		// Submitting something...
 		if (isset($this->_req->post->delete) && !empty($this->_req->post->holiday))
@@ -122,7 +122,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 			'id' => 'holiday_list',
 			'title' => $txt['current_holidays'],
 			'items_per_page' => 20,
-			'base_href' => $scripturl . '?action=admin;area=managecalendar;sa=holidays',
+			'base_href' => ,
 			'default_sort_col' => 'name',
 			'get_items' => array(
 				'file' => SUBSDIR . '/Calendar.subs.php',
@@ -140,7 +140,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . $scripturl . '?action=admin;area=managecalendar;sa=editholiday;holiday=%1$d">%2$s</a>',
+							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'managecalendar', 'sa' => 'editholiday', 'holiday' => '%1$d']) . '">%2$s</a>',
 							'params' => array(
 								'id_holiday' => false,
 								'title' => false,
@@ -190,7 +190,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=managecalendar;sa=holidays',
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'managecalendar', 'sa' => 'holidays']),
 				'token' => 'admin-mc',
 			),
 			'additional_rows' => array(
@@ -198,7 +198,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 					'position' => 'below_table_data',
 					'class' => 'submitbutton',
 					'value' => '<input type="submit" name="delete" value="' . $txt['quickmod_delete_selected'] . '" class="right_submit" onclick="return confirm(\'' . $txt['holidays_delete_confirm'] . '\');" />
-					<a class="linkbutton" href="' . $scripturl . '?action=admin;area=managecalendar;sa=editholiday">' . $txt['holidays_add'] . '</a>',
+					<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'managecalendar', 'sa' => 'editholiday']) . '">' . $txt['holidays_add'] . '</a>',
 				),
 			),
 		);
@@ -282,7 +282,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 	 */
 	public function action_calendarSettings_display()
 	{
-		global $txt, $context, $scripturl;
+		global $txt, $context;
 
 		// Initialize the form
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
@@ -300,7 +300,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 			legend.parent().toggleClass("collapsed")', true);
 
 		// Get the final touches in place.
-		$context['post_url'] = $scripturl . '?action=admin;area=managecalendar;save;sa=settings';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'managecalendar', 'sa' => 'settings']);
 		$context[$context['admin_menu_name']]['current_subsection'] = 'settings';
 
 		// Saving the settings?

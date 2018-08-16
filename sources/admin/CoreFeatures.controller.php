@@ -452,7 +452,7 @@ class CoreFeatures_Controller extends Action_Controller
 	 */
 	protected function _prepare_corefeatures($core_features)
 	{
-		global $context, $txt, $settings, $scripturl;
+		global $context, $txt, $settings;
 
 		$features = array();
 		foreach ($core_features as $id => $feature)
