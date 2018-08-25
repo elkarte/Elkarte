@@ -80,7 +80,7 @@ class AddonSettings_Controller extends Action_Controller
 	 */
 	public function action_addonSettings_display()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		// instantiate the form
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);

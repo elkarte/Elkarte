@@ -115,10 +115,10 @@ class ManageDraftsModule_Controller extends Action_Controller
 	 */
 	public static function integrate_topics_maintenance(&$topics_actions)
 	{
-		global $scripturl, $txt;
+		global $txt;
 
 		$topics_actions['olddrafts'] = array(
-			'url' => $scripturl . '?action=admin;area=maintain;sa=topics;activity=olddrafts',
+			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'topics', 'activity' => 'olddrafts']),
 			'title' => $txt['maintain_old_drafts'],
 			'submit' => $txt['maintain_old_remove'],
 			'confirm' => $txt['maintain_old_drafts_confirm'],
@@ -190,7 +190,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 	 */
 	public function action_draftSettings_display()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		isAllowedTo('admin_forum');
 		theme()->getTemplates()->loadLanguageFile('Drafts');
@@ -241,7 +241,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 			}', true);
 
 		// Final settings...
-		$context['post_url'] = $scripturl . '?action=admin;area=managedrafts;save';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'managedrafts', 'save']);
 		$context['settings_title'] = $txt['managedrafts_settings'];
 
 		// Prepare the settings...

@@ -32,7 +32,7 @@ class AdminLog_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		global $context, $txt, $scripturl, $modSettings;
+		global $context, $txt, $modSettings;
 
 		// These are the logs they can load.
 		$subActions = array(
@@ -122,7 +122,7 @@ class AdminLog_Controller extends Action_Controller
 	 */
 	public function action_pruningSettings_display()
 	{
-		global $txt, $scripturl, $context, $modSettings;
+		global $txt, $context, $modSettings;
 
 		// Make sure we understand what's going on.
 		theme()->getTemplates()->loadLanguageFile('ManageSettings');

@@ -41,7 +41,7 @@ class BadBehavior_Controller extends Action_Controller
 	 */
 	public function action_log()
 	{
-		global $scripturl, $txt, $context, $modSettings;
+		global $txt, $context, $modSettings;
 
 		// Check for the administrative permission to do this.
 		isAllowedTo('admin_forum');
@@ -110,7 +110,7 @@ class BadBehavior_Controller extends Action_Controller
 	 */
 	protected function _prepareMembers()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		$members = array();
 		foreach ($context['bb_entries'] as $member)

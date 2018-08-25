@@ -132,7 +132,7 @@ class ManageErrors_Controller extends Action_Controller
 		$context['error_types']['all'] = array(
 			'label' => $txt['errortype_all'],
 			'description' => isset($txt['errortype_all_desc']) ? $txt['errortype_all_desc'] : '',
-			'url' => $scripturl . '?action=admin;area=logs;sa=errorlog' . ($context['sort_direction'] == 'down' ? ';desc' : ''),
+			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog', $context['sort_direction'] == 'down' ? 'desc' : '']),
 			'is_selected' => empty($filter),
 		);
 

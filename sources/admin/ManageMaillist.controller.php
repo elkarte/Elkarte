@@ -99,7 +99,7 @@ class ManageMaillist_Controller extends Action_Controller
 	 */
 	public function action_unapproved_email()
 	{
-		global $context, $scripturl, $modSettings, $txt;
+		global $context, $modSettings, $txt;
 
 		// Set an id if none was supplied
 		$id = $this->_req->getQuery('e_id', 'intval', 0);
@@ -114,7 +114,7 @@ class ManageMaillist_Controller extends Action_Controller
 			'title' => $txt['ml_emailerror'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['ml_emailerror_none'],
-			'base_href' => $scripturl . '?action=admin;area=maillist',
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist']),
 			'default_sort_col' => 'id_email',
 			'get_items' => array(
 				'function' => array($this, 'list_maillist_unapproved'),
@@ -267,7 +267,7 @@ class ManageMaillist_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'emaillist']),
 				'include_sort' => true,
 				'include_start' => true,
 			),
@@ -583,7 +583,7 @@ class ManageMaillist_Controller extends Action_Controller
 	 */
 	public function action_list_filters()
 	{
-		global $context, $scripturl, $txt, $modSettings;
+		global $context, $txt, $modSettings;
 
 		$id = 0;
 
@@ -593,7 +593,7 @@ class ManageMaillist_Controller extends Action_Controller
 			'title' => $txt['filters'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['no_filters'],
-			'base_href' => $scripturl . '?action=admin;area=maillist;sa=emailfilters',
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'emailfilters']),
 			'default_sort_col' => 'name',
 			'get_items' => array(
 				'function' => array($this, 'load_filter_parser'),
@@ -683,7 +683,7 @@ class ManageMaillist_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=maillist;sa=editfilter;',
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'editfilter']),
 				'include_sort' => true,
 				'include_start' => true,
 				'hidden_fields' => array(
@@ -700,7 +700,7 @@ class ManageMaillist_Controller extends Action_Controller
 					'class' => 'submitbutton',
 					'value' => '
 						<input type="submit" name="addfilter" value="' . $txt['add_filter'] . '" />
-						<a class="linkbutton" href="' . $scripturl . '?action=admin;area=maillist;sa=sortfilters">' . $txt['sort_filter'] . '</a>',
+						<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'sortfilters']) . '">' . $txt['sort_filter'] . '</a>',
 				),
 			),
 		);
@@ -721,7 +721,7 @@ class ManageMaillist_Controller extends Action_Controller
 	 */
 	public function action_sort_filters()
 	{
-		global $context, $scripturl, $txt;
+		global $context, $txt;
 
 		$id = 0;
 		$token = createToken('admin-sort');
@@ -733,7 +733,7 @@ class ManageMaillist_Controller extends Action_Controller
 			'sortable' => true,
 			'items_per_page' => 0,
 			'no_items_label' => $txt['no_filters'],
-			'base_href' => $scripturl . '?action=admin;area=maillist;sa=sortfilters',
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'sortfilters']),
 			'get_items' => array(
 				'function' => array($this, 'load_filter_parser'),
 				'params' => array(
@@ -795,7 +795,7 @@ class ManageMaillist_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=maillist;sa=sortfilters',
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'sortfilters']),
 				'hidden_fields' => array(
 					$context['session_var'] => $context['session_id'],
 				),
@@ -872,7 +872,7 @@ class ManageMaillist_Controller extends Action_Controller
 	 */
 	public function action_edit_filters()
 	{
-		global $context, $scripturl, $txt, $modSettings;
+		global $context, $txt, $modSettings;
 
 		// Editing an existing filter?
 		if (isset($this->_req->query->f_id))
@@ -962,10 +962,10 @@ class ManageMaillist_Controller extends Action_Controller
 
 		// Prepare some final context for the template
 		$title = !empty($this->_req->query->saved) ? 'saved_filter' : ($context['editing'] === true ? 'edit_filter' : 'add_filter');
-		$context['post_url'] = $scripturl . '?action=admin;area=maillist;sa=editfilter' . ($context['editing'] ? ';edit=' . $modSettings['id_filter'] : ';new') . ';save';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'editfilter', $context['editing'] ? 'edit' => $modSettings['id_filter'] : 'new', 'save']);
 		$context['settings_title'] = $txt[$title];
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=admin;area=maillist;sa=editfilter',
+			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'editfilter']),
 			'name' => ($context['editing']) ? $txt['edit_filter'] : $txt['add_filter'],
 		);
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -1037,7 +1037,7 @@ class ManageMaillist_Controller extends Action_Controller
 	 */
 	public function action_list_parsers()
 	{
-		global $context, $scripturl, $txt, $modSettings;
+		global $context, $txt, $modSettings;
 
 		$id = 0;
 
@@ -1047,7 +1047,7 @@ class ManageMaillist_Controller extends Action_Controller
 			'title' => $txt['parsers'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['no_parsers'],
-			'base_href' => $scripturl . '?action=admin;area=maillist;sa=emailparser',
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'emailparser']),
 			'get_items' => array(
 				'function' => array($this, 'load_filter_parser'),
 				'params' => array(
@@ -1123,7 +1123,7 @@ class ManageMaillist_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=maillist;sa=editparser',
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'editparser']),
 				'include_sort' => true,
 				'include_start' => true,
 				'hidden_fields' => array(
@@ -1140,7 +1140,7 @@ class ManageMaillist_Controller extends Action_Controller
 					'class' => 'submitbutton',
 					'value' => '
 						<input type="submit" name="addparser" value="' . $txt['add_parser'] . '" />
-						<a class="linkbutton" href="' . $scripturl . '?action=admin;area=maillist;sa=sortparsers">' . $txt['sort_parser'] . '</a>',
+						<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'sortparsers']) . '">' . $txt['sort_parser'] . '</a>',
 					),
 			),
 		);
@@ -1161,7 +1161,7 @@ class ManageMaillist_Controller extends Action_Controller
 	 */
 	public function action_sort_parsers()
 	{
-		global $context, $scripturl, $txt;
+		global $context, $txt;
 
 		$id = 0;
 		$token = createToken('admin-sort');
@@ -1173,7 +1173,7 @@ class ManageMaillist_Controller extends Action_Controller
 			'sortable' => true,
 			'items_per_page' => 0,
 			'no_items_label' => $txt['no_parsers'],
-			'base_href' => $scripturl . '?action=admin;area=maillist;sa=sortparsers',
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'sortparsers']),
 			'get_items' => array(
 				'function' => array($this, 'load_filter_parser'),
 				'params' => array(
@@ -1226,7 +1226,7 @@ class ManageMaillist_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=maillist;sa=sortparsers',
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'sortparsers']),
 				'hidden_fields' => array(
 					$context['session_var'] => $context['session_id'],
 				),
@@ -1269,7 +1269,7 @@ class ManageMaillist_Controller extends Action_Controller
 	 */
 	public function action_edit_parsers()
 	{
-		global $context, $scripturl, $txt, $modSettings;
+		global $context, $txt, $modSettings;
 
 		// Editing an existing filter?
 		if (isset($this->_req->query->f_id))
@@ -1358,9 +1358,9 @@ class ManageMaillist_Controller extends Action_Controller
 		// Prepare the context for viewing
 		$title = ((isset($this->_req->query->saved) && $this->_req->query->saved == '1') ? 'saved_parser' : ($context['editing'] === true ? 'edit_parser' : 'add_parser'));
 		$context['settings_title'] = $txt[$title];
-		$context['post_url'] = $scripturl . '?action=admin;area=maillist;sa=editparser' . ($context['editing'] ? ';edit=' . $modSettings['id_filter'] : ';new') . ';save';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'editparser', $context['editing'] ? 'edit' => $modSettings['id_filter'] : 'new', 'save']);
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=admin;area=maillist;sa=editparser',
+			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'editparser']),
 			'name' => ($context['editing']) ? $txt['edit_parser'] : $txt['add_parser'],
 		);
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -1425,7 +1425,7 @@ class ManageMaillist_Controller extends Action_Controller
 	 */
 	public function action_settings()
 	{
-		global $scripturl, $context, $txt, $modSettings;
+		global $context, $txt, $modSettings;
 
 		// Be nice, show them we did something
 		if (isset($this->_req->query->saved))
@@ -1552,7 +1552,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context['boards'] = $board_list;
 		$context['settings_title'] = $txt['ml_emailsettings'];
 		$context['page_title'] = $txt['ml_emailsettings'];
-		$context['post_url'] = $scripturl . '?action=admin;area=maillist;sa=emailsettings;save';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'emailsettings', 'save']);
 		$context['sub_template'] = 'show_settings';
 		$settingsForm->prepare();
 	}
@@ -1677,7 +1677,7 @@ class ManageMaillist_Controller extends Action_Controller
 			'title' => $txt['ml_bounce_templates_title'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['ml_bounce_templates_none'],
-			'base_href' => $scripturl . '?action=admin;area=maillist;sa=emailtemplates;' . $context['session_var'] . '=' . $context['session_id'],
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'emailtemplates', '{session_data}']),
 			'default_sort_col' => 'title',
 			'get_items' => array(
 				'function' => array($this, 'list_getBounceTemplates'),
@@ -1745,7 +1745,7 @@ class ManageMaillist_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=maillist;sa=emailtemplates',
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'emailtemplates']),
 				'token' => 'mod-mlt',
 			),
 			'additional_rows' => array(

@@ -104,7 +104,7 @@ class Admin_Controller extends Action_Controller
 	 */
 	private function loadMenu()
 	{
-		global $txt, $context, $scripturl, $modSettings, $settings;
+		global $txt, $context, $modSettings, $settings;
 
 		// Need these to do much
 		require_once(SUBSDIR . '/Menu.subs.php');
@@ -602,7 +602,7 @@ class Admin_Controller extends Action_Controller
 	 */
 	private function buildLinktree($admin_include_data)
 	{
-		global $txt, $context, $scripturl;
+		global $txt, $context;
 
 		// Build the link tree.
 		$context['linktree'][] = array(
@@ -638,7 +638,7 @@ class Admin_Controller extends Action_Controller
 	 */
 	public function action_home()
 	{
-		global $txt, $scripturl, $context, $user_info, $settings;
+		global $txt, $context, $user_info, $settings;
 
 		// We need a little help
 		require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -685,7 +685,7 @@ class Admin_Controller extends Action_Controller
 	 */
 	public function action_credits()
 	{
-		global $txt, $scripturl, $context, $user_info;
+		global $txt, $context, $user_info;
 
 		// We need a little help from our friends
 		require_once(SUBSDIR . '/Membergroups.subs.php');
