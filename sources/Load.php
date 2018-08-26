@@ -938,7 +938,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 		$request = $db->query('', '
 			SELECT' . $select_columns . '
 			FROM {db_prefix}members AS mem' . $select_tables . '
-			WHERE mem.' . ($is_name ? 'member_name' : 'id_member') . (count($users) == 1 ? ' = {' . ($is_name ? 'string' : 'int') . ':users}' : ' IN ({' . ($is_name ? 'array_string' : 'array_int') . ':users})'),
+			WHERE mem.' . ($is_name ? 'member_name' : 'id_member') . (count($users) == 1 ? ' = {' . ($is_name ? 'string' : 'int') . ':users}' : ' IN ({' . ($is_name ? 'array_string_case_insensitive' : 'array_int') . ':users})'),
 			array(
 				'blank_string' => '',
 				'users' => count($users) == 1 ? current($users) : $users,
