@@ -51,7 +51,7 @@ class Help_Controller extends Action_Controller
 	 */
 	public function action_help()
 	{
-		global $scripturl, $context, $txt;
+		global $context, $txt;
 
 		theme()->getTemplates()->load('Help');
 		theme()->getTemplates()->loadLanguageFile('Manual');
@@ -75,7 +75,7 @@ class Help_Controller extends Action_Controller
 
 		// Build the link tree.
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=help',
+			'url' => getUrl('action', ['action' => 'help']),
 			'name' => $txt['help'],
 		);
 
@@ -145,6 +145,8 @@ class Help_Controller extends Action_Controller
 
 		// Link to the forum URL, and include session id.
 		if (preg_match('~%([0-9]+\$)?s\?~', $context['help_text'], $match))
-			$context['help_text'] = sprintf($context['help_text'], $scripturl, $context['session_id'], $context['session_var']);
+		{
+			$context['help_text'] = sprintf($context['help_text'], getUrl('boardindex', []), $context['session_id'], $context['session_var']);
+		}
 	}
 }

@@ -91,7 +91,7 @@ class MarkRead_Controller extends Action_Controller
 	 */
 	public function action_index_api()
 	{
-		global $context, $txt, $user_info, $scripturl;
+		global $context, $txt, $user_info;
 
 		theme()->getTemplates()->load('Xml');
 
@@ -118,7 +118,7 @@ class MarkRead_Controller extends Action_Controller
 				theme()->getTemplates()->loadLanguageFile('Errors');
 				$context['xml_data'] = array(
 					'error' => 1,
-					'url' => $scripturl . '?action=markasread;sa=all;' . $context['session_var'] . '=' . $context['session_id'],
+					'url' => getUrl('action', ['action' => 'markasread', 'sa' => 'all', '{session_data}']),
 				);
 
 				return;
@@ -132,9 +132,19 @@ class MarkRead_Controller extends Action_Controller
 		// For the time being this is a special case, but in BoardIndex no, we don't want it
 		if ($this->_req->getQuery('sa') === 'all' || $this->_req->getQuery('sa') === 'board' && !isset($this->_req->query->bi))
 		{
+			$url_params = ['action' => 'unread', 'all', '{session_data}'];
+			if (!empty($this->_querystring_board_limits))
+			{
+				$url_params += $this->_querystring_board_limits;
+				$url_params['start'] = 0;
+			}
+			if (!empty($this->$this->_querystring_sort_limits))
+			{
+				$url_params += $this->$this->_querystring_sort_limits;
+			}
 			$context['xml_data'] = array(
 				'text' => $txt['topic_alert_none'],
-				'body' => str_replace('{unread_all_url}', $scripturl . '?action=unread;all' . sprintf($this->_querystring_board_limits, 0) . $this->_querystring_sort_limits, $txt['unread_topics_visit_none']),
+				'body' => str_replace('{unread_all_url}', getUrl('action', $url_params), $txt['unread_topics_visit_none']),
 			);
 		}
 		// No need to do anything, just die :'(
@@ -302,7 +312,7 @@ class MarkRead_Controller extends Action_Controller
 				$_SESSION['topicseen_cache'][$b] = array();
 		}
 
-		$this->_querystring_board_limits = $this->_req->getQuery('sa') === 'board' ? ';boards=' . implode(',', $boards) . ';start=%d' : '';
+		$this->_querystring_board_limits = $this->_req->getQuery('sa') === 'board' ? ['boards' => implode(',', $boards), 'start' => '%d'] : [];
 
 		$sort_methods = array(
 			'subject',
@@ -315,10 +325,14 @@ class MarkRead_Controller extends Action_Controller
 
 		// The default is the most logical: newest first.
 		if (!isset($this->_req->query->sort) || !in_array($this->_req->query->sort, $sort_methods))
-			$this->_querystring_sort_limits = isset($this->_req->query->asc) ? ';asc' : '';
+		{
+			$this->_querystring_sort_limits = isset($this->_req->query->asc) ? ['asc'] : [];
+		}
 		// But, for other methods the default sort is ascending.
 		else
-			$this->_querystring_sort_limits = ';sort=' . $this->_req->query->sort . (isset($this->_req->query->desc) ? ';desc' : '');
+		{
+			$this->_querystring_sort_limits = ['sort' => $this->_req->query->sort, isset($this->_req->query->desc) ? 'desc' : ''];
+		}
 
 		if (!isset($this->_req->query->unread))
 		{

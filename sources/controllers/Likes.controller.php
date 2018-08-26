@@ -282,7 +282,7 @@ class Likes_Controller extends Action_Controller
 	 */
 	private function _action_showGiven()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt, $user_profile, $scripturl;
 
 		$memID = currentMemberID();
 
@@ -384,7 +384,7 @@ class Likes_Controller extends Action_Controller
 	 */
 	private function _action_showReceived()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt, $user_profile;
 
 		$memID = currentMemberID();
 
@@ -394,7 +394,7 @@ class Likes_Controller extends Action_Controller
 			'title' => $txt['likes'],
 			'items_per_page' => 25,
 			'no_items_label' => $txt['likes_none_received'],
-			'base_href' => $scripturl . '?action=profile;area=showlikes;sa=received;u=' . $memID,
+			'base_href' => getUrl('profile', ['action' => 'profile', 'area' => 'showlikes', 'sa' => 'received', 'u' => $memID, 'name' => $user_profile[$memID]['real_name']]),
 			'default_sort_col' => 'subject',
 			'get_items' => array(
 				'function' => array($this, 'list_loadLikesReceived'),
@@ -504,7 +504,7 @@ class Likes_Controller extends Action_Controller
 			'title' => $txt['likes_by'],
 			'items_per_page' => 25,
 			'no_items_label' => $txt['likes_none_given'],
-			'base_href' => $scripturl . '?action=likes;sa=showWhoLiked;msg=' . $message,
+			'base_href' => getUrl('action', ['action' => 'likes', 'sa' => 'showWhoLiked', 'msg' => $message]),
 			'default_sort_col' => 'member',
 			'get_items' => array(
 				'function' => array($this, 'list_loadPostLikers'),

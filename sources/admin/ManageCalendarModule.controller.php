@@ -122,7 +122,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 			'id' => 'holiday_list',
 			'title' => $txt['current_holidays'],
 			'items_per_page' => 20,
-			'base_href' => ,
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'managecalendar', 'sa' => 'holidas']),
 			'default_sort_col' => 'name',
 			'get_items' => array(
 				'file' => SUBSDIR . '/Calendar.subs.php',

@@ -111,7 +111,7 @@ class Emailuser_Controller extends Action_Controller
 	 */
 	public function action_sendtopic_api()
 	{
-		global $topic, $modSettings, $txt, $context, $scripturl;
+		global $topic, $modSettings, $txt, $context;
 
 		theme()->getTemplates()->load('Xml');
 
@@ -139,7 +139,7 @@ class Emailuser_Controller extends Action_Controller
 			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
-				'url' => $scripturl . '?action=emailuser;sa=sendtopic;topic=' . $topic . '.0',
+				'url' => getUrl('action', ['action' => 'emailuser', 'sa' => 'sendtopic' => 'topic' => $topic . '.0']),
 			);
 			return;
 		}
@@ -207,7 +207,7 @@ class Emailuser_Controller extends Action_Controller
 	 */
 	private function _sendTopic($row)
 	{
-		global $scripturl, $topic, $txt;
+		global $topic, $txt;
 
 		// This is needed for sendmail().
 		require_once(SUBSDIR . '/Mail.subs.php');
@@ -253,7 +253,7 @@ class Emailuser_Controller extends Action_Controller
 			'TOPICSUBJECT' => $row['subject'],
 			'SENDERNAME' => $validator->y_name,
 			'RECPNAME' => $validator->r_name,
-			'TOPICLINK' => $scripturl . '?topic=' . $topic . '.0',
+			'TOPICLINK' => getUrl('topic', ['topic' => $row['id_topic'] . '.0', 'name' => $row['subject']]),
 		);
 
 		$emailtemplate = 'send_topic';
@@ -282,7 +282,7 @@ class Emailuser_Controller extends Action_Controller
 	 */
 	public function action_email()
 	{
-		global $context, $user_info, $txt, $scripturl;
+		global $context, $user_info, $txt;
 
 		// Can the user even see this information?
 		if ($user_info['is_guest'])
@@ -333,7 +333,7 @@ class Emailuser_Controller extends Action_Controller
 			'name' => $row['real_name'],
 			'email' => $row['email_address'],
 			'email_link' => ($context['show_email_address'] == 'yes_permission_override' ? '<em>' : '') . '<a href="mailto:' . $row['email_address'] . '">' . $row['email_address'] . '</a>' . ($context['show_email_address'] == 'yes_permission_override' ? '</em>' : ''),
-			'link' => $row['id_member'] ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>' : $row['real_name'],
+			'link' => $row['id_member'] ? '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['real_name']]) . '">' . $row['real_name'] . '</a>' : $row['real_name'],
 		);
 
 		// Can we see this person's email address?
@@ -527,7 +527,7 @@ class Emailuser_Controller extends Action_Controller
 	 */
 	public function action_reporttm2()
 	{
-		global $txt, $scripturl, $topic, $board, $user_info, $modSettings, $language, $context;
+		global $txt, $topic, $board, $user_info, $modSettings, $language, $context;
 
 		// You must have the proper permissions!
 		isAllowedTo('report_any');
@@ -642,8 +642,8 @@ class Emailuser_Controller extends Action_Controller
 				'TOPICSUBJECT' => $subject,
 				'POSTERNAME' => $poster_name,
 				'REPORTERNAME' => $reporterName,
-				'TOPICLINK' => $scripturl . '?topic=' . $topic . '.msg' . $msg_id . '#msg' . $msg_id,
-				'REPORTLINK' => !empty($id_report) ? $scripturl . '?action=moderate;area=reports;report=' . $id_report : '',
+				'TOPICLINK' => getUrl('topic', ['topic' => $topic . '.msg' . $msg_id, 'name' => $subject]) . '#msg' . $msg_id,
+				'REPORTLINK' => !empty($id_report) ? getUrl('action', ['action' => 'moderate', 'area' => 'reports', 'report' => $id_report]) : '',
 				'COMMENT' => $this->_req->post->comment,
 			);
 
