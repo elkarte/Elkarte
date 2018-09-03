@@ -75,7 +75,7 @@ class ManageBans_Controller extends Action_Controller
 				),
 				'browse' => array(
 					'description' => $txt['ban_trigger_browse_description'],
-					'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'browse'],
+					'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'browse']),
 					'is_selected' => $subAction == 'browse',
 				),
 				'log' => array(

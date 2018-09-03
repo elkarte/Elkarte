@@ -501,7 +501,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 							// Add a link to the topic in case of an attachment.
 							if ($context['browse_type'] !== 'avatars')
-								$date .= '<br />' . $txt['in'] . ' <a href="' . getUrl('topic', ['topic' => ((int) $rowData['id_topic']) '.msg' . ((int) $rowData['id_msg']), 'subject' => $rowData['subject']]) . '#msg' . (int) $rowData['id_msg'] . '">' . $rowData['subject'] . '</a>';
+								$date .= '<br />' . $txt['in'] . ' <a href="' . getUrl('topic', ['topic' => ((int) $rowData['id_topic']) . '.msg' . ((int) $rowData['id_msg']), 'subject' => $rowData['subject']]) . '#msg' . (int) $rowData['id_msg'] . '">' . $rowData['subject'] . '</a>';
 
 							return $date;
 							},

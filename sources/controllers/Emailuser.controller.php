@@ -139,7 +139,7 @@ class Emailuser_Controller extends Action_Controller
 			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
-				'url' => getUrl('action', ['action' => 'emailuser', 'sa' => 'sendtopic' => 'topic' => $topic . '.0']),
+				'url' => getUrl('action', ['action' => 'emailuser', 'sa' => 'sendtopic', 'topic' => $topic . '.0']),
 			);
 			return;
 		}

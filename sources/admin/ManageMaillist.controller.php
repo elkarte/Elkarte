@@ -923,8 +923,8 @@ class ManageMaillist_Controller extends Action_Controller
 			call_integration_hook('integrate_save_filter_settings');
 
 			// Editing an entry?
-			$editId = (isset($this->_req->query->edit)) ? (int) $this->_req->query->edit : -1;
-			$editName = (isset($this->_req->query->edit)) ? 'id_filter' : '';
+			$editId = isset($this->_req->query->edit) && $this->_req->query->edit !== 'new' ? (int) $this->_req->query->edit : -1;
+			$editName = isset($this->_req->query->edit) && $this->_req->query->edit !== 'new' ? 'id_filter' : '';
 
 			// If its regex we do a quick check to see if its valid or not
 			if ($this->_req->post->filter_type === 'regex')
@@ -962,7 +962,7 @@ class ManageMaillist_Controller extends Action_Controller
 
 		// Prepare some final context for the template
 		$title = !empty($this->_req->query->saved) ? 'saved_filter' : ($context['editing'] === true ? 'edit_filter' : 'add_filter');
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'editfilter', $context['editing'] ? 'edit' => $modSettings['id_filter'] : 'new', 'save']);
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'editfilter', 'edit' => $context['editing'] ? $modSettings['id_filter'] : 'new', 'save']);
 		$context['settings_title'] = $txt[$title];
 		$context['linktree'][] = array(
 			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'editfilter']),
@@ -1317,8 +1317,8 @@ class ManageMaillist_Controller extends Action_Controller
 			call_integration_hook('integrate_save_parser_settings');
 
 			// Editing a parser?
-			$editId = isset($this->_req->query->edit) ? (int) $this->_req->query->edit : -1;
-			$editName = isset($this->_req->query->edit) ? 'id_filter' : '';
+			$editId = isset($this->_req->query->edit) && $this->_req->query->edit !== 'new' ? (int) $this->_req->query->edit : -1;
+			$editName = isset($this->_req->query->edit) && $this->_req->query->edit !== 'new' ? 'id_filter' : '';
 
 			// Test the regex
 			if ($this->_req->post->filter_type === 'regex' && !empty($this->_req->post->filter_from))
@@ -1358,7 +1358,7 @@ class ManageMaillist_Controller extends Action_Controller
 		// Prepare the context for viewing
 		$title = ((isset($this->_req->query->saved) && $this->_req->query->saved == '1') ? 'saved_parser' : ($context['editing'] === true ? 'edit_parser' : 'add_parser'));
 		$context['settings_title'] = $txt[$title];
-		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'editparser', $context['editing'] ? 'edit' => $modSettings['id_filter'] : 'new', 'save']);
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'editparser', 'edit' => $context['editing'] ? $modSettings['id_filter'] : 'new', 'save']);
 		$context['linktree'][] = array(
 			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist', 'sa' => 'editparser']),
 			'name' => ($context['editing']) ? $txt['edit_parser'] : $txt['add_parser'],
