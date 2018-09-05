@@ -150,7 +150,7 @@ class Profile_Controller extends Action_Controller
 		$this->_check_access();
 
 		// Build the link tree.
-		$this->_build_profile_linktree();
+		$this->_build_profile_linktree($cur_profile);
 
 		// Set the template for this area... if you still can :P
 		// and add the profile layer.
@@ -213,7 +213,7 @@ class Profile_Controller extends Action_Controller
 	 */
 	private function _define_profile_menu()
 	{
-		global $txt, $scripturl, $context, $cur_profile, $modSettings;
+		global $txt, $context, $cur_profile, $modSettings;
 
 		$profile_areas = array(
 			'info' => array(
@@ -430,7 +430,7 @@ class Profile_Controller extends Action_Controller
 				'areas' => array(
 					'sendpm' => array(
 						'label' => $txt['profileSendIm'],
-						'custom_url' => $scripturl . '?action=pm;sa=send',
+						'custom_url' => getUrl('action', ['action' => 'pm', 'sa' => 'send']),
 						'permission' => array(
 							'own' => array(),
 							'any' => array('pm_send'),
@@ -449,7 +449,7 @@ class Profile_Controller extends Action_Controller
 					),
 					'banuser' => array(
 						'label' => $txt['profileBanUser'],
-						'custom_url' => $scripturl . '?action=admin;area=ban;sa=add',
+						'custom_url' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'add']),
 						'enabled' => $cur_profile['id_group'] != 1 && !in_array(1, explode(',', $cur_profile['additional_groups'])),
 						'permission' => array(
 							'own' => array(),
@@ -557,19 +557,19 @@ class Profile_Controller extends Action_Controller
 	 * Just builds the link tree based on where were are in the profile section
 	 * and who's profile is being viewed, etc.
 	 */
-	private function _build_profile_linktree()
+	private function _build_profile_linktree($cur_profile)
 	{
-		global $context, $scripturl, $txt, $user_info;
+		global $context, $txt, $user_info;
 
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=profile' . ($this->_memID != $user_info['id'] ? ';u=' . $this->_memID : ''),
+			'url' => getUrl('profile', ['action' => 'profile', 'u' => $this->_memID, 'name' => $cur_profile['real_name']]),
 			'name' => sprintf($txt['profile_of_username'], $context['member']['name']),
 		);
 
 		if (!empty($this->_profile_include_data['label']))
 		{
 			$context['linktree'][] = array(
-				'url' => $scripturl . '?action=profile' . ($this->_memID != $user_info['id'] ? ';u=' . $this->_memID : '') . ';area=' . $this->_profile_include_data['current_area'],
+				'url' => getUrl('profile', ['action' => 'profile', 'area' => $this->_profile_include_data['current_area'], 'u' => $this->_memID, 'name' => $cur_profile['real_name']]),
 				'name' => $this->_profile_include_data['label'],
 			);
 		}
@@ -577,7 +577,7 @@ class Profile_Controller extends Action_Controller
 		if (!empty($this->_profile_include_data['current_subsection']) && $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']][0] != $this->_profile_include_data['label'])
 		{
 			$context['linktree'][] = array(
-				'url' => $scripturl . '?action=profile' . ($this->_memID != $user_info['id'] ? ';u=' . $this->_memID : '') . ';area=' . $this->_profile_include_data['current_area'] . ';sa=' . $this->_profile_include_data['current_subsection'],
+				'url' => getUrl('profile', ['action' => 'profile', 'area' => $this->_profile_include_data['current_area'], 'sa' => $this->_profile_include_data['current_subsection'], 'u' => $this->_memID, 'name' => $cur_profile['real_name']]),
 				'name' => $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']][0],
 			);
 		}
