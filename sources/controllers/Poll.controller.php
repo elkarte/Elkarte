@@ -201,7 +201,7 @@ class Poll_Controller extends Action_Controller
 		checkSession('get');
 
 		// Get the poll starter, ID, and whether or not it is locked.
-		$poll = pollStatus($topic);
+		$poll = pollInfoForTopic($topic);
 
 		// If the user _can_ modify the poll....
 		if (!allowedTo('poll_lock_any'))
@@ -247,7 +247,7 @@ class Poll_Controller extends Action_Controller
 	 */
 	public function action_editpoll()
 	{
-		global $txt, $user_info, $context, $topic, $board, $scripturl;
+		global $txt, $user_info, $context, $topic, $board;
 
 		// No topic, means you can't edit the poll
 		if (empty($topic))
@@ -498,12 +498,12 @@ class Poll_Controller extends Action_Controller
 		}
 
 		$context['page_title'] = $context['is_edit'] ? $txt['poll_edit'] : $txt['add_poll'];
-		$context['form_url'] = $scripturl . '?action=editpoll2' . ($context['is_edit'] ? '' : ';add') . ';topic=' . $context['current_topic'] . '.' . $context['start'];
+		$context['form_url'] = getUrl('action', ['action' => 'editpoll2', $context['is_edit'] ? '' : ';add', 'topic' => $context['current_topic'] . '.' . $context['start']]);
 
 		// Build the link tree.
 		$pollinfo['subject'] = censor($pollinfo['subject']);
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?topic=' . $topic . '.0',
+			'url' => getUrl('topic', ['topic' => $topic . '.0', 'subject' => $pollinfo['subject']]),
 			'name' => $pollinfo['subject'],
 		);
 		$context['linktree'][] = array(
