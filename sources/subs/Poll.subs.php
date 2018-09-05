@@ -207,7 +207,7 @@ function pollInfoForTopic($topicID)
 	// Check if a poll currently exists on this topic, and get the id, question and starter.
 	$request = $db->query('', '
 		SELECT
-			t.id_member_started AS id_member, p.id_poll, p.voting_locked, p.question,
+			t.id_member_started, p.id_poll, p.voting_locked, p.question,
 			p.hide_results, p.expire_time, p.max_votes, p.change_vote,
 			m.subject, p.guest_vote, p.id_member AS poll_starter
 		FROM {db_prefix}topics AS t

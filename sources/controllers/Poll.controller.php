@@ -205,7 +205,7 @@ class Poll_Controller extends Action_Controller
 
 		// If the user _can_ modify the poll....
 		if (!allowedTo('poll_lock_any'))
-			isAllowedTo('poll_lock_' . ($user_info['id'] == $poll['id_member'] ? 'own' : 'any'));
+			isAllowedTo('poll_lock_' . ($user_info['id'] == $poll['id_member_started'] ? 'own' : 'any'));
 
 		// It's been locked by a non-moderator.
 		if ($poll['locked'] == '1')
