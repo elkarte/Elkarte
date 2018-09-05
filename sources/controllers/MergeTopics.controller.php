@@ -68,7 +68,7 @@ class MergeTopics_Controller extends Action_Controller
 	 */
 	public function action_mergeIndex()
 	{
-		global $txt, $board, $context, $scripturl, $user_info, $modSettings;
+		global $txt, $board, $context, $user_info, $modSettings;
 
 		// If we don't know where you are from we know where you go
 		$from = $this->_req->getQuery('from', 'intval', null);
@@ -92,7 +92,7 @@ class MergeTopics_Controller extends Action_Controller
 		$topiccount = countTopicsByBoard($target_board, $onlyApproved);
 
 		// Make the page list.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=mergetopics;from=' . $from . ';targetboard=' . $target_board . ';board=' . $board . '.%1$d', $this->_req->query->start, $topiccount, $modSettings['defaultMaxTopics'], true);
+		$context['page_index'] = constructPageIndex(getUrl('action', ['action' => 'mergetopics', 'from' => $from, 'targetboard' => $target_board, 'board' => $board . '.%1$d']), $this->_req->query->start, $topiccount, $modSettings['defaultMaxTopics'], true);
 
 		// Get the topic's subject.
 		$topic_info = getTopicInfo($from, 'message');

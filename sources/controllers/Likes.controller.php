@@ -282,7 +282,7 @@ class Likes_Controller extends Action_Controller
 	 */
 	private function _action_showGiven()
 	{
-		global $context, $txt, $user_profile, $scripturl;
+		global $context, $txt, $user_profile;
 
 		$memID = currentMemberID();
 
@@ -292,7 +292,7 @@ class Likes_Controller extends Action_Controller
 			'title' => $txt['likes'],
 			'items_per_page' => 25,
 			'no_items_label' => $txt['likes_none_given'],
-			'base_href' => $scripturl . '?action=profile;area=showlikes;sa=given;u=' . $memID,
+			'base_href' => getUrl('profile', ['action' => 'profile', 'area' => 'showlikes', 'sa' => 'given', 'u' => $memID, 'name' => $user_profile[$memID]['real_name']]),
 			'default_sort_col' => 'subject',
 			'get_items' => array(
 				'function' => array($this, 'list_loadLikesPosts'),
@@ -490,7 +490,7 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function action_showWhoLiked()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		require_once(SUBSDIR . '/Likes.subs.php');
 		theme()->getTemplates()->loadLanguageFile('Profile');

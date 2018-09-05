@@ -98,7 +98,7 @@ class Help_Controller extends Action_Controller
 	 */
 	public function action_quickhelp()
 	{
-		global $txt, $helptxt, $context, $scripturl;
+		global $txt, $helptxt, $context;
 
 		if (!isset($this->_req->query->help) || !is_string($this->_req->query->help))
 			throw new Elk_Exception('no_access', false);
