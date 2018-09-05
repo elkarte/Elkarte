@@ -196,7 +196,7 @@ class Display_Controller extends Action_Controller
 			if (!empty($redir_topics[$redirfrom]))
 			{
 				$context['topic_redirected_from'] = $redir_topics[$redirfrom];
-				$context['topic_redirected_from']['redir_href'] = getUrl('topic', ['topic' => $context['topic_redirected_from']['id_topic'] . '.0', 'name' => $context['topic_redirected_from']['subject'], 'noredir']);
+				$context['topic_redirected_from']['redir_href'] = getUrl('topic', ['topic' => $context['topic_redirected_from']['id_topic'] . '.0', 'subject' => $context['topic_redirected_from']['subject'], 'noredir']);
 			}
 		}
 
@@ -286,8 +286,8 @@ class Display_Controller extends Action_Controller
 		if ($modSettings['enablePreviousNext'])
 		{
 			$context['links'] += array(
-				'go_prev' => getUrl('topic', ['topic' => $topicinfo['id_topic'] . '.0', 'name' => $topicinfo['subject'], 'prev_next' => 'prev']) . '#new',
-				'go_next' => getUrl('topic', ['topic' => $topicinfo['id_topic'] . '.0', 'name' => $topicinfo['subject'], 'prev_next' => 'next']) . '#new'
+				'go_prev' => getUrl('topic', ['topic' => $topicinfo['id_topic'] . '.0', 'subject' => $topicinfo['subject'], 'prev_next' => 'prev']) . '#new',
+				'go_next' => getUrl('topic', ['topic' => $topicinfo['id_topic'] . '.0', 'subject' => $topicinfo['subject'], 'prev_next' => 'next']) . '#new'
 			);
 		}
 
@@ -331,7 +331,7 @@ class Display_Controller extends Action_Controller
 			$this->_start = -1;
 
 		// Construct the page index, allowing for the .START method...
-		$context['page_index'] = constructPageIndex(getUrl('topic', ['topic' => $topicinfo['id_topic'] . '.%1$d', 'name' => $topicinfo['subject']]), $this->_start, $total_visible_posts, $context['messages_per_page'], true, array('all' => $can_show_all, 'all_selected' => isset($this->_req->query->all)));
+		$context['page_index'] = constructPageIndex(getUrl('topic', ['topic' => $topicinfo['id_topic'] . '.%1$d', 'subject' => $topicinfo['subject']]), $this->_start, $total_visible_posts, $context['messages_per_page'], true, array('all' => $can_show_all, 'all_selected' => isset($this->_req->query->all)));
 		$context['start'] = $this->_start;
 
 		// This is information about which page is current, and which page we're on - in case you don't like
@@ -343,8 +343,8 @@ class Display_Controller extends Action_Controller
 
 		// Figure out all the link to the next/prev
 		$context['links'] += array(
-			'prev' => $this->_start >= $context['messages_per_page'] ? getUrl('topic', ['topic' => $topicinfo['id_topic'] . ($this->_start - $context['messages_per_page']), 'name' => $topicinfo['subject']]) : '',
-			'next' => $this->_start + $context['messages_per_page'] < $total_visible_posts ? getUrl('topic', ['topic' => $topicinfo['id_topic'] . ($this->_start + $context['messages_per_page']), 'name' => $topicinfo['subject']]) : '',
+			'prev' => $this->_start >= $context['messages_per_page'] ? getUrl('topic', ['topic' => $topicinfo['id_topic'] . ($this->_start - $context['messages_per_page']), 'subject' => $topicinfo['subject']]) : '',
+			'next' => $this->_start + $context['messages_per_page'] < $total_visible_posts ? getUrl('topic', ['topic' => $topicinfo['id_topic'] . ($this->_start + $context['messages_per_page']), 'subject' => $topicinfo['subject']]) : '',
 		);
 
 		// If they are viewing all the posts, show all the posts, otherwise limit the number.
@@ -359,7 +359,7 @@ class Display_Controller extends Action_Controller
 
 		// Build the link tree.
 		$context['linktree'][] = array(
-			'url' => getUrl('topic', ['topic' => $topicinfo['id_topic'] . '.0', 'name' => $topicinfo['subject']]),
+			'url' => getUrl('topic', ['topic' => $topicinfo['id_topic'] . '.0', 'subject' => $topicinfo['subject']]),
 			'name' => $topicinfo['subject'],
 		);
 
@@ -383,7 +383,7 @@ class Display_Controller extends Action_Controller
 		$context['mark_unread_time'] = !empty($this->_virtual_msg) ? $this->_virtual_msg : $topicinfo['new_from'];
 
 		// Set a canonical URL for this page.
-		$context['canonical_url'] = getUrl('topic', ['topic' => $topicinfo['id_topic'] . '.' . $context['start'], 'name' => $topicinfo['subject']]);
+		$context['canonical_url'] = getUrl('topic', ['topic' => $topicinfo['id_topic'] . '.' . $context['start'], 'subject' => $topicinfo['subject']]);
 
 		// For quick reply we need a response prefix in the default forum language.
 		$context['response_prefix'] = response_prefix();
