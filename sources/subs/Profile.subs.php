@@ -1197,7 +1197,7 @@ function saveProfileChanges(&$profile_vars, $memID)
 	global $context, $user_profile;
 
 	// These make life easier....
-	$old_profile = &$user_profile[$memID];
+	$old_id_theme = $user_profile[$memID]['id_theme'];
 
 	// Permissions...
 	if ($context['user']['is_owner'])
@@ -1252,7 +1252,7 @@ function saveProfileChanges(&$profile_vars, $memID)
 	// Here's where we sort out all the 'other' values...
 	if ($changeOther)
 	{
-		makeThemeChanges($memID, isset($_POST['id_theme']) ? (int) $_POST['id_theme'] : $old_profile['id_theme']);
+		makeThemeChanges($memID, isset($_POST['id_theme']) ? (int) $_POST['id_theme'] : $old_id_theme);
 		makeNotificationChanges($memID);
 		if (!empty($_REQUEST['sa']))
 			makeCustomFieldChanges($memID, $_REQUEST['sa'], false);
