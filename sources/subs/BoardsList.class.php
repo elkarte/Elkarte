@@ -64,12 +64,6 @@ class Boards_List
 	private $_images_url = '';
 
 	/**
-	 * The url of the script
-	 * @var string
-	 */
-	private $_scripturl = '';
-
-	/**
 	 * A string with session data to be user in urls
 	 * @var string
 	 */
@@ -106,7 +100,7 @@ class Boards_List
 	 */
 	public function __construct($options)
 	{
-		global $user_info, $settings, $context, $scripturl, $modSettings;
+		global $user_info, $settings, $context, $modSettings;
 
 		$this->_options = array_merge(array(
 			'include_categories' => false,
@@ -120,7 +114,6 @@ class Boards_List
 		$this->_options['avatars_on_indexes'] = !empty($settings['avatars_on_indexes']) && $settings['avatars_on_indexes'] !== 2;
 
 		$this->_images_url = $settings['images_url'] . '/' . $context['theme_variant_url'];
-		$this->_scripturl = $scripturl;
 		$this->_session_url = $context['session_var'] . '=' . $context['session_id'];
 
 		$this->_subject_length = $modSettings['subject_length'];
@@ -223,14 +216,14 @@ class Boards_List
 						'order' => $row_board['cat_order'],
 						'is_collapsed' => isset($row_board['can_collapse']) && $row_board['can_collapse'] == 1 && $row_board['is_collapsed'] > 0,
 						'can_collapse' => isset($row_board['can_collapse']) && $row_board['can_collapse'] == 1,
-						'collapse_href' => isset($row_board['can_collapse']) ? $this->_scripturl . '?action=collapse;c=' . $row_board['id_cat'] . ';sa=' . ($row_board['is_collapsed'] > 0 ? 'expand;' : 'collapse;') . $this->_session_url . '#c' . $row_board['id_cat'] : '',
+						'collapse_href' => isset($row_board['can_collapse']) ? getUrl('action', ['action' => 'collapse', 'c' => $row_board['id_cat'], 'sa' => ($row_board['is_collapsed'] > 0 ? 'expand' : 'collapse', '{session_data}']) . '#c' . $row_board['id_cat'] : '',
 						'collapse_image' => isset($row_board['can_collapse']) ? '<img src="' . $this->_images_url . ($row_board['is_collapsed'] > 0 ? 'expand.png" alt="+"' : 'collapse.png" alt="-"') . ' />' : '',
 						'href' => getUrl('action', $modSettings['default_forum_action']) . '#c' . $row_board['id_cat'],
 						'boards' => array(),
 						'new' => false
 					);
 					$this->_categories[$row_board['id_cat']]['link'] = '<a id="c' . $row_board['id_cat'] . '"></a>' . (!$this->_user['is_guest']
-							? '<a href="' . $this->_scripturl . '?action=unread;c=' . $row_board['id_cat'] . '" title="' . sprintf($txt['new_posts_in_category'], strip_tags($row_board['cat_name'])) . '">' . $cat_name . '</a>'
+							? '<a href="' . getUrl('action', ['action' => 'unread', 'c' => $row_board['id_cat']]) . '" title="' . sprintf($txt['new_posts_in_category'], strip_tags($row_board['cat_name'])) . '">' . $cat_name . '</a>'
 							: $cat_name);
 				}
 
@@ -255,6 +248,7 @@ class Boards_List
 				// Is this a new board, or just another moderator?
 				if (!isset($this->_current_boards[$row_board['id_board']]))
 				{
+					$href = getUrl('board', ['board' => $row_board['id_board'] . '.0', 'name' => $row_board['board_name']]);
 					$this->_current_boards[$row_board['id_board']] = array(
 						'new' => empty($row_board['is_read']),
 						'id' => $row_board['id_board'],
@@ -272,8 +266,8 @@ class Boards_List
 						'unapproved_topics' => $row_board['unapproved_topics'],
 						'unapproved_posts' => $row_board['unapproved_posts'] - $row_board['unapproved_topics'],
 						'can_approve_posts' => $this->_user['mod_cache_ap'] == array(0) || in_array($row_board['id_board'], $this->_user['mod_cache_ap']),
-						'href' => $this->_scripturl . '?board=' . $row_board['id_board'] . '.0',
-						'link' => '<a href="' . $this->_scripturl . '?board=' . $row_board['id_board'] . '.0">' . $row_board['board_name'] . '</a>'
+						'href' => $href,
+						'link' => '<a href="' . $href . '">' . $row_board['board_name'] . '</a>'
 					);
 				}
 				$this->_boards[$row_board['id_board']] = $this->_options['include_categories'] ? $row_board['id_cat'] : 0;
@@ -284,6 +278,7 @@ class Boards_List
 				// A valid child!
 				$isChild = true;
 
+				$href = getUrl('board', ['board' => $row_board['id_board'] . '.0', 'name' => $row_board['board_name']]);
 				$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']] = array(
 					'id' => $row_board['id_board'],
 					'name' => $row_board['board_name'],
@@ -296,8 +291,8 @@ class Boards_List
 					'unapproved_topics' => $row_board['unapproved_topics'],
 					'unapproved_posts' => $row_board['unapproved_posts'] - $row_board['unapproved_topics'],
 					'can_approve_posts' => $this->_user['mod_cache_ap'] == array(0) || in_array($row_board['id_board'], $this->_user['mod_cache_ap']),
-					'href' => $this->_scripturl . '?board=' . $row_board['id_board'] . '.0',
-					'link' => '<a href="' . $this->_scripturl . '?board=' . $row_board['id_board'] . '.0">' . $row_board['board_name'] . '</a>'
+					'href' => $href,
+					'link' => '<a href="' . $href . '">' . $row_board['board_name'] . '</a>'
 				);
 
 				// Counting sub-board posts is... slow :/.
@@ -351,6 +346,7 @@ class Boards_List
 			// Prepare the subject, and make sure it's not too long.
 			$row_board['subject'] = censor($row_board['subject']);
 			$row_board['short_subject'] = Util::shorten_text($row_board['subject'], $this->_subject_length);
+			$poster_href = getUrl('profile', ['action' => 'profile', 'u' => $row_board['id_member'], 'name' => $row_board['real_name']]);
 			$this_last_post = array(
 				'id' => $row_board['id_msg'],
 				'time' => $row_board['poster_time'] > 0 ? standardTime($row_board['poster_time']) : $txt['not_applicable'],
@@ -361,8 +357,8 @@ class Boards_List
 					'id' => $row_board['id_member'],
 					'username' => $row_board['poster_name'] != '' ? $row_board['poster_name'] : $txt['not_applicable'],
 					'name' => $row_board['real_name'],
-					'href' => $row_board['poster_name'] != '' && !empty($row_board['id_member']) ? $this->_scripturl . '?action=profile;u=' . $row_board['id_member'] : '',
-					'link' => $row_board['poster_name'] != '' ? (!empty($row_board['id_member']) ? '<a href="' . $this->_scripturl . '?action=profile;u=' . $row_board['id_member'] . '">' . $row_board['real_name'] . '</a>' : $row_board['real_name']) : $txt['not_applicable'],
+					'href' => $row_board['poster_name'] != '' && !empty($row_board['id_member']) ? $poster_href : '',
+					'link' => $row_board['poster_name'] != '' ? (!empty($row_board['id_member']) ? '<a href="' . $poster_href . '">' . $row_board['real_name'] . '</a>' : $row_board['real_name']) : $txt['not_applicable'],
 				),
 				'start' => 'msg' . $row_board['new_from'],
 				'topic' => $row_board['id_topic']
@@ -374,7 +370,7 @@ class Boards_List
 			// Provide the href and link.
 			if ($row_board['subject'] != '')
 			{
-				$this_last_post['href'] = $this->_scripturl . '?topic=' . $row_board['id_topic'] . '.msg' . ($this->_user['is_guest'] ? $row_board['id_msg'] : $row_board['new_from']) . (empty($row_board['is_read']) ? ';boardseen' : '') . '#new';
+				$this_last_post['href'] = getUrl('topic', ['topic' => $row_board['id_topic'] . '.msg' . ($this->_user['is_guest'] ? $row_board['id_msg'] : $row_board['new_from']), 'subject' => $row_board['subject'], 0 => empty($row_board['is_read']) ? 'boardseen' : '']) . '#new';
 				$this_last_post['link'] = '<a href="' . $this_last_post['href'] . '" title="' . $row_board['subject'] . '">' . $row_board['short_subject'] . '</a>';
 				/* The board's and children's 'last_post's have:
 				time, timestamp (a number that represents the time.), id (of the post), topic (topic id.),
@@ -461,13 +457,14 @@ class Boards_List
 			if ($this->_options['include_categories'])
 				$this->_current_boards = &$this->_categories[$this->_boards[$row_mods['id_board']]]['boards'];
 
+			$href = getUrl('profile', ['action' => 'profile', 'u' => $row_mods['id_moderator'], 'name' => $row_mods['mod_real_name']);
 			$this->_current_boards[$row_mods['id_board']]['moderators'][$row_mods['id_moderator']] = array(
 				'id' => $row_mods['id_moderator'],
 				'name' => $row_mods['mod_real_name'],
-				'href' => $this->_scripturl . '?action=profile;u=' . $row_mods['id_moderator'],
-				'link' => '<a href="' . $this->_scripturl . '?action=profile;u=' . $row_mods['id_moderator'] . '" title="' . $txt['board_moderator'] . '">' . $row_mods['mod_real_name'] . '</a>'
+				'href' => $href,
+				'link' => '<a href="' . $href . '" title="' . $txt['board_moderator'] . '">' . $row_mods['mod_real_name'] . '</a>'
 			);
-			$this->_current_boards[$row_mods['id_board']]['link_moderators'][] = '<a href="' . $this->_scripturl . '?action=profile;u=' . $row_mods['id_moderator'] . '" title="' . $txt['board_moderator'] . '">' . $row_mods['mod_real_name'] . '</a>';
+			$this->_current_boards[$row_mods['id_board']]['link_moderators'][] = '<a href="' . $href . '" title="' . $txt['board_moderator'] . '">' . $row_mods['mod_real_name'] . '</a>';
 		}
 	}
 }

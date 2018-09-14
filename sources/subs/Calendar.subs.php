@@ -104,7 +104,7 @@ function getBirthdayRange($low_date, $high_date)
  */
 function getEventRange($low_date, $high_date, $use_permissions = true, $limit = null)
 {
-	global $scripturl, $modSettings, $user_info, $context;
+	global $modSettings, $user_info, $context;
 
 	$db = database();
 
@@ -117,7 +117,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 	$result = $db->query('', '
 		SELECT
 			cal.id_event, cal.start_date, cal.end_date, cal.title, cal.id_member, cal.id_topic,
-			cal.id_board, b.member_groups, t.id_first_msg, t.approved, b.id_board
+			cal.id_board, b.member_groups, t.id_first_msg, t.approved, t.subject, b.id_board
 		FROM {db_prefix}calendar AS cal
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = cal.id_board)
 			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = cal.id_topic)
@@ -155,9 +155,20 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 			if (strftime('%Y-%m-%d', $date) == $lastDate)
 				$date += 3601;
 			$lastDate = strftime('%Y-%m-%d', $date);
+			$href = getUrl('topic', ['topic' => $row['id_topic'] . '.0', 'subject' => $row['subject']]);
 
 			// If we're using permissions (calendar pages?) then just ouput normal contextual style information.
 			if ($use_permissions)
+			{
+				if ($row['id_board'] == 0)
+				{
+					$modify_href = ['action' => 'calendar', 'sa' => 'post', 'eventid' => $row['id_event'], '{session_data}'];
+				}
+				else
+				{
+					$modify_href = ['action' => 'post', 'msg' => $row['id_first_msg'], 'topic' => $row['id_topic'] . '.0', 'calendar', 'eventid' => $row['id_event'], '{session_data}'];
+				}
+
 				$events[strftime('%Y-%m-%d', $date)][] = array(
 					'id' => $row['id_event'],
 					'title' => $row['title'],
@@ -166,15 +177,17 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 					'is_last' => false,
 					'id_board' => $row['id_board'],
 					'id_topic' => $row['id_topic'],
-					'href' => $row['id_board'] == 0 ? '' : $scripturl . '?topic=' . $row['id_topic'] . '.0',
-					'link' => $row['id_board'] == 0 ? $row['title'] : '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['title'] . '</a>',
+					'href' => $row['id_board'] == 0 ? '' : $href,
+					'link' => $row['id_board'] == 0 ? $row['title'] : '<a href="' . $href . '">' . $row['title'] . '</a>',
 					'can_edit' => allowedTo('calendar_edit_any') || ($row['id_member'] == $user_info['id'] && allowedTo('calendar_edit_own')),
-					'modify_href' => $scripturl . '?action=' . ($row['id_board'] == 0 ? 'calendar;sa=post;' : 'post;msg=' . $row['id_first_msg'] . ';topic=' . $row['id_topic'] . '.0;calendar;') . 'eventid=' . $row['id_event'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+					'modify_href' => getUrl('action', $modify_href),
 					'can_export' => !empty($modSettings['cal_export']) ? true : false,
-					'export_href' => $scripturl . '?action=calendar;sa=ical;eventid=' . $row['id_event'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+					'export_href' => getUrl('action', ['action' => 'calendar', 'sa' => 'ical', 'eventid' => $row['id_event'], '{session_data}']),
 				);
+			}
 			// Otherwise, this is going to be cached and the VIEWER'S permissions should apply... just put together some info.
 			else
+			{
 				$events[strftime('%Y-%m-%d', $date)][] = array(
 					'id' => $row['id_event'],
 					'title' => $row['title'],
@@ -183,8 +196,8 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 					'is_last' => false,
 					'id_board' => $row['id_board'],
 					'id_topic' => $row['id_topic'],
-					'href' => $row['id_topic'] == 0 ? '' : $scripturl . '?topic=' . $row['id_topic'] . '.0',
-					'link' => $row['id_topic'] == 0 ? $row['title'] : '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['title'] . '</a>',
+					'href' => $row['id_topic'] == 0 ? '' : $href,
+					'link' => $row['id_topic'] == 0 ? $row['title'] : '<a href="' . $href . '">' . $row['title'] . '</a>',
 					'can_edit' => false,
 					'can_export' => !empty($modSettings['cal_export']) ? true : false,
 					'topic' => $row['id_topic'],
@@ -192,6 +205,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 					'poster' => $row['id_member'],
 					'allowed_groups' => explode(',', $row['member_groups']),
 				);
+			}
 		}
 	}
 	$db->free_result($result);
@@ -327,7 +341,7 @@ function getTodayInfo()
  */
 function getCalendarGrid($month, $year, $calendarOptions)
 {
-	global $scripturl, $modSettings;
+	global $modSettings;
 
 	// Eventually this is what we'll be returning.
 	$calendarGrid = array(
@@ -468,8 +482,8 @@ function getCalendarGrid($month, $year, $calendarOptions)
 	}
 
 	// Set the previous and the next month's links.
-	$calendarGrid['previous_calendar']['href'] = $scripturl . '?action=calendar;year=' . $calendarGrid['previous_calendar']['year'] . ';month=' . $calendarGrid['previous_calendar']['month'];
-	$calendarGrid['next_calendar']['href'] = $scripturl . '?action=calendar;year=' . $calendarGrid['next_calendar']['year'] . ';month=' . $calendarGrid['next_calendar']['month'];
+	$calendarGrid['previous_calendar']['href'] = getUrl('action', ['action' => 'calendar', 'year' => $calendarGrid['previous_calendar']['year'], 'month' => $calendarGrid['previous_calendar']['month']]);
+	$calendarGrid['next_calendar']['href'] = getUrl('action', ['action' => 'calendar', 'year' => $calendarGrid['next_calendar']['year'], 'month' => $calendarGrid['next_calendar']['month']]);
 
 	return $calendarGrid;
 }
@@ -486,7 +500,7 @@ function getCalendarGrid($month, $year, $calendarOptions)
  */
 function getCalendarWeek($month, $year, $day, $calendarOptions)
 {
-	global $scripturl, $modSettings;
+	global $modSettings;
 
 	// Get todays date.
 	$today = getTodayInfo();
@@ -598,8 +612,8 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 	}
 
 	// Set the previous and the next week's links.
-	$calendarGrid['previous_week']['href'] = $scripturl . '?action=calendar;viewweek;year=' . $calendarGrid['previous_week']['year'] . ';month=' . $calendarGrid['previous_week']['month'] . ';day=' . $calendarGrid['previous_week']['day'];
-	$calendarGrid['next_week']['href'] = $scripturl . '?action=calendar;viewweek;year=' . $calendarGrid['next_week']['year'] . ';month=' . $calendarGrid['next_week']['month'] . ';day=' . $calendarGrid['next_week']['day'];
+	$calendarGrid['previous_week']['href'] = getUrl('action', ['action' => 'calendar', 'viewweek', 'year' => $calendarGrid['previous_week']['year'], 'month' => $calendarGrid['previous_week']['month'], 'day' => $calendarGrid['previous_week']['day']]);
+	$calendarGrid['next_week']['href'] = getUrl('action', ['action' => 'calendar', 'viewweek' ,'year' => $calendarGrid['next_week']['year'], 'month' => $calendarGrid['next_week']['month'], 'day' => $calendarGrid['next_week']['day']]);
 
 	return $calendarGrid;
 }

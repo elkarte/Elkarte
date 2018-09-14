@@ -122,7 +122,7 @@ abstract class Renderer
 	 */
 	public function getContext($reset = false)
 	{
-		global $settings, $txt, $modSettings, $scripturl, $user_info;
+		global $settings, $txt, $modSettings, $user_info;
 		global $memberContext, $context, $topic;
 		static $counter = null;
 
