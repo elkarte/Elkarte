@@ -104,7 +104,7 @@ function getBirthdayRange($low_date, $high_date)
  */
 function getEventRange($low_date, $high_date, $use_permissions = true, $limit = null)
 {
-	global $modSettings, $user_info, $context;
+	global $modSettings, $user_info;
 
 	$db = database();
 
@@ -742,33 +742,69 @@ function cache_getRecentEvents($eventOptions)
 		'data' => $return_data,
 		'expires' => time() + 3600,
 		'refresh_eval' => 'return \'' . strftime('%Y%m%d', forum_time(false)) . '\' != strftime(\'%Y%m%d\', forum_time(false)) || (!empty($modSettings[\'calendar_updated\']) && ' . time() . ' < $modSettings[\'calendar_updated\']);',
-		'post_retri_eval' => '
-			global $context, $scripturl, $user_info;
-
-			foreach ($cache_block[\'data\'][\'calendar_events\'] as $k => $event)
-			{
-				// Remove events that the user may not see or wants to ignore.
-				if ((count(array_intersect($user_info[\'groups\'], $event[\'allowed_groups\'])) === 0 && !allowedTo(\'admin_forum\') && !empty($event[\'id_board\'])) || in_array($event[\'id_board\'], $user_info[\'ignoreboards\']))
-					unset($cache_block[\'data\'][\'calendar_events\'][$k]);
-				else
-				{
-					// Whether the event can be edited depends on the permissions.
-					$cache_block[\'data\'][\'calendar_events\'][$k][\'can_edit\'] = allowedTo(\'calendar_edit_any\') || ($event[\'poster\'] == $user_info[\'id\'] && allowedTo(\'calendar_edit_own\'));
-
-					// The added session code makes this URL not cachable.
-					$cache_block[\'data\'][\'calendar_events\'][$k][\'modify_href\'] = $scripturl . \'?action=\' . ($event[\'topic\'] == 0 ? \'calendar;sa=post;\' : \'post;msg=\' . $event[\'msg\'] . \';topic=\' . $event[\'topic\'] . \'.0;calendar;\') . \'eventid=\' . $event[\'id\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'];
-				}
-			}
-
-			if (empty($params[0][\'include_holidays\']))
-				$cache_block[\'data\'][\'calendar_holidays\'] = array();
-			if (empty($params[0][\'include_birthdays\']))
-				$cache_block[\'data\'][\'calendar_birthdays\'] = array();
-			if (empty($params[0][\'include_events\']))
-				$cache_block[\'data\'][\'calendar_events\'] = array();
-
-			$cache_block[\'data\'][\'show_calendar\'] = !empty($cache_block[\'data\'][\'calendar_holidays\']) || !empty($cache_block[\'data\'][\'calendar_birthdays\']) || !empty($cache_block[\'data\'][\'calendar_events\']);',
+		'post_retri_eval' =>  '
+			require_once(SUBSDIR . \'/Calendar.subs.php\');
+			return cache_getRecentEvents_post_retri_eval($cache_block, $params);',
 	);
+}
+
+/**
+ * Refines the data retrieved from the cache for the cache_getRecentEvents function.
+ *
+ * @package Calendar
+ * @param mixed[] $cache_block
+ * @param mixed[] $params
+ */
+function cache_getRecentEvents_post_retri_eval(&$cache_block, $params)
+{
+	global $user_info;
+
+	foreach ($cache_block['data']['calendar_events'] as $k => $event)
+	{
+		// Remove events that the user may not see or wants to ignore.
+		if ((count(array_intersect($user_info['groups'], $event['allowed_groups'])) === 0 && !allowedTo('admin_forum') && !empty($event['id_board'])) || in_array($event['id_board'], $user_info['ignoreboards']))
+		{
+			unset($cache_block['data']['calendar_events'][$k]);
+		}
+		else
+		{
+			// Whether the event can be edited depends on the permissions.
+			$cache_block['data']['calendar_events'][$k]['can_edit'] = allowedTo('calendar_edit_any') || ($event['poster'] == $user_info['id'] && allowedTo('calendar_edit_own'));
+
+			if ($event['topic'] == 0)
+			{
+				$modify_href = ['action' => 'calendar', 'sa' => 'post', 'eventid' => $event['id'], '{session_data}'];
+			}
+			else
+			{
+				$modify_href = [
+					'action' => 'post',
+					'msg' => $event['msg'],
+					'topic' => $event['topic'] . '.0',
+					'calendar',
+					'eventid' => $event['id'],
+					'{session_data}'
+				];
+			}
+			// The added session code makes this URL not cachable.
+			$cache_block['data']['calendar_events'][$k]['modify_href'] = getUrl('action', $modify_href);
+		}
+	}
+
+	if (empty($params[0]['include_holidays']))
+	{
+		$cache_block['data']['calendar_holidays'] = array();
+	}
+	if (empty($params[0]['include_birthdays']))
+	{
+		$cache_block['data']['calendar_birthdays'] = array();
+	}
+	if (empty($params[0]['include_events']))
+	{
+		$cache_block['data']['calendar_events'] = array();
+	}
+
+	$cache_block['data']['show_calendar'] = !empty($cache_block['data']['calendar_holidays']) || !empty($cache_block['data']['calendar_birthdays']) || !empty($cache_block['data']['calendar_events']);
 }
 
 /**
