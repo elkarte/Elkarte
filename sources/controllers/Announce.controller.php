@@ -225,7 +225,7 @@ class Announce_Controller extends Action_Controller
 				$replacements = array(
 					'TOPICSUBJECT' => $topic_info['subject'],
 					'MESSAGE' => $topic_info['body'],
-					'TOPICLINK' => getUrl('topic', ['topic' => $topic_info['id_topic'] . '.0', 'subject' => $topic_info['subject']]),
+					'TOPICLINK' => getUrl('topic', ['topic' => $topic_info['id_topic'], 'start' => '0', 'subject' => $topic_info['subject']]),
 				);
 
 				$emaildata = loadEmailTemplate('new_announcement', $replacements, $cur_language);

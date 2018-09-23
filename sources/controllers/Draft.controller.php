@@ -129,11 +129,11 @@ class Draft_Controller extends Post_Controller
 				'board' => array(
 					'name' => $row['bname'],
 					'id' => $row['id_board'],
-					'link' => '<a href="' . getUrl('board', ['board' => $row['id_board'] . '.0', 'name' => $row['bname']]) . '">' . $row['bname'] . '</a>',
+					'link' => '<a href="' . getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['bname']]) . '">' . $row['bname'] . '</a>',
 				),
 				'topic' => array(
 					'id' => $row['id_topic'],
-					'link' => empty($row['id_topic']) ? $row['subject'] : '<a href="' . getUrl('topic', ['topic' => $row['id_topic'] . '.0', 'subject' => $row['subject']]) . '">' . $row['subject'] . '</a>',
+					'link' => empty($row['id_topic']) ? $row['subject'] : '<a href="' . getUrl('topic', ['topic' => $row['id_topic'], 'start' => '0', 'subject' => $row['subject']]) . '">' . $row['subject'] . '</a>',
 				),
 				'subject' => $row['subject'],
 				'time' => standardTime($row['poster_time']),

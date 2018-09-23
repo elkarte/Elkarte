@@ -75,7 +75,7 @@ class DisplayRenderer extends Renderer
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		$output = parent::_buildOutputArray();
-		$href = getUrl('topic', ['topic' => $topic . '.msg' . $this->_this_message['id_msg'], 'subject' => $this->_this_message['subject']]) . '#msg' . $this->_this_message['id_msg'],
+		$href = getUrl('topic', ['topic' => $topic, 'start' => 'msg' . $this->_this_message['id_msg'], 'subject' => $this->_this_message['subject']]) . '#msg' . $this->_this_message['id_msg'],
 		$output += array(
 			'attachment' => loadAttachmentContext($this->_this_message['id_msg']),
 			'href' => $href,

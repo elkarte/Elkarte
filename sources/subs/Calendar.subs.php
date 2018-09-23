@@ -156,7 +156,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 			if (strftime('%Y-%m-%d', $date) == $lastDate)
 				$date += 3601;
 			$lastDate = strftime('%Y-%m-%d', $date);
-			$href = getUrl('topic', ['topic' => $row['id_topic'] . '.0', 'subject' => $row['subject']]);
+			$href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => '0', 'subject' => $row['subject']]);
 
 			// If we're using permissions (calendar pages?) then just ouput normal contextual style information.
 			if ($use_permissions)

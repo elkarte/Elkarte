@@ -120,9 +120,9 @@ class Topic_Util
 			}
 			else
 			{
-				$topic_href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['id_last_msg']), 'subject' => $row['first_subject'], $topicseen]) . '#new';
+				$topic_href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => $row['num_replies'] == 0 ? '.0' : ('.msg' . $row['id_last_msg']), 'subject' => $row['first_subject'], $topicseen]) . '#new';
 			}
-			$href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => ($row['num_replies'] == 0 ? '0' : 'msg' . $row['new_from']), 'subject' => $row['first_subject'], $topicseen]) . $row['num_replies'] == 0 ? '' : '#new';
+			$href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => $row['num_replies'] == 0 ? '0' : ('msg' . $row['new_from']), 'subject' => $row['first_subject'], $topicseen]) . $row['num_replies'] == 0 ? '' : '#new';
 
 			// And build the array.
 			$topics[$row['id_topic']] = array(

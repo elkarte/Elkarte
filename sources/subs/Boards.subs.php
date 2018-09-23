@@ -2079,7 +2079,7 @@ function boardNotifications($sort, $memID)
 		),
 		function ($row)
 		{
-			$href = getUrl('board', ['board' => $row['id_board'] . '.0', 'name' => $row['name']]);
+			$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
 			return array(
 				'id' => $row['id_board'],
 				'name' => $row['name'],
@@ -2109,7 +2109,7 @@ function boardNotifications($sort, $memID)
 	);
 	while ($row = $db->fetch_assoc($request))
 	{
-		$href = getUrl('board', ['board' => $row['id_board'] . '.0', 'name' => $row['name']]);
+		$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
 		$notification_boards[] = array(
 			'id' => $row['id_board'],
 			'name' => $row['name'],

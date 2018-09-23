@@ -253,7 +253,7 @@ class Emailuser_Controller extends Action_Controller
 			'TOPICSUBJECT' => $row['subject'],
 			'SENDERNAME' => $validator->y_name,
 			'RECPNAME' => $validator->r_name,
-			'TOPICLINK' => getUrl('topic', ['topic' => $row['id_topic'] . '.0', 'subject' => $row['subject']]),
+			'TOPICLINK' => getUrl('topic', ['topic' => $row['id_topic'], 'start' => '0', 'subject' => $row['subject']]),
 		);
 
 		$emailtemplate = 'send_topic';
@@ -642,7 +642,7 @@ class Emailuser_Controller extends Action_Controller
 				'TOPICSUBJECT' => $subject,
 				'POSTERNAME' => $poster_name,
 				'REPORTERNAME' => $reporterName,
-				'TOPICLINK' => getUrl('topic', ['topic' => $topic . '.msg' . $msg_id, 'subject' => $subject]) . '#msg' . $msg_id,
+				'TOPICLINK' => getUrl('topic', ['topic' => $topic, 'start' => 'msg' . $msg_id, 'subject' => $subject]) . '#msg' . $msg_id,
 				'REPORTLINK' => !empty($id_report) ? getUrl('action', ['action' => 'moderate', 'area' => 'reports', 'report' => $id_report]) : '',
 				'COMMENT' => $this->_req->post->comment,
 			);

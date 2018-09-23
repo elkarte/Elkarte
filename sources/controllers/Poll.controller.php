@@ -503,7 +503,7 @@ class Poll_Controller extends Action_Controller
 		// Build the link tree.
 		$pollinfo['subject'] = censor($pollinfo['subject']);
 		$context['linktree'][] = array(
-			'url' => getUrl('topic', ['topic' => $topic . '.0', 'subject' => $pollinfo['subject']]),
+			'url' => getUrl('topic', ['topic' => $topic, 'start' => '0', 'subject' => $pollinfo['subject']]),
 			'name' => $pollinfo['subject'],
 		);
 		$context['linktree'][] = array(

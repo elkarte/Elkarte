@@ -191,7 +191,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 		if (isset($this->_req->query->sort) && !in_array($this->_req->query->sort, array('subject', 'starter', 'last_poster', 'replies', 'views', 'likes', 'first_post', 'last_post')))
 			$this->_req->query->sort = 'last_post';
 
-		$board_url_param = ['board' => $board . '.%1$d', 'name' => $board_info['name']];
+		$board_url_param = ['board' => $board, 'start' => '%1$d', 'name' => $board_info['name']];
 		// Make sure the starting place makes sense and construct the page index.
 		if (isset($this->_req->query->sort))
 		{
@@ -206,11 +206,11 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 		$context['start'] = &$this->_req->query->start;
 
 		// Set a canonical URL for this page.
-		$context['canonical_url'] = getUrl('board', ['board' => $board . '.' . $context['start'], 'name' => $board_info['name']]);
+		$context['canonical_url'] = getUrl('board', ['board' => $board, 'start' => $context['start'], 'name' => $board_info['name']]);
 
 		$context['links'] += array(
-			'prev' => $this->_req->query->start >= $context['topics_per_page'] ? getUrl('board', ['board=' . $board . '.' . ($this->_req->query->start - $context['topics_per_page']), 'name' => $board_info['name']]) : '',
-			'next' => $this->_req->query->start + $context['topics_per_page'] < $board_info['total_topics'] ? getUrl('board', ['board' => $board . '.' . ($this->_req->query->start + $context['topics_per_page']), 'name' => $board_info['name']]) : '',
+			'prev' => $this->_req->query->start >= $context['topics_per_page'] ? getUrl('board', ['board' => $board, 'start' => $this->_req->query->start - $context['topics_per_page'], 'name' => $board_info['name']]) : '',
+			'next' => $this->_req->query->start + $context['topics_per_page'] < $board_info['total_topics'] ? getUrl('board', ['board' => $board, 'start' => $this->_req->query->start + $context['topics_per_page'], 'name' => $board_info['name']]) : '',
 		);
 
 		$context['page_info'] = array(
@@ -347,7 +347,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 			}
 
 			$context['topics_headers'][$key] = array(
-				'url' => getUrl('board', ['board' => $context['current_board'] . '.' . $context['start'], 'sort' => $key, 'name' => $board_info['name'], $context['sort_by'] == $key && $context['sort_direction'] === 'up' ? 'desc' : '']),
+				'url' => getUrl('board', ['board' => $context['current_board'], 'start' => $context['start'], 'sort' => $key, 'name' => $board_info['name'], $context['sort_by'] == $key && $context['sort_direction'] === 'up' ? 'desc' : '']),
 				'sort_dir_img' => $context['sort_by'] == $key ? '<i class="icon icon-small i-sort-' . $sorticon . '-' . $context['sort_direction'] . '" title="' . $context['sort_title'] . '"><s>' . $context['sort_title'] . '</s></i>' : '',
 			);
 		}

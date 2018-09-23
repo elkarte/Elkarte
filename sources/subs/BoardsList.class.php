@@ -248,7 +248,7 @@ class Boards_List
 				// Is this a new board, or just another moderator?
 				if (!isset($this->_current_boards[$row_board['id_board']]))
 				{
-					$href = getUrl('board', ['board' => $row_board['id_board'] . '.0', 'name' => $row_board['board_name']]);
+					$href = getUrl('board', ['board' => $row_board['id_board'], 'start' => '0', 'name' => $row_board['board_name']]);
 					$this->_current_boards[$row_board['id_board']] = array(
 						'new' => empty($row_board['is_read']),
 						'id' => $row_board['id_board'],
@@ -278,7 +278,7 @@ class Boards_List
 				// A valid child!
 				$isChild = true;
 
-				$href = getUrl('board', ['board' => $row_board['id_board'] . '.0', 'name' => $row_board['board_name']]);
+				$href = getUrl('board', ['board' => $row_board['id_board'], 'start' => '0', 'name' => $row_board['board_name']]);
 				$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']] = array(
 					'id' => $row_board['id_board'],
 					'name' => $row_board['board_name'],
@@ -370,7 +370,7 @@ class Boards_List
 			// Provide the href and link.
 			if ($row_board['subject'] != '')
 			{
-				$this_last_post['href'] = getUrl('topic', ['topic' => $row_board['id_topic'] . '.msg' . ($this->_user['is_guest'] ? $row_board['id_msg'] : $row_board['new_from']), 'subject' => $row_board['subject'], 0 => empty($row_board['is_read']) ? 'boardseen' : '']) . '#new';
+				$this_last_post['href'] = getUrl('topic', ['topic' => $row_board['id_topic'], 'start' => 'msg' . ($this->_user['is_guest'] ? $row_board['id_msg'] : $row_board['new_from']), 'subject' => $row_board['subject'], 0 => empty($row_board['is_read']) ? 'boardseen' : '']) . '#new';
 				$this_last_post['link'] = '<a href="' . $this_last_post['href'] . '" title="' . $row_board['subject'] . '">' . $row_board['short_subject'] . '</a>';
 				/* The board's and children's 'last_post's have:
 				time, timestamp (a number that represents the time.), id (of the post), topic (topic id.),
