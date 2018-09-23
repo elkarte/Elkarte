@@ -216,7 +216,7 @@ class Boards_List
 						'order' => $row_board['cat_order'],
 						'is_collapsed' => isset($row_board['can_collapse']) && $row_board['can_collapse'] == 1 && $row_board['is_collapsed'] > 0,
 						'can_collapse' => isset($row_board['can_collapse']) && $row_board['can_collapse'] == 1,
-						'collapse_href' => isset($row_board['can_collapse']) ? getUrl('action', ['action' => 'collapse', 'c' => $row_board['id_cat'], 'sa' => ($row_board['is_collapsed'] > 0 ? 'expand' : 'collapse', '{session_data}']) . '#c' . $row_board['id_cat'] : '',
+						'collapse_href' => isset($row_board['can_collapse']) ? getUrl('action', ['action' => 'collapse', 'c' => $row_board['id_cat'], 'sa' => $row_board['is_collapsed'] > 0 ? 'expand' : 'collapse', '{session_data}']) . '#c' . $row_board['id_cat'] : '',
 						'collapse_image' => isset($row_board['can_collapse']) ? '<img src="' . $this->_images_url . ($row_board['is_collapsed'] > 0 ? 'expand.png" alt="+"' : 'collapse.png" alt="-"') . ' />' : '',
 						'href' => getUrl('action', $modSettings['default_forum_action']) . '#c' . $row_board['id_cat'],
 						'boards' => array(),
@@ -457,7 +457,7 @@ class Boards_List
 			if ($this->_options['include_categories'])
 				$this->_current_boards = &$this->_categories[$this->_boards[$row_mods['id_board']]]['boards'];
 
-			$href = getUrl('profile', ['action' => 'profile', 'u' => $row_mods['id_moderator'], 'name' => $row_mods['mod_real_name']);
+			$href = getUrl('profile', ['action' => 'profile', 'u' => $row_mods['id_moderator'], 'name' => $row_mods['mod_real_name']]);
 			$this->_current_boards[$row_mods['id_board']]['moderators'][$row_mods['id_moderator']] = array(
 				'id' => $row_mods['id_moderator'],
 				'name' => $row_mods['mod_real_name'],

@@ -2620,8 +2620,6 @@ function updateMemberData($members, $data)
  */
 function loadMembersIPs($ip_string, $ip_var)
 {
-	global $scripturl;
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -2635,7 +2633,9 @@ function loadMembersIPs($ip_string, $ip_var)
 	);
 	$ips = array();
 	while ($row = $db->fetch_assoc($request))
-		$ips[$row['member_ip']][] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['display_name'] . '</a>';
+	{
+		$ips[$row['member_ip']][] = '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['display_name']]) . '">' . $row['display_name'] . '</a>';
+	}
 	$db->free_result($request);
 
 	ksort($ips);

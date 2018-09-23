@@ -1748,7 +1748,7 @@ function profileLoadSignatureData()
  */
 function profileLoadAvatarData()
 {
-	global $context, $cur_profile, $modSettings, $scripturl;
+	global $context, $cur_profile, $modSettings;
 
 	$context['avatar_url'] = $modSettings['avatar_url'];
 
@@ -1780,32 +1780,40 @@ function profileLoadAvatarData()
 			'server_pic' => 'blank.png',
 			'external' => $schema
 		);
-		$context['member']['avatar']['href'] = empty($cur_profile['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $cur_profile['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $cur_profile['filename'];
+		$context['member']['avatar']['href'] = empty($cur_profile['attachment_type']) ? getUrl('attach', ['action' => 'dlattach', 'attach' => (int) $cur_profile['id_attach'], 'name' => $cur_profile['filename'], 'type' => 'avatar']) : $modSettings['custom_avatar_url'] . '/' . $cur_profile['filename'];
 	}
 	elseif ($valid_protocol && $context['member']['avatar']['allow_external'])
+	{
 		$context['member']['avatar'] += array(
 			'choice' => 'external',
 			'server_pic' => 'blank.png',
 			'external' => $cur_profile['avatar']
 		);
+	}
 	elseif ($cur_profile['avatar'] === 'gravatar' && $context['member']['avatar']['allow_gravatar'])
+	{
 		$context['member']['avatar'] += array(
 			'choice' => 'gravatar',
 			'server_pic' => 'blank.png',
 			'external' => 'https://'
 		);
+	}
 	elseif ($cur_profile['avatar'] != '' && file_exists($modSettings['avatar_directory'] . '/' . $cur_profile['avatar']) && $context['member']['avatar']['allow_server_stored'])
+	{
 		$context['member']['avatar'] += array(
 			'choice' => 'server_stored',
 			'server_pic' => $cur_profile['avatar'] == '' ? 'blank.png' : $cur_profile['avatar'],
 			'external' => $schema
 		);
+	}
 	else
+	{
 		$context['member']['avatar'] += array(
 			'choice' => 'none',
 			'server_pic' => 'blank.png',
 			'external' => $schema
 		);
+	}
 
 	// Get a list of all the avatars.
 	if ($context['member']['avatar']['allow_server_stored'])
@@ -2531,8 +2539,6 @@ function profileSaveGroups(&$value)
  */
 function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 {
-	global $scripturl;
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -2555,7 +2561,7 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 		$previous_warnings[] = array(
 			'issuer' => array(
 				'id' => $row['id_member'],
-				'link' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['member_name'] . '</a>') : $row['member_name'],
+				'link' => $row['id_member'] ? ('<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['member_name']]) . '">' . $row['member_name'] . '</a>') : $row['member_name'],
 			),
 			'time' => standardTime($row['log_time']),
 			'html_time' => htmlTime($row['log_time']),
@@ -2612,7 +2618,7 @@ function list_getUserWarningCount($memID)
  */
 function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID, $exclude_boards = null)
 {
-	global $board, $modSettings, $context, $settings, $scripturl, $txt;
+	global $board, $modSettings, $context, $settings, $txt;
 
 	$db = database();
 
@@ -2653,10 +2659,15 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
 	$attachments = array();
 	while ($row = $db->fetch_assoc($request))
 	{
+		$row['subject'] = censor($row['subject']);
 		if (!$row['approved'])
-			$row['filename'] = str_replace(array('{attachment_link}', '{txt_awaiting}'), array('<a href="' . $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $row['id_attach'] . '">' . $row['filename'] . '</a>', $txt['awaiting_approval']), $settings['attachments_awaiting_approval']);
+		{
+			$row['filename'] = str_replace(array('{attachment_link}', '{txt_awaiting}'), array('<a href="' . getUrl('attach', ['action' => 'dlattach', 'attach' => $row['id_attach'], 'name' => $row['filename'], 'topic' => $row['id_topic'], 'subject' => $row['subject'] ]) . '">' . $row['filename'] . '</a>', $txt['awaiting_approval']), $settings['attachments_awaiting_approval']);
+		}
 		else
-			$row['filename'] = '<a href="' . $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $row['id_attach'] . '">' . $row['filename'] . '</a>';
+		{
+			$row['filename'] = '<a href="' . getUrl('attach', ['action' => 'dlattach', 'attach' => $row['id_attach'], 'name' => $row['filename'], 'topic' => $row['id_topic'], 'subject' => $row['subject']])  . '">' . $row['filename'] . '</a>';
+		}
 
 		$attachments[] = array(
 			'id' => $row['id_attach'],
@@ -2667,7 +2678,7 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
 			'downloads' => $row['downloads'],
 			'is_image' => !empty($row['width']) && !empty($row['height']) && !empty($modSettings['attachmentShowImages']),
 			'id_thumb' => !empty($row['id_thumb']) ? $row['id_thumb'] : '',
-			'subject' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . censor($row['subject']) . '</a>',
+			'subject' => '<a href="' . getUrl('topic', ['topic' => $row['id_topic'], 'start' => 'msg' . $row['id_msg'], 'subject' => $row['subject']]) . '#msg' . $row['id_msg'] . '" rel="nofollow">' . censor($row['subject']) . '</a>',
 			'posted' => $row['poster_time'],
 			'msg' => $row['id_msg'],
 			'topic' => $row['id_topic'],

@@ -117,10 +117,11 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 	$result = $db->query('', '
 		SELECT
 			cal.id_event, cal.start_date, cal.end_date, cal.title, cal.id_member, cal.id_topic,
-			cal.id_board, b.member_groups, t.id_first_msg, t.approved, t.subject, b.id_board
+			cal.id_board, b.member_groups, t.id_first_msg, t.approved, m.subject, b.id_board
 		FROM {db_prefix}calendar AS cal
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = cal.id_board)
 			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = cal.id_topic)
+			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
 		WHERE cal.start_date <= {date:high_date}
 			AND cal.end_date >= {date:low_date}' . ($use_permissions ? '
 			AND (cal.id_board = {int:no_board_link} OR {query_wanna_see_board})' : '') . (!empty($limit) ? '

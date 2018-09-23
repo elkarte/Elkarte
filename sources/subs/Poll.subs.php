@@ -819,7 +819,7 @@ function getPollStarter($id_topic)
  */
 function loadPollContext($poll_id)
 {
-	global $context, $user_info, $txt, $scripturl;
+	global $context, $user_info, $txt;
 
 	// Get the question and if it's locked.
 	$pollinfo = pollInfo($poll_id);
@@ -880,6 +880,7 @@ function loadPollContext($poll_id)
 	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	// Set up the basic poll information.
+	$starter_href = getUrl('profile', ['action' => 'profile', 'u' => $pollinfo['id_member'], 'name' => $pollinfo['poster_name']]);
 	$context['poll'] = array(
 		'id' => $poll_id,
 		'image' => 'normal_' . (empty($pollinfo['voting_locked']) ? 'poll' : 'locked_poll'),
@@ -897,8 +898,8 @@ function loadPollContext($poll_id)
 		'starter' => array(
 			'id' => $pollinfo['id_member'],
 			'name' => $pollinfo['poster_name'],
-			'href' => $pollinfo['id_member'] == 0 ? '' : $scripturl . '?action=profile;u=' . $pollinfo['id_member'],
-			'link' => $pollinfo['id_member'] == 0 ? $pollinfo['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $pollinfo['id_member'] . '">' . $pollinfo['poster_name'] . '</a>'
+			'href' => $pollinfo['id_member'] == 0 ? '' : $starter_href,
+			'link' => $pollinfo['id_member'] == 0 ? $pollinfo['poster_name'] : '<a href="' . $starter_href . '">' . $pollinfo['poster_name'] . '</a>'
 		)
 	);
 

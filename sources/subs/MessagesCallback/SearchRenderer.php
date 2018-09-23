@@ -91,7 +91,7 @@ class SearchRenderer extends Renderer
 	 */
 	protected function _buildOutputArray()
 	{
-		global $modSettings, $context, $scripturl, $options, $user_info, $memberContext, $txt;
+		global $modSettings, $context, $options, $user_info, $memberContext, $txt;
 		global $boards_can;
 
 		// Make sure we don't end up with a practically empty message body.
@@ -110,11 +110,12 @@ class SearchRenderer extends Renderer
 			'can_quote' => (in_array($this->_this_message['id_board'], $boards_can['post_reply_any']) || in_array(0, $boards_can['post_reply_any'])) && $quote_enabled,
 			'can_mark_notify' => in_array($this->_this_message['id_board'], $boards_can['mark_any_notify']) || in_array(0, $boards_can['mark_any_notify']) && !$context['user']['is_guest'],
 		);
+		$href = getUrl('board', ['board' => $this->_this_message['id_board'], 'start' => '0', 'name' => $this->_this_message['bname']]);
 		$output['board'] = array(
 			'id' => $this->_this_message['id_board'],
 			'name' => $this->_this_message['bname'],
-			'href' => $scripturl . '?board=' . $this->_this_message['id_board'] . '.0',
-			'link' => '<a href="' . $scripturl . '?board=' . $this->_this_message['id_board'] . '.0">' . $this->_this_message['bname'] . '</a>'
+			'href' => $href,
+			'link' => '<a href="' . $href . '0">' . $this->_this_message['bname'] . '</a>'
 		);
 		$output['category'] = array(
 			'id' => $this->_this_message['id_cat'],
@@ -196,19 +197,19 @@ class SearchRenderer extends Renderer
 			$output['buttons'] = array(
 				// Can we request notification of topics?
 				'notify' => array(
-					'href' => $scripturl . '?action=notify;topic=' . $output['id'] . '.msg' . $this->_this_message['id_msg'],
+					'href' => getUrl('action', ['action' => 'notify', 'topic' => $output['id'] . '.msg' . $this->_this_message['id_msg']]),
 					'text' => $txt['notify'],
 					'test' => 'can_mark_notify',
 				),
 				// If they *can* reply?
 				'reply' => array(
-					'href' => $scripturl . '?action=post;topic=' . $output['id'] . '.msg' . $this->_this_message['id_msg'],
+					'href' => getUrl('action', ['action' => 'post', 'topic' => $output['id'] . '.msg' . $this->_this_message['id_msg']]),
 					'text' => $txt['reply'],
 					'test' => 'can_reply',
 				),
 				// If they *can* quote?
 				'quote' => array(
-					'href' => $scripturl . '?action=post;topic=' . $output['id'] . '.msg' . $this->_this_message['id_msg'] . ';quote=' . $this->_this_message['id_msg'],
+					'href' => getUrl('action', ['action' => 'post', 'topic' => $output['id'] . '.msg' . $this->_this_message['id_msg'], 'quote' => $this->_this_message['id_msg']]),
 					'text' => $txt['quote'],
 					'test' => 'can_quote',
 				),

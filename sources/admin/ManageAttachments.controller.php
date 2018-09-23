@@ -315,7 +315,7 @@ class ManageAttachments_Controller extends Action_Controller
 						? $txt['basedirectory_for_attachments_current']
 						: $txt['basedirectory_for_attachments_warning']))
 				),
-				empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && count($modSettings['attachmentUploadDir']) == 1
+				empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && count((array) $modSettings['attachmentUploadDir']) == 1
 					? array('text', 'attachmentUploadDir', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 40, 'invalid' => !$context['valid_upload_dir'])
 					: array('var_message', 'attach_current_directory', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 'message' => 'attachment_path', 'invalid' => empty($context['valid_upload_dir']), 'text_label' => (!empty($context['valid_upload_dir'])
 						? $txt['attach_current_dir']
@@ -421,15 +421,19 @@ class ManageAttachments_Controller extends Action_Controller
 
 							// In case of a custom avatar URL attachments have a fixed directory.
 							if ($rowData['attachment_type'] == 1)
+							{
 								$link .= sprintf('%1$s/%2$s', $modSettings['custom_avatar_url'], $rowData['filename']);
-
+							}
 							// By default avatars are downloaded almost as attachments.
 							elseif ($context['browse_type'] == 'avatars')
-								$link .= getUrl('attach', ['action' => 'dlattach', 'type' => 'avatar', 'attach' => (int) $rowData['id_attach']]);
-
+							{
+								$link .= getUrl('attach', ['action' => 'dlattach', 'type' => 'avatar', 'attach' => (int) $rowData['id_attach'], 'name' => $rowData['filename']]);
+							}
 							// Normal attachments are always linked to a topic ID.
 							else
-								$link .= getUrl('attach', ['action' => 'dlattach', 'topic' => ((int) $rowData['id_topic']) . '.0', 'attach' => (int) $rowData['id_attach']]);
+							{
+								$link .= getUrl('attach', ['action' => 'dlattach', 'topic' => ((int) $rowData['id_topic']) . '.0', 'attach' => (int) $rowData['id_attach'], 'name' => $rowData['filename']]);
+							}
 
 							$link .= '"';
 
