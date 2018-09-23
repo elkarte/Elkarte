@@ -11,23 +11,17 @@
  *
  */
 
-use \ElkArte\UrlGenerator\Standard;
-
 class Url_Generator
 {
-	/**
-	 * The instance of the class
-	 * @var Url_Generator
-	 */
-	private static $_instance = null;
-
 	protected $_config = array();
 	protected $_generators = array();
 	protected $_search = array();
 	protected $_replace = array();
 
-	private function __construct($options)
+	public function __construct($options)
 	{
+		Elk_Autoloader::instance()->register(SUBSDIR . '/UrlGenerator', '\\ElkArte\\UrlGenerator');
+
 		$this->_config = array_merge(array(
 			'queryless' => false,
 			'frendly' => false,
@@ -35,7 +29,7 @@ class Url_Generator
 			'replacements' => array(),
 		), $options);
 
-		$this->register(new Standard());
+		$this->register('Standard');
 		$this->updateReplacements($this->_config['replacements']);
 	}
 
@@ -60,9 +54,10 @@ class Url_Generator
 		}
 		else
 		{
-			$class = '\\ElkArte\\UrlGenerator\\' . $name;
+			$class = '\\ElkArte\\UrlGenerator\\' . $this->_config['generator'] . '\\' . $name;
 
 			$generator = new $class();
+// 			_debug($generator->getTypes(),$class);
 		}
 
 		foreach ($generator->getTypes() as $type)
@@ -80,6 +75,7 @@ class Url_Generator
 
 	public function getQuery($type, $params)
 	{
+// 	_debug(array_keys($this->_generators), $type);
 		if (isset($this->_generators[$type]) === false)
 		{
 			$type = 'standard';
@@ -96,17 +92,5 @@ class Url_Generator
 		}
 
 		return $this->_config['scripturl'] . $args;
-	}
-
-	public static function instance()
-	{
-		global $scripturl, $context;
-
-		if (self::$_instance === null)
-		{
-			self::$_instance = new Url_Generator(array('scripturl' => $scripturl, 'replacements' => array('{session_data}' => $context['session_var'] . '=' . $context['session_id'])));
-		}
-
-		return self::$_instance;
 	}
 }

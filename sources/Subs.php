@@ -1882,10 +1882,40 @@ function obStart($use_compression = false)
 
 function getUrl($type, $params)
 {
-	return Url_Generator::instance()->get($type, $params);
+	global $scripturl, $context;
+	static $generator = null;
+
+	if ($generator === null)
+	{
+		$generator = new Url_Generator([
+			'generator' => 'Standard',
+			'scripturl' => $scripturl,
+			'replacements' => [
+				'{session_data}' => $context['session_var'] . '=' . $context['session_id']
+			]
+		]);
+		$generator->register('Topic');
+		$generator->register('Board');
+	}
+	return $generator->get($type, $params);
 }
 
 function getUrlQuery($type, $params)
 {
-	return Url_Generator::instance()->getQuery($type, $params);
+	global $scripturl, $context;
+	static $generator = null;
+
+	if ($generator === null)
+	{
+		$generator = new Url_Generator([
+			'generator' => 'Standard',
+			'scripturl' => $scripturl,
+			'replacements' => [
+				'{session_data}' => $context['session_var'] . '=' . $context['session_id']
+			]
+		]);
+		$generator->register('Topic');
+		$generator->register('Board');
+	}
+	return $generator->getQuery($type, $params);
 }
