@@ -2347,7 +2347,7 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 
 	// Add a URL onto the message.
 	$reason = strtr($reason, array(
-		$txt['movetopic_auto_board'] => '[url=' . getUrl('board', ['board' => $board_info['id'], 'start' => '0', 'name' => $board_info['name']]) ']' . $board_info['name'] . '[/url]',
+		$txt['movetopic_auto_board'] => '[url=' . getUrl('board', ['board' => $board_info['id'], 'start' => '0', 'name' => $board_info['name']]) . ']' . $board_info['name'] . '[/url]',
 		$txt['movetopic_auto_topic'] => '[iurl]' . getUrl('topic', ['topic' => $new_topic, 'start' => '0', 'subject' => $subject]) . '[/iurl]'
 	));
 
