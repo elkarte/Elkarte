@@ -362,7 +362,7 @@ function getLastTopics($latestTopicOptions)
 
 		$board_href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['board_name']]);
 		$poster_href = getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['poster_name']]);
-		$topic_href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => 'msg' . $row['id_msg'], 'topicseen']);
+		$topic_href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => 'msg' . $row['id_msg'], 'subject' => $row['subject'], 'topicseen']);
 		// Build the array.
 		$post = array(
 			'board' => array(
@@ -390,7 +390,7 @@ function getLastTopics($latestTopicOptions)
 			'new' => $row['new_from'] <= $row['id_msg_modified'],
 			'new_from' => $row['new_from'],
 			'newtime' => $row['new_from'],
-			'new_href' => getUrl('topic', ['topic' => $row['id_topic'], 'start' => 'msg' . $row['new_from']]) . '#new',
+			'new_href' => getUrl('topic', ['topic' => $row['id_topic'], 'start' => 'msg' . $row['new_from'], 'subject' => $row['subject']]) . '#new',
 		);
 		if ($post['new'])
 		{

@@ -11,7 +11,7 @@
  *
  */
 
-namespace ElkArte\UrlGenerator\Sef;
+namespace ElkArte\UrlGenerator\Semantic;
 
 class Board extends Standard
 {
@@ -19,7 +19,7 @@ class Board extends Standard
 
 	public function generate($params)
 	{
-		$url = urlencode(strtr($params['name'], ' ', '-')) . '-' . $params['board'] . '.' . $params['start'];
+		$url = 'b/' . urlencode(strtr($params['name'], ' ', '-')) . '-' . $params['board'] . (!empty($params['start']) ? '/page-' . $params['start'] : '');
 		unset($params['name'], $params['board'], $params['start']);
 
 		return $url . $this->generateQuery($params);

@@ -11,7 +11,7 @@
  *
  */
 
-namespace ElkArte\UrlGenerator\Sef;
+namespace ElkArte\UrlGenerator\Semantic;
 
 use ElkArte\UrlGenerator\Abstract_Url_Generator;
 

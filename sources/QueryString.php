@@ -32,12 +32,15 @@
 function cleanRequest()
 {
 	require_once(SOURCEDIR . '/Request.php');
+	Elk_Autoloader::instance()->register(SUBSDIR . '/UrlGenerator', '\\ElkArte\\UrlGenerator');
 
 	// Make sure REMOTE_ADDR, other IPs, and the like are parsed
 	$req = Request::instance();
 
+	$parser = new ElkArte\UrlGenerator\Semantic\ParseQuery();
+
 	// Make sure there are no problems with the request
-	$req->cleanRequest();
+	$req->cleanRequest($parser);
 
 	// Parse the $_REQUEST and make sure things like board, topic don't have weird stuff
 	$req->parseRequest();

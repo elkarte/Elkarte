@@ -1888,7 +1888,7 @@ function getUrl($type, $params)
 	if ($generator === null)
 	{
 		$generator = new Url_Generator([
-			'generator' => 'Standard',
+			'generator' => 'Semantic',
 			'scripturl' => $scripturl,
 			'replacements' => [
 				'{session_data}' => $context['session_var'] . '=' . $context['session_id']
@@ -1896,6 +1896,7 @@ function getUrl($type, $params)
 		]);
 		$generator->register('Topic');
 		$generator->register('Board');
+		$generator->register('Profile');
 	}
 	return $generator->get($type, $params);
 }
@@ -1908,7 +1909,7 @@ function getUrlQuery($type, $params)
 	if ($generator === null)
 	{
 		$generator = new Url_Generator([
-			'generator' => 'Standard',
+			'generator' => 'Semantic',
 			'scripturl' => $scripturl,
 			'replacements' => [
 				'{session_data}' => $context['session_var'] . '=' . $context['session_id']
@@ -1916,6 +1917,7 @@ function getUrlQuery($type, $params)
 		]);
 		$generator->register('Topic');
 		$generator->register('Board');
+		$generator->register('Profile');
 	}
 	return $generator->getQuery($type, $params);
 }

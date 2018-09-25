@@ -11,7 +11,7 @@
  *
  */
 
-namespace ElkArte\UrlGenerator\Sef;
+namespace ElkArte\UrlGenerator\Semantic;
 
 class Topic extends Standard
 {
@@ -19,7 +19,7 @@ class Topic extends Standard
 
 	public function generate($params)
 	{
-		$url = urlencode(strtr($params['subject'], ' ', '-')) . '-' . $params['topic'] . '.' . $params['start'];
+		$url = 't/' . urlencode(strtr($params['subject'], ' ', '-')) . '-' . $params['topic'] . (!empty($params['start']) ? '/page-' . $params['start'] : '');
 		unset($params['subject'], $params['topic'], $params['start']);
 
 		return $url . $this->generateQuery($params);

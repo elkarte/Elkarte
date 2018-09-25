@@ -57,7 +57,6 @@ class Url_Generator
 			$class = '\\ElkArte\\UrlGenerator\\' . $this->_config['generator'] . '\\' . $name;
 
 			$generator = new $class();
-// 			_debug($generator->getTypes(),$class);
 		}
 
 		foreach ($generator->getTypes() as $type)
@@ -75,7 +74,6 @@ class Url_Generator
 
 	public function getQuery($type, $params)
 	{
-// 	_debug(array_keys($this->_generators), $type);
 		if (isset($this->_generators[$type]) === false)
 		{
 			$type = 'standard';

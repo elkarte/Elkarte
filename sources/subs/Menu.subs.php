@@ -567,28 +567,28 @@ function loadDefaultMenuButtons()
 	$buttons += array(
 		'profile' => array(
 			'title' => !empty($modSettings['displayMemberNames']) ? $user_info['name'] : $txt['account_short'],
-			'href' => getUrl('profile', ['action' => 'profile']),
+			'href' => getUrl('profile', ['action' => 'profile', 'u' => $user_info['id'], 'name' => $user_info['name']]),
 			'data-icon' => 'i-account',
 			'show' => $context['allow_edit_profile'],
 			'sub_buttons' => array(
 				'account' => array(
 					'title' => $txt['account'],
-					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'account']),
+					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'account', 'u' => $user_info['id'], 'name' => $user_info['name']]),
 					'show' => allowedTo(array('profile_identity_any', 'profile_identity_own', 'manage_membergroups')),
 				),
 				'drafts' => array(
 					'title' => $txt['mydrafts'],
-					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts']),
+					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => $user_info['id'], 'name' => $user_info['name']]),
 					'show' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft'),
 				),
 				'forumprofile' => array(
 					'title' => $txt['forumprofile'],
-					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile']),
+					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $user_info['id'], 'name' => $user_info['name']]),
 					'show' => allowedTo(array('profile_extra_any', 'profile_extra_own')),
 				),
 				'theme' => array(
 					'title' => $txt['theme'],
-					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'theme']),
+					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'theme', 'u' => $user_info['id'], 'name' => $user_info['name']]),
 					'show' => allowedTo(array('profile_extra_any', 'profile_extra_own', 'profile_extra_any')),
 				),
 				'logout' => array(
