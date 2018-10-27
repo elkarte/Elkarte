@@ -1880,36 +1880,60 @@ function obStart($use_compression = false)
 	}
 }
 
+/**
+ * Returns an URL based on the parameters passed and the selected generator
+ *
+ * @param string $type The type of the URL (depending on the type, the
+ *                     generator can act differently
+ * @param mixed[] $params All the parameters of the URL
+ *
+ * @return string An URL
+ */
 function getUrl($type, $params)
 {
-	global $scripturl, $context;
 	static $generator = null;
 
 	if ($generator === null)
 	{
-		$generator = new Url_Generator([
-			'generator' => 'Semantic',
-			'scripturl' => $scripturl,
-			'replacements' => [
-				'{session_data}' => $context['session_var'] . '=' . $context['session_id']
-			]
-		]);
-		$generator->register('Topic');
-		$generator->register('Board');
-		$generator->register('Profile');
+		$generator = initUrlGenerator();
 	}
 	return $generator->get($type, $params);
 }
 
+/**
+ * Returns the query part of an URL based on the parameters passed and the selected generator
+ *
+ * @param string $type The type of the URL (depending on the type, the
+ *                     generator can act differently
+ * @param mixed[] $params All the parameters of the URL
+ *
+ * @return string The query part of an URL
+ */
 function getUrlQuery($type, $params)
 {
-	global $scripturl, $context;
+	static $generator = null;
+
+	if ($generator === null)
+	{
+		$generator = initUrlGenerator();
+	}
+	return $generator->getQuery($type, $params);
+}
+
+/**
+ * Initialize the URL generator
+ *
+ * @return object The URL generator object
+ */
+function initUrlGenerator()
+{
+	global $scripturl, $context, $modSettings;
 	static $generator = null;
 
 	if ($generator === null)
 	{
 		$generator = new Url_Generator([
-			'generator' => 'Semantic',
+			'generator' => ucfirst($modSettings['url_format'] ?? 'standard'),
 			'scripturl' => $scripturl,
 			'replacements' => [
 				'{session_data}' => $context['session_var'] . '=' . $context['session_id']
@@ -1919,5 +1943,5 @@ function getUrlQuery($type, $params)
 		$generator->register('Board');
 		$generator->register('Profile');
 	}
-	return $generator->getQuery($type, $params);
+	return $generator;
 }
