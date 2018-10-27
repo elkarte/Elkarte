@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Dummy
+ * Semantic representation of any URL that doesn't have a custom builder
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -17,13 +17,22 @@ use ElkArte\UrlGenerator\Abstract_Url_Generator;
 
 class Standard extends Abstract_Url_Generator
 {
+	/**
+	 * {@inheritdoc }
+	 */
 	protected $_types = ['standard'];
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public function generate($params)
 	{
 		return $this->generateQuery($params);
 	}
 
+	/**
+	 * {@inheritdoc }
+	 */
 	protected function generateQuery($params)
 	{
 		$args = array();

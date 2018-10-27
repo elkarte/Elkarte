@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Dummy
+ * Standard representation of topic URLs
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -15,8 +15,14 @@ namespace ElkArte\UrlGenerator\Standard;
 
 class Topic extends Standard
 {
+	/**
+	 * {@inheritdoc }
+	 */
 	protected $_types = ['topic'];
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public function generate($params)
 	{
 		$params['topic'] = $params['topic'] . '.' . $params['start'];

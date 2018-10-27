@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Dummy
+ * Semantic representation of profile URLs
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -15,8 +15,14 @@ namespace ElkArte\UrlGenerator\Semantic;
 
 class Profile extends Standard
 {
+	/**
+	 * {@inheritdoc }
+	 */
 	protected $_types = ['profile'];
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public function generate($params)
 	{
 		$url = 'p/' . urlencode(strtr($params['name'], ' ', '-')) . '-' . $params['u'];

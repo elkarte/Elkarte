@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Dummy
+ * Semantic representation of board URLs
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -15,8 +15,14 @@ namespace ElkArte\UrlGenerator\Semantic;
 
 class Board extends Standard
 {
+	/**
+	 * {@inheritdoc }
+	 */
 	protected $_types = ['board'];
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public function generate($params)
 	{
 		$url = 'b/' . urlencode(strtr($params['name'], ' ', '-')) . '-' . $params['board'] . (!empty($params['start']) ? '/page-' . $params['start'] : '');

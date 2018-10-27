@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Dummy
+ * Standard representation of board URLs
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -15,8 +15,14 @@ namespace ElkArte\UrlGenerator\Standard;
 
 class Board extends Standard
 {
+	/**
+	 * {@inheritdoc }
+	 */
 	protected $_types = ['board'];
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public function generate($params)
 	{
 		$params['board'] = $params['board'] . '.' . $params['start'];

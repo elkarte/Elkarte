@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Dummy
+ * This class takes care of converting a Semantic URL into a Standard one, so that
+ * the request parser can do its work and explode everything into an array of values.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -15,9 +16,27 @@ namespace ElkArte\UrlGenerator\Semantic;
 
 class ParseQuery
 {
+	/**
+	 * Holds the special types of URLs we know
+	 *
+	 * @var string[]
+	 */
 	protected $parsers = ['b' => 'board', 't' => 'topic', 'p' => 'profile', 's' => 'standard'];
+
+	/**
+	 * The character to use as parameters separator
+	 *
+	 * @var string
+	 */
 	protected $separator = ';';
 
+	/**
+	 * Public facing function that converts the query part of the URL from the
+	 * semantic format back to the standard ElkArte one
+	 *
+	 * @param string $query The semantic query
+	 * @return string $query The corresponding standard query
+	 */
 	public function parse($query)
 	{
 		if (isset($this->parsers[$query[0]]))
@@ -32,11 +51,62 @@ class ParseQuery
 		return $this->{$call}($query);
 	}
 
+	/**
+	 * The standard way to convert it (i.e. do nothing).
+	 * This is used when the parse method cannot identify the type of URL
+	 * it is facing, so it assumes the URL is a standard one.
+	 *
+	 * @param string $query The semantic query
+	 * @return string $query The corresponding standard query
+	 */
+	protected function standard($query)
+	{
+		return $query;
+	}
+
+	/**
+	 * Boards have to have a "board" parameter, and this method ensures the query
+	 * has it.
+	 *
+	 * @param string $query The semantic query
+	 * @return string $query The corresponding standard query
+	 */
 	protected function board($query)
 	{
 		return 'board=' . $this->process($query);
 	}
 
+	/**
+	 * Topics have to have a "topic" parameter, and this method ensures the query
+	 * has it.
+	 *
+	 * @param string $query The semantic query
+	 * @return string $query The corresponding standard query
+	 */
+	protected function topic($query)
+	{
+		return 'topic=' . $this->process($query);
+	}
+
+	/**
+	 * Profiles are an action to begin with and then have the "u" holding the user id.
+	 *
+	 * @param string $query The semantic query
+	 * @return string $query The corresponding standard query
+	 */
+	protected function profile($query)
+	{
+		return 'action=profile;u=' . $this->process($query);
+	}
+
+	/**
+	 * This method splits the semantic URL into pieces (exploding at each "/")
+	 * and puts more or less everything back together into the standard format.
+	 * Some more processing takes care of "-" => ".".
+	 *
+	 * @param string $query The semantic query
+	 * @return string $query The corresponding standard query
+	 */
 	protected function process($query)
 	{
 		$match = [];
@@ -54,20 +124,5 @@ class ParseQuery
 		$real_query .= $this->separator . (isset($split_query[1]) ? $split_query[1] : '');
 
 		return $real_query;
-	}
-
-	protected function topic($query)
-	{
-		return 'topic=' . $this->process($query);
-	}
-
-	protected function profile($query)
-	{
-		return 'action=profile;u=' . $this->process($query);
-	}
-
-	protected function standard($query)
-	{
-		return $query;
 	}
 }

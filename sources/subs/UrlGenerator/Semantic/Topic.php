@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Dummy
+ * Semantic representation of topic URLs
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -15,8 +15,14 @@ namespace ElkArte\UrlGenerator\Semantic;
 
 class Topic extends Standard
 {
+	/**
+	 * {@inheritdoc }
+	 */
 	protected $_types = ['topic'];
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public function generate($params)
 	{
 		$url = 't/' . urlencode(strtr($params['subject'], ' ', '-')) . '-' . $params['topic'] . (!empty($params['start']) ? '/page-' . $params['start'] : '');
