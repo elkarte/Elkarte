@@ -1226,6 +1226,8 @@ class ManageFeatures_Controller extends Action_Controller
 				array('text', 'jqueryui_version', 'postinput' => $txt['jqueryui_custom_after']),
 				array('check', 'minify_css_js', 'postinput' => '<a href="#" id="clean_hives" class="linkbutton">' . $txt['clean_hives'] . '</a>'),
 			'',
+				array('select', 'url_format', array('standard' => $txt['url_format_standard'], 'semantic' => $txt['url_format_semantic'])),
+			'',
 				// Number formatting, timezones.
 				array('text', 'time_format'),
 				array('float', 'time_offset', 'subtext' => $txt['setting_time_offset_note'], 6, 'postinput' => $txt['hours']),
