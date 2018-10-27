@@ -813,11 +813,12 @@ class Theme extends BaseTheme
 		}
 
 		// This looks weird, but it's because BoardIndex.controller.php references the variable.
+		$href = getUrl('profile', ['action' => 'profile', 'u' => $modSettings['latestMember'], 'name' => $modSettings['latestRealName']]);
 		$context['common_stats']['latest_member'] = array(
 			'id' => $modSettings['latestMember'],
 			'name' => $modSettings['latestRealName'],
-			'href' => $scripturl . '?action=profile;u=' . $modSettings['latestMember'],
-			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . '">' . $modSettings['latestRealName'] . '</a>',
+			'href' => $href,
+			'link' => '<a href="' . $href . '">' . $modSettings['latestRealName'] . '</a>',
 		);
 
 		$context['common_stats'] = array(

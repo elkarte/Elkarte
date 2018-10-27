@@ -183,7 +183,7 @@ function template_editIgnoreList()
 
 		echo '
 				<td class="righttext">
-					<a href="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=lists;sa=ignore;remove=', $member['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="icon i-remove" title="', $txt['ignore_remove'], '">
+					<a href="', getUrl('profile', ['action' => 'profile', 'u' => $context['id_member'], 'name' => $context['member']['name'], 'area' => 'lists', 'sa' => 'ignore', 'remove' => $member['id'], '{session_data}']), '" class="icon i-remove" title="', $txt['ignore_remove'], '">
 					</a>
 				</td>
 			</tr>';

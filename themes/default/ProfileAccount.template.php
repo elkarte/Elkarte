@@ -57,7 +57,7 @@ function template_issueWarning()
 	</script>';
 
 	echo '
-	<form action="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=issuewarning" method="post" class="flow_hidden" accept-charset="UTF-8">
+	<form action="', getUrl('profile', ['action' => 'profile', 'area' => 'issuewarning', 'u' => $context['id_member'], 'name' => $context['member']['name']]), '" method="post" class="flow_hidden" accept-charset="UTF-8">
 		<h2 class="category_header hdicon cat_img_profile">
 			', $context['user']['is_owner'] ? $txt['profile_warning_level'] : $txt['profile_issue_warning'], '
 		</h2>';
