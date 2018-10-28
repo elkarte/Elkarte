@@ -183,14 +183,14 @@ function template_info_center_below()
  */
 function template_ic_recent_posts()
 {
-	global $context, $txt, $scripturl, $settings;
+	global $context, $txt, $settings;
 
 	// Show the Recent Posts title
 	// hslice class is a left over from webslice support.
 	echo '
 			<li class="board_row hslice" id="recent_posts_content">
 				<h3 class="ic_section_header">
-					<a href="', $scripturl, '?action=recent"><i class="icon i-post-text"></i>', $txt['recent_posts'], '</a>
+					<a href="', getUrl('action', ['action' => 'recent']), '"><i class="icon i-post-text"></i>', $txt['recent_posts'], '</a>
 				</h3>';
 
 	// Only show one post.
@@ -199,7 +199,7 @@ function template_ic_recent_posts()
 		// latest_post has link, href, time, subject, short_subject (shortened with...), and topic. (its id.)
 		echo '
 				<p id="infocenter_onepost" class="inline">
-					<a href="', $scripturl, '?action=recent">', $txt['recent_view'], '</a>&nbsp;', sprintf($txt['is_recent_updated'], '&quot;' . $context['latest_post']['link'] . '&quot;'), ' (', $context['latest_post']['html_time'], ')
+					<a href="', getUrl('action', ['action' => 'recent']), '">', $txt['recent_view'], '</a>&nbsp;', sprintf($txt['is_recent_updated'], '&quot;' . $context['latest_post']['link'] . '&quot;'), ' (', $context['latest_post']['html_time'], ')
 				</p>';
 	}
 	// Show lots of posts. @todo - Although data here is actually tabular, perhaps use faux table for greater responsiveness.
@@ -240,12 +240,12 @@ function template_ic_recent_posts()
  */
 function template_ic_show_events()
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt;
 
 	echo '
 			<li class="board_row">
 				<h3 class="ic_section_header">
-					<a href="', $scripturl, '?action=calendar">
+					<a href="', getUrl('action', ['action' => 'calendar']), '">
 						<i class="icon i-calendar"></i> ', $context['calendar_only_today'] ? $txt['calendar_today'] : $txt['calendar_upcoming'], '
 					</a>
 				</h3>';
@@ -265,7 +265,7 @@ function template_ic_show_events()
 		// Each member in calendar_birthdays has: id, name (person), age (if they have one set?), is_last. (last in list?), and is_today (birthday is today?)
 		foreach ($context['calendar_birthdays'] as $member)
 			echo '
-					<a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['is_today'] ? '<strong>' : '', $member['name'], $member['is_today'] ? '</strong>' : '', isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] ? '' : ', ';
+					<a href="', getUrl('profile', ['action' => 'profile', 'u' => $member['id'], 'name' => $member['name']]), '">', $member['is_today'] ? '<strong>' : '', $member['name'], $member['is_today'] ? '</strong>' : '', isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] ? '' : ', ';
 
 		echo '
 				</p>';
@@ -297,16 +297,16 @@ function template_ic_show_events()
  */
 function template_ic_show_stats()
 {
-	global $txt, $scripturl, $context, $settings, $modSettings;
+	global $txt, $context, $settings, $modSettings;
 
 	echo '
 			<li class="board_row">
 				<h3 class="ic_section_header">
-					', $context['show_stats'] ? '<a href="' . $scripturl . '?action=stats" title="' . $txt['more_stats'] . '"><i class="icon i-pie-chart"></i>' . $txt['forum_stats'] . '</a>' : $txt['forum_stats'], '
+					', $context['show_stats'] ? '<a href="' . getUrl('action', ['action' => 'stats']) . '" title="' . $txt['more_stats'] . '"><i class="icon i-pie-chart"></i>' . $txt['forum_stats'] . '</a>' : $txt['forum_stats'], '
 				</h3>
 				<p class="inline">
 					', $context['common_stats']['boardindex_total_posts'], '', !empty($settings['show_latest_member']) ? ' - ' . $txt['latest_member'] . ': <strong> ' . $context['common_stats']['latest_member']['link'] . '</strong>' : '', ' - ', $txt['most_online_today'], ': ', comma_format($modSettings['mostOnlineToday']), '<br />
-					', (!empty($context['latest_post']) ? $txt['latest_post'] . ': <strong>&quot;' . $context['latest_post']['link'] . '&quot;</strong>  ( ' . $context['latest_post']['time'] . ' )' : ''), ' - <a href="', $scripturl, '?action=recent">', $txt['recent_view'], '</a>
+					', (!empty($context['latest_post']) ? $txt['latest_post'] . ': <strong>&quot;' . $context['latest_post']['link'] . '&quot;</strong>  ( ' . $context['latest_post']['time'] . ' )' : ''), ' - <a href="', getUrl('action', ['action' => 'recent']), '">', $txt['recent_view'], '</a>
 				</p>
 			</li>';
 }
@@ -316,13 +316,13 @@ function template_ic_show_stats()
  */
 function template_ic_show_users()
 {
-	global $context, $txt, $scripturl, $settings, $modSettings;
+	global $context, $txt, $settings, $modSettings;
 
 	// "Users online" - in order of activity.
 	echo '
 			<li class="board_row">
 				<h3 class="ic_section_header">
-					', $context['show_who'] ? '<a href="' . $scripturl . '?action=who">' : '', '<i class="icon i-users"></i>', $txt['online_now'], ':
+					', $context['show_who'] ? '<a href="' . getUrl('action', ['action' => 'who']) . '">' : '', '<i class="icon i-users"></i>', $txt['online_now'], ':
 					', comma_format($context['num_guests']), ' ', $context['num_guests'] == 1 ? $txt['guest'] : $txt['guests'], ', ', comma_format($context['num_users_online']), ' ', $context['num_users_online'] == 1 ? $txt['user'] : $txt['users'];
 
 	// Handle hidden users and buddies.

@@ -57,7 +57,7 @@ class Auth_Controller extends Action_Controller
 	 */
 	public function action_login()
 	{
-		global $txt, $context, $scripturl, $user_info;
+		global $txt, $context, $user_info;
 
 		// You are already logged in, go take a tour of the boards
 		if (!empty($user_info['id']))
@@ -79,7 +79,7 @@ class Auth_Controller extends Action_Controller
 
 		// Add the login chain to the link tree.
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=login',
+			'url' => getUrl('action', ['action' => 'login']),
 			'name' => $txt['login'],
 		);
 
@@ -109,7 +109,7 @@ class Auth_Controller extends Action_Controller
 	 */
 	public function action_login2()
 	{
-		global $txt, $scripturl, $user_info, $user_settings, $modSettings, $context;
+		global $txt, $user_info, $user_settings, $modSettings, $context;
 
 		// Load cookie authentication and all stuff.
 		require_once(SUBSDIR . '/Auth.subs.php');
@@ -153,7 +153,7 @@ class Auth_Controller extends Action_Controller
 
 		// Add the login chain to the link tree.
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=login',
+			'url' => getUrl('action', ['action' => 'login']),
 			'name' => $txt['login'],
 		);
 
@@ -704,7 +704,7 @@ class Auth_Controller extends Action_Controller
  */
 function checkActivation()
 {
-	global $context, $txt, $scripturl, $user_settings, $modSettings;
+	global $context, $txt, $user_settings, $modSettings;
 
 	if (!isset($context['login_errors']))
 		$context['login_errors'] = array();
@@ -715,7 +715,7 @@ function checkActivation()
 	// Check if the account is activated - COPPA first...
 	if ($activation_status == 5)
 	{
-		$context['login_errors'][] = $txt['coppa_no_concent'] . ' <a href="' . $scripturl . '?action=register;sa=coppa;member=' . $user_settings['id_member'] . '">' . $txt['coppa_need_more_details'] . '</a>';
+		$context['login_errors'][] = $txt['coppa_no_concent'] . ' <a href="' . getUrl('action', ['action' => 'register', 'sa' => 'coppa', 'member' => $user_settings['id_member']]) . '">' . $txt['coppa_need_more_details'] . '</a>';
 		return false;
 	}
 	// Awaiting approval still?
@@ -743,7 +743,7 @@ function checkActivation()
 	{
 		Errors::instance()->log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', false);
 
-		$context['login_errors'][] = $txt['activate_not_completed1'] . ' <a class="linkbutton" href="' . $scripturl . '?action=register;sa=activate;resend;u=' . $user_settings['id_member'] . '">' . $txt['activate_not_completed2'] . '</a>';
+		$context['login_errors'][] = $txt['activate_not_completed1'] . ' <a class="linkbutton" href="' . getUrl('action', ['action' => 'register', 'sa' => 'activate', 'resend', 'u' => $user_settings['id_member']]) . '">' . $txt['activate_not_completed2'] . '</a>';
 		return false;
 	}
 	return true;

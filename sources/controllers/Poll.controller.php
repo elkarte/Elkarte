@@ -201,11 +201,11 @@ class Poll_Controller extends Action_Controller
 		checkSession('get');
 
 		// Get the poll starter, ID, and whether or not it is locked.
-		$poll = pollStatus($topic);
+		$poll = pollInfoForTopic($topic);
 
 		// If the user _can_ modify the poll....
 		if (!allowedTo('poll_lock_any'))
-			isAllowedTo('poll_lock_' . ($user_info['id'] == $poll['id_member'] ? 'own' : 'any'));
+			isAllowedTo('poll_lock_' . ($user_info['id'] == $poll['id_member_started'] ? 'own' : 'any'));
 
 		// It's been locked by a non-moderator.
 		if ($poll['locked'] == '1')
@@ -247,11 +247,13 @@ class Poll_Controller extends Action_Controller
 	 */
 	public function action_editpoll()
 	{
-		global $txt, $user_info, $context, $topic, $board, $scripturl;
+		global $txt, $user_info, $context, $topic, $board;
 
 		// No topic, means you can't edit the poll
 		if (empty($topic))
+		{
 			throw new Elk_Exception('no_access', false);
+		}
 
 		// We work hard with polls.
 		require_once(SUBSDIR . '/Poll.subs.php');
@@ -269,20 +271,30 @@ class Poll_Controller extends Action_Controller
 
 		// Assume it all exists, right?
 		if (empty($pollinfo))
+		{
 			throw new Elk_Exception('no_board');
+		}
 
 		// If we are adding a new poll - make sure that there isn't already a poll there.
 		if (!$context['is_edit'] && !empty($pollinfo['id_poll']))
+		{
 			throw new Elk_Exception('poll_already_exists');
+		}
 		// Otherwise, if we're editing it, it does exist I assume?
 		elseif ($context['is_edit'] && empty($pollinfo['id_poll']))
+		{
 			throw new Elk_Exception('poll_not_found');
+		}
 
 		// Can you do this?
 		if ($context['is_edit'] && !allowedTo('poll_edit_any'))
+		{
 			isAllowedTo('poll_edit_' . ($user_info['id'] == $pollinfo['id_member_started'] || ($pollinfo['poll_starter'] != 0 && $user_info['id'] == $pollinfo['poll_starter']) ? 'own' : 'any'));
+		}
 		elseif (!$context['is_edit'] && !allowedTo('poll_add_any'))
+		{
 			isAllowedTo('poll_add_' . ($user_info['id'] == $pollinfo['id_member_started'] ? 'own' : 'any'));
+		}
 
 		$context['can_moderate_poll'] = isset($this->_req->post->add) ? true : allowedTo('poll_edit_' . ($user_info['id'] == $pollinfo['id_member_started'] || ($pollinfo['poll_starter'] != 0 && $user_info['id'] == $pollinfo['poll_starter']) ? 'own' : 'any'));
 
@@ -320,11 +332,15 @@ class Poll_Controller extends Action_Controller
 				{
 					// Get the highest id so we can add more without reusing.
 					if ($option['id_choice'] >= $last_id)
+					{
 						$last_id = $option['id_choice'] + 1;
+					}
 
 					// They cleared this by either omitting it or emptying it.
 					if (!isset($this->_req->post->options[$option['id_choice']]) || $this->_req->post->options[$option['id_choice']] == '')
+					{
 						continue;
+					}
 
 					// Add the choice!
 					$context['poll']['choices'][$option['id_choice']] = array(
@@ -342,7 +358,9 @@ class Poll_Controller extends Action_Controller
 			foreach ($this->_req->post->options as $id => $label)
 			{
 				if ($label != '')
+				{
 					$totalPostOptions++;
+				}
 			}
 
 			$count = 1;
@@ -398,12 +416,16 @@ class Poll_Controller extends Action_Controller
 			$context['last_choice_id'] = $last_id;
 
 			if ($context['can_moderate_poll'])
+			{
 				$context['poll']['expiration'] = (int) $this->_req->post->poll_expire;
+			}
 
 			// Check the question/option count for errors.
 			// @todo: why !$poll_errors->hasErrors()?
 			if (trim($this->_req->post->question) === '' && !$poll_errors->hasErrors())
+			{
 				$poll_errors->addError('no_question');
+			}
 
 			// No check is needed, since nothing is really posted.
 			checkSubmitOnce('free');
@@ -476,12 +498,12 @@ class Poll_Controller extends Action_Controller
 		}
 
 		$context['page_title'] = $context['is_edit'] ? $txt['poll_edit'] : $txt['add_poll'];
-		$context['form_url'] = $scripturl . '?action=editpoll2' . ($context['is_edit'] ? '' : ';add') . ';topic=' . $context['current_topic'] . '.' . $context['start'];
+		$context['form_url'] = getUrl('action', ['action' => 'editpoll2', $context['is_edit'] ? '' : ';add', 'topic' => $context['current_topic'] . '.' . $context['start']]);
 
 		// Build the link tree.
 		$pollinfo['subject'] = censor($pollinfo['subject']);
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?topic=' . $topic . '.0',
+			'url' => getUrl('topic', ['topic' => $topic, 'start' => '0', 'subject' => $pollinfo['subject']]),
 			'name' => $pollinfo['subject'],
 		);
 		$context['linktree'][] = array(

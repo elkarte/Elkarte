@@ -26,6 +26,19 @@
  */
 class ProfileOptions_Controller extends Action_Controller
 {
+
+	/**
+	 * Member id for the profile being viewed
+	 * @var int
+	 */
+	private $_memID = 0;
+
+	/**
+	 * The array from $user_profile stored here to avoid some global
+	 * @var mixed[]
+	 */
+	private $_profile = [];
+
 	/**
 	 * Returns the profile fields for a given area
 	 *
@@ -101,12 +114,6 @@ class ProfileOptions_Controller extends Action_Controller
 	}
 
 	/**
-	 * Member id for the profile being viewed
-	 * @var int
-	 */
-	private $_memID = 0;
-
-	/**
 	 * Called before all other methods when coming from the dispatcher or
 	 * action class.
 	 *
@@ -115,7 +122,10 @@ class ProfileOptions_Controller extends Action_Controller
 	 */
 	public function pre_dispatch()
 	{
+		global $user_profile;
+
 		$this->_memID = currentMemberID();
+		$this->_profile = $user_profile[$this->_memID];
 	}
 
 	/**
@@ -178,7 +188,7 @@ class ProfileOptions_Controller extends Action_Controller
 	 */
 	public function action_editBuddies()
 	{
-		global $context, $user_profile, $memberContext;
+		global $context, $memberContext;
 
 		theme()->getTemplates()->load('ProfileOptions');
 
@@ -189,7 +199,7 @@ class ProfileOptions_Controller extends Action_Controller
 		loadJavascriptFile('suggest.js', array('defer' => true));
 
 		// For making changes!
-		$buddiesArray = explode(',', $user_profile[$this->_memID]['buddy_list']);
+		$buddiesArray = explode(',', $this->_profile['buddy_list']);
 		foreach ($buddiesArray as $k => $dummy)
 		{
 			if ($dummy === '')
@@ -211,9 +221,9 @@ class ProfileOptions_Controller extends Action_Controller
 			}
 
 			// Make the changes.
-			$user_profile[$this->_memID]['buddy_list'] = implode(',', $buddiesArray);
+			$this->_profile['buddy_list'] = implode(',', $buddiesArray);
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($this->_memID, array('buddy_list' => $user_profile[$this->_memID]['buddy_list']));
+			updateMemberData($this->_memID, array('buddy_list' => $this->_profile['buddy_list']));
 
 			// Redirect off the page because we don't like all this ugly query stuff to stick in the history.
 			redirectexit('action=profile;area=lists;sa=buddies;u=' . $this->_memID);
@@ -232,7 +242,7 @@ class ProfileOptions_Controller extends Action_Controller
 			{
 				$new_buddies[$k] = strtr(trim($new_buddies[$k]), array('\'' => '&#039;'));
 
-				if (strlen($new_buddies[$k]) == 0 || in_array($new_buddies[$k], array($user_profile[$this->_memID]['member_name'], $user_profile[$this->_memID]['real_name'])))
+				if (strlen($new_buddies[$k]) == 0 || in_array($new_buddies[$k], array($this->_profile['member_name'], $this->_profile['real_name'])))
 					unset($new_buddies[$k]);
 			}
 
@@ -243,12 +253,12 @@ class ProfileOptions_Controller extends Action_Controller
 				// Now find out the id_member of the buddy.
 				require_once(SUBSDIR . '/ProfileOptions.subs.php');
 				$new_buddiesArray = getBuddiesID($new_buddies);
-				$old_buddiesArray = explode(',', $user_profile[$this->_memID]['buddy_list']);
+				$old_buddiesArray = explode(',', $this->_profile['buddy_list']);
 
 				// Now update the current users buddy list.
-				$user_profile[$this->_memID]['buddy_list'] = implode(',', array_unique(array_merge($new_buddiesArray, $old_buddiesArray)));
+				$this->_profile['buddy_list'] = implode(',', array_unique(array_merge($new_buddiesArray, $old_buddiesArray)));
 				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData($this->_memID, array('buddy_list' => $user_profile[$this->_memID]['buddy_list']));
+				updateMemberData($this->_memID, array('buddy_list' => $this->_profile['buddy_list']));
 			}
 
 			// Back to the buddy list!
@@ -261,7 +271,7 @@ class ProfileOptions_Controller extends Action_Controller
 		if (!empty($buddiesArray))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			$result = getBasicMemberData($buddiesArray, array('sort' => 'real_name', 'limit' => substr_count($user_profile[$this->_memID]['buddy_list'], ',') + 1));
+			$result = getBasicMemberData($buddiesArray, array('sort' => 'real_name', 'limit' => substr_count($this->_profile['buddy_list'], ',') + 1));
 			foreach ($result as $row)
 				$buddies[] = $row['id_member'];
 		}
@@ -289,7 +299,7 @@ class ProfileOptions_Controller extends Action_Controller
 	 */
 	public function action_editIgnoreList()
 	{
-		global $context, $user_profile, $memberContext;
+		global $context, $memberContext;
 
 		theme()->getTemplates()->load('ProfileOptions');
 
@@ -298,7 +308,7 @@ class ProfileOptions_Controller extends Action_Controller
 		loadJavascriptFile('suggest.js', array('defer' => true));
 
 		// For making changes!
-		$ignoreArray = explode(',', $user_profile[$this->_memID]['pm_ignore_list']);
+		$ignoreArray = explode(',', $this->_profile['pm_ignore_list']);
 		foreach ($ignoreArray as $k => $dummy)
 		{
 			if ($dummy === '')
@@ -318,9 +328,9 @@ class ProfileOptions_Controller extends Action_Controller
 			}
 
 			// Make the changes.
-			$user_profile[$this->_memID]['pm_ignore_list'] = implode(',', $ignoreArray);
+			$this->_profile['pm_ignore_list'] = implode(',', $ignoreArray);
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($this->_memID, array('pm_ignore_list' => $user_profile[$this->_memID]['pm_ignore_list']));
+			updateMemberData($this->_memID, array('pm_ignore_list' => $this->_profile['pm_ignore_list']));
 
 			// Redirect off the page because we don't like all this ugly query stuff to stick in the history.
 			redirectexit('action=profile;area=lists;sa=ignore;u=' . $this->_memID);
@@ -338,7 +348,7 @@ class ProfileOptions_Controller extends Action_Controller
 			{
 				$new_entries[$k] = strtr(trim($new_entries[$k]), array('\'' => '&#039;'));
 
-				if (strlen($new_entries[$k]) == 0 || in_array($new_entries[$k], array($user_profile[$this->_memID]['member_name'], $user_profile[$this->_memID]['real_name'])))
+				if (strlen($new_entries[$k]) == 0 || in_array($new_entries[$k], array($this->_profile['member_name'], $this->_profile['real_name'])))
 					unset($new_entries[$k]);
 			}
 
@@ -349,9 +359,9 @@ class ProfileOptions_Controller extends Action_Controller
 				$ignoreArray = getBuddiesID($new_entries, false);
 
 				// Now update the current users buddy list.
-				$user_profile[$this->_memID]['pm_ignore_list'] = implode(',', $ignoreArray);
+				$this->_profile['pm_ignore_list'] = implode(',', $ignoreArray);
 				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData($this->_memID, array('pm_ignore_list' => $user_profile[$this->_memID]['pm_ignore_list']));
+				updateMemberData($this->_memID, array('pm_ignore_list' => $this->_profile['pm_ignore_list']));
 			}
 
 			// Back to the list of pitiful people!
@@ -364,7 +374,7 @@ class ProfileOptions_Controller extends Action_Controller
 		if (!empty($ignoreArray))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			$result = getBasicMemberData($ignoreArray, array('sort' => 'real_name', 'limit' => substr_count($user_profile[$this->_memID]['pm_ignore_list'], ',') + 1));
+			$result = getBasicMemberData($ignoreArray, array('sort' => 'real_name', 'limit' => substr_count($this->_profile['pm_ignore_list'], ',') + 1));
 			foreach ($result as $row)
 				$ignored[] = $row['id_member'];
 		}
@@ -615,7 +625,7 @@ class ProfileOptions_Controller extends Action_Controller
 	 */
 	public function action_notification()
 	{
-		global $txt, $scripturl, $user_profile, $context, $modSettings;
+		global $txt, $scripturl, $context, $modSettings;
 
 		theme()->getTemplates()->load('ProfileOptions');
 
@@ -832,10 +842,10 @@ class ProfileOptions_Controller extends Action_Controller
 
 		// What options are set?
 		$context['member'] += array(
-			'notify_announcements' => $user_profile[$this->_memID]['notify_announcements'],
-			'notify_send_body' => $user_profile[$this->_memID]['notify_send_body'],
-			'notify_types' => $user_profile[$this->_memID]['notify_types'],
-			'notify_regularity' => $user_profile[$this->_memID]['notify_regularity'],
+			'notify_announcements' => $this->_profile['notify_announcements'],
+			'notify_send_body' => $this->_profile['notify_send_body'],
+			'notify_types' => $this->_profile['notify_types'],
+			'notify_regularity' => $this->_profile['notify_regularity'],
 		);
 
 		$this->loadThemeOptions();
@@ -921,12 +931,12 @@ class ProfileOptions_Controller extends Action_Controller
 	 */
 	public function action_groupMembership()
 	{
-		global $txt, $user_profile, $context;
+		global $txt, $context;
 
 		theme()->getTemplates()->load('ProfileOptions');
 		$context['sub_template'] = 'groupMembership';
 
-		$curMember = $user_profile[$this->_memID];
+		$curMember = $this->_profile;
 		$context['primary_group'] = $curMember['id_group'];
 
 		// Can they manage groups?
@@ -982,7 +992,7 @@ class ProfileOptions_Controller extends Action_Controller
 	 */
 	public function action_groupMembership2()
 	{
-		global $context, $user_profile, $modSettings, $scripturl, $language;
+		global $context, $modSettings, $scripturl, $language;
 
 		// Let's be extra cautious...
 		if (!$context['user']['is_owner'] || empty($modSettings['show_group_membership']))
@@ -998,14 +1008,13 @@ class ProfileOptions_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
-		$old_profile = &$user_profile[$this->_memID];
 		$context['can_manage_membergroups'] = allowedTo('manage_membergroups');
 		$context['can_manage_protected'] = allowedTo('admin_forum');
 
 		// By default the new primary is the old one.
-		$newPrimary = $old_profile['id_group'];
-		$addGroups = array_flip(explode(',', $old_profile['additional_groups']));
-		$canChangePrimary = $old_profile['id_group'] == 0;
+		$newPrimary = $this->_profile['id_group'];
+		$addGroups = array_flip(explode(',', $this->_profile['additional_groups']));
+		$canChangePrimary = $this->_profile['id_group'] == 0;
 		$changeType = isset($this->_req->post->primary) ? 'primary' : (isset($this->_req->post->req) ? 'request' : 'free');
 
 		// One way or another, we have a target group in mind...
@@ -1017,7 +1026,7 @@ class ProfileOptions_Controller extends Action_Controller
 			isAllowedTo('admin_forum');
 
 		// What ever we are doing, we need to determine if changing primary is possible!
-		$groups_details = membergroupsById(array($group_id, $old_profile['id_group']), 0, true);
+		$groups_details = membergroupsById(array($group_id, $this->_profile['id_group']), 0, true);
 
 		// Protected groups require proper permissions!
 		if ($group_id != 1 && $groups_details[$group_id]['group_type'] == 1)
@@ -1035,7 +1044,7 @@ class ProfileOptions_Controller extends Action_Controller
 				if ($changeType === 'request' && $row['group_type'] != 2)
 					throw new Elk_Exception('no_access', false);
 				// What about leaving a requestable group we are not a member of?
-				elseif ($changeType === 'free' && $row['group_type'] == 2 && $old_profile['id_group'] != $row['id_group'] && !isset($addGroups[$row['id_group']]))
+				elseif ($changeType === 'free' && $row['group_type'] == 2 && $this->_profile['id_group'] != $row['id_group'] && !isset($addGroups[$row['id_group']]))
 					throw new Elk_Exception('no_access', false);
 				elseif ($changeType === 'free' && $row['group_type'] != 3 && $row['group_type'] != 2)
 					throw new Elk_Exception('no_access', false);
@@ -1046,11 +1055,11 @@ class ProfileOptions_Controller extends Action_Controller
 			}
 
 			// If this is their old primary, can we change it?
-			if ($row['id_group'] == $old_profile['id_group'] && ($row['group_type'] > 1 || $context['can_manage_membergroups']) && $canChangePrimary !== false)
+			if ($row['id_group'] == $this->_profile['id_group'] && ($row['group_type'] > 1 || $context['can_manage_membergroups']) && $canChangePrimary !== false)
 				$canChangePrimary = true;
 
 			// If we are not doing a force primary move, don't do it automatically if current primary is not 0.
-			if ($changeType != 'primary' && $old_profile['id_group'] != 0)
+			if ($changeType != 'primary' && $this->_profile['id_group'] != 0)
 				$canChangePrimary = false;
 
 			// If this is the one we are acting on, can we even act?
@@ -1111,7 +1120,7 @@ class ProfileOptions_Controller extends Action_Controller
 
 					$replacements = array(
 						'RECPNAME' => $member['member_name'],
-						'APPYNAME' => $old_profile['member_name'],
+						'APPYNAME' => $this->_profile['member_name'],
 						'GROUPNAME' => $group_name,
 						'REASON' => $this->_req->post->reason,
 						'MODLINK' => $scripturl . '?action=moderate;area=groups;sa=requests',
@@ -1128,9 +1137,9 @@ class ProfileOptions_Controller extends Action_Controller
 		elseif ($changeType === 'free')
 		{
 			// Are we leaving?
-			if ($old_profile['id_group'] == $group_id || isset($addGroups[$group_id]))
+			if ($this->_profile['id_group'] == $group_id || isset($addGroups[$group_id]))
 			{
-				if ($old_profile['id_group'] == $group_id)
+				if ($this->_profile['id_group'] == $group_id)
 					$newPrimary = 0;
 				else
 					unset($addGroups[$group_id]);
@@ -1141,8 +1150,8 @@ class ProfileOptions_Controller extends Action_Controller
 				// Can we change the primary, and do we want to?
 				if ($canChangePrimary)
 				{
-					if ($old_profile['id_group'] != 0)
-						$addGroups[$old_profile['id_group']] = -1;
+					if ($this->_profile['id_group'] != 0)
+						$addGroups[$this->_profile['id_group']] = -1;
 					$newPrimary = $group_id;
 				}
 				// Otherwise it's an additional group...
@@ -1153,8 +1162,8 @@ class ProfileOptions_Controller extends Action_Controller
 		// Finally, we must be setting the primary.
 		elseif ($canChangePrimary)
 		{
-			if ($old_profile['id_group'] != 0)
-				$addGroups[$old_profile['id_group']] = -1;
+			if ($this->_profile['id_group'] != 0)
+				$addGroups[$this->_profile['id_group']] = -1;
 			if (isset($addGroups[$group_id]))
 				unset($addGroups[$group_id]);
 			$newPrimary = $group_id;

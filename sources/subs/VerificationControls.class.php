@@ -29,6 +29,6 @@
  */
 function create_control_verification(&$verificationOptions, $do_test = false)
 {
-	Errors::instance()->log_deprecated('create_control_verification()', 'VerificationControls_Integrate::create().');
+	Errors::instance()->log_deprecated('create_control_verification()', 'VerificationControls_Integrate::create()');
 	return VerificationControls_Integrate::create($verificationOptions, $do_test);
 }

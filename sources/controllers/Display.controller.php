@@ -98,7 +98,7 @@ class Display_Controller extends Action_Controller
 	 */
 	public function action_display()
 	{
-		global $scripturl, $txt, $modSettings, $context, $settings;
+		global $txt, $modSettings, $context, $settings;
 		global $options, $user_info, $board_info, $topic, $board;
 		global $attachments, $messages_request;
 
@@ -181,7 +181,7 @@ class Display_Controller extends Action_Controller
 		// Is this a moved topic that we are redirecting to?
 		if (!empty($topicinfo['id_redirect_topic']) && !isset($this->_req->query->noredir))
 		{
-			markTopicsRead(array($user_info['id'], $topic, $topicinfo['id_last_msg'], 0), $topicinfo['new_from'] !== 0);
+			markTopicsRead(array($user_info['id'], $topicinfo['id_topic'], $topicinfo['id_last_msg'], 0), $topicinfo['new_from'] !== 0);
 			redirectexit('topic=' . $topicinfo['id_redirect_topic'] . '.0;redirfrom=' . $topicinfo['id_topic']);
 		}
 
@@ -196,7 +196,7 @@ class Display_Controller extends Action_Controller
 			if (!empty($redir_topics[$redirfrom]))
 			{
 				$context['topic_redirected_from'] = $redir_topics[$redirfrom];
-				$context['topic_redirected_from']['redir_href'] = $scripturl . '?topic=' . $context['topic_redirected_from']['id_topic'] . '.0;noredir';
+				$context['topic_redirected_from']['redir_href'] = getUrl('topic', ['topic' => $context['topic_redirected_from']['id_topic'], 'start' => '0', 'subject' => $context['topic_redirected_from']['subject'], 'noredir']);
 			}
 		}
 
@@ -213,7 +213,7 @@ class Display_Controller extends Action_Controller
 		// If this topic has unapproved posts, we need to work out how many posts the user can see, for page indexing.
 		if (!$includeUnapproved && $topicinfo['unapproved_posts'] && !$user_info['is_guest'])
 		{
-			$myUnapprovedPosts = unapprovedPosts($topic, $user_info['id']);
+			$myUnapprovedPosts = unapprovedPosts($topicinfo['id_topic'], $user_info['id']);
 
 			$total_visible_posts = $context['num_replies'] + $myUnapprovedPosts + ($topicinfo['approved'] ? 1 : 0);
 		}
@@ -259,7 +259,7 @@ class Display_Controller extends Action_Controller
 				else
 				{
 					// Find the number of messages posted before said time...
-					$context['start_from'] = countNewPosts($topic, $topicinfo, $timestamp);
+					$context['start_from'] = countNewPosts($topicinfo['id_topic'], $topicinfo, $timestamp);
 					$this->_start = $context['start_from'];
 				}
 			}
@@ -274,7 +274,7 @@ class Display_Controller extends Action_Controller
 				else
 				{
 					$only_approved = $modSettings['postmod_active'] && $topicinfo['unapproved_posts'] && !allowedTo('approve_posts');
-					$context['start_from'] = countMessagesBefore($topic, $this->_virtual_msg, false, $only_approved, !$user_info['is_guest']);
+					$context['start_from'] = countMessagesBefore($topicinfo['id_topic'], $this->_virtual_msg, false, $only_approved, !$user_info['is_guest']);
 				}
 
 				// We need to reverse the start as well in this case.
@@ -284,10 +284,12 @@ class Display_Controller extends Action_Controller
 
 		// Create a previous next string if the selected theme has it as a selected option.
 		if ($modSettings['enablePreviousNext'])
+		{
 			$context['links'] += array(
-				'go_prev' => $scripturl . '?topic=' . $topic . '.0;prev_next=prev#new',
-				'go_next' => $scripturl . '?topic=' . $topic . '.0;prev_next=next#new'
+				'go_prev' => getUrl('topic', ['topic' => $topicinfo['id_topic'], 'start' => '0', 'subject' => $topicinfo['subject'], 'prev_next' => 'prev']) . '#new',
+				'go_next' => getUrl('topic', ['topic' => $topicinfo['id_topic'], 'start' => '0', 'subject' => $topicinfo['subject'], 'prev_next' => 'next']) . '#new'
 			);
+		}
 
 		// Check if spellchecking is both enabled and actually working. (for quick reply.)
 		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
@@ -317,7 +319,7 @@ class Display_Controller extends Action_Controller
 		if (!empty($settings['display_who_viewing']))
 		{
 			require_once(SUBSDIR . '/Who.subs.php');
-			formatViewers($topic, 'topic');
+			formatViewers($topicinfo['id_topic'], 'topic');
 		}
 
 		// If all is set, but not allowed... just unset it.
@@ -329,7 +331,7 @@ class Display_Controller extends Action_Controller
 			$this->_start = -1;
 
 		// Construct the page index, allowing for the .START method...
-		$context['page_index'] = constructPageIndex($scripturl . '?topic=' . $topic . '.%1$d', $this->_start, $total_visible_posts, $context['messages_per_page'], true, array('all' => $can_show_all, 'all_selected' => isset($this->_req->query->all)));
+		$context['page_index'] = constructPageIndex(getUrl('topic', ['topic' => $topicinfo['id_topic'], 'start' => '%1$d', 'subject' => $topicinfo['subject']]), $this->_start, $total_visible_posts, $context['messages_per_page'], true, array('all' => $can_show_all, 'all_selected' => isset($this->_req->query->all)));
 		$context['start'] = $this->_start;
 
 		// This is information about which page is current, and which page we're on - in case you don't like
@@ -341,8 +343,8 @@ class Display_Controller extends Action_Controller
 
 		// Figure out all the link to the next/prev
 		$context['links'] += array(
-			'prev' => $this->_start >= $context['messages_per_page'] ? $scripturl . '?topic=' . $topic . '.' . ($this->_start - $context['messages_per_page']) : '',
-			'next' => $this->_start + $context['messages_per_page'] < $total_visible_posts ? $scripturl . '?topic=' . $topic . '.' . ($this->_start + $context['messages_per_page']) : '',
+			'prev' => $this->_start >= $context['messages_per_page'] ? getUrl('topic', ['topic' => $topicinfo['id_topic'], 'start' => $this->_start - $context['messages_per_page'], 'subject' => $topicinfo['subject']]) : '',
+			'next' => $this->_start + $context['messages_per_page'] < $total_visible_posts ? getUrl('topic', ['topic' => $topicinfo['id_topic'], 'start' => $this->_start + $context['messages_per_page'], 'subject' => $topicinfo['subject']]) : '',
 		);
 
 		// If they are viewing all the posts, show all the posts, otherwise limit the number.
@@ -357,7 +359,7 @@ class Display_Controller extends Action_Controller
 
 		// Build the link tree.
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?topic=' . $topic . '.0',
+			'url' => getUrl('topic', ['topic' => $topicinfo['id_topic'], 'start' => '0', 'subject' => $topicinfo['subject']]),
 			'name' => $topicinfo['subject'],
 		);
 
@@ -381,7 +383,7 @@ class Display_Controller extends Action_Controller
 		$context['mark_unread_time'] = !empty($this->_virtual_msg) ? $this->_virtual_msg : $topicinfo['new_from'];
 
 		// Set a canonical URL for this page.
-		$context['canonical_url'] = $scripturl . '?topic=' . $topic . '.' . $context['start'];
+		$context['canonical_url'] = getUrl('topic', ['topic' => $topicinfo['id_topic'], 'start' => $context['start'], 'subject' => $topicinfo['subject']]);
 
 		// For quick reply we need a response prefix in the default forum language.
 		$context['response_prefix'] = response_prefix();
@@ -407,7 +409,7 @@ class Display_Controller extends Action_Controller
 		);
 
 		// Get each post and poster in this topic.
-		$topic_details = getTopicsPostsAndPoster($topic, $limit_settings, $ascending);
+		$topic_details = getTopicsPostsAndPoster($topicinfo['id_topic'], $limit_settings, $ascending);
 		$messages = $topic_details['messages'];
 		$posters = array_unique($topic_details['all_posters']);
 		$all_posters = $topic_details['all_posters'];
@@ -425,14 +427,14 @@ class Display_Controller extends Action_Controller
 				$mark_at_msg = $modSettings['maxMsgID'];
 			if ($mark_at_msg >= $topicinfo['new_from'])
 			{
-				markTopicsRead(array($user_info['id'], $topic, $mark_at_msg, $topicinfo['unwatched']), $topicinfo['new_from'] !== 0);
+				markTopicsRead(array($user_info['id'], $topicinfo['id_topic'], $mark_at_msg, $topicinfo['unwatched']), $topicinfo['new_from'] !== 0);
 				$numNewTopics = getUnreadCountSince($board, empty($_SESSION['id_msg_last_visit']) ? 0 : $_SESSION['id_msg_last_visit']);
 
 				if (empty($numNewTopics))
 					$boardseen = true;
 			}
 
-			updateReadNotificationsFor($topic, $board);
+			updateReadNotificationsFor($topicinfo['id_topic'], $board);
 
 			// Mark board as seen if we came using last post link from BoardIndex. (or other places...)
 			if ($boardseen)
@@ -665,26 +667,106 @@ class Display_Controller extends Action_Controller
 
 		// Build the normal button array.
 		$context['normal_buttons'] = array(
-			'reply' => array('test' => 'can_reply', 'text' => 'reply', 'image' => 'reply.png', 'lang' => true, 'url' => $scripturl . '?action=post;topic=' . $context['current_topic'] . '.' . $context['start'] . ';last_msg=' . $context['topic_last_message'], 'active' => true),
-			'notify' => array('test' => 'can_mark_notify', 'text' => $context['is_marked_notify'] ? 'unnotify' : 'notify', 'image' => ($context['is_marked_notify'] ? 'un' : '') . 'notify.png', 'lang' => true, 'custom' => 'onclick="return notifyButton(this);"', 'url' => $scripturl . '?action=notify;sa=' . ($context['is_marked_notify'] ? 'off' : 'on') . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
-			'mark_unread' => array('test' => 'can_mark_unread', 'text' => 'mark_unread', 'image' => 'markunread.png', 'lang' => true, 'url' => $scripturl . '?action=markasread;sa=topic;t=' . $context['mark_unread_time'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
-			'unwatch' => array('test' => 'can_unwatch', 'text' => ($context['topic_unwatched'] ? '' : 'un') . 'watch', 'image' => ($context['topic_unwatched'] ? '' : 'un') . 'watched.png', 'lang' => true, 'custom' => 'onclick="return unwatchButton(this);"', 'url' => $scripturl . '?action=unwatchtopic;topic=' . $context['current_topic'] . '.' . $context['start'] . ';sa=' . ($context['topic_unwatched'] ? 'off' : 'on') . ';' . $context['session_var'] . '=' . $context['session_id']),
-			'send' => array('test' => 'can_send_topic', 'text' => 'send_topic', 'image' => 'sendtopic.png', 'lang' => true, 'url' => $scripturl . '?action=emailuser;sa=sendtopic;topic=' . $context['current_topic'] . '.0', 'custom' => 'onclick="return sendtopicOverlayDiv(this.href, \'' . $txt['send_topic'] . '\');"'),
-			'print' => array('test' => 'can_print', 'text' => 'print', 'image' => 'print.png', 'lang' => true, 'custom' => 'rel="nofollow"', 'class' => 'new_win', 'url' => $scripturl . '?action=topic;sa=printpage;topic=' . $context['current_topic'] . '.0'),
+			'reply' => array(
+				'test' => 'can_reply',
+				'text' => 'reply',
+				'image' => 'reply.png',
+				'lang' => true,
+				'url' => getUrl('action', ['action' => 'post', 'topic' => $context['current_topic'] . '.' . $context['start'], 'last_msg' => $context['topic_last_message']]),
+				'active' => true
+			),
+			'notify' => array(
+				'test' => 'can_mark_notify',
+				'text' => $context['is_marked_notify'] ? 'unnotify' : 'notify',
+				'image' => ($context['is_marked_notify'] ? 'un' : '') . 'notify.png',
+				'lang' => true,
+				'custom' => 'onclick="return notifyButton(this);"',
+				'url' => getUrl('action', ['action' => 'notify', 'sa' => $context['is_marked_notify'] ? 'off' : 'on', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}'])
+			),
+			'mark_unread' => array(
+				'test' => 'can_mark_unread',
+				'text' => 'mark_unread',
+				'image' => 'markunread.png',
+				'lang' => true,
+				'url' => getUrl('action', ['action' => 'markasread', 'sa' => 'topic', 't' => $context['mark_unread_time'], 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}'])
+			),
+			'unwatch' => array(
+				'test' => 'can_unwatch',
+				'text' => ($context['topic_unwatched'] ? '' : 'un') . 'watch',
+				'image' => ($context['topic_unwatched'] ? '' : 'un') . 'watched.png',
+				'lang' => true,
+				'custom' => 'onclick="return unwatchButton(this);"',
+				'url' => getUrl('action', ['action' => 'unwatchtopic', 'sa' => $context['topic_unwatched'] ? 'off' : 'on', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}'])
+			),
+			'send' => array(
+				'test' => 'can_send_topic',
+				'text' => 'send_topic',
+				'image' => 'sendtopic.png',
+				'lang' => true,
+				'url' => getUrl('action', ['action' => 'emailuser', 'sa' => 'sendtopic', 'topic' => $context['current_topic'] . '.0']),
+				'custom' => 'onclick="return sendtopicOverlayDiv(this.href, \'' . $txt['send_topic'] . '\');"'
+			),
+			'print' => array(
+				'test' => 'can_print',
+				'text' => 'print',
+				'image' => 'print.png',
+				'lang' => true,
+				'custom' => 'rel="nofollow"',
+				'class' => 'new_win',
+				'url' => getUrl('action', ['action' => 'topic', 'sa' => 'printpage', 'topic' => $context['current_topic'] . '.0'])
+			),
 		);
 
 		// Build the mod button array
 		$context['mod_buttons'] = array(
-			'move' => array('test' => 'can_move', 'text' => 'move_topic', 'image' => 'admin_move.png', 'lang' => true, 'url' => $scripturl . '?action=movetopic;current_board=' . $context['current_board'] . ';topic=' . $context['current_topic'] . '.0'),
-			'delete' => array('test' => 'can_delete', 'text' => 'remove_topic', 'image' => 'admin_rem.png', 'lang' => true, 'custom' => 'onclick="return confirm(\'' . $txt['are_sure_remove_topic'] . '\');"', 'url' => $scripturl . '?action=removetopic2;topic=' . $context['current_topic'] . '.0;' . $context['session_var'] . '=' . $context['session_id']),
-			'lock' => array('test' => 'can_lock', 'text' => empty($context['is_locked']) ? 'set_lock' : 'set_unlock', 'image' => 'admin_lock.png', 'lang' => true, 'url' => $scripturl . '?action=topic;sa=lock;topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
-			'sticky' => array('test' => 'can_sticky', 'text' => empty($context['is_sticky']) ? 'set_sticky' : 'set_nonsticky', 'image' => 'admin_sticky.png', 'lang' => true, 'url' => $scripturl . '?action=topic;sa=sticky;topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
-			'merge' => array('test' => 'can_merge', 'text' => 'merge', 'image' => 'merge.png', 'lang' => true, 'url' => $scripturl . '?action=mergetopics;board=' . $context['current_board'] . '.0;from=' . $context['current_topic']),
+			'move' => array(
+				'test' => 'can_move',
+				'text' => 'move_topic',
+				'image' => 'admin_move.png',
+				'lang' => true,
+				'url' => getUrl('action', ['action' => 'movetopic', 'current_board' => $context['current_board'], 'topic' => $context['current_topic'] . '.0'])
+			),
+			'delete' => array(
+				'test' => 'can_delete',
+				'text' => 'remove_topic',
+				'image' => 'admin_rem.png',
+				'lang' => true,
+				'custom' => 'onclick="return confirm(\'' . $txt['are_sure_remove_topic'] . '\');"',
+				'url' => getUrl('action', ['action' => 'removetopic2', 'topic' => $context['current_topic'] . '.0', '{session_data}'])
+			),
+			'lock' => array(
+				'test' => 'can_lock',
+				'text' => empty($context['is_locked']) ? 'set_lock' : 'set_unlock',
+				'image' => 'admin_lock.png',
+				'lang' => true,
+				'url' => getUrl('action', ['action' => 'topic', 'sa' => 'lock', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}'])
+			),
+			'sticky' => array(
+				'test' => 'can_sticky',
+				'text' => empty($context['is_sticky']) ? 'set_sticky' : 'set_nonsticky',
+				'image' => 'admin_sticky.png',
+				'lang' => true,
+				'url' => getUrl('action', ['action' => 'topic', 'sa' => 'sticky', 'topic' => $context['current_topic'] . '.' . $context['start'], '{session_data}'])
+			),
+			'merge' => array(
+				'test' => 'can_merge',
+				'text' => 'merge',
+				'image' => 'merge.png',
+				'lang' => true,
+				'url' => getUrl('action', ['action' => 'mergetopics', 'board' => $context['current_board'] . '.0', 'from' => $context['current_topic']])
+			),
 		);
 
 		// Restore topic. eh?  No monkey business.
 		if ($context['can_restore_topic'])
-			$context['mod_buttons'][] = array('text' => 'restore_topic', 'image' => '', 'lang' => true, 'url' => $scripturl . '?action=restoretopic;topics=' . $context['current_topic'] . ';' . $context['session_var'] . '=' . $context['session_id']);
+		{
+			$context['mod_buttons'][] = array(
+				'text' => 'restore_topic',
+				'image' => '',
+				'lang' => true,
+				'url' => getUrl('action', ['action' => 'restoretopic', 'topics' => $context['current_topic'], '{session_data}'])
+			);
+		}
 
 		// Quick reply & modify enabled?
 		if ($context['can_reply'] && !empty($options['display_quick_reply']))

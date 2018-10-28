@@ -72,7 +72,7 @@ abstract class Action_Controller
 			'action_hook' => true,
 		)), $buttons);
 
-		$buttons['home']['href'] = $scripturl . $modSettings['default_forum_action'];
+		$buttons['home']['href'] = getUrl('action', $modSettings['default_forum_action']);
 		$buttons['home']['data-icon'] = 'i-comment-blank';
 	}
 

@@ -149,7 +149,7 @@ class ManageLanguages_Controller extends Action_Controller
 	 */
 	public function action_edit()
 	{
-		global $txt, $context, $scripturl, $language;
+		global $txt, $context, $language;
 
 		require_once(SUBSDIR . '/Language.subs.php');
 
@@ -185,7 +185,7 @@ class ManageLanguages_Controller extends Action_Controller
 		$listOptions = array(
 			'id' => 'language_list',
 			'items_per_page' => 20,
-			'base_href' => $scripturl . '?action=admin;area=languages',
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'languages']),
 			'title' => $txt['edit_languages'],
 			'data_check' => array(
 				'class' => function ($rowData) {
@@ -221,9 +221,7 @@ class ManageLanguages_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $scripturl;
-
-							return sprintf('<a href="%1$s?action=admin;area=languages;sa=editlang;lid=%2$s">%3$s<i class="icon icon-small i-modify"></i></a>', $scripturl, $rowData['id'], $rowData['name']);
+							return sprintf('<a href="%1$s">%3$s<i class="icon icon-small i-modify"></i></a>', getUrl('admin', ['action' => 'admin', 'area' => 'languages', 'sa' => 'editlang', 'lid' => $rowData['id']]), $rowData['name']);
 						},
 					),
 				),
@@ -245,7 +243,7 @@ class ManageLanguages_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=languages',
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'languages']),
 				'token' => 'admin-lang',
 			),
 			'additional_rows' => array(
@@ -343,7 +341,7 @@ class ManageLanguages_Controller extends Action_Controller
 
 				// Make sure the files aren't stuck in the cache.
 				package_flush_cache();
-				$context['install_complete'] = sprintf($txt['languages_download_complete_desc'], $scripturl . '?action=admin;area=languages');
+				$context['install_complete'] = sprintf($txt['languages_download_complete_desc'], getUrl('admin', ['action' => 'admin', 'area' => 'languages']));
 
 				return;
 			}
@@ -618,7 +616,7 @@ class ManageLanguages_Controller extends Action_Controller
 	 */
 	public function action_editlang()
 	{
-		global $settings, $context, $txt, $modSettings, $language, $scripturl;
+		global $settings, $context, $txt, $modSettings, $language;
 
 		require_once(SUBSDIR . '/Language.subs.php');
 		theme()->getTemplates()->loadLanguageFile('ManageSettings');
@@ -694,7 +692,7 @@ class ManageLanguages_Controller extends Action_Controller
 			$possiblePackage = findPossiblePackages($context['lang_id']);
 			if ($possiblePackage !== false)
 			{
-				$context['langpack_uninstall_link'] = $scripturl . '?action=admin;area=packages;sa=uninstall;package=' . $possiblePackage[1] . ';pid=' . $possiblePackage[0];
+				$context['langpack_uninstall_link'] = getUrl('admin', ['action' => 'admin', 'area' => 'packages', 'sa' => 'uninstall', 'package' => $possiblePackage[1], 'pid' => $possiblePackage[0]]);
 			}
 		}
 
@@ -955,7 +953,7 @@ class ManageLanguages_Controller extends Action_Controller
 	 */
 	public function action_languageSettings_display()
 	{
-		global $scripturl, $context, $txt;
+		global $context, $txt;
 
 		// Initialize the form
 		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
@@ -980,7 +978,7 @@ class ManageLanguages_Controller extends Action_Controller
 		}
 
 		// Setup the template stuff.
-		$context['post_url'] = $scripturl . '?action=admin;area=languages;sa=settings;save';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'languages', 'sa' => 'settings', 'save']);
 		$context['settings_title'] = $txt['language_settings'];
 		$context['save_disabled'] = $settings_not_writable;
 

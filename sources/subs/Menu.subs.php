@@ -403,43 +403,43 @@ function loadDefaultMenuButtons()
 	$buttons = array(
 		'home' => array(
 			'title' => $txt['community'],
-			'href' => $scripturl,
+			'href' => getUrl('home', []),
 			'data-icon' => 'i-home',
 			'show' => true,
 			'sub_buttons' => array(
 				'help' => array(
 					'title' => $txt['help'],
-					'href' => $scripturl . '?action=help',
+					'href' => getUrl('action', ['action' => 'help']),
 					'show' => true,
 				),
 				'search' => array(
 					'title' => $txt['search'],
-					'href' => $scripturl . '?action=search',
+					'href' => getUrl('action', ['action' => 'search']),
 					'show' => $context['allow_search'],
 				),
 				'calendar' => array(
 					'title' => $txt['calendar'],
-					'href' => $scripturl . '?action=calendar',
+					'href' => getUrl('action', ['action' => 'calendar']),
 					'show' => $context['allow_calendar'],
 				),
 				'memberlist' => array(
 					'title' => $txt['members_title'],
-					'href' => $scripturl . '?action=memberlist',
+					'href' => getUrl('action', ['action' => 'memberlist']),
 					'show' => $context['allow_memberlist'],
 				),
 				'recent' => array(
 					'title' => $txt['recent_posts'],
-					'href' => $scripturl . '?action=recent',
+					'href' => getUrl('action', ['action' => 'recent']),
 					'show' => true,
 				),
 				'like_stats' => array(
 					'title' => $txt['like_post_stats'],
-					'href' => $scripturl . '?action=likes;sa=likestats',
+					'href' => getUrl('action', ['action' => 'likes', 'sa' => 'likestats']),
 					'show' => !empty($modSettings['likes_enabled']) && allowedTo('like_posts_stats'),
 				),
 				'contact' => array(
 					'title' => $txt['contact'],
-					'href' => $scripturl . '?action=register;sa=contact',
+					'href' => getUrl('action', ['action' => 'register', 'sa' => 'contact']),
 					'show' => $user_info['is_guest'] && !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] == 'menu',
 				),
 			),
@@ -567,33 +567,33 @@ function loadDefaultMenuButtons()
 	$buttons += array(
 		'profile' => array(
 			'title' => !empty($modSettings['displayMemberNames']) ? $user_info['name'] : $txt['account_short'],
-			'href' => $scripturl . '?action=profile',
+			'href' => getUrl('profile', ['action' => 'profile', 'u' => $user_info['id'], 'name' => $user_info['name']]),
 			'data-icon' => 'i-account',
 			'show' => $context['allow_edit_profile'],
 			'sub_buttons' => array(
 				'account' => array(
 					'title' => $txt['account'],
-					'href' => $scripturl . '?action=profile;area=account',
+					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'account', 'u' => $user_info['id'], 'name' => $user_info['name']]),
 					'show' => allowedTo(array('profile_identity_any', 'profile_identity_own', 'manage_membergroups')),
 				),
 				'drafts' => array(
 					'title' => $txt['mydrafts'],
-					'href' => $scripturl . '?action=profile;area=showdrafts',
+					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => $user_info['id'], 'name' => $user_info['name']]),
 					'show' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft'),
 				),
 				'forumprofile' => array(
 					'title' => $txt['forumprofile'],
-					'href' => $scripturl . '?action=profile;area=forumprofile',
+					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $user_info['id'], 'name' => $user_info['name']]),
 					'show' => allowedTo(array('profile_extra_any', 'profile_extra_own')),
 				),
 				'theme' => array(
 					'title' => $txt['theme'],
-					'href' => $scripturl . '?action=profile;area=theme',
+					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'theme', 'u' => $user_info['id'], 'name' => $user_info['name']]),
 					'show' => allowedTo(array('profile_extra_any', 'profile_extra_own', 'profile_extra_any')),
 				),
 				'logout' => array(
 					'title' => $txt['logout'],
-					'href' => $scripturl . '?action=logout',
+					'href' => getUrl('action', ['action' => 'logout']),
 					'show' => !$user_info['is_guest'],
 				),
 			),
@@ -603,18 +603,18 @@ function loadDefaultMenuButtons()
 		'pm' => array(
 			'title' => $txt['pm_short'],
 			'counter' => 'unread_messages',
-			'href' => $scripturl . '?action=pm',
+			'href' => getUrl('action', ['action' => 'pm']),
 			'data-icon' => ($context['user']['unread_messages'] ? 'i-envelope' : 'i-envelope-blank'),
 			'show' => $context['allow_pm'],
 			'sub_buttons' => array(
 				'pm_read' => array(
 					'title' => $txt['pm_menu_read'],
-					'href' => $scripturl . '?action=pm',
+					'href' => getUrl('action', ['action' => 'pm']),
 					'show' => allowedTo('pm_read'),
 				),
 				'pm_send' => array(
 					'title' => $txt['pm_menu_send'],
-					'href' => $scripturl . '?action=pm;sa=send',
+					'href' => getUrl('action', ['action' => 'pm', 'sa' => 'send']),
 					'show' => allowedTo('pm_send'),
 				),
 			),
@@ -622,7 +622,7 @@ function loadDefaultMenuButtons()
 		'mentions' => array(
 			'title' => $txt['mention'],
 			'counter' => 'mentions',
-			'href' => $scripturl . '?action=mentions',
+			'href' => getUrl('action', ['action' => 'mentions']),
 			'data-icon' => ($context['user']['mentions'] ? 'i-bell' : 'i-bell-blank'),
 			'show' => !$user_info['is_guest'] && !empty($modSettings['mentions_enabled']),
 		),
@@ -631,7 +631,7 @@ function loadDefaultMenuButtons()
 		// of old unread posts, and they wont be reached from this button.
 		'unread' => array(
 			'title' => $txt['view_unread_category'],
-			'href' => $scripturl . '?action=unread',
+			'href' => getUrl('action', ['action' => 'unread']),
 			'data-icon' => 'i-comments',
 			'show' => !$user_info['is_guest'],
 		),
@@ -640,20 +640,20 @@ function loadDefaultMenuButtons()
 		// that the user has never posted in and doesn't care about.
 		'unreadreplies' => array(
 			'title' => $txt['view_replies_category'],
-			'href' => $scripturl . '?action=unreadreplies',
+			'href' => getUrl('action', ['action' => 'unreadreplies']),
 			'data-icon' => 'i-comments-blank',
 			'show' => !$user_info['is_guest'],
 		),
 		'login' => array(
 			'title' => $txt['login'],
-			'href' => $scripturl . '?action=login',
+			'href' => getUrl('action', ['action' => 'login']),
 			'data-icon' => 'i-sign-in',
 			'show' => $user_info['is_guest'],
 		),
 
 		'register' => array(
 			'title' => $txt['register'],
-			'href' => $scripturl . '?action=register',
+			'href' => getUrl('action', ['action' => 'register']),
 			'data-icon' => 'i-register',
 			'show' => $user_info['is_guest'] && $context['can_register'],
 		),

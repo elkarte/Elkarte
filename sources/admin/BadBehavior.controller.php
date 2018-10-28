@@ -41,7 +41,7 @@ class BadBehavior_Controller extends Action_Controller
 	 */
 	public function action_log()
 	{
-		global $scripturl, $txt, $context, $modSettings;
+		global $txt, $context, $modSettings;
 
 		// Check for the administrative permission to do this.
 		isAllowedTo('admin_forum');
@@ -83,7 +83,7 @@ class BadBehavior_Controller extends Action_Controller
 		$sort = isset($this->_req->query->desc) ? 'down' : 'up';
 
 		// Set the page listing up.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=admin;area=logs;sa=badbehaviorlog' . ($sort == 'down' ? ';desc' : '') . (!empty($filter) ? $filter['href'] : ''), $start, $num_errors, $modSettings['defaultMaxMessages']);
+		$context['page_index'] = constructPageIndex(getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'badbehaviorlog', $sort == 'down' ? 'desc' : '', !empty($filter) ? $filter['href'] : '']), $start, $num_errors, $modSettings['defaultMaxMessages']);
 
 		// Find and sort out the log entries.
 		$context['bb_entries'] = getBadBehaviorLogEntries($start, $modSettings['defaultMaxMessages'], $sort, $filter);
@@ -110,7 +110,7 @@ class BadBehavior_Controller extends Action_Controller
 	 */
 	protected function _prepareMembers()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		$members = array();
 		foreach ($context['bb_entries'] as $member)
@@ -128,8 +128,8 @@ class BadBehavior_Controller extends Action_Controller
 				$memID = $context['bb_entries'][$id]['member']['id'];
 				$context['bb_entries'][$id]['member']['username'] = $members[$memID]['member_name'];
 				$context['bb_entries'][$id]['member']['name'] = $members[$memID]['real_name'];
-				$context['bb_entries'][$id]['member']['href'] = empty($memID) ? '' : $scripturl . '?action=profile;u=' . $memID;
-				$context['bb_entries'][$id]['member']['link'] = empty($memID) ? $txt['guest_title'] : '<a href="' . $scripturl . '?action=profile;u=' . $memID . '">' . $context['bb_entries'][$id]['member']['name'] . '</a>';
+				$context['bb_entries'][$id]['member']['href'] = empty($memID) ? '' : getUrl('profile', ['action' => 'profile', 'u' => $memID, 'name' => $members[$memID]['real_name']]);
+				$context['bb_entries'][$id]['member']['link'] = empty($memID) ? $txt['guest_title'] : '<a href="' . $context['bb_entries'][$id]['member']['href'] . '">' . $context['bb_entries'][$id]['member']['name'] . '</a>';
 			}
 		}
 	}
@@ -151,7 +151,7 @@ class BadBehavior_Controller extends Action_Controller
 			case 'id_member':
 				$id = $filter['value']['sql'];
 				loadMemberData($id, false, 'minimal');
-				$context['filter']['value']['html'] = '<a href="' . $scripturl . '?action=profile;u=' . $id . '">' . $user_profile[$id]['real_name'] . '</a>';
+				$context['filter']['value']['html'] = '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $id, 'name' => $user_profile[$id]['real_name']]) . '">' . $user_profile[$id]['real_name'] . '</a>';
 				break;
 			case 'url':
 				$context['filter']['value']['html'] = '\'' . strtr(htmlspecialchars((substr($filter['value']['sql'], 0, 1) === '?' ? $scripturl : '') . $filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array('\_' => '_')) . '\'';

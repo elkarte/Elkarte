@@ -280,7 +280,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_routine()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		if ($this->_req->getQuery('done', 'trim|strval') === 'recount')
 			$context['maintenance_finished'] = $txt['maintain_recount'];
@@ -289,7 +289,7 @@ class Maintenance_Controller extends Action_Controller
 		$context['sub_template'] = 'maintain_routine';
 		$context['routine_actions'] = array(
 			'version' => array(
-				'url' => $scripturl . '?action=admin;area=maintain;sa=routine;activity=version',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'routine', 'activity' => 'version']),
 				'title' => $txt['maintain_version'],
 				'description' => $txt['maintain_version_info'],
 				'submit' => $txt['maintain_run_now'],
@@ -298,7 +298,7 @@ class Maintenance_Controller extends Action_Controller
 				)
 			),
 			'repair' => array(
-				'url' => $scripturl . '?action=admin;area=repairboards',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'repairboards']),
 				'title' => $txt['maintain_errors'],
 				'description' => $txt['maintain_errors_info'],
 				'submit' => $txt['maintain_run_now'],
@@ -308,7 +308,7 @@ class Maintenance_Controller extends Action_Controller
 				)
 			),
 			'recount' => array(
-				'url' => $scripturl . '?action=admin;area=maintain;sa=routine;activity=recount',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'routine', 'activity' => 'recount']),
 				'title' => $txt['maintain_recount'],
 				'description' => $txt['maintain_recount_info'],
 				'submit' => $txt['maintain_run_now'],
@@ -318,7 +318,7 @@ class Maintenance_Controller extends Action_Controller
 				)
 			),
 			'logs' => array(
-				'url' => $scripturl . '?action=admin;area=maintain;sa=routine;activity=logs',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'routine', 'activity' => 'logs']),
 				'title' => $txt['maintain_logs'],
 				'description' => $txt['maintain_logs_info'],
 				'submit' => $txt['maintain_run_now'],
@@ -328,7 +328,7 @@ class Maintenance_Controller extends Action_Controller
 				)
 			),
 			'cleancache' => array(
-				'url' => $scripturl . '?action=admin;area=maintain;sa=routine;activity=cleancache',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'routine', 'activity' => 'cleancache']),
 				'title' => $txt['maintain_cache'],
 				'description' => $txt['maintain_cache_info'],
 				'submit' => $txt['maintain_run_now'],
@@ -375,7 +375,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_topics()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 
@@ -396,7 +396,7 @@ class Maintenance_Controller extends Action_Controller
 
 		$context['topics_actions'] = array(
 			'pruneold' => array(
-				'url' => $scripturl . '?action=admin;area=maintain;sa=topics;activity=pruneold',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'topics', 'activity' => 'pruneold']),
 				'title' => $txt['maintain_old'],
 				'submit' => $txt['maintain_old_remove'],
 				'confirm' => $txt['maintain_old_confirm'],
@@ -406,7 +406,7 @@ class Maintenance_Controller extends Action_Controller
 				)
 			),
 			'massmove' => array(
-				'url' => $scripturl . '?action=admin;area=maintain;sa=topics;activity=massmove',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'topics', 'activity' => 'massmove']),
 				'title' => $txt['move_topics_maintenance'],
 				'submit' => $txt['move_topics_now'],
 				'confirm' => $txt['move_topics_confirm'],
@@ -1285,7 +1285,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_hooks()
 	{
-		global $scripturl, $context, $txt;
+		global $context, $txt;
 
 		require_once(SUBSDIR . '/AddonSettings.subs.php');
 
@@ -1304,7 +1304,7 @@ class Maintenance_Controller extends Action_Controller
 			'id' => 'list_integration_hooks',
 			'title' => $txt['maintain_sub_hooks_list'],
 			'items_per_page' => 20,
-			'base_href' => $scripturl . '?action=admin;area=maintain;sa=hooks' . $context['filter_url'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'hooks', $context['filter_url'], '{session_data}']),
 			'default_sort_col' => 'hook_name',
 			'get_items' => array(
 				'function' => array($this, 'list_getIntegrationHooks'),

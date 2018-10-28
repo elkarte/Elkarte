@@ -70,15 +70,16 @@ class DisplayRenderer extends Renderer
 	 */
 	protected function _buildOutputArray()
 	{
-		global $scripturl, $topic, $context, $modSettings, $user_info, $txt;
+		global $topic, $context, $modSettings, $user_info, $txt;
 
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		$output = parent::_buildOutputArray();
+		$href = getUrl('topic', ['topic' => $topic, 'start' => 'msg' . $this->_this_message['id_msg'], 'subject' => $this->_this_message['subject']]) . '#msg' . $this->_this_message['id_msg'];
 		$output += array(
 			'attachment' => loadAttachmentContext($this->_this_message['id_msg']),
-			'href' => $scripturl . '?topic=' . $topic . '.msg' . $this->_this_message['id_msg'] . '#msg' . $this->_this_message['id_msg'],
-			'link' => '<a href="' . $scripturl . '?topic=' . $topic . '.msg' . $this->_this_message['id_msg'] . '#msg' . $this->_this_message['id_msg'] . '" rel="nofollow">' . $this->_this_message['subject'] . '</a>',
+			'href' => $href,
+			'link' => '<a href="' . $href . '" rel="nofollow">' . $this->_this_message['subject'] . '</a>',
 			'icon' => $this->_this_message['icon'],
 			'icon_url' => $this->_options->icon_sources->{$this->_this_message['icon']},
 			'modified' => array(
@@ -109,8 +110,8 @@ class DisplayRenderer extends Renderer
 		if (!empty($output['member']['karma']['allow']))
 		{
 			$output['member']['karma'] += array(
-				'applaud_url' => $scripturl . '?action=karma;sa=applaud;uid=' . $output['member']['id'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';m=' . $output['id'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-				'smite_url' => $scripturl . '?action=karma;sa=smite;uid=' . $output['member']['id'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';m=' . $output['id'] . ';' . $context['session_var'] . '=' . $context['session_id']
+				'applaud_url' => getUrl('action', ['action' => 'karma', 'sa' => 'applaud', 'uid' => $output['member']['id'], 'topic' => $context['current_topic'] . '.' . $context['start'], 'm' => $output['id'], '{session_data}']),
+				'smite_url' => getUrl('action', ['action' => 'karma', 'sa' => 'smite', 'uid' => $output['member']['id'], 'topic' => $context['current_topic'] . '.' . $context['start'], 'm' => $output['id'], '{session_data}'])
 			);
 		}
 

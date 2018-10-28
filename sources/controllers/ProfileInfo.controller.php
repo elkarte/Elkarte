@@ -30,6 +30,12 @@ class ProfileInfo_Controller extends Action_Controller
 	private $_memID = 0;
 
 	/**
+	 * The array from $user_profile stored here to avoid some global
+	 * @var mixed[]
+	 */
+	private $_profile = [];
+
+	/**
 	 * Holds the current summary tabs to load
 	 * @var array
 	 */
@@ -44,14 +50,17 @@ class ProfileInfo_Controller extends Action_Controller
 	 */
 	public function pre_dispatch()
 	{
-		global $context, $user_info;
+		global $context, $user_info, $user_profile;
 
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		$this->_memID = currentMemberID();
+		$this->_profile = $user_profile[$this->_memID];
 
 		if (!isset($context['user']['is_owner']))
+		{
 			$context['user']['is_owner'] = (int) $this->_memID === (int) $user_info['id'];
+		}
 
 		theme()->getTemplates()->loadLanguageFile('Profile');
 	}
@@ -434,7 +443,7 @@ class ProfileInfo_Controller extends Action_Controller
 	 */
 	public function action_showPosts()
 	{
-		global $txt, $user_info, $scripturl, $modSettings, $context, $user_profile, $board;
+		global $txt, $user_info, $scripturl, $modSettings, $context, $board;
 
 		// Some initial context.
 		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
@@ -465,7 +474,7 @@ class ProfileInfo_Controller extends Action_Controller
 		);
 
 		// Set the page title
-		$context['page_title'] = $txt['showPosts'] . ' - ' . $user_profile[$this->_memID]['real_name'];
+		$context['page_title'] = $txt['showPosts'] . ' - ' . $this->_profile['real_name'];
 
 		// Is the load average too high to allow searching just now?
 		if (!empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'])
@@ -920,11 +929,11 @@ class ProfileInfo_Controller extends Action_Controller
 	 */
 	public function action_statPanel()
 	{
-		global $txt, $context, $user_profile, $modSettings;
+		global $txt, $context, $modSettings;
 
 		require_once(SUBSDIR . '/Stats.subs.php');
 
-		$context['page_title'] = $txt['statPanel_showStats'] . ' ' . $user_profile[$this->_memID]['real_name'];
+		$context['page_title'] = $txt['statPanel_showStats'] . ' ' . $this->_profile['real_name'];
 
 		// Is the load average too high to allow searching just now?
 		if (!empty($modSettings['loadavg_userstats']) && $modSettings['current_load'] >= $modSettings['loadavg_userstats'])
@@ -933,10 +942,10 @@ class ProfileInfo_Controller extends Action_Controller
 		theme()->getTemplates()->load('ProfileInfo');
 
 		// General user statistics.
-		$timeDays = floor($user_profile[$this->_memID]['total_time_logged_in'] / 86400);
-		$timeHours = floor(($user_profile[$this->_memID]['total_time_logged_in'] % 86400) / 3600);
-		$context['time_logged_in'] = ($timeDays > 0 ? $timeDays . $txt['totalTimeLogged2'] : '') . ($timeHours > 0 ? $timeHours . $txt['totalTimeLogged3'] : '') . floor(($user_profile[$this->_memID]['total_time_logged_in'] % 3600) / 60) . $txt['totalTimeLogged4'];
-		$context['num_posts'] = comma_format($user_profile[$this->_memID]['posts']);
+		$timeDays = floor($this->_profile['total_time_logged_in'] / 86400);
+		$timeHours = floor(($this->_profile['total_time_logged_in'] % 86400) / 3600);
+		$context['time_logged_in'] = ($timeDays > 0 ? $timeDays . $txt['totalTimeLogged2'] : '') . ($timeHours > 0 ? $timeHours . $txt['totalTimeLogged3'] : '') . floor(($this->_profile['total_time_logged_in'] % 3600) / 60) . $txt['totalTimeLogged4'];
+		$context['num_posts'] = comma_format($this->_profile['posts']);
 
 		// Menu tab
 		$context[$context['profile_menu_name']]['tab_data'] = array(
@@ -976,7 +985,7 @@ class ProfileInfo_Controller extends Action_Controller
 	 */
 	public function action_showPermissions()
 	{
-		global $txt, $board, $user_profile, $context, $scripturl;
+		global $txt, $board, $context, $scripturl;
 
 		// Verify if the user has sufficient permissions.
 		isAllowedTo('manage_permissions');
@@ -991,20 +1000,20 @@ class ProfileInfo_Controller extends Action_Controller
 		loadPermissionProfiles();
 
 		$context['member']['id'] = $this->_memID;
-		$context['member']['name'] = $user_profile[$this->_memID]['real_name'];
+		$context['member']['name'] = $this->_profile['real_name'];
 
 		$context['page_title'] = $txt['showPermissions'];
 		$board = empty($board) ? 0 : (int) $board;
 		$context['board'] = $board;
 
 		// Determine which groups this user is in.
-		if (empty($user_profile[$this->_memID]['additional_groups']))
+		if (empty($this->_profile['additional_groups']))
 			$curGroups = array();
 		else
-			$curGroups = explode(',', $user_profile[$this->_memID]['additional_groups']);
+			$curGroups = explode(',', $this->_profile['additional_groups']);
 
-		$curGroups[] = $user_profile[$this->_memID]['id_group'];
-		$curGroups[] = $user_profile[$this->_memID]['id_post_group'];
+		$curGroups[] = $this->_profile['id_group'];
+		$curGroups[] = $this->_profile['id_post_group'];
 
 		// Load a list of boards for the jump box - except the defaults.
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -1334,12 +1343,12 @@ class ProfileInfo_Controller extends Action_Controller
 	 */
 	private function _determine_member_action()
 	{
-		global $context, $user_profile, $modSettings;
+		global $context, $modSettings;
 
 		if (!empty($modSettings['who_enabled']) && $context['member']['online']['is_online'])
 		{
 			include_once(SUBSDIR . '/Who.subs.php');
-			$action = determineActions($user_profile[$this->_memID]['url']);
+			$action = determineActions($this->_profile['url']);
 			theme()->getTemplates()->loadLanguageFile('index');
 
 			if ($action !== false)
@@ -1425,11 +1434,11 @@ class ProfileInfo_Controller extends Action_Controller
 	 */
 	private function _determine_posts_per_day()
 	{
-		global $user_profile, $context, $txt;
+		global $context, $txt;
 
 		// They haven't even been registered for a full day!?
-		$days_registered = (int) ((time() - $user_profile[$this->_memID]['date_registered']) / (3600 * 24));
-		if (empty($user_profile[$this->_memID]['date_registered']) || $days_registered < 1)
+		$days_registered = (int) ((time() - $this->_profile['date_registered']) / (3600 * 24));
+		if (empty($this->_profile['date_registered']) || $days_registered < 1)
 		{
 			$context['member']['posts_per_day'] = $txt['not_applicable'];
 		}

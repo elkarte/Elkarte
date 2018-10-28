@@ -18,10 +18,10 @@
  */
 function template_mlsearch_above()
 {
-	global $context, $scripturl, $txt;
+	global $context, $txt;
 
 	$extra = '
-	<form id="mlsearch" action="' . $scripturl . '?action=memberlist;sa=search" method="post" accept-charset="UTF-8">
+	<form id="mlsearch" action="' . getUrl('action', ['action' => 'memberlist', 'sa' => 'search']) . '" method="post" accept-charset="UTF-8">
 		<ul class="floatright">
 			<li>
 				<input id="mlsearch_input" class="input_text" onfocus="toggle_mlsearch_opt();" type="text" name="search" value="' . $context['old_search_value'] . '" placeholder="' . $txt['mlist_search'] . '" />

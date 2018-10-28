@@ -191,21 +191,26 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 		if (isset($this->_req->query->sort) && !in_array($this->_req->query->sort, array('subject', 'starter', 'last_poster', 'replies', 'views', 'likes', 'first_post', 'last_post')))
 			$this->_req->query->sort = 'last_post';
 
+		$board_url_param = ['board' => $board, 'start' => '%1$d', 'name' => $board_info['name']];
 		// Make sure the starting place makes sense and construct the page index.
 		if (isset($this->_req->query->sort))
-			$sort_string = ';sort=' . $this->_req->query->sort . (isset($this->_req->query->desc) ? ';desc' : '');
-		else
-			$sort_string = '';
+		{
+			$board_url_param['sort'] = $this->_req->query->sort;
+			if (isset($this->_req->query->desc))
+			{
+				$board_url_param[] = 'desc';
+			}
+		}
 
-		$context['page_index'] = constructPageIndex($scripturl . '?board=' . $board . '.%1$d' . $sort_string, $this->_req->query->start, $board_info['total_topics'], $maxindex, true);
+		$context['page_index'] = constructPageIndex(getUrl('board', $board_url_param), $this->_req->query->start, $board_info['total_topics'], $maxindex, true);
 		$context['start'] = &$this->_req->query->start;
 
 		// Set a canonical URL for this page.
-		$context['canonical_url'] = $scripturl . '?board=' . $board . '.' . $context['start'];
+		$context['canonical_url'] = getUrl('board', ['board' => $board, 'start' => $context['start'], 'name' => $board_info['name']]);
 
 		$context['links'] += array(
-			'prev' => $this->_req->query->start >= $context['topics_per_page'] ? $scripturl . '?board=' . $board . '.' . ($this->_req->query->start - $context['topics_per_page']) : '',
-			'next' => $this->_req->query->start + $context['topics_per_page'] < $board_info['total_topics'] ? $scripturl . '?board=' . $board . '.' . ($this->_req->query->start + $context['topics_per_page']) : '',
+			'prev' => $this->_req->query->start >= $context['topics_per_page'] ? getUrl('board', ['board' => $board, 'start' => $this->_req->query->start - $context['topics_per_page'], 'name' => $board_info['name']]) : '',
+			'next' => $this->_req->query->start + $context['topics_per_page'] < $board_info['total_topics'] ? getUrl('board', ['board' => $board, 'start' => $this->_req->query->start + $context['topics_per_page'], 'name' => $board_info['name']]) : '',
 		);
 
 		$context['page_info'] = array(
@@ -225,7 +230,9 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 		if (!empty($board_info['moderators']))
 		{
 			foreach ($board_info['moderators'] as $mod)
-				$context['link_moderators'][] = '<a href="' . $scripturl . '?action=profile;u=' . $mod['id'] . '" title="' . $txt['board_moderator'] . '">' . $mod['name'] . '</a>';
+			{
+				$context['link_moderators'][] = '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $mod['id'], 'name' => $mod['name']]) . '" title="' . $txt['board_moderator'] . '">' . $mod['name'] . '</a>';
+			}
 		}
 
 		// Mark current and parent boards as seen.
@@ -340,7 +347,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 			}
 
 			$context['topics_headers'][$key] = array(
-				'url' => $scripturl . '?board=' . $context['current_board'] . '.' . $context['start'] . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] === 'up' ? ';desc' : ''),
+				'url' => getUrl('board', ['board' => $context['current_board'], 'start' => $context['start'], 'sort' => $key, 'name' => $board_info['name'], $context['sort_by'] == $key && $context['sort_direction'] === 'up' ? 'desc' : '']),
 				'sort_dir_img' => $context['sort_by'] == $key ? '<i class="icon icon-small i-sort-' . $sorticon . '-' . $context['sort_direction'] . '" title="' . $context['sort_title'] . '"><s>' . $context['sort_title'] . '</s></i>' : '',
 			);
 		}
@@ -540,7 +547,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 		else
 		{
 			$boards_can = boardsAllowedTo(array('make_sticky', 'move_any', 'move_own', 'remove_any', 'remove_own', 'lock_any', 'lock_own', 'merge_any', 'approve_posts'), true, false);
-			$redirect_url = isset($this->_req->post->redirect_url) ? $this->_req->post->redirect_url : (isset($_SESSION['old_url']) ? $_SESSION['old_url'] : substr($modSettings['default_forum_action'], 1));
+			$redirect_url = isset($this->_req->post->redirect_url) ? $this->_req->post->redirect_url : (isset($_SESSION['old_url']) ? $_SESSION['old_url'] : getUrlQuery('action', $modSettings['default_forum_action']));
 		}
 
 		if (!$user_info['is_guest'])

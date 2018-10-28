@@ -37,7 +37,7 @@ class ManageBans_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		theme()->getTemplates()->load('ManageBans');
 		require_once(SUBSDIR . '/Bans.subs.php');
@@ -65,22 +65,22 @@ class ManageBans_Controller extends Action_Controller
 			'tabs' => array(
 				'list' => array(
 					'description' => $txt['ban_description'],
-					'href' => $scripturl . '?action=admin;area=ban;sa=list',
+					'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'list']),
 					'is_selected' => $subAction == 'list' || $subAction == 'edit' || $subAction == 'edittrigger',
 				),
 				'add' => array(
 					'description' => $txt['ban_description'],
-					'href' => $scripturl . '?action=admin;area=ban;sa=add',
+					'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'add']),
 					'is_selected' => $subAction == 'add',
 				),
 				'browse' => array(
 					'description' => $txt['ban_trigger_browse_description'],
-					'href' => $scripturl . '?action=admin;area=ban;sa=browse',
+					'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'browse']),
 					'is_selected' => $subAction == 'browse',
 				),
 				'log' => array(
 					'description' => $txt['ban_log_description'],
-					'href' => $scripturl . '?action=admin;area=ban;sa=log',
+					'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'log']),
 					'is_selected' => $subAction == 'log',
 					'is_last' => true,
 				),
@@ -113,7 +113,7 @@ class ManageBans_Controller extends Action_Controller
 	 */
 	public function action_list()
 	{
-		global $txt, $context, $scripturl, $user_info;
+		global $txt, $context, $user_info;
 
 		require_once(SUBSDIR . '/Bans.subs.php');
 
@@ -147,7 +147,7 @@ class ManageBans_Controller extends Action_Controller
 			'id' => 'ban_list',
 			'title' => $txt['ban_title'],
 			'items_per_page' => 20,
-			'base_href' => $scripturl . '?action=admin;area=ban;sa=list',
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'list']),
 			'default_sort_col' => 'added',
 			'default_sort_dir' => 'desc',
 			'get_items' => array(
@@ -257,7 +257,7 @@ class ManageBans_Controller extends Action_Controller
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . $scripturl . '?action=admin;area=ban;sa=edit;bg=%1$d">' . $txt['modify'] . '</a>',
+							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'edit', 'bg' => '%1$d']) . '">' . $txt['modify'] . '</a>',
 							'params' => array(
 								'id_ban_group' => false,
 							),
@@ -279,7 +279,7 @@ class ManageBans_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=ban;sa=list',
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'list']),
 			),
 			'additional_rows' => array(
 				array(
@@ -309,7 +309,7 @@ class ManageBans_Controller extends Action_Controller
 	 */
 	public function action_edit()
 	{
-		global $txt, $modSettings, $context, $scripturl;
+		global $txt, $modSettings, $context;
 
 		require_once(SUBSDIR . '/Bans.subs.php');
 
@@ -324,7 +324,7 @@ class ManageBans_Controller extends Action_Controller
 		// Template needs this to show errors using javascript
 		theme()->getTemplates()->loadLanguageFile('Errors');
 		createToken('admin-bet');
-		$context['form_url'] = $scripturl . '?action=admin;area=ban;sa=edit';
+		$context['form_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'edit']);
 
 		// Prepare any errors found to the template to show
 		$context['ban_errors'] = array(
@@ -343,7 +343,7 @@ class ManageBans_Controller extends Action_Controller
 				// Setup for a createlist
 				$listOptions = array(
 					'id' => 'ban_items',
-					'base_href' => $scripturl . '?action=admin;area=ban;sa=edit;bg=' . $ban_group_id,
+					'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'edit', 'bg' => $ban_group_id]),
 					'no_items_label' => $txt['ban_no_triggers'],
 					'items_per_page' => $modSettings['defaultMaxMessages'],
 					'get_items' => array(
@@ -394,9 +394,9 @@ class ManageBans_Controller extends Action_Controller
 							),
 							'data' => array(
 								'function' => function ($ban_item) {
-									global $txt, $context, $scripturl;
+									global $txt, $context;
 
-									return '<a href="' . $scripturl . '?action=admin;area=ban;sa=edittrigger;bg=' . $context['ban']['id'] . ';bi=' . $ban_item['id'] . '">' . $txt['ban_edit_trigger'] . '</a>';
+									return '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'edittrigger', 'bg' => $context['ban']['id'], 'bi' => $ban_item['id']]) . '">' . $txt['ban_edit_trigger'] . '</a>';
 								},
 							),
 						),
@@ -416,7 +416,7 @@ class ManageBans_Controller extends Action_Controller
 						),
 					),
 					'form' => array(
-						'href' => $scripturl . '?action=admin;area=ban;sa=edit;bg=' . $ban_group_id,
+						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'edit', 'bg' => $ban_group_id]),
 					),
 					'additional_rows' => array(
 						array(
@@ -424,7 +424,7 @@ class ManageBans_Controller extends Action_Controller
 							'class' => 'submitbutton',
 							'value' => '
 								<input type="submit" name="remove_selection" value="' . $txt['ban_remove_selected_triggers'] . '" class="right_submit" />
-								<a class="linkbutton" href="' . $scripturl . '?action=admin;area=ban;sa=edittrigger;bg=' . $ban_group_id . '">' . $txt['ban_add_trigger'] . '</a>
+								<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'edittrigger', 'bg' => $ban_group_id]) . '">' . $txt['ban_add_trigger'] . '</a>
 								<input type="hidden" name="bg" value="' . $ban_group_id . '" />
 								<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 								<input type="hidden" name="' . $context['admin-bet_token_var'] . '" value="' . $context['admin-bet_token'] . '" />',
@@ -470,7 +470,7 @@ class ManageBans_Controller extends Action_Controller
 
 					if (!empty($context['ban_suggestions']['member']['id']))
 					{
-						$context['ban_suggestions']['href'] = $scripturl . '?action=profile;u=' . $context['ban_suggestions']['member']['id'];
+						$context['ban_suggestions']['href'] = getUrl('profile', ['action' => 'profile', 'u' => $context['ban_suggestions']['member']['id'], 'name' => $context['ban_suggestions']['member']]);
 						$context['ban_suggestions']['member']['link'] = '<a href="' . $context['ban_suggestions']['href'] . '">' . $context['ban_suggestions']['member']['name'] . '</a>';
 
 						// Default the ban name to the name of the banned member.
@@ -520,7 +520,7 @@ class ManageBans_Controller extends Action_Controller
 	 */
 	public function action_log()
 	{
-		global $scripturl, $context, $txt;
+		global $context, $txt;
 
 		require_once(SUBSDIR . '/Bans.subs.php');
 
@@ -546,7 +546,7 @@ class ManageBans_Controller extends Action_Controller
 			'id' => 'ban_log',
 			'title' => $txt['ban_log'],
 			'items_per_page' => 30,
-			'base_href' => $context['admin_area'] == 'ban' ? $scripturl . '?action=admin;area=ban;sa=log' : $scripturl . '?action=admin;area=logs;sa=banlog',
+			'base_href' => $context['admin_area'] == 'ban' ?  getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'log']) : getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'banlog']),
 			'default_sort_col' => 'date',
 			'get_items' => array(
 				'function' => 'list_getBanLogEntries',
@@ -562,7 +562,7 @@ class ManageBans_Controller extends Action_Controller
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . $scripturl . '?action=trackip;searchip=%1$s">%1$s</a>',
+							'format' => '<a href="' . getUrl('admin', ['action' => 'trackip', 'searchip' => '%1$s']) . '">%1$s</a>',
 							'params' => array(
 								'ip' => false,
 							),
@@ -591,7 +591,7 @@ class ManageBans_Controller extends Action_Controller
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . $scripturl . '?action=profile;u=%1$d">%2$s</a>',
+							'format' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => '%1$d']) . '">%2$s</a>',
 							'params' => array(
 								'id_member' => false,
 								'real_name' => false,
@@ -634,7 +634,7 @@ class ManageBans_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $context['admin_area'] == 'ban' ? $scripturl . '?action=admin;area=ban;sa=log' : $scripturl . '?action=admin;area=logs;sa=banlog',
+				'href' => $context['admin_area'] == 'ban' ? getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'log']) : getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'banlog']),
 				'include_start' => true,
 				'include_sort' => true,
 				'token' => 'admin-bl',
@@ -781,7 +781,7 @@ class ManageBans_Controller extends Action_Controller
 	 */
 	public function action_edittrigger()
 	{
-		global $context, $scripturl;
+		global $context;
 
 		require_once(SUBSDIR . '/Bans.subs.php');
 
@@ -879,7 +879,7 @@ class ManageBans_Controller extends Action_Controller
 
 		// Template we will use
 		$context['sub_template'] = 'ban_edit_trigger';
-		$context['form_url'] = $scripturl . '?action=admin;area=ban;sa=edittrigger';
+		$context['form_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'edittrigger']);
 
 		createToken('admin-bet');
 	}
@@ -896,7 +896,7 @@ class ManageBans_Controller extends Action_Controller
 	 */
 	public function action_browse()
 	{
-		global $modSettings, $context, $scripturl, $txt;
+		global $modSettings, $context, $txt;
 
 		require_once(SUBSDIR . '/Bans.subs.php');
 
@@ -923,7 +923,7 @@ class ManageBans_Controller extends Action_Controller
 			'id' => 'ban_trigger_list',
 			'title' => $txt['ban_trigger_browse'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
-			'base_href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=' . $context['selected_entity'],
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'browse', 'entity' => $context['selected_entity']]),
 			'default_sort_col' => 'banned_entity',
 			'no_items_label' => $txt['ban_no_triggers'],
 			'get_items' => array(
@@ -950,7 +950,7 @@ class ManageBans_Controller extends Action_Controller
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . $scripturl . '?action=admin;area=ban;sa=edit;bg=%1$d">%2$s</a>',
+							'format' => '<a href="' . getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'edit', 'bg' => '%1$d']) . '">%2$s</a>',
 							'params' => array(
 								'id_ban_group' => false,
 								'name' => false,
@@ -991,7 +991,7 @@ class ManageBans_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=' . $context['selected_entity'],
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'browse', 'entity' => $context['selected_entity']]),
 				'include_start' => true,
 				'include_sort' => true,
 			),
@@ -1006,22 +1006,22 @@ class ManageBans_Controller extends Action_Controller
 				'show_on' => 'top',
 				'links' => array(
 					array(
-						'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=ip',
+						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'browse', 'entity' => 'ip']),
 						'is_selected' => $context['selected_entity'] == 'ip',
 						'label' => $txt['ip']
 					),
 					array(
-						'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=hostname',
+						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'browse', 'entity' => 'hostname']),
 						'is_selected' => $context['selected_entity'] == 'hostname',
 						'label' => $txt['hostname']
 					),
 					array(
-						'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=email',
+						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'browse', 'entity' => 'email']),
 						'is_selected' => $context['selected_entity'] == 'email',
 						'label' => $txt['email']
 					),
 					array(
-						'href' => $scripturl . '?action=admin;area=ban;sa=browse;entity=member',
+						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'browse', 'entity' => 'member']),
 						'is_selected' => $context['selected_entity'] == 'member',
 						'label' => $txt['username']
 					)
@@ -1088,7 +1088,7 @@ class ManageBans_Controller extends Action_Controller
 		{
 			$listOptions['columns']['banned_entity']['data'] = array(
 				'sprintf' => array(
-					'format' => '<a href="' . $scripturl . '?action=profile;u=%1$d">%2$s</a>',
+					'format' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => '%1$d']) . '">%2$s</a>',
 					'params' => array(
 						'id_member' => false,
 						'real_name' => false,

@@ -28,14 +28,23 @@ class ProfileHistory_Controller extends Action_Controller
 	private $_memID = 0;
 
 	/**
+	 * The array from $user_profile stored here to avoid some global
+	 * @var mixed[]
+	 */
+	private $_profile = [];
+
+	/**
 	 * Called before all other methods when coming from the dispatcher or
 	 * action class.
 	 */
 	public function pre_dispatch()
 	{
+		global $user_profile;
+
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		$this->_memID = currentMemberID();
+		$this->_profile = $user_profile[$this->_memID];
 	}
 
 	/**
@@ -46,7 +55,7 @@ class ProfileHistory_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		global $context, $txt, $modSettings, $user_profile;
+		global $context, $txt, $modSettings;
 
 		$subActions = array(
 			'activity' => array('controller' => $this, 'function' => 'action_trackactivity', 'label' => $txt['trackActivity']),
@@ -80,7 +89,7 @@ class ProfileHistory_Controller extends Action_Controller
 
 		// Set a page title.
 		$context['history_area'] = $subAction;
-		$context['page_title'] = $txt['trackUser'] . ' - ' . $subActions[$subAction]['label'] . ' - ' . $user_profile[$this->_memID]['real_name'];
+		$context['page_title'] = $txt['trackUser'] . ' - ' . $subActions[$subAction]['label'] . ' - ' . $this->_profile['real_name'];
 
 		// Pass on to the actual method.
 		$action->dispatch($subAction);
@@ -91,17 +100,17 @@ class ProfileHistory_Controller extends Action_Controller
 	 */
 	public function action_trackactivity()
 	{
-		global $scripturl, $txt, $modSettings, $user_profile, $context;
+		global $scripturl, $txt, $modSettings, $context;
 
 		// Verify if the user has sufficient permissions.
 		isAllowedTo('moderate_forum');
 
-		$context['last_ip'] = $user_profile[$this->_memID]['member_ip'];
+		$context['last_ip'] = $this->_profile['member_ip'];
 
-		if ($context['last_ip'] != $user_profile[$this->_memID]['member_ip2'])
-			$context['last_ip2'] = $user_profile[$this->_memID]['member_ip2'];
+		if ($context['last_ip'] != $this->_profile['member_ip2'])
+			$context['last_ip2'] = $this->_profile['member_ip2'];
 
-		$context['member']['name'] = $user_profile[$this->_memID]['real_name'];
+		$context['member']['name'] = $this->_profile['real_name'];
 
 		// Set the options for the list component.
 		$listOptions = array(
@@ -215,7 +224,7 @@ class ProfileHistory_Controller extends Action_Controller
 	 */
 	public function action_trackip()
 	{
-		global $user_profile, $scripturl, $txt, $user_info, $modSettings, $context;
+		global $scripturl, $txt, $user_info, $modSettings, $context;
 
 		// Can the user do this?
 		isAllowedTo('moderate_forum');
@@ -232,7 +241,7 @@ class ProfileHistory_Controller extends Action_Controller
 		}
 		else
 		{
-			$context['ip'] = $user_profile[$this->_memID]['member_ip'];
+			$context['ip'] = $this->_profile['member_ip'];
 			$context['base_url'] = $scripturl . '?action=profile;area=history;sa=ip;u=' . $this->_memID;
 		}
 

@@ -87,7 +87,7 @@ class Draft_Controller extends Post_Controller
 	 */
 	public function action_showProfileDrafts()
 	{
-		global $txt, $scripturl, $modSettings, $context, $user_info;
+		global $txt, $modSettings, $context, $user_info, $user_profile;
 
 		// Safe is safe.
 		if ($this->_memID != $user_info['id'])
@@ -108,7 +108,7 @@ class Draft_Controller extends Post_Controller
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
 		// Make sure the starting place makes sense and construct our friend the page index.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=profile;u=' . $this->_memID . ';area=showdrafts', $context['start'], $msgCount, $maxIndex);
+		$context['page_index'] = constructPageIndex(getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => $this->_memID, 'name' => $user_profile[$this->_memID]['real_name']]), $context['start'], $msgCount, $maxIndex);
 		$context['current_page'] = $context['start'] / $maxIndex;
 
 		list ($maxIndex, $reverse, $limit, $order) = $this->_query_limits($msgCount, $maxIndex);
@@ -129,11 +129,11 @@ class Draft_Controller extends Post_Controller
 				'board' => array(
 					'name' => $row['bname'],
 					'id' => $row['id_board'],
-					'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['bname'] . '</a>',
+					'link' => '<a href="' . getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['bname']]) . '">' . $row['bname'] . '</a>',
 				),
 				'topic' => array(
 					'id' => $row['id_topic'],
-					'link' => empty($row['id_topic']) ? $row['subject'] : '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['subject'] . '</a>',
+					'link' => empty($row['id_topic']) ? $row['subject'] : '<a href="' . getUrl('topic', ['topic' => $row['id_topic'], 'start' => '0', 'subject' => $row['subject']]) . '">' . $row['subject'] . '</a>',
 				),
 				'subject' => $row['subject'],
 				'time' => standardTime($row['poster_time']),
@@ -152,12 +152,12 @@ class Draft_Controller extends Post_Controller
 						'name' => 'delete',
 					),
 					'remove' => array(
-						'href' => $scripturl . '?action=profile;u=' . $context['member']['id'] . ';area=showdrafts;delete=' . $row['id_draft'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+						'href' => getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => $context['member']['id'], 'name' => $context['member']['name'], 'delete' => $row['id_draft'], 'start' => $context['start'], '{session_data}']),
 						'text' => $txt['draft_delete'],
 						'custom' => 'onclick="return confirm(' . JavaScriptEscape($txt['draft_remove'] . '?') . ');"',
 					),
 					'edit' => array(
-						'href' => $scripturl . '?action=post;' . (empty($row['id_topic']) ? 'board=' . $row['id_board'] : 'topic=' . $row['id_topic']) . '.0;id_draft=' . $row['id_draft'],
+						'href' => getUrl('action', ['action' => 'post', empty($row['id_topic']) ? 'board' : 'topic' => empty($row['id_topic']) ? $row['id_board'] . '.0' : $row['id_topic'] . '.0', 'id_draft' => $row['id_draft']]),
 						'text' => $txt['draft_edit'],
 					),
 				)
@@ -189,7 +189,7 @@ class Draft_Controller extends Post_Controller
 	 */
 	public function action_showPMDrafts()
 	{
-		global $txt, $user_info, $scripturl, $modSettings, $context;
+		global $txt, $user_info, $modSettings, $context;
 
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
@@ -217,7 +217,7 @@ class Draft_Controller extends Post_Controller
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
 		// Make sure the starting place makes sense and construct our friend the page index.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=pm;sa=showpmdrafts', $context['start'], $msgCount, $maxIndex);
+		$context['page_index'] = constructPageIndex(getUrl('action', ['action' => 'pm', 'sa' => 'showpmdrafts']), $context['start'], $msgCount, $maxIndex);
 		$context['current_page'] = $context['start'] / $maxIndex;
 
 		list ($maxIndex, $reverse, $limit, $order) = $this->_query_limits($msgCount, $maxIndex);
@@ -270,7 +270,7 @@ class Draft_Controller extends Post_Controller
 		$context['page_title'] = $txt['drafts'];
 		$context['sub_template'] = 'showPMDrafts';
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=pm;sa=showpmdrafts',
+			'url' => getUrl('action', ['action' => 'pm', 'sa' => 'showpmdrafts']),
 			'name' => $txt['drafts'],
 		);
 	}

@@ -26,7 +26,7 @@ function template_Calendar_init()
  */
 function template_show_calendar()
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt;
 
 	echo '
 		<div id="calendar">
@@ -40,7 +40,7 @@ function template_show_calendar()
 
 	// Show some controls to allow easy calendar navigation.
 	echo '
-				<form id="calendar_navigation" action="', $scripturl, '?action=calendar" method="post" accept-charset="UTF-8">';
+				<form id="calendar_navigation" action="', getUrl('action', ['action' => 'calendar']), '" method="post" accept-charset="UTF-8">';
 
 	template_button_strip($context['calendar_buttons'], 'right');
 
@@ -74,11 +74,11 @@ function template_show_calendar()
  */
 function template_unlinked_event_post()
 {
-	global $context, $txt, $scripturl, $modSettings;
+	global $context, $txt, $modSettings;
 
 	// Start the javascript for drop down boxes...
 	echo '
-		<form action="', $scripturl, '?action=calendar;sa=post" method="post" name="postevent" accept-charset="UTF-8" onsubmit="submitonce(this);smc_saveEntities(\'postevent\', [\'evtitle\']);">';
+		<form action="', getUrl('action', ['action' => 'calendar', 'sa' => 'post']), '" method="post" name="postevent" accept-charset="UTF-8" onsubmit="submitonce(this);smc_saveEntities(\'postevent\', [\'evtitle\']);">';
 
 	if (!empty($context['event']['new']))
 		echo '
@@ -204,7 +204,7 @@ function template_unlinked_event_post()
  */
 function template_show_month_grid($grid_name)
 {
-	global $context, $txt, $scripturl, $modSettings;
+	global $context, $txt, $modSettings;
 
 	if (!isset($context['calendar_grid_' . $grid_name]))
 		return false;
@@ -233,7 +233,7 @@ function template_show_month_grid($grid_name)
 					', $txt['months_titles'][$calendar_data['current_month']], ' ', $calendar_data['current_year'];
 		else
 			echo '
-					<a href="', $scripturl, '?action=calendar;year=', $calendar_data['current_year'], ';month=', $calendar_data['current_month'], '">
+					<a href="', getUrl('action', ['action' => 'calendar', 'year' => $calendar_data['current_year'], 'month' => $calendar_data['current_month']]), '">
 						<i class="icon icon-small i-calendar"></i> ', $txt['months_titles'][$calendar_data['current_month']], ' ', $calendar_data['current_year'], '
 					</a>';
 
@@ -273,7 +273,7 @@ function template_show_month_grid($grid_name)
 		if (!empty($calendar_data['show_week_links']))
 			echo '
 						<td class="weeks">
-							<a href="', $scripturl, '?action=calendar;viewweek;year=', $calendar_data['current_year'], ';month=', $calendar_data['current_month'], ';day=', $week['days'][0]['day'], '">
+							<a href="', getUrl('action', ['action' => 'calendar', 'year' => $calendar_data['current_year'], 'month' => $calendar_data['current_month'], 'day' => $week['days'][0]['day'], 'viewweek']), '">
 								<i class="icon i-eye-plus"></i>
 							</a>
 						</td>';
@@ -293,14 +293,14 @@ function template_show_month_grid($grid_name)
 				// Should the day number be a link?
 				if (!empty($modSettings['cal_daysaslink']) && $context['can_post'])
 					echo '
-							<a href="', $scripturl, '?action=calendar;sa=post;month=', $calendar_data['current_month'], ';year=', $calendar_data['current_year'], ';day=', $day['day'], ';', $context['session_var'], '=', $context['session_id'], '">', $day['day'], '</a>';
+							<a href="', getUrl('action', ['action' => 'calendar', 'sa' => 'post', 'year' => $calendar_data['current_year'], 'month' => $calendar_data['current_month'], 'day' => $day['day'], '{session_data}']), '">', $day['day'], '</a>';
 				else
 					echo '
 							', $day['day'];
 
 				// Is this the first day of the week? (and are we showing week numbers?)
 				if ($day['is_first_day'] && $calendar_data['size'] != 'small')
-					echo ' - <a href="', $scripturl, '?action=calendar;viewweek;year=', $calendar_data['current_year'], ';month=', $calendar_data['current_month'], ';day=', $day['day'], '">', $txt['calendar_week'], ' ', $week['number'], '</a>';
+					echo ' - <a href="', getUrl('action', ['action' => 'calendar', 'year' => $calendar_data['current_year'], 'month' => $calendar_data['current_month'], 'day' => $day['day'], 'viewweek']), '">', $txt['calendar_week'], ' ', $week['number'], '</a>';
 
 				// Are there any holidays?
 				if (!empty($day['holidays']))
@@ -321,13 +321,13 @@ function template_show_month_grid($grid_name)
 					foreach ($day['birthdays'] as $member)
 					{
 						echo '
-									<a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['name'], isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] || ($count == 10 && $use_js_hide) ? '' : ', ';
+									<a href="', getUrl('profile', ['action' => 'profile', 'u' => $member['id'], 'name' => $member['name']]), '">', $member['name'], isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] || ($count == 10 && $use_js_hide) ? '' : ', ';
 
 						// Stop at ten?
 						if ($count == 10 && $use_js_hide)
 							echo '
 									<span class="hidelink" id="bdhidelink_', $day['day'], '">...<br />
-										<a href="', $scripturl, '?action=calendar;month=', $calendar_data['current_month'], ';year=', $calendar_data['current_year'], ';showbd" onclick="document.getElementById(\'bdhide_', $day['day'], '\').style.display = \'block\'; document.getElementById(\'bdhidelink_', $day['day'], '\').style.display = \'none\'; return false;">(', sprintf($txt['calendar_click_all'], count($day['birthdays'])), ')</a>
+										<a href="', getUrl('action', ['action' => 'calendar', 'year' => $calendar_data['current_year'], 'month' => $calendar_data['current_month'], 'showbd']), '" onclick="document.getElementById(\'bdhide_', $day['day'], '\').style.display = \'block\'; document.getElementById(\'bdhidelink_', $day['day'], '\').style.display = \'none\'; return false;">(', sprintf($txt['calendar_click_all'], count($day['birthdays'])), ')</a>
 									</span>
 									<span id="bdhide_', $day['day'], '" class="hide">, ';
 
@@ -394,7 +394,7 @@ function template_show_month_grid($grid_name)
  */
 function template_show_week_grid($grid_name)
 {
-	global $context, $txt, $scripturl, $modSettings;
+	global $context, $txt, $modSettings;
 
 	if (!isset($context['calendar_grid_' . $grid_name]))
 		return false;
@@ -425,7 +425,7 @@ function template_show_week_grid($grid_name)
 					</span>';
 
 		echo '
-					<a href="', $scripturl, '?action=calendar;month=', $month_data['current_month'], ';year=', $month_data['current_year'], '">', $txt['months_titles'][$month_data['current_month']], ' ', $month_data['current_year'], '</a>', empty($done_title) && !empty($calendar_data['week_number']) ? (' - ' . $txt['calendar_week'] . ' ' . $calendar_data['week_number']) : '', '
+					<a href="', getUrl('action', ['action' => 'calendar', 'month' => $month_data['current_month'], 'year' => $month_data['current_year']]), '">', $txt['months_titles'][$month_data['current_month']], ' ', $month_data['current_year'], '</a>', empty($done_title) && !empty($calendar_data['week_number']) ? (' - ' . $txt['calendar_week'] . ' ' . $calendar_data['week_number']) : '', '
 				</h2>';
 
 		$done_title = true;
@@ -442,7 +442,7 @@ function template_show_week_grid($grid_name)
 			// Should the day number be a link?
 			if (!empty($modSettings['cal_daysaslink']) && $context['can_post'])
 				echo '
-							<a href="', $scripturl, '?action=calendar;sa=post;month=', $month_data['current_month'], ';year=', $month_data['current_year'], ';day=', $day['day'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['days'][$day['day_of_week']], ' - ', $day['day'], '</a>';
+							<a href="', getUrl('action', ['action' => 'calendar', 'sa' => 'post', 'month' => $month_data['current_month'], 'year' => $month_data['current_year'], 'day' => $day['day'], '{session_data}']), '">', $txt['days'][$day['day_of_week']], ' - ', $day['day'], '</a>';
 			else
 				echo '
 							', $txt['days'][$day['day_of_week']], ' - ', $day['day'];
@@ -467,7 +467,7 @@ function template_show_week_grid($grid_name)
 				// id, name (person), age (if they have one set?), and is_last. (last in list?)
 				foreach ($day['birthdays'] as $member)
 					echo '
-								<a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['name'], isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] ? '' : ', ';
+								<a href="', getUrl('profile', ['action' => 'profile', 'u' => $member['id'], 'name' => $member['name']]), '">', $member['name'], isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] ? '' : ', ';
 
 				echo '
 							</div>';

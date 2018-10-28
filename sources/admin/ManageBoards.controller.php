@@ -133,7 +133,7 @@ class ManageBoards_Controller extends Action_Controller
 	 */
 	public function action_main()
 	{
-		global $txt, $context, $cat_tree, $boards, $boardList, $scripturl;
+		global $txt, $context, $cat_tree, $boards, $boardList;
 
 		theme()->getTemplates()->load('ManageBoards');
 
@@ -206,14 +206,14 @@ class ManageBoards_Controller extends Action_Controller
 				$stack = array();
 
 				// Just a shortcut, this is the same for all the urls
-				$security = $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-bm-' . $context['move_board'] . '_token_var'] . '=' . $context['admin-bm-' . $context['move_board'] . '_token'];
+				$security_token = $context['admin-bm-' . $context['move_board'] . '_token_var'] . '=' . $context['admin-bm-' . $context['move_board'] . '_token'];
 				foreach ($boardList[$catid] as $boardid)
 				{
 					if (!isset($context['categories'][$catid]['move_link']))
 						$context['categories'][$catid]['move_link'] = array(
 							'child_level' => 0,
 							'label' => $txt['mboards_order_before'] . ' \'' . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . '\'',
-							'href' => $scripturl . '?action=admin;area=manageboards;sa=move;src_board=' . $context['move_board'] . ';target_board=' . $boardid . ';move_to=before;' . $security,
+							'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageboards', 'sa' => 'move', 'src_board' => $context['move_board'], 'target_board' => $boardid, 'move_to' => 'before', '{session_data}', $security_token]),
 						);
 
 					if (!$context['categories'][$catid]['boards'][$boardid]['move'])
@@ -221,12 +221,12 @@ class ManageBoards_Controller extends Action_Controller
 						array(
 							'child_level' => $boards[$boardid]['level'],
 							'label' => $txt['mboards_order_after'] . '\'' . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . '\'',
-							'href' => $scripturl . '?action=admin;area=manageboards;sa=move;src_board=' . $context['move_board'] . ';target_board=' . $boardid . ';move_to=after;' . $security,
+							'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageboards', 'sa' => 'move', 'src_board' => $context['move_board'], 'target_board' => $boardid, 'move_to' => 'after', '{session_data}', $security_token]),
 						),
 						array(
 							'child_level' => $boards[$boardid]['level'] + 1,
 							'label' => $txt['mboards_order_child_of'] . ' \'' . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . '\'',
-							'href' => $scripturl . '?action=admin;area=manageboards;sa=move;src_board=' . $context['move_board'] . ';target_board=' . $boardid . ';move_to=child;' . $security,
+							'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageboards', 'sa' => 'move', 'src_board' => $context['move_board'], 'target_board' => $boardid, 'move_to' => 'child', '{session_data}', $security_token]),
 						),
 					);
 
@@ -257,7 +257,7 @@ class ManageBoards_Controller extends Action_Controller
 					$context['categories'][$catid]['move_link'] = array(
 						'child_level' => 0,
 						'label' => $txt['mboards_order_before'] . ' \'' . htmlspecialchars($tree['node']['name'], ENT_COMPAT, 'UTF-8') . '\'',
-						'href' => $scripturl . '?action=admin;area=manageboards;sa=move;src_board=' . $context['move_board'] . ';target_cat=' . $catid . ';move_to=top;' . $security,
+						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageboards', 'sa' => 'move', 'src_board' => $context['move_board'], 'target_cat' => $catid, 'move_to' => 'top', '{session_data}', $security_token]),
 					);
 			}
 		}
@@ -772,7 +772,7 @@ class ManageBoards_Controller extends Action_Controller
 	 */
 	public function action_boardSettings_display()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		// Initialize the form
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
@@ -788,7 +788,7 @@ class ManageBoards_Controller extends Action_Controller
 		theme()->getTemplates()->load('ManageBoards');
 		$context['page_title'] = $txt['boards_and_cats'] . ' - ' . $txt['settings'];
 		$context['sub_template'] = 'show_settings';
-		$context['post_url'] = $scripturl . '?action=admin;area=manageboards;save;sa=settings';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'manageboards', 'sa' => 'settings', 'save']);
 
 		// Warn the admin against selecting the recycle topic without selecting a board.
 		$context['force_form_onsubmit'] = 'if(document.getElementById(\'recycle_enable\').checked && document.getElementById(\'recycle_board\').value == 0) { return confirm(\'' . $txt['recycle_board_unselected_notice'] . '\');} return true;';

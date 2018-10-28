@@ -18,12 +18,12 @@
  */
 function template_whos_selection_above()
 {
-	global $context, $scripturl, $txt;
+	global $context, $txt;
 
 	// Display the table header and linktree.
 	echo '
 	<div id="whos_online">
-		<form action="', $scripturl, '?action=who" method="post" id="whoFilter" accept-charset="UTF-8">
+		<form action="', getUrl('action', ['action' => 'who']), '" method="post" id="whoFilter" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['who_title'], '</h2>';
 
 	$extra = '
@@ -76,8 +76,10 @@ function template_whos_online()
 							</span>';
 
 		if (!empty($member['ip']))
+		{
 			echo '
-							<a class="track_ip" href="' . $scripturl . '?action=', ($member['is_guest'] ? 'trackip' : 'profile;area=history;sa=ip;u=' . $member['id']), ';searchip=' . $member['ip'] . '">' . $member['ip'] . '</a>';
+							<a class="track_ip" href="' . $member['track_href'] . '">' . $member['ip'] . '</a>';
+		}
 
 		echo '
 						</div>

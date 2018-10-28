@@ -402,11 +402,11 @@ class Bootstrap
 
 		if (!empty($modSettings['front_page']) && is_callable(array($modSettings['front_page'], 'frontPageHook')))
 		{
-			$modSettings['default_forum_action'] = '?action=forum;';
+			$modSettings['default_forum_action'] = ['action' => 'forum'];
 		}
 		else
 		{
-			$modSettings['default_forum_action'] = '';
+			$modSettings['default_forum_action'] = [];
 		}
 
 		// Load the stuff like the menu bar, etc.

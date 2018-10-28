@@ -237,6 +237,15 @@ class Who_Controller extends Action_Controller
 				$context['members'][$i] += $spiderContext[$member['id_spider']];
 			else
 				$context['members'][$i] += $memberContext[$member['id']];
+
+			if ($member['is_guest'])
+			{
+				$context['members'][$i]['track_href'] = getUrl('action', ['action' => 'trackip', 'searchip' => $member['ip']]);
+			}
+			else
+			{
+				$context['members'][$i]['track_href'] = getUrl('profile', ['action' => 'profile', 'area' => 'history', 'sa' => 'ip', 'u' => $member['id'], 'name' => $member['name'], 'searchip' => $member['ip']]);
+			}
 		}
 
 		// Some people can't send personal messages...

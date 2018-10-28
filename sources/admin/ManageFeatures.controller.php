@@ -42,7 +42,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		global $context, $txt, $settings, $scripturl;
+		global $context, $txt, $settings;
 
 		// Often Helpful
 		theme()->getTemplates()->loadLanguageFile('Help');
@@ -108,7 +108,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['modSettings_title'],
 			'help' => 'featuresettings',
-			'description' => sprintf($txt['modSettings_desc'], $scripturl . '?action=admin;area=theme;sa=list;th=' . $settings['theme_id'] . ';' . $context['session_id'] . '=' . $context['session_var']),
+			'description' => sprintf($txt['modSettings_desc'], getUrl('admin', ['action' => 'admin', 'area' => 'theme', 'sa' => 'list', 'th' => $settings['theme_id'], '{session_data}'])),
 			'tabs' => array(
 				'basic' => array(
 				),
@@ -153,7 +153,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	public function action_basicSettings_display()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		// Initialize the form
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
@@ -193,7 +193,7 @@ class ManageFeatures_Controller extends Action_Controller
 			return;
 		}
 
-		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=basic';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'basic', 'save']);
 		$context['settings_title'] = $txt['mods_cat_features'];
 
 		// Show / hide custom jquery fields as required
@@ -211,7 +211,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	public function action_layoutSettings_display()
 	{
-		global $txt, $scripturl, $context, $modSettings;
+		global $txt, $context, $modSettings;
 
 		// Initialize the form
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
@@ -245,7 +245,7 @@ class ManageFeatures_Controller extends Action_Controller
 			redirectexit('action=admin;area=featuresettings;sa=layout');
 		}
 
-		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=layout';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'layout', 'save']);
 		$context['settings_title'] = $txt['mods_cat_layout'];
 
 		$settingsForm->prepare();
@@ -260,7 +260,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	public function action_karmaSettings_display()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		// Initialize the form
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
@@ -280,7 +280,7 @@ class ManageFeatures_Controller extends Action_Controller
 			redirectexit('action=admin;area=featuresettings;sa=karma');
 		}
 
-		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=karma';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'karm', 'save']);
 		$context['settings_title'] = $txt['karma'];
 
 		$settingsForm->prepare();
@@ -295,7 +295,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	public function action_likesSettings_display()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		// Initialize the form
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
@@ -315,7 +315,7 @@ class ManageFeatures_Controller extends Action_Controller
 			redirectexit('action=admin;area=featuresettings;sa=likes');
 		}
 
-		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=likes';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'likes', 'save']);
 		$context['settings_title'] = $txt['likes'];
 
 		$settingsForm->prepare();
@@ -330,7 +330,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	public function action_notificationsSettings_display()
 	{
-		global $txt, $context, $scripturl, $modSettings;
+		global $txt, $context, $modSettings;
 
 		theme()->getTemplates()->loadLanguageFile('Mentions');
 
@@ -427,7 +427,7 @@ class ManageFeatures_Controller extends Action_Controller
 		}
 
 		// Prepare the settings for display
-		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=mention';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'mention', 'save']);
 		$settingsForm->prepare();
 	}
 
@@ -440,7 +440,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	public function action_signatureSettings_display()
 	{
-		global $context, $txt, $modSettings, $sig_start, $scripturl;
+		global $context, $txt, $modSettings, $sig_start;
 
 		// Initialize the form
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
@@ -542,9 +542,9 @@ class ManageFeatures_Controller extends Action_Controller
 			redirectexit('action=admin;area=featuresettings;sa=sig');
 		}
 
-		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=sig';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'sig', 'save']);
 		$context['settings_title'] = $txt['signature_settings'];
-		$context['settings_message'] = !empty($settings_applied) ? $txt['signature_settings_applied'] : sprintf($txt['signature_settings_warning'], $scripturl . '?action=admin;area=featuresettings;sa=sig;apply;' . $context['session_var'] . '=' . $context['session_id']);
+		$context['settings_message'] = !empty($settings_applied) ? $txt['signature_settings_applied'] : sprintf($txt['signature_settings_warning'], getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'sig', 'apply', '{session_data}']));
 
 		$settingsForm->prepare();
 	}
@@ -619,7 +619,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$listOptions = array(
 			'id' => 'standard_profile_fields',
 			'title' => $txt['standard_profile_title'],
-			'base_href' => $scripturl . '?action=admin;area=featuresettings;sa=profile',
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'profile']),
 			'get_items' => array(
 				'function' => 'list_getProfileFields',
 				'params' => array(
@@ -668,7 +668,7 @@ class ManageFeatures_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=featuresettings;sa=profile',
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'profile']),
 				'name' => 'standardProfileFields',
 				'token' => 'admin-scp',
 			),
@@ -686,7 +686,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$listOptions = array(
 			'id' => 'custom_profile_fields',
 			'title' => $txt['custom_profile_title'],
-			'base_href' => $scripturl . '?action=admin;area=featuresettings;sa=profile',
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'profile']),
 			'default_sort_col' => 'vieworder',
 			'no_items_label' => $txt['custom_profile_none'],
 			'items_per_page' => 25,
@@ -720,9 +720,7 @@ class ManageFeatures_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $scripturl;
-
-							return sprintf('<a href="%1$s?action=admin;area=featuresettings;sa=profileedit;fid=%2$d">%3$s</a><div class="smalltext">%4$s</div>', $scripturl, $rowData['id_field'], $rowData['field_name'], $rowData['field_desc']);
+							return sprintf('<a href="%1$s">%3$s</a><div class="smalltext">%4$s</div>', getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'profileedit', 'fid' => (int) $rowData['id_field']]), $rowData['field_name'], $rowData['field_desc']);
 						},
 						'style' => 'width: 65%;',
 					),
@@ -814,7 +812,7 @@ class ManageFeatures_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=featuresettings;sa=profileedit',
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'profileedit']),
 				'name' => 'customProfileFields',
 				'token' => 'admin-scp',
 			),
@@ -854,7 +852,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	public function action_profileedit()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		theme()->getTemplates()->load('ManageFeatures');
 
@@ -935,11 +933,11 @@ class ManageFeatures_Controller extends Action_Controller
 
 			// Everyone needs a name - even the (bracket) unknown...
 			if (trim($this->_req->post->field_name) == '')
-				redirectexit($scripturl . '?action=admin;area=featuresettings;sa=profileedit;fid=' . $this->_req->query->fid . ';msg=need_name');
+				redirectexit('action=admin;area=featuresettings;sa=profileedit;fid=' . $this->_req->query->fid . ';msg=need_name');
 
 			// Regex you say?  Do a very basic test to see if the pattern is valid
 			if (!empty($this->_req->post->regex) && @preg_match($this->_req->post->regex, 'dummy') === false)
-				redirectexit($scripturl . '?action=admin;area=featuresettings;sa=profileedit;fid=' . $this->_req->query->fid . ';msg=regex_error');
+				redirectexit('action=admin;area=featuresettings;sa=profileedit;fid=' . $this->_req->query->fid . ';msg=regex_error');
 
 			$this->_req->post->field_name = $this->_req->getPost('field_name', 'Util::htmlspecialchars');
 			$this->_req->post->field_desc = $this->_req->getPost('field_desc', 'Util::htmlspecialchars');
@@ -1165,7 +1163,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	public function action_pmsettings()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $context;
 
 		// Initialize the form
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
@@ -1197,7 +1195,7 @@ class ManageFeatures_Controller extends Action_Controller
 			redirectexit('action=admin;area=featuresettings;sa=pmsettings');
 		}
 
-		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=pmsettings';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'pmsettings', 'save']);
 		$context['settings_title'] = $txt['personal_messages'];
 
 		$settingsForm->prepare();
@@ -1227,6 +1225,8 @@ class ManageFeatures_Controller extends Action_Controller
 				array('check', 'jqueryui_default', 'onchange' => 'showhideJqueryOptions();'),
 				array('text', 'jqueryui_version', 'postinput' => $txt['jqueryui_custom_after']),
 				array('check', 'minify_css_js', 'postinput' => '<a href="#" id="clean_hives" class="linkbutton">' . $txt['clean_hives'] . '</a>'),
+			'',
+				array('select', 'url_format', array('standard' => $txt['url_format_standard'], 'semantic' => $txt['url_format_semantic'])),
 			'',
 				// Number formatting, timezones.
 				array('text', 'time_format'),

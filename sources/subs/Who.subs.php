@@ -59,7 +59,7 @@ function viewers($id, $session, $type = 'topic')
  */
 function formatViewers($id, $type)
 {
-	global $user_info, $context, $scripturl;
+	global $user_info, $context;
 
 	// Lets say there's no one around. (what? could happen!)
 	$context['view_members'] = array();
@@ -78,11 +78,12 @@ function formatViewers($id, $type)
 			continue;
 		}
 
+		$href = getUrl('profile', ['action' => 'profile', 'u' => $viewer['id_member'], 'name' => $viewer['real_name']]);
 		// it's a member. We format them with links 'n stuff.
 		if (!empty($viewer['online_color']))
-			$link = '<a href="' . $scripturl . '?action=profile;u=' . $viewer['id_member'] . '" style="color: ' . $viewer['online_color'] . ';">' . $viewer['real_name'] . '</a>';
+			$link = '<a href="' . $href . '" style="color: ' . $viewer['online_color'] . ';">' . $viewer['real_name'] . '</a>';
 		else
-			$link = '<a href="' . $scripturl . '?action=profile;u=' . $viewer['id_member'] . '">' . $viewer['real_name'] . '</a>';
+			$link = '<a href="' . $href . '">' . $viewer['real_name'] . '</a>';
 
 		$is_buddy = in_array($viewer['id_member'], $user_info['buddies']);
 		if ($is_buddy)
@@ -98,7 +99,7 @@ function formatViewers($id, $type)
 			'username' => $viewer['member_name'],
 			'name' => $viewer['real_name'],
 			'group' => $viewer['id_group'],
-			'href' => $scripturl . '?action=profile;u=' . $viewer['id_member'],
+			'href' => $href,
 			'link' => $link,
 			'is_buddy' => $is_buddy,
 			'hidden' => empty($viewer['show_online']),
@@ -188,12 +189,14 @@ function addonsCredits()
  */
 function determineActions($urls, $preferred_prefix = false)
 {
-	global $txt, $user_info, $modSettings, $scripturl;
+	global $txt, $user_info, $modSettings;
 
 	$db = database();
 
 	if (!allowedTo('who_view'))
+	{
 		return array();
+	}
 
 	theme()->getTemplates()->loadLanguageFile('Who');
 
@@ -224,9 +227,13 @@ function determineActions($urls, $preferred_prefix = false)
 	call_integration_hook('integrate_whos_online_allowed', array(&$allowedActions));
 
 	if (!is_array($urls))
+	{
 		$url_list = array(array($urls, $user_info['id']));
+	}
 	else
+	{
 		$url_list = $urls;
+	}
 
 	// These are done to query these in large chunks. (instead of one by one.)
 	$topic_ids = array();
@@ -239,11 +246,15 @@ function determineActions($urls, $preferred_prefix = false)
 		// Get the request parameters..
 		$actions = Util::unserialize($url[0]);
 		if ($actions === false)
+		{
 			continue;
+		}
 
 		// If it's the admin or moderation center, and there is an area set, use that instead.
 		if (isset($actions['action']) && ($actions['action'] == 'admin' || $actions['action'] == 'moderate') && isset($actions['area']))
+		{
 			$actions['action'] = $actions['area'];
+		}
 
 		// Check if there was no action or the action is display.
 		if (!isset($actions['action']) || $actions['action'] == 'display')
@@ -264,11 +275,15 @@ function determineActions($urls, $preferred_prefix = false)
 			}
 			// It's the board index!!  It must be!
 			else
+			{
 				$data[$k] = replaceBasicActionUrl($txt['who_index']);
+			}
 		}
 		// Probably an error or some goon?
 		elseif ($actions['action'] == '')
+		{
 			$data[$k] = replaceBasicActionUrl($txt['who_index']);
+		}
 		// Some other normal action...?
 		else
 		{
@@ -282,9 +297,13 @@ function determineActions($urls, $preferred_prefix = false)
 					$memID = currentMemberID();
 
 					if ($memID == $user_info['id'])
+					{
 						$actions['u'] = $url[1];
+					}
 					else
+					{
 						$actions['u'] = $memID;
+					}
 				}
 
 				$data[$k] = $txt['who_hidden'];
@@ -295,16 +314,24 @@ function determineActions($urls, $preferred_prefix = false)
 			{
 				$data[$k] = $txt['who_hidden'];
 				if ($actions['action'] == 'topicbyemail')
+				{
 					$board_ids[(int) $actions['board']][$k] = $txt['who_topicbyemail'];
+				}
 				else
+				{
 					$board_ids[(int) $actions['board']][$k] = isset($actions['poll']) ? $txt['who_poll'] : $txt['who_post'];
+				}
 			}
 			// A subaction anyone can view... if the language string is there, show it.
 			elseif (isset($actions['sa']) && isset($txt['whoall_' . $actions['action'] . '_' . $actions['sa']]))
+			{
 				$data[$k] = $preferred_prefix && isset($txt[$preferred_prefix . $actions['action'] . '_' . $actions['sa']]) ? $txt[$preferred_prefix . $actions['action'] . '_' . $actions['sa']] : $txt['whoall_' . $actions['action'] . '_' . $actions['sa']];
+			}
 			// An action any old fellow can look at. (if $txt['whoall_' . $action] exists, we know everyone can see it.)
 			elseif (isset($txt['whoall_' . $actions['action']]))
+			{
 				$data[$k] = $preferred_prefix && isset($txt[$preferred_prefix . $actions['action']]) ? $txt[$preferred_prefix . $actions['action']] : replaceBasicActionUrl($txt['whoall_' . $actions['action']]);
+			}
 			// Viewable if and only if they can see the board...
 			elseif (isset($txt['whotopic_' . $actions['action']]))
 			{
@@ -343,11 +370,13 @@ function determineActions($urls, $preferred_prefix = false)
 					)
 				);
 				list ($id_topic, $subject) = $db->fetch_row($result);
-				$data[$k] = sprintf($txt['whopost_' . $actions['action']], $scripturl . '?topic=' . $id_topic . '.0', $subject);
+				$data[$k] = sprintf($txt['whopost_' . $actions['action']], getUrl('topic', ['topic' => $id_topic, 'start' => '0', 'subject' => $subject]), $subject);
 				$db->free_result($result);
 
 				if (empty($id_topic))
+				{
 					$data[$k] = $txt['who_hidden'];
+				}
 			}
 			// Viewable only by administrators.. (if it starts with whoadmin, it's admin only!)
 			elseif (allowedTo('moderate_forum') && isset($txt['whoadmin_' . $actions['action']]))
@@ -358,23 +387,37 @@ function determineActions($urls, $preferred_prefix = false)
 				if (allowedTo($allowedActions[$actions['action']]))
 				{
 					if (isset($actions['sa']) && isset($txt['whoallow_' . $actions['action'] . '_' . $actions['sa']]))
+					{
 						$data[$k] = replaceBasicActionUrl($txt['whoallow_' . $actions['action'] . '_' . $actions['sa']]);
+					}
 					else
+					{
 						$data[$k] = replaceBasicActionUrl($txt['whoallow_' . $actions['action']]);
+					}
 				}
 				elseif (in_array('moderate_forum', $allowedActions[$actions['action']]))
+				{
 					$data[$k] = $txt['who_moderate'];
+				}
 				elseif (in_array('admin_forum', $allowedActions[$actions['action']]))
+				{
 					$data[$k] = $txt['who_admin'];
+				}
 				else
+				{
 					$data[$k] = $txt['who_hidden'];
+				}
 			}
 			// Something we don't have details about, but it is an action, maybe an addon
 			elseif (!empty($actions['action']))
+			{
 				$data[$k] = sprintf($txt['who_generic'], $actions['action']);
+			}
 			// We just don't know
 			else
+			{
 				$data[$k] = $txt['who_unknown'];
+			}
 		}
 
 		// Maybe the action is integrated into another system?
@@ -403,7 +446,9 @@ function determineActions($urls, $preferred_prefix = false)
 		{
 			// Show the topic's subject for each of the members looking at this...
 			foreach ($topic_ids[$topic['id_topic']] as $k => $session_text)
-				$data[$k] = sprintf($session_text, $scripturl . '?topic=' . $topic['id_topic'] . '.0', $topic['subject']);
+			{
+				$data[$k] = sprintf($session_text, getUrl('topic', ['topic' => $topic['id_topic'], 'start' => '0', 'subject' => $topic['subject']]), $topic['subject']);
+			}
 		}
 	}
 
@@ -417,7 +462,9 @@ function determineActions($urls, $preferred_prefix = false)
 		{
 			// Put the board name into the string for each member...
 			foreach ($board_ids[$board['id_board']] as $k => $session_text)
-				$data[$k] = sprintf($session_text, $scripturl . '?board=' . $board['id_board'] . '.0', $board['board_name']);
+			{
+				$data[$k] = sprintf($session_text, getUrl('board', ['board' => $board['id_board'], 'start' => '0', 'name' => $board['board_name']]), $board['board_name']);
+			}
 		}
 	}
 
@@ -430,18 +477,26 @@ function determineActions($urls, $preferred_prefix = false)
 		{
 			// If they aren't allowed to view this person's profile, skip it.
 			if (!allowedTo('profile_view_any') && $user_info['id'] != $row['id_member'])
+			{
 				continue;
+			}
 
 			// Set their action on each - session/text to sprintf.
 			foreach ($profile_ids[$row['id_member']] as $k => $session_text)
-				$data[$k] = sprintf($session_text, $scripturl . '?action=profile;u=' . $row['id_member'], $row['real_name']);
+			{
+				$data[$k] = sprintf($session_text, getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['real_name']]), $row['real_name']);
+			}
 		}
 	}
 
 	if (!is_array($urls))
+	{
 		return isset($data[0]) ? $data[0] : false;
+	}
 	else
+	{
 		return $data;
+	}
 }
 
 /**
