@@ -37,7 +37,7 @@ function cleanRequest()
 	// Make sure REMOTE_ADDR, other IPs, and the like are parsed
 	$req = Request::instance();
 
-	$parser = new ElkArte\UrlGenerator\Semantic\ParseQuery();
+	$parser = initUrlGenerator()->getParser();
 
 	// Make sure there are no problems with the request
 	$req->cleanRequest($parser);

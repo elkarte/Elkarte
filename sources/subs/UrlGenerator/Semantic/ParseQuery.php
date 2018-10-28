@@ -14,22 +14,10 @@
 
 namespace ElkArte\UrlGenerator\Semantic;
 
-class ParseQuery
+use ElkArte\UrlGenerator\Abstract_ParseQuery;
+
+class ParseQuery extends Abstract_ParseQuery
 {
-	/**
-	 * Holds the special types of URLs we know
-	 *
-	 * @var string[]
-	 */
-	protected $parsers = ['b' => 'board', 't' => 'topic', 'p' => 'profile', 's' => 'standard'];
-
-	/**
-	 * The character to use as parameters separator
-	 *
-	 * @var string
-	 */
-	protected $separator = ';';
-
 	/**
 	 * Public facing function that converts the query part of the URL from the
 	 * semantic format back to the standard ElkArte one

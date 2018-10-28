@@ -1936,7 +1936,7 @@ function initUrlGenerator()
 			'generator' => ucfirst($modSettings['url_format'] ?? 'standard'),
 			'scripturl' => $scripturl,
 			'replacements' => [
-				'{session_data}' => $context['session_var'] . '=' . $context['session_id']
+				'{session_data}' => isset($context['session_var']) ? $context['session_var'] . '=' . $context['session_id'] : ''
 			]
 		]);
 		$generator->register('Topic');
