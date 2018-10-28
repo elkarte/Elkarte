@@ -138,6 +138,8 @@ final class Request
 	 */
 	private function __construct()
 	{
+		global $boardurl, $scripturl;
+
 		// Client IP: REMOTE_ADDR, unless missing
 		$this->_getClientIP();
 
@@ -158,6 +160,10 @@ final class Request
 
 		// We want to know who we are, too :P
 		$this->_server_software = isset($_SERVER['SERVER_SOFTWARE']) ? $_SERVER['SERVER_SOFTWARE'] : '';
+
+		// Makes it easier to refer to things this way.
+		$scripturl = $boardurl . '/index.php';
+		$this->_scripturl = $scripturl;
 	}
 
 	/**
@@ -362,12 +368,6 @@ final class Request
 	 */
 	public function cleanRequest($parser)
 	{
-		global $boardurl, $scripturl;
-
-		// Makes it easier to refer to things this way.
-		$scripturl = $boardurl . '/index.php';
-		$this->_scripturl = $scripturl;
-
 		// Live to die another day
 		$this->_checkExit();
 
