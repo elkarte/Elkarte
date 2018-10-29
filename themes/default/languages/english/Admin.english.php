@@ -33,6 +33,7 @@ $txt['admin_webmaster_email'] = 'Webmaster email address';
 $txt['url_format'] = 'Aspect of URLs';
 $txt['url_format_standard'] = 'Standard (index.php?action=something;area=param)';
 $txt['url_format_semantic'] = 'Semantic (index.php?/action/something/area/param)';
+$txt['url_format_queryless'] = 'Queryless (index.php?/topic,10.0.html)';
 $txt['boarddir'] = 'ElkArte Directory';
 $txt['sourcesdir'] = 'Sources Directory';
 $txt['cachedir'] = 'Cache Directory';

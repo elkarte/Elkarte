@@ -443,7 +443,7 @@ class ManageServer_Controller extends Action_Controller
 			'',
 				array('enableCompressedOutput', $txt['enableCompressedOutput'], 'db', 'check', null, 'enableCompressedOutput'),
 				array('disableHostnameLookup', $txt['disableHostnameLookup'], 'db', 'check', null, 'disableHostnameLookup'),
-				array('url_format', $txt['url_format'], 'file', 'select', array('standard' => $txt['url_format_standard'], 'semantic' => $txt['url_format_semantic'])),
+				array('url_format', $txt['url_format'], 'file', 'select', array('standard' => $txt['url_format_standard'], 'semantic' => $txt['url_format_semantic'], 'queryless' => $txt['url_format_queryless'])),
 		);
 
 		// Notify the integration
