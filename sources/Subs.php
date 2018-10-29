@@ -1927,13 +1927,13 @@ function getUrlQuery($type, $params)
  */
 function initUrlGenerator()
 {
-	global $scripturl, $context, $modSettings;
+	global $scripturl, $context, $url_format;
 	static $generator = null;
 
 	if ($generator === null)
 	{
 		$generator = new Url_Generator([
-			'generator' => ucfirst($modSettings['url_format'] ?? 'standard'),
+			'generator' => ucfirst($url_format ?? 'standard'),
 			'scripturl' => $scripturl,
 			'replacements' => [
 				'{session_data}' => isset($context['session_var']) ? $context['session_var'] . '=' . $context['session_id'] : ''

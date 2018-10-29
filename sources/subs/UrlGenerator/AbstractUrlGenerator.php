@@ -15,7 +15,14 @@ namespace ElkArte\UrlGenerator;
 
 abstract class Abstract_Url_Generator
 {
+	/**
+	 * The piece of glue between differet parameters of the URL
+	 */
 	protected $_separator = ';';
+
+	/**
+	 * The type of URLs this class supports
+	 */
 	protected $_types = array();
 
 	/**

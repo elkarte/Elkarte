@@ -139,7 +139,7 @@ class Bootstrap
 		global $maintenance, $mtitle, $msubject, $mmessage, $mbname, $language, $boardurl, $webmaster_email;
 		global $cookiename, $db_type, $db_server, $db_port, $db_name, $db_user, $db_passwd;
 		global $ssi_db_user, $ssi_db_passwd, $db_prefix, $db_persist, $db_error_send, $cache_accelerator;
-		global $cache_uid, $cache_password, $cache_enable, $cache_memcached, $db_show_debug;
+		global $cache_uid, $cache_password, $cache_enable, $cache_memcached, $db_show_debug, $url_format;
 		global $cachedir, $boarddir, $sourcedir, $extdir, $languagedir, $ignore_install_dir;
 
 		// Where the Settings.php file is located
