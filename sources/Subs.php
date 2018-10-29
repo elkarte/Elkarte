@@ -674,14 +674,6 @@ function redirectexit($setLocation = '', $refresh = false)
 	elseif (isset($_GET['debug']))
 		$setLocation = preg_replace('/^' . preg_quote($scripturl, '/') . '\\??/', $scripturl . '?debug;', $setLocation);
 
-	if (!empty($modSettings['queryless_urls']) && detectServer()->supportRewrite())
-	{
-		if (defined('SID') && SID != '')
-			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '~') . '\?(?:' . SID . '(?:;|&|&amp;))((?:board|topic)=[^#]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);
-		else
-			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '~') . '\?((?:board|topic)=[^#"]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);
-	}
-
 	// Maybe integrations want to change where we are heading?
 	call_integration_hook('integrate_redirect', array(&$setLocation, &$refresh));
 
@@ -698,28 +690,6 @@ function redirectexit($setLocation = '', $refresh = false)
 	}
 
 	obExit(false);
-}
-
-/**
- * URL fixer for redirect exit
- *
- * What it does:
- *
- * - Similar to the callback function used in ob_sessrewrite
- * - Evoked by enabling queryless_urls for systems that support that function
- *
- * @param mixed[] $matches results from the calling preg
- *
- * @return string
- */
-function redirectexit_callback($matches)
-{
-	global $scripturl;
-
-	if (defined('SID') && SID != '')
-		return $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html?' . SID . (isset($matches[2]) ? $matches[2] : '');
-	else
-		return $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html' . (isset($matches[2]) ? $matches[2] : '');
 }
 
 /**
