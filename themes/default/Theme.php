@@ -690,7 +690,7 @@ class Theme extends BaseTheme
 	 */
 	public function setupThemeContext($forceload = false)
 	{
-		global $modSettings, $user_info, $scripturl, $context, $settings, $options, $txt;
+		global $modSettings, $user_info, $scripturl, $context, $settings, $options, $txt, $boardurl;
 
 		static $loaded = false;
 
@@ -844,7 +844,7 @@ class Theme extends BaseTheme
 		// Set some specific vars.
 		$context['page_title_html_safe'] = \Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
 
-		$context['favicon'] = $scripturl . '/mobile.png';
+		$context['favicon'] = $boardurl . '/mobile.png';
 
 		$this->loadSupportCSS();
 

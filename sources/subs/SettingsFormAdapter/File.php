@@ -105,9 +105,11 @@ class File extends Db
 				if ($configVar[2] === 'file')
 				{
 					$value = in_array($varname, $defines) ? constant(strtoupper($varname)) : $$varname;
+
 					if (in_array($varname, $safe_strings))
 					{
 						$new_setting['mask'] = 'nohtml';
+						$value = strtr($value, array(\Util::htmlspecialchars('<br />') => "\n"));
 					}
 					$modSettings[$configVar[0]] = $value;
 				}
@@ -260,6 +262,7 @@ class File extends Db
 			'ssi_db_user',
 			'cache_accelerator',
 			'cache_memcached',
+			'url_format',
 		);
 
 		// These need HTML encoded. Be sure they all exist in $config_strs!
@@ -297,7 +300,7 @@ class File extends Db
 			{
 				if (in_array($configVar, $safe_strings))
 				{
-					$this->new_settings[$configVar] = '\'' . addcslashes(\Util::htmlspecialchars($this->configValues[$configVar], ENT_QUOTES), '\'\\') . '\'';
+					$this->new_settings[$configVar] = '\'' . addcslashes(\Util::htmlspecialchars(strtr($this->configValues[$configVar], array("\n" => '<br />', "\r" => '')), ENT_QUOTES), '\'\\') . '\'';
 				}
 				else
 				{

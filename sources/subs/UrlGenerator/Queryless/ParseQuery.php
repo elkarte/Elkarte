@@ -12,7 +12,7 @@
  *
  */
 
-namespace ElkArte\UrlGenerator\Semantic;
+namespace ElkArte\UrlGenerator\Queryless;
 
 use ElkArte\UrlGenerator\Abstract_ParseQuery;
 
@@ -77,17 +77,6 @@ class ParseQuery extends Abstract_ParseQuery
 	}
 
 	/**
-	 * Profiles are an action to begin with and then have the "u" holding the user id.
-	 *
-	 * @param string $query The semantic query
-	 * @return string $query The corresponding standard query
-	 */
-	protected function profile($query)
-	{
-		return 'action=profile;u=' . $this->process($query);
-	}
-
-	/**
 	 * This method splits the semantic URL into pieces (exploding at each "/")
 	 * and puts more or less everything back together into the standard format.
 	 * Some more processing takes care of "-" => ".".
@@ -97,19 +86,9 @@ class ParseQuery extends Abstract_ParseQuery
 	 */
 	protected function process($query)
 	{
-		$match = [];
-		$parts = explode('/', $query);
-		$split_query = explode('?', $parts[isset($parts[2]) ? 2 : 1]);
+		preg_match('~(?!board|topic),(\d+)\.([^\.]+)\.html(.*)~', $query, $parts);
 
-		if (isset($parts[2]))
-		{
-			$real_query = substr($parts[1], strrpos($parts[1], '-') + 1) . '.' . substr($split_query[0], 5);
-		}
-		else
-		{
-			$real_query = substr($split_query[0], strrpos($split_query[0], '-') + 1);
-		}
-		$real_query .= $this->separator . (isset($split_query[1]) ? $split_query[1] : '');
+		$real_query = $parts[1] . '.' . $parts[2] . (!empty($parts[3]) ? $parts[3] : '');
 
 		return $real_query;
 	}

@@ -58,6 +58,18 @@ class Url_Generator
 	}
 
 	/**
+	 * Instantiate and return the query parser.
+	 *
+	 * @return \ElkArte\UrlGenerator\ParseQuery_Abstract
+	 */
+	public function getParser()
+	{
+		$class = '\\ElkArte\\UrlGenerator\\' . $this->_config['generator'] . '\\ParseQuery';
+
+		return new $class();
+	}
+
+	/**
 	 * Adds new replacements to the stack.
 	 *
 	 * @param string[] $replacements

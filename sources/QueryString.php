@@ -37,7 +37,7 @@ function cleanRequest()
 	// Make sure REMOTE_ADDR, other IPs, and the like are parsed
 	$req = Request::instance();
 
-	$parser = new ElkArte\UrlGenerator\Semantic\ParseQuery();
+	$parser = initUrlGenerator()->getParser();
 
 	// Make sure there are no problems with the request
 	$req->cleanRequest($parser);
@@ -282,13 +282,6 @@ function ob_sessrewrite($buffer)
 	// Debugging templates, are we?
 	elseif (isset($_GET['debug']))
 		$buffer = preg_replace('/(?<!<link rel="canonical" href=)"' . preg_quote($scripturl, '/') . '\\??/', '"' . $scripturl . '?debug;', $buffer);
-
-	// This should work even in 4.2.x, just not CGI without cgi.fix_pathinfo.
-	if (!empty($modSettings['queryless_urls']) && detectServer()->supportRewrite())
-	{
-		// Let's do something special for session ids!
-		$buffer = preg_replace_callback('~"' . preg_quote($scripturl, '~') . '\?((?:board|topic)=[^#"]+?)(#[^"]*?)?"~', 'buffer_callback', $buffer);
-	}
 
 	// Return the changed buffer.
 	return $buffer;
