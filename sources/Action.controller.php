@@ -11,6 +11,8 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Abstract base class for controllers.
  *

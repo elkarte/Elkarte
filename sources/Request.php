@@ -11,6 +11,8 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Class to parse $_REQUEST for always necessary data, such as 'action', 'board', 'topic', 'start'.
  *

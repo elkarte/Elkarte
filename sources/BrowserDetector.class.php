@@ -15,6 +15,8 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * This class is an experiment for the job of correctly detecting browsers and
  * settings needed for them.

@@ -11,6 +11,8 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Simple cURL class to fetch a web page
  * Properly redirects even with safe mode and basedir restrictions

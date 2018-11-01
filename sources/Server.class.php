@@ -15,6 +15,8 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Class Server
  *

@@ -10,6 +10,8 @@
  * @version 2.0 dev
  */
 
+namespace ElkArte;
+
 /**
  * Used to combine css or js files in to a single file
  *

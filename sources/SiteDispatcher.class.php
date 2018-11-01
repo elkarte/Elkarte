@@ -12,6 +12,8 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Dispatch the request to the function or method registered to handle it.
  *

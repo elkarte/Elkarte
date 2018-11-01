@@ -13,6 +13,8 @@
  *
  */
 
+namespace ElkArte;
+
 use ElkArte\Errors\Errors as E;
 
 /**

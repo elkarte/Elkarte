@@ -12,6 +12,8 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Class AbstractModel
  *
