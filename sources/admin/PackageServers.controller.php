@@ -16,13 +16,15 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * PackageServers controller handles browsing, adding and removing
  * package servers, and download of a package from them.
  *
  * @package Packages
  */
-class PackageServers_Controller extends Action_Controller
+class PackageServers extends \ElkArte\AbstractController
 {
 	/**
 	 * Called before all other methods when coming from the dispatcher or
@@ -46,7 +48,7 @@ class PackageServers_Controller extends Action_Controller
 	 * - Accessed by action=admin;area=packageservers
 	 *
 	 * @event integrate_sa_package_servers
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

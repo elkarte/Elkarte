@@ -15,12 +15,14 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * Coordinates the processing for all known package actions
  *
  * @package Packages
  */
-class Package_Actions extends Action_Controller
+class Package_Actions extends \ElkArte\AbstractController
 {
 	/**
 	 * Passed actions from parsePackageInfo

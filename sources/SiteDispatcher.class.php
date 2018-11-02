@@ -57,7 +57,7 @@ class Site_Dispatcher
 
 	/**
 	 * The instance of the controller
-	 * @var Action_Controller
+	 * @var \ElkArte\AbstractController
 	 */
 	protected $_controller;
 
@@ -387,7 +387,7 @@ class Site_Dispatcher
 	}
 
 	/**
-	 * @return Action_Controller
+	 * @return \ElkArte\AbstractController
 	 */
 	public function getController()
 	{

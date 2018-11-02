@@ -20,13 +20,15 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * "Report" Functions are responsible for generating data for reporting.
  *
  * - They are all called from action_index.
  * - Never access the context directly, but use the data handling functions to do so.
  */
-class Reports_Controller extends Action_Controller
+class Reports extends \ElkArte\AbstractController
 {
 	/**
 	 * Handling function for generating reports.
@@ -46,7 +48,7 @@ class Reports_Controller extends Action_Controller
 	 *
 	 * @event integrate_report_types
 	 * @event integrate_report_buttons
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

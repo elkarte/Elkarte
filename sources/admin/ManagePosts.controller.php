@@ -15,12 +15,14 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * ManagePosts controller handles all the administration settings for topics and posts.
  *
  * @package Posts
  */
-class ManagePosts_Controller extends Action_Controller
+class ManagePosts extends \ElkArte\AbstractController
 {
 	/**
 	 * The main entrance point for the 'Posts and topics' screen.
@@ -34,7 +36,7 @@ class ManagePosts_Controller extends Action_Controller
 	 * - Requires (and checks for) the admin_forum permission.
 	 *
 	 * @event integrate_sa_manage_posts used to add new subactions
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -45,13 +47,13 @@ class ManagePosts_Controller extends Action_Controller
 				$this, 'action_postSettings_display', 'permission' => 'admin_forum'),
 			'bbc' => array(
 				'function' => 'action_index',
-				'controller' => 'ManageBBC_Controller',
+				'controller' => '\\ElkArte\\admin\\ManageBBC',
 				'permission' => 'admin_forum'),
 			'censor' => array(
 				$this, 'action_censor', 'permission' => 'admin_forum'),
 			'topics' => array(
 				'function' => 'action_index',
-				'controller' => 'ManageTopics_Controller',
+				'controller' => '\\ElkArte\\admin\\ManageTopics',
 				'permission' => 'admin_forum'),
 		);
 

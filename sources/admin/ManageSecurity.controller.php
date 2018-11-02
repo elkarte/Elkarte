@@ -16,19 +16,21 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * ManageSecurity controller handles the Security and Moderation
  * pages in admin panel.
  *
  * @package Security
  */
-class ManageSecurity_Controller extends Action_Controller
+class ManageSecurity extends \ElkArte\AbstractController
 {
 	/**
 	 * This function passes control through to the relevant security tab.
 	 *
 	 * @event integrate_sa_modify_security
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

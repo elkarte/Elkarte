@@ -11,16 +11,18 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * ManagePosts controller handles all the administration settings for topics and posts.
  */
-class ManageTopics_Controller extends Action_Controller
+class ManageTopics extends \ElkArte\AbstractController
 {
 	/**
 	 * Check permissions and forward to the right method.
 	 *
 	 * @event integrate_sa_manage_topics
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

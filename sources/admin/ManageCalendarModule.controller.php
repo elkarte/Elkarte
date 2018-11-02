@@ -15,13 +15,15 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * This class controls execution for actions in the manage calendar area
  * of the admin panel.
  *
  * @package Calendar
  */
-class ManageCalendarModule_Controller extends Action_Controller
+class ManageCalendarModule extends \ElkArte\AbstractController
 {
 	/**
 	 * Used to add the Calendar entry to the Core Features list.

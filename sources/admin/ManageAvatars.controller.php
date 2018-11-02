@@ -11,6 +11,8 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * This is the avatars administration controller class.
  *
@@ -18,7 +20,7 @@
  *
  * @package Avatars
  */
-class ManageAvatars_Controller extends Action_Controller
+class ManageAvatars extends \ElkArte\AbstractController
 {
 	/**
 	 * The Avatars admin area
@@ -31,7 +33,7 @@ class ManageAvatars_Controller extends Action_Controller
 	 * - requires manage_attachments permissions
 	 *
 	 * @event integrate_sa_manage_avatars
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

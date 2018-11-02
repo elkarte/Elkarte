@@ -15,13 +15,15 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * This class controls execution for actions in the manage boards area
  * of the admin panel.
  *
  * @package Boards
  */
-class ManageBoards_Controller extends Action_Controller
+class ManageBoards extends \ElkArte\AbstractController
 {
 	/**
 	 * Category being worked on

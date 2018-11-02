@@ -15,17 +15,19 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * Admin and moderation log controller.
  * Depending on permissions, this class will display and allow to act on the log
  * for administrators or for moderators.
  */
-class Modlog_Controller extends Action_Controller
+class Modlog extends \ElkArte\AbstractController
 {
 	/**
 	 * Default method for this controller.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

@@ -15,13 +15,15 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * This is the attachments and avatars controller class.
  * It is doing the job of attachments and avatars maintenance and management.
  *
  * @package Attachments
  */
-class ManageAttachments_Controller extends Action_Controller
+class ManageAttachments extends \ElkArte\AbstractController
 {
 	/**
 	 * Loop counter for paused attachment maintenance actions
@@ -92,7 +94,7 @@ class ManageAttachments_Controller extends Action_Controller
 	 * @uses Admin language file.
 	 * @uses template layer 'manage_files' for showing the tab bar.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -108,7 +110,7 @@ class ManageAttachments_Controller extends Action_Controller
 		$subActions = array(
 			'attachments' => array($this, 'action_attachSettings_display'),
 			'avatars' => array(
-				'controller' => 'ManageAvatars_Controller',
+				'controller' => '\\ElkArte\\admin\\ManageAvatars',
 				'function' => 'action_index'),
 			'attachpaths' => array($this, 'action_attachpaths'),
 			'browse' => array($this, 'action_browse'),

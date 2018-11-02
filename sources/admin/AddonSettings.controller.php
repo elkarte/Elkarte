@@ -11,6 +11,8 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * AddonSettings controller handles administration settings added
  * in the common area for all addons in admin panel.
@@ -25,12 +27,12 @@
  *
  * @package AddonSettings
  */
-class AddonSettings_Controller extends Action_Controller
+class AddonSettings extends \ElkArte\AbstractController
 {
 	/**
 	 * This, my friend, is for all the authors of addons out there.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

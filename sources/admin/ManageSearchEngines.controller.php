@@ -15,19 +15,21 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * ManageSearchEngines admin controller. This class handles all search engines
  * pages in admin panel, forwards to display and allows to change options.
  *
  * @package SearchEngines
  */
-class ManageSearchEngines_Controller extends Action_Controller
+class ManageSearchEngines extends \ElkArte\AbstractController
 {
 	/**
 	 * Entry point for this section.
 	 *
 	 * @event integrate_sa_manage_search_engines add additonal search engine actions
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

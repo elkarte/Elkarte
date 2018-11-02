@@ -15,6 +15,8 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * This class takes care of the Core Features admin screen.
  *
@@ -26,12 +28,12 @@
  *
  * @package CoreFeatures
  */
-class CoreFeatures_Controller extends Action_Controller
+class CoreFeatures extends \ElkArte\AbstractController
 {
 	/**
 	 * Default handler.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -286,14 +288,16 @@ class CoreFeatures_Controller extends Action_Controller
 	protected function _getModulesConfig(&$core_features)
 	{
 		// Find appropriately named core feature files in the admin directory
-		$glob = new GlobIterator(ADMINDIR . '/Manage*Module.controller.php', FilesystemIterator::SKIP_DOTS);
+		$glob = new GlobIterator(ADMINDIR . '/Manage*Module.php', FilesystemIterator::SKIP_DOTS);
 
 		foreach ($glob as $file)
 		{
-			$class = $file->getBasename('.controller.php') . '_Controller';
+			$class = $file->getBasename('.controller.php');
 
 			if (method_exists($class, 'addCoreFeature'))
+			{
 				$class::addCoreFeature($core_features);
+			}
 		}
 
 		$integrations = Hooks::instance()->discoverIntegrations(ADDONSDIR);

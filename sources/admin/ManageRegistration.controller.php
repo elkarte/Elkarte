@@ -16,6 +16,8 @@
  *
  */
 
+namespace ElkArte\admin;
+
 use ElkArte\Errors\ErrorContext;
 
 /**
@@ -28,7 +30,7 @@ use ElkArte\Errors\ErrorContext;
  *
  * @package Registration
  */
-class ManageRegistration_Controller extends Action_Controller
+class ManageRegistration extends \ElkArte\AbstractController
 {
 	/**
 	 * Entrance point for the registration center, it checks permissions and forwards
@@ -40,7 +42,7 @@ class ManageRegistration_Controller extends Action_Controller
 	 * @event integrate_sa_manage_registrations add new registration sub actions
 	 * @uses Login language file
 	 * @uses Register template.
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

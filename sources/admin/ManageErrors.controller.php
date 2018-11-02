@@ -16,10 +16,12 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * ManageErrors controller, administration of error log.
  */
-class ManageErrors_Controller extends Action_Controller
+class ManageErrors extends \ElkArte\AbstractController
 {
 	/** @var ElkArte\Errors\Log */
 	private $errorLog;
@@ -28,7 +30,7 @@ class ManageErrors_Controller extends Action_Controller
 	 * Calls the right handler.
 	 * Requires admin_forum permission.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

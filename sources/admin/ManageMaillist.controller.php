@@ -12,6 +12,8 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * This class is the administration maillist controller.
  *
@@ -21,7 +23,7 @@
  *
  * @package Maillist
  */
-class ManageMaillist_Controller extends Action_Controller
+class ManageMaillist extends \ElkArte\AbstractController
 {
 	/**
 	 * Main dispatcher.
@@ -29,7 +31,7 @@ class ManageMaillist_Controller extends Action_Controller
 	 * This function checks permissions and passes control to the sub action.
 	 *
 	 * @event integrate_sa_manage_maillist Used to add more sub actions
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 * @uses Maillist template
 	 */
 	public function action_index()

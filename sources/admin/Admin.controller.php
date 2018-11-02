@@ -15,6 +15,8 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * Admin controller class.
  *
@@ -26,7 +28,7 @@
  * @package Admin
  */
 
-class Admin_Controller extends Action_Controller
+class Admin extends \ElkArte\AbstractController
 {
 	/**
 	 * @var string[] areas to find current installed status and installed version
@@ -117,21 +119,21 @@ class Admin_Controller extends Action_Controller
 				'areas' => array(
 					'index' => array(
 						'label' => $txt['admin_center'],
-						'controller' => 'Admin_Controller',
+						'controller' => '\\ElkArte\\admin\\Admin',
 						'function' => 'action_home',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_administration',
 					),
 					'credits' => array(
 						'label' => $txt['support_credits_title'],
-						'controller' => 'Admin_Controller',
+						'controller' => '\\ElkArte\\admin\\Admin',
 						'function' => 'action_credits',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_support',
 					),
 					'maillist' => array(
 						'label' => $txt['mail_center'],
-						'controller' => 'ManageMaillist_Controller',
+						'controller' => '\\ElkArte\\admin\\ManageMaillist',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_mail',
@@ -147,7 +149,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'news' => array(
 						'label' => $txt['news_title'],
-						'controller' => 'ManageNews_Controller',
+						'controller' => '\\ElkArte\\admin\\ManageNews',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_news',
@@ -160,7 +162,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'packages' => array(
 						'label' => $txt['package'],
-						'controller' => 'Packages_Controller',
+						'controller' => '\\ElkArte\\admin\\Packages',
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
 						'icon' => 'transparent.png',
@@ -176,7 +178,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'packageservers' => array(
 						'label' => $txt['package_servers'],
-						'controller' => 'PackageServers_Controller',
+						'controller' => '\\ElkArte\\admin\\PackageServers',
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
 						'icon' => 'transparent.png',
@@ -184,13 +186,13 @@ class Admin_Controller extends Action_Controller
 						'hidden' => true,
 					),
 					'search' => array(
-						'controller' => 'Admin_Controller',
+						'controller' => '\\ElkArte\\admin\\Admin',
 						'function' => 'action_search',
 						'permission' => array('admin_forum'),
 						'select' => 'index'
 					),
 					'adminlogoff' => array(
-						'controller' => 'Admin_Controller',
+						'controller' => '\\ElkArte\\admin\\Admin',
 						'function' => 'action_endsession',
 						'label' => $txt['admin_logoff'],
 						'enabled' => empty($modSettings['securityDisable']),
@@ -205,14 +207,14 @@ class Admin_Controller extends Action_Controller
 				'areas' => array(
 					'corefeatures' => array(
 						'label' => $txt['core_settings_title'],
-						'controller' => 'CoreFeatures_Controller',
+						'controller' => '\\ElkArte\\admin\\CoreFeatures',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_corefeatures',
 					),
 					'featuresettings' => array(
 						'label' => $txt['modSettings_title'],
-						'controller' => 'ManageFeatures_Controller',
+						'controller' => '\\ElkArte\\admin\\ManageFeatures',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_features',
@@ -229,7 +231,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'serversettings' => array(
 						'label' => $txt['admin_server_settings'],
-						'controller' => 'ManageServer_Controller',
+						'controller' => '\\ElkArte\\admin\\ManageServer',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_server',
@@ -244,7 +246,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'securitysettings' => array(
 						'label' => $txt['admin_security_moderation'],
-						'controller' => 'ManageSecurity_Controller',
+						'controller' => '\\ElkArte\\admin\\ManageSecurity',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_security',
@@ -257,7 +259,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'theme' => array(
 						'label' => $txt['theme_admin'],
-						'controller' => 'ManageThemes_Controller',
+						'controller' => '\\ElkArte\\admin\\ManageThemes',
 						'function' => 'action_index',
 						'custom_url' => getUrl('admin', ['action' => 'admin', 'area' => 'theme']),
 						'icon' => 'transparent.png',
@@ -273,7 +275,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'current_theme' => array(
 						'label' => $txt['theme_current_settings'],
-						'controller' => 'ManageThemes_Controller',
+						'controller' => '\\ElkArte\\admin\\ManageThemes',
 						'function' => 'action_index',
 						'custom_url' => getUrl('admin', ['action' => 'admin', 'area' => 'theme', 'sa' => 'list', 'th' => $settings['theme_id']]),
 						'icon' => 'transparent.png',
@@ -281,7 +283,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'languages' => array(
 						'label' => $txt['language_configuration'],
-						'controller' => 'ManageLanguages_Controller',
+						'controller' => '\\ElkArte\\admin\\ManageLanguages',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_languages',
@@ -293,7 +295,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'addonsettings' => array(
 						'label' => $txt['admin_modifications'],
-						'controller' => 'AddonSettings_Controller',
+						'controller' => '\\ElkArte\\admin\\AddonSettings',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_modifications',
@@ -309,7 +311,7 @@ class Admin_Controller extends Action_Controller
 				'areas' => array(
 					'manageboards' => array(
 						'label' => $txt['admin_boards'],
-						'controller' => 'ManageBoards_Controller',
+						'controller' => '\\ElkArte\\admin\\ManageBoards',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_boards',
@@ -322,7 +324,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'postsettings' => array(
 						'label' => $txt['manageposts'],
-						'controller' => 'ManagePosts_Controller',
+						'controller' => '\\ElkArte\\admin\\ManagePosts',
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
 						'icon' => 'transparent.png',
@@ -336,7 +338,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'bbc' => array(
 						'label' => $txt['bbc_manage'],
-						'controller' => 'ManageBBC_Controller',
+						'controller' => '\\ElkArte\\admin\\ManageBBC',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_smiley',
@@ -344,7 +346,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'smileys' => array(
 						'label' => $txt['smileys_manage'],
-						'controller' => 'ManageSmileys_Controller',
+						'controller' => '\\ElkArte\\admin\\ManageSmileys',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_smiley',
@@ -360,7 +362,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'manageattachments' => array(
 						'label' => $txt['attachments_avatars'],
-						'controller' => 'ManageAttachments_Controller',
+						'controller' => '\\ElkArte\\admin\\ManageAttachments',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_attachment',
@@ -375,7 +377,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'managesearch' => array(
 						'label' => $txt['manage_search'],
-						'controller' => 'ManageSearch_Controller',
+						'controller' => '\\ElkArte\\admin\\ManageSearch',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_search',
@@ -395,7 +397,7 @@ class Admin_Controller extends Action_Controller
 				'areas' => array(
 					'viewmembers' => array(
 						'label' => $txt['admin_users'],
-						'controller' => 'ManageMembers_Controller',
+						'controller' => '\\ElkArte\\admin\\ManageMembers',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_members',
@@ -407,7 +409,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'membergroups' => array(
 						'label' => $txt['admin_groups'],
-						'controller' => 'ManageMembergroups_Controller',
+						'controller' => '\\ElkArte\\admin\\ManageMembergroups',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_membergroups',
@@ -420,7 +422,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'permissions' => array(
 						'label' => $txt['edit_permissions'],
-						'controller' => 'ManagePermissions_Controller',
+						'controller' => '\\ElkArte\\admin\\ManagePermissions',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_permissions',
@@ -435,7 +437,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'ban' => array(
 						'label' => $txt['ban_title'],
-						'controller' => 'ManageBans_Controller',
+						'controller' => '\\ElkArte\\admin\\ManageBans',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_ban',
@@ -449,7 +451,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'regcenter' => array(
 						'label' => $txt['registration_center'],
-						'controller' => 'ManageRegistration_Controller',
+						'controller' => '\\ElkArte\\admin\\ManageRegistration',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_regcenter',
@@ -464,7 +466,7 @@ class Admin_Controller extends Action_Controller
 					'sengines' => array(
 						'label' => $txt['search_engines'],
 						'enabled' => in_array('sp', $context['admin_features']),
-						'controller' => 'ManageSearchEngines_Controller',
+						'controller' => '\\ElkArte\\admin\\ManageSearchEngines',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_engines',
@@ -479,7 +481,7 @@ class Admin_Controller extends Action_Controller
 					'paidsubscribe' => array(
 						'label' => $txt['paid_subscriptions'],
 						'enabled' => in_array('ps', $context['admin_features']),
-						'controller' => 'ManagePaid_Controller',
+						'controller' => '\\ElkArte\\admin\\ManagePaid',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_paid',
 						'function' => 'action_index',
@@ -497,7 +499,7 @@ class Admin_Controller extends Action_Controller
 				'areas' => array(
 					'maintain' => array(
 						'label' => $txt['maintain_title'],
-						'controller' => 'Maintenance_Controller',
+						'controller' => '\\ElkArte\\admin\\Maintenance',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_maintain',
@@ -512,7 +514,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'logs' => array(
 						'label' => $txt['logs'],
-						'controller' => 'AdminLog_Controller',
+						'controller' => '\\ElkArte\\admin\\AdminLog',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_logs',
@@ -529,7 +531,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'scheduledtasks' => array(
 						'label' => $txt['maintain_tasks'],
-						'controller' => 'ManageScheduledTasks_Controller',
+						'controller' => '\\ElkArte\\admin\\ManageScheduledTasks',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_scheduled',
@@ -540,7 +542,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'mailqueue' => array(
 						'label' => $txt['mailqueue_title'],
-						'controller' => 'ManageMail_Controller',
+						'controller' => '\\ElkArte\\admin\\ManageMail',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_mail',
@@ -552,14 +554,14 @@ class Admin_Controller extends Action_Controller
 					'reports' => array(
 						'enabled' => in_array('rg', $context['admin_features']),
 						'label' => $txt['generate_reports'],
-						'controller' => 'Reports_Controller',
+						'controller' => '\\ElkArte\\admin\\Reports',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_reports',
 					),
 					'repairboards' => array(
 						'label' => $txt['admin_repair'],
-						'controller' => 'RepairBoards_Controller',
+						'controller' => '\\ElkArte\\admin\\RepairBoards',
 						'function' => 'action_repairboards',
 						'select' => 'maintain',
 						'hidden' => true,
@@ -827,41 +829,41 @@ class Admin_Controller extends Action_Controller
 		// This is a special array of functions that contain setting data
 		// - we query all these to simply pull all setting bits!
 		$settings_search = array(
-			array('settings_search', 'area=logs;sa=pruning', 'AdminLog_Controller'),
-			array('config_vars', 'area=corefeatures', 'CoreFeatures_Controller'),
-			array('basicSettings_search', 'area=featuresettings;sa=basic', 'ManageFeatures_Controller'),
-			array('layoutSettings_search', 'area=featuresettings;sa=layout', 'ManageFeatures_Controller'),
-			array('karmaSettings_search', 'area=featuresettings;sa=karma', 'ManageFeatures_Controller'),
-			array('likesSettings_search', 'area=featuresettings;sa=likes', 'ManageFeatures_Controller'),
-			array('mentionSettings_search', 'area=featuresettings;sa=mention', 'ManageFeatures_Controller'),
-			array('signatureSettings_search', 'area=featuresettings;sa=sig', 'ManageFeatures_Controller'),
-			array('settings_search', 'area=addonsettings;sa=general', 'AddonSettings_Controller'),
-			array('settings_search', 'area=manageattachments;sa=attachments', 'ManageAttachments_Controller'),
-			array('settings_search', 'area=manageattachments;sa=avatars', 'ManageAvatars_Controller'),
-			array('settings_search', 'area=postsettings;sa=bbc', 'ManageBBC_Controller'),
-			array('settings_search', 'area=manageboards;sa=settings', 'ManageBoards_Controller'),
-			array('settings_search', 'area=languages;sa=settings', 'ManageLanguages_Controller'),
-			array('settings_search', 'area=mailqueue;sa=settings', 'ManageMail_Controller'),
-			array('settings_search', 'area=maillist;sa=emailsettings', 'ManageMaillist_Controller'),
-			array('settings_search', 'area=membergroups;sa=settings', 'ManageMembergroups_Controller'),
-			array('settings_search', 'area=news;sa=settings', 'ManageNews_Controller'),
-			array('settings_search', 'area=paidsubscribe;sa=settings', 'ManagePaid_Controller'),
-			array('settings_search', 'area=permissions;sa=settings', 'ManagePermissions_Controller'),
-			array('settings_search', 'area=postsettings;sa=posts', 'ManagePosts_Controller'),
-			array('settings_search', 'area=regcenter;sa=settings', 'ManageRegistration_Controller'),
-			array('settings_search', 'area=managesearch;sa=settings', 'ManageSearch_Controller'),
-			array('settings_search', 'area=sengines;sa=settings', 'ManageSearchEngines_Controller'),
-			array('securitySettings_search', 'area=securitysettings;sa=general', 'ManageSecurity_Controller'),
-			array('spamSettings_search', 'area=securitysettings;sa=spam', 'ManageSecurity_Controller'),
-			array('moderationSettings_search', 'area=securitysettings;sa=moderation', 'ManageSecurity_Controller'),
-			array('bbSettings_search', 'area=securitysettings;sa=badbehavior', 'ManageSecurity_Controller'),
-			array('generalSettings_search', 'area=serversettings;sa=general', 'ManageServer_Controller'),
-			array('databaseSettings_search', 'area=serversettings;sa=database', 'ManageServer_Controller'),
-			array('cookieSettings_search', 'area=serversettings;sa=cookie', 'ManageServer_Controller'),
-			array('cacheSettings_search', 'area=serversettings;sa=cache', 'ManageServer_Controller'),
-			array('balancingSettings_search', 'area=serversettings;sa=loads', 'ManageServer_Controller'),
-			array('settings_search', 'area=smileys;sa=settings', 'ManageSmileys_Controller'),
-			array('settings_search', 'area=postsettings;sa=topics', 'ManageTopics_Controller'),
+			array('settings_search', 'area=logs;sa=pruning', '\\ElkArte\\admin\\AdminLog'),
+			array('config_vars', 'area=corefeatures', '\\ElkArte\\admin\\CoreFeatures'),
+			array('basicSettings_search', 'area=featuresettings;sa=basic', '\\ElkArte\\admin\\ManageFeatures'),
+			array('layoutSettings_search', 'area=featuresettings;sa=layout', '\\ElkArte\\admin\\ManageFeatures'),
+			array('karmaSettings_search', 'area=featuresettings;sa=karma', '\\ElkArte\\admin\\ManageFeatures'),
+			array('likesSettings_search', 'area=featuresettings;sa=likes', '\\ElkArte\\admin\\ManageFeatures'),
+			array('mentionSettings_search', 'area=featuresettings;sa=mention', '\\ElkArte\\admin\\ManageFeatures'),
+			array('signatureSettings_search', 'area=featuresettings;sa=sig', '\\ElkArte\\admin\\ManageFeatures'),
+			array('settings_search', 'area=addonsettings;sa=general', '\\ElkArte\\admin\\AddonSettings'),
+			array('settings_search', 'area=manageattachments;sa=attachments', '\\ElkArte\\admin\\ManageAttachments'),
+			array('settings_search', 'area=manageattachments;sa=avatars', '\\ElkArte\\admin\\ManageAvatars'),
+			array('settings_search', 'area=postsettings;sa=bbc', '\\ElkArte\\admin\\ManageBBC'),
+			array('settings_search', 'area=manageboards;sa=settings', '\\ElkArte\\admin\\ManageBoards'),
+			array('settings_search', 'area=languages;sa=settings', '\\ElkArte\\admin\\ManageLanguages'),
+			array('settings_search', 'area=mailqueue;sa=settings', '\\ElkArte\\admin\\ManageMail'),
+			array('settings_search', 'area=maillist;sa=emailsettings', '\\ElkArte\\admin\\ManageMaillist'),
+			array('settings_search', 'area=membergroups;sa=settings', '\\ElkArte\\admin\\ManageMembergroups'),
+			array('settings_search', 'area=news;sa=settings', '\\ElkArte\\admin\\ManageNews'),
+			array('settings_search', 'area=paidsubscribe;sa=settings', '\\ElkArte\\admin\\ManagePaid'),
+			array('settings_search', 'area=permissions;sa=settings', '\\ElkArte\\admin\\ManagePermissions'),
+			array('settings_search', 'area=postsettings;sa=posts', '\\ElkArte\\admin\\ManagePosts'),
+			array('settings_search', 'area=regcenter;sa=settings', '\\ElkArte\\admin\\ManageRegistration'),
+			array('settings_search', 'area=managesearch;sa=settings', '\\ElkArte\\admin\\ManageSearch'),
+			array('settings_search', 'area=sengines;sa=settings', '\\ElkArte\\admin\\ManageSearchEngines'),
+			array('securitySettings_search', 'area=securitysettings;sa=general', '\\ElkArte\\admin\\ManageSecurity'),
+			array('spamSettings_search', 'area=securitysettings;sa=spam', '\\ElkArte\\admin\\ManageSecurity'),
+			array('moderationSettings_search', 'area=securitysettings;sa=moderation', '\\ElkArte\\admin\\ManageSecurity'),
+			array('bbSettings_search', 'area=securitysettings;sa=badbehavior', '\\ElkArte\\admin\\ManageSecurity'),
+			array('generalSettings_search', 'area=serversettings;sa=general', '\\ElkArte\\admin\\ManageServer'),
+			array('databaseSettings_search', 'area=serversettings;sa=database', '\\ElkArte\\admin\\ManageServer'),
+			array('cookieSettings_search', 'area=serversettings;sa=cookie', '\\ElkArte\\admin\\ManageServer'),
+			array('cacheSettings_search', 'area=serversettings;sa=cache', '\\ElkArte\\admin\\ManageServer'),
+			array('balancingSettings_search', 'area=serversettings;sa=loads', '\\ElkArte\\admin\\ManageServer'),
+			array('settings_search', 'area=smileys;sa=settings', '\\ElkArte\\admin\\ManageSmileys'),
+			array('settings_search', 'area=postsettings;sa=topics', '\\ElkArte\\admin\\ManageTopics'),
 		);
 
 		// Allow integration to add settings to search
@@ -898,7 +900,7 @@ class Admin_Controller extends Action_Controller
 		$this->_req->post->membername = un_htmlspecialchars($context['search_term']);
 		$this->_req->post->types = '';
 
-		$managemembers = new ManageMembers_Controller(new Event_manager());
+		$managemembers = new \ElkArte\admin\ManageMembers(new Event_manager());
 		$managemembers->pre_dispatch();
 		$managemembers->action_index();
 	}

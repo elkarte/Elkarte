@@ -16,12 +16,14 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * ManagePaid controller, administration controller for paid subscriptions.
  *
  * @package Subscriptions
  */
-class ManagePaid_Controller extends Action_Controller
+class ManagePaid extends \ElkArte\AbstractController
 {
 	/**
 	 * The main entrance point for the 'Paid Subscription' screen,
@@ -34,7 +36,7 @@ class ManagePaid_Controller extends Action_Controller
 	 * - It requires admin_forum permission for admin based actions.
 	 *
 	 * @event integrate_sa_manage_subscriptions
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

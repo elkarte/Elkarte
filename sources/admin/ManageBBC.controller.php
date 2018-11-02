@@ -11,12 +11,14 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * ManageBBC controller handles administration options for BBC tags.
  *
  * @package BBC
  */
-class ManageBBC_Controller extends Action_Controller
+class ManageBBC extends \ElkArte\AbstractController
 {
 	/**
 	 * The BBC admin area
@@ -28,7 +30,7 @@ class ManageBBC_Controller extends Action_Controller
 	 * - requires admin_forum permissions
 	 *
 	 * @event integrate_sa_manage_bbc Used to add more sub actions
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

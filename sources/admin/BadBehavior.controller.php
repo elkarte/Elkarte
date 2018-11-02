@@ -12,12 +12,14 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * Class to show a list of all badbehavior log entries
  *
  * @package BadBehavior
  */
-class BadBehavior_Controller extends Action_Controller
+class BadBehavior extends \ElkArte\AbstractController
 {
 	/**
 	 * Call the appropriate action method.

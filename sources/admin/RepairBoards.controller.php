@@ -15,16 +15,18 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * Repair boards controller handles a special admin action:
  * boards and categories attempt to repair, from maintenance.
  */
-class RepairBoards_Controller extends Action_Controller
+class RepairBoards extends \ElkArte\AbstractController
 {
 	/**
 	 * Default method.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

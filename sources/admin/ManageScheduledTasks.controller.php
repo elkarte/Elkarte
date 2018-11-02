@@ -15,13 +15,15 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * ManageScheduledTasks admin Controller: handles the scheduled task pages
  * which allow to see and edit and run the systems scheduled tasks
  *
  * @package ScheduledTasks
  */
-class ManageScheduledTasks_Controller extends Action_Controller
+class ManageScheduledTasks extends \ElkArte\AbstractController
 {
 	/**
 	 * Scheduled tasks management dispatcher.
@@ -34,7 +36,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	 * @uses ManageScheduledTasks template file
 	 * @uses ManageScheduledTasks language file
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

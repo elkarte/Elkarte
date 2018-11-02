@@ -15,12 +15,14 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * ManageNews controller, for news administration screens.
  *
  * @package News
  */
-class ManageNews_Controller extends Action_Controller
+class ManageNews extends \ElkArte\AbstractController
 {
 	/**
 	 * Members specifically being included in a newsletter
@@ -45,7 +47,7 @@ class ManageNews_Controller extends Action_Controller
 	 * based on the requested sub-action.
 	 *
 	 * @event integrate_sa_manage_news used to add new subactions
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

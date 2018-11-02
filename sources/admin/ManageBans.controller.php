@@ -11,6 +11,8 @@
  *
  */
 
+namespace ElkArte\admin;
+
 use ElkArte\Errors\ErrorContext;
 
 /**
@@ -19,7 +21,7 @@ use ElkArte\Errors\ErrorContext;
  *
  * @package Bans
  */
-class ManageBans_Controller extends Action_Controller
+class ManageBans extends \ElkArte\AbstractController
 {
 	/**
 	 * Ban center. The main entrance point for all ban center functions.

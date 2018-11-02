@@ -33,6 +33,8 @@
  *  - please include any special license in a license.txt file.
  */
 
+namespace ElkArte\admin;
+
 /**
  * Class to deal with theme administration.
  *
@@ -41,7 +43,7 @@
  *
  * @package Themes
  */
-class ManageThemes_Controller extends Action_Controller
+class ManageThemes extends \ElkArte\AbstractController
 {
 	/**
 	 * Holds the selected theme options
@@ -109,7 +111,7 @@ class ManageThemes_Controller extends Action_Controller
 	 * - Requires the user to not be a guest.
 	 * - Accessed via ?action=admin;area=theme.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

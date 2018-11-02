@@ -16,12 +16,14 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * ManagePermissions handles all possible permission stuff.
  *
  * @package Permissions
  */
-class ManagePermissions_Controller extends Action_Controller
+class ManagePermissions extends \ElkArte\AbstractController
 {
 	/**
 	 * Permissions object
@@ -54,7 +56,7 @@ class ManagePermissions_Controller extends Action_Controller
 	 *
 	 * @event integrate_sa_manage_permissions used to add new subactions
 	 * @uses ManagePermissions language file.
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

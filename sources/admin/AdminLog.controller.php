@@ -11,6 +11,8 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * Admin logs controller.
  *
@@ -21,7 +23,7 @@
  *
  * @package AdminLog
  */
-class AdminLog_Controller extends Action_Controller
+class AdminLog extends \ElkArte\AbstractController
 {
 	/**
 	 * This method decides which log to load.
@@ -38,27 +40,27 @@ class AdminLog_Controller extends Action_Controller
 		$subActions = array(
 			'errorlog' => array(
 				'function' => 'action_index',
-				'controller' => 'ManageErrors_Controller'),
+				'controller' => '\\ElkArte\\admin\\ManageErrors'),
 			'adminlog' => array(
 				'function' => 'action_log',
-				'controller' => 'Modlog_Controller'),
+				'controller' => '\\ElkArte\\admin\\Modlog'),
 			'modlog' => array(
 				'function' => 'action_log',
-				'controller' => 'Modlog_Controller',
+				'controller' => '\\ElkArte\\admin\\Modlog',
 				'disabled' => !in_array('ml', $context['admin_features'])),
 			'badbehaviorlog' => array(
 				'function' => 'action_log',
 				'disabled' => empty($modSettings['badbehavior_enabled']),
-				'controller' => 'BadBehavior_Controller'),
+				'controller' => '\\ElkArte\\admin\\BadBehavior'),
 			'banlog' => array(
 				'function' => 'action_log',
-				'controller' => 'ManageBans_Controller'),
+				'controller' => '\\ElkArte\\admin\\ManageBans'),
 			'spiderlog' => array(
 				'function' => 'action_logs',
-				'controller' => 'ManageSearchEngines_Controller'),
+				'controller' => '\\ElkArte\\admin\\ManageSearchEngines'),
 			'tasklog' => array(
 				'function' => 'action_log',
-				'controller' => 'ManageScheduledTasks_Controller'),
+				'controller' => '\\ElkArte\\admin\\ManageScheduledTasks'),
 			'pruning' => array(
 				'controller' => $this,
 				'function' => 'action_pruningSettings_display'),

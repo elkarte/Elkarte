@@ -15,11 +15,13 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * This class is in charge with administration of smileys and message icons.
  * It handles actions from the Smileys pages in admin panel.
  */
-class ManageSmileys_Controller extends Action_Controller
+class ManageSmileys extends \ElkArte\AbstractController
 {
 	/**
 	 * Contextual information about smiley sets.
@@ -32,7 +34,7 @@ class ManageSmileys_Controller extends Action_Controller
 	 *
 	 * @uses ManageSmileys language
 	 * @uses ManageSmileys template
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

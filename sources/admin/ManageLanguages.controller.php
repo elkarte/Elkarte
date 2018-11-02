@@ -15,12 +15,14 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * Manage languages controller class.
  *
  * @package Languages
  */
-class ManageLanguages_Controller extends Action_Controller
+class ManageLanguages extends \ElkArte\AbstractController
 {
 	/**
 	 * This is the main function for the languages area.
@@ -32,7 +34,7 @@ class ManageLanguages_Controller extends Action_Controller
 	 *
 	 * @event integrate_sa_manage_languages Used to add more sub actions
 	 * @uses ManageSettings language file
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

@@ -15,10 +15,12 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * Admin class for interfacing with the debug function viewquery
  */
-class AdminDebug_Controller extends Action_Controller
+class AdminDebug extends \ElkArte\AbstractController
 {
 	/**
 	 * {@inheritdoc }
@@ -31,7 +33,7 @@ class AdminDebug_Controller extends Action_Controller
 	/**
 	 * Main dispatcher.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

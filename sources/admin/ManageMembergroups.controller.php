@@ -15,12 +15,14 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * ManageMembergroups controller, administration page for membergroups.
  *
  * @package Membergroups
  */
-class ManageMembergroups_Controller extends Action_Controller
+class ManageMembergroups extends \ElkArte\AbstractController
 {
 	/**
 	 * Main dispatcher, the en\trance point for all 'Manage Membergroup' actions.
@@ -35,7 +37,7 @@ class ManageMembergroups_Controller extends Action_Controller
 	 * @event integrate_sa_manage_membergroups Used to add more sub actions
 	 * @uses ManageMembergroups template.
 	 * @uses ManageMembers language file.
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -63,13 +65,13 @@ class ManageMembergroups_Controller extends Action_Controller
 				'function' => 'action_list',
 				'permission' => 'manage_membergroups'),
 			'members' => array(
-				'controller' => 'Groups_Controller',
+				'controller' => '\\ElkArte\\admin\\Groups',
 				'function' => 'action_index',
 				'permission' => 'manage_membergroups'),
 			'settings' => array(
 				'controller' => $this,
 				'function' => 'action_groupSettings_display',
-				'permission' => 'admin_forum'),
+				'permission' => '\ElkArte\AbstractControlleradmin_forum'),
 		);
 
 		$action = new Action('manage_membergroups');

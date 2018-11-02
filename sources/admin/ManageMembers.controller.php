@@ -15,13 +15,15 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * ManageMembers controller deals with members administration, approval,
  * admin-visible list and search in it.
  *
  * @package Members
  */
-class ManageMembers_Controller extends Action_Controller
+class ManageMembers extends \ElkArte\AbstractController
 {
 	/**
 	 * Holds various setting conditions for the current action
@@ -47,7 +49,7 @@ class ManageMembers_Controller extends Action_Controller
 	 * @event integrate_manage_members used to add subactions and tabs
 	 * @uses ManageMembers template
 	 * @uses ManageMembers language file.
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

@@ -15,6 +15,8 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * This class is the administration package manager controller.
  * Its main job is to install/uninstall, allow to browse, packages.
@@ -22,7 +24,7 @@
  *
  * @package Packages
  */
-class Packages_Controller extends Action_Controller
+class Packages extends \ElkArte\AbstractController
 {
 	/**
 	 * listing of files in a packages
@@ -85,7 +87,7 @@ class Packages_Controller extends Action_Controller
 	 * Entry point, the default method of this controller.
 	 *
 	 * @event integrate_sa_packages
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -119,10 +121,10 @@ class Packages_Controller extends Action_Controller
 			// The following two belong to PackageServers,
 			// for UI's sake moved here at least temporarily
 			'servers' => array(
-				'controller' => 'PackageServers_Controller',
+				'controller' => '\\ElkArte\\admin\\PackageServers',
 				'function' => 'action_list'),
 			'upload' => array(
-				'controller' => 'PackageServers_Controller',
+				'controller' => '\\ElkArte\\admin\\PackageServers',
 				'function' => 'action_upload'),
 		);
 

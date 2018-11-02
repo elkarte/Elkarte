@@ -15,13 +15,15 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * Manage features and options administration page.
  *
  * This controller handles the pages which allow the admin
  * to see and change the basic feature settings of their site.
  */
-class ManageFeatures_Controller extends Action_Controller
+class ManageFeatures extends \ElkArte\AbstractController
 {
 	/**
 	 * Pre Dispatch, called before other methods.
@@ -36,7 +38,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 * This function passes control through to the relevant tab.
 	 *
 	 * @event integrate_sa_modify_features Use to add new Configuration tabs
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 * @uses Help, ManageSettings languages
 	 * @uses sub_template show_settings
 	 */

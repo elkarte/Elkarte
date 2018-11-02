@@ -15,6 +15,8 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * This class is the administration mailing controller.
  *
@@ -25,7 +27,7 @@
  *
  * @package Mail
  */
-class ManageMail_Controller extends Action_Controller
+class ManageMail extends \ElkArte\AbstractController
 {
 	/**
 	 * Main dispatcher.
@@ -33,7 +35,7 @@ class ManageMail_Controller extends Action_Controller
 	 * - This function checks permissions and passes control through to the relevant section.
 	 *
 	 * @event integrate_sa_manage_mail Used to add more sub actions
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 * @uses Help and MangeMail language files
 	 */
 	public function action_index()

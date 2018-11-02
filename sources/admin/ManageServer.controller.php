@@ -17,6 +17,8 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * ManageServer administration pages controller.
  *
@@ -24,7 +26,7 @@
  * database settings, cache, general forum settings, and others.
  * It sends the data for display, and it allows the admin to change it.
  */
-class ManageServer_Controller extends Action_Controller
+class ManageServer extends \ElkArte\AbstractController
 {
 	/**
 	 * This is the main dispatcher. Sets up all the available sub-actions, all the tabs and selects
@@ -37,7 +39,7 @@ class ManageServer_Controller extends Action_Controller
 	 *
 	 * @event integrate_sa_server_settings
 	 * @uses edit_settings adminIndex.
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

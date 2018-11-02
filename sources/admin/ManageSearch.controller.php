@@ -16,12 +16,14 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * ManageSearch controller admin class.
  *
  * @package Search
  */
-class ManageSearch_Controller extends Action_Controller
+class ManageSearch extends \ElkArte\AbstractController
 {
 	/**
 	 * Main entry point for the admin search settings screen.
@@ -37,7 +39,7 @@ class ManageSearch_Controller extends Action_Controller
 	 * @event integrate_sa_manage_search add new search actions
 	 * @uses ManageSearch template.
 	 * @uses Search language file.
-	 * @see  Action_Controller::action_index()
+	 * @see  \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

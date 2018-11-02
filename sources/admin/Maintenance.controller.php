@@ -15,13 +15,15 @@
  *
  */
 
+namespace ElkArte\admin;
+
 /**
  * Entry point class for all of the maintenance ,routine, members, database,
  * attachments, topics and hooks
  *
  * @package Maintenance
  */
-class Maintenance_Controller extends Action_Controller
+class Maintenance extends \ElkArte\AbstractController
 {
 	/**
 	 * Maximum topic counter
@@ -61,7 +63,7 @@ class Maintenance_Controller extends Action_Controller
 	 * - This, as usual, checks permissions, loads language files,
 	 * and forwards to the actual workers.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -133,7 +135,7 @@ class Maintenance_Controller extends Action_Controller
 				'function' => 'action_hooks',
 			),
 			'attachments' => array(
-				'controller' => 'ManageAttachments_Controller',
+				'controller' => '\\ElkArte\\admin\\ManageAttachments',
 				'function' => 'action_maintenance',
 			),
 		);
@@ -442,7 +444,7 @@ class Maintenance_Controller extends Action_Controller
 		// Honestly, this should be done in the sub function.
 		validateToken('admin-maint');
 
-		$controller = new RepairBoards_Controller(new Event_manager());
+		$controller = new \ElkArte\admin\RepairBoards(new Event_manager());
 		$controller->pre_dispatch();
 		$controller->action_repairboards();
 	}

@@ -19,7 +19,7 @@ namespace ElkArte;
  * - Requires a default action handler, action_index().
  * - Defines an empty implementation for pre_dispatch() method.
  */
-abstract class Action_Controller
+abstract class AbstractController
 {
 	/**
 	 * The event manager.
