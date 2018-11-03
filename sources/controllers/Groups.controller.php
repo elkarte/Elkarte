@@ -16,11 +16,12 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * Groups_Controller class
  * Shows group access and allows for add/remove group members
  */
-class Groups_Controller extends Action_Controller
+class Groups extends \ElkArte\AbstractController
 {
 	/**
 	 * Set up templates and pre-requisites for any request processed by this class.
@@ -41,7 +42,7 @@ class Groups_Controller extends Action_Controller
 		if (allowedTo('access_mod_center') || $user_info['mod_cache']['bq'] != '0=1' || $user_info['mod_cache']['gq'] != '0=1' || allowedTo('manage_membergroups'))
 		{
 			$this->_req->query->area = $this->_req->getQuery('sa') === 'requests' ? 'groups' : 'viewgroups';
-			$controller = new ModerationCenter_Controller(new Event_Manager());
+			$controller = new \ElkArte\controller\ModerationCenter(new Event_Manager());
 			$controller->pre_dispatch();
 			$controller->prepareModcenter();
 		}
@@ -61,7 +62,7 @@ class Groups_Controller extends Action_Controller
 	 * Entry point to groups.
 	 * It allows moderators and users to access the group showing functions.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

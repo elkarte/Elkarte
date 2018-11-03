@@ -16,13 +16,14 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * Auth_Controller class.
  * Deals with logging in and out members, and the validation of them
  *
  * @package Authorization
  */
-class Auth_Controller extends Action_Controller
+class Auth extends \ElkArte\AbstractController
 {
 	/**
 	 * {@inheritdoc }
@@ -37,7 +38,7 @@ class Auth_Controller extends Action_Controller
 	 *
 	 * - (well no, not really. We route directly to the rest.)
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

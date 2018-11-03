@@ -17,11 +17,12 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * Profile_Controller class
  * Has the job of showing and editing people's profiles.
  */
-class Profile_Controller extends Action_Controller
+class Profile extends \ElkArte\AbstractController
 {
 	/**
 	 * If the save was successful or not
@@ -85,7 +86,7 @@ class Profile_Controller extends Action_Controller
 	 *
 	 * - Fires the pre_load event
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -230,7 +231,7 @@ class Profile_Controller extends Action_Controller
 				'areas' => array(
 					'summary' => array(
 						'label' => $txt['summary'],
-						'controller' => 'ProfileInfo_Controller',
+						'controller' => '\\ElkArte\\controller\\ProfileInfo',
 						'function' => 'action_summary',
 						// From the summary it's possible to activate an account, so we need the token
 						'token' => 'profile-aa%u',
@@ -242,7 +243,7 @@ class Profile_Controller extends Action_Controller
 					),
 					'statistics' => array(
 						'label' => $txt['statPanel'],
-						'controller' => 'ProfileInfo_Controller',
+						'controller' => '\\ElkArte\\controller\\ProfileInfo',
 						'function' => 'action_statPanel',
 						'permission' => array(
 							'own' => 'profile_view_own',
@@ -251,7 +252,7 @@ class Profile_Controller extends Action_Controller
 					),
 					'showposts' => array(
 						'label' => $txt['showPosts'],
-						'controller' => 'ProfileInfo_Controller',
+						'controller' => '\\ElkArte\\controller\\ProfileInfo',
 						'function' => 'action_showPosts',
 						'subsections' => array(
 							'messages' => array($txt['showMessages'], array('profile_view_own', 'profile_view_any')),
@@ -266,7 +267,7 @@ class Profile_Controller extends Action_Controller
 					),
 					'showlikes' => array(
 						'label' => $txt['likes_show'],
-						'controller' => 'Likes_Controller',
+						'controller' => '\\ElkArte\\controller\\Likes',
 						'function' => 'action_showProfileLikes',
 						'enabled' => !empty($modSettings['likes_enabled']) && $context['user']['is_owner'],
 						'subsections' => array(
@@ -280,7 +281,7 @@ class Profile_Controller extends Action_Controller
 					),
 					'permissions' => array(
 						'label' => $txt['showPermissions'],
-						'controller' => 'ProfileInfo_Controller',
+						'controller' => '\\ElkArte\\controller\\ProfileInfo',
 						'function' => 'action_showPermissions',
 						'permission' => array(
 							'own' => 'manage_permissions',
@@ -289,7 +290,7 @@ class Profile_Controller extends Action_Controller
 					),
 					'history' => array(
 						'label' => $txt['history'],
-						'controller' => 'ProfileHistory_Controller',
+						'controller' => '\\ElkArte\\controller\\ProfileHistory',
 						'function' => 'action_index',
 						'subsections' => array(
 							'activity' => array($txt['trackActivity'], 'moderate_forum'),
@@ -305,7 +306,7 @@ class Profile_Controller extends Action_Controller
 					'viewwarning' => array(
 						'label' => $txt['profile_view_warnings'],
 						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $this->_profile['warning'] && (!empty($modSettings['warning_show']) && ($context['user']['is_owner'] || $modSettings['warning_show'] == 2)),
-						'controller' => 'ProfileInfo_Controller',
+						'controller' => '\\ElkArte\\controller\\ProfileInfo',
 						'function' => 'action_viewWarning',
 						'permission' => array(
 							'own' => 'profile_view_own',
@@ -319,7 +320,7 @@ class Profile_Controller extends Action_Controller
 				'areas' => array(
 					'account' => array(
 						'label' => $txt['account'],
-						'controller' => 'ProfileOptions_Controller',
+						'controller' => '\\ElkArte\\controller\\ProfileOptions',
 						'function' => 'action_account',
 						'enabled' => $context['user']['is_admin'] || ($this->_profile['id_group'] != 1 && !in_array(1, explode(',', $this->_profile['additional_groups']))),
 						'sc' => 'post',
@@ -332,7 +333,7 @@ class Profile_Controller extends Action_Controller
 					),
 					'forumprofile' => array(
 						'label' => $txt['forumprofile'],
-						'controller' => 'ProfileOptions_Controller',
+						'controller' => '\\ElkArte\\controller\\ProfileOptions',
 						'function' => 'action_forumProfile',
 						'sc' => 'post',
 						'token' => 'profile-fp%u',
@@ -343,7 +344,7 @@ class Profile_Controller extends Action_Controller
 					),
 					'theme' => array(
 						'label' => $txt['theme'],
-						'controller' => 'ProfileOptions_Controller',
+						'controller' => '\\ElkArte\\controller\\ProfileOptions',
 						'function' => 'action_themepick',
 						'sc' => 'post',
 						'token' => 'profile-th%u',
@@ -354,7 +355,7 @@ class Profile_Controller extends Action_Controller
 					),
 					'authentication' => array(
 						'label' => $txt['authentication'],
-						'controller' => 'ProfileOptions_Controller',
+						'controller' => '\\ElkArte\\controller\\ProfileOptions',
 						'function' => 'action_authentication',
 						'enabled' => !empty($modSettings['enableOpenID']) || !empty($this->_profile['openid_uri']),
 						'sc' => 'post',
@@ -368,7 +369,7 @@ class Profile_Controller extends Action_Controller
 					),
 					'notification' => array(
 						'label' => $txt['notifications'],
-						'controller' => 'ProfileOptions_Controller',
+						'controller' => '\\ElkArte\\controller\\ProfileOptions',
 						'function' => 'action_notification',
 						'sc' => 'post',
 						'token' => 'profile-nt%u',
@@ -381,7 +382,7 @@ class Profile_Controller extends Action_Controller
 					// @todo at some point decouple it from PMs
 					'contactprefs' => array(
 						'label' => $txt['contactprefs'],
-						'controller' => 'ProfileOptions_Controller',
+						'controller' => '\\ElkArte\\controller\\ProfileOptions',
 						'function' => 'action_pmprefs',
 						'enabled' => allowedTo(array('profile_extra_own', 'profile_extra_any')),
 						'sc' => 'post',
@@ -393,7 +394,7 @@ class Profile_Controller extends Action_Controller
 					),
 					'ignoreboards' => array(
 						'label' => $txt['ignoreboards'],
-						'controller' => 'ProfileOptions_Controller',
+						'controller' => '\\ElkArte\\controller\\ProfileOptions',
 						'function' => 'action_ignoreboards',
 						'enabled' => !empty($modSettings['allow_ignore_boards']),
 						'sc' => 'post',
@@ -405,7 +406,7 @@ class Profile_Controller extends Action_Controller
 					),
 					'lists' => array(
 						'label' => $txt['editBuddyIgnoreLists'],
-						'controller' => 'ProfileOptions_Controller',
+						'controller' => '\\ElkArte\\controller\\ProfileOptions',
 						'function' => 'action_editBuddyIgnoreLists',
 						'enabled' => !empty($modSettings['enable_buddylist']) && $context['user']['is_owner'],
 						'sc' => 'post',
@@ -421,7 +422,7 @@ class Profile_Controller extends Action_Controller
 					),
 					'groupmembership' => array(
 						'label' => $txt['groupmembership'],
-						'controller' => 'ProfileOptions_Controller',
+						'controller' => '\\ElkArte\\controller\\ProfileOptions',
 						'function' => 'action_groupMembership',
 						'enabled' => !empty($modSettings['show_group_membership']) && $context['user']['is_owner'],
 						'sc' => 'request',
@@ -448,7 +449,7 @@ class Profile_Controller extends Action_Controller
 					'issuewarning' => array(
 						'label' => $txt['profile_issue_warning'],
 						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && (!$context['user']['is_owner'] || $context['user']['is_admin']),
-						'controller' => 'ProfileAccount_Controller',
+						'controller' => '\\ElkArte\\controller\\ProfileAccount',
 						'function' => 'action_issuewarning',
 						'token' => 'profile-iw%u',
 						'permission' => array(
@@ -467,7 +468,7 @@ class Profile_Controller extends Action_Controller
 					),
 					'subscriptions' => array(
 						'label' => $txt['subscriptions'],
-						'controller' => 'ProfileSubscriptions_Controller',
+						'controller' => '\\ElkArte\\controller\\ProfileSubscriptions',
 						'function' => 'action_subscriptions',
 						'enabled' => !empty($modSettings['paid_enabled']),
 						'permission' => array(
@@ -477,7 +478,7 @@ class Profile_Controller extends Action_Controller
 					),
 					'deleteaccount' => array(
 						'label' => $txt['deleteAccount'],
-						'controller' => 'ProfileAccount_Controller',
+						'controller' => '\\ElkArte\\controller\\ProfileAccount',
 						'function' => 'action_deleteaccount',
 						'sc' => 'post',
 						'token' => 'profile-da%u',
@@ -488,7 +489,7 @@ class Profile_Controller extends Action_Controller
 						),
 					),
 					'activateaccount' => array(
-						'controller' => 'ProfileAccount_Controller',
+						'controller' => '\\ElkArte\\controller\\ProfileAccount',
 						'function' => 'action_activateaccount',
 						'sc' => 'get',
 						'token' => 'profile-aa%u',
@@ -626,13 +627,13 @@ class Profile_Controller extends Action_Controller
 			// Now call the sub-action function...
 			if ($this->_current_area === 'activateaccount' && empty($post_errors))
 			{
-				$controller = new ProfileAccount_Controller(new Event_Manager());
+				$controller = new \ElkArte\controller\ProfileAccount(new Event_Manager());
 				$controller->pre_dispatch();
 				$controller->action_activateaccount();
 			}
 			elseif ($this->_current_area === 'deleteaccount' && empty($post_errors))
 			{
-				$controller = new ProfileAccount_Controller(new Event_Manager());
+				$controller = new \ElkArte\controller\ProfileAccount(new Event_Manager());
 				$controller->pre_dispatch();
 				$controller->action_deleteaccount2();
 
@@ -641,7 +642,7 @@ class Profile_Controller extends Action_Controller
 			}
 			elseif ($this->_current_area === 'groupmembership' && empty($post_errors))
 			{
-				$controller = new ProfileOptions_Controller(new Event_Manager());
+				$controller = new \ElkArte\controller\ProfileOptions(new Event_Manager());
 				$controller->pre_dispatch();
 				$msg = $controller->action_groupMembership2();
 
@@ -651,7 +652,7 @@ class Profile_Controller extends Action_Controller
 			// Authentication changes?
 			elseif ($this->_current_area === 'authentication')
 			{
-				$controller = new ProfileOptions_Controller(new Event_Manager());
+				$controller = new \ElkArte\controller\ProfileOptions(new Event_Manager());
 				$controller->pre_dispatch();
 				$controller->action_authentication(true);
 			}
@@ -663,11 +664,11 @@ class Profile_Controller extends Action_Controller
 				require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
 				if ($this->_current_area === 'account' && !empty($modSettings['enableOTP']))
 				{
-					$fields = ProfileOptions_Controller::getFields('account_otp');
+					$fields = \ElkArte\controller\ProfileOptions::getFields('account_otp');
 				}
 				else
 				{
-					$fields = ProfileOptions_Controller::getFields($this->_current_area);
+					$fields = \ElkArte\controller\ProfileOptions::getFields($this->_current_area);
 				}
 
 				saveProfileFields($fields['fields'], $fields['hook']);

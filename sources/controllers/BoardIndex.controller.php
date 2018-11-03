@@ -15,13 +15,14 @@
  *
  */
 
+namespace ElkArte\controller;
+
 use ElkArte\sources\Frontpage_Interface;
 
 /**
- * BoardIndex_Controller class
  * Displays the main board index
  */
-class BoardIndex_Controller extends Action_Controller implements Frontpage_Interface
+class BoardIndex extends \ElkArte\AbstractController implements Frontpage_Interface
 {
 	/**
 	 * {@inheritdoc }
@@ -29,7 +30,7 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 	public static function frontPageHook(&$default_action)
 	{
 		$default_action = array(
-			'controller' => 'BoardIndex_Controller',
+			'controller' => '\\ElkArte\\controller\\BoardIndex',
 			'function' => 'action_boardindex'
 		);
 	}
@@ -37,7 +38,7 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 	/**
 	 * Forwards to the action to execute here by default.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

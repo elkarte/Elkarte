@@ -15,13 +15,14 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * Karma_Controller class,
  * Can give good or bad karma so watch out!
  *
  * @package Karma
  */
-class Karma_Controller extends Action_Controller
+class Karma extends \ElkArte\AbstractController
 {
 	/**
 	 * Pre Dispatch, called before other methods.  Loads integration hooks.
@@ -35,7 +36,7 @@ class Karma_Controller extends Action_Controller
 	 * Default entry point, in case action methods are not directly
 	 * called. Simply forward to applaud.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

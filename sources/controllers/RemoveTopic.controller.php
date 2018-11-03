@@ -16,11 +16,12 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * RemoveTopic_Controller Class
  * Handles the deletion of topics, posts
  */
-class RemoveTopic_Controller extends Action_Controller
+class RemoveTopic extends \ElkArte\AbstractController
 {
 	/**
 	 * Hold topic information for supplied message
@@ -43,7 +44,7 @@ class RemoveTopic_Controller extends Action_Controller
 	 * All actions are directly called from other points, so there
 	 * is currently nothing to action in this method.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

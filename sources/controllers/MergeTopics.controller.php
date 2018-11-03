@@ -17,11 +17,12 @@
  * ETA: Sorry, we did.
  */
 
+namespace ElkArte\controller;
+
 /**
- * MergeTopics_Controller class.
  * Merges two or more topics into a single topic.
  */
-class MergeTopics_Controller extends Action_Controller
+class MergeTopics extends \ElkArte\AbstractController
 {
 	/**
 	 * Merges two or more topics into one topic.
@@ -33,7 +34,7 @@ class MergeTopics_Controller extends Action_Controller
 	 * - requires the merge_any permission.
 	 * - is accessed with ?action=mergetopics.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

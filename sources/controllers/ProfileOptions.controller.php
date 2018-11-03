@@ -17,14 +17,15 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * ProfileOptions_Controller Class.
  *
  * - Does the job of showing and editing people's profiles.
  * - Interface to buddy list, ignore list, notifications, authentication options, forum profile
  * account settings, etc
  */
-class ProfileOptions_Controller extends Action_Controller
+class ProfileOptions extends \ElkArte\AbstractController
 {
 
 	/**
@@ -131,7 +132,7 @@ class ProfileOptions_Controller extends Action_Controller
 	/**
 	 * Default method, if another action is not called by the menu.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

@@ -15,11 +15,12 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * Announce_Controller class.
  * Used to handle announce topic functionality.
  */
-class Announce_Controller extends Action_Controller
+class Announce extends \ElkArte\AbstractController
 {
 	/**
 	 * Set up the context for the announce topic function (action=announce).
@@ -54,7 +55,7 @@ class Announce_Controller extends Action_Controller
 	/**
 	 * Default (sub)action for ?action=announce
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

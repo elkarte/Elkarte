@@ -11,12 +11,13 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * Jslocale_Controller class.
  * This file is called via ?action=jslocale;sa=sceditor to load in a list of
  * language strings for the editor
  */
-class Jslocale_Controller extends Action_Controller
+class Jslocale extends \ElkArte\AbstractController
 {
 	/**
 	 * The content of the file to be returned

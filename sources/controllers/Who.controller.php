@@ -16,12 +16,13 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * Who_Controller Class
  * I woke up in a Soho doorway A policeman knew my name He said "You can go sleep at home
  * tonight If you can get up and walk away"
  */
-class Who_Controller extends Action_Controller
+class Who extends \ElkArte\AbstractController
 {
 	/**
 	 * Default action of this class

@@ -15,11 +15,12 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * ProfileAccount_Controller Class
  * Processes user warnings, account activation and account deletion
  */
-class ProfileAccount_Controller extends Action_Controller
+class ProfileAccount extends \ElkArte\AbstractController
 {
 	/**
 	 * Member id for the account being worked on
@@ -54,7 +55,7 @@ class ProfileAccount_Controller extends Action_Controller
 	/**
 	 * Entry point for this class.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -626,7 +627,7 @@ class ProfileAccount_Controller extends Action_Controller
 		{
 			deleteMembers($this->_memID);
 
-			$controller = new Auth_Controller(new Event_manager());
+			$controller = new \ElkArte\controller\Auth(new Event_manager());
 			$controller->action_logout(true);
 
 			redirectexit();

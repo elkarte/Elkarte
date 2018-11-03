@@ -15,11 +15,12 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * ProfileHistory_Controller
  * Show a users login, profile edits, IP history
  */
-class ProfileHistory_Controller extends Action_Controller
+class ProfileHistory extends \ElkArte\AbstractController
 {
 	/**
 	 * Member id for the history being viewed
@@ -51,7 +52,7 @@ class ProfileHistory_Controller extends Action_Controller
 	 * Profile history entry point.
 	 * Re-directs to sub-actions.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

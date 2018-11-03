@@ -15,11 +15,12 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * Reminder_Controller Class
  * Handles sending out reminders, and checking the secret answer and question.
  */
-class Reminder_Controller extends Action_Controller
+class Reminder extends \ElkArte\AbstractController
 {
 	/**
 	 * This is the pre-dispatch function

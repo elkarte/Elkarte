@@ -11,13 +11,14 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * Mentions_Controller Class:  Add mention notifications for various actions such
  * as liking a post, adding a buddy, @ calling a member in a post
  *
  * @package Mentions
  */
-class Mentions_Controller extends Action_Controller
+class Mentions extends \ElkArte\AbstractController
 {
 	/**
 	 * Will hold all available mention types
@@ -83,8 +84,7 @@ class Mentions_Controller extends Action_Controller
 	protected $_all = false;
 
 	/**
-	 * Mentions_Controller constructor.
-	 *
+		 *
 	 * @param Event_Manager $eventManager
 	 */
 	public function __construct($eventManager)

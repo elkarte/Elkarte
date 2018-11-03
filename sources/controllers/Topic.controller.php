@@ -18,16 +18,17 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * Topic_Controller Class
  * Handles various topic actions, lock/unlock, sticky (pin) /unsticky (unpin), printing
  */
-class Topic_Controller extends Action_Controller
+class Topic extends \ElkArte\AbstractController
 {
 	/**
 	 * Entry point for this class (by default).
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

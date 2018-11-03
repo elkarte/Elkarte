@@ -11,12 +11,14 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
  * This class contains one likable use, which allows members to like a post
  *
  * @package Likes
  */
-class Likes_Controller extends Action_Controller
+class Likes extends \ElkArte\AbstractController
 {
 	/**
 	 * Holds the ajax response
@@ -46,7 +48,7 @@ class Likes_Controller extends Action_Controller
 	 * Default action method, if a specific methods was not
 	 * directly called already. Simply forwards to likepost.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

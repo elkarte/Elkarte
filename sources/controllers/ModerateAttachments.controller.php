@@ -15,16 +15,17 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * ModerateAttachments_Controller class
  */
-class ModerateAttachments_Controller extends Action_Controller
+class ModerateAttachments extends \ElkArte\AbstractController
 {
 	/**
 	 * Forward to attachments approval method is the only responsibility
 	 * of this controller.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

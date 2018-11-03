@@ -16,10 +16,12 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
  * Memberlist Controller class
  */
-class Memberlist_Controller extends Action_Controller
+class Memberlist extends \ElkArte\AbstractController
 {
 	/**
 	 * The fields that we can search
@@ -62,7 +64,7 @@ class Memberlist_Controller extends Action_Controller
 	 *
 	 * @uses Memberlist template, main sub-template.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

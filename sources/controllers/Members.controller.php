@@ -15,16 +15,18 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
  * Members Controller class.
  * Allows for the adding or removing of buddies
  */
-class Members_Controller extends Action_Controller
+class Members extends \ElkArte\AbstractController
 {
 	/**
 	 * Forwards to an action method.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

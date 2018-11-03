@@ -16,14 +16,15 @@
  * Original module by Mach8 - We'll never forget you.
  */
 
+namespace ElkArte\controller;
+
 /**
- * SplitTopics_Controller Class
  * Allows to take a topic and split at a point or select individual messages to
  * split to a new topic.
  *
  * - Requires the split_any permission
  */
-class SplitTopics_Controller extends Action_Controller
+class SplitTopics extends \ElkArte\AbstractController
 {
 	/**
 	 * Holds the new subject for the split topic
@@ -35,7 +36,7 @@ class SplitTopics_Controller extends Action_Controller
 	/**
 	 * Intended entry point for this class.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

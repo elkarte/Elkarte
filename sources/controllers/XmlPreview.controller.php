@@ -10,11 +10,12 @@
  * @version 2.0 dev
  */
 
+namespace ElkArte\controller;
+
 /**
- * XmlPreview_Controller Class.
  * Handles requests for previews of an item, in an ajax enabled template.
  */
-class XmlPreview_Controller extends Action_Controller
+class XmlPreview extends \ElkArte\AbstractController
 {
 	/**
 	 * {@inheritdoc }
@@ -27,7 +28,7 @@ class XmlPreview_Controller extends Action_Controller
 	/**
 	 * Calls the correct function for the action.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

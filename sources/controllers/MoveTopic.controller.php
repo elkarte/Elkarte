@@ -15,10 +15,12 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
  * Move Topic Controller
  */
-class MoveTopic_Controller extends Action_Controller
+class MoveTopic extends \ElkArte\AbstractController
 {
 	/**
 	 * The id of the topic being manipulated
@@ -58,7 +60,7 @@ class MoveTopic_Controller extends Action_Controller
 	/**
 	 * Forwards to the action method to handle the action.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

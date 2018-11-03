@@ -15,12 +15,13 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * Display_Controller class.
  * This controller is the most important and probably most accessed of all.
  * It controls topic display, with all related.
  */
-class Display_Controller extends Action_Controller
+class Display extends \ElkArte\AbstractController
 {
 	/**
 	 * The template layers object

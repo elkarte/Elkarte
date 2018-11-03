@@ -15,16 +15,17 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * Stats_Controller Class
  * Handles the calculation of forum statistics
  */
-class Stats_Controller extends Action_Controller
+class Stats extends \ElkArte\AbstractController
 {
 	/**
 	 * Entry point for this class.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

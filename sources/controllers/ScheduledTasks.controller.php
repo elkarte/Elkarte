@@ -11,12 +11,13 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * ScheduledTasks_Controller Class
  * This controllers action handlers are automatically called.
  * It handles execution of scheduled tasks, mail queue scheduling included.
  */
-class ScheduledTasks_Controller extends Action_Controller
+class ScheduledTasks extends \ElkArte\AbstractController
 {
 	/**
 	 * Default method for the class, just forwards to autotask

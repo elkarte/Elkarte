@@ -17,10 +17,11 @@
  *
  */
 
+namespace ElkArte\controller;
+
 use ElkArte\Errors\ErrorContext;
 
 /**
- * Register_Controller Class
  * It registers new members, and it allows the administrator moderate member registration
  *
  * is_activated value key is as follows, for reference again:
@@ -32,7 +33,7 @@ use ElkArte\Errors\ErrorContext;
  * - 1 = Approved and active
  * - 0 = Not active
  */
-class Register_Controller extends Action_Controller
+class Register extends \ElkArte\AbstractController
 {
 	/**
 	 * Holds the results of a findUser() request
@@ -70,7 +71,7 @@ class Register_Controller extends Action_Controller
 	 *
 	 * By default, this is called for action=register
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -714,8 +715,7 @@ class Register_Controller extends Action_Controller
 
 			// Here, and here only, emulate the permissions the user would have to do this.
 			$user_info['permissions'] = array_merge($user_info['permissions'], array('profile_account_own', 'profile_extra_own'));
-			require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
-			$reg_fields = ProfileOptions_Controller::getFields('registration');
+			$reg_fields = \ElkArte\controller\ProfileOptions::getFields('registration');
 
 			// We might have had some submissions on this front - go check.
 			foreach ($reg_fields['fields'] as $field)

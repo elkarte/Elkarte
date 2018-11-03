@@ -15,11 +15,12 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * Recent_Controller Class
  * Retrieve information about recent posts
  */
-class Recent_Controller extends Action_Controller
+class Recent extends \ElkArte\AbstractController
 {
 	/**
 	 * The object that will retrieve the data
@@ -96,7 +97,7 @@ class Recent_Controller extends Action_Controller
 	/**
 	 * Intended entry point for recent controller class.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

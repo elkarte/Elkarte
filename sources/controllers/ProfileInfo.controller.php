@@ -16,12 +16,13 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * ProfileInfo_Controller Class
  * Access all profile summary areas for a user including overall summary,
  * post listing, attachment listing, user statistics user permissions, user warnings
  */
-class ProfileInfo_Controller extends Action_Controller
+class ProfileInfo extends \ElkArte\AbstractController
 {
 	/**
 	 * Member id for the profile being worked with
@@ -79,7 +80,7 @@ class ProfileInfo_Controller extends Action_Controller
 		$subActions = array(
 			'buddies' => array($this, 'action_profile_buddies'),
 			'recent' => array($this, 'action_profile_recent'),
-			'summary' => array('controller' => 'Profile_Controller', 'function' => 'action_index'),
+			'summary' => array('controller' => '\\ElkArte\\controller\\Profile', 'function' => 'action_index'),
 		);
 
 		// Action control

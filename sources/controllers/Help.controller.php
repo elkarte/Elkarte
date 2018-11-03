@@ -15,11 +15,12 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * Help_Controller Class
  * Handles the help page and boxes
  */
-class Help_Controller extends Action_Controller
+class Help extends \ElkArte\AbstractController
 {
 	/**
 	 * Pre Dispatch, called before other methods.  Loads integration hooks.
@@ -32,7 +33,7 @@ class Help_Controller extends Action_Controller
 	/**
 	 * Default action handler: just help.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

@@ -15,11 +15,12 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * ProfileSubscriptions_Controller Class
  * This class handles the paid subscriptions on a user's profile.
  */
-class ProfileSubscriptions_Controller extends Action_Controller
+class ProfileSubscriptions extends \ElkArte\AbstractController
 {
 	/**
 	 * Holds the the details of the subscription order
@@ -45,7 +46,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 	 * - This is just a stub as action_subscriptions is called from a menu pick
 	 * and not routed through this method.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

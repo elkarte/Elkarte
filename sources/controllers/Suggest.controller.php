@@ -15,10 +15,12 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
  * Suggest Controller
  */
-class Suggest_Controller extends Action_Controller
+class Suggest extends \ElkArte\AbstractController
 {
 	/**
 	 * {@inheritdoc }
@@ -31,7 +33,7 @@ class Suggest_Controller extends Action_Controller
 	/**
 	 * Intended entry point for this class.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

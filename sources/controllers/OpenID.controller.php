@@ -15,11 +15,12 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * OpenID_Controller Class.
  * Controls openID verification process
  */
-class OpenID_Controller extends Action_Controller
+class OpenID extends \ElkArte\AbstractController
 {
 	/**
 	 * Can't say, you see, its a secret
@@ -30,7 +31,7 @@ class OpenID_Controller extends Action_Controller
 	/**
 	 * Forward to the right action.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -143,7 +144,7 @@ class OpenID_Controller extends Action_Controller
 						$this->_req->post->{$id} = $value;
 				}
 
-				$controller = new Register_Controller(new Event_Manager());
+				$controller = new \ElkArte\controller\Register(new Event_Manager());
 				$controller->pre_dispatch();
 				$controller->do_register(true);
 				return null;

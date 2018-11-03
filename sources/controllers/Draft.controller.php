@@ -11,12 +11,16 @@
  *
  */
 
+namespace ElkArte\controller;
+
+use ElkArte\controller\Post;
+
 /**
  * Draft controller.
  * This class handles requests that allow for the saving,
  * retrieving, deleting and settings for the drafts functionality.
  */
-class Draft_Controller extends Post_Controller
+class Draft extends Post
 {
 	/**
 	 * The id of the member
@@ -40,7 +44,7 @@ class Draft_Controller extends Post_Controller
 	/**
 	 * Default method, just forwards, if we ever get here.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -50,8 +54,7 @@ class Draft_Controller extends Post_Controller
 
 	/**
 	 * @override
-	 * @todo implement the saving of drafts bypassing the Post_Controller
-	 */
+		 */
 	public function action_post()
 	{
 		$this->action_index();
@@ -59,8 +62,7 @@ class Draft_Controller extends Post_Controller
 
 	/**
 	 * @override
-	 * @todo implement the saving of drafts bypassing the Post_Controller
-	 */
+		 */
 	public function action_post2()
 	{
 		$this->action_index();
@@ -68,8 +70,7 @@ class Draft_Controller extends Post_Controller
 
 	/**
 	 * @override
-	 * @todo implement the saving of drafts bypassing the Post_Controller
-	 */
+		 */
 	public function action_save()
 	{
 		$this->action_index();

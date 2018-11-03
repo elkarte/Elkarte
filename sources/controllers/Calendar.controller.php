@@ -16,16 +16,17 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * Calendar_Controller class
  * Displays the calendar for the site and provides for its navigation
  */
-class Calendar_Controller extends Action_Controller
+class Calendar extends \ElkArte\AbstractController
 {
 	/**
 	 * Default action handler for requests on the calendar
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -249,8 +250,7 @@ class Calendar_Controller extends Action_Controller
 
 	/**
 	 * Takes care of the saving process.
-	 * Not yet used directly, but through Calendar_Controller::action_post
-	 */
+		 */
 	public function action_save()
 	{
 		global $modSettings, $user_info;
@@ -307,8 +307,7 @@ class Calendar_Controller extends Action_Controller
 	}
 
 	/**
-	 * Shortcut to instantiate the Post_Controller
-	 *
+		 *
 	 * What it does:
 	 *  - require_once modules of the controller (not addons because these are
 	 *    always all require'd by the dispatcher),
@@ -319,7 +318,7 @@ class Calendar_Controller extends Action_Controller
 	 */
 	protected function _returnToPost()
 	{
-		$controller = new Post_Controller(new Event_Manager());
+		$controller = new \ElkArte\controller\Post(new Event_Manager());
 		$hook = $controller->getHook();
 		$controller->pre_dispatch();
 		$function_name = 'action_post';

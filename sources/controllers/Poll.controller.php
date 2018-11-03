@@ -15,19 +15,20 @@
  *
  */
 
+namespace ElkArte\controller;
+
 use ElkArte\Errors\ErrorContext;
 
 /**
- * Poll_Controller Class
  * This receives requests for voting, locking, removing and editing polls.
  * Note that that posting polls is done in Post.controller.php.
  */
-class Poll_Controller extends Action_Controller
+class Poll extends \ElkArte\AbstractController
 {
 	/**
 	 * Forward to the right action.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

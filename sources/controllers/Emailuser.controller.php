@@ -16,13 +16,14 @@
  *
  */
 
+namespace ElkArte\controller;
+
 use ElkArte\Errors\ErrorContext;
 
 /**
- * Emailuser_Controller class.
  * Allows for sending topics via email
  */
-class Emailuser_Controller extends Action_Controller
+class Emailuser extends \ElkArte\AbstractController
 {
 	/**
 	 * This function initializes or sets up the necessary, for the other actions
@@ -41,7 +42,7 @@ class Emailuser_Controller extends Action_Controller
 	/**
 	 * Default action handler
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

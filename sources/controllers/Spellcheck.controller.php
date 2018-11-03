@@ -15,12 +15,13 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * Spellcheck_Controller Class
  *
  * Handles the initialization pspell and spellchecker processing
  */
-class Spellcheck_Controller extends Action_Controller
+class Spellcheck extends \ElkArte\AbstractController
 {
 	/**
 	 * Known words that pspell will not now

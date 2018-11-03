@@ -15,11 +15,12 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * Unread_Controller Class
  * Handles the finding of Unread posts and replies
  */
-class Unread_Controller extends Action_Controller
+class Unread extends \ElkArte\AbstractController
 {
 	/**
 	 * The board ids we are marking
@@ -156,7 +157,7 @@ class Unread_Controller extends Action_Controller
 	/**
 	 * Intended entry point for unread controller class.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

@@ -15,10 +15,11 @@
  *
  */
 
+namespace ElkArte\controller;
+
 use ElkArte\Errors\AttachmentErrorContext;
 
 /**
- * Attachment_Controller class.
  *
  * What it does:
  *
@@ -28,7 +29,7 @@ use ElkArte\Errors\AttachmentErrorContext;
  *
  * @package Attachments
  */
-class Attachment_Controller extends Action_Controller
+class Attachment extends \ElkArte\AbstractController
 {
 	/**
 	 * {@inheritdoc }

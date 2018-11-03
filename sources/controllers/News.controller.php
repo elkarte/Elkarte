@@ -13,13 +13,14 @@
  *
  * @version 2.0 dev
  *
- *
  */
+
+namespace ElkArte\controller;
 
 /**
  * News Controller class
  */
-class News_Controller extends Action_Controller
+class News extends \ElkArte\AbstractController
 {
 	/**
 	 * Holds news specific version board query for news feeds
@@ -49,7 +50,7 @@ class News_Controller extends Action_Controller
 	/**
 	 * Dispatcher. Forwards to the action to execute.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

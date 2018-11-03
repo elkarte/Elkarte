@@ -11,12 +11,13 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * MarkRead_Controller class
  * This class handles a part of the actions to mark boards, topics, or replies,
  * as read/unread.
  */
-class MarkRead_Controller extends Action_Controller
+class MarkRead extends \ElkArte\AbstractController
 {
 	/**
 	 * String used to redirect user to the correct boards when marking unread
@@ -35,7 +36,7 @@ class MarkRead_Controller extends Action_Controller
 	/**
 	 * This is the main function for markasread file if not using API
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

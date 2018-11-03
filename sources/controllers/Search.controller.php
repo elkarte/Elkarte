@@ -15,13 +15,14 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * Search_Controller class
  * Handle all of the searching for the site
  *
  * @package Search
  */
-class Search_Controller extends Action_Controller
+class Search extends \ElkArte\AbstractController
 {
 	/**
 	 * Holds the search object
@@ -81,7 +82,7 @@ class Search_Controller extends Action_Controller
 	 *
 	 * - The default action for no sub-action is... present the search screen
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

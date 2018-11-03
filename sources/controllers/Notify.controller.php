@@ -16,16 +16,17 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * Notify_Controller Class
  * Functions that turn on and off various member notifications
  */
-class Notify_Controller extends Action_Controller
+class Notify extends \ElkArte\AbstractController
 {
 	/**
 	 * Dispatch to the right action.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

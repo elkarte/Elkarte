@@ -11,18 +11,19 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * Emailpost_Controller class.
  * Handles items pertaining to posting or PM an item that was received by email
  *
  * @package Maillist
  */
-class Emailpost_Controller extends Action_Controller
+class Emailpost extends \ElkArte\AbstractController
 {
 	/**
 	 * Default entry point, it forwards to a worker method,
 	 * if we ever get here.
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

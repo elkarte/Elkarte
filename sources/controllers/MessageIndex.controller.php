@@ -16,23 +16,24 @@
  *
  */
 
+namespace ElkArte\controller;
+
 use ElkArte\sources\Frontpage_Interface;
 
 /**
- * MessageIndex_Controller class
  */
-class MessageIndex_Controller extends Action_Controller implements Frontpage_Interface
+class MessageIndex extends \ElkArte\AbstractController implements Frontpage_Interface
 {
 	/**
 	 * {@inheritdoc}
 	 */
 	public static function frontPageHook(&$default_action)
 	{
-		add_integration_function('integrate_menu_buttons', 'MessageIndex_Controller::addForumButton', '', false);
-		add_integration_function('integrate_current_action', 'MessageIndex_Controller::fixCurrentAction', '', false);
+		add_integration_function('integrate_menu_buttons', '\\ElkArte\\controller\\MessageIndex::addForumButton', '', false);
+		add_integration_function('integrate_current_action', '\\ElkArte\\controller\\MessageIndex::fixCurrentAction', '', false);
 
 		$default_action = array(
-			'controller' => 'MessageIndex_Controller',
+			'controller' => '\\ElkArte\\controller\\MessageIndex',
 			'function' => 'action_messageindex_fp'
 		);
 	}
@@ -47,7 +48,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 		theme()->addInlineJavascript('
 			$(\'#front_page\').on(\'change\', function() {
 				var $base = $(\'#message_index_frontpage\').parent();
-				if ($(this).val() == \'MessageIndex_Controller\')
+				if ($(this).val() == \'\\ElkArte\\controller\\MessageIndex\')
 				{
 					$base.fadeIn();
 					$base.prev().fadeIn();
@@ -104,7 +105,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 	/**
 	 * Dispatches forward to message index handler.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -578,7 +579,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 				if (empty($this->_req->post->topics) || count($this->_req->post->topics) < 2)
 					redirectexit($redirect_url);
 
-				$controller = new MergeTopics_Controller(new Event_Manager());
+				$controller = new \ElkArte\controller\MergeTopics(new Event_Manager());
 				$controller->pre_dispatch();
 				return $controller->action_mergeExecute($this->_req->post->topics);
 			}

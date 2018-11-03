@@ -11,13 +11,14 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * Xml_Controller Class
  *
  * Receives XMLhttp requests of various types such as
  * jump to, message and group icons, core features, drag and drop ordering
  */
-class Xml_Controller extends Action_Controller
+class Xml extends \ElkArte\AbstractController
 {
 	/**
 	 * {@inheritdoc }
@@ -30,7 +31,7 @@ class Xml_Controller extends Action_Controller
 	/**
 	 * Main dispatcher for action=xmlhttp.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -160,7 +161,7 @@ class Xml_Controller extends Action_Controller
 		$validation = validateSession();
 		if ($validation === true)
 		{
-			$controller = new CoreFeatures_Controller(new Event_Manager());
+			$controller = new \ElkArte\admin\CoreFeatures(new Event_Manager());
 			$controller->pre_dispatch();
 			$result = $controller->action_index();
 

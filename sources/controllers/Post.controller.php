@@ -17,13 +17,14 @@
  *
  */
 
+namespace ElkArte\controller;
+
 use ElkArte\Errors\ErrorContext;
 
 /**
- * Post_Controller Class
  * Everything related to posting new replies and topics and modifications of them
  */
-class Post_Controller extends Action_Controller
+class Post extends \ElkArte\AbstractController
 {
 	/** @var null|ErrorContext The post (messages) errors object */
 	protected $_post_errors = null;
@@ -61,7 +62,7 @@ class Post_Controller extends Action_Controller
 	/**
 	 * Dispatch to the right action method for the request.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

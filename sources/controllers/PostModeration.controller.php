@@ -15,11 +15,12 @@
  *
  */
 
+namespace ElkArte\controller;
+
 /**
- * PostModeration_Controller Class
  * Handles post moderation actions. (approvals, unapproved)
  */
-class PostModeration_Controller extends Action_Controller
+class PostModeration extends \ElkArte\AbstractController
 {
 	/**
 	 * Holds any passed brd values, used for filtering and the like
@@ -32,7 +33,7 @@ class PostModeration_Controller extends Action_Controller
 	 *
 	 * @uses ModerationCenter.template
 	 * @uses ModerationCenter language file
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{

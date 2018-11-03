@@ -17,15 +17,16 @@
  *
  */
 
+namespace ElkArte\controller;
+
 use ElkArte\Errors\ErrorContext;
 
 /**
- * PersonalMessage_Controller class
  * It allows viewing, sending, deleting, and marking personal messages
  *
  * @package PersonalMessage
  */
-class PersonalMessage_Controller extends Action_Controller
+class PersonalMessage extends \ElkArte\AbstractController
 {
 	/**
 	 * $_search_params will carry all settings that differ from the default
@@ -188,7 +189,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 * - It sets up the menu.
 	 * - Calls from the menu the appropriate method/function for the current area.
 	 *
-	 * @see Action_Controller::action_index()
+	 * @see \ElkArte\AbstractController::action_index()
 	 */
 	public function action_index()
 	{
@@ -1830,7 +1831,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			// Save the fields.
 			require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
-			$fields = ProfileOptions_Controller::getFields('contactprefs');
+			$fields = \ElkArte\controller\ProfileOptions::getFields('contactprefs');
 			saveProfileFields($fields['fields'], $fields['hook']);
 
 			if (!empty($profile_vars))
@@ -1846,7 +1847,7 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// Load up the fields.
-		$controller = new ProfileOptions_Controller(new Event_Manager());
+		$controller = new \ElkArte\controller\ProfileOptions(new Event_Manager());
 		$controller->pre_dispatch();
 		$controller->action_pmprefs();
 	}
