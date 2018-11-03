@@ -44,7 +44,7 @@ class Drafts_Admin_Module extends ElkArte\sources\modules\Abstract_Module
 
 		$admin_areas['layout']['areas']['managedrafts'] = array(
 			'label' => $txt['manage_drafts'],
-			'controller' => 'ManageDraftsModule_Controller',
+			'controller' => '\\ElkArte\\admin\\ManageDraftsModule',
 			'function' => 'action_index',
 			'icon' => 'transparent.png',
 			'class' => 'admin_img_logs',
@@ -64,6 +64,6 @@ class Drafts_Admin_Module extends ElkArte\sources\modules\Abstract_Module
 	{
 		$language_files[] = 'Drafts';
 		$include_files[] = 'ManageDraftsModule.controller';
-		$settings_search[] = array('settings_search', 'area=managedrafts', 'ManageDraftsModule_Controller');
+		$settings_search[] = array('settings_search', 'area=managedrafts', '\\ElkArte\\admin\\ManageDraftsModule');
 	}
 }

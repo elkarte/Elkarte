@@ -375,7 +375,7 @@ function callMenu($selectedMenu)
 
 	if (!empty($selectedMenu['controller']))
 	{
-		// 'controller' => 'ManageAttachments_Controller'
+		// 'controller' => '\ElkArte\admin\ManageAttachments'
 		// 'function' => 'action_avatars'
 		$controller = new $selectedMenu['controller'](new Event_Manager());
 

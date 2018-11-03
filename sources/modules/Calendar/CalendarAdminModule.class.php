@@ -45,7 +45,7 @@ class Calendar_Admin_Module extends ElkArte\sources\modules\Abstract_Module
 
 		$admin_areas['layout']['areas']['managecalendar'] = array(
 			'label' => $txt['manage_calendar'],
-			'controller' => 'ManageCalendarModule_Controller',
+			'controller' => '\\ElkArte\\admin\\ManageCalendarModule',
 			'function' => 'action_index',
 			'icon' => 'transparent.png',
 			'class' => 'admin_img_calendar',
@@ -69,6 +69,6 @@ class Calendar_Admin_Module extends ElkArte\sources\modules\Abstract_Module
 	{
 		$language_files[] = 'ManageCalendar';
 		$include_files[] = 'ManageCalendarModule.controller';
-		$settings_search[] = array('settings_search', 'area=managecalendar;sa=settings', 'ManageCalendarModule_Controller');
+		$settings_search[] = array('settings_search', 'area=managecalendar;sa=settings', '\\ElkArte\\admin\\ManageCalendarModule');
 	}
 }

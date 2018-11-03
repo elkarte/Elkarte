@@ -851,21 +851,20 @@ function scanFileSystemForControllers($iterator, $namespace = '')
 
 	foreach ($iterator as $file)
 	{
-		$class_name = $namespace . preg_replace('~([^^])((?<=)[A-Z](?=[a-z]))~', '$1_$2', $file->getBasename('.controller.php')) . '_Controller';
+		$class_name = $namespace . $file->getBasename('.php');
 
 		if (!class_exists($class_name))
 		{
-			$class_name = $file->getBasename('.controller.php') . '_Controller';
-
-			if (!class_exists($class_name))
-				continue;
+			continue;
 		}
 
-		if (is_subclass_of($class_name, 'Action_Controller') && $class_name::canFrontPage())
+		if (is_subclass_of($class_name, '\\ElkArte\\AbstractController') && $class_name::canFrontPage())
 		{
 			// Temporary
 			if (!isset($txt[$class_name]))
+			{
 				continue;
+			}
 
 			$types[$class_name] = $txt[$class_name];
 		}

@@ -325,7 +325,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 					$data = $temp_email[0]['body'];
 
 					// Read/parse this message for viewing
-					$controller = new Emailpost_Controller(new Event_manager());
+					$controller = new \ElkArte\controller\Emailpost(new Event_manager());
 					$result = $controller->action_pbe_preview($data);
 					$text = isset($result['body']) ? $result['body'] : '';
 					$email_to = isset($result['to']) ? $result['to'] : '';
@@ -430,8 +430,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 					}
 
 					// Lets TRY AGAIN to make a post!
-					include_once(CONTROLLERDIR . '/Emailpost.controller.php');
-					$controller = new Emailpost_Controller(new Event_manager());
+					$controller = new \ElkArte\controller\Emailpost(new Event_manager());
 					$text = $controller->action_pbe_post($data, $force, $key);
 
 					// Assuming all went well, remove this entry and file since we are done.

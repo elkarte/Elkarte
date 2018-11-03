@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file contains the integration of mentions into Display_Controller.
+ * This file contains the integration of mentions into \ElkArte\controller\Display.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors

@@ -123,7 +123,7 @@ class Drafts_PersonalMessage_Module extends ElkArte\sources\modules\Abstract_Mod
 	public static function integrate_sa_pm_index(&$subActions)
 	{
 		$subActions['showpmdrafts'] = array(
-			'controller' => 'Draft_Controller',
+			'controller' => '\\ElkArte\\controller\\Draft',
 			'function' => 'action_showPMDrafts',
 			'permission' => 'pm_read'
 		);

@@ -24,7 +24,7 @@ use \ElkArte\ValuesContainer;
 /**
  * SearchRenderer
  *
- * Used by the Search_Controller to prepare the search results.
+ * Used by the \ElkArte\controller\Search to prepare the search results.
  */
 class SearchRenderer extends Renderer
 {

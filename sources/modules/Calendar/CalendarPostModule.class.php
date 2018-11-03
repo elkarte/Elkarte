@@ -154,7 +154,7 @@ class Calendar_Post_Module extends ElkArte\sources\modules\Abstract_Module
 			// If the user doesn't have permission to edit the post in this topic, redirect them.
 			if ((empty($id_member_poster) || $id_member_poster != $user_info['id'] || !allowedTo('modify_own')) && !allowedTo('modify_any'))
 			{
-				throw new Controller_Redirect_Exception('Calendar_Controller', 'action_post');
+				throw new Controller_Redirect_Exception('\\ElkArte\\controller\\Calendar', 'action_post');
 			}
 		}
 

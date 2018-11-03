@@ -26,7 +26,7 @@ class Controller_Redirect_Exception extends Exception
 	 * Redefine the initialization.
 	 * Do note that parent::__construct() is not called.
 	 *
-	 * @param string $controller Is the name of controller (lowercase and without "_Controller",
+	 * @param string $controller Is the name of controller (lowercase and with namespace,
 	 *                 for example 'post', or 'calendar') that should be instantiated
 	 * @param string $method The method to call.
 	 */
@@ -46,7 +46,7 @@ class Controller_Redirect_Exception extends Exception
 	 */
 	public function doRedirect($source)
 	{
-		if (get_class($source) === $this->_controller)
+		if (ltrim(get_class($source), '\\') === ltrim($this->_controller, '\\'))
 		{
 			return $source->{$this->_method}();
 		}

@@ -18,7 +18,7 @@
 /**
  * Recent Post Class, retrieve information about recent posts
  *
- * This is used by Recent_Controller to retrieve the data
+ * This is used by \ElkArte\controller\Recent to retrieve the data
  * from the db, in particular by action_recent
  */
 class Recent_Class

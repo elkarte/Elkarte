@@ -52,7 +52,7 @@ class Drafts_Profile_Module extends ElkArte\sources\modules\Abstract_Module
 		$profile_areas['info']['areas'] = elk_array_insert($profile_areas['info']['areas'], 'showposts', array(
 			'showdrafts' => array(
 				'label' => $txt['drafts_show'],
-				'controller' => 'Draft_Controller',
+				'controller' => '\\ElkArte\\controller\\Draft',
 				'function' => 'action_showProfileDrafts',
 				'enabled' => $context['user']['is_owner'],
 				'permission' => array(

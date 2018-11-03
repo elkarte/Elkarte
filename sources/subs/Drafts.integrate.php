@@ -36,11 +36,11 @@ class Drafts_Integrate
 	{
 		// $hook, $function, $file
 		return array(
-			array('integrate_load_permissions', 'ManageDraftsModule_Controller::integrate_load_permissions'),
-			array('integrate_topics_maintenance', 'ManageDraftsModule_Controller::integrate_topics_maintenance'),
-			array('integrate_sa_manage_maintenance', 'ManageDraftsModule_Controller::integrate_sa_manage_maintenance'),
-			array('integrate_delete_members', 'ManageDraftsModule_Controller::integrate_delete_members'),
-			array('integrate_load_illegal_guest_permissions', 'ManageDraftsModule_Controller::integrate_load_illegal_guest_permissions'),
+			array('integrate_load_permissions', '\\ElkArte\\admin\\ManageDraftsModule::integrate_load_permissions'),
+			array('integrate_topics_maintenance', '\\ElkArte\\admin\\ManageDraftsModule::integrate_topics_maintenance'),
+			array('integrate_sa_manage_maintenance', '\\ElkArte\\admin\\ManageDraftsModule::integrate_sa_manage_maintenance'),
+			array('integrate_delete_members', '\\ElkArte\\admin\\ManageDraftsModule::integrate_delete_members'),
+			array('integrate_load_illegal_guest_permissions', '\\ElkArte\\admin\\ManageDraftsModule::integrate_load_illegal_guest_permissions'),
 		);
 	}
 }

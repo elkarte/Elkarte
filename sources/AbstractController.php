@@ -40,12 +40,7 @@ abstract class AbstractController
 	protected $_req;
 
 	/**
-	 * Constructor...
-	 *
-	 * Requires the name of the controller we want to instantiate, lowercase and
-	 * without the "_Controller" part.
-	 *
-	 * @param Event_Manager $eventManager - The event manager
+	 * @param Event_Manager $eventManager
 	 */
 	public function __construct($eventManager)
 	{
@@ -161,7 +156,7 @@ abstract class AbstractController
 	/**
 	 * Initialize the event manager for the controller
 	 *
-	 * Uses the XXX_Controller name to define the set of event hooks to load
+	 * Uses the \ElkArte\controller\XXX name to define the set of event hooks to load
 	 */
 	protected function _initEventManager()
 	{
@@ -182,7 +177,7 @@ abstract class AbstractController
 		if ($this->_hook === '')
 		{
 			// Use the base controller name for the hook, ie post
-			$this->_hook = str_replace('_Controller', '', get_class($this));
+			$this->_hook = str_replace('ElkArte\\controller\\', '', trim(get_class($this), '\\'));
 
 			// Initialize the events associated with this controller
 			$this->_initEventManager();
@@ -197,7 +192,7 @@ abstract class AbstractController
 	public function getModuleClass()
 	{
 		// Use the base controller name for the hook, ie post
-		$module_class = str_replace('_Controller', '', get_class($this));
+		$module_class = str_replace('ElkArte\\controller\\', '', trim(get_class($this), '\\'));
 
 		return ucfirst($module_class);
 	}
@@ -210,7 +205,7 @@ abstract class AbstractController
 	 * - Uses the controllers generic hook name to find modules
 	 * - Searches for modules registered against the module name
 	 * - Example
-	 *   - Display_Controller results in searching for modules registered against modules_display
+	 *   - \ElkArte\controller\Display results in searching for modules registered against modules_display
 	 *   - $modSettings['modules_display'] returns drafts,calendar,.....
 	 *   - Verifies classes Drafts_Display_Module, Calendar_Display_Module, ... exist
 	 *

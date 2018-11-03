@@ -51,7 +51,7 @@ class Site_Dispatcher
 	 * @var string[]
 	 */
 	protected $_default_action = array(
-		'controller' => 'BoardIndex_Controller',
+		'controller' => '\\ElkArte\\controller\\BoardIndex',
 		'function' => 'action_boardindex'
 	);
 
@@ -82,49 +82,49 @@ class Site_Dispatcher
 	 * @var string[]
 	 */
 	protected $actionArray = array(
-		'attachapprove' => array('ModerateAttachments_Controller', 'action_attachapprove'),
-		'buddy' => array('Members_Controller', 'action_buddy'),
-		'collapse' => array('BoardIndex_Controller', 'action_collapse'),
-		'deletemsg' => array('RemoveTopic_Controller', 'action_deletemsg'),
-		'dlattach' => array('Attachment_Controller', 'action_index'),
-		'unwatchtopic' => array('Notify_Controller', 'action_unwatchtopic'),
-		'editpoll' => array('Poll_Controller', 'action_editpoll'),
-		'editpoll2' => array('Poll_Controller', 'action_editpoll2'),
-		'forum' => array('BoardIndex_Controller', 'action_index'),
-		'quickhelp' => array('Help_Controller', 'action_quickhelp'),
-		'jsmodify' => array('Post_Controller', 'action_jsmodify'),
-		'jsoption' => array('ManageThemes_Controller', 'action_jsoption'),
-		'keepalive' => array('Auth_Controller', 'action_keepalive'),
-		'lockvoting' => array('Poll_Controller', 'action_lockvoting'),
-		'login' => array('Auth_Controller', 'action_login'),
-		'login2' => array('Auth_Controller', 'action_login2'),
-		'logout' => array('Auth_Controller', 'action_logout'),
-		'markasread' => array('MarkRead_Controller', 'action_index'),
-		'mergetopics' => array('MergeTopics_Controller', 'action_index'),
-		'moderate' => array('ModerationCenter_Controller', 'action_index'),
-		'movetopic' => array('MoveTopic_Controller', 'action_movetopic'),
-		'movetopic2' => array('MoveTopic_Controller', 'action_movetopic2'),
-		'notify' => array('Notify_Controller', 'action_notify'),
-		'notifyboard' => array('Notify_Controller', 'action_notifyboard'),
-		'openidreturn' => array('OpenID_Controller', 'action_openidreturn'),
-		'xrds' => array('OpenID_Controller', 'action_xrds'),
-		'pm' => array('PersonalMessage_Controller', 'action_index'),
-		'post2' => array('Post_Controller', 'action_post2'),
-		'quotefast' => array('Post_Controller', 'action_quotefast'),
-		'quickmod' => array('MessageIndex_Controller', 'action_quickmod'),
-		'quickmod2' => array('Display_Controller', 'action_quickmod2'),
-		'removetopic2' => array('RemoveTopic_Controller', 'action_removetopic2'),
-		'reporttm' => array('Emailuser_Controller', 'action_reporttm'),
-		'restoretopic' => array('RemoveTopic_Controller', 'action_restoretopic'),
-		'splittopics' => array('SplitTopics_Controller', 'action_splittopics'),
-		'theme' => array('ManageThemes_Controller', 'action_thememain'),
-		'trackip' => array('ProfileHistory_Controller', 'action_trackip'),
-		'unreadreplies' => array('Unread_Controller', 'action_unreadreplies'),
-		'viewprofile' => array('Profile_Controller', 'action_index'),
-		'viewquery' => array('AdminDebug_Controller', 'action_viewquery'),
-		'.xml' => array('News_Controller', 'action_showfeed'),
-		'xmlhttp' => array('Xml_Controller', 'action_index'),
-		'xmlpreview' => array('XmlPreview_Controller', 'action_index'),
+		'attachapprove' => array('\\ElkArte\\controller\\ModerateAttachments', 'action_attachapprove'),
+		'buddy' => array('\\ElkArte\\controller\\Members', 'action_buddy'),
+		'collapse' => array('\\ElkArte\\controller\\BoardIndex', 'action_collapse'),
+		'deletemsg' => array('\\ElkArte\\controller\\RemoveTopic', 'action_deletemsg'),
+		'dlattach' => array('\\ElkArte\\controller\\Attachment', 'action_index'),
+		'unwatchtopic' => array('\\ElkArte\\controller\\Notify', 'action_unwatchtopic'),
+		'editpoll' => array('\\ElkArte\\controller\\Poll', 'action_editpoll'),
+		'editpoll2' => array('\\ElkArte\\controller\\Poll', 'action_editpoll2'),
+		'forum' => array('\\ElkArte\\controller\\BoardIndex', 'action_index'),
+		'quickhelp' => array('\\ElkArte\\controller\\Help', 'action_quickhelp'),
+		'jsmodify' => array('\\ElkArte\\controller\\Post', 'action_jsmodify'),
+		'jsoption' => array('\\ElkArte\\admin\\ManageThemes', 'action_jsoption'),
+		'keepalive' => array('\\ElkArte\\controller\\Auth', 'action_keepalive'),
+		'lockvoting' => array('\\ElkArte\\controller\\Poll', 'action_lockvoting'),
+		'login' => array('\\ElkArte\\controller\\Auth', 'action_login'),
+		'login2' => array('\\ElkArte\\controller\\Auth', 'action_login2'),
+		'logout' => array('\\ElkArte\\controller\\Auth', 'action_logout'),
+		'markasread' => array('\\ElkArte\\controller\\MarkRead', 'action_index'),
+		'mergetopics' => array('\\ElkArte\\controller\\MergeTopics', 'action_index'),
+		'moderate' => array('\\ElkArte\\controller\\ModerationCenter', 'action_index'),
+		'movetopic' => array('\\ElkArte\\controller\\MoveTopic', 'action_movetopic'),
+		'movetopic2' => array('\\ElkArte\\controller\\MoveTopic', 'action_movetopic2'),
+		'notify' => array('\\ElkArte\\controller\\Notify', 'action_notify'),
+		'notifyboard' => array('\\ElkArte\\controller\\Notify', 'action_notifyboard'),
+		'openidreturn' => array('\\ElkArte\\controller\\OpenID', 'action_openidreturn'),
+		'xrds' => array('\\ElkArte\\controller\\OpenID', 'action_xrds'),
+		'pm' => array('\\ElkArte\\controller\\PersonalMessage', 'action_index'),
+		'post2' => array('\\ElkArte\\controller\\Post', 'action_post2'),
+		'quotefast' => array('\\ElkArte\\controller\\Post', 'action_quotefast'),
+		'quickmod' => array('\\ElkArte\\controller\\MessageIndex', 'action_quickmod'),
+		'quickmod2' => array('\\ElkArte\\controller\\Display', 'action_quickmod2'),
+		'removetopic2' => array('\\ElkArte\\controller\\RemoveTopic', 'action_removetopic2'),
+		'reporttm' => array('\\ElkArte\\controller\\Emailuser', 'action_reporttm'),
+		'restoretopic' => array('\\ElkArte\\controller\\RemoveTopic', 'action_restoretopic'),
+		'splittopics' => array('\\ElkArte\\controller\\SplitTopics', 'action_splittopics'),
+		'theme' => array('\\ElkArte\\admin\\ManageThemes', 'action_thememain'),
+		'trackip' => array('\\ElkArte\\controller\\ProfileHistory', 'action_trackip'),
+		'unreadreplies' => array('\\ElkArte\\controller\\Unread', 'action_unreadreplies'),
+		'viewprofile' => array('\\ElkArte\\controller\\Profile', 'action_index'),
+		'viewquery' => array('\\ElkArte\\admin\\AdminDebug', 'action_viewquery'),
+		'.xml' => array('\\ElkArte\\controller\\News', 'action_showfeed'),
+		'xmlhttp' => array('\\ElkArte\\controller\\Xml', 'action_index'),
+		'xmlpreview' => array('\\ElkArte\\controller\\XmlPreview', 'action_index'),
 	);
 
 	/**
@@ -217,13 +217,13 @@ class Site_Dispatcher
 			// ?board=b message index
 			elseif (empty($topic))
 			{
-				$this->_controller_name = 'MessageIndex_Controller';
+				$this->_controller_name = '\\ElkArte\\controller\\MessageIndex';
 				$this->_function_name = 'action_messageindex';
 			}
 			// board=b;topic=t topic display
 			else
 			{
-				$this->_controller_name = 'Display_Controller';
+				$this->_controller_name = '\\ElkArte\\controller\\Display';
 				$this->_function_name = 'action_display';
 			}
 		}
@@ -263,7 +263,7 @@ class Site_Dispatcher
 		{
 			// action=gallery => Gallery.controller.php
 			// sa=upload => action_upload()
-			$this->_controller_name = ucfirst($this->action) . '_Controller';
+			$this->_controller_name = '\\ElkArte\\controller\\' . ucfirst($this->action);
 			if (isset($this->subAction) && preg_match('~^\w+$~', $this->subAction) && empty($this->area))
 				$this->_function_name = 'action_' . $this->subAction;
 			else
@@ -304,11 +304,11 @@ class Site_Dispatcher
 	 * What it does:
 	 *
 	 * - Calls generic pre (_before) hook based on the controllers class name.
-	 *   - e.g. integrate_action_draft_before will be called before Draft_Controller
+	 *   - e.g. integrate_action_draft_before will be called before \ElkArte\controller\Draft
 	 * - Calls the controllers pre_dispatch method
 	 * - Calls the controllers selected method
 	 * - Calls generic post (_after) hook based on the controllers class name.
-	 *   - e.g. integrate_action_draft_after will be called after Draft_Controller
+	 *   - e.g. integrate_action_draft_after will be called after \ElkArte\controller\Draft
 	 *
 	 * @event integrate_action_xyz_before
 	 * @event integrate_action_xyz_after
@@ -352,13 +352,13 @@ class Site_Dispatcher
 			// You can only login
 			if ($this->action == 'login2' || $this->action == 'logout')
 			{
-				$this->_controller_name = 'Auth_Controller';
+				$this->_controller_name = '\\ElkArte\\controller\\Auth';
 				$this->_function_name = 'action_' . $this->action;
 			}
 			// "maintenance mode" page
 			else
 			{
-				$this->_controller_name = 'Auth_Controller';
+				$this->_controller_name = '\\ElkArte\\controller\\Auth';
 				$this->_function_name = 'action_maintenance_mode';
 			}
 
@@ -368,7 +368,7 @@ class Site_Dispatcher
 		// If guest access is disallowed, a guest is kicked out... politely. :P
 		elseif ($this->restrictedGuestAccess())
 		{
-			$this->_controller_name = 'Auth_Controller';
+			$this->_controller_name = '\\ElkArte\\controller\\Auth';
 			$this->_function_name = 'action_kickguest';
 
 			// re-initialize... you got the drift
@@ -403,7 +403,7 @@ class Site_Dispatcher
 	{
 		if (!empty($this->_controller_name))
 		{
-			$action = strtolower(str_replace('_Controller', '', $this->_controller_name));
+			$action = strtolower(str_replace('ElkArte\\controller\\', '', trim($this->_controller_name, '\\')));
 			$action = substr($action, -1) == 2 ? substr($action, 0, -1) : $action;
 		}
 

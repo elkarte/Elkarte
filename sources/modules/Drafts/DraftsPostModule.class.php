@@ -241,7 +241,7 @@ class Drafts_Post_Module extends ElkArte\sources\modules\Abstract_Module
 					obExit();
 				}
 
-				throw new Controller_Redirect_Exception('Post_Controller', 'action_post');
+				throw new Controller_Redirect_Exception('\\ElkArte\\controller\\Post', 'action_post');
 			}
 		}
 	}
