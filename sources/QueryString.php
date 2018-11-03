@@ -31,11 +31,11 @@
  */
 function cleanRequest()
 {
-	require_once(SOURCEDIR . '/Request.php');
+// 	require_once(SOURCEDIR . '/Request.php');
 	Elk_Autoloader::instance()->register(SUBSDIR . '/UrlGenerator', '\\ElkArte\\UrlGenerator');
 
 	// Make sure REMOTE_ADDR, other IPs, and the like are parsed
-	$req = Request::instance();
+	$req = \ElkArte\Request::instance();
 
 	$parser = initUrlGenerator()->getParser();
 

@@ -11,6 +11,7 @@
  * @version 2.0 dev
  *
  */
+namespace ElkArte;
 
 /**
  * Class Token_Hash

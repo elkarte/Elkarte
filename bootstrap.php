@@ -15,6 +15,10 @@
  *
  */
 
+use ElkArte\Errors;
+use ElkArte\Debug;
+use ElkArte\Hooks;
+
 /**
  * Class Bootstrap
  *
@@ -350,7 +354,7 @@ class Bootstrap
 
 			if (!isset($_SESSION['session_value']))
 			{
-				$tokenizer = new Token_Hash();
+				$tokenizer = new \ElkArte\Token_Hash();
 				$_SESSION['session_value'] = $tokenizer->generate_hash(32, session_id());
 				$_SESSION['session_var'] = substr(preg_replace('~^\d+~', '', $tokenizer->generate_hash(16, session_id())), 0, rand(7, 12));
 			}
@@ -375,7 +379,7 @@ class Bootstrap
 		loadPermissions();
 
 		// Load the current or SSI theme. (just use $ssi_theme = id_theme;)
-		new ElkArte\Themes\ThemeLoader(isset($ssi_theme) ? (int) $ssi_theme : 0);
+		new \ElkArte\Themes\ThemeLoader(isset($ssi_theme) ? (int) $ssi_theme : 0);
 
 		// Load BadBehavior functions
 		loadBadBehavior();
@@ -395,7 +399,7 @@ class Bootstrap
 		// Do we allow guests in here?
 		if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && basename($_SERVER['PHP_SELF']) !== 'SSI.php')
 		{
-			$controller = new Auth_Controller(new Event_manager());
+			$controller = new \ElkArte\controller\Auth(new Event_manager());
 			$controller->action_kickguest();
 			obExit(null, true);
 		}
@@ -412,7 +416,7 @@ class Bootstrap
 		// Load the stuff like the menu bar, etc.
 		if (isset($ssi_layers))
 		{
-			$template_layers = Template_Layers::instance();
+			$template_layers = theme()->getLayers();
 			$template_layers->removeAll();
 			foreach ($ssi_layers as $layer)
 			{
