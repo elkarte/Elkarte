@@ -132,7 +132,7 @@ class ManageErrors_Controller extends Action_Controller
 		$context['error_types']['all'] = array(
 			'label' => $txt['errortype_all'],
 			'description' => isset($txt['errortype_all_desc']) ? $txt['errortype_all_desc'] : '',
-			'url' => $scripturl . '?action=admin;area=logs;sa=errorlog' . ($context['sort_direction'] == 'down' ? ';desc' : ''),
+			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog', $context['sort_direction'] == 'down' ? 'desc' : '']),
 			'is_selected' => empty($filter),
 		);
 
@@ -172,7 +172,7 @@ class ManageErrors_Controller extends Action_Controller
 				case 'id_member':
 					$id = $filter['value']['sql'];
 					loadMemberData($id, false, 'minimal');
-					$context['filter']['value']['html'] = '<a href="' . $scripturl . '?action=profile;u=' . $id . '">' . $user_profile[$id]['real_name'] . '</a>';
+					$context['filter']['value']['html'] = '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $id,  'name' => $user_profile[$id]['real_name']]) . '">' . $user_profile[$id]['real_name'] . '</a>';
 					break;
 				case 'url':
 					$context['filter']['value']['html'] = '\'' . strtr(htmlspecialchars((substr($filter['value']['sql'], 0, 1) == '?' ? $scripturl : '') . $filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array('\_' => '_')) . '\'';
@@ -197,7 +197,7 @@ class ManageErrors_Controller extends Action_Controller
 	 */
 	private function _loadMemData($members)
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		// Load the member data.
 		if (!empty($members))
@@ -211,8 +211,8 @@ class ManageErrors_Controller extends Action_Controller
 				$memID = $context['errors'][$id]['member']['id'];
 				$context['errors'][$id]['member']['username'] = $members[$memID]['member_name'];
 				$context['errors'][$id]['member']['name'] = $members[$memID]['real_name'];
-				$context['errors'][$id]['member']['href'] = empty($memID) ? '' : $scripturl . '?action=profile;u=' . $memID;
-				$context['errors'][$id]['member']['link'] = empty($memID) ? $txt['guest_title'] : '<a href="' . $scripturl . '?action=profile;u=' . $memID . '">' . $context['errors'][$id]['member']['name'] . '</a>';
+				$context['errors'][$id]['member']['href'] = empty($memID) ? '' : $getUrl('profile', ['action' => 'profile', 'u' => $memID,  'name' => $members[$memID]['real_name']]);
+				$context['errors'][$id]['member']['link'] = empty($memID) ? $txt['guest_title'] : '<a href="' . $context['errors'][$id]['member']['href'] . '">' . $context['errors'][$id]['member']['name'] . '</a>';
 			}
 		}
 	}
@@ -275,49 +275,35 @@ class ManageErrors_Controller extends Action_Controller
 	{
 		global $context;
 
-		// We can't help you if you don't spell it out loud :P
-		if (!isset($this->_req->query->file))
-			redirectexit();
+		$error_details = $this->errorLog->getErrorLogData(
+			0,
+			'down',
+			[
+				'variable' => 'id_error',
+				'value' => [
+					'sql' => $this->_req->query->err,
+				],
+			]
+		)['errors'][$this->_req->query->err]['file'];
 
-		// Decode the file and get the line
-		$filename = base64_decode($this->_req->query->file);
-		$file = realpath($filename);
-		$line = $this->_req->getQuery('line', 'intval', 0);
-
-		// Make sure things are normalized
-		$real_board = realpath(BOARDDIR);
-		$real_source = realpath(SOURCEDIR);
-		$real_cache = realpath(CACHEDIR);
-
-		// Make sure the file requested is one they are allowed to look at
-		$excluded = array('settings.php', 'settings_bak.php');
-		$basename = strtolower(basename($file));
-		$ext = strrchr($basename, '.');
-
-		// Not like we can look at just any old file
-		if ($ext !== '.php' || (strpos($file, $real_board) === false && strpos($file, $real_source) === false) || strpos($file, $real_cache) !== false || in_array($basename, $excluded) || !is_readable($file))
-			throw new Elk_Exception('error_bad_file', true, array(htmlspecialchars($filename, ENT_COMPAT, 'UTF-8')));
-
-		// Get the min and max lines
-		$min = $line - 16 <= 0 ? 1 : $line - 16;
-		$max = $line + 21; // One additional line to make everything work out correctly
-
-		if ($max <= 0 || $min >= $max)
-			throw new Elk_Exception('error_bad_line');
-
-		$file_data = explode('<br />', highlight_php_code(htmlspecialchars(implode('', file($file)), ENT_COMPAT, 'UTF-8')));
-
-		// We don't want to slice off too many so lets make sure we stop at the last one
-		$max = min($max, max(array_keys($file_data)));
-
-		$file_data = array_slice($file_data, $min - 1, $max - $min);
-
-		$context['file_data'] = array(
-			'contents' => $file_data,
-			'min' => $min,
-			'target' => $line,
-			'file' => strtr($file, array('"' => '\\"')),
+		$data = iterator_to_array(
+			theme()->getTemplates()->getHighlightedLinesFromFile(
+				$error_details['file'],
+				max($error_details['line'] - 16 - 9, 1),
+				min($error_details['line'] + 21, count(file($error_details['file'])) + 1)
+			)
 		);
+
+		// Mark the offending line.
+		$data[$error_details['line']] = sprintf(
+			'<div class="curline">%s</div>',
+			$data[$error_details['line']]
+		);
+
+		$context['file_data'] = [
+			'contents' => $data,
+			'file' => strtr($error_details['file'], ['"' => '\\"']),
+		];
 
 		theme()->getTemplates()->load('Errors');
 		theme()->getLayers()->removeAll();

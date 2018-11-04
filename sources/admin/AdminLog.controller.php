@@ -32,7 +32,7 @@ class AdminLog_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		global $context, $txt, $scripturl, $modSettings;
+		global $context, $txt, $modSettings;
 
 		// These are the logs they can load.
 		$subActions = array(
@@ -71,7 +71,7 @@ class AdminLog_Controller extends Action_Controller
 			'description' => $txt['maintain_info'],
 			'tabs' => array(
 				'errorlog' => array(
-					'url' => $scripturl . '?action=admin;area=logs;sa=errorlog;desc',
+					'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'errorlog', 'desc']),
 					'description' => sprintf($txt['errlog_desc'], $txt['remove']),
 				),
 				'adminlog' => array(
@@ -122,7 +122,7 @@ class AdminLog_Controller extends Action_Controller
 	 */
 	public function action_pruningSettings_display()
 	{
-		global $txt, $scripturl, $context, $modSettings;
+		global $txt, $context, $modSettings;
 
 		// Make sure we understand what's going on.
 		theme()->getTemplates()->loadLanguageFile('ManageSettings');
@@ -167,7 +167,7 @@ class AdminLog_Controller extends Action_Controller
 			redirectexit('action=admin;area=logs;sa=pruning');
 		}
 
-		$context['post_url'] = $scripturl . '?action=admin;area=logs;save;sa=pruning';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'pruning', 'save']);
 		$context['settings_title'] = $txt['pruning_title'];
 		$context['sub_template'] = 'show_settings';
 

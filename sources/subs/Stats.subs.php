@@ -121,7 +121,7 @@ function mostOnline($date)
  */
 function topPosters($limit = null)
 {
-	global $scripturl, $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -148,13 +148,14 @@ function topPosters($limit = null)
 	$max_num_posts = 1;
 	while ($row_members = $db->fetch_assoc($members_result))
 	{
+		$href = getUrl('profile', ['action' => 'profile', 'u' => $row_members['id_member'], 'name' => $row_members['real_name']]);
 		// Build general member information for each top poster
 		$top_posters[] = array(
 			'name' => $row_members['real_name'],
 			'id' => $row_members['id_member'],
 			'num_posts' => $row_members['posts'],
-			'href' => $scripturl . '?action=profile;u=' . $row_members['id_member'],
-			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row_members['id_member'] . '">' . $row_members['real_name'] . '</a>'
+			'href' => $href,
+			'link' => '<a href="' . $href . '">' . $row_members['real_name'] . '</a>'
 		);
 		if ($max_num_posts < $row_members['posts'])
 			$max_num_posts = $row_members['posts'];
@@ -182,7 +183,7 @@ function topPosters($limit = null)
  */
 function topBoards($limit = null, $read_status = false)
 {
-	global $modSettings, $scripturl, $user_info;
+	global $modSettings, $user_info;
 
 	$db = database();
 
@@ -214,14 +215,15 @@ function topBoards($limit = null, $read_status = false)
 	$max_num_posts = 1;
 	while ($row_board = $db->fetch_assoc($boards_result))
 	{
+		$href = getUrl('board', ['board' => $row_board['id_board'], 'start' => '0', 'name' => $row_board['name']]);
 		// Load the boards info, number of posts, topics etc
 		$top_boards[$row_board['id_board']] = array(
 			'id' => $row_board['id_board'],
 			'name' => $row_board['name'],
 			'num_posts' => $row_board['num_posts'],
 			'num_topics' => $row_board['num_topics'],
-			'href' => $scripturl . '?board=' . $row_board['id_board'] . '.0',
-			'link' => '<a href="' . $scripturl . '?board=' . $row_board['id_board'] . '.0">' . $row_board['name'] . '</a>'
+			'href' => $href,
+			'link' => '<a href="' . $href . '">' . $row_board['name'] . '</a>'
 		);
 		if ($read_status)
 			$top_boards[$row_board['id_board']]['is_read'] = !empty($row_board['is_read']);
@@ -252,7 +254,7 @@ function topBoards($limit = null, $read_status = false)
  */
 function topTopicReplies($limit = 10)
 {
-	global $modSettings, $scripturl;
+	global $modSettings;
 
 	$db = database();
 
@@ -294,6 +296,7 @@ function topTopicReplies($limit = 10)
 	$top_topics_replies = array();
 	while ($row_topic_reply = $db->fetch_assoc($topic_reply_result))
 	{
+		$href = getUrl('topic', ['topic' => $row_topic_reply['id_topic'], 'start' => '0', 'subject' => $row_topic_reply['subject']]);
 		// Build out this topics details for controller use
 		$top_topics_replies[$row_topic_reply['id_topic']] = array(
 			'id' => $row_topic_reply['id_topic'],
@@ -301,8 +304,8 @@ function topTopicReplies($limit = 10)
 			'num_replies' => comma_format($row_topic_reply['num_replies']),
 			'post_percent' => round(($row_topic_reply['num_replies'] * 100) / $max_num_replies),
 			'num_views' => $row_topic_reply['num_views'],
-			'href' => $scripturl . '?topic=' . $row_topic_reply['id_topic'] . '.0',
-			'link' => '<a href="' . $scripturl . '?topic=' . $row_topic_reply['id_topic'] . '.0">' . $row_topic_reply['subject'] . '</a>'
+			'href' => $href,
+			'link' => '<a href="' . $href . '">' . $row_topic_reply['subject'] . '</a>'
 		);
 	}
 	$db->free_result($topic_reply_result);
@@ -325,7 +328,7 @@ function topTopicReplies($limit = 10)
  */
 function topTopicViews($limit = null)
 {
-	global $modSettings, $scripturl;
+	global $modSettings;
 
 	$db = database();
 
@@ -379,6 +382,8 @@ function topTopicViews($limit = null)
 	$max_num_views = 1;
 	while ($row_topic_views = $db->fetch_assoc($topic_view_result))
 	{
+		$board_href = getUrl('board', ['board' => $row_topic_views['id_board'], 'start' => '0', 'name' => $row_topic_views['name']]);
+		$topic_href = getUrl('topic', ['topic' => $row_topic_views['id_topic'], 'start' => '0', 'subject' => $row_topic_views['subject']]);
 		// Build the topic result array
 		$row_topic_views['subject'] = censor($row_topic_views['subject']);
 		$top_topics_views[$row_topic_views['id_topic']] = array(
@@ -386,14 +391,14 @@ function topTopicViews($limit = null)
 			'board' => array(
 				'id' => $row_topic_views['id_board'],
 				'name' => $row_topic_views['name'],
-				'href' => $scripturl . '?board=' . $row_topic_views['id_board'] . '.0',
-				'link' => '<a href="' . $scripturl . '?board=' . $row_topic_views['id_board'] . '.0">' . $row_topic_views['name'] . '</a>'
+				'href' => $board_href,
+				'link' => '<a href="' . $board_href . '">' . $row_topic_views['name'] . '</a>'
 			),
 			'subject' => $row_topic_views['subject'],
 			'num_replies' => $row_topic_views['num_replies'],
 			'num_views' => $row_topic_views['num_views'],
-			'href' => $scripturl . '?topic=' . $row_topic_views['id_topic'] . '.0',
-			'link' => '<a href="' . $scripturl . '?topic=' . $row_topic_views['id_topic'] . '.0">' . $row_topic_views['subject'] . '</a>'
+			'href' => $topic_href,
+			'link' => '<a href="' . $topic_href . '">' . $row_topic_views['subject'] . '</a>'
 		);
 
 		if ($max_num_views < $row_topic_views['num_views'])
@@ -420,7 +425,7 @@ function topTopicViews($limit = null)
  */
 function topTopicStarter()
 {
-	global $modSettings, $scripturl;
+	global $modSettings;
 
 	$db = database();
 	$members = array();
@@ -462,14 +467,15 @@ function topTopicStarter()
 	);
 	while ($row_members = $db->fetch_assoc($members_result))
 	{
+		$href = getUrl('profile', ['action' => 'profile', 'u' => $row_members['id_member'], 'name' => $row_members['real_name']]);
 		// Our array of spammers, er topic starters !
 		$top_starters[$row_members['id_member']] = array(
 			'name' => $row_members['real_name'],
 			'id' => $row_members['id_member'],
 			'num_topics' => comma_format($members[$row_members['id_member']]),
 			'post_percent' => round(($members[$row_members['id_member']] * 100) / $max_num_topics),
-			'href' => $scripturl . '?action=profile;u=' . $row_members['id_member'],
-			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row_members['id_member'] . '">' . $row_members['real_name'] . '</a>'
+			'href' => $href,
+			'link' => '<a href="' . $href . '">' . $row_members['real_name'] . '</a>'
 		);
 
 	}
@@ -492,7 +498,7 @@ function topTopicStarter()
  */
 function topTimeOnline()
 {
-	global $modSettings, $scripturl, $txt;
+	global $modSettings, $txt;
 
 	$db = database();
 
@@ -536,18 +542,21 @@ function topTimeOnline()
 
 		$timelogged .= floor(($row_members['total_time_logged_in'] % 3600) / 60) . $txt['totalTimeLogged7'];
 
+		$href = getUrl('profile', ['action' => 'profile', 'u' => $row_members['id_member'], 'name' => $row_members['real_name']]);
 		// Finally add it to the stats array
 		$top_time_online[] = array(
 			'id' => $row_members['id_member'],
 			'name' => $row_members['real_name'],
 			'time_online' => $timelogged,
 			'seconds_online' => $row_members['total_time_logged_in'],
-			'href' => $scripturl . '?action=profile;u=' . $row_members['id_member'],
-			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row_members['id_member'] . '">' . $row_members['real_name'] . '</a>'
+			'href' => $href,
+			'link' => '<a href="' . $href . '">' . $row_members['real_name'] . '</a>'
 		);
 
 		if ($max_time_online < $row_members['total_time_logged_in'])
+		{
 			$max_time_online = $row_members['total_time_logged_in'];
+		}
 	}
 	$db->free_result($members_result);
 
@@ -570,7 +579,7 @@ function topTimeOnline()
  */
 function monthlyActivity()
 {
-	global $context, $scripturl, $txt;
+	global $context, $txt;
 
 	$db = database();
 
@@ -600,14 +609,15 @@ function monthlyActivity()
 				'current_year' => $row_months['stats_year'] == date('Y'),
 			);
 
+		$href = getUrl('action', ['action' => 'stats', ($expanded ? 'collapse' : 'expand') => $id_month]) . '#m' . $id_month;
 		$context['yearly'][$row_months['stats_year']]['months'][(int) $row_months['stats_month']] = array(
 			'id' => $id_month,
 			'date' => array(
 				'month' => sprintf('%02d', $row_months['stats_month']),
 				'year' => $row_months['stats_year']
 			),
-			'href' => $scripturl . '?action=stats;' . ($expanded ? 'collapse' : 'expand') . '=' . $id_month . '#m' . $id_month,
-			'link' => '<a href="' . $scripturl . '?action=stats;' . ($expanded ? 'collapse' : 'expand') . '=' . $id_month . '#m' . $id_month . '">' . $txt['months'][(int) $row_months['stats_month']] . ' ' . $row_months['stats_year'] . '</a>',
+			'href' => $href,
+			'link' => '<a href="' . $href . '">' . $txt['months'][(int) $row_months['stats_month']] . ' ' . $row_months['stats_year'] . '</a>',
 			'month' => $txt['months'][(int) $row_months['stats_month']],
 			'year' => $row_months['stats_year'],
 			'new_topics' => comma_format($row_months['topics']),
@@ -775,7 +785,7 @@ function UserStatsPollsVoted($memID)
  */
 function UserStatsMostPostedBoard($memID, $limit = 10)
 {
-	global $scripturl, $user_profile;
+	global $user_profile;
 
 	$db = database();
 
@@ -800,12 +810,13 @@ function UserStatsMostPostedBoard($memID, $limit = 10)
 	$popular_boards = array();
 	while ($row = $db->fetch_assoc($result))
 	{
+		$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
 		// Build the board details that this member is responsible for
 		$popular_boards[$row['id_board']] = array(
 			'id' => $row['id_board'],
 			'posts' => $row['message_count'],
-			'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
-			'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',
+			'href' => $href,
+			'link' => '<a href="' . $href . '">' . $row['name'] . '</a>',
 			'posts_percent' => $user_profile[$memID]['posts'] == 0 ? 0 : ($row['message_count'] * 100) / $user_profile[$memID]['posts'],
 			'total_posts' => $row['num_posts'],
 			'total_posts_member' => $user_profile[$memID]['posts'],
@@ -828,8 +839,6 @@ function UserStatsMostPostedBoard($memID, $limit = 10)
  */
 function UserStatsMostActiveBoard($memID, $limit = 10)
 {
-	global $scripturl;
-
 	$db = database();
 
 	// Find the board this member spammed most often.
@@ -852,12 +861,13 @@ function UserStatsMostActiveBoard($memID, $limit = 10)
 	$board_activity = array();
 	while ($row = $db->fetch_assoc($result))
 	{
+		$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
 		// What have they been doing in this board
 		$board_activity[$row['id_board']] = array(
 			'id' => $row['id_board'],
 			'posts' => $row['message_count'],
-			'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
-			'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',
+			'href' => $href,
+			'link' => '<a href="' . $href . '">' . $row['name'] . '</a>',
 			'percent' => comma_format((float) $row['percentage'], 2),
 			'posts_percent' => (float) $row['percentage'],
 			'total_posts' => $row['num_posts'],

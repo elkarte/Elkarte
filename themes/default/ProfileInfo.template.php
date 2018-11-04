@@ -517,12 +517,12 @@ function template_viewWarning()
  */
 function template_profile_block_summary()
 {
-	global $txt, $context, $modSettings, $scripturl;
+	global $txt, $context, $modSettings;
 
 	echo '
 			<div class="profileblock_left">
 				<h2 class="category_header hdicon cat_img_profile">
-					', ($context['user']['is_owner']) ? '<a href="' . $scripturl . '?action=profile;area=forumprofile;u=' . $context['member']['id'] . '">' . $txt['profile_user_summary'] . '</a>' : $txt['profile_user_summary'], '
+					', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'u' => $context['member']['name']]) . '">' . $txt['profile_user_summary'] . '</a>' : $txt['profile_user_summary'], '
 				</h2>
 				<div id="basicinfo">
 					<div class="username">
@@ -577,15 +577,15 @@ function template_profile_block_summary()
 	echo '
 						<dt>', $txt['profile_activity'], ': </dt>
 						<dd>
-							<a href="', $scripturl, '?action=profile;area=showposts;u=', $context['id_member'], '">', $txt['showPosts'], '</a>
+							<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'showposts', 'u' => $context['member']['id'], 'u' => $context['member']['name']]), '">', $txt['showPosts'], '</a>
 							<br />';
 
 	if ($context['user']['is_owner'] && !empty($modSettings['drafts_enabled']))
 		echo '
-							<a href="', $scripturl, '?action=profile;area=showdrafts;u=', $context['id_member'], '">', $txt['drafts_show'], '</a>
+							<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => $context['member']['id'], 'u' => $context['member']['name']]), '">', $txt['drafts_show'], '</a>
 							<br />';
 	echo '
-							<a href="', $scripturl, '?action=profile;area=statistics;u=', $context['id_member'], '">', $txt['statPanel'], '</a>
+							<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'statistics', 'u' => $context['member']['id'], 'u' => $context['member']['name']]), '">', $txt['statPanel'], '</a>
 						</dd>';
 
 	// close this block up
@@ -609,7 +609,7 @@ function template_profile_block_user_info()
 	echo '
 		<div class="profileblock_right">
 			<h2 class="category_header hdicon cat_img_stats_info">
-				', ($context['user']['is_owner']) ? '<a href="' . $scripturl . '?action=profile;area=forumprofile;u=' . $context['member']['id'] . '">' . $txt['profile_user_info'] . '</a>' : $txt['profile_user_info'], '
+				', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'u' => $context['member']['name']]) . '">' . $txt['profile_user_info'] . '</a>' : $txt['profile_user_info'], '
 			</h2>
 			<div class="profileblock">
 					<dl>';
@@ -787,12 +787,12 @@ function template_profile_block_contact()
  */
 function template_profile_block_other_info()
 {
-	global $txt, $context, $scripturl;
+	global $txt, $context;
 
 	echo '
 		<div class="profileblock_right">
 			<h2 class="category_header hdicon cat_img_write">
-				', ($context['user']['is_owner']) ? '<a href="' . $scripturl . '?action=profile;area=forumprofile;u=' . $context['member']['id'] . '">' . $txt['profile_more'] . '</a>' : $txt['profile_more'], '
+				', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'u' => $context['member']['name']]) . '">' . $txt['profile_more'] . '</a>' : $txt['profile_more'], '
 			</h2>
 			<div class="profileblock profileblock_signature">';
 
@@ -854,12 +854,12 @@ function template_profile_block_other_info()
  */
 function template_profile_block_user_customprofileinfo()
 {
-	global $txt, $context, $scripturl;
+	global $txt, $context;
 
 	echo '
 		<div class="profileblock_left">
 			<h2 class="category_header hdicon cat_img_plus">
-				', ($context['user']['is_owner']) ? '<a href="' . $scripturl . '?action=profile;area=forumprofile;u=' . $context['member']['id'] . '">' . $txt['profile_info'] . '</a>' : $txt['profile_info'], '
+				', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'u' => $context['member']['name']]) . '">' . $txt['profile_info'] . '</a>' : $txt['profile_info'], '
 			</h2>
 			<div class="profileblock">';
 
@@ -1014,7 +1014,7 @@ function template_profile_block_buddies()
 				<div class="attachment">
 					<div class="generic_border centertext">
 						', $data['avatar']['image'], '<br />
-						<a href="', $scripturl, '?action=profile;u=', $data['id'], '">', $data['name'], '</a>
+						<a href="', getUrl('profile', ['action' => 'profile', 'u' => $data['id'], 'name' => $data['name']]), '">', $data['name'], '</a>
 						<br />
 						', template_member_online($data), '<em><span class="smalltext"> ' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '</span></em>
 						<div class="contact">';
@@ -1094,12 +1094,12 @@ function template_profile_blocks()
  */
 function template_profile_block_attachments()
 {
-	global $txt, $context, $scripturl;
+	global $txt, $context;
 
 	// The attachment div
 	echo '
 	<h2 class="category_header hdicon cat_img_attachments">
-		<a href="', $scripturl, '?action=profile;area=showposts;sa=attach;u=', $context['member']['id'], '">', $txt['profile_attachments'], '</a>
+		<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'showposts', 'sa' => 'attach', 'u' => $context['member']['id'], 'name' => $context['member']['name']]), '">', $txt['profile_attachments'], '</a>
 	</h2>
 	<div class="attachments">';
 
@@ -1138,12 +1138,12 @@ function template_profile_block_attachments()
  */
 function template_profile_block_posts()
 {
-	global $txt, $context, $scripturl;
+	global $txt, $context;
 
 	// The posts block
 	echo '
 	<h2 class="category_header hdicon cat_img_posts">
-		<a href="', $scripturl, '?action=profile;area=showposts;sa=messages;u=', $context['member']['id'], '">', $txt['profile_recent_posts'], '</a>
+		<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'showposts', 'sa' => 'messages', 'u' => $context['member']['id'], 'name' => $context['member']['name']]), '">', $txt['profile_recent_posts'], '</a>
 	</h2>
 	<div class="flow_auto">
 		<table id="ps_recentposts">';
@@ -1187,12 +1187,12 @@ function template_profile_block_posts()
  */
 function template_profile_block_topics()
 {
-	global $txt, $context, $scripturl;
+	global $txt, $context;
 
 	// The topics block
 	echo '
 	<h2 class="category_header hdicon cat_img_topics">
-		<a href="', $scripturl, '?action=profile;area=showposts;sa=topics;u=', $context['member']['id'], '">', $txt['profile_topics'], '</a>
+		<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'showposts', 'sa' => 'topics', 'u' => $context['member']['id'], 'name' => $context['member']['name']]), '">', $txt['profile_topics'], '</a>
 	</h2>
 	<div class="flow_auto">
 		<table id="ps_recenttopics">';

@@ -759,10 +759,13 @@ function reorderBoards()
 		}
 	}
 
-	$db->query(
-		'',
-		'
-		UPDATE {db_prefix}boards
+	if (empty($update_query))
+	{
+		return;
+	}
+
+	$db->query('',
+		'UPDATE {db_prefix}boards
 			SET
 				board_order = CASE id_board ' . $update_query . '
 					END',
@@ -2057,7 +2060,7 @@ function decrementBoard($id_board, $values)
  */
 function boardNotifications($sort, $memID)
 {
-	global $scripturl, $user_info, $modSettings;
+	global $user_info, $modSettings;
 
 	$db = database();
 
@@ -2074,13 +2077,14 @@ function boardNotifications($sort, $memID)
 			'current_member' => $user_info['id'],
 			'selected_member' => $memID,
 		),
-		function ($row) use ($scripturl)
+		function ($row)
 		{
+			$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
 			return array(
 				'id' => $row['id_board'],
 				'name' => $row['name'],
-				'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
-				'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0"><strong>' . $row['name'] . '</strong></a>',
+				'href' => $href,
+				'link' => '<a href="' . $href . '"><strong>' . $row['name'] . '</strong></a>',
 				'new' => $row['board_read'] < $row['id_msg_updated'],
 				'checked' => 'checked="checked"',
 			);
@@ -2104,14 +2108,17 @@ function boardNotifications($sort, $memID)
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
+	{
+		$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
 		$notification_boards[] = array(
 			'id' => $row['id_board'],
 			'name' => $row['name'],
-			'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
-			'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',
+			'href' => $href,
+			'link' => '<a href="' . $href . '">' . $row['name'] . '</a>',
 			'new' => $row['board_read'] < $row['id_msg_updated'],
 			'checked' => '',
 		);
+	}
 	$db->free_result($request);
 
 	return $notification_boards;

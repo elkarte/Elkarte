@@ -32,8 +32,6 @@ class Verification_PersonalMessage_Module extends ElkArte\sources\modules\Abstra
 		// Are controls required?
 		if (!$user_info['is_admin'] && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'])
 		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-
 			// Add the events to call for the verification
 			return array(
 				array('prepare_send_context', array('Verification_PersonalMessage_Module', 'prepare_send_context'), array()),
@@ -57,7 +55,7 @@ class Verification_PersonalMessage_Module extends ElkArte\sources\modules\Abstra
 		$verificationOptions = array(
 			'id' => 'pm',
 		);
-		$context['require_verification'] = create_control_verification($verificationOptions);
+		$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions);
 		$context['visual_verification_id'] = $verificationOptions['id'];
 	}
 
@@ -78,7 +76,7 @@ class Verification_PersonalMessage_Module extends ElkArte\sources\modules\Abstra
 		$verificationOptions = array(
 			'id' => 'pm',
 		);
-		$context['require_verification'] = create_control_verification($verificationOptions, true);
+		$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions, true);
 
 		if (is_array($context['require_verification']))
 		{

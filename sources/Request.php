@@ -138,6 +138,8 @@ final class Request
 	 */
 	private function __construct()
 	{
+		global $boardurl, $scripturl;
+
 		// Client IP: REMOTE_ADDR, unless missing
 		$this->_getClientIP();
 
@@ -158,6 +160,10 @@ final class Request
 
 		// We want to know who we are, too :P
 		$this->_server_software = isset($_SERVER['SERVER_SOFTWARE']) ? $_SERVER['SERVER_SOFTWARE'] : '';
+
+		// Makes it easier to refer to things this way.
+		$scripturl = $boardurl . '/index.php';
+		$this->_scripturl = $scripturl;
 	}
 
 	/**
@@ -360,19 +366,13 @@ final class Request
 	 * - Use with ->parseRequest() to clean and set up variables like $board or $_REQUEST['start'].
 	 * - Uses Request to try to determine client IPs for the current request.
 	 */
-	public function cleanRequest()
+	public function cleanRequest($parser)
 	{
-		global $boardurl, $scripturl;
-
-		// Makes it easier to refer to things this way.
-		$scripturl = $boardurl . '/index.php';
-		$this->_scripturl = $scripturl;
-
 		// Live to die another day
 		$this->_checkExit();
 
 		// Process server_query_string as needed
-		$this->_cleanArg();
+		$this->_cleanArg($parser);
 
 		// Process request_uri
 		$this->_cleanRequest();
@@ -460,7 +460,7 @@ final class Request
 	/**
 	 * Helper method used to clean $_GET arguments
 	 */
-	private function _cleanArg()
+	private function _cleanArg($parser)
 	{
 		// Are we going to need to parse the ; out?
 		if (strpos(ini_get('arg_separator.input'), ';') === false && !empty($this->_server_query_string))
@@ -476,6 +476,7 @@ final class Request
 			if (strpos($this->_server_query_string, 'activate') !== false || strpos($this->_server_query_string, 'reminder') !== false)
 				$this->_server_query_string = urldecode($this->_server_query_string);
 
+			$this->_server_query_string = $parser->parse($this->_server_query_string);
 			// Replace ';' with '&' and '&something&' with '&something=&'.  (this is done for compatibility...)
 			parse_str(preg_replace('/&(\w+)(?=&|$)/', '&$1=', strtr($this->_server_query_string, array(';?' => '&', ';' => '&', '%00' => '', "\0" => ''))), $_GET);
 

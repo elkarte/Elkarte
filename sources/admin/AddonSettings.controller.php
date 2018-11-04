@@ -80,7 +80,7 @@ class AddonSettings_Controller extends Action_Controller
 	 */
 	public function action_addonSettings_display()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt;
 
 		// instantiate the form
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
@@ -95,7 +95,7 @@ class AddonSettings_Controller extends Action_Controller
 			$context['settings_message'] = '<div class="centertext">' . $txt['modification_no_misc_settings'] . '</div>';
 		}
 
-		$context['post_url'] = $scripturl . '?action=admin;area=addonsettings;save;sa=general';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'addonsettings', 'sa' => 'general', 'save']);
 		$context['settings_title'] = $txt['mods_cat_modifications_misc'];
 
 		// Saving?

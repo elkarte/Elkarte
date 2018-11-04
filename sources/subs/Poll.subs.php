@@ -207,7 +207,8 @@ function pollInfoForTopic($topicID)
 	// Check if a poll currently exists on this topic, and get the id, question and starter.
 	$request = $db->query('', '
 		SELECT
-			t.id_member_started, p.id_poll, p.question, p.hide_results, p.expire_time, p.max_votes, p.change_vote,
+			t.id_member_started, p.id_poll, p.voting_locked, p.question,
+			p.hide_results, p.expire_time, p.max_votes, p.change_vote,
 			m.subject, p.guest_vote, p.id_member AS poll_starter
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
@@ -713,28 +714,14 @@ function determineVote($id_member, $id_poll)
 /**
  * Get some basic details from a poll
  *
+ * @deprecated since 2.0 - use pollInfoForTopic instead
  * @param int $id_topic
  * @return array
  */
 function pollStatus($id_topic)
 {
-	$db = database();
-
-	$poll = array();
-
-	$request = $db->query('', '
-		SELECT t.id_member_started, t.id_poll, p.voting_locked
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
-		WHERE t.id_topic = {int:current_topic}
-		LIMIT 1',
-		array(
-			'current_topic' => $id_topic,
-		)
-	);
-	list ($poll['id_member'], $poll['id_poll'], $poll['locked']) = $db->fetch_row($request);
-
-		return $poll;
+	Errors::instance()->log_deprecated('pollStatus()', 'pollInfoForTopic()');
+	return pollInfoForTopic($id_topic);
 }
 
 /**
@@ -832,7 +819,7 @@ function getPollStarter($id_topic)
  */
 function loadPollContext($poll_id)
 {
-	global $context, $user_info, $txt, $scripturl;
+	global $context, $user_info, $txt;
 
 	// Get the question and if it's locked.
 	$pollinfo = pollInfo($poll_id);
@@ -893,6 +880,7 @@ function loadPollContext($poll_id)
 	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	// Set up the basic poll information.
+	$starter_href = getUrl('profile', ['action' => 'profile', 'u' => $pollinfo['id_member'], 'name' => $pollinfo['poster_name']]);
 	$context['poll'] = array(
 		'id' => $poll_id,
 		'image' => 'normal_' . (empty($pollinfo['voting_locked']) ? 'poll' : 'locked_poll'),
@@ -910,8 +898,8 @@ function loadPollContext($poll_id)
 		'starter' => array(
 			'id' => $pollinfo['id_member'],
 			'name' => $pollinfo['poster_name'],
-			'href' => $pollinfo['id_member'] == 0 ? '' : $scripturl . '?action=profile;u=' . $pollinfo['id_member'],
-			'link' => $pollinfo['id_member'] == 0 ? $pollinfo['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $pollinfo['id_member'] . '">' . $pollinfo['poster_name'] . '</a>'
+			'href' => $pollinfo['id_member'] == 0 ? '' : $starter_href,
+			'link' => $pollinfo['id_member'] == 0 ? $pollinfo['poster_name'] : '<a href="' . $starter_href . '">' . $pollinfo['poster_name'] . '</a>'
 		)
 	);
 

@@ -2668,7 +2668,7 @@ class InstallInstructions_install_1_1
 				array('badbehavior_url_wl', 'a:1:{i:0;s:18:"/subscriptions.php";}'),
 				array('badbehavior_url_wl_desc', 'a:1:{i:0;s:15:"Payment Gateway";}'),
 				array('notification_methods', 'a:4:{s:5:"buddy";a:4:{s:12:"notification";s:1:"1";s:5:"email";s:1:"1";s:11:"email_daily";s:1:"1";s:12:"email_weekly";s:1:"1";}s:7:"likemsg";a:1:{s:12:"notification";s:1:"1";}s:10:"mentionmem";a:4:{s:12:"notification";s:1:"1";s:5:"email";s:1:"1";s:11:"email_daily";s:1:"1";s:12:"email_weekly";s:1:"1";}s:9:"quotedmem";a:4:{s:12:"notification";s:1:"1";s:5:"email";s:1:"1";s:11:"email_daily";s:1:"1";s:12:"email_weekly";s:1:"1";}}'),
-				array('autoload_integrate', 'User_Notification_Integrate,Ila_Integrate'),
+				array('autoload_integrate', 'User_Notification_Integrate,Ila_Integrate,VerificationControls_Integrate'),
 				array('usernotif_favicon_bgColor', '#ff0000'),
 				array('usernotif_favicon_position', 'up'),
 				array('usernotif_favicon_textColor', '#ffff00'),

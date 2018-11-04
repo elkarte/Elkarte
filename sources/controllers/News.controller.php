@@ -684,29 +684,7 @@ function fix_possible_url($val)
 
 	call_integration_hook('integrate_fix_url', array(&$val));
 
-	if (!empty($modSettings['queryless_urls']) && detectServer()->supportRewrite())
-	{
-		$val = preg_replace_callback('~^' . preg_quote($scripturl, '~') . '\?((?:board|topic)=[^#"]+)(#[^"]*)?$~', 'fix_possible_url_callback', $val);
-	}
-
 	return $val;
-}
-
-/**
- * Callback function for the preg_replace_callback in fix_possible_url
- *
- * - Invoked when queryless_urls are enabled and the system supports them
- * - Updated URLs to be of "queryless" style
- *
- * @param mixed[] $matches
- *
- * @return string
- */
-function fix_possible_url_callback($matches)
-{
-	global $scripturl;
-
-	return $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html' . (isset($matches[2]) ? $matches[2] : '');
 }
 
 /**

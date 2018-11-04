@@ -99,7 +99,7 @@ function template_postarea_above()
 	if (!empty($context['drafts_autosave']))
 		echo '
 						<div id="draft_section" class="successbox', isset($context['draft_saved']) ? '"' : ' hide"', '>
-							', sprintf($txt['draft_saved'], $scripturl . '?action=profile;u=' . $context['user']['id'] . ';area=showdrafts'), '
+							', sprintf($txt['draft_saved'], getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => $context['user']['id'], 'name' => $context['user']['name']])), '
 						</div>';
 
 	// The post header... important stuff

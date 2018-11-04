@@ -84,13 +84,14 @@ function template_folder()
 
 	$start = true;
 
+	$controller = $context['get_pmessage'][0];
 	// Do we have some messages to display?
-	if ($context['get_pmessage']('message', true))
+	if ($controller->{$context['get_pmessage'][1]}(true))
 	{
 		echo '
 					<div id="forumposts">';
 
-		while ($message = $context['get_pmessage']('message'))
+		while ($message = $controller->{$context['get_pmessage'][1]}())
 		{
 			// Show the helpful titlebar - generally.
 			if ($start && $context['display_mode'] != 1)
@@ -424,8 +425,9 @@ function template_subject_list()
 								<td colspan="5">', $txt['pm_alert_none'], '</td>
 							</tr>';
 
+	$controller = $context['get_psubject'][0];
 	// Use the query callback to get the subject list
-	while ($message = $context['get_pmessage']('subject'))
+	while ($message = $controller->{$context['get_psubject'][1]}())
 	{
 		$discussion_url = $context['display_mode'] == 0 || $context['current_pm'] == $message['id'] ? '' : ($scripturl . '?action=pm;pmid=' . $message['id'] . ';kstart;f=' . $context['folder'] . ';start=' . $context['start'] . ';sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';asc' : ';desc') . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''));
 

@@ -77,7 +77,7 @@ class ManageMail_Controller extends Action_Controller
 	 */
 	public function action_browse()
 	{
-		global $scripturl, $context, $txt;
+		global $context, $txt;
 
 		require_once(SUBSDIR . '/Mail.subs.php');
 		theme()->getTemplates()->load('ManageMail');
@@ -100,7 +100,7 @@ class ManageMail_Controller extends Action_Controller
 			'id' => 'mail_queue',
 			'title' => $txt['mailqueue_browse'],
 			'items_per_page' => 20,
-			'base_href' => $scripturl . '?action=admin;area=mailqueue',
+			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'mailqueue']),
 			'default_sort_col' => 'age',
 			'no_items_label' => $txt['mailqueue_no_items'],
 			'get_items' => array(
@@ -192,7 +192,7 @@ class ManageMail_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=mailqueue',
+				'href' => getUrl('admin', ['action' => 'admin', 'area' => 'mailqueue']),
 				'include_start' => true,
 				'include_sort' => true,
 			),
@@ -202,7 +202,7 @@ class ManageMail_Controller extends Action_Controller
 					'class' => 'submitbutton',
 					'value' => '
 						<input type="submit" name="delete_redirects" value="' . $txt['quickmod_delete_selected'] . '" onclick="return confirm(\'' . $txt['quickmod_confirm'] . '\');" />
-						<a class="linkbutton" href="' . $scripturl . '?action=admin;area=mailqueue;sa=clear;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['mailqueue_clear_list_warning'] . '\');">' . $txt['mailqueue_clear_list'] . '</a> ',
+						<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'mailqueue', 'sa' => 'clear', '{session_data}']) . '" onclick="return confirm(\'' . $txt['mailqueue_clear_list_warning'] . '\');">' . $txt['mailqueue_clear_list'] . '</a> ',
 				),
 			),
 		);
@@ -218,7 +218,7 @@ class ManageMail_Controller extends Action_Controller
 	 */
 	public function action_mailSettings_display()
 	{
-		global $txt, $scripturl, $context, $txtBirthdayEmails;
+		global $txt, $context, $txtBirthdayEmails;
 
 		// Some important context stuff
 		$context['page_title'] = $txt['mail_settings'];
@@ -265,7 +265,7 @@ class ManageMail_Controller extends Action_Controller
 			redirectexit('action=admin;area=mailqueue;sa=settings');
 		}
 
-		$context['post_url'] = $scripturl . '?action=admin;area=mailqueue;save;sa=settings';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'mailqueue', 'sa' => 'settings', 'save']);
 		$context['settings_title'] = $txt['mailqueue_settings'];
 
 		// Prepare the config form

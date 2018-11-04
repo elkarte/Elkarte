@@ -96,7 +96,7 @@ function template_error_log()
 	if (count($context['errors']) == 0)
 		echo '
 				<tr>
-					<td class="centertext" colspan="2">', $txt['errlog_no_entries'], '</td>
+					<td class="centertext" colspan="3">', $txt['errlog_no_entries'], '</td>
 				</tr>';
 
 	// We have some errors, show them...
@@ -104,80 +104,56 @@ function template_error_log()
 	{
 		echo '
 				<tr>
-					<td>
-						<ul class="error_who">
-							<li>
-								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=id_member;value=', $error['member']['id'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_member'], '" class="icon i-search"></a>
-								<span>
-									<strong>', $error['member']['link'], '</strong>
-								</span>
-							</li>
-							<li>
-								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? '' : ';desc', $context['has_filter'] ? $context['filter']['href'] : '', '" title="', $txt['reverse_direction'], '"><i class="icon icon-small i-sort-numeric-', $context['sort_direction'], '" title="', $txt['reverse_direction'], '"></i></a>
-								<span>
-									', $error['time'], '
-								</span>
-							</li>
-							<li>
-								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=ip;value=', $error['member']['ip'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_ip'], '" class="icon i-search"></a>
-								<span>
-									<strong><a href="', $scripturl, '?action=trackip;searchip=', $error['member']['ip'], '">', $error['member']['ip'], '</a></strong>
-								</span>
-							</li>
-						</ul>
-
-						<ul class="error_type">';
-
-		if ($error['member']['session'] != '')
-			echo '
-							<li>
-								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=session;value=', $error['member']['session'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_session'], '" class="icon i-search"></a>
-								<span>
-									', $error['member']['session'], '
-								</span>
-							</li>';
-		echo '
-							<li>
-								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=error_type;value=', $error['error_type']['type'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_type'], '" class="icon i-search"></a>
-								<span>
-									', $txt['error_type'], ': ', $error['error_type']['name'], '
-								</span>
-							</li>
-							<li>
-								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=message;value=', $error['message']['href'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_message'], '" class="icon i-search"></a>
-								<span>', $error['message']['html'], '</span>
-							</li>';
-
-		echo '
-						</ul>
-
-						<ul class="error_where">
-							<li>
-								<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=url;value=', $error['url']['href'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_url'], '" class="icon i-search"></a>
-								<span>
-									<a href="', $error['url']['html'], '">', $error['url']['html'], '</a>
-								</span>
-							</li>
-						</ul>';
+					<td class="grid60">
+						<div>
+							<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=error_type;value=', $error['error_type']['type'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_type'], '" class="nosel icon i-search"></a>
+							', $txt['error_type'], ': ', $error['error_type']['name'], '
+						</div>
+						<div>
+							<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=message;value=', $error['message']['href'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_message'], '" class="nosel icon i-search"></a>
+						', $error['message']['html'], '
+						</div>
+						<div>
+							<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=url;value=', $error['url']['href'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_url'], '" class="nosel icon i-search"></a>
+							<a href="', $error['url']['html'], '">', $error['url']['html'], '</a>
+						</div>';
 
 		if (!empty($error['file']))
 			echo '
-						<ul class="error_where">
-							<li>
-								<a class="scope" href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=file;value=', $error['file']['search'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_file'], '" class="icon i-search"></a>
-								<span>
-									', $txt['file'], ': ', $error['file']['link'], '<br />
-									', $txt['line'], ': ', $error['file']['line'], '
-								</span>
-							</li>
-						</ul>';
+						<div>
+							<a class="scope" href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=file;value=', $error['file']['search'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_file'], '" class="nosel icon i-search"></a>
+							', $txt['file'], ': ', $error['file']['link'], '<br />
+							', $txt['line'], ': ', $error['file']['line'], '
+						</div>';
+
+		echo '
+					</td>
+					<td>
+						<div>
+							<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=id_member;value=', $error['member']['id'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_member'], '" class="nosel icon i-search"></a>
+							<strong>', $error['member']['link'], '</strong>
+						</div>
+						<div>
+							<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? '' : ';desc', $context['has_filter'] ? $context['filter']['href'] : '', '" title="', $txt['reverse_direction'], '"><i class="nosel icon icon-small i-sort-numeric-', $context['sort_direction'], '" title="', $txt['reverse_direction'], '"></i></a>
+							', $error['time'], '
+						</div>
+						<div>
+							<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=ip;value=', $error['member']['ip'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_ip'], '" class="nosel icon i-search"></a>
+							<strong><a href="', $scripturl, '?action=trackip;searchip=', $error['member']['ip'], '">', $error['member']['ip'], '</a></strong>
+						</div>';
+
+		if ($error['member']['session'] != '')
+			echo '
+						<div>
+							<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=session;value=', $error['member']['session'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_session'], '" class="nosel icon i-search"></a>
+							', $error['member']['session'], '
+						</div>';
 
 		echo '
 					</td>
 					<td class="checkbox_column">
 						<input type="checkbox" name="delete[]" value="', $error['id'], '" />
 					</td>
-					<td></td>
 				</tr>';
 	}
 
@@ -206,7 +182,6 @@ function template_error_log()
 
 	echo '
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-el_token_var'], '" value="', $context['admin-el_token'], '" />
 				</div>
 			</div>
@@ -225,23 +200,33 @@ function template_show_file()
 	<head>
 		<title>', $context['file_data']['file'], '</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/admin.css', CACHE_STALE, '" />
+		<style>
+			body {
+				color: #222;
+				background-color: #FAFAFA;
+				font-family: Verdana, arial, helvetica, serif;
+				font-size: small;
+			}
+			a {color: #49643D;}
+			.curline {background: #ffe; display: inline-block; font-weight: bold;}
+			.lineno {color:#222;}
+		</style>
 	</head>
 	<body>
-		<table id="errorfile_table" class="table_grid">';
+		<div style="overflow: auto;"><pre style="margin: 0;">';
 
-	foreach ($context['file_data']['contents'] as $index => $line)
+	foreach ($context['file_data']['contents'] as $line => $content)
 	{
-		$line_num = $index + $context['file_data']['min'];
-		echo '
-			<tr', $line_num == $context['file_data']['target'] ? ' class="current"' : '', '>
-				<td class="linenumber">', $line_num, ':</td>
-				<td class="linetext">', $line, '</td>
-			</tr>';
+		printf(
+			'<span class="lineno">%d:</span> ',
+			$line
+		);
+
+		echo $content, "\n";
 	}
 
 	echo '
-		</table>
+		</pre></div>
 	</body>
 </html>';
 }

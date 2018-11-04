@@ -133,7 +133,7 @@ class CoreFeatures_Controller extends Action_Controller
 		$core_features = array(
 			// cp = custom profile fields.
 			'cp' => array(
-				'url' => 'action=admin;area=featuresettings;sa=profile',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'profile', '{session_data}']),
 				'save_callback' => 'custom_profiles_toggle_callback',
 				'setting_callback' => function ($value) {
 					if (!$value)
@@ -148,14 +148,14 @@ class CoreFeatures_Controller extends Action_Controller
 			),
 			// k = karma.
 			'k' => array(
-				'url' => 'action=admin;area=featuresettings;sa=karma',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'karma', '{session_data}']),
 				'settings' => array(
 					'karmaMode' => 2,
 				),
 			),
 			// l = likes.
 			'l' => array(
-				'url' => 'action=admin;area=featuresettings;sa=likes',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'likes', '{session_data}']),
 				'settings' => array(
 					'likes_enabled' => 1,
 				),
@@ -178,14 +178,14 @@ class CoreFeatures_Controller extends Action_Controller
 			),
 			// ml = moderation log.
 			'ml' => array(
-				'url' => 'action=admin;area=logs;sa=modlog',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'modlog', '{session_data}']),
 				'settings' => array(
 					'modlog_enabled' => 1,
 				),
 			),
 			// pe = post email
 			'pe' => array(
-				'url' => 'action=admin;area=maillist',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'maillist']),
 				'save_callback' => 'postbyemail_toggle_callback',
 				'settings' => array(
 					'maillist_enabled' => 1,
@@ -195,7 +195,7 @@ class CoreFeatures_Controller extends Action_Controller
 			),
 			// pm = post moderation.
 			'pm' => array(
-				'url' => 'action=admin;area=permissions;sa=postmod',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'permissions', 'sa' => 'postmod', '{session_data}']),
 				'setting_callback' => function ($value) {
 					// Cannot use warning post moderation if disabled!
 					if (!$value)
@@ -211,7 +211,7 @@ class CoreFeatures_Controller extends Action_Controller
 			),
 			// ps = Paid Subscriptions.
 			'ps' => array(
-				'url' => 'action=admin;area=paidsubscribe',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'paidsubscribe']),
 				'settings' => array(
 					'paid_enabled' => 1,
 				),
@@ -219,11 +219,11 @@ class CoreFeatures_Controller extends Action_Controller
 			),
 			// rg = report generator.
 			'rg' => array(
-				'url' => 'action=admin;area=reports',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'reports']),
 			),
 			// w = warning.
 			'w' => array(
-				'url' => 'action=admin;area=securitysettings;sa=moderation',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'securitysettings', 'sa' => 'moderation']),
 				'setting_callback' => function ($value) {
 					global $modSettings;
 
@@ -254,7 +254,7 @@ class CoreFeatures_Controller extends Action_Controller
 			),
 			// Search engines
 			'sp' => array(
-				'url' => 'action=admin;area=sengines',
+				'url' => getUrl('admin', ['action' => 'admin', 'area' => 'sengines']),
 				'settings' => array(
 					'spider_mode' => 1,
 				),
@@ -301,7 +301,7 @@ class CoreFeatures_Controller extends Action_Controller
 		foreach ($integrations as $integration)
 		{
 			$core_features[$integration['id']] = array(
-				'url' => empty($integration['details']->extra->setting_url) ? '?action=admin;area=addonsettings' : $integration['details']->extra->setting_url,
+				'url' => empty($integration['details']->extra->setting_url) ? getUrl('admin', ['action' => 'admin', 'area' => 'addonsettings']) : $integration['details']->extra->setting_url,
 				'title' => $integration['title'],
 				'desc' => $integration['description'],
 			);
@@ -452,7 +452,7 @@ class CoreFeatures_Controller extends Action_Controller
 	 */
 	protected function _prepare_corefeatures($core_features)
 	{
-		global $context, $txt, $settings, $scripturl;
+		global $context, $txt, $settings;
 
 		$features = array();
 		foreach ($core_features as $id => $feature)
@@ -462,7 +462,7 @@ class CoreFeatures_Controller extends Action_Controller
 				'desc' => isset($feature['desc']) ? $feature['desc'] : $txt['core_settings_item_' . $id . '_desc'],
 				'enabled' => in_array($id, $context['admin_features']),
 				'state' => in_array($id, $context['admin_features']) ? 'on' : 'off',
-				'url' => !empty($feature['url']) ? $scripturl . '?' . $feature['url'] . ';' . $context['session_var'] . '=' . $context['session_id'] : '',
+				'url' => $feature['url'],
 				'image' => (file_exists($settings['theme_dir'] . '/images/admin/feature_' . $id . '.png') ? $settings['images_url'] : $settings['default_images_url']) . '/admin/feature_' . $id . '.png',
 			);
 		}

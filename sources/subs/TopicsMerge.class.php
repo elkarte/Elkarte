@@ -380,6 +380,8 @@ class TopicsMerge
 	 */
 	protected function _updateStats($affected_msgs, $id_topic, $target_subject, $enforce_subject)
 	{
+		global $modSettings;
+
 		// Cycle through each board...
 		foreach ($this->_boardTotals as $id_board => $stats)
 			decrementBoard($id_board, $stats);
@@ -406,10 +408,8 @@ class TopicsMerge
 		$response_prefix = response_prefix();
 
 		// If there's a search index that needs updating, update it...
-		$search = new \ElkArte\Search\Search;
-		$searchAPI = $search->findSearchAPI();
-		if (is_callable(array($searchAPI, 'topicMerge')))
-			$searchAPI->topicMerge($id_topic, $this->_topics, $affected_msgs, empty($enforce_subject) ? null : array($response_prefix, $target_subject));
+		$searchAPI = new \ElkArte\Search\SearchApiWrapper(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '');
+		$searchAPI->topicMerge($id_topic, $this->_topics, $affected_msgs, empty($enforce_subject) ? null : array($response_prefix, $target_subject));
 	}
 
 	/**

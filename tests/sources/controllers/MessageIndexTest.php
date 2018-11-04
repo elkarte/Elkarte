@@ -15,7 +15,7 @@ class TestMessageIndex extends \PHPUnit\Framework\TestCase
 		// Lets add in just enough info for the system to think we are logged
 		$modSettings['smiley_sets_known'] = 'none';
 		$modSettings['smileys_url'] = 'http://127.0.0.1/smileys';
-		$modSettings['default_forum_action'] = '';
+		$modSettings['default_forum_action'] = [];
 		$settings['default_theme_dir'] = '/var/www/themes/default';
 
 		$user_info = array(

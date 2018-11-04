@@ -1154,60 +1154,15 @@ Adjusts display of wording and selections to one line.
 	border-top: 1px solid;
 }
 
-#error_log tr.content td {
+#error_log tr {
 	padding: 8px;
 	line-height: 160%;
-}
-
-#error_log td div {
-	box-sizing: border-box;
-	word-wrap: break-word;
-	word-break: break-all;
-	hyphens: auto;
-	-webkit-hyphens: auto;
-	-moz-hyphens: auto;
-	-ms-hyphens: auto;
-}
-
-#error_log .error_who, #error_log .error_type, #error_log .error_where {
-	float: left;
-	width: 50%;
-	line-height: 1.8em;
-	padding: 0 4px 4px 4px;
-	vertical-align: bottom;
-}
-
-#error_log .error_where {
-	width: 100%;
-	padding-top: 4px;
-	border-top: 1px solid;
-}
-
-#error_log .error_who li>a, #error_log .error_type li>a, #error_log .error_where li>a,
-#error_log .error_who span, #error_log .error_type span, #error_log .error_where span {
-	display: table-cell;
 }
 
 #error_log .checkbox_column {
 	width: 15px;
 	vertical-align: top;
 	text-align: center;
-}
-
-#error_log a img {
-	vertical-align: middle;
-	margin: 0 8px 0 0;
-}
-
-#errorfile_table .current .linenumber:before {
-	content: '==>';
-}
-#errorfile_table .linetext {
-	white-space: nowrap;
-}
-#errorfile_table .current .linetext {
-	border: 1px solid;
-	border-left-width: 0;
 }
 
 /* Styles for the Report generation

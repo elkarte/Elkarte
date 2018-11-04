@@ -48,14 +48,14 @@ function template_profile_above()
  */
 function template_showDrafts()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $settings, $txt;
 
 	if (!empty($context['drafts']))
 		template_pagesection();
 
 	echo '
 		<div id="recentposts" class="profile_center">
-			<form action="', $scripturl, '?action=profile;u=' . $context['member']['id'] . ';area=showdrafts;delete" method="post" accept-charset="UTF-8" name="draftForm" id="draftForm" >
+			<form action="', getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'delete', 'u' => $context['member']['id'], 'name' => $context['member']['id']]), '" method="post" accept-charset="UTF-8" name="draftForm" id="draftForm" >
 				<h2 class="category_header">
 					<span class="floatright">
 						<input type="checkbox" onclick="invertAll(this, this.form, \'delete[]\');" />

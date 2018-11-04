@@ -43,22 +43,16 @@ then
     memcached -p 11213 -d
 
     # Phpunit and support
-    if [ "$SHORT_PHP" == "5.5" ]
-    then
-        # need prior version of phpunit for php 5.5 and below
-        composer require phpunit/phpunit-selenium:~2.0 phpunit/dbunit:1.4.* phpunit/phpunit:~4.8
-        composer install --no-interaction --no-suggest --no-dev
-    else
-        composer install --no-interaction --no-suggest
-    fi
+    composer install --no-interaction --no-suggest
 
     # Copy phpunit_coverage.php into the webserver's document root directory.
     if [ "$COVERAGE" == "true" ]; then cp /var/www/vendor/phpunit/phpunit-selenium/PHPUnit/Extensions/SeleniumCommon/phpunit_coverage.php /var/www; fi
 
+    TRAVIS_PHP="$(which php)"
     # Install the database for this run
-    if [ "$SHORT_DB" == "mysql" ]; then sudo php /var/www/tests/travis-ci/setup_mysql.php; fi
-    if [ "$SHORT_DB" == "mariadb" ]; then sudo php /var/www/tests/travis-ci/setup_mysql.php; fi
-    if [ "$SHORT_DB" == "postgres" ]; then sudo php /var/www/tests/travis-ci/setup_pgsql.php; fi
+    if [ "$SHORT_DB" == "mysql" ]; then sudo $TRAVIS_PHP /var/www/tests/travis-ci/setup_mysql.php; fi
+    if [ "$SHORT_DB" == "mariadb" ]; then sudo $TRAVIS_PHP /var/www/tests/travis-ci/setup_mysql.php; fi
+    if [ "$SHORT_DB" == "postgres" ]; then sudo $TRAVIS_PHP /var/www/tests/travis-ci/setup_pgsql.php; fi
 
     # Remove the install dir
     sudo rm -rf /var/www/install

@@ -28,6 +28,12 @@ class ProfileAccount_Controller extends Action_Controller
 	private $_memID = 0;
 
 	/**
+	 * The array from $user_profile stored here to avoid some global
+	 * @var mixed[]
+	 */
+	private $_profile = [];
+
+	/**
 	 * Holds any errors that were generated when issuing a warning
 	 * @var array
 	 */
@@ -39,7 +45,10 @@ class ProfileAccount_Controller extends Action_Controller
 	 */
 	public function pre_dispatch()
 	{
+		global $user_profile;
+
 		$this->_memID = currentMemberID();
+		$this->_profile = $user_profile[$this->_memID];
 	}
 
 	/**
@@ -530,7 +539,7 @@ class ProfileAccount_Controller extends Action_Controller
 	 */
 	public function action_deleteaccount2()
 	{
-		global $user_info, $context, $cur_profile, $user_profile, $modSettings;
+		global $user_info, $context, $cur_profile, $modSettings;
 
 		// Try get more time...
 		detectServer()->setTimeLimit(600);
@@ -548,7 +557,7 @@ class ProfileAccount_Controller extends Action_Controller
 		checkSession();
 
 		// Check we got here as we should have!
-		if ($cur_profile != $user_profile[$this->_memID])
+		if ($cur_profile != $this->_profile)
 		{
 			throw new Elk_Exception('no_access', false);
 		}
@@ -631,31 +640,31 @@ class ProfileAccount_Controller extends Action_Controller
 	 */
 	public function action_activateaccount()
 	{
-		global $context, $user_profile, $modSettings;
+		global $context, $modSettings;
 
 		isAllowedTo('moderate_forum');
 
 		if (isset($this->_req->query->save)
-			&& isset($user_profile[$this->_memID]['is_activated'])
-			&& $user_profile[$this->_memID]['is_activated'] != 1)
+			&& isset($this->_profile['is_activated'])
+			&& $this->_profile['is_activated'] != 1)
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
 
 			// If we are approving the deletion of an account, we do something special ;)
-			if ($user_profile[$this->_memID]['is_activated'] == 4)
+			if ($this->_profile['is_activated'] == 4)
 			{
 				deleteMembers($context['id_member']);
 				redirectexit();
 			}
 
 			// Actually update this member now, as it guarantees the unapproved count can't get corrupted.
-			approveMembers(array('members' => array($context['id_member']), 'activated_status' => $user_profile[$this->_memID]['is_activated']));
+			approveMembers(array('members' => array($context['id_member']), 'activated_status' => $this->_profile['is_activated']));
 
 			// Log what we did?
 			logAction('approve_member', array('member' => $this->_memID), 'admin');
 
 			// If we are doing approval, update the stats for the member just in case.
-			if (in_array($user_profile[$this->_memID]['is_activated'], array(3, 4, 13, 14)))
+			if (in_array($this->_profile['is_activated'], array(3, 4, 13, 14)))
 				updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > 1 ? $modSettings['unapprovedMembers'] - 1 : 0)));
 
 			// Make sure we update the stats too.

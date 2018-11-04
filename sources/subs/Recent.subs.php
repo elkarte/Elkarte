@@ -23,7 +23,7 @@
  */
 function getLastPosts($latestPostOptions)
 {
-	global $scripturl, $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -65,20 +65,23 @@ function getLastPosts($latestPostOptions)
 		$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
 		$row['body'] = Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
 
+		$board_href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['board_name']]);
+		$poster_href = getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['poster_name']]);
+		$topic_href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => 'msg' . $row['id_msg'], 'subject' => $row['subject'], 'topicseen']);
 		// Build the array.
 		$posts[] = array(
 			'board' => array(
 				'id' => $row['id_board'],
 				'name' => $row['board_name'],
-				'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
-				'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['board_name'] . '</a>'
+				'href' => $board_href,
+				'link' => '<a href="' . $board_href . '">' . $row['board_name'] . '</a>'
 			),
 			'topic' => $row['id_topic'],
 			'poster' => array(
 				'id' => $row['id_member'],
 				'name' => $row['poster_name'],
-				'href' => empty($row['id_member']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member'],
-				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>'
+				'href' => empty($row['id_member']) ? '' : $poster_href,
+				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $poster_href . '">' . $row['poster_name'] . '</a>'
 			),
 			'subject' => $row['subject'],
 			'short_subject' => Util::shorten_text($row['subject'], $modSettings['subject_length']),
@@ -87,8 +90,8 @@ function getLastPosts($latestPostOptions)
 			'html_time' => htmlTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'raw_timestamp' => $row['poster_time'],
-			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';topicseen#msg' . $row['id_msg'],
-			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';topicseen#msg' . $row['id_msg'] . '" rel="nofollow">' . $row['subject'] . '</a>'
+			'href' => $topic_href . '#msg' . $row['id_msg'],
+			'link' => '<a href="' . $topic_href . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $row['subject'] . '</a>'
 		);
 	}
 	$db->free_result($request);
@@ -130,7 +133,7 @@ function cache_getLastPosts($latestPostOptions)
  */
 function prepareRecentPosts($messages, $start)
 {
-	global $user_info, $scripturl, $modSettings;
+	global $user_info, $modSettings;
 
 	$counter = $start + 1;
 	$posts = array();
@@ -145,6 +148,10 @@ function prepareRecentPosts($messages, $start)
 		// BBC-atize the message.
 		$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
+		$board_href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['bname']]);
+		$topic_href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => 'msg' . $row['id_msg'], 'subject' => $row['subject']]);
+		$first_poster_href = getUrl('profile', ['action' => 'profile', 'u' => $row['first_id_member'], 'name' => $row['first_display_name']]);
+		$poster_href = getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['poster_name']]);
 		// And build the array.
 		$posts[$row['id_msg']] = array(
 			'id' => $row['id_msg'],
@@ -153,18 +160,18 @@ function prepareRecentPosts($messages, $start)
 			'category' => array(
 				'id' => $row['id_cat'],
 				'name' => $row['cname'],
-				'href' => $scripturl . $modSettings['default_forum_action'] . '#c' . $row['id_cat'],
-				'link' => '<a href="' . $scripturl . $modSettings['default_forum_action'] . '#c' . $row['id_cat'] . '">' . $row['cname'] . '</a>'
+				'href' => getUrl('action', $modSettings['default_forum_action']) . '#c' . $row['id_cat'],
+				'link' => '<a href="' . getUrl('action', $modSettings['default_forum_action']) . '#c' . $row['id_cat'] . '">' . $row['cname'] . '</a>'
 			),
 			'board' => array(
 				'id' => $row['id_board'],
 				'name' => $row['bname'],
-				'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
-				'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['bname'] . '</a>'
+				'href' => $board_href,
+				'link' => '<a href="' . $board_href . '">' . $row['bname'] . '</a>'
 			),
 			'topic' => $row['id_topic'],
-			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
-			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $row['subject'] . '</a>',
+			'href' => $topic_href . '#msg' . $row['id_msg'],
+			'link' => '<a href="' . $topic_href . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $row['subject'] . '</a>',
 			'start' => $row['num_replies'],
 			'subject' => $row['subject'],
 			'time' => standardTime($row['poster_time']),
@@ -173,14 +180,14 @@ function prepareRecentPosts($messages, $start)
 			'first_poster' => array(
 				'id' => $row['first_id_member'],
 				'name' => $row['first_display_name'],
-				'href' => empty($row['first_id_member']) ? '' : $scripturl . '?action=profile;u=' . $row['first_id_member'],
-				'link' => empty($row['first_id_member']) ? $row['first_display_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['first_id_member'] . '">' . $row['first_display_name'] . '</a>'
+				'href' => empty($row['first_id_member']) ? '' : $first_poster_href,
+				'link' => empty($row['first_id_member']) ? $row['first_display_name'] : '<a href="' . $first_poster_href . '">' . $row['first_display_name'] . '</a>'
 			),
 			'poster' => array(
 				'id' => $row['id_member'],
 				'name' => $row['poster_name'],
-				'href' => empty($row['id_member']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member'],
-				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>'
+				'href' => empty($row['id_member']) ? '' : $poster_href,
+				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $poster_href . '">' . $row['poster_name'] . '</a>'
 			),
 			'body' => $row['body'],
 			'message' => $row['body'],
@@ -306,7 +313,7 @@ function cache_getLastTopics($latestTopicOptions)
  */
 function getLastTopics($latestTopicOptions)
 {
-	global $scripturl, $modSettings, $txt;
+	global $modSettings, $txt;
 
 	$db = database();
 
@@ -353,20 +360,23 @@ function getLastTopics($latestTopicOptions)
 		$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
 		$row['body'] = Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
 
+		$board_href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['board_name']]);
+		$poster_href = getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['poster_name']]);
+		$topic_href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => 'msg' . $row['id_msg'], 'subject' => $row['subject'], 'topicseen']);
 		// Build the array.
 		$post = array(
 			'board' => array(
 				'id' => $row['id_board'],
 				'name' => $row['board_name'],
-				'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
-				'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['board_name'] . '</a>'
+				'href' => $board_href,
+				'link' => '<a href="' . $board_href . '">' . $row['board_name'] . '</a>'
 			),
 			'topic' => $row['id_topic'],
 			'poster' => array(
 				'id' => $row['id_member'],
 				'name' => $row['poster_name'],
-				'href' => empty($row['id_member']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member'],
-				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>'
+				'href' => empty($row['id_member']) ? '' : $poster_href,
+				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $poster_href . '">' . $row['poster_name'] . '</a>'
 			),
 			'subject' => $row['subject'],
 			'short_subject' => Util::shorten_text($row['subject'], $modSettings['subject_length']),
@@ -375,16 +385,18 @@ function getLastTopics($latestTopicOptions)
 			'html_time' => htmlTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'raw_timestamp' => $row['poster_time'],
-			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';topicseen#msg' . $row['id_msg'],
-			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';topicseen#msg' . $row['id_msg'] . '" rel="nofollow">' . $row['subject'] . '</a>',
+			'href' => $topic_href . '#msg' . $row['id_msg'],
+			'link' => '<a href="' . $topic_href . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $row['subject'] . '</a>',
 			'new' => $row['new_from'] <= $row['id_msg_modified'],
 			'new_from' => $row['new_from'],
 			'newtime' => $row['new_from'],
-			'new_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . '#new',
+			'new_href' => getUrl('topic', ['topic' => $row['id_topic'], 'start' => 'msg' . $row['new_from'], 'subject' => $row['subject']]) . '#new',
 		);
 		if ($post['new'])
+		{
 			$post['link'] .= '
 							<a class="new_posts" href="' . $post['new_href'] . '" id="newicon' . $row['id_msg'] . '">' . $txt['new'] . '</a>';
+		}
 
 		$posts[] = $post;
 	}

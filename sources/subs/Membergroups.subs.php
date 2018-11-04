@@ -542,8 +542,6 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
  */
 function listMembergroupMembers_Href(&$members, $membergroup, $limit = null)
 {
-	global $scripturl;
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -557,7 +555,7 @@ function listMembergroupMembers_Href(&$members, $membergroup, $limit = null)
 	);
 	$members = array();
 	while ($row = $db->fetch_assoc($request))
-		$members[$row['id_member']] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
+		$members[$row['id_member']] = '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['real_name']]) . '">' . $row['real_name'] . '</a>';
 	$db->free_result($request);
 
 	// If there are more than $limit members, add a 'more' link.
@@ -577,8 +575,6 @@ function listMembergroupMembers_Href(&$members, $membergroup, $limit = null)
  */
 function cache_getMembergroupList()
 {
-	global $scripturl;
-
 	$db = database();
 
 	$groupCache = $db->fetchQueryCallback('
@@ -595,9 +591,9 @@ function cache_getMembergroupList()
 			'mod_group' => 3,
 			'blank_string' => '',
 		),
-		function ($row) use ($scripturl)
+		function ($row)
 		{
-			return '<a href="' . $scripturl . '?action=groups;sa=members;group=' . $row['id_group'] . '" ' . ($row['online_color'] ? 'style="color: ' . $row['online_color'] . '"' : '') . '>' . $row['group_name'] . '</a>';
+			return '<a href="' . getUrl('group', ['action' => 'groups', 'sa' => 'members', 'group' => $row['id_group'], 'name' => $row['group_name']]) . '" ' . ($row['online_color'] ? 'style="color: ' . $row['online_color'] . '"' : '') . '>' . $row['group_name'] . '</a>';
 		}
 	);
 
@@ -628,7 +624,7 @@ function cache_getMembergroupList()
  */
 function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type, $user_id, $include_hidden, $include_all = false, $aggregate = false, $count_permissions = false, $pid = null)
 {
-	global $scripturl, $txt, $context;
+	global $txt, $context;
 
 	$db = database();
 	theme()->getTemplates()->loadLanguageFile('Admin');
@@ -763,7 +759,9 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 			)
 		);
 		while ($row = $db->fetch_assoc($query))
-			$groups[$row['id_group']]['moderators'][] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
+		{
+			$groups[$row['id_group']]['moderators'][] = '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['real_name']]) . '">' . $row['real_name'] . '</a>';
+		}
 		$db->free_result($query);
 	}
 
@@ -1941,8 +1939,6 @@ function list_getGroupRequestCount($where, $where_parameters)
  */
 function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_parameters)
 {
-	global $scripturl;
-
 	$db = database();
 
 	return $db->fetchQueryCallback('
@@ -1957,11 +1953,11 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
 		array_merge($where_parameters, array(
 			'sort' => $sort,
 		)),
-		function ($row) use ($scripturl)
+		function ($row)
 		{
 			return array(
 				'id' => $row['id_request'],
-				'member_link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
+				'member_link' => '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['real_name']]) . '">' . $row['real_name'] . '</a>',
 				'group_link' => '<span style="color: ' . $row['online_color'] . '">' . $row['group_name'] . '</span>',
 				'reason' => censor($row['reason']),
 				'time_submitted' => standardTime($row['time_applied']),

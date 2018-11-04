@@ -68,7 +68,7 @@ class ManageAvatars_Controller extends Action_Controller
 	 */
 	public function action_avatarSettings_display()
 	{
-		global $txt, $context, $scripturl;
+		global $txt, $context;
 
 		// Initialize the form
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
@@ -96,7 +96,7 @@ class ManageAvatars_Controller extends Action_Controller
 		$context['settings_save_onclick'] = 'return document.getElementById(\'custom_avatar_enabled\').value == 1 && (document.getElementById(\'custom_avatar_dir\').value == \'\' || document.getElementById(\'custom_avatar_url\').value == \'\') ? confirm(\'' . $txt['custom_avatar_check_empty'] . '\') : true;';
 
 		// Prepare the context.
-		$context['post_url'] = $scripturl . '?action=admin;area=manageattachments;save;sa=avatars';
+		$context['post_url'] = getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'avatars', 'save']);
 		$settingsForm->prepare();
 
 		$context['sub_template'] = 'show_settings';

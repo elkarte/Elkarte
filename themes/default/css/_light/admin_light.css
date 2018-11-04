@@ -221,25 +221,6 @@
 	border-bottom-color: #CCCCCC;
 }
 
-/* Styles for the error log.
-------------------------------------------------- */
-
-#error_log {
-	border-top-color: #DDDDDD;
-}
-
-#error_log .error_where {
-	border-top-color: #DDDDDD;
-}
-
-#errorfile_table {
-	background-color: #FEFEFE;
-}
-
-#errorfile_table .current .linetext {
-	border-color: black;
-}
-
 /* Styles for the Report generation
 ------------------------------------------------- */
 .report_results th {

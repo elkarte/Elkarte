@@ -220,7 +220,7 @@ class OpenID_Controller extends Action_Controller
 	 */
 	public function action_xrds()
 	{
-		global $scripturl, $modSettings;
+		global $modSettings;
 
 		obStart(!empty($modSettings['enableCompressedOutput']));
 
@@ -232,7 +232,7 @@ class OpenID_Controller extends Action_Controller
 	<XRD>
 		<Service>
 			<Type>http://specs.openid.net/auth/2.0/return_to</Type>
-			<URI>', $scripturl, '?action=openidreturn</URI>
+			<URI>', getUrl('action', ['action' => 'openidreturn']) . '</URI>
 	</Service>
 	</XRD>
 </xrds:XRDS>';

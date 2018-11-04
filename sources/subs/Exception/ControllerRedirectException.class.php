@@ -41,12 +41,15 @@ class Controller_Redirect_Exception extends Exception
 	 *
 	 * @param object $source The controller object that called the method
 	 *                ($this in the calling class)
+	 *
 	 * @return The return of the method called.
 	 */
 	public function doRedirect($source)
 	{
 		if (get_class($source) === $this->_controller)
+		{
 			return $source->{$this->_method}();
+		}
 
 		$controller = new $this->_controller(new Event_Manager());
 		$controller->pre_dispatch();

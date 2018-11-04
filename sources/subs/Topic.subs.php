@@ -860,8 +860,6 @@ function moveTopics($topics, $toBoard, $log = false)
  */
 function moveTopicConcurrence($move_from, $id_board, $id_topic)
 {
-	global $scripturl;
-
 	$db = database();
 
 	if (empty($move_from) || empty($id_board) || empty($id_topic))
@@ -889,8 +887,8 @@ function moveTopicConcurrence($move_from, $id_board, $id_topic)
 		list ($topic_subject, $board_name) = $db->fetch_row($request);
 		$db->free_result($request);
 
-		$board_link = '<a href="' . $scripturl . '?board=' . $id_board . '.0">' . $board_name . '</a>';
-		$topic_link = '<a href="' . $scripturl . '?topic=' . $id_topic . '.0">' . $topic_subject . '</a>';
+		$board_link = '<a href="' . getUrl('board', ['board' => $id_board, 'start' => '0', 'name' => $board_name]) . '">' . $board_name . '</a>';
+		$topic_link = '<a href="' . getUrl('topic', ['topic' => $id_topic, 'start' => '0', 'subject' => $topic_subject]) . '">' . $topic_subject . '</a>';
 		throw new Elk_Exception('topic_already_moved', false, array($topic_link, $board_link));
 	}
 }
@@ -904,7 +902,7 @@ function moveTopicConcurrence($move_from, $id_board, $id_topic)
  */
 function removeDeleteConcurrence()
 {
-	global $modSettings, $board, $scripturl, $context;
+	global $modSettings, $board, $context;
 
 	$recycled_enabled = !empty($modSettings['recycle_enable']) && !empty($modSettings['recycle_board']);
 
@@ -915,11 +913,11 @@ function removeDeleteConcurrence()
 		{
 			if (isset($_REQUEST['msg']))
 			{
-				$confirm_url = $scripturl . '?action=deletemsg;confirm_delete;topic=' . $context['current_topic'] . '.0;msg=' . $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'];
+				$confirm_url = getUrl('action', ['action' => 'deletemsg', 'confirm_delete', 'topic' => $context['current_topic'] . '.0', 'msg' => $_REQUEST['msg'], '{session_data}']);
 			}
 			else
 			{
-				$confirm_url = $scripturl . '?action=removetopic2;confirm_delete;topic=' . $context['current_topic'] . '.0;' . $context['session_var'] . '=' . $context['session_id'];
+				$confirm_url = getUrl('action', ['action' => 'removetopic2', 'confirm_delete', 'topic' => $context['current_topic'] . '.0', '{session_data}']);
 			}
 
 			// Give them a prompt before we remove the message
@@ -2339,7 +2337,7 @@ function approveTopics($topics, $approve = true, $log = false)
  */
 function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 {
-	global $scripturl, $user_info, $language, $txt, $topic, $board;
+	global $user_info, $language, $txt, $topic, $board;
 
 	// Should be in the boardwide language.
 	if ($user_info['language'] != $language)
@@ -2349,8 +2347,8 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 
 	// Add a URL onto the message.
 	$reason = strtr($reason, array(
-		$txt['movetopic_auto_board'] => '[url=' . $scripturl . '?board=' . $board_info['id'] . '.0]' . $board_info['name'] . '[/url]',
-		$txt['movetopic_auto_topic'] => '[iurl]' . $scripturl . '?topic=' . $new_topic . '.0[/iurl]'
+		$txt['movetopic_auto_board'] => '[url=' . getUrl('board', ['board' => $board_info['id'], 'start' => '0', 'name' => $board_info['name']]) . ']' . $board_info['name'] . '[/url]',
+		$txt['movetopic_auto_topic'] => '[iurl]' . getUrl('topic', ['topic' => $new_topic, 'start' => '0', 'subject' => $subject]) . '[/iurl]'
 	));
 
 	$msgOptions = array(
@@ -2393,7 +2391,7 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
  */
 function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 {
-	global $txt;
+	global $txt, $modSettings;
 
 	$db = database();
 
@@ -2631,10 +2629,8 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	sendNotifications($split1_ID_TOPIC, 'split');
 
 	// If there's a search index that needs updating, update it...
-	$search = new \ElkArte\Search\Search;
-	$searchAPI = $search->findSearchAPI();
-	if (is_callable(array($searchAPI, 'topicSplit')))
-		$searchAPI->topicSplit($split2_ID_TOPIC, $splitMessages);
+	$searchAPI = new \ElkArte\Search\SearchApiWrapper(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '');
+	$searchAPI->topicSplit($split2_ID_TOPIC, $splitMessages);
 
 	// Return the ID of the newly created topic.
 	return $split2_ID_TOPIC;
@@ -2788,7 +2784,7 @@ function topicNotificationCount($memID)
  */
 function topicNotifications($start, $items_per_page, $sort, $memID)
 {
-	global $scripturl, $user_info, $modSettings;
+	global $user_info, $modSettings;
 
 	$db = database();
 
@@ -2824,20 +2820,22 @@ function topicNotifications($start, $items_per_page, $sort, $memID)
 	while ($row = $db->fetch_assoc($request))
 	{
 		$row['subject'] = censor($row['subject']);
+		$topic_href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => '0', 'subject' => $row['subject']]);
+		$topic_new_href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => 'msg' . $row['new_from'], 'subject' => $row['subject']]);
 
 		$notification_topics[] = array(
 			'id' => $row['id_topic'],
-			'poster_link' => empty($row['id_member']) ? $row['real_name_col'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name_col'] . '</a>',
-			'poster_updated_link' => empty($row['id_member_updated']) ? $row['last_real_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_updated'] . '">' . $row['last_real_name'] . '</a>',
+			'poster_link' => empty($row['id_member']) ? $row['real_name_col'] : '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['real_name_col']]) . '">' . $row['real_name_col'] . '</a>',
+			'poster_updated_link' => empty($row['id_member_updated']) ? $row['last_real_name'] : '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $row['id_member_updated'], 'name' => $row['last_real_name']]) . '</a>',
 			'subject' => $row['subject'],
-			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
-			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['subject'] . '</a>',
+			'href' => $topic_href,
+			'link' => '<a href="' . $topic_href . '">' . $row['subject'] . '</a>',
 			'new' => $row['new_from'] <= $row['id_msg_modified'],
 			'new_from' => $row['new_from'],
 			'updated' => standardTime($row['poster_time']),
-			'new_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . '#new',
-			'new_link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . '#new">' . $row['subject'] . '</a>',
-			'board_link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',
+			'new_href' => $topic_new_href . '#new',
+			'new_link' => '<a href="' . $topic_new_href . '#new">' . $row['subject'] . '</a>',
+			'board_link' => '<a href="' . getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]) . '">' . $row['name'] . '</a>',
 		);
 	}
 	$db->free_result($request);
@@ -2920,7 +2918,7 @@ function countTopicsByBoard($board, $approved = false)
  */
 function mergeableTopics($id_board, $id_topic, $approved, $offset)
 {
-	global $modSettings, $scripturl;
+	global $modSettings;
 
 	$db = database();
 
@@ -2948,13 +2946,14 @@ function mergeableTopics($id_board, $id_topic, $approved, $offset)
 	{
 		$row['subject'] = censor($row['subject']);
 
+		$href = getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['poster_name']]);
 		$topics[] = array(
 			'id' => $row['id_topic'],
 			'poster' => array(
 				'id' => $row['id_member'],
 				'name' => $row['poster_name'],
-				'href' => empty($row['id_member']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member'],
-				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '" target="_blank" class="new_win">' . $row['poster_name'] . '</a>'
+				'href' => empty($row['id_member']) ? '' : $href,
+				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $href . '" target="_blank" class="new_win">' . $row['poster_name'] . '</a>'
 			),
 			'subject' => $row['subject'],
 			'js_subject' => addcslashes(addslashes($row['subject']), '/')

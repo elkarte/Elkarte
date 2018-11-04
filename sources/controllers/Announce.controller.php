@@ -211,7 +211,7 @@ class Announce_Controller extends Action_Controller
 	 */
 	private function _send_announcement($member_info, $topic_info)
 	{
-		global $modSettings, $language, $scripturl, $context;
+		global $modSettings, $language, $context;
 
 		// Loop through all members that'll receive an announcement in this batch.
 		$announcements = array();
@@ -225,7 +225,7 @@ class Announce_Controller extends Action_Controller
 				$replacements = array(
 					'TOPICSUBJECT' => $topic_info['subject'],
 					'MESSAGE' => $topic_info['body'],
-					'TOPICLINK' => $scripturl . '?topic=' . $topic_info['id_topic'] . '.0',
+					'TOPICLINK' => getUrl('topic', ['topic' => $topic_info['id_topic'], 'start' => '0', 'subject' => $topic_info['subject']]),
 				);
 
 				$emaildata = loadEmailTemplate('new_announcement', $replacements, $cur_language);

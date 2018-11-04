@@ -60,15 +60,24 @@ class Profile_Controller extends Action_Controller
 	private $_memID = 0;
 
 	/**
+	 * The array from $user_profile stored here to avoid some global
+	 * @var mixed[]
+	 */
+	private $_profile = [];
+
+	/**
 	 * Called before all other methods when coming from the dispatcher or
 	 * action class.
 	 */
 	public function pre_dispatch()
 	{
+		global $user_profile;
+
 		require_once(SUBSDIR . '/Menu.subs.php');
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		$this->_memID = currentMemberID();
+		$this->_profile = $user_profile[$this->_memID];
 	}
 
 	/**
@@ -80,7 +89,7 @@ class Profile_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		global $txt, $user_info, $context, $user_profile, $cur_profile, $memberContext;
+		global $txt, $user_info, $context, $cur_profile, $memberContext;
 		global $profile_vars, $post_errors;
 
 		// Don't reload this as we may have processed error strings.
@@ -93,7 +102,7 @@ class Profile_Controller extends Action_Controller
 
 		// A little bit about this member
 		$context['id_member'] = $this->_memID;
-		$cur_profile = $user_profile[$this->_memID];
+		$cur_profile = $this->_profile;
 
 		// Let's have some information about this member ready, too.
 		loadMemberContext($this->_memID);
@@ -213,7 +222,7 @@ class Profile_Controller extends Action_Controller
 	 */
 	private function _define_profile_menu()
 	{
-		global $txt, $scripturl, $context, $cur_profile, $modSettings;
+		global $txt, $context, $modSettings;
 
 		$profile_areas = array(
 			'info' => array(
@@ -295,7 +304,7 @@ class Profile_Controller extends Action_Controller
 					),
 					'viewwarning' => array(
 						'label' => $txt['profile_view_warnings'],
-						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $cur_profile['warning'] && (!empty($modSettings['warning_show']) && ($context['user']['is_owner'] || $modSettings['warning_show'] == 2)),
+						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $this->_profile['warning'] && (!empty($modSettings['warning_show']) && ($context['user']['is_owner'] || $modSettings['warning_show'] == 2)),
 						'controller' => 'ProfileInfo_Controller',
 						'function' => 'action_viewWarning',
 						'permission' => array(
@@ -312,7 +321,7 @@ class Profile_Controller extends Action_Controller
 						'label' => $txt['account'],
 						'controller' => 'ProfileOptions_Controller',
 						'function' => 'action_account',
-						'enabled' => $context['user']['is_admin'] || ($cur_profile['id_group'] != 1 && !in_array(1, explode(',', $cur_profile['additional_groups']))),
+						'enabled' => $context['user']['is_admin'] || ($this->_profile['id_group'] != 1 && !in_array(1, explode(',', $this->_profile['additional_groups']))),
 						'sc' => 'post',
 						'token' => 'profile-ac%u',
 						'password' => true,
@@ -347,10 +356,10 @@ class Profile_Controller extends Action_Controller
 						'label' => $txt['authentication'],
 						'controller' => 'ProfileOptions_Controller',
 						'function' => 'action_authentication',
-						'enabled' => !empty($modSettings['enableOpenID']) || !empty($cur_profile['openid_uri']),
+						'enabled' => !empty($modSettings['enableOpenID']) || !empty($this->_profile['openid_uri']),
 						'sc' => 'post',
 						'token' => 'profile-au%u',
-						'hidden' => empty($modSettings['enableOpenID']) && empty($cur_profile['openid_uri']),
+						'hidden' => empty($modSettings['enableOpenID']) && empty($this->_profile['openid_uri']),
 						'password' => true,
 						'permission' => array(
 							'own' => array('profile_identity_any', 'profile_identity_own'),
@@ -430,7 +439,7 @@ class Profile_Controller extends Action_Controller
 				'areas' => array(
 					'sendpm' => array(
 						'label' => $txt['profileSendIm'],
-						'custom_url' => $scripturl . '?action=pm;sa=send',
+						'custom_url' => getUrl('action', ['action' => 'pm', 'sa' => 'send']),
 						'permission' => array(
 							'own' => array(),
 							'any' => array('pm_send'),
@@ -449,8 +458,8 @@ class Profile_Controller extends Action_Controller
 					),
 					'banuser' => array(
 						'label' => $txt['profileBanUser'],
-						'custom_url' => $scripturl . '?action=admin;area=ban;sa=add',
-						'enabled' => $cur_profile['id_group'] != 1 && !in_array(1, explode(',', $cur_profile['additional_groups'])),
+						'custom_url' => getUrl('admin', ['action' => 'admin', 'area' => 'ban', 'sa' => 'add']),
+						'enabled' => $this->_profile['id_group'] != 1 && !in_array(1, explode(',', $this->_profile['additional_groups'])),
 						'permission' => array(
 							'own' => array(),
 							'any' => array('manage_bans'),
@@ -559,17 +568,17 @@ class Profile_Controller extends Action_Controller
 	 */
 	private function _build_profile_linktree()
 	{
-		global $context, $scripturl, $txt, $user_info;
+		global $context, $txt, $user_info;
 
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=profile' . ($this->_memID != $user_info['id'] ? ';u=' . $this->_memID : ''),
+			'url' => getUrl('profile', ['action' => 'profile', 'u' => $this->_memID, 'name' => $this->_profile['real_name']]),
 			'name' => sprintf($txt['profile_of_username'], $context['member']['name']),
 		);
 
 		if (!empty($this->_profile_include_data['label']))
 		{
 			$context['linktree'][] = array(
-				'url' => $scripturl . '?action=profile' . ($this->_memID != $user_info['id'] ? ';u=' . $this->_memID : '') . ';area=' . $this->_profile_include_data['current_area'],
+				'url' => getUrl('profile', ['action' => 'profile', 'area' => $this->_profile_include_data['current_area'], 'u' => $this->_memID, 'name' => $this->_profile['real_name']]),
 				'name' => $this->_profile_include_data['label'],
 			);
 		}
@@ -577,7 +586,7 @@ class Profile_Controller extends Action_Controller
 		if (!empty($this->_profile_include_data['current_subsection']) && $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']][0] != $this->_profile_include_data['label'])
 		{
 			$context['linktree'][] = array(
-				'url' => $scripturl . '?action=profile' . ($this->_memID != $user_info['id'] ? ';u=' . $this->_memID : '') . ';area=' . $this->_profile_include_data['current_area'] . ';sa=' . $this->_profile_include_data['current_subsection'],
+				'url' => getUrl('profile', ['action' => 'profile', 'area' => $this->_profile_include_data['current_area'], 'sa' => $this->_profile_include_data['current_subsection'], 'u' => $this->_memID, 'name' => $this->_profile['real_name']]),
 				'name' => $this->_profile_include_data['subsections'][$this->_profile_include_data['current_subsection']][0],
 			);
 		}
@@ -588,7 +597,7 @@ class Profile_Controller extends Action_Controller
 	 */
 	private function _save_updates()
 	{
-		global $txt, $user_info, $context, $cur_profile, $modSettings, $user_settings, $post_errors, $profile_vars;
+		global $txt, $user_info, $context, $modSettings, $user_settings, $post_errors, $profile_vars;
 
 		// All the subactions that require a user password in order to validate.
 		$check_password = $context['user']['is_owner'] && !empty($this->_profile_include_data['password']);
@@ -686,7 +695,7 @@ class Profile_Controller extends Action_Controller
 				// If we've changed the password, notify any integration that may be listening in.
 				if (isset($profile_vars['passwd']))
 				{
-					call_integration_hook('integrate_reset_pass', array($cur_profile['member_name'], $cur_profile['member_name'], $this->_req->post->passwrd2));
+					call_integration_hook('integrate_reset_pass', array($this->_profile['member_name'], $this->_profile['member_name'], $this->_req->post->passwrd2));
 				}
 
 				require_once(SUBSDIR . '/Members.subs.php');
@@ -738,7 +747,7 @@ class Profile_Controller extends Action_Controller
 				}
 
 				// Let them know it worked!
-				$context['profile_updated'] = $context['user']['is_owner'] ? $txt['profile_updated_own'] : sprintf($txt['profile_updated_else'], $cur_profile['member_name']);
+				$context['profile_updated'] = $context['user']['is_owner'] ? $txt['profile_updated_own'] : sprintf($txt['profile_updated_else'], $this->_profile['member_name']);
 
 				// Invalidate any cached data.
 				Cache::instance()->remove('member_data-profile-' . $this->_memID);
@@ -754,7 +763,7 @@ class Profile_Controller extends Action_Controller
 	 */
 	private function _check_password($check_password)
 	{
-		global $user_settings, $cur_profile, $user_info, $user_profile, $post_errors, $context;
+		global $user_settings, $user_info, $post_errors, $context;
 
 		if ($check_password)
 		{
@@ -777,13 +786,13 @@ class Profile_Controller extends Action_Controller
 				$this->_req->post->oldpasswrd = un_htmlspecialchars($this->_req->post->oldpasswrd);
 
 				// Does the integration want to check passwords?
-				$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($cur_profile['member_name'], $this->_req->post->oldpasswrd, false)), true);
+				$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($this->_profile['member_name'], $this->_req->post->oldpasswrd, false)), true);
 
 				// Start up the password checker, we have work to do
 				require_once(SUBSDIR . '/Auth.subs.php');
 
 				// Bad password!!!
-				if (!$good_password && !validateLoginPassword($this->_req->post->oldpasswrd, $user_info['passwd'], $user_profile[$this->_memID]['member_name']))
+				if (!$good_password && !validateLoginPassword($this->_req->post->oldpasswrd, $user_info['passwd'], $this->_profile['member_name']))
 				{
 					$post_errors[] = 'bad_password';
 				}

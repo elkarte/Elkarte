@@ -102,9 +102,9 @@ function template_html_above()
 	// Show all the relative links, such as help, search, contents, and the like.
 	echo '
 	<link rel="shortcut icon" sizes="196x196" href="' . $context['favicon'] . '" />
-	<link rel="help" href="', $scripturl, '?action=help" />
+	<link rel="help" href="', getUrl('action', ['action' => 'help']), '" />
 	<link rel="contents" href="', $scripturl, '" />', ($context['allow_search'] ? '
-	<link rel="search" href="' . $scripturl . '?action=search" />' : '');
+	<link rel="search" href="' . getUrl('action', ['action' => 'search']) . '" />' : '');
 
 	// If RSS feeds are enabled, advertise the presence of one.
 	if (!empty($context['newsfeed_urls']))
@@ -165,7 +165,7 @@ function template_html_above()
  */
 function template_body_above()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $settings, $txt;
 
 	// Go to top/bottom of page links and skipnav link for a11y.
 	echo '
@@ -184,7 +184,7 @@ function template_body_above()
 		</aside>
 		<section id="header" class="wrapper', !empty($settings['header_layout']) ? ($settings['header_layout'] == 1 ? ' centerheader' : ' rightheader') : '', empty($context['minmax_preferences']['upshrink']) ? '"' : ' hide" aria-hidden="true"', '>
 			<h1 id="forumtitle">
-				<a class="forumlink" href="', $scripturl, '">', $context['forum_name'], '</a>';
+				<a class="forumlink" href="', getUrl('boardindex', []), '">', $context['forum_name'], '</a>';
 
 	echo '
 				<span id="logobox">
@@ -262,10 +262,10 @@ function template_th_login_bar()
  */
 function template_th_search_bar()
 {
-	global $context, $modSettings, $txt, $scripturl;
+	global $context, $modSettings, $txt;
 
 	echo '
-			<form id="search_form" action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8">
+			<form id="search_form" action="', getUrl('action', ['action' => 'search', 'sa' => 'results']), '" method="post" accept-charset="UTF-8">
 				<label for="quicksearch">
 					<input type="text" name="search" id="quicksearch" value="" class="input_text" placeholder="', $txt['search'], '" />
 				</label>';

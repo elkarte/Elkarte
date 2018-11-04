@@ -674,14 +674,6 @@ function redirectexit($setLocation = '', $refresh = false)
 	elseif (isset($_GET['debug']))
 		$setLocation = preg_replace('/^' . preg_quote($scripturl, '/') . '\\??/', $scripturl . '?debug;', $setLocation);
 
-	if (!empty($modSettings['queryless_urls']) && detectServer()->supportRewrite())
-	{
-		if (defined('SID') && SID != '')
-			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '~') . '\?(?:' . SID . '(?:;|&|&amp;))((?:board|topic)=[^#]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);
-		else
-			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '~') . '\?((?:board|topic)=[^#"]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);
-	}
-
 	// Maybe integrations want to change where we are heading?
 	call_integration_hook('integrate_redirect', array(&$setLocation, &$refresh));
 
@@ -698,28 +690,6 @@ function redirectexit($setLocation = '', $refresh = false)
 	}
 
 	obExit(false);
-}
-
-/**
- * URL fixer for redirect exit
- *
- * What it does:
- *
- * - Similar to the callback function used in ob_sessrewrite
- * - Evoked by enabling queryless_urls for systems that support that function
- *
- * @param mixed[] $matches results from the calling preg
- *
- * @return string
- */
-function redirectexit_callback($matches)
-{
-	global $scripturl;
-
-	if (defined('SID') && SID != '')
-		return $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html?' . SID . (isset($matches[2]) ? $matches[2] : '');
-	else
-		return $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html' . (isset($matches[2]) ? $matches[2] : '');
 }
 
 /**
@@ -1543,19 +1513,19 @@ function replaceBasicActionUrl($string)
 			'{forum_name_html_unsafe}' => un_htmlspecialchars($context['forum_name_html_safe']),
 			'{script_url}' => $scripturl,
 			'{board_url}' => $boardurl,
-			'{login_url}' => $scripturl . '?action=login',
-			'{register_url}' => $scripturl . '?action=register',
-			'{activate_url}' => $scripturl . '?action=register;sa=activate',
-			'{help_url}' => $scripturl . '?action=help',
-			'{admin_url}' => $scripturl . '?action=admin',
-			'{moderate_url}' => $scripturl . '?action=moderate',
-			'{recent_url}' => $scripturl . '?action=recent',
-			'{search_url}' => $scripturl . '?action=search',
-			'{who_url}' => $scripturl . '?action=who',
-			'{credits_url}' => $scripturl . '?action=who;sa=credits',
-			'{calendar_url}' => $scripturl . '?action=calendar',
-			'{memberlist_url}' => $scripturl . '?action=memberlist',
-			'{stats_url}' => $scripturl . '?action=stats',
+			'{login_url}' => getUrl('action', ['action' => 'login']),
+			'{register_url}' => getUrl('action', ['action' => 'register']),
+			'{activate_url}' => getUrl('action', ['action' => 'register', 'sa' => 'activate']),
+			'{help_url}' => getUrl('action', ['action' => 'help']),
+			'{admin_url}' => getUrl('admin', ['action' => 'admin']),
+			'{moderate_url}' => getUrl('moderate', ['action' => 'moderate']),
+			'{recent_url}' => getUrl('action', ['action' => 'recent']),
+			'{search_url}' => getUrl('action', ['action' => 'search']),
+			'{who_url}' => getUrl('action', ['action' => 'who']),
+			'{credits_url}' => getUrl('action', ['action' => 'who', 'sa' => 'credits']),
+			'{calendar_url}' => getUrl('action', ['action' => 'calendar']),
+			'{memberlist_url}' => getUrl('action', ['action' => 'memberlist']),
+			'{stats_url}' => getUrl('action', ['action' => 'stats']),
 		);
 		call_integration_hook('integrate_basic_url_replacement', array(&$find_replace));
 	}
@@ -1878,4 +1848,70 @@ function obStart($use_compression = false)
 		ob_start();
 		header('Content-Encoding: none');
 	}
+}
+
+/**
+ * Returns an URL based on the parameters passed and the selected generator
+ *
+ * @param string $type The type of the URL (depending on the type, the
+ *                     generator can act differently
+ * @param mixed[] $params All the parameters of the URL
+ *
+ * @return string An URL
+ */
+function getUrl($type, $params)
+{
+	static $generator = null;
+
+	if ($generator === null)
+	{
+		$generator = initUrlGenerator();
+	}
+	return $generator->get($type, $params);
+}
+
+/**
+ * Returns the query part of an URL based on the parameters passed and the selected generator
+ *
+ * @param string $type The type of the URL (depending on the type, the
+ *                     generator can act differently
+ * @param mixed[] $params All the parameters of the URL
+ *
+ * @return string The query part of an URL
+ */
+function getUrlQuery($type, $params)
+{
+	static $generator = null;
+
+	if ($generator === null)
+	{
+		$generator = initUrlGenerator();
+	}
+	return $generator->getQuery($type, $params);
+}
+
+/**
+ * Initialize the URL generator
+ *
+ * @return object The URL generator object
+ */
+function initUrlGenerator()
+{
+	global $scripturl, $context, $url_format;
+	static $generator = null;
+
+	if ($generator === null)
+	{
+		$generator = new Url_Generator([
+			'generator' => ucfirst($url_format ?? 'standard'),
+			'scripturl' => $scripturl,
+			'replacements' => [
+				'{session_data}' => isset($context['session_var']) ? $context['session_var'] . '=' . $context['session_id'] : ''
+			]
+		]);
+		$generator->register('Topic');
+		$generator->register('Board');
+		$generator->register('Profile');
+	}
+	return $generator;
 }

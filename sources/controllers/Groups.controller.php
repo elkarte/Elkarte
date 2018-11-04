@@ -30,7 +30,7 @@ class Groups_Controller extends Action_Controller
 	 */
 	public function pre_dispatch()
 	{
-		global $context, $txt, $scripturl, $user_info;
+		global $context, $txt, $user_info;
 
 		// Get the template stuff up and running.
 		theme()->getTemplates()->loadLanguageFile('ManageMembers');
@@ -51,7 +51,7 @@ class Groups_Controller extends Action_Controller
 			isAllowedTo('view_mlist');
 
 			$context['linktree'][] = array(
-				'url' => $scripturl . '?action=groups',
+				'url' => getUrl('group', ['action' => 'groups']),
 				'name' => $txt['groups'],
 			);
 		}
@@ -86,21 +86,37 @@ class Groups_Controller extends Action_Controller
 	 */
 	public function action_list()
 	{
-		global $txt, $context, $scripturl, $user_info;
+		global $txt, $context, $user_info;
 
 		$context['page_title'] = $txt['viewing_groups'];
 		$current_area = isset($context['admin_menu_name']) ? $context['admin_menu_name'] : (isset($context['moderation_menu_name']) ? $context['moderation_menu_name'] : '');
 		if (!empty($current_area))
+		{
 			$context[$current_area]['tab_data'] = array(
 				'title' => $txt['mc_group_requests'],
 			);
+		}
 
-		$base_url = $scripturl . (isset($context['admin_menu_name']) ? '?action=admin;area=membergroups;sa=members' : (isset($context['moderation_menu_name']) ? '?action=moderate;area=viewgroups;sa=members' : '?action=groups;sa=members'));
+		if (isset($context['admin_menu_name']))
+		{
+			$base_type = 'admin';
+			$base_params = ['action' => 'admin', 'area' => 'membergroups', 'sa' => 'members'];
+		}
+		elseif (isset($context['moderation_menu_name']))
+		{
+			$base_type = 'moderate';
+			$base_params = ['action' => 'moderate', 'area' => 'viewgroups', 'sa' => 'members'];
+		}
+		else
+		{
+			$base_type = 'group';
+			$base_params = ['action' => 'groups', 'sa' => 'members'];
+		}
 
 		// Use the standard templates for showing this.
 		$listOptions = array(
 			'id' => 'group_lists',
-			'base_href' => $base_url,
+			'base_href' => getUrl($base_type, $base_params),
 			'default_sort_col' => 'group',
 			'get_items' => array(
 				'file' => SUBSDIR . '/Membergroups.subs.php',
@@ -118,22 +134,25 @@ class Groups_Controller extends Action_Controller
 						'value' => $txt['name'],
 					),
 					'data' => array(
-						'function' => function ($rowData) use ($base_url) {
-							global $scripturl;
-
+						'function' => function ($rowData) use ($base_type, $base_params) {
 							// Since the moderator group has no explicit members, no link is needed.
 							if ($rowData['id_group'] == 3)
 								$group_name = $rowData['group_name'];
 							else
 							{
-								$group_name = sprintf('<a href="%1$s;group=%2$d">%3$s</a>', '' . $base_url . '', $rowData['id_group'], $rowData['group_name_color']);
+								$url = getUrl($base_type, array_merge($base_params, ['group' => $rowData['id_group']]));
+								$group_name = sprintf('<a href="%1$s">%3$s</a>', $url, $rowData['id_group'], $rowData['group_name_color']);
 							}
 
 							// Add a help option for moderator and administrator.
 							if ($rowData['id_group'] == 1)
-								$group_name .= sprintf(' (<a href="%1$s?action=quickhelp;help=membergroup_administrator" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)', $scripturl);
+							{
+								$group_name .= ' (<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'membergroup_administrator']) . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)';
+							}
 							elseif ($rowData['id_group'] == 3)
-								$group_name .= sprintf(' (<a href="%1$s?action=quickhelp;help=membergroup_moderator" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)', $scripturl);
+							{
+								$group_name .= ' (<a href="' . getUrl('action', ['action' => 'quickhelp', 'help' => 'membergroup_moderator']) . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)';
+							}
 
 							return $group_name;
 						},
@@ -219,7 +238,7 @@ class Groups_Controller extends Action_Controller
 	 */
 	public function action_members()
 	{
-		global $txt, $scripturl, $context, $modSettings, $user_info, $settings;
+		global $txt, $context, $modSettings, $user_info, $settings;
 
 		$current_group = $this->_req->getQuery('group', 'intval', 0);
 
@@ -244,7 +263,7 @@ class Groups_Controller extends Action_Controller
 
 		// The template is very needy
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=groups;sa=members;group=' . $context['group']['id'],
+			'url' => getUrl('group', ['action' => 'groups', 'sa' => 'members', 'group' => $context['group']['id'], 'name' => $context['group']['name']]),
 			'name' => $context['group']['name'],
 		);
 		$context['can_send_email'] = allowedTo('send_email_to_members');
@@ -383,7 +402,8 @@ class Groups_Controller extends Action_Controller
 		$context['total_members'] = comma_format($context['total_members']);
 
 		// Create the page index.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=' . ($context['group']['can_moderate'] ? 'moderate;area=viewgroups' : 'groups') . ';sa=members;group=' . $current_group . ';sort=' . $context['sort_by'] . (isset($this->_req->query->desc) ? ';desc' : ''), $this->_req->query->start, $context['total_members'], $modSettings['defaultMaxMembers']);
+		$context['page_index'] = constructPageIndex(
+		getUrl($context['group']['can_moderate'] ? 'moderate' : 'group', ['action' => $context['group']['can_moderate'] ? 'moderate' : 'groups', 'area' => $context['group']['can_moderate'] ? 'viewgroups' : '', 'sa' => 'members', 'group' => $current_group, 'sort' => $context['sort_by'], isset($this->_req->query->desc) ? 'desc' : '']), $this->_req->query->start, $context['total_members'], $modSettings['defaultMaxMembers']);
 
 		// Fetch the members that meet the where criteria
 		$context['members'] = membersBy($where, array($where => $current_group, 'order' => $querySort), true);
@@ -397,10 +417,10 @@ class Groups_Controller extends Action_Controller
 
 			$context['members'][$id] = array(
 				'id' => $row['id_member'],
-				'name' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
+				'name' => '<a href="' . getUrl('profile', ['action' => 'quickhelp', 'u' => $row['id_member'], 'name' => $row['real_name']]) . '">' . $row['real_name'] . '</a>',
 				'email' => $row['email_address'],
 				'show_email' => showEmailAddress(!empty($row['hide_email']), $row['id_member']),
-				'ip' => '<a href="' . $scripturl . '?action=trackip;searchip=' . $row['member_ip'] . '">' . $row['member_ip'] . '</a>',
+				'ip' => '<a href="' . getUrl('action', ['action' => 'trackip', 'searchip' => $row['member_ip']]) . '">' . $row['member_ip'] . '</a>',
 				'registered' => standardTime($row['date_registered']),
 				'last_online' => $last_online,
 				'posts' => comma_format($row['posts']),
@@ -422,7 +442,7 @@ class Groups_Controller extends Action_Controller
 	 */
 	public function action_requests()
 	{
-		global $txt, $context, $scripturl, $user_info, $modSettings;
+		global $txt, $context, $user_info, $modSettings;
 
 		// Set up the template stuff...
 		$context['page_title'] = $txt['mc_group_requests'];
@@ -548,7 +568,7 @@ class Groups_Controller extends Action_Controller
 			'width' => '100%',
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['mc_groupr_none_found'],
-			'base_href' => $scripturl . '?action=groups;sa=requests',
+			'base_href' => getUrl('group', ['action' => 'groups', 'sa' => 'requests']),
 			'default_sort_col' => 'member',
 			'get_items' => array(
 				'function' => 'list_getGroupRequests',
@@ -623,7 +643,7 @@ class Groups_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=groups;sa=requests',
+				'href' => getUrl('group', ['action' => 'groups', 'sa' => 'requests']),
 				'include_sort' => true,
 				'include_start' => true,
 				'hidden_fields' => array(

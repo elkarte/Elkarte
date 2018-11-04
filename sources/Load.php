@@ -646,7 +646,7 @@ function loadBoard()
 		$context['linktree'] = array_merge(
 			$context['linktree'],
 			array(array(
-				'url' => $scripturl . $modSettings['default_forum_action'] . '#c' . $board_info['cat']['id'],
+				'url' => getUrl('action', $modSettings['default_forum_action']) . '#c' . $board_info['cat']['id'],
 				'name' => $board_info['cat']['name']
 			)),
 			array_reverse($board_info['parent_boards']),
@@ -938,7 +938,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 		$request = $db->query('', '
 			SELECT' . $select_columns . '
 			FROM {db_prefix}members AS mem' . $select_tables . '
-			WHERE mem.' . ($is_name ? 'member_name' : 'id_member') . (count($users) == 1 ? ' = {' . ($is_name ? 'string' : 'int') . ':users}' : ' IN ({' . ($is_name ? 'array_string' : 'array_int') . ':users})'),
+			WHERE mem.' . ($is_name ? 'member_name' : 'id_member') . (count($users) == 1 ? ' = {' . ($is_name ? 'string' : 'int') . ':users}' : ' IN ({' . ($is_name ? 'array_string_case_insensitive' : 'array_int') . ':users})'),
 			array(
 				'blank_string' => '',
 				'users' => count($users) == 1 ? current($users) : $users,
@@ -1218,7 +1218,7 @@ function detectBrowser()
  */
 function loadTheme($id_theme = 0, $initialize = true)
 {
-	Errors::instance()->log_deprecated('loadTheme()', 'ElkArte\Themes\ThemeLoader.');
+	Errors::instance()->log_deprecated('loadTheme()', 'ElkArte\Themes\ThemeLoader');
 	new ElkArte\Themes\ThemeLoader($id_theme, $initialize);
 }
 
@@ -1294,7 +1294,7 @@ function determineSmileySet($user_smiley_set, $known_smiley_sets)
  */
 function loadEssentialThemeData()
 {
-	Errors::instance()->log_deprecated('loadEssentialThemeData()', 'theme()->getTemplates()->loadEssentialThemeData().');
+	Errors::instance()->log_deprecated('loadEssentialThemeData()', 'theme()->getTemplates()->loadEssentialThemeData()');
 	return theme()->getTemplates()->loadEssentialThemeData();
 }
 
@@ -1321,7 +1321,7 @@ function loadEssentialThemeData()
  */
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
-	Errors::instance()->log_deprecated('loadTemplate()', 'theme()->getTemplates()->load().');
+	Errors::instance()->log_deprecated('loadTemplate()', 'theme()->getTemplates()->load()');
 	return theme()->getTemplates()->load($template_name, $style_sheets, $fatal);
 }
 
@@ -1345,7 +1345,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  */
 function loadSubTemplate($sub_template_name, $fatal = false)
 {
-	Errors::instance()->log_deprecated('loadSubTemplate()', 'theme()->getTemplates()->loadSubTemplate().');
+	Errors::instance()->log_deprecated('loadSubTemplate()', 'theme()->getTemplates()->loadSubTemplate()');
 	theme()->getTemplates()->loadSubTemplate($sub_template_name, $fatal);
 
 	return true;
@@ -1568,7 +1568,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
  */
 function addJavascriptVar($vars, $escape = false)
 {
-	Errors::instance()->log_deprecated('addJavascriptVar()', 'theme()->getTemplates()->addJavascriptVar().');
+	Errors::instance()->log_deprecated('addJavascriptVar()', 'theme()->getTemplates()->addJavascriptVar()');
 	theme()->addJavascriptVar($vars, $escape);
 }
 
@@ -1588,7 +1588,7 @@ function addJavascriptVar($vars, $escape = false)
  */
 function addInlineJavascript($javascript, $defer = false)
 {
-	Errors::instance()->log_deprecated('addInlineJavascript()', 'theme()->getTemplates()->addInlineJavascript().');
+	Errors::instance()->log_deprecated('addInlineJavascript()', 'theme()->addInlineJavascript()');
 	theme()->addInlineJavascript($javascript, $defer);
 }
 
@@ -1607,7 +1607,7 @@ function addInlineJavascript($javascript, $defer = false)
  */
 function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload = false)
 {
-	Errors::instance()->log_deprecated('loadLanguage()', 'theme()->getTemplates()->loadLanguageFile().');
+	Errors::instance()->log_deprecated('loadLanguage()', 'theme()->getTemplates()->loadLanguageFile()');
 	return theme()->getTemplates()->loadLanguageFile($template_name, $lang, $fatal, $force_reload);
 }
 

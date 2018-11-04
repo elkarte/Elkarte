@@ -47,7 +47,7 @@ class Calendar_Controller extends Action_Controller
 	 */
 	public function action_calendar()
 	{
-		global $txt, $context, $modSettings, $scripturl, $options;
+		global $txt, $context, $modSettings, $options;
 
 		// Permissions, permissions, permissions.
 		isAllowedTo('calendar_view');
@@ -144,22 +144,24 @@ class Calendar_Controller extends Action_Controller
 
 		// Load up the linktree!
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=calendar',
+			'url' => getUrl('action', ['action' => 'calendar']),
 			'name' => $txt['calendar']
 		);
 
 		// Add the current month to the linktree.
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=calendar;year=' . $context['current_year'] . ';month=' . $context['current_month'],
+			'url' => getUrl('action', ['action' => 'calendar', 'year' => $context['current_year'], 'month' => $context['current_month']]),
 			'name' => $txt['months'][$context['current_month']] . ' ' . $context['current_year']
 		);
 
 		// If applicable, add the current week to the linktree.
 		if ($context['view_week'])
+		{
 			$context['linktree'][] = array(
-				'url' => $scripturl . '?action=calendar;viewweek;year=' . $context['current_year'] . ';month=' . $context['current_month'] . ';day=' . $context['current_day'],
+				'url' => getUrl('action', ['action' => 'calendar', 'year' => $context['current_year'], 'month' => $context['current_month'], 'day' => $context['current_day'], 'viewweek']),
 				'name' => $txt['calendar_week'] . ' ' . $context['calendar_grid_main']['week_number']
 			);
+		}
 
 		// Build the calendar button array.
 		$context['calendar_buttons'] = array(
@@ -167,7 +169,8 @@ class Calendar_Controller extends Action_Controller
 				'test' => 'can_post',
 				'text' => 'calendar_post_event',
 				'image' => 'calendarpe.png',
-				'lang' => true, 'url' => $scripturl . '?action=calendar;sa=post;month=' . $context['current_month'] . ';year=' . $context['current_year'] . ';' . $context['session_var'] . '=' . $context['session_id']
+				'lang' => true,
+				'url' => getUrl('action', ['action' => 'calendar', 'sa' => 'post', 'year' => $context['current_year'], 'month' => $context['current_month'], '{session_data}'])
 			),
 		);
 
@@ -250,7 +253,7 @@ class Calendar_Controller extends Action_Controller
 	 */
 	public function action_save()
 	{
-		global $modSettings, $user_info, $scripturl;
+		global $modSettings, $user_info;
 
 		checkSession();
 
@@ -300,7 +303,7 @@ class Calendar_Controller extends Action_Controller
 		}
 
 		// No point hanging around here now...
-		redirectexit($scripturl . '?action=calendar;month=' . $this->_req->get('month', 'intval') . ';year=' . $this->_req->get('year', 'intval'));
+		redirectexit('action=calendar;month=' . $this->_req->get('month', 'intval') . ';year=' . $this->_req->get('year', 'intval'));
 	}
 
 	/**
