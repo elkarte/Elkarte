@@ -206,7 +206,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		// If this was submitted already then make the value the posted version.
 		if (!empty($custom_fields) && isset($custom_fields[$row['col_name']]))
 		{
-			$value = Util::htmlspecialchars($custom_fields[$row['col_name']]);
+			$value = \ElkArte\Util::htmlspecialchars($custom_fields[$row['col_name']]);
 			if (in_array($row['field_type'], array('select', 'radio')))
 				$value = ($options = explode(',', $row['field_options'])) && isset($options[$value]) ? $options[$value] : '';
 		}
@@ -768,7 +768,7 @@ function loadProfileFields($force_reload = false)
 
 				if (trim($value) == '')
 					return 'no_name';
-				elseif (Util::strlen($value) > 60)
+				elseif (\ElkArte\Util::strlen($value) > 60)
 					return 'name_too_long';
 				elseif ($cur_profile['real_name'] != $value)
 				{
@@ -937,7 +937,7 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_title',
 			'enabled' => !empty($modSettings['titlesEnable']),
 			'input_validate' => function (&$value) {
-				if (Util::strlen($value) > 50)
+				if (\ElkArte\Util::strlen($value) > 50)
 					return 'user_title_too_long';
 
 				return true;
@@ -1547,7 +1547,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 				switch ($is_valid)
 				{
 					case 'custom_field_too_long':
-						$value = Util::substr($value, 0, $row['field_length']);
+						$value = \ElkArte\Util::substr($value, 0, $row['field_length']);
 						break;
 					case 'custom_field_invalid_email':
 					case 'custom_field_inproper_format':
@@ -1612,7 +1612,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 function isCustomFieldValid($field, $value)
 {
 	// Is it too long?
-	if ($field['field_length'] && $field['field_length'] < Util::strlen($value))
+	if ($field['field_length'] && $field['field_length'] < \ElkArte\Util::strlen($value))
 		return 'custom_field_too_long';
 
 	// Any masks to apply?
@@ -1898,7 +1898,7 @@ function profileReloadUser()
 	if (isset($_POST['passwrd2']) && $_POST['passwrd2'] != '')
 	{
 		require_once(SUBSDIR . '/Auth.subs.php');
-		setLoginCookie(60 * $modSettings['cookieTime'], $context['id_member'], hash('sha256', Util::strtolower($cur_profile['member_name']) . un_htmlspecialchars($_POST['passwrd2']) . $cur_profile['password_salt']));
+		setLoginCookie(60 * $modSettings['cookieTime'], $context['id_member'], hash('sha256', \ElkArte\Util::strtolower($cur_profile['member_name']) . un_htmlspecialchars($_POST['passwrd2']) . $cur_profile['password_salt']));
 	}
 
 	loadUserSettings();
@@ -2107,7 +2107,7 @@ function profileValidateSignature(&$value)
 	preparsecode($value);
 
 	// Too long?
-	if (!allowedTo('admin_forum') && !empty($sig_limits[1]) && Util::strlen(str_replace('<br />', "\n", $value)) > $sig_limits[1])
+	if (!allowedTo('admin_forum') && !empty($sig_limits[1]) && \ElkArte\Util::strlen(str_replace('<br />', "\n", $value)) > $sig_limits[1])
 	{
 		$_POST['signature'] = trim(htmlspecialchars(str_replace('<br />', "\n", $value), ENT_QUOTES, 'UTF-8'));
 		$txt['profile_error_signature_max_length'] = sprintf($txt['profile_error_signature_max_length'], $sig_limits[1]);
@@ -3405,7 +3405,7 @@ function getMemberNotificationsProfile($member_id)
 
 	require_once(SUBSDIR . '/Notification.subs.php');
 
-	$mention_methods = Notifications::instance()->getNotifiers();
+	$mention_methods = \ElkArte\Notifications::instance()->getNotifiers();
 	$enabled_mentions = explode(',', $modSettings['enabled_mentions']);
 	$user_preferences = getUsersNotificationsPreferences($enabled_mentions, $member_id);
 	$mention_types = array();

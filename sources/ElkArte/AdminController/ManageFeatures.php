@@ -985,7 +985,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 						foreach ($this->_req->post->select_option as $k => $v)
 						{
 							// Clean, clean, clean...
-							$v = Util::htmlspecialchars($v);
+							$v = \ElkArte\Util::htmlspecialchars($v);
 							$v = strtr($v, array(',' => ''));
 
 							// Nada, zip, etc...
@@ -1020,7 +1020,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 			// Come up with the unique name?
 			if (empty($context['fid']))
 			{
-				$colname = Util::substr(strtr($this->_req->post->field_name, array(' ' => '')), 0, 6);
+				$colname = \ElkArte\Util::substr(strtr($this->_req->post->field_name, array(' ' => '')), 0, 6);
 				preg_match('~([\w\d_-]+)~', $colname, $matches);
 
 				// If there is nothing to the name, then let's start our own - for foreign languages etc.
@@ -1406,7 +1406,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 			array('check', 'mentions_enabled'),
 		);
 
-		$notification_methods = Notifications::instance()->getNotifiers();
+		$notification_methods = \ElkArte\Notifications::instance()->getNotifiers();
 		$notification_types = getNotificationTypes();
 		$current_settings = unserialize($modSettings['notification_methods']);
 

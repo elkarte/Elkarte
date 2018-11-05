@@ -464,8 +464,8 @@ function saveDraft($draft, $check_last_save = false)
 
 	// The message and subject still need a bit more work
 	preparsecode($draft['body']);
-	if (Util::strlen($draft['subject']) > 100)
-		$draft['subject'] = Util::substr($draft['subject'], 0, 100);
+	if (\ElkArte\Util::strlen($draft['subject']) > 100)
+		$draft['subject'] = \ElkArte\Util::substr($draft['subject'], 0, 100);
 
 	if (!isset($draft['is_usersaved']))
 		$draft['is_usersaved'] = 0;
@@ -542,12 +542,12 @@ function savePMDraft($recipientList, $draft, $check_last_save = false)
 
 	// Determine who this is being sent to
 	if (!$check_last_save && !empty($draft_info['to_list']) && empty($recipientList))
-		$recipientList = Util::unserialize($draft_info['to_list']);
+		$recipientList = \ElkArte\Util::unserialize($draft_info['to_list']);
 
 	// message and subject always need a bit more work
 	preparsecode($draft['body']);
-	if (Util::strlen($draft['subject']) > 100)
-		$draft['subject'] = Util::substr($draft['subject'], 0, 100);
+	if (\ElkArte\Util::strlen($draft['subject']) > 100)
+		$draft['subject'] = \ElkArte\Util::substr($draft['subject'], 0, 100);
 
 	if (!isset($draft['is_usersaved']))
 		$draft['is_usersaved'] = 0;
@@ -646,7 +646,7 @@ function loadDraft($id_draft, $type = 0, $check = true, $load = false)
 			$_REQUEST['message'] = !empty($draft_info['body']) ? $draft_info['body'] : '';
 			$_REQUEST['replied_to'] = !empty($draft_info['id_reply']) ? $draft_info['id_reply'] : 0;
 			$context['id_pm_draft'] = !empty($draft_info['id_draft']) ? $draft_info['id_draft'] : 0;
-			$recipients = Util::unserialize($draft_info['to_list']);
+			$recipients = \ElkArte\Util::unserialize($draft_info['to_list']);
 
 			// Make sure we only have integers in this array
 			$recipients['to'] = array_map('intval', $recipients['to']);

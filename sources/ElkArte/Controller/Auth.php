@@ -72,7 +72,7 @@ class Auth extends \ElkArte\AbstractController
 
 		// Get the template ready.... not really much else to do.
 		$context['page_title'] = $txt['login'];
-		$_REQUEST['u'] = isset($_REQUEST['u']) ? Util::htmlspecialchars($_REQUEST['u']) : '';
+		$_REQUEST['u'] = isset($_REQUEST['u']) ? \ElkArte\Util::htmlspecialchars($_REQUEST['u']) : '';
 		$context['default_username'] = &$_REQUEST['u'];
 		$context['using_openid'] = isset($_GET['openid']);
 		$context['default_password'] = '';
@@ -181,8 +181,8 @@ class Auth extends \ElkArte\AbstractController
 		}
 
 		// No one needs a username that long, plus we only support 80 chars in the db
-		if (Util::strlen($_POST['user']) > 80)
-			$_POST['user'] = Util::substr($_POST['user'], 0, 80);
+		if (\ElkArte\Util::strlen($_POST['user']) > 80)
+			$_POST['user'] = \ElkArte\Util::substr($_POST['user'], 0, 80);
 
 		// Can't use a password > 64 characters sorry, to long and only good for a DoS attack
 		// Plus we expect a 64 character one from SHA-256

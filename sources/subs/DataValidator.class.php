@@ -470,7 +470,7 @@ class Data_Validator
 					$sanitation_parameters = null;
 					$sanitation_parameters_function = array();
 
-					// Were any parameters provided for the rule, e.g. Util::htmlspecialchars[ENT_QUOTES]
+					// Were any parameters provided for the rule, e.g. \ElkArte\Util::htmlspecialchars[ENT_QUOTES]
 					if (preg_match('~(.*)\[(.*)\]~', $rule, $match))
 					{
 						$sanitation_method = '_sanitation_' . $match[1];
@@ -827,7 +827,7 @@ class Data_Validator
 		if (!isset($input[$field]))
 			return;
 
-		if (Util::strlen($input[$field]) <= (int) $validation_parameters)
+		if (\ElkArte\Util::strlen($input[$field]) <= (int) $validation_parameters)
 			return;
 
 		return array(
@@ -854,7 +854,7 @@ class Data_Validator
 		if (!isset($input[$field]))
 			return;
 
-		if (Util::strlen($input[$field]) >= (int) $validation_parameters)
+		if (\ElkArte\Util::strlen($input[$field]) >= (int) $validation_parameters)
 			return;
 
 		return array(
@@ -881,7 +881,7 @@ class Data_Validator
 		if (!isset($input[$field]))
 			return;
 
-		if (Util::strlen($input[$field]) == (int) $validation_parameters)
+		if (\ElkArte\Util::strlen($input[$field]) == (int) $validation_parameters)
 			return;
 
 		return array(
@@ -1354,7 +1354,7 @@ class Data_Validator
 	}
 
 	/**
-	 * Uses Util::htmlspecialchars to sanitize any html in the input
+	 * Uses \ElkArte\Util::htmlspecialchars to sanitize any html in the input
 	 *
 	 * @param string $input
 	 *
@@ -1365,6 +1365,6 @@ class Data_Validator
 		if (!isset($input))
 			return;
 
-		return Util::htmlspecialchars($input);
+		return \ElkArte\Util::htmlspecialchars($input);
 	}
 }

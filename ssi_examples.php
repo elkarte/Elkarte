@@ -639,7 +639,7 @@ template_ssi_above();
 				<a href="javascript:void(0);" onclick="return elkSelectText(this);" class="codeoperation">[Select]</a>
 			</div>
 			<pre class="bbc_code"><?php
-				echo Util::htmlspecialchars(template_homepage_sample1('source'), ENT_COMPAT, 'UTF-8'); ?>
+				echo \ElkArte\Util::htmlspecialchars(template_homepage_sample1('source'), ENT_COMPAT, 'UTF-8'); ?>
 			</pre>
 			<h3>Result</h3>
 			<iframe src="?view=home1" style="width: 100%; height: 450px;"></iframe>

@@ -306,7 +306,7 @@ class Poll extends \ElkArte\AbstractController
 		// Want to make sure before you actually submit?  Must be a lot of options, or something.
 		if ($poll_errors->hasErrors())
 		{
-			$question = Util::htmlspecialchars($this->_req->post->question);
+			$question = \ElkArte\Util::htmlspecialchars($this->_req->post->question);
 
 			// Basic theme info...
 			$context['poll'] = array(
@@ -369,7 +369,7 @@ class Poll extends \ElkArte\AbstractController
 			// If an option exists, update it.  If it is new, add it - but don't reuse ids!
 			foreach ($this->_req->post->options as $id => $label)
 			{
-				$label = censor(Util::htmlspecialchars($label));
+				$label = censor(\ElkArte\Util::htmlspecialchars($label));
 
 				if (isset($context['poll']['choices'][$id]))
 				{
@@ -598,8 +598,8 @@ class Poll extends \ElkArte\AbstractController
 		checkSubmitOnce('check');
 
 		// Now we've done all our error checking, let's get the core poll information cleaned... question first.
-		$question = Util::htmlspecialchars($this->_req->getPost('question', 'trim'));
-		$question = Util::substr($question, 0, 255);
+		$question = \ElkArte\Util::htmlspecialchars($this->_req->getPost('question', 'trim'));
+		$question = \ElkArte\Util::substr($question, 0, 255);
 		$poll_hide = $this->_req->getPost('poll_hide', 'intval', 0);
 		$poll_expire = $this->_req->getPost('poll_expire', 'intval', 0);
 		$poll_change_vote = isset($this->_req->post->poll_change_vote) ? 1 : 0;
@@ -679,7 +679,7 @@ class Poll extends \ElkArte\AbstractController
 			}
 
 			// Dress the option up for its big date with the database.
-			$option = Util::htmlspecialchars($option);
+			$option = \ElkArte\Util::htmlspecialchars($option);
 
 			// If it's already there, update it.  If it's not... add it.
 			if (in_array($k, $choices))

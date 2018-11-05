@@ -97,7 +97,7 @@ class SearchArray
 		$stripped_query = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', $this->_search_string);
 
 		// Make the query lower case. It's gonna be case insensitive anyway.
-		$stripped_query = un_htmlspecialchars(\Util::strtolower($stripped_query));
+		$stripped_query = un_htmlspecialchars(\ElkArte\Util::strtolower($stripped_query));
 
 		// This option will do fulltext searching in the most basic way.
 		if ($this->_search_simple_fulltext)
@@ -113,7 +113,7 @@ class SearchArray
 
 		// Remove the phrase parts and extract the words.
 		$wordArray = preg_replace('~(?:^|\s)(?:[-]?)"(?:[^"]+)"(?:$|\s)~u', ' ', $this->_search_string);
-		$wordArray = explode(' ', \Util::htmlspecialchars(un_htmlspecialchars($wordArray), ENT_QUOTES));
+		$wordArray = explode(' ', \ElkArte\Util::htmlspecialchars(un_htmlspecialchars($wordArray), ENT_QUOTES));
 
 		// A minus sign in front of a word excludes the word.... so...
 		// .. first, we check for things like -"some words", but not "-some words".
@@ -140,7 +140,7 @@ class SearchArray
 				unset($this->_searchArray[$index]);
 			}
 			// Don't allow very, very short words.
-			elseif (\Util::strlen($value) < 2)
+			elseif (\ElkArte\Util::strlen($value) < 2)
 			{
 				$this->_ignored[] = $value;
 				unset($this->_searchArray[$index]);

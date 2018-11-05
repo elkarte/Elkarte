@@ -1066,7 +1066,7 @@ class ManageBans extends \ElkArte\AbstractController
 		{
 			$listOptions['columns']['banned_entity']['data'] = array(
 				'function' => function ($rowData) {
-					return strtr(Util::htmlspecialchars($rowData['hostname']), array('%' => '*'));
+					return strtr(\ElkArte\Util::htmlspecialchars($rowData['hostname']), array('%' => '*'));
 				},
 			);
 			$listOptions['columns']['banned_entity']['sort'] = array(
@@ -1078,7 +1078,7 @@ class ManageBans extends \ElkArte\AbstractController
 		{
 			$listOptions['columns']['banned_entity']['data'] = array(
 				'function' => function ($rowData) {
-					return strtr(Util::htmlspecialchars($rowData['email_address']), array('%' => '*'));
+					return strtr(\ElkArte\Util::htmlspecialchars($rowData['email_address']), array('%' => '*'));
 				},
 			);
 			$listOptions['columns']['banned_entity']['sort'] = array(

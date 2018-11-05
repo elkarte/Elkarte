@@ -1224,7 +1224,7 @@ function createMembergroup($groupname, $minposts, $type)
 			'icons' => 'string', 'online_color' => 'string', 'group_type' => 'int',
 		),
 		array(
-			'', Util::htmlspecialchars($groupname, ENT_QUOTES), $minposts,
+			'', \ElkArte\Util::htmlspecialchars($groupname, ENT_QUOTES), $minposts,
 			'1#icon.png', '', $type,
 		),
 		array('id_group')
@@ -1396,7 +1396,7 @@ function updateMembergroupProperties($properties)
 			switch ($known_properties[$name]['type'])
 			{
 				case 'string':
-					$values['subs_' . $name] = Util::htmlspecialchars((string) $value);
+					$values['subs_' . $name] = \ElkArte\Util::htmlspecialchars((string) $value);
 					break;
 				default:
 					$values['subs_' . $name] = (int) $value;

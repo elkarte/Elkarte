@@ -103,7 +103,7 @@ function updateAllSignatures($applied_sigs)
 
 			// Max characters...
 			if (!empty($sig_limits[1]))
-				$sig = Util::substr($sig, 0, $sig_limits[1]);
+				$sig = \ElkArte\Util::substr($sig, 0, $sig_limits[1]);
 
 			// Max lines...
 			if (!empty($sig_limits[2]))

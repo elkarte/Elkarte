@@ -451,7 +451,7 @@ function loadSubscriptions()
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Pick a cost.
-		$costs = Util::unserialize($row['cost']);
+		$costs = \ElkArte\Util::unserialize($row['cost']);
 
 		if ($row['length'] != 'F' && !empty($modSettings['paid_currency_symbol']) && !empty($costs['fixed']))
 			$cost = sprintf($modSettings['paid_currency_symbol'], $costs['fixed']);
@@ -849,7 +849,7 @@ function getSubscriptionDetails($sub_id)
 			'id' => $row['id_subscribe'],
 			'name' => $row['name'],
 			'desc' => $row['description'],
-			'cost' => Util::unserialize($row['cost']),
+			'cost' => \ElkArte\Util::unserialize($row['cost']),
 			'span' => array(
 				'value' => $span_value,
 				'unit' => $span_unit,

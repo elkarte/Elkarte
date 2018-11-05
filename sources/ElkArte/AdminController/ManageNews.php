@@ -162,7 +162,7 @@ class ManageNews extends \ElkArte\AbstractController
 					unset($this->_req->post->news[$i]);
 				else
 				{
-					$this->_req->post->news[$i] = Util::htmlspecialchars($this->_req->post->news[$i], ENT_QUOTES);
+					$this->_req->post->news[$i] = \ElkArte\Util::htmlspecialchars($this->_req->post->news[$i], ENT_QUOTES);
 					preparsecode($this->_req->post->news[$i]);
 				}
 			}
@@ -497,7 +497,7 @@ class ManageNews extends \ElkArte\AbstractController
 				foreach ($temp as $index => $member)
 				{
 					if (strlen(trim($member)) > 0)
-						$temp[$index] = Util::htmlspecialchars(Util::strtolower(trim($member)));
+						$temp[$index] = \ElkArte\Util::htmlspecialchars(\ElkArte\Util::strtolower(trim($member)));
 					else
 						unset($temp[$index]);
 				}

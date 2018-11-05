@@ -1186,7 +1186,7 @@ function copyPermissionProfile($profile_name, $copy_from)
 {
 	$db = database();
 
-	$profile_name = Util::htmlspecialchars($profile_name);
+	$profile_name = \ElkArte\Util::htmlspecialchars($profile_name);
 	// Insert the profile itself.
 	$db->insert('',
 		'{db_prefix}permission_profiles',
@@ -1236,7 +1236,7 @@ function renamePermissionProfile($id_profile, $name)
 {
 	$db = database();
 
-	$name = Util::htmlspecialchars($name);
+	$name = \ElkArte\Util::htmlspecialchars($name);
 
 	$db->query('', '
 		UPDATE {db_prefix}permission_profiles

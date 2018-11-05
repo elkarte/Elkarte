@@ -240,7 +240,7 @@ class ManageCalendarModule extends \ElkArte\AbstractController
 			checkSession();
 
 			// Not too long good sir?
-			$this->_req->post->title = Util::substr($this->_req->post->title, 0, 60);
+			$this->_req->post->title = \ElkArte\Util::substr($this->_req->post->title, 0, 60);
 			$this->_req->post->holiday = $this->_req->getPost('holiday', 'intval', 0);
 
 			if (isset($this->_req->post->delete))

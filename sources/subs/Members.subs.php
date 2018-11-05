@@ -835,7 +835,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	$db = database();
 
 	$name = preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'replaceEntities__callback', $name);
-	$checkName = Util::strtolower($name);
+	$checkName = \ElkArte\Util::strtolower($name);
 
 	// Administrators are never restricted ;).
 	if (!allowedTo('admin_forum') && ((!empty($modSettings['reserveName']) && $is_name) || !empty($modSettings['reserveUser']) && !$is_name))
@@ -855,10 +855,10 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 
 			// Case sensitive name?
 			if (empty($modSettings['reserveCase']))
-				$reservedCheck = Util::strtolower($reservedCheck);
+				$reservedCheck = \ElkArte\Util::strtolower($reservedCheck);
 
 			// If it's not just entire word, check for it in there somewhere...
-			if ($checkMe == $reservedCheck || (Util::strpos($checkMe, $reservedCheck) !== false && empty($modSettings['reserveWord'])))
+			if ($checkMe == $reservedCheck || (\ElkArte\Util::strpos($checkMe, $reservedCheck) !== false && empty($modSettings['reserveWord'])))
 				if ($fatal)
 					throw new \ElkArte\Exceptions\Exception('username_reserved', 'password', array($reserved));
 				else
@@ -1776,7 +1776,7 @@ function getMemberByName($name, $flexible = false)
 			OR {column_case_insensitive:member_name} LIKE {string_case_insensitive:name}' : '') . '
 		LIMIT 1',
 		array(
-			'name' => Util::strtolower($name),
+			'name' => \ElkArte\Util::strtolower($name),
 		)
 	);
 	if ($db->num_rows($request) == 0)
@@ -1822,7 +1822,7 @@ function getMember($search, $buddies = array())
 			'buddy_list' => $buddies,
 			'search' => $search,
 			'activation_status' => array(1, 12),
-			'limit' => Util::strlen($search) <= 2 ? 100 : 200,
+			'limit' => \ElkArte\Util::strlen($search) <= 2 ? 100 : 200,
 		),
 		function ($row)
 		{

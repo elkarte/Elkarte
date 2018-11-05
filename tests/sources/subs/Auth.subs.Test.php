@@ -59,7 +59,7 @@ class TestAuthsubs extends \PHPUnit\Framework\TestCase
 		$this->assertNotEmpty($user_data);
 
 		// What a form could send in
-		$password = hash('sha256', Util::strtolower($this->user) . un_htmlspecialchars($this->passwd));
+		$password = hash('sha256', \ElkArte\Util::strtolower($this->user) . un_htmlspecialchars($this->passwd));
 
 		// Check secure and insecure forms
 		$this->assertTrue(validateLoginPassword($password, $user_data['passwd']));

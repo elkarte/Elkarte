@@ -150,12 +150,12 @@ function addonsCredits()
 		);
 		while ($row = $db->fetch_assoc($request))
 		{
-			$credit_info = Util::unserialize($row['credits']);
+			$credit_info = \ElkArte\Util::unserialize($row['credits']);
 
-			$copyright = empty($credit_info['copyright']) ? '' : $txt['credits_copyright'] . ' &copy; ' . Util::htmlspecialchars($credit_info['copyright']);
-			$license = empty($credit_info['license']) ? '' : $txt['credits_license'] . ': ' . Util::htmlspecialchars($credit_info['license']);
+			$copyright = empty($credit_info['copyright']) ? '' : $txt['credits_copyright'] . ' &copy; ' . \ElkArte\Util::htmlspecialchars($credit_info['copyright']);
+			$license = empty($credit_info['license']) ? '' : $txt['credits_license'] . ': ' . \ElkArte\Util::htmlspecialchars($credit_info['license']);
 			$version = $txt['credits_version'] . '' . $row['version'];
-			$title = (empty($credit_info['title']) ? $row['name'] : Util::htmlspecialchars($credit_info['title'])) . ': ' . $version;
+			$title = (empty($credit_info['title']) ? $row['name'] : \ElkArte\Util::htmlspecialchars($credit_info['title'])) . ': ' . $version;
 
 			// Build this one out and stash it away
 			$name = empty($credit_info['url']) ? $title : '<a href="' . $credit_info['url'] . '">' . $title . '</a>';
@@ -244,7 +244,7 @@ function determineActions($urls, $preferred_prefix = false)
 	foreach ($url_list as $k => $url)
 	{
 		// Get the request parameters..
-		$actions = Util::unserialize($url[0]);
+		$actions = \ElkArte\Util::unserialize($url[0]);
 		if ($actions === false)
 		{
 			continue;

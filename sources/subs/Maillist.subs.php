@@ -211,9 +211,9 @@ function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $s
 		$email_filters[$row['id_filter']] = array(
 			'id_filter' => $row['id_filter'],
 			'filter_type' => $row['filter_type'],
-			'filter_to' => '<strong>"</strong>' . Util::htmlspecialchars($row['filter_to']) . '<strong>"</strong>',
-			'filter_from' => '<strong>"</strong>' . Util::htmlspecialchars($row['filter_from']) . '<strong>"</strong>',
-			'filter_name' => Util::htmlspecialchars($row['filter_name']),
+			'filter_to' => '<strong>"</strong>' . \ElkArte\Util::htmlspecialchars($row['filter_to']) . '<strong>"</strong>',
+			'filter_from' => '<strong>"</strong>' . \ElkArte\Util::htmlspecialchars($row['filter_from']) . '<strong>"</strong>',
+			'filter_name' => \ElkArte\Util::htmlspecialchars($row['filter_name']),
 			'filter_order' => $row['filter_order'],
 		);
 	}

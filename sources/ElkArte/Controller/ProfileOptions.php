@@ -235,7 +235,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 			checkSession();
 
 			// Prepare the string for extraction...
-			$new_buddy = strtr(Util::htmlspecialchars($this->_req->post->new_buddy, ENT_QUOTES), array('&quot;' => '"'));
+			$new_buddy = strtr(\ElkArte\Util::htmlspecialchars($this->_req->post->new_buddy, ENT_QUOTES), array('&quot;' => '"'));
 			preg_match_all('~"([^"]+)"~', $new_buddy, $matches);
 			$new_buddies = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $new_buddy))));
 
@@ -341,7 +341,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 			checkSession();
 
 			// Prepare the string for extraction...
-			$new_ignore = strtr(Util::htmlspecialchars($this->_req->post->new_ignore, ENT_QUOTES), array('&quot;' => '"'));
+			$new_ignore = strtr(\ElkArte\Util::htmlspecialchars($this->_req->post->new_ignore, ENT_QUOTES), array('&quot;' => '"'));
 			preg_match_all('~"([^"]+)"~', $new_ignore, $matches);
 			$new_entries = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $new_ignore))));
 

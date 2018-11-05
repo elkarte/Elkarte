@@ -548,9 +548,9 @@ class Emailuser extends \ElkArte\AbstractController
 		// Make sure we have a comment and it's clean.
 		if ($this->_req->getPost('comment', 'Util::htmltrim', '') === '')
 			$report_errors->addError('no_comment');
-		$poster_comment = strtr(Util::htmlspecialchars($this->_req->post->comment), array("\r" => '', "\t" => ''));
+		$poster_comment = strtr(\ElkArte\Util::htmlspecialchars($this->_req->post->comment), array("\r" => '', "\t" => ''));
 
-		if (Util::strlen($poster_comment) > 254)
+		if (\ElkArte\Util::strlen($poster_comment) > 254)
 			$report_errors->addError('post_too_long');
 
 		// Guests need to provide their address!

@@ -173,7 +173,7 @@ class PackageServers extends \ElkArte\AbstractController
 			{
 				// Section title / header for the category
 				$context['package_list'][$packageSection] = array(
-					'title' => Util::htmlspecialchars(ucwords($packageSection)),
+					'title' => \ElkArte\Util::htmlspecialchars(ucwords($packageSection)),
 					'text' => '',
 					'items' => array(),
 				);
@@ -279,10 +279,10 @@ class PackageServers extends \ElkArte\AbstractController
 		return array(
 			'id' => !empty($thisPackage->pkid) ? array($thisPackage->pkid) : $this->_assume_id($thisPackage),
 			'type' => $packageSection,
-			'name' => Util::htmlspecialchars($thisPackage->title),
+			'name' => \ElkArte\Util::htmlspecialchars($thisPackage->title),
 			'date' => htmlTime(strtotime($thisPackage->date)),
-			'author' =>  Util::htmlspecialchars($thisPackage->author),
-			'description' => !empty($thisPackage->short) ? Util::htmlspecialchars($thisPackage->short) : '',
+			'author' =>  \ElkArte\Util::htmlspecialchars($thisPackage->author),
+			'description' => !empty($thisPackage->short) ? \ElkArte\Util::htmlspecialchars($thisPackage->short) : '',
 			'version' => $thisPackage->version,
 			'elkversion' => $thisPackage->elkversion,
 			'license' => $thisPackage->license,
@@ -659,8 +659,8 @@ class PackageServers extends \ElkArte\AbstractController
 			$this->_req->post->serverurl = substr($this->_req->post->serverurl, 0, -1);
 
 		// Are they both nice and clean?
-		$servername = trim(Util::htmlspecialchars($this->_req->post->servername));
-		$serverurl = trim(Util::htmlspecialchars($this->_req->post->serverurl));
+		$servername = trim(\ElkArte\Util::htmlspecialchars($this->_req->post->servername));
+		$serverurl = trim(\ElkArte\Util::htmlspecialchars($this->_req->post->serverurl));
 
 		// Make sure the URL has the correct prefix.
 		$serverurl = addProtocol($serverurl, array('http://', 'https://'));

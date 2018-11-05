@@ -37,7 +37,7 @@ class User_Access_Mentions implements Scheduled_Task_Interface
 
 		if (!empty($modSettings['user_access_mentions']))
 		{
-			$user_access_mentions = \Util::unserialize($modSettings['user_access_mentions']);
+			$user_access_mentions = \ElkArte\Util::unserialize($modSettings['user_access_mentions']);
 		}
 		else
 		{
@@ -210,7 +210,7 @@ class User_Access_Mentions implements Scheduled_Task_Interface
 				if ($db->num_rows($request2) == 1)
 				{
 					if (!empty($modSettings['user_access_mentions']))
-						$modSettings['user_access_mentions'] = \Util::unserialize($modSettings['user_access_mentions']);
+						$modSettings['user_access_mentions'] = \ElkArte\Util::unserialize($modSettings['user_access_mentions']);
 					else
 						$modSettings['user_access_mentions'] = array();
 

@@ -178,7 +178,7 @@ function bb2_insert($settings, $package, $key)
 		{
 			// Make sure this header it will fit in the db, if not move on to the next
 			// @todo increase the db space to 512 or convert to text?
-			$check = $length + Util::strlen($h) + Util::strlen($v) + 2;
+			$check = $length + \ElkArte\Util::strlen($h) + \ElkArte\Util::strlen($v) + 2;
 			if ($check < 255)
 			{
 				$headers .= bb2_db_escape($h . ': ' .  $v . "\n");
@@ -259,7 +259,7 @@ function bb2_read_whitelist()
 		$whitelist[$list] = array();
 		if (!empty($modSettings[$list]))
 		{
-			$whitelist[$list] = Util::unserialize($modSettings[$list]);
+			$whitelist[$list] = \ElkArte\Util::unserialize($modSettings[$list]);
 			$whitelist[$list] = array_filter($whitelist[$list]);
 		}
 	}

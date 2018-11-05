@@ -133,7 +133,7 @@ class Spellcheck extends \ElkArte\AbstractController
 			$check_word = explode('|', $alpha);
 
 			// If the word is a known word, or spelled right...
-			if (in_array(Util::strtolower($check_word[0]), $this->known_words) || pspell_check($this->pspell_link, $check_word[0]) || !isset($check_word[2]))
+			if (in_array(\ElkArte\Util::strtolower($check_word[0]), $this->known_words) || pspell_check($this->pspell_link, $check_word[0]) || !isset($check_word[2]))
 			{
 				continue;
 			}

@@ -310,7 +310,7 @@ class SplitTopics extends \ElkArte\AbstractController
 		// This is a special case for split topics from quick-moderation checkboxes
 		if (isset($this->_req->query->subname_enc))
 		{
-			$this->_new_topic_subject = trim(Util::htmlspecialchars(urldecode($this->_req->query->subname_enc)));
+			$this->_new_topic_subject = trim(\ElkArte\Util::htmlspecialchars(urldecode($this->_req->query->subname_enc)));
 			$this->_set_session_values();
 		}
 
@@ -471,7 +471,7 @@ class SplitTopics extends \ElkArte\AbstractController
 		// Clean up the subject.
 		$subname = $this->_req->getPost('subname', 'trim', $this->_req->getQuery('subname', 'trim', null));
 		if (isset($subname) && empty($this->_new_topic_subject))
-			$this->_new_topic_subject = Util::htmlspecialchars($subname);
+			$this->_new_topic_subject = \ElkArte\Util::htmlspecialchars($subname);
 
 		if (empty($this->_new_topic_subject))
 			$this->_new_topic_subject = $txt['new_topic'];
@@ -480,7 +480,7 @@ class SplitTopics extends \ElkArte\AbstractController
 		if (empty($_SESSION['move_to_board']))
 		{
 			$_SESSION['move_to_board'] = (!empty($this->_req->post->move_new_topic) && !empty($this->_req->post->move_to_board)) ? (int) $this->_req->post->move_to_board : 0;
-			$_SESSION['reason'] = !empty($this->_req->post->reason) ? trim(Util::htmlspecialchars($this->_req->post->reason, ENT_QUOTES)) : '';
+			$_SESSION['reason'] = !empty($this->_req->post->reason) ? trim(\ElkArte\Util::htmlspecialchars($this->_req->post->reason, ENT_QUOTES)) : '';
 			$_SESSION['messageRedirect'] = !empty($this->_req->post->messageRedirect);
 			$_SESSION['new_topic_subject'] = $this->_new_topic_subject;
 		}

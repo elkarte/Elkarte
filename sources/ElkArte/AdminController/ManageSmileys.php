@@ -1447,7 +1447,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 		if (isset($this->_req->query->set_gz))
 		{
 			$base_name = strtr(basename($this->_req->query->set_gz), ':/', '-_');
-			$name = Util::htmlspecialchars(strtok(basename($this->_req->query->set_gz), '.'));
+			$name = \ElkArte\Util::htmlspecialchars(strtok(basename($this->_req->query->set_gz), '.'));
 			$context['filename'] = $base_name;
 
 			// Check that the smiley is from simplemachines.org, for now... maybe add mirroring later.
@@ -1466,7 +1466,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 		elseif (isset($this->_req->query->package))
 		{
 			$base_name = basename($this->_req->query->package);
-			$name = Util::htmlspecialchars(strtok(basename($this->_req->query->package), '.'));
+			$name = \ElkArte\Util::htmlspecialchars(strtok(basename($this->_req->query->package), '.'));
 			$context['filename'] = $base_name;
 
 			$destination = BOARDDIR . '/packages/' . basename($this->_req->query->package);
@@ -1562,7 +1562,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 				// Do this one...
 				$thisAction = array(
 					'type' => $txt['package_extract'] . ' ' . ($action['type'] === 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
-					'action' => Util::htmlspecialchars(strtr($action['destination'], array(BOARDDIR => '.')))
+					'action' => \ElkArte\Util::htmlspecialchars(strtr($action['destination'], array(BOARDDIR => '.')))
 				);
 
 				$file = BOARDDIR . '/packages/temp/' . $base_path . $action['filename'];
@@ -1609,7 +1609,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 			{
 				updateSettings(array(
 					'smiley_sets_known' => $modSettings['smiley_sets_known'] . ',' . basename($action['action']),
-					'smiley_sets_names' => $modSettings['smiley_sets_names'] . "\n" . $smileyInfo['name'] . (count($context['actions']) > 1 ? ' ' . (!empty($action['description']) ? Util::htmlspecialchars($action['description']) : basename($action['action'])) : ''),
+					'smiley_sets_names' => $modSettings['smiley_sets_names'] . "\n" . $smileyInfo['name'] . (count($context['actions']) > 1 ? ' ' . (!empty($action['description']) ? \ElkArte\Util::htmlspecialchars($action['description']) : basename($action['action'])) : ''),
 				));
 			}
 
@@ -1631,7 +1631,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 			);
 			logPackageInstall($installed);
 
-			logAction('install_package', array('package' => Util::htmlspecialchars($smileyInfo['name']), 'version' => Util::htmlspecialchars($smileyInfo['version'])), 'admin');
+			logAction('install_package', array('package' => \ElkArte\Util::htmlspecialchars($smileyInfo['name']), 'version' => \ElkArte\Util::htmlspecialchars($smileyInfo['version'])), 'admin');
 
 			$this->clearSmileyCache();
 		}

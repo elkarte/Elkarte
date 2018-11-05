@@ -741,7 +741,7 @@ class Packages extends \ElkArte\AbstractController
 			deltree(BOARDDIR . '/packages/temp');
 
 		// Log what we just did.
-		logAction($this->_uninstalling ? 'uninstall_package' : (!empty($is_upgrade) ? 'upgrade_package' : 'install_package'), array('package' => Util::htmlspecialchars($packageInfo['name']), 'version' => Util::htmlspecialchars($packageInfo['version'])), 'admin');
+		logAction($this->_uninstalling ? 'uninstall_package' : (!empty($is_upgrade) ? 'upgrade_package' : 'install_package'), array('package' => \ElkArte\Util::htmlspecialchars($packageInfo['name']), 'version' => \ElkArte\Util::htmlspecialchars($packageInfo['version'])), 'admin');
 
 		// Just in case, let's clear the whole cache to avoid anything going up the swanny.
 		clean_cache();
@@ -1332,7 +1332,7 @@ class Packages extends \ElkArte\AbstractController
 			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['attachments']);
 
 			if (!is_array($modSettings['attachmentUploadDir']))
-				$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
+				$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 
 			// @todo Should we suggest non-current directories be read only?
 			foreach ($modSettings['attachmentUploadDir'] as $dir)

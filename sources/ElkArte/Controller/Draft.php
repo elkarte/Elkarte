@@ -236,7 +236,7 @@ class Draft extends Post
 				'to' => array(),
 				'bcc' => array(),
 			);
-			$recipient_ids = (!empty($row['to_list'])) ? Util::unserialize($row['to_list']) : array();
+			$recipient_ids = (!empty($row['to_list'])) ? \ElkArte\Util::unserialize($row['to_list']) : array();
 
 			// Get nice names to show the user, the id's are not that great to see!
 			if (!empty($recipient_ids['to']) || !empty($recipient_ids['bcc']))
@@ -351,7 +351,7 @@ class Draft extends Post
 			$body = '';
 		}
 
-		$subject = Util::htmltrim($subject);
+		$subject = \ElkArte\Util::htmltrim($subject);
 		if (empty($subject))
 		{
 			$subject = $default_subject;

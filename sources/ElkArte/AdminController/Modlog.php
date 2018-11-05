@@ -275,7 +275,7 @@ class Modlog extends \ElkArte\AbstractController
 					'position' => 'below_table_data',
 					'value' => '
 						' . $txt['modlog_search'] . ' (' . $txt['modlog_by'] . ': ' . $context['search']['label'] . ')
-						<input type="text" name="search" size="18" value="' . Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
+						<input type="text" name="search" size="18" value="' . \ElkArte\Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
 						<input type="submit" name="is_search" value="' . $txt['modlog_go'] . '" />
 						' . ($context['can_delete'] ? '|&nbsp;
 						<input type="submit" name="remove" value="' . $txt['modlog_remove'] . '" onclick="return confirm(\'' . $txt['modlog_remove_selected_confirm'] . '\');" />

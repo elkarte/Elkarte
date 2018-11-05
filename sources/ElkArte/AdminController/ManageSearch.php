@@ -117,7 +117,7 @@ class ManageSearch extends \ElkArte\AbstractController
 		$context['search_engines'] = array();
 		if (!empty($modSettings['additional_search_engines']))
 		{
-			$context['search_engines'] = Util::unserialize($modSettings['additional_search_engines']);
+			$context['search_engines'] = \ElkArte\Util::unserialize($modSettings['additional_search_engines']);
 		}
 
 		for ($count = 0; $count < 3; $count++)
@@ -149,9 +149,9 @@ class ManageSearch extends \ElkArte\AbstractController
 				if (!empty($searchengine) && !empty($url) && filter_var($url, FILTER_VALIDATE_URL))
 				{
 					$new_engines[] = array(
-						'name' => trim(Util::htmlspecialchars($searchengine, ENT_COMPAT)),
+						'name' => trim(\ElkArte\Util::htmlspecialchars($searchengine, ENT_COMPAT)),
 						'url' => $url,
-						'separator' => trim(Util::htmlspecialchars(!empty($this->_req->post->engine_separator[$id]) ? $this->_req->post->engine_separator[$id] : '+', ENT_COMPAT)),
+						'separator' => trim(\ElkArte\Util::htmlspecialchars(!empty($this->_req->post->engine_separator[$id]) ? $this->_req->post->engine_separator[$id] : '+', ENT_COMPAT)),
 					);
 				}
 			}
@@ -453,7 +453,7 @@ class ManageSearch extends \ElkArte\AbstractController
 		// Resume building an index that was not completed
 		if (isset($this->_req->query->resume) && !empty($modSettings['search_custom_index_resume']))
 		{
-			$context['index_settings'] = Util::unserialize($modSettings['search_custom_index_resume']);
+			$context['index_settings'] = \ElkArte\Util::unserialize($modSettings['search_custom_index_resume']);
 			$context['start'] = (int) $context['index_settings']['resume_at'];
 			unset($context['index_settings']['resume_at']);
 			$context['step'] = 1;

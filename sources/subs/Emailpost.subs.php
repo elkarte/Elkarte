@@ -801,7 +801,7 @@ function pbe_email_attachments($pbe, $email_message)
 	if (!empty($modSettings['currentAttachmentUploadDir']))
 	{
 		if (!is_array($modSettings['attachmentUploadDir']))
-			$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
+			$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 
 		// The current directory, of course!
 		$current_attach_dir = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
@@ -901,7 +901,7 @@ function pbe_find_board_number($email_address)
 	$board_number = 0;
 
 	// Load our valid email ids and the corresponding board ids
-	$data = (!empty($modSettings['maillist_receiving_address'])) ? Util::unserialize($modSettings['maillist_receiving_address']) : array();
+	$data = (!empty($modSettings['maillist_receiving_address'])) ? \ElkArte\Util::unserialize($modSettings['maillist_receiving_address']) : array();
 	foreach ($data as $key => $addr)
 		$valid_address[$addr[0]] = $addr[1];
 
@@ -1083,8 +1083,8 @@ function pbe_disable_user_notify($email_message)
 		//Add a "mention" of email notification being disabled
 		if (!empty($modSettings['mentions_enabled']))
 		{
-			$notifier = Notifications::instance();
-			$notifier->add(new Notifications_Task(
+			$notifier = \ElkArte\Notifications::instance();
+			$notifier->add(new \ElkArte\NotificationsTask(
 				'mailfail',
 				0,
 				$id_member,

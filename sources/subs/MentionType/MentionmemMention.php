@@ -164,8 +164,8 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 	{
 		if (!empty($this->_actually_mentioned))
 		{
-			$notifier = \Notifications::instance();
-			$notifier->add(new \Notifications_Task(
+			$notifier = \ElkArte\Notifications::instance();
+			$notifier->add(new \ElkArte\NotificationsTask(
 				'mentionmem',
 				$msgOptions['id'],
 				$posterOptions['id'],

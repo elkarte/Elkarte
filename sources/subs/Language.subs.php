@@ -90,7 +90,7 @@ function list_getLanguages()
 			'char_set' => 'UTF-8',
 			'default' => $language == $lang['filename'] || ($language == '' && $lang['filename'] == 'english'),
 			'locale' => $txt['lang_locale'],
-			'name' => Util::ucwords(strtr($lang['filename'], array('_' => ' ', '-utf8' => ''))),
+			'name' => \ElkArte\Util::ucwords(strtr($lang['filename'], array('_' => ' ', '-utf8' => ''))),
 		);
 	}
 
@@ -230,7 +230,7 @@ function cleanLangString($string, $to_display = true)
 		}
 
 		// Un-html then re-html the whole thing!
-		$new_string = Util::htmlspecialchars(un_htmlspecialchars($new_string));
+		$new_string = \ElkArte\Util::htmlspecialchars(un_htmlspecialchars($new_string));
 	}
 	else
 	{
@@ -367,12 +367,12 @@ function list_getLanguagesList()
 		foreach ($lang_files as $file)
 		{
 			// Were we searching?
-			if (!empty($context['elk_search_term']) && strpos($file->fetch('name'), Util::strtolower($context['elk_search_term'])) === false)
+			if (!empty($context['elk_search_term']) && strpos($file->fetch('name'), \ElkArte\Util::strtolower($context['elk_search_term'])) === false)
 				continue;
 
 			$languages[] = array(
 				'id' => $file->fetch('id'),
-				'name' => Util::ucwords($file->fetch('name')),
+				'name' => \ElkArte\Util::ucwords($file->fetch('name')),
 				'version' => $file->fetch('version'),
 				'utf8' => $txt['yes'],
 				'description' => $file->fetch('description'),

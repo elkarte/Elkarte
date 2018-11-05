@@ -348,8 +348,8 @@ class News extends \ElkArte\AbstractController
 		foreach ($results as $row)
 		{
 			// Limit the length of the message, if the option is set.
-			if (!empty($modSettings['xmlnews_maxlen']) && Util::strlen(str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
-				$row['body'] = strtr(Util::shorten_text(str_replace('<br />', "\n", $row['body']), $modSettings['xmlnews_maxlen'], true), array("\n" => '<br />'));
+			if (!empty($modSettings['xmlnews_maxlen']) && \ElkArte\Util::strlen(str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
+				$row['body'] = strtr(\ElkArte\Util::shorten_text(str_replace('<br />', "\n", $row['body']), $modSettings['xmlnews_maxlen'], true), array("\n" => '<br />'));
 
 			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
@@ -454,8 +454,8 @@ class News extends \ElkArte\AbstractController
 		foreach ($results as $row)
 		{
 			// Limit the length of the message, if the option is set.
-			if (!empty($modSettings['xmlnews_maxlen']) && Util::strlen(str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
-				$row['body'] = strtr(Util::shorten_text(str_replace('<br />', "\n", $row['body']), $modSettings['xmlnews_maxlen'], true), array("\n" => '<br />'));
+			if (!empty($modSettings['xmlnews_maxlen']) && \ElkArte\Util::strlen(str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
+				$row['body'] = strtr(\ElkArte\Util::shorten_text(str_replace('<br />', "\n", $row['body']), $modSettings['xmlnews_maxlen'], true), array("\n" => '<br />'));
 
 			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
@@ -720,7 +720,7 @@ function cdata_parse($data, $ns = '')
 
 	$cdata = '<![CDATA[';
 
-	for ($pos = 0, $n = Util::strlen($data); $pos < $n; null)
+	for ($pos = 0, $n = \ElkArte\Util::strlen($data); $pos < $n; null)
 	{
 		$positions = array(
 			Util::strpos($data, '&', $pos),
@@ -728,7 +728,7 @@ function cdata_parse($data, $ns = '')
 		);
 
 		if ($ns != '')
-			$positions[] = Util::strpos($data, '<', $pos);
+			$positions[] = \ElkArte\Util::strpos($data, '<', $pos);
 
 		foreach ($positions as $k => $dummy)
 		{
@@ -740,42 +740,42 @@ function cdata_parse($data, $ns = '')
 		$pos = empty($positions) ? $n : min($positions);
 
 		if ($pos - $old > 0)
-			$cdata .= Util::substr($data, $old, $pos - $old);
+			$cdata .= \ElkArte\Util::substr($data, $old, $pos - $old);
 
 		if ($pos >= $n)
 			break;
 
-		if (Util::substr($data, $pos, 1) === '<')
+		if (\ElkArte\Util::substr($data, $pos, 1) === '<')
 		{
-			$pos2 = Util::strpos($data, '>', $pos);
+			$pos2 = \ElkArte\Util::strpos($data, '>', $pos);
 			if ($pos2 === false)
 				$pos2 = $n;
 
-			if (Util::substr($data, $pos + 1, 1) === '/')
-				$cdata .= ']]></' . $ns . ':' . Util::substr($data, $pos + 2, $pos2 - $pos - 1) . '<![CDATA[';
+			if (\ElkArte\Util::substr($data, $pos + 1, 1) === '/')
+				$cdata .= ']]></' . $ns . ':' . \ElkArte\Util::substr($data, $pos + 2, $pos2 - $pos - 1) . '<![CDATA[';
 			else
-				$cdata .= ']]><' . $ns . ':' . Util::substr($data, $pos + 1, $pos2 - $pos) . '<![CDATA[';
+				$cdata .= ']]><' . $ns . ':' . \ElkArte\Util::substr($data, $pos + 1, $pos2 - $pos) . '<![CDATA[';
 
 			$pos = $pos2 + 1;
 		}
-		elseif (Util::substr($data, $pos, 1) === ']')
+		elseif (\ElkArte\Util::substr($data, $pos, 1) === ']')
 		{
 			$cdata .= ']]>&#093;<![CDATA[';
 			$pos++;
 		}
-		elseif (Util::substr($data, $pos, 1) === '&')
+		elseif (\ElkArte\Util::substr($data, $pos, 1) === '&')
 		{
-			$pos2 = Util::strpos($data, ';', $pos);
+			$pos2 = \ElkArte\Util::strpos($data, ';', $pos);
 
 			if ($pos2 === false)
 				$pos2 = $n;
 
-			$ent = Util::substr($data, $pos + 1, $pos2 - $pos - 1);
+			$ent = \ElkArte\Util::substr($data, $pos + 1, $pos2 - $pos - 1);
 
-			if (Util::substr($data, $pos + 1, 1) === '#')
-				$cdata .= ']]>' . Util::substr($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';
+			if (\ElkArte\Util::substr($data, $pos + 1, 1) === '#')
+				$cdata .= ']]>' . \ElkArte\Util::substr($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';
 			elseif (in_array($ent, array('amp', 'lt', 'gt', 'quot')))
-				$cdata .= ']]>' . Util::substr($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';
+				$cdata .= ']]>' . \ElkArte\Util::substr($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';
 
 			$pos = $pos2 + 1;
 		}

@@ -180,7 +180,7 @@ class Reminder extends \ElkArte\AbstractController
 		$context += array(
 			'page_title' => $txt['reminder_set_password'],
 			'sub_template' => 'set_password',
-			'code' => Util::htmlspecialchars($this->_req->query->code),
+			'code' => \ElkArte\Util::htmlspecialchars($this->_req->query->code),
 			'memID' => (int) $this->_req->query->u
 		);
 

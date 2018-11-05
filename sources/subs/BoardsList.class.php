@@ -345,7 +345,7 @@ class Boards_List
 
 			// Prepare the subject, and make sure it's not too long.
 			$row_board['subject'] = censor($row_board['subject']);
-			$row_board['short_subject'] = Util::shorten_text($row_board['subject'], $this->_subject_length);
+			$row_board['short_subject'] = \ElkArte\Util::shorten_text($row_board['subject'], $this->_subject_length);
 			$poster_href = getUrl('profile', ['action' => 'profile', 'u' => $row_board['id_member'], 'name' => $row_board['real_name']]);
 			$this_last_post = array(
 				'id' => $row_board['id_msg'],

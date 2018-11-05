@@ -107,7 +107,7 @@ class Help extends \ElkArte\AbstractController
 		if (!isset($helptxt))
 			$helptxt = array();
 
-		$help_str = Util::htmlspecialchars($this->_req->query->help);
+		$help_str = \ElkArte\Util::htmlspecialchars($this->_req->query->help);
 
 		// Load the admin help language file and template.
 		theme()->getTemplates()->loadLanguageFile('Help');

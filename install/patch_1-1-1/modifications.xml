@@ -802,7 +802,7 @@ if (isset($_GET['scheduled']))
 	// decoding failed, let's try with unserialize
 	if ($array_form === null)
 	{
-		$array_form = Util::unserialize($variable);
+		$array_form = \ElkArte\Util::unserialize($variable);
 
 		// If unserialize fails as well, let's just store an empty array
 		if ($array_form === false)]]></search>
@@ -813,7 +813,7 @@ if (isset($_GET['scheduled']))
 	{
 		try
 		{
-			$array_form = Util::unserialize($variable);
+			$array_form = \ElkArte\Util::unserialize($variable);
 		}
 		catch (\Exception $e)
 		{

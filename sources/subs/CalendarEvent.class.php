@@ -106,10 +106,10 @@ class Calendar_Event
 				throw new \ElkArte\Exceptions\Exception('invalid_date', false);
 
 			// No title?
-			if (Util::htmltrim($event['evtitle']) === '')
+			if (\ElkArte\Util::htmltrim($event['evtitle']) === '')
 				throw new \ElkArte\Exceptions\Exception('no_event_title', false);
-			if (Util::strlen($event['evtitle']) > 100)
-				$event['evtitle'] = Util::substr($event['evtitle'], 0, 100);
+			if (\ElkArte\Util::strlen($event['evtitle']) > 100)
+				$event['evtitle'] = \ElkArte\Util::substr($event['evtitle'], 0, 100);
 			$event['evtitle'] = str_replace(';', '', $event['evtitle']);
 		}
 
@@ -127,7 +127,7 @@ class Calendar_Event
 		$eventOptions = array(
 			'id_board' => isset($options['id_board']) ? $options['id_board'] : 0,
 			'id_topic' => isset($options['id_topic']) ? $options['id_topic'] : 0,
-			'title' => Util::substr($options['evtitle'], 0, 100),
+			'title' => \ElkArte\Util::substr($options['evtitle'], 0, 100),
 			'member' => $member_id,
 			'start_date' => sprintf('%04d-%02d-%02d', $options['year'], $options['month'], $options['day']),
 			'span' => isset($options['span']) && $options['span'] > 0 ? min((int) $this->_settings['cal_maxspan'], (int) $options['span'] - 1) : 0,
@@ -167,7 +167,7 @@ class Calendar_Event
 			$span = min((int) $this->_settings['cal_maxspan'], (int) $options['span'] - 1);
 
 		$eventOptions = array(
-			'title' => Util::substr($options['evtitle'], 0, 100),
+			'title' => \ElkArte\Util::substr($options['evtitle'], 0, 100),
 			'span' => $span,
 			'start_date' => strftime('%Y-%m-%d', mktime(0, 0, 0, (int) $options['month'], (int) $options['day'], (int) $options['year'])),
 			'id_board' => isset($eventProperties['id_board']) ? (int) $eventProperties['id_board'] : 0,

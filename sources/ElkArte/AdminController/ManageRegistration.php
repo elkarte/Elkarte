@@ -286,7 +286,7 @@ class ManageRegistration extends \ElkArte\AbstractController
 			updateSettings(array('requireAgreement' => !empty($this->_req->post->requireAgreement), 'checkboxAgreement' => !empty($this->_req->post->checkboxAgreement)));
 		}
 
-		$context['agreement'] = Util::htmlspecialchars($agreement->getPlainText(false));
+		$context['agreement'] = \ElkArte\Util::htmlspecialchars($agreement->getPlainText(false));
 
 		$context['warning'] = $agreement->isWritable() ? '' : $txt['agreement_not_writable'];
 		$context['require_agreement'] = !empty($modSettings['requireAgreement']);

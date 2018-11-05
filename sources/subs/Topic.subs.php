@@ -290,7 +290,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	// Delete search index entries.
 	if (!empty($modSettings['search_custom_index_config']))
 	{
-		$customIndexSettings = Util::unserialize($modSettings['search_custom_index_config']);
+		$customIndexSettings = \ElkArte\Util::unserialize($modSettings['search_custom_index_config']);
 
 		$request = $db->query('', '
 			SELECT id_msg, body
@@ -2352,7 +2352,7 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 	));
 
 	$msgOptions = array(
-		'subject' => $txt['split'] . ': ' . strtr(Util::htmltrim(Util::htmlspecialchars($subject)), array("\r" => '', "\n" => '', "\t" => '')),
+		'subject' => $txt['split'] . ': ' . strtr(\ElkArte\Util::htmltrim(\ElkArte\Util::htmlspecialchars($subject)), array("\r" => '', "\n" => '', "\t" => '')),
 		'body' => $reason,
 		'icon' => 'moved',
 		'smileys_enabled' => 1,
@@ -2544,11 +2544,11 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		throw new \ElkArte\Exceptions\Exception('cant_insert_topic');
 
 	// Move the messages over to the other topic.
-	$new_subject = strtr(Util::htmltrim(Util::htmlspecialchars($new_subject)), array("\r" => '', "\n" => '', "\t" => ''));
+	$new_subject = strtr(\ElkArte\Util::htmltrim(\ElkArte\Util::htmlspecialchars($new_subject)), array("\r" => '', "\n" => '', "\t" => ''));
 
 	// Check the subject length.
-	if (Util::strlen($new_subject) > 100)
-		$new_subject = Util::substr($new_subject, 0, 100);
+	if (\ElkArte\Util::strlen($new_subject) > 100)
+		$new_subject = \ElkArte\Util::substr($new_subject, 0, 100);
 
 	// Valid subject?
 	if ($new_subject != '')

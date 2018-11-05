@@ -596,11 +596,11 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 
 	// First on the agenda the subject
 	$subject = pbe_clean_email_subject($email_message->subject);
-	$subject = strtr(Util::htmlspecialchars($subject), array("\r" => '', "\n" => '', "\t" => ''));
+	$subject = strtr(\ElkArte\Util::htmlspecialchars($subject), array("\r" => '', "\n" => '', "\t" => ''));
 
 	// Not to long not to short
-	if (Util::strlen($subject) > 100)
-		$subject = Util::substr($subject, 0, 100);
+	if (\ElkArte\Util::strlen($subject) > 100)
+		$subject = \ElkArte\Util::substr($subject, 0, 100);
 	elseif ($subject == '')
 		return pbe_emailError('error_no_subject', $email_message);
 
@@ -706,7 +706,7 @@ function pbe_load_text(&$html, $email_message, $pbe)
 	$text = pbe_fix_email_body($text, $pbe['profile']['real_name'], (empty($email_message->_converted_utf8) ? $email_message->headers['x-parameters']['content-type']['charset'] : 'UTF-8'));
 
 	// Do we even have a message left to post?
-	$text = Util::htmltrim($text);
+	$text = \ElkArte\Util::htmltrim($text);
 	if (empty($text))
 		return '';
 

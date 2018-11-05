@@ -153,8 +153,8 @@ class Likes extends \ElkArte\AbstractController
 					// Lets add in a mention to the member that just had their post liked
 					if (!empty($modSettings['mentions_enabled']))
 					{
-						$notifier = Notifications::instance();
-						$notifier->add(new Notifications_Task(
+						$notifier = \ElkArte\Notifications::instance();
+						$notifier->add(new \ElkArte\NotificationsTask(
 							$type,
 							$this->_id_liked,
 							$user_info['id'],

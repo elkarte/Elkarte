@@ -227,7 +227,7 @@ class Drafts_PersonalMessage_Module extends ElkArte\sources\modules\Abstract_Mod
 		{
 			$short_subject = empty($draft['subject'])
 				? $txt['drafts_none']
-				: Util::shorten_text(stripslashes($draft['subject']), self::$_subject_length);
+				: \ElkArte\Util::shorten_text(stripslashes($draft['subject']), self::$_subject_length);
 			$context['drafts'][] = array(
 				'subject' => censor($short_subject),
 				'poster_time' => standardTime($draft['poster_time']),
@@ -338,8 +338,8 @@ class Drafts_PersonalMessage_Module extends ElkArte\sources\modules\Abstract_Mod
 				$draft = array(
 					'id_pm_draft' => empty($_POST['id_pm_draft']) ? 0 : (int) $_POST['id_pm_draft'],
 					'reply_id' => empty($_POST['replied_to']) ? 0 : (int) $_POST['replied_to'],
-					'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true),
-					'subject' => strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
+					'body' => \ElkArte\Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true),
+					'subject' => strtr(\ElkArte\Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
 					'id_member' => $user_info['id'],
 					'is_usersaved' => (int) empty($_REQUEST['autosave']),
 				);

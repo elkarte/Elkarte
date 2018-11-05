@@ -261,7 +261,7 @@ class SearchParams extends \ElkArte\ValuesContainer
 		}
 		else
 		{
-			$userString = strtr(\Util::htmlspecialchars($this->_search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
+			$userString = strtr(\ElkArte\Util::htmlspecialchars($this->_search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
 			$userString = strtr($userString, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_'));
 
 			preg_match_all('~"([^"]+)"~', $userString, $matches);

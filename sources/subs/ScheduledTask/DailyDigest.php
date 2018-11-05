@@ -182,7 +182,7 @@ class Daily_Digest implements Scheduled_Task_Interface
 				{
 					// Convert to markdown markup e.g. text ;)
 					pbe_prepare_text($row['body']);
-					$row['body'] = \Util::shorten_text($row['body'], !empty($modSettings['digest_preview_length']) ? $modSettings['digest_preview_length'] : 375, true);
+					$row['body'] = \ElkArte\Util::shorten_text($row['body'], !empty($modSettings['digest_preview_length']) ? $modSettings['digest_preview_length'] : 375, true);
 					$row['body'] = preg_replace("~\n~s", "\n  ", $row['body']);
 				}
 
@@ -230,7 +230,7 @@ class Daily_Digest implements Scheduled_Task_Interface
 					// Replace the body array with the appropriate preview message
 					$body = $types['reply'][$id]['lines'][$topic['id']]['body_text'];
 					pbe_prepare_text($body);
-					$body = \Util::shorten_text($body, !empty($modSettings['digest_preview_length']) ? $modSettings['digest_preview_length'] : 375, true);
+					$body = \ElkArte\Util::shorten_text($body, !empty($modSettings['digest_preview_length']) ? $modSettings['digest_preview_length'] : 375, true);
 					$body = preg_replace("~\n~s", "\n  ", $body);
 					$types['reply'][$id]['lines'][$topic['id']]['body'] = $body;
 

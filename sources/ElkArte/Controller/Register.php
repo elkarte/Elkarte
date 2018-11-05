@@ -601,7 +601,7 @@ class Register extends \ElkArte\AbstractController
 			'hide_email', 'show_online',
 		);
 
-		if ($has_real_name && trim($this->_req->post->real_name) != '' && !isReservedName($this->_req->post->real_name) && Util::strlen($this->_req->post->real_name) < 60)
+		if ($has_real_name && trim($this->_req->post->real_name) != '' && !isReservedName($this->_req->post->real_name) && \ElkArte\Util::strlen($this->_req->post->real_name) < 60)
 			$possible_strings[] = 'real_name';
 
 		// Some of these fields we may not want.
@@ -632,7 +632,7 @@ class Register extends \ElkArte\AbstractController
 		// Include the additional options that might have been filled in.
 		foreach ($possible_strings as $var)
 			if (isset($this->_req->post->{$var}))
-				$extra_register_vars[$var] = Util::htmlspecialchars($this->_req->post->{$var}, ENT_QUOTES);
+				$extra_register_vars[$var] = \ElkArte\Util::htmlspecialchars($this->_req->post->{$var}, ENT_QUOTES);
 
 		foreach ($possible_ints as $var)
 			if (isset($this->_req->post->{$var}))
@@ -722,7 +722,7 @@ class Register extends \ElkArte\AbstractController
 			{
 				if (isset($this->_req->post->{$field}))
 				{
-					$cur_profile[$field] = Util::htmlspecialchars($this->_req->post->{$field});
+					$cur_profile[$field] = \ElkArte\Util::htmlspecialchars($this->_req->post->{$field});
 				}
 			}
 

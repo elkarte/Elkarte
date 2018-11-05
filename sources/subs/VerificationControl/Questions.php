@@ -198,7 +198,7 @@ class Questions implements ControlInterface
 				'q' => $parser->parseVerificationControls($row['question']),
 				'is_error' => !empty($this->_incorrectQuestions) && in_array($row['id_question'], $this->_incorrectQuestions),
 				// Remember a previous submission?
-				'a' => isset($_REQUEST[$this->_options['id'] . '_vv'], $_REQUEST[$this->_options['id'] . '_vv']['q'], $_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) ? \Util::htmlspecialchars($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) : '',
+				'a' => isset($_REQUEST[$this->_options['id'] . '_vv'], $_REQUEST[$this->_options['id'] . '_vv']['q'], $_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) ? \ElkArte\Util::htmlspecialchars($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) : '',
 			);
 			$sessionVal['q'][] = $row['id_question'];
 		}
@@ -303,14 +303,14 @@ class Questions implements ControlInterface
 
 		foreach ($save_question as $id => $question)
 		{
-			$question = trim(\Util::htmlspecialchars($question, ENT_COMPAT));
+			$question = trim(\ElkArte\Util::htmlspecialchars($question, ENT_COMPAT));
 			$answers = array();
 			$question_lang = isset($save_language[$id]) && isset($languages[$save_language[$id]]) ? $save_language[$id] : $language;
 			if (!empty($save_answer[$id]))
 			{
 				foreach ($save_answer[$id] as $answer)
 				{
-					$answer = trim(\Util::strtolower(\Util::htmlspecialchars($answer, ENT_COMPAT)));
+					$answer = trim(\ElkArte\Util::strtolower(\ElkArte\Util::htmlspecialchars($answer, ENT_COMPAT)));
 					if ($answer != '')
 						$answers[] = $answer;
 				}
@@ -370,9 +370,9 @@ class Questions implements ControlInterface
 			// Everything lowercase
 			$answers = array();
 			foreach ($row['answer'] as $answer)
-				$answers[] = \Util::strtolower($answer);
+				$answers[] = \ElkArte\Util::strtolower($answer);
 
-			if (!isset($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) || trim($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) == '' || !in_array(trim(\Util::htmlspecialchars(\Util::strtolower($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]))), $answers))
+			if (!isset($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) || trim($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) == '' || !in_array(trim(\ElkArte\Util::htmlspecialchars(\ElkArte\Util::strtolower($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]))), $answers))
 				$this->_incorrectQuestions[] = $row['id_question'];
 		}
 
@@ -438,7 +438,7 @@ class Questions implements ControlInterface
 			$question_answers[$row['id_question']] = array(
 				'id_question' => $row['id_question'],
 				'question' => $row['question'],
-				'answer' => \Util::unserialize($row['answer']),
+				'answer' => \ElkArte\Util::unserialize($row['answer']),
 				'language' => $row['language'],
 			);
 		}

@@ -118,7 +118,7 @@ class ManageMail extends \ElkArte\AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							return Util::shorten_text(Util::htmlspecialchars($rowData['subject'], 50));
+							return \ElkArte\Util::shorten_text(\ElkArte\Util::htmlspecialchars($rowData['subject'], 50));
 						},
 						'class' => 'smalltext',
 					),

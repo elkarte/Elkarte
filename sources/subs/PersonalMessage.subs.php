@@ -539,11 +539,11 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	call_integration_hook('integrate_personal_message', array(&$recipients, &$from, &$subject, &$message));
 
 	// This is the one that will go in their inbox.
-	$htmlmessage = Util::htmlspecialchars($message, ENT_QUOTES, 'UTF-8', true);
+	$htmlmessage = \ElkArte\Util::htmlspecialchars($message, ENT_QUOTES, 'UTF-8', true);
 	preparsecode($htmlmessage);
-	$htmlsubject = strtr(Util::htmlspecialchars($subject), array("\r" => '', "\n" => '', "\t" => ''));
-	if (Util::strlen($htmlsubject) > 100)
-		$htmlsubject = Util::substr($htmlsubject, 0, 100);
+	$htmlsubject = strtr(\ElkArte\Util::htmlspecialchars($subject), array("\r" => '', "\n" => '', "\t" => ''));
+	if (\ElkArte\Util::strlen($htmlsubject) > 100)
+		$htmlsubject = \ElkArte\Util::substr($htmlsubject, 0, 100);
 
 	// Make sure is an array
 	if (!is_array($recipients))
@@ -557,7 +557,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		{
 			if (!is_numeric($recipients[$rec_type][$id]))
 			{
-				$recipients[$rec_type][$id] = Util::strtolower(trim(preg_replace('/[<>&"\'=\\\]/', '', $recipients[$rec_type][$id])));
+				$recipients[$rec_type][$id] = \ElkArte\Util::strtolower(trim(preg_replace('/[<>&"\'=\\\]/', '', $recipients[$rec_type][$id])));
 				$usernames[$recipients[$rec_type][$id]] = 0;
 			}
 		}
@@ -629,7 +629,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	// Check whether we have to apply anything...
 	while ($row = $db->fetch_assoc($request))
 	{
-		$criteria = Util::unserialize($row['criteria']);
+		$criteria = \ElkArte\Util::unserialize($row['criteria']);
 
 		// Note we don't check the buddy status, cause deletion from buddy = madness!
 		$delete = false;
@@ -1288,8 +1288,8 @@ function loadRules($reload = false)
 		$context['rules'][$row['id_rule']] = array(
 			'id' => $row['id_rule'],
 			'name' => $row['rule_name'],
-			'criteria' => Util::unserialize($row['criteria']),
-			'actions' => Util::unserialize($row['actions']),
+			'criteria' => \ElkArte\Util::unserialize($row['criteria']),
+			'actions' => \ElkArte\Util::unserialize($row['actions']),
 			'delete' => $row['delete_pm'],
 			'logic' => $row['is_or'] ? 'or' : 'and',
 		);

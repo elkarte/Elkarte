@@ -271,10 +271,10 @@ class ManageSecurity extends \ElkArte\AbstractController
 			$context[$list . '_desc'] = array();
 
 			if (!empty($modSettings[$list]))
-				$context[$list] = Util::unserialize($modSettings[$list]);
+				$context[$list] = \ElkArte\Util::unserialize($modSettings[$list]);
 
 			if (!empty($modSettings[$list . '_desc']))
-				$context[$list . '_desc'] = Util::unserialize($modSettings[$list . '_desc']);
+				$context[$list . '_desc'] = \ElkArte\Util::unserialize($modSettings[$list . '_desc']);
 		}
 
 		// Saving?

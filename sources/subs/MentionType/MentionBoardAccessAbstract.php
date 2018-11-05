@@ -88,7 +88,7 @@ abstract class Mention_BoardAccess_Abstract extends Mention_Message_Abstract
 				unset($mentions[$key]);
 
 			if (!empty($modSettings['user_access_mentions']))
-				$modSettings['user_access_mentions'] = \Util::unserialize($modSettings['user_access_mentions']);
+				$modSettings['user_access_mentions'] = \ElkArte\Util::unserialize($modSettings['user_access_mentions']);
 			else
 				$modSettings['user_access_mentions'] = array();
 

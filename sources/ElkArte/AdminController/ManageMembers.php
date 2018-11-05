@@ -352,7 +352,7 @@ class ManageMembers extends \ElkArte\AbstractController
 				else
 				{
 					// Replace the wildcard characters ('*' and '?') into MySQL ones.
-					$parameter = strtolower(strtr(Util::htmlspecialchars($search_params[$param_name], ENT_QUOTES), array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_')));
+					$parameter = strtolower(strtr(\ElkArte\Util::htmlspecialchars($search_params[$param_name], ENT_QUOTES), array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_')));
 
 					$query_parts[] = '({column_case_insensitive:' . implode(' LIKE {string_case_insensitive:' . $param_name . '_normal} OR {column_case_insensitive:', $param_info['db_fields']) . '} LIKE {string_case_insensitive:' . $param_name . '_normal})';
 

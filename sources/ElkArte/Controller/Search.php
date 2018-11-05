@@ -157,7 +157,7 @@ class Search extends \ElkArte\AbstractController
 		if (isset($_REQUEST['search']))
 			$context['search_params']['search'] = un_htmlspecialchars($_REQUEST['search']);
 		if (isset($context['search_params']['search']))
-			$context['search_params']['search'] = Util::htmlspecialchars($context['search_params']['search']);
+			$context['search_params']['search'] = \ElkArte\Util::htmlspecialchars($context['search_params']['search']);
 		if (isset($context['search_params']['userspec']))
 			$context['search_params']['userspec'] = htmlspecialchars($context['search_params']['userspec'], ENT_COMPAT, 'UTF-8');
 		if (!empty($context['search_params']['searchtype']))
@@ -288,7 +288,7 @@ class Search extends \ElkArte\AbstractController
 		if ($this->_search->param('search') === false || $this->_search->param('search') === '')
 			$context['search_errors']['invalid_search_string'] = true;
 		// Too long?
-		elseif (Util::strlen($this->_search->param('search')) > $context['search_string_limit'])
+		elseif (\ElkArte\Util::strlen($this->_search->param('search')) > $context['search_string_limit'])
 			$context['search_errors']['string_too_long'] = true;
 
 		// Build the search array
@@ -324,9 +324,9 @@ class Search extends \ElkArte\AbstractController
 		// Let the user adjust the search query, should they wish?
 		$context['search_params'] = (array) $this->_search->getSearchParams(true);
 		if (isset($context['search_params']['search']))
-			$context['search_params']['search'] = Util::htmlspecialchars($context['search_params']['search']);
+			$context['search_params']['search'] = \ElkArte\Util::htmlspecialchars($context['search_params']['search']);
 		if (isset($context['search_params']['userspec']))
-			$context['search_params']['userspec'] = Util::htmlspecialchars($context['search_params']['userspec']);
+			$context['search_params']['userspec'] = \ElkArte\Util::htmlspecialchars($context['search_params']['userspec']);
 		if (empty($context['search_params']['minage']))
 			$context['search_params']['minage'] = 0;
 		if (empty($context['search_params']['maxage']))
@@ -522,20 +522,20 @@ class Search extends \ElkArte\AbstractController
 			if (preg_match('~^\w+$~', $word) === 0)
 			{
 				$did_you_mean['search'][] = '"' . $word . '"';
-				$did_you_mean['display'][] = '&quot;' . \Util::htmlspecialchars($word) . '&quot;';
+				$did_you_mean['display'][] = '&quot;' . \ElkArte\Util::htmlspecialchars($word) . '&quot;';
 				continue;
 			}
 			// For some strange reason spell check can crash PHP on decimals.
 			elseif (preg_match('~\d~', $word) === 1)
 			{
 				$did_you_mean['search'][] = $word;
-				$did_you_mean['display'][] = \Util::htmlspecialchars($word);
+				$did_you_mean['display'][] = \ElkArte\Util::htmlspecialchars($word);
 				continue;
 			}
 			elseif (pspell_check($pspell_link, $word))
 			{
 				$did_you_mean['search'][] = $word;
-				$did_you_mean['display'][] = \Util::htmlspecialchars($word);
+				$did_you_mean['display'][] = \ElkArte\Util::htmlspecialchars($word);
 				continue;
 			}
 
@@ -543,7 +543,7 @@ class Search extends \ElkArte\AbstractController
 			foreach ($suggestions as $i => $s)
 			{
 				// Search is case insensitive.
-				if (\Util::strtolower($s) == \Util::strtolower($word))
+				if (\ElkArte\Util::strtolower($s) == \ElkArte\Util::strtolower($word))
 				{
 					unset($suggestions[$i]);
 				}
@@ -559,13 +559,13 @@ class Search extends \ElkArte\AbstractController
 			{
 				$suggestions = array_values($suggestions);
 				$did_you_mean['search'][] = $suggestions[0];
-				$did_you_mean['display'][] = str_replace('{word}', \Util::htmlspecialchars($suggestions[0]), $display_highlight);
+				$did_you_mean['display'][] = str_replace('{word}', \ElkArte\Util::htmlspecialchars($suggestions[0]), $display_highlight);
 				$found_misspelling = true;
 			}
 			else
 			{
 				$did_you_mean['search'][] = $word;
-				$did_you_mean['display'][] = \Util::htmlspecialchars($word);
+				$did_you_mean['display'][] = \ElkArte\Util::htmlspecialchars($word);
 			}
 		}
 
@@ -578,12 +578,12 @@ class Search extends \ElkArte\AbstractController
 				if (preg_match('~^\w+$~', $word) == 0)
 				{
 					$temp_excluded['search'][] = '-"' . $word . '"';
-					$temp_excluded['display'][] = '-&quot;' . \Util::htmlspecialchars($word) . '&quot;';
+					$temp_excluded['display'][] = '-&quot;' . \ElkArte\Util::htmlspecialchars($word) . '&quot;';
 				}
 				else
 				{
 					$temp_excluded['search'][] = '-' . $word;
-					$temp_excluded['display'][] = '-' . \Util::htmlspecialchars($word);
+					$temp_excluded['display'][] = '-' . \ElkArte\Util::htmlspecialchars($word);
 				}
 			}
 

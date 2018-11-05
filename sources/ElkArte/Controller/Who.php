@@ -160,7 +160,7 @@ class Who extends \ElkArte\AbstractController
 
 		foreach ($members as $row)
 		{
-			$actions = Util::unserialize($row['url']);
+			$actions = \ElkArte\Util::unserialize($row['url']);
 			if ($actions === false)
 				continue;
 

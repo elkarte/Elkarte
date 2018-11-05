@@ -121,7 +121,7 @@ class ProfileSubscriptions extends \ElkArte\AbstractController
 		foreach ($context['subscriptions'] as $id => $sub)
 		{
 			// Work out the costs.
-			$costs = Util::unserialize($sub['real_cost']);
+			$costs = \ElkArte\Util::unserialize($sub['real_cost']);
 
 			$cost_array = array();
 
@@ -174,7 +174,7 @@ class ProfileSubscriptions extends \ElkArte\AbstractController
 		if (isset($context['current'][$sub_id]))
 		{
 			// What are the pending details?
-			$current_pending = Util::unserialize($context['current'][$sub_id]['pending_details']);
+			$current_pending = \ElkArte\Util::unserialize($context['current'][$sub_id]['pending_details']);
 
 			// Nothing pending, nothing to do
 			if (!empty($current_pending))
@@ -262,7 +262,7 @@ class ProfileSubscriptions extends \ElkArte\AbstractController
 			// What are the details like?
 			$current_pending = array();
 			if ($context['current'][$this->_order['id']]['pending_details'] != '')
-				$current_pending = Util::unserialize($context['current'][$this->_order['id']]['pending_details']);
+				$current_pending = \ElkArte\Util::unserialize($context['current'][$this->_order['id']]['pending_details']);
 
 			// Don't get silly.
 			if (count($current_pending) > 9)

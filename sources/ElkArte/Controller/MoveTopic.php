@@ -330,11 +330,11 @@ class MoveTopic extends \ElkArte\AbstractController
 		// Rename the topic...
 		if (isset($this->_req->post->reset_subject, $this->_req->post->custom_subject) && $this->_req->post->custom_subject != '')
 		{
-			$custom_subject = strtr(Util::htmltrim(Util::htmlspecialchars($this->_req->post->custom_subject)), array("\r" => '', "\n" => '', "\t" => ''));
+			$custom_subject = strtr(\ElkArte\Util::htmltrim(\ElkArte\Util::htmlspecialchars($this->_req->post->custom_subject)), array("\r" => '', "\n" => '', "\t" => ''));
 
 			// Keep checking the length.
-			if (Util::strlen($custom_subject) > 100)
-				$custom_subject = Util::substr($custom_subject, 0, 100);
+			if (\ElkArte\Util::strlen($custom_subject) > 100)
+				$custom_subject = \ElkArte\Util::substr($custom_subject, 0, 100);
 
 			// If it's still valid move onwards and upwards.
 			if ($custom_subject != '')
@@ -376,7 +376,7 @@ class MoveTopic extends \ElkArte\AbstractController
 			if ($user_info['language'] != $language)
 				theme()->getTemplates()->loadLanguageFile('index', $language);
 
-			$reason = Util::htmlspecialchars($this->_req->post->reason, ENT_QUOTES);
+			$reason = \ElkArte\Util::htmlspecialchars($this->_req->post->reason, ENT_QUOTES);
 			preparsecode($reason);
 
 			// Add a URL onto the message.

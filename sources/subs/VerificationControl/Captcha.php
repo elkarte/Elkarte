@@ -158,7 +158,7 @@ class Captcha implements ControlInterface
 				$sessionVal['code'] .= $character_range[array_rand($character_range)];
 		}
 		else
-			$this->_text_value = !empty($_REQUEST[$this->_options['id'] . '_vv']['code']) ? \Util::htmlspecialchars($_REQUEST[$this->_options['id'] . '_vv']['code']) : '';
+			$this->_text_value = !empty($_REQUEST[$this->_options['id'] . '_vv']['code']) ? \ElkArte\Util::htmlspecialchars($_REQUEST[$this->_options['id'] . '_vv']['code']) : '';
 	}
 
 	/**

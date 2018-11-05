@@ -307,7 +307,7 @@ function validateTriggers(&$triggers)
 			}
 			elseif ($key == 'user')
 			{
-				$user = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', Util::htmlspecialchars($value, ENT_QUOTES));
+				$user = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', \ElkArte\Util::htmlspecialchars($value, ENT_QUOTES));
 
 				$request = $db->query('', '
 					SELECT id_member, (id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0) AS isAdmin

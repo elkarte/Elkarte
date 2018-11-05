@@ -730,7 +730,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 			if (!empty($template_body) && !empty($template_title))
 			{
 				// Safety first.
-				$template_title = Util::htmlspecialchars($template_title);
+				$template_title = \ElkArte\Util::htmlspecialchars($template_title);
 
 				// Clean up BBC.
 				preparsecode($template_body);
@@ -819,7 +819,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 		{
 			checkSession();
 
-			$newComment = trim(Util::htmlspecialchars($this->_req->post->mod_comment));
+			$newComment = trim(\ElkArte\Util::htmlspecialchars($this->_req->post->mod_comment));
 
 			// In it goes.
 			if (!empty($newComment))
@@ -1389,7 +1389,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 					'position' => 'below_table_data',
 					'value' => '
 						' . $txt['modlog_search'] . ' (' . $txt['modlog_by'] . ': ' . $context['search']['label'] . ')
-						<input type="text" name="search" size="18" value="' . Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
+						<input type="text" name="search" size="18" value="' . \ElkArte\Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
 						<input type="submit" name="is_search" value="' . $txt['modlog_go'] . '" />',
 				),
 			),
@@ -1789,7 +1789,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 		{
 			checkSession();
 
-			$new_note = Util::htmlspecialchars(trim($this->_req->post->new_note));
+			$new_note = \ElkArte\Util::htmlspecialchars(trim($this->_req->post->new_note));
 
 			// Make sure they actually entered something.
 			if (!empty($new_note) && $new_note !== $txt['mc_click_add_note'])

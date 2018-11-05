@@ -203,7 +203,7 @@ class Db extends Adapter
 			if ($configVar[0] === 'select' && !empty($configVar['multiple']))
 			{
 				$this->context[$configVar[1]]['name'] .= '[]';
-				$this->context[$configVar[1]]['value'] = !empty($this->context[$configVar[1]]['value']) ? \Util::unserialize($this->context[$configVar[1]]['value']) : array();
+				$this->context[$configVar[1]]['value'] = !empty($this->context[$configVar[1]]['value']) ? \ElkArte\Util::unserialize($this->context[$configVar[1]]['value']) : array();
 			}
 
 			// If it's associative

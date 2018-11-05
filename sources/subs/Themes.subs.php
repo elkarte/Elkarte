@@ -965,7 +965,7 @@ function write_theme_info($name, $version, $theme_dir, $theme_values)
 	$xml_info = '<' . '?xml version="1.0"?' . '>
 	<theme-info xmlns="http://www.elkarte.net/xml/theme-info" xmlns:elk="http://www.elkarte.net/">
 		<!-- For the id, always use something unique - put your name, a colon, and then the package name. -->
-		<id>elk:' . Util::strtolower(str_replace(array(' '), '_', $name)) . '</id>
+		<id>elk:' . \ElkArte\Util::strtolower(str_replace(array(' '), '_', $name)) . '</id>
 		<version>' . $version . '</version>
 		<!-- Theme name, used purely for aesthetics. -->
 		<name>' . $name . '</name>

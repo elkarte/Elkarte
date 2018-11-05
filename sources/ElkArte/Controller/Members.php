@@ -75,8 +75,8 @@ class Members extends \ElkArte\AbstractController
 			// Do we want a mention for our newly added buddy?
 			if (!empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
 			{
-				$notifier = Notifications::instance();
-				$notifier->add(new Notifications_Task(
+				$notifier = \ElkArte\Notifications::instance();
+				$notifier->add(new \ElkArte\NotificationsTask(
 					'buddy',
 					$user,
 					$user_info['id'],

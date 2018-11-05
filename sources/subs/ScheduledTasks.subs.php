@@ -52,7 +52,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 		)
 	);
 	$tasks = array();
-	$scheduleTaskImmediate = !empty($modSettings['scheduleTaskImmediate']) ? Util::unserialize($modSettings['scheduleTaskImmediate']) : array();
+	$scheduleTaskImmediate = !empty($modSettings['scheduleTaskImmediate']) ? \ElkArte\Util::unserialize($modSettings['scheduleTaskImmediate']) : array();
 	while ($row = $db->fetch_assoc($request))
 	{
 		// scheduleTaskImmediate is a way to speed up scheduled tasks and fire them as fast as possible
@@ -585,7 +585,7 @@ function run_this_task($id_task, $task_name)
 		$completed = false;
 	}
 
-	$scheduleTaskImmediate = !empty($modSettings['scheduleTaskImmediate']) ? Util::unserialize($modSettings['scheduleTaskImmediate']) : array();
+	$scheduleTaskImmediate = !empty($modSettings['scheduleTaskImmediate']) ? \ElkArte\Util::unserialize($modSettings['scheduleTaskImmediate']) : array();
 	// Log that we did it ;)
 	if ($completed)
 	{

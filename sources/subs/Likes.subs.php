@@ -586,8 +586,8 @@ function dbMostLikedMessage($limit = 10)
 		$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 		// Something short and sweet
-		$msgString = Util::shorten_html($row['body'], 255);
-		$preview = Util::htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
+		$msgString = \ElkArte\Util::shorten_html($row['body'], 255);
+		$preview = \ElkArte\Util::htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
 
 		// Love those avatars
 		$avatar = determineAvatar($row);
@@ -684,8 +684,8 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// Something short to show is all that's needed
-			$msgString = Util::shorten_html($row['body'], 255);
-			$preview = Util::htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
+			$msgString = \ElkArte\Util::shorten_html($row['body'], 255);
+			$preview = \ElkArte\Util::htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
 
 			$avatar = determineAvatar($row);
 
@@ -966,8 +966,8 @@ function dbMostLikedPostsByUser($id_member, $limit = 10)
 			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// Something short to show is all that's needed
-			$msgString = Util::shorten_html($row['body'], 255);
-			$preview = Util::htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
+			$msgString = \ElkArte\Util::shorten_html($row['body'], 255);
+			$preview = \ElkArte\Util::htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
 
 			return array(
 				'id_topic' => $row['id_topic'],
@@ -1086,8 +1086,8 @@ function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// Something short to show is all that's required
-			$msgString = Util::shorten_html($row['body'], 255);
-			$preview = Util::htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
+			$msgString = \ElkArte\Util::shorten_html($row['body'], 255);
+			$preview = \ElkArte\Util::htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
 
 			return array(
 				'id_msg' => $row['id_msg'],

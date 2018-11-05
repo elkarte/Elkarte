@@ -126,7 +126,7 @@ function reloadSettings()
 	// Integration is cool.
 	if (defined('ELK_INTEGRATION_SETTINGS'))
 	{
-		$integration_settings = Util::unserialize(ELK_INTEGRATION_SETTINGS);
+		$integration_settings = \ElkArte\Util::unserialize(ELK_INTEGRATION_SETTINGS);
 		foreach ($integration_settings as $hook => $function)
 			add_integration_function($hook, $function);
 	}
@@ -1118,13 +1118,13 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'ip2' => htmlspecialchars($profile['member_ip2'], ENT_COMPAT, 'UTF-8'),
 			'online' => array(
 				'is_online' => $profile['is_online'],
-				'text' => Util::htmlspecialchars($txt[$profile['is_online'] ? 'online' : 'offline']),
-				'member_online_text' => sprintf($txt[$profile['is_online'] ? 'member_is_online' : 'member_is_offline'], Util::htmlspecialchars($profile['real_name'])),
+				'text' => \ElkArte\Util::htmlspecialchars($txt[$profile['is_online'] ? 'online' : 'offline']),
+				'member_online_text' => sprintf($txt[$profile['is_online'] ? 'member_is_online' : 'member_is_offline'], \ElkArte\Util::htmlspecialchars($profile['real_name'])),
 				'href' => $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'],
 				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'] . '">' . $txt[$profile['is_online'] ? 'online' : 'offline'] . '</a>',
 				'label' => $txt[$profile['is_online'] ? 'online' : 'offline']
 			),
-			'language' => Util::ucwords(strtr($profile['lngfile'], array('_' => ' '))),
+			'language' => \ElkArte\Util::ucwords(strtr($profile['lngfile'], array('_' => ' '))),
 			'is_activated' => isset($profile['is_activated']) ? $profile['is_activated'] : 1,
 			'is_banned' => isset($profile['is_activated']) ? $profile['is_activated'] >= 10 : 0,
 			'options' => $profile['options'],
@@ -1146,7 +1146,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 	if ($display_custom_fields && !empty($modSettings['displayFields']))
 	{
 		if (!isset($context['display_fields']))
-			$context['display_fields'] = Util::unserialize($modSettings['displayFields']);
+			$context['display_fields'] = \ElkArte\Util::unserialize($modSettings['displayFields']);
 
 		foreach ($context['display_fields'] as $custom)
 		{
@@ -1187,12 +1187,12 @@ function loadMemberContext($user, $display_custom_fields = false)
 /**
  * Loads information about what browser the user is viewing with and places it in $context
  *
- * @uses BrowserDetector class
+ * @uses ElkArte\BrowserDetector class
  */
 function detectBrowser()
 {
 	// Load the current user's browser of choice
-	$detector = new BrowserDetector;
+	$detector = new ElkArte\BrowserDetector;
 	$detector->detectBrowser();
 }
 
@@ -1821,7 +1821,7 @@ function getLanguages($use_cache = true)
 						continue;
 
 					$languages[$matches[1]] = array(
-						'name' => Util::ucwords(strtr($matches[1], array('_' => ' '))),
+						'name' => \ElkArte\Util::ucwords(strtr($matches[1], array('_' => ' '))),
 						'selected' => false,
 						'filename' => $matches[1],
 						'location' => $language_dir . '/' . $entry . '/index.' . $matches[1] . '.php',
@@ -1988,7 +1988,7 @@ function detectServer()
 
 	if ($server === null)
 	{
-		$server = new Server($_SERVER);
+		$server = new ElkArte\Server($_SERVER);
 		$servers = array('iis', 'apache', 'litespeed', 'lighttpd', 'nginx', 'cgi', 'windows');
 		$context['server'] = array();
 		foreach ($servers as $name)
@@ -2093,13 +2093,13 @@ function doSecurityChecks()
 			$context['security_controls_query']['title'] = $txt['query_command_denied'];
 			$show_warnings = true;
 			foreach ($_SESSION['query_command_denied'] as $command => $error)
-				$context['security_controls_query']['errors'][$command] = '<pre>' . Util::htmlspecialchars($error) . '</pre>';
+				$context['security_controls_query']['errors'][$command] = '<pre>' . \ElkArte\Util::htmlspecialchars($error) . '</pre>';
 		}
 		else
 		{
 			$context['security_controls_query']['title'] = $txt['query_command_denied_guests'];
 			foreach ($_SESSION['query_command_denied'] as $command => $error)
-				$context['security_controls_query']['errors'][$command] = '<pre>' . sprintf($txt['query_command_denied_guests_msg'], Util::htmlspecialchars($command)) . '</pre>';
+				$context['security_controls_query']['errors'][$command] = '<pre>' . sprintf($txt['query_command_denied_guests_msg'], \ElkArte\Util::htmlspecialchars($command)) . '</pre>';
 		}
 	}
 
@@ -2175,7 +2175,7 @@ function serializeToJson($variable, $save_callback = null)
 	{
 		try
 		{
-			$array_form = Util::unserialize($variable);
+			$array_form = \ElkArte\Util::unserialize($variable);
 		}
 		catch (\Exception $e)
 		{

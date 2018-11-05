@@ -344,18 +344,18 @@ class Post extends \ElkArte\AbstractController
 			$context['can_announce'] &= $context['becomes_approved'];
 
 			// Set up the inputs for the form.
-			$this->_form_subject = strtr(Util::htmlspecialchars($_REQUEST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
-			$this->_form_message = Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES, 'UTF-8', true);
+			$this->_form_subject = strtr(\ElkArte\Util::htmlspecialchars($_REQUEST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
+			$this->_form_message = \ElkArte\Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES, 'UTF-8', true);
 
 			// Make sure the subject isn't too long - taking into account special characters.
-			if (Util::strlen($this->_form_subject) > 100)
-				$this->_form_subject = Util::substr($this->_form_subject, 0, 100);
+			if (\ElkArte\Util::strlen($this->_form_subject) > 100)
+				$this->_form_subject = \ElkArte\Util::substr($this->_form_subject, 0, 100);
 
 			// Are you... a guest?
 			if ($user_info['is_guest'])
 			{
-				$context['name'] = !isset($_REQUEST['guestname']) ? '' : Util::htmlspecialchars(trim($_REQUEST['guestname']));
-				$context['email'] = !isset($_REQUEST['email']) ? '' : Util::htmlspecialchars(trim($_REQUEST['email']));
+				$context['name'] = !isset($_REQUEST['guestname']) ? '' : \ElkArte\Util::htmlspecialchars(trim($_REQUEST['guestname']));
+				$context['email'] = !isset($_REQUEST['email']) ? '' : \ElkArte\Util::htmlspecialchars(trim($_REQUEST['email']));
 				$user_info['name'] = $context['name'];
 			}
 
@@ -384,7 +384,7 @@ class Post extends \ElkArte\AbstractController
 
 				if ($context['preview_message'] === '')
 					$this->_post_errors->addError('no_message');
-				elseif (!empty($modSettings['max_messageLength']) && Util::strlen($this->_form_message) > $modSettings['max_messageLength'])
+				elseif (!empty($modSettings['max_messageLength']) && \ElkArte\Util::strlen($this->_form_message) > $modSettings['max_messageLength'])
 					$this->_post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
 
 				// Protect any CDATA blocks.
@@ -868,13 +868,13 @@ class Post extends \ElkArte\AbstractController
 		// If the poster is a guest evaluate the legality of name and email.
 		if ($posterIsGuest)
 		{
-			$_POST['guestname'] = !isset($_POST['guestname']) ? '' : Util::htmlspecialchars(trim($_POST['guestname']));
-			$_POST['email'] = !isset($_POST['email']) ? '' : Util::htmlspecialchars(trim($_POST['email']));
+			$_POST['guestname'] = !isset($_POST['guestname']) ? '' : \ElkArte\Util::htmlspecialchars(trim($_POST['guestname']));
+			$_POST['email'] = !isset($_POST['email']) ? '' : \ElkArte\Util::htmlspecialchars(trim($_POST['email']));
 
 			if ($_POST['guestname'] == '' || $_POST['guestname'] == '_')
 				$this->_post_errors->addError('no_name');
 
-			if (Util::strlen($_POST['guestname']) > 25)
+			if (\ElkArte\Util::strlen($_POST['guestname']) > 25)
 				$this->_post_errors->addError('long_name');
 
 			if (empty($modSettings['guest_post_no_email']))
@@ -909,17 +909,17 @@ class Post extends \ElkArte\AbstractController
 		}
 
 		// Check the subject and message.
-		if (!isset($_POST['subject']) || Util::htmltrim(Util::htmlspecialchars($_POST['subject'])) === '')
+		if (!isset($_POST['subject']) || \ElkArte\Util::htmltrim(\ElkArte\Util::htmlspecialchars($_POST['subject'])) === '')
 			$this->_post_errors->addError('no_subject');
 
-		if (!isset($_POST['message']) || Util::htmltrim(Util::htmlspecialchars($_POST['message'], ENT_QUOTES)) === '')
+		if (!isset($_POST['message']) || \ElkArte\Util::htmltrim(\ElkArte\Util::htmlspecialchars($_POST['message'], ENT_QUOTES)) === '')
 			$this->_post_errors->addError('no_message');
-		elseif (!empty($modSettings['max_messageLength']) && Util::strlen($_POST['message']) > $modSettings['max_messageLength'])
+		elseif (!empty($modSettings['max_messageLength']) && \ElkArte\Util::strlen($_POST['message']) > $modSettings['max_messageLength'])
 			$this->_post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
 		else
 		{
 			// Prepare the message a bit for some additional testing.
-			$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true);
+			$_POST['message'] = \ElkArte\Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true);
 
 			// Preparse code. (Zef)
 			if ($user_info['is_guest'])
@@ -930,7 +930,7 @@ class Post extends \ElkArte\AbstractController
 			$bbc_parser = \BBC\ParserWrapper::instance();
 
 			// Let's see if there's still some content left without the tags.
-			if (Util::htmltrim(strip_tags($bbc_parser->parseMessage($_POST['message'], false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($_POST['message'], '[html]') === false))
+			if (\ElkArte\Util::htmltrim(strip_tags($bbc_parser->parseMessage($_POST['message'], false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($_POST['message'], '[html]') === false))
 				$this->_post_errors->addError('no_message');
 		}
 
@@ -984,13 +984,13 @@ class Post extends \ElkArte\AbstractController
 		detectServer()->setTimeLimit(300);
 
 		// Add special html entities to the subject, name, and email.
-		$_POST['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
+		$_POST['subject'] = strtr(\ElkArte\Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
 		$_POST['guestname'] = htmlspecialchars($_POST['guestname'], ENT_COMPAT, 'UTF-8');
 		$_POST['email'] = htmlspecialchars($_POST['email'], ENT_COMPAT, 'UTF-8');
 
 		// At this point, we want to make sure the subject isn't too long.
-		if (Util::strlen($_POST['subject']) > 100)
-			$_POST['subject'] = Util::substr($_POST['subject'], 0, 100);
+		if (\ElkArte\Util::strlen($_POST['subject']) > 100)
+			$_POST['subject'] = \ElkArte\Util::substr($_POST['subject'], 0, 100);
 
 		// Creating a new topic?
 		$newTopic = empty($_REQUEST['msg']) && empty($topic);
@@ -1199,7 +1199,7 @@ class Post extends \ElkArte\AbstractController
 			$context['quote']['text'] = strtr(un_htmlspecialchars($context['quote']['xml']), array('\'' => '\\\'', '\\' => '\\\\', "\n" => '\\n', '</script>' => '</\' + \'script>'));
 			$context['quote']['xml'] = strtr($context['quote']['xml'], array('&nbsp;' => '&#160;', '<' => '&lt;', '>' => '&gt;'));
 
-			$context['quote']['mozilla'] = strtr(Util::htmlspecialchars($context['quote']['text']), array('&quot;' => '"'));
+			$context['quote']['mozilla'] = strtr(\ElkArte\Util::htmlspecialchars($context['quote']['text']), array('&quot;' => '"'));
 		}
 		//@todo Needs a nicer interface.
 		// In case our message has been removed in the meantime.
@@ -1265,13 +1265,13 @@ class Post extends \ElkArte\AbstractController
 			$moderationAction = $row['id_member'] != $user_info['id'];
 		}
 
-		if (isset($_POST['subject']) && Util::htmltrim(Util::htmlspecialchars($_POST['subject'])) !== '')
+		if (isset($_POST['subject']) && \ElkArte\Util::htmltrim(\ElkArte\Util::htmlspecialchars($_POST['subject'])) !== '')
 		{
-			$_POST['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
+			$_POST['subject'] = strtr(\ElkArte\Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
 
 			// Maximum number of characters.
-			if (Util::strlen($_POST['subject']) > 100)
-				$_POST['subject'] = Util::substr($_POST['subject'], 0, 100);
+			if (\ElkArte\Util::strlen($_POST['subject']) > 100)
+				$_POST['subject'] = \ElkArte\Util::substr($_POST['subject'], 0, 100);
 		}
 		elseif (isset($_POST['subject']))
 		{
@@ -1281,24 +1281,24 @@ class Post extends \ElkArte\AbstractController
 
 		if (isset($_POST['message']))
 		{
-			if (Util::htmltrim(Util::htmlspecialchars($_POST['message'])) === '')
+			if (\ElkArte\Util::htmltrim(\ElkArte\Util::htmlspecialchars($_POST['message'])) === '')
 			{
 				$this->_post_errors->addError('no_message');
 				unset($_POST['message']);
 			}
-			elseif (!empty($modSettings['max_messageLength']) && Util::strlen($_POST['message']) > $modSettings['max_messageLength'])
+			elseif (!empty($modSettings['max_messageLength']) && \ElkArte\Util::strlen($_POST['message']) > $modSettings['max_messageLength'])
 			{
 				$this->_post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
 				unset($_POST['message']);
 			}
 			else
 			{
-				$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true);
+				$_POST['message'] = \ElkArte\Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true);
 
 				$this->preparse->preparsecode($_POST['message']);
 				$bbc_parser = \BBC\ParserWrapper::instance();
 
-				if (Util::htmltrim(strip_tags($bbc_parser->parseMessage($_POST['message'], false), '<img>')) === '')
+				if (\ElkArte\Util::htmltrim(strip_tags($bbc_parser->parseMessage($_POST['message'], false), '<img>')) === '')
 				{
 					$this->_post_errors->addError('no_message');
 					unset($_POST['message']);
@@ -1336,8 +1336,8 @@ class Post extends \ElkArte\AbstractController
 
 				if (!empty($actually_mentioned))
 				{
-					$notifier = Notifications::instance();
-					$notifier->add(new Notifications_Task(
+					$notifier = \ElkArte\Notifications::instance();
+					$notifier->add(new \ElkArte\NotificationsTask(
 						'Mentionmem',
 						$row['id_msg'],
 						$row['id_member'],

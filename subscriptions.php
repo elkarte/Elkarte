@@ -149,14 +149,14 @@ if ($gatewayClass->isRefund())
 // Otherwise is it what we want, a purchase?
 elseif ($gatewayClass->isPayment() || $gatewayClass->isSubscription())
 {
-	$cost = Util::unserialize($subscription_info['cost']);
+	$cost = \ElkArte\Util::unserialize($subscription_info['cost']);
 	$total_cost = $gatewayClass->getCost();
 	$notify = false;
 
 	// For one off's we want to only capture them once!
 	if (!$gatewayClass->isSubscription())
 	{
-		$real_details = Util::unserialize($subscription_info['pending_details']);
+		$real_details = \ElkArte\Util::unserialize($subscription_info['pending_details']);
 		if (empty($real_details))
 			generateSubscriptionError(sprintf($txt['paid_count_not_find_outstanding_payment'], $member_id, $subscription_id));
 
@@ -269,7 +269,7 @@ function generateSubscriptionError($text)
 	if (!empty($_POST))
 	{
 		foreach ($_POST as $key => $val)
-			$text .= '<br />' . Util::htmlspecialchars($key) . ': ' . Util::htmlspecialchars($val);
+			$text .= '<br />' . \ElkArte\Util::htmlspecialchars($key) . ': ' . \ElkArte\Util::htmlspecialchars($val);
 	}
 
 	// Then just log and die.

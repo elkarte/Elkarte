@@ -999,13 +999,13 @@ function lastPost()
 	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
-	$row['body'] = Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
+	$row['body'] = \ElkArte\Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
 
 	// Send the data.
 	return array(
 		'topic' => $row['id_topic'],
 		'subject' => $row['subject'],
-		'short_subject' => Util::shorten_text($row['subject'], $modSettings['subject_length']),
+		'short_subject' => \ElkArte\Util::shorten_text($row['subject'], $modSettings['subject_length']),
 		'preview' => $row['body'],
 		'time' => standardTime($row['poster_time']),
 		'html_time' => htmlTime($row['poster_time']),
@@ -1088,7 +1088,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 
 			// Add 'Re: ' to the front of the quoted subject.
 			$response_prefix = response_prefix();
-			if (trim($response_prefix) != '' && Util::strpos($form_subject, trim($response_prefix)) !== 0)
+			if (trim($response_prefix) != '' && \ElkArte\Util::strpos($form_subject, trim($response_prefix)) !== 0)
 				$form_subject = $response_prefix . $form_subject;
 
 			// Censor the message and subject.
@@ -1109,7 +1109,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 
 			// Add 'Re: ' to the front of the subject.
 			$response_prefix = response_prefix();
-			if (trim($response_prefix) != '' && $form_subject != '' && Util::strpos($form_subject, trim($response_prefix)) !== 0)
+			if (trim($response_prefix) != '' && $form_subject != '' && \ElkArte\Util::strpos($form_subject, trim($response_prefix)) !== 0)
 				$form_subject = $response_prefix . $form_subject;
 
 			// Censor the subject.

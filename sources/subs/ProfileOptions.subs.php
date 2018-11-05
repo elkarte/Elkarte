@@ -45,7 +45,7 @@ function getBuddiesID($buddies, $adding = true)
 	// If we are mentioning buddies, then let them know who's their buddy.
 	if ($adding && !empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
 	{
-		$notifier = Notifications::instance();
+		$notifier = \ElkArte\Notifications::instance();
 	}
 
 	// Add the new member(s) to the buddies array.
@@ -57,7 +57,7 @@ function getBuddiesID($buddies, $adding = true)
 		// Let them know they have been added as a buddy
 		if (isset($notifier))
 		{
-			$notifier->add(new Notifications_Task(
+			$notifier->add(new \ElkArte\NotificationsTask(
 				'buddy',
 				$row['id_member'],
 				$user_info['id'],

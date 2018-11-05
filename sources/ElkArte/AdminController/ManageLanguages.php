@@ -733,7 +733,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 
 		// Setup the primary settings context.
 		$context['primary_settings'] = array(
-			'name' => Util::ucwords(strtr($context['lang_id'], array('_' => ' ', '-utf8' => ''))),
+			'name' => \ElkArte\Util::ucwords(strtr($context['lang_id'], array('_' => ' ', '-utf8' => ''))),
 			'locale' => $txt['lang_locale'],
 			'dictionary' => $txt['lang_dictionary'],
 			'spelling' => $txt['lang_spelling'],

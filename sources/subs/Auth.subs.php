@@ -329,7 +329,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 	foreach ($names as $i => $name)
 	{
 		// Trim, and fix wildcards for each name.
-		$names[$i] = trim(Util::strtolower($name));
+		$names[$i] = trim(\ElkArte\Util::strtolower($name));
 
 		$maybe_email |= strpos($name, '@') !== false;
 
@@ -496,7 +496,7 @@ function validateUsername($memID, $username, $ErrorContext = 'register', $check_
 	$errors = ElkArte\Errors\ErrorContext::context($ErrorContext, 0);
 
 	// Don't use too long a name.
-	if (Util::strlen($username) > 25)
+	if (\ElkArte\Util::strlen($username) > 25)
 		$errors->addError('error_long_name');
 
 	// No name?!  How can you register with no name?
@@ -539,7 +539,7 @@ function validatePassword($password, $username, $restrict_in = array())
 	global $modSettings, $txt;
 
 	// Perform basic requirements first.
-	if (Util::strlen($password) < (empty($modSettings['password_strength']) ? 4 : 8))
+	if (\ElkArte\Util::strlen($password) < (empty($modSettings['password_strength']) ? 4 : 8))
 	{
 		theme()->getTemplates()->loadLanguageFile('Errors');
 		$txt['profile_error_password_short'] = sprintf($txt['profile_error_password_short'], empty($modSettings['password_strength']) ? 4 : 8);
@@ -553,7 +553,7 @@ function validatePassword($password, $username, $restrict_in = array())
 	// Otherwise, perform the medium strength test - checking if password appears in the restricted string.
 	if (preg_match('~\b' . preg_quote($password, '~') . '\b~', implode(' ', $restrict_in)) != 0)
 		return 'restricted_words';
-	elseif (Util::strpos($password, $username) !== false)
+	elseif (\ElkArte\Util::strpos($password, $username) !== false)
 		return 'restricted_words';
 
 	// If just medium, we're done.
@@ -562,7 +562,7 @@ function validatePassword($password, $username, $restrict_in = array())
 
 	// Otherwise, hard test next, check for numbers and letters, uppercase too.
 	$good = preg_match('~(\D\d|\d\D)~', $password) != 0;
-	$good &= Util::strtolower($password) != $password;
+	$good &= \ElkArte\Util::strtolower($password) != $password;
 
 	return $good ? null : 'chars';
 }
@@ -602,7 +602,7 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
 
 	// If the password is not 64 characters, lets make it a (SHA-256)
 	if (strlen($password) !== 64)
-		$password = hash('sha256', Util::strtolower($user) . un_htmlspecialchars($password));
+		$password = hash('sha256', \ElkArte\Util::strtolower($user) . un_htmlspecialchars($password));
 
 	// They need a password hash, something to save in the db?
 	if ($returnhash)

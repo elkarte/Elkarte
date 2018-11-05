@@ -71,7 +71,7 @@ class XmlPreview extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/Post.subs.php');
 
 		$errors = array();
-		$news = !isset($this->_req->post->news) ? '' : Util::htmlspecialchars($this->_req->post->news, ENT_QUOTES);
+		$news = !isset($this->_req->post->news) ? '' : \ElkArte\Util::htmlspecialchars($this->_req->post->news, ENT_QUOTES);
 		if (empty($news))
 			$errors[] = array('value' => 'no_news');
 		else
@@ -155,7 +155,7 @@ class XmlPreview extends \ElkArte\AbstractController
 			$member['signature'] = $bbc_parser->parseSignature($member['signature'], true);
 
 			// And now what they want it to be
-			$preview_signature = !empty($this->_req->post->signature) ? Util::htmlspecialchars($this->_req->post->signature) : '';
+			$preview_signature = !empty($this->_req->post->signature) ? \ElkArte\Util::htmlspecialchars($this->_req->post->signature) : '';
 			$validation = profileValidateSignature($preview_signature);
 
 			// An odd check for errors to be sure
@@ -226,7 +226,7 @@ class XmlPreview extends \ElkArte\AbstractController
 		if (allowedTo('issue_warning'))
 		{
 			$warning_body = !empty($this->_req->post->body) ? trim(censor($this->_req->post->body)) : '';
-			$context['preview_subject'] = !empty($this->_req->post->title) ? trim(Util::htmlspecialchars($this->_req->post->title)) : '';
+			$context['preview_subject'] = !empty($this->_req->post->title) ? trim(\ElkArte\Util::htmlspecialchars($this->_req->post->title)) : '';
 			if (isset($this->_req->post->issuing))
 			{
 				if (empty($this->_req->post->title) || empty($this->_req->post->body))
@@ -295,7 +295,7 @@ class XmlPreview extends \ElkArte\AbstractController
 		if (allowedTo('approve_emails'))
 		{
 			$body = !empty($this->_req->post->body) ? trim(censor($this->_req->post->body)) : '';
-			$context['preview_subject'] = !empty($this->_req->post->title) ? trim(Util::htmlspecialchars($this->_req->post->title)) : '';
+			$context['preview_subject'] = !empty($this->_req->post->title) ? trim(\ElkArte\Util::htmlspecialchars($this->_req->post->title)) : '';
 
 			if (isset($this->_req->post->issuing))
 			{

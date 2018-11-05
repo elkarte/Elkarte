@@ -58,7 +58,7 @@ class Topic_Util
 			{
 				// Limit them to $preview_length characters - do this FIRST because it's a lot of wasted censoring otherwise.
 				$row['first_body'] = strtr($parser->parseMessage($row['first_body'], $row['first_smileys']), array('<br />' => "\n", '&nbsp;' => ' '));
-				$row['first_body'] = Util::htmlspecialchars(Util::shorten_html($row['first_body'], $preview_length));
+				$row['first_body'] = \ElkArte\Util::htmlspecialchars(\ElkArte\Util::shorten_html($row['first_body'], $preview_length));
 
 				// No reply then they are the same, no need to process it again
 				if ($row['num_replies'] == 0)
@@ -66,7 +66,7 @@ class Topic_Util
 				else
 				{
 					$row['last_body'] = strtr($parser->parseMessage($row['last_body'], $row['last_smileys']), array('<br />' => "\n", '&nbsp;' => ' '));
-					$row['last_body'] = Util::htmlspecialchars(Util::shorten_html($row['last_body'], $preview_length));
+					$row['last_body'] = \ElkArte\Util::htmlspecialchars(\ElkArte\Util::shorten_html($row['last_body'], $preview_length));
 				}
 
 				// Censor the subject and message preview.

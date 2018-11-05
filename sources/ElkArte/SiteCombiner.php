@@ -558,7 +558,7 @@ class SiteCombiner
 	private function _closure_js_code()
 	{
 		// As long as we are below 200000 in post data size we can do this in one request
-		if (Util::strlen(urlencode($this->_post_header . $this->_cache)) <= 200000)
+		if (\ElkArte\Util::strlen(urlencode($this->_post_header . $this->_cache)) <= 200000)
 		{
 			$post_data = '&js_code=' . urlencode($this->_cache);
 			$fetch_data = fetch_web_data($this->_url, $this->_post_header . $post_data);
@@ -607,7 +607,7 @@ class SiteCombiner
 
 				// Prepare the data for posting
 				$data = urlencode($file['content']);
-				$data_len = Util::strlen($data);
+				$data_len = \ElkArte\Util::strlen($data);
 
 				// While we can add data to the post and not exceed the post size allowed by the service
 				if ($data_len + $post_len < 200000)

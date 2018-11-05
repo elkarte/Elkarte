@@ -162,7 +162,7 @@ class SearchRenderer extends Renderer
 			// Fix the international characters in the keyword too.
 			$query = un_htmlspecialchars($query);
 			$query = trim($query, '\*+');
-			$query = strtr(\Util::htmlspecialchars($query), array('\\\'' => '\''));
+			$query = strtr(\ElkArte\Util::htmlspecialchars($query), array('\\\'' => '\''));
 
 			$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu', array($this, '_highlighted_callback'), $body_highlighted);
 			$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $subject_highlighted);

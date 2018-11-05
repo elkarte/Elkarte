@@ -81,11 +81,11 @@ class Compact implements BodyParserInterface
 		$body = $this->_bbc_parser->parseMessage($body, $smileys_enabled);
 		$body = strip_tags(strtr($body, array('</div>' => '<br />', '</li>' => '<br />')), '<br>');
 
-		if (Util::strlen($body) > $charLimit)
+		if (\ElkArte\Util::strlen($body) > $charLimit)
 		{
 			if ($this->_highlight === false)
 			{
-				$body = Util::substr($body, 0, $charLimit) . '<strong>...</strong>';
+				$body = \ElkArte\Util::substr($body, 0, $charLimit) . '<strong>...</strong>';
 			}
 			else
 			{

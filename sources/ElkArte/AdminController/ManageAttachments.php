@@ -208,7 +208,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 				if (!empty($modSettings['attachment_basedirectories']))
 				{
 					if (!is_array($modSettings['attachment_basedirectories']))
-						$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
+						$modSettings['attachment_basedirectories'] = \ElkArte\Util::unserialize($modSettings['attachment_basedirectories']);
 				}
 				else
 					$modSettings['attachment_basedirectories'] = array();
@@ -260,7 +260,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 		global $modSettings, $txt, $context;
 
 		// Get the current attachment directory.
-		$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
+		$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 		$context['attachmentUploadDir'] = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
 
 		// First time here?
@@ -631,7 +631,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 		$context['attach_multiple_dirs'] = count($attach_dirs) > 1 ? true : false;
 		$context['attach_dirs'] = $attach_dirs;
-		$context['base_dirs'] = !empty($modSettings['attachment_basedirectories']) ? Util::unserialize($modSettings['attachment_basedirectories']) : array();
+		$context['base_dirs'] = !empty($modSettings['attachment_basedirectories']) ? \ElkArte\Util::unserialize($modSettings['attachment_basedirectories']) : array();
 		$context['checked'] = $this->_req->getSession('checked', true);
 		if (!empty($this->_req->session->results))
 		{
@@ -947,7 +947,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 		{
 			// Just use the current path for temp files.
 			if (!is_array($modSettings['attachmentUploadDir']))
-				$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
+				$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 
 			$attach_dirs = $modSettings['attachmentUploadDir'];
 			$current_check = 0;
@@ -1041,12 +1041,12 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 		// Since this needs to be done eventually.
 		if (!is_array($modSettings['attachmentUploadDir']))
-			$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
+			$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 
 		if (!isset($modSettings['attachment_basedirectories']))
 			$modSettings['attachment_basedirectories'] = array();
 		elseif (!is_array($modSettings['attachment_basedirectories']))
-			$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
+			$modSettings['attachment_basedirectories'] = \ElkArte\Util::unserialize($modSettings['attachment_basedirectories']);
 
 		$errors = array();
 
@@ -1128,7 +1128,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 							'attachment_basedirectories' => serialize($modSettings['attachment_basedirectories']),
 							'basedirectory_for_attachments' => $base,
 						));
-						$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
+						$modSettings['attachment_basedirectories'] = \ElkArte\Util::unserialize($modSettings['attachment_basedirectories']);
 					}
 				}
 
@@ -1180,7 +1180,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 							{
 								unset($modSettings['attachment_basedirectories'][$id]);
 								updateSettings(array('attachment_basedirectories' => serialize($modSettings['attachment_basedirectories'])));
-								$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
+								$modSettings['attachment_basedirectories'] = \ElkArte\Util::unserialize($modSettings['attachment_basedirectories']);
 							}
 						}
 						else
@@ -1213,7 +1213,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 			if ($this->current_dir != $modSettings['currentAttachmentUploadDir'] && !empty($modSettings['last_attachments_directory']) && (isset($modSettings['last_attachments_directory'][$this->current_dir]) || isset($modSettings['last_attachments_directory'][0])))
 			{
 				if (!is_array($modSettings['last_attachments_directory']))
-					$modSettings['last_attachments_directory'] = Util::unserialize($modSettings['last_attachments_directory']);
+					$modSettings['last_attachments_directory'] = \ElkArte\Util::unserialize($modSettings['last_attachments_directory']);
 
 				$num = substr(strrchr($modSettings['attachmentUploadDir'][$this->current_dir], '_'), 1);
 				if (is_numeric($num))
@@ -1367,11 +1367,11 @@ class ManageAttachments extends \ElkArte\AbstractController
 				$errors = array();
 				if (!empty($this->_req->session->errors['dir']))
 					foreach ($this->_req->session->errors['dir'] as $error)
-						$errors['dir'][] = Util::htmlspecialchars($error, ENT_QUOTES);
+						$errors['dir'][] = \ElkArte\Util::htmlspecialchars($error, ENT_QUOTES);
 
 				if (!empty($this->_req->session->errors['base']))
 					foreach ($this->_req->session->errors['base'] as $error)
-						$errors['base'][] = Util::htmlspecialchars($error, ENT_QUOTES);
+						$errors['base'][] = \ElkArte\Util::htmlspecialchars($error, ENT_QUOTES);
 			}
 			unset($_SESSION['errors'], $this->_req->session->errors);
 		}
@@ -1556,9 +1556,9 @@ class ManageAttachments extends \ElkArte\AbstractController
 		checkSession();
 
 		// The list(s) of directory's that are available.
-		$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
+		$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 		if (!empty($modSettings['attachment_basedirectories']))
-			$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
+			$modSettings['attachment_basedirectories'] = \ElkArte\Util::unserialize($modSettings['attachment_basedirectories']);
 		else
 			$modSettings['basedirectory_for_attachments'] = array();
 

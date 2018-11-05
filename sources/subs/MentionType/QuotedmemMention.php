@@ -93,8 +93,8 @@ class Quotedmem_Mention extends Mention_BoardAccess_Abstract
 
 		if (!empty($members_id))
 		{
-			$notifier = \Notifications::instance();
-			$notifier->add(new \Notifications_Task(
+			$notifier = \ElkArte\Notifications::instance();
+			$notifier->add(new \ElkArte\NotificationsTask(
 				'quotedmem',
 				$msg_id,
 				$posterOptions['id'],

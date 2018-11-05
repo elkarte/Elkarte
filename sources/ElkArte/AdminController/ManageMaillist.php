@@ -1439,7 +1439,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 
 		// Load any existing email => board values used for new topic creation
 		$context['maillist_from_to_board'] = array();
-		$data = (!empty($modSettings['maillist_receiving_address'])) ? Util::unserialize($modSettings['maillist_receiving_address']) : array();
+		$data = (!empty($modSettings['maillist_receiving_address'])) ? \ElkArte\Util::unserialize($modSettings['maillist_receiving_address']) : array();
 		foreach ($data as $key => $addr)
 		{
 			$context['maillist_from_to_board'][$key] = array(
@@ -1820,7 +1820,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 			if (!empty($template_body) && !empty($template_title))
 			{
 				// Safety first.
-				$template_title = Util::htmlspecialchars($template_title);
+				$template_title = \ElkArte\Util::htmlspecialchars($template_title);
 
 				// Clean up BBC.
 				preparsecode($template_body);

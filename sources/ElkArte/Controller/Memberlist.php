@@ -259,7 +259,7 @@ class Memberlist extends \ElkArte\AbstractController
 		{
 			// Maybe there's something cached already.
 			if (!empty($modSettings['memberlist_cache']))
-				$memberlist_cache = Util::unserialize($modSettings['memberlist_cache']);
+				$memberlist_cache = \ElkArte\Util::unserialize($modSettings['memberlist_cache']);
 
 			// The chunk size for the cached index.
 			$cache_step_size = 500;
@@ -281,7 +281,7 @@ class Memberlist extends \ElkArte\AbstractController
 		// Looking at a specific rolodex letter?
 		if (!is_numeric($start))
 		{
-			if (preg_match('~^[^\'\\\\/]~u', Util::strtolower($start), $match) === 0)
+			if (preg_match('~^[^\'\\\\/]~u', \ElkArte\Util::strtolower($start), $match) === 0)
 				throw new \ElkArte\Exceptions\Exception('Hacker?', false);
 
 			$start = ml_alphaStart($match[0]);
@@ -374,11 +374,11 @@ class Memberlist extends \ElkArte\AbstractController
 			$last_letter = '';
 			foreach ($context['members'] as $i => $dummy)
 			{
-				$this_letter = Util::strtolower(Util::substr($context['members'][$i]['name'], 0, 1));
+				$this_letter = \ElkArte\Util::strtolower(\ElkArte\Util::substr($context['members'][$i]['name'], 0, 1));
 
 				if ($this_letter != $last_letter && preg_match('~[a-z]~', $this_letter) === 1)
 				{
-					$context['members'][$i]['sort_letter'] = Util::htmlspecialchars($this_letter);
+					$context['members'][$i]['sort_letter'] = \ElkArte\Util::htmlspecialchars($this_letter);
 					$last_letter = $this_letter;
 				}
 			}
@@ -407,7 +407,7 @@ class Memberlist extends \ElkArte\AbstractController
 			$start = $this->_req->getQuery('start', '', null);
 			$desc = $this->_req->getQuery('desc', '', null);
 			$sort = $this->_req->getQuery('sort', '', null);
-			$search = Util::htmlspecialchars(trim(isset($this->_req->query->search) ? $this->_req->query->search : $this->_req->post->search), ENT_QUOTES);
+			$search = \ElkArte\Util::htmlspecialchars(trim(isset($this->_req->query->search) ? $this->_req->query->search : $this->_req->post->search), ENT_QUOTES);
 			$input_fields = isset($this->_req->query->fields) ? explode(',', $this->_req->query->fields) : $this->_req->post->fields;
 
 			$fields_key = array_keys($this->_search_fields);

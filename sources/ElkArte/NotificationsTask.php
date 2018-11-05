@@ -12,10 +12,12 @@
  *
  */
 
+namespace ElkArte;
+
 /**
- * Class Notifications_Task
+ * Class NotificationsTask
  */
-class Notifications_Task extends \ElkArte\ValuesContainer
+class NotificationsTask extends \ElkArte\ValuesContainer
 {
 	/**
 	 * Data of the members to notify.

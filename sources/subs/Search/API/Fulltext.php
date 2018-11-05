@@ -127,8 +127,8 @@ class Fulltext extends Standard
 	 */
 	public function searchSort($a, $b)
 	{
-		$x = \Util::strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
-		$y = \Util::strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
+		$x = \ElkArte\Util::strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
+		$y = \ElkArte\Util::strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
 
 		return $x < $y ? 1 : ($x > $y ? -1 : 0);
 	}
@@ -150,13 +150,13 @@ class Fulltext extends Standard
 			{
 				// Using special characters that a full index would ignore and the remaining words are
 				// short which would also be ignored
-				if ((\Util::strlen(current($subwords)) < $this->min_word_length) && (\Util::strlen(next($subwords)) < $this->min_word_length))
+				if ((\ElkArte\Util::strlen(current($subwords)) < $this->min_word_length) && (\ElkArte\Util::strlen(next($subwords)) < $this->min_word_length))
 				{
 					$wordsSearch['words'][] = trim($word, '/*- ');
 					$wordsSearch['complex_words'][] = count($subwords) === 1 ? $word : '"' . $word . '"';
 				}
 			}
-			elseif (\Util::strlen(trim($word, '/*- ')) < $this->min_word_length)
+			elseif (\ElkArte\Util::strlen(trim($word, '/*- ')) < $this->min_word_length)
 			{
 				// Short words have feelings too
 				$wordsSearch['words'][] = trim($word, '/*- ');

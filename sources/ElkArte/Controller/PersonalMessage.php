@@ -802,7 +802,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			$form_subject = $row_quoted['subject'];
 
 			// Add 'Re: ' to it....
-			if ($context['reply'] && trim($context['response_prefix']) != '' && Util::strpos($form_subject, trim($context['response_prefix'])) !== 0)
+			if ($context['reply'] && trim($context['response_prefix']) != '' && \ElkArte\Util::strpos($form_subject, trim($context['response_prefix'])) !== 0)
 			{
 				$form_subject = $context['response_prefix'] . $form_subject;
 			}
@@ -996,7 +996,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			$post_errors->addError('session_timeout');
 		}
 
-		$this->_req->post->subject = isset($this->_req->post->subject) ? strtr(Util::htmltrim($this->_req->post->subject), array("\r" => '', "\n" => '', "\t" => '')) : '';
+		$this->_req->post->subject = isset($this->_req->post->subject) ? strtr(\ElkArte\Util::htmltrim($this->_req->post->subject), array("\r" => '', "\n" => '', "\t" => '')) : '';
 		$this->_req->post->to = $this->_req->getPost('to', 'trim', empty($this->_req->query->to) ? '' : $this->_req->query->to);
 		$this->_req->post->bcc = $this->_req->getPost('bcc', 'trim', empty($this->_req->query->bcc) ? '' : $this->_req->query->bcc);
 
@@ -1036,7 +1036,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 				{
 					if (strlen(trim($recipient)) > 0)
 					{
-						$namedRecipientList[$recipientType][$index] = Util::htmlspecialchars(Util::strtolower(trim($recipient)));
+						$namedRecipientList[$recipientType][$index] = \ElkArte\Util::htmlspecialchars(\ElkArte\Util::strtolower(trim($recipient)));
 					}
 					else
 					{
@@ -1119,7 +1119,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		{
 			$post_errors->addError('no_message');
 		}
-		elseif (!empty($modSettings['max_messageLength']) && Util::strlen($this->_req->post->message) > $modSettings['max_messageLength'])
+		elseif (!empty($modSettings['max_messageLength']) && \ElkArte\Util::strlen($this->_req->post->message) > $modSettings['max_messageLength'])
 		{
 			$post_errors->addError('long_message');
 		}
@@ -1130,7 +1130,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			preparsecode($message);
 
 			// Make sure there's still some content left without the tags.
-			if (Util::htmltrim(strip_tags($bbc_parser->parsePM(Util::htmlspecialchars($message, ENT_QUOTES)), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($message, '[html]') === false))
+			if (\ElkArte\Util::htmltrim(strip_tags($bbc_parser->parsePM(\ElkArte\Util::htmlspecialchars($message, ENT_QUOTES)), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($message, '[html]') === false))
 			{
 				$post_errors->addError('no_message');
 			}
@@ -1148,8 +1148,8 @@ class PersonalMessage extends \ElkArte\AbstractController
 		if (isset($this->_req->query->preview))
 		{
 			// Set everything up to be displayed.
-			$context['preview_subject'] = Util::htmlspecialchars($this->_req->post->subject);
-			$context['preview_message'] = Util::htmlspecialchars($this->_req->post->message, ENT_QUOTES, 'UTF-8', true);
+			$context['preview_subject'] = \ElkArte\Util::htmlspecialchars($this->_req->post->subject);
+			$context['preview_message'] = \ElkArte\Util::htmlspecialchars($this->_req->post->message, ENT_QUOTES, 'UTF-8', true);
 			preparsecode($context['preview_message'], true);
 
 			// Parse out the BBC if it is enabled.
@@ -1321,8 +1321,8 @@ class PersonalMessage extends \ElkArte\AbstractController
 		}
 		else
 		{
-			$context['subject'] = isset($this->_req->post->subject) ? Util::htmlspecialchars($this->_req->post->subject) : '';
-			$context['message'] = isset($this->_req->post->message) ? str_replace(array('  '), array('&nbsp; '), Util::htmlspecialchars($this->_req->post->message, ENT_QUOTES, 'UTF-8', true)) : '';
+			$context['subject'] = isset($this->_req->post->subject) ? \ElkArte\Util::htmlspecialchars($this->_req->post->subject) : '';
+			$context['message'] = isset($this->_req->post->message) ? str_replace(array('  '), array('&nbsp; '), \ElkArte\Util::htmlspecialchars($this->_req->post->message, ENT_QUOTES, 'UTF-8', true)) : '';
 			$context['reply'] = !empty($this->_req->post->replied_to);
 		}
 
@@ -1643,11 +1643,11 @@ class PersonalMessage extends \ElkArte\AbstractController
 			// Adding a new label?
 			if (isset($this->_req->post->add))
 			{
-				$this->_req->post->label = strtr(Util::htmlspecialchars(trim($this->_req->post->label)), array(',' => '&#044;'));
+				$this->_req->post->label = strtr(\ElkArte\Util::htmlspecialchars(trim($this->_req->post->label)), array(',' => '&#044;'));
 
-				if (Util::strlen($this->_req->post->label) > 30)
+				if (\ElkArte\Util::strlen($this->_req->post->label) > 30)
 				{
-					$this->_req->post->label = Util::substr($this->_req->post->label, 0, 30);
+					$this->_req->post->label = \ElkArte\Util::substr($this->_req->post->label, 0, 30);
 				}
 				if ($this->_req->post->label != '')
 				{
@@ -1684,12 +1684,12 @@ class PersonalMessage extends \ElkArte\AbstractController
 					elseif (isset($this->_req->post->label_name[$id]))
 					{
 						// Prepare the label name
-						$this->_req->post->label_name[$id] = trim(strtr(Util::htmlspecialchars($this->_req->post->label_name[$id]), array(',' => '&#044;')));
+						$this->_req->post->label_name[$id] = trim(strtr(\ElkArte\Util::htmlspecialchars($this->_req->post->label_name[$id]), array(',' => '&#044;')));
 
 						// Has to fit in the database as well
-						if (Util::strlen($this->_req->post->label_name[$id]) > 30)
+						if (\ElkArte\Util::strlen($this->_req->post->label_name[$id]) > 30)
 						{
-							$this->_req->post->label_name[$id] = Util::substr($this->_req->post->label_name[$id], 0, 30);
+							$this->_req->post->label_name[$id] = \ElkArte\Util::substr($this->_req->post->label_name[$id], 0, 30);
 						}
 
 						if ($this->_req->post->label_name[$id] != '')
@@ -1889,9 +1889,9 @@ class PersonalMessage extends \ElkArte\AbstractController
 		// If we're here, just send the user to the template, with a few useful context bits.
 		if (isset($this->_req->post->report))
 		{
-			$poster_comment = strtr(Util::htmlspecialchars($this->_req->post->reason), array("\r" => '', "\t" => ''));
+			$poster_comment = strtr(\ElkArte\Util::htmlspecialchars($this->_req->post->reason), array("\r" => '', "\t" => ''));
 
-			if (Util::strlen($poster_comment) > 254)
+			if (\ElkArte\Util::strlen($poster_comment) > 254)
 			{
 				throw new \ElkArte\Exceptions\Exception('post_too_long', false);
 			}
@@ -1960,7 +1960,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 					// Plonk it in the array ;)
 					$messagesToSend[$cur_language] = array(
-						'subject' => (Util::strpos($subject, $txt['pm_report_pm_subject']) === false ? $txt['pm_report_pm_subject'] : '') . un_htmlspecialchars($subject),
+						'subject' => (\ElkArte\Util::strpos($subject, $txt['pm_report_pm_subject']) === false ? $txt['pm_report_pm_subject'] : '') . un_htmlspecialchars($subject),
 						'body' => $report_body,
 						'recipients' => array(
 							'to' => array(),
@@ -2128,7 +2128,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			$context['rid'] = isset($this->_req->query->rid) && isset($context['rules'][$this->_req->query->rid]) ? (int) $this->_req->query->rid : 0;
 
 			// Name is easy!
-			$ruleName = Util::htmlspecialchars(trim($this->_req->post->rule_name));
+			$ruleName = \ElkArte\Util::htmlspecialchars(trim($this->_req->post->rule_name));
 			if (empty($ruleName))
 			{
 				throw new \ElkArte\Exceptions\Exception('pm_rule_no_name', false);
@@ -2177,7 +2177,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 				}
 				elseif (in_array($type, array('sub', 'msg')) && trim($this->_req->post->ruledef[$ind]) != '')
 				{
-					$criteria[] = array('t' => $type, 'v' => Util::htmlspecialchars(trim($this->_req->post->ruledef[$ind])));
+					$criteria[] = array('t' => $type, 'v' => \ElkArte\Util::htmlspecialchars(trim($this->_req->post->ruledef[$ind])));
 				}
 			}
 
@@ -2301,7 +2301,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		$stripped_query = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', $this->_search_params['search']);
 
 		// Make the query lower case since it will case insensitive anyway.
-		$stripped_query = un_htmlspecialchars(Util::strtolower($stripped_query));
+		$stripped_query = un_htmlspecialchars(\ElkArte\Util::strtolower($stripped_query));
 
 		// Extract phrase parts first (e.g. some words "this is a phrase" some more words.)
 		preg_match_all('/(?:^|\s)([-]?)"([^"]+)"(?:$|\s)/', $stripped_query, $matches, PREG_PATTERN_ORDER);
@@ -2309,7 +2309,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 		// Remove the phrase parts and extract the words.
 		$wordArray = preg_replace('~(?:^|\s)(?:[-]?)"(?:[^"]+)"(?:$|\s)~u', ' ', $this->_search_params['search']);
-		$wordArray = explode(' ', Util::htmlspecialchars(un_htmlspecialchars($wordArray), ENT_QUOTES));
+		$wordArray = explode(' ', \ElkArte\Util::htmlspecialchars(un_htmlspecialchars($wordArray), ENT_QUOTES));
 
 		// A minus sign in front of a word excludes the word.... so...
 		$excludedWords = array();
@@ -2361,7 +2361,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 			if (isset($searchArray[$index]))
 			{
-				$searchArray[$index] = Util::strtolower(trim($value));
+				$searchArray[$index] = \ElkArte\Util::strtolower(trim($value));
 
 				if ($searchArray[$index] === '')
 				{
@@ -2370,7 +2370,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 				else
 				{
 					// Sort out entities first.
-					$searchArray[$index] = Util::htmlspecialchars($searchArray[$index]);
+					$searchArray[$index] = \ElkArte\Util::htmlspecialchars($searchArray[$index]);
 				}
 			}
 		}
@@ -2390,12 +2390,12 @@ class PersonalMessage extends \ElkArte\AbstractController
 		$context['search_params'] = $this->_search_params;
 		if (isset($context['search_params']['search']))
 		{
-			$context['search_params']['search'] = Util::htmlspecialchars($context['search_params']['search']);
+			$context['search_params']['search'] = \ElkArte\Util::htmlspecialchars($context['search_params']['search']);
 		}
 
 		if (isset($context['search_params']['userspec']))
 		{
-			$context['search_params']['userspec'] = Util::htmlspecialchars($context['search_params']['userspec']);
+			$context['search_params']['userspec'] = \ElkArte\Util::htmlspecialchars($context['search_params']['userspec']);
 		}
 
 		// Now we have all the parameters, combine them together for pagination and the like...
@@ -2518,7 +2518,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 					// Fix the international characters in the keyword too.
 					$query = un_htmlspecialchars($query);
 					$query = trim($query, '\*+');
-					$query = strtr(Util::htmlspecialchars($query), array('\\\'' => '\''));
+					$query = strtr(\ElkArte\Util::htmlspecialchars($query), array('\\\'' => '\''));
 
 					$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu', array($this, '_highlighted_callback'), $row['body']);
 					$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $row['subject']);
@@ -2659,7 +2659,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		if (!empty($this->_search_params['userspec']))
 		{
 			// Set up so we can search by user name, wildcards, like, etc
-			$userString = strtr(Util::htmlspecialchars($this->_search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
+			$userString = strtr(\ElkArte\Util::htmlspecialchars($this->_search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
 			$userString = strtr($userString, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_'));
 
 			preg_match_all('~"([^"]+)"~', $userString, $matches);

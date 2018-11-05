@@ -966,14 +966,14 @@ class ManagePaid extends \ElkArte\AbstractController
 			$context['pending_payments'] = array();
 			if (!empty($row['pending_details']))
 			{
-				$pending_details = Util::unserialize($row['pending_details']);
+				$pending_details = \ElkArte\Util::unserialize($row['pending_details']);
 				foreach ($pending_details as $id => $pending)
 				{
 					// Only this type need be displayed.
 					if ($pending[3] === 'payback')
 					{
 						// Work out what the options were.
-						$costs = Util::unserialize($context['current_subscription']['real_cost']);
+						$costs = \ElkArte\Util::unserialize($context['current_subscription']['real_cost']);
 
 						if ($context['current_subscription']['real_length'] === 'F')
 						{

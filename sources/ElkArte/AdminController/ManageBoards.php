@@ -678,7 +678,7 @@ class ManageBoards extends \ElkArte\AbstractController
 			// Change '1 & 2' to '1 &amp; 2', but not '&amp;' to '&amp;amp;'...
 			$boardOptions['board_name'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $this->_req->post->board_name);
 
-			$boardOptions['board_description'] = Util::htmlspecialchars($this->_req->post->desc);
+			$boardOptions['board_description'] = \ElkArte\Util::htmlspecialchars($this->_req->post->desc);
 			preparsecode($boardOptions['board_description']);
 
 			$boardOptions['moderator_string'] = $this->_req->post->moderators;

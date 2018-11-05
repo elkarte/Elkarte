@@ -789,7 +789,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 		{
 			$error = 'verify_url_fail';
 			$log_error = true;
-			$sprintf = array(Util::htmlspecialchars($referrer_url));
+			$sprintf = array(\ElkArte\Util::htmlspecialchars($referrer_url));
 		}
 	}
 
@@ -798,7 +798,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	{
 		$error = 'verify_url_fail';
 		$log_error = true;
-		$sprintf = array(Util::htmlspecialchars($referrer_url));
+		$sprintf = array(\ElkArte\Util::htmlspecialchars($referrer_url));
 	}
 
 	// Everything is ok, return an empty string.

@@ -1221,7 +1221,7 @@ class ManageThemes extends \ElkArte\AbstractController
 				}
 
 				if (!empty($theme_info_xml['extra']))
-					$install_info += Util::unserialize($theme_info_xml['extra']);
+					$install_info += \ElkArte\Util::unserialize($theme_info_xml['extra']);
 			}
 
 			if (isset($install_info['based_on']))

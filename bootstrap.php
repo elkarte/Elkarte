@@ -250,8 +250,8 @@ class Bootstrap
 		require_once(EXTDIR . '/ClassLoader.php');
 		$loader = new \Composer\Autoload\ClassLoader();
 
-		$loader->set('ElkArte\\', SOURCEDIR, '/ElkArte');
-		$loader->set('BBC\\', SOURCEDIR . '/subs/BBC');
+		$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
+		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
 		$loader->register();
 	}
 

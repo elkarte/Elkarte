@@ -163,7 +163,7 @@ function DumpDatabase2()
 			}
 			$db_chunks .=
 				$get_rows;
-			$current_used_memory += Util::strlen($db_chunks);
+			$current_used_memory += \ElkArte\Util::strlen($db_chunks);
 
 			$db_backup .= $db_chunks;
 			unset($db_chunks);

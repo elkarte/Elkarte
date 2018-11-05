@@ -270,7 +270,7 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	{
 		global $context;
 
-		$context['poll']['question'] = isset($_REQUEST['question']) ? Util::htmlspecialchars(trim($_REQUEST['question'])) : '';
+		$context['poll']['question'] = isset($_REQUEST['question']) ? \ElkArte\Util::htmlspecialchars(trim($_REQUEST['question'])) : '';
 
 		$context['poll']['choices'] = array();
 		$choice_id = 0;
@@ -377,7 +377,7 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 
 		// Clean up the question and answers.
 		$question = htmlspecialchars($options['question'], ENT_COMPAT, 'UTF-8');
-		$question = Util::substr($question, 0, 255);
+		$question = \ElkArte\Util::substr($question, 0, 255);
 		$question = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $question);
 		$poll_options = htmlspecialchars__recursive($options['options']);
 

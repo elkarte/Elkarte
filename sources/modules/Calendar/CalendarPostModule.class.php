@@ -75,7 +75,7 @@ class Calendar_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 */
 	public function before_save_post($post_errors)
 	{
-		if (!isset($_REQUEST['deleteevent']) && Util::htmltrim($_POST['evtitle']) === '')
+		if (!isset($_REQUEST['deleteevent']) && \ElkArte\Util::htmltrim($_POST['evtitle']) === '')
 			$post_errors->addError('no_event');
 	}
 
