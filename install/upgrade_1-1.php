@@ -338,7 +338,7 @@ class UpgradeInstructions_upgrade_1_1
 					if (!empty($modSettings['drafts_enabled']))
 					{
 						enableModules('drafts', array('post', 'display', 'profile', 'personalmessage'));
-						Hooks::instance()->enableIntegration('Drafts_Integrate');
+						\ElkArte\Hooks::instance()->enableIntegration('Drafts_Integrate');
 					}
 
 					if (!empty($modSettings['enabled_mentions']))
@@ -349,8 +349,8 @@ class UpgradeInstructions_upgrade_1_1
 					enableModules('poll', array('display', 'post'));
 					enableModules('verification', array('post', 'personalmessage', 'register'));
 					enableModules('random', array('post', 'display'));
-					Hooks::instance()->enableIntegration('User_Notification_Integrate');
-					Hooks::instance()->enableIntegration('Ila_Integrate');
+					\ElkArte\Hooks::instance()->enableIntegration('User_Notification_Integrate');
+					\ElkArte\Hooks::instance()->enableIntegration('Ila_Integrate');
 					updateSettings(array(
 						'usernotif_favicon_bgColor' => '#ff0000',
 						'usernotif_favicon_position' => 'up',

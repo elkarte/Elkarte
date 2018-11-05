@@ -29,7 +29,7 @@ class Karma extends \ElkArte\AbstractController
 	 */
 	public function pre_dispatch()
 	{
-		Hooks::instance()->loadIntegrationsSettings();
+		\ElkArte\Hooks::instance()->loadIntegrationsSettings();
 	}
 
 	/**

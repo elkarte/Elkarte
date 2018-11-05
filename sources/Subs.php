@@ -1162,7 +1162,7 @@ function setupMenuContext()
  */
 function call_integration_hook($hook, $parameters = array())
 {
-	return Hooks::instance()->hook($hook, $parameters);
+	return \ElkArte\Hooks::instance()->hook($hook, $parameters);
 }
 
 /**
@@ -1172,7 +1172,7 @@ function call_integration_hook($hook, $parameters = array())
  */
 function call_integration_include_hook($hook)
 {
-	Hooks::instance()->include_hook($hook);
+	\ElkArte\Hooks::instance()->include_hook($hook);
 }
 
 /**
@@ -1180,7 +1180,7 @@ function call_integration_include_hook($hook)
  */
 function call_integration_buffer()
 {
-	Hooks::instance()->buffer_hook();
+	\ElkArte\Hooks::instance()->buffer_hook();
 }
 
 /**
@@ -1195,7 +1195,7 @@ function call_integration_buffer()
  */
 function add_integration_function($hook, $function, $file = '', $permanent = true)
 {
-	Hooks::instance()->add($hook, $function, $file, $permanent);
+	\ElkArte\Hooks::instance()->add($hook, $function, $file, $permanent);
 }
 
 /**
@@ -1212,7 +1212,7 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
  */
 function remove_integration_function($hook, $function, $file = '')
 {
-	Hooks::instance()->remove($hook, $function, $file);
+	\ElkArte\Hooks::instance()->remove($hook, $function, $file);
 }
 
 /**

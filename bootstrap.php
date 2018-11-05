@@ -298,7 +298,7 @@ class Bootstrap
 		loadDatabase();
 
 		// Let's set up our shiny new hooks handler.
-		Hooks::init(database(), \ElkArte\Debug::instance());
+		\ElkArte\Hooks::init(database(), \ElkArte\Debug::instance());
 
 		// It's time for settings loaded from the database.
 		reloadSettings();

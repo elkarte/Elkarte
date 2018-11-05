@@ -39,7 +39,7 @@ function reloadSettings()
 
 	$db = database();
 	$cache = \ElkArte\Cache\Cache::instance();
-	$hooks = Hooks::instance();
+	$hooks = \ElkArte\Hooks::instance();
 
 	// Try to load it from the cache first; it'll never get cached if the setting is off.
 	if (!$cache->getVar($modSettings, 'modSettings', 90))

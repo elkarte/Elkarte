@@ -470,7 +470,7 @@ class ThemeLoader
 
 		$this->theme->loadThemeJavascript();
 
-		\Hooks::instance()->newPath(['$themedir' => $settings['theme_dir']]);
+		\\ElkArte\Hooks::instance()->newPath(['$themedir' => $settings['theme_dir']]);
 
 		// Any files to include at this point?
 		call_integration_include_hook('integrate_theme_include');

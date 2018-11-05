@@ -47,13 +47,13 @@ class ManageDraftsModule extends \ElkArte\AbstractController
 				{
 					enableModules('drafts', $modules);
 					calculateNextTrigger('remove_old_drafts');
-					Hooks::instance()->enableIntegration('Drafts_Integrate');
+					\ElkArte\Hooks::instance()->enableIntegration('Drafts_Integrate');
 				}
 				// Disabling, just forget about the modules
 				else
 				{
 					disableModules('drafts', $modules);
-					Hooks::instance()->disableIntegration('Drafts_Integrate');
+					\ElkArte\Hooks::instance()->disableIntegration('Drafts_Integrate');
 				}
 			},
 		);

@@ -300,7 +300,7 @@ class CoreFeatures extends \ElkArte\AbstractController
 			}
 		}
 
-		$integrations = Hooks::instance()->discoverIntegrations(ADDONSDIR);
+		$integrations = \ElkArte\Hooks::instance()->discoverIntegrations(ADDONSDIR);
 
 		foreach ($integrations as $integration)
 		{
