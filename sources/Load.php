@@ -1492,7 +1492,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 		{
 			foreach ($temp as $temp_params)
 			{
-				Debug::instance()->add($params['debug_index'], $temp_params['options']['basename'] . '(' . (!empty($temp_params['options']['local']) ? (!empty($temp_params['options']['url']) ? basename($temp_params['options']['url']) : basename($temp_params['options']['dir'])) : '') . ')');
+				\ElkArte\Debug::instance()->add($params['debug_index'], $temp_params['options']['basename'] . '(' . (!empty($temp_params['options']['local']) ? (!empty($temp_params['options']['url']) ? basename($temp_params['options']['url']) : basename($temp_params['options']['dir'])) : '') . ')');
 			}
 		}
 	}
@@ -1548,7 +1548,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 
 				if ($db_show_debug === true)
 				{
-					Debug::instance()->add($params['debug_index'], $params['basename'] . '(' . (!empty($params['local']) ? (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) : '') . ')');
+					\ElkArte\Debug::instance()->add($params['debug_index'], $params['basename'] . '(' . (!empty($params['local']) ? (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) : '') . ')');
 				}
 			}
 

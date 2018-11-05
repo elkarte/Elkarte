@@ -63,7 +63,7 @@ class AdminDebug extends \ElkArte\AbstractController
 		// Don't allow except for administrators.
 		isAllowedTo('admin_forum');
 
-		$debug = Debug::instance();
+		$debug = \ElkArte\Debug::instance();
 
 		// If we're just hiding/showing, do it now.
 		if (isset($this->_req->query->sa) && $this->_req->query->sa === 'hide')

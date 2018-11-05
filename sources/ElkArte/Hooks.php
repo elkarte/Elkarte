@@ -518,7 +518,7 @@ final class Hooks
 			$db = database();
 
 		if ($debug === null)
-			$debug = Debug::instance();
+			$debug = \ElkArte\Debug::instance();
 
 		self::$_instance = new Hooks($db, $debug, $paths);
 	}

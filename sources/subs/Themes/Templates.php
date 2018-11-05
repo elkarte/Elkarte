@@ -200,7 +200,7 @@ class Templates
 		{
 			if ($db_show_debug === true)
 			{
-				Debug::instance()->add(
+				\ElkArte\Debug::instance()->add(
 					'templates',
 					$template_name . ' (' . basename($template_dir) . ')'
 				);
@@ -328,7 +328,7 @@ class Templates
 					// Keep track of what we're up to, soldier.
 					if ($db_show_debug === true)
 					{
-						Debug::instance()->add(
+						\ElkArte\Debug::instance()->add(
 							'language_files',
 							$template . '.' . $lang . ' (' . basename(
 								$settings['theme_url']
@@ -698,7 +698,7 @@ class Templates
 		{
 			if ($db_show_debug === true)
 			{
-				Debug::instance()->add('sub_templates', $sub_template_name);
+				\ElkArte\Debug::instance()->add('sub_templates', $sub_template_name);
 			}
 
 			// Figure out what the template function is named.

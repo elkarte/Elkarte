@@ -686,7 +686,7 @@ function redirectexit($setLocation = '', $refresh = false)
 	// Debugging.
 	if ($db_show_debug === true)
 	{
-		$_SESSION['debug_redirect'] = Debug::instance()->get_db();
+		$_SESSION['debug_redirect'] = \ElkArte\Debug::instance()->get_db();
 	}
 
 	obExit(false);
@@ -770,7 +770,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 			{
 				if (!isset($_REQUEST['xml']) && ((!isset($_GET['action']) || $_GET['action'] != 'viewquery') && !isset($_GET['api'])))
 				{
-					Debug::instance()->display();
+					\ElkArte\Debug::instance()->display();
 				}
 			}
 		}

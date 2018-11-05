@@ -280,7 +280,7 @@ class Bootstrap
 		// Show lots of debug information below the page, not for production sites
 		if ($db_show_debug === true)
 		{
-			Debug::instance()->rusage('start', $rusage_start);
+			\ElkArte\Debug::instance()->rusage('start', $rusage_start);
 		}
 	}
 
@@ -298,7 +298,7 @@ class Bootstrap
 		loadDatabase();
 
 		// Let's set up our shiny new hooks handler.
-		Hooks::init(database(), Debug::instance());
+		Hooks::init(database(), \ElkArte\Debug::instance());
 
 		// It's time for settings loaded from the database.
 		reloadSettings();

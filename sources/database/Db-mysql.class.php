@@ -177,7 +177,7 @@ class Database_MySQL extends Database_Abstract
 		// Debugging.
 		if ($db_show_debug === true)
 		{
-			$debug = Debug::instance();
+			$debug = \ElkArte\Debug::instance();
 
 			// Get the file and line number this function was called.
 			list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);

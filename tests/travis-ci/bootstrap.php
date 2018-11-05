@@ -70,7 +70,7 @@ $context['forum_name_html_safe'] = $context['forum_name'];
 // Just like we are starting, almost
 cleanRequest();
 loadDatabase();
-Hooks::init(database(), Debug::instance());
+Hooks::init(database(), \ElkArte\Debug::instance());
 reloadSettings();
 /**
  * This next line is pointless, but without that tests fail in postgre.

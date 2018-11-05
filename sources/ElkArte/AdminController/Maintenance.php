@@ -1437,7 +1437,7 @@ class Maintenance extends \ElkArte\AbstractController
 
 		// Ask for some extra time, on big boards this may take a bit
 		detectServer()->setTimeLimit(600);
-		Debug::instance()->off();
+		\ElkArte\Debug::instance()->off();
 
 		// The functions here will come in handy
 		require_once(SUBSDIR . '/Maintenance.subs.php');
@@ -1471,14 +1471,14 @@ class Maintenance extends \ElkArte\AbstractController
 			$context['continue_post_data'] = '<input type="hidden" name="' . $context['admin-recountposts_token_var'] . '" value="' . $context['admin-recountposts_token'] . '" />
 				<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />';
 
-			Debug::instance()->on();
+			\ElkArte\Debug::instance()->on();
 			return;
 		}
 
 		// No countable posts? set posts counter to 0
 		updateZeroPostMembers();
 
-		Debug::instance()->on();
+		\ElkArte\Debug::instance()->on();
 		// All done, clean up and go back to maintenance
 		unset($_SESSION['total_members']);
 		redirectexit('action=admin;area=maintain;sa=members;done=recountposts');

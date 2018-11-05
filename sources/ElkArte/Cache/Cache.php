@@ -239,7 +239,7 @@ class Cache
 		if ($db_show_debug === true)
 		{
 			$cache_hit['t'] = microtime(true) - $st;
-			Debug::instance()->cache($cache_hit);
+			\ElkArte\Debug::instance()->cache($cache_hit);
 		}
 	}
 
@@ -279,7 +279,7 @@ class Cache
 		{
 			$cache_hit['t'] = microtime(true) - $st;
 			$cache_hit['s'] = isset($value) ? strlen($value) : 0;
-			Debug::instance()->cache($cache_hit);
+			\ElkArte\Debug::instance()->cache($cache_hit);
 		}
 
 		call_integration_hook('cache_get_data', array($key, $ttl, $value));
