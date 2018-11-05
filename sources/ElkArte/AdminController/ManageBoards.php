@@ -420,7 +420,7 @@ class ManageBoards extends \ElkArte\AbstractController
 			if (isset($this->_req->post->delete_action) && $this->_req->post->delete_action == 1)
 			{
 				if (empty($this->_req->post->cat_to))
-					throw new Elk_Exception('mboards_delete_error');
+					throw new \ElkArte\Exceptions\Exception('mboards_delete_error');
 
 				deleteCategories(array($this->cat), (int) $this->_req->post->cat_to);
 			}
@@ -648,7 +648,7 @@ class ManageBoards extends \ElkArte\AbstractController
 			elseif (!empty($this->_req->post->placement) && !empty($this->_req->post->board_order))
 			{
 				if (!in_array($this->_req->post->placement, array('before', 'after', 'child')))
-					throw new Elk_Exception('mangled_post', false);
+					throw new \ElkArte\Exceptions\Exception('mangled_post', false);
 
 				$boardOptions['move_to'] = $this->_req->post->placement;
 				$boardOptions['target_board'] = (int) $this->_req->post->board_order;
@@ -673,7 +673,7 @@ class ManageBoards extends \ElkArte\AbstractController
 			}
 
 			if (strlen(implode(',', $boardOptions['access_groups'])) > 255 || strlen(implode(',', $boardOptions['deny_groups'])) > 255)
-				throw new Elk_Exception('too_many_groups', false);
+				throw new \ElkArte\Exceptions\Exception('too_many_groups', false);
 
 			// Change '1 & 2' to '1 &amp; 2', but not '&amp;' to '&amp;amp;'...
 			$boardOptions['board_name'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $this->_req->post->board_name);
@@ -735,7 +735,7 @@ class ManageBoards extends \ElkArte\AbstractController
 		elseif (isset($this->_req->post->delete) && !isset($this->_req->post->confirmation) && !isset($this->_req->post->no_children))
 		{
 			if ($posts) {
-				throw new Elk_Exception('mboards_delete_board_has_posts');
+				throw new \ElkArte\Exceptions\Exception('mboards_delete_board_has_posts');
 			}
 			else {
 				$this->action_board();
@@ -746,13 +746,13 @@ class ManageBoards extends \ElkArte\AbstractController
 		{
 			// First, check if our board still has posts or topics.
 			if ($posts) {
-				throw new Elk_Exception('mboards_delete_board_has_posts');
+				throw new \ElkArte\Exceptions\Exception('mboards_delete_board_has_posts');
 			}
 			else if (isset($this->_req->post->delete_action) && $this->_req->post->delete_action == 1)
 			{
 				// Check if we are moving all the current sub-boards first - before we start deleting!
 				if (empty($this->_req->post->board_to))
-					throw new Elk_Exception('mboards_delete_board_error');
+					throw new \ElkArte\Exceptions\Exception('mboards_delete_board_error');
 
 				deleteBoards(array($board_id), (int) $this->_req->post->board_to);
 			}

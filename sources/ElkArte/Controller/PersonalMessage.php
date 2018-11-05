@@ -20,6 +20,7 @@
 namespace ElkArte\Controller;
 
 use ElkArte\Errors\ErrorContext;
+use ElkArte\Exceptions\ControllerRedirectException;
 
 /**
  * It allows viewing, sending, deleting, and marking personal messages
@@ -238,7 +239,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 	 *
 	 * @param string $area
 	 *
-	 * @throws Elk_Exception no_access
+	 * @throws \ElkArte\Exceptions\Exception no_access
 	 */
 	private function _messageIndexBar($area)
 	{
@@ -366,7 +367,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		// No menu means no access.
 		if (!$pm_include_data && (!$user_info['is_guest'] || validateSession() !== true))
 		{
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 		}
 
 		// Make a note of the Unique ID for this menu.
@@ -505,7 +506,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			// Make sure you have access to this PM.
 			if (!isAccessiblePM($pmID, $context['folder'] === 'sent' ? 'outbox' : 'inbox'))
 			{
-				throw new Elk_Exception('no_access', false);
+				throw new \ElkArte\Exceptions\Exception('no_access', false);
 			}
 
 			$context['current_pm'] = $pmID;
@@ -533,7 +534,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 			if (!isAccessiblePM($pmsg, $context['folder'] === 'sent' ? 'outbox' : 'inbox'))
 			{
-				throw new Elk_Exception('no_access', false);
+				throw new \ElkArte\Exceptions\Exception('no_access', false);
 			}
 		}
 
@@ -564,7 +565,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		// Make sure that we have been given a correct head pm id if we are in conversation mode
 		if ($context['display_mode'] == 2 && !empty($pmID) && $pmID != $lastData['id'])
 		{
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 		}
 
 		// If loadPMs returned results, lets show the pm subject list
@@ -754,7 +755,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 			if (!empty($pmCount) && $pmCount >= $modSettings['pm_posts_per_hour'])
 			{
-				throw new Elk_Exception('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
+				throw new \ElkArte\Exceptions\Exception('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
 			}
 		}
 
@@ -762,7 +763,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		{
 			$this->_events->trigger('before_set_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0)));
 		}
-		catch (Pm_Error_Exception $e)
+		catch (\ElkArte\Exceptions\PmErrorException $e)
 		{
 			return $this->messagePostError($e->namedRecipientList, $e->recipientList, $e->msgOptions);
 		}
@@ -775,7 +776,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			// Make sure this is accessible (not deleted)
 			if (!isAccessiblePM($pmsg))
 			{
-				throw new Elk_Exception('no_access', false);
+				throw new \ElkArte\Exceptions\Exception('no_access', false);
 			}
 
 			// Validate that this is one has been received?
@@ -785,7 +786,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			$row_quoted = loadPMQuote($pmsg, $isReceived);
 			if ($row_quoted === false)
 			{
-				throw new Elk_Exception('pm_not_yours', false);
+				throw new \ElkArte\Exceptions\Exception('pm_not_yours', false);
 			}
 
 			// Censor the message.
@@ -980,7 +981,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			{
 				if (!isset($this->_req->query->xml))
 				{
-					throw new Elk_Exception('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
+					throw new \ElkArte\Exceptions\Exception('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
 				}
 				else
 				{
@@ -1185,7 +1186,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		{
 			$this->_events->trigger('before_sending', array('namedRecipientList' => $namedRecipientList, 'recipientList' => $recipientList, 'namesNotFound' => $namesNotFound, 'post_errors' => $post_errors));
 		}
-		catch (Controller_Redirect_Exception $e)
+		catch (ControllerRedirectException $e)
 		{
 			return $this->messagePostError($namedRecipientList, $recipientList);
 		}
@@ -1268,7 +1269,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 	 * @param mixed[] $recipient_ids array keys of [bbc] => int[] and [to] => int[]
 	 * @param mixed[] $msg_options body, subject and reply values
 	 *
-	 * @throws Elk_Exception pm_not_yours
+	 * @throws \ElkArte\Exceptions\Exception pm_not_yours
 	 */
 	public function messagePostError($named_recipients, $recipient_ids = array(), $msg_options = null)
 	{
@@ -1335,7 +1336,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			{
 				if (!isset($this->_req->query->xml))
 				{
-					throw new Elk_Exception('pm_not_yours', false);
+					throw new \ElkArte\Exceptions\Exception('pm_not_yours', false);
 				}
 				else
 				{
@@ -1514,7 +1515,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			// Any errors?
 			if (!empty($updateErrors))
 			{
-				throw new Elk_Exception('labels_too_many', true, array($updateErrors));
+				throw new \ElkArte\Exceptions\Exception('labels_too_many', true, array($updateErrors));
 			}
 		}
 
@@ -1868,14 +1869,14 @@ class PersonalMessage extends \ElkArte\AbstractController
 		// Check that this feature is even enabled!
 		if (empty($modSettings['enableReportPM']) || empty($this->_req->query->pmsg))
 		{
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 		}
 
 		$pmsg = $this->_req->getQuery('pmsg', 'intval', $this->_req->getPost('pmsg', 'intval', 0));
 
 		if (!isAccessiblePM($pmsg, 'inbox'))
 		{
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 		}
 
 		$context['pm_id'] = $pmsg;
@@ -1892,7 +1893,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 			if (Util::strlen($poster_comment) > 254)
 			{
-				throw new Elk_Exception('post_too_long', false);
+				throw new \ElkArte\Exceptions\Exception('post_too_long', false);
 			}
 
 			// Check the session before proceeding any further!
@@ -1930,7 +1931,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			// Maybe we shouldn't advertise this?
 			if (empty($admins))
 			{
-				throw new Elk_Exception('no_access', false);
+				throw new \ElkArte\Exceptions\Exception('no_access', false);
 			}
 
 			$memberFromName = un_htmlspecialchars($memberFromName);
@@ -2130,13 +2131,13 @@ class PersonalMessage extends \ElkArte\AbstractController
 			$ruleName = Util::htmlspecialchars(trim($this->_req->post->rule_name));
 			if (empty($ruleName))
 			{
-				throw new Elk_Exception('pm_rule_no_name', false);
+				throw new \ElkArte\Exceptions\Exception('pm_rule_no_name', false);
 			}
 
 			// Sanity check...
 			if (empty($this->_req->post->ruletype) || empty($this->_req->post->acttype))
 			{
-				throw new Elk_Exception('pm_rule_no_criteria', false);
+				throw new \ElkArte\Exceptions\Exception('pm_rule_no_criteria', false);
 			}
 
 			// Let's do the criteria first - it's also hardest!
@@ -2205,7 +2206,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 			if (empty($criteria) || (empty($actions) && !$doDelete))
 			{
-				throw new Elk_Exception('pm_rule_no_criteria', false);
+				throw new \ElkArte\Exceptions\Exception('pm_rule_no_criteria', false);
 			}
 
 			// What are we storing?
@@ -2258,7 +2259,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		// Make sure the server is able to do this right now
 		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
 		{
-			throw new Elk_Exception('loadavg_search_disabled', false);
+			throw new \ElkArte\Exceptions\Exception('loadavg_search_disabled', false);
 		}
 
 		// Some useful general permissions.
@@ -2933,7 +2934,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			// Make sure this is accessible, should be of course
 			if (!isAccessiblePM($pmsg, 'inbox'))
 			{
-				throw new Elk_Exception('no_access', false);
+				throw new \ElkArte\Exceptions\Exception('no_access', false);
 			}
 
 			// Well then, you get to hear about it all over again

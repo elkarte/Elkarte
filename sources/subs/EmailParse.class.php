@@ -202,7 +202,7 @@ class Email_Parse
 	 *
 	 * @param string $data optional, if supplied must be a full headers+body email string
 	 * @param string $location optional, used for debug
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function read_data($data = '', $location = '')
 	{
@@ -229,7 +229,7 @@ class Email_Parse
 	 * - Must have admin permissions
 	 *
 	 * @param string $location
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _readFailed($location)
 	{
@@ -296,7 +296,7 @@ class Email_Parse
 	 * @param boolean $html - flag to determine if we are saving html or not
 	 * @param string $data - full header+message string
 	 * @param string $location - optional, used for debug
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function read_email($html = false, $data = '', $location = '')
 	{

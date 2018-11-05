@@ -72,7 +72,7 @@ class TestCalendar_Event extends \PHPUnit\Framework\TestCase
 	}
 
 	/**
-	 * @expectedException Elk_Exception
+	 * @expectedException \ElkArte\Exceptions\Exception
 	 * @expectedExceptionMessage The span feature is currently disabled.
 	 */
 	public function testValidateNoSpan()
@@ -82,7 +82,7 @@ class TestCalendar_Event extends \PHPUnit\Framework\TestCase
 	}
 
 	/**
-	 * @expectedException Elk_Exception
+	 * @expectedException \ElkArte\Exceptions\Exception
 	 * @expectedExceptionMessage Invalid number of days to span.
 	 */
 	public function testValidateInvalidSpan1()
@@ -92,7 +92,7 @@ class TestCalendar_Event extends \PHPUnit\Framework\TestCase
 	}
 
 	/**
-	 * @expectedException Elk_Exception
+	 * @expectedException \ElkArte\Exceptions\Exception
 	 * @expectedExceptionMessage Invalid number of days to span.
 	 */
 	public function testValidateInvalidSpan2()
@@ -102,29 +102,29 @@ class TestCalendar_Event extends \PHPUnit\Framework\TestCase
 	}
 
 	/**
-	 * @expectedException Elk_Exception
+	 * @expectedException \ElkArte\Exceptions\Exception
 	 * @expectedExceptionMessage Event month is missing.
 	 */
 	public function testValidateNotDelete1()
 	{
 		$event = new Calendar_Event(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
-		// No month passed => Elk_Exception
+		// No month passed => \ElkArte\Exceptions\Exception
 		$event->validate(array());
 	}
 
 	/**
-	 * @expectedException Elk_Exception
+	 * @expectedException \ElkArte\Exceptions\Exception
 	 * @expectedExceptionMessage Event year is missing.
 	 */
 	public function testValidateNotDelete2()
 	{
 		$event = new Calendar_Event(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
-		// No year passed => Elk_Exception
+		// No year passed => \ElkArte\Exceptions\Exception
 		$event->validate(array('month' => 1));
 	}
 
 	/**
-	 * @expectedException Elk_Exception
+	 * @expectedException \ElkArte\Exceptions\Exception
 	 * @expectedExceptionMessage Invalid month value.
 	 */
 	public function testValidateNotDelete3()
@@ -135,7 +135,7 @@ class TestCalendar_Event extends \PHPUnit\Framework\TestCase
 	}
 
 	/**
-	 * @expectedException Elk_Exception
+	 * @expectedException \ElkArte\Exceptions\Exception
 	 * @expectedExceptionMessage Invalid month value.
 	 */
 	public function testValidateNotDelete4()
@@ -146,7 +146,7 @@ class TestCalendar_Event extends \PHPUnit\Framework\TestCase
 	}
 
 	/**
-	 * @expectedException Elk_Exception
+	 * @expectedException \ElkArte\Exceptions\Exception
 	 * @expectedExceptionMessage Invalid month value.
 	 */
 	public function testValidateNotDelete5()
@@ -157,7 +157,7 @@ class TestCalendar_Event extends \PHPUnit\Framework\TestCase
 	}
 
 	/**
-	 * @expectedException Elk_Exception
+	 * @expectedException \ElkArte\Exceptions\Exception
 	 * @expectedExceptionMessage Invalid year value.
 	 */
 	public function testValidateNotDelete6()
@@ -168,7 +168,7 @@ class TestCalendar_Event extends \PHPUnit\Framework\TestCase
 	}
 
 	/**
-	 * @expectedException Elk_Exception
+	 * @expectedException \ElkArte\Exceptions\Exception
 	 * @expectedExceptionMessage Invalid year value.
 	 */
 	public function testValidateNotDelete7()
@@ -179,29 +179,29 @@ class TestCalendar_Event extends \PHPUnit\Framework\TestCase
 	}
 
 	/**
-	 * @expectedException Elk_Exception
+	 * @expectedException \ElkArte\Exceptions\Exception
 	 * @expectedExceptionMessage Event day is missing.
 	 */
 	public function testValidateNotDelete8()
 	{
 		$event = new Calendar_Event(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
-		// No day => Elk_Exception
+		// No day => \ElkArte\Exceptions\Exception
 		$event->validate(array('month' => 1, 'year' => 2013));
 	}
 
 	/**
-	 * @expectedException Elk_Exception
+	 * @expectedException \ElkArte\Exceptions\Exception
 	 * @expectedExceptionMessage Event title is missing.
 	 */
 	public function testValidateNotDelete9()
 	{
 		$event = new Calendar_Event(1, array('cal_minyear' => 2012, 'cal_limityear' => 10));
-		// No title => Elk_Exception
+		// No title => \ElkArte\Exceptions\Exception
 		$event->validate(array('month' => 1, 'year' => 2013, 'day' => 1));
 	}
 
 	/**
-	 * @expectedException Elk_Exception
+	 * @expectedException \ElkArte\Exceptions\Exception
 	 * @expectedExceptionMessage Invalid date.
 	 */
 	public function testValidateNotDelete10()
@@ -212,7 +212,7 @@ class TestCalendar_Event extends \PHPUnit\Framework\TestCase
 	}
 
 	/**
-	 * @expectedException Elk_Exception
+	 * @expectedException \ElkArte\Exceptions\Exception
 	 * @expectedExceptionMessage No event title was entered.
 	 */
 	public function testValidateNotDelete11()

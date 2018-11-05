@@ -186,7 +186,7 @@ class Packages extends \ElkArte\AbstractController
 
 		// If we can't find the file, our install ends here
 		if (!file_exists(BOARDDIR . '/packages/' . $this->_filename))
-			throw new Elk_Exception('package_no_file', false);
+			throw new \ElkArte\Exceptions\Exception('package_no_file', false);
 
 		// Do we have an existing id, for uninstalls and the like.
 		$this->install_id = $this->_req->getQuery('pid', 'intval', 0);
@@ -212,7 +212,7 @@ class Packages extends \ElkArte\AbstractController
 		// Get the package info...
 		$packageInfo = getPackageInfo($this->_filename);
 		if (!is_array($packageInfo))
-			throw new Elk_Exception($packageInfo);
+			throw new \ElkArte\Exceptions\Exception($packageInfo);
 
 		$packageInfo['filename'] = $this->_filename;
 
@@ -414,7 +414,7 @@ class Packages extends \ElkArte\AbstractController
 		}
 		// Well we don't know what it is then, so we stop
 		else
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 	}
 
 	/**
@@ -427,7 +427,7 @@ class Packages extends \ElkArte\AbstractController
 	 * @param boolean $testing passed to parsePackageInfo, true for test install, false for real install
 	 *
 	 * @return array
-	 * @throws Elk_Exception package_cant_uninstall, package_uninstall_cannot
+	 * @throws \ElkArte\Exceptions\Exception package_cant_uninstall, package_uninstall_cannot
 	 */
 	private function _get_package_actions($package_installed, $packageInfo, $testing = true)
 	{
@@ -442,7 +442,7 @@ class Packages extends \ElkArte\AbstractController
 			if (!isset($package_installed['old_version']))
 			{
 				deltree(BOARDDIR . '/packages/temp');
-				throw new Elk_Exception('package_cant_uninstall', false);
+				throw new \ElkArte\Exceptions\Exception('package_cant_uninstall', false);
 			}
 
 			$actions = parsePackageInfo($packageInfo['xml'], $testing, 'uninstall');
@@ -451,7 +451,7 @@ class Packages extends \ElkArte\AbstractController
 			if (empty($actions))
 			{
 				deltree(BOARDDIR . '/packages/temp');
-				throw new Elk_Exception('package_uninstall_cannot', false);
+				throw new \ElkArte\Exceptions\Exception('package_uninstall_cannot', false);
 			}
 
 			// Can't edit the custom themes it's edited if you're uninstalling, they must be removed.
@@ -518,7 +518,7 @@ class Packages extends \ElkArte\AbstractController
 				// No temp directory was able to be made, that's fatal
 				deltree(BOARDDIR . '/packages/temp', false);
 				if (!mktree(BOARDDIR . '/packages/temp', 0777))
-					throw new Elk_Exception('package_cant_download', false);
+					throw new \ElkArte\Exceptions\Exception('package_cant_download', false);
 			}
 		}
 	}
@@ -541,7 +541,7 @@ class Packages extends \ElkArte\AbstractController
 
 		// And if the file does not exist there is a problem
 		if (!file_exists(BOARDDIR . '/packages/' . $this->_filename))
-			throw new Elk_Exception('package_no_file', false);
+			throw new \ElkArte\Exceptions\Exception('package_no_file', false);
 
 		// If this is an uninstall, we'll have an id.
 		$this->install_id = $this->_req->getQuery('pid', 'intval', 0);
@@ -603,7 +603,7 @@ class Packages extends \ElkArte\AbstractController
 		// Get the package info...
 		$packageInfo = getPackageInfo($this->_filename);
 		if (!is_array($packageInfo))
-			throw new Elk_Exception($packageInfo);
+			throw new \ElkArte\Exceptions\Exception($packageInfo);
 
 		$packageInfo['filename'] = $this->_filename;
 
@@ -1109,7 +1109,7 @@ class Packages extends \ElkArte\AbstractController
 
 		// We need to know the operation key for the search and replace?
 		if (!isset($this->_req->query->operation_key, $this->_req->query->filename) && !is_numeric($this->_req->query->operation_key))
-			throw new Elk_Exception('operation_invalid', 'general');
+			throw new \ElkArte\Exceptions\Exception('operation_invalid', 'general');
 
 		// Load the required file.
 		require_once(SUBSDIR . '/Themes.subs.php');
@@ -1196,7 +1196,7 @@ class Packages extends \ElkArte\AbstractController
 		if (isset($this->_req->query->restore))
 		{
 			create_chmod_control(array(), array(), true);
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 		}
 
 		// This is a time and memory eating ...
@@ -1555,7 +1555,7 @@ class Packages extends \ElkArte\AbstractController
 				if ($validate_custom)
 				{
 					if (!preg_match('~^[4567][4567][4567]$~', $context['custom_value']))
-						throw new Elk_Exception($txt['chmod_value_invalid']);
+						throw new \ElkArte\Exceptions\Exception($txt['chmod_value_invalid']);
 				}
 
 				// Nothing to do?
@@ -1564,7 +1564,7 @@ class Packages extends \ElkArte\AbstractController
 			}
 			// Should never get here,
 			else
-				throw new Elk_Exception('no_access', false);
+				throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 			// Setup the custom value.
 			$custom_value = octdec('0' . $context['custom_value']);
@@ -1762,7 +1762,7 @@ class Packages extends \ElkArte\AbstractController
 	 * @param bool $installed
 	 *
 	 * @return mixed
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function list_packages($start, $items_per_page, $sort, $params, $installed)
 	{
@@ -2043,7 +2043,7 @@ class Packages extends \ElkArte\AbstractController
  * @param mixed[] $data
  * @param int     $level
  *
- * @throws Elk_Exception no_access
+ * @throws \ElkArte\Exceptions\Exception no_access
  */
 function fetchPerms__recursive($path, &$data, $level)
 {
@@ -2067,7 +2067,7 @@ function fetchPerms__recursive($path, &$data, $level)
 
 	// @todo Shouldn't happen - but better error message?
 	if (!is_dir($path))
-		throw new Elk_Exception('no_access', false);
+		throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 	// This is where we put stuff we've found for sorting.
 	$foundData = array(

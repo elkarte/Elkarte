@@ -615,7 +615,7 @@ class Reports extends \ElkArte\AbstractController
 
 		// This is a bit of a cop out - but we're protecting their forum, really!
 		if (count($allStaff) > 300)
-			throw new Elk_Exception('report_error_too_many_staff');
+			throw new \ElkArte\Exceptions\Exception('report_error_too_many_staff');
 
 		// Get all the possible membergroups!
 		$all_groups = getBasicMembergroupData(array('all'), array(), null, false);

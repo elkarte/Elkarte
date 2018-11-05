@@ -130,7 +130,7 @@ class Auth extends \ElkArte\AbstractController
 
 		// Been guessing a lot, haven't we?
 		if (isset($_SESSION['failed_login']) && $_SESSION['failed_login'] >= $modSettings['failed_login_threshold'] * 3)
-			throw new Elk_Exception('login_threshold_fail', 'critical');
+			throw new \ElkArte\Exceptions\Exception('login_threshold_fail', 'critical');
 
 		// Set up the cookie length.  (if it's invalid, just fall through and use the default.)
 		if (isset($_POST['cookieneverexp']) || (!empty($_POST['cookielength']) && $_POST['cookielength'] == -1))
@@ -388,7 +388,7 @@ class Auth extends \ElkArte\AbstractController
 	 *
 	 * @param boolean $internal if true, it doesn't check the session
 	 * @param boolean $redirect if true, redirect to the board index
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function action_logout($internal = false, $redirect = true)
 	{
@@ -527,7 +527,7 @@ class Auth extends \ElkArte\AbstractController
 		{
 			// Strike!  You're outta there!
 			if ($_GET['member'] != $user_info['id'])
-				throw new Elk_Exception('login_cookie_error', false);
+				throw new \ElkArte\Exceptions\Exception('login_cookie_error', false);
 
 			$user_info['can_mod'] = allowedTo('access_mod_center') || (!$user_info['is_guest'] && ($user_info['mod_cache']['gq'] != '0=1' || $user_info['mod_cache']['bq'] != '0=1' || ($modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']))));
 			if ($user_info['can_mod'] && isset($user_settings['openid_uri']) && empty($user_settings['openid_uri']))
@@ -721,7 +721,7 @@ function checkActivation()
 	}
 	// Awaiting approval still?
 	elseif ($activation_status == 3)
-		throw new Elk_Exception('still_awaiting_approval', 'user');
+		throw new \ElkArte\Exceptions\Exception('still_awaiting_approval', 'user');
 	// Awaiting deletion, changed their mind?
 	elseif ($activation_status == 4)
 	{

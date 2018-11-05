@@ -292,9 +292,9 @@ function canLinkEvent()
 
 	// No board?  No topic?!?
 	if (empty($board))
-		throw new Elk_Exception('missing_board_id', false);
+		throw new \ElkArte\Exceptions\Exception('missing_board_id', false);
 	if (empty($topic))
-		throw new Elk_Exception('missing_topic_id', false);
+		throw new \ElkArte\Exceptions\Exception('missing_topic_id', false);
 
 	// Administrator, Moderator, or owner.  Period.
 	if (!allowedTo('admin_forum') && !allowedTo('moderate_board'))
@@ -305,11 +305,11 @@ function canLinkEvent()
 		{
 			// Not the owner of the topic.
 			if ($row['id_member_started'] != $user_info['id'])
-				throw new Elk_Exception('not_your_topic', 'user');
+				throw new \ElkArte\Exceptions\Exception('not_your_topic', 'user');
 		}
 		// Topic/Board doesn't exist.....
 		else
-			throw new Elk_Exception('calendar_no_topic', 'general');
+			throw new \ElkArte\Exceptions\Exception('calendar_no_topic', 'general');
 	}
 }
 

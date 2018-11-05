@@ -93,7 +93,7 @@ class MoveTopic extends \ElkArte\AbstractController
 
 		// No boards?
 		if (empty($context['categories']) || $context['num_boards'] == 1)
-			throw new Elk_Exception('moveto_noboards', false);
+			throw new \ElkArte\Exceptions\Exception('moveto_noboards', false);
 
 		// Already used the function, let's set the selected board back to the last
 		$last_moved_to = isset($_SESSION['move_to_topic']['move_to']) && $_SESSION['move_to_topic']['move_to'] != $context['current_board'] ? (int) $_SESSION['move_to_topic']['move_to'] : 0;
@@ -142,7 +142,7 @@ class MoveTopic extends \ElkArte\AbstractController
 		// Make sure they can see the board they are trying to move to (and get whether posts count in the target board).
 		$this->_board_info = boardInfo($this->_toboard, $this->_topic);
 		if (empty($this->_board_info))
-			throw new Elk_Exception('no_board');
+			throw new \ElkArte\Exceptions\Exception('no_board');
 
 		// Remember this for later.
 		$_SESSION['move_to_topic'] = array(
@@ -236,14 +236,14 @@ class MoveTopic extends \ElkArte\AbstractController
 		global $modSettings, $user_info;
 
 		if (empty($this->_topic))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// Retrieve the basic topic information for whats being moved
 		require_once(SUBSDIR . '/Topic.subs.php');
 		$this->_topic_info = getTopicInfo($this->_topic, 'message');
 
 		if (empty($this->_topic_info))
-			throw new Elk_Exception('topic_gone', false);
+			throw new \ElkArte\Exceptions\Exception('topic_gone', false);
 
 		// Can they see it - if not approved?
 		if ($modSettings['postmod_active'] && !$this->_topic_info['approved'])
@@ -251,7 +251,7 @@ class MoveTopic extends \ElkArte\AbstractController
 
 		// Are they allowed to actually move any topics or even their own?
 		if (!allowedTo('move_any') && ($this->_topic_info['id_member_started'] == $user_info['id'] && !allowedTo('move_own')))
-			throw new Elk_Exception('cannot_move_any', false);
+			throw new \ElkArte\Exceptions\Exception('cannot_move_any', false);
 	}
 
 	/**
@@ -265,22 +265,22 @@ class MoveTopic extends \ElkArte\AbstractController
 	 * - If the member is the topic starter requires the move_own permission, otherwise the move_any permission.
 	 *
 	 * @return bool
-	 * @throws Elk_Exception no_access
+	 * @throws \ElkArte\Exceptions\Exception no_access
 	 */
 	private function _check_access_2()
 	{
 		global $user_info, $board;
 
 		if (empty($this->_topic))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// You can't choose to have a redirection topic and not provide a reason.
 		if (isset($this->_req->post->postRedirect) && $this->_req->getPost('reason', 'trim', '') === '')
-			throw new Elk_Exception('movetopic_no_reason', false);
+			throw new \ElkArte\Exceptions\Exception('movetopic_no_reason', false);
 
 		// You have to tell us were you are moving to
 		if (!isset($this->_req->post->toboard))
-			throw new Elk_Exception('movetopic_no_board', false);
+			throw new \ElkArte\Exceptions\Exception('movetopic_no_board', false);
 
 		// We will need this
 		require_once(SUBSDIR . '/Topic.subs.php');

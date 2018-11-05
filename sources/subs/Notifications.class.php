@@ -52,7 +52,7 @@ class Notifications extends AbstractModel
 	 * Registers the known notifications to the system, allows for integration to add more
 	 *
 	 * @param \Database $db
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function __construct($db)
 	{
@@ -123,13 +123,13 @@ class Notifications extends AbstractModel
 	 *  - 'suffix' => true/false
 	 *
 	 * Used to identify the strings for the subject and body respectively of the notification.
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function register($id, $key, $callback, $lang_data = null)
 	{
 		if (isset($this->_notifiers[$key]))
 		{
-			throw new Elk_Exception('error_invalid_notification_id');
+			throw new \ElkArte\Exceptions\Exception('error_invalid_notification_id');
 		}
 
 		$this->_notifiers[$key] = array(

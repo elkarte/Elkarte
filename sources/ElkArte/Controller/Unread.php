@@ -359,7 +359,7 @@ class Unread extends \ElkArte\AbstractController
 
 		if (empty($this->_boards))
 		{
-			throw new Elk_Exception('error_no_boards_selected');
+			throw new \ElkArte\Exceptions\Exception('error_no_boards_selected');
 		}
 		else
 		{
@@ -577,15 +577,15 @@ class Unread extends \ElkArte\AbstractController
 		// Check for any server load issues
 		if ($context['showing_all_topics'] && !empty($modSettings['loadavg_allunread']) && $modSettings['current_load'] >= $modSettings['loadavg_allunread'])
 		{
-			throw new Elk_Exception('loadavg_allunread_disabled', false);
+			throw new \ElkArte\Exceptions\Exception('loadavg_allunread_disabled', false);
 		}
 		elseif ($this->_action_unreadreplies && !empty($modSettings['loadavg_unreadreplies']) && $modSettings['current_load'] >= $modSettings['loadavg_unreadreplies'])
 		{
-			throw new Elk_Exception('loadavg_unreadreplies_disabled', false);
+			throw new \ElkArte\Exceptions\Exception('loadavg_unreadreplies_disabled', false);
 		}
 		elseif (!$context['showing_all_topics'] && $this->_action_unread && !empty($modSettings['loadavg_unread']) && $modSettings['current_load'] >= $modSettings['loadavg_unread'])
 		{
-			throw new Elk_Exception('loadavg_unread_disabled', false);
+			throw new \ElkArte\Exceptions\Exception('loadavg_unread_disabled', false);
 		}
 	}
 }

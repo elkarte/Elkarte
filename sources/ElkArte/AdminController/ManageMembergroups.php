@@ -399,7 +399,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 
 					// Keep protected groups ... well, protected!
 					if ($copy_type['group_type'] == 1)
-						throw new Elk_Exception('membergroup_does_not_exist');
+						throw new \ElkArte\Exceptions\Exception('membergroup_does_not_exist');
 				}
 
 				// Don't allow copying of a real privileged person!
@@ -524,7 +524,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 
 		// Now, do we have a valid id?
 		if (!allowedTo('admin_forum') && !empty($current_group_id) && $current_group['group_type'] == 1)
-			throw new Elk_Exception('membergroup_does_not_exist', false);
+			throw new \ElkArte\Exceptions\Exception('membergroup_does_not_exist', false);
 
 		// The delete this membergroup button was pressed.
 		if (isset($this->_req->post->delete))
@@ -533,7 +533,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 			validateToken('admin-mmg');
 
 			if (empty($current_group_id))
-				throw new Elk_Exception('membergroup_does_not_exist', false);
+				throw new \ElkArte\Exceptions\Exception('membergroup_does_not_exist', false);
 
 			// Let's delete the group
 			deleteMembergroups($current_group['id_group']);
@@ -548,7 +548,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 			validateToken('admin-mmg');
 
 			if (empty($current_group_id))
-				throw new Elk_Exception('membergroup_does_not_exist', false);
+				throw new \ElkArte\Exceptions\Exception('membergroup_does_not_exist', false);
 
 			// Empty values will be replaced by validator values where they exist
 			$empty_post = array('max_messages' => null, 'min_posts' => null, 'group_type' => null, 'group_desc' => '',
@@ -722,7 +722,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 		$row = membergroupById($current_group['id_group'], true);
 
 		if (empty($row) || (!allowedTo('admin_forum') && $row['group_type'] == 1))
-			throw new Elk_Exception('membergroup_does_not_exist', false);
+			throw new \ElkArte\Exceptions\Exception('membergroup_does_not_exist', false);
 
 		$row['icons'] = explode('#', $row['icons']);
 

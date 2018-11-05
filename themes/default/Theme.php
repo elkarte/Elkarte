@@ -314,7 +314,7 @@ class Theme extends BaseTheme
 		// Combine and minify javascript source files to save bandwidth and requests
 		if (!empty($modSettings['minify_css_js']))
 		{
-			$combiner = new \Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
+			$combiner = new \ElkArte\SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
 			$combine_name = $combiner->site_js_combine($this->js_files, $do_deferred);
 
 			call_integration_hook('post_javascript_combine', array(&$combine_name, $combiner));
@@ -363,7 +363,7 @@ class Theme extends BaseTheme
 	{
 		global $settings;
 
-		$combiner = new \Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
+		$combiner = new \ElkArte\SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
 		$result = true;
 
 		if ($type === 'all' || $type === 'css')
@@ -470,7 +470,7 @@ class Theme extends BaseTheme
 		{
 			if (!empty($modSettings['minify_css_js']))
 			{
-				$combiner = new \Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
+				$combiner = new \ElkArte\SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
 				$combine_name = $combiner->site_css_combine($this->css_files);
 
 				call_integration_hook('post_css_combine', array(&$combine_name, $combiner));

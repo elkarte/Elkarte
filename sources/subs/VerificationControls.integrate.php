@@ -56,7 +56,7 @@ class VerificationControls_Integrate
 	 * @param bool    $do_test = false If we are validating the input to a verification control
 	 *
 	 * @return array|bool
-	 * @throws Elk_Exception no_access
+	 * @throws \ElkArte\Exceptions\Exception no_access
 	 */
 	public static function create(&$verificationOptions, $do_test = false)
 	{

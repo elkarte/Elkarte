@@ -22,7 +22,7 @@
  * @param boolean $reload_id if true the already set value is ignored (default false)
  *
  * @return int if no error.  May return false in case of problems only if $fatal is set to false
- * @throws Elk_Exception not_a_user
+ * @throws \ElkArte\Exceptions\Exception not_a_user
  */
 function currentMemberID($fatal = true, $reload_id = false)
 {
@@ -50,7 +50,7 @@ function currentMemberID($fatal = true, $reload_id = false)
 		is_not_guest('', $fatal);
 
 		if ($fatal)
-			throw new Elk_Exception('not_a_user', false);
+			throw new \ElkArte\Exceptions\Exception('not_a_user', false);
 		else
 			return false;
 	}
@@ -624,7 +624,7 @@ function loadProfileFields($force_reload = false)
 							// Otherwise grab all of them and do not log anything
 							$error_severity = $errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
 							foreach ($errors->prepareErrors($error_severity) as $error)
-								throw new Elk_Exception($error, $error_severity === null ? false : 'general');
+								throw new \ElkArte\Exceptions\Exception($error, $error_severity === null ? false : 'general');
 						}
 					}
 				}
@@ -998,7 +998,7 @@ function loadProfileFields($force_reload = false)
  *
  * @param string[] $fields
  * @param string $hook
- * @throws \Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function saveProfileFields($fields, $hook)
 {
@@ -1190,7 +1190,7 @@ function profileValidateEmail($email, $memID = 0)
  *
  * @param mixed[] $profile_vars
  * @param int $memID id_member
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function saveProfileChanges(&$profile_vars, $memID)
 {
@@ -1278,7 +1278,7 @@ function saveProfileChanges(&$profile_vars, $memID)
  * @param int $memID
  * @param int $id_theme
  *
- * @throws Elk_Exception no_access
+ * @throws \ElkArte\Exceptions\Exception no_access
  */
 function makeThemeChanges($memID, $id_theme)
 {
@@ -1307,7 +1307,7 @@ function makeThemeChanges($memID, $id_theme)
 
 	// Can't change reserved vars.
 	if ((isset($_POST['options']) && count(array_intersect(array_keys($_POST['options']), $reservedVars)) != 0) || (isset($_POST['default_options']) && count(array_intersect(array_keys($_POST['default_options']), $reservedVars)) != 0))
-		throw new Elk_Exception('no_access', false);
+		throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 	// Don't allow any overriding of custom fields with default or non-default options.
 	$request = $db->query('', '
@@ -2125,7 +2125,7 @@ function profileValidateSignature(&$value)
  * @param mixed[] $value
  *
  * @return false|string
- * @throws Elk_Exception attachments_no_write, attach_timeout
+ * @throws \ElkArte\Exceptions\Exception attachments_no_write, attach_timeout
  */
 function profileSaveAvatarData(&$value)
 {
@@ -2150,7 +2150,7 @@ function profileSaveAvatarData(&$value)
 	{
 		theme()->getTemplates()->loadLanguageFile('Post');
 		if (!is_writable($uploadDir))
-			throw new Elk_Exception('attachments_no_write', 'critical');
+			throw new \ElkArte\Exceptions\Exception('attachments_no_write', 'critical');
 
 		require_once(SUBSDIR . '/Package.subs.php');
 
@@ -2259,14 +2259,14 @@ function profileSaveAvatarData(&$value)
 				if (!is_writable($uploadDir))
 				{
 					theme()->getTemplates()->loadLanguageFile('Post');
-					throw new Elk_Exception('attachments_no_write', 'critical');
+					throw new \ElkArte\Exceptions\Exception('attachments_no_write', 'critical');
 				}
 
 				$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, null, null, true);
 				if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $new_avatar_name))
 				{
 					theme()->getTemplates()->loadLanguageFile('Post');
-					throw new Elk_Exception('attach_timeout', 'critical');
+					throw new \ElkArte\Exceptions\Exception('attach_timeout', 'critical');
 				}
 
 				$_FILES['attachment']['tmp_name'] = $new_avatar_name;
@@ -2396,7 +2396,7 @@ function profileSaveAvatarData(&$value)
 					theme()->getTemplates()->loadLanguageFile('Post');
 					// I guess a man can try.
 					removeAttachments(array('id_member' => $memID));
-					throw new Elk_Exception('attach_timeout', 'critical');
+					throw new \ElkArte\Exceptions\Exception('attach_timeout', 'critical');
 				}
 
 				// Attempt to chmod it.
@@ -2427,7 +2427,7 @@ function profileSaveAvatarData(&$value)
  * @param int $value
  *
  * @return bool
- * @throws Elk_Exception at_least_one_admin
+ * @throws \ElkArte\Exceptions\Exception at_least_one_admin
  */
 function profileSaveGroups(&$value)
 {
@@ -2510,7 +2510,7 @@ function profileSaveGroups(&$value)
 			$db->free_result($request);
 
 			if (empty($another))
-				throw new Elk_Exception('at_least_one_admin', 'critical');
+				throw new \ElkArte\Exceptions\Exception('at_least_one_admin', 'critical');
 		}
 	}
 

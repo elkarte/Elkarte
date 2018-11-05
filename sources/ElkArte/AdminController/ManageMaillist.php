@@ -881,7 +881,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 			// Needs to be an int!
 			$id = (int) $this->_req->query->f_id;
 			if (empty($id) || $id <= 0)
-				throw new Elk_Exception('error_no_id_filter');
+				throw new \ElkArte\Exceptions\Exception('error_no_id_filter');
 
 			// Load it up and set it as the current values
 			$row = maillist_load_filter_parser($id, 'filter');
@@ -1278,7 +1278,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 			// Needs to be an int!
 			$id = (int) $this->_req->query->f_id;
 			if (empty($id) || $id < 0)
-				throw new Elk_Exception('error_no_id_filter');
+				throw new \ElkArte\Exceptions\Exception('error_no_id_filter');
 
 			// Load this filter so we can edit it
 			$row = maillist_load_filter_parser($id, 'parser');

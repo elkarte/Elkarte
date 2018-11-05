@@ -49,7 +49,7 @@ class Emailpost extends \ElkArte\AbstractController
 	 * @param string|null $key used to supply a lost key
 	 *
 	 * @return bool
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function action_pbe_post($data = null, $force = false, $key = null)
 	{
@@ -227,7 +227,7 @@ class Emailpost extends \ElkArte\AbstractController
 	 * @param string|null $data used to supply a full body+headers email
 	 *
 	 * @return bool
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function action_pbe_topic($data = null)
 	{
@@ -341,7 +341,7 @@ class Emailpost extends \ElkArte\AbstractController
 	 *
 	 * @param string $data raw email string, including headers
 	 * @return boolean
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function action_pbe_preview($data = '')
 	{
@@ -403,7 +403,7 @@ class Emailpost extends \ElkArte\AbstractController
  * @param mixed[] $topic_info
  *
  * @return bool
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function pbe_create_post($pbe, $email_message, $topic_info)
 {
@@ -508,7 +508,7 @@ function pbe_create_post($pbe, $email_message, $topic_info)
  * @param mixed[] $pm_info
  *
  * @return bool
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function pbe_create_pm($pbe, $email_message, $pm_info)
 {
@@ -568,7 +568,7 @@ function pbe_create_pm($pbe, $email_message, $pm_info)
  * @param mixed[] $board_info
  *
  * @return bool
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function pbe_create_topic($pbe, $email_message, $board_info)
 {

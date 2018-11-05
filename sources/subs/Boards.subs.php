@@ -196,7 +196,7 @@ function getMsgMemberID($messageID)
  * @param int     $board_id
  * @param mixed[] $boardOptions
  *
- * @throws Elk_Exception no_board
+ * @throws \ElkArte\Exceptions\Exception no_board
  */
 function modifyBoard($board_id, &$boardOptions)
 {
@@ -209,7 +209,7 @@ function modifyBoard($board_id, &$boardOptions)
 
 	// Make sure given boards and categories exist.
 	if (!isset($boards[$board_id]) || (isset($boardOptions['target_board']) && !isset($boards[$boardOptions['target_board']])) || (isset($boardOptions['target_category']) && !isset($cat_tree[$boardOptions['target_category']])))
-		throw new Elk_Exception('no_board');
+		throw new \ElkArte\Exceptions\Exception('no_board');
 
 	// All things that will be updated in the database will be in $boardUpdates.
 	$boardUpdates = array();
@@ -247,9 +247,9 @@ function modifyBoard($board_id, &$boardOptions)
 
 			// People can be creative, in many ways...
 			if (isChildOf($id_parent, $board_id))
-				throw new Elk_Exception('mboards_parent_own_child_error', false);
+				throw new \ElkArte\Exceptions\Exception('mboards_parent_own_child_error', false);
 			elseif ($id_parent == $board_id)
-				throw new Elk_Exception('mboards_board_own_child_error', false);
+				throw new \ElkArte\Exceptions\Exception('mboards_board_own_child_error', false);
 
 			$after = $boards[$boardOptions['target_board']]['order'];
 
@@ -489,7 +489,7 @@ function modifyBoard($board_id, &$boardOptions)
  * @package Boards
  * @param mixed[] $boardOptions
  * @return int The new board id
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function createBoard($boardOptions)
 {
@@ -584,7 +584,7 @@ function createBoard($boardOptions)
  * @package Boards
  * @param int[] $boards_to_remove
  * @param int|null $moveChildrenTo = null
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 {
@@ -828,7 +828,7 @@ function fixChildren($parent, $newLevel, $newParent)
  *
  * @param array $query
  *
- * @throws Elk_Exception no_valid_parent
+ * @throws \ElkArte\Exceptions\Exception no_valid_parent
  * @package Boards
  */
 function getBoardTree($query = array())
@@ -916,7 +916,7 @@ function getBoardTree($query = array())
 			{
 				// Parent doesn't exist!
 				if (!isset($boards[$row['id_parent']]['tree']))
-					throw new Elk_Exception('no_valid_parent', false, array($row['board_name']));
+					throw new \ElkArte\Exceptions\Exception('no_valid_parent', false, array($row['board_name']));
 
 				// Wrong childlevel...we can silently fix this...
 				if ($boards[$row['id_parent']]['tree']['node']['level'] != $row['child_level'] - 1)

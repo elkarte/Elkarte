@@ -74,7 +74,7 @@ class MergeTopics extends \ElkArte\AbstractController
 		// If we don't know where you are from we know where you go
 		$from = $this->_req->getQuery('from', 'intval', null);
 		if (!isset($from))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		$target_board = $this->_req->getPost('targetboard', 'intval', $board);
 		$context['target_board'] = $target_board;
@@ -100,7 +100,7 @@ class MergeTopics extends \ElkArte\AbstractController
 
 		// @todo review: double check the logic
 		if (empty($topic_info) || ($topic_info['id_board'] != $board) || ($onlyApproved && empty($topic_info['approved'])))
-			throw new Elk_Exception('no_board');
+			throw new \ElkArte\Exceptions\Exception('no_board');
 
 		// Tell the template a few things..
 		$context['origin_topic'] = $from;
@@ -112,7 +112,7 @@ class MergeTopics extends \ElkArte\AbstractController
 		$merge_boards = boardsAllowedTo('merge_any');
 
 		if (empty($merge_boards))
-			throw new Elk_Exception('cannot_merge_any', 'user');
+			throw new \ElkArte\Exceptions\Exception('cannot_merge_any', 'user');
 
 		// Get a list of boards they can navigate to to merge.
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -138,7 +138,7 @@ class MergeTopics extends \ElkArte\AbstractController
 		$context['topics'] = mergeableTopics($target_board, $from, $onlyApproved, $this->_req->query->start);
 
 		if (empty($context['topics']) && count($context['boards']) <= 1)
-			throw new Elk_Exception('merge_need_more_topics');
+			throw new \ElkArte\Exceptions\Exception('merge_need_more_topics');
 
 		$context['sub_template'] = 'merge';
 	}
@@ -161,7 +161,7 @@ class MergeTopics extends \ElkArte\AbstractController
 	 * @param int[] $topics = array() of topic ids
 	 *
 	 * @return bool
-	 * @throws Elk_Exception merge_need_more_topics
+	 * @throws \ElkArte\Exceptions\Exception merge_need_more_topics
 	 */
 	public function action_mergeExecute($topics = array())
 	{
@@ -183,7 +183,7 @@ class MergeTopics extends \ElkArte\AbstractController
 
 		// There's nothing to merge with just one topic...
 		if (empty($topics) || !is_array($topics) || count($topics) == 1)
-			throw new Elk_Exception('merge_need_more_topics');
+			throw new \ElkArte\Exceptions\Exception('merge_need_more_topics');
 
 		// Send the topics to the TopicsMerge class
 		$merger = new TopicsMerge($topics);
@@ -192,7 +192,7 @@ class MergeTopics extends \ElkArte\AbstractController
 		if ($merger->hasErrors())
 		{
 			$error = $merger->firstError();
-			throw new Elk_Exception($error[0], $error[1]);
+			throw new \ElkArte\Exceptions\Exception($error[0], $error[1]);
 		}
 
 		// The parameters of action_mergeExecute were set, so this must've been an internal call.
@@ -207,7 +207,7 @@ class MergeTopics extends \ElkArte\AbstractController
 
 		// No permissions to merge, your effort ends here
 		if (empty($allowedto_merge_boards))
-			throw new Elk_Exception('cannot_merge_any', 'user');
+			throw new \ElkArte\Exceptions\Exception('cannot_merge_any', 'user');
 
 		// Make sure they can see all boards....
 		$query_boards = array('boards' => $merger->boards);
@@ -237,7 +237,7 @@ class MergeTopics extends \ElkArte\AbstractController
 		{
 			if (!isset($boards_info[$board]))
 			{
-				throw new Elk_Exception('no_board');
+				throw new \ElkArte\Exceptions\Exception('no_board');
 			}
 		}
 
@@ -269,7 +269,7 @@ class MergeTopics extends \ElkArte\AbstractController
 		if ($merger->hasErrors())
 		{
 			$error = $merger->firstError();
-			throw new Elk_Exception($error[0], $error[1]);
+			throw new \ElkArte\Exceptions\Exception($error[0], $error[1]);
 		}
 
 		// Send them to the all done page.

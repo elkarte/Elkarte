@@ -477,7 +477,7 @@ function loadBoard()
 		{
 			loadPermissions();
 			new ElkArte\Themes\ThemeLoader();
-			throw new Elk_Exception('topic_gone', false);
+			throw new \ElkArte\Exceptions\Exception('topic_gone', false);
 		}
 	}
 
@@ -697,7 +697,7 @@ function loadBoard()
 			is_not_guest($txt['topic_gone']);
 		}
 		else
-			throw new Elk_Exception('topic_gone', false);
+			throw new \ElkArte\Exceptions\Exception('topic_gone', false);
 	}
 
 	if ($user_info['is_mod'])
@@ -794,7 +794,7 @@ function loadPermissions()
 	{
 		// Make sure the board (if any) has been loaded by loadBoard().
 		if (!isset($board_info['profile']))
-			throw new Elk_Exception('no_board');
+			throw new \ElkArte\Exceptions\Exception('no_board');
 
 		$request = $db->query('', '
 			SELECT
@@ -1187,12 +1187,12 @@ function loadMemberContext($user, $display_custom_fields = false)
 /**
  * Loads information about what browser the user is viewing with and places it in $context
  *
- * @uses Browser_Detector class from BrowserDetect.class.php
+ * @uses BrowserDetector class
  */
 function detectBrowser()
 {
 	// Load the current user's browser of choice
-	$detector = new Browser_Detector;
+	$detector = new BrowserDetector;
 	$detector->detectBrowser();
 }
 
@@ -1694,7 +1694,7 @@ function fix_calendar_text()
  * @param int $id_parent
  *
  * @return array
- * @throws Elk_Exception parent_not_found
+ * @throws \ElkArte\Exceptions\Exception parent_not_found
  */
 function getBoardParents($id_parent)
 {
@@ -1728,7 +1728,7 @@ function getBoardParents($id_parent)
 			// In the EXTREMELY unlikely event this happens, give an error message.
 			if ($db->num_rows($result) == 0)
 			{
-				throw new Elk_Exception('parent_not_found', 'critical');
+				throw new \ElkArte\Exceptions\Exception('parent_not_found', 'critical');
 			}
 			while ($row = $db->fetch_assoc($result))
 			{

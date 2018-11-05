@@ -15,6 +15,8 @@
  *
  */
 
+use ElkArte\Exceptions\ControllerRedirectException;
+
 /**
  * This class's task is to bind the posting of a topic to a calendar event.
  * Used when from the calendar controller the poster is redirected to the post page.
@@ -139,8 +141,8 @@ class Calendar_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 *
 	 * @param int $id_member_poster
 	 *
-	 * @throws Controller_Redirect_Exception
-	 * @throws Elk_Exception
+	 * @throws ControllerRedirectException
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function prepare_context($id_member_poster)
 	{
@@ -154,7 +156,7 @@ class Calendar_Post_Module extends ElkArte\sources\modules\Abstract_Module
 			// If the user doesn't have permission to edit the post in this topic, redirect them.
 			if ((empty($id_member_poster) || $id_member_poster != $user_info['id'] || !allowedTo('modify_own')) && !allowedTo('modify_any'))
 			{
-				throw new Controller_Redirect_Exception('\\ElkArte\\controller\\Calendar', 'action_post');
+				throw new ControllerRedirectException('\\ElkArte\\controller\\Calendar', 'action_post');
 			}
 		}
 
@@ -168,7 +170,7 @@ class Calendar_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 *
 	 * @param int $event_id The id of the event
 	 *
-	 * @throws Elk_Exception cannot_post_new, invalid_year, invalid_month
+	 * @throws \ElkArte\Exceptions\Exception cannot_post_new, invalid_year, invalid_month
 	 */
 	private function _prepareEventContext($event_id)
 	{
@@ -231,17 +233,17 @@ class Calendar_Post_Module extends ElkArte\sources\modules\Abstract_Module
 
 			// Make sure the year and month are in the valid range.
 			if ($context['event']['month'] < 1 || $context['event']['month'] > 12)
-				throw new Elk_Exception('invalid_month', false);
+				throw new \ElkArte\Exceptions\Exception('invalid_month', false);
 
 			if ($context['event']['year'] < $modSettings['cal_minyear'] || $context['event']['year'] > date('Y') + $modSettings['cal_limityear'])
-				throw new Elk_Exception('invalid_year', false);
+				throw new \ElkArte\Exceptions\Exception('invalid_year', false);
 
 			// Get a list of boards they can post in.
 			require_once(SUBSDIR . '/Boards.subs.php');
 
 			$boards = boardsAllowedTo('post_new');
 			if (empty($boards))
-				throw new Elk_Exception('cannot_post_new', 'user');
+				throw new \ElkArte\Exceptions\Exception('cannot_post_new', 'user');
 
 			// Load a list of boards for this event in the context.
 			$boardListOptions = array(

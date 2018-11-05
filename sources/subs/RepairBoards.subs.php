@@ -1275,7 +1275,7 @@ function createSalvageArea()
 		if ($db->affected_rows() <= 0)
 		{
 			theme()->getTemplates()->loadLanguageFile('Admin');
-			throw new Elk_Exception('salvaged_category_error', false);
+			throw new \ElkArte\Exceptions\Exception('salvaged_category_error', false);
 		}
 
 		$salvageCatID = $db->insert_id('{db_prefix}categories', 'id_cat');
@@ -1309,7 +1309,7 @@ function createSalvageArea()
 		if ($db->affected_rows() <= 0)
 		{
 			theme()->getTemplates()->loadLanguageFile('Admin');
-			throw new Elk_Exception('salvaged_board_error', false);
+			throw new \ElkArte\Exceptions\Exception('salvaged_board_error', false);
 		}
 
 		$salvageBoardID = $db->insert_id('{db_prefix}boards', 'id_board');
@@ -1329,7 +1329,7 @@ function createSalvageArea()
  * @param string $current_step_description
  * @param int $max_substep = none
  * @param boolean $force = false
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0, $force = false)
 {
@@ -1381,7 +1381,7 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
  *
  * @param boolean $do_fix
  * @return mixed[]
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function findForumErrors($do_fix = false)
 {

@@ -184,7 +184,7 @@ class SearchParams extends \ElkArte\ValuesContainer
 	 * @param int     $maxMembersToSearch - The maximum number of members to consider
 	 *                when multiple are found
 	 *
-	 * @throws \Elk_Exception topic_gone
+	 * @throws \ElkArte\Exceptions\Exception topic_gone
 	 */
 	public function merge($params, $recentPercentage, $maxMembersToSearch)
 	{
@@ -378,7 +378,7 @@ class SearchParams extends \ElkArte\ValuesContainer
 
 			if ($this->_db->num_rows($request) == 0)
 			{
-				throw new \Elk_Exception('topic_gone', false);
+				throw new \ElkArte\Exceptions\Exception('topic_gone', false);
 			}
 
 			$this->_search_params['brd'] = array();

@@ -57,7 +57,7 @@ class Who extends \ElkArte\AbstractController
 
 		// You can't do anything if this is off.
 		if (empty($modSettings['who_enabled']))
-			throw new Elk_Exception('who_off', false);
+			throw new \ElkArte\Exceptions\Exception('who_off', false);
 
 		// Load the 'Who' template.
 		theme()->getTemplates()->load('Who');

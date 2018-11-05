@@ -253,7 +253,7 @@ class ProfileHistory extends \ElkArte\AbstractController
 		if (preg_match('/^\d{1,3}\.(\d{1,3}|\*)\.(\d{1,3}|\*)\.(\d{1,3}|\*)$/', $context['ip']) == 0
 			&& isValidIPv6($context['ip']) === false)
 		{
-			throw new Elk_Exception('invalid_tracking_ip', false);
+			throw new \ElkArte\Exceptions\Exception('invalid_tracking_ip', false);
 		}
 
 		$ip_var = str_replace('*', '%', $context['ip']);

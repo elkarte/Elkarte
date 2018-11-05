@@ -86,7 +86,7 @@ class ProfileSubscriptions extends \ElkArte\AbstractController
 
 		// No gateways yet, no way to pay then, blame the admin !
 		if (empty($this->_gateways))
-			throw new Elk_Exception($txt['paid_admin_not_setup_gateway']);
+			throw new \ElkArte\Exceptions\Exception($txt['paid_admin_not_setup_gateway']);
 
 		// Get the members current subscriptions.
 		$context['current'] = loadMemberSubscriptions($memID, $context['subscriptions']);
@@ -207,7 +207,7 @@ class ProfileSubscriptions extends \ElkArte\AbstractController
 	 *
 	 * @param int $memID The id of the member who is ordering
 	 *
-	 * @throws Elk_Exception paid_sub_not_active
+	 * @throws \ElkArte\Exceptions\Exception paid_sub_not_active
 	 */
 	private function _confirmOrder($memID)
 	{
@@ -220,7 +220,7 @@ class ProfileSubscriptions extends \ElkArte\AbstractController
 		// Selecting a subscription that does not exist or is not active?
 		if (!isset($this->_id_sub, $context['subscriptions'][$this->_id_sub]) || $context['subscriptions'][$this->_id_sub]['active'] == 0)
 		{
-			throw new Elk_Exception('paid_sub_not_active');
+			throw new \ElkArte\Exceptions\Exception('paid_sub_not_active');
 		}
 
 		// Simplify...
@@ -236,7 +236,7 @@ class ProfileSubscriptions extends \ElkArte\AbstractController
 		// Check we have a valid cost.
 		if ($this->_order['flexible'] && $period === 'xx')
 		{
-			throw new Elk_Exception('paid_sub_not_active');
+			throw new \ElkArte\Exceptions\Exception('paid_sub_not_active');
 		}
 
 		// Sort out the cost/currency.
@@ -251,7 +251,7 @@ class ProfileSubscriptions extends \ElkArte\AbstractController
 
 		// No active payment gateways, then no way to pay, time to bail out, blame the admin
 		if (empty($context['gateways']))
-			throw new Elk_Exception($txt['paid_admin_not_setup_gateway']);
+			throw new \ElkArte\Exceptions\Exception($txt['paid_admin_not_setup_gateway']);
 
 		// Now we are going to assume they want to take this out ;)
 		$new_data = array($this->_order['id'], $context['value'], $period, 'prepay');

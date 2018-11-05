@@ -41,7 +41,7 @@ class Likes extends \ElkArte\AbstractController
 
 		// If likes are disabled, we don't go any further
 		if (empty($modSettings['likes_enabled']))
-			throw new Elk_Exception('feature_disabled', true);
+			throw new \ElkArte\Exceptions\Exception('feature_disabled', true);
 	}
 
 	/**
@@ -648,7 +648,7 @@ class Likes extends \ElkArte\AbstractController
 
 		// Likes are not on, your quest for statistics ends here
 		if (empty($modSettings['likes_enabled']))
-			throw new Elk_Exception('feature_disabled', true);
+			throw new \ElkArte\Exceptions\Exception('feature_disabled', true);
 
 		// And you can see the stats
 		isAllowedTo('like_posts_stats');
@@ -691,7 +691,7 @@ class Likes extends \ElkArte\AbstractController
 
 		// Likes are not on, your quest for statistics ends here
 		if (empty($modSettings['likes_enabled']))
-			throw new Elk_Exception('feature_disabled', true);
+			throw new \ElkArte\Exceptions\Exception('feature_disabled', true);
 
 		// Worthy to view like statistics?
 		isAllowedTo('like_posts_stats');

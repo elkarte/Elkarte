@@ -282,7 +282,7 @@ function getPackageInfo($gzfilename)
  * @param mixed[] $chmodOptions
  * @param boolean $restore_write_status
  * @return array|boolean
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $restore_write_status = false)
 {
@@ -605,7 +605,7 @@ function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
  * @param bool $return = false
  *
  * @return null|string[]
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function packageRequireFTP($destination_url, $files = null, $return = false)
 {
@@ -2594,7 +2594,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	// More likely a standard HTTP URL, first try to use cURL if available
 	elseif (isset($match[1]) && $match[1] === 'http' && function_exists('curl_init'))
 	{
-		$fetch_data = new Curl_Fetch_Webdata(array(), $redirection_level);
+		$fetch_data = new CurlFetchWebdata(array(), $redirection_level);
 		$fetch_data->get_url_data($url, $post_data);
 
 		// no errors and a 200 result, then we have a good dataset, well we at least have data ;)

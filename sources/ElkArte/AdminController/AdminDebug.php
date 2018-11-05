@@ -58,7 +58,7 @@ class AdminDebug extends \ElkArte\AbstractController
 
 		// We should have debug mode enabled, as well as something to display!
 		if ($db_show_debug !== true || !isset($this->_req->session->debug))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// Don't allow except for administrators.
 		isAllowedTo('admin_forum');

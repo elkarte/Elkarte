@@ -20,10 +20,10 @@ namespace ElkArte;
  *
  * Load class
  * Initiate as
- *  - $fetch_data = new Curl_Fetch_Webdata();
+ *  - $fetch_data = new CurlFetchWebdata();
  *  - optionally pass an array of cURL options and redirect count
- *  - Curl_Fetch_Webdata(cURL options array, Max redirects);
- *  - $fetch_data = new Curl_Fetch_Webdata(array(CURLOPT_SSL_VERIFYPEER => 1), 5);
+ *  - CurlFetchWebdata(cURL options array, Max redirects);
+ *  - $fetch_data = new CurlFetchWebdata(array(CURLOPT_SSL_VERIFYPEER => 1), 5);
  *
  * Make the call
  *  - $fetch_data->get_url_data('http://www.adomain.org'); // fetch a page
@@ -36,7 +36,7 @@ namespace ElkArte;
  *  - $fetch_data->result_raw(); // show all results of all calls (in the event of a redirect)
  *  - $fetch_data->result_raw(x); // show all results of call x
  */
-class Curl_Fetch_Webdata
+class CurlFetchWebdata
 {
 	/**
 	 * Set the default items for this class
@@ -126,7 +126,7 @@ class Curl_Fetch_Webdata
 	 * @param string $url the site we are going to fetch
 	 * @param mixed[]|string $post_data data to send in the curl request as post data
 	 *
-	 * @return Curl_Fetch_Webdata
+	 * @return CurlFetchWebdata
 	 */
 	public function get_url_data($url, $post_data = array())
 	{

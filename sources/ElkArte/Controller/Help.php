@@ -102,7 +102,7 @@ class Help extends \ElkArte\AbstractController
 		global $txt, $helptxt, $context;
 
 		if (!isset($this->_req->query->help) || !is_string($this->_req->query->help))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		if (!isset($helptxt))
 			$helptxt = array();

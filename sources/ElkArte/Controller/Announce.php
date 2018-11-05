@@ -43,7 +43,7 @@ class Announce extends \ElkArte\AbstractController
 
 		// You need to announce something
 		if (empty($topic))
-			throw new Elk_Exception('topic_gone', false);
+			throw new \ElkArte\Exceptions\Exception('topic_gone', false);
 
 		// Language files
 		theme()->getTemplates()->loadLanguageFile('Post');
@@ -130,7 +130,7 @@ class Announce extends \ElkArte\AbstractController
 
 		// Check that at least one membergroup was selected (set from announce sub template)
 		if (empty($_who))
-			throw new Elk_Exception('no_membergroup_selected');
+			throw new \ElkArte\Exceptions\Exception('no_membergroup_selected');
 
 		// Make sure all membergroups are integers and can access the board of the announcement.
 		foreach ($_who as $id => $mg)
@@ -208,7 +208,7 @@ class Announce extends \ElkArte\AbstractController
 	 *                 It must contain:
 	 *                  - subject: the subject of the topic
 	 *                  - body: the body of the topic
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _send_announcement($member_info, $topic_info)
 	{

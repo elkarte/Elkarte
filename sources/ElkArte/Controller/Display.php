@@ -70,7 +70,7 @@ class Display extends \ElkArte\AbstractController
 	 * @param string $action the function name of the current action
 	 *
 	 * @return bool
-	 * @throws Elk_Exception not_a_topic
+	 * @throws \ElkArte\Exceptions\Exception not_a_topic
 	 */
 	public function trackStats($action = '')
 	{
@@ -78,7 +78,7 @@ class Display extends \ElkArte\AbstractController
 
 		if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($user_info['id'] != $board_info['cur_topic_starter'] || $user_info['is_guest']))
 		{
-			throw new Elk_Exception('not_a_topic', false);
+			throw new \ElkArte\Exceptions\Exception('not_a_topic', false);
 		}
 
 		return parent::trackStats($action);
@@ -107,7 +107,7 @@ class Display extends \ElkArte\AbstractController
 
 		// What are you gonna display if these are empty?!
 		if (empty($topic))
-			throw new Elk_Exception('no_board', false);
+			throw new \ElkArte\Exceptions\Exception('no_board', false);
 
 		// Load the template
 		theme()->getTemplates()->load('Display');
@@ -177,7 +177,7 @@ class Display extends \ElkArte\AbstractController
 		// Load the topic details
 		$topicinfo = getTopicInfo($topic_parameters, 'all', $topic_selects, $topic_tables);
 		if (empty($topicinfo))
-			throw new Elk_Exception('not_a_topic', false);
+			throw new \ElkArte\Exceptions\Exception('not_a_topic', false);
 
 		// Is this a moved topic that we are redirecting to?
 		if (!empty($topicinfo['id_redirect_topic']) && !isset($this->_req->query->noredir))

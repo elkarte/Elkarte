@@ -59,7 +59,7 @@ class SplitTopics extends \ElkArte\AbstractController
 
 		// And... which topic were you splitting, again?
 		if (empty($topic))
-			throw new Elk_Exception('numbers_one_to_nine', false);
+			throw new \ElkArte\Exceptions\Exception('numbers_one_to_nine', false);
 
 		// Load up the "dependencies" - the template, getMsgMemberID().
 		if (!isset($this->_req->query->xml))
@@ -105,7 +105,7 @@ class SplitTopics extends \ElkArte\AbstractController
 
 		// Validate "at".
 		if (empty($this->_req->query->at))
-			throw new Elk_Exception('numbers_one_to_nine', false);
+			throw new \ElkArte\Exceptions\Exception('numbers_one_to_nine', false);
 
 		// We deal with topics here.
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -117,7 +117,7 @@ class SplitTopics extends \ElkArte\AbstractController
 		// Retrieve message info for the message at the split point.
 		$messageInfo = basicMessageInfo($splitAt, false, true);
 		if ($messageInfo === false)
-			throw new Elk_Exception('cant_find_messages');
+			throw new \ElkArte\Exceptions\Exception('cant_find_messages');
 
 		// If not approved validate they can approve it.
 		if ($modSettings['postmod_active'] && !$messageInfo['topic_approved'])
@@ -132,7 +132,7 @@ class SplitTopics extends \ElkArte\AbstractController
 
 		// Check if there is more than one message in the topic.  (there should be.)
 		if ($messageInfo['num_replies'] < 1)
-			throw new Elk_Exception('topic_one_post', false);
+			throw new \ElkArte\Exceptions\Exception('topic_one_post', false);
 
 		// Check if this is the first message in the topic (if so, the first and second option won't be available)
 		if ($messageInfo['id_first_msg'] == $splitAt)
@@ -181,7 +181,7 @@ class SplitTopics extends \ElkArte\AbstractController
 		if (!empty($_SESSION['messageRedirect']) && empty($_SESSION['reason']))
 		{
 			$this->_unset_session_values();
-			throw new Elk_Exception('splittopic_no_reason', false);
+			throw new \ElkArte\Exceptions\Exception('splittopic_no_reason', false);
 		}
 
 		// Redirect to the selector if they chose selective.
@@ -216,7 +216,7 @@ class SplitTopics extends \ElkArte\AbstractController
 		else
 		{
 			$this->_unset_session_values();
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 		}
 
 		$context['old_topic'] = $topic;
@@ -260,7 +260,7 @@ class SplitTopics extends \ElkArte\AbstractController
 		if (empty($_SESSION['split_selection'][$topic]))
 		{
 			$this->_unset_session_values();
-			throw new Elk_Exception('no_posts_selected', false);
+			throw new \ElkArte\Exceptions\Exception('no_posts_selected', false);
 		}
 
 		// This is here because there are two fatal_lang_errors in there

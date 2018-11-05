@@ -127,7 +127,7 @@ class UnTgz
 	 * @param bool          $overwrite
 	 * @param null|string[] $files_to_extract
 	 *
-	 * @throws Elk_Exception package_no_zlib
+	 * @throws \ElkArte\Exceptions\Exception package_no_zlib
 	 */
 	public function __construct($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 	{
@@ -140,7 +140,7 @@ class UnTgz
 
 		// This class sorta needs gzinflate!
 		if (!function_exists('gzinflate'))
-			throw new Elk_Exception('package_no_zlib', 'critical');
+			throw new \ElkArte\Exceptions\Exception('package_no_zlib', 'critical');
 
 		// Make sure we have this loaded.
 		theme()->getTemplates()->loadLanguageFile('Packages');

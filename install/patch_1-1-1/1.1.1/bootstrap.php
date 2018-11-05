@@ -29,7 +29,7 @@ class Bootstrap
 	 * @param bool $standalone
 	 *  - true to boot outside of elkarte
 	 *  - false to bootstrap the main elkarte site.
-	 * @throws \Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function __construct($standalone = true)
 	{
@@ -315,7 +315,7 @@ class Bootstrap
 	 * If you are running SSI standalone, you need to call this function after bootstrap is
 	 * initialized.
 	 *
-	 * @throws \Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function ssi_main()
 	{

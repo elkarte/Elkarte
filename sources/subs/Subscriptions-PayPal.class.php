@@ -200,8 +200,8 @@ class PayPal_Payment
 	 * - If valid returns the subscription and member IDs we are going to process if it passes
 	 *
 	 * @return array
-	 * @throws Elk_Exception
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function precheck()
 	{

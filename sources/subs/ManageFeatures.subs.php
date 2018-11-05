@@ -64,7 +64,7 @@ function updateSignature($id_member, $signature)
  * Update all signatures given a new set of constraints
  *
  * @param int $applied_sigs
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateAllSignatures($applied_sigs)
 {

@@ -523,7 +523,7 @@ class ManageNews extends \ElkArte\AbstractController
 	 * @param bool $clean_only = false; if set, it will only clean the variables, put them in context, then return.
 	 *
 	 * @return null|void
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function action_mailingsend($clean_only = false)
 	{

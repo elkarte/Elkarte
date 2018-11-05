@@ -55,7 +55,7 @@ class Xml extends \ElkArte\AbstractController
 
 		// Act a bit special for XML, probably never see it anyway :P
 		if (empty($subAction))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// Off we go then, (it will check permissions)
 		$action->dispatch($subAction);

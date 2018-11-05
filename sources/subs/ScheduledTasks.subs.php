@@ -320,7 +320,7 @@ function updateTask($id_task, $disabled = null, $offset = null, $interval = null
  * @param int $id_task
  *
  * @return array
- * @throws Elk_Exception no_access
+ * @throws \ElkArte\Exceptions\Exception no_access
  */
 function loadTaskDetails($id_task)
 {
@@ -340,7 +340,7 @@ function loadTaskDetails($id_task)
 	);
 	// Should never, ever, happen!
 	if ($db->num_rows($request) == 0)
-		throw new Elk_Exception('no_access', false);
+		throw new \ElkArte\Exceptions\Exception('no_access', false);
 	while ($row = $db->fetch_assoc($request))
 	{
 		$task = array(

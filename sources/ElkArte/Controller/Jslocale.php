@@ -92,7 +92,7 @@ class Jslocale extends \ElkArte\AbstractController
 			{
 				$context['json_data'] = $agreement->getParsedText();
 			}
-			catch (\Elk_Exception $e)
+			catch (\ElkArte\Exceptions\Exception $e)
 			{
 				$context['json_data'] = $e->getMessage();
 			}

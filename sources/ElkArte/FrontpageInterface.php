@@ -12,13 +12,13 @@
  *
  */
 
-namespace ElkArte\sources;
+namespace ElkArte;
 
 /**
  * Implementing this interface will make controllers usable as a front page
  * replacing the classic board index.
  */
-interface Frontpage_Interface
+interface FrontpageInterface
 {
 	/**
 	 * Used to attach integrate_action_frontpage hook, to change the default action.

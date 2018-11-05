@@ -106,7 +106,7 @@ class WeightFactors
 			// Admins can be bothered with a failure
 			if ($this->_is_admin)
 			{
-				throw new Elk_Exception('search_invalid_weights');
+				throw new \ElkArte\Exceptions\Exception('search_invalid_weights');
 			}
 
 			// Even if users will get an answer, the admin should know something is broken

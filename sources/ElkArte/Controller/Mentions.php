@@ -119,7 +119,7 @@ class Mentions extends \ElkArte\AbstractController
 
 		// I'm not sure this is needed, though better have it. :P
 		if (empty($modSettings['mentions_enabled']))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		$this->_known_mentions = $this->_findMentionTypes();
 	}

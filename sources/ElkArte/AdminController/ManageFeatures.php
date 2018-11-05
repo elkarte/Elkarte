@@ -1033,7 +1033,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 
 				// Still not a unique column name? Leave it up to the user, then.
 				if (!$unique)
-					throw new Elk_Exception('custom_option_not_unique');
+					throw new \ElkArte\Exceptions\Exception('custom_option_not_unique');
 
 				// And create a new field
 				$new_field = array(
@@ -1536,7 +1536,7 @@ class ManageFeatures extends \ElkArte\AbstractController
  *    pausePermsSave(), pauseAttachmentMaintenance(), pauseRepairProcess()
  *
  * @param int $applied_sigs
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function pauseSignatureApplySettings($applied_sigs)
 {

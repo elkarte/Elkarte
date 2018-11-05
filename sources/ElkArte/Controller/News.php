@@ -139,7 +139,7 @@ class News extends \ElkArte\AbstractController
 			// Either the board specified doesn't exist or you have no access.
 			$num_boards = count($boards_data);
 			if ($num_boards == 0)
-				throw new Elk_Exception('no_board');
+				throw new \ElkArte\Exceptions\Exception('no_board');
 
 			$total_posts = 0;
 			$boards = array_keys($boards_data);

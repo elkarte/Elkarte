@@ -21,7 +21,7 @@ namespace ElkArte;
  * - Calls minification classes to reduce size of css and js file saving bandwidth
  * - Can creates a .gz file, be would require .htaccess or the like to use
  */
-class Site_Combiner
+class SiteCombiner
 {
 	/**
 	 * Holds all the files contents that we have joined in to one

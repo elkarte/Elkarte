@@ -34,7 +34,7 @@ namespace ElkArte;
  * - Nokia
  * - Basic mobile and tablet (ipad, android and tablet PC)
  */
-class Browser_Detector
+class BrowserDetector
 {
 	/**
 	 * Holds all browsers information. Its contents will be placed into $context['browser'].
@@ -72,7 +72,7 @@ class Browser_Detector
 	 * - Determines the user agent (browser) as best it can.
 	 * - The method fills the instance variables _is_mobile and _is_tablet,
 	 * and the _browsers array.
-	 * - When it returns, the Browser_Detector can be queried for information on client browser.
+	 * - When it returns, the BrowserDetector can be queried for information on client browser.
 	 * - It also attempts to detect if the client is a robot.
 	 */
 	public function detectBrowser()

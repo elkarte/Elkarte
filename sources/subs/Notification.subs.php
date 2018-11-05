@@ -26,7 +26,7 @@
  * @param int[]|int $members_only = array() - are the only ones that will be sent the notification if they have it on.
  * @param mixed[] $pbe = array() - array containing user_info if this is being run as a result of an email posting
  * @uses Post language file
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function sendNotifications($topics, $type, $exclude = array(), $members_only = array(), $pbe = array())
 {
@@ -387,7 +387,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
  * loads the Post language file multiple times for each language if the userLanguage setting is set.
  *
  * @param mixed[] $topicData
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function sendBoardNotifications(&$topicData)
 {
@@ -554,7 +554,7 @@ function sendBoardNotifications(&$topicData)
  * A special function for handling the hell which is sending approval notifications.
  *
  * @param mixed[] $topicData
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function sendApprovalNotifications(&$topicData)
 {
@@ -704,7 +704,7 @@ function sendApprovalNotifications(&$topicData)
  * @param int $memberID
  * @param string|null $member_name = null
  * @uses the Login language file.
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function sendAdminNotifications($type, $memberID, $member_name = null)
 {
@@ -807,7 +807,7 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
  * @param boolean $email_perm
  *
  * @return bool
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function validateNotificationAccess($row, $maillist, &$email_perm = true)
 {

@@ -129,7 +129,7 @@ class Profile extends \ElkArte\AbstractController
 
 		// No menu means no access at all.
 		if (!$this->_profile_include_data || (isset($this->_profile_include_data['enabled']) && $this->_profile_include_data['enabled'] === false))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// Make a note of the Unique ID for this menu.
 		$context['profile_menu_id'] = $context['max_menu_id'];
@@ -760,7 +760,7 @@ class Profile extends \ElkArte\AbstractController
 	 * If a password validation before a change is needed, this is the function to do it
 	 *
 	 * @param bool $check_password if this profile update requires a password verification
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _check_password($check_password)
 	{

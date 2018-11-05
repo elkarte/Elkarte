@@ -17,7 +17,7 @@
 
 namespace ElkArte\Errors;
 
-use Elk_Exception;
+use \ElkArte\Exceptions\Exception;
 use ErrorException;
 use Throwable;
 
@@ -110,7 +110,7 @@ final class ErrorHandler extends Errors
 	 * @param int $line
 	 *
 	 * @return bool
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function error_handler($error_level, $error_string, $file, $line)
 	{
@@ -142,7 +142,7 @@ final class ErrorHandler extends Errors
 	 *
 	 * @param Throwable $e
 	 *
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function exception_handler(Throwable $e)
 	{
@@ -158,8 +158,8 @@ final class ErrorHandler extends Errors
 		// Let's give integrations a chance to output a bit differently
 		call_integration_hook('integrate_output_error', [$e]);
 
-		// Elk_Exception handles its own logging.
-		if (!$e instanceof Elk_Exception)
+		// \ElkArte\Exceptions\Exception handles its own logging.
+		if (!$e instanceof \ElkArte\Exceptions\Exception)
 		{
 			$this->log_error(
 				$this->error_name . ': ' . $this->error_string,

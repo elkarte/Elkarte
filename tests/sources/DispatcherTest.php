@@ -170,7 +170,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 			);
 
 			// Start a new dispatcher every time (the dispatching is done on __construct)
-			$dispatcher = New Site_Dispatcher_Tester(new HttpReq);
+			$dispatcher = New \ElkArte\SiteDispatcher_Tester(new HttpReq);
 			$this->assertTrue($dispatcher->compare($test['result']), $test['test_name']);
 		}
 	}
@@ -193,14 +193,14 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 }
 
 /**
- * A small variation of Site_Dispatcher that provides a method to expose the
+ * A small variation of SiteDispatcher that provides a method to expose the
  * otherwise hidden results of the dispaching (_function_name and _controller_name)
  */
-class Site_Dispatcher_Tester extends Site_Dispatcher
+class SiteDispatcher_Tester extends \ElkArte\SiteDispatcher
 {
 	/**
 	 * This method compares the values of _function_name and
-	 * _controller_name obtained from the Site_Dispatcher and the expected values
+	 * _controller_name obtained from the SiteDispatcher and the expected values
 	 *
 	 * @param array An array containing the expected results of a dispaching in the form:
 	 *              'function_name' => 'function_name',

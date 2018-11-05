@@ -18,11 +18,11 @@
 
 namespace ElkArte\Controller;
 
-use ElkArte\sources\Frontpage_Interface;
+use ElkArte\FrontpageInterface;
 
 /**
  */
-class MessageIndex extends \ElkArte\AbstractController implements Frontpage_Interface
+class MessageIndex extends \ElkArte\AbstractController implements FrontpageInterface
 {
 	/**
 	 * {@inheritdoc}

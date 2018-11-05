@@ -63,7 +63,7 @@ function un_preparsecode($message)
  * @param mixed[] $posterOptions
  *
  * @return bool
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
@@ -426,7 +426,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
  * @param mixed[] $posterOptions
  *
  * @return bool
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
@@ -573,7 +573,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
  * @param bool $approve = true
  *
  * @return bool|void
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function approvePosts($msgs, $approve = true)
 {
@@ -825,7 +825,7 @@ function approvePosts($msgs, $approve = true)
  * @param int $id_msg = 0
  *
  * @return bool
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateLastMessages($setboards, $id_msg = 0)
 {
@@ -1032,7 +1032,7 @@ function lastPost()
  * @param int            $msg_id
  *
  * @return false|mixed[]
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 {
@@ -1082,7 +1082,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 				)
 			);
 			if ($db->num_rows($request) == 0)
-				throw new Elk_Exception('quoted_post_deleted', false);
+				throw new \ElkArte\Exceptions\Exception('quoted_post_deleted', false);
 			list ($form_subject, $mname, $mdate, $form_message) = $db->fetch_row($request);
 			$db->free_result($request);
 

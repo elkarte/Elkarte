@@ -107,7 +107,7 @@ class ProfileInfo extends \ElkArte\AbstractController
 
 		// Attempt to load the member's profile data.
 		if (!loadMemberContext($this->_memID) || !isset($memberContext[$this->_memID]))
-			throw new Elk_Exception('not_a_user', false);
+			throw new \ElkArte\Exceptions\Exception('not_a_user', false);
 
 		theme()->getTemplates()->load('ProfileInfo');
 
@@ -479,7 +479,7 @@ class ProfileInfo extends \ElkArte\AbstractController
 
 		// Is the load average too high to allow searching just now?
 		if (!empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'])
-			throw new Elk_Exception('loadavg_show_posts_disabled', false);
+			throw new \ElkArte\Exceptions\Exception('loadavg_show_posts_disabled', false);
 
 		// If we're specifically dealing with attachments use that function!
 		if ($action === 'attach')
@@ -938,7 +938,7 @@ class ProfileInfo extends \ElkArte\AbstractController
 
 		// Is the load average too high to allow searching just now?
 		if (!empty($modSettings['loadavg_userstats']) && $modSettings['current_load'] >= $modSettings['loadavg_userstats'])
-			throw new Elk_Exception('loadavg_userstats_disabled', false);
+			throw new \ElkArte\Exceptions\Exception('loadavg_userstats_disabled', false);
 
 		theme()->getTemplates()->load('ProfileInfo');
 
@@ -1070,7 +1070,7 @@ class ProfileInfo extends \ElkArte\AbstractController
 
 		// Firstly, can we actually even be here?
 		if (!allowedTo('issue_warning') && (empty($modSettings['warning_show']) || ($modSettings['warning_show'] == 1 && !$context['user']['is_owner'])))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		theme()->getTemplates()->load('ProfileInfo');
 

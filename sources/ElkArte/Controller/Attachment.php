@@ -246,7 +246,7 @@ class Attachment extends \ElkArte\AbstractController
 	 * Generates a language image based on text for display.
 	 *
 	 * @param null|string $text
-	 * @throws \Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function action_no_attach($text = null)
 	{
@@ -265,7 +265,7 @@ class Attachment extends \ElkArte\AbstractController
 
 		if ($img === false)
 		{
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 		}
 
 		echo $img;
@@ -537,7 +537,7 @@ class Attachment extends \ElkArte\AbstractController
 		}
 		catch (\Exception $e)
 		{
-			throw new Elk_Exception($e->getMessage(), false);
+			throw new \ElkArte\Exceptions\Exception($e->getMessage(), false);
 		}
 		$resize = true;
 

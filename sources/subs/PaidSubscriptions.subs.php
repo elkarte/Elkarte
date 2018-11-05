@@ -875,7 +875,7 @@ function getSubscriptionDetails($sub_id)
  * @param int $id
  *
  * @return int
- * @throws Elk_Exception no_access
+ * @throws \ElkArte\Exceptions\Exception no_access
  */
 function validateSubscriptionID($id)
 {
@@ -896,7 +896,7 @@ function validateSubscriptionID($id)
 
 	// Humm this should not happen, if it does, boom
 	if ($sub_id === null)
-		throw new Elk_Exception('no_access', false);
+		throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 	return $sub_id;
 }
@@ -936,7 +936,7 @@ function alreadySubscribed($id_sub, $id_member)
  * @param int $log_id
  *
  * @return array
- * @throws Elk_Exception no_access
+ * @throws \ElkArte\Exceptions\Exception no_access
  */
 function getSubscriptionStatus($log_id)
 {
@@ -960,7 +960,7 @@ function getSubscriptionStatus($log_id)
 
 	// Nothing found?
 	if (empty($status))
-		throw new Elk_Exception('no_access', false);
+		throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 	return $status;
 }

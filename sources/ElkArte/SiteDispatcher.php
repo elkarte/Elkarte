@@ -30,7 +30,7 @@ namespace ElkArte;
  * - An addon files to handle custom actions will be called if they follow
  * any of these patterns.
  */
-class Site_Dispatcher
+class SiteDispatcher
 {
 	/**
 	 * Function or method to call

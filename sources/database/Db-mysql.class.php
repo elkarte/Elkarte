@@ -46,7 +46,7 @@ class Database_MySQL extends Database_Abstract
 	 * @param mixed[] $db_options
 	 *
 	 * @return mysqli|null
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
@@ -120,7 +120,7 @@ class Database_MySQL extends Database_Abstract
 	 * @param mysqli_result|false|null $connection = null
 	 *
 	 * @return bool|mysqli_result
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
@@ -491,7 +491,7 @@ class Database_MySQL extends Database_Abstract
 	 * @param mysqli|null $connection = null
 	 *
 	 * @return bool
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function error($db_string, $connection = null)
 	{
@@ -693,7 +693,7 @@ class Database_MySQL extends Database_Abstract
 			$message .= '<br /><br />' . nl2br($db_string);
 
 		// It's already been logged... don't log it again.
-		throw new Elk_Exception($message, false);
+		throw new \ElkArte\Exceptions\Exception($message, false);
 	}
 
 	/**
@@ -706,7 +706,7 @@ class Database_MySQL extends Database_Abstract
 	 * @param mixed[] $keys
 	 * @param bool $disable_trans = false
 	 * @param mysqli|null $connection = null
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
@@ -793,7 +793,7 @@ class Database_MySQL extends Database_Abstract
 	 * @param bool $new_table
 	 *
 	 * @return string the query to insert the data back in, or an empty string if the table was empty.
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function insert_sql($tableName, $new_table = false)
 	{
@@ -868,7 +868,7 @@ class Database_MySQL extends Database_Abstract
 	 * @param string $tableName - the table
 	 *
 	 * @return string - the CREATE statement as string
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function db_table_sql($tableName)
 	{
@@ -1010,7 +1010,7 @@ class Database_MySQL extends Database_Abstract
 	 * @param string $backup_table
 	 *
 	 * @return bool|mysqli_result - the request handle to the table creation query
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function db_backup_table($table_name, $backup_table)
 	{
@@ -1138,7 +1138,7 @@ class Database_MySQL extends Database_Abstract
 	 * Get the version number.
 	 *
 	 * @return string - the version
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function db_server_version()
 	{
@@ -1221,7 +1221,7 @@ class Database_MySQL extends Database_Abstract
 	 *  Get the version number.
 	 *
 	 * @return string - the version
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function db_client_version()
 	{

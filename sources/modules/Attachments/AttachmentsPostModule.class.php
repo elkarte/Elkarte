@@ -337,7 +337,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * Save attachments when the post is saved
 	 *
 	 * @param ErrorContext $post_errors
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function prepare_save_post($post_errors)
 	{
@@ -354,7 +354,7 @@ class Attachments_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * Handles both the saving and removing of attachments on post save
 	 *
 	 * @param int $msg
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function saveAttachments($msg)
 	{

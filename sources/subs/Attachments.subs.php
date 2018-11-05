@@ -351,7 +351,7 @@ function attachments_init_dir(&$tree, &$count)
  * @package Attachments
  * @param int|null $id_msg = null or id of the message with attachments, if any.
  *                  If null, this is an upload in progress for a new post.
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function processAttachments($id_msg = null)
 {
@@ -727,7 +727,7 @@ function attachmentUploadChecks($attachID)
  * @param int $attachID id of the attachment to check
  *
  * @return bool
- * @throws Elk_Exception attach_check_nag
+ * @throws \ElkArte\Exceptions\Exception attach_check_nag
  */
 function attachmentChecks($attachID)
 {
@@ -747,7 +747,7 @@ function attachmentChecks($attachID)
 
 	// Let's get their attention.
 	if (!empty($error))
-		throw new Elk_Exception('attach_check_nag', 'debug', array($error));
+		throw new \ElkArte\Exceptions\Exception('attach_check_nag', 'debug', array($error));
 
 	// Just in case this slipped by the first checks, we stop it here and now
 	if ($_SESSION['temp_attachments'][$attachID]['size'] == 0)

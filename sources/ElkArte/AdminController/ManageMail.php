@@ -398,7 +398,7 @@ class ManageMail extends \ElkArte\AbstractController
 	 *
 	 * @param int $all_emails total emails to be sent
 	 * @param int $sent_emails number of emails sent so far
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _pauseMailQueueClear($all_emails, $sent_emails)
 	{

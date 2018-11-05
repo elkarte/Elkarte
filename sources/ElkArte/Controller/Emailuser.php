@@ -70,16 +70,16 @@ class Emailuser extends \ElkArte\AbstractController
 
 		// We need at least a topic... go away if you don't have one.
 		if (empty($topic))
-			throw new Elk_Exception('not_a_topic', false);
+			throw new \ElkArte\Exceptions\Exception('not_a_topic', false);
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 		$row = getTopicInfo($topic, 'message');
 		if (empty($row))
-			throw new Elk_Exception('not_a_topic', false);
+			throw new \ElkArte\Exceptions\Exception('not_a_topic', false);
 
 		// Can't send topic if its unapproved and using post moderation.
 		if ($modSettings['postmod_active'] && !$row['approved'])
-			throw new Elk_Exception('not_approved_topic', false);
+			throw new \ElkArte\Exceptions\Exception('not_approved_topic', false);
 
 		// Censor the subject....
 		$row['subject'] = censor($row['subject']);
@@ -204,7 +204,7 @@ class Emailuser extends \ElkArte\AbstractController
 	 * @param mixed[] $row
 	 *
 	 * @return array|bool
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _sendTopic($row)
 	{
@@ -287,7 +287,7 @@ class Emailuser extends \ElkArte\AbstractController
 
 		// Can the user even see this information?
 		if ($user_info['is_guest'])
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		isAllowedTo('send_email_to_members');
 
@@ -316,17 +316,17 @@ class Emailuser extends \ElkArte\AbstractController
 
 		// Are you sure you got the address or any data?
 		if (empty($row['email_address']) || empty($row))
-			throw new Elk_Exception('cant_find_user_email');
+			throw new \ElkArte\Exceptions\Exception('cant_find_user_email');
 
 		// Can they actually do this?
 		$context['show_email_address'] = showEmailAddress(!empty($row['hide_email']), $row['id_member']);
 		if ($context['show_email_address'] === 'no')
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// Does the user want to be contacted at all by you?
 		require_once(SUBSDIR . '/Members.subs.php');
 		if (!canContact($row['id_member']))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// Setup the context!
 		$context['recipient'] = array(
@@ -466,13 +466,13 @@ class Emailuser extends \ElkArte\AbstractController
 
 		// We need a message ID to check!
 		if (empty($this->_req->query->msg) && empty($this->_req->post->msg))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// Check the message's ID - don't want anyone reporting a post that does not exist
 		require_once(SUBSDIR . '/Messages.subs.php');
 		$message_id = $this->_req->getPost('msg', 'intval', isset($this->_req->query->msg) ? (int) $this->_req->query->msg : 0);
 		if (basicMessageInfo($message_id, true, true) === false)
-			throw new Elk_Exception('no_board', false);
+			throw new \ElkArte\Exceptions\Exception('no_board', false);
 
 		// Do we need to show the visual verification image?
 		$context['require_verification'] = $user_info['is_guest'] && !empty($modSettings['guests_report_require_captcha']);
@@ -591,7 +591,7 @@ class Emailuser extends \ElkArte\AbstractController
 		$message = posterDetails($msg_id, $topic);
 
 		if (empty($message))
-			throw new Elk_Exception('no_board', false);
+			throw new \ElkArte\Exceptions\Exception('no_board', false);
 
 		$poster_name = un_htmlspecialchars($message['real_name']) . ($message['real_name'] != $message['poster_name'] ? ' (' . $message['poster_name'] . ')' : '');
 		$reporterName = un_htmlspecialchars($user_info['name']) . ($user_info['name'] != $user_info['username'] && $user_info['username'] != '' ? ' (' . $user_info['username'] . ')' : '');
@@ -610,7 +610,7 @@ class Emailuser extends \ElkArte\AbstractController
 
 		// Check that moderators do exist!
 		if (empty($mod_to_notify))
-			throw new Elk_Exception('no_mods', false);
+			throw new \ElkArte\Exceptions\Exception('no_mods', false);
 
 		// If we get here, I believe we should make a record of this, for historical significance, yabber.
 		if (empty($modSettings['disable_log_report']))

@@ -25,7 +25,7 @@
  * @param bool    $do_test = false If we are validating the input to a verification control
  *
  * @return array|bool
- * @throws Elk_Exception no_access
+ * @throws \ElkArte\Exceptions\Exception no_access
  */
 function create_control_verification(&$verificationOptions, $do_test = false)
 {

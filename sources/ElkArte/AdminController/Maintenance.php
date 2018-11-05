@@ -651,7 +651,7 @@ class Maintenance extends \ElkArte\AbstractController
 		// If there aren't any tables then I believe that would mean the world has exploded...
 		$context['num_tables'] = count($tables);
 		if ($context['num_tables'] == 0)
-			throw new Elk_Exception('You appear to be running ElkArte in a flat file mode... fantastic!', false);
+			throw new \ElkArte\Exceptions\Exception('You appear to be running ElkArte in a flat file mode... fantastic!', false);
 
 		// For each table....
 		$context['optimized_tables'] = array();
@@ -997,7 +997,7 @@ class Maintenance extends \ElkArte\AbstractController
 
 			// No members, no further
 			if (empty($members))
-				throw new Elk_Exception('reattribute_cannot_find_member');
+				throw new \ElkArte\Exceptions\Exception('reattribute_cannot_find_member');
 
 			$memID = array_shift($members);
 			$memID = $memID['id'];
@@ -1042,7 +1042,7 @@ class Maintenance extends \ElkArte\AbstractController
 
 		// Administrators only!
 		if (!allowedTo('admin_forum'))
-			throw new Elk_Exception('no_dump_database', 'critical');
+			throw new \ElkArte\Exceptions\Exception('no_dump_database', 'critical');
 
 		checkSession('post');
 

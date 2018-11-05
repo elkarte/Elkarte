@@ -150,7 +150,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 
 		// Do a quick check to ensure people aren't getting here illegally!
 		if (!$context['user']['is_owner'] || empty($modSettings['enable_buddylist']))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		theme()->getTemplates()->load('ProfileOptions');
 
@@ -533,7 +533,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 	 * @param bool $saving = false
 	 *
 	 * @return bool
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function action_authentication($saving = false)
 	{
@@ -909,7 +909,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 
 		// Have the admins enabled this option?
 		if (empty($modSettings['allow_ignore_boards']))
-			throw new Elk_Exception('ignoreboards_disallowed', 'user');
+			throw new \ElkArte\Exceptions\Exception('ignoreboards_disallowed', 'user');
 
 		theme()->getTemplates()->load('ProfileOptions');
 
@@ -989,7 +989,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 	 * This function actually makes all the group changes
 	 *
 	 * @return string
-	 * @throws Elk_Exception no_access
+	 * @throws \ElkArte\Exceptions\Exception no_access
 	 */
 	public function action_groupMembership2()
 	{
@@ -1002,7 +1002,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 		$group_id = $this->_req->getPost('gid', 'intval', $this->_req->getQuery('gid', 'intval', null));
 
 		if (!isset($group_id) && !isset($this->_req->post->primary))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// GID may be from a link or a form
 		checkSession(isset($this->_req->query->gid) ? 'get' : 'post');
@@ -1043,12 +1043,12 @@ class ProfileOptions extends \ElkArte\AbstractController
 
 				// Does the group type match what we're doing - are we trying to request a non-requestable group?
 				if ($changeType === 'request' && $row['group_type'] != 2)
-					throw new Elk_Exception('no_access', false);
+					throw new \ElkArte\Exceptions\Exception('no_access', false);
 				// What about leaving a requestable group we are not a member of?
 				elseif ($changeType === 'free' && $row['group_type'] == 2 && $this->_profile['id_group'] != $row['id_group'] && !isset($addGroups[$row['id_group']]))
-					throw new Elk_Exception('no_access', false);
+					throw new \ElkArte\Exceptions\Exception('no_access', false);
 				elseif ($changeType === 'free' && $row['group_type'] != 3 && $row['group_type'] != 2)
-					throw new Elk_Exception('no_access', false);
+					throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 				// We can't change the primary group if this is hidden!
 				if ($row['hidden'] == 2)
@@ -1070,7 +1070,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 
 		// Didn't find the target?
 		if (!$foundTarget)
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// Final security check, don't allow users to promote themselves to admin.
 		require_once(SUBSDIR . '/ProfileOptions.subs.php');
@@ -1085,7 +1085,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 		if ($changeType === 'request')
 		{
 			if (logMembergroupRequest($group_id, $this->_memID))
-				throw new Elk_Exception('profile_error_already_requested_group');
+				throw new \ElkArte\Exceptions\Exception('profile_error_already_requested_group');
 
 			// Send an email to all group moderators etc.
 			require_once(SUBSDIR . '/Mail.subs.php');

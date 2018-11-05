@@ -294,14 +294,14 @@ class ManageLanguages extends \ElkArte\AbstractController
 	public function action_downloadlang()
 	{
 		// @todo for the moment there is no facility to download packages, so better kill it here
-		throw new Elk_Exception('no_access', false);
+		throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		theme()->getTemplates()->loadLanguageFile('ManageSettings');
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// Clearly we need to know what to request.
 		if (!isset($this->_req->query->did))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// Some lovely context.
 		$context['download_id'] = $this->_req->query->did;
@@ -322,7 +322,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 			{
 				// Check it's not very bad.
 				if (strpos($file, '..') !== false || (strpos($file, 'themes') !== 0 && !preg_match('~agreement\.[A-Za-z-_0-9]+\.txt$~', $file)))
-					throw new Elk_Exception($txt['languages_download_illegal_paths']);
+					throw new \ElkArte\Exceptions\Exception($txt['languages_download_illegal_paths']);
 
 				$chmod_files[] = BOARDDIR . '/' . $file;
 				$install_files[] = $file;
@@ -353,7 +353,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 		$archive_content = read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, array('ElkArte ' => ''))) . ';fetch=' . urlencode($this->_req->query->did), null);
 
 		if (empty($archive_content))
-			throw new Elk_Exception($txt['add_language_error_no_response']);
+			throw new \ElkArte\Exceptions\Exception($txt['add_language_error_no_response']);
 
 		// Now for each of the files, let's do some *stuff*
 		$context['files'] = array(

@@ -60,7 +60,7 @@ class Calendar_Event
 	 * @param array $event The options may come from a form
 	 *
 	 * @return array
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function validate($event)
 	{
@@ -71,9 +71,9 @@ class Calendar_Event
 		{
 			// Make sure it's turned on and not some fool trying to trick it.
 			if (empty($this->_settings['cal_allowspan']))
-				throw new Elk_Exception('no_span', false);
+				throw new \ElkArte\Exceptions\Exception('no_span', false);
 			if ($event['span'] < 1 || $event['span'] > $this->_settings['cal_maxspan'])
-				throw new Elk_Exception('invalid_days_numb', false);
+				throw new \ElkArte\Exceptions\Exception('invalid_days_numb', false);
 		}
 
 
@@ -82,32 +82,32 @@ class Calendar_Event
 		{
 			// No month?  No year?
 			if (!isset($event['month']))
-				throw new Elk_Exception('event_month_missing', false);
+				throw new \ElkArte\Exceptions\Exception('event_month_missing', false);
 			if (!isset($event['year']))
-				throw new Elk_Exception('event_year_missing', false);
+				throw new \ElkArte\Exceptions\Exception('event_year_missing', false);
 
 			// Check the month and year...
 			if ($event['month'] < 1 || $event['month'] > 12)
-				throw new Elk_Exception('invalid_month', false);
+				throw new \ElkArte\Exceptions\Exception('invalid_month', false);
 			if ($event['year'] < $this->_settings['cal_minyear'] || $event['year'] > date('Y') + $this->_settings['cal_limityear'])
-				throw new Elk_Exception('invalid_year', false);
+				throw new \ElkArte\Exceptions\Exception('invalid_year', false);
 
 			// No day?
 			if (!isset($event['day']))
-				throw new Elk_Exception('event_day_missing', false);
+				throw new \ElkArte\Exceptions\Exception('event_day_missing', false);
 
 			if (!isset($event['evtitle']) && !isset($event['subject']))
-				throw new Elk_Exception('event_title_missing', false);
+				throw new \ElkArte\Exceptions\Exception('event_title_missing', false);
 			elseif (!isset($event['evtitle']))
 				$event['evtitle'] = $event['subject'];
 
 			// Bad day?
 			if (!checkdate($event['month'], $event['day'], $event['year']))
-				throw new Elk_Exception('invalid_date', false);
+				throw new \ElkArte\Exceptions\Exception('invalid_date', false);
 
 			// No title?
 			if (Util::htmltrim($event['evtitle']) === '')
-				throw new Elk_Exception('no_event_title', false);
+				throw new \ElkArte\Exceptions\Exception('no_event_title', false);
 			if (Util::strlen($event['evtitle']) > 100)
 				$event['evtitle'] = Util::substr($event['evtitle'], 0, 100);
 			$event['evtitle'] = str_replace(';', '', $event['evtitle']);
@@ -186,7 +186,7 @@ class Calendar_Event
 	 * @param int   $member_id - the id of the member saving the event
 	 *
 	 * @return mixed[] The event structure.
-	 * @throws Elk_Exception no_access
+	 * @throws \ElkArte\Exceptions\Exception no_access
 	 */
 	public function load($options, $member_id)
 	{
@@ -216,7 +216,7 @@ class Calendar_Event
 			$event = getEventProperties($this->_event_id);
 
 			if ($event === false)
-				throw new Elk_Exception('no_access', false);
+				throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 			// If it has a board, then they should be editing it within the topic.
 			if (!empty($event['topic']['id']) && !empty($event['topic']['first_msg']))

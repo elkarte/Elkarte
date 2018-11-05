@@ -84,7 +84,7 @@ abstract class Database_Abstract implements Database
 	 * @param mixed[] $matches
 	 *
 	 * @return mixed|string
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function replacement__callback($matches)
 	{
@@ -250,7 +250,7 @@ abstract class Database_Abstract implements Database
 	 * @param mixed $identifier
 	 * @param mixed $replacement
 	 * @return string
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _replaceInt($identifier, $replacement)
 	{
@@ -265,7 +265,7 @@ abstract class Database_Abstract implements Database
 	 * @param string $identifier
 	 * @param mixed[] $replacement
 	 * @return string
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _replaceArrayInt($identifier, $replacement)
 	{
@@ -341,7 +341,7 @@ abstract class Database_Abstract implements Database
 	 * @param string $identifier
 	 * @param mixed[] $replacement
 	 * @return string
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _replaceArrayString($identifier, $replacement)
 	{
@@ -372,7 +372,7 @@ abstract class Database_Abstract implements Database
 	 * @param string $identifier
 	 * @param mixed[] $replacement
 	 * @return string
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _replaceArrayStringCaseInsensitive($identifier, $replacement)
 	{
@@ -402,7 +402,7 @@ abstract class Database_Abstract implements Database
 	 * @param mixed $identifier
 	 * @param mixed $replacement
 	 * @return string
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _replaceDate($identifier, $replacement)
 	{
@@ -418,7 +418,7 @@ abstract class Database_Abstract implements Database
 	 * @param mixed $identifier
 	 * @param mixed $replacement
 	 * @return string
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _replaceFloat($identifier, $replacement)
 	{
@@ -432,7 +432,7 @@ abstract class Database_Abstract implements Database
 	 *
 	 * @param mixed $replacement
 	 * @return string
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _replaceIdentifier($replacement)
 	{
@@ -454,7 +454,7 @@ abstract class Database_Abstract implements Database
 	 * @param integer|null   $line
 	 *
 	 * @return array
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
 	{
@@ -487,9 +487,9 @@ abstract class Database_Abstract implements Database
 			Errors::instance()->log_error($log_message, 'critical', $file, $line);
 		}
 
-		if (class_exists('Elk_Exception'))
+		if (class_exists('\ElkArte\Exceptions\Exception'))
 		{
-			throw new Elk_Exception($error_message, false);
+			throw new \ElkArte\Exceptions\Exception($error_message, false);
 		}
 		elseif ($error_type)
 			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''), $error_type);

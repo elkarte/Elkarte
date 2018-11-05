@@ -272,7 +272,7 @@ class ManageScheduledTasks extends \ElkArte\AbstractController
 
 		// Cleaning...
 		if (!isset($this->_req->query->tid))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 		$this->_req->query->tid = (int) $this->_req->query->tid;
 
 		// Saving?

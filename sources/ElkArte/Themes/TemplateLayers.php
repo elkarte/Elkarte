@@ -13,7 +13,7 @@
 
 namespace ElkArte\Themes;
 
-use Priority;
+use \Priority;
 
 /**
  * Class used to manage template layers

@@ -15,6 +15,8 @@
  *
  */
 
+use ElkArte\Exceptions\ControllerRedirectException;
+
 /**
  * Class Drafts_PersonalMessage_Module
  *
@@ -134,7 +136,7 @@ class Drafts_PersonalMessage_Module extends ElkArte\sources\modules\Abstract_Mod
 	 *
 	 * @param int $pmsg
 	 *
-	 * @throws Pm_Error_Exception
+	 * @throws \ElkArte\Exceptions\PmErrorException
 	 */
 	public function before_set_context($pmsg)
 	{
@@ -147,7 +149,7 @@ class Drafts_PersonalMessage_Module extends ElkArte\sources\modules\Abstract_Mod
 			if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
 			{
 				$this->_loadDraft($user_info['id'], (int) $_REQUEST['id_draft']);
-				throw new Pm_Error_Exception($this->_loaded_draft->to_list, $this->_loaded_draft);
+				throw new \ElkArte\Exceptions\PmErrorException($this->_loaded_draft->to_list, $this->_loaded_draft);
 			}
 			else
 			{
@@ -313,8 +315,8 @@ class Drafts_PersonalMessage_Module extends ElkArte\sources\modules\Abstract_Mod
 	 *
 	 * @param array $recipientList
 	 *
-	 * @throws Controller_Redirect_Exception
-	 * @throws Elk_Exception
+	 * @throws ControllerRedirectException
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function before_sending($recipientList)
 	{
@@ -353,7 +355,7 @@ class Drafts_PersonalMessage_Module extends ElkArte\sources\modules\Abstract_Mod
 
 				// Now save the draft
 				savePMDraft($recipientList, $draft, isset($_REQUEST['xml']));
-				throw new Controller_Redirect_Exception('', '');
+				throw new ControllerRedirectException('', '');
 			}
 		}
 	}

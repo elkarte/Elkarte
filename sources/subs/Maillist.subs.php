@@ -268,7 +268,7 @@ function list_count_filter_parser($id, $style)
  * @param string $style parser or filter
  *
  * @return array of filters/parsers
- * @throws Elk_Exception email_error_no_filter
+ * @throws \ElkArte\Exceptions\Exception email_error_no_filter
  */
 function maillist_load_filter_parser($id, $style)
 {
@@ -291,7 +291,7 @@ function maillist_load_filter_parser($id, $style)
 
 	// Check that the filter does exist
 	if (empty($row))
-		throw new Elk_Exception('email_error_no_filter');
+		throw new \ElkArte\Exceptions\Exception('email_error_no_filter');
 
 	return $row;
 }

@@ -13,12 +13,14 @@
  *
  */
 
+namespace ElkArte\Exceptions;
+
 use ElkArte\Errors\Errors as E;
 
 /**
- * Class Elk_Exception
+ * Class ElkArte\Exception
  */
-class Elk_Exception extends Exception
+class Exception extends \Exception
 {
 	/**
 	 * The log under which the error should be displayed.
@@ -35,7 +37,7 @@ class Elk_Exception extends Exception
 	protected $sprintf = array();
 
 	/**
-	 * Elk_Exception constructor.
+	 * \ElkArte\Exceptions\Exception constructor.
 	 * Extended exception rules because we need more stuff
 	 *
 	 * @param string|string[] $message index of $txt or message
@@ -105,7 +107,7 @@ class Elk_Exception extends Exception
 	}
 
 	/**
-	 * Loads the language file specified in Elk_Exception::parseMessage()
+	 * Loads the language file specified in \ElkArte\Exceptions\Exception::parseMessage()
 	 * and replaces the index received in the constructor.
 	 *
 	 * @param string|string[] $message
@@ -125,7 +127,7 @@ class Elk_Exception extends Exception
 	}
 
 	/**
-	 * Loads the language file specified in Elk_Exception::parseMessage()
+	 * Loads the language file specified in \ElkArte\Exceptions\Exception::parseMessage()
 	 * and replaces the index received in the constructor.  Logs the message if needed.
 	 *
 	 * @param string $msg

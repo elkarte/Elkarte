@@ -253,11 +253,11 @@ class Errors extends \ElkArte\AbstractModel
 	 * @param string $error
 	 * @param string|boolean $log defaults to 'general' false will skip logging, true will use general
 	 *
-	 * @throws \Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function fatal_error($error = '', $log = 'general')
 	{
-		throw new \Elk_Exception($error, $log);
+		throw new \ElkArte\Exceptions\Exception($error, $log);
 	}
 
 	/**
@@ -276,11 +276,11 @@ class Errors extends \ElkArte\AbstractModel
 	 * @param string|boolean $log defaults to 'general' false will skip logging, true will use general
 	 * @param string[] $sprintf defaults to empty array()
 	 *
-	 * @throws \Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function fatal_lang_error($error, $log = 'general', $sprintf = array())
 	{
-		throw new \Elk_Exception($error, $log, $sprintf);
+		throw new \ElkArte\Exceptions\Exception($error, $log, $sprintf);
 	}
 
 	/**
@@ -292,7 +292,7 @@ class Errors extends \ElkArte\AbstractModel
 	 * @param string $error_code string or int code
 	 *
 	 * @return bool
-	 * @throws \Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	final protected function _setup_fatal_ErrorContext($error_message, $error_code)
 	{

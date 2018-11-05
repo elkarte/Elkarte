@@ -17,12 +17,12 @@
 
 namespace ElkArte\Controller;
 
-use ElkArte\sources\Frontpage_Interface;
+use ElkArte\FrontpageInterface;
 
 /**
  * Displays the main board index
  */
-class BoardIndex extends \ElkArte\AbstractController implements Frontpage_Interface
+class BoardIndex extends \ElkArte\AbstractController implements FrontpageInterface
 {
 	/**
 	 * {@inheritdoc }
@@ -178,7 +178,7 @@ class BoardIndex extends \ElkArte\AbstractController implements Frontpage_Interf
 		checkSession('request');
 
 		if (!isset($this->_req->query->sa))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// Check if the input values are correct.
 		if (in_array($this->_req->query->sa, array('expand', 'collapse', 'toggle')) && isset($this->_req->query->c))

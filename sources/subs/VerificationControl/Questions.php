@@ -216,7 +216,7 @@ class Questions implements ControlInterface
 	{
 		if ($this->_number_questions && (!isset($sessionVal['q']) || !isset($_REQUEST[$this->_options['id'] . '_vv']['q'])))
 		{
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 		}
 
 		if (!$this->_verifyAnswers($sessionVal))

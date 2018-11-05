@@ -195,7 +195,7 @@ class TopicsMerge
 	 *
 	 * @param mixed[] $details
 	 * @return bool|int[]
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function doMerge($details = array())
 	{
@@ -376,7 +376,7 @@ class TopicsMerge
 	 * @param int $id_topic
 	 * @param string $target_subject
 	 * @param bool $enforce_subject
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _updateStats($affected_msgs, $id_topic, $target_subject, $enforce_subject)
 	{

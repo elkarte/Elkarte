@@ -467,7 +467,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 		if (!empty($this->_pid))
 		{
 			if (!isset($context['profiles'][$this->_pid]))
-				throw new Elk_Exception('no_access', false);
+				throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 			// Change the selected tab to better reflect that this really is a board profile.
 			$context[$context['admin_menu_name']]['current_subsection'] = 'profiles';
@@ -582,7 +582,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 
 		// Make sure only one of the quick options was selected.
 		if ((!empty($this->_req->post->predefined) && ((isset($this->_req->post->copy_from) && $this->_req->post->copy_from !== 'empty') || !empty($this->_req->post->permissions))) || (!empty($this->_req->post->copy_from) && $this->_req->post->copy_from !== 'empty' && !empty($this->_req->post->permissions)))
-			throw new Elk_Exception('permissions_only_one_option', false);
+			throw new \ElkArte\Exceptions\Exception('permissions_only_one_option', false);
 
 		if (empty($this->_req->post->group) || !is_array($this->_req->post->group))
 			$this->_req->post->group = array();
@@ -599,7 +599,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 
 		// No modifying the predefined profiles.
 		if ($this->_pid > 1 && $this->_pid < 5)
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// Clear out any cached authority.
 		updateSettings(array('settings_updated' => time()));
@@ -704,7 +704,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 		global $context, $txt;
 
 		if (!isset($this->_req->query->group))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 		$context['group']['id'] = (int) $this->_req->query->group;
@@ -726,7 +726,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 
 			// Cannot edit an inherited group!
 			if ($parent != -2)
-				throw new Elk_Exception('cannot_edit_permissions_inherited');
+				throw new \ElkArte\Exceptions\Exception('cannot_edit_permissions_inherited');
 		}
 		elseif ($context['group']['id'] == -1)
 			$context['group']['name'] = $txt['membergroups_guests'];
@@ -813,7 +813,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 
 		// Cannot modify predefined profiles.
 		if ($this->_pid > 1 && $this->_pid < 5)
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// Verify this isn't inherited.
 		if ($current_group_id == -1 || $current_group_id == 0)
@@ -826,7 +826,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 		}
 
 		if ($parent != -2)
-			throw new Elk_Exception('cannot_edit_permissions_inherited');
+			throw new \ElkArte\Exceptions\Exception('cannot_edit_permissions_inherited');
 
 		$givePerms = array('membergroup' => array(), 'board' => array());
 

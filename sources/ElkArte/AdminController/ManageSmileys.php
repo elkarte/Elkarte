@@ -384,7 +384,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 				if ($set == -1 && isset($this->_req->post->smiley_sets_path))
 				{
 					if (in_array($this->_req->post->smiley_sets_path, $set_paths))
-						throw new Elk_Exception('smiley_set_already_exists');
+						throw new \ElkArte\Exceptions\Exception('smiley_set_already_exists');
 
 					updateSettings(array(
 						'smiley_sets_known' => $modSettings['smiley_sets_known'] . ',' . $this->_req->post->smiley_sets_path,
@@ -397,11 +397,11 @@ class ManageSmileys extends \ElkArte\AbstractController
 				{
 					// Make sure the smiley set exists.
 					if (!isset($set_paths[$set]) || !isset($set_names[$set]))
-						throw new Elk_Exception('smiley_set_not_found');
+						throw new \ElkArte\Exceptions\Exception('smiley_set_not_found');
 
 					// Make sure the path is not yet used by another smileyset.
 					if (in_array($this->_req->post->smiley_sets_path, $set_paths) && $this->_req->post->smiley_sets_path != $set_paths[$set])
-						throw new Elk_Exception('smiley_set_path_already_used');
+						throw new \ElkArte\Exceptions\Exception('smiley_set_path_already_used');
 
 					$set_paths[$set] = $this->_req->post->smiley_sets_path;
 					$set_names[$set] = $this->_req->post->smiley_sets_name;
@@ -459,7 +459,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 					$dir->close();
 
 					if (empty($smileys))
-						throw new Elk_Exception('smiley_set_dir_not_found', false, array($context['current_set']['name']));
+						throw new \ElkArte\Exceptions\Exception('smiley_set_dir_not_found', false, array($context['current_set']['name']));
 
 					// Exclude the smileys that are already in the database.
 					$found = smileyExists($smileys);
@@ -560,11 +560,11 @@ class ManageSmileys extends \ElkArte\AbstractController
 
 			// Make sure some code was entered.
 			if (empty($this->_req->post->smiley_code))
-				throw new Elk_Exception('smiley_has_no_code');
+				throw new \ElkArte\Exceptions\Exception('smiley_has_no_code');
 
 			// Check whether the new code has duplicates. It should be unique.
 			if (validateDuplicateSmiley($this->_req->post->smiley_code))
-				throw new Elk_Exception('smiley_not_unique');
+				throw new \ElkArte\Exceptions\Exception('smiley_not_unique');
 
 			// If we are uploading - check all the smiley sets are writable!
 			if ($this->_req->post->method !== 'existing')
@@ -577,28 +577,28 @@ class ManageSmileys extends \ElkArte\AbstractController
 				}
 
 				if (!empty($writeErrors))
-					throw new Elk_Exception('smileys_upload_error_notwritable', true, array(implode(', ', $writeErrors)));
+					throw new \ElkArte\Exceptions\Exception('smileys_upload_error_notwritable', true, array(implode(', ', $writeErrors)));
 			}
 
 			// Uploading just one smiley for all of them?
 			if (isset($this->_req->post->sameall) && isset($_FILES['uploadSmiley']['name']) && $_FILES['uploadSmiley']['name'] != '')
 			{
 				if (!is_uploaded_file($_FILES['uploadSmiley']['tmp_name']) || (ini_get('open_basedir') == '' && !file_exists($_FILES['uploadSmiley']['tmp_name'])))
-					throw new Elk_Exception('smileys_upload_error');
+					throw new \ElkArte\Exceptions\Exception('smileys_upload_error');
 
 				// Sorry, no spaces, dots, or anything else but letters allowed.
 				$_FILES['uploadSmiley']['name'] = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('_', '.', ''), $_FILES['uploadSmiley']['name']);
 
 				// We only allow image files - it's THAT simple - no messing around here...
 				if (!in_array(strtolower(substr(strrchr($_FILES['uploadSmiley']['name'], '.'), 1)), $allowedTypes))
-					throw new Elk_Exception('smileys_upload_error_types', false, array(implode(', ', $allowedTypes)));
+					throw new \ElkArte\Exceptions\Exception('smileys_upload_error_types', false, array(implode(', ', $allowedTypes)));
 
 				// We only need the filename...
 				$destName = basename($_FILES['uploadSmiley']['name']);
 
 				// Make sure they aren't trying to upload a nasty file - for their own good here!
 				if (in_array(strtolower($destName), $disabledFiles))
-					throw new Elk_Exception('smileys_upload_error_illegal');
+					throw new \ElkArte\Exceptions\Exception('smileys_upload_error_illegal');
 
 				// Check if the file already exists... and if not move it to EVERY smiley set directory.
 				$i = 0;
@@ -639,12 +639,12 @@ class ManageSmileys extends \ElkArte\AbstractController
 				foreach ($_FILES as $name => $dummy)
 				{
 					if ($_FILES[$name]['name'] == '')
-						throw new Elk_Exception('smileys_upload_error_blank');
+						throw new \ElkArte\Exceptions\Exception('smileys_upload_error_blank');
 
 					if (empty($newName))
 						$newName = basename($_FILES[$name]['name']);
 					elseif (basename($_FILES[$name]['name']) != $newName)
-						throw new Elk_Exception('smileys_upload_error_name');
+						throw new \ElkArte\Exceptions\Exception('smileys_upload_error_name');
 				}
 
 				foreach ($context['smiley_sets'] as $i => $set)
@@ -657,21 +657,21 @@ class ManageSmileys extends \ElkArte\AbstractController
 
 					// Got one...
 					if (!is_uploaded_file($_FILES['individual_' . $set['name']]['tmp_name']) || (ini_get('open_basedir') == '' && !file_exists($_FILES['individual_' . $set['name']]['tmp_name'])))
-						throw new Elk_Exception('smileys_upload_error');
+						throw new \ElkArte\Exceptions\Exception('smileys_upload_error');
 
 					// Sorry, no spaces, dots, or anything else but letters allowed.
 					$_FILES['individual_' . $set['name']]['name'] = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('_', '.', ''), $_FILES['individual_' . $set['name']]['name']);
 
 					// We only allow image files - it's THAT simple - no messing around here...
 					if (!in_array(strtolower(substr(strrchr($_FILES['individual_' . $set['name']]['name'], '.'), 1)), $allowedTypes))
-						throw new Elk_Exception('smileys_upload_error_types', false, array(implode(', ', $allowedTypes)));
+						throw new \ElkArte\Exceptions\Exception('smileys_upload_error_types', false, array(implode(', ', $allowedTypes)));
 
 					// We only need the filename...
 					$destName = basename($_FILES['individual_' . $set['name']]['name']);
 
 					// Make sure they aren't trying to upload a nasty file - for their own good here!
 					if (in_array(strtolower($destName), $disabledFiles))
-						throw new Elk_Exception('smileys_upload_error_illegal');
+						throw new \ElkArte\Exceptions\Exception('smileys_upload_error_illegal');
 
 					// If the file exists - ignore it.
 					$smileyLocation = $context['smileys_dir'] . '/' . $set['path'] . '/' . $destName;
@@ -689,7 +689,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 
 			// Also make sure a filename was given.
 			if (empty($this->_req->post->smiley_filename))
-				throw new Elk_Exception('smiley_has_no_filename');
+				throw new \ElkArte\Exceptions\Exception('smiley_has_no_filename');
 
 			// Find the position on the right.
 			$smiley_order = '0';
@@ -811,15 +811,15 @@ class ManageSmileys extends \ElkArte\AbstractController
 
 					// Make sure some code was entered.
 					if (empty($this->_req->post->smiley_code))
-						throw new Elk_Exception('smiley_has_no_code');
+						throw new \ElkArte\Exceptions\Exception('smiley_has_no_code');
 
 					// Also make sure a filename was given.
 					if (empty($this->_req->post->smiley_filename))
-						throw new Elk_Exception('smiley_has_no_filename');
+						throw new \ElkArte\Exceptions\Exception('smiley_has_no_filename');
 
 					// Check whether the new code has duplicates. It should be unique.
 					if (validateDuplicateSmiley($this->_req->post->smiley_code, $this->_req->post->smiley))
-						throw new Elk_Exception('smiley_not_unique');
+						throw new \ElkArte\Exceptions\Exception('smiley_not_unique');
 
 					$param = array(
 						'smiley_location' => $this->_req->post->smiley_location,
@@ -1149,12 +1149,12 @@ class ManageSmileys extends \ElkArte\AbstractController
 					$this->_req->post->icon_filename = substr($this->_req->post->icon_filename, 0, -4);
 
 				if (!file_exists($settings['default_theme_dir'] . '/images/post/' . $this->_req->post->icon_filename . '.png'))
-					throw new Elk_Exception('icon_not_found');
+					throw new \ElkArte\Exceptions\Exception('icon_not_found');
 				// There is a 16 character limit on message icons...
 				elseif (strlen($this->_req->post->icon_filename) > 16)
-					throw new Elk_Exception('icon_name_too_long');
+					throw new \ElkArte\Exceptions\Exception('icon_name_too_long');
 				elseif ($this->_req->post->icon_location == $this->_req->query->icon && !empty($this->_req->query->icon))
-					throw new Elk_Exception('icon_after_itself');
+					throw new \ElkArte\Exceptions\Exception('icon_after_itself');
 
 				// First do the sorting... if this is an edit reduce the order of everything after it by one ;)
 				if ($this->_req->query->icon != 0)
@@ -1361,7 +1361,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 			$this->_req->query->source = empty($this->_req->query->source) ? 0 : (int) $this->_req->query->source;
 
 			if (empty($this->_req->query->source))
-				throw new Elk_Exception('smiley_not_found');
+				throw new \ElkArte\Exceptions\Exception('smiley_not_found');
 
 			$smiley = array();
 
@@ -1371,7 +1371,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 
 				$smiley = getSmileyPosition($this->_req->query->location, $this->_req->query->after);
 				if (empty($smiley))
-					throw new Elk_Exception('smiley_not_found');
+					throw new \ElkArte\Exceptions\Exception('smiley_not_found');
 			}
 			else
 			{
@@ -1452,12 +1452,12 @@ class ManageSmileys extends \ElkArte\AbstractController
 
 			// Check that the smiley is from simplemachines.org, for now... maybe add mirroring later.
 			if (!isAuthorizedServer($this->_req->query->set_gz) == 0)
-				throw new Elk_Exception('not_valid_server');
+				throw new \ElkArte\Exceptions\Exception('not_valid_server');
 
 			$destination = BOARDDIR . '/packages/' . $base_name;
 
 			if (file_exists($destination))
-				throw new Elk_Exception('package_upload_error_exists');
+				throw new \ElkArte\Exceptions\Exception('package_upload_error_exists');
 
 			// Let's copy it to the packages directory
 			file_put_contents($destination, fetch_web_data($this->_req->query->set_gz));
@@ -1473,7 +1473,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 		}
 
 		if (!file_exists($destination))
-			throw new Elk_Exception('package_no_file', false);
+			throw new \ElkArte\Exceptions\Exception('package_no_file', false);
 
 		// Make sure temp directory exists and is empty.
 		if (file_exists(BOARDDIR . '/packages/temp'))
@@ -1490,7 +1490,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 
 				deltree(BOARDDIR . '/packages/temp', false);
 				if (!mktree(BOARDDIR . '/packages/temp', 0777))
-					throw new Elk_Exception('package_cant_download', false);
+					throw new \ElkArte\Exceptions\Exception('package_cant_download', false);
 			}
 		}
 
@@ -1498,7 +1498,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 
 		// @todo needs to change the URL in the next line ;)
 		if (!$extracted)
-			throw new Elk_Exception('packageget_unable', false, array('http://custom.elkarte.net/index.php?action=search;type=12;basic_search=' . $name));
+			throw new \ElkArte\Exceptions\Exception('packageget_unable', false, array('http://custom.elkarte.net/index.php?action=search;type=12;basic_search=' . $name));
 
 		if ($extracted && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
 		{
@@ -1516,11 +1516,11 @@ class ManageSmileys extends \ElkArte\AbstractController
 			$base_path = '';
 
 		if (!file_exists(BOARDDIR . '/packages/temp/' . $base_path . 'package-info.xml'))
-			throw new Elk_Exception('package_get_error_missing_xml', false);
+			throw new \ElkArte\Exceptions\Exception('package_get_error_missing_xml', false);
 
 		$smileyInfo = getPackageInfo($context['filename']);
 		if (!is_array($smileyInfo))
-			throw new Elk_Exception($smileyInfo);
+			throw new \ElkArte\Exceptions\Exception($smileyInfo);
 
 		// See if it is installed?
 		if (isSmileySetInstalled($smileyInfo['id']))
@@ -1666,7 +1666,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 	 *
 	 * @param string $smileyPath
 	 *
-	 * @throws Elk_Exception smiley_set_unable_to_import
+	 * @throws \ElkArte\Exceptions\Exception smiley_set_unable_to_import
 	 */
 	public function importSmileys($smileyPath)
 	{
@@ -1675,7 +1675,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/Smileys.subs.php');
 
 		if (empty($modSettings['smileys_dir']) || !is_dir($modSettings['smileys_dir'] . '/' . $smileyPath))
-			throw new Elk_Exception('smiley_set_unable_to_import');
+			throw new \ElkArte\Exceptions\Exception('smiley_set_unable_to_import');
 
 		$smileys = array();
 		$dir = dir($modSettings['smileys_dir'] . '/' . $smileyPath);

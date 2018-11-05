@@ -92,7 +92,7 @@ class Draft extends Post
 
 		// Safe is safe.
 		if ($this->_memID != $user_info['id'])
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
@@ -197,7 +197,7 @@ class Draft extends Post
 		// Quick check how we got here.
 		if ($this->_memID != $user_info['id'])
 			// empty($modSettings['drafts_enabled']) || empty($modSettings['drafts_pm_enabled']))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// Set up what we will need
 		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
@@ -282,7 +282,7 @@ class Draft extends Post
 	 *
 	 * @param string $redirect - The url to redirect to after the drafts have
 	 * been deleted
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _action_delete($redirect = '')
 	{

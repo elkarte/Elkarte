@@ -819,7 +819,7 @@ function mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break)
  * @param string[] $additional_files - Additional language files to load
  *
  * @return array
- * @throws Elk_Exception email_no_template
+ * @throws \ElkArte\Exceptions\Exception email_no_template
  */
 function loadEmailTemplate($template, $replacements = array(), $lang = '', $loadLang = true, $suffixes = array(), $additional_files = array())
 {
@@ -840,7 +840,7 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 	}
 
 	if (!isset($txt[$template . '_subject']) || !isset($txt[$template . '_body']))
-		throw new Elk_Exception('email_no_template', 'template', array($template));
+		throw new \ElkArte\Exceptions\Exception('email_no_template', 'template', array($template));
 
 	$ret = array(
 		'subject' => $txt[$template . '_subject'],

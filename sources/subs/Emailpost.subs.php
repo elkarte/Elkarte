@@ -643,7 +643,7 @@ function pbe_check_moderation(&$pbe)
  * @param Email_Parse $email_message
  *
  * @return bool
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function pbe_emailError($error, $email_message)
 {
@@ -786,7 +786,7 @@ function pbe_emailError($error, $email_message)
  * @param Email_Parse $email_message
  *
  * @return array
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function pbe_email_attachments($pbe, $email_message)
 {

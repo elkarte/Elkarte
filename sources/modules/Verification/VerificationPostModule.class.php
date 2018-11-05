@@ -45,7 +45,7 @@ class Verification_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * Prepare $context for the post page.
 	 *
 	 * @param \ErrorContext $_post_errors
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function post_errors($_post_errors)
 	{
@@ -67,7 +67,7 @@ class Verification_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * Checks the user passed the verifications on the post page.
 	 *
 	 * @param \ErrorContext $_post_errors
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function prepare_save_post($_post_errors)
 	{

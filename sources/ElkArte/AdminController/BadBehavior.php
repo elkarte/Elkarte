@@ -203,7 +203,7 @@ class BadBehavior extends \ElkArte\AbstractController
 	 * Performs the removal of one or multiple log entries
 	 *
 	 * @param array $filter - an array describing the current filter
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _action_delete($filter)
 	{

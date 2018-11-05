@@ -11,12 +11,14 @@
  *
  */
 
+namespace ElkArte\Exceptions;
+
 /**
- * Class Pm_Error_Exception
+ * Class PmErrorException
  *
  * An exception to be cached by the PM controller.
  */
-class Pm_Error_Exception extends Exception
+class PmErrorException extends \Exception
 {
 	/**
 	 * @var int[]

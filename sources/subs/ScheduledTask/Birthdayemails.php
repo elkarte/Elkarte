@@ -29,7 +29,7 @@ class Birthdayemails implements Scheduled_Task_Interface
 	 * Happy birthday to me ! Sends out birthday greeting emails.
 	 *
 	 * @return bool
-	 * @throws \Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function run()
 	{

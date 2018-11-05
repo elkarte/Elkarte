@@ -81,7 +81,7 @@ function elk_main()
 	$_req = HttpReq::instance();
 
 	// What shall we do?
-	$dispatcher = new Site_Dispatcher($_req);
+	$dispatcher = new ElkArte\SiteDispatcher($_req);
 
 	if ($dispatcher->needSecurity())
 	{

@@ -274,7 +274,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 
 		// We got something - didn't we? DIDN'T WE!
 		if ($mod_include_data === false)
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// Retain the ID information in case required by a subaction.
 		$context['moderation_menu_id'] = $context['max_menu_id'];
@@ -389,7 +389,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 
 		// legit?
 		if (empty($notice) || !$context['can_moderate_boards'])
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		list ($context['notice_body'], $context['notice_subject']) = $notice;
 
@@ -796,7 +796,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 		// Have to at least give us something
 		$report = $this->_req->getQuery('report', 'intval', 0);
 		if (empty($report))
-			throw new Elk_Exception('mc_no_modreport_specified');
+			throw new \ElkArte\Exceptions\Exception('mc_no_modreport_specified');
 
 		// This should not be needed...
 		$show_pms = false;
@@ -811,7 +811,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 
 		// So did we find anything?
 		if ($row === false)
-			throw new Elk_Exception('mc_no_modreport_found');
+			throw new \ElkArte\Exceptions\Exception('mc_no_modreport_found');
 
 		// Woohoo we found a report and they can see it!  Bad news is we have more work to do
 		// If they are adding a comment then... add a comment.

@@ -19,7 +19,7 @@ namespace ElkArte\Themes;
 
 use BadFunctionCallException;
 use Debug;
-use Elk_Exception;
+use \ElkArte\Exceptions\Exception;
 use ElkArte\Errors\Errors;
 use Error;
 use Generator;
@@ -89,7 +89,7 @@ class Templates
 	 *     template cannot be found
 	 *
 	 * @return boolean|null
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function load($template_name, $style_sheets = [], $fatal = true): ?bool
 	{
@@ -137,7 +137,7 @@ class Templates
 	 *     template cannot be found
 	 *
 	 * @return bool
-	 * @throws Elk_Exception theme_template_error
+	 * @throws \ElkArte\Exceptions\Exception theme_template_error
 	 */
 	protected function requireTemplate($template_name, $style_sheets, $fatal): bool
 	{
@@ -239,7 +239,7 @@ class Templates
 		// Cause an error otherwise.
 		elseif ($template_name !== 'Errors' && $template_name !== 'index' && $fatal)
 		{
-			throw new Elk_Exception(
+			throw new \ElkArte\Exceptions\Exception(
 				'theme_template_error',
 				'template',
 				[(string) $template_name]
@@ -247,7 +247,7 @@ class Templates
 		}
 		elseif ($fatal)
 		{
-			throw new Elk_Exception(
+			throw new \ElkArte\Exceptions\Exception(
 				sprintf(
 					isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load themes/default/%s.template.php!',
 					(string) $template_name
@@ -688,7 +688,7 @@ class Templates
 	 * @param bool|string $fatal = false, $fatal = true is for templates that
 	 *                           shouldn't get a 'pretty' error screen 'ignore' to skip
 	 *
-	 * @throws Elk_Exception theme_template_error
+	 * @throws \ElkArte\Exceptions\Exception theme_template_error
 	 */
 	public function loadSubTemplate($sub_template_name, $fatal = false)
 	{
@@ -716,7 +716,7 @@ class Templates
 			}
 			elseif ($fatal === false)
 			{
-				throw new Elk_Exception(
+				throw new \ElkArte\Exceptions\Exception(
 					'theme_template_error',
 					'template',
 					[(string) $sub_template_name]

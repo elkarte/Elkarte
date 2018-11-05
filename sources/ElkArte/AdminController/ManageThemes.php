@@ -277,10 +277,10 @@ class ManageThemes extends \ElkArte\AbstractController
 					$this->_req->post->options['known_themes'][$key] = (int) $id;
 			}
 			else
-				throw new Elk_Exception('themes_none_selectable', false);
+				throw new \ElkArte\Exceptions\Exception('themes_none_selectable', false);
 
 			if (!in_array($this->_req->post->options['theme_guests'], $this->_req->post->options['known_themes']))
-				throw new Elk_Exception('themes_default_selectable', false);
+				throw new \ElkArte\Exceptions\Exception('themes_default_selectable', false);
 
 			// Commit the new settings.
 			updateSettings(array(
@@ -644,7 +644,7 @@ class ManageThemes extends \ElkArte\AbstractController
 
 		// Validate inputs/user.
 		if (empty($theme))
-			throw new Elk_Exception('no_theme', false);
+			throw new \ElkArte\Exceptions\Exception('no_theme', false);
 
 		// Select the best fitting tab.
 		$context[$context['admin_menu_name']]['current_subsection'] = 'list';
@@ -822,7 +822,7 @@ class ManageThemes extends \ElkArte\AbstractController
 
 		// You can't delete the default theme!
 		if ($theme == 1)
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// Its no longer known
 		$known = explode(',', $modSettings['knownThemes']);
@@ -959,7 +959,7 @@ class ManageThemes extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/Themes.subs.php');
 
 		if (!$modSettings['theme_allow'] && $settings['disable_user_variant'] && !allowedTo('admin_forum'))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		theme()->getTemplates()->loadLanguageFile('Profile');
 		theme()->getTemplates()->load('ManageThemes');
@@ -1174,7 +1174,7 @@ class ManageThemes extends \ElkArte\AbstractController
 		elseif ($method === 'upload')
 			$this->installFromZip();
 		else
-			throw new Elk_Exception('theme_install_general', false);
+			throw new \ElkArte\Exceptions\Exception('theme_install_general', false);
 
 		// Something go wrong?
 		if ($this->theme_dir != '' && basename($this->theme_dir) !== 'themes')
@@ -1275,7 +1275,7 @@ class ManageThemes extends \ElkArte\AbstractController
 	{
 		// Hopefully the themes directory is writable, or we might have a problem.
 		if (!is_writable(BOARDDIR . '/themes'))
-			throw new Elk_Exception('theme_install_write_error', 'critical');
+			throw new \ElkArte\Exceptions\Exception('theme_install_write_error', 'critical');
 
 		// This happens when the admin session is gone and the user has to login again
 		if (empty($_FILES['theme_gz']) && empty($this->_req->post->theme_gz))
@@ -1291,7 +1291,7 @@ class ManageThemes extends \ElkArte\AbstractController
 		elseif (isset($this->_req->post->theme_gz))
 		{
 			if (!isAuthorizedServer($this->_req->post->theme_gz))
-				throw new Elk_Exception('not_valid_server');
+				throw new \ElkArte\Exceptions\Exception('not_valid_server');
 
 			read_tgz_file($this->_req->post->theme_gz, BOARDDIR . '/themes/' . $this->theme_name, false, true);
 		}
@@ -1305,7 +1305,7 @@ class ManageThemes extends \ElkArte\AbstractController
 	public function installFromDir()
 	{
 		if (!is_dir($this->_req->post->theme_dir) || !file_exists($this->_req->post->theme_dir . '/theme_info.xml'))
-			throw new Elk_Exception('theme_install_error', false);
+			throw new \ElkArte\Exceptions\Exception('theme_install_error', false);
 
 		$this->theme_name = basename($this->_req->post->theme_dir);
 		$this->theme_dir = $this->_req->post->theme_dir;
@@ -1320,7 +1320,7 @@ class ManageThemes extends \ElkArte\AbstractController
 
 		// Hopefully the themes directory is writable, or we might have a problem.
 		if (!is_writable(BOARDDIR . '/themes'))
-			throw new Elk_Exception('theme_install_write_error', 'critical');
+			throw new \ElkArte\Exceptions\Exception('theme_install_write_error', 'critical');
 
 		// Make the new directory, standard characters only
 		$this->theme_dir = BOARDDIR . '/themes/' . preg_replace('~[^A-Za-z0-9_\- ]~', '', $this->_req->post->copy);
@@ -1641,7 +1641,7 @@ class ManageThemes extends \ElkArte\AbstractController
 		if (empty($selectedTheme))
 		{
 			// This should never be happening. Never I say. But... in case it does :P
-			throw new Elk_Exception('theme_edit_missing');
+			throw new \ElkArte\Exceptions\Exception('theme_edit_missing');
 		}
 
 		$theme_dir = themeDirectory($context['theme_id']);
@@ -1651,7 +1651,7 @@ class ManageThemes extends \ElkArte\AbstractController
 		if (empty($file))
 		{
 			// @todo a better error message
-			throw new Elk_Exception('theme_edit_missing');
+			throw new \ElkArte\Exceptions\Exception('theme_edit_missing');
 		}
 
 		// Checking PHP syntax on css files is not a most constructive use of processing power :P
@@ -1824,7 +1824,7 @@ class ManageThemes extends \ElkArte\AbstractController
 
 		// Eh? not trying to sneak a peek outside the theme directory are we
 		if (!file_exists($theme_dir . '/index.template.php') && !file_exists($theme_dir . '/css/index.css'))
-			throw new Elk_Exception('theme_edit_missing', false);
+			throw new \ElkArte\Exceptions\Exception('theme_edit_missing', false);
 
 		// Now, where exactly are you?
 		if (isset($this->_req->query->directory))
@@ -1941,7 +1941,7 @@ class ManageThemes extends \ElkArte\AbstractController
 			elseif (file_exists($settings['default_theme_dir'] . '/' . $this->_req->query->template . '.template.php'))
 				$filename = $settings['default_theme_dir'] . '/' . $this->_req->query->template . '.template.php';
 			else
-				throw new Elk_Exception('no_access', false);
+				throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 			$fp = fopen($theme_dirs['theme_dir'] . '/' . $this->_req->query->template . '.template.php', 'w');
 			fwrite($fp, file_get_contents($filename));
@@ -1959,7 +1959,7 @@ class ManageThemes extends \ElkArte\AbstractController
 			elseif (file_exists($settings['default_theme_dir'] . '/languages/' . $this->_req->query->template . '.php'))
 				$filename = $settings['default_theme_dir'] . '/languages/' . $this->_req->query->template . '.php';
 			else
-				throw new Elk_Exception('no_access', false);
+				throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 			$fp = fopen($theme_dirs['theme_dir'] . '/languages/' . $this->_req->query->lang_file . '.php', 'w');
 			fwrite($fp, file_get_contents($filename));
@@ -2070,7 +2070,7 @@ class ManageThemes extends \ElkArte\AbstractController
 
 		// Eh? not trying to sneak a peek outside the theme directory are we
 		if (!file_exists($this->theme_dir . '/index.template.php') && !file_exists($this->theme_dir . '/css/index.css'))
-			throw new Elk_Exception('theme_edit_missing', false);
+			throw new \ElkArte\Exceptions\Exception('theme_edit_missing', false);
 
 		// Get the filename from the appropriate spot
 		$filename = isset($this->_req->post->save) ? $this->_req->getPost('filename', 'strval', '') : $this->_req->getQuery('filename', 'strval', '');
@@ -2089,7 +2089,7 @@ class ManageThemes extends \ElkArte\AbstractController
 
 		// We shouldn't end up with no file
 		if (empty($filename))
-			throw new Elk_Exception('theme_edit_missing', false);
+			throw new \ElkArte\Exceptions\Exception('theme_edit_missing', false);
 
 		// Initialize context
 		$context['allow_save'] = is_writable($this->theme_dir . '/' . $filename);

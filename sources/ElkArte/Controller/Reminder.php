@@ -86,7 +86,7 @@ class Reminder extends \ElkArte\AbstractController
 
 		// You must enter a username/email address.
 		if (empty($where))
-			throw new Elk_Exception('username_no_exist', false);
+			throw new \ElkArte\Exceptions\Exception('username_no_exist', false);
 
 		// Make sure we are not being slammed
 		// Don't call this if you're coming from the "Choose a reminder type" page - otherwise you'll likely get an error
@@ -103,15 +103,15 @@ class Reminder extends \ElkArte\AbstractController
 		{
 			// Awaiting approval...
 			if (trim($member['validation_code']) === '')
-				throw new Elk_Exception($txt['registration_not_approved'] . ' <a class="linkbutton" href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_req->post->user . '">' . $txt['here'] . '</a>.', false);
+				throw new \ElkArte\Exceptions\Exception($txt['registration_not_approved'] . ' <a class="linkbutton" href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_req->post->user . '">' . $txt['here'] . '</a>.', false);
 			else
-				throw new Elk_Exception($txt['registration_not_activated'] . ' <a class="linkbutton" href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_req->post->user . '">' . $txt['here'] . '</a>.', false);
+				throw new \ElkArte\Exceptions\Exception($txt['registration_not_activated'] . ' <a class="linkbutton" href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_req->post->user . '">' . $txt['here'] . '</a>.', false);
 		}
 
 		// You can't get emailed if you have no email address.
 		$member['email_address'] = trim($member['email_address']);
 		if ($member['email_address'] === '')
-			throw new Elk_Exception($txt['no_reminder_email'] . '<br />' . $txt['send_email'] . ' <a href="mailto:' . $webmaster_email . '">webmaster</a> ' . $txt['to_ask_password'] . '.');
+			throw new \ElkArte\Exceptions\Exception($txt['no_reminder_email'] . '<br />' . $txt['send_email'] . ' <a href="mailto:' . $webmaster_email . '">webmaster</a> ' . $txt['to_ask_password'] . '.');
 
 		// If they have no secret question then they can only get emailed the item, or they are requesting the email, send them an email.
 		if (empty($member['secret_question'])
@@ -174,7 +174,7 @@ class Reminder extends \ElkArte\AbstractController
 
 		// You need a code!
 		if (!isset($this->_req->query->code))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// Fill the context array.
 		$context += array(
@@ -204,13 +204,13 @@ class Reminder extends \ElkArte\AbstractController
 		validateToken('remind-sp');
 
 		if (empty($this->_req->post->u) || !isset($this->_req->post->passwrd1, $this->_req->post->passwrd2))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		if ($this->_req->post->passwrd1 != $this->_req->post->passwrd2)
-			throw new Elk_Exception('passwords_dont_match', false);
+			throw new \ElkArte\Exceptions\Exception('passwords_dont_match', false);
 
 		if ($this->_req->post->passwrd1 === '')
-			throw new Elk_Exception('no_password', false);
+			throw new \ElkArte\Exceptions\Exception('no_password', false);
 
 		$member_id = $this->_req->getPost('u', 'intval', -1);
 		$code = $this->_req->getPost('code', 'trim', '');
@@ -223,7 +223,7 @@ class Reminder extends \ElkArte\AbstractController
 
 		// Does this user exist at all? Is he activated? Does he have a validation code?
 		if (empty($member) || $member['is_activated'] != 1 || $member['validation_code'] === '')
-			throw new Elk_Exception('invalid_userid', false);
+			throw new \ElkArte\Exceptions\Exception('invalid_userid', false);
 
 		// Is the password actually valid to the forums rules?
 		require_once(SUBSDIR . '/Auth.subs.php');
@@ -231,7 +231,7 @@ class Reminder extends \ElkArte\AbstractController
 
 		// What - it's not?
 		if ($passwordError !== null)
-			throw new Elk_Exception('profile_error_password_' . $passwordError, false);
+			throw new \ElkArte\Exceptions\Exception('profile_error_password_' . $passwordError, false);
 
 		// Quit if this code is not right.
 		if (empty($code) || $member['validation_code'] !== substr(hash('sha256', $code), 0, 10))
@@ -239,7 +239,7 @@ class Reminder extends \ElkArte\AbstractController
 			// Stop brute force attacks like this.
 			validatePasswordFlood($member_id, $member['passwd_flood'], false);
 
-			throw new Elk_Exception($txt['invalid_activation_code'], false);
+			throw new \ElkArte\Exceptions\Exception($txt['invalid_activation_code'], false);
 		}
 
 		// Just in case, flood control.
@@ -282,7 +282,7 @@ class Reminder extends \ElkArte\AbstractController
 
 		// Hacker?  How did you get this far without an email or username?
 		if (empty($this->_req->post->uid))
-			throw new Elk_Exception('username_no_exist', false);
+			throw new \ElkArte\Exceptions\Exception('username_no_exist', false);
 
 		theme()->getTemplates()->loadLanguageFile('Login');
 
@@ -290,13 +290,13 @@ class Reminder extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/Members.subs.php');
 		$member = getBasicMemberData((int) $this->_req->post->uid, array('authentication' => true));
 		if (empty($member))
-			throw new Elk_Exception('username_no_exist', false);
+			throw new \ElkArte\Exceptions\Exception('username_no_exist', false);
 
 		// Check if the secret answer is correct.
 		if ($member['secret_question'] === '' || $member['secret_answer'] === '' || md5($this->_req->post->secret_answer) !== $member['secret_answer'])
 		{
 			Errors::instance()->log_error(sprintf($txt['reminder_error'], $member['member_name']), 'user');
-			throw new Elk_Exception('incorrect_answer', false);
+			throw new \ElkArte\Exceptions\Exception('incorrect_answer', false);
 		}
 
 		// If it's OpenID this is where the music ends.
@@ -309,11 +309,11 @@ class Reminder extends \ElkArte\AbstractController
 
 		// You can't use a blank one!
 		if (strlen(trim($this->_req->post->passwrd1)) === 0)
-			throw new Elk_Exception('no_password', false);
+			throw new \ElkArte\Exceptions\Exception('no_password', false);
 
 		// They have to be the same too.
 		if ($this->_req->post->passwrd1 != $this->_req->post->passwrd2)
-			throw new Elk_Exception('passwords_dont_match', false);
+			throw new \ElkArte\Exceptions\Exception('passwords_dont_match', false);
 
 		// Make sure they have a strong enough password.
 		require_once(SUBSDIR . '/Auth.subs.php');
@@ -321,7 +321,7 @@ class Reminder extends \ElkArte\AbstractController
 
 		// Invalid?
 		if ($passwordError !== null)
-			throw new Elk_Exception('profile_error_password_' . $passwordError, false);
+			throw new \ElkArte\Exceptions\Exception('profile_error_password_' . $passwordError, false);
 
 		// Alright, so long as 'yer sure.
 		require_once(SUBSDIR . '/Auth.subs.php');
@@ -361,19 +361,19 @@ function secretAnswerInput()
 
 	// Check they entered something...
 	if (empty($_POST['uid']))
-		throw new Elk_Exception('username_no_exist', false);
+		throw new \ElkArte\Exceptions\Exception('username_no_exist', false);
 
 	// Get the stuff....
 	require_once(SUBSDIR . '/Members.subs.php');
 	$member = getBasicMemberData((int) $_POST['uid'], array('authentication' => true));
 	if (empty($member))
-		throw new Elk_Exception('username_no_exist', false);
+		throw new \ElkArte\Exceptions\Exception('username_no_exist', false);
 
 	$context['account_type'] = !empty($member['openid_uri']) ? 'openid' : 'password';
 
 	// If there is NO secret question - then throw an error.
 	if (trim($member['secret_question']) === '')
-		throw new Elk_Exception('registration_no_secret_question', false);
+		throw new \ElkArte\Exceptions\Exception('registration_no_secret_question', false);
 
 	// Ask for the answer...
 	$context['remind_user'] = $member['id_member'];

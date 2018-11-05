@@ -90,7 +90,7 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * @param int $board
 	 *
 	 * @return bool
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function prepare_context($topic_attributes, $topic, $board)
 	{
@@ -207,7 +207,7 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * @param ErrorContext $post_errors
 	 * @param array        $topic_info
 	 *
-	 * @throws Elk_Exception no_access
+	 * @throws \ElkArte\Exceptions\Exception no_access
 	 */
 	public function before_save_post($post_errors, $topic_info)
 	{
@@ -215,7 +215,7 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 
 		// Validate the poll...
 		if (!empty($topic_info) && !isset($_REQUEST['msg']))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// This is a new topic... so it's a new poll.
 		if (empty($topic_info))
@@ -250,7 +250,7 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * Create the poll!
 	 *
 	 * @param array $topicOptions
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function pre_save_post(&$topicOptions)
 	{
@@ -331,7 +331,7 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	 * @param string  $user_name The username of the member that creates the poll
 	 *
 	 * @return int - the id of the newly created poll
-	 * @throws Elk_Exception poll_range_error
+	 * @throws \ElkArte\Exceptions\Exception poll_range_error
 	 */
 	protected function _createPoll($options, $user_name)
 	{
@@ -370,7 +370,7 @@ class Poll_Post_Module extends ElkArte\sources\modules\Abstract_Module
 		// If the user tries to set the poll too far in advance, don't let them.
 		if (!empty($poll_expire) && $poll_expire < 1)
 			// @todo this fatal error should not be here
-			throw new Elk_Exception('poll_range_error', false);
+			throw new \ElkArte\Exceptions\Exception('poll_range_error', false);
 		// Don't allow them to select option 2 for hidden results if it's not time limited.
 		elseif (empty($poll_expire) && $poll_hide == 2)
 			$poll_hide = 1;

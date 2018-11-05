@@ -185,7 +185,7 @@ function addonsCredits()
  * @param mixed[]|string $urls a single url (string) or an array of arrays, each inner array being (serialized request data, id_member)
  * @param string|bool $preferred_prefix = false
  * @return mixed[]|string an array of descriptions if you passed an array, otherwise the string describing their current location.
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function determineActions($urls, $preferred_prefix = false)
 {

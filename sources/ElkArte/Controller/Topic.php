@@ -65,7 +65,7 @@ class Topic extends \ElkArte\AbstractController
 
 		// Just quit if there's no topic to lock.
 		if (empty($topic))
-			throw new Elk_Exception('not_a_topic', false);
+			throw new \ElkArte\Exceptions\Exception('not_a_topic', false);
 
 		checkSession('get');
 
@@ -95,7 +95,7 @@ class Topic extends \ElkArte\AbstractController
 			$locked = '0';
 		// You cannot unlock this!
 		else
-			throw new Elk_Exception('locked_by_admin', 'user');
+			throw new \ElkArte\Exceptions\Exception('locked_by_admin', 'user');
 
 		// Lock the topic!
 		setTopicAttribute($topic, array('locked' => $locked));
@@ -132,7 +132,7 @@ class Topic extends \ElkArte\AbstractController
 
 		// You can't sticky a board or something!
 		if (empty($topic))
-			throw new Elk_Exception('not_a_topic', false);
+			throw new \ElkArte\Exceptions\Exception('not_a_topic', false);
 
 		checkSession('get');
 
@@ -184,7 +184,7 @@ class Topic extends \ElkArte\AbstractController
 		{
 			unset($this->_req->query->action);
 			$context['theme_loaded'] = false;
-			throw new Elk_Exception('feature_disabled', false);
+			throw new \ElkArte\Exceptions\Exception('feature_disabled', false);
 		}
 
 		// Clean out the template layers

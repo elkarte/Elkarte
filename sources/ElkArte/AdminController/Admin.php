@@ -102,7 +102,7 @@ class Admin extends \ElkArte\AbstractController
 	 * @event integrate_admin_areas passed admin area area, used to add items to the admin menu
 	 *
 	 * @return false|mixed[]
-	 * @throws Elk_Exception no_access
+	 * @throws \ElkArte\Exceptions\Exception no_access
 	 */
 	private function loadMenu()
 	{
@@ -584,7 +584,7 @@ class Admin extends \ElkArte\AbstractController
 		// Nothing valid?
 		if ($admin_include_data === false)
 		{
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 		}
 
 		// Make a note of the Unique ID for this menu.
@@ -939,7 +939,7 @@ class Admin extends \ElkArte\AbstractController
 
 		// If we didn't get any xml back we are in trouble - perhaps the doc site is overloaded?
 		if (!$search_results || preg_match('~<' . '\?xml\sversion="\d+\.\d+"\?' . '>\s*(<api>.+?</api>)~is', $search_results, $matches) !== 1)
-			throw new Elk_Exception('cannot_connect_doc_site');
+			throw new \ElkArte\Exceptions\Exception('cannot_connect_doc_site');
 
 		$search_results = !empty($matches[1]) ? $matches[1] : '';
 
@@ -952,7 +952,7 @@ class Admin extends \ElkArte\AbstractController
 		// Move through the api layer.
 		if (!$results->exists('api'))
 		{
-			throw new Elk_Exception('cannot_connect_doc_site');
+			throw new \ElkArte\Exceptions\Exception('cannot_connect_doc_site');
 		}
 
 		// Are there actually some results?

@@ -36,7 +36,7 @@ class Daily_Maintenance implements Scheduled_Task_Interface
 	 * Our only method, runs the show
 	 *
 	 * @return bool
-	 * @throws \Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function run()
 	{

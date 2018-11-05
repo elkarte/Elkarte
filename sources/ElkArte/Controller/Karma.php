@@ -98,7 +98,7 @@ class Karma extends \ElkArte\AbstractController
 	 * @param int $action applaud or smite
 	 * @param int $dir
 	 *
-	 * @throws Elk_Exception karma_wait_time
+	 * @throws \ElkArte\Exceptions\Exception karma_wait_time
 	 */
 	private function _give_karma($id_executor, $id_target, $action, $dir)
 	{
@@ -111,7 +111,7 @@ class Karma extends \ElkArte\AbstractController
 		{
 			// If you are gonna try to repeat.... don't allow it.
 			if ($action == $dir)
-				throw new Elk_Exception('karma_wait_time', false, array($modSettings['karmaWaitTime'], ($modSettings['karmaWaitTime'] == 1 ? strtolower($txt['hour']) : $txt['hours'])));
+				throw new \ElkArte\Exceptions\Exception('karma_wait_time', false, array($modSettings['karmaWaitTime'], ($modSettings['karmaWaitTime'] == 1 ? strtolower($txt['hour']) : $txt['hours'])));
 
 			updateKarma($id_executor, $id_target, $dir);
 		}
@@ -123,7 +123,7 @@ class Karma extends \ElkArte\AbstractController
 	 * @param int $id_target
 	 *
 	 * @return int
-	 * @throws Elk_Exception feature_disabled
+	 * @throws \ElkArte\Exceptions\Exception feature_disabled
 	 */
 	private function _prepare_karma($id_target)
 	{
@@ -131,7 +131,7 @@ class Karma extends \ElkArte\AbstractController
 
 		// If the mod is disabled, show an error.
 		if (empty($modSettings['karmaMode']))
-			throw new Elk_Exception('feature_disabled', true);
+			throw new \ElkArte\Exceptions\Exception('feature_disabled', true);
 
 		// If you're a guest or can't do this, blow you off...
 		is_not_guest();
@@ -146,11 +146,11 @@ class Karma extends \ElkArte\AbstractController
 		// @todo Should this be dropped in favor of post group permissions?
 		// Should this apply to the member you are smiting/applauding?
 		if (!$user_info['is_admin'] && $user_info['posts'] < $modSettings['karmaMinPosts'])
-			throw new Elk_Exception('not_enough_posts_karma', true, array($modSettings['karmaMinPosts']));
+			throw new \ElkArte\Exceptions\Exception('not_enough_posts_karma', true, array($modSettings['karmaMinPosts']));
 
 		// And you can't modify your own, punk! (use the profile if you need to.)
 		if (empty($id_target) || $id_target == $user_info['id'])
-			throw new Elk_Exception('cant_change_own_karma', false);
+			throw new \ElkArte\Exceptions\Exception('cant_change_own_karma', false);
 
 		// Delete any older items from the log so we can get the go ahead or not
 		clearKarma($modSettings['karmaWaitTime']);

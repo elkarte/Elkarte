@@ -1251,7 +1251,7 @@ function list_getNumBans()
  * @param int $ban_group_id
  *
  * @return array
- * @throws Elk_Exception ban_not_found
+ * @throws \ElkArte\Exceptions\Exception ban_not_found
  */
 function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group_id = 0)
 {
@@ -1279,7 +1279,7 @@ function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group
 		)
 	);
 	if ($db->num_rows($request) == 0)
-		throw new Elk_Exception('ban_not_found', false);
+		throw new \ElkArte\Exceptions\Exception('ban_not_found', false);
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!isset($context['ban']))

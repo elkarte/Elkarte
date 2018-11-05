@@ -147,7 +147,7 @@ class VerificationControls
 		// This cannot happen!
 		if (!isset($this->_sessionVal['count']))
 		{
-			throw new \Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 		}
 
 		foreach ($this->_verification_instances as $instance)

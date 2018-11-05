@@ -791,7 +791,7 @@ class ManageBans extends \ElkArte\AbstractController
 		$ban_id = $this->_req->getQuery('bi', 'intval', 0);
 
 		if (empty($ban_group))
-			throw new Elk_Exception('ban_not_found', false);
+			throw new \ElkArte\Exceptions\Exception('ban_not_found', false);
 
 		// Adding a new trigger
 		if (isset($this->_req->post->add_new_trigger) && !empty($this->_req->post->ban_suggestions))
@@ -849,7 +849,7 @@ class ManageBans extends \ElkArte\AbstractController
 		{
 			$ban_row = banDetails($ban_id, $ban_group);
 			if (empty($ban_row))
-				throw new Elk_Exception('ban_not_found', false);
+				throw new \ElkArte\Exceptions\Exception('ban_not_found', false);
 			$row = $ban_row[$ban_id];
 
 			// Load it up for the template

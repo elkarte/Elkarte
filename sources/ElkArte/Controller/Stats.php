@@ -56,7 +56,7 @@ class Stats extends \ElkArte\AbstractController
 
 		// Page disabled - redirect them out
 		if (empty($modSettings['trackStats']))
-			throw new Elk_Exception('feature_disabled', true);
+			throw new \ElkArte\Exceptions\Exception('feature_disabled', true);
 
 		// Expanding out the history summary
 		list($year, $month) = $this->_expandedStats();

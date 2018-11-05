@@ -176,7 +176,7 @@ function url_parts($local, $global)
  *
  * @package Authorization
  * @param string $type = 'admin'
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function adminLogin($type = 'admin')
 {
@@ -410,7 +410,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
  * @param int         $memID
  * @param string|null $username = null
  *
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function resetPassword($memID, $username = null)
 {
@@ -454,7 +454,7 @@ function resetPassword($memID, $username = null)
 		// Otherwise grab all of them and don't log anything
 		$error_severity = $errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
 		foreach ($errors->prepareErrors($error_severity) as $error)
-			throw new Elk_Exception($error, $error_severity === null ? false : 'general');
+			throw new \ElkArte\Exceptions\Exception($error, $error_severity === null ? false : 'general');
 
 		// Update the database...
 		updateMemberData($memID, array('member_name' => $user, 'passwd' => $db_hash));
@@ -487,7 +487,7 @@ function resetPassword($memID, $username = null)
  * @param boolean $check_reserved_name
  * @param boolean $fatal pass through to isReservedName
  * @return string
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function validateUsername($memID, $username, $ErrorContext = 'register', $check_reserved_name = true, $fatal = true)
 {
@@ -763,7 +763,7 @@ function isFirstLogin($id_member)
  * @param bool    $fatal
  *
  * @return array of members data or false on failure
- * @throws Elk_Exception no_user_with_email
+ * @throws \ElkArte\Exceptions\Exception no_user_with_email
  */
 function findUser($where, $where_params, $fatal = true)
 {
@@ -795,7 +795,7 @@ function findUser($where, $where_params, $fatal = true)
 		if ($db->num_rows($request) == 0)
 		{
 			if ($fatal)
-				throw new Elk_Exception('no_user_with_email', false);
+				throw new \ElkArte\Exceptions\Exception('no_user_with_email', false);
 			else
 				return false;
 		}

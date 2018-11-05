@@ -271,7 +271,7 @@ class Recent extends \ElkArte\AbstractController
 			$name = categoryName($categories[0]);
 
 			if (empty($name))
-				throw new Elk_Exception('no_access', false);
+				throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 			$context['linktree'][] = array(
 				'url' => getUrl('action', $modSettings['default_forum_action']) . '#c' . $categories[0],
@@ -285,7 +285,7 @@ class Recent extends \ElkArte\AbstractController
 		$boards = array_keys($boards_posts);
 
 		if (empty($boards))
-			throw new Elk_Exception('error_no_boards_selected');
+			throw new \ElkArte\Exceptions\Exception('error_no_boards_selected');
 
 		// The query for getting the messages
 		$this->_grabber->setBoards($boards);
@@ -316,7 +316,7 @@ class Recent extends \ElkArte\AbstractController
 		// No boards, your request ends here
 		if (empty($boards))
 		{
-			throw new Elk_Exception('error_no_boards_selected');
+			throw new \ElkArte\Exceptions\Exception('error_no_boards_selected');
 		}
 
 		// Build the query for finding the messages

@@ -57,7 +57,7 @@ class TestAdminSearch extends \PHPUnit\Framework\TestCase
 		// Set up the controller.
 		$_GET['action'] = 'admin';
 		$user_info['permissions'][] = 'admin_forum';
-		$dispatcher = new Site_Dispatcher(new HttpReq);
+		$dispatcher = new \ElkArte\SiteDispatcher(new HttpReq);
 		$this->controller = $dispatcher->getController();
 
 		// Won't hurt to call this again...

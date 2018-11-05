@@ -37,7 +37,7 @@
  * @package Members
  * @param int[]|int $users
  * @param bool $check_not_admin = false
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function deleteMembers($users, $check_not_admin = false)
 {
@@ -472,7 +472,7 @@ function deleteMembers($users, $check_not_admin = false)
  * @param string  $ErrorContext
  *
  * @return int the ID of the newly created member
- * @throws Elk_Exception no_theme
+ * @throws \ElkArte\Exceptions\Exception no_theme
  */
 function registerMember(&$regOptions, $ErrorContext = 'register')
 {
@@ -572,7 +572,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 
 	// Can't change reserved vars.
 	if (isset($regOptions['theme_vars']) && count(array_intersect(array_keys($regOptions['theme_vars']), $reservedVars)) != 0)
-		throw new Elk_Exception('no_theme');
+		throw new \ElkArte\Exceptions\Exception('no_theme');
 
 	$tokenizer = new Token_Hash();
 
@@ -826,7 +826,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
  * @param bool   $fatal
  *
  * @return bool
- * @throws Elk_Exception username_reserved, name_censored
+ * @throws \ElkArte\Exceptions\Exception username_reserved, name_censored
  */
 function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal = true)
 {
@@ -860,7 +860,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 			// If it's not just entire word, check for it in there somewhere...
 			if ($checkMe == $reservedCheck || (Util::strpos($checkMe, $reservedCheck) !== false && empty($modSettings['reserveWord'])))
 				if ($fatal)
-					throw new Elk_Exception('username_reserved', 'password', array($reserved));
+					throw new \ElkArte\Exceptions\Exception('username_reserved', 'password', array($reserved));
 				else
 					return true;
 		}
@@ -868,7 +868,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 		$censor_name = $name;
 		if (censor($censor_name) != $name)
 			if ($fatal)
-				throw new Elk_Exception('name_censored', 'password', array($name));
+				throw new \ElkArte\Exceptions\Exception('name_censored', 'password', array($name));
 			else
 				return true;
 	}
@@ -877,7 +877,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	foreach (array('*') as $char)
 		if (strpos($checkName, $char) !== false)
 			if ($fatal)
-				throw new Elk_Exception('username_reserved', 'password', array($char));
+				throw new \ElkArte\Exceptions\Exception('username_reserved', 'password', array($char));
 			else
 				return true;
 
@@ -936,7 +936,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
  *
  * @return array containing an array for the allowed membergroup ID's
  * and an array for the denied membergroup ID's.
- * @throws Elk_Exception no_board
+ * @throws \ElkArte\Exceptions\Exception no_board
  */
 function groupsAllowedTo($permission, $board_id = null)
 {
@@ -978,7 +978,7 @@ function groupsAllowedTo($permission, $board_id = null)
 			$board_data = fetchBoardsInfo(array('boards' => $board_id), array('selects' => 'permissions'));
 
 			if (empty($board_data))
-				throw new Elk_Exception('no_board');
+				throw new \ElkArte\Exceptions\Exception('no_board');
 			$profile_id = $board_data[$board_id]['id_profile'];
 		}
 		else
@@ -1017,7 +1017,7 @@ function groupsAllowedTo($permission, $board_id = null)
  * @param integer|null $board_id = null
  *
  * @return int[] an array containing member ID's.
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function membersAllowedTo($permission, $board_id = null)
 {

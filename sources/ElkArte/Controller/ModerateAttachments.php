@@ -63,7 +63,7 @@ class ModerateAttachments extends \ElkArte\AbstractController
 			$attachments[] = (int) $this->_req->query->aid;
 
 		if (empty($attachments))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// @todo nb: this requires permission to approve posts, not manage attachments
 		// Now we have some ID's cleaned and ready to approve, but first - let's check we have permission!
@@ -90,7 +90,7 @@ class ModerateAttachments extends \ElkArte\AbstractController
 		$redirect = 'topic=' . $attach_home['id_topic'] . '.msg' . $attach_home['id_msg'] . '#msg' . $attach_home['id_msg'];
 
 		if (empty($attachments))
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// Finally, we are there. Follow through!
 		if ($is_approve)

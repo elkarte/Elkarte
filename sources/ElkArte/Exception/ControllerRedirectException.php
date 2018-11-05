@@ -11,13 +11,14 @@
  *
  */
 
+namespace ElkArte\Exceptions;
 /**
  * In certain cases a module of a controller my want to "redirect" to another
  * controller (e.g. from Calendar to Post).
  * This exception class catches these "redirects", then instantiate a new controller
  * taking into account loading of addons and pre_dispatch and returns.
  */
-class Controller_Redirect_Exception extends Exception
+class ControllerRedirectException extends \Exception
 {
 	protected $_controller;
 	protected $_method;

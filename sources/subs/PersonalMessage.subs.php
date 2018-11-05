@@ -504,7 +504,7 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
  * @param mixed[]|null $from - an array with the id, name, and username of the member.
  * @param int $pm_head - the ID of the chain being replied to - if any.
  * @return mixed[] an array with log entries telling how many recipients were successful and which recipients it failed to send to.
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function sendpm($recipients, $subject, $message, $store_outbox = true, $from = null, $pm_head = 0)
 {
@@ -2174,7 +2174,7 @@ function loadPMRecipientsAll($pmsg, $bcc_count = false)
  * @param int $pm_id
  *
  * @return
- * @throws Elk_Exception no_access
+ * @throws \ElkArte\Exceptions\Exception no_access
  */
 function loadPersonalMessage($pm_id)
 {
@@ -2203,7 +2203,7 @@ function loadPersonalMessage($pm_id)
 	);
 	// Can only be a hacker here!
 	if ($db->num_rows($request) == 0)
-		throw new Elk_Exception('no_access', false);
+		throw new \ElkArte\Exceptions\Exception('no_access', false);
 	$pm_details = $db->fetch_row($request);
 	$db->free_result($request);
 

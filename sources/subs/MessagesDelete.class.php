@@ -73,7 +73,7 @@ class MessagesDelete
 	 * @param int[] $msgs_id Messages to restore
 	 *
 	 * @return array|void
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function restoreMessages($msgs_id)
 	{
@@ -333,7 +333,7 @@ class MessagesDelete
 	 *              errors or login screens)
 	 *
 	 * @return bool
-	 * @throws Elk_Exception recycle_no_valid_board
+	 * @throws \ElkArte\Exceptions\Exception recycle_no_valid_board
 	 */
 	public function removeMessage($message, $decreasePostCount = true, $check_permissions = true)
 	{
@@ -456,7 +456,7 @@ class MessagesDelete
 				)
 			);
 			if ($db->num_rows($request) == 0)
-				throw new Elk_Exception('recycle_no_valid_board');
+				throw new \ElkArte\Exceptions\Exception('recycle_no_valid_board');
 			list ($isRead, $last_board_msg) = $db->fetch_row($request);
 			$db->free_result($request);
 
@@ -731,7 +731,7 @@ class MessagesDelete
 	 * @param mixed[] $board The the user is in (?)
 	 *
 	 * @return bool|string
-	 * @throws Elk_Exception cannot_delete_replies, cannot_delete_own, modify_post_time_passed
+	 * @throws \ElkArte\Exceptions\Exception cannot_delete_replies, cannot_delete_own, modify_post_time_passed
 	 */
 	protected function _checkDeletePermissions($row, $board)
 	{
@@ -755,21 +755,21 @@ class MessagesDelete
 						if ($row['id_member_poster'] == $user_info['id'])
 						{
 							if (!$delete_replies)
-								throw new Elk_Exception('cannot_delete_replies', 'permission');
+								throw new \ElkArte\Exceptions\Exception('cannot_delete_replies', 'permission');
 						}
 						else
-							throw new Elk_Exception('cannot_delete_own', 'permission');
+							throw new \ElkArte\Exceptions\Exception('cannot_delete_own', 'permission');
 					}
 					elseif (($row['id_member_poster'] != $user_info['id'] || !$delete_replies) && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
-						throw new Elk_Exception('modify_post_time_passed', false);
+						throw new \ElkArte\Exceptions\Exception('modify_post_time_passed', false);
 				}
 				elseif ($row['id_member_poster'] == $user_info['id'])
 				{
 					if (!$delete_replies)
-						throw new Elk_Exception('cannot_delete_replies', 'permission');
+						throw new \ElkArte\Exceptions\Exception('cannot_delete_replies', 'permission');
 				}
 				else
-					throw new Elk_Exception('cannot_delete_any', 'permission');
+					throw new \ElkArte\Exceptions\Exception('cannot_delete_any', 'permission');
 			}
 
 			// Can't delete an unapproved message, if you can't see it!
@@ -793,7 +793,7 @@ class MessagesDelete
 						isAllowedTo('delete_own');
 				}
 				elseif (!allowedTo('delete_any') && ($row['id_member_poster'] != $user_info['id'] || !allowedTo('delete_replies')) && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
-					throw new Elk_Exception('modify_post_time_passed', false);
+					throw new \ElkArte\Exceptions\Exception('modify_post_time_passed', false);
 			}
 			elseif ($row['id_member_poster'] == $user_info['id'] && !allowedTo('delete_any'))
 				isAllowedTo('delete_replies');
@@ -820,9 +820,9 @@ class MessagesDelete
 				}
 
 				if ($row['id_member'] != $user_info['id'] && !$remove_any)
-					throw new Elk_Exception('cannot_remove_any', 'permission');
+					throw new \ElkArte\Exceptions\Exception('cannot_remove_any', 'permission');
 				elseif (!$remove_any && !$remove_own)
-					throw new Elk_Exception('cannot_remove_own', 'permission');
+					throw new \ElkArte\Exceptions\Exception('cannot_remove_own', 'permission');
 			}
 			else
 			{
@@ -835,7 +835,7 @@ class MessagesDelete
 
 			// ...if there is only one post.
 			if (!empty($row['num_replies']))
-				throw new Elk_Exception('delFirstPost', false);
+				throw new \ElkArte\Exceptions\Exception('delFirstPost', false);
 
 			return true;
 		}
@@ -847,7 +847,7 @@ class MessagesDelete
 	 * @param int[] $msgs
 	 * @param integer $from_topic
 	 * @param integer $target_topic
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _mergePosts($msgs, $from_topic, $target_topic)
 	{

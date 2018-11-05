@@ -431,7 +431,7 @@ function getOldDrafts($days)
  * @package Drafts
  * @param mixed[] $draft
  * @param boolean $check_last_save
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function saveDraft($draft, $check_last_save = false)
 {
@@ -513,7 +513,7 @@ function saveDraft($draft, $check_last_save = false)
  * @param boolean $check_last_save
  *
  * @return bool|void
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function savePMDraft($recipientList, $draft, $check_last_save = false)
 {

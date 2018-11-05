@@ -31,7 +31,7 @@ class Paid_Subscriptions implements Scheduled_Task_Interface
 	 * Removes expired and reminds members who have ones close to expiration
 	 *
 	 * @return bool
-	 * @throws \Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function run()
 	{

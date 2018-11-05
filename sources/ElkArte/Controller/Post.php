@@ -20,6 +20,7 @@
 namespace ElkArte\Controller;
 
 use ElkArte\Errors\ErrorContext;
+use ElkArte\Exceptions\ControllerRedirectException;
 
 /**
  * Everything related to posting new replies and topics and modifications of them
@@ -107,7 +108,7 @@ class Post extends \ElkArte\AbstractController
 		{
 			$this->_events->trigger('prepare_context', array('id_member_poster' => $this->_topic_attributes['id_member']));
 		}
-		catch (Controller_Redirect_Exception $e)
+		catch (ControllerRedirectException $e)
 		{
 			return $e->doRedirect($this);
 		}
@@ -172,7 +173,7 @@ class Post extends \ElkArte\AbstractController
 
 		// You must be posting to *some* board.
 		if (empty($board) && !$context['make_event'])
-			throw new Elk_Exception('no_board', false);
+			throw new \ElkArte\Exceptions\Exception('no_board', false);
 
 		// All those wonderful modifiers and attachments
 		$this->_template_layers->add('additional_options', 200);
@@ -277,7 +278,7 @@ class Post extends \ElkArte\AbstractController
 
 		// Don't allow a post if it's locked and you aren't all powerful.
 		if ($this->_topic_attributes['locked'] && !allowedTo('moderate_board'))
-			throw new Elk_Exception('topic_locked', false);
+			throw new \ElkArte\Exceptions\Exception('topic_locked', false);
 	}
 
 	protected function _generating_message()
@@ -411,7 +412,7 @@ class Post extends \ElkArte\AbstractController
 				// The message they were trying to edit was most likely deleted.
 				// @todo Change this error message?
 				if ($message === false)
-					throw new Elk_Exception('no_board', false);
+					throw new \ElkArte\Exceptions\Exception('no_board', false);
 
 				$errors = checkMessagePermissions($message['message']);
 				if (!empty($errors))
@@ -447,7 +448,7 @@ class Post extends \ElkArte\AbstractController
 
 			// The message they were trying to edit was most likely deleted.
 			if ($message === false)
-				throw new Elk_Exception('no_message', false);
+				throw new \ElkArte\Exceptions\Exception('no_message', false);
 
 			// Trigger the prepare_editing event
 			$this->_events->trigger('prepare_editing', array('topic' => $topic, 'message' => &$message));
@@ -660,7 +661,7 @@ class Post extends \ElkArte\AbstractController
 			if (empty($_SERVER['CONTENT_LENGTH']))
 				redirectexit('action=post;board=' . $board . '.0');
 			else
-				throw new Elk_Exception('post_upload_error', false);
+				throw new \ElkArte\Exceptions\Exception('post_upload_error', false);
 		}
 		elseif (empty($_POST) && !empty($topic))
 			redirectexit('action=post;topic=' . $topic . '.0');
@@ -704,11 +705,11 @@ class Post extends \ElkArte\AbstractController
 
 			// Though the topic should be there, it might have vanished.
 			if (empty($topic_info))
-				throw new Elk_Exception('topic_doesnt_exist');
+				throw new \ElkArte\Exceptions\Exception('topic_doesnt_exist');
 
 			// Did this topic suddenly move? Just checking...
 			if ($topic_info['id_board'] != $board)
-				throw new Elk_Exception('not_a_topic');
+				throw new \ElkArte\Exceptions\Exception('not_a_topic');
 		}
 
 		// Replying to a topic?
@@ -716,7 +717,7 @@ class Post extends \ElkArte\AbstractController
 		{
 			// Don't allow a post if it's locked.
 			if ($topic_info['locked'] != 0 && !allowedTo('moderate_board'))
-				throw new Elk_Exception('topic_locked', false);
+				throw new \ElkArte\Exceptions\Exception('topic_locked', false);
 
 			// Do the permissions and approval stuff...
 			$becomesApproved = true;
@@ -801,13 +802,13 @@ class Post extends \ElkArte\AbstractController
 			$msgInfo = basicMessageInfo($_REQUEST['msg'], true);
 
 			if (empty($msgInfo))
-				throw new Elk_Exception('cant_find_messages', false);
+				throw new \ElkArte\Exceptions\Exception('cant_find_messages', false);
 
 			// Trigger teh save_modify event
 			$this->_events->trigger('save_modify', array('msgInfo' => &$msgInfo));
 
 			if (!empty($topic_info['locked']) && !allowedTo('moderate_board'))
-				throw new Elk_Exception('topic_locked', false);
+				throw new \ElkArte\Exceptions\Exception('topic_locked', false);
 
 			if (isset($_POST['lock']))
 			{
@@ -821,7 +822,7 @@ class Post extends \ElkArte\AbstractController
 			if ($msgInfo['id_member'] == $user_info['id'] && !allowedTo('modify_any'))
 			{
 				if ((!$modSettings['postmod_active'] || $msgInfo['approved']) && !empty($modSettings['edit_disable_time']) && $msgInfo['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
-					throw new Elk_Exception('modify_post_time_passed', false);
+					throw new \ElkArte\Exceptions\Exception('modify_post_time_passed', false);
 				elseif ($topic_info['id_member_started'] == $user_info['id'] && !allowedTo('modify_own'))
 					isAllowedTo('modify_replies');
 				else
@@ -902,7 +903,7 @@ class Post extends \ElkArte\AbstractController
 		{
 			$this->_events->trigger('before_save_post', array('post_errors' => $this->_post_errors, 'topic_info' => $topic_info));
 		}
-		catch (Controller_Redirect_Exception $e)
+		catch (ControllerRedirectException $e)
 		{
 			return $e->doRedirect($this);
 		}
@@ -1237,7 +1238,7 @@ class Post extends \ElkArte\AbstractController
 		$row = getTopicInfoByMsg($topic, empty($_REQUEST['msg']) ? 0 : (int) $_REQUEST['msg']);
 
 		if (empty($row))
-			throw new Elk_Exception('no_board', false);
+			throw new \ElkArte\Exceptions\Exception('no_board', false);
 
 		// Change either body or subject requires permissions to modify messages.
 		if (isset($_POST['message']) || isset($_POST['subject']) || isset($_REQUEST['icon']))
@@ -1248,7 +1249,7 @@ class Post extends \ElkArte\AbstractController
 			if ($row['id_member'] == $user_info['id'] && !allowedTo('modify_any'))
 			{
 				if ((!$modSettings['postmod_active'] || $row['approved']) && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
-					throw new Elk_Exception('modify_post_time_passed', false);
+					throw new \ElkArte\Exceptions\Exception('modify_post_time_passed', false);
 				elseif ($row['id_member_started'] == $user_info['id'] && !allowedTo('modify_own'))
 					isAllowedTo('modify_replies');
 				else

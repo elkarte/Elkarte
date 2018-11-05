@@ -16,6 +16,7 @@
  */
 
 use ElkArte\Errors\ErrorContext;
+use ElkArte\Exceptions\ControllerRedirectException;
 
 /**
  * Class Drafts_Post_Module
@@ -194,8 +195,8 @@ class Drafts_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	/**
 	 * Does the actual saving of a Draft to the DB
 	 *
-	 * @throws Controller_Redirect_Exception
-	 * @throws Elk_Exception
+	 * @throws ControllerRedirectException
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function before_save_post()
 	{
@@ -241,7 +242,7 @@ class Drafts_Post_Module extends ElkArte\sources\modules\Abstract_Module
 					obExit();
 				}
 
-				throw new Controller_Redirect_Exception('\\ElkArte\\controller\\Post', 'action_post');
+				throw new ControllerRedirectException('\\ElkArte\\controller\\Post', 'action_post');
 			}
 		}
 	}

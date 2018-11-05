@@ -94,7 +94,7 @@ class ProfileAccount extends \ElkArte\AbstractController
 			|| ($context['user']['is_owner'] && !$cur_profile['warning'])
 			|| !allowedTo('issue_warning'))
 		{
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 		}
 
 		// Get the base (errors related) stuff done.
@@ -476,7 +476,7 @@ class ProfileAccount extends \ElkArte\AbstractController
 	 * Issue a pm to the member getting the warning
 	 *
 	 * @return int
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _issue_warning_pm()
 	{
@@ -560,7 +560,7 @@ class ProfileAccount extends \ElkArte\AbstractController
 		// Check we got here as we should have!
 		if ($cur_profile != $this->_profile)
 		{
-			throw new Elk_Exception('no_access', false);
+			throw new \ElkArte\Exceptions\Exception('no_access', false);
 		}
 
 		$old_profile = &$cur_profile;
@@ -577,7 +577,7 @@ class ProfileAccount extends \ElkArte\AbstractController
 			$another = isAnotherAdmin($this->_memID);
 
 			if (empty($another))
-				throw new Elk_Exception('at_least_one_admin', 'critical');
+				throw new \ElkArte\Exceptions\Exception('at_least_one_admin', 'critical');
 		}
 
 		// Do you have permission to delete others profiles, or is that your profile you wanna delete?

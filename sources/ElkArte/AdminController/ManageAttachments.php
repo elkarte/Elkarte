@@ -657,7 +657,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 			// Guess that didn't work?
 			if (!is_writable($modSettings['custom_avatar_dir']))
-				throw new Elk_Exception('attachments_no_write', 'critical');
+				throw new \ElkArte\Exceptions\Exception('attachments_no_write', 'critical');
 		}
 
 		// Finally move the attachments..
@@ -1750,7 +1750,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 	 * @param mixed[] $to_fix attachments to fix
 	 * @param int $max_substep = 0
 	 * @todo Move to ManageAttachments.subs.php
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _pauseAttachmentMaintenance($to_fix, $max_substep = 0)
 	{

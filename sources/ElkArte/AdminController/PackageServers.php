@@ -136,7 +136,7 @@ class PackageServers extends \ElkArte\AbstractController
 
 		// Minimum required parameter did not exist so dump out.
 		else
-			throw new Elk_Exception('couldnt_connect', false);
+			throw new \ElkArte\Exceptions\Exception('couldnt_connect', false);
 
 		// Might take some time.
 		detectServer()->setTimeLimit(60);
@@ -392,7 +392,7 @@ class PackageServers extends \ElkArte\AbstractController
 
 		// To download something, we need either a valid server or url.
 		if (empty($this->_req->query->server) && (!empty($this->_req->query->get) && !empty($this->_req->post->package)))
-			throw new Elk_Exception('package_get_error_is_zero', false);
+			throw new \ElkArte\Exceptions\Exception('package_get_error_is_zero', false);
 
 		// Start off with nothing
 		$server = '';
@@ -421,7 +421,7 @@ class PackageServers extends \ElkArte\AbstractController
 			}
 			// Not found or some monkey business
 			else
-				throw new Elk_Exception('package_cant_download', false);
+				throw new \ElkArte\Exceptions\Exception('package_cant_download', false);
 		}
 		// Entered a url and optional filename
 		elseif (isset($this->_req->post->byurl) && !empty($this->_req->post->filename))
@@ -460,7 +460,7 @@ class PackageServers extends \ElkArte\AbstractController
 		$packageInfo = getPackageInfo($url . $package_id);
 
 		if (!is_array($packageInfo))
-			throw new Elk_Exception($packageInfo);
+			throw new \ElkArte\Exceptions\Exception($packageInfo);
 
 		// Save the package to disk, use FTP if necessary
 		create_chmod_control(
@@ -484,7 +484,7 @@ class PackageServers extends \ElkArte\AbstractController
 		$context['package'] = getPackageInfo($package_name);
 
 		if (!is_array($context['package']))
-			throw new Elk_Exception('package_cant_download', false);
+			throw new \ElkArte\Exceptions\Exception('package_cant_download', false);
 
 		if ($context['package']['type'] === 'modification')
 			$context['package']['install']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">[ ' . $txt['install_mod'] . ' ]</a>';
@@ -509,7 +509,7 @@ class PackageServers extends \ElkArte\AbstractController
 	 * - Reads the database to fetch the server url and name
 	 *
 	 * @return array
-	 * @throws Elk_Exception couldnt_connect
+	 * @throws \ElkArte\Exceptions\Exception couldnt_connect
 	 */
 	private function _package_server()
 	{
@@ -532,7 +532,7 @@ class PackageServers extends \ElkArte\AbstractController
 
 			// If server does not exist then dump out.
 			if (empty($url))
-				throw new Elk_Exception('couldnt_connect', false);
+				throw new \ElkArte\Exceptions\Exception('couldnt_connect', false);
 		}
 
 		return array($name, $url, $server);
@@ -553,15 +553,15 @@ class PackageServers extends \ElkArte\AbstractController
 		// @todo Use FTP if the packages directory is not writable.
 		// Check the file was even sent!
 		if (!isset($_FILES['package']['name']) || $_FILES['package']['name'] == '')
-			throw new Elk_Exception('package_upload_error_nofile');
+			throw new \ElkArte\Exceptions\Exception('package_upload_error_nofile');
 		elseif (!is_uploaded_file($_FILES['package']['tmp_name']) || (ini_get('open_basedir') == '' && !file_exists($_FILES['package']['tmp_name'])))
-			throw new Elk_Exception('package_upload_error_failed');
+			throw new \ElkArte\Exceptions\Exception('package_upload_error_failed');
 
 		// Make sure it has a sane filename.
 		$_FILES['package']['name'] = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('_', '.', ''), $_FILES['package']['name']);
 
 		if (strtolower(substr($_FILES['package']['name'], -4)) !== '.zip' && strtolower(substr($_FILES['package']['name'], -4)) !== '.tgz' && strtolower(substr($_FILES['package']['name'], -7)) !== '.tar.gz')
-			throw new Elk_Exception('package_upload_error_supports', false, array('zip, tgz, tar.gz'));
+			throw new \ElkArte\Exceptions\Exception('package_upload_error_supports', false, array('zip, tgz, tar.gz'));
 
 		// We only need the filename...
 		$packageName = basename($_FILES['package']['name']);
@@ -571,7 +571,7 @@ class PackageServers extends \ElkArte\AbstractController
 
 		// @todo Maybe just roll it like we do for downloads?
 		if (file_exists($destination))
-			throw new Elk_Exception('package_upload_error_exists');
+			throw new \ElkArte\Exceptions\Exception('package_upload_error_exists');
 
 		// Now move the file.
 		move_uploaded_file($_FILES['package']['tmp_name'], $destination);
@@ -587,7 +587,7 @@ class PackageServers extends \ElkArte\AbstractController
 			@unlink($destination);
 			theme()->getTemplates()->loadLanguageFile('Errors');
 			$txt[$context['package']] = str_replace('{MANAGETHEMEURL}', $scripturl . '?action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id'] . '#theme_install', $txt[$context['package']]);
-			throw new Elk_Exception('package_upload_error_broken', false, $txt[$context['package']]);
+			throw new \ElkArte\Exceptions\Exception('package_upload_error_broken', false, $txt[$context['package']]);
 		}
 		// Is it already uploaded, maybe?
 		else
@@ -615,7 +615,7 @@ class PackageServers extends \ElkArte\AbstractController
 					{
 						@unlink($destination);
 						theme()->getTemplates()->loadLanguageFile('Errors');
-						throw new Elk_Exception('package_upload_already_exists', 'general', $package->getFilename());
+						throw new \ElkArte\Exceptions\Exception('package_upload_already_exists', 'general', $package->getFilename());
 					}
 				}
 			}

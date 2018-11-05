@@ -188,7 +188,7 @@ class RemoveTopic extends \ElkArte\AbstractController
 		// Is recycled board enabled?
 		if (empty($modSettings['recycle_enable']))
 		{
-			throw new Elk_Exception('restored_disabled', 'critical');
+			throw new \ElkArte\Exceptions\Exception('restored_disabled', 'critical');
 		}
 
 		// Can we be in here?
@@ -214,7 +214,7 @@ class RemoveTopic extends \ElkArte\AbstractController
 		// Didn't find some things?
 		if ($restorer->unfoundRestoreMessages())
 		{
-			throw new Elk_Exception('restore_not_found', false, array('<ul><li>' . implode('</li><li>', $restorer->unfoundRestoreMessages(true)) . '</li></ul>'));
+			throw new \ElkArte\Exceptions\Exception('restore_not_found', false, array('<ul><li>' . implode('</li><li>', $restorer->unfoundRestoreMessages(true)) . '</li></ul>'));
 		}
 
 		// Lets send them back somewhere that may make sense
@@ -261,7 +261,7 @@ class RemoveTopic extends \ElkArte\AbstractController
 				&& !empty($modSettings['edit_disable_time'])
 				&& $this->_topic_info['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
 			{
-				throw new Elk_Exception('modify_post_time_passed', false);
+				throw new \ElkArte\Exceptions\Exception('modify_post_time_passed', false);
 			}
 		}
 		elseif ($this->_topic_info['id_member_started'] == $user_info['id'] && !allowedTo('delete_any'))
@@ -278,7 +278,7 @@ class RemoveTopic extends \ElkArte\AbstractController
 	 * After deleting a message(s) returns the user to the best possible location
 	 *
 	 * @param bool $full_topic if the entire topic was removed
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	private function _redirectBack($full_topic)
 	{
