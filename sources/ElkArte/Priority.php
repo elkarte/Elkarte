@@ -11,6 +11,8 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Priority Class An abstract class to deal with priority
  * of template layers
