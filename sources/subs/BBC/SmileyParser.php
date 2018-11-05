@@ -240,7 +240,7 @@ class SmileyParser
 	protected function getFromDB()
 	{
 		// Load the smileys in reverse order by length so they don't get parsed wrong.
-		if (!\\ElkArte\Cache\Cache::instance()->getVar($temp, 'parsing_smileys', 480))
+		if (!\ElkArte\Cache\Cache::instance()->getVar($temp, 'parsing_smileys', 480))
 		{
 			$smileysfrom = array();
 			$smileysto = array();
@@ -264,7 +264,7 @@ class SmileyParser
 
 			// Cache this for a bit
 			$temp = array($smileysfrom, $smileysto, $smileysdescs);
-			\\ElkArte\Cache\Cache::instance()->put('parsing_smileys', $temp, 480);
+			\ElkArte\Cache\Cache::instance()->put('parsing_smileys', $temp, 480);
 		}
 
 		return $temp;

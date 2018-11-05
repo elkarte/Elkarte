@@ -22,7 +22,7 @@ namespace ElkArte\Errors;
 /**
  * Class to handle all forum errors and exceptions
  */
-class Errors extends \AbstractModel
+class Errors extends \ElkArte\AbstractModel
 {
 	/** @var Errors Sole private Errors instance */
 	private static $_errors = null;
@@ -403,7 +403,7 @@ class Errors extends \AbstractModel
 	{
 		global $mbname, $maintenance, $webmaster_email, $db_error_send;
 
-		$cache = \\ElkArte\Cache\Cache::instance();
+		$cache = \ElkArte\Cache\Cache::instance();
 
 		// Just check we're not in any buffers, just in case.
 		while (ob_get_level() > 0)

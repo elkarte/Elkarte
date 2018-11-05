@@ -17,7 +17,7 @@ use ElkArte\Theme\TemplateLayers;
 /**
  * Class to handle all forum errors and exceptions
  */
-class Log extends \AbstractModel
+class Log extends \ElkArte\AbstractModel
 {
 	/**
 	 * Delete all or some of the errors in the error log.
