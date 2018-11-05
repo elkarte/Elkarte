@@ -33,7 +33,6 @@
 		"myclabs/deep-copy": "1.8.0"
 	},
 	"autoload": {
-		"files": ["sources/Autoloader.class.php"],
-		"psr-4": { "ElkArte\\": ["sources/", "sources/subs/"] }
+		"psr-4": { "ElkArte\\": ["sources/ElkArte"] }
 	}
 }

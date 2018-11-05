@@ -247,12 +247,12 @@ class Bootstrap
 	 */
 	private function loadAutoloader()
 	{
-		// Initialize the class Autoloader
-		require_once(SOURCEDIR . '/Autoloader.class.php');
-		$autoloader = Elk_Autoloader::instance();
-		$autoloader->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
-		$autoloader->register(SOURCEDIR, '\\ElkArte');
-		$autoloader->register(SOURCEDIR . '/subs/BBC', '\\BBC');
+		require_once(EXTDIR . '/ClassLoader.php');
+		$loader = new \Composer\Autoload\ClassLoader();
+
+		$loader->set('ElkArte\\', SOURCEDIR, '/ElkArte');
+		$loader->set('BBC\\', SOURCEDIR . '/subs/BBC');
+		$loader->register();
 	}
 
 	/**
