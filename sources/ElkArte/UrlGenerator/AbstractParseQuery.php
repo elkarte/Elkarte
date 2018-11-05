@@ -12,12 +12,24 @@
  *
  */
 
-namespace ElkArte\UrlGenerator\Standard;
+namespace ElkArte\UrlGenerator;
 
-use ElkArte\UrlGenerator\Abstract_ParseQuery;
-
-class ParseQuery extends Abstract_ParseQuery
+abstract class AbstractParseQuery
 {
+	/**
+	 * Holds the special types of URLs we know
+	 *
+	 * @var string[]
+	 */
+	protected $parsers = ['b' => 'board', 't' => 'topic', 'p' => 'profile', 's' => 'standard'];
+
+	/**
+	 * The character to use as parameters separator
+	 *
+	 * @var string
+	 */
+	protected $separator = ';';
+
 	/**
 	 * Public facing function that converts the query part of the URL from the
 	 * semantic format back to the standard ElkArte one
@@ -25,8 +37,5 @@ class ParseQuery extends Abstract_ParseQuery
 	 * @param string $query The semantic query
 	 * @return string $query The corresponding standard query
 	 */
-	public function parse($query)
-	{
-		return $query;
-	}
+	abstract public function parse($query);
 }

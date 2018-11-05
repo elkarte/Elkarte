@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Semantic representation of any URL that doesn't have a custom builder
+ * Standard representation of any URL that doesn't have a custom builder
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -11,11 +11,11 @@
  *
  */
 
-namespace ElkArte\UrlGenerator\Semantic;
+namespace ElkArte\UrlGenerator\Standard;
 
-use ElkArte\UrlGenerator\Abstract_Url_Generator;
+use ElkArte\UrlGenerator\AbstractUrlGenerator;
 
-class Standard extends Abstract_Url_Generator
+class Standard extends AbstractUrlGenerator
 {
 	/**
 	 * {@inheritdoc }

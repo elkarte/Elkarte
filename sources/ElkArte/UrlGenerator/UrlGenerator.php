@@ -13,7 +13,9 @@
  *
  */
 
-class Url_Generator
+namespace ElkArte\UrlGenerator;
+
+class UrlGenerator
 {
 	/**
 	 * Configuration parameters (for the moment script url and replacements)

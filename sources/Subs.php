@@ -1902,7 +1902,7 @@ function initUrlGenerator()
 
 	if ($generator === null)
 	{
-		$generator = new Url_Generator([
+		$generator = new \ElkArte\UrlGenerator\UrlGenerator([
 			'generator' => ucfirst($url_format ?? 'standard'),
 			'scripturl' => $scripturl,
 			'replacements' => [

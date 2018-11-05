@@ -14,9 +14,9 @@
 
 namespace ElkArte\UrlGenerator\Semantic;
 
-use ElkArte\UrlGenerator\Abstract_ParseQuery;
+use ElkArte\UrlGenerator\AbstractParseQuery;
 
-class ParseQuery extends Abstract_ParseQuery
+class ParseQuery extends AbstractParseQuery
 {
 	/**
 	 * Public facing function that converts the query part of the URL from the
