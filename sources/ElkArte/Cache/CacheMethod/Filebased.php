@@ -11,7 +11,7 @@
  *
  */
 
-namespace ElkArte\sources\subs\CacheMethod;
+namespace ElkArte\Cache\CacheMethod;
 
 use FilesystemIterator;
 use UnexpectedValueException;
@@ -26,7 +26,7 @@ use UnexpectedValueException;
  * It requires the CACHEDIR constant to be defined and pointing to a
  * writable directory.
  */
-class Filebased extends Cache_Method_Abstract
+class Filebased extends AbstractCacheMethod
 {
 	/**
 	 * {@inheritdoc}

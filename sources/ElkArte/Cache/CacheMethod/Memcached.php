@@ -11,12 +11,12 @@
  *
  */
 
-namespace ElkArte\sources\subs\CacheMethod;
+namespace ElkArte\Cache\CacheMethod;
 
 /**
  * Memcached
  */
-class Memcached extends Cache_Method_Abstract
+class Memcached extends AbstractCacheMethod
 {
 	/**
 	 * {@inheritdoc}

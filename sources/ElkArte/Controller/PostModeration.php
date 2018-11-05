@@ -197,7 +197,7 @@ class PostModeration extends \ElkArte\AbstractController
 				else
 					removeMessages($toAction, $details, $context['current_view']);
 
-				Cache::instance()->remove('num_menu_errors');
+				\ElkArte\Cache\Cache::instance()->remove('num_menu_errors');
 			}
 		}
 
@@ -318,7 +318,7 @@ class PostModeration extends \ElkArte\AbstractController
 				else
 					removeAttachments(array('id_attach' => $attachments, 'do_logging' => true));
 
-				Cache::instance()->remove('num_menu_errors');
+				\ElkArte\Cache\Cache::instance()->remove('num_menu_errors');
 			}
 		}
 
@@ -499,7 +499,7 @@ class PostModeration extends \ElkArte\AbstractController
 				logAction(($message_info['approved'] ? 'un' : '') . 'approve', array('topic' => $topic, 'subject' => $message_info['subject'], 'member' => $message_info['id_member'], 'board' => $board));
 		}
 
-		Cache::instance()->remove('num_menu_errors');
+		\ElkArte\Cache\Cache::instance()->remove('num_menu_errors');
 
 		redirectexit('topic=' . $topic . '.msg' . $current_msg . '#msg' . $current_msg);
 	}

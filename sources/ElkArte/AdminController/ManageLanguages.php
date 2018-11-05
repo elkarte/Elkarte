@@ -605,7 +605,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 		);
 
 		// Kill the cache, as it is now invalid..
-		$cache = Cache::instance();
+		$cache = \ElkArte\Cache\Cache::instance();
 		$cache->put('known_languages', null, $cache->maxLevel(1) ? 86400 : 3600);
 
 		createList($listOptions);

@@ -367,7 +367,7 @@ class ManageThemes extends \ElkArte\AbstractController
 					$setValues[] = array($id, 0, 'base_images_url', $this->_req->post->reset_url . '/' . basename($theme['base_theme_dir']) . '/' . basename($theme['base_images_url']));
 				}
 
-				Cache::instance()->remove('theme_settings-' . $id);
+				\ElkArte\Cache\Cache::instance()->remove('theme_settings-' . $id);
 			}
 
 			if (!empty($setValues))
@@ -483,8 +483,8 @@ class ManageThemes extends \ElkArte\AbstractController
 			}
 
 			// Cache the theme settings
-			Cache::instance()->remove('theme_settings-' . $theme);
-			Cache::instance()->remove('theme_settings-1');
+			\ElkArte\Cache\Cache::instance()->remove('theme_settings-' . $theme);
+			\ElkArte\Cache\Cache::instance()->remove('theme_settings-1');
 
 			redirectexit('action=admin;area=theme;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=reset');
 		}
@@ -730,8 +730,8 @@ class ManageThemes extends \ElkArte\AbstractController
 				updateThemeOptions($inserts);
 
 			// Clear and Invalidate the cache.
-			Cache::instance()->remove('theme_settings-' . $theme);
-			Cache::instance()->remove('theme_settings-1');
+			\ElkArte\Cache\Cache::instance()->remove('theme_settings-' . $theme);
+			\ElkArte\Cache\Cache::instance()->remove('theme_settings-1');
 			updateSettings(array('settings_updated' => time()));
 
 			redirectexit('action=admin;area=theme;sa=list;th=' . $theme . ';' . $context['session_var'] . '=' . $context['session_id']);
@@ -1007,7 +1007,7 @@ class ManageThemes extends \ElkArte\AbstractController
 				{
 					updateThemeOptions(array($th, $user_info['id'], 'theme_variant', $vrt));
 
-					Cache::instance()->remove('theme_settings-' . $th . ':' . $user_info['id']);
+					\ElkArte\Cache\Cache::instance()->remove('theme_settings-' . $th . ':' . $user_info['id']);
 
 					$_SESSION['id_variant'] = 0;
 				}
@@ -1021,7 +1021,7 @@ class ManageThemes extends \ElkArte\AbstractController
 				updateThemeOptions(array($th, 0, 'default_variant', $vrt));
 
 				// Make it obvious that it's changed
-				Cache::instance()->remove('theme_settings-' . $th);
+				\ElkArte\Cache\Cache::instance()->remove('theme_settings-' . $th);
 			}
 
 			// For everyone.
@@ -1056,7 +1056,7 @@ class ManageThemes extends \ElkArte\AbstractController
 				if (!empty($vrt))
 				{
 					updateThemeOptions(array($th, $u, 'theme_variant', $vrt));
-					Cache::instance()->remove('theme_settings-' . $th . ':' . $u);
+					\ElkArte\Cache\Cache::instance()->remove('theme_settings-' . $th . ':' . $u);
 
 					if ($user_info['id'] == $u)
 						$_SESSION['id_variant'] = 0;
@@ -1416,7 +1416,7 @@ class ManageThemes extends \ElkArte\AbstractController
 		if (isset($this->_req->query->th) || isset($this->_req->query->id))
 		{
 			// Invalidate the current themes cache too.
-			Cache::instance()->remove('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id']);
+			\ElkArte\Cache\Cache::instance()->remove('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id']);
 
 			$settings['theme_id'] = $this->_req->getQuery('th', 'intval', $this->_req->getQuery('id', 'intval'));
 		}
@@ -1476,7 +1476,7 @@ class ManageThemes extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/Themes.subs.php');
 		updateThemeOptions(array($settings['theme_id'], $user_info['id'], $this->_req->query->var, is_array($this->_req->query->val) ? implode(',', $this->_req->query->val) : $this->_req->query->val));
 
-		Cache::instance()->remove('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id']);
+		\ElkArte\Cache\Cache::instance()->remove('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id']);
 
 		// Don't output anything...
 		redirectexit($settings['images_url'] . '/blank.png');

@@ -15,6 +15,8 @@
  *
  */
 
+namespace ElkArte\Cache;
+
 /**
  * Class Cache - Methods that deal with getting and setting cache values.
  */
@@ -125,7 +127,7 @@ class Cache
 	 */
 	protected function _init()
 	{
-		$cache_class = '\\ElkArte\\sources\\subs\\CacheMethod\\' . ucfirst($this->_accelerator);
+		$cache_class = '\\ElkArte\\Cache\\CacheMethod\\' . ucfirst($this->_accelerator);
 
 		if (class_exists($cache_class))
 		{
@@ -245,7 +247,7 @@ class Cache
 	 * Gets the value from the cache specified by key, so long as it is not older than ttl seconds.
 	 *
 	 * - It may often "miss", so shouldn't be depended on.
-	 * - It supports the same as cache::put().
+	 * - It supports the same as \ElkArte\Cache\Cache::put().
 	 *
 	 * @param string $key
 	 * @param int $ttl = 120
@@ -515,7 +517,6 @@ class Cache
 				);
 			}
 
-			Elk_Autoloader::instance()->register(SUBSDIR . '/CacheMethod', '\\ElkArte\\sources\\subs\\CacheMethod');
 			self::$_instance = new Cache($cache_enable, $cache_accelerator, $options);
 		}
 

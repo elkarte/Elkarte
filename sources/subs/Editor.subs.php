@@ -62,7 +62,7 @@ function getMessageIcons($board_id)
 	else
 	{
 		$icons = array();
-		if (!Cache::instance()->getVar($icons, 'posting_icons-' . $board_id, 480))
+		if (!\ElkArte\Cache\Cache::instance()->getVar($icons, 'posting_icons-' . $board_id, 480))
 		{
 			$icon_data = $db->fetchQuery('
 				SELECT 
@@ -85,7 +85,7 @@ function getMessageIcons($board_id)
 				);
 			}
 
-			Cache::instance()->put('posting_icons-' . $board_id, $icons, 480);
+			\ElkArte\Cache\Cache::instance()->put('posting_icons-' . $board_id, $icons, 480);
 		}
 	}
 
@@ -406,7 +406,7 @@ function create_control_richedit($editorOptions)
 		elseif ($context['smiley_enabled'])
 		{
 			$temp = array();
-			if (!Cache::instance()->getVar($temp, 'posting_smileys', 480))
+			if (!\ElkArte\Cache\Cache::instance()->getVar($temp, 'posting_smileys', 480))
 			{
 				$db->fetchQueryCallback('
 					SELECT code, filename, description, smiley_row, hidden
@@ -439,7 +439,7 @@ function create_control_richedit($editorOptions)
 						$context['smileys'][$section][$last_row]['isLast'] = true;
 				}
 
-				Cache::instance()->put('posting_smileys', $context['smileys'], 480);
+				\ElkArte\Cache\Cache::instance()->put('posting_smileys', $context['smileys'], 480);
 			}
 			else
 				$context['smileys'] = $temp;

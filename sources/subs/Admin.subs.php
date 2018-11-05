@@ -432,7 +432,7 @@ function updateAdminPreferences()
 	updateThemeOptions(array(1, $user_info['id'], 'admin_preferences', $options['admin_preferences']));
 
 	// Make sure we invalidate any cache.
-	Cache::instance()->put('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 0);
+	\ElkArte\Cache\Cache::instance()->put('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 0);
 }
 
 /**

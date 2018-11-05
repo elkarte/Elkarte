@@ -16,7 +16,7 @@ namespace ElkArte\sources\subs\CacheMethod;
 /**
  * Alternative PHP Cache or APC / APCu
  */
-class Apc extends Cache_Method_Abstract
+class Apc extends AbstractCacheMethod
 {
 	/**
 	 * {@inheritdoc}

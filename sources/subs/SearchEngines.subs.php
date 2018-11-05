@@ -34,7 +34,7 @@ function spiderCheck()
 
 	// We cache the spider data for five minutes if we can.
 	$spider_data = array();
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 	if (!$cache->getVar($spider_data, 'spider_search', 300))
 	{
 		$request = $db->query('', '

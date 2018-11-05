@@ -85,7 +85,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		}
 
 		// Load the label counts data.
-		if ($user_settings['new_pm'] || !Cache::instance()->getVar($context['labels'], 'labelCounts:' . $user_info['id'], 720))
+		if ($user_settings['new_pm'] || !\ElkArte\Cache\Cache::instance()->getVar($context['labels'], 'labelCounts:' . $user_info['id'], 720))
 		{
 			$this->_loadLabels();
 
@@ -1775,7 +1775,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			}
 
 			// Make sure we're not caching this!
-			Cache::instance()->remove('labelCounts:' . $user_info['id']);
+			\ElkArte\Cache\Cache::instance()->remove('labelCounts:' . $user_info['id']);
 
 			// To make the changes appear right away, redirect.
 			redirectexit('action=pm;sa=manlabels');
@@ -1841,7 +1841,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			}
 
 			// Invalidate any cached data and reload so we show the saved values
-			Cache::instance()->remove('member_data-profile-' . $user_info['id']);
+			\ElkArte\Cache\Cache::instance()->remove('member_data-profile-' . $user_info['id']);
 			loadMemberData($user_info['id'], false, 'profile');
 			$cur_profile = $user_profile[$user_info['id']];
 		}

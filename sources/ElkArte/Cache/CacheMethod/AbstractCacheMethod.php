@@ -11,13 +11,13 @@
  *
  */
 
-namespace ElkArte\sources\subs\CacheMethod;
+namespace ElkArte\Cache\CacheMethod;
 
 /**
  * Abstract cache class, implementing the Cache_Method_Interface interface.
  * Used to provide common methods and properties to the caching classes
  */
-abstract class Cache_Method_Abstract implements Cache_Method_Interface
+abstract class AbstractCacheMethod implements CacheMethodInterface
 {
 	/**
 	 * The settings of the caching engine

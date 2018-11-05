@@ -38,7 +38,7 @@ function reloadSettings()
 	global $modSettings;
 
 	$db = database();
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 	$hooks = Hooks::instance();
 
 	// Try to load it from the cache first; it'll never get cached if the setting is off.
@@ -159,7 +159,7 @@ function loadUserSettings()
 	global $context, $modSettings, $user_settings, $cookiename, $user_info, $language;
 
 	$db = database();
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	// Check first the integration, then the cookie, and last the session.
 	if (count($integration_ids = call_integration_hook('integrate_verify_user')) > 0)
@@ -439,7 +439,7 @@ function loadBoard()
 	global $board_info, $board, $topic, $user_info;
 
 	$db = database();
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	// Assume they are not a moderator.
 	$user_info['is_mod'] = false;
@@ -730,7 +730,7 @@ function loadPermissions()
 
 	$removals = array();
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	if ($cache->isEnabled())
 	{
@@ -862,7 +862,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	global $user_profile, $modSettings, $board_info, $context, $user_info;
 
 	$db = database();
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	// Can't just look for no users :P.
 	if (empty($users))
@@ -1462,7 +1462,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 	if (empty($filenames))
 		return;
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	if (!is_array($filenames))
 		$filenames = array($filenames);
@@ -1701,7 +1701,7 @@ function getBoardParents($id_parent)
 	global $scripturl;
 
 	$db = database();
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 	$boards = array();
 
 	// First check if we have this cached already.
@@ -1775,7 +1775,7 @@ function getLanguages($use_cache = true)
 {
 	global $settings;
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	// Either we don't use the cache, or its expired.
 	$languages = array();
@@ -2033,7 +2033,7 @@ function doSecurityChecks()
 
 	$show_warnings = false;
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	if (allowedTo('admin_forum') && !$user_info['is_guest'])
 	{

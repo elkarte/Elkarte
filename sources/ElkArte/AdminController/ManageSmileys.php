@@ -1720,7 +1720,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 
 	protected function clearSmileyCache()
 	{
-		Cache::instance()->remove('parsing_smileys');
-		Cache::instance()->remove('posting_smileys');
+		\ElkArte\Cache\Cache::instance()->remove('parsing_smileys');
+		\ElkArte\Cache\Cache::instance()->remove('posting_smileys');
 	}
 }

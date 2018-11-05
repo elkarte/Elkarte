@@ -97,7 +97,7 @@ class ThemeLoader
 	{
 		global $modSettings, $boardurl;
 
-		$cache = Cache::instance();
+		$cache = \ElkArte\Cache\Cache::instance();
 
 		// Do we already have this members theme data and specific options loaded (for aggressive cache settings)
 		$temp = [];

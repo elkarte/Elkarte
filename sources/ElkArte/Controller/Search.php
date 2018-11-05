@@ -426,7 +426,7 @@ class Search extends \ElkArte\AbstractController
 		$context['page_index'] = constructPageIndex($scripturl . '?action=search;sa=results;params=' . $context['params'], $_REQUEST['start'], $this->_search->getNumResults(), $modSettings['search_results_per_page'], false);
 
 		// Consider the search complete!
-		Cache::instance()->remove('search_start:' . ($user_info['is_guest'] ? $user_info['ip'] : $user_info['id']));
+		\ElkArte\Cache\Cache::instance()->remove('search_start:' . ($user_info['is_guest'] ? $user_info['ip'] : $user_info['id']));
 
 		$context['sub_template'] = 'results';
 		$context['page_title'] = $txt['search_results'];

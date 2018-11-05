@@ -30,7 +30,7 @@
  */
 function cache_quick_get($key, $file, $function, $params, $level = 1)
 {
-	return Cache::instance()->quick_get($key, $file, $function, $params, $level);
+	return \ElkArte\Cache\Cache::instance()->quick_get($key, $file, $function, $params, $level);
 }
 
 /**
@@ -49,14 +49,14 @@ function cache_quick_get($key, $file, $function, $params, $level = 1)
  */
 function cache_put_data($key, $value, $ttl = 120)
 {
-	Cache::instance()->put($key, $value, $ttl);
+	\ElkArte\Cache\Cache::instance()->put($key, $value, $ttl);
 }
 
 /**
  * Gets the value from the cache specified by key, so long as it is not older than ttl seconds.
  *
  * - It may often "miss", so shouldn't be depended on.
- * - It supports the same as Cache::instance()->put().
+ * - It supports the same as \ElkArte\Cache\Cache::instance()->put().
  *
  * @param string $key
  * @param int $ttl = 120
@@ -65,7 +65,7 @@ function cache_put_data($key, $value, $ttl = 120)
  */
 function cache_get_data($key, $ttl = 120)
 {
-	return Cache::instance()->get($key, $ttl);
+	return \ElkArte\Cache\Cache::instance()->get($key, $ttl);
 }
 
 /**
@@ -82,7 +82,7 @@ function cache_get_data($key, $ttl = 120)
  */
 function clean_cache($type = '')
 {
-	Cache::instance()->clean($type);
+	\ElkArte\Cache\Cache::instance()->clean($type);
 }
 
 /**

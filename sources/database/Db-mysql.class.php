@@ -546,7 +546,7 @@ class Database_MySQL extends Database_Abstract
 		}
 
 		// Database error auto fixing ;).
-		if (function_exists('Cache::instance()->get') && (!isset($modSettings['autoFixDatabase']) || $modSettings['autoFixDatabase'] == '1'))
+		if (function_exists('\ElkArte\Cache\Cache::instance()->get') && (!isset($modSettings['autoFixDatabase']) || $modSettings['autoFixDatabase'] == '1'))
 		{
 			$db_last_error = db_last_error();
 
@@ -554,7 +554,7 @@ class Database_MySQL extends Database_Abstract
 			$old_cache = isset($modSettings['cache_enable']) ? $modSettings['cache_enable'] : null;
 			$modSettings['cache_enable'] = '1';
 
-			if (Cache::instance()->getVar($temp, 'db_last_error', 600))
+			if (\ElkArte\Cache\Cache::instance()->getVar($temp, 'db_last_error', 600))
 				$db_last_error = max($db_last_error, $temp);
 
 			if ($db_last_error < time() - 3600 * 24 * 3)
@@ -601,8 +601,8 @@ class Database_MySQL extends Database_Abstract
 				require_once(SUBSDIR . '/Mail.subs.php');
 
 				// Make a note of the REPAIR...
-				Cache::instance()->put('db_last_error', time(), 600);
-				if (!Cache::instance()->getVar($temp, 'db_last_error', 600))
+				\ElkArte\Cache\Cache::instance()->put('db_last_error', time(), 600);
+				if (!\ElkArte\Cache\Cache::instance()->getVar($temp, 'db_last_error', 600))
 					updateDbLastError(time());
 
 				// Attempt to find and repair the broken table.

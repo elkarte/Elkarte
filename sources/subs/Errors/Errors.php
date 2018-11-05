@@ -403,7 +403,7 @@ class Errors extends \AbstractModel
 	{
 		global $mbname, $maintenance, $webmaster_email, $db_error_send;
 
-		$cache = \Cache::instance();
+		$cache = \\ElkArte\Cache\Cache::instance();
 
 		// Just check we're not in any buffers, just in case.
 		while (ob_get_level() > 0)

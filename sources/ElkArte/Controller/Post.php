@@ -1123,7 +1123,7 @@ class Post extends \ElkArte\AbstractController
 		}
 
 		if ($board_info['num_topics'] == 0)
-			Cache::instance()->remove('board-' . $board);
+			\ElkArte\Cache\Cache::instance()->remove('board-' . $board);
 
 		if (!empty($_POST['announce_topic']))
 			redirectexit('action=announce;sa=selectgroup;topic=' . $topic . (!empty($_POST['move']) && allowedTo('move_any') ? ';move' : '') . (empty($_REQUEST['goback']) ? '' : ';goback'));

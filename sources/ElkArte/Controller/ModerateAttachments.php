@@ -102,7 +102,7 @@ class ModerateAttachments extends \ElkArte\AbstractController
 			removeAttachments(array('id_attach' => $attachments, 'do_logging' => true));
 
 		// We approved or removed, either way we reset those numbers
-		Cache::instance()->remove('num_menu_errors');
+		\ElkArte\Cache\Cache::instance()->remove('num_menu_errors');
 
 		// Return to the topic....
 		redirectexit($redirect);

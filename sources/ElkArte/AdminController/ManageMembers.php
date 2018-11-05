@@ -1279,7 +1279,7 @@ class ManageMembers extends \ElkArte\AbstractController
 		}
 
 		// Update the menu action cache so its forced to refresh
-		Cache::instance()->remove('num_menu_errors');
+		\ElkArte\Cache\Cache::instance()->remove('num_menu_errors');
 	}
 
 	/**

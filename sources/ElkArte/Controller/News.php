@@ -206,7 +206,7 @@ class News extends \ElkArte\AbstractController
 
 		$cachekey = md5(serialize($cachekey) . (!empty($this->_query_this_board) ? $this->_query_this_board : ''));
 		$cache_t = microtime(true);
-		$cache = Cache::instance();
+		$cache = \ElkArte\Cache\Cache::instance();
 
 		// Get the associative array representing the xml.
 		if (!$user_info['is_guest'] || $cache->levelHigherThan(2))

@@ -1107,7 +1107,7 @@ function getAvatar($id_attach)
 
 	// Use our cache when possible
 	$cache = array();
-	if (Cache::instance()->getVar($cache, 'getAvatar_id-' . $id_attach))
+	if (\ElkArte\Cache\Cache::instance()->getVar($cache, 'getAvatar_id-' . $id_attach))
 		$avatarData = $cache;
 	else
 	{
@@ -1127,7 +1127,7 @@ function getAvatar($id_attach)
 			$avatarData = $db->fetch_row($request);
 		$db->free_result($request);
 
-		Cache::instance()->put('getAvatar_id-' . $id_attach, $avatarData, 900);
+		\ElkArte\Cache\Cache::instance()->put('getAvatar_id-' . $id_attach, $avatarData, 900);
 	}
 
 	return $avatarData;
@@ -1468,7 +1468,7 @@ function url_image_size($url)
 
 	// Can we pull this from the cache... please please?
 	$temp = array();
-	if (Cache::instance()->getVar($temp, 'url_image_size-' . md5($url), 240))
+	if (\ElkArte\Cache\Cache::instance()->getVar($temp, 'url_image_size-' . md5($url), 240))
 		return $temp;
 
 	$t = microtime(true);
@@ -1525,7 +1525,7 @@ function url_image_size($url)
 
 	// If this took a long time, we may never have to do it again, but then again we might...
 	if (microtime(true) - $t > 0.8)
-		Cache::instance()->put('url_image_size-' . md5($url), $size, 240);
+		\ElkArte\Cache\Cache::instance()->put('url_image_size-' . md5($url), $size, 240);
 
 	// Didn't work.
 	return $size;

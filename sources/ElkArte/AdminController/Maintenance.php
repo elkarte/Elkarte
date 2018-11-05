@@ -464,7 +464,7 @@ class Maintenance extends \ElkArte\AbstractController
 		validateToken('admin-maint');
 
 		// Just wipe the whole cache directory!
-		Cache::instance()->clean();
+		\ElkArte\Cache\Cache::instance()->clean();
 
 		$context['maintenance_finished'] = $txt['maintain_cache'];
 	}
@@ -1273,8 +1273,8 @@ class Maintenance extends \ElkArte\AbstractController
 		}
 
 		// Don't confuse admins by having an out of date cache.
-		Cache::instance()->remove('board-' . $id_board_from);
-		Cache::instance()->remove('board-' . $id_board_to);
+		\ElkArte\Cache\Cache::instance()->remove('board-' . $id_board_from);
+		\ElkArte\Cache\Cache::instance()->remove('board-' . $id_board_to);
 
 		redirectexit('action=admin;area=maintain;sa=topics;done=massmove');
 	}

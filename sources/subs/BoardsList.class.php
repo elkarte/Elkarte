@@ -438,7 +438,7 @@ class Boards_List
 		$boards = array_keys($this->_boards);
 		$mod_cached = array();
 
-		if (!Cache::instance()->getVar($mod_cached, 'localmods_' . md5(implode(',', $boards)), 3600))
+		if (!\ElkArte\Cache\Cache::instance()->getVar($mod_cached, 'localmods_' . md5(implode(',', $boards)), 3600))
 		{
 			$mod_cached = $this->_db->fetchQuery('
 				SELECT mods.id_board, COALESCE(mods_mem.id_member, 0) AS id_moderator, mods_mem.real_name AS mod_real_name
@@ -449,7 +449,7 @@ class Boards_List
 					'id_boards' => $boards,
 				)
 			);
-			Cache::instance()->put('localmods_' . md5(implode(',', $boards)), $mod_cached, 3600);
+			\ElkArte\Cache\Cache::instance()->put('localmods_' . md5(implode(',', $boards)), $mod_cached, 3600);
 		}
 
 		foreach ($mod_cached as $row_mods)

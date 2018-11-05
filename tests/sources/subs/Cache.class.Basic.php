@@ -76,7 +76,7 @@ class TestCache extends \PHPUnit\Framework\TestCase
 		$cache_enable = 1;
 
 		require_once(SUBSDIR . '/Cache.class.php');
-		$cache = Cache::instance();
+		$cache = \ElkArte\Cache\Cache::instance();
 		$file_cache = new ElkArte\sources\subs\CacheMethod\Filebased(array());
 		$object = new \ReflectionClass($cache);
 		$property = $object->getProperty('_cache_obj');

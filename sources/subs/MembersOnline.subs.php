@@ -55,7 +55,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 
 	// Get it from the cache and send it back.
 	$temp = array();
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 	if ($cache->levelHigherThan(1) && $cache->getVar($temp, 'membersOnlineStats-' . $membersOnlineOptions['sort'], 240))
 		return filter_members_online($temp, empty($membersOnlineOptions['reverse_sort']) ? 'ksort' : 'krsort');
 
@@ -178,7 +178,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 	// Hidden and non-hidden members make up all online members.
 	$membersOnlineStats['num_users_online'] = count($membersOnlineStats['users_online']) + $membersOnlineStats['num_users_hidden'] - (isset($modSettings['show_spider_online']) && $modSettings['show_spider_online'] > 1 ? count($spider_finds) : 0);
 
-	Cache::instance()->put('membersOnlineStats-' . $membersOnlineOptions['sort'], $membersOnlineStats, 240);
+	\ElkArte\Cache\Cache::instance()->put('membersOnlineStats-' . $membersOnlineOptions['sort'], $membersOnlineStats, 240);
 
 	return filter_members_online($membersOnlineStats, empty($membersOnlineOptions['reverse_sort']) ? 'ksort' : 'krsort');
 }

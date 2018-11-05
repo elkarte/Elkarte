@@ -134,7 +134,7 @@ function deleteMembers($users, $check_not_admin = false)
 		);
 
 		// Remove any cached data if enabled.
-		Cache::instance()->remove('user_settings-' . $user[0]);
+		\ElkArte\Cache\Cache::instance()->remove('user_settings-' . $user[0]);
 	}
 
 	// Make these peoples' posts guest posts.
@@ -2588,7 +2588,7 @@ function updateMemberData($members, $data)
 	require_once(SUBSDIR . '/Membergroups.subs.php');
 	updatePostGroupStats($members, array_keys($data));
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	// Clear any caching?
 	if ($cache->levelHigherThan(1) && !empty($members))

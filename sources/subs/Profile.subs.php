@@ -1375,7 +1375,7 @@ function makeThemeChanges($memID, $id_theme)
 
 		$themes = explode(',', $modSettings['knownThemes']);
 		foreach ($themes as $t)
-			Cache::instance()->remove('theme_settings-' . $t . ':' . $memID);
+			\ElkArte\Cache\Cache::instance()->remove('theme_settings-' . $t . ':' . $memID);
 	}
 }
 

@@ -751,7 +751,7 @@ class Profile extends \ElkArte\AbstractController
 				$context['profile_updated'] = $context['user']['is_owner'] ? $txt['profile_updated_own'] : sprintf($txt['profile_updated_else'], $this->_profile['member_name']);
 
 				// Invalidate any cached data.
-				Cache::instance()->remove('member_data-profile-' . $this->_memID);
+				\ElkArte\Cache\Cache::instance()->remove('member_data-profile-' . $this->_memID);
 			}
 		}
 	}

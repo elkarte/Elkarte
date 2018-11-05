@@ -70,7 +70,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		return;
 
 	$db = database();
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	// Only a single topic.
 	if (!is_array($topics))
@@ -817,7 +817,7 @@ function moveTopics($topics, $toBoard, $log = false)
 		markBoardsRead($toBoard);
 	}
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 	// Update the cache?
 	foreach ($topics as $topic_id)
 		$cache->remove('topic_board-' . $topic_id);

@@ -11,14 +11,14 @@
  *
  */
 
-namespace ElkArte\sources\subs\CacheMethod;
+namespace ElkArte\Cache\CacheMethod;
 
 /**
  * In order to work with ElkArte any caching method must implement this
  * interface
  *
  */
-interface Cache_Method_Interface
+interface CacheMethodInterface
 {
 	/**
 	 * The class is initialized passing the settings of the cache

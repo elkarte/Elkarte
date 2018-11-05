@@ -216,7 +216,7 @@ class ManageSecurity extends \ElkArte\AbstractController
 			// Now save.
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
-			Cache::instance()->remove('verificationQuestionIds');
+			\ElkArte\Cache\Cache::instance()->remove('verificationQuestionIds');
 			redirectexit('action=admin;area=securitysettings;sa=spam');
 		}
 

@@ -11,12 +11,12 @@
  *
  */
 
-namespace ElkArte\sources\subs\CacheMethod;
+namespace ElkArte\Cache\CacheMethod;
 
 /**
  * Zend caching engine.
  */
-class Zend extends Cache_Method_Abstract
+class Zend extends AbstractCacheMethod
 {
 	/**
 	 * {@inheritdoc}

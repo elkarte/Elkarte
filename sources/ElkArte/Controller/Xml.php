@@ -593,8 +593,8 @@ class Xml extends \ElkArte\AbstractController
 						}
 
 						// Clear the cache, its stale now
-						Cache::instance()->remove('parsing_smileys');
-						Cache::instance()->remove('posting_smileys');
+						\ElkArte\Cache\Cache::instance()->remove('parsing_smileys');
+						\ElkArte\Cache\Cache::instance()->remove('posting_smileys');
 						$order[] = array('value' => $txt['smileys_moved_done']);
 					}
 				}

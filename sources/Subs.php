@@ -36,7 +36,7 @@ function updateSettings($changeArray, $update = false)
 	global $modSettings;
 
 	$db = database();
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	if (empty($changeArray) || !is_array($changeArray))
 		return;
@@ -126,7 +126,7 @@ function removeSettings($toRemove)
 			unset($modSettings[$setting]);
 
 	// Kill the cache - it needs redoing now, but we won't bother ourselves with that here.
-	Cache::instance()->remove('modSettings');
+	\ElkArte\Cache\Cache::instance()->remove('modSettings');
 }
 
 /**
@@ -1025,7 +1025,7 @@ function host_from_ip($ip)
 {
 	global $modSettings;
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	$host = '';
 	if ($cache->getVar($host, 'hostlookup-' . $ip, 600) || empty($ip))
@@ -1594,7 +1594,7 @@ function response_prefix()
 	global $language, $user_info, $txt;
 	static $response_prefix = null;
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	// Get a response prefix, but in the forum's default language.
 	if ($response_prefix === null && (!$cache->getVar($response_prefix, 'response_prefix') || !$response_prefix))

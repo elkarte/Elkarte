@@ -147,7 +147,7 @@ class Sphinx extends SearchAPI
 
 		// Only request the results if they haven't been cached yet.
 		$cached_results = array();
-		if (!\Cache::instance()->getVar($cached_results, 'search_results_' . md5($user_info['query_see_board'] . '_' . $context['params'])))
+		if (!\\ElkArte\Cache\Cache::instance()->getVar($cached_results, 'search_results_' . md5($user_info['query_see_board'] . '_' . $context['params'])))
 		{
 			// The API communicating with the search daemon.
 			require_once(SOURCEDIR . '/sphinxapi.php');
@@ -283,7 +283,7 @@ class Sphinx extends SearchAPI
 			}
 
 			// Store the search results in the cache.
-			\Cache::instance()->put('search_results_' . md5($user_info['query_see_board'] . '_' . $context['params']), $cached_results, 600);
+			\\ElkArte\Cache\Cache::instance()->put('search_results_' . md5($user_info['query_see_board'] . '_' . $context['params']), $cached_results, 600);
 		}
 
 		$participants = array();

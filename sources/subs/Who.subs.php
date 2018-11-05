@@ -129,7 +129,7 @@ function addonsCredits()
 
 	$db = database();
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 	$credits = array();
 	if (!$cache->getVar($credits, 'addons_credits', 86400))
 	{

@@ -216,7 +216,7 @@ class ManageSearchEngines extends \ElkArte\AbstractController
 			// Delete them all!
 			removeSpiders($toRemove);
 
-			Cache::instance()->remove('spider_search');
+			\ElkArte\Cache\Cache::instance()->remove('spider_search');
 			recacheSpiderNames();
 		}
 
@@ -366,7 +366,7 @@ class ManageSearchEngines extends \ElkArte\AbstractController
 			// Goes in as it is...
 			updateSpider($context['id_spider'], $this->_req->post->spider_name, $this->_req->post->spider_agent, $ips);
 
-			Cache::instance()->remove('spider_search');
+			\ElkArte\Cache\Cache::instance()->remove('spider_search');
 			recacheSpiderNames();
 
 			redirectexit('action=admin;area=sengines;sa=spiders');

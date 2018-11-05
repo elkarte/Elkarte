@@ -140,7 +140,7 @@ class Recent_Class
 	 */
 	public function findRecentMessages($start, $limit = 10)
 	{
-		$cache = Cache::instance();
+		$cache = \ElkArte\Cache\Cache::instance();
 		$key = 'recent-' . $this->_user_id . '-' . md5(serialize(array_diff_key($this->_query_parameters, array('max_id_msg' => 0)))) . '-' . $start . '-' . $limit;
 		$this->_messages = $cache->get($key, 120);
 

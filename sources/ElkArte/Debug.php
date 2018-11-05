@@ -314,7 +314,7 @@ class Debug
 		}
 
 		// If the cache is on, how successful was it?
-		if (Cache::instance()->isEnabled() && !empty($this->_cache_hits))
+		if (\ElkArte\Cache\Cache::instance()->isEnabled() && !empty($this->_cache_hits))
 		{
 			$entries = array();
 			$total_t = 0;

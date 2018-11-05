@@ -1798,8 +1798,8 @@ class ModerationCenter extends \ElkArte\AbstractController
 				addModeratorNote($user_info['id'], $user_info['name'], $new_note);
 
 				// Clear the cache.
-				Cache::instance()->remove('moderator_notes');
-				Cache::instance()->remove('moderator_notes_total');
+				\ElkArte\Cache\Cache::instance()->remove('moderator_notes');
+				\ElkArte\Cache\Cache::instance()->remove('moderator_notes_total');
 			}
 
 			// Redirect otherwise people can resubmit.
@@ -1818,8 +1818,8 @@ class ModerationCenter extends \ElkArte\AbstractController
 			removeModeratorNote($id_delete);
 
 			// Clear the cache.
-			Cache::instance()->remove('moderator_notes');
-			Cache::instance()->remove('moderator_notes_total');
+			\ElkArte\Cache\Cache::instance()->remove('moderator_notes');
+			\ElkArte\Cache\Cache::instance()->remove('moderator_notes_total');
 
 			redirectexit('action=moderate');
 		}

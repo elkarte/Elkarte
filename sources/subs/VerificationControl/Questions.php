@@ -387,7 +387,7 @@ class Questions implements ControlInterface
 		global $modSettings;
 
 		$db = database();
-		$cache = Cache::instance();
+		$cache = \ElkArte\Cache\Cache::instance();
 
 		if (!$cache->getVar($modSettings['question_id_cache'], 'verificationQuestionIds', 300) || !$modSettings['question_id_cache'])
 		{
