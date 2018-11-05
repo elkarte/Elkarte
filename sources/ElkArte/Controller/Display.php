@@ -537,8 +537,6 @@ class Display extends \ElkArte\AbstractController
 			$this->_show_signatures = !empty($signature_settings[9]) ? (int) $signature_settings[9] : 0;
 		}
 
-		Elk_Autoloader::instance()->register(SUBSDIR . '/MessagesCallback', '\\ElkArte\\sources\\subs\\MessagesCallback');
-
 		// Set the callback.  (do you REALIZE how much memory all the messages would take?!?)
 		// This will be called from the template.
 		$bodyParser = new \ElkArte\sources\subs\MessagesCallback\BodyParser\Normal(array(), false);

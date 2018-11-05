@@ -82,8 +82,6 @@ class Notifications extends AbstractModel
 	 */
 	public function send()
 	{
-		Elk_Autoloader::instance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
-
 		$this->_notification_frequencies = array(
 			// 0 is for no notifications, so we start from 1 the counting, that saves a +1 later
 			1 => 'notification',

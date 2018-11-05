@@ -74,7 +74,6 @@ class Search extends \ElkArte\AbstractController
 		{
 			throw new Elk_Exception('loadavg_search_disabled', false);
 		}
-		Elk_Autoloader::instance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 	}
 
 	/**
@@ -430,8 +429,6 @@ class Search extends \ElkArte\AbstractController
 
 		$context['sub_template'] = 'results';
 		$context['page_title'] = $txt['search_results'];
-
-		Elk_Autoloader::instance()->register(SUBSDIR . '/MessagesCallback', '\\ElkArte\\sources\\subs\\MessagesCallback');
 
 		$this->_icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
 

@@ -46,8 +46,6 @@ class Url_Generator
 	 */
 	public function __construct($options)
 	{
-		Elk_Autoloader::instance()->register(SUBSDIR . '/UrlGenerator', '\\ElkArte\\UrlGenerator');
-
 		$this->_config = array_merge(array(
 			'scripturl' => '',
 			'replacements' => array(),

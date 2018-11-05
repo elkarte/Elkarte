@@ -761,8 +761,6 @@ function loadAllCustomFields()
  */
 function getNotificationTypes()
 {
-	Elk_Autoloader::instance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
-
 	$glob = new GlobIterator(SUBSDIR . '/MentionType/*Mention.php', FilesystemIterator::SKIP_DOTS);
 	$types = array();
 

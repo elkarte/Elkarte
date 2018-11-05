@@ -655,8 +655,6 @@ class PersonalMessage extends \ElkArte\AbstractController
 			$messages_request = false;
 		}
 
-		Elk_Autoloader::instance()->register(SUBSDIR . '/MessagesCallback', '\\ElkArte\\sources\\subs\\MessagesCallback');
-
 		$bodyParser = new \ElkArte\sources\subs\MessagesCallback\BodyParser\Normal(array(), false);
 		$renderer = new \ElkArte\sources\subs\MessagesCallback\PmRenderer($messages_request, $bodyParser);
 		$srenderer = new \ElkArte\sources\subs\MessagesCallback\PmRenderer($subjects_request, $bodyParser);

@@ -121,8 +121,6 @@ class Mentions extends \ElkArte\AbstractController
 		if (empty($modSettings['mentions_enabled']))
 			throw new Elk_Exception('no_access', false);
 
-		Elk_Autoloader::instance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
-
 		$this->_known_mentions = $this->_findMentionTypes();
 	}
 
