@@ -31,7 +31,7 @@ function setPermissionLevel($level, $group = null, $profile = null)
 	$db = database();
 
 	// we'll need to init illegal permissions.
-	$permissionsObject = new Permissions;
+	$permissionsObject = new \ElkArte\Permissions;
 	$illegal_permissions = $permissionsObject->getIllegalPermissions();
 	$illegal_guest_permissions = $permissionsObject->getIllegalGuestPermissions();
 
@@ -500,7 +500,7 @@ function loadAllPermissions()
 	);
 
 	// We need to know what permissions we can't give to guests.
-	$permissionsObject = new Permissions;
+	$permissionsObject = new \ElkArte\Permissions;
 	$illegal_guest_permissions = $permissionsObject->getIllegalGuestPermissions();
 
 	// Some permissions are hidden if features are off.

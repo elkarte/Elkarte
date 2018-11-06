@@ -15,13 +15,15 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Recent Post Class, retrieve information about recent posts
  *
  * This is used by \ElkArte\controller\Recent to retrieve the data
  * from the db, in particular by action_recent
  */
-class Recent_Class
+class RecentClass
 {
 	/**
 	 * Holds the boards the member is looking at

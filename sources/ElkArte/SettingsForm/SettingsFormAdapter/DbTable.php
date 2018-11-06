@@ -11,12 +11,12 @@
  *
  */
 
-namespace ElkArte\sources\subs\SettingsFormAdapter;
+namespace ElkArte\SettingsForm\SettingsFormAdapter;
 
 /**
  * Class DbTable
  *
- * @package ElkArte\sources\subs\SettingsFormAdapter
+ * @package ElkArte\SettingsForm\SettingsFormAdapter
  */
 class DbTable extends Db
 {

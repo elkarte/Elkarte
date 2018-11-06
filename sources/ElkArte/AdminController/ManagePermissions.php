@@ -64,7 +64,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 
 		// Make sure they can't do certain things,
 		// unless they have the right permissions.
-		$this->permissionsObject = new Permissions;
+		$this->permissionsObject = new \ElkArte\Permissions;
 		$this->illegal_permissions = $this->permissionsObject->getIllegalPermissions();
 		$this->illegal_guest_permissions = $this->permissionsObject->getIllegalGuestPermissions();
 
@@ -897,7 +897,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
 		// Initialize the form
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());

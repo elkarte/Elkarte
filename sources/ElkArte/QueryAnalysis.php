@@ -11,7 +11,9 @@
  *
  */
 
-class Query_Analysis
+namespace ElkArte;
+
+class QueryAnalysis
 {
 	/**
 	 * The SELECT statement of the query (if any)

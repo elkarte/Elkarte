@@ -25,7 +25,7 @@ class TestInlinePermissionsForm extends \PHPUnit\Framework\TestCase
 
 		// Make sure they can't do certain things,
 		// unless they have the right permissions.
-		$this->permissionsObject = new Permissions;
+		$this->permissionsObject = new \ElkArte\Permissions;
 		$this->illegal_permissions = $this->permissionsObject->getIllegalPermissions();
 
 		$this->config_vars = array(
@@ -57,7 +57,7 @@ class TestInlinePermissionsForm extends \PHPUnit\Framework\TestCase
 			),
 		);
 
-		$this->permissionsForm = new ElkArte\sources\subs\SettingsFormAdapter\InlinePermissions;
+		$this->permissionsForm = new ElkArte\SettingsForm\SettingsFormAdapter\InlinePermissions;
 		$this->permissionsForm->setPermissions($this->config_vars);
 
 		// Load the permission settings that guests cannot have

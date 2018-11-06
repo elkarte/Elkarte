@@ -374,7 +374,7 @@ class Debug
 	{
 		$queries_data = array();
 
-		$query_analysis = new Query_Analysis();
+		$query_analysis = new \ElkArte\Query_Analysis();
 
 		foreach ($_SESSION['debug'] as $q => $query_data)
 		{

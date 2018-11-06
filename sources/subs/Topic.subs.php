@@ -2225,7 +2225,7 @@ function removeMessages($messages, $messageDetails, $type = 'replies')
 	}
 	else
 	{
-		$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
+		$remover = new \ElkArte\MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 		foreach ($messages as $post)
 		{
 			$remover->removeMessage($post);

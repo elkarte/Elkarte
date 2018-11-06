@@ -15,13 +15,13 @@
  *
  */
 
-namespace ElkArte\sources\subs\SettingsFormAdapter;
+namespace ElkArte\SettingsForm\SettingsFormAdapter;
 use BBC\ParserWrapper;
 
 /**
  * Class Db
  *
- * @package ElkArte\sources\subs\SettingsFormAdapter
+ * @package ElkArte\SettingsForm\SettingsFormAdapter
  */
 class Db extends Adapter
 {

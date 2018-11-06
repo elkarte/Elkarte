@@ -164,7 +164,7 @@ class RemoveTopic extends \ElkArte\AbstractController
 		$this->_verifyDeletePermissions();
 
 		// Do the removal, track if we removed the entire topic so we redirect back to the board.
-		$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
+		$remover = new \ElkArte\MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 		$full_topic = $remover->removeMessage($_msg);
 
 		$this->_redirectBack($full_topic);
@@ -194,7 +194,7 @@ class RemoveTopic extends \ElkArte\AbstractController
 		// Can we be in here?
 		isAllowedTo('move_any', $modSettings['recycle_board']);
 
-		$restorer = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
+		$restorer = new \ElkArte\MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 
 		// Restoring messages?
 		if (!empty($this->_req->query->msgs))

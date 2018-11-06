@@ -12,11 +12,13 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Grabs unread messages from an imap account
  * Passes any new messages found to the postby email function for processing
  */
-class Pbe_Imap extends AbstractModel
+class PbeImap extends AbstractModel
 {
 	/**
 	 * The name of the imap host

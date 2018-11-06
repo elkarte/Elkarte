@@ -362,7 +362,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 			// @todo Check for members with same name too?
 
 			// Don't allow copying of a real privileged person!
-			$permissionsObject = new Permissions;
+			$permissionsObject = new \ElkArte\Permissions;
 			$illegal_permissions = $permissionsObject->getIllegalPermissions();
 			$minposts = !empty($this->_req->post->min_posts) ? (int) $this->_req->post->min_posts : '-1';
 
@@ -654,7 +654,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 			// Do we need to set inherited permissions?
 			if ($group_inherit != -2 && $group_inherit != $this->_req->post->old_inherit)
 			{
-				$permissionsObject = new Permissions;
+				$permissionsObject = new \ElkArte\Permissions;
 				$permissionsObject->updateChild($group_inherit);
 			}
 
@@ -800,7 +800,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 
 		// initialize the form
 		// Instantiate the form
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());

@@ -291,7 +291,7 @@ function removeMessage($message, $decreasePostCount = true)
 {
 	global $modSettings;
 
-	$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
+	$remover = new \ElkArte\MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 	$remover->removeMessage($message, $decreasePostCount, true);
 }
 

@@ -92,7 +92,7 @@ class ManageSecurity extends \ElkArte\AbstractController
 		global $txt, $scripturl, $context;
 
 		// Initialize the form
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_securitySettings());
@@ -129,7 +129,7 @@ class ManageSecurity extends \ElkArte\AbstractController
 		global $txt, $scripturl, $context, $modSettings;
 
 		// Initialize the form
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$config_vars = $this->_moderationSettings();
@@ -189,7 +189,7 @@ class ManageSecurity extends \ElkArte\AbstractController
 		global $txt, $scripturl, $context, $modSettings;
 
 		// Initialize the form
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$config_vars = $this->_spamSettings();
@@ -244,7 +244,7 @@ class ManageSecurity extends \ElkArte\AbstractController
 		global $txt, $scripturl, $context, $modSettings, $boardurl;
 
 		// Initialize the form
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_bbSettings());

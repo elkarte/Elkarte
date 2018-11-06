@@ -596,7 +596,7 @@ class PackageServers extends \ElkArte\AbstractController
 			{
 				$dir = new FilesystemIterator(BOARDDIR . '/packages', FilesystemIterator::SKIP_DOTS);
 
-				$filter = new PackagesFilterIterator($dir);
+				$filter = new \ElkArte\PackagesFilterIterator($dir);
 				$packages = new \IteratorIterator($filter);
 
 				foreach ($packages as $package)

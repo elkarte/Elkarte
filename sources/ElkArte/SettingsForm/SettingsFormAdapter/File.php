@@ -15,12 +15,12 @@
  *
  */
 
-namespace ElkArte\sources\subs\SettingsFormAdapter;
+namespace ElkArte\SettingsForm\SettingsFormAdapter;
 
 /**
  * Class File
  *
- * @package ElkArte\sources\subs\SettingsFormAdapter
+ * @package ElkArte\SettingsForm\SettingsFormAdapter
  */
 class File extends Db
 {

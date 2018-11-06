@@ -159,7 +159,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 		global $modSettings, $context;
 
 		// initialize the form
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
 
 		// Initialize settings
 		$settingsForm->setConfigVars($this->_settings());

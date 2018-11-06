@@ -11,6 +11,8 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Extends RecursiveFilterIterator to filter anything that looks like a package.
  *

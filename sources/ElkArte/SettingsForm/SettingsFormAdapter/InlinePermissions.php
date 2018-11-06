@@ -10,7 +10,7 @@
  * @version 2.0 dev
  */
 
-namespace ElkArte\sources\subs\SettingsFormAdapter;
+namespace ElkArte\SettingsForm\SettingsFormAdapter;
 
 /**
  * Class to initialize inline permissions sub-form and save its settings

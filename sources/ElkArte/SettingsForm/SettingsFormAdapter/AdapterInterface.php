@@ -15,12 +15,12 @@
  *
  */
 
-namespace ElkArte\sources\subs\SettingsFormAdapter;
+namespace ElkArte\SettingsForm\SettingsFormAdapter;
 
 /**
  * Interface AdapterInterface
  *
- * @package ElkArte\sources\subs\SettingsFormAdapter
+ * @package ElkArte\SettingsForm\SettingsFormAdapter
  */
 interface AdapterInterface
 {

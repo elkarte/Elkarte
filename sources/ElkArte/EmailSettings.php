@@ -26,7 +26,7 @@ namespace ElkArte;
  *
  * @package Maillist
  */
-class EmailSettings extends Settings_Form
+class EmailSettings extends \ElkArte\SettingsForm
 {
 	/**
 	 * static function saveTableSettings, now part of the Settings Form class
@@ -50,7 +50,7 @@ class EmailSettings extends Settings_Form
 		}
 
 		$settingsForm = new self(self::DBTABLE_ADAPTER);
-		/** @var ElkArte\sources\subs\SettingsFormAdapter\DbTable */
+		/** @var ElkArte\SettingsForm\SettingsFormAdapter\DbTable */
 		$settingsAdapter = $settingsForm->getAdapter();
 		$settingsAdapter->setTableName($tableName);
 		$settingsAdapter->setEditId($editId);

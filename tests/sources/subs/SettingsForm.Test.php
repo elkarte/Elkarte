@@ -74,17 +74,17 @@ class TestSettingsForm extends \PHPUnit\Framework\TestCase
 
 	/**
 	 * Looping over the tests to verify
-	 * Settings_Form::prepare works as expected.
+	 * \ElkArte\SettingsForm::prepare works as expected.
 	 */
 	public function testPrepare()
 	{
 		global $context;
 
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
 		$settingsForm->setConfigVars($this->configVars);
 		$settingsForm->prepare();
 		$this->assertSame($this->configVars, $settingsForm->getConfigVars());
-		$this->assertInstanceOf('ElkArte\\sources\\subs\\SettingsFormAdapter\\Adapter', $settingsForm->getAdapter());
+		$this->assertInstanceOf('ElkArte\\SettingsForm\\SettingsFormAdapter\\Adapter', $settingsForm->getAdapter());
 		$this->assertCount(1, $context['config_vars'][$this->configVars[5][1]]['data']);
 		$this->assertContains('value', $context['config_vars'][$this->configVars[5][1]]['data'][0]);
 		$this->assertCount(2, $context['config_vars'][$this->configVars[6][1]]['data']);
@@ -106,13 +106,13 @@ class TestSettingsForm extends \PHPUnit\Framework\TestCase
 
 	/**
 	 * Looping over the tests to verify
-	 * Settings_Form::save works as expected.
+	 * \ElkArte\SettingsForm::save works as expected.
 	 */
 	public function testSaveDb()
 	{
 		global $context, $modSettings;
 
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
 		$settingsForm->setConfigVars($this->configVars);
 		$settingsForm->setConfigValues((array) $this->configValues);
 		$this->assertSame($this->configValues, $settingsForm->getConfigValues());
@@ -161,7 +161,7 @@ class TestSettingsForm extends \PHPUnit\Framework\TestCase
 	public function testSaveDbTable()
 	{
 		$this->assertSame('W', chr(ord($this->getMessageBody())));
-		$settingsForm = new Settings_Form(Settings_Form::DBTABLE_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DBTABLE_ADAPTER);
 		$settingsForm->getAdapter()->setTableName('messages');
 		$settingsForm->getAdapter()->setEditId(1);
 		$settingsForm->getAdapter()->setEditName('id_msg');
@@ -193,7 +193,7 @@ class TestSettingsForm extends \PHPUnit\Framework\TestCase
 			array('mtitle', 'maintenance_subject', 'file', 'text', 36),
 			array('enableCompressedOutput', 'enableCompressedOutput', 'db', 'check', null, 'enableCompressedOutput'),
 		);
-		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::FILE_ADAPTER);
 		$settingsForm->setConfigVars($this->configVars);
 		$settingsForm->prepare();
 		foreach ($this->configVars as $configVar)
@@ -220,7 +220,7 @@ class TestSettingsForm extends \PHPUnit\Framework\TestCase
 			'mtitle' => 'value',
 			'enableCompressedOutput' => '1'
 		);
-		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::FILE_ADAPTER);
 		$settingsForm->setConfigVars($this->configVars);
 		$settingsForm->setConfigValues((array) $this->configValues);
 		$settingsForm->save();

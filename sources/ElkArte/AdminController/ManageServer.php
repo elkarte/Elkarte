@@ -125,7 +125,7 @@ class ManageServer extends \ElkArte\AbstractController
 		global $scripturl, $context, $txt;
 
 		// Initialize the form
-		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::FILE_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_generalSettings());
@@ -169,7 +169,7 @@ class ManageServer extends \ElkArte\AbstractController
 		global $scripturl, $context, $txt;
 
 		// Initialize the form
-		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::FILE_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_databaseSettings());
@@ -206,7 +206,7 @@ class ManageServer extends \ElkArte\AbstractController
 		global $context, $scripturl, $txt, $modSettings, $cookiename, $user_settings, $boardurl;
 
 		// Initialize the form
-		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::FILE_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_cookieSettings());
@@ -275,7 +275,7 @@ class ManageServer extends \ElkArte\AbstractController
 		global $context, $scripturl, $txt;
 
 		// Initialize the form
-		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::FILE_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_cacheSettings());
@@ -332,7 +332,7 @@ class ManageServer extends \ElkArte\AbstractController
 		global $txt, $scripturl, $context;
 
 		// Initialize the form
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_loadavgSettings());

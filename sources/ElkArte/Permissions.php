@@ -9,6 +9,9 @@
  *
  * @version 2.0 dev
  */
+
+namespace ElkArte;
+
 class Permissions
 {
 	private $db;

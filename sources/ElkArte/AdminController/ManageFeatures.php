@@ -158,7 +158,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 		global $txt, $context;
 
 		// Initialize the form
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_basicSettings());
@@ -216,7 +216,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 		global $txt, $context, $modSettings;
 
 		// Initialize the form
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_layoutSettings());
@@ -265,7 +265,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 		global $txt, $context;
 
 		// Initialize the form
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_karmaSettings());
@@ -300,7 +300,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 		global $txt, $context;
 
 		// Initialize the form
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_likesSettings());
@@ -337,7 +337,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 		theme()->getTemplates()->loadLanguageFile('Mentions');
 
 		// Instantiate the form
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_notificationsSettings());
@@ -445,7 +445,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 		global $context, $txt, $modSettings, $sig_start;
 
 		// Initialize the form
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_signatureSettings());
@@ -1168,7 +1168,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 		global $txt, $context;
 
 		// Initialize the form
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_pmSettings());

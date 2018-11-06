@@ -831,7 +831,7 @@ class Display extends \ElkArte\AbstractController
 		// Get the first message in the topic - because you can't delete that!
 		$first_message = $topic_info['id_first_msg'];
 		$last_message = $topic_info['id_last_msg'];
-		$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
+		$remover = new \ElkArte\MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 
 		// Delete all the messages we know they can delete. ($messages)
 		foreach ($messages as $message => $info)

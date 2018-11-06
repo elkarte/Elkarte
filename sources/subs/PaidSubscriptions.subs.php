@@ -391,27 +391,28 @@ function loadPaymentGateways()
 
 	try
 	{
-		$files = new FilesystemIterator(SUBSDIR, FilesystemIterator::SKIP_DOTS);
+		$files = new FilesystemIterator(SOURCEDIR . '/ElkArte/Subscriptions/PaymentGateway', FilesystemIterator::SKIP_DOTS);
 		foreach ($files as $file)
 		{
-			if ($file->isFile() && preg_match('~^Subscriptions-([A-Za-z\d]+)\.class\.php$~', $file->getFilename(), $matches))
+			if ($file->isDir())
 			{
 				// Check this is definitely a valid gateway!
 				$fp = fopen($file->getPathname(), 'rb');
 				$header = fread($fp, 4096);
 				fclose($fp);
+				$filename = $file->getFilename();
 
-				if (strpos($header, 'Payment Gateway: ' . $matches[1]) !== false)
+				if (strpos($header, 'Payment Gateway: ' . $filename) !== false)
 				{
 					require_once($file->getPathname());
 
 					$gateways[] = array(
 						'filename' => $file->getFilename(),
-						'code' => strtolower($matches[1]),
+						'code' => strtolower($filename),
 						// Don't need anything snazzier than this yet.
-						'valid_version' => class_exists($matches[1] . '_Payment') && class_exists($matches[1] . '_Display'),
-						'payment_class' => $matches[1] . '_Payment',
-						'display_class' => $matches[1] . '_Display',
+						'valid_version' => class_exists('\\ElkArte\\Subscriptions\\PaymentGateway\\' . $filename . '\\Payment') && class_exists($filename . '_Display'),
+						'payment_class' => '\\ElkArte\\Subscriptions\\PaymentGateway\\' . $filename . '\\Payment',
+						'display_class' => '\\ElkArte\\Subscriptions\\PaymentGateway\\' . $filename . '\\Display',
 					);
 				}
 			}

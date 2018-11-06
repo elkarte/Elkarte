@@ -57,6 +57,8 @@
  *    array('text', 'invalid label', 3, 'label' => 'Actual Label')
  */
 
+namespace ElkArte\SettingsForm;
+
 /**
  * Settings Form class.
  * This class handles display, edit, save, of forum settings.
@@ -64,14 +66,14 @@
  * and it is available for addons administration screens.
  *
  */
-class Settings_Form
+class SettingsForm
 {
-	const DB_ADAPTER = 'ElkArte\\sources\\subs\\SettingsFormAdapter\\Db';
-	const DBTABLE_ADAPTER = 'ElkArte\\sources\\subs\\SettingsFormAdapter\\DbTable';
-	const FILE_ADAPTER = 'ElkArte\\sources\\subs\\SettingsFormAdapter\\File';
+	const DB_ADAPTER = 'ElkArte\\SettingsForm\\SettingsFormAdapter\\Db';
+	const DBTABLE_ADAPTER = 'ElkArte\\SettingsForm\\SettingsFormAdapter\\DbTable';
+	const FILE_ADAPTER = 'ElkArte\\SettingsForm\\SettingsFormAdapter\\File';
 
 	/**
-	 * @var ElkArte\sources\subs\SettingsFormAdapter\Adapter
+	 * @var ElkArte\SettingsForm\SettingsFormAdapter\Adapter
 	 */
 	private $adapter;
 
@@ -118,7 +120,7 @@ class Settings_Form
 	}
 
 	/**
-	 * @return ElkArte\sources\subs\SettingsFormAdapter\Adapter
+	 * @return ElkArte\SettingsForm\SettingsFormAdapter\Adapter
 	 */
 	public function getAdapter()
 	{

@@ -1840,7 +1840,7 @@ class Packages extends \ElkArte\AbstractController
 		try
 		{
 			$dir = new FilesystemIterator(BOARDDIR . '/packages', FilesystemIterator::SKIP_DOTS);
-			$filtered_dir = new PackagesFilterIterator($dir);
+			$filtered_dir = new \ElkArte\PackagesFilterIterator($dir);
 
 			$dirs = array();
 			$sort_id = array(

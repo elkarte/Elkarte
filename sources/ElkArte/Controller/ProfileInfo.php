@@ -497,7 +497,7 @@ class ProfileInfo extends \ElkArte\AbstractController
 			checkSession('get');
 
 			// We can be lazy, since removeMessage() will check the permissions for us.
-			$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
+			$remover = new \ElkArte\MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 			$remover->removeMessage((int) $this->_req->query->delete);
 
 			// Back to... where we are now ;).
