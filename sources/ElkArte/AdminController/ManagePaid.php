@@ -70,7 +70,7 @@ class ManagePaid extends \ElkArte\AbstractController
 		);
 
 		// Some actions
-		$action = new Action('manage_subscriptions');
+		$action = new \ElkArte\Action('manage_subscriptions');
 
 		// Tabs for browsing the different subscription functions.
 		$context[$context['admin_menu_name']]['tab_data'] = array(

@@ -84,7 +84,7 @@ class ProfileInfo extends \ElkArte\AbstractController
 		);
 
 		// Action control
-		$action = new Action('profile_info');
+		$action = new \ElkArte\Action('profile_info');
 
 		// By default we want the summary
 		$subAction = $action->initialize($subActions, 'summary');

@@ -83,7 +83,7 @@ class ManageMembers extends \ElkArte\AbstractController
 		);
 
 		// Prepare our action control
-		$action = new Action();
+		$action = new \ElkArte\Action();
 
 		// Default to sub action 'all', needed for the tabs array below
 		$subAction = $action->initialize($subActions, 'all');

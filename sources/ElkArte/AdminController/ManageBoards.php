@@ -112,7 +112,7 @@ class ManageBoards extends \ElkArte\AbstractController
 		);
 
 		// You way will end here if you don't have permission.
-		$action = new Action('manage_boards');
+		$action = new \ElkArte\Action('manage_boards');
 
 		// Default to sub-action 'main' or 'settings' depending on permissions.
 		$subAction = $action->initialize($subActions, allowedTo('manage_boards') ? 'main' : 'settings');

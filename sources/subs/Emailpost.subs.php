@@ -51,7 +51,7 @@ function pbe_email_to_bbc($text, $html)
 		// Run the parsers on the html
 		$text = pbe_run_parsers($text);
 
-		$bbc_converter = new Html_2_BBC($text);
+		$bbc_converter = new \ElkArte\Html2BBC($text);
 		$bbc_converter->skip_tags(array('font', 'span'));
 		$bbc_converter->skip_styles(array('font-family', 'font-size', 'color'));
 		$text = $bbc_converter->get_bbc();
@@ -76,7 +76,7 @@ function pbe_email_to_bbc($text, $html)
 		$text = str_replace(array('&gt;blockquote>', '&gt;/blockquote>'), array('<blockquote>', '</blockquote>'), $text);
 
 		// Convert any resulting HTML created by markup style text in the email to BBC
-		$bbc_converter = new Html_2_BBC($text, false);
+		$bbc_converter = new \ElkArte\Html2BBC($text, false);
 		$text = $bbc_converter->get_bbc();
 	}
 
@@ -158,7 +158,7 @@ function pbe_fix_email_body($body, $real_name = '', $charset = 'UTF-8')
 	$body = preg_replace('~(\[quote\s?([a-zA-Z0-9"=]*)?\]\s*(\[br\]\s*)?\[/quote\])~s', '', $body);
 
 	// Reflow and Cleanup this message to something that looks normal-er
-	$formatter = new Email_Format();
+	$formatter = new \ElkArte\EmailFormat();
 	$body = $formatter->reflow($body, $real_name, $charset);
 
 	return $body;
@@ -640,7 +640,7 @@ function pbe_check_moderation(&$pbe)
  * @package Maillist
  *
  * @param string $error
- * @param Email_Parse $email_message
+ * @param \ElkArte\EmailParse $email_message
  *
  * @return bool
  * @throws \ElkArte\Exceptions\Exception
@@ -783,7 +783,7 @@ function pbe_emailError($error, $email_message)
  * @package Maillist
  *
  * @param mixed[] $pbe
- * @param Email_Parse $email_message
+ * @param \ElkArte\EmailParse $email_message
  *
  * @return array
  * @throws \ElkArte\Exceptions\Exception
@@ -889,7 +889,7 @@ function pbe_email_attachments($pbe, $email_message)
  *
  * @package Maillist
  *
- * @param Email_Parse $email_address
+ * @param \ElkArte\EmailParse $email_address
  *
  * @return int
  */
@@ -1008,7 +1008,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	);
 
 	// Convert this to text (markdown)
-	$mark_down = new Html_2_Md($message);
+	$mark_down = new \ElkArte\Html2Md($message);
 	$message = $mark_down->get_markdown();
 
 	// Finally the sig, its goes as just plain text
@@ -1031,7 +1031,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
  * When finished, fire off a site notification informing the user of the action and reason
  *
  * @package Maillist
- * @param Email_Parse $email_message
+ * @param \ElkArte\EmailParse $email_message
  */
 function pbe_disable_user_notify($email_message)
 {
@@ -1344,7 +1344,7 @@ function query_user_keys($email)
  * Return the email that a given key was sent to
  *
  * @package Maillist
- * @param Email_Parse $email_message
+ * @param \ElkArte\EmailParse $email_message
  * @return string email address the key was sent to
  */
 function query_key_owner($email_message)
@@ -1743,7 +1743,7 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $pe
  * - Updates the number of unread to reflect this
  *
  * @package Maillist
- * @param Email_Parse $email_message
+ * @param \ElkArte\EmailParse $email_message
  * @param mixed[] $pbe
  */
 function query_mark_pms($email_message, $pbe)
@@ -1807,7 +1807,7 @@ function query_mark_pms($email_message, $pbe)
  * - Also removes any old keys to minimize security issues
  *
  * @package Maillist
- * @param Email_Parse $email_message
+ * @param \ElkArte\EmailParse $email_message
  */
 function query_key_maintenance($email_message)
 {
@@ -1857,7 +1857,7 @@ function query_key_maintenance($email_message)
  *
  * @package Maillist
  * @param mixed[] $pbe
- * @param Email_Parse $email_message
+ * @param \ElkArte\EmailParse $email_message
  * @param mixed[] $topic_info
  */
 function query_update_member_stats($pbe, $email_message, $topic_info = array())

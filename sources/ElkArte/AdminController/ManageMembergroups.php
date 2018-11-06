@@ -74,7 +74,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 				'permission' => '\ElkArte\AbstractControlleradmin_forum'),
 		);
 
-		$action = new Action('manage_membergroups');
+		$action = new \ElkArte\Action('manage_membergroups');
 
 		// Setup the admin tabs.
 		$context[$context['admin_menu_name']]['tab_data'] = array(

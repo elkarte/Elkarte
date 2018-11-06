@@ -15,12 +15,14 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * A class to handle the basics of calendar events.
  * Namely a certain kind of validation, inserting a new one, updating existing,
  * deleting, etc.
  */
-class Calendar_Event
+class CalendarEvent
 {
 	/**
 	 * The id of the event.
@@ -41,7 +43,7 @@ class Calendar_Event
 	 *
 	 * @param null|int $event_id Obviously the id of the event.
 	 *                  If null or -1 the event is considered new
-	 *                  @see Calendar_Event::isNew
+	 *                  @see \ElkArte\CalendarEvent::isNew
 	 * @param mixed[] $settings An array of settings ($modSettings is the current one)
 	 */
 	public function __construct($event_id, $settings = array())

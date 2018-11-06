@@ -80,7 +80,7 @@ class ManageNews extends \ElkArte\AbstractController
 		);
 
 		// Action control
-		$action = new Action('manage_news');
+		$action = new \ElkArte\Action('manage_news');
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(

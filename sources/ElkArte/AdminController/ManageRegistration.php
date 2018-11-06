@@ -77,7 +77,7 @@ class ManageRegistration extends \ElkArte\AbstractController
 		);
 
 		// Action controller
-		$action = new Action('manage_registrations');
+		$action = new \ElkArte\Action('manage_registrations');
 
 		// Next create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(

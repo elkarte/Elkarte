@@ -13,6 +13,8 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * An event.
  * In fact a container that holds a list of classes to be called when an event

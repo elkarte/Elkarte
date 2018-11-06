@@ -11,6 +11,8 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Class to parse and email in to its header and body parts for use in posting
  *
@@ -49,7 +51,7 @@
  *
  * @package Maillist
  */
-class Email_Parse
+class EmailParse
 {
 	/**
 	 * The full message section (headers, body, etc) we are working on
@@ -757,7 +759,7 @@ class Email_Parse
 			}
 
 			// Parse this section just like its was a separate email
-			$this->_boundary_section[$this->_boundary_section_count] = new Email_Parse();
+			$this->_boundary_section[$this->_boundary_section_count] = new \ElkArte\EmailParse();
 			$this->_boundary_section[$this->_boundary_section_count]->read_email($html, $part);
 
 			$this->plain_body .= $this->_boundary_section[$this->_boundary_section_count]->plain_body;

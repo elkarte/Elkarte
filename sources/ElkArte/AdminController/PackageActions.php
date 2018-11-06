@@ -217,7 +217,7 @@ class Package_Actions extends \ElkArte\AbstractController
 		);
 
 		// Set up action/subaction stuff.
-		$action = new Action();
+		$action = new \ElkArte\Action();
 
 		foreach ($this->_passed_actions as $this->_action)
 		{
@@ -734,7 +734,7 @@ class Package_Actions extends \ElkArte\AbstractController
 		$this->failed_steps = array();
 
 		// Set up action/subaction stuff.
-		$action = new Action();
+		$action = new \ElkArte\Action();
 
 		foreach ($this->_passed_actions as $this->_action)
 		{

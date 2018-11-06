@@ -9,10 +9,12 @@
  *
  */
 
+namespace ElkArte;
+
 /**
- * Class Ila_Integrate
+ * Class IlaIntegrate
  */
-class Ila_Integrate
+class IlaIntegrate
 {
 	/**
 	 * Register ILA hooks to the system
@@ -30,9 +32,9 @@ class Ila_Integrate
 
 		// $hook, $function, $file
 		return array(
-			array('integrate_additional_bbc', 'Ila_Integrate::integrate_additional_bbc'),
-			array('integrate_before_prepare_display_context', 'Ila_Integrate::integrate_before_prepare_display_context'),
-			array('integrate_post_bbc_parser', 'Ila_Integrate::integrate_post_parser')
+			array('integrate_additional_bbc', '\\ElkArte\\IlaIntegrate::integrate_additional_bbc'),
+			array('integrate_before_prepare_display_context', '\\ElkArte\\IlaIntegrate::integrate_before_prepare_display_context'),
+			array('integrate_post_bbc_parser', '\\ElkArte\\IlaIntegrate::integrate_post_parser')
 		);
 	}
 
@@ -45,7 +47,7 @@ class Ila_Integrate
 	{
 		// $hook, $function, $file
 		return array(
-			array('integrate_modify_attachment_settings', 'Ila_Integrate::integrate_modify_attachment_settings'),
+			array('integrate_modify_attachment_settings', '\\ElkArte\\IlaIntegrate::integrate_modify_attachment_settings'),
 		);
 	}
 

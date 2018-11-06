@@ -51,7 +51,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 		);
 
 		// Get ready for action
-		$action = new Action('manage_languages');
+		$action = new \ElkArte\Action('manage_languages');
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(

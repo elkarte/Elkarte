@@ -146,7 +146,7 @@ class ManageThemes extends \ElkArte\AbstractController
 		);
 
 		// Action controller
-		$action = new Action('manage_themes');
+		$action = new \ElkArte\Action('manage_themes');
 
 		// @todo Layout Settings?
 		if (!empty($context['admin_menu_name']))

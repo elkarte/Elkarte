@@ -1549,7 +1549,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 		);
 
 		// Call the right function.
-		$action = new Action();
+		$action = new \ElkArte\Action();
 		$subAction = $action->initialize($subActions, 'log');
 		$context['sub_action'] = $subAction;
 		$action->dispatch($subAction);

@@ -51,7 +51,7 @@ class MergeTopics extends \ElkArte\AbstractController
 		);
 
 		// ?action=mergetopics;sa=LETSBREAKIT won't work, sorry.
-		$action = new Action();
+		$action = new \ElkArte\Action();
 		$subAction = $action->initialize($subActions, 'index');
 		$context['sub_action'] = $subAction;
 		$action->dispatch($subAction);

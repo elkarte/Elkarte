@@ -664,7 +664,7 @@ class Likes extends \ElkArte\AbstractController
 		);
 
 		// Set up the action controller
-		$action = new Action('likesstats');
+		$action = new \ElkArte\Action('likesstats');
 
 		// Pick the correct sub-action, call integrate_sa_likesstats
 		$subAction = $action->initialize($subActions, 'messagestats', 'area');

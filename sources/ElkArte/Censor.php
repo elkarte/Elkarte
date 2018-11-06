@@ -16,6 +16,8 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Class Censor
  */

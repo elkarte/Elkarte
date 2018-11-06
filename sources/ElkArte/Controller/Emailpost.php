@@ -67,7 +67,7 @@ class Emailpost extends \ElkArte\AbstractController
 		detectServer()->setMemoryLimit('128M');
 
 		// Load the email parser and get some data to work with
-		$email_message = new Email_Parse();
+		$email_message = new \ElkArte\EmailParse();
 		$email_message->read_data($data, BOARDDIR);
 		if (!$email_message->raw_message)
 			return false;
@@ -245,7 +245,7 @@ class Emailpost extends \ElkArte\AbstractController
 		detectServer()->setMemoryLimit('256M');
 
 		// Get the data from one of our sources
-		$email_message = new Email_Parse();
+		$email_message = new \ElkArte\EmailParse();
 		$email_message->read_data($data, BOARDDIR);
 		if (!$email_message->raw_message)
 			return false;
@@ -355,7 +355,7 @@ class Emailpost extends \ElkArte\AbstractController
 		theme()->getTemplates()->loadLanguageFile('Maillist');
 
 		// Load the email parser and get some data to work with
-		$email_message = new Email_Parse();
+		$email_message = new \ElkArte\EmailParse();
 		$email_message->read_data($data, BOARDDIR);
 		if (!$email_message->raw_message)
 			return false;
@@ -399,7 +399,7 @@ class Emailpost extends \ElkArte\AbstractController
  * @package Maillist
  *
  * @param mixed[] $pbe array of all pbe user_info values
- * @param Email_Parse $email_message
+ * @param \ElkArte\EmailParse $email_message
  * @param mixed[] $topic_info
  *
  * @return bool
@@ -504,7 +504,7 @@ function pbe_create_post($pbe, $email_message, $topic_info)
  * @package Maillist
  *
  * @param mixed[] $pbe array of pbe 'user_info' values
- * @param Email_Parse $email_message
+ * @param \ElkArte\EmailParse $email_message
  * @param mixed[] $pm_info
  *
  * @return bool
@@ -564,7 +564,7 @@ function pbe_create_pm($pbe, $email_message, $pm_info)
  * @package Maillist
  *
  * @param mixed[] $pbe array of pbe 'user_info' values
- * @param Email_Parse $email_message
+ * @param \ElkArte\EmailParse $email_message
  * @param mixed[] $board_info
  *
  * @return bool
@@ -680,7 +680,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
  * @package Maillist
  *
  * @param boolean $html
- * @param Email_Parse $email_message
+ * @param \ElkArte\EmailParse $email_message
  * @param mixed[] $pbe
  *
  * @return mixed|null|string|string[]

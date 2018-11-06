@@ -414,7 +414,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 	// If we have some FTP information already, then let's assume it was required and try to get ourselves connected.
 	if (!empty($_SESSION['pack_ftp']['connected']))
 	{
-		$package_ftp = new Ftp_Connection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
+		$package_ftp = new \ElkArte\FtpConnection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
 
 		// Check for a valid connection
 		if ($package_ftp->error !== false)
@@ -424,7 +424,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 	// Just got a submission did we?
 	if ((empty($package_ftp) || ($package_ftp->error !== false)) && isset($_POST['ftp_username']))
 	{
-		$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
+		$ftp = new \ElkArte\FtpConnection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 		// We're connected, jolly good!
 		if ($ftp->error === false)
@@ -489,7 +489,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 		{
 			if (!isset($ftp))
 			{
-				$ftp = new Ftp_Connection(null);
+				$ftp = new \ElkArte\FtpConnection(null);
 			}
 			elseif ($ftp->error !== false && !isset($ftp_error))
 				$ftp_error = $ftp->last_message === null ? '' : $ftp->last_message;
@@ -674,7 +674,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	}
 	elseif (isset($_SESSION['pack_ftp']))
 	{
-		$package_ftp = new Ftp_Connection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
+		$package_ftp = new \ElkArte\FtpConnection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
 
 		if ($files === null)
 			return array();
@@ -716,7 +716,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	elseif (isset($_POST['ftp_username']))
 	{
 		// Attempt to make a new FTP connection
-		$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
+		$ftp = new \ElkArte\FtpConnection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 		if ($ftp->error === false)
 		{
@@ -733,7 +733,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	{
 		if (!isset($ftp))
 		{
-			$ftp = new Ftp_Connection(null);
+			$ftp = new \ElkArte\FtpConnection(null);
 		}
 		elseif ($ftp->error !== false && !isset($ftp_error))
 			$ftp_error = $ftp->last_message === null ? '' : $ftp->last_message;
@@ -2567,7 +2567,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	elseif ($match[1] == 'ftp')
 	{
 		// Establish a connection and attempt to enable passive mode.
-		$ftp = new Ftp_Connection(($match[2] ? 'ssl://' : '') . $match[3], empty($match[5]) ? 21 : $match[5], 'anonymous', $webmaster_email);
+		$ftp = new \ElkArte\FtpConnection(($match[2] ? 'ssl://' : '') . $match[3], empty($match[5]) ? 21 : $match[5], 'anonymous', $webmaster_email);
 		if ($ftp->error !== false || !$ftp->passive())
 			return false;
 
@@ -2594,7 +2594,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	// More likely a standard HTTP URL, first try to use cURL if available
 	elseif (isset($match[1]) && $match[1] === 'http' && function_exists('curl_init'))
 	{
-		$fetch_data = new CurlFetchWebdata(array(), $redirection_level);
+		$fetch_data = new ElkArte\CurlFetchWebdata(array(), $redirection_level);
 		$fetch_data->get_url_data($url, $post_data);
 
 		// no errors and a 200 result, then we have a good dataset, well we at least have data ;)

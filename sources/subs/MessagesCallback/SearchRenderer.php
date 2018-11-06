@@ -100,7 +100,7 @@ class SearchRenderer extends Renderer
 		// Do we have quote tag enabled?
 		$quote_enabled = empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']));
 
-		$output_pre = \Topic_Util::prepareContext(array($this->_this_message))[$this->_this_message['id_topic']];
+		$output_pre = \\ElkArte\TopicUtil::prepareContext(array($this->_this_message))[$this->_this_message['id_topic']];
 
 		$output = array_merge($context['topics'][$this->_this_message['id_msg']], $output_pre);
 

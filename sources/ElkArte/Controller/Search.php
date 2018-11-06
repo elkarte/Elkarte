@@ -31,8 +31,8 @@ class Search extends \ElkArte\AbstractController
 	protected $_search = null;
 
 	/**
-	 * The class that takes care of rendering the message icons (MessageTopicIcons)
-	 * @var null|MessageTopicIcons
+	 * The class that takes care of rendering the message icons (\ElkArte\MessageTopicIcons)
+	 * @var null|\ElkArte\MessageTopicIcons
 	 */
 	protected $_icon_sources = null;
 
@@ -430,7 +430,7 @@ class Search extends \ElkArte\AbstractController
 		$context['sub_template'] = 'results';
 		$context['page_title'] = $txt['search_results'];
 
-		$this->_icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
+		$this->_icon_sources = new \ElkArte\MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
 
 		// Set the callback.  (do you REALIZE how much memory all the messages would take?!?)
 		// This will be called from the template.

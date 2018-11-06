@@ -36,8 +36,8 @@ class Display extends \ElkArte\AbstractController
 	protected $_virtual_msg = 0;
 
 	/**
-	 * The class that takes care of rendering the message icons (MessageTopicIcons)
-	 * @var null|MessageTopicIcons
+	 * The class that takes care of rendering the message icons (\ElkArte\MessageTopicIcons)
+	 * @var null|\ElkArte\MessageTopicIcons
 	 */
 	protected $_icon_sources = null;
 
@@ -527,7 +527,7 @@ class Display extends \ElkArte\AbstractController
 		list ($sig_limits) = explode(':', $modSettings['signature_settings']);
 		$signature_settings = explode(',', $sig_limits);
 
-		$this->_icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
+		$this->_icon_sources = new \ElkArte\MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
 		if ($user_info['is_guest'])
 		{
 			$this->_show_signatures = !empty($signature_settings[8]) ? (int) $signature_settings[8] : 0;

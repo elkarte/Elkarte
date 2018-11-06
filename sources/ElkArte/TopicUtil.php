@@ -17,13 +17,15 @@
  *
  */
 
+namespace ElkArte;
+
 /**
- * Class Topic_Util
+ * Class TopicUtil
  *
  * Methods for dealing with topics presentation.
  * Converts queries results into data usable in the templates.
  */
-class Topic_Util
+class TopicUtil
 {
 	/**
 	 * This function takes an array of data coming from the database and related
@@ -47,7 +49,7 @@ class Topic_Util
 		$messages_per_page = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
 		$topicseen = $topicseen ? 'topicseen' : '';
 
-		$icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
+		$icon_sources = new \ElkArte\MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
 
 		$parser = \BBC\ParserWrapper::instance();
 

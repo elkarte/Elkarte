@@ -11,10 +11,12 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Class MessageTopicIcons
  */
-class MessageTopicIcons extends ElkArte\ValuesContainer
+class MessageTopicIcons extends \ElkArte\ValuesContainer
 {
 	const IMAGE_URL = 'images_url';
 	const DEFAULT_URL = 'default_images_url';

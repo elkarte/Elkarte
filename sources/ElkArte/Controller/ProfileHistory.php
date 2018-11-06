@@ -78,7 +78,7 @@ class ProfileHistory extends \ElkArte\AbstractController
 		);
 
 		// Set up action/subaction stuff.
-		$action = new Action('profile_history');
+		$action = new \ElkArte\Action('profile_history');
 
 		// Yep, sub-action time and call integrate_sa_profile_history as well
 		$subAction = $action->initialize($subActions, 'activity');

@@ -81,7 +81,7 @@ class BoardIndex extends \ElkArte\AbstractController implements FrontpageInterfa
 
 		$this->_events->trigger('pre_load', array('boardIndexOptions' => &$boardIndexOptions));
 
-		$boardlist = new Boards_List($boardIndexOptions);
+		$boardlist = new \ElkArte\BoardsList($boardIndexOptions);
 		$context['categories'] = $boardlist->getBoards();
 		$context['latest_post'] = $boardlist->getLatestPost();
 

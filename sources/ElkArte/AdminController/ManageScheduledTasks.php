@@ -52,7 +52,7 @@ class ManageScheduledTasks extends \ElkArte\AbstractController
 		);
 
 		// Control those actions
-		$action = new Action('manage_scheduled_tasks');
+		$action = new \ElkArte\Action('manage_scheduled_tasks');
 
 		// Now for the lovely tabs. That we all love.
 		$context[$context['admin_menu_name']]['tab_data'] = array(

@@ -44,7 +44,7 @@ class ManageBBC extends \ElkArte\AbstractController
 		);
 
 		// Set up
-		$action = new Action('manage_bbc');
+		$action = new \ElkArte\Action('manage_bbc');
 
 		// Only one option I'm afraid, but integrate_sa_manage_bbc can add more
 		$subAction = $action->initialize($subActions, 'display');

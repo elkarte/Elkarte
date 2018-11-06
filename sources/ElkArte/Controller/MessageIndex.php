@@ -296,7 +296,7 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 			'set_latest_post' => false,
 			'countChildPosts' => !empty($modSettings['countChildPosts']),
 		);
-		$boardlist = new Boards_List($boardIndexOptions);
+		$boardlist = new \ElkArte\BoardsList($boardIndexOptions);
 		$context['boards'] = $boardlist->getBoards();
 
 		// Nosey, nosey - who's viewing this board?
@@ -381,7 +381,7 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 
 		$topics_info = messageIndexTopics($board, $user_info['id'], $start, $maxindex, $context['sort_by'], $sort_column, $indexOptions);
 
-		$context['topics'] = Topic_Util::prepareContext($topics_info, false, !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128);
+		$context['topics'] = \ElkArte\TopicUtil::prepareContext($topics_info, false, !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128);
 
 		// Allow addons to add to the $context['topics']
 		call_integration_hook('integrate_messageindex_listing', array($topics_info));

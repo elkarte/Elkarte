@@ -47,7 +47,7 @@ class ManageSearchEngines extends \ElkArte\AbstractController
 		);
 
 		// Control
-		$action = new Action('manage_search_engines');
+		$action = new \ElkArte\Action('manage_search_engines');
 
 		// Some more tab data.
 		$context[$context['admin_menu_name']]['tab_data'] = array(

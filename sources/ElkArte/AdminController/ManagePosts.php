@@ -58,7 +58,7 @@ class ManagePosts extends \ElkArte\AbstractController
 		);
 
 		// Good old action handle
-		$action = new Action('manage_posts');
+		$action = new \ElkArte\Action('manage_posts');
 
 		// Tabs for browsing the different post functions.
 		$context[$context['admin_menu_name']]['tab_data'] = array(

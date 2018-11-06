@@ -11,11 +11,13 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Converts a string of HTML to BBC
  *
  * Initiate
- *    $bbc_converter = new Html_2_BBC($html);
+ *    $bbc_converter = new \ElkArte\Html2BBC($html);
  *    where $html is a string of html we want to convert to bbc
  *
  * Override
@@ -26,7 +28,7 @@
  *    $bbc = $bbc_converter->get_bbc();
  *
  */
-class Html_2_BBC
+class Html2BBC
 {
 	/**
 	 * The value that will hold our dom object

@@ -13,6 +13,8 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Similar in construction to saveDBSettings,
  *
@@ -24,7 +26,7 @@
  *
  * @package Maillist
  */
-class Email_Settings extends Settings_Form
+class EmailSettings extends Settings_Form
 {
 	/**
 	 * static function saveTableSettings, now part of the Settings Form class

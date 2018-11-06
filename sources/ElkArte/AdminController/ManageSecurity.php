@@ -47,7 +47,7 @@ class ManageSecurity extends \ElkArte\AbstractController
 		);
 
 		// Action control
-		$action = new Action('modify_security');
+		$action = new \ElkArte\Action('modify_security');
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(

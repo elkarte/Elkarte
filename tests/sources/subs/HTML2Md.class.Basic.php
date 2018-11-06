@@ -80,7 +80,7 @@ class TestHTML2Md extends \PHPUnit\Framework\TestCase
 			$test = $testcase[1];
 			$expected = $testcase[2];
 
-			$parser = new Html_2_Md($test);
+			$parser = new \ElkArte\Html2Md($test);
 
 			// Convert the html to bbc
 			$result = $parser->get_markdown();

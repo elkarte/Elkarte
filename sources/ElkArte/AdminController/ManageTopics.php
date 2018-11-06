@@ -36,7 +36,7 @@ class ManageTopics extends \ElkArte\AbstractController
 		);
 
 		// Control for an action, why not!
-		$action = new Action('manage_topics');
+		$action = new \ElkArte\Action('manage_topics');
 
 		// Only one option I'm afraid, but integrate_sa_manage_topics may add more
 		$subAction = $action->initialize($subActions, 'display');

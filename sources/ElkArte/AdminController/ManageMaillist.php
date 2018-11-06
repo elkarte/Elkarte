@@ -62,7 +62,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 		);
 
 		// Action Controller
-		$action = new Action('manage_maillist');
+		$action = new \ElkArte\Action('manage_maillist');
 
 		// Help is needed in most places, so load it up front
 		require_once(SUBSDIR . '/Maillist.subs.php');
@@ -956,7 +956,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 				$config_vars[] = array('text', 'filter_style');
 				$this->_req->post->filter_style = 'filter';
 
-				Email_Settings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array('id_filter'), $editId, $editName);
+				\ElkArte\Email_Settings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array('id_filter'), $editId, $editName);
 				redirectexit('action=admin;area=maillist;sa=emailfilters;saved');
 			}
 		}
@@ -1351,7 +1351,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 				$this->_req->post->filter_style = 'parser';
 
 				// Save, log, show
-				Email_Settings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array('id_filter'), $editId, $editName);
+				\ElkArte\Email_Settings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array('id_filter'), $editId, $editName);
 				redirectexit('action=admin;area=maillist;sa=emailparser;saved');
 			}
 		}

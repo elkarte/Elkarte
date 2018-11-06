@@ -74,7 +74,7 @@ class ManageCalendarModule extends \ElkArte\AbstractController
 		);
 
 		// Action control
-		$action = new Action('manage_calendar');
+		$action = new \ElkArte\Action('manage_calendar');
 
 		// Set up the two tabs here...
 		$context[$context['admin_menu_name']]['tab_data'] = array(

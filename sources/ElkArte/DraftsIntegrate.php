@@ -11,10 +11,12 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Integration trick.
  */
-class Drafts_Integrate
+class DraftsIntegrate
 {
 	/**
 	 * Registers hooks as needed for the drafts function to work

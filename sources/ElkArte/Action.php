@@ -11,6 +11,8 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Action class defines an action with its associated sub-actions.
  * Object-oriented controllers (with sub-actions) uses it to set their action-subaction arrays, and have it call the

@@ -215,7 +215,7 @@ class Calendar extends \ElkArte\AbstractController
 			return $this->_returnToPost();
 		}
 
-		$event = new Calendar_Event($event_id, $modSettings);
+		$event = new \ElkArte\CalendarEvent($event_id, $modSettings);
 
 		$context['event'] = $event->load($_REQUEST, $user_info['id']);
 
@@ -260,7 +260,7 @@ class Calendar extends \ElkArte\AbstractController
 		// Cast this for safety...
 		$event_id = $this->_req->get('eventid', 'intval');
 
-		$event = new Calendar_Event($event_id, $modSettings);
+		$event = new \ElkArte\CalendarEvent($event_id, $modSettings);
 
 		// Validate the post...
 		$save_data = array();

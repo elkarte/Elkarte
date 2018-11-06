@@ -11,6 +11,8 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Attempts, though an outrageous set of assumptions, to reflow/format an email message
  * that was previously wrapped by an email client (so it would look good on
@@ -26,14 +28,14 @@
  *
  * Load class
  * Initiate as
- *  - $formatter = new Email_Format();
+ *  - $formatter = new \ElkArte\EmailFormat();
  *
  * Make the call, accepts a string of data and returns it formatted
  * - $body = $formatter->reflow($body);
  *
  * @package Maillist
  */
-class Email_Format
+class EmailFormat
 {
 	/**
 	 * The full message section we will return

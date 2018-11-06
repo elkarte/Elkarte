@@ -61,7 +61,7 @@ class ManageSearch extends \ElkArte\AbstractController
 		);
 
 		// Control for actions
-		$action = new Action('manage_search');
+		$action = new \ElkArte\Action('manage_search');
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(

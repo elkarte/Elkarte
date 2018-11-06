@@ -125,7 +125,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 		);
 
 		// Get ready for some action
-		$action = new Action('manage_attachments');
+		$action = new \ElkArte\Action('manage_attachments');
 
 		// Default page title is good.
 		$context['page_title'] = $txt['attachments_avatars'];

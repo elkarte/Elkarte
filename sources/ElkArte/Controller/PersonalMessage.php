@@ -215,7 +215,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		);
 
 		// Set up our action array
-		$action = new Action('pm_index');
+		$action = new \ElkArte\Action('pm_index');
 
 		// Known action, go to it, otherwise the inbox for you
 		$subAction = $action->initialize($subActions, 'inbox');

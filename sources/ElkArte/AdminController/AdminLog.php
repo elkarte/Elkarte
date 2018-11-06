@@ -105,7 +105,7 @@ class AdminLog extends \ElkArte\AbstractController
 			$this->_req->query->desc = true;
 
 		// Set up the action control
-		$action = new Action('manage_logs');
+		$action = new \ElkArte\Action('manage_logs');
 
 		// By default do the basic settings, call integrate_sa_manage_logs
 		$subAction = $action->initialize($subActions, 'errorlog');

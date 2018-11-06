@@ -54,7 +54,7 @@ class ManageBans extends \ElkArte\AbstractController
 		);
 
 		// Start up the controller
-		$action = new Action();
+		$action = new \ElkArte\Action();
 
 		// Default the sub-action to 'view ban list'.
 		$subAction = $this->_req->getQuery('sa', 'strval', 'list');

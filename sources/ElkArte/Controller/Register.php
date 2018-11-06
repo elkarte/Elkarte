@@ -88,7 +88,7 @@ class Register extends \ElkArte\AbstractController
 		);
 
 		// Setup the action handler
-		$action = new Action();
+		$action = new \ElkArte\Action();
 		$subAction = $action->initialize($subActions, 'register');
 
 		// Call the action
@@ -206,7 +206,7 @@ class Register extends \ElkArte\AbstractController
 			$_SESSION['register']['timenow'] = time();
 
 		// If you have to agree to the agreement, it needs to be fetched from the file.
-		$agreement = new \Agreement($user_info['language']);
+		$agreement = new \ElkArte\Agreement($user_info['language']);
 		$context['agreement'] = $agreement->getParsedText();
 
 		if (empty($context['agreement']))

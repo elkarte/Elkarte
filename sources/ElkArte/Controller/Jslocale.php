@@ -87,7 +87,7 @@ class Jslocale extends \ElkArte\AbstractController
 		if (isset($langs[$lang]))
 		{
 			// If you have to agree to the agreement, it needs to be fetched from the file.
-			$agreement = new \Agreement($lang);
+			$agreement = new \ElkArte\Agreement($lang);
 			try
 			{
 				$context['json_data'] = $agreement->getParsedText();

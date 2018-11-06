@@ -141,7 +141,7 @@ class Maintenance extends \ElkArte\AbstractController
 		);
 
 		// Set up the action handler
-		$action = new Action('manage_maintenance');
+		$action = new \ElkArte\Action('manage_maintenance');
 
 		// Yep, sub-action time and call integrate_sa_manage_maintenance as well
 		$subAction = $action->initialize($subActions, 'routine');
@@ -1077,7 +1077,7 @@ class Maintenance extends \ElkArte\AbstractController
 
 		require_once(SUBSDIR . '/FtpConnection.class.php');
 
-		$ftp = new Ftp_Connection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
+		$ftp = new \ElkArte\FtpConnection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
 
 		// No errors on the connection, id/pass are good
 		if ($ftp->error === false)

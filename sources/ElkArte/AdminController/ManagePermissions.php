@@ -113,7 +113,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 		);
 
 		// Action controller
-		$action = new Action('manage_permissions');
+		$action = new \ElkArte\Action('manage_permissions');
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(

@@ -197,7 +197,7 @@ class Unread
 	 * @param int $start - position to start the query
 	 * @param int $limit - number of entries to grab
 	 * @param bool $include_avatars - if avatars should be retrieved as well
-	 * @return mixed[] - see Topic_Util::prepareContext
+	 * @return mixed[] - see \ElkArte\TopicUtil::prepareContext
 	 */
 	public function getUnreads($join, $start, $limit, $include_avatars)
 	{
@@ -217,7 +217,7 @@ class Unread
 	 * @param int $start - position to start the query
 	 * @param int $limit - number of entries to grab
 	 * @param bool|int $include_avatars - if avatars should be retrieved as well
-	 * @return mixed[] - see Topic_Util::prepareContext
+	 * @return mixed[] - see \ElkArte\TopicUtil::prepareContext
 	 */
 	private function _getUnreadTopics($join, $start, $limit, $include_avatars = false)
 	{
@@ -296,7 +296,7 @@ class Unread
 			$topics[] = $row;
 		$this->_db->free_result($request);
 
-		return Topic_Util::prepareContext($topics, true, ((int) $this->_preview_bodies) + 128);
+		return \ElkArte\TopicUtil::prepareContext($topics, true, ((int) $this->_preview_bodies) + 128);
 	}
 
 	/**
@@ -381,7 +381,7 @@ class Unread
 	 * @param int $start - position to start the query
 	 * @param int $limit - number of entries to grab
 	 * @param bool|int $include_avatars - if avatars should be retrieved as well
-	 * @return mixed[] - see Topic_Util::prepareContext
+	 * @return mixed[] - see \ElkArte\TopicUtil::prepareContext
 	 */
 	private function _getUnreadReplies($start, $limit, $include_avatars = false)
 	{
@@ -505,7 +505,7 @@ class Unread
 			$return[] = $row;
 		$this->_db->free_result($request);
 
-		return Topic_Util::prepareContext($return, true, ((int) $this->_preview_bodies) + 128);
+		return \ElkArte\TopicUtil::prepareContext($return, true, ((int) $this->_preview_bodies) + 128);
 	}
 
 	/**

@@ -1547,7 +1547,7 @@ function createList($listOptions)
 {
 	call_integration_hook('integrate_list_' . $listOptions['id'], array(&$listOptions));
 
-	$list = new ElkArte\Generic_List($listOptions);
+	$list = new \ElkArte\GenericList($listOptions);
 
 	$list->buildList();
 }
@@ -1758,7 +1758,7 @@ function censor($text, $force = false)
 
 	if ($censor === null)
 	{
-		$censor = new ElkArte\Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
+		$censor = new \ElkArte\Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
 	}
 
 	return $censor->censor($text, $force);

@@ -11,10 +11,12 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Converts HTML to Markdown text
  */
-class Html_2_Md
+class Html2Md
 {
 	/**
 	 * The value that will hold our dom object

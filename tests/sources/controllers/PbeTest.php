@@ -118,7 +118,7 @@ Regards, The ElkArte Community
 	public function testMailParse()
 	{
 		// Parse a simple email
-		$email_message = new Email_Parse();
+		$email_message = new \ElkArte\EmailParse();
 		$email_message->read_email(true, $this->_email);
 
 		// Basics

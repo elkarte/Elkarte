@@ -104,7 +104,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 		);
 
 		// Set up the action control
-		$action = new Action('modify_features');
+		$action = new \ElkArte\Action('modify_features');
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(

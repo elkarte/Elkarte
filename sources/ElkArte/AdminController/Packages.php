@@ -129,7 +129,7 @@ class Packages extends \ElkArte\AbstractController
 		);
 
 		// Set up action/subaction stuff.
-		$action = new Action('packages');
+		$action = new \ElkArte\Action('packages');
 
 		// Set up some tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -1208,7 +1208,7 @@ class Packages extends \ElkArte\AbstractController
 
 		if (empty($package_ftp) && !isset($this->_req->post->skip_ftp))
 		{
-			$ftp = new Ftp_Connection(null);
+			$ftp = new \ElkArte\FtpConnection(null);
 			list ($username, $detect_path) = $ftp->detect_path(BOARDDIR);
 
 			$context['package_ftp'] = array(

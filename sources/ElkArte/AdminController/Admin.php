@@ -759,7 +759,7 @@ class Admin extends \ElkArte\AbstractController
 		);
 
 		// Set the subaction
-		$action = new Action();
+		$action = new \ElkArte\Action();
 		$subAction = $action->initialize($subActions, 'internal');
 
 		// Keep track of what the admin wants in terms of advanced or not
@@ -875,7 +875,7 @@ class Admin extends \ElkArte\AbstractController
 		// Go through all the search data trying to find this text!
 		$search_term = strtolower(un_htmlspecialchars($context['search_term']));
 
-		$search = new AdminSettings_Search($language_files, $include_files, $settings_search);
+		$search = new \ElkArte\AdminSettingsSearch($language_files, $include_files, $settings_search);
 		$search->initSearch($context['admin_menu_name'], array(
 			array('COPPA', 'area=regcenter;sa=settings'),
 			array('CAPTCHA', 'area=securitysettings;sa=spam'),

@@ -81,7 +81,7 @@ class Attachment extends \ElkArte\AbstractController
 		);
 
 		// Setup the action handler
-		$action = new Action();
+		$action = new \ElkArte\Action();
 		$subAction = $action->initialize($subActions, 'dlattach');
 
 		// Call the action

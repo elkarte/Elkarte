@@ -245,7 +245,7 @@ class SiteCombiner
 
 			// CSSmin it to save some space
 			require_once(EXTDIR . '/cssmin.php');
-			$compressor = new CSSmin();
+			$compressor = new \CSSmin();
 			$this->_minified_cache = $compressor->run($this->_cache);
 
 			// Combine in any pre minimized css files to our new minimized string
@@ -509,7 +509,7 @@ class SiteCombiner
 				@ini_set('pcre.recursion_limit', '524');
 
 			require_once(EXTDIR . '/JSqueeze.php');
-			$jsqueeze = new Patchwork\JSqueeze;
+			$jsqueeze = new \Patchwork\JSqueeze;
 			$fetch_data = $jsqueeze->squeeze($this->_cache);
 		}
 

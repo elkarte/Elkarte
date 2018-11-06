@@ -50,7 +50,7 @@ class Xml extends \ElkArte\AbstractController
 		);
 
 		// Easy adding of xml sub actions with integrate_xmlhttp
-		$action = new Action('xmlhttp');
+		$action = new \ElkArte\Action('xmlhttp');
 		$subAction = $action->initialize($subActions);
 
 		// Act a bit special for XML, probably never see it anyway :P

@@ -52,7 +52,7 @@ class ManageMail extends \ElkArte\AbstractController
 		);
 
 		// Action control
-		$action = new Action('manage_mail');
+		$action = new \ElkArte\Action('manage_mail');
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(

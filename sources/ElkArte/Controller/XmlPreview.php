@@ -44,7 +44,7 @@ class XmlPreview extends \ElkArte\AbstractController
 		);
 
 		// Valid action?
-		$action = new Action();
+		$action = new \ElkArte\Action();
 		$subAction = $action->initialize($subActions, 'invalid', 'item');
 
 		if ($subAction === 'invalid')

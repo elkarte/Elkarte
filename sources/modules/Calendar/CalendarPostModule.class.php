@@ -91,7 +91,7 @@ class Calendar_Post_Module extends ElkArte\sources\modules\Abstract_Module
 		$req = \ElkArte\HttpReq::instance();
 		$eventid = $req->getPost('eventid', 'intval', -1);
 
-		$event = new Calendar_Event($eventid, $modSettings);
+		$event = new \ElkArte\CalendarEvent($eventid, $modSettings);
 
 		try
 		{

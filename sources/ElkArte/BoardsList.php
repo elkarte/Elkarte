@@ -16,10 +16,12 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * This class fetches all the stuff needed to build a list of boards
  */
-class Boards_List
+class BoardsList
 {
 	/**
 	 * All the options

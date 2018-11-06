@@ -15,10 +15,12 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * This class implements a standard way of displaying lists.
  */
-class Generic_List
+class GenericList
 {
 	/**
 	 * List options, an array with the format:
@@ -82,7 +84,7 @@ class Generic_List
 	protected $descVar = '';
 
 	/**
-	 * Generic_List constructor, Starts a new list
+	 * GenericList constructor, Starts a new list
 	 * Makes sure the passed list contains the minimum needed options to create a list
 	 * Loads the options in to this instance
 	 *

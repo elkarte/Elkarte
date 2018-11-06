@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The Ftp_Connection class is a Simple FTP protocol implementation.
+ * The FtpConnection class is a Simple FTP protocol implementation.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -15,12 +15,14 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Simple FTP protocol implementation.
  *
  * http://www.faqs.org/rfcs/rfc959.html
  */
-class Ftp_Connection
+class FtpConnection
 {
 	/**
 	 * Holds the connection response

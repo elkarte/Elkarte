@@ -58,7 +58,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 		);
 
 		// Action controller
-		$action = new Action('manage_smileys');
+		$action = new \ElkArte\Action('manage_smileys');
 
 		// Set the smiley context.
 		$this->_initSmileyContext();

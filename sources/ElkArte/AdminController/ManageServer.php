@@ -61,7 +61,7 @@ class ManageServer extends \ElkArte\AbstractController
 			'phpinfo' => array($this, 'action_phpinfo', 'permission' => 'admin_forum'),
 		);
 
-		$action = new Action('server_settings');
+		$action = new \ElkArte\Action('server_settings');
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(

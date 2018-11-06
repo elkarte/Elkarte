@@ -81,7 +81,7 @@ class PackageServers extends \ElkArte\AbstractController
 		);
 
 		// Set up action/subaction stuff.
-		$action = new Action('package_servers');
+		$action = new \ElkArte\Action('package_servers');
 
 		// Now let's decide where we are taking this... call integrate_sa_package_servers
 		$subAction = $action->initialize($subActions, 'servers');
@@ -748,7 +748,7 @@ class PackageServers extends \ElkArte\AbstractController
 			// Are they connecting to their FTP account already?
 			if (isset($this->_req->post->ftp_username))
 			{
-				$ftp = new Ftp_Connection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
+				$ftp = new \ElkArte\FtpConnection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
 
 				if ($ftp->error === false)
 				{
@@ -767,7 +767,7 @@ class PackageServers extends \ElkArte\AbstractController
 				// Maybe we didn't even try yet
 				if (!isset($ftp))
 				{
-					$ftp = new Ftp_Connection(null);
+					$ftp = new \ElkArte\FtpConnection(null);
 				}
 				// ...or we failed
 				elseif ($ftp->error !== false && !isset($ftp_error))

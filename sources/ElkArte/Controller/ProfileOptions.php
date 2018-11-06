@@ -164,7 +164,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 		);
 
 		// Set a subaction
-		$action = new Action();
+		$action = new \ElkArte\Action();
 		$subAction = $action->initialize($subActions, 'buddies');
 
 		// Create the tabs for the template.
