@@ -11,16 +11,16 @@
  *
  */
 
-namespace ElkArte\sources\subs\MentionType;
+namespace ElkArte\Mentions\MentionType;
 
 /**
- * Class Buddy_Mention
+ * Class BuddyMention
  *
  * Handles mentioning of buddies
  *
- * @package ElkArte\sources\subs\MentionType
+ * @package ElkArte\Mentions\MentionType
  */
-class Buddy_Mention extends Mention_Message_Abstract
+class BuddyMention extends MentionMessageAbstract
 {
 	/**
 	 * {@inheritdoc }

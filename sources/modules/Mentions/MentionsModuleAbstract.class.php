@@ -36,7 +36,7 @@ abstract class Mentions_Module_Abstract extends ElkArte\sources\modules\Abstract
 
 			foreach ($mentions as $mention)
 			{
-				$class = '\\ElkArte\\sources\\subs\\MentionType\\' . ucfirst($mention) . '_Mention';
+				$class = '\\ElkArte\\Mentions\\MentionType\\' . ucfirst($mention);
 				$hooks = $class::getEvents($action);
 
 				foreach ($hooks as $method => $dependencies)

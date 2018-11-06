@@ -16,7 +16,7 @@
  *
  */
 
-namespace ElkArte\sources\subs\MessagesCallback\BodyParser;
+namespace ElkArte\MessagesCallback\BodyParser;
 
 /**
  * Compact

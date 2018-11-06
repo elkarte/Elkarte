@@ -11,16 +11,16 @@
  *
  */
 
-namespace ElkArte\sources\subs\MentionType;
+namespace ElkArte\Mentions\MentionType;
 
 /**
- * Class Mailfail_Mention
+ * Class MailfailMention
  *
  * Handles notifying users who have had email notifications disabled for failure to deliver
  *
- * @package ElkArte\sources\subs\MentionType
+ * @package ElkArte\Mentions\MentionType
  */
-class Mailfail_Mention extends Mention_BoardAccess_Abstract
+class MailfailMention extends MentionBoardAccessAbstract
 {
 	/**
 	 * {@inheritdoc }

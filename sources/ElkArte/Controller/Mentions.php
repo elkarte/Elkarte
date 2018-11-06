@@ -426,12 +426,12 @@ class Mentions extends \ElkArte\AbstractController
 	{
 		if (!empty($type))
 		{
-			$to_register = array('\\ElkArte\\sources\\subs\\MentionType\\' . ucfirst($type) . '_Mention');
+			$to_register = array('\\ElkArte\\Mentions\\MentionType\\' . ucfirst($type));
 		}
 		else
 		{
 			$to_register = array_map(function ($name) {
-				return '\\ElkArte\\sources\\subs\\MentionType\\' . ucfirst($name) . '_Mention';
+				return '\\ElkArte\\Mentions\\MentionType\\' . ucfirst($name);
 			}, $this->_known_mentions);
 		}
 
@@ -452,7 +452,7 @@ class Mentions extends \ElkArte\AbstractController
 		$this->_buildUrl();
 
 		$id_mention = $this->_req->getQuery('item', 'intval', 0);
-		$mentioning = new \ElkArte\Mentioning(database(), new \ElkArte\DataValidator, $modSettings['enabled_mentions']);
+		$mentioning = new \ElkArte\Mentions(database(), new \ElkArte\DataValidator, $modSettings['enabled_mentions']);
 		$mentioning->updateStatus($id_mention, 'read');
 	}
 
@@ -465,7 +465,7 @@ class Mentions extends \ElkArte\AbstractController
 
 		checkSession('request');
 
-		$mentioning = new \ElkArte\Mentioning(database(), new \ElkArte\DataValidator, $modSettings['enabled_mentions']);
+		$mentioning = new \ElkArte\Mentions(database(), new \ElkArte\DataValidator, $modSettings['enabled_mentions']);
 
 		$id_mention = $this->_req->getQuery('item', 'intval', 0);
 		$mark = $this->_req->getQuery('mark');

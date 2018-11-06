@@ -16,9 +16,9 @@
  *
  */
 
-namespace ElkArte\sources\subs\MessagesCallback;
+namespace ElkArte\MessagesCallback;
 
-use \ElkArte\sources\subs\MessagesCallback\BodyParser\BodyParserInterface;
+use \ElkArte\MessagesCallback\BodyParser\BodyParserInterface;
 use \ElkArte\ValuesContainer;
 
 /**

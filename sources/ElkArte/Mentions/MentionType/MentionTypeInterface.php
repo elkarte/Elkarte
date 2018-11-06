@@ -11,14 +11,14 @@
  *
  */
 
-namespace ElkArte\sources\subs\MentionType;
+namespace ElkArte\Mentions\MentionType;
 
 /**
  * Interface Mention_Type_Interface
  *
- * @package ElkArte\sources\subs\MentionType
+ * @package ElkArte\Mentions\MentionType
  */
-interface Mention_Type_Interface
+interface MentionTypeInterface
 {
 	/**
 	 * This static function is used to obtain the events to register to a controller.

@@ -11,16 +11,16 @@
  *
  */
 
-namespace ElkArte\sources\subs\MentionType;
+namespace ElkArte\Mentions\MentionType;
 
 /**
- * Class Likemsg_Mention
+ * Class LikemsgMention
  *
  * Handles mentions of likes
  *
- * @package ElkArte\sources\subs\MentionType
+ * @package ElkArte\Mentions\MentionType
  */
-class Likemsg_Mention extends Mention_BoardAccess_Abstract
+class LikemsgMention extends MentionBoardAccessAbstract
 {
 	/**
 	 * {@inheritdoc }

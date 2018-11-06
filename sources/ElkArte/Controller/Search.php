@@ -434,12 +434,12 @@ class Search extends \ElkArte\AbstractController
 
 		// Set the callback.  (do you REALIZE how much memory all the messages would take?!?)
 		// This will be called from the template.
-		$bodyParser = new \ElkArte\sources\subs\MessagesCallback\BodyParser\Normal($this->_search->getSearchArray(), empty($modSettings['search_method']));
+		$bodyParser = new \ElkArte\MessagesCallback\BodyParser\Normal($this->_search->getSearchArray(), empty($modSettings['search_method']));
 		$opt = new \ElkArte\ValuesContainer([
 			'icon_sources' => $this->_icon_sources,
 			'show_signatures' => false,
 		]);
-		$renderer = new \ElkArte\sources\subs\MessagesCallback\SearchRenderer($messages_request, $bodyParser, $opt);
+		$renderer = new \ElkArte\MessagesCallback\SearchRenderer($messages_request, $bodyParser, $opt);
 		$renderer->setParticipants($this->_participants);
 
 		$context['topic_starter_id'] = 0;

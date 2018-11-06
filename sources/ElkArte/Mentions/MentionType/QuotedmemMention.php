@@ -11,16 +11,16 @@
  *
  */
 
-namespace ElkArte\sources\subs\MentionType;
+namespace ElkArte\Mentions\MentionType;
 
 /**
- * Class Quotedmem_Mention
+ * Class QuotedmemMention
  *
  * Handles mentioning of members whose messages has been quoted
  *
- * @package ElkArte\sources\subs\MentionType
+ * @package ElkArte\Mentions\MentionType
  */
-class Quotedmem_Mention extends Mention_BoardAccess_Abstract
+class QuotedmemMention extends MentionBoardAccessAbstract
 {
 	/**
 	 * {@inheritdoc }
@@ -55,7 +55,7 @@ class Quotedmem_Mention extends Mention_BoardAccess_Abstract
 		// Mark the mention as read if requested
 		if (isset($_REQUEST['mentionread']) && !empty($virtual_msg))
 		{
-			$mentions = new \ElkArte\Mentioning(database(), new \ElkArte\DataValidator(), $modSettings['enabled_mentions']);
+			$mentions = new \ElkArte\Mentions(database(), new \ElkArte\DataValidator(), $modSettings['enabled_mentions']);
 			$mentions->markread((int) $_REQUEST['item']);
 		}
 	}

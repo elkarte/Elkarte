@@ -656,9 +656,9 @@ class PersonalMessage extends \ElkArte\AbstractController
 			$messages_request = false;
 		}
 
-		$bodyParser = new \ElkArte\sources\subs\MessagesCallback\BodyParser\Normal(array(), false);
-		$renderer = new \ElkArte\sources\subs\MessagesCallback\PmRenderer($messages_request, $bodyParser);
-		$srenderer = new \ElkArte\sources\subs\MessagesCallback\PmRenderer($subjects_request, $bodyParser);
+		$bodyParser = new \ElkArte\MessagesCallback\BodyParser\Normal(array(), false);
+		$renderer = new \ElkArte\MessagesCallback\PmRenderer($messages_request, $bodyParser);
+		$srenderer = new \ElkArte\MessagesCallback\PmRenderer($subjects_request, $bodyParser);
 
 		$context['get_pmessage'] = array($renderer, 'getContext');
 		$context['get_psubject'] = array($srenderer, 'getContext');

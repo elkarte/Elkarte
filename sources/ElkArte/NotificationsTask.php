@@ -44,7 +44,7 @@ class NotificationsTask extends \ElkArte\ValuesContainer
 	 * @param int $id_member The id of the member generating the notification
 	 * @param mixed[] $data An array of data that can be necessary in the process
 	 * @param string $namespace A namespace for the class if different from the
-	 *               default \ElkArte\sources\subs\MentionType\
+	 *               default \ElkArte\Mentions\MentionType\
 	 */
 	public function __construct($type, $id, $id_member, $data, $namespace = '')
 	{
@@ -52,7 +52,7 @@ class NotificationsTask extends \ElkArte\ValuesContainer
 
 		$this->data = array(
 			'notification_type' => $type,
-			'namespace' => empty($namespace) ? '\\ElkArte\\sources\\subs\\MentionType\\' : rtrim($namespace, '\\') . '\\',
+			'namespace' => empty($namespace) ? '\\ElkArte\\Mentions\\MentionType\\' : rtrim($namespace, '\\') . '\\',
 			'id_target' => $id,
 			'id_member_from' => $id_member,
 			'source_data' => $data,
@@ -128,6 +128,6 @@ class NotificationsTask extends \ElkArte\ValuesContainer
 	 */
 	public function getClass()
 	{
-		return $this->data['namespace'] . ucfirst($this->data['notification_type']) . '_Mention';
+		return $this->data['namespace'] . ucfirst($this->data['notification_type']);
 	}
 }

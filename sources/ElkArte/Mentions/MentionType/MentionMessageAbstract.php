@@ -11,14 +11,14 @@
  *
  */
 
-namespace ElkArte\sources\subs\MentionType;
+namespace ElkArte\Mentions\MentionType;
 
 /**
- * Class Mention_Message_Abstract
+ * Class MentionMessageAbstract
  *
- * @package ElkArte\sources\subs\MentionType
+ * @package ElkArte\Mentions\MentionType
  */
-abstract class Mention_Message_Abstract implements Mention_Type_Interface
+abstract class MentionMessageAbstract implements MentionTypeInterface
 {
 	/**
 	 * The identifier of the mention (the name that is stored in the db)

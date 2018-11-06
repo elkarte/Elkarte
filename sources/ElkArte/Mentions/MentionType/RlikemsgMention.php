@@ -11,16 +11,16 @@
  *
  */
 
-namespace ElkArte\sources\subs\MentionType;
+namespace ElkArte\Mentions\MentionType;
 
 /**
- * Class Rlikemsg_Mention
+ * Class RlikemsgMention
  *
  * Handles the notification (or non-notification) of removed likes.
  *
- * @package ElkArte\sources\subs\MentionType
+ * @package ElkArte\Mentions\MentionType
  */
-class Rlikemsg_Mention extends Mention_BoardAccess_Abstract
+class RlikemsgMention extends MentionBoardAccessAbstract
 {
 	/**
 	 * {@inheritdoc }

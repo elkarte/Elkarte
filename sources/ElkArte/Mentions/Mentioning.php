@@ -11,7 +11,7 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Mentions;
 
 /**
  * Takes care of validating and inserting mention notifications in the database
@@ -103,7 +103,7 @@ class Mentioning extends AbstractModel
 	/**
 	 * Inserts a new mention.
 	 *
-	 * @param ElkArte\sources\subs\MentionType\Mention_Type_Interface $mention_obj The object that knows how to store
+	 * @param ElkArte\Mentions\MentionType\Mention_Type_Interface $mention_obj The object that knows how to store
 	 *  the mention in the database
 	 * @param mixed[] $data must contain uid, type and msg at a minimum
 	 *

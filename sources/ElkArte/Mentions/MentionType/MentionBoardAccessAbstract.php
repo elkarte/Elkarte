@@ -11,14 +11,14 @@
  *
  */
 
-namespace ElkArte\sources\subs\MentionType;
+namespace ElkArte\Mentions\MentionType;
 
 /**
- * Class Mention_BoardAccess_Abstract
+ * Class MentionBoardAccessAbstract
  *
- * @package ElkArte\sources\subs\MentionType
+ * @package ElkArte\Mentions\MentionType
  */
-abstract class Mention_BoardAccess_Abstract extends Mention_Message_Abstract
+abstract class MentionBoardAccessAbstract extends MentionMessageAbstract
 {
 	/**
 	 * {@inheritdoc}

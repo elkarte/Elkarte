@@ -539,12 +539,12 @@ class Display extends \ElkArte\AbstractController
 
 		// Set the callback.  (do you REALIZE how much memory all the messages would take?!?)
 		// This will be called from the template.
-		$bodyParser = new \ElkArte\sources\subs\MessagesCallback\BodyParser\Normal(array(), false);
+		$bodyParser = new \ElkArte\MessagesCallback\BodyParser\Normal(array(), false);
 		$opt = new \ElkArte\ValuesContainer([
 			'icon_sources' => $this->_icon_sources,
 			'show_signatures' => $this->_show_signatures,
 		]);
-		$renderer = new \ElkArte\sources\subs\MessagesCallback\DisplayRenderer($messages_request, $bodyParser, $opt);
+		$renderer = new \ElkArte\MessagesCallback\DisplayRenderer($messages_request, $bodyParser, $opt);
 
 		$context['get_message'] = array($renderer, 'getContext');
 
