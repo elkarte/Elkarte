@@ -110,13 +110,13 @@ function loadCacheEngines($supported_only = true)
 		// Get the engine name from the file name
 		$parts = explode('.', $file_path->getBasename());
 		$engine_name = $parts[0];
-		$class = '\\ElkArte\\sources\\subs\\CacheMethod\\' . $parts[0];
+		$class = '\\ElkArte\\Cache\\CacheMethod\\' . $parts[0];
 
 		// Validate the class name exists
 		if (class_exists($class))
 		{
 			$obj = new $class(array());
-			if ($obj instanceof ElkArte\sources\subs\CacheMethod\Cache_Method_Abstract)
+			if ($obj instanceof ElkArte\Cache\CacheMethod\AbstractCacheMethod)
 			{
 				if ($supported_only && $obj->isAvailable())
 				{

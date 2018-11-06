@@ -80,7 +80,7 @@ class ProfileInfo extends \ElkArte\AbstractController
 		$subActions = array(
 			'buddies' => array($this, 'action_profile_buddies'),
 			'recent' => array($this, 'action_profile_recent'),
-			'summary' => array('controller' => '\\ElkArte\\controller\\Profile', 'function' => 'action_index'),
+			'summary' => array('controller' => '\\ElkArte\\Controller\\Profile', 'function' => 'action_index'),
 		);
 
 		// Action control

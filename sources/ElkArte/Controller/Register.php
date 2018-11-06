@@ -715,7 +715,7 @@ class Register extends \ElkArte\AbstractController
 
 			// Here, and here only, emulate the permissions the user would have to do this.
 			$user_info['permissions'] = array_merge($user_info['permissions'], array('profile_account_own', 'profile_extra_own'));
-			$reg_fields = \ElkArte\controller\ProfileOptions::getFields('registration');
+			$reg_fields = \ElkArte\Controller\ProfileOptions::getFields('registration');
 
 			// We might have had some submissions on this front - go check.
 			foreach ($reg_fields['fields'] as $field)

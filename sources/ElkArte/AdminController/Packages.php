@@ -121,10 +121,10 @@ class Packages extends \ElkArte\AbstractController
 			// The following two belong to PackageServers,
 			// for UI's sake moved here at least temporarily
 			'servers' => array(
-				'controller' => '\\ElkArte\\admin\\PackageServers',
+				'controller' => '\\ElkArte\\AdminController\\PackageServers',
 				'function' => 'action_list'),
 			'upload' => array(
-				'controller' => '\\ElkArte\\admin\\PackageServers',
+				'controller' => '\\ElkArte\\AdminController\\PackageServers',
 				'function' => 'action_upload'),
 		);
 

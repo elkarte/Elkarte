@@ -102,28 +102,28 @@ class ModerationCenter extends \ElkArte\AbstractController
 				'areas' => array(
 					'index' => array(
 						'label' => $txt['moderation_center'],
-						'controller' => '\\ElkArte\\controller\\ModerationCenter',
+						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
 						'function' => 'action_moderationHome',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_home',
 					),
 					'settings' => array(
 						'label' => $txt['mc_settings'],
-						'controller' => '\\ElkArte\\controller\\ModerationCenter',
+						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
 						'function' => 'action_moderationSettings',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_features',
 					),
 					'modlogoff' => array(
 						'label' => $txt['mc_logoff'],
-						'controller' => '\\ElkArte\\controller\\ModerationCenter',
+						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
 						'function' => 'action_modEndSession',
 						'enabled' => empty($modSettings['securityDisable_moderate']),
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_exit',
 					),
 					'notice' => array(
-						'controller' => '\\ElkArte\\controller\\ModerationCenter',
+						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
 						'function' => 'action_showNotice',
 						'select' => 'index',
 						'icon' => 'transparent.png',
@@ -137,7 +137,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 					'modlog' => array(
 						'label' => $txt['modlog_view'],
 						'enabled' => !empty($modSettings['modlog_enabled']) && $context['can_moderate_boards'],
-						'controller' => '\\ElkArte\\admin\\Modlog',
+						'controller' => '\ElkArte\AdminController\Modlog',
 						'function' => 'action_log',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_logs',
@@ -145,7 +145,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 					'warnings' => array(
 						'label' => $txt['mc_warnings'],
 						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
-						'controller' => '\\ElkArte\\controller\\ModerationCenter',
+						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
 						'function' => 'action_viewWarnings',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_reports',
@@ -163,7 +163,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 					'postmod' => array(
 						'label' => $txt['mc_unapproved_posts'] . (!empty($mod_counts['postmod']) ? ' [' . $mod_counts['postmod'] . ']' : ''),
 						'enabled' => $context['can_moderate_approvals'],
-						'controller' => '\\ElkArte\\controller\\PostModeration',
+						'controller' => '\\ElkArte\\Controller\\PostModeration',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_posts',
@@ -184,7 +184,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 					'attachmod' => array(
 						'label' => $txt['mc_unapproved_attachments'] . (!empty($mod_counts['attachments']) ? ' [' . $mod_counts['attachments'] . ']' : ''),
 						'enabled' => $context['can_moderate_approvals'],
-						'controller' => '\\ElkArte\\controller\\PostModeration',
+						'controller' => '\\ElkArte\\Controller\\PostModeration',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_attachment',
@@ -193,7 +193,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 					'reports' => array(
 						'label' => $txt['mc_reported_posts'] . (!empty($mod_counts['reports']) ? ' [' . $mod_counts['reports'] . ']' : ''),
 						'enabled' => $context['can_moderate_boards'],
-						'controller' => '\\ElkArte\\controller\\ModerationCenter',
+						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
 						'function' => 'action_reportedPosts',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_reports',
@@ -205,7 +205,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 					'pm_reports' => array(
 						'label' => $txt['mc_reported_pms'] . (!empty($mod_counts['pm_reports']) ? ' [' . $mod_counts['pm_reports'] . ']' : ''),
 						'enabled' => $user_info['is_admin'],
-						'controller' => '\\ElkArte\\controller\\ModerationCenter',
+						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
 						'function' => 'action_reportedPosts',
 						'subsections' => array(
 							'open' => array($txt['mc_reportedp_active']),
@@ -221,7 +221,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 					'userwatch' => array(
 						'label' => $txt['mc_watched_users_title'],
 						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
-						'controller' => '\\ElkArte\\controller\\ModerationCenter',
+						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
 						'function' => 'action_viewWatchedUsers',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_permissions',
@@ -232,7 +232,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 					),
 					'groups' => array(
 						'label' => $txt['mc_group_requests'] . (!empty($mod_counts['groupreq']) ? ' [' . $mod_counts['groupreq'] . ']' : ''),
-						'controller' => '\\ElkArte\\controller\\Groups',
+						'controller' => '\\ElkArte\\Controller\\Groups',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_regcenter',
@@ -241,7 +241,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 					'members' => array(
 						'enabled' => allowedTo('moderate_forum'),
 						'label' => $txt['mc_member_requests'] . (!empty($mod_counts['memberreq']) ? ' [' . $mod_counts['memberreq'] . ']' : ''),
-						'controller' => '\\ElkArte\\admin\\ManageMembers',
+						'controller' => '\ElkArte\AdminController\ManageMembers',
 						'function' => 'action_approve',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_members',
@@ -249,7 +249,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 					),
 					'viewgroups' => array(
 						'label' => $txt['mc_view_groups'],
-						'controller' => '\\ElkArte\\controller\\Groups',
+						'controller' => '\\ElkArte\\Controller\\Groups',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_membergroups',

@@ -161,7 +161,7 @@ class Xml extends \ElkArte\AbstractController
 		$validation = validateSession();
 		if ($validation === true)
 		{
-			$controller = new \ElkArte\admin\CoreFeatures(new \ElkArte\EventManager());
+			$controller = new \ElkArte\AdminController\CoreFeatures(new \ElkArte\EventManager());
 			$controller->pre_dispatch();
 			$result = $controller->action_index();
 

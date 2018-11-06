@@ -47,13 +47,13 @@ class ManagePosts extends \ElkArte\AbstractController
 				$this, 'action_postSettings_display', 'permission' => 'admin_forum'),
 			'bbc' => array(
 				'function' => 'action_index',
-				'controller' => '\\ElkArte\\admin\\ManageBBC',
+				'controller' => '\\ElkArte\\AdminController\\ManageBBC',
 				'permission' => 'admin_forum'),
 			'censor' => array(
 				$this, 'action_censor', 'permission' => 'admin_forum'),
 			'topics' => array(
 				'function' => 'action_index',
-				'controller' => '\\ElkArte\\admin\\ManageTopics',
+				'controller' => '\\ElkArte\\AdminController\\ManageTopics',
 				'permission' => 'admin_forum'),
 		);
 

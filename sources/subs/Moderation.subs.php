@@ -558,7 +558,7 @@ function warningTemplateCount($template_type = 'warntpl')
 /**
  * Get all issued warnings in the system given the specified query parameters
  *
- * Callback for createList() in \ElkArte\controller\ModerationCenter::action_viewWarningLog().
+ * Callback for createList() in \ElkArte\Controller\ModerationCenter::action_viewWarningLog().
  *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $items_per_page The number of items to show per page
@@ -611,7 +611,7 @@ function warnings($start, $items_per_page, $sort, $query_string = '', $query_par
 /**
  * Get the count of all current warnings.
  *
- * Callback for createList() in \ElkArte\controller\ModerationCenter::action_viewWarningLog().
+ * Callback for createList() in \ElkArte\Controller\ModerationCenter::action_viewWarningLog().
  *
  * @param string|null $query_string
  * @param mixed[] $query_params

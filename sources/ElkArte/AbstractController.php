@@ -134,7 +134,7 @@ abstract class AbstractController
 	 */
 	public static function canFrontPage()
 	{
-		return in_array('ElkArte\\sources\\FrontpageInterface', class_implements(get_called_class()));
+		return in_array('ElkArte\\FrontpageInterface', class_implements(get_called_class()));
 	}
 
 	/**
@@ -156,7 +156,7 @@ abstract class AbstractController
 	/**
 	 * Initialize the event manager for the controller
 	 *
-	 * Uses the \ElkArte\controller\XXX name to define the set of event hooks to load
+	 * Uses the \ElkArte\Controller\XXX name to define the set of event hooks to load
 	 */
 	protected function _initEventManager()
 	{
@@ -177,7 +177,7 @@ abstract class AbstractController
 		if ($this->_hook === '')
 		{
 			// Use the base controller name for the hook, ie post
-			$this->_hook = str_replace('ElkArte\\controller\\', '', trim(get_class($this), '\\'));
+			$this->_hook = str_replace('\\ElkArte\\Controller\\', '', trim(get_class($this), '\\'));
 
 			// Initialize the events associated with this controller
 			$this->_initEventManager();
@@ -192,7 +192,7 @@ abstract class AbstractController
 	public function getModuleClass()
 	{
 		// Use the base controller name for the hook, ie post
-		$module_class = str_replace('ElkArte\\controller\\', '', trim(get_class($this), '\\'));
+		$module_class = str_replace('\\ElkArte\\Controller\\', '', trim(get_class($this), '\\'));
 
 		return ucfirst($module_class);
 	}
@@ -205,7 +205,7 @@ abstract class AbstractController
 	 * - Uses the controllers generic hook name to find modules
 	 * - Searches for modules registered against the module name
 	 * - Example
-	 *   - \ElkArte\controller\Display results in searching for modules registered against modules_display
+	 *   - \ElkArte\Controller\Display results in searching for modules registered against modules_display
 	 *   - $modSettings['modules_display'] returns drafts,calendar,.....
 	 *   - Verifies classes Drafts_Display_Module, Calendar_Display_Module, ... exist
 	 *

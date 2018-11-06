@@ -30,7 +30,7 @@ class BoardIndex extends \ElkArte\AbstractController implements FrontpageInterfa
 	public static function frontPageHook(&$default_action)
 	{
 		$default_action = array(
-			'controller' => '\\ElkArte\\controller\\BoardIndex',
+			'controller' => '\\ElkArte\\Controller\\BoardIndex',
 			'function' => 'action_boardindex'
 		);
 	}

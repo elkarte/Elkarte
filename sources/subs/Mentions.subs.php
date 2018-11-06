@@ -13,7 +13,7 @@
 
 /**
  * Count the mentions of the current user
- * callback for createList in action_list of \ElkArte\controller\Mentions
+ * callback for createList in action_list of \ElkArte\Controller\Mentions
  *
  * @package Mentions
  *
@@ -64,7 +64,7 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 
 /**
  * Retrieve all the info to render the mentions page for the current user
- * callback for createList in action_list of \ElkArte\controller\Mentions
+ * callback for createList in action_list of \ElkArte\Controller\Mentions
  *
  * @package Mentions
  *

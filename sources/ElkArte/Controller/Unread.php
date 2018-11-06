@@ -174,7 +174,7 @@ class Unread extends \ElkArte\AbstractController
 	{
 		global $context, $modSettings, $settings;
 
-		$this->_grabber->setAction(Unread::UNREAD);
+		$this->_grabber->setAction(\ElkArte\Unread::UNREAD);
 		$this->_grabber->setEarliestMsg($context['showing_all_topics'] ? earliest_msg() : 0);
 
 		// @todo Add modified_time in for log_time check?
@@ -242,7 +242,7 @@ class Unread extends \ElkArte\AbstractController
 	{
 		global $scripturl, $context, $modSettings, $settings;
 
-		$this->_grabber->setAction(Unread::UNREADREPLIES);
+		$this->_grabber->setAction(\ElkArte\Unread::UNREADREPLIES);
 
 		if ($modSettings['totalMessages'] > 100000)
 		{

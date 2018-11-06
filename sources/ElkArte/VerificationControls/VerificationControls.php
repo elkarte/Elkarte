@@ -57,7 +57,7 @@ class VerificationControls
 
 		foreach ($this->_known_verifications as $verification)
 		{
-			$class_name = '\\ElkArte\\sources\\subs\\VerificationControl\\' . $verification;
+			$class_name = '\\ElkArte\\VerificationControls\\VerificationControl\\' . $verification;
 			$current_instance = new $class_name($verificationOptions);
 
 			// If there is anything to show, otherwise forget it
@@ -80,12 +80,12 @@ class VerificationControls
 
 		foreach ($known_verifications as $verification)
 		{
-			$class = 'ElkArte\\sources\\subs\\VerificationControl\\' . $verification;
+			$class = '\\ElkArte\\VerificationControls\\VerificationControl\\' . $verification;
 
 			try
 			{
 				$obj = new $class(array());
-				if ($obj instanceof \ElkArte\sources\subs\VerificationControl\ControlInterface)
+				if ($obj instanceof \ElkArte\VerificationControls\VerificationControl\ControlInterface)
 				{
 					$new_settings = $obj->settings();
 					$working_verifications[] = $verification;

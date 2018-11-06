@@ -24,7 +24,7 @@ use \ElkArte\ValuesContainer;
 /**
  * PmRenderer
  *
- * Used by the \ElkArte\controller\PersonalMessage to prepare both the subjects (for
+ * Used by the \ElkArte\Controller\PersonalMessage to prepare both the subjects (for
  * the list of messages in the index) and the bodies of the PMs.
  */
 class PmRenderer extends Renderer

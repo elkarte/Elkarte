@@ -487,7 +487,7 @@ abstract class Database_Abstract implements Database
 			Errors::instance()->log_error($log_message, 'critical', $file, $line);
 		}
 
-		if (class_exists('\ElkArte\Exceptions\Exception'))
+		if (class_exists('\\ElkArte\\Exceptions\\Exception'))
 		{
 			throw new \ElkArte\Exceptions\Exception($error_message, false);
 		}

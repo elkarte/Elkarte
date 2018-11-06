@@ -13,7 +13,7 @@
 
 namespace ElkArte\Controller;
 
-use ElkArte\controller\Post;
+use ElkArte\Controller\Post;
 
 /**
  * Draft controller.

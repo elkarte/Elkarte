@@ -38,11 +38,11 @@ class DraftsIntegrate
 	{
 		// $hook, $function, $file
 		return array(
-			array('integrate_load_permissions', '\\ElkArte\\admin\\ManageDraftsModule::integrate_load_permissions'),
-			array('integrate_topics_maintenance', '\\ElkArte\\admin\\ManageDraftsModule::integrate_topics_maintenance'),
-			array('integrate_sa_manage_maintenance', '\\ElkArte\\admin\\ManageDraftsModule::integrate_sa_manage_maintenance'),
-			array('integrate_delete_members', '\\ElkArte\\admin\\ManageDraftsModule::integrate_delete_members'),
-			array('integrate_load_illegal_guest_permissions', '\\ElkArte\\admin\\ManageDraftsModule::integrate_load_illegal_guest_permissions'),
+			array('integrate_load_permissions', '\\ElkArte\\AdminController\\ManageDraftsModule::integrate_load_permissions'),
+			array('integrate_topics_maintenance', '\\ElkArte\\AdminController\\ManageDraftsModule::integrate_topics_maintenance'),
+			array('integrate_sa_manage_maintenance', '\\ElkArte\\AdminController\\ManageDraftsModule::integrate_sa_manage_maintenance'),
+			array('integrate_delete_members', '\\ElkArte\\AdminController\\ManageDraftsModule::integrate_delete_members'),
+			array('integrate_load_illegal_guest_permissions', '\\ElkArte\\AdminController\\ManageDraftsModule::integrate_load_illegal_guest_permissions'),
 		);
 	}
 }

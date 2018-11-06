@@ -112,7 +112,7 @@ class PbeImap extends AbstractModel
 		if (!empty($emails))
 		{
 			// Initialize Emailpost controller
-			$controller = new \ElkArte\controller\Emailpost(new \ElkArte\EventManager());
+			$controller = new \ElkArte\Controller\Emailpost(new \ElkArte\EventManager());
 
 			// Make sure we work from the oldest to the newest message
 			sort($emails);

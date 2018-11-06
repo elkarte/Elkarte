@@ -65,13 +65,13 @@ class ManageMembergroups extends \ElkArte\AbstractController
 				'function' => 'action_list',
 				'permission' => 'manage_membergroups'),
 			'members' => array(
-				'controller' => '\\ElkArte\\admin\\Groups',
+				'controller' => '\\ElkArte\\AdminController\\Groups',
 				'function' => 'action_index',
 				'permission' => 'manage_membergroups'),
 			'settings' => array(
 				'controller' => $this,
 				'function' => 'action_groupSettings_display',
-				'permission' => '\ElkArte\AbstractControlleradmin_forum'),
+				'permission' => 'admin_forum'),
 		);
 
 		$action = new \ElkArte\Action('manage_membergroups');

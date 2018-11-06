@@ -42,7 +42,7 @@ class Groups extends \ElkArte\AbstractController
 		if (allowedTo('access_mod_center') || $user_info['mod_cache']['bq'] != '0=1' || $user_info['mod_cache']['gq'] != '0=1' || allowedTo('manage_membergroups'))
 		{
 			$this->_req->query->area = $this->_req->getQuery('sa') === 'requests' ? 'groups' : 'viewgroups';
-			$controller = new \ElkArte\controller\ModerationCenter(new \ElkArte\EventManager());
+			$controller = new \ElkArte\Controller\ModerationCenter(new \ElkArte\EventManager());
 			$controller->pre_dispatch();
 			$controller->prepareModcenter();
 		}

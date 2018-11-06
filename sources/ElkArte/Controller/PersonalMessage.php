@@ -1830,7 +1830,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 			// Save the fields.
 			require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
-			$fields = \ElkArte\controller\ProfileOptions::getFields('contactprefs');
+			$fields = \ElkArte\Controller\ProfileOptions::getFields('contactprefs');
 			saveProfileFields($fields['fields'], $fields['hook']);
 
 			if (!empty($profile_vars))
@@ -1846,7 +1846,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		}
 
 		// Load up the fields.
-		$controller = new \ElkArte\controller\ProfileOptions(new \ElkArte\EventManager());
+		$controller = new \ElkArte\Controller\ProfileOptions(new \ElkArte\EventManager());
 		$controller->pre_dispatch();
 		$controller->action_pmprefs();
 	}

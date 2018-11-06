@@ -43,7 +43,7 @@ interface MentionTypeInterface
 	public static function getModules($modules);
 
 	/**
-	 * Used by \ElkArte\controller\Mentions to filter the mentions to display in the list.
+	 * Used by \ElkArte\Controller\Mentions to filter the mentions to display in the list.
 	 *
 	 * @param string $type
 	 * @param mixed[] $mentions

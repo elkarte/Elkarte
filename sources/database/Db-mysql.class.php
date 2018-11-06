@@ -546,7 +546,7 @@ class Database_MySQL extends Database_Abstract
 		}
 
 		// Database error auto fixing ;).
-		if (function_exists('\ElkArte\Cache\Cache::instance()->get') && (!isset($modSettings['autoFixDatabase']) || $modSettings['autoFixDatabase'] == '1'))
+		if (function_exists('\\ElkArte\\Cache\\Cache::instance()->get') && (!isset($modSettings['autoFixDatabase']) || $modSettings['autoFixDatabase'] == '1'))
 		{
 			$db_last_error = db_last_error();
 

@@ -110,7 +110,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 		$subActions = array(
 			'attachments' => array($this, 'action_attachSettings_display'),
 			'avatars' => array(
-				'controller' => '\\ElkArte\\admin\\ManageAvatars',
+				'controller' => '\\ElkArte\\AdminController\\ManageAvatars',
 				'function' => 'action_index'),
 			'attachpaths' => array($this, 'action_attachpaths'),
 			'browse' => array($this, 'action_browse'),

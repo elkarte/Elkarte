@@ -29,11 +29,11 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 	 */
 	public static function frontPageHook(&$default_action)
 	{
-		add_integration_function('integrate_menu_buttons', '\\ElkArte\\controller\\MessageIndex::addForumButton', '', false);
-		add_integration_function('integrate_current_action', '\\ElkArte\\controller\\MessageIndex::fixCurrentAction', '', false);
+		add_integration_function('integrate_menu_buttons', '\\ElkArte\\Controller\\MessageIndex::addForumButton', '', false);
+		add_integration_function('integrate_current_action', '\\ElkArte\\Controller\\MessageIndex::fixCurrentAction', '', false);
 
 		$default_action = array(
-			'controller' => '\\ElkArte\\controller\\MessageIndex',
+			'controller' => '\\ElkArte\\Controller\\MessageIndex',
 			'function' => 'action_messageindex_fp'
 		);
 	}
@@ -48,7 +48,7 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 		theme()->addInlineJavascript('
 			$(\'#front_page\').on(\'change\', function() {
 				var $base = $(\'#message_index_frontpage\').parent();
-				if ($(this).val() == \'\\ElkArte\\controller\\MessageIndex\')
+				if ($(this).val() == \'\ElkArte\Controller\MessageIndex\')
 				{
 					$base.fadeIn();
 					$base.prev().fadeIn();
@@ -579,7 +579,7 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 				if (empty($this->_req->post->topics) || count($this->_req->post->topics) < 2)
 					redirectexit($redirect_url);
 
-				$controller = new \ElkArte\controller\MergeTopics(new \ElkArte\EventManager());
+				$controller = new \ElkArte\Controller\MergeTopics(new \ElkArte\EventManager());
 				$controller->pre_dispatch();
 				return $controller->action_mergeExecute($this->_req->post->topics);
 			}

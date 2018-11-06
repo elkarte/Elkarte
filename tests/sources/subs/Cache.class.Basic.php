@@ -27,7 +27,7 @@ class TestCache extends \PHPUnit\Framework\TestCase
 	 */
 	public function setUp()
 	{
-		Elk_Autoloader::instance()->register(SUBSDIR . '/CacheMethod', '\\ElkArte\\sources\\subs\\CacheMethod');
+		Elk_Autoloader::instance()->register(SUBSDIR . '/CacheMethod', '\\ElkArte\\Cache\\CacheMethod');
 	}
 
 	/**
@@ -35,7 +35,7 @@ class TestCache extends \PHPUnit\Framework\TestCase
 	 */
 	public function testFilebasedCache()
 	{
-		$this->_cache_obj = new ElkArte\sources\subs\CacheMethod\Filebased(array());
+		$this->_cache_obj = new ElkArte\Cache\CacheMethod\Filebased(array());
 		$this->doCacheTests();
 	}
 

@@ -139,7 +139,7 @@ class ManageDraftsModule extends \ElkArte\AbstractController
 	public static function integrate_sa_manage_maintenance(&$subActions)
 	{
 		$subActions['topics']['activities']['olddrafts'] = function () {
-			$controller = new \ElkArte\admin\ManageDraftsModule(new \ElkArte\EventManager());
+			$controller = new \ElkArte\AdminController\ManageDraftsModule(new \ElkArte\EventManager());
 			$controller->pre_dispatch();
 			$controller->action_olddrafts_display();
 		};

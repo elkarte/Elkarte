@@ -135,7 +135,7 @@ class Maintenance extends \ElkArte\AbstractController
 				'function' => 'action_hooks',
 			),
 			'attachments' => array(
-				'controller' => '\\ElkArte\\admin\\ManageAttachments',
+				'controller' => '\\ElkArte\\AdminController\\ManageAttachments',
 				'function' => 'action_maintenance',
 			),
 		);
@@ -444,7 +444,7 @@ class Maintenance extends \ElkArte\AbstractController
 		// Honestly, this should be done in the sub function.
 		validateToken('admin-maint');
 
-		$controller = new \ElkArte\admin\RepairBoards(new \ElkArte\EventManager());
+		$controller = new \ElkArte\AdminController\RepairBoards(new \ElkArte\EventManager());
 		$controller->pre_dispatch();
 		$controller->action_repairboards();
 	}

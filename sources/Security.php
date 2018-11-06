@@ -401,7 +401,7 @@ function is_not_banned($forceCheck = false)
 		// We don't wanna see you!
 		if (!$user_info['is_guest'])
 		{
-			$controller = new \ElkArte\controller\Auth(new \ElkArte\EventManager());
+			$controller = new \ElkArte\Controller\Auth(new \ElkArte\EventManager());
 			$controller->action_logout(true, false);
 		}
 
@@ -474,7 +474,7 @@ function is_not_banned($forceCheck = false)
 		writeLog(true);
 
 		// Log them out
-		$controller = new \ElkArte\controller\Auth(new \ElkArte\EventManager());
+		$controller = new \ElkArte\Controller\Auth(new \ElkArte\EventManager());
 		$controller->action_logout(true, false);
 
 		// Tell them thanks
