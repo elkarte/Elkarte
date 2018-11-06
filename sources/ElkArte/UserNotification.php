@@ -13,7 +13,9 @@
  *
  */
 
-class User_Notification extends AbstractModel
+namespace ElkArte;
+
+class UserNotification extends \ElkArte\AbstractModel
 {
 	/**
 	 * All the shapes the icon can be.

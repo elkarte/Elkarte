@@ -352,7 +352,7 @@ function list_getLanguagesList()
 	$url = 'http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, array('ElkArte ' => '')));
 
 	// Load the class file and stick it into an array.
-	$language_list = new Xml_Array(fetch_web_data($url), true);
+	$language_list = new \ElkArte\XmlArray(fetch_web_data($url), true);
 
 	// Check that the site responded and that the language exists.
 	if (!$language_list->exists('languages'))

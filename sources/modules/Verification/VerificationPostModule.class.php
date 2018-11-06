@@ -55,7 +55,7 @@ class Verification_Post_Module extends ElkArte\sources\modules\Abstract_Module
 		$verificationOptions = array(
 			'id' => 'post',
 		);
-		$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions);
+		$context['require_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions);
 		$context['visual_verification_id'] = $verificationOptions['id'];
 
 		// If they came from quick reply, and have to enter verification details, give them some notice.
@@ -77,7 +77,7 @@ class Verification_Post_Module extends ElkArte\sources\modules\Abstract_Module
 		$verificationOptions = array(
 			'id' => 'post',
 		);
-		$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions, true);
+		$context['require_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions, true);
 
 		if (is_array($context['require_verification']))
 		{

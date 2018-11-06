@@ -1408,7 +1408,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			$verificationOptions = array(
 				'id' => 'pm',
 			);
-			$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions);
+			$context['require_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions);
 			$context['visual_verification_id'] = $verificationOptions['id'];
 		}
 

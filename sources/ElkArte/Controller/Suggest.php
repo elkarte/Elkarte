@@ -60,7 +60,7 @@ class Suggest extends \ElkArte\AbstractController
 		// These are all registered types.
 		$searchTypes = array(
 			'member' => array(
-				'class' => 'Suggest',
+				'class' => '\\ElkArte\\Suggest',
 				'function' => 'member'
 			),
 		);

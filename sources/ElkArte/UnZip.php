@@ -11,6 +11,8 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Utility class to unzip package files
  *

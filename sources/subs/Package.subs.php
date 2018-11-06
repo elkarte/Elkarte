@@ -78,8 +78,7 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  */
 function read_tgz_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
-	require_once(SUBSDIR . '/UnTgz.class.php');
-	$untgz = new UnTgz($data, $destination, $single_file, $overwrite, $files_to_extract);
+	$untgz = new \ElkArte\UnTgz($data, $destination, $single_file, $overwrite, $files_to_extract);
 
 	// Choose the right method for the file
 	if ($untgz->check_valid_tgz())
@@ -106,8 +105,7 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
  */
 function read_zip_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
-	require_once(SUBSDIR . '/UnZip.class.php');
-	$unzip = new UnZip($data, $destination, $single_file, $overwrite, $files_to_extract);
+	$unzip = new \ElkArte\UnZip($data, $destination, $single_file, $overwrite, $files_to_extract);
 
 	return $unzip->read_zip_data();
 }
@@ -213,7 +211,7 @@ function loadInstalledPackages()
  * - Expects the file to be a package in packages/.
  * - Returns a error string if the package-info is invalid.
  * - Otherwise returns a basic array of id, version, filename, and similar information.
- * - An Xml_Array is available in 'xml'.
+ * - An \ElkArte\XmlArray is available in 'xml'.
  *
  * @package Packages
  * @param string $gzfilename
@@ -253,8 +251,8 @@ function getPackageInfo($gzfilename)
 			return 'package_get_error_is_zero';
 	}
 
-	// Parse package-info.xml into an Xml_Array.
-	$packageInfo = new Xml_Array($packageInfo);
+	// Parse package-info.xml into an \ElkArte\XmlArray.
+	$packageInfo = new \ElkArte\XmlArray($packageInfo);
 
 	// @todo Error message of some sort?
 	if (!$packageInfo->exists('package-info[0]'))
@@ -799,14 +797,14 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
  *
  * What it does:
  *
- * - Package should be an Xml_Array with package-info as its base.
+ * - Package should be an \ElkArte\XmlArray with package-info as its base.
  * - Testing_only should be true if the package should not actually be applied.
  * - Method can be upgrade, install, or uninstall.  Its default is install.
  * - Previous_version should be set to the previous installed version of this package, if any.
  * - Does not handle failure terribly well; testing first is always better.
  *
  * @package Packages
- * @param Xml_Array $packageXML
+ * @param \ElkArte\XmlArray $packageXML
  * @param bool $testing_only = true
  * @param string $method = 'install' ('install', 'upgrade', or 'uninstall')
  * @param string $previous_version = ''
@@ -1747,7 +1745,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 
 	detectServer()->setTimeLimit(600);
 
-	$xml = new Xml_Array(strtr($file, array("\r" => '')));
+	$xml = new \ElkArte\XmlArray(strtr($file, array("\r" => '')));
 	$actions = array();
 	$everything_found = true;
 

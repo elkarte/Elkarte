@@ -16,14 +16,14 @@
  *
  */
 
-namespace ElkArte\sources\subs;
+namespace ElkArte\VerificationControls;
 
 /**
  * Class VerificationControls
  *
  * - Takes care of create the verification controls, do the tests, etc.
  * - Assumes the controls are available under /sources/subs/VerificationControl
- *   and implement \ElkArte\sources\subs\VerificationControl\ControlInterface
+ *   and implement \ElkArte\VerificationControl\ControlInterface
  * - It also provides a static method to load the available verifications (admin)
  *
  * @package ElkArte

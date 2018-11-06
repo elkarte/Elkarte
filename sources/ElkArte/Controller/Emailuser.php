@@ -481,7 +481,7 @@ class Emailuser extends \ElkArte\AbstractController
 			$verificationOptions = array(
 				'id' => 'report',
 			);
-			$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions);
+			$context['require_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions);
 			$context['visual_verification_id'] = $verificationOptions['id'];
 		}
 
@@ -570,7 +570,7 @@ class Emailuser extends \ElkArte\AbstractController
 			$verificationOptions = array(
 				'id' => 'report',
 			);
-			$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions, true);
+			$context['require_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions, true);
 
 			if (is_array($context['require_verification']))
 			{

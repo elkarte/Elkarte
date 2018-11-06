@@ -58,7 +58,7 @@ class Verification_Register_Module extends ElkArte\sources\modules\Abstract_Modu
 			$verificationOptions = array(
 				'id' => 'register',
 			);
-			$context['visual_verification'] = VerificationControls_Integrate::create($verificationOptions);
+			$context['visual_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions);
 			$context['visual_verification_id'] = $verificationOptions['id'];
 		}
 		// Otherwise we have nothing to show.
@@ -80,7 +80,7 @@ class Verification_Register_Module extends ElkArte\sources\modules\Abstract_Modu
 		$verificationOptions = array(
 			'id' => 'register',
 		);
-		$context['visual_verification'] = VerificationControls_Integrate::create($verificationOptions, true);
+		$context['visual_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions, true);
 
 		if (is_array($context['visual_verification']))
 		{
@@ -100,7 +100,7 @@ class Verification_Register_Module extends ElkArte\sources\modules\Abstract_Modu
 		$verificationOptions = array(
 			'id' => 'contactform',
 		);
-		$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions, true);
+		$context['require_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions, true);
 
 		if (is_array($context['require_verification']))
 		{
@@ -119,7 +119,7 @@ class Verification_Register_Module extends ElkArte\sources\modules\Abstract_Modu
 		$verificationOptions = array(
 			'id' => 'contactform',
 		);
-		$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions);
+		$context['require_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions);
 		$context['visual_verification_id'] = $verificationOptions['id'];
 	}
 }

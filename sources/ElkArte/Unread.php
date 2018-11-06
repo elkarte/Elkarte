@@ -15,6 +15,8 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Unread posts and replies Controller
  */

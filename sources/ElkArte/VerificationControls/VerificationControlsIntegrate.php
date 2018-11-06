@@ -16,17 +16,19 @@
  *
  */
 
+namespace ElkArte\VerificationControls;
+
 use ElkArte\sources\subs\VerificationControls;
 use ElkArte\Sessions\SessionIndex;
 
 /**
- * Class VerificationControls_Integrate
+ * Class VerificationControlsIntegrate
  *
  * - Injects the verification controls settings in the appropriate admin page.
  *
  * @package ElkArte
  */
-class VerificationControls_Integrate
+class VerificationControlsIntegrate
 {
 	/**
 	 * Register ACP config hooks for setting values
@@ -37,7 +39,7 @@ class VerificationControls_Integrate
 	{
 		// $hook, $function, $file
 		return array(
-			array('integrate_spam_settings', 'VerificationControls_Integrate::integrate_spam_settings'),
+			array('integrate_spam_settings', '\\ElkArte\\VerificationControls\\VerificationControlsIntegrate::integrate_spam_settings'),
 		);
 	}
 
@@ -77,7 +79,7 @@ class VerificationControls_Integrate
 
 		if (!isset($all_instances[$verificationOptions['id']]))
 		{
-			$all_instances[$verificationOptions['id']] = new VerificationControls($sessionVal, $modSettings, $verificationOptions, $isNew, $force_refresh);
+			$all_instances[$verificationOptions['id']] = new \ElkArte\VerificationControls\VerificationControls($sessionVal, $modSettings, $verificationOptions, $isNew, $force_refresh);
 		}
 
 		$instances = &$all_instances[$verificationOptions['id']];

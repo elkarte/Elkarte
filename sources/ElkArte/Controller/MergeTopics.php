@@ -186,7 +186,7 @@ class MergeTopics extends \ElkArte\AbstractController
 			throw new \ElkArte\Exceptions\Exception('merge_need_more_topics');
 
 		// Send the topics to the TopicsMerge class
-		$merger = new TopicsMerge($topics);
+		$merger = new \ElkArte\TopicsMerge($topics);
 
 		// If we didn't get any topics then they've been messing with unapproved stuff.
 		if ($merger->hasErrors())

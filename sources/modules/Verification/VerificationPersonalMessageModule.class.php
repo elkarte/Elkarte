@@ -55,7 +55,7 @@ class Verification_PersonalMessage_Module extends ElkArte\sources\modules\Abstra
 		$verificationOptions = array(
 			'id' => 'pm',
 		);
-		$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions);
+		$context['require_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions);
 		$context['visual_verification_id'] = $verificationOptions['id'];
 	}
 
@@ -76,7 +76,7 @@ class Verification_PersonalMessage_Module extends ElkArte\sources\modules\Abstra
 		$verificationOptions = array(
 			'id' => 'pm',
 		);
-		$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions, true);
+		$context['require_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions, true);
 
 		if (is_array($context['require_verification']))
 		{

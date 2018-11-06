@@ -11,7 +11,9 @@
  *
  */
 
-class User_Notification_Integrate
+namespace ElkArte;
+
+class UserNotificationIntegrate
 {
 	/**
 	 * Dynamically registers the hooks for the feature.
@@ -25,7 +27,7 @@ class User_Notification_Integrate
 
 		// $hook, $function, $file
 		return array(
-			array('integrate_load_theme', 'User_Notification_Integrate::integrate_load_theme'),
+			array('integrate_load_theme', '\\ElkArte\\UserNotificationIntegrate::integrate_load_theme'),
 		);
 	}
 
@@ -36,8 +38,8 @@ class User_Notification_Integrate
 	{
 		// $hook, $function, $file
 		return array(
-			array('integrate_modify_mention_settings', 'User_Notification_Integrate::integrate_modify_mention_settings'),
-			array('integrate_save_modify_mention_settings', 'User_Notification_Integrate::integrate_save_modify_mention_settings'),
+			array('integrate_modify_mention_settings', '\\ElkArte\\UserNotificationIntegrate::integrate_modify_mention_settings'),
+			array('integrate_save_modify_mention_settings', '\\ElkArte\\UserNotificationIntegrate::integrate_save_modify_mention_settings'),
 		);
 	}
 
@@ -53,7 +55,7 @@ class User_Notification_Integrate
 			return;
 		}
 
-		$notification = new User_Notification;
+		$notification = new \ElkArte\UserNotification;
 		$notification->present();
 	}
 
@@ -64,7 +66,7 @@ class User_Notification_Integrate
 	 */
 	public static function integrate_modify_mention_settings(&$config_vars)
 	{
-		$notification = new User_Notification;
+		$notification = new \ElkArte\UserNotification;
 
 		$notification_cfg = $notification->addConfig();
 		$config_vars = elk_array_insert($config_vars, $config_vars[1], $notification_cfg, 'after', false);
@@ -77,7 +79,7 @@ class User_Notification_Integrate
 	{
 		$req = \ElkArte\HttpReq::instance();
 
-		$notification = new User_Notification;
+		$notification = new \ElkArte\UserNotification;
 		$req->post = $notification->validate($req->post);
 	}
 }

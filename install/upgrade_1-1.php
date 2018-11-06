@@ -349,7 +349,7 @@ class UpgradeInstructions_upgrade_1_1
 					enableModules('poll', array('display', 'post'));
 					enableModules('verification', array('post', 'personalmessage', 'register'));
 					enableModules('random', array('post', 'display'));
-					\ElkArte\Hooks::instance()->enableIntegration('User_Notification_Integrate');
+					\ElkArte\Hooks::instance()->enableIntegration('\\ElkArte\\UserNotificationIntegrate');
 					\ElkArte\Hooks::instance()->enableIntegration('\\ElkArte\\IlaIntegrate');
 					updateSettings(array(
 						'usernotif_favicon_bgColor' => '#ff0000',

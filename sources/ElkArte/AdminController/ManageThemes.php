@@ -1192,8 +1192,8 @@ class ManageThemes extends \ElkArte\AbstractController
 			{
 				$theme_info = file_get_contents($this->theme_dir . '/theme_info.xml');
 
-				// Parse theme-info.xml into an Xml_Array.
-				$theme_info_xml = new Xml_Array($theme_info);
+				// Parse theme-info.xml into an \ElkArte\XmlArray.
+				$theme_info_xml = new \ElkArte\XmlArray($theme_info);
 
 				// @todo Error message of some sort?
 				if (!$theme_info_xml->exists('theme-info[0]'))

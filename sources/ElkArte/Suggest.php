@@ -16,8 +16,10 @@
  *
  */
 
+namespace ElkArte;
+
 /**
- * Suggest Controller
+ * Suggesting names (basically a wrapper for getMember)
  */
 class Suggest
 {

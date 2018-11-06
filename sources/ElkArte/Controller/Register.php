@@ -1133,7 +1133,6 @@ class Register extends \ElkArte\AbstractController
 			theme()->getTemplates()->loadLanguageFile('Errors');
 
 			// Could they get the right send topic verification code?
-			require_once(SUBSDIR . '/VerificationControls.class.php');
 			require_once(SUBSDIR . '/Members.subs.php');
 
 			// Form validation

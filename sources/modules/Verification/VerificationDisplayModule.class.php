@@ -50,7 +50,7 @@ class Verification_Display_Module extends ElkArte\sources\modules\Abstract_Modul
 		$verificationOptions = array(
 			'id' => 'post',
 		);
-		$context['require_verification'] = VerificationControls_Integrate::create($verificationOptions);
+		$context['require_verification'] = \ElkArte\VerificationControls\VerificationControlsIntegrate::create($verificationOptions);
 		$context['visual_verification_id'] = $verificationOptions['id'];
 	}
 }

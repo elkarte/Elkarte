@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The Xml_Array class is an xml parser.
+ * The XmlArray class is an xml parser.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -15,13 +15,15 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Class representing an xml array.
  *
  * Reads in xml, allows you to access it simply.
  * Version 2.0 dev.
  */
-class Xml_Array
+class XmlArray
 {
 	/**
 	 * Holds xml parsed results
@@ -45,12 +47,12 @@ class Xml_Array
 	 * Constructor for the xml parser.
 	 *
 	 * Example use:
-	 *   $xml = new Xml_Array(file('data.xml'));
+	 *   $xml = new \ElkArte\XmlArray(file('data.xml'));
 	 *
 	 * @param string $data the xml data or an array of, unless is_clone is true.
 	 * @param bool $auto_trim default false, used to automatically trim textual data.
 	 * @param int|null $level default null, the debug level, specifies whether notices should be generated for missing elements and attributes.
-	 * @param bool $is_clone default false. If is_clone is true, the  Xml_Array is cloned from another - used internally only.
+	 * @param bool $is_clone default false. If is_clone is true, the  \ElkArte\XmlArray is cloned from another - used internally only.
 	 */
 	public function __construct($data, $auto_trim = false, $level = null, $is_clone = false)
 	{
@@ -134,7 +136,7 @@ class Xml_Array
 	}
 
 	/**
-	 * Get an element, returns a new Xml_Array.
+	 * Get an element, returns a new \ElkArte\XmlArray.
 	 *
 	 * - It finds any elements that match the path specified.
 	 * - It will always return a set if there is more than one of the element
@@ -145,7 +147,7 @@ class Xml_Array
 	 *
 	 * @param string $path  - the path to the element to get
 	 * @param bool $return_full  - always return full result set
-	 * @return Xml_Array a new Xml_Array.
+	 * @return \ElkArte\XmlArray a new \ElkArte\XmlArray.
 	 */
 	public function path($path, $return_full = false)
 	{
@@ -199,7 +201,7 @@ class Xml_Array
 		// Create the right type of class...
 		$newClass = get_class($this);
 
-		// Return a new Xml_Array for the result.
+		// Return a new \ElkArte\XmlArray for the result.
 		return $array === false ? false : new $newClass($array, $this->trim, $this->debug_level, true);
 	}
 
@@ -270,16 +272,16 @@ class Xml_Array
 	}
 
 	/**
-	 * Get an array of Xml_Array's matching the specified path.
+	 * Get an array of \ElkArte\XmlArray's matching the specified path.
 	 *
-	 * - This differs from ->path(path, true) in that instead of an Xml_Array
-	 * of elements, an array of Xml_Array's is returned for use with foreach.
+	 * - This differs from ->path(path, true) in that instead of an \ElkArte\XmlArray
+	 * of elements, an array of \ElkArte\XmlArray's is returned for use with foreach.
 	 *
 	 * Example use:
 	 *   foreach ($xml->set('html/body/p') as $p)
 	 *
 	 * @param string $path  - the path to search for.
-	 * @return array an array of Xml_Array objects
+	 * @return array an array of \ElkArte\XmlArray objects
 	 */
 	public function set($path)
 	{
@@ -296,7 +298,7 @@ class Xml_Array
 			// Create the right type of class...
 			$newClass = get_class($this);
 
-			// Create a new Xml_Array and stick it in the array.
+			// Create a new \ElkArte\XmlArray and stick it in the array.
 			$array[] = new $newClass($val, $this->trim, $this->debug_level, true);
 		}
 
@@ -304,7 +306,7 @@ class Xml_Array
 	}
 
 	/**
-	 * Create an xml file from an Xml_Array, the specified path if any.
+	 * Create an xml file from an \ElkArte\XmlArray, the specified path if any.
 	 *
 	 * Example use:
 	 *   echo $this->create_xml();

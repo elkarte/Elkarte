@@ -947,7 +947,7 @@ class Admin extends \ElkArte\AbstractController
 		$context['search_results'] = array();
 
 		// Get the results loaded into an array for processing!
-		$results = new Xml_Array($search_results, false);
+		$results = new \ElkArte\XmlArray($search_results, false);
 
 		// Move through the api layer.
 		if (!$results->exists('api'))
