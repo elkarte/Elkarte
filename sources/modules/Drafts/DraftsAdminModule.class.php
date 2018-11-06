@@ -25,7 +25,7 @@ class Drafts_Admin_Module extends ElkArte\sources\modules\Abstract_Module
 	/**
 	 * {@inheritdoc}
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(\ElkArte\EventManager $eventsManager)
 	{
 		return array(
 			array('addMenu', array('Drafts_Admin_Module', 'addMenu'), array()),

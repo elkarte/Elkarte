@@ -1162,7 +1162,7 @@ function profileValidateEmail($email, $memID = 0)
 	// Check the name and email for validity.
 	$check = array();
 	$check['email'] = strtr($email, array('&#039;' => '\''));
-	if (Data_Validator::is_valid($check, array('email' => 'valid_email|required'), array('email' => 'trim')))
+	if (\ElkArte\DataValidator::is_valid($check, array('email' => 'valid_email|required'), array('email' => 'trim')))
 		$email = $check['email'];
 	else
 		return empty($check['email']) ? 'no_email' : 'bad_email';

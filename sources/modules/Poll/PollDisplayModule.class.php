@@ -35,7 +35,7 @@ class Poll_Display_Module extends ElkArte\sources\modules\Abstract_Module
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(\ElkArte\EventManager $eventsManager)
 	{
 		global $modSettings;
 

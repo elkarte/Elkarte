@@ -900,7 +900,7 @@ class Admin extends \ElkArte\AbstractController
 		$this->_req->post->membername = un_htmlspecialchars($context['search_term']);
 		$this->_req->post->types = '';
 
-		$managemembers = new \ElkArte\admin\ManageMembers(new Event_manager());
+		$managemembers = new \ElkArte\admin\ManageMembers(new \ElkArte\EventManager());
 		$managemembers->pre_dispatch();
 		$managemembers->action_index();
 	}

@@ -11,11 +11,13 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Class used to validate and transform data
  *
  * Initiate
- *    $validation = new Data_Validator();
+ *    $validation = new \ElkArte\DataValidator();
  *
  * Set validation rules
  *    $validation->validation_rules(array(
@@ -52,7 +54,7 @@
  *
  * Use it inline with the static method
  * $_POST['username'] = ' username '
- * if (Data_Validator::is_valid($_POST, array('username' => 'required|alpha_numeric'), array('username' => 'trim|strtoupper')))
+ * if (\ElkArte\DataValidator::is_valid($_POST, array('username' => 'required|alpha_numeric'), array('username' => 'trim|strtoupper')))
  *    $username = $_POST['username'] // now = 'USERNAME'
  *
  * Current validation can be one or a combination of:
@@ -62,7 +64,7 @@
  *    valid_url, valid_ip, valid_ipv6, valid_email, valid_color
  *    php_syntax, contains[x,y,x], required, without[x,y,z]
  */
-class Data_Validator
+class DataValidator
 {
 	/**
 	 * Validation rules
@@ -143,7 +145,7 @@ class Data_Validator
 	 */
 	public static function is_valid(&$data = array(), $validation_rules = array(), $sanitation_rules = array())
 	{
-		$validator = new Data_Validator();
+		$validator = new \ElkArte\DataValidator();
 
 		// Set the rules
 		$validator->sanitation_rules($sanitation_rules);
@@ -389,7 +391,7 @@ class Data_Validator
 			return;
 
 		// Start a new instance of the validator to work on this sub data (csv/array)
-		$sub_validator = new Data_Validator();
+		$sub_validator = new \ElkArte\DataValidator();
 
 		$fields = array();
 		$validation_rules = array();
@@ -533,7 +535,7 @@ class Data_Validator
 	private function _sanitize_recursive($input, $field, $rules)
 	{
 		// create a new instance to run against this sub data
-		$validator = new Data_Validator();
+		$validator = new \ElkArte\DataValidator();
 
 		$fields = array();
 		$sanitation_rules = array();

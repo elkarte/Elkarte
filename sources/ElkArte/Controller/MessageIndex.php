@@ -579,7 +579,7 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 				if (empty($this->_req->post->topics) || count($this->_req->post->topics) < 2)
 					redirectexit($redirect_url);
 
-				$controller = new \ElkArte\controller\MergeTopics(new Event_Manager());
+				$controller = new \ElkArte\controller\MergeTopics(new \ElkArte\EventManager());
 				$controller->pre_dispatch();
 				return $controller->action_mergeExecute($this->_req->post->topics);
 			}

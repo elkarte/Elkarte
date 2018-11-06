@@ -218,7 +218,7 @@ class PreparseCode
 		$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $this->message, -1, PREG_SPLIT_DELIM_CAPTURE);
 
 		// Token generator
-		$tokenizer = new \Token_Hash();
+		$tokenizer = new \ElkArte\TokenHash();
 
 		// Separate all code blocks
 		for ($i = 0, $n = count($parts); $i < $n; $i++)

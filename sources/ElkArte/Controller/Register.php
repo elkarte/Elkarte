@@ -847,7 +847,7 @@ class Register extends \ElkArte\AbstractController
 			}
 
 			// @todo Separate the sprintf?
-			if (!Data_Validator::is_valid($this->_req->post, array('new_email' => 'valid_email|required|max_length[255]'), array('new_email' => 'trim')))
+			if (!\ElkArte\DataValidator::is_valid($this->_req->post, array('new_email' => 'valid_email|required|max_length[255]'), array('new_email' => 'trim')))
 			{
 				throw new \ElkArte\Exceptions\Exception(sprintf($txt['valid_email_needed'], htmlspecialchars($this->_req->post->new_email, ENT_COMPAT, 'UTF-8')), false);
 			}
@@ -1137,7 +1137,7 @@ class Register extends \ElkArte\AbstractController
 			require_once(SUBSDIR . '/Members.subs.php');
 
 			// Form validation
-			$validator = new Data_Validator();
+			$validator = new \ElkArte\DataValidator();
 			$validator->sanitation_rules(array(
 				'emailaddress' => 'trim',
 				'contactmessage' => 'trim'
@@ -1156,7 +1156,7 @@ class Register extends \ElkArte\AbstractController
 				$context['errors'] = $validator->validation_errors();
 
 			// Get the clean data
-			$this->_req->post = new ArrayObject($validator->validation_data(), ArrayObject::ARRAY_AS_PROPS);
+			$this->_req->post = new \ArrayObject($validator->validation_data(), \ArrayObject::ARRAY_AS_PROPS);
 
 			// Trigger the verify contact event for captcha checks
 			$this->_events->trigger('verify_contact', array());

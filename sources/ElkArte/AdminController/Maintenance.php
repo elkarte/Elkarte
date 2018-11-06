@@ -444,7 +444,7 @@ class Maintenance extends \ElkArte\AbstractController
 		// Honestly, this should be done in the sub function.
 		validateToken('admin-maint');
 
-		$controller = new \ElkArte\admin\RepairBoards(new Event_manager());
+		$controller = new \ElkArte\admin\RepairBoards(new \ElkArte\EventManager());
 		$controller->pre_dispatch();
 		$controller->action_repairboards();
 	}
@@ -980,7 +980,7 @@ class Maintenance extends \ElkArte\AbstractController
 
 		checkSession();
 
-		$validator = new Data_Validator();
+		$validator = new \ElkArte\DataValidator();
 		$validator->sanitation_rules(array('posts' => 'empty', 'type' => 'trim', 'from_email' => 'trim', 'from_name' => 'trim', 'to' => 'trim'));
 		$validator->validation_rules(array('from_email' => 'valid_email', 'from_name' => 'required', 'to' => 'required', 'type' => 'contains[name,email]'));
 		$validator->validate($this->_req->post);
@@ -1120,7 +1120,7 @@ class Maintenance extends \ElkArte\AbstractController
 		validateToken('admin-maint');
 
 		// Start with checking and cleaning what was sent
-		$validator = new Data_Validator();
+		$validator = new \ElkArte\DataValidator();
 		$validator->sanitation_rules(array('maxdays' => 'intval'));
 		$validator->validation_rules(array('maxdays' => 'required', 'groups' => 'isarray', 'del_type' => 'required'));
 

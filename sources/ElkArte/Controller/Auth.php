@@ -317,7 +317,7 @@ class Auth extends \ElkArte\AbstractController
 			// Whichever encryption it was using, let's make it use ElkArte's now ;).
 			if (in_array($user_settings['passwd'], $other_passwords))
 			{
-				$tokenizer = new Token_Hash();
+				$tokenizer = new \ElkArte\TokenHash();
 				$user_settings['passwd'] = validateLoginPassword($sha_passwd, '', '', true);
 				$user_settings['password_salt'] = $tokenizer->generate_hash(4);
 
@@ -359,7 +359,7 @@ class Auth extends \ElkArte\AbstractController
 		if ($user_settings['password_salt'] === '')
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			$tokenizer = new Token_Hash();
+			$tokenizer = new \ElkArte\TokenHash();
 			$user_settings['password_salt'] = $tokenizer->generate_hash(4);
 			updateMemberData($user_settings['id_member'], array('password_salt' => $user_settings['password_salt']));
 		}
@@ -436,7 +436,7 @@ class Auth extends \ElkArte\AbstractController
 		session_destroy();
 		if (!empty($user_info['id']))
 		{
-			$tokenizer = new Token_Hash();
+			$tokenizer = new \ElkArte\TokenHash();
 			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($user_info['id'], array('password_salt' => $tokenizer->generate_hash(4)));
 		}

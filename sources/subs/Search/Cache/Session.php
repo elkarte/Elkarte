@@ -14,7 +14,7 @@
 
 namespace ElkArte\Search\Cache;
 
-use \ElkArte\sources\subs\SessionIndex;
+use ElkArte\Sessions\SessionIndex;
 
 class Session
 {

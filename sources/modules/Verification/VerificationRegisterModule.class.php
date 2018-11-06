@@ -25,7 +25,7 @@ class Verification_Register_Module extends ElkArte\sources\modules\Abstract_Modu
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(\ElkArte\EventManager $eventsManager)
 	{
 		global $modSettings;
 

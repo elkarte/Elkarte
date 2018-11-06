@@ -78,7 +78,7 @@ function elk_main()
 
 	// A safer way to work with our form globals
 	// @todo Use dependency injection
-	$_req = HttpReq::instance();
+	$_req = \ElkArte\HttpReq::instance();
 
 	// What shall we do?
 	$dispatcher = new ElkArte\SiteDispatcher($_req);

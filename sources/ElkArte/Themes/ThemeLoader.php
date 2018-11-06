@@ -251,6 +251,12 @@ class ThemeLoader
 			? 'DefaultTheme'
 			: ucfirst(basename($settings['theme_dir']));
 
+		// The require should not be necessary, but I guess it's better to stay on the safe side.
+		require_once(EXTDIR . '/ClassLoader.php');
+		$loader = new \Composer\Autoload\ClassLoader();
+		$loader->setPsr4('ElkArte\\Themes\\' . $themeName . '\\', $themeData[0]['default_theme_dir']);
+		$loader->register();
+
 		// Setup the theme file.
 		require_once($settings['theme_dir'] . '/Theme.php');
 		$class = 'ElkArte\\Themes\\' . $themeName . '\\Theme';

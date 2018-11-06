@@ -882,7 +882,7 @@ class Post extends \ElkArte\AbstractController
 				// Only check if they changed it!
 				if (!isset($msgInfo) || $msgInfo['poster_email'] != $_POST['email'])
 				{
-					if (!allowedTo('moderate_forum') && !Data_Validator::is_valid($_POST, array('email' => 'valid_email|required'), array('email' => 'trim')))
+					if (!allowedTo('moderate_forum') && !\ElkArte\DataValidator::is_valid($_POST, array('email' => 'valid_email|required'), array('email' => 'trim')))
 						empty($_POST['email']) ? $this->_post_errors->addError('no_email') : $this->_post_errors->addError('bad_email');
 				}
 

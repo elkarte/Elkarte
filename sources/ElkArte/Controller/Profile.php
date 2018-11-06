@@ -613,7 +613,7 @@ class Profile extends \ElkArte\AbstractController
 			// Clean up the POST variables.
 			$post = htmltrim__recursive((array) $this->_req->post);
 			$post = htmlspecialchars__recursive($post);
-			$this->_req->post = new ArrayObject($post, ArrayObject::ARRAY_AS_PROPS);
+			$this->_req->post = new \ArrayObject($post, \ArrayObject::ARRAY_AS_PROPS);
 
 			// Does the change require the current password as well?
 			$this->_check_password($check_password);
@@ -627,13 +627,13 @@ class Profile extends \ElkArte\AbstractController
 			// Now call the sub-action function...
 			if ($this->_current_area === 'activateaccount' && empty($post_errors))
 			{
-				$controller = new \ElkArte\controller\ProfileAccount(new Event_Manager());
+				$controller = new \ElkArte\controller\ProfileAccount(new \ElkArte\EventManager());
 				$controller->pre_dispatch();
 				$controller->action_activateaccount();
 			}
 			elseif ($this->_current_area === 'deleteaccount' && empty($post_errors))
 			{
-				$controller = new \ElkArte\controller\ProfileAccount(new Event_Manager());
+				$controller = new \ElkArte\controller\ProfileAccount(new \ElkArte\EventManager());
 				$controller->pre_dispatch();
 				$controller->action_deleteaccount2();
 
@@ -642,7 +642,7 @@ class Profile extends \ElkArte\AbstractController
 			}
 			elseif ($this->_current_area === 'groupmembership' && empty($post_errors))
 			{
-				$controller = new \ElkArte\controller\ProfileOptions(new Event_Manager());
+				$controller = new \ElkArte\controller\ProfileOptions(new \ElkArte\EventManager());
 				$controller->pre_dispatch();
 				$msg = $controller->action_groupMembership2();
 
@@ -652,7 +652,7 @@ class Profile extends \ElkArte\AbstractController
 			// Authentication changes?
 			elseif ($this->_current_area === 'authentication')
 			{
-				$controller = new \ElkArte\controller\ProfileOptions(new Event_Manager());
+				$controller = new \ElkArte\controller\ProfileOptions(new \ElkArte\EventManager());
 				$controller->pre_dispatch();
 				$controller->action_authentication(true);
 			}

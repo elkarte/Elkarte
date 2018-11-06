@@ -10,7 +10,9 @@
  * @version 2.0 dev
  */
 
-class Event_Manager
+namespace ElkArte;
+
+class EventManager
 {
 	/**
 	 * An array of events, each entry is a different position.
@@ -51,11 +53,11 @@ class Event_Manager
 	}
 
 	/**
-	 * Allows to set the object that instantiated the Event_Manager.
+	 * Allows to set the object that instantiated the \ElkArte\EventManager.
 	 *
 	 * - Necessary in order to be able to provide the dependencies later on
 	 *
-	 * @param object $source The controller that instantiated the Event_Manager
+	 * @param object $source The controller that instantiated the \ElkArte\EventManager
 	 */
 	public function setSource($source)
 	{
@@ -127,7 +129,7 @@ class Event_Manager
 	 * What it does:
 	 *
 	 * - Objects are stored in order to be shared between different triggers
-	 * in the same Event_Manager.
+	 * in the same \ElkArte\EventManager.
 	 * - If the object doesn't exist yet, it is created
 	 *
 	 * @param string $class_name The name of the class.
@@ -139,7 +141,7 @@ class Event_Manager
 			return $this->_instances[$class_name];
 		else
 		{
-			$instance = new $class_name(HttpReq::instance());
+			$instance = new $class_name(\ElkArte\HttpReq::instance());
 			$this->_setInstance($class_name, $instance);
 
 			return $instance;
@@ -173,7 +175,7 @@ class Event_Manager
 	 *        name of the variables the method requires.
 	 *        The variables can be from:
 	 *          - the default list of variables passed to the trigger
-	 *          - properties (private, protected, or public) of the object that instantiate the Event_Manager
+	 *          - properties (private, protected, or public) of the object that instantiate the \ElkArte\EventManager
 	 *            (i.e. the controller)
 	 *          - globals
 	 * @param int $priority Defines the order the method is called.
@@ -190,7 +192,7 @@ class Event_Manager
 	 * Loads addons and modules based on a pattern.
 	 *
 	 * - The pattern defines the names of the classes that will be registered
-	 * to this Event_Manager.
+	 * to this \ElkArte\EventManager.
 	 *
 	 * @param string[] $classes A set of class names that should be attached
 	 */
@@ -214,13 +216,13 @@ class Event_Manager
 
 	/**
 	 * Takes care of registering the classes/methods to the different positions
-	 * of the Event_Manager.
+	 * of the \ElkArte\EventManager.
 	 *
 	 * What it does:
 	 *
 	 * - Each class must have a static Method ::hooks
 	 * - Method ::hooks must return an array defining where and how the class
-	 * will interact with the object that started the Event_Manager.
+	 * will interact with the object that started the \ElkArte\EventManager.
 	 *
 	 * @param string[] $classes A list of class names.
 	 */

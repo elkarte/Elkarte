@@ -12,6 +12,8 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * Class used to interact with super globals, POST, GET, SERVER, COOKIES, SESSION
  *
@@ -63,8 +65,8 @@ class HttpReq
 	public $server;
 
 	/**
-	 * Sole private HttpReq instance
-	 * @var HttpReq
+	 * Sole private \ElkArte\HttpReq instance
+	 * @var \ElkArte\HttpReq
 	 */
 	private static $_req = null;
 
@@ -76,29 +78,29 @@ class HttpReq
 
 	/**
 	 * holds instance of the validator
-	 * @var Data_Validator
+	 * @var \ElkArte\DataValidator
 	 */
 	protected $_dataValidator;
 
 	/**
 	 * Class constructor, sets PHP globals to class members
 	 *
-	 * @param $dataValidator Data_Validator|null Instance of the data validator
+	 * @param $dataValidator \ElkArte\DataValidator|null Instance of the data validator
 	 */
 	public function __construct($dataValidator = null)
 	{
 		// Make sure the validator is initiated
-		$this->_dataValidator = $dataValidator === null ? new Data_Validator : $dataValidator;
+		$this->_dataValidator = $dataValidator === null ? new \ElkArte\DataValidator : $dataValidator;
 
 		// Make the superglobals available as R/W properties
-		$this->cookie = new ArrayObject($_COOKIE, ArrayObject::ARRAY_AS_PROPS);
+		$this->cookie = new \ArrayObject($_COOKIE, \ArrayObject::ARRAY_AS_PROPS);
 		if (session_status() === PHP_SESSION_ACTIVE)
 		{
-			$this->session = new ArrayObject($_SESSION, ArrayObject::ARRAY_AS_PROPS);
+			$this->session = new \ArrayObject($_SESSION, \ArrayObject::ARRAY_AS_PROPS);
 		}
 		else
 		{
-			$this->session = new ArrayObject(array(), ArrayObject::ARRAY_AS_PROPS);
+			$this->session = new \ArrayObject(array(), \ArrayObject::ARRAY_AS_PROPS);
 		}
 
 		$this->server = detectServer();
@@ -139,8 +141,8 @@ class HttpReq
 		$this->_loadJson();
 
 		// Make the $_GET $_POST super globals available as R/W properties
-		$this->post = new ArrayObject($this->_derived_post, ArrayObject::ARRAY_AS_PROPS);
-		$this->query = new ArrayObject($derived_get, ArrayObject::ARRAY_AS_PROPS);
+		$this->post = new \ArrayObject($this->_derived_post, \ArrayObject::ARRAY_AS_PROPS);
+		$this->query = new \ArrayObject($derived_get, \ArrayObject::ARRAY_AS_PROPS);
 	}
 
 	/**
@@ -265,7 +267,7 @@ class HttpReq
 	/**
 	 * Method to return a $_GET value
 	 *
-	 * - Uses any sanitize rule(s) that can be passed to the Data_Validator class
+	 * - Uses any sanitize rule(s) that can be passed to the \ElkArte\DataValidator class
 	 * - Returned value will be the sanitized value or null of the key is not in $_GET
 	 * - If you just want a value back access it directly as $req->query->{$name}
 	 *
@@ -291,7 +293,7 @@ class HttpReq
 	/**
 	 * Method to return a $_POST value
 	 *
-	 * - Uses any sanitize rule(s) that can be passed to the Data_Validator class
+	 * - Uses any sanitize rule(s) that can be passed to the \ElkArte\DataValidator class
 	 * - Returned value will be the sanitized value or null of the key is not in $_POST
 	 * - If you just want a value back access it directly as $req->post->{$name}
 	 *
@@ -380,7 +382,7 @@ class HttpReq
 	/**
 	 * Retrieve the sole instance of this class.
 	 *
-	 * @return HttpReq
+	 * @return \ElkArte\HttpReq
 	 */
 	public static function instance()
 	{

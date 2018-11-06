@@ -52,7 +52,7 @@ class ControllerRedirectException extends \Exception
 			return $source->{$this->_method}();
 		}
 
-		$controller = new $this->_controller(new Event_Manager());
+		$controller = new $this->_controller(new \ElkArte\EventManager());
 		$controller->pre_dispatch();
 
 		return $controller->{$this->_method}();

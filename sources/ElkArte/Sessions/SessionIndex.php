@@ -11,7 +11,7 @@
  *
  */
 
-namespace ElkArte\sources\subs;
+namespace ElkArte\Sessions;
 
 use \ElkArte\ValuesContainer;
 

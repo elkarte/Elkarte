@@ -34,7 +34,7 @@ class Calendar_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(\ElkArte\EventManager $eventsManager)
 	{
 		global $context, $modSettings;
 
@@ -88,7 +88,7 @@ class Calendar_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	{
 		global $user_info, $modSettings, $board, $topic;
 
-		$req = HttpReq::instance();
+		$req = \ElkArte\HttpReq::instance();
 		$eventid = $req->getPost('eventid', 'intval', -1);
 
 		$event = new Calendar_Event($eventid, $modSettings);

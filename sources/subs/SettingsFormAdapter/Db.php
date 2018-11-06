@@ -181,7 +181,7 @@ class Db extends Adapter
 			{
 				$rules[$configVar[1]] = implode('|', $rules[$configVar[1]]);
 
-				$validator = new \Data_Validator();
+				$validator = new \ElkArte\DataValidator();
 				$validator->sanitation_rules($rules);
 				$validator->validate(array($configVar[1] => $str));
 

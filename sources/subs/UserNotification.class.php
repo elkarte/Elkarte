@@ -175,7 +175,7 @@ class User_Notification extends AbstractModel
 	 */
 	public function validate($post)
 	{
-		$validator = new Data_Validator();
+		$validator = new \ElkArte\DataValidator();
 		$validation_rules = array(
 			'usernotif_favicon_bgColor' => 'valid_color',
 			'usernotif_favicon_textColor' => 'valid_color',

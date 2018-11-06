@@ -325,7 +325,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 					$data = $temp_email[0]['body'];
 
 					// Read/parse this message for viewing
-					$controller = new \ElkArte\controller\Emailpost(new Event_manager());
+					$controller = new \ElkArte\controller\Emailpost(new \ElkArte\EventManager());
 					$result = $controller->action_pbe_preview($data);
 					$text = isset($result['body']) ? $result['body'] : '';
 					$email_to = isset($result['to']) ? $result['to'] : '';
@@ -430,7 +430,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 					}
 
 					// Lets TRY AGAIN to make a post!
-					$controller = new \ElkArte\controller\Emailpost(new Event_manager());
+					$controller = new \ElkArte\controller\Emailpost(new \ElkArte\EventManager());
 					$text = $controller->action_pbe_post($data, $force, $key);
 
 					// Assuming all went well, remove this entry and file since we are done.
@@ -1467,11 +1467,11 @@ class ManageMaillist extends \ElkArte\AbstractController
 			$maillist_receiving_address = array();
 
 			// Basic checking of the email addresses
-			if (!Data_Validator::is_valid($this->_req->post, array('maillist_sitename_address' => 'valid_email'), array('maillist_sitename_address' => 'trim')))
+			if (!\ElkArte\DataValidator::is_valid($this->_req->post, array('maillist_sitename_address' => 'valid_email'), array('maillist_sitename_address' => 'trim')))
 				$email_error = $this->_req->post->maillist_sitename_address;
-			if (!Data_Validator::is_valid($this->_req->post, array('maillist_sitename_help' => 'valid_email'), array('maillist_sitename_help' => 'trim')))
+			if (!\ElkArte\DataValidator::is_valid($this->_req->post, array('maillist_sitename_help' => 'valid_email'), array('maillist_sitename_help' => 'trim')))
 				$email_error = $this->_req->post->maillist_sitename_help;
-			if (!Data_Validator::is_valid($this->_req->post, array('maillist_mail_from' => 'valid_email'), array('maillist_mail_from' => 'trim')))
+			if (!\ElkArte\DataValidator::is_valid($this->_req->post, array('maillist_mail_from' => 'valid_email'), array('maillist_mail_from' => 'trim')))
 				$email_error = $this->_req->post->maillist_mail_from;
 
 			// Inbound email set up then we need to check for both valid email and valid board
@@ -1487,7 +1487,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 				foreach ($addresstocheck as $key => $checkme)
 				{
 					// Valid email syntax
-					if (!Data_Validator::is_valid($addresstocheck, array($key => 'valid_email'), array($key => 'trim')))
+					if (!\ElkArte\DataValidator::is_valid($addresstocheck, array($key => 'valid_email'), array($key => 'trim')))
 					{
 						$email_error = $checkme;
 						$context['error_type'] = 'notice';

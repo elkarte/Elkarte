@@ -25,9 +25,9 @@ abstract class Abstract_Module implements Module_Interface
 
 	/**
 	 * Abstract_Module constructor.
-	 * @param \HttpReq $req
+	 * @param \ElkArte\HttpReq $req
 	 */
-	public function __construct(\HttpReq $req)
+	public function __construct(\ElkArte\HttpReq $req)
 	{
 		$this->_req = $req;
 	}

@@ -21,7 +21,7 @@ class Mentions_Display_Module extends Mentions_Module_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(\ElkArte\EventManager $eventsManager)
 	{
 		self::registerHooks('display', $eventsManager);
 

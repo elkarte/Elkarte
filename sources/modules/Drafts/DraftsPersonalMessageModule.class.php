@@ -43,7 +43,7 @@ class Drafts_PersonalMessage_Module extends ElkArte\sources\modules\Abstract_Mod
 	protected static $_subject_length = 24;
 
 	/**
-	 * @var Event_Manager
+	 * @var \ElkArte\EventManager
 	 */
 	protected static $_eventsManager = null;
 
@@ -57,7 +57,7 @@ class Drafts_PersonalMessage_Module extends ElkArte\sources\modules\Abstract_Mod
 	 *
 	 * {@inheritdoc}
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(\ElkArte\EventManager $eventsManager)
 	{
 		global $modSettings, $context;
 

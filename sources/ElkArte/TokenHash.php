@@ -20,7 +20,7 @@ namespace ElkArte;
  *
  * - Can return up to a 32 character alphanumeric hash A-Z a-z 0-9
  */
-class Token_Hash
+class TokenHash
 {
 	/**
 	 * Available characters for private salt

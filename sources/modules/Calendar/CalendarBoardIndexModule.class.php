@@ -23,7 +23,7 @@ class Calendar_BoardIndex_Module extends ElkArte\sources\modules\Abstract_Module
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(\ElkArte\EventManager $eventsManager)
 	{
 		// Load the calendar?
 		if (allowedTo('calendar_view'))

@@ -85,7 +85,7 @@ class Mentions extends \ElkArte\AbstractController
 
 	/**
 		 *
-	 * @param Event_Manager $eventManager
+	 * @param \ElkArte\EventManager $eventManager
 	 */
 	public function __construct($eventManager)
 	{
@@ -452,7 +452,7 @@ class Mentions extends \ElkArte\AbstractController
 		$this->_buildUrl();
 
 		$id_mention = $this->_req->getQuery('item', 'intval', 0);
-		$mentioning = new Mentioning(database(), new Data_Validator, $modSettings['enabled_mentions']);
+		$mentioning = new Mentioning(database(), new \ElkArte\DataValidator, $modSettings['enabled_mentions']);
 		$mentioning->updateStatus($id_mention, 'read');
 	}
 
@@ -465,7 +465,7 @@ class Mentions extends \ElkArte\AbstractController
 
 		checkSession('request');
 
-		$mentioning = new Mentioning(database(), new Data_Validator, $modSettings['enabled_mentions']);
+		$mentioning = new Mentioning(database(), new \ElkArte\DataValidator, $modSettings['enabled_mentions']);
 
 		$id_mention = $this->_req->getQuery('item', 'intval', 0);
 		$mark = $this->_req->getQuery('mark');

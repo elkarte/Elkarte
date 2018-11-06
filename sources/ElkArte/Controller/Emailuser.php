@@ -214,7 +214,7 @@ class Emailuser extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/Mail.subs.php');
 
 		// Time to check and clean what was placed in the form
-		$validator = new Data_Validator();
+		$validator = new \ElkArte\DataValidator();
 		$validator->sanitation_rules(array(
 			'y_name' => 'trim',
 			'r_name' => 'trim'
@@ -355,7 +355,7 @@ class Emailuser extends \ElkArte\AbstractController
 			require_once(SUBSDIR . '/Mail.subs.php');
 
 			// We will need to do some data checking
-			$validator = new Data_Validator();
+			$validator = new \ElkArte\DataValidator();
 			$validator->sanitation_rules(array(
 				'y_name' => 'trim',
 				'email_body' => 'trim',
@@ -556,7 +556,7 @@ class Emailuser extends \ElkArte\AbstractController
 		// Guests need to provide their address!
 		if ($user_info['is_guest'])
 		{
-			if (!Data_Validator::is_valid($this->_req->post, array('email' => 'valid_email'), array('email' => 'trim')))
+			if (!\ElkArte\DataValidator::is_valid($this->_req->post, array('email' => 'valid_email'), array('email' => 'trim')))
 				empty($this->_req->post->email) ? $report_errors->addError('no_email') : $report_errors->addError('bad_email');
 
 			isBannedEmail($this->_req->post->email, 'cannot_post', sprintf($txt['you_are_post_banned'], $txt['guest_title']));

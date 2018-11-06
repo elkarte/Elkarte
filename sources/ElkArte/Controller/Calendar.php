@@ -318,7 +318,7 @@ class Calendar extends \ElkArte\AbstractController
 	 */
 	protected function _returnToPost()
 	{
-		$controller = new \ElkArte\controller\Post(new Event_Manager());
+		$controller = new \ElkArte\controller\Post(new \ElkArte\EventManager());
 		$hook = $controller->getHook();
 		$controller->pre_dispatch();
 		$function_name = 'action_post';

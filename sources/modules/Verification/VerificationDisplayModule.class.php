@@ -25,7 +25,7 @@ class Verification_Display_Module extends ElkArte\sources\modules\Abstract_Modul
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(\ElkArte\EventManager $eventsManager)
 	{
 		global $user_info, $modSettings;
 

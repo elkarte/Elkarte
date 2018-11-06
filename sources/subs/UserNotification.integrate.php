@@ -75,7 +75,7 @@ class User_Notification_Integrate
 	 */
 	public static function integrate_save_modify_mention_settings()
 	{
-		$req = HttpReq::instance();
+		$req = \ElkArte\HttpReq::instance();
 
 		$notification = new User_Notification;
 		$req->post = $notification->validate($req->post);

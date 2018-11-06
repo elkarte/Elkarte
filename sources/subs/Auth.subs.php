@@ -434,7 +434,7 @@ function resetPassword($memID, $username = null)
 	}
 
 	// Generate a random password.
-	$tokenizer = new Token_Hash();
+	$tokenizer = new \ElkArte\TokenHash();
 	$newPassword = $tokenizer->generate_hash(14);
 
 	// Create a db hash for the generated password
@@ -848,7 +848,7 @@ function userByEmail($email, $username = null)
  */
 function generateValidationCode($length = 10)
 {
-	$tokenizer = new Token_Hash();
+	$tokenizer = new \ElkArte\TokenHash();
 
 	return $tokenizer->generate_hash((int) $length);
 }

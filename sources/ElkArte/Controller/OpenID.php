@@ -144,7 +144,7 @@ class OpenID extends \ElkArte\AbstractController
 						$this->_req->post->{$id} = $value;
 				}
 
-				$controller = new \ElkArte\controller\Register(new Event_Manager());
+				$controller = new \ElkArte\controller\Register(new \ElkArte\EventManager());
 				$controller->pre_dispatch();
 				$controller->do_register(true);
 				return null;
@@ -170,7 +170,7 @@ class OpenID extends \ElkArte\AbstractController
 			// Generate an ElkArte hash for the db to protect this account
 			$user_settings['passwd'] = validateLoginPassword($this->_secret, '', $user_settings['member_name'], true);
 
-			$tokenizer = new Token_Hash();
+			$tokenizer = new \ElkArte\TokenHash();
 			$user_settings['password_salt'] = $tokenizer->generate_hash(4);
 
 			require_once(SUBSDIR . '/Members.subs.php');

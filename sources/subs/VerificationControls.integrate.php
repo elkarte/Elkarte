@@ -17,7 +17,7 @@
  */
 
 use ElkArte\sources\subs\VerificationControls;
-use ElkArte\sources\subs\SessionIndex;
+use ElkArte\Sessions\SessionIndex;
 
 /**
  * Class VerificationControls_Integrate

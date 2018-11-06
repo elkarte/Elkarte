@@ -64,7 +64,7 @@ class Event
 	 *                           The variables can be from:
 	 *                           - the default list of variables passed to the trigger
 	 *                           - properties (private, protected, or public) of the object that
-	 *                             instantiate the Event_Manager (i.e. the controller)
+	 *                             instantiate the \ElkArte\EventManager (i.e. the controller)
 	 *                           - globals
 	 *	)
 	 * @param int $priority A value that defines the relative priority at which

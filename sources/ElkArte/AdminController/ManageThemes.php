@@ -1700,7 +1700,7 @@ class ManageThemes extends \ElkArte\AbstractController
 					}
 				}
 
-				$validator = new Data_Validator();
+				$validator = new \ElkArte\DataValidator();
 				$validator->validation_rules(array(
 					'entire_file' => 'php_syntax'
 				));

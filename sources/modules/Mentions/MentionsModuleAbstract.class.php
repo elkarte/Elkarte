@@ -23,10 +23,10 @@ abstract class Mentions_Module_Abstract extends ElkArte\sources\modules\Abstract
 	 * event manager.
 	 *
 	 * @param string $action
-	 * @param \Event_Manager $eventsManager
+	 * @param \ElkArte\EventManager $eventsManager
 	 * @global $modSettings
 	 */
-	protected static function registerHooks($action, \Event_Manager $eventsManager)
+	protected static function registerHooks($action, \ElkArte\EventManager $eventsManager)
 	{
 		global $modSettings;
 

@@ -15,12 +15,12 @@
  *
  */
 
-namespace ElkArte\sources\subs\SessionHandler;
+namespace ElkArte\Sessions\SessionHandler;
 
 /**
  * Class DatabaseHandler
  *
- * @package ElkArte\sources\subs\SessionHandler
+ * @package ElkArte\Sessions
  */
 class DatabaseHandler extends \SessionHandler
 {

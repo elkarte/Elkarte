@@ -137,7 +137,7 @@ class ManageRegistration extends \ElkArte\AbstractController
 			// Generate a password
 			if (empty($this->_req->post->password) || !is_string($this->_req->post->password) || trim($this->_req->post->password) === '')
 			{
-				$tokenizer = new Token_Hash();
+				$tokenizer = new \ElkArte\TokenHash();
 				$password = $tokenizer->generate_hash(14);
 			}
 			else

@@ -50,8 +50,8 @@ class Generic_List
 	protected $listOptions = array();
 
 	/**
-	 * Instance of HttpReq
-	 * @var HttpReq
+	 * Instance of \ElkArte\HttpReq
+	 * @var \ElkArte\HttpReq
 	 */
 	protected $req;
 
@@ -91,7 +91,7 @@ class Generic_List
 	public function __construct(array $listOptions)
 	{
 		// Access to post/get data
-		$this->req = HttpReq::instance();
+		$this->req = \ElkArte\HttpReq::instance();
 
 		// First make sure the array is constructed properly.
 		$this->validateListOptions($listOptions);

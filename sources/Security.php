@@ -401,7 +401,7 @@ function is_not_banned($forceCheck = false)
 		// We don't wanna see you!
 		if (!$user_info['is_guest'])
 		{
-			$controller = new \ElkArte\controller\Auth(new Event_manager());
+			$controller = new \ElkArte\controller\Auth(new \ElkArte\EventManager());
 			$controller->action_logout(true, false);
 		}
 
@@ -474,7 +474,7 @@ function is_not_banned($forceCheck = false)
 		writeLog(true);
 
 		// Log them out
-		$controller = new \ElkArte\controller\Auth(new Event_manager());
+		$controller = new \ElkArte\controller\Auth(new \ElkArte\EventManager());
 		$controller->action_logout(true, false);
 
 		// Tell them thanks
@@ -841,7 +841,7 @@ function createToken($action, $type = 'post')
 	global $context;
 
 	// Generate a new token token_var pair
-	$tokenizer = new Token_Hash();
+	$tokenizer = new \ElkArte\TokenHash();
 	$token_var = $tokenizer->generate_hash(rand(7, 12));
 	$token = $tokenizer->generate_hash(32);
 
@@ -998,7 +998,7 @@ function checkSubmitOnce($action, $is_fatal = false)
 	// Register a form number and store it in the session stack. (use this on the page that has the form.)
 	if ($action == 'register')
 	{
-		$tokenizer = new Token_Hash();
+		$tokenizer = new \ElkArte\TokenHash();
 		$context['form_sequence_number'] = '';
 		while (empty($context['form_sequence_number']) || in_array($context['form_sequence_number'], $_SESSION['forms']))
 			$context['form_sequence_number'] = $tokenizer->generate_hash();

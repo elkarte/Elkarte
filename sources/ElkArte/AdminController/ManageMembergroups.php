@@ -555,7 +555,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 				'group_name' => '', 'group_hidden' => null, 'group_inherit' => null, 'icon_count' => null,
 				'icon_image' => '', 'online_color' => '', 'boardaccess' => null);
 
-			$validator = new Data_Validator();
+			$validator = new \ElkArte\DataValidator();
 
 			// Cleanup the inputs! :D
 			$validator->sanitation_rules(array(

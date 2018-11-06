@@ -147,7 +147,7 @@ class ManagePaid extends \ElkArte\AbstractController
 			// Check that the entered email addresses are valid
 			if (!empty($this->_req->post->paid_email_to))
 			{
-				$validator = new Data_Validator();
+				$validator = new \ElkArte\DataValidator();
 
 				// Some cleaning and some rules
 				$validator->sanitation_rules(array('paid_email_to' => 'trim'));

@@ -832,7 +832,7 @@ class Package_Actions extends \ElkArte\AbstractController
 	public function action_database2()
 	{
 		// Only do the database changes on uninstall if requested.
-		if (!empty($this->_action['filename']) && (!$this->_uninstalling || !empty(HttpReq::instance()->post->do_db_changes)))
+		if (!empty($this->_action['filename']) && (!$this->_uninstalling || !empty(\ElkArte\HttpReq::instance()->post->do_db_changes)))
 		{
 			// These can also be there for database changes.
 			global $context;

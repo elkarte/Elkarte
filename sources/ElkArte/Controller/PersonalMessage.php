@@ -1846,7 +1846,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		}
 
 		// Load up the fields.
-		$controller = new \ElkArte\controller\ProfileOptions(new Event_Manager());
+		$controller = new \ElkArte\controller\ProfileOptions(new \ElkArte\EventManager());
 		$controller->pre_dispatch();
 		$controller->action_pmprefs();
 	}

@@ -25,7 +25,7 @@ class Verification_PersonalMessage_Module extends ElkArte\sources\modules\Abstra
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(\ElkArte\EventManager $eventsManager)
 	{
 		global $user_info, $modSettings;
 

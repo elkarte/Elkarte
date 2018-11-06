@@ -79,7 +79,7 @@ class Mentioning extends AbstractModel
 	 * Mentioning constructor.
 	 *
 	 * @param Database $db
-	 * @param Data_Validator $validator
+	 * @param \ElkArte\DataValidator $validator
 	 * @param string $enabled_mentions
 	 */
 	public function __construct($db, $validator, $enabled_mentions = '')

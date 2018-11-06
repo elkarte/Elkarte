@@ -65,7 +65,7 @@ function createMenu($menuData, $menuOptions = array())
 {
 	global $context, $settings, $options, $txt, $scripturl, $user_info;
 
-	$_req = HttpReq::instance();
+	$_req = \ElkArte\HttpReq::instance();
 
 	// Work out where we should get our images from.
 	$context['menu_image_path'] = file_exists($settings['theme_dir'] . '/images/admin/change_menu.png') ? $settings['images_url'] . '/admin' : $settings['default_images_url'] . '/admin';
@@ -377,7 +377,7 @@ function callMenu($selectedMenu)
 	{
 		// 'controller' => '\ElkArte\admin\ManageAttachments'
 		// 'function' => 'action_avatars'
-		$controller = new $selectedMenu['controller'](new Event_Manager());
+		$controller = new $selectedMenu['controller'](new \ElkArte\EventManager());
 
 		// always set up the environment
 		$controller->pre_dispatch();

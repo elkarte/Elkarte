@@ -21,7 +21,7 @@ class Random_Post_Module extends ElkArte\sources\modules\Abstract_Module
 	/**
 	 * {@inheritDoc}
 	 */
-	public static function hooks(\Event_Manager $eventsManager)
+	public static function hooks(\ElkArte\EventManager $eventsManager)
 	{
 		global $modSettings;
 

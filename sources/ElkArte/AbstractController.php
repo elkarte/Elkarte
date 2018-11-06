@@ -34,18 +34,18 @@ abstract class AbstractController
 	protected $_hook = '';
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
+	 * Holds instance of \ElkArte\HttpReq object
+	 * @var \ElkArte\HttpReq
 	 */
 	protected $_req;
 
 	/**
-	 * @param Event_Manager $eventManager
+	 * @param \ElkArte\EventManager $eventManager
 	 */
 	public function __construct($eventManager)
 	{
 		// Dependency injection will come later
-		$this->_req = HttpReq::instance();
+		$this->_req = \ElkArte\HttpReq::instance();
 
 		$this->_events = $eventManager;
 	}
