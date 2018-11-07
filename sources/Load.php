@@ -1218,7 +1218,7 @@ function detectBrowser()
  */
 function loadTheme($id_theme = 0, $initialize = true)
 {
-	Errors::instance()->log_deprecated('loadTheme()', 'ElkArte\Themes\ThemeLoader');
+	Errors::instance()->log_deprecated('loadTheme()', '\\ElkArte\\Themes\\ThemeLoader');
 	new ElkArte\Themes\ThemeLoader($id_theme, $initialize);
 }
 

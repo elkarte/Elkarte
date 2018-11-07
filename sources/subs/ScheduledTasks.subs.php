@@ -572,7 +572,7 @@ function run_this_task($id_task, $task_name)
 	// Let's start logging the task and saying we failed it
 	$log_task_id = logTask(0, $id_task);
 
-	$class = '\\ElkArte\\sources\\subs\\ScheduledTask\\' . implode('_', array_map('ucfirst', explode('_', $task_name)));
+	$class = '\\ElkArte\\ScheduledTasks\\Tasks\\' . implode('', array_map('ucfirst', explode('_', $task_name)));
 
 	if (class_exists($class))
 	{

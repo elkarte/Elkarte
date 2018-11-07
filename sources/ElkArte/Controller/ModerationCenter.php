@@ -137,7 +137,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 					'modlog' => array(
 						'label' => $txt['modlog_view'],
 						'enabled' => !empty($modSettings['modlog_enabled']) && $context['can_moderate_boards'],
-						'controller' => '\ElkArte\AdminController\Modlog',
+						'controller' => '\\ElkArte\\AdminController\\Modlog',
 						'function' => 'action_log',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_logs',
@@ -241,7 +241,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 					'members' => array(
 						'enabled' => allowedTo('moderate_forum'),
 						'label' => $txt['mc_member_requests'] . (!empty($mod_counts['memberreq']) ? ' [' . $mod_counts['memberreq'] . ']' : ''),
-						'controller' => '\ElkArte\AdminController\ManageMembers',
+						'controller' => '\\ElkArte\\AdminController\\ManageMembers',
 						'function' => 'action_approve',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_members',

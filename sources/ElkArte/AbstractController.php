@@ -217,6 +217,7 @@ abstract class AbstractController
 
 		$classes = array();
 		$setting_key = 'modules_' . $this->getHook();
+		$namespace = '\\ElkArte\\Modules\\';
 
 		// For all the modules that have been registered see if we have a class to load for this hook area
 		if (!empty($modSettings[$setting_key]))
@@ -227,7 +228,7 @@ abstract class AbstractController
 			{
 				// drafts => Drafts, some_name => SomeName
 				$module_name = array_map('ucfirst', explode('_', $module));
-				$class = implode('', $module_name) . '_' . $this->getModuleClass() . '_Module';
+				$class = $namespace . implode('', $module_name) . '\\' . $this->getModuleClass();
 
 				if (class_exists($class))
 				{
