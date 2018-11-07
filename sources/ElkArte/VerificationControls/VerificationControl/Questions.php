@@ -16,7 +16,7 @@
  *
  */
 
-namespace ElkArte\sources\subs\VerificationControl;
+namespace ElkArte\VerificationControls\VerificationControl;
 
 /**
  * Class to manage, prepare, show, and validate question -> answer verifications

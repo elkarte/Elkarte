@@ -131,7 +131,7 @@ class AdminLog extends \ElkArte\AbstractController
 
 		$context['page_title'] = $txt['pruning_title'];
 
-		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
 
 		// Initialize settings
 		$config_vars = $this->_settings();

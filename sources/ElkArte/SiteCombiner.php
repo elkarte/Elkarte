@@ -295,7 +295,7 @@ class SiteCombiner
 	{
 		$path = $this->_archive_dir . '/hive-*.' . $ext;
 
-		$glob = new GlobIterator($path, FilesystemIterator::SKIP_DOTS);
+		$glob = new \GlobIterator($path, \FilesystemIterator::SKIP_DOTS);
 		$return = true;
 
 		foreach ($glob as $file)

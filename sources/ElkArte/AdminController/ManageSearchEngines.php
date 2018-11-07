@@ -76,7 +76,7 @@ class ManageSearchEngines extends \ElkArte\AbstractController
 		global $context, $txt, $scripturl;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();

@@ -198,7 +198,7 @@ class ManageDraftsModule extends \ElkArte\AbstractController
 		theme()->getTemplates()->loadLanguageFile('Drafts');
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());

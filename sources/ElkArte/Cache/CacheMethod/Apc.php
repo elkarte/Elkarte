@@ -11,7 +11,7 @@
  *
  */
 
-namespace ElkArte\sources\subs\CacheMethod;
+namespace ElkArte\Cache\CacheMethod;
 
 /**
  * Alternative PHP Cache or APC / APCu

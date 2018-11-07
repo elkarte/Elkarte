@@ -26,7 +26,7 @@ namespace ElkArte;
  *
  * @package Maillist
  */
-class EmailSettings extends \ElkArte\SettingsForm
+class EmailSettings extends \ElkArte\SettingsForm\SettingsForm
 {
 	/**
 	 * static function saveTableSettings, now part of the Settings Form class

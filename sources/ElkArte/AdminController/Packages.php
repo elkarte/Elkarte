@@ -1639,7 +1639,7 @@ class Packages extends \ElkArte\AbstractController
 					$file_count = 0;
 					$dont_chmod = false;
 
-					$entrys = new FilesystemIterator($path, FilesystemIterator::SKIP_DOTS);
+					$entrys = new \FilesystemIterator($path, \FilesystemIterator::SKIP_DOTS);
 					foreach ($entrys as $entry)
 					{
 						$file_count++;
@@ -1839,7 +1839,7 @@ class Packages extends \ElkArte\AbstractController
 
 		try
 		{
-			$dir = new FilesystemIterator(BOARDDIR . '/packages', FilesystemIterator::SKIP_DOTS);
+			$dir = new \FilesystemIterator(BOARDDIR . '/packages', \FilesystemIterator::SKIP_DOTS);
 			$filtered_dir = new \ElkArte\PackagesFilterIterator($dir);
 
 			$dirs = array();
@@ -2077,7 +2077,7 @@ function fetchPerms__recursive($path, &$data, $level)
 
 	try
 	{
-		$entrys = new FilesystemIterator($path, FilesystemIterator::SKIP_DOTS);
+		$entrys = new \FilesystemIterator($path, \FilesystemIterator::SKIP_DOTS);
 		foreach ($entrys as $entry)
 		{
 			// Some kind of file?

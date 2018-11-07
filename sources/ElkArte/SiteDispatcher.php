@@ -82,6 +82,7 @@ class SiteDispatcher
 	 * @var string[]
 	 */
 	protected $actionArray = array(
+		'admin' => array('\\ElkArte\\AdminController\\Admin', 'action_index'),
 		'attachapprove' => array('\\ElkArte\\Controller\\ModerateAttachments', 'action_attachapprove'),
 		'buddy' => array('\\ElkArte\\Controller\\Members', 'action_buddy'),
 		'collapse' => array('\\ElkArte\\Controller\\BoardIndex', 'action_collapse'),

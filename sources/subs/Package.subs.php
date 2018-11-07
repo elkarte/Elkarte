@@ -1495,7 +1495,7 @@ function deltree($dir, $delete_dir = true)
 	// Read all the files in the directory
 	try
 	{
-		$entrynames = new FilesystemIterator($dir, FilesystemIterator::SKIP_DOTS);
+		$entrynames = new \FilesystemIterator($dir, \FilesystemIterator::SKIP_DOTS);
 		foreach ($entrynames as $entryname)
 		{
 			// Recursively dive in to each directory looking for files to delete

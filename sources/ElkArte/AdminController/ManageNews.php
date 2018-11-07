@@ -889,14 +889,14 @@ class ManageNews extends \ElkArte\AbstractController
 		global $context, $txt, $scripturl;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
 
 		// Add some javascript at the bottom...
 		theme()->addInlineJavascript('
-			document.getElementById("xmlnews_maxlen").disabled = !document.getElementById("xmlnews_enable").checked;
+			document.getElementById("xmlnews_maxle").disabled = !document.getElementById("xmlnews_enable").checked;
 			document.getElementById("xmlnews_limit").disabled = !document.getElementById("xmlnews_enable").checked;', true);
 
 		// Wrap it all up nice and warm...

@@ -85,7 +85,7 @@ class AddonSettings extends \ElkArte\AbstractController
 		global $context, $txt;
 
 		// instantiate the form
-		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
 
 		// initialize it with our existing settings. If any.
 		$config_vars = $this->_settings();

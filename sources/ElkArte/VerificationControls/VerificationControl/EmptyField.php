@@ -16,7 +16,7 @@
  *
  */
 
-namespace ElkArte\sources\subs\VerificationControl;
+namespace ElkArte\VerificationControls\VerificationControl;
 
 /**
  * This class shows an anti spam bot box in the form

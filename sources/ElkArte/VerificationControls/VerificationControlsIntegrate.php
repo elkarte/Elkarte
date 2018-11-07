@@ -18,7 +18,7 @@
 
 namespace ElkArte\VerificationControls;
 
-use ElkArte\sources\subs\VerificationControls;
+use ElkArte\VerificationControls\VerificationControls;
 use ElkArte\Sessions\SessionIndex;
 
 /**

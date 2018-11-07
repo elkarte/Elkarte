@@ -73,7 +73,7 @@ class ManageAvatars extends \ElkArte\AbstractController
 		global $txt, $context;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
 
 		// Initialize settings
 		$settingsForm->setConfigVars($this->_settings());

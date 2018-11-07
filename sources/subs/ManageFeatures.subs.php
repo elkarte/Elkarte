@@ -761,7 +761,7 @@ function loadAllCustomFields()
  */
 function getNotificationTypes()
 {
-	$glob = new GlobIterator(SOURCEDIR . '/ElkArte/Mentions/MentionType/*Mention.php', FilesystemIterator::SKIP_DOTS);
+	$glob = new \GlobIterator(SOURCEDIR . '/ElkArte/Mentions/MentionType/*Mention.php', \FilesystemIterator::SKIP_DOTS);
 	$types = array();
 
 	// For each file found, call its getType method
@@ -815,10 +815,10 @@ function getFrontPageControllers()
 
 	$classes = array();
 
-	$glob = new GlobIterator(CONTROLLERDIR . '/*.controller.php', FilesystemIterator::SKIP_DOTS);
+	$glob = new \GlobIterator(CONTROLLERDIR . '/*.controller.php', \FilesystemIterator::SKIP_DOTS);
 	$classes += scanFileSystemForControllers($glob);
 
-	$glob = new GlobIterator(ADDONSDIR . '/*/controllers/*.controller.php', FilesystemIterator::SKIP_DOTS);
+	$glob = new \GlobIterator(ADDONSDIR . '/*/controllers/*.controller.php', \FilesystemIterator::SKIP_DOTS);
 	$classes += scanFileSystemForControllers($glob, '\\ElkArte\\Addon\\');
 
 	$config_vars = array(array('select', 'front_page', $classes));
@@ -836,7 +836,7 @@ function getFrontPageControllers()
 
 /**
  *
- * @param GlobIterator $iterator
+ * @param \GlobIterator $iterator
  * @param string $namespace
  *
  * @return array

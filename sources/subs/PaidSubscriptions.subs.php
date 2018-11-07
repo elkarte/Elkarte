@@ -391,7 +391,7 @@ function loadPaymentGateways()
 
 	try
 	{
-		$files = new FilesystemIterator(SOURCEDIR . '/ElkArte/Subscriptions/PaymentGateway', FilesystemIterator::SKIP_DOTS);
+		$files = new \FilesystemIterator(SOURCEDIR . '/ElkArte/Subscriptions/PaymentGateway', \FilesystemIterator::SKIP_DOTS);
 		foreach ($files as $file)
 		{
 			if ($file->isDir())

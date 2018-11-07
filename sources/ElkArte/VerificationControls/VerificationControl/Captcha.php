@@ -16,7 +16,7 @@
  *
  */
 
-namespace ElkArte\sources\subs\VerificationControl;
+namespace ElkArte\VerificationControls\VerificationControl;
 
 /**
  * Class to manage, create, show and validate captcha images

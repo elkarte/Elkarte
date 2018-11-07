@@ -103,7 +103,7 @@ function loadCacheEngines($supported_only = true)
 {
 	$engines = array();
 
-	$classes = new GlobIterator(SUBSDIR . '/CacheMethod/*.php', FilesystemIterator::SKIP_DOTS);
+	$classes = new \GlobIterator(SUBSDIR . '/CacheMethod/*.php', \FilesystemIterator::SKIP_DOTS);
 
 	foreach ($classes as $file_path)
 	{

@@ -16,7 +16,7 @@
  *
  */
 
-namespace ElkArte\sources\subs\VerificationControl;
+namespace ElkArte\VerificationControls\VerificationControl;
 
 /**
  * A simple interface that defines all the methods any "Control_Verification"

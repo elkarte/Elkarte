@@ -2343,14 +2343,14 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 		<operation>
 			<search position="replace"><![CDATA[
 	// Count the files with a glob, easier and less time consuming
-	$glob = new GlobIterator($dir . '/*.elk', FilesystemIterator::SKIP_DOTS);
+	$glob = new GlobIterator($dir . '/*.elk', \FilesystemIterator::SKIP_DOTS);
 	$num_files = $glob->count();
 
 	if ($num_files < $expected_files)
 		return array('files_missing', true, $num_files);]]></search>
 			<add><![CDATA[
 	// Count the files with a glob, easier and less time consuming
-	$glob = new GlobIterator($dir . '/*.elk', FilesystemIterator::SKIP_DOTS);
+	$glob = new GlobIterator($dir . '/*.elk', \FilesystemIterator::SKIP_DOTS);
 	try
 	{
 		$num_files = $glob->count();

@@ -295,7 +295,7 @@ final class Hooks
 		$path = $basepath . '/*/*' . $ext;
 		$names = array();
 
-		$glob = new GlobIterator($path, FilesystemIterator::SKIP_DOTS);
+		$glob = new \GlobIterator($path, \FilesystemIterator::SKIP_DOTS);
 
 		// Find all integration files
 		foreach ($glob as $file)

@@ -17,13 +17,13 @@
 
 namespace ElkArte\sources\subs\ScheduledTask;
 
-use FilesystemIterator;
+use \FilesystemIterator;
 use UnexpectedValueException;
 
 /**
  * Class Remove_Temp_Attachments - Check for un-posted attachments is something we can do once in a while :P
  *
- * - This function uses FilesystemIterator cycling through all the attachments
+ * - This function uses \FilesystemIterator cycling through all the attachments
  *
  * @package ScheduledTasks
  */
@@ -46,7 +46,7 @@ class Remove_Temp_Attachments implements Scheduled_Task_Interface
 		{
 			try
 			{
-				$files = new FilesystemIterator($attach_dir, FilesystemIterator::SKIP_DOTS);
+				$files = new \FilesystemIterator($attach_dir, \FilesystemIterator::SKIP_DOTS);
 				foreach ($files as $file)
 				{
 					if (strpos($file->getFilename(), 'post_tmp_') !== false)

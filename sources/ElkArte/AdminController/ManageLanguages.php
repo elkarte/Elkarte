@@ -958,7 +958,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 		global $context, $txt;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::FILE_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::FILE_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
@@ -1047,7 +1047,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 		$configValues = array(
 			'language' => $language
 		);
-		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::FILE_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::FILE_ADAPTER);
 		$settingsForm->setConfigVars($configVars);
 		$settingsForm->setConfigValues((array) $configValues);
 		$settingsForm->save();

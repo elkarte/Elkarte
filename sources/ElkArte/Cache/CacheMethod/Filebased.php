@@ -13,7 +13,7 @@
 
 namespace ElkArte\Cache\CacheMethod;
 
-use FilesystemIterator;
+use \FilesystemIterator;
 use UnexpectedValueException;
 
 /**
@@ -135,7 +135,7 @@ class Filebased extends AbstractCacheMethod
 	{
 		try
 		{
-			$files = new FilesystemIterator(CACHEDIR, FilesystemIterator::SKIP_DOTS);
+			$files = new \FilesystemIterator(CACHEDIR, \FilesystemIterator::SKIP_DOTS);
 
 			foreach ($files as $file)
 			{

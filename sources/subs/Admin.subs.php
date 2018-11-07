@@ -393,7 +393,7 @@ function readFileVersions(&$version_info, $directories, $pattern, $recursive = f
  *
  * What it does:
  *
- * - Done separately from \ElkArte\SettingsForm::save_file() to avoid race conditions
+ * - Done separately from \ElkArte\SettingsForm\SettingsForm::save_file() to avoid race conditions
  * which can occur during a db error
  * - If it fails Settings.php will assume 0
  *

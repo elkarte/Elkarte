@@ -280,14 +280,14 @@ class ManageCalendarModule extends \ElkArte\AbstractController
 	 * Show and allow to modify calendar settings.
 	 *
 	 * @event integrate_save_calendar_settings
-	 * - The method uses a \ElkArte\SettingsForm to do the work.
+	 * - The method uses a \ElkArte\SettingsForm\SettingsForm to do the work.
 	 */
 	public function action_calendarSettings_display()
 	{
 		global $txt, $context;
 
 		// Initialize the form
-		$settingsForm = new \ElkArte\SettingsForm(\ElkArte\SettingsForm::DB_ADAPTER);
+		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());

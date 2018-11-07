@@ -115,7 +115,7 @@ class Xml extends \ElkArte\AbstractController
 		$icons = array();
 
 		// Get all the available member group icons
-		$files = new FilesystemIterator($directory, FilesystemIterator::SKIP_DOTS);
+		$files = new \FilesystemIterator($directory, \FilesystemIterator::SKIP_DOTS);
 		foreach ($files as $file)
 		{
 			if ($file->getFilename() === 'blank.png')

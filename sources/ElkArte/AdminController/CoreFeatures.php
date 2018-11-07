@@ -288,7 +288,7 @@ class CoreFeatures extends \ElkArte\AbstractController
 	protected function _getModulesConfig(&$core_features)
 	{
 		// Find appropriately named core feature files in the admin directory
-		$glob = new GlobIterator(ADMINDIR . '/Manage*Module.php', FilesystemIterator::SKIP_DOTS);
+		$glob = new \GlobIterator(ADMINDIR . '/Manage*Module.php', \FilesystemIterator::SKIP_DOTS);
 
 		foreach ($glob as $file)
 		{
