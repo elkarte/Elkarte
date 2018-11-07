@@ -487,16 +487,16 @@ function loadEssentialData()
 	if (file_exists(SOURCEDIR . '/database/Database.subs.php'))
 	{
 		require_once(SOURCEDIR . '/Subs.php');
-		require_once(SOURCEDIR . '/Errors.class.php');
 		require_once(SOURCEDIR . '/Logging.php');
 		require_once(SOURCEDIR . '/Load.php');
 		require_once(SUBSDIR . '/Cache.subs.php');
 		require_once(SOURCEDIR . '/Security.php');
-		require_once(SOURCEDIR . '/Autoloader.class.php');
-		$autoloder = Elk_Autoloader::instance();
-		$autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
-		$autoloder->register(SOURCEDIR, '\\ElkArte');
-		load_possible_databases($db_type);
+		require_once(EXTDIR . '/ClassLoader.php');
+
+		$loader = new \Composer\Autoload\ClassLoader();
+		$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
+		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
+		$loader->register();
 
 		$db = load_database();
 
