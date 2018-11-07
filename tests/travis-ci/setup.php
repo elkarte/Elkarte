@@ -238,10 +238,13 @@ Class Elk_Testing_Setup
 		require_once(BOARDDIR . '/Settings.php');
 		require_once(SOURCEDIR . '/Subs.php');
 		require_once(SOURCEDIR . '/Load.php');
-		require_once(SUBSDIR . '/Util.class.php');
 		require_once(SUBSDIR . '/Auth.subs.php');
+		require_once(EXTDIR . '/ClassLoader.php');
 
-		Elk_Autoloader::instance()->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
+		$loader = new \Composer\Autoload\ClassLoader();
+		$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
+		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
+		$loader->register();
 
 		$settings['theme_dir'] = $settings['default_theme_dir'] = BOARDDIR . '/Themes/default';
 		$settings['theme_url'] = $settings['default_theme_url'] = $boardurl . '/themes/default';

@@ -661,7 +661,6 @@ class Profile extends \ElkArte\AbstractController
 				// @todo yes this is ugly, but saveProfileFields needs to be updated first
 				$_POST = (array) $this->_req->post;
 
-				require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
 				if ($this->_current_area === 'account' && !empty($modSettings['enableOTP']))
 				{
 					$fields = \ElkArte\Controller\ProfileOptions::getFields('account_otp');

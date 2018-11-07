@@ -20,8 +20,6 @@ class TestHTML2Md extends \PHPUnit\Framework\TestCase
 			$this->restore_txt = true;
 		}
 
-		require_once(SUBSDIR . '/Html2BBC.class.php');
-
 		$this->mdTestCases = array(
 			array(
 				'Test bold',

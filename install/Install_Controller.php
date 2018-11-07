@@ -922,7 +922,6 @@ class Install_Controller
 
 		// These files may be or may not be already included, better safe than sorry for now
 		require_once(SOURCEDIR . '/Subs.php');
-		require_once(SUBSDIR . '/Util.class.php');
 
 		$db = load_database();
 

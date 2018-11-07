@@ -9,8 +9,6 @@ class TestHTML2BBC extends \PHPUnit\Framework\TestCase
 	 */
 	public function setUp()
 	{
-		require_once(SUBSDIR . '/Html2BBC.class.php');
-
 		$this->bbcTestCases = array(
 			array(
 				'Test bold',

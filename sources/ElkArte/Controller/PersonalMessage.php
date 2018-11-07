@@ -1829,7 +1829,6 @@ class PersonalMessage extends \ElkArte\AbstractController
 			$_POST = htmlspecialchars__recursive($_POST);
 
 			// Save the fields.
-			require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
 			$fields = \ElkArte\Controller\ProfileOptions::getFields('contactprefs');
 			saveProfileFields($fields['fields'], $fields['hook']);
 

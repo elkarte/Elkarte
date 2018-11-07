@@ -14,8 +14,6 @@ class TestPBE extends \PHPUnit\Framework\TestCase
 	 */
 	public function setUp()
 	{
-		require_once(CONTROLLERDIR . '/Emailpost.controller.php');
-		require_once(SUBSDIR . '/EmailParse.class.php');
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 
 		theme()->getTemplates()->loadLanguageFile('Maillist');
