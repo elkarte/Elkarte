@@ -18,7 +18,7 @@ namespace ElkArte\Search\API;
  *
  * @package Search
  */
-abstract class SearchAPI
+abstract class AbstractAPI
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
