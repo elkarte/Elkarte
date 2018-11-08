@@ -24,7 +24,7 @@ class Recent extends \ElkArte\AbstractController
 {
 	/**
 	 * The object that will retrieve the data
-	 * @var \ElkArte\RecentClass
+	 * @var \ElkArte\Recent
 	 */
 	private $_grabber;
 
@@ -115,7 +115,7 @@ class Recent extends \ElkArte\AbstractController
 		global $txt, $scripturl, $context, $modSettings, $board, $user_info;
 
 		// Start up a new recent posts grabber
-		$this->_grabber = new \ElkArte\RecentClass($user_info['id']);
+		$this->_grabber = new \ElkArte\Recent($user_info['id']);
 
 		// Set or use a starting point for pagination
 		$this->_start = $this->_req->getQuery('start', 'intval', 0);

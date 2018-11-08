@@ -98,7 +98,7 @@ class BoardIndex extends \ElkArte\AbstractController implements FrontpageInterfa
 
 		// Are we showing all membergroups on the board index?
 		if (!empty($settings['show_group_key']))
-			$context['membergroups'] = cache_quick_get('membergroup_list', 'subs/Membergroups.subs.php', 'cache_getMembergroupList', array());
+			$context['membergroups'] = \ElkArte\Cache\Cache::instance()->quick_get('membergroup_list', 'subs/Membergroups.subs.php', 'cache_getMembergroupList', array());
 
 		// Track most online statistics? (subs/Members.subs.phpOnline.php)
 		if (!empty($modSettings['trackStats']))
@@ -113,11 +113,11 @@ class BoardIndex extends \ElkArte\AbstractController implements FrontpageInterfa
 			);
 			if (empty($settings['recent_post_topics']))
 			{
-				$context['latest_posts'] = cache_quick_get('boardindex-latest_posts:' . md5($user_info['query_wanna_see_board'] . $user_info['language']), 'subs/Recent.subs.php', 'cache_getLastPosts', array($latestPostOptions));
+				$context['latest_posts'] = \ElkArte\Cache\Cache::instance()->quick_get('boardindex-latest_posts:' . md5($user_info['query_wanna_see_board'] . $user_info['language']), 'subs/Recent.subs.php', 'cache_getLastPosts', array($latestPostOptions));
 			}
 			else
 			{
-				$context['latest_posts'] = cache_quick_get('boardindex-latest_topics:' . md5($user_info['query_wanna_see_board'] . $user_info['language']), 'subs/Recent.subs.php', 'cache_getLastTopics', array($latestPostOptions));
+				$context['latest_posts'] = \ElkArte\Cache\Cache::instance()->quick_get('boardindex-latest_topics:' . md5($user_info['query_wanna_see_board'] . $user_info['language']), 'subs/Recent.subs.php', 'cache_getLastTopics', array($latestPostOptions));
 			}
 		}
 

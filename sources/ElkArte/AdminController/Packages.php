@@ -744,7 +744,7 @@ class Packages extends \ElkArte\AbstractController
 		logAction($this->_uninstalling ? 'uninstall_package' : (!empty($is_upgrade) ? 'upgrade_package' : 'install_package'), array('package' => \ElkArte\Util::htmlspecialchars($packageInfo['name']), 'version' => \ElkArte\Util::htmlspecialchars($packageInfo['version'])), 'admin');
 
 		// Just in case, let's clear the whole cache to avoid anything going up the swanny.
-		clean_cache();
+		\ElkArte\Cache\Cache::instance()->clean();
 
 		// Restore file permissions?
 		create_chmod_control(array(), array(), true);

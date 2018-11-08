@@ -432,7 +432,9 @@ class CoreFeatures extends \ElkArte\AbstractController
 
 		// This is needed to let menus appear if cache > 2
 		if ($modSettings['cache_enable'] > 2)
-			clean_cache('data');
+		{
+			\ElkArte\Cache\Cache::instance()->clean('data');
+		}
 
 		// Any post save things?
 		foreach ($core_features as $id => $feature)

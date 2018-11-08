@@ -45,7 +45,7 @@ class DailyMaintenance implements ScheduledTaskInterface
 		$db = database();
 
 		// First clean out the cache.
-		clean_cache('data');
+		\ElkArte\Cache\Cache::instance()->clean('data');
 
 		// If warning decrement is enabled and we have people who have not had a new warning in 24 hours, lower their warning level.
 		list (,, $modSettings['warning_decrement']) = explode(',', $modSettings['warning_settings']);

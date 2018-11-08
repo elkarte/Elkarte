@@ -940,7 +940,7 @@ class Theme extends BaseTheme
 		}
 
 		// All the buttons we can possible want and then some, try pulling the final list of buttons from cache first.
-		if (($menu_buttons = cache_get_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
+		if (($menu_buttons = \ElkArte\Cache\Cache::instance()->get('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
 		{
 			// Start things up: this is what we know by default
 			require_once(SUBSDIR . '/Menu.subs.php');
@@ -1021,7 +1021,7 @@ class Theme extends BaseTheme
 
 			if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
 			{
-				cache_put_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $menu_buttons, $cacheTime);
+				\ElkArte\Cache\Cache::instance()->put('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $menu_buttons, $cacheTime);
 			}
 		}
 

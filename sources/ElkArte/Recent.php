@@ -23,7 +23,7 @@ namespace ElkArte;
  * This is used by \ElkArte\Controller\Recent to retrieve the data
  * from the db, in particular by action_recent
  */
-class RecentClass
+class Recent
 {
 	/**
 	 * Holds the boards the member is looking at

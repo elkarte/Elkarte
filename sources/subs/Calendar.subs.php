@@ -662,7 +662,7 @@ function cache_getOffsetIndependentEvents($days_to_index)
 function cache_getRecentEvents($eventOptions)
 {
 	// With the 'static' cached data we can calculate the user-specific data.
-	$cached_data = cache_quick_get('calendar_index', 'subs/Calendar.subs.php', 'cache_getOffsetIndependentEvents', array($eventOptions['num_days_shown']));
+	$cached_data = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index', 'subs/Calendar.subs.php', 'cache_getOffsetIndependentEvents', array($eventOptions['num_days_shown']));
 
 	// Get the information about today (from user perspective).
 	$today = getTodayInfo();
