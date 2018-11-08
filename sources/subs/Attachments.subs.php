@@ -357,7 +357,7 @@ function processAttachments($id_msg = null)
 {
 	global $context, $modSettings, $txt, $user_info, $ignore_temp, $topic, $board;
 
-	$attach_errors = ElkArte\Errors\AttachmentErrorContext::context();
+	$attach_errors = \ElkArte\Errors\AttachmentErrorContext::context();
 	$added_initial_error = false;
 
 	// Make sure we're uploading to the right place.

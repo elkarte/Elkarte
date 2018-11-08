@@ -25,7 +25,7 @@ use ElkArte\Exceptions\ControllerRedirectException;
  *
  * @package Calendar
  */
-class Post extends ElkArte\Modules\AbstractModule
+class Post extends \ElkArte\Modules\AbstractModule
 {
 	/**
 	 * If we are making a topic event

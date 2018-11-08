@@ -24,7 +24,7 @@ use ElkArte\Exceptions\ControllerRedirectException;
  *
  * Prepares the draft functions for the personal message page
  */
-class PersonalMessage extends ElkArte\Modules\AbstractModule
+class PersonalMessage extends \ElkArte\Modules\AbstractModule
 {
 	/**
 	 * Autosave enabled

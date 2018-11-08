@@ -23,7 +23,7 @@ use ElkArte\Errors\AttachmentErrorContext;
 /**
  * Class Attachments_Post_Module
  */
-class Post extends ElkArte\Modules\AbstractModule
+class Post extends \ElkArte\Modules\AbstractModule
 {
 	/**
 	 * The mode of attachments (disabled/enabled/show only).

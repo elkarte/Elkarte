@@ -94,7 +94,7 @@ class VerificationControlsIntegrate
 			return true;
 		}
 
-		$verification_errors = ElkArte\Errors\ErrorContext::context($verificationOptions['id']);
+		$verification_errors = \ElkArte\Errors\ErrorContext::context($verificationOptions['id']);
 
 		// Start with any testing.
 		if ($do_test)

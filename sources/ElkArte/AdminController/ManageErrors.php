@@ -37,7 +37,7 @@ class ManageErrors extends \ElkArte\AbstractController
 		// Check for the administrative permission to do this.
 		isAllowedTo('admin_forum');
 
-		$this->errorLog = new ElkArte\Errors\Log(database());
+		$this->errorLog = new \ElkArte\Errors\Log(database());
 
 		// The error log. View the list or view a file?
 		$activity = $this->_req->getQuery('activity', 'strval');

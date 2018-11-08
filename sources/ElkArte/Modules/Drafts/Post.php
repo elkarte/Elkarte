@@ -25,7 +25,7 @@ use ElkArte\Exceptions\ControllerRedirectException;
  *
  * Events and functions for post based drafts
  */
-class Post extends ElkArte\Modules\AbstractModule
+class Post extends \ElkArte\Modules\AbstractModule
 {
 	/**
 	 * Autosave enabled

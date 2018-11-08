@@ -551,7 +551,7 @@ class ManageThemes extends \ElkArte\AbstractController
 		$old_id = $settings['theme_id'];
 		$old_settings = $settings;
 
-		new ElkArte\Themes\ThemeLoader($theme, false);
+		new \ElkArte\Themes\ThemeLoader($theme, false);
 		theme()->getTemplates()->loadLanguageFile('Profile');
 
 		// @todo Should we just move these options so they are no longer theme dependant?
@@ -609,7 +609,7 @@ class ManageThemes extends \ElkArte\AbstractController
 		}
 
 		// Restore the existing theme.
-		new ElkArte\Themes\ThemeLoader($old_id, false);
+		new \ElkArte\Themes\ThemeLoader($old_id, false);
 		$settings = $old_settings;
 
 		theme()->getTemplates()->load('ManageThemes');
@@ -662,7 +662,7 @@ class ManageThemes extends \ElkArte\AbstractController
 		$old_id = $settings['theme_id'];
 		$old_settings = $settings;
 
-		new ElkArte\Themes\ThemeLoader($theme, false);
+		new \ElkArte\Themes\ThemeLoader($theme, false);
 
 		// Also load the actual themes language file - in case of special settings.
 		theme()->getTemplates()->loadLanguageFile('Settings', '', true, true);
@@ -785,7 +785,7 @@ class ManageThemes extends \ElkArte\AbstractController
 		}
 
 		// Restore the current theme.
-		new ElkArte\Themes\ThemeLoader($old_id, false);
+		new \ElkArte\Themes\ThemeLoader($old_id, false);
 
 		$settings = $old_settings;
 

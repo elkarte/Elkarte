@@ -20,7 +20,7 @@ namespace ElkArte\Modules\Calendar;
 /**
  * This class's task is to show the upcoming events in the BoardIndex.
  */
-class BoardIndex extends ElkArte\Modules\AbstractModule
+class BoardIndex extends \ElkArte\Modules\AbstractModule
 {
 	/**
 	 * {@inheritdoc }

@@ -22,7 +22,7 @@ namespace ElkArte\Modules\Drafts;
  *
  * Events and functions for post based drafts
  */
-class Admin extends ElkArte\Modules\AbstractModule
+class Admin extends \ElkArte\Modules\AbstractModule
 {
 	/**
 	 * {@inheritdoc}

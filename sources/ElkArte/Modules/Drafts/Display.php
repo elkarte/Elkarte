@@ -22,7 +22,7 @@ namespace ElkArte\Modules\Drafts;
  *
  * Enables draft functions for teh Display.controller page (quick reply)
  */
-class Display extends ElkArte\Modules\AbstractModule
+class Display extends \ElkArte\Modules\AbstractModule
 {
 	/**
 	 * Autosave switch

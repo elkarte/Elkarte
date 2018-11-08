@@ -22,7 +22,7 @@ namespace ElkArte\Modules\Drafts;
  *
  * Handles adding the show drafts area to the user profile
  */
-class Profile extends ElkArte\Modules\AbstractModule
+class Profile extends \ElkArte\Modules\AbstractModule
 {
 	/**
 	 * {@inheritdoc }

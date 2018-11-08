@@ -116,7 +116,7 @@ function loadCacheEngines($supported_only = true)
 		if (class_exists($class))
 		{
 			$obj = new $class(array());
-			if ($obj instanceof ElkArte\Cache\CacheMethod\AbstractCacheMethod)
+			if ($obj instanceof \ElkArte\Cache\CacheMethod\AbstractCacheMethod)
 			{
 				if ($supported_only && $obj->isAvailable())
 				{

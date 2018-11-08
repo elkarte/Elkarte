@@ -22,7 +22,7 @@ namespace ElkArte\Modules\Calendar;
  *
  * @package Calendar
  */
-class Display extends ElkArte\Modules\AbstractModule
+class Display extends \ElkArte\Modules\AbstractModule
 {
 	/**
 	 * {@inheritdoc }

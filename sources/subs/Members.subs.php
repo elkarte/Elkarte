@@ -487,7 +487,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Put any errors in here.
-	$reg_errors = ElkArte\Errors\ErrorContext::context($ErrorContext, 0);
+	$reg_errors = \ElkArte\Errors\ErrorContext::context($ErrorContext, 0);
 
 	// What method of authorization are we going to use?
 	if (empty($regOptions['auth_method']) || !in_array($regOptions['auth_method'], array('password', 'openid')))

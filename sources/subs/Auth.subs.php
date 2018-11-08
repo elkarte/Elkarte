@@ -447,7 +447,7 @@ function resetPassword($memID, $username = null)
 	require_once(SUBSDIR . '/Members.subs.php');
 	if ($username !== null)
 	{
-		$errors = ElkArte\Errors\ErrorContext::context('reset_pwd', 0);
+		$errors = \ElkArte\Errors\ErrorContext::context('reset_pwd', 0);
 		validateUsername($memID, $user, 'reset_pwd');
 
 		// If there are "important" errors and you are not an admin: log the first error
@@ -493,7 +493,7 @@ function validateUsername($memID, $username, $ErrorContext = 'register', $check_
 {
 	global $txt;
 
-	$errors = ElkArte\Errors\ErrorContext::context($ErrorContext, 0);
+	$errors = \ElkArte\Errors\ErrorContext::context($ErrorContext, 0);
 
 	// Don't use too long a name.
 	if (\ElkArte\Util::strlen($username) > 25)

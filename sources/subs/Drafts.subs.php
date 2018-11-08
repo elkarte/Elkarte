@@ -460,7 +460,7 @@ function saveDraft($draft, $check_last_save = false)
 	}
 
 	// Be ready for surprises
-	$post_errors = ElkArte\Errors\ErrorContext::context('post', 1);
+	$post_errors = \ElkArte\Errors\ErrorContext::context('post', 1);
 
 	// The message and subject still need a bit more work
 	preparsecode($draft['body']);
@@ -522,7 +522,7 @@ function savePMDraft($recipientList, $draft, $check_last_save = false)
 	// Read in what was sent
 	$id_pm_draft = $draft['id_pm_draft'];
 	$draft_info = loadDraft($id_pm_draft, 1);
-	$post_errors = ElkArte\Errors\ErrorContext::context('pm', 1);
+	$post_errors = \ElkArte\Errors\ErrorContext::context('pm', 1);
 
 	// 5 seconds is the same limit we have for posting
 	if ($check_last_save && !empty($draft_info['poster_time']) && time() < $draft_info['poster_time'] + 5)
