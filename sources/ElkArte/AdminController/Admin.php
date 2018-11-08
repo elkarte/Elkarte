@@ -815,15 +815,15 @@ class Admin extends \ElkArte\AbstractController
 
 		// All the files we need to include.
 		$include_files = array(
-			'AddonSettings.controller', 'AdminLog.controller', 'CoreFeatures.controller',
-			'ManageAttachments.controller', 'ManageAvatars.controller', 'ManageBBC.controller',
-			'ManageBoards.controller',
-			'ManageFeatures.controller', 'ManageLanguages.controller', 'ManageMail.controller',
-			'ManageNews.controller', 'ManagePaid.controller', 'ManagePermissions.controller',
-			'ManagePosts.controller', 'ManageRegistration.controller', 'ManageSearch.controller',
-			'ManageSearchEngines.controller', 'ManageSecurity.controller', 'ManageServer.controller',
-			'ManageSmileys.controller', 'ManageTopics.controller', 'ManageMaillist.controller',
-			'ManageMembergroups.controller'
+// 			'AddonSettings', 'AdminLog', 'CoreFeatures',
+// 			'ManageAttachments', 'ManageAvatars', 'ManageBBC',
+// 			'ManageBoards',
+// 			'ManageFeatures', 'ManageLanguages', 'ManageMail',
+// 			'ManageNews', 'ManagePaid', 'ManagePermissions',
+// 			'ManagePosts', 'ManageRegistration', 'ManageSearch',
+// 			'ManageSearchEngines', 'ManageSecurity', 'ManageServer',
+// 			'ManageSmileys', 'ManageTopics', 'ManageMaillist',
+// 			'ManageMembergroups'
 		);
 
 		// This is a special array of functions that contain setting data
