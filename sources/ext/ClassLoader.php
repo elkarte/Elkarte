@@ -10,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Composer\Autoload;
+namespace ElkArte\ext\Composer\Autoload;
 
 /**
  * ClassLoader implements a PSR-0, PSR-4 and classmap class loader.

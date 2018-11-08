@@ -493,7 +493,7 @@ function loadEssentialData()
 		require_once(SOURCEDIR . '/Security.php');
 		require_once(EXTDIR . '/ClassLoader.php');
 
-		$loader = new \Composer\Autoload\ClassLoader();
+		$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
 		$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
 		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
 		$loader->register();
