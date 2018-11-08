@@ -213,7 +213,7 @@ class ManageErrors extends \ElkArte\AbstractController
 				$memID = $context['errors'][$id]['member']['id'];
 				$context['errors'][$id]['member']['username'] = $members[$memID]['member_name'];
 				$context['errors'][$id]['member']['name'] = $members[$memID]['real_name'];
-				$context['errors'][$id]['member']['href'] = empty($memID) ? '' : $getUrl('profile', ['action' => 'profile', 'u' => $memID,  'name' => $members[$memID]['real_name']]);
+				$context['errors'][$id]['member']['href'] = empty($memID) ? '' : getUrl('profile', ['action' => 'profile', 'u' => $memID,  'name' => $members[$memID]['real_name']]);
 				$context['errors'][$id]['member']['link'] = empty($memID) ? $txt['guest_title'] : '<a href="' . $context['errors'][$id]['member']['href'] . '">' . $context['errors'][$id]['member']['name'] . '</a>';
 			}
 		}
