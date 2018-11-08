@@ -273,7 +273,7 @@ class ManageRegistration extends \ElkArte\AbstractController
 			}
 		}
 
-		$agreement = new \Agreement($context['current_agreement']);
+		$agreement = new \ElkArte\Agreement($context['current_agreement']);
 
 		if (isset($this->_req->post->save) && isset($this->_req->post->agreement))
 		{

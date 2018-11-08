@@ -80,8 +80,8 @@ class Reminder extends \ElkArte\AbstractController
 		elseif ($this->_req->getPost('user') !== '')
 		{
 			$where = 'member_name = {string:member_name}';
-			$where_params['member_name'] = $this->_req->getPost('user', 'trim|Util::htmlspecialchars[ENT_QUOTES]');
-			$where_params['email_address'] = $this->_req->getPost('user', 'trim|Util::htmlspecialchars[ENT_QUOTES]');
+			$where_params['member_name'] = $this->_req->getPost('user', 'trim|\\ElkArte\\Util::htmlspecialchars[ENT_QUOTES]');
+			$where_params['email_address'] = $this->_req->getPost('user', 'trim|\\ElkArte\\Util::htmlspecialchars[ENT_QUOTES]');
 		}
 
 		// You must enter a username/email address.

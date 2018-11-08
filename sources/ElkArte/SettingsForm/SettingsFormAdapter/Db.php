@@ -143,7 +143,7 @@ class Db extends Adapter
 	private function setMasks(array $configVar, $str)
 	{
 		$known_rules = array(
-			'nohtml' => 'Util::htmlspecialchars[' . ENT_QUOTES . ']',
+			'nohtml' => '\\ElkArte\\Util::htmlspecialchars[' . ENT_QUOTES . ']',
 			'email' => 'valid_email',
 			'url' => 'valid_url',
 		);

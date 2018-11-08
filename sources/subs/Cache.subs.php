@@ -56,7 +56,6 @@ function cache_put_data($key, $value, $ttl = 120)
 {
 	\ElkArte\Errors\Errors::instance()->log_deprecated('cache_put_data()', '\\ElkArte\\Cache\\Cache::instance()->put');
 	\ElkArte\Cache\Cache::instance()->put($key, $value, $ttl);
-}($key, $value, $ttl);
 }
 
 /**

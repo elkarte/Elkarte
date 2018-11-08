@@ -375,7 +375,7 @@ class ProfileAccount extends \ElkArte\AbstractController
 			}
 
 			// Try to remember some bits.
-			$context['preview_subject'] = $this->_req->getPost('warn_sub', 'trim|Util::htmlspecialchars', '');
+			$context['preview_subject'] = $this->_req->getPost('warn_sub', 'trim|\\ElkArte\\Util::htmlspecialchars', '');
 			$context['warning_data'] = array(
 				'reason' => $this->_req->post->warn_reason,
 				'notify' => !empty($this->_req->post->warn_notify),
@@ -406,7 +406,7 @@ class ProfileAccount extends \ElkArte\AbstractController
 			checkSession('post');
 
 			// There must be a reason, and use of flowery words is allowed.
-			$warn_reason = $this->_req->getPost('warn_reason', 'trim|Util::htmlspecialchars', '');
+			$warn_reason = $this->_req->getPost('warn_reason', 'trim|\\ElkArte\\Util::htmlspecialchars', '');
 			if ($warn_reason === '' && !$context['user']['is_owner'])
 			{
 				$this->_issueErrors[] = 'warning_no_reason';

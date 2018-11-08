@@ -546,7 +546,7 @@ class Emailuser extends \ElkArte\AbstractController
 			$report_errors->addError('session_timeout');
 
 		// Make sure we have a comment and it's clean.
-		if ($this->_req->getPost('comment', 'Util::htmltrim', '') === '')
+		if ($this->_req->getPost('comment', '\\ElkArte\\Util::htmltrim', '') === '')
 			$report_errors->addError('no_comment');
 		$poster_comment = strtr(\ElkArte\Util::htmlspecialchars($this->_req->post->comment), array("\r" => '', "\t" => ''));
 

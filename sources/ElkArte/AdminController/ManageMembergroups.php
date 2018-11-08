@@ -562,12 +562,12 @@ class ManageMembergroups extends \ElkArte\AbstractController
 				'max_messages' => 'intval',
 				'min_posts' => 'intval|abs',
 				'group_type' => 'intval',
-				'group_desc' => 'trim|Util::htmlspecialchars',
-				'group_name' => 'trim|Util::htmlspecialchars',
+				'group_desc' => 'trim|\\ElkArte\\Util::htmlspecialchars',
+				'group_name' => 'trim|\\ElkArte\\Util::htmlspecialchars',
 				'group_hidden' => 'intval',
 				'group_inherit' => 'intval',
 				'icon_count' => 'intval',
-				'icon_image' => 'trim|Util::htmlspecialchars',
+				'icon_image' => 'trim|\\ElkArte\\Util::htmlspecialchars',
 				'online_color' => 'trim|valid_color',
 			));
 			$validator->input_processing(array(

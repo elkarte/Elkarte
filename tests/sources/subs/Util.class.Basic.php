@@ -58,7 +58,7 @@ class TestUtilclass extends \PHPUnit\Framework\TestCase
 		$string = ' &nbsp;	&#x202D;Some string with leading spaces';
 		$actual1 = 'Some string with leading spaces';
 
-		Util::htmltrim($string);
+		\ElkArte\Util::htmltrim($string);
 		$this->assertEquals(\ElkArte\Util::htmltrim($string), $actual1);
 	}
 

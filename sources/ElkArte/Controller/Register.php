@@ -230,15 +230,15 @@ class Register extends \ElkArte\AbstractController
 		if (!empty($_SESSION['openid']['verified']) && !empty($_SESSION['openid']['openid_uri']) && !empty($_SESSION['openid']['nickname']))
 		{
 			$context['openid'] = $_SESSION['openid']['openid_uri'];
-			$context['username'] = $this->_req->getPost('user', 'Util::htmlspecialchars', $_SESSION['openid']['nickname']);
-			$context['email'] = $this->_req->getPost('email', 'Util::htmlspecialchars', $_SESSION['openid']['email']);
+			$context['username'] = $this->_req->getPost('user', '\\ElkArte\\Util::htmlspecialchars', $_SESSION['openid']['nickname']);
+			$context['email'] = $this->_req->getPost('email', '\\ElkArte\\Util::htmlspecialchars', $_SESSION['openid']['email']);
 		}
 		// See whether we have some pre filled values.
 		else
 		{
 			$context['openid'] = $this->_req->getPost('openid_identifier', 'trim', '');
-			$context['username'] = $this->_req->getPost('user', 'Util::htmlspecialchars', '');
-			$context['email'] = $this->_req->getPost('email', 'Util::htmlspecialchars', '');
+			$context['username'] = $this->_req->getPost('user', '\\ElkArte\\Util::htmlspecialchars', '');
+			$context['email'] = $this->_req->getPost('email', '\\ElkArte\\Util::htmlspecialchars', '');
 			$context['notify_announcements'] = (int) !empty($this->_req->post->notify_announcements);
 		}
 

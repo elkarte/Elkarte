@@ -554,8 +554,8 @@ class ManageSmileys extends \ElkArte\AbstractController
 			$allowedTypes = array('jpeg', 'jpg', 'gif', 'png', 'bmp');
 			$disabledFiles = array('con', 'com1', 'com2', 'com3', 'com4', 'prn', 'aux', 'lpt1', '.htaccess', 'index.php');
 
-			$this->_req->post->smiley_code = $this->_req->getPost('smiley_code', 'Util::htmltrim', '');
-			$this->_req->post->smiley_filename = $this->_req->getPost('smiley_filename', 'Util::htmltrim', '');
+			$this->_req->post->smiley_code = $this->_req->getPost('smiley_code', '\\ElkArte\\Util::htmltrim', '');
+			$this->_req->post->smiley_filename = $this->_req->getPost('smiley_filename', '\\ElkArte\\Util::htmltrim', '');
 			$this->_req->post->smiley_location = empty($this->_req->post->smiley_location) || $this->_req->post->smiley_location > 2 || $this->_req->post->smiley_location < 0 ? 0 : (int) $this->_req->post->smiley_location;
 
 			// Make sure some code was entered.
@@ -805,8 +805,8 @@ class ManageSmileys extends \ElkArte\AbstractController
 				// Otherwise an edit.
 				else
 				{
-					$this->_req->post->smiley_code = $this->_req->getPost('smiley_code', 'Util::htmltrim', '');
-					$this->_req->post->smiley_filename = $this->_req->getPost('smiley_filename', 'Util::htmltrim', '');
+					$this->_req->post->smiley_code = $this->_req->getPost('smiley_code', '\\ElkArte\\Util::htmltrim', '');
+					$this->_req->post->smiley_filename = $this->_req->getPost('smiley_filename', '\\ElkArte\\Util::htmltrim', '');
 					$this->_req->post->smiley_location = empty($this->_req->post->smiley_location) || $this->_req->post->smiley_location > 2 || $this->_req->post->smiley_location < 0 ? 0 : (int) $this->_req->post->smiley_location;
 
 					// Make sure some code was entered.

@@ -1553,7 +1553,7 @@ function getAttachmentPath()
 	elseif (!empty($modSettings['currentAttachmentUploadDir']) && !is_array($modSettings['attachmentUploadDir']) && (@unserialize($modSettings['attachmentUploadDir']) !== false))
 	{
 		// @todo this is here to prevent the package manager to die when complete the installation of the patch (the new Util class has not yet been loaded so we need the normal one)
-		if (function_exists('Util::unserialize'))
+		if (function_exists('\\ElkArte\\Util::unserialize'))
 		{
 			$attachmentDir = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 		}

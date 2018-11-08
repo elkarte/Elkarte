@@ -118,7 +118,7 @@ class Html2Md
 	private function _set_parser()
 	{
 		// Using PHP built in functions ...
-		if (class_exists('DOMDocument'))
+		if (class_exists('\\DOMDocument'))
 		{
 			$this->_parser = true;
 			$previous = libxml_use_internal_errors(true);
@@ -233,7 +233,7 @@ class Html2Md
 		$this->html = $this->_returnBodyText($this->html);
 
 		// Set up processing details
-		$this->doc = new DOMDocument();
+		$this->doc = new \DOMDocument();
 		$this->doc->preserveWhiteSpace = false;
 		$this->doc->encoding = 'UTF-8';
 
@@ -1068,7 +1068,7 @@ class Html2Md
 	{
 		if ($this->_parser)
 		{
-			$doc = new DOMDocument();
+			$doc = new \DOMDocument();
 			$doc->appendChild($doc->importNode($node, true));
 			$html = trim($doc->saveHTML());
 			$tag = $node->nodeName;

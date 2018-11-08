@@ -576,9 +576,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		);
 		while ($row = $db->fetch_assoc($request))
 		{
-			if (isset($usernames[Util::strtolower($row['member_name'])]))
+			if (isset($usernames[\ElkArte\Util::strtolower($row['member_name'])]))
 			{
-				$usernames[Util::strtolower($row['member_name'])] = $row['id_member'];
+				$usernames[\ElkArte\Util::strtolower($row['member_name'])] = $row['id_member'];
 			}
 		}
 		$db->free_result($request);

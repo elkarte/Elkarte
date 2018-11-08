@@ -183,7 +183,7 @@ class EventManager
 	public function register($position, $event, $priority = 0)
 	{
 		if (!isset($this->_registered_events[$position]))
-			$this->_registered_events[$position] = new \ElkArte\Event(new Priority());
+			$this->_registered_events[$position] = new \ElkArte\Event(new \ElkArte\Priority());
 
 		$this->_registered_events[$position]->add($event, $priority);
 	}

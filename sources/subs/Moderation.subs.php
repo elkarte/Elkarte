@@ -386,7 +386,7 @@ function logWarningNotice($subject, $body)
 			'subject' => 'string-255', 'body' => 'string-65534',
 		),
 		array(
-			Util::htmlspecialchars($subject), \ElkArte\Util::htmlspecialchars($body),
+			\ElkArte\Util::htmlspecialchars($subject), \ElkArte\Util::htmlspecialchars($body),
 		),
 		array('id_notice')
 	);

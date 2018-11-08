@@ -1056,9 +1056,9 @@ class PersonalMessage extends \ElkArte\AbstractController
 					foreach ($foundMembers as $member)
 					{
 						$testNames = array(
-							Util::strtolower($member['username']),
-							Util::strtolower($member['name']),
-							Util::strtolower($member['email']),
+							\ElkArte\Util::strtolower($member['username']),
+							\ElkArte\Util::strtolower($member['name']),
+							\ElkArte\Util::strtolower($member['email']),
 						);
 
 						if (count(array_intersect($testNames, $namedRecipientList[$recipientType])) !== 0)

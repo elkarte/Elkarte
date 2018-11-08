@@ -723,8 +723,8 @@ function cdata_parse($data, $ns = '')
 	for ($pos = 0, $n = \ElkArte\Util::strlen($data); $pos < $n; null)
 	{
 		$positions = array(
-			Util::strpos($data, '&', $pos),
-			Util::strpos($data, ']', $pos),
+			\ElkArte\Util::strpos($data, '&', $pos),
+			\ElkArte\Util::strpos($data, ']', $pos),
 		);
 
 		if ($ns != '')

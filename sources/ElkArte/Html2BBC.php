@@ -98,10 +98,10 @@ class Html2BBC
 		$this->strip_newlines = $strip;
 
 		// Using PHP built in functions ...
-		if (class_exists('DOMDocument'))
+		if (class_exists('\\DOMDocument'))
 		{
 			$this->_parser = true;
-			$this->doc = new DOMDocument();
+			$this->doc = new \DOMDocument();
 			$this->doc->preserveWhiteSpace = false;
 
 			// Make it a utf-8 doc always and be silent about those html structure errors
@@ -864,7 +864,7 @@ class Html2BBC
 	{
 		if ($this->_parser)
 		{
-			$doc = new DOMDocument();
+			$doc = new \DOMDocument();
 			$doc->appendChild($doc->importNode($node, true));
 			$html = trim($doc->saveHTML());
 			$tag = $node->nodeName;
