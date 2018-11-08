@@ -95,7 +95,7 @@ class TestBrowser extends \PHPUnit\Framework\TestCase
 	}
 }
 
-class testBrowserDetector extends BrowserDetector
+class testBrowserDetector extends \ElkArte\BrowserDetector
 {
 	public function testdetectBrowser()
 	{

@@ -354,7 +354,7 @@ class Bootstrap
 
 			if (!isset($_SESSION['session_value']))
 			{
-				$tokenizer = new \ElkArte\Token_Hash();
+				$tokenizer = new \ElkArte\TokenHash();
 				$_SESSION['session_value'] = $tokenizer->generate_hash(32, session_id());
 				$_SESSION['session_var'] = substr(preg_replace('~^\d+~', '', $tokenizer->generate_hash(16, session_id())), 0, rand(7, 12));
 			}
@@ -399,7 +399,7 @@ class Bootstrap
 		// Do we allow guests in here?
 		if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && basename($_SERVER['PHP_SELF']) !== 'SSI.php')
 		{
-			$controller = new \ElkArte\Controller\Auth(new Event_manager());
+			$controller = new \ElkArte\Controller\Auth(new \ElkArte\EventManager());
 			$controller->action_kickguest();
 			obExit(null, true);
 		}

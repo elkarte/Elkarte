@@ -2592,7 +2592,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 	// More likely a standard HTTP URL, first try to use cURL if available
 	elseif (isset($match[1]) && $match[1] === 'http' && function_exists('curl_init'))
 	{
-		$fetch_data = new ElkArte\CurlFetchWebdata(array(), $redirection_level);
+		$fetch_data = new \ElkArte\CurlFetchWebdata(array(), $redirection_level);
 		$fetch_data->get_url_data($url, $post_data);
 
 		// no errors and a 200 result, then we have a good dataset, well we at least have data ;)

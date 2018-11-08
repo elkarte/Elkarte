@@ -32,7 +32,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 		foreach (array_keys($auto_actions) as $action)
 		{
 			$controller_name = ucfirst($action) . '_Controller';
-			$controller = new $controller_name(new Event_Manager());
+			$controller = new $controller_name(new \ElkArte\EventManager());
 			foreach ($auto_actions[$action] as $subaction)
 				$this->assertTrue(method_exists($controller, 'action_' . $subaction));
 		}
@@ -70,7 +70,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 		foreach (array_keys($actions) as $action)
 		{
 			$controller_name = ucfirst($actions[$action]) . '_Controller';
-			$controller = new $controller_name(new Event_Manager());
+			$controller = new $controller_name(new \ElkArte\EventManager());
 			$this->assertTrue(method_exists($controller, 'action_' . $action));
 		}
 
@@ -170,7 +170,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 			);
 
 			// Start a new dispatcher every time (the dispatching is done on __construct)
-			$dispatcher = New \ElkArte\SiteDispatcher_Tester(new HttpReq);
+			$dispatcher = New \ElkArte\SiteDispatcher_Tester(new \ElkArte\HttpReq);
 			$this->assertTrue($dispatcher->compare($test['result']), $test['test_name']);
 		}
 	}

@@ -7,7 +7,7 @@ class TestEvent extends \PHPUnit\Framework\TestCase
 {
 	public function testEmpty()
 	{
-		$event = new Event(new Priority());
+		$event = new \ElkArte\Event(new \ElkArte\Priority());
 
 		// First basic: no events at the beginning
 		$this->assertFalse($event->hasEvents());
@@ -15,7 +15,7 @@ class TestEvent extends \PHPUnit\Framework\TestCase
 
 	public function testSingle()
 	{
-		$event = new Event(new Priority());
+		$event = new \ElkArte\Event(new \ElkArte\Priority());
 
 		// A properly formed event
 		$event_def = array(
@@ -39,7 +39,7 @@ class TestEvent extends \PHPUnit\Framework\TestCase
 
 	public function testMultiple()
 	{
-		$event = new Event(new Priority());
+		$event = new \ElkArte\Event(new \ElkArte\Priority());
 
 		// A properly formed event
 		$event_def = array(
@@ -77,7 +77,7 @@ class TestEvent extends \PHPUnit\Framework\TestCase
 	 */
 	public function testMultipleSorted()
 	{
-		$event = new Event(new Priority());
+		$event = new \ElkArte\Event(new \ElkArte\Priority());
 
 		// A properly formed event
 		$event_def = array(

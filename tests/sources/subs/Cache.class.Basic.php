@@ -35,7 +35,7 @@ class TestCache extends \PHPUnit\Framework\TestCase
 	 */
 	public function testFilebasedCache()
 	{
-		$this->_cache_obj = new ElkArte\Cache\CacheMethod\Filebased(array());
+		$this->_cache_obj = new \ElkArte\Cache\CacheMethod\Filebased(array());
 		$this->doCacheTests();
 	}
 
@@ -44,7 +44,7 @@ class TestCache extends \PHPUnit\Framework\TestCase
 	 */
 	public function testApc()
 	{
-		$this->_cache_obj = new ElkArte\Cache\CacheMethod\Apc(array());
+		$this->_cache_obj = new \ElkArte\Cache\CacheMethod\Apc(array());
 
 		// We may not build APCu for every matrix
 		if (!$this->_cache_obj->isAvailable())
@@ -76,7 +76,7 @@ class TestCache extends \PHPUnit\Framework\TestCase
 		$cache_enable = 1;
 
 		$cache = \ElkArte\Cache\Cache::instance();
-		$file_cache = new ElkArte\Cache\CacheMethod\Filebased(array());
+		$file_cache = new \ElkArte\Cache\CacheMethod\Filebased(array());
 		$object = new \ReflectionClass($cache);
 		$property = $object->getProperty('_cache_obj');
 		$property->setAccessible(true);

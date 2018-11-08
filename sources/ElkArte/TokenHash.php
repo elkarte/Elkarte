@@ -14,7 +14,7 @@
 namespace ElkArte;
 
 /**
- * Class Token_Hash
+ * Class TokenHash
  *
  * Used to generate a high entropy random hash for use in one time use forms
  *

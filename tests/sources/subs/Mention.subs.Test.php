@@ -170,7 +170,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 	{
 		global $modSettings;
 
-		$mentioning = new \ElkArte\Mentions(database(), new Data_Validator, $modSettings['enabled_mentions']);
+		$mentioning = new \ElkArte\Mentions(database(), new \ElkArte\DataValidator, $modSettings['enabled_mentions']);
 		// Mark mention 2 as read
 		$result = $mentioning->markread(2);
 

@@ -22,7 +22,7 @@ namespace ElkArte\AdminController;
  *
  * @package Packages
  */
-class Package_Actions extends \ElkArte\AbstractController
+class PackageActions extends \ElkArte\AbstractController
 {
 	/**
 	 * Passed actions from parsePackageInfo

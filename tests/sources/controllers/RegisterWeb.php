@@ -7,7 +7,7 @@
  *
  * @backupGlobals disabled
  */
-class TestRegister_Controller extends ElkArteWebTest
+class TestRegisterController extends ElkArteWebTest
 {
 	/*
 	 * Used by teardown();

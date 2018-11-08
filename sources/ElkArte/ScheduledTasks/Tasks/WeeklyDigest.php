@@ -31,7 +31,7 @@ class WeeklyDigest implements ScheduledTaskInterface
 	 */
 	public function run()
 	{
-		$digest = new Daily_Digest();
+		$digest = new \ElkArte\ScheduledTasks\Tasks\DailyDigest();
 
 		return $digest->runDigest(true);
 	}

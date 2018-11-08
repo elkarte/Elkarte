@@ -27,7 +27,7 @@ class TestControllerRedirectException extends \PHPUnit\Framework\TestCase
 	}
 }
 
-class Same_Controller extends Action_Controller
+class Same_Controller extends \ElkArte\AbstractController
 {
 	public function __construct($tester)
 	{
@@ -47,7 +47,7 @@ class Same_Controller extends Action_Controller
 	}
 }
 
-class Mock_Controller extends Action_Controller
+class Mock_Controller extends \ElkArte\AbstractController
 {
 	public function action_index()
 	{
@@ -59,7 +59,7 @@ class Mock_Controller extends Action_Controller
 	}
 }
 
-class Mockpre_Controller extends Action_Controller
+class Mockpre_Controller extends \ElkArte\AbstractController
 {
 	protected $_pre_run = false;
 

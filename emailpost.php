@@ -35,7 +35,7 @@ $_SERVER['SERVER_SOFTWARE'] = '';
 $_SERVER['SERVER_NAME'] = '';
 
 // Our mail controller
-$controller = new Emailpost_Controller(new Event_manager());
+$controller = new \ElkArte\Controller\Emailpost(new \ElkArte\EventManager());
 $controller->action_pbe_post();
 
 // Always exit as successful

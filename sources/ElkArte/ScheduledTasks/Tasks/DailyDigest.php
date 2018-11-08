@@ -18,7 +18,7 @@
 namespace ElkArte\ScheduledTasks\Tasks;
 
 /**
- * Class Daily_Digest - Send out a daily email of all subscribed topics, to members.
+ * Class DailyDigest - Send out a daily email of all subscribed topics, to members.
  *
  * - It sends notifications about replies or new topics, and moderation actions.
  *

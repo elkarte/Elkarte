@@ -623,7 +623,7 @@ class Theme extends BaseTheme
 		if (isBrowser('possibly_robot'))
 		{
 			// @todo Maybe move this somewhere better?!
-			$controller = new \ElkArte\Controller\ScheduledTasks(new \Event_Manager());
+			$controller = new \ElkArte\Controller\ScheduledTasks(new \ElkArte\EventManager());
 
 			// What to do, what to do?!
 			if (empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())

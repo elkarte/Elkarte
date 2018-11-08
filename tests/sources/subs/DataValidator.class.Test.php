@@ -94,7 +94,7 @@ class TestDataValidator extends \PHPUnit\Framework\TestCase
 	public function testValidation()
 	{
 		// These should all fail
-		$validation = new Data_Validator();
+		$validation = new \ElkArte\DataValidator();
 		$validation->validation_rules($this->rules);
 		$validation->sanitation_rules(array('min_len_csv' => 'trim'));
 		$validation->input_processing(array('min_len_csv' => 'csv', 'min_len_array' => 'array'));
@@ -109,7 +109,7 @@ class TestDataValidator extends \PHPUnit\Framework\TestCase
 		}
 
 		// These should all pass
-		$validation = new Data_Validator();
+		$validation = new \ElkArte\DataValidator();
 		$validation->validation_rules($this->rules);
 		$validation->input_processing(array('min_len_csv' => 'csv', 'min_len_array' => 'array'));
 		$validation->validate($this->valid_data);
@@ -125,7 +125,7 @@ class TestDataValidator extends \PHPUnit\Framework\TestCase
 
 	public function testCsv()
 	{
-		$validation = new Data_Validator();
+		$validation = new \ElkArte\DataValidator();
 		$validation->validation_rules(array('csv' => 'limits[0,10]|without[1,2,3]'));
 		$validation->input_processing(array('csv' => 'csv'));
 		$validation->validate(array('csv' => '10,12,36,49,5'));
@@ -152,7 +152,7 @@ class TestDataValidator extends \PHPUnit\Framework\TestCase
 	public function testIsValidBoolean($value, $expected)
 	{
 		$data = array('value' => $value);
-		$result = Data_Validator::is_valid($data, array('value' => 'boolean'));
+		$result = \ElkArte\DataValidator::is_valid($data, array('value' => 'boolean'));
 		$this->assertSame($expected !== null, $result);
 	}
 
@@ -204,7 +204,7 @@ class TestDataValidator extends \PHPUnit\Framework\TestCase
 	public function testIsValidFloat($value, $expected)
 	{
 		$data = array('value' => $value);
-		$result = Data_Validator::is_valid($data, array('value' => 'float'));
+		$result = \ElkArte\DataValidator::is_valid($data, array('value' => 'float'));
 		$this->assertSame($expected, $result);
 	}
 
@@ -244,7 +244,7 @@ class TestDataValidator extends \PHPUnit\Framework\TestCase
 	public function testIsValidInteger($value, $expected)
 	{
 		$data = array('value' => $value);
-		$result = Data_Validator::is_valid($data, array('value' => 'integer'));
+		$result = \ElkArte\DataValidator::is_valid($data, array('value' => 'integer'));
 		$this->assertSame($expected, $result);
 	}
 
