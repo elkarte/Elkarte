@@ -556,6 +556,7 @@ class ManageServer extends \ElkArte\AbstractController
 	{
 		global $txt;
 
+		require_once(SUBSDIR . '/Cache.subs.php');
 		// Detect all available optimizers
 		$detected = loadCacheEngines(false);
 		$detected_names = array();

@@ -31,7 +31,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 
 		foreach (array_keys($auto_actions) as $action)
 		{
-			$controller_name = ucfirst($action) . '_Controller';
+			$controller_name = '\\ElkArte\\Controller\\' . ucfirst($action);
 			$controller = new $controller_name(new \ElkArte\EventManager());
 			foreach ($auto_actions[$action] as $subaction)
 				$this->assertTrue(method_exists($controller, 'action_' . $subaction));
@@ -69,7 +69,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 
 		foreach (array_keys($actions) as $action)
 		{
-			$controller_name = ucfirst($actions[$action]) . '_Controller';
+			$controller_name = ucfirst($actions[$action]);
 			$controller = new $controller_name(new \ElkArte\EventManager());
 			$this->assertTrue(method_exists($controller, 'action_' . $action));
 		}

@@ -35,9 +35,9 @@ abstract class MentionMessageAbstract implements MentionTypeInterface
 	protected $_db = null;
 
 	/**
-	 * The Notifications_Task in use
+	 * The \ElkArte\NotificationsTask in use
 	 *
-	 * @var \Notifications_Task
+	 * @var \ElkArte\NotificationsTask
 	 */
 	protected $_task = null;
 
@@ -92,7 +92,7 @@ abstract class MentionMessageAbstract implements MentionTypeInterface
 	/**
 	 * {@inheritdoc }
 	 */
-	public function setTask(\Notifications_Task $task)
+	public function setTask(\ElkArte\NotificationsTask $task)
 	{
 		$this->_task = $task;
 	}
@@ -138,13 +138,13 @@ abstract class MentionMessageAbstract implements MentionTypeInterface
 	 * @param string $template An email template to load
 	 * @param string[] $keys Pair values to match the $txt indexes to subject and body
 	 * @param int[] $members
-	 * @param \Notifications_Task $task
+	 * @param \ElkArte\NotificationsTask $task
 	 * @param string[] $lang_files Language files to load (optional)
 	 * @param string[] $replacements Additional replacements for the loadEmailTemplate function (optional)
 	 * @return mixed[]
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	protected function _getNotificationStrings($template, $keys, $members, \Notifications_Task $task, $lang_files = array(), $replacements = array())
+	protected function _getNotificationStrings($template, $keys, $members, \ElkArte\NotificationsTask $task, $lang_files = array(), $replacements = array())
 	{
 		$members_data = $task->getMembersData();
 

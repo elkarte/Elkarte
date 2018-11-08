@@ -95,12 +95,12 @@ interface MentionTypeInterface
 	public function getNotificationBody($lang_data, $users);
 
 	/**
-	 * The Notifications_Task contains few data that may be necessary for the processing
+	 * The \ElkArte\NotificationsTask contains few data that may be necessary for the processing
 	 * of the mention.
 	 *
-	 * @param \Notifications_Task $task
+	 * @param \ElkArte\NotificationsTask $task
 	 */
-	public function setTask(\Notifications_Task $task);
+	public function setTask(\ElkArte\NotificationsTask $task);
 
 	/**
 	 * Used when sending an immediate email to get the last message id (email id)
