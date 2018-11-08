@@ -1524,7 +1524,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 
 		// See if it is installed?
 		if (isSmileySetInstalled($smileyInfo['id']))
-			\Errors::instance()->fatal_lang_error('package_installed_warning1');
+			\ElkArte\Errors\Errors::instance()->fatal_lang_error('package_installed_warning1');
 
 		// Everything is fine, now it's time to do something, first we test
 		$actions = parsePackageInfo($smileyInfo['xml'], true, 'install');

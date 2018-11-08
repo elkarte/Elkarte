@@ -257,10 +257,10 @@ class Sphinx extends AbstractAPI
 				// Just log the error.
 				if ($mySphinx->GetLastError())
 				{
-					\Errors::instance()->log_error($mySphinx->GetLastError());
+					\ElkArte\Errors\Errors::instance()->log_error($mySphinx->GetLastError());
 				}
 
-				\Errors::instance()->fatal_lang_error('error_no_search_daemon');
+				\ElkArte\Errors\Errors::instance()->fatal_lang_error('error_no_search_daemon');
 			}
 
 			// Get the relevant information from the search results.

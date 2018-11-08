@@ -150,7 +150,7 @@ class Sphinxql extends AbstractAPI
 			// No connection, daemon not running?  log the error
 			if ($mySphinx === false)
 			{
-				\Errors::instance()->fatal_lang_error('error_no_search_daemon');
+				\ElkArte\Errors\Errors::instance()->fatal_lang_error('error_no_search_daemon');
 			}
 
 			// Compile different options for our query
@@ -231,10 +231,10 @@ class Sphinxql extends AbstractAPI
 				// Just log the error.
 				if (mysqli_error($mySphinx))
 				{
-					\Errors::instance()->log_error(mysqli_error($mySphinx));
+					\ElkArte\Errors\Errors::instance()->log_error(mysqli_error($mySphinx));
 				}
 
-				\Errors::instance()->fatal_lang_error('error_no_search_daemon');
+				\ElkArte\Errors\Errors::instance()->fatal_lang_error('error_no_search_daemon');
 			}
 
 			// Get the relevant information from the search results.

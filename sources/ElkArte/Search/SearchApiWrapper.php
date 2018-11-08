@@ -258,7 +258,7 @@ class SearchApiWrapper
 		{
 			// Log the error.
 			theme()->getTemplates()->loadLanguageFile('Errors');
-			\Errors::instance()->log_error(sprintf($txt['search_api_not_compatible'], $fqcn), 'critical');
+			\ElkArte\Errors\Errors::instance()->log_error(sprintf($txt['search_api_not_compatible'], $fqcn), 'critical');
 
 			$this->_searchAPI = new API\Standard($config, $searchParams);
 		}

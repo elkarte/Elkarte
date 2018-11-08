@@ -47,23 +47,23 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 		// controller hardcoded, sa action
 		// these are ?action=name routed to SomeController->action_name()
 		$actions = array(
-			'activate' => 'Register',
-			'attachapprove' => 'ModerateAttachments',
-			'addbuddy' => 'Members',
-			'collapse' => 'BoardIndex',
-			'contact' => 'Register',
-			'coppa' => 'Register',
-			'deletemsg' => 'RemoveTopic',
-			'dlattach' => 'Attachment',
-			'unwatchtopic' => 'Notify',
-			'quickhelp' => 'Help',
-			'login' => 'Auth',
-			'login2' => 'Auth',
-			'logout' => 'Auth',
-			'quotefast' => 'Post',
-			'quickmod' => 'MessageIndex',
-			'quickmod2' => 'Display',
-			'openidreturn' => 'OpenID',
+			'activate' => '\\ElkArte\\Controller\\Register',
+			'attachapprove' => '\\ElkArte\\AdminController\\ModerateAttachments',
+			'addbuddy' => '\\ElkArte\\Controller\\Members',
+			'collapse' => '\\ElkArte\\Controller\\BoardIndex',
+			'contact' => '\\ElkArte\\Controller\\Register',
+			'coppa' => '\\ElkArte\\Controller\\Register',
+			'deletemsg' => '\\ElkArte\\Controller\\RemoveTopic',
+			'dlattach' => '\\ElkArte\\Controller\\Attachment',
+			'unwatchtopic' => '\\ElkArte\\Controller\\Notify',
+			'quickhelp' => '\\ElkArte\\Controller\\Help',
+			'login' => '\\ElkArte\\Controller\\Auth',
+			'login2' => '\\ElkArte\\Controller\\Auth',
+			'logout' => '\\ElkArte\\Controller\\Auth',
+			'quotefast' => '\\ElkArte\\Controller\\Post',
+			'quickmod' => '\\ElkArte\\Controller\\MessageIndex',
+			'quickmod2' => '\\ElkArte\\Controller\\Display',
+			'openidreturn' => '\\ElkArte\\Controller\\OpenID',
 
 		);
 
@@ -89,7 +89,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 				'test_name' => 'no action',
 				'result' => array(
 					'function_name' => 'action_boardindex',
-					'controller_name' => 'BoardIndex_Controller',
+					'controller_name' => '\\ElkArte\\Controller\\BoardIndex',
 				),
 			),
 			// A topic
@@ -99,7 +99,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 				'topic' => 1,
 				'result' => array(
 					'function_name' => 'action_display',
-					'controller_name' => 'Display_Controller',
+					'controller_name' => '\\ElkArte\\Controller\\Display',
 				),
 			),
 			// A board
@@ -108,7 +108,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 				'board' => 1,
 				'result' => array(
 					'function_name' => 'action_messageindex',
-					'controller_name' => 'MessageIndex_Controller',
+					'controller_name' => '\\ElkArte\\Controller\\MessageIndex',
 				),
 			),
 			// Non-existing action
@@ -117,7 +117,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 				'action' => 'qwerty',
 				'result' => array(
 					'function_name' => 'action_boardindex',
-					'controller_name' => 'BoardIndex_Controller',
+					'controller_name' => '\\ElkArte\\Controller\\BoardIndex',
 				),
 			),
 			// An existing one, no sub-action, naming patterns
@@ -126,7 +126,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 				'action' => 'announce',
 				'result' => array(
 					'function_name' => 'action_index',
-					'controller_name' => 'Announce_Controller',
+					'controller_name' => '\\ElkArte\\Controller\\Announce',
 				),
 			),
 			// An existing one, with sub-action, naming patterns
@@ -136,7 +136,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 				'sa' => 'test',
 				'result' => array(
 					'function_name' => 'action_index',
-					'controller_name' => 'Announce_Controller',
+					'controller_name' => '\\ElkArte\\Controller\\Announce',
 				),
 			),
 			// An existing one, action array, naming patterns, ADMINDIR
@@ -145,7 +145,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 				'action' => 'admin',
 				'result' => array(
 					'function_name' => 'action_index',
-					'controller_name' => 'Admin_Controller',
+					'controller_name' => '\\ElkArte\\AdminController\\Admin',
 				),
 			),
 			// An existing one, action array
@@ -154,7 +154,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 				'action' => 'removetopic2',
 				'result' => array(
 					'function_name' => 'action_removetopic2',
-					'controller_name' => 'RemoveTopic_Controller',
+					'controller_name' => '\\ElkArte\\Controller\\RemoveTopic',
 				),
 			),
 		);
@@ -170,7 +170,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 			);
 
 			// Start a new dispatcher every time (the dispatching is done on __construct)
-			$dispatcher = New \ElkArte\SiteDispatcher_Tester(new \ElkArte\HttpReq);
+			$dispatcher = New SiteDispatcher_Tester(new \ElkArte\HttpReq);
 			$this->assertTrue($dispatcher->compare($test['result']), $test['test_name']);
 		}
 	}
