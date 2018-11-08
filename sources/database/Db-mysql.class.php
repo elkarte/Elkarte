@@ -74,7 +74,7 @@ class Database_MySQL extends Database_Abstract
 			if (!empty($db_options['non_fatal']))
 				return null;
 			else
-				Errors::instance()->display_db_error('Database_MySQL::initiate');
+				\ElkArte\Errors\Errors::instance()->display_db_error('Database_MySQL::initiate');
 		}
 
 		self::$_db->_connection = $connection;
@@ -532,7 +532,7 @@ class Database_MySQL extends Database_Abstract
 				// Let the admin know there is a command denied issue
 				if (class_exists('Errors'))
 				{
-					Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
+					\ElkArte\Errors\Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
 				}
 
 				return false;
@@ -542,7 +542,7 @@ class Database_MySQL extends Database_Abstract
 		// Log the error.
 		if ($query_errno != 1213 && $query_errno != 1205 && class_exists('Errors'))
 		{
-			Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
+			\ElkArte\Errors\Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
 		}
 
 		// Database error auto fixing ;).

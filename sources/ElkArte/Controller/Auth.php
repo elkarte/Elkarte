@@ -286,7 +286,7 @@ class Auth extends \ElkArte\AbstractController
 					redirectexit('action=reminder');
 				else
 				{
-					Errors::instance()->log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', 'user');
+					\ElkArte\Errors\Errors::instance()->log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', 'user');
 
 					// Wrong password, lets enable plain text responses in case form hashing is causing problems
 					$context['disable_login_hashing'] = true;
@@ -338,7 +338,7 @@ class Auth extends \ElkArte\AbstractController
 				else
 				{
 					// Log an error so we know that it didn't go well in the error log.
-					Errors::instance()->log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', 'user');
+					\ElkArte\Errors\Errors::instance()->log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', 'user');
 
 					$context['login_errors'] = array($txt['incorrect_password']);
 					return false;
@@ -742,7 +742,7 @@ function checkActivation()
 	// Standard activation?
 	elseif ($activation_status != 1)
 	{
-		Errors::instance()->log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', false);
+		\ElkArte\Errors\Errors::instance()->log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', false);
 
 		$context['login_errors'][] = $txt['activate_not_completed1'] . ' <a class="linkbutton" href="' . getUrl('action', ['action' => 'register', 'sa' => 'activate', 'resend', 'u' => $user_settings['id_member']]) . '">' . $txt['activate_not_completed2'] . '</a>';
 		return false;

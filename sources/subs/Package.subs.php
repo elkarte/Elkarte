@@ -2529,7 +2529,7 @@ function package_create_backup($id = 'backup')
 	}
 	catch (Exception $e)
 	{
-		Errors::instance()->log_error($e->getMessage(), 'backup');
+		\ElkArte\Errors\Errors::instance()->log_error($e->getMessage(), 'backup');
 
 		return false;
 	}

@@ -269,7 +269,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 			$old_return = ini_set('sendmail_from', $return_path);
 			if (!mail(strtr($to, array("\r" => '', "\n" => '')), $subject, $message, $headers . $unq_id, '-f ' . $return_path))
 			{
-				Errors::instance()->log_error(sprintf($txt['mail_send_unable'], $to));
+				\ElkArte\Errors\Errors::instance()->log_error(sprintf($txt['mail_send_unable'], $to));
 				$mail_result = false;
 			}
 			else
@@ -592,13 +592,13 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 		if (substr($modSettings['smtp_host'], 0, 4) == 'ssl:' && (empty($modSettings['smtp_port']) || $modSettings['smtp_port'] == 25))
 		{
 			if ($socket = fsockopen($modSettings['smtp_host'], 465, $errno, $errstr, 3))
-				Errors::instance()->log_error($txt['smtp_port_ssl']);
+				\ElkArte\Errors\Errors::instance()->log_error($txt['smtp_port_ssl']);
 		}
 
 		// Unable to connect!  Don't show any error message, but just log one and try to continue anyway.
 		if (!$socket)
 		{
-			Errors::instance()->log_error($txt['smtp_no_connect'] . ': ' . $errno . ' : ' . $errstr);
+			\ElkArte\Errors\Errors::instance()->log_error($txt['smtp_no_connect'] . ': ' . $errno . ' : ' . $errstr);
 			return false;
 		}
 	}
@@ -754,7 +754,7 @@ function server_parse($message, $socket, $response)
 		if (!($server_response = fgets($socket, 256)))
 		{
 			// @todo Change this message to reflect that it may mean bad user/password/server issues/etc.
-			Errors::instance()->log_error($txt['smtp_bad_response']);
+			\ElkArte\Errors\Errors::instance()->log_error($txt['smtp_bad_response']);
 			return false;
 		}
 
@@ -763,7 +763,7 @@ function server_parse($message, $socket, $response)
 
 	if (substr($server_response, 0, 3) != $response)
 	{
-		Errors::instance()->log_error($txt['smtp_error'] . $server_response);
+		\ElkArte\Errors\Errors::instance()->log_error($txt['smtp_error'] . $server_response);
 		return false;
 	}
 

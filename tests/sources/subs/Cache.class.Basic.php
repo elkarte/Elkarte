@@ -27,7 +27,6 @@ class TestCache extends \PHPUnit\Framework\TestCase
 	 */
 	public function setUp()
 	{
-		Elk_Autoloader::instance()->register(SUBSDIR . '/CacheMethod', '\\ElkArte\\Cache\\CacheMethod');
 	}
 
 	/**

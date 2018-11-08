@@ -110,7 +110,7 @@ class WeightFactors
 			}
 
 			// Even if users will get an answer, the admin should know something is broken
-			Errors::instance()->log_lang_error('search_invalid_weights');
+			\ElkArte\Errors\Errors::instance()->log_lang_error('search_invalid_weights');
 
 			// Instead is better to give normal users and guests some kind of result
 			// using our defaults.

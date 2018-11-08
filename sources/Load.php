@@ -52,7 +52,7 @@ function reloadSettings()
 		);
 		$modSettings = array();
 		if (!$request)
-			Errors::instance()->display_db_error();
+			\ElkArte\Errors\Errors::instance()->display_db_error();
 		while ($row = $db->fetch_row($request))
 			$modSettings[$row[0]] = $row[1];
 		$db->free_result($request);
@@ -99,7 +99,7 @@ function reloadSettings()
 			$modSettings['current_load'] = $modSettings['load_average'];
 
 		if (!empty($modSettings['loadavg_forum']) && $modSettings['current_load'] >= $modSettings['loadavg_forum'])
-			Errors::instance()->display_loadavg_error();
+			\ElkArte\Errors\Errors::instance()->display_loadavg_error();
 	}
 	else
 		$modSettings['current_load'] = 0;
@@ -1218,7 +1218,7 @@ function detectBrowser()
  */
 function loadTheme($id_theme = 0, $initialize = true)
 {
-	Errors::instance()->log_deprecated('loadTheme()', '\\ElkArte\\Themes\\ThemeLoader');
+	\ElkArte\Errors\Errors::instance()->log_deprecated('loadTheme()', '\\ElkArte\\Themes\\ThemeLoader');
 	new ElkArte\Themes\ThemeLoader($id_theme, $initialize);
 }
 
@@ -1294,7 +1294,7 @@ function determineSmileySet($user_smiley_set, $known_smiley_sets)
  */
 function loadEssentialThemeData()
 {
-	Errors::instance()->log_deprecated('loadEssentialThemeData()', 'theme()->getTemplates()->loadEssentialThemeData()');
+	\ElkArte\Errors\Errors::instance()->log_deprecated('loadEssentialThemeData()', 'theme()->getTemplates()->loadEssentialThemeData()');
 	return theme()->getTemplates()->loadEssentialThemeData();
 }
 
@@ -1321,7 +1321,7 @@ function loadEssentialThemeData()
  */
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
-	Errors::instance()->log_deprecated('loadTemplate()', 'theme()->getTemplates()->load()');
+	\ElkArte\Errors\Errors::instance()->log_deprecated('loadTemplate()', 'theme()->getTemplates()->load()');
 	return theme()->getTemplates()->load($template_name, $style_sheets, $fatal);
 }
 
@@ -1345,7 +1345,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  */
 function loadSubTemplate($sub_template_name, $fatal = false)
 {
-	Errors::instance()->log_deprecated('loadSubTemplate()', 'theme()->getTemplates()->loadSubTemplate()');
+	\ElkArte\Errors\Errors::instance()->log_deprecated('loadSubTemplate()', 'theme()->getTemplates()->loadSubTemplate()');
 	theme()->getTemplates()->loadSubTemplate($sub_template_name, $fatal);
 
 	return true;
@@ -1568,7 +1568,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
  */
 function addJavascriptVar($vars, $escape = false)
 {
-	Errors::instance()->log_deprecated('addJavascriptVar()', 'theme()->getTemplates()->addJavascriptVar()');
+	\ElkArte\Errors\Errors::instance()->log_deprecated('addJavascriptVar()', 'theme()->getTemplates()->addJavascriptVar()');
 	theme()->addJavascriptVar($vars, $escape);
 }
 
@@ -1588,7 +1588,7 @@ function addJavascriptVar($vars, $escape = false)
  */
 function addInlineJavascript($javascript, $defer = false)
 {
-	Errors::instance()->log_deprecated('addInlineJavascript()', 'theme()->addInlineJavascript()');
+	\ElkArte\Errors\Errors::instance()->log_deprecated('addInlineJavascript()', 'theme()->addInlineJavascript()');
 	theme()->addInlineJavascript($javascript, $defer);
 }
 
@@ -1607,7 +1607,7 @@ function addInlineJavascript($javascript, $defer = false)
  */
 function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload = false)
 {
-	Errors::instance()->log_deprecated('loadLanguage()', 'theme()->getTemplates()->loadLanguageFile()');
+	\ElkArte\Errors\Errors::instance()->log_deprecated('loadLanguage()', 'theme()->getTemplates()->loadLanguageFile()');
 	return theme()->getTemplates()->loadLanguageFile($template_name, $lang, $fatal, $force_reload);
 }
 
@@ -1864,7 +1864,7 @@ function loadDatabase()
 
 	// Safe guard here, if there isn't a valid connection lets put a stop to it.
 	if (!$connection)
-		Errors::instance()->display_db_error();
+		\ElkArte\Errors\Errors::instance()->display_db_error();
 
 	// If in SSI mode fix up the prefix.
 	$db = database();

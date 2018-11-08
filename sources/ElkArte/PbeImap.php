@@ -177,7 +177,7 @@ class PbeImap extends AbstractModel
 				$imap_error = imap_last_error();
 				if (!empty($imap_error))
 				{
-					Errors::instance()->log_error($imap_error, 'debug', 'IMAP');
+					\ElkArte\Errors\Errors::instance()->log_error($imap_error, 'debug', 'IMAP');
 				}
 			}
 		}

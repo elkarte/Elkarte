@@ -79,7 +79,7 @@ class Jslocale extends \ElkArte\AbstractController
 		$langs = getLanguages();
 		$lang = $this->_req->post->lang;
 
-		Template_Layers::instance()->removeAll();
+		theme()->getLayers()->removeAll();
 		theme()->getTemplates()->load('Json');
 		$context['sub_template'] = 'send_json';
 		$context['require_agreement'] = !empty($modSettings['requireAgreement']);

@@ -381,7 +381,7 @@ function processAttachments($id_msg = null)
 	elseif (!is_dir($context['attach_dir']))
 	{
 		$initial_error = 'attach_folder_warning';
-		Errors::instance()->log_error(sprintf($txt['attach_folder_admin_warning'], $context['attach_dir']), 'critical');
+		\ElkArte\Errors\Errors::instance()->log_error(sprintf($txt['attach_folder_admin_warning'], $context['attach_dir']), 'critical');
 	}
 
 	if (!isset($initial_error) && !isset($context['attachments']['quantity']))
@@ -540,7 +540,7 @@ function processAttachments($id_msg = null)
 					$attach_errors->addError($error);
 					if (in_array($error, $log_these))
 					{
-						Errors::instance()->log_error($_SESSION['temp_attachments'][$attachID]['name'] . ': ' . $txt[$error], 'critical');
+						\ElkArte\Errors\Errors::instance()->log_error($_SESSION['temp_attachments'][$attachID]['name'] . ': ' . $txt[$error], 'critical');
 
 						// For critical errors, we don't want the file or session data to persist
 						if (file_exists($_SESSION['temp_attachments'][$attachID]['tmp_name']))
@@ -701,10 +701,10 @@ function attachmentUploadChecks($attachID)
 			$errors[] = array('file_too_big', array($modSettings['attachmentSizeLimit']));
 		// Missing or a full a temp directory on the server
 		elseif ($_FILES['attachment']['error'][$attachID] == 6)
-			Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_6'], 'critical');
+			\ElkArte\Errors\Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_6'], 'critical');
 		// One of many errors such as (3)partially uploaded, (4)empty file,
 		else
-			Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$attachID]]);
+			\ElkArte\Errors\Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$attachID]]);
 
 		// If we did not set an user error (3,4,6,7,8) to show then give them a generic one as there is
 		// no need to provide back specifics of a server error, those are logged

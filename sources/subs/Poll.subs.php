@@ -720,7 +720,7 @@ function determineVote($id_member, $id_poll)
  */
 function pollStatus($id_topic)
 {
-	Errors::instance()->log_deprecated('pollStatus()', 'pollInfoForTopic()');
+	\ElkArte\Errors\Errors::instance()->log_deprecated('pollStatus()', 'pollInfoForTopic()');
 	return pollInfoForTopic($id_topic);
 }
 

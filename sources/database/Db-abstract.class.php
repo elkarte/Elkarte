@@ -92,7 +92,7 @@ abstract class Database_Abstract implements Database
 
 		// Connection gone???  This should *never* happen at this point, yet it does :'(
 		if (!$this->validConnection($this->_db_callback_connection))
-			Errors::instance()->display_db_error('Database_Abstract::replacement__callback');
+			\ElkArte\Errors\Errors::instance()->display_db_error('Database_Abstract::replacement__callback');
 
 		if ($matches[1] === 'db_prefix')
 			return $this->_db_prefix;
@@ -484,7 +484,7 @@ abstract class Database_Abstract implements Database
 		// Is always a critical error.
 		if (class_exists('Errors'))
 		{
-			Errors::instance()->log_error($log_message, 'critical', $file, $line);
+			\ElkArte\Errors\Errors::instance()->log_error($log_message, 'critical', $file, $line);
 		}
 
 		if (class_exists('\\ElkArte\\Exceptions\\Exception'))

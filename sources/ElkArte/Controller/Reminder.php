@@ -295,7 +295,7 @@ class Reminder extends \ElkArte\AbstractController
 		// Check if the secret answer is correct.
 		if ($member['secret_question'] === '' || $member['secret_answer'] === '' || md5($this->_req->post->secret_answer) !== $member['secret_answer'])
 		{
-			Errors::instance()->log_error(sprintf($txt['reminder_error'], $member['member_name']), 'user');
+			\ElkArte\Errors\Errors::instance()->log_error(sprintf($txt['reminder_error'], $member['member_name']), 'user');
 			throw new \ElkArte\Exceptions\Exception('incorrect_answer', false);
 		}
 

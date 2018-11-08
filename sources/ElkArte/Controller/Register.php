@@ -213,7 +213,7 @@ class Register extends \ElkArte\AbstractController
 		{
 			// No file found or a blank file, log the error so the admin knows there is a problem!
 			theme()->getTemplates()->loadLanguageFile('Errors');
-			Errors::instance()->log_error($txt['registration_agreement_missing'], 'critical');
+			\ElkArte\Errors\Errors::instance()->log_error($txt['registration_agreement_missing'], 'critical');
 			throw new \ElkArte\Exceptions\Exception('registration_disabled', false);
 		}
 

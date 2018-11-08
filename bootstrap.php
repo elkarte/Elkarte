@@ -265,7 +265,7 @@ class Bootstrap
 		// Don't do john didley if the forum's been shut down completely.
 		if (!empty($maintenance) && $maintenance == 2 && (!isset($ssi_maintenance_off) || $ssi_maintenance_off !== true))
 		{
-			Errors::instance()->display_maintenance_message();
+			\ElkArte\Errors\Errors::instance()->display_maintenance_message();
 		}
 	}
 

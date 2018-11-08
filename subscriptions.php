@@ -273,7 +273,7 @@ function generateSubscriptionError($text)
 	}
 
 	// Then just log and die.
-	Errors::instance()->log_error($text);
+	\ElkArte\Errors\Errors::instance()->log_error($text);
 
 	exit;
 }

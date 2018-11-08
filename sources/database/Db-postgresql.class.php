@@ -84,7 +84,7 @@ class Database_PostgreSQL extends Database_Abstract
 			if (!empty($db_options['non_fatal']))
 				return null;
 			else
-				Errors::instance()->display_db_error('Database_PostgreSQL::initiate');
+				\ElkArte\Errors\Errors::instance()->display_db_error('Database_PostgreSQL::initiate');
 		}
 
 		self::$_db->_connection = $connection;
@@ -503,7 +503,7 @@ class Database_PostgreSQL extends Database_Abstract
 		// Log the error.
 		if (class_exists('Errors'))
 		{
-			Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n" . $db_string : ''), 'database', $file, $line);
+			\ElkArte\Errors\Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n" . $db_string : ''), 'database', $file, $line);
 		}
 
 		// Nothing's defined yet... just die with it.
