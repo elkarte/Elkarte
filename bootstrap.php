@@ -220,8 +220,8 @@ class Bootstrap
 		define('EXTDIR', $extdir);
 		define('LANGUAGEDIR', $languagedir);
 		define('SOURCEDIR', $sourcedir);
-		define('ADMINDIR', $sourcedir . '/admin');
-		define('CONTROLLERDIR', $sourcedir . '/controllers');
+		define('ADMINDIR', $sourcedir . '/ElkArte/AdminController');
+		define('CONTROLLERDIR', $sourcedir . '/ElkArte/Controller');
 		define('SUBSDIR', $sourcedir . '/subs');
 		define('ADDONSDIR', $boarddir . '/addons');
 		unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
