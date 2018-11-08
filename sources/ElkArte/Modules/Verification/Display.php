@@ -18,11 +18,11 @@
 namespace ElkArte\Modules\Verification;
 
 /**
- * Class Verification_Display_Module
+ * Class \ElkArte\Modules\Verification\Display
  *
  * Adding Visual Verification event to Quick Reply area (display.controller)
  */
-class Verification_Display_Module extends ElkArte\Modules\AbstractModule
+class Display extends \ElkArte\Modules\AbstractModule
 {
 	/**
 	 * {@inheritdoc }
@@ -34,7 +34,7 @@ class Verification_Display_Module extends ElkArte\Modules\AbstractModule
 		if (!$user_info['is_admin'] && !$user_info['is_moderator'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
 		{
 			return array(
-				array('topicinfo', array('Verification_Display_Module', 'topicinfo'), array()),
+				array('topicinfo', array('\\ElkArte\\Modules\\Verification\\Display', 'topicinfo'), array()),
 			);
 		}
 		else

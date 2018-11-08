@@ -18,11 +18,11 @@
 namespace ElkArte\Modules\Verification;
 
 /**
- * Class Verification_Register_Module
+ * Class \ElkArte\Modules\Verification\Register
  *
  * Adds Visual Verification controls to the Registration page.
  */
-class Verification_Register_Module extends ElkArte\Modules\AbstractModule
+class Register extends ElkArte\Modules\AbstractModule
 {
 	/**
 	 * {@inheritdoc }
@@ -34,14 +34,16 @@ class Verification_Register_Module extends ElkArte\Modules\AbstractModule
 		if (!empty($modSettings['reg_verification']))
 		{
 			return array(
-				array('prepare_context', array('Verification_Register_Module', 'prepare_context'), array('current_step')),
-				array('before_complete_register', array('Verification_Register_Module', 'before_complete_register'), array('reg_errors')),
-				array('verify_contact', array('Verification_Register_Module', 'verify_contact'), array()),
-				array('setup_contact', array('Verification_Register_Module', 'setup_contact'), array()),
+				array('prepare_context', array('\\ElkArte\\Modules\\Verification\\Register', 'prepare_context'), array('current_step')),
+				array('before_complete_register', array('\\ElkArte\\Modules\\Verification\\Register', 'before_complete_register'), array('reg_errors')),
+				array('verify_contact', array('\\ElkArte\\Modules\\Verification\\Register', 'verify_contact'), array()),
+				array('setup_contact', array('\\ElkArte\\Modules\\Verification\\Register', 'setup_contact'), array()),
 			);
 		}
 		else
+		{
 			return array();
+		}
 	}
 
 	/**

@@ -14,11 +14,11 @@
 namespace ElkArte\Modules\Random;
 
 /**
- * Class Random_Post_Module
+ * Class \ElkArte\Modules\Random\Post
  *
  * Collection of small items not requiring a separate module
  */
-class Random_Post_Module extends ElkArte\Modules\AbstractModule
+class Post extends \ElkArte\Modules\AbstractModule
 {
 	/**
 	 * {@inheritDoc}
@@ -31,9 +31,9 @@ class Random_Post_Module extends ElkArte\Modules\AbstractModule
 
 		if (!empty($modSettings['enableFollowup']))
 		{
-			$return[] = array('prepare_context', array('Random_Post_Module', 'prepare_context_followup'), array());
+			$return[] = array('prepare_context', array('\\ElkArte\\Modules\\Random\\Post', 'prepare_context_followup'), array());
 
-			add_integration_function('integrate_create_topic', 'Random_Post_Module::followup_create_topic', '', false);
+			add_integration_function('integrate_create_topic', '\\ElkArte\\Modules\\Random\\Post::followup_create_topic', '', false);
 		}
 
 		return $return;

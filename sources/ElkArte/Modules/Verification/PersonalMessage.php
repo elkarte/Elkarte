@@ -18,11 +18,11 @@
 namespace ElkArte\Modules\Verification;
 
 /**
- * Class Verification_PersonalMessage_Module
+ * Class \ElkArte\Modules\Verification\PersonalMessage
  *
  * Adds Visual Verification controls to the PM page for those that need it.
  */
-class Verification_PersonalMessage_Module extends ElkArte\Modules\AbstractModule
+class PersonalMessage extends \ElkArte\Modules\AbstractModule
 {
 	/**
 	 * {@inheritdoc }
@@ -36,8 +36,8 @@ class Verification_PersonalMessage_Module extends ElkArte\Modules\AbstractModule
 		{
 			// Add the events to call for the verification
 			return array(
-				array('prepare_send_context', array('Verification_PersonalMessage_Module', 'prepare_send_context'), array()),
-				array('before_sending', array('Verification_PersonalMessage_Module', 'before_sending'), array('post_errors')),
+				array('prepare_send_context', array('\\ElkArte\\Modules\\Verification\\PersonalMessage', 'prepare_send_context'), array()),
+				array('before_sending', array('\\ElkArte\\Modules\\Verification\\PersonalMessage', 'before_sending'), array('post_errors')),
 			);
 		}
 		else

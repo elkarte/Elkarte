@@ -18,11 +18,11 @@
 namespace ElkArte\Modules\Verification;
 
 /**
- * Class Verification_Post_Module
+ * Class \ElkArte\Modules\Verification\Post
  *
  * Adds Visual Verification controls to the Post page for those that need it.
  */
-class Verification_Post_Module extends ElkArte\Modules\AbstractModule
+class Post extends \ElkArte\Modules\AbstractModule
 {
 	/**
 	 * {@inheritDoc}
@@ -35,8 +35,8 @@ class Verification_Post_Module extends ElkArte\Modules\AbstractModule
 		if (!$user_info['is_admin'] && !$user_info['is_moderator'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
 		{
 			return array(
-				array('post_errors', array('Verification_Post_Module', 'post_errors'), array('_post_errors')),
-				array('prepare_save_post', array('Verification_Post_Module', 'prepare_save_post'), array('_post_errors')),
+				array('post_errors', array('\\ElkArte\\Modules\\Verification\\Post', 'post_errors'), array('_post_errors')),
+				array('prepare_save_post', array('\\ElkArte\\Modules\\Verification\\Post', 'prepare_save_post'), array('_post_errors')),
 			);
 		}
 		else

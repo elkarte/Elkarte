@@ -14,9 +14,9 @@
 namespace ElkArte\Modules\Random;
 
 /**
- * Class Random_Display_Module
+ * Class \ElkArte\Modules\Random\Display
  */
-class Random_Display_Module extends ElkArte\Modules\AbstractModule
+class Display extends \ElkArte\Modules\AbstractModule
 {
 	/**
 	 * @var bool
@@ -35,12 +35,12 @@ class Random_Display_Module extends ElkArte\Modules\AbstractModule
 		if (!empty($modSettings['enableFollowup']))
 		{
 			$return = array(
-				array('topicinfo', array('Random_Display_Module', 'topicinfo'), array('topicinfo', 'topic', 'includeUnapproved')),
-				array('prepare_context', array('Random_Display_Module', 'prepare_context'), array())
+				array('topicinfo', array('\\ElkArte\\Modules\\Random\\Display', 'topicinfo'), array('topicinfo', 'topic', 'includeUnapproved')),
+				array('prepare_context', array('\\ElkArte\\Modules\\Random\\Display', 'prepare_context'), array())
 			);
 
-			add_integration_function('integrate_topic_query', 'Random_Display_Module::followup_topic_query', '', false);
-			add_integration_function('integrate_display_message_list', 'Random_Display_Module::followup_message_list', '', false);
+			add_integration_function('integrate_topic_query', '\\ElkArte\\Modules\\Random\\Display::followup_topic_query', '', false);
+			add_integration_function('integrate_display_message_list', '\\ElkArte\\Modules\\Random\\Display::followup_message_list', '', false);
 		}
 
 		return $return;
