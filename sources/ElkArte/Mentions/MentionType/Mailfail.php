@@ -20,7 +20,7 @@ namespace ElkArte\Mentions\MentionType;
  *
  * @package ElkArte\Mentions\MentionType
  */
-class MailfailMention extends MentionBoardAccessAbstract
+class Mailfail extends AbstractMentionBoardAccess
 {
 	/**
 	 * {@inheritdoc }

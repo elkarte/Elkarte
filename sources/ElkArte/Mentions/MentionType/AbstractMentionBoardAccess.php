@@ -14,11 +14,11 @@
 namespace ElkArte\Mentions\MentionType;
 
 /**
- * Class MentionBoardAccessAbstract
+ * Class AbstractMentionBoardAccess
  *
  * @package ElkArte\Mentions\MentionType
  */
-abstract class MentionBoardAccessAbstract extends MentionMessageAbstract
+abstract class AbstractMentionBoardAccess extends AbstractMentionMessage
 {
 	/**
 	 * {@inheritdoc}

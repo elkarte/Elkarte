@@ -20,7 +20,7 @@ namespace ElkArte\Mentions\MentionType;
  *
  * @package ElkArte\Mentions\MentionType
  */
-class QuotedmemMention extends MentionBoardAccessAbstract
+class Quotedmem extends AbstractMentionBoardAccess
 {
 	/**
 	 * {@inheritdoc }

@@ -20,7 +20,7 @@ namespace ElkArte\Mentions\MentionType;
  *
  * @package ElkArte\Mentions\MentionType
  */
-class BuddyMention extends MentionMessageAbstract
+class Buddy extends AbstractMentionMessage
 {
 	/**
 	 * {@inheritdoc }
