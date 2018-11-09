@@ -55,7 +55,7 @@ class Quotedmem extends AbstractMentionBoardAccess
 		// Mark the mention as read if requested
 		if (isset($_REQUEST['mentionread']) && !empty($virtual_msg))
 		{
-			$mentions = new \ElkArte\Mentions(database(), new \ElkArte\DataValidator(), $modSettings['enabled_mentions']);
+			$mentions = new \ElkArte\Mentions\Mentioning(database(), new \ElkArte\DataValidator(), $modSettings['enabled_mentions']);
 			$mentions->markread((int) $_REQUEST['item']);
 		}
 	}

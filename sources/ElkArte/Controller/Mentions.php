@@ -452,7 +452,7 @@ class Mentions extends \ElkArte\AbstractController
 		$this->_buildUrl();
 
 		$id_mention = $this->_req->getQuery('item', 'intval', 0);
-		$mentioning = new \ElkArte\Mentions(database(), new \ElkArte\DataValidator, $modSettings['enabled_mentions']);
+		$mentioning = new \ElkArte\Mentions\Mentioning(database(), new \ElkArte\DataValidator, $modSettings['enabled_mentions']);
 		$mentioning->updateStatus($id_mention, 'read');
 	}
 
@@ -465,7 +465,7 @@ class Mentions extends \ElkArte\AbstractController
 
 		checkSession('request');
 
-		$mentioning = new \ElkArte\Mentions(database(), new \ElkArte\DataValidator, $modSettings['enabled_mentions']);
+		$mentioning = new \ElkArte\Mentions\Mentioning(database(), new \ElkArte\DataValidator, $modSettings['enabled_mentions']);
 
 		$id_mention = $this->_req->getQuery('item', 'intval', 0);
 		$mark = $this->_req->getQuery('mark');
