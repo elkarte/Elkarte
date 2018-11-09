@@ -103,7 +103,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 		{
 			$save_data = $event->validate($_POST);
 		}
-		catch (Exception $e)
+		catch (\Exception $e)
 		{
 			throw $e;
 		}

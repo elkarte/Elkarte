@@ -1662,7 +1662,7 @@ class Packages extends \ElkArte\AbstractController
 						}
 					}
 				}
-				catch (UnexpectedValueException $e)
+				catch (\UnexpectedValueException $e)
 				{
 					// @todo for now do nothing...
 				}
@@ -1726,10 +1726,10 @@ class Packages extends \ElkArte\AbstractController
 
 		try
 		{
-			$iterator = new RecursiveIteratorIterator(
-				new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
-				RecursiveIteratorIterator::SELF_FIRST,
-				RecursiveIteratorIterator::CATCH_GET_CHILD
+			$iterator = new \RecursiveIteratorIterator(
+				new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
+				\RecursiveIteratorIterator::SELF_FIRST,
+				\RecursiveIteratorIterator::CATCH_GET_CHILD
 			);
 
 			foreach ($iterator as $path => $file)
@@ -1741,7 +1741,7 @@ class Packages extends \ElkArte\AbstractController
 				}
 			}
 		}
-		catch (UnexpectedValueException $e)
+		catch (\UnexpectedValueException $e)
 		{
 			// @todo
 		}
@@ -2020,7 +2020,7 @@ class Packages extends \ElkArte\AbstractController
 				}
 			}
 		}
-		catch (UnexpectedValueException $e)
+		catch (\UnexpectedValueException $e)
 		{
 			// @todo for now do nothing...
 		}
@@ -2122,7 +2122,7 @@ function fetchPerms__recursive($path, &$data, $level)
 			}
 		}
 	}
-	catch (UnexpectedValueException $e)
+	catch (\UnexpectedValueException $e)
 	{
 		// @todo for now do nothing...
 	}

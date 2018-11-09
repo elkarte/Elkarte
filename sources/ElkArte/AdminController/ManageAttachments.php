@@ -1003,7 +1003,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 							$this->_pauseAttachmentMaintenance($to_fix);
 					}
 				}
-				catch (UnexpectedValueException $e)
+				catch (\UnexpectedValueException $e)
 				{
 					// @todo for now do nothing...
 				}

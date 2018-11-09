@@ -1245,7 +1245,7 @@ class DataValidator
 					}
 				');
 			}
-			catch (ParseError $e)
+			catch (\ParseError $e)
 			{
 				$result = false;
 			}

@@ -14,7 +14,7 @@
 namespace ElkArte\Mentions\MentionType;
 
 /**
- * Interface Mention_Type_Interface
+ * Interface \ElkArte\Mentions\MentionType\MentionTypeInterface
  *
  * @package ElkArte\Mentions\MentionType
  */

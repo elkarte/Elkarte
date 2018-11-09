@@ -619,7 +619,7 @@ class PackageServers extends \ElkArte\AbstractController
 					}
 				}
 			}
-			catch (UnexpectedValueException $e)
+			catch (\UnexpectedValueException $e)
 			{
 				// @todo for now do nothing...
 			}
