@@ -22,7 +22,7 @@ namespace ElkArte\Modules\Verification;
  *
  * Adds Visual Verification controls to the Registration page.
  */
-class Register extends ElkArte\Modules\AbstractModule
+class Register extends \ElkArte\Modules\AbstractModule
 {
 	/**
 	 * {@inheritdoc }

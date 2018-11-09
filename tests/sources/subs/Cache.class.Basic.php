@@ -1,6 +1,6 @@
 <?php
 
-class MockMemcached extends ElkArte\Cache\CacheMethod\Memcached
+class MockMemcached extends \ElkArte\Cache\CacheMethod\Memcached
 {
 	/**
 	 * Server count.

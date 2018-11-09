@@ -18,7 +18,7 @@ namespace ElkArte\Mentions;
  *
  * @package Mentions
  */
-class Mentioning extends AbstractModel
+class Mentioning extends \ElkArte\AbstractModel
 {
 	/**
 	 * Value assumed by a new mention
