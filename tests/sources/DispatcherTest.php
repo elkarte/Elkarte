@@ -48,7 +48,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 		// these are ?action=name routed to SomeController->action_name()
 		$actions = array(
 			'activate' => '\\ElkArte\\Controller\\Register',
-			'attachapprove' => '\\ElkArte\\AdminController\\ModerateAttachments',
+			'attachapprove' => '\\ElkArte\\Controller\\ModerateAttachments',
 			'addbuddy' => '\\ElkArte\\Controller\\Members',
 			'collapse' => '\\ElkArte\\Controller\\BoardIndex',
 			'contact' => '\\ElkArte\\Controller\\Register',
