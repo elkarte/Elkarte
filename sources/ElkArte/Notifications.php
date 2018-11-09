@@ -202,7 +202,7 @@ class Notifications extends AbstractModel
 	 */
 	protected function _send_notification(\ElkArte\Mentions\MentionType\MentionTypeInterface $obj, \ElkArte\NotificationsTask $task, $bodies)
 	{
-		$mentioning = new \ElkArte\Mentions($this->_db, new \ElkArte\DataValidator(), $this->_modSettings->enabled_mentions);
+		$mentioning = new \ElkArte\Mentions\Mentioning($this->_db, new \ElkArte\DataValidator(), $this->_modSettings->enabled_mentions);
 		foreach ($bodies as $body)
 		{
 			$mentioning->create($obj, array(
