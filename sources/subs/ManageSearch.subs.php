@@ -28,7 +28,7 @@ function detectFulltextIndex()
 	$db = database();
 
 	// Something like 5.7.16
-	list($ver,) = explode('-', $db->db_server_version());
+	list($ver,) = explode('-', $db->server_version());
 
 	$request = $db->query('', '
 		SHOW INDEX

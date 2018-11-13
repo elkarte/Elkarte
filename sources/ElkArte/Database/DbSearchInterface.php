@@ -11,10 +11,12 @@
  *
  */
 
+namespace ElkArte\Database;
+
 /**
  * Interface methods for database searches
  */
-interface DbSearch
+interface DbSearchInterface
 {
 	/**
 	 * Execute the appropriate query for the search.
@@ -22,10 +24,10 @@ interface DbSearch
 	 * @param string $identifier
 	 * @param string $db_string
 	 * @param mixed[] $db_values
-	 * @param resource|null $connection
+	 *
 	 * @return resource
 	 */
-	public function search_query($identifier, $db_string, $db_values = array(), $connection = null);
+	public function search_query($identifier, $db_string, $db_values = array());
 
 	/**
 	 * This method will tell you whether this database type supports this search type.

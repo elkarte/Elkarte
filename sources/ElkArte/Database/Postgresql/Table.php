@@ -16,16 +16,18 @@
  *
  */
 
+namespace ElkArte\Database\Postgresql;
+
 /**
  * Adds PostgreSQL table level functionality,
  * Table creation / dropping, column adding / removing
  * Most often used during install and Upgrades of the forum and addons
  */
-class DbTable_PostgreSQL extends DbTable
+class Table extends \ElkArte\Database\AbstractTable
 {
 	/**
 	 * Holds this instance of the table interface
-	 * @var DbTable_PostgreSQL
+	 * @var \ElkArte\Database\Postgresql\Table
 	 */
 	protected static $_tbl = null;
 
@@ -130,7 +132,7 @@ class DbTable_PostgreSQL extends DbTable
 				$this->_db->skip_next_error();
 			}
 			// We can then drop the table.
-			$this->_db->db_transaction('begin');
+			$this->_db->transaction('begin');
 
 			// the table
 			$table_query = 'DROP TABLE ' . $table_name;
@@ -152,7 +154,7 @@ class DbTable_PostgreSQL extends DbTable
 				)
 			);
 
-			$this->_db->db_transaction('commit');
+			$this->_db->transaction('commit');
 
 			return true;
 		}
@@ -263,7 +265,7 @@ class DbTable_PostgreSQL extends DbTable
 		if (isset($column_info['null']) && $column_info['null'] != $old_info['null'])
 		{
 			$action = $column_info['null'] ? 'DROP' : 'SET';
-			$this->_db->db_transaction('begin');
+			$this->_db->transaction('begin');
 			if (!$column_info['null'])
 			{
 				// We have to set it to something if we are making it NOT NULL. And we must comply with the current column format.
@@ -279,7 +281,7 @@ class DbTable_PostgreSQL extends DbTable
 			}
 			$this->_alter_table($table_name, '
 				ALTER COLUMN ' . $column_info['name'] . ' ' . $action . ' NOT NULL');
-			$this->_db->db_transaction('commit');
+			$this->_db->transaction('commit');
 		}
 
 		// What about a change in type?
@@ -291,7 +293,7 @@ class DbTable_PostgreSQL extends DbTable
 				$type = $type . '(' . $size . ')';
 
 			// The alter is a pain.
-			$this->_db->db_transaction('begin');
+			$this->_db->transaction('begin');
 			$this->_alter_table($table_name, '
 				ADD COLUMN ' . $column_info['name'] . '_tempxx ' . $type);
 			$this->_db->query('', '
@@ -305,7 +307,7 @@ class DbTable_PostgreSQL extends DbTable
 				DROP COLUMN ' . $column_info['name']);
 			$this->_alter_table($table_name, '
 				RENAME COLUMN ' . $column_info['name'] . '_tempxx TO ' . $column_info['name']);
-			$this->_db->db_transaction('commit');
+			$this->_db->transaction('commit');
 		}
 
 		// Finally - auto increment?!

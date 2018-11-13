@@ -16,10 +16,12 @@
  *
  */
 
+namespace ElkArte\Database;
+
 /**
  * Abstract database class, implements database to control functions
  */
-abstract class Database_Abstract implements Database
+abstract class AbstractQuery implements DatabaseInterface
 {
 	/**
 	 * Current connection to the database
@@ -59,19 +61,38 @@ abstract class Database_Abstract implements Database
 	protected $_db_callback_values = array();
 
 	/**
-	 * This contains the "connection" used in the replacement__callback method
-	 * TBH I'm not sure why $this->_connection is not used
-	 * @var resource|object
+	 * Temporary variable to support the migration to the new db-layer
+	 * Ideally to be removed before 2.0 shipment
+	 * @var \ElkArte\Database\AbstractResult
 	 */
-	protected $_db_callback_connection = null;
+	protected $result = null;
 
 	/**
-	 * Private constructor.
+	 * Constructor.
+	 *
+	 * @param string $db_prefix Guess what? The tables prefix
+	 * @param resource $connection Obviously the database connection
 	 */
-	protected function __construct($db_prefix)
+	public function __construct($db_prefix, $connection)
 	{
 		$this->_db_prefix = $db_prefix;
+		$this->_connection = $connection;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	abstract public function query($identifier, $db_string, $db_values = array());
+
+	/**
+	 * {@inheritDoc}
+	 */
+	abstract public function transaction($type = 'commit');
+
+	/**
+	 * {@inheritDoc}
+	 */
+	abstract public function last_error();
 
 	/**
 	 * Callback for preg_replace_callback on the query.
@@ -91,8 +112,10 @@ abstract class Database_Abstract implements Database
 		global $user_info;
 
 		// Connection gone???  This should *never* happen at this point, yet it does :'(
-		if (!$this->validConnection($this->_db_callback_connection))
-			\ElkArte\Errors\Errors::instance()->display_db_error('Database_Abstract::replacement__callback');
+		if (!$this->validConnection($this->_connection))
+		{
+			\ElkArte\Errors\Errors::instance()->display_db_error('ElkArte\\Database\\AbstractQuery::replacement__callback');
+		}
 
 		if ($matches[1] === 'db_prefix')
 			return $this->_db_prefix;
@@ -148,37 +171,21 @@ abstract class Database_Abstract implements Database
 	}
 
 	/**
-	 * This function works like $this->query(), escapes and quotes a string,
-	 * but it doesn't execute the query.
-	 *
-	 * @param string $db_string
-	 * @param mixed[] $db_values
-	 * @param mysqli|postgre|null $connection = null
-	 *
-	 * @return null|string|string[]
+	 * {@inheritDoc}
 	 */
-	public function quote($db_string, $db_values, $connection = null)
+	public function quote($db_string, $db_values)
 	{
 		// Only bother if there's something to replace.
 		if (strpos($db_string, '{') !== false)
 		{
 			// This is needed by the callback function.
 			$this->_db_callback_values = $db_values;
-			if ($connection === null)
-			{
-				$this->_db_callback_connection = $this->_connection;
-			}
-			else
-			{
-				$this->_db_callback_connection = $connection;
-			}
 
 			// Do the quoting and escaping
 			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', array($this, 'replacement__callback'), $db_string);
 
 			// Clear this variables.
 			$this->_db_callback_values = array();
-			$this->_db_callback_connection = null;
 		}
 
 		return $db_string;
@@ -445,16 +452,17 @@ abstract class Database_Abstract implements Database
 	}
 
 	/**
-	 * This function tries to work out additional error information from a back trace.
-	 *
-	 * @param string         $error_message
-	 * @param string         $log_message
-	 * @param string|boolean $error_type
-	 * @param string|null    $file
-	 * @param integer|null   $line
-	 *
-	 * @return array
-	 * @throws \ElkArte\Exceptions\Exception
+	 * {@inheritDoc}
+	 */
+	abstract public function error($db_string);
+
+	/**
+	 * {@inheritDoc}
+	 */
+	abstract public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false);
+
+	/**
+	 * {@inheritDoc}
 	 */
 	public function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
 	{
@@ -500,12 +508,7 @@ abstract class Database_Abstract implements Database
 	}
 
 	/**
-	 * Escape the LIKE wildcards so that they match the character and not the wildcard.
-	 *
-	 * @param string $string
-	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
-	 *
-	 * @return string
+	 * {@inheritDoc}
 	 */
 	public function escape_wildcard_string($string, $translate_human_wildcards = false)
 	{
@@ -524,9 +527,7 @@ abstract class Database_Abstract implements Database
 	}
 
 	/**
-	 * Retrieve the connection object
-	 *
-	 * @return resource what? The connection
+	 * {@inheritDoc}
 	 */
 	public function connection()
 	{
@@ -535,9 +536,7 @@ abstract class Database_Abstract implements Database
 	}
 
 	/**
-	 * Return the number of queries executed
-	 *
-	 * @return int
+	 * {@inheritDoc}
 	 */
 	public function num_queries()
 	{
@@ -565,12 +564,143 @@ abstract class Database_Abstract implements Database
 	/**
 	 * Finds out if the connection is still valid.
 	 *
-	 * @param mysqli|postgre|null $connection = null
-	 *
 	 * @return bool
 	 */
-	public function validConnection($connection = null)
+	public function validConnection()
 	{
-		return (bool) $connection;
+		return (bool) $this->_connection;
+	}
+
+	/**
+	 *  Get the version number.
+	 *
+	 * @return string - the version
+	 * @throws Elk_Exception
+	 */
+	abstract public function client_version();
+
+	/**
+	 * Return server info.
+	 *
+	 * @return string
+	 */
+	abstract public function server_info();
+
+	/**
+	 * Escape string for the database input
+	 *
+	 * @param string $string
+	 *
+	 * @return string
+	 */
+	abstract public function escape_string($string);
+
+	/**
+	 * Whether the database system is case sensitive.
+	 *
+	 * @return boolean
+	 */
+	abstract public function case_sensitive();
+
+	/**
+	 * Get the name (title) of the database system.
+	 *
+	 * @return string
+	 */
+	abstract public function title();
+
+	/**
+	 * Returns whether the database system supports ignore.
+	 *
+	 * @return false
+	 */
+	abstract public function support_ignore();
+
+	/**
+	 * Get the version number.
+	 *
+	 * @return string - the version
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
+	abstract public function server_version();
+
+	/**
+	 * Temporary function to supoprt migration to the new schema of the db layer
+	 * @deprecated since 2.0
+	 */
+	public function fetch_row()
+	{
+		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::fetch_row()', 'Result::fetch_row()');
+		return $this->result->fetch_row();
+	}
+
+	/**
+	 * Temporary function to supoprt migration to the new schema of the db layer
+	 * @deprecated since 2.0
+	 */
+	public function fetch_assoc()
+	{
+		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::fetch_assoc()', 'Result::fetch_assoc()');
+		return $this->result->fetch_assoc();
+	}
+
+	/**
+	 * Temporary function to supoprt migration to the new schema of the db layer
+	 * @deprecated since 2.0
+	 */
+	public function free_result()
+	{
+		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::free_result()', 'Result::free_result()');
+		return $this->result->free_result();
+	}
+
+	/**
+	 * Temporary function to supoprt migration to the new schema of the db layer
+	 * @deprecated since 2.0
+	 */
+	public function affected_rows()
+	{
+		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::affected_rows()', 'Result::affected_rows()');
+		return $this->result->affected_rows();
+	}
+
+	/**
+	 * Temporary function to supoprt migration to the new schema of the db layer
+	 * @deprecated since 2.0
+	 */
+	public function num_rows()
+	{
+		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::num_rows()', 'Result::num_rows()');
+		return $this->result->num_rows();
+	}
+
+	/**
+	 * Temporary function to supoprt migration to the new schema of the db layer
+	 * @deprecated since 2.0
+	 */
+	public function num_fields()
+	{
+		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::num_fields()', 'Result::num_fields()');
+		return $this->result->num_fields();
+	}
+
+	/**
+	 * Temporary function to supoprt migration to the new schema of the db layer
+	 * @deprecated since 2.0
+	 */
+	public function insert_id()
+	{
+		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::insert_id()', 'Result::insert_id()');
+		return $this->result->insert_id();
+	}
+
+	/**
+	 * Temporary function to supoprt migration to the new schema of the db layer
+	 * @deprecated since 2.0
+	 */
+	public function data_seek($counter)
+	{
+		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::data_seek()', 'Result::data_seek()');
+		return $this->result->data_seek($counter);
 	}
 }

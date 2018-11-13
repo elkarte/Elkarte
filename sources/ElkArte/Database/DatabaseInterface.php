@@ -11,10 +11,12 @@
  *
  */
 
+namespace ElkArte\Database;
+
 /**
  * Database driver interface
  */
-interface Database
+interface DatabaseInterface
 {
 	/**
 	 * Fix up the prefix so it doesn't require the database to be selected.
@@ -42,20 +44,21 @@ interface Database
 	 *
 	 * @param string $db_string
 	 * @param mixed[] $db_values
-	 * @param resource|null $connection = null
 	 * @return string
 	 */
-	public function quote($db_string, $db_values, $connection = null);
+	public function quote($db_string, $db_values);
 
 	/**
 	 * Do a query.  Takes care of errors too.
 	 *
 	 * @param string $identifier
 	 * @param string $db_string
-	 * @param mixed[] $db_values = array()
-	 * @param resource|null $connection = null
+	 * @param mixed[]|false $db_values = array()
+	 *
+	 * @return bool|resource
+	 * @throws \ElkArte\Exception\Exception
 	 */
-	public function query($identifier, $db_string, $db_values = array(), $connection = null);
+	public function query($identifier, $db_string, $db_values = array());
 
 	/**
 	 * Do a query, and returns the results.
@@ -82,81 +85,28 @@ interface Database
 	public function fetchQueryCallback($db_string, $db_values = array(), $callback = '', $seeds = null);
 
 	/**
-	 * Fetch next result as association.
-	 *
-	 * @param resource $request
-	 * @param int|boolean $counter = false
-	 */
-	public function fetch_assoc($request, $counter = false);
-
-	/**
-	 * Fetch a row from the result set given as parameter.
-	 *
-	 * @param resource $result
-	 * @param int|boolean $counter = false
-	 */
-	public function fetch_row($result, $counter = false);
-
-	/**
-	 * Free the resultset.
-	 *
-	 * @param resource $result
-	 * @return void
-	 */
-	public function free_result($result);
-
-	/**
-	 * Get the number of rows in the result.
-	 *
-	 * @param resource $result
-	 */
-	public function num_rows($result);
-
-	/**
-	 * Get the number of fields in the resultset.
-	 *
-	 * @param resource $request
-	 */
-	public function num_fields($request);
-
-	/**
-	 * Reset the internal result pointer.
-	 *
-	 * @param resource $request
-	 * @param int $counter
-	 */
-	public function data_seek($request, $counter);
-
-	/**
-	 * Returns count of affected rows from the last transaction.
-	 */
-	public function affected_rows();
-
-	/**
 	 * Last insert id
 	 *
 	 * @param string $table
-	 * @param string|null $field = null
-	 * @param resource|null $connection = null
 	 */
-	public function insert_id($table, $field = null, $connection = null);
+	public function insert_id();
 
 	/**
 	 * Do a transaction.
 	 *
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
-	 * @param resource|null $connection = null
+	 *
+	 * @return bool|resource
 	 */
-	public function db_transaction($type = 'commit', $connection = null);
+	public function transaction($type = 'commit');
 
 	/**
 	 * Database error.
 	 * Backtrace, log, try to fix.
 	 *
 	 * @param string $db_string
-	 * @param resource|null $connection = null
 	 */
-	public function error($db_string, $connection = null);
+	public function error($db_string);
 
 	/**
 	 * Sets the class not to return the error in case of failures
@@ -173,10 +123,9 @@ interface Database
 	 * @param mixed[] $data
 	 * @param mixed[] $keys
 	 * @param bool $disable_trans = false
-	 * @param resource|null $connection = null
 	 * @return void
 	 */
-	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null);
+	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false);
 
 	/**
 	 * This function tries to work out additional error information from a back trace.
@@ -186,6 +135,9 @@ interface Database
 	 * @param string|boolean $error_type
 	 * @param string|null $file
 	 * @param int|null $line
+	 *
+	 * @return array
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null);
 
@@ -202,6 +154,7 @@ interface Database
 	 *
 	 * @param string $string
 	 * @param bool $translate_human_wildcards = false, if true, turns human readable wildcards into SQL wildcards.
+	 *
 	 * @return string
 	 */
 	public function escape_wildcard_string($string, $translate_human_wildcards = false);
@@ -217,10 +170,9 @@ interface Database
 	/**
 	 * Return last error string from the database server
 	 *
-	 * @param resource|null $connection = null
 	 * @return string
 	 */
-	public function last_error($connection = null);
+	public function last_error();
 
 	/**
 	 * Returns whether the database system supports ignore.
@@ -233,32 +185,21 @@ interface Database
 	 * Get the name (title) of the database system.
 	 * @return string
 	 */
-	public function db_title();
+	public function title();
 
 	/**
 	 * Whether the database system is case sensitive.
 	 *
 	 * @return bool
 	 */
-	public function db_case_sensitive();
-
-	/**
-	 * Gets all the necessary INSERTs for the table named table_name.
-	 * It goes in 250 row segments.
-	 *
-	 * @param string $tableName - the table to create the inserts for.
-	 * @param bool $new_table
-	 * @return string the query to insert the data back in, or an empty string if the table was empty.
-	 */
-	public function insert_sql($tableName, $new_table = false);
+	public function case_sensitive();
 
 	/**
 	 * Select database.
 	 *
 	 * @param string|null $dbName = null
-	 * @param resource|null $connection = null
 	 */
-	public function select_db($dbName = null, $connection = null);
+	public function select_db($dbName = null);
 
 	/**
 	 * Return the number of queries executed
@@ -275,29 +216,9 @@ interface Database
 	public function connection();
 
 	/**
-	 * This function lists all tables in the database.
-	 * The listing could be filtered according to $filter.
-	 *
-	 * @param string|bool $db_name_str string holding the database name, or false, default false
-	 * @param string|bool $filter string to filter by, or false, default false
-	 *
-	 * @return string[] an array of table names. (strings)
-	 */
-	public function db_list_tables($db_name_str = false, $filter = false);
-
-	/**
-	 * Dumps the schema (CREATE) for a table.
-	 *
-	 * @param string $tableName - the table name.
-	 *
-	 * @return string - the CREATE statement as string
-	 */
-	public function db_table_sql($tableName);
-
-	/**
 	 * Return the DB version the system is running under
 	 *
 	 * @return string - the version as string
 	 */
-	public function db_server_version();
+	public function server_version();
 }

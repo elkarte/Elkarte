@@ -954,7 +954,7 @@ function loadPMs($pm_options, $id_member)
 	if ($pm_options['display_mode'] == 2)
 	{
 		// On a non-default sort, when using PostgreSQL we have to do a harder sort.
-		if ($db->db_title() == 'PostgreSQL' && $pm_options['sort_by_query'] != 'pm.id_pm')
+		if ($db->title() == 'PostgreSQL' && $pm_options['sort_by_query'] != 'pm.id_pm')
 		{
 			$sub_request = $db->query('', '
 				SELECT

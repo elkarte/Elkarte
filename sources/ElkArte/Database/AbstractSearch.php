@@ -11,10 +11,12 @@
  *
  */
 
+namespace ElkArte\Database;
+
 /**
- * The common base for the implementation of DbSearch
+ * The common base for the implementation of DbSearchInterface
  */
-abstract class DbSearch_Abstract implements DbSearch
+abstract class AbstractSearch implements DbSearchInterface
 {
 	/**
 	 * The supported search methods
@@ -39,7 +41,7 @@ abstract class DbSearch_Abstract implements DbSearch
 	/**
 	 * {@inheritdoc }
 	 */
-	public function search_query($identifier, $db_string, $db_values = array(), $connection = null)
+	public function search_query($identifier, $db_string, $db_values = array())
 	{
 		$db = database();
 
@@ -50,7 +52,7 @@ abstract class DbSearch_Abstract implements DbSearch
 		}
 
 		// Simply delegate to the database adapter method.
-		return $db->query($identifier, $db_string, $db_values, $connection);
+		return $db->query($identifier, $db_string, $db_values);
 	}
 
 	/**
@@ -65,7 +67,6 @@ abstract class DbSearch_Abstract implements DbSearch
 	 * {@inheritDoc}
 	 */
 	abstract public function membersTableInfo();
-
 
 	/**
 	 * {@inheritDoc}

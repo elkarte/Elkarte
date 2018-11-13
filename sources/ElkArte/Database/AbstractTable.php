@@ -14,11 +14,13 @@
  *
  */
 
+namespace ElkArte\Database;
+
 /**
  * This is used to create a table without worrying about schema compatibilities
  * across supported database systems.
  */
-abstract class DbTable
+abstract class AbstractTable
 {
 	/**
 	 * We need a way to interact with the database
@@ -148,7 +150,7 @@ abstract class DbTable
 		}
 
 		// If we've got this far - good news - no table exists. We can build our own!
-		$this->_db->db_transaction('begin');
+		$this->_db->transaction('begin');
 
 		if ($parameters['temporary'] !== true)
 		{
@@ -182,7 +184,7 @@ abstract class DbTable
 		$this->_build_indexes();
 
 		// Go, go power rangers!
-		$this->_db->db_transaction('commit');
+		$this->_db->transaction('commit');
 
 		return true;
 	}

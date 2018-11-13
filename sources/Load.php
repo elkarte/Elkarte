@@ -1844,36 +1844,33 @@ function getLanguages($use_cache = true)
  */
 function loadDatabase()
 {
-	global $db_persist, $db_server, $db_user, $db_passwd, $db_port;
-	global $db_type, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix;
+	global $db_prefix, $db_name;
 
 	// Database stuffs
 	require_once(SOURCEDIR . '/database/Database.subs.php');
 
-	// Figure out what type of database we are using.
-	if (empty($db_type) || !file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.class.php'))
-		$db_type = 'mysql';
-
-	// If we are in SSI try them first, but don't worry if it doesn't work, we have the normal username and password we can use.
-	if (ELK === 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
-		$connection = elk_db_initiate($db_server, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix, array('persist' => $db_persist, 'non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
-
-	// Either we aren't in SSI mode, or it failed.
-	if (empty($connection))
-		$connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'dont_select_db' => ELK === 'SSI', 'port' => $db_port), $db_type);
-
 	// Safe guard here, if there isn't a valid connection lets put a stop to it.
-	if (!$connection)
+	try
+	{
+		$db = database(false);
+	}
+	catch (\Exception $e)
+	{
 		\ElkArte\Errors\Errors::instance()->display_db_error();
+	}
 
 	// If in SSI mode fix up the prefix.
-	$db = database();
 	if (ELK === 'SSI')
+	{
 		$db_prefix = $db->fix_prefix($db_prefix, $db_name);
+	}
 
 	// Case sensitive database? Let's define a constant.
-	if ($db->db_case_sensitive() && !defined('DB_CASE_SENSITIVE'))
+	// @NOTE: I think it is already taken care by the abstraction, it should be possible to remove
+	if ($db->case_sensitive() && !defined('DB_CASE_SENSITIVE'))
+	{
 		DEFINE('DB_CASE_SENSITIVE', '1');
+	}
 }
 
 /**

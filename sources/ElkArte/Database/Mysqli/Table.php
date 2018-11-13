@@ -21,7 +21,7 @@
  * Table creation / dropping, column adding / removing
  * Most often used during install and Upgrades of the forum and addons
  */
-class DbTable_MySQL extends DbTable
+class DbTable_MySQL extends \ElkArte\Database\AbstractTable
 {
 	/**
 	 * Holds this instance of the table interface
@@ -516,7 +516,7 @@ class DbTable_MySQL extends DbTable
 	/**
 	 * Static method that allows to retrieve or create an instance of this class.
 	 *
-	 * @param object $db - A Database_MySQL object
+	 * @param object $db - A \ElkArte\Database\Mysqli\Query object
 	 * @param string $db_prefix - The tables prefix
 	 * @return DbTable_MySQL - A DbTable_MySQL object
 	 */

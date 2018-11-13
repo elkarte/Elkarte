@@ -11,10 +11,12 @@
  *
  */
 
+namespace ElkArte\Database\Postgresql;
+
 /**
  * PostgreSQL implementation of DbSearch
  */
-class DbSearch_PostgreSQL extends DbSearch_Abstract
+class Search extends \ElkArte\Database\AbstractSearch
 {
 	/**
 	 * This instance of the search
@@ -33,7 +35,7 @@ class DbSearch_PostgreSQL extends DbSearch_Abstract
 	/**
 	 * {@inheritDoc}
 	 */
-	public function search_query($identifier, $db_string, $db_values = array(), $connection = null)
+	public function search_query($identifier, $db_string, $db_values = array())
 	{
 		$replacements = array(
 			'drop_tmp_log_search_topics' => array(
@@ -67,7 +69,7 @@ class DbSearch_PostgreSQL extends DbSearch_Abstract
 			$this->_skip_error = true;
 		}
 
-		return parent::search_query('', $db_string, $db_values, $connection);
+		return parent::search_query('', $db_string, $db_values);
 	}
 
 	/**

@@ -23,25 +23,56 @@
  * @param mixed[] $db_options
  * @param string $db_type
  *
- * @return resource
+ * @return \ElkArte\DatabaseInterface
+ * @throws \Exception
  */
 function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array(), $db_type = 'mysql')
 {
-	require_once(SOURCEDIR . '/database/Db.php');
-	require_once(SOURCEDIR . '/database/Db-abstract.class.php');
-	require_once(SOURCEDIR . '/database/Db-' . $db_type . '.class.php');
-
-	return call_user_func_array(array('Database_' . DB_TYPE, 'initiate'), array($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options));
+	return database(false);
 }
 
 /**
  * Retrieve existing instance of the active database class.
  *
- * @return Database
+ * @return \ElkArte\DatabaseInterface
+ * @throws \Exception
  */
-function database()
+function database($fatal = true)
 {
-	return call_user_func(array('Database_' . DB_TYPE, 'db'));
+	static $db = null;
+
+	if ($db === null)
+	{
+		global $db_persist, $db_server, $db_user, $db_passwd, $db_port;
+		global $db_type, $db_name, $db_prefix, $mysql_set_mode;
+
+		$db_options = [
+			'persist' => $db_persist,
+			'select_db' => false,
+			'port' => $db_port,
+			'mysql_set_mode' => (bool) ($mysql_set_mode ?? false)
+		];
+		$db_type = strtolower($db_type);
+		$db_type = $db_type === 'mysql' ? 'mysqli' : $db_type;
+		$class = '\\ElkArte\\Database\\' . ucfirst($db_type) . '\\Connection';
+		try
+		{
+			$db = $class::initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options);
+		}
+		catch (\Exception $e)
+		{
+			if ($fatal === true)
+			{
+				\ElkArte\Errors\Errors::instance()->display_db_error($e->getMessage());
+			}
+			else
+			{
+				throw $e;
+			}
+		}
+		
+	}
+	return $db;
 }
 
 /**
