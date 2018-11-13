@@ -27,9 +27,10 @@ class Search extends \ElkArte\Database\AbstractSearch
 	/**
 	 * Everything starts here... more or less
 	 */
-	public function __construct()
+	public function __construct($db)
 	{
 		$this->_supported_types = array('custom');
+		parent::__construct($db);
 	}
 
 	/**
@@ -79,7 +80,6 @@ class Search extends \ElkArte\Database\AbstractSearch
 	{
 		global $db_prefix, $txt;
 
-		$db = database();
 		$db_table = db_table();
 
 		$table_info = array();
@@ -92,7 +92,7 @@ class Search extends \ElkArte\Database\AbstractSearch
 		}
 
 		// PostGreSql has some hidden sizes.
-		$request = $db->query('', '
+		$request = $this->_db->query('', '
 			SELECT relname, relpages * 8 *1024 AS "KB" FROM pg_class
 			WHERE relname = {string:messages} OR relname = {string:log_search_words}
 			ORDER BY relpages DESC',
@@ -102,9 +102,9 @@ class Search extends \ElkArte\Database\AbstractSearch
 			)
 		);
 
-		if ($request !== false && $db->num_rows($request) > 0)
+		if ($request !== false && $this->_db->num_rows($request) > 0)
 		{
-			while ($row = $db->fetch_assoc($request))
+			while ($row = $this->_db->fetch_assoc($request))
 			{
 				if ($row['relname'] == $db_prefix . 'messages')
 				{
@@ -120,7 +120,7 @@ class Search extends \ElkArte\Database\AbstractSearch
 					$table_info['custom_index_length'] = (int) $row['KB'];
 				}
 			}
-			$db->free_result($request);
+			$this->_db->free_result($request);
 		}
 		else
 		{
@@ -142,17 +142,5 @@ class Search extends \ElkArte\Database\AbstractSearch
 	public function create_word_search($type, $size = 10)
 	{
 		parent::create_word_search('int', 10);
-	}
-
-	/**
-	 * Static method that allows to retrieve or create an instance of this class.
-	 */
-	public static function db_search()
-	{
-		if (is_null(self::$_search))
-		{
-			self::$_search = new self();
-		}
-		return self::$_search;
 	}
 }

@@ -19,6 +19,12 @@ namespace ElkArte\Database;
 abstract class AbstractSearch implements DbSearchInterface
 {
 	/**
+	 * The database object
+	 * @var \ElkArte\Database\DatabaseInterface
+	 */
+	protected $_db = null;
+
+	/**
 	 * The supported search methods
 	 * @var string[]
 	 */
@@ -29,6 +35,14 @@ abstract class AbstractSearch implements DbSearchInterface
 	 * @var boolean
 	 */
 	protected $_skip_error = false;
+
+	/**
+	 * Usual constructor
+	 */
+	public function __construct($db)
+	{
+		$this->_db = $db;
+	}
 
 	/**
 	 * {@inheritdoc }
@@ -43,16 +57,14 @@ abstract class AbstractSearch implements DbSearchInterface
 	 */
 	public function search_query($identifier, $db_string, $db_values = array())
 	{
-		$db = database();
-
 		if ($this->_skip_error === true)
 		{
-			$db->skip_next_error();
+			$this->_db->skip_next_error();
 			$this->_skip_error = false;
 		}
 
 		// Simply delegate to the database adapter method.
-		return $db->query($identifier, $db_string, $db_values);
+		return $this->_db->query($identifier, $db_string, $db_values);
 	}
 
 	/**

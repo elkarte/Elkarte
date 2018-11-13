@@ -34,6 +34,8 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
 /**
  * Retrieve existing instance of the active database class.
  *
+ * @param bool $fatal - Stop the execution or throw an \Exception
+ *
  * @return \ElkArte\DatabaseInterface
  * @throws \Exception
  */
@@ -80,19 +82,40 @@ function database($fatal = true)
  * and returns it.
  *
  * @param object|null $db - A database object (e.g. Database_MySQL or Database_PostgreSQL)
- * @return DbTable
+ * @param bool $fatal - Stop the execution or throw an \Exception
+ *
+ * @return \ElkArte\DatabaseInterface
+ * @throws \Exception
  */
-function db_table($db = null)
+function db_table($db = null, $fatal = false)
 {
-	global $db_prefix;
+	global $db_prefix, $db_type;
+	static $db_table = null;
 
-	if ($db === null)
+	if ($db_table === null)
+	{
 		$db = database();
+		$db_type = strtolower($db_type);
+		$db_type = $db_type === 'mysql' ? 'mysqli' : $db_type;
+		$class = '\\ElkArte\\Database\\' . ucfirst($db_type) . '\\Table';
+		try
+		{
+			$db_table = new $class($db, $db_prefix);
+		}
+		catch (\Exception $e)
+		{
+			if ($fatal === true)
+			{
+				\ElkArte\Errors\Errors::instance()->display_db_error($e->getMessage());
+			}
+			else
+			{
+				throw $e;
+			}
+		}
+	}
 
-	require_once(SOURCEDIR . '/database/DbTable.class.php');
-	require_once(SOURCEDIR . '/database/DbTable-' . strtolower(DB_TYPE) . '.php');
-
-	return call_user_func(array('DbTable_' . DB_TYPE, 'db_table'), $db, $db_prefix);
+	return $db_table;
 }
 
 /**
@@ -104,9 +127,30 @@ function db_table($db = null)
  */
 function db_search()
 {
-	require_once(SOURCEDIR . '/database/DbSearch.php');
-	require_once(SOURCEDIR . '/database/DbSearch-abstract.php');
-	require_once(SOURCEDIR . '/database/DbSearch-' . strtolower(DB_TYPE) . '.php');
+	static $db_search = null;
 
-	return call_user_func(array('DbSearch_' . DB_TYPE, 'db_search'));
+	if ($db_search === null)
+	{
+		$db = database();
+		$db_type = strtolower($db_type);
+		$db_type = $db_type === 'mysql' ? 'mysqli' : $db_type;
+		$class = '\\ElkArte\\Database\\' . ucfirst($db_type) . '\\Search';
+		try
+		{
+			$db_search = new $class($db);
+		}
+		catch (\Exception $e)
+		{
+			if ($fatal === true)
+			{
+				\ElkArte\Errors\Errors::instance()->display_db_error($e->getMessage());
+			}
+			else
+			{
+				throw $e;
+			}
+		}
+	}
+
+	return $db_search;
 }

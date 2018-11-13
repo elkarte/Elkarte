@@ -53,7 +53,7 @@ abstract class AbstractTable
 	 *
 	 * @param object $db - An implementation of the abstract DbTable
 	 */
-	protected function __construct($db, $db_prefix)
+	public function __construct($db, $db_prefix)
 	{
 		$this->_db_prefix = $db_prefix;
 
@@ -298,14 +298,6 @@ abstract class AbstractTable
 	 * @param boolean $reverse
 	 */
 	abstract public function calculate_type($type_name, $type_size = null, $reverse = false);
-
-	/**
-	 * Get table structure.
-	 *
-	 * @param string $table_name
-	 * @param mixed[] $parameters default array()
-	 */
-	abstract public function db_table_structure($table_name, $parameters = array());
 
 	/**
 	 * Return column information for a table.

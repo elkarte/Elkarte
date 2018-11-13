@@ -27,9 +27,10 @@ class DbSearch_MySQL extends \ElkArte\Database\AbstractSearch
 	/**
 	 * Everything starts here... more or less
 	 */
-	public function __construct()
+	public function __construct($db)
 	{
 		$this->_supported_types = array('fulltext');
+		parent::__construct($db);
 	}
 
 	/**
@@ -54,7 +55,7 @@ class DbSearch_MySQL extends \ElkArte\Database\AbstractSearch
 
 		if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
 		{
-			$request = $db->query('', '
+			$request = $this->_db->query('', '
 				SHOW TABLE STATUS
 				FROM {string:database_name}
 				LIKE {string:table_name}',
@@ -66,7 +67,7 @@ class DbSearch_MySQL extends \ElkArte\Database\AbstractSearch
 		}
 		else
 		{
-			$request = $db->query('', '
+			$request = $this->_db->query('', '
 				SHOW TABLE STATUS
 				LIKE {string:table_name}',
 				array(
@@ -75,19 +76,19 @@ class DbSearch_MySQL extends \ElkArte\Database\AbstractSearch
 			);
 		}
 
-		if ($request !== false && $db->num_rows($request) == 1)
+		if ($request !== false && $this->_db->num_rows($request) == 1)
 		{
 			// Only do this if the user has permission to execute this query.
-			$row = $db->fetch_assoc($request);
+			$row = $this->_db->fetch_assoc($request);
 			$table_info['data_length'] = $row['Data_length'];
 			$table_info['index_length'] = $row['Index_length'];
 			$table_info['fulltext_length'] = $row['Index_length'];
-			$db->free_result($request);
+			$this->_db->free_result($request);
 		}
 
 		// Now check the custom index table, if it exists at all.
 		if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
-			$request = $db->query('', '
+			$request = $this->_db->query('', '
 				SHOW TABLE STATUS
 				FROM {string:database_name}
 				LIKE {string:table_name}',
@@ -97,7 +98,7 @@ class DbSearch_MySQL extends \ElkArte\Database\AbstractSearch
 				)
 			);
 		else
-			$request = $db->query('', '
+			$request = $this->_db->query('', '
 				SHOW TABLE STATUS
 				LIKE {string:table_name}',
 				array(
@@ -105,13 +106,13 @@ class DbSearch_MySQL extends \ElkArte\Database\AbstractSearch
 				)
 			);
 
-		if ($request !== false && $db->num_rows($request) == 1)
+		if ($request !== false && $this->_db->num_rows($request) == 1)
 		{
 			// Only do this if the user has permission to execute this query.
-			$row = $db->fetch_assoc($request);
+			$row = $this->_db->fetch_assoc($request);
 			$table_info['index_length'] += $row['Data_length'] + $row['Index_length'];
 			$table_info['custom_index_length'] = $row['Data_length'] + $row['Index_length'];
-			$db->free_result($request);
+			$this->_db->free_result($request);
 		}
 
 		return $table_info;
@@ -139,18 +140,5 @@ class DbSearch_MySQL extends \ElkArte\Database\AbstractSearch
 		}
 
 		parent::create_word_search($type, $size);
-	}
-
-	/**
-	 * Static method that allows to retrieve or create an instance of this class.
-	 */
-	public static function db_search()
-	{
-		if (is_null(self::$_search))
-		{
-			self::$_search = new self();
-		}
-
-		return self::$_search;
 	}
 }

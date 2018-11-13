@@ -512,21 +512,4 @@ class DbTable_MySQL extends \ElkArte\Database\AbstractTable
 	{
 		return $this->_package_log;
 	}
-
-	/**
-	 * Static method that allows to retrieve or create an instance of this class.
-	 *
-	 * @param object $db - A \ElkArte\Database\Mysqli\Query object
-	 * @param string $db_prefix - The tables prefix
-	 * @return DbTable_MySQL - A DbTable_MySQL object
-	 */
-	public static function db_table($db, $db_prefix)
-	{
-		if (is_null(self::$_tbl))
-		{
-			self::$_tbl = new DbTable_MySQL($db, $db_prefix);
-		}
-
-		return self::$_tbl;
-	}
 }

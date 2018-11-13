@@ -689,20 +689,4 @@ class Table extends \ElkArte\Database\AbstractTable
 	{
 		return $this->_package_log;
 	}
-
-	/**
-	 * Static method that allows to retrieve or create an instance of this class.
-	 * @param object $db - A Database_PostgreSQL object
-	 * @param string $db_prefix - The tables prefix
-	 * @return DbTable_PostgreSQL - A DbTable_PostgreSQL object
-	 */
-	public static function db_table($db, $db_prefix)
-	{
-		if (is_null(self::$_tbl))
-		{
-			self::$_tbl = new DbTable_PostgreSQL($db, $db_prefix);
-		}
-
-		return self::$_tbl;
-	}
 }

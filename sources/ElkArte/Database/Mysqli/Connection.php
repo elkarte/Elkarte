@@ -11,9 +11,6 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * copyright:	2004-2011, GreyWyvern - All rights reserved.
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
- *
  * @version 2.0 dev
  *
  */
@@ -43,7 +40,7 @@ class Connection implements \ElkArte\Database\ConnectionInterface
 		// Something's wrong, show an error if its fatal (which we assume it is)
 		if (!$connection)
 		{
-			throw new \Exception('Database_MySQL::initiate');
+			throw new \Exception('\\ElkArte\\Database\\Mysqli\\Connection::initiate');
 		}
 
 		$query = new \ElkArte\Database\Mysqli\Query($db_prefix, $connection);
