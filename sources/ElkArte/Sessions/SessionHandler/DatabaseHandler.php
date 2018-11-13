@@ -115,8 +115,8 @@ class DatabaseHandler extends \SessionHandler
 				'session_id' => $sessionId,
 			)
 		);
-		list ($sessionData) = $this->_db->fetch_row($result);
-		$this->_db->free_result($result);
+		list ($sessionData) = $result->fetch_row();
+		$result->free_result();
 
 		return empty($sessionData) ? '' : $sessionData;
 	}
@@ -132,7 +132,7 @@ class DatabaseHandler extends \SessionHandler
 		}
 
 		// First try to update an existing row...
-		$this->_db->query('', '
+		$result = $this->_db->query('test_connection', '
 			UPDATE {db_prefix}sessions
 			SET data = {string:data}, last_update = {int:last_update}
 			WHERE session_id = {string:session_id}',
@@ -144,7 +144,7 @@ class DatabaseHandler extends \SessionHandler
 		);
 
 		// If that didn't work, try inserting a new one.
-		if ($this->_db->affected_rows() == 0)
+		if ($result->affected_rows() == 0)
 		{
 			$this->_db->insert('ignore',
 				'{db_prefix}sessions',

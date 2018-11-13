@@ -185,7 +185,7 @@ class Table extends \ElkArte\Database\AbstractTable
 
 		// Get the specifics...
 		$column_info['size'] = isset($column_info['size']) && is_numeric($column_info['size']) ? $column_info['size'] : null;
-		list ($type, $size) = $this->db_calculate_type($column_info['type'], $column_info['size']);
+		list ($type, $size) = $this->calculate_type($column_info['type'], $column_info['size']);
 		if ($size !== null)
 			$type = $type . '(' . $size . ')';
 
@@ -288,7 +288,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		if (isset($column_info['type']) && ($column_info['type'] != $old_info['type'] || (isset($column_info['size']) && $column_info['size'] != $old_info['size'])))
 		{
 			$column_info['size'] = isset($column_info['size']) && is_numeric($column_info['size']) ? $column_info['size'] : null;
-			list ($type, $size) = $this->db_calculate_type($column_info['type'], $column_info['size']);
+			list ($type, $size) = $this->calculate_type($column_info['type'], $column_info['size']);
 			if ($size !== null)
 				$type = $type . '(' . $size . ')';
 
@@ -307,7 +307,7 @@ class Table extends \ElkArte\Database\AbstractTable
 				DROP COLUMN ' . $column_info['name']);
 			$this->_alter_table($table_name, '
 				RENAME COLUMN ' . $column_info['name'] . '_tempxx TO ' . $column_info['name']);
-			$this->_db->transaction('commit');
+			$this->_db->('commit');
 		}
 
 		// Finally - auto increment?!
@@ -452,7 +452,7 @@ class Table extends \ElkArte\Database\AbstractTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_calculate_type($type_name, $type_size = null, $reverse = false)
+	public function calculate_type($type_name, $type_size = null, $reverse = false)
 	{
 		// Let's be sure it's lowercase MySQL likes both, others no.
 		$type_name = strtolower($type_name);
@@ -547,7 +547,7 @@ class Table extends \ElkArte\Database\AbstractTable
 					$default = null;
 
 				// Make the type generic.
-				list ($type, $size) = $this->db_calculate_type($row['data_type'], $row['character_maximum_length'], true);
+				list ($type, $size) = $this->calculate_type($row['data_type'], $row['character_maximum_length'], true);
 
 				$columns[$row['column_name']] = array(
 					'name' => $row['column_name'],
@@ -649,7 +649,7 @@ class Table extends \ElkArte\Database\AbstractTable
 
 		// Sort out the size...
 		$column['size'] = isset($column['size']) && is_numeric($column['size']) ? $column['size'] : null;
-		list ($type, $size) = $this->db_calculate_type($column['type'], $column['size']);
+		list ($type, $size) = $this->calculate_type($column['type'], $column['size']);
 		if ($size !== null)
 			$type = $type . '(' . $size . ')';
 

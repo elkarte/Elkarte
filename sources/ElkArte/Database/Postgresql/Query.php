@@ -48,12 +48,9 @@ class Query extends AbstractQuery
 	/**
 	 * {@inheritDoc}
 	 */
-	public function query($identifier, $db_string, $db_values = array(), $connection = null)
+	public function query($identifier, $db_string, $db_values = array())
 	{
 		global $db_show_debug, $time_start, $modSettings;
-
-		// Decide which connection to use.
-		$connection = $connection === null ? $this->_connection : $connection;
 
 		// Special queries that need processing.
 		$replacements = array(
@@ -200,19 +197,19 @@ class Query extends AbstractQuery
 			elseif (strpos($clean, 'benchmark') !== false && preg_match('~(^|[^a-z])benchmark($|[^[a-z])~s', $clean) != 0)
 				$fail = true;
 
-			if (!empty($fail) && class_exists('Errors'))
+			if (!empty($fail) && class_exists('\\ElkArte\\Errors\\Errors'))transaction
 				$this->error_backtrace('Hacking attempt...', 'Hacking attempt...' . "\n" . $db_string, E_USER_ERROR, __FILE__, __LINE__);
 
 			// If we are updating something, better start a transaction so that indexes may be kept consistent
 			if (!$this->_in_transaction && strpos($clean, 'update') !== false)
-				$this->transaction('begin', $connection);
+				$this->transaction('begin');
 		}
 
-		$this->_db_last_result = @pg_query($connection, $db_string);
+		$this->_db_last_result = @pg_query($this->connection, $db_string);
 
 		if ($this->_db_last_result === false && !$this->_skip_error)
 		{
-			$this->error($db_string, $connection);
+			$this->error($db_string);
 		}
 
 		// Revert not to skip errors
@@ -222,7 +219,7 @@ class Query extends AbstractQuery
 		}
 
 		if ($this->_in_transaction)
-			$this->transaction('commit', $connection);
+			$this->transaction('commit');
 
 		// Debugging.
 		if ($db_show_debug === true)
@@ -239,22 +236,19 @@ class Query extends AbstractQuery
 	/**
 	 * {@inheritDoc}
 	 */
-	public function transaction($type = 'commit', $connection = null)
+	public function transaction($type = 'commit')
 	{
-		// Decide which connection to use
-		$connection = $connection === null ? $this->_connection : $connection;
-
 		if ($type == 'begin')
 		{
 			$this->_in_transaction = true;
-			return @pg_query($connection, 'BEGIN');
+			return @pg_query($this->connection, 'BEGIN');
 		}
 		elseif ($type == 'rollback')
-			return @pg_query($connection, 'ROLLBACK');
+			return @pg_query($this->connection, 'ROLLBACK');
 		elseif ($type == 'commit')
 		{
 			$this->_in_transaction = false;
-			return @pg_query($connection, 'COMMIT');
+			return @pg_query($this->connection, 'COMMIT');
 		}
 
 		return false;
@@ -265,9 +259,9 @@ class Query extends AbstractQuery
 	 */
 	public function last_error()
 	{
-		if (is_resource($this->_connection))
+		if (is_resource($this->connection))
 		{
-			return pg_last_error($this->_connection);
+			return pg_last_error($this->connection);
 		}
 		else
 		{
@@ -287,7 +281,7 @@ class Query extends AbstractQuery
 
 		// Decide which connection to use
 		// This is the error message...
-		$query_error = @pg_last_error($this->_connection);
+		$query_error = @pg_last_error($this->connection);
 
 		// Log the error.
 		if (class_exists('\\ElkArte\\Errors\\Errors'))
@@ -412,7 +406,7 @@ class Query extends AbstractQuery
 			$this->_skip_error = $skip_error;
 
 			// Do the insert.
-			$this->query('', '
+			$ret = $this->query('', '
 				INSERT INTO ' . $table . '("' . implode('", "', $indexed_columns) . '")
 				VALUES
 				' . implode(',
@@ -435,7 +429,7 @@ class Query extends AbstractQuery
 		}
 
 		$this->result = new \ElkArte\Database\Postgresql\Result(
-			null,
+			$ret->getResultObject,
 			new \ElkArte\ValuesContainer([
 				'insert_id' => $last_inserted_id,
 				'replaceResults' => $this->_db_replace_result,
@@ -580,7 +574,7 @@ class Query extends AbstractQuery
 		$request = $this->query('', 'SELECT CURRVAL(\'' . $table . '_seq\') AS insertID',
 			array(
 			),
-			$this->_connection
+			$this->connection
 		);
 
 		if (!$request)
@@ -599,6 +593,6 @@ class Query extends AbstractQuery
 	 */
 	public function validConnection()
 	{
-		return is_resource($this->_connection);
+		return is_resource($this->connection);
 	}
 }

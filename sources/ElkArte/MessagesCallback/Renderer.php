@@ -219,10 +219,10 @@ abstract class Renderer
 		}
 
 		// Attempt to get the next message.
-		$this->_this_message = $this->_db->fetch_assoc($this->_dbRequest);
+		$this->_this_message = $this->_dbRequest->fetch_assoc();
 		if (!$this->_this_message)
 		{
-			$this->_db->free_result($this->_dbRequest);
+			$this->_dbRequest->free_result();
 
 			return false;
 		}

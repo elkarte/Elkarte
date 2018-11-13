@@ -48,7 +48,7 @@ function database($fatal = true)
 
 		$db_options = [
 			'persist' => $db_persist,
-			'select_db' => false,
+			'select_db' => true,
 			'port' => $db_port,
 			'mysql_set_mode' => (bool) ($mysql_set_mode ?? false)
 		];

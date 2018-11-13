@@ -297,7 +297,7 @@ abstract class AbstractTable
 	 * @param int|null $type_size
 	 * @param boolean $reverse
 	 */
-	abstract public function db_calculate_type($type_name, $type_size = null, $reverse = false);
+	abstract public function calculate_type($type_name, $type_size = null, $reverse = false);
 
 	/**
 	 * Get table structure.

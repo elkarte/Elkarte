@@ -40,7 +40,7 @@ class Query extends AbstractQuery
 	/**
 	 * {@inheritDoc}
 	 */
-	public function query($identifier, $db_string, $db_values = array(), $connection = null)
+	public function query($identifier, $db_string, $db_values = array())
 	{
 		global $db_show_debug, $time_start, $modSettings;
 
@@ -57,9 +57,6 @@ class Query extends AbstractQuery
 			'',
 			'',
 		);
-
-		// Decide which connection to use.
-		$connection = $connection === null ? $this->_connection : $connection;
 
 		// One more query....
 		$this->_query_count++;
@@ -159,18 +156,18 @@ class Query extends AbstractQuery
 			elseif (strpos($clean, 'benchmark') !== false && preg_match('~(^|[^a-z])benchmark($|[^[a-z])~s', $clean) != 0)
 				$fail = true;
 
-			if (!empty($fail) && function_exists('log_error'))
+			if (!empty($fail) && class_exists('\\ElkArte\\Errors\\Errors'))
 				$this->error_backtrace('Hacking attempt...', 'Hacking attempt...' . "\n" . $db_string, E_USER_ERROR, __FILE__, __LINE__);
 		}
 
 		if ($this->_unbuffered === false)
-			$ret = @mysqli_query($connection, $db_string);
+			$ret = @mysqli_query($this->connection, $db_string);
 		else
-			$ret = @mysqli_query($connection, $db_string, MYSQLI_USE_RESULT);
+			$ret = @mysqli_query($this->connection, $db_string, MYSQLI_USE_RESULT);
 
 		if ($ret === false && $this->_skip_error === false)
 		{
-			$ret = $this->error($db_string, $connection);
+			$ret = $this->error($db_string);
 		}
 
 		// Revert not to skip errors
@@ -186,7 +183,11 @@ class Query extends AbstractQuery
 			$debug->db_query($db_cache);
 		}
 
-		$this->result = new \ElkArte\Database\Mysqli\Result($ret);
+		$this->result = new \ElkArte\Database\Mysqli\Result($ret,
+			new \ElkArte\ValuesContainer([
+				'connection' => $this->connection
+			])
+		);
 
 		return $this->result;
 	}
@@ -277,15 +278,15 @@ class Query extends AbstractQuery
 	{
 		if ($type == 'begin')
 		{
-			return @mysqli_query($this->_connection, 'BEGIN');
+			return @mysqli_query($this->connection, 'BEGIN');
 		}
 		elseif ($type == 'rollback')
 		{
-			return @mysqli_query($this->_connection, 'ROLLBACK');
+			return @mysqli_query($this->connection, 'ROLLBACK');
 		}
 		elseif ($type == 'commit')
 		{
-			return @mysqli_query($this->_connection, 'COMMIT');
+			return @mysqli_query($this->connection, 'COMMIT');
 		}
 
 		return false;
@@ -296,16 +297,20 @@ class Query extends AbstractQuery
 	 */
 	public function last_error()
 	{
-		if (is_object($this->_connection))
+		if (is_object($this->connection))
 		{
-			return mysqli_error($this->_connection);
+			return mysqli_error($this->connection);
+		}
+		else
+		{
+			return false;
 		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function error($db_string, $connection = null)
+	public function error($db_string)
 	{
 		global $txt, $context, $webmaster_email, $modSettings, $db_persist;
 		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
@@ -314,8 +319,8 @@ class Query extends AbstractQuery
 		list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
 
 		// This is the error message...
-		$query_error = mysqli_error($this->_connection);
-		$query_errno = mysqli_errno($this->_connection);
+		$query_error = mysqli_error($this->connection);
+		$query_errno = mysqli_errno($this->connection);
 
 		// Error numbers:
 		//    1016: Can't open file '....MYI'
@@ -452,7 +457,7 @@ class Query extends AbstractQuery
 
 				if ($new_connection)
 				{
-					$this->_connection = $new_connection;
+					$this->connection = $new_connection;
 
 					// Try a deadlock more than once more.
 					for ($n = 0; $n < 4; $n++)
@@ -550,7 +555,7 @@ class Query extends AbstractQuery
 		$skip_error = $table === $this->_db_prefix . 'log_errors';
 		$this->_skip_error = $skip_error;
 		// Do the insert.
-		$this->query('', '
+		$ret = $this->query('', '
 			' . $queryTitle . ' INTO ' . $table . '(`' . implode('`, `', $indexed_columns) . '`)
 			VALUES
 				' . implode(',
@@ -560,9 +565,9 @@ class Query extends AbstractQuery
 			)
 		);
 
-		$this->result = new \ElkArte\Database\Mysqli\Result($ret,
+		$this->result = new \ElkArte\Database\Mysqli\Result($ret->getResultObject(),
 			new \ElkArte\ValuesContainer([
-				'connection' => $this->_connection
+				'connection' => $this->connection
 			])
 		);
 
@@ -628,7 +633,7 @@ class Query extends AbstractQuery
 	{
 		$string = $this->_clean_4byte_chars($string);
 
-		return mysqli_real_escape_string($this->_connection, $string);
+		return mysqli_real_escape_string($this->connection, $string);
 	}
 
 	/**
@@ -636,7 +641,7 @@ class Query extends AbstractQuery
 	 */
 	public function server_info()
 	{
-		return mysqli_get_server_info($this->_connection);
+		return mysqli_get_server_info($this->connection);
 	}
 
 	/**

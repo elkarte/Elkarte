@@ -76,7 +76,7 @@ abstract class AbstractQuery implements DatabaseInterface
 	public function __construct($db_prefix, $connection)
 	{
 		$this->_db_prefix = $db_prefix;
-		$this->_connection = $connection;
+		$this->connection = $connection;
 	}
 
 	/**
@@ -112,7 +112,7 @@ abstract class AbstractQuery implements DatabaseInterface
 		global $user_info;
 
 		// Connection gone???  This should *never* happen at this point, yet it does :'(
-		if (!$this->validConnection($this->_connection))
+		if (!$this->validConnection($this->connection))
 		{
 			\ElkArte\Errors\Errors::instance()->display_db_error('ElkArte\\Database\\AbstractQuery::replacement__callback');
 		}
@@ -532,7 +532,7 @@ abstract class AbstractQuery implements DatabaseInterface
 	public function connection()
 	{
 		// find it, find it
-		return $this->_connection;
+		return $this->connection;
 	}
 
 	/**
@@ -568,7 +568,7 @@ abstract class AbstractQuery implements DatabaseInterface
 	 */
 	public function validConnection()
 	{
-		return (bool) $this->_connection;
+		return (bool) $this->connection;
 	}
 
 	/**
@@ -630,7 +630,7 @@ abstract class AbstractQuery implements DatabaseInterface
 	 */
 	public function fetch_row()
 	{
-		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::fetch_row()', 'Result::fetch_row()');
+// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::fetch_row()', 'Result::fetch_row()');
 		return $this->result->fetch_row();
 	}
 
@@ -640,7 +640,7 @@ abstract class AbstractQuery implements DatabaseInterface
 	 */
 	public function fetch_assoc()
 	{
-		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::fetch_assoc()', 'Result::fetch_assoc()');
+// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::fetch_assoc()', 'Result::fetch_assoc()');
 		return $this->result->fetch_assoc();
 	}
 
@@ -650,7 +650,7 @@ abstract class AbstractQuery implements DatabaseInterface
 	 */
 	public function free_result()
 	{
-		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::free_result()', 'Result::free_result()');
+// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::free_result()', 'Result::free_result()');
 		return $this->result->free_result();
 	}
 
@@ -660,7 +660,7 @@ abstract class AbstractQuery implements DatabaseInterface
 	 */
 	public function affected_rows()
 	{
-		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::affected_rows()', 'Result::affected_rows()');
+// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::affected_rows()', 'Result::affected_rows()');
 		return $this->result->affected_rows();
 	}
 
@@ -670,7 +670,7 @@ abstract class AbstractQuery implements DatabaseInterface
 	 */
 	public function num_rows()
 	{
-		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::num_rows()', 'Result::num_rows()');
+// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::num_rows()', 'Result::num_rows()');
 		return $this->result->num_rows();
 	}
 
@@ -680,7 +680,7 @@ abstract class AbstractQuery implements DatabaseInterface
 	 */
 	public function num_fields()
 	{
-		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::num_fields()', 'Result::num_fields()');
+// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::num_fields()', 'Result::num_fields()');
 		return $this->result->num_fields();
 	}
 
@@ -690,7 +690,7 @@ abstract class AbstractQuery implements DatabaseInterface
 	 */
 	public function insert_id()
 	{
-		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::insert_id()', 'Result::insert_id()');
+// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::insert_id()', 'Result::insert_id()');
 		return $this->result->insert_id();
 	}
 
@@ -698,9 +698,9 @@ abstract class AbstractQuery implements DatabaseInterface
 	 * Temporary function to supoprt migration to the new schema of the db layer
 	 * @deprecated since 2.0
 	 */
-	public function data_seek($counter)
+	public function data_seek($request, $counter)
 	{
-		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::data_seek()', 'Result::data_seek()');
+// 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::data_seek()', 'Result::data_seek()');
 		return $this->result->data_seek($counter);
 	}
 }

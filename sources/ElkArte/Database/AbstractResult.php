@@ -37,7 +37,7 @@ abstract class AbstractResult
 	protected $details = null;
 
 	/**
-	 * Private constructor.
+	 * Constructor.
 	 * @param $result
 	 * @param null $details
 	 */
@@ -45,6 +45,14 @@ abstract class AbstractResult
 	{
 		$this->result = $result;
 		$this->details = $details ?? new ValuesContainer();
+	}
+
+	/**
+	 * Returns the result object as obtained from the query function
+	 */
+	public function getResultObject()
+	{
+		return $this->result;
 	}
 
 	/**

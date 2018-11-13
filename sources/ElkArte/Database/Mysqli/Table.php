@@ -295,7 +295,7 @@ class DbTable_MySQL extends \ElkArte\Database\AbstractTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_calculate_type($type_name, $type_size = null, $reverse = false)
+	public function calculate_type($type_name, $type_size = null, $reverse = false)
 	{
 		// MySQL is actually the generic baseline.
 		return array($type_name, $type_size);
@@ -451,7 +451,7 @@ class DbTable_MySQL extends \ElkArte\Database\AbstractTable
 
 		// Sort out the size... and stuff...
 		$column['size'] = isset($column['size']) && is_numeric($column['size']) ? $column['size'] : null;
-		list ($type, $size) = $this->db_calculate_type($column['type'], $column['size']);
+		list ($type, $size) = $this->calculate_type($column['type'], $column['size']);
 
 		// Allow unsigned integers (mysql only)
 		$unsigned = in_array($type, array('int', 'tinyint', 'smallint', 'mediumint', 'bigint', 'float')) && !empty($column['unsigned']) ? 'unsigned ' : '';
