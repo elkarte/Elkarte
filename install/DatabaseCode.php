@@ -105,7 +105,7 @@ if (class_exists('\\ElkArte\\Database\\Mysqli\\Table'))
 		*
 		* @param object $db - A Database_MySQL object
 		*/
-		protected function __construct($db, $db_prefix)
+		public function __construct($db, $db_prefix)
 		{
 			// We are doing install, of course we want to do any remove on these
 			$this->_reservedTables = array();
@@ -237,7 +237,7 @@ if (class_exists('\\ElkArte\\Database\\Postgresql\\Table'))
 		*
 		* @param object $db - A DbTable_PostgreSQL object
 		*/
-		protected function __construct($db, $db_prefix)
+		public function __construct($db, $db_prefix)
 		{
 			// We are doing install, of course we want to do any remove on these
 			$this->_reservedTables = array();

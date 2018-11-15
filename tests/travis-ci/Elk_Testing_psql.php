@@ -25,7 +25,7 @@ class DbTable_PostgreSQL_Install extends \ElkArte\Database\Postgresql\Table
 	 *
 	 * @param object $db - A Database_PostgreSQL object
 	 */
-	protected function __construct($db, $db_prefix)
+	public function __construct($db, $db_prefix)
 	{
 		global $db_prefix;
 

@@ -24,7 +24,7 @@ class DbTable_MySQL_Install extends \ElkArte\Database\Mysqli\Table
 	 *
 	 * @param object $db - A Database_MySQL object
 	 */
-	protected function __construct($db, $db_prefix)
+	public function __construct($db, $db_prefix)
 	{
 		global $db_prefix;
 
