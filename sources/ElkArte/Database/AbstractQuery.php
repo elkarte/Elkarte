@@ -628,60 +628,60 @@ abstract class AbstractQuery implements DatabaseInterface
 	 * Temporary function to supoprt migration to the new schema of the db layer
 	 * @deprecated since 2.0
 	 */
-	public function fetch_row()
+	public function fetch_row($result)
 	{
 // 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::fetch_row()', 'Result::fetch_row()');
-		return $this->result->fetch_row();
+		return $result->fetch_row();
 	}
 
 	/**
 	 * Temporary function to supoprt migration to the new schema of the db layer
 	 * @deprecated since 2.0
 	 */
-	public function fetch_assoc()
+	public function fetch_assoc($result)
 	{
 // 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::fetch_assoc()', 'Result::fetch_assoc()');
-		return $this->result->fetch_assoc();
+		return $result->fetch_assoc();
 	}
 
 	/**
 	 * Temporary function to supoprt migration to the new schema of the db layer
 	 * @deprecated since 2.0
 	 */
-	public function free_result()
+	public function free_result($result)
 	{
 // 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::free_result()', 'Result::free_result()');
-		return $this->result->free_result();
+		return $result->free_result();
 	}
 
 	/**
 	 * Temporary function to supoprt migration to the new schema of the db layer
 	 * @deprecated since 2.0
 	 */
-	public function affected_rows()
+	public function affected_rows($result)
 	{
 // 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::affected_rows()', 'Result::affected_rows()');
-		return $this->result->affected_rows();
+		return $result->affected_rows();
 	}
 
 	/**
 	 * Temporary function to supoprt migration to the new schema of the db layer
 	 * @deprecated since 2.0
 	 */
-	public function num_rows()
+	public function num_rows($result)
 	{
 // 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::num_rows()', 'Result::num_rows()');
-		return $this->result->num_rows();
+		return $result->num_rows();
 	}
 
 	/**
 	 * Temporary function to supoprt migration to the new schema of the db layer
 	 * @deprecated since 2.0
 	 */
-	public function num_fields()
+	public function num_fields($result)
 	{
 // 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::num_fields()', 'Result::num_fields()');
-		return $this->result->num_fields();
+		return $result->num_fields();
 	}
 
 	/**
@@ -698,9 +698,9 @@ abstract class AbstractQuery implements DatabaseInterface
 	 * Temporary function to supoprt migration to the new schema of the db layer
 	 * @deprecated since 2.0
 	 */
-	public function data_seek($request, $counter)
+	public function data_seek($result, $counter)
 	{
 // 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::data_seek()', 'Result::data_seek()');
-		return $this->result->data_seek($counter);
+		return $result->data_seek($counter);
 	}
 }
