@@ -24,21 +24,39 @@ namespace ElkArte\Database;
 abstract class AbstractDump
 {
 	/**
-	 * Holds current instance of the class
+	 * Holds current instance of the db class
 	 *
-	 * @var \ElkArte\Database\Mysqli\Query
+	 * @var \ElkArte\Database\DatabaseInterface
 	 */
-	private static $_db = null;
+	protected $_db = null;
+
+	/**
+	 * Holds current instance of the tables-related class
+	 *
+	 * @var \ElkArte\Database\AbstractTable
+	 */
+	protected $_db_table = null;
+
+	/**
+	 * The db prefix
+	 *
+	 * @var string
+	 */
+	protected $_db_prefix = '';
 
 	/**
 	 * Initializes a database connection.
 	 * It returns the connection, if successful.
 	 *
-	 * @param \ElkArte\Database\Mysqli\Query $db
+	 * @param \ElkArte\Database\DatabaseInterface $db
+	 * @param \ElkArte\Database\AbstractTable|null $db_table
+	 * @param string|null $db_prefix
 	 */
-	public function __construct($db)
+	public function __construct($db, $db_table = null, $db_prefix = null)
 	{
 		$this->_db = $db;
+		$this->_db_table = $db_table;
+		$this->_db_prefix = $db_prefix;
 	}
 
 	/**

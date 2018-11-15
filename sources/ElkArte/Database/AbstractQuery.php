@@ -703,4 +703,10 @@ abstract class AbstractQuery implements DatabaseInterface
 // 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::data_seek()', 'Result::data_seek()');
 		return $result->data_seek($counter);
 	}
+
+	/**
+	 * Temporary function to supoprt migration to the new schema of the db layer
+	 * @deprecated since 2.0
+	 */
+	abstract public function db_list_tables($db_name_str = false, $filter = false);
 }

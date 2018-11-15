@@ -38,7 +38,7 @@ class Dump extends \ElkArte\Database\AbstractDump
 		$seq_create = '';
 
 		// Find all the fields.
-		$result = $this->query('', '
+		$result = $this->_db->query('', '
 			SELECT column_name, column_default, is_nullable, data_type, character_maximum_length
 			FROM information_schema.columns
 			WHERE table_name = {string:table}
@@ -47,7 +47,7 @@ class Dump extends \ElkArte\Database\AbstractDump
 				'table' => $tableName,
 			)
 		);
-		while ($row = $this->fetch_assoc($result))
+		while ($row = $result->fetch_assoc())
 		{
 			if ($row['data_type'] == 'character varying')
 				$row['data_type'] = 'varchar';
@@ -69,7 +69,7 @@ class Dump extends \ElkArte\Database\AbstractDump
 				if (preg_match('~nextval\(\'(.+?)\'(.+?)*\)~i', $row['column_default'], $matches) != 0)
 				{
 					// Get to find the next variable first!
-					$count_req = $this->query('', '
+					$count_req = $this->_db->query('', '
 						SELECT MAX("{raw:column}")
 						FROM {raw:table}',
 						array(
@@ -77,8 +77,8 @@ class Dump extends \ElkArte\Database\AbstractDump
 							'table' => $tableName,
 						)
 					);
-					list ($max_ind) = $this->fetch_row($count_req);
-					$this->free_result($count_req);
+					list ($max_ind) = $count_req->fetch_row();
+					$count_req->free_result();
 
 					// Get the right bloody start!
 					$seq_create .= 'CREATE SEQUENCE ' . $matches[1] . ' START WITH ' . ($max_ind + 1) . ';' . $crlf . $crlf;
@@ -87,12 +87,12 @@ class Dump extends \ElkArte\Database\AbstractDump
 
 			$schema_create .= ',' . $crlf;
 		}
-		$this->free_result($result);
+		$result->free_result();
 
 		// Take off the last comma.
 		$schema_create = substr($schema_create, 0, -strlen($crlf) - 1);
 
-		$result = $this->query('', '
+		$result = $this->_db->query('', '
 			SELECT CASE WHEN i.indisprimary THEN 1 ELSE 0 END AS is_primary, pg_get_indexdef(i.indexrelid) AS inddef
 			FROM pg_class AS c
 				INNER JOIN pg_index AS i ON (i.indrelid = c.oid)
@@ -103,7 +103,7 @@ class Dump extends \ElkArte\Database\AbstractDump
 			)
 		);
 
-		while ($row = $this->fetch_assoc($result))
+		while ($row = $result->fetch_assoc())
 		{
 			if ($row['is_primary'])
 			{
@@ -115,7 +115,7 @@ class Dump extends \ElkArte\Database\AbstractDump
 			else
 				$index_create .= $crlf . $row['inddef'] . ';';
 		}
-		$this->free_result($result);
+		$result->free_result();
 
 		// Finish it off!
 		$schema_create .= $crlf . ');';
@@ -128,7 +128,7 @@ class Dump extends \ElkArte\Database\AbstractDump
 	 */
 	public function db_list_tables($db_name_str = false, $filter = false)
 	{
-		$request = $this->query('', '
+		$request = $this->_db->query('', '
 			SELECT tablename
 			FROM pg_tables
 			WHERE schemaname = {string:schema_public}' . ($filter === false ? '' : '
@@ -140,9 +140,9 @@ class Dump extends \ElkArte\Database\AbstractDump
 			)
 		);
 		$tables = array();
-		while ($row = $this->fetch_row($request))
+		while ($row = $request->fetch_row())
 			$tables[] = $row[0];
-		$this->free_result($request);
+		$request->free_result();
 
 		return $tables;
 	}
@@ -155,11 +155,10 @@ class Dump extends \ElkArte\Database\AbstractDump
 		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
 
 		// Do we need to drop it first?
-		$db_table = db_table();
-		$db_table->db_drop_table($backup_table);
+		$this->_db_table->db_drop_table($backup_table);
 
 		// @todo Should we create backups of sequences as well?
-		$this->query('', '
+		$this->_db->query('', '
 			CREATE TABLE {raw:backup_table}
 			(
 				LIKE {raw:table}
@@ -171,7 +170,7 @@ class Dump extends \ElkArte\Database\AbstractDump
 			)
 		);
 
-		$this->query('', '
+		$this->_db->query('', '
 			INSERT INTO {raw:backup_table}
 			SELECT * FROM {raw:table}',
 			array(
@@ -200,7 +199,7 @@ class Dump extends \ElkArte\Database\AbstractDump
 		// This will be handy...
 		$crlf = "\r\n";
 
-		$result = $this->query('', '
+		$result = $this->_db->query('', '
 			SELECT *
 			FROM ' . $tableName . '
 			LIMIT ' . $start . ', ' . $limit,
@@ -210,22 +209,22 @@ class Dump extends \ElkArte\Database\AbstractDump
 		);
 
 		// The number of rows, just for record keeping and breaking INSERTs up.
-		$num_rows = $this->num_rows($result);
+		$num_rows = $result->num_rows();
 
 		if ($num_rows == 0)
 			return '';
 
 		if ($new_table)
 		{
-			$fields = array_keys($this->fetch_assoc($result));
-			$this->data_seek($result, 0);
+			$fields = array_keys($result->fetch_assoc());
+			$result->data_seek(0);
 		}
 
 		// Start it off with the basic INSERT INTO.
 		$insert_msg = 'INSERT INTO ' . $tableName . $crlf . "\t" . '(' . implode(', ', $fields) . ')' . $crlf . 'VALUES ' . $crlf . "\t";
 
 		// Loop through each row.
-		while ($row = $this->fetch_assoc($result))
+		while ($row = $result->fetch_assoc())
 		{
 			// Get the fields in this row...
 			$field_list = array();
@@ -238,13 +237,13 @@ class Dump extends \ElkArte\Database\AbstractDump
 				elseif (is_numeric($item) && (int) $item == $item)
 					$field_list[] = $item;
 				else
-					$field_list[] = '\'' . $this->escape_string($item) . '\'';
+					$field_list[] = '\'' . $this->_db->escape_string($item) . '\'';
 			}
 
 			// 'Insert' the data.
 			$data .= $insert_msg . '(' . implode(', ', $field_list) . ');' . $crlf;
 		}
-		$this->free_result($result);
+		$result->free_result();
 
 		$data .= $crlf;
 

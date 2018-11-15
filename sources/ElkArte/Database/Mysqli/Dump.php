@@ -39,14 +39,14 @@ namespace ElkArte\Database\Mysqli;
 		$schema_create .= 'CREATE TABLE `' . $tableName . '` (' . $crlf;
 
 		// Find all the fields.
-		$result = $this->query('', '
+		$result = $this->_db->query('', '
 			SHOW FIELDS
 			FROM `{raw:table}`',
 			array(
 				'table' => $tableName,
 			)
 		);
-		while ($row = $this->fetch_assoc($result))
+		while ($row = $result->fetch_assoc())
 		{
 			// Make the CREATE for this column.
 			$schema_create .= ' `' . $row['Field'] . '` ' . $row['Type'] . ($row['Null'] != 'YES' ? ' NOT NULL' : '');
@@ -64,20 +64,20 @@ namespace ElkArte\Database\Mysqli;
 					$type = strtolower($row['Type']);
 					$isNumericColumn = strpos($type, 'int') !== false || strpos($type, 'bool') !== false || strpos($type, 'bit') !== false || strpos($type, 'float') !== false || strpos($type, 'double') !== false || strpos($type, 'decimal') !== false;
 
-					$schema_create .= ' default ' . ($isNumericColumn ? $row['Default'] : '\'' . $this->escape_string($row['Default']) . '\'');
+					$schema_create .= ' default ' . ($isNumericColumn ? $row['Default'] : '\'' . $this->_db->escape_string($row['Default']) . '\'');
 				}
 			}
 
 			// And now any extra information. (such as auto_increment.)
 			$schema_create .= ($row['Extra'] != '' ? ' ' . $row['Extra'] : '') . ',' . $crlf;
 		}
-		$this->free_result($result);
+		$result->free_result();
 
 		// Take off the last comma.
 		$schema_create = substr($schema_create, 0, -strlen($crlf) - 1);
 
 		// Find the keys.
-		$result = $this->query('', '
+		$result = $this->_db->query('', '
 			SHOW KEYS
 			FROM `{raw:table}`',
 			array(
@@ -85,7 +85,7 @@ namespace ElkArte\Database\Mysqli;
 			)
 		);
 		$indexes = array();
-		while ($row = $this->fetch_assoc($result))
+		while ($row = $result->fetch_assoc())
 		{
 			// Is this a primary key, unique index, or regular index?
 			$row['Key_name'] = $row['Key_name'] == 'PRIMARY' ? 'PRIMARY KEY' : (empty($row['Non_unique']) ? 'UNIQUE ' : ($row['Comment'] == 'FULLTEXT' || (isset($row['Index_type']) && $row['Index_type'] == 'FULLTEXT') ? 'FULLTEXT ' : 'KEY ')) . '`' . $row['Key_name'] . '`';
@@ -100,7 +100,7 @@ namespace ElkArte\Database\Mysqli;
 			else
 				$indexes[$row['Key_name']][$row['Seq_in_index']] = '`' . $row['Column_name'] . '`';
 		}
-		$this->free_result($result);
+		$result->free_result();
 
 		// Build the CREATEs for the keys.
 		foreach ($indexes as $keyname => $columns)
@@ -112,15 +112,15 @@ namespace ElkArte\Database\Mysqli;
 		}
 
 		// Now just get the comment and type... (MyISAM, etc.)
-		$result = $this->query('', '
+		$result = $this->_db->query('', '
 			SHOW TABLE STATUS
 			LIKE {string:table}',
 			array(
 				'table' => strtr($tableName, array('_' => '\\_', '%' => '\\%')),
 			)
 		);
-		$row = $this->fetch_assoc($result);
-		$this->free_result($result);
+		$row = $result->fetch_assoc();
+		$result->free_result();
 
 		// Probably MyISAM.... and it might have a comment.
 		$schema_create .= $crlf . ') ENGINE=' . (isset($row['Type']) ? $row['Type'] : $row['Engine']) . ($row['Comment'] != '' ? ' COMMENT="' . $row['Comment'] . '"' : '');
@@ -139,7 +139,7 @@ namespace ElkArte\Database\Mysqli;
 		$db_name_str = trim($db_name_str);
 		$filter = $filter === false ? '' : ' LIKE \'' . $filter . '\'';
 
-		$request = $this->query('', '
+		$request = $this->_db->query('', '
 			SHOW TABLES
 			FROM `{raw:db_name_str}`
 			{raw:filter}',
@@ -149,11 +149,11 @@ namespace ElkArte\Database\Mysqli;
 			)
 		);
 		$tables = array();
-		while ($row = $this->fetch_row($request))
+		while ($row = $request->fetch_row())
 		{
 			$tables[] = $row[0];
 		}
-		$this->free_result($request);
+		$request->free_result();
 
 		return $tables;
 	}
@@ -166,11 +166,10 @@ namespace ElkArte\Database\Mysqli;
 		$table = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// First, get rid of the old table.
-		$db_table = db_table();
-		$db_table->db_drop_table($backup_table);
+		$this->_db_table->db_drop_table($backup_table);
 
 		// Can we do this the quick way?
-		$result = $this->query('', '
+		$result = $this->_db->query('', '
 			CREATE TABLE {raw:backup_table} LIKE {raw:table}',
 			array(
 				'backup_table' => $backup_table,
@@ -179,7 +178,7 @@ namespace ElkArte\Database\Mysqli;
 		// If this failed, we go old school.
 		if ($result)
 		{
-			$request = $this->query('', '
+			$request = $this->_db->query('', '
 				INSERT INTO {raw:backup_table}
 				SELECT *
 				FROM {raw:table}',
@@ -194,14 +193,14 @@ namespace ElkArte\Database\Mysqli;
 		}
 
 		// At this point, the quick method failed.
-		$result = $this->query('', '
+		$result = $this->_db->query('', '
 			SHOW CREATE TABLE {raw:table}',
 			array(
 				'table' => $table,
 			)
 		);
-		list (, $create) = $this->fetch_row($result);
-		$this->free_result($result);
+		list (, $create) = $result->fetch_row();
+		$result->free_result();
 
 		$create = preg_split('/[\n\r]/', $create);
 
@@ -249,7 +248,7 @@ namespace ElkArte\Database\Mysqli;
 		else
 			$create = '';
 
-		$request = $this->query('', '
+		$request = $this->_db->query('', '
 			CREATE TABLE {raw:backup_table} {raw:create}
 			ENGINE={raw:engine}' . (empty($charset) ? '' : ' CHARACTER SET {raw:charset}' . (empty($collate) ? '' : ' COLLATE {raw:collate}')) . '
 			SELECT *
@@ -269,7 +268,7 @@ namespace ElkArte\Database\Mysqli;
 			if (preg_match('~\`(.+?)\`\s~', $auto_inc, $match) != 0 && substr($auto_inc, -1, 1) == ',')
 				$auto_inc = substr($auto_inc, 0, -1);
 
-			$this->query('', '
+			$this->_db->query('', '
 				ALTER TABLE {raw:backup_table}
 				CHANGE COLUMN {raw:column_detail} {raw:auto_inc}',
 				array(
@@ -301,7 +300,7 @@ namespace ElkArte\Database\Mysqli;
 		// This will be handy...
 		$crlf = "\r\n";
 
-		$result = $this->query('', '
+		$result = $this->_db->query('', '
 			SELECT /*!40001 SQL_NO_CACHE */ *
 			FROM `' . $tableName . '`
 			LIMIT ' . $start . ', ' . $limit,
@@ -311,22 +310,22 @@ namespace ElkArte\Database\Mysqli;
 		);
 
 		// The number of rows, just for record keeping and breaking INSERTs up.
-		$num_rows = $this->num_rows($result);
+		$num_rows = $result->num_rows();
 
 		if ($num_rows == 0)
 			return '';
 
 		if ($new_table)
 		{
-			$fields = array_keys($this->fetch_assoc($result));
-			$this->data_seek($result, 0);
+			$fields = array_keys($result->fetch_assoc());
+			$result->data_seek(0);
 		}
 
 		// Start it off with the basic INSERT INTO.
 		$data = 'INSERT INTO `' . $tableName . '`' . $crlf . "\t" . '(`' . implode('`, `', $fields) . '`)' . $crlf . 'VALUES ';
 
 		// Loop through each row.
-		while ($row = $this->fetch_assoc($result))
+		while ($row = $result->fetch_assoc())
 		{
 			// Get the fields in this row...
 			$field_list = array();
@@ -345,7 +344,7 @@ namespace ElkArte\Database\Mysqli;
 			$data .= '(' . implode(', ', $field_list) . '),' . $crlf . "\t";
 		}
 
-		$this->free_result($result);
+		$result->free_result();
 		$data = substr(trim($data), 0, -1) . ';' . $crlf . $crlf;
 
 		$start += $limit;
