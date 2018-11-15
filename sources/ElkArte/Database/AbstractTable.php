@@ -382,10 +382,7 @@ abstract class AbstractTable
 	 */
 	public function table_exists($table_name)
 	{
-		// Grab ourselves one o'these.
-		$db = database();
-
-		$filter = $db->db_list_tables(false, $table_name);
+		$filter = $this->_db->db_list_tables(false, $table_name);
 		return !empty($filter);
 	}
 
