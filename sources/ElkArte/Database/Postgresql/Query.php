@@ -197,8 +197,10 @@ class Query extends AbstractQuery
 			elseif (strpos($clean, 'benchmark') !== false && preg_match('~(^|[^a-z])benchmark($|[^[a-z])~s', $clean) != 0)
 				$fail = true;
 
-			if (!empty($fail) && class_exists('\\ElkArte\\Errors\\Errors'))transaction
+			if (!empty($fail) && class_exists('\\ElkArte\\Errors\\Errors'))
+			{
 				$this->error_backtrace('Hacking attempt...', 'Hacking attempt...' . "\n" . $db_string, E_USER_ERROR, __FILE__, __LINE__);
+			}
 
 			// If we are updating something, better start a transaction so that indexes may be kept consistent
 			if (!$this->_in_transaction && strpos($clean, 'update') !== false)

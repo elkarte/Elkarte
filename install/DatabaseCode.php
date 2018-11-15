@@ -94,9 +94,9 @@ class DbTableWrapper
 	}
 }
 
-if (class_exists('DbTable_MySQL'))
+if (class_exists('\\ElkArte\\Database\\Mysqli\\Table'))
 {
-	class DbTable_MySQL_Install extends DbTable_MySQL
+	class DbTable_MySQL_Install extends \ElkArte\Database\Mysqli\Table
 	{
 		public static $_tbl_inst = null;
 
@@ -226,7 +226,7 @@ if (class_exists('DbTable_MySQL'))
 	}
 }
 
-if (class_exists('DbTable_PostgreSQL'))
+if (class_exists('\\ElkArte\\Database\\Postgresql\\Table'))
 {
 	class DbTable_PostgreSQL_Install extends DbTable_PostgreSQL
 	{

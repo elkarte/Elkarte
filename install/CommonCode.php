@@ -492,26 +492,38 @@ function load_possible_databases($type = null)
 /**
  * This handy function loads some settings and the like.
  */
-function load_database()
+function load_database($force = false)
 {
 	global $db_prefix, $db_connection, $db_type, $db_name, $db_user, $db_persist, $db_server, $db_passwd, $db_port;
 
 	// Connect the database.
-	if (empty($db_connection))
+	if (empty($db_connection) || $force === true)
 	{
 		if (!defined('SOURCEDIR'))
 			define('SOURCEDIR', TMP_BOARDDIR . '/sources');
 
-		// Need this to check whether we need the database password.
-		require(TMP_BOARDDIR . '/Settings.php');
+		if (empty($db_prefix) || $force === true)
+		{
+			// Need this to check whether we need the database password.
+			require(TMP_BOARDDIR . '/Settings.php');
+		}
 
 		if (!defined('ELK'))
 			define('ELK', 1);
 
-		require_once(SOURCEDIR . '/database/Database.subs.php');
-		require_once(__DIR__ . '/DatabaseCode.php');
+		if (empty($db_connection))
+		{
+			require_once(EXTDIR . '/ClassLoader.php');
 
-		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'port' => $db_port), $db_type);
+			$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
+			$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
+			$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
+			$loader->register();
+
+			require_once(SOURCEDIR . '/database/Database.subs.php');
+		}
+
+		$db_connection = database(false, true);
 	}
 
 	return database();
@@ -526,10 +538,7 @@ function db_table_install()
 
 	$db = load_database();
 
-	require_once(SOURCEDIR . '/database/DbTable.class.php');
-	require_once(SOURCEDIR . '/database/DbTable-' . $db_type . '.php');
-
-	return call_user_func(array('DbTable_' . DB_TYPE . '_Install', 'db_table'), $db, $db_prefix);
+	return call_user_func(array('DbTable_' . DB_TYPE . '_Install', 'db_table'), $db);
 }
 
 /**

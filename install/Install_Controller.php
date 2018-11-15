@@ -541,10 +541,21 @@ class Install_Controller
 			if (!defined('SOURCEDIR'))
 				define('SOURCEDIR', TMP_BOARDDIR . '/sources');
 
+			require_once(EXTDIR . '/ClassLoader.php');
+
+			$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
+			$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
+			$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
+			$loader->register();
+
+			$db_type = strtolower($db_type);
+			$db_type = $db_type === 'mysql' ? 'mysqli' : $db_type;
+			$class = '\\ElkArte\\Database\\' . ucfirst($db_type) . '\\Connection';
+
 			// Better find the database file!
-			if (!file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.class.php'))
+			if (!class_exists($class))
 			{
-				$incontext['error'] = sprintf($txt['error_db_file'], 'Db-' . $db_type . '.class.php');
+				$incontext['error'] = sprintf($txt['error_db_file'], $class . '\\Connection.php');
 				return false;
 			}
 
@@ -555,16 +566,17 @@ class Install_Controller
 			require_once(SOURCEDIR . '/database/Database.subs.php');
 
 			// Attempt a connection.
-			$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
-			$db = database();
+			// @todo This global $db_connection is currently required, but it may be possible to remove it
+			$db = $db_connection = load_database();
 
 			// No dice?  Let's try adding the prefix they specified, just in case they misread the instructions ;)
-			if ($db_connection === null)
+			if ($db === null)
 			{
 				$db_error = $db->last_error();
 
-				$db_connection = elk_db_initiate($db_server, $db_name, $_POST['db_prefix'] . $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
-				if ($db_connection !== null)
+				$db_user = $_POST['db_prefix'] . $db_user;
+				$db = load_database(true);
+				if ($db !== null)
 				{
 					$db_user = $_POST['db_prefix'] . $db_user;
 					updateSettingsFile(array('db_user' => $db_user));
@@ -572,7 +584,7 @@ class Install_Controller
 			}
 
 			// Still no connection?  Big fat error message :P.
-			if (!$db_connection)
+			if (!$db)
 			{
 				$incontext['error'] = $txt['error_db_connect'] . '<div style="margin: 2.5ex; font-family: monospace;"><strong>' . $db_error . '</strong></div>';
 				return false;
@@ -594,23 +606,21 @@ class Install_Controller
 					CREATE DATABASE IF NOT EXISTS `$db_name`",
 					array(
 						'security_override' => true,
-					),
-					$db_connection
+					)
 				);
 
 				// Okay, let's try the prefix if it didn't work...
-				if (!$db->select_db($db_name, $db_connection) && $db_name != '')
+				if (!$db->select_db($db_name) && $db_name != '')
 				{
 					$db->skip_next_error();
 					$db->query('', "
 						CREATE DATABASE IF NOT EXISTS `$_POST[db_prefix]$db_name`",
 						array(
 							'security_override' => true,
-						),
-						$db_connection
+						)
 					);
 
-					if ($db->select_db($_POST['db_prefix'] . $db_name, $db_connection))
+					if ($db->select_db($_POST['db_prefix'] . $db_name))
 					{
 						$db_name = $_POST['db_prefix'] . $db_name;
 						updateSettingsFile(array('db_name' => $db_name));
@@ -618,7 +628,7 @@ class Install_Controller
 				}
 
 				// Okay, now let's try to connect...
-				if (!$db->select_db($db_name, $db_connection))
+				if (!$db->select_db($db_name))
 				{
 					$incontext['error'] = sprintf($txt['error_db_database'], $db_name);
 					return false;
@@ -868,7 +878,7 @@ class Install_Controller
 
 		// Let's optimize those new tables.
 		$tables = $db->db_list_tables($db_name, $db_prefix . '%');
-		$db_table = db_table();
+		$db_table = db_table($db);
 		foreach ($tables as $table)
 		{
 			if ($db_table->optimize($table) == -1)

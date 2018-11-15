@@ -661,11 +661,7 @@ class Query extends AbstractQuery
 	}
 
 	/**
-	 * Select database.
-	 *
-	 * @param string|null $dbName = null
-	 *
-	 * @return bool
+	 * {@inheritdoc}
 	 */
 	public function select_db($dbName = null)
 	{

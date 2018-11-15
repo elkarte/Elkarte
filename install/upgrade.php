@@ -500,15 +500,6 @@ function loadEssentialData()
 
 		$db = load_database();
 
-		$db->skip_next_error();
-		if ($db_type == 'mysql' && isset($db_character_set) && preg_match('~^\w+$~', $db_character_set) === 1)
-		{
-			$db->query('', '
-				SET NAMES ' . $db_character_set,
-				array()
-			);
-		}
-
 		// Load the modSettings data...
 		$db->skip_next_error();
 		$request = $db->query('', '

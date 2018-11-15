@@ -35,15 +35,18 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
  * Retrieve existing instance of the active database class.
  *
  * @param bool $fatal - Stop the execution or throw an \Exception
+ * @param bool $force - Force the re-creation of the database instance.
+ *                      If set to true, from that moment onwards the old
+ *                      instance will be lost and only the new one returned
  *
  * @return \ElkArte\DatabaseInterface
  * @throws \Exception
  */
-function database($fatal = true)
+function database($fatal = true, $force = false)
 {
 	static $db = null;
 
-	if ($db === null)
+	if ($db === null || $force === true)
 	{
 		global $db_persist, $db_server, $db_user, $db_passwd, $db_port;
 		global $db_type, $db_name, $db_prefix, $mysql_set_mode;
@@ -78,13 +81,13 @@ function database($fatal = true)
 }
 
 /**
- * This function retrieves an existing instance of DbTable
+ * This function retrieves an existing instance of \ElkArte\AbstractTable
  * and returns it.
  *
- * @param object|null $db - A database object (e.g. Database_MySQL or Database_PostgreSQL)
+ * @param object|null $db - A database object (e.g. \ElkArte\Mysqli\Query)
  * @param bool $fatal - Stop the execution or throw an \Exception
  *
- * @return \ElkArte\DatabaseInterface
+ * @return \ElkArte\AbstractTable
  * @throws \Exception
  */
 function db_table($db = null, $fatal = false)
@@ -94,7 +97,10 @@ function db_table($db = null, $fatal = false)
 
 	if ($db_table === null)
 	{
-		$db = database();
+		if ($db === null)
+		{
+			$db = database();
+		}
 		$db_type = strtolower($db_type);
 		$db_type = $db_type === 'mysql' ? 'mysqli' : $db_type;
 		$class = '\\ElkArte\\Database\\' . ucfirst($db_type) . '\\Table';
@@ -119,14 +125,15 @@ function db_table($db = null, $fatal = false)
 }
 
 /**
- * This function returns an instance of DbSearch,
+ * This function returns an instance of \ElkArte\AbstractSearch,
  * specifically designed for database utilities related to search.
  *
- * @return DbSearch
- *
+ * @return \ElkArte\AbstractSearch
+ * @throws \Exception
  */
 function db_search()
 {
+	global $db_type;
 	static $db_search = null;
 
 	if ($db_search === null)

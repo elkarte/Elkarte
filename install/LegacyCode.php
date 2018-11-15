@@ -23,7 +23,7 @@ function textfield_alter($change, $substep)
 {
 	global $db_prefix;
 
-	$db = database();
+	$db = load_database();
 
 	$db->skip_next_error();
 	$request = $db->query('', '
@@ -111,7 +111,7 @@ function checkChange(&$change)
 	global $db_type, $databases, $db_connection;
 	static $database_version, $where_field_support;
 
-	$db = database();
+	$db = load_database();
 
 	// Attempt to find a database_version.
 	if (empty($database_version))

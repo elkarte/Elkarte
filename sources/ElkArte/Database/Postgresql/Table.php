@@ -307,7 +307,7 @@ class Table extends \ElkArte\Database\AbstractTable
 				DROP COLUMN ' . $column_info['name']);
 			$this->_alter_table($table_name, '
 				RENAME COLUMN ' . $column_info['name'] . '_tempxx TO ' . $column_info['name']);
-			$this->_db->('commit');
+			$this->_db->transaction('commit');
 		}
 
 		// Finally - auto increment?!
