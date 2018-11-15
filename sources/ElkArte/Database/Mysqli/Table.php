@@ -16,6 +16,8 @@
  *
  */
 
+namespace ElkArte\Database\Mysqli;
+
 /**
  * Adds MySQL table level functionality,
  * Table creation / dropping, column adding / removing

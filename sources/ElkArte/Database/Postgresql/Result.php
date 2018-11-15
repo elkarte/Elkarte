@@ -11,7 +11,7 @@
  *
  */
 
-namespace ElkArte\Database\Mysqli;
+namespace ElkArte\Database\Postgresql;
 
 /**
  * PostgreSQL database class, implements database class to control postgresql functions
