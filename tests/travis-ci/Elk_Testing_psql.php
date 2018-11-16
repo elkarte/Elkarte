@@ -69,14 +69,15 @@ class Elk_Testing_psql extends Elk_Testing_Setup
 {
 	public function init()
 	{
-		global $db_name, $db_prefix, $modSettings;
+		global $db_name, $db_prefix, $db_type, $boardurl, $db_server, $db_user, $db_passwd;
+		global $modSettings;
 
-		$this->_boardurl = 'http://127.0.0.1';
-		$this->_db_server = 'localhost';
-		$this->_db_type = 'postgresql';
+		$boardurl = $this->_boardurl = 'http://127.0.0.1';
+		$db_server = $this->_db_server = 'localhost';
+		$db_type = $this->_db_type = 'postgresql';
 		$db_name = $this->_db_name = 'elkarte_test';
-		$this->_db_user = 'postgres';
-		$this->_db_passwd = '';
+		$db_user = $this->_db_user = 'postgres';
+		$db_passwd = $this->_db_passwd = '';
 		$db_prefix = $this->_db_prefix = 'elkarte_';
 
 		// Start the database interface

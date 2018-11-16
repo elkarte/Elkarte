@@ -38,6 +38,13 @@ class Query extends AbstractQuery
 	private $_db_replace_result = null;
 
 	/**
+	 * Since PostgreSQL doesn't support INSERT REPLACE we are using this to remember
+	 * the rows affected by the delete
+	 * @var int
+	 */
+	private $_in_transaction = false;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public function fix_prefix($db_prefix, $db_name)

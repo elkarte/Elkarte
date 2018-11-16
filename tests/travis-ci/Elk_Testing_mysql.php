@@ -69,14 +69,14 @@ class Elk_Testing_mysql extends Elk_Testing_Setup
 {
 	public function init()
 	{
-		global $db_name, $db_prefix;
+		global $db_name, $db_prefix, $db_type, $boardurl, $db_server, $db_user, $db_passwd;
 
-		$this->_boardurl = 'http://127.0.0.1';
-		$this->_db_server = 'localhost';
-		$this->_db_type = 'mysql';
+		$boardurl = $this->_boardurl = 'http://127.0.0.1';
+		$db_server = $this->_db_server = 'localhost';
+		$db_type = $this->_db_type = 'mysql';
 		$db_name = $this->_db_name = 'elkarte_test';
-		$this->_db_user = 'root';
-		$this->_db_passwd = '';
+		$db_user = $this->_db_user = 'root';
+		$db_passwd = $this->_db_passwd = '';
 		$db_prefix = $this->_db_prefix = 'elkarte_';
 
 		$link = mysqli_connect($this->_db_server, $this->_db_user, $this->_db_passwd);
