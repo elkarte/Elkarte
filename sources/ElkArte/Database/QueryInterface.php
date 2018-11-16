@@ -16,7 +16,7 @@ namespace ElkArte\Database;
 /**
  * Database driver interface
  */
-interface DatabaseInterface
+interface QueryInterface
 {
 	/**
 	 * Fix up the prefix so it doesn't require the database to be selected.
@@ -89,7 +89,7 @@ interface DatabaseInterface
 	 *
 	 * @param string $table
 	 */
-	public function insert_id();
+	public function insert_id($table);
 
 	/**
 	 * Do a transaction.

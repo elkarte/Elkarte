@@ -16,7 +16,7 @@ namespace ElkArte\Database;
 /**
  * Interface methods for database searches
  */
-interface DbSearchInterface
+interface SearchInterface
 {
 	/**
 	 * Execute the appropriate query for the search.

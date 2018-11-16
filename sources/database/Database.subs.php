@@ -23,7 +23,7 @@
  * @param mixed[] $db_options
  * @param string $db_type
  *
- * @return \ElkArte\DatabaseInterface
+ * @return \ElkArte\QueryInterface
  * @throws \Exception
  */
 function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array(), $db_type = 'mysql')
@@ -39,7 +39,7 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
  *                      If set to true, from that moment onwards the old
  *                      instance will be lost and only the new one returned
  *
- * @return \ElkArte\DatabaseInterface
+ * @return \ElkArte\QueryInterface
  * @throws \Exception
  */
 function database($fatal = true, $force = false)

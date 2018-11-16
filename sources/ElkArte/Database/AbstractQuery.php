@@ -21,7 +21,7 @@ namespace ElkArte\Database;
 /**
  * Abstract database class, implements database to control functions
  */
-abstract class AbstractQuery implements DatabaseInterface
+abstract class AbstractQuery implements QueryInterface
 {
 	/**
 	 * Current connection to the database
@@ -688,10 +688,10 @@ abstract class AbstractQuery implements DatabaseInterface
 	 * Temporary function to supoprt migration to the new schema of the db layer
 	 * @deprecated since 2.0
 	 */
-	public function insert_id()
+	public function insert_id($table)
 	{
 // 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::insert_id()', 'Result::insert_id()');
-		return $this->result->insert_id();
+		return $this->result->insert_id($table);
 	}
 
 	/**

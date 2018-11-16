@@ -14,13 +14,13 @@
 namespace ElkArte\Database;
 
 /**
- * The common base for the implementation of DbSearchInterface
+ * The common base for the implementation of SearchInterface
  */
-abstract class AbstractSearch implements DbSearchInterface
+abstract class AbstractSearch implements SearchInterface
 {
 	/**
 	 * The database object
-	 * @var \ElkArte\Database\DatabaseInterface
+	 * @var \ElkArte\Database\QueryInterface
 	 */
 	protected $_db = null;
 

@@ -26,7 +26,7 @@ abstract class AbstractDump
 	/**
 	 * Holds current instance of the db class
 	 *
-	 * @var \ElkArte\Database\DatabaseInterface
+	 * @var \ElkArte\Database\QueryInterface
 	 */
 	protected $_db = null;
 
@@ -48,7 +48,7 @@ abstract class AbstractDump
 	 * Initializes a database connection.
 	 * It returns the connection, if successful.
 	 *
-	 * @param \ElkArte\Database\DatabaseInterface $db
+	 * @param \ElkArte\Database\QueryInterface $db
 	 * @param \ElkArte\Database\AbstractTable|null $db_table
 	 * @param string|null $db_prefix
 	 */
