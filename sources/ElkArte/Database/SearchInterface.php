@@ -67,9 +67,4 @@ interface SearchInterface
 	 * @param mixed[] $indexes default array(), in the format specified.
 	 */
 	public function createTemporaryTable($name, $columns, $indexes);
-
-	/**
-	 * Static method that allows to retrieve or create an instance of this class.
-	 */
-	public static function db_search();
 }

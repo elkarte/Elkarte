@@ -9,7 +9,7 @@
  *
  */
 
-$GLOBALS['databases']['mysql'] = array(
+$GLOBALS['databases']['mysqli'] = array(
 	'name' => 'MySQL',
 	'extension' => 'MySQL Improved (MySQLi)',
 	'version' => '5.0.52',
@@ -24,11 +24,7 @@ $GLOBALS['databases']['mysql'] = array(
 	'default_password' => 'mysqli.default_password',
 	'default_host' => 'mysqli.default_host',
 	'default_port' => 'mysqli.default_port',
-	'utf8_support' => true,
-	'utf8_version' => '4.1.0',
-	'utf8_version_check' => function($db_connection) {
-		return mysqli_get_server_info($db_connection);
-	},
+	'test_collation' => true,
 	'alter_support' => true,
 	'validate_prefix' => function (&$value) {
 		$value = preg_replace('~[^A-Za-z0-9_\$]~', '', $value);

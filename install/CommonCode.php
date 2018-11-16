@@ -499,14 +499,15 @@ function load_database($force = false)
 	// Connect the database.
 	if (empty($db_connection) || $force === true)
 	{
-		if (!defined('SOURCEDIR'))
-			define('SOURCEDIR', TMP_BOARDDIR . '/sources');
-
 		if (empty($db_prefix) || $force === true)
 		{
 			// Need this to check whether we need the database password.
 			require(TMP_BOARDDIR . '/Settings.php');
+			definePaths();
 		}
+
+		if (!defined('SOURCEDIR'))
+			define('SOURCEDIR', TMP_BOARDDIR . '/sources');
 
 		if (!defined('ELK'))
 			define('ELK', 1);
@@ -521,12 +522,42 @@ function load_database($force = false)
 			$loader->register();
 
 			require_once(SOURCEDIR . '/database/Database.subs.php');
+			require_once(TMP_BOARDDIR . '/install/DatabaseCode.php');
 		}
 
 		$db_connection = database(false, true);
 	}
 
 	return database();
+}
+
+function test_db_connection()
+{
+	global $db_persist, $db_server, $db_user, $db_passwd, $db_port;
+	global $db_type, $db_name, $db_prefix, $mysql_set_mode;
+
+	$db_options = [
+		'persist' => $db_persist,
+		'select_db' => false,
+		'port' => $db_port,
+		'mysql_set_mode' => (bool) ($mysql_set_mode ?? false)
+	];
+	$type = strtolower($db_type);
+	$type = $type === 'mysql' ? 'mysqli' : $type;
+	$class = '\\ElkArte\\Database\\' . ucfirst($type) . '\\Connection';
+	try
+	{
+		$db = $class::initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options);
+		if (!defined('DB_TYPE'))
+		{
+			define('DB_TYPE', $db_type);
+		}
+		return $db;
+	}
+	catch (\Exception $e)
+	{
+		return false;
+	}
 }
 
 /**
@@ -538,7 +569,7 @@ function db_table_install()
 
 	$db = load_database();
 
-	return call_user_func(array('DbTable_' . DB_TYPE . '_Install', 'db_table'), $db);
+	return call_user_func_array(array('DbTable_' . $db_type . '_Install', 'db_table'), [$db, $db_prefix]);
 }
 
 /**
@@ -553,11 +584,16 @@ function updateLastError()
 /**
  * Checks the servers database version against our requirements
  */
-function db_version_check()
+function db_version_check($db = null)
 {
 	global $db_type, $databases, $db_connection;
 
-	$current_version = call_user_func($databases[$db_type]['version_check'], $db_connection);
+	if ($db === null)
+	{
+		$db = load_database();
+	}
+
+	$current_version = $db->server_version();
 	$current_version = preg_replace('~\-.+?$~', '', $current_version);
 
 	return version_compare($databases[$db_type]['version'], $current_version, '<=');

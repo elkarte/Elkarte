@@ -62,6 +62,10 @@ class DbTable_MySQL_Install extends \ElkArte\Database\Mysqli\Table
 	}
 }
 
+class DbTable_MySQLi_Install extends DbTable_MySQL_Install
+{
+}
+
 /**
  * Extend Elk_Testing_Setup with MySql values
  */
@@ -86,9 +90,16 @@ class Elk_Testing_mysql extends Elk_Testing_Setup
 		}
 		printf("MySQL server version: %s\n", mysqli_get_server_info($link));
 
-		// Start the database interface
-		$this->_db = \ElkArte\Database\Mysqli\Connection::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd, $this->_db_prefix);
-		$this->_db_table = DbTable_MySQL_Install::db_table($this->_db, $this->_db_prefix);
+		try
+		{
+			// Start the database interface
+			$this->_db = \ElkArte\Database\Mysqli\Connection::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd, $this->_db_prefix, ['select_db' => true]);
+			$this->_db_table = DbTable_MySQL_Install::db_table($this->_db, $this->_db_prefix);
+		}
+		catch (\Exception $e)
+		{
+			die($e->getMessage());
+		}
 
 		// Load the mysql install queries
 		$this->load_queries(BOARDDIR . '/install/install_' . DB_SCRIPT_VERSION . '.php');

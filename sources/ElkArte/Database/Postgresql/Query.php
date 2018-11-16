@@ -239,7 +239,16 @@ class Query extends AbstractQuery
 
 		$this->result = new \ElkArte\Database\Postgresql\Result($this->_db_last_result);
 
-		return $this->result;
+		// This is here only for compatibility with the previous database code.
+		// To remove when all the instances are fixed.
+		if ($this->_db_last_result === false)
+		{
+			return false;
+		}
+		else
+		{
+			return $this->result;
+		}
 	}
 
 	/**

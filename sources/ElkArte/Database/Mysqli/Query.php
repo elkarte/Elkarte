@@ -189,7 +189,16 @@ class Query extends AbstractQuery
 			])
 		);
 
-		return $this->result;
+		// This is here only for compatibility with the previous database code.
+		// To remove when all the instances are fixed.
+		if ($ret === false)
+		{
+			return false;
+		}
+		else
+		{
+			return $this->result;
+		}
 	}
 
 	/**

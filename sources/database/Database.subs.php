@@ -57,9 +57,9 @@ function database($fatal = true, $force = false)
 			'port' => $db_port,
 			'mysql_set_mode' => (bool) ($mysql_set_mode ?? false)
 		];
-		$db_type = strtolower($db_type);
-		$db_type = $db_type === 'mysql' ? 'mysqli' : $db_type;
-		$class = '\\ElkArte\\Database\\' . ucfirst($db_type) . '\\Connection';
+		$type = strtolower($db_type);
+		$type = $type === 'mysql' ? 'mysqli' : $type;
+		$class = '\\ElkArte\\Database\\' . ucfirst($type) . '\\Connection';
 		try
 		{
 			$db = $class::initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options);

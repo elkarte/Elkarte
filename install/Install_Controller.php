@@ -547,10 +547,11 @@ class Install_Controller
 			$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
 			$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
 			$loader->register();
+			require_once(TMP_BOARDDIR . '/install/DatabaseCode.php');
 
-			$db_type = strtolower($db_type);
-			$db_type = $db_type === 'mysql' ? 'mysqli' : $db_type;
-			$class = '\\ElkArte\\Database\\' . ucfirst($db_type) . '\\Connection';
+			$type = strtolower($db_type);
+			$type = $type === 'mysql' ? 'mysqli' : $type;
+			$class = '\\ElkArte\\Database\\' . ucfirst($type) . '\\Connection';
 
 			// Better find the database file!
 			if (!class_exists($class))
@@ -566,8 +567,7 @@ class Install_Controller
 			require_once(SOURCEDIR . '/database/Database.subs.php');
 
 			// Attempt a connection.
-			// @todo This global $db_connection is currently required, but it may be possible to remove it
-			$db = $db_connection = load_database();
+			$db = test_db_connection();
 
 			// No dice?  Let's try adding the prefix they specified, just in case they misread the instructions ;)
 			if ($db === null)
@@ -575,7 +575,7 @@ class Install_Controller
 				$db_error = $db->last_error();
 
 				$db_user = $_POST['db_prefix'] . $db_user;
-				$db = load_database(true);
+				$db = test_db_connection(true);
 				if ($db !== null)
 				{
 					$db_user = $_POST['db_prefix'] . $db_user;
@@ -590,9 +590,13 @@ class Install_Controller
 				return false;
 			}
 
+			// @todo This global $db_connection is currently required bu the upgrade code,
+			// of course it would be much better if gone and passed as argument
+			// it was possible to remove it.
+			$db_connection = $db->connection();
 			// Do they meet the install requirements?
 			// @todo Old client, new server?
-			if (!db_version_check())
+			if (!db_version_check($db))
 			{
 				$incontext['error'] = $txt['error_db_too_low'];
 				return false;
@@ -633,6 +637,7 @@ class Install_Controller
 					$incontext['error'] = sprintf($txt['error_db_database'], $db_name);
 					return false;
 				}
+				$db_connection = load_database();
 			}
 
 			return true;
@@ -703,16 +708,8 @@ class Install_Controller
 			// Make sure it works.
 			require(TMP_BOARDDIR . '/Settings.php');
 
-			// UTF-8 requires a setting to override any language charset.
-			if (!empty($databases[$db_type]['utf8_version_check']) && version_compare($databases[$db_type]['utf8_version'], preg_replace('~\-.+?$~', '', $databases[$db_type]['utf8_version_check']($db_connection)), '>'))
-			{
-				// our uft-8 check support on the db failed ....
-				$incontext['error'] = sprintf($txt['error_utf8_version'], $databases[$db_type]['utf8_version']);
-				return false;
-			}
-			else
-				// Set our db character_set to utf8
-				updateSettingsFile(array('db_character_set' => 'utf8'));
+			// Set our db character_set to utf8
+			updateSettingsFile(array('db_character_set' => 'utf8'));
 
 			// Good, skip on.
 			return true;
@@ -919,6 +916,8 @@ class Install_Controller
 	private function action_adminAccount()
 	{
 		global $txt, $db_type, $db_connection, $databases, $incontext, $db_prefix, $db_passwd, $webmaster_email;
+		global $db_persist, $db_server, $db_user, $db_port;
+		global $db_type, $db_name, $mysql_set_mode;
 
 		$incontext['sub_template'] = 'admin_account';
 		$incontext['page_title'] = $txt['user_settings'];
@@ -1133,6 +1132,7 @@ class Install_Controller
 		$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
 		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
 		$loader->register();
+		require_once(TMP_BOARDDIR . '/install/DatabaseCode.php');
 
 		// Bring a warning over.
 		if (!empty($incontext['account_existed']))
@@ -1140,16 +1140,12 @@ class Install_Controller
 			$incontext['warning'] = $incontext['account_existed'];
 		}
 
-		if (!empty($db_character_set) && !empty($databases[$db_type]['utf8_support']))
-		{
-			$db->skip_next_error();
-			$db->query('', '
-				SET NAMES {raw:db_character_set}',
-				array(
-					'db_character_set' => $db_character_set,
-				)
-			);
-		}
+		$db->skip_next_error();
+		$db->query('', '
+			SET NAMES UTF8',
+			array(
+			)
+		);
 
 		// As track stats is by default enabled let's add some activity.
 		$db->insert('ignore',

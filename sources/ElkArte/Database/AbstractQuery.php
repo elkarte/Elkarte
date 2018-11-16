@@ -631,7 +631,14 @@ abstract class AbstractQuery implements QueryInterface
 	public function fetch_row($result)
 	{
 // 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::fetch_row()', 'Result::fetch_row()');
-		return $result->fetch_row();
+		if ($result === false)
+		{
+			return false;
+		}
+		else
+		{
+			return $result->fetch_row();
+		}
 	}
 
 	/**
@@ -641,7 +648,14 @@ abstract class AbstractQuery implements QueryInterface
 	public function fetch_assoc($result)
 	{
 // 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::fetch_assoc()', 'Result::fetch_assoc()');
-		return $result->fetch_assoc();
+		if ($result === false)
+		{
+			return false;
+		}
+		else
+		{
+			return $result->fetch_assoc();
+		}
 	}
 
 	/**
@@ -651,17 +665,24 @@ abstract class AbstractQuery implements QueryInterface
 	public function free_result($result)
 	{
 // 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::free_result()', 'Result::free_result()');
-		return $result->free_result();
+		if ($result === false)
+		{
+			return;
+		}
+		else
+		{
+			return $result->free_result();
+		}
 	}
 
 	/**
 	 * Temporary function to supoprt migration to the new schema of the db layer
 	 * @deprecated since 2.0
 	 */
-	public function affected_rows($result)
+	public function affected_rows()
 	{
 // 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::affected_rows()', 'Result::affected_rows()');
-		return $result->affected_rows();
+		return $this->result->affected_rows();
 	}
 
 	/**
@@ -671,7 +692,14 @@ abstract class AbstractQuery implements QueryInterface
 	public function num_rows($result)
 	{
 // 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::num_rows()', 'Result::num_rows()');
-		return $result->num_rows();
+		if ($result === false)
+		{
+			return 0;
+		}
+		else
+		{
+			return $result->num_rows();
+		}
 	}
 
 	/**
@@ -681,7 +709,14 @@ abstract class AbstractQuery implements QueryInterface
 	public function num_fields($result)
 	{
 // 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::num_fields()', 'Result::num_fields()');
-		return $result->num_fields();
+		if ($result === false)
+		{
+			return 0;
+		}
+		else
+		{
+			return $result->num_fields();
+		}
 	}
 
 	/**

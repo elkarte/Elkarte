@@ -224,11 +224,14 @@ if (class_exists('\\ElkArte\\Database\\Mysqli\\Table'))
 			return self::$_tbl_inst;
 		}
 	}
+	class DbTable_MySQLi_Install extends DbTable_MySQL_Install
+	{
+	}
 }
 
 if (class_exists('\\ElkArte\\Database\\Postgresql\\Table'))
 {
-	class DbTable_PostgreSQL_Install extends DbTable_PostgreSQL
+	class DbTable_PostgreSQL_Install extends \ElkArte\Database\Postgresql\Table
 	{
 		public static $_tbl_inst = null;
 

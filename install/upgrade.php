@@ -497,6 +497,7 @@ function loadEssentialData()
 		$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
 		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
 		$loader->register();
+		require_once('./DatabaseCode.php');
 
 		$db = load_database();
 
@@ -2115,7 +2116,7 @@ function discoverCollation()
 	$db_collation = '';
 
 	// If we're on MySQL supporting collations then let's find out what the members table uses and put it in a global var - to allow upgrade script to match collations!
-	if (!empty($databases[$db_type]['utf8_support']) && version_compare($databases[$db_type]['utf8_version'], $databases[$db_type]['utf8_version_check']($db_connection), '>'))
+	if (!empty($databases[$db_type]['test_collation']))
 	{
 		$db = load_database();
 
