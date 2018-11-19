@@ -227,7 +227,7 @@ abstract class AbstractMentionMessage implements MentionTypeInterface
 	/**
 	 * {@inheritdoc }
 	 */
-	public function setDb(\Database $db)
+	public function setDb(\ElkArte\Database\QueryInterface $db)
 	{
 		$this->_db = $db;
 	}

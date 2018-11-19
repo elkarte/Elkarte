@@ -447,7 +447,7 @@ class Query extends AbstractQuery
 		}
 
 		$this->result = new \ElkArte\Database\Postgresql\Result(
-			$ret->getResultObject,
+			is_object($ret) ? $ret->getResultObject() : $ret,
 			new \ElkArte\ValuesContainer([
 				'insert_id' => $last_inserted_id,
 				'replaceResults' => $this->_db_replace_result,
@@ -588,6 +588,7 @@ class Query extends AbstractQuery
 	{
 		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
 
+		$this->skip_next_error();
 		// Try get the last ID for the auto increment field.
 		$request = $this->query('', 'SELECT CURRVAL(\'' . $table . '_seq\') AS insertID',
 			array(

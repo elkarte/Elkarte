@@ -60,9 +60,9 @@ interface MentionTypeInterface
 	/**
 	 * Used to inject the database object.
 	 *
-	 * @param \Database $db
+	 * @param \ElkArte\Database\QueryInterface $db
 	 */
-	public function setDb(\Database $db);
+	public function setDb(\ElkArte\Database\QueryInterface $db);
 
 	/**
 	 * Inserts a new mention into the database.

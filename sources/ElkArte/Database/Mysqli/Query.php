@@ -574,7 +574,8 @@ class Query extends AbstractQuery
 			)
 		);
 
-		$this->result = new \ElkArte\Database\Mysqli\Result($ret->getResultObject(),
+		$this->result = new \ElkArte\Database\Mysqli\Result(
+			is_object($ret) ? $ret->getResultObject() : $ret,
 			new \ElkArte\ValuesContainer([
 				'connection' => $this->connection
 			])

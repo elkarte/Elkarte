@@ -28,7 +28,15 @@ class Result extends \ElkArte\Database\AbstractResult
 		elseif ($this->result === null && !($this->details->lastResult))
 			return 0;
 
-		return pg_affected_rows($this->result === null ? $this->details->lastResult : $this->result);
+		$resource = $this->result === null ? $this->details->lastResult : $this->result;
+		if (is_resource($resource))
+		{
+			return pg_affected_rows($resource);
+		}
+		else
+		{
+			return 0;
+		}
 	}
 
 	/**

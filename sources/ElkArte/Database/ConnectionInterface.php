@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * This defines the methods required by a class that establishes the connection
+ * to a database.
+ *
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 2.0 dev
+ *
+ */
+
 namespace ElkArte\Database;
 
 interface ConnectionInterface
