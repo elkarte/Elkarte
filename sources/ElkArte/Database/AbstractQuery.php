@@ -740,6 +740,16 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
+	 * Temporary function: I'm not sure this is the best place to have it, though it was
+	 * convenient while fixing other issues.
+	 * @deprecated since 2.0
+	 */
+	public function supportMediumtext()
+	{
+		return false;
+	}
+
+	/**
 	 * Temporary function to supoprt migration to the new schema of the db layer
 	 * @deprecated since 2.0
 	 */

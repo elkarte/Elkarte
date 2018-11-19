@@ -548,10 +548,7 @@ function test_db_connection()
 	try
 	{
 		$db = $class::initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options);
-		if (!defined('DB_TYPE'))
-		{
-			define('DB_TYPE', $db_type);
-		}
+
 		return $db;
 	}
 	catch (\Exception $e)

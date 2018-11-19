@@ -73,7 +73,7 @@ class Sphinxql extends AbstractAPI
 	public function __construct($config, $searchParams)
 	{
 		// Is this database supported?
-		if (!in_array(DB_TYPE, $this->supported_databases))
+		if (!in_array($this->_db->title(), $this->supported_databases))
 		{
 			$this->is_supported = false;
 

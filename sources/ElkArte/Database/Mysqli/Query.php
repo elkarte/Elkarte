@@ -720,4 +720,12 @@ class Query extends AbstractQuery
 		$dump = new Dump($this);
 		return $dump->db_list_tables($db_name_str, $filter);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function supportMediumtext()
+	{
+		return true;
+	}
 }

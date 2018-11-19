@@ -251,9 +251,10 @@ class ManagePosts extends \ElkArte\AbstractController
 		if (isset($this->_req->query->save))
 		{
 			checkSession();
+			$db = database();
 
 			// If we're changing the message length (and we are using MySQL) let's check the column is big enough.
-			if (isset($this->_req->post->max_messageLength) && $this->_req->post->max_messageLength != $modSettings['max_messageLength'] && DB_TYPE === 'MySQL')
+			if (isset($this->_req->post->max_messageLength) && $this->_req->post->max_messageLength != $modSettings['max_messageLength'] && $db->supportMediumtext())
 			{
 				require_once(SUBSDIR . '/Maintenance.subs.php');
 				$colData = getMessageTableColumns();

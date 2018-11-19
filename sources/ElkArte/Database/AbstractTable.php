@@ -123,6 +123,7 @@ abstract class AbstractTable
 		// With or without the database name, the fullname looks like this.
 		$full_table_name = str_replace('{db_prefix}', $this->_real_prefix(), $table_name);
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
+		print_r(['$table_name' => $table_name]);
 
 		// First - no way do we touch our tables.
 		if (in_array(strtolower($table_name), $this->_reservedTables))

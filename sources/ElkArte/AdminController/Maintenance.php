@@ -195,8 +195,9 @@ class Maintenance extends \ElkArte\AbstractController
 
 		// Set up the sub-template
 		$context['sub_template'] = 'maintain_database';
+		$db = database();
 
-		if (DB_TYPE === 'MySQL')
+		if ($db->supportMediumtext())
 		{
 			$body_type = fetchBodyType();
 
@@ -515,8 +516,9 @@ class Maintenance extends \ElkArte\AbstractController
 
 		// Show me your badge!
 		isAllowedTo('admin_forum');
+		$db = database();
 
-		if (DB_TYPE !== 'MySQL')
+		if ($db->supportMediumtext() === false)
 			return;
 
 		$body_type = '';

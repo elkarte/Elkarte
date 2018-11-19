@@ -179,7 +179,7 @@ abstract class AbstractAPI
 	public function isValid()
 	{
 		// Always fall back to the standard search method.
-		return in_array(DB_TYPE, $this->supported_databases);
+		return in_array($this->_db->title(), $this->supported_databases);
 	}
 
 	/**
