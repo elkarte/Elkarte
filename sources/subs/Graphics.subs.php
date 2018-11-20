@@ -104,7 +104,7 @@ function reencodeImage($fileName, $preferred_format = 0)
  * @param bool   $extensiveCheck = false if it should perform extensive checks
  *
  * @return bool Whether the image appears to be safe
- * @throws Elk_Exception attach_timeout
+ * @throws \ElkArte\Exceptions\Exception attach_timeout
  */
 function checkImageContents($fileName, $extensiveCheck = false)
 {
@@ -112,7 +112,7 @@ function checkImageContents($fileName, $extensiveCheck = false)
 	if (!$fp)
 	{
 		theme()->getTemplates()->loadLanguageFile('Post');
-		throw new Elk_Exception('attach_timeout');
+		throw new \ElkArte\Exceptions\Exception('attach_timeout');
 	}
 
 	$prev_chunk = '';

@@ -720,7 +720,7 @@ function determineVote($id_member, $id_poll)
  */
 function pollStatus($id_topic)
 {
-	Errors::instance()->log_deprecated('pollStatus()', 'pollInfoForTopic()');
+	\ElkArte\Errors\Errors::instance()->log_deprecated('pollStatus()', 'pollInfoForTopic()');
 	return pollInfoForTopic($id_topic);
 }
 
@@ -788,7 +788,7 @@ function getPollChoices($id_poll)
  * @param int $id_topic The id of the topic that has an associated poll
  *
  * @return array
- * @throws Elk_Exception no_board
+ * @throws \ElkArte\Exceptions\Exception no_board
  */
 function getPollStarter($id_topic)
 {
@@ -805,7 +805,7 @@ function getPollStarter($id_topic)
 		)
 	);
 	if ($db->num_rows($request) == 0)
-		throw new Elk_Exception('no_board');
+		throw new \ElkArte\Exceptions\Exception('no_board');
 	$bcinfo = $db->fetch_assoc($request);
 	$db->free_result($request);
 

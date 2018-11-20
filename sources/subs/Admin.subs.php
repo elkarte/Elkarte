@@ -59,8 +59,8 @@ function getServerVersions($checkFor)
 			trigger_error('getServerVersions(): you need to be connected to the database in order to get its server version', E_USER_NOTICE);
 		else
 		{
-			$versions['db_server'] = array('title' => sprintf($txt['support_versions_db'], $db->db_title()), 'version' => '');
-			$versions['db_server']['version'] = $db->db_server_version();
+			$versions['db_server'] = array('title' => sprintf($txt['support_versions_db'], $db->title()), 'version' => '');
+			$versions['db_server']['version'] = $db->server_version();
 		}
 	}
 
@@ -393,7 +393,7 @@ function readFileVersions(&$version_info, $directories, $pattern, $recursive = f
  *
  * What it does:
  *
- * - Done separately from Settings_Form::save_file() to avoid race conditions
+ * - Done separately from \ElkArte\SettingsForm\SettingsForm::save_file() to avoid race conditions
  * which can occur during a db error
  * - If it fails Settings.php will assume 0
  *
@@ -432,7 +432,7 @@ function updateAdminPreferences()
 	updateThemeOptions(array(1, $user_info['id'], 'admin_preferences', $options['admin_preferences']));
 
 	// Make sure we invalidate any cache.
-	Cache::instance()->put('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 0);
+	\ElkArte\Cache\Cache::instance()->put('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 0);
 }
 
 /**
@@ -448,7 +448,7 @@ function updateAdminPreferences()
  * @param string $template
  * @param mixed[] $replacements
  * @param int[] $additional_recipients
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function emailAdmins($template, $replacements = array(), $additional_recipients = array())
 {

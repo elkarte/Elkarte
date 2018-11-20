@@ -64,7 +64,7 @@ function updateSignature($id_member, $signature)
  * Update all signatures given a new set of constraints
  *
  * @param int $applied_sigs
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateAllSignatures($applied_sigs)
 {
@@ -103,7 +103,7 @@ function updateAllSignatures($applied_sigs)
 
 			// Max characters...
 			if (!empty($sig_limits[1]))
-				$sig = Util::substr($sig, 0, $sig_limits[1]);
+				$sig = \ElkArte\Util::substr($sig, 0, $sig_limits[1]);
 
 			// Max lines...
 			if (!empty($sig_limits[2]))
@@ -761,15 +761,13 @@ function loadAllCustomFields()
  */
 function getNotificationTypes()
 {
-	Elk_Autoloader::instance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
-
-	$glob = new GlobIterator(SUBSDIR . '/MentionType/*Mention.php', FilesystemIterator::SKIP_DOTS);
+	$glob = new \GlobIterator(SOURCEDIR . '/ElkArte/Mentions/MentionType/*Mention.php', \FilesystemIterator::SKIP_DOTS);
 	$types = array();
 
 	// For each file found, call its getType method
 	foreach ($glob as $file)
 	{
-		$class_name = '\\ElkArte\\sources\\subs\\MentionType\\' . preg_replace('~([^^])((?<=)[A-Z](?=[a-z]))~', '$1_$2', $file->getBasename('.php'));
+		$class_name = '\\ElkArte\\Mentions\\MentionType\\' . $file->getBasename('.php');
 		$types[] = $class_name::getType();
 	}
 
@@ -794,7 +792,7 @@ function getMentionsModules($enabled_mentions)
 
 	foreach ($enabled_mentions as $mention)
 	{
-		$class_name = '\\ElkArte\\sources\\subs\\MentionType\\' . ucfirst($mention) . '_Mention';
+		$class_name = '\\ElkArte\\Mentions\\MentionType\\' . ucfirst($mention);
 		$modules = $class_name::getModules($modules);
 	}
 
@@ -817,10 +815,10 @@ function getFrontPageControllers()
 
 	$classes = array();
 
-	$glob = new GlobIterator(CONTROLLERDIR . '/*.controller.php', FilesystemIterator::SKIP_DOTS);
+	$glob = new \GlobIterator(CONTROLLERDIR . '/*.controller.php', \FilesystemIterator::SKIP_DOTS);
 	$classes += scanFileSystemForControllers($glob);
 
-	$glob = new GlobIterator(ADDONSDIR . '/*/controllers/*.controller.php', FilesystemIterator::SKIP_DOTS);
+	$glob = new \GlobIterator(ADDONSDIR . '/*/controllers/*.controller.php', \FilesystemIterator::SKIP_DOTS);
 	$classes += scanFileSystemForControllers($glob, '\\ElkArte\\Addon\\');
 
 	$config_vars = array(array('select', 'front_page', $classes));
@@ -838,7 +836,7 @@ function getFrontPageControllers()
 
 /**
  *
- * @param GlobIterator $iterator
+ * @param \GlobIterator $iterator
  * @param string $namespace
  *
  * @return array
@@ -851,21 +849,20 @@ function scanFileSystemForControllers($iterator, $namespace = '')
 
 	foreach ($iterator as $file)
 	{
-		$class_name = $namespace . preg_replace('~([^^])((?<=)[A-Z](?=[a-z]))~', '$1_$2', $file->getBasename('.controller.php')) . '_Controller';
+		$class_name = $namespace . $file->getBasename('.php');
 
 		if (!class_exists($class_name))
 		{
-			$class_name = $file->getBasename('.controller.php') . '_Controller';
-
-			if (!class_exists($class_name))
-				continue;
+			continue;
 		}
 
-		if (is_subclass_of($class_name, 'Action_Controller') && $class_name::canFrontPage())
+		if (is_subclass_of($class_name, '\\ElkArte\\AbstractController') && $class_name::canFrontPage())
 		{
 			// Temporary
 			if (!isset($txt[$class_name]))
+			{
 				continue;
+			}
 
 			$types[$class_name] = $txt[$class_name];
 		}

@@ -115,7 +115,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 	$entries = array();
 	while ($row = $db->fetch_assoc($result))
 	{
-		$row['extra'] = Util::unserialize($row['extra']);
+		$row['extra'] = \ElkArte\Util::unserialize($row['extra']);
 
 		// Corrupt?
 		$row['extra'] = is_array($row['extra']) ? $row['extra'] : array();

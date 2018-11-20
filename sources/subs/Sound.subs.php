@@ -30,7 +30,7 @@ function createWaveFile($word)
 {
 	global $settings, $user_info;
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	// Allow max 2 requests per 20 seconds.
 	if (($ip = $cache->get('wave_file/' . $user_info['ip'], 20)) > 2 || ($ip2 = $cache->get('wave_file/' . $user_info['ip2'], 20)) > 2)

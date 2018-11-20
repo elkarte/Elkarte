@@ -55,12 +55,12 @@ require_once(SOURCEDIR . '/Subs.php');
 require_once(SOURCEDIR . '/Logging.php');
 require_once(SOURCEDIR . '/Load.php');
 require_once(SOURCEDIR . '/Security.php');
-require_once(SUBSDIR . '/Cache.subs.php');
+require_once(EXTDIR . '/ClassLoader.php');
 
-// Get the autoloader rolling
-$autoloder = Elk_Autoloader::instance();
-$autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
-$autoloder->register(SOURCEDIR, '\\ElkArte');
+$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
+$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
+$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
+$loader->register();
 
 // Used by the test, add others as needed or ...
 $context = array();
@@ -70,7 +70,7 @@ $context['forum_name_html_safe'] = $context['forum_name'];
 // Just like we are starting, almost
 cleanRequest();
 loadDatabase();
-Hooks::init(database(), Debug::instance());
+\ElkArte\Hooks::init(database(), \ElkArte\Debug::instance());
 reloadSettings();
 /**
  * This next line is pointless, but without that tests fail in postgre.

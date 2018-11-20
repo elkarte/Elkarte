@@ -56,7 +56,7 @@ function saveTriggers($suggestions, $ban_group, $member = 0, $trigger_id = 0)
 		)
 	);
 
-	$ban_errors = ElkArte\Errors\ErrorContext::context('ban', 1);
+	$ban_errors = \ElkArte\Errors\ErrorContext::context('ban', 1);
 
 	if (!is_array($suggestions))
 		return false;
@@ -241,7 +241,7 @@ function validateTriggers(&$triggers)
 {
 	$db = database();
 
-	$ban_errors = ElkArte\Errors\ErrorContext::context('ban', 1);
+	$ban_errors = \ElkArte\Errors\ErrorContext::context('ban', 1);
 	if (empty($triggers))
 		$ban_errors->addError('ban_empty_triggers');
 
@@ -307,7 +307,7 @@ function validateTriggers(&$triggers)
 			}
 			elseif ($key == 'user')
 			{
-				$user = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', Util::htmlspecialchars($value, ENT_QUOTES));
+				$user = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', \ElkArte\Util::htmlspecialchars($value, ENT_QUOTES));
 
 				$request = $db->query('', '
 					SELECT id_member, (id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0) AS isAdmin
@@ -388,7 +388,7 @@ function addTriggers($group_id = 0, $triggers = array(), $logs = array())
 {
 	$db = database();
 
-	$ban_errors = ElkArte\Errors\ErrorContext::context('ban', 1);
+	$ban_errors = \ElkArte\Errors\ErrorContext::context('ban', 1);
 
 	if (empty($group_id))
 		$ban_errors->addError('ban_not_found');
@@ -482,7 +482,7 @@ function updateTriggers($ban_item = 0, $group_id = 0, $trigger = array(), $logs 
 {
 	$db = database();
 
-	$ban_errors = ElkArte\Errors\ErrorContext::context('ban', 1);
+	$ban_errors = \ElkArte\Errors\ErrorContext::context('ban', 1);
 
 	if (empty($ban_item))
 		$ban_errors->addError('ban_ban_item_empty');
@@ -590,7 +590,7 @@ function updateBanGroup($ban_info = array())
 	$db = database();
 
 	// Lets check for errors first
-	$ban_errors = ElkArte\Errors\ErrorContext::context('ban', 1);
+	$ban_errors = \ElkArte\Errors\ErrorContext::context('ban', 1);
 
 	if (empty($ban_info['name']))
 		$ban_errors->addError('ban_name_empty');
@@ -661,7 +661,7 @@ function insertBanGroup($ban_info = array())
 {
 	$db = database();
 
-	$ban_errors = ElkArte\Errors\ErrorContext::context('ban', 1);
+	$ban_errors = \ElkArte\Errors\ErrorContext::context('ban', 1);
 
 	if (empty($ban_info['name']))
 		$ban_errors->addError('ban_name_empty');
@@ -1251,7 +1251,7 @@ function list_getNumBans()
  * @param int $ban_group_id
  *
  * @return array
- * @throws Elk_Exception ban_not_found
+ * @throws \ElkArte\Exceptions\Exception ban_not_found
  */
 function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group_id = 0)
 {
@@ -1279,7 +1279,7 @@ function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group
 		)
 	);
 	if ($db->num_rows($request) == 0)
-		throw new Elk_Exception('ban_not_found', false);
+		throw new \ElkArte\Exceptions\Exception('ban_not_found', false);
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!isset($context['ban']))

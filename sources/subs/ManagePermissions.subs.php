@@ -24,14 +24,14 @@
  * @param integer|null $group The group to set the permission for
  * @param integer|null $profile = null, int id of the permissions group or 'null' if we're setting it for a group
  *
- * @throws Elk_Exception no_access
+ * @throws \ElkArte\Exceptions\Exception no_access
  */
 function setPermissionLevel($level, $group = null, $profile = null)
 {
 	$db = database();
 
 	// we'll need to init illegal permissions.
-	$permissionsObject = new Permissions;
+	$permissionsObject = new \ElkArte\Permissions;
 	$illegal_permissions = $permissionsObject->getIllegalPermissions();
 	$illegal_guest_permissions = $permissionsObject->getIllegalGuestPermissions();
 
@@ -339,7 +339,7 @@ function setPermissionLevel($level, $group = null, $profile = null)
 	}
 	// $profile and $group are both null!
 	else
-		throw new Elk_Exception('no_access', false);
+		throw new \ElkArte\Exceptions\Exception('no_access', false);
 }
 
 /**
@@ -500,7 +500,7 @@ function loadAllPermissions()
 	);
 
 	// We need to know what permissions we can't give to guests.
-	$permissionsObject = new Permissions;
+	$permissionsObject = new \ElkArte\Permissions;
 	$illegal_guest_permissions = $permissionsObject->getIllegalGuestPermissions();
 
 	// Some permissions are hidden if features are off.
@@ -1186,7 +1186,7 @@ function copyPermissionProfile($profile_name, $copy_from)
 {
 	$db = database();
 
-	$profile_name = Util::htmlspecialchars($profile_name);
+	$profile_name = \ElkArte\Util::htmlspecialchars($profile_name);
 	// Insert the profile itself.
 	$db->insert('',
 		'{db_prefix}permission_profiles',
@@ -1236,7 +1236,7 @@ function renamePermissionProfile($id_profile, $name)
 {
 	$db = database();
 
-	$name = Util::htmlspecialchars($name);
+	$name = \ElkArte\Util::htmlspecialchars($name);
 
 	$db->query('', '
 		UPDATE {db_prefix}permission_profiles
@@ -1256,7 +1256,7 @@ function renamePermissionProfile($id_profile, $name)
  *
  * @param int[] $profiles
  *
- * @throws Elk_Exception no_access
+ * @throws \ElkArte\Exceptions\Exception no_access
  */
 function deletePermissionProfiles($profiles)
 {
@@ -1273,7 +1273,7 @@ function deletePermissionProfiles($profiles)
 		)
 	);
 	if ($db->num_rows($request) != 0)
-		throw new Elk_Exception('no_access', false);
+		throw new \ElkArte\Exceptions\Exception('no_access', false);
 	$db->free_result($request);
 
 	// Oh well, delete.

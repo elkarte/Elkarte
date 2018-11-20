@@ -187,7 +187,7 @@ function updateSmiley($param)
  * @param int $id
  *
  * @return array
- * @throws Elk_Exception smiley_not_found
+ * @throws \ElkArte\Exceptions\Exception smiley_not_found
  */
 function getSmiley($id)
 {
@@ -202,7 +202,7 @@ function getSmiley($id)
 		)
 	);
 	if ($db->num_rows($request) != 1)
-		throw new Elk_Exception('smiley_not_found');
+		throw new \ElkArte\Exceptions\Exception('smiley_not_found');
 	$current_smiley = $db->fetch_assoc($request);
 	$db->free_result($request);
 

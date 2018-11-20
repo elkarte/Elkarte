@@ -287,7 +287,7 @@ function getProfileEdits($start, $items_per_page, $sort, $memID)
 	$bbc_parser = \BBC\ParserWrapper::instance();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$extra = Util::unserialize($row['extra']);
+		$extra = \ElkArte\Util::unserialize($row['extra']);
 		if (!empty($extra['applicator']))
 			$members[] = $extra['applicator'];
 

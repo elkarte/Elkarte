@@ -42,7 +42,7 @@ class OpenID
 	 * @param mixed[]|null $save_fields = array()
 	 * @param string|null $return_action = null
 	 * @return string
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function validate($openid_uri, $return = false, $save_fields = array(), $return_action = null)
 	{
@@ -120,7 +120,7 @@ class OpenID
 	 * - Note that this function will not return when authentication is required.
 	 *
 	 * @return boolean|null
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function revalidate()
 	{
@@ -193,7 +193,7 @@ class OpenID
 	 * @param string $server
 	 *
 	 * @return array
-	 * @throws Elk_Exception openid_server_bad_response
+	 * @throws \ElkArte\Exceptions\Exception openid_server_bad_response
 	 */
 	public function makeAssociation($server)
 	{
@@ -229,7 +229,7 @@ class OpenID
 			$assoc_data[$match] = $matches[2][$key];
 
 		if (!isset($assoc_data['assoc_type']) || (empty($assoc_data['mac_key']) && empty($assoc_data['enc_mac_key'])))
-			throw new Elk_Exception('openid_server_bad_response');
+			throw new \ElkArte\Exceptions\Exception('openid_server_bad_response');
 
 		// Clean things up a bit.
 		$handle = isset($assoc_data['assoc_handle']) ? $assoc_data['assoc_handle'] : '';
@@ -312,7 +312,7 @@ class OpenID
 	 *
 	 * @param bool $regenerate = false
 	 * @return string return false on failure or an array() on success
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function setup_DH($regenerate = false)
 	{
@@ -334,7 +334,7 @@ class OpenID
 	 * @param bool $regenerate
 	 *
 	 * @return array
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function get_keys($regenerate)
 	{
@@ -370,7 +370,7 @@ class OpenID
 	 * Generate private key
 	 *
 	 * @return string
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function generate_private_key()
 	{
@@ -411,7 +411,7 @@ class OpenID
 	 * @param string $openid_url
 	 *
 	 * @return array|bool
-	 * @throws Elk_Exception openid_server_bad_response
+	 * @throws \ElkArte\Exceptions\Exception openid_server_bad_response
 	 */
 	public function getServerInfo($openid_url)
 	{
@@ -436,7 +436,7 @@ class OpenID
 
 		// Some OpenID servers have strange but still valid HTML which makes our job hard.
 		if (preg_match_all('~<link([\s\S]*?)/?>~i', $webdata, $link_matches) == 0)
-			throw new Elk_Exception('openid_server_bad_response');
+			throw new \ElkArte\Exceptions\Exception('openid_server_bad_response');
 
 		foreach ($link_matches[1] as $link_match)
 		{
@@ -489,13 +489,13 @@ function binary_to_long($str)
  * @param string $value
  *
  * @return string
- * @throws Elk_Exception Only non-negative integers allowed
+ * @throws \ElkArte\Exceptions\Exception Only non-negative integers allowed
  */
 function long_to_binary($value)
 {
 	$cmp = bccomp($value, 0);
 	if ($cmp < 0)
-		throw new Elk_Exception('Only non-negative integers allowed.');
+		throw new \ElkArte\Exceptions\Exception('Only non-negative integers allowed.');
 
 	if ($cmp == 0)
 		return "\x00";

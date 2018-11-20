@@ -94,9 +94,9 @@ class DbTableWrapper
 	}
 }
 
-if (class_exists('DbTable_MySQL'))
+if (class_exists('\\ElkArte\\Database\\Mysqli\\Table'))
 {
-	class DbTable_MySQL_Install extends DbTable_MySQL
+	class DbTable_MySQL_Install extends \ElkArte\Database\Mysqli\Table
 	{
 		public static $_tbl_inst = null;
 
@@ -105,7 +105,7 @@ if (class_exists('DbTable_MySQL'))
 		*
 		* @param object $db - A Database_MySQL object
 		*/
-		protected function __construct($db, $db_prefix)
+		public function __construct($db, $db_prefix)
 		{
 			// We are doing install, of course we want to do any remove on these
 			$this->_reservedTables = array();
@@ -224,11 +224,14 @@ if (class_exists('DbTable_MySQL'))
 			return self::$_tbl_inst;
 		}
 	}
+	class DbTable_MySQLi_Install extends DbTable_MySQL_Install
+	{
+	}
 }
 
-if (class_exists('DbTable_PostgreSQL'))
+if (class_exists('\\ElkArte\\Database\\Postgresql\\Table'))
 {
-	class DbTable_PostgreSQL_Install extends DbTable_PostgreSQL
+	class DbTable_PostgreSQL_Install extends \ElkArte\Database\Postgresql\Table
 	{
 		public static $_tbl_inst = null;
 
@@ -237,7 +240,7 @@ if (class_exists('DbTable_PostgreSQL'))
 		*
 		* @param object $db - A DbTable_PostgreSQL object
 		*/
-		protected function __construct($db, $db_prefix)
+		public function __construct($db, $db_prefix)
 		{
 			// We are doing install, of course we want to do any remove on these
 			$this->_reservedTables = array();

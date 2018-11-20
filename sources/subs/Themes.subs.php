@@ -327,7 +327,7 @@ function loadThemesAffected($id)
  * @param string $relative
  *
  * @return array
- * @throws Elk_Exception error_invalid_dir
+ * @throws \ElkArte\Exceptions\Exception error_invalid_dir
  */
 function get_file_listing($path, $relative)
 {
@@ -338,7 +338,7 @@ function get_file_listing($path, $relative)
 
 	// Is it even a directory?
 	if (!is_dir($path))
-		throw new Elk_Exception('error_invalid_dir', 'critical');
+		throw new \ElkArte\Exceptions\Exception('error_invalid_dir', 'critical');
 
 	// Read this directory's contents
 	$entries = array();
@@ -737,7 +737,7 @@ function addThemeOptions($id_theme, $options, $value)
  *
  * @param int $id
  *
- * @throws Elk_Exception no_access
+ * @throws \ElkArte\Exceptions\Exception no_access
  */
 function deleteTheme($id)
 {
@@ -745,7 +745,7 @@ function deleteTheme($id)
 
 	// Make sure we never ever delete the default theme!
 	if ($id === 1)
-		throw new Elk_Exception('no_access', false);
+		throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 	$db->query('', '
 		DELETE FROM {db_prefix}themes
@@ -965,7 +965,7 @@ function write_theme_info($name, $version, $theme_dir, $theme_values)
 	$xml_info = '<' . '?xml version="1.0"?' . '>
 	<theme-info xmlns="http://www.elkarte.net/xml/theme-info" xmlns:elk="http://www.elkarte.net/">
 		<!-- For the id, always use something unique - put your name, a colon, and then the package name. -->
-		<id>elk:' . Util::strtolower(str_replace(array(' '), '_', $name)) . '</id>
+		<id>elk:' . \ElkArte\Util::strtolower(str_replace(array(' '), '_', $name)) . '</id>
 		<version>' . $version . '</version>
 		<!-- Theme name, used purely for aesthetics. -->
 		<name>' . $name . '</name>

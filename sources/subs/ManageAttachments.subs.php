@@ -89,7 +89,7 @@ function approveAttachments($attachments)
 				'approve_attach',
 				array(
 					'message' => $row['id_msg'],
-					'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', Util::htmlspecialchars($row['filename'])),
+					'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', \ElkArte\Util::htmlspecialchars($row['filename'])),
 				)
 			);
 		}
@@ -261,7 +261,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 					'remove_attach',
 					array(
 						'message' => $row['id_msg'],
-						'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', Util::htmlspecialchars($row['filename'])),
+						'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', \ElkArte\Util::htmlspecialchars($row['filename'])),
 					)
 				);
 			}
@@ -301,7 +301,7 @@ function attachmentPaths()
 	{
 		// we have more directories
 		if (!is_array($modSettings['attachmentUploadDir']))
-			$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
+			$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 
 		return $modSettings['attachmentUploadDir'];
 	}
@@ -402,7 +402,7 @@ function getAttachmentDirs()
 	global $modSettings;
 
 	if (!empty($modSettings['currentAttachmentUploadDir']))
-		$attach_dirs = Util::unserialize($modSettings['attachmentUploadDir']);
+		$attach_dirs = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 	elseif (!empty($modSettings['attachmentUploadDir']))
 		$attach_dirs = array($modSettings['attachmentUploadDir']);
 	else
@@ -742,7 +742,7 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 				$attachment_name = !empty($row['file_hash']) ? $row['id_attach'] . '_' . $row['file_hash'] . '.elk' : getLegacyAttachmentFilename($row['filename'], $row['id_attach'], null, true);
 
 				if (!is_array($modSettings['attachmentUploadDir']))
-					$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
+					$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 
 				// Loop through the other folders looking for this file
 				foreach ($modSettings['attachmentUploadDir'] as $id => $dir)
@@ -766,7 +766,7 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 					$attachment_name = $row['id_attach'] . '_' . $row['file_hash'];
 
 					if (!is_array($modSettings['attachmentUploadDir']))
-						$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
+						$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 
 					// Loop through the other folders looking for this file
 					foreach ($modSettings['attachmentUploadDir'] as $id => $dir)
@@ -1316,7 +1316,7 @@ function attachDirStatus($dir, $expected_files)
 		return array('not_writable', true, '');
 
 	// Count the files with a glob, easier and less time consuming
-	$glob = new GlobIterator($dir . '/*.elk', FilesystemIterator::SKIP_DOTS);
+	$glob = new \GlobIterator($dir . '/*.elk', \FilesystemIterator::SKIP_DOTS);
 	try
 	{
 		$num_files = $glob->count();

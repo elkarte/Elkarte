@@ -49,7 +49,7 @@ class CensoringTest extends \PHPUnit\Framework\TestCase
 		foreach ($this->tests as $key => $test)
 		{
 			$this->setCensors($test);
-			$censor = new Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
+			$censor = new \ElkArte\Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
 			$censored = $censor->censor($inputText);
 
 			$this->assertEquals($censored, $results[$key]);
@@ -76,7 +76,7 @@ class CensoringTest extends \PHPUnit\Framework\TestCase
 		foreach ($this->tests as $key => $test)
 		{
 			$this->setCensors($test);
-			$censor = new Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
+			$censor = new \ElkArte\Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
 			$censored = $censor->censor($inputText);
 
 			$this->assertEquals($censored, $results[$key]);
@@ -103,7 +103,7 @@ class CensoringTest extends \PHPUnit\Framework\TestCase
 		foreach ($this->tests as $key => $test)
 		{
 			$this->setCensors($test);
-			$censor = new Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
+			$censor = new \ElkArte\Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
 			$censored = $censor->censor($inputText);
 
 			$this->assertEquals($censored, $results[$key]);
@@ -130,7 +130,7 @@ class CensoringTest extends \PHPUnit\Framework\TestCase
 		foreach ($this->tests as $key => $test)
 		{
 			$this->setCensors($test);
-			$censor = new Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
+			$censor = new \ElkArte\Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
 			$censored = $censor->censor($inputText);
 
 			$this->assertEquals($censored, $results[$key]);

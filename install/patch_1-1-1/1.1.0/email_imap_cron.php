@@ -46,7 +46,7 @@ function postbyemail_imap()
 		return false;
 	}
 
-	$pbe = new Pbe_Imap();
+	$pbe = new \ElkArte\PbeImap();
 
 	if ($pbe !== false)
 	{

@@ -7,7 +7,7 @@
  *
  * @backupGlobals disabled
  */
-class TestManageMembergroups_Controller extends ElkArteWebTest
+class TestManageMembergroupsController extends ElkArteWebTest
 {
 	/**
 	 * Add a group

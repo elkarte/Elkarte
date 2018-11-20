@@ -33,7 +33,7 @@ function loadMessageLimit()
 	$message_limit = 0;
 	if ($user_info['is_admin'])
 		$message_limit = 0;
-	elseif (!Cache::instance()->getVar($message_limit, 'msgLimit:' . $user_info['id'], 360))
+	elseif (!\ElkArte\Cache\Cache::instance()->getVar($message_limit, 'msgLimit:' . $user_info['id'], 360))
 	{
 		$request = $db->query('', '
 			SELECT
@@ -50,7 +50,7 @@ function loadMessageLimit()
 		$message_limit = $minMessage == 0 ? 0 : $maxMessage;
 
 		// Save us doing it again!
-		Cache::instance()->put('msgLimit:' . $user_info['id'], $message_limit, 360);
+		\ElkArte\Cache\Cache::instance()->put('msgLimit:' . $user_info['id'], $message_limit, 360);
 	}
 
 	return $message_limit;
@@ -101,7 +101,7 @@ function loadPMLabels($labels)
 	$db->free_result($result);
 
 	// Store it please!
-	Cache::instance()->put('labelCounts:' . $user_info['id'], $labels, 720);
+	\ElkArte\Cache\Cache::instance()->put('labelCounts:' . $user_info['id'], $labels, 720);
 
 	return $labels;
 }
@@ -303,7 +303,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 	}
 
 	// Any cached numbers may be wrong now.
-	Cache::instance()->put('labelCounts:' . $user_info['id'], null, 720);
+	\ElkArte\Cache\Cache::instance()->put('labelCounts:' . $user_info['id'], null, 720);
 }
 
 /**
@@ -431,7 +431,7 @@ function updatePMMenuCounts($owner)
 	$db->free_result($result);
 
 	// Need to store all this.
-	Cache::instance()->put('labelCounts:' . $owner, $context['labels'], 720);
+	\ElkArte\Cache\Cache::instance()->put('labelCounts:' . $owner, $context['labels'], 720);
 	require_once(SUBSDIR . '/Members.subs.php');
 	updateMemberData($owner, array('unread_messages' => $total_unread));
 
@@ -504,7 +504,7 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
  * @param mixed[]|null $from - an array with the id, name, and username of the member.
  * @param int $pm_head - the ID of the chain being replied to - if any.
  * @return mixed[] an array with log entries telling how many recipients were successful and which recipients it failed to send to.
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function sendpm($recipients, $subject, $message, $store_outbox = true, $from = null, $pm_head = 0)
 {
@@ -539,11 +539,11 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	call_integration_hook('integrate_personal_message', array(&$recipients, &$from, &$subject, &$message));
 
 	// This is the one that will go in their inbox.
-	$htmlmessage = Util::htmlspecialchars($message, ENT_QUOTES, 'UTF-8', true);
+	$htmlmessage = \ElkArte\Util::htmlspecialchars($message, ENT_QUOTES, 'UTF-8', true);
 	preparsecode($htmlmessage);
-	$htmlsubject = strtr(Util::htmlspecialchars($subject), array("\r" => '', "\n" => '', "\t" => ''));
-	if (Util::strlen($htmlsubject) > 100)
-		$htmlsubject = Util::substr($htmlsubject, 0, 100);
+	$htmlsubject = strtr(\ElkArte\Util::htmlspecialchars($subject), array("\r" => '', "\n" => '', "\t" => ''));
+	if (\ElkArte\Util::strlen($htmlsubject) > 100)
+		$htmlsubject = \ElkArte\Util::substr($htmlsubject, 0, 100);
 
 	// Make sure is an array
 	if (!is_array($recipients))
@@ -557,7 +557,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		{
 			if (!is_numeric($recipients[$rec_type][$id]))
 			{
-				$recipients[$rec_type][$id] = Util::strtolower(trim(preg_replace('/[<>&"\'=\\\]/', '', $recipients[$rec_type][$id])));
+				$recipients[$rec_type][$id] = \ElkArte\Util::strtolower(trim(preg_replace('/[<>&"\'=\\\]/', '', $recipients[$rec_type][$id])));
 				$usernames[$recipients[$rec_type][$id]] = 0;
 			}
 		}
@@ -576,9 +576,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		);
 		while ($row = $db->fetch_assoc($request))
 		{
-			if (isset($usernames[Util::strtolower($row['member_name'])]))
+			if (isset($usernames[\ElkArte\Util::strtolower($row['member_name'])]))
 			{
-				$usernames[Util::strtolower($row['member_name'])] = $row['id_member'];
+				$usernames[\ElkArte\Util::strtolower($row['member_name'])] = $row['id_member'];
 			}
 		}
 		$db->free_result($request);
@@ -629,7 +629,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	// Check whether we have to apply anything...
 	while ($row = $db->fetch_assoc($request))
 	{
-		$criteria = Util::unserialize($row['criteria']);
+		$criteria = \ElkArte\Util::unserialize($row['criteria']);
 
 		// Note we don't check the buddy status, cause deletion from buddy = madness!
 		$delete = false;
@@ -954,7 +954,7 @@ function loadPMs($pm_options, $id_member)
 	if ($pm_options['display_mode'] == 2)
 	{
 		// On a non-default sort, when using PostgreSQL we have to do a harder sort.
-		if ($db->db_title() == 'PostgreSQL' && $pm_options['sort_by_query'] != 'pm.id_pm')
+		if ($db->title() == 'PostgreSQL' && $pm_options['sort_by_query'] != 'pm.id_pm')
 		{
 			$sub_request = $db->query('', '
 				SELECT
@@ -1288,8 +1288,8 @@ function loadRules($reload = false)
 		$context['rules'][$row['id_rule']] = array(
 			'id' => $row['id_rule'],
 			'name' => $row['rule_name'],
-			'criteria' => Util::unserialize($row['criteria']),
-			'actions' => Util::unserialize($row['actions']),
+			'criteria' => \ElkArte\Util::unserialize($row['criteria']),
+			'actions' => \ElkArte\Util::unserialize($row['actions']),
 			'delete' => $row['delete_pm'],
 			'logic' => $row['is_or'] ? 'or' : 'and',
 		);
@@ -2174,7 +2174,7 @@ function loadPMRecipientsAll($pmsg, $bcc_count = false)
  * @param int $pm_id
  *
  * @return
- * @throws Elk_Exception no_access
+ * @throws \ElkArte\Exceptions\Exception no_access
  */
 function loadPersonalMessage($pm_id)
 {
@@ -2203,7 +2203,7 @@ function loadPersonalMessage($pm_id)
 	);
 	// Can only be a hacker here!
 	if ($db->num_rows($request) == 0)
-		throw new Elk_Exception('no_access', false);
+		throw new \ElkArte\Exceptions\Exception('no_access', false);
 	$pm_details = $db->fetch_row($request);
 	$db->free_result($request);
 

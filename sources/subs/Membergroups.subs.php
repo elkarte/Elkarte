@@ -216,7 +216,7 @@ function deleteMembergroups($groups)
  * @param bool $permissionCheckDone = false
  *
  * @return boolean
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function removeMembersFromGroups($members, $groups = null, $permissionCheckDone = false)
 {
@@ -423,7 +423,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
  *                     available. If not, assign it to the additional group.
  * @param bool $permissionCheckDone = false if true, it checks permission of the current user to add groups ('manage_membergroups')
  * @return boolean success or failure
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDone = false)
 {
@@ -1224,7 +1224,7 @@ function createMembergroup($groupname, $minposts, $type)
 			'icons' => 'string', 'online_color' => 'string', 'group_type' => 'int',
 		),
 		array(
-			'', Util::htmlspecialchars($groupname, ENT_QUOTES), $minposts,
+			'', \ElkArte\Util::htmlspecialchars($groupname, ENT_QUOTES), $minposts,
 			'1#icon.png', '', $type,
 		),
 		array('id_group')
@@ -1396,7 +1396,7 @@ function updateMembergroupProperties($properties)
 			switch ($known_properties[$name]['type'])
 			{
 				case 'string':
-					$values['subs_' . $name] = Util::htmlspecialchars((string) $value);
+					$values['subs_' . $name] = \ElkArte\Util::htmlspecialchars((string) $value);
 					break;
 				default:
 					$values['subs_' . $name] = (int) $value;
@@ -2002,7 +2002,7 @@ function updatePostGroupStats($members = null, $parameter2 = null)
 	if ($parameter2 !== null && !in_array('posts', $parameter2))
 		return;
 
-	$postgroups = Cache::instance()->get('updatePostGroupStats', 360);
+	$postgroups = \ElkArte\Cache\Cache::instance()->get('updatePostGroupStats', 360);
 	if ($postgroups === null || $members === null)
 	{
 		// Fetch the postgroups!
@@ -2022,7 +2022,7 @@ function updatePostGroupStats($members = null, $parameter2 = null)
 		// Sort them this way because if it's done with MySQL it causes a filesort :(.
 		arsort($postgroups);
 
-		Cache::instance()->put('updatePostGroupStats', $postgroups, 360);
+		\ElkArte\Cache\Cache::instance()->put('updatePostGroupStats', $postgroups, 360);
 	}
 
 	// Oh great, they've screwed their post groups.

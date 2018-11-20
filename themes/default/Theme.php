@@ -314,7 +314,7 @@ class Theme extends BaseTheme
 		// Combine and minify javascript source files to save bandwidth and requests
 		if (!empty($modSettings['minify_css_js']))
 		{
-			$combiner = new \Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
+			$combiner = new \ElkArte\SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
 			$combine_name = $combiner->site_js_combine($this->js_files, $do_deferred);
 
 			call_integration_hook('post_javascript_combine', array(&$combine_name, $combiner));
@@ -363,7 +363,7 @@ class Theme extends BaseTheme
 	{
 		global $settings;
 
-		$combiner = new \Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
+		$combiner = new \ElkArte\SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
 		$result = true;
 
 		if ($type === 'all' || $type === 'css')
@@ -470,7 +470,7 @@ class Theme extends BaseTheme
 		{
 			if (!empty($modSettings['minify_css_js']))
 			{
-				$combiner = new \Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
+				$combiner = new \ElkArte\SiteCombiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
 				$combine_name = $combiner->site_css_combine($this->css_files);
 
 				call_integration_hook('post_css_combine', array(&$combine_name, $combiner));
@@ -623,7 +623,7 @@ class Theme extends BaseTheme
 		if (isBrowser('possibly_robot'))
 		{
 			// @todo Maybe move this somewhere better?!
-			$controller = new \ScheduledTasks_Controller(new \Event_Manager());
+			$controller = new \ElkArte\Controller\ScheduledTasks(new \ElkArte\EventManager());
 
 			// What to do, what to do?!
 			if (empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())
@@ -842,7 +842,7 @@ class Theme extends BaseTheme
 		}
 
 		// Set some specific vars.
-		$context['page_title_html_safe'] = \Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
+		$context['page_title_html_safe'] = \ElkArte\Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
 
 		$context['favicon'] = $boardurl . '/mobile.png';
 
@@ -940,7 +940,7 @@ class Theme extends BaseTheme
 		}
 
 		// All the buttons we can possible want and then some, try pulling the final list of buttons from cache first.
-		if (($menu_buttons = cache_get_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
+		if (($menu_buttons = \ElkArte\Cache\Cache::instance()->get('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
 		{
 			// Start things up: this is what we know by default
 			require_once(SUBSDIR . '/Menu.subs.php');
@@ -1021,7 +1021,7 @@ class Theme extends BaseTheme
 
 			if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
 			{
-				cache_put_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $menu_buttons, $cacheTime);
+				\ElkArte\Cache\Cache::instance()->put('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $menu_buttons, $cacheTime);
 			}
 		}
 

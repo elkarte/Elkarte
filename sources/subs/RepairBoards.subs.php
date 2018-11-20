@@ -1275,7 +1275,7 @@ function createSalvageArea()
 		if ($db->affected_rows() <= 0)
 		{
 			theme()->getTemplates()->loadLanguageFile('Admin');
-			throw new Elk_Exception('salvaged_category_error', false);
+			throw new \ElkArte\Exceptions\Exception('salvaged_category_error', false);
 		}
 
 		$salvageCatID = $db->insert_id('{db_prefix}categories', 'id_cat');
@@ -1309,7 +1309,7 @@ function createSalvageArea()
 		if ($db->affected_rows() <= 0)
 		{
 			theme()->getTemplates()->loadLanguageFile('Admin');
-			throw new Elk_Exception('salvaged_board_error', false);
+			throw new \ElkArte\Exceptions\Exception('salvaged_board_error', false);
 		}
 
 		$salvageBoardID = $db->insert_id('{db_prefix}boards', 'id_board');
@@ -1329,7 +1329,7 @@ function createSalvageArea()
  * @param string $current_step_description
  * @param int $max_substep = none
  * @param boolean $force = false
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0, $force = false)
 {
@@ -1344,7 +1344,7 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
 
 	// Restore the query cache if interested.
 	if ($db_show_debug === true)
-		Debug::instance()->on();
+		\ElkArte\Debug::instance()->on();
 
 	$context['continue_get_data'] = '?action=admin;area=repairboards' . (isset($_GET['fixErrors']) ? ';fixErrors' : '') . ';step=' . $_GET['step'] . ';substep=' . $_GET['substep'] . ';' . $context['session_var'] . '=' . $context['session_id'];
 	$context['page_title'] = $txt['not_done_title'];
@@ -1381,7 +1381,7 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
  *
  * @param boolean $do_fix
  * @return mixed[]
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function findForumErrors($do_fix = false)
 {
@@ -1400,7 +1400,7 @@ function findForumErrors($do_fix = false)
 
 	// Don't allow the cache to get too full.
 	if ($db_show_debug === true)
-		Debug::instance()->off();
+		\ElkArte\Debug::instance()->off();
 
 	$context['total_steps'] = count($errorTests);
 

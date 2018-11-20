@@ -36,7 +36,7 @@ function updateSettings($changeArray, $update = false)
 	global $modSettings;
 
 	$db = database();
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	if (empty($changeArray) || !is_array($changeArray))
 		return;
@@ -126,7 +126,7 @@ function removeSettings($toRemove)
 			unset($modSettings[$setting]);
 
 	// Kill the cache - it needs redoing now, but we won't bother ourselves with that here.
-	Cache::instance()->remove('modSettings');
+	\ElkArte\Cache\Cache::instance()->remove('modSettings');
 }
 
 /**
@@ -470,7 +470,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 
 		foreach (array('%a', '%A', '%b', '%B') as $token)
 			if (strpos($str, $token) !== false)
-				$str = str_replace($token, !empty($txt['lang_capitalize_dates']) ? Util::ucwords(strftime($token, $time)) : strftime($token, $time), $str);
+				$str = str_replace($token, !empty($txt['lang_capitalize_dates']) ? ElkArte\Util::ucwords(strftime($token, $time)) : strftime($token, $time), $str);
 	}
 	else
 	{
@@ -649,7 +649,7 @@ function highlight_php_code($code)
  * @event integrate_redirect called before headers are sent
  * @param string $setLocation = '' The URL to redirect to
  * @param bool $refresh = false, enable to send a refresh header, default is a location header
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function redirectexit($setLocation = '', $refresh = false)
 {
@@ -660,7 +660,7 @@ function redirectexit($setLocation = '', $refresh = false)
 		// @todo this relies on 'flush_mail' being only set in AddMailQueue itself... :\
 		AddMailQueue(true);
 
-	Notifications::instance()->send();
+	\ElkArte\Notifications::instance()->send();
 
 	$add = preg_match('~^(ftp|http)[s]?://~', $setLocation) == 0 && substr($setLocation, 0, 6) != 'about:';
 
@@ -686,7 +686,7 @@ function redirectexit($setLocation = '', $refresh = false)
 	// Debugging.
 	if ($db_show_debug === true)
 	{
-		$_SESSION['debug_redirect'] = Debug::instance()->get_db();
+		$_SESSION['debug_redirect'] = \ElkArte\Debug::instance()->get_db();
 	}
 
 	obExit(false);
@@ -725,7 +725,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	// Clear out the stat cache.
 	trackStats();
 
-	Notifications::instance()->send();
+	\ElkArte\Notifications::instance()->send();
 
 	// If we have mail to send, send it.
 	if (!empty($context['flush_mail']))
@@ -741,7 +741,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	{
 		// Was the page title set last minute? Also update the HTML safe one.
 		if (!empty($context['page_title']) && empty($context['page_title_html_safe']))
-			$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
+			$context['page_title_html_safe'] = ElkArte\Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
 
 		// Start up the session URL fixer.
 		ob_start('ob_sessrewrite');
@@ -770,7 +770,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 			{
 				if (!isset($_REQUEST['xml']) && ((!isset($_GET['action']) || $_GET['action'] != 'viewquery') && !isset($_GET['api'])))
 				{
-					Debug::instance()->display();
+					\ElkArte\Debug::instance()->display();
 				}
 			}
 		}
@@ -1025,7 +1025,7 @@ function host_from_ip($ip)
 {
 	global $modSettings;
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	$host = '';
 	if ($cache->getVar($host, 'hostlookup-' . $ip, 600) || empty($ip))
@@ -1091,7 +1091,7 @@ function text2words($text, $max_chars = 20, $encrypt = false)
 	$words = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', strtr($text, array('<br />' => ' ')));
 
 	// Step 2: Entities we left to letters, where applicable, lowercase.
-	$words = un_htmlspecialchars(Util::strtolower($words));
+	$words = un_htmlspecialchars(ElkArte\Util::strtolower($words));
 
 	// Step 3: Ready to split apart and index!
 	$words = explode(' ', $words);
@@ -1162,7 +1162,7 @@ function setupMenuContext()
  */
 function call_integration_hook($hook, $parameters = array())
 {
-	return Hooks::instance()->hook($hook, $parameters);
+	return \ElkArte\Hooks::instance()->hook($hook, $parameters);
 }
 
 /**
@@ -1172,7 +1172,7 @@ function call_integration_hook($hook, $parameters = array())
  */
 function call_integration_include_hook($hook)
 {
-	Hooks::instance()->include_hook($hook);
+	\ElkArte\Hooks::instance()->include_hook($hook);
 }
 
 /**
@@ -1180,7 +1180,7 @@ function call_integration_include_hook($hook)
  */
 function call_integration_buffer()
 {
-	Hooks::instance()->buffer_hook();
+	\ElkArte\Hooks::instance()->buffer_hook();
 }
 
 /**
@@ -1195,7 +1195,7 @@ function call_integration_buffer()
  */
 function add_integration_function($hook, $function, $file = '', $permanent = true)
 {
-	Hooks::instance()->add($hook, $function, $file, $permanent);
+	\ElkArte\Hooks::instance()->add($hook, $function, $file, $permanent);
 }
 
 /**
@@ -1212,7 +1212,7 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
  */
 function remove_integration_function($hook, $function, $file = '')
 {
-	Hooks::instance()->remove($hook, $function, $file);
+	\ElkArte\Hooks::instance()->remove($hook, $function, $file);
 }
 
 /**
@@ -1337,7 +1337,7 @@ function prepareSearchEngines()
 	$engines = array();
 	if (!empty($modSettings['additional_search_engines']))
 	{
-		$search_engines = Util::unserialize($modSettings['additional_search_engines']);
+		$search_engines = ElkArte\Util::unserialize($modSettings['additional_search_engines']);
 		foreach ($search_engines as $engine)
 			$engines[strtolower(preg_replace('~[^A-Za-z0-9 ]~', '', $engine['name']))] = $engine;
 	}
@@ -1441,7 +1441,7 @@ function scheduleTaskImmediate($task)
 	if (!isset($modSettings['scheduleTaskImmediate']))
 		$scheduleTaskImmediate = array();
 	else
-		$scheduleTaskImmediate = Util::unserialize($modSettings['scheduleTaskImmediate']);
+		$scheduleTaskImmediate = \ElkArte\Util::unserialize($modSettings['scheduleTaskImmediate']);
 
 	// If it has not been scheduled, the do so now
 	if (!isset($scheduleTaskImmediate[$task]))
@@ -1474,7 +1474,7 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 	if (!isset($modSettings['scheduleTaskImmediate']))
 		return;
 	else
-		$scheduleTaskImmediate = Util::unserialize($modSettings['scheduleTaskImmediate']);
+		$scheduleTaskImmediate = \ElkArte\Util::unserialize($modSettings['scheduleTaskImmediate']);
 
 	// Clear / remove the task if it was set
 	if (isset($scheduleTaskImmediate[$task]))
@@ -1547,7 +1547,7 @@ function createList($listOptions)
 {
 	call_integration_hook('integrate_list_' . $listOptions['id'], array(&$listOptions));
 
-	$list = new Generic_List($listOptions);
+	$list = new \ElkArte\GenericList($listOptions);
 
 	$list->buildList();
 }
@@ -1562,7 +1562,7 @@ function createList($listOptions)
  */
 function request()
 {
-	return Request::instance();
+	return ElkArte\Request::instance();
 }
 
 /**
@@ -1594,7 +1594,7 @@ function response_prefix()
 	global $language, $user_info, $txt;
 	static $response_prefix = null;
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	// Get a response prefix, but in the forum's default language.
 	if ($response_prefix === null && (!$cache->getVar($response_prefix, 'response_prefix') || !$response_prefix))
@@ -1627,7 +1627,7 @@ function response_prefix()
 function isValidEmail($value)
 {
 	$value = trim($value);
-	if (filter_var($value, FILTER_VALIDATE_EMAIL) && Util::strlen($value) < 255)
+	if (filter_var($value, FILTER_VALIDATE_EMAIL) && ElkArte\Util::strlen($value) < 255)
 		return $value;
 	else
 		return false;
@@ -1758,7 +1758,7 @@ function censor($text, $force = false)
 
 	if ($censor === null)
 	{
-		$censor = new Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
+		$censor = new \ElkArte\Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
 	}
 
 	return $censor->censor($text, $force);
@@ -1812,7 +1812,7 @@ function dieGif($expired = false)
 		}
 		else
 		{
-			Errors::instance()->log_error('Headers already sent in ' . $filename . ' at line ' . $linenum);
+			ElkArte\Errors::instance()->log_error('Headers already sent in ' . $filename . ' at line ' . $linenum);
 		}
 	}
 
@@ -1902,7 +1902,7 @@ function initUrlGenerator()
 
 	if ($generator === null)
 	{
-		$generator = new Url_Generator([
+		$generator = new \ElkArte\UrlGenerator\UrlGenerator([
 			'generator' => ucfirst($url_format ?? 'standard'),
 			'scripturl' => $scripturl,
 			'replacements' => [

@@ -26,8 +26,8 @@ function protected_alter($change, $substep, $is_test = false)
 {
 	global $db_prefix;
 
-	$table = db_table();
-	$db = database();
+	$db = load_database();
+	$table = db_table($db);
 
 	// Firstly, check whether the current index/column exists.
 	$found = false;

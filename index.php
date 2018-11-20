@@ -32,7 +32,7 @@ if (isset($_GET['scheduled']))
 	if (function_exists('fastcgi_finish_request'))
 		fastcgi_finish_request();
 
-	$controller = new ScheduledTasks_Controller(new Event_manager());
+	$controller = new \ElkArte\Controller\ScheduledTasks(new \ElkArte\EventManager());
 	$controller->action_autotask();
 }
 
@@ -78,10 +78,10 @@ function elk_main()
 
 	// A safer way to work with our form globals
 	// @todo Use dependency injection
-	$_req = HttpReq::instance();
+	$_req = \ElkArte\HttpReq::instance();
 
 	// What shall we do?
-	$dispatcher = new Site_Dispatcher($_req);
+	$dispatcher = new ElkArte\SiteDispatcher($_req);
 
 	if ($dispatcher->needSecurity())
 	{

@@ -1,6 +1,6 @@
 <?php
 
-class TestCurl_Fetch_Webdata extends \PHPUnit\Framework\TestCase
+class TestCurlFetchWebdata extends \PHPUnit\Framework\TestCase
 {
 	protected $curl_fetch_testcases = array();
 	protected $curl_post_testcases = array();
@@ -61,7 +61,7 @@ class TestCurl_Fetch_Webdata extends \PHPUnit\Framework\TestCase
 	public function testFetch()
 	{
 		// Start curl, pass some default values for a test
-		$curl = new Curl_Fetch_Webdata(array(CURLOPT_RETURNTRANSFER => 1), 1);
+		$curl = new \ElkArte\CurlFetchWebdata(array(CURLOPT_RETURNTRANSFER => 1), 1);
 
 		foreach ($this->curl_fetch_testcases as $testcase)
 		{
@@ -82,7 +82,7 @@ class TestCurl_Fetch_Webdata extends \PHPUnit\Framework\TestCase
 	public function testPost()
 	{
 		// Start curl, pass some default values for a test
-		$curl = new Curl_Fetch_Webdata();
+		$curl = new \ElkArte\CurlFetchWebdata();
 
 		foreach ($this->curl_post_testcases as $testcase)
 		{

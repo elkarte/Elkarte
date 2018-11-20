@@ -38,8 +38,8 @@ function reloadSettings()
 	global $modSettings;
 
 	$db = database();
-	$cache = Cache::instance();
-	$hooks = Hooks::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
+	$hooks = \ElkArte\Hooks::instance();
 
 	// Try to load it from the cache first; it'll never get cached if the setting is off.
 	if (!$cache->getVar($modSettings, 'modSettings', 90))
@@ -52,7 +52,7 @@ function reloadSettings()
 		);
 		$modSettings = array();
 		if (!$request)
-			Errors::instance()->display_db_error();
+			\ElkArte\Errors\Errors::instance()->display_db_error();
 		while ($row = $db->fetch_row($request))
 			$modSettings[$row[0]] = $row[1];
 		$db->free_result($request);
@@ -99,7 +99,7 @@ function reloadSettings()
 			$modSettings['current_load'] = $modSettings['load_average'];
 
 		if (!empty($modSettings['loadavg_forum']) && $modSettings['current_load'] >= $modSettings['loadavg_forum'])
-			Errors::instance()->display_loadavg_error();
+			\ElkArte\Errors\Errors::instance()->display_loadavg_error();
 	}
 	else
 		$modSettings['current_load'] = 0;
@@ -126,7 +126,7 @@ function reloadSettings()
 	// Integration is cool.
 	if (defined('ELK_INTEGRATION_SETTINGS'))
 	{
-		$integration_settings = Util::unserialize(ELK_INTEGRATION_SETTINGS);
+		$integration_settings = \ElkArte\Util::unserialize(ELK_INTEGRATION_SETTINGS);
 		foreach ($integration_settings as $hook => $function)
 			add_integration_function($hook, $function);
 	}
@@ -159,7 +159,7 @@ function loadUserSettings()
 	global $context, $modSettings, $user_settings, $cookiename, $user_info, $language;
 
 	$db = database();
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	// Check first the integration, then the cookie, and last the session.
 	if (count($integration_ids = call_integration_hook('integrate_verify_user')) > 0)
@@ -439,7 +439,7 @@ function loadBoard()
 	global $board_info, $board, $topic, $user_info;
 
 	$db = database();
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	// Assume they are not a moderator.
 	$user_info['is_mod'] = false;
@@ -477,7 +477,7 @@ function loadBoard()
 		{
 			loadPermissions();
 			new ElkArte\Themes\ThemeLoader();
-			throw new Elk_Exception('topic_gone', false);
+			throw new \ElkArte\Exceptions\Exception('topic_gone', false);
 		}
 	}
 
@@ -697,7 +697,7 @@ function loadBoard()
 			is_not_guest($txt['topic_gone']);
 		}
 		else
-			throw new Elk_Exception('topic_gone', false);
+			throw new \ElkArte\Exceptions\Exception('topic_gone', false);
 	}
 
 	if ($user_info['is_mod'])
@@ -730,7 +730,7 @@ function loadPermissions()
 
 	$removals = array();
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	if ($cache->isEnabled())
 	{
@@ -794,7 +794,7 @@ function loadPermissions()
 	{
 		// Make sure the board (if any) has been loaded by loadBoard().
 		if (!isset($board_info['profile']))
-			throw new Elk_Exception('no_board');
+			throw new \ElkArte\Exceptions\Exception('no_board');
 
 		$request = $db->query('', '
 			SELECT
@@ -862,7 +862,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	global $user_profile, $modSettings, $board_info, $context, $user_info;
 
 	$db = database();
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	// Can't just look for no users :P.
 	if (empty($users))
@@ -1118,13 +1118,13 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'ip2' => htmlspecialchars($profile['member_ip2'], ENT_COMPAT, 'UTF-8'),
 			'online' => array(
 				'is_online' => $profile['is_online'],
-				'text' => Util::htmlspecialchars($txt[$profile['is_online'] ? 'online' : 'offline']),
-				'member_online_text' => sprintf($txt[$profile['is_online'] ? 'member_is_online' : 'member_is_offline'], Util::htmlspecialchars($profile['real_name'])),
+				'text' => \ElkArte\Util::htmlspecialchars($txt[$profile['is_online'] ? 'online' : 'offline']),
+				'member_online_text' => sprintf($txt[$profile['is_online'] ? 'member_is_online' : 'member_is_offline'], \ElkArte\Util::htmlspecialchars($profile['real_name'])),
 				'href' => $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'],
 				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'] . '">' . $txt[$profile['is_online'] ? 'online' : 'offline'] . '</a>',
 				'label' => $txt[$profile['is_online'] ? 'online' : 'offline']
 			),
-			'language' => Util::ucwords(strtr($profile['lngfile'], array('_' => ' '))),
+			'language' => \ElkArte\Util::ucwords(strtr($profile['lngfile'], array('_' => ' '))),
 			'is_activated' => isset($profile['is_activated']) ? $profile['is_activated'] : 1,
 			'is_banned' => isset($profile['is_activated']) ? $profile['is_activated'] >= 10 : 0,
 			'options' => $profile['options'],
@@ -1146,7 +1146,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 	if ($display_custom_fields && !empty($modSettings['displayFields']))
 	{
 		if (!isset($context['display_fields']))
-			$context['display_fields'] = Util::unserialize($modSettings['displayFields']);
+			$context['display_fields'] = \ElkArte\Util::unserialize($modSettings['displayFields']);
 
 		foreach ($context['display_fields'] as $custom)
 		{
@@ -1187,12 +1187,12 @@ function loadMemberContext($user, $display_custom_fields = false)
 /**
  * Loads information about what browser the user is viewing with and places it in $context
  *
- * @uses Browser_Detector class from BrowserDetect.class.php
+ * @uses ElkArte\BrowserDetector class
  */
 function detectBrowser()
 {
 	// Load the current user's browser of choice
-	$detector = new Browser_Detector;
+	$detector = new ElkArte\BrowserDetector;
 	$detector->detectBrowser();
 }
 
@@ -1218,7 +1218,7 @@ function detectBrowser()
  */
 function loadTheme($id_theme = 0, $initialize = true)
 {
-	Errors::instance()->log_deprecated('loadTheme()', 'ElkArte\Themes\ThemeLoader');
+	\ElkArte\Errors\Errors::instance()->log_deprecated('loadTheme()', '\\ElkArte\\Themes\\ThemeLoader');
 	new ElkArte\Themes\ThemeLoader($id_theme, $initialize);
 }
 
@@ -1294,7 +1294,7 @@ function determineSmileySet($user_smiley_set, $known_smiley_sets)
  */
 function loadEssentialThemeData()
 {
-	Errors::instance()->log_deprecated('loadEssentialThemeData()', 'theme()->getTemplates()->loadEssentialThemeData()');
+	\ElkArte\Errors\Errors::instance()->log_deprecated('loadEssentialThemeData()', 'theme()->getTemplates()->loadEssentialThemeData()');
 	return theme()->getTemplates()->loadEssentialThemeData();
 }
 
@@ -1321,7 +1321,7 @@ function loadEssentialThemeData()
  */
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
-	Errors::instance()->log_deprecated('loadTemplate()', 'theme()->getTemplates()->load()');
+	\ElkArte\Errors\Errors::instance()->log_deprecated('loadTemplate()', 'theme()->getTemplates()->load()');
 	return theme()->getTemplates()->load($template_name, $style_sheets, $fatal);
 }
 
@@ -1345,7 +1345,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  */
 function loadSubTemplate($sub_template_name, $fatal = false)
 {
-	Errors::instance()->log_deprecated('loadSubTemplate()', 'theme()->getTemplates()->loadSubTemplate()');
+	\ElkArte\Errors\Errors::instance()->log_deprecated('loadSubTemplate()', 'theme()->getTemplates()->loadSubTemplate()');
 	theme()->getTemplates()->loadSubTemplate($sub_template_name, $fatal);
 
 	return true;
@@ -1462,7 +1462,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 	if (empty($filenames))
 		return;
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	if (!is_array($filenames))
 		$filenames = array($filenames);
@@ -1492,7 +1492,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 		{
 			foreach ($temp as $temp_params)
 			{
-				Debug::instance()->add($params['debug_index'], $temp_params['options']['basename'] . '(' . (!empty($temp_params['options']['local']) ? (!empty($temp_params['options']['url']) ? basename($temp_params['options']['url']) : basename($temp_params['options']['dir'])) : '') . ')');
+				\ElkArte\Debug::instance()->add($params['debug_index'], $temp_params['options']['basename'] . '(' . (!empty($temp_params['options']['local']) ? (!empty($temp_params['options']['url']) ? basename($temp_params['options']['url']) : basename($temp_params['options']['dir'])) : '') . ')');
 			}
 		}
 	}
@@ -1548,7 +1548,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 
 				if ($db_show_debug === true)
 				{
-					Debug::instance()->add($params['debug_index'], $params['basename'] . '(' . (!empty($params['local']) ? (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) : '') . ')');
+					\ElkArte\Debug::instance()->add($params['debug_index'], $params['basename'] . '(' . (!empty($params['local']) ? (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) : '') . ')');
 				}
 			}
 
@@ -1568,7 +1568,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
  */
 function addJavascriptVar($vars, $escape = false)
 {
-	Errors::instance()->log_deprecated('addJavascriptVar()', 'theme()->getTemplates()->addJavascriptVar()');
+	\ElkArte\Errors\Errors::instance()->log_deprecated('addJavascriptVar()', 'theme()->getTemplates()->addJavascriptVar()');
 	theme()->addJavascriptVar($vars, $escape);
 }
 
@@ -1588,7 +1588,7 @@ function addJavascriptVar($vars, $escape = false)
  */
 function addInlineJavascript($javascript, $defer = false)
 {
-	Errors::instance()->log_deprecated('addInlineJavascript()', 'theme()->addInlineJavascript()');
+	\ElkArte\Errors\Errors::instance()->log_deprecated('addInlineJavascript()', 'theme()->addInlineJavascript()');
 	theme()->addInlineJavascript($javascript, $defer);
 }
 
@@ -1607,7 +1607,7 @@ function addInlineJavascript($javascript, $defer = false)
  */
 function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload = false)
 {
-	Errors::instance()->log_deprecated('loadLanguage()', 'theme()->getTemplates()->loadLanguageFile()');
+	\ElkArte\Errors\Errors::instance()->log_deprecated('loadLanguage()', 'theme()->getTemplates()->loadLanguageFile()');
 	return theme()->getTemplates()->loadLanguageFile($template_name, $lang, $fatal, $force_reload);
 }
 
@@ -1694,14 +1694,14 @@ function fix_calendar_text()
  * @param int $id_parent
  *
  * @return array
- * @throws Elk_Exception parent_not_found
+ * @throws \ElkArte\Exceptions\Exception parent_not_found
  */
 function getBoardParents($id_parent)
 {
 	global $scripturl;
 
 	$db = database();
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 	$boards = array();
 
 	// First check if we have this cached already.
@@ -1728,7 +1728,7 @@ function getBoardParents($id_parent)
 			// In the EXTREMELY unlikely event this happens, give an error message.
 			if ($db->num_rows($result) == 0)
 			{
-				throw new Elk_Exception('parent_not_found', 'critical');
+				throw new \ElkArte\Exceptions\Exception('parent_not_found', 'critical');
 			}
 			while ($row = $db->fetch_assoc($result))
 			{
@@ -1775,7 +1775,7 @@ function getLanguages($use_cache = true)
 {
 	global $settings;
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	// Either we don't use the cache, or its expired.
 	$languages = array();
@@ -1821,7 +1821,7 @@ function getLanguages($use_cache = true)
 						continue;
 
 					$languages[$matches[1]] = array(
-						'name' => Util::ucwords(strtr($matches[1], array('_' => ' '))),
+						'name' => \ElkArte\Util::ucwords(strtr($matches[1], array('_' => ' '))),
 						'selected' => false,
 						'filename' => $matches[1],
 						'location' => $language_dir . '/' . $entry . '/index.' . $matches[1] . '.php',
@@ -1844,36 +1844,33 @@ function getLanguages($use_cache = true)
  */
 function loadDatabase()
 {
-	global $db_persist, $db_server, $db_user, $db_passwd, $db_port;
-	global $db_type, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix;
+	global $db_prefix, $db_name;
 
 	// Database stuffs
 	require_once(SOURCEDIR . '/database/Database.subs.php');
 
-	// Figure out what type of database we are using.
-	if (empty($db_type) || !file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.class.php'))
-		$db_type = 'mysql';
-
-	// If we are in SSI try them first, but don't worry if it doesn't work, we have the normal username and password we can use.
-	if (ELK === 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
-		$connection = elk_db_initiate($db_server, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix, array('persist' => $db_persist, 'non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
-
-	// Either we aren't in SSI mode, or it failed.
-	if (empty($connection))
-		$connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'dont_select_db' => ELK === 'SSI', 'port' => $db_port), $db_type);
-
 	// Safe guard here, if there isn't a valid connection lets put a stop to it.
-	if (!$connection)
-		Errors::instance()->display_db_error();
+	try
+	{
+		$db = database(false);
+	}
+	catch (\Exception $e)
+	{
+		\ElkArte\Errors\Errors::instance()->display_db_error();
+	}
 
 	// If in SSI mode fix up the prefix.
-	$db = database();
 	if (ELK === 'SSI')
+	{
 		$db_prefix = $db->fix_prefix($db_prefix, $db_name);
+	}
 
 	// Case sensitive database? Let's define a constant.
-	if ($db->db_case_sensitive() && !defined('DB_CASE_SENSITIVE'))
+	// @NOTE: I think it is already taken care by the abstraction, it should be possible to remove
+	if ($db->case_sensitive() && !defined('DB_CASE_SENSITIVE'))
+	{
 		DEFINE('DB_CASE_SENSITIVE', '1');
+	}
 }
 
 /**
@@ -1988,7 +1985,7 @@ function detectServer()
 
 	if ($server === null)
 	{
-		$server = new Server($_SERVER);
+		$server = new ElkArte\Server($_SERVER);
 		$servers = array('iis', 'apache', 'litespeed', 'lighttpd', 'nginx', 'cgi', 'windows');
 		$context['server'] = array();
 		foreach ($servers as $name)
@@ -2033,7 +2030,7 @@ function doSecurityChecks()
 
 	$show_warnings = false;
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	if (allowedTo('admin_forum') && !$user_info['is_guest'])
 	{
@@ -2093,13 +2090,13 @@ function doSecurityChecks()
 			$context['security_controls_query']['title'] = $txt['query_command_denied'];
 			$show_warnings = true;
 			foreach ($_SESSION['query_command_denied'] as $command => $error)
-				$context['security_controls_query']['errors'][$command] = '<pre>' . Util::htmlspecialchars($error) . '</pre>';
+				$context['security_controls_query']['errors'][$command] = '<pre>' . \ElkArte\Util::htmlspecialchars($error) . '</pre>';
 		}
 		else
 		{
 			$context['security_controls_query']['title'] = $txt['query_command_denied_guests'];
 			foreach ($_SESSION['query_command_denied'] as $command => $error)
-				$context['security_controls_query']['errors'][$command] = '<pre>' . sprintf($txt['query_command_denied_guests_msg'], Util::htmlspecialchars($command)) . '</pre>';
+				$context['security_controls_query']['errors'][$command] = '<pre>' . sprintf($txt['query_command_denied_guests_msg'], \ElkArte\Util::htmlspecialchars($command)) . '</pre>';
 		}
 	}
 
@@ -2175,7 +2172,7 @@ function serializeToJson($variable, $save_callback = null)
 	{
 		try
 		{
-			$array_form = Util::unserialize($variable);
+			$array_form = \ElkArte\Util::unserialize($variable);
 		}
 		catch (\Exception $e)
 		{

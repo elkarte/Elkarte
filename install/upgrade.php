@@ -487,27 +487,19 @@ function loadEssentialData()
 	if (file_exists(SOURCEDIR . '/database/Database.subs.php'))
 	{
 		require_once(SOURCEDIR . '/Subs.php');
-		require_once(SOURCEDIR . '/Errors.class.php');
 		require_once(SOURCEDIR . '/Logging.php');
 		require_once(SOURCEDIR . '/Load.php');
 		require_once(SUBSDIR . '/Cache.subs.php');
 		require_once(SOURCEDIR . '/Security.php');
-		require_once(SOURCEDIR . '/Autoloader.class.php');
-		$autoloder = Elk_Autoloader::instance();
-		$autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
-		$autoloder->register(SOURCEDIR, '\\ElkArte');
-		load_possible_databases($db_type);
+		require_once(EXTDIR . '/ClassLoader.php');
+
+		$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
+		$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
+		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
+		$loader->register();
+		require_once('./DatabaseCode.php');
 
 		$db = load_database();
-
-		$db->skip_next_error();
-		if ($db_type == 'mysql' && isset($db_character_set) && preg_match('~^\w+$~', $db_character_set) === 1)
-		{
-			$db->query('', '
-				SET NAMES ' . $db_character_set,
-				array()
-			);
-		}
 
 		// Load the modSettings data...
 		$db->skip_next_error();
@@ -849,7 +841,7 @@ function checkLogin()
 				if ($valid_password === false && !empty($_POST['passwrd']))
 				{
 					// SHA-1 from SMF?
-					$sha_passwd = sha1(Util::strtolower($_POST['user']) . $_POST['passwrd']);
+					$sha_passwd = sha1(\ElkArte\Util::strtolower($_POST['user']) . $_POST['passwrd']);
 					$valid_password = $sha_passwd === $password;
 
 					// Lets upgrade this to our new password
@@ -2056,7 +2048,7 @@ function loadEssentialFunctions()
 			$words = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', strtr($text, array('<br />' => ' ')));
 
 			// Step 2: Entities we left to letters, where applicable, lowercase.
-			$words = un_htmlspecialchars(Util::strtolower($words));
+			$words = un_htmlspecialchars(\ElkArte\Util::strtolower($words));
 
 			// Step 3: Ready to split apart and index!
 			$words = explode(' ', $words);
@@ -2124,7 +2116,7 @@ function discoverCollation()
 	$db_collation = '';
 
 	// If we're on MySQL supporting collations then let's find out what the members table uses and put it in a global var - to allow upgrade script to match collations!
-	if (!empty($databases[$db_type]['utf8_support']) && version_compare($databases[$db_type]['utf8_version'], $databases[$db_type]['utf8_version_check']($db_connection), '>'))
+	if (!empty($databases[$db_type]['test_collation']))
 	{
 		$db = load_database();
 

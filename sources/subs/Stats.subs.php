@@ -432,7 +432,7 @@ function topTopicStarter()
 	$top_starters = array();
 
 	// Try to cache this when possible, because it's a little unavoidably slow.
-	if (!Cache::instance()->getVar($members, 'stats_top_starters', 360) || empty($members))
+	if (!\ElkArte\Cache\Cache::instance()->getVar($members, 'stats_top_starters', 360) || empty($members))
 	{
 		$request = $db->query('', '
 			SELECT id_member_started, COUNT(*) AS hits
@@ -449,7 +449,7 @@ function topTopicStarter()
 		arsort($members);
 		$members = array_slice($members, 0, $modSettings['stats_limit'] ?? 10, true);
 
-		Cache::instance()->put('stats_top_starters', $members, 360);
+		\ElkArte\Cache\Cache::instance()->put('stats_top_starters', $members, 360);
 	}
 	$max_num_topics = max($members);
 
@@ -505,7 +505,7 @@ function topTimeOnline()
 	$max_members = isset($modSettings['stats_limit']) ? $modSettings['stats_limit'] : 10;
 
 	// Do we have something cached that will help speed this up?
-	$temp = Cache::instance()->get('stats_total_time_members', 600);
+	$temp = \ElkArte\Cache\Cache::instance()->get('stats_total_time_members', 600);
 
 	// Get the member data, sorted by total time logged in
 	$members_result = $db->query('', '
@@ -566,7 +566,7 @@ function topTimeOnline()
 
 	// Cache the ones we found for a bit, just so we don't have to look again.
 	if ($temp !== $temp2)
-		Cache::instance()->put('stats_total_time_members', $temp2, 600);
+		\ElkArte\Cache\Cache::instance()->put('stats_total_time_members', $temp2, 600);
 
 	return $top_time_online;
 }

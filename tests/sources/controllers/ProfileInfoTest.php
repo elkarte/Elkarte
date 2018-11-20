@@ -70,7 +70,7 @@ class TestProfileInfo extends \PHPUnit\Framework\TestCase
 	{
 		global $context, $modSettings;
 
-		$controller = new ProfileInfo_Controller(new Event_Manager());
+		$controller = new \ElkArte\Controller\ProfileInfo(new \ElkArte\EventManager());
 		$controller->pre_dispatch();
 		$controller->action_index();
 

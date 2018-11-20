@@ -368,8 +368,8 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>'
 			),
 			'subject' => $row['subject'],
-			'short_subject' => Util::shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24),
-			'preview' => Util::shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128),
+			'short_subject' => \ElkArte\Util::shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24),
+			'preview' => \ElkArte\Util::shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128),
 			'body' => $row['body'],
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),
@@ -547,7 +547,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 		$row['subject'] = censor($row['subject']);
 		$row['body'] = censor($row['body']);
 
-		$row['body'] = Util::shorten_text($row['body'], 128);
+		$row['body'] = \ElkArte\Util::shorten_text($row['body'], 128);
 
 		// Build the array.
 		$posts[$row['id_last_msg']] = array(
@@ -573,7 +573,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			'subject' => $row['subject'],
 			'replies' => $row['num_replies'],
 			'views' => $row['num_views'],
-			'short_subject' => Util::shorten_text($row['subject'], 25),
+			'short_subject' => \ElkArte\Util::shorten_text($row['subject'], 25),
 			'preview' => $row['body'],
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),
@@ -1539,7 +1539,7 @@ function ssi_pollVote()
 	list ($topic, $board) = topicFromPoll($pollID);
 	loadBoard();
 
-	$poll_action = new Poll_Controller(new Event_manager());
+	$poll_action = new \ElkArte\Controller\Poll(new \ElkArte\EventManager());
 	$poll_action->pre_dispatch();
 
 	// The controller takes already care of redirecting properly or fail
@@ -1610,7 +1610,7 @@ function ssi_todaysBirthdays($output_method = 'echo')
 		'include_birthdays' => true,
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
-	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
+	$return = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 	if ($output_method !== 'echo')
 	{
@@ -1643,7 +1643,7 @@ function ssi_todaysHolidays($output_method = 'echo')
 		'include_holidays' => true,
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
-	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
+	$return = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 	if ($output_method !== 'echo')
 	{
@@ -1673,7 +1673,7 @@ function ssi_todaysEvents($output_method = 'echo')
 		'include_events' => true,
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
-	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
+	$return = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 	if ($output_method !== 'echo')
 	{
@@ -1715,7 +1715,7 @@ function ssi_todaysCalendar($output_method = 'echo')
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
 
-	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
+	$return = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 	if ($output_method !== 'echo')
 	{

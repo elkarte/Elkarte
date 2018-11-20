@@ -78,7 +78,7 @@ class TestBrowser extends \PHPUnit\Framework\TestCase
 	{
 		global $context;
 
-		$detector = new testBrowser_Detector;
+		$detector = new testBrowserDetector;
 
 		foreach ($this->browser_testcases as $testcase)
 		{
@@ -95,7 +95,7 @@ class TestBrowser extends \PHPUnit\Framework\TestCase
 	}
 }
 
-class testBrowser_Detector extends Browser_Detector
+class testBrowserDetector extends \ElkArte\BrowserDetector
 {
 	public function testdetectBrowser()
 	{

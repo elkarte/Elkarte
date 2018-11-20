@@ -176,7 +176,7 @@ function url_parts($local, $global)
  *
  * @package Authorization
  * @param string $type = 'admin'
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function adminLogin($type = 'admin')
 {
@@ -197,7 +197,7 @@ function adminLogin($type = 'admin')
 		// log some info along with it! referer, user agent
 		$req = request();
 		$txt['security_wrong'] = sprintf($txt['security_wrong'], isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $txt['unknown'], $req->user_agent(), $user_info['ip']);
-		Errors::instance()->log_error($txt['security_wrong'], 'critical');
+		\ElkArte\Errors\Errors::instance()->log_error($txt['security_wrong'], 'critical');
 
 		if (isset($_POST[$type . '_hash_pass']))
 			unset($_POST[$type . '_hash_pass']);
@@ -329,7 +329,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 	foreach ($names as $i => $name)
 	{
 		// Trim, and fix wildcards for each name.
-		$names[$i] = trim(Util::strtolower($name));
+		$names[$i] = trim(\ElkArte\Util::strtolower($name));
 
 		$maybe_email |= strpos($name, '@') !== false;
 
@@ -410,7 +410,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
  * @param int         $memID
  * @param string|null $username = null
  *
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function resetPassword($memID, $username = null)
 {
@@ -434,7 +434,7 @@ function resetPassword($memID, $username = null)
 	}
 
 	// Generate a random password.
-	$tokenizer = new Token_Hash();
+	$tokenizer = new \ElkArte\TokenHash();
 	$newPassword = $tokenizer->generate_hash(14);
 
 	// Create a db hash for the generated password
@@ -447,14 +447,14 @@ function resetPassword($memID, $username = null)
 	require_once(SUBSDIR . '/Members.subs.php');
 	if ($username !== null)
 	{
-		$errors = ElkArte\Errors\ErrorContext::context('reset_pwd', 0);
+		$errors = \ElkArte\Errors\ErrorContext::context('reset_pwd', 0);
 		validateUsername($memID, $user, 'reset_pwd');
 
 		// If there are "important" errors and you are not an admin: log the first error
 		// Otherwise grab all of them and don't log anything
 		$error_severity = $errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
 		foreach ($errors->prepareErrors($error_severity) as $error)
-			throw new Elk_Exception($error, $error_severity === null ? false : 'general');
+			throw new \ElkArte\Exceptions\Exception($error, $error_severity === null ? false : 'general');
 
 		// Update the database...
 		updateMemberData($memID, array('member_name' => $user, 'passwd' => $db_hash));
@@ -487,16 +487,16 @@ function resetPassword($memID, $username = null)
  * @param boolean $check_reserved_name
  * @param boolean $fatal pass through to isReservedName
  * @return string
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function validateUsername($memID, $username, $ErrorContext = 'register', $check_reserved_name = true, $fatal = true)
 {
 	global $txt;
 
-	$errors = ElkArte\Errors\ErrorContext::context($ErrorContext, 0);
+	$errors = \ElkArte\Errors\ErrorContext::context($ErrorContext, 0);
 
 	// Don't use too long a name.
-	if (Util::strlen($username) > 25)
+	if (\ElkArte\Util::strlen($username) > 25)
 		$errors->addError('error_long_name');
 
 	// No name?!  How can you register with no name?
@@ -539,7 +539,7 @@ function validatePassword($password, $username, $restrict_in = array())
 	global $modSettings, $txt;
 
 	// Perform basic requirements first.
-	if (Util::strlen($password) < (empty($modSettings['password_strength']) ? 4 : 8))
+	if (\ElkArte\Util::strlen($password) < (empty($modSettings['password_strength']) ? 4 : 8))
 	{
 		theme()->getTemplates()->loadLanguageFile('Errors');
 		$txt['profile_error_password_short'] = sprintf($txt['profile_error_password_short'], empty($modSettings['password_strength']) ? 4 : 8);
@@ -553,7 +553,7 @@ function validatePassword($password, $username, $restrict_in = array())
 	// Otherwise, perform the medium strength test - checking if password appears in the restricted string.
 	if (preg_match('~\b' . preg_quote($password, '~') . '\b~', implode(' ', $restrict_in)) != 0)
 		return 'restricted_words';
-	elseif (Util::strpos($password, $username) !== false)
+	elseif (\ElkArte\Util::strpos($password, $username) !== false)
 		return 'restricted_words';
 
 	// If just medium, we're done.
@@ -562,7 +562,7 @@ function validatePassword($password, $username, $restrict_in = array())
 
 	// Otherwise, hard test next, check for numbers and letters, uppercase too.
 	$good = preg_match('~(\D\d|\d\D)~', $password) != 0;
-	$good &= Util::strtolower($password) != $password;
+	$good &= \ElkArte\Util::strtolower($password) != $password;
 
 	return $good ? null : 'chars';
 }
@@ -602,7 +602,7 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
 
 	// If the password is not 64 characters, lets make it a (SHA-256)
 	if (strlen($password) !== 64)
-		$password = hash('sha256', Util::strtolower($user) . un_htmlspecialchars($password));
+		$password = hash('sha256', \ElkArte\Util::strtolower($user) . un_htmlspecialchars($password));
 
 	// They need a password hash, something to save in the db?
 	if ($returnhash)
@@ -763,7 +763,7 @@ function isFirstLogin($id_member)
  * @param bool    $fatal
  *
  * @return array of members data or false on failure
- * @throws Elk_Exception no_user_with_email
+ * @throws \ElkArte\Exceptions\Exception no_user_with_email
  */
 function findUser($where, $where_params, $fatal = true)
 {
@@ -795,7 +795,7 @@ function findUser($where, $where_params, $fatal = true)
 		if ($db->num_rows($request) == 0)
 		{
 			if ($fatal)
-				throw new Elk_Exception('no_user_with_email', false);
+				throw new \ElkArte\Exceptions\Exception('no_user_with_email', false);
 			else
 				return false;
 		}
@@ -848,7 +848,7 @@ function userByEmail($email, $username = null)
  */
 function generateValidationCode($length = 10)
 {
-	$tokenizer = new Token_Hash();
+	$tokenizer = new \ElkArte\TokenHash();
 
 	return $tokenizer->generate_hash((int) $length);
 }

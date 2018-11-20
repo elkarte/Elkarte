@@ -30,7 +30,7 @@ class TestUtilclass extends \PHPUnit\Framework\TestCase
 	public function test_entity_fix()
 	{
 		$string = '8237'; // 0x202D
-		$this->assertEmpty(Util::entity_fix($string));
+		$this->assertEmpty(\ElkArte\Util::entity_fix($string));
 	}
 
 	/**
@@ -44,10 +44,10 @@ class TestUtilclass extends \PHPUnit\Framework\TestCase
 		$actual1 = 'Some string  with &quot;special&quot; chars like &amp; and &gt;';
 		$actual2 = 'Some string &amp;amp;#8238; with &quot;special&quot; chars like &amp; and &amp;gt;';
 
-		$this->assertEquals(Util::htmlspecialchars($string), $actual1);
+		$this->assertEquals(\ElkArte\Util::htmlspecialchars($string), $actual1);
 
 		$modSettings['disableEntityCheck'] = true;
-		$this->assertEquals(Util::htmlspecialchars($string, ENT_COMPAT, 'UTF-8', true), $actual2);
+		$this->assertEquals(\ElkArte\Util::htmlspecialchars($string, ENT_COMPAT, 'UTF-8', true), $actual2);
 	}
 
 	/**
@@ -58,8 +58,8 @@ class TestUtilclass extends \PHPUnit\Framework\TestCase
 		$string = ' &nbsp;	&#x202D;Some string with leading spaces';
 		$actual1 = 'Some string with leading spaces';
 
-		Util::htmltrim($string);
-		$this->assertEquals(Util::htmltrim($string), $actual1);
+		\ElkArte\Util::htmltrim($string);
+		$this->assertEquals(\ElkArte\Util::htmltrim($string), $actual1);
 	}
 
 	/**
@@ -68,7 +68,7 @@ class TestUtilclass extends \PHPUnit\Framework\TestCase
 	public function test_strpos()
 	{
 		// Should be 30, strpos would say 39
-		$this->assertEquals(Util::strpos($this->string, 'elkarte'), 30);
+		$this->assertEquals(\ElkArte\Util::strpos($this->string, 'elkarte'), 30);
 	}
 
 	/**
@@ -77,7 +77,7 @@ class TestUtilclass extends \PHPUnit\Framework\TestCase
 	public function test_substr()
 	{
 		// Should be 30, strpos would say 39
-		$this->assertEquals(Util::substr($this->string, 30, 7), 'elkarte');
+		$this->assertEquals(\ElkArte\Util::substr($this->string, 30, 7), 'elkarte');
 	}
 
 	/**
@@ -88,7 +88,7 @@ class TestUtilclass extends \PHPUnit\Framework\TestCase
 		$string = 'Sôn bôn de magnà el véder, el me fa minga mal.';
 		$actual = 'SÔN BÔN DE MAGNÀ EL VÉDER, EL ME FA MINGA MAL.';
 
-		$this->assertEquals(Util::strtoupper($string), $actual);
+		$this->assertEquals(\ElkArte\Util::strtoupper($string), $actual);
 	}
 
 	/**
@@ -99,7 +99,7 @@ class TestUtilclass extends \PHPUnit\Framework\TestCase
 		$string = 'Sôn bôn de magnà el véder, el me fa minga mal.';
 		$actual = 'sôn bôn de magnà el véder, el me fa minga mal.';
 
-		$this->assertEquals(Util::strtolower($string), $actual);
+		$this->assertEquals(\ElkArte\Util::strtolower($string), $actual);
 	}
 
 	/**
@@ -109,7 +109,7 @@ class TestUtilclass extends \PHPUnit\Framework\TestCase
 	{
 		$actual = html_entity_decode('Some 4 byte characters&#x2070e;&#x20731;&#x20779;', ENT_COMPAT, 'UTF-8');
 
-		$this->assertEquals(Util::shorten_text($this->string, 26, true, ''), $actual);
+		$this->assertEquals(\ElkArte\Util::shorten_text($this->string, 26, true, ''), $actual);
 	}
 
 	/**
@@ -120,7 +120,7 @@ class TestUtilclass extends \PHPUnit\Framework\TestCase
 		$string = '<div><b><i><u>ElkArte Forum Software</u></i></b></div>';
 		$actual = '<div><b><i><u>ElkArte...</u></i></b></div>';
 
-		$this->assertEquals(Util::shorten_html($string, 12), $actual);
+		$this->assertEquals(\ElkArte\Util::shorten_html($string, 12), $actual);
 	}
 
 	/**
@@ -128,6 +128,6 @@ class TestUtilclass extends \PHPUnit\Framework\TestCase
 	 */
 	public function test_strlen()
 	{
-		$this->assertEquals(Util::strlen($this->string), 45);
+		$this->assertEquals(\ElkArte\Util::strlen($this->string), 45);
 	}
 }

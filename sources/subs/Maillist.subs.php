@@ -211,9 +211,9 @@ function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $s
 		$email_filters[$row['id_filter']] = array(
 			'id_filter' => $row['id_filter'],
 			'filter_type' => $row['filter_type'],
-			'filter_to' => '<strong>"</strong>' . Util::htmlspecialchars($row['filter_to']) . '<strong>"</strong>',
-			'filter_from' => '<strong>"</strong>' . Util::htmlspecialchars($row['filter_from']) . '<strong>"</strong>',
-			'filter_name' => Util::htmlspecialchars($row['filter_name']),
+			'filter_to' => '<strong>"</strong>' . \ElkArte\Util::htmlspecialchars($row['filter_to']) . '<strong>"</strong>',
+			'filter_from' => '<strong>"</strong>' . \ElkArte\Util::htmlspecialchars($row['filter_from']) . '<strong>"</strong>',
+			'filter_name' => \ElkArte\Util::htmlspecialchars($row['filter_name']),
 			'filter_order' => $row['filter_order'],
 		);
 	}
@@ -268,7 +268,7 @@ function list_count_filter_parser($id, $style)
  * @param string $style parser or filter
  *
  * @return array of filters/parsers
- * @throws Elk_Exception email_error_no_filter
+ * @throws \ElkArte\Exceptions\Exception email_error_no_filter
  */
 function maillist_load_filter_parser($id, $style)
 {
@@ -291,7 +291,7 @@ function maillist_load_filter_parser($id, $style)
 
 	// Check that the filter does exist
 	if (empty($row))
-		throw new Elk_Exception('email_error_no_filter');
+		throw new \ElkArte\Exceptions\Exception('email_error_no_filter');
 
 	return $row;
 }

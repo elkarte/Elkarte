@@ -67,7 +67,7 @@ function writeLog($force = false)
 	// Guests use 0, members use their session ID.
 	$session_id = $user_info['is_guest'] ? 'ip' . $user_info['ip'] : session_id();
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	// Grab the last all-of-Elk-specific log_online deletion time.
 	$do_delete = $cache->get('log_online-update', 30) < time() - 30;

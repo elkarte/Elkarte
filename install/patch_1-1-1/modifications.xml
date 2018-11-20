@@ -802,7 +802,7 @@ if (isset($_GET['scheduled']))
 	// decoding failed, let's try with unserialize
 	if ($array_form === null)
 	{
-		$array_form = Util::unserialize($variable);
+		$array_form = \ElkArte\Util::unserialize($variable);
 
 		// If unserialize fails as well, let's just store an empty array
 		if ($array_form === false)]]></search>
@@ -813,7 +813,7 @@ if (isset($_GET['scheduled']))
 	{
 		try
 		{
-			$array_form = Util::unserialize($variable);
+			$array_form = \ElkArte\Util::unserialize($variable);
 		}
 		catch (\Exception $e)
 		{
@@ -1306,7 +1306,7 @@ function readFileVersions(&$version_info, $directories, $pattern, $recursive = f
 		</operation>
 		<operation>
 			<search position="replace"><![CDATA[	if (!empty($error))
-		throw new Elk_Exception('attach_check_nag', 'debug', array($error));
+		throw new \ElkArte\Exceptions\Exception('attach_check_nag', 'debug', array($error));
 
 	// These are the only valid image types.
 	$validImageTypes = array(
@@ -1325,7 +1325,7 @@ function readFileVersions(&$version_info, $directories, $pattern, $recursive = f
 	if ($_SESSION['temp_attachments'][$attachID]['size'] == 0)
 	{]]></search>
 			<add><![CDATA[	if (!empty($error))
-		throw new Elk_Exception('attach_check_nag', 'debug', array($error));
+		throw new \ElkArte\Exceptions\Exception('attach_check_nag', 'debug', array($error));
 
 	// Just in case this slipped by the first checks, we stop it here and now
 	if ($_SESSION['temp_attachments'][$attachID]['size'] == 0)
@@ -2343,14 +2343,14 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 		<operation>
 			<search position="replace"><![CDATA[
 	// Count the files with a glob, easier and less time consuming
-	$glob = new GlobIterator($dir . '/*.elk', FilesystemIterator::SKIP_DOTS);
+	$glob = new GlobIterator($dir . '/*.elk', \FilesystemIterator::SKIP_DOTS);
 	$num_files = $glob->count();
 
 	if ($num_files < $expected_files)
 		return array('files_missing', true, $num_files);]]></search>
 			<add><![CDATA[
 	// Count the files with a glob, easier and less time consuming
-	$glob = new GlobIterator($dir . '/*.elk', FilesystemIterator::SKIP_DOTS);
+	$glob = new GlobIterator($dir . '/*.elk', \FilesystemIterator::SKIP_DOTS);
 	try
 	{
 		$num_files = $glob->count();

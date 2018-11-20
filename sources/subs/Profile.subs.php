@@ -22,7 +22,7 @@
  * @param boolean $reload_id if true the already set value is ignored (default false)
  *
  * @return int if no error.  May return false in case of problems only if $fatal is set to false
- * @throws Elk_Exception not_a_user
+ * @throws \ElkArte\Exceptions\Exception not_a_user
  */
 function currentMemberID($fatal = true, $reload_id = false)
 {
@@ -50,7 +50,7 @@ function currentMemberID($fatal = true, $reload_id = false)
 		is_not_guest('', $fatal);
 
 		if ($fatal)
-			throw new Elk_Exception('not_a_user', false);
+			throw new \ElkArte\Exceptions\Exception('not_a_user', false);
 		else
 			return false;
 	}
@@ -206,7 +206,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		// If this was submitted already then make the value the posted version.
 		if (!empty($custom_fields) && isset($custom_fields[$row['col_name']]))
 		{
-			$value = Util::htmlspecialchars($custom_fields[$row['col_name']]);
+			$value = \ElkArte\Util::htmlspecialchars($custom_fields[$row['col_name']]);
 			if (in_array($row['field_type'], array('select', 'radio')))
 				$value = ($options = explode(',', $row['field_options'])) && isset($options[$value]) ? $options[$value] : '';
 		}
@@ -611,7 +611,7 @@ function loadProfileFields($force_reload = false)
 					}
 					elseif ($value !== null)
 					{
-						$errors = ElkArte\Errors\ErrorContext::context('change_username', 0);
+						$errors = \ElkArte\Errors\ErrorContext::context('change_username', 0);
 
 						validateUsername($context['id_member'], $value, 'change_username');
 
@@ -624,7 +624,7 @@ function loadProfileFields($force_reload = false)
 							// Otherwise grab all of them and do not log anything
 							$error_severity = $errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
 							foreach ($errors->prepareErrors($error_severity) as $error)
-								throw new Elk_Exception($error, $error_severity === null ? false : 'general');
+								throw new \ElkArte\Exceptions\Exception($error, $error_severity === null ? false : 'general');
 						}
 					}
 				}
@@ -768,7 +768,7 @@ function loadProfileFields($force_reload = false)
 
 				if (trim($value) == '')
 					return 'no_name';
-				elseif (Util::strlen($value) > 60)
+				elseif (\ElkArte\Util::strlen($value) > 60)
 					return 'name_too_long';
 				elseif ($cur_profile['real_name'] != $value)
 				{
@@ -937,7 +937,7 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_title',
 			'enabled' => !empty($modSettings['titlesEnable']),
 			'input_validate' => function (&$value) {
-				if (Util::strlen($value) > 50)
+				if (\ElkArte\Util::strlen($value) > 50)
 					return 'user_title_too_long';
 
 				return true;
@@ -998,7 +998,7 @@ function loadProfileFields($force_reload = false)
  *
  * @param string[] $fields
  * @param string $hook
- * @throws \Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function saveProfileFields($fields, $hook)
 {
@@ -1162,7 +1162,7 @@ function profileValidateEmail($email, $memID = 0)
 	// Check the name and email for validity.
 	$check = array();
 	$check['email'] = strtr($email, array('&#039;' => '\''));
-	if (Data_Validator::is_valid($check, array('email' => 'valid_email|required'), array('email' => 'trim')))
+	if (\ElkArte\DataValidator::is_valid($check, array('email' => 'valid_email|required'), array('email' => 'trim')))
 		$email = $check['email'];
 	else
 		return empty($check['email']) ? 'no_email' : 'bad_email';
@@ -1190,7 +1190,7 @@ function profileValidateEmail($email, $memID = 0)
  *
  * @param mixed[] $profile_vars
  * @param int $memID id_member
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function saveProfileChanges(&$profile_vars, $memID)
 {
@@ -1278,7 +1278,7 @@ function saveProfileChanges(&$profile_vars, $memID)
  * @param int $memID
  * @param int $id_theme
  *
- * @throws Elk_Exception no_access
+ * @throws \ElkArte\Exceptions\Exception no_access
  */
 function makeThemeChanges($memID, $id_theme)
 {
@@ -1307,7 +1307,7 @@ function makeThemeChanges($memID, $id_theme)
 
 	// Can't change reserved vars.
 	if ((isset($_POST['options']) && count(array_intersect(array_keys($_POST['options']), $reservedVars)) != 0) || (isset($_POST['default_options']) && count(array_intersect(array_keys($_POST['default_options']), $reservedVars)) != 0))
-		throw new Elk_Exception('no_access', false);
+		throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 	// Don't allow any overriding of custom fields with default or non-default options.
 	$request = $db->query('', '
@@ -1375,7 +1375,7 @@ function makeThemeChanges($memID, $id_theme)
 
 		$themes = explode(',', $modSettings['knownThemes']);
 		foreach ($themes as $t)
-			Cache::instance()->remove('theme_settings-' . $t . ':' . $memID);
+			\ElkArte\Cache\Cache::instance()->remove('theme_settings-' . $t . ':' . $memID);
 	}
 }
 
@@ -1547,7 +1547,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 				switch ($is_valid)
 				{
 					case 'custom_field_too_long':
-						$value = Util::substr($value, 0, $row['field_length']);
+						$value = \ElkArte\Util::substr($value, 0, $row['field_length']);
 						break;
 					case 'custom_field_invalid_email':
 					case 'custom_field_inproper_format':
@@ -1612,7 +1612,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 function isCustomFieldValid($field, $value)
 {
 	// Is it too long?
-	if ($field['field_length'] && $field['field_length'] < Util::strlen($value))
+	if ($field['field_length'] && $field['field_length'] < \ElkArte\Util::strlen($value))
 		return 'custom_field_too_long';
 
 	// Any masks to apply?
@@ -1898,7 +1898,7 @@ function profileReloadUser()
 	if (isset($_POST['passwrd2']) && $_POST['passwrd2'] != '')
 	{
 		require_once(SUBSDIR . '/Auth.subs.php');
-		setLoginCookie(60 * $modSettings['cookieTime'], $context['id_member'], hash('sha256', Util::strtolower($cur_profile['member_name']) . un_htmlspecialchars($_POST['passwrd2']) . $cur_profile['password_salt']));
+		setLoginCookie(60 * $modSettings['cookieTime'], $context['id_member'], hash('sha256', \ElkArte\Util::strtolower($cur_profile['member_name']) . un_htmlspecialchars($_POST['passwrd2']) . $cur_profile['password_salt']));
 	}
 
 	loadUserSettings();
@@ -2107,7 +2107,7 @@ function profileValidateSignature(&$value)
 	preparsecode($value);
 
 	// Too long?
-	if (!allowedTo('admin_forum') && !empty($sig_limits[1]) && Util::strlen(str_replace('<br />', "\n", $value)) > $sig_limits[1])
+	if (!allowedTo('admin_forum') && !empty($sig_limits[1]) && \ElkArte\Util::strlen(str_replace('<br />', "\n", $value)) > $sig_limits[1])
 	{
 		$_POST['signature'] = trim(htmlspecialchars(str_replace('<br />', "\n", $value), ENT_QUOTES, 'UTF-8'));
 		$txt['profile_error_signature_max_length'] = sprintf($txt['profile_error_signature_max_length'], $sig_limits[1]);
@@ -2125,7 +2125,7 @@ function profileValidateSignature(&$value)
  * @param mixed[] $value
  *
  * @return false|string
- * @throws Elk_Exception attachments_no_write, attach_timeout
+ * @throws \ElkArte\Exceptions\Exception attachments_no_write, attach_timeout
  */
 function profileSaveAvatarData(&$value)
 {
@@ -2150,7 +2150,7 @@ function profileSaveAvatarData(&$value)
 	{
 		theme()->getTemplates()->loadLanguageFile('Post');
 		if (!is_writable($uploadDir))
-			throw new Elk_Exception('attachments_no_write', 'critical');
+			throw new \ElkArte\Exceptions\Exception('attachments_no_write', 'critical');
 
 		require_once(SUBSDIR . '/Package.subs.php');
 
@@ -2259,14 +2259,14 @@ function profileSaveAvatarData(&$value)
 				if (!is_writable($uploadDir))
 				{
 					theme()->getTemplates()->loadLanguageFile('Post');
-					throw new Elk_Exception('attachments_no_write', 'critical');
+					throw new \ElkArte\Exceptions\Exception('attachments_no_write', 'critical');
 				}
 
 				$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, null, null, true);
 				if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $new_avatar_name))
 				{
 					theme()->getTemplates()->loadLanguageFile('Post');
-					throw new Elk_Exception('attach_timeout', 'critical');
+					throw new \ElkArte\Exceptions\Exception('attach_timeout', 'critical');
 				}
 
 				$_FILES['attachment']['tmp_name'] = $new_avatar_name;
@@ -2396,7 +2396,7 @@ function profileSaveAvatarData(&$value)
 					theme()->getTemplates()->loadLanguageFile('Post');
 					// I guess a man can try.
 					removeAttachments(array('id_member' => $memID));
-					throw new Elk_Exception('attach_timeout', 'critical');
+					throw new \ElkArte\Exceptions\Exception('attach_timeout', 'critical');
 				}
 
 				// Attempt to chmod it.
@@ -2427,7 +2427,7 @@ function profileSaveAvatarData(&$value)
  * @param int $value
  *
  * @return bool
- * @throws Elk_Exception at_least_one_admin
+ * @throws \ElkArte\Exceptions\Exception at_least_one_admin
  */
 function profileSaveGroups(&$value)
 {
@@ -2510,7 +2510,7 @@ function profileSaveGroups(&$value)
 			$db->free_result($request);
 
 			if (empty($another))
-				throw new Elk_Exception('at_least_one_admin', 'critical');
+				throw new \ElkArte\Exceptions\Exception('at_least_one_admin', 'critical');
 		}
 	}
 
@@ -3404,9 +3404,8 @@ function getMemberNotificationsProfile($member_id)
 		return array();
 
 	require_once(SUBSDIR . '/Notification.subs.php');
-	Elk_Autoloader::instance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
 
-	$mention_methods = Notifications::instance()->getNotifiers();
+	$mention_methods = \ElkArte\Notifications::instance()->getNotifiers();
 	$enabled_mentions = explode(',', $modSettings['enabled_mentions']);
 	$user_preferences = getUsersNotificationsPreferences($enabled_mentions, $member_id);
 	$mention_types = array();

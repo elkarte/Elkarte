@@ -16,7 +16,7 @@
 /**
  * Loads the GenericHelpers template
  *
- * @throws \Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function template_MergeTopics_init()
 {

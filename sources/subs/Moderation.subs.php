@@ -75,7 +75,7 @@ function recountOpenReports($flush = true, $count_pms = false)
 
 	if ($flush)
 	{
-		Cache::instance()->remove('num_menu_errors');
+		\ElkArte\Cache\Cache::instance()->remove('num_menu_errors');
 	}
 
 	return $open_reports;
@@ -279,7 +279,7 @@ function loadModeratorMenuCounts($brd = null)
 		return $menu_errors[$cache_key];
 
 	// If its been cached, guess what, that's right use it!
-	$temp = Cache::instance()->get('num_menu_errors', 900);
+	$temp = \ElkArte\Cache\Cache::instance()->get('num_menu_errors', 900);
 
 	if ($temp === null || !isset($temp[$cache_key]))
 	{
@@ -360,7 +360,7 @@ function loadModeratorMenuCounts($brd = null)
 		$menu_errors = is_array($temp) ? array_merge($temp, $menu_errors) : $menu_errors;
 
 		// Store it away for a while, not like this should change that often
-		Cache::instance()->put('num_menu_errors', $menu_errors, 900);
+		\ElkArte\Cache\Cache::instance()->put('num_menu_errors', $menu_errors, 900);
 	}
 	else
 		$menu_errors = $temp === null ? array() : $temp;
@@ -386,7 +386,7 @@ function logWarningNotice($subject, $body)
 			'subject' => 'string-255', 'body' => 'string-65534',
 		),
 		array(
-			Util::htmlspecialchars($subject), Util::htmlspecialchars($body),
+			\ElkArte\Util::htmlspecialchars($subject), \ElkArte\Util::htmlspecialchars($body),
 		),
 		array('id_notice')
 	);
@@ -514,7 +514,7 @@ function warningTemplates($start, $items_per_page, $sort, $template_type = 'warn
 			'html_time' => htmlTime($row['log_time']),
 			'timestamp' => forum_time(true, $row['log_time']),
 			'title' => $row['template_title'],
-			'body' => Util::htmlspecialchars($row['body']),
+			'body' => \ElkArte\Util::htmlspecialchars($row['body']),
 		);
 	}
 	$db->free_result($request);
@@ -558,7 +558,7 @@ function warningTemplateCount($template_type = 'warntpl')
 /**
  * Get all issued warnings in the system given the specified query parameters
  *
- * Callback for createList() in ModerationCenter_Controller::action_viewWarningLog().
+ * Callback for createList() in \ElkArte\Controller\ModerationCenter::action_viewWarningLog().
  *
  * @param int $start The item to start with (for pagination purposes)
  * @param int $items_per_page The number of items to show per page
@@ -611,7 +611,7 @@ function warnings($start, $items_per_page, $sort, $query_string = '', $query_par
 /**
  * Get the count of all current warnings.
  *
- * Callback for createList() in ModerationCenter_Controller::action_viewWarningLog().
+ * Callback for createList() in \ElkArte\Controller\ModerationCenter::action_viewWarningLog().
  *
  * @param string|null $query_string
  * @param mixed[] $query_params
@@ -668,7 +668,7 @@ function modLoadTemplate($id_template, $template_type = 'warntpl')
 	{
 		$context['template_data'] = array(
 			'title' => $row['template_title'],
-			'body' => Util::htmlspecialchars($row['body']),
+			'body' => \ElkArte\Util::htmlspecialchars($row['body']),
 			'personal' => $row['id_recipient'],
 			'can_edit_personal' => $row['id_member'] == $user_info['id'],
 		);
@@ -909,7 +909,7 @@ function approveAllUnapproved()
 	{
 		require_once(SUBSDIR . '/Post.subs.php');
 		approvePosts($msgs);
-		Cache::instance()->remove('num_menu_errors');
+		\ElkArte\Cache\Cache::instance()->remove('num_menu_errors');
 	}
 
 	// Now do attachments
@@ -930,7 +930,7 @@ function approveAllUnapproved()
 	{
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 		approveAttachments($attaches);
-		Cache::instance()->remove('num_menu_errors');
+		\ElkArte\Cache\Cache::instance()->remove('num_menu_errors');
 	}
 }
 
@@ -1224,7 +1224,7 @@ function basicWatchedUsers()
 	$db = database();
 
 	$watched_users = array();
-	if (!Cache::instance()->getVar($watched_users, 'recent_user_watches', 240))
+	if (!\ElkArte\Cache\Cache::instance()->getVar($watched_users, 'recent_user_watches', 240))
 	{
 		$modSettings['warning_watch'] = empty($modSettings['warning_watch']) ? 1 : $modSettings['warning_watch'];
 		$request = $db->query('', '
@@ -1242,7 +1242,7 @@ function basicWatchedUsers()
 			$watched_users[] = $row;
 		$db->free_result($request);
 
-		Cache::instance()->put('recent_user_watches', $watched_users, 240);
+		\ElkArte\Cache\Cache::instance()->put('recent_user_watches', $watched_users, 240);
 	}
 
 	return $watched_users;
@@ -1265,7 +1265,7 @@ function reportedPosts($show_pms = false)
 	$cachekey = md5(serialize($user_info['mod_cache']['bq']));
 
 	$reported_posts = array();
-	if (!Cache::instance()->getVar($reported_posts, 'reported_posts_' . $cachekey, 90))
+	if (!\ElkArte\Cache\Cache::instance()->getVar($reported_posts, 'reported_posts_' . $cachekey, 90))
 	{
 		$reported_posts = array();
 		// By George, that means we in a position to get the reports, jolly good.
@@ -1295,7 +1295,7 @@ function reportedPosts($show_pms = false)
 		$db->free_result($request);
 
 		// Cache it.
-		Cache::instance()->put('reported_posts_' . $cachekey, $reported_posts, 90);
+		\ElkArte\Cache\Cache::instance()->put('reported_posts_' . $cachekey, $reported_posts, 90);
 	}
 
 	return $reported_posts;
@@ -1332,7 +1332,7 @@ function countModeratorNotes()
 	$db = database();
 
 	$moderator_notes_total = 0;
-	if (!Cache::instance()->getVar($moderator_notes_total, 'moderator_notes_total', 240))
+	if (!\ElkArte\Cache\Cache::instance()->getVar($moderator_notes_total, 'moderator_notes_total', 240))
 	{
 		$request = $db->query('', '
 			SELECT
@@ -1347,7 +1347,7 @@ function countModeratorNotes()
 		list ($moderator_notes_total) = $db->fetch_row($request);
 		$db->free_result($request);
 
-		Cache::instance()->put('moderator_notes_total', $moderator_notes_total, 240);
+		\ElkArte\Cache\Cache::instance()->put('moderator_notes_total', $moderator_notes_total, 240);
 	}
 
 	return $moderator_notes_total;
@@ -1419,7 +1419,7 @@ function moderatorNotes($offset)
 
 	// Grab the current notes.
 	// We can only use the cache for the first page of notes.
-	if ($offset != 0 || !Cache::instance()->getVar($moderator_notes, 'moderator_notes', 240))
+	if ($offset != 0 || !\ElkArte\Cache\Cache::instance()->getVar($moderator_notes, 'moderator_notes', 240))
 	{
 		$request = $db->query('', '
 			SELECT COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, lc.member_name) AS member_name,
@@ -1440,7 +1440,7 @@ function moderatorNotes($offset)
 		$db->free_result($request);
 
 		if ($offset == 0)
-			Cache::instance()->put('moderator_notes', $moderator_notes, 240);
+			\ElkArte\Cache\Cache::instance()->put('moderator_notes', $moderator_notes, 240);
 	}
 
 	return $moderator_notes;

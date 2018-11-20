@@ -15,6 +15,10 @@
  *
  */
 
+use ElkArte\Errors;
+use ElkArte\Debug;
+use ElkArte\Hooks;
+
 /**
  * Class Bootstrap
  *
@@ -29,7 +33,7 @@ class Bootstrap
 	 * @param bool $standalone
 	 *  - true to boot outside of elkarte
 	 *  - false to bootstrap the main elkarte site.
-	 * @throws \Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function __construct($standalone = true)
 	{
@@ -216,8 +220,8 @@ class Bootstrap
 		define('EXTDIR', $extdir);
 		define('LANGUAGEDIR', $languagedir);
 		define('SOURCEDIR', $sourcedir);
-		define('ADMINDIR', $sourcedir . '/admin');
-		define('CONTROLLERDIR', $sourcedir . '/controllers');
+		define('ADMINDIR', $sourcedir . '/ElkArte/AdminController');
+		define('CONTROLLERDIR', $sourcedir . '/ElkArte/Controller');
 		define('SUBSDIR', $sourcedir . '/subs');
 		define('ADDONSDIR', $boarddir . '/addons');
 		unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
@@ -243,12 +247,12 @@ class Bootstrap
 	 */
 	private function loadAutoloader()
 	{
-		// Initialize the class Autoloader
-		require_once(SOURCEDIR . '/Autoloader.class.php');
-		$autoloader = Elk_Autoloader::instance();
-		$autoloader->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
-		$autoloader->register(SOURCEDIR, '\\ElkArte');
-		$autoloader->register(SOURCEDIR . '/subs/BBC', '\\BBC');
+		require_once(EXTDIR . '/ClassLoader.php');
+
+		$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
+		$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
+		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
+		$loader->register();
 	}
 
 	/**
@@ -261,7 +265,7 @@ class Bootstrap
 		// Don't do john didley if the forum's been shut down completely.
 		if (!empty($maintenance) && $maintenance == 2 && (!isset($ssi_maintenance_off) || $ssi_maintenance_off !== true))
 		{
-			Errors::instance()->display_maintenance_message();
+			\ElkArte\Errors\Errors::instance()->display_maintenance_message();
 		}
 	}
 
@@ -276,7 +280,7 @@ class Bootstrap
 		// Show lots of debug information below the page, not for production sites
 		if ($db_show_debug === true)
 		{
-			Debug::instance()->rusage('start', $rusage_start);
+			\ElkArte\Debug::instance()->rusage('start', $rusage_start);
 		}
 	}
 
@@ -294,7 +298,7 @@ class Bootstrap
 		loadDatabase();
 
 		// Let's set up our shiny new hooks handler.
-		Hooks::init(database(), Debug::instance());
+		\ElkArte\Hooks::init(database(), \ElkArte\Debug::instance());
 
 		// It's time for settings loaded from the database.
 		reloadSettings();
@@ -310,7 +314,7 @@ class Bootstrap
 	 * If you are running SSI standalone, you need to call this function after bootstrap is
 	 * initialized.
 	 *
-	 * @throws \Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function ssi_main()
 	{
@@ -350,7 +354,7 @@ class Bootstrap
 
 			if (!isset($_SESSION['session_value']))
 			{
-				$tokenizer = new Token_Hash();
+				$tokenizer = new \ElkArte\TokenHash();
 				$_SESSION['session_value'] = $tokenizer->generate_hash(32, session_id());
 				$_SESSION['session_var'] = substr(preg_replace('~^\d+~', '', $tokenizer->generate_hash(16, session_id())), 0, rand(7, 12));
 			}
@@ -375,7 +379,7 @@ class Bootstrap
 		loadPermissions();
 
 		// Load the current or SSI theme. (just use $ssi_theme = id_theme;)
-		new ElkArte\Themes\ThemeLoader(isset($ssi_theme) ? (int) $ssi_theme : 0);
+		new \ElkArte\Themes\ThemeLoader(isset($ssi_theme) ? (int) $ssi_theme : 0);
 
 		// Load BadBehavior functions
 		loadBadBehavior();
@@ -395,7 +399,7 @@ class Bootstrap
 		// Do we allow guests in here?
 		if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && basename($_SERVER['PHP_SELF']) !== 'SSI.php')
 		{
-			$controller = new Auth_Controller(new Event_manager());
+			$controller = new \ElkArte\Controller\Auth(new \ElkArte\EventManager());
 			$controller->action_kickguest();
 			obExit(null, true);
 		}
@@ -412,7 +416,7 @@ class Bootstrap
 		// Load the stuff like the menu bar, etc.
 		if (isset($ssi_layers))
 		{
-			$template_layers = Template_Layers::instance();
+			$template_layers = theme()->getLayers();
 			$template_layers->removeAll();
 			foreach ($ssi_layers as $layer)
 			{

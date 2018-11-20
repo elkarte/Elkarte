@@ -31,11 +31,8 @@
  */
 function cleanRequest()
 {
-	require_once(SOURCEDIR . '/Request.php');
-	Elk_Autoloader::instance()->register(SUBSDIR . '/UrlGenerator', '\\ElkArte\\UrlGenerator');
-
 	// Make sure REMOTE_ADDR, other IPs, and the like are parsed
-	$req = Request::instance();
+	$req = \ElkArte\Request::instance();
 
 	$parser = initUrlGenerator()->getParser();
 
@@ -171,7 +168,7 @@ function expandIPv6($addr, $strict_check = true)
 function htmlspecialchars__recursive($var, $level = 0)
 {
 	if (!is_array($var))
-		return Util::htmlspecialchars($var, ENT_QUOTES);
+		return \ElkArte\Util::htmlspecialchars($var, ENT_QUOTES);
 
 	// Add the htmlspecialchars to every element.
 	foreach ($var as $k => $v)
@@ -200,7 +197,7 @@ function htmltrim__recursive($var, $level = 0)
 {
 	// Remove spaces (32), tabs (9), returns (13, 10, and 11), nulls (0), and hard spaces. (160)
 	if (!is_array($var))
-		return Util::htmltrim($var);
+		return \ElkArte\Util::htmltrim($var);
 
 	// Go through all the elements and remove the whitespace.
 	foreach ($var as $k => $v)
