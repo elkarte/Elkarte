@@ -60,7 +60,7 @@ interface SearchInterface
 
 	/**
 	 * Create a temporary table.
-	 * A wrapper around DbTable::db_create_table setting the 'temporary' parameter.
+	 * A wrapper around DbTable::create_table setting the 'temporary' parameter.
 	 *
 	 * @param string $name
 	 * @param mixed[] $columns in the format specified.

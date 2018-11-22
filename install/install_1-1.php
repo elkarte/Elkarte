@@ -26,7 +26,7 @@ class InstallInstructions_install_1_1
 
 	public function table_antispam_questions()
 	{
-		return $this->table->db_create_table('{db_prefix}antispam_questions',
+		return $this->table->create_table('{db_prefix}antispam_questions',
 			array(
 				array('name' => 'id_question', 'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'auto' => true),
 				array('name' => 'question',    'type' => 'text'),
@@ -44,7 +44,7 @@ class InstallInstructions_install_1_1
 
 	public function table_approval_queue()
 	{
-		return $this->table->db_create_table('{db_prefix}approval_queue',
+		return $this->table->create_table('{db_prefix}approval_queue',
 			array(
 				array('name' => 'id_msg',    'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_attach', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
@@ -58,7 +58,7 @@ class InstallInstructions_install_1_1
 
 	public function table_attachments()
 	{
-		return $this->table->db_create_table('{db_prefix}attachments',
+		return $this->table->create_table('{db_prefix}attachments',
 			array(
 				array('name' => 'id_attach',       'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
 				array('name' => 'id_thumb',        'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
@@ -90,7 +90,7 @@ class InstallInstructions_install_1_1
 
 	public function table_ban_groups()
 	{
-		return $this->table->db_create_table('{db_prefix}ban_groups',
+		return $this->table->create_table('{db_prefix}ban_groups',
 			array(
 				array('name' => 'id_ban_group',    'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
 				array('name' => 'name',            'type' => 'varchar', 'default' => '', 'size' => 20),
@@ -113,7 +113,7 @@ class InstallInstructions_install_1_1
 
 	public function table_ban_items()
 	{
-		return $this->table->db_create_table('{db_prefix}ban_items',
+		return $this->table->create_table('{db_prefix}ban_items',
 			array(
 				array('name' => 'id_ban',        'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
 				array('name' => 'id_ban_group',  'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
@@ -149,7 +149,7 @@ class InstallInstructions_install_1_1
 
 	public function table_board_permissions()
 	{
-		return $this->table->db_create_table('{db_prefix}board_permissions',
+		return $this->table->create_table('{db_prefix}board_permissions',
 			array(
 				array('name' => 'id_group',   'type' => 'smallint', 'size' => 5, 'default' => 0),
 				array('name' => 'id_profile', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
@@ -544,7 +544,7 @@ class InstallInstructions_install_1_1
 
 	public function table_boards()
 	{
-		return $this->table->db_create_table('{db_prefix}boards',
+		return $this->table->create_table('{db_prefix}boards',
 			array(
 				array('name' => 'id_board',           'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'auto' => true),
 				array('name' => 'id_cat',             'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 0),
@@ -593,7 +593,7 @@ class InstallInstructions_install_1_1
 
 	public function table_calendar()
 	{
-		return $this->table->db_create_table('{db_prefix}calendar',
+		return $this->table->create_table('{db_prefix}calendar',
 			array(
 				array('name' => 'id_event',   'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'auto' => true),
 				array('name' => 'start_date', 'type' => 'date', 'default' => '0001-01-01'),
@@ -616,7 +616,7 @@ class InstallInstructions_install_1_1
 
 	public function table_calendar_holidays()
 	{
-		return $this->table->db_create_table('{db_prefix}calendar_holidays',
+		return $this->table->create_table('{db_prefix}calendar_holidays',
 			array(
 				array('name' => 'id_holiday', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'auto' => true),
 				array('name' => 'event_date', 'type' => 'date', 'default' => '0001-01-01'),
@@ -695,7 +695,7 @@ class InstallInstructions_install_1_1
 
 	public function table_categories()
 	{
-		return $this->table->db_create_table('{db_prefix}categories',
+		return $this->table->create_table('{db_prefix}categories',
 			array(
 				array('name' => 'id_cat',       'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'auto' => true),
 				array('name' => 'cat_order',    'type' => 'tinyint', 'size' => 4, 'default' => 0),
@@ -724,7 +724,7 @@ class InstallInstructions_install_1_1
 
 	public function table_collapsed_categories()
 	{
-		return $this->table->db_create_table('{db_prefix}collapsed_categories',
+		return $this->table->create_table('{db_prefix}collapsed_categories',
 			array(
 				array('name' => 'id_cat',   'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_member',   'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -739,7 +739,7 @@ class InstallInstructions_install_1_1
 
 	public function table_custom_fields()
 	{
-		return $this->table->db_create_table('{db_prefix}custom_fields',
+		return $this->table->create_table('{db_prefix}custom_fields',
 			array(
 				array('name' => 'id_field',        'type' => 'smallint', 'size' => 5, 'auto' => true),
 				array('name' => 'col_name',        'type' => 'varchar', 'default' => '', 'size' => 12),
@@ -1058,7 +1058,7 @@ class InstallInstructions_install_1_1
 
 	public function table_custom_fields_data()
 	{
-		return $this->table->db_create_table('{db_prefix}custom_fields_data',
+		return $this->table->create_table('{db_prefix}custom_fields_data',
 			array(
 				array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'variable',  'type' => 'varchar', 'size' => 255, 'default' => ''),
@@ -1075,7 +1075,7 @@ class InstallInstructions_install_1_1
 
 	public function table_group_moderators()
 	{
-		return $this->table->db_create_table('{db_prefix}group_moderators',
+		return $this->table->create_table('{db_prefix}group_moderators',
 			array(
 				array('name' => 'id_group',  'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -1090,7 +1090,7 @@ class InstallInstructions_install_1_1
 
 	public function table_follow_ups()
 	{
-		return $this->table->db_create_table('{db_prefix}follow_ups',
+		return $this->table->create_table('{db_prefix}follow_ups',
 			array(
 				array('name' => 'follow_up',    'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
 				array('name' => 'derived_from', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
@@ -1105,7 +1105,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_actions()
 	{
-		return $this->table->db_create_table('{db_prefix}log_actions',
+		return $this->table->create_table('{db_prefix}log_actions',
 			array(
 				array('name' => 'id_action', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
 				array('name' => 'id_log',    'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 1),
@@ -1133,7 +1133,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_activity()
 	{
-		return $this->table->db_create_table('{db_prefix}log_activity',
+		return $this->table->create_table('{db_prefix}log_activity',
 			array(
 				array('name' => 'date',      'type' => 'date', 'default' => '0001-01-01'),
 				array('name' => 'hits',      'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -1155,7 +1155,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_badbehavior()
 	{
-		return $this->table->db_create_table('{db_prefix}log_badbehavior',
+		return $this->table->create_table('{db_prefix}log_badbehavior',
 			array(
 				array('name' => 'id',              'type' => 'int', 'size' => 10, 'auto' => true),
 				array('name' => 'ip',              'type' => 'char', 'size' => 19),
@@ -1182,7 +1182,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_banned()
 	{
-		return $this->table->db_create_table('{db_prefix}log_banned',
+		return $this->table->create_table('{db_prefix}log_banned',
 			array(
 				array('name' => 'id_ban_log', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
 				array('name' => 'id_member',  'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -1201,7 +1201,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_boards()
 	{
-		return $this->table->db_create_table('{db_prefix}log_boards',
+		return $this->table->create_table('{db_prefix}log_boards',
 			array(
 				array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_board',  'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
@@ -1217,7 +1217,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_comments()
 	{
-		return $this->table->db_create_table('{db_prefix}log_comments',
+		return $this->table->create_table('{db_prefix}log_comments',
 			array(
 				array('name' => 'id_comment',     'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
 				array('name' => 'id_member',      'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -1243,7 +1243,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_digest()
 	{
-		return $this->table->db_create_table('{db_prefix}log_digest',
+		return $this->table->create_table('{db_prefix}log_digest',
 			array(
 				array('name' => 'id_topic',  'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_msg',    'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
@@ -1260,7 +1260,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_errors()
 	{
-		return $this->table->db_create_table('{db_prefix}log_errors',
+		return $this->table->create_table('{db_prefix}log_errors',
 			array(
 				array('name' => 'id_error',   'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
 				array('name' => 'log_time',   'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
@@ -1286,7 +1286,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_floodcontrol()
 	{
-		return $this->table->db_create_table('{db_prefix}log_floodcontrol',
+		return $this->table->create_table('{db_prefix}log_floodcontrol',
 			array(
 				array('name' => 'ip',       'type' => 'char', 'size' => 16, 'default' => '                '),
 				array('name' => 'log_time', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
@@ -1302,7 +1302,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_group_requests()
 	{
-		return $this->table->db_create_table('{db_prefix}log_group_requests',
+		return $this->table->create_table('{db_prefix}log_group_requests',
 			array(
 				array('name' => 'id_request',   'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
 				array('name' => 'id_member',    'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -1321,7 +1321,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_karma()
 	{
-		return $this->table->db_create_table('{db_prefix}log_karma',
+		return $this->table->create_table('{db_prefix}log_karma',
 			array(
 				array('name' => 'id_target',   'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_executor', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -1339,7 +1339,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_likes()
 	{
-		return $this->table->db_create_table('{db_prefix}log_likes',
+		return $this->table->create_table('{db_prefix}log_likes',
 			array(
 				array('name' => 'action',    'type' => 'char', 'size' => 1, 'default' => '0'),
 				array('name' => 'id_target', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -1357,7 +1357,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_mark_read()
 	{
-		return $this->table->db_create_table('{db_prefix}log_mark_read',
+		return $this->table->create_table('{db_prefix}log_mark_read',
 			array(
 				array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_board',  'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
@@ -1373,7 +1373,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_member_notices()
 	{
-		return $this->table->db_create_table('{db_prefix}log_member_notices',
+		return $this->table->create_table('{db_prefix}log_member_notices',
 			array(
 				array('name' => 'id_notice', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
 				array('name' => 'subject',   'type' => 'varchar', 'size' => 255, 'default' => ''),
@@ -1389,7 +1389,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_mentions()
 	{
-		return $this->table->db_create_table('{db_prefix}log_mentions',
+		return $this->table->create_table('{db_prefix}log_mentions',
 			array(
 				array('name' => 'id_mention',     'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
 				array('name' => 'id_member',      'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -1411,7 +1411,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_notify()
 	{
-		return $this->table->db_create_table('{db_prefix}log_notify',
+		return $this->table->create_table('{db_prefix}log_notify',
 			array(
 				array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_topic',  'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -1429,7 +1429,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_online()
 	{
-		return $this->table->db_create_table('{db_prefix}log_online',
+		return $this->table->create_table('{db_prefix}log_online',
 			array(
 				array('name' => 'session',   'type' => 'varchar', 'size' => 64, 'default' => ''),
 				array('name' => 'log_time',  'type' => 'int', 'size' => 10, 'default' => 0),
@@ -1450,7 +1450,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_packages()
 	{
-		return $this->table->db_create_table('{db_prefix}log_packages',
+		return $this->table->create_table('{db_prefix}log_packages',
 			array(
 				array('name' => 'id_install',          'type' => 'int', 'size' => 10, 'auto' => true),
 				array('name' => 'filename',            'type' => 'varchar', 'size' => 255, 'default' => ''),
@@ -1480,7 +1480,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_polls()
 	{
-		return $this->table->db_create_table('{db_prefix}log_polls',
+		return $this->table->create_table('{db_prefix}log_polls',
 			array(
 				array('name' => 'id_poll',   'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -1496,7 +1496,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_reported()
 	{
-		return $this->table->db_create_table('{db_prefix}log_reported',
+		return $this->table->create_table('{db_prefix}log_reported',
 			array(
 				array('name' => 'id_report',    'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
 				array('name' => 'id_msg',       'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
@@ -1529,7 +1529,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_reported_comments()
 	{
-		return $this->table->db_create_table('{db_prefix}log_reported_comments',
+		return $this->table->create_table('{db_prefix}log_reported_comments',
 			array(
 				array('name' => 'id_comment',    'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
 				array('name' => 'id_report',     'type' => 'mediumint', 'size' => 8, 'default' => 0),
@@ -1553,7 +1553,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_scheduled_tasks()
 	{
-		return $this->table->db_create_table('{db_prefix}log_scheduled_tasks',
+		return $this->table->create_table('{db_prefix}log_scheduled_tasks',
 			array(
 				array('name' => 'id_log',     'type' => 'mediumint', 'size' => 8, 'auto' => true),
 				array('name' => 'id_task',    'type' => 'smallint', 'size' => 5, 'default' => 0),
@@ -1570,7 +1570,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_search_messages()
 	{
-		return $this->table->db_create_table('{db_prefix}log_search_messages',
+		return $this->table->create_table('{db_prefix}log_search_messages',
 			array(
 				array('name' => 'id_search', 'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_msg',    'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
@@ -1585,7 +1585,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_search_results()
 	{
-		return $this->table->db_create_table('{db_prefix}log_search_results',
+		return $this->table->create_table('{db_prefix}log_search_results',
 			array(
 				array('name' => 'id_search',   'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_topic',    'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -1603,7 +1603,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_search_subjects()
 	{
-		return $this->table->db_create_table('{db_prefix}log_search_subjects',
+		return $this->table->create_table('{db_prefix}log_search_subjects',
 			array(
 				array('name' => 'word',     'type' => 'varchar', 'size' => 20, 'default' => ''),
 				array('name' => 'id_topic', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -1619,7 +1619,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_search_topics()
 	{
-		return $this->table->db_create_table('{db_prefix}log_search_topics',
+		return $this->table->create_table('{db_prefix}log_search_topics',
 			array(
 				array('name' => 'id_search', 'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_topic',  'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -1634,7 +1634,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_spider_hits()
 	{
-		return $this->table->db_create_table('{db_prefix}log_spider_hits',
+		return $this->table->create_table('{db_prefix}log_spider_hits',
 			array(
 				array('name' => 'id_hit',    'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
 				array('name' => 'id_spider', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
@@ -1655,7 +1655,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_spider_stats()
 	{
-		return $this->table->db_create_table('{db_prefix}log_spider_stats',
+		return $this->table->create_table('{db_prefix}log_spider_stats',
 			array(
 				array('name' => 'id_spider', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
 				array('name' => 'page_hits', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
@@ -1672,7 +1672,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_subscribed()
 	{
-		return $this->table->db_create_table('{db_prefix}log_subscribed',
+		return $this->table->create_table('{db_prefix}log_subscribed',
 			array(
 				array('name' => 'id_sublog',        'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
 				array('name' => 'id_subscribe',     'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -1702,7 +1702,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_topics()
 	{
-		return $this->table->db_create_table('{db_prefix}log_topics',
+		return $this->table->create_table('{db_prefix}log_topics',
 			array(
 				array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_topic',  'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -1720,7 +1720,7 @@ class InstallInstructions_install_1_1
 
 	public function table_mail_queue()
 	{
-		return $this->table->db_create_table('{db_prefix}mail_queue',
+		return $this->table->create_table('{db_prefix}mail_queue',
 			array(
 				array('name' => 'id_mail',    'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
 				array('name' => 'time_sent',  'type' => 'int', 'size' => 10, 'default' => 0),
@@ -1745,7 +1745,7 @@ class InstallInstructions_install_1_1
 
 	public function table_membergroups()
 	{
-		return $this->table->db_create_table('{db_prefix}membergroups',
+		return $this->table->create_table('{db_prefix}membergroups',
 			array(
 				array('name' => 'id_group',     'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'auto' => true),
 				array('name' => 'group_name',   'type' => 'varchar', 'size' => 80, 'default' => ''),
@@ -1788,7 +1788,7 @@ class InstallInstructions_install_1_1
 
 	public function table_members()
 	{
-		return $this->table->db_create_table('{db_prefix}members',
+		return $this->table->create_table('{db_prefix}members',
 			array(
 				array('name' => 'id_member',            'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
 				array('name' => 'member_name',          'type' => 'varchar', 'size' => 80, 'default' => ''),
@@ -1872,7 +1872,7 @@ class InstallInstructions_install_1_1
 
 	public function table_member_logins()
 	{
-		return $this->table->db_create_table('{db_prefix}member_logins',
+		return $this->table->create_table('{db_prefix}member_logins',
 			array(
 				array('name' => 'id_login',  'type' => 'int', 'size' => 10, 'auto' => true),
 				array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -1892,7 +1892,7 @@ class InstallInstructions_install_1_1
 
 	public function table_message_icons()
 	{
-		return $this->table->db_create_table('{db_prefix}message_icons',
+		return $this->table->create_table('{db_prefix}message_icons',
 			array(
 				array('name' => 'id_icon',    'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'auto' => true),
 				array('name' => 'title',      'type' => 'varchar', 'size' => 80, 'default' => ''),
@@ -1936,7 +1936,7 @@ class InstallInstructions_install_1_1
 
 	public function table_message_likes()
 	{
-		return $this->table->db_create_table('{db_prefix}message_likes',
+		return $this->table->create_table('{db_prefix}message_likes',
 			array(
 				array('name' => 'id_member',      'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_msg',         'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -1955,7 +1955,7 @@ class InstallInstructions_install_1_1
 
 	public function table_messages()
 	{
-		return $this->table->db_create_table('{db_prefix}messages',
+		return $this->table->create_table('{db_prefix}messages',
 			array(
 				array('name' => 'id_msg',          'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
 				array('name' => 'id_topic',        'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -2007,7 +2007,7 @@ class InstallInstructions_install_1_1
 
 	public function table_moderators()
 	{
-		return $this->table->db_create_table('{db_prefix}moderators',
+		return $this->table->create_table('{db_prefix}moderators',
 			array(
 				array('name' => 'id_board',  'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -2022,7 +2022,7 @@ class InstallInstructions_install_1_1
 
 	public function table_notifications_pref()
 	{
-		return $this->table->db_create_table('{db_prefix}notifications_pref',
+		return $this->table->create_table('{db_prefix}notifications_pref',
 			array(
 				array('name' => 'id_member',          'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'notification_level', 'type' => 'tinyint', 'size' => 1, 'default' => 1),
@@ -2074,7 +2074,7 @@ class InstallInstructions_install_1_1
 
 	public function table_openid_assoc()
 	{
-		return $this->table->db_create_table('{db_prefix}openid_assoc',
+		return $this->table->create_table('{db_prefix}openid_assoc',
 			array(
 				array('name' => 'server_url', 'type' => 'text'),
 				array('name' => 'handle',     'type' => 'varchar', 'size' => 255, 'default' => ''),
@@ -2094,7 +2094,7 @@ class InstallInstructions_install_1_1
 
 	public function table_package_servers()
 	{
-		return $this->table->db_create_table('{db_prefix}package_servers',
+		return $this->table->create_table('{db_prefix}package_servers',
 			array(
 				array('name' => 'id_server', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'auto' => true),
 				array('name' => 'name',      'type' => 'varchar', 'size' => 255, 'default' => ''),
@@ -2122,7 +2122,7 @@ class InstallInstructions_install_1_1
 
 	public function table_pending_notifications()
 	{
-		return $this->table->db_create_table('{db_prefix}pending_notifications',
+		return $this->table->create_table('{db_prefix}pending_notifications',
 			array(
 				array('name' => 'notification_type', 'type' => 'varchar', 'size' => 10),
 				array('name' => 'id_member',         'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -2140,7 +2140,7 @@ class InstallInstructions_install_1_1
 
 	public function table_permission_profiles()
 	{
-		return $this->table->db_create_table('{db_prefix}permission_profiles',
+		return $this->table->create_table('{db_prefix}permission_profiles',
 			array(
 				array('name' => 'id_profile',   'type' => 'smallint', 'size' => 5, 'auto' => true),
 				array('name' => 'profile_name', 'type' => 'varchar', 'size' => 255, 'default' => ''),
@@ -2170,7 +2170,7 @@ class InstallInstructions_install_1_1
 
 	public function table_permissions()
 	{
-		return $this->table->db_create_table('{db_prefix}permissions',
+		return $this->table->create_table('{db_prefix}permissions',
 			array(
 				array('name' => 'id_group',   'type' => 'smallint', 'size' => 5, 'default' => 0),
 				array('name' => 'permission', 'type' => 'varchar', 'size' => 30, 'default' => ''),
@@ -2237,7 +2237,7 @@ class InstallInstructions_install_1_1
 
 	public function table_personal_messages()
 	{
-		return $this->table->db_create_table('{db_prefix}personal_messages',
+		return $this->table->create_table('{db_prefix}personal_messages',
 			array(
 				array('name' => 'id_pm',             'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
 				array('name' => 'id_pm_head',        'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
@@ -2261,7 +2261,7 @@ class InstallInstructions_install_1_1
 
 	public function table_pm_recipients()
 	{
-		return $this->table->db_create_table('{db_prefix}pm_recipients',
+		return $this->table->create_table('{db_prefix}pm_recipients',
 			array(
 				array('name' => 'id_pm',     'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -2282,7 +2282,7 @@ class InstallInstructions_install_1_1
 
 	public function table_pm_rules()
 	{
-		return $this->table->db_create_table('{db_prefix}pm_rules',
+		return $this->table->create_table('{db_prefix}pm_rules',
 			array(
 				array('name' => 'id_rule',   'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
 				array('name' => 'id_member', 'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
@@ -2304,7 +2304,7 @@ class InstallInstructions_install_1_1
 
 	public function table_polls()
 	{
-		return $this->table->db_create_table('{db_prefix}polls',
+		return $this->table->create_table('{db_prefix}polls',
 			array(
 				array('name' => 'id_poll',          'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
 				array('name' => 'question',         'type' => 'varchar', 'size' => 255, 'default' => ''),
@@ -2329,7 +2329,7 @@ class InstallInstructions_install_1_1
 
 	public function table_poll_choices()
 	{
-		return $this->table->db_create_table('{db_prefix}poll_choices',
+		return $this->table->create_table('{db_prefix}poll_choices',
 			array(
 				array('name' => 'id_poll',   'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_choice', 'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
@@ -2346,7 +2346,7 @@ class InstallInstructions_install_1_1
 
 	public function table_postby_emails()
 	{
-		return $this->table->db_create_table('{db_prefix}postby_emails',
+		return $this->table->create_table('{db_prefix}postby_emails',
 			array(
 				array('name' => 'message_key',  'type' => 'varchar', 'size' => 32, 'default' => ''),
 				array('name' => 'message_type', 'type' => 'varchar', 'size' => 10, 'default' => ''),
@@ -2364,7 +2364,7 @@ class InstallInstructions_install_1_1
 
 	public function table_postby_emails_error()
 	{
-		return $this->table->db_create_table('{db_prefix}postby_emails_error',
+		return $this->table->create_table('{db_prefix}postby_emails_error',
 			array(
 				array('name' => 'id_email',     'type' => 'int', 'size' => 10, 'auto' => true),
 				array('name' => 'error',        'type' => 'varchar', 'size' => 255, 'default' => ''),
@@ -2386,7 +2386,7 @@ class InstallInstructions_install_1_1
 
 	public function table_postby_emails_filters()
 	{
-		return $this->table->db_create_table('{db_prefix}postby_emails_filters',
+		return $this->table->create_table('{db_prefix}postby_emails_filters',
 			array(
 				array('name' => 'id_filter',    'type' => 'int', 'size' => 10, 'auto' => true),
 				array('name' => 'filter_style', 'type' => 'char', 'size' => 6, 'default' => ''),
@@ -2406,7 +2406,7 @@ class InstallInstructions_install_1_1
 
 	public function table_scheduled_tasks()
 	{
-		return $this->table->db_create_table('{db_prefix}scheduled_tasks',
+		return $this->table->create_table('{db_prefix}scheduled_tasks',
 			array(
 				array('name' => 'id_task',         'type' => 'smallint', 'size' => 5, 'auto' => true),
 				array('name' => 'next_time',       'type' => 'int', 'size' => 10, 'default' => 0),
@@ -2454,7 +2454,7 @@ class InstallInstructions_install_1_1
 
 	public function table_settings()
 	{
-		return $this->table->db_create_table('{db_prefix}settings',
+		return $this->table->create_table('{db_prefix}settings',
 			array(
 				array('name' => 'variable', 'type' => 'varchar', 'size' => 255, 'default' => ''),
 				array('name' => 'value',    'type' => 'text'),
@@ -2682,7 +2682,7 @@ class InstallInstructions_install_1_1
 
 	public function table_sessions()
 	{
-		return $this->table->db_create_table('{db_prefix}sessions',
+		return $this->table->create_table('{db_prefix}sessions',
 			array(
 				array('name' => 'session_id',  'type' => 'char', 'size' => 64),
 				array('name' => 'last_update', 'type' => 'int', 'size' => 10, 'unsigned' => true),
@@ -2698,7 +2698,7 @@ class InstallInstructions_install_1_1
 
 	public function table_smileys()
 	{
-		return $this->table->db_create_table('{db_prefix}smileys',
+		return $this->table->create_table('{db_prefix}smileys',
 			array(
 				array('name' => 'id_smiley',    'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'auto' => true),
 				array('name' => 'code',         'type' => 'varchar', 'size' => 30, 'default' => ''),
@@ -2751,7 +2751,7 @@ class InstallInstructions_install_1_1
 
 	public function table_spiders()
 	{
-		return $this->table->db_create_table('{db_prefix}spiders',
+		return $this->table->create_table('{db_prefix}spiders',
 			array(
 				array('name' => 'id_spider',   'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'auto' => true),
 				array('name' => 'spider_name', 'type' => 'varchar', 'size' => 255, 'default' => ''),
@@ -2806,7 +2806,7 @@ class InstallInstructions_install_1_1
 
 	public function table_subscriptions()
 	{
-		return $this->table->db_create_table('{db_prefix}subscriptions',
+		return $this->table->create_table('{db_prefix}subscriptions',
 			array(
 				array('name' => 'id_subscribe',   'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
 				array('name' => 'name',           'type' => 'varchar', 'size' => 60, 'default' => ''),
@@ -2833,7 +2833,7 @@ class InstallInstructions_install_1_1
 	public function table_themes()
 	{
 		// this may look inconsistent, but id_member is *not* unsigned
-		return $this->table->db_create_table('{db_prefix}themes',
+		return $this->table->create_table('{db_prefix}themes',
 			array(
 				array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'default' => 0),
 				array('name' => 'id_theme',  'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 1),
@@ -2895,7 +2895,7 @@ class InstallInstructions_install_1_1
 
 	public function table_topics()
 	{
-		return $this->table->db_create_table('{db_prefix}topics',
+		return $this->table->create_table('{db_prefix}topics',
 			array(
 				array('name' => 'id_topic',          'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
 				array('name' => 'is_sticky',         'type' => 'tinyint', 'size' => 4, 'default' => 0),
@@ -2947,7 +2947,7 @@ class InstallInstructions_install_1_1
 
 	public function table_user_drafts()
 	{
-		return $this->table->db_create_table('{db_prefix}user_drafts',
+		return $this->table->create_table('{db_prefix}user_drafts',
 			array(
 				array('name' => 'id_draft',        'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
 				array('name' => 'id_topic',        'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),

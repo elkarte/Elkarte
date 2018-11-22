@@ -383,7 +383,7 @@ class DbTableWrapper
 		$args = func_get_args();
 
 		// In this case errors are ignored, so the return is always true
-		call_user_func_array(array($this->db, 'db_create_table'), $args);
+		call_user_func_array(array($this->db, 'create_table'), $args);
 
 		return true;
 	}

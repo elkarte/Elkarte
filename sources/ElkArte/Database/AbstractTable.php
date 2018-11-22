@@ -113,7 +113,7 @@ abstract class AbstractTable
 	 *                  'temporary' => false,
 	 *                )
 	 */
-	public function db_create_table($table_name, $columns, $indexes = array(), $parameters = array())
+	public function create_table($table_name, $columns, $indexes = array(), $parameters = array())
 	{
 		$parameters = array_merge(array(
 			'if_exists' => 'ignore',
@@ -203,7 +203,7 @@ abstract class AbstractTable
 	abstract protected function _close_table_query($temporary);
 
 	/**
-	 * It is mean to parse the indexes array of a db_create_table function
+	 * It is mean to parse the indexes array of a create_table function
 	 * to prepare for the indexes creation
 	 *
 	 * @param string[] $indexes

@@ -148,7 +148,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Adding new tables for notifications...',
 				'function' => function()
 				{
-					$this->table->db_create_table('{db_prefix}pending_notifications',
+					$this->table->create_table('{db_prefix}pending_notifications',
 						array(
 							array('name' => 'notification_type', 'type' => 'varchar', 'size' => 10),
 							array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -163,7 +163,7 @@ class UpgradeInstructions_upgrade_1_1
 						'ignore'
 					);
 
-					$this->table->db_create_table('{db_prefix}notifications_pref',
+					$this->table->create_table('{db_prefix}notifications_pref',
 						array(
 							array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 							array('name' => 'notification_level', 'type' => 'tinyint', 'size' => 1, 'default' => 1),
