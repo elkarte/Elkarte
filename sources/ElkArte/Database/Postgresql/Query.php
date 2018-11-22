@@ -109,102 +109,16 @@ class Query extends AbstractQuery
 		$this->_query_count++;
 		$this->_db_replace_result = null;
 
-		if (empty($modSettings['disableQueryCheck']) && strpos($db_string, '\'') !== false && empty($db_values['security_override']))
-		{
-			$this->error_backtrace('Hacking attempt...', 'Illegal character (\') used in query...', true, __FILE__, __LINE__);
-		}
-
-		if (empty($db_values['security_override']) && (!empty($db_values) || strpos($db_string, '{db_prefix}') !== false))
-		{
-			// Store these values for use in the callback function.
-			$this->_db_callback_values = $db_values;
-
-			// Inject the values passed to this function.
-			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', array($this, 'replacement__callback'), $db_string);
-
-			// No need for them any longer.
-			$this->_db_callback_values = array();
-		}
+		$db_string = $this->_testSecurity($db_string, $db_values);
 
 		// Debugging.
-		if ($db_show_debug === true)
-		{
-			$debug = \ElkArte\Debug::instance();
+		$this->_preQueryDebug($db_string);
 
-			// Get the file and line number this function was called.
-			list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
+		$this->_doSanityCheck($db_string, '\'\'');
 
-			if (!empty($_SESSION['debug_redirect']))
-			{
-				$debug->merge_db($_SESSION['debug_redirect']);
-				// @todo this may be off by 1
-				$this->_query_count += count($_SESSION['debug_redirect']);
-				$_SESSION['debug_redirect'] = array();
-			}
-
-			// Don't overload it.
-			$st = microtime(true);
-			$db_cache = array();
-			$db_cache['q'] = $this->_query_count < 50 ? $db_string : '...';
-			$db_cache['f'] = $file;
-			$db_cache['l'] = $line;
-			$db_cache['s'] = $st - $time_start;
-		}
-
-		// First, we clean strings out of the query, reduce whitespace, lowercase, and trim - so we can check it over.
-		if (empty($modSettings['disableQueryCheck']))
-		{
-			$clean = '';
-			$old_pos = 0;
-			$pos = -1;
-			while (true)
-			{
-				$pos = strpos($db_string, '\'', $pos + 1);
-				if ($pos === false)
-					break;
-				$clean .= substr($db_string, $old_pos, $pos - $old_pos);
-
-				while (true)
-				{
-					$pos1 = strpos($db_string, '\'', $pos + 1);
-					$pos2 = strpos($db_string, '\'\'', $pos + 1);
-
-					if ($pos1 === false)
-						break;
-					elseif ($pos2 === false || $pos2 > $pos1)
-					{
-						$pos = $pos1;
-						break;
-					}
-
-					$pos = $pos2 + 1;
-				}
-
-				$clean .= ' %s ';
-				$old_pos = $pos + 1;
-			}
-
-			$clean .= substr($db_string, $old_pos);
-			$clean = trim(strtolower(preg_replace($this->allowed_comments['from'], $this->allowed_comments['to'], $clean)));
-
-			// Comments?  We don't use comments in our queries, we leave 'em outside!
-			if (strpos($clean, '/*') > 2 || strpos($clean, '--') !== false || strpos($clean, ';') !== false)
-				$fail = true;
-			// Trying to change passwords, slow us down, or something?
-			elseif (strpos($clean, 'sleep') !== false && preg_match('~(^|[^a-z])sleep($|[^[_a-z])~s', $clean) != 0)
-				$fail = true;
-			elseif (strpos($clean, 'benchmark') !== false && preg_match('~(^|[^a-z])benchmark($|[^[a-z])~s', $clean) != 0)
-				$fail = true;
-
-			if (!empty($fail) && class_exists('\\ElkArte\\Errors\\Errors'))
-			{
-				$this->error_backtrace('Hacking attempt...', 'Hacking attempt...' . "\n" . $db_string, E_USER_ERROR, __FILE__, __LINE__);
-			}
-
-			// If we are updating something, better start a transaction so that indexes may be kept consistent
-			if (!$this->_in_transaction && strpos($clean, 'update') !== false)
-				$this->transaction('begin');
-		}
+		// If we are updating something, better start a transaction so that indexes may be kept consistent
+		if (!$this->_in_transaction && strpos($clean, 'update') !== false)
+			$this->transaction('begin');
 
 		$this->_db_last_result = @pg_query($this->connection, $db_string);
 
@@ -223,11 +137,7 @@ class Query extends AbstractQuery
 			$this->transaction('commit');
 
 		// Debugging.
-		if ($db_show_debug === true)
-		{
-			$db_cache['t'] = microtime(true) - $st;
-			$debug->db_query($db_cache);
-		}
+		$this->_postQueryDebug();
 
 		$this->result = new \ElkArte\Database\Postgresql\Result($this->_db_last_result);
 
