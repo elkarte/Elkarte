@@ -198,10 +198,9 @@ abstract class AbstractQuery implements QueryInterface
 	{
 		$request = $this->query('', $db_string, $db_values);
 
-		$results = $seeds !== null ? $seeds : array();
-		while ($row = $this->fetch_assoc($request))
-			$results[] = $row;
-		$this->free_result($request);
+		$results = array_merge($seeds !== null ? $seeds : array(), $result->fetch_all());
+
+		$request->free_result();
 
 		return $results;
 	}
@@ -211,15 +210,17 @@ abstract class AbstractQuery implements QueryInterface
 	 */
 	public function fetchQueryCallback($db_string, $db_values = array(), $callback = '', $seeds = null)
 	{
+		$results = $this->fetchQuery($db_string, $db_values);
+
 		if ($callback === '')
-			return $this->fetchQuery($db_string, $db_values);
+		{
+			return $results;
+		}
 
-		$request = $this->query('', $db_string, $db_values);
-
-		$results = $seeds !== null ? $seeds : array();
-		while ($row = $this->fetch_assoc($request))
-			$results[] = $callback($row);
-		$this->free_result($request);
+		foreach ($results as $idx => $row)
+		{
+			$results[$idx] = $callback($row);
+		}
 
 		return $results;
 	}

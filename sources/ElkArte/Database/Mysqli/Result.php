@@ -86,4 +86,12 @@ class Result extends \ElkArte\Database\AbstractResult
 	{
 		return mysqli_fetch_assoc($this->result);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function fetch_all()
+	{
+		return mysqli_fetch_all($this->result, MYSQLI_ASSOC);
+	}
 }

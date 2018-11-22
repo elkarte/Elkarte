@@ -98,4 +98,12 @@ class Result extends \ElkArte\Database\AbstractResult
 	{
 		return pg_fetch_assoc($this->result);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function fetch_all()
+	{
+		return pg_fetch_all($this->result, PGSQL_ASSOC);
+	}
 }

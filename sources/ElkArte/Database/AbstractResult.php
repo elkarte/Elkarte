@@ -73,6 +73,11 @@ abstract class AbstractResult
 	abstract public function fetch_row();
 
 	/**
+	 * Fetch all the results at once.
+	 */
+	abstract public function fetch_all();
+
+	/**
 	 * Free the resultset.
 	 */
 	abstract public function free_result();
