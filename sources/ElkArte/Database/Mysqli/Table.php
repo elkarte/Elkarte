@@ -230,7 +230,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		$this->_package_log[] = array('remove_index', $table_name, $index_info['name']);
 
 		// Let's get all our indexes.
-		$indexes = $this->db_list_indexes($table_name, true);
+		$indexes = $this->list_indexes($table_name, true);
 
 		// Do we already have it?
 		foreach ($indexes as $index)
@@ -266,7 +266,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// Better exist!
-		$indexes = $this->db_list_indexes($table_name, true);
+		$indexes = $this->list_indexes($table_name, true);
 
 		foreach ($indexes as $index)
 		{
@@ -313,7 +313,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		return array(
 			'name' => $table_name,
 			'columns' => $this->list_columns($table_name, true),
-			'indexes' => $this->db_list_indexes($table_name, true),
+			'indexes' => $this->list_indexes($table_name, true),
 		);
 	}
 
@@ -381,7 +381,7 @@ class Table extends \ElkArte\Database\AbstractTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_list_indexes($table_name, $detail = false, $parameters = array())
+	public function list_indexes($table_name, $detail = false, $parameters = array())
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 

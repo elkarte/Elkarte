@@ -317,7 +317,7 @@ abstract class AbstractTable
 	 * @param mixed[] $parameters
 	 * @return mixed
 	 */
-	abstract public function db_list_indexes($table_name, $detail = false, $parameters = array());
+	abstract public function list_indexes($table_name, $detail = false, $parameters = array());
 
 	/**
 	 * Optimize a table
