@@ -418,7 +418,7 @@ class UpgradeInstructions_upgrade_1_1
 						);
 
 						// Do the cleanup
-						$this->table->db_remove_column('{db_prefix}postby_emails', 'id_email');
+						$this->table->remove_column('{db_prefix}postby_emails', 'id_email');
 						$this->table->db_remove_index('{db_prefix}postby_emails', 'id_email');
 						$this->table->db_add_index('{db_prefix}postby_emails', array('name' => 'id_email', 'columns' => array('message_key', 'message_type', 'message_id'), 'type' => 'primary'));
 					}

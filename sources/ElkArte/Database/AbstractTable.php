@@ -259,7 +259,7 @@ abstract class AbstractTable
 	 * @param string $column_name
 	 * @param mixed[] $parameters default array()
 	 */
-	abstract public function db_remove_column($table_name, $column_name, $parameters = array());
+	abstract public function remove_column($table_name, $column_name, $parameters = array());
 
 	/**
 	 * Change a column.
