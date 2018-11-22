@@ -101,7 +101,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Adding new two factor columns to members table...',
 				'function' => function()
 				{
-					$this->table->db_add_column('{db_prefix}members',
+					$this->table->add_column('{db_prefix}members',
 						array(
 							'name' => 'otp_secret',
 							'type' => 'varchar',
@@ -111,7 +111,7 @@ class UpgradeInstructions_upgrade_1_1
 						array(),
 						'ignore'
 					);
-					$this->table->db_add_column('{db_prefix}members',
+					$this->table->add_column('{db_prefix}members',
 						array(
 							'name' => 'enable_otp',
 							'type' => 'tinyint',
@@ -121,7 +121,7 @@ class UpgradeInstructions_upgrade_1_1
 						array(),
 						'ignore'
 					);
-					$this->table->db_add_column('{db_prefix}members',
+					$this->table->add_column('{db_prefix}members',
 						array(
 							'name' => 'otp_used',
 							'type' => 'int',
@@ -196,7 +196,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Separate mentions visibility from accessibility...',
 				'function' => function()
 				{
-					$this->table->db_add_column('{db_prefix}log_mentions',
+					$this->table->add_column('{db_prefix}log_mentions',
 						array(
 							'name' => 'is_accessible',
 							'type' => 'tinyint',
@@ -377,7 +377,7 @@ class UpgradeInstructions_upgrade_1_1
 					if ($this->table->column_exists('{db_prefix}postby_emails', 'message_key') === false)
 					{
 						// Add the new columns
-						$this->table->db_add_column('{db_prefix}postby_emails',
+						$this->table->add_column('{db_prefix}postby_emails',
 							array(
 								'name' => 'message_key',
 								'type' => 'varchar',
@@ -387,7 +387,7 @@ class UpgradeInstructions_upgrade_1_1
 							array(),
 							'ignore'
 						);
-						$this->table->db_add_column('{db_prefix}postby_emails',
+						$this->table->add_column('{db_prefix}postby_emails',
 							array(
 								'name' => 'message_type',
 								'type' => 'varchar',
@@ -397,7 +397,7 @@ class UpgradeInstructions_upgrade_1_1
 							array(),
 							'ignore'
 						);
-						$this->table->db_add_column('{db_prefix}postby_emails',
+						$this->table->add_column('{db_prefix}postby_emails',
 							array(
 								'name' => 'message_id',
 								'type' => 'mediumint',
@@ -497,7 +497,7 @@ class UpgradeInstructions_upgrade_1_1
 				{
 					if ($this->table->column_exists('{db_prefix}log_reported', 'type') === false)
 					{
-						$this->table->db_add_column('{db_prefix}log_reported',
+						$this->table->add_column('{db_prefix}log_reported',
 							array(
 								'name' => 'type',
 								'type' => 'varchar',
@@ -507,7 +507,7 @@ class UpgradeInstructions_upgrade_1_1
 							array(),
 							'ignore'
 						);
-						$this->table->db_add_column('{db_prefix}log_reported',
+						$this->table->add_column('{db_prefix}log_reported',
 							array(
 								'name' => 'time_message',
 								'type' => 'int',
@@ -602,7 +602,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Adding new custom field columns',
 				'function' => function()
 				{
-					$this->table->db_add_column('{db_prefix}custom_fields',
+					$this->table->add_column('{db_prefix}custom_fields',
 						array(
 							'name' => 'rows',
 							'type' => 'smallint',
@@ -610,7 +610,7 @@ class UpgradeInstructions_upgrade_1_1
 							'default' => 4
 						)
 					);
-					$this->table->db_add_column('{db_prefix}custom_fields',
+					$this->table->add_column('{db_prefix}custom_fields',
 						array(
 							'name' => 'cols',
 							'type' => 'smallint',
@@ -797,7 +797,7 @@ class UpgradeInstructions_upgrade_1_1
 				{
 					if ($this->table->column_exists('{db_prefix}user_drafts', 'is_usersaved') === false)
 					{
-						$this->table->db_add_column('{db_prefix}user_drafts',
+						$this->table->add_column('{db_prefix}user_drafts',
 							array(
 								'name' => 'is_usersaved',
 								'type' => 'tinyint',

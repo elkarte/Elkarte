@@ -250,7 +250,7 @@ abstract class AbstractTable
 	 * @param mixed[] $parameters default array()
 	 * @param string $if_exists default 'update'
 	 */
-	abstract public function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update');
+	abstract public function add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update');
 
 	/**
 	 * Removes a column.

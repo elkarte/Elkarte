@@ -55,7 +55,7 @@ class UpgradeInstructions_upgrade_1_0
 				'debug_title' => 'Adding new column to message_likes...',
 				'function' => function($db, $db_table)
 				{
-					$db_table->db_add_column('{db_prefix}message_likes',
+					$db_table->add_column('{db_prefix}message_likes',
 						array(
 							'name' => 'like_timestamp',
 							'type' => 'int',
@@ -72,7 +72,7 @@ class UpgradeInstructions_upgrade_1_0
 				'debug_title' => 'More space for email filters...',
 				'function' => function($db, $db_table)
 				{
-					$db_table->db_add_column('{db_prefix}postby_emails_filters',
+					$db_table->add_column('{db_prefix}postby_emails_filters',
 						array(
 							'name' => 'filter_style',
 							'type' => 'char',
@@ -88,7 +88,7 @@ class UpgradeInstructions_upgrade_1_0
 				'debug_title' => 'Possible wrong type for mail_queue...',
 				'function' => function($db, $db_table)
 				{
-					$db_table->db_add_column('{db_prefix}mail_queue',
+					$db_table->add_column('{db_prefix}mail_queue',
 						array(
 							'name' => 'message_id',
 							'type' => 'varchar',

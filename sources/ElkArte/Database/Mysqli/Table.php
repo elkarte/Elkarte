@@ -125,7 +125,7 @@ class Table extends \ElkArte\Database\AbstractTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update')
+	public function add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update')
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
