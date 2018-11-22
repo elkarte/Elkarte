@@ -732,7 +732,7 @@ class Packages extends \ElkArte\AbstractController
 				elseif ($change[0] === 'remove_column' && isset($change[2]))
 					$table_installer->remove_column($change[1], $change[2]);
 				elseif ($change[0] === 'remove_index' && isset($change[2]))
-					$table_installer->db_remove_index($change[1], $change[2]);
+					$table_installer->remove_index($change[1], $change[2]);
 			}
 		}
 

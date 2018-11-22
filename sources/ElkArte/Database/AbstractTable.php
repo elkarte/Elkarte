@@ -288,7 +288,7 @@ abstract class AbstractTable
 	 * @param string $index_name
 	 * @param mixed[] $parameters default array()
 	 */
-	abstract public function db_remove_index($table_name, $index_name, $parameters = array());
+	abstract public function remove_index($table_name, $index_name, $parameters = array());
 
 	/**
 	 * Get the schema formatted name for a type.

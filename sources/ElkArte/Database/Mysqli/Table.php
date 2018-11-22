@@ -241,7 +241,7 @@ class Table extends \ElkArte\Database\AbstractTable
 				if ($if_exists != 'update' || $index['type'] == 'primary')
 					return false;
 				else
-					$this->db_remove_index($table_name, $index_info['name']);
+					$this->remove_index($table_name, $index_info['name']);
 			}
 		}
 
@@ -261,7 +261,7 @@ class Table extends \ElkArte\Database\AbstractTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_remove_index($table_name, $index_name, $parameters = array())
+	public function remove_index($table_name, $index_name, $parameters = array())
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
