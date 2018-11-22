@@ -93,34 +93,26 @@ class Query extends AbstractQuery
 		);
 
 		if (isset($replacements[$identifier]))
+		{
 			$db_string = preg_replace(array_keys($replacements[$identifier]), array_values($replacements[$identifier]), $db_string);
+		}
 
 		// Limits need to be a little different.
 		$db_string = preg_replace('~\sLIMIT\s(\d+|{int:.+}),\s*(\d+|{int:.+})\s*$~i', 'LIMIT $2 OFFSET $1', $db_string);
 
 		if (trim($db_string) == '')
+		{
 			return false;
-
-		// Comments that are allowed in a query are preg_removed.
-		static $allowed_comments_from = array(
-			'~\s+~s',
-			'~/\*!40001 SQL_NO_CACHE \*/~',
-			'~/\*!40000 USE INDEX \([A-Za-z\_]+?\) \*/~',
-			'~/\*!40100 ON DUPLICATE KEY UPDATE id_msg = \d+ \*/~',
-		);
-		static $allowed_comments_to = array(
-			' ',
-			'',
-			'',
-			'',
-		);
+		}
 
 		// One more query....
 		$this->_query_count++;
 		$this->_db_replace_result = null;
 
 		if (empty($modSettings['disableQueryCheck']) && strpos($db_string, '\'') !== false && empty($db_values['security_override']))
+		{
 			$this->error_backtrace('Hacking attempt...', 'Illegal character (\') used in query...', true, __FILE__, __LINE__);
+		}
 
 		if (empty($db_values['security_override']) && (!empty($db_values) || strpos($db_string, '{db_prefix}') !== false))
 		{
@@ -193,7 +185,7 @@ class Query extends AbstractQuery
 			}
 
 			$clean .= substr($db_string, $old_pos);
-			$clean = trim(strtolower(preg_replace($allowed_comments_from, $allowed_comments_to, $clean)));
+			$clean = trim(strtolower(preg_replace($this->allowed_comments['from'], $this->allowed_comments['to'], $clean)));
 
 			// Comments?  We don't use comments in our queries, we leave 'em outside!
 			if (strpos($clean, '/*') > 2 || strpos($clean, '--') !== false || strpos($clean, ';') !== false)

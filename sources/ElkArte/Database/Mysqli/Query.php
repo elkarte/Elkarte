@@ -44,25 +44,13 @@ class Query extends AbstractQuery
 	{
 		global $db_show_debug, $time_start, $modSettings;
 
-		// Comments that are allowed in a query are preg_removed.
-		static $allowed_comments_from = array(
-			'~\s+~s',
-			'~/\*!40001 SQL_NO_CACHE \*/~',
-			'~/\*!40000 USE INDEX \([A-Za-z\_]+?\) \*/~',
-			'~/\*!40100 ON DUPLICATE KEY UPDATE id_msg = \d+ \*/~',
-		);
-		static $allowed_comments_to = array(
-			' ',
-			'',
-			'',
-			'',
-		);
-
 		// One more query....
 		$this->_query_count++;
 
 		if (empty($modSettings['disableQueryCheck']) && strpos($db_string, '\'') !== false && empty($db_values['security_override']))
+		{
 			$this->error_backtrace('Hacking attempt...', 'Illegal character (\') used in query...', true, __FILE__, __LINE__);
+		}
 
 		// Use "ORDER BY null" to prevent Mysql doing filesorts for Group By clauses without an Order By
 		if (strpos($db_string, 'GROUP BY') !== false && strpos($db_string, 'ORDER BY') === false && strpos($db_string, 'INSERT INTO') === false)
@@ -145,7 +133,7 @@ class Query extends AbstractQuery
 			}
 
 			$clean .= substr($db_string, $old_pos);
-			$clean = trim(strtolower(preg_replace($allowed_comments_from, $allowed_comments_to, $clean)));
+			$clean = trim(strtolower(preg_replace($this->allowed_comments['from'], $this->allowed_comments['to'], $clean)));
 
 			// Comments?  We don't use comments in our queries, we leave 'em outside!
 			if (strpos($clean, '/*') > 2 || strpos($clean, '--') !== false || strpos($clean, ';') !== false)

@@ -68,6 +68,26 @@ abstract class AbstractQuery implements QueryInterface
 	protected $result = null;
 
 	/**
+	 * Comments that are allowed in a query are preg_removed.
+	 * These replacements happen in the query checks.
+	 * @var string[]
+	 */
+	protected $allowed_comments = [
+		'from' => [
+			'~\s+~s',
+			'~/\*!40001 SQL_NO_CACHE \*/~',
+			'~/\*!40000 USE INDEX \([A-Za-z\_]+?\) \*/~',
+			'~/\*!40100 ON DUPLICATE KEY UPDATE id_msg = \d+ \*/~',
+		],
+		'to' => [
+			' ',
+			'',
+			'',
+			'',
+		]
+	];
+
+	/**
 	 * Constructor.
 	 *
 	 * @param string $db_prefix Guess what? The tables prefix
