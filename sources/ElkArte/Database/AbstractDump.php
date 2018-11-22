@@ -89,7 +89,7 @@ abstract class AbstractDump
 	 * @return bool|mysqli_result - the request handle to the table creation query
 	 * @throws Elk_Exception
 	 */
-	abstract public function db_backup_table($table_name, $backup_table);
+	abstract public function backup_table($table_name, $backup_table);
 
 	/**
 	 * Gets all the necessary INSERTs for the table named table_name.

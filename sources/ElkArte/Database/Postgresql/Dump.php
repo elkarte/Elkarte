@@ -150,7 +150,7 @@ class Dump extends \ElkArte\Database\AbstractDump
 	/**
 	 * {@inheritDoc}
 	 */
-	public function db_backup_table($table, $backup_table)
+	public function backup_table($table, $backup_table)
 	{
 		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
 

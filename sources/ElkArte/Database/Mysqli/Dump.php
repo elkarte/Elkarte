@@ -161,7 +161,7 @@ namespace ElkArte\Database\Mysqli;
 	/**
 	 * {@inheritDoc}
 	 */
-	public function db_backup_table($table_name, $backup_table)
+	public function backup_table($table_name, $backup_table)
 	{
 		$table = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 

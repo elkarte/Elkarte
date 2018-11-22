@@ -1223,7 +1223,7 @@ function backupTable($table)
 	}
 
 	$db = load_database();
-	$db->db_backup_table($table, 'backup_' . $table);
+	$db->backup_table($table, 'backup_' . $table);
 
 	if ($is_debug && $command_line)
 	{
