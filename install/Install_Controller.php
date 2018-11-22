@@ -874,7 +874,7 @@ class Install_Controller
 		}
 
 		// Let's optimize those new tables.
-		$tables = $db->db_list_tables($db_name, $db_prefix . '%');
+		$tables = $db->list_tables($db_name, $db_prefix . '%');
 		$db_table = db_table($db);
 		foreach ($tables as $table)
 		{

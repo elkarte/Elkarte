@@ -22,7 +22,7 @@ class TestDatabase extends \PHPUnit\Framework\TestCase
 		global $db_prefix;
 
 		$db = database();
-		$tables = $db->db_list_tables();
+		$tables = $db->list_tables();
 
 		$known_tables = array(
 			'antispam_questions',

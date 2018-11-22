@@ -167,7 +167,7 @@ Class Elk_Testing_Setup
 	public function clear_tables()
 	{
 		// Get all the tables.
-		$tables = $this->_db->db_list_tables($this->_db_name, $this->_db_prefix . '%');
+		$tables = $this->_db->list_tables($this->_db_name, $this->_db_prefix . '%');
 
 		// Bu-bye
 		foreach ($tables as $table)

@@ -617,9 +617,9 @@ class Query extends AbstractQuery
 	/**
 	 * {@inheritDoc}
 	 */
-	public function db_list_tables($db_name_str = false, $filter = false)
+	public function list_tables($db_name_str = false, $filter = false)
 	{
 		$dump = new Dump($this);
-		return $dump->db_list_tables($db_name_str, $filter);
+		return $dump->list_tables($db_name_str, $filter);
 	}
 }

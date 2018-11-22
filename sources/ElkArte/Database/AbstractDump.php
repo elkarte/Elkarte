@@ -78,7 +78,7 @@ abstract class AbstractDump
 	 *
 	 * @return string[] an array of table names. (strings)
 	 */
-	abstract public function db_list_tables($db_name_str = false, $filter = false);
+	abstract public function list_tables($db_name_str = false, $filter = false);
 
 	/**
 	 * Backup $table_name to $backup_table.

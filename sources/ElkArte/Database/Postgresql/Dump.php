@@ -126,7 +126,7 @@ class Dump extends \ElkArte\Database\AbstractDump
 	/**
 	 * {@inheritdoc}
 	 */
-	public function db_list_tables($db_name_str = false, $filter = false)
+	public function list_tables($db_name_str = false, $filter = false)
 	{
 		$request = $this->_db->query('', '
 			SELECT tablename

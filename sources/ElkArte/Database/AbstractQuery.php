@@ -754,5 +754,5 @@ abstract class AbstractQuery implements QueryInterface
 	 * Temporary function to supoprt migration to the new schema of the db layer
 	 * @deprecated since 2.0
 	 */
-	abstract public function db_list_tables($db_name_str = false, $filter = false);
+	abstract public function list_tables($db_name_str = false, $filter = false);
 }

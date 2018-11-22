@@ -131,7 +131,7 @@ namespace ElkArte\Database\Mysqli;
 	/**
 	 * {@inheritdoc}
 	 */
-	public function db_list_tables($db_name_str = false, $filter = false)
+	public function list_tables($db_name_str = false, $filter = false)
 	{
 		global $db_name;
 
