@@ -420,7 +420,7 @@ class UpgradeInstructions_upgrade_1_1
 						// Do the cleanup
 						$this->table->remove_column('{db_prefix}postby_emails', 'id_email');
 						$this->table->db_remove_index('{db_prefix}postby_emails', 'id_email');
-						$this->table->db_add_index('{db_prefix}postby_emails', array('name' => 'id_email', 'columns' => array('message_key', 'message_type', 'message_id'), 'type' => 'primary'));
+						$this->table->add_index('{db_prefix}postby_emails', array('name' => 'id_email', 'columns' => array('message_key', 'message_type', 'message_id'), 'type' => 'primary'));
 					}
 				}
 			),
@@ -518,7 +518,7 @@ class UpgradeInstructions_upgrade_1_1
 							'ignore'
 						);
 						$this->table->db_remove_index('{db_prefix}log_reported', 'id_msg');
-						$this->table->db_add_index('{db_prefix}log_reported', array('name' => 'msg_type', 'columns' => array('type', 'id_msg'), 'type' => 'key'));
+						$this->table->add_index('{db_prefix}log_reported', array('name' => 'msg_type', 'columns' => array('type', 'id_msg'), 'type' => 'key'));
 					}
 				}
 			)

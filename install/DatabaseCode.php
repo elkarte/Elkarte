@@ -83,12 +83,12 @@ class DbTableWrapper
 
 		return true;
 	}
-	public function db_add_index()
+	public function add_index()
 	{
 		$args = func_get_args();
 
 		// In this case errors are ignored, so the return is always true
-		call_user_func_array(array($this->db, 'db_add_index'), $args);
+		call_user_func_array(array($this->db, 'add_index'), $args);
 
 		return true;
 	}

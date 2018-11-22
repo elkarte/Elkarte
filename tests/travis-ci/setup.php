@@ -378,7 +378,7 @@ class DbTableWrapper
 		return call_user_func_array(array($this->db, $name), $args);
 	}
 
-	public function db_add_index()
+	public function add_index()
 	{
 		$args = func_get_args();
 

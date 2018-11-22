@@ -279,7 +279,7 @@ abstract class AbstractTable
 	 * @param mixed[] $parameters default array()
 	 * @param string $if_exists default 'update'
 	 */
-	abstract public function db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update');
+	abstract public function add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update');
 
 	/**
 	 * Remove an index.
