@@ -116,10 +116,6 @@ class Query extends AbstractQuery
 
 		$this->_doSanityCheck($db_string, '\'\'');
 
-		// If we are updating something, better start a transaction so that indexes may be kept consistent
-		if (!$this->_in_transaction && strpos($clean, 'update') !== false)
-			$this->transaction('begin');
-
 		$this->_db_last_result = @pg_query($this->connection, $db_string);
 
 		if ($this->_db_last_result === false && !$this->_skip_error)
@@ -132,9 +128,6 @@ class Query extends AbstractQuery
 		{
 			$this->_skip_error = false;
 		}
-
-		if ($this->_in_transaction)
-			$this->transaction('commit');
 
 		// Debugging.
 		$this->_postQueryDebug();
