@@ -178,7 +178,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		{
 			// If we're going to overwrite then use change column.
 			if ($if_exists == 'update')
-				return $this->db_change_column($table_name, $column_info['name'], $column_info);
+				return $this->change_column($table_name, $column_info['name'], $column_info);
 			else
 				return false;
 		}
@@ -197,7 +197,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		unset($column_info['type'], $column_info['size']);
 
 		if (count($column_info) != 1)
-			return $this->db_change_column($table_name, $column_info['name'], $column_info);
+			return $this->change_column($table_name, $column_info['name'], $column_info);
 		else
 			return true;
 	}
@@ -235,7 +235,7 @@ class Table extends \ElkArte\Database\AbstractTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_change_column($table_name, $old_column, $column_info, $parameters = array())
+	public function change_column($table_name, $old_column, $column_info, $parameters = array())
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 

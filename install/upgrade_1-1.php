@@ -205,7 +205,7 @@ class UpgradeInstructions_upgrade_1_1
 						)
 					);
 
-					$this->table->db_change_column('{db_prefix}log_mentions',
+					$this->table->change_column('{db_prefix}log_mentions',
 						'mention_type',
 						array(
 							'type' => 'varchar',
@@ -300,7 +300,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Make mentions generic and not message-centric...',
 				'function' => function()
 				{
-					$this->table->db_change_column('{db_prefix}log_mentions', 'id_msg',
+					$this->table->change_column('{db_prefix}log_mentions', 'id_msg',
 						array(
 							'name' => 'id_target',
 						)
@@ -431,13 +431,13 @@ class UpgradeInstructions_upgrade_1_1
 					if ($this->table->column_exists('{db_prefix}postby_emails_error', 'data_id') === true)
 					{
 						// Rename some columns
-						$this->table->db_change_column('{db_prefix}postby_emails_error',
+						$this->table->change_column('{db_prefix}postby_emails_error',
 							'data_id',
 							array(
 								'name' => 'message_key',
 							)
 						);
-						$this->table->db_change_column('{db_prefix}postby_emails_error',
+						$this->table->change_column('{db_prefix}postby_emails_error',
 							'id_message',
 							array(
 								'name' => 'message_id',
@@ -451,7 +451,7 @@ class UpgradeInstructions_upgrade_1_1
 				'function' => function()
 				{
 					// Filter type was 5 now needs to be 6
-					$this->table->db_change_column('{db_prefix}postby_emails_filters',
+					$this->table->change_column('{db_prefix}postby_emails_filters',
 						'filter_style',
 						array(
 							'type' => 'char',
@@ -552,7 +552,7 @@ class UpgradeInstructions_upgrade_1_1
 					$this->db->query('', '
 						TRUNCATE TABLE {db_prefix}log_online');
 
-					$this->table->db_change_column('{db_prefix}log_online',
+					$this->table->change_column('{db_prefix}log_online',
 						$column_name,
 						array(
 							'type' => 'varchar',
@@ -577,7 +577,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Changing the pm count column to mediumint.',
 				'function' => function()
 				{
-					$this->table->db_change_column('{db_prefix}members',
+					$this->table->change_column('{db_prefix}members',
 						'personal_messages',
 						array(
 							'type' => 'mediumint',
@@ -825,7 +825,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Altering column to varchar(255)...',
 				'function' => function()
 				{
-					$this->table->db_change_column('{db_prefix}attachments',
+					$this->table->change_column('{db_prefix}attachments',
 						'mime_type',
 						array(
 							'type' => 'varchar',

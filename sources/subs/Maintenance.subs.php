@@ -115,7 +115,7 @@ function fetchBodyType()
 function resizeMessageTableBody($type)
 {
 	$table = db_table();
-	$table->db_change_column('{db_prefix}messages', 'body', array('type' => $type));
+	$table->change_column('{db_prefix}messages', 'body', array('type' => $type));
 }
 
 /**

@@ -269,7 +269,7 @@ abstract class AbstractTable
 	 * @param mixed[] $column_info
 	 * @param mixed[] $parameters default array()
 	 */
-	abstract public function db_change_column($table_name, $old_column, $column_info, $parameters = array());
+	abstract public function change_column($table_name, $old_column, $column_info, $parameters = array());
 
 	/**
 	 * Add an index.
