@@ -155,7 +155,7 @@ class Dump extends \ElkArte\Database\AbstractDump
 		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
 
 		// Do we need to drop it first?
-		$this->_db_table->db_drop_table($backup_table);
+		$this->_db_table->drop_table($backup_table);
 
 		// @todo Should we create backups of sequences as well?
 		$this->_db->query('', '

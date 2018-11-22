@@ -166,7 +166,7 @@ namespace ElkArte\Database\Mysqli;
 		$table = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// First, get rid of the old table.
-		$this->_db_table->db_drop_table($backup_table);
+		$this->_db_table->drop_table($backup_table);
 
 		// Can we do this the quick way?
 		$result = $this->_db->query('', '

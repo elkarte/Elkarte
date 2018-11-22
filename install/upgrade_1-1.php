@@ -80,7 +80,7 @@ class UpgradeInstructions_upgrade_1_1
 							list ($count) = (int) $this->db->fetch_row($request);
 							if ($count == 0)
 							{
-								$this->table->db_drop_table('{db_prefix}admin_info_files');
+								$this->table->drop_table('{db_prefix}admin_info_files');
 							}
 						}
 					}

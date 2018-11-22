@@ -89,7 +89,7 @@ class Table extends \ElkArte\Database\AbstractTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_drop_table($table_name, $force = false)
+	public function drop_table($table_name, $force = false)
 	{
 		// Get some aliases.
 		$full_table_name = str_replace('{db_prefix}', $this->_real_prefix(), $table_name);

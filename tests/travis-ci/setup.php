@@ -172,7 +172,7 @@ Class Elk_Testing_Setup
 		// Bu-bye
 		foreach ($tables as $table)
 		{
-			$this->_db_table->db_drop_table($table);
+			$this->_db_table->drop_table($table);
 		}
 	}
 

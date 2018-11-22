@@ -134,14 +134,14 @@ abstract class AbstractTable
 		// This... my friends... is a function in a half - let's start by checking if the table exists!
 		if ($parameters['if_exists'] === 'force_drop')
 		{
-			$this->db_drop_table($table_name, true);
+			$this->drop_table($table_name, true);
 		}
 		elseif ($this->table_exists($full_table_name))
 		{
 			// This is a sad day... drop the table? If not, return false (error) by default.
 			if ($parameters['if_exists'] === 'overwrite')
 			{
-				$this->db_drop_table($table_name);
+				$this->drop_table($table_name);
 			}
 			else
 			{
@@ -240,7 +240,7 @@ abstract class AbstractTable
 	 * @param bool $force If forcing the drop or not. Useful in case of temporary
 	 *                    tables that may not be detected as existing.
 	 */
-	abstract public function db_drop_table($table_name, $force = false);
+	abstract public function drop_table($table_name, $force = false);
 
 	/**
 	 * This function adds a column.
