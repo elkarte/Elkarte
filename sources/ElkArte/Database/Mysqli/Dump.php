@@ -25,7 +25,7 @@ namespace ElkArte\Database\Mysqli;
 	/**
 	 * {@inheritDoc}
 	 */
-	public function db_table_sql($tableName)
+	public function table_sql($tableName)
 	{
 		$tableName = str_replace('{db_prefix}', $this->_db_prefix, $tableName);
 

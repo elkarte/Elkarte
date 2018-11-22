@@ -122,11 +122,11 @@ function DumpDatabase2()
 				'-- Table structure for table `' . $tableName . '`' . $crlf .
 				'--' . $crlf .
 				$crlf .
-				$database->db_table_sql($tableName) . ';' . $crlf;
+				$database->table_sql($tableName) . ';' . $crlf;
 		}
 		else
 			// This is needed to speedup things later
-			$database->db_table_sql($tableName);
+			$database->table_sql($tableName);
 
 		// How about the data?
 		if (!isset($_REQUEST['data']) || substr($tableName, -10) == 'log_errors')

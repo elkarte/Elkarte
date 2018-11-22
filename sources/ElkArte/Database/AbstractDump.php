@@ -67,7 +67,7 @@ abstract class AbstractDump
 	 * @return string - the CREATE statement as string
 	 * @throws Elk_Exception
 	 */
-	abstract public function db_table_sql($tableName);
+	abstract public function table_sql($tableName);
 
 	/**
 	 * This function lists all tables in the database.
