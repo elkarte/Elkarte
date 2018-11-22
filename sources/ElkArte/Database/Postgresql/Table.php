@@ -503,7 +503,7 @@ class Table extends \ElkArte\Database\AbstractTable
 
 		return array(
 			'name' => $table_name,
-			'columns' => $this->db_list_columns($table_name, true),
+			'columns' => $this->list_columns($table_name, true),
 			'indexes' => $this->db_list_indexes($table_name, true),
 		);
 	}
@@ -511,7 +511,7 @@ class Table extends \ElkArte\Database\AbstractTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_list_columns($table_name, $detail = false, $parameters = array())
+	public function list_columns($table_name, $detail = false, $parameters = array())
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 

@@ -307,7 +307,7 @@ abstract class AbstractTable
 	 * @param mixed[] $parameters default array()
 	 * @return mixed
 	 */
-	abstract public function db_list_columns($table_name, $detail = false, $parameters = array());
+	abstract public function list_columns($table_name, $detail = false, $parameters = array());
 
 	/**
 	 * Get index information.
@@ -353,7 +353,7 @@ abstract class AbstractTable
 	 */
 	protected function _get_column_info($table_name, $column_name)
 	{
-		$columns = $this->db_list_columns($table_name, true);
+		$columns = $this->list_columns($table_name, true);
 
 		foreach ($columns as $column)
 		{

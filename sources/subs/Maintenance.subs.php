@@ -83,7 +83,7 @@ function flushLogTables()
 function getMessageTableColumns()
 {
 	$table = db_table();
-	$colData = $table->db_list_columns('{db_prefix}messages', true);
+	$colData = $table->list_columns('{db_prefix}messages', true);
 
 	return $colData;
 }
@@ -98,7 +98,7 @@ function fetchBodyType()
 {
 	$table = db_table();
 
-	$colData = $table->db_list_columns('{db_prefix}messages', true);
+	$colData = $table->list_columns('{db_prefix}messages', true);
 	foreach ($colData as $column)
 		if ($column['name'] == 'body')
 			$body_type = $column['type'];

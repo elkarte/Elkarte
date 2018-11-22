@@ -33,7 +33,7 @@ function protected_alter($change, $substep, $is_test = false)
 	$found = false;
 	if ($change['type'] === 'column')
 	{
-		$columns = $table->db_list_columns('{db_prefix}' . $change['table'], true);
+		$columns = $table->list_columns('{db_prefix}' . $change['table'], true);
 		foreach ($columns as $column)
 		{
 			// Found it?
