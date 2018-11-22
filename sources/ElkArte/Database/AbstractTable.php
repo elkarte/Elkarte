@@ -397,4 +397,21 @@ abstract class AbstractTable
 	{
 		return $this->_get_column_info($table_name, $column_name) !== false;
 	}
+
+	/**
+	 * Resturns name, columns and indexes of a table
+	 *
+	 * @param string $table_name
+	 * @return mixed[]
+	 */
+	public function table_structure($table_name)
+	{
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
+
+		return array(
+			'name' => $table_name,
+			'columns' => $this->list_columns($table_name, true),
+			'indexes' => $this->list_indexes($table_name, true),
+		);
+	}
 }
