@@ -685,7 +685,7 @@ abstract class AbstractQuery implements QueryInterface
 
 		if (class_exists('\\ElkArte\\Exceptions\\Exception'))
 		{
-			throw new \ElkArte\Exceptions\Exception($error_message, false);
+			throw new \ElkArte\Exceptions\Exception([false, $error_message], false);
 		}
 		elseif ($error_type)
 			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''), $error_type);

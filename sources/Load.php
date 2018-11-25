@@ -53,9 +53,9 @@ function reloadSettings()
 		$modSettings = array();
 		if (!$request)
 			\ElkArte\Errors\Errors::instance()->display_db_error();
-		while ($row = $db->fetch_row($request))
+		while ($row = $request->fetch_row())
 			$modSettings[$row[0]] = $row[1];
-		$db->free_result($request);
+		$request->free_result();
 
 		// Do a few things to protect against missing settings or settings with invalid values...
 		if (empty($modSettings['defaultMaxTopics']) || $modSettings['defaultMaxTopics'] <= 0 || $modSettings['defaultMaxTopics'] > 999)
