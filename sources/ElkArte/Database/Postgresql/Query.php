@@ -109,7 +109,7 @@ class Query extends AbstractQuery
 		$this->_query_count++;
 		$this->_db_replace_result = null;
 
-		$db_string = $this->_testSecurity($db_string, $db_values);
+		$db_string = $this->_prepareQuery($db_string, $db_values);
 
 		// Debugging.
 		$this->_preQueryDebug($db_string);

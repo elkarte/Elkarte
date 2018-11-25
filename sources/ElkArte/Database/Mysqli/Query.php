@@ -58,7 +58,7 @@ class Query extends AbstractQuery
 				$db_string .= "\n\t\t\tORDER BY null";
 		}
 
-		$db_string = $this->_testSecurity($db_string, $db_values);
+		$db_string = $this->_prepareQuery($db_string, $db_values);
 
 		// Debugging.
 		$this->_preQueryDebug($db_string);
