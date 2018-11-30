@@ -330,8 +330,6 @@ class Query extends AbstractQuery
 			);
 			$inserted_results += (!$this->_db_last_result ? 0 : pg_affected_rows($this->_db_last_result));
 
-			$last_inserted_id = $this->insert_id($table);
-
 			if (isset($db_replace_result))
 				$this->_db_replace_result = $db_replace_result + $inserted_results;
 		}
@@ -339,6 +337,11 @@ class Query extends AbstractQuery
 		if ($priv_trans)
 		{
 			$this->transaction('commit');
+		}
+
+		if (!empty($data))
+		{
+			$last_inserted_id = $this->insert_id($table);
 		}
 
 		$this->result = new \ElkArte\Database\Postgresql\Result(

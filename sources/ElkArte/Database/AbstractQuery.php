@@ -173,7 +173,9 @@ abstract class AbstractQuery implements QueryInterface
 			$this->error_backtrace('Invalid value inserted or no type specified.', '', E_USER_ERROR, __FILE__, __LINE__);
 
 		if (!isset($this->_db_callback_values[$matches[2]]))
+		{
 			$this->error_backtrace('The database value you\'re trying to insert does not exist: ' . htmlspecialchars($matches[2], ENT_COMPAT, 'UTF-8'), '', E_USER_ERROR, __FILE__, __LINE__);
+		}
 
 		$replacement = $this->_db_callback_values[$matches[2]];
 
