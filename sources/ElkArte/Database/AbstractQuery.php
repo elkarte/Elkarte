@@ -27,7 +27,7 @@ abstract class AbstractQuery implements QueryInterface
 	 * Current connection to the database
 	 * @var mysqli|postgre|resource
 	 */
-	protected $_connection = null;
+	protected $connection = null;
 
 	/**
 	 * Number of queries run (may include queries from $_SESSION if is a redirect)
@@ -239,11 +239,20 @@ abstract class AbstractQuery implements QueryInterface
 	public function fetchQuery($db_string, $db_values = array(), $seeds = null)
 	{
 		$request = $this->query('', $db_string, $db_values);
-		$fetched = $request->fetch_all();
+		$results = $seeds !== null ? $seeds : array();
 
-		$results = array_merge($seeds !== null ? $seeds : array(), empty($fetched) ? [] : $fetched);
+		if ($request !== false)
+		{
+			$fetched = $request->fetch_all();
 
-		$request->free_result();
+			$results = array_merge($results, empty($fetched) ? [] : $fetched);
+
+			$request->free_result();
+		}
+		else
+		{
+			$results = false;
+		}
 
 		return $results;
 	}
@@ -563,8 +572,6 @@ abstract class AbstractQuery implements QueryInterface
 
 	/**
 	 * Closes up the tracking and stores everything in the debug class.
-	 *
-	 * @param string $db_string
 	 */
 	protected function _postQueryDebug()
 	{
