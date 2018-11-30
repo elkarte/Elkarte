@@ -789,7 +789,7 @@ class Install_Controller
 		foreach ($txt as $key => $value)
 		{
 			if (substr($key, 0, 8) == 'default_')
-				$replaces['{$' . $key . '}'] = addslashes($value);
+				$replaces['{$' . $key . '}'] = $value;
 		}
 		$replaces['{$default_reserved_names}'] = strtr($replaces['{$default_reserved_names}'], array('\\\\n' => '\\n'));
 
