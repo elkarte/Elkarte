@@ -127,34 +127,37 @@ class Table extends \ElkArte\Database\AbstractTable
 		// Does it exist?
 		if ($force === true || $this->table_exists($full_table_name))
 		{
+			// We can then drop the table.
+			$this->_db->transaction('begin');
+
 			if ($force === true)
 			{
 				$this->_db->skip_next_error();
 			}
-			// We can then drop the table.
-			$this->_db->transaction('begin');
-
-			// the table
 			$table_query = 'DROP TABLE ' . $table_name;
 
-			// and the associated sequence, if any
-			$sequence_query = 'DROP SEQUENCE IF EXISTS ' . $table_name . '_seq';
-
-			// drop them
 			$this->_db->query('',
 				$table_query,
 				array(
 					'security_override' => true,
 				)
 			);
+
+			$this->_db->transaction('commit');
+
+			// and the associated sequence, if any
+			if ($force === true)
+			{
+				$this->_db->skip_next_error();
+			}
+
+			$sequence_query = 'DROP SEQUENCE IF EXISTS ' . $table_name . '_seq';
 			$this->_db->query('',
 				$sequence_query,
 				array(
 					'security_override' => true,
 				)
 			);
-
-			$this->_db->transaction('commit');
 
 			return true;
 		}
