@@ -2223,7 +2223,7 @@ class InstallInstructions_install_1_1
 				array(2, 'profile_identity_own'),
 				array(2, 'profile_extra_own'),
 				array(2, 'profile_remove_own'),
-				array(0, 'profile_set_avatar'),
+				array(2, 'profile_set_avatar'),
 				array(2, 'send_email_to_members'),
 				array(2, 'profile_title_own'),
 				array(2, 'calendar_post'),
@@ -2469,7 +2469,7 @@ class InstallInstructions_install_1_1
 
 	public function insert_settings()
 	{
-		return $this->db->insert('ignore',
+		return $this->db->insert('',
 			'{db_prefix}settings',
 			array('variable' => 'string', 'value' => 'string'),
 			array(
