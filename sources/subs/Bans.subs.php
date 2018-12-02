@@ -862,7 +862,7 @@ function updateBanMembers()
 	$memberEmailWild = array();
 
 	// Start by getting all active bans - it's quicker doing this in parts...
-	$db->fetchQueryCallback('
+	$db->fetchQuery('
 		SELECT bi.id_member, bi.email_address
 		FROM {db_prefix}ban_items AS bi
 			INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group)
@@ -874,7 +874,8 @@ function updateBanMembers()
 			'cannot_access_on' => 1,
 			'current_time' => time(),
 			'blank_string' => '',
-		),
+		)
+	)->fetch_callback(
 		function ($row) use (&$memberIDs, &$memberEmails, &$memberEmailWild)
 		{
 			if ($row['id_member'])
@@ -915,11 +916,12 @@ function updateBanMembers()
 	// Find all banned members.
 	if (!empty($queryPart))
 	{
-		$db->fetchQueryCallback('
+		$db->fetchQuery('
 			SELECT mem.id_member, mem.is_activated
 			FROM {db_prefix}members AS mem
 			WHERE ' . implode(' OR ', $queryPart),
-			$queryValues,
+			$queryValues
+		)->fetch_callback(
 			function ($row) use (&$allMembers, &$updates, &$newMembers)
 			{
 				if (!in_array($row['id_member'], $allMembers))
@@ -944,7 +946,7 @@ function updateBanMembers()
 	}
 
 	// Find members that are wrongfully marked as banned.
-	$db->fetchQueryCallback('
+	$db->fetchQuery('
 		SELECT mem.id_member, mem.is_activated - 10 AS new_value
 		FROM {db_prefix}members AS mem
 			LEFT JOIN {db_prefix}ban_items AS bi ON (bi.id_member = mem.id_member OR mem.email_address LIKE bi.email_address)
@@ -955,7 +957,8 @@ function updateBanMembers()
 			'cannot_access_activated' => 1,
 			'current_time' => time(),
 			'ban_flag' => 10,
-		),
+		)
+	)->fetch_callback(
 		function ($row) use (&$allMembers, &$updates)
 		{
 			// Don't do this twice!

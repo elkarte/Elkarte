@@ -333,7 +333,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 		return false;
 
 	// First, reset those who have this as their primary group - this is the easy one.
-	$log_inserts = $db->fetchQueryCallback('
+	$log_inserts = $db->fetchQuery('
 		SELECT id_member, id_group
 		FROM {db_prefix}members AS members
 		WHERE id_group IN ({array_int:group_list})
@@ -341,7 +341,8 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 		array(
 			'group_list' => $groups,
 			'member_list' => $members,
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($group_names)
 		{
 			return array('group' => $group_names[$row['id_group']], 'member' => $row['id_member']);
@@ -577,7 +578,7 @@ function cache_getMembergroupList()
 {
 	$db = database();
 
-	$groupCache = $db->fetchQueryCallback('
+	$groupCache = $db->fetchQuery('
 		SELECT id_group, group_name, online_color
 		FROM {db_prefix}membergroups
 		WHERE min_posts = {int:min_posts}
@@ -590,7 +591,8 @@ function cache_getMembergroupList()
 			'not_hidden' => 0,
 			'mod_group' => 3,
 			'blank_string' => '',
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			return '<a href="' . getUrl('group', ['action' => 'groups', 'sa' => 'members', 'group' => $row['id_group'], 'name' => $row['group_name']]) . '" ' . ($row['online_color'] ? 'style="color: ' . $row['online_color'] . '"' : '') . '>' . $row['group_name'] . '</a>';
@@ -1284,13 +1286,14 @@ function copyBoardPermissions($id_group, $copy_from)
 {
 	$db = database();
 
-	$inserts = $db->fetchQueryCallback('
+	$inserts = $db->fetchQuery('
 		SELECT id_profile, permission, add_deny
 		FROM {db_prefix}board_permissions
 		WHERE id_group = {int:copy_from}',
 		array(
 			'copy_from' => $copy_from,
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($id_group)
 		{
 			return array($id_group, $row['id_profile'], $row['permission'], $row['add_deny']);
@@ -1428,7 +1431,7 @@ function detachGroupFromBoards($id_group, $boards, $access_list)
 	$db = database();
 
 	// Find all boards in whose access list this group is in, but shouldn't be.
-	$db->fetchQueryCallback('
+	$db->fetchQuery('
 		SELECT id_board, {raw:column}
 		FROM {db_prefix}boards
 		WHERE FIND_IN_SET({string:current_group}, {raw:column}) != 0' . (empty($boards[$access_list]) ? '' : '
@@ -1437,7 +1440,8 @@ function detachGroupFromBoards($id_group, $boards, $access_list)
 			'current_group' => $id_group,
 			'board_access_list' => $boards[$access_list],
 			'column' => $access_list == 'allow' ? 'member_groups' : 'deny_member_groups',
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($id_group, $access_list, $db)
 		{
 			$db->query('', '
@@ -1624,14 +1628,15 @@ function getIDMemberFromGroupModerators($moderators)
 {
 	$db = database();
 
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT id_member
 		FROM {db_prefix}members
 		WHERE member_name IN ({array_string:moderators}) OR real_name IN ({array_string:moderators})
 		LIMIT ' . count($moderators),
 		array(
 			'moderators' => $moderators,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			return $row['id_member'];
@@ -1941,7 +1946,7 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
 {
 	$db = database();
 
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT lgr.id_request, lgr.id_member, lgr.id_group, lgr.time_applied, lgr.reason,
 			mem.member_name, mg.group_name, mg.online_color, mem.real_name
 		FROM {db_prefix}log_group_requests AS lgr
@@ -1952,7 +1957,8 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
 		LIMIT ' . $start . ', ' . $items_per_page,
 		array_merge($where_parameters, array(
 			'sort' => $sort,
-		)),
+		))
+	)->fetch_callback(
 		function ($row)
 		{
 			return array(
@@ -2062,7 +2068,7 @@ function getUnassignableGroups($ignore_protected)
 {
 	$db = database();
 
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT id_group
 		FROM {db_prefix}membergroups
 		WHERE min_posts != {int:min_posts}' . ($ignore_protected ? '' : '
@@ -2070,7 +2076,8 @@ function getUnassignableGroups($ignore_protected)
 		array(
 			'min_posts' => -1,
 			'is_protected' => 1,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			return $row['id_group'];

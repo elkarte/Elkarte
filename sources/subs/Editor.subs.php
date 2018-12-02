@@ -408,13 +408,14 @@ function create_control_richedit($editorOptions)
 			$temp = array();
 			if (!\ElkArte\Cache\Cache::instance()->getVar($temp, 'posting_smileys', 480))
 			{
-				$db->fetchQueryCallback('
+				$db->fetchQuery('
 					SELECT code, filename, description, smiley_row, hidden
 					FROM {db_prefix}smileys
 					WHERE hidden IN (0, 2)
 					ORDER BY smiley_row, smiley_order',
 					array(
-					),
+					)
+				)->fetch_callback(
 					function ($row)
 					{
 						global $context;

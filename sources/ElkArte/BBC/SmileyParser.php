@@ -248,12 +248,12 @@ class SmileyParser
 
 			$db = database();
 
-			$db->fetchQueryCallback('
+			$db->fetchQuery('
 				SELECT code, filename, description
 				FROM {db_prefix}smileys
 				ORDER BY LENGTH(code) DESC',
-				array(
-				),
+				[]
+			)->fetch_callback(
 				function ($row) use (&$smileysfrom, &$smileysto, &$smileysdescs)
 				{
 					$smileysfrom[] = $row['code'];

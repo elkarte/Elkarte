@@ -1136,13 +1136,14 @@ function clearPostgroupPermissions()
 {
 	$db = database();
 
-	$post_groups = $db->fetchQueryCallback('
+	$post_groups = $db->fetchQuery('
 		SELECT id_group
 		FROM {db_prefix}membergroups
 		WHERE min_posts != {int:min_posts}',
 		array(
 			'min_posts' => -1,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			return $row['id_group'];
@@ -1201,13 +1202,14 @@ function copyPermissionProfile($profile_name, $copy_from)
 	$profile_id = $db->insert_id('{db_prefix}permission_profiles', 'id_profile');
 
 	// Load the permissions from the one it's being copied from.
-	$inserts = $db->fetchQueryCallback('
+	$inserts = $db->fetchQuery('
 		SELECT id_group, permission, add_deny
 		FROM {db_prefix}board_permissions
 		WHERE id_profile = {int:copy_from}',
 		array(
 			'copy_from' => $copy_from,
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($profile_id)
 		{
 			return array($profile_id, $row['id_group'], $row['permission'], $row['add_deny']);

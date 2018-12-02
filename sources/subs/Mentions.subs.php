@@ -82,7 +82,7 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 
 	$db = database();
 
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT
 			mtn.id_mention, mtn.id_target, mtn.id_member_from, mtn.log_time, mtn.mention_type, mtn.status,
 			m.subject, m.id_topic, m.id_board,
@@ -108,7 +108,8 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 			'start' => $start,
 			'limit' => $limit,
 			'sort' => $sort,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			$row['avatar'] = determineAvatar($row);
@@ -175,13 +176,14 @@ function toggleMentionsApproval($msgs, $approved)
 
 	// Update the mentions menu count for the members that have this message
 	$status = $approved ? 0 : 3;
-	$db->fetchQueryCallback('
+	$db->fetchQuery('
 		SELECT id_member, status
 		FROM {db_prefix}log_mentions
 		WHERE id_target IN ({array_int:messages})',
 		array(
 			'messages' => $msgs,
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($status)
 		{
 			updateMentionMenuCount($status, $row['id_member']);

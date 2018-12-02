@@ -375,7 +375,7 @@ class Templates
 		$db = database();
 
 		// Get all the default theme variables.
-		$db->fetchQueryCallback(
+		$db->fetchQuery(
 			'
 			SELECT id_theme, variable, value
 			FROM {db_prefix}themes
@@ -384,22 +384,20 @@ class Templates
 			[
 				'no_member' => 0,
 				'theme_guests' => $modSettings['theme_guests'],
-			],
+			]
+		)->fetch_callback(
 			function ($row) {
 				global $settings;
 
 				$settings[$row['variable']] = $row['value'];
+				$indexes_to_default = [
+					'theme_dir',
+					'theme_url',
+					'images_url',
+				];
 
 				// Is this the default theme?
-				if (in_array(
-						$row['variable'],
-						[
-							'theme_dir',
-							'theme_url',
-							'images_url',
-						]
-					) && $row['id_theme'] == '1'
-				)
+				if ($row['id_theme'] == '1' && in_array($row['variable'], $indexes_to_default))
 				{
 					$settings['default_' . $row['variable']] = $row['value'];
 				}

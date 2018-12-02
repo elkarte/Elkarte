@@ -691,7 +691,7 @@ function updateDisplayCache()
 {
 	$db = database();
 
-	$fields = $db->fetchQueryCallback('
+	$fields = $db->fetchQuery('
 		SELECT col_name, field_name, field_type, bbc, enclose, placement, vieworder
 		FROM {db_prefix}custom_fields
 		WHERE show_display = {int:is_displayed}
@@ -704,7 +704,8 @@ function updateDisplayCache()
 			'active' => 1,
 			'not_owner_only' => 2,
 			'not_admin_only' => 3,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			return array(
