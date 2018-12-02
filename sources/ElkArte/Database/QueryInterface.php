@@ -68,21 +68,7 @@ interface QueryInterface
 	 * @param mixed[]|null
 	 * @return array
 	 */
-	public function fetchQuery($db_string, $db_values = array(), $seeds = null);
-
-	/**
-	 * Do a query and returns the results calling a callback on each row.
-	 *
-	 * The callback is supposed to accept as argument the row of data fetched
-	 * by the query from the database.
-	 *
-	 * @param string $db_string
-	 * @param mixed[] $db_values = array()
-	 * @param object|string $callback
-	 * @param mixed[]|null
-	 * @return array
-	 */
-	public function fetchQueryCallback($db_string, $db_values = array(), $callback = '', $seeds = null);
+	public function fetchQuery($db_string, $db_values = array());
 
 	/**
 	 * Last insert id

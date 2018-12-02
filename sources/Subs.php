@@ -1368,8 +1368,10 @@ function currentContext($messages_request, $reset = false)
 		return $db->data_seek($messages_request, 0);
 
 	// If the query has already returned false, get out of here
-	if (empty($messages_request))
+	if ($messages_request->hasResults())
+	{
 		return false;
+	}
 
 	// Attempt to get the next message.
 	$message = $db->fetch_assoc($messages_request);

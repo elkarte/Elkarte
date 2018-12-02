@@ -94,7 +94,7 @@ class QueryAnalysis
 			)
 		);
 
-		if ($result === false)
+		if ($result->hasResults() === false)
 		{
 			$explain = array(
 				'is_error' => true,

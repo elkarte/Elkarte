@@ -1865,7 +1865,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 	require_once(SUBSDIR . '/MessageIndex.subs.php');
 	$request = messageIndexTopics($board, 0, $start, $limit, 'first_post', 't.id_topic', $indexOptions);
 
-	if (empty($request))
+	if ($request->hasResults() === false)
 	{
 		return false;
 	}

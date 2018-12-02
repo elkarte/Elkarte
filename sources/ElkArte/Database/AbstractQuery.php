@@ -236,45 +236,9 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * {@inheritDoc}
 	 */
-	public function fetchQuery($db_string, $db_values = array(), $seeds = null)
+	public function fetchQuery($db_string, $db_values = array())
 	{
-		$request = $this->query('', $db_string, $db_values);
-		$results = $seeds !== null ? $seeds : array();
-
-		if ($request !== false)
-		{
-			$fetched = $request->fetch_all();
-
-			$results = array_merge($results, empty($fetched) ? [] : $fetched);
-
-			$request->free_result();
-		}
-		else
-		{
-			$results = false;
-		}
-
-		return $results;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function fetchQueryCallback($db_string, $db_values = array(), $callback = '', $seeds = null)
-	{
-		$results = $this->fetchQuery($db_string, $db_values);
-
-		if ($callback === '')
-		{
-			return $results;
-		}
-
-		foreach ($results as $idx => $row)
-		{
-			$results[$idx] = $callback($row);
-		}
-
-		return $results;
+		return $this->query('', $db_string, $db_values);
 	}
 
 	/**

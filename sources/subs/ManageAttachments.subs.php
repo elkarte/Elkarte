@@ -468,7 +468,7 @@ function attachment_filesize($attach_id, $filesize = null)
 				'id_attach' => $attach_id,
 			)
 		);
-		if (!empty($result))
+		if ($result->hasResults())
 		{
 			list ($filesize) = $db->fetch_row($result);
 			$db->free_result($result);
@@ -514,7 +514,7 @@ function attachment_folder($attach_id, $folder_id = null)
 				'id_attach' => $attach_id,
 			)
 		);
-		if (!empty($result))
+		if ($result->hasResults())
 		{
 			list ($folder_id) = $db->fetch_row($result);
 			$db->free_result($result);

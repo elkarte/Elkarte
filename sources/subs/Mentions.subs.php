@@ -358,7 +358,7 @@ function getTimeLastMention($id_member)
 			'member' => $id_member
 		)
 	);
-	if (!empty($request))
+	if ($request->hasResults())
 	{
 		return $request[0]['log_time'];
 	}

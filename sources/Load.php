@@ -219,13 +219,10 @@ function loadUserSettings()
 				)
 			);
 
-			if (!empty($this_user))
-			{
-				list ($user_settings) = $this_user;
+			$user_settings = $this_user->fetch_assoc();
 
-				// Make the ID specifically an integer
-				$user_settings['id_member'] = (int) $user_settings['id_member'];
-			}
+			// Make the ID specifically an integer
+			$user_settings['id_member'] = (int) ($user_settings['id_member'] ?? 0);
 
 			if ($cache->levelHigherThan(1))
 				$cache->put('user_settings-' . $id_member, $user_settings, 60);

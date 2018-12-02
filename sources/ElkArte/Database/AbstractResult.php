@@ -48,11 +48,30 @@ abstract class AbstractResult
 	}
 
 	/**
+	 * The destructor is used to free the results.
+	 */
+	public function __destruct()
+	{
+		if (!is_bool($this->result))
+		{
+			$this->free_result();
+		}
+	}
+
+	/**
 	 * Returns the result object as obtained from the query function
 	 */
 	public function getResultObject()
 	{
 		return $this->result;
+	}
+
+	/**
+	 * Allows to check if the results obtained are valid.
+	 */
+	public function hasResults()
+	{
+		return !empty($this->result);
 	}
 
 	/**
@@ -111,4 +130,42 @@ abstract class AbstractResult
 	 * @return int|string
 	 */
 	abstract public function insert_id();
+
+	/**
+	 * Returns the results calling a callback on each row.
+	 *
+	 * The callback is supposed to accept as argument the row of data fetched
+	 * by the query from the database.
+	 *
+	 * @param null|object|string $callback
+	 * @param mixed[]|null
+	 * @return array
+	 */
+	public function fetch_callback($callback = null, $seeds = null)
+	{
+		$results = $seeds !== null ? $seeds : array();
+
+		if ($request !== false)
+		{
+			$fetched = $this->result->fetch_all();
+
+			$results = array_merge($results, empty($fetched) ? [] : $fetched);
+
+			$request->free_result();
+
+			if (!empty($callback))
+			{
+				foreach ($results as $idx => $row)
+				{
+					$results[$idx] = call_user_func_array($callback, $row);
+				}
+			}
+		}
+		else
+		{
+			$results = false;
+		}
+
+		return $results;
+	}
 }

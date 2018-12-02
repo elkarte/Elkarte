@@ -90,16 +90,7 @@ class Query extends AbstractQuery
 			])
 		);
 
-		// This is here only for compatibility with the previous database code.
-		// To remove when all the instances are fixed.
-		if ($ret === false)
-		{
-			return false;
-		}
-		else
-		{
-			return $this->result;
-		}
+		return $this->result;
 	}
 
 	/**
@@ -344,8 +335,10 @@ class Query extends AbstractQuery
 
 				// Try the query again...?
 				$ret = $this->query('', $db_string, false, false);
-				if ($ret !== false)
+				if ($ret->hasResults())
+				{
 					return $ret;
+				}
 			}
 			else
 				$modSettings['cache_enable'] = $old_cache;
@@ -375,13 +368,17 @@ class Query extends AbstractQuery
 						$ret = $this->query('', $db_string, false, false);
 
 						$new_errno = mysqli_errno($new_connection);
-						if ($ret !== false || in_array($new_errno, array(1205, 1213)))
+						if ($ret->hasResults() || in_array($new_errno, array(1205, 1213)))
+						{
 							break;
+						}
 					}
 
 					// If it failed again, shucks to be you... we're not trying it over and over.
-					if ($ret !== false)
+					if ($ret->hasResults())
+					{
 						return $ret;
+					}
 				}
 			}
 			// Are they out of space, perhaps?

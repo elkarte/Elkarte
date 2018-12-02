@@ -95,9 +95,9 @@ function bb2_db_query($query)
 		return true;
 
 	// Run the query, return success, failure or the actual results
-	$result = $db->query('', $query, array());
+	$result = $db->query('', $query, array())->getResultObject();
 
-	if (!$result)
+	if ($result === false)
 		return false;
 	elseif ($result === true)
 		return (bb2_db_affected_rows() !== 0);

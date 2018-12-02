@@ -767,9 +767,9 @@ function updateZeroPostMembers()
 			'string_zero' => '0',
 			'recycle' => $modSettings['recycle_board'],
 		)
-	) !== false;
+	)->hasResults() !== false;
 
-	if ($createTemporary)
+	if ($createTemporary->hasResults())
 	{
 		// Outer join the members table on the temporary table finding the members that
 		// have a post count but no posts in the message table

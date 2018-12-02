@@ -1517,7 +1517,7 @@ function getMemberGroups()
 		)
 	);
 
-	if ($request === false)
+	if ($request->hasResults() === false)
 	{
 		$db->skip_next_error();
 		$request = $db->query('', '

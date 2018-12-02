@@ -565,7 +565,7 @@ class Unread
 				'is_approved' => 1,
 				'string_zero' => '0',
 			)
-		) !== false;
+		)->hasResults() !== false;
 
 		// If that worked, create a sample of the log_topics table too.
 		if ($this->_have_temp_table)
@@ -582,7 +582,7 @@ class Unread
 				array(
 					'current_member' => $this->_user_id,
 				)
-			) !== false;
+			)->hasResults() !== false;
 		}
 	}
 
@@ -616,6 +616,6 @@ class Unread
 				'earliest_msg' => $this->_earliest_msg,
 				'is_approved' => 1,
 			))
-		) !== false;
+		)->hasResults() !== false;
 	}
 }

@@ -176,7 +176,7 @@ namespace ElkArte\Database\Mysqli;
 				'table' => $table
 		));
 		// If this failed, we go old school.
-		if ($result)
+		if ($result->hasResults())
 		{
 			$request = $this->_db->query('', '
 				INSERT INTO {raw:backup_table}

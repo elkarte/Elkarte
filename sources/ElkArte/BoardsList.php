@@ -159,7 +159,7 @@ class BoardsList
 		global $txt, $modSettings;
 
 		// Find all boards and categories, as well as related information.
-		$result_boards = $this->_db->fetchQuery('
+		$request = $this->_db->fetchQuery('
 			SELECT' . ($this->_options['include_categories'] ? '
 				c.id_cat, c.name AS cat_name, c.cat_order,' : '') . '
 				b.id_board, b.name AS board_name, b.description, b.board_order,
@@ -190,7 +190,8 @@ class BoardsList
 			)
 		);
 
-		///
+		$result_boards = $request->fetch_all();
+
 		usort($result_boards, function ($a, $b) {
 			return $a['board_order'] <=> $b['board_order'];
 		});
@@ -442,7 +443,7 @@ class BoardsList
 
 		if (!\ElkArte\Cache\Cache::instance()->getVar($mod_cached, 'localmods_' . md5(implode(',', $boards)), 3600))
 		{
-			$mod_cached = $this->_db->fetchQuery('
+			$request = $this->_db->fetchQuery('
 				SELECT mods.id_board, COALESCE(mods_mem.id_member, 0) AS id_moderator, mods_mem.real_name AS mod_real_name
 				FROM {db_prefix}moderators AS mods
 					LEFT JOIN {db_prefix}members AS mods_mem ON (mods_mem.id_member = mods.id_member)
@@ -451,6 +452,8 @@ class BoardsList
 					'id_boards' => $boards,
 				)
 			);
+			$mod_cached = $request->fetch_all();
+
 			\ElkArte\Cache\Cache::instance()->put('localmods_' . md5(implode(',', $boards)), $mod_cached, 3600);
 		}
 
