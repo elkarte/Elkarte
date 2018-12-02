@@ -1171,7 +1171,7 @@ function list_getMembers($start, $items_per_page, $sort, $where, $where_params =
 			'start' => $start,
 			'per_page' => $items_per_page,
 		))
-	);
+	)->fetch_all();
 
 	// If we want duplicates pass the members array off.
 	if ($get_duplicates)
@@ -1391,7 +1391,7 @@ function membersByIP($ip1, $match = 'exact', $ip2 = false)
 		FROM {db_prefix}members
 		WHERE ' . $where,
 		$ip_params
-	);
+	)->fetch_all();
 }
 
 /**
@@ -2138,7 +2138,7 @@ function onlineMembers($conditions, $sort_method, $sort_direction, $start)
 			'offset' => $start,
 			'limit' => $modSettings['defaultMaxMembers'],
 		)
-	);
+	)->fetch_all();
 }
 
 /**
@@ -2188,7 +2188,7 @@ function recentMembers($limit)
 		array(
 			'limit' => $limit,
 		)
-	);
+	)->fetch_all();
 }
 
 /**

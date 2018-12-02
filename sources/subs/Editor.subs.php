@@ -75,7 +75,7 @@ function getMessageIcons($board_id)
 				)
 			);
 			$icons = array();
-			foreach ($icon_data as $icon)
+			foreach ($icon_data->fetch_all() as $icon)
 			{
 				$icons[$icon['filename']] = array(
 					'value' => $icon['filename'],

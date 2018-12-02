@@ -1029,7 +1029,7 @@ function list_getBanTriggers($start, $items_per_page, $sort, $trigger_type)
 		'email' => 'bi.email_address != {string:blank_string}',
 	);
 
-	$request = $db->fetchQuery('
+	return $db->fetchQuery('
 		SELECT
 			bi.id_ban, bi.ip_low1, bi.ip_high1, bi.ip_low2, bi.ip_high2, bi.ip_low3, bi.ip_high3, bi.ip_low4, bi.ip_high4, bi.ip_low5, bi.ip_high5, bi.ip_low6, bi.ip_high6, bi.ip_low7, bi.ip_high7, bi.ip_low8, bi.ip_high8, bi.hostname, bi.email_address, bi.hits,
 			bg.id_ban_group, bg.name' . ($trigger_type === 'member' ? ',
@@ -1043,9 +1043,7 @@ function list_getBanTriggers($start, $items_per_page, $sort, $trigger_type)
 		array(
 			'blank_string' => '',
 		)
-	);
-
-	return $request->fetch_all();
+	)->fetch_all();
 }
 
 /**
@@ -1186,7 +1184,7 @@ function list_getBanLogEntries($start, $items_per_page, $sort)
 {
 	$db = database();
 
-	$request = $db->fetchQuery('
+	return $db->fetchQuery('
 		SELECT lb.id_ban_log, lb.id_member, COALESCE(lb.ip, {string:dash}) AS ip, COALESCE(lb.email, {string:dash}) AS email, lb.log_time, COALESCE(mem.real_name, {string:blank_string}) AS real_name
 		FROM {db_prefix}log_banned AS lb
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lb.id_member)
@@ -1196,9 +1194,7 @@ function list_getBanLogEntries($start, $items_per_page, $sort)
 			'blank_string' => '',
 			'dash' => '-',
 		)
-	);
-
-	return $request->fetch_all();
+	)->fetch_all();
 }
 
 /**
@@ -1366,7 +1362,7 @@ function list_getBans($start, $items_per_page, $sort)
 {
 	$db = database();
 
-	$request = $db->fetchQuery('
+	return $db->fetchQuery('
 		SELECT bg.id_ban_group, bg.name, bg.ban_time, bg.expire_time, bg.reason, bg.notes, COUNT(bi.id_ban) AS num_triggers
 		FROM {db_prefix}ban_groups AS bg
 			LEFT JOIN {db_prefix}ban_items AS bi ON (bi.id_ban_group = bg.id_ban_group)
@@ -1378,9 +1374,7 @@ function list_getBans($start, $items_per_page, $sort)
 			'offset' => $start,
 			'limit' => $items_per_page,
 		)
-	);
-
-	return $request->fetch_all();
+	)->fetch_all();
 }
 
 /**

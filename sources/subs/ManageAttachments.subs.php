@@ -1481,7 +1481,7 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
 				'start' => $start,
 				'per_page' => $items_per_page,
 			)
-		);
+		)->fetch_all();
 	}
 	else
 	{
@@ -1503,7 +1503,7 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
 				'start' => $start,
 				'per_page' => $items_per_page,
 			)
-		);
+		)->fetch_all();
 	}
 }
 
@@ -1648,7 +1648,7 @@ function findAttachmentsToMove($from, $start, $limit)
 			'start' => $start,
 			'limit' => $limit,
 		)
-	);
+	)->fetch_all();
 	$number = count($attachments);
 
 	return array($number, $attachments);

@@ -382,7 +382,7 @@ function getNewMentions($id_member, $timestamp)
 
 	if (empty($timestamp))
 	{
-		list ($result) = $db->fetchQuery('
+		$result = $db->fetchQuery('
 			SELECT COUNT(*) AS c
 			FROM {db_prefix}log_mentions
 			WHERE status = {int:status}
@@ -393,11 +393,11 @@ function getNewMentions($id_member, $timestamp)
 				'has_access' => 1,
 				'member' => $id_member
 			)
-		);
+		)->fetch_assoc();
 	}
 	else
 	{
-		list ($result) = $db->fetchQuery('
+		$result = $db->fetchQuery('
 			SELECT COUNT(*) AS c
 			FROM {db_prefix}log_mentions
 			WHERE status = {int:status}
@@ -410,7 +410,7 @@ function getNewMentions($id_member, $timestamp)
 				'last_seen' => $timestamp,
 				'member' => $id_member
 			)
-		);
+		)->fetch_assoc();
 	}
 
 	return $result['c'];

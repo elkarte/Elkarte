@@ -1088,7 +1088,7 @@ function eventInfoForTopic($id_topic)
 		array(
 			'current_topic' => $id_topic,
 		)
-	);
+	)->fetch_all();
 }
 
 /**
@@ -1112,7 +1112,7 @@ function list_getHolidays($start, $items_per_page, $sort)
 		array(
 			'sort' => $sort,
 		)
-	);
+	)->fetch_all();
 }
 
 /**

@@ -471,7 +471,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 			'id_group' => 0,
 			'admin_forum' => 'admin_forum',
 		)
-	);
+	)->fetch_all();
 	$groups[] = 1;
 	$groups = array_unique($groups);
 

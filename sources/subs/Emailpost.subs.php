@@ -1337,7 +1337,7 @@ function query_user_keys($email)
 		array(
 			'email' => $email,
 		)
-	);
+	)->fetch_all();
 }
 
 /**

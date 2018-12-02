@@ -275,7 +275,7 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $order = 
 			'order' => $order,
 			'limit' => $limit,
 		)
-	);
+	)->fetch_all();
 }
 
 /**

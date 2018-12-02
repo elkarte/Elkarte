@@ -633,7 +633,7 @@ function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 		array(
 			'boards_to_remove' => $boards_to_remove,
 		)
-	);
+	)->fetch_all();
 
 	require_once(SUBSDIR . '/Topic.subs.php');
 	removeTopics($topics, false);
@@ -1675,7 +1675,7 @@ function getAllThemes()
 		array(
 			'name' => 'name',
 		)
-	);
+	)->fetch_all();
 }
 
 /**
