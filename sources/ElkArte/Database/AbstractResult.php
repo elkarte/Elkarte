@@ -145,13 +145,11 @@ abstract class AbstractResult
 	{
 		$results = $seeds !== null ? $seeds : array();
 
-		if ($request !== false)
+		if (is_resource($this->result))
 		{
 			$fetched = $this->result->fetch_all();
 
 			$results = array_merge($results, empty($fetched) ? [] : $fetched);
-
-			$request->free_result();
 
 			if (!empty($callback))
 			{
@@ -163,7 +161,7 @@ abstract class AbstractResult
 		}
 		else
 		{
-			$results = false;
+			$results = (bool) $this->result;
 		}
 
 		return $results;
