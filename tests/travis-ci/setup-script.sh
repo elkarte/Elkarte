@@ -29,8 +29,10 @@ if [ "$COVERAGE" != "true" -o "${TRAVIS_PULL_REQUEST}" == "false" ]; then COVER=
 if [ "$WEBTESTS" == "true" ]; then WEB="-with-webtest"; fi
 CONFIG="--verbose --debug --configuration /var/www/tests/travis-ci/phpunit${WEB}-${SHORT_DB}-travis.xml ${COVER}"
 
+/var/www/vendor/bin/phpunit /var/www/tests/travis-ci/DatabaseTestExt.php;
+
 # Run PHPUnit tests for the site
 /var/www/vendor/bin/phpunit ${CONFIG}
 
 # Run validation (lock file)
-if [ "$SHORT_DB" != "none" ]; then /var/www/vendor/bin/phpunit /var/www/tests/travis-ci/BootstrapRunTest.php; fi
+if [ "$SHORT_DB" != "none" ]; then /var/www/vendor/bin/phpunit /var/www/tests/travis-ci/BootstrapRunTestExt.php; fi
