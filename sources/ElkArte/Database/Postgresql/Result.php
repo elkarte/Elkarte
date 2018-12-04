@@ -104,6 +104,8 @@ class Result extends \ElkArte\Database\AbstractResult
 	 */
 	public function fetch_all()
 	{
-		return pg_fetch_all($this->result, PGSQL_ASSOC);
+		$results = pg_fetch_all($this->result, PGSQL_ASSOC);
+
+		return empty($results) ? [] : $results;
 	}
 }
