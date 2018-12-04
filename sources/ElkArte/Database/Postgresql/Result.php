@@ -63,7 +63,7 @@ class Result extends \ElkArte\Database\AbstractResult
 	public function free_result()
 	{
 		// Just delegate to the native function
-		pg_free_result($this->result);
+		@pg_free_result($this->result);
 	}
 
 	/**

@@ -50,7 +50,7 @@ class Result extends \ElkArte\Database\AbstractResult
 	public function free_result()
 	{
 		// Just delegate to MySQL's function
-		mysqli_free_result($this->result);
+		@mysqli_free_result($this->result);
 	}
 
 	/**
