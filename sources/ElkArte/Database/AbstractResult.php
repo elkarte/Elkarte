@@ -141,22 +141,15 @@ abstract class AbstractResult
 	 * @param mixed[]|null
 	 * @return array
 	 */
-	public function fetch_callback($callback = null, $seeds = null)
+	public function fetch_callback($callback, $seeds = null)
 	{
-		$results = $seeds !== null ? $seeds : array();
+		$results = $seeds !== null ? (array) $seeds : array();
 
-		if (is_resource($this->result))
+		if (!is_bool($this->result))
 		{
-			$fetched = $this->result->fetch_all();
-
-			$results = array_merge($results, empty($fetched) ? [] : $fetched);
-
-			if (!empty($callback))
+			while ($row = $this->fetch_assoc())
 			{
-				foreach ($results as $idx => $row)
-				{
-					$results[$idx] = call_user_func_array($callback, $row);
-				}
+				$results[] = call_user_func($callback, $row);
 			}
 		}
 		else
