@@ -619,7 +619,7 @@ function updateInputBoxes()
  */
 function addOption()
 {
-	setOuterHTML(document.getElementById("addopt"), '<br /><input type="radio" name="default_select" value="' + startOptID + '" id="' + startOptID + '" /><input type="text" name="select_option[' + startOptID + ']" value="" class="input_text" /><span id="addopt"></span>');
+	setOuterHTML(document.getElementById("addopt"), '<p><input type="radio" name="default_select" value="' + startOptID + '" id="' + startOptID + '" /><input type="text" name="select_option[' + startOptID + ']" value="" class="input_text" /></p><span id="addopt"></span>');
 	startOptID++;
 }
 
@@ -1976,3 +1976,10 @@ $(function() {
 		});
 	});
 });
+
+function confirmAgreement(text) {
+	if ($('#checkboxAcceptAgreement').is(':checked')) {
+		return confirm(text);
+	}
+	return true;
+}

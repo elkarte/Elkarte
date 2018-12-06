@@ -1195,6 +1195,8 @@ function decreaseLikeCounts($messages)
 	}
 
 	// Update the totals for these members
+	require_once(SUBSDIR . '/Members.subs.php');
+
 	foreach ($update_given as $id_member => $total)
 		updateMemberData($id_member, array('likes_given' => (int) $total));
 

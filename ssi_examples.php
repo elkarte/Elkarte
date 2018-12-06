@@ -365,7 +365,7 @@ template_ssi_above();
 		<!-- WELCOME, LOGIN AND LOGOUT -->
 		<div class="ssi_preview" id="ssi_login">
 			<h2>Login Function</h2>
-			<p>Shows a login box only when user is not logged in.</p>
+			<p>Shows a login box <strong>only</strong> when user is not logged in.</p>
 			<h3>Code</h3>
 			<div class="codeheader">
 				<a href="javascript:void(0);" onclick="return elkSelectText(this);" class="codeoperation">[Select]</a>
@@ -379,7 +379,7 @@ template_ssi_above();
 			</div>
 
 			<h2>Logout Function</h2>
-			<p>Shows a logout link only when user is logged in.</p>
+			<p>Shows a logout link <strong>only</strong> when user is logged in.</p>
 			<h3>Code</h3>
 			<div class="codeheader">
 				<a href="javascript:void(0);" onclick="return elkSelectText(this);" class="codeoperation">[Select]</a>
@@ -656,8 +656,9 @@ function template_ssi_above()
 	echo '<!DOCTYPE html>
 <html>
 	<head>
-		<title>SSI.php Examples</title>
+		<title>ElkArte SSI Examples</title>
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css', CACHE_STALE, '" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/icons_svg.css', CACHE_STALE, '" />
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/_light/index_light.css', CACHE_STALE, '" />
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<style>
@@ -670,10 +671,10 @@ function template_ssi_above()
 			}
 			#main_content_section h2 {
 				font-size: 1.5em;
-				border-bottom: solid 1px #d05800;
+				border-bottom: solid 1px #D05800;
 				line-height: 1.5em;
 				margin: 0.5em 0;
-				color: #d05800;
+				color: #D05800;
 			}
 			#liftup {
 				position: relative;
@@ -683,7 +684,8 @@ function template_ssi_above()
 			}
 			#footer_section {
 				position: relative;
-				top: -20px;
+				top: 0;
+				min-height: 40px;
 			}
 			#sidenav {
 				width: 210px;
@@ -691,10 +693,10 @@ function template_ssi_above()
 				margin-right: 20px;
 			}
 			#sidenav ul {
-				margin: 0 0 0 15px;
+				margin: 0 0 0 1em;
 				padding: 0;
 				list-style: none;
-				font-size: 90%;
+				font-size: 95%;
 			}
 			#preview {
 				margin-left: 230px;
@@ -706,9 +708,9 @@ function template_ssi_above()
 				margin: 1em 0 0.5em 0;
 			}
 			.ssi_result {
-				background: #fff;
-				border: 1px solid #99a;
-				padding: 10px;
+				background: #FFFFFF;
+				border: 1px solid #9999AA;
+				padding: .8em;
 				overflow: hidden;
 			}
 			.bbc_code {
@@ -722,25 +724,25 @@ function template_ssi_above()
 				border: none;
 			}
 			.ssi_table th {
-				padding: 5px 8px;
-				border-top: 2px solid #ddd;
-				border-bottom: 2px solid #ddd;
-				background: #fff;
-				color: #555;
+				padding: 5px 8px 5px 0;
+				border-top: 2px solid #DDDDDD;
+				border-bottom: 2px solid #DDDDDD;
+				background: #FFFFFF;
+				color: #555555;
 				font-size: 1em;
 				font-weight: 600;
 			}
-			.ssi_table>td, .ssi_table>th  {
+			.ssi_table td, .ssi_table th {
 				text-align: left;
 				white-space: nowrap;
 			}
-			.ssi_table>td.top  {
+			.ssi_table td.top {
 				vertical-align: top;
 			}
-			.ssi_table>th.righttext, .ssi_table>td.righttext {
+			.ssi_table th.righttext, .ssi_table td.righttext {
 				text-align: right;
 			}
-			.ssi_table>th.centertext, .ssi_table>td.centertext {
+			.ssi_table th.centertext, .ssi_table td.centertext {
 				text-align: center;
 			}
 			.top_topic .link {
@@ -771,6 +773,10 @@ function template_ssi_above()
 			{
 				toggleVisibleByClass("ssi_preview", true);
 				document.getElementById(elementID).style.display = "block";
+				if (elementID !== "ssi_recentTopics") 
+				{
+					document.getElementById(elementID).scrollIntoView(); 
+				}
 			}
 
 			// Toggle visibility of all sections.
@@ -790,8 +796,11 @@ function template_ssi_above()
 	<body>
 		<div id="top_section">
 			<div id="header" class="wrapper">
-				<h1 id="forumtitle">SSI.php Examples</h1>
-				<img id="logo" src="themes/default/images/logo.png" alt="ElkArte Community" title="ElkArte Community" />
+				<h1 id="forumtitle">ElkArte SSI (Server Side Includes) Examples
+					<span id="logobox">
+						<img id="logo" src="themes/default/images/logo.png" alt="ElkArte Logo" title="ElkArte Community" />
+					</span>
+				</h1>
 			</div>
 		</div>
 		<div id="wrapper" class="wrapper">
@@ -843,19 +852,19 @@ function template_homepage_sample1($method = 'source')
 			color: #FFFFFF;
 			margin: 0;
 		}
-		ul,ol {
-			padding-left: 19px;
+		ul, ol {
+			padding-left: 1.25em;
 			margin: 0;
 		}
 		li {
-			font-size: 11px;
+			font-size: 1em;
 		}
-		h1,h2,h3 {
+		h1, h2, h3 {
 			margin: 0;
 			padding: 0;
 		}
 		h3 {
-			font-size: 15px;
+			font-size: 1em;
 		}
 		a:link,a:visited {
 			color: #FF9000;
@@ -895,7 +904,7 @@ function template_homepage_sample1($method = 'source')
 		#navigation {
 			float: right;
 		}
-		#navigation a:link,#navigation a:visited {
+		#navigation a:link, #navigation a:visited {
 			color: #FF9000;
 		}
 	</style>

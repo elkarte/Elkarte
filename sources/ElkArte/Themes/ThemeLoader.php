@@ -474,6 +474,26 @@ class ThemeLoader
 			];
 		}
 
+		if (!empty($_SESSION['agreement_accepted']))
+		{
+			$_SESSION['agreement_accepted'] = null;
+			$context['accepted_agreement'] = array(
+				'errors' => array(
+					'accepted_agreement' => $txt['agreement_accepted']
+				)
+			);
+		}
+
+		if (!empty($_SESSION['privacypolicy_accepted']))
+		{
+			$_SESSION['privacypolicy_accepted'] = null;
+			$context['accepted_agreement'] = array(
+				'errors' => array(
+					'accepted_privacy_policy' => $txt['privacypolicy_accepted']
+				)
+			);
+		}
+
 		$this->theme->loadThemeJavascript();
 
 		\ElkArte\Hooks::instance()->newPath(['$themedir' => $settings['theme_dir']]);

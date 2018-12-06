@@ -264,7 +264,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 		$context['attachmentUploadDir'] = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
 
 		// First time here?
-		if (empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && count($modSettings['attachmentUploadDir']) == 1)
+		if (empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && (is_array($modSettings['attachmentUploadDir']) && count($modSettings['attachmentUploadDir']) == 1))
 			$modSettings['attachmentUploadDir'] = $modSettings['attachmentUploadDir'][1];
 
 		// If not set, show a default path for the base directory
@@ -317,7 +317,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 						? $txt['basedirectory_for_attachments_current']
 						: $txt['basedirectory_for_attachments_warning']))
 				),
-				empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && count((array) $modSettings['attachmentUploadDir']) == 1
+				empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && (is_array($modSettings['attachmentUploadDir']) && count($modSettings['attachmentUploadDir']) == 1)
 					? array('text', 'attachmentUploadDir', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 40, 'invalid' => !$context['valid_upload_dir'])
 					: array('var_message', 'attach_current_directory', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 'message' => 'attachment_path', 'invalid' => empty($context['valid_upload_dir']), 'text_label' => (!empty($context['valid_upload_dir'])
 						? $txt['attach_current_dir']

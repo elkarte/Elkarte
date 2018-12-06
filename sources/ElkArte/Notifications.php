@@ -50,6 +50,15 @@ class Notifications extends AbstractModel
 	 * @var array
 	 */
 	protected $_notifiers;
+
+	/**
+	 * Only the members that should be notified.
+	 * For example, in case of editing a message, quoted members
+	 * should not be mentioned twice.
+	 *
+	 * @var array
+	 */
+	protected $_to_actually_mention = array();
 	/**
 	 * Notifications constructor.
 	 *
@@ -205,7 +214,7 @@ class Notifications extends AbstractModel
 		$mentioning = new \ElkArte\Mentions\Mentioning($this->_db, new \ElkArte\DataValidator(), $this->_modSettings->enabled_mentions);
 		foreach ($bodies as $body)
 		{
-			$mentioning->create($obj, array(
+			$this->_to_actually_mention[$task['notification_type']] = $mentioning->create($obj, array(
 				'id_member_from' => $task['id_member_from'],
 				'id_member' => $body['id_member_to'],
 				'id_msg' => $task['id_target'],
@@ -228,7 +237,10 @@ class Notifications extends AbstractModel
 		$last_id = $obj->getLastId();
 		foreach ($bodies as $body)
 		{
-			sendmail($body['email_address'], $body['subject'], $body['body'], null, $last_id);
+			if (in_array($body['id_member_to'], $this->_to_actually_mention[$task['notification_type']]))
+			{
+				sendmail($body['email_address'], $body['subject'], $body['body'], null, $last_id);
+			}
 		}
 	}
 
@@ -243,13 +255,16 @@ class Notifications extends AbstractModel
 	{
 		foreach ($bodies as $body)
 		{
-			$this->_insert_delayed(array(
-				$task['notification_type'],
-				$body['id_member_to'],
-				$task['log_time'],
-				'd',
-				$body['body']
-			));
+			if (in_array($body['id_member_to'], $this->_to_actually_mention[$task['notification_type']]))
+			{
+				$this->_insert_delayed(array(
+					$task['notification_type'],
+					$body['id_member_to'],
+					$task['log_time'],
+					'd',
+					$body['body']
+				));
+			}
 		}
 	}
 
@@ -264,13 +279,16 @@ class Notifications extends AbstractModel
 	{
 		foreach ($bodies as $body)
 		{
-			$this->_insert_delayed(array(
-				$task['notification_type'],
-				$body['id_member_to'],
-				$task['log_time'],
-				'w',
-				$body['body']
-			));
+			if (in_array($body['id_member_to'], $this->_to_actually_mention[$task['notification_type']]))
+			{
+				$this->_insert_delayed(array(
+					$task['notification_type'],
+					$body['id_member_to'],
+					$task['log_time'],
+					'w',
+					$body['body']
+				));
+			}
 		}
 	}
 

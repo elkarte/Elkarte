@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!DOCTYPE package-info SYSTEM "http://www.elkarte.net/site/package-info">
+<package-info xmlns="http://www.elkarte.net/site/package-info" xmlns:elk="http://www.elkarte.net/">
+	<id>Elkarte Contributors:ElkArte_114_patch</id>
+	<name>ElkArte 1.1.4 patch</name>
+	<version>1.1.4</version>
+	<type>modification</type>
+		<install for="1.1.3">
+			<modification>modifications.xml</modification>
+			<require-file name="1.1.4/bootstrap.php" destination="BOARDDIR" />
+			<require-file name="1.1.4/email_imap_cron.php" destination="BOARDDIR" />
+			<require-file name="1.1.4/emailpost.php" destination="BOARDDIR" />
+			<require-file name="1.1.4/emailtopic.php" destination="BOARDDIR" />
+			<require-file name="1.1.4/ssi_examples.php" destination="BOARDDIR" />
+			<require-file name="1.1.4/Errors.php" destination="SUBSDIR/Errors" />
+			<require-file name="1.1.4/icons_svg_besocial.css" destination="THEMEDIR/css/_besocial" />
+			<require-file name="1.1.4/PrivacyPolicy.class.php" destination="SUBSDIR" />
+			<require-file name="1.1.4/Agreement.class.php" destination="SUBSDIR" />
+			<require-file name="1.1.4/serialize.php" destination="EXTDIR" />
+			<require-file name="1.1.4/simple_html_dom.php" destination="EXTDIR" />
+			<require-dir name="1.1.4/bad-behavior" destination="EXTDIR" />
+			<require-dir name="1.1.4/CacheMethod" destination="SUBSDIR" />
+			<require-dir name="1.1.4/MentionType" destination="SUBSDIR" />
+			<require-dir name="agreements" destination="BOARDDIR/packages/backups" />
+			<require-dir name="privacypolicies" destination="BOARDDIR/packages/backups" />
+			<code>code.php</code>
+		</install>
+		<uninstall for="1.1.4">
+			<modification reverse="true">modifications.xml</modification>
+			<require-file name="1.1.3/bootstrap.php" destination="BOARDDIR" />
+			<require-file name="1.1.3/email_imap_cron.php" destination="BOARDDIR" />
+			<require-file name="1.1.3/emailpost.php" destination="BOARDDIR" />
+			<require-file name="1.1.3/emailtopic.php" destination="BOARDDIR" />
+			<require-file name="1.1.3/ssi_examples.php" destination="BOARDDIR" />
+			<require-file name="1.1.3/Errors.php" destination="SUBSDIR/Errors" />
+			<require-file name="1.1.3/Agreement.class.php" destination="SUBSDIR" />
+			<require-file name="1.1.3/serialize.php" destination="EXTDIR" />
+			<require-file name="1.1.3/simple_html_dom.php" destination="EXTDIR" />
+			<require-dir name="1.1.3/bad-behavior" destination="EXTDIR" />
+			<require-dir name="1.1.3/CacheMethod" destination="SUBSDIR" />
+			<require-dir name="1.1.3/MentionType" destination="SUBSDIR" />
+		</uninstall>
+</package-info>

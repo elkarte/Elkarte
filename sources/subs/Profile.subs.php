@@ -208,7 +208,10 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		{
 			$value = \ElkArte\Util::htmlspecialchars($custom_fields[$row['col_name']]);
 			if (in_array($row['field_type'], array('select', 'radio')))
-				$value = ($options = explode(',', $row['field_options'])) && isset($options[$value]) ? $options[$value] : '';
+			{
+				$options = explode(',', $row['field_options']);
+				$value = isset($options[$value]) ? $options[$value] : '';
+			}
 		}
 
 		// HTML for the input form.
@@ -226,12 +229,16 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		{
 			$input_html = '<select id="' . $row['col_name'] . '" name="customfield[' . $row['col_name'] . ']"><option value=""' . ($row['default_value'] === 'no_default' ? ' selected="selected"' : '') . '></option>';
 			$options = explode(',', $row['field_options']);
+
 			foreach ($options as $k => $v)
 			{
 				$true = ($value == $v);
 				$input_html .= '<option value="' . $k . '"' . ($true ? ' selected="selected"' : '') . '>' . $v . '</option>';
 				if ($true)
+				{
+					$key = $k;
 					$output_html = $v;
+				}
 			}
 
 			$input_html .= '</select>';
@@ -241,12 +248,16 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		{
 			$input_html = '<fieldset>';
 			$options = explode(',', $row['field_options']);
+
 			foreach ($options as $k => $v)
 			{
 				$true = ($value == $v);
 				$input_html .= '<label for="customfield_' . $row['col_name'] . '_' . $k . '"><input type="radio" name="customfield[' . $row['col_name'] . ']" class="input_radio" id="customfield_' . $row['col_name'] . '_' . $k . '" value="' . $k . '" ' . ($true ? 'checked="checked"' : '') . ' />' . $v . '</label><br />';
 				if ($true)
+				{
+					$key = $k;
 					$output_html = $v;
+				}
 			}
 			$input_html .= '</fieldset>';
 		}
@@ -270,13 +281,27 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 
 		// Enclosing the user input within some other text?
 		if (!empty($row['enclose']) && !empty($output_html))
-			$output_html = strtr($row['enclose'], array(
+		{
+			$replacements = array(
 				'{SCRIPTURL}' => $scripturl,
 				'{IMAGES_URL}' => $settings['images_url'],
 				'{DEFAULT_IMAGES_URL}' => $settings['default_images_url'],
 				'{INPUT}' => $output_html,
-			));
+			);
+			if (in_array($row['field_type'], array('radio', 'select')))
+			{
+				$replacements['{KEY}'] = $row['col_name'] . '_' . $key;
+			}
+			$output_html = strtr($row['enclose'], $replacements);
+		}
 
+		$context['custom_fields_required'] = $context['custom_fields_required'] || $row['show_reg'];
+		$valid_areas = array('register', 'account', 'forumprofile', 'theme');
+
+		if (!in_array($area, $valid_areas) && ($value === '' || $value === 'no_default'))
+		{
+			continue;
+		}
 		$context['custom_fields'][] = array(
 			'name' => $row['field_name'],
 			'desc' => $row['field_desc'],
@@ -290,7 +315,6 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 			'field_length' => $row['field_length'],
 			'mask' => $row['mask'],
 		);
-		$context['custom_fields_required'] = $context['custom_fields_required'] || $row['show_reg'];
 	}
 
 	$db->free_result($request);
@@ -1526,13 +1550,18 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 		// Validate the user data.
 		if ($row['field_type'] === 'check')
 			$value = isset($_POST['customfield'][$row['col_name']]) ? 1 : 0;
-		elseif ($row['field_type'] === 'select' || $row['field_type'] === 'radio')
+		elseif (in_array($row['field_type'], array('radio', 'select')))
 		{
 			$value = $row['default_value'];
-			foreach (explode(',', $row['field_options']) as $k => $v)
+			$options = explode(',', $row['field_options']);
+
+			foreach ($options as $k => $v)
 			{
 				if (isset($_POST['customfield'][$row['col_name']]) && $_POST['customfield'][$row['col_name']] == $k)
+				{
+					$key = $k;
 					$value = $v;
+				}
 			}
 		}
 		// Otherwise some form of text!
@@ -1575,7 +1604,15 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 			);
 
 			$changes[] = array($row['col_name'], $value, $memID);
-			$user_profile[$memID]['options'][$row['col_name']] = $value;
+			if (in_array($row['field_type'], array('radio', 'select')))
+			{
+				$user_profile[$memID]['options'][$row['col_name']] = $value;
+				$user_profile[$memID]['options'][$row['col_name'] . '_key'] = $row['col_name'] . '_' . $key;
+			}
+			else
+			{
+				$user_profile[$memID]['options'][$row['col_name']] = $value;
+			}
 		}
 	}
 	$db->free_result($request);

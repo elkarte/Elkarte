@@ -193,7 +193,7 @@ The following bbcode is for testing, to be moved to a test when ready.
 		}
 
 		$replacements = array(
-			'ACTIONNAME' => $this->_task['notifier_data']['name'],
+			'ACTIONNAME' => $this->_task['source_data']['notifier_data']['name'],
 			'MSGLINK' => replaceBasicActionUrl('{script_url}?msg=' . $this->_task->id_target),
 		);
 

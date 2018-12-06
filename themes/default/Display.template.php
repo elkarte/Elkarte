@@ -206,7 +206,7 @@ function template_messages()
 		// Show a checkbox for quick moderation?
 		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $message['can_remove'])
 			echo '
-							<li class="listlevel1 inline_mod_check none" id="in_topic_mod_check_', $message['id'], '"></li>';
+							<li class="listlevel1 inline_mod_check hide" id="in_topic_mod_check_', $message['id'], '"></li>';
 
 		// Show "Last Edit: Time by Person" if this post was edited.
 		if ($settings['show_modify'])

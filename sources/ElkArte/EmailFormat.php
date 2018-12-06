@@ -325,7 +325,7 @@ class EmailFormat
 		$this->_body = preg_replace('~\]\s*\[br\]\s*\[br\]\s*\[~s', '][br][', $this->_body);
 
 		// Repair the &nbsp; in its various states and any other chaff
-		$this->_body = strtr($this->_body, array(' &nbsp;' => ' ', '&nbsp; ' => ' ', "\xc2\xa0" => ' ', "\xe2\x80\xa8" => "\n", "\xA0" => ' '));
+		$this->_body = strtr($this->_body, array(' &nbsp;' => ' ', '&nbsp; ' => ' ', "\xc2\xa0" => ' ', "\xe2\x80\xa8" => "\n"));
 
 		// Trailing space before an end quote
 		$this->_body = preg_replace('~\s*\n\s*\[/quote\]~', '[/quote]', $this->_body);

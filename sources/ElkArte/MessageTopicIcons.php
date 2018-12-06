@@ -40,13 +40,26 @@ class MessageTopicIcons extends \ElkArte\ValuesContainer
 	protected $_default_icon = 'xx';
 
 	/**
+	 * Icons that are default with ElkArte
+	 * @var array
+	 */
+	protected $_stable_icons = 	array();
+
+	/**
+	 * Icons to load in addition to the default
+	 * @var array
+	 */
+	protected $_custom_icons = array();
+
+	/**
 	 * This simple function returns the message topic icon array.
 	 *
 	 * @param bool|false $icon_check
 	 * @param string $theme_dir
+	 * @param array topic icons to load in addition to default
 	 * @param string $default
 	 */
-	public function __construct($icon_check = false, $theme_dir = '', $default = 'xx')
+	public function __construct($icon_check = false, $theme_dir = '', $custom = array(), $default = 'xx')
 	{
 		parent::__construct();
 
@@ -54,6 +67,16 @@ class MessageTopicIcons extends \ElkArte\ValuesContainer
 		$this->_check = $icon_check;
 		$this->_theme_dir = $theme_dir;
 		$this->_default_icon = $default;
+		$this->_custom_icons = $custom;
+
+		// Set default icons
+		$this->_loadStableIcons();
+
+		// Merge in additional ones
+		$custom_icons = array_map(function($element) {
+			return $element['first_icon'];
+		}, $custom);
+		$this->_stable_icons = array_merge($this->_stable_icons, $custom_icons);
 
 		$this->_loadIcons();
 	}
@@ -63,29 +86,26 @@ class MessageTopicIcons extends \ElkArte\ValuesContainer
 	 *
 	 * @param int|string $idx
 	 *
-	 * @return
+	 * @return string
 	 */
 	public function __get($idx)
 	{
-		if (isset($this->data[$idx]))
+		// Not a standard topic icon
+		if (!isset($this->data[$idx]))
 		{
-			return $this->data[$idx];
+			$this->_setUrl($idx);
 		}
-		else
-		{
-			return $this->data[$this->_default_icon];
-		}
+
+		return $this->data[$idx];
 	}
 
 	/**
-	 * This simple function returns the message topic icon array.
+	 * Load the stable icon array
 	 */
-	protected function _loadIcons()
+	protected function _loadStableIcons()
 	{
-		global $settings;
-
 		// Setup the default topic icons...
-		$stable_icons = array(
+		$this->_stable_icons = array(
 			'xx',
 			'thumbup',
 			'thumbdown',
@@ -104,23 +124,41 @@ class MessageTopicIcons extends \ElkArte\ValuesContainer
 			'wireless',
 			'clip'
 		);
+	}
 
+	/**
+	 * This simple function returns the message topic icon array.
+	 */
+	protected function _loadIcons()
+	{
 		// Allow addons to add to the message icon array
-		call_integration_hook('integrate_messageindex_icons', array(&$stable_icons));
+		call_integration_hook('integrate_messageindex_icons', array(&$this->_stable_icons));
 
 		$this->data = array();
-		foreach ($stable_icons as $icon)
+		foreach ($this->_stable_icons as $icon)
 		{
-			if ($this->_check)
-			{
-				$this->data[$icon] = $settings[file_exists($this->_theme_dir . '/images/post/' . $icon . '.png')
-					? self::IMAGE_URL
-					: self::DEFAULT_URL] . '/post/' . $icon . '.png';
-			}
-			else
-			{
-				$this->data[$icon] = $settings[self::IMAGE_URL] . '/post/' . $icon . '.png';
-			}
+			$this->_setUrl($icon);
+		}
+	}
+
+	/**
+	 * Set the icon URL location
+	 *
+	 * @param string $icon
+	 */
+	protected function _setUrl($icon)
+	{
+		global $settings;
+
+		if ($this->_check)
+		{
+			$this->data[$icon] = $settings[file_exists($this->_theme_dir . '/images/post/' . $icon . '.png')
+				 ? self::IMAGE_URL
+				 : self::DEFAULT_URL] . '/post/' . $icon . '.png';
+		}
+		else
+		{
+			$this->data[$icon] = $settings[self::IMAGE_URL] . '/post/' . $icon . '.png';
 		}
 	}
 }

@@ -118,13 +118,20 @@ class Exception extends \Exception
 	{
 		global $txt;
 
-		list ($msg, $lang) = $this->parseMessage($message);
-		if ($lang !== false)
+		try
 		{
-			theme()->getTemplates()->loadLanguageFile($lang);
+			list ($msg, $lang) = $this->parseMessage($message);
+			if ($lang !== false)
+			{
+				theme()->getTemplates()->loadLanguageFile($lang);
+			}
 		}
-		$msg = !isset($txt[$msg]) ? $msg : vsprintf($txt[$msg], $this->sprintf);
-		$this->logMessage($message, $lang);
+		catch (\Exception $e)
+		{
+			E::instance()->display_minimal_error($message);
+		}
+
+		$msg = !isset($txt[$msg]) ? $msg : (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
 
 		return $msg;
 	}

@@ -1645,7 +1645,7 @@ var ElkNotifier = new ElkNotifications();
 						{
 							ila_text = ila_text + ' type=thumb';
 						}
-						if ($over.find("input[data-size='cust']").is(':checked'))
+						else if ($over.find("input[data-size='cust']").is(':checked'))
 						{
 							var w = $over.find('.range').val();
 							// Doesn't really matter that much, but just to ensure it's not 1
@@ -1653,6 +1653,10 @@ var ElkNotifier = new ElkNotifications();
 							{
 								ila_text = ila_text + ' width=' + w;
 							}
+						}
+						else if ($over.find("input[data-size='full']").is(':checked'))
+						{
+							ila_text = ila_text + ' type=image';
 						}
 
 						$over.find(".container[data-visual='align'] input").each(function (k, v) {

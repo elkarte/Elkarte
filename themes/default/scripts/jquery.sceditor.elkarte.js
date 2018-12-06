@@ -561,7 +561,7 @@ $.sceditor.plugins.bbcode.bbcode
 			else
 				sAuthor += sDate !== '' ? ' ' + bbc_search_on : '';
 
-			content = '<blockquote author="' + attr_author + '" link="' + attr_link + '" date="' + attr_date + '"><cite>' + sAuthor + ' ' + sDate + '</cite>' + content + '</blockquote>';
+			content = '<blockquote author="' + attr_author + '" link="' + attr_link + '" date="' + attr_date + '"><cite>' + sAuthor + ' ' + sDate + '</cite>' + content + '</blockquote>&nbsp;';
 
 			return content;
 		}

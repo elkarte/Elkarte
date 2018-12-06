@@ -257,7 +257,8 @@ class ProfileOptions extends \ElkArte\AbstractController
 				$old_buddiesArray = explode(',', $this->_profile['buddy_list']);
 
 				// Now update the current users buddy list.
-				$this->_profile['buddy_list'] = implode(',', array_unique(array_merge($new_buddiesArray, $old_buddiesArray)));
+				$this->_profile['buddy_list'] = implode(',', array_filter(array_unique(array_merge($new_buddiesArray, $old_buddiesArray))));
+
 				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData($this->_memID, array('buddy_list' => $this->_profile['buddy_list']));
 			}
@@ -423,8 +424,8 @@ class ProfileOptions extends \ElkArte\AbstractController
 				{
 					var qrcode = new QRCode("qrcode", {
 						text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + secret,
-						width: 80,
-						height: 80,
+						width: 100,
+						height: 100,
 						colorDark : "#000000",
 						colorLight : "#ffffff",
 					});
@@ -449,8 +450,8 @@ class ProfileOptions extends \ElkArte\AbstractController
 
 					var qrcode = new QRCode("qrcode", {
 						text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + text,
-						width: 80,
-						height: 80,
+						width: 100,
+						height: 100,
 						colorDark: "#000000",
 						colorLight: "#ffffff",
 					});

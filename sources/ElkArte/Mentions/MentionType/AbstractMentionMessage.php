@@ -153,8 +153,8 @@ abstract class AbstractMentionMessage implements MentionTypeInterface
 		{
 			foreach ($members as $member)
 			{
-				$langstrings = $this->_loadStringsByTemplate($template, $members, $members_data, $lang_files, $replacements);
 				$replacements['REALNAME'] = $members_data[$member]['real_name'];
+				$langstrings = $this->_loadStringsByTemplate($template, $keys, $members, $members_data, $lang_files, $replacements);
 
 				$return[] = array(
 					'id_member_to' => $member,
@@ -259,6 +259,7 @@ abstract class AbstractMentionMessage implements MentionTypeInterface
 			$existing[] = $row['id_member'];
 		$this->_db->free_result($request);
 
+		$actually_mentioned = array();
 		// If the member has already been mentioned, it's not necessary to do it again
 		foreach ($members_to as $id_member)
 		{
@@ -273,26 +274,29 @@ abstract class AbstractMentionMessage implements MentionTypeInterface
 					$time === null ? time() : $time,
 					static::$_type
 				);
+				$actually_mentioned[] = $id_member;
 			}
 		}
 
-		if (empty($inserts))
-			return;
+		if (!empty($inserts))
+		{
+			// Insert the new mentions
+			$this->_db->insert('',
+				'{db_prefix}log_mentions',
+				array(
+					'id_member' => 'int',
+					'id_target' => 'int',
+					'status' => 'int',
+					'is_accessible' => 'int',
+					'id_member_from' => 'int',
+					'log_time' => 'int',
+					'mention_type' => 'string-12',
+				),
+				$inserts,
+				array('id_mention')
+			);
+		}
 
-		// Insert the new mentions
-		$this->_db->insert('',
-			'{db_prefix}log_mentions',
-			array(
-				'id_member' => 'int',
-				'id_target' => 'int',
-				'status' => 'int',
-				'is_accessible' => 'int',
-				'id_member_from' => 'int',
-				'log_time' => 'int',
-				'mention_type' => 'string-12',
-			),
-			$inserts,
-			array('id_mention')
-		);
+		return $actually_mentioned;
 	}
 }

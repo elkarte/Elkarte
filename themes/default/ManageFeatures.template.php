@@ -188,8 +188,10 @@ function template_edit_profile_field()
 	}
 
 	foreach ($context['field']['options'] as $k => $option)
+	{
 		echo '
-							', $k == 0 ? '' : '<br />', '<input type="radio" name="default_select" value="', $k, '"', $context['field']['default_select'] == $option ? ' checked="checked"' : '', ' /><input type="text" name="select_option[', $k, ']" value="', $option, '" class="input_text" />';
+							<p><input type="radio" name="default_select" value="', $k, '"', $context['field']['default_select'] == $option ? ' checked="checked"' : '', ' /><input type="text" name="select_option[', $k, ']" value="', $option, '" class="input_text" /></p>';
+	}
 
 	echo '
 							<span id="addopt"></span>

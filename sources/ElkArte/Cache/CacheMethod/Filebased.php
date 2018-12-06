@@ -102,25 +102,23 @@ class Filebased extends AbstractCacheMethod
 
 		if (file_exists(CACHEDIR . '/' . $fName))
 		{
-			if (filesize(CACHEDIR . '/' . $fName) > 10)
+			// Even though it exists, we may not be able to access the file so we use @ here
+			$value = json_decode(substr(@file_get_contents(CACHEDIR . '/' . $fName), 7, -2));
+
+			if ($value === null || $value->expiration < time())
 			{
-				$value = json_decode(substr(file_get_contents(CACHEDIR . '/' . $fName), 7, -2));
-
-				if ($value->expiration < time())
-				{
-					@unlink(CACHEDIR . '/' . $fName);
-					$return = null;
-				}
-				else
-				{
-					$return = $value->data;
-				}
-
-				unset($value);
-				$this->is_miss = $return === null;
-
-				return $return;
+				@unlink(CACHEDIR . '/' . $fName);
+				$return = null;
 			}
+			else
+			{
+				$return = $value->data;
+			}
+
+			unset($value);
+			$this->is_miss = $return === null;
+
+			return $return;
 		}
 
 		$this->is_miss = true;

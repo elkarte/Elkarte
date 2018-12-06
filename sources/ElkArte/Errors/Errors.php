@@ -391,6 +391,39 @@ class Errors extends \ElkArte\AbstractModel
 	}
 
 	/**
+	 * Show a message for the (full block) maintenance mode.
+	 *
+	 * What it does:
+	 *
+	 * - It shows a complete page independent of language files or themes.
+	 * - It is used only if $maintenance = 2 in Settings.php.
+	 * - It stops further execution of the script.
+	 */
+	public function display_minimal_error($message)
+	{
+		global $maintenance, $mtitle, $mmessage;
+
+		if (!headers_sent())
+		{
+			$this->_set_fatal_error_headers();
+		}
+
+		echo '<!DOCTYPE html>
+	<html>
+		<head>
+			<meta name="robots" content="noindex" />
+			<title>Unknown Error</title>
+		</head>
+		<body>
+			<h3>Unknown Error</h3>
+			', $message, '
+		</body>
+	</html>';
+
+		$this->terminate();
+	}
+
+	/**
 	 * Show an error message for the connection problems.
 	 *
 	 * What it does:

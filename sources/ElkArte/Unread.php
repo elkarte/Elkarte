@@ -142,7 +142,7 @@ class Unread
 			$this->_recent_log_topics_unread_tempTable();
 		else
 		{
-			$board = !empty($this->_query_parameters['boards'][0]) ? $this->_query_parameters['boards'][0] : 0;
+			$board = !empty($this->_query_parameters['boards'][0]) && count($this->_query_parameters['boards']) === 1 ? $this->_query_parameters['boards'][0] : 0;
 
 			$this->_unreadreplies_tempTable($board);
 		}

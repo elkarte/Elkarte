@@ -32,7 +32,7 @@ function ml_CustomProfile()
 
 	// Find any custom profile fields that are to be shown for the memberlist?
 	$request = $db->query('', '
-		SELECT col_name, field_name, field_desc, field_type, bbc, enclose, vieworder
+		SELECT col_name, field_name, field_desc, field_type, bbc, enclose, vieworder, default_value, field_options
 		FROM {db_prefix}custom_fields
 		WHERE active = {int:active}
 			AND show_memberlist = {int:show}
@@ -56,6 +56,8 @@ function ml_CustomProfile()
 			'type' => $row['field_type'],
 			'bbc' => !empty($row['bbc']),
 			'enclose' => $row['enclose'],
+			'default_value' => $row['default_value'],
+			'field_options' => explode(',', $row['field_options']),
 		);
 
 		// Have they selected to sort on a custom column? .., then we build the query
@@ -339,7 +341,7 @@ function printMemberListRows($request)
 	$context['members'] = array();
 	foreach ($members as $member)
 	{
-		if (!loadMemberContext($member))
+		if (!loadMemberContext($member, true))
 			continue;
 
 		$context['members'][$member] = $memberContext[$member];
@@ -360,20 +362,33 @@ function printMemberListRows($request)
 				$curField = substr($key, 5);
 
 				// Does this member even have it filled out?
-				if (!isset($context['members'][$member]['options'][$curField]))
+				if (!isset($context['members'][$member]['options'][$curField]) && $context['custom_profile_fields']['columns'][$key]['default_value'] === '')
 				{
 					$context['members'][$member]['options'][$curField] = '';
 					continue;
 				}
+				// Otherwise use the default value
+				if (!isset($context['members'][$member]['options'][$curField]))
+				{
+					$context['members'][$member]['options'][$curField] = $context['custom_profile_fields']['columns'][$key]['default_value'];
+					$context['members'][$member]['options'][$curField . '_key'] = $curField . '_0';
+				}
 
 				// Should it be enclosed for display?
 				if (!empty($column['enclose']) && !empty($context['members'][$member]['options'][$curField]))
-					$context['members'][$member]['options'][$curField] = strtr($column['enclose'], array(
+				{
+					$replacements = array(
 						'{SCRIPTURL}' => $scripturl,
 						'{IMAGES_URL}' => $settings['images_url'],
 						'{DEFAULT_IMAGES_URL}' => $settings['default_images_url'],
 						'{INPUT}' => $context['members'][$member]['options'][$curField],
-					));
+					);
+					if (in_array($column['type'], array('radio', 'select')))
+					{
+						$replacements['{KEY}'] = $context['members'][$member]['options'][$curField . '_key'];
+					}
+					$context['members'][$member]['options'][$curField] = strtr($column['enclose'], $replacements);
+				}
 
 				// Anything else to make it look "nice"
 				if ($column['bbc'])
