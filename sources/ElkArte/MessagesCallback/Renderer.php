@@ -127,7 +127,7 @@ abstract class Renderer
 		static $counter = null;
 
 		// If the query returned false, bail.
-		if ($this->_dbRequest === false)
+		if ($this->_dbRequest->hasResults() === false)
 		{
 			return false;
 		}
@@ -213,7 +213,7 @@ abstract class Renderer
 		}
 
 		// If the query has already returned false, get out of here
-		if (empty($this->_dbRequest))
+		if ($this->_dbRequest->hasResults() === false)
 		{
 			return false;
 		}

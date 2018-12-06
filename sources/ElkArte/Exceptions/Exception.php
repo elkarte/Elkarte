@@ -119,7 +119,10 @@ class Exception extends \Exception
 		global $txt;
 
 		list ($msg, $lang) = $this->parseMessage($message);
-		theme()->getTemplates()->loadLanguageFile($lang);
+		if ($lang !== false)
+		{
+			theme()->getTemplates()->loadLanguageFile($lang);
+		}
 		$msg = !isset($txt[$msg]) ? $msg : vsprintf($txt[$msg], $this->sprintf);
 		$this->logMessage($message, $lang);
 
@@ -139,7 +142,7 @@ class Exception extends \Exception
 
 		// Don't need to reload the language file if both the user and
 		// the forum share the same language.
-		if ($language !== $user_info['language'])
+		if ($language !== $user_info['language'] && $lang !== false)
 		{
 			theme()->getTemplates()->loadLanguageFile($lang, $language);
 		}

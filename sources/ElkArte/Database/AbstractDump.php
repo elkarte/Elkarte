@@ -67,7 +67,7 @@ abstract class AbstractDump
 	 * @return string - the CREATE statement as string
 	 * @throws Elk_Exception
 	 */
-	abstract public function db_table_sql($tableName);
+	abstract public function table_sql($tableName);
 
 	/**
 	 * This function lists all tables in the database.
@@ -78,7 +78,7 @@ abstract class AbstractDump
 	 *
 	 * @return string[] an array of table names. (strings)
 	 */
-	abstract public function db_list_tables($db_name_str = false, $filter = false);
+	abstract public function list_tables($db_name_str = false, $filter = false);
 
 	/**
 	 * Backup $table_name to $backup_table.
@@ -89,7 +89,7 @@ abstract class AbstractDump
 	 * @return bool|mysqli_result - the request handle to the table creation query
 	 * @throws Elk_Exception
 	 */
-	abstract public function db_backup_table($table_name, $backup_table);
+	abstract public function backup_table($table_name, $backup_table);
 
 	/**
 	 * Gets all the necessary INSERTs for the table named table_name.

@@ -25,7 +25,7 @@ class Dump extends \ElkArte\Database\AbstractDump
 	/**
 	 * {@inheritDoc}
 	 */
-	public function db_table_sql($tableName)
+	public function table_sql($tableName)
 	{
 		$tableName = str_replace('{db_prefix}', $this->_db_prefix, $tableName);
 
@@ -126,7 +126,7 @@ class Dump extends \ElkArte\Database\AbstractDump
 	/**
 	 * {@inheritdoc}
 	 */
-	public function db_list_tables($db_name_str = false, $filter = false)
+	public function list_tables($db_name_str = false, $filter = false)
 	{
 		$request = $this->_db->query('', '
 			SELECT tablename
@@ -150,12 +150,12 @@ class Dump extends \ElkArte\Database\AbstractDump
 	/**
 	 * {@inheritDoc}
 	 */
-	public function db_backup_table($table, $backup_table)
+	public function backup_table($table, $backup_table)
 	{
 		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
 
 		// Do we need to drop it first?
-		$this->_db_table->db_drop_table($backup_table);
+		$this->_db_table->drop_table($backup_table);
 
 		// @todo Should we create backups of sequences as well?
 		$this->_db->query('', '

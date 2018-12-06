@@ -80,7 +80,7 @@ class UpgradeInstructions_upgrade_1_1
 							list ($count) = (int) $this->db->fetch_row($request);
 							if ($count == 0)
 							{
-								$this->table->db_drop_table('{db_prefix}admin_info_files');
+								$this->table->drop_table('{db_prefix}admin_info_files');
 							}
 						}
 					}
@@ -101,7 +101,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Adding new two factor columns to members table...',
 				'function' => function()
 				{
-					$this->table->db_add_column('{db_prefix}members',
+					$this->table->add_column('{db_prefix}members',
 						array(
 							'name' => 'otp_secret',
 							'type' => 'varchar',
@@ -111,7 +111,7 @@ class UpgradeInstructions_upgrade_1_1
 						array(),
 						'ignore'
 					);
-					$this->table->db_add_column('{db_prefix}members',
+					$this->table->add_column('{db_prefix}members',
 						array(
 							'name' => 'enable_otp',
 							'type' => 'tinyint',
@@ -121,7 +121,7 @@ class UpgradeInstructions_upgrade_1_1
 						array(),
 						'ignore'
 					);
-					$this->table->db_add_column('{db_prefix}members',
+					$this->table->add_column('{db_prefix}members',
 						array(
 							'name' => 'otp_used',
 							'type' => 'int',
@@ -148,7 +148,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Adding new tables for notifications...',
 				'function' => function()
 				{
-					$this->table->db_create_table('{db_prefix}pending_notifications',
+					$this->table->create_table('{db_prefix}pending_notifications',
 						array(
 							array('name' => 'notification_type', 'type' => 'varchar', 'size' => 10),
 							array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -163,7 +163,7 @@ class UpgradeInstructions_upgrade_1_1
 						'ignore'
 					);
 
-					$this->table->db_create_table('{db_prefix}notifications_pref',
+					$this->table->create_table('{db_prefix}notifications_pref',
 						array(
 							array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 							array('name' => 'notification_level', 'type' => 'tinyint', 'size' => 1, 'default' => 1),
@@ -196,7 +196,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Separate mentions visibility from accessibility...',
 				'function' => function()
 				{
-					$this->table->db_add_column('{db_prefix}log_mentions',
+					$this->table->add_column('{db_prefix}log_mentions',
 						array(
 							'name' => 'is_accessible',
 							'type' => 'tinyint',
@@ -205,7 +205,7 @@ class UpgradeInstructions_upgrade_1_1
 						)
 					);
 
-					$this->table->db_change_column('{db_prefix}log_mentions',
+					$this->table->change_column('{db_prefix}log_mentions',
 						'mention_type',
 						array(
 							'type' => 'varchar',
@@ -300,7 +300,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Make mentions generic and not message-centric...',
 				'function' => function()
 				{
-					$this->table->db_change_column('{db_prefix}log_mentions', 'id_msg',
+					$this->table->change_column('{db_prefix}log_mentions', 'id_msg',
 						array(
 							'name' => 'id_target',
 						)
@@ -377,7 +377,7 @@ class UpgradeInstructions_upgrade_1_1
 					if ($this->table->column_exists('{db_prefix}postby_emails', 'message_key') === false)
 					{
 						// Add the new columns
-						$this->table->db_add_column('{db_prefix}postby_emails',
+						$this->table->add_column('{db_prefix}postby_emails',
 							array(
 								'name' => 'message_key',
 								'type' => 'varchar',
@@ -387,7 +387,7 @@ class UpgradeInstructions_upgrade_1_1
 							array(),
 							'ignore'
 						);
-						$this->table->db_add_column('{db_prefix}postby_emails',
+						$this->table->add_column('{db_prefix}postby_emails',
 							array(
 								'name' => 'message_type',
 								'type' => 'varchar',
@@ -397,7 +397,7 @@ class UpgradeInstructions_upgrade_1_1
 							array(),
 							'ignore'
 						);
-						$this->table->db_add_column('{db_prefix}postby_emails',
+						$this->table->add_column('{db_prefix}postby_emails',
 							array(
 								'name' => 'message_id',
 								'type' => 'mediumint',
@@ -418,9 +418,9 @@ class UpgradeInstructions_upgrade_1_1
 						);
 
 						// Do the cleanup
-						$this->table->db_remove_column('{db_prefix}postby_emails', 'id_email');
-						$this->table->db_remove_index('{db_prefix}postby_emails', 'id_email');
-						$this->table->db_add_index('{db_prefix}postby_emails', array('name' => 'id_email', 'columns' => array('message_key', 'message_type', 'message_id'), 'type' => 'primary'));
+						$this->table->remove_column('{db_prefix}postby_emails', 'id_email');
+						$this->table->remove_index('{db_prefix}postby_emails', 'id_email');
+						$this->table->add_index('{db_prefix}postby_emails', array('name' => 'id_email', 'columns' => array('message_key', 'message_type', 'message_id'), 'type' => 'primary'));
 					}
 				}
 			),
@@ -431,13 +431,13 @@ class UpgradeInstructions_upgrade_1_1
 					if ($this->table->column_exists('{db_prefix}postby_emails_error', 'data_id') === true)
 					{
 						// Rename some columns
-						$this->table->db_change_column('{db_prefix}postby_emails_error',
+						$this->table->change_column('{db_prefix}postby_emails_error',
 							'data_id',
 							array(
 								'name' => 'message_key',
 							)
 						);
-						$this->table->db_change_column('{db_prefix}postby_emails_error',
+						$this->table->change_column('{db_prefix}postby_emails_error',
 							'id_message',
 							array(
 								'name' => 'message_id',
@@ -451,7 +451,7 @@ class UpgradeInstructions_upgrade_1_1
 				'function' => function()
 				{
 					// Filter type was 5 now needs to be 6
-					$this->table->db_change_column('{db_prefix}postby_emails_filters',
+					$this->table->change_column('{db_prefix}postby_emails_filters',
 						'filter_style',
 						array(
 							'type' => 'char',
@@ -497,7 +497,7 @@ class UpgradeInstructions_upgrade_1_1
 				{
 					if ($this->table->column_exists('{db_prefix}log_reported', 'type') === false)
 					{
-						$this->table->db_add_column('{db_prefix}log_reported',
+						$this->table->add_column('{db_prefix}log_reported',
 							array(
 								'name' => 'type',
 								'type' => 'varchar',
@@ -507,7 +507,7 @@ class UpgradeInstructions_upgrade_1_1
 							array(),
 							'ignore'
 						);
-						$this->table->db_add_column('{db_prefix}log_reported',
+						$this->table->add_column('{db_prefix}log_reported',
 							array(
 								'name' => 'time_message',
 								'type' => 'int',
@@ -517,8 +517,8 @@ class UpgradeInstructions_upgrade_1_1
 							array(),
 							'ignore'
 						);
-						$this->table->db_remove_index('{db_prefix}log_reported', 'id_msg');
-						$this->table->db_add_index('{db_prefix}log_reported', array('name' => 'msg_type', 'columns' => array('type', 'id_msg'), 'type' => 'key'));
+						$this->table->remove_index('{db_prefix}log_reported', 'id_msg');
+						$this->table->add_index('{db_prefix}log_reported', array('name' => 'msg_type', 'columns' => array('type', 'id_msg'), 'type' => 'key'));
 					}
 				}
 			)
@@ -537,7 +537,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Converting IP columns to varchar instead of int...',
 				'function' => function()
 				{
-					$columns = $this->table->db_list_columns('{db_prefix}log_online', true);
+					$columns = $this->table->list_columns('{db_prefix}log_online', true);
 
 					$column_name = 'ip';
 
@@ -552,7 +552,7 @@ class UpgradeInstructions_upgrade_1_1
 					$this->db->query('', '
 						TRUNCATE TABLE {db_prefix}log_online');
 
-					$this->table->db_change_column('{db_prefix}log_online',
+					$this->table->change_column('{db_prefix}log_online',
 						$column_name,
 						array(
 							'type' => 'varchar',
@@ -577,7 +577,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Changing the pm count column to mediumint.',
 				'function' => function()
 				{
-					$this->table->db_change_column('{db_prefix}members',
+					$this->table->change_column('{db_prefix}members',
 						'personal_messages',
 						array(
 							'type' => 'mediumint',
@@ -602,7 +602,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Adding new custom field columns',
 				'function' => function()
 				{
-					$this->table->db_add_column('{db_prefix}custom_fields',
+					$this->table->add_column('{db_prefix}custom_fields',
 						array(
 							'name' => 'rows',
 							'type' => 'smallint',
@@ -610,7 +610,7 @@ class UpgradeInstructions_upgrade_1_1
 							'default' => 4
 						)
 					);
-					$this->table->db_add_column('{db_prefix}custom_fields',
+					$this->table->add_column('{db_prefix}custom_fields',
 						array(
 							'name' => 'cols',
 							'type' => 'smallint',
@@ -797,7 +797,7 @@ class UpgradeInstructions_upgrade_1_1
 				{
 					if ($this->table->column_exists('{db_prefix}user_drafts', 'is_usersaved') === false)
 					{
-						$this->table->db_add_column('{db_prefix}user_drafts',
+						$this->table->add_column('{db_prefix}user_drafts',
 							array(
 								'name' => 'is_usersaved',
 								'type' => 'tinyint',
@@ -825,7 +825,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Altering column to varchar(255)...',
 				'function' => function()
 				{
-					$this->table->db_change_column('{db_prefix}attachments',
+					$this->table->change_column('{db_prefix}attachments',
 						'mime_type',
 						array(
 							'type' => 'varchar',

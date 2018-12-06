@@ -94,7 +94,7 @@ class QueryAnalysis
 			)
 		);
 
-		if ($result === false)
+		if ($result->hasResults() === false)
 		{
 			$explain = array(
 				'is_error' => true,
@@ -143,7 +143,7 @@ class QueryAnalysis
 	}
 
 	/**
-	 * Determines is the query has a SELECT statement and if so it is returned
+	 * Determines if the query has a SELECT statement and if so it is returned
 	 *
 	 * @param string $query_data - The query string
 	 * @return false|string false if the query doesn't have a SELECT, otherwise

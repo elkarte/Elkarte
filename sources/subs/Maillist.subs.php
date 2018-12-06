@@ -386,7 +386,7 @@ function maillist_templates($template_type, $subject = null)
 
 	$db = database();
 
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT recipient_name AS template_title, body
 		FROM {db_prefix}log_comments
 		WHERE comment_type = {string:tpltype}
@@ -395,7 +395,8 @@ function maillist_templates($template_type, $subject = null)
 			'tpltype' => $template_type,
 			'generic' => 0,
 			'current_member' => $user_info['id'],
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($subject)
 		{
 			$template = array(

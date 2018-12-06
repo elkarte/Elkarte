@@ -1003,7 +1003,7 @@ function list_getMailQueue($start, $items_per_page, $sort)
 
 	$db = database();
 
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT
 			id_mail, time_sent, recipient, priority, private, subject
 		FROM {db_prefix}mail_queue
@@ -1013,7 +1013,8 @@ function list_getMailQueue($start, $items_per_page, $sort)
 			'start' => $start,
 			'sort' => $sort,
 			'items_per_page' => $items_per_page,
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($txt)
 		{
 			// Private PM/email subjects and similar shouldn't be shown in the mailbox area.
@@ -1231,13 +1232,14 @@ function emailsInfo($number)
 	$emails = array();
 
 	// Get the next $number emails, with all that's to know about them and one more.
-	$db->fetchQueryCallback('
+	$db->fetchQuery('
 		SELECT /*!40001 SQL_NO_CACHE */ id_mail, recipient, body, subject, headers, send_html, time_sent, priority, private, message_id
 		FROM {db_prefix}mail_queue
 		ORDER BY priority ASC, id_mail ASC
 		LIMIT ' . $number,
 		array(
-		),
+		)
+	)->fetch_callback(
 		function ($row) use(&$ids, &$emails)
 		{
 			// Just get the data and go.

@@ -25,7 +25,7 @@ namespace ElkArte\Database\Mysqli;
 	/**
 	 * {@inheritDoc}
 	 */
-	public function db_table_sql($tableName)
+	public function table_sql($tableName)
 	{
 		$tableName = str_replace('{db_prefix}', $this->_db_prefix, $tableName);
 
@@ -131,7 +131,7 @@ namespace ElkArte\Database\Mysqli;
 	/**
 	 * {@inheritdoc}
 	 */
-	public function db_list_tables($db_name_str = false, $filter = false)
+	public function list_tables($db_name_str = false, $filter = false)
 	{
 		global $db_name;
 
@@ -161,12 +161,12 @@ namespace ElkArte\Database\Mysqli;
 	/**
 	 * {@inheritDoc}
 	 */
-	public function db_backup_table($table_name, $backup_table)
+	public function backup_table($table_name, $backup_table)
 	{
 		$table = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// First, get rid of the old table.
-		$this->_db_table->db_drop_table($backup_table);
+		$this->_db_table->drop_table($backup_table);
 
 		// Can we do this the quick way?
 		$result = $this->_db->query('', '
@@ -176,7 +176,7 @@ namespace ElkArte\Database\Mysqli;
 				'table' => $table
 		));
 		// If this failed, we go old school.
-		if ($result)
+		if ($result->hasResults())
 		{
 			$request = $this->_db->query('', '
 				INSERT INTO {raw:backup_table}

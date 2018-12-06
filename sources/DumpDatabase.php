@@ -108,7 +108,7 @@ function DumpDatabase2()
 
 	// Get all tables in the database....for our installation
 	$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
-	$tables = $database->db_list_tables(false, $real_prefix . '%');
+	$tables = $database->list_tables(false, $real_prefix . '%');
 
 	// Dump each table.
 	foreach ($tables as $tableName)
@@ -122,11 +122,11 @@ function DumpDatabase2()
 				'-- Table structure for table `' . $tableName . '`' . $crlf .
 				'--' . $crlf .
 				$crlf .
-				$database->db_table_sql($tableName) . ';' . $crlf;
+				$database->table_sql($tableName) . ';' . $crlf;
 		}
 		else
 			// This is needed to speedup things later
-			$database->db_table_sql($tableName);
+			$database->table_sql($tableName);
 
 		// How about the data?
 		if (!isset($_REQUEST['data']) || substr($tableName, -10) == 'log_errors')

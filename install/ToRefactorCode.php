@@ -33,7 +33,7 @@ function protected_alter($change, $substep, $is_test = false)
 	$found = false;
 	if ($change['type'] === 'column')
 	{
-		$columns = $table->db_list_columns('{db_prefix}' . $change['table'], true);
+		$columns = $table->list_columns('{db_prefix}' . $change['table'], true);
 		foreach ($columns as $column)
 		{
 			// Found it?
@@ -64,7 +64,7 @@ function protected_alter($change, $substep, $is_test = false)
 		$request = upgrade_query('
 			SHOW INDEX
 			FROM ' . $db_prefix . $change['table']);
-		if ($request !== false)
+		if ($request->hasResults())
 		{
 			$cur_index = array();
 
@@ -119,11 +119,11 @@ function protected_alter($change, $substep, $is_test = false)
 		{
 			$db->free_result($request);
 
-			$success = upgrade_query('
+			$alter_failed = upgrade_query('
 				ALTER TABLE ' . $db_prefix . $change['table'] . '
-				' . $change['text'], true) !== false;
+				' . $change['text'], true)->hasResults() === false;
 
-			if (!$success)
+			if ($alter_failed)
 			{
 				return false;
 			}
@@ -175,7 +175,7 @@ function upgrade_query($string, $unbuffered = false)
 	$db->setUnbuffered(false);
 
 	// Failure?!
-	if ($result !== false)
+	if ($result->hasResults())
 	{
 		return $result;
 	}

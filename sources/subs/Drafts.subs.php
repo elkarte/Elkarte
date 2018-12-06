@@ -275,7 +275,7 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $order = 
 			'order' => $order,
 			'limit' => $limit,
 		)
-	);
+	)->fetch_all();
 }
 
 /**
@@ -407,14 +407,15 @@ function getOldDrafts($days)
 	$db = database();
 
 	// Find all of the old drafts
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT
 			id_draft
 		FROM {db_prefix}user_drafts
 		WHERE poster_time <= {int:poster_time_old}',
 		array(
 			'poster_time_old' => time() - (86400 * $days),
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			return (int) $row['id_draft'];

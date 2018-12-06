@@ -643,13 +643,14 @@ function rebuildModCache()
 
 	if ($group_query == '0=1')
 	{
-		$groups = $db->fetchQueryCallback('
+		$groups = $db->fetchQuery('
 			SELECT id_group
 			FROM {db_prefix}group_moderators
 			WHERE id_member = {int:current_member}',
 			array(
 				'current_member' => $user_info['id'],
-			),
+			)
+		)->fetch_callback(
 			function ($row)
 			{
 				return $row['id_group'];

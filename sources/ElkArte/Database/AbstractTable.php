@@ -113,7 +113,7 @@ abstract class AbstractTable
 	 *                  'temporary' => false,
 	 *                )
 	 */
-	public function db_create_table($table_name, $columns, $indexes = array(), $parameters = array())
+	public function create_table($table_name, $columns, $indexes = array(), $parameters = array())
 	{
 		$parameters = array_merge(array(
 			'if_exists' => 'ignore',
@@ -134,14 +134,14 @@ abstract class AbstractTable
 		// This... my friends... is a function in a half - let's start by checking if the table exists!
 		if ($parameters['if_exists'] === 'force_drop')
 		{
-			$this->db_drop_table($table_name, true);
+			$this->drop_table($table_name, true);
 		}
 		elseif ($this->table_exists($full_table_name))
 		{
 			// This is a sad day... drop the table? If not, return false (error) by default.
 			if ($parameters['if_exists'] === 'overwrite')
 			{
-				$this->db_drop_table($table_name);
+				$this->drop_table($table_name);
 			}
 			else
 			{
@@ -203,7 +203,7 @@ abstract class AbstractTable
 	abstract protected function _close_table_query($temporary);
 
 	/**
-	 * It is mean to parse the indexes array of a db_create_table function
+	 * It is mean to parse the indexes array of a create_table function
 	 * to prepare for the indexes creation
 	 *
 	 * @param string[] $indexes
@@ -240,7 +240,7 @@ abstract class AbstractTable
 	 * @param bool $force If forcing the drop or not. Useful in case of temporary
 	 *                    tables that may not be detected as existing.
 	 */
-	abstract public function db_drop_table($table_name, $force = false);
+	abstract public function drop_table($table_name, $force = false);
 
 	/**
 	 * This function adds a column.
@@ -250,7 +250,7 @@ abstract class AbstractTable
 	 * @param mixed[] $parameters default array()
 	 * @param string $if_exists default 'update'
 	 */
-	abstract public function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update');
+	abstract public function add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update');
 
 	/**
 	 * Removes a column.
@@ -259,7 +259,7 @@ abstract class AbstractTable
 	 * @param string $column_name
 	 * @param mixed[] $parameters default array()
 	 */
-	abstract public function db_remove_column($table_name, $column_name, $parameters = array());
+	abstract public function remove_column($table_name, $column_name, $parameters = array());
 
 	/**
 	 * Change a column.
@@ -269,7 +269,7 @@ abstract class AbstractTable
 	 * @param mixed[] $column_info
 	 * @param mixed[] $parameters default array()
 	 */
-	abstract public function db_change_column($table_name, $old_column, $column_info, $parameters = array());
+	abstract public function change_column($table_name, $old_column, $column_info, $parameters = array());
 
 	/**
 	 * Add an index.
@@ -279,7 +279,7 @@ abstract class AbstractTable
 	 * @param mixed[] $parameters default array()
 	 * @param string $if_exists default 'update'
 	 */
-	abstract public function db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update');
+	abstract public function add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update');
 
 	/**
 	 * Remove an index.
@@ -288,7 +288,7 @@ abstract class AbstractTable
 	 * @param string $index_name
 	 * @param mixed[] $parameters default array()
 	 */
-	abstract public function db_remove_index($table_name, $index_name, $parameters = array());
+	abstract public function remove_index($table_name, $index_name, $parameters = array());
 
 	/**
 	 * Get the schema formatted name for a type.
@@ -307,7 +307,7 @@ abstract class AbstractTable
 	 * @param mixed[] $parameters default array()
 	 * @return mixed
 	 */
-	abstract public function db_list_columns($table_name, $detail = false, $parameters = array());
+	abstract public function list_columns($table_name, $detail = false, $parameters = array());
 
 	/**
 	 * Get index information.
@@ -317,7 +317,7 @@ abstract class AbstractTable
 	 * @param mixed[] $parameters
 	 * @return mixed
 	 */
-	abstract public function db_list_indexes($table_name, $detail = false, $parameters = array());
+	abstract public function list_indexes($table_name, $detail = false, $parameters = array());
 
 	/**
 	 * Optimize a table
@@ -353,7 +353,7 @@ abstract class AbstractTable
 	 */
 	protected function _get_column_info($table_name, $column_name)
 	{
-		$columns = $this->db_list_columns($table_name, true);
+		$columns = $this->list_columns($table_name, true);
 
 		foreach ($columns as $column)
 		{
@@ -382,7 +382,7 @@ abstract class AbstractTable
 	 */
 	public function table_exists($table_name)
 	{
-		$filter = $this->_db->db_list_tables(false, $table_name);
+		$filter = $this->_db->list_tables(false, $table_name);
 		return !empty($filter);
 	}
 
@@ -396,5 +396,22 @@ abstract class AbstractTable
 	public function column_exists($table_name, $column_name)
 	{
 		return $this->_get_column_info($table_name, $column_name) !== false;
+	}
+
+	/**
+	 * Resturns name, columns and indexes of a table
+	 *
+	 * @param string $table_name
+	 * @return mixed[]
+	 */
+	public function table_structure($table_name)
+	{
+		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
+
+		return array(
+			'name' => $table_name,
+			'columns' => $this->list_columns($table_name, true),
+			'indexes' => $this->list_indexes($table_name, true),
+		);
 	}
 }

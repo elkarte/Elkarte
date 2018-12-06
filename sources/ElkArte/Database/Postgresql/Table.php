@@ -114,7 +114,7 @@ class Table extends \ElkArte\Database\AbstractTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_drop_table($table_name, $force = false)
+	public function drop_table($table_name, $force = false)
 	{
 		// Get some aliases.
 		$full_table_name = str_replace('{db_prefix}', $this->_real_prefix(), $table_name);
@@ -127,34 +127,37 @@ class Table extends \ElkArte\Database\AbstractTable
 		// Does it exist?
 		if ($force === true || $this->table_exists($full_table_name))
 		{
+			// We can then drop the table.
+			$this->_db->transaction('begin');
+
 			if ($force === true)
 			{
 				$this->_db->skip_next_error();
 			}
-			// We can then drop the table.
-			$this->_db->transaction('begin');
-
-			// the table
 			$table_query = 'DROP TABLE ' . $table_name;
 
-			// and the associated sequence, if any
-			$sequence_query = 'DROP SEQUENCE IF EXISTS ' . $table_name . '_seq';
-
-			// drop them
 			$this->_db->query('',
 				$table_query,
 				array(
 					'security_override' => true,
 				)
 			);
+
+			$this->_db->transaction('commit');
+
+			// and the associated sequence, if any
+			if ($force === true)
+			{
+				$this->_db->skip_next_error();
+			}
+
+			$sequence_query = 'DROP SEQUENCE IF EXISTS ' . $table_name . '_seq';
 			$this->_db->query('',
 				$sequence_query,
 				array(
 					'security_override' => true,
 				)
 			);
-
-			$this->_db->transaction('commit');
 
 			return true;
 		}
@@ -166,7 +169,7 @@ class Table extends \ElkArte\Database\AbstractTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update')
+	public function add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update')
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
@@ -178,7 +181,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		{
 			// If we're going to overwrite then use change column.
 			if ($if_exists == 'update')
-				return $this->db_change_column($table_name, $column_info['name'], $column_info);
+				return $this->change_column($table_name, $column_info['name'], $column_info);
 			else
 				return false;
 		}
@@ -197,7 +200,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		unset($column_info['type'], $column_info['size']);
 
 		if (count($column_info) != 1)
-			return $this->db_change_column($table_name, $column_info['name'], $column_info);
+			return $this->change_column($table_name, $column_info['name'], $column_info);
 		else
 			return true;
 	}
@@ -205,7 +208,7 @@ class Table extends \ElkArte\Database\AbstractTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_remove_column($table_name, $column_name, $parameters = array())
+	public function remove_column($table_name, $column_name, $parameters = array())
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
@@ -235,7 +238,7 @@ class Table extends \ElkArte\Database\AbstractTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_change_column($table_name, $old_column, $column_info, $parameters = array())
+	public function change_column($table_name, $old_column, $column_info, $parameters = array())
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
@@ -344,7 +347,7 @@ class Table extends \ElkArte\Database\AbstractTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update')
+	public function add_index($table_name, $index_info, $parameters = array(), $if_exists = 'update')
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
@@ -375,7 +378,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		$this->_package_log[] = array('remove_index', $table_name, $index_info['name']);
 
 		// Let's get all our indexes.
-		$indexes = $this->db_list_indexes($table_name, true);
+		$indexes = $this->list_indexes($table_name, true);
 
 		// Do we already have it?
 		foreach ($indexes as $index)
@@ -386,7 +389,7 @@ class Table extends \ElkArte\Database\AbstractTable
 				if ($if_exists != 'update' || $index['type'] == 'primary')
 					return false;
 				else
-					$this->db_remove_index($table_name, $index_info['name']);
+					$this->remove_index($table_name, $index_info['name']);
 			}
 		}
 
@@ -410,12 +413,12 @@ class Table extends \ElkArte\Database\AbstractTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_remove_index($table_name, $index_name, $parameters = array())
+	public function remove_index($table_name, $index_name, $parameters = array())
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		// Better exist!
-		$indexes = $this->db_list_indexes($table_name, true);
+		$indexes = $this->list_indexes($table_name, true);
 		if ($index_name != 'primary')
 			$index_name = $table_name . '_' . $index_name;
 
@@ -497,21 +500,21 @@ class Table extends \ElkArte\Database\AbstractTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_table_structure($table_name, $parameters = array())
+	public function table_structure($table_name)
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
 		return array(
 			'name' => $table_name,
-			'columns' => $this->db_list_columns($table_name, true),
-			'indexes' => $this->db_list_indexes($table_name, true),
+			'columns' => $this->list_columns($table_name, true),
+			'indexes' => $this->list_indexes($table_name, true),
 		);
 	}
 
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_list_columns($table_name, $detail = false, $parameters = array())
+	public function list_columns($table_name, $detail = false, $parameters = array())
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 
@@ -567,7 +570,7 @@ class Table extends \ElkArte\Database\AbstractTable
 	/**
 	 * {@inheritdoc }
 	 */
-	public function db_list_indexes($table_name, $detail = false, $parameters = array())
+	public function list_indexes($table_name, $detail = false, $parameters = array())
 	{
 		$table_name = str_replace('{db_prefix}', $this->_db_prefix, $table_name);
 

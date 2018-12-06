@@ -471,11 +471,11 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 			'id_group' => 0,
 			'admin_forum' => 'admin_forum',
 		)
-	);
+	)->fetch_all();
 	$groups[] = 1;
 	$groups = array_unique($groups);
 
-	$emails_sent = $db->fetchQueryCallback('
+	$emails_sent = $db->fetchQuery('
 		SELECT id_member, member_name, real_name, lngfile, email_address
 		FROM {db_prefix}members
 		WHERE (id_group IN ({array_int:group_list}) OR FIND_IN_SET({raw:group_array_implode}, additional_groups) != 0)
@@ -485,7 +485,8 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 			'group_list' => $groups,
 			'notify_types' => 4,
 			'group_array_implode' => implode(', additional_groups) != 0 OR FIND_IN_SET(', $groups),
-		),
+		)
+	)->fetch_callback(
 		function ($row) use($replacements, $modSettings, $language, $template)
 		{
 			// Stick their particulars in the replacement data.

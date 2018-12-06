@@ -86,7 +86,7 @@ abstract class AbstractSearch implements SearchInterface
 	public function create_word_search($type, $size = 10)
 	{
 		$db_table = db_table();
-		$db_table->db_create_table('{db_prefix}log_search_words',
+		$db_table->create_table('{db_prefix}log_search_words',
 			array(
 				array(
 					'name' => 'id_word',
@@ -115,7 +115,7 @@ abstract class AbstractSearch implements SearchInterface
 	public function createTemporaryTable($name, $columns, $indexes)
 	{
 		$db_table = db_table();
-		return $db_table->db_create_table($name, $columns, $indexes, array(
+		return $db_table->create_table($name, $columns, $indexes, array(
 			'temporary' => true,
 			'if_exists' => 'force_drop'
 		));

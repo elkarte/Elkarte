@@ -53,9 +53,9 @@ function reloadSettings()
 		$modSettings = array();
 		if (!$request)
 			\ElkArte\Errors\Errors::instance()->display_db_error();
-		while ($row = $db->fetch_row($request))
+		while ($row = $request->fetch_row())
 			$modSettings[$row[0]] = $row[1];
-		$db->free_result($request);
+		$request->free_result();
 
 		// Do a few things to protect against missing settings or settings with invalid values...
 		if (empty($modSettings['defaultMaxTopics']) || $modSettings['defaultMaxTopics'] <= 0 || $modSettings['defaultMaxTopics'] > 999)
@@ -219,13 +219,10 @@ function loadUserSettings()
 				)
 			);
 
-			if (!empty($this_user))
-			{
-				list ($user_settings) = $this_user;
+			$user_settings = $this_user->fetch_assoc();
 
-				// Make the ID specifically an integer
-				$user_settings['id_member'] = (int) $user_settings['id_member'];
-			}
+			// Make the ID specifically an integer
+			$user_settings['id_member'] = (int) ($user_settings['id_member'] ?? 0);
 
 			if ($cache->levelHigherThan(1))
 				$cache->put('user_settings-' . $id_member, $user_settings, 60);

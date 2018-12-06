@@ -359,7 +359,7 @@ function likesPostsGiven($start, $items_per_page, $sort, $memberID)
 	$db = database();
 
 	// Load up what the user likes from the db
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT
 			l.id_member, l.id_msg,
 			m.subject, m.poster_name, m.id_board, m.id_topic,
@@ -376,7 +376,8 @@ function likesPostsGiven($start, $items_per_page, $sort, $memberID)
 			'sort' => $sort,
 			'start' => $start,
 			'per_page' => $items_per_page,
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($scripturl, $context)
 		{
 			return array(
@@ -411,7 +412,7 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
 	$db = database();
 
 	// Load up what the user likes from the db
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT
 			m.subject, m.id_topic,
 			b.name, l.id_msg, COUNT(l.id_msg) AS likes
@@ -428,7 +429,8 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
 			'sort' => $sort,
 			'start' => $start,
 			'per_page' => $items_per_page,
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($scripturl)
 		{
 			return array(
@@ -465,7 +467,7 @@ function postLikers($start, $items_per_page, $sort, $messageID, $simple = true)
 		return $likes;
 
 	// Load up the likes for this message
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT
 			l.id_member, l.id_msg,
 			m.real_name' . ($simple === true ? '' : ',
@@ -482,7 +484,8 @@ function postLikers($start, $items_per_page, $sort, $messageID, $simple = true)
 			'sort' => $sort,
 			'start' => $start,
 			'per_page' => $items_per_page,
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($scripturl, $simple)
 		{
 			$like = array(
@@ -649,7 +652,7 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	// Most liked messages in a given topic
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT
 			COALESCE(mem.real_name, m.poster_name) AS member_received_name, lp.id_msg,
 			m.id_topic, m.id_board, m.id_member, m.subject, m.body, m.poster_time,
@@ -674,7 +677,8 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 			'id_topic' => $topic,
 			'limit' => $limit,
 			'type_avatar' => 1,
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($scripturl, $bbc_parser)
 		{
 			// Censor those naughty words
@@ -941,7 +945,7 @@ function dbMostLikedPostsByUser($id_member, $limit = 10)
 	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	// Lets fetch highest liked posts by this user
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT
 			lp.id_msg, COUNT(lp.id_msg) AS like_count,
 			m.body, m.poster_time, m.smileys_enabled, m.id_topic, m.subject
@@ -956,7 +960,8 @@ function dbMostLikedPostsByUser($id_member, $limit = 10)
 		array(
 			'id_member' => $id_member,
 			'limit' => $limit
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($bbc_parser)
 		{
 			// Censor those naughty words
@@ -1063,7 +1068,7 @@ function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	// Lets fetch the latest liked posts by this user
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT
 			m.id_msg, m.id_topic, m.subject, m.body, m.poster_time, m.smileys_enabled
 		FROM {db_prefix}message_likes AS ml
@@ -1076,7 +1081,8 @@ function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 		array(
 			'id_member' => $id_liker,
 			'limit' => $limit
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($bbc_parser)
 		{
 			// Censor those $%#^&% words

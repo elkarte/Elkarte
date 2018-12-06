@@ -728,11 +728,11 @@ class Packages extends \ElkArte\AbstractController
 			foreach ($package_installed['db_changes'] as $change)
 			{
 				if ($change[0] === 'remove_table' && isset($change[1]))
-					$table_installer->db_drop_table($change[1]);
+					$table_installer->drop_table($change[1]);
 				elseif ($change[0] === 'remove_column' && isset($change[2]))
-					$table_installer->db_remove_column($change[1], $change[2]);
+					$table_installer->remove_column($change[1], $change[2]);
 				elseif ($change[0] === 'remove_index' && isset($change[2]))
-					$table_installer->db_remove_index($change[1], $change[2]);
+					$table_installer->remove_index($change[1], $change[2]);
 			}
 		}
 

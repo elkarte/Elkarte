@@ -50,7 +50,7 @@ class Result extends \ElkArte\Database\AbstractResult
 	public function free_result()
 	{
 		// Just delegate to MySQL's function
-		mysqli_free_result($this->result);
+		@mysqli_free_result($this->result);
 	}
 
 	/**
@@ -85,5 +85,13 @@ class Result extends \ElkArte\Database\AbstractResult
 	public function fetch_assoc()
 	{
 		return mysqli_fetch_assoc($this->result);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function fetch_all()
+	{
+		return mysqli_fetch_all($this->result, MYSQLI_ASSOC);
 	}
 }

@@ -422,14 +422,15 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 
 	// These users are nobody's buddy nomore.
-	$db->fetchQueryCallback('
+	$db->fetchQuery('
 		SELECT id_member, pm_ignore_list, buddy_list
 		FROM {db_prefix}members
 		WHERE FIND_IN_SET({raw:pm_ignore_list}, pm_ignore_list) != 0 OR FIND_IN_SET({raw:buddy_list}, buddy_list) != 0',
 		array(
 			'pm_ignore_list' => implode(', pm_ignore_list) != 0 OR FIND_IN_SET(', $users),
 			'buddy_list' => implode(', buddy_list) != 0 OR FIND_IN_SET(', $users),
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($users)
 		{
 			updateMemberData($row['id_member'], array(
@@ -1031,7 +1032,7 @@ function membersAllowedTo($permission, $board_id = null)
 	$exclude_moderators = in_array(3, $member_groups['denied']) && $board_id !== null;
 	$member_groups['denied'] = array_diff($member_groups['denied'], array(3));
 
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT mem.id_member
 		FROM {db_prefix}members AS mem' . ($include_moderators || $exclude_moderators ? '
 			LEFT JOIN {db_prefix}moderators AS mods ON (mods.id_member = mem.id_member AND mods.id_board = {int:board_id})' : '') . '
@@ -1043,7 +1044,8 @@ function membersAllowedTo($permission, $board_id = null)
 			'board_id' => $board_id,
 			'member_group_allowed_implode' => implode(', mem.additional_groups) != 0 OR FIND_IN_SET(', $member_groups['allowed']),
 			'member_group_denied_implode' => implode(', mem.additional_groups) != 0 OR FIND_IN_SET(', $member_groups['denied']),
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			return $row['id_member'];
@@ -1171,7 +1173,7 @@ function list_getMembers($start, $items_per_page, $sort, $where, $where_params =
 			'start' => $start,
 			'per_page' => $items_per_page,
 		))
-	);
+	)->fetch_all();
 
 	// If we want duplicates pass the members array off.
 	if ($get_duplicates)
@@ -1391,7 +1393,7 @@ function membersByIP($ip1, $match = 'exact', $ip2 = false)
 		FROM {db_prefix}members
 		WHERE ' . $where,
 		$ip_params
-	);
+	)->fetch_all();
 }
 
 /**
@@ -1810,7 +1812,7 @@ function getMember($search, $buddies = array())
 		),
 	);
 	// Find the member.
-	$xml_data['items']['children'] = $db->fetchQueryCallback('
+	$xml_data['items']['children'] = $db->fetchQuery('
 		SELECT id_member, real_name
 		FROM {db_prefix}members
 		WHERE {column_case_insensitive:real_name} LIKE {string_case_insensitive:search}' . (!empty($buddies) ? '
@@ -1823,7 +1825,8 @@ function getMember($search, $buddies = array())
 			'search' => $search,
 			'activation_status' => array(1, 12),
 			'limit' => \ElkArte\Util::strlen($search) <= 2 ? 100 : 200,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			$row['real_name'] = strtr($row['real_name'], array('&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;'));
@@ -2138,7 +2141,7 @@ function onlineMembers($conditions, $sort_method, $sort_direction, $start)
 			'offset' => $start,
 			'limit' => $modSettings['defaultMaxMembers'],
 		)
-	);
+	)->fetch_all();
 }
 
 /**
@@ -2188,7 +2191,7 @@ function recentMembers($limit)
 		array(
 			'limit' => $limit,
 		)
-	);
+	)->fetch_all();
 }
 
 /**
@@ -2526,11 +2529,12 @@ function updateMemberData($members, $data)
 				$member_names = array($user_info['username']);
 			else
 			{
-				$member_names = $db->fetchQueryCallback('
+				$member_names = $db->fetchQuery('
 					SELECT member_name
 					FROM {db_prefix}members
 					WHERE ' . $condition,
-					$parameters,
+					$parameters
+				)->fetch_callback(
 					function ($row)
 					{
 						return $row['member_name'];

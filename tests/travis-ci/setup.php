@@ -127,7 +127,7 @@ Class Elk_Testing_Setup
 		{
 			if (substr($key, 0, 8) == 'default_')
 			{
-				$replaces['{$' . $key . '}'] = addslashes($value);
+				$replaces['{$' . $key . '}'] = $value;
 			}
 		}
 		$replaces['{$default_reserved_names}'] = strtr($replaces['{$default_reserved_names}'], array('\\\\n' => '\\n'));
@@ -167,12 +167,12 @@ Class Elk_Testing_Setup
 	public function clear_tables()
 	{
 		// Get all the tables.
-		$tables = $this->_db->db_list_tables($this->_db_name, $this->_db_prefix . '%');
+		$tables = $this->_db->list_tables($this->_db_name, $this->_db_prefix . '%');
 
 		// Bu-bye
 		foreach ($tables as $table)
 		{
-			$this->_db_table->db_drop_table($table);
+			$this->_db_table->drop_table($table);
 		}
 	}
 
@@ -378,12 +378,12 @@ class DbTableWrapper
 		return call_user_func_array(array($this->db, $name), $args);
 	}
 
-	public function db_add_index()
+	public function add_index()
 	{
 		$args = func_get_args();
 
 		// In this case errors are ignored, so the return is always true
-		call_user_func_array(array($this->db, 'db_create_table'), $args);
+		call_user_func_array(array($this->db, 'create_table'), $args);
 
 		return true;
 	}

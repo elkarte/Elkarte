@@ -70,7 +70,7 @@ class DbTableWrapper
 		return call_user_func_array(array($this->db, $name), $args);
 	}
 
-	public function db_create_table()
+	public function create_table()
 	{
 		$args = func_get_args();
 		if (!isset($args[4]))
@@ -79,16 +79,16 @@ class DbTableWrapper
 		}
 
 		// In this case errors are ignored, so the return is always true
-		call_user_func_array(array($this->db, 'db_create_table'), $args);
+		call_user_func_array(array($this->db, 'create_table'), $args);
 
 		return true;
 	}
-	public function db_add_index()
+	public function add_index()
 	{
 		$args = func_get_args();
 
 		// In this case errors are ignored, so the return is always true
-		call_user_func_array(array($this->db, 'db_add_index'), $args);
+		call_user_func_array(array($this->db, 'add_index'), $args);
 
 		return true;
 	}

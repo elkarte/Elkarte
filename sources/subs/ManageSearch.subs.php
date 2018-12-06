@@ -510,5 +510,5 @@ function drop_log_search_words()
 {
 	$db_table = db_table();
 
-	$db_table->db_drop_table('{db_prefix}log_search_words');
+	$db_table->drop_table('{db_prefix}log_search_words');
 }

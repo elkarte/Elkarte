@@ -751,7 +751,7 @@ class Install_Controller
 		);
 
 		$modSettings = array();
-		if ($result !== false)
+		if ($result->hasResults())
 		{
 			while ($row = $db->fetch_assoc($result))
 				$modSettings[$row['variable']] = $row['value'];
@@ -789,7 +789,7 @@ class Install_Controller
 		foreach ($txt as $key => $value)
 		{
 			if (substr($key, 0, 8) == 'default_')
-				$replaces['{$' . $key . '}'] = addslashes($value);
+				$replaces['{$' . $key . '}'] = $value;
 		}
 		$replaces['{$default_reserved_names}'] = strtr($replaces['{$default_reserved_names}'], array('\\\\n' => '\\n'));
 
@@ -874,7 +874,7 @@ class Install_Controller
 		}
 
 		// Let's optimize those new tables.
-		$tables = $db->db_list_tables($db_name, $db_prefix . '%');
+		$tables = $db->list_tables($db_name, $db_prefix . '%');
 		$db_table = db_table($db);
 		foreach ($tables as $table)
 		{
@@ -887,15 +887,15 @@ class Install_Controller
 
 		// Check for the ALTER privilege.
 		$db->skip_next_error();
-		$can_alter_table = $db->query('', "
+		$cannot_alter_table = $db->query('', "
 			ALTER TABLE {$db_prefix}log_digest
 			ORDER BY id_topic",
 			array(
 				'security_override' => true
 			)
-		) === false;
+		)->getResultObject() === false;
 
-		if (!empty($databases[$db_type]['alter_support']) && $can_alter_table)
+		if (!empty($databases[$db_type]['alter_support']) && $cannot_alter_table)
 		{
 			$incontext['error'] = $txt['error_db_alter_priv'];
 			return false;
@@ -1076,7 +1076,7 @@ class Install_Controller
 				);
 
 				// Awww, crud!
-				if ($request === false)
+				if ($request->hasResults() === false)
 				{
 					$incontext['error'] = $txt['error_user_settings_query'] . '<br />
 					<div style="margin: 2ex;">' . nl2br(htmlspecialchars($db->last_error($db_connection), ENT_COMPAT, 'UTF-8')) . '</div>';

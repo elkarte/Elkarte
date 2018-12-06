@@ -63,7 +63,7 @@ class Result extends \ElkArte\Database\AbstractResult
 	public function free_result()
 	{
 		// Just delegate to the native function
-		pg_free_result($this->result);
+		@pg_free_result($this->result);
 	}
 
 	/**
@@ -97,5 +97,15 @@ class Result extends \ElkArte\Database\AbstractResult
 	public function fetch_assoc()
 	{
 		return pg_fetch_assoc($this->result);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function fetch_all()
+	{
+		$results = pg_fetch_all($this->result, PGSQL_ASSOC);
+
+		return empty($results) ? [] : $results;
 	}
 }

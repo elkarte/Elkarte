@@ -316,14 +316,15 @@ function is_not_banned($forceCheck = false)
 				'cannot_post',
 				'cannot_register',
 			);
-			$db->fetchQueryCallback('
+			$db->fetchQuery('
 				SELECT bi.id_ban, bi.email_address, bi.id_member, bg.cannot_access, bg.cannot_register,
 					bg.cannot_post, bg.cannot_login, bg.reason, COALESCE(bg.expire_time, 0) AS expire_time
 				FROM {db_prefix}ban_items AS bi
 					INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group AND (bg.expire_time IS NULL OR bg.expire_time > {int:current_time}))
 				WHERE
 					(' . implode(' OR ', $ban_query) . ')',
-				$ban_query_vars,
+				$ban_query_vars
+			)->fetch_callback(
 				function ($row) use($user_info, $restrictions, &$flag_is_activated)
 				{
 					// Store every type of ban that applies to you in your session.
@@ -362,9 +363,11 @@ function is_not_banned($forceCheck = false)
 	{
 		$bans = explode(',', $_COOKIE[$cookiename . '_']);
 		foreach ($bans as $key => $value)
+		{
 			$bans[$key] = (int) $value;
+		}
 
-		$db->fetchQueryCallback('
+		$db->fetchQuery('
 			SELECT bi.id_ban, bg.reason
 			FROM {db_prefix}ban_items AS bi
 				INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group)
@@ -376,7 +379,8 @@ function is_not_banned($forceCheck = false)
 				'cannot_access' => 1,
 				'ban_list' => $bans,
 				'current_time' => time(),
-			),
+			)
+		)->fetch_callback(
 			function ($row)
 			{
 				$_SESSION['ban']['cannot_access']['ids'][] = $row['id_ban'];

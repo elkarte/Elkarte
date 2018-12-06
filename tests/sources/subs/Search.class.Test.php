@@ -255,7 +255,7 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 			array(
 				'id_member' => $member
 			)
-		);
+		)->fetch_all();
 
 		if (empty($res))
 		{

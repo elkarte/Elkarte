@@ -63,7 +63,7 @@ class AutoOptimize implements ScheduledTaskInterface
 			return false;
 
 		// Get all the tables.
-		$tables = $db->db_list_tables(false, $db_prefix . '%');
+		$tables = $db->list_tables(false, $db_prefix . '%');
 
 		foreach ($tables as $table)
 			$db_table->optimize($table);

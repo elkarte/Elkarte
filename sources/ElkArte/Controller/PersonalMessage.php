@@ -672,19 +672,22 @@ class PersonalMessage extends \ElkArte\AbstractController
 		$context['sort_direction'] = $descending ? 'down' : 'up';
 		$context['sort_by'] = $sort_by;
 
-		// Auto video embedding enabled, someone may have a link in a PM
-		if (!empty($messages_request) && !empty($modSettings['enableVideoEmbeding']))
+		if ($messages_request->hasResults())
 		{
-			theme()->addInlineJavascript('
-		$(function() {
-			$().linkifyvideo(oEmbedtext);
-		});', true
-			);
-		}
+			// Auto video embedding enabled, someone may have a link in a PM
+			if (!empty($modSettings['enableVideoEmbeding']))
+			{
+				theme()->addInlineJavascript('
+					$(function() {
+						$().linkifyvideo(oEmbedtext);
+					});', true
+				);
+			}
 
-		if (!empty($messages_request) && !empty($context['show_delete']))
-		{
-			theme()->getLayers()->addEnd('pm_pages_and_buttons');
+			if (!empty($context['show_delete']))
+			{
+				theme()->getLayers()->addEnd('pm_pages_and_buttons');
+			}
 		}
 
 		// Set up the page index.

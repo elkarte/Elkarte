@@ -1132,7 +1132,7 @@ function action_backupDatabase()
 	// Get all the table names.
 	$filter = str_replace('_', '\_', preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0 ? $match[2] : $db_prefix) . '%';
 	$db_name = preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0 ? strtr($match[1], array('`' => '')) : false;
-	$tables = $db->db_list_tables($db_name, $filter);
+	$tables = $db->list_tables($db_name, $filter);
 
 	$table_names = array();
 	foreach ($tables as $table)
@@ -1223,7 +1223,7 @@ function backupTable($table)
 	}
 
 	$db = load_database();
-	$db->db_backup_table($table, 'backup_' . $table);
+	$db->backup_table($table, 'backup_' . $table);
 
 	if ($is_debug && $command_line)
 	{
@@ -1517,7 +1517,7 @@ function getMemberGroups()
 		)
 	);
 
-	if ($request === false)
+	if ($request->hasResults() === false)
 	{
 		$db->skip_next_error();
 		$request = $db->query('', '
