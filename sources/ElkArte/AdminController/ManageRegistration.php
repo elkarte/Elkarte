@@ -362,7 +362,7 @@ class ManageRegistration extends \ElkArte\AbstractController
 		}
 
 		$context['warning'] = '';
-		$privacypol = new \PrivacyPolicy($context['current_agreement']);
+		$privacypol = new \ElkArte\PrivacyPolicy($context['current_agreement']);
 
 		if (isset($this->_req->post->save) && isset($this->_req->post->agreement))
 		{

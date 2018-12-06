@@ -230,7 +230,7 @@ class Register extends \ElkArte\AbstractController
 
 		if (!empty($context['require_privacypol']))
 		{
-			$privacypol = new \PrivacyPolicy($user_info['language']);
+			$privacypol = new \ElkArte\PrivacyPolicy($user_info['language']);
 			$context['privacy_policy'] = $privacypol->getParsedText();
 
 			if (empty($context['privacy_policy']))
@@ -521,12 +521,12 @@ class Register extends \ElkArte\AbstractController
 		$memberID = registerMember($regOptions, 'register');
 
 		$lang = !empty($modSettings['userLanguage']) ? $modSettings['userLanguage'] : 'english';
-		$agreement = new Agreement($lang);
+		$agreement = new \ElkArte\Agreement($lang);
 		$agreement->accept($memberID, $user_info['ip'], empty($modSettings['agreementRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
 
 		if (!empty($modSettings['requirePrivacypolicy']))
 		{
-			$policy = new \PrivacyPolicy($lang);
+			$policy = new \ElkArte\PrivacyPolicy($lang);
 			$policy->accept($memberID, $user_info['ip'], empty($modSettings['privacypolicyRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacypolicyRevision']);
 		}
 
@@ -1287,7 +1287,7 @@ class Register extends \ElkArte\AbstractController
 
 		if (isset($this->_req->post->accept_agreement))
 		{
-			$agreement = new Agreement($user_info['language']);
+			$agreement = new \ElkArte\Agreement($user_info['language']);
 			$agreement->accept($user_info['id'], $user_info['ip'], empty($modSettings['agreementRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
 
 			$_SESSION['agreement_accepted'] = true;
@@ -1314,7 +1314,7 @@ class Register extends \ElkArte\AbstractController
 		loadLanguage('Profile');
 		loadTemplate('Register');
 		// If you have to agree to the agreement, it needs to be fetched from the file.
-		$agreement = new \Agreement($user_info['language']);
+		$agreement = new \ElkArte\Agreement($user_info['language']);
 		$context['agreement'] = $agreement->getParsedText();
 		$context['page_title'] = $txt['registration_agreement'];
 
@@ -1334,7 +1334,7 @@ class Register extends \ElkArte\AbstractController
 	{
 		global $context, $user_info, $modSettings, $txt;
 
-		$policy = new \PrivacyPolicy($user_info['language']);
+		$policy = new \ElkArte\PrivacyPolicy($user_info['language']);
 
 		if (isset($this->_req->post->accept_agreement))
 		{

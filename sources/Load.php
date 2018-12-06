@@ -410,14 +410,14 @@ function loadUserSettings()
 
 	if ($user_info['is_guest'] === false)
 	{
-		$http_request = HttpReq::instance();
+		$http_request = \ElkArte\HttpReq::instance();
 		if (!empty($modSettings['force_accept_agreement']))
 		{
 			if (!empty($modSettings['agreementRevision']) && !empty($modSettings['requireAgreement']) && in_array($http_request->action, array('reminder', 'register')) === false)
 			{
 				if ($http_request->action !== 'profile' || $http_request->area !== 'deleteaccount')
 				{
-					$agreement = new \Agreement($user_info['language']);
+					$agreement = new \ElkArte\Agreement($user_info['language']);
 					if (false === $agreement->checkAccepted($id_member, $modSettings['agreementRevision']))
 					{
 						setOldUrl('agreement_url_redirect');
@@ -432,7 +432,7 @@ function loadUserSettings()
 			{
 				if ($http_request->action !== 'profile' || $http_request->area !== 'deleteaccount')
 				{
-					$privacypol = new \PrivacyPolicy($user_info['language']);
+					$privacypol = new \ElkArte\PrivacyPolicy($user_info['language']);
 					if (false === $privacypol->checkAccepted($id_member, $modSettings['privacypolicyRevision']))
 					{
 						setOldUrl('agreement_url_redirect');

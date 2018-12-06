@@ -824,11 +824,7 @@ class Install_Controller
 			array('variable')
 		);
 
-		// Better safe, than sorry, just in case the autoloader doesn't cope well with the upgrade
-		require_once(TMP_BOARDDIR . '/sources/subs/Agreement.class.php');
-		require_once(TMP_BOARDDIR . '/sources/subs/PrivacyPolicy.class.php');
-
-		$agreement = new \Agreement('english');
+		$agreement = new \ElkArte\Agreement('english');
 		$success = $agreement->storeBackup();
 		$db->insert('replace',
 			$db_prefix . 'settings',
@@ -843,7 +839,7 @@ class Install_Controller
 
 		if (file_exists(TMP_BOARDDIR . '/privacypolicy.txt'))
 		{
-			$privacypol = new \PrivacyPolicy('english');
+			$privacypol = new \ElkArte\PrivacyPolicy('english');
 			$success = $privacypol->storeBackup();
 			$db->insert('replace',
 				$db_prefix . 'settings',

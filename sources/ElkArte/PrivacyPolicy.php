@@ -7,16 +7,18 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.4
+ * @version 2.0 dev
  *
  */
+
+namespace ElkArte;
 
 /**
  * Class PrivacyPolicy
  *
  * A simple class to take care of the privacy policy
  */
-class PrivacyPolicy extends Agreement
+class PrivacyPolicy extends \ElkArte\Agreement
 {
 	/**
 	 * Everything starts here.
