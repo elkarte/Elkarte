@@ -266,7 +266,7 @@ class Agreement
 		{
 			return false;
 		}
-		$glob = new GlobIterator(BOARDDIR . '/' . $this->_file_name . '*.txt', FilesystemIterator::SKIP_DOTS);
+		$glob = new \GlobIterator(BOARDDIR . '/' . $this->_file_name . '*.txt', \FilesystemIterator::SKIP_DOTS);
 		foreach ($glob as $file)
 		{
 			copy($file->getPathname(), $destination . $file->getBasename());

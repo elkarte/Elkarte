@@ -1113,7 +1113,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_agreement_accept()
 	{
-		return $this->table->db_create_table('{db_prefix}log_agreement_accept',
+		return $this->table->create_table('{db_prefix}log_agreement_accept',
 			array(
 				array('name' => 'version',       'type' => 'varchar', 'size' => 20, 'default' => ''),
 				array('name' => 'id_member',     'type' => 'mediumint', 'size' => 10, 'unsigned' => true, 'default' => 0),
@@ -2381,7 +2381,7 @@ class InstallInstructions_install_1_1
 
 	public function table_log_privacy_policy_accept()
 	{
-		return $this->table->db_create_table('{db_prefix}log_privacy_policy_accept',
+		return $this->table->create_table('{db_prefix}log_privacy_policy_accept',
 			array(
 				array('name' => 'version',       'type' => 'varchar', 'size' => 20, 'default' => ''),
 				array('name' => 'id_member',     'type' => 'mediumint', 'size' => 10, 'unsigned' => true, 'default' => 0),

@@ -16,9 +16,9 @@ class TestFiles extends \PHPUnit\Framework\TestCase
 	{
 		$this->_ourFiles = array();
 
-		$directory = new RecursiveDirectoryIterator(BOARDDIR);
-		$iterator = new RecursiveIteratorIterator($directory);
-		$regex = new RegexIterator($iterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
+		$directory = new \RecursiveDirectoryIterator(BOARDDIR);
+		$iterator = new \RecursiveIteratorIterator($directory);
+		$regex = new \RegexIterator($iterator, '/^.+\.php$/i', \RecursiveRegexIterator::GET_MATCH);
 
 		foreach ($regex as $fileo)
 		{

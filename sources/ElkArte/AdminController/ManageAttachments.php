@@ -958,7 +958,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 			{
 				try
 				{
-					$files = new FilesystemIterator($attach_dir, FilesystemIterator::SKIP_DOTS);
+					$files = new \FilesystemIterator($attach_dir, \FilesystemIterator::SKIP_DOTS);
 					foreach ($files as $file)
 					{
 						if ($file->getFilename() === '.htaccess')

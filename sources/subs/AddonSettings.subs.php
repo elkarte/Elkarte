@@ -28,10 +28,10 @@ function get_files_recursive($dir_path)
 
 	try
 	{
-		$iterator = new RecursiveIteratorIterator(
-			new RecursiveDirectoryIterator($dir_path, RecursiveDirectoryIterator::SKIP_DOTS),
-			RecursiveIteratorIterator::SELF_FIRST,
-			RecursiveIteratorIterator::CATCH_GET_CHILD
+		$iterator = new \RecursiveIteratorIterator(
+			new \RecursiveDirectoryIterator($dir_path, \RecursiveDirectoryIterator::SKIP_DOTS),
+			\RecursiveIteratorIterator::SELF_FIRST,
+			\RecursiveIteratorIterator::CATCH_GET_CHILD
 		);
 
 		foreach ($iterator as $file)
