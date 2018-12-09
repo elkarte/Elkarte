@@ -1300,8 +1300,8 @@ class ManageSmileys extends \ElkArte\AbstractController
 					'position' => 'below_table_data',
 					'class' => 'submitbutton',
 					'value' => '
-						<input type="submit" name="delete" value="' . $txt['quickmod_delete_selected'] . '" onclick="return confirm(\'' . $txt['icons_confirm'] . '\');" class="right_submit" />
-						<a class="linkbutton" href="' . $scripturl . '?action=admin;area=smileys;sa=editicon">' . $txt['icons_add_new'] . '</a>',
+						<a class="linkbutton" href="' . $scripturl . '?action=admin;area=smileys;sa=editicon">' . $txt['icons_add_new'] . '</a>
+						<input type="submit" name="delete" value="' . $txt['quickmod_delete_selected'] . '" onclick="return confirm(\'' . $txt['icons_confirm'] . '\');" />',
 				),
 				array(
 					'position' => 'after_title',

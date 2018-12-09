@@ -560,6 +560,11 @@ class Theme extends BaseTheme
 			template_show_error('new_version_updates');
 		}
 
+		if (!empty($context['accepted_agreement']))
+		{
+			template_show_error('accepted_agreement');
+		}
+
 		// Any special notices to remind the admin about?
 		if (!empty($context['warning_controls']))
 		{

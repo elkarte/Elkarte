@@ -1718,7 +1718,7 @@ class ManageThemes extends \ElkArte\AbstractController
 				fwrite($fp, $entire_file);
 				fclose($fp);
 
-				if (function_exists('opcache_invalidate'))
+				if ($this->_checkOpcache())
 					opcache_invalidate($theme_dir . '/' . $_REQUEST['filename']);
 
 				// We're done here.
@@ -1794,6 +1794,16 @@ class ManageThemes extends \ElkArte\AbstractController
 
 			return;
 		}
+	}
+
+	/**
+	 * Checks if  Zend Opcache is installed, active and its cmd functions available.
+	 *
+	 * @return bool
+	 */
+	private function _checkOpcache()
+	{
+		return (extension_loaded('Zend OPcache') && ini_get('opcache.enable') && stripos(BOARDDIR, ini_get('opcache.restrict_api')) !== 0);
 	}
 
 	/**
@@ -1947,7 +1957,7 @@ class ManageThemes extends \ElkArte\AbstractController
 			fwrite($fp, file_get_contents($filename));
 			fclose($fp);
 
-			if (function_exists('opcache_invalidate'))
+			if ($this->_checkOpcache())
 				opcache_invalidate($filename);
 
 			redirectexit('action=admin;area=theme;th=' . $context['theme_id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=copy');
@@ -1965,7 +1975,7 @@ class ManageThemes extends \ElkArte\AbstractController
 			fwrite($fp, file_get_contents($filename));
 			fclose($fp);
 
-			if (function_exists('opcache_invalidate'))
+			if ($this->_checkOpcache())
 				opcache_invalidate($filename);
 
 			redirectexit('action=admin;area=theme;th=' . $context['theme_id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=copy');

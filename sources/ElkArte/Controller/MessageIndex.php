@@ -188,9 +188,18 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 			$context['unapproved_posts_message'] = sprintf($txt['there_are_unapproved_topics'], $untopics, $unposts, $scripturl . '?action=moderate;area=postmod;sa=' . ($board_info['unapproved_topics'] ? 'topics' : 'posts') . ';brd=' . $board);
 		}
 
+		// And now, what we're here for: topics!
+		require_once(SUBSDIR . '/MessageIndex.subs.php');
+
+		// Known sort methods.
+		$sort_methods = messageIndexSort();
+		$default_sort_method = 'last_post';
+
 		// We only know these.
-		if (isset($this->_req->query->sort) && !in_array($this->_req->query->sort, array('subject', 'starter', 'last_poster', 'replies', 'views', 'likes', 'first_post', 'last_post')))
-			$this->_req->query->sort = 'last_post';
+		if (isset($this->_req->query->sort) && !isset($sort_methods[$this->_req->query->sort]))
+		{
+			$this->_req->query->sort = $default_sort_method;
+		}
 
 		$board_url_param = ['board' => $board, 'start' => '%1$d', 'name' => $board_info['name']];
 		// Make sure the starting place makes sense and construct the page index.
@@ -306,16 +315,10 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 			formatViewers($board, 'board');
 		}
 
-		// And now, what we're here for: topics!
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
-
-		// Known sort methods.
-		$sort_methods = messageIndexSort();
-
 		// They didn't pick one, default to by last post descending.
 		if (!isset($this->_req->query->sort) || !isset($sort_methods[$this->_req->query->sort]))
 		{
-			$context['sort_by'] = 'last_post';
+			$context['sort_by'] = $default_sort_method;
 			$ascending = isset($this->_req->query->asc);
 		}
 		// Otherwise sort by user selection and default to ascending.
@@ -587,6 +590,10 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 			// Just convert to the other method, to make it easier.
 			foreach ($this->_req->post->topics as $topic)
 				$actions[(int) $topic] = $this->_req->post->qaction;
+		}
+		else
+		{
+			$actions = $this->_req->actions;
 		}
 
 		// Weird... how'd you get here?

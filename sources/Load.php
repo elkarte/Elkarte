@@ -408,6 +408,40 @@ function loadUserSettings()
 	else
 		$user_info['query_wanna_see_board'] = '(' . $user_info['query_see_board'] . ' AND b.id_board NOT IN (' . implode(',', $user_info['ignoreboards']) . '))';
 
+	if ($user_info['is_guest'] === false)
+	{
+		$http_request = \ElkArte\HttpReq::instance();
+		if (!empty($modSettings['force_accept_agreement']))
+		{
+			if (!empty($modSettings['agreementRevision']) && !empty($modSettings['requireAgreement']) && in_array($http_request->action, array('reminder', 'register')) === false)
+			{
+				if ($http_request->action !== 'profile' || $http_request->area !== 'deleteaccount')
+				{
+					$agreement = new \ElkArte\Agreement($user_info['language']);
+					if (false === $agreement->checkAccepted($id_member, $modSettings['agreementRevision']))
+					{
+						setOldUrl('agreement_url_redirect');
+						redirectexit('action=register;sa=agreement', true);
+					}
+				}
+			}
+		}
+		if (!empty($modSettings['force_accept_privacy_policy']))
+		{
+			if (!empty($modSettings['privacypolicyRevision']) && !empty($modSettings['requirePrivacypolicy']) && in_array($http_request->action, array('reminder', 'register')) === false)
+			{
+				if ($http_request->action !== 'profile' || $http_request->area !== 'deleteaccount')
+				{
+					$privacypol = new \ElkArte\PrivacyPolicy($user_info['language']);
+					if (false === $privacypol->checkAccepted($id_member, $modSettings['privacypolicyRevision']))
+					{
+						setOldUrl('agreement_url_redirect');
+						redirectexit('action=register;sa=privacypol', true);
+					}
+				}
+			}
+		}
+	}
 	call_integration_hook('integrate_user_info');
 }
 
@@ -956,15 +990,29 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	if (!empty($new_loaded_ids) && !empty($user_info['id']) && $set !== 'minimal' && (in_array('cp', $context['admin_features'])))
 	{
 		$request = $db->query('', '
-			SELECT id_member, variable, value
-			FROM {db_prefix}custom_fields_data
+			SELECT cfd.id_member, cfd.variable, cfd.value, cf.field_options, cf.field_type
+			FROM {db_prefix}custom_fields_data AS cfd
+			JOIN {db_prefix}custom_fields AS cf ON (cf.col_name = cfd.variable)
 			WHERE id_member' . (count($new_loaded_ids) == 1 ? ' = {int:loaded_ids}' : ' IN ({array_int:loaded_ids})'),
 			array(
 				'loaded_ids' => count($new_loaded_ids) == 1 ? $new_loaded_ids[0] : $new_loaded_ids,
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
+		{
+			if (!empty($row['field_options']))
+			{
+				$field_options = explode(',', $row['field_options']);
+				$key = (int) array_search($row['value'], $field_options);
+			}
+			else
+			{
+				$key = 0;
+			}
+
+			$user_profile[$row['id_member']]['options'][$row['variable'] . '_key'] = $row['variable'] . '_' . $key;
 			$user_profile[$row['id_member']]['options'][$row['variable']] = $row['value'];
+		}
 		$db->free_result($request);
 	}
 
@@ -1161,12 +1209,20 @@ function loadMemberContext($user, $display_custom_fields = false)
 
 			// Enclosing the user input within some other text?
 			if (!empty($custom['enclose']))
-				$value = strtr($custom['enclose'], array(
+			{
+				$replacements = array(
 					'{SCRIPTURL}' => $scripturl,
 					'{IMAGES_URL}' => $settings['images_url'],
 					'{DEFAULT_IMAGES_URL}' => $settings['default_images_url'],
 					'{INPUT}' => $value,
-				));
+				);
+
+				if (in_array($custom['type'], array('radio', 'select')))
+				{
+					$replacements['{KEY}'] = $profile['options'][$custom['colname'] . '_key'];
+				}
+				$value = strtr($custom['enclose'], $replacements);
+			}
 
 			$memberContext[$user]['custom_fields'][] = array(
 				'title' => $custom['title'],

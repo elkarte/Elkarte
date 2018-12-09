@@ -1440,7 +1440,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 		// Set the action to apply to the pm's defined by pm_actions (yes its that brilliant)
 		$pm_action = $this->_req->getPost('pm_action', 'trim', '');
-		$pm_action = empty($pm_action) && isset($this->_req->post->del_selected) ? 'delete' : '';
+		$pm_action = empty($pm_action) && isset($this->_req->post->del_selected) ? 'delete' : $pm_action;
 
 		// Create a list of pm's that we need to work on
 		if ($pm_action != ''

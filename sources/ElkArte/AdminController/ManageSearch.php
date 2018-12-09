@@ -657,7 +657,7 @@ class ManageSearch extends \ElkArte\AbstractController
 		$apis = array();
 		try
 		{
-			$files = new GlobIterator(SUBSDIR . '/Search/API/*.php', FilesystemIterator::SKIP_DOTS);
+			$files = new \GlobIterator(SUBSDIR . '/Search/API/*.php', \FilesystemIterator::SKIP_DOTS);
 			foreach ($files as $file)
 			{
 				if ($file->isFile())

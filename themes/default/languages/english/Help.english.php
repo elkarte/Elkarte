@@ -591,6 +591,7 @@ $helptxt['field_show_enclosed'] = 'Encloses the user input between some text or 
 		You can use the following variables:<br />
 		<ul class="normallist">
 			<li>{INPUT} - The input specified by the user.</li>
+			<li>{KEY} - The key specified for a certain value of select box or radio buttons in the admin panel. Usually to use in case of localization or use in CSS of Javascript elements (e.g. as class name).</li>
 			<li>{SCRIPTURL} - Web address of forum.</li>
 			<li>{IMAGES_URL} - URI of the images directory of the user\'s current theme.</li>
 			<li>{DEFAULT_IMAGES_URL} - URI of the images directory of the default theme.</li>
@@ -676,7 +677,7 @@ $helptxt['attachment_inline_title'] = '<b>Add an inline attachment</b><br />
 				<li>align=left : The image is aligned to the left and the text will flow around it</li>
 				<li>align=right : The image is aligned to the right and the text will flow around it</li>
 				<li>align=center : The image is centered and the text will be below it</li>
-			<ul>
+			</ul>
 		</p><br />
 		<p>
 			You can choose how wide to show the image:
@@ -684,7 +685,7 @@ $helptxt['attachment_inline_title'] = '<b>Add an inline attachment</b><br />
 				<li>width=123 : The image is displayed 123 pixels wide</li>
 				<li>If the width specified is larger than the image or larger than the forum allows the largest allowable width will be used</li>
 				<li>Can be used to shrink a thumbnail as well [attach width=50]x[/attach] will display a 50px wide thumbnail</li>
-			<ul>
+			</ul>
 		</p><br />
 		<p>
 			You can choose how tall to show the image:

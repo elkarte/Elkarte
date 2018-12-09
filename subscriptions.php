@@ -17,12 +17,14 @@
  */
 
 // Start things rolling by getting the forum alive...
-$ssi_guest_access = true;
 if (!file_exists(dirname(__FILE__) . '/bootstrap.php'))
 	die('Unable to initialize');
 
+global $ssi_guest_access;
+
 require_once(dirname(__FILE__) . '/bootstrap.php');
-new Bootstrap();
+$ssi_guest_access = true;
+new Bootstrap(true);
 
 global $txt, $modSettings, $context;
 

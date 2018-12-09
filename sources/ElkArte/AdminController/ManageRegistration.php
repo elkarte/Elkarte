@@ -64,6 +64,11 @@ class ManageRegistration extends \ElkArte\AbstractController
 				'function' => 'action_agreement',
 				'permission' => 'admin_forum',
 			),
+			'privacypol' => array(
+				'controller' => $this,
+				'function' => 'action_privacypol',
+				'permission' => 'admin_forum',
+			),
 			'reservednames' => array(
 				'controller' => $this,
 				'function' => 'action_reservednames',
@@ -90,6 +95,9 @@ class ManageRegistration extends \ElkArte\AbstractController
 				),
 				'agreement' => array(
 					'description' => $txt['registration_agreement_desc'],
+				),
+				'privacypol' => array(
+					'description' => $txt['privacy_policy_desc'],
 				),
 				'reservednames' => array(
 					'description' => $txt['admin_reserved_desc'],
@@ -273,6 +281,7 @@ class ManageRegistration extends \ElkArte\AbstractController
 			}
 		}
 
+		$context['warning'] = '';
 		$agreement = new \ElkArte\Agreement($context['current_agreement']);
 
 		if (isset($this->_req->post->save) && isset($this->_req->post->agreement))
@@ -281,19 +290,115 @@ class ManageRegistration extends \ElkArte\AbstractController
 			validateToken('admin-rega');
 
 			// Off it goes to the agreement file.
-			$agreement->save($this->_req->post->agreement);
+			$success = $agreement->save($this->_req->post->agreement, !empty($this->_req->post->checkboxAcceptAgreement));
+			if (!empty($this->_req->post->checkboxAcceptAgreement))
+			{
+				if ($success === false)
+				{
+					$context['warning'] .= $txt['agreement_backup_not_writable'] . '<br />';
+				}
+				else
+				{
+					updateSettings(array('agreementRevision' => $success));
+				}
+			}
 
 			updateSettings(array('requireAgreement' => !empty($this->_req->post->requireAgreement), 'checkboxAgreement' => !empty($this->_req->post->checkboxAgreement)));
 		}
 
 		$context['agreement'] = \ElkArte\Util::htmlspecialchars($agreement->getPlainText(false));
 
-		$context['warning'] = $agreement->isWritable() ? '' : $txt['agreement_not_writable'];
+		$context['warning'] .= $agreement->isWritable() ? '' : $txt['agreement_not_writable'];
 		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
 		$context['checkbox_agreement'] = !empty($modSettings['checkboxAgreement']);
 
 		$context['sub_template'] = 'edit_agreement';
+		$context['subaction'] = 'agreement';
+		$context['agreement_show_options'] = true;
 		$context['page_title'] = $txt['registration_agreement'];
+		createToken('admin-rega');
+	}
+
+	/**
+	 * Allows the administrator to edit the privacy policy, and choose whether
+	 * it should be shown or not.
+	 *
+	 * - It writes and saves the privacy policy to the privacypolicy.txt file.
+	 * - Accessed by ?action=admin;area=regcenter;sa=privacypol
+	 * - Requires the admin_forum permission.
+	 *
+	 * @uses Admin template and the edit_agreement sub template.
+	 */
+	public function action_privacypol()
+	{
+		// I hereby agree not to be a lazy bum.
+		global $txt, $context, $modSettings;
+
+		// By default we look at privacypolicy.txt.
+		$context['current_agreement'] = '';
+
+		// Is there more than one to edit?
+		$context['editable_agreements'] = array(
+			'' => $txt['admin_agreement_default'],
+		);
+
+		// Get our languages.
+		$languages = getLanguages();
+
+		// Try to figure out if we have more agreements.
+		foreach ($languages as $lang)
+		{
+			if (file_exists(BOARDDIR . '/privacypolicy.' . $lang['filename'] . '.txt'))
+			{
+				$context['editable_agreements'][$lang['filename']] = $lang['name'];
+
+				// Are we editing this?
+				if (isset($this->_req->post->agree_lang) && $this->_req->post->agree_lang === $lang['filename'])
+				{
+					$context['current_agreement'] = $lang['filename'];
+					break;
+				}
+			}
+		}
+
+		$context['warning'] = '';
+		$privacypol = new \ElkArte\PrivacyPolicy($context['current_agreement']);
+
+		if (isset($this->_req->post->save) && isset($this->_req->post->agreement))
+		{
+			checkSession();
+			validateToken('admin-rega');
+
+			// Off it goes to the agreement file.
+			$success = $privacypol->save($this->_req->post->agreement, !empty($this->_req->post->checkboxAcceptAgreement));
+			if (!empty($this->_req->post->checkboxAcceptAgreement))
+			{
+				if ($success === false)
+				{
+					$context['warning'] .= $txt['privacypol_backup_not_writable'] . '<br />';
+				}
+				else
+				{
+					updateSettings(array('privacypolicyRevision' => $success));
+				}
+			}
+
+			updateSettings(array('requirePrivacypolicy' => !empty($this->_req->post->requireAgreement)));
+		}
+
+		$context['agreement'] = Util::htmlspecialchars($privacypol->getPlainText(false));
+
+		$context['warning'] .= $privacypol->isWritable() ? '' : $txt['privacypol_not_writable'];
+		$context['require_agreement'] = !empty($modSettings['requirePrivacypolicy']);
+
+		$context['sub_template'] = 'edit_agreement';
+		$context['subaction'] = 'privacypol';
+		$context['page_title'] = $txt['privacy_policy'];
+		// These overrides are here to be able to reuse the template in a simple way without having to change much.
+		$txt['admin_agreement'] = $txt['admin_privacypol'];
+		$txt['admin_checkbox_accept_agreement'] = $txt['admin_checkbox_accept_privacypol'];
+		$txt['confirm_request_accept_agreement'] = $txt['confirm_request_accept_privacy_policy'];
+
 		createToken('admin-rega');
 	}
 
@@ -418,6 +523,8 @@ class ManageRegistration extends \ElkArte\AbstractController
 			array('select', 'registration_method', array($txt['setting_registration_standard'], $txt['setting_registration_activate'], $txt['setting_registration_approval'], $txt['setting_registration_disabled'])),
 			array('check', 'enableOpenID'),
 			array('check', 'notify_new_registration'),
+			array('check', 'force_accept_agreement'),
+			array('check', 'force_accept_privacy_policy'),
 			array('check', 'send_welcomeEmail'),
 			array('check', 'show_DisplayNameOnRegistration'),
 			'',

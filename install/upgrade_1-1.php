@@ -202,7 +202,9 @@ class UpgradeInstructions_upgrade_1_1
 							'type' => 'tinyint',
 							'size' => 1,
 							'default' => 0
-						)
+						),
+						array(),
+						'ignore'
 					);
 
 					$this->table->change_column('{db_prefix}log_mentions',
@@ -608,7 +610,9 @@ class UpgradeInstructions_upgrade_1_1
 							'type' => 'smallint',
 							'size' => 5,
 							'default' => 4
-						)
+						),
+						array(),
+						'ignore'
 					);
 					$this->table->add_column('{db_prefix}custom_fields',
 						array(
@@ -616,7 +620,9 @@ class UpgradeInstructions_upgrade_1_1
 							'type' => 'smallint',
 							'size' => 5,
 							'default' => 30
-						)
+						),
+						array(),
+						'ignore'
 					);
 				}
 			),
@@ -654,7 +660,7 @@ class UpgradeInstructions_upgrade_1_1
 						'{db_prefix}custom_fields',
 						array('col_name' => 'string', 'field_name' => 'string', 'field_desc' => 'string', 'field_type' => 'string', 'field_length' => 'int', 'field_options' => 'string', 'mask' => 'string', 'show_reg' => 'int', 'show_display' => 'int', 'show_profile' => 'string', 'private' => 'int', 'active' => 'int', 'bbc' => 'int', 'can_search' => 'int', 'default_value' => 'string', 'enclose' => 'string', 'placement' => 'int', 'rows' => 'int', 'cols' => 'int'),
 						array(
-							array('cust_gender', 'Gender', 'Your gender', 'radio', 15, 'undisclosed,male,female,genderless,nonbinary,transgendered', '', 0, 1, 'forumprofile', 0, 1, 0, 0, 'undisclosed', '<i class="icon i-{INPUT}" title="{INPUT}"><s>{INPUT}</s></i>', 0, 0, 0),
+							array('cust_gender', 'Gender', 'Your gender', 'radio', 15, 'undisclosed,male,female,genderless,nonbinary,transgendered', '', 0, 1, 'forumprofile', 0, 1, 0, 0, 'undisclosed', '<i class="icon i-{KEY}" title="{INPUT}"><s>{INPUT}</s></i>', 0, 0, 0),
 							array('cust_blurb', 'Personal Text', 'A custom bit of text for your postbit.', 'text', 120, '', '', 0, 0, 'forumprofile', 0, 1, 0, 0, 'Default Personal Text', '', 3, 0, 0),
 							array('cust_locate', 'Location', 'Where you are', 'text', 32, '', '', 0, 0, 'forumprofile', 0, 1, 0, 0, '', '', 0, 0, 0),
 						),
@@ -855,6 +861,65 @@ class UpgradeInstructions_upgrade_1_1
 						'cal_limityear' => '10',
 						'avatar_max_height' => '65',
 					));
+				}
+			)
+		);
+	}
+
+	public function agreement_logging_title()
+	{
+		return 'Introducing the logging of accepted agreement and privacy policy...';
+	}
+
+	public function agreement_logging()
+	{
+		return array(
+			array(
+				'debug_title' => 'Creating the tables...',
+				'function' => function()
+				{
+					$this->table->create_table('{db_prefix}log_agreement_accept',
+						array(
+							array('name' => 'version',       'type' => 'varchar', 'size' => 20, 'default' => ''),
+							array('name' => 'id_member',     'type' => 'mediumint', 'size' => 10, 'unsigned' => true, 'default' => 0),
+							array('name' => 'accepted_date', 'type' => 'date', 'default' => '0001-01-01'),
+							array('name' => 'accepted_ip',   'type' => 'varchar', 'size' => 255, 'default' => ''),
+						),
+						array(
+							array('name' => 'version', 'columns' => array('version', 'id_member'), 'type' => 'primary'),
+						),
+						array(),
+						'ignore'
+					);
+					$this->table->create_table('{db_prefix}log_privacy_policy_accept',
+						array(
+							array('name' => 'version',       'type' => 'varchar', 'size' => 20, 'default' => ''),
+							array('name' => 'id_member',     'type' => 'mediumint', 'size' => 10, 'unsigned' => true, 'default' => 0),
+							array('name' => 'accepted_date', 'type' => 'date', 'default' => '0001-01-01'),
+							array('name' => 'accepted_ip',   'type' => 'varchar', 'size' => 255, 'default' => ''),
+						),
+						array(
+							array('name' => 'version', 'columns' => array('version', 'id_member'), 'type' => 'primary'),
+						),
+						array(),
+						'ignore'
+					);
+				}
+			),
+			array(
+				'debug_title' => 'Preparing first status...',
+				'function' => function()
+				{
+					$agreement = new \ElkArte\Agreement('english');
+					$success = $agreement->storeBackup();
+					updateSettings(array('agreementRevision' => $success));
+
+					if (file_exists(BOARDDIR . '/privacypolicy.txt'))
+					{
+						$privacypol = new \ElkArte\PrivacyPolicy('english');
+						$success = $privacypol->storeBackup();
+						updateSettings(array('privacypolicyRevision' => $success));
+					}
 				}
 			)
 		);

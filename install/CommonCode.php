@@ -708,7 +708,7 @@ function saveFileSettings($config_vars, $settingsArray)
 	}
 	fclose($fp);
 
-	if (function_exists('opcache_invalidate'))
+	if (extension_loaded('Zend OPcache') && ini_get('opcache.enable') && stripos(BOARDDIR, ini_get('opcache.restrict_api')) !== 0)
 		opcache_invalidate(TMP_BOARDDIR . '/Settings.php', true);
 
 	return true;

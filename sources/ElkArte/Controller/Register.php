@@ -85,6 +85,8 @@ class Register extends \ElkArte\AbstractController
 			'verificationcode' => array($this, 'action_verificationcode'),
 			'coppa' => array($this, 'action_coppa'),
 			'agrelang' => array($this, 'action_agrelang'),
+			'privacypol' => array($this, 'action_privacypol'),
+			'agreement' => array($this, 'action_agreement'),
 		);
 
 		// Setup the action handler
@@ -120,13 +122,21 @@ class Register extends \ElkArte\AbstractController
 		if (isset($this->_req->post->show_contact))
 			redirectexit('action=register;sa=contact');
 
+		// If we have language support enabled then they need to be loaded
+		if ($this->_load_language_support())
+		{
+			redirectexit('action=register');
+		}
+
 		theme()->getTemplates()->loadLanguageFile('Login');
 		theme()->getTemplates()->load('Register');
 
 		// Do we need them to agree to the registration agreement, first?
 		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
 		$context['checkbox_agreement'] = !empty($modSettings['checkboxAgreement']);
+		$context['require_privacypol'] = !empty($modSettings['requirePrivacypolicy']);
 		$context['registration_passed_agreement'] = !empty($_SESSION['registration_agreed']);
+		$context['registration_passed_privacypol'] = !empty($_SESSION['registration_privacypolicy']);
 		$context['show_coppa'] = !empty($modSettings['coppaAge']);
 		$context['show_contact_button'] = !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] === 'registration';
 		if (!empty($modSettings['show_DisplayNameOnRegistration']))
@@ -154,6 +164,7 @@ class Register extends \ElkArte\AbstractController
 		if ($current_step == 1 && (isset($this->_req->post->accept_agreement) || isset($this->_req->post->accept_agreement_coppa)))
 		{
 			$context['registration_passed_agreement'] = $_SESSION['registration_agreed'] = true;
+			$context['registration_passed_privacypol'] = $_SESSION['registration_privacypolicy'] = true;
 			$current_step = 2;
 
 			// Skip the coppa procedure if the user says he's old enough.
@@ -215,6 +226,20 @@ class Register extends \ElkArte\AbstractController
 			theme()->getTemplates()->loadLanguageFile('Errors');
 			\ElkArte\Errors\Errors::instance()->log_error($txt['registration_agreement_missing'], 'critical');
 			throw new \ElkArte\Exceptions\Exception('registration_disabled', false);
+		}
+
+		if (!empty($context['require_privacypol']))
+		{
+			$privacypol = new \ElkArte\PrivacyPolicy($user_info['language']);
+			$context['privacy_policy'] = $privacypol->getParsedText();
+
+			if (empty($context['privacy_policy']))
+			{
+				// No file found or a blank file, log the error so the admin knows there is a problem!
+				loadLanguage('Errors');
+				Errors::instance()->log_error($txt['registration_privacy_policy_missing'], 'critical');
+				throw new Elk_Exception('registration_disabled', false);
+			}
 		}
 
 		// If we have language support enabled then they need to be loaded
@@ -283,6 +308,13 @@ class Register extends \ElkArte\AbstractController
 
 		// Well, if you don't agree, you can't register.
 		if (!empty($modSettings['requireAgreement']) && empty($_SESSION['registration_agreed']))
+			redirectexit();
+
+		if (!empty($modSettings['requireAgreement']) && !empty($modSettings['requirePrivacypolicy']) && !empty($this->_req->post->checkbox_privacypol))
+			$_SESSION['registration_privacypolicy'] = true;
+
+		// Well, if you don't agree, you can't register.
+		if (!empty($modSettings['requireAgreement']) && !empty($modSettings['requirePrivacypolicy']) && empty($_SESSION['registration_privacypolicy']))
 			redirectexit();
 
 		// Make sure they came from *somewhere*, have a session.
@@ -488,6 +520,16 @@ class Register extends \ElkArte\AbstractController
 		$regOptions['ip2'] = $req->ban_ip();
 		$memberID = registerMember($regOptions, 'register');
 
+		$lang = !empty($modSettings['userLanguage']) ? $modSettings['userLanguage'] : 'english';
+		$agreement = new \ElkArte\Agreement($lang);
+		$agreement->accept($memberID, $user_info['ip'], empty($modSettings['agreementRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
+
+		if (!empty($modSettings['requirePrivacypolicy']))
+		{
+			$policy = new \ElkArte\PrivacyPolicy($lang);
+			$policy->accept($memberID, $user_info['ip'], empty($modSettings['privacypolicyRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacypolicyRevision']);
+		}
+
 		// If there are "important" errors and you are not an admin: log the first error
 		// Otherwise grab all of them and don't log anything
 		if ($reg_errors->hasErrors(1) && !$user_info['is_admin'])
@@ -657,10 +699,11 @@ class Register extends \ElkArte\AbstractController
 	 * - If language support is enabled, loads whats available
 	 * - Verifies the users choice is available
 	 * - Sets in in context / session
+	 * @return bool true if the language was changed, false if not.
 	 */
 	private function _load_language_support()
 	{
-		global $context, $modSettings, $language;
+		global $context, $modSettings, $language, $user_info;
 
 		// Language support enabled
 		if (!empty($modSettings['userLanguage']))
@@ -671,6 +714,10 @@ class Register extends \ElkArte\AbstractController
 			if (isset($this->_req->post->lngfile) && isset($languages[$this->_req->post->lngfile]))
 			{
 				$_SESSION['language'] = $this->_req->post->lngfile;
+				if ($_SESSION['language'] !== $user_info['language'])
+				{
+					return true;
+				}
 			}
 
 			// No selected, or not found, use the site default
@@ -688,6 +735,7 @@ class Register extends \ElkArte\AbstractController
 				}
 			}
 		}
+		return false;
 	}
 
 	/**
@@ -1231,5 +1279,103 @@ class Register extends \ElkArte\AbstractController
 		validateUsername(0, $context['checked_username'], 'valid_username', true, false);
 
 		$context['valid_username'] = !$errors->hasErrors();
+	}
+
+	public function action_agreement()
+	{
+		global $context, $user_info, $modSettings, $txt;
+
+		if (isset($this->_req->post->accept_agreement))
+		{
+			$agreement = new \ElkArte\Agreement($user_info['language']);
+			$agreement->accept($user_info['id'], $user_info['ip'], empty($modSettings['agreementRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
+
+			$_SESSION['agreement_accepted'] = true;
+			if (isset($_SESSION['agreement_url_redirect']))
+			{
+				redirectexit($_SESSION['agreement_url_redirect']);
+			}
+			else
+			{
+				redirectexit();
+			}
+		}
+		elseif (isset($this->_req->post->no_accept))
+		{
+			redirectexit('action=profile;area=deleteaccount');
+		}
+		else
+		{
+			$context['sub_template'] = 'registration_agreement';
+			$context['register_subaction'] = 'agreement';
+		}
+
+		loadLanguage('Login');
+		loadLanguage('Profile');
+		loadTemplate('Register');
+		// If you have to agree to the agreement, it needs to be fetched from the file.
+		$agreement = new \ElkArte\Agreement($user_info['language']);
+		$context['agreement'] = $agreement->getParsedText();
+		$context['page_title'] = $txt['registration_agreement'];
+
+		$context['show_coppa'] = !empty($modSettings['coppaAge']);
+		$context['show_contact_button'] = !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] === 'registration';
+		// Under age restrictions?
+		if ($context['show_coppa'])
+		{
+			$context['skip_coppa'] = false;
+			$context['coppa_agree_above'] = sprintf($txt[($context['require_agreement'] ? 'agreement_' : '') . 'agree_coppa_above'], $modSettings['coppaAge']);
+			$context['coppa_agree_below'] = sprintf($txt[($context['require_agreement'] ? 'agreement_' : '') . 'agree_coppa_below'], $modSettings['coppaAge']);
+		}
+		createToken('register');
+	}
+
+	public function action_privacypol()
+	{
+		global $context, $user_info, $modSettings, $txt;
+
+		$policy = new \ElkArte\PrivacyPolicy($user_info['language']);
+
+		if (isset($this->_req->post->accept_agreement))
+		{
+			$policy->accept($user_info['id'], $user_info['ip'], empty($modSettings['privacypolicyRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacypolicyRevision']);
+
+			$_SESSION['privacypolicy_accepted'] = true;
+			if (isset($_SESSION['privacypolicy_url_redirect']))
+			{
+				redirectexit($_SESSION['privacypolicy_url_redirect']);
+			}
+			else
+			{
+				redirectexit();
+			}
+		}
+		elseif (isset($this->_req->post->no_accept))
+		{
+			redirectexit('action=profile;area=deleteaccount');
+		}
+		else
+		{
+			$context['sub_template'] = 'registration_agreement';
+			$context['register_subaction'] = 'privacypol';
+		}
+
+		loadLanguage('Login');
+		loadLanguage('Profile');
+		loadTemplate('Register');
+
+		$txt['agreement_agree'] = $txt['policy_agree'];
+		$txt['agreement_no_agree'] = $txt['policy_no_agree'];
+		$txt['registration_agreement'] = $txt['registration_privacy_policy'];
+		$context['page_title'] = $txt['registration_agreement'];
+
+		// If you have to agree to the privacy policy, it needs to be fetched from the file.
+		$context['agreement'] = $policy->getParsedText();
+
+		$context['show_coppa'] = false;
+		$context['skip_coppa'] = true;
+		$context['show_contact_button'] = !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] === 'registration';
+
+		createToken('register');
 	}
 }

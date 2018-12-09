@@ -625,13 +625,15 @@ function action_welcomeLogin()
 	}
 
 	// Do they have ALTER privileges?
-	if (!empty($databases[$db_type]['alter_support']) && $db->query('alter_boards', 'ALTER TABLE {db_prefix}boards ORDER BY id_board', array()) === false)
+	$db->skip_next_error();
+	if (!empty($databases[$db_type]['alter_support'])
+		&& $db->query('', '	ALTER TABLE {db_prefix}log_digest ORDER BY id_topic', array('security_override' => true)) === false)
 	{
 		return throw_error('The ' . $databases[$db_type]['name'] . ' user you have set in Settings.php does not have proper privileges.<br /><br />Please ask your host to give this user the ALTER, CREATE, and DROP privileges.');
 	}
 
 	// Do a quick version spot check.
-	$temp = substr(@implode('', @file(BOARDDIR . '/index.php')), 0, 4096);
+	$temp = substr(@implode('', @file(BOARDDIR . '/bootstrap.php')), 0, 4096);
 	preg_match('~\*\s@version\s+(.+)~i', $temp, $match);
 	if (empty($match[1]) || compareVersions(trim(str_replace('Release Candidate', 'RC', $match[1])), CURRENT_VERSION) != 0)
 	{
@@ -1863,7 +1865,9 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 
 	$db = load_database();
 
-	if (!empty($databases[$db_type]['alter_support']) && $db->query('alter_boards', 'ALTER TABLE {db_prefix}boards ORDER BY id_board', array()) === false)
+	$db->skip_next_error();
+	if (!empty($databases[$db_type]['alter_support'])
+		&& $db->query('', '	ALTER TABLE {db_prefix}log_digest ORDER BY id_topic', array('security_override' => true)) === false)
 	{
 		print_error('Error: The ' . $databases[$db_type]['name'] . ' account in Settings.php does not have sufficient privileges.', true);
 	}
@@ -1877,7 +1881,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 	}
 
 	// Do a quick version spot check.
-	$temp = substr(@implode('', @file(BOARDDIR . '/index.php')), 0, 4096);
+	$temp = substr(@implode('', @file(BOARDDIR . '/bootstrap.php')), 0, 4096);
 	preg_match('~\*\s@version\s+(.+)~i', $temp, $match);
 	if (empty($match[1]) || $match[1] != CURRENT_VERSION)
 	{

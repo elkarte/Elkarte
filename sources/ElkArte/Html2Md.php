@@ -210,7 +210,7 @@ class Html2Md
 	 */
 	private function _clipHead()
 	{
-		$head = ($this->_parser) ? $this->doc->getElementsByTagName('head')->item(0) : $this->doc->find('head', 0)->outertext;
+		$head = ($this->_parser) ? $this->doc->getElementsByTagName('head')->item(0) : $this->doc->find('head', 0);
 		if ($head !== null)
 		{
 			if ($this->_parser)

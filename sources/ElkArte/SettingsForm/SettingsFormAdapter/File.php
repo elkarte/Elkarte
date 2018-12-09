@@ -501,8 +501,8 @@ class File extends Db
 					@copy(BOARDDIR . '/Settings_bak.php', BOARDDIR . '/Settings.php');
 				}
 			}
-			// And ensure we are going to read the correct file next time
-			if (function_exists('opcache_invalidate'))
+
+			if (extension_loaded('Zend OPcache') && ini_get('opcache.enable') && stripos(BOARDDIR, ini_get('opcache.restrict_api')) !== 0)
 			{
 				opcache_invalidate(BOARDDIR . '/Settings.php');
 			}

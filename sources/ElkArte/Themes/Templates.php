@@ -372,6 +372,11 @@ class Templates
 	{
 		global $settings, $modSettings, $mbname, $context;
 
+		if (function_exists('database') === false)
+		{
+			throw new \Exception('');
+		}
+
 		$db = database();
 
 		// Get all the default theme variables.

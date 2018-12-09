@@ -428,7 +428,8 @@ function onCheckChange()
 			.done(function(request) {
 				if (request != '')
 				{
-					$('#agreement_box').html(request);
+					$('#agreement_box').html(request.agreement);
+					$('#privacypol_box').html(request.privacypol);
 				}
 			})
 			.fail(function(request) {

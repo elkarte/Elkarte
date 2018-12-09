@@ -88,9 +88,18 @@ class Jslocale extends \ElkArte\AbstractController
 		{
 			// If you have to agree to the agreement, it needs to be fetched from the file.
 			$agreement = new \ElkArte\Agreement($lang);
+			if (!empty($modSettings['requirePrivacypolicy']))
+			{
+				$privacypol = new \ElkArte\PrivacyPolicy($lang);
+			}
+			$context['json_data'] = array('agreement' => '', 'privacypol' => '');
 			try
 			{
-				$context['json_data'] = $agreement->getParsedText();
+				$context['json_data']['agreement'] = $agreement->getParsedText();
+				if (!empty($modSettings['requirePrivacypolicy']))
+				{
+					$context['json_data']['privacypol'] = $privacypol->getParsedText();
+				}
 			}
 			catch (\ElkArte\Exceptions\Exception $e)
 			{

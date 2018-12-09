@@ -256,7 +256,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 				$unq_head_array[0] = md5($boardurl . microtime() . rand());
 				$unq_head_array[1] = $message_type;
 				$unq_head_array[2] = $message_id;
-				$unq_head = $unq_head_array[0] . '-' . $unq_head_array[2];
+				$unq_head = $unq_head_array[0] . '-' . $unq_head_array[1] . $unq_head_array[2];
 				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
 				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 				$message = mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break);

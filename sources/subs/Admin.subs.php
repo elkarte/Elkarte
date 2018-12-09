@@ -340,15 +340,15 @@ function readFileVersions(&$version_info, $directories, $pattern, $recursive = f
 	{
 		if ($recursive === true)
 		{
-			$iter = new RecursiveIteratorIterator(
-				new RecursiveDirectoryIterator($dirname, RecursiveDirectoryIterator::SKIP_DOTS),
-				RecursiveIteratorIterator::CHILD_FIRST,
-				RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
+			$iter = new \RecursiveIteratorIterator(
+				new \RecursiveDirectoryIterator($dirname, \RecursiveDirectoryIterator::SKIP_DOTS),
+				\RecursiveIteratorIterator::CHILD_FIRST,
+				\RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
 			);
 		}
 		else
 		{
-			$iter = new IteratorIterator(new FilesystemIterator($dirname));
+			$iter = new \IteratorIterator(new \FilesystemIterator($dirname));
 		}
 
 		foreach ($iter as $dir)

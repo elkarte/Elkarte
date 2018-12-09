@@ -1,24 +1,29 @@
 {
 	"name": "elkarte/elkarte",
-	"description": "ElkArte Forum Software application",
+	"description": "ElkArte PHP-based community discussion forum.",
 	"version": "2.0 dev",
 	"type": "project",
-	"keywords": ["elkarte", "forum"],
-	"homepage": "http://www.elkarte.net",
-	"license": "BSD-3",
+	"keywords": ["elkarte", "forum", "discussion", "php", "community"],
+	"homepage": "https://www.elkarte.net",
+	"license": "BSD-3-Clause",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/elkarte/Elkarte.git"
+	},
 	"authors": [
 		{
 			"name": "ElkArte Forum Contributors",
 			"email": "operations@elkarte.net",
-			"homepage": "http://www.elkarte.net"
+			"homepage": "https://www.elkarte.net"
 		}
 	],
 	"support": {
 		"issues": "https://github.com/elkarte/Elkarte/issues",
-		"forum": "http://www.elkarte.com/community/",
+		"forum": "https://www.elkarte.com/community/",
 		"wiki": "https://github.com/elkarte/Elkarte/wiki",
 		"irc": "irc://irc.freenode.org/elkarte"
 	},
+	"minimum-stability": "beta",
 	"scripts": {
 	},
 	"replace": {
