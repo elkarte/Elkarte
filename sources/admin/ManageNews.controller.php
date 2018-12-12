@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.6
  *
  */
 
@@ -382,11 +382,11 @@ class ManageNews_Controller extends Action_Controller
 			$context['recipients']['groups'] = !empty($this->_req->post->groups) ? explode(',', $this->_req->post->groups) : array();
 			$context['recipients']['exclude_groups'] = !empty($this->_req->post->exclude_groups) ? explode(',', $this->_req->post->exclude_groups) : array();
 			$context['recipients']['emails'] = !empty($this->_req->post->emails) ? explode(';', $this->_req->post->emails) : array();
-			$context['email_force'] = $this->_req->getPost('email_force', 'intval', 0);
+			$context['email_force'] = $this->_req->getPost('email_force', 'isset', false);
 			$context['total_emails'] = $this->_req->getPost('total_emails', 'intval', 0);
 			$context['max_id_member'] = $this->_req->getPost('max_id_member', 'intval', 0);
-			$context['send_pm'] = $this->_req->getPost('send_pm', 'intval', 0);
-			$context['send_html'] = $this->_req->getPost('send_html', 'intval', 0);
+			$context['send_pm'] = $this->_req->getPost('send_pm', 'isset', false);
+			$context['send_html'] = $this->_req->getPost('send_html', 'isset', false);
 
 			prepareMailingForPreview();
 			return null;
@@ -551,12 +551,12 @@ class ManageNews_Controller extends Action_Controller
 
 		// Where are we actually to?
 		$context['start'] = $this->_req->getPost('start', 'intval', 0);
-		$context['email_force'] = $this->_req->getPost('email_force', 'intval', 0);
+		$context['email_force'] = $this->_req->getPost('email_force', 'isset', false);
 		$context['total_emails'] = $this->_req->getPost('total_emails', 'intval', 0);
 		$context['max_id_member'] = $this->_req->getPost('max_id_member', 'intval', 0);
-		$context['send_pm'] = $this->_req->getPost('send_pm', 'intval', 0);
-		$context['send_html'] = $this->_req->getPost('send_html', 'intval', 0);
-		$context['parse_html'] = $this->_req->getPost('parse_html', 'intval', 0);
+		$context['send_pm'] = $this->_req->getPost('send_pm', 'isset', false);
+		$context['send_html'] = $this->_req->getPost('send_html', 'isset', false);
+		$context['parse_html'] = $this->_req->getPost('parse_html', 'isset', false);
 
 		// Create our main context.
 		$context['recipients'] = array(
@@ -651,10 +651,10 @@ class ManageNews_Controller extends Action_Controller
 		$context['message'] = htmlspecialchars($base_message, ENT_COMPAT, 'UTF-8');
 
 		// Prepare the message for sending it as HTML
-		if (!$context['send_pm'] && !empty($this->_req->post->send_html))
+		if (!$context['send_pm'] && !empty($context['send_html']))
 		{
 			// Prepare the message for HTML.
-			if (!empty($this->_req->post->parse_html))
+			if (!empty($context['parse_html']))
 				$base_message = str_replace(array("\n", '  '), array('<br />' . "\n", '&nbsp; '), $base_message);
 
 			// This is here to prevent spam filters from tagging this as spam.
@@ -685,14 +685,14 @@ class ManageNews_Controller extends Action_Controller
 		);
 
 		// We might need this in a bit
-		$cleanLatestMember = empty($this->_req->post->send_html) || $context['send_pm'] ? un_htmlspecialchars($modSettings['latestRealName']) : $modSettings['latestRealName'];
+		$cleanLatestMember = empty($context['send_html']) || $context['send_pm'] ? un_htmlspecialchars($modSettings['latestRealName']) : $modSettings['latestRealName'];
 
 		// Replace in all the standard things.
 		$base_message = str_replace($variables,
 			array(
-				!empty($this->_req->post->send_html) ? '<a href="' . $scripturl . '">' . $scripturl . '</a>' : $scripturl,
+				!empty($context['send_html']) ? '<a href="' . $scripturl . '">' . $scripturl . '</a>' : $scripturl,
 				standardTime(forum_time(), false),
-				!empty($this->_req->post->send_html) ? '<a href="' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . '">' . $cleanLatestMember . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . ']' . $cleanLatestMember . '[/url]' : $cleanLatestMember),
+				!empty($context['send_html']) ? '<a href="' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . '">' . $cleanLatestMember . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . ']' . $cleanLatestMember . '[/url]' : $cleanLatestMember),
 				$modSettings['latestMember'],
 				$cleanLatestMember
 			), $base_message);
@@ -730,12 +730,12 @@ class ManageNews_Controller extends Action_Controller
 
 			$to_member = array(
 				$email,
-				!empty($this->_req->post->send_html) ? '<a href="mailto:' . $email . '">' . $email . '</a>' : $email,
+				!empty($context['send_html']) ? '<a href="mailto:' . $email . '">' . $email . '</a>' : $email,
 				'??',
 				$email
 			);
 
-			sendmail($email, str_replace($from_member, $to_member, $base_subject), str_replace($from_member, $to_member, $base_message), null, null, !empty($this->_req->post->send_html), 5);
+			sendmail($email, str_replace($from_member, $to_member, $base_subject), str_replace($from_member, $to_member, $base_message), null, null, !empty($context['send_html']), 5);
 
 			// Done another...
 			$i++;
@@ -816,13 +816,13 @@ class ManageNews_Controller extends Action_Controller
 					continue;
 
 				// We might need this
-				$cleanMemberName = empty($this->_req->post->send_html) || $context['send_pm'] ? un_htmlspecialchars($row['real_name']) : $row['real_name'];
+				$cleanMemberName = empty($context['send_html']) || $context['send_pm'] ? un_htmlspecialchars($row['real_name']) : $row['real_name'];
 
 				// Replace the member-dependant variables
 				$message = str_replace($from_member,
 					array(
 						$row['email_address'],
-						!empty($this->_req->post->send_html) ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $cleanMemberName . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $row['id_member'] . ']' . $cleanMemberName . '[/url]' : $cleanMemberName),
+						!empty($context['send_html']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $cleanMemberName . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $row['id_member'] . ']' . $cleanMemberName . '[/url]' : $cleanMemberName),
 						$row['id_member'],
 						$cleanMemberName,
 					), $base_message);
@@ -837,7 +837,7 @@ class ManageNews_Controller extends Action_Controller
 
 				// Send the actual email - or a PM!
 				if (!$context['send_pm'])
-					sendmail($row['email_address'], $subject, $message, null, null, !empty($this->_req->post->send_html), 5);
+					sendmail($row['email_address'], $subject, $message, null, null, !empty($context['send_html']), 5);
 				else
 					sendpm(array('to' => array($row['id_member']), 'bcc' => array()), $subject, $message);
 			}
