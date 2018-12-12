@@ -547,18 +547,7 @@ class ManageSearch_Controller extends Action_Controller
 		{
 			checkSession();
 			validateToken('admin-mssphinx');
-
-			updateSettings(array(
-				'sphinx_index_prefix' => rtrim($this->_req->post->sphinx_index_prefix, '/'),
-				'sphinx_data_path' => rtrim($this->_req->post->sphinx_data_path, '/'),
-				'sphinx_log_path' => rtrim($this->_req->post->sphinx_log_path, '/'),
-				'sphinx_stopword_path' => $this->_req->post->sphinx_stopword_path,
-				'sphinx_indexer_mem' => (int) $this->_req->post->sphinx_indexer_mem,
-				'sphinx_searchd_server' => $this->_req->post->sphinx_searchd_server,
-				'sphinx_searchd_port' => (int) $this->_req->post->sphinx_searchd_port,
-				'sphinxql_searchd_port' => (int) $this->_req->post->sphinxql_searchd_port,
-				'sphinx_max_results' => (int) $this->_req->post->sphinx_max_results,
-			));
+			$this->_saveSphinxConfig();
 		}
 		// Checking if we can connect?
 		elseif (isset($this->_req->post->checkconnect))
@@ -633,6 +622,8 @@ class ManageSearch_Controller extends Action_Controller
 		{
 			checkSession();
 			validateToken('admin-mssphinx');
+			$this->_saveSphinxConfig();
+
 			require_once(SUBSDIR . '/ManageSearch.subs.php');
 
 			createSphinxConfig();
@@ -644,6 +635,26 @@ class ManageSearch_Controller extends Action_Controller
 		$context['page_description'] = $txt['sphinx_description'];
 		$context['sub_template'] = 'manage_sphinx';
 		createToken('admin-mssphinx');
+	}
+
+	/**
+	 * Save the form values in modsettings
+	 *
+	 * @throws \Elk_Exception
+	 */
+	private function _saveSphinxConfig()
+	{
+		updateSettings(array(
+			'sphinx_index_prefix' => rtrim($this->_req->post->sphinx_index_prefix, '/'),
+			'sphinx_data_path' => rtrim($this->_req->post->sphinx_data_path, '/'),
+			'sphinx_log_path' => rtrim($this->_req->post->sphinx_log_path, '/'),
+			'sphinx_stopword_path' => $this->_req->post->sphinx_stopword_path,
+			'sphinx_indexer_mem' => (int) $this->_req->post->sphinx_indexer_mem,
+			'sphinx_searchd_server' => $this->_req->post->sphinx_searchd_server,
+			'sphinx_searchd_port' => (int) $this->_req->post->sphinx_searchd_port,
+			'sphinxql_searchd_port' => (int) $this->_req->post->sphinxql_searchd_port,
+			'sphinx_max_results' => (int) $this->_req->post->sphinx_max_results,
+		));
 	}
 
 	/**
