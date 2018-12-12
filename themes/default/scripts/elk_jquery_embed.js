@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.6
  *
  * Original code from Aziz, redone and refactored for ElkArte
  */
@@ -11,17 +11,21 @@
 /**
  * This javascript searches the message for video links and replaces them
  * with a clickable preview thumbnail of the video.  Once the image is clicked
- * the video is embeded in to the page to play.
+ * the video is embedded in to the page to play.
  *
  * Currently works with youtube, vimeo and dailymotion
  *
- * @param {object} oInstanceSettings holds the text strings to use in the html created
- * @param {int} msgid optional to only search for links in a specific id
  */
  (function($) {
 	'use strict';
+
+	/**
+	 * @param {object} oInstanceSettings holds the text strings to use in the html created
+	 * @param {int} msgid optional to only search for links in a specific id
+	 */
 	$.fn.linkifyvideo = function(oInstanceSettings, msgid) {
 		var oDefaultsSettings = {
+			embed_limit : 25,
 			preview_image : '',
 			ctp_video : '',
 			hide_video : '',
@@ -138,8 +142,11 @@
 		}
 
 		var domain_regex = /^[^:]*:\/\/(?:www\.)?([^\/]+)(\/.*)$/,
-			embed_html = '<div class="elk_video"><iframe width="640px" height="385px" style="max-width: 98%; max-height: auto;" src="{src}" frameborder="0" allowfullscreen></iframe></div>',
+			already_embedded = 0,
+			embed_html = '<div class="elk_video"><iframe width="640px" height="385px" style="max-width: 98%; max-height: 100%;" src="{src}" frameborder="0" allowfullscreen></iframe></div>',
 			handlers = {};
+
+		// Youtube and variants link handler
 		handlers['youtube.com'] = function(path, a, embed) {
 			var videoID = path.match(/\bv[=/]([^&#?$]+)/i) || path.match(/#p\/(?:a\/)?[uf]\/\d+\/([^?$]+)/i) || path.match(/(?:\/)([\w-]{11})/i);
 			if (!videoID || !(videoID = videoID[1]))
@@ -149,8 +156,8 @@
 			// http://youtu.be/lLOE3fBZcUU?t=1m37s when you click share underneath the video
 			// http://youtu.be/lLOE3fBZcUU?t=97 when you right click on a video and choose "Copy video URL at current time"
 			// For embedding, you need to use "?start=97" instead, so we have to convert t=1m37s to seconds while also supporting t=97
-			var startAt = path.match(/t=(?:([1-9]{1,2})h)?(?:([1-9]{1,2})m)?(?:([1-9]+)s?)/);
-			var startAtPar = '';
+			var startAt = path.match(/t=(?:([1-9]{1,2})h)?(?:([1-9]{1,2})m)?(?:([1-9]+)s?)/),
+				startAtPar = '';
 			if (startAt)
 			{
 				var startAtSeconds = 0;
@@ -175,6 +182,8 @@
 		};
 		handlers['m.youtube.com'] = handlers['youtube.com'];
 		handlers['youtu.be'] = handlers['youtube.com'];
+
+		// Vimeo link handler
 		handlers['vimeo.com'] = function(path, a, embed) {
 			var videoID = path.match(/^\/(\d+)/i);
 			if (!videoID || !(videoID = videoID[1]))
@@ -200,6 +209,8 @@
 
 			return [oSettings.vimeo, tag];
 		};
+
+		// Dailymotion link handler
 		handlers['dailymotion.com'] = function(path, a, embed) {
 			var videoID = path.match(/^\/(?:video|swf)\/([a-z0-9]{1,18})/i);
 			if (!videoID || !(videoID = videoID[1]))
@@ -234,7 +245,7 @@
 			links = $('[id^=msg_] a');
 
 		// Create the show/hide button
-		var showhideBtn = $('<a class="floatright" title="' + oSettings.hide_video + '"><img src="' + elk_images_url + '/selected.png"></a>').on('click', function() {
+		var showhideBtn = $('<a class="floatright" title="' + oSettings.hide_video + '"><img alt=">" src="' + elk_images_url + '/selected.png"></a>').on('click', function() {
 				var $img = $(this).find("img"),
 					$vid = $(this).parent().next();
 
@@ -267,14 +278,15 @@
 				args = null;
 
 			// One of our video provider domains?
-			if (m !== null && typeof(handlers[m[1]]) !== "undefined" && handlers[m[1]] !== null)
+			if (already_embedded < oSettings.embed_limit && m !== null && typeof(handlers[m[1]]) !== "undefined" && handlers[m[1]] !== null)
 			{
-				// Call the handeler and get the tag to insert
+				// Call the handler and get the tag to insert
 				handler = handlers[m[1]];
 
 				args = handler(m[2], tag, false);
 				if (args)
 				{
+					already_embedded++;
 					$(tag).wrap('<div class="elk_videoheader">').text(args[0]).after(showhideBtn.clone(true));
 					$(tag).parent().after(args[1]);
 				}
