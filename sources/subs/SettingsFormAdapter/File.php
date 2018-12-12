@@ -108,6 +108,7 @@ class File extends Db
 					if (in_array($varname, $safe_strings))
 					{
 						$new_setting['mask'] = 'nohtml';
+						$value = strtr($value, array(\Util::htmlspecialchars('<br />') => "\n"));
 					}
 					$modSettings[$configVar[0]] = $value;
 				}
@@ -298,7 +299,7 @@ class File extends Db
 			{
 				if (in_array($configVar, $safe_strings))
 				{
-					$this->new_settings[$configVar] = '\'' . addcslashes(\Util::htmlspecialchars($this->configValues[$configVar], ENT_QUOTES), '\'\\') . '\'';
+					$this->new_settings[$configVar] = '\'' . addcslashes(\Util::htmlspecialchars(strtr($this->configValues[$configVar], array("\n" => '<br />', "\r" => '')), ENT_QUOTES), '\'\\') . '\'';
 				}
 				else
 				{
