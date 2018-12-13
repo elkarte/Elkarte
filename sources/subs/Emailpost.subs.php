@@ -1134,7 +1134,7 @@ function quote_callback_2($matches)
 /**
  * Loads up the vital user information given an email address
  *
- * - Similar to loadMemberData, loadPermissions, loadUserSettings, but only loads a
+ * - Similar to \ElkArte\MembersList::load, loadPermissions, loadUserSettings, but only loads a
  * subset of that data, enough to validate that a user can make a post to a given board.
  * - Done this way to avoid over-writing user_info etc for those who are running
  * this function (on behalf of the email owner, similar to profile views etc)
@@ -1154,7 +1154,7 @@ function quote_callback_2($matches)
  */
 function query_load_user_info($email)
 {
-	global $user_profile, $modSettings, $language;
+	global $modSettings, $language;
 
 	$db = database();
 
@@ -1183,9 +1183,9 @@ function query_load_user_info($email)
 
 	// Load the users profile information
 	$pbe = array();
-	if (loadMemberData($id_member, false, 'profile'))
+	if (\ElkArte\MembersList::load($id_member, false, 'profile'))
 	{
-		$pbe['profile'] = $user_profile[$id_member];
+		$pbe['profile'] = \ElkArte\MembersList::get($id_member);
 
 		// Load in *some* user_info data just like loadUserSettings would do
 		if (empty($pbe['profile']['additional_groups']))

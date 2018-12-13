@@ -554,10 +554,10 @@ class News extends \ElkArte\AbstractController
 	 */
 	public function action_xmlprofile($xml_format)
 	{
-		global $scripturl, $memberContext, $user_profile, $modSettings, $user_info;
+		global $scripturl, $memberContext, $modSettings, $user_info;
 
 		// You must input a valid user....
-		if (empty($this->_req->query->u) || loadMemberData((int) $this->_req->query->u) === false)
+		if (empty($this->_req->query->u) || \ElkArte\MembersList::load((int) $this->_req->query->u) === false)
 			return array();
 
 		// Make sure the id is a number and not "I like trying to hack the database".
@@ -568,6 +568,7 @@ class News extends \ElkArte\AbstractController
 			return array();
 
 		$profile = &$memberContext[$uid];
+		$member = \ElkArte\MembersList::get($uid);
 
 		// No feed data yet
 		$data = array();
@@ -579,7 +580,7 @@ class News extends \ElkArte\AbstractController
 				'link' => $scripturl . '?action=profile;u=' . $profile['id'],
 				'description' => cdata_parse(isset($profile['group']) ? $profile['group'] : $profile['post_group']),
 				'comments' => $scripturl . '?action=pm;sa=send;u=' . $profile['id'],
-				'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $user_profile[$profile['id']]['date_registered']),
+				'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $member->date_registered),
 				'guid' => $scripturl . '?action=profile;u=' . $profile['id'],
 			));
 		}
@@ -602,8 +603,8 @@ class News extends \ElkArte\AbstractController
 					'email' => in_array(showEmailAddress(!empty($profile['hide_email']), $profile['id']), array('yes', 'yes_permission_override')) ? $profile['email'] : null,
 					'uri' => !empty($profile['website']) ? $profile['website']['url'] : ''
 				),
-				'published' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $user_profile[$profile['id']]['date_registered']),
-				'updated' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $user_profile[$profile['id']]['last_login']),
+				'published' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member->date_registered),
+				'updated' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member->last_login),
 				'id' => $scripturl . '?action=profile;u=' . $profile['id'],
 				'logo' => !empty($profile['avatar']) ? $profile['avatar']['url'] : '',
 			);
@@ -617,8 +618,8 @@ class News extends \ElkArte\AbstractController
 				'posts' => $profile['posts'],
 				'post-group' => cdata_parse($profile['post_group']),
 				'language' => cdata_parse($profile['language']),
-				'last-login' => gmdate('D, d M Y H:i:s \G\M\T', $user_profile[$profile['id']]['last_login']),
-				'registered' => gmdate('D, d M Y H:i:s \G\M\T', $user_profile[$profile['id']]['date_registered'])
+				'last-login' => gmdate('D, d M Y H:i:s \G\M\T', $member->last_login),
+				'registered' => gmdate('D, d M Y H:i:s \G\M\T', $member->date_registered)
 			);
 
 			// Everything below here might not be set, and thus maybe shouldn't be displayed.

@@ -143,7 +143,7 @@ class BadBehavior extends \ElkArte\AbstractController
 	 */
 	protected function _prepareFilters($filter)
 	{
-		global $context, $scripturl, $user_profile;
+		global $context, $scripturl;
 
 		$context['filter'] = $filter;
 
@@ -152,8 +152,9 @@ class BadBehavior extends \ElkArte\AbstractController
 		{
 			case 'id_member':
 				$id = $filter['value']['sql'];
-				loadMemberData($id, false, 'minimal');
-				$context['filter']['value']['html'] = '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $id, 'name' => $user_profile[$id]['real_name']]) . '">' . $user_profile[$id]['real_name'] . '</a>';
+				\ElkArte\MembersList::load($id, false, 'minimal');
+				$name = \ElkArte\MembersList::get($id)->real_name;
+				$context['filter']['value']['html'] = '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $id, 'name' => $name]) . '">' . $name . '</a>';
 				break;
 			case 'url':
 				$context['filter']['value']['html'] = '\'' . strtr(htmlspecialchars((substr($filter['value']['sql'], 0, 1) === '?' ? $scripturl : '') . $filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array('\_' => '_')) . '\'';

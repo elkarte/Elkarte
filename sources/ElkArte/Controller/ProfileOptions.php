@@ -35,7 +35,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 	private $_memID = 0;
 
 	/**
-	 * The array from $user_profile stored here to avoid some global
+	 * The array from \ElkArte\Member stored here to avoid some global
 	 * @var mixed[]
 	 */
 	private $_profile = [];
@@ -123,10 +123,8 @@ class ProfileOptions extends \ElkArte\AbstractController
 	 */
 	public function pre_dispatch()
 	{
-		global $user_profile;
-
 		$this->_memID = currentMemberID();
-		$this->_profile = $user_profile[$this->_memID];
+		$this->_profile = \ElkArte\MembersList::get($this->_memID);
 	}
 
 	/**
@@ -281,7 +279,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 		$context['buddy_count'] = count($buddies);
 
 		// Load all the members up.
-		loadMemberData($buddies, false, 'profile');
+		\ElkArte\MembersList::load($buddies, false, 'profile');
 
 		// Setup the context for each buddy.
 		$context['buddies'] = array();
@@ -384,7 +382,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 		$context['ignore_count'] = count($ignored);
 
 		// Load all the members up.
-		loadMemberData($ignored, false, 'profile');
+		\ElkArte\MembersList::load($ignored, false, 'profile');
 
 		// Setup the context for each buddy.
 		$context['ignore_list'] = array();

@@ -785,8 +785,6 @@ function UserStatsPollsVoted($memID)
  */
 function UserStatsMostPostedBoard($memID, $limit = 10)
 {
-	global $user_profile;
-
 	$db = database();
 
 	// Find the board this member spammed most often.
@@ -811,15 +809,16 @@ function UserStatsMostPostedBoard($memID, $limit = 10)
 	while ($row = $db->fetch_assoc($result))
 	{
 		$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
+		$posts = \ElkArte\MembersList::get($memID)->posts;
 		// Build the board details that this member is responsible for
 		$popular_boards[$row['id_board']] = array(
 			'id' => $row['id_board'],
 			'posts' => $row['message_count'],
 			'href' => $href,
 			'link' => '<a href="' . $href . '">' . $row['name'] . '</a>',
-			'posts_percent' => $user_profile[$memID]['posts'] == 0 ? 0 : ($row['message_count'] * 100) / $user_profile[$memID]['posts'],
+			'posts_percent' => $posts == 0 ? 0 : ($row['message_count'] * 100) / $posts,
 			'total_posts' => $row['num_posts'],
-			'total_posts_member' => $user_profile[$memID]['posts'],
+			'total_posts_member' => $posts,
 		);
 	}
 	$db->free_result($result);

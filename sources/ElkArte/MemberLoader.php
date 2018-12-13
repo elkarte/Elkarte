@@ -32,6 +32,7 @@ class MemberLoader
 	protected $base_select_columns = '';
 	protected $base_select_tables = '';
 	protected $loaded_ids = [];
+	protected $loaded_members = [];
 
 	public function __construct($db, $cache, $list, $options = [])
 	{
@@ -70,12 +71,15 @@ class MemberLoader
 		$this->set = $set;
 		$users = array_unique((array) $users);
 		$this->loaded_ids = [];
+		$this->loaded_members = [];
 
 		$to_load = $this->loadFromCache($users);
 
 		$this->loadByCondition('mem.id_member' . (count($to_load) == 1 ? ' = {int:users}' : ' IN ({array_int:users})'), $to_load);
 
 		$this->loadModerators();
+
+		return $this->loaded_ids;
 	}
 
 	public function loadByName($name,  $set = 'normal')
@@ -93,6 +97,8 @@ class MemberLoader
 		$this->loadByCondition('{column_case_insensitive:col_member_name}' . (count($users) == 1 ? ' = {string_case_insensitive:users}' : ' IN ({array_string_case_insensitive:users})'), $users);
 
 		$this->loadModerators();
+
+		return $this->loaded_ids;
 	}
 
 	protected function loadFromCache($users)
@@ -120,6 +126,7 @@ class MemberLoader
 				}
 				$this->users_list->add($member, $data['data']['id_member']);
 				$this->loaded_ids[] = $data['data']['id_member'];
+				$this->loaded_members[$data['data']['id_member']] = $member;
 			}
 		}
 		return $to_load;
@@ -143,7 +150,7 @@ class MemberLoader
 			return;
 		}
 
-		$temp_mods = array_intersect($loaded_ids, array_keys($board_info['moderators']));
+		$temp_mods = array_intersect($this->loaded_ids, array_keys($board_info['moderators']));
 		if (count($temp_mods) !== 0)
 		{
 			$group_info = array();
@@ -158,14 +165,20 @@ class MemberLoader
 			foreach ($temp_mods as $id)
 			{
 				// By popular demand, don't show admins or global moderators as moderators.
-				if ($user_profile[$id]['id_group'] != 1 && $user_profile[$id]['id_group'] != 2)
-					$user_profile[$id]['member_group'] = $group_info['group_name'];
+				if ($this->loaded_members[$id]['id_group'] != 1 && $this->loaded_members[$id]['id_group'] != 2)
+				{
+					$this->loaded_members[$id]['member_group'] = $group_info['group_name'];
+				}
 
 				// If the Moderator group has no color or icons, but their group does... don't overwrite.
 				if (!empty($group_info['icons']))
-					$user_profile[$id]['icons'] = $group_info['icons'];
+				{
+					$this->loaded_members[$id]['icons'] = $group_info['icons'];
+				}
 				if (!empty($group_info['online_color']))
-					$user_profile[$id]['member_group_color'] = $group_info['online_color'];
+				{
+					$this->loaded_members[$id]['member_group_color'] = $group_info['online_color'];
+				}
 			}
 		}
 	}
@@ -174,7 +187,7 @@ class MemberLoader
 	{
 		if (empty($to_load))
 		{
-			return [];
+			return false;
 		}
 
 		$select_columns = $this->base_select_columns;
@@ -199,7 +212,7 @@ class MemberLoader
 				$select_tables = '';
 				break;
 			default:
-				trigger_error('loadMemberData(): Invalid member data set \'' . $this->set . '\'', E_USER_WARNING);
+				trigger_error('\ElkArte\MembersList::load(): Invalid member data set \'' . $this->set . '\'', E_USER_WARNING);
 		}
 
 		// Allow addons to easily add to the selected member data
@@ -236,7 +249,7 @@ class MemberLoader
 			$this->storeInCache($new_loaded_ids);
 		}
 
-		return $new_loaded_ids;
+		return !empty($new_loaded_ids);
 	}
 
 	protected function loadCustomFields($new_loaded_ids)

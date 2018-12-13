@@ -183,7 +183,7 @@ class Who extends \ElkArte\AbstractController
 		}
 
 		// Load the user data for these members.
-		loadMemberData($member_ids);
+		\ElkArte\MembersList::load($member_ids);
 
 		// Load up the guest user.
 		$memberContext[0] = array(

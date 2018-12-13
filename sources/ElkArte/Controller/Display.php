@@ -466,7 +466,9 @@ class Display extends \ElkArte\AbstractController
 
 			// What?  It's not like it *couldn't* be only guests in this topic...
 			if (!empty($posters))
-				loadMemberData($posters);
+			{
+				\ElkArte\MembersList::load($posters);
+			}
 
 			// Load in the likes for this group of messages
 			if (!empty($modSettings['likes_enabled']))

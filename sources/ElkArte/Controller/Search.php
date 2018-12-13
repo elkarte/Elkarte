@@ -409,7 +409,9 @@ class Search extends \ElkArte\AbstractController
 			call_integration_hook('integrate_search_message_list', array(&$msg_list, &$posters));
 
 			if (!empty($posters))
-				loadMemberData(array_unique($posters));
+			{
+				\ElkArte\MembersList::load(array_unique($posters));
+			}
 
 			// Get the messages out for the callback - select enough that it can be made to look just like Display.
 			$messages_request = $this->_search->loadMessagesRequest($msg_list, count($context['topics']));

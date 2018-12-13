@@ -625,7 +625,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			$posters = array_unique($posters);
 			if (!empty($posters))
 			{
-				loadMemberData($posters);
+				\ElkArte\MembersList::load($posters);
 			}
 
 			// If we're on grouped/restricted view get a restricted list of messages.
@@ -1793,13 +1793,13 @@ class PersonalMessage extends \ElkArte\AbstractController
 	 */
 	public function action_settings()
 	{
-		global $txt, $user_info, $context, $scripturl, $profile_vars, $cur_profile, $user_profile;
+		global $txt, $user_info, $context, $scripturl, $profile_vars, $cur_profile;
 
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		// Load the member data for editing
-		loadMemberData($user_info['id'], false, 'profile');
-		$cur_profile = $user_profile[$user_info['id']];
+		\ElkArte\MembersList::load($user_info['id'], false, 'profile');
+		$cur_profile = \ElkArte\MembersList::get($user_info['id']);
 
 		// Load up the profile template, its where PM settings are located
 		theme()->getTemplates()->loadLanguageFile('Profile');
@@ -1843,8 +1843,8 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 			// Invalidate any cached data and reload so we show the saved values
 			\ElkArte\Cache\Cache::instance()->remove('member_data-profile-' . $user_info['id']);
-			loadMemberData($user_info['id'], false, 'profile');
-			$cur_profile = $user_profile[$user_info['id']];
+			\ElkArte\MembersList::load($user_info['id'], false, 'profile');
+			$cur_profile = \ElkArte\MembersList::get($user_info['id']);
 		}
 
 		// Load up the fields.
@@ -2467,7 +2467,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		$posters = array_unique($posters);
 		if (!empty($posters))
 		{
-			loadMemberData($posters);
+			\ElkArte\MembersList::load($posters);
 		}
 
 		// Sort out the page index.

@@ -31,7 +31,7 @@ class ProfileInfo extends \ElkArte\AbstractController
 	private $_memID = 0;
 
 	/**
-	 * The array from $user_profile stored here to avoid some global
+	 * The array from \ElkArte\Member stored here to avoid some global
 	 * @var mixed[]
 	 */
 	private $_profile = [];
@@ -51,12 +51,12 @@ class ProfileInfo extends \ElkArte\AbstractController
 	 */
 	public function pre_dispatch()
 	{
-		global $context, $user_info, $user_profile;
+		global $context, $user_info;
 
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		$this->_memID = currentMemberID();
-		$this->_profile = $user_profile[$this->_memID];
+		$this->_profile = \ElkArte\MembersList::get($this->_memID);
 
 		if (!isset($context['user']['is_owner']))
 		{
@@ -348,7 +348,7 @@ class ProfileInfo extends \ElkArte\AbstractController
 			&& !empty($user_info['buddies'])
 			&& in_array('buddies', $this->_summary_areas))
 		{
-			loadMemberData($user_info['buddies'], false, 'profile');
+			\ElkArte\MembersList::load($user_info['buddies'], false, 'profile');
 
 			// Get the info for this buddy
 			foreach ($user_info['buddies'] as $buddy)

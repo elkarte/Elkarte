@@ -300,6 +300,9 @@ class Bootstrap
 		// Let's set up our shiny new hooks handler.
 		\ElkArte\Hooks::init(database(), \ElkArte\Debug::instance());
 
+		// Make sure we have ready the list of members for populating it
+		\ElkArte\MembersList::init(database(), \ElkArte\Cache::instance());
+
 		// It's time for settings loaded from the database.
 		reloadSettings();
 

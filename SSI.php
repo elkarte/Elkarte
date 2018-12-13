@@ -921,7 +921,7 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 	}
 
 	// Load the members.
-	loadMemberData($members);
+	\ElkArte\MembersList::load($members);
 
 	// Draw the table!
 	if ($output_method === 'echo')

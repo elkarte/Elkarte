@@ -334,7 +334,7 @@ function printMemberListRows($request)
 		$members[] = $row['id_member'];
 
 	// Load all the members for display.
-	loadMemberData($members);
+	\ElkArte\MembersList::load($members);
 
 	$bbc_parser = \BBC\ParserWrapper::instance();
 

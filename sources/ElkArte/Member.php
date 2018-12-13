@@ -21,11 +21,9 @@ namespace ElkArte;
  * This class collects all the data related to a certain member extracted
  * from the db
  */
-class Member
+class Member extends \ElkArte\ValuesContainer
 {
 	protected $set = '';
-	protected $data = [];
-	protected $additional_data = [];
 
 	public function __construct($data, $set)
 	{
@@ -35,7 +33,23 @@ class Member
 
 	public function append($type, $data)
 	{
-		$this->additional_data[$type] = $data;
+		$this->data[$type] = $data;
+	}
+
+	public function get($item)
+	{
+		if (isset($this->data[$item]))
+		{
+			return $this->data[$item];
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	public function getContext($id)
+	{
 	}
 
 	public function toArray()
@@ -43,7 +57,6 @@ class Member
 		return [
 			'set' => $this->set,
 			'data' => $this->data,
-			'additional_data' => $this->additional_data
 		];
 	}
 }

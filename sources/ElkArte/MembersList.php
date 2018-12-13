@@ -35,19 +35,23 @@ class MembersList
 	{
 		if ($is_name === true)
 		{
-			$members = self::$loader->loadByName($users, $set);
+			$result = self::$loader->loadByName($users, $set);
 		}
 		else
 		{
-			$members = self::$loader->loadById($users, $set);
+			$result = self::$loader->loadById($users, $set);
 		}
-		foreach ($members as $member)
-		{
-			self::$members[$member->getId()] = $member;
-		}
+
+		return !empty($result) ? $result : false;
 	}
 
-	public function add($member_data, $id)
+	public static function get($id)
+	{
+		$member = self::$instance->getById($id);
+		return $member === false ? new \ElkArte\ValuesContainer() : $member;
+	}
+
+	public static function add($member_data, $id)
 	{
 		self::$members[$id] = $member_data;
 	}
