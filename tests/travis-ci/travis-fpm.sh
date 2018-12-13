@@ -3,7 +3,7 @@
 set -e
 set +x
 
-owner=$USER
+owner=${USER}
 phpversionname="$1"
 
 echo "Preparing PHP-FPM"
@@ -13,7 +13,7 @@ file="/home/${owner}/.phpenv/versions/${phpversionname}/etc/php-fpm.conf"
 cp /home/${owner}/.phpenv/versions/${phpversionname}/etc/php-fpm.conf.default /home/${owner}/.phpenv/versions/${phpversionname}/etc/php-fpm.conf
 
 # Check if we should using www.conf instead
-if [ -f /home/${owner}/.phpenv/versions/${phpversionname}/etc/php-fpm.d/www.conf.default ]
+if [[ -f /home/${owner}/.phpenv/versions/${phpversionname}/etc/php-fpm.d/www.conf.default ]]
 then
 	cp /home/${owner}/.phpenv/versions/${phpversionname}/etc/php-fpm.d/www.conf.default /home/${owner}/.phpenv/versions/${phpversionname}/etc/php-fpm.d/www.conf
 	file=/home/${owner}/.phpenv/versions/${phpversionname}/etc/php-fpm.d/www.conf

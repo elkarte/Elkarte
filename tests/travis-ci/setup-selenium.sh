@@ -29,7 +29,7 @@ CHROMEDRIVER_DOWNLOAD_URL=https://chromedriver.storage.googleapis.com/2.9/chrome
 CHROMEDRIVER_ZIP=/tmp/chromedriver.zip
 
 # If this is a web test run then we need to enable selenium
-if [ "$WEBTESTS" == "true" ]
+if [[ "$WEBTESTS" == "true" ]]
 then
 	echo "Downloading Selenium Server"
     sudo mkdir -p $(dirname "$WEBTESTS_JAR")
@@ -41,7 +41,7 @@ then
     wget --retry-connrefused --tries=120 --waitretry=3 --output-file=/dev/null "$WEBTESTS_HUB_URL/wd/hub/status" -O /dev/null
 
     # Test to see if the selenium server really did start
-    if [ ! $? -eq 0 ]
+    if [[ ! $? -eq 0 ]]
     then
         echo "Selenium Failed"
     else
