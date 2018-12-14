@@ -445,7 +445,7 @@ class Maintenance extends \ElkArte\AbstractController
 		// Honestly, this should be done in the sub function.
 		validateToken('admin-maint');
 
-		$controller = new \ElkArte\AdminController\RepairBoards(new \ElkArte\EventManager());
+		$controller = new RepairBoards(new \ElkArte\EventManager());
 		$controller->pre_dispatch();
 		$controller->action_repairboards();
 	}

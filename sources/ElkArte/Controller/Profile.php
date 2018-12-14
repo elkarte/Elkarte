@@ -626,13 +626,13 @@ class Profile extends \ElkArte\AbstractController
 			// Now call the sub-action function...
 			if ($this->_current_area === 'activateaccount' && empty($post_errors))
 			{
-				$controller = new \ElkArte\Controller\ProfileAccount(new \ElkArte\EventManager());
+				$controller = new ProfileAccount(new \ElkArte\EventManager());
 				$controller->pre_dispatch();
 				$controller->action_activateaccount();
 			}
 			elseif ($this->_current_area === 'deleteaccount' && empty($post_errors))
 			{
-				$controller = new \ElkArte\Controller\ProfileAccount(new \ElkArte\EventManager());
+				$controller = new ProfileAccount(new \ElkArte\EventManager());
 				$controller->pre_dispatch();
 				$controller->action_deleteaccount2();
 
@@ -641,7 +641,7 @@ class Profile extends \ElkArte\AbstractController
 			}
 			elseif ($this->_current_area === 'groupmembership' && empty($post_errors))
 			{
-				$controller = new \ElkArte\Controller\ProfileOptions(new \ElkArte\EventManager());
+				$controller = new ProfileOptions(new \ElkArte\EventManager());
 				$controller->pre_dispatch();
 				$msg = $controller->action_groupMembership2();
 
@@ -651,7 +651,7 @@ class Profile extends \ElkArte\AbstractController
 			// Authentication changes?
 			elseif ($this->_current_area === 'authentication')
 			{
-				$controller = new \ElkArte\Controller\ProfileOptions(new \ElkArte\EventManager());
+				$controller = new ProfileOptions(new \ElkArte\EventManager());
 				$controller->pre_dispatch();
 				$controller->action_authentication(true);
 			}
@@ -662,11 +662,11 @@ class Profile extends \ElkArte\AbstractController
 
 				if ($this->_current_area === 'account' && !empty($modSettings['enableOTP']))
 				{
-					$fields = \ElkArte\Controller\ProfileOptions::getFields('account_otp');
+					$fields = ProfileOptions::getFields('account_otp');
 				}
 				else
 				{
-					$fields = \ElkArte\Controller\ProfileOptions::getFields($this->_current_area);
+					$fields = ProfileOptions::getFields($this->_current_area);
 				}
 
 				saveProfileFields($fields['fields'], $fields['hook']);

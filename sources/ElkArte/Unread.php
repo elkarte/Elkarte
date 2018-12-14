@@ -298,7 +298,7 @@ class Unread
 			$topics[] = $row;
 		$this->_db->free_result($request);
 
-		return \ElkArte\TopicUtil::prepareContext($topics, true, ((int) $this->_preview_bodies) + 128);
+		return TopicUtil::prepareContext($topics, true, ((int) $this->_preview_bodies) + 128);
 	}
 
 	/**
@@ -507,7 +507,7 @@ class Unread
 			$return[] = $row;
 		$this->_db->free_result($request);
 
-		return \ElkArte\TopicUtil::prepareContext($return, true, ((int) $this->_preview_bodies) + 128);
+		return TopicUtil::prepareContext($return, true, ((int) $this->_preview_bodies) + 128);
 	}
 
 	/**

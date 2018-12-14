@@ -45,7 +45,7 @@ abstract class AbstractController
 	public function __construct($eventManager)
 	{
 		// Dependency injection will come later
-		$this->_req = \ElkArte\HttpReq::instance();
+		$this->_req = HttpReq::instance();
 
 		$this->_events = $eventManager;
 	}

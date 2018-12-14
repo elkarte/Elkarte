@@ -142,7 +142,7 @@ class UnZip
 
 		// This function sorta needs gzinflate!
 		if (!function_exists('gzinflate'))
-			throw new \ElkArte\Exceptions\Exception('package_no_zlib', 'critical');
+			throw new Exceptions\Exception('package_no_zlib', 'critical');
 
 		// Make sure we have this loaded.
 		theme()->getTemplates()->loadLanguageFile('Packages');

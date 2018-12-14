@@ -145,7 +145,7 @@ class DataValidator
 	 */
 	public static function is_valid(&$data = array(), $validation_rules = array(), $sanitation_rules = array())
 	{
-		$validator = new \ElkArte\DataValidator();
+		$validator = new DataValidator();
 
 		// Set the rules
 		$validator->sanitation_rules($sanitation_rules);
@@ -391,7 +391,7 @@ class DataValidator
 			return;
 
 		// Start a new instance of the validator to work on this sub data (csv/array)
-		$sub_validator = new \ElkArte\DataValidator();
+		$sub_validator = new DataValidator();
 
 		$fields = array();
 		$validation_rules = array();
@@ -535,7 +535,7 @@ class DataValidator
 	private function _sanitize_recursive($input, $field, $rules)
 	{
 		// create a new instance to run against this sub data
-		$validator = new \ElkArte\DataValidator();
+		$validator = new DataValidator();
 
 		$fields = array();
 		$sanitation_rules = array();
@@ -829,7 +829,7 @@ class DataValidator
 		if (!isset($input[$field]))
 			return;
 
-		if (\ElkArte\Util::strlen($input[$field]) <= (int) $validation_parameters)
+		if (Util::strlen($input[$field]) <= (int) $validation_parameters)
 			return;
 
 		return array(
@@ -856,7 +856,7 @@ class DataValidator
 		if (!isset($input[$field]))
 			return;
 
-		if (\ElkArte\Util::strlen($input[$field]) >= (int) $validation_parameters)
+		if (Util::strlen($input[$field]) >= (int) $validation_parameters)
 			return;
 
 		return array(
@@ -883,7 +883,7 @@ class DataValidator
 		if (!isset($input[$field]))
 			return;
 
-		if (\ElkArte\Util::strlen($input[$field]) == (int) $validation_parameters)
+		if (Util::strlen($input[$field]) == (int) $validation_parameters)
 			return;
 
 		return array(
@@ -1360,13 +1360,13 @@ class DataValidator
 	 *
 	 * @param string $input
 	 *
-	 * @return null|string|string[]|void
+	 * @return null|string|string[]
 	 */
 	protected function _sanitation_cleanhtml($input)
 	{
 		if (!isset($input))
 			return;
 
-		return \ElkArte\Util::htmlspecialchars($input);
+		return Util::htmlspecialchars($input);
 	}
 }

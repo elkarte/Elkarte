@@ -41,7 +41,7 @@ class Suggest
 	 */
 	public function __construct($search, $params)
 	{
-		$this->_search = trim(\ElkArte\Util::strtolower($search)) . '*';
+		$this->_search = trim(Util::strtolower($search)) . '*';
 		$this->_params = $params;
 	}
 

@@ -73,9 +73,9 @@ class CalendarEvent
 		{
 			// Make sure it's turned on and not some fool trying to trick it.
 			if (empty($this->_settings['cal_allowspan']))
-				throw new \ElkArte\Exceptions\Exception('no_span', false);
+				throw new Exceptions\Exception('no_span', false);
 			if ($event['span'] < 1 || $event['span'] > $this->_settings['cal_maxspan'])
-				throw new \ElkArte\Exceptions\Exception('invalid_days_numb', false);
+				throw new Exceptions\Exception('invalid_days_numb', false);
 		}
 
 
@@ -84,34 +84,34 @@ class CalendarEvent
 		{
 			// No month?  No year?
 			if (!isset($event['month']))
-				throw new \ElkArte\Exceptions\Exception('event_month_missing', false);
+				throw new Exceptions\Exception('event_month_missing', false);
 			if (!isset($event['year']))
-				throw new \ElkArte\Exceptions\Exception('event_year_missing', false);
+				throw new Exceptions\Exception('event_year_missing', false);
 
 			// Check the month and year...
 			if ($event['month'] < 1 || $event['month'] > 12)
-				throw new \ElkArte\Exceptions\Exception('invalid_month', false);
+				throw new Exceptions\Exception('invalid_month', false);
 			if ($event['year'] < $this->_settings['cal_minyear'] || $event['year'] > date('Y') + $this->_settings['cal_limityear'])
-				throw new \ElkArte\Exceptions\Exception('invalid_year', false);
+				throw new Exceptions\Exception('invalid_year', false);
 
 			// No day?
 			if (!isset($event['day']))
-				throw new \ElkArte\Exceptions\Exception('event_day_missing', false);
+				throw new Exceptions\Exception('event_day_missing', false);
 
 			if (!isset($event['evtitle']) && !isset($event['subject']))
-				throw new \ElkArte\Exceptions\Exception('event_title_missing', false);
+				throw new Exceptions\Exception('event_title_missing', false);
 			elseif (!isset($event['evtitle']))
 				$event['evtitle'] = $event['subject'];
 
 			// Bad day?
 			if (!checkdate($event['month'], $event['day'], $event['year']))
-				throw new \ElkArte\Exceptions\Exception('invalid_date', false);
+				throw new Exceptions\Exception('invalid_date', false);
 
 			// No title?
-			if (\ElkArte\Util::htmltrim($event['evtitle']) === '')
-				throw new \ElkArte\Exceptions\Exception('no_event_title', false);
-			if (\ElkArte\Util::strlen($event['evtitle']) > 100)
-				$event['evtitle'] = \ElkArte\Util::substr($event['evtitle'], 0, 100);
+			if (Util::htmltrim($event['evtitle']) === '')
+				throw new Exceptions\Exception('no_event_title', false);
+			if (Util::strlen($event['evtitle']) > 100)
+				$event['evtitle'] = Util::substr($event['evtitle'], 0, 100);
 			$event['evtitle'] = str_replace(';', '', $event['evtitle']);
 		}
 
@@ -129,7 +129,7 @@ class CalendarEvent
 		$eventOptions = array(
 			'id_board' => isset($options['id_board']) ? $options['id_board'] : 0,
 			'id_topic' => isset($options['id_topic']) ? $options['id_topic'] : 0,
-			'title' => \ElkArte\Util::substr($options['evtitle'], 0, 100),
+			'title' => Util::substr($options['evtitle'], 0, 100),
 			'member' => $member_id,
 			'start_date' => sprintf('%04d-%02d-%02d', $options['year'], $options['month'], $options['day']),
 			'span' => isset($options['span']) && $options['span'] > 0 ? min((int) $this->_settings['cal_maxspan'], (int) $options['span'] - 1) : 0,
@@ -169,7 +169,7 @@ class CalendarEvent
 			$span = min((int) $this->_settings['cal_maxspan'], (int) $options['span'] - 1);
 
 		$eventOptions = array(
-			'title' => \ElkArte\Util::substr($options['evtitle'], 0, 100),
+			'title' => Util::substr($options['evtitle'], 0, 100),
 			'span' => $span,
 			'start_date' => strftime('%Y-%m-%d', mktime(0, 0, 0, (int) $options['month'], (int) $options['day'], (int) $options['year'])),
 			'id_board' => isset($eventProperties['id_board']) ? (int) $eventProperties['id_board'] : 0,
@@ -218,7 +218,7 @@ class CalendarEvent
 			$event = getEventProperties($this->_event_id);
 
 			if ($event === false)
-				throw new \ElkArte\Exceptions\Exception('no_access', false);
+				throw new Exceptions\Exception('no_access', false);
 
 			// If it has a board, then they should be editing it within the topic.
 			if (!empty($event['topic']['id']) && !empty($event['topic']['first_msg']))

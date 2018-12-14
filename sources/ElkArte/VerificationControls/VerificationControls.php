@@ -85,7 +85,7 @@ class VerificationControls
 			try
 			{
 				$obj = new $class(array());
-				if ($obj instanceof \ElkArte\VerificationControls\VerificationControl\ControlInterface)
+				if ($obj instanceof VerificationControl\ControlInterface)
 				{
 					$new_settings = $obj->settings();
 					$working_verifications[] = $verification;
@@ -198,7 +198,7 @@ class VerificationControls
 				$this->_verification_options['render'] = true;
 			}
 		}
-	
+
 		return array(
 			'id' => $this->_verification_options['id'],
 			'max_errors' => isset($this->_verification_options['max_errors']) ? $this->_verification_options['max_errors'] : 3,

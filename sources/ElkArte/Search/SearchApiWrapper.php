@@ -166,7 +166,7 @@ class SearchApiWrapper
 	 *
 	 * @param \ElkArte\Search\SearchArray $searchArray
 	 */
-	public function setSearchArray(\ElkArte\Search\SearchArray $searchArray)
+	public function setSearchArray(SearchArray $searchArray)
 	{
 		$this->_searchAPI->setSearchArray($searchArray);
 	}
@@ -202,7 +202,7 @@ class SearchApiWrapper
 	 *
 	 * @param \ElkArte\Search\WeightFactors $weights
 	 */
-	public function setWeightFactors(\ElkArte\Search\WeightFactors $weights)
+	public function setWeightFactors(WeightFactors $weights)
 	{
 		$this->_searchAPI->setWeightFactors($weights);
 	}

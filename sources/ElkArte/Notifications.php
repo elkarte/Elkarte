@@ -85,7 +85,7 @@ class Notifications extends AbstractModel
 	 *
 	 * @param \ElkArte\NotificationsTask $task
 	 */
-	public function add(\ElkArte\NotificationsTask $task)
+	public function add(NotificationsTask $task)
 	{
 		$this->_to_send[] = $task;
 	}
@@ -142,7 +142,7 @@ class Notifications extends AbstractModel
 	{
 		if (isset($this->_notifiers[$key]))
 		{
-			throw new \ElkArte\Exceptions\Exception('error_invalid_notification_id');
+			throw new Exceptions\Exception('error_invalid_notification_id');
 		}
 
 		$this->_notifiers[$key] = array(
@@ -170,7 +170,7 @@ class Notifications extends AbstractModel
 	 *
 	 * @param ElkArte\NotificationsTask $task
 	 */
-	protected function _send_task(\ElkArte\NotificationsTask $task)
+	protected function _send_task(NotificationsTask $task)
 	{
 		$class = $task->getClass();
 		$obj = new $class($this->_db);
@@ -209,9 +209,9 @@ class Notifications extends AbstractModel
 	 * @param ElkArte\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
-	protected function _send_notification(\ElkArte\Mentions\MentionType\MentionTypeInterface $obj, \ElkArte\NotificationsTask $task, $bodies)
+	protected function _send_notification(Mentions\MentionType\MentionTypeInterface $obj, NotificationsTask $task, $bodies)
 	{
-		$mentioning = new \ElkArte\Mentions\Mentioning($this->_db, new \ElkArte\DataValidator(), $this->_modSettings->enabled_mentions);
+		$mentioning = new Mentions\Mentioning($this->_db, new DataValidator(), $this->_modSettings->enabled_mentions);
 		foreach ($bodies as $body)
 		{
 			$this->_to_actually_mention[$task['notification_type']] = $mentioning->create($obj, array(
@@ -232,7 +232,7 @@ class Notifications extends AbstractModel
 	 * @param ElkArte\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
-	protected function _send_email(\ElkArte\Mentions\MentionType\MentionTypeInterface $obj, \ElkArte\NotificationsTask $task, $bodies)
+	protected function _send_email(Mentions\MentionType\MentionTypeInterface $obj, NotificationsTask $task, $bodies)
 	{
 		$last_id = $obj->getLastId();
 		foreach ($bodies as $body)
@@ -251,7 +251,7 @@ class Notifications extends AbstractModel
 	 * @param ElkArte\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
-	protected function _send_daily_email(\ElkArte\Mentions\MentionType\MentionTypeInterface $obj, \ElkArte\NotificationsTask $task, $bodies)
+	protected function _send_daily_email(Mentions\MentionType\MentionTypeInterface $obj, NotificationsTask $task, $bodies)
 	{
 		foreach ($bodies as $body)
 		{
@@ -275,7 +275,7 @@ class Notifications extends AbstractModel
 	 * @param ElkArte\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
-	protected function _send_weekly_email(\ElkArte\Mentions\MentionType\MentionTypeInterface $obj, \ElkArte\NotificationsTask $task, $bodies)
+	protected function _send_weekly_email(Mentions\MentionType\MentionTypeInterface $obj, NotificationsTask $task, $bodies)
 	{
 		foreach ($bodies as $body)
 		{

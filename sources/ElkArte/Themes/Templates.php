@@ -239,7 +239,7 @@ class Templates
 		// Cause an error otherwise.
 		elseif ($template_name !== 'Errors' && $template_name !== 'index' && $fatal)
 		{
-			throw new \ElkArte\Exceptions\Exception(
+			throw new Exception(
 				'theme_template_error',
 				'template',
 				[(string) $template_name]
@@ -247,7 +247,7 @@ class Templates
 		}
 		elseif ($fatal)
 		{
-			throw new \ElkArte\Exceptions\Exception(
+			throw new Exception(
 				sprintf(
 					isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load themes/default/%s.template.php!',
 					(string) $template_name
@@ -352,7 +352,7 @@ class Templates
 			// That couldn't be found!  Log the error, but *try* to continue normally.
 			if (!$found && $fatal)
 			{
-				\ElkArte\Errors\Errors::instance()->log_error(
+				Errors::instance()->log_error(
 					sprintf(
 						$txt['theme_language_error'],
 						$template_name . '.' . $lang,
@@ -730,7 +730,7 @@ class Templates
 			}
 			elseif ($fatal === false)
 			{
-				throw new \ElkArte\Exceptions\Exception(
+				throw new Exception(
 					'theme_template_error',
 					'template',
 					[(string) $sub_template_name]
@@ -739,7 +739,7 @@ class Templates
 			elseif ($fatal !== 'ignore')
 			{
 				throw new BadFunctionCallException(
-					\ElkArte\Errors\Errors::instance()->log_error(
+					Errors::instance()->log_error(
 						sprintf(
 							isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load the %s sub template!',
 							(string) $sub_template_name

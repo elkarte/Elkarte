@@ -248,7 +248,7 @@ class Packages extends \ElkArte\AbstractController
 			redirectexit('action=admin;area=packages');
 
 		// Now prepare things for the template using the package actions class
-		$pka = new \ElkArte\AdminController\PackageActions(new \ElkArte\EventManager());
+		$pka = new PackageActions(new \ElkArte\EventManager());
 		$pka->test_init($actions, $this->_uninstalling, $this->_base_path, $this->theme_paths);
 
 		$context['has_failure'] = $pka->has_failure;
@@ -647,7 +647,7 @@ class Packages extends \ElkArte\AbstractController
 		if (!empty($install_log))
 		{
 			// @todo Make a log of any errors that occurred and output them?
-			$pka = new \ElkArte\AdminController\PackageActions(new \ElkArte\EventManager());
+			$pka = new PackageActions(new \ElkArte\EventManager());
 			$pka->install_init($install_log, $this->_uninstalling, $this->_base_path, $this->theme_paths, $themes_installed);
 			$failed_steps = $pka->failed_steps;
 			$themes_installed = $pka->themes_installed;

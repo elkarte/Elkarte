@@ -438,7 +438,7 @@ final class ParserWrapper
 				loadUserContext();
 			}
 
-			$this->smiley_parser = new \BBC\SmileyParser($context['user']['smiley_path']);
+			$this->smiley_parser = new SmileyParser($context['user']['smiley_path']);
 			$this->smiley_parser->setEnabled($context['smiley_enabled']);
 		}
 

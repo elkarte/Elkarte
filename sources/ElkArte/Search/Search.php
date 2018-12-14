@@ -104,7 +104,7 @@ class Search
 	private $_createTemporary = true;
 
 	/**
-	 * 
+	 *
 	 * @var mixed[]
 	 */
 	protected $_participants = [];
@@ -216,7 +216,7 @@ class Search
 	 *
 	 * @param \ElkArte\Search\WeightFactors $weight
 	 */
-	public function setWeights(\ElkArte\Search\WeightFactors $weight)
+	public function setWeights(WeightFactors $weight)
 	{
 		$this->_weightFactors = $weight;
 	}
@@ -231,7 +231,7 @@ class Search
 		$blacklisted_words = array('img', 'url', 'quote', 'www', 'http', 'the', 'is', 'it', 'are', 'if');
 		call_integration_hook('integrate_search_blacklisted_words', array(&$blacklisted_words));
 
-		$this->_searchArray = new \ElkArte\Search\SearchArray($this->_searchParams->search, $blacklisted_words, $search_simple_fulltext);
+		$this->_searchArray = new SearchArray($this->_searchParams->search, $blacklisted_words, $search_simple_fulltext);
 	}
 
 	/**
@@ -500,7 +500,7 @@ class Search
 		return $this->_db->num_rows($messages_request) == 0;
 	}
 
-	public function searchQuery(\ElkArte\Search\SearchApiWrapper $searchAPI)
+	public function searchQuery(SearchApiWrapper $searchAPI)
 	{
 		$this->_searchAPI = $searchAPI;
 		$searchAPI->setExcludedPhrases($this->_excludedPhrases);

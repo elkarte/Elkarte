@@ -580,7 +580,7 @@ class Html2BBC
 			$bbc .= $lines[0];
 		}
 
-		return '[code]' . \ElkArte\Util::htmlspecialchars($bbc) . '[/code]';
+		return '[code]' . Util::htmlspecialchars($bbc) . '[/code]';
 	}
 
 	/**

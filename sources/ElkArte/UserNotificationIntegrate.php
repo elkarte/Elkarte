@@ -55,7 +55,7 @@ class UserNotificationIntegrate
 			return;
 		}
 
-		$notification = new \ElkArte\UserNotification;
+		$notification = new UserNotification;
 		$notification->present();
 	}
 
@@ -66,7 +66,7 @@ class UserNotificationIntegrate
 	 */
 	public static function integrate_modify_mention_settings(&$config_vars)
 	{
-		$notification = new \ElkArte\UserNotification;
+		$notification = new UserNotification;
 
 		$notification_cfg = $notification->addConfig();
 		$config_vars = elk_array_insert($config_vars, $config_vars[1], $notification_cfg, 'after', false);
@@ -77,9 +77,9 @@ class UserNotificationIntegrate
 	 */
 	public static function integrate_save_modify_mention_settings()
 	{
-		$req = \ElkArte\HttpReq::instance();
+		$req = HttpReq::instance();
 
-		$notification = new \ElkArte\UserNotification;
+		$notification = new UserNotification;
 		$req->post = $notification->validate($req->post);
 	}
 }

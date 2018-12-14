@@ -286,7 +286,7 @@ class Cache
 
 		call_integration_hook('cache_get_data', array($key, $ttl, $value));
 
-		return empty($value) ? null : \ElkArte\Util::unserialize($value);
+		return empty($value) ? null : Util::unserialize($value);
 	}
 
 	/**

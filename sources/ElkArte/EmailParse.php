@@ -759,7 +759,7 @@ class EmailParse
 			}
 
 			// Parse this section just like its was a separate email
-			$this->_boundary_section[$this->_boundary_section_count] = new \ElkArte\EmailParse();
+			$this->_boundary_section[$this->_boundary_section_count] = new EmailParse();
 			$this->_boundary_section[$this->_boundary_section_count]->read_email($html, $part);
 
 			$this->plain_body .= $this->_boundary_section[$this->_boundary_section_count]->plain_body;

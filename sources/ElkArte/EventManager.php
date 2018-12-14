@@ -141,7 +141,7 @@ class EventManager
 			return $this->_instances[$class_name];
 		else
 		{
-			$instance = new $class_name(\ElkArte\HttpReq::instance());
+			$instance = new $class_name(HttpReq::instance());
 			$this->_setInstance($class_name, $instance);
 
 			return $instance;
@@ -183,7 +183,7 @@ class EventManager
 	public function register($position, $event, $priority = 0)
 	{
 		if (!isset($this->_registered_events[$position]))
-			$this->_registered_events[$position] = new \ElkArte\Event(new \ElkArte\Priority());
+			$this->_registered_events[$position] = new Event(new Priority());
 
 		$this->_registered_events[$position]->add($event, $priority);
 	}
