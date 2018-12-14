@@ -104,7 +104,7 @@ class Install_Controller
 				$incontext['warning'] = str_replace('{try_delete}', '
 		<div id="delete_label" style="font-weight: bold; display: none">
 			<label for="delete_self"><input type="checkbox" id="delete_self" onclick="doTheDelete();" class="input_check" /> ' . $txt['delete_installer'] . (!isset($_SESSION['installer_temp_ftp']) ? ' ' . $txt['delete_installer_maybe'] : '') . '</label>
-		<script><!-- // --><![CDATA[
+		<script>
 			function doTheDelete()
 			{
 				var theCheck = document.getElementById ? document.getElementById("delete_self") : document.all.delete_self,
@@ -116,7 +116,7 @@ class Install_Controller
 				window.location.href = elk_scripturl;
 			}
 			document.getElementById(\'delete_label\').style.display = \'block\';
-		// ]]></script>
+		</script>
 		</div>', $txt['error_already_installed']);
 		}
 

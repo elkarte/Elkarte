@@ -399,7 +399,7 @@ function template_database_settings()
 
 	// Allow the toggling of input boxes for Postgresql
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		function validatePgsql()
 		{
 			var dbtype = document.getElementById(\'db_type_input\');
@@ -410,7 +410,7 @@ function template_database_settings()
 				document.getElementById(\'db_name_info_warning\').style.display = \'\';
 		}
 		validatePgsql();
-	// ]]></script>';
+	</script>';
 }
 
 /**
