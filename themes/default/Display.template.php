@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.5
+ * @version 1.1.6
  *
  */
 
@@ -303,7 +303,7 @@ function template_messages()
 			if ($message['can_like'] || $message['can_unlike'])
 				echo '
 							<li class="listlevel1', !empty($message['like_counter']) ? ' liked"' : '"', '>
-								<a class="linklevel1 ', $message['can_unlike'] ? 'unlike_button' : 'like_button', '" href="javascript:void(0)" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : $txt['like_post'], '" onclick="likePosts.prototype.likeUnlikePosts(event,', $message['id'], ', ', $context['current_topic'], '); return false;">',
+								<a class="linklevel1 ', $message['can_unlike'] ? 'unlike_button' : 'like_button', '" href="javascript:void(0)"', !empty($message['like_counter']) ? ' title="' . $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) . '"' : '', ' onclick="likePosts.prototype.likeUnlikePosts(event,', $message['id'], ', ', $context['current_topic'], '); return false;">',
 									!empty($message['like_counter']) ? '<span class="likes_indicator">' . $message['like_counter'] . '</span>&nbsp;' . $txt['likes'] : $txt['like_post'], '
 								</a>
 							</li>';

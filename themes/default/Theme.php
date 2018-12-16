@@ -11,7 +11,7 @@
  * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  * license:      BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.6
  *
  */
 
@@ -506,6 +506,7 @@ class Theme extends \Theme
 		{
 			addInlineJavascript('
 			var oEmbedtext = ({
+				embed_limit : ' . (!empty($modSettings['video_embed_limit']) ? $modSettings['video_embed_limit'] : 25) . ',
 				preview_image : ' . JavaScriptEscape($txt['preview_image']) . ',
 				ctp_video : ' . JavaScriptEscape($txt['ctp_video']) . ',
 				hide_video : ' . JavaScriptEscape($txt['hide_video']) . ',
