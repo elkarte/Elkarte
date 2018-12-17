@@ -27,7 +27,7 @@ class TestCurlFetchWebdata extends \PHPUnit\Framework\TestCase
 				'https://duckduckgo.com/html',
 				array('q' => 'elkarte+forum', 'ia' => 'about'),
 				200,
-				'is a modern, powerful community building forum software. It is completely free to use and is licensed with an open source BSD-3 clause license.',
+				'ElkArte is designed to provide you with all the features you need for a full featured community forum and website right out of the box',
 			),
 		);
 
