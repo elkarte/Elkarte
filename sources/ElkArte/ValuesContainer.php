@@ -153,4 +153,14 @@ class ValuesContainer implements \ArrayAccess
 	{
 		return isset($this->data[$offset]) ? $this->data[$offset] : null;
 	}
+
+	/**
+	 * Returns if the data array is empty or not
+	 *
+	 * @return bool
+	 */
+	public function isEmpty()
+	{
+		return empty($this->data);
+	}
 }

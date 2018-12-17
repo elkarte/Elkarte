@@ -23,8 +23,13 @@ namespace ElkArte;
  */
 class MemberLoader
 {
+	const SET_MINIMAL = 'minimal';
+	const SET_NORMAL = 'normal';
+	const SET_PROFILE = 'profile';
+
 	protected $db = null;
 	protected $cache = null;
+	protected $bbc_parser = null;
 	protected $users_list = null;
 	protected $options = ['titlesEnable' => false, 'custom_fields' => false, 'load_moderators' => false];
 	protected $useCache = false;
@@ -34,12 +39,17 @@ class MemberLoader
 	protected $loaded_ids = [];
 	protected $loaded_members = [];
 
-	public function __construct($db, $cache, $list, $options = [])
+	public function __construct($db, $cache, $bbc_parser, $list, $options = [])
 	{
+		global $modSettings;
+
 		$this->db = $db;
 		$this->cache = $cache;
+		$this->bbc_parser = $bbc_parser;
 		$this->users_list = $list;
 		$this->options = array_merge($this->options, $options);
+
+		$this->options['display_fields'] = \ElkArte\Util::unserialize($modSettings['displayFields']);
 
 		$this->useCache = $this->cache->isEnabled() && $this->cache->levelHigherThan(2);
 
@@ -60,7 +70,7 @@ class MemberLoader
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = mem.id_group)';
 	}
 
-	public function loadById($users,  $set = 'normal')
+	public function loadById($users,  $set = MemberLoader::SET_NORMAL)
 	{
 		// Can't just look for no users :P.
 		if (empty($users))
@@ -82,7 +92,7 @@ class MemberLoader
 		return $this->loaded_ids;
 	}
 
-	public function loadByName($name,  $set = 'normal')
+	public function loadByName($name,  $set = MemberLoader::SET_NORMAL)
 	{
 		// Can't just look for no users :P.
 		if (empty($users))
@@ -119,7 +129,7 @@ class MemberLoader
 					continue;
 				}
 
-				$member = new \ElkArte\Member($data['data'], $data['set']);
+				$member = new \ElkArte\Member($data['data'], $data['set'], $this->bbc_parser);
 				foreach ($data['additional_data'] as $key => $values)
 				{
 					$member->append($key, $values);
@@ -138,14 +148,14 @@ class MemberLoader
 		{
 			foreach ($new_loaded_ids as $id)
 			{
-				$this->cache->put('member_data-' . $set . '-' . $id, $this->users_list->getByid($id)->toArray(), 240);
+				$this->cache->put('member_data-' . $this->set . '-' . $id, $this->users_list->getByid($id)->toArray(), 240);
 			}
 		}
 	}
 
 	protected function loadModerators()
 	{
-		if (empty($this->loaded_ids) || $this->options['load_moderators'] === false || $this->set === 'normal')
+		if (empty($this->loaded_ids) || $this->options['load_moderators'] === false || $this->set === MemberLoader::SET_NORMAL)
 		{
 			return;
 		}
@@ -196,16 +206,16 @@ class MemberLoader
 		// We add or replace according to the set
 		switch ($this->set)
 		{
-			case 'normal':
+			case MemberLoader::SET_NORMAL:
 				$select_columns .= ', mem.buddy_list';
 				break;
-			case 'profile':
+			case MemberLoader::SET_PROFILE:
 				$select_columns .= ', mem.openid_uri, mem.id_theme, mem.pm_ignore_list, mem.pm_email_notify, mem.receive_from,
 				mem.time_format, mem.secret_question, mem.additional_groups, mem.smiley_set,
 				mem.total_time_logged_in, mem.notify_announcements, mem.notify_regularity, mem.notify_send_body,
 				mem.notify_types, lo.url, mem.ignore_boards, mem.password_salt, mem.pm_prefs, mem.buddy_list, mem.otp_secret, mem.enable_otp';
 				break;
-			case 'minimal':
+			case MemberLoader::SET_MINIMAL:
 				$select_columns = '
 				mem.id_member, mem.member_name, mem.real_name, mem.email_address, mem.hide_email, mem.date_registered,
 				mem.posts, mem.last_login, mem.member_ip, mem.member_ip2, mem.lngfile, mem.id_group';
@@ -236,7 +246,7 @@ class MemberLoader
 			$new_loaded_ids[] = $row['id_member'];
 			$this->loaded_ids[] = $row['id_member'];
 			$row['options'] = array();
-			$this->users_list->add(new \ElkArte\Member($row, $this->set), $row['id_member']);
+			$this->users_list->add(new \ElkArte\Member($row, $this->set, $this->bbc_parser), $row['id_member']);
 		}
 		$request->free_result();
 		$this->loadCustomFields($new_loaded_ids);
@@ -282,8 +292,9 @@ class MemberLoader
 
 			$data[$row['variable'] . '_key'] = $row['variable'] . '_' . $key;
 			$data[$row['variable']] = $row['value'];
+
+			$this->users_list->appendTo($data, 'options', $row['id_member'], $this->options['display_fields']);
 		}
 		$request->free_result();
-		$this->users_list->appendTo($data, 'options', $row['id_member']);
 	}
 }

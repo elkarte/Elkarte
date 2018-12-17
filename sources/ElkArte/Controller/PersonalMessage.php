@@ -2256,7 +2256,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 	 */
 	public function action_search2()
 	{
-		global $scripturl, $modSettings, $context, $txt, $memberContext;
+		global $scripturl, $modSettings, $context, $txt;
 
 		// Make sure the server is able to do this right now
 		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
@@ -2494,15 +2494,17 @@ class PersonalMessage extends \ElkArte\AbstractController
 				$row['subject'] = $row['subject'] === '' ? $txt['no_subject'] : $row['subject'];
 
 				// Load this posters context info, if its not there then fill in the essentials...
-				if (!loadMemberContext($row['id_member_from'], true))
+				$member = \ElkArte\MembersList::get($row['id_member_from']);
+				$member->loadContext(true);
+				if ($member->isEmpty() === false)
 				{
-					$memberContext[$row['id_member_from']]['name'] = $row['from_name'];
-					$memberContext[$row['id_member_from']]['id'] = 0;
-					$memberContext[$row['id_member_from']]['group'] = $txt['guest_title'];
-					$memberContext[$row['id_member_from']]['link'] = $row['from_name'];
-					$memberContext[$row['id_member_from']]['email'] = '';
-					$memberContext[$row['id_member_from']]['show_email'] = showEmailAddress(true, 0);
-					$memberContext[$row['id_member_from']]['is_guest'] = true;
+					$member['name'] = $row['from_name'];
+					$member['id'] = 0;
+					$member['group'] = $txt['guest_title'];
+					$member['link'] = $row['from_name'];
+					$member['email'] = '';
+					$member['show_email'] = showEmailAddress(true, 0);
+					$member['is_guest'] = true;
 				}
 
 				// Censor anything we don't want to see...
@@ -2531,7 +2533,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 				$context['personal_messages'][] = array(
 					'id' => $row['id_pm'],
-					'member' => &$memberContext[$row['id_member_from']],
+					'member' => $member,
 					'subject' => $subject_highlighted,
 					'body' => $body_highlighted,
 					'time' => standardTime($row['msgtime']),

@@ -187,7 +187,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 	 */
 	public function action_editBuddies()
 	{
-		global $context, $memberContext;
+		global $context;
 
 		theme()->getTemplates()->load('ProfileOptions');
 
@@ -285,8 +285,8 @@ class ProfileOptions extends \ElkArte\AbstractController
 		$context['buddies'] = array();
 		foreach ($buddies as $buddy)
 		{
-			loadMemberContext($buddy, true);
-			$context['buddies'][$buddy] = $memberContext[$buddy];
+			$context['buddies'][$buddy] = \ElkArte\MembersList::get($buddy, true);
+			$context['buddies'][$buddy]->loadContext();
 		}
 
 		call_integration_hook('integrate_view_buddies', array($this->_memID));
@@ -299,7 +299,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 	 */
 	public function action_editIgnoreList()
 	{
-		global $context, $memberContext;
+		global $context;
 
 		theme()->getTemplates()->load('ProfileOptions');
 
@@ -388,8 +388,8 @@ class ProfileOptions extends \ElkArte\AbstractController
 		$context['ignore_list'] = array();
 		foreach ($ignored as $ignore_member)
 		{
-			loadMemberContext($ignore_member);
-			$context['ignore_list'][$ignore_member] = $memberContext[$ignore_member];
+			$context['ignore_list'][$ignore_member] = \ElkArte\MembersList::get($ignore_member);
+			$context['ignore_list'][$ignore_member]->loadContext();
 		}
 	}
 

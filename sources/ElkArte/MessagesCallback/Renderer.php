@@ -123,7 +123,7 @@ abstract class Renderer
 	public function getContext($reset = false)
 	{
 		global $settings, $txt, $modSettings, $user_info;
-		global $memberContext, $context, $topic;
+		global $context, $topic;
 		static $counter = null;
 
 		// If the query returned false, bail.
@@ -160,17 +160,19 @@ abstract class Renderer
 		$this->_setupPermissions();
 
 		$id_member = $this->_this_message[$this->_idx_mapper->id_member];
+		$member_context = \ElkArte\MembersList::get($id_member);
+		$member_context->loadContext();
 
 		// If it couldn't load, or the user was a guest.... someday may be done with a guest table.
-		if (!loadMemberContext($id_member, true))
+		if ($member_context->isEmpty())
 		{
-			$this->_adjustGuestContext();
+			$this->_adjustGuestContext($member_context);
 		}
 		else
 		{
-			$this->_adjustMemberContext();
+			$this->_adjustMemberContext($member_context);
 		}
-		$this->_adjustAllMembers();
+		$this->_adjustAllMembers($member_context);
 
 		// Do the censor thang.
 		$this->_this_message['subject'] = censor($this->_this_message['subject']);
@@ -232,45 +234,45 @@ abstract class Renderer
 
 	/**
 	 * Utility function, it shall be implemented by the extending class.
-	 * Run just before loadMemberContext is executed.
+	 * Run just before \ElkArte\MembersList::get()->loadContext is executed.
 	 */
 	abstract protected function _setupPermissions();
 
 	/**
 	 * Utility function, it can be overridden to alter something just after the
 	 * members' data have been loaded from the database.
-	 * Run only if loadMemberContext succeeded.
+	 * Run only if member exists succeeded.
 	 */
-	protected function _adjustGuestContext()
+	protected function _adjustGuestContext($member_context)
 	{
-		global $memberContext, $txt;
+		global $txt;
 
 		$member_id = $this->_this_message[$this->_idx_mapper->id_member];
 
 		// Notice this information isn't used anywhere else....
-		$memberContext[$member_id]['name'] = $this->_this_message[$this->_idx_mapper->name];
-		$memberContext[$member_id]['id'] = 0;
-		$memberContext[$member_id]['group'] = $txt['guest_title'];
-		$memberContext[$member_id]['link'] = $this->_this_message[$this->_idx_mapper->name];
-		$memberContext[$member_id]['email'] = $this->_this_message['poster_email'] ?? '';
-		$memberContext[$member_id]['show_email'] = showEmailAddress(true, 0);
-		$memberContext[$member_id]['is_guest'] = true;
+		$member_context['name'] = $this->_this_message[$this->_idx_mapper->name];
+		$member_context['id'] = 0;
+		$member_context['group'] = $txt['guest_title'];
+		$member_context['link'] = $this->_this_message[$this->_idx_mapper->name];
+		$member_context['email'] = $this->_this_message['poster_email'] ?? '';
+		$member_context['show_email'] = showEmailAddress(true, 0);
+		$member_context['is_guest'] = true;
 	}
 
 	/**
 	 * Utility function, it can be overridden to alter something just after the
 	 * members data have been set.
-	 * Run only if loadMemberContext failed.
+	 * Run only if member doesn't exist failed.
 	 */
-	protected function _adjustMemberContext()
+	protected function _adjustMemberContext($member_context)
 	{
-		global $memberContext, $txt, $user_info, $context, $modSettings;
+		global $txt, $user_info, $context, $modSettings;
 
 		$member_id = $this->_this_message[$this->_idx_mapper->id_member];
 
-		$memberContext[$member_id]['can_view_profile'] = allowedTo('profile_view_any') || ($member_id == $user_info['id'] && allowedTo('profile_view_own'));
-		$memberContext[$member_id]['is_topic_starter'] = $member_id == $context['topic_starter_id'];
-		$memberContext[$member_id]['can_see_warning'] = !isset($context['disabled_fields']['warning_status']) && $memberContext[$member_id]['warning_status'] && (!empty($context['user']['can_mod']) || (!$user_info['is_guest'] && !empty($modSettings['warning_show']) && ($modSettings['warning_show'] > 1 || $member_id == $user_info['id'])));
+		$member_context['can_view_profile'] = allowedTo('profile_view_any') || ($member_id == $user_info['id'] && allowedTo('profile_view_own'));
+		$member_context['is_topic_starter'] = $member_id == $context['topic_starter_id'];
+		$member_context['can_see_warning'] = !isset($context['disabled_fields']['warning_status']) && $member_context['warning_status'] && (!empty($context['user']['can_mod']) || (!$user_info['is_guest'] && !empty($modSettings['warning_show']) && ($modSettings['warning_show'] > 1 || $member_id == $user_info['id'])));
 
 		if ($this->_options->show_signatures === 1)
 		{
@@ -280,21 +282,21 @@ abstract class Renderer
 			}
 			else
 			{
-				$memberContext[$member_id]['signature'] = '';
+				$member_context['signature'] = '';
 			}
 		}
 		elseif ($this->_options->show_signatures === 2)
 		{
-			$memberContext[$member_id]['signature'] = '';
+			$member_context['signature'] = '';
 		}
 	}
 
 	/**
 	 * Utility function, it can be overridden to alter something just after either
 	 * the members or the guests data have been loaded from the database.
-	 * Run both if loadMemberContext succeeded or failed.
+	 * Run both if he member exists or not.
 	 */
-	protected function _adjustAllMembers()
+	protected function _adjustAllMembers($member_context)
 	{
 	}
 
@@ -312,12 +314,12 @@ abstract class Renderer
 	 */
 	protected function _buildOutputArray()
 	{
-		global $user_info, $memberContext;
+		global $user_info;
 
 		return array(
 			'alternate' => $this->_counter % 2,
 			'id' => $this->_this_message[$this->_idx_mapper->id_msg],
-			'member' => &$memberContext[$this->_this_message[$this->_idx_mapper->id_member]],
+			'member' => \ElkArte\MembersList::get($this->_this_message[$this->_idx_mapper->id_member]),
 			'subject' => $this->_this_message['subject'],
 			'html_time' => htmlTime($this->_this_message[$this->_idx_mapper->time]),
 			'time' => standardTime($this->_this_message[$this->_idx_mapper->time]),

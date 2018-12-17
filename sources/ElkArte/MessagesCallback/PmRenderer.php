@@ -65,29 +65,29 @@ class PmRenderer extends Renderer
 	/**
 	 * {@inheritdoc }
 	 */
-	protected function _adjustGuestContext()
+	protected function _adjustGuestContext($member_context)
 	{
-		global $memberContext, $context;
+		global $context;
 
-		parent::_adjustGuestContext();
+		parent::_adjustGuestContext($member_context);
 
 		// Sometimes the forum sends messages itself (Warnings are an example)
 		// in this case don't label it from a guest.
 		if ($this->_this_message['from_name'] === $context['forum_name'])
 		{
-			$memberContext[$this->_this_message['id_member_from']]['group'] = '';
+			$member_context['group'] = '';
 		}
-		$memberContext[$this->_this_message['id_member_from']]['email'] = '';
+		$member_context['email'] = '';
 	}
 
 	/**
 	 * {@inheritdoc }
 	 */
-	protected function _adjustAllMembers()
+	protected function _adjustAllMembers($member_context)
 	{
-		global $memberContext, $context, $settings;
+		global $context, $settings;
 
-		$memberContext[$this->_this_message['id_member_from']]['show_profile_buttons'] = $settings['show_profile_buttons'] && (!empty($memberContext[$this->_this_message['id_member_from']]['can_view_profile']) || (!empty($memberContext[$this->_this_message['id_member_from']]['website']['url']) && !isset($context['disabled_fields']['website'])) || (in_array($memberContext[$this->_this_message['id_member_from']]['show_email'], array('yes', 'yes_permission_override', 'no_through_forum'))) || $context['can_send_pm']);
+		$member_context['show_profile_buttons'] = $settings['show_profile_buttons'] && (!empty($member_context['can_view_profile']) || (!empty($member_context['website']['url']) && !isset($context['disabled_fields']['website'])) || (in_array($member_context['show_email'], array('yes', 'yes_permission_override', 'no_through_forum'))) || $context['can_send_pm']);
 	}
 
 	/**

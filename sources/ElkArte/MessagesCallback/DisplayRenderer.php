@@ -53,14 +53,16 @@ class DisplayRenderer extends Renderer
 	/**
 	 * {@inheritdoc }
 	 */
-	protected function _adjustAllMembers()
+	protected function _adjustAllMembers($member_context)
 	{
-		global $memberContext, $settings, $context;
+		global $settings, $context;
 
 		$id_member = $this->_this_message[$this->_idx_mapper->id_member];
+		$this_member = \ElkArte\MembersList::get($id_member);
+		$this_member->loadContext();
 
-		$memberContext[$id_member]['ip'] = $this->_this_message['poster_ip'] ?? '';
-		$memberContext[$id_member]['show_profile_buttons'] = $settings['show_profile_buttons'] && (!empty($memberContext[$id_member]['can_view_profile']) || (!empty($memberContext[$id_member]['website']['url']) && !isset($context['disabled_fields']['website'])) || (in_array($memberContext[$id_member]['show_email'], array('yes', 'yes_permission_override', 'no_through_forum'))) || $context['can_send_pm']);
+		$this_member['ip'] = $this->_this_message['poster_ip'] ?? '';
+		$this_member['show_profile_buttons'] = $settings['show_profile_buttons'] && (!empty($this_member['can_view_profile']) || (!empty($this_member['website']['url']) && !isset($context['disabled_fields']['website'])) || (in_array($this_member['show_email'], array('yes', 'yes_permission_override', 'no_through_forum'))) || $context['can_send_pm']);
 
 		$context['id_msg'] = $this->_this_message['id_msg'] ?? '';
 	}

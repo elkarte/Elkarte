@@ -76,6 +76,7 @@ class Profile extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		$this->_memID = currentMemberID();
+		\ElkArte\MembersList::load($this->_memID);
 		$this->_profile = \ElkArte\MembersList::get($this->_memID);
 	}
 
@@ -88,7 +89,7 @@ class Profile extends \ElkArte\AbstractController
 	 */
 	public function action_index()
 	{
-		global $txt, $user_info, $context, $cur_profile, $memberContext;
+		global $txt, $user_info, $context, $cur_profile;
 		global $profile_vars, $post_errors;
 
 		// Don't reload this as we may have processed error strings.
@@ -104,8 +105,8 @@ class Profile extends \ElkArte\AbstractController
 		$cur_profile = $this->_profile;
 
 		// Let's have some information about this member ready, too.
-		loadMemberContext($this->_memID);
-		$context['member'] = $memberContext[$this->_memID];
+		$context['member'] = $this->_profile;
+		$context['member']->loadContext();
 
 		// Is this the profile of the user himself or herself?
 		$context['user']['is_owner'] = (int) $this->_memID === (int) $user_info['id'];

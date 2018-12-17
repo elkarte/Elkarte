@@ -554,21 +554,31 @@ class News extends \ElkArte\AbstractController
 	 */
 	public function action_xmlprofile($xml_format)
 	{
-		global $scripturl, $memberContext, $modSettings, $user_info;
+		global $scripturl, $modSettings, $user_info;
 
 		// You must input a valid user....
-		if (empty($this->_req->query->u) || \ElkArte\MembersList::load((int) $this->_req->query->u) === false)
+		if (empty($this->_req->query->u))
+		{
 			return array();
+		}
 
 		// Make sure the id is a number and not "I like trying to hack the database".
 		$uid = (int) $this->_req->query->u;
 
-		// Load the member's contextual information!
-		if (!loadMemberContext($uid) || !allowedTo('profile_view_any'))
+		// You must input a valid user....
+		if (\ElkArte\MembersList::load($uid) === false)
+		{
 			return array();
+		}
 
-		$profile = &$memberContext[$uid];
+		// Load the member's contextual information!
+		if (!allowedTo('profile_view_any'))
+		{
+			return array();
+		}
+
 		$member = \ElkArte\MembersList::get($uid);
+		$member->loadContext();
 
 		// No feed data yet
 		$data = array();
@@ -576,94 +586,94 @@ class News extends \ElkArte\AbstractController
 		if ($xml_format === 'rss' || $xml_format === 'rss2')
 		{
 			$data = array(array(
-				'title' => cdata_parse($profile['name']),
-				'link' => $scripturl . '?action=profile;u=' . $profile['id'],
-				'description' => cdata_parse(isset($profile['group']) ? $profile['group'] : $profile['post_group']),
-				'comments' => $scripturl . '?action=pm;sa=send;u=' . $profile['id'],
+				'title' => cdata_parse($member['name']),
+				'link' => $scripturl . '?action=profile;u=' . $member['id'],
+				'description' => cdata_parse(isset($member['group']) ? $member['group'] : $member['post_group']),
+				'comments' => $scripturl . '?action=pm;sa=send;u=' . $member['id'],
 				'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $member->date_registered),
-				'guid' => $scripturl . '?action=profile;u=' . $profile['id'],
+				'guid' => $scripturl . '?action=profile;u=' . $member['id'],
 			));
 		}
 		elseif ($xml_format === 'rdf')
 		{
 			$data = array(array(
-				'title' => cdata_parse($profile['name']),
-				'link' => $scripturl . '?action=profile;u=' . $profile['id'],
-				'description' => cdata_parse(isset($profile['group']) ? $profile['group'] : $profile['post_group']),
+				'title' => cdata_parse($member['name']),
+				'link' => $scripturl . '?action=profile;u=' . $member['id'],
+				'description' => cdata_parse(isset($member['group']) ? $member['group'] : $member['post_group']),
 			));
 		}
 		elseif ($xml_format === 'atom')
 		{
 			$data[] = array(
-				'title' => cdata_parse($profile['name']),
-				'link' => $scripturl . '?action=profile;u=' . $profile['id'],
-				'summary' => cdata_parse(isset($profile['group']) ? $profile['group'] : $profile['post_group']),
+				'title' => cdata_parse($member['name']),
+				'link' => $scripturl . '?action=profile;u=' . $member['id'],
+				'summary' => cdata_parse(isset($member['group']) ? $member['group'] : $member['post_group']),
 				'author' => array(
-					'name' => $profile['real_name'],
-					'email' => in_array(showEmailAddress(!empty($profile['hide_email']), $profile['id']), array('yes', 'yes_permission_override')) ? $profile['email'] : null,
-					'uri' => !empty($profile['website']) ? $profile['website']['url'] : ''
+					'name' => $member['real_name'],
+					'email' => in_array(showEmailAddress(!empty($member['hide_email']), $member['id']), array('yes', 'yes_permission_override')) ? $member['email'] : null,
+					'uri' => !empty($member['website']) ? $member['website']['url'] : ''
 				),
 				'published' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member->date_registered),
 				'updated' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member->last_login),
-				'id' => $scripturl . '?action=profile;u=' . $profile['id'],
-				'logo' => !empty($profile['avatar']) ? $profile['avatar']['url'] : '',
+				'id' => $scripturl . '?action=profile;u=' . $member['id'],
+				'logo' => !empty($member['avatar']) ? $member['avatar']['url'] : '',
 			);
 		}
 		else
 		{
 			$data = array(
-				'username' => $user_info['is_admin'] || $user_info['id'] == $profile['id'] ? cdata_parse($profile['username']) : '',
-				'name' => cdata_parse($profile['name']),
-				'link' => $scripturl . '?action=profile;u=' . $profile['id'],
-				'posts' => $profile['posts'],
-				'post-group' => cdata_parse($profile['post_group']),
-				'language' => cdata_parse($profile['language']),
+				'username' => $user_info['is_admin'] || $user_info['id'] == $member['id'] ? cdata_parse($member['username']) : '',
+				'name' => cdata_parse($member['name']),
+				'link' => $scripturl . '?action=profile;u=' . $member['id'],
+				'posts' => $member['posts'],
+				'post-group' => cdata_parse($member['post_group']),
+				'language' => cdata_parse($member['language']),
 				'last-login' => gmdate('D, d M Y H:i:s \G\M\T', $member->last_login),
 				'registered' => gmdate('D, d M Y H:i:s \G\M\T', $member->date_registered)
 			);
 
 			// Everything below here might not be set, and thus maybe shouldn't be displayed.
-			if ($profile['avatar']['name'] != '')
-				$data['avatar'] = $profile['avatar']['url'];
+			if ($member['avatar']['name'] != '')
+				$data['avatar'] = $member['avatar']['url'];
 
 			// If they are online, show an empty tag... no reason to put anything inside it.
-			if ($profile['online']['is_online'])
+			if ($member['online']['is_online'])
 				$data['online'] = '';
 
-			if ($profile['signature'] != '')
-				$data['signature'] = cdata_parse($profile['signature']);
+			if ($member['signature'] != '')
+				$data['signature'] = cdata_parse($member['signature']);
 
-			if ($profile['title'] != '')
-				$data['title'] = cdata_parse($profile['title']);
+			if ($member['title'] != '')
+				$data['title'] = cdata_parse($member['title']);
 
-			if ($profile['website']['title'] != '')
+			if ($member['website']['title'] != '')
 				$data['website'] = array(
-					'title' => cdata_parse($profile['website']['title']),
-					'link' => $profile['website']['url']
+					'title' => cdata_parse($member['website']['title']),
+					'link' => $member['website']['url']
 				);
 
-			if ($profile['group'] != '')
-				$data['position'] = cdata_parse($profile['group']);
+			if ($member['group'] != '')
+				$data['position'] = cdata_parse($member['group']);
 
 			if (!empty($modSettings['karmaMode']))
 				$data['karma'] = array(
-					'good' => $profile['karma']['good'],
-					'bad' => $profile['karma']['bad']
+					'good' => $member['karma']['good'],
+					'bad' => $member['karma']['bad']
 				);
 
-			if (in_array($profile['show_email'], array('yes', 'yes_permission_override')))
-				$data['email'] = $profile['email'];
+			if (in_array($member['show_email'], array('yes', 'yes_permission_override')))
+				$data['email'] = $member['email'];
 
-			if (!empty($profile['birth_date']) && substr($profile['birth_date'], 0, 4) != '0000')
+			if (!empty($member['birth_date']) && substr($member['birth_date'], 0, 4) != '0000')
 			{
-				list ($birth_year, $birth_month, $birth_day) = sscanf($profile['birth_date'], '%d-%d-%d');
+				list ($birth_year, $birth_month, $birth_day) = sscanf($member['birth_date'], '%d-%d-%d');
 				$datearray = getdate(forum_time());
 				$data['age'] = $datearray['year'] - $birth_year - (($datearray['mon'] > $birth_month || ($datearray['mon'] == $birth_month && $datearray['mday'] >= $birth_day)) ? 0 : 1);
 			}
 		}
 
 		// Save some memory.
-		unset($profile, $memberContext[$uid]);
+		\ElkArte\MembersList::unset($uid);
 
 		return $data;
 	}

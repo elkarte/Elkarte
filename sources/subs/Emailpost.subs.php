@@ -1179,7 +1179,9 @@ function query_load_user_info($email)
 
 	// No user found ... back we go
 	if (empty($id_member))
+	{
 		return false;
+	}
 
 	// Load the users profile information
 	$pbe = array();
@@ -1189,17 +1191,23 @@ function query_load_user_info($email)
 
 		// Load in *some* user_info data just like loadUserSettings would do
 		if (empty($pbe['profile']['additional_groups']))
+		{
 			$pbe['user_info']['groups'] = array(
 				$pbe['profile']['id_group'], $pbe['profile']['id_post_group']);
+		}
 		else
+		{
 			$pbe['user_info']['groups'] = array_merge(
 				array($pbe['profile']['id_group'], $pbe['profile']['id_post_group']),
 				explode(',', $pbe['profile']['additional_groups'])
 			);
+		}
 
 		// Clean up the groups
 		foreach ($pbe['user_info']['groups'] as $k => $v)
+		{
 			$pbe['user_info']['groups'][$k] = (int) $v;
+		}
 		$pbe['user_info']['groups'] = array_unique($pbe['user_info']['groups']);
 
 		// Load the user's general permissions....
@@ -1210,9 +1218,13 @@ function query_load_user_info($email)
 
 		// Work out our query_see_board string for security
 		if (in_array(1, $pbe['user_info']['groups']))
+		{
 			$pbe['user_info']['query_see_board'] = '1=1';
+		}
 		else
+		{
 			$pbe['user_info']['query_see_board'] = '((FIND_IN_SET(' . implode(', b.member_groups) != 0 OR FIND_IN_SET(', $pbe['user_info']['groups']) . ', b.member_groups) != 0)' . (!empty($modSettings['deny_boards_access']) ? ' AND (FIND_IN_SET(' . implode(', b.deny_member_groups) = 0 AND FIND_IN_SET(', $pbe['user_info']['groups']) . ', b.deny_member_groups) = 0)' : '') . ')';
+		}
 
 		// Set some convenience items
 		$pbe['user_info']['is_admin'] = in_array(1, $pbe['user_info']['groups']) ? 1 : 0;
