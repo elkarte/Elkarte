@@ -526,8 +526,8 @@ class Admin extends \ElkArte\AbstractController
 							'banlog' => array($txt['ban_log'], 'manage_bans'),
 							'spiderlog' => array($txt['spider_logs'], 'admin_forum', 'enabled' => featureEnabled('sp')),
 							'tasklog' => array($txt['scheduled_log'], 'admin_forum'),
-							'badbehaviorlog' => array($txt['badbehavior_log'], 'admin_forum', 'enabled' => !empty($modSettings['badbehavior_enabled']), 'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'badbehaviorlog', 'desc']),
-							'pruning' => array($txt['pruning_title'], 'admin_forum')),
+							'badbehaviorlog' => array($txt['badbehavior_log'], 'admin_forum', 'enabled' => !empty($modSettings['badbehavior_enabled']), 'url' => getUrl('admin', ['action' => 'admin', 'area' => 'logs', 'sa' => 'badbehaviorlog', 'desc'])),
+							'pruning' => array($txt['pruning_title'], 'admin_forum'),
 						),
 					),
 					'scheduledtasks' => array(
