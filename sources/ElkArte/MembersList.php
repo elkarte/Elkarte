@@ -29,12 +29,19 @@ class MembersList
 
 	public static function init($db, $cache, $bbc_parser)
 	{
+		global $modSettings, $context, $board_info;
+
 		if (self::$instance === null)
 		{
 			self::$instance = new MembersList();
 		}
 
-		self::$loader = new \ElkArte\MemberLoader($db, $cache, $bbc_parser, self::$instance, []);
+		self::$loader = new \ElkArte\MemberLoader($db, $cache, $bbc_parser, self::$instance, [
+			'titlesEnable' => !empty($modSettings['titlesEnable']),
+			'custom_fields' => in_array('cp', $context['admin_features']),
+			'load_moderators' => !empty($board_info['moderators']),
+			'display_fields' => \ElkArte\Util::unserialize($modSettings['displayFields'])
+		]);
 	}
 
 	public static function load($users, $is_name = false, $set = 'normal')

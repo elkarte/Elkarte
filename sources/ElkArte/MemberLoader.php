@@ -31,7 +31,7 @@ class MemberLoader
 	protected $cache = null;
 	protected $bbc_parser = null;
 	protected $users_list = null;
-	protected $options = ['titlesEnable' => false, 'custom_fields' => false, 'load_moderators' => false];
+	protected $options = ['titlesEnable' => false, 'custom_fields' => false, 'load_moderators' => false, 'display_fields' => []];
 	protected $useCache = false;
 	protected $set = '';
 	protected $base_select_columns = '';
@@ -41,15 +41,11 @@ class MemberLoader
 
 	public function __construct($db, $cache, $bbc_parser, $list, $options = [])
 	{
-		global $modSettings;
-
 		$this->db = $db;
 		$this->cache = $cache;
 		$this->bbc_parser = $bbc_parser;
 		$this->users_list = $list;
 		$this->options = array_merge($this->options, $options);
-
-		$this->options['display_fields'] = \ElkArte\Util::unserialize($modSettings['displayFields']);
 
 		$this->useCache = $this->cache->isEnabled() && $this->cache->levelHigherThan(2);
 
