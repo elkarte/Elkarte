@@ -224,7 +224,7 @@ abstract class AbstractQuery implements QueryInterface
 			$this->_db_callback_values = $db_values;
 
 			// Do the quoting and escaping
-			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', array($this, 'replacement__callback'), $db_string);
+			$db_string = preg_replace_callback('~{([a-z_]+)(?::([\.a-zA-Z0-9_-]+))?}~', array($this, 'replacement__callback'), $db_string);
 
 			// Clear this variables.
 			$this->_db_callback_values = array();
@@ -491,7 +491,7 @@ abstract class AbstractQuery implements QueryInterface
 			$this->_db_callback_values = $db_values;
 
 			// Inject the values passed to this function.
-			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', array($this, 'replacement__callback'), $db_string);
+			$db_string = preg_replace_callback('~{([a-z_]+)(?::([\.a-zA-Z0-9_-]+))?}~', array($this, 'replacement__callback'), $db_string);
 
 			// No need for them any longer.
 			$this->_db_callback_values = array();

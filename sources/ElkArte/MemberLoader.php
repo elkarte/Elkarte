@@ -100,7 +100,7 @@ class MemberLoader
 		$users = array_unique((array) $name);
 		$this->loaded_ids = [];
 
-		$this->loadByCondition('{column_case_insensitive:col_member_name}' . (count($users) == 1 ? ' = {string_case_insensitive:users}' : ' IN ({array_string_case_insensitive:users})'), $users);
+		$this->loadByCondition('{column_case_insensitive:mem.member_name}' . (count($users) == 1 ? ' = {string_case_insensitive:users}' : ' IN ({array_string_case_insensitive:users})'), $users);
 
 		$this->loadModerators();
 
@@ -230,7 +230,6 @@ class MemberLoader
 			FROM {db_prefix}members AS mem' . $select_tables . '
 			WHERE ' . $where_clause,
 			array(
-				'col_member_name' => 'mem.member_name',
 				'blank_string' => '',
 				'users' => count($to_load) == 1 ? current($to_load) : $to_load,
 			)
