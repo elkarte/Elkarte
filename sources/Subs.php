@@ -1914,3 +1914,19 @@ function initUrlGenerator()
 	}
 	return $generator;
 }
+
+function featureEnabled($feature)
+{
+	global $modSettings, $context;
+	static $features = null;
+
+	if ($features === null)
+	{
+		// This allows us to change the way things look for the admin.
+		$features = explode(',', isset($modSettings['admin_features']) ?
+			$modSettings['admin_features'] : 'cd,cp,k,w,rg,ml,pm');
+		// @deprecated since 2.0 - Next line is just for backward compatibility to remove before release
+		$context['admin_features'] = $features;
+	}
+	return in_array($feature, $features);
+}

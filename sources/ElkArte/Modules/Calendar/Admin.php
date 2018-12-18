@@ -52,7 +52,7 @@ class Admin extends \ElkArte\Modules\AbstractModule
 			'icon' => 'transparent.png',
 			'class' => 'admin_img_calendar',
 			'permission' => array('admin_forum'),
-			'enabled' => in_array('cd', $context['admin_features']),
+			'enabled' => featureEnabled('cd'),
 			'subsections' => array(
 				'holidays' => array($txt['manage_holidays'], 'admin_forum', 'enabled' => !empty($modSettings['cal_enabled'])),
 				'settings' => array($txt['calendar_settings'], 'admin_forum'),

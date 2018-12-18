@@ -117,7 +117,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 		// This is convenient.  Do you know how annoying it is to do this every time?!
 		$context['current_label_redirect'] = 'action=pm;f=' . $context['folder'] . (isset($this->_req->query->start) ? ';start=' . $this->_req->query->start : '') . (isset($this->_req->query->l) ? ';l=' . $this->_req->query->l : '');
-		$context['can_issue_warning'] = in_array('w', $context['admin_features']) && allowedTo('issue_warning') && !empty($modSettings['warning_enable']);
+		$context['can_issue_warning'] = featureEnabled('w') && allowedTo('issue_warning') && !empty($modSettings['warning_enable']);
 
 		// Build the linktree for all the actions...
 		$context['linktree'][] = array(

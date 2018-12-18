@@ -304,7 +304,7 @@ class Profile extends \ElkArte\AbstractController
 					),
 					'viewwarning' => array(
 						'label' => $txt['profile_view_warnings'],
-						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $this->_profile['warning'] && (!empty($modSettings['warning_show']) && ($context['user']['is_owner'] || $modSettings['warning_show'] == 2)),
+						'enabled' => featureEnabled('w') && !empty($modSettings['warning_enable']) && $this->_profile['warning'] && (!empty($modSettings['warning_show']) && ($context['user']['is_owner'] || $modSettings['warning_show'] == 2)),
 						'controller' => '\\ElkArte\\Controller\\ProfileInfo',
 						'function' => 'action_viewWarning',
 						'permission' => array(
@@ -447,7 +447,7 @@ class Profile extends \ElkArte\AbstractController
 					),
 					'issuewarning' => array(
 						'label' => $txt['profile_issue_warning'],
-						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && (!$context['user']['is_owner'] || $context['user']['is_admin']),
+						'enabled' => featureEnabled('w') && !empty($modSettings['warning_enable']) && (!$context['user']['is_owner'] || $context['user']['is_admin']),
 						'controller' => '\\ElkArte\\Controller\\ProfileAccount',
 						'function' => 'action_issuewarning',
 						'token' => 'profile-iw%u',

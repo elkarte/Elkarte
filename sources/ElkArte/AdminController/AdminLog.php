@@ -47,7 +47,7 @@ class AdminLog extends \ElkArte\AbstractController
 			'modlog' => array(
 				'function' => 'action_log',
 				'controller' => '\\ElkArte\\AdminController\\Modlog',
-				'disabled' => !in_array('ml', $context['admin_features'])),
+				'disabled' => featureEnabled('ml') === false),
 			'badbehaviorlog' => array(
 				'function' => 'action_log',
 				'disabled' => empty($modSettings['badbehavior_enabled']),

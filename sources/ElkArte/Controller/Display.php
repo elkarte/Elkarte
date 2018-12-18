@@ -585,7 +585,7 @@ class Display extends \ElkArte\AbstractController
 		$context['can_mark_notify'] &= !$context['user']['is_guest'];
 		$context['can_reply'] &= empty($topicinfo['locked']) || allowedTo('moderate_board');
 		$context['can_reply_unapproved'] &= $modSettings['postmod_active'] && (empty($topicinfo['locked']) || allowedTo('moderate_board'));
-		$context['can_issue_warning'] &= in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']);
+		$context['can_issue_warning'] &= featureEnabled('w') && !empty($modSettings['warning_enable']);
 
 		// Handle approval flags...
 		$context['can_reply_approved'] = $context['can_reply'];

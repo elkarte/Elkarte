@@ -101,7 +101,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 				'controller' => $this,
 				'function' => 'action_postmod',
 				'permission' => 'manage_permissions',
-				'disabled' => !in_array('pm', $context['admin_features'])),
+				'disabled' => featureEnabled('pm') === false),
 			'profiles' => array(
 				'controller' => $this,
 				'function' => 'action_profiles',

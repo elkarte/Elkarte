@@ -35,8 +35,6 @@ class TestAuthsubs extends \PHPUnit\Framework\TestCase
 	{
 		global $cookiename, $context;
 
-		$context['admin_features'] = array();
-
 		// Lets test load data, this should be id #1 for the testcase
 		$user_data = \ElkArte\MembersList::load($this->user, true, 'profile');
 		$member = \ElkArte\MembersList::get($this->user);

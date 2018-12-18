@@ -1318,8 +1318,8 @@ class ProfileInfo extends \ElkArte\AbstractController
 			'can_send_pm' => allowedTo('pm_send'),
 			'can_send_email' => allowedTo('send_email_to_members'),
 			'can_have_buddy' => allowedTo('profile_identity_own') && !empty($modSettings['enable_buddylist']),
-			'can_issue_warning' => in_array('w', $context['admin_features']) && allowedTo('issue_warning') && !empty($modSettings['warning_enable']),
-			'can_view_warning' => in_array('w', $context['admin_features']) && (allowedTo('issue_warning') && !$context['user']['is_owner']) || (!empty($modSettings['warning_show']) && ($modSettings['warning_show'] > 1 || $context['user']['is_owner']))
+			'can_issue_warning' => featureEnabled('w') && allowedTo('issue_warning') && !empty($modSettings['warning_enable']),
+			'can_view_warning' => featureEnabled('w') && (allowedTo('issue_warning') && !$context['user']['is_owner']) || (!empty($modSettings['warning_show']) && ($modSettings['warning_show'] > 1 || $context['user']['is_owner']))
 		);
 
 		// @critical: potential problem here
