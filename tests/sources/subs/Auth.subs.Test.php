@@ -37,10 +37,9 @@ class TestAuthsubs extends \PHPUnit\Framework\TestCase
 
 		// Lets test load data, this should be id #1 for the testcase
 		$user_data = \ElkArte\MembersList::load($this->user, true, 'profile');
-		$member = \ElkArte\MembersList::get($this->user);
+		$member = \ElkArte\MembersList::get($user_data[0]);
 
 		$this->assertEquals(1, $user_data[0]);
-
 		$salt = $member->password_salt;
 		setLoginCookie(60 * 60, $member->id_member, hash('sha256', $this->passwd . $salt));
 
