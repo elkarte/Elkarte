@@ -40,7 +40,7 @@ class MembersList
 			'titlesEnable' => !empty($modSettings['titlesEnable']),
 			'custom_fields' => featureEnabled('cp'),
 			'load_moderators' => !empty($board_info['moderators']),
-			'display_fields' => \ElkArte\Util::unserialize($modSettings['displayFields'])
+			'display_fields' => isset($modSettings['displayFields']) ? \ElkArte\Util::unserialize($modSettings['displayFields']) : []
 		]);
 	}
 

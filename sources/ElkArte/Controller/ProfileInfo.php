@@ -113,6 +113,7 @@ class ProfileInfo extends \ElkArte\AbstractController
 		$this->_profile->loadContext();
 
 		theme()->getTemplates()->load('ProfileInfo');
+		theme()->getTemplates()->loadLanguageFile('Profile');
 
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = $scripturl . '?action=profile;u=' . $this->_memID;
@@ -1323,7 +1324,8 @@ class ProfileInfo extends \ElkArte\AbstractController
 		);
 
 		// @critical: potential problem here
-		$context['member'] = $this->_profile->toArray()['data'];
+		$context['member'] = $this->_profile;
+		$context['member']->loadContext();
 		$context['member']['id'] = $this->_memID;
 
 		// Is the signature even enabled on this forum?
@@ -1465,19 +1467,16 @@ class ProfileInfo extends \ElkArte\AbstractController
 		// Set the age...
 		if (empty($context['member']['birth_date']))
 		{
-			$context['member'] += array(
-				'age' => $txt['not_applicable'],
-				'today_is_birthday' => false
-			);
+			$context['member']['age'] = $txt['not_applicable'];
+			$context['member']['today_is_birthday'] = false;
 		}
 		else
 		{
 			list ($birth_year, $birth_month, $birth_day) = sscanf($context['member']['birth_date'], '%d-%d-%d');
 			$datearray = getdate(forum_time());
-			$context['member'] += array(
-				'age' => $birth_year <= 4 ? $txt['not_applicable'] : $datearray['year'] - $birth_year - (($datearray['mon'] > $birth_month || ($datearray['mon'] == $birth_month && $datearray['mday'] >= $birth_day)) ? 0 : 1),
-				'today_is_birthday' => $datearray['mon'] == $birth_month && $datearray['mday'] == $birth_day
-			);
+			$context['member']['age'] = $birth_year <= 4 ? $txt['not_applicable'] : $datearray['year'] - $birth_year - (($datearray['mon'] > $birth_month || ($datearray['mon'] == $birth_month && $datearray['mday'] >= $birth_day)) ? 0 : 1);
+			$context['member']['today_is_birthday'] = $datearray['mon'] == $birth_month && $datearray['mday'] == $birth_day;
+
 		}
 	}
 

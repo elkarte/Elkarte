@@ -71,8 +71,8 @@ $context['forum_name_html_safe'] = $context['forum_name'];
 cleanRequest();
 loadDatabase();
 \ElkArte\Hooks::init(database(), \ElkArte\Debug::instance());
-\ElkArte\MembersList::init(database(), \ElkArte\Cache\Cache::instance(),  \BBC\ParserWrapper::instance());
 reloadSettings();
+\ElkArte\MembersList::init(database(), \ElkArte\Cache\Cache::instance(),  \BBC\ParserWrapper::instance());
 /**
  * This next line is pointless, but without that tests fail in postgre.
  * I don't know why, so I'll opne an issue, but for the moment,

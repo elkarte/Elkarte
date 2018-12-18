@@ -300,11 +300,11 @@ class Bootstrap
 		// Let's set up our shiny new hooks handler.
 		\ElkArte\Hooks::init(database(), \ElkArte\Debug::instance());
 
-		// Make sure we have ready the list of members for populating it
-		\ElkArte\MembersList::init(database(), \ElkArte\Cache\Cache::instance(),  \BBC\ParserWrapper::instance());
-
 		// It's time for settings loaded from the database.
 		reloadSettings();
+
+		// Make sure we have ready the list of members for populating it
+		\ElkArte\MembersList::init(database(), \ElkArte\Cache\Cache::instance(),  \BBC\ParserWrapper::instance());
 
 		// Our good ole' contextual array, which will hold everything
 		if (empty($context))

@@ -841,12 +841,10 @@ class ProfileOptions extends \ElkArte\AbstractController
 		createList($listOptions);
 
 		// What options are set?
-		$context['member'] += array(
-			'notify_announcements' => $this->_profile['notify_announcements'],
-			'notify_send_body' => $this->_profile['notify_send_body'],
-			'notify_types' => $this->_profile['notify_types'],
-			'notify_regularity' => $this->_profile['notify_regularity'],
-		);
+		$context['member']['notify_announcements'] = $this->_profile['notify_announcements'];
+		$context['member']['notify_send_body'] = $this->_profile['notify_send_body'];
+		$context['member']['notify_types'] = $this->_profile['notify_types'];
+		$context['member']['notify_regularity'] = $this->_profile['notify_regularity'];
 
 		$this->loadThemeOptions();
 	}
