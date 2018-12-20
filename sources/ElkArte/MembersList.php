@@ -48,7 +48,7 @@ class MembersList
 	 *
 	 * @param \ElkArte\Database\QueryInterface $db The object to query the database
 	 * @param \ElkArte\Cache\Cache $cache Cache object used to... well cache content of each member
-	 * @param \BBC\BBCParser $bbc_parser BBC parser to convert BBC to HTML
+	 * @param \BBC\ParserWrapper $bbc_parser BBC parser to convert BBC to HTML
 	 */
 	public static function init($db, $cache, $bbc_parser)
 	{

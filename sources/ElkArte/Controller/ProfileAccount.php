@@ -29,10 +29,10 @@ class ProfileAccount extends \ElkArte\AbstractController
 	private $_memID = 0;
 
 	/**
-	 * The array from \ElkArte\Member stored here to avoid some global
-	 * @var mixed[]
+	 * The \ElkArte\Member object is stored here to avoid some global
+	 * @var \ElkArte\Member
 	 */
-	private $_profile = [];
+	private $_profile = null;
 
 	/**
 	 * Holds any errors that were generated when issuing a warning

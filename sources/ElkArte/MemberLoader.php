@@ -47,7 +47,7 @@ class MemberLoader
 	protected $cache = null;
 
 	/**
-	 * @var \BBC\BBCParser
+	 * @var \BBC\ParserWrapper
 	 */
 	protected $bbc_parser = null;
 
@@ -101,7 +101,7 @@ class MemberLoader
 	 *
 	 * @param \ElkArte\Database\QueryInterface $db The object to query the database
 	 * @param \ElkArte\Cache\Cache $cache Cache object used to... well cache content of each member
-	 * @param \BBC\BBCParser $bbc_parser BBC parser to convert BBC to HTML
+	 * @param \BBC\ParserWrapper $bbc_parser BBC parser to convert BBC to HTML
 	 * @param \ElkArte\MembersList $list the instance of the list of members
 	 * @param mixed[] $options Random options useful to the loader to decide what to actually load
 	 */
@@ -164,7 +164,7 @@ class MemberLoader
 	/**
 	 * Loads users data from a member name
 	 *
-	 * @param string|string[] $users Single name or list of names to load
+	 * @param string|string[] $name Single name or list of names to load
 	 * @param string $set The data to load (see the constants SET_*)
 	 * @return int[] The ids of the members loaded
 	 */
@@ -208,7 +208,7 @@ class MemberLoader
 			'email' => $txt['guest_title'],
 			'is_guest' => true
 		], $this->set, $this->bbc_parser);
-		$this->loaded_members[0] = $this->users_list->add($this->loaded_members[0], 0);
+		$this->users_list->add($this->loaded_members[0], 0);
 	}
 
 	/**

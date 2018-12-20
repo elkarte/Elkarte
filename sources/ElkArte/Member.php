@@ -28,7 +28,7 @@ class Member extends \ElkArte\ValuesContainer
 	protected $set = '';
 
 	/**
-	 * @var \BBC\BBCParser
+	 * @var \BBC\ParserWrapper
 	 */
 	protected $bbc_parser = null;
 
@@ -42,7 +42,7 @@ class Member extends \ElkArte\ValuesContainer
 	/**
 	 * Basically the content of $modSettings['displayFields']
 	 *
-	 * @var bool
+	 * @var mixed[]
 	 */
 	protected $display_fields = [];
 
@@ -51,7 +51,7 @@ class Member extends \ElkArte\ValuesContainer
 	 *
 	 * @param mixed[] $data
 	 * @param string $set
-	 * @param \ElkArte\BBC\BBCParser $bbc_parser
+	 * @param \BBC\ParserWrapper $bbc_parser
 	 */
 	public function __construct($data, $set, $bbc_parser)
 	{

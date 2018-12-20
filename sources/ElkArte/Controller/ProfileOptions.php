@@ -35,10 +35,10 @@ class ProfileOptions extends \ElkArte\AbstractController
 	private $_memID = 0;
 
 	/**
-	 * The array from \ElkArte\Member stored here to avoid some global
-	 * @var mixed[]
+	 * The \ElkArte\Member object is stored here to avoid some global
+	 * @var \ElkArte\Member
 	 */
-	private $_profile = [];
+	private $_profile = null;
 
 	/**
 	 * Returns the profile fields for a given area
