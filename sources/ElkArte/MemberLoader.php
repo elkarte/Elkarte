@@ -16,29 +16,95 @@
 namespace ElkArte;
 
 /**
- * Class Member
- *
- * This class collects all the data related to a certain member extracted
- * from the db
+ * This class loads all the data related to a certain member or
+ * set of members taken from the db
  */
 class MemberLoader
 {
+	/**
+	 * Just the bare minimum set of fields
+	 */
 	const SET_MINIMAL = 'minimal';
+
+	/**
+	 * What is needed in most of the cases
+	 */
 	const SET_NORMAL = 'normal';
+
+	/**
+	 * What is required to see a profile page
+	 */
 	const SET_PROFILE = 'profile';
 
+	/**
+	 * @var \ElkArte\Database\QueryInterface
+	 */
 	protected $db = null;
+
+	/**
+	 * @var \ElkArte\Cache\Cache
+	 */
 	protected $cache = null;
+
+	/**
+	 * @var \BBC\BBCParser
+	 */
 	protected $bbc_parser = null;
+
+	/**
+	 * @var \ElkArte\MembersList
+	 */
 	protected $users_list = null;
-	protected $options = ['titlesEnable' => false, 'custom_fields' => false, 'load_moderators' => false, 'display_fields' => []];
+
+	/**
+	 * @var mixed[]
+	 */
+	protected $options = [
+		'titlesEnable' => false,
+		'custom_fields' => false,
+		'load_moderators' => false,
+		'display_fields' => []
+	];
+
+	/**
+	 * @var bool
+	 */
 	protected $useCache = false;
+
+	/**
+	 * @var string
+	 */
 	protected $set = '';
+
+	/**
+	 * @var string
+	 */
 	protected $base_select_columns = '';
+
+	/**
+	 * @var string
+	 */
 	protected $base_select_tables = '';
+
+	/**
+	 * @var int[]
+	 */
 	protected $loaded_ids = [];
+
+	/**
+	 * @var \ElkArte\Member[]
+	 */
 	protected $loaded_members = [];
 
+	/**
+	 * Initialize the class
+	 *
+	 * @param \ElkArte\Database\QueryInterface $db The object to query the database
+	 * @param \ElkArte\Cache\Cache $cache Cache object used to... well cache content of each member
+	 * @param \BBC\BBCParser $bbc_parser BBC parser to convert BBC to HTML
+	 * @param \ElkArte\MembersList $list the instance of the list of members
+	 * @param mixed[] $options Random options useful to the loader to decide what to actually load
+	 */
 	public function __construct($db, $cache, $bbc_parser, $list, $options = [])
 	{
 		$this->db = $db;
@@ -66,6 +132,13 @@ class MemberLoader
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = mem.id_group)';
 	}
 
+	/**
+	 * Loads users data from a member id
+	 *
+	 * @param int|int[] $users Single id or list of ids to load
+	 * @param string $set The data to load (see the constants SET_*)
+	 * @return int[] The ids of the members loaded
+	 */
 	public function loadById($users,  $set = MemberLoader::SET_NORMAL)
 	{
 		// Can't just look for no users :P.
@@ -88,6 +161,13 @@ class MemberLoader
 		return $this->loaded_ids;
 	}
 
+	/**
+	 * Loads users data from a member name
+	 *
+	 * @param string|string[] $users Single name or list of names to load
+	 * @param string $set The data to load (see the constants SET_*)
+	 * @return int[] The ids of the members loaded
+	 */
 	public function loadByName($name,  $set = MemberLoader::SET_NORMAL)
 	{
 		// Can't just look for no users :P.
@@ -107,6 +187,36 @@ class MemberLoader
 		return $this->loaded_ids;
 	}
 
+	/**
+	 * Loads a guest member (i.e. some standard data for guests)
+	 */
+	public function loadGuest()
+	{
+		global $txt;
+
+		if (isset($this->loaded_members[0]))
+		{
+			return;
+		}
+
+		$this->loaded_members[0] = new \ElkArte\Member([
+			'id' => 0,
+			'name' => $txt['guest_title'],
+			'group' => $txt['guest_title'],
+			'href' => '',
+			'link' => $txt['guest_title'],
+			'email' => $txt['guest_title'],
+			'is_guest' => true
+		], $this->set, $this->bbc_parser);
+		$this->loaded_members[0] = $this->users_list->add($this->loaded_members[0], 0);
+	}
+
+	/**
+	 * Retrieve \ElkArte\Member objects from the cache
+	 *
+	 * @param int|int[] $users Single id or list of ids to load
+	 * @return int[] The ids not found in the cache
+	 */
 	protected function loadFromCache($users)
 	{
 		if ($this->useCache === false)
@@ -128,7 +238,7 @@ class MemberLoader
 				$member = new \ElkArte\Member($data['data'], $data['set'], $this->bbc_parser);
 				foreach ($data['additional_data'] as $key => $values)
 				{
-					$member->append($key, $values);
+					$member->append($key, $values, $this->options['display_fields']);
 				}
 				$this->users_list->add($member, $data['data']['id_member']);
 				$this->loaded_ids[] = $data['data']['id_member'];
@@ -138,6 +248,11 @@ class MemberLoader
 		return $to_load;
 	}
 
+	/**
+	 * Stored \ElkArte\Member objects in the cache
+	 *
+	 * @param int[] $new_loaded_ids Ids of members that have been loaded
+	 */
 	protected function storeInCache($new_loaded_ids)
 	{
 		if ($this->useCache === true)
@@ -149,8 +264,13 @@ class MemberLoader
 		}
 	}
 
+	/**
+	 * Loads moderators data into the \ElkArte\Member objects
+	 */
 	protected function loadModerators()
 	{
+		global $board_info;
+
 		if (empty($this->loaded_ids) || $this->options['load_moderators'] === false || $this->set === MemberLoader::SET_NORMAL)
 		{
 			return;
@@ -189,6 +309,13 @@ class MemberLoader
 		}
 	}
 
+	/**
+	 * Loads users data provided a where clause and an array of ids
+	 *
+	 * @param string $where_clause The WHERE clause of the query to run
+	 * @param int[] $to_load Array of ids to load
+	 * @return bool If loaded anything or not
+	 */
 	protected function loadByCondition($where_clause, $to_load)
 	{
 		if (empty($to_load))
@@ -241,7 +368,8 @@ class MemberLoader
 			$new_loaded_ids[] = $row['id_member'];
 			$this->loaded_ids[] = $row['id_member'];
 			$row['options'] = array();
-			$this->users_list->add(new \ElkArte\Member($row, $this->set, $this->bbc_parser), $row['id_member']);
+			$this->loaded_members[$row['id_member']] = new \ElkArte\Member($row, $this->set, $this->bbc_parser);
+			$this->users_list->add($this->loaded_members[$row['id_member']], $row['id_member']);
 		}
 		$request->free_result();
 		$this->loadCustomFields($new_loaded_ids);
@@ -257,6 +385,11 @@ class MemberLoader
 		return !empty($new_loaded_ids);
 	}
 
+	/**
+	 * Loads custom fields data for a set of users
+	 *
+	 * @param int[] $new_loaded_ids Array of ids to load
+	 */
 	protected function loadCustomFields($new_loaded_ids)
 	{
 		if (empty($new_loaded_ids) || $this->options['custom_fields'] === false)
@@ -273,6 +406,7 @@ class MemberLoader
 				'loaded_ids' => count($new_loaded_ids) == 1 ? $new_loaded_ids[0] : $new_loaded_ids,
 			)
 		);
+		$data = [];
 		while ($row = $request->fetch_assoc())
 		{
 			if (!empty($row['field_options']))
@@ -285,10 +419,13 @@ class MemberLoader
 				$key = 0;
 			}
 
-			$data[$row['variable'] . '_key'] = $row['variable'] . '_' . $key;
-			$data[$row['variable']] = $row['value'];
+			$data[$row['id_member']][$row['variable'] . '_key'] = $row['variable'] . '_' . $key;
+			$data[$row['id_member']][$row['variable']] = $row['value'];
+		}
 
-			$this->users_list->appendTo($data, 'options', $row['id_member'], $this->options['display_fields']);
+		foreach ($data as $id => $val)
+		{
+			$this->users_list->appendTo($val, 'options', $id, $this->options['display_fields']);
 		}
 		$request->free_result();
 	}

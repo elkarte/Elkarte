@@ -285,7 +285,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 		$context['buddies'] = array();
 		foreach ($buddies as $buddy)
 		{
-			$context['buddies'][$buddy] = \ElkArte\MembersList::get($buddy, true);
+			$context['buddies'][$buddy] = \ElkArte\MembersList::get($buddy);
 			$context['buddies'][$buddy]->loadContext();
 		}
 

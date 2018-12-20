@@ -32,9 +32,9 @@ class ProfileInfo extends \ElkArte\AbstractController
 
 	/**
 	 * The array from \ElkArte\Member stored here to avoid some global
-	 * @var mixed[]
+	 * @var \ElkArte\Member
 	 */
-	private $_profile = [];
+	private $_profile = null;
 
 	/**
 	 * Holds the current summary tabs to load

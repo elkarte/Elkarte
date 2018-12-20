@@ -929,7 +929,7 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 	}
 
 	$query_members = array();
-	foreach ($members as $mid)
+	foreach ($members as $id)
 	{
 		$member = \ElkArte\MembersList::get($id);
 		// Load their context data.

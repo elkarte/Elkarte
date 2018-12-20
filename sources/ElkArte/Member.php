@@ -16,18 +16,43 @@
 namespace ElkArte;
 
 /**
- * Class Member
- *
- * This class collects all the data related to a certain member extracted
- * from the db
+ * This class holds all the data belonging to a certain member.
  */
 class Member extends \ElkArte\ValuesContainer
 {
+	/**
+	 * The set of data loaded
+	 *
+	 * @var string
+	 */
 	protected $set = '';
+
+	/**
+	 * @var \BBC\BBCParser
+	 */
 	protected $bbc_parser = null;
+
+	/**
+	 * If context has been loaded or not
+	 *
+	 * @var bool
+	 */
 	protected $loaded = false;
+
+	/**
+	 * Basically the content of $modSettings['displayFields']
+	 *
+	 * @var bool
+	 */
 	protected $display_fields = [];
 
+	/**
+	 * Constructor
+	 *
+	 * @param mixed[] $data
+	 * @param string $set
+	 * @param \ElkArte\BBC\BBCParser $bbc_parser
+	 */
 	public function __construct($data, $set, $bbc_parser)
 	{
 		parent::__construct($data);
@@ -35,12 +60,25 @@ class Member extends \ElkArte\ValuesContainer
 		$this->bbc_parser = $bbc_parser;
 	}
 
+	/**
+	 * Adds data to a member
+	 *
+	 * @param string $type
+	 * @param mixed[] $data
+	 * @param mixed[] $display_fields Basically the content of $modSettings['displayFields']
+	 */
 	public function append($type, $data, $display_fields)
 	{
 		$this->data[$type] = $data;
 		$this->display_fields[$type] = $display_fields;
 	}
 
+	/**
+	 * Returns a certain data
+	 *
+	 * @param string $item
+	 * @return mixed[] Anything set for that index
+	 */
 	public function get($item)
 	{
 		if (isset($this->data[$item]))
@@ -53,6 +91,12 @@ class Member extends \ElkArte\ValuesContainer
 		}
 	}
 
+	/**
+	 * Prepares some data that can be useful in the templates (and not only)
+	 *
+	 * @param bool $display_custom_fields
+	 * @return bool
+	 */
 	public function loadContext($display_custom_fields = false)
 	{
 		global $user_info;
@@ -83,6 +127,9 @@ class Member extends \ElkArte\ValuesContainer
 		return true;
 	}
 
+	/**
+	 * Loads any additional data (custom fields)
+	 */
 	protected function loadOptions()
 	{
 		global $txt, $settings, $scripturl;
@@ -139,6 +186,9 @@ class Member extends \ElkArte\ValuesContainer
 		}
 	}
 
+	/**
+	 * Loads the huge array of content for the templates (context)
+	 */
 	protected function loadExtended()
 	{
 		global $user_info, $modSettings, $txt, $settings, $context;
@@ -252,6 +302,9 @@ class Member extends \ElkArte\ValuesContainer
 		}
 	}
 
+	/**
+	 * Prepares signature, icons, and few basic stuff
+	 */
 	protected function prepareBasics()
 	{
 		global $user_info;
@@ -271,6 +324,11 @@ class Member extends \ElkArte\ValuesContainer
 		$this->data['buddy'] = in_array($this->data['id_member'], $user_info['buddies']);
 	}
 
+	/**
+	 * Stores the data of the user into an array
+	 *
+	 * @return mixed[]
+	 */
 	public function toArray()
 	{
 		return [

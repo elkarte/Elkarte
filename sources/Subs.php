@@ -1915,6 +1915,13 @@ function initUrlGenerator()
 	return $generator;
 }
 
+/**
+ * This function only checks if a certain feature (in core features)
+ * is enabled or not.
+ *
+ * @param string $feature The abbreviated code of a core feature
+ * @return bool true/false for enabled/disabled
+ */
 function featureEnabled($feature)
 {
 	global $modSettings, $context;

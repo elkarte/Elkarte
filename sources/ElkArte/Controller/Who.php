@@ -215,19 +215,19 @@ class Who extends \ElkArte\AbstractController
 		);
 
 		// Put it in the context variables.
+		\ElkArte\MembersList::loadGuest();
 		foreach ($context['members'] as $i => $member)
 		{
-			if ($member['id'] != 0)
+			$member_context = \ElkArte\MembersList::get($member['id']);
+			// The following happens when $member['id'] is not found among the loaded for any reason
+			// in such cases we load a guest dummy
+			if ($member_context->isEmpty())
 			{
-				$member_context = \ElkArte\MembersList::get($member['id']);
-				if ($member_context->isEmpty())
-				{
-					$member_context['id'] = 0;
-				}
-				else
-				{
-					$member_context->loadContext();
-				}
+				$member_context = \ElkArte\MembersList::get(0);
+			}
+			else
+			{
+				$member_context->loadContext();
 			}
 
 			// Keep the IP that came from the database.
