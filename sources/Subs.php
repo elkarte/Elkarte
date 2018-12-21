@@ -1914,3 +1914,26 @@ function initUrlGenerator()
 	}
 	return $generator;
 }
+
+/**
+ * This function only checks if a certain feature (in core features)
+ * is enabled or not.
+ *
+ * @param string $feature The abbreviated code of a core feature
+ * @return bool true/false for enabled/disabled
+ */
+function featureEnabled($feature)
+{
+	global $modSettings, $context;
+	static $features = null;
+
+	if ($features === null)
+	{
+		// This allows us to change the way things look for the admin.
+		$features = explode(',', isset($modSettings['admin_features']) ?
+			$modSettings['admin_features'] : 'cd,cp,k,w,rg,ml,pm');
+		// @deprecated since 2.0 - Next line is just for backward compatibility to remove before release
+		$context['admin_features'] = $features;
+	}
+	return in_array($feature, $features);
+}

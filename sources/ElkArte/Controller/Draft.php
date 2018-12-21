@@ -88,7 +88,7 @@ class Draft extends Post
 	 */
 	public function action_showProfileDrafts()
 	{
-		global $txt, $modSettings, $context, $user_info, $user_profile;
+		global $txt, $modSettings, $context, $user_info;
 
 		// Safe is safe.
 		if ($this->_memID != $user_info['id'])
@@ -107,9 +107,10 @@ class Draft extends Post
 		// Get things started
 		$msgCount = draftsCount($this->_memID, 0);
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
+		$name = \ElkArte\MembersList::get($this->_memID)->real_name;
 
 		// Make sure the starting place makes sense and construct our friend the page index.
-		$context['page_index'] = constructPageIndex(getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => $this->_memID, 'name' => $user_profile[$this->_memID]['real_name']]), $context['start'], $msgCount, $maxIndex);
+		$context['page_index'] = constructPageIndex(getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => $this->_memID, 'name' => $name]), $context['start'], $msgCount, $maxIndex);
 		$context['current_page'] = $context['start'] / $maxIndex;
 
 		list ($maxIndex, $reverse, $limit, $order) = $this->_query_limits($msgCount, $maxIndex);

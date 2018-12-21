@@ -66,7 +66,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 			'karma' => array(
 				'controller' => $this,
 				'function' => 'action_karmaSettings_display',
-				'enabled' => in_array('k', $context['admin_features']),
+				'enabled' => featureEnabled('k'),
 				'permission' => 'admin_forum'
 			),
 			'pmsettings' => array(
@@ -77,7 +77,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 			'likes' => array(
 				'controller' => $this,
 				'function' => 'action_likesSettings_display',
-				'enabled' => in_array('l', $context['admin_features']),
+				'enabled' => featureEnabled('l'),
 				'permission' => 'admin_forum'
 			),
 			'mention' => array(
@@ -93,7 +93,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 			'profile' => array(
 				'controller' => $this,
 				'function' => 'action_profile',
-				'enabled' => in_array('cp', $context['admin_features']),
+				'enabled' => featureEnabled('cp'),
 				'permission' => 'admin_forum'
 			),
 			'profileedit' => array(

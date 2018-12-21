@@ -1064,13 +1064,15 @@ function list_getBanTriggers($start, $items_per_page, $sort, $trigger_type)
  */
 function BanCheckUser($memID, $hostname = '', $email = '')
 {
-	global $memberContext, $scripturl, $txt;
+	global $scripturl, $txt;
 
 	$db = database();
 	$bans = array();
+	$member = \ElkArte\MembersList::get($memID);
+	$member->loadContext();
 
 	// This is a valid member id, we at least need that
-	if (loadMemberContext($memID) && isset($memberContext[$memID]))
+	if ($member->isEmpty() === false)
 	{
 		$ban_query = array();
 		$ban_query_vars = array(
@@ -1080,7 +1082,7 @@ function BanCheckUser($memID, $hostname = '', $email = '')
 		// Member id and ip
 		$ban_query[] = 'id_member = ' . $memID;
 		require_once(SOURCEDIR . '/Security.php');
-		$ban_query[] = constructBanQueryIP($memberContext[$memID]['ip']);
+		$ban_query[] = constructBanQueryIP($member['ip']);
 
 		// Do we have a hostname?
 		if (!empty($hostname))

@@ -61,10 +61,10 @@ class Profile extends \ElkArte\AbstractController
 	private $_memID = 0;
 
 	/**
-	 * The array from $user_profile stored here to avoid some global
-	 * @var mixed[]
+	 * The \ElkArte\Member object is stored here to avoid some global
+	 * @var \ElkArte\Member
 	 */
-	private $_profile = [];
+	private $_profile = null;
 
 	/**
 	 * Called before all other methods when coming from the dispatcher or
@@ -72,13 +72,12 @@ class Profile extends \ElkArte\AbstractController
 	 */
 	public function pre_dispatch()
 	{
-		global $user_profile;
-
 		require_once(SUBSDIR . '/Menu.subs.php');
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		$this->_memID = currentMemberID();
-		$this->_profile = $user_profile[$this->_memID];
+		\ElkArte\MembersList::load($this->_memID);
+		$this->_profile = \ElkArte\MembersList::get($this->_memID);
 	}
 
 	/**
@@ -90,7 +89,7 @@ class Profile extends \ElkArte\AbstractController
 	 */
 	public function action_index()
 	{
-		global $txt, $user_info, $context, $cur_profile, $memberContext;
+		global $txt, $user_info, $context, $cur_profile;
 		global $profile_vars, $post_errors;
 
 		// Don't reload this as we may have processed error strings.
@@ -106,8 +105,8 @@ class Profile extends \ElkArte\AbstractController
 		$cur_profile = $this->_profile;
 
 		// Let's have some information about this member ready, too.
-		loadMemberContext($this->_memID);
-		$context['member'] = $memberContext[$this->_memID];
+		$context['member'] = $this->_profile;
+		$context['member']->loadContext();
 
 		// Is this the profile of the user himself or herself?
 		$context['user']['is_owner'] = (int) $this->_memID === (int) $user_info['id'];
@@ -305,7 +304,7 @@ class Profile extends \ElkArte\AbstractController
 					),
 					'viewwarning' => array(
 						'label' => $txt['profile_view_warnings'],
-						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $this->_profile['warning'] && (!empty($modSettings['warning_show']) && ($context['user']['is_owner'] || $modSettings['warning_show'] == 2)),
+						'enabled' => featureEnabled('w') && !empty($modSettings['warning_enable']) && $this->_profile['warning'] && (!empty($modSettings['warning_show']) && ($context['user']['is_owner'] || $modSettings['warning_show'] == 2)),
 						'controller' => '\\ElkArte\\Controller\\ProfileInfo',
 						'function' => 'action_viewWarning',
 						'permission' => array(
@@ -448,7 +447,7 @@ class Profile extends \ElkArte\AbstractController
 					),
 					'issuewarning' => array(
 						'label' => $txt['profile_issue_warning'],
-						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && (!$context['user']['is_owner'] || $context['user']['is_admin']),
+						'enabled' => featureEnabled('w') && !empty($modSettings['warning_enable']) && (!$context['user']['is_owner'] || $context['user']['is_admin']),
 						'controller' => '\\ElkArte\\Controller\\ProfileAccount',
 						'function' => 'action_issuewarning',
 						'token' => 'profile-iw%u',

@@ -29,10 +29,10 @@ class ProfileHistory extends \ElkArte\AbstractController
 	private $_memID = 0;
 
 	/**
-	 * The array from $user_profile stored here to avoid some global
-	 * @var mixed[]
+	 * The \ElkArte\Member object is stored here to avoid some global
+	 * @var \ElkArte\Member
 	 */
-	private $_profile = [];
+	private $_profile = null;
 
 	/**
 	 * Called before all other methods when coming from the dispatcher or
@@ -40,12 +40,10 @@ class ProfileHistory extends \ElkArte\AbstractController
 	 */
 	public function pre_dispatch()
 	{
-		global $user_profile;
-
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		$this->_memID = currentMemberID();
-		$this->_profile = $user_profile[$this->_memID];
+		$this->_profile = \ElkArte\MembersList::get($this->_memID);
 	}
 
 	/**

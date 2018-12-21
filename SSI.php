@@ -894,8 +894,6 @@ function ssi_fetchGroupMembers($group_id = null, $output_method = 'echo')
  */
 function ssi_queryMembers($query_where = null, $query_where_params = array(), $query_limit = '', $query_order = 'id_member DESC', $output_method = 'echo')
 {
-	global $memberContext;
-
 	if ($query_where === null)
 	{
 		return false;
@@ -921,7 +919,7 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 	}
 
 	// Load the members.
-	loadMemberData($members);
+	\ElkArte\MembersList::load($members);
 
 	// Draw the table!
 	if ($output_method === 'echo')
@@ -931,16 +929,18 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 	}
 
 	$query_members = array();
-	foreach ($members as $member)
+	foreach ($members as $id)
 	{
+		$member = \ElkArte\MembersList::get($id);
 		// Load their context data.
-		if (!loadMemberContext($member))
+		if ($member->isEmpty())
 		{
 			continue;
 		}
+		$member->loadContext();
 
 		// Store this member's information.
-		$query_members[$member] = $memberContext[$member];
+		$query_members[$id] = $member;
 
 		// Only do something if we're echo'ing.
 		if ($output_method === 'echo')

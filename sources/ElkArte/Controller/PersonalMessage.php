@@ -117,7 +117,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 		// This is convenient.  Do you know how annoying it is to do this every time?!
 		$context['current_label_redirect'] = 'action=pm;f=' . $context['folder'] . (isset($this->_req->query->start) ? ';start=' . $this->_req->query->start : '') . (isset($this->_req->query->l) ? ';l=' . $this->_req->query->l : '');
-		$context['can_issue_warning'] = in_array('w', $context['admin_features']) && allowedTo('issue_warning') && !empty($modSettings['warning_enable']);
+		$context['can_issue_warning'] = featureEnabled('w') && allowedTo('issue_warning') && !empty($modSettings['warning_enable']);
 
 		// Build the linktree for all the actions...
 		$context['linktree'][] = array(
@@ -625,7 +625,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			$posters = array_unique($posters);
 			if (!empty($posters))
 			{
-				loadMemberData($posters);
+				\ElkArte\MembersList::load($posters);
 			}
 
 			// If we're on grouped/restricted view get a restricted list of messages.
@@ -1793,13 +1793,13 @@ class PersonalMessage extends \ElkArte\AbstractController
 	 */
 	public function action_settings()
 	{
-		global $txt, $user_info, $context, $scripturl, $profile_vars, $cur_profile, $user_profile;
+		global $txt, $user_info, $context, $scripturl, $profile_vars, $cur_profile;
 
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		// Load the member data for editing
-		loadMemberData($user_info['id'], false, 'profile');
-		$cur_profile = $user_profile[$user_info['id']];
+		\ElkArte\MembersList::load($user_info['id'], false, 'profile');
+		$cur_profile = \ElkArte\MembersList::get($user_info['id']);
 
 		// Load up the profile template, its where PM settings are located
 		theme()->getTemplates()->loadLanguageFile('Profile');
@@ -1843,8 +1843,8 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 			// Invalidate any cached data and reload so we show the saved values
 			\ElkArte\Cache\Cache::instance()->remove('member_data-profile-' . $user_info['id']);
-			loadMemberData($user_info['id'], false, 'profile');
-			$cur_profile = $user_profile[$user_info['id']];
+			\ElkArte\MembersList::load($user_info['id'], false, 'profile');
+			$cur_profile = \ElkArte\MembersList::get($user_info['id']);
 		}
 
 		// Load up the fields.
@@ -2256,7 +2256,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 	 */
 	public function action_search2()
 	{
-		global $scripturl, $modSettings, $context, $txt, $memberContext;
+		global $scripturl, $modSettings, $context, $txt;
 
 		// Make sure the server is able to do this right now
 		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
@@ -2467,7 +2467,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		$posters = array_unique($posters);
 		if (!empty($posters))
 		{
-			loadMemberData($posters);
+			\ElkArte\MembersList::load($posters);
 		}
 
 		// Sort out the page index.
@@ -2494,15 +2494,17 @@ class PersonalMessage extends \ElkArte\AbstractController
 				$row['subject'] = $row['subject'] === '' ? $txt['no_subject'] : $row['subject'];
 
 				// Load this posters context info, if its not there then fill in the essentials...
-				if (!loadMemberContext($row['id_member_from'], true))
+				$member = \ElkArte\MembersList::get($row['id_member_from']);
+				$member->loadContext(true);
+				if ($member->isEmpty() === false)
 				{
-					$memberContext[$row['id_member_from']]['name'] = $row['from_name'];
-					$memberContext[$row['id_member_from']]['id'] = 0;
-					$memberContext[$row['id_member_from']]['group'] = $txt['guest_title'];
-					$memberContext[$row['id_member_from']]['link'] = $row['from_name'];
-					$memberContext[$row['id_member_from']]['email'] = '';
-					$memberContext[$row['id_member_from']]['show_email'] = showEmailAddress(true, 0);
-					$memberContext[$row['id_member_from']]['is_guest'] = true;
+					$member['name'] = $row['from_name'];
+					$member['id'] = 0;
+					$member['group'] = $txt['guest_title'];
+					$member['link'] = $row['from_name'];
+					$member['email'] = '';
+					$member['show_email'] = showEmailAddress(true, 0);
+					$member['is_guest'] = true;
 				}
 
 				// Censor anything we don't want to see...
@@ -2531,7 +2533,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 				$context['personal_messages'][] = array(
 					'id' => $row['id_pm'],
-					'member' => &$memberContext[$row['id_member_from']],
+					'member' => $member,
 					'subject' => $subject_highlighted,
 					'body' => $body_highlighted,
 					'time' => standardTime($row['msgtime']),

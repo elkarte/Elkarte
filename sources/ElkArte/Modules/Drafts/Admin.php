@@ -51,7 +51,7 @@ class Admin extends \ElkArte\Modules\AbstractModule
 			'icon' => 'transparent.png',
 			'class' => 'admin_img_logs',
 			'permission' => array('admin_forum'),
-			'enabled' => in_array('dr', $context['admin_features']),
+			'enabled' => featureEnabled('dr'),
 		);
 	}
 

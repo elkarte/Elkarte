@@ -313,13 +313,13 @@ function increaseTopicLikes($id_topic, $direction)
  */
 function likesCount($memberID, $given = true)
 {
-	global $user_profile;
-
 	$db = database();
 
 	// Give is a given, received takes a query so its only the unique messages
 	if ($given === true)
-		$likes = $user_profile[$memberID]['likes_given'];
+	{
+		$likes = \ElkArte\MembersList::get($memberID)->likes_given;
+	}
 	else
 	{
 		$request = $db->query('', '

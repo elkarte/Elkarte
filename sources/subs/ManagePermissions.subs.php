@@ -507,19 +507,25 @@ function loadAllPermissions()
 	$hiddenPermissions = array();
 	$relabelPermissions = array(); // Permissions to apply a different label to.
 
-	if (!in_array('cd', $context['admin_features']))
+	if (featureEnabled('cd') === false)
 	{
 		$hiddenPermissions[] = 'calendar_view';
 		$hiddenPermissions[] = 'calendar_post';
 		$hiddenPermissions[] = 'calendar_edit';
 	}
-	if (!in_array('w', $context['admin_features']))
+	if (featureEnabled('w') === false)
+	{
 		$hiddenPermissions[] = 'issue_warning';
-	if (!in_array('k', $context['admin_features']))
+	}
+	if (featureEnabled('k') === false)
+	{
 		$hiddenPermissions[] = 'karma_edit';
-	if (!in_array('l', $context['admin_features']))
+	}
+	if (featureEnabled('l') === false)
+	{
 		$hiddenPermissions[] = 'like_posts';
-	if (!in_array('pe', $context['admin_features']))
+	}
+	if (featureEnabled('pe') === false)
 	{
 		$hiddenPermissions[] = 'approve_emails';
 		$hiddenPermissions[] = 'postby_email';

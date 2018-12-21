@@ -69,18 +69,17 @@ class SearchRenderer extends Renderer
 	/**
 	 * {@inheritdoc }
 	 */
-	protected function _adjustMemberContext()
+	protected function _adjustMemberContext($member_context)
 	{
 	}
 
 	/**
 	 * {@inheritdoc }
 	 */
-	protected function _adjustAllMembers()
+	protected function _adjustAllMembers($member_context)
 	{
-		global $memberContext;
-
-		$memberContext[$this->_this_message['id_member']]['ip'] = $this->_this_message['poster_ip'];
+		$member = \ElkArte\MembersList::get($this->_this_message['id_member']);
+		$member['ip'] = $this->_this_message['poster_ip'];
 
 		$this->_this_message['first_subject'] = censor($this->_this_message['first_subject']);
 		$this->_this_message['last_subject'] = censor($this->_this_message['last_subject']);
@@ -91,7 +90,7 @@ class SearchRenderer extends Renderer
 	 */
 	protected function _buildOutputArray()
 	{
-		global $modSettings, $context, $options, $user_info, $memberContext, $txt;
+		global $modSettings, $context, $options, $user_info, $txt;
 		global $boards_can;
 
 		// Make sure we don't end up with a practically empty message body.
@@ -168,11 +167,12 @@ class SearchRenderer extends Renderer
 			$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $subject_highlighted);
 		}
 
+		$member = \ElkArte\MembersList::get($this->_this_message['id_member']);
 		$output['matches'][] = array(
 			'id' => $this->_this_message['id_msg'],
 			'attachment' => loadAttachmentContext($this->_this_message['id_msg']),
 			'alternate' => $this->_counter % 2,
-			'member' => &$memberContext[$this->_this_message['id_member']],
+			'member' => $member,
 			'icon' => $this->_this_message['icon'],
 			'icon_url' => $this->_options->icon_sources->{$this->_this_message['icon']},
 			'subject' => $this->_this_message['subject'],

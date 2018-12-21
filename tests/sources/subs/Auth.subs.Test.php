@@ -33,16 +33,15 @@ class TestAuthsubs extends \PHPUnit\Framework\TestCase
 	 */
 	public function test_login_cookie()
 	{
-		global $cookiename, $context, $user_profile;
-
-		$context['admin_features'] = array();
+		global $cookiename, $context;
 
 		// Lets test load data, this should be id #1 for the testcase
-		$user_data = loadMemberData($this->user, true, 'profile');
-		$this->assertEquals(1, $user_data[0]);
+		$user_data = \ElkArte\MembersList::load($this->user, true, 'profile');
+		$member = \ElkArte\MembersList::get($user_data[0]);
 
-		$salt = $user_profile[1]['password_salt'];
-		setLoginCookie(60 * 60, $user_profile[1]['id_member'], hash('sha256', $this->passwd . $salt));
+		$this->assertEquals(1, $user_data[0]);
+		$salt = $member->password_salt;
+		setLoginCookie(60 * 60, $member->id_member, hash('sha256', $this->passwd . $salt));
 
 		// Cookie should be set, with our values
 		$array = json_decode($_COOKIE[$cookiename]);

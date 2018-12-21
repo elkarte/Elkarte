@@ -35,15 +35,21 @@ function currentMemberID($fatal = true, $reload_id = false)
 
 	// Did we get the user by name...
 	if (isset($_REQUEST['user']))
-		$memberResult = loadMemberData($_REQUEST['user'], true, 'profile');
+	{
+		$memberResult = \ElkArte\MembersList::load($_REQUEST['user'], true, 'profile');
+	}
 	// ... or by id_member?
 	elseif (!empty($_REQUEST['u']))
-		$memberResult = loadMemberData((int) $_REQUEST['u'], false, 'profile');
+	{
+		$memberResult = \ElkArte\MembersList::load((int) $_REQUEST['u'], false, 'profile');
+	}
 	// If it was just ?action=profile, edit your own profile.
 	else
-		$memberResult = loadMemberData($user_info['id'], false, 'profile');
+	{
+		$memberResult = \ElkArte\MembersList::load($user_info['id'], false, 'profile');
+	}
 
-	// Check if loadMemberData() has returned a valid result.
+	// Check if \ElkArte\MembersList::load() has returned a valid result.
 	if (!is_array($memberResult))
 	{
 		// Members only...
@@ -161,7 +167,7 @@ function setupProfileContext($fields, $hook = '')
  */
 function loadCustomFields($memID, $area = 'summary', array $custom_fields = array())
 {
-	global $context, $txt, $user_profile, $user_info, $settings, $scripturl;
+	global $context, $txt, $user_info, $settings, $scripturl;
 
 	$db = database();
 
@@ -200,8 +206,8 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Shortcut.
-		$exists = $memID && isset($user_profile[$memID], $user_profile[$memID]['options'][$row['col_name']]);
-		$value = $exists ? $user_profile[$memID]['options'][$row['col_name']] : $row['default_value'];
+		$options = \ElkArte\MembersList::get($memID)->options;
+		$value = isset($options[$row['col_name']]) ? $options[$row['col_name']] : $row['default_value'];
 
 		// If this was submitted already then make the value the posted version.
 		if (!empty($custom_fields) && isset($custom_fields[$row['col_name']]))
@@ -1218,10 +1224,10 @@ function profileValidateEmail($email, $memID = 0)
  */
 function saveProfileChanges(&$profile_vars, $memID)
 {
-	global $context, $user_profile;
+	global $context;
 
 	// These make life easier....
-	$old_id_theme = $user_profile[$memID]['id_theme'];
+	$old_id_theme = \ElkArte\MembersList::get($memID)->id_theme;
 
 	// Permissions...
 	if ($context['user']['is_owner'])
@@ -1514,7 +1520,7 @@ function makeNotificationChanges($memID)
  */
 function makeCustomFieldChanges($memID, $area, $sanitize = true)
 {
-	global $context, $user_profile, $user_info, $modSettings;
+	global $context, $user_info, $modSettings;
 
 	$db = database();
 
@@ -1589,14 +1595,15 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 				$value = (int) $value;
 		}
 
+		$options = \ElkArte\MembersList::get($memID)->options;
 		// Did it change or has it been set?
-		if ((!isset($user_profile[$memID]['options'][$row['col_name']]) && !empty($value)) || (isset($user_profile[$memID]['options'][$row['col_name']]) && $user_profile[$memID]['options'][$row['col_name']] !== $value))
+		if ((!isset($options[$row['col_name']]) && !empty($value)) || (isset($options[$row['col_name']]) && $options[$row['col_name']] !== $value))
 		{
 			$log_changes[] = array(
 				'action' => 'customfield_' . $row['col_name'],
 				'log_type' => 'user',
 				'extra' => array(
-					'previous' => !empty($user_profile[$memID]['options'][$row['col_name']]) ? $user_profile[$memID]['options'][$row['col_name']] : '',
+					'previous' => !empty($options[$row['col_name']]) ? $options[$row['col_name']] : '',
 					'new' => $value,
 					'applicator' => $user_info['id'],
 					'member_affected' => $memID,
@@ -1606,12 +1613,12 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 			$changes[] = array($row['col_name'], $value, $memID);
 			if (in_array($row['field_type'], array('radio', 'select')))
 			{
-				$user_profile[$memID]['options'][$row['col_name']] = $value;
-				$user_profile[$memID]['options'][$row['col_name'] . '_key'] = $row['col_name'] . '_' . $key;
+				$options[$row['col_name']] = $value;
+				$options[$row['col_name'] . '_key'] = $row['col_name'] . '_' . $key;
 			}
 			else
 			{
-				$user_profile[$memID]['options'][$row['col_name']] = $value;
+				$options[$row['col_name']] = $value;
 			}
 		}
 	}
@@ -3290,13 +3297,14 @@ function getMemberBoardPermissions($memID, $curGroups, $board = null)
  */
 function getMembersIPs($memID)
 {
-	global $modSettings, $user_profile;
+	global $modSettings;
 
 	$db = database();
+	$member = \ElkArte\MembersList::get($memID);
 
 	// @todo cache this
 	// If this is a big forum, or a large posting user, let's limit the search.
-	if ($modSettings['totalMessages'] > 50000 && $user_profile[$memID]['posts'] > 500)
+	if ($modSettings['totalMessages'] > 50000 && $member->posts > 500)
 	{
 		$request = $db->query('', '
 			SELECT MAX(id_msg)
@@ -3310,13 +3318,13 @@ function getMembersIPs($memID)
 		$db->free_result($request);
 
 		// There's no point worrying ourselves with messages made yonks ago, just get recent ones!
-		$min_msg_member = max(0, $max_msg_member - $user_profile[$memID]['posts'] * 3);
+		$min_msg_member = max(0, $max_msg_member - $member->posts * 3);
 	}
 
 	// Default to at least the ones we know about.
 	$ips = array(
-		$user_profile[$memID]['member_ip'],
-		$user_profile[$memID]['member_ip2'],
+		$member->member_ip,
+		$member->member_ip2,
 	);
 
 	// @todo cache this

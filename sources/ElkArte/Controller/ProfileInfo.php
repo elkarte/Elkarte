@@ -31,10 +31,10 @@ class ProfileInfo extends \ElkArte\AbstractController
 	private $_memID = 0;
 
 	/**
-	 * The array from $user_profile stored here to avoid some global
-	 * @var mixed[]
+	 * The \ElkArte\Member object is stored here to avoid some global
+	 * @var \ElkArte\Member
 	 */
-	private $_profile = [];
+	private $_profile = null;
 
 	/**
 	 * Holds the current summary tabs to load
@@ -51,12 +51,12 @@ class ProfileInfo extends \ElkArte\AbstractController
 	 */
 	public function pre_dispatch()
 	{
-		global $context, $user_info, $user_profile;
+		global $context, $user_info;
 
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		$this->_memID = currentMemberID();
-		$this->_profile = $user_profile[$this->_memID];
+		$this->_profile = \ElkArte\MembersList::get($this->_memID);
 
 		if (!isset($context['user']['is_owner']))
 		{
@@ -103,13 +103,17 @@ class ProfileInfo extends \ElkArte\AbstractController
 	 */
 	public function action_summary()
 	{
-		global $context, $memberContext, $modSettings, $scripturl;
+		global $context, $modSettings, $scripturl;
 
 		// Attempt to load the member's profile data.
-		if (!loadMemberContext($this->_memID) || !isset($memberContext[$this->_memID]))
+		if ($this->_profile->isEmpty())
+		{
 			throw new \ElkArte\Exceptions\Exception('not_a_user', false);
+		}
+		$this->_profile->loadContext();
 
 		theme()->getTemplates()->load('ProfileInfo');
+		theme()->getTemplates()->loadLanguageFile('Profile');
 
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = $scripturl . '?action=profile;u=' . $this->_memID;
@@ -339,7 +343,7 @@ class ProfileInfo extends \ElkArte\AbstractController
 	 */
 	private function _load_buddies()
 	{
-		global $context, $modSettings, $memberContext, $user_info;
+		global $context, $modSettings, $user_info;
 
 		// Would you be mine? Could you be mine? Be my buddy :D
 		$context['buddies'] = array();
@@ -348,13 +352,15 @@ class ProfileInfo extends \ElkArte\AbstractController
 			&& !empty($user_info['buddies'])
 			&& in_array('buddies', $this->_summary_areas))
 		{
-			loadMemberData($user_info['buddies'], false, 'profile');
+			\ElkArte\MembersList::load($user_info['buddies'], false, 'profile');
 
 			// Get the info for this buddy
 			foreach ($user_info['buddies'] as $buddy)
 			{
-				loadMemberContext($buddy, true);
-				$context['buddies'][$buddy] = $memberContext[$buddy];
+				$member = \ElkArte\MembersList::get($buddy);
+				$member->loadContext(true);
+
+				$context['buddies'][$buddy] = $member;
 			}
 		}
 	}
@@ -1305,19 +1311,21 @@ class ProfileInfo extends \ElkArte\AbstractController
 	 */
 	private function _define_user_values()
 	{
-		global $context, $memberContext, $modSettings, $txt;
+		global $context, $modSettings, $txt;
 
 		// Set up the context stuff and load the user.
 		$context += array(
-			'page_title' => sprintf($txt['profile_of_username'], $memberContext[$this->_memID]['name']),
+			'page_title' => sprintf($txt['profile_of_username'], $this->_profile['name']),
 			'can_send_pm' => allowedTo('pm_send'),
 			'can_send_email' => allowedTo('send_email_to_members'),
 			'can_have_buddy' => allowedTo('profile_identity_own') && !empty($modSettings['enable_buddylist']),
-			'can_issue_warning' => in_array('w', $context['admin_features']) && allowedTo('issue_warning') && !empty($modSettings['warning_enable']),
-			'can_view_warning' => in_array('w', $context['admin_features']) && (allowedTo('issue_warning') && !$context['user']['is_owner']) || (!empty($modSettings['warning_show']) && ($modSettings['warning_show'] > 1 || $context['user']['is_owner']))
+			'can_issue_warning' => featureEnabled('w') && allowedTo('issue_warning') && !empty($modSettings['warning_enable']),
+			'can_view_warning' => featureEnabled('w') && (allowedTo('issue_warning') && !$context['user']['is_owner']) || (!empty($modSettings['warning_show']) && ($modSettings['warning_show'] > 1 || $context['user']['is_owner']))
 		);
 
-		$context['member'] = &$memberContext[$this->_memID];
+		// @critical: potential problem here
+		$context['member'] = $this->_profile;
+		$context['member']->loadContext();
 		$context['member']['id'] = $this->_memID;
 
 		// Is the signature even enabled on this forum?
@@ -1459,19 +1467,16 @@ class ProfileInfo extends \ElkArte\AbstractController
 		// Set the age...
 		if (empty($context['member']['birth_date']))
 		{
-			$context['member'] += array(
-				'age' => $txt['not_applicable'],
-				'today_is_birthday' => false
-			);
+			$context['member']['age'] = $txt['not_applicable'];
+			$context['member']['today_is_birthday'] = false;
 		}
 		else
 		{
 			list ($birth_year, $birth_month, $birth_day) = sscanf($context['member']['birth_date'], '%d-%d-%d');
 			$datearray = getdate(forum_time());
-			$context['member'] += array(
-				'age' => $birth_year <= 4 ? $txt['not_applicable'] : $datearray['year'] - $birth_year - (($datearray['mon'] > $birth_month || ($datearray['mon'] == $birth_month && $datearray['mday'] >= $birth_day)) ? 0 : 1),
-				'today_is_birthday' => $datearray['mon'] == $birth_month && $datearray['mday'] == $birth_day
-			);
+			$context['member']['age'] = $birth_year <= 4 ? $txt['not_applicable'] : $datearray['year'] - $birth_year - (($datearray['mon'] > $birth_month || ($datearray['mon'] == $birth_month && $datearray['mday'] >= $birth_day)) ? 0 : 1);
+			$context['member']['today_is_birthday'] = $datearray['mon'] == $birth_month && $datearray['mday'] == $birth_day;
+
 		}
 	}
 
@@ -1480,14 +1485,14 @@ class ProfileInfo extends \ElkArte\AbstractController
 	 */
 	private function _determine_member_ip()
 	{
-		global $context, $memberContext, $modSettings;
+		global $context, $modSettings;
 
 		if (allowedTo('moderate_forum'))
 		{
 			// Make sure it's a valid ip address; otherwise, don't bother...
-			if (filter_var($memberContext[$this->_memID]['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false && empty($modSettings['disableHostnameLookup']))
+			if (filter_var($this->_profile['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false && empty($modSettings['disableHostnameLookup']))
 			{
-				$context['member']['hostname'] = host_from_ip($memberContext[$this->_memID]['ip']);
+				$context['member']['hostname'] = host_from_ip($this->_profile['ip']);
 			}
 			else
 			{

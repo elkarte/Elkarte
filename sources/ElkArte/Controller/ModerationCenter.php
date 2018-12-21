@@ -144,7 +144,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 					),
 					'warnings' => array(
 						'label' => $txt['mc_warnings'],
-						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
+						'enabled' => featureEnabled('w') && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
 						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
 						'function' => 'action_viewWarnings',
 						'icon' => 'transparent.png',
@@ -220,7 +220,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 				'areas' => array(
 					'userwatch' => array(
 						'label' => $txt['mc_watched_users_title'],
-						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
+						'enabled' => featureEnabled('w') && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
 						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
 						'function' => 'action_viewWatchedUsers',
 						'icon' => 'transparent.png',

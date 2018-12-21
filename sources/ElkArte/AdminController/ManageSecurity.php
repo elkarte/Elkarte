@@ -43,7 +43,7 @@ class ManageSecurity extends \ElkArte\AbstractController
 			'general' => array($this, 'action_securitySettings_display', 'permission' => 'admin_forum'),
 			'spam' => array($this, 'action_spamSettings_display', 'permission' => 'admin_forum'),
 			'badbehavior' => array($this, 'action_bbSettings_display', 'permission' => 'admin_forum'),
-			'moderation' => array($this, 'action_moderationSettings_display', 'enabled' => in_array('w', $context['admin_features']), 'permission' => 'admin_forum'),
+			'moderation' => array($this, 'action_moderationSettings_display', 'enabled' => featureEnabled('w'), 'permission' => 'admin_forum'),
 		);
 
 		// Action control

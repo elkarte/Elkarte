@@ -466,8 +466,8 @@ class CoreFeatures extends \ElkArte\AbstractController
 			$features[$id] = array(
 				'title' => isset($feature['title']) ? $feature['title'] : $txt['core_settings_item_' . $id],
 				'desc' => isset($feature['desc']) ? $feature['desc'] : $txt['core_settings_item_' . $id . '_desc'],
-				'enabled' => in_array($id, $context['admin_features']),
-				'state' => in_array($id, $context['admin_features']) ? 'on' : 'off',
+				'enabled' => featureEnabled($id),
+				'state' => featureEnabled($id) ? 'on' : 'off',
 				'url' => $feature['url'],
 				'image' => (file_exists($settings['theme_dir'] . '/images/admin/feature_' . $id . '.png') ? $settings['images_url'] : $settings['default_images_url']) . '/admin/feature_' . $id . '.png',
 			);

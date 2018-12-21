@@ -274,9 +274,13 @@ class Likes extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/Likes.subs.php');
 
 		if ($this->_req->getQuery('sa') === 'received')
+		{
 			$this->_action_showReceived();
+		}
 		else
+		{
 			$this->_action_showGiven();
+		}
 	}
 
 	/**
@@ -284,9 +288,10 @@ class Likes extends \ElkArte\AbstractController
 	 */
 	private function _action_showGiven()
 	{
-		global $context, $txt, $user_profile;
+		global $context, $txt;
 
 		$memID = currentMemberID();
+		$name = \ElkArte\MembersList::get($memID)->real_name;
 
 		// Build the listoption array to display the like data
 		$listOptions = array(
@@ -294,7 +299,7 @@ class Likes extends \ElkArte\AbstractController
 			'title' => $txt['likes'],
 			'items_per_page' => 25,
 			'no_items_label' => $txt['likes_none_given'],
-			'base_href' => getUrl('profile', ['action' => 'profile', 'area' => 'showlikes', 'sa' => 'given', 'u' => $memID, 'name' => $user_profile[$memID]['real_name']]),
+			'base_href' => getUrl('profile', ['action' => 'profile', 'area' => 'showlikes', 'sa' => 'given', 'u' => $memID, 'name' => $name]),
 			'default_sort_col' => 'subject',
 			'get_items' => array(
 				'function' => array($this, 'list_loadLikesPosts'),
@@ -386,9 +391,10 @@ class Likes extends \ElkArte\AbstractController
 	 */
 	private function _action_showReceived()
 	{
-		global $context, $txt, $user_profile;
+		global $context, $txt;
 
 		$memID = currentMemberID();
+		$name = \ElkArte\MembersList::get($memID)->real_name;
 
 		// Build the listoption array to display the data
 		$listOptions = array(
@@ -396,7 +402,7 @@ class Likes extends \ElkArte\AbstractController
 			'title' => $txt['likes'],
 			'items_per_page' => 25,
 			'no_items_label' => $txt['likes_none_received'],
-			'base_href' => getUrl('profile', ['action' => 'profile', 'area' => 'showlikes', 'sa' => 'received', 'u' => $memID, 'name' => $user_profile[$memID]['real_name']]),
+			'base_href' => getUrl('profile', ['action' => 'profile', 'area' => 'showlikes', 'sa' => 'received', 'u' => $memID, 'name' => $name]),
 			'default_sort_col' => 'subject',
 			'get_items' => array(
 				'function' => array($this, 'list_loadLikesReceived'),

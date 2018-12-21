@@ -296,12 +296,18 @@ class Templates
 			$this->loadEssentialThemeData();
 		}
 
+		$fix_arrays = false;
 		// For each file open it up and write it out!
 		foreach ($template_name as $template)
 		{
 			if (!$force_reload && isset($already_loaded[$template]) && $already_loaded[$template] == $lang)
 			{
 				return $lang;
+			}
+
+			if ($template === 'index')
+			{
+				$fix_arrays = true;
 			}
 
 			// Do we want the English version of language file as fallback?
@@ -355,6 +361,11 @@ class Templates
 				);
 				break;
 			}
+		}
+
+		if ($fix_arrays)
+		{
+			fix_calendar_text();
 		}
 
 		// Return the language actually loaded.

@@ -311,7 +311,7 @@ function ml_findSearchableCustomFields()
  */
 function printMemberListRows($request)
 {
-	global $txt, $context, $scripturl, $memberContext, $settings;
+	global $txt, $context, $scripturl, $settings;
 
 	$db = database();
 
@@ -334,17 +334,21 @@ function printMemberListRows($request)
 		$members[] = $row['id_member'];
 
 	// Load all the members for display.
-	loadMemberData($members);
+	\ElkArte\MembersList::load($members);
 
 	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	$context['members'] = array();
 	foreach ($members as $member)
 	{
-		if (!loadMemberContext($member, true))
+		$member_context = \ElkArte\MembersList::get($member);
+		$member_context->loadContext(true);
+		if ($member_context->isEmpty())
+		{
 			continue;
+		}
 
-		$context['members'][$member] = $memberContext[$member];
+		$context['members'][$member] = $member_context;
 		$context['members'][$member]['post_percent'] = round(($context['members'][$member]['real_posts'] * 100) / $most_posts);
 		$context['members'][$member]['registered_date'] = strftime('%Y-%m-%d', $context['members'][$member]['registered_timestamp']);
 		$context['members'][$member]['real_name'] = $context['members'][$member]['link'];
@@ -392,9 +396,13 @@ function printMemberListRows($request)
 
 				// Anything else to make it look "nice"
 				if ($column['bbc'])
+				{
 					$context['members'][$member]['options'][$curField] = strip_tags($bbc_parser->parseCustomFields($context['members'][$member]['options'][$curField]));
+				}
 				elseif ($column['type'] === 'check')
+				{
 					$context['members'][$member]['options'][$curField] = $context['members'][$member]['options'][$curField] == 0 ? $txt['no'] : $txt['yes'];
+				}
 			}
 		}
 	}

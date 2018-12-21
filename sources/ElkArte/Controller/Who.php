@@ -50,7 +50,7 @@ class Who extends \ElkArte\AbstractController
 	 */
 	public function action_who()
 	{
-		global $context, $scripturl, $txt, $modSettings, $memberContext;
+		global $context, $scripturl, $txt, $modSettings;
 
 		// Permissions, permissions, permissions.
 		isAllowedTo('who_view');
@@ -182,19 +182,9 @@ class Who extends \ElkArte\AbstractController
 			$member_ids[] = $row['id_member'];
 		}
 
-		// Load the user data for these members.
-		loadMemberData($member_ids);
-
-		// Load up the guest user.
-		$memberContext[0] = array(
-			'id' => 0,
-			'name' => $txt['guest_title'],
-			'group' => $txt['guest_title'],
-			'href' => '',
-			'link' => $txt['guest_title'],
-			'email' => $txt['guest_title'],
-			'is_guest' => true
-		);
+		// Load the user data for these members (and the guests).
+		\ElkArte\MembersList::load($member_ids);
+		\ElkArte\MembersList::loadGuest();
 
 		// Are we showing spiders?
 		$spiderContext = array();
@@ -225,19 +215,33 @@ class Who extends \ElkArte\AbstractController
 		);
 
 		// Put it in the context variables.
+		\ElkArte\MembersList::loadGuest();
 		foreach ($context['members'] as $i => $member)
 		{
-			if ($member['id'] != 0)
-				$member['id'] = loadMemberContext($member['id']) ? $member['id'] : 0;
+			$member_context = \ElkArte\MembersList::get($member['id']);
+			// The following happens when $member['id'] is not found among the loaded for any reason
+			// in such cases we load a guest dummy
+			if ($member_context->isEmpty())
+			{
+				$member_context = \ElkArte\MembersList::get(0);
+			}
+			else
+			{
+				$member_context->loadContext();
+			}
 
 			// Keep the IP that came from the database.
-			$memberContext[$member['id']]['ip'] = $member['ip'];
+			$member_context['ip'] = $member['ip'];
 			$context['members'][$i]['action'] = isset($url_data[$i]) ? $url_data[$i] : $txt['who_hidden'];
 
 			if ($member['id'] == 0 && isset($spiderContext[$member['id_spider']]))
+			{
 				$context['members'][$i] += $spiderContext[$member['id_spider']];
+			}
 			else
-				$context['members'][$i] += $memberContext[$member['id']];
+			{
+				$context['members'][$i] += $member_context->toArray()['data'];
+			}
 
 			if ($member['is_guest'])
 			{

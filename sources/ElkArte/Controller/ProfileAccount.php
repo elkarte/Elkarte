@@ -29,10 +29,10 @@ class ProfileAccount extends \ElkArte\AbstractController
 	private $_memID = 0;
 
 	/**
-	 * The array from $user_profile stored here to avoid some global
-	 * @var mixed[]
+	 * The \ElkArte\Member object is stored here to avoid some global
+	 * @var \ElkArte\Member
 	 */
-	private $_profile = [];
+	private $_profile = null;
 
 	/**
 	 * Holds any errors that were generated when issuing a warning
@@ -46,10 +46,8 @@ class ProfileAccount extends \ElkArte\AbstractController
 	 */
 	public function pre_dispatch()
 	{
-		global $user_profile;
-
 		$this->_memID = currentMemberID();
-		$this->_profile = $user_profile[$this->_memID];
+		$this->_profile = \ElkArte\MembersList::get($this->_memID);
 	}
 
 	/**
@@ -558,18 +556,16 @@ class ProfileAccount extends \ElkArte\AbstractController
 		checkSession();
 
 		// Check we got here as we should have!
-		if ($cur_profile != $this->_profile)
+		if ($cur_profile->id_member != $this->_profile->id_member)
 		{
 			throw new \ElkArte\Exceptions\Exception('no_access', false);
 		}
-
-		$old_profile = &$cur_profile;
 
 		// This file is needed for our utility functions.
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// Too often, people remove/delete their own only administrative account.
-		if (in_array(1, explode(',', $old_profile['additional_groups'])) || $old_profile['id_group'] == 1)
+		if (in_array(1, explode(',', $cur_profile['additional_groups'])) || $cur_profile['id_group'] == 1)
 		{
 			// Are you allowed to administrate the forum, as they are?
 			isAllowedTo('admin_forum');

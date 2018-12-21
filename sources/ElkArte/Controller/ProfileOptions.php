@@ -35,10 +35,10 @@ class ProfileOptions extends \ElkArte\AbstractController
 	private $_memID = 0;
 
 	/**
-	 * The array from $user_profile stored here to avoid some global
-	 * @var mixed[]
+	 * The \ElkArte\Member object is stored here to avoid some global
+	 * @var \ElkArte\Member
 	 */
-	private $_profile = [];
+	private $_profile = null;
 
 	/**
 	 * Returns the profile fields for a given area
@@ -123,10 +123,8 @@ class ProfileOptions extends \ElkArte\AbstractController
 	 */
 	public function pre_dispatch()
 	{
-		global $user_profile;
-
 		$this->_memID = currentMemberID();
-		$this->_profile = $user_profile[$this->_memID];
+		$this->_profile = \ElkArte\MembersList::get($this->_memID);
 	}
 
 	/**
@@ -189,7 +187,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 	 */
 	public function action_editBuddies()
 	{
-		global $context, $memberContext;
+		global $context;
 
 		theme()->getTemplates()->load('ProfileOptions');
 
@@ -281,14 +279,14 @@ class ProfileOptions extends \ElkArte\AbstractController
 		$context['buddy_count'] = count($buddies);
 
 		// Load all the members up.
-		loadMemberData($buddies, false, 'profile');
+		\ElkArte\MembersList::load($buddies, false, 'profile');
 
 		// Setup the context for each buddy.
 		$context['buddies'] = array();
 		foreach ($buddies as $buddy)
 		{
-			loadMemberContext($buddy, true);
-			$context['buddies'][$buddy] = $memberContext[$buddy];
+			$context['buddies'][$buddy] = \ElkArte\MembersList::get($buddy);
+			$context['buddies'][$buddy]->loadContext();
 		}
 
 		call_integration_hook('integrate_view_buddies', array($this->_memID));
@@ -301,7 +299,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 	 */
 	public function action_editIgnoreList()
 	{
-		global $context, $memberContext;
+		global $context;
 
 		theme()->getTemplates()->load('ProfileOptions');
 
@@ -384,14 +382,14 @@ class ProfileOptions extends \ElkArte\AbstractController
 		$context['ignore_count'] = count($ignored);
 
 		// Load all the members up.
-		loadMemberData($ignored, false, 'profile');
+		\ElkArte\MembersList::load($ignored, false, 'profile');
 
 		// Setup the context for each buddy.
 		$context['ignore_list'] = array();
 		foreach ($ignored as $ignore_member)
 		{
-			loadMemberContext($ignore_member);
-			$context['ignore_list'][$ignore_member] = $memberContext[$ignore_member];
+			$context['ignore_list'][$ignore_member] = \ElkArte\MembersList::get($ignore_member);
+			$context['ignore_list'][$ignore_member]->loadContext();
 		}
 	}
 
@@ -843,12 +841,10 @@ class ProfileOptions extends \ElkArte\AbstractController
 		createList($listOptions);
 
 		// What options are set?
-		$context['member'] += array(
-			'notify_announcements' => $this->_profile['notify_announcements'],
-			'notify_send_body' => $this->_profile['notify_send_body'],
-			'notify_types' => $this->_profile['notify_types'],
-			'notify_regularity' => $this->_profile['notify_regularity'],
-		);
+		$context['member']['notify_announcements'] = $this->_profile['notify_announcements'];
+		$context['member']['notify_send_body'] = $this->_profile['notify_send_body'];
+		$context['member']['notify_types'] = $this->_profile['notify_types'];
+		$context['member']['notify_regularity'] = $this->_profile['notify_regularity'];
 
 		$this->loadThemeOptions();
 	}
