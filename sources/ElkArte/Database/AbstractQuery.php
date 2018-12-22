@@ -152,7 +152,7 @@ abstract class AbstractQuery implements QueryInterface
 		global $user_info;
 
 		// Connection gone???  This should *never* happen at this point, yet it does :'(
-		if (!$this->validConnection($this->connection))
+		if (!$this->validConnection())
 		{
 			\ElkArte\Errors\Errors::instance()->display_db_error('ElkArte\\Database\\AbstractQuery::replacement__callback');
 		}
@@ -790,7 +790,7 @@ abstract class AbstractQuery implements QueryInterface
 	abstract public function server_version();
 
 	/**
-	 * Temporary function to supoprt migration to the new schema of the db layer
+	 * Temporary function to support migration to the new schema of the db layer
 	 * @deprecated since 2.0
 	 */
 	public function fetch_row($result)
@@ -807,7 +807,7 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
-	 * Temporary function to supoprt migration to the new schema of the db layer
+	 * Temporary function to support migration to the new schema of the db layer
 	 * @deprecated since 2.0
 	 */
 	public function fetch_assoc($result)
@@ -824,7 +824,7 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
-	 * Temporary function to supoprt migration to the new schema of the db layer
+	 * Temporary function to support migration to the new schema of the db layer
 	 * @deprecated since 2.0
 	 */
 	public function free_result($result)
@@ -851,7 +851,7 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
-	 * Temporary function to supoprt migration to the new schema of the db layer
+	 * Temporary function to support migration to the new schema of the db layer
 	 * @deprecated since 2.0
 	 */
 	public function num_rows($result)
@@ -868,7 +868,7 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
-	 * Temporary function to supoprt migration to the new schema of the db layer
+	 * Temporary function to support migration to the new schema of the db layer
 	 * @deprecated since 2.0
 	 */
 	public function num_fields($result)
@@ -885,7 +885,7 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
-	 * Temporary function to supoprt migration to the new schema of the db layer
+	 * Temporary function to support migration to the new schema of the db layer
 	 * @deprecated since 2.0
 	 */
 	public function insert_id($table)
@@ -895,7 +895,7 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
-	 * Temporary function to supoprt migration to the new schema of the db layer
+	 * Temporary function to support migration to the new schema of the db layer
 	 * @deprecated since 2.0
 	 */
 	public function data_seek($result, $counter)
@@ -915,7 +915,7 @@ abstract class AbstractQuery implements QueryInterface
 	}
 
 	/**
-	 * Temporary function to supoprt migration to the new schema of the db layer
+	 * Temporary function to support migration to the new schema of the db layer
 	 * @deprecated since 2.0
 	 */
 	abstract public function list_tables($db_name_str = false, $filter = false);

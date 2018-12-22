@@ -39,7 +39,7 @@ class Search extends \ElkArte\Database\AbstractSearch
 	public function search_query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
 		// Simply delegate to the database adapter method.
-		return parent::search_query('', $db_string, $db_values, $connection);
+		return parent::search_query('', $db_string, $db_values);
 	}
 
 	/**

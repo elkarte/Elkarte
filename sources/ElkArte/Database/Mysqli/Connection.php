@@ -43,14 +43,13 @@ class Connection implements \ElkArte\Database\ConnectionInterface
 			throw new \Exception('\\ElkArte\\Database\\Mysqli\\Connection::initiate');
 		}
 
-		$query = new \ElkArte\Database\Mysqli\Query($db_prefix, $connection);
+		$query = new Query($db_prefix, $connection);
 
 		// This makes it possible to automatically change the sql_mode and autocommit if needed.
 		if (!empty($db_options['mysql_set_mode']))
 		{
 			$query->query('', 'SET sql_mode = \'\', AUTOCOMMIT = 1',
-				array(),
-				false
+				array()
 			);
 		}
 
