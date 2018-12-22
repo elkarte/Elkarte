@@ -4,13 +4,9 @@
  * Part of the files dealing with preparing the content for display posts
  * via callbacks (Display, PM, Search).
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
- *
- * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -22,13 +18,15 @@ use \ElkArte\MessagesCallback\BodyParser\BodyParserInterface;
 use \ElkArte\ValuesContainer;
 
 /**
- * Renderer
+ * Class Renderer
  *
  * The common skeleton to display content via callback.
  * Classes extending this abstract should declare two constants:
  *   - BEFORE_PREPARE_HOOK
  *   - CONTEXT_HOOK
  * that will be strings used as hook names.
+ *
+ * @package ElkArte\MessagesCallback
  */
 abstract class Renderer
 {
@@ -81,11 +79,12 @@ abstract class Renderer
 	protected $_idx_mapper = array();
 
 	/**
-	 * Starts everything.
+	 * Renderer constructor, starts everything.
 	 *
 	 * @param Object $request
 	 * @param BodyParserInterface $bodyParser
 	 * @param ValuesContainer $opt
+	 * @throws \Exception
 	 */
 	public function __construct($request, BodyParserInterface $bodyParser, ValuesContainer $opt = null)
 	{
@@ -122,12 +121,11 @@ abstract class Renderer
 	 */
 	public function getContext($reset = false)
 	{
-		global $settings, $txt, $modSettings, $user_info;
-		global $context, $topic;
+		global $txt, $context;
 		static $counter = null;
 
 		// If the query returned false, bail.
-		if ($this->_dbRequest->hasResults() === false)
+		if (!is_object($this->_dbRequest) || $this->_dbRequest->hasResults() === false)
 		{
 			return false;
 		}
@@ -155,7 +153,7 @@ abstract class Renderer
 		}
 
 		// If you're a lazy bum, you probably didn't give a subject...
-		$this->_this_message['subject'] = $this->_this_message['subject'] != '' ? $this->_this_message['subject'] : $txt['no_subject'];
+		$this->_this_message['subject'] = $this->_this_message['subject'] !== '' ? $this->_this_message['subject'] : $txt['no_subject'];
 
 		$this->_setupPermissions();
 
@@ -241,13 +239,13 @@ abstract class Renderer
 	/**
 	 * Utility function, it can be overridden to alter something just after the
 	 * members' data have been loaded from the database.
-	 * Run only if member exists succeeded.
+	 * Run only if member exists failed.
+	 *
+	 * @param \ElkArte\ValuesContainer $member_context
 	 */
 	protected function _adjustGuestContext($member_context)
 	{
 		global $txt;
-
-		$member_id = $this->_this_message[$this->_idx_mapper->id_member];
 
 		// Notice this information isn't used anywhere else....
 		$member_context['name'] = $this->_this_message[$this->_idx_mapper->name];
@@ -262,11 +260,13 @@ abstract class Renderer
 	/**
 	 * Utility function, it can be overridden to alter something just after the
 	 * members data have been set.
-	 * Run only if member doesn't exist failed.
+	 * Run only if member doesn't exist succeeded.
+	 *
+	 * @param \ElkArte\ValuesContainer $member_context
 	 */
 	protected function _adjustMemberContext($member_context)
 	{
-		global $txt, $user_info, $context, $modSettings;
+		global $user_info, $context, $modSettings;
 
 		$member_id = $this->_this_message[$this->_idx_mapper->id_member];
 
@@ -295,10 +295,11 @@ abstract class Renderer
 	 * Utility function, it can be overridden to alter something just after either
 	 * the members or the guests data have been loaded from the database.
 	 * Run both if he member exists or not.
+	 *
+	 * @param \ElkArte\ValuesContainer $member_context
+	 * @return mixed
 	 */
-	protected function _adjustAllMembers($member_context)
-	{
-	}
+	abstract protected function _adjustAllMembers($member_context);
 
 	/**
 	 * The most important bit that differentiate the various implementations.
