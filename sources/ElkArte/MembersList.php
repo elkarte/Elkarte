@@ -59,11 +59,11 @@ class MembersList
 			self::$instance = new MembersList();
 		}
 
-		self::$loader = new \ElkArte\MemberLoader($db, $cache, $bbc_parser, self::$instance, [
+		self::$loader = new MemberLoader($db, $cache, $bbc_parser, self::$instance, [
 			'titlesEnable' => !empty($modSettings['titlesEnable']),
 			'custom_fields' => featureEnabled('cp'),
 			'load_moderators' => !empty($board_info['moderators']),
-			'display_fields' => isset($modSettings['displayFields']) ? \ElkArte\Util::unserialize($modSettings['displayFields']) : []
+			'display_fields' => isset($modSettings['displayFields']) ? Util::unserialize($modSettings['displayFields']) : []
 		]);
 	}
 
@@ -113,7 +113,7 @@ class MembersList
 	{
 		$member = self::$instance->getById($id);
 
-		return $member !== false ? $member : new class() extends \ElkArte\ValuesContainer {
+		return $member !== false ? $member : new class() extends ValuesContainer {
 			public function loadContext($display_custom_fields = false)
 			{}
 		};
@@ -122,7 +122,7 @@ class MembersList
 	/**
 	 * Adds a \ElkArte\Member object to the list.
 	 *
-	 * @param \ElkArte\Member $member_data The object representing 
+	 * @param \ElkArte\Member $member_data The object representing
 	 * @param int $id id of the member
 	 */
 	public static function add($member_data, $id)

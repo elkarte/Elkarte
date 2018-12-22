@@ -132,7 +132,7 @@ class Query extends AbstractQuery
 		// Debugging.
 		$this->_postQueryDebug();
 
-		$this->result = new \ElkArte\Database\Postgresql\Result($this->_db_last_result);
+		$this->result = new Result($this->_db_last_result);
 
 		// This is here only for compatibility with the previous database code.
 		// To remove when all the instances are fixed.
@@ -344,7 +344,7 @@ class Query extends AbstractQuery
 			$last_inserted_id = $this->insert_id($table);
 		}
 
-		$this->result = new \ElkArte\Database\Postgresql\Result(
+		$this->result = new Result(
 			is_object($ret) ? $ret->getResultObject() : $ret,
 			new \ElkArte\ValuesContainer([
 				'insert_id' => $last_inserted_id,

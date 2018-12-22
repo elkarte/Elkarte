@@ -18,7 +18,7 @@ namespace ElkArte;
 /**
  * This class holds all the data belonging to a certain member.
  */
-class Member extends \ElkArte\ValuesContainer
+class Member extends ValuesContainer
 {
 	/**
 	 * The set of data loaded
@@ -192,7 +192,7 @@ class Member extends \ElkArte\ValuesContainer
 	protected function loadExtended()
 	{
 		global $user_info, $modSettings, $txt, $settings, $context;
-		if ($this->set !== \ElkArte\MemberLoader::SET_MINIMAL)
+		if ($this->set !== MemberLoader::SET_MINIMAL)
 		{
 			$buddy_list = !empty($this->data['buddy_list']) ? explode(',', $this->data['buddy_list']) : array();
 			$style_color = !empty($this->data['member_group_color']) ? 'style="color:' . $this->data['member_group_color'] . ';"' : '';
@@ -231,13 +231,13 @@ class Member extends \ElkArte\ValuesContainer
 				'ip2' => htmlspecialchars($this->data['member_ip2'], ENT_COMPAT, 'UTF-8'),
 				'online' => array(
 					'is_online' => $this->data['is_online'],
-					'text' => \ElkArte\Util::htmlspecialchars($txt[$online_status]),
-					'member_online_text' => sprintf($txt['member_is_' . $online_status], \ElkArte\Util::htmlspecialchars($this->data['real_name'])),
+					'text' => Util::htmlspecialchars($txt[$online_status]),
+					'member_online_text' => sprintf($txt['member_is_' . $online_status], Util::htmlspecialchars($this->data['real_name'])),
 					'href' => $send_pm_url,
 					'link' => '<a href="' . $send_pm_url . '">' . $txt[$online_status] . '</a>',
 					'label' => $txt[$online_status]
 				),
-				'language' => \ElkArte\Util::ucwords(strtr($this->data['lngfile'], array('_' => ' '))),
+				'language' => Util::ucwords(strtr($this->data['lngfile'], array('_' => ' '))),
 				'is_activated' => isset($this->data['is_activated']) ? $this->data['is_activated'] : 1,
 				'is_banned' => isset($this->data['is_activated']) ? $this->data['is_activated'] >= 10 : 0,
 				'options' => $this->data['options'],

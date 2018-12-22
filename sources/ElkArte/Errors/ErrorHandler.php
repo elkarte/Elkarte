@@ -159,7 +159,7 @@ final class ErrorHandler extends Errors
 		call_integration_hook('integrate_output_error', [$e]);
 
 		// \ElkArte\Exceptions\Exception handles its own logging.
-		if (!$e instanceof \ElkArte\Exceptions\Exception)
+		if (!$e instanceof Exception)
 		{
 			$this->log_error(
 				$this->error_name . ': ' . $this->error_string,

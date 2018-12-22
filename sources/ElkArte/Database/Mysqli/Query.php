@@ -84,7 +84,7 @@ class Query extends AbstractQuery
 		// Debugging.
 		$this->_postQueryDebug();
 
-		$this->result = new \ElkArte\Database\Mysqli\Result($ret,
+		$this->result = new Result($ret,
 			new \ElkArte\ValuesContainer([
 				'connection' => $this->connection
 			])
@@ -472,7 +472,7 @@ class Query extends AbstractQuery
 			)
 		);
 
-		$this->result = new \ElkArte\Database\Mysqli\Result(
+		$this->result = new Result(
 			is_object($ret) ? $ret->getResultObject() : $ret,
 			new \ElkArte\ValuesContainer([
 				'connection' => $this->connection
