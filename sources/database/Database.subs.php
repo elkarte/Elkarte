@@ -23,7 +23,7 @@
  * @param mixed[] $db_options
  * @param string $db_type
  *
- * @return \ElkArte\QueryInterface
+ * @return \ElkArte\Database\QueryInterface
  * @throws \Exception
  */
 function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array(), $db_type = 'mysql')
@@ -39,7 +39,7 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
  *                      If set to true, from that moment onwards the old
  *                      instance will be lost and only the new one returned
  *
- * @return \ElkArte\QueryInterface
+ * @return \ElkArte\Database\QueryInterface
  * @throws \Exception
  */
 function database($fatal = true, $force = false)
@@ -75,7 +75,7 @@ function database($fatal = true, $force = false)
 				throw $e;
 			}
 		}
-		
+
 	}
 	return $db;
 }
@@ -87,7 +87,7 @@ function database($fatal = true, $force = false)
  * @param object|null $db - A database object (e.g. \ElkArte\Mysqli\Query)
  * @param bool $fatal - Stop the execution or throw an \Exception
  *
- * @return \ElkArte\AbstractTable
+ * @return \ElkArte\Database\AbstractTable
  * @throws \Exception
  */
 function db_table($db = null, $fatal = false)
@@ -128,7 +128,7 @@ function db_table($db = null, $fatal = false)
  * This function returns an instance of \ElkArte\AbstractSearch,
  * specifically designed for database utilities related to search.
  *
- * @return \ElkArte\AbstractSearch
+ * @return \ElkArte\Database\AbstractSearch
  * @throws \Exception
  */
 function db_search()

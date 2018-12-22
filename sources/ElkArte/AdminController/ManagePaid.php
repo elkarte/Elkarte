@@ -759,6 +759,8 @@ class ManagePaid extends \ElkArte\AbstractController
 
 		$context['sub_template'] = 'show_list';
 		$context['default_list'] = 'subscribed_users_list';
+
+		return true;
 	}
 
 	/**

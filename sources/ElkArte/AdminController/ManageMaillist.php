@@ -1872,6 +1872,8 @@ class ManageMaillist extends \ElkArte\AbstractController
 		}
 
 		createToken('mod-mlt');
+
+		return true;
 	}
 
 	/**
