@@ -5,13 +5,12 @@
  * messages. It allows viewing, sending, deleting, and marking.
  * For compatibility reasons, they are often called "instant messages".
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ * copyright: 2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -23,9 +22,10 @@ use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\ControllerRedirectException;
 
 /**
+ * Class PersonalMessage
  * It allows viewing, sending, deleting, and marking personal messages
  *
- * @package PersonalMessage
+ * @package ElkArte\Controller
  */
 class PersonalMessage extends \ElkArte\AbstractController
 {
@@ -394,6 +394,8 @@ class PersonalMessage extends \ElkArte\AbstractController
 	/**
 	 * Display a folder, ie. inbox/sent etc.
 	 *
+	 * Display mode: 0 = all at once, 1 = one at a time, 2 = as a conversation
+	 *
 	 * @uses folder sub template
 	 * @uses subject_list, pm template layers
 	 */
@@ -656,15 +658,17 @@ class PersonalMessage extends \ElkArte\AbstractController
 			$messages_request = false;
 		}
 
+		// Initialize the subject and message render callbacks
 		$bodyParser = new \ElkArte\MessagesCallback\BodyParser\Normal(array(), false);
 		$renderer = new \ElkArte\MessagesCallback\PmRenderer($messages_request, $bodyParser);
-		$srenderer = new \ElkArte\MessagesCallback\PmRenderer($subjects_request, $bodyParser);
+		$subject_renderer = new \ElkArte\MessagesCallback\PmRenderer($subjects_request, $bodyParser);
 
+		// Subject and Message
 		$context['get_pmessage'] = array($renderer, 'getContext');
-		$context['get_psubject'] = array($srenderer, 'getContext');
+		$context['get_psubject'] = array($subject_renderer, 'getContext');
 
-		$context['topic_starter_id'] = 0;
 		// Prepare some items for the template
+		$context['topic_starter_id'] = 0;
 		$context['can_send_pm'] = allowedTo('pm_send');
 		$context['can_send_email'] = allowedTo('send_email_to_members');
 		$context['sub_template'] = 'folder';
@@ -672,7 +676,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		$context['sort_direction'] = $descending ? 'down' : 'up';
 		$context['sort_by'] = $sort_by;
 
-		if ($messages_request->hasResults())
+		if ($messages_request !== false && $messages_request->hasResults())
 		{
 			// Auto video embedding enabled, someone may have a link in a PM
 			if (!empty($modSettings['enableVideoEmbeding']))
@@ -2587,6 +2591,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 	 * - Sets the parameters for use in the query
 	 *
 	 * @return string
+	 * @throws \Exception
 	 */
 	private function _setLabelQuery()
 	{
