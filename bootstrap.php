@@ -28,6 +28,13 @@ use ElkArte\Hooks;
 class Bootstrap
 {
 	/**
+	 * What is returned by the function getrusage.
+	 *
+	 * @var mixed[]
+	 */
+	protected $rusage_start = [];
+
+	/**
 	 * Bootstrap constructor.
 	 *
 	 * @param bool $standalone
@@ -105,18 +112,7 @@ class Bootstrap
 	 */
 	private function setRusage()
 	{
-		global $rusage_start;
-
-		// Directional only script time usage for display
-		// getrusage is missing in php < 7 on Windows
-		if (function_exists('getrusage'))
-		{
-			$rusage_start = getrusage();
-		}
-		else
-		{
-			$rusage_start = array();
-		}
+		$this->rusage_start = getrusage();
 	}
 
 	/**
@@ -275,12 +271,12 @@ class Bootstrap
 	 */
 	private function setDebug()
 	{
-		global $db_show_debug, $rusage_start;
+		global $db_show_debug;
 
 		// Show lots of debug information below the page, not for production sites
 		if ($db_show_debug === true)
 		{
-			\ElkArte\Debug::instance()->rusage('start', $rusage_start);
+			\ElkArte\Debug::instance()->rusage('start', $this->rusage_start);
 		}
 	}
 
