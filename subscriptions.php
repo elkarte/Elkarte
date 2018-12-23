@@ -257,7 +257,7 @@ else
 }
 
 // In case we have anything specific to do.
-$gatewayClass->close();
+$gatewayClass->close($subscription_id);
 
 /**
  * Log an error then exit
