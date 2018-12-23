@@ -20,11 +20,11 @@
 
 /**
  * Load up all the tests we might want to do ;)
+ *
+ * @return mixed[]
  */
 function loadForumTests()
 {
-	global $errorTests;
-
 	/**
 	 * This array is defined like so:
 	 *
@@ -54,7 +54,7 @@ function loadForumTests()
 	 */
 
 	// This great array contains all of our error checks, fixes, etc etc etc.
-	$errorTests = array(
+	return array(
 		// Make a last-ditch-effort check to get rid of topics with zeros..
 		'zero_topics' => array(
 			'check_query' => '
@@ -1385,7 +1385,7 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
  */
 function findForumErrors($do_fix = false)
 {
-	global $context, $txt, $errorTests, $db_show_debug;
+	global $context, $txt, $db_show_debug;
 
 	$db = database();
 
@@ -1402,6 +1402,8 @@ function findForumErrors($do_fix = false)
 	if ($db_show_debug === true)
 		\ElkArte\Debug::instance()->off();
 
+	// Will want this.
+	$errorTests = loadForumTests();
 	$context['total_steps'] = count($errorTests);
 
 	// For all the defined error types do the necessary tests.

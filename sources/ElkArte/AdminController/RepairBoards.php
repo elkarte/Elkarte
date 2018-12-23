@@ -75,9 +75,6 @@ class RepairBoards extends \ElkArte\AbstractController
 		if (isset($this->_req->query->fixErrors))
 			checkSession('get');
 
-		// Will want this.
-		loadForumTests();
-
 		// Giant if/else. The first displays the forum errors if a variable is not set and asks
 		// if you would like to continue, the other fixes the errors.
 		if (!isset($this->_req->query->fixErrors))
