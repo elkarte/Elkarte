@@ -144,13 +144,13 @@ class Bootstrap
 		global $cookiename, $db_type, $db_server, $db_port, $db_name, $db_user, $db_passwd;
 		global $ssi_db_user, $ssi_db_passwd, $db_prefix, $db_persist, $db_error_send, $cache_accelerator;
 		global $cache_uid, $cache_password, $cache_enable, $cache_memcached, $db_show_debug, $url_format;
-		global $cachedir, $boarddir, $sourcedir, $extdir, $languagedir, $ignore_install_dir;
+		global $cachedir, $boarddir, $sourcedir, $extdir, $languagedir;
 
 		// Where the Settings.php file is located
 		$settings_loc = __DIR__ . '/Settings.php';
 
 		// First thing: if the install dir exists, just send anybody there
-		// The ignore_install_dir var is for developers only. Do not add it on production sites
+		// The IGNORE_INSTALL_DIR constant is for developers only. Do not add it on production sites
 		if (file_exists('install'))
 		{
 			if (file_exists($settings_loc))
@@ -158,7 +158,7 @@ class Bootstrap
 				require_once($settings_loc);
 			}
 
-			if (empty($ignore_install_dir))
+			if (defined('IGNORE_INSTALL_DIR'))
 			{
 				if (file_exists($settings_loc) && empty($_SESSION['installing']))
 				{
