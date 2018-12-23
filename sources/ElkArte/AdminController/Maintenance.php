@@ -188,7 +188,7 @@ class Maintenance extends \ElkArte\AbstractController
 	 */
 	public function action_database()
 	{
-		global $context, $modSettings, $maintenance, $iknowitmaybeunsafe;
+		global $context, $modSettings, $maintenance;
 
 		// We need this, really..
 		require_once(SUBSDIR . '/Maintenance.subs.php');
@@ -271,7 +271,7 @@ class Maintenance extends \ElkArte\AbstractController
 				'error' => '',
 			);
 		}
-		$context['skip_security'] = !empty($iknowitmaybeunsafe);
+		$context['skip_security'] = defined('I_KNOW_IT_MAY_BE_UNSAFE');
 	}
 
 	/**
@@ -1038,7 +1038,7 @@ class Maintenance extends \ElkArte\AbstractController
 	 */
 	public function action_backup_display()
 	{
-		global $user_info, $iknowitmaybeunsafe;
+		global $user_info;
 
 		validateToken('admin-maint');
 
@@ -1049,8 +1049,10 @@ class Maintenance extends \ElkArte\AbstractController
 		checkSession('post');
 
 		// Validate access
-		if (empty($iknowitmaybeunsafe) && !$this->_validate_access())
+		if (defined('I_KNOW_IT_MAY_BE_UNSAFE') === false && $this->_validate_access() === false)
+		{
 			return $this->action_database();
+		}
 		else
 		{
 			require_once(SUBSDIR . '/Admin.subs.php');
