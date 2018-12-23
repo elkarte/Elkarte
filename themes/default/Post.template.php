@@ -666,7 +666,7 @@ function template_topic_replies_below()
  */
 function template_postarea_below()
 {
-	global $context, $txt, $counter, $settings;
+	global $context, $txt, $settings;
 
 	// Is visual verification enabled?
 	if (!empty($context['require_verification']))
@@ -720,7 +720,6 @@ function template_postarea_below()
 				txt_preview_fetch = "', $txt['preview_fetch'], '",
 				make_poll = ', $context['make_poll'] ? 'true' : 'false', ',
 				new_replies = new Array(),
-				reply_counter = ', empty($counter) ? 0 : $counter, ',
 				can_quote = ', $context['can_quote'] ? 'true' : 'false', ',
 				show_ignore_user_post = "', $txt['show_ignore_user_post'], '",
 				txt_bbc_quote = "', $txt['bbc_quote'], '",
