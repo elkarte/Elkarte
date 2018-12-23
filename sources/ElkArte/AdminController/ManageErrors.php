@@ -64,7 +64,7 @@ class ManageErrors extends \ElkArte\AbstractController
 	 */
 	protected function action_log()
 	{
-		global $scripturl, $txt, $context, $modSettings, $filter;
+		global $scripturl, $txt, $context, $modSettings;
 
 		// Templates, etc...
 		theme()->getTemplates()->loadLanguageFile('Maintenance');
