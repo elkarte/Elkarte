@@ -68,7 +68,7 @@ function updateSignature($id_member, $signature)
  */
 function updateAllSignatures($applied_sigs)
 {
-	global $context, $sig_start, $modSettings;
+	global $context, $modSettings;
 
 	require_once(SUBSDIR . '/Members.subs.php');
 	$sig_start = time();
@@ -305,7 +305,9 @@ function updateAllSignatures($applied_sigs)
 
 		$applied_sigs += 50;
 		if (!$done)
-			pauseSignatureApplySettings($applied_sigs);
+		{
+			pauseSignatureApplySettings($applied_sigs, $sig_start);
+		}
 	}
 }
 
@@ -870,4 +872,44 @@ function scanFileSystemForControllers($iterator, $namespace = '')
 	}
 
 	return $types;
+}
+
+/**
+ * Just pause the signature applying thing.
+ *
+ * @todo Move to subs file
+ * @todo Merge with other pause functions?
+ *    pausePermsSave(), pauseAttachmentMaintenance(), pauseRepairProcess()
+ *
+ * @param int $applied_sigs
+ * @param int $sig_start
+ * @throws \ElkArte\Exceptions\Exception
+ */
+function pauseSignatureApplySettings($applied_sigs, $sig_start)
+{
+	global $context, $txt;
+
+	// Try get more time...
+	detectServer()->setTimeLimit(600);
+
+	// Have we exhausted all the time we allowed?
+	if (time() - array_sum(explode(' ', $sig_start)) < 3)
+		return;
+
+	$context['continue_get_data'] = '?action=admin;area=featuresettings;sa=sig;apply;step=' . $applied_sigs . ';' . $context['session_var'] . '=' . $context['session_id'];
+	$context['page_title'] = $txt['not_done_title'];
+	$context['continue_post_data'] = '';
+	$context['continue_countdown'] = '2';
+	$context['sub_template'] = 'not_done';
+
+	// Specific stuff to not break this template!
+	$context[$context['admin_menu_name']]['current_subsection'] = 'sig';
+
+	// Get the right percent.
+	$context['continue_percent'] = round(($applied_sigs / $context['max_member']) * 100);
+
+	// Never more than 100%!
+	$context['continue_percent'] = min($context['continue_percent'], 100);
+
+	obExit();
 }

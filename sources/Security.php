@@ -1525,11 +1525,13 @@ function constructBanQueryIP($fullip)
  * - Admins and Moderators get a free pass
  * - Optionally existing users with post counts over a limit are bypassed
  * - Others get a humane frisking
+ * @return bool|int
  */
 function loadBadBehavior()
 {
-	global $modSettings, $user_info, $bb2_results;
+	global $modSettings, $user_info;
 
+	$bb2_results = false;
 	// Bad Behavior Enabled?
 	if (!empty($modSettings['badbehavior_enabled']))
 	{
@@ -1554,6 +1556,8 @@ function loadBadBehavior()
 			theme()->addInlineJavascript(bb2_insert_head());
 		}
 	}
+
+	return $bb2_results;
 }
 
 /**

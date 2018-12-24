@@ -46,7 +46,7 @@ class RepairBoards extends \ElkArte\AbstractController
 	 */
 	public function action_repairboards()
 	{
-		global $txt, $context, $salvageBoardID, $db_show_debug;
+		global $txt, $context, $db_show_debug;
 
 		isAllowedTo('admin_forum');
 
@@ -74,9 +74,6 @@ class RepairBoards extends \ElkArte\AbstractController
 		// Start displaying errors without fixing them.
 		if (isset($this->_req->query->fixErrors))
 			checkSession('get');
-
-		// Will want this.
-		loadForumTests();
 
 		// Giant if/else. The first displays the forum errors if a variable is not set and asks
 		// if you would like to continue, the other fixes the errors.
@@ -135,8 +132,11 @@ class RepairBoards extends \ElkArte\AbstractController
 				'calendar_updated' => time(),
 			));
 
-			if (!empty($salvageBoardID))
+			if (!empty($_SESSION['redirect_to_recount']))
+			{
 				$context['redirect_to_recount'] = true;
+				$_SESSION['redirect_to_recount'] = null;
+			}
 
 			$_SESSION['repairboards_to_fix'] = null;
 			$_SESSION['repairboards_to_fix2'] = null;

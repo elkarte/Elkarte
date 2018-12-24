@@ -91,7 +91,6 @@ class SearchRenderer extends Renderer
 	protected function _buildOutputArray()
 	{
 		global $modSettings, $context, $options, $user_info, $txt;
-		global $boards_can;
 
 		// Make sure we don't end up with a practically empty message body.
 		$this->_this_message['body'] = preg_replace('~^(?:&nbsp;)+$~', '', $this->_this_message['body']);
@@ -105,9 +104,9 @@ class SearchRenderer extends Renderer
 
 		$output['posted_in'] = !empty($this->_participants[$this->_this_message['id_topic']]);
 		$output['tests'] = array(
-			'can_reply' => in_array($this->_this_message['id_board'], $boards_can['post_reply_any']) || in_array(0, $boards_can['post_reply_any']),
-			'can_quote' => (in_array($this->_this_message['id_board'], $boards_can['post_reply_any']) || in_array(0, $boards_can['post_reply_any'])) && $quote_enabled,
-			'can_mark_notify' => in_array($this->_this_message['id_board'], $boards_can['mark_any_notify']) || in_array(0, $boards_can['mark_any_notify']) && !$context['user']['is_guest'],
+			'can_reply' => in_array($this->_this_message['id_board'], $this->_options['boards_can']['post_reply_any']) || in_array(0, $this->_options['boards_can']['post_reply_any']),
+			'can_quote' => (in_array($this->_this_message['id_board'], $this->_options['boards_can']['post_reply_any']) || in_array(0, $this->_options['boards_can']['post_reply_any'])) && $quote_enabled,
+			'can_mark_notify' => in_array($this->_this_message['id_board'], $this->_options['boards_can']['mark_any_notify']) || in_array(0, $this->_options['boards_can']['mark_any_notify']) && !$context['user']['is_guest'],
 		);
 		$href = getUrl('board', ['board' => $this->_this_message['id_board'], 'start' => '0', 'name' => $this->_this_message['bname']]);
 		$output['board'] = array(
@@ -138,17 +137,17 @@ class SearchRenderer extends Renderer
 			$started = $output['first_post']['member']['id'] == $user_info['id'];
 
 			$output['quick_mod'] = array(
-				'lock' => in_array(0, $boards_can['lock_any']) || in_array($output['board']['id'], $boards_can['lock_any']) || ($started && (in_array(0, $boards_can['lock_own']) || in_array($output['board']['id'], $boards_can['lock_own']))),
-				'sticky' => (in_array(0, $boards_can['make_sticky']) || in_array($output['board']['id'], $boards_can['make_sticky'])),
-				'move' => in_array(0, $boards_can['move_any']) || in_array($output['board']['id'], $boards_can['move_any']) || ($started && (in_array(0, $boards_can['move_own']) || in_array($output['board']['id'], $boards_can['move_own']))),
-				'remove' => in_array(0, $boards_can['remove_any']) || in_array($output['board']['id'], $boards_can['remove_any']) || ($started && (in_array(0, $boards_can['remove_own']) || in_array($output['board']['id'], $boards_can['remove_own']))),
+				'lock' => in_array(0, $this->_options['boards_can']['lock_any']) || in_array($output['board']['id'], $this->_options['boards_can']['lock_any']) || ($started && (in_array(0, $this->_options['boards_can']['lock_own']) || in_array($output['board']['id'], $this->_options['boards_can']['lock_own']))),
+				'sticky' => (in_array(0, $this->_options['boards_can']['make_sticky']) || in_array($output['board']['id'], $this->_options['boards_can']['make_sticky'])),
+				'move' => in_array(0, $this->_options['boards_can']['move_any']) || in_array($output['board']['id'], $this->_options['boards_can']['move_any']) || ($started && (in_array(0, $this->_options['boards_can']['move_own']) || in_array($output['board']['id'], $this->_options['boards_can']['move_own']))),
+				'remove' => in_array(0, $this->_options['boards_can']['remove_any']) || in_array($output['board']['id'], $this->_options['boards_can']['remove_any']) || ($started && (in_array(0, $this->_options['boards_can']['remove_own']) || in_array($output['board']['id'], $this->_options['boards_can']['remove_own']))),
 			);
 
 			$context['can_lock'] |= $output['quick_mod']['lock'];
 			$context['can_sticky'] |= $output['quick_mod']['sticky'];
 			$context['can_move'] |= $output['quick_mod']['move'];
 			$context['can_remove'] |= $output['quick_mod']['remove'];
-			$context['can_merge'] |= in_array($output['board']['id'], $boards_can['merge_any']);
+			$context['can_merge'] |= in_array($output['board']['id'], $this->_options['boards_can']['merge_any']);
 			$context['can_markread'] = $context['user']['is_logged'];
 
 			$context['qmod_actions'] = array('remove', 'lock', 'sticky', 'move', 'markread');

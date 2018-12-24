@@ -28,6 +28,13 @@ use ElkArte\Hooks;
 class Bootstrap
 {
 	/**
+	 * What is returned by the function getrusage.
+	 *
+	 * @var mixed[]
+	 */
+	protected $rusage_start = [];
+
+	/**
 	 * Bootstrap constructor.
 	 *
 	 * @param bool $standalone
@@ -105,18 +112,7 @@ class Bootstrap
 	 */
 	private function setRusage()
 	{
-		global $rusage_start;
-
-		// Directional only script time usage for display
-		// getrusage is missing in php < 7 on Windows
-		if (function_exists('getrusage'))
-		{
-			$rusage_start = getrusage();
-		}
-		else
-		{
-			$rusage_start = array();
-		}
+		$this->rusage_start = getrusage();
 	}
 
 	/**
@@ -144,13 +140,13 @@ class Bootstrap
 		global $cookiename, $db_type, $db_server, $db_port, $db_name, $db_user, $db_passwd;
 		global $ssi_db_user, $ssi_db_passwd, $db_prefix, $db_persist, $db_error_send, $cache_accelerator;
 		global $cache_uid, $cache_password, $cache_enable, $cache_memcached, $db_show_debug, $url_format;
-		global $cachedir, $boarddir, $sourcedir, $extdir, $languagedir, $ignore_install_dir;
+		global $cachedir, $boarddir, $sourcedir, $extdir, $languagedir;
 
 		// Where the Settings.php file is located
 		$settings_loc = __DIR__ . '/Settings.php';
 
 		// First thing: if the install dir exists, just send anybody there
-		// The ignore_install_dir var is for developers only. Do not add it on production sites
+		// The IGNORE_INSTALL_DIR constant is for developers only. Do not add it on production sites
 		if (file_exists('install'))
 		{
 			if (file_exists($settings_loc))
@@ -158,7 +154,7 @@ class Bootstrap
 				require_once($settings_loc);
 			}
 
-			if (empty($ignore_install_dir))
+			if (defined('IGNORE_INSTALL_DIR'))
 			{
 				if (file_exists($settings_loc) && empty($_SESSION['installing']))
 				{
@@ -275,12 +271,12 @@ class Bootstrap
 	 */
 	private function setDebug()
 	{
-		global $db_show_debug, $rusage_start;
+		global $db_show_debug;
 
 		// Show lots of debug information below the page, not for production sites
 		if ($db_show_debug === true)
 		{
-			\ElkArte\Debug::instance()->rusage('start', $rusage_start);
+			\ElkArte\Debug::instance()->rusage('start', $this->rusage_start);
 		}
 	}
 
@@ -322,7 +318,7 @@ class Bootstrap
 	public function ssi_main()
 	{
 		global $ssi_layers, $ssi_theme, $ssi_gzip, $ssi_ban, $ssi_guest_access;
-		global $modSettings, $context, $sc, $board, $topic, $user_info, $txt;
+		global $modSettings, $context, $board, $topic, $user_info, $txt;
 
 		// Check on any hacking attempts.
 		$this->_validRequestCheck();
@@ -362,7 +358,6 @@ class Bootstrap
 				$_SESSION['session_var'] = substr(preg_replace('~^\d+~', '', $tokenizer->generate_hash(16, session_id())), 0, rand(7, 12));
 			}
 
-			$sc = $_SESSION['session_value'];
 			// This is here only to avoid session errors in PHP7
 			// microtime effectively forces the replacing of the session in the db each
 			// time the page is loaded

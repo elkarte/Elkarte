@@ -20,11 +20,11 @@
 
 /**
  * Load up all the tests we might want to do ;)
+ *
+ * @return mixed[]
  */
 function loadForumTests()
 {
-	global $errorTests;
-
 	/**
 	 * This array is defined like so:
 	 *
@@ -54,7 +54,7 @@ function loadForumTests()
 	 */
 
 	// This great array contains all of our error checks, fixes, etc etc etc.
-	$errorTests = array(
+	return array(
 		// Make a last-ditch-effort check to get rid of topics with zeros..
 		'zero_topics' => array(
 			'check_query' => '
@@ -105,15 +105,12 @@ function loadForumTests()
 				WHERE t.id_topic IS NULL
 				GROUP BY m.id_topic, m.id_board',
 			'fix_processing' => function ($row) {
-				global $salvageBoardID;
-
 				$db = database();
 
 				// Only if we don't have a reasonable idea of where to put it.
 				if ($row['id_board'] == 0)
 				{
-					createSalvageArea();
-					$row['id_board'] = (int) $salvageBoardID;
+					$row['id_board'] = createSalvageBoard();
 				}
 
 				// Make sure that no topics claim the first/last message as theirs.
@@ -227,15 +224,14 @@ function loadForumTests()
 				WHERE p.id_poll BETWEEN {STEP_LOW} AND {STEP_HIGH}
 					AND t.id_poll IS NULL',
 			'fix_processing' => function ($row) {
-				global $salvageBoardID, $txt;
+				global $txt;
 
 				$db = database();
 
 				// Only if we don't have a reasonable idea of where to put it.
 				if ($row['id_board'] == 0)
 				{
-					createSalvageArea();
-					$row['id_board'] = (int) $salvageBoardID;
+					$row['id_board'] = createSalvageBoard();
 				}
 
 				$row['poster_name'] = !empty($row['poster_name']) ? $row['poster_name'] : $txt['guest'];
@@ -471,10 +467,10 @@ function loadForumTests()
 					AND t.id_topic BETWEEN {STEP_LOW} AND {STEP_HIGH}
 				GROUP BY t.id_board',
 			'fix_processing' => function ($row) {
-				global $salvageCatID, $txt;
+				global $txt;
 
 				$db = database();
-				createSalvageArea();
+				$salvageCatID = createSalvageCategory();
 
 				$row['my_num_topics'] = (int) $row['my_num_topics'];
 				$row['my_num_posts'] = (int) $row['my_num_posts'];
@@ -519,10 +515,8 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_cat',
 				'process' => function ($cats) {
-					global $salvageCatID;
-
 					$db = database();
-					createSalvageArea();
+					$salvageCatID = createSalvageCategory();
 					$db->query('', '
 						UPDATE {db_prefix}boards
 						SET id_cat = {int:salvageCatID}
@@ -583,10 +577,9 @@ function loadForumTests()
 			'fix_collect' => array(
 				'index' => 'id_parent',
 				'process' => function ($parents) {
-					global $salvageBoardID, $salvageCatID;
-
 					$db = database();
-					createSalvageArea();
+					$salvageCatID = createSalvageCategory();
+					$salvageBoardID = createSalvageBoard();
 					$db->query('', '
 						UPDATE {db_prefix}boards
 						SET id_parent = {int:salvageBoardID}, id_cat = {int:salvageCatID}, child_level = 1
@@ -1233,18 +1226,80 @@ function loadForumTests()
  * Create a salvage area for repair purposes, if one doesn't already exist.
  * Uses the forum's default language, and checks based on that name.
  */
-function createSalvageArea()
+function createSalvageBoard()
 {
-	global $txt, $language, $salvageBoardID, $salvageCatID;
+	global $txt, $language;
+	static $salvageBoardID = null;
+
+	if ($salvageBoardID !== null)
+	{
+		return $salvageBoardID;
+	}
 
 	$db = database();
-	static $createOnce = false;
 
-	// Have we already created it?
-	if ($createOnce)
-		return;
-	else
-		$createOnce = true;
+	// Back to the forum's default language.
+	theme()->getTemplates()->loadLanguageFile('Admin', $language);
+	$salvageCatID = createSalvageCategory();
+
+	// Check to see if a 'Salvage Board' exists, if not => insert one.
+	$result = $db->query('', '
+		SELECT id_board
+		FROM {db_prefix}boards
+		WHERE id_cat = {int:id_cat}
+			AND name = {string:board_name}
+		LIMIT 1',
+		array(
+			'id_cat' => $salvageCatID,
+			'board_name' => $txt['salvaged_board_name'],
+		)
+	);
+	if ($result->num_rows() != 0)
+	{
+		list ($salvageBoardID) = $result->fetch_row();
+	}
+	$result->free_result();
+
+	if (empty($salvageBoardID))
+	{
+		$result = $db->insert('',
+			'{db_prefix}boards',
+			array('name' => 'string-255', 'description' => 'string-255', 'id_cat' => 'int', 'member_groups' => 'string', 'board_order' => 'int', 'redirect' => 'string'),
+			array($txt['salvaged_board_name'], $txt['salvaged_board_description'], $salvageCatID, '1', -1, ''),
+			array('id_board')
+		);
+
+		if ($result->affected_rows() <= 0)
+		{
+			theme()->getTemplates()->loadLanguageFile('Admin');
+			throw new \ElkArte\Exceptions\Exception('salvaged_board_error', false);
+		}
+
+		$salvageBoardID = $result->insert_id();
+	}
+
+	// Restore the user's language.
+	theme()->getTemplates()->loadLanguageFile('Admin');
+	$salvageBoardID = (int) $salvageBoardID;
+
+	return $salvageBoardID;
+}
+
+/**
+ * Create a salvage area for repair purposes, if one doesn't already exist.
+ * Uses the forum's default language, and checks based on that name.
+ */
+function createSalvageCategory()
+{
+	global $txt, $language;
+	static $salvageCatID = null;
+
+	if ($salvageCatID !== null)
+	{
+		return $salvageCatID;
+	}
+
+	$db = database();
 
 	// Back to the forum's default language.
 	theme()->getTemplates()->loadLanguageFile('Admin', $language);
@@ -1259,64 +1314,36 @@ function createSalvageArea()
 			'cat_name' => $txt['salvaged_category_name'],
 		)
 	);
-	if ($db->num_rows($result) != 0)
-		list ($salvageCatID) = $db->fetch_row($result);
-	$db->free_result($result);
+	if ($result->num_rows() != 0)
+	{
+		list ($salvageCatID) = $result->fetch_row();
+	}
+	$result->free_result();
 
 	if (empty($salvageCatID))
 	{
-		$db->insert('',
+		$result = $db->insert('',
 			'{db_prefix}categories',
 			array('name' => 'string-255', 'cat_order' => 'int'),
 			array($txt['salvaged_category_name'], -1),
 			array('id_cat')
 		);
 
-		if ($db->affected_rows() <= 0)
+		if ($result->affected_rows() <= 0)
 		{
 			theme()->getTemplates()->loadLanguageFile('Admin');
 			throw new \ElkArte\Exceptions\Exception('salvaged_category_error', false);
 		}
 
-		$salvageCatID = $db->insert_id('{db_prefix}categories', 'id_cat');
-	}
-
-	// Check to see if a 'Salvage Board' exists, if not => insert one.
-	$result = $db->query('', '
-		SELECT id_board
-		FROM {db_prefix}boards
-		WHERE id_cat = {int:id_cat}
-			AND name = {string:board_name}
-		LIMIT 1',
-		array(
-			'id_cat' => $salvageCatID,
-			'board_name' => $txt['salvaged_board_name'],
-		)
-	);
-	if ($db->num_rows($result) != 0)
-		list ($salvageBoardID) = $db->fetch_row($result);
-	$db->free_result($result);
-
-	if (empty($salvageBoardID))
-	{
-		$db->insert('',
-			'{db_prefix}boards',
-			array('name' => 'string-255', 'description' => 'string-255', 'id_cat' => 'int', 'member_groups' => 'string', 'board_order' => 'int', 'redirect' => 'string'),
-			array($txt['salvaged_board_name'], $txt['salvaged_board_description'], $salvageCatID, '1', -1, ''),
-			array('id_board')
-		);
-
-		if ($db->affected_rows() <= 0)
-		{
-			theme()->getTemplates()->loadLanguageFile('Admin');
-			throw new \ElkArte\Exceptions\Exception('salvaged_board_error', false);
-		}
-
-		$salvageBoardID = $db->insert_id('{db_prefix}boards', 'id_board');
+		$salvageCatID = $result->insert_id();
 	}
 
 	// Restore the user's language.
 	theme()->getTemplates()->loadLanguageFile('Admin');
+	$salvageCatID = (int) $salvageCatID;
+	$_SESSION['redirect_to_recount'] = true;
+
+	return $salvageCatID;
 }
 
 /**
@@ -1385,7 +1412,7 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
  */
 function findForumErrors($do_fix = false)
 {
-	global $context, $txt, $errorTests, $db_show_debug;
+	global $context, $txt, $db_show_debug;
 
 	$db = database();
 
@@ -1402,6 +1429,8 @@ function findForumErrors($do_fix = false)
 	if ($db_show_debug === true)
 		\ElkArte\Debug::instance()->off();
 
+	// Will want this.
+	$errorTests = loadForumTests();
 	$context['total_steps'] = count($errorTests);
 
 	// For all the defined error types do the necessary tests.

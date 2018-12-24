@@ -718,16 +718,24 @@ function encode_special($data)
  *
  * @param string $data
  * @param string $ns
+ * @param string $override
  *
  * @return string
  */
-function cdata_parse($data, $ns = '')
+function cdata_parse($data, $ns = '', $override = null)
 {
-	global $cdata_override;
+	static $cdata_override = false;
+
+	if ($override !== null)
+	{
+		$cdata_override = (bool) $override;
+	}
 
 	// Are we not doing it?
 	if (!empty($cdata_override))
+	{
 		return $data;
+	}
 
 	$cdata = '<![CDATA[';
 

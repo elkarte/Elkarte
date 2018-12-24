@@ -223,11 +223,11 @@ class Payment
 
 	/**
 	 * Record the transaction reference and exit
+	 *
+	 * @param string $subscription_id
 	 */
-	public function close()
+	public function close($subscription_id)
 	{
-		global $subscription_id;
-
 		$db = database();
 
 		// If it's a subscription record the reference.

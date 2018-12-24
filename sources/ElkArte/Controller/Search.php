@@ -244,7 +244,7 @@ class Search extends \ElkArte\AbstractController
 	public function action_results()
 	{
 		global $scripturl, $modSettings, $txt, $settings;
-		global $user_info, $context, $options, $messages_request, $boards_can;
+		global $user_info, $context, $options, $messages_request;
 
 		// No, no, no... this is a bit hard on the server, so don't you go prefetching it!
 		stop_prefetching();
@@ -440,6 +440,7 @@ class Search extends \ElkArte\AbstractController
 		$opt = new \ElkArte\ValuesContainer([
 			'icon_sources' => $this->_icon_sources,
 			'show_signatures' => false,
+			'boards_can' => $boards_can,
 		]);
 		$renderer = new \ElkArte\MessagesCallback\SearchRenderer($messages_request, $bodyParser, $opt);
 		$renderer->setParticipants($this->_participants);
