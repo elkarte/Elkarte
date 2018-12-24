@@ -442,7 +442,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 	 */
 	public function action_signatureSettings_display()
 	{
-		global $context, $txt, $modSettings, $sig_start;
+		global $context, $txt, $modSettings;
 
 		// Initialize the form
 		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::DB_ADAPTER);
@@ -471,8 +471,6 @@ class ManageFeatures extends \ElkArte\AbstractController
 		{
 			// Security!
 			checkSession('get');
-
-			$sig_start = time();
 
 			// This is horrid - but I suppose some people will want the option to do it.
 			$applied_sigs = $this->_req->getQuery('step', 'intval', 0);
@@ -1532,43 +1530,4 @@ class ManageFeatures extends \ElkArte\AbstractController
 
 		return $config_vars;
 	}
-}
-
-/**
- * Just pause the signature applying thing.
- *
- * @todo Move to subs file
- * @todo Merge with other pause functions?
- *    pausePermsSave(), pauseAttachmentMaintenance(), pauseRepairProcess()
- *
- * @param int $applied_sigs
- * @throws \ElkArte\Exceptions\Exception
- */
-function pauseSignatureApplySettings($applied_sigs)
-{
-	global $context, $txt, $sig_start;
-
-	// Try get more time...
-	detectServer()->setTimeLimit(600);
-
-	// Have we exhausted all the time we allowed?
-	if (time() - array_sum(explode(' ', $sig_start)) < 3)
-		return;
-
-	$context['continue_get_data'] = '?action=admin;area=featuresettings;sa=sig;apply;step=' . $applied_sigs . ';' . $context['session_var'] . '=' . $context['session_id'];
-	$context['page_title'] = $txt['not_done_title'];
-	$context['continue_post_data'] = '';
-	$context['continue_countdown'] = '2';
-	$context['sub_template'] = 'not_done';
-
-	// Specific stuff to not break this template!
-	$context[$context['admin_menu_name']]['current_subsection'] = 'sig';
-
-	// Get the right percent.
-	$context['continue_percent'] = round(($applied_sigs / $context['max_member']) * 100);
-
-	// Never more than 100%!
-	$context['continue_percent'] = min($context['continue_percent'], 100);
-
-	obExit();
 }
