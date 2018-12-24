@@ -292,8 +292,7 @@ class CoreFeatures extends \ElkArte\AbstractController
 
 		foreach ($glob as $file)
 		{
-			$class = $file->getBasename('.controller.php');
-
+			$class = '\ElkArte\AdminController\\' . $file->getBasename('.php');
 			if (method_exists($class, 'addCoreFeature'))
 			{
 				$class::addCoreFeature($core_features);
