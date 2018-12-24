@@ -733,7 +733,7 @@ function attachmentUploadChecks($attachID)
  */
 function attachmentChecks($attachID)
 {
-	global $modSettings, $context, $attachmentOptions;
+	global $modSettings, $context;
 
 	$db = database();
 
@@ -778,7 +778,7 @@ function attachmentChecks($attachID)
 			// Success! However, successes usually come for a price:
 			// we might get a new format for our image...
 			$old_format = $size[2];
-			$size = elk_getimagesize($attachmentOptions['tmp_name']);
+			$size = elk_getimagesize($_SESSION['temp_attachments'][$attachID]['tmp_name']);
 
 			if (!(empty($size)) && ($size[2] !== $old_format))
 			{
