@@ -318,7 +318,7 @@ class Bootstrap
 	public function ssi_main()
 	{
 		global $ssi_layers, $ssi_theme, $ssi_gzip, $ssi_ban, $ssi_guest_access;
-		global $modSettings, $context, $sc, $board, $topic, $user_info, $txt;
+		global $modSettings, $context, $board, $topic, $user_info, $txt;
 
 		// Check on any hacking attempts.
 		$this->_validRequestCheck();
@@ -358,7 +358,6 @@ class Bootstrap
 				$_SESSION['session_var'] = substr(preg_replace('~^\d+~', '', $tokenizer->generate_hash(16, session_id())), 0, rand(7, 12));
 			}
 
-			$sc = $_SESSION['session_value'];
 			// This is here only to avoid session errors in PHP7
 			// microtime effectively forces the replacing of the session in the db each
 			// time the page is loaded

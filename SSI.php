@@ -67,7 +67,7 @@ if (!defined('ELKBOOT'))
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
 global $boardurl, $webmaster_email, $cookiename;
 global $db_type, $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send;
-global $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
+global $modSettings, $context, $user_info, $topic, $board, $txt;
 global $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
 global $boarddir, $sourcedir, $db_show_debug, $ssi_error_reporting;
 

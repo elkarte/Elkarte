@@ -26,7 +26,7 @@
  */
 function loadSession()
 {
-	global $modSettings, $boardurl, $sc, $context;
+	global $modSettings, $boardurl, $context;
 
 	// Attempt to change a few PHP settings.
 	@ini_set('session.use_cookies', true);
@@ -114,7 +114,4 @@ function loadSession()
 	// For injection into hidden form fields...
 	$context['session_var'] = $_SESSION['session_var'];
 	$context['session_id'] = $_SESSION['session_value'];
-
-	// @todo find where this is used and fix the reference!
-	$sc = $_SESSION['session_value'];
 }
