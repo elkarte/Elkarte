@@ -50,6 +50,12 @@ class Post extends \ElkArte\Modules\AbstractModule
 	protected $_is_new_message = false;
 
 	/**
+	 * If temporary attachments should be ignored or not
+	 * @var bool
+	 */
+	protected $ignore_temp = false;
+
+	/**
 	 * {@inheritdoc }
 	 */
 	public static function hooks(\ElkArte\EventManager $eventsManager)
@@ -409,9 +415,13 @@ class Post extends \ElkArte\Modules\AbstractModule
 		{
 			require_once(SUBSDIR . '/Attachments.subs.php');
 			if (!empty($msg))
-				processAttachments((int) $msg);
+			{
+				$this->ignore_temp = processAttachments((int) $msg);
+			}
 			else
-				processAttachments();
+			{
+				$this->ignore_temp = processAttachments();
+			}
 		}
 	}
 
@@ -422,12 +432,12 @@ class Post extends \ElkArte\Modules\AbstractModule
 	 */
 	public function pre_save_post(&$msgOptions)
 	{
-		global $ignore_temp, $context, $user_info, $modSettings;
+		global $context, $user_info, $modSettings;
 
 		$this->_is_new_message = empty($msgOptions['id']);
 
 		// ...or attach a new file...
-		if (empty($ignore_temp) && $context['attachments']['can']['post'] && !empty($_SESSION['temp_attachments']) && empty($_POST['from_qr']))
+		if (empty($this->ignore_temp) && $context['attachments']['can']['post'] && !empty($_SESSION['temp_attachments']) && empty($_POST['from_qr']))
 		{
 			$this->_saved_attach_id = array();
 

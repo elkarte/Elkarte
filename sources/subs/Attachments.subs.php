@@ -355,7 +355,7 @@ function attachments_init_dir(&$tree, &$count)
  */
 function processAttachments($id_msg = null)
 {
-	global $context, $modSettings, $txt, $user_info, $ignore_temp, $topic, $board;
+	global $context, $modSettings, $txt, $user_info, $topic, $board;
 
 	$attach_errors = \ElkArte\Errors\AttachmentErrorContext::context();
 	$added_initial_error = false;
@@ -567,6 +567,8 @@ function processAttachments($id_msg = null)
 	//   errors => An array of errors (use the index of the $txt variable for that error).
 	// Template changes can be done using "integrate_upload_template".
 	call_integration_hook('integrate_attachment_upload');
+
+	return $ignore_temp;
 }
 
 /**
