@@ -28,7 +28,7 @@ class ManageDraftsModule extends \ElkArte\AbstractController
 	public static function addCoreFeature(&$core_features)
 	{
 		$core_features['dr'] = array(
-			'url' => 'action=admin;area=managedrafts',
+			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'managedrafts', '{session_data}']),
 			'settings' => array(
 				'drafts_enabled' => 1,
 				'drafts_post_enabled' => 2,
@@ -63,6 +63,7 @@ class ManageDraftsModule extends \ElkArte\AbstractController
 	 * Integrate drafts in to the delete member chain
 	 *
 	 * @param int[] $users
+	 * @throws \Exception
 	 */
 	public static function integrate_delete_members($users)
 	{
