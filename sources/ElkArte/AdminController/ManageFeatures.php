@@ -722,7 +722,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							return sprintf('<a href="%1$s">%3$s</a><div class="smalltext">%4$s</div>', getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'profileedit', 'fid' => (int) $rowData['id_field']]), $rowData['field_name'], $rowData['field_desc']);
+							return sprintf('<a href="%1$s">%2$s</a><div class="smalltext">%3$s</div>', getUrl('admin', ['action' => 'admin', 'area' => 'featuresettings', 'sa' => 'profileedit', 'fid' => (int) $rowData['id_field']]), $rowData['field_name'], $rowData['field_desc']);
 						},
 						'style' => 'width: 65%;',
 					),
