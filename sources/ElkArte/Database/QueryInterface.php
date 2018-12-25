@@ -56,7 +56,7 @@ interface QueryInterface
 	 * @param mixed[]|false $db_values = array()
 	 *
 	 * @return bool|resource
-	 * @throws \ElkArte\Exception\Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function query($identifier, $db_string, $db_values = array());
 

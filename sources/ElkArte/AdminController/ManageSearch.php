@@ -580,7 +580,7 @@ class ManageSearch extends \ElkArte\AbstractController
 					$server = !empty($modSettings['sphinx_searchd_server']) ? $modSettings['sphinx_searchd_server'] : 'localhost';
 					$port = !empty($modSettings['sphinx_searchd_port']) ? $modSettings['sphinxql_searchd_port'] : '9312';
 
-					$mySphinx = new SphinxClient();
+					$mySphinx = new \SphinxClient();
 					$mySphinx->SetServer($server, (int) $port);
 					$mySphinx->SetLimits(0, 25);
 					$mySphinx->SetMatchMode(SPH_MATCH_BOOLEAN);

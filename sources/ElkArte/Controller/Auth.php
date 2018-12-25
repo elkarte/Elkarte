@@ -227,7 +227,7 @@ class Auth extends \ElkArte\AbstractController
 		if (!empty($_POST['otp_token']))
 		{
 			require_once(EXTDIR . '/GoogleAuthenticator.php');
-			$ga = New GoogleAuthenticator();
+			$ga = New \GoogleAuthenticator();
 
 			$ga->getCode($user_settings['otp_secret']);
 			$checkResult = $ga->verifyCode($user_settings['otp_secret'], $_POST['otp_token'], 2);

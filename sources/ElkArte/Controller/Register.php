@@ -237,8 +237,8 @@ class Register extends \ElkArte\AbstractController
 			{
 				// No file found or a blank file, log the error so the admin knows there is a problem!
 				loadLanguage('Errors');
-				Errors::instance()->log_error($txt['registration_privacy_policy_missing'], 'critical');
-				throw new Elk_Exception('registration_disabled', false);
+				\Errors::instance()->log_error($txt['registration_privacy_policy_missing'], 'critical');
+				throw new \Exception('registration_disabled', false);
 			}
 		}
 
