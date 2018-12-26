@@ -490,7 +490,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 	 */
 	public function action_board()
 	{
-		global $context, $txt, $cat_tree, $boardList, $boards;
+		global $context, $txt;
 
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
@@ -505,12 +505,16 @@ class ManagePermissions extends \ElkArte\AbstractController
 
 			$changes = array();
 			foreach ($this->_req->post->boardprofile as $board => $profile)
+			{
 				$changes[(int) $profile][] = (int) $board;
+			}
 
 			if (!empty($changes))
 			{
-				foreach ($changes as $profile => $boards)
-					assignPermissionProfileToBoard($profile, $boards);
+				foreach ($changes as $profile => $list_boards)
+				{
+					assignPermissionProfileToBoard($profile, $list_boards);
+				}
 			}
 
 			$context['edit_all'] = false;
@@ -532,8 +536,10 @@ class ManagePermissions extends \ElkArte\AbstractController
 		}
 
 		// Get the board tree.
-		require_once(SUBSDIR . '/Boards.subs.php');
-		getBoardTree();
+		$boardTree = new \ElkArte\BoardsTree(database());
+		$boardList = $boardTree->getBoardList();
+		$cat_tree = $boardTree->getCategories();
+		$boards = $boardTree->getBoards();
 
 		// Build the list of the boards.
 		$context['categories'] = array();
