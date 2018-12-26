@@ -1866,6 +1866,7 @@ function getUrl($type, $params)
 	{
 		$generator = initUrlGenerator();
 	}
+
 	return $generator->get($type, $params);
 }
 
@@ -1897,21 +1898,19 @@ function getUrlQuery($type, $params)
 function initUrlGenerator()
 {
 	global $scripturl, $context, $url_format;
-	static $generator = null;
 
-	if ($generator === null)
-	{
-		$generator = new \ElkArte\UrlGenerator\UrlGenerator([
-			'generator' => ucfirst($url_format ?? 'standard'),
-			'scripturl' => $scripturl,
-			'replacements' => [
-				'{session_data}' => isset($context['session_var']) ? $context['session_var'] . '=' . $context['session_id'] : ''
-			]
-		]);
-		$generator->register('Topic');
-		$generator->register('Board');
-		$generator->register('Profile');
-	}
+	$generator = new \ElkArte\UrlGenerator\UrlGenerator([
+		'generator' => ucfirst($url_format ?? 'standard'),
+		'scripturl' => $scripturl,
+		'replacements' => [
+			'{session_data}' => isset($context['session_var']) ? $context['session_var'] . '=' . $context['session_id'] : ''
+		]
+	]);
+
+	$generator->register('Topic');
+	$generator->register('Board');
+	$generator->register('Profile');
+
 	return $generator;
 }
 
@@ -1932,8 +1931,10 @@ function featureEnabled($feature)
 		// This allows us to change the way things look for the admin.
 		$features = explode(',', isset($modSettings['admin_features']) ?
 			$modSettings['admin_features'] : 'cd,cp,k,w,rg,ml,pm');
+
 		// @deprecated since 2.0 - Next line is just for backward compatibility to remove before release
 		$context['admin_features'] = $features;
 	}
+
 	return in_array($feature, $features);
 }

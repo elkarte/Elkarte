@@ -15,7 +15,7 @@
 
 namespace ElkArte;
 
-class UserNotification extends \ElkArte\AbstractModel
+class UserNotification extends AbstractModel
 {
 	/**
 	 * All the shapes the icon can be.
@@ -177,7 +177,7 @@ class UserNotification extends \ElkArte\AbstractModel
 	 */
 	public function validate($post)
 	{
-		$validator = new \ElkArte\DataValidator();
+		$validator = new DataValidator();
 		$validation_rules = array(
 			'usernotif_favicon_bgColor' => 'valid_color',
 			'usernotif_favicon_textColor' => 'valid_color',

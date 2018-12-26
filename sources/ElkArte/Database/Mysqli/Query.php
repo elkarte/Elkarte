@@ -84,7 +84,7 @@ class Query extends AbstractQuery
 		// Debugging.
 		$this->_postQueryDebug();
 
-		$this->result = new \ElkArte\Database\Mysqli\Result($ret,
+		$this->result = new Result($ret,
 			new \ElkArte\ValuesContainer([
 				'connection' => $this->connection
 			])
@@ -325,7 +325,7 @@ class Query extends AbstractQuery
 				foreach ($fix_tables as $table)
 				{
 					$this->query('', "
-						REPAIR TABLE $table", false, false);
+						REPAIR TABLE $table", false);
 				}
 
 				// And send off an email!
@@ -334,7 +334,7 @@ class Query extends AbstractQuery
 				$modSettings['cache_enable'] = $old_cache;
 
 				// Try the query again...?
-				$ret = $this->query('', $db_string, false, false);
+				$ret = $this->query('', $db_string, false);
 				if ($ret->hasResults())
 				{
 					return $ret;
@@ -365,7 +365,7 @@ class Query extends AbstractQuery
 					// Try a deadlock more than once more.
 					for ($n = 0; $n < 4; $n++)
 					{
-						$ret = $this->query('', $db_string, false, false);
+						$ret = $this->query('', $db_string, false);
 
 						$new_errno = mysqli_errno($new_connection);
 						if ($ret->hasResults() || in_array($new_errno, array(1205, 1213)))
@@ -472,7 +472,7 @@ class Query extends AbstractQuery
 			)
 		);
 
-		$this->result = new \ElkArte\Database\Mysqli\Result(
+		$this->result = new Result(
 			is_object($ret) ? $ret->getResultObject() : $ret,
 			new \ElkArte\ValuesContainer([
 				'connection' => $this->connection

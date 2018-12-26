@@ -15,10 +15,10 @@ namespace ElkArte\Modules\Mentions;
 
 /**
  * Class \ElkArte\Modules\Mentions\Display
- * 
+ *
  * @package Mentions
  */
-class Display extends \ElkArte\Modules\Mentions\AbstractMentions
+class Display extends AbstractMentions
 {
 	/**
 	 * {@inheritdoc }

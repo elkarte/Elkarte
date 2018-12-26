@@ -237,8 +237,8 @@ class Register extends \ElkArte\AbstractController
 			{
 				// No file found or a blank file, log the error so the admin knows there is a problem!
 				loadLanguage('Errors');
-				Errors::instance()->log_error($txt['registration_privacy_policy_missing'], 'critical');
-				throw new Elk_Exception('registration_disabled', false);
+				\Errors::instance()->log_error($txt['registration_privacy_policy_missing'], 'critical');
+				throw new \Exception('registration_disabled', false);
 			}
 		}
 
@@ -763,7 +763,7 @@ class Register extends \ElkArte\AbstractController
 
 			// Here, and here only, emulate the permissions the user would have to do this.
 			$user_info['permissions'] = array_merge($user_info['permissions'], array('profile_account_own', 'profile_extra_own'));
-			$reg_fields = \ElkArte\Controller\ProfileOptions::getFields('registration');
+			$reg_fields = ProfileOptions::getFields('registration');
 
 			// We might have had some submissions on this front - go check.
 			foreach ($reg_fields['fields'] as $field)

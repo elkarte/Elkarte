@@ -144,7 +144,7 @@ class OpenID extends \ElkArte\AbstractController
 						$this->_req->post->{$id} = $value;
 				}
 
-				$controller = new \ElkArte\Controller\Register(new \ElkArte\EventManager());
+				$controller = new Register(new \ElkArte\EventManager());
 				$controller->pre_dispatch();
 				$controller->do_register(true);
 				return null;

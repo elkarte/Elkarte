@@ -225,11 +225,11 @@ class TopicsMerge
 		// Determine the subject of the newly merged topic - was a custom subject specified?
 		if (empty($details['subject']) && $details['custom_subject'] != '')
 		{
-			$target_subject = strtr(\ElkArte\Util::htmltrim(\ElkArte\Util::htmlspecialchars($details['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
+			$target_subject = strtr(Util::htmltrim(Util::htmlspecialchars($details['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
 
 			// Keep checking the length.
-			if (\ElkArte\Util::strlen($target_subject) > 100)
-				$target_subject = \ElkArte\Util::substr($target_subject, 0, 100);
+			if (Util::strlen($target_subject) > 100)
+				$target_subject = Util::substr($target_subject, 0, 100);
 
 			// Nothing left - odd but pick the first topics subject.
 			if ($target_subject == '')
@@ -338,7 +338,7 @@ class TopicsMerge
 		// Assign the first topic ID to be the merged topic.
 		$id_topic = min($this->_topics);
 
-		$enforce_subject = \ElkArte\Util::htmlspecialchars(trim($details['enforce_subject']));
+		$enforce_subject = Util::htmlspecialchars(trim($details['enforce_subject']));
 
 		// Merge topic notifications.
 		$notifications = is_array($details['notifications']) ? array_intersect($this->_topics, $details['notifications']) : array();
@@ -410,7 +410,7 @@ class TopicsMerge
 		$response_prefix = response_prefix();
 
 		// If there's a search index that needs updating, update it...
-		$searchAPI = new \ElkArte\Search\SearchApiWrapper(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '');
+		$searchAPI = new Search\SearchApiWrapper(!empty($modSettings['search_index']) ? $modSettings['search_index'] : '');
 		$searchAPI->topicMerge($id_topic, $this->_topics, $affected_msgs, empty($enforce_subject) ? null : array($response_prefix, $target_subject));
 	}
 

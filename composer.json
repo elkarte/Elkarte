@@ -6,10 +6,12 @@
 	"keywords": ["elkarte", "forum", "discussion", "php", "community"],
 	"homepage": "https://www.elkarte.net",
 	"license": "BSD-3-Clause",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/elkarte/Elkarte.git"
-	},
+	"repository": [
+		{
+			"type": "git",
+			"url": "git+https://github.com/elkarte/Elkarte.git"
+		}
+	],
 	"authors": [
 		{
 			"name": "ElkArte Forum Contributors",
@@ -29,7 +31,35 @@
 	"replace": {
 	},
 	"require": {
-		"php": ">=7.1.0"
+		"php": ">=7.1.0",
+      	"ext-json": "*",
+		"ext-gd": "*",
+		"ext-curl": "*",
+		"ext-mysqli": "*",
+		"ext-fileinfo": "*"
+	},
+	"suggest": {
+		"ext-exif": "*",
+		"ext-recode": "*",
+		"ext-openssl": "*",
+		"ext-ctype": "*",
+		"ext-memcache": "*",
+		"ext-bcmath": "*",
+		"ext-zlib": "*",
+		"ext-pgsql": "*",
+		"ext-pspell": "*",
+		"ext-imap": "*",
+		"ext-memcached": "*",
+		"ext-zend-opcache": "*",
+		"ext-apc": "*",
+		"ext-mbstring": "*",
+		"ext-apcu": "*",
+		"ext-libxml": "*",
+		"ext-dom": "*",
+		"ext-mcrypt": "*",
+		"ext-apache": "*",
+		"ext-imagick": "*",
+		"ext-iconv": "*"
 	},
 	"require-dev": {
 		"phpunit/phpunit-selenium": "~4.1",

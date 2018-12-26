@@ -176,7 +176,7 @@ class SiteDispatcher
 	 *
 	 * @param \ElkArte\HttpReq $_req
 	 */
-	public function __construct(\ElkArte\HttpReq $_req)
+	public function __construct(HttpReq $_req)
 	{
 		global $context;
 
@@ -192,7 +192,7 @@ class SiteDispatcher
 		}
 
 		// Initialize this controller with its event manager
-		$this->_controller = new $this->_controller_name(new \ElkArte\EventManager());
+		$this->_controller = new $this->_controller_name(new EventManager());
 	}
 
 	/**
@@ -364,7 +364,7 @@ class SiteDispatcher
 			}
 
 			// re-initialize the controller and the event manager
-			$this->_controller = new $this->_controller_name(new \ElkArte\EventManager());
+			$this->_controller = new $this->_controller_name(new EventManager());
 		}
 		// If guest access is disallowed, a guest is kicked out... politely. :P
 		elseif ($this->restrictedGuestAccess())
@@ -373,7 +373,7 @@ class SiteDispatcher
 			$this->_function_name = 'action_kickguest';
 
 			// re-initialize... you got the drift
-			$this->_controller = new $this->_controller_name(new \ElkArte\EventManager());
+			$this->_controller = new $this->_controller_name(new EventManager());
 		}
 
 		return $this->_controller->needTheme($this->_function_name);

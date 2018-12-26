@@ -154,7 +154,7 @@ abstract class AbstractMentionMessage implements MentionTypeInterface
 			foreach ($members as $member)
 			{
 				$replacements['REALNAME'] = $members_data[$member]['real_name'];
-				$langstrings = $this->_loadStringsByTemplate($template, $keys, $members, $members_data, $lang_files, $replacements);
+				$langstrings = $this->_loadStringsByTemplate($template, $members, $members_data, $lang_files, $replacements);
 
 				$return[] = array(
 					'id_member_to' => $member,

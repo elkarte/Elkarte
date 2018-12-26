@@ -18,7 +18,7 @@ namespace ElkArte;
  *
  * A simple class to take care of the privacy policy
  */
-class PrivacyPolicy extends \ElkArte\Agreement
+class PrivacyPolicy extends Agreement
 {
 	/**
 	 * Everything starts here.

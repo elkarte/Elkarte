@@ -407,7 +407,7 @@ class ManageServer extends \ElkArte\AbstractController
 
 			// New category?
 			if (strpos($line, '<h2>') !== false)
-				$category = preg_match('~<h2>(.*)</h2>~', $line, $title) ? $category = $title[1] : $category;
+				$category = preg_match('~<h2>(.*)</h2>~', $line, $title) ? $title[1] : $category;
 
 			// Load it as setting => value or the old setting local master
 			if (preg_match('~<tr><td[^>]+>([^<]*)</td><td[^>]+>([^<]*)</td></tr>~', $line, $val))

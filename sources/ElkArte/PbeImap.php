@@ -18,7 +18,7 @@ namespace ElkArte;
  * Grabs unread messages from an imap account
  * Passes any new messages found to the postby email function for processing
  */
-class PbeImap extends \ElkArte\AbstractModel
+class PbeImap extends AbstractModel
 {
 	/**
 	 * The name of the imap host
@@ -112,7 +112,7 @@ class PbeImap extends \ElkArte\AbstractModel
 		if (!empty($emails))
 		{
 			// Initialize Emailpost controller
-			$controller = new \ElkArte\Controller\Emailpost(new \ElkArte\EventManager());
+			$controller = new Controller\Emailpost(new EventManager());
 
 			// Make sure we work from the oldest to the newest message
 			sort($emails);
@@ -177,7 +177,7 @@ class PbeImap extends \ElkArte\AbstractModel
 				$imap_error = imap_last_error();
 				if (!empty($imap_error))
 				{
-					\ElkArte\Errors\Errors::instance()->log_error($imap_error, 'debug', 'IMAP');
+					Errors\Errors::instance()->log_error($imap_error, 'debug', 'IMAP');
 				}
 			}
 		}

@@ -348,7 +348,7 @@ class BoardsList
 
 			// Prepare the subject, and make sure it's not too long.
 			$row_board['subject'] = censor($row_board['subject']);
-			$row_board['short_subject'] = \ElkArte\Util::shorten_text($row_board['subject'], $this->_subject_length);
+			$row_board['short_subject'] = Util::shorten_text($row_board['subject'], $this->_subject_length);
 			$poster_href = getUrl('profile', ['action' => 'profile', 'u' => $row_board['id_member'], 'name' => $row_board['real_name']]);
 			$this_last_post = array(
 				'id' => $row_board['id_msg'],
@@ -441,7 +441,7 @@ class BoardsList
 		$boards = array_keys($this->_boards);
 		$mod_cached = array();
 
-		if (!\ElkArte\Cache\Cache::instance()->getVar($mod_cached, 'localmods_' . md5(implode(',', $boards)), 3600))
+		if (!Cache\Cache::instance()->getVar($mod_cached, 'localmods_' . md5(implode(',', $boards)), 3600))
 		{
 			$request = $this->_db->fetchQuery('
 				SELECT mods.id_board, COALESCE(mods_mem.id_member, 0) AS id_moderator, mods_mem.real_name AS mod_real_name
@@ -454,7 +454,7 @@ class BoardsList
 			);
 			$mod_cached = $request->fetch_all();
 
-			\ElkArte\Cache\Cache::instance()->put('localmods_' . md5(implode(',', $boards)), $mod_cached, 3600);
+			Cache\Cache::instance()->put('localmods_' . md5(implode(',', $boards)), $mod_cached, 3600);
 		}
 
 		foreach ($mod_cached as $row_mods)

@@ -93,7 +93,7 @@ class GenericList
 	public function __construct(array $listOptions)
 	{
 		// Access to post/get data
-		$this->req = \ElkArte\HttpReq::instance();
+		$this->req = HttpReq::instance();
 
 		// First make sure the array is constructed properly.
 		$this->validateListOptions($listOptions);

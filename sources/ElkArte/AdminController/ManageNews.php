@@ -438,6 +438,8 @@ class ManageNews extends \ElkArte\AbstractController
 		// Clean up the arrays.
 		$context['recipients']['members'] = array_unique($context['recipients']['members']);
 		$context['recipients']['exclude_members'] = array_unique($context['recipients']['exclude_members']);
+
+		return true;
 	}
 
 	/**

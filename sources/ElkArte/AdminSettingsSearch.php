@@ -173,7 +173,7 @@ class AdminSettingsSearch
 
 			$return = array(
 				'name' => $name,
-				'help' => \ElkArte\Util::shorten_text(isset($item[2]) ? strip_tags($helptxt[$item[2]]) : (isset($helptxt[$found]) ? strip_tags($helptxt[$found]) : ''), 255),
+				'help' => Util::shorten_text(isset($item[2]) ? strip_tags($helptxt[$item[2]]) : (isset($helptxt[$found]) ? strip_tags($helptxt[$found]) : ''), 255),
 			);
 		}
 
@@ -241,7 +241,7 @@ class AdminSettingsSearch
 			if (isset($setting_area[2]))
 			{
 				// an OOP controller: get the settings from the settings method.
-				$controller = new $setting_area[2](new \ElkArte\EventManager());
+				$controller = new $setting_area[2](new EventManager());
 				$controller->pre_dispatch();
 				$config_vars = $controller->{$setting_area[0]}();
 			}

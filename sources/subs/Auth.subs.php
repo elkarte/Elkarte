@@ -375,6 +375,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 			'real_name_search' => $real_name . ' ' . $comparison . ' ' . implode( ' OR ' . $real_name . ' ' . $comparison . ' ', $names) . '',
 			'email_condition' => $email_condition,
 			'limit' => $max,
+			'recursive' => true,
 		)
 	);
 	while ($row = $db->fetch_assoc($request))

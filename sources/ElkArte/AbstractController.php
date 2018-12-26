@@ -45,7 +45,7 @@ abstract class AbstractController
 	public function __construct($eventManager)
 	{
 		// Dependency injection will come later
-		$this->_req = \ElkArte\HttpReq::instance();
+		$this->_req = HttpReq::instance();
 
 		$this->_events = $eventManager;
 	}
@@ -177,7 +177,8 @@ abstract class AbstractController
 		if ($this->_hook === '')
 		{
 			// Use the base controller name for the hook, ie post
-			$this->_hook = str_replace('\\ElkArte\\Controller\\', '', trim(get_class($this), '\\'));
+			$this->_hook = explode('\\', trim(get_class($this), '\\'));
+			$this->_hook = end($this->_hook);
 
 			// Initialize the events associated with this controller
 			$this->_initEventManager();
@@ -192,7 +193,8 @@ abstract class AbstractController
 	public function getModuleClass()
 	{
 		// Use the base controller name for the hook, ie post
-		$module_class = str_replace('\\ElkArte\\Controller\\', '', trim(get_class($this), '\\'));
+		$module_class = explode('\\', trim(get_class($this), '\\'));
+		$module_class= end($module_class);
 
 		return ucfirst($module_class);
 	}

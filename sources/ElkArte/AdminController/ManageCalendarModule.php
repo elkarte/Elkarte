@@ -33,7 +33,7 @@ class ManageCalendarModule extends \ElkArte\AbstractController
 	public static function addCoreFeature(&$core_features)
 	{
 		$core_features['cd'] = array(
-			'url' => 'action=admin;area=managecalendar',
+			'url' => getUrl('admin', ['action' => 'admin', 'area' => 'managecalendar', '{session_data}']),
 			'settings' => array(
 				'cal_enabled' => 1,
 			),

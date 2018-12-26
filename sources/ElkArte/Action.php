@@ -51,10 +51,10 @@ class Action
 	 * @param string  $name Hook name
 	 * @param \ElkArte\HttpReq $req  Access to post/get data
 	 */
-	public function __construct(string $name = '', \ElkArte\HttpReq $req = null)
+	public function __construct(string $name = '', HttpReq $req = null)
 	{
 		$this->_name = $name;
-		$this->req = $req ?: \ElkArte\HttpReq::instance();
+		$this->req = $req ?: HttpReq::instance();
 	}
 
 	/**
@@ -151,7 +151,7 @@ class Action
 			else
 			{
 				// Pointer to a controller to load
-				$controller = new $subAction['controller'](new \ElkArte\EventManager());
+				$controller = new $subAction['controller'](new EventManager());
 
 				// always set up the environment
 				$controller->pre_dispatch();

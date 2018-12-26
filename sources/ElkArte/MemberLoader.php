@@ -199,7 +199,7 @@ class MemberLoader
 			return;
 		}
 
-		$this->loaded_members[0] = new \ElkArte\Member([
+		$this->loaded_members[0] = new Member([
 			'id' => 0,
 			'name' => $txt['guest_title'],
 			'group' => $txt['guest_title'],
@@ -235,7 +235,7 @@ class MemberLoader
 					continue;
 				}
 
-				$member = new \ElkArte\Member($data['data'], $data['set'], $this->bbc_parser);
+				$member = new Member($data['data'], $data['set'], $this->bbc_parser);
 				foreach ($data['additional_data'] as $key => $values)
 				{
 					$member->append($key, $values, $this->options['display_fields']);
@@ -368,7 +368,7 @@ class MemberLoader
 			$new_loaded_ids[] = $row['id_member'];
 			$this->loaded_ids[] = $row['id_member'];
 			$row['options'] = array();
-			$this->loaded_members[$row['id_member']] = new \ElkArte\Member($row, $this->set, $this->bbc_parser);
+			$this->loaded_members[$row['id_member']] = new Member($row, $this->set, $this->bbc_parser);
 			$this->users_list->add($this->loaded_members[$row['id_member']], $row['id_member']);
 		}
 		$request->free_result();

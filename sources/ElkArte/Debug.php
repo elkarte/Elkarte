@@ -314,7 +314,7 @@ class Debug
 		}
 
 		// If the cache is on, how successful was it?
-		if (\ElkArte\Cache\Cache::instance()->isEnabled() && !empty($this->_cache_hits))
+		if (Cache\Cache::instance()->isEnabled() && !empty($this->_cache_hits))
 		{
 			$entries = array();
 			$total_t = 0;
@@ -374,7 +374,7 @@ class Debug
 	{
 		$queries_data = array();
 
-		$query_analysis = new \ElkArte\QueryAnalysis();
+		$query_analysis = new QueryAnalysis();
 
 		foreach ($_SESSION['debug'] as $q => $query_data)
 		{

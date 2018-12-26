@@ -170,7 +170,8 @@ class Cache
 			4. The cached item has a custom expiration condition evaluating to true.
 			5. The expire time set in the cache item has passed (needed for Zend).
 		*/
-		if (!$this->isEnabled() || $this->level < $level || !is_array($cache_block = $this->get($key, 3600)) || (!empty($cache_block['refresh_eval']) && eval($cache_block['refresh_eval'])) || (!empty($cache_block['expires']) && $cache_block['expires'] < time()))
+		$cache_block = $this->get($key, 3600);
+		if (!$this->isEnabled() || $this->level < $level || !is_array($cache_block) || (!empty($cache_block['refresh_eval']) && eval($cache_block['refresh_eval'])) || (!empty($cache_block['expires']) && $cache_block['expires'] < time()))
 		{
 			require_once(SOURCEDIR . '/' . $file);
 			$cache_block = call_user_func_array($function, $params);
@@ -286,7 +287,7 @@ class Cache
 
 		call_integration_hook('cache_get_data', array($key, $ttl, $value));
 
-		return empty($value) ? null : \ElkArte\Util::unserialize($value);
+		return empty($value) ? null : Util::unserialize($value);
 	}
 
 	/**

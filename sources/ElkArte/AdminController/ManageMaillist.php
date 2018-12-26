@@ -956,7 +956,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 				$config_vars[] = array('text', 'filter_style');
 				$this->_req->post->filter_style = 'filter';
 
-				\ElkArte\Email_Settings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array('id_filter'), $editId, $editName);
+				\ElkArte\EmailSettings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array('id_filter'), $editId, $editName);
 				redirectexit('action=admin;area=maillist;sa=emailfilters;saved');
 			}
 		}
@@ -1351,7 +1351,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 				$this->_req->post->filter_style = 'parser';
 
 				// Save, log, show
-				\ElkArte\Email_Settings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array('id_filter'), $editId, $editName);
+				\ElkArte\EmailSettings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array('id_filter'), $editId, $editName);
 				redirectexit('action=admin;area=maillist;sa=emailparser;saved');
 			}
 		}
@@ -1872,6 +1872,8 @@ class ManageMaillist extends \ElkArte\AbstractController
 		}
 
 		createToken('mod-mlt');
+
+		return true;
 	}
 
 	/**

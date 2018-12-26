@@ -18,7 +18,7 @@ namespace ElkArte\Modules\Mentions;
  *
  * @package Mentions
  */
-class Post extends \ElkArte\Modules\Mentions\AbstractMentions
+class Post extends AbstractMentions
 {
 	/**
 	 * {@inheritdoc }

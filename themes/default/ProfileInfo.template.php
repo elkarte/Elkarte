@@ -526,7 +526,7 @@ function template_profile_block_summary()
 	echo '
 			<div class="profileblock_left">
 				<h2 class="category_header hdicon cat_img_profile">
-					', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'u' => $context['member']['name']]) . '">' . $txt['profile_user_summary'] . '</a>' : $txt['profile_user_summary'], '
+					', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'name' => $context['member']['name']]) . '">' . $txt['profile_user_summary'] . '</a>' : $txt['profile_user_summary'], '
 				</h2>
 				<div id="basicinfo">
 					<div class="username">
@@ -581,15 +581,15 @@ function template_profile_block_summary()
 	echo '
 						<dt>', $txt['profile_activity'], ': </dt>
 						<dd>
-							<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'showposts', 'u' => $context['member']['id'], 'u' => $context['member']['name']]), '">', $txt['showPosts'], '</a>
+							<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'showposts', 'u' => $context['member']['id'], 'name' => $context['member']['name']]), '">', $txt['showPosts'], '</a>
 							<br />';
 
 	if ($context['user']['is_owner'] && !empty($modSettings['drafts_enabled']))
 		echo '
-							<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => $context['member']['id'], 'u' => $context['member']['name']]), '">', $txt['drafts_show'], '</a>
+							<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => $context['member']['id'], 'name' => $context['member']['name']]), '">', $txt['drafts_show'], '</a>
 							<br />';
 	echo '
-							<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'statistics', 'u' => $context['member']['id'], 'u' => $context['member']['name']]), '">', $txt['statPanel'], '</a>
+							<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'statistics', 'u' => $context['member']['id'], 'name' => $context['member']['name']]), '">', $txt['statPanel'], '</a>
 						</dd>';
 
 	// close this block up
@@ -613,7 +613,7 @@ function template_profile_block_user_info()
 	echo '
 		<div class="profileblock_right">
 			<h2 class="category_header hdicon cat_img_stats_info">
-				', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'u' => $context['member']['name']]) . '">' . $txt['profile_user_info'] . '</a>' : $txt['profile_user_info'], '
+				', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'name' => $context['member']['name']]) . '">' . $txt['profile_user_info'] . '</a>' : $txt['profile_user_info'], '
 			</h2>
 			<div class="profileblock">
 					<dl>';
@@ -796,7 +796,7 @@ function template_profile_block_other_info()
 	echo '
 		<div class="profileblock_right">
 			<h2 class="category_header hdicon cat_img_write">
-				', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'u' => $context['member']['name']]) . '">' . $txt['profile_more'] . '</a>' : $txt['profile_more'], '
+				', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'name' => $context['member']['name']]) . '">' . $txt['profile_more'] . '</a>' : $txt['profile_more'], '
 			</h2>
 			<div class="profileblock profileblock_signature">';
 
@@ -863,7 +863,7 @@ function template_profile_block_user_customprofileinfo()
 	echo '
 		<div class="profileblock_left">
 			<h2 class="category_header hdicon cat_img_plus">
-				', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'u' => $context['member']['name']]) . '">' . $txt['profile_info'] . '</a>' : $txt['profile_info'], '
+				', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'name' => $context['member']['name']]) . '">' . $txt['profile_info'] . '</a>' : $txt['profile_info'], '
 			</h2>
 			<div class="profileblock">';
 

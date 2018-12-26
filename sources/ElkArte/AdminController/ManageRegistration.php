@@ -19,6 +19,7 @@
 namespace ElkArte\AdminController;
 
 use ElkArte\Errors\ErrorContext;
+use ElkArte\Util;
 
 /**
  * ManageRegistration admin controller: handles the registration pages

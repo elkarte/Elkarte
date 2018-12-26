@@ -28,7 +28,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 	/**
 	 * Permissions object
 	 *
-	 * @var Permissions
+	 * @var \Elkarte\Permissions
 	 */
 	private $permissionsObject;
 
@@ -297,7 +297,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 							global $scripturl, $txt;
 
 							if ($rowData['id_group'] != 1)
-								return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . '' . (isset($this->_id) ? ';pid=' . $this->_id : '') . '">' . $txt['membergroups_modify'] . '</a>';
+								return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . '' . (isset($this->_pid) ? ';pid=' . $this->_pid : '') . '">' . $txt['membergroups_modify'] . '</a>';
 
 							return '';
 						},
@@ -429,15 +429,15 @@ class ManagePermissions extends \ElkArte\AbstractController
 							'class' => 'grid17',
 						),
 						'data' => array(
-							'function' => function ($rowData) use ($_pid) {
+							'function' => function ($rowData) {
 								global $scripturl, $txt;
 
 								if ($rowData['id_parent'] == -2)
-										return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . (isset($_pid) ? ';pid=' . $_pid : '') . '">' . $txt['membergroups_modify'] . '</a>';
+										return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . (isset($this->_pid) ? ';pid=' . $this->_pid : '') . '">' . $txt['membergroups_modify'] . '</a>';
 									else
 										return '<span class="smalltext">' . $txt['permissions_includes_inherited_from'] . '&quot;' . $rowData['parent_name'] . '&quot;</span>
 											<br />
-											<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_parent'] . (isset($_pid) ? ';pid=' . $_pid : '') . '">' . $txt['membergroups_modify_parent'] . '</a>';
+											<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_parent'] . (isset($this->_pid) ? ';pid=' . $this->_pid : '') . '">' . $txt['membergroups_modify_parent'] . '</a>';
 							}
 						),
 					),

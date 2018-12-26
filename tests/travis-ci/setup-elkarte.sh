@@ -34,7 +34,7 @@ cd /var/www
 # Yes but its a test run
 sudo chmod -R 777 /var/www
 
-if [ "$SHORT_DB" != "none" ]
+if [[ "$SHORT_DB" != "none" ]]
 then
     # Start a memcached service on localhost and on the default port. In order to
     # test against multiple memcached instances we spawn a couple more, so we
@@ -46,13 +46,13 @@ then
     composer install --no-interaction --no-suggest
 
     # Copy phpunit_coverage.php into the webserver's document root directory.
-    if [ "$COVERAGE" == "true" ]; then cp /var/www/vendor/phpunit/phpunit-selenium/PHPUnit/Extensions/SeleniumCommon/phpunit_coverage.php /var/www; fi
+    if [[ "$COVERAGE" == "true" ]]; then cp /var/www/vendor/phpunit/phpunit-selenium/PHPUnit/Extensions/SeleniumCommon/phpunit_coverage.php /var/www; fi
 
     TRAVIS_PHP="$(which php)"
     # Install the database for this run
-    if [ "$SHORT_DB" == "mysql" ]; then sudo $TRAVIS_PHP /var/www/tests/travis-ci/setup_mysql.php; fi
-    if [ "$SHORT_DB" == "mariadb" ]; then sudo $TRAVIS_PHP /var/www/tests/travis-ci/setup_mysql.php; fi
-    if [ "$SHORT_DB" == "postgres" ]; then sudo $TRAVIS_PHP /var/www/tests/travis-ci/setup_pgsql.php; fi
+    if [[ "$SHORT_DB" == "mysql" ]]; then sudo ${TRAVIS_PHP} /var/www/tests/travis-ci/setup_mysql.php; fi
+    if [[ "$SHORT_DB" == "mariadb" ]]; then sudo ${TRAVIS_PHP} /var/www/tests/travis-ci/setup_mysql.php; fi
+    if [[ "$SHORT_DB" == "postgres" ]]; then sudo ${TRAVIS_PHP} /var/www/tests/travis-ci/setup_pgsql.php; fi
 
     # Remove the install dir
     sudo rm -rf /var/www/install

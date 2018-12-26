@@ -230,7 +230,7 @@ class Maintenance extends \ElkArte\AbstractController
 		$plain_limit = 240000;
 
 		// Last thing: are we able to gain time?
-		$current_time_limit = ini_get('max_execution_time');
+		$current_time_limit = (int) ini_get('max_execution_time');
 		@set_time_limit(159); //something strange just to be sure
 		$new_time_limit = ini_get('max_execution_time');
 		@set_time_limit($current_time_limit);
@@ -445,7 +445,7 @@ class Maintenance extends \ElkArte\AbstractController
 		// Honestly, this should be done in the sub function.
 		validateToken('admin-maint');
 
-		$controller = new \ElkArte\AdminController\RepairBoards(new \ElkArte\EventManager());
+		$controller = new RepairBoards(new \ElkArte\EventManager());
 		$controller->pre_dispatch();
 		$controller->action_repairboards();
 	}

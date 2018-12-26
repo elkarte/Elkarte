@@ -48,7 +48,7 @@ class Connection implements \ElkArte\Database\ConnectionInterface
 			throw new \Exception('\\ElkArte\\Database\\Postgresql\\Connection::initiate');
 		}
 
-		$query = new \ElkArte\Database\Postgresql\Query($db_prefix, $connection);
+		$query = new Query($db_prefix, $connection);
 
 		return $query;
 	}

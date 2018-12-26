@@ -623,7 +623,7 @@ class ProfileAccount extends \ElkArte\AbstractController
 		{
 			deleteMembers($this->_memID);
 
-			$controller = new \ElkArte\Controller\Auth(new \ElkArte\EventManager());
+			$controller = new Auth(new \ElkArte\EventManager());
 			$controller->action_logout(true);
 
 			redirectexit();

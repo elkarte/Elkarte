@@ -38,13 +38,13 @@ class VerificationControls
 	/**
 	 * Obviously the entry point of verification
 	 *
-	 * @param ElkArte\Sessions\SessionIndex $sessionVal
+	 * @param \ElkArte\Sessions\SessionIndex $sessionVal
 	 * @param mixed[] $settings Basically $modSettings
 	 * @param mixed[] $verificationOptions
 	 * @param bool $isNew If the control was initialized before
 	 * @param bool $force_refresh If the controls should be re-initialized
 	 */
-	public function __construct(ElkArte\Sessions\SessionIndex $sessionVal, $settings = array(), $verificationOptions = array(), $isNew = false, $force_refresh = false)
+	public function __construct(\ElkArte\Sessions\SessionIndex $sessionVal, $settings = array(), $verificationOptions = array(), $isNew = false, $force_refresh = false)
 	{
 		if (empty($settings['known_verifications']))
 		{
@@ -85,7 +85,7 @@ class VerificationControls
 			try
 			{
 				$obj = new $class(array());
-				if ($obj instanceof \ElkArte\VerificationControls\VerificationControl\ControlInterface)
+				if ($obj instanceof VerificationControl\ControlInterface)
 				{
 					$new_settings = $obj->settings();
 					$working_verifications[] = $verification;
@@ -198,7 +198,7 @@ class VerificationControls
 				$this->_verification_options['render'] = true;
 			}
 		}
-	
+
 		return array(
 			'id' => $this->_verification_options['id'],
 			'max_errors' => isset($this->_verification_options['max_errors']) ? $this->_verification_options['max_errors'] : 3,
