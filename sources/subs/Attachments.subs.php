@@ -524,7 +524,8 @@ function processAttachments($id_msg = null)
 		// Want to correct for phonetographer photos?
 		if (!empty($modSettings['attachment_autorotate']) && empty($_SESSION['temp_attachments'][$attachID]['errors']) && substr($_SESSION['temp_attachments'][$attachID]['type'], 0, 5) === 'image')
 		{
-			autoRotateImage($_SESSION['temp_attachments'][$attachID]['tmp_name']);
+			$image = new \ElkArte\Graphics\Image($_SESSION['temp_attachments'][$attachID]['tmp_name']);
+			$image->autoRotateImage();
 		}
 
 		// Sort out the errors for display and delete any associated files.
@@ -1340,7 +1341,6 @@ function increaseDownloadCounter($id_attach)
  *
  * - supports GIF, JPG, PNG, BMP and WBMP formats.
  * - detects if GD2 is available.
- * - uses resizeImageFile() to resize to max_width by max_height, and saves the result to a file.
  * - updates the database info for the member's avatar.
  * - returns whether the download and resize was successful.
  *
@@ -1394,18 +1394,23 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	$destName = empty($avatar_hash) ? $destName : $path . '/' . $attachID . '_' . $avatar_hash . '.elk';
 
 	// Resize it.
-	require_once(SUBSDIR . '/Graphics.subs.php');
+	require_once(SUBSDIR . '/Attachments.subs.php');
+	$image = new \ElkArte\Graphics\Image($tempName);
 	if (!empty($modSettings['avatar_download_png']))
-		$success = resizeImageFile($temporary_path, $tempName, $max_width, $max_height, 3);
+	{
+		$success = $image->resizeImageFile($tempName, $max_width, $max_height, 3);
+	}
 	else
-		$success = resizeImageFile($temporary_path, $tempName, $max_width, $max_height);
+	{
+		$success = $image->resizeImageFile($tempName, $max_width, $max_height);
+	}
 
 	if ($success)
 	{
 		// Remove the .tmp extension from the attachment.
-		if (rename($tempName, $destName))
+		if ($image->moveTo($destName))
 		{
-			list ($width, $height) = elk_getimagesize($destName);
+			list ($width, $height) = $image->getSize();
 			$mime_type = getValidMimeImageType($ext);
 
 			// Write filesize in the database.
@@ -1415,7 +1420,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 					mime_type = {string:mime_type}
 				WHERE id_attach = {int:current_attachment}',
 				array(
-					'filesize' => filesize($destName),
+					'filesize' => $image->filesize(),
 					'width' => (int) $width,
 					'height' => (int) $height,
 					'current_attachment' => $attachID,

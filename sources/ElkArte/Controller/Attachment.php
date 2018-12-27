@@ -259,14 +259,17 @@ class Attachment extends \ElkArte\AbstractController
 			$text = $txt['attachment_not_found'];
 		}
 
-		$this->_send_headers('no_image', 'no_image', 'image/png', false, 'inline', 'no_image.png', true, false);
-
-		$img = generateTextImage($text, 200);
-
-		if ($img === false)
+		try
+		{
+			$image = new \ElkArte\Graphics\Image(null);
+			$img = $image->generateTextImage($text, 200);
+		}
+		catch (\Exception $e)
 		{
 			throw new \ElkArte\Exceptions\Exception('no_access', false);
 		}
+
+		$this->_send_headers('no_image', 'no_image', 'image/png', false, 'inline', 'no_image.png', true, false);
 
 		echo $img;
 		obExit(false);
@@ -553,27 +556,34 @@ class Attachment extends \ElkArte\AbstractController
 		}
 		finfo_close($finfo);
 
+		$compressable_files = array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java');
 		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
-		$use_compression = !empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java'));
+		$use_compression = !empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, $compressable_files);
 		$do_cache = false === (!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '');
 
 		$this->_send_headers($filename, $eTag, $mime_type, $use_compression, 'inline', $real_filename, $do_cache);
 
-		if ($resize && resizeImageFile($filename, $filename . '_thumb', 100, 100))
+		$image = new \ElkArte\Graphics\Image($filename . '_thumb');
+
+		if ($resize && $image->resizeImageFile($filename, 100, 100))
 		{
 			if (!empty($modSettings['attachment_autorotate']))
 			{
-				autoRotateImage($filename . '_thumb');
+				$image->autoRotateImage();
 			}
 
 			$filename = $filename . '_thumb';
 		}
 
-		if (empty($modSettings['enableCompressedOutput']) || filesize($filename) > 4194304)
-			header('Content-Length: ' . filesize($filename));
+		if ($use_compression === false)
+		{
+			header('Content-Length: ' . $image->filesize());
+		}
 
 		if (@readfile($filename) === null)
+		{
 			echo file_get_contents($filename);
+		}
 
 		obExit(false);
 	}
