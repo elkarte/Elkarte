@@ -95,14 +95,14 @@ class PmRenderer extends Renderer
 	 */
 	protected function _buildOutputArray()
 	{
-		global $recipients, $context, $user_info, $modSettings, $scripturl, $txt;
+		global $context, $user_info, $modSettings, $scripturl, $txt;
 
 		$id_pm = $this->_this_message['id_pm'];
 
 		$output = parent::_buildOutputArray();
 		$output += array(
-			'recipients' => &$recipients[$id_pm],
-			'number_recipients' => count($recipients[$id_pm]['to']),
+			'recipients' => $this->_options->recipients[$id_pm],
+			'number_recipients' => count($this->_options->recipients[$id_pm]['to']),
 			'labels' => &$context['message_labels'][$id_pm],
 			'fully_labeled' => count($context['message_labels'][$id_pm]) == count($context['labels']),
 			'is_replied_to' => &$context['message_replied'][$id_pm],
