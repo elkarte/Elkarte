@@ -402,7 +402,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 	public function action_folder()
 	{
 		global $txt, $scripturl, $modSettings, $context, $subjects_request;
-		global $messages_request, $user_info, $recipients, $options, $user_settings;
+		global $messages_request, $user_info, $options, $user_settings;
 
 		// Changing view?
 		if (isset($this->_req->query->view))
@@ -660,8 +660,9 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 		// Initialize the subject and message render callbacks
 		$bodyParser = new \ElkArte\MessagesCallback\BodyParser\Normal(array(), false);
-		$renderer = new \ElkArte\MessagesCallback\PmRenderer($messages_request, $bodyParser);
-		$subject_renderer = new \ElkArte\MessagesCallback\PmRenderer($subjects_request, $bodyParser);
+		$opt = new \ElkArte\ValuesContainer(['recipients' => $recipients]);
+		$renderer = new \ElkArte\MessagesCallback\PmRenderer($messages_request, $bodyParser, $opt);
+		$subject_renderer = new \ElkArte\MessagesCallback\PmRenderer($subjects_request, $bodyParser, $opt);
 
 		// Subject and Message
 		$context['get_pmessage'] = array($renderer, 'getContext');
