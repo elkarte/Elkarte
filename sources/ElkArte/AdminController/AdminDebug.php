@@ -24,7 +24,7 @@ class AdminDebug extends \ElkArte\AbstractController
 	/**
 	 * {@inheritdoc }
 	 */
-	public function trackStats()
+	public function trackStats($action = '')
 	{
 		return false;
 	}

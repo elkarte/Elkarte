@@ -60,7 +60,7 @@ class Recent
 	private $_user_id = 0;
 
 	/**
-	 * @var Database|null
+	 * @var \ElkArte\Database\QueryInterface|null
 	 */
 	private $_db = null;
 

@@ -306,14 +306,13 @@ class Calendar extends \ElkArte\AbstractController
 	}
 
 	/**
-		 *
+	 *
 	 * What it does:
 	 *  - require_once modules of the controller (not addons because these are
 	 *    always all require'd by the dispatcher),
 	 *  - Creates the event manager and registers addons and modules,
 	 *  - Instantiate the controller
 	 *  - Runs pre_dispatch
-	 * @return The return of the action_post.
 	 */
 	protected function _returnToPost()
 	{
@@ -324,11 +323,9 @@ class Calendar extends \ElkArte\AbstractController
 
 		call_integration_hook('integrate_action_' . $hook . '_before', array($function_name));
 
-		$result = $controller->{$function_name}();
+		$controller->{$function_name}();
 
 		call_integration_hook('integrate_action_' . $hook . '_after', array($function_name));
-
-		return $result;
 	}
 
 	/**

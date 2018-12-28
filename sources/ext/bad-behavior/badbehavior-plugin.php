@@ -246,7 +246,7 @@ function bb2_multi_implode($array, $glue = ',', $trim_all = false)
  * Retrieve whitelist
  *
  * @todo
- * @return type
+ * @return mixed[]
  */
 function bb2_read_whitelist()
 {

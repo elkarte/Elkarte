@@ -46,7 +46,7 @@ class Unread
 	private $_post_mod = false;
 	/** @var bool */
 	private $_unwatch = false;
-	/** @var Database|null */
+	/** @var \ElkArte\Database\QueryInterface|null */
 	private $_db = null;
 	/** @var int|string */
 	private $_preview_bodies = 0;

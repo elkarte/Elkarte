@@ -42,8 +42,6 @@ class ControllerRedirectException extends \Exception
 	 *
 	 * @param object $source The controller object that called the method
 	 *                ($this in the calling class)
-	 *
-	 * @return The return of the method called.
 	 */
 	public function doRedirect($source)
 	{
@@ -55,6 +53,6 @@ class ControllerRedirectException extends \Exception
 		$controller = new $this->_controller(new \ElkArte\EventManager());
 		$controller->pre_dispatch();
 
-		return $controller->{$this->_method}();
+		$controller->{$this->_method}();
 	}
 }

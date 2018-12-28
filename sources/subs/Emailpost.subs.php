@@ -83,7 +83,7 @@ function pbe_email_to_bbc($text, $html)
 	// Some tags often end up as just empty tags - remove those.
 	$emptytags = array(
 		'~\[[bisu]\]\s*\[/[bisu]\]~' => '',
-		'~\[[bisu]\]\s*\[/[bisu]\]~' => '',
+		'~\[quote\]\s*\[/quote\]~' => '',
 		'~(\n){3,}~si' => "\n\n",
 	);
 	$text = preg_replace(array_keys($emptytags), array_values($emptytags), $text);

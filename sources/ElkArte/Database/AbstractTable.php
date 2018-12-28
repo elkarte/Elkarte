@@ -24,7 +24,7 @@ abstract class AbstractTable
 {
 	/**
 	 * We need a way to interact with the database
-	 * @var Database
+	 * @var \ElkArte\Database\QueryInterface
 	 */
 	protected $_db = null;
 

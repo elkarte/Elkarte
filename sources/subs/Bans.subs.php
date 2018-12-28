@@ -582,7 +582,7 @@ function logTriggersUpdates($logs, $new = true)
  *
  * @package Bans
  * @param mixed[] $ban_info
- * @return nothing
+ * @return int|bool
  */
 function updateBanGroup($ban_info = array())
 {

@@ -1653,7 +1653,7 @@ class BBCParser
 				$this->message = substr_replace($this->message, '', $this->pos, 6);
 			}
 
-			if (isset($tag[Codes::ATTR_TRIM]) && $tag[Codes::ATTR_TRIM] !== Codes::TRIM_INSIDE)
+			if (isset($this->open_tags[$i][Codes::ATTR_TRIM]) && $this->open_tags[$i][Codes::ATTR_TRIM] !== Codes::TRIM_INSIDE)
 			{
 				$this->trimWhiteSpace($this->pos);
 			}

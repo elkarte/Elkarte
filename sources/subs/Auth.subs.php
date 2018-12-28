@@ -426,6 +426,7 @@ function resetPassword($memID, $username = null)
 	$user = $result['member_name'];
 	$email = $result['email_address'];
 	$lngfile = $result['lngfile'];
+	$old_user = '';
 
 	if ($username !== null)
 	{

@@ -25,7 +25,7 @@ class DatabaseHandler extends \SessionHandler
 {
 	/**
 	 * The database object
-	 * @var database
+	 * @var \ElkArte\Database\QueryInterface
 	 */
 	protected $_db = null;
 

@@ -382,7 +382,7 @@ class SiteDispatcher
 	/**
 	 * If the current controller wants to track access and stats.
 	 */
-	public function trackStats()
+	public function trackStats($action = '')
 	{
 		return $this->_controller->trackStats($this->_function_name);
 	}

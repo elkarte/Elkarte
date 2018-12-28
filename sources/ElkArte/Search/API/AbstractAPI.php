@@ -112,13 +112,13 @@ abstract class AbstractAPI
 
 	/**
 	 * Database instance
-	 * @var \Database|null
+	 * @var \ElkArte\Database\QueryInterface|null
 	 */
 	protected $_db = null;
 
 	/**
 	 * Search db instance
-	 * @var \DbSearch|null
+	 * @var \ElkArte\Database\AbstractSearch|null
 	 */
 	protected $_db_search = null;
 

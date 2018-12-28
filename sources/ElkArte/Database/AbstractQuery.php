@@ -24,7 +24,7 @@ abstract class AbstractQuery implements QueryInterface
 {
 	/**
 	 * Current connection to the database
-	 * @var mysqli|postgre|resource
+	 * @var \ElkArte\Database\ConnectionInterface
 	 */
 	protected $connection = null;
 
@@ -739,7 +739,7 @@ abstract class AbstractQuery implements QueryInterface
 	 *  Get the version number.
 	 *
 	 * @return string - the version
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	abstract public function client_version();
 

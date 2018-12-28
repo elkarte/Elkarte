@@ -111,6 +111,8 @@ function automanage_attachments_check_directory()
 		$outputCreation = automanage_attachments_create_directory($updir);
 	elseif (in_array($updir, $modSettings['attachmentUploadDir']))
 		$outputCreation = true;
+	else
+		$outputCreation = false;
 
 	if ($outputCreation)
 	{

@@ -23,7 +23,7 @@ abstract class AbstractModel
 {
 	/**
 	 * The database object
-	 * @var database
+	 * @var \ElkArte\Database\QueryInterface
 	 */
 	protected $_db = null;
 
