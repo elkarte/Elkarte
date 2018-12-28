@@ -458,11 +458,6 @@ function processAttachments($id_msg = null)
 			// This is a generic error
 			$attach_errors->activate();
 			$attach_errors->addError('attach_no_upload');
-			// @todo This is likely the result of some refactoring, verify when $attachment is not set and why
-			if (isset($attachment))
-			{
-				$attach_errors->addError(is_array($attachment) ? array($attachment[0], $attachment[1]) : $attachment);
-			}
 
 			// And delete the files 'cos they ain't going nowhere.
 			foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
