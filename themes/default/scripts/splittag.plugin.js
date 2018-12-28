@@ -4,7 +4,7 @@
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause  (see accompanying LICENSE.txt file)
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This software is a derived product, based on:
  *
