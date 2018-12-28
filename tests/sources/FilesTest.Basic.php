@@ -124,7 +124,7 @@ class TestFiles extends \PHPUnit\Framework\TestCase
 \/\*\*
 (?: \*.{0,200}\n)* \* @package\s{1,5}ElkArte Forum
  \* @copyright ElkArte Forum contributors
- \* @license\s{1,5}?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause \(see accompanying LICENSE.txt file\)
+ \* @license\s{1,5}?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause \(see accompanying LICENSE\.txt file\)
  \*
  \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)?
 (?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
@@ -134,7 +134,7 @@ class TestFiles extends \PHPUnit\Framework\TestCase
 \/\*\*
 (?: \*.{0,200}\n)* \* @package\s{1,5}ElkArte Forum
  \* @copyright ElkArte Forum contributors
- \* @license\s{1,5}?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause \(see accompanying LICENSE.txt file\)
+ \* @license\s{1,5}?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause \(see accompanying LICENSE\.txt file\)
  \*
  \* This file contains code covered by:
  \* copyright: 2011 Simple Machines (?:Forum )?\(http:\/\/www\.simplemachines\.org\)
