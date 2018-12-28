@@ -1554,15 +1554,23 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
 				foreach ($query_conditions as $condition => $query_condition)
 				{
 					if ($query_condition == 'member_names')
+					{
 						$query_parts[$condition === 'or' ? 'or' : 'and'][] = $allowed_conditions[$query_condition]($query_params);
+					}
 					else
+					{
 						$query_parts[$condition === 'or' ? 'or' : 'and'][] = isset($allowed_conditions[$query_condition]) ? $allowed_conditions[$query_condition] : $query_condition;
+					}
 				}
 			}
-			elseif ($query == 'member_names')
-				$query_parts[$condition === 'or' ? 'or' : 'and'][] = $allowed_conditions[$query]($query_params);
+			elseif ($query_conditions == 'member_names')
+			{
+				$query_parts['and'][] = $allowed_conditions[$query_conditions]($query_params);
+			}
 			else
-				$query_parts['and'][] = isset($allowed_conditions[$query]) ? $allowed_conditions[$query] : $query;
+			{
+				$query_parts['and'][] = isset($allowed_conditions[$query_conditions]) ? $allowed_conditions[$query_conditions] : $query_conditions;
+			}
 		}
 
 		if (!empty($query_parts['or']))

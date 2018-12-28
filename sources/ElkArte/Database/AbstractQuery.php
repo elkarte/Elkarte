@@ -891,7 +891,7 @@ abstract class AbstractQuery implements QueryInterface
 	public function insert_id($table)
 	{
 // 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::insert_id()', 'Result::insert_id()');
-		return $this->result->insert_id($table);
+		return $this->result->insert_id();
 	}
 
 	/**

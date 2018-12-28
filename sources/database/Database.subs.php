@@ -148,14 +148,7 @@ function db_search()
 		}
 		catch (\Exception $e)
 		{
-			if ($fatal === true)
-			{
-				\ElkArte\Errors\Errors::instance()->display_db_error($e->getMessage());
-			}
-			else
-			{
-				throw $e;
-			}
+			\ElkArte\Errors\Errors::instance()->display_db_error($e->getMessage());
 		}
 	}
 

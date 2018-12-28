@@ -295,6 +295,8 @@ class Questions implements ControlInterface
 	 */
 	protected function _saveSettings($save_question, $save_answer, $save_language)
 	{
+		global $language;
+
 		$existing_question_answers = $this->_loadAntispamQuestions();
 
 		// Handle verification questions.

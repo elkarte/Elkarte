@@ -30,7 +30,7 @@ abstract class AbstractMentionMessage implements MentionTypeInterface
 	/**
 	 * The database object
 	 *
-	 * @var \Database
+	 * @var \ElkArte\Database\QueryInterface
 	 */
 	protected $_db = null;
 
