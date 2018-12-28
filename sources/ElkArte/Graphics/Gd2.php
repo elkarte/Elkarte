@@ -20,17 +20,14 @@ namespace ElkArte\Graphics;
 class Gd2 extends AbstractManipulator
 {
 	protected $src_img = null;
-	protected static $gd2 = false;
 
 	/**
 	 * Used to determine if GD2 whether the GD2 library is present.
 	 * The parameter returns the check for imagecreatetruecolor
 	 *
-	 * @param bool $gd2
-	 *
 	 * @return bool Whether or not GD is available.
 	 */
-	public static function canUse($gd2 = false)
+	public static function canUse()
 	{
 		// Check to see if GD is installed and what version.
 		if (($extensionFunctions = get_extension_funcs('gd')) === false)
@@ -41,10 +38,9 @@ class Gd2 extends AbstractManipulator
 		return true;
 	}
 
-	public function __construct($fileName, $do_memory_check = true)
+	public function __construct($fileName)
 	{
 		$this->fileName = $fileName;
-		$this->do_memory_check = $do_memory_check;
 	}
 
 	/**
@@ -84,39 +80,6 @@ class Gd2 extends AbstractManipulator
 		}
 
 		return false;
-	}
-
-	/**
-	 * See if we have enough memory to thumbnail an image
-	 *
-	 * @param int[] $sizes image size
-	 *
-	 * @return bool Whether or not the memory is available.
-	 */
-	protected function memoryCheck()
-	{
-		// Just to be sure
-		if (!is_array($this->sizes) || $this->sizes[0] === -1)
-		{
-			return true;
-		}
-
-		// Doing the old 'set it and hope' way?
-		if ($this->do_memory_check === false)
-		{
-			detectServer()->setMemoryLimit('128M');
-			return true;
-		}
-
-		// Determine the memory requirements for this image, note: if you want to use an image formula
-		// W x H x bits/8 x channels x Overhead factor
-		// You will need to account for single bit images as GD expands them to an 8 bit and will greatly
-		// overun the calculated value.
-		// The 5 below is simply a shortcut of 8bpp, 3 channels, 1.66 overhead
-		$needed_memory = ($sizes[0] * $sizes[1] * 5);
-
-		// If we need more, lets try to get it
-		return detectServer()->setMemoryLimit($needed_memory, true);
 	}
 
 	/**

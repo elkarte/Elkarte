@@ -33,27 +33,24 @@ class Image
 	protected $manipulator = null;
 	protected $fileName = '';
 	protected $forse_gd = false;
-	protected $do_memory_check = true;
 
-	// $do_memory_check = !empty($modSettings['attachment_thumb_memory']
-	public function __construct($fileName, $forse_gd = false, $do_memory_check = true)
+	public function __construct($fileName, $forse_gd = false)
 	{
 		$this->fileName = $fileName;
 		$this->forse_gd = $forse_gd;
-		$this->do_memory_check = $do_memory_check;
-		$this->setManipulator($fileName, $forse_gd, $do_memory_check);
+		$this->setManipulator($fileName, $forse_gd);
 	}
 
-	protected function setManipulator($fileName, $forse_gd, $do_memory_check)
+	protected function setManipulator($fileName, $forse_gd)
 	{
 		// Later this could become an array of "manipulators" (or not) and remove the hard-coded IM/GD requirements
 		if ($forse_gd === false && Imagick::canUse())
 		{
-			$this->manipulator = new Imagick($fileName, $do_memory_check);
+			$this->manipulator = new Imagick($fileName);
 		}
 		elseif (Gd2::canUse())
 		{
-			$this->manipulator = new Gd2($fileName, $do_memory_check);
+			$this->manipulator = new Gd2($fileName);
 		}
 		else
 		{
@@ -158,7 +155,7 @@ class Image
 	public function moveTo($destination)
 	{
 		$this->fileName = $destination;
-		$this->setManipulator($destination, $this->forse_gd, $this->do_memory_check);
+		$this->setManipulator($destination, $this->forse_gd);
 		return @rename($tempName, $destName);
 	}
 

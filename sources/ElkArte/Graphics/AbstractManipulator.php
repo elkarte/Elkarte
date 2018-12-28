@@ -23,10 +23,9 @@ abstract class AbstractManipulator
 	protected $fileName = '';
 	protected $fileHandle = null;
 	protected $sizes = [];
-	protected $do_memory_check = true;
 	protected $image = null;
 
-	abstract public function __construct($fileName, $do_memory_check = true);
+	abstract public function __construct($fileName);
 
 	abstract public static function canUse();
 
@@ -68,4 +67,31 @@ abstract class AbstractManipulator
 	}
 
 	abstract public function getSize();
+
+	/**
+	 * See if we have enough memory to thumbnail an image
+	 *
+	 * @param int[] $sizes image size
+	 *
+	 * @return bool Whether or not the memory is available.
+	 */
+	public function memoryCheck()
+	{
+		// Just to be sure
+		if (!is_array($this->sizes) || $this->sizes[0] === -1)
+		{
+			return true;
+		}
+
+		// Determine the memory requirements for this image, note: if you want to use an image formula
+		// W x H x bits/8 x channels x Overhead factor
+		// You will need to account for single bit images as GD expands them to an 8 bit and will greatly
+		// overun the calculated value.
+		// The 5 below is simply a shortcut of 8bpp, 3 channels, 1.66 overhead
+		$needed_memory = ($sizes[0] * $sizes[1] * 5);
+
+		// If we need more, lets try to get it
+		return detectServer()->setMemoryLimit($needed_memory, true);
+	}
+
 }
