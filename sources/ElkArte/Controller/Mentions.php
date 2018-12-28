@@ -3,7 +3,7 @@
 /**
  * Handles all the mentions actions so members are notified of mentionable actions
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

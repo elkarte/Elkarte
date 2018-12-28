@@ -4,7 +4,7 @@
  * This is a notification task, by default a container that may act like
  * an array (through ArrayAccess), with some ad-hoc methods.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

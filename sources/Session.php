@@ -9,7 +9,7 @@
  *  - It uses the databaseSession_lifetime setting for garbage collection.
  *  - The custom session handler is set by loadSession().
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

@@ -4,7 +4,7 @@
  * Handles the Security and Moderation pages in the admin panel.  This includes
  * bad behavior, anti spam, security and moderation settings
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

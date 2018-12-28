@@ -4,7 +4,7 @@
  * This file provides an implementation of the most common functions needed
  * for the database drivers to work.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

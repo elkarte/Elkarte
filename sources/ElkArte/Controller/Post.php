@@ -5,7 +5,7 @@
  * new topics, quotes, and modifications to existing posts.  It also handles
  * quoting posts by way of javascript.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

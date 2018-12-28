@@ -4,7 +4,7 @@
  * All the vital helper functions for use in email posting, formatting and conversion
  * and boy are there a bunch !
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

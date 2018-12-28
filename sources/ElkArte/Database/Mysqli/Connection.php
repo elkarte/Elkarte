@@ -3,7 +3,7 @@
 /**
  * This file has all the main functions in it that relate to the mysql database.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

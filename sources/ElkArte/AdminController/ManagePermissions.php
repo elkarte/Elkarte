@@ -4,7 +4,7 @@
  * Handles all possible permission items, permissions by membergroup
  * permissions by board, adding, modifying, etc
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

@@ -5,7 +5,7 @@
  * The version provided shows the number of notifications in the favicon
  * and sends a desktop notification if a new notification is present.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

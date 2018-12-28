@@ -4,7 +4,7 @@
  * This file is mainly concerned with tasks relating to follow-ups, such as
  * link messages and topics, delete follow-ups, etc.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

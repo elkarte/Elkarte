@@ -6,7 +6,7 @@
  * Copyright (C) 2005,2006,2007,2008,2009,2010,2011,2012 Michael Hampton
  * License: LGPLv3
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

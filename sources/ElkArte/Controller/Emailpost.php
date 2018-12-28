@@ -3,7 +3,7 @@
 /**
  * All the functions that validate and then save an email as a post or pm
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

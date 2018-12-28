@@ -2,7 +2,7 @@
  * This file contains javascript associated with the splittag function as it
  * relates to an sceditor instance
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

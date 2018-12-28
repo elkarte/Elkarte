@@ -3,7 +3,7 @@
 /**
  * This file contains a couple of functions for the latest posts on forum.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

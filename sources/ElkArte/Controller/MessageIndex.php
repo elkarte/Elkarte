@@ -4,7 +4,7 @@
  * This file is what shows the listing of topics in a board.
  * It's just one or two functions, but don't underestimate it ;).
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

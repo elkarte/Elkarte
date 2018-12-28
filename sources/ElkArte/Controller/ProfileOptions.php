@@ -5,7 +5,7 @@
  * It also allows the user to change some of their or another's preferences,
  * and such things
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

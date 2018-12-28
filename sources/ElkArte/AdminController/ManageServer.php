@@ -5,7 +5,7 @@
  * This includes anything from which an error may result in the forum destroying
  * itself in a firey fury.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

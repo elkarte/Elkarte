@@ -6,7 +6,7 @@
  * related to a table structure.
  * Add-ons will need this, to change the database for their needs.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

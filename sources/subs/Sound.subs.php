@@ -5,7 +5,7 @@
  * verification is still accessible for all users, a sound clip is being added
  * that reads the letters that are being shown.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

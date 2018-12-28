@@ -5,7 +5,7 @@
  * operations, including sending emails, ims, blocking spam, preparsing posts,
  * spell checking, and the post box.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

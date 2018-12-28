@@ -4,7 +4,7 @@
  * Functions to search for a member by real name or member name, invoked
  * via xml form requests
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

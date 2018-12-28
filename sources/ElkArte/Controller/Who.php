@@ -4,7 +4,7 @@
  * This file is mainly concerned with the Who's Online list.
  * Although, it also handles credits. :P
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

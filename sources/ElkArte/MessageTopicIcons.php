@@ -3,7 +3,7 @@
 /**
  * General class for setting the message icon array and returning index values
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

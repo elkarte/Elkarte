@@ -7,7 +7,7 @@
  * perhaps for use of addons in a similar way they were using some
  * SSI functions.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

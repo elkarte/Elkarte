@@ -4,7 +4,7 @@
  * The admin screen to change the search settings.  Allows for the creation \
  * of search indexes and search weights
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

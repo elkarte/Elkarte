@@ -3,7 +3,7 @@
 /**
  * This file contains the functions to add, modify, remove, collapse and expand categories.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

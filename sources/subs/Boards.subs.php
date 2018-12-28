@@ -4,7 +4,7 @@
  * This file is mainly concerned with minor tasks relating to boards, such as
  * marking them read, collapsing categories, or quick moderation.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

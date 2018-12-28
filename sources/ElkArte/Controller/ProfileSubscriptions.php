@@ -3,7 +3,7 @@
 /**
  * Handles paid subscriptions on a user's profile.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

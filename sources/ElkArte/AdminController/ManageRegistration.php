@@ -4,7 +4,7 @@
  * This file helps the administrator setting registration settings and policy
  * as well as allow the administrator to register new members themselves.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

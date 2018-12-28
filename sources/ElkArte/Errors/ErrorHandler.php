@@ -3,7 +3,7 @@
 /**
  * This file contains our custom error handlers for PHP, hence its final status.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

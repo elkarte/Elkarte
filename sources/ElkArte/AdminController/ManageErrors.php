@@ -4,7 +4,7 @@
  * The main purpose of this file is to show a list of all errors that were
  * logged on the forum, and allow filtering and deleting them.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

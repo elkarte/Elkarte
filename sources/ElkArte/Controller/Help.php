@@ -3,7 +3,7 @@
 /**
  * This file has the job of taking care of help messages and the help center.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

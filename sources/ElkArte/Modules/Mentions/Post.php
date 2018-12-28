@@ -3,7 +3,7 @@
 /**
  * This module is attached to the Post action to enable mentions on it.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

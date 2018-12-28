@@ -3,7 +3,7 @@
 /**
  * class that will reflow/format an email message to make it look like a post again
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

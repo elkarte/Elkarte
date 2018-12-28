@@ -4,7 +4,7 @@
  * This file currently just shows group info, and allows certain privileged
  * members to add/remove members.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

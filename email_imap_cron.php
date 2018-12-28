@@ -4,7 +4,7 @@
  * Should be run from a cron job to fetch messages from an imap mailbox
  * Can be called from scheduled tasks (fake-cron) if needed
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

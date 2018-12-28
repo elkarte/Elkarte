@@ -4,7 +4,7 @@
  * This file contains a (static) class that will track some debug information
  * if debug is on.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

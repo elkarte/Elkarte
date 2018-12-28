@@ -3,7 +3,7 @@
 /**
  * This file contains the integration of mentions into \ElkArte\Controller\Display.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

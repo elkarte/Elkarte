@@ -11,7 +11,7 @@
  * For example
  * - Ubuntu and Debian would normally be #!/usr/bin/php -q
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

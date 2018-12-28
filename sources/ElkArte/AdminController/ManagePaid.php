@@ -4,7 +4,7 @@
  * This file contains all the administration functions for subscriptions.
  * (and some more than that :P)
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

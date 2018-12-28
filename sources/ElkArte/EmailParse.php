@@ -3,7 +3,7 @@
 /**
  * Class to parse and email in to its header and body parts for use in posting
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

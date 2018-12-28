@@ -4,7 +4,7 @@
  * Provides ways to add information to your website by linking to and capturing output
  * from ElkArte
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

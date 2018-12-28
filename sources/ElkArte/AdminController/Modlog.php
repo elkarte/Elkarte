@@ -3,7 +3,7 @@
 /**
  * The moderation log is this file's only job. It views it, and that's about all it does.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

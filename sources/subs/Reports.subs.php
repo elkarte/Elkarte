@@ -3,7 +3,7 @@
 /**
  * This file is used by Reports.controller.php mainly to retrieve data from the database
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

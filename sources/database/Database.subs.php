@@ -4,7 +4,7 @@
  * This file has all the main functions in it that set up the database connection
  * and initializes the appropriate adapters.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

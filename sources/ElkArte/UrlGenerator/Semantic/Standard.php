@@ -3,7 +3,7 @@
 /**
  * Semantic representation of any URL that doesn't have a custom builder
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

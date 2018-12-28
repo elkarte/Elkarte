@@ -4,7 +4,7 @@
  * This file has only one real task, showing the calendar.
  * Original module by Aaron O'Neil - aaron@mud-master.com
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

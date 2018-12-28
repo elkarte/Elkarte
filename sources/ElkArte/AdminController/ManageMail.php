@@ -3,7 +3,7 @@
 /**
  * Handles mail configuration, displays the queue and allows for the removal of specific items
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

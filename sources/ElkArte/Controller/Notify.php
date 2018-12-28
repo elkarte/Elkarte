@@ -4,7 +4,7 @@
  * This file contains just the functions that turn on and off notifications
  * to topics or boards.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

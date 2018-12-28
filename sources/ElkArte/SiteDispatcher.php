@@ -4,7 +4,7 @@
  * Primary site dispatch controller, sends the request to the function or method
  * registered to handle it.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

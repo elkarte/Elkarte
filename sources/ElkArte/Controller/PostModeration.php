@@ -3,7 +3,7 @@
 /**
  * Handles Post Moderation approvals and un-approvals
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

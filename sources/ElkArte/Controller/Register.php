@@ -5,7 +5,7 @@
  * members, and it helps the administrator moderate member registrations.
  * Similarly, it handles account activation as well.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

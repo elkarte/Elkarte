@@ -3,7 +3,7 @@
 /**
  * This file contains some useful functions for members and membergroups.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

@@ -4,7 +4,7 @@
  * This file has the very important job of ensuring forum security.
  * This task includes banning and permissions, namely.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

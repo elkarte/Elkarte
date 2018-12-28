@@ -5,7 +5,7 @@
  * are specifically targeted at users, and even placing multiple messages
  * in one exception.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

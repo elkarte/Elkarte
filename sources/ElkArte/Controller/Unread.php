@@ -3,7 +3,7 @@
 /**
  * Find and retrieve information about recently posted topics, messages, and the like.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

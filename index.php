@@ -5,7 +5,7 @@
  * Everything should start here, so all the setup and security is done
  * properly.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

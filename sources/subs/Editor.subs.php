@@ -4,7 +4,7 @@
  * This file contains functions specific to the editing box and is
  * generally used for WYSIWYG type functionality.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

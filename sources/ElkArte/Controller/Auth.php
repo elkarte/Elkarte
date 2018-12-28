@@ -4,7 +4,7 @@
  * This file is concerned pretty entirely, as you see from its name, with
  * logging in and out members, and the validation of that.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

@@ -4,7 +4,7 @@
  * This file provides utility functions and db function for the profile functions,
  * notably, but not exclusively, deals with custom profile fields
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

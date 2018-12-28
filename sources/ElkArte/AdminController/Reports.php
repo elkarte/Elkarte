@@ -8,7 +8,7 @@
  * will fill context with relevant data. Secondly, the choice of sub-template will
  * determine how this data is shown to the user
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

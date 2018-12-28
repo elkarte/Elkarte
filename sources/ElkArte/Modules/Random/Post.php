@@ -3,7 +3,7 @@
 /**
  * Random module is a collection of small stuff not worth it's own module.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

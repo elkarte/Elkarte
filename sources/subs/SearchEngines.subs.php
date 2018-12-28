@@ -3,7 +3,7 @@
 /**
  * This file contains all the screens that relate to search engines.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

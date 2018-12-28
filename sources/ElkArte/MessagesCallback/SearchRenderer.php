@@ -4,7 +4,7 @@
  * Part of the files dealing with preparing the content for display posts
  * via callbacks (Display, PM, Search).
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

@@ -4,7 +4,7 @@
  * This file contains those functions pertaining to polls, including removing
  * resetting votes, editing, adding, and more
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

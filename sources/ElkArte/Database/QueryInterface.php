@@ -3,7 +3,7 @@
 /**
  * This class is the base class for database drivers implementations.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

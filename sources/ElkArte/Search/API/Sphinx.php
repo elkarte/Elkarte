@@ -4,7 +4,7 @@
  * Used when an Sphinx search daemon is running and access is via the Sphinx
  * native search API (SphinxAPI)
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *

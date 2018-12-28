@@ -4,7 +4,7 @@
  * This file does a lot of important stuff.  Mainly, this means it handles
  * the query string, request variables, and session management.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
