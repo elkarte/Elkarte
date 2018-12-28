@@ -24,8 +24,6 @@ class SmileyParser
 {
 	/** @var bool Are smiley enabled */
 	protected $enabled = true;
-	/** @var array|void the smiles*/
-	protected $smileys = array();
 	/** @var string smiley regex for parse protection */
 	protected $search = '';
 	/** @var array The replacement images for the ;) */
@@ -41,13 +39,13 @@ class SmileyParser
 	 * @param string $path
 	 * @param array $smileys
 	 */
-	public function __construct($path, array $smileys = array())
+	public function __construct($path)
 	{
 		$this->setPath($path);
 
 		if ($this->enabled)
 		{
-			$this->smileys = empty($smileys) ? $this->load() : $smileys;
+			$this->load();
 		}
 	}
 
