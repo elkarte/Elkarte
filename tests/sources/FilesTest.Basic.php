@@ -137,7 +137,9 @@ class TestFiles extends \PHPUnit\Framework\TestCase
  \* @license\s{1,5}?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause \(see accompanying LICENSE\.txt file\)
  \*
  \* This file contains code covered by:
- \* copyright:\s+20\d\d Simple Machines (?:Forum )?\(http:\/\/www\.simplemachines\.org\)
+ \* copyright:\s+20\d\d Simple Machines (?:Forum )?\(http:\/\/www\.simplemachines\.org\)(
+ \*
+ \* copyright:\s+?2004-2011, GreyWyvern - All rights reserved\.)?
  \*
  \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)?
 (?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
