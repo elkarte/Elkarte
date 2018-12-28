@@ -38,14 +38,6 @@ class Gd2 extends AbstractManipulator
 			return false;
 		}
 
-		// Also determine if GD2 is installed and store it in a global.
-		self::$gd2 = in_array('imagecreatetruecolor', $extensionFunctions) && function_exists('imagecreatetruecolor');
-
-		if ($gd2 === true)
-		{
-			return self::$gd2;
-		}
-
 		return true;
 	}
 
