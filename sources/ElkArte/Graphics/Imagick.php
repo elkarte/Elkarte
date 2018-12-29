@@ -21,8 +21,8 @@ class Imagick extends AbstractManipulator
 {
 	public function __construct($fileNname)
 	{
-		$this->fileName = $fileName;
-		$this->image = new \Imagick($fileName);
+		$this->_fileName = $fileName;
+		$this->_image = new \Imagick($fileName);
 	}
 
 	/**
@@ -93,8 +93,8 @@ class Imagick extends AbstractManipulator
 		$preferred_format = empty($preferred_format) || !isset(Image::DEFAULT_FORMATS[$preferred_format]) ? 2 : $preferred_format;
 
 		// Set the input and output image size
-		$src_width = $this->image->getImageWidth();
-		$src_height = $this->image->getImageHeight();
+		$src_width = $this->_image->getImageWidth();
+		$src_height = $this->_image->getImageHeight();
 
 		// It should never happen, but let's keep these two as a failsafe
 		$max_width = $max_width === null ? $src_width : $max_width;
@@ -107,26 +107,26 @@ class Imagick extends AbstractManipulator
 		// Set jpeg image quality to 80
 		if (Image::DEFAULT_FORMATS[$preferred_format] === 'jpeg')
 		{
-			$this->image->borderImage('white', 0, 0);
-			$this->image->setImageCompression(Imagick::COMPRESSION_JPEG);
-			$this->image->setImageCompressionQuality(80);
+			$this->_image->borderImage('white', 0, 0);
+			$this->_image->setImageCompression(Imagick::COMPRESSION_JPEG);
+			$this->_image->setImageCompressionQuality(80);
 		}
 
 		// Create a new image in our preferred format and resize it if needed
-		$this->image->setImageFormat(Image::DEFAULT_FORMATS[$preferred_format]);
-		$this->image->resizeImage($dest_width, $dest_height, Imagick::FILTER_LANCZOS, 1, true);
+		$this->_image->setImageFormat(Image::DEFAULT_FORMATS[$preferred_format]);
+		$this->_image->resizeImage($dest_width, $dest_height, Imagick::FILTER_LANCZOS, 1, true);
 
 		// Remove EXIF / ICC data?
 		if ($strip)
 		{
-			$this->image->stripImage();
+			$this->_image->stripImage();
 		}
 
 		// Save the new image in the destination location
-		$success = $this->image->writeImage($this->fileName);
+		$success = $this->_image->writeImage($this->_fileName);
 
 		// Free resources associated with the Imagick object
-		$this->image->clear();
+		$this->_image->clear();
 
 		return !empty($success);
 	}
@@ -149,12 +149,12 @@ class Imagick extends AbstractManipulator
 		{
 			// This method should exist if Imagick has been compiled against ImageMagick version
 			// 6.3.0 or higher which is forever ago, but we check anyway ;)
-			if (!method_exists($this->image, 'getImageOrientation'))
+			if (!method_exists($this->_image, 'getImageOrientation'))
 			{
 				return false;
 			}
 
-			$orientation = $this->image->getImageOrientation();
+			$orientation = $this->_image->getImageOrientation();
 			switch ($orientation)
 			{
 				// 0 & 1 Not set or Normal
@@ -163,47 +163,47 @@ class Imagick extends AbstractManipulator
 					break;
 				// 2 Mirror image, Normal orientation
 				case Imagick::ORIENTATION_TOPRIGHT:
-					$this->image->flopImage();
+					$this->_image->flopImage();
 					break;
 				// 3 Normal image, rotated 180
 				case Imagick::ORIENTATION_BOTTOMRIGHT:
-					$this->image->rotateImage('#000', 180);
+					$this->_image->rotateImage('#000', 180);
 					break;
 				// 4 Mirror image, rotated 180
 				case Imagick::ORIENTATION_BOTTOMLEFT:
-					$this->image->flipImage();
+					$this->_image->flipImage();
 					break;
 				// 5 Mirror image, rotated 90 CCW
 				case Imagick::ORIENTATION_LEFTTOP:
-					$this->image->rotateImage('#000', 90);
-					$this->image->flopImage();
+					$this->_image->rotateImage('#000', 90);
+					$this->_image->flopImage();
 					break;
 				// 6 Normal image, rotated 90 CCW
 				case Imagick::ORIENTATION_RIGHTTOP:
-					$this->image->rotateImage('#000', 90);
+					$this->_image->rotateImage('#000', 90);
 					break;
 				// 7 Mirror image, rotated 90 CW
 				case Imagick::ORIENTATION_RIGHTBOTTOM:
-					$this->image->rotateImage('#000', -90);
-					$this->image->flopImage();
+					$this->_image->rotateImage('#000', -90);
+					$this->_image->flopImage();
 					break;
 				// 8 Normal image, rotated 90 CW
 				case Imagick::ORIENTATION_LEFTBOTTOM:
-					$this->image->rotateImage('#000', -90);
+					$this->_image->rotateImage('#000', -90);
 					break;
 			}
 
 			// Now that it's auto-rotated, make sure the EXIF data is correctly updated
 			if ($orientation >= 2)
 			{
-				$this->image->setImageOrientation(Imagick::ORIENTATION_TOPLEFT);
+				$this->_image->setImageOrientation(Imagick::ORIENTATION_TOPLEFT);
 			}
 
 			// Save the new image in the destination location
-			$success = $this->image->writeImage($this->fileName);
+			$success = $this->_image->writeImage($this->_fileName);
 
 			// Free resources associated with the Imagick object
-			$this->image->clear();
+			$this->_image->clear();
 		}
 		catch (\Exception $e)
 		{
@@ -230,8 +230,8 @@ class Imagick extends AbstractManipulator
 
 		try
 		{
-			$this->image->newImage($width, $height, new ImagickPixel('white'));
-			$this->image->setImageFormat($format);
+			$this->_image->newImage($width, $height, new ImagickPixel('white'));
+			$this->_image->setImageFormat($format);
 
 			// 28pt is ~2em given default font stack
 			$font_size = 28;
@@ -247,13 +247,13 @@ class Imagick extends AbstractManipulator
 			do
 			{
 				$draw->setFontSize($font_size);
-				$metric = $this->image->queryFontMetrics($draw, $text);
+				$metric = $this->_image->queryFontMetrics($draw, $text);
 				$text_width = (int) $metric['textWidth'];
 			} while ($text_width > $width && $font_size-- > 1);
 
 			// Place text in center of block
-			$this->image->annotateImage($draw, $width / 2, $height / 2 + $font_size / 4, 0, $text);
-			$image = $this->image->getImageBlob();
+			$this->_image->annotateImage($draw, $width / 2, $height / 2 + $font_size / 4, 0, $text);
+			$image = $this->_image->getImageBlob();
 
 			return $image;
 		}

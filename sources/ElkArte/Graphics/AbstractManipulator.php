@@ -20,10 +20,12 @@ namespace ElkArte\Graphics;
 
 abstract class AbstractManipulator
 {
-	protected $fileName = '';
-	protected $fileHandle = null;
-	protected $sizes = [];
-	protected $image = null;
+	protected $_fileName = '';
+	protected $_fileHandle = null;
+	protected $_sizes = [];
+	protected $_image = null;
+	protected $_width = 0;
+	protected $_height = 0;
 
 	abstract public function __construct($fileName);
 
@@ -35,10 +37,13 @@ abstract class AbstractManipulator
 
 	abstract public function generateTextImage($text, $width = 100, $height = 100, $format = 'png');
 
+	abstract function createImageFromFile();
+	abstract function createImageFromWeb();
+
 	public function copyFrom(Image $source)
 	{
 		// Get the image file, we have to work with something after all
-		$fp_destination = fopen($this->fileName, 'wb');
+		$fp_destination = fopen($this->_fileName, 'wb');
 		if ($fp_destination && $source->isWebAddress())
 		{
 			require_once(SUBSDIR . '/Package.subs.php');
@@ -62,23 +67,62 @@ abstract class AbstractManipulator
 			fclose($fp_destination);
 		}
 
-		$this->sizes = $this->getSize();
-		return $this->sizes;
+		$this->_sizes = $this->getSize();
+		return $this->_sizes;
 	}
 
-	abstract public function getSize();
+	/**
+	 * Simple wrapper for getimagesize
+	 *
+	 * @param string $type
+	 * @param string|boolean $error return array or false on error
+	 *
+	 * @return array|boolean
+	 */
+	public function getSize($type = 'file', $error = 'array')
+	{
+		try
+		{
+			if ($type === 'string')
+			{
+				$this->_sizes = getimagesizefromstring($this->_image);
+			}
+			else
+			{
+				$this->_sizes = getimagesize($this->_fileName);
+			}
+		}
+		catch (\Exception $e)
+		{
+			$this->_sizes = false;
+		}
+
+		// Can't get it, what shall we return
+		if (empty($this->_sizes))
+		{
+			if ($error === 'array')
+			{
+				$this->_sizes = array(-1, -1, -1);
+			}
+			else
+			{
+				$this->_sizes = false;
+			}
+		}
+	}
 
 	/**
 	 * See if we have enough memory to thumbnail an image
 	 *
-	 * @param int[] $sizes image size
+	 * @param bool $fatal if to throw an exception on lack of memory
 	 *
 	 * @return bool Whether or not the memory is available.
+	 * @throws \Exception
 	 */
-	public function memoryCheck()
+	public function memoryCheck($fatal = false)
 	{
-		// Just to be sure
-		if (!is_array($this->sizes) || $this->sizes[0] === -1)
+		// No Need
+		if (empty($this->_width) || empty($this->_height))
 		{
 			return true;
 		}
@@ -88,10 +132,17 @@ abstract class AbstractManipulator
 		// You will need to account for single bit images as GD expands them to an 8 bit and will greatly
 		// overun the calculated value.
 		// The 5 below is simply a shortcut of 8bpp, 3 channels, 1.66 overhead
-		$needed_memory = ($sizes[0] * $sizes[1] * 5);
+		$needed_memory = $this->_width * $this->_height * 5;
 
 		// If we need more, lets try to get it
-		return detectServer()->setMemoryLimit($needed_memory, true);
+		$success = detectServer()->setMemoryLimit($needed_memory, true);
+
+		if ($fatal && !$success)
+		{
+			throw new \Exception('Not enough memory');
+		}
+
+		return $success;
 	}
 
 }

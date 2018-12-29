@@ -24,33 +24,41 @@ namespace ElkArte\Graphics;
 class Image
 {
 	const DEFAULT_FORMATS = [
-		'1' => 'gif',
-		'2' => 'jpeg',
-		'3' => 'png',
-		'6' => 'bmp',
-		'15' => 'wbmp'
+		IMAGETYPE_GIF => 'gif',
+		IMAGETYPE_JPEG => 'jpeg',
+		IMAGETYPE_PNG => 'png',
+		IMAGETYPE_BMP => 'bmp',
+		IMAGETYPE_WBMP => 'wbmp'
 	];
-	protected $manipulator = null;
-	protected $fileName = '';
-	protected $forse_gd = false;
+	/** @var \ElkArte\Graphics\Imagick|\ElkArte\Graphics\Gd2  */
+	protected $_manipulator;
+	protected $_fileName = '';
+	protected $_force_gd = false;
 
-	public function __construct($fileName, $forse_gd = false)
+	public function __construct($fileName = '', $force_gd = false)
 	{
-		$this->fileName = $fileName;
-		$this->forse_gd = $forse_gd;
-		$this->setManipulator($fileName, $forse_gd);
+		$this->_fileName = $fileName;
+		$this->_force_gd = $force_gd;
+
+		try
+		{
+			$this->setManipulator($fileName, $force_gd);
+		}
+		catch (\Exception $e)
+		{
+		}
 	}
 
-	protected function setManipulator($fileName, $forse_gd)
+	protected function setManipulator($fileName, $force_gd)
 	{
 		// Later this could become an array of "manipulators" (or not) and remove the hard-coded IM/GD requirements
-		if ($forse_gd === false && Imagick::canUse())
+		if ($force_gd === false && Imagick::canUse())
 		{
-			$this->manipulator = new Imagick($fileName);
+			$this->_manipulator = new Imagick($fileName);
 		}
 		elseif (Gd2::canUse())
 		{
-			$this->manipulator = new Gd2($fileName);
+			$this->_manipulator = new Gd2($fileName);
 		}
 		else
 		{
@@ -58,19 +66,33 @@ class Image
 		}
 	}
 
+	public function loadImage($source)
+	{
+		if ($this->isWebAddress($source))
+		{
+			$this->_fileName = $source;
+			$this->_manipulator->createImageFromWeb();
+		}
+		else
+		{
+			$this->_fileName = $source;
+			$this->_manipulator->createImageFromFile();
+		}
+	}
+
 	public function getFileName()
 	{
-		return $this->fileName;
+		return $this->_fileName;
 	}
 
 	public function getSize()
 	{
-		return $this->manipulator->getSize();
+		return $this->_manipulator->getSize();
 	}
 
-	public function isWebAddress()
+	public function isWebAddress($source)
 	{
-		return substr($source, 0, 7) === 'http://' || substr($this->fileName, 0, 8) === 'https://';
+		return substr($source, 0, 7) === 'http://' || substr($this->_fileName, 0, 8) === 'https://';
 	}
 
 	/**
@@ -94,23 +116,21 @@ class Image
 	public function resizeImageFile($source, $max_width, $max_height, $preferred_format = 0, $strip = false, $force_resize = true)
 	{
 		// Nothing to do without GD or IM
-		if ($this->manipulator === null)
+		if ($this->_manipulator === null)
 		{
 			return false;
 		}
 
-		$sourceImage = new Image($source);
-
-		if (!file_exists($this->fileName) && $sourceImage->isWebAddress() == false)
+		if (!file_exists($this->_fileName) && $sourceImage->isWebAddress() == false)
 		{
 			return false;
 		}
 
-		$this->manipulator->copyFrom($sourceImage);
+		$this->_manipulator->copyFrom($sourceImage);
 
 		try
 		{
-			return $this->manipulator->resizeImageFile($max_width, $max_height, $preferred_format, $strip, $force_resize);
+			return $this->_manipulator->resizeImageFile($max_width, $max_height, $preferred_format, $strip, $force_resize);
 		}
 		catch (\Exception $e)
 		{
@@ -126,7 +146,7 @@ class Image
 	 */
 	public function autoRotateImage()
 	{
-		$this->manipulator->autoRotateImage();
+		$this->_manipulator->autoRotateImage();
 	}
 
 	/**
@@ -149,18 +169,19 @@ class Image
 			$format = 'png';
 		}
 
-		return $this->manipulator->generateTextImage($text, $width, $height, $format);
+		return $this->_manipulator->generateTextImage($text, $width, $height, $format);
 	}
 
 	public function moveTo($destination)
 	{
-		$this->fileName = $destination;
-		$this->setManipulator($destination, $this->forse_gd);
+		$this->_fileName = $destination;
+		$this->setManipulator($destination, $this->_force_gd);
+
 		return @rename($tempName, $destName);
 	}
 
 	public function filesize()
 	{
-		return @filesize($this->fileName);
+		return @filesize($this->_fileName);
 	}
 }

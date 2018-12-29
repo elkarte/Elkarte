@@ -19,11 +19,14 @@ namespace ElkArte\Graphics;
 
 class Gd2 extends AbstractManipulator
 {
-	protected $src_img = null;
+	public function __construct($image)
+	{
+		$this->_setImage($image);
+		$this->memoryCheck();
+	}
 
 	/**
 	 * Used to determine if GD2 whether the GD2 library is present.
-	 * The parameter returns the check for imagecreatetruecolor
 	 *
 	 * @return bool Whether or not GD is available.
 	 */
@@ -38,13 +41,75 @@ class Gd2 extends AbstractManipulator
 		return true;
 	}
 
-	public function __construct($fileName)
+	/**
+	 * Sets the internal GD image resource.
+	 *
+	 * @param resource $image
+	 */
+	protected function _setImage($image)
 	{
-		$this->fileName = $fileName;
+		$this->_image = $image;
+
+		// Get the image size via GD functions
+		$this->_width = imagesx($image);
+		$this->_height = imagesy($image);
+	}
+
+	public function createImageFromFile()
+	{
+		$this->getSize();
+
+		if (isset(Image::DEFAULT_FORMATS[$this->_sizes[2]))
+		{
+			try
+			{
+				$imagecreatefrom = 'imagecreatefrom' . Image::DEFAULT_FORMATS[$this->_sizes[2]];
+
+				$this->_image = $imagecreatefrom($this->_fileName);
+			}
+			catch (\Exception $e)
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	public function createImageFromWeb()
+	{
+		require_once(SUBSDIR . '/Package.subs.php');
+		$this->_image = fetch_web_data($this->_fileName);
+
+		$this->getSize('string');
+
+		if (isset(Image::DEFAULT_FORMATS[$this->_sizes[2]))
+		{
+			try
+			{
+				$this->_image = imagecreatefromstring($this->_image);
+			}
+			catch (\Exception $e)
+			{
+				unset($this->_image);
+				return false;
+			}
+		}
+		else
+		{
+			unset($this->_image);
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
-	 * Resize an image from a remote location or a local file.
+	 * Resize an image.
 	 *
 	 * What it does:
 	 *
@@ -59,22 +124,11 @@ class Gd2 extends AbstractManipulator
 	 * @param bool $force_resize Always resize the image (force scale up)
 	 *
 	 * @return boolean Whether the thumbnail creation was successful.
+	 * @throws \Exception
 	 */
 	public function resizeImageFile($max_width, $max_height, $preferred_format = 0, $strip = false, $force_resize = true)
 	{
-		if ($this->memoryCheck() === false)
-		{
-			throw new \Exception('Not enough memory');
-		}
-
-		if (!isset(Image::DEFAULT_FORMATS[$sizes[2]]) || !function_exists('imagecreatefrom' . Image::DEFAULT_FORMATS[$sizes[2]]))
-		{
-			throw new \Exception('Format not supported');
-		}
-
-		$imagecreatefrom = 'imagecreatefrom' . Image::DEFAULT_FORMATS[$sizes[2]];
-		$this->image = @$imagecreatefrom($this->fileName);
-		if ($this->image !== false)
+		if (!empty($this->_image))
 		{
 			return $this->resizeImage($max_width, $max_height, $force_resize, $preferred_format, $strip);
 		}
@@ -88,7 +142,6 @@ class Gd2 extends AbstractManipulator
 	 * What it does:
 	 *
 	 * - Will do nothing to the image if the file fits within the size limits
-	 * - It'll use GD to achieve better quality (imagecopyresampled)
 	 * - Saves the new image to destination_filename, in the preferred_format
 	 * if possible, default is jpeg.
 	 *
@@ -108,8 +161,8 @@ class Gd2 extends AbstractManipulator
 	 */
 	protected function resizeImage($max_width, $max_height, $force_resize = false, $preferred_format = 0, $strip = false)
 	{
-		$src_width = imagesx($this->image);
-		$src_height = imagesy($this->image);
+		$src_width = $this->_width;
+		$src_height = $this->_height;
 
 		// It should never happen, but let's keep these two as a failsafe
 		$max_width = $max_width === null ? $src_width : $max_width;
@@ -132,64 +185,50 @@ class Gd2 extends AbstractManipulator
 			// Don't bother resizing if it's already smaller...
 			if (!empty($dst_width) && !empty($dst_height) && ($dst_width < $src_width || $dst_height < $src_height || $force_resize))
 			{
-				// (make a true color image, because it just looks better for resizing.)
-				if (self::$gd2)
-				{
-					$dst_img = imagecreatetruecolor($dst_width, $dst_height);
+				// Make a true color image, because it just looks better for resizing.
+				$dst_img = imagecreatetruecolor($dst_width, $dst_height);
 
-					// Deal nicely with a PNG - because we can.
-					if ((!empty($preferred_format)) && ($preferred_format == 3))
-					{
-						imagealphablending($dst_img, false);
-						if (function_exists('imagesavealpha'))
-						{
-							imagesavealpha($dst_img, true);
-						}
-					}
-				}
-				else
+				// Deal nicely with a PNG's
+				if ((!empty($preferred_format)) && ($preferred_format == 3))
 				{
-					$dst_img = imagecreate($dst_width, $dst_height);
+					imagealphablending($dst_img, false);
+					if (function_exists('imagesavealpha'))
+					{
+						imagesavealpha($dst_img, true);
+					}
 				}
 
 				// Resize it!
-				if (self::$gd2)
-				{
-					imagecopyresampled($dst_img, $this->image, 0, 0, 0, 0, $dst_width, $dst_height, $src_width, $src_height);
-				}
-				else
-				{
-					$this->imagecopyresamplebicubic($dst_img, $this->image, 0, 0, 0, 0, $dst_width, $dst_height, $src_width, $src_height);
-				}
+				imagecopyresampled($dst_img, $this->_image, 0, 0, 0, 0, $dst_width, $dst_height, $src_width, $src_height);
 			}
 			else
 			{
-				$dst_img = $this->image;
+				$dst_img = $this->_image;
 			}
 		}
 		else
 		{
-			$dst_img = $this->image;
+			$dst_img = $this->_image;
 		}
 
 		$success = false;
 		// Save the image as ...
 		if (!empty($preferred_format) && ($preferred_format == 3) && function_exists('imagepng'))
 		{
-			$success = imagepng($dst_img, $this->fileName);
+			$success = imagepng($dst_img, $this->_fileName);
 		}
 		elseif (!empty($preferred_format) && ($preferred_format == 1) && function_exists('imagegif'))
 		{
-			$success = imagegif($dst_img, $this->fileName);
+			$success = imagegif($dst_img, $this->_fileName);
 		}
 		elseif (function_exists('imagejpeg'))
 		{
-			$success = imagejpeg($dst_img, $this->fileName, 80);
+			$success = imagejpeg($dst_img, $this->_fileName, 80);
 		}
 
 		// Free the memory.
-		imagedestroy($this->image);
-		if ($dst_img != $this->image)
+		imagedestroy($this->_image);
+		if ($dst_img != $this->_image)
 		{
 			imagedestroy($dst_img);
 		}
@@ -213,7 +252,7 @@ class Gd2 extends AbstractManipulator
 	function autoRotateImage()
 	{
 		// Read the EXIF data
-		$exif = function_exists('exif_read_data') ? @exif_read_data($this->fileName) : array();
+		$exif = function_exists('exif_read_data') ? @exif_read_data($this->_fileName) : array();
 
 		// We're only interested in the exif orientation
 		$orientation = isset($exif['Orientation']) ? $exif['Orientation'] : 0;
@@ -287,8 +326,8 @@ class Gd2 extends AbstractManipulator
 			$degrees -= floor($degrees / 360) * 360;
 
 			// Rotate away
-			$background = imagecolorallocatealpha($this->image, 255, 255, 255, 127);
-			$this->image = imagerotate($this->image, $degrees, $background);
+			$background = imagecolorallocatealpha($this->_image, 255, 255, 255, 127);
+			$this->_image = imagerotate($this->_image, $degrees, $background);
 		}
 	}
 
@@ -307,73 +346,7 @@ class Gd2 extends AbstractManipulator
 	 */
 	protected function flipImage($axis = 'vertical')
 	{
-		imageflip($this->image, $axis === 'vertical' ? IMG_FLIP_VERTICAL : IMG_FLIP_HORIZONTAL);
-	}
-
-	/**
-	 * Copy / resize an image using GD bicubic methods
-	 *
-	 * What it does:
-	 *
-	 * - Used when imagecopyresample() is not available
-	 * - Uses bicubic resizing methods which are lower quality then imagecopyresample
-	 *
-	 * @param resource $dst_img The destination image - a GD image resource
-	 * @param resource $src_img The source image - a GD image resource
-	 * @param int $dst_x The "x" coordinate of the destination image
-	 * @param int $dst_y The "y" coordinate of the destination image
-	 * @param int $src_x The "x" coordinate of the source image
-	 * @param int $src_y The "y" coordinate of the source image
-	 * @param int $dst_w The width of the destination image
-	 * @param int $dst_h The height of the destination image
-	 * @param int $src_w The width of the destination image
-	 * @param int $src_h The height of the destination image
-	 */
-	protected function imagecopyresamplebicubic($dst_img, $src_img, $dst_x, $dst_y, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h)
-	{
-		$palsize = imagecolorstotal($src_img);
-		for ($i = 0; $i < $palsize; $i++)
-		{
-			$colors = imagecolorsforindex($src_img, $i);
-			imagecolorallocate($dst_img, $colors['red'], $colors['green'], $colors['blue']);
-		}
-
-		$scaleX = ($src_w - 1) / $dst_w;
-		$scaleY = ($src_h - 1) / $dst_h;
-
-		$scaleX2 = (int) $scaleX / 2;
-		$scaleY2 = (int) $scaleY / 2;
-
-		for ($j = $src_y; $j < $dst_h; $j++)
-		{
-			$sY = (int) $j * $scaleY;
-			$y13 = $sY + $scaleY2;
-
-			for ($i = $src_x; $i < $dst_w; $i++)
-			{
-				$sX = (int) $i * $scaleX;
-				$x34 = $sX + $scaleX2;
-
-				$color1 = imagecolorsforindex($src_img, imagecolorat($src_img, $sX, $y13));
-				$color2 = imagecolorsforindex($src_img, imagecolorat($src_img, $sX, $sY));
-				$color3 = imagecolorsforindex($src_img, imagecolorat($src_img, $x34, $y13));
-				$color4 = imagecolorsforindex($src_img, imagecolorat($src_img, $x34, $sY));
-
-				$red = ($color1['red'] + $color2['red'] + $color3['red'] + $color4['red']) / 4;
-				$green = ($color1['green'] + $color2['green'] + $color3['green'] + $color4['green']) / 4;
-				$blue = ($color1['blue'] + $color2['blue'] + $color3['blue'] + $color4['blue']) / 4;
-
-				$color = imagecolorresolve($dst_img, $red, $green, $blue);
-				if ($color == -1)
-				{
-					if ($palsize++ < 256)
-						imagecolorallocate($dst_img, $red, $green, $blue);
-					$color = imagecolorclosest($dst_img, $red, $green, $blue);
-				}
-
-				imagesetpixel($dst_img, $i + $dst_x - $src_x, $j + $dst_y - $src_y, $color);
-			}
-		}
+		imageflip($this->_image, $axis === 'vertical' ? IMG_FLIP_VERTICAL : IMG_FLIP_HORIZONTAL);
 	}
 
 	/**
@@ -438,34 +411,6 @@ class Gd2 extends AbstractManipulator
 		ob_end_clean();
 
 		return $result ? $image : false;
-	}
-
-	/**
-	 * Simple wrapper for getimagesize
-	 *
-	 * @param string $file
-	 * @param string|boolean $error return array or false on error
-	 *
-	 * @return array|boolean
-	 */
-	function getSize($error = 'array')
-	{
-		$sizes = @getimagesize($this->fileName);
-
-		// Can't get it, what shall we return
-		if (empty($sizes))
-		{
-			if ($error === 'array')
-			{
-				$sizes = array(-1, -1, -1);
-			}
-			else
-			{
-				$sizes = false;
-			}
-		}
-
-		return $sizes;
 	}
 }
 
