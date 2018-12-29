@@ -190,16 +190,9 @@ class Gd2 extends AbstractManipulator
 			{
 				// Make a true color image, because it just looks better for resizing.
 				$dst_img = imagecreatetruecolor($dst_width, $dst_height);
-
-				// Deal nicely with a PNG's
-				if ((!empty($preferred_format)) && ($preferred_format == 3))
-				{
-					imagealphablending($dst_img, false);
-					if (function_exists('imagesavealpha'))
-					{
-						imagesavealpha($dst_img, true);
-					}
-				}
+				imagesavealpha($dst_img, true);
+				$color = imagecolorallocatealpha($dst_img, 255, 255, 255, 127);
+				imagefill($dst_img, 0, 0, $color);
 
 				// Resize it!
 				imagecopyresampled($dst_img, $this->_image, 0, 0, 0, 0, $dst_width, $dst_height, $src_width, $src_height);
