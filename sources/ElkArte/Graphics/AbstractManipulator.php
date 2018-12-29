@@ -39,6 +39,7 @@ abstract class AbstractManipulator
 
 	abstract function createImageFromFile();
 	abstract function createImageFromWeb();
+	abstract function output($preferred_format, $file_name = null, $quality = 85);
 
 	public function copyFrom(Image $source)
 	{

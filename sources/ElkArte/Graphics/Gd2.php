@@ -207,27 +207,29 @@ class Gd2 extends AbstractManipulator
 			$dst_img = $this->_image;
 		}
 
-		$success = false;
+		// Update things to the converted image
+		$this->_setImage($dst_img);
+	}
+
+	public function output($preferred_format, $file_name = null, $quality = 85)
+	{
 		// Save the image as ...
-		if (!empty($preferred_format) && ($preferred_format == 3) && function_exists('imagepng'))
+		$success = false;
+		if (!empty($preferred_format) && ($preferred_format == IMAGETYPE_PNG) && function_exists('imagepng'))
 		{
-			$success = imagepng($dst_img, $this->_fileName);
+			$success = imagepng($this->_image, $file_name);
 		}
-		elseif (!empty($preferred_format) && ($preferred_format == 1) && function_exists('imagegif'))
+		elseif (!empty($preferred_format) && ($preferred_format == IMAGETYPE_GIF) && function_exists('imagegif'))
 		{
-			$success = imagegif($dst_img, $this->_fileName);
+			$success = imagegif($this->_image, $file_name);
 		}
 		elseif (function_exists('imagejpeg'))
 		{
-			$success = imagejpeg($dst_img, $this->_fileName, 80);
+			$success = imagejpeg($this->_image, $file_name, $quality);
 		}
 
 		// Free the memory.
 		imagedestroy($this->_image);
-		if ($dst_img != $this->_image)
-		{
-			imagedestroy($dst_img);
-		}
 
 		return $success;
 	}
