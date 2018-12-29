@@ -171,15 +171,18 @@ class Gd2 extends AbstractManipulator
 		// Determine whether to resize to max width or to max height (depending on the limits.)
 		if (!empty($max_width) || !empty($max_height))
 		{
-			if (!empty($max_width) && (empty($max_height) || $src_height * $max_width / $src_width <= $max_height))
+			$image_ratio = $this->_width / $this->_height;
+			$requested_ratio = $max_width / $max_height;
+
+			if ($requested_ratio > $image_ratio)
+			{
+				$dst_width = max(1, $max_height * $image_ratio);
+				$dst_height = $max_height;
+			}
+			else
 			{
 				$dst_width = $max_width;
-				$dst_height = floor($src_height * $max_width / $src_width);
-			}
-			elseif (!empty($max_height))
-			{
-				$dst_width = floor($src_width * $max_height / $src_height);
-				$dst_height = $max_height;
+				$dst_height = max(1, $max_width / $image_ratio);
 			}
 
 			// Don't bother resizing if it's already smaller...
