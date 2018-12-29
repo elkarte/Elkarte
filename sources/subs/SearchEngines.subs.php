@@ -300,6 +300,7 @@ function getSpiders($start, $items_per_page, $sort)
  *
  * @package SearchEngines
  * @param int $spider_id id of a spider
+ * @return mixed[]
  */
 function getSpiderDetails($spider_id)
 {

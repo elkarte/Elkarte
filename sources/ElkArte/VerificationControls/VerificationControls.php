@@ -71,6 +71,7 @@ class VerificationControls
 	 * This method returns the verification controls found in the file system
 	 *
 	 * @param mixed[] $config_vars
+	 * @return false|string
 	 */
 	public static function discoverControls(&$config_vars = null)
 	{
@@ -137,6 +138,7 @@ class VerificationControls
 	 *
 	 * @param \ElkArte\Errors\ErrorContext $verification_errors
 	 * @param int $max_errors
+	 * @return bool
 	 */
 	public function test($verification_errors, $max_errors)
 	{
@@ -183,6 +185,7 @@ class VerificationControls
 	 * Instantiate the verification controls
 	 *
 	 * @param bool $force_refresh If the controls should be re-initialized
+	 * @return mixed[]
 	 */
 	public function create($force_refresh = false)
 	{

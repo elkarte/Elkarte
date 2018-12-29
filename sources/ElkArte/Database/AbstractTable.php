@@ -112,6 +112,7 @@ abstract class AbstractTable
 	 *                  'if_exists' => 'ignore',
 	 *                  'temporary' => false,
 	 *                )
+	 * @return bool
 	 */
 	public function create_table($table_name, $columns, $indexes = array(), $parameters = array())
 	{

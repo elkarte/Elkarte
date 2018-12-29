@@ -86,6 +86,7 @@ class Agreement
 	 *
 	 * @param string $text the language of the agreement we want.
 	 * @param bool $update_backup if store a copy of the text of the agreements.
+	 * @return bool|string
 	 */
 	public function save($text, $update_backup = false)
 	{

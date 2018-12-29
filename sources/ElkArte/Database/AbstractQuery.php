@@ -474,6 +474,7 @@ abstract class AbstractQuery implements QueryInterface
 	 *
 	 * @param string $db_string
 	 * @param mixed $db_values
+	 * @return null|string|string[]
 	 */
 	protected function _prepareQuery($db_string, $db_values)
 	{

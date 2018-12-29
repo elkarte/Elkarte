@@ -1292,6 +1292,7 @@ function query_load_permissions($type, &$pbe, $topic_info = array())
  *
  * @package Maillist
  * @param string $from
+ * @return mixed[]
  */
 function query_sender_wrapper($from)
 {
@@ -1609,6 +1610,7 @@ function query_load_board($message_id)
  * @package Maillist
  * @param int $board_id
  * @param mixed[] $pbe
+ * @return mixed[]
  */
 function query_load_board_details($board_id, $pbe)
 {

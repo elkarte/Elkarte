@@ -72,6 +72,7 @@ class MembersList
 	 * @param int|int[]|string|string[] $users Name/s or id/s of the members to load
 	 * @param bool $is_name If the data passed with $users is a name or an id (true if names)
 	 * @param string $set The "amount" of data to be loaded (see constants in \ElkArte\MemberLoader for the values)
+	 * @return bool|int[]
 	 */
 	public static function load($users, $is_name = false, $set = 'normal')
 	{

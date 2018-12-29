@@ -1964,6 +1964,7 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
  * @package PersonalMessage
  * @param int[] $pms array of PM ids to fetch
  * @param string[] $orderBy raw query defining how to order the results
+ * @return bool|resource
  */
 function loadPMSubjectRequest($pms, $orderBy)
 {
@@ -2003,6 +2004,7 @@ function loadPMSubjectRequest($pms, $orderBy)
  * @param boolean $descending if true descending order of display
  * @param int|string $display_mode how are they being viewed, all, conversation, etc
  * @param string $folder current pm folder
+ * @return bool|resource
  */
 function loadPMMessageRequest($display_pms, $sort_by_query, $sort_by, $descending, $display_mode = '', $folder = '')
 {

@@ -918,6 +918,7 @@ function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variab
  * @todo may be merged with something else?
  * @param string $based_on name of theme this is based on, will do a LIKE search
  * @param boolean $explicit_images Don't worry its not like it sounds !
+ * @return mixed[]
  */
 function loadBasedOnTheme($based_on, $explicit_images = false)
 {

@@ -1098,6 +1098,7 @@ function wantedBoards($see_board, $hide_recycle = true)
  * @package Boards
  * @param int $board_id
  * @param int|null $topic_id
+ * @return mixed[]
  */
 function boardInfo($board_id, $topic_id = null)
 {

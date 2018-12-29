@@ -64,6 +64,7 @@ class Rlikemsg extends AbstractMentionBoardAccess
 	 * @param int|null $status status to change the mention to, if no notification,
 	 *             - default is to set it as read (status = 1)
 	 * @param bool|null $is_accessible optional if the mention is accessible to the user
+	 * @return array|int[]
 	 */
 	public function insert($member_from, $members_to, $target, $time = null, $status = null, $is_accessible = null)
 	{

@@ -550,6 +550,7 @@ function pollStarters($id_topic)
  * Check if they have already voted, or voting is locked.
  *
  * @param int $topic the topic with an associated poll
+ * @return mixed[]
  */
 function checkVote($topic)
 {

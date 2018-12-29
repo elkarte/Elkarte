@@ -341,6 +341,7 @@ function bb2_insert_head()
  * This option is not available or has no effect when logging is not in use.
  *
  * @param bool $force
+ * @return string
  */
 function bb2_insert_stats($force = false)
 {
