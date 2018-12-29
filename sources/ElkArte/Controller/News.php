@@ -3,13 +3,12 @@
 /**
  * This file contains the files necessary to display news as an XML feed.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -689,7 +688,7 @@ class News extends \ElkArte\AbstractController
  */
 function fix_possible_url($val)
 {
-	global $modSettings, $scripturl;
+	global $scripturl;
 
 	if (substr($val, 0, strlen($scripturl)) != $scripturl)
 		return $val;

@@ -4,9 +4,9 @@
  * This file has all the main functions in it that set up the database connection
  * and initializes the appropriate adapters.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -148,14 +148,7 @@ function db_search()
 		}
 		catch (\Exception $e)
 		{
-			if ($fatal === true)
-			{
-				\ElkArte\Errors\Errors::instance()->display_db_error($e->getMessage());
-			}
-			else
-			{
-				throw $e;
-			}
+			\ElkArte\Errors\Errors::instance()->display_db_error($e->getMessage());
 		}
 	}
 

@@ -2,13 +2,12 @@
 
 /**
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -72,6 +71,10 @@ class BBCParser
 	protected $fn_content = array();
 	/** @var array  */
 	protected $tag_possible = array();
+	/** @var int  */
+	protected $fn_count = 0;
+	/** @var int  */
+	protected $fn_num = 0;
 
 	/**
 	 * BBCParser constructor.
@@ -1190,22 +1193,21 @@ class BBCParser
 	 */
 	protected function handleFootnotes()
 	{
-		global $fn_num, $fn_count;
-		static $fn_total;
+		static $fn_total = 0;
 
 		// @todo temporary until we have nesting
 		$this->message = str_replace(array('[footnote]', '[/footnote]'), '', $this->message);
 
-		$fn_num = 0;
+		$this->fn_num = 0;
 		$this->fn_content = array();
-		$fn_count = isset($fn_total) ? $fn_total : 0;
+		$this->fn_count = $fn_total;
 
 		// Replace our footnote text with a [1] link, save the text for use at the end of the message
 		$this->message = preg_replace_callback('~(%fn%(.*?)%fn%)~is', array($this, 'footnoteCallback'), $this->message);
-		$fn_total += $fn_num;
+		$fn_total += $this->fn_num;
 
 		// If we have footnotes, add them in at the end of the message
-		if (!empty($fn_num))
+		if (!empty($this->fn_num))
 		{
 			$this->message .= $this->smiley_marker . '<div class="bbc_footnotes">' . implode('', $this->fn_content) . '</div>' . $this->smiley_marker;
 		}
@@ -1220,12 +1222,10 @@ class BBCParser
 	 */
 	protected function footnoteCallback(array $matches)
 	{
-		global $fn_num, $fn_count;
+		$this->fn_num++;
+		$this->fn_content[] = '<div class="target" id="fn' . $this->fn_num . '_' . $this->fn_count . '"><sup>' . $this->fn_num . '&nbsp;</sup>' . $matches[2] . '<a class="footnote_return" href="#ref' . $this->fn_num . '_' . $this->fn_count . '">&crarr;</a></div>';
 
-		$fn_num++;
-		$this->fn_content[] = '<div class="target" id="fn' . $fn_num . '_' . $fn_count . '"><sup>' . $fn_num . '&nbsp;</sup>' . $matches[2] . '<a class="footnote_return" href="#ref' . $fn_num . '_' . $fn_count . '">&crarr;</a></div>';
-
-		return '<a class="target" href="#fn' . $fn_num . '_' . $fn_count . '" id="ref' . $fn_num . '_' . $fn_count . '">[' . $fn_num . ']</a>';
+		return '<a class="target" href="#fn' . $this->fn_num . '_' . $this->fn_count . '" id="ref' . $this->fn_num . '_' . $this->fn_count . '">[' . $this->fn_num . ']</a>';
 	}
 
 	/**
@@ -1653,7 +1653,7 @@ class BBCParser
 				$this->message = substr_replace($this->message, '', $this->pos, 6);
 			}
 
-			if (isset($tag[Codes::ATTR_TRIM]) && $tag[Codes::ATTR_TRIM] !== Codes::TRIM_INSIDE)
+			if (isset($this->open_tags[$i][Codes::ATTR_TRIM]) && $this->open_tags[$i][Codes::ATTR_TRIM] !== Codes::TRIM_INSIDE)
 			{
 				$this->trimWhiteSpace($this->pos);
 			}

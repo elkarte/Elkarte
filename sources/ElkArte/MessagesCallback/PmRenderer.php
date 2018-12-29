@@ -4,13 +4,12 @@
  * Part of the files dealing with preparing the content for display posts
  * via callbacks (Display, PM, Search).
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -95,14 +94,14 @@ class PmRenderer extends Renderer
 	 */
 	protected function _buildOutputArray()
 	{
-		global $recipients, $context, $user_info, $modSettings, $scripturl, $txt;
+		global $context, $user_info, $modSettings, $scripturl, $txt;
 
 		$id_pm = $this->_this_message['id_pm'];
 
 		$output = parent::_buildOutputArray();
 		$output += array(
-			'recipients' => &$recipients[$id_pm],
-			'number_recipients' => count($recipients[$id_pm]['to']),
+			'recipients' => $this->_options->recipients[$id_pm],
+			'number_recipients' => count($this->_options->recipients[$id_pm]['to']),
 			'labels' => &$context['message_labels'][$id_pm],
 			'fully_labeled' => count($context['message_labels'][$id_pm]) == count($context['labels']),
 			'is_replied_to' => &$context['message_replied'][$id_pm],

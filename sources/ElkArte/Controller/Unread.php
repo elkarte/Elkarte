@@ -3,13 +3,12 @@
 /**
  * Find and retrieve information about recently posted topics, messages, and the like.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -309,7 +308,7 @@ class Unread extends \ElkArte\AbstractController
 
 			if (!empty($this->_req->query->boards))
 			{
-				$this->_boards = array_map('intval', explode(',', explode(',', $this->_req->query->boards)));
+				$this->_boards = array_map('intval', explode(',', $this->_req->query->boards));
 			}
 
 			if (!empty($board))

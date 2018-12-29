@@ -6,13 +6,12 @@
  * These functions do NOT make permissions checks. (they assume those were
  * already made).
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -1272,7 +1271,7 @@ function setTopicWatch($id_member, $topic, $on = false)
  *    - if 'all' returns additional infos about the read/unwatched status
  * @param string[] $selects (optional from integration)
  * @param string[] $tables (optional from integration)
- * @return array to topic attributes
+ * @return mixed[]|bool to topic attributes
  */
 function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables = array())
 {

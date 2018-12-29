@@ -6,9 +6,9 @@
  * related to a table structure.
  * Add-ons will need this, to change the database for their needs.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -24,7 +24,7 @@ abstract class AbstractTable
 {
 	/**
 	 * We need a way to interact with the database
-	 * @var Database
+	 * @var \ElkArte\Database\QueryInterface
 	 */
 	protected $_db = null;
 
@@ -112,6 +112,7 @@ abstract class AbstractTable
 	 *                  'if_exists' => 'ignore',
 	 *                  'temporary' => false,
 	 *                )
+	 * @return bool
 	 */
 	public function create_table($table_name, $columns, $indexes = array(), $parameters = array())
 	{

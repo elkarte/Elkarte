@@ -3,13 +3,12 @@
 /**
  * This file contains several functions for retrieving and manipulating polls.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -162,7 +161,7 @@ class Poll_Post_Module extends \ElkArte\Modules\AbstractModule
 	 *
 	 * @param string $destination
 	 * @param string $page_title
-	 * @param ElkArte\Theme\TemplateLayers $template_layers
+	 * @param \ElkArte\Themes\TemplateLayers $template_layers
 	 */
 	public function finalize_post_form(&$destination, &$page_title, $template_layers)
 	{
@@ -206,7 +205,7 @@ class Poll_Post_Module extends \ElkArte\Modules\AbstractModule
 	/**
 	 * Checks the poll conditions before we go to save
 	 *
-	 * @param ErrorContext $post_errors
+	 * @param \ElkArte\Errors\ErrorContext $post_errors
 	 * @param array        $topic_info
 	 *
 	 * @throws \ElkArte\Exceptions\Exception no_access

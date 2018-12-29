@@ -3,13 +3,12 @@
 /**
  * Find and retrieve information about recently posted topics, messages, and the like.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -47,7 +46,7 @@ class Unread
 	private $_post_mod = false;
 	/** @var bool */
 	private $_unwatch = false;
-	/** @var Database|null */
+	/** @var \ElkArte\Database\QueryInterface|null */
 	private $_db = null;
 	/** @var int|string */
 	private $_preview_bodies = 0;
@@ -383,7 +382,7 @@ class Unread
 	 * @param int $start - position to start the query
 	 * @param int $limit - number of entries to grab
 	 * @param bool|int $include_avatars - if avatars should be retrieved as well
-	 * @return mixed[] - see \ElkArte\TopicUtil::prepareContext
+	 * @return mixed[]|bool - see \ElkArte\TopicUtil::prepareContext
 	 */
 	private function _getUnreadReplies($start, $limit, $include_avatars = false)
 	{

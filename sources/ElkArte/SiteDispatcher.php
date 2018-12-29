@@ -4,9 +4,9 @@
  * Primary site dispatch controller, sends the request to the function or method
  * registered to handle it.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -382,7 +382,7 @@ class SiteDispatcher
 	/**
 	 * If the current controller wants to track access and stats.
 	 */
-	public function trackStats()
+	public function trackStats($action = '')
 	{
 		return $this->_controller->trackStats($this->_function_name);
 	}

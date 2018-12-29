@@ -3,9 +3,9 @@
 /**
  * Common methods shared by any type of mention so far.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -30,7 +30,7 @@ abstract class AbstractMentionMessage implements MentionTypeInterface
 	/**
 	 * The database object
 	 *
-	 * @var \Database
+	 * @var \ElkArte\Database\QueryInterface
 	 */
 	protected $_db = null;
 
@@ -110,7 +110,7 @@ abstract class AbstractMentionMessage implements MentionTypeInterface
 	 * Does the replacement of some placeholders with the corresponding
 	 * text/link/url.
 	 *
-	 * @param string $row A text string on which replacements are done
+	 * @param string[] $row A text string on which replacements are done
 	 * @return string the input string with the placeholders replaced
 	 */
 	protected function _replaceMsg($row)

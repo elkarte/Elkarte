@@ -4,17 +4,15 @@
  * Class that centralize the "notification" process.
  * ... or at least tries to.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte;
-
-use ElkArte\AbstractModel;
 
 /**
  * Class Notifications
@@ -33,7 +31,7 @@ class Notifications extends AbstractModel
 	/**
 	 * List of notifications to send
 	 *
-	 * @var \Notifications_Task[]
+	 * @var \ElkArte\NotificationsTask[]
 	 */
 	protected $_to_send;
 
@@ -64,7 +62,7 @@ class Notifications extends AbstractModel
 	 *
 	 * Registers the known notifications to the system, allows for integration to add more
 	 *
-	 * @param \Database $db
+	 * @param \ElkArte\Database\QueryInterface $db
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function __construct($db)
@@ -168,7 +166,7 @@ class Notifications extends AbstractModel
 	/**
 	 * Process a certain task in order to send out the notifications.
 	 *
-	 * @param ElkArte\NotificationsTask $task
+	 * @param \ElkArte\NotificationsTask $task
 	 */
 	protected function _send_task(NotificationsTask $task)
 	{
@@ -206,7 +204,7 @@ class Notifications extends AbstractModel
 	 * Inserts a new mention in the database (those that appear in the mentions area).
 	 *
 	 * @param \ElkArte\Mentions\MentionType\MentionTypeInterface $obj
-	 * @param ElkArte\NotificationsTask $task
+	 * @param \ElkArte\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
 	protected function _send_notification(Mentions\MentionType\MentionTypeInterface $obj, NotificationsTask $task, $bodies)
@@ -229,7 +227,7 @@ class Notifications extends AbstractModel
 	 * Sends an immediate email notification.
 	 *
 	 * @param \ElkArte\Mentions\MentionType\MentionTypeInterface $obj
-	 * @param ElkArte\NotificationsTask $task
+	 * @param \ElkArte\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
 	protected function _send_email(Mentions\MentionType\MentionTypeInterface $obj, NotificationsTask $task, $bodies)
@@ -248,7 +246,7 @@ class Notifications extends AbstractModel
 	 * Stores data in the database to send a daily digest.
 	 *
 	 * @param \ElkArte\Mentions\MentionType\MentionTypeInterface $obj
-	 * @param ElkArte\NotificationsTask $task
+	 * @param \ElkArte\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
 	protected function _send_daily_email(Mentions\MentionType\MentionTypeInterface $obj, NotificationsTask $task, $bodies)
@@ -272,7 +270,7 @@ class Notifications extends AbstractModel
 	 * Stores data in the database to send a weekly digest.
 	 *
 	 * @param \ElkArte\Mentions\MentionType\MentionTypeInterface $obj
-	 * @param ElkArte\NotificationsTask $task
+	 * @param \ElkArte\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
 	protected function _send_weekly_email(Mentions\MentionType\MentionTypeInterface $obj, NotificationsTask $task, $bodies)

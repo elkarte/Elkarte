@@ -3,9 +3,9 @@
 /**
  * Handles xml requests
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -324,7 +324,7 @@ class Xml extends \ElkArte\AbstractController
 	 */
 	public function action_boardorder()
 	{
-		global $context, $txt, $boards, $cat_tree;
+		global $context, $txt;
 
 		// Start off clean
 		$context['xml_data'] = array();
@@ -399,11 +399,11 @@ class Xml extends \ElkArte\AbstractController
 						break;
 				}
 
-				// Retrieve the current saved state, returned in global $boards
-				getBoardTree();
+				// Retrieve the current saved state
+				$boardTree = new \ElkArte\BoardsTree(database());
 
 				$boardOptions = array();
-				$board_current = $boards[$board_moved];
+				$board_current = $boardTree->getBoardById($board_moved);
 				$board_new = $board_tree[$moved_key];
 
 				// Dropped on a sibling node, move after that
@@ -413,7 +413,7 @@ class Xml extends \ElkArte\AbstractController
 						'move_to' => 'after',
 						'target_board' => $board_previous_sibling['id'],
 					);
-					$order[] = array('value' => $board_current['name'] . ' ' . $txt['mboards_order_after'] . ' ' . $boards[$board_previous_sibling['id']]['name']);
+					$order[] = array('value' => $board_current['name'] . ' ' . $txt['mboards_order_after'] . ' ' . $boardTree->getBoardById($board_previous_sibling['id'])['name']);
 				}
 				// No sibling, maybe a new child
 				elseif (isset($board_previous))
@@ -423,7 +423,7 @@ class Xml extends \ElkArte\AbstractController
 						'target_board' => $board_previous['id'],
 						'move_first_child' => true,
 					);
-					$order[] = array('value' => $board_current['name'] . ' ' . $txt['mboards_order_child_of'] . ' ' . $boards[$board_previous['id']]['name']);
+					$order[] = array('value' => $board_current['name'] . ' ' . $txt['mboards_order_child_of'] . ' ' . $boardTree->getBoardById($board_previous['id'])['name']);
 				}
 				// Nothing before this board at all, move to the top of the cat
 				elseif (!isset($board_previous))
@@ -432,7 +432,7 @@ class Xml extends \ElkArte\AbstractController
 						'move_to' => 'top',
 						'target_category' => $board_new['category'],
 					);
-					$order[] = array('value' => $board_current['name'] . ' ' . $txt['mboards_order_in_category'] . ' ' . $cat_tree[$board_new['category']]['node']['name']);
+					$order[] = array('value' => $board_current['name'] . ' ' . $txt['mboards_order_in_category'] . ' ' . $boardTree->getCategoryNodeById($board_new['category'])['name']);
 				}
 
 				// If we have figured out what to do

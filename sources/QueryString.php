@@ -4,13 +4,12 @@
  * This file does a lot of important stuff.  Mainly, this means it handles
  * the query string, request variables, and session management.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -266,7 +265,7 @@ function JavaScriptEscape($string)
  */
 function ob_sessrewrite($buffer)
 {
-	global $scripturl, $modSettings;
+	global $scripturl;
 
 	// If $scripturl is set to nothing, or the SID is not defined (SSI?) just quit.
 	if ($scripturl == '' || !defined('SID'))

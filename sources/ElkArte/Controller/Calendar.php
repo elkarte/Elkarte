@@ -4,13 +4,12 @@
  * This file has only one real task, showing the calendar.
  * Original module by Aaron O'Neil - aaron@mud-master.com
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -307,14 +306,13 @@ class Calendar extends \ElkArte\AbstractController
 	}
 
 	/**
-		 *
+	 *
 	 * What it does:
 	 *  - require_once modules of the controller (not addons because these are
 	 *    always all require'd by the dispatcher),
 	 *  - Creates the event manager and registers addons and modules,
 	 *  - Instantiate the controller
 	 *  - Runs pre_dispatch
-	 * @return The return of the action_post.
 	 */
 	protected function _returnToPost()
 	{
@@ -325,11 +323,9 @@ class Calendar extends \ElkArte\AbstractController
 
 		call_integration_hook('integrate_action_' . $hook . '_before', array($function_name));
 
-		$result = $controller->{$function_name}();
+		$controller->{$function_name}();
 
 		call_integration_hook('integrate_action_' . $hook . '_after', array($function_name));
-
-		return $result;
 	}
 
 	/**

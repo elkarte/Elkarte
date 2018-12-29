@@ -3,13 +3,12 @@
 /**
  * Integration system for drafts into Post controller
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -120,7 +119,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 	 * @param array $editorOptions
 	 * @param int $board
 	 * @param int $topic
-	 * @param ElkArte\Theme\TemplateLayers $template_layers
+	 * @param \ElkArte\Themes\TemplateLayers $template_layers
 	 */
 	public function finalize_post_form(&$editorOptions, $board, $topic, $template_layers)
 	{

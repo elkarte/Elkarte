@@ -7,13 +7,12 @@
  *
  * The functions in this file do NOT check permissions.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -1965,6 +1964,7 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
  * @package PersonalMessage
  * @param int[] $pms array of PM ids to fetch
  * @param string[] $orderBy raw query defining how to order the results
+ * @return bool|resource
  */
 function loadPMSubjectRequest($pms, $orderBy)
 {
@@ -2004,6 +2004,7 @@ function loadPMSubjectRequest($pms, $orderBy)
  * @param boolean $descending if true descending order of display
  * @param int|string $display_mode how are they being viewed, all, conversation, etc
  * @param string $folder current pm folder
+ * @return bool|resource
  */
 function loadPMMessageRequest($display_pms, $sort_by_query, $sort_by, $descending, $display_mode = '', $folder = '')
 {

@@ -5,9 +5,9 @@
  * are specifically targeted at users, and even placing multiple messages
  * in one exception.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -50,8 +50,6 @@ class Exception extends \Exception
 	 */
 	public function __construct($message, $log = false, $sprintf = array(), $code = 0, Exception $previous = null)
 	{
-		global $txt;
-
 		$this->log = $log;
 		$this->sprintf = $sprintf;
 

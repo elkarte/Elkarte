@@ -3,13 +3,12 @@
 /**
  * The XmlArray class is an xml parser.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -147,7 +146,7 @@ class XmlArray
 	 *
 	 * @param string $path  - the path to the element to get
 	 * @param bool $return_full  - always return full result set
-	 * @return \ElkArte\XmlArray a new \ElkArte\XmlArray.
+	 * @return \ElkArte\XmlArray|bool a new \ElkArte\XmlArray.
 	 */
 	public function path($path, $return_full = false)
 	{

@@ -5,13 +5,12 @@
  * care of logging, error messages, error handling, database errors, and
  * error log administration.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:    2011 Simple Machines (http://www.simplemachines.org)
- * license:        BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -43,7 +42,7 @@ class Errors extends \ElkArte\AbstractModel
 	 * this __construct will feed AbstractModel with a value just to stop it
 	 * from trying to initialize the database connection.
 	 *
-	 * @param $db Database|null
+	 * @param $db \ElkArte\Database\QueryInterface|null
 	 */
 	public function __construct($db = null)
 	{
@@ -401,8 +400,6 @@ class Errors extends \ElkArte\AbstractModel
 	 */
 	public function display_minimal_error($message)
 	{
-		global $maintenance, $mtitle, $mmessage;
-
 		if (!headers_sent())
 		{
 			$this->_set_fatal_error_headers();
@@ -466,7 +463,7 @@ class Errors extends \ElkArte\AbstractModel
 			}
 
 			// Language files aren't loaded yet :'(
-			$db_error = $this->_db->last_error($this->_db->connection());
+			$db_error = $this->_db->last_error();
 			@mail($webmaster_email, $mbname . ': Database Error!', 'There has been a problem with the database!' . ($db_error == '' ? '' : "\n" . $this->_db->title() . ' reported:' . "\n" . $db_error) . "\n\n" . 'This is a notice email to let you know that the system could not connect to the database, contact your host if this continues.');
 		}
 

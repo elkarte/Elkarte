@@ -3,9 +3,9 @@
 /**
  * This class is the base class for database drivers implementations.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -107,7 +107,7 @@ interface QueryInterface
 	 * @param string $table
 	 * @param mixed[] $columns
 	 * @param mixed[] $data
-	 * @param mixed[] $keys
+	 * @param string[] $keys
 	 * @param bool $disable_trans = false
 	 * @return void
 	 */

@@ -3,9 +3,9 @@
 /**
  * Converts HTML to Markdown text
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -1061,7 +1061,7 @@ class Html2Md
 	/**
 	 * Gets the inner html of a node
 	 *
-	 * @param DOMNode|object $node
+	 * @param \DOMNode|object $node
 	 * @return string
 	 */
 	private function _get_innerHTML($node)
@@ -1084,7 +1084,7 @@ class Html2Md
 	/**
 	 * Gets the outer html of a node
 	 *
-	 * @param DOMNode|object $node
+	 * @param \DOMNode|object $node
 	 * @return string
 	 */
 	private function _get_outerHTML($node)

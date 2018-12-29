@@ -4,13 +4,12 @@
  * Handles all possible permission items, permissions by membergroup
  * permissions by board, adding, modifying, etc
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -490,7 +489,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 	 */
 	public function action_board()
 	{
-		global $context, $txt, $cat_tree, $boardList, $boards;
+		global $context, $txt;
 
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
@@ -505,12 +504,16 @@ class ManagePermissions extends \ElkArte\AbstractController
 
 			$changes = array();
 			foreach ($this->_req->post->boardprofile as $board => $profile)
+			{
 				$changes[(int) $profile][] = (int) $board;
+			}
 
 			if (!empty($changes))
 			{
-				foreach ($changes as $profile => $boards)
-					assignPermissionProfileToBoard($profile, $boards);
+				foreach ($changes as $profile => $list_boards)
+				{
+					assignPermissionProfileToBoard($profile, $list_boards);
+				}
 			}
 
 			$context['edit_all'] = false;
@@ -532,8 +535,10 @@ class ManagePermissions extends \ElkArte\AbstractController
 		}
 
 		// Get the board tree.
-		require_once(SUBSDIR . '/Boards.subs.php');
-		getBoardTree();
+		$boardTree = new \ElkArte\BoardsTree(database());
+		$boardList = $boardTree->getBoardList();
+		$cat_tree = $boardTree->getCategories();
+		$boards = $boardTree->getBoards();
 
 		// Build the list of the boards.
 		$context['categories'] = array();

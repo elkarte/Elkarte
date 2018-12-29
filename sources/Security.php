@@ -4,13 +4,12 @@
  * This file has the very important job of ensuring forum security.
  * This task includes banning and permissions, namely.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -1405,7 +1404,7 @@ function spamProtection($error_type, $fatal = true)
  * @param boolean $allow_localhost if access should be allowed to localhost
  * @param string $files (optional, default '*') parameter for the Files tag
  *
- * @return string|boolean on success error string if anything fails
+ * @return string[]|bool on success error string if anything fails
  */
 function secureDirectory($path, $allow_localhost = false, $files = '*')
 {

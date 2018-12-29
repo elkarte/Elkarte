@@ -3,13 +3,12 @@
 /**
  * This file contains several functions for retrieving and manipulating calendar events, birthdays and holidays.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -42,7 +41,7 @@ class Admin extends \ElkArte\Modules\AbstractModule
 	 */
 	public function addMenu(&$admin_areas)
 	{
-		global $txt, $context;
+		global $txt;
 
 		$admin_areas['layout']['areas']['managedrafts'] = array(
 			'label' => $txt['manage_drafts'],

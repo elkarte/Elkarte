@@ -4,13 +4,12 @@
  * This class takes care of deleting and restoring messages in boards
  * that means posts and topics
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -478,7 +477,8 @@ class MessagesDelete
 
 			// Insert a new topic in the recycle board if $id_recycle_topic is empty.
 			if (empty($id_recycle_topic))
-				$db->insert('',
+			{
+				$insert_res = $db->insert('',
 					'{db_prefix}topics',
 					array(
 						'id_board' => 'int', 'id_member_started' => 'int', 'id_member_updated' => 'int', 'id_first_msg' => 'int',
@@ -490,9 +490,13 @@ class MessagesDelete
 					),
 					array('id_topic')
 				);
-
-			// Capture the ID of the new topic...
-			$topicID = empty($id_recycle_topic) ? $db->insert_id('{db_prefix}topics', 'id_topic') : $id_recycle_topic;
+				$topicID = $insert_res->insert_id();
+			}
+			else
+			{
+				// Capture the ID of the new topic...
+				$topicID = $id_recycle_topic;
+			}
 
 			// If the topic creation went successful, move the message.
 			if ($topicID > 0)

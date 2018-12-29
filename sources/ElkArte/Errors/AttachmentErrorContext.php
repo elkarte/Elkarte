@@ -3,9 +3,9 @@
 /**
  * This does the job of handling attachment related errors
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -104,7 +104,7 @@ class AttachmentErrorContext
 	/**
 	 * Add an error
 	 *
-	 * @param string $error error code
+	 * @param mixed|mixed[] $error error code
 	 * @param string|null $lang_file = null
 	 */
 	public function addError($error, $lang_file = null)

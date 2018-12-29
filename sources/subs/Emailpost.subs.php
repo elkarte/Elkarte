@@ -4,9 +4,9 @@
  * All the vital helper functions for use in email posting, formatting and conversion
  * and boy are there a bunch !
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -83,7 +83,7 @@ function pbe_email_to_bbc($text, $html)
 	// Some tags often end up as just empty tags - remove those.
 	$emptytags = array(
 		'~\[[bisu]\]\s*\[/[bisu]\]~' => '',
-		'~\[[bisu]\]\s*\[/[bisu]\]~' => '',
+		'~\[quote\]\s*\[/quote\]~' => '',
 		'~(\n){3,}~si' => "\n\n",
 	);
 	$text = preg_replace(array_keys($emptytags), array_values($emptytags), $text);
@@ -1292,6 +1292,7 @@ function query_load_permissions($type, &$pbe, $topic_info = array())
  *
  * @package Maillist
  * @param string $from
+ * @return mixed[]
  */
 function query_sender_wrapper($from)
 {
@@ -1609,6 +1610,7 @@ function query_load_board($message_id)
  * @package Maillist
  * @param int $board_id
  * @param mixed[] $pbe
+ * @return mixed[]
  */
 function query_load_board_details($board_id, $pbe)
 {

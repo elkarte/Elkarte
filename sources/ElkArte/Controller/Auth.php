@@ -4,13 +4,12 @@
  * This file is concerned pretty entirely, as you see from its name, with
  * logging in and out members, and the validation of that.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -162,7 +161,7 @@ class Auth extends \ElkArte\AbstractController
 		if (!empty($_POST['openid_identifier']) && !empty($modSettings['enableOpenID']))
 		{
 			require_once(SUBSDIR . '/OpenID.subs.php');
-			$open_id = new OpenID();
+			$open_id = new \OpenID();
 
 			if (($open_id->validate($_POST['openid_identifier'])) !== 'no_data')
 				return $open_id;

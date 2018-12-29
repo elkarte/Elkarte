@@ -3,16 +3,14 @@
 /**
  * This file has all the main functions in it that relate to the mysql database.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * copyright:	2004-2011, GreyWyvern - All rights reserved.
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -42,8 +40,6 @@ class Query extends AbstractQuery
 	 */
 	public function query($identifier, $db_string, $db_values = array())
 	{
-		global $db_show_debug, $time_start, $modSettings;
-
 		// One more query....
 		$this->_query_count++;
 
@@ -257,7 +253,7 @@ class Query extends AbstractQuery
 		// Log the error.
 		if ($query_errno != 1213 && $query_errno != 1205 && class_exists('Errors'))
 		{
-			\ElkArte\Errors\ErrorsErrors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
+			\ElkArte\Errors\Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
 		}
 
 		// Database error auto fixing ;).

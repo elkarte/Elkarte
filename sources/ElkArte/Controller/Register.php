@@ -5,13 +5,12 @@
  * members, and it helps the administrator moderate member registrations.
  * Similarly, it handles account activation as well.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -501,7 +500,7 @@ class Register extends \ElkArte\AbstractController
 					$save_variables[$k] = $v;
 
 			require_once(SUBSDIR . '/OpenID.subs.php');
-			$openID = new OpenID();
+			$openID = new \OpenID();
 			$openID->validate($this->_req->post->openid_identifier, false, $save_variables);
 		}
 		// If we've come from OpenID set up some default stuff.

@@ -5,9 +5,9 @@
  * an external file.
  * Handles saving of config vars in another table than settings.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -50,7 +50,7 @@ class EmailSettings extends SettingsForm\SettingsForm
 		}
 
 		$settingsForm = new self(self::DBTABLE_ADAPTER);
-		/** @var ElkArte\SettingsForm\SettingsFormAdapter\DbTable */
+		/** @var \ElkArte\SettingsForm\SettingsFormAdapter\DbTable */
 		$settingsAdapter = $settingsForm->getAdapter();
 		$settingsAdapter->setTableName($tableName);
 		$settingsAdapter->setEditId($editId);

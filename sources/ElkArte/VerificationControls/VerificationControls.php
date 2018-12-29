@@ -4,13 +4,12 @@
  * This file contains those functions specific to the various verification controls
  * used to challenge users, and hopefully robots as well.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -72,6 +71,7 @@ class VerificationControls
 	 * This method returns the verification controls found in the file system
 	 *
 	 * @param mixed[] $config_vars
+	 * @return false|string
 	 */
 	public static function discoverControls(&$config_vars = null)
 	{
@@ -138,6 +138,7 @@ class VerificationControls
 	 *
 	 * @param \ElkArte\Errors\ErrorContext $verification_errors
 	 * @param int $max_errors
+	 * @return bool
 	 */
 	public function test($verification_errors, $max_errors)
 	{
@@ -184,6 +185,7 @@ class VerificationControls
 	 * Instantiate the verification controls
 	 *
 	 * @param bool $force_refresh If the controls should be re-initialized
+	 * @return mixed[]
 	 */
 	public function create($force_refresh = false)
 	{

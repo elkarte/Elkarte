@@ -3,13 +3,12 @@
 /**
  * Manage and maintain the boards and categories of the forum.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -135,7 +134,7 @@ class ManageBoards extends \ElkArte\AbstractController
 	 */
 	public function action_main()
 	{
-		global $txt, $context, $cat_tree, $boards, $boardList;
+		global $txt, $context;
 
 		theme()->getTemplates()->load('ManageBoards');
 
@@ -166,19 +165,22 @@ class ManageBoards extends \ElkArte\AbstractController
 			modifyBoard((int) $this->_req->query->src_board, $boardOptions);
 		}
 
-		getBoardTree();
+		$boardTree = new \ElkArte\BoardsTree(database());
+		$boards = $boardTree->getBoards();
+		$boardList = $boardTree->getBoardList();
 
 		createToken('admin-sort');
 		$context['move_board'] = !empty($this->_req->query->move) && isset($boards[(int) $this->_req->query->move]) ? (int) $this->_req->query->move : 0;
 
 		$bbc_parser = \BBC\ParserWrapper::instance();
+		$cat_tree = $boardTree->getCategories();
 
 		$context['categories'] = array();
 		foreach ($cat_tree as $catid => $tree)
 		{
 			$context['categories'][$catid] = array(
-				'name' => &$tree['node']['name'],
-				'id' => &$tree['node']['id'],
+				'name' => $tree['node']['name'],
+				'id' => $tree['node']['id'],
 				'boards' => array()
 			);
 			$move_cat = !empty($context['move_board']) && $boards[$context['move_board']]['category'] == $catid;
@@ -186,12 +188,12 @@ class ManageBoards extends \ElkArte\AbstractController
 			{
 				$boards[$boardid]['description'] = $bbc_parser->parseBoard($boards[$boardid]['description']);
 				$context['categories'][$catid]['boards'][$boardid] = array(
-					'id' => &$boards[$boardid]['id'],
-					'name' => &$boards[$boardid]['name'],
-					'description' => &$boards[$boardid]['description'],
-					'child_level' => &$boards[$boardid]['level'],
-					'move' => $move_cat && ($boardid == $context['move_board'] || isChildOf($boardid, (int) $context['move_board'])),
-					'permission_profile' => &$boards[$boardid]['profile'],
+					'id' => $boards[$boardid]['id'],
+					'name' => $boards[$boardid]['name'],
+					'description' => $boards[$boardid]['description'],
+					'child_level' => $boards[$boardid]['level'],
+					'move' => $move_cat && ($boardid == $context['move_board'] || $boardTree->isChildOf($boardid, (int) $context['move_board'])),
+					'permission_profile' => $boards[$boardid]['profile'],
 				);
 			}
 		}
@@ -212,37 +214,49 @@ class ManageBoards extends \ElkArte\AbstractController
 				foreach ($boardList[$catid] as $boardid)
 				{
 					if (!isset($context['categories'][$catid]['move_link']))
+					{
 						$context['categories'][$catid]['move_link'] = array(
 							'child_level' => 0,
 							'label' => $txt['mboards_order_before'] . ' \'' . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . '\'',
 							'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageboards', 'sa' => 'move', 'src_board' => $context['move_board'], 'target_board' => $boardid, 'move_to' => 'before', '{session_data}', $security_token]),
 						);
+					}
 
 					if (!$context['categories'][$catid]['boards'][$boardid]['move'])
-					$context['categories'][$catid]['boards'][$boardid]['move_links'] = array(
-						array(
-							'child_level' => $boards[$boardid]['level'],
-							'label' => $txt['mboards_order_after'] . '\'' . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . '\'',
-							'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageboards', 'sa' => 'move', 'src_board' => $context['move_board'], 'target_board' => $boardid, 'move_to' => 'after', '{session_data}', $security_token]),
-						),
-						array(
-							'child_level' => $boards[$boardid]['level'] + 1,
-							'label' => $txt['mboards_order_child_of'] . ' \'' . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . '\'',
-							'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageboards', 'sa' => 'move', 'src_board' => $context['move_board'], 'target_board' => $boardid, 'move_to' => 'child', '{session_data}', $security_token]),
-						),
-					);
+					{
+						$context['categories'][$catid]['boards'][$boardid]['move_links'] = array(
+							array(
+								'child_level' => $boards[$boardid]['level'],
+								'label' => $txt['mboards_order_after'] . '\'' . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . '\'',
+								'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageboards', 'sa' => 'move', 'src_board' => $context['move_board'], 'target_board' => $boardid, 'move_to' => 'after', '{session_data}', $security_token]),
+							),
+							array(
+								'child_level' => $boards[$boardid]['level'] + 1,
+								'label' => $txt['mboards_order_child_of'] . ' \'' . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . '\'',
+								'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageboards', 'sa' => 'move', 'src_board' => $context['move_board'], 'target_board' => $boardid, 'move_to' => 'child', '{session_data}', $security_token]),
+							),
+						);
+					}
 
 					$difference = $boards[$boardid]['level'] - $prev_child_level;
 					if ($difference == 1)
+					{
 						array_push($stack, !empty($context['categories'][$catid]['boards'][$prev_board]['move_links']) ? array_shift($context['categories'][$catid]['boards'][$prev_board]['move_links']) : null);
+					}
 					elseif ($difference < 0)
 					{
 						if (empty($context['categories'][$catid]['boards'][$prev_board]['move_links']))
+						{
 							$context['categories'][$catid]['boards'][$prev_board]['move_links'] = array();
+						}
 
 						for ($i = 0; $i < -$difference; $i++)
+						{
 							if (($temp = array_pop($stack)) !== null)
+							{
 								array_unshift($context['categories'][$catid]['boards'][$prev_board]['move_links'], $temp);
+							}
+						}
 					}
 
 					$prev_board = $boardid;
@@ -251,16 +265,22 @@ class ManageBoards extends \ElkArte\AbstractController
 				}
 
 				if (!empty($stack) && !empty($context['categories'][$catid]['boards'][$prev_board]['move_links']))
+				{
 					$context['categories'][$catid]['boards'][$prev_board]['move_links'] = array_merge($stack, $context['categories'][$catid]['boards'][$prev_board]['move_links']);
+				}
 				elseif (!empty($stack))
+				{
 					$context['categories'][$catid]['boards'][$prev_board]['move_links'] = $stack;
+				}
 
 				if (empty($boardList[$catid]))
+				{
 					$context['categories'][$catid]['move_link'] = array(
 						'child_level' => 0,
 						'label' => $txt['mboards_order_before'] . ' \'' . htmlspecialchars($tree['node']['name'], ENT_COMPAT, 'UTF-8') . '\'',
 						'href' => getUrl('admin', ['action' => 'admin', 'area' => 'manageboards', 'sa' => 'move', 'src_board' => $context['move_board'], 'target_cat' => $catid, 'move_to' => 'top', '{session_data}', $security_token]),
 					);
+				}
 			}
 		}
 
@@ -286,11 +306,12 @@ class ManageBoards extends \ElkArte\AbstractController
 	 */
 	public function action_cat()
 	{
-		global $txt, $context, $cat_tree, $boardList, $boards;
+		global $txt, $context;
 
 		theme()->getTemplates()->load('ManageBoards');
 		require_once(SUBSDIR . '/Boards.subs.php');
-		getBoardTree();
+		$boardTree = new \ElkArte\BoardsTree(database());
+		$cat_tree = $boardTree->getCategories();
 
 		// id_cat must be a number.... if it exists.
 		$this->cat = $this->_req->getQuery('cat', 'intval', 0);
@@ -300,7 +321,7 @@ class ManageBoards extends \ElkArte\AbstractController
 			array(
 				'id' => 0,
 				'name' => $txt['mboards_order_first'],
-				'selected' => !empty($this->cat) ? $cat_tree[$this->cat]['is_first'] : false,
+				'selected' => !empty($this->cat) && !empty($cat_tree[$this->cat]['is_first']),
 				'true_name' => ''
 			)
 		);
@@ -318,8 +339,10 @@ class ManageBoards extends \ElkArte\AbstractController
 			);
 		}
 		// Category doesn't exist, man... sorry.
-		elseif (!isset($cat_tree[$this->cat]))
+		elseif ($boardTree->categoryExists($this->cat) === false)
+		{
 			redirectexit('action=admin;area=manageboards');
+		}
 		else
 		{
 			$context['category'] = array(
@@ -331,22 +354,30 @@ class ManageBoards extends \ElkArte\AbstractController
 				'is_empty' => empty($cat_tree[$this->cat]['children'])
 			);
 
-			foreach ($boardList[$this->cat] as $child_board)
+			$boardCat = $boardTree->getBoardsInCat($this->cat);
+			$boards = $boardTree->getBoards();
+			foreach ($boardCat as $child_board)
+			{
 				$context['category']['children'][] = str_repeat('-', $boards[$child_board]['level']) . ' ' . $boards[$child_board]['name'];
+			}
 		}
 
 		$prevCat = 0;
 		foreach ($cat_tree as $catid => $tree)
 		{
 			if ($catid == $this->cat && $prevCat > 0)
+			{
 				$context['category_order'][$prevCat]['selected'] = true;
+			}
 			elseif ($catid != $this->cat)
+			{
 				$context['category_order'][$catid] = array(
 					'id' => $catid,
 					'name' => $txt['mboards_order_after'] . $tree['node']['name'],
 					'selected' => false,
 					'true_name' => $tree['node']['name']
 				);
+			}
 
 			$prevCat = $catid;
 		}
@@ -363,8 +394,8 @@ class ManageBoards extends \ElkArte\AbstractController
 		}
 
 		// Create a special token.
-		createToken('admin-bc-' . $this->cat);
 		$context['token_check'] = 'admin-bc-' . $this->cat;
+		createToken($context['token_check']);
 
 		call_integration_hook('integrate_edit_category');
 	}
@@ -446,12 +477,12 @@ class ManageBoards extends \ElkArte\AbstractController
 	 */
 	public function action_board()
 	{
-		global $txt, $context, $cat_tree, $boards, $boardList, $modSettings;
+		global $txt, $context, $modSettings;
 
 		theme()->getTemplates()->load('ManageBoards');
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
-		getBoardTree();
+		$boardTree = new \ElkArte\BoardsTree(database());
 
 		// For editing the profile we'll need this.
 		theme()->getTemplates()->loadLanguageFile('ManagePermissions');
@@ -460,7 +491,7 @@ class ManageBoards extends \ElkArte\AbstractController
 
 		// id_board must be a number....
 		$this->boardid = $this->_req->getQuery('boardid', 'intval', 0);
-		if (!isset($boards[$this->boardid]))
+		if ($boardTree->boardExists($this->boardid) === false)
 		{
 			$this->boardid = 0;
 			$this->_req->query->sa = 'newboard';
@@ -472,7 +503,9 @@ class ManageBoards extends \ElkArte\AbstractController
 
 			// Category doesn't exist, man... sorry.
 			if (empty($this->cat))
+			{
 				redirectexit('action=admin;area=manageboards');
+			}
 
 			// Some things that need to be setup for a new board.
 			$curBoard = array(
@@ -500,11 +533,11 @@ class ManageBoards extends \ElkArte\AbstractController
 		else
 		{
 			// Just some easy shortcuts.
-			$curBoard = &$boards[$this->boardid];
-			$context['board'] = $boards[$this->boardid];
+			$curBoard = $boardTree->getBoardById($this->boardid);
+			$context['board'] = $curBoard;
 			$context['board']['name'] = htmlspecialchars(strtr($context['board']['name'], array('&amp;' => '&')), ENT_COMPAT, 'UTF-8');
 			$context['board']['description'] = un_preparsecode($context['board']['description']);
-			$context['board']['no_children'] = empty($boards[$this->boardid]['tree']['children']);
+			$context['board']['no_children'] = empty($curBoard['tree']['children']);
 			$context['board']['is_recycle'] = !empty($modSettings['recycle_enable']) && !empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $context['board']['id'];
 		}
 
@@ -535,18 +568,22 @@ class ManageBoards extends \ElkArte\AbstractController
 		$context['groups'] += getOtherGroups($curBoard, $this->_req->query->sa == 'newboard');
 
 		// Category doesn't exist, man... sorry.
-		if (!isset($boardList[$curBoard['category']]))
-			redirectexit('action=admin;area=manageboards');
-
-		foreach ($boardList[$curBoard['category']] as $boardid)
+		if ($boardTree->categoryExists($curBoard['category']) === false)
 		{
+			redirectexit('action=admin;area=manageboards');
+		}
+
+		$catBoards = $boardTree->getBoardsInCat($curBoard['category']);
+		foreach ($catBoards as $boardid)
+		{
+			$thisBoard = $boardTree->getBoardById($boardid);
 			if ($boardid == $this->boardid)
 			{
 				$context['board_order'][] = array(
 					'id' => $boardid,
-					'name' => str_repeat('-', $boards[$boardid]['level']) . ' (' . $txt['mboards_current_position'] . ')',
-					'children' => $boards[$boardid]['tree']['children'],
-					'no_children' => empty($boards[$boardid]['tree']['children']),
+					'name' => str_repeat('-', $thisBoard['level']) . ' (' . $txt['mboards_current_position'] . ')',
+					'children' => $thisBoard['tree']['children'],
+					'no_children' => empty($thisBoard['tree']['children']),
 					'is_child' => false,
 					'selected' => true
 				);
@@ -555,8 +592,8 @@ class ManageBoards extends \ElkArte\AbstractController
 			{
 				$context['board_order'][] = array(
 					'id' => $boardid,
-					'name' => str_repeat('-', $boards[$boardid]['level']) . ' ' . $boards[$boardid]['name'],
-					'is_child' => empty($this->boardid) ? false : isChildOf($boardid, $this->boardid),
+					'name' => str_repeat('-', $thisBoard['level']) . ' ' . $thisBoard['name'],
+					'is_child' => empty($this->boardid) ? false : $boardTree->isChildOf($boardid, $this->boardid),
 					'selected' => false
 				);
 			}
@@ -566,7 +603,7 @@ class ManageBoards extends \ElkArte\AbstractController
 		if (!empty($this->boardid))
 		{
 			$context['can_move_children'] = false;
-			$context['children'] = $boards[$this->boardid]['tree']['children'];
+			$context['children'] = $curBoard['tree']['children'];
 			foreach ($context['board_order'] as $board)
 				if ($board['is_child'] === false && $board['selected'] === false)
 					$context['can_move_children'] = true;
@@ -574,12 +611,15 @@ class ManageBoards extends \ElkArte\AbstractController
 
 		// Get other available categories.
 		$context['categories'] = array();
+		$cat_tree = $boardTree->getCategories();
 		foreach ($cat_tree as $catID => $tree)
+		{
 			$context['categories'][] = array(
 				'id' => $catID == $curBoard['category'] ? 0 : $catID,
 				'name' => $tree['node']['name'],
 				'selected' => $catID == $curBoard['category']
 			);
+		}
 
 		$context['board']['moderators'] = getBoardModerators($this->boardid);
 		$context['board']['moderator_list'] = empty($context['board']['moderators']) ? '' : '&quot;' . implode('&quot;, &quot;', $context['board']['moderators']) . '&quot;';
@@ -648,7 +688,9 @@ class ManageBoards extends \ElkArte\AbstractController
 			elseif (!empty($this->_req->post->placement) && !empty($this->_req->post->board_order))
 			{
 				if (!in_array($this->_req->post->placement, array('before', 'after', 'child')))
+				{
 					throw new \ElkArte\Exceptions\Exception('mangled_post', false);
+				}
 
 				$boardOptions['move_to'] = $this->_req->post->placement;
 				$boardOptions['target_board'] = (int) $this->_req->post->board_order;
@@ -666,14 +708,20 @@ class ManageBoards extends \ElkArte\AbstractController
 				foreach ($this->_req->post->groups as $group => $action)
 				{
 					if ($action == 'allow')
+					{
 						$boardOptions['access_groups'][] = (int) $group;
+					}
 					elseif ($action == 'deny')
+					{
 						$boardOptions['deny_groups'][] = (int) $group;
+					}
 				}
 			}
 
 			if (strlen(implode(',', $boardOptions['access_groups'])) > 255 || strlen(implode(',', $boardOptions['deny_groups'])) > 255)
+			{
 				throw new \ElkArte\Exceptions\Exception('too_many_groups', false);
+			}
 
 			// Change '1 & 2' to '1 &amp; 2', but not '&amp;' to '&amp;amp;'...
 			$boardOptions['board_name'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $this->_req->post->board_name);
@@ -687,7 +735,9 @@ class ManageBoards extends \ElkArte\AbstractController
 			{
 				$moderators = array();
 				foreach ($this->_req->post->moderator_list as $moderator)
+				{
 					$moderators[(int) $moderator] = (int) $moderator;
+				}
 
 				$boardOptions['moderators'] = $moderators;
 			}
@@ -706,13 +756,19 @@ class ManageBoards extends \ElkArte\AbstractController
 
 				// If we're turning redirection on check the board doesn't have posts in it - if it does don't make it a redirection board.
 				if ($boardOptions['redirect'] && empty($properties['oldRedirect']) && $properties['numPosts'])
+				{
 					unset($boardOptions['redirect']);
+				}
 				// Reset the redirection count when switching on/off.
 				elseif (empty($boardOptions['redirect']) != empty($properties['oldRedirect']))
+				{
 					$boardOptions['num_posts'] = 0;
+				}
 				// Resetting the count?
 				elseif ($boardOptions['redirect'] && !empty($this->_req->post->reset_redirect))
+				{
 					$boardOptions['num_posts'] = 0;
+				}
 			}
 
 			call_integration_hook('integrate_save_board', array($board_id, &$boardOptions));
@@ -722,48 +778,66 @@ class ManageBoards extends \ElkArte\AbstractController
 			{
 				// New boards by default go to the bottom of the category.
 				if (empty($this->_req->post->new_cat))
+				{
 					$boardOptions['target_category'] = (int) $this->_req->post->cur_cat;
+				}
 				if (!isset($boardOptions['move_to']))
+				{
 					$boardOptions['move_to'] = 'bottom';
+				}
 
 				createBoard($boardOptions);
 			}
 			// ...or update an existing board.
 			else
+			{
 				modifyBoard($board_id, $boardOptions);
+			}
 		}
 		elseif (isset($this->_req->post->delete) && !isset($this->_req->post->confirmation) && !isset($this->_req->post->no_children))
 		{
-			if ($posts) {
+			if ($posts)
+			{
 				throw new \ElkArte\Exceptions\Exception('mboards_delete_board_has_posts');
 			}
-			else {
+			else
+			{
 				$this->action_board();
 			}
 			return;
 		}
 		elseif (isset($this->_req->post->delete))
 		{
+			$boardTree = new \ElkArte\BoardsTree(database());
 			// First, check if our board still has posts or topics.
-			if ($posts) {
+			if ($posts)
+			{
 				throw new \ElkArte\Exceptions\Exception('mboards_delete_board_has_posts');
 			}
 			else if (isset($this->_req->post->delete_action) && $this->_req->post->delete_action == 1)
 			{
 				// Check if we are moving all the current sub-boards first - before we start deleting!
 				if (empty($this->_req->post->board_to))
+				{
 					throw new \ElkArte\Exceptions\Exception('mboards_delete_board_error');
+				}
 
-				deleteBoards(array($board_id), (int) $this->_req->post->board_to);
+				$boardTree->deleteBoards(array($board_id), (int) $this->_req->post->board_to);
 			}
 			else
-				deleteBoards(array($board_id), 0);
+			{
+				$boardTree->deleteBoards(array($board_id), 0);
+			}
 		}
 
 		if (isset($this->_req->query->rid) && $this->_req->query->rid == 'permissions')
+		{
 			redirectexit('action=admin;area=permissions;sa=board;' . $context['session_var'] . '=' . $context['session_id']);
+		}
 		else
+		{
 			redirectexit('action=admin;area=manageboards');
+		}
 	}
 
 	/**

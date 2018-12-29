@@ -5,13 +5,12 @@
  * new topics, quotes, and modifications to existing posts.  It also handles
  * quoting posts by way of javascript.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -30,7 +29,7 @@ class Post extends \ElkArte\AbstractController
 	/** @var null|ErrorContext The post (messages) errors object */
 	protected $_post_errors = null;
 
-	/** @var null|ElkArte\Theme\TemplateLayers The template layers object */
+	/** @var null|\ElkArte\Themes\TemplateLayers The template layers object */
 	protected $_template_layers = null;
 
 	/** @var array An array of attributes of the topic (if not new) */

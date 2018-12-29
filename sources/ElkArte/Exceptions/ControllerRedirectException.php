@@ -3,9 +3,9 @@
 /**
  * Extension of the default Exception class to handle controllers redirection.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -42,8 +42,7 @@ class ControllerRedirectException extends \Exception
 	 *
 	 * @param object $source The controller object that called the method
 	 *                ($this in the calling class)
-	 *
-	 * @return The return of the method called.
+	 * @return mixed
 	 */
 	public function doRedirect($source)
 	{

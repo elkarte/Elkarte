@@ -3,9 +3,9 @@
 /**
  * Handles all the mentions actions so members are notified of mentionable actions
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -80,7 +80,7 @@ class Mentioning extends \ElkArte\AbstractModel
 	/**
 	 * Mentioning constructor.
 	 *
-	 * @param Database $db
+	 * @param \ElkArte\Database\QueryInterface $db
 	 * @param \ElkArte\DataValidator $validator
 	 * @param string $enabled_mentions
 	 */
@@ -171,7 +171,7 @@ class Mentioning extends \ElkArte\AbstractModel
 	 * Used in Display.controller.php, it may be merged to action_updatestatus
 	 * though that would require to add an optional parameter to avoid the redirect
 	 *
-	 * @param int $mention_id
+	 * @param int|int[] $mention_id
 	 * @return bool if successfully changed or not
 	 */
 	public function markread($mention_id)

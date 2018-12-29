@@ -6,13 +6,12 @@
  * Note to enhance documentation later:
  * attachment_type = 3 is a thumbnail, etc.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -112,6 +111,8 @@ function automanage_attachments_check_directory()
 		$outputCreation = automanage_attachments_create_directory($updir);
 	elseif (in_array($updir, $modSettings['attachmentUploadDir']))
 		$outputCreation = true;
+	else
+		$outputCreation = false;
 
 	if ($outputCreation)
 	{
@@ -351,6 +352,7 @@ function attachments_init_dir(&$tree, &$count)
  * @package Attachments
  * @param int|null $id_msg = null or id of the message with attachments, if any.
  *                  If null, this is an upload in progress for a new post.
+ * @return bool
  * @throws \ElkArte\Exceptions\Exception
  */
 function processAttachments($id_msg = null)
@@ -358,7 +360,6 @@ function processAttachments($id_msg = null)
 	global $context, $modSettings, $txt, $user_info, $topic, $board;
 
 	$attach_errors = \ElkArte\Errors\AttachmentErrorContext::context();
-	$added_initial_error = false;
 
 	// Make sure we're uploading to the right place.
 	if (!empty($modSettings['automanage_attachments']))
@@ -442,36 +443,30 @@ function processAttachments($id_msg = null)
 			'board' => !empty($board) ? $board : 0,
 		);
 
+	// If we have an initial error, lets just display it.
+	if (!empty($initial_error))
+	{
+		$_SESSION['temp_attachments']['initial_error'] = $initial_error;
+
+		// This is a generic error
+		$attach_errors->activate();
+		$attach_errors->addError('attach_no_upload');
+
+		// And delete the files 'cos they ain't going nowhere.
+		foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
+		{
+			if (file_exists($_FILES['attachment']['tmp_name'][$n]))
+				unlink($_FILES['attachment']['tmp_name'][$n]);
+		}
+
+		$_FILES['attachment']['tmp_name'] = array();
+	}
+
 	// Loop through $_FILES['attachment'] array and move each file to the current attachments folder.
 	foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
 	{
 		if ($_FILES['attachment']['name'][$n] == '')
 			continue;
-
-		// If we have an initial error, lets just display it.
-		if (!empty($initial_error) && $added_initial_error === false)
-		{
-			$added_initial_error = true;
-			$_SESSION['temp_attachments']['initial_error'] = $initial_error;
-
-			// This is a generic error
-			$attach_errors->activate();
-			$attach_errors->addError('attach_no_upload');
-			// @todo This is likely the result of some refactoring, verify when $attachment is not set and why
-			if (isset($attachment))
-			{
-				$attach_errors->addError(is_array($attachment) ? array($attachment[0], $attachment[1]) : $attachment);
-			}
-
-			// And delete the files 'cos they ain't going nowhere.
-			foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
-			{
-				if (file_exists($_FILES['attachment']['tmp_name'][$n]))
-					unlink($_FILES['attachment']['tmp_name'][$n]);
-			}
-
-			$_FILES['attachment']['tmp_name'] = array();
-		}
 
 		// First, let's first check for PHP upload errors.
 		$errors = attachmentUploadChecks($n);
@@ -1461,7 +1456,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
  *
  * @package Attachments
  * @param string $url
- * @return array or false, the image size as array(width, height), or false on failure
+ * @return mixed[]|bool the image size as array(width, height), or false on failure
  */
 function url_image_size($url)
 {
@@ -1773,7 +1768,9 @@ function getServerStoredAvatars($directory, $level)
  * @param int $id_attach
  * @param int $id_msg
  * @param int $old_id_thumb = 0
+ * @param string $real_filename
  * @return array The updated information
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb = 0, $real_filename = '')
 {

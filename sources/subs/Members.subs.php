@@ -3,13 +3,12 @@
 /**
  * This file contains some useful functions for members and membergroups.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -1554,15 +1553,23 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
 				foreach ($query_conditions as $condition => $query_condition)
 				{
 					if ($query_condition == 'member_names')
+					{
 						$query_parts[$condition === 'or' ? 'or' : 'and'][] = $allowed_conditions[$query_condition]($query_params);
+					}
 					else
+					{
 						$query_parts[$condition === 'or' ? 'or' : 'and'][] = isset($allowed_conditions[$query_condition]) ? $allowed_conditions[$query_condition] : $query_condition;
+					}
 				}
 			}
-			elseif ($query == 'member_names')
-				$query_parts[$condition === 'or' ? 'or' : 'and'][] = $allowed_conditions[$query]($query_params);
+			elseif ($query_conditions == 'member_names')
+			{
+				$query_parts['and'][] = $allowed_conditions[$query_conditions]($query_params);
+			}
 			else
-				$query_parts['and'][] = isset($allowed_conditions[$query]) ? $allowed_conditions[$query] : $query;
+			{
+				$query_parts['and'][] = isset($allowed_conditions[$query_conditions]) ? $allowed_conditions[$query_conditions] : $query_conditions;
+			}
 		}
 
 		if (!empty($query_parts['or']))
@@ -1667,7 +1674,7 @@ function maxMemberID()
  * - 'authentication' (bool) includes secret_answer, secret_question, openid_uri,
  *    is_activated, validation_code, passwd_flood
  * - 'preferences' (bool) includes lngfile, mod_prefs, notify_types, signature
- * @return array
+ * @return mixed[]|bool
  */
 function getBasicMemberData($member_ids, $options = array())
 {

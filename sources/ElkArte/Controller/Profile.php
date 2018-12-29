@@ -5,13 +5,12 @@
  * It also allows the user to change some of their or another's preferences,
  * and such things.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -568,7 +567,7 @@ class Profile extends \ElkArte\AbstractController
 	 */
 	private function _build_profile_linktree()
 	{
-		global $context, $txt, $user_info;
+		global $context, $txt;
 
 		$context['linktree'][] = array(
 			'url' => getUrl('profile', ['action' => 'profile', 'u' => $this->_memID, 'name' => $this->_profile['real_name']]),
@@ -770,7 +769,7 @@ class Profile extends \ElkArte\AbstractController
 			if (!empty($user_settings['openid_uri']))
 			{
 				require_once(SUBSDIR . '/OpenID.subs.php');
-				$openID = new OpenID();
+				$openID = new \OpenID();
 				$openID->revalidate();
 			}
 			else

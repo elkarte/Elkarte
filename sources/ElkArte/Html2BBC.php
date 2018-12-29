@@ -3,9 +3,9 @@
 /**
  * Converts a string of HTML to BBC
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -203,7 +203,7 @@ class Html2BBC
 	 * For a given node, checks if it is anywhere nested inside of a code block
 	 * - Prevents converting anything that's inside a code block
 	 *
-	 * @param DOMNode|object $node current dom node being worked on
+	 * @param \DOMNode|object $node current dom node being worked on
 	 * @param boolean $parser internal or external parser
 	 *
 	 * @return bool
@@ -231,7 +231,7 @@ class Html2BBC
 	/**
 	 * Traverse each node to its base, then convert tags to bbc on the way back out
 	 *
-	 * @param DOMNode|object $node
+	 * @param \DOMNode|object $node
 	 */
 	private function _convert_childNodes($node)
 	{
@@ -256,7 +256,7 @@ class Html2BBC
 	/**
 	 * Convert the supplied node into its bbc equivalent
 	 *
-	 * @param DOMNode|object $node
+	 * @param \DOMNode|object $node
 	 */
 	private function _convert_to_bbc($node)
 	{
@@ -433,7 +433,7 @@ class Html2BBC
 	 * html: <abbr title="Hyper Text Markup Language">HTML</abbr>
 	 * bbc:  [abbr=Hyper Text Markup Language]HTML[/abbr]
 	 *
-	 * @param DOMNode|object $node
+	 * @param \DOMNode|object $node
 	 *
 	 * @return string
 	 */
@@ -456,7 +456,7 @@ class Html2BBC
 	 * html: <a href='http://somesite.com' title='Title'>Awesome Site</a>
 	 * bbc: [url=http://somesite.com]Awesome Site[/url]
 	 *
-	 * @param DOMNode|object $node
+	 * @param \DOMNode|object $node
 	 *
 	 * @return string
 	 */
@@ -523,7 +523,7 @@ class Html2BBC
 	 * html: <bdo dir="rtl">Some text</bdo>
 	 * bbc: [bdo=rtl]Some Text[/bdo]
 	 *
-	 * @param DOMNode|object $node
+	 * @param \DOMNode|object $node
 	 *
 	 * @return string
 	 */
@@ -543,7 +543,7 @@ class Html2BBC
 	/**
 	 * Converts code tags to bbc block code
 	 *
-	 * @param DOMNode|object $node
+	 * @param \DOMNode|object $node
 	 *
 	 * @return string
 	 */
@@ -588,7 +588,7 @@ class Html2BBC
 	 * html: <font size="3" color="red">This is some text!</font>
 	 * bbc: [color=red][size=12pt]This is some text![/size][/color]
 	 *
-	 * @param DOMNode|object $node
+	 * @param \DOMNode|object $node
 	 *
 	 * @return string
 	 */
@@ -644,7 +644,7 @@ class Html2BBC
 	 * html: <img src='source' alt='alt' title='title' />
 	 * bbc: [img]src[/img]
 	 *
-	 * @param DOMNode|object $node
+	 * @param \DOMNode|object $node
 	 *
 	 * @return mixed|string
 	 */
@@ -708,7 +708,7 @@ class Html2BBC
 	 * html: <span style="font-weight: bold;">Some Text</span>
 	 * bbc: [b]Some Text[/b]
 	 *
-	 * @param DOMNode|object $node
+	 * @param \DOMNode|object $node
 	 *
 	 * @return string
 	 */
@@ -787,7 +787,7 @@ class Html2BBC
 	 * html: <td colspan="2">Some Text</td>
 	 * bbc: [td]Some Text[/td][td][/td]
 	 *
-	 * @param DOMNode|object $node
+	 * @param \DOMNode|object $node
 	 *
 	 * @return string
 	 */
@@ -821,7 +821,7 @@ class Html2BBC
 	/**
 	 * Helper function for getting a node value
 	 *
-	 * @param DOMNode|object $node
+	 * @param \DOMNode|object $node
 	 *
 	 * @return string
 	 */
@@ -839,7 +839,7 @@ class Html2BBC
 	/**
 	 * Helper function for getting a node name
 	 *
-	 * @param DOMNode|object $node
+	 * @param \DOMNode|object $node
 	 *
 	 * @return string
 	 */
@@ -857,7 +857,7 @@ class Html2BBC
 	/**
 	 * Gets the inner html of a node
 	 *
-	 * @param DOMNode|object $node
+	 * @param \DOMNode|object $node
 	 * @return string
 	 */
 	private function _get_innerHTML($node)
@@ -878,7 +878,7 @@ class Html2BBC
 	/**
 	 * Gets the outer html of a node
 	 *
-	 * @param DOMNode|object $node
+	 * @param \DOMNode|object $node
 	 *
 	 * @return
 	 */

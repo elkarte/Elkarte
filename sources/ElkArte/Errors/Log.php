@@ -3,16 +3,16 @@
 /**
  * Functions to assist in viewing and maintaining the error logs
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  */
 
 namespace ElkArte\Errors;
 
-use ElkArte\Theme\TemplateLayers;
+use ElkArte\Themes\TemplateLayers;
 
 /**
  * Class to handle all forum errors and exceptions

@@ -4,13 +4,12 @@
  * This file provides an implementation of the most common functions needed
  * for the database drivers to work.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -65,7 +64,7 @@ abstract class AbstractDump
 	 * @param string $tableName - the table
 	 *
 	 * @return string - the CREATE statement as string
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	abstract public function table_sql($tableName);
 
@@ -86,8 +85,8 @@ abstract class AbstractDump
 	 * @param string $table_name
 	 * @param string $backup_table
 	 *
-	 * @return bool|mysqli_result - the request handle to the table creation query
-	 * @throws Elk_Exception
+	 * @return bool|\ElkArte\Database\AbstractResult - the request handle to the table creation query
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	abstract public function backup_table($table_name, $backup_table);
 

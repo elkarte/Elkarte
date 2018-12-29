@@ -3,13 +3,12 @@
 /**
  * Handles openID verification
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2012 Simple Machines Forum (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -70,7 +69,7 @@ class OpenID extends \ElkArte\AbstractController
 			}
 		}
 
-		$openID = new OpenID();
+		$openID = new \OpenID();
 
 		// Did they tell us to remove any associations?
 		if (!empty($this->_req->query->openid_invalidate_handle))

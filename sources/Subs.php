@@ -3,13 +3,12 @@
 /**
  * This file has all the main functions in it that relate to, well, everything.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -572,7 +571,7 @@ function un_htmlspecialchars($string)
  * @param mixed[] $p The array keys to apply permutation
  * @param int $size The size of our permutation array
  *
- * @return mixed[] the next permutation of the passed array $p
+ * @return mixed[]|bool the next permutation of the passed array $p
  */
 function pc_next_permutation($p, $size)
 {
@@ -1795,7 +1794,7 @@ function can_see_button_strip($button_strip)
 }
 
 /**
- * @return Themes\DefaultTheme\Theme
+ * @return \ElkArte\Themes\DefaultTheme\Theme
  */
 function theme()
 {

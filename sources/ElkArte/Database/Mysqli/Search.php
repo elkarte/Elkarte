@@ -3,9 +3,9 @@
 /**
  * This class handles database search. (MySQL)
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -18,12 +18,6 @@ namespace ElkArte\Database\Mysqli;
  */
 class Search extends \ElkArte\Database\AbstractSearch
 {
-	/**
-	 * This instance of the search
-	 * @var DbSearch_MySQL
-	 */
-	private static $_search = null;
-
 	/**
 	 * Everything starts here... more or less
 	 */
@@ -48,8 +42,6 @@ class Search extends \ElkArte\Database\AbstractSearch
 	public function membersTableInfo()
 	{
 		global $db_prefix;
-
-		$db = database();
 
 		$table_info = array();
 

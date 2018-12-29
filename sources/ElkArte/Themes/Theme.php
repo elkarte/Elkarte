@@ -3,9 +3,9 @@
 /**
  * The main abstract theme class
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -221,7 +221,7 @@ abstract class Theme
 	 * @param int $type One of ALL, SELF, DEFERRED class constants
 	 *
 	 * @return array
-	 * @throws Exception if the type is not known
+	 * @throws \Exception if the type is not known
 	 */
 	public function getInlineJavascript($type = self::ALL)
 	{

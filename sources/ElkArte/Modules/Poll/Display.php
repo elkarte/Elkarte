@@ -3,13 +3,12 @@
 /**
  * This file contains several functions for display polls and polling buttons.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -78,7 +77,7 @@ class Poll_Display_Module extends \ElkArte\Modules\AbstractModule
 	/**
 	 * Prepare context to display the poll itself and the appropriate poll buttons
 	 *
-	 * @param ElkArte\Theme\TemplateLayers $template_layers
+	 * @param \ElkArte\Themes\TemplateLayers $template_layers
 	 */
 	public function prepare_context($template_layers)
 	{

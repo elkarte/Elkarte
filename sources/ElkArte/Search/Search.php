@@ -3,21 +3,18 @@
 /**
  * Utility class for search functionality.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\Search;
-
-use \ElkArte\Search\SearchParams;
 
 /**
  * Actually do the searches
@@ -51,13 +48,13 @@ class Search
 
 	/**
 	 * Database instance
-	 * @var \Database|null
+	 * @var \ElkArte\Database\QueryInterface|null
 	 */
 	private $_db = null;
 
 	/**
 	 * Search db instance
-	 * @var \DbSearch|null
+	 * @var \ElkArte\Database\SearchInterface|null
 	 */
 	private $_db_search = null;
 
@@ -196,7 +193,7 @@ class Search
 	 */
 	public function getParams()
 	{
-		return array_merge($this->_searchParams, array(
+		return $this->_searchParams->mergeWith(array(
 			'min_msg_id' => (int) $this->_searchParams->_minMsgID,
 			'max_msg_id' => (int) $this->_searchParams->_maxMsgID,
 			'memberlist' => $this->_searchParams->_memberlist,

@@ -2,13 +2,12 @@
 
 /**
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -25,8 +24,6 @@ class SmileyParser
 {
 	/** @var bool Are smiley enabled */
 	protected $enabled = true;
-	/** @var array|void the smiles*/
-	protected $smileys = array();
 	/** @var string smiley regex for parse protection */
 	protected $search = '';
 	/** @var array The replacement images for the ;) */
@@ -42,13 +39,13 @@ class SmileyParser
 	 * @param string $path
 	 * @param array $smileys
 	 */
-	public function __construct($path, array $smileys = array())
+	public function __construct($path)
 	{
 		$this->setPath($path);
 
 		if ($this->enabled)
 		{
-			$this->smileys = empty($smileys) ? $this->load() : $smileys;
+			$this->load();
 		}
 	}
 

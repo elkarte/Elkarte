@@ -3,13 +3,12 @@
 /**
  * This file handles the administration of languages tasks.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -618,7 +617,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 	 */
 	public function action_editlang()
 	{
-		global $settings, $context, $txt, $modSettings, $language;
+		global $settings, $context, $txt;
 
 		require_once(SUBSDIR . '/Language.subs.php');
 		theme()->getTemplates()->loadLanguageFile('ManageSettings');

@@ -3,13 +3,12 @@
 /**
  * This file contains several functions for retrieving and manipulating calendar events, birthdays and holidays.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -77,7 +76,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 	/**
 	 * before_save_post event, checks the event title is set
 	 *
-	 * @param ErrorContext $post_errors
+	 * @param \ElkArte\Errors\ErrorContext $post_errors
 	 */
 	public function before_save_post($post_errors)
 	{
@@ -88,7 +87,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 	/**
 	 * after_save_post event, creates/edits/removes the linked event in the calendar
 	 *
-	 * @throws Exception
+	 * @throws \Exception
 	 */
 	public function after_save_post()
 	{

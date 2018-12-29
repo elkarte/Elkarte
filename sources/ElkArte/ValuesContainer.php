@@ -3,9 +3,9 @@
 /**
  * Just a class to implement ArrayAccess and getter/setter and stuff like that.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -162,5 +162,16 @@ class ValuesContainer implements \ArrayAccess
 	public function isEmpty()
 	{
 		return empty($this->data);
+	}
+
+	/**
+	 * Merges the passed array into the existing one.
+	 * Works the same as array_merge.
+	 *
+	 * @param mixed[] $new_data
+	 */
+	public function mergeWith($new_data)
+	{
+		$this->data = array_merge($this->data, $new_data);
 	}
 }

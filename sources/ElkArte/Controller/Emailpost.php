@@ -3,9 +3,9 @@
 /**
  * All the functions that validate and then save an email as a post or pm
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -340,7 +340,7 @@ class Emailpost extends \ElkArte\AbstractController
 	 * - Returns an array of values for use in the template
 	 *
 	 * @param string $data raw email string, including headers
-	 * @return boolean
+	 * @return string[]|boolean
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function action_pbe_preview($data = '')

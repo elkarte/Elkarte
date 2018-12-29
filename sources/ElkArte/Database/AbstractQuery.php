@@ -4,13 +4,12 @@
  * This file provides an implementation of the most common functions needed
  * for the database drivers to work.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -25,7 +24,7 @@ abstract class AbstractQuery implements QueryInterface
 {
 	/**
 	 * Current connection to the database
-	 * @var mysqli|postgre|resource
+	 * @var \ElkArte\Database\ConnectionInterface
 	 */
 	protected $connection = null;
 
@@ -89,7 +88,7 @@ abstract class AbstractQuery implements QueryInterface
 
 	/**
 	 * Holds some values (time, file, line, delta) to debug performancs of the queries.
-	 * @var string[]
+	 * @var mixed[]
 	 */
 	protected $db_cache = [];
 
@@ -103,7 +102,7 @@ abstract class AbstractQuery implements QueryInterface
 	 * Constructor.
 	 *
 	 * @param string $db_prefix Guess what? The tables prefix
-	 * @param resource $connection Obviously the database connection
+	 * @param resource|object $connection Obviously the database connection
 	 */
 	public function __construct($db_prefix, $connection)
 	{
@@ -475,6 +474,7 @@ abstract class AbstractQuery implements QueryInterface
 	 *
 	 * @param string $db_string
 	 * @param mixed $db_values
+	 * @return null|string|string[]
 	 */
 	protected function _prepareQuery($db_string, $db_values)
 	{
@@ -740,7 +740,7 @@ abstract class AbstractQuery implements QueryInterface
 	 *  Get the version number.
 	 *
 	 * @return string - the version
-	 * @throws Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	abstract public function client_version();
 
@@ -891,7 +891,7 @@ abstract class AbstractQuery implements QueryInterface
 	public function insert_id($table)
 	{
 // 		\ElkArte\Errors\Errors::instance()->log_deprecated('Query::insert_id()', 'Result::insert_id()');
-		return $this->result->insert_id($table);
+		return $this->result->insert_id();
 	}
 
 	/**

@@ -5,13 +5,12 @@
  * It also allows the user to change some of their or another's preferences,
  * and such things
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -594,7 +593,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 				require_once(SUBSDIR . '/OpenID.subs.php');
 				require_once(SUBSDIR . '/Members.subs.php');
 
-				$openID = new OpenID();
+				$openID = new \OpenID();
 				$this->_req->post->openid_identifier = $openID->canonize($this->_req->post->openid_identifier);
 
 				if (memberExists($this->_req->post->openid_identifier))

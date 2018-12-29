@@ -3,13 +3,12 @@
 /**
  * This file contains functions that are specifically done by administrators.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -583,7 +582,7 @@ function logTriggersUpdates($logs, $new = true)
  *
  * @package Bans
  * @param mixed[] $ban_info
- * @return nothing
+ * @return int|bool
  */
 function updateBanGroup($ban_info = array())
 {

@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -73,6 +72,7 @@ class MembersList
 	 * @param int|int[]|string|string[] $users Name/s or id/s of the members to load
 	 * @param bool $is_name If the data passed with $users is a name or an id (true if names)
 	 * @param string $set The "amount" of data to be loaded (see constants in \ElkArte\MemberLoader for the values)
+	 * @return bool|int[]
 	 */
 	public static function load($users, $is_name = false, $set = 'normal')
 	{
@@ -93,8 +93,6 @@ class MembersList
 	 */
 	public static function loadGuest()
 	{
-		global $txt;
-
 		if (isset(self::$members[0]))
 		{
 			return;

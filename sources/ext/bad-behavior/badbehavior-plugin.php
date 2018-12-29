@@ -6,9 +6,9 @@
  * Copyright (C) 2005,2006,2007,2008,2009,2010,2011,2012 Michael Hampton
  * License: LGPLv3
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -79,7 +79,7 @@ function bb2_db_num_rows($result)
  * Bad Behavior will use the return value here in other callbacks.
  *
  * @param string $query
- * @return bool or int
+* @return bool|mixed[]
  */
 function bb2_db_query($query)
 {
@@ -246,7 +246,7 @@ function bb2_multi_implode($array, $glue = ',', $trim_all = false)
  * Retrieve whitelist
  *
  * @todo
- * @return type
+ * @return mixed[]|bool
  */
 function bb2_read_whitelist()
 {
@@ -341,6 +341,7 @@ function bb2_insert_head()
  * This option is not available or has no effect when logging is not in use.
  *
  * @param bool $force
+ * @return string
  */
 function bb2_insert_stats($force = false)
 {

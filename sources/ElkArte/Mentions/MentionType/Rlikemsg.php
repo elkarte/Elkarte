@@ -3,9 +3,9 @@
 /**
  * Handles the notification (or non-notification) of removed likes.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -64,6 +64,7 @@ class Rlikemsg extends AbstractMentionBoardAccess
 	 * @param int|null $status status to change the mention to, if no notification,
 	 *             - default is to set it as read (status = 1)
 	 * @param bool|null $is_accessible optional if the mention is accessible to the user
+	 * @return array|int[]
 	 */
 	public function insert($member_from, $members_to, $target, $time = null, $status = null, $is_accessible = null)
 	{

@@ -3,13 +3,12 @@
 /**
  *
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -73,7 +72,7 @@ class Register extends \ElkArte\Modules\AbstractModule
 	/**
 	 * Checks the user passed the verifications on the registration form.
 	 *
-	 * @param ErrorContext $reg_errors Errors object from the registration controller
+	 * @param \ElkArte\Errors\ErrorContext $reg_errors Errors object from the registration controller
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function before_complete_register($reg_errors)

@@ -3,9 +3,9 @@
 /**
  * Handles mentioning of members whose messages has been quoted.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -108,7 +108,7 @@ class Quotedmem extends AbstractMentionBoardAccess
 	 *
 	 * @param string $text the string to look into for member names
 	 *
-	 * @return string[] An array of member names
+	 * @return string[]|bool An array of member names
 	 */
 	protected function _findQuotedMembers($text)
 	{

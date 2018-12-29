@@ -3,9 +3,9 @@
 /**
  * This class takes care of the registration agreement
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -86,6 +86,7 @@ class Agreement
 	 *
 	 * @param string $text the language of the agreement we want.
 	 * @param bool $update_backup if store a copy of the text of the agreements.
+	 * @return bool|string
 	 */
 	public function save($text, $update_backup = false)
 	{
