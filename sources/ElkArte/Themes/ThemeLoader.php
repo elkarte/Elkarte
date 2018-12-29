@@ -13,8 +13,6 @@
 
 namespace ElkArte\Themes;
 
-use Cache;
-
 /**
  * Class ThemeLoader
  */

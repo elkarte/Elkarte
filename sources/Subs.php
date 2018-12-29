@@ -1794,7 +1794,7 @@ function can_see_button_strip($button_strip)
 }
 
 /**
- * @return Themes\DefaultTheme\Theme
+ * @return \ElkArte\Themes\DefaultTheme\Theme
  */
 function theme()
 {

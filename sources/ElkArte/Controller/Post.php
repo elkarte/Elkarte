@@ -29,7 +29,7 @@ class Post extends \ElkArte\AbstractController
 	/** @var null|ErrorContext The post (messages) errors object */
 	protected $_post_errors = null;
 
-	/** @var null|ElkArte\Theme\TemplateLayers The template layers object */
+	/** @var null|\ElkArte\Themes\TemplateLayers The template layers object */
 	protected $_template_layers = null;
 
 	/** @var array An array of attributes of the topic (if not new) */

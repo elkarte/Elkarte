@@ -48,13 +48,13 @@ class Search
 
 	/**
 	 * Database instance
-	 * @var \Database|null
+	 * @var \ElkArte\Database\QueryInterface|null
 	 */
 	private $_db = null;
 
 	/**
 	 * Search db instance
-	 * @var \DbSearch|null
+	 * @var \ElkArte\Database\SearchInterface|null
 	 */
 	private $_db_search = null;
 

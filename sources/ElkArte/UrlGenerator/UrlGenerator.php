@@ -60,7 +60,7 @@ class UrlGenerator
 	/**
 	 * Instantiate and return the query parser.
 	 *
-	 * @return \ElkArte\UrlGenerator\ParseQuery_Abstract
+	 * @return \ElkArte\UrlGenerator\AbstractParseQuery
 	 */
 	public function getParser()
 	{

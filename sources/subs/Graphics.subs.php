@@ -807,7 +807,7 @@ if (!function_exists('imagecreatefrombmp'))
 	 *
 	 * @package Graphics
 	 * @param string $filename The name of the file
-	 * @return resource An image identifier representing the bitmap image
+	 * @return resource|bool An image identifier representing the bitmap image
 	 */
 	function imagecreatefrombmp($filename)
 	{

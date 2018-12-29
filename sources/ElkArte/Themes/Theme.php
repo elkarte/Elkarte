@@ -221,7 +221,7 @@ abstract class Theme
 	 * @param int $type One of ALL, SELF, DEFERRED class constants
 	 *
 	 * @return array
-	 * @throws Exception if the type is not known
+	 * @throws \Exception if the type is not known
 	 */
 	public function getInlineJavascript($type = self::ALL)
 	{

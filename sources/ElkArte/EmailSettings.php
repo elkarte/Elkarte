@@ -50,7 +50,7 @@ class EmailSettings extends SettingsForm\SettingsForm
 		}
 
 		$settingsForm = new self(self::DBTABLE_ADAPTER);
-		/** @var ElkArte\SettingsForm\SettingsFormAdapter\DbTable */
+		/** @var \ElkArte\SettingsForm\SettingsFormAdapter\DbTable */
 		$settingsAdapter = $settingsForm->getAdapter();
 		$settingsAdapter->setTableName($tableName);
 		$settingsAdapter->setEditId($editId);

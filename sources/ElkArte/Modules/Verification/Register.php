@@ -72,7 +72,7 @@ class Register extends \ElkArte\Modules\AbstractModule
 	/**
 	 * Checks the user passed the verifications on the registration form.
 	 *
-	 * @param ErrorContext $reg_errors Errors object from the registration controller
+	 * @param \ElkArte\Errors\ErrorContext $reg_errors Errors object from the registration controller
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function before_complete_register($reg_errors)

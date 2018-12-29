@@ -12,7 +12,7 @@
 
 namespace ElkArte\Errors;
 
-use ElkArte\Theme\TemplateLayers;
+use ElkArte\Themes\TemplateLayers;
 
 /**
  * Class to handle all forum errors and exceptions

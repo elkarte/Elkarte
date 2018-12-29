@@ -119,7 +119,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 	 * @param array $editorOptions
 	 * @param int $board
 	 * @param int $topic
-	 * @param ElkArte\Theme\TemplateLayers $template_layers
+	 * @param \ElkArte\Themes\TemplateLayers $template_layers
 	 */
 	public function finalize_post_form(&$editorOptions, $board, $topic, $template_layers)
 	{

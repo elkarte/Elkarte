@@ -76,7 +76,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 	/**
 	 * before_save_post event, checks the event title is set
 	 *
-	 * @param ErrorContext $post_errors
+	 * @param \ElkArte\Errors\ErrorContext $post_errors
 	 */
 	public function before_save_post($post_errors)
 	{
@@ -87,7 +87,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 	/**
 	 * after_save_post event, creates/edits/removes the linked event in the calendar
 	 *
-	 * @throws Exception
+	 * @throws \Exception
 	 */
 	public function after_save_post()
 	{

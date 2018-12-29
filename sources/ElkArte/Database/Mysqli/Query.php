@@ -253,7 +253,7 @@ class Query extends AbstractQuery
 		// Log the error.
 		if ($query_errno != 1213 && $query_errno != 1205 && class_exists('Errors'))
 		{
-			\ElkArte\Errors\ErrorsErrors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
+			\ElkArte\Errors\Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
 		}
 
 		// Database error auto fixing ;).

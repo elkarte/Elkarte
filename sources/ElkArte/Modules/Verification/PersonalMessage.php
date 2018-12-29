@@ -63,7 +63,7 @@ class PersonalMessage extends \ElkArte\Modules\AbstractModule
 	/**
 	 * Checks the user passed the verifications on the PM page.
 	 *
-	 * @param \ErrorContext $post_errors
+	 * @param \ElkArte\Errors\ErrorContext $post_errors
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function before_sending($post_errors)

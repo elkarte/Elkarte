@@ -72,7 +72,7 @@ class SettingsForm
 	const FILE_ADAPTER = 'ElkArte\\SettingsForm\\SettingsFormAdapter\\File';
 
 	/**
-	 * @var ElkArte\SettingsForm\SettingsFormAdapter\Adapter
+	 * @var \ElkArte\SettingsForm\SettingsFormAdapter\Adapter
 	 */
 	private $adapter;
 
@@ -119,7 +119,7 @@ class SettingsForm
 	}
 
 	/**
-	 * @return ElkArte\SettingsForm\SettingsFormAdapter\Adapter
+	 * @return \ElkArte\SettingsForm\SettingsFormAdapter\Adapter
 	 */
 	public function getAdapter()
 	{

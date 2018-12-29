@@ -166,7 +166,7 @@ class Notifications extends AbstractModel
 	/**
 	 * Process a certain task in order to send out the notifications.
 	 *
-	 * @param ElkArte\NotificationsTask $task
+	 * @param \ElkArte\NotificationsTask $task
 	 */
 	protected function _send_task(NotificationsTask $task)
 	{
@@ -204,7 +204,7 @@ class Notifications extends AbstractModel
 	 * Inserts a new mention in the database (those that appear in the mentions area).
 	 *
 	 * @param \ElkArte\Mentions\MentionType\MentionTypeInterface $obj
-	 * @param ElkArte\NotificationsTask $task
+	 * @param \ElkArte\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
 	protected function _send_notification(Mentions\MentionType\MentionTypeInterface $obj, NotificationsTask $task, $bodies)
@@ -227,7 +227,7 @@ class Notifications extends AbstractModel
 	 * Sends an immediate email notification.
 	 *
 	 * @param \ElkArte\Mentions\MentionType\MentionTypeInterface $obj
-	 * @param ElkArte\NotificationsTask $task
+	 * @param \ElkArte\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
 	protected function _send_email(Mentions\MentionType\MentionTypeInterface $obj, NotificationsTask $task, $bodies)
@@ -246,7 +246,7 @@ class Notifications extends AbstractModel
 	 * Stores data in the database to send a daily digest.
 	 *
 	 * @param \ElkArte\Mentions\MentionType\MentionTypeInterface $obj
-	 * @param ElkArte\NotificationsTask $task
+	 * @param \ElkArte\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
 	protected function _send_daily_email(Mentions\MentionType\MentionTypeInterface $obj, NotificationsTask $task, $bodies)
@@ -270,7 +270,7 @@ class Notifications extends AbstractModel
 	 * Stores data in the database to send a weekly digest.
 	 *
 	 * @param \ElkArte\Mentions\MentionType\MentionTypeInterface $obj
-	 * @param ElkArte\NotificationsTask $task
+	 * @param \ElkArte\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
 	protected function _send_weekly_email(Mentions\MentionType\MentionTypeInterface $obj, NotificationsTask $task, $bodies)

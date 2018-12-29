@@ -1061,7 +1061,7 @@ class Html2Md
 	/**
 	 * Gets the inner html of a node
 	 *
-	 * @param DOMNode|object $node
+	 * @param \DOMNode|object $node
 	 * @return string
 	 */
 	private function _get_innerHTML($node)
@@ -1084,7 +1084,7 @@ class Html2Md
 	/**
 	 * Gets the outer html of a node
 	 *
-	 * @param DOMNode|object $node
+	 * @param \DOMNode|object $node
 	 * @return string
 	 */
 	private function _get_outerHTML($node)

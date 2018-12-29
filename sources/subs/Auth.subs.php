@@ -764,7 +764,7 @@ function isFirstLogin($id_member)
  * @param mixed[] $where_params array of values to used in the where statement
  * @param bool    $fatal
  *
- * @return mixed[]|null array of members data or false on failure
+ * @return mixed[]|bool array of members data or false on failure
  * @throws \ElkArte\Exceptions\Exception no_user_with_email
  */
 function findUser($where, $where_params, $fatal = true)

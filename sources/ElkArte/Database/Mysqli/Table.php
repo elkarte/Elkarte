@@ -26,7 +26,7 @@ class Table extends \ElkArte\Database\AbstractTable
 {
 	/**
 	 * Holds this instance of the table interface
-	 * @var DbTable_MySQL
+	 * @var \ElkArte\Database\AbstractTable
 	 */
 	protected static $_tbl = null;
 

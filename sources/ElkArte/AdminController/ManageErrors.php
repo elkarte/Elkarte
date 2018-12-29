@@ -22,7 +22,7 @@ namespace ElkArte\AdminController;
  */
 class ManageErrors extends \ElkArte\AbstractController
 {
-	/** @var ElkArte\Errors\Log */
+	/** @var \ElkArte\Errors\Log */
 	private $errorLog;
 
 	/**

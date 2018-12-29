@@ -36,7 +36,7 @@ final class Hooks
 
 	/**
 	 * Holds the database instance
-	 * @var null|database
+	 * @var null|\ElkArte\Database\QueryInterface
 	 */
 	protected $_db = null;
 
@@ -49,7 +49,7 @@ final class Hooks
 	/**
 	 * The class constructor, loads globals in to the class object
 	 *
-	 * @param Database $db
+	 * @param \ElkArte\Database\QueryInterface $db
 	 * @param Debug $debug
 	 * @param string[]|string|null $paths - additional paths to add to the replacement array
 	 */
@@ -507,7 +507,7 @@ final class Hooks
 	/**
 	 * Instantiation is a bit more complex, so let's give it a custom function
 	 *
-	 * @param Database|null $db A database connection
+	 * @param \ElkArte\Database\QueryInterface|null $db A database connection
 	 * @param Debug|null $debug A class for debugging
 	 * @param string[]|null $paths An array of paths for replacement
 	 */
@@ -525,7 +525,7 @@ final class Hooks
 	/**
 	 * Being a singleton, this is the static method to retrieve the instance of the class
 	 *
-	 * @param Database|null $db A database connection
+	 * @param \ElkArte\Database\QueryInterface|null $db A database connection
 	 * @param Debug|null $debug A class for debugging
 	 * @param string[]|null $paths An array of paths for replacement
 	 *

@@ -161,7 +161,7 @@ class Poll_Post_Module extends \ElkArte\Modules\AbstractModule
 	 *
 	 * @param string $destination
 	 * @param string $page_title
-	 * @param ElkArte\Theme\TemplateLayers $template_layers
+	 * @param \ElkArte\Themes\TemplateLayers $template_layers
 	 */
 	public function finalize_post_form(&$destination, &$page_title, $template_layers)
 	{
@@ -205,7 +205,7 @@ class Poll_Post_Module extends \ElkArte\Modules\AbstractModule
 	/**
 	 * Checks the poll conditions before we go to save
 	 *
-	 * @param ErrorContext $post_errors
+	 * @param \ElkArte\Errors\ErrorContext $post_errors
 	 * @param array        $topic_info
 	 *
 	 * @throws \ElkArte\Exceptions\Exception no_access
