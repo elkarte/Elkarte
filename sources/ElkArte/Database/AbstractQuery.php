@@ -88,7 +88,7 @@ abstract class AbstractQuery implements QueryInterface
 
 	/**
 	 * Holds some values (time, file, line, delta) to debug performancs of the queries.
-	 * @var string[]
+	 * @var mixed[]
 	 */
 	protected $db_cache = [];
 
@@ -102,7 +102,7 @@ abstract class AbstractQuery implements QueryInterface
 	 * Constructor.
 	 *
 	 * @param string $db_prefix Guess what? The tables prefix
-	 * @param resource $connection Obviously the database connection
+	 * @param resource|object $connection Obviously the database connection
 	 */
 	public function __construct($db_prefix, $connection)
 	{

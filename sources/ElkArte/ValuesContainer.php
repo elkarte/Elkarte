@@ -163,4 +163,15 @@ class ValuesContainer implements \ArrayAccess
 	{
 		return empty($this->data);
 	}
+
+	/**
+	 * Merges the passed array into the existing one.
+	 * Works the same as array_merge.
+	 *
+	 * @param mixed[] $new_data
+	 */
+	public function mergeWith($new_data)
+	{
+		$this->data = array_merge($this->data, $new_data);
+	}
 }

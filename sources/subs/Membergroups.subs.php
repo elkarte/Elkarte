@@ -1902,7 +1902,7 @@ function accessibleGroups()
  *
  * @package Membergroups
  * @param string $where
- * @param string $where_parameters
+ * @param string[] $where_parameters
  * @return int the count of group requests
  */
 function list_getGroupRequestCount($where, $where_parameters)

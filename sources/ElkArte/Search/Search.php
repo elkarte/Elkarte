@@ -195,7 +195,7 @@ class Search
 	 */
 	public function getParams()
 	{
-		return array_merge($this->_searchParams, array(
+		return $this->_searchParams->mergeWith(array(
 			'min_msg_id' => (int) $this->_searchParams->_minMsgID,
 			'max_msg_id' => (int) $this->_searchParams->_maxMsgID,
 			'memberlist' => $this->_searchParams->_memberlist,

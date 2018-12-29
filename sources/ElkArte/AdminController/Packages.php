@@ -1438,7 +1438,7 @@ class Packages extends \ElkArte\AbstractController
 
 		// ... maybe posted?
 		if (!empty($this->_req->post->back_look))
-			$context['only_find'] = array_merge($context['only_find'], $this->_req->post->back_look);
+			$context['look_for'] = array_merge($context['look_for'], $this->_req->post->back_look);
 
 		$context['back_look_data'] = base64_encode(json_encode(array_slice($context['look_for'], 0, 15)));
 
@@ -1688,7 +1688,7 @@ class Packages extends \ElkArte\AbstractController
 		}
 
 		// If we're here we are done!
-		redirectexit('action=admin;area=packages;sa=perms' . (!empty($context['back_look_data']) ? ';back_look=' . base64_encode(json_decode($context['back_look_data'], true)) : '') . ';' . $context['session_var'] . '=' . $context['session_id']);
+		redirectexit('action=admin;area=packages;sa=perms' . (!empty($context['back_look_data']) ? ';back_look=' . base64_encode(json_encode($context['back_look_data'])) : '') . ';' . $context['session_var'] . '=' . $context['session_id']);
 	}
 
 	/**

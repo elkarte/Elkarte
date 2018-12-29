@@ -107,7 +107,7 @@ interface QueryInterface
 	 * @param string $table
 	 * @param mixed[] $columns
 	 * @param mixed[] $data
-	 * @param mixed[] $keys
+	 * @param string[] $keys
 	 * @param bool $disable_trans = false
 	 * @return void
 	 */

@@ -104,7 +104,7 @@ class AttachmentErrorContext
 	/**
 	 * Add an error
 	 *
-	 * @param string $error error code
+	 * @param mixed|mixed[] $error error code
 	 * @param string|null $lang_file = null
 	 */
 	public function addError($error, $lang_file = null)

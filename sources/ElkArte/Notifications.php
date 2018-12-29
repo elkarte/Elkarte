@@ -33,7 +33,7 @@ class Notifications extends AbstractModel
 	/**
 	 * List of notifications to send
 	 *
-	 * @var \Notifications_Task[]
+	 * @var \ElkArte\NotificationsTask[]
 	 */
 	protected $_to_send;
 
@@ -64,7 +64,7 @@ class Notifications extends AbstractModel
 	 *
 	 * Registers the known notifications to the system, allows for integration to add more
 	 *
-	 * @param \Database $db
+	 * @param \ElkArte\Database\QueryInterface $db
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function __construct($db)

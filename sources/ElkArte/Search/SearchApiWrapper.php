@@ -120,7 +120,7 @@ class SearchApiWrapper
 	 * Wrapper for searchQuery of the SearchAPI
 	 * @param string[] $search_words
 	 * @param string[] $excluded_words
-	 * @param bool[] $participants
+	 * @param mixed[] $participants
 	 * @param string[] $search_results
 	 *
 	 * @return mixed[]

@@ -32,7 +32,7 @@ class Spellcheck extends \ElkArte\AbstractController
 	/**
 	 * The object that holds our initialized pspell
 	 *
-	 * @var object
+	 * @var int
 	 */
 	public $pspell_link;
 

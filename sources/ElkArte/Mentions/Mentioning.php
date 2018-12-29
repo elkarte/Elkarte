@@ -80,7 +80,7 @@ class Mentioning extends \ElkArte\AbstractModel
 	/**
 	 * Mentioning constructor.
 	 *
-	 * @param Database $db
+	 * @param \ElkArte\Database\QueryInterface $db
 	 * @param \ElkArte\DataValidator $validator
 	 * @param string $enabled_mentions
 	 */
@@ -171,7 +171,7 @@ class Mentioning extends \ElkArte\AbstractModel
 	 * Used in Display.controller.php, it may be merged to action_updatestatus
 	 * though that would require to add an optional parameter to avoid the redirect
 	 *
-	 * @param int $mention_id
+	 * @param int|int[] $mention_id
 	 * @return bool if successfully changed or not
 	 */
 	public function markread($mention_id)

@@ -25,7 +25,7 @@ class Query extends AbstractQuery
 {
 	/**
 	 * Holds last query result
-	 * @var string
+	 * @var resource
 	 */
 	private $_db_last_result = null;
 

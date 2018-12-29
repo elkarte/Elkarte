@@ -308,7 +308,7 @@ class Unread extends \ElkArte\AbstractController
 
 			if (!empty($this->_req->query->boards))
 			{
-				$this->_boards = array_map('intval', explode(',', explode(',', $this->_req->query->boards)));
+				$this->_boards = array_map('intval', explode(',', $this->_req->query->boards));
 			}
 
 			if (!empty($board))

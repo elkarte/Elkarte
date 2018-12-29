@@ -69,7 +69,7 @@ class OpenID extends \ElkArte\AbstractController
 			}
 		}
 
-		$openID = new OpenID();
+		$openID = new \OpenID();
 
 		// Did they tell us to remove any associations?
 		if (!empty($this->_req->query->openid_invalidate_handle))
