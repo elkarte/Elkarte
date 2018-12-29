@@ -340,7 +340,7 @@ class Emailpost extends \ElkArte\AbstractController
 	 * - Returns an array of values for use in the template
 	 *
 	 * @param string $data raw email string, including headers
-	 * @return boolean
+	 * @return string[]|boolean
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function action_pbe_preview($data = '')

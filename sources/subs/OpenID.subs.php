@@ -310,7 +310,7 @@ class OpenID
 	 * Prepare for a Diffie-Hellman key exchange.
 	 *
 	 * @param bool $regenerate = false
-	 * @return string return false on failure or an array() on success
+	 * @return string[]|bool return false on failure or an array() on success
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function setup_DH($regenerate = false)
@@ -332,7 +332,7 @@ class OpenID
 	 *
 	 * @param bool $regenerate
 	 *
-	 * @return array
+	 * @return string[]
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function get_keys($regenerate)

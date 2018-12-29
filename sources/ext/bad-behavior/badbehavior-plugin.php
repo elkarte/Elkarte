@@ -79,7 +79,7 @@ function bb2_db_num_rows($result)
  * Bad Behavior will use the return value here in other callbacks.
  *
  * @param string $query
- * @return bool or int
+* @return bool|mixed[]
  */
 function bb2_db_query($query)
 {
@@ -246,7 +246,7 @@ function bb2_multi_implode($array, $glue = ',', $trim_all = false)
  * Retrieve whitelist
  *
  * @todo
- * @return mixed[]
+ * @return mixed[]|bool
  */
 function bb2_read_whitelist()
 {

@@ -110,7 +110,7 @@ abstract class AbstractMentionMessage implements MentionTypeInterface
 	 * Does the replacement of some placeholders with the corresponding
 	 * text/link/url.
 	 *
-	 * @param string $row A text string on which replacements are done
+	 * @param string[] $row A text string on which replacements are done
 	 * @return string the input string with the placeholders replaced
 	 */
 	protected function _replaceMsg($row)

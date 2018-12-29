@@ -382,7 +382,7 @@ class Unread
 	 * @param int $start - position to start the query
 	 * @param int $limit - number of entries to grab
 	 * @param bool|int $include_avatars - if avatars should be retrieved as well
-	 * @return mixed[] - see \ElkArte\TopicUtil::prepareContext
+	 * @return mixed[]|bool - see \ElkArte\TopicUtil::prepareContext
 	 */
 	private function _getUnreadReplies($start, $limit, $include_avatars = false)
 	{

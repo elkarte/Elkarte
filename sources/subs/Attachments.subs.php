@@ -1455,7 +1455,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
  *
  * @package Attachments
  * @param string $url
- * @return array or false, the image size as array(width, height), or false on failure
+ * @return mixed[]|bool the image size as array(width, height), or false on failure
  */
 function url_image_size($url)
 {

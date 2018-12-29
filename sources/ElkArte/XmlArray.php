@@ -146,7 +146,7 @@ class XmlArray
 	 *
 	 * @param string $path  - the path to the element to get
 	 * @param bool $return_full  - always return full result set
-	 * @return \ElkArte\XmlArray a new \ElkArte\XmlArray.
+	 * @return \ElkArte\XmlArray|bool a new \ElkArte\XmlArray.
 	 */
 	public function path($path, $return_full = false)
 	{

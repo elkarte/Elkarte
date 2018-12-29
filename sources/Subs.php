@@ -571,7 +571,7 @@ function un_htmlspecialchars($string)
  * @param mixed[] $p The array keys to apply permutation
  * @param int $size The size of our permutation array
  *
- * @return mixed[] the next permutation of the passed array $p
+ * @return mixed[]|bool the next permutation of the passed array $p
  */
 function pc_next_permutation($p, $size)
 {

@@ -266,7 +266,7 @@ class IlaIntegrate
 	 * - Determines the best image, full or thumbnail, based on ILA width desired
 	 * - Used as PARAM_ATTR_VALIDATE function
 	 *
-	 * @return Closure
+	 * @return string
 	 */
 	public static function validate_width()
 	{
@@ -292,7 +292,7 @@ class IlaIntegrate
 	 * - Determines the best image, full or thumbnail, based on desired ILA height
 	 * - Used as PARAM_ATTR_VALIDATE function
 	 *
-	 * @return Closure
+	 * @return string
 	 */
 	public static function validate_height()
 	{
@@ -318,7 +318,7 @@ class IlaIntegrate
 	 * - Determines if the ILA is an image or not
 	 * - Keeps track of attachment usage to prevent displaying below the post
 	 *
-	 * @return Closure
+	 * @return object
 	 */
 	public static function validate_url()
 	{
@@ -369,7 +369,7 @@ class IlaIntegrate
 	 * - Sets the lightbox attributes if an image is identified
 	 * - Keeps track of attachment usage to prevent displaying below the post
 	 *
-	 * @return Closure
+	 * @return object
 	 */
 	public static function validate_plain()
 	{
@@ -426,7 +426,7 @@ class IlaIntegrate
 	 *
 	 * - Keeps track of attachment usage to prevent displaying below the post
 	 *
-	 * @return Closure
+	 * @return object
 	 */
 	public static function validate_options()
 	{

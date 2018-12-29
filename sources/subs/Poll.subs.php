@@ -198,7 +198,7 @@ function pollInfo($id_poll, $ignore_permissions = true)
  *
  * @param int $topicID the topic with an associated poll.
  *
- * @return bool
+ * @return string[]|bool
  */
 function pollInfoForTopic($topicID)
 {
@@ -716,7 +716,7 @@ function determineVote($id_member, $id_poll)
  *
  * @deprecated since 2.0 - use pollInfoForTopic instead
  * @param int $id_topic
- * @return array
+ * @return string[]|bool
  */
 function pollStatus($id_topic)
 {

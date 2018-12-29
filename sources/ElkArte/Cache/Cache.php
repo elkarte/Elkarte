@@ -262,7 +262,7 @@ class Cache
 
 		if (!$this->isEnabled())
 		{
-			return;
+			return null;
 		}
 
 		if ($db_show_debug === true)

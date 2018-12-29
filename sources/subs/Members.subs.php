@@ -1674,7 +1674,7 @@ function maxMemberID()
  * - 'authentication' (bool) includes secret_answer, secret_question, openid_uri,
  *    is_activated, validation_code, passwd_flood
  * - 'preferences' (bool) includes lngfile, mod_prefs, notify_types, signature
- * @return array
+ * @return mixed[]|bool
  */
 function getBasicMemberData($member_ids, $options = array())
 {

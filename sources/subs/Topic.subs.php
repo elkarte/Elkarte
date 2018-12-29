@@ -1271,7 +1271,7 @@ function setTopicWatch($id_member, $topic, $on = false)
  *    - if 'all' returns additional infos about the read/unwatched status
  * @param string[] $selects (optional from integration)
  * @param string[] $tables (optional from integration)
- * @return array to topic attributes
+ * @return mixed[]|bool to topic attributes
  */
 function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables = array())
 {

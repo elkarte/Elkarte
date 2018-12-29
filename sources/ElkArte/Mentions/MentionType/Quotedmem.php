@@ -108,7 +108,7 @@ class Quotedmem extends AbstractMentionBoardAccess
 	 *
 	 * @param string $text the string to look into for member names
 	 *
-	 * @return string[] An array of member names
+	 * @return string[]|bool An array of member names
 	 */
 	protected function _findQuotedMembers($text)
 	{

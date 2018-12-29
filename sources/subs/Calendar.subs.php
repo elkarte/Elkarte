@@ -1003,7 +1003,7 @@ function removeEvent($event_id)
  * @package Calendar
  * @param int $event_id
  * @param bool $calendar_only
- * @return array
+ * @return mixed[]|bool
  */
 function getEventProperties($event_id, $calendar_only = false)
 {

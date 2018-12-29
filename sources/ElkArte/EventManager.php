@@ -133,7 +133,7 @@ class EventManager
 	 * - If the object doesn't exist yet, it is created
 	 *
 	 * @param string $class_name The name of the class.
-	 * @return An instance of the class requested.
+	 * @return object
 	 */
 	protected function _getInstance($class_name)
 	{
