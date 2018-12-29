@@ -19,12 +19,6 @@ namespace ElkArte\Database\Mysqli;
 class Search extends \ElkArte\Database\AbstractSearch
 {
 	/**
-	 * This instance of the search
-	 * @var DbSearch_MySQL
-	 */
-	private static $_search = null;
-
-	/**
 	 * Everything starts here... more or less
 	 */
 	public function __construct($db)
@@ -48,8 +42,6 @@ class Search extends \ElkArte\Database\AbstractSearch
 	public function membersTableInfo()
 	{
 		global $db_prefix;
-
-		$db = database();
 
 		$table_info = array();
 

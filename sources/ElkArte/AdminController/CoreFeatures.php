@@ -456,7 +456,7 @@ class CoreFeatures extends \ElkArte\AbstractController
 	 */
 	protected function _prepare_corefeatures($core_features)
 	{
-		global $context, $txt, $settings;
+		global $txt, $settings;
 
 		$features = array();
 		foreach ($core_features as $id => $feature)

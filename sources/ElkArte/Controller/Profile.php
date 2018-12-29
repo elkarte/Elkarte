@@ -567,7 +567,7 @@ class Profile extends \ElkArte\AbstractController
 	 */
 	private function _build_profile_linktree()
 	{
-		global $context, $txt, $user_info;
+		global $context, $txt;
 
 		$context['linktree'][] = array(
 			'url' => getUrl('profile', ['action' => 'profile', 'u' => $this->_memID, 'name' => $this->_profile['real_name']]),

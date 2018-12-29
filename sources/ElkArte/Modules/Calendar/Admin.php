@@ -42,7 +42,7 @@ class Admin extends \ElkArte\Modules\AbstractModule
 	 */
 	public function addMenu(&$admin_areas)
 	{
-		global $txt, $context, $modSettings;
+		global $txt, $modSettings;
 
 		$admin_areas['layout']['areas']['managecalendar'] = array(
 			'label' => $txt['manage_calendar'],

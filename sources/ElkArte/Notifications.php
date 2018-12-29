@@ -14,8 +14,6 @@
 
 namespace ElkArte;
 
-use ElkArte\AbstractModel;
-
 /**
  * Class Notifications
  *

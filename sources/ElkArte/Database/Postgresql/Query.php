@@ -56,8 +56,6 @@ class Query extends AbstractQuery
 	 */
 	public function query($identifier, $db_string, $db_values = array())
 	{
-		global $db_show_debug, $time_start, $modSettings;
-
 		// Special queries that need processing.
 		$replacements = array(
 			'ban_suggest_error_ips' => array(

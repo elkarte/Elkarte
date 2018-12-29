@@ -93,8 +93,6 @@ class MembersList
 	 */
 	public static function loadGuest()
 	{
-		global $txt;
-
 		if (isset(self::$members[0]))
 		{
 			return;

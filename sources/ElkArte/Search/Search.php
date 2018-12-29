@@ -16,8 +16,6 @@
 
 namespace ElkArte\Search;
 
-use \ElkArte\Search\SearchParams;
-
 /**
  * Actually do the searches
  */

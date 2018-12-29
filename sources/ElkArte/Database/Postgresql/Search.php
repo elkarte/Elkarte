@@ -19,12 +19,6 @@ namespace ElkArte\Database\Postgresql;
 class Search extends \ElkArte\Database\AbstractSearch
 {
 	/**
-	 * This instance of the search
-	 * @var DbSearch_PostgreSQL
-	 */
-	private static $_search = null;
-
-	/**
 	 * Everything starts here... more or less
 	 */
 	public function __construct($db)

@@ -50,8 +50,6 @@ class Exception extends \Exception
 	 */
 	public function __construct($message, $log = false, $sprintf = array(), $code = 0, Exception $previous = null)
 	{
-		global $txt;
-
 		$this->log = $log;
 		$this->sprintf = $sprintf;
 

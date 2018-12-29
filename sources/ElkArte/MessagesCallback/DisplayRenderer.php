@@ -17,9 +17,6 @@
 
 namespace ElkArte\MessagesCallback;
 
-use \ElkArte\MessagesCallback\BodyParser\BodyParserInterface;
-use \ElkArte\ValuesContainer;
-
 /**
  * DisplayRenderer
  * The class prepares the details of a message so that they can be used

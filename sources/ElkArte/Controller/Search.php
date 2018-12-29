@@ -49,7 +49,7 @@ class Search extends \ElkArte\AbstractController
 	 */
 	public function pre_dispatch()
 	{
-		global $modSettings, $scripturl;
+		global $modSettings;
 
 		// Coming from quick search box and going to some custom place?
 		if (isset($_REQUEST['search_selection']) && !empty($modSettings['additional_search_engines']))

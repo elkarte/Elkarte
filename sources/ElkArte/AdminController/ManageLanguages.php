@@ -617,7 +617,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 	 */
 	public function action_editlang()
 	{
-		global $settings, $context, $txt, $modSettings, $language;
+		global $settings, $context, $txt;
 
 		require_once(SUBSDIR . '/Language.subs.php');
 		theme()->getTemplates()->loadLanguageFile('ManageSettings');

@@ -41,7 +41,7 @@ class Admin extends \ElkArte\Modules\AbstractModule
 	 */
 	public function addMenu(&$admin_areas)
 	{
-		global $txt, $context;
+		global $txt;
 
 		$admin_areas['layout']['areas']['managedrafts'] = array(
 			'label' => $txt['manage_drafts'],

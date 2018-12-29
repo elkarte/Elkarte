@@ -16,7 +16,6 @@
 
 namespace ElkArte\ScheduledTasks\Tasks;
 
-use \FilesystemIterator;
 use \UnexpectedValueException;
 
 /**

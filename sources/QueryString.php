@@ -265,7 +265,7 @@ function JavaScriptEscape($string)
  */
 function ob_sessrewrite($buffer)
 {
-	global $scripturl, $modSettings;
+	global $scripturl;
 
 	// If $scripturl is set to nothing, or the SID is not defined (SSI?) just quit.
 	if ($scripturl == '' || !defined('SID'))

@@ -1768,7 +1768,9 @@ function getServerStoredAvatars($directory, $level)
  * @param int $id_attach
  * @param int $id_msg
  * @param int $old_id_thumb = 0
+ * @param string $real_filename
  * @return array The updated information
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb = 0, $real_filename = '')
 {

@@ -97,7 +97,6 @@ class ParseQuery extends AbstractParseQuery
 	 */
 	protected function process($query)
 	{
-		$match = [];
 		$parts = explode('/', $query);
 		$split_query = explode('?', $parts[isset($parts[2]) ? 2 : 1]);
 

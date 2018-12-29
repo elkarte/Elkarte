@@ -13,7 +13,6 @@
 
 namespace ElkArte\Cache\CacheMethod;
 
-use \FilesystemIterator;
 use UnexpectedValueException;
 
 /**

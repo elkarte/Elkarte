@@ -400,8 +400,6 @@ class Errors extends \ElkArte\AbstractModel
 	 */
 	public function display_minimal_error($message)
 	{
-		global $maintenance, $mtitle, $mmessage;
-
 		if (!headers_sent())
 		{
 			$this->_set_fatal_error_headers();

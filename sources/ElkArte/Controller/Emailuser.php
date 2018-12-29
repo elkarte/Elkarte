@@ -207,7 +207,7 @@ class Emailuser extends \ElkArte\AbstractController
 	 */
 	private function _sendTopic($row)
 	{
-		global $topic, $txt;
+		global $txt;
 
 		// This is needed for sendmail().
 		require_once(SUBSDIR . '/Mail.subs.php');

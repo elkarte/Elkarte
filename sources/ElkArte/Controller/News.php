@@ -688,7 +688,7 @@ class News extends \ElkArte\AbstractController
  */
 function fix_possible_url($val)
 {
-	global $modSettings, $scripturl;
+	global $scripturl;
 
 	if (substr($val, 0, strlen($scripturl)) != $scripturl)
 		return $val;

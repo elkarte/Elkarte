@@ -13,8 +13,6 @@
 
 namespace ElkArte\Controller;
 
-use ElkArte\Controller\Post;
-
 /**
  * Draft controller.
  * This class handles requests that allow for the saving,

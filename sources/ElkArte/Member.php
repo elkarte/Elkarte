@@ -98,8 +98,6 @@ class Member extends ValuesContainer
 	 */
 	public function loadContext($display_custom_fields = false)
 	{
-		global $user_info;
-
 		if ($this->loaded === true)
 		{
 			return true;
