@@ -26,6 +26,7 @@ abstract class AbstractManipulator
 	protected $_image = null;
 	protected $_width = 0;
 	protected $_height = 0;
+	protected $_orientation = 0;
 
 	abstract public function __construct($fileName);
 
@@ -38,7 +39,9 @@ abstract class AbstractManipulator
 	abstract public function generateTextImage($text, $width = 100, $height = 100, $format = 'png');
 
 	abstract function createImageFromFile();
+
 	abstract function createImageFromWeb();
+
 	abstract function output($preferred_format, $file_name = null, $quality = 85);
 
 	public function copyFrom(Image $source)
@@ -68,7 +71,7 @@ abstract class AbstractManipulator
 			fclose($fp_destination);
 		}
 
-		$this->_sizes = $this->getSize();
+		$this->getSize();
 		return $this->_sizes;
 	}
 
@@ -77,8 +80,6 @@ abstract class AbstractManipulator
 	 *
 	 * @param string $type
 	 * @param string|boolean $error return array or false on error
-	 *
-	 * @return array|boolean
 	 */
 	public function getSize($type = 'file', $error = 'array')
 	{
@@ -111,6 +112,8 @@ abstract class AbstractManipulator
 			}
 		}
 	}
+
+	abstract function getOrientation();
 
 	/**
 	 * See if we have enough memory to thumbnail an image
@@ -145,5 +148,4 @@ abstract class AbstractManipulator
 
 		return $success;
 	}
-
 }

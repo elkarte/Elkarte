@@ -20,7 +20,19 @@
 
 namespace ElkArte\Graphics;
 
-
+/**
+ * Class Image
+ *
+ * Base class for image function and interaction with the various engines (GD/IMagick)
+ *
+ * $image = new Image('', true);
+ * $image->loadImage(filename or web address);
+ * $image->resizeImageFile();
+ * $image->output();
+ *
+ *
+ * @package ElkArte\Graphics
+ */
 class Image
 {
 	const DEFAULT_FORMATS = [
@@ -30,9 +42,12 @@ class Image
 		IMAGETYPE_BMP => 'bmp',
 		IMAGETYPE_WBMP => 'wbmp'
 	];
+
 	/** @var \ElkArte\Graphics\Imagick|\ElkArte\Graphics\Gd2  */
 	protected $_manipulator;
+
 	protected $_fileName = '';
+
 	protected $_force_gd = false;
 
 	public function __construct($fileName = '', $force_gd = false)
@@ -46,6 +61,12 @@ class Image
 		}
 		catch (\Exception $e)
 		{
+			return false;
+		}
+
+		if (!empty($this->_fileName))
+		{
+			$this->loadImage($this->_fileName);
 		}
 	}
 
@@ -80,6 +101,11 @@ class Image
 		}
 	}
 
+	public function saveImage($file_name = null, $preferred_format = null, $quality = 85)
+	{
+		$this->_manipulator->output($file_name, $preferred_format, $quality);
+	}
+
 	public function getFileName()
 	{
 		return $this->_fileName;
@@ -104,7 +130,6 @@ class Image
 	 * - The file would have the format preferred_format if possible,
 	 * otherwise the default format is jpeg.
 	 *
-	 * @param string $source The name of the source image
 	 * @param int $max_width The maximum allowed width
 	 * @param int $max_height The maximum allowed height
 	 * @param int $preferred_format Used by Imagick/resizeImage
@@ -113,20 +138,13 @@ class Image
 	 *
 	 * @return boolean Whether the thumbnail creation was successful.
 	 */
-	public function resizeImageFile($source, $max_width, $max_height, $preferred_format = 0, $strip = false, $force_resize = true)
+	public function resizeImage($max_width, $max_height, $preferred_format = 0, $strip = false, $force_resize = true)
 	{
-		// Nothing to do without GD or IM
-		if ($this->_manipulator === null)
+		// Nothing to do without GD or IM or an Image
+		if ($this->_manipulator === null || empty($this->_image))
 		{
 			return false;
 		}
-
-		if (!file_exists($this->_fileName) && $sourceImage->isWebAddress() == false)
-		{
-			return false;
-		}
-
-		$this->_manipulator->copyFrom($sourceImage);
 
 		try
 		{
@@ -138,15 +156,27 @@ class Image
 		}
 	}
 
+	public function getOrientation()
+	{
+		return $this->_manipulator->getOrientation();
+	}
+
 	/**
 	 * Calls GD or ImageMagick functions to correct an images orientation
 	 * based on the EXIF orientation flag
 	 *
-	 * @param string $image_name
+	 * @throws \Exception
 	 */
 	public function autoRotateImage()
 	{
-		$this->_manipulator->autoRotateImage();
+		try
+		{
+			$this->_manipulator->autoRotateImage();
+		}
+		catch (\Exception $e)
+		{
+			// Nice try
+		}
 	}
 
 	/**

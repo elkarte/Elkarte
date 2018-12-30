@@ -26,7 +26,7 @@ class Gd2 extends AbstractManipulator
 	}
 
 	/**
-	 * Used to determine if GD2 whether the GD2 library is present.
+	 * Used to determine if the GD2 library is present.
 	 *
 	 * @return bool Whether or not GD is available.
 	 */
@@ -59,7 +59,7 @@ class Gd2 extends AbstractManipulator
 	{
 		$this->getSize();
 
-		if (isset(Image::DEFAULT_FORMATS[$this->_sizes[2]))
+		if (isset(Image::DEFAULT_FORMATS[$this->_sizes[2]]))
 		{
 			try
 			{
@@ -86,8 +86,7 @@ class Gd2 extends AbstractManipulator
 		$this->_image = fetch_web_data($this->_fileName);
 
 		$this->getSize('string');
-
-		if (isset(Image::DEFAULT_FORMATS[$this->_sizes[2]))
+		if (isset(Image::DEFAULT_FORMATS[$this->_sizes[2]]))
 		{
 			try
 			{
@@ -211,27 +210,38 @@ class Gd2 extends AbstractManipulator
 		$this->_setImage($dst_img);
 	}
 
-	public function output($preferred_format, $file_name = null, $quality = 85)
+	public function output($file_name = null, $preferred_format = null , $quality = 85)
 	{
 		// Save the image as ...
 		$success = false;
-		if (!empty($preferred_format) && ($preferred_format == IMAGETYPE_PNG) && function_exists('imagepng'))
+		if (!empty($preferred_format))
 		{
-			$success = imagepng($this->_image, $file_name);
-		}
-		elseif (!empty($preferred_format) && ($preferred_format == IMAGETYPE_GIF) && function_exists('imagegif'))
-		{
-			$success = imagegif($this->_image, $file_name);
+			if ($preferred_format == IMAGETYPE_PNG && function_exists('imagepng'))
+			{
+				$success = imagepng($this->_image, $file_name);
+			}
+			elseif ($preferred_format == IMAGETYPE_GIF && function_exists('imagegif'))
+			{
+				$success = imagegif($this->_image, $file_name);
+			}
 		}
 		elseif (function_exists('imagejpeg'))
 		{
 			$success = imagejpeg($this->_image, $file_name, $quality);
 		}
 
-		// Free the memory.
-		imagedestroy($this->_image);
-
 		return $success;
+	}
+
+	public function getOrientation()
+	{
+		// Read the EXIF data
+		$exif = function_exists('exif_read_data') ? @exif_read_data($this->_fileName) : array();
+
+		$this->_orientation = isset($exif['Orientation']) ? $exif['Orientation'] : 0;
+
+		// We're only interested in the exif orientation
+		return $this->_orientation;
 	}
 
 	/**
@@ -239,33 +249,30 @@ class Gd2 extends AbstractManipulator
 	 *
 	 * What it does:
 	 *
-	 * - GD only
 	 * - Checks exif data for orientation flag and rotates image so its proper
-	 * - Does not update orientation flag as GD removes EXIF data
+	 * - Does not update the orientation flag as GD also removes EXIF data
 	 * - Only works with jpeg images, could add TIFF as well
-	 * - Writes the update image back to $image_name
+	 * - Writes the updated image back to $image_name
 	 *
 	 * @return bool
+	 * @throws \Exception
 	 */
 	function autoRotateImage()
 	{
-		// Read the EXIF data
-		$exif = function_exists('exif_read_data') ? @exif_read_data($this->_fileName) : array();
-
-		// We're only interested in the exif orientation
-		$orientation = isset($exif['Orientation']) ? $exif['Orientation'] : 0;
+		if (!isset($this->_orientation))
+			$this->getOrientation();
 
 		// For now we only process jpeg images, so check that we have one
-		$sizes = $this->getSize();
+		$this->getSize();
 
 		// Not a jpeg or not rotated, done!
-		if ($sizes[2] !== 2 || $orientation === 0 || $this->memoryCheck() === false)
+		if ($this->_sizes[2] !== 2 || $this->_orientation === 0 || $this->memoryCheck() === false)
 		{
 			return false;
 		}
 
 		// Time to spin and mirror as needed
-		switch ($orientation)
+		switch ($this->_orientation)
 		{
 			// 0 & 1 Not set or Normal
 			case 0:
@@ -302,10 +309,6 @@ class Gd2 extends AbstractManipulator
 				$this->rotateImage(90);
 				break;
 		}
-
-		// Save the updated image, free resources
-		imagejpeg($source, $image_name);
-		imagedestroy($source);
 
 		return true;
 	}
@@ -409,196 +412,5 @@ class Gd2 extends AbstractManipulator
 		ob_end_clean();
 
 		return $result ? $image : false;
-	}
-}
-
-if (!function_exists('imagecreatefrombmp'))
-{
-	/**
-	 * It is set only if it doesn't already exist (for forwards compatibility.)
-	 *
-	 * What it does:
-	 *
-	 * - It only supports uncompressed bitmaps.
-	 * - It only supports standard windows bitmaps (no os/2 variants)
-	 * - Returns an image identifier representing the bitmap image
-	 * obtained from the given filename.
-	 *
-	 * @param string $filename The name of the file
-	 * @return resource An image identifier representing the bitmap image
-	 */
-	function imagecreatefrombmp($filename)
-	{
-		$fp = fopen($filename, 'rb');
-
-		$errors = error_reporting(0);
-
-		// Unpack the general information about the Bitmap Image File, first 14 Bytes
-		$header = unpack('vtype/Vsize/Vreserved/Voffset', fread($fp, 14));
-
-		// Unpack the DIB header, it stores detailed information about the bitmap image the pixel format, 40 Bytes long
-		$info = unpack('Vsize/Vwidth/Vheight/vplanes/vbits/Vcompression/Vimagesize/Vxres/Vyres/Vncolor/Vcolorimportant', fread($fp, 40));
-
-		// Not a standard bitmap, bail out
-		if ($header['type'] != 0x4D42)
-			return false;
-
-		// Create our image canvas with the given WxH
-		if (Gd2::canUse(true))
-			$dst_img = imagecreatetruecolor($info['width'], $info['height']);
-		else
-			$dst_img = imagecreate($info['width'], $info['height']);
-
-		// Color bitCounts 1,4,8 have palette information we use
-		$palette = array();
-		if ($info['bits'] == 1 || $info['bits'] == 4 || $info['bits'] == 8)
-		{
-			$palette_size = $header['offset'] - 54;
-
-			// Read the palette data
-			$palettedata = fread($fp, $palette_size);
-
-			// Create the rgb color array
-			$n = 0;
-			for ($j = 0; $j < $palette_size; $j++)
-			{
-				$b = ord($palettedata[$j++]);
-				$g = ord($palettedata[$j++]);
-				$r = ord($palettedata[$j++]);
-
-				$palette[$n++] = imagecolorallocate($dst_img, $r, $g, $b);
-			}
-		}
-
-		$scan_line_size = ($info['bits'] * $info['width'] + 7) >> 3;
-		$scan_line_align = $scan_line_size & 3 ? 4 - ($scan_line_size & 3) : 0;
-
-		for ($y = 0, $l = $info['height'] - 1; $y < $info['height']; $y++, $l--)
-		{
-			fseek($fp, $header['offset'] + ($scan_line_size + $scan_line_align) * $l);
-			$scan_line = fread($fp, $scan_line_size);
-
-			if (strlen($scan_line) < $scan_line_size)
-				continue;
-
-			// 32 bits per pixel
-			if ($info['bits'] == 32)
-			{
-				$x = 0;
-				for ($j = 0; $j < $scan_line_size; $x++)
-				{
-					$b = ord($scan_line[$j++]);
-					$g = ord($scan_line[$j++]);
-					$r = ord($scan_line[$j++]);
-					$j++;
-
-					$color = imagecolorexact($dst_img, $r, $g, $b);
-					if ($color == -1)
-					{
-						$color = imagecolorallocate($dst_img, $r, $g, $b);
-
-						// Gah!  Out of colors?  Stupid GD 1... try anyhow.
-						if ($color == -1)
-							$color = imagecolorclosest($dst_img, $r, $g, $b);
-					}
-
-					imagesetpixel($dst_img, $x, $y, $color);
-				}
-			}
-			// 24 bits per pixel
-			elseif ($info['bits'] == 24)
-			{
-				$x = 0;
-				for ($j = 0; $j < $scan_line_size; $x++)
-				{
-					$b = ord($scan_line[$j++]);
-					$g = ord($scan_line[$j++]);
-					$r = ord($scan_line[$j++]);
-
-					$color = imagecolorexact($dst_img, $r, $g, $b);
-					if ($color == -1)
-					{
-						$color = imagecolorallocate($dst_img, $r, $g, $b);
-
-						// Gah!  Out of colors?  Stupid GD 1... try anyhow.
-						if ($color == -1)
-							$color = imagecolorclosest($dst_img, $r, $g, $b);
-					}
-
-					imagesetpixel($dst_img, $x, $y, $color);
-				}
-			}
-			// 16 bits per pixel
-			elseif ($info['bits'] == 16)
-			{
-				$x = 0;
-				for ($j = 0; $j < $scan_line_size; $x++)
-				{
-					$b1 = ord($scan_line[$j++]);
-					$b2 = ord($scan_line[$j++]);
-
-					$word = $b2 * 256 + $b1;
-
-					$b = (($word & 31) * 255) / 31;
-					$g = ((($word >> 5) & 31) * 255) / 31;
-					$r = ((($word >> 10) & 31) * 255) / 31;
-
-					// Scale the image colors up properly.
-					$color = imagecolorexact($dst_img, $r, $g, $b);
-					if ($color == -1)
-					{
-						$color = imagecolorallocate($dst_img, $r, $g, $b);
-
-						// Gah!  Out of colors?  Stupid GD 1... try anyhow.
-						if ($color == -1)
-							$color = imagecolorclosest($dst_img, $r, $g, $b);
-					}
-
-					imagesetpixel($dst_img, $x, $y, $color);
-				}
-			}
-			// 8 bits per pixel
-			elseif ($info['bits'] == 8)
-			{
-				$x = 0;
-				for ($j = 0; $j < $scan_line_size; $x++)
-					imagesetpixel($dst_img, $x, $y, $palette[ord($scan_line[$j++])]);
-			}
-			// 4 bits per pixel
-			elseif ($info['bits'] == 4)
-			{
-				$x = 0;
-				for ($j = 0; $j < $scan_line_size; $x++)
-				{
-					$byte = ord($scan_line[$j++]);
-
-					imagesetpixel($dst_img, $x, $y, $palette[(int) ($byte / 16)]);
-					if (++$x < $info['width'])
-						imagesetpixel($dst_img, $x, $y, $palette[$byte & 15]);
-				}
-			}
-			// 1 bit
-			elseif ($info['bits'] == 1)
-			{
-				$x = 0;
-				for ($j = 0; $j < $scan_line_size; $x++)
-				{
-					$byte = ord($scan_line[$j++]);
-
-					imagesetpixel($dst_img, $x, $y, $palette[(($byte) & 128) != 0]);
-					for ($shift = 1; $shift < 8; $shift++)
-					{
-						if (++$x < $info['width'])
-							imagesetpixel($dst_img, $x, $y, $palette[(($byte << $shift) & 128) != 0]);
-					}
-				}
-			}
-		}
-
-		fclose($fp);
-
-		error_reporting($errors);
-
-		return $dst_img;
 	}
 }

@@ -19,7 +19,7 @@ namespace ElkArte\Graphics;
 
 class Imagick extends AbstractManipulator
 {
-	public function __construct($fileNname)
+	public function __construct($fileName)
 	{
 		$this->_fileName = $fileName;
 		$this->_image = new \Imagick($fileName);
@@ -32,7 +32,7 @@ class Imagick extends AbstractManipulator
 	 */
 	public static function canUse()
 	{
-		return class_exists('\\Imagick', false);
+		return class_exists('\Imagick', false);
 	}
 
 	/**
@@ -108,13 +108,13 @@ class Imagick extends AbstractManipulator
 		if (Image::DEFAULT_FORMATS[$preferred_format] === 'jpeg')
 		{
 			$this->_image->borderImage('white', 0, 0);
-			$this->_image->setImageCompression(Imagick::COMPRESSION_JPEG);
+			$this->_image->setImageCompression(\Imagick::COMPRESSION_JPEG);
 			$this->_image->setImageCompressionQuality(80);
 		}
 
 		// Create a new image in our preferred format and resize it if needed
 		$this->_image->setImageFormat(Image::DEFAULT_FORMATS[$preferred_format]);
-		$this->_image->resizeImage($dest_width, $dest_height, Imagick::FILTER_LANCZOS, 1, true);
+		$this->_image->resizeImage($dest_width, $dest_height, \Imagick::FILTER_LANCZOS, 1, true);
 
 		// Remove EXIF / ICC data?
 		if ($strip)
@@ -131,6 +131,13 @@ class Imagick extends AbstractManipulator
 		return !empty($success);
 	}
 
+	public function getOrientation()
+	{
+		$this->_orientation = $this->_image->getImageOrientation();
+
+		return $this->_orientation;
+	}
+
 	/**
 	 * Autorotate an image based on its EXIF Orientation tag.
 	 *
@@ -145,65 +152,58 @@ class Imagick extends AbstractManipulator
 	 */
 	function autoRotateImage()
 	{
+		// Get or use the $starting_orientation
+		if (!isset($this->_orientation))
+			$this->getOrientation();
+
 		try
 		{
-			// This method should exist if Imagick has been compiled against ImageMagick version
-			// 6.3.0 or higher which is forever ago, but we check anyway ;)
-			if (!method_exists($this->_image, 'getImageOrientation'))
-			{
-				return false;
-			}
-
-			$orientation = $this->_image->getImageOrientation();
-			switch ($orientation)
+			switch ($this->_orientation)
 			{
 				// 0 & 1 Not set or Normal
-				case Imagick::ORIENTATION_UNDEFINED:
-				case Imagick::ORIENTATION_TOPLEFT:
+				case \Imagick::ORIENTATION_UNDEFINED:
+				case \Imagick::ORIENTATION_TOPLEFT:
 					break;
 				// 2 Mirror image, Normal orientation
-				case Imagick::ORIENTATION_TOPRIGHT:
+				case \Imagick::ORIENTATION_TOPRIGHT:
 					$this->_image->flopImage();
 					break;
 				// 3 Normal image, rotated 180
-				case Imagick::ORIENTATION_BOTTOMRIGHT:
+				case \Imagick::ORIENTATION_BOTTOMRIGHT:
 					$this->_image->rotateImage('#000', 180);
 					break;
 				// 4 Mirror image, rotated 180
-				case Imagick::ORIENTATION_BOTTOMLEFT:
+				case \Imagick::ORIENTATION_BOTTOMLEFT:
 					$this->_image->flipImage();
 					break;
 				// 5 Mirror image, rotated 90 CCW
-				case Imagick::ORIENTATION_LEFTTOP:
+				case \Imagick::ORIENTATION_LEFTTOP:
 					$this->_image->rotateImage('#000', 90);
 					$this->_image->flopImage();
 					break;
 				// 6 Normal image, rotated 90 CCW
-				case Imagick::ORIENTATION_RIGHTTOP:
+				case \Imagick::ORIENTATION_RIGHTTOP:
 					$this->_image->rotateImage('#000', 90);
 					break;
 				// 7 Mirror image, rotated 90 CW
-				case Imagick::ORIENTATION_RIGHTBOTTOM:
+				case \Imagick::ORIENTATION_RIGHTBOTTOM:
 					$this->_image->rotateImage('#000', -90);
 					$this->_image->flopImage();
 					break;
 				// 8 Normal image, rotated 90 CW
-				case Imagick::ORIENTATION_LEFTBOTTOM:
+				case \Imagick::ORIENTATION_LEFTBOTTOM:
 					$this->_image->rotateImage('#000', -90);
 					break;
 			}
 
 			// Now that it's auto-rotated, make sure the EXIF data is correctly updated
-			if ($orientation >= 2)
+			if ($this->_orientation >= 2)
 			{
-				$this->_image->setImageOrientation(Imagick::ORIENTATION_TOPLEFT);
+				$this->_image->setImageOrientation(\Imagick::ORIENTATION_TOPLEFT);
 			}
 
 			// Save the new image in the destination location
-			$success = $this->_image->writeImage($this->_fileName);
-
-			// Free resources associated with the Imagick object
-			$this->_image->clear();
+			$success = true;
 		}
 		catch (\Exception $e)
 		{
@@ -230,17 +230,17 @@ class Imagick extends AbstractManipulator
 
 		try
 		{
-			$this->_image->newImage($width, $height, new ImagickPixel('white'));
+			$this->_image->newImage($width, $height, new \ImagickPixel('white'));
 			$this->_image->setImageFormat($format);
 
 			// 28pt is ~2em given default font stack
 			$font_size = 28;
 
-			$draw = new ImagickDraw();
-			$draw->setStrokeColor(new ImagickPixel('#000000'));
-			$draw->setFillColor(new ImagickPixel('#000000'));
+			$draw = new \ImagickDraw();
+			$draw->setStrokeColor(new \ImagickPixel('#000000'));
+			$draw->setFillColor(new \ImagickPixel('#000000'));
 			$draw->setStrokeWidth(0);
-			$draw->setTextAlignment(Imagick::ALIGN_CENTER);
+			$draw->setTextAlignment(\Imagick::ALIGN_CENTER);
 			$draw->setFont($settings['default_theme_dir'] . '/fonts/VDS_New.ttf');
 
 			// Make sure the text will fit the the allowed space
