@@ -33,6 +33,11 @@ class Gd2 extends AbstractManipulator
 		}
 	}
 
+	public function setSource($source)
+	{
+		$this->_fileName = $source;
+	}
+
 	/**
 	 * Used to determine if the GD2 library is present.
 	 *
@@ -49,25 +54,6 @@ class Gd2 extends AbstractManipulator
 		return true;
 	}
 
-	/**
-	 * Sets the internal GD image resource.
-	 *
-	 * @param resource $image
-	 */
-	protected function _setImage($image)
-	{
-		$this->_image = $image;
-
-		// Get the image size via GD functions
-		$this->_width = imagesx($image);
-		$this->_height = imagesy($image);
-	}
-
-	public function setSource($source)
-	{
-		$this->_fileName = $source;
-	}
-
 	public function createImageFromFile()
 	{
 		$this->getSize();
@@ -77,7 +63,6 @@ class Gd2 extends AbstractManipulator
 			try
 			{
 				$imagecreatefrom = 'imagecreatefrom' . Image::DEFAULT_FORMATS[$this->_sizes[2]];
-
 				$this->_image = $imagecreatefrom($this->_fileName);
 			}
 			catch (\Exception $e)
@@ -107,47 +92,15 @@ class Gd2 extends AbstractManipulator
 			}
 			catch (\Exception $e)
 			{
-				unset($this->_image);
-
 				return false;
 			}
 		}
 		else
 		{
-			unset($this->_image);
-
 			return false;
 		}
 
 		return true;
-	}
-
-	/**
-	 * Resize an image.
-	 *
-	 * What it does:
-	 *
-	 * - Puts the resized image at the destination location.
-	 * - The file would have the format preferred_format if possible,
-	 * otherwise the default format is jpeg.
-	 *
-	 * @param int $max_width The maximum allowed width
-	 * @param int $max_height The maximum allowed height
-	 * @param int $preferred_format Used by Imagick/resizeImage
-	 * @param bool $strip Allow IM to remove exif data as GD always will
-	 * @param bool $force_resize Always resize the image (force scale up)
-	 *
-	 * @return boolean Whether the thumbnail creation was successful.
-	 * @throws \Exception
-	 */
-	public function resizeImageFile($max_width, $max_height, $preferred_format = 0, $strip = false, $force_resize = true)
-	{
-		if (!empty($this->_image))
-		{
-			return $this->resizeImage($max_width, $max_height, $force_resize, $preferred_format, $strip);
-		}
-
-		return false;
 	}
 
 	/**
@@ -162,19 +115,18 @@ class Gd2 extends AbstractManipulator
 	 * @param int $max_width The maximum allowed width
 	 * @param int $max_height The maximum allowed height
 	 * @param bool $force_resize = false Whether to override defaults and resize it
-	 * @param int $preferred_format - The preferred format
-	 *   - 0 to use jpeg
-	 *   - 1 for gif
-	 *   - 2 to force jpeg
-	 *   - 3 for png
-	 *   - 6 for bmp
-	 *   - 15 for wbmp
-	 * @param bool $strip Whether to have IM strip EXIF data as GD will
 	 *
 	 * @return bool Whether resize was successful.
 	 */
-	protected function resizeImage($max_width, $max_height, $force_resize = false, $preferred_format = 0, $strip = false)
+	public function resizeImage($max_width, $max_height, $force_resize = false)
 	{
+		$success = false;
+
+		if (empty($this->_image))
+		{
+			return $success;
+		}
+
 		$src_width = $this->_width;
 		$src_height = $this->_height;
 
@@ -202,18 +154,16 @@ class Gd2 extends AbstractManipulator
 			// Don't bother resizing if it's already smaller...
 			if (!empty($dst_width) && !empty($dst_height) && ($dst_width < $src_width || $dst_height < $src_height || $force_resize))
 			{
-				// Make a true color image, because it just looks better for resizing.
 				$dst_img = imagecreatetruecolor($dst_width, $dst_height);
-				imagesavealpha($dst_img, true);
-				$color = imagecolorallocatealpha($dst_img, 255, 255, 255, 127);
-				imagefill($dst_img, 0, 0, $color);
+				$this->_createCanvas($dst_img);
 
 				// Resize it!
-				imagecopyresampled($dst_img, $this->_image, 0, 0, 0, 0, $dst_width, $dst_height, $src_width, $src_height);
+				$success = imagecopyresampled($dst_img, $this->_image, 0, 0, 0, 0, $dst_width, $dst_height, $src_width, $src_height);
 			}
 			else
 			{
 				$dst_img = $this->_image;
+				$success = true;
 			}
 		}
 		else
@@ -221,13 +171,37 @@ class Gd2 extends AbstractManipulator
 			$dst_img = $this->_image;
 		}
 
-		// Update things to the converted image
+		// Update to the converted image
 		$this->_setImage($dst_img);
+
+		return $success;
+	}
+
+	protected function _createCanvas($dst_img)
+	{
+		// Make a true color image, because it just looks better for resizing.
+		imagesavealpha($dst_img, true);
+		$color = imagecolorallocatealpha($dst_img, 255, 255, 255, 127);
+		imagefill($dst_img, 0, 0, $color);
+	}
+
+	/**
+	 * Sets the internal GD image resource.
+	 *
+	 * @param resource $image
+	 */
+	protected function _setImage($image)
+	{
+		$this->_image = $image;
+
+		// Get the image size via GD functions
+		$this->_width = imagesx($image);
+		$this->_height = imagesy($image);
 	}
 
 	public function output($file_name, $preferred_format = null, $quality = 85)
 	{
-		if (empty($file_name))
+		if (empty($file_name) || !isset(Image::DEFAULT_FORMATS[$preferred_format]))
 		{
 			// Dump to browser instead ??
 			return false;
@@ -235,34 +209,42 @@ class Gd2 extends AbstractManipulator
 
 		// Save the image as ...
 		$success = false;
-		if (!empty($preferred_format))
+		switch ($preferred_format)
 		{
-			if ($preferred_format == IMAGETYPE_PNG && function_exists('imagepng'))
-			{
-				$success = imagepng($this->_image, $file_name);
-			}
-			elseif ($preferred_format == IMAGETYPE_GIF && function_exists('imagegif'))
-			{
-				$success = imagegif($this->_image, $file_name);
-			}
-		}
-		elseif (function_exists('imagejpeg'))
-		{
-			$success = imagejpeg($this->_image, $file_name, $quality);
+			case IMAGETYPE_PNG:
+				if (function_exists('imagepng'))
+				{
+					imagealphablending($this->_image, false);
+					imagesavealpha($this->_image, true);
+					$success = imagepng($this->_image, $file_name, 9, PNG_ALL_FILTERS);
+				}
+				break;
+			case IMAGETYPE_GIF:
+				if (function_exists('imagegif'))
+				{
+					$success = imagegif($this->_image, $file_name);
+				}
+				break;
+			case IMAGETYPE_WBMP:
+				if (function_exists('imagewbmp'))
+				{
+					$success = imagewbmp($this->_image, $file_name);
+				}
+				break;
+			case IMAGETYPE_BMP:
+				if (function_exists('imagebmp'))
+				{
+					$success = imagebmp($this->_image, $file_name);
+				}
+				break;
+			default:
+				if (function_exists('imagejpeg'))
+				{
+					$success = imagejpeg($this->_image, $file_name, $quality);
+				}
 		}
 
 		return $success;
-	}
-
-	public function getOrientation()
-	{
-		// Read the EXIF data
-		$exif = function_exists('exif_read_data') ? @exif_read_data($this->_fileName) : array();
-
-		$this->_orientation = isset($exif['Orientation']) ? $exif['Orientation'] : 0;
-
-		// We're only interested in the exif orientation
-		return $this->_orientation;
 	}
 
 	/**
@@ -278,7 +260,7 @@ class Gd2 extends AbstractManipulator
 	 * @return bool
 	 * @throws \Exception
 	 */
-	function autoRotateImage()
+	public function autoRotateImage()
 	{
 		if (!isset($this->_orientation))
 		{
@@ -336,23 +318,15 @@ class Gd2 extends AbstractManipulator
 		return true;
 	}
 
-	/**
-	 * Rotate an image by X degrees, GD function
-	 *
-	 * @param int $degrees
-	 */
-	protected function rotateImage($degrees)
+	public function getOrientation()
 	{
-		// Kind of need this to do anything
-		if (function_exists('imagerotate'))
-		{
-			// Use positive degrees so GD does not get confused
-			$degrees -= floor($degrees / 360) * 360;
+		// Read the EXIF data
+		$exif = function_exists('exif_read_data') ? @exif_read_data($this->_fileName) : array();
 
-			// Rotate away
-			$background = imagecolorallocatealpha($this->_image, 255, 255, 255, 127);
-			$this->_image = imagerotate($this->_image, $degrees, $background);
-		}
+		$this->_orientation = isset($exif['Orientation']) ? $exif['Orientation'] : 0;
+
+		// We're only interested in the exif orientation
+		return $this->_orientation;
 	}
 
 	/**
@@ -371,6 +345,25 @@ class Gd2 extends AbstractManipulator
 	protected function flipImage($axis = 'vertical')
 	{
 		imageflip($this->_image, $axis === 'vertical' ? IMG_FLIP_VERTICAL : IMG_FLIP_HORIZONTAL);
+	}
+
+	/**
+	 * Rotate an image by X degrees, GD function
+	 *
+	 * @param int $degrees
+	 */
+	protected function rotateImage($degrees)
+	{
+		// Kind of need this to do anything
+		if (function_exists('imagerotate'))
+		{
+			// Use positive degrees so GD does not get confused
+			$degrees -= floor($degrees / 360) * 360;
+
+			// Rotate away
+			$background = imagecolorallocatealpha($this->_image, 255, 255, 255, 127);
+			$this->_image = imagerotate($this->_image, $degrees, $background);
+		}
 	}
 
 	/**

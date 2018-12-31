@@ -32,7 +32,7 @@ abstract class AbstractManipulator
 
 	abstract public static function canUse();
 
-	abstract public function resizeImageFile($max_width, $max_height, $preferred_format = 0, $strip = false, $force_resize = true);
+	abstract public function resizeImage($max_width, $max_height, $preferred_format = 0, $strip = false, $force_resize = true);
 
 	abstract public function autoRotateImage();
 
@@ -72,6 +72,7 @@ abstract class AbstractManipulator
 		}
 
 		$this->getSize();
+
 		return $this->_sizes;
 	}
 

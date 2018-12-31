@@ -104,12 +104,12 @@ class Imagick extends AbstractManipulator
 		$dest_width = empty($max_width) ? $src_width : ($force_resize ? $max_width : min($max_width, $src_width));
 		$dest_height = empty($max_height) ? $src_height : ($force_resize ? $max_height : min($max_height, $src_height));
 
-		// Set jpeg image quality to 80
+		// Set jpeg image quality to 85
 		if (Image::DEFAULT_FORMATS[$preferred_format] === 'jpeg')
 		{
 			$this->_image->borderImage('white', 0, 0);
 			$this->_image->setImageCompression(\Imagick::COMPRESSION_JPEG);
-			$this->_image->setImageCompressionQuality(80);
+			$this->_image->setImageCompressionQuality(85);
 		}
 
 		// Create a new image in our preferred format and resize it if needed

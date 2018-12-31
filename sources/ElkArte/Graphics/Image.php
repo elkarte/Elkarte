@@ -101,6 +101,17 @@ class Image
 		}
 	}
 
+	public function setSource($source)
+	{
+		$this->_fileName = $source;
+		$this->_manipulator->setSource($source);
+	}
+
+	public function isWebAddress($source)
+	{
+		return substr($source, 0, 7) === 'http://' || substr($this->_fileName, 0, 8) === 'https://';
+	}
+
 	public function saveImage($file_name = null, $preferred_format = null, $quality = 85)
 	{
 		if ($this->_manipulator->output($file_name, $preferred_format, $quality))
@@ -109,25 +120,9 @@ class Image
 		}
 	}
 
-	public function setSource($source)
-	{
-		$this->_fileName = $source;
-		$this->_manipulator->setSource($source);
-	}
-
 	public function getFileName()
 	{
 		return $this->_fileName;
-	}
-
-	public function getSize()
-	{
-		return $this->_manipulator->getSize();
-	}
-
-	public function isWebAddress($source)
-	{
-		return substr($source, 0, 7) === 'http://' || substr($this->_fileName, 0, 8) === 'https://';
 	}
 
 	/**
@@ -157,7 +152,7 @@ class Image
 
 		try
 		{
-			return $this->_manipulator->resizeImageFile($max_width, $max_height, $preferred_format, $strip, $force_resize);
+			return $this->_manipulator->resizeImage($max_width, $max_height, $preferred_format, $strip, $force_resize);
 		}
 		catch (\Exception $e)
 		{
