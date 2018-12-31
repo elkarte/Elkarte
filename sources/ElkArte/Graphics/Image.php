@@ -43,7 +43,7 @@ class Image
 		IMAGETYPE_WBMP => 'wbmp'
 	];
 
-	/** @var \ElkArte\Graphics\Imagick|\ElkArte\Graphics\Gd2  */
+	/** @var \ElkArte\Graphics\Imagick|\ElkArte\Graphics\Gd2 */
 	protected $_manipulator;
 
 	protected $_fileName = '';
@@ -57,7 +57,7 @@ class Image
 
 		try
 		{
-			$this->setManipulator($fileName, $force_gd);
+			$this->setManipulator();
 		}
 		catch (\Exception $e)
 		{
@@ -70,16 +70,16 @@ class Image
 		}
 	}
 
-	protected function setManipulator($fileName, $force_gd)
+	protected function setManipulator()
 	{
 		// Later this could become an array of "manipulators" (or not) and remove the hard-coded IM/GD requirements
-		if ($force_gd === false && Imagick::canUse())
+		if ($this->_force_gd === false && Imagick::canUse())
 		{
-			$this->_manipulator = new Imagick($fileName);
+			$this->_manipulator = new Imagick($this->_fileName);
 		}
 		elseif (Gd2::canUse())
 		{
-			$this->_manipulator = new Gd2($fileName);
+			$this->_manipulator = new Gd2($this->_fileName);
 		}
 		else
 		{
@@ -89,21 +89,30 @@ class Image
 
 	public function loadImage($source)
 	{
+		$this->setSource($source);
+
 		if ($this->isWebAddress($source))
 		{
-			$this->_fileName = $source;
 			$this->_manipulator->createImageFromWeb();
 		}
 		else
 		{
-			$this->_fileName = $source;
 			$this->_manipulator->createImageFromFile();
 		}
 	}
 
 	public function saveImage($file_name = null, $preferred_format = null, $quality = 85)
 	{
-		$this->_manipulator->output($file_name, $preferred_format, $quality);
+		if ($this->_manipulator->output($file_name, $preferred_format, $quality))
+		{
+			$this->_fileName = $file_name;
+		}
+	}
+
+	public function setSource($source)
+	{
+		$this->_fileName = $source;
+		$this->_manipulator->setSource($source);
 	}
 
 	public function getFileName()
@@ -176,6 +185,7 @@ class Image
 		catch (\Exception $e)
 		{
 			// Nice try
+			return false;
 		}
 	}
 

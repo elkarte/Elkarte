@@ -154,7 +154,9 @@ class Imagick extends AbstractManipulator
 	{
 		// Get or use the $starting_orientation
 		if (!isset($this->_orientation))
+		{
 			$this->getOrientation();
+		}
 
 		try
 		{
@@ -213,6 +215,11 @@ class Imagick extends AbstractManipulator
 		return $success;
 	}
 
+	public function setSource($source)
+	{
+		$this->_fileName = $source;
+	}
+
 	/**
 	 * Function to generate an image containing some text.
 	 * It uses Imagick, Font and size are fixed to fit within width
@@ -261,34 +268,5 @@ class Imagick extends AbstractManipulator
 		{
 			return false;
 		}
-	}
-
-	/**
-	 * Simple wrapper for getimagesize
-	 * For an ImageMacig "pure" alternative getImageGeometry and
-	 * getImageMimeType (plus some conversions) could be used
-	 *
-	 * @param string|boolean $error return array or false on error
-	 *
-	 * @return array|boolean
-	 */
-	protected function getSize($error = 'array')
-	{
-		$sizes = @getimagesize($file);
-
-		// Can't get it, what shall we return
-		if (empty($sizes))
-		{
-			if ($error === 'array')
-			{
-				$sizes = array(-1, -1, -1);
-			}
-			else
-			{
-				$sizes = false;
-			}
-		}
-
-		return $sizes;
 	}
 }

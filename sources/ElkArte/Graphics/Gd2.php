@@ -21,8 +21,16 @@ class Gd2 extends AbstractManipulator
 {
 	public function __construct($image)
 	{
-		$this->_setImage($image);
-		$this->memoryCheck();
+		$this->setSource($image);
+
+		try
+		{
+			$this->memoryCheck();
+		}
+		catch (\Exception $e)
+		{
+			return false;
+		}
 	}
 
 	/**
@@ -53,6 +61,11 @@ class Gd2 extends AbstractManipulator
 		// Get the image size via GD functions
 		$this->_width = imagesx($image);
 		$this->_height = imagesy($image);
+	}
+
+	public function setSource($source)
+	{
+		$this->_fileName = $source;
 	}
 
 	public function createImageFromFile()
@@ -95,12 +108,14 @@ class Gd2 extends AbstractManipulator
 			catch (\Exception $e)
 			{
 				unset($this->_image);
+
 				return false;
 			}
 		}
 		else
 		{
 			unset($this->_image);
+
 			return false;
 		}
 
@@ -210,8 +225,14 @@ class Gd2 extends AbstractManipulator
 		$this->_setImage($dst_img);
 	}
 
-	public function output($file_name = null, $preferred_format = null , $quality = 85)
+	public function output($file_name, $preferred_format = null, $quality = 85)
 	{
+		if (empty($file_name))
+		{
+			// Dump to browser instead ??
+			return false;
+		}
+
 		// Save the image as ...
 		$success = false;
 		if (!empty($preferred_format))
@@ -260,7 +281,9 @@ class Gd2 extends AbstractManipulator
 	function autoRotateImage()
 	{
 		if (!isset($this->_orientation))
+		{
 			$this->getOrientation();
+		}
 
 		// For now we only process jpeg images, so check that we have one
 		$this->getSize();
