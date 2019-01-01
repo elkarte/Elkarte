@@ -31,6 +31,16 @@ class Gd2 extends AbstractManipulator
 		{
 			return false;
 		}
+
+		return true;
+	}
+
+	public function __destruct()
+	{
+		if (is_object($this->_image))
+		{
+			imagedestroy($this->_image);
+		}
 	}
 
 	public function setSource($source)
@@ -58,12 +68,12 @@ class Gd2 extends AbstractManipulator
 	{
 		$this->getSize();
 
-		if (isset(Image::DEFAULT_FORMATS[$this->_sizes[2]]))
+		if (isset(Image::DEFAULT_FORMATS[$this->sizes[2]]))
 		{
 			try
 			{
-				$imagecreatefrom = 'imagecreatefrom' . Image::DEFAULT_FORMATS[$this->_sizes[2]];
-				$this->_image = $imagecreatefrom($this->_fileName);
+				$imagecreatefrom = 'imagecreatefrom' . Image::DEFAULT_FORMATS[$this->sizes[2]];
+				$image = $imagecreatefrom($this->_fileName);
 			}
 			catch (\Exception $e)
 			{
@@ -74,6 +84,8 @@ class Gd2 extends AbstractManipulator
 		{
 			return false;
 		}
+
+		$this->_setImage($image);
 
 		return true;
 	}
@@ -84,11 +96,11 @@ class Gd2 extends AbstractManipulator
 		$this->_image = fetch_web_data($this->_fileName);
 
 		$this->getSize('string');
-		if (isset(Image::DEFAULT_FORMATS[$this->_sizes[2]]))
+		if (isset(Image::DEFAULT_FORMATS[$this->sizes[2]]))
 		{
 			try
 			{
-				$this->_image = imagecreatefromstring($this->_image);
+				$image = imagecreatefromstring($this->_image);
 			}
 			catch (\Exception $e)
 			{
@@ -99,6 +111,8 @@ class Gd2 extends AbstractManipulator
 		{
 			return false;
 		}
+
+		$this->_setImage($image);
 
 		return true;
 	}
@@ -114,14 +128,16 @@ class Gd2 extends AbstractManipulator
 	 *
 	 * @param int $max_width The maximum allowed width
 	 * @param int $max_height The maximum allowed height
+	 * @param bool $strip if to remove the images Exif data (GD will always)
 	 * @param bool $force_resize = false Whether to override defaults and resize it
 	 *
 	 * @return bool Whether resize was successful.
 	 */
-	public function resizeImage($max_width, $max_height, $force_resize = false)
+	public function resizeImage($max_width, $max_height, $strip = true, $force_resize = false)
 	{
 		$success = false;
 
+		// No image, no further
 		if (empty($this->_image))
 		{
 			return $success;
@@ -171,7 +187,7 @@ class Gd2 extends AbstractManipulator
 			$dst_img = $this->_image;
 		}
 
-		// Update to the converted image
+		// Update all settings to the converted image
 		$this->_setImage($dst_img);
 
 		return $success;
@@ -199,16 +215,16 @@ class Gd2 extends AbstractManipulator
 		$this->_height = imagesy($image);
 	}
 
-	public function output($file_name, $preferred_format = null, $quality = 85)
+	public function output($file_name, $preferred_format = IMAGETYPE_JPEG, $quality = 85)
 	{
+		$success = false;
 		if (empty($file_name) || !isset(Image::DEFAULT_FORMATS[$preferred_format]))
 		{
 			// Dump to browser instead ??
-			return false;
+			return $success;
 		}
 
 		// Save the image as ...
-		$success = false;
 		switch ($preferred_format)
 		{
 			case IMAGETYPE_PNG:
@@ -244,6 +260,13 @@ class Gd2 extends AbstractManipulator
 				}
 		}
 
+		// Update the sizes array to the output file
+		if ($success)
+		{
+			$this->_fileName = $file_name;
+			$this->getSize();
+		}
+
 		return $success;
 	}
 
@@ -271,7 +294,7 @@ class Gd2 extends AbstractManipulator
 		$this->getSize();
 
 		// Not a jpeg or not rotated, done!
-		if ($this->_sizes[2] !== 2 || $this->_orientation === 0 || $this->memoryCheck() === false)
+		if ($this->sizes[2] !== 2 || $this->_orientation === 0 || $this->memoryCheck() === false)
 		{
 			return false;
 		}

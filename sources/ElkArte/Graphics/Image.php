@@ -68,6 +68,8 @@ class Image
 		{
 			$this->loadImage($this->_fileName);
 		}
+
+		return true;
 	}
 
 	protected function setManipulator()
@@ -112,17 +114,31 @@ class Image
 		return substr($source, 0, 7) === 'http://' || substr($this->_fileName, 0, 8) === 'https://';
 	}
 
-	public function saveImage($file_name = null, $preferred_format = null, $quality = 85)
+	public function saveImage($file_name = null, $preferred_format = IMAGETYPE_JPEG, $quality = 85)
 	{
 		if ($this->_manipulator->output($file_name, $preferred_format, $quality))
 		{
 			$this->_fileName = $file_name;
+			return true;
 		}
+
+		return false;
 	}
 
 	public function getFileName()
 	{
 		return $this->_fileName;
+	}
+
+	public function getSize($source)
+	{
+		if (empty($this->_manipulator->sizes))
+		{
+			$this->setSource($source);
+			$this->_manipulator->getSize();
+		}
+
+		return $this->_manipulator->sizes;
 	}
 
 	/**
@@ -142,17 +158,17 @@ class Image
 	 *
 	 * @return boolean Whether the thumbnail creation was successful.
 	 */
-	public function resizeImage($max_width, $max_height, $preferred_format = 0, $strip = false, $force_resize = true)
+	public function resizeImage($max_width, $max_height, $strip = false, $force_resize = true)
 	{
 		// Nothing to do without GD or IM or an Image
-		if ($this->_manipulator === null || empty($this->_image))
+		if ($this->_manipulator === null)
 		{
 			return false;
 		}
 
 		try
 		{
-			return $this->_manipulator->resizeImage($max_width, $max_height, $preferred_format, $strip, $force_resize);
+			return $this->_manipulator->resizeImage($max_width, $max_height, $strip, $force_resize);
 		}
 		catch (\Exception $e)
 		{
@@ -207,16 +223,40 @@ class Image
 		return $this->_manipulator->generateTextImage($text, $width, $height, $format);
 	}
 
-	public function moveTo($destination)
-	{
-		$this->_fileName = $destination;
-		$this->setManipulator($destination, $this->_force_gd);
-
-		return @rename($tempName, $destName);
-	}
-
-	public function filesize()
+	public function getFilesize()
 	{
 		return @filesize($this->_fileName);
+	}
+
+	public function isImage($source)
+	{
+		$file_info = finfo_open(FILEINFO_MIME_TYPE);
+
+		return (substr(finfo_file($file_info, $source), 0, 5) === 'image');
+	}
+
+	public function createThumbnail($source, $max_width, $max_height, $destName = '',$format = '')
+	{
+		global $modSettings;
+
+		$destName = empty($destName) ? $source . '_thumb' : $destName;
+		$format = empty($format) && !empty($modSettings['attachment_thumb_png']) ? IMAGETYPE_PNG : IMAGETYPE_JPEG;
+		$max_width = max(12, $max_width);
+		$max_height = max(12, $max_height);
+
+		// Do the actual resize, thumbnails by default strip EXIF data to save space
+		$this->loadImage($source);
+		$success = $this->resizeImage($max_width, $max_height, true);
+
+		if ($success)
+		{
+			return $this->saveImage($destName, $format);
+		}
+		else
+		{
+			@touch($destName);
+
+			return false;
+		}
 	}
 }

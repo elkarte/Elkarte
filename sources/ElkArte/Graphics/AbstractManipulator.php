@@ -22,7 +22,7 @@ abstract class AbstractManipulator
 {
 	protected $_fileName = '';
 	protected $_fileHandle = null;
-	protected $_sizes = [];
+	public $sizes = [];
 	protected $_image = null;
 	protected $_width = 0;
 	protected $_height = 0;
@@ -32,7 +32,7 @@ abstract class AbstractManipulator
 
 	abstract public static function canUse();
 
-	abstract public function resizeImage($max_width, $max_height, $preferred_format = 0, $strip = false, $force_resize = true);
+	abstract public function resizeImage($max_width, $max_height, $strip = false, $force_resize = true);
 
 	abstract public function autoRotateImage();
 
@@ -42,7 +42,7 @@ abstract class AbstractManipulator
 
 	abstract function createImageFromWeb();
 
-	abstract function output($preferred_format, $file_name = null, $quality = 85);
+	abstract function output($file_name, $preferred_format = IMAGETYPE_JPEG, $quality = 85);
 
 	public function copyFrom(Image $source)
 	{
@@ -73,7 +73,7 @@ abstract class AbstractManipulator
 
 		$this->getSize();
 
-		return $this->_sizes;
+		return $this->sizes;
 	}
 
 	/**
@@ -88,28 +88,28 @@ abstract class AbstractManipulator
 		{
 			if ($type === 'string')
 			{
-				$this->_sizes = getimagesizefromstring($this->_image);
+				$this->sizes = getimagesizefromstring($this->_image);
 			}
 			else
 			{
-				$this->_sizes = getimagesize($this->_fileName);
+				$this->sizes = getimagesize($this->_fileName);
 			}
 		}
 		catch (\Exception $e)
 		{
-			$this->_sizes = false;
+			$this->sizes = false;
 		}
 
 		// Can't get it, what shall we return
-		if (empty($this->_sizes))
+		if (empty($this->sizes))
 		{
 			if ($error === 'array')
 			{
-				$this->_sizes = array(-1, -1, -1);
+				$this->sizes = array(-1, -1, -1);
 			}
 			else
 			{
-				$this->_sizes = false;
+				$this->sizes = false;
 			}
 		}
 	}

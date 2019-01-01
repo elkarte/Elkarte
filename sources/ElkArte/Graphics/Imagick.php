@@ -25,6 +25,14 @@ class Imagick extends AbstractManipulator
 		$this->_image = new \Imagick($fileName);
 	}
 
+	public function __destruct()
+	{
+		if ($this->_image)
+		{
+			$this->_image->destroy();
+		}
+	}
+
 	/**
 	 * Checks whether the Imagick class is present.
 	 *
