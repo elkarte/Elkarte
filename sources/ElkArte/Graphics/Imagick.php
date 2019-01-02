@@ -8,9 +8,6 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
- * This file contains code covered by:
- * copyright: 2011 Simple Machines (http://www.simplemachines.org)
- *
  * @version 2.0 dev
  *
  */
@@ -35,14 +32,6 @@ class Imagick extends AbstractManipulator
 		return true;
 	}
 
-	public function __destruct()
-	{
-		if ($this->_image)
-		{
-			$this->_image->clear();
-		}
-	}
-
 	public function setSource($source)
 	{
 		$this->_fileName = $source;
@@ -58,6 +47,14 @@ class Imagick extends AbstractManipulator
 		return class_exists('\Imagick', false);
 	}
 
+	public function __destruct()
+	{
+		if ($this->_image)
+		{
+			$this->_image->clear();
+		}
+	}
+
 	public function createImageFromFile()
 	{
 		$this->getSize();
@@ -66,7 +63,7 @@ class Imagick extends AbstractManipulator
 		{
 			try
 			{
-				$image = new \Imagick($this->_fileName);
+				$this->_image = new \Imagick($this->_fileName);
 			}
 			catch (\Exception $e)
 			{
@@ -83,6 +80,16 @@ class Imagick extends AbstractManipulator
 		return true;
 	}
 
+	/**
+	 * Sets the image sizes.
+	 */
+	protected function _setImage()
+	{
+		// Update the image size values
+		$this->_width = $this->_image->getImageWidth();
+		$this->_height = $this->_image->getImageHeight();
+	}
+
 	public function createImageFromWeb()
 	{
 		require_once(SUBSDIR . '/Package.subs.php');
@@ -93,7 +100,7 @@ class Imagick extends AbstractManipulator
 		{
 			try
 			{
-				$blob = $this->_image
+				$blob = $this->_image;
 				$this->_image = new \Imagick();
 				$this->_image->readImageBlob($blob);
 			}
@@ -149,19 +156,19 @@ class Imagick extends AbstractManipulator
 
 		if ($requested_ratio > $image_ratio)
 		{
-			$dest_width = max(1, $max_height * $image_ratio);
-			$dest_height = $max_height;
+			$dst_width = max(1, $max_height * $image_ratio);
+			$dst_height = $max_height;
 		}
 		else
 		{
-			$dest_width = $max_width;
-			$dest_height = max(1, $max_width / $image_ratio);
+			$dst_width = $max_width;
+			$dst_height = max(1, $max_width / $image_ratio);
 		}
 
 		// Don't bother resizing if it's already smaller...
 		if (!empty($dst_width) && !empty($dst_height) && ($dst_width < $src_width || $dst_height < $src_height || $force_resize))
 		{
-			$success = $this->_image->resizeImage($dest_width, $dest_height, \Imagick::FILTER_LANCZOS, 1, true);
+			$success = $this->_image->resizeImage($dst_width, $dst_height, \Imagick::FILTER_LANCZOS, 1, true);
 			$this->_setImage();
 		}
 
@@ -225,23 +232,6 @@ class Imagick extends AbstractManipulator
 		}
 
 		return $success;
-	}
-
-	/**
-	 * Sets the image sizes.
-	 */
-	protected function _setImage()
-	{
-		// Update the image size values
-		$this->_width = $this->_image->getImageWidth();
-		$this->_height = $this->_image->getImageHeight();
-	}
-
-	public function getOrientation()
-	{
-		$this->_orientation = $this->_image->getImageOrientation();
-
-		return $this->_orientation;
 	}
 
 	/**
@@ -319,6 +309,13 @@ class Imagick extends AbstractManipulator
 		}
 
 		return $success;
+	}
+
+	public function getOrientation()
+	{
+		$this->_orientation = $this->_image->getImageOrientation();
+
+		return $this->_orientation;
 	}
 
 	/**

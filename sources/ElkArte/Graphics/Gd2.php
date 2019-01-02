@@ -32,14 +32,6 @@ class Gd2 extends AbstractManipulator
 		return true;
 	}
 
-	public function __destruct()
-	{
-		if (is_object($this->_image))
-		{
-			imagedestroy($this->_image);
-		}
-	}
-
 	public function setSource($source)
 	{
 		$this->_fileName = $source;
@@ -59,6 +51,14 @@ class Gd2 extends AbstractManipulator
 		}
 
 		return true;
+	}
+
+	public function __destruct()
+	{
+		if (is_object($this->_image))
+		{
+			imagedestroy($this->_image);
+		}
 	}
 
 	public function createImageFromFile()
@@ -85,6 +85,20 @@ class Gd2 extends AbstractManipulator
 		$this->_setImage($image);
 
 		return true;
+	}
+
+	/**
+	 * Sets the internal GD image resource.
+	 *
+	 * @param resource $image
+	 */
+	protected function _setImage($image)
+	{
+		$this->_image = $image;
+
+		// Get the image size via GD functions
+		$this->_width = imagesx($image);
+		$this->_height = imagesy($image);
 	}
 
 	public function createImageFromWeb()
@@ -192,20 +206,6 @@ class Gd2 extends AbstractManipulator
 		imagesavealpha($dst_img, true);
 		$color = imagecolorallocatealpha($dst_img, 255, 255, 255, 127);
 		imagefill($dst_img, 0, 0, $color);
-	}
-
-	/**
-	 * Sets the internal GD image resource.
-	 *
-	 * @param resource $image
-	 */
-	protected function _setImage($image)
-	{
-		$this->_image = $image;
-
-		// Get the image size via GD functions
-		$this->_width = imagesx($image);
-		$this->_height = imagesy($image);
 	}
 
 	public function output($file_name, $preferred_format = IMAGETYPE_JPEG, $quality = 85)
