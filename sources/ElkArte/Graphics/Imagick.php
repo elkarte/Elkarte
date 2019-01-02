@@ -19,18 +19,33 @@ namespace ElkArte\Graphics;
 
 class Imagick extends AbstractManipulator
 {
-	public function __construct($fileName)
+	public function __construct($image)
 	{
-		$this->_fileName = $fileName;
-		$this->_image = new \Imagick($fileName);
+		$this->setSource($image);
+
+		try
+		{
+			$this->memoryCheck();
+		}
+		catch (\Exception $e)
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 	public function __destruct()
 	{
 		if ($this->_image)
 		{
-			$this->_image->destroy();
+			$this->_image->clear();
 		}
+	}
+
+	public function setSource($source)
+	{
+		$this->_fileName = $source;
 	}
 
 	/**
@@ -43,32 +58,58 @@ class Imagick extends AbstractManipulator
 		return class_exists('\Imagick', false);
 	}
 
-	/**
-	 * Resize an image from a remote location or a local file.
-	 *
-	 * What it does:
-	 *
-	 * - Puts the resized image at the destination location.
-	 * - The file would have the format preferred_format if possible,
-	 * otherwise the default format is jpeg.
-	 *
-	 * @param int $max_width The maximum allowed width
-	 * @param int $max_height The maximum allowed height
-	 * @param int $preferred_format Used by Imagick/resizeImage
-	 * @param bool $force_resize Always resize the image (force scale up)
-	 * @param bool $strip Allow IM to remove exif data as GD always will
-	 *
-	 * @return boolean Whether the thumbnail creation was successful.
-	 */
-	public function resizeImageFile($max_width, $max_height, $preferred_format = 0, $strip = false, $force_resize = true)
+	public function createImageFromFile()
 	{
-		// A known and supported format?
-		if (!isset(Image::DEFAULT_FORMATS[$sizes[2]]))
+		$this->getSize();
+
+		if (isset(Image::DEFAULT_FORMATS[$this->sizes[2]]))
 		{
-			throw new \Exception('Format not supported');
+			try
+			{
+				$image = new \Imagick($this->_fileName);
+			}
+			catch (\Exception $e)
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
 		}
 
-		return $this->resizeImage($max_width, $max_height, $force_resize, $preferred_format, $strip);
+		$this->_setImage();
+
+		return true;
+	}
+
+	public function createImageFromWeb()
+	{
+		require_once(SUBSDIR . '/Package.subs.php');
+		$this->_image = fetch_web_data($this->_fileName);
+		$this->getSize('string');
+
+		if (isset(Image::DEFAULT_FORMATS[$this->sizes[2]]))
+		{
+			try
+			{
+				$blob = $this->_image
+				$this->_image = new \Imagick();
+				$this->_image->readImageBlob($blob);
+			}
+			catch (\Exception $e)
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+
+		$this->_setImage();
+
+		return true;
 	}
 
 	/**
@@ -78,51 +119,51 @@ class Imagick extends AbstractManipulator
 	 *
 	 * - Will do nothing to the image if the file fits within the size limits
 	 * - If Image Magick is present it will use those function over any GD solutions
-	 * - If GD2 is present, it'll use it to achieve better quality (imagecopyresampled)
 	 * - Saves the new image to destination_filename, in the preferred_format
 	 * if possible, default is jpeg.
 	 *
 	 * @param int $max_width The maximum allowed width
 	 * @param int $max_height The maximum allowed height
-	 * @param bool $force_resize = false Whether to override defaults and resize it
-	 * @param int $preferred_format - The preferred format
-	 *   - 0 to use jpeg
-	 *   - 1 for gif
-	 *   - 2 to force jpeg
-	 *   - 3 for png
-	 *   - 6 for bmp
-	 *   - 15 for wbmp
 	 * @param bool $strip Whether to have IM strip EXIF data as GD will
+	 * @param bool $force_resize = false Whether to override defaults and resize it
 	 *
 	 * @return bool Whether resize was successful.
 	 */
-	function resizeImage($max_width, $max_height, $force_resize = false, $preferred_format = 0, $strip = false)
+	function resizeImage($max_width, $max_height, $strip = false, $force_resize = false)
 	{
-		$preferred_format = empty($preferred_format) || !isset(Image::DEFAULT_FORMATS[$preferred_format]) ? 2 : $preferred_format;
+		$success = false;
 
-		// Set the input and output image size
-		$src_width = $this->_image->getImageWidth();
-		$src_height = $this->_image->getImageHeight();
-
-		// It should never happen, but let's keep these two as a failsafe
-		$max_width = $max_width === null ? $src_width : $max_width;
-		$max_height = $max_height === null ? $src_height : $max_height;
-
-		// The behavior of bestfit changed in Imagick 3.0.0 and it will now scale up, we prevent that
-		$dest_width = empty($max_width) ? $src_width : ($force_resize ? $max_width : min($max_width, $src_width));
-		$dest_height = empty($max_height) ? $src_height : ($force_resize ? $max_height : min($max_height, $src_height));
-
-		// Set jpeg image quality to 85
-		if (Image::DEFAULT_FORMATS[$preferred_format] === 'jpeg')
+		// No image, no further
+		if (empty($this->_image))
 		{
-			$this->_image->borderImage('white', 0, 0);
-			$this->_image->setImageCompression(\Imagick::COMPRESSION_JPEG);
-			$this->_image->setImageCompressionQuality(85);
+			return $success;
 		}
 
-		// Create a new image in our preferred format and resize it if needed
-		$this->_image->setImageFormat(Image::DEFAULT_FORMATS[$preferred_format]);
-		$this->_image->resizeImage($dest_width, $dest_height, \Imagick::FILTER_LANCZOS, 1, true);
+		// Set the input and output image size
+		$src_width = $this->_width;
+		$src_height = $this->_height;
+
+		// Determine whether to resize to max width or to max height (depending on the limits.)
+		$image_ratio = $this->_width / $this->_height;
+		$requested_ratio = $max_width / $max_height;
+
+		if ($requested_ratio > $image_ratio)
+		{
+			$dest_width = max(1, $max_height * $image_ratio);
+			$dest_height = $max_height;
+		}
+		else
+		{
+			$dest_width = $max_width;
+			$dest_height = max(1, $max_width / $image_ratio);
+		}
+
+		// Don't bother resizing if it's already smaller...
+		if (!empty($dst_width) && !empty($dst_height) && ($dst_width < $src_width || $dst_height < $src_height || $force_resize))
+		{
+			$success = $this->_image->resizeImage($dest_width, $dest_height, \Imagick::FILTER_LANCZOS, 1, true);
+			$this->_setImage();
+		}
 
 		// Remove EXIF / ICC data?
 		if ($strip)
@@ -130,13 +171,70 @@ class Imagick extends AbstractManipulator
 			$this->_image->stripImage();
 		}
 
-		// Save the new image in the destination location
-		$success = $this->_image->writeImage($this->_fileName);
+		return $success;
+	}
 
-		// Free resources associated with the Imagick object
-		$this->_image->clear();
+	public function output($file_name, $preferred_format = IMAGETYPE_JPEG, $quality = 85)
+	{
+		$success = false;
+		if (empty($file_name) || !isset(Image::DEFAULT_FORMATS[$preferred_format]))
+		{
+			// Dump to browser instead ??
+			return $success;
+		}
 
-		return !empty($success);
+		switch ($preferred_format)
+		{
+			case IMAGETYPE_GIF:
+				$success = $this->_image->setImageFormat('gif');
+				break;
+			case IMAGETYPE_PNG:
+				$success = $this->_image->setImageFormat('png');
+				break;
+			case IMAGETYPE_WBMP:
+				$success = $this->_image->setImageFormat('wbmp');
+				break;
+			case IMAGETYPE_BMP:
+				$success = $this->_image->setImageFormat('bmp');
+				break;
+			default:
+				$this->_image->borderImage('white', 0, 0);
+				$this->_image->setImageCompression(\Imagick::COMPRESSION_JPEG);
+				$this->_image->setImageCompressionQuality($quality);
+				$success = $this->_image->setImageFormat('jpeg');
+				break;
+		}
+
+		try
+		{
+			if ($success)
+			{
+				$success = $this->_image->writeImage($file_name);
+			}
+		}
+		catch (\Exception $e)
+		{
+			return false;
+		}
+
+		// Update the sizes array to the output file
+		if ($success)
+		{
+			$this->_fileName = $file_name;
+			$this->getSize();
+		}
+
+		return $success;
+	}
+
+	/**
+	 * Sets the image sizes.
+	 */
+	protected function _setImage()
+	{
+		// Update the image size values
+		$this->_width = $this->_image->getImageWidth();
+		$this->_height = $this->_image->getImageHeight();
 	}
 
 	public function getOrientation()
@@ -221,11 +319,6 @@ class Imagick extends AbstractManipulator
 		}
 
 		return $success;
-	}
-
-	public function setSource($source)
-	{
-		$this->_fileName = $source;
 	}
 
 	/**
