@@ -8,9 +8,6 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
- * This file contains code covered by:
- * copyright: 2011 Simple Machines (http://www.simplemachines.org)
- *
  * @version 2.0 dev
  *
  */
@@ -146,12 +143,8 @@ class Gd2 extends AbstractManipulator
 		$src_width = $this->_width;
 		$src_height = $this->_height;
 
-		// It should never happen, but let's keep these two as a failsafe
-		$max_width = $max_width === null ? $src_width : $max_width;
-		$max_height = $max_height === null ? $src_height : $max_height;
-
 		// Determine whether to resize to max width or to max height (depending on the limits.)
-		if (!empty($max_width) || !empty($max_height))
+		if (!empty($max_width) && !empty($max_height))
 		{
 			$image_ratio = $this->_width / $this->_height;
 			$requested_ratio = $max_width / $max_height;

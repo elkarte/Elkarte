@@ -241,8 +241,8 @@ class Image
 
 		$destName = empty($destName) ? $source . '_thumb' : $destName;
 		$format = empty($format) && !empty($modSettings['attachment_thumb_png']) ? IMAGETYPE_PNG : IMAGETYPE_JPEG;
-		$max_width = max(12, $max_width);
-		$max_height = max(12, $max_height);
+		$max_width = max(16, $max_width);
+		$max_height = max(16, $max_height);
 
 		// Do the actual resize, thumbnails by default strip EXIF data to save space
 		$this->loadImage($source);

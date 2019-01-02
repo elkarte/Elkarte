@@ -23,7 +23,8 @@ abstract class AbstractManipulator
 	protected $_fileName = '';
 	protected $_fileHandle = null;
 	public $sizes = [];
-	protected $_image = null;
+	/** @var \Imagick | resource  */
+	protected $_image ;
 	protected $_width = 0;
 	protected $_height = 0;
 	protected $_orientation = 0;
