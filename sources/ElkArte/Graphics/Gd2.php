@@ -157,6 +157,10 @@ class Gd2 extends AbstractManipulator
 		$src_width = $this->_width;
 		$src_height = $this->_height;
 
+		// Allow for a re-encode to the same size
+		$max_width = $max_width === null ? $src_width : $max_width;
+		$max_height = $max_height === null ? $src_height : $max_height;
+
 		// Determine whether to resize to max width or to max height (depending on the limits.)
 		if (!empty($max_width) && !empty($max_height))
 		{
@@ -271,27 +275,12 @@ class Gd2 extends AbstractManipulator
 	 * - Checks exif data for orientation flag and rotates image so its proper
 	 * - Does not update the orientation flag as GD also removes EXIF data
 	 * - Only works with jpeg images, could add TIFF as well
-	 * - Writes the updated image back to $image_name
 	 *
 	 * @return bool
 	 * @throws \Exception
 	 */
 	public function autoRotateImage()
 	{
-		if (!isset($this->_orientation))
-		{
-			$this->getOrientation();
-		}
-
-		// For now we only process jpeg images, so check that we have one
-		$this->getSize();
-
-		// Not a jpeg or not rotated, done!
-		if ($this->sizes[2] !== 2 || $this->_orientation === 0 || $this->memoryCheck() === false)
-		{
-			return false;
-		}
-
 		// Time to spin and mirror as needed
 		switch ($this->_orientation)
 		{

@@ -50,6 +50,8 @@ class Image
 
 	protected $_force_gd = false;
 
+	protected $_image_loaded = false;
+
 	public function __construct($fileName = '', $force_gd = false)
 	{
 		$this->_fileName = $fileName;
@@ -70,6 +72,11 @@ class Image
 		}
 
 		return true;
+	}
+
+	public function __destruct()
+	{
+		$this->_manipulator->__destruct();
 	}
 
 	protected function setManipulator()
@@ -95,11 +102,16 @@ class Image
 
 		if ($this->isWebAddress($source))
 		{
-			$this->_manipulator->createImageFromWeb();
+			$success = $this->_manipulator->createImageFromWeb();
 		}
 		else
 		{
-			$this->_manipulator->createImageFromFile();
+			$success = $this->_manipulator->createImageFromFile();
+		}
+
+		if ($success === true)
+		{
+			$this->_image_loaded = true;
 		}
 	}
 
@@ -116,13 +128,10 @@ class Image
 
 	public function saveImage($file_name = null, $preferred_format = IMAGETYPE_JPEG, $quality = 85)
 	{
-		if ($this->_manipulator->output($file_name, $preferred_format, $quality))
-		{
-			$this->_fileName = $file_name;
-			return true;
-		}
+		$success = $this->_manipulator->output($file_name, $preferred_format, $quality);
+		$this->__destruct();
 
-		return false;
+		return $success;
 	}
 
 	public function getFileName()
@@ -146,13 +155,13 @@ class Image
 	 *
 	 * What it does:
 	 *
-	 * - Puts the resized image at the destination location.
+	 * - Resize an image, proportionally, to fit withing WxH limits
 	 * - The file would have the format preferred_format if possible,
 	 * otherwise the default format is jpeg.
+	 * - Optionally removes exif header data to make a smaller image
 	 *
 	 * @param int $max_width The maximum allowed width
 	 * @param int $max_height The maximum allowed height
-	 * @param int $preferred_format Used by Imagick/resizeImage
 	 * @param bool $force_resize Always resize the image (force scale up)
 	 * @param bool $strip Allow IM to remove exif data as GD always will
 	 *
@@ -182,13 +191,27 @@ class Image
 	}
 
 	/**
-	 * Calls GD or ImageMagick functions to correct an images orientation
-	 * based on the EXIF orientation flag
+	 * Calls functions to correct an images orientation based on the EXIF orientation flag
 	 *
+	 * @return bool
 	 * @throws \Exception
 	 */
 	public function autoRotateImage()
 	{
+		$this->getOrientation();
+
+		// For now we only process jpeg images, so check that we have one
+		if (!isset($this->_manipulator->sizes[2]))
+		{
+			$this->_manipulator->getSize();
+		}
+
+		// Not a jpeg or not rotated, done!
+		if ($this->_manipulator->sizes[2] !== 2 || $this->_manipulator->_orientation === 0)
+		{
+			return true;
+		}
+
 		try
 		{
 			$this->_manipulator->autoRotateImage();
@@ -198,6 +221,8 @@ class Image
 			// Nice try
 			return false;
 		}
+
+		return true;
 	}
 
 	/**
@@ -235,28 +260,87 @@ class Image
 		return (substr(finfo_file($file_info, $source), 0, 5) === 'image');
 	}
 
-	public function createThumbnail($source, $max_width, $max_height, $destName = '',$format = '')
+	public function createThumbnail($source, $max_width, $max_height, $dstName = '', $format = '')
 	{
 		global $modSettings;
 
-		$destName = empty($destName) ? $source . '_thumb' : $destName;
+		$dstName = empty($destName) ? $source . '_thumb' : $dstName;
 		$format = empty($format) && !empty($modSettings['attachment_thumb_png']) ? IMAGETYPE_PNG : IMAGETYPE_JPEG;
 		$max_width = max(16, $max_width);
 		$max_height = max(16, $max_height);
 
-		// Do the actual resize, thumbnails by default strip EXIF data to save space
 		$this->loadImage($source);
+
+		if (!empty($modSettings['attachment_autorotate']))
+		{
+			$this->autoRotateImage();
+		}
+
+		// Do the actual resize, thumbnails by default strip EXIF data to save space
 		$success = $this->resizeImage($max_width, $max_height, true);
 
 		if ($success)
 		{
-			return $this->saveImage($destName, $format);
+			$success = $this->saveImage($dstName, $format);
 		}
 		else
 		{
-			@touch($destName);
+			@touch($dstName);
+		}
 
+		return $success;
+	}
+
+	public function reencodeImage($source)
+	{
+		// The image should already be loaded
+		if (!$this->_image_loaded || $this->_fileName !== $source)
+		{
 			return false;
 		}
+
+		$sizes = $this->getSize($source);
+		$success = $this->resizeImage(null, null, true, true);
+
+		if ($success && !empty(Image::DEFAULT_FORMATS[$sizes[2]]))
+		{
+			// Write over the original file
+			$success = $this->saveImage($source, $sizes[2]);
+
+			return $success;
+		}
+	}
+
+	public function checkImageContents($source)
+	{
+		$fp = fopen($source, 'rb');
+
+		// If we can't open it to scan, go no further
+		if (!$fp)
+		{
+			theme()->getTemplates()->loadLanguageFile('Post');
+			throw new \ElkArte\Exceptions\Exception('attach_timeout');
+		}
+
+		$prev_chunk = '';
+		while (!feof($fp))
+		{
+			$cur_chunk = fread($fp, 32768);
+			$test_chunk = $prev_chunk . $cur_chunk;
+
+			// Though not exhaustive lists, better safe than sorry.
+			if (preg_match('~<\\?php|<script\s+language\s*=\s*(?:php|"php"|\'php\')\s*>~i', $test_chunk) === 1)
+			{
+				fclose($fp);
+
+				return false;
+			}
+
+			$prev_chunk = $cur_chunk;
+		}
+
+		fclose($fp);
+
+		return true;
 	}
 }

@@ -27,7 +27,7 @@ abstract class AbstractManipulator
 	protected $_image ;
 	protected $_width = 0;
 	protected $_height = 0;
-	protected $_orientation = 0;
+	public $_orientation = 0;
 
 	abstract public function __construct($fileName);
 
@@ -44,38 +44,6 @@ abstract class AbstractManipulator
 	abstract function createImageFromWeb();
 
 	abstract function output($file_name, $preferred_format = IMAGETYPE_JPEG, $quality = 85);
-
-	public function copyFrom(Image $source)
-	{
-		// Get the image file, we have to work with something after all
-		$fp_destination = fopen($this->_fileName, 'wb');
-		if ($fp_destination && $source->isWebAddress())
-		{
-			require_once(SUBSDIR . '/Package.subs.php');
-			$fileContents = fetch_web_data($source->getFileName());
-
-			fwrite($fp_destination, $fileContents);
-			fclose($fp_destination);
-		}
-		elseif ($fp_destination)
-		{
-			$fp_source = fopen($source->getFileName(), 'rb');
-			if ($fp_source !== false)
-			{
-				while (!feof($fp_source))
-				{
-					fwrite($fp_destination, fread($fp_source, 8192));
-				}
-				fclose($fp_source);
-			}
-
-			fclose($fp_destination);
-		}
-
-		$this->getSize();
-
-		return $this->sizes;
-	}
 
 	/**
 	 * Simple wrapper for getimagesize

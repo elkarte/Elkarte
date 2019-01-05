@@ -136,7 +136,7 @@ class Imagick extends AbstractManipulator
 	 *
 	 * @return bool Whether resize was successful.
 	 */
-	function resizeImage($max_width, $max_height, $strip = false, $force_resize = false)
+	public function resizeImage($max_width, $max_height, $strip = false, $force_resize = false)
 	{
 		$success = false;
 
@@ -149,6 +149,10 @@ class Imagick extends AbstractManipulator
 		// Set the input and output image size
 		$src_width = $this->_width;
 		$src_height = $this->_height;
+
+		// Allow for a re-encode to the same size
+		$max_width = $max_width === null ? $src_width : $max_width;
+		$max_height = $max_height === null ? $src_height : $max_height;
 
 		// Determine whether to resize to max width or to max height (depending on the limits.)
 		$image_ratio = $this->_width / $this->_height;
@@ -239,21 +243,13 @@ class Imagick extends AbstractManipulator
 	 *
 	 * What it does:
 	 *
-	 * - ImageMagick only
 	 * - Checks exif data for orientation flag and rotates image so its proper
 	 * - Updates orientation flag if rotation was required
-	 * - Writes the update image back to $image_name
 	 *
 	 * @return bool
 	 */
 	function autoRotateImage()
 	{
-		// Get or use the $starting_orientation
-		if (!isset($this->_orientation))
-		{
-			$this->getOrientation();
-		}
-
 		try
 		{
 			switch ($this->_orientation)
@@ -300,7 +296,6 @@ class Imagick extends AbstractManipulator
 				$this->_image->setImageOrientation(\Imagick::ORIENTATION_TOPLEFT);
 			}
 
-			// Save the new image in the destination location
 			$success = true;
 		}
 		catch (\Exception $e)
