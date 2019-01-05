@@ -11,9 +11,6 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
- * This file contains code covered by:
- * copyright: 2011 Simple Machines (http://www.simplemachines.org)
- *
  * @version 2.0 dev
  *
  */
@@ -23,7 +20,7 @@ namespace ElkArte\Graphics;
 /**
  * Class Image
  *
- * Base class for image function and interaction with the various engines (GD/IMagick)
+ * Base class for image function and interaction with the various graphic engines (GD/IMagick)
  *
  * $image = new Image('', true);
  * $image->loadImage(filename or web address);
@@ -46,17 +43,27 @@ class Image
 	/** @var \ElkArte\Graphics\Imagick|\ElkArte\Graphics\Gd2 */
 	protected $_manipulator;
 
+	/** @var string filename we are working with */
 	protected $_fileName = '';
 
+	/** @var bool if to force only using GD even if Imagick is present */
 	protected $_force_gd = false;
 
+	/** @var bool if the image has been loaded into the manipulator */
 	protected $_image_loaded = false;
 
+	/**
+	 * Image constructor.
+	 *
+	 * @param string $fileName
+	 * @param bool $force_gd
+	 */
 	public function __construct($fileName = '', $force_gd = false)
 	{
 		$this->_fileName = $fileName;
 		$this->_force_gd = $force_gd;
 
+		// Determine and set what image library we will use
 		try
 		{
 			$this->setManipulator();
@@ -74,11 +81,19 @@ class Image
 		return true;
 	}
 
+	/**
+	 * Clear the image object
+	 */
 	public function __destruct()
 	{
 		$this->_manipulator->__destruct();
 	}
 
+	/**
+	 * Determine and set what image library we will use
+	 *
+	 * @throws \Exception
+	 */
 	protected function setManipulator()
 	{
 		// Later this could become an array of "manipulators" (or not) and remove the hard-coded IM/GD requirements
@@ -96,6 +111,11 @@ class Image
 		}
 	}
 
+	/**
+	 * Load an image from a file or web address into the active graphics library
+	 *
+	 * @param string $source
+	 */
 	public function loadImage($source)
 	{
 		$this->setSource($source);
@@ -115,17 +135,35 @@ class Image
 		}
 	}
 
+	/**
+	 * Set the source name here and in the graphics manipulator
+	 *
+	 * @param string $source
+	 */
 	public function setSource($source)
 	{
 		$this->_fileName = $source;
 		$this->_manipulator->setSource($source);
 	}
 
+	/**
+	 * Return if the source is actually a web address vs local file
+	 * @param $source
+	 * @return bool
+	 */
 	public function isWebAddress($source)
 	{
 		return substr($source, 0, 7) === 'http://' || substr($this->_fileName, 0, 8) === 'https://';
 	}
 
+	/**
+	 * Save the image object to a file.
+	 *
+	 * @param null|string $file_name name to save the image to
+	 * @param int $preferred_format what format to save the image
+	 * @param int $quality some formats require we provide a compression quality
+	 * @return bool
+	 */
 	public function saveImage($file_name = null, $preferred_format = IMAGETYPE_JPEG, $quality = 85)
 	{
 		$success = $this->_manipulator->output($file_name, $preferred_format, $quality);
@@ -134,11 +172,23 @@ class Image
 		return $success;
 	}
 
+	/**
+	 * The name of the active file
+	 *
+	 * @return string
+	 */
 	public function getFileName()
 	{
 		return $this->_fileName;
 	}
 
+	/**
+	 * Return or set (via getimagesize or getimagesizefromstring) some image details such
+	 * as size and mime type
+	 *
+	 * @param string $source
+	 * @return array
+	 */
 	public function getSize($source)
 	{
 		if (empty($this->_manipulator->sizes))
@@ -185,6 +235,11 @@ class Image
 		}
 	}
 
+	/**
+	 * Finds the orientation flag of the image as defined by its EXIF data
+	 *
+	 * @return int
+	 */
 	public function getOrientation()
 	{
 		return $this->_manipulator->getOrientation();
@@ -248,11 +303,22 @@ class Image
 		return $this->_manipulator->generateTextImage($text, $width, $height, $format);
 	}
 
+	/**
+	 * Its how big ?
+	 *
+	 * @return int
+	 */
 	public function getFilesize()
 	{
 		return @filesize($this->_fileName);
 	}
 
+	/**
+	 * If the file is an image or not
+	 *
+	 * @param string $source
+	 * @return bool
+	 */
 	public function isImage($source)
 	{
 		$file_info = finfo_open(FILEINFO_MIME_TYPE);
@@ -260,17 +326,36 @@ class Image
 		return (substr(finfo_file($file_info, $source), 0, 5) === 'image');
 	}
 
+	/**
+	 * Creates a thumbnail from and image.
+	 *
+	 * - "recipe" function to create, rotate and save a thumbnail of a given image
+	 * - Thumbnail will be proportional to the original image
+	 * - Will adjust for image rotation if needed.
+	 * - Saves the thumbnail file
+	 *
+	 * @param string $source the image file to thumbnail
+	 * @param int $max_width allowed width
+	 * @param int $max_height allowed height
+	 * @param string $dstName name to save
+	 * @param string $format image format to save the thumbnail
+	 * @return bool
+	 * @throws \Exception
+	 */
 	public function createThumbnail($source, $max_width, $max_height, $dstName = '', $format = '')
 	{
 		global $modSettings;
 
+		// The particulars
 		$dstName = empty($destName) ? $source . '_thumb' : $dstName;
 		$format = empty($format) && !empty($modSettings['attachment_thumb_png']) ? IMAGETYPE_PNG : IMAGETYPE_JPEG;
 		$max_width = max(16, $max_width);
 		$max_height = max(16, $max_height);
 
+		// Load the data to the manipulator
 		$this->loadImage($source);
 
+		// Spin it if needed
 		if (!empty($modSettings['attachment_autorotate']))
 		{
 			$this->autoRotateImage();
@@ -279,6 +364,7 @@ class Image
 		// Do the actual resize, thumbnails by default strip EXIF data to save space
 		$success = $this->resizeImage($max_width, $max_height, true);
 
+		// Save our work
 		if ($success)
 		{
 			$success = $this->saveImage($dstName, $format);
@@ -291,6 +377,19 @@ class Image
 		return $success;
 	}
 
+	/**
+	 * Used to re-encodes an image to a specified image format
+	 *
+	 * What it does:
+	 *
+	 * - creates a copy of the file at the same location.
+	 * - the file would have the format preferred_format if possible, otherwise the default format is jpeg.
+	 * - strips the exif data
+	 * - the function makes sure that all non-essential image contents are disposed.
+	 *
+	 * @param $source
+	 * @return bool
+	 */
 	public function reencodeImage($source)
 	{
 		// The image should already be loaded
@@ -299,9 +398,11 @@ class Image
 			return false;
 		}
 
+		// re-encode the image at the same size it is now, strip exif data.
 		$sizes = $this->getSize($source);
 		$success = $this->resizeImage(null, null, true, true);
 
+		// if all went well, and its valid, save it back in place
 		if ($success && !empty(Image::DEFAULT_FORMATS[$sizes[2]]))
 		{
 			// Write over the original file
@@ -311,6 +412,17 @@ class Image
 		}
 	}
 
+	/**
+	 * Searches through the file to see if there's potentially harmful content.
+	 *
+	 * What it does:
+	 *
+	 * - Basic search of an image file for potential web (php/script) infections
+	 *
+	 * @param string $source
+	 * @return bool
+	 * @throws \ElkArte\Exceptions\Exception
+	 */
 	public function checkImageContents($source)
 	{
 		$fp = fopen($source, 'rb');

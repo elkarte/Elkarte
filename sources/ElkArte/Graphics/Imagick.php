@@ -310,7 +310,7 @@ class Imagick extends AbstractManipulator
 	{
 		$this->_orientation = $this->_image->getImageOrientation();
 
-		return $this->_orientation;
+		return (int) $this->_orientation;
 	}
 
 	/**

@@ -331,7 +331,7 @@ class Gd2 extends AbstractManipulator
 		$this->_orientation = isset($exif['Orientation']) ? $exif['Orientation'] : 0;
 
 		// We're only interested in the exif orientation
-		return $this->_orientation;
+		return (int) $this->_orientation;
 	}
 
 	/**
