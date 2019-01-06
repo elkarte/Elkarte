@@ -86,8 +86,8 @@ class Imagick extends AbstractManipulator
 	protected function _setImage()
 	{
 		// Update the image size values
-		$this->_width = $this->_image->getImageWidth();
-		$this->_height = $this->_image->getImageHeight();
+		$this->_width = $this->sizes[0] = $this->_image->getImageWidth();
+		$this->_height = $this->sizes[1] = $this->_image->getImageHeight();
 	}
 
 	public function createImageFromWeb()
@@ -125,9 +125,6 @@ class Imagick extends AbstractManipulator
 	 * What it does:
 	 *
 	 * - Will do nothing to the image if the file fits within the size limits
-	 * - If Image Magick is present it will use those function over any GD solutions
-	 * - Saves the new image to destination_filename, in the preferred_format
-	 * if possible, default is jpeg.
 	 *
 	 * @param int $max_width The maximum allowed width
 	 * @param int $max_height The maximum allowed height
@@ -185,12 +182,22 @@ class Imagick extends AbstractManipulator
 		return $success;
 	}
 
+	/**
+	 * Output the image resource to a file in a chosen format
+	 *
+	 * @param string $file_name where to save the image, if null output to screen
+	 * @param int $preferred_format jpg,png,gif, etc
+	 * @param int $quality the jpg image quality
+	 *
+	 * @return bool
+	 */
 	public function output($file_name, $preferred_format = IMAGETYPE_JPEG, $quality = 85)
 	{
 		$success = false;
-		if (empty($file_name) || !isset(Image::DEFAULT_FORMATS[$preferred_format]))
+
+		// No name, but not null, or an unknown type
+		if ($file_name === '' || !isset(Image::DEFAULT_FORMATS[$preferred_format]))
 		{
-			// Dump to browser instead ??
 			return $success;
 		}
 
@@ -220,7 +227,15 @@ class Imagick extends AbstractManipulator
 		{
 			if ($success)
 			{
-				$success = $this->_image->writeImage($file_name);
+				// Screen to file, your choice
+				if ($file_name === null)
+				{
+					echo $this->_image->getImagesBlob();
+				}
+				else
+				{
+					$success = $this->_image->writeImage($file_name);
+				}
 			}
 		}
 		catch (\Exception $e)
@@ -232,7 +247,8 @@ class Imagick extends AbstractManipulator
 		if ($success)
 		{
 			$this->_fileName = $file_name;
-			$this->getSize();
+			$this->sizes[2] = $preferred_format;
+			$this->_setImage();
 		}
 
 		return $success;
@@ -294,6 +310,8 @@ class Imagick extends AbstractManipulator
 			if ($this->_orientation >= 2)
 			{
 				$this->_image->setImageOrientation(\Imagick::ORIENTATION_TOPLEFT);
+				$this->_orientation = 1;
+				$this->_setImage();
 			}
 
 			$success = true;

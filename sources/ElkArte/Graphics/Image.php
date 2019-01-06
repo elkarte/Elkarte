@@ -32,6 +32,7 @@ namespace ElkArte\Graphics;
  */
 class Image
 {
+	/** @var array The image formats we will work with */
 	const DEFAULT_FORMATS = [
 		IMAGETYPE_GIF => 'gif',
 		IMAGETYPE_JPEG => 'jpeg',
@@ -82,11 +83,12 @@ class Image
 	}
 
 	/**
-	 * Clear the image object
+	 * Clears the image object
 	 */
 	public function __destruct()
 	{
 		$this->_manipulator->__destruct();
+		$this->_image_loaded = false;
 	}
 
 	/**
@@ -173,16 +175,6 @@ class Image
 	}
 
 	/**
-	 * The name of the active file
-	 *
-	 * @return string
-	 */
-	public function getFileName()
-	{
-		return $this->_fileName;
-	}
-
-	/**
 	 * Return or set (via getimagesize or getimagesizefromstring) some image details such
 	 * as size and mime type
 	 *
@@ -191,7 +183,7 @@ class Image
 	 */
 	public function getSize($source)
 	{
-		if (empty($this->_manipulator->sizes))
+		if (empty($this->_manipulator->sizes) || $source !== $this->_fileName)
 		{
 			$this->setSource($source);
 			$this->_manipulator->getSize();
@@ -262,9 +254,9 @@ class Image
 		}
 
 		// Not a jpeg or not rotated, done!
-		if ($this->_manipulator->sizes[2] !== 2 || $this->_manipulator->_orientation === 0)
+		if ($this->_manipulator->sizes[2] !== 2 || $this->_manipulator->_orientation <= 1)
 		{
-			return true;
+			return false;
 		}
 
 		try
@@ -321,9 +313,7 @@ class Image
 	 */
 	public function isImage($source)
 	{
-		$file_info = finfo_open(FILEINFO_MIME_TYPE);
-
-		return (substr(finfo_file($file_info, $source), 0, 5) === 'image');
+		return substr(get_finfo_mime($source), 0, 5) === 'image';
 	}
 
 	/**
@@ -347,7 +337,7 @@ class Image
 		global $modSettings;
 
 		// The particulars
-		$dstName = empty($destName) ? $source . '_thumb' : $dstName;
+		$dstName = $dstName === '' ? $source . '_thumb' : $dstName;
 		$format = empty($format) && !empty($modSettings['attachment_thumb_png']) ? IMAGETYPE_PNG : IMAGETYPE_JPEG;
 		$max_width = max(16, $max_width);
 		$max_height = max(16, $max_height);
