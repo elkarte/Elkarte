@@ -59,7 +59,7 @@ abstract class AbstractManipulator
 
 	abstract public function autoRotateImage();
 
-	abstract public function generateTextImage($text, $width = 100, $height = 100, $format = 'png');
+	abstract public function generateTextImage($text, $width = 100, $height = 75, $format = 'png');
 
 	abstract function createImageFromFile();
 

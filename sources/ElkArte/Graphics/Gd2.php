@@ -403,17 +403,25 @@ class Gd2 extends AbstractManipulator
 	 *
 	 * @return resource|boolean The image
 	 */
-	public function generateTextImage($text, $width = 100, $height = 100, $format = 'png')
+	public function generateTextImage($text, $width = 100, $height = 75, $format = 'png')
 	{
 		global $settings;
 
 		$create_function = 'image' . $format;
 
 		// Create a white filled box
-		$image = imagecreate($width, $height);
-		imagecolorallocate($image, 255, 255, 255);
+		try
+		{
+			$image = imagecreatetruecolor($width, $height);
+			$background = imagecolorallocate($image, 255, 255, 255);
+			imagefill($image, 0, 0, $background);
+		}
+		catch (\Exception $e)
+		{
+			return false;
+		}
 
-		$text_color = imagecolorallocate($image, 0, 0, 0);
+		$text_color = imagecolorallocate($image, 109, 109, 109);
 		$font = $settings['default_theme_dir'] . '/fonts/VDS_New.ttf';
 
 		// The loop is to try to fit the text into the image.
@@ -451,6 +459,7 @@ class Gd2 extends AbstractManipulator
 		$result = $create_function($image);
 		$image = ob_get_contents();
 		ob_end_clean();
+		$this->__destruct();
 
 		return $result ? $image : false;
 	}

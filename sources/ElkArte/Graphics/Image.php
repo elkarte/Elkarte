@@ -284,7 +284,7 @@ class Image
 	 *
 	 * @return boolean|resource The image or false if neither Imagick nor GD are found
 	 */
-	public function generateTextImage($text, $width = 100, $height = 100, $format = 'png')
+	public function generateTextImage($text, $width = 100, $height = 75, $format = 'png')
 	{
 		$valid_formats = array('jpeg', 'png', 'gif');
 		if (!in_array($format, $valid_formats))

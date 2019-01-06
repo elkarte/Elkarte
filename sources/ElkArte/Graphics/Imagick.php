@@ -44,6 +44,7 @@ class Imagick extends AbstractManipulator
 	 */
 	public static function canUse()
 	{
+
 		return class_exists('\Imagick', false);
 	}
 
@@ -342,12 +343,13 @@ class Imagick extends AbstractManipulator
 	 *
 	 * @return boolean|resource The image or false on error
 	 */
-	function generateTextImage($text, $width = 100, $height = 100, $format = 'png')
+	public function generateTextImage($text, $width = 100, $height = 75, $format = 'png')
 	{
 		global $settings;
 
 		try
 		{
+			$this->_image = new \Imagick();
 			$this->_image->newImage($width, $height, new \ImagickPixel('white'));
 			$this->_image->setImageFormat($format);
 
@@ -355,9 +357,9 @@ class Imagick extends AbstractManipulator
 			$font_size = 28;
 
 			$draw = new \ImagickDraw();
-			$draw->setStrokeColor(new \ImagickPixel('#000000'));
-			$draw->setFillColor(new \ImagickPixel('#000000'));
-			$draw->setStrokeWidth(0);
+			$draw->setStrokeColor(new \ImagickPixel("rgba(100%, 100%, 100%, 0)"));
+			$draw->setFillColor(new \ImagickPixel('#A9A9A9'));
+			$draw->setStrokeWidth(1);
 			$draw->setTextAlignment(\Imagick::ALIGN_CENTER);
 			$draw->setFont($settings['default_theme_dir'] . '/fonts/VDS_New.ttf');
 
@@ -372,6 +374,7 @@ class Imagick extends AbstractManipulator
 			// Place text in center of block
 			$this->_image->annotateImage($draw, $width / 2, $height / 2 + $font_size / 4, 0, $text);
 			$image = $this->_image->getImageBlob();
+			$this->__destruct();
 
 			return $image;
 		}
