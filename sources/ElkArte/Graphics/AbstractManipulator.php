@@ -20,19 +20,41 @@ namespace ElkArte\Graphics;
 
 abstract class AbstractManipulator
 {
-	protected $_fileName = '';
-	protected $_fileHandle = null;
+	/** @var array the array as output by getimagesize */
 	public $sizes = [];
-	/** @var \Imagick | resource  */
-	protected $_image ;
-	protected $_width = 0;
-	protected $_height = 0;
+	/** @var int the exif orientation value */
 	public $_orientation = 0;
+	/** @var string the name of the file we are manipulating */
+	protected $_fileName = '';
+	/** @var \Imagick | resource */
+	protected $_image;
+	/** @var int width of the image, updated after any manipulation */
+	protected $_width = 0;
+	/** @var int the height of the image, updated after any manipulation */
+	protected $_height = 0;
 
+	/**
+	 * AbstractManipulator constructor.
+	 *
+	 * @param $fileName
+	 */
 	abstract public function __construct($fileName);
 
+	/**
+	 * If a given manipulator can be used
+	 *
+	 * @return mixed
+	 */
 	abstract public static function canUse();
 
+	/**
+	 * Resize an image proportionally to fit within the defined max_width and max_height limits
+	 *
+	 * @param int $max_width The maximum allowed width
+	 * @param int $max_height The maximum allowed height
+	 * @param bool $strip Whether to have IM strip EXIF data as GD will
+	 * @param bool $force_resize = false Whether to override defaults and resize it
+	 */
 	abstract public function resizeImage($max_width, $max_height, $strip = false, $force_resize = true);
 
 	abstract public function autoRotateImage();
@@ -49,9 +71,8 @@ abstract class AbstractManipulator
 	 * Simple wrapper for getimagesize
 	 *
 	 * @param string $type
-	 * @param string|boolean $error return array or false on error
 	 */
-	public function getSize($type = 'file', $error = 'array')
+	public function getSize($type = 'file')
 	{
 		try
 		{
@@ -72,17 +93,15 @@ abstract class AbstractManipulator
 		// Can't get it, what shall we return
 		if (empty($this->sizes))
 		{
-			if ($error === 'array')
-			{
-				$this->sizes = array(-1, -1, -1);
-			}
-			else
-			{
-				$this->sizes = false;
-			}
+			$this->sizes = array(-1, -1, -1);
 		}
 	}
 
+	/**
+	 * Uses the manipulator functions to read the exif orientation flag
+	 *
+	 * @return mixed
+	 */
 	abstract function getOrientation();
 
 	/**
