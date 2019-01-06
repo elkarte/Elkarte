@@ -53,6 +53,9 @@ class Gd2 extends AbstractManipulator
 		return true;
 	}
 
+	/**
+	 * Cleanup when done
+	 */
 	public function __destruct()
 	{
 		if (is_object($this->_image))
@@ -97,8 +100,8 @@ class Gd2 extends AbstractManipulator
 		$this->_image = $image;
 
 		// Get the image size via GD functions
-		$this->_width = imagesx($image);
-		$this->_height = imagesy($image);
+		$this->_width = $this->sizes[0] = imagesx($image);
+		$this->_height = $this->sizes[1] = imagesy($image);
 	}
 
 	public function createImageFromWeb()
@@ -134,8 +137,6 @@ class Gd2 extends AbstractManipulator
 	 * What it does:
 	 *
 	 * - Will do nothing to the image if the file fits within the size limits
-	 * - Saves the new image to destination_filename, in the preferred_format
-	 * if possible, default is jpeg.
 	 *
 	 * @param int $max_width The maximum allowed width
 	 * @param int $max_height The maximum allowed height
@@ -204,6 +205,11 @@ class Gd2 extends AbstractManipulator
 		return $success;
 	}
 
+	/**
+	 * Create a transparent true image canvas to place our image on
+	 *
+	 * @param resource $dst_img
+	 */
 	protected function _createCanvas($dst_img)
 	{
 		// Make a true color image, because it just looks better for resizing.
@@ -212,12 +218,22 @@ class Gd2 extends AbstractManipulator
 		imagefill($dst_img, 0, 0, $color);
 	}
 
+	/**
+	 * Output the image resource to a file in a chosen format
+	 *
+	 * @param string $file_name where to save the image, if null output to screen
+	 * @param int $preferred_format jpg,png,gif, etc
+	 * @param int $quality the jpg image quality
+	 *
+	 * @return bool
+	 */
 	public function output($file_name, $preferred_format = IMAGETYPE_JPEG, $quality = 85)
 	{
 		$success = false;
-		if (empty($file_name) || !isset(Image::DEFAULT_FORMATS[$preferred_format]))
+
+		// No name, but not null, or a bogus format
+		if ($file_name === '' || !isset(Image::DEFAULT_FORMATS[$preferred_format]))
 		{
-			// Dump to browser instead ??
 			return $success;
 		}
 
@@ -261,7 +277,8 @@ class Gd2 extends AbstractManipulator
 		if ($success)
 		{
 			$this->_fileName = $file_name;
-			$this->getSize();
+			$this->sizes[2] = $preferred_format;
+			$this->_setImage($this->_image);
 		}
 
 		return $success;
@@ -320,18 +337,10 @@ class Gd2 extends AbstractManipulator
 				break;
 		}
 
+		$this->_orientation = 1;
+		$this->_setImage($this->_image);
+
 		return true;
-	}
-
-	public function getOrientation()
-	{
-		// Read the EXIF data
-		$exif = function_exists('exif_read_data') ? @exif_read_data($this->_fileName) : array();
-
-		$this->_orientation = isset($exif['Orientation']) ? $exif['Orientation'] : 0;
-
-		// We're only interested in the exif orientation
-		return (int) $this->_orientation;
 	}
 
 	/**
@@ -369,6 +378,17 @@ class Gd2 extends AbstractManipulator
 			$background = imagecolorallocatealpha($this->_image, 255, 255, 255, 127);
 			$this->_image = imagerotate($this->_image, $degrees, $background);
 		}
+	}
+
+	public function getOrientation()
+	{
+		// Read the EXIF data
+		$exif = function_exists('exif_read_data') ? @exif_read_data($this->_fileName) : array();
+
+		$this->_orientation = isset($exif['Orientation']) ? $exif['Orientation'] : 0;
+
+		// We're only interested in the exif orientation
+		return (int) $this->_orientation;
 	}
 
 	/**
