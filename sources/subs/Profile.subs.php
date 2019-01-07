@@ -576,8 +576,10 @@ function loadProfileFields($force_reload = false)
 			'preload' => function () {
 				global $context, $cur_profile;
 
-				$context['member']['karma']['good'] = $cur_profile['karma_good'];
-				$context['member']['karma']['bad'] = $cur_profile['karma_bad'];
+				$context['member']['karma'] = array(
+					'good' => (int) $cur_profile['karma_good'],
+					'bad' => (int) $cur_profile['karma_bad']
+				);
 
 				return true;
 			},
@@ -1795,7 +1797,7 @@ function profileLoadAvatarData()
 
 	$context['avatar_url'] = $modSettings['avatar_url'];
 
-	$valid_protocol = preg_match('~^https' . (detectServer()->supportsSSL() ? '' : '?') . '://~i', $cur_profile['avatar']) === 1;
+	$valid_protocol = preg_match('~^https' . (detectServer()->supportsSSL() ? '' : '?') . '://~i', $cur_profile['avatar']['name']) === 1;
 	$schema = 'http' . (detectServer()->supportsSSL() ? 's' : '') . '://';
 
 	// @todo Temporary
@@ -1806,8 +1808,8 @@ function profileLoadAvatarData()
 
 	// Default context.
 	$context['member']['avatar'] += array(
-		'custom' => $valid_protocol ? $cur_profile['avatar'] : $schema,
-		'selection' => $valid_protocol ? $cur_profile['avatar'] : '',
+		'custom' => $valid_protocol ? $cur_profile['avatar']['name'] : $schema,
+		'selection' => $valid_protocol ? $cur_profile['avatar']['name'] : '',
 		'id_attach' => $cur_profile['id_attach'],
 		'filename' => $cur_profile['filename'],
 		'allow_server_stored' => !empty($modSettings['avatar_stored_enabled']) && $allowedChange,
@@ -1816,24 +1818,28 @@ function profileLoadAvatarData()
 		'allow_gravatar' =>  !empty($modSettings['avatar_gravatar_enabled']) && $allowedChange,
 	);
 
-	if ($cur_profile['avatar'] === '' && $cur_profile['id_attach'] > 0 && $context['member']['avatar']['allow_upload'])
+	if ($cur_profile['avatar']['name'] === '' && $cur_profile['id_attach'] > 0 && $context['member']['avatar']['allow_upload'])
 	{
 		$context['member']['avatar'] += array(
 			'choice' => 'upload',
 			'server_pic' => 'blank.png',
 			'external' => $schema
 		);
-		$context['member']['avatar']['href'] = empty($cur_profile['attachment_type']) ? getUrl('attach', ['action' => 'dlattach', 'attach' => (int) $cur_profile['id_attach'], 'name' => $cur_profile['filename'], 'type' => 'avatar']) : $modSettings['custom_avatar_url'] . '/' . $cur_profile['filename'];
+		$context['member']['avatar'] += array(
+			'href' => empty($cur_profile['attachment_type'])
+				? getUrl('attach', ['action' => 'dlattach', 'attach' => (int) $cur_profile['id_attach'], 'name' => $cur_profile['filename'], 'type' => 'avatar'])
+				: $modSettings['custom_avatar_url'] . '/' . $cur_profile['filename']
+		);
 	}
 	elseif ($valid_protocol && $context['member']['avatar']['allow_external'])
 	{
 		$context['member']['avatar'] += array(
 			'choice' => 'external',
 			'server_pic' => 'blank.png',
-			'external' => $cur_profile['avatar']
+			'external' => $cur_profile['avatar']['name']
 		);
 	}
-	elseif ($cur_profile['avatar'] === 'gravatar' && $context['member']['avatar']['allow_gravatar'])
+	elseif ($cur_profile['avatar']['name'] === 'gravatar' && $context['member']['avatar']['allow_gravatar'])
 	{
 		$context['member']['avatar'] += array(
 			'choice' => 'gravatar',
@@ -1841,11 +1847,11 @@ function profileLoadAvatarData()
 			'external' => 'https://'
 		);
 	}
-	elseif ($cur_profile['avatar'] != '' && file_exists($modSettings['avatar_directory'] . '/' . $cur_profile['avatar']) && $context['member']['avatar']['allow_server_stored'])
+	elseif ($cur_profile['avatar']['name'] != '' && file_exists($modSettings['avatar_directory'] . '/' . $cur_profile['avatar']['name']) && $context['member']['avatar']['allow_server_stored'])
 	{
 		$context['member']['avatar'] += array(
 			'choice' => 'server_stored',
-			'server_pic' => $cur_profile['avatar'] == '' ? 'blank.png' : $cur_profile['avatar'],
+			'server_pic' => $cur_profile['avatar']['name'] == '' ? 'blank.png' : $cur_profile['avatar']['name'],
 			'external' => $schema
 		);
 	}
@@ -2349,8 +2355,8 @@ function profileSaveAvatarData(&$value)
 					// Attempt to chmod it.
 					@chmod($_FILES['attachment']['tmp_name'], 0644);
 
-					require_once(SUBSDIR . '/Graphics.subs.php');
-					if (!reencodeImage($_FILES['attachment']['tmp_name'], $sizes[2]))
+					$image = new \ElkArte\Graphics\Image($_FILES['attachment']['tmp_name']);
+					if (!$image->reencodeImage($_FILES['attachment']['tmp_name']))
 					{
 						@unlink($_FILES['attachment']['tmp_name']);
 						return 'bad_avatar';
@@ -2379,24 +2385,20 @@ function profileSaveAvatarData(&$value)
 			elseif (is_array($sizes))
 			{
 				// Now try to find an infection.
-				require_once(SUBSDIR . '/Graphics.subs.php');
-				if (!checkImageContents($_FILES['attachment']['tmp_name'], !empty($modSettings['avatar_paranoid'])))
+				$image = new \ElkArte\Graphics\Image($_FILES['attachment']['tmp_name']);
+				$size = $image->getSize($_FILES['attachment']['tmp_name']);
+				$valid_mime = getValidMimeImageType($size[2]);
+				if ($valid_mime !== '')
 				{
-					// It's bad. Try to re-encode the contents?
-					if (empty($modSettings['avatar_reencode']) || (!reencodeImage($_FILES['attachment']['tmp_name'], $sizes[2])))
+					if ($image->checkImageContents($_FILES['attachment']['tmp_name']) === false)
 					{
-						@unlink($_FILES['attachment']['tmp_name']);
-						return 'bad_avatar';
-					}
+						// It's bad. Try to re-encode the contents?
+						if (empty($modSettings['avatar_reencode']) || (!$image->reencodeImage($_FILES['attachment']['tmp_name'])))
+						{
+							@unlink($_FILES['attachment']['tmp_name']);
 
-					// We were successful. However, at what price?
-					$sizes = elk_getimagesize($_FILES['attachment']['tmp_name'], false);
-
-					// Hard to believe this would happen, but can you bet?
-					if ($sizes === false)
-					{
-						@unlink($_FILES['attachment']['tmp_name']);
-						return 'bad_avatar';
+							return 'bad_avatar';
+						}
 					}
 				}
 
