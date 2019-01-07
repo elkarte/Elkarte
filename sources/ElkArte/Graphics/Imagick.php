@@ -16,6 +16,9 @@ namespace ElkArte\Graphics;
 
 class Imagick extends AbstractManipulator
 {
+	/** @var \Imagick */
+	protected $_image;
+
 	public function __construct($image)
 	{
 		$this->setSource($image);
@@ -55,6 +58,11 @@ class Imagick extends AbstractManipulator
 		}
 	}
 
+	/**
+	 * Loads a image file into the image engine for processing
+	 *
+	 * @return bool|mixed
+	 */
 	public function createImageFromFile()
 	{
 		$this->getSize();
@@ -90,6 +98,11 @@ class Imagick extends AbstractManipulator
 		$this->_height = $this->sizes[1] = $this->_image->getImageHeight();
 	}
 
+	/**
+	 * Loads an image from a web address into the image engine for processing
+	 *
+	 * @return bool|mixed
+	 */
 	public function createImageFromWeb()
 	{
 		require_once(SUBSDIR . '/Package.subs.php');
@@ -126,14 +139,14 @@ class Imagick extends AbstractManipulator
 	 *
 	 * - Will do nothing to the image if the file fits within the size limits
 	 *
-	 * @param int $max_width The maximum allowed width
-	 * @param int $max_height The maximum allowed height
+	 * @param int|null $max_width The maximum allowed width
+	 * @param int|null $max_height The maximum allowed height
 	 * @param bool $strip Whether to have IM strip EXIF data as GD will
 	 * @param bool $force_resize = false Whether to override defaults and resize it
 	 *
 	 * @return bool Whether resize was successful.
 	 */
-	public function resizeImage($max_width, $max_height, $strip = false, $force_resize = false)
+	public function resizeImage($max_width = null, $max_height = null, $strip = false, $force_resize = false)
 	{
 		$success = false;
 
@@ -191,7 +204,7 @@ class Imagick extends AbstractManipulator
 	 *
 	 * @return bool
 	 */
-	public function output($file_name, $preferred_format = IMAGETYPE_JPEG, $quality = 85)
+	public function output($file_name = null, $preferred_format = IMAGETYPE_JPEG, $quality = 85)
 	{
 		$success = false;
 
@@ -264,11 +277,11 @@ class Imagick extends AbstractManipulator
 	 *
 	 * @return bool
 	 */
-	function autoRotateImage()
+	public function autoRotateImage()
 	{
 		try
 		{
-			switch ($this->_orientation)
+			switch ($this->orientation)
 			{
 				// 0 & 1 Not set or Normal
 				case \Imagick::ORIENTATION_UNDEFINED:
@@ -307,10 +320,10 @@ class Imagick extends AbstractManipulator
 			}
 
 			// Now that it's auto-rotated, make sure the EXIF data is correctly updated
-			if ($this->_orientation >= 2)
+			if ($this->orientation >= 2)
 			{
 				$this->_image->setImageOrientation(\Imagick::ORIENTATION_TOPLEFT);
-				$this->_orientation = 1;
+				$this->orientation = 1;
 				$this->_setImage();
 			}
 
@@ -326,9 +339,9 @@ class Imagick extends AbstractManipulator
 
 	public function getOrientation()
 	{
-		$this->_orientation = $this->_image->getImageOrientation();
+		$this->orientation = $this->_image->getImageOrientation();
 
-		return (int) $this->_orientation;
+		return (int) $this->orientation;
 	}
 
 	/**
@@ -340,7 +353,7 @@ class Imagick extends AbstractManipulator
 	 * @param int $height Height of the image
 	 * @param string $format Type of the image (valid types are png, jpeg, gif)
 	 *
-	 * @return boolean|resource The image or false on error
+	 * @return boolean|string The image or false on error
 	 */
 	public function generateTextImage($text, $width = 100, $height = 75, $format = 'png')
 	{

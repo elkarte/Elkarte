@@ -26,13 +26,10 @@ abstract class AbstractManipulator
 	public $sizes = [];
 
 	/** @var int the exif orientation value */
-	public $_orientation = 0;
+	public $orientation = 0;
 
 	/** @var string the name of the file we are manipulating */
 	protected $_fileName = '';
-
-	/** @var \Imagick | resource */
-	protected $_image;
 
 	/** @var int width of the image, updated after any manipulation */
 	protected $_width = 0;
@@ -57,12 +54,12 @@ abstract class AbstractManipulator
 	/**
 	 * Resize an image proportionally to fit within the defined max_width and max_height limits
 	 *
-	 * @param int $max_width The maximum allowed width
-	 * @param int $max_height The maximum allowed height
+	 * @param int|null $max_width The maximum allowed width
+	 * @param int|null $max_height The maximum allowed height
 	 * @param bool $strip Whether to have IM strip EXIF data as GD will
 	 * @param bool $force_resize = false Whether to override defaults and resize it
 	 */
-	abstract public function resizeImage($max_width, $max_height, $strip = false, $force_resize = true);
+	abstract public function resizeImage($max_width = null, $max_height = null, $strip = false, $force_resize = true);
 
 	/**
 	 * Rotate an image based on its EXIF flag, used to correct for smart phone pictures.
@@ -86,12 +83,13 @@ abstract class AbstractManipulator
 	/**
 	 * Loads a image file into the image engine for processing
 	 *
-	 * @return mixed
+	 * @return bool|mixed
 	 */
 	abstract function createImageFromFile();
 
 	/**
 	 * Loads an image from a web address into the image engine for processing
+	 *
 	 * @return mixed
 	 */
 	abstract function createImageFromWeb();
@@ -105,7 +103,7 @@ abstract class AbstractManipulator
 	 *
 	 * @return mixed
 	 */
-	abstract function output($file_name, $preferred_format = IMAGETYPE_JPEG, $quality = 85);
+	abstract function output($file_name = null, $preferred_format = IMAGETYPE_JPEG, $quality = 85);
 
 	/**
 	 * Simple wrapper for getimagesize

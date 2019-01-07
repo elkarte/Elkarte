@@ -14,8 +14,21 @@
 
 namespace ElkArte\Graphics;
 
+/**
+ * Class Gd2
+ *
+ * @package ElkArte\Graphics
+ */
 class Gd2 extends AbstractManipulator
 {
+	/** @var resource */
+	protected $_image;
+
+	/**
+	 * Gd2 constructor.
+	 *
+	 * @param string $image
+	 */
 	public function __construct($image)
 	{
 		$this->setSource($image);
@@ -32,6 +45,11 @@ class Gd2 extends AbstractManipulator
 		return true;
 	}
 
+	/**
+	 * Set the filename to the class
+	 *
+	 * @param $source
+	 */
 	public function setSource($source)
 	{
 		$this->_fileName = $source;
@@ -45,7 +63,7 @@ class Gd2 extends AbstractManipulator
 	public static function canUse()
 	{
 		// Check to see if GD is installed and what version.
-		if (($extensionFunctions = get_extension_funcs('gd')) === false)
+		if ((get_extension_funcs('gd')) === false)
 		{
 			return false;
 		}
@@ -58,12 +76,17 @@ class Gd2 extends AbstractManipulator
 	 */
 	public function __destruct()
 	{
-		if (is_object($this->_image))
+		if (is_resource($this->_image))
 		{
 			imagedestroy($this->_image);
 		}
 	}
 
+	/**
+	 * Loads a image file into the image engine for processing
+	 *
+	 * @return bool|mixed
+	 */
 	public function createImageFromFile()
 	{
 		$this->getSize();
@@ -104,6 +127,11 @@ class Gd2 extends AbstractManipulator
 		$this->_height = $this->sizes[1] = imagesy($image);
 	}
 
+	/**
+	 * Loads an image from a web address into the image engine for processing
+	 *
+	 * @return bool|mixed
+	 */
 	public function createImageFromWeb()
 	{
 		require_once(SUBSDIR . '/Package.subs.php');
@@ -138,14 +166,14 @@ class Gd2 extends AbstractManipulator
 	 *
 	 * - Will do nothing to the image if the file fits within the size limits
 	 *
-	 * @param int $max_width The maximum allowed width
-	 * @param int $max_height The maximum allowed height
+	 * @param int|null $max_width The maximum allowed width
+	 * @param int|null $max_height The maximum allowed height
 	 * @param bool $strip if to remove the images Exif data (GD will always)
 	 * @param bool $force_resize = false Whether to override defaults and resize it
 	 *
 	 * @return bool Whether resize was successful.
 	 */
-	public function resizeImage($max_width, $max_height, $strip = true, $force_resize = false)
+	public function resizeImage($max_width = null, $max_height = null, $strip = true, $force_resize = false)
 	{
 		$success = false;
 
@@ -227,7 +255,7 @@ class Gd2 extends AbstractManipulator
 	 *
 	 * @return bool
 	 */
-	public function output($file_name, $preferred_format = IMAGETYPE_JPEG, $quality = 85)
+	public function output($file_name = null, $preferred_format = IMAGETYPE_JPEG, $quality = 85)
 	{
 		$success = false;
 
@@ -299,7 +327,7 @@ class Gd2 extends AbstractManipulator
 	public function autoRotateImage()
 	{
 		// Time to spin and mirror as needed
-		switch ($this->_orientation)
+		switch ($this->orientation)
 		{
 			// 0 & 1 Not set or Normal
 			case 0:
@@ -337,7 +365,7 @@ class Gd2 extends AbstractManipulator
 				break;
 		}
 
-		$this->_orientation = 1;
+		$this->orientation = 1;
 		$this->_setImage($this->_image);
 
 		return true;
@@ -385,10 +413,10 @@ class Gd2 extends AbstractManipulator
 		// Read the EXIF data
 		$exif = function_exists('exif_read_data') ? @exif_read_data($this->_fileName) : array();
 
-		$this->_orientation = isset($exif['Orientation']) ? $exif['Orientation'] : 0;
+		$this->orientation = isset($exif['Orientation']) ? $exif['Orientation'] : 0;
 
 		// We're only interested in the exif orientation
-		return (int) $this->_orientation;
+		return (int) $this->orientation;
 	}
 
 	/**
@@ -401,7 +429,7 @@ class Gd2 extends AbstractManipulator
 	 * @param int $height Height of the image
 	 * @param string $format Type of the image (valid types are png, jpeg, gif)
 	 *
-	 * @return resource|boolean The image
+	 * @return string|boolean The image
 	 */
 	public function generateTextImage($text, $width = 100, $height = 75, $format = 'png')
 	{

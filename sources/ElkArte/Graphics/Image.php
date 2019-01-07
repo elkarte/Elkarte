@@ -22,12 +22,6 @@ namespace ElkArte\Graphics;
  *
  * Base class for image function and interaction with the various graphic engines (GD/IMagick)
  *
- * $image = new Image('', true);
- * $image->loadImage(filename or web address);
- * $image->resizeImageFile();
- * $image->output();
- *
- *
  * @package ElkArte\Graphics
  */
 class Image
@@ -254,7 +248,7 @@ class Image
 		}
 
 		// Not a jpeg or not rotated, done!
-		if ($this->_manipulator->sizes[2] !== 2 || $this->_manipulator->_orientation <= 1)
+		if ($this->_manipulator->sizes[2] !== 2 || $this->_manipulator->orientation <= 1)
 		{
 			return false;
 		}
@@ -282,7 +276,7 @@ class Image
 	 * @param int $height Height of the image
 	 * @param string $format Type of the image (valid types are png, jpeg, gif)
 	 *
-	 * @return boolean|resource The image or false if neither Imagick nor GD are found
+	 * @return boolean|string The image or false if neither Imagick nor GD are found
 	 */
 	public function generateTextImage($text, $width = 100, $height = 75, $format = 'png')
 	{
