@@ -9,27 +9,34 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
- * This file contains code covered by:
- * copyright: 2011 Simple Machines (http://www.simplemachines.org)
- *
  * @version 2.0 dev
  *
  */
 
 namespace ElkArte\Graphics;
 
+/**
+ * Class AbstractManipulator
+ *
+ * @package ElkArte\Graphics
+ */
 abstract class AbstractManipulator
 {
 	/** @var array the array as output by getimagesize */
 	public $sizes = [];
+
 	/** @var int the exif orientation value */
 	public $_orientation = 0;
+
 	/** @var string the name of the file we are manipulating */
 	protected $_fileName = '';
+
 	/** @var \Imagick | resource */
 	protected $_image;
+
 	/** @var int width of the image, updated after any manipulation */
 	protected $_width = 0;
+
 	/** @var int the height of the image, updated after any manipulation */
 	protected $_height = 0;
 
@@ -57,14 +64,47 @@ abstract class AbstractManipulator
 	 */
 	abstract public function resizeImage($max_width, $max_height, $strip = false, $force_resize = true);
 
+	/**
+	 * Rotate an image based on its EXIF flag, used to correct for smart phone pictures.
+	 *
+	 * @return mixed
+	 */
 	abstract public function autoRotateImage();
 
+	/**
+	 * Creates an image using the supplied text.
+	 *
+	 * @param string $text
+	 * @param int $width
+	 * @param int $height
+	 * @param string $format
+	 *
+	 * @return mixed
+	 */
 	abstract public function generateTextImage($text, $width = 100, $height = 75, $format = 'png');
 
+	/**
+	 * Loads a image file into the image engine for processing
+	 *
+	 * @return mixed
+	 */
 	abstract function createImageFromFile();
 
+	/**
+	 * Loads an image from a web address into the image engine for processing
+	 * @return mixed
+	 */
 	abstract function createImageFromWeb();
 
+	/**
+	 * Output the image resource to a file in a chosen format
+	 *
+	 * @param string $file_name where to save the image, if null output to screen
+	 * @param int $preferred_format the integer constant representing a type ... jpg,png,gif, etc
+	 * @param int $quality the jpg image quality
+	 *
+	 * @return mixed
+	 */
 	abstract function output($file_name, $preferred_format = IMAGETYPE_JPEG, $quality = 85);
 
 	/**

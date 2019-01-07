@@ -44,7 +44,6 @@ class Imagick extends AbstractManipulator
 	 */
 	public static function canUse()
 	{
-
 		return class_exists('\Imagick', false);
 	}
 
