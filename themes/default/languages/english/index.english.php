@@ -294,7 +294,7 @@ $txt['female'] = 'Female';
 $txt['error_invalid_characters_username'] = 'Invalid character used in user name.';
 
 $txt['welcome_guest'] = 'Welcome, <strong>Guest</strong>. Please <a href="{login_url}" rel="nofollow">login</a>.';
-$txt['welcome_guest_register'] = 'Welcome to <strong>{forum_name}</strong>. Please <a href="{login_url}" rel="nofollow">login</a> or <a href="{register_url} rel="nofollow"">register</a>.';
+$txt['welcome_guest_register'] = 'Welcome to <strong>{forum_name}</strong>. Please <a href="{login_url}" rel="nofollow">login</a> or <a href="{register_url}" rel="nofollow">register</a>.';
 $txt['welcome_guest_activate'] = '<br />Did you miss your <a href="{activate_url}" rel="nofollow">activation email</a>?';
 
 // @todo the following to sprintf

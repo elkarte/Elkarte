@@ -420,7 +420,7 @@ function loadUserSettings()
 					if (false === $agreement->checkAccepted($id_member, $modSettings['agreementRevision']))
 					{
 						setOldUrl('agreement_url_redirect');
-						redirectexit('action=register;sa=agreement', true);
+						redirectexit('action=register;sa=agreement');
 					}
 				}
 			}
@@ -435,7 +435,7 @@ function loadUserSettings()
 					if (false === $privacypol->checkAccepted($id_member, $modSettings['privacypolicyRevision']))
 					{
 						setOldUrl('agreement_url_redirect');
-						redirectexit('action=register;sa=privacypol', true);
+						redirectexit('action=register;sa=privacypol');
 					}
 				}
 			}

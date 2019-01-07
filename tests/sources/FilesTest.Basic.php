@@ -75,7 +75,7 @@ class TestFiles extends \PHPUnit\Framework\TestCase
 			$tokens = @token_get_all($file_content);
 			foreach ($tokens as $token)
 			{
-				if ($token === '{')
+				if ($token === '{' || (isset($token[1]) && $token[1] === '${'))
 					$level++;
 				elseif ($token === '}')
 					$level--;
