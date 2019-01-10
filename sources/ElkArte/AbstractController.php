@@ -177,8 +177,7 @@ abstract class AbstractController
 		if ($this->_hook === '')
 		{
 			// Use the base controller name for the hook, ie post
-			$this->_hook = explode('\\', trim(get_class($this), '\\'));
-			$this->_hook = end($this->_hook);
+			$this->_hook = $this->getModuleClass();
 
 			// Initialize the events associated with this controller
 			$this->_initEventManager();

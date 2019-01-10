@@ -19,7 +19,7 @@ namespace ElkArte\Modules\Poll;
 /**
  * Class Poll_Display_Module
  */
-class Poll_Display_Module extends \ElkArte\Modules\AbstractModule
+class Display extends \ElkArte\Modules\AbstractModule
 {
 	/**
 	 * If polls are enabled
@@ -41,12 +41,12 @@ class Poll_Display_Module extends \ElkArte\Modules\AbstractModule
 		global $modSettings;
 
 		$return = array(
-			array('topicinfo', array('Poll_Display_Module', 'topicinfo'), array('topicinfo')),
+			array('topicinfo', array('\\ElkArte\\Modules\\Poll\\Display', 'topicinfo'), array('topicinfo')),
 		);
 		self::$_enabled = !empty($modSettings['pollMode']);
 		if (self::$_enabled && allowedTo('poll_view'))
 		{
-			$return[] = array('prepare_context', array('Poll_Display_Module', 'prepare_context'), array('template_layers'));
+			$return[] = array('prepare_context', array('\\ElkArte\\Modules\\Poll\\Display', 'prepare_context'), array('template_layers'));
 		}
 
 		return $return;

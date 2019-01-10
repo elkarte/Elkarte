@@ -66,13 +66,12 @@ class Post extends \ElkArte\Modules\AbstractModule
 			self::$_attach_level = $modSettings['attachmentEnable'];
 
 			return array(
-				array('prepare_post', array('Attachments_Post_Module', 'prepare_post'), array()),
-				array('prepare_context', array('Attachments_Post_Module', 'prepare_context'), array('post_errors')),
-				array('finalize_post_form', array('Attachments_Post_Module', 'finalize_post_form'), array('show_additional_options', 'board', 'topic')),
-
-				array('prepare_save_post', array('Attachments_Post_Module', 'prepare_save_post'), array('post_errors')),
-				array('pre_save_post', array('Attachments_Post_Module', 'pre_save_post'), array('msgOptions')),
-				array('after_save_post', array('Attachments_Post_Module', 'after_save_post'), array('msgOptions')),
+				array('prepare_post', array('\\ElkArte\\Modules\\Attachments\\Post', 'prepare_post'), array()),
+				array('prepare_context', array('\\ElkArte\\Modules\\Attachments\\Post', 'prepare_context'), array('post_errors')),
+				array('finalize_post_form', array('\\ElkArte\\Modules\\Attachments\\Post', 'finalize_post_form'), array('show_additional_options', 'board', 'topic')),
+				array('prepare_save_post', array('\\ElkArte\\Modules\\Attachments\\Post', 'prepare_save_post'), array('post_errors')),
+				array('pre_save_post', array('\\ElkArte\\Modules\\Attachments\\Post', 'pre_save_post'), array('msgOptions')),
+				array('after_save_post', array('\\ElkArte\\Modules\\Attachments\\Post', 'after_save_post'), array('msgOptions')),
 			);
 		}
 		else
@@ -166,6 +165,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 						if (strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') !== false)
 						{
 							@unlink($attachment['tmp_name']);
+							@unlink($attachment['tmp_name'] . '_thumb');
 						}
 					}
 					$this->_attach_errors->addError('temp_attachments_gone');
