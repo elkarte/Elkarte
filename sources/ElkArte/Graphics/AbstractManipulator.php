@@ -37,6 +37,9 @@ abstract class AbstractManipulator
 	/** @var int the height of the image, updated after any manipulation */
 	protected $_height = 0;
 
+	/** @var \Imagick|resource */
+	protected $_image;
+
 	/**
 	 * AbstractManipulator constructor.
 	 *
@@ -85,38 +88,39 @@ abstract class AbstractManipulator
 	 *
 	 * @return bool|mixed
 	 */
-	abstract function createImageFromFile();
+	abstract public function createImageFromFile();
 
 	/**
 	 * Loads an image from a web address into the image engine for processing
 	 *
 	 * @return mixed
 	 */
-	abstract function createImageFromWeb();
+	abstract public function createImageFromWeb();
 
 	/**
 	 * Output the image resource to a file in a chosen format
 	 *
-	 * @param string $file_name where to save the image, if null output to screen
+	 * @param string $file_name where to save the image, if '' echos to screen/buffer
 	 * @param int $preferred_format the integer constant representing a type ... jpg,png,gif, etc
 	 * @param int $quality the jpg image quality
 	 *
 	 * @return mixed
 	 */
-	abstract function output($file_name = null, $preferred_format = IMAGETYPE_JPEG, $quality = 85);
+	abstract public function output($file_name = '', $preferred_format = IMAGETYPE_JPEG, $quality = 85);
 
 	/**
 	 * Simple wrapper for getimagesize
 	 *
 	 * @param string $type
+	 * @param string $data only used when calling the function in string mode
 	 */
-	public function getSize($type = 'file')
+	public function getSize($type = 'file', $data = '')
 	{
 		try
 		{
 			if ($type === 'string')
 			{
-				$this->sizes = getimagesizefromstring($this->_image);
+				$this->sizes = getimagesizefromstring($data);
 			}
 			else
 			{
@@ -125,7 +129,7 @@ abstract class AbstractManipulator
 		}
 		catch (\Exception $e)
 		{
-			$this->sizes = false;
+			$this->sizes = array();
 		}
 
 		// Can't get it, what shall we return
@@ -140,7 +144,7 @@ abstract class AbstractManipulator
 	 *
 	 * @return mixed
 	 */
-	abstract function getOrientation();
+	abstract public function getOrientation();
 
 	/**
 	 * See if we have enough memory to thumbnail an image

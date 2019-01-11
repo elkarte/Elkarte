@@ -65,15 +65,13 @@ class Image
 		}
 		catch (\Exception $e)
 		{
-			return false;
+			// Nothing to do
 		}
 
 		if (!empty($this->_fileName))
 		{
 			$this->loadImage($this->_fileName);
 		}
-
-		return true;
 	}
 
 	/**
@@ -155,12 +153,13 @@ class Image
 	/**
 	 * Save the image object to a file.
 	 *
-	 * @param null|string $file_name name to save the image to
+	 * @param string $file_name name to save the image to
 	 * @param int $preferred_format what format to save the image
 	 * @param int $quality some formats require we provide a compression quality
+	 *
 	 * @return bool
 	 */
-	public function saveImage($file_name = null, $preferred_format = IMAGETYPE_JPEG, $quality = 85)
+	public function saveImage($file_name = '', $preferred_format = IMAGETYPE_JPEG, $quality = 85)
 	{
 		$success = $this->_manipulator->output($file_name, $preferred_format, $quality);
 		$this->__destruct();
@@ -173,6 +172,7 @@ class Image
 	 * as size and mime type
 	 *
 	 * @param string $source
+	 *
 	 * @return array
 	 */
 	public function getSize($source)

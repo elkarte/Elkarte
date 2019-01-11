@@ -39,16 +39,14 @@ class Gd2 extends AbstractManipulator
 		}
 		catch (\Exception $e)
 		{
-			return false;
+			// Just pass through since the check is not fatal
 		}
-
-		return true;
 	}
 
 	/**
 	 * Set the filename to the class
 	 *
-	 * @param $source
+	 * @param string $source
 	 */
 	public function setSource($source)
 	{
@@ -63,12 +61,7 @@ class Gd2 extends AbstractManipulator
 	public static function canUse()
 	{
 		// Check to see if GD is installed and what version.
-		if ((get_extension_funcs('gd')) === false)
-		{
-			return false;
-		}
-
-		return true;
+		return !(get_extension_funcs('gd') === false);
 	}
 
 	/**
@@ -135,9 +128,9 @@ class Gd2 extends AbstractManipulator
 	public function createImageFromWeb()
 	{
 		require_once(SUBSDIR . '/Package.subs.php');
-		$this->_image = fetch_web_data($this->_fileName);
+		$image = fetch_web_data($this->_fileName);
 
-		$this->getSize('string');
+		$this->getSize('string', $image);
 		if (isset(Image::DEFAULT_FORMATS[$this->sizes[2]]))
 		{
 			try
@@ -249,23 +242,24 @@ class Gd2 extends AbstractManipulator
 	/**
 	 * Output the image resource to a file in a chosen format
 	 *
-	 * @param string $file_name where to save the image, if null output to screen
+	 * @param string $file_name where to save the image, if '' output to screen
 	 * @param int $preferred_format jpg,png,gif, etc
 	 * @param int $quality the jpg image quality
 	 *
 	 * @return bool
 	 */
-	public function output($file_name = null, $preferred_format = IMAGETYPE_JPEG, $quality = 85)
+	public function output($file_name = '', $preferred_format = IMAGETYPE_JPEG, $quality = 85)
 	{
 		$success = false;
 
-		// No name, but not null, or a bogus format
-		if ($file_name === '' || !isset(Image::DEFAULT_FORMATS[$preferred_format]))
+		// No bogus formats
+		if (!isset(Image::DEFAULT_FORMATS[$preferred_format]))
 		{
 			return $success;
 		}
 
-		// Save the image as ...
+		// Save the image as ..
+		$output_name = empty($file_name) ? null : $file_name;
 		switch ($preferred_format)
 		{
 			case IMAGETYPE_PNG:
@@ -273,36 +267,36 @@ class Gd2 extends AbstractManipulator
 				{
 					imagealphablending($this->_image, false);
 					imagesavealpha($this->_image, true);
-					$success = imagepng($this->_image, $file_name, 9, PNG_ALL_FILTERS);
+					$success = imagepng($this->_image, $output_name, 9, PNG_ALL_FILTERS);
 				}
 				break;
 			case IMAGETYPE_GIF:
 				if (function_exists('imagegif'))
 				{
-					$success = imagegif($this->_image, $file_name);
+					$success = imagegif($this->_image, $output_name);
 				}
 				break;
 			case IMAGETYPE_WBMP:
 				if (function_exists('imagewbmp'))
 				{
-					$success = imagewbmp($this->_image, $file_name);
+					$success = imagewbmp($this->_image, $output_name);
 				}
 				break;
 			case IMAGETYPE_BMP:
 				if (function_exists('imagebmp'))
 				{
-					$success = imagebmp($this->_image, $file_name);
+					$success = imagebmp($this->_image, $output_name);
 				}
 				break;
 			default:
 				if (function_exists('imagejpeg'))
 				{
-					$success = imagejpeg($this->_image, $file_name, $quality);
+					$success = imagejpeg($this->_image, $output_name, $quality);
 				}
 		}
 
 		// Update the sizes array to the output file
-		if ($success)
+		if ($success && $file_name !== '')
 		{
 			$this->_fileName = $file_name;
 			$this->sizes[2] = $preferred_format;

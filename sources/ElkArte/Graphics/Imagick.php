@@ -14,11 +14,21 @@
 
 namespace ElkArte\Graphics;
 
+/**
+ * Class Imagick
+ *
+ * @package ElkArte\Graphics
+ */
 class Imagick extends AbstractManipulator
 {
 	/** @var \Imagick */
 	protected $_image;
 
+	/**
+	 * Imagick constructor.
+	 *
+	 * @param string $image
+	 */
 	public function __construct($image)
 	{
 		$this->setSource($image);
@@ -29,12 +39,15 @@ class Imagick extends AbstractManipulator
 		}
 		catch (\Exception $e)
 		{
-			return false;
+			// Just pass through
 		}
-
-		return true;
 	}
 
+	/**
+	 * Set the source to the class fileName
+	 *
+	 * @param string $source
+	 */
 	public function setSource($source)
 	{
 		$this->_fileName = $source;
@@ -106,16 +119,15 @@ class Imagick extends AbstractManipulator
 	public function createImageFromWeb()
 	{
 		require_once(SUBSDIR . '/Package.subs.php');
-		$this->_image = fetch_web_data($this->_fileName);
-		$this->getSize('string');
+		$image = fetch_web_data($this->_fileName);
+		$this->getSize('string', $image);
 
 		if (isset(Image::DEFAULT_FORMATS[$this->sizes[2]]))
 		{
 			try
 			{
-				$blob = $this->_image;
 				$this->_image = new \Imagick();
-				$this->_image->readImageBlob($blob);
+				$this->_image->readImageBlob($image);
 			}
 			catch (\Exception $e)
 			{
@@ -198,18 +210,18 @@ class Imagick extends AbstractManipulator
 	/**
 	 * Output the image resource to a file in a chosen format
 	 *
-	 * @param string $file_name where to save the image, if null output to screen
+	 * @param string $file_name where to save the image, if '' output to screen
 	 * @param int $preferred_format jpg,png,gif, etc
 	 * @param int $quality the jpg image quality
 	 *
 	 * @return bool
 	 */
-	public function output($file_name = null, $preferred_format = IMAGETYPE_JPEG, $quality = 85)
+	public function output($file_name = '', $preferred_format = IMAGETYPE_JPEG, $quality = 85)
 	{
 		$success = false;
 
-		// No name, but not null, or an unknown type
-		if ($file_name === '' || !isset(Image::DEFAULT_FORMATS[$preferred_format]))
+		// An unknown type
+		if (!isset(Image::DEFAULT_FORMATS[$preferred_format]))
 		{
 			return $success;
 		}
@@ -240,8 +252,8 @@ class Imagick extends AbstractManipulator
 		{
 			if ($success)
 			{
-				// Screen to file, your choice
-				if ($file_name === null)
+				// Screen or file, your choice
+				if ($file_name === '')
 				{
 					echo $this->_image->getImagesBlob();
 				}
@@ -257,7 +269,7 @@ class Imagick extends AbstractManipulator
 		}
 
 		// Update the sizes array to the output file
-		if ($success)
+		if ($success && $file_name !== '')
 		{
 			$this->_fileName = $file_name;
 			$this->sizes[2] = $preferred_format;
