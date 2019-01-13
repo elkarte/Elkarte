@@ -30,7 +30,7 @@ class FsockFetchWebdata
 	/** @var int Holds the current redirect count for the request */
 	private $_current_redirect = 0;
 
-	/** @var null"string Used on redirect when keep alive is true */
+	/** @var null|string Used on redirect when keep alive is true */
 	private $_keep_alive_host = null;
 
 	/** @var null|resource the fp resource to reuse */
@@ -42,19 +42,19 @@ class FsockFetchWebdata
 	/** @var array the parsed url with host, port, path, etc */
 	private $_url = array();
 
-	/** @var null the fsockopen resource */
+	/** @var null|resource the fsockopen resource */
 	private $_fp = null;
 
 	/** @var mixed[] Holds the passed user options array (only option is max_length) */
 	private $_user_options = array();
 
-	/** @var string|array Holds any data that will be posted to a form */
+	/** @var string|string[] Holds any data that will be posted to a form */
 	private $_post_data = '';
 
 	/** @var string[] Holds the response to the request, headers, data, code */
 	private $_response = array('url' => '', 'code' => 404, 'error' => '', 'redirects' => 0, 'size' => 0, 'headers' => array(), 'body' => '');
 
-	/** @var string Holds the last headers response to the request */
+	/** @var array() Holds the last headers response to the request */
 	private $_headers = array();
 
 	/** @var string the HTTP response from the server 200/404/302 etc */
@@ -82,7 +82,7 @@ class FsockFetchWebdata
 	 * Prepares any post data supplied and then makes the request for data
 	 *
 	 * @param string $url
-	 * @param string $post_data
+	 * @param string|string[] $post_data
 	 *
 	 */
 	public function get_url_data($url, $post_data = '')
@@ -138,7 +138,7 @@ class FsockFetchWebdata
 		// Is it where we thought?
 		$this->_readHeaders();
 		$location = $this->_checkRedirect();
-		if ($location === false)
+		if (empty($location))
 		{
 			preg_match('~^HTTP/\S+\s+(\d{3})~i', $this->_server_response, $code);
 			$this->_response['code'] = isset($code[1]) ? intval($code[1]) : '???';
@@ -315,7 +315,7 @@ class FsockFetchWebdata
 	/**
 	 * Looks at the server response and header array to determine if we are redirecting
 	 *
-	 * @return bool
+	 * @return string
 	 */
 	private function _checkRedirect()
 	{
@@ -330,7 +330,7 @@ class FsockFetchWebdata
 			// redirection with no location, just like working in a corporation
 			if (empty($this->_headers['location']))
 			{
-				return false;
+				return '';
 			}
 			else
 			{
@@ -344,7 +344,7 @@ class FsockFetchWebdata
 			}
 		}
 
-		return false;
+		return '';
 	}
 
 	/**
@@ -445,7 +445,7 @@ class FsockFetchWebdata
 	 *
 	 * @param string $area used to return an area such as body, header, error
 	 *
-	 * @return string
+	 * @return string|string[]
 	 */
 	public function result($area = '')
 	{

@@ -33,20 +33,17 @@ class StreamFetchWebdata
 	/** @var array the parsed url with host, port, path, etc */
 	private $_url = array();
 
-	/** @var null the fopen resource */
+	/** @var null|resource the fopen resource */
 	private $_fp = null;
 
 	/** @var mixed[] Holds the passed user options array (only option is max_length) */
 	private $_user_options = array();
 
-	/** @var string|array Holds any data that will be posted to a form */
+	/** @var string|string[] Holds any data that will be posted to a form */
 	private $_post_data = '';
 
 	/** @var string[] Holds the response to the request, headers, data, code */
 	private $_response = array('url' => '', 'code' => 404, 'error' => '', 'redirects' => 0, 'size' => 0, 'headers' => array(), 'body' => '');
-
-	/** @var string Holds the last headers response to the request */
-	private $_headers = '';
 
 	/** @var array the context options for the stream */
 	private $_options = array();
@@ -70,7 +67,7 @@ class StreamFetchWebdata
 	 * Prepares any post data supplied and then makes the request for data
 	 *
 	 * @param string $url
-	 * @param string $post_data
+	 * @param string|string[] $post_data
 	 */
 	public function get_url_data($url, $post_data = '')
 	{
