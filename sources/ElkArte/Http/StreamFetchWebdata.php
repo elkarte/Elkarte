@@ -76,11 +76,11 @@ class StreamFetchWebdata
 		{
 			if (is_array($post_data))
 			{
-				$this->_post_data = http_build_query($post_data);
+				$this->_post_data = http_build_query($post_data, '', '&');
 			}
 			else
 			{
-				$this->_post_data = http_build_query(array(trim($post_data)));
+				$this->_post_data = http_build_query(array(trim($post_data)), '', '&');
 			}
 		}
 
@@ -145,7 +145,7 @@ class StreamFetchWebdata
 		$this->_options = array(
 			'http' =>
 				array(
-					'method' => empty($this->_post_data) ? 'GET' : 'POST',
+					'method' => 'GET',
 					'max_redirects' => $this->_max_redirect,
 					'ignore_errors' => true,
 					'protocol_version' => 1.1,
@@ -153,6 +153,7 @@ class StreamFetchWebdata
 					'header' => array(
 						'Connection: ' . ($this->_keep_alive ? 'Keep-Alive' : 'close'),
 						'User-Agent: PHP/ELK',
+						'Content-type: application/x-www-form-urlencoded',
 					),
 				)
 		);
@@ -162,6 +163,13 @@ class StreamFetchWebdata
 		{
 			$this->_content_length = intval($this->_user_options['max_length']);
 			$this->_options['http']['header'][] = 'Range: bytes=0-' . $this->_content_length - 1;
+		}
+
+		if (!empty($this->_post_data))
+		{
+			$this->_options['http']['method'] = 'POST';
+			$this->_options['http']['header'][] ='Content-Length: ' . strlen($this->_post_data);
+			$this->_options['http']['content'] = $this->_post_data;
 		}
 	}
 
@@ -202,11 +210,11 @@ class StreamFetchWebdata
 		foreach ($headers['wrapper_data'] as $header)
 		{
 			// Create the final header array
-			list($name, $value) = explode(':', $header, 2);
+			$temp = explode(':', $header, 2);
 
 			// Normalize / clean
-			$name = strtolower($name);
-			$value = trim($value);
+			$name = isset($temp[0]) ? strtolower($temp[0]) : '';
+			$value = isset($temp[1]) ? trim($temp[1]) : '';
 
 			// How many redirects
 			if ($name === 'location')
@@ -295,7 +303,7 @@ class StreamFetchWebdata
 	 *
 	 * @param string $area used to return an area such as body, header, error
 	 *
-	 * @return string
+	 * @return string|string[]
 	 */
 	public function result($area = '')
 	{

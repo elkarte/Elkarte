@@ -92,15 +92,16 @@ class FsockFetchWebdata
 		{
 			if (is_array($post_data))
 			{
-				$this->_post_data = http_build_query($post_data);
+				$this->_post_data = http_build_query($post_data, '', '&');
 			}
 			else
 			{
-				$this->_post_data = http_build_query(array(trim($post_data)));
+				$this->_post_data = http_build_query(array(trim($post_data)), '', '&');
 			}
 		}
 
 		// Set the options and get it
+		$this->_current_redirect = 0;
 		$this->_fopenRequest($url);
 	}
 
@@ -148,10 +149,12 @@ class FsockFetchWebdata
 			{
 				// Provide a common valid 200 return code to the caller
 				$this->_response['code'] = 200;
-				$this->_fetchData();
-
-				return true;
 			}
+
+			$this->_fetchData();
+			fclose($this->_fp);
+
+			return true;
 		}
 		else
 		{
@@ -230,20 +233,23 @@ class FsockFetchWebdata
 		$request .= (empty($this->_post_data) ? 'GET ' : 'POST ') . $this->_url['path'] . ' HTTP/1.1' . "\r\n";
 		$request .= 'Host: ' . $this->_url['host_raw'] . "\r\n";
 		$request .= $this->_keepAlive();
+		$request .= 'User-Agent: PHP/ELK' . "\r\n";
 		$request .= 'Content-Type: application/x-www-form-urlencoded' . "\r\n";
-
-		if (!empty($this->_post_data))
-		{
-			$request .= 'Content-Length: ' . strlen($this->_post_data) . "\r\n";
-			$request .= $this->_post_data;
-		}
 
 		if (!empty($this->_content_length))
 		{
 			$request .= 'Range: bytes=0-' . $this->_content_length - 1 . "\r\n";
 		}
 
-		$request .= 'User-Agent: PHP/ELK' . "\r\n\r\n";
+		if (!empty($this->_post_data))
+		{
+			$request .= 'Content-Length: ' . strlen($this->_post_data) . "\r\n\r\n";
+			$request .= $this->_post_data;
+		}
+		else
+		{
+			$request .= "\r\n\r\n";
+		}
 
 		// Make the request and read the first line of the server response, ending at the first CRLF
 		fwrite($this->_fp, $request);
@@ -369,11 +375,6 @@ class FsockFetchWebdata
 
 		$this->_response['body'] = $this->_unChunk($response);
 		$this->_response['size'] = strlen($this->_response['body']);
-
-		if (!$this->_keep_alive)
-		{
-			fclose($this->_fp);
-		}
 	}
 
 	/**

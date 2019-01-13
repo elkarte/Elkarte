@@ -31,9 +31,9 @@ class TestBrowser extends \PHPUnit\Framework\TestCase
 				'is_firefox32'
 			),
 			array(
-				'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1944.0 Safari/537.36',
+				'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36',
 				'chrome',
-				'is_chrome36'
+				'is_chrome70'
 			),
 			array(
 				'Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2_1 like Mac OS X; da-dk) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8C148 Safari/6533.18.5',
@@ -59,7 +59,67 @@ class TestBrowser extends \PHPUnit\Framework\TestCase
 				'Mozilla/5.0 (Linux; Android 4.3; Nexus 10 Build/JWR66Y) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.72 Safari/537.36',
 				'tablet',
 				'is_chrome29'
-			)
+			),
+			array(
+				'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10147',
+				'edge',
+				'is_edge',
+				'Win10 edge'
+			),
+			array(
+				'Mozilla/5.0 (Linux; Android 7.0; SM-G892A Build/NRD90M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/60.0.3112.107 Mobile Safari/537.36',
+				'mobile',
+				'is_android',
+				'Galaxy S8'
+			),
+			array(
+				'Mozilla/5.0 (iPhone; CPU iPhone OS 12_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/69.0.3497.105 Mobile/15E148 Safari/605.1',
+				'mobile',
+				'is_iphone',
+				'Apple iPhone XR'
+			),
+			array(
+				'Mozilla/5.0 (Apple-iPhone7C2/1202.466; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1A543 Safari/419.3',
+				'mobile',
+				'is_iphone',
+				'Apple iPhone 6'
+			),
+			array(
+				'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.34 (KHTML, like Gecko) Version/11.0 Mobile/15A5341f Safari/604.1',
+				'mobile',
+				'is_iphone',
+				'Apple iPhone 8'
+			),
+			array(
+				'Mozilla/5.0 (Linux; Android 7.0; Pixel C Build/NRD90M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/52.0.2743.98 Safari/537.36',
+				'tablet',
+				'is_tablet',
+				'Pixel C'
+			),
+			array(
+				'Mozilla/5.0 (Linux; Android 5.0.2; SAMSUNG SM-T550 Build/LRX22G) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/3.3 Chrome/38.0.2125.102 Safari/537.36',
+				'tablet',
+				'is_tablet',
+				'Galaxy Tab A'
+			),
+			array(
+				'Mozilla/5.0 (Linux; Android 4.4.3; KFTHWI Build/KTU84M) AppleWebKit/537.36 (KHTML, like Gecko) Silk/47.1.79 like Chrome/47.0.2526.80 Safari/537.36',
+				'tablet',
+				'is_android_tablet',
+				'Kindle'
+			),
+			array(
+				'Mozilla/5.0 (X11; CrOS x86_64 8172.45.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.64 Safari/537.36',
+				'chrome',
+				'is_chrome51',
+				'Chrome Book'
+			),
+			array(
+				'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9',
+				'safari',
+				'is_safari',
+				'Mac OS X Safari'
+			),
 		);
 	}
 
@@ -72,7 +132,7 @@ class TestBrowser extends \PHPUnit\Framework\TestCase
 	}
 
 	/**
-	* Test broswer strings with BrowserDetector
+	* Test browser strings with BrowserDetector
 	*/
 	public function testBrowserDetector()
 	{
@@ -95,7 +155,7 @@ class TestBrowser extends \PHPUnit\Framework\TestCase
 	}
 }
 
-class testBrowserDetector extends \ElkArte\BrowserDetector
+class testBrowserDetector extends \ElkArte\Http\BrowserDetector
 {
 	public function testdetectBrowser()
 	{
