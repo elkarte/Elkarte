@@ -747,7 +747,7 @@ class PackageServers extends \ElkArte\AbstractController
 			// Are they connecting to their FTP account already?
 			if (isset($this->_req->post->ftp_username))
 			{
-				$ftp = new \ElkArte\FtpConnection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
+				$ftp = new \ElkArte\Http\FtpConnection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
 
 				if ($ftp->error === false)
 				{
@@ -766,7 +766,7 @@ class PackageServers extends \ElkArte\AbstractController
 				// Maybe we didn't even try yet
 				if (!isset($ftp))
 				{
-					$ftp = new \ElkArte\FtpConnection(null);
+					$ftp = new \ElkArte\Http\FtpConnection(null);
 				}
 				// ...or we failed
 				elseif ($ftp->error !== false && !isset($ftp_error))

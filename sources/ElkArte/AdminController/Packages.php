@@ -1207,7 +1207,7 @@ class Packages extends \ElkArte\AbstractController
 
 		if (empty($package_ftp) && !isset($this->_req->post->skip_ftp))
 		{
-			$ftp = new \ElkArte\FtpConnection(null);
+			$ftp = new \ElkArte\Http\FtpConnection(null);
 			list ($username, $detect_path) = $ftp->detect_path(BOARDDIR);
 
 			$context['package_ftp'] = array(
