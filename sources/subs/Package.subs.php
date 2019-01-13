@@ -2610,7 +2610,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		}
 		else
 		{
-			$fetch_data = new \ElkArte\Http\FopenFetchWebdata(array(), $redirection_level, $keep_alive);
+			$fetch_data = new \ElkArte\Http\FsockFetchWebdata(array(), $redirection_level, $keep_alive);
 		}
 
 		// no errors and a 200 result, then we have a good dataset, well we at least have data ;)
