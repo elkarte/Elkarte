@@ -251,7 +251,6 @@ class Attachment extends \ElkArte\AbstractController
 	{
 		global $txt;
 
-		require_once(SUBSDIR . '/Graphics.subs.php');
 		if ($text === null)
 		{
 			theme()->getTemplates()->loadLanguageFile('Errors');
@@ -260,7 +259,8 @@ class Attachment extends \ElkArte\AbstractController
 
 		$this->_send_headers('no_image', 'no_image', 'image/png', false, 'inline', 'no_image.png', true, false);
 
-		$img = generateTextImage($text, 200);
+		$img = new \ElkArte\Graphics\Image();
+		$img = $img->generateTextImage($text, 200);
 
 		if ($img === false)
 		{
@@ -498,7 +498,6 @@ class Attachment extends \ElkArte\AbstractController
 
 		// We need to do some work on attachments and avatars.
 		require_once(SUBSDIR . '/Attachments.subs.php');
-		require_once(SUBSDIR . '/Graphics.subs.php');
 
 		try
 		{
@@ -548,26 +547,30 @@ class Attachment extends \ElkArte\AbstractController
 		}
 
 		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
-		$use_compression = !empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java'));
+		$compressible_files = array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java');
+		$use_compression = !empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, $compressible_files);
 		$do_cache = false === (!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '');
 
 		$this->_send_headers($filename, $eTag, $mime_type, $use_compression, 'inline', $real_filename, $do_cache);
 
-		if ($resize && resizeImageFile($filename, $filename . '_thumb', 100, 100))
+		if ($resize)
 		{
-			if (!empty($modSettings['attachment_autorotate']))
+			// Create a thumbnail image and write it directly to the screen
+			$image = new \ElkArte\Graphics\Image();
+			$image->createThumbnail($filename, 100, 100, null);
+		}
+		else
+		{
+			if ($use_compression === false)
 			{
-				autoRotateImage($filename . '_thumb');
+				header('Content-Length: ' . filesize($filename));
 			}
 
-			$filename = $filename . '_thumb';
+			if (@readfile($filename) === null)
+			{
+				echo file_get_contents($filename);
+			}
 		}
-
-		if (empty($modSettings['enableCompressedOutput']) || filesize($filename) > 4194304)
-			header('Content-Length: ' . filesize($filename));
-
-		if (@readfile($filename) === null)
-			echo file_get_contents($filename);
 
 		obExit(false);
 	}
