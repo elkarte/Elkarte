@@ -128,14 +128,15 @@ class Gd2 extends AbstractManipulator
 	public function createImageFromWeb()
 	{
 		require_once(SUBSDIR . '/Package.subs.php');
-		$image = fetch_web_data($this->_fileName);
+		$image_data = fetch_web_data($this->_fileName);
 
-		$this->getSize('string', $image);
+		$this->getSize('string', $image_data);
 		if (isset(Image::DEFAULT_FORMATS[$this->sizes[2]]))
 		{
 			try
 			{
-				$image = imagecreatefromstring($this->_image);
+				$image = imagecreatefromstring($image_data);
+				unset($image_data);
 			}
 			catch (\Exception $e)
 			{
