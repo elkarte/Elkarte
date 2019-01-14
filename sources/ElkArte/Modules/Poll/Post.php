@@ -21,7 +21,7 @@ namespace ElkArte\Modules\Poll;
  *
  * This class contains all matter of things related to creating polls
  */
-class Poll_Post_Module extends \ElkArte\Modules\AbstractModule
+class Post extends \ElkArte\Modules\AbstractModule
 {
 	protected static $_make_poll = false;
 
@@ -39,9 +39,9 @@ class Poll_Post_Module extends \ElkArte\Modules\AbstractModule
 		if (!empty($modSettings['pollMode']))
 		{
 			$return = array(
-				array('prepare_post', array('Poll_Post_Module', 'prepare_post'), array('topic', 'topic_attributes')),
-				array('prepare_context', array('Poll_Post_Module', 'prepare_context'), array('topic_attributes', 'topic', 'board')),
-				array('finalize_post_form', array('Poll_Post_Module', 'finalize_post_form'), array('destination', 'page_title', 'template_layers')),
+				array('prepare_post', array('\\ElkArte\\Modules\\Poll\\Post', 'prepare_post'), array('topic', 'topic_attributes')),
+				array('prepare_context', array('\\ElkArte\\Modules\\Poll\\Post', 'prepare_context'), array('topic_attributes', 'topic', 'board')),
+				array('finalize_post_form', array('\\ElkArte\\Modules\\Poll\\Post', 'finalize_post_form'), array('destination', 'page_title', 'template_layers')),
 			);
 		}
 

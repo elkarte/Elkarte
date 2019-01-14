@@ -32,7 +32,7 @@ class Profile extends \ElkArte\Modules\AbstractModule
 
 		if (!empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']))
 		{
-			add_integration_function('integrate_profile_areas', 'Drafts_Profile_Module::integrate_profile_areas', '', false);
+			add_integration_function('integrate_profile_areas', '\\ElkArte\\Modules\\Drafts\\Profile::integrate_profile_areas', '', false);
 			return array(
 				array('pre_load', array('\\ElkArte\\Modules\\Drafts\\Profile', 'pre_load'), array('post_errors')),
 			);

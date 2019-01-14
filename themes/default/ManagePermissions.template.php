@@ -243,7 +243,7 @@ function template_by_board()
 			echo '
 			<div class="content">
 				<ul class="perm_boards flow_hidden">
-					<li class="flow_hidden">
+					<li class="flow_hidden basic_row" style="font-weight: 600;">
 						<span class="perm_name floatleft">', $txt['board_name'], '</span>
 						<span class="perm_profile floatleft">', $txt['permission_profile'], '</span>
 					</li>';

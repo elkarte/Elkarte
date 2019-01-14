@@ -582,7 +582,6 @@ class ManagePermissions extends \ElkArte\AbstractController
 		validateToken('admin-mpq', 'quick');
 
 		// we'll need to init illegal permissions, update permissions, etc.
-		require_once(SUBSDIR . '/Permission.subs.php');
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
 		// Make sure only one of the quick options was selected.
@@ -810,7 +809,6 @@ class ManagePermissions extends \ElkArte\AbstractController
 		validateToken('admin-mp');
 
 		// We'll need to init illegal permissions, update child permissions, etc.
-		require_once(SUBSDIR . '/Permission.subs.php');
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
 		$current_group_id = (int) $this->_req->query->group;

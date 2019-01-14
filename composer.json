@@ -36,10 +36,10 @@
 		"ext-gd": "*",
 		"ext-curl": "*",
 		"ext-mysqli": "*",
-		"ext-fileinfo": "*"
+		"ext-fileinfo": "*",
+		"ext-exif": "*"
 	},
 	"suggest": {
-		"ext-exif": "*",
 		"ext-recode": "*",
 		"ext-openssl": "*",
 		"ext-ctype": "*",
@@ -58,8 +58,8 @@
 		"ext-dom": "*",
 		"ext-mcrypt": "*",
 		"ext-apache": "*",
-		"ext-imagick": "*",
-		"ext-iconv": "*"
+		"ext-iconv": "*",
+		"ext-imagick": "*"
 	},
 	"require-dev": {
 		"phpunit/phpunit-selenium": "~4.1",

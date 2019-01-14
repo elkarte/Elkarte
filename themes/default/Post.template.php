@@ -660,7 +660,7 @@ function template_topic_replies_below()
 
 /**
  * The area below the postbox
- * Typically holds our action buttons, save, preivew, drafts, etc
+ * Typically holds our action buttons, save, preview, drafts, etc
  * Oh and lots of JS ;)
  */
 function template_postarea_below()

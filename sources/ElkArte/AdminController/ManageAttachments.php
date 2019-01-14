@@ -842,7 +842,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 			'files_without_attachment' => 0,
 		);
 
-		$to_fix = !empty($this->_req->session->attachments_to_fix) ? $this->_req->session->attachments_to_fix : array();
+		$to_fix = !empty($_SESSION['attachments_to_fix']) ? $_SESSION['attachments_to_fix'] : array();
 		$context['repair_errors'] = $this->_req->getSession('attachments_to_fix2', $context['repair_errors']);
 		$fix_errors = isset($this->_req->query->fixErrors) ? true : false;
 
