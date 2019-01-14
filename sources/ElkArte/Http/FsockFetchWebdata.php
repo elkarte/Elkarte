@@ -238,7 +238,7 @@ class FsockFetchWebdata
 
 		if (!empty($this->_content_length))
 		{
-			$request .= 'Range: bytes=0-' . $this->_content_length - 1 . "\r\n";
+			$request .= 'Range: bytes=0-' . ($this->_content_length - 1) . "\r\n";
 		}
 
 		if (!empty($this->_post_data))
