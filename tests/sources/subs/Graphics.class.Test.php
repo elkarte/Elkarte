@@ -23,20 +23,10 @@ class TestGraphics extends \PHPUnit\Framework\TestCase
 				'height' => 78,
 			),
 			array(
-				'url' => 'https://pngimage.net/wp-content/uploads/2018/05/eyes-drawing-png-3.png',
-				'width' => 2400,
-  				'height' => 1817,
-			),
-			array(
 				'url' => 'http://www.google.com/intl/en_ALL/images/logo.gif',
 				'width' => 276,
 				'height' => 110,
 			),
-			array(
-				'url' => 'http://eeweb.poly.edu/~yao/EL5123/image/barbara_gray.bmp',
-				'width' => 512,
-				'height' => 512,
-			)
 		);
 	}
 
@@ -68,12 +58,15 @@ class TestGraphics extends \PHPUnit\Framework\TestCase
 	{
 		$images = new \ElkArte\Graphics\Image();
 
+		$success = \ElkArte\Graphics\Gd2::canUse();
+		$this->assertEquals($success, true, 'GD NOT INSTALLED');
+
 		foreach ($this->image_testcases as $image)
 		{
-			$success = $images->createThumbnail($image['url'], 100, 100, 'test');
+			$success = $images->createThumbnail($image['url'], 100, 100, '/tmp/test');
 
 			// Check for correct results
-			$this->assertEquals($success, true);
+			$this->assertEquals($success, true, $image['url']);
 		}
 	}
 }

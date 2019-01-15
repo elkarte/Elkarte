@@ -297,7 +297,7 @@ class Gd2 extends AbstractManipulator
 		}
 
 		// Update the sizes array to the output file
-		if ($success && $file_name !== '')
+		if ($success && !empty($file_name))
 		{
 			$this->_fileName = $file_name;
 			$this->sizes[2] = $preferred_format;
