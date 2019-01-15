@@ -341,9 +341,6 @@ class ManageAttachments extends \ElkArte\AbstractController
 				// Image checks.
 				array('warning', empty($testImg) ? 'attachment_img_enc_warning' : ''),
 				array('check', 'attachment_image_reencode'),
-			'',
-				array('warning', 'attachment_image_paranoid_warning'),
-				array('check', 'attachment_image_paranoid'),
 			// Thumbnail settings.
 			array('title', 'attachment_thumbnail_settings'),
 				array('check', 'attachmentShowImages'),
