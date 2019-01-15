@@ -16,16 +16,19 @@ class TestGraphics extends \PHPUnit\Framework\TestCase
 				'url' => 'https://images.pexels.com/photos/753626/pexels-photo-753626.jpeg',
 				'width' => 2000,
   				'height' => 1335,
+				'format' => IMAGETYPE_JPEG
 			),
 			array(
 				'url' => 'http://weblogs.us/images/weblogs.us.png',
 				'width' => 432,
 				'height' => 78,
+				'format' => IMAGETYPE_PNG
 			),
 			array(
 				'url' => 'http://www.google.com/intl/en_ALL/images/logo.gif',
 				'width' => 276,
 				'height' => 110,
+				'format' => IMAGETYPE_GIF
 			),
 		);
 	}
@@ -56,6 +59,10 @@ class TestGraphics extends \PHPUnit\Framework\TestCase
 
 	public function testThumbs()
 	{
+		global $modSettings;
+
+		$modSettings['attachment_autorotate'] = 1;
+
 		$images = new \ElkArte\Graphics\Image();
 
 		$success = \ElkArte\Graphics\Gd2::canUse();
@@ -63,7 +70,7 @@ class TestGraphics extends \PHPUnit\Framework\TestCase
 
 		foreach ($this->image_testcases as $image)
 		{
-			$success = $images->createThumbnail($image['url'], 100, 100, '/tmp/test');
+			$success = $images->createThumbnail($image['url'], 100, 100, '/tmp/test', $image['format']);
 
 			// Check for correct results
 			$this->assertEquals($success, true, $image['url']);
