@@ -30,6 +30,12 @@ class TestGraphics extends \PHPUnit\Framework\TestCase
 				'height' => 110,
 				'format' => IMAGETYPE_GIF
 			),
+			array(
+				'url' => 'https://raw.githubusercontent.com/recurser/exif-orientation-examples/master/Landscape_2.jpg',
+				'width' => 1800,
+				'height' => 1200,
+				'format' => IMAGETYPE_PNG
+			)
 		);
 	}
 
