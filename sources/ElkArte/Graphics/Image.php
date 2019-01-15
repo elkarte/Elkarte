@@ -412,7 +412,7 @@ class Image
 		$fp = fopen($source, 'rb');
 
 		// If we can't open it to scan, go no further
-		if (!$fp)
+		if ($fp === false)
 		{
 			theme()->getTemplates()->loadLanguageFile('Post');
 			throw new \ElkArte\Exceptions\Exception('attach_timeout');

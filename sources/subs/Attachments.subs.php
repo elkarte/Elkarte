@@ -1409,8 +1409,6 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
  * - Uses getimagesize() to determine the size of a file.
  * - Attempts to connect to the server first so it won't time out.
  *
- * @todo see if it's better in subs/Graphics.subs.php, but one step at the time.
- *
  * @package Attachments
  * @param string $url
  * @return mixed[]|bool the image size as array(width, height), or false on failure
