@@ -31,9 +31,9 @@ class TestGraphics extends \PHPUnit\Framework\TestCase
 				'format' => IMAGETYPE_GIF
 			),
 			array(
-				'url' => 'https://raw.githubusercontent.com/recurser/exif-orientation-examples/master/Landscape_2.jpg',
-				'width' => 1800,
-				'height' => 1200,
+				'url' => 'https://raw.githubusercontent.com/recurser/exif-orientation-examples/master/Landscape_5.jpg',
+				'width' => 1200,
+				'height' => 1800,
 				'format' => IMAGETYPE_PNG
 			)
 		);
@@ -81,5 +81,14 @@ class TestGraphics extends \PHPUnit\Framework\TestCase
 			// Check for correct results
 			$this->assertEquals($success, true, $image['url']);
 		}
+	}
+
+	public function testText()
+	{
+		$images = new \ElkArte\Graphics\Image();
+		$success = $images->generateTextImage('test', 100, 75, 'png');
+		$success = !empty($success);
+
+		$this->assertEquals($success, true);
 	}
 }
