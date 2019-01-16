@@ -1409,79 +1409,69 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
  * - Uses getimagesize() to determine the size of a file.
  * - Attempts to connect to the server first so it won't time out.
  *
- * @todo see if it's better in subs/Graphics.subs.php, but one step at the time.
- *
  * @package Attachments
  * @param string $url
  * @return mixed[]|bool the image size as array(width, height), or false on failure
  */
 function url_image_size($url)
 {
-	// Make sure it is a proper URL.
-	$url = str_replace(' ', '%20', $url);
-
 	// Can we pull this from the cache... please please?
 	$temp = array();
 	if (\ElkArte\Cache\Cache::instance()->getVar($temp, 'url_image_size-' . md5($url), 240))
-		return $temp;
-
-	$t = microtime(true);
-
-	// Get the host to pester...
-	preg_match('~^\w+://(.+?)/(.*)$~', $url, $match);
-
-	// Can't figure it out, just try the image size.
-	if ($url == '' || $url == 'http://' || $url == 'https://')
-		return false;
-	elseif (!isset($match[1]))
-		$size = elk_getimagesize($url, false);
-	else
 	{
-		// Try to connect to the server... give it half a second.
-		$temp = 0;
-		$fp = @fsockopen($match[1], 80, $temp, $temp, 0.5);
-
-		// Successful?  Continue...
-		if ($fp !== false)
-		{
-			// Send the HEAD request (since we don't have to worry about chunked, HTTP/1.1 is fine here.)
-			fwrite($fp, 'HEAD /' . $match[2] . ' HTTP/1.1' . "\r\n" . 'Host: ' . $match[1] . "\r\n" . 'User-Agent: PHP/ELK' . "\r\n" . 'Connection: close' . "\r\n\r\n");
-
-			// Read in the HTTP/1.1 or whatever.
-			$test = substr(fgets($fp, 11), -1);
-			fclose($fp);
-
-			// See if it returned a 404/403 or something.
-			if ($test < 4)
-			{
-				$size = elk_getimagesize($url, false);
-
-				// This probably means allow_url_fopen is off, let's try GD.
-				if ($size === false && function_exists('imagecreatefromstring'))
-				{
-					include_once(SUBSDIR . '/Package.subs.php');
-
-					// It's going to hate us for doing this, but another request...
-					$image = @imagecreatefromstring(fetch_web_data($url));
-					if ($image !== false)
-					{
-						$size = array(imagesx($image), imagesy($image));
-						imagedestroy($image);
-					}
-				}
-			}
-		}
+		return $temp;
 	}
 
-	// If we didn't get it, we failed.
-	if (!isset($size))
-		$size = false;
+	$url_path = parse_url($url, PHP_URL_PATH);
+	$extension = pathinfo($url_path, PATHINFO_EXTENSION);
 
-	// If this took a long time, we may never have to do it again, but then again we might...
-	if (microtime(true) - $t > 0.8)
-		\ElkArte\Cache\Cache::instance()->put('url_image_size-' . md5($url), $size, 240);
+	switch ($extension)
+	{
+		case 'jpg':
+		case 'jpeg':
+			// Size location block is variable, so we fetch a meaningful chunk
+			$range = 32768;
+			break;
+		case 'png':
+			// Size will be in the first 24 bytes
+			$range = 1024;
+			break;
+		case 'gif':
+			// Size will be in the first 10 bytes
+			$range = 1024;
+			break;
+		case 'bmp':
+			// Size will be in the first 32 bytes
+			$range = 1024;
+			break;
+		default:
+			$range = 16384;
+	}
 
-	// Didn't work.
+	$image = new \ElkArte\Http\FsockFetchWebdata(array('max_length' => $range));
+	$image->get_url_data($url);
+
+	// The server may not understand Range: so lets try to fetch the entire thing
+	// assuming we were not simply turned away
+	if ($image->result('code') != 200 && $image->result('code') != 403)
+	{
+		$image = new \ElkArte\Http\FsockFetchWebdata(array());
+		$image->get_url_data($url);
+	}
+
+	// Here is the data, getimagesizefromstring does not care if its a complete image, it only
+	// searches for size headers in a given data set.
+	$data = $image->result('body');
+	$size = getimagesizefromstring($data);
+
+	// Well, ok, umm, fail!
+	if ($data === false || $size === false)
+	{
+		return array(-1, -1, -1);
+	}
+
+	\ElkArte\Cache\Cache::instance()->put('url_image_size-' . md5($url), $size, 240);
+
 	return $size;
 }
 

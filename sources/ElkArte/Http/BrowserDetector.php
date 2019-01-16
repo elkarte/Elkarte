@@ -14,7 +14,7 @@
  *
  */
 
-namespace ElkArte;
+namespace ElkArte\Http;
 
 /**
  * This class is an experiment for the job of correctly detecting browsers and

@@ -341,15 +341,11 @@ class ManageAttachments extends \ElkArte\AbstractController
 				// Image checks.
 				array('warning', empty($testImg) ? 'attachment_img_enc_warning' : ''),
 				array('check', 'attachment_image_reencode'),
-			'',
-				array('warning', 'attachment_image_paranoid_warning'),
-				array('check', 'attachment_image_paranoid'),
 			// Thumbnail settings.
 			array('title', 'attachment_thumbnail_settings'),
 				array('check', 'attachmentShowImages'),
 				array('check', 'attachmentThumbnails'),
 				array('check', 'attachment_thumb_png'),
-				array('check', 'attachment_thumb_memory', 'subtext' => $txt['attachment_thumb_memory_note1'], 'postinput' => $txt['attachment_thumb_memory_note2']),
 				array('text', 'attachmentThumbWidth', 6),
 				array('text', 'attachmentThumbHeight', 6),
 			'',

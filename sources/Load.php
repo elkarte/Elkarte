@@ -333,7 +333,7 @@ function loadUserSettings()
 		else
 		{
 			$ci_user_agent = strtolower($req->user_agent());
-			$user_info['possibly_robot'] = (strpos($ci_user_agent, 'mozilla') === false && strpos($ci_user_agent, 'opera') === false) || preg_match('~(googlebot|slurp|crawl|msnbot|yandex|bingbot|baidu)~u', $ci_user_agent) == 1;
+			$user_info['possibly_robot'] = (strpos($ci_user_agent, 'mozilla') === false && strpos($ci_user_agent, 'opera') === false) || preg_match('~(googlebot|slurp|crawl|msnbot|yandex|bingbot|baidu|duckduckbot)~u', $ci_user_agent) == 1;
 		}
 	}
 
@@ -876,12 +876,12 @@ function loadPermissions()
 /**
  * Loads information about what browser the user is viewing with and places it in $context
  *
- * @uses ElkArte\BrowserDetector class
+ * @uses ElkArte\Http\BrowserDetector class
  */
 function detectBrowser()
 {
 	// Load the current user's browser of choice
-	$detector = new ElkArte\BrowserDetector;
+	$detector = new ElkArte\Http\BrowserDetector;
 	$detector->detectBrowser();
 }
 

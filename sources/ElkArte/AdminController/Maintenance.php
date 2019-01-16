@@ -1078,7 +1078,7 @@ class Maintenance extends \ElkArte\AbstractController
 	{
 		global $context, $txt;
 
-		$ftp = new \ElkArte\FtpConnection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
+		$ftp = new \ElkArte\Http\FtpConnection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
 
 		// No errors on the connection, id/pass are good
 		if ($ftp->error === false)

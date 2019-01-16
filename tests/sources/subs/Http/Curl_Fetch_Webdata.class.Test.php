@@ -61,7 +61,7 @@ class TestCurlFetchWebdata extends \PHPUnit\Framework\TestCase
 	public function testFetch()
 	{
 		// Start curl, pass some default values for a test
-		$curl = new \ElkArte\CurlFetchWebdata(array(CURLOPT_RETURNTRANSFER => 1), 1);
+		$curl = new \ElkArte\Http\CurlFetchWebdata(array(CURLOPT_RETURNTRANSFER => 1), 1);
 
 		foreach ($this->curl_fetch_testcases as $testcase)
 		{
@@ -82,7 +82,7 @@ class TestCurlFetchWebdata extends \PHPUnit\Framework\TestCase
 	public function testPost()
 	{
 		// Start curl, pass some default values for a test
-		$curl = new \ElkArte\CurlFetchWebdata();
+		$curl = new \ElkArte\Http\CurlFetchWebdata();
 
 		foreach ($this->curl_post_testcases as $testcase)
 		{

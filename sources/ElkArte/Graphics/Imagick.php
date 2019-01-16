@@ -253,7 +253,7 @@ class Imagick extends AbstractManipulator
 			if ($success)
 			{
 				// Screen or file, your choice
-				if ($file_name === '')
+				if (empty($file_name))
 				{
 					echo $this->_image->getImagesBlob();
 				}
