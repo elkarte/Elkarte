@@ -12,6 +12,8 @@
 
 namespace ElkArte;
 
+use tubalmartin\CssMin\Minifier as CSSmin;
+
 /**
  * Used to combine css or js files in to a single file
  *
@@ -243,9 +245,14 @@ class SiteCombiner
 			$this->_archive_header = '/* ' . $this->_archive_filenames . " */\n";
 			$this->_combineFiles('css');
 
+			// Temporary manual loading of css min files
+			require_once(EXTDIR . '/CssMin/Minifier.php');
+			require_once(EXTDIR . '/CssMin/Colors.php');
+			require_once(EXTDIR . '/CssMin/Utils.php');
+			require_once(EXTDIR . '/CssMin/Command.php');
+
 			// CSSmin it to save some space
-			require_once(EXTDIR . '/cssmin.php');
-			$compressor = new \CSSmin();
+			$compressor = new CSSmin;
 			$this->_minified_cache = $compressor->run($this->_cache);
 
 			// Combine in any pre minimized css files to our new minimized string
