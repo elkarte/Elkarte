@@ -395,23 +395,19 @@ function loadPaymentGateways()
 		{
 			if ($file->isDir())
 			{
+				$payment_class = '\\ElkArte\\Subscriptions\\PaymentGateway\\' . $file->getFileName() . '\\Payment';
+				$display_class = '\\ElkArte\\Subscriptions\\PaymentGateway\\' . $file->getFileName() . '\\Display';
+
 				// Check this is definitely a valid gateway!
-				$fp = fopen($file->getPathname(), 'rb');
-				$header = fread($fp, 4096);
-				fclose($fp);
-				$filename = $file->getFilename();
-
-				if (strpos($header, 'Payment Gateway: ' . $filename) !== false)
+				if (in_array('ElkArte\\Subscriptions\\PaymentGateway\\PaymentInterface', class_implements($payment_class)))
 				{
-					require_once($file->getPathname());
-
 					$gateways[] = array(
 						'filename' => $file->getFilename(),
-						'code' => strtolower($filename),
+						'code' => strtolower($file->getFilename()),
 						// Don't need anything snazzier than this yet.
-						'valid_version' => class_exists('\\ElkArte\\Subscriptions\\PaymentGateway\\' . $filename . '\\Payment') && class_exists($filename . '_Display'),
-						'payment_class' => '\\ElkArte\\Subscriptions\\PaymentGateway\\' . $filename . '\\Payment',
-						'display_class' => '\\ElkArte\\Subscriptions\\PaymentGateway\\' . $filename . '\\Display',
+						'valid_version' => class_exists($payment_class) && class_exists($display_class),
+						'payment_class' => $payment_class,
+						'display_class' => $display_class,
 					);
 				}
 			}

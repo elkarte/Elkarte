@@ -16,12 +16,14 @@
 
 namespace ElkArte\Subscriptions\PaymentGateway\PayPal;
 
+use ElkArte\Subscriptions\PaymentGateway\PaymentInterface;
+
 /**
  * Class of functions to validate a IPN response and provide details of the payment
  *
  * @package Subscriptions
  */
-class Payment
+class Payment implements PaymentInterface
 {
 	/**
 	 * Holds the IPN response data

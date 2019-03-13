@@ -16,12 +16,14 @@
 
 namespace ElkArte\Subscriptions\PaymentGateway\TwoCheckOut;
 
+use ElkArte\Subscriptions\PaymentGateway\DisplayInterface;
+
 /**
  * The available form data for the gateway
  *
  * @package Subscriptions
  */
-class Display
+class Display implements DisplayInterface
 {
 	/**
 	 * Name of this payment gateway
