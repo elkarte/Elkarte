@@ -346,7 +346,7 @@ class ProfileOptions_Controller extends Action_Controller
 			{
 				// Now find out the id_member for the members in question.
 				require_once(SUBSDIR . '/ProfileOptions.subs.php');
-				$ignoreArray = getBuddiesID($new_entries, false);
+				$ignoreArray = array_merge($ignoreArray, getBuddiesID($new_entries, false));
 
 				// Now update the current users buddy list.
 				$user_profile[$this->_memID]['pm_ignore_list'] = implode(',', $ignoreArray);
