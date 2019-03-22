@@ -16,7 +16,7 @@ $txt['like_post_show'] = 'Show';
 $txt['like_post_hide'] = 'Hide';
 
 // For message
-$txt['like_post_users_who_liked'] = 'users who liked this post';
+$txt['like_post_users_who_liked'] = '%1% users who liked this post';
 
 // For topic
 $txt['like_post_most_popular_topic_heading1'] = 'has received a total of (%1%) like(s) so far.';
