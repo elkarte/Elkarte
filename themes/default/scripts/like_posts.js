@@ -339,7 +339,7 @@
 						'   </div>' +
 						'   <div class="separator"></div>' +
 						'   <div class="well">' +
-						'       <p>' + data[i].member_liked_data.length + ' ' + txtStrings.usersWhoLiked + '</p>';
+						'       <p>' + txtStrings.usersWhoLiked.easyReplace({1 : data[i].member_liked_data.length}) + '</p>';
 
 					// All the members that liked this masterpiece of internet jibba jabba
 					for (var j = 0, likerslen = data[i].member_liked_data.length; j < likerslen; j++) {

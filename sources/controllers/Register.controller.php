@@ -519,16 +519,6 @@ class Register_Controller extends Action_Controller
 		$regOptions['ip2'] = $req->ban_ip();
 		$memberID = registerMember($regOptions, 'register');
 
-		$lang = !empty($modSettings['userLanguage']) ? $modSettings['userLanguage'] : 'english';
-		$agreement = new Agreement($lang);
-		$agreement->accept($memberID, $user_info['ip'], empty($modSettings['agreementRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
-
-		if (!empty($modSettings['requirePrivacypolicy']))
-		{
-			$policy = new \PrivacyPolicy($lang);
-			$policy->accept($memberID, $user_info['ip'], empty($modSettings['privacypolicyRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacypolicyRevision']);
-		}
-
 		// If there are "important" errors and you are not an admin: log the first error
 		// Otherwise grab all of them and don't log anything
 		if ($reg_errors->hasErrors(1) && !$user_info['is_admin'])
@@ -543,6 +533,16 @@ class Register_Controller extends Action_Controller
 			$this->_req->post->step = 2;
 			$this->action_register();
 			return false;
+		}
+
+		$lang = !empty($modSettings['userLanguage']) ? $modSettings['userLanguage'] : 'english';
+		$agreement = new Agreement($lang);
+		$agreement->accept($memberID, $user_info['ip'], empty($modSettings['agreementRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
+
+		if (!empty($modSettings['requirePrivacypolicy']))
+		{
+			$policy = new \PrivacyPolicy($lang);
+			$policy->accept($memberID, $user_info['ip'], empty($modSettings['privacypolicyRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacypolicyRevision']);
 		}
 
 		// Do our spam protection now.
