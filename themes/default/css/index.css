@@ -5734,6 +5734,11 @@ a > i {
 	#menu_nav {
 		padding: 6px 0;
 	}
+
+	.new_posts, .require_approval {
+		padding: 1px 6px 2px 4px;
+		font-size: .857em;
+	}
 }
 
 /* This one does 800 screens at default font size. */
