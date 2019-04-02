@@ -541,7 +541,7 @@
 						'       <div class="content forumposts">' +
 						'	        <div class="topic_details">' +
 						'                <h5 class="like_stats_likers">' +
-						txtStrings.postedAt + ' ' + data[i].post_data[j].html_time + ': ' + txtStrings.likesReceived + ' (' + data[i].post_data[j].like_count + ')' +
+						txtStrings.postedAt + ' ' + data[i].post_data[j].html_time + ' - ' + data[i].post_data[j].like_count + ' ' + txtStrings.likesReceived +
 						'               </h5>' +
 						'           </div>' +
 						'          <div class="inner">' + data[i].post_data[j].body + '</div>' +
