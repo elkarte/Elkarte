@@ -970,6 +970,7 @@ class Post_Controller extends Action_Controller
 				});'
 			);
 
+			$_REQUEST['preview'] = false;
 			return $this->action_post();
 		}
 

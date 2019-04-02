@@ -21,7 +21,6 @@
 			'letterCount' : 5,
 			'uniqueID' : '',
 			'imageURL' : '',
-			'useLibrary' : false,
 			'refreshevent': 'click',
 			'playevent': 'click',
 			'admin': false
@@ -81,16 +80,7 @@
 							new_url = new_url + hexstr.substr(Math.floor(Math.random() * 16), 1);
 					}
 
-					if (settings.useLibrary)
-					{
-						$('#verification_image' + uniqueID).attr('src', new_url);
-					}
-					else if (document.getElementById("verification_image" + uniqueID))
-					{
-						for (i = 1; i <= settings.letterCount; i++)
-							if (document.getElementById("verification_image" + uniqueID + "_" + i))
-								document.getElementById("verification_image" + uniqueID + "_" + i).src = new_url + ";letter=" + i;
-					}
+					$('#verification_image' + uniqueID).attr('src', new_url);
 				});
 			}
 		});
