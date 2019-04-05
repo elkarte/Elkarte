@@ -3,13 +3,12 @@
 /**
  * Support functions and db interface functions for permissions
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -24,14 +23,14 @@
  * @param integer|null $group The group to set the permission for
  * @param integer|null $profile = null, int id of the permissions group or 'null' if we're setting it for a group
  *
- * @throws Elk_Exception no_access
+ * @throws \ElkArte\Exceptions\Exception no_access
  */
 function setPermissionLevel($level, $group = null, $profile = null)
 {
 	$db = database();
 
 	// we'll need to init illegal permissions.
-	$permissionsObject = new Permissions;
+	$permissionsObject = new \ElkArte\Permissions;
 	$illegal_permissions = $permissionsObject->getIllegalPermissions();
 	$illegal_guest_permissions = $permissionsObject->getIllegalGuestPermissions();
 
@@ -339,7 +338,7 @@ function setPermissionLevel($level, $group = null, $profile = null)
 	}
 	// $profile and $group are both null!
 	else
-		throw new Elk_Exception('no_access', false);
+		throw new \ElkArte\Exceptions\Exception('no_access', false);
 }
 
 /**
@@ -500,26 +499,32 @@ function loadAllPermissions()
 	);
 
 	// We need to know what permissions we can't give to guests.
-	$permissionsObject = new Permissions;
+	$permissionsObject = new \ElkArte\Permissions;
 	$illegal_guest_permissions = $permissionsObject->getIllegalGuestPermissions();
 
 	// Some permissions are hidden if features are off.
 	$hiddenPermissions = array();
 	$relabelPermissions = array(); // Permissions to apply a different label to.
 
-	if (!in_array('cd', $context['admin_features']))
+	if (featureEnabled('cd') === false)
 	{
 		$hiddenPermissions[] = 'calendar_view';
 		$hiddenPermissions[] = 'calendar_post';
 		$hiddenPermissions[] = 'calendar_edit';
 	}
-	if (!in_array('w', $context['admin_features']))
+	if (featureEnabled('w') === false)
+	{
 		$hiddenPermissions[] = 'issue_warning';
-	if (!in_array('k', $context['admin_features']))
+	}
+	if (featureEnabled('k') === false)
+	{
 		$hiddenPermissions[] = 'karma_edit';
-	if (!in_array('l', $context['admin_features']))
+	}
+	if (featureEnabled('l') === false)
+	{
 		$hiddenPermissions[] = 'like_posts';
-	if (!in_array('pe', $context['admin_features']))
+	}
+	if (featureEnabled('pe') === false)
 	{
 		$hiddenPermissions[] = 'approve_emails';
 		$hiddenPermissions[] = 'postby_email';
@@ -1136,13 +1141,14 @@ function clearPostgroupPermissions()
 {
 	$db = database();
 
-	$post_groups = $db->fetchQueryCallback('
+	$post_groups = $db->fetchQuery('
 		SELECT id_group
 		FROM {db_prefix}membergroups
 		WHERE min_posts != {int:min_posts}',
 		array(
 			'min_posts' => -1,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			return $row['id_group'];
@@ -1186,7 +1192,7 @@ function copyPermissionProfile($profile_name, $copy_from)
 {
 	$db = database();
 
-	$profile_name = Util::htmlspecialchars($profile_name);
+	$profile_name = \ElkArte\Util::htmlspecialchars($profile_name);
 	// Insert the profile itself.
 	$db->insert('',
 		'{db_prefix}permission_profiles',
@@ -1201,13 +1207,14 @@ function copyPermissionProfile($profile_name, $copy_from)
 	$profile_id = $db->insert_id('{db_prefix}permission_profiles', 'id_profile');
 
 	// Load the permissions from the one it's being copied from.
-	$inserts = $db->fetchQueryCallback('
+	$inserts = $db->fetchQuery('
 		SELECT id_group, permission, add_deny
 		FROM {db_prefix}board_permissions
 		WHERE id_profile = {int:copy_from}',
 		array(
 			'copy_from' => $copy_from,
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($profile_id)
 		{
 			return array($profile_id, $row['id_group'], $row['permission'], $row['add_deny']);
@@ -1236,7 +1243,7 @@ function renamePermissionProfile($id_profile, $name)
 {
 	$db = database();
 
-	$name = Util::htmlspecialchars($name);
+	$name = \ElkArte\Util::htmlspecialchars($name);
 
 	$db->query('', '
 		UPDATE {db_prefix}permission_profiles
@@ -1256,7 +1263,7 @@ function renamePermissionProfile($id_profile, $name)
  *
  * @param int[] $profiles
  *
- * @throws Elk_Exception no_access
+ * @throws \ElkArte\Exceptions\Exception no_access
  */
 function deletePermissionProfiles($profiles)
 {
@@ -1273,7 +1280,7 @@ function deletePermissionProfiles($profiles)
 		)
 	);
 	if ($db->num_rows($request) != 0)
-		throw new Elk_Exception('no_access', false);
+		throw new \ElkArte\Exceptions\Exception('no_access', false);
 	$db->free_result($request);
 
 	// Oh well, delete.

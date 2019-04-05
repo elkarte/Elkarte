@@ -7,13 +7,12 @@
  * perhaps for use of addons in a similar way they were using some
  * SSI functions.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -432,7 +431,7 @@ function topTopicStarter()
 	$top_starters = array();
 
 	// Try to cache this when possible, because it's a little unavoidably slow.
-	if (!Cache::instance()->getVar($members, 'stats_top_starters', 360) || empty($members))
+	if (!\ElkArte\Cache\Cache::instance()->getVar($members, 'stats_top_starters', 360) || empty($members))
 	{
 		$request = $db->query('', '
 			SELECT id_member_started, COUNT(*) AS hits
@@ -449,7 +448,7 @@ function topTopicStarter()
 		arsort($members);
 		$members = array_slice($members, 0, $modSettings['stats_limit'] ?? 10, true);
 
-		Cache::instance()->put('stats_top_starters', $members, 360);
+		\ElkArte\Cache\Cache::instance()->put('stats_top_starters', $members, 360);
 	}
 	$max_num_topics = max($members);
 
@@ -505,7 +504,7 @@ function topTimeOnline()
 	$max_members = isset($modSettings['stats_limit']) ? $modSettings['stats_limit'] : 10;
 
 	// Do we have something cached that will help speed this up?
-	$temp = Cache::instance()->get('stats_total_time_members', 600);
+	$temp = \ElkArte\Cache\Cache::instance()->get('stats_total_time_members', 600);
 
 	// Get the member data, sorted by total time logged in
 	$members_result = $db->query('', '
@@ -566,7 +565,7 @@ function topTimeOnline()
 
 	// Cache the ones we found for a bit, just so we don't have to look again.
 	if ($temp !== $temp2)
-		Cache::instance()->put('stats_total_time_members', $temp2, 600);
+		\ElkArte\Cache\Cache::instance()->put('stats_total_time_members', $temp2, 600);
 
 	return $top_time_online;
 }
@@ -785,8 +784,6 @@ function UserStatsPollsVoted($memID)
  */
 function UserStatsMostPostedBoard($memID, $limit = 10)
 {
-	global $user_profile;
-
 	$db = database();
 
 	// Find the board this member spammed most often.
@@ -811,15 +808,16 @@ function UserStatsMostPostedBoard($memID, $limit = 10)
 	while ($row = $db->fetch_assoc($result))
 	{
 		$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);
+		$posts = \ElkArte\MembersList::get($memID)->posts;
 		// Build the board details that this member is responsible for
 		$popular_boards[$row['id_board']] = array(
 			'id' => $row['id_board'],
 			'posts' => $row['message_count'],
 			'href' => $href,
 			'link' => '<a href="' . $href . '">' . $row['name'] . '</a>',
-			'posts_percent' => $user_profile[$memID]['posts'] == 0 ? 0 : ($row['message_count'] * 100) / $user_profile[$memID]['posts'],
+			'posts_percent' => $posts == 0 ? 0 : ($row['message_count'] * 100) / $posts,
 			'total_posts' => $row['num_posts'],
-			'total_posts_member' => $user_profile[$memID]['posts'],
+			'total_posts_member' => $posts,
 		);
 	}
 	$db->free_result($result);

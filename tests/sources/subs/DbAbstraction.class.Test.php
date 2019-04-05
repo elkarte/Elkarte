@@ -49,10 +49,11 @@ class TestDbAbstraction extends \PHPUnit\Framework\TestCase
 
 	public function testCallback()
 	{
+		$db_type = $this->_dummy_db->title();
 		foreach ($this->tests as $test)
 		{
 			$db_string = $this->_dummy_db->quote($test['string_test'], $test['params_test']);
-			$this->assertEquals($db_string, $test['results'][DB_TYPE], 'Wrong replacement for ' . DB_TYPE . ' on test ' . $test['string_test']);
+			$this->assertEquals($db_string, $test['results'][$db_type], 'Wrong replacement for ' . $db_type . ' on test ' . $test['string_test']);
 		}
 	}
 }

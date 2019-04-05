@@ -6,13 +6,12 @@
  * Note to enhance documentation later:
  * attachment_type = 3 is a thumbnail, etc.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -73,7 +72,7 @@ function approveAttachments($attachments)
 	);
 
 	// In order to log the attachments, we really need their message and filename
-	$db->fetchQueryCallback('
+	$db->fetchQuery('
 		SELECT m.id_msg, a.filename
 		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (a.id_msg = m.id_msg)
@@ -82,14 +81,15 @@ function approveAttachments($attachments)
 		array(
 			'attachments' => $attachments,
 			'attachment_type' => 0,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			logAction(
 				'approve_attach',
 				array(
 					'message' => $row['id_msg'],
-					'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', Util::htmlspecialchars($row['filename'])),
+					'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', \ElkArte\Util::htmlspecialchars($row['filename'])),
 				)
 			);
 		}
@@ -245,7 +245,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 	if (!empty($do_logging))
 	{
 		// In order to log the attachments, we really need their message and filename
-		$db->fetchQueryCallback('
+		$db->fetchQuery('
 			SELECT m.id_msg, a.filename
 			FROM {db_prefix}attachments AS a
 				INNER JOIN {db_prefix}messages AS m ON (a.id_msg = m.id_msg)
@@ -254,14 +254,15 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 			array(
 				'attachments' => $do_logging,
 				'attachment_type' => 0,
-			),
+			)
+		)->fetch_callback(
 			function ($row)
 			{
 				logAction(
 					'remove_attach',
 					array(
 						'message' => $row['id_msg'],
-						'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', Util::htmlspecialchars($row['filename'])),
+						'filename' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', \ElkArte\Util::htmlspecialchars($row['filename'])),
 					)
 				);
 			}
@@ -301,7 +302,7 @@ function attachmentPaths()
 	{
 		// we have more directories
 		if (!is_array($modSettings['attachmentUploadDir']))
-			$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
+			$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 
 		return $modSettings['attachmentUploadDir'];
 	}
@@ -402,7 +403,7 @@ function getAttachmentDirs()
 	global $modSettings;
 
 	if (!empty($modSettings['currentAttachmentUploadDir']))
-		$attach_dirs = Util::unserialize($modSettings['attachmentUploadDir']);
+		$attach_dirs = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 	elseif (!empty($modSettings['attachmentUploadDir']))
 		$attach_dirs = array($modSettings['attachmentUploadDir']);
 	else
@@ -468,7 +469,7 @@ function attachment_filesize($attach_id, $filesize = null)
 				'id_attach' => $attach_id,
 			)
 		);
-		if (!empty($result))
+		if ($result->hasResults())
 		{
 			list ($filesize) = $db->fetch_row($result);
 			$db->free_result($result);
@@ -514,7 +515,7 @@ function attachment_folder($attach_id, $folder_id = null)
 				'id_attach' => $attach_id,
 			)
 		);
-		if (!empty($result))
+		if ($result->hasResults())
 		{
 			list ($folder_id) = $db->fetch_row($result);
 			$db->free_result($result);
@@ -650,7 +651,7 @@ function findParentsOrphanThumbnails($start, $fix_errors, $to_fix)
 {
 	$db = database();
 
-	$to_update = $db->fetchQueryCallback('
+	$to_update = $db->fetchQuery('
 		SELECT a.id_attach
 		FROM {db_prefix}attachments AS a
 			LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)
@@ -660,7 +661,8 @@ function findParentsOrphanThumbnails($start, $fix_errors, $to_fix)
 		array(
 			'no_thumb' => 0,
 			'substep' => $start,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			return $row['id_attach'];
@@ -742,7 +744,7 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 				$attachment_name = !empty($row['file_hash']) ? $row['id_attach'] . '_' . $row['file_hash'] . '.elk' : getLegacyAttachmentFilename($row['filename'], $row['id_attach'], null, true);
 
 				if (!is_array($modSettings['attachmentUploadDir']))
-					$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
+					$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 
 				// Loop through the other folders looking for this file
 				foreach ($modSettings['attachmentUploadDir'] as $id => $dir)
@@ -766,7 +768,7 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 					$attachment_name = $row['id_attach'] . '_' . $row['file_hash'];
 
 					if (!is_array($modSettings['attachmentUploadDir']))
-						$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
+						$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 
 					// Loop through the other folders looking for this file
 					foreach ($modSettings['attachmentUploadDir'] as $id => $dir)
@@ -845,7 +847,7 @@ function findOrphanAvatars($start, $fix_errors, $to_fix)
 
 	require_once(SUBSDIR . '/Attachments.subs.php');
 
-	$to_remove = $db->fetchQueryCallback('
+	$to_remove = $db->fetchQuery('
 		SELECT a.id_attach, a.id_folder, a.filename, a.file_hash, a.attachment_type
 		FROM {db_prefix}attachments AS a
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = a.id_member)
@@ -857,7 +859,8 @@ function findOrphanAvatars($start, $fix_errors, $to_fix)
 			'no_member' => 0,
 			'no_msg' => 0,
 			'substep' => $start,
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($fix_errors, $to_fix, $modSettings)
 		{
 			// If we are repairing remove the file from disk now.
@@ -910,7 +913,7 @@ function findOrphanAttachments($start, $fix_errors, $to_fix)
 
 	require_once(SUBSDIR . '/Attachments.subs.php');
 
-	$to_remove = $db->fetchQueryCallback('
+	$to_remove = $db->fetchQuery('
 		SELECT a.id_attach, a.id_folder, a.filename, a.file_hash
 		FROM {db_prefix}attachments AS a
 			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
@@ -922,7 +925,8 @@ function findOrphanAttachments($start, $fix_errors, $to_fix)
 			'no_member' => 0,
 			'no_msg' => 0,
 			'substep' => $start,
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($fix_errors, $to_fix)
 		{
 			// If we are repairing remove the file from disk now.
@@ -1014,7 +1018,7 @@ function validateAttachments($attachments, $approve_query)
 	$db = database();
 
 	// double check the attachments array, pick only what is returned from the database
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT a.id_attach, m.id_board, m.id_msg, m.id_topic
 		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
@@ -1028,7 +1032,8 @@ function validateAttachments($attachments, $approve_query)
 			'attachments' => $attachments,
 			'not_approved' => 0,
 			'attachment_type' => 0,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			return $row['id_attach'];
@@ -1116,7 +1121,7 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	// Get all unapproved attachments.
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT a.id_attach, a.filename, a.size, m.id_msg, m.id_topic, m.id_board, m.subject, m.body, m.id_member,
 			COALESCE(mem.real_name, m.poster_name) AS poster_name, m.poster_time,
 			t.id_member_started, t.id_first_msg, b.name AS board_name, c.id_cat, c.name AS cat_name
@@ -1139,7 +1144,8 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 			'sort' => $sort,
 			'items_per_page' => $items_per_page,
 			'approve_query' => $approve_query,
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($scripturl, $bbc_parser)
 		{
 			return array(
@@ -1316,7 +1322,7 @@ function attachDirStatus($dir, $expected_files)
 		return array('not_writable', true, '');
 
 	// Count the files with a glob, easier and less time consuming
-	$glob = new GlobIterator($dir . '/*.elk', FilesystemIterator::SKIP_DOTS);
+	$glob = new \GlobIterator($dir . '/*.elk', \FilesystemIterator::SKIP_DOTS);
 	try
 	{
 		$num_files = $glob->count();
@@ -1481,7 +1487,7 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
 				'start' => $start,
 				'per_page' => $items_per_page,
 			)
-		);
+		)->fetch_all();
 	}
 	else
 	{
@@ -1503,7 +1509,7 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
 				'start' => $start,
 				'per_page' => $items_per_page,
 			)
-		);
+		)->fetch_all();
 	}
 }
 
@@ -1648,7 +1654,7 @@ function findAttachmentsToMove($from, $start, $limit)
 			'start' => $start,
 			'limit' => $limit,
 		)
-	);
+	)->fetch_all();
 	$number = count($attachments);
 
 	return array($number, $attachments);
@@ -1711,7 +1717,7 @@ function attachmentsOfMessage($id_msg, $unapproved = false)
 {
 	$db = database();
 
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT id_attach
 		FROM {db_prefix}attachments
 		WHERE id_msg = {int:id_msg}' . ($unapproved ? '' : '
@@ -1721,7 +1727,8 @@ function attachmentsOfMessage($id_msg, $unapproved = false)
 			'id_msg' => $id_msg,
 			'is_approved' => 0,
 			'attachment_type' => 0,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			return $row['id_attach'];

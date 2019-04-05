@@ -6,13 +6,12 @@
  * These functions do NOT make permissions checks. (they assume those were
  * already made).
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -22,7 +21,7 @@
  * Removes the passed id_topic's checking for permissions.
  *
  * @param int[]|int $topics The topics to remove (can be an id or an array of ids).
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function removeTopicsPermissions($topics)
 {
@@ -59,7 +58,7 @@ function removeTopicsPermissions($topics)
  * @param bool $ignoreRecycling if true topics are not moved to the recycle board (if it exists).
  * @param bool $log if true logs the action.
  * @param int[] $removeCacheBoards an array matching topics and boards.
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = false, $log = false, $removeCacheBoards = array())
 {
@@ -70,7 +69,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		return;
 
 	$db = database();
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	// Only a single topic.
 	if (!is_array($topics))
@@ -290,7 +289,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	// Delete search index entries.
 	if (!empty($modSettings['search_custom_index_config']))
 	{
-		$customIndexSettings = Util::unserialize($modSettings['search_custom_index_config']);
+		$customIndexSettings = \ElkArte\Util::unserialize($modSettings['search_custom_index_config']);
 
 		$request = $db->query('', '
 			SELECT id_msg, body
@@ -438,7 +437,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
  * Moves lots of topics to a specific board and checks if the user can move them
  *
  * @param array $moveCache [0] => int[] is the topic, [1] => int[]  is the board to move to.
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function moveTopicsPermissions($moveCache)
 {
@@ -544,7 +543,7 @@ function moveTopicsPermissions($moveCache)
  * @param int[]|int $topics
  * @param int $toBoard
  * @param bool $log if true logs the action.
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function moveTopics($topics, $toBoard, $log = false)
 {
@@ -817,7 +816,7 @@ function moveTopics($topics, $toBoard, $log = false)
 		markBoardsRead($toBoard);
 	}
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 	// Update the cache?
 	foreach ($topics as $topic_id)
 		$cache->remove('topic_board-' . $topic_id);
@@ -856,7 +855,7 @@ function moveTopics($topics, $toBoard, $log = false)
  * @param int $id_topic The topic id
  *
  * @return bool
- * @throws Elk_Exception topic_already_moved
+ * @throws \ElkArte\Exceptions\Exception topic_already_moved
  */
 function moveTopicConcurrence($move_from, $id_board, $id_topic)
 {
@@ -889,7 +888,7 @@ function moveTopicConcurrence($move_from, $id_board, $id_topic)
 
 		$board_link = '<a href="' . getUrl('board', ['board' => $id_board, 'start' => '0', 'name' => $board_name]) . '">' . $board_name . '</a>';
 		$topic_link = '<a href="' . getUrl('topic', ['topic' => $id_topic, 'start' => '0', 'subject' => $topic_subject]) . '">' . $topic_subject . '</a>';
-		throw new Elk_Exception('topic_already_moved', false, array($topic_link, $board_link));
+		throw new \ElkArte\Exceptions\Exception('topic_already_moved', false, array($topic_link, $board_link));
 	}
 }
 
@@ -921,7 +920,7 @@ function removeDeleteConcurrence()
 			}
 
 			// Give them a prompt before we remove the message
-			throw new Elk_Exception('post_already_deleted', false, array($confirm_url));
+			throw new \ElkArte\Exceptions\Exception('post_already_deleted', false, array($confirm_url));
 		}
 	}
 }
@@ -1272,7 +1271,7 @@ function setTopicWatch($id_member, $topic, $on = false)
  *    - if 'all' returns additional infos about the read/unwatched status
  * @param string[] $selects (optional from integration)
  * @param string[] $tables (optional from integration)
- * @return array to topic attributes
+ * @return mixed[]|bool to topic attributes
  */
 function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables = array())
 {
@@ -1382,7 +1381,7 @@ function getTopicInfoByMsg($topic, $msg = null)
  * @param string $delete_type
  * @param boolean $exclude_stickies
  * @param int $older_than
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function removeOldTopics(array $boards, $delete_type, $exclude_stickies, $older_than)
 {
@@ -2034,7 +2033,7 @@ function topicsDetails($topics)
  * @param int[] $topics
  * @param bool $log If true the action is logged
  * @return int Number of topics toggled
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function toggleTopicSticky($topics, $log = false)
 {
@@ -2203,7 +2202,7 @@ function getTopicsPostsAndPoster($topic, $limit, $sort)
  * @param int[] $messages
  * @param mixed[] $messageDetails
  * @param string $type = replies
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function removeMessages($messages, $messageDetails, $type = 'replies')
 {
@@ -2225,7 +2224,7 @@ function removeMessages($messages, $messageDetails, $type = 'replies')
 	}
 	else
 	{
-		$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
+		$remover = new \ElkArte\MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 		foreach ($messages as $post)
 		{
 			$remover->removeMessage($post);
@@ -2239,7 +2238,7 @@ function removeMessages($messages, $messageDetails, $type = 'replies')
  * @param int[] $messages
  * @param mixed[] $messageDetails
  * @param string $type = replies
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function approveMessages($messages, $messageDetails, $type = 'replies')
 {
@@ -2266,7 +2265,7 @@ function approveMessages($messages, $messageDetails, $type = 'replies')
  * @param bool $log if true logs the action.
  *
  * @return bool|void
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function approveTopics($topics, $approve = true, $log = false)
 {
@@ -2333,7 +2332,7 @@ function approveTopics($topics, $approve = true, $log = false)
  * @param string $subject the text that will become the message subject
  * @param mixed[] $board_info some board information (at least id, name, if posts are counted)
  * @param string $new_topic used to build the url for moving to a new topic
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 {
@@ -2352,7 +2351,7 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 	));
 
 	$msgOptions = array(
-		'subject' => $txt['split'] . ': ' . strtr(Util::htmltrim(Util::htmlspecialchars($subject)), array("\r" => '', "\n" => '', "\t" => '')),
+		'subject' => $txt['split'] . ': ' . strtr(\ElkArte\Util::htmltrim(\ElkArte\Util::htmlspecialchars($subject)), array("\r" => '', "\n" => '', "\t" => '')),
 		'body' => $reason,
 		'icon' => 'moved',
 		'smileys_enabled' => 1,
@@ -2387,7 +2386,7 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
  * @param string $new_subject
  *
  * @return int the topic ID of the new split topic.
- * @throws Elk_Exception no_posts_selected
+ * @throws \ElkArte\Exceptions\Exception no_posts_selected
  */
 function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 {
@@ -2397,7 +2396,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 
 	// Nothing to split?
 	if (empty($splitMessages))
-		throw new Elk_Exception('no_posts_selected', false);
+		throw new \ElkArte\Exceptions\Exception('no_posts_selected', false);
 
 	// Get some board info.
 	$topicAttribute = topicAttribute($split1_ID_TOPIC, array('id_board', 'approved'));
@@ -2422,7 +2421,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	);
 	// You can't select ALL the messages!
 	if ($db->num_rows($request) == 0)
-		throw new Elk_Exception('selected_all_posts', false);
+		throw new \ElkArte\Exceptions\Exception('selected_all_posts', false);
 
 	$split1_first_msg = null;
 	$split1_last_msg = null;
@@ -2508,11 +2507,11 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 
 	// No database changes yet, so let's double check to see if everything makes at least a little sense.
 	if ($split1_first_msg <= 0 || $split1_last_msg <= 0 || $split2_first_msg <= 0 || $split2_last_msg <= 0 || $split1_replies < 0 || $split2_replies < 0 || $split1_unapprovedposts < 0 || $split2_unapprovedposts < 0 || !isset($split1_approved) || !isset($split2_approved))
-		throw new Elk_Exception('cant_find_messages');
+		throw new \ElkArte\Exceptions\Exception('cant_find_messages');
 
 	// You cannot split off the first message of a topic.
 	if ($split1_first_msg > $split2_first_msg)
-		throw new Elk_Exception('split_first_post', false);
+		throw new \ElkArte\Exceptions\Exception('split_first_post', false);
 
 	// The message that is starting the new topic may have likes, these become topic likes
 	require_once(SUBSDIR . '/Likes.subs.php');
@@ -2541,14 +2540,14 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	);
 	$split2_ID_TOPIC = $db->insert_id('{db_prefix}topics', 'id_topic');
 	if ($split2_ID_TOPIC <= 0)
-		throw new Elk_Exception('cant_insert_topic');
+		throw new \ElkArte\Exceptions\Exception('cant_insert_topic');
 
 	// Move the messages over to the other topic.
-	$new_subject = strtr(Util::htmltrim(Util::htmlspecialchars($new_subject)), array("\r" => '', "\n" => '', "\t" => ''));
+	$new_subject = strtr(\ElkArte\Util::htmltrim(\ElkArte\Util::htmlspecialchars($new_subject)), array("\r" => '', "\n" => '', "\t" => ''));
 
 	// Check the subject length.
-	if (Util::strlen($new_subject) > 100)
-		$new_subject = Util::substr($new_subject, 0, 100);
+	if (\ElkArte\Util::strlen($new_subject) > 100)
+		$new_subject = \ElkArte\Util::substr($new_subject, 0, 100);
 
 	// Valid subject?
 	if ($new_subject != '')
@@ -2642,7 +2641,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
  *
  * @param mixed[] $boards an array containing basic info of the origin and destination boards (from splitDestinationBoard)
  * @param int $totopic id of the destination topic
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function splitAttemptMove($boards, $totopic)
 {
@@ -2715,7 +2714,7 @@ function splitAttemptMove($boards, $totopic)
  * @param int $toboard
  *
  * @return array
- * @throws Elk_Exception no_board
+ * @throws \ElkArte\Exceptions\Exception no_board
  */
 function splitDestinationBoard($toboard = 0)
 {
@@ -2723,13 +2722,13 @@ function splitDestinationBoard($toboard = 0)
 
 	$current_board = boardInfo($board, $topic);
 	if (empty($current_board))
-		throw new Elk_Exception('no_board');
+		throw new \ElkArte\Exceptions\Exception('no_board');
 
 	if (!empty($toboard) && $board !== $toboard)
 	{
 		$destination_board = boardInfo($toboard);
 		if (empty($destination_board))
-			throw new Elk_Exception('no_board');
+			throw new \ElkArte\Exceptions\Exception('no_board');
 	}
 
 	if (!isset($destination_board))
@@ -3179,7 +3178,7 @@ function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_
  * @param int $id_topic
  *
  * @return string
- * @throws Elk_Exception topic_gone
+ * @throws \ElkArte\Exceptions\Exception topic_gone
  */
 function getSubject($id_topic)
 {
@@ -3203,7 +3202,7 @@ function getSubject($id_topic)
 	);
 
 	if ($db->num_rows($request) == 0)
-		throw new Elk_Exception('topic_gone', false);
+		throw new \ElkArte\Exceptions\Exception('topic_gone', false);
 
 	list ($subject) = $db->fetch_row($request);
 	$db->free_result($request);
@@ -3249,7 +3248,7 @@ function updateTopicStats($increment = null)
  *
  * @param int[] $topics The topics to lock (can be an id or an array of ids).
  * @param bool $log if true logs the action.
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function toggleTopicsLock($topics, $log = false)
 {

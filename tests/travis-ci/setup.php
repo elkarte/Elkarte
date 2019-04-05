@@ -3,9 +3,9 @@
 /**
  * Installs the ElkArte db on the travis test server
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -13,16 +13,23 @@
 
 global $txt;
 
+define('BOARDDIR', dirname(__FILE__) . '/../..');
+define('CACHEDIR', BOARDDIR . '/cache');
+define('ELK', '1');
+
 // Lots of needs
-require_once(BOARDDIR . '/sources/database/Db.php');
-require_once(BOARDDIR . '/sources/database/Db-abstract.class.php');
 require_once(BOARDDIR . '/sources/Subs.php');
 require_once(BOARDDIR . '/sources/subs/Cache.subs.php');
 require_once(BOARDDIR . '/sources/database/Database.subs.php');
 require_once(BOARDDIR . '/install/installcore.php');
 
 // Composer-Autoloader
-require_once(BOARDDIR . '/vendor/autoload.php');
+require_once(BOARDDIR . '/sources/ext/ClassLoader.php');
+
+$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
+$loader->setPsr4('ElkArte\\', BOARDDIR . '/sources/ElkArte');
+$loader->setPsr4('BBC\\', BOARDDIR . '/sources/ElkArte/BBC');
+$loader->register();
 
 /**
  * Used to install ElkArte SQL files to a database scheme
@@ -120,7 +127,7 @@ Class Elk_Testing_Setup
 		{
 			if (substr($key, 0, 8) == 'default_')
 			{
-				$replaces['{$' . $key . '}'] = addslashes($value);
+				$replaces['{$' . $key . '}'] = $value;
 			}
 		}
 		$replaces['{$default_reserved_names}'] = strtr($replaces['{$default_reserved_names}'], array('\\\\n' => '\\n'));
@@ -160,12 +167,12 @@ Class Elk_Testing_Setup
 	public function clear_tables()
 	{
 		// Get all the tables.
-		$tables = $this->_db->db_list_tables($this->_db_name, $this->_db_prefix . '%');
+		$tables = $this->_db->list_tables($this->_db_name, $this->_db_prefix . '%');
 
 		// Bu-bye
 		foreach ($tables as $table)
 		{
-			$this->_db_table->db_drop_table($table);
+			$this->_db_table->drop_table($table);
 		}
 	}
 
@@ -223,7 +230,7 @@ Class Elk_Testing_Setup
 		global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
 		global $boardurl, $webmaster_email, $cookiename;
 		global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send;
-		global $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
+		global $modSettings, $context, $user_info, $topic, $board, $txt;
 		global $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
 		global $sourcedir, $boarddir;
 
@@ -238,10 +245,14 @@ Class Elk_Testing_Setup
 		require_once(BOARDDIR . '/Settings.php');
 		require_once(SOURCEDIR . '/Subs.php');
 		require_once(SOURCEDIR . '/Load.php');
-		require_once(SUBSDIR . '/Util.class.php');
 		require_once(SUBSDIR . '/Auth.subs.php');
+		require_once(EXTDIR . '/ClassLoader.php');
+		require_once(SOURCEDIR . '/database/Database.subs.php');
 
-		Elk_Autoloader::instance()->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
+		$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
+		$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
+		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
+		$loader->register();
 
 		$settings['theme_dir'] = $settings['default_theme_dir'] = BOARDDIR . '/Themes/default';
 		$settings['theme_url'] = $settings['default_theme_url'] = $boardurl . '/themes/default';
@@ -367,12 +378,12 @@ class DbTableWrapper
 		return call_user_func_array(array($this->db, $name), $args);
 	}
 
-	public function db_add_index()
+	public function add_index()
 	{
 		$args = func_get_args();
 
 		// In this case errors are ignored, so the return is always true
-		call_user_func_array(array($this->db, 'db_create_table'), $args);
+		call_user_func_array(array($this->db, 'create_table'), $args);
 
 		return true;
 	}

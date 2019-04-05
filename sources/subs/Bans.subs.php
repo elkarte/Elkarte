@@ -3,13 +3,12 @@
 /**
  * This file contains functions that are specifically done by administrators.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -56,7 +55,7 @@ function saveTriggers($suggestions, $ban_group, $member = 0, $trigger_id = 0)
 		)
 	);
 
-	$ban_errors = ElkArte\Errors\ErrorContext::context('ban', 1);
+	$ban_errors = \ElkArte\Errors\ErrorContext::context('ban', 1);
 
 	if (!is_array($suggestions))
 		return false;
@@ -241,7 +240,7 @@ function validateTriggers(&$triggers)
 {
 	$db = database();
 
-	$ban_errors = ElkArte\Errors\ErrorContext::context('ban', 1);
+	$ban_errors = \ElkArte\Errors\ErrorContext::context('ban', 1);
 	if (empty($triggers))
 		$ban_errors->addError('ban_empty_triggers');
 
@@ -307,7 +306,7 @@ function validateTriggers(&$triggers)
 			}
 			elseif ($key == 'user')
 			{
-				$user = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', Util::htmlspecialchars($value, ENT_QUOTES));
+				$user = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', \ElkArte\Util::htmlspecialchars($value, ENT_QUOTES));
 
 				$request = $db->query('', '
 					SELECT id_member, (id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0) AS isAdmin
@@ -388,7 +387,7 @@ function addTriggers($group_id = 0, $triggers = array(), $logs = array())
 {
 	$db = database();
 
-	$ban_errors = ElkArte\Errors\ErrorContext::context('ban', 1);
+	$ban_errors = \ElkArte\Errors\ErrorContext::context('ban', 1);
 
 	if (empty($group_id))
 		$ban_errors->addError('ban_not_found');
@@ -482,7 +481,7 @@ function updateTriggers($ban_item = 0, $group_id = 0, $trigger = array(), $logs 
 {
 	$db = database();
 
-	$ban_errors = ElkArte\Errors\ErrorContext::context('ban', 1);
+	$ban_errors = \ElkArte\Errors\ErrorContext::context('ban', 1);
 
 	if (empty($ban_item))
 		$ban_errors->addError('ban_ban_item_empty');
@@ -583,14 +582,14 @@ function logTriggersUpdates($logs, $new = true)
  *
  * @package Bans
  * @param mixed[] $ban_info
- * @return nothing
+ * @return int|bool
  */
 function updateBanGroup($ban_info = array())
 {
 	$db = database();
 
 	// Lets check for errors first
-	$ban_errors = ElkArte\Errors\ErrorContext::context('ban', 1);
+	$ban_errors = \ElkArte\Errors\ErrorContext::context('ban', 1);
 
 	if (empty($ban_info['name']))
 		$ban_errors->addError('ban_name_empty');
@@ -661,7 +660,7 @@ function insertBanGroup($ban_info = array())
 {
 	$db = database();
 
-	$ban_errors = ElkArte\Errors\ErrorContext::context('ban', 1);
+	$ban_errors = \ElkArte\Errors\ErrorContext::context('ban', 1);
 
 	if (empty($ban_info['name']))
 		$ban_errors->addError('ban_name_empty');
@@ -862,7 +861,7 @@ function updateBanMembers()
 	$memberEmailWild = array();
 
 	// Start by getting all active bans - it's quicker doing this in parts...
-	$db->fetchQueryCallback('
+	$db->fetchQuery('
 		SELECT bi.id_member, bi.email_address
 		FROM {db_prefix}ban_items AS bi
 			INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group)
@@ -874,7 +873,8 @@ function updateBanMembers()
 			'cannot_access_on' => 1,
 			'current_time' => time(),
 			'blank_string' => '',
-		),
+		)
+	)->fetch_callback(
 		function ($row) use (&$memberIDs, &$memberEmails, &$memberEmailWild)
 		{
 			if ($row['id_member'])
@@ -915,11 +915,12 @@ function updateBanMembers()
 	// Find all banned members.
 	if (!empty($queryPart))
 	{
-		$db->fetchQueryCallback('
+		$db->fetchQuery('
 			SELECT mem.id_member, mem.is_activated
 			FROM {db_prefix}members AS mem
 			WHERE ' . implode(' OR ', $queryPart),
-			$queryValues,
+			$queryValues
+		)->fetch_callback(
 			function ($row) use (&$allMembers, &$updates, &$newMembers)
 			{
 				if (!in_array($row['id_member'], $allMembers))
@@ -944,7 +945,7 @@ function updateBanMembers()
 	}
 
 	// Find members that are wrongfully marked as banned.
-	$db->fetchQueryCallback('
+	$db->fetchQuery('
 		SELECT mem.id_member, mem.is_activated - 10 AS new_value
 		FROM {db_prefix}members AS mem
 			LEFT JOIN {db_prefix}ban_items AS bi ON (bi.id_member = mem.id_member OR mem.email_address LIKE bi.email_address)
@@ -955,7 +956,8 @@ function updateBanMembers()
 			'cannot_access_activated' => 1,
 			'current_time' => time(),
 			'ban_flag' => 10,
-		),
+		)
+	)->fetch_callback(
 		function ($row) use (&$allMembers, &$updates)
 		{
 			// Don't do this twice!
@@ -1043,7 +1045,7 @@ function list_getBanTriggers($start, $items_per_page, $sort, $trigger_type)
 		array(
 			'blank_string' => '',
 		)
-	);
+	)->fetch_all();
 }
 
 /**
@@ -1061,13 +1063,15 @@ function list_getBanTriggers($start, $items_per_page, $sort, $trigger_type)
  */
 function BanCheckUser($memID, $hostname = '', $email = '')
 {
-	global $memberContext, $scripturl, $txt;
+	global $scripturl, $txt;
 
 	$db = database();
 	$bans = array();
+	$member = \ElkArte\MembersList::get($memID);
+	$member->loadContext();
 
 	// This is a valid member id, we at least need that
-	if (loadMemberContext($memID) && isset($memberContext[$memID]))
+	if ($member->isEmpty() === false)
 	{
 		$ban_query = array();
 		$ban_query_vars = array(
@@ -1077,7 +1081,7 @@ function BanCheckUser($memID, $hostname = '', $email = '')
 		// Member id and ip
 		$ban_query[] = 'id_member = ' . $memID;
 		require_once(SOURCEDIR . '/Security.php');
-		$ban_query[] = constructBanQueryIP($memberContext[$memID]['ip']);
+		$ban_query[] = constructBanQueryIP($member['ip']);
 
 		// Do we have a hostname?
 		if (!empty($hostname))
@@ -1194,7 +1198,7 @@ function list_getBanLogEntries($start, $items_per_page, $sort)
 			'blank_string' => '',
 			'dash' => '-',
 		)
-	);
+	)->fetch_all();
 }
 
 /**
@@ -1251,7 +1255,7 @@ function list_getNumBans()
  * @param int $ban_group_id
  *
  * @return array
- * @throws Elk_Exception ban_not_found
+ * @throws \ElkArte\Exceptions\Exception ban_not_found
  */
 function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group_id = 0)
 {
@@ -1279,7 +1283,7 @@ function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group
 		)
 	);
 	if ($db->num_rows($request) == 0)
-		throw new Elk_Exception('ban_not_found', false);
+		throw new \ElkArte\Exceptions\Exception('ban_not_found', false);
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!isset($context['ban']))
@@ -1374,7 +1378,7 @@ function list_getBans($start, $items_per_page, $sort)
 			'offset' => $start,
 			'limit' => $items_per_page,
 		)
-	);
+	)->fetch_all();
 }
 
 /**

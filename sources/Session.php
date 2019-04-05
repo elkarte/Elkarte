@@ -9,13 +9,12 @@
  *  - It uses the databaseSession_lifetime setting for garbage collection.
  *  - The custom session handler is set by loadSession().
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -26,7 +25,7 @@
  */
 function loadSession()
 {
-	global $modSettings, $boardurl, $sc, $context;
+	global $modSettings, $boardurl, $context;
 
 	// Attempt to change a few PHP settings.
 	@ini_set('session.use_cookies', true);
@@ -54,7 +53,7 @@ function loadSession()
 		// This is here to stop people from using bad junky PHPSESSIDs.
 		if (isset($_REQUEST[session_name()]) && preg_match('~^[A-Za-z0-9,-]{16,64}$~', $_REQUEST[session_name()]) == 0 && !isset($_COOKIE[session_name()]))
 		{
-			$tokenizer = new Token_Hash();
+			$tokenizer = new \ElkArte\TokenHash();
 			$session_id = hash('md5', hash('md5', 'elk_sess_' . time()) . $tokenizer->generate_hash(8));
 			$_REQUEST[session_name()] = $session_id;
 			$_GET[session_name()] = $session_id;
@@ -67,7 +66,7 @@ function loadSession()
 			@ini_set('session.serialize_handler', 'php');
 			@ini_set('session.gc_probability', '1');
 
-			$handler = new ElkArte\sources\subs\SessionHandler\DatabaseHandler(database());
+			$handler = new ElkArte\Sessions\SessionHandler\DatabaseHandler(database());
 			session_set_save_handler(
 				array($handler, 'open'),
 				array($handler, 'close'),
@@ -106,7 +105,7 @@ function loadSession()
 	// Set the randomly generated code.
 	if (!isset($_SESSION['session_var']))
 	{
-		$tokenizer = new Token_Hash();
+		$tokenizer = new \ElkArte\TokenHash();
 		$_SESSION['session_value'] = $tokenizer->generate_hash(32, session_id());
 		$_SESSION['session_var'] = substr(preg_replace('~^\d+~', '', $tokenizer->generate_hash(16, session_id())), 0, rand(7, 12));
 	}
@@ -114,7 +113,4 @@ function loadSession()
 	// For injection into hidden form fields...
 	$context['session_var'] = $_SESSION['session_var'];
 	$context['session_id'] = $_SESSION['session_value'];
-
-	// @todo find where this is used and fix the reference!
-	$sc = $_SESSION['session_value'];
 }

@@ -3,13 +3,12 @@
 /**
  * This file contains several functions for retrieving and manipulating calendar events, birthdays and holidays.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -292,9 +291,9 @@ function canLinkEvent()
 
 	// No board?  No topic?!?
 	if (empty($board))
-		throw new Elk_Exception('missing_board_id', false);
+		throw new \ElkArte\Exceptions\Exception('missing_board_id', false);
 	if (empty($topic))
-		throw new Elk_Exception('missing_topic_id', false);
+		throw new \ElkArte\Exceptions\Exception('missing_topic_id', false);
 
 	// Administrator, Moderator, or owner.  Period.
 	if (!allowedTo('admin_forum') && !allowedTo('moderate_board'))
@@ -305,11 +304,11 @@ function canLinkEvent()
 		{
 			// Not the owner of the topic.
 			if ($row['id_member_started'] != $user_info['id'])
-				throw new Elk_Exception('not_your_topic', 'user');
+				throw new \ElkArte\Exceptions\Exception('not_your_topic', 'user');
 		}
 		// Topic/Board doesn't exist.....
 		else
-			throw new Elk_Exception('calendar_no_topic', 'general');
+			throw new \ElkArte\Exceptions\Exception('calendar_no_topic', 'general');
 	}
 }
 
@@ -662,7 +661,7 @@ function cache_getOffsetIndependentEvents($days_to_index)
 function cache_getRecentEvents($eventOptions)
 {
 	// With the 'static' cached data we can calculate the user-specific data.
-	$cached_data = cache_quick_get('calendar_index', 'subs/Calendar.subs.php', 'cache_getOffsetIndependentEvents', array($eventOptions['num_days_shown']));
+	$cached_data = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index', 'subs/Calendar.subs.php', 'cache_getOffsetIndependentEvents', array($eventOptions['num_days_shown']));
 
 	// Get the information about today (from user perspective).
 	$today = getTodayInfo();
@@ -859,7 +858,7 @@ function insertEvent(&$eventOptions)
 	$db = database();
 
 	// Add special chars to the title.
-	$eventOptions['title'] = Util::htmlspecialchars($eventOptions['title'], ENT_QUOTES);
+	$eventOptions['title'] = \ElkArte\Util::htmlspecialchars($eventOptions['title'], ENT_QUOTES);
 
 	// Add some sanity checking to the span.
 	$eventOptions['span'] = isset($eventOptions['span']) && $eventOptions['span'] > 0 ? (int) $eventOptions['span'] : 0;
@@ -922,7 +921,7 @@ function modifyEvent($event_id, &$eventOptions)
 	$db = database();
 
 	// Properly sanitize the title.
-	$eventOptions['title'] = Util::htmlspecialchars($eventOptions['title'], ENT_QUOTES);
+	$eventOptions['title'] = \ElkArte\Util::htmlspecialchars($eventOptions['title'], ENT_QUOTES);
 
 	// Scan the start date for validity and get its components.
 	$year = '';
@@ -1004,7 +1003,7 @@ function removeEvent($event_id)
  * @package Calendar
  * @param int $event_id
  * @param bool $calendar_only
- * @return array
+ * @return mixed[]|bool
  */
 function getEventProperties($event_id, $calendar_only = false)
 {
@@ -1088,7 +1087,7 @@ function eventInfoForTopic($id_topic)
 		array(
 			'current_topic' => $id_topic,
 		)
-	);
+	)->fetch_all();
 }
 
 /**
@@ -1112,7 +1111,7 @@ function list_getHolidays($start, $items_per_page, $sort)
 		array(
 			'sort' => $sort,
 		)
-	);
+	)->fetch_all();
 }
 
 /**

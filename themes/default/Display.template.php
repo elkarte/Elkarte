@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -51,7 +50,7 @@ function template_messages_informations_above()
 				<span class="nextlinks">',
 					!empty($context['links']['go_prev']) ? '<a href="' . $context['links']['go_prev'] . '">' . $txt['previous_next_back'] . '</a>' : '',
 					!empty($context['links']['go_next']) ? ' - <a href="' . $context['links']['go_next'] . '">' . $txt['previous_next_forward'] . '</a>' : '',
-					!empty($context['links']['derived_from']) ? ' - <a href="' . $context['links']['derived_from'] . '">' . sprintf($txt['topic_derived_from'], '<em>' . Util::shorten_text($context['topic_derived_from']['subject'], $modSettings['subject_length'])) . '</em></a>' : '',
+					!empty($context['links']['derived_from']) ? ' - <a href="' . $context['links']['derived_from'] . '">' . sprintf($txt['topic_derived_from'], '<em>' . \ElkArte\Util::shorten_text($context['topic_derived_from']['subject'], $modSettings['subject_length'])) . '</em></a>' : '',
 				'</span>
 			</header>
 			<section>';
@@ -98,24 +97,21 @@ function template_messages()
 {
 	global $context, $settings, $options, $txt, $scripturl;
 
-	// Yeah, I know, though at the moment is the only way...
-	global $removableMessageIDs, $ignoredMsgs;
-
-	$ignoredMsgs = array();
-	$removableMessageIDs = array();
+	$context['quick_reply_removableMessageIDs'] = array();
+	$context['quick_reply_ignoredMsgs'] = array();
 
 	// Get all the messages...
 	$controller = $context['get_message'][0];
 	while ($message = $controller->{$context['get_message'][1]}())
 	{
 		if ($message['can_remove'])
-			$removableMessageIDs[] = $message['id'];
+			$context['quick_reply_removableMessageIDs'][] = $message['id'];
 
 		// Are we ignoring this message?
 		if (!empty($message['is_ignored']))
 		{
 			$ignoring = true;
-			$ignoredMsgs[] = $message['id'];
+			$context['quick_reply_ignoredMsgs'][] = $message['id'];
 		}
 		else
 			$ignoring = false;
@@ -206,7 +202,7 @@ function template_messages()
 		// Show a checkbox for quick moderation?
 		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $message['can_remove'])
 			echo '
-							<li class="listlevel1 inline_mod_check none" id="in_topic_mod_check_', $message['id'], '"></li>';
+							<li class="listlevel1 inline_mod_check hide" id="in_topic_mod_check_', $message['id'], '"></li>';
 
 		// Show "Last Edit: Time by Person" if this post was edited.
 		if ($settings['show_modify'])
@@ -410,9 +406,6 @@ function template_quickreply_below()
 {
 	global $context, $options, $settings, $txt, $modSettings, $scripturl;
 
-	// Yeah, I know, though at the moment is the only way...
-	global $removableMessageIDs, $ignoredMsgs;
-
 	// Using the quick reply box below the messages and you can reply?
 	if ($context['can_reply'] && !empty($options['display_quick_reply']))
 	{
@@ -573,7 +566,7 @@ function template_quickreply_below()
 		echo '
 				var oInTopicModeration = new InTopicModeration({
 					sCheckboxContainerMask: \'in_topic_mod_check_\',
-					aMessageIds: [\'', implode('\', \'', $removableMessageIDs), '\'],
+					aMessageIds: [\'', implode('\', \'', $context['quick_reply_removableMessageIDs']), '\'],
 					sSessionId: elk_session_id,
 					sSessionVar: elk_session_var,
 					sButtonStrip: \'moderationbuttons\',
@@ -655,9 +648,11 @@ function template_quickreply_below()
 					sItemBackgroundHover: "#e0e0f0"
 				});';
 
-	if (!empty($ignoredMsgs))
+	if (!empty($context['quick_reply_ignoredMsgs']))
+	{
 		echo '
-				ignore_toggles([', implode(', ', $ignoredMsgs), '], ', JavaScriptEscape($txt['show_ignore_user_post']), ');';
+				ignore_toggles([', implode(', ', $context['quick_reply_ignoredMsgs']), '], ', JavaScriptEscape($txt['show_ignore_user_post']), ');';
+	}
 
 	echo '
 			</script>';
@@ -846,7 +841,7 @@ function template_pages_and_buttons_below()
  */
 function template_display_attachments($message, $ignoring)
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt, $scripturl, $modSettings;
 
 	echo '
 							<footer id="msg_', $message['id'], '_footer" class="attachments', $ignoring ? ' hide"' : '"', '>';
@@ -885,6 +880,8 @@ function template_display_attachments($message, $ignoring)
 				echo '
 											<img class="attachment_image" src="', $attachment['href'], ';image" alt="" style="max-width:100%; max-height:' . $attachment['height'] . 'px;"/>';
 		}
+		elseif (!empty($modSettings['attachmentShowImages']))
+			echo '							<img class="attachment_image" src="', $attachment['href'], ';thumb" alt="" style="max-width:' . $modSettings['attachmentThumbWidth'] . 'px; max-height:' . $modSettings['attachmentThumbHeight'] . 'px;" />';
 
 		echo '
 											<a href="', $attachment['href'], '" class="attachment_name">

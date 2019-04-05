@@ -11,9 +11,9 @@
  * For example
  * - Ubuntu and Debian would normally be #!/usr/bin/php -q
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -26,16 +26,19 @@ if (!defined('STDIN'))
 // Any output here is not good
 error_reporting(0);
 
+global $ssi_guest_access;
+
 // Need to bootstrap to do much
 require_once(__DIR__ . '/bootstrap.php');
-new Bootstrap();
+$ssi_guest_access = true;
+new Bootstrap(true);
 
 // No need to ID the server if we fall on our face :)
 $_SERVER['SERVER_SOFTWARE'] = '';
 $_SERVER['SERVER_NAME'] = '';
 
 // Our mail controller
-$controller = new Emailpost_Controller(new Event_manager());
+$controller = new \ElkArte\Controller\Emailpost(new \ElkArte\EventManager());
 $controller->action_pbe_post();
 
 // Always exit as successful

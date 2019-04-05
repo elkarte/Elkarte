@@ -5,13 +5,12 @@
  * operations, including sending emails, ims, blocking spam, preparsing posts,
  * spell checking, and the post box.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -63,7 +62,7 @@ function un_preparsecode($message)
  * @param mixed[] $posterOptions
  *
  * @return bool
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
@@ -426,7 +425,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
  * @param mixed[] $posterOptions
  *
  * @return bool
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
@@ -573,7 +572,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
  * @param bool $approve = true
  *
  * @return bool|void
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function approvePosts($msgs, $approve = true)
 {
@@ -825,7 +824,7 @@ function approvePosts($msgs, $approve = true)
  * @param int $id_msg = 0
  *
  * @return bool
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateLastMessages($setboards, $id_msg = 0)
 {
@@ -999,13 +998,13 @@ function lastPost()
 	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
-	$row['body'] = Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
+	$row['body'] = \ElkArte\Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
 
 	// Send the data.
 	return array(
 		'topic' => $row['id_topic'],
 		'subject' => $row['subject'],
-		'short_subject' => Util::shorten_text($row['subject'], $modSettings['subject_length']),
+		'short_subject' => \ElkArte\Util::shorten_text($row['subject'], $modSettings['subject_length']),
 		'preview' => $row['body'],
 		'time' => standardTime($row['poster_time']),
 		'html_time' => htmlTime($row['poster_time']),
@@ -1032,7 +1031,7 @@ function lastPost()
  * @param int            $msg_id
  *
  * @return false|mixed[]
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 {
@@ -1082,13 +1081,13 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 				)
 			);
 			if ($db->num_rows($request) == 0)
-				throw new Elk_Exception('quoted_post_deleted', false);
+				throw new \ElkArte\Exceptions\Exception('quoted_post_deleted', false);
 			list ($form_subject, $mname, $mdate, $form_message) = $db->fetch_row($request);
 			$db->free_result($request);
 
 			// Add 'Re: ' to the front of the quoted subject.
 			$response_prefix = response_prefix();
-			if (trim($response_prefix) != '' && Util::strpos($form_subject, trim($response_prefix)) !== 0)
+			if (trim($response_prefix) != '' && \ElkArte\Util::strpos($form_subject, trim($response_prefix)) !== 0)
 				$form_subject = $response_prefix . $form_subject;
 
 			// Censor the message and subject.
@@ -1109,7 +1108,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 
 			// Add 'Re: ' to the front of the subject.
 			$response_prefix = response_prefix();
-			if (trim($response_prefix) != '' && $form_subject != '' && Util::strpos($form_subject, trim($response_prefix)) !== 0)
+			if (trim($response_prefix) != '' && $form_subject != '' && \ElkArte\Util::strpos($form_subject, trim($response_prefix)) !== 0)
 				$form_subject = $response_prefix . $form_subject;
 
 			// Censor the subject.

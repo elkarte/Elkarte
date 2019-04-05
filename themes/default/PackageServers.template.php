@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -211,7 +210,7 @@ function template_package_list()
 				// Show the addon type?
 				if ($package['type'] != '')
 					echo '
-								<li>', $txt['package_type'], ':&nbsp; ', Util::ucwords(Util::strtolower($package['type'])), '</li>';
+								<li>', $txt['package_type'], ':&nbsp; ', \ElkArte\Util::ucwords(\ElkArte\Util::strtolower($package['type'])), '</li>';
 
 				// Show the version number?
 				if ($package['version'] != '')

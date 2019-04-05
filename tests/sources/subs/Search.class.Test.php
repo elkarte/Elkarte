@@ -141,8 +141,6 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 			'update_post_count' => false,
 		];
 		createPost($msgOptions, $topicOptions, $posterOptions);
-
-		Elk_Autoloader::instance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 	}
 
 	/**
@@ -257,7 +255,7 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 			array(
 				'id_member' => $member
 			)
-		);
+		)->fetch_all();
 
 		if (empty($res))
 		{

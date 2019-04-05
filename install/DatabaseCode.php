@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -70,7 +69,7 @@ class DbTableWrapper
 		return call_user_func_array(array($this->db, $name), $args);
 	}
 
-	public function db_create_table()
+	public function create_table()
 	{
 		$args = func_get_args();
 		if (!isset($args[4]))
@@ -79,24 +78,24 @@ class DbTableWrapper
 		}
 
 		// In this case errors are ignored, so the return is always true
-		call_user_func_array(array($this->db, 'db_create_table'), $args);
+		call_user_func_array(array($this->db, 'create_table'), $args);
 
 		return true;
 	}
-	public function db_add_index()
+	public function add_index()
 	{
 		$args = func_get_args();
 
 		// In this case errors are ignored, so the return is always true
-		call_user_func_array(array($this->db, 'db_add_index'), $args);
+		call_user_func_array(array($this->db, 'add_index'), $args);
 
 		return true;
 	}
 }
 
-if (class_exists('DbTable_MySQL'))
+if (class_exists('\\ElkArte\\Database\\Mysqli\\Table'))
 {
-	class DbTable_MySQL_Install extends DbTable_MySQL
+	class DbTable_MySQL_Install extends \ElkArte\Database\Mysqli\Table
 	{
 		public static $_tbl_inst = null;
 
@@ -105,7 +104,7 @@ if (class_exists('DbTable_MySQL'))
 		*
 		* @param object $db - A Database_MySQL object
 		*/
-		protected function __construct($db, $db_prefix)
+		public function __construct($db, $db_prefix)
 		{
 			// We are doing install, of course we want to do any remove on these
 			$this->_reservedTables = array();
@@ -224,11 +223,14 @@ if (class_exists('DbTable_MySQL'))
 			return self::$_tbl_inst;
 		}
 	}
+	class DbTable_MySQLi_Install extends DbTable_MySQL_Install
+	{
+	}
 }
 
-if (class_exists('DbTable_PostgreSQL'))
+if (class_exists('\\ElkArte\\Database\\Postgresql\\Table'))
 {
-	class DbTable_PostgreSQL_Install extends DbTable_PostgreSQL
+	class DbTable_PostgreSQL_Install extends \ElkArte\Database\Postgresql\Table
 	{
 		public static $_tbl_inst = null;
 
@@ -237,7 +239,7 @@ if (class_exists('DbTable_PostgreSQL'))
 		*
 		* @param object $db - A DbTable_PostgreSQL object
 		*/
-		protected function __construct($db, $db_prefix)
+		public function __construct($db, $db_prefix)
 		{
 			// We are doing install, of course we want to do any remove on these
 			$this->_reservedTables = array();

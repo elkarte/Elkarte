@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -731,6 +730,21 @@ function template_show_error($error_id)
 					</div>';
 }
 
+function template_uc_generic_infobox()
+{
+	global $context;
+
+	if (empty($context['generic_infobox']))
+	{
+		return;
+	}
+
+	foreach ($context['generic_infobox'] as $key)
+	{
+		template_show_error($key);
+	}
+}
+
 /**
  * Another used and abused piece of template that can be found everywhere
  *
@@ -856,7 +870,7 @@ function template_member_email($member, $text = false)
  * Sometimes we only get a message id.
  *
  * @param      $id
- * @param bool $member
+ * @param bool|mixed[] $member
  *
  * @return string
  */
@@ -868,7 +882,14 @@ function template_msg_email($id, $member = false)
 	{
 		if ($member === false || $member['show_email'] != 'no')
 		{
-			return '<a href="' . $scripturl . '?action=emailuser;sa=email;msg=' . $id . '" class="icon i-envelope-o' . (($member !== false && $member['online']['is_online']) ? '' : '-blank') . '" title="' . $txt['email'] . '"><s>' . $txt['email'] . '</s></a>';
+			if (empty($member['id']))
+			{
+				return '<a href="' . $scripturl . '?action=emailuser;sa=email;msg=' . $id . '" class="icon i-envelope-o' . (($member !== false && $member['online']['is_online']) ? '' : '-blank') . '" title="' . $txt['email'] . '"><s>' . $txt['email'] . '</s></a>';
+			}
+			else
+			{
+				return '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" class="icon i-envelope-o' . (($member !== false && $member['online']['is_online']) ? '' : '-blank') . '" title="' . $txt['email'] . '"><s>' . $txt['email'] . '</s></a>';
+			}
 		}
 		else
 		{

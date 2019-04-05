@@ -4,13 +4,12 @@
  * This file provides utility functions and db function for the profile functions,
  * notably, but not exclusively, deals with custom profile fields
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -64,11 +63,11 @@ function updateSignature($id_member, $signature)
  * Update all signatures given a new set of constraints
  *
  * @param int $applied_sigs
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function updateAllSignatures($applied_sigs)
 {
-	global $context, $sig_start, $modSettings;
+	global $context, $modSettings;
 
 	require_once(SUBSDIR . '/Members.subs.php');
 	$sig_start = time();
@@ -103,7 +102,7 @@ function updateAllSignatures($applied_sigs)
 
 			// Max characters...
 			if (!empty($sig_limits[1]))
-				$sig = Util::substr($sig, 0, $sig_limits[1]);
+				$sig = \ElkArte\Util::substr($sig, 0, $sig_limits[1]);
 
 			// Max lines...
 			if (!empty($sig_limits[2]))
@@ -305,7 +304,9 @@ function updateAllSignatures($applied_sigs)
 
 		$applied_sigs += 50;
 		if (!$done)
-			pauseSignatureApplySettings($applied_sigs);
+		{
+			pauseSignatureApplySettings($applied_sigs, $sig_start);
+		}
 	}
 }
 
@@ -691,7 +692,7 @@ function updateDisplayCache()
 {
 	$db = database();
 
-	$fields = $db->fetchQueryCallback('
+	$fields = $db->fetchQuery('
 		SELECT col_name, field_name, field_type, bbc, enclose, placement, vieworder
 		FROM {db_prefix}custom_fields
 		WHERE show_display = {int:is_displayed}
@@ -704,7 +705,8 @@ function updateDisplayCache()
 			'active' => 1,
 			'not_owner_only' => 2,
 			'not_admin_only' => 3,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			return array(
@@ -761,15 +763,13 @@ function loadAllCustomFields()
  */
 function getNotificationTypes()
 {
-	Elk_Autoloader::instance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
-
-	$glob = new GlobIterator(SUBSDIR . '/MentionType/*Mention.php', FilesystemIterator::SKIP_DOTS);
+	$glob = new \GlobIterator(SOURCEDIR . '/ElkArte/Mentions/MentionType/*Mention.php', \FilesystemIterator::SKIP_DOTS);
 	$types = array();
 
 	// For each file found, call its getType method
 	foreach ($glob as $file)
 	{
-		$class_name = '\\ElkArte\\sources\\subs\\MentionType\\' . preg_replace('~([^^])((?<=)[A-Z](?=[a-z]))~', '$1_$2', $file->getBasename('.php'));
+		$class_name = '\\ElkArte\\Mentions\\MentionType\\' . $file->getBasename('.php');
 		$types[] = $class_name::getType();
 	}
 
@@ -794,7 +794,7 @@ function getMentionsModules($enabled_mentions)
 
 	foreach ($enabled_mentions as $mention)
 	{
-		$class_name = '\\ElkArte\\sources\\subs\\MentionType\\' . ucfirst($mention) . '_Mention';
+		$class_name = '\\ElkArte\\Mentions\\MentionType\\' . ucfirst($mention);
 		$modules = $class_name::getModules($modules);
 	}
 
@@ -817,10 +817,10 @@ function getFrontPageControllers()
 
 	$classes = array();
 
-	$glob = new GlobIterator(CONTROLLERDIR . '/*.controller.php', FilesystemIterator::SKIP_DOTS);
+	$glob = new \GlobIterator(CONTROLLERDIR . '/*.controller.php', \FilesystemIterator::SKIP_DOTS);
 	$classes += scanFileSystemForControllers($glob);
 
-	$glob = new GlobIterator(ADDONSDIR . '/*/controllers/*.controller.php', FilesystemIterator::SKIP_DOTS);
+	$glob = new \GlobIterator(ADDONSDIR . '/*/controllers/*.controller.php', \FilesystemIterator::SKIP_DOTS);
 	$classes += scanFileSystemForControllers($glob, '\\ElkArte\\Addon\\');
 
 	$config_vars = array(array('select', 'front_page', $classes));
@@ -838,7 +838,7 @@ function getFrontPageControllers()
 
 /**
  *
- * @param GlobIterator $iterator
+ * @param \GlobIterator $iterator
  * @param string $namespace
  *
  * @return array
@@ -851,25 +851,64 @@ function scanFileSystemForControllers($iterator, $namespace = '')
 
 	foreach ($iterator as $file)
 	{
-		$class_name = $namespace . preg_replace('~([^^])((?<=)[A-Z](?=[a-z]))~', '$1_$2', $file->getBasename('.controller.php')) . '_Controller';
+		$class_name = $namespace . $file->getBasename('.php');
 
 		if (!class_exists($class_name))
 		{
-			$class_name = $file->getBasename('.controller.php') . '_Controller';
-
-			if (!class_exists($class_name))
-				continue;
+			continue;
 		}
 
-		if (is_subclass_of($class_name, 'Action_Controller') && $class_name::canFrontPage())
+		if (is_subclass_of($class_name, '\\ElkArte\\AbstractController') && $class_name::canFrontPage())
 		{
 			// Temporary
 			if (!isset($txt[$class_name]))
+			{
 				continue;
+			}
 
 			$types[$class_name] = $txt[$class_name];
 		}
 	}
 
 	return $types;
+}
+
+/**
+ * Just pause the signature applying thing.
+ *
+ * @todo Move to subs file
+ * @todo Merge with other pause functions?
+ *    pausePermsSave(), pauseAttachmentMaintenance(), pauseRepairProcess()
+ *
+ * @param int $applied_sigs
+ * @param int $sig_start
+ * @throws \ElkArte\Exceptions\Exception
+ */
+function pauseSignatureApplySettings($applied_sigs, $sig_start)
+{
+	global $context, $txt;
+
+	// Try get more time...
+	detectServer()->setTimeLimit(600);
+
+	// Have we exhausted all the time we allowed?
+	if (time() - array_sum(explode(' ', $sig_start)) < 3)
+		return;
+
+	$context['continue_get_data'] = '?action=admin;area=featuresettings;sa=sig;apply;step=' . $applied_sigs . ';' . $context['session_var'] . '=' . $context['session_id'];
+	$context['page_title'] = $txt['not_done_title'];
+	$context['continue_post_data'] = '';
+	$context['continue_countdown'] = '2';
+	$context['sub_template'] = 'not_done';
+
+	// Specific stuff to not break this template!
+	$context[$context['admin_menu_name']]['current_subsection'] = 'sig';
+
+	// Get the right percent.
+	$context['continue_percent'] = round(($applied_sigs / $context['max_member']) * 100);
+
+	// Never more than 100%!
+	$context['continue_percent'] = min($context['continue_percent'], 100);
+
+	obExit();
 }

@@ -1,9 +1,9 @@
 <?php
 
 /**
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -210,6 +210,11 @@ function getFilesChanged($from, $to)
 			continue;
 		}
 
+		if (strpos($file, 'docs/') !== false)
+		{
+			continue;
+		}
+
 		if (strpos($file, '/images') !== false)
 		{
 			continue;
@@ -225,7 +230,22 @@ function getFilesChanged($from, $to)
 			continue;
 		}
 
+		if (strpos($file, 'packages') !== false)
+		{
+			continue;
+		}
+
+		if (strpos($file, '.txt') !== false)
+		{
+			continue;
+		}
+
 		if ($file === 'index.php')
+		{
+			continue;
+		}
+
+		if ($file === 'ssi_examples.php')
 		{
 			continue;
 		}

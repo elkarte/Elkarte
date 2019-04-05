@@ -117,8 +117,8 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 	{
 		$id_member = 2;
 
-		$notifier = Notifications::instance();
-		$notifier->add(new Notifications_Task(
+		$notifier = \ElkArte\Notifications::instance();
+		$notifier->add(new \ElkArte\NotificationsTask(
 			'mentionmem',
 			$this->id_msg,
 			$this->_posterOptions['id'],
@@ -145,8 +145,8 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 		$user_info['id'] = 2;
 		$user_info['ip'] = '127.0.0.1';
 
-		$notifier = Notifications::instance();
-		$notifier->add(new Notifications_Task(
+		$notifier = \ElkArte\Notifications::instance();
+		$notifier->add(new \ElkArte\NotificationsTask(
 			'likemsg',
 			$this->id_msg,
 			$user_info['id'],
@@ -170,7 +170,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 	{
 		global $modSettings;
 
-		$mentioning = new Mentioning(database(), new Data_Validator, $modSettings['enabled_mentions']);
+		$mentioning = new \ElkArte\Mentions\Mentioning(database(), new \ElkArte\DataValidator, $modSettings['enabled_mentions']);
 		// Mark mention 2 as read
 		$result = $mentioning->markread(2);
 

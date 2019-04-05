@@ -4,13 +4,12 @@
  * Provides ways to add information to your website by linking to and capturing output
  * from ElkArte
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:    2011 Simple Machines (http://www.simplemachines.org)
- * license:        BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -60,14 +59,14 @@ if (!defined('ELKBOOT'))
 	define('ELK', 'SSI');
 
 	require_once(dirname(__FILE__) . '/bootstrap.php');
-	$bootstrap = new Bootstrap();
+	$bootstrap = new Bootstrap(true);
 }
 
 // The globals that were created during the bootstrap process
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
 global $boardurl, $webmaster_email, $cookiename;
 global $db_type, $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send;
-global $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
+global $modSettings, $context, $user_info, $topic, $board, $txt;
 global $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
 global $boarddir, $sourcedir, $db_show_debug, $ssi_error_reporting;
 
@@ -368,8 +367,8 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>'
 			),
 			'subject' => $row['subject'],
-			'short_subject' => Util::shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24),
-			'preview' => Util::shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128),
+			'short_subject' => \ElkArte\Util::shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24),
+			'preview' => \ElkArte\Util::shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128),
 			'body' => $row['body'],
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),
@@ -547,7 +546,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 		$row['subject'] = censor($row['subject']);
 		$row['body'] = censor($row['body']);
 
-		$row['body'] = Util::shorten_text($row['body'], 128);
+		$row['body'] = \ElkArte\Util::shorten_text($row['body'], 128);
 
 		// Build the array.
 		$posts[$row['id_last_msg']] = array(
@@ -573,7 +572,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			'subject' => $row['subject'],
 			'replies' => $row['num_replies'],
 			'views' => $row['num_views'],
-			'short_subject' => Util::shorten_text($row['subject'], 25),
+			'short_subject' => \ElkArte\Util::shorten_text($row['subject'], 25),
 			'preview' => $row['body'],
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),
@@ -677,9 +676,9 @@ function ssi_topBoards($num_top = 10, $output_method = 'echo')
 	echo '
 		<table class="ssi_table">
 			<tr>
-				<th class="lefttext">', $txt['board'], '</th>
-				<th class="righttext">', $txt['board_topics'], '</th>
-				<th class="righttext">', $txt['posts'], '</th>
+				<th>', $txt['board'], '</th>
+				<th class="centertext">', $txt['board_topics'], '</th>
+				<th class="centertext">', $txt['posts'], '</th>
 			</tr>';
 
 	foreach ($boards as $board)
@@ -687,8 +686,8 @@ function ssi_topBoards($num_top = 10, $output_method = 'echo')
 		echo '
 			<tr>
 				<td>', $board['new'] ? ' <a href="' . $board['href'] . '"><span class="new_posts">' . $txt['new'] . '</span></a> ' : '', $board['link'], '</td>
-				<td class="righttext">', $board['num_topics'], '</td>
-				<td class="righttext">', $board['num_posts'], '</td>
+				<td class="centertext">', $board['num_topics'], '</td>
+				<td class="centertext">', $board['num_posts'], '</td>
 			</tr>';
 	}
 
@@ -738,8 +737,8 @@ function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'ec
 		<table class="top_topic ssi_table">
 			<tr>
 				<th class="link"></th>
-				<th class="views">', $txt['views'], '</th>
-				<th class="num_replies">', $txt['replies'], '</th>
+				<th class="centertext views">', $txt['views'], '</th>
+				<th class="centertext num_replies">', $txt['replies'], '</th>
 			</tr>';
 
 	foreach ($topics as $topic)
@@ -749,8 +748,8 @@ function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'ec
 				<td class="link">
 					', $topic['link'], '
 				</td>
-				<td class="views">', $topic['num_views'], '</td>
-				<td class="num_replies">', $topic['num_replies'], '</td>
+				<td class="centertext views">', $topic['num_views'], '</td>
+				<td class="centertext num_replies">', $topic['num_replies'], '</td>
 			</tr>';
 	}
 
@@ -894,8 +893,6 @@ function ssi_fetchGroupMembers($group_id = null, $output_method = 'echo')
  */
 function ssi_queryMembers($query_where = null, $query_where_params = array(), $query_limit = '', $query_order = 'id_member DESC', $output_method = 'echo')
 {
-	global $memberContext;
-
 	if ($query_where === null)
 	{
 		return false;
@@ -921,7 +918,7 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 	}
 
 	// Load the members.
-	loadMemberData($members);
+	\ElkArte\MembersList::load($members);
 
 	// Draw the table!
 	if ($output_method === 'echo')
@@ -931,16 +928,18 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 	}
 
 	$query_members = array();
-	foreach ($members as $member)
+	foreach ($members as $id)
 	{
+		$member = \ElkArte\MembersList::get($id);
 		// Load their context data.
-		if (!loadMemberContext($member))
+		if ($member->isEmpty())
 		{
 			continue;
 		}
+		$member->loadContext();
 
 		// Store this member's information.
-		$query_members[$member] = $memberContext[$member];
+		$query_members[$id] = $member;
 
 		// Only do something if we're echo'ing.
 		if ($output_method === 'echo')
@@ -1220,7 +1219,9 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 			INNER JOIN {db_prefix}topics AS t ON (t.id_poll = p.id_poll' . ($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') . ')
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)' . ($topPollInstead ? '
 			INNER JOIN {db_prefix}poll_choices AS pc ON (pc.id_poll = p.id_poll)' : '') . '
-			LEFT JOIN {db_prefix}log_polls AS lp ON (lp.id_poll = p.id_poll AND lp.id_member > {int:no_member} AND lp.id_member = {int:current_member})
+			LEFT JOIN {db_prefix}log_polls AS lp ON (lp.id_poll = p.id_poll 
+				AND lp.id_member > {int:no_member} 
+				AND lp.id_member = {int:current_member})
 		WHERE p.voting_locked = {int:voting_opened}
 			AND (p.expire_time = {int:no_expiration} OR {int:current_time} < p.expire_time)
 			AND ' . ($user_info['is_guest'] ? 'p.guest_vote = {int:guest_vote_allowed}' : 'lp.id_choice IS NULL') . '
@@ -1245,7 +1246,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 	$db->free_result($request);
 
 	// This user has voted on all the polls.
-	if ($row === false)
+	if (empty($row))
 	{
 		return array();
 	}
@@ -1539,7 +1540,7 @@ function ssi_pollVote()
 	list ($topic, $board) = topicFromPoll($pollID);
 	loadBoard();
 
-	$poll_action = new Poll_Controller(new Event_manager());
+	$poll_action = new \ElkArte\Controller\Poll(new \ElkArte\EventManager());
 	$poll_action->pre_dispatch();
 
 	// The controller takes already care of redirecting properly or fail
@@ -1610,7 +1611,7 @@ function ssi_todaysBirthdays($output_method = 'echo')
 		'include_birthdays' => true,
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
-	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
+	$return = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 	if ($output_method !== 'echo')
 	{
@@ -1643,7 +1644,7 @@ function ssi_todaysHolidays($output_method = 'echo')
 		'include_holidays' => true,
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
-	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
+	$return = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 	if ($output_method !== 'echo')
 	{
@@ -1673,7 +1674,7 @@ function ssi_todaysEvents($output_method = 'echo')
 		'include_events' => true,
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
-	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
+	$return = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 	if ($output_method !== 'echo')
 	{
@@ -1715,7 +1716,7 @@ function ssi_todaysCalendar($output_method = 'echo')
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
 
-	$return = cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
+	$return = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 	if ($output_method !== 'echo')
 	{
@@ -1865,7 +1866,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 	require_once(SUBSDIR . '/MessageIndex.subs.php');
 	$request = messageIndexTopics($board, 0, $start, $limit, 'first_post', 't.id_topic', $indexOptions);
 
-	if (empty($request))
+	if ($request->hasResults() === false)
 	{
 		return false;
 	}
@@ -2156,12 +2157,12 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 
 	// Give them the default.
 	echo '
-		<table class="ssi_downloads" cellpadding="2">
+		<table class="ssi_table">
 			<tr>
-				<th align="left">', $txt['file'], '</th>
-				<th align="left">', $txt['posted_by'], '</th>
-				<th align="left">', $txt['downloads'], '</th>
-				<th align="left">', $txt['filesize'], '</th>
+				<th>', $txt['file'], '</th>
+				<th>', $txt['posted_by'], '</th>
+				<th class="centertext">', $txt['downloads'], '</th>
+				<th>', $txt['filesize'], '</th>
 			</tr>';
 
 	foreach ($attachments as $attach)
@@ -2170,7 +2171,7 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 			<tr>
 				<td>', $attach['file']['link'], '</td>
 				<td>', $attach['member']['link'], '</td>
-				<td align="center">', $attach['file']['downloads'], '</td>
+				<td class="centertext">', $attach['file']['downloads'], '</td>
 				<td>', $attach['file']['filesize'], '</td>
 			</tr>';
 	}

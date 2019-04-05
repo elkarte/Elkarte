@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -492,34 +491,69 @@ function load_possible_databases($type = null)
 /**
  * This handy function loads some settings and the like.
  */
-function load_database()
+function load_database($force = false)
 {
 	global $db_prefix, $db_connection, $db_type, $db_name, $db_user, $db_persist, $db_server, $db_passwd, $db_port;
 
 	// Connect the database.
-	if (empty($db_connection))
+	if (empty($db_connection) || $force === true)
 	{
+		if (empty($db_prefix) || $force === true)
+		{
+			// Need this to check whether we need the database password.
+			require(TMP_BOARDDIR . '/Settings.php');
+			definePaths();
+		}
+
 		if (!defined('SOURCEDIR'))
 			define('SOURCEDIR', TMP_BOARDDIR . '/sources');
-
-		// Need this to check whether we need the database password.
-		require(TMP_BOARDDIR . '/Settings.php');
 
 		if (!defined('ELK'))
 			define('ELK', 1);
 
-		require_once(SOURCEDIR . '/database/Database.subs.php');
-		require_once(SOURCEDIR . '/database/Db.php');
-		require_once(SOURCEDIR . '/database/DbTable.class.php');
-		require_once(SOURCEDIR . '/database/Db-abstract.class.php');
-		require_once(SOURCEDIR . '/database/Db-' . $db_type . '.class.php');
-		require_once(SOURCEDIR . '/database/DbTable-' . $db_type . '.php');
-		require_once(__DIR__ . '/DatabaseCode.php');
+		if (empty($db_connection))
+		{
+			require_once(EXTDIR . '/ClassLoader.php');
 
-		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'port' => $db_port), $db_type);
+			$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
+			$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
+			$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
+			$loader->register();
+
+			require_once(SOURCEDIR . '/database/Database.subs.php');
+			require_once(TMP_BOARDDIR . '/install/DatabaseCode.php');
+		}
+
+		$db_connection = database(false, true);
 	}
 
 	return database();
+}
+
+function test_db_connection()
+{
+	global $db_persist, $db_server, $db_user, $db_passwd, $db_port;
+	global $db_type, $db_name, $db_prefix, $mysql_set_mode;
+
+	$db_options = [
+		'persist' => $db_persist,
+		'select_db' => false,
+		'port' => $db_port,
+		'mysql_set_mode' => (bool) ($mysql_set_mode ?? false)
+	];
+	$type = strtolower($db_type);
+	$type = $type === 'mysql' ? 'mysqli' : $type;
+	$class = '\\ElkArte\\Database\\' . ucfirst($type) . '\\Connection';
+	try
+	{
+		$db = $class::initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options);
+
+		return $db;
+	}
+	catch (\Exception $e)
+	{
+		return false;
+	}
 }
 
 /**
@@ -531,10 +565,7 @@ function db_table_install()
 
 	$db = load_database();
 
-	require_once(SOURCEDIR . '/database/DbTable.class.php');
-	require_once(SOURCEDIR . '/database/DbTable-' . $db_type . '.php');
-
-	return call_user_func(array('DbTable_' . DB_TYPE . '_Install', 'db_table'), $db, $db_prefix);
+	return call_user_func_array(array('DbTable_' . $db_type . '_Install', 'db_table'), [$db, $db_prefix]);
 }
 
 /**
@@ -549,11 +580,16 @@ function updateLastError()
 /**
  * Checks the servers database version against our requirements
  */
-function db_version_check()
+function db_version_check($db = null)
 {
 	global $db_type, $databases, $db_connection;
 
-	$current_version = call_user_func($databases[$db_type]['version_check'], $db_connection);
+	if ($db === null)
+	{
+		$db = load_database();
+	}
+
+	$current_version = $db->server_version();
 	$current_version = preg_replace('~\-.+?$~', '', $current_version);
 
 	return version_compare($databases[$db_type]['version'], $current_version, '<=');
@@ -671,7 +707,7 @@ function saveFileSettings($config_vars, $settingsArray)
 	}
 	fclose($fp);
 
-	if (function_exists('opcache_invalidate'))
+	if (extension_loaded('Zend OPcache') && ini_get('opcache.enable') && stripos(BOARDDIR, ini_get('opcache.restrict_api')) !== 0)
 		opcache_invalidate(TMP_BOARDDIR . '/Settings.php', true);
 
 	return true;

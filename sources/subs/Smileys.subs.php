@@ -3,13 +3,12 @@
 /**
  * Database and support functions for adding, moving, saving smileys
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -187,7 +186,7 @@ function updateSmiley($param)
  * @param int $id
  *
  * @return array
- * @throws Elk_Exception smiley_not_found
+ * @throws \ElkArte\Exceptions\Exception smiley_not_found
  */
 function getSmiley($id)
 {
@@ -202,7 +201,7 @@ function getSmiley($id)
 		)
 	);
 	if ($db->num_rows($request) != 1)
-		throw new Elk_Exception('smiley_not_found');
+		throw new \ElkArte\Exceptions\Exception('smiley_not_found');
 	$current_smiley = $db->fetch_assoc($request);
 	$db->free_result($request);
 

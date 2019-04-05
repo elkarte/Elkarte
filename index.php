@@ -5,13 +5,12 @@
  * Everything should start here, so all the setup and security is done
  * properly.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -32,7 +31,7 @@ if (isset($_GET['scheduled']))
 	if (function_exists('fastcgi_finish_request'))
 		fastcgi_finish_request();
 
-	$controller = new ScheduledTasks_Controller(new Event_manager());
+	$controller = new \ElkArte\Controller\ScheduledTasks(new \ElkArte\EventManager());
 	$controller->action_autotask();
 }
 
@@ -78,10 +77,10 @@ function elk_main()
 
 	// A safer way to work with our form globals
 	// @todo Use dependency injection
-	$_req = HttpReq::instance();
+	$_req = \ElkArte\HttpReq::instance();
 
 	// What shall we do?
-	$dispatcher = new Site_Dispatcher($_req);
+	$dispatcher = new ElkArte\SiteDispatcher($_req);
 
 	if ($dispatcher->needSecurity())
 	{

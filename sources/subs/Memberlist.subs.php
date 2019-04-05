@@ -3,13 +3,12 @@
 /**
  * Handle memberlist functions
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -32,7 +31,7 @@ function ml_CustomProfile()
 
 	// Find any custom profile fields that are to be shown for the memberlist?
 	$request = $db->query('', '
-		SELECT col_name, field_name, field_desc, field_type, bbc, enclose, vieworder
+		SELECT col_name, field_name, field_desc, field_type, bbc, enclose, vieworder, default_value, field_options
 		FROM {db_prefix}custom_fields
 		WHERE active = {int:active}
 			AND show_memberlist = {int:show}
@@ -56,6 +55,8 @@ function ml_CustomProfile()
 			'type' => $row['field_type'],
 			'bbc' => !empty($row['bbc']),
 			'enclose' => $row['enclose'],
+			'default_value' => $row['default_value'],
+			'field_options' => explode(',', $row['field_options']),
 		);
 
 		// Have they selected to sort on a custom column? .., then we build the query
@@ -309,7 +310,7 @@ function ml_findSearchableCustomFields()
  */
 function printMemberListRows($request)
 {
-	global $txt, $context, $scripturl, $memberContext, $settings;
+	global $txt, $context, $scripturl, $settings;
 
 	$db = database();
 
@@ -332,17 +333,21 @@ function printMemberListRows($request)
 		$members[] = $row['id_member'];
 
 	// Load all the members for display.
-	loadMemberData($members);
+	\ElkArte\MembersList::load($members);
 
 	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	$context['members'] = array();
 	foreach ($members as $member)
 	{
-		if (!loadMemberContext($member))
+		$member_context = \ElkArte\MembersList::get($member);
+		$member_context->loadContext(true);
+		if ($member_context->isEmpty())
+		{
 			continue;
+		}
 
-		$context['members'][$member] = $memberContext[$member];
+		$context['members'][$member] = $member_context;
 		$context['members'][$member]['post_percent'] = round(($context['members'][$member]['real_posts'] * 100) / $most_posts);
 		$context['members'][$member]['registered_date'] = strftime('%Y-%m-%d', $context['members'][$member]['registered_timestamp']);
 		$context['members'][$member]['real_name'] = $context['members'][$member]['link'];
@@ -360,26 +365,43 @@ function printMemberListRows($request)
 				$curField = substr($key, 5);
 
 				// Does this member even have it filled out?
-				if (!isset($context['members'][$member]['options'][$curField]))
+				if (!isset($context['members'][$member]['options'][$curField]) && $context['custom_profile_fields']['columns'][$key]['default_value'] === '')
 				{
 					$context['members'][$member]['options'][$curField] = '';
 					continue;
 				}
+				// Otherwise use the default value
+				if (!isset($context['members'][$member]['options'][$curField]))
+				{
+					$context['members'][$member]['options'][$curField] = $context['custom_profile_fields']['columns'][$key]['default_value'];
+					$context['members'][$member]['options'][$curField . '_key'] = $curField . '_0';
+				}
 
 				// Should it be enclosed for display?
 				if (!empty($column['enclose']) && !empty($context['members'][$member]['options'][$curField]))
-					$context['members'][$member]['options'][$curField] = strtr($column['enclose'], array(
+				{
+					$replacements = array(
 						'{SCRIPTURL}' => $scripturl,
 						'{IMAGES_URL}' => $settings['images_url'],
 						'{DEFAULT_IMAGES_URL}' => $settings['default_images_url'],
 						'{INPUT}' => $context['members'][$member]['options'][$curField],
-					));
+					);
+					if (in_array($column['type'], array('radio', 'select')))
+					{
+						$replacements['{KEY}'] = $context['members'][$member]['options'][$curField . '_key'];
+					}
+					$context['members'][$member]['options'][$curField] = strtr($column['enclose'], $replacements);
+				}
 
 				// Anything else to make it look "nice"
 				if ($column['bbc'])
+				{
 					$context['members'][$member]['options'][$curField] = strip_tags($bbc_parser->parseCustomFields($context['members'][$member]['options'][$curField]));
+				}
 				elseif ($column['type'] === 'check')
+				{
 					$context['members'][$member]['options'][$curField] = $context['members'][$member]['options'][$curField] == 0 ? $txt['no'] : $txt['yes'];
+				}
 			}
 		}
 	}

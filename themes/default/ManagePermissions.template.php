@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -244,7 +243,7 @@ function template_by_board()
 			echo '
 			<div class="content">
 				<ul class="perm_boards flow_hidden">
-					<li class="flow_hidden">
+					<li class="flow_hidden basic_row" style="font-weight: 600;">
 						<span class="perm_name floatleft">', $txt['board_name'], '</span>
 						<span class="perm_profile floatleft">', $txt['permission_profile'], '</span>
 					</li>';

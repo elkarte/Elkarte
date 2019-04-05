@@ -3,13 +3,12 @@
 /**
  * This file contains a standard way of displaying side/drop down menus.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -65,7 +64,7 @@ function createMenu($menuData, $menuOptions = array())
 {
 	global $context, $settings, $options, $txt, $scripturl, $user_info;
 
-	$_req = HttpReq::instance();
+	$_req = \ElkArte\HttpReq::instance();
 
 	// Work out where we should get our images from.
 	$context['menu_image_path'] = file_exists($settings['theme_dir'] . '/images/admin/change_menu.png') ? $settings['images_url'] . '/admin' : $settings['default_images_url'] . '/admin';
@@ -375,9 +374,9 @@ function callMenu($selectedMenu)
 
 	if (!empty($selectedMenu['controller']))
 	{
-		// 'controller' => 'ManageAttachments_Controller'
+		// 'controller' => '\\ElkArte\\AdminController\\ManageAttachments'
 		// 'function' => 'action_avatars'
-		$controller = new $selectedMenu['controller'](new Event_Manager());
+		$controller = new $selectedMenu['controller'](new \ElkArte\EventManager());
 
 		// always set up the environment
 		$controller->pre_dispatch();

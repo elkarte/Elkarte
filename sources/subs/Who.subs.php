@@ -3,9 +3,9 @@
 /**
  * This file contains nosey functions so show where a user is active
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -129,7 +129,7 @@ function addonsCredits()
 
 	$db = database();
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 	$credits = array();
 	if (!$cache->getVar($credits, 'addons_credits', 86400))
 	{
@@ -150,12 +150,12 @@ function addonsCredits()
 		);
 		while ($row = $db->fetch_assoc($request))
 		{
-			$credit_info = Util::unserialize($row['credits']);
+			$credit_info = \ElkArte\Util::unserialize($row['credits']);
 
-			$copyright = empty($credit_info['copyright']) ? '' : $txt['credits_copyright'] . ' &copy; ' . Util::htmlspecialchars($credit_info['copyright']);
-			$license = empty($credit_info['license']) ? '' : $txt['credits_license'] . ': ' . Util::htmlspecialchars($credit_info['license']);
+			$copyright = empty($credit_info['copyright']) ? '' : $txt['credits_copyright'] . ' &copy; ' . \ElkArte\Util::htmlspecialchars($credit_info['copyright']);
+			$license = empty($credit_info['license']) ? '' : $txt['credits_license'] . ': ' . \ElkArte\Util::htmlspecialchars($credit_info['license']);
 			$version = $txt['credits_version'] . '' . $row['version'];
-			$title = (empty($credit_info['title']) ? $row['name'] : Util::htmlspecialchars($credit_info['title'])) . ': ' . $version;
+			$title = (empty($credit_info['title']) ? $row['name'] : \ElkArte\Util::htmlspecialchars($credit_info['title'])) . ': ' . $version;
 
 			// Build this one out and stash it away
 			$name = empty($credit_info['url']) ? $title : '<a href="' . $credit_info['url'] . '">' . $title . '</a>';
@@ -185,7 +185,7 @@ function addonsCredits()
  * @param mixed[]|string $urls a single url (string) or an array of arrays, each inner array being (serialized request data, id_member)
  * @param string|bool $preferred_prefix = false
  * @return mixed[]|string an array of descriptions if you passed an array, otherwise the string describing their current location.
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function determineActions($urls, $preferred_prefix = false)
 {
@@ -244,7 +244,7 @@ function determineActions($urls, $preferred_prefix = false)
 	foreach ($url_list as $k => $url)
 	{
 		// Get the request parameters..
-		$actions = Util::unserialize($url[0]);
+		$actions = \ElkArte\Util::unserialize($url[0]);
 		if ($actions === false)
 		{
 			continue;

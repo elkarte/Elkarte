@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -80,7 +79,7 @@ class UpgradeInstructions_upgrade_1_1
 							list ($count) = (int) $this->db->fetch_row($request);
 							if ($count == 0)
 							{
-								$this->table->db_drop_table('{db_prefix}admin_info_files');
+								$this->table->drop_table('{db_prefix}admin_info_files');
 							}
 						}
 					}
@@ -101,7 +100,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Adding new two factor columns to members table...',
 				'function' => function()
 				{
-					$this->table->db_add_column('{db_prefix}members',
+					$this->table->add_column('{db_prefix}members',
 						array(
 							'name' => 'otp_secret',
 							'type' => 'varchar',
@@ -111,7 +110,7 @@ class UpgradeInstructions_upgrade_1_1
 						array(),
 						'ignore'
 					);
-					$this->table->db_add_column('{db_prefix}members',
+					$this->table->add_column('{db_prefix}members',
 						array(
 							'name' => 'enable_otp',
 							'type' => 'tinyint',
@@ -121,7 +120,7 @@ class UpgradeInstructions_upgrade_1_1
 						array(),
 						'ignore'
 					);
-					$this->table->db_add_column('{db_prefix}members',
+					$this->table->add_column('{db_prefix}members',
 						array(
 							'name' => 'otp_used',
 							'type' => 'int',
@@ -148,7 +147,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Adding new tables for notifications...',
 				'function' => function()
 				{
-					$this->table->db_create_table('{db_prefix}pending_notifications',
+					$this->table->create_table('{db_prefix}pending_notifications',
 						array(
 							array('name' => 'notification_type', 'type' => 'varchar', 'size' => 10),
 							array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -163,7 +162,7 @@ class UpgradeInstructions_upgrade_1_1
 						'ignore'
 					);
 
-					$this->table->db_create_table('{db_prefix}notifications_pref',
+					$this->table->create_table('{db_prefix}notifications_pref',
 						array(
 							array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 							array('name' => 'notification_level', 'type' => 'tinyint', 'size' => 1, 'default' => 1),
@@ -196,16 +195,18 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Separate mentions visibility from accessibility...',
 				'function' => function()
 				{
-					$this->table->db_add_column('{db_prefix}log_mentions',
+					$this->table->add_column('{db_prefix}log_mentions',
 						array(
 							'name' => 'is_accessible',
 							'type' => 'tinyint',
 							'size' => 1,
 							'default' => 0
-						)
+						),
+						array(),
+						'ignore'
 					);
 
-					$this->table->db_change_column('{db_prefix}log_mentions',
+					$this->table->change_column('{db_prefix}log_mentions',
 						'mention_type',
 						array(
 							'type' => 'varchar',
@@ -300,7 +301,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Make mentions generic and not message-centric...',
 				'function' => function()
 				{
-					$this->table->db_change_column('{db_prefix}log_mentions', 'id_msg',
+					$this->table->change_column('{db_prefix}log_mentions', 'id_msg',
 						array(
 							'name' => 'id_target',
 						)
@@ -338,7 +339,7 @@ class UpgradeInstructions_upgrade_1_1
 					if (!empty($modSettings['drafts_enabled']))
 					{
 						enableModules('drafts', array('post', 'display', 'profile', 'personalmessage'));
-						Hooks::instance()->enableIntegration('Drafts_Integrate');
+						\ElkArte\Hooks::instance()->enableIntegration('\\ElkArte\\DraftsIntegrate');
 					}
 
 					if (!empty($modSettings['enabled_mentions']))
@@ -349,8 +350,8 @@ class UpgradeInstructions_upgrade_1_1
 					enableModules('poll', array('display', 'post'));
 					enableModules('verification', array('post', 'personalmessage', 'register'));
 					enableModules('random', array('post', 'display'));
-					Hooks::instance()->enableIntegration('User_Notification_Integrate');
-					Hooks::instance()->enableIntegration('Ila_Integrate');
+					\ElkArte\Hooks::instance()->enableIntegration('\\ElkArte\\UserNotificationIntegrate');
+					\ElkArte\Hooks::instance()->enableIntegration('\\ElkArte\\IlaIntegrate');
 					updateSettings(array(
 						'usernotif_favicon_bgColor' => '#ff0000',
 						'usernotif_favicon_position' => 'up',
@@ -377,7 +378,7 @@ class UpgradeInstructions_upgrade_1_1
 					if ($this->table->column_exists('{db_prefix}postby_emails', 'message_key') === false)
 					{
 						// Add the new columns
-						$this->table->db_add_column('{db_prefix}postby_emails',
+						$this->table->add_column('{db_prefix}postby_emails',
 							array(
 								'name' => 'message_key',
 								'type' => 'varchar',
@@ -387,7 +388,7 @@ class UpgradeInstructions_upgrade_1_1
 							array(),
 							'ignore'
 						);
-						$this->table->db_add_column('{db_prefix}postby_emails',
+						$this->table->add_column('{db_prefix}postby_emails',
 							array(
 								'name' => 'message_type',
 								'type' => 'varchar',
@@ -397,7 +398,7 @@ class UpgradeInstructions_upgrade_1_1
 							array(),
 							'ignore'
 						);
-						$this->table->db_add_column('{db_prefix}postby_emails',
+						$this->table->add_column('{db_prefix}postby_emails',
 							array(
 								'name' => 'message_id',
 								'type' => 'mediumint',
@@ -418,9 +419,9 @@ class UpgradeInstructions_upgrade_1_1
 						);
 
 						// Do the cleanup
-						$this->table->db_remove_column('{db_prefix}postby_emails', 'id_email');
-						$this->table->db_remove_index('{db_prefix}postby_emails', 'id_email');
-						$this->table->db_add_index('{db_prefix}postby_emails', array('name' => 'id_email', 'columns' => array('message_key', 'message_type', 'message_id'), 'type' => 'primary'));
+						$this->table->remove_column('{db_prefix}postby_emails', 'id_email');
+						$this->table->remove_index('{db_prefix}postby_emails', 'id_email');
+						$this->table->add_index('{db_prefix}postby_emails', array('name' => 'id_email', 'columns' => array('message_key', 'message_type', 'message_id'), 'type' => 'primary'));
 					}
 				}
 			),
@@ -431,13 +432,13 @@ class UpgradeInstructions_upgrade_1_1
 					if ($this->table->column_exists('{db_prefix}postby_emails_error', 'data_id') === true)
 					{
 						// Rename some columns
-						$this->table->db_change_column('{db_prefix}postby_emails_error',
+						$this->table->change_column('{db_prefix}postby_emails_error',
 							'data_id',
 							array(
 								'name' => 'message_key',
 							)
 						);
-						$this->table->db_change_column('{db_prefix}postby_emails_error',
+						$this->table->change_column('{db_prefix}postby_emails_error',
 							'id_message',
 							array(
 								'name' => 'message_id',
@@ -451,7 +452,7 @@ class UpgradeInstructions_upgrade_1_1
 				'function' => function()
 				{
 					// Filter type was 5 now needs to be 6
-					$this->table->db_change_column('{db_prefix}postby_emails_filters',
+					$this->table->change_column('{db_prefix}postby_emails_filters',
 						'filter_style',
 						array(
 							'type' => 'char',
@@ -497,7 +498,7 @@ class UpgradeInstructions_upgrade_1_1
 				{
 					if ($this->table->column_exists('{db_prefix}log_reported', 'type') === false)
 					{
-						$this->table->db_add_column('{db_prefix}log_reported',
+						$this->table->add_column('{db_prefix}log_reported',
 							array(
 								'name' => 'type',
 								'type' => 'varchar',
@@ -507,7 +508,7 @@ class UpgradeInstructions_upgrade_1_1
 							array(),
 							'ignore'
 						);
-						$this->table->db_add_column('{db_prefix}log_reported',
+						$this->table->add_column('{db_prefix}log_reported',
 							array(
 								'name' => 'time_message',
 								'type' => 'int',
@@ -517,8 +518,8 @@ class UpgradeInstructions_upgrade_1_1
 							array(),
 							'ignore'
 						);
-						$this->table->db_remove_index('{db_prefix}log_reported', 'id_msg');
-						$this->table->db_add_index('{db_prefix}log_reported', array('name' => 'msg_type', 'columns' => array('type', 'id_msg'), 'type' => 'key'));
+						$this->table->remove_index('{db_prefix}log_reported', 'id_msg');
+						$this->table->add_index('{db_prefix}log_reported', array('name' => 'msg_type', 'columns' => array('type', 'id_msg'), 'type' => 'key'));
 					}
 				}
 			)
@@ -537,7 +538,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Converting IP columns to varchar instead of int...',
 				'function' => function()
 				{
-					$columns = $this->table->db_list_columns('{db_prefix}log_online', true);
+					$columns = $this->table->list_columns('{db_prefix}log_online', true);
 
 					$column_name = 'ip';
 
@@ -552,7 +553,7 @@ class UpgradeInstructions_upgrade_1_1
 					$this->db->query('', '
 						TRUNCATE TABLE {db_prefix}log_online');
 
-					$this->table->db_change_column('{db_prefix}log_online',
+					$this->table->change_column('{db_prefix}log_online',
 						$column_name,
 						array(
 							'type' => 'varchar',
@@ -577,7 +578,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Changing the pm count column to mediumint.',
 				'function' => function()
 				{
-					$this->table->db_change_column('{db_prefix}members',
+					$this->table->change_column('{db_prefix}members',
 						'personal_messages',
 						array(
 							'type' => 'mediumint',
@@ -602,21 +603,25 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Adding new custom field columns',
 				'function' => function()
 				{
-					$this->table->db_add_column('{db_prefix}custom_fields',
+					$this->table->add_column('{db_prefix}custom_fields',
 						array(
 							'name' => 'rows',
 							'type' => 'smallint',
 							'size' => 5,
 							'default' => 4
-						)
+						),
+						array(),
+						'ignore'
 					);
-					$this->table->db_add_column('{db_prefix}custom_fields',
+					$this->table->add_column('{db_prefix}custom_fields',
 						array(
 							'name' => 'cols',
 							'type' => 'smallint',
 							'size' => 5,
 							'default' => 30
-						)
+						),
+						array(),
+						'ignore'
 					);
 				}
 			),
@@ -654,7 +659,7 @@ class UpgradeInstructions_upgrade_1_1
 						'{db_prefix}custom_fields',
 						array('col_name' => 'string', 'field_name' => 'string', 'field_desc' => 'string', 'field_type' => 'string', 'field_length' => 'int', 'field_options' => 'string', 'mask' => 'string', 'show_reg' => 'int', 'show_display' => 'int', 'show_profile' => 'string', 'private' => 'int', 'active' => 'int', 'bbc' => 'int', 'can_search' => 'int', 'default_value' => 'string', 'enclose' => 'string', 'placement' => 'int', 'rows' => 'int', 'cols' => 'int'),
 						array(
-							array('cust_gender', 'Gender', 'Your gender', 'radio', 15, 'undisclosed,male,female,genderless,nonbinary,transgendered', '', 0, 1, 'forumprofile', 0, 1, 0, 0, 'undisclosed', '<i class="icon i-{INPUT}" title="{INPUT}"><s>{INPUT}</s></i>', 0, 0, 0),
+							array('cust_gender', 'Gender', 'Your gender', 'radio', 15, 'undisclosed,male,female,genderless,nonbinary,transgendered', '', 0, 1, 'forumprofile', 0, 1, 0, 0, 'undisclosed', '<i class="icon i-{KEY}" title="{INPUT}"><s>{INPUT}</s></i>', 0, 0, 0),
 							array('cust_blurb', 'Personal Text', 'A custom bit of text for your postbit.', 'text', 120, '', '', 0, 0, 'forumprofile', 0, 1, 0, 0, 'Default Personal Text', '', 3, 0, 0),
 							array('cust_locate', 'Location', 'Where you are', 'text', 32, '', '', 0, 0, 'forumprofile', 0, 1, 0, 0, '', '', 0, 0, 0),
 						),
@@ -797,7 +802,7 @@ class UpgradeInstructions_upgrade_1_1
 				{
 					if ($this->table->column_exists('{db_prefix}user_drafts', 'is_usersaved') === false)
 					{
-						$this->table->db_add_column('{db_prefix}user_drafts',
+						$this->table->add_column('{db_prefix}user_drafts',
 							array(
 								'name' => 'is_usersaved',
 								'type' => 'tinyint',
@@ -825,7 +830,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Altering column to varchar(255)...',
 				'function' => function()
 				{
-					$this->table->db_change_column('{db_prefix}attachments',
+					$this->table->change_column('{db_prefix}attachments',
 						'mime_type',
 						array(
 							'type' => 'varchar',
@@ -855,6 +860,65 @@ class UpgradeInstructions_upgrade_1_1
 						'cal_limityear' => '10',
 						'avatar_max_height' => '65',
 					));
+				}
+			)
+		);
+	}
+
+	public function agreement_logging_title()
+	{
+		return 'Introducing the logging of accepted agreement and privacy policy...';
+	}
+
+	public function agreement_logging()
+	{
+		return array(
+			array(
+				'debug_title' => 'Creating the tables...',
+				'function' => function()
+				{
+					$this->table->create_table('{db_prefix}log_agreement_accept',
+						array(
+							array('name' => 'version',       'type' => 'varchar', 'size' => 20, 'default' => ''),
+							array('name' => 'id_member',     'type' => 'mediumint', 'size' => 10, 'unsigned' => true, 'default' => 0),
+							array('name' => 'accepted_date', 'type' => 'date', 'default' => '0001-01-01'),
+							array('name' => 'accepted_ip',   'type' => 'varchar', 'size' => 255, 'default' => ''),
+						),
+						array(
+							array('name' => 'version', 'columns' => array('version', 'id_member'), 'type' => 'primary'),
+						),
+						array(),
+						'ignore'
+					);
+					$this->table->create_table('{db_prefix}log_privacy_policy_accept',
+						array(
+							array('name' => 'version',       'type' => 'varchar', 'size' => 20, 'default' => ''),
+							array('name' => 'id_member',     'type' => 'mediumint', 'size' => 10, 'unsigned' => true, 'default' => 0),
+							array('name' => 'accepted_date', 'type' => 'date', 'default' => '0001-01-01'),
+							array('name' => 'accepted_ip',   'type' => 'varchar', 'size' => 255, 'default' => ''),
+						),
+						array(
+							array('name' => 'version', 'columns' => array('version', 'id_member'), 'type' => 'primary'),
+						),
+						array(),
+						'ignore'
+					);
+				}
+			),
+			array(
+				'debug_title' => 'Preparing first status...',
+				'function' => function()
+				{
+					$agreement = new \ElkArte\Agreement('english');
+					$success = $agreement->storeBackup();
+					updateSettings(array('agreementRevision' => $success));
+
+					if (file_exists(BOARDDIR . '/privacypolicy.txt'))
+					{
+						$privacypol = new \ElkArte\PrivacyPolicy('english');
+						$success = $privacypol->storeBackup();
+						updateSettings(array('privacypolicyRevision' => $success));
+					}
 				}
 			)
 		);

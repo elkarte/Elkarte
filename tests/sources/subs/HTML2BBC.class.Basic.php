@@ -9,8 +9,6 @@ class TestHTML2BBC extends \PHPUnit\Framework\TestCase
 	 */
 	public function setUp()
 	{
-		require_once(SUBSDIR . '/Html2BBC.class.php');
-
 		$this->bbcTestCases = array(
 			array(
 				'Test bold',
@@ -51,7 +49,7 @@ class TestHTML2BBC extends \PHPUnit\Framework\TestCase
 			$test = $testcase[1];
 			$expected = $testcase[2];
 
-			$parser = new Html_2_BBC($test);
+			$parser = new \ElkArte\Html2BBC($test);
 
 			// Convert the html to bbc
 			$result = $parser->get_bbc();

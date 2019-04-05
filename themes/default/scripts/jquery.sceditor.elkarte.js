@@ -1,11 +1,10 @@
 /*!
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  */
@@ -561,7 +560,7 @@ $.sceditor.plugins.bbcode.bbcode
 			else
 				sAuthor += sDate !== '' ? ' ' + bbc_search_on : '';
 
-			content = '<blockquote author="' + attr_author + '" link="' + attr_link + '" date="' + attr_date + '"><cite>' + sAuthor + ' ' + sDate + '</cite>' + content + '</blockquote>';
+			content = '<blockquote author="' + attr_author + '" link="' + attr_link + '" date="' + attr_date + '"><cite>' + sAuthor + ' ' + sDate + '</cite>' + content + '</blockquote>&nbsp;';
 
 			return content;
 		}

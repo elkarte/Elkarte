@@ -6,13 +6,12 @@
  * Note to enhance documentation later:
  * attachment_type = 3 is a thumbnail, etc.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -61,7 +60,7 @@ function automanage_attachments_check_directory()
 	if (!empty($modSettings['attachment_basedirectories']) && !empty($modSettings['use_subdirectories_for_attachments']))
 	{
 		if (!is_array($modSettings['attachment_basedirectories']))
-			$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
+			$modSettings['attachment_basedirectories'] = \ElkArte\Util::unserialize($modSettings['attachment_basedirectories']);
 
 		$base_dir = array_search($modSettings['basedirectory_for_attachments'], $modSettings['attachment_basedirectories']);
 	}
@@ -73,7 +72,7 @@ function automanage_attachments_check_directory()
 		if (!isset($modSettings['last_attachments_directory']))
 			$modSettings['last_attachments_directory'] = array();
 		if (!is_array($modSettings['last_attachments_directory']))
-			$modSettings['last_attachments_directory'] = Util::unserialize($modSettings['last_attachments_directory']);
+			$modSettings['last_attachments_directory'] = \ElkArte\Util::unserialize($modSettings['last_attachments_directory']);
 		if (!isset($modSettings['last_attachments_directory'][$base_dir]))
 			$modSettings['last_attachments_directory'][$base_dir] = 0;
 	}
@@ -106,12 +105,14 @@ function automanage_attachments_check_directory()
 	}
 
 	if (!is_array($modSettings['attachmentUploadDir']))
-		$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
+		$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 
 	if (!in_array($updir, $modSettings['attachmentUploadDir']) && !empty($updir))
 		$outputCreation = automanage_attachments_create_directory($updir);
 	elseif (in_array($updir, $modSettings['attachmentUploadDir']))
 		$outputCreation = true;
+	else
+		$outputCreation = false;
 
 	if ($outputCreation)
 	{
@@ -212,7 +213,7 @@ function automanage_attachments_create_directory($updir)
 			'attachmentUploadDir' => serialize($modSettings['attachmentUploadDir']),
 			'currentAttachmentUploadDir' => $modSettings['currentAttachmentUploadDir'],
 		), true);
-		$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
+		$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 	}
 
 	$context['attach_dir'] = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
@@ -268,7 +269,7 @@ function automanage_attachments_by_space()
 			'last_attachments_directory' => serialize($modSettings['last_attachments_directory']),
 			'currentAttachmentUploadDir' => $modSettings['currentAttachmentUploadDir'],
 		));
-		$modSettings['last_attachments_directory'] = Util::unserialize($modSettings['last_attachments_directory']);
+		$modSettings['last_attachments_directory'] = \ElkArte\Util::unserialize($modSettings['last_attachments_directory']);
 
 		return true;
 	}
@@ -351,14 +352,14 @@ function attachments_init_dir(&$tree, &$count)
  * @package Attachments
  * @param int|null $id_msg = null or id of the message with attachments, if any.
  *                  If null, this is an upload in progress for a new post.
- * @throws Elk_Exception
+ * @return bool
+ * @throws \ElkArte\Exceptions\Exception
  */
 function processAttachments($id_msg = null)
 {
-	global $context, $modSettings, $txt, $user_info, $ignore_temp, $topic, $board;
+	global $context, $modSettings, $txt, $user_info, $topic, $board;
 
-	$attach_errors = ElkArte\Errors\AttachmentErrorContext::context();
-	$added_initial_error = false;
+	$attach_errors = \ElkArte\Errors\AttachmentErrorContext::context();
 
 	// Make sure we're uploading to the right place.
 	if (!empty($modSettings['automanage_attachments']))
@@ -366,7 +367,7 @@ function processAttachments($id_msg = null)
 
 	if (!is_array($modSettings['attachmentUploadDir']))
 	{
-		$attachmentUploadDir = Util::unserialize($modSettings['attachmentUploadDir']);
+		$attachmentUploadDir = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 		if (!empty($attachmentUploadDir))
 		{
 			$modSettings['attachmentUploadDir'] = $attachmentUploadDir;
@@ -381,7 +382,7 @@ function processAttachments($id_msg = null)
 	elseif (!is_dir($context['attach_dir']))
 	{
 		$initial_error = 'attach_folder_warning';
-		Errors::instance()->log_error(sprintf($txt['attach_folder_admin_warning'], $context['attach_dir']), 'critical');
+		\ElkArte\Errors\Errors::instance()->log_error(sprintf($txt['attach_folder_admin_warning'], $context['attach_dir']), 'critical');
 	}
 
 	if (!isset($initial_error) && !isset($context['attachments']['quantity']))
@@ -442,36 +443,30 @@ function processAttachments($id_msg = null)
 			'board' => !empty($board) ? $board : 0,
 		);
 
+	// If we have an initial error, lets just display it.
+	if (!empty($initial_error))
+	{
+		$_SESSION['temp_attachments']['initial_error'] = $initial_error;
+
+		// This is a generic error
+		$attach_errors->activate();
+		$attach_errors->addError('attach_no_upload');
+
+		// And delete the files 'cos they ain't going nowhere.
+		foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
+		{
+			if (file_exists($_FILES['attachment']['tmp_name'][$n]))
+				unlink($_FILES['attachment']['tmp_name'][$n]);
+		}
+
+		$_FILES['attachment']['tmp_name'] = array();
+	}
+
 	// Loop through $_FILES['attachment'] array and move each file to the current attachments folder.
 	foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
 	{
 		if ($_FILES['attachment']['name'][$n] == '')
 			continue;
-
-		// If we have an initial error, lets just display it.
-		if (!empty($initial_error) && $added_initial_error === false)
-		{
-			$added_initial_error = true;
-			$_SESSION['temp_attachments']['initial_error'] = $initial_error;
-
-			// This is a generic error
-			$attach_errors->activate();
-			$attach_errors->addError('attach_no_upload');
-			// @todo This is likely the result of some refactoring, verify when $attachment is not set and why
-			if (isset($attachment))
-			{
-				$attach_errors->addError(is_array($attachment) ? array($attachment[0], $attachment[1]) : $attachment);
-			}
-
-			// And delete the files 'cos they ain't going nowhere.
-			foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
-			{
-				if (file_exists($_FILES['attachment']['tmp_name'][$n]))
-					unlink($_FILES['attachment']['tmp_name'][$n]);
-			}
-
-			$_FILES['attachment']['tmp_name'] = array();
-		}
 
 		// First, let's first check for PHP upload errors.
 		$errors = attachmentUploadChecks($n);
@@ -524,7 +519,12 @@ function processAttachments($id_msg = null)
 		// Want to correct for phonetographer photos?
 		if (!empty($modSettings['attachment_autorotate']) && empty($_SESSION['temp_attachments'][$attachID]['errors']) && substr($_SESSION['temp_attachments'][$attachID]['type'], 0, 5) === 'image')
 		{
-			autoRotateImage($_SESSION['temp_attachments'][$attachID]['tmp_name']);
+			$image = new \ElkArte\Graphics\Image($_SESSION['temp_attachments'][$attachID]['tmp_name']);
+			if ($image->autoRotateImage())
+			{
+				$image->saveImage($_SESSION['temp_attachments'][$attachID]['tmp_name'], IMAGETYPE_JPEG, 95);
+				$_SESSION['temp_attachments'][$attachID]['size'] = filesize($_SESSION['temp_attachments'][$attachID]['tmp_name']);
+			}
 		}
 
 		// Sort out the errors for display and delete any associated files.
@@ -540,7 +540,7 @@ function processAttachments($id_msg = null)
 					$attach_errors->addError($error);
 					if (in_array($error, $log_these))
 					{
-						Errors::instance()->log_error($_SESSION['temp_attachments'][$attachID]['name'] . ': ' . $txt[$error], 'critical');
+						\ElkArte\Errors\Errors::instance()->log_error($_SESSION['temp_attachments'][$attachID]['name'] . ': ' . $txt[$error], 'critical');
 
 						// For critical errors, we don't want the file or session data to persist
 						if (file_exists($_SESSION['temp_attachments'][$attachID]['tmp_name']))
@@ -567,6 +567,8 @@ function processAttachments($id_msg = null)
 	//   errors => An array of errors (use the index of the $txt variable for that error).
 	// Template changes can be done using "integrate_upload_template".
 	call_integration_hook('integrate_attachment_upload');
+
+	return $ignore_temp;
 }
 
 /**
@@ -701,10 +703,10 @@ function attachmentUploadChecks($attachID)
 			$errors[] = array('file_too_big', array($modSettings['attachmentSizeLimit']));
 		// Missing or a full a temp directory on the server
 		elseif ($_FILES['attachment']['error'][$attachID] == 6)
-			Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_6'], 'critical');
+			\ElkArte\Errors\Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_6'], 'critical');
 		// One of many errors such as (3)partially uploaded, (4)empty file,
 		else
-			Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$attachID]]);
+			\ElkArte\Errors\Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$attachID]]);
 
 		// If we did not set an user error (3,4,6,7,8) to show then give them a generic one as there is
 		// no need to provide back specifics of a server error, those are logged
@@ -727,11 +729,11 @@ function attachmentUploadChecks($attachID)
  * @param int $attachID id of the attachment to check
  *
  * @return bool
- * @throws Elk_Exception attach_check_nag
+ * @throws \ElkArte\Exceptions\Exception attach_check_nag
  */
 function attachmentChecks($attachID)
 {
-	global $modSettings, $context, $attachmentOptions;
+	global $modSettings, $context;
 
 	$db = database();
 
@@ -747,7 +749,7 @@ function attachmentChecks($attachID)
 
 	// Let's get their attention.
 	if (!empty($error))
-		throw new Elk_Exception('attach_check_nag', 'debug', array($error));
+		throw new \ElkArte\Exceptions\Exception('attach_check_nag', 'debug', array($error));
 
 	// Just in case this slipped by the first checks, we stop it here and now
 	if ($_SESSION['temp_attachments'][$attachID]['size'] == 0)
@@ -757,34 +759,24 @@ function attachmentChecks($attachID)
 	}
 
 	// First, the dreaded security check. Sorry folks, but this should't be avoided
-	$size = elk_getimagesize($_SESSION['temp_attachments'][$attachID]['tmp_name']);
+	$image = new \ElkArte\Graphics\Image($_SESSION['temp_attachments'][$attachID]['tmp_name']);
+	$size = $image->getSize($_SESSION['temp_attachments'][$attachID]['tmp_name']);
 	$valid_mime = getValidMimeImageType($size[2]);
 
 	if ($valid_mime !== '')
 	{
-		require_once(SUBSDIR . '/Graphics.subs.php');
-		if (!checkImageContents($_SESSION['temp_attachments'][$attachID]['tmp_name'], !empty($modSettings['attachment_image_paranoid'])))
+		if ($image->checkImageContents($_SESSION['temp_attachments'][$attachID]['tmp_name']) === false)
 		{
 			// It's bad. Last chance, maybe we can re-encode it?
-			if (empty($modSettings['attachment_image_reencode']) || (!reencodeImage($_SESSION['temp_attachments'][$attachID]['tmp_name'], $size[2])))
+			if (empty($modSettings['attachment_image_reencode']) || (!$image->reencodeImage($_SESSION['temp_attachments'][$attachID]['tmp_name'])))
 			{
 				// Nothing to do: not allowed or not successful re-encoding it.
 				$_SESSION['temp_attachments'][$attachID]['errors'][] = 'bad_attachment';
 				return false;
 			}
-
-			// Success! However, successes usually come for a price:
-			// we might get a new format for our image...
-			$old_format = $size[2];
-			$size = elk_getimagesize($attachmentOptions['tmp_name']);
-
-			if (!(empty($size)) && ($size[2] !== $old_format))
+			else
 			{
-				$valid_mime = getValidMimeImageType($size[2]);
-				if ($valid_mime !== '')
-				{
-					$_SESSION['temp_attachments'][$attachID]['type'] = $valid_mime;
-				}
+				$_SESSION['temp_attachments'][$attachID]['size'] = $image->getFilesize();
 			}
 		}
 	}
@@ -921,33 +913,17 @@ function createAttachment(&$attachmentOptions)
 
 	$db = database();
 
-	require_once(SUBSDIR . '/Graphics.subs.php');
+	$image = new \ElkArte\Graphics\Image();
 
 	// If this is an image we need to set a few additional parameters.
-	$size = elk_getimagesize($attachmentOptions['tmp_name']);
+	$is_image = $image->isImage($attachmentOptions['tmp_name']);
+	$size = $is_image ? $image->getSize($attachmentOptions['tmp_name']) : array(0, 0, 0);
 	list ($attachmentOptions['width'], $attachmentOptions['height']) = $size;
 
 	// If it's an image get the mime type right.
-	if (empty($attachmentOptions['mime_type']) && $attachmentOptions['width'])
+	if ($is_image)
 	{
-		// Got a proper mime type?
-		if (!empty($size['mime']))
-		{
-			$attachmentOptions['mime_type'] = $size['mime'];
-		}
-		// Otherwise a valid one?
-		else
-		{
-			$attachmentOptions['mime_type'] = getValidMimeImageType($size[2]);
-		}
-	}
-
-	// It is possible we might have a MIME type that isn't actually an image but still have a size.
-	// For example, Shockwave files will be able to return size but be 'application/shockwave' or similar.
-	if (!empty($attachmentOptions['mime_type']) && strpos($attachmentOptions['mime_type'], 'image/') !== 0)
-	{
-		$attachmentOptions['width'] = 0;
-		$attachmentOptions['height'] = 0;
+		$attachmentOptions['mime_type'] = getValidMimeImageType($size[2]);
 	}
 
 	// Get the hash if no hash has been given yet.
@@ -999,29 +975,21 @@ function createAttachment(&$attachmentOptions)
 			array()
 		);
 
-	if (empty($modSettings['attachmentThumbnails']) || (empty($attachmentOptions['width']) && empty($attachmentOptions['height'])))
+	if (empty($modSettings['attachmentThumbnails']) || !$is_image || (empty($attachmentOptions['width']) && empty($attachmentOptions['height'])))
 		return true;
 
 	// Like thumbnails, do we?
 	if (!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight']) && ($attachmentOptions['width'] > $modSettings['attachmentThumbWidth'] || $attachmentOptions['height'] > $modSettings['attachmentThumbHeight']))
 	{
-		if (createThumbnail($attachmentOptions['destination'], $modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']))
+		if ($image->createThumbnail($attachmentOptions['destination'], $modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']))
 		{
 			// Figure out how big we actually made it.
-			$size = elk_getimagesize($attachmentOptions['destination'] . '_thumb');
+			$size = $image->getSize($attachmentOptions['destination'] . '_thumb');
 			list ($thumb_width, $thumb_height) = $size;
 
-			if (!empty($size['mime']))
-			{
-				$thumb_mime = $size['mime'];
-			}
-			else
-			{
-				$thumb_mime = getValidMimeImageType($size[2]);
-			}
-
+			$thumb_mime = getValidMimeImageType($size[2]);
 			$thumb_filename = $attachmentOptions['name'] . '_thumb';
-			$thumb_size = filesize($attachmentOptions['destination'] . '_thumb');
+			$thumb_size = $image->getfilesize();
 			$thumb_file_hash = getAttachmentFilename($thumb_filename, 0, null, true);
 			$thumb_path = $attachmentOptions['destination'] . '_thumb';
 
@@ -1107,7 +1075,7 @@ function getAvatar($id_attach)
 
 	// Use our cache when possible
 	$cache = array();
-	if (Cache::instance()->getVar($cache, 'getAvatar_id-' . $id_attach))
+	if (\ElkArte\Cache\Cache::instance()->getVar($cache, 'getAvatar_id-' . $id_attach))
 		$avatarData = $cache;
 	else
 	{
@@ -1127,7 +1095,7 @@ function getAvatar($id_attach)
 			$avatarData = $db->fetch_row($request);
 		$db->free_result($request);
 
-		Cache::instance()->put('getAvatar_id-' . $id_attach, $avatarData, 900);
+		\ElkArte\Cache\Cache::instance()->put('getAvatar_id-' . $id_attach, $avatarData, 900);
 	}
 
 	return $avatarData;
@@ -1342,14 +1310,13 @@ function increaseDownloadCounter($id_attach)
  * - updates the database info for the member's avatar.
  * - returns whether the download and resize was successful.
  *
- * @uses subs/Graphics.subs.php
  * @package Attachments
  * @param string $temporary_path the full path to the temporary file
  * @param int $memID member ID
  * @param int $max_width
  * @param int $max_height
  * @return boolean whether the download and resize was successful.
- *
+ * @throws \ElkArte\Exceptions\Exception
  */
 function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 {
@@ -1383,54 +1350,42 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	);
 	$attachID = $db->insert_id('{db_prefix}attachments', 'id_attach');
 
-	// First, the temporary file will have the .tmp extension.
-	$tempName = getAvatarPath() . '/' . $destName . '.tmp';
-
 	// The destination filename will depend on whether custom dir for avatars has been set
 	$destName = getAvatarPath() . '/' . $destName;
 	$path = getAttachmentPath();
 	$destName = empty($avatar_hash) ? $destName : $path . '/' . $attachID . '_' . $avatar_hash . '.elk';
+	$format = !empty($modSettings['avatar_download_png']) ? IMAGETYPE_PNG : IMAGETYPE_JPEG;
 
 	// Resize it.
-	require_once(SUBSDIR . '/Graphics.subs.php');
-	if (!empty($modSettings['avatar_download_png']))
-		$success = resizeImageFile($temporary_path, $tempName, $max_width, $max_height, 3);
-	else
-		$success = resizeImageFile($temporary_path, $tempName, $max_width, $max_height);
-
-	if ($success)
+	$image = new \ElkArte\Graphics\Image();
+	if ($image->createThumbnail($temporary_path, $max_width, $max_height, $destName, $format))
 	{
-		// Remove the .tmp extension from the attachment.
-		if (rename($tempName, $destName))
-		{
-			list ($width, $height) = elk_getimagesize($destName);
-			$mime_type = getValidMimeImageType($ext);
+		list ($width, $height) = $image->getSize($destName);
+		$mime_type = getValidMimeImageType($ext);
 
-			// Write filesize in the database.
-			$db->query('', '
-				UPDATE {db_prefix}attachments
-				SET size = {int:filesize}, width = {int:width}, height = {int:height},
-					mime_type = {string:mime_type}
-				WHERE id_attach = {int:current_attachment}',
-				array(
-					'filesize' => filesize($destName),
-					'width' => (int) $width,
-					'height' => (int) $height,
-					'current_attachment' => $attachID,
-					'mime_type' => $mime_type,
-				)
-			);
+		// Write filesize in the database.
+		$db->query('', '
+			UPDATE {db_prefix}attachments
+			SET size = {int:filesize}, width = {int:width}, height = {int:height},
+				mime_type = {string:mime_type}
+			WHERE id_attach = {int:current_attachment}',
+			array(
+				'filesize' => $image->getFilesize(),
+				'width' => (int) $width,
+				'height' => (int) $height,
+				'current_attachment' => $attachID,
+				'mime_type' => $mime_type,
+			)
+		);
 
-			// Retain this globally in case the script wants it.
-			$modSettings['new_avatar_data'] = array(
-				'id' => $attachID,
-				'filename' => $destName,
-				'type' => empty($modSettings['custom_avatar_enabled']) ? 0 : 1,
-			);
-			return true;
-		}
-		else
-			return false;
+		// Retain this globally in case the script wants it.
+		$modSettings['new_avatar_data'] = array(
+			'id' => $attachID,
+			'filename' => $destName,
+			'type' => empty($modSettings['custom_avatar_enabled']) ? 0 : 1,
+		);
+
+		return true;
 	}
 	else
 	{
@@ -1442,7 +1397,6 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 			)
 		);
 
-		@unlink($tempName);
 		return false;
 	}
 }
@@ -1455,79 +1409,69 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
  * - Uses getimagesize() to determine the size of a file.
  * - Attempts to connect to the server first so it won't time out.
  *
- * @todo see if it's better in subs/Graphics.subs.php, but one step at the time.
- *
  * @package Attachments
  * @param string $url
- * @return array or false, the image size as array(width, height), or false on failure
+ * @return mixed[]|bool the image size as array(width, height), or false on failure
  */
 function url_image_size($url)
 {
-	// Make sure it is a proper URL.
-	$url = str_replace(' ', '%20', $url);
-
 	// Can we pull this from the cache... please please?
 	$temp = array();
-	if (Cache::instance()->getVar($temp, 'url_image_size-' . md5($url), 240))
-		return $temp;
-
-	$t = microtime(true);
-
-	// Get the host to pester...
-	preg_match('~^\w+://(.+?)/(.*)$~', $url, $match);
-
-	// Can't figure it out, just try the image size.
-	if ($url == '' || $url == 'http://' || $url == 'https://')
-		return false;
-	elseif (!isset($match[1]))
-		$size = elk_getimagesize($url, false);
-	else
+	if (\ElkArte\Cache\Cache::instance()->getVar($temp, 'url_image_size-' . md5($url), 240))
 	{
-		// Try to connect to the server... give it half a second.
-		$temp = 0;
-		$fp = @fsockopen($match[1], 80, $temp, $temp, 0.5);
-
-		// Successful?  Continue...
-		if ($fp !== false)
-		{
-			// Send the HEAD request (since we don't have to worry about chunked, HTTP/1.1 is fine here.)
-			fwrite($fp, 'HEAD /' . $match[2] . ' HTTP/1.1' . "\r\n" . 'Host: ' . $match[1] . "\r\n" . 'User-Agent: PHP/ELK' . "\r\n" . 'Connection: close' . "\r\n\r\n");
-
-			// Read in the HTTP/1.1 or whatever.
-			$test = substr(fgets($fp, 11), -1);
-			fclose($fp);
-
-			// See if it returned a 404/403 or something.
-			if ($test < 4)
-			{
-				$size = elk_getimagesize($url, false);
-
-				// This probably means allow_url_fopen is off, let's try GD.
-				if ($size === false && function_exists('imagecreatefromstring'))
-				{
-					include_once(SUBSDIR . '/Package.subs.php');
-
-					// It's going to hate us for doing this, but another request...
-					$image = @imagecreatefromstring(fetch_web_data($url));
-					if ($image !== false)
-					{
-						$size = array(imagesx($image), imagesy($image));
-						imagedestroy($image);
-					}
-				}
-			}
-		}
+		return $temp;
 	}
 
-	// If we didn't get it, we failed.
-	if (!isset($size))
-		$size = false;
+	$url_path = parse_url($url, PHP_URL_PATH);
+	$extension = pathinfo($url_path, PATHINFO_EXTENSION);
 
-	// If this took a long time, we may never have to do it again, but then again we might...
-	if (microtime(true) - $t > 0.8)
-		Cache::instance()->put('url_image_size-' . md5($url), $size, 240);
+	switch ($extension)
+	{
+		case 'jpg':
+		case 'jpeg':
+			// Size location block is variable, so we fetch a meaningful chunk
+			$range = 32768;
+			break;
+		case 'png':
+			// Size will be in the first 24 bytes
+			$range = 1024;
+			break;
+		case 'gif':
+			// Size will be in the first 10 bytes
+			$range = 1024;
+			break;
+		case 'bmp':
+			// Size will be in the first 32 bytes
+			$range = 1024;
+			break;
+		default:
+			$range = 16384;
+	}
 
-	// Didn't work.
+	$image = new \ElkArte\Http\FsockFetchWebdata(array('max_length' => $range));
+	$image->get_url_data($url);
+
+	// The server may not understand Range: so lets try to fetch the entire thing
+	// assuming we were not simply turned away
+	if ($image->result('code') != 200 && $image->result('code') != 403)
+	{
+		$image = new \ElkArte\Http\FsockFetchWebdata(array());
+		$image->get_url_data($url);
+	}
+
+	// Here is the data, getimagesizefromstring does not care if its a complete image, it only
+	// searches for size headers in a given data set.
+	$data = $image->result('body');
+	$size = getimagesizefromstring($data);
+
+	// Well, ok, umm, fail!
+	if ($data === false || $size === false)
+	{
+		return array(-1, -1, -1);
+	}
+
+	\ElkArte\Cache\Cache::instance()->put('url_image_size-' . md5($url), $size, 240);
+
 	return $size;
 }
 
@@ -1553,9 +1497,9 @@ function getAttachmentPath()
 	elseif (!empty($modSettings['currentAttachmentUploadDir']) && !is_array($modSettings['attachmentUploadDir']) && (@unserialize($modSettings['attachmentUploadDir']) !== false))
 	{
 		// @todo this is here to prevent the package manager to die when complete the installation of the patch (the new Util class has not yet been loaded so we need the normal one)
-		if (function_exists('Util::unserialize'))
+		if (function_exists('\\ElkArte\\Util::unserialize'))
 		{
-			$attachmentDir = Util::unserialize($modSettings['attachmentUploadDir']);
+			$attachmentDir = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 		}
 		else
 		{
@@ -1771,37 +1715,32 @@ function getServerStoredAvatars($directory, $level)
  * @param int $id_attach
  * @param int $id_msg
  * @param int $old_id_thumb = 0
+ * @param string $real_filename
  * @return array The updated information
+ * @throws \ElkArte\Exceptions\Exception
  */
-function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb = 0)
+function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb = 0, $real_filename = '')
 {
 	global $modSettings;
 
 	$attachment = array('id_attach' => $id_attach);
 
-	require_once(SUBSDIR . '/Graphics.subs.php');
-	if (createThumbnail($filename, $modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']))
+	$image = new \ElkArte\Graphics\Image();
+	if ($image->createThumbnail($filename, $modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']))
 	{
 		// So what folder are we putting this image in?
 		$id_folder_thumb = getAttachmentPathID();
 
 		// Calculate the size of the created thumbnail.
-		$size = elk_getimagesize($filename . '_thumb');
+		$size = $image->getSize($filename . '_thumb');
 		list ($attachment['thumb_width'], $attachment['thumb_height']) = $size;
-		$thumb_size = filesize($filename . '_thumb');
+		$thumb_size = $image->getfilesize();
 
 		// Figure out the mime type.
-		if (!empty($size['mime']))
-		{
-			$thumb_mime = $size['mime'];
-		}
-		else
-		{
-			$thumb_mime = getValidMimeImageType($size[2]);
-		}
+		$thumb_mime = getValidMimeImageType($size[2]);
 		$thumb_ext = substr($thumb_mime, strpos($thumb_mime, '/') + 1);
 
-		$thumb_filename = $filename . '_thumb';
+		$thumb_filename = (!empty($real_filename) ? $real_filename : $filename) . '_thumb';
 		$thumb_hash = getAttachmentFilename($thumb_filename, 0, null, true);
 
 		$db = database();
@@ -1944,7 +1883,7 @@ function loadAttachmentContext($id_msg)
 				if (empty($attachment['id_thumb']) || $attachment['thumb_width'] > $modSettings['attachmentThumbWidth'] || $attachment['thumb_height'] > $modSettings['attachmentThumbHeight'] || ($attachment['thumb_width'] < $modSettings['attachmentThumbWidth'] && $attachment['thumb_height'] < $modSettings['attachmentThumbHeight']))
 				{
 					$filename = getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder'], false, $attachment['file_hash']);
-					$attachment = array_merge($attachment, updateAttachmentThumbnail($filename, $attachment['id_attach'], $id_msg, $attachment['id_thumb']));
+					$attachment = array_merge($attachment, updateAttachmentThumbnail($filename, $attachment['id_attach'], $id_msg, $attachment['id_thumb'], $attachment['filename']));
 				}
 
 				// Only adjust dimensions on successful thumbnail creation.
@@ -2074,7 +2013,7 @@ function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $ne
 	if (!empty($modSettings['currentAttachmentUploadDir']))
 	{
 		if (!is_array($modSettings['attachmentUploadDir']))
-			$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
+			$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 		$path = $modSettings['attachmentUploadDir'][$dir];
 	}
 	else
@@ -2148,7 +2087,7 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 	if (!empty($modSettings['currentAttachmentUploadDir']))
 	{
 		if (!is_array($modSettings['attachmentUploadDir']))
-			$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
+			$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 		$path = isset($modSettings['attachmentUploadDir'][$dir]) ? $modSettings['attachmentUploadDir'][$dir] : $modSettings['basedirectory_for_attachments'];
 	}
 	else
@@ -2313,15 +2252,16 @@ function getValidMimeImageType($mime)
 	static $validImageTypes = array(
 		-1 => 'jpg',
 		// Starting from here are the IMAGETYPE_* constants
-		1 => 'gif',
-		2 => 'jpeg',
-		3 => 'png',
-		5 => 'psd',
-		6 => 'bmp',
-		7 => 'tiff',
-		8 => 'tiff',
-		9 => 'jpeg',
-		14 => 'iff'
+		IMAGETYPE_GIF => 'gif',
+		IMAGETYPE_JPEG => 'jpeg',
+		IMAGETYPE_PNG => 'png',
+		IMAGETYPE_PSD => 'psd',
+		IMAGETYPE_BMP => 'bmp',
+		IMAGETYPE_TIFF_II => 'tiff',
+		IMAGETYPE_TIFF_MM => 'tiff',
+		IMAGETYPE_JPC => 'jpeg',
+		IMAGETYPE_IFF => 'iff',
+		IMAGETYPE_WBMP => 'bmp'
 	);
 
 	if ((int) $mime > 0)
@@ -2336,8 +2276,8 @@ function getValidMimeImageType($mime)
 	{
 		$ext = $mime;
 	}
-	$ext = strtolower($ext);
 
+	$ext = strtolower($ext);
 	foreach ($validImageTypes as $valid_ext)
 	{
 		if ($valid_ext === $ext)
@@ -2347,4 +2287,57 @@ function getValidMimeImageType($mime)
 	}
 
 	return '';
+}
+
+/**
+ * This function returns the mimeType of a file using the best means available
+ *
+ * @param string $filename
+ * @return bool|mixed|string
+ */
+function get_finfo_mime($filename)
+{
+	$mimeType = false;
+
+	// Check only existing readable files
+	if (!file_exists($filename) || !is_readable($filename))
+	{
+		return $mimeType;
+	}
+
+	// Try finfo, this is the preferred way
+	if (function_exists('finfo_open'))
+	{
+		$finfo = finfo_open(FILEINFO_MIME);
+		$mimeType = finfo_file($finfo, $filename);
+		finfo_close($finfo);
+	}
+	// No finfo? What? lets try the old mime_content_type
+	elseif (function_exists('mime_content_type'))
+	{
+		$mimeType = mime_content_type($filename);
+	}
+	// Try using an exec call
+	elseif (function_exists('exec'))
+	{
+		$mimeType = @exec("/usr/bin/file -i -b $filename");
+	}
+
+	// Still nothing? We should at least be able to get images correct
+	if (empty($mimeType))
+	{
+		$imageData = elk_getimagesize($filename, 'none');
+		if (!empty($imageData['mime']))
+		{
+			$mimeType = $imageData['mime'];
+		}
+	}
+
+	// Account for long responses like text/plain; charset=us-ascii
+	if (!empty($mimeType) && strpos($mimeType, ';'))
+	{
+		list($mimeType,) = explode(';', $mimeType);
+	}
+
+	return $mimeType;
 }

@@ -3,13 +3,12 @@
 /**
  * Function to support online user functions
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -55,7 +54,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 
 	// Get it from the cache and send it back.
 	$temp = array();
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 	if ($cache->levelHigherThan(1) && $cache->getVar($temp, 'membersOnlineStats-' . $membersOnlineOptions['sort'], 240))
 		return filter_members_online($temp, empty($membersOnlineOptions['reverse_sort']) ? 'ksort' : 'krsort');
 
@@ -75,7 +74,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 	$spiders = array();
 	$spider_finds = array();
 	if (!empty($modSettings['show_spider_online']) && ($modSettings['show_spider_online'] < 3 || allowedTo('admin_forum')) && !empty($modSettings['spider_name_cache']))
-		$spiders = Util::unserialize($modSettings['spider_name_cache']);
+		$spiders = \ElkArte\Util::unserialize($modSettings['spider_name_cache']);
 
 	// Load the users online right now.
 	$request = $db->query('', '
@@ -178,7 +177,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 	// Hidden and non-hidden members make up all online members.
 	$membersOnlineStats['num_users_online'] = count($membersOnlineStats['users_online']) + $membersOnlineStats['num_users_hidden'] - (isset($modSettings['show_spider_online']) && $modSettings['show_spider_online'] > 1 ? count($spider_finds) : 0);
 
-	Cache::instance()->put('membersOnlineStats-' . $membersOnlineOptions['sort'], $membersOnlineStats, 240);
+	\ElkArte\Cache\Cache::instance()->put('membersOnlineStats-' . $membersOnlineOptions['sort'], $membersOnlineStats, 240);
 
 	return filter_members_online($membersOnlineStats, empty($membersOnlineOptions['reverse_sort']) ? 'ksort' : 'krsort');
 }

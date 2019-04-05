@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -104,7 +103,7 @@ class Install_Controller
 				$incontext['warning'] = str_replace('{try_delete}', '
 		<div id="delete_label" style="font-weight: bold; display: none">
 			<label for="delete_self"><input type="checkbox" id="delete_self" onclick="doTheDelete();" class="input_check" /> ' . $txt['delete_installer'] . (!isset($_SESSION['installer_temp_ftp']) ? ' ' . $txt['delete_installer_maybe'] : '') . '</label>
-		<script><!-- // --><![CDATA[
+		<script>
 			function doTheDelete()
 			{
 				var theCheck = document.getElementById ? document.getElementById("delete_self") : document.all.delete_self,
@@ -116,7 +115,7 @@ class Install_Controller
 				window.location.href = elk_scripturl;
 			}
 			document.getElementById(\'delete_label\').style.display = \'block\';
-		// ]]></script>
+		</script>
 		</div>', $txt['error_already_installed']);
 		}
 
@@ -240,6 +239,7 @@ class Install_Controller
 			'smileys',
 			'themes',
 			'agreement.txt',
+			'privacypolicy.txt',
 			'db_last_error.txt',
 			'Settings.php',
 			'Settings_bak.php'
@@ -541,10 +541,22 @@ class Install_Controller
 			if (!defined('SOURCEDIR'))
 				define('SOURCEDIR', TMP_BOARDDIR . '/sources');
 
+			require_once(EXTDIR . '/ClassLoader.php');
+
+			$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
+			$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
+			$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
+			$loader->register();
+			require_once(TMP_BOARDDIR . '/install/DatabaseCode.php');
+
+			$type = strtolower($db_type);
+			$type = $type === 'mysql' ? 'mysqli' : $type;
+			$class = '\\ElkArte\\Database\\' . ucfirst($type) . '\\Connection';
+
 			// Better find the database file!
-			if (!file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.class.php'))
+			if (!class_exists($class))
 			{
-				$incontext['error'] = sprintf($txt['error_db_file'], 'Db-' . $db_type . '.class.php');
+				$incontext['error'] = sprintf($txt['error_db_file'], $class . '\\Connection.php');
 				return false;
 			}
 
@@ -555,16 +567,16 @@ class Install_Controller
 			require_once(SOURCEDIR . '/database/Database.subs.php');
 
 			// Attempt a connection.
-			$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
-			$db = database();
+			$db = test_db_connection();
 
 			// No dice?  Let's try adding the prefix they specified, just in case they misread the instructions ;)
-			if ($db_connection === null)
+			if ($db === null)
 			{
 				$db_error = $db->last_error();
 
-				$db_connection = elk_db_initiate($db_server, $db_name, $_POST['db_prefix'] . $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
-				if ($db_connection !== null)
+				$db_user = $_POST['db_prefix'] . $db_user;
+				$db = test_db_connection(true);
+				if ($db !== null)
 				{
 					$db_user = $_POST['db_prefix'] . $db_user;
 					updateSettingsFile(array('db_user' => $db_user));
@@ -572,15 +584,19 @@ class Install_Controller
 			}
 
 			// Still no connection?  Big fat error message :P.
-			if (!$db_connection)
+			if (!$db)
 			{
 				$incontext['error'] = $txt['error_db_connect'] . '<div style="margin: 2.5ex; font-family: monospace;"><strong>' . $db_error . '</strong></div>';
 				return false;
 			}
 
+			// @todo This global $db_connection is currently required bu the upgrade code,
+			// of course it would be much better if gone and passed as argument
+			// it was possible to remove it.
+			$db_connection = $db->connection();
 			// Do they meet the install requirements?
 			// @todo Old client, new server?
-			if (!db_version_check())
+			if (!db_version_check($db))
 			{
 				$incontext['error'] = $txt['error_db_too_low'];
 				return false;
@@ -594,23 +610,21 @@ class Install_Controller
 					CREATE DATABASE IF NOT EXISTS `$db_name`",
 					array(
 						'security_override' => true,
-					),
-					$db_connection
+					)
 				);
 
 				// Okay, let's try the prefix if it didn't work...
-				if (!$db->select_db($db_name, $db_connection) && $db_name != '')
+				if (!$db->select_db($db_name) && $db_name != '')
 				{
 					$db->skip_next_error();
 					$db->query('', "
 						CREATE DATABASE IF NOT EXISTS `$_POST[db_prefix]$db_name`",
 						array(
 							'security_override' => true,
-						),
-						$db_connection
+						)
 					);
 
-					if ($db->select_db($_POST['db_prefix'] . $db_name, $db_connection))
+					if ($db->select_db($_POST['db_prefix'] . $db_name))
 					{
 						$db_name = $_POST['db_prefix'] . $db_name;
 						updateSettingsFile(array('db_name' => $db_name));
@@ -618,11 +632,12 @@ class Install_Controller
 				}
 
 				// Okay, now let's try to connect...
-				if (!$db->select_db($db_name, $db_connection))
+				if (!$db->select_db($db_name))
 				{
 					$incontext['error'] = sprintf($txt['error_db_database'], $db_name);
 					return false;
 				}
+				$db_connection = load_database();
 			}
 
 			return true;
@@ -693,16 +708,8 @@ class Install_Controller
 			// Make sure it works.
 			require(TMP_BOARDDIR . '/Settings.php');
 
-			// UTF-8 requires a setting to override any language charset.
-			if (!empty($databases[$db_type]['utf8_version_check']) && version_compare($databases[$db_type]['utf8_version'], preg_replace('~\-.+?$~', '', $databases[$db_type]['utf8_version_check']($db_connection)), '>'))
-			{
-				// our uft-8 check support on the db failed ....
-				$incontext['error'] = sprintf($txt['error_utf8_version'], $databases[$db_type]['utf8_version']);
-				return false;
-			}
-			else
-				// Set our db character_set to utf8
-				updateSettingsFile(array('db_character_set' => 'utf8'));
+			// Set our db character_set to utf8
+			updateSettingsFile(array('db_character_set' => 'utf8'));
 
 			// Good, skip on.
 			return true;
@@ -744,7 +751,7 @@ class Install_Controller
 		);
 
 		$modSettings = array();
-		if ($result !== false)
+		if ($result->hasResults())
 		{
 			while ($row = $db->fetch_assoc($result))
 				$modSettings[$row['variable']] = $row['value'];
@@ -782,7 +789,7 @@ class Install_Controller
 		foreach ($txt as $key => $value)
 		{
 			if (substr($key, 0, 8) == 'default_')
-				$replaces['{$' . $key . '}'] = addslashes($value);
+				$replaces['{$' . $key . '}'] = $value;
 		}
 		$replaces['{$default_reserved_names}'] = strtr($replaces['{$default_reserved_names}'], array('\\\\n' => '\\n'));
 
@@ -815,6 +822,35 @@ class Install_Controller
 			),
 			array('variable')
 		);
+
+		$agreement = new \ElkArte\Agreement('english');
+		$success = $agreement->storeBackup();
+		$db->insert('replace',
+			$db_prefix . 'settings',
+			array(
+				'variable' => 'string-255', 'value' => 'string-65534',
+			),
+			array(
+				'agreementRevision', $success,
+			),
+			array('variable')
+		);
+
+		if (file_exists(TMP_BOARDDIR . '/privacypolicy.txt'))
+		{
+			$privacypol = new \ElkArte\PrivacyPolicy('english');
+			$success = $privacypol->storeBackup();
+			$db->insert('replace',
+				$db_prefix . 'settings',
+				array(
+					'variable' => 'string-255', 'value' => 'string-65534',
+				),
+				array(
+					'privacypolicyRevision', $success,
+				),
+				array('variable')
+			);
+		}
 
 		// Maybe we can auto-detect better cookie settings?
 		preg_match('~^http[s]?://([^\.]+?)([^/]*?)(/.*)?$~', $boardurl, $matches);
@@ -867,8 +903,8 @@ class Install_Controller
 		}
 
 		// Let's optimize those new tables.
-		$tables = $db->db_list_tables($db_name, $db_prefix . '%');
-		$db_table = db_table();
+		$tables = $db->list_tables($db_name, $db_prefix . '%');
+		$db_table = db_table($db);
 		foreach ($tables as $table)
 		{
 			if ($db_table->optimize($table) == -1)
@@ -880,15 +916,15 @@ class Install_Controller
 
 		// Check for the ALTER privilege.
 		$db->skip_next_error();
-		$can_alter_table = $db->query('', "
+		$cannot_alter_table = $db->query('', "
 			ALTER TABLE {$db_prefix}log_digest
 			ORDER BY id_topic",
 			array(
 				'security_override' => true
 			)
-		) === false;
+		)->getResultObject() === false;
 
-		if (!empty($databases[$db_type]['alter_support']) && $can_alter_table)
+		if (!empty($databases[$db_type]['alter_support']) && $cannot_alter_table)
 		{
 			$incontext['error'] = $txt['error_db_alter_priv'];
 			return false;
@@ -909,6 +945,8 @@ class Install_Controller
 	private function action_adminAccount()
 	{
 		global $txt, $db_type, $db_connection, $databases, $incontext, $db_prefix, $db_passwd, $webmaster_email;
+		global $db_persist, $db_server, $db_user, $db_port;
+		global $db_type, $db_name, $mysql_set_mode;
 
 		$incontext['sub_template'] = 'admin_account';
 		$incontext['page_title'] = $txt['user_settings'];
@@ -922,7 +960,6 @@ class Install_Controller
 
 		// These files may be or may not be already included, better safe than sorry for now
 		require_once(SOURCEDIR . '/Subs.php');
-		require_once(SUBSDIR . '/Util.class.php');
 
 		$db = load_database();
 
@@ -1068,7 +1105,7 @@ class Install_Controller
 				);
 
 				// Awww, crud!
-				if ($request === false)
+				if ($request->hasResults() === false)
 				{
 					$incontext['error'] = $txt['error_user_settings_query'] . '<br />
 					<div style="margin: 2ex;">' . nl2br(htmlspecialchars($db->last_error($db_connection), ENT_COMPAT, 'UTF-8')) . '</div>';
@@ -1112,18 +1149,19 @@ class Install_Controller
 
 		chdir(TMP_BOARDDIR);
 
-		require_once(SOURCEDIR . '/Errors.class.php');
 		require_once(SOURCEDIR . '/Logging.php');
 		require_once(SOURCEDIR . '/Subs.php');
 		require_once(SOURCEDIR . '/Load.php');
 		require_once(SUBSDIR . '/Cache.subs.php');
 		require_once(SOURCEDIR . '/Security.php');
 		require_once(SUBSDIR . '/Auth.subs.php');
-		require_once(SUBSDIR . '/Util.class.php');
-		require_once(SOURCEDIR . '/Autoloader.class.php');
-		$autoloder = Elk_Autoloader::instance();
-		$autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
-		$autoloder->register(SOURCEDIR, '\\ElkArte');
+		require_once(EXTDIR . '/ClassLoader.php');
+
+		$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
+		$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
+		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
+		$loader->register();
+		require_once(TMP_BOARDDIR . '/install/DatabaseCode.php');
 
 		// Bring a warning over.
 		if (!empty($incontext['account_existed']))
@@ -1131,16 +1169,12 @@ class Install_Controller
 			$incontext['warning'] = $incontext['account_existed'];
 		}
 
-		if (!empty($db_character_set) && !empty($databases[$db_type]['utf8_support']))
-		{
-			$db->skip_next_error();
-			$db->query('', '
-				SET NAMES {raw:db_character_set}',
-				array(
-					'db_character_set' => $db_character_set,
-				)
-			);
-		}
+		$db->skip_next_error();
+		$db->query('', '
+			SET NAMES UTF8',
+			array(
+			)
+		);
 
 		// As track stats is by default enabled let's add some activity.
 		$db->insert('ignore',

@@ -1289,6 +1289,10 @@ a.active {
 	border-color: #008000;
 }
 
+.insertoverlay .tabs li.active {
+	background-color: #E4E4E4;
+}
+
 .statusbar .insertoverlay .button {
 	background: #008000;
 	color: #FAFAFA;
@@ -1797,6 +1801,14 @@ a.help .icon {
 
 	#main_menu .linklevel1.active, #main_menu .linklevel1.active:hover {
 		border-color: transparent;
+	}
+
+	#main_menu .linklevel1.active .icon-menu {
+		border-color: #43A8DA;
+	}
+
+	#main_menu .linklevel1 .icon-menu:hover {
+		background: #F4F4F4;
 	}
 
 	.statistics .flow_hidden, .statistics .floatleft {

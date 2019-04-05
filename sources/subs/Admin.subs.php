@@ -3,13 +3,12 @@
 /**
  * Functions to support admin controller
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -59,8 +58,8 @@ function getServerVersions($checkFor)
 			trigger_error('getServerVersions(): you need to be connected to the database in order to get its server version', E_USER_NOTICE);
 		else
 		{
-			$versions['db_server'] = array('title' => sprintf($txt['support_versions_db'], $db->db_title()), 'version' => '');
-			$versions['db_server']['version'] = $db->db_server_version();
+			$versions['db_server'] = array('title' => sprintf($txt['support_versions_db'], $db->title()), 'version' => '');
+			$versions['db_server']['version'] = $db->server_version();
 		}
 	}
 
@@ -340,15 +339,15 @@ function readFileVersions(&$version_info, $directories, $pattern, $recursive = f
 	{
 		if ($recursive === true)
 		{
-			$iter = new RecursiveIteratorIterator(
-				new RecursiveDirectoryIterator($dirname, RecursiveDirectoryIterator::SKIP_DOTS),
-				RecursiveIteratorIterator::CHILD_FIRST,
-				RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
+			$iter = new \RecursiveIteratorIterator(
+				new \RecursiveDirectoryIterator($dirname, \RecursiveDirectoryIterator::SKIP_DOTS),
+				\RecursiveIteratorIterator::CHILD_FIRST,
+				\RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
 			);
 		}
 		else
 		{
-			$iter = new IteratorIterator(new FilesystemIterator($dirname));
+			$iter = new \IteratorIterator(new \FilesystemIterator($dirname));
 		}
 
 		foreach ($iter as $dir)
@@ -393,7 +392,7 @@ function readFileVersions(&$version_info, $directories, $pattern, $recursive = f
  *
  * What it does:
  *
- * - Done separately from Settings_Form::save_file() to avoid race conditions
+ * - Done separately from \ElkArte\SettingsForm\SettingsForm::save_file() to avoid race conditions
  * which can occur during a db error
  * - If it fails Settings.php will assume 0
  *
@@ -432,7 +431,7 @@ function updateAdminPreferences()
 	updateThemeOptions(array(1, $user_info['id'], 'admin_preferences', $options['admin_preferences']));
 
 	// Make sure we invalidate any cache.
-	Cache::instance()->put('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 0);
+	\ElkArte\Cache\Cache::instance()->put('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 0);
 }
 
 /**
@@ -448,7 +447,7 @@ function updateAdminPreferences()
  * @param string $template
  * @param mixed[] $replacements
  * @param int[] $additional_recipients
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function emailAdmins($template, $replacements = array(), $additional_recipients = array())
 {
@@ -471,11 +470,11 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 			'id_group' => 0,
 			'admin_forum' => 'admin_forum',
 		)
-	);
+	)->fetch_all();
 	$groups[] = 1;
 	$groups = array_unique($groups);
 
-	$emails_sent = $db->fetchQueryCallback('
+	$emails_sent = $db->fetchQuery('
 		SELECT id_member, member_name, real_name, lngfile, email_address
 		FROM {db_prefix}members
 		WHERE (id_group IN ({array_int:group_list}) OR FIND_IN_SET({raw:group_array_implode}, additional_groups) != 0)
@@ -485,7 +484,8 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 			'group_list' => $groups,
 			'notify_types' => 4,
 			'group_array_implode' => implode(', additional_groups) != 0 OR FIND_IN_SET(', $groups),
-		),
+		)
+	)->fetch_callback(
 		function ($row) use($replacements, $modSettings, $language, $template)
 		{
 			// Stick their particulars in the replacement data.

@@ -4,13 +4,12 @@
  * This file is mainly concerned with minor tasks relating to boards, such as
  * marking them read, collapsing categories, or quick moderation.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -119,7 +118,7 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 		// @todo SLOW This query seems to eat it sometimes.
 		$delete_topics = array();
 		$update_topics = array();
-		$db->fetchQueryCallback('
+		$db->fetchQuery('
 			SELECT lt.id_topic, lt.unwatched
 			FROM {db_prefix}log_topics AS lt
 				INNER JOIN {db_prefix}topics AS t /*!40000 USE INDEX (PRIMARY) */ ON (t.id_topic = lt.id_topic
@@ -130,7 +129,8 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 				'current_member' => $user_info['id'],
 				'board_list' => $boards,
 				'lowest_topic' => $lowest_topic,
-			),
+			)
+		)->fetch_callback(
 			function ($row) use (&$delete_topics, &$update_topics, $user_info, $modSettings)
 			{
 				if (!empty($row['unwatched']))
@@ -196,20 +196,30 @@ function getMsgMemberID($messageID)
  * @param int     $board_id
  * @param mixed[] $boardOptions
  *
- * @throws Elk_Exception no_board
+ * @throws \ElkArte\Exceptions\Exception no_board
  */
 function modifyBoard($board_id, &$boardOptions)
 {
-	global $cat_tree, $boards;
-
 	$db = database();
 
 	// Get some basic information about all boards and categories.
-	getBoardTree();
+	$boardTree = new \ElkArte\BoardsTree($db);
+	$cat_tree = $boardTree->getCategories();
+	$boards = $boardTree->getBoards();
 
 	// Make sure given boards and categories exist.
-	if (!isset($boards[$board_id]) || (isset($boardOptions['target_board']) && !isset($boards[$boardOptions['target_board']])) || (isset($boardOptions['target_category']) && !isset($cat_tree[$boardOptions['target_category']])))
-		throw new Elk_Exception('no_board');
+	if (!isset($boards[$board_id]))
+	{
+		throw new \ElkArte\Exceptions\Exception('no_board');
+	}
+	if(isset($boardOptions['target_board']) && !isset($boards[$boardOptions['target_board']]))
+	{
+		throw new \ElkArte\Exceptions\Exception('no_board');
+	}
+	if (isset($boardOptions['target_category']) && !isset($cat_tree[$boardOptions['target_category']]))
+	{
+		throw new \ElkArte\Exceptions\Exception('no_board');
+	}
 
 	// All things that will be updated in the database will be in $boardUpdates.
 	$boardUpdates = array();
@@ -235,7 +245,9 @@ function modifyBoard($board_id, &$boardOptions)
 			$id_parent = 0;
 			$after = 0;
 			foreach ($cat_tree[$id_cat]['children'] as $id_board => $dummy)
+			{
 				$after = max($after, $boards[$id_board]['order']);
+			}
 		}
 
 		// Make the board a child of a given board.
@@ -246,17 +258,25 @@ function modifyBoard($board_id, &$boardOptions)
 			$id_parent = $boardOptions['target_board'];
 
 			// People can be creative, in many ways...
-			if (isChildOf($id_parent, $board_id))
-				throw new Elk_Exception('mboards_parent_own_child_error', false);
+			if ($boardTree->isChildOf($id_parent, $board_id))
+			{
+				throw new \ElkArte\Exceptions\Exception('mboards_parent_own_child_error', false);
+			}
 			elseif ($id_parent == $board_id)
-				throw new Elk_Exception('mboards_board_own_child_error', false);
+			{
+				throw new \ElkArte\Exceptions\Exception('mboards_board_own_child_error', false);
+			}
 
 			$after = $boards[$boardOptions['target_board']]['order'];
 
 			// Check if there are already children and (if so) get the max board order.
 			if (!empty($boards[$id_parent]['tree']['children']) && empty($boardOptions['move_first_child']))
+			{
 				foreach ($boards[$id_parent]['tree']['children'] as $childBoard_id => $dummy)
+				{
 					$after = max($after, $boards[$childBoard_id]['order']);
+				}
+			}
 		}
 
 		// Place a board before or after another board, on the same child level.
@@ -270,22 +290,28 @@ function modifyBoard($board_id, &$boardOptions)
 
 		// Oops...?
 		else
+		{
 			trigger_error('modifyBoard(): The move_to value \'' . $boardOptions['move_to'] . '\' is incorrect', E_USER_ERROR);
+		}
 
 		// Get a list of children of this board.
-		$childList = array();
-		recursiveBoards($childList, $boards[$board_id]['tree']);
+		$childList = $boardTree->allChildsOf($board_id);
 
 		// See if there are changes that affect children.
 		$childUpdates = array();
 		$levelDiff = $child_level - $boards[$board_id]['level'];
 		if ($levelDiff != 0)
+		{
 			$childUpdates[] = 'child_level = child_level ' . ($levelDiff > 0 ? '+ ' : '') . '{int:level_diff}';
+		}
 		if ($id_cat != $boards[$board_id]['category'])
+		{
 			$childUpdates[] = 'id_cat = {int:category}';
+		}
 
 		// Fix the children of this board.
 		if (!empty($childList) && !empty($childUpdates))
+		{
 			$db->query('', '
 				UPDATE {db_prefix}boards
 				SET ' . implode(',
@@ -297,6 +323,7 @@ function modifyBoard($board_id, &$boardOptions)
 					'level_diff' => $levelDiff,
 				)
 			);
+		}
 
 		// Make some room for this spot.
 		$db->query('', '
@@ -392,6 +419,7 @@ function modifyBoard($board_id, &$boardOptions)
 
 	// Do the updates (if any).
 	if (!empty($boardUpdates))
+	{
 		$db->query('', '
 			UPDATE {db_prefix}boards
 			SET
@@ -402,6 +430,7 @@ function modifyBoard($board_id, &$boardOptions)
 				'selected_board' => $board_id,
 			))
 		);
+	}
 
 	// Set moderators of this board.
 	if (isset($boardOptions['moderators']) || isset($boardOptions['moderator_string']))
@@ -419,7 +448,7 @@ function modifyBoard($board_id, &$boardOptions)
 		if (isset($boardOptions['moderator_string']) && trim($boardOptions['moderator_string']) != '')
 		{
 			// Divvy out the usernames, remove extra space.
-			$moderator_string = strtr(Util::htmlspecialchars($boardOptions['moderator_string'], ENT_QUOTES), array('&quot;' => '"'));
+			$moderator_string = strtr(\ElkArte\Util::htmlspecialchars($boardOptions['moderator_string'], ENT_QUOTES), array('&quot;' => '"'));
 			preg_match_all('~"([^"]+)"~', $moderator_string, $matches);
 			$moderators = array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $moderator_string)));
 			for ($k = 0, $n = count($moderators); $k < $n; $k++)
@@ -427,22 +456,27 @@ function modifyBoard($board_id, &$boardOptions)
 				$moderators[$k] = trim($moderators[$k]);
 
 				if (strlen($moderators[$k]) == 0)
+				{
 					unset($moderators[$k]);
+				}
 			}
 
 			// Find all the id_member's for the member_name's in the list.
 			if (empty($boardOptions['moderators']))
+			{
 				$boardOptions['moderators'] = array();
+			}
 			if (!empty($moderators))
 			{
-				$boardOptions['moderators'] = $db->fetchQueryCallback('
+				$boardOptions['moderators'] = $db->fetchQuery('
 					SELECT id_member
 					FROM {db_prefix}members
 					WHERE member_name IN ({array_string:moderator_list}) OR real_name IN ({array_string:moderator_list})
 					LIMIT ' . count($moderators),
 					array(
 						'moderator_list' => $moderators,
-					),
+					)
+				)->fetch_callback(
 					function ($row)
 					{
 						return $row['id_member'];
@@ -456,7 +490,9 @@ function modifyBoard($board_id, &$boardOptions)
 		{
 			$inserts = array();
 			foreach ($boardOptions['moderators'] as $moderator)
+			{
 				$inserts[] = array($board_id, $moderator);
+			}
 
 			$db->insert('insert',
 				'{db_prefix}moderators',
@@ -471,12 +507,16 @@ function modifyBoard($board_id, &$boardOptions)
 	}
 
 	if (isset($boardOptions['move_to']))
-		reorderBoards();
+	{
+		$boardTree->reorderBoards();
+	}
 
-	clean_cache('data');
+	\ElkArte\Cache\Cache::instance()->clean('data');
 
 	if (empty($boardOptions['dont_log']))
+	{
 		logAction('edit_board', array('board' => $board_id), 'admin');
+	}
 }
 
 /**
@@ -489,12 +529,10 @@ function modifyBoard($board_id, &$boardOptions)
  * @package Boards
  * @param mixed[] $boardOptions
  * @return int The new board id
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function createBoard($boardOptions)
 {
-	global $boards;
-
 	$db = database();
 
 	// Trigger an error if one of the required values is not set.
@@ -526,16 +564,18 @@ function createBoard($boardOptions)
 	);
 
 	// Insert a board, the settings are dealt with later.
-	$db->insert('',
+	$result = $db->insert('',
 		'{db_prefix}boards',
 		$board_columns,
 		$board_parameters,
 		array('id_board')
 	);
-	$board_id = $db->insert_id('{db_prefix}boards', 'id_board');
+	$board_id = $result->insert_id();
 
 	if (empty($board_id))
+	{
 		return 0;
+	}
 
 	// Change the board according to the given specifications.
 	modifyBoard($board_id, $boardOptions);
@@ -543,414 +583,36 @@ function createBoard($boardOptions)
 	// Do we want the parent permissions to be inherited?
 	if ($boardOptions['inherit_permissions'])
 	{
-		getBoardTree();
+		$boardTree = new \ElkArte\BoardsTree($db);
 
-		if (!empty($boards[$board_id]['parent']))
+		try
 		{
-			$board_data = fetchBoardsInfo(array('boards' => $boards[$board_id]['parent']), array('selects' => 'permissions'));
+			$board = $boardTree->getBoardById($board_id);
+			$board_data = fetchBoardsInfo(array('boards' => $board['parent']), array('selects' => 'permissions'));
 
 			$db->query('', '
 				UPDATE {db_prefix}boards
 				SET id_profile = {int:new_profile}
 				WHERE id_board = {int:current_board}',
 				array(
-					'new_profile' => $board_data[$boards[$board_id]['parent']]['id_profile'],
+					'new_profile' => $board_data[$board['parent']]['id_profile'],
 					'current_board' => $board_id,
 				)
 			);
 		}
+		catch (\Exception $e)
+		{
+		}
 	}
 
 	// Clean the data cache.
-	clean_cache('data');
+	\ElkArte\Cache\Cache::instance()->clean('data');
 
 	// Created it.
 	logAction('add_board', array('board' => $board_id), 'admin');
 
 	// Here you are, a new board, ready to be spammed.
 	return $board_id;
-}
-
-/**
- * Remove one or more boards.
- *
- * - Allows to move the children of the board before deleting it
- * - if moveChildrenTo is set to null, the sub-boards will be deleted.
- * - Deletes:
- *   - all topics that are on the given boards;
- *   - all information that's associated with the given boards;
- * - updates the statistics to reflect the new situation.
- *
- * @package Boards
- * @param int[] $boards_to_remove
- * @param int|null $moveChildrenTo = null
- * @throws Elk_Exception
- */
-function deleteBoards($boards_to_remove, $moveChildrenTo = null)
-{
-	global $boards;
-
-	$db = database();
-
-	// No boards to delete? Return!
-	if (empty($boards_to_remove))
-		return;
-
-	getBoardTree();
-
-	call_integration_hook('integrate_delete_board', array($boards_to_remove, &$moveChildrenTo));
-
-	// If $moveChildrenTo is set to null, include the children in the removal.
-	if ($moveChildrenTo === null)
-	{
-		// Get a list of the sub-boards that will also be removed.
-		$child_boards_to_remove = array();
-		foreach ($boards_to_remove as $board_to_remove)
-			recursiveBoards($child_boards_to_remove, $boards[$board_to_remove]['tree']);
-
-		// Merge the children with their parents.
-		if (!empty($child_boards_to_remove))
-			$boards_to_remove = array_unique(array_merge($boards_to_remove, $child_boards_to_remove));
-	}
-	// Move the children to a safe home.
-	else
-	{
-		foreach ($boards_to_remove as $id_board)
-		{
-			// @todo Separate category?
-			if ($moveChildrenTo === 0)
-				fixChildren($id_board, 0, 0);
-			else
-				fixChildren($id_board, $boards[$moveChildrenTo]['level'] + 1, $moveChildrenTo);
-		}
-	}
-
-	// Delete ALL topics in the selected boards (done first so topics can't be marooned.)
-	$topics = $db->fetchQuery('
-		SELECT id_topic
-		FROM {db_prefix}topics
-		WHERE id_board IN ({array_int:boards_to_remove})',
-		array(
-			'boards_to_remove' => $boards_to_remove,
-		)
-	);
-
-	require_once(SUBSDIR . '/Topic.subs.php');
-	removeTopics($topics, false);
-
-	// Delete the board's logs.
-	$db->query('', '
-		DELETE FROM {db_prefix}log_mark_read
-		WHERE id_board IN ({array_int:boards_to_remove})',
-		array(
-			'boards_to_remove' => $boards_to_remove,
-		)
-	);
-	$db->query('', '
-		DELETE FROM {db_prefix}log_boards
-		WHERE id_board IN ({array_int:boards_to_remove})',
-		array(
-			'boards_to_remove' => $boards_to_remove,
-		)
-	);
-	$db->query('', '
-		DELETE FROM {db_prefix}log_notify
-		WHERE id_board IN ({array_int:boards_to_remove})',
-		array(
-			'boards_to_remove' => $boards_to_remove,
-		)
-	);
-
-	// Delete this board's moderators.
-	$db->query('', '
-		DELETE FROM {db_prefix}moderators
-		WHERE id_board IN ({array_int:boards_to_remove})',
-		array(
-			'boards_to_remove' => $boards_to_remove,
-		)
-	);
-
-	// Delete any extra events in the calendar.
-	$db->query('', '
-		DELETE FROM {db_prefix}calendar
-		WHERE id_board IN ({array_int:boards_to_remove})',
-		array(
-			'boards_to_remove' => $boards_to_remove,
-		)
-	);
-
-	// Delete any message icons that only appear on these boards.
-	$db->query('', '
-		DELETE FROM {db_prefix}message_icons
-		WHERE id_board IN ({array_int:boards_to_remove})',
-		array(
-			'boards_to_remove' => $boards_to_remove,
-		)
-	);
-
-	// Delete the boards.
-	$db->query('', '
-		DELETE FROM {db_prefix}boards
-		WHERE id_board IN ({array_int:boards_to_remove})',
-		array(
-			'boards_to_remove' => $boards_to_remove,
-		)
-	);
-
-	// Latest message/topic might not be there anymore.
-	require_once(SUBSDIR . '/Messages.subs.php');
-	updateMessageStats();
-	require_once(SUBSDIR . '/Topic.subs.php');
-	updateTopicStats();
-	updateSettings(array(
-		'calendar_updated' => time(),
-	));
-
-	// Plus reset the cache to stop people getting odd results.
-	updateSettings(array('settings_updated' => time()));
-
-	// Clean the cache as well.
-	clean_cache('data');
-
-	// Let's do some serious logging.
-	foreach ($boards_to_remove as $id_board)
-		logAction('delete_board', array('boardname' => $boards[$id_board]['name']), 'admin');
-
-	reorderBoards();
-}
-
-/**
- * Put all boards in the right order and sorts the records of the boards table.
- *
- * - Used by modifyBoard(), deleteBoards(), modifyCategory(), and deleteCategories() functions
- */
-function reorderBoards()
-{
-	global $cat_tree, $boardList, $boards;
-
-	$db = database();
-	$update_query = '';
-	$update_params = [];
-
-	getBoardTree();
-
-	// Set the board order for each category.
-	$board_order = 0;
-	foreach ($cat_tree as $catID => $dummy)
-	{
-		foreach ($boardList[$catID] as $boardID)
-		{
-			if ($boards[$boardID]['order'] != ++$board_order)
-			{
-				$update_query .= sprintf(
-					'
-				WHEN {int:selected_board%1$d} THEN {int:new_order%1$d}',
-					$boardID
-				);
-
-				$update_params = array_merge(
-					$update_params,
-					[
-						'new_order' . $boardID => $board_order,
-						'selected_board' . $boardID => $boardID,
-					]
-				);
-			}
-		}
-	}
-
-	if (empty($update_query))
-	{
-		return;
-	}
-
-	$db->query('',
-		'UPDATE {db_prefix}boards
-			SET
-				board_order = CASE id_board ' . $update_query . '
-					END',
-		$update_params
-	);
-}
-
-/**
- * Fixes the children of a board by setting their child_levels to new values.
- *
- * - Used when a board is deleted or moved, to affect its children.
- *
- * @package Boards
- * @param int $parent
- * @param int $newLevel
- * @param int $newParent
- */
-function fixChildren($parent, $newLevel, $newParent)
-{
-	$db = database();
-
-	// Grab all children of $parent...
-	$children = $db->fetchQueryCallback('
-		SELECT id_board
-		FROM {db_prefix}boards
-		WHERE id_parent = {int:parent_board}',
-		array(
-			'parent_board' => $parent,
-		),
-		function ($row)
-		{
-			return $row['id_board'];
-		}
-	);
-
-	// ...and set it to a new parent and child_level.
-	$db->query('', '
-		UPDATE {db_prefix}boards
-		SET id_parent = {int:new_parent}, child_level = {int:new_child_level}
-		WHERE id_parent = {int:parent_board}',
-		array(
-			'new_parent' => $newParent,
-			'new_child_level' => $newLevel,
-			'parent_board' => $parent,
-		)
-	);
-
-	// Recursively fix the children of the children.
-	foreach ($children as $child)
-		fixChildren($child, $newLevel + 1, $child);
-}
-
-/**
- * Load a lot of useful information regarding the boards and categories.
- *
- * - The information retrieved is stored in globals:
- *   $boards:    properties of each board.
- *   $boardList: a list of boards grouped by category ID.
- *   $cat_tree:  properties of each category.
- *
- * @param array $query
- *
- * @throws Elk_Exception no_valid_parent
- * @package Boards
- */
-function getBoardTree($query = array())
-{
-	global $cat_tree, $boards, $boardList;
-
-	$db = database();
-
-	// Addons may want to add their own information to the board table.
-	call_integration_hook('integrate_board_tree_query', array(&$query));
-
-	// Getting all the board and category information you'd ever wanted.
-	$request = $db->query('', '
-		SELECT
-			COALESCE(b.id_board, 0) AS id_board, b.id_parent, b.name AS board_name, b.description, b.child_level,
-			b.board_order, b.count_posts, b.member_groups, b.id_theme, b.override_theme, b.id_profile, b.redirect,
-			b.num_posts, b.num_topics, b.deny_member_groups, c.id_cat, c.name AS cat_name, c.cat_order, c.can_collapse' . (!empty($query['select']) ?
-			$query['select'] : '') . '
-		FROM {db_prefix}categories AS c
-			LEFT JOIN {db_prefix}boards AS b ON (b.id_cat = c.id_cat)' . (!empty($query['join']) ?
-			$query['join'] : '') . '
-		ORDER BY c.cat_order, b.child_level, b.board_order',
-		array(
-		)
-	);
-	$cat_tree = array();
-	$boards = array();
-	$last_board_order = 0;
-	while ($row = $db->fetch_assoc($request))
-	{
-		if (!isset($cat_tree[$row['id_cat']]))
-		{
-			$cat_tree[$row['id_cat']] = array(
-				'node' => array(
-					'id' => $row['id_cat'],
-					'name' => $row['cat_name'],
-					'order' => $row['cat_order'],
-					'can_collapse' => $row['can_collapse']
-				),
-				'is_first' => empty($cat_tree),
-				'last_board_order' => $last_board_order,
-				'children' => array()
-			);
-			$prevBoard = 0;
-			$curLevel = 0;
-		}
-
-		if (!empty($row['id_board']))
-		{
-			if ($row['child_level'] != $curLevel)
-				$prevBoard = 0;
-
-			$boards[$row['id_board']] = array(
-				'id' => $row['id_board'],
-				'category' => $row['id_cat'],
-				'parent' => $row['id_parent'],
-				'level' => $row['child_level'],
-				'order' => $row['board_order'],
-				'name' => $row['board_name'],
-				'member_groups' => explode(',', $row['member_groups']),
-				'deny_groups' => explode(',', $row['deny_member_groups']),
-				'description' => $row['description'],
-				'count_posts' => empty($row['count_posts']),
-				'posts' => $row['num_posts'],
-				'topics' => $row['num_topics'],
-				'theme' => $row['id_theme'],
-				'override_theme' => $row['override_theme'],
-				'profile' => $row['id_profile'],
-				'redirect' => $row['redirect'],
-				'prev_board' => $prevBoard
-			);
-			$prevBoard = $row['id_board'];
-			$last_board_order = $row['board_order'];
-
-			if (empty($row['child_level']))
-			{
-				$cat_tree[$row['id_cat']]['children'][$row['id_board']] = array(
-					'node' => &$boards[$row['id_board']],
-					'is_first' => empty($cat_tree[$row['id_cat']]['children']),
-					'children' => array()
-				);
-				$boards[$row['id_board']]['tree'] = &$cat_tree[$row['id_cat']]['children'][$row['id_board']];
-			}
-			else
-			{
-				// Parent doesn't exist!
-				if (!isset($boards[$row['id_parent']]['tree']))
-					throw new Elk_Exception('no_valid_parent', false, array($row['board_name']));
-
-				// Wrong childlevel...we can silently fix this...
-				if ($boards[$row['id_parent']]['tree']['node']['level'] != $row['child_level'] - 1)
-					$db->query('', '
-						UPDATE {db_prefix}boards
-						SET child_level = {int:new_child_level}
-						WHERE id_board = {int:selected_board}',
-						array(
-							'new_child_level' => $boards[$row['id_parent']]['tree']['node']['level'] + 1,
-							'selected_board' => $row['id_board'],
-						)
-					);
-
-				$boards[$row['id_parent']]['tree']['children'][$row['id_board']] = array(
-					'node' => &$boards[$row['id_board']],
-					'is_first' => empty($boards[$row['id_parent']]['tree']['children']),
-					'children' => array()
-				);
-				$boards[$row['id_board']]['tree'] = &$boards[$row['id_parent']]['tree']['children'][$row['id_board']];
-			}
-		}
-
-		// Let integration easily add data to $boards and $cat_tree
-		call_integration_hook('integrate_board_tree', array($row));
-	}
-	$db->free_result($request);
-
-	// Get a list of all the boards in each category (using recursion).
-	$boardList = array();
-	foreach ($cat_tree as $catID => $node)
-	{
-		$boardList[$catID] = array();
-		recursiveBoards($boardList[$catID], $node);
-	}
 }
 
 /**
@@ -1149,44 +811,25 @@ function getBoardList($boardListOptions = array(), $simple = false)
 /**
  * Recursively get a list of boards.
  *
- * - Used by getBoardTree
- *
  * @package Boards
- * @param int[] $_boardList The board list
- * @param array $_tree the board tree
+ * @param array $tree the board tree
+ * @return array list of child boards id
  */
-function recursiveBoards(&$_boardList, &$_tree)
+function recursiveBoards($tree)
 {
-	if (empty($_tree['children']))
-		return;
-
-	foreach ($_tree['children'] as $id => $node)
+	if (empty($tree['children']))
 	{
-		$_boardList[] = $id;
-		recursiveBoards($_boardList, $node);
+		return [];
 	}
-}
 
-/**
- * Returns whether the sub-board id is actually a child of the parent (recursive).
- *
- * @package Boards
- * @param int $child The ID of the child board
- * @param int $parent The ID of a parent board
- *
- * @return boolean if the specified child board is a child of the specified parent board.
- */
-function isChildOf($child, $parent)
-{
-	global $boards;
+	$boardsList = [];
+	foreach ($tree['children'] as $id => $node)
+	{
+		$boardsList[] = $id;
+		$boardsList = array_merge($boardsList, recursiveBoards($node));
+	}
 
-	if (empty($boards[$child]['parent']))
-		return false;
-
-	if ($boards[$child]['parent'] == $parent)
-		return true;
-
-	return isChildOf($boards[$child]['parent'], $parent);
+	return $boardsList;
 }
 
 /**
@@ -1430,14 +1073,15 @@ function wantedBoards($see_board, $hide_recycle = true)
 	);
 
 	// Find all boards down from $id_parent
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT b.id_board
 		FROM {db_prefix}boards AS b
 		WHERE ' . $user_info[in_array($see_board, $allowed_see) ? $see_board : $allowed_see[0]] . ($hide_recycle && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 			AND b.id_board != {int:recycle_board}' : ''),
 		array(
 			'recycle_board' => (int) $modSettings['recycle_board'],
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			return $row['id_board'];
@@ -1454,6 +1098,7 @@ function wantedBoards($see_board, $hide_recycle = true)
  * @package Boards
  * @param int $board_id
  * @param int|null $topic_id
+ * @return mixed[]
  */
 function boardInfo($board_id, $topic_id = null)
 {
@@ -1643,13 +1288,14 @@ function boardsModerated($id_member)
 {
 	$db = database();
 
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT id_board
 		FROM {db_prefix}moderators
 		WHERE id_member = {int:current_member}',
 		array(
 			'current_member' => $id_member,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			return $row['id_board'];
@@ -1675,7 +1321,7 @@ function getAllThemes()
 		array(
 			'name' => 'name',
 		)
-	);
+	)->fetch_all();
 }
 
 /**
@@ -2065,7 +1711,7 @@ function boardNotifications($sort, $memID)
 	$db = database();
 
 	// All the boards that you have notification enabled
-	$notification_boards = $db->fetchQueryCallback('
+	$notification_boards = $db->fetchQuery('
 		SELECT b.id_board, b.name, COALESCE(lb.id_msg, 0) AS board_read, b.id_msg_updated
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
@@ -2076,7 +1722,8 @@ function boardNotifications($sort, $memID)
 		array(
 			'current_member' => $user_info['id'],
 			'selected_member' => $memID,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			$href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['name']]);

@@ -3,9 +3,9 @@
 /**
  * Functions to support schedules tasks
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -52,7 +52,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 		)
 	);
 	$tasks = array();
-	$scheduleTaskImmediate = !empty($modSettings['scheduleTaskImmediate']) ? Util::unserialize($modSettings['scheduleTaskImmediate']) : array();
+	$scheduleTaskImmediate = !empty($modSettings['scheduleTaskImmediate']) ? \ElkArte\Util::unserialize($modSettings['scheduleTaskImmediate']) : array();
 	while ($row = $db->fetch_assoc($request))
 	{
 		// scheduleTaskImmediate is a way to speed up scheduled tasks and fire them as fast as possible
@@ -320,7 +320,7 @@ function updateTask($id_task, $disabled = null, $offset = null, $interval = null
  * @param int $id_task
  *
  * @return array
- * @throws Elk_Exception no_access
+ * @throws \ElkArte\Exceptions\Exception no_access
  */
 function loadTaskDetails($id_task)
 {
@@ -340,7 +340,7 @@ function loadTaskDetails($id_task)
 	);
 	// Should never, ever, happen!
 	if ($db->num_rows($request) == 0)
-		throw new Elk_Exception('no_access', false);
+		throw new \ElkArte\Exceptions\Exception('no_access', false);
 	while ($row = $db->fetch_assoc($request))
 	{
 		$task = array(
@@ -569,12 +569,10 @@ function run_this_task($id_task, $task_name)
 {
 	global $time_start, $modSettings;
 
-	Elk_Autoloader::instance()->register(SUBSDIR . '/ScheduledTask', '\\ElkArte\\sources\\subs\\ScheduledTask');
-
 	// Let's start logging the task and saying we failed it
 	$log_task_id = logTask(0, $id_task);
 
-	$class = '\\ElkArte\\sources\\subs\\ScheduledTask\\' . implode('_', array_map('ucfirst', explode('_', $task_name)));
+	$class = '\\ElkArte\\ScheduledTasks\\Tasks\\' . implode('', array_map('ucfirst', explode('_', $task_name)));
 
 	if (class_exists($class))
 	{
@@ -587,7 +585,7 @@ function run_this_task($id_task, $task_name)
 		$completed = false;
 	}
 
-	$scheduleTaskImmediate = !empty($modSettings['scheduleTaskImmediate']) ? Util::unserialize($modSettings['scheduleTaskImmediate']) : array();
+	$scheduleTaskImmediate = !empty($modSettings['scheduleTaskImmediate']) ? \ElkArte\Util::unserialize($modSettings['scheduleTaskImmediate']) : array();
 	// Log that we did it ;)
 	if ($completed)
 	{

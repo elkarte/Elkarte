@@ -166,11 +166,11 @@ h2 a.collapse {
 }
 
 .bbc_img.floatleft {
-	padding-left: .25em;
+	padding: .1em 0 .1em .75em;
 }
 
 .bbc_img.floatright {
-	padding-right: .25em;
+	padding: .1em .75em .1em 0;
 }
 
 /*	$AJAX		*/

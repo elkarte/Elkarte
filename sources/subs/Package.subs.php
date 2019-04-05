@@ -3,13 +3,12 @@
 /**
  * This contains functions for handling tar.gz and .zip files
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -78,8 +77,7 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  */
 function read_tgz_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
-	require_once(SUBSDIR . '/UnTgz.class.php');
-	$untgz = new UnTgz($data, $destination, $single_file, $overwrite, $files_to_extract);
+	$untgz = new \ElkArte\UnTgz($data, $destination, $single_file, $overwrite, $files_to_extract);
 
 	// Choose the right method for the file
 	if ($untgz->check_valid_tgz())
@@ -106,8 +104,7 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
  */
 function read_zip_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
-	require_once(SUBSDIR . '/UnZip.class.php');
-	$unzip = new UnZip($data, $destination, $single_file, $overwrite, $files_to_extract);
+	$unzip = new \ElkArte\UnZip($data, $destination, $single_file, $overwrite, $files_to_extract);
 
 	return $unzip->read_zip_data();
 }
@@ -213,7 +210,7 @@ function loadInstalledPackages()
  * - Expects the file to be a package in packages/.
  * - Returns a error string if the package-info is invalid.
  * - Otherwise returns a basic array of id, version, filename, and similar information.
- * - An Xml_Array is available in 'xml'.
+ * - An \ElkArte\XmlArray is available in 'xml'.
  *
  * @package Packages
  * @param string $gzfilename
@@ -253,8 +250,8 @@ function getPackageInfo($gzfilename)
 			return 'package_get_error_is_zero';
 	}
 
-	// Parse package-info.xml into an Xml_Array.
-	$packageInfo = new Xml_Array($packageInfo);
+	// Parse package-info.xml into an \ElkArte\XmlArray.
+	$packageInfo = new \ElkArte\XmlArray($packageInfo);
 
 	// @todo Error message of some sort?
 	if (!$packageInfo->exists('package-info[0]'))
@@ -282,7 +279,7 @@ function getPackageInfo($gzfilename)
  * @param mixed[] $chmodOptions
  * @param boolean $restore_write_status
  * @return array|boolean
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $restore_write_status = false)
 {
@@ -414,7 +411,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 	// If we have some FTP information already, then let's assume it was required and try to get ourselves connected.
 	if (!empty($_SESSION['pack_ftp']['connected']))
 	{
-		$package_ftp = new Ftp_Connection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
+		$package_ftp = new \ElkArte\Http\FtpConnection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
 
 		// Check for a valid connection
 		if ($package_ftp->error !== false)
@@ -424,7 +421,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 	// Just got a submission did we?
 	if ((empty($package_ftp) || ($package_ftp->error !== false)) && isset($_POST['ftp_username']))
 	{
-		$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
+		$ftp = new \ElkArte\Http\FtpConnection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 		// We're connected, jolly good!
 		if ($ftp->error === false)
@@ -489,7 +486,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 		{
 			if (!isset($ftp))
 			{
-				$ftp = new Ftp_Connection(null);
+				$ftp = new \ElkArte\Http\FtpConnection(null);
 			}
 			elseif ($ftp->error !== false && !isset($ftp_error))
 				$ftp_error = $ftp->last_message === null ? '' : $ftp->last_message;
@@ -605,7 +602,7 @@ function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
  * @param bool $return = false
  *
  * @return null|string[]
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function packageRequireFTP($destination_url, $files = null, $return = false)
 {
@@ -674,7 +671,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	}
 	elseif (isset($_SESSION['pack_ftp']))
 	{
-		$package_ftp = new Ftp_Connection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
+		$package_ftp = new \ElkArte\Http\FtpConnection($_SESSION['pack_ftp']['server'], $_SESSION['pack_ftp']['port'], $_SESSION['pack_ftp']['username'], package_crypt($_SESSION['pack_ftp']['password']));
 
 		if ($files === null)
 			return array();
@@ -716,7 +713,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	elseif (isset($_POST['ftp_username']))
 	{
 		// Attempt to make a new FTP connection
-		$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
+		$ftp = new \ElkArte\Http\FtpConnection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 		if ($ftp->error === false)
 		{
@@ -733,7 +730,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	{
 		if (!isset($ftp))
 		{
-			$ftp = new Ftp_Connection(null);
+			$ftp = new \ElkArte\Http\FtpConnection(null);
 		}
 		elseif ($ftp->error !== false && !isset($ftp_error))
 			$ftp_error = $ftp->last_message === null ? '' : $ftp->last_message;
@@ -799,14 +796,14 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
  *
  * What it does:
  *
- * - Package should be an Xml_Array with package-info as its base.
+ * - Package should be an \ElkArte\XmlArray with package-info as its base.
  * - Testing_only should be true if the package should not actually be applied.
  * - Method can be upgrade, install, or uninstall.  Its default is install.
  * - Previous_version should be set to the previous installed version of this package, if any.
  * - Does not handle failure terribly well; testing first is always better.
  *
  * @package Packages
- * @param Xml_Array $packageXML
+ * @param \ElkArte\XmlArray $packageXML
  * @param bool $testing_only = true
  * @param string $method = 'install' ('install', 'upgrade', or 'uninstall')
  * @param string $previous_version = ''
@@ -1497,7 +1494,7 @@ function deltree($dir, $delete_dir = true)
 	// Read all the files in the directory
 	try
 	{
-		$entrynames = new FilesystemIterator($dir, FilesystemIterator::SKIP_DOTS);
+		$entrynames = new \FilesystemIterator($dir, \FilesystemIterator::SKIP_DOTS);
 		foreach ($entrynames as $entryname)
 		{
 			// Recursively dive in to each directory looking for files to delete
@@ -1747,7 +1744,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 
 	detectServer()->setTimeLimit(600);
 
-	$xml = new Xml_Array(strtr($file, array("\r" => '')));
+	$xml = new \ElkArte\XmlArray(strtr($file, array("\r" => '')));
 	$actions = array();
 	$everything_found = true;
 
@@ -2476,10 +2473,10 @@ function package_create_backup($id = 'backup')
 	{
 		foreach ($dirs as $dir => $dest)
 		{
-			$iter = new RecursiveIteratorIterator(
-				new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
-				RecursiveIteratorIterator::CHILD_FIRST,
-				RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
+			$iter = new \RecursiveIteratorIterator(
+				new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
+				\RecursiveIteratorIterator::CHILD_FIRST,
+				\RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
 			);
 
 			foreach ($iter as $entry => $dir)
@@ -2531,7 +2528,7 @@ function package_create_backup($id = 'backup')
 	}
 	catch (Exception $e)
 	{
-		Errors::instance()->log_error($e->getMessage(), 'backup');
+		\ElkArte\Errors\Errors::instance()->log_error($e->getMessage(), 'backup');
 
 		return false;
 	}
@@ -2557,19 +2554,23 @@ function package_create_backup($id = 'backup')
 function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection_level = 3)
 {
 	global $webmaster_email;
-	static $keep_alive_dom = null, $keep_alive_fp = null;
 
 	preg_match('~^(http|ftp)(s)?://([^/:]+)(:(\d+))?(.+)$~', $url, $match);
+	$data = '';
 
 	// An FTP url. We should try connecting and RETRieving it...
 	if (empty($match[1]))
+	{
 		return false;
-	elseif ($match[1] == 'ftp')
+	}
+	elseif ($match[1] === 'ftp')
 	{
 		// Establish a connection and attempt to enable passive mode.
-		$ftp = new Ftp_Connection(($match[2] ? 'ssl://' : '') . $match[3], empty($match[5]) ? 21 : $match[5], 'anonymous', $webmaster_email);
+		$ftp = new \ElkArte\Http\FtpConnection(($match[2] ? 'ssl://' : '') . $match[3], empty($match[5]) ? 21 : $match[5], 'anonymous', $webmaster_email);
 		if ($ftp->error !== false || !$ftp->passive())
+		{
 			return false;
+		}
 
 		// I want that one *points*!
 		fwrite($ftp->connection, 'RETR ' . $match[6] . "\r\n");
@@ -2577,14 +2578,18 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		// Since passive mode worked (or we would have returned already!) open the connection.
 		$fp = @fsockopen($ftp->pasv['ip'], $ftp->pasv['port'], $err, $err, 5);
 		if (!$fp)
+		{
 			return false;
+		}
 
 		// The server should now say something in acknowledgement.
 		$ftp->check_response(150);
 
 		$data = '';
 		while (!feof($fp))
+		{
 			$data .= fread($fp, 4096);
+		}
 		fclose($fp);
 
 		// All done, right?  Good.
@@ -2592,119 +2597,32 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		$ftp->close();
 	}
 	// More likely a standard HTTP URL, first try to use cURL if available
-	elseif (isset($match[1]) && $match[1] === 'http' && function_exists('curl_init'))
+	elseif (isset($match[1]) && $match[1] === 'http')
 	{
-		$fetch_data = new Curl_Fetch_Webdata(array(), $redirection_level);
-		$fetch_data->get_url_data($url, $post_data);
+		// Choose the fastest and most robust way
+		if (function_exists('curl_init'))
+		{
+			$fetch_data = new \ElkArte\Http\CurlFetchWebdata(array(), $redirection_level);
+		}
+		elseif (empty(ini_get('allow_url_fopen')))
+		{
+			$fetch_data = new \ElkArte\Http\StreamFetchWebdata(array(), $redirection_level, $keep_alive);
+		}
+		else
+		{
+			$fetch_data = new \ElkArte\Http\FsockFetchWebdata(array(), $redirection_level, $keep_alive);
+		}
 
 		// no errors and a 200 result, then we have a good dataset, well we at least have data ;)
+		$fetch_data->get_url_data($url, $post_data);
 		if ($fetch_data->result('code') == 200 && !$fetch_data->result('error'))
-			$data = $fetch_data->result('body');
+		{
+			return $fetch_data->result('body');
+		}
 		else
+		{
 			return false;
-	}
-	// This is more likely; a standard HTTP URL.
-	elseif (isset($match[1]) && $match[1] == 'http')
-	{
-		if ($keep_alive && $match[3] == $keep_alive_dom)
-			$fp = $keep_alive_fp;
-		if (empty($fp))
-		{
-			// Open the socket on the port we want...
-			$fp = @fsockopen(($match[2] ? 'ssl://' : '') . $match[3], empty($match[5]) ? ($match[2] ? 443 : 80) : $match[5], $err, $err, 5);
-			if (!$fp)
-				return false;
 		}
-
-		if ($keep_alive)
-		{
-			$keep_alive_dom = $match[3];
-			$keep_alive_fp = $fp;
-		}
-
-		// I want this, from there, and I'm not going to be bothering you for more (probably.)
-		if (empty($post_data))
-		{
-			fwrite($fp, 'GET ' . ($match[6] !== '/' ? str_replace(' ', '%20', $match[6]) : '/') . ' HTTP/1.1' . "\r\n");
-			fwrite($fp, 'Host: ' . $match[3] . (empty($match[5]) ? ($match[2] ? ':443' : '') : ':' . $match[5]) . "\r\n");
-			fwrite($fp, 'User-Agent: PHP/ELK' . "\r\n");
-			if ($keep_alive)
-				fwrite($fp, 'Connection: Keep-Alive' . "\r\n\r\n");
-			else
-				fwrite($fp, 'Connection: close' . "\r\n\r\n");
-		}
-		else
-		{
-			fwrite($fp, 'POST ' . ($match[6] !== '/' ? $match[6] : '') . ' HTTP/1.1' . "\r\n");
-			fwrite($fp, 'Host: ' . $match[3] . (empty($match[5]) ? ($match[2] ? ':443' : '') : ':' . $match[5]) . "\r\n");
-			fwrite($fp, 'User-Agent: PHP/ELK' . "\r\n");
-			if ($keep_alive)
-				fwrite($fp, 'Connection: Keep-Alive' . "\r\n");
-			else
-				fwrite($fp, 'Connection: close' . "\r\n");
-			fwrite($fp, 'Content-Type: application/x-www-form-urlencoded' . "\r\n");
-			fwrite($fp, 'Content-Length: ' . strlen($post_data) . "\r\n\r\n");
-			fwrite($fp, $post_data);
-		}
-
-		$response = fgets($fp, 768);
-
-		// Redirect in case this location is permanently or temporarily moved.
-		if ($redirection_level < 6 && preg_match('~^HTTP/\S+\s+30[127]~i', $response) === 1)
-		{
-			$location = '';
-			while (!feof($fp) && trim($header = fgets($fp, 4096)) != '')
-				if (strpos($header, 'Location:') !== false)
-					$location = trim(substr($header, strpos($header, ':') + 1));
-
-			if (empty($location))
-				return false;
-			else
-			{
-				if (!$keep_alive)
-					fclose($fp);
-				return fetch_web_data($location, $post_data, $keep_alive, $redirection_level + 1);
-			}
-		}
-
-		// Make sure we get a 200 OK.
-		elseif (preg_match('~^HTTP/\S+\s+20[01]~i', $response) === 0)
-			return false;
-
-		// Skip the headers...
-		while (!feof($fp) && trim($header = fgets($fp, 4096)) != '')
-		{
-			if (preg_match('~content-length:\s*(\d+)~i', $header, $match) != 0)
-				$content_length = $match[1];
-			elseif (preg_match('~connection:\s*close~i', $header) != 0)
-			{
-				$keep_alive_dom = null;
-				$keep_alive = false;
-			}
-
-			continue;
-		}
-
-		$data = '';
-		if (isset($content_length))
-		{
-			while (!feof($fp) && strlen($data) < $content_length)
-				$data .= fread($fp, $content_length - strlen($data));
-		}
-		else
-		{
-			while (!feof($fp))
-				$data .= fread($fp, 4096);
-		}
-
-		if (!$keep_alive)
-			fclose($fp);
-	}
-	else
-	{
-		// Umm, this shouldn't happen?
-		trigger_error('fetch_web_data(): Bad URL', E_USER_NOTICE);
-		$data = false;
 	}
 
 	return $data;
@@ -2757,7 +2675,7 @@ function isPackageInstalled($id, $install_id = null)
 		$result = array(
 			'old_themes' => explode(',', $row['themes_installed']),
 			'old_version' => $row['version'],
-			'db_changes' => empty($row['db_changes']) ? array() : Util::unserialize($row['db_changes']),
+			'db_changes' => empty($row['db_changes']) ? array() : \ElkArte\Util::unserialize($row['db_changes']),
 			'package_id' => $row['package_id'],
 			'install_state' => $row['install_state'],
 		);
@@ -2822,7 +2740,7 @@ function checkPackageDependency($id)
 			'current_package' => $id,
 		)
 	);
-	while ($row = $db->fetch_row($request));
+	while ($row = $db->fetch_row($request))
 		list ($version) = $row;
 	$db->free_result($request);
 
@@ -2896,7 +2814,7 @@ function isAuthorizedServer($remote_url)
 	global $modSettings;
 
 	// Know addon servers
-	$servers = Util::unserialize($modSettings['authorized_package_servers']);
+	$servers = \ElkArte\Util::unserialize($modSettings['authorized_package_servers']);
 	if (empty($servers))
 		return false;
 

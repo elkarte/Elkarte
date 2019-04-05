@@ -4,25 +4,26 @@
  * This file is the file which all subscription gateways should call
  * when a payment has been received - it sorts out the user status.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
  */
 
 // Start things rolling by getting the forum alive...
-$ssi_guest_access = true;
 if (!file_exists(dirname(__FILE__) . '/bootstrap.php'))
 	die('Unable to initialize');
 
+global $ssi_guest_access;
+
 require_once(dirname(__FILE__) . '/bootstrap.php');
-new Bootstrap();
+$ssi_guest_access = true;
+new Bootstrap(true);
 
 global $txt, $modSettings, $context;
 
@@ -73,7 +74,9 @@ foreach ($gatewayHandles as $gateway)
 }
 
 if (empty($txnType))
-	generateSubscriptionError($txt['paid_unknown_transaction_type']);
+{
+	generateSubscriptionError($txt['paid_unknown_transaction_type'], $notify_users);
+}
 
 // Get the subscription and member ID amongst others...
 @list($subscription_id, $member_id) = $gatewayClass->precheck();
@@ -84,14 +87,18 @@ $member_id = (int) $member_id;
 
 // This would be bad...
 if (empty($member_id))
-	generateSubscriptionError($txt['paid_empty_member']);
+{
+	generateSubscriptionError($txt['paid_empty_member'], $notify_users);
+}
 
 // Verify the member.
 $member_info = getBasicMemberData($member_id);
 
 // Didn't find them?
 if (empty($member_info))
-	generateSubscriptionError(sprintf($txt['paid_could_not_find_member'], $member_id));
+{
+	generateSubscriptionError(sprintf($txt['paid_could_not_find_member'], $member_id), $notify_users);
+}
 
 // Get the subscription details.
 $request = $db->query('', '
@@ -105,7 +112,9 @@ $request = $db->query('', '
 
 // Didn't find it?
 if ($db->num_rows($request) === 0)
-	generateSubscriptionError(sprintf($txt['paid_count_not_find_subscription'], $member_id, $subscription_id));
+{
+	generateSubscriptionError(sprintf($txt['paid_count_not_find_subscription'], $member_id, $subscription_id), $notify_users);
+}
 
 $subscription_info = $db->fetch_assoc($request);
 $db->free_result($request);
@@ -123,7 +132,9 @@ $request = $db->query('', '
 	)
 );
 if ($db->num_rows($request) == 0)
-	generateSubscriptionError(sprintf($txt['paid_count_not_find_subscription_log'], $member_id, $subscription_id));
+{
+	generateSubscriptionError(sprintf($txt['paid_count_not_find_subscription_log'], $member_id, $subscription_id), $notify_users);
+}
 $subscription_info += $db->fetch_assoc($request);
 $db->free_result($request);
 
@@ -149,16 +160,18 @@ if ($gatewayClass->isRefund())
 // Otherwise is it what we want, a purchase?
 elseif ($gatewayClass->isPayment() || $gatewayClass->isSubscription())
 {
-	$cost = Util::unserialize($subscription_info['cost']);
+	$cost = \ElkArte\Util::unserialize($subscription_info['cost']);
 	$total_cost = $gatewayClass->getCost();
 	$notify = false;
 
 	// For one off's we want to only capture them once!
 	if (!$gatewayClass->isSubscription())
 	{
-		$real_details = Util::unserialize($subscription_info['pending_details']);
+		$real_details = \ElkArte\Util::unserialize($subscription_info['pending_details']);
 		if (empty($real_details))
-			generateSubscriptionError(sprintf($txt['paid_count_not_find_outstanding_payment'], $member_id, $subscription_id));
+		{
+			generateSubscriptionError(sprintf($txt['paid_count_not_find_outstanding_payment'], $member_id, $subscription_id), $notify_users);
+		}
 
 		// Now we just try to find anything pending.
 		// We don't really care which it is as security happens later.
@@ -243,17 +256,18 @@ else
 }
 
 // In case we have anything specific to do.
-$gatewayClass->close();
+$gatewayClass->close($subscription_id);
 
 /**
  * Log an error then exit
  *
  * @param string $text
- * @throws \Elk_Exception
+ * @param mixed[] $notify_users
+ * @throws \ElkArte\Exceptions\Exception
  */
-function generateSubscriptionError($text)
+function generateSubscriptionError($text, $notify_users = [])
 {
-	global $modSettings, $notify_users;
+	global $modSettings;
 
 	// Send an email?
 	if (!empty($modSettings['paid_email']))
@@ -269,11 +283,11 @@ function generateSubscriptionError($text)
 	if (!empty($_POST))
 	{
 		foreach ($_POST as $key => $val)
-			$text .= '<br />' . Util::htmlspecialchars($key) . ': ' . Util::htmlspecialchars($val);
+			$text .= '<br />' . \ElkArte\Util::htmlspecialchars($key) . ': ' . \ElkArte\Util::htmlspecialchars($val);
 	}
 
 	// Then just log and die.
-	Errors::instance()->log_error($text);
+	\ElkArte\Errors\Errors::instance()->log_error($text);
 
 	exit;
 }

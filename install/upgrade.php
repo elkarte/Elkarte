@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:    2011 Simple Machines (http://www.simplemachines.org)
- * license:    BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -487,27 +486,19 @@ function loadEssentialData()
 	if (file_exists(SOURCEDIR . '/database/Database.subs.php'))
 	{
 		require_once(SOURCEDIR . '/Subs.php');
-		require_once(SOURCEDIR . '/Errors.class.php');
 		require_once(SOURCEDIR . '/Logging.php');
 		require_once(SOURCEDIR . '/Load.php');
 		require_once(SUBSDIR . '/Cache.subs.php');
 		require_once(SOURCEDIR . '/Security.php');
-		require_once(SOURCEDIR . '/Autoloader.class.php');
-		$autoloder = Elk_Autoloader::instance();
-		$autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
-		$autoloder->register(SOURCEDIR, '\\ElkArte');
-		load_possible_databases($db_type);
+		require_once(EXTDIR . '/ClassLoader.php');
+
+		$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
+		$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
+		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
+		$loader->register();
+		require_once('./DatabaseCode.php');
 
 		$db = load_database();
-
-		$db->skip_next_error();
-		if ($db_type == 'mysql' && isset($db_character_set) && preg_match('~^\w+$~', $db_character_set) === 1)
-		{
-			$db->query('', '
-				SET NAMES ' . $db_character_set,
-				array()
-			);
-		}
 
 		// Load the modSettings data...
 		$db->skip_next_error();
@@ -633,13 +624,15 @@ function action_welcomeLogin()
 	}
 
 	// Do they have ALTER privileges?
-	if (!empty($databases[$db_type]['alter_support']) && $db->query('alter_boards', 'ALTER TABLE {db_prefix}boards ORDER BY id_board', array()) === false)
+	$db->skip_next_error();
+	if (!empty($databases[$db_type]['alter_support'])
+		&& $db->query('', '	ALTER TABLE {db_prefix}log_digest ORDER BY id_topic', array('security_override' => true)) === false)
 	{
 		return throw_error('The ' . $databases[$db_type]['name'] . ' user you have set in Settings.php does not have proper privileges.<br /><br />Please ask your host to give this user the ALTER, CREATE, and DROP privileges.');
 	}
 
 	// Do a quick version spot check.
-	$temp = substr(@implode('', @file(BOARDDIR . '/index.php')), 0, 4096);
+	$temp = substr(@implode('', @file(BOARDDIR . '/bootstrap.php')), 0, 4096);
 	preg_match('~\*\s@version\s+(.+)~i', $temp, $match);
 	if (empty($match[1]) || compareVersions(trim(str_replace('Release Candidate', 'RC', $match[1])), CURRENT_VERSION) != 0)
 	{
@@ -849,7 +842,7 @@ function checkLogin()
 				if ($valid_password === false && !empty($_POST['passwrd']))
 				{
 					// SHA-1 from SMF?
-					$sha_passwd = sha1(Util::strtolower($_POST['user']) . $_POST['passwrd']);
+					$sha_passwd = sha1(\ElkArte\Util::strtolower($_POST['user']) . $_POST['passwrd']);
 					$valid_password = $sha_passwd === $password;
 
 					// Lets upgrade this to our new password
@@ -1140,7 +1133,7 @@ function action_backupDatabase()
 	// Get all the table names.
 	$filter = str_replace('_', '\_', preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0 ? $match[2] : $db_prefix) . '%';
 	$db_name = preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0 ? strtr($match[1], array('`' => '')) : false;
-	$tables = $db->db_list_tables($db_name, $filter);
+	$tables = $db->list_tables($db_name, $filter);
 
 	$table_names = array();
 	foreach ($tables as $table)
@@ -1231,7 +1224,7 @@ function backupTable($table)
 	}
 
 	$db = load_database();
-	$db->db_backup_table($table, 'backup_' . $table);
+	$db->backup_table($table, 'backup_' . $table);
 
 	if ($is_debug && $command_line)
 	{
@@ -1525,7 +1518,7 @@ function getMemberGroups()
 		)
 	);
 
-	if ($request === false)
+	if ($request->hasResults() === false)
 	{
 		$db->skip_next_error();
 		$request = $db->query('', '
@@ -1871,7 +1864,9 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 
 	$db = load_database();
 
-	if (!empty($databases[$db_type]['alter_support']) && $db->query('alter_boards', 'ALTER TABLE {db_prefix}boards ORDER BY id_board', array()) === false)
+	$db->skip_next_error();
+	if (!empty($databases[$db_type]['alter_support'])
+		&& $db->query('', '	ALTER TABLE {db_prefix}log_digest ORDER BY id_topic', array('security_override' => true)) === false)
 	{
 		print_error('Error: The ' . $databases[$db_type]['name'] . ' account in Settings.php does not have sufficient privileges.', true);
 	}
@@ -1885,7 +1880,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 	}
 
 	// Do a quick version spot check.
-	$temp = substr(@implode('', @file(BOARDDIR . '/index.php')), 0, 4096);
+	$temp = substr(@implode('', @file(BOARDDIR . '/bootstrap.php')), 0, 4096);
 	preg_match('~\*\s@version\s+(.+)~i', $temp, $match);
 	if (empty($match[1]) || $match[1] != CURRENT_VERSION)
 	{
@@ -2056,7 +2051,7 @@ function loadEssentialFunctions()
 			$words = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', strtr($text, array('<br />' => ' ')));
 
 			// Step 2: Entities we left to letters, where applicable, lowercase.
-			$words = un_htmlspecialchars(Util::strtolower($words));
+			$words = un_htmlspecialchars(\ElkArte\Util::strtolower($words));
 
 			// Step 3: Ready to split apart and index!
 			$words = explode(' ', $words);
@@ -2124,7 +2119,7 @@ function discoverCollation()
 	$db_collation = '';
 
 	// If we're on MySQL supporting collations then let's find out what the members table uses and put it in a global var - to allow upgrade script to match collations!
-	if (!empty($databases[$db_type]['utf8_support']) && version_compare($databases[$db_type]['utf8_version'], $databases[$db_type]['utf8_version_check']($db_connection), '>'))
+	if (!empty($databases[$db_type]['test_collation']))
 	{
 		$db = load_database();
 

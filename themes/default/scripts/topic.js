@@ -1,11 +1,10 @@
 /*!
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  */
@@ -696,7 +695,7 @@ InTopicModeration.prototype.init = function()
 		// Append it to the container
 		var oCheckboxContainer = document.getElementById(this.opt.sCheckboxContainerMask + this.opt.aMessageIds[i]);
 		oCheckboxContainer.appendChild(oCheckbox);
-		oCheckboxContainer.style.display = '';
+		oCheckboxContainer.style.display = 'inline';
 	}
 };
 
@@ -911,6 +910,7 @@ function expandThumbLB(thumbID, messageID) {
 					setTimeout(function () {
 						ajaxIndicatorOff();
 						closeLightbox();
+						window.location = link.href;
 					}, 1500);
 				});
 		},

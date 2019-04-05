@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:    2011 Simple Machines (http://www.simplemachines.org)
- * license:    BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -26,14 +25,14 @@ function protected_alter($change, $substep, $is_test = false)
 {
 	global $db_prefix;
 
-	$table = db_table();
-	$db = database();
+	$db = load_database();
+	$table = db_table($db);
 
 	// Firstly, check whether the current index/column exists.
 	$found = false;
 	if ($change['type'] === 'column')
 	{
-		$columns = $table->db_list_columns('{db_prefix}' . $change['table'], true);
+		$columns = $table->list_columns('{db_prefix}' . $change['table'], true);
 		foreach ($columns as $column)
 		{
 			// Found it?
@@ -64,7 +63,7 @@ function protected_alter($change, $substep, $is_test = false)
 		$request = upgrade_query('
 			SHOW INDEX
 			FROM ' . $db_prefix . $change['table']);
-		if ($request !== false)
+		if ($request->hasResults())
 		{
 			$cur_index = array();
 
@@ -119,11 +118,11 @@ function protected_alter($change, $substep, $is_test = false)
 		{
 			$db->free_result($request);
 
-			$success = upgrade_query('
+			$alter_failed = upgrade_query('
 				ALTER TABLE ' . $db_prefix . $change['table'] . '
-				' . $change['text'], true) !== false;
+				' . $change['text'], true)->hasResults() === false;
 
-			if (!$success)
+			if ($alter_failed)
 			{
 				return false;
 			}
@@ -175,7 +174,7 @@ function upgrade_query($string, $unbuffered = false)
 	$db->setUnbuffered(false);
 
 	// Failure?!
-	if ($result !== false)
+	if ($result->hasResults())
 	{
 		return $result;
 	}

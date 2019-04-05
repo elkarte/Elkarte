@@ -1,7 +1,7 @@
 /*!
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  */
@@ -411,7 +411,7 @@
 
 					// Posts from the topic itself
 					for (var j = 0, topiclen =  data[i].msg_data.length; j < topiclen; j++) {
-						msgUrl = topicUrl + '.msg' +  data[i].msg_data[j].id_msg;
+						msgUrl = topicUrl + '.msg' +  data[i].msg_data[j].id_msg + '#msg' + data[i].msg_data[j].id_msg;
 
 						htmlContent += '' +
 							'   <div class="content forumposts">' +

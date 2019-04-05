@@ -3,13 +3,12 @@
 /**
  * This file contains functions regarding manipulation of and information about membergroups.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -216,7 +215,7 @@ function deleteMembergroups($groups)
  * @param bool $permissionCheckDone = false
  *
  * @return boolean
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function removeMembersFromGroups($members, $groups = null, $permissionCheckDone = false)
 {
@@ -333,7 +332,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 		return false;
 
 	// First, reset those who have this as their primary group - this is the easy one.
-	$log_inserts = $db->fetchQueryCallback('
+	$log_inserts = $db->fetchQuery('
 		SELECT id_member, id_group
 		FROM {db_prefix}members AS members
 		WHERE id_group IN ({array_int:group_list})
@@ -341,7 +340,8 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 		array(
 			'group_list' => $groups,
 			'member_list' => $members,
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($group_names)
 		{
 			return array('group' => $group_names[$row['id_group']], 'member' => $row['id_member']);
@@ -423,7 +423,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
  *                     available. If not, assign it to the additional group.
  * @param bool $permissionCheckDone = false if true, it checks permission of the current user to add groups ('manage_membergroups')
  * @return boolean success or failure
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDone = false)
 {
@@ -577,7 +577,7 @@ function cache_getMembergroupList()
 {
 	$db = database();
 
-	$groupCache = $db->fetchQueryCallback('
+	$groupCache = $db->fetchQuery('
 		SELECT id_group, group_name, online_color
 		FROM {db_prefix}membergroups
 		WHERE min_posts = {int:min_posts}
@@ -590,7 +590,8 @@ function cache_getMembergroupList()
 			'not_hidden' => 0,
 			'mod_group' => 3,
 			'blank_string' => '',
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			return '<a href="' . getUrl('group', ['action' => 'groups', 'sa' => 'members', 'group' => $row['id_group'], 'name' => $row['group_name']]) . '" ' . ($row['online_color'] ? 'style="color: ' . $row['online_color'] . '"' : '') . '>' . $row['group_name'] . '</a>';
@@ -1224,7 +1225,7 @@ function createMembergroup($groupname, $minposts, $type)
 			'icons' => 'string', 'online_color' => 'string', 'group_type' => 'int',
 		),
 		array(
-			'', Util::htmlspecialchars($groupname, ENT_QUOTES), $minposts,
+			'', \ElkArte\Util::htmlspecialchars($groupname, ENT_QUOTES), $minposts,
 			'1#icon.png', '', $type,
 		),
 		array('id_group')
@@ -1284,13 +1285,14 @@ function copyBoardPermissions($id_group, $copy_from)
 {
 	$db = database();
 
-	$inserts = $db->fetchQueryCallback('
+	$inserts = $db->fetchQuery('
 		SELECT id_profile, permission, add_deny
 		FROM {db_prefix}board_permissions
 		WHERE id_group = {int:copy_from}',
 		array(
 			'copy_from' => $copy_from,
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($id_group)
 		{
 			return array($id_group, $row['id_profile'], $row['permission'], $row['add_deny']);
@@ -1396,7 +1398,7 @@ function updateMembergroupProperties($properties)
 			switch ($known_properties[$name]['type'])
 			{
 				case 'string':
-					$values['subs_' . $name] = Util::htmlspecialchars((string) $value);
+					$values['subs_' . $name] = \ElkArte\Util::htmlspecialchars((string) $value);
 					break;
 				default:
 					$values['subs_' . $name] = (int) $value;
@@ -1428,7 +1430,7 @@ function detachGroupFromBoards($id_group, $boards, $access_list)
 	$db = database();
 
 	// Find all boards in whose access list this group is in, but shouldn't be.
-	$db->fetchQueryCallback('
+	$db->fetchQuery('
 		SELECT id_board, {raw:column}
 		FROM {db_prefix}boards
 		WHERE FIND_IN_SET({string:current_group}, {raw:column}) != 0' . (empty($boards[$access_list]) ? '' : '
@@ -1437,7 +1439,8 @@ function detachGroupFromBoards($id_group, $boards, $access_list)
 			'current_group' => $id_group,
 			'board_access_list' => $boards[$access_list],
 			'column' => $access_list == 'allow' ? 'member_groups' : 'deny_member_groups',
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($id_group, $access_list, $db)
 		{
 			$db->query('', '
@@ -1624,14 +1627,15 @@ function getIDMemberFromGroupModerators($moderators)
 {
 	$db = database();
 
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT id_member
 		FROM {db_prefix}members
 		WHERE member_name IN ({array_string:moderators}) OR real_name IN ({array_string:moderators})
 		LIMIT ' . count($moderators),
 		array(
 			'moderators' => $moderators,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			return $row['id_member'];
@@ -1898,7 +1902,7 @@ function accessibleGroups()
  *
  * @package Membergroups
  * @param string $where
- * @param string $where_parameters
+ * @param string[] $where_parameters
  * @return int the count of group requests
  */
 function list_getGroupRequestCount($where, $where_parameters)
@@ -1941,7 +1945,7 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
 {
 	$db = database();
 
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT lgr.id_request, lgr.id_member, lgr.id_group, lgr.time_applied, lgr.reason,
 			mem.member_name, mg.group_name, mg.online_color, mem.real_name
 		FROM {db_prefix}log_group_requests AS lgr
@@ -1952,7 +1956,8 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
 		LIMIT ' . $start . ', ' . $items_per_page,
 		array_merge($where_parameters, array(
 			'sort' => $sort,
-		)),
+		))
+	)->fetch_callback(
 		function ($row)
 		{
 			return array(
@@ -2002,7 +2007,7 @@ function updatePostGroupStats($members = null, $parameter2 = null)
 	if ($parameter2 !== null && !in_array('posts', $parameter2))
 		return;
 
-	$postgroups = Cache::instance()->get('updatePostGroupStats', 360);
+	$postgroups = \ElkArte\Cache\Cache::instance()->get('updatePostGroupStats', 360);
 	if ($postgroups === null || $members === null)
 	{
 		// Fetch the postgroups!
@@ -2022,7 +2027,7 @@ function updatePostGroupStats($members = null, $parameter2 = null)
 		// Sort them this way because if it's done with MySQL it causes a filesort :(.
 		arsort($postgroups);
 
-		Cache::instance()->put('updatePostGroupStats', $postgroups, 360);
+		\ElkArte\Cache\Cache::instance()->put('updatePostGroupStats', $postgroups, 360);
 	}
 
 	// Oh great, they've screwed their post groups.
@@ -2062,7 +2067,7 @@ function getUnassignableGroups($ignore_protected)
 {
 	$db = database();
 
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT id_group
 		FROM {db_prefix}membergroups
 		WHERE min_posts != {int:min_posts}' . ($ignore_protected ? '' : '
@@ -2070,7 +2075,8 @@ function getUnassignableGroups($ignore_protected)
 		array(
 			'min_posts' => -1,
 			'is_protected' => 1,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			return $row['id_group'];

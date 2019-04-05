@@ -302,7 +302,6 @@ $helptxt['attachmentSizeLimit'] = 'Specify the largest size a single attachment 
 $helptxt['attachmentNumPerPostLimit'] = 'Select the number of attachments a member can add per post.';
 $helptxt['attachmentCheckExtensions'] = 'Check this box to enable attachment filtering, which will only allow files to be uploaded with the file extensions that you have defined.';
 $helptxt['attachmentExtensions'] = 'Specify what attachment types are allowed, for example: jpg,png,gif  Remember to be careful in what you allow as some file extensions can cause a security risk to your website.';
-$helptxt['attachment_image_paranoid'] = 'Selecting this option will enable very strict security checks on image attachments. Warning! These extensive checks can fail on valid images too. It is strongly recommended to only use this option together with image re-encoding, in order to have ElkArte try to resample the images which fail the security checks: if successful, they will be sanitized and uploaded. Otherwise, if image re-encoding is not enabled, all attachments failing checks will be rejected.';
 $helptxt['attachment_autorotate'] = 'Selecting this option will allow the system to detect rotated images, typical of phone cameras, and automatically adjust the orientation such that the image top is oriented up. Requires either ImageMagick or both GD and Exif modules to be available.';
 $helptxt['attachmentShowImages'] = 'If the uploaded file is a picture, this will automatically display it underneath the post.';
 $helptxt['attachmentThumbnails'] = 'Enable this to show post images as a smaller thumbnail image, which when selected will expand to the full sized image.';
@@ -310,7 +309,6 @@ $helptxt['attachment_thumb_png'] = 'When creating thumbnails to display under a 
 $helptxt['attachmentThumbWidth'] = 'Only used with the &quot;Resize images when showing under posts&quot; option, the maximum width to resize attachments down from.  They will be resized proportionally.';
 $helptxt['attachmentThumbHeight'] = 'Only used with the &quot;Resize images when showing under posts&quot; option, the maximum height to resize attachments down from.  They will be resized proportionally.';
 $helptxt['attachment_image_reencode'] = 'Selecting this option will enable trying to re-encode the uploaded image attachments. Image re-encoding offers better security. Note however that image re-encoding also renders all animated images static.<br />This feature is only possible if the GD module is installed on your server.';
-$helptxt['attachment_thumb_memory'] = 'The larger the source image (size & width x height), the higher the memory requirements are for the system to successfully create a thumbnail image.<br />With this option checked, the system will estimate the required memory and will then request that amount.  If successful, only then will it attempt to create the thumbnail.<br />This will result in fewer white screen errors but may result in fewer thumbnails being created.  If you leave this option unchecked, the system will always try to create the thumbnail (with a fixed amount of memory).  This may result in more white screen errors.';
 $helptxt['max_image_height'] = 'The maximum displayed height of an attached image.';
 $helptxt['max_image_width'] = 'The maximum displayed width of an attached image.';
 $helptxt['attachmentUploadDir'] = 'Select where you want the files uploaded to be stored on your server. This can be located outside your public html directory for additional security.';
@@ -591,6 +589,7 @@ $helptxt['field_show_enclosed'] = 'Encloses the user input between some text or 
 		You can use the following variables:<br />
 		<ul class="normallist">
 			<li>{INPUT} - The input specified by the user.</li>
+			<li>{KEY} - The key specified for a certain value of select box or radio buttons in the admin panel. Usually to use in case of localization or use in CSS of Javascript elements (e.g. as class name).</li>
 			<li>{SCRIPTURL} - Web address of forum.</li>
 			<li>{IMAGES_URL} - URI of the images directory of the user\'s current theme.</li>
 			<li>{DEFAULT_IMAGES_URL} - URI of the images directory of the default theme.</li>
@@ -622,7 +621,6 @@ $helptxt['custom_mask'] = 'The input mask is important for your forum\'s securit
 $helptxt['badbehavior_reverse_proxy_addresses'] = 'In some server farm configurations, Bad Behavior may be unable to determine whether a remote request originated from your reverse proxy/load balancer or arrived directly. In this case you should add all of the internal IP addresses for your reverse proxy/load balancer servers as seen from the origin server. These can usually be omitted; however if you have a configuration where some requests can bypass the reverse proxy/load balancer and connect to the origin server directly, then you should use this option. You should also use this option when incoming requests pass through two or more reverse proxies before reaching the origin server.<br /><br />Enter each IP address or CIDR netblocks separated by a | (1.2.3.4|5.4.3.2/27)';
 $helptxt['badbehavior_reverse_proxy_header'] = 'When a reverse proxy is in use, Bad Behavior looks at this HTTP header to determine the actual source IP address for each web request. Your reverse proxy or load balancer must add an HTTP header containing the remote IP address where the connection originated. Most do this by default; check the configuration for your reverse proxy or load balancer to ensure that this header is sent.<br /><br />If you use the CloudFlare service, you should change this option to CF-Connecting-IP.';
 $helptxt['badbehavior_reverse_proxy'] = 'When enabled, Bad Behavior will assume it is receiving a connection from a reverse proxy, when a specific HTTP header is received.';
-$helptxt['badbehavior_eucookie'] = 'Set this option on if you believe Bad Behavior\'s site security cookie is not exempt from the 2012 EU cookie regulation.</a>';
 $helptxt['badbehavior_httpbl_maxage'] = 'This is the number of days since suspicious activity was last observed from an IP address by Project Honey Pot. Bad Behavior will block requests with a maximum age equal to or less than this setting.';
 $helptxt['badbehavior_httpbl_threat'] = 'This number provides a measure of how suspicious an IP address is, based on activity observed at Project Honey Pot. Bad Behavior will block requests with a threat level equal or higher to this setting. Project Honey Pot has <a href="http://www.projecthoneypot.org/threat_info.php" target="_blank">more information on this parameter</a>.';
 $helptxt['badbehavior_httpbl_key'] = 'Bad Behavior is capable of using data from the <a href="http://www.projecthoneypot.org/faq.php#g" target="_blank">http:BL</a> service provided by <a href="http://www.projecthoneypot.org/" target="_blank">Project Honey Pot</a> to screen requests.<br /><br />This is purely optional; however if you wish to use it, you must <a href="http://www.projecthoneypot.org/httpbl_configure.php" target="_blank">sign up for the service</a> and obtain an API key. To disable http:BL use, remove the API key from your settings.';
@@ -676,7 +674,7 @@ $helptxt['attachment_inline_title'] = '<b>Add an inline attachment</b><br />
 				<li>align=left : The image is aligned to the left and the text will flow around it</li>
 				<li>align=right : The image is aligned to the right and the text will flow around it</li>
 				<li>align=center : The image is centered and the text will be below it</li>
-			<ul>
+			</ul>
 		</p><br />
 		<p>
 			You can choose how wide to show the image:
@@ -684,7 +682,7 @@ $helptxt['attachment_inline_title'] = '<b>Add an inline attachment</b><br />
 				<li>width=123 : The image is displayed 123 pixels wide</li>
 				<li>If the width specified is larger than the image or larger than the forum allows the largest allowable width will be used</li>
 				<li>Can be used to shrink a thumbnail as well [attach width=50]x[/attach] will display a 50px wide thumbnail</li>
-			<ul>
+			</ul>
 		</p><br />
 		<p>
 			You can choose how tall to show the image:

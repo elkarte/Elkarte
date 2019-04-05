@@ -4,9 +4,9 @@
  * This file contains those functions pertaining to polls, including removing
  * resetting votes, editing, adding, and more
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -198,7 +198,7 @@ function pollInfo($id_poll, $ignore_permissions = true)
  *
  * @param int $topicID the topic with an associated poll.
  *
- * @return bool
+ * @return string[]|bool
  */
 function pollInfoForTopic($topicID)
 {
@@ -550,6 +550,7 @@ function pollStarters($id_topic)
  * Check if they have already voted, or voting is locked.
  *
  * @param int $topic the topic with an associated poll
+ * @return mixed[]
  */
 function checkVote($topic)
 {
@@ -716,11 +717,11 @@ function determineVote($id_member, $id_poll)
  *
  * @deprecated since 2.0 - use pollInfoForTopic instead
  * @param int $id_topic
- * @return array
+ * @return string[]|bool
  */
 function pollStatus($id_topic)
 {
-	Errors::instance()->log_deprecated('pollStatus()', 'pollInfoForTopic()');
+	\ElkArte\Errors\Errors::instance()->log_deprecated('pollStatus()', 'pollInfoForTopic()');
 	return pollInfoForTopic($id_topic);
 }
 
@@ -788,7 +789,7 @@ function getPollChoices($id_poll)
  * @param int $id_topic The id of the topic that has an associated poll
  *
  * @return array
- * @throws Elk_Exception no_board
+ * @throws \ElkArte\Exceptions\Exception no_board
  */
 function getPollStarter($id_topic)
 {
@@ -805,7 +806,7 @@ function getPollStarter($id_topic)
 		)
 	);
 	if ($db->num_rows($request) == 0)
-		throw new Elk_Exception('no_board');
+		throw new \ElkArte\Exceptions\Exception('no_board');
 	$bcinfo = $db->fetch_assoc($request);
 	$db->free_result($request);
 

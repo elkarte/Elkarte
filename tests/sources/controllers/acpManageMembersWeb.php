@@ -7,7 +7,7 @@
  *
  * @backupGlobals disabled
  */
-class TestManageMembers_Controller extends ElkArteWebTest
+class TestManageMembersController extends ElkArteWebTest
 {
 	public function registerMembers()
 	{

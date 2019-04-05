@@ -3,13 +3,12 @@
 /**
  * Moderation log helper functions.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -115,7 +114,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 	$entries = array();
 	while ($row = $db->fetch_assoc($result))
 	{
-		$row['extra'] = Util::unserialize($row['extra']);
+		$row['extra'] = \ElkArte\Util::unserialize($row['extra']);
 
 		// Corrupt?
 		$row['extra'] = is_array($row['extra']) ? $row['extra'] : array();

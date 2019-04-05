@@ -4,9 +4,9 @@
  * Should be run from a cron job to fetch messages from an imap mailbox
  * Can be called from scheduled tasks (fake-cron) if needed
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -18,8 +18,11 @@ error_reporting(0);
 // Being run as a cron job
 if (!defined('ELK'))
 {
+	global $ssi_guest_access;
+
 	require_once(__DIR__ . '/bootstrap.php');
-	new Bootstrap();
+	$ssi_guest_access = true;
+	new Bootstrap(true);
 	postbyemail_imap();
 
 	// Need to keep the cli clean on return
@@ -47,7 +50,7 @@ function postbyemail_imap()
 		return false;
 	}
 
-	$pbe = new Pbe_Imap();
+	$pbe = new \ElkArte\PbeImap();
 
 	if ($pbe !== false)
 	{

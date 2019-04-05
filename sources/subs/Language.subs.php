@@ -3,9 +3,9 @@
 /**
  * This file contains the database work for languages.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -90,7 +90,7 @@ function list_getLanguages()
 			'char_set' => 'UTF-8',
 			'default' => $language == $lang['filename'] || ($language == '' && $lang['filename'] == 'english'),
 			'locale' => $txt['lang_locale'],
-			'name' => Util::ucwords(strtr($lang['filename'], array('_' => ' ', '-utf8' => ''))),
+			'name' => \ElkArte\Util::ucwords(strtr($lang['filename'], array('_' => ' ', '-utf8' => ''))),
 		);
 	}
 
@@ -230,7 +230,7 @@ function cleanLangString($string, $to_display = true)
 		}
 
 		// Un-html then re-html the whole thing!
-		$new_string = Util::htmlspecialchars(un_htmlspecialchars($new_string));
+		$new_string = \ElkArte\Util::htmlspecialchars(un_htmlspecialchars($new_string));
 	}
 	else
 	{
@@ -352,7 +352,7 @@ function list_getLanguagesList()
 	$url = 'http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, array('ElkArte ' => '')));
 
 	// Load the class file and stick it into an array.
-	$language_list = new Xml_Array(fetch_web_data($url), true);
+	$language_list = new \ElkArte\XmlArray(fetch_web_data($url), true);
 
 	// Check that the site responded and that the language exists.
 	if (!$language_list->exists('languages'))
@@ -367,12 +367,12 @@ function list_getLanguagesList()
 		foreach ($lang_files as $file)
 		{
 			// Were we searching?
-			if (!empty($context['elk_search_term']) && strpos($file->fetch('name'), Util::strtolower($context['elk_search_term'])) === false)
+			if (!empty($context['elk_search_term']) && strpos($file->fetch('name'), \ElkArte\Util::strtolower($context['elk_search_term'])) === false)
 				continue;
 
 			$languages[] = array(
 				'id' => $file->fetch('id'),
-				'name' => Util::ucwords($file->fetch('name')),
+				'name' => \ElkArte\Util::ucwords($file->fetch('name')),
 				'version' => $file->fetch('version'),
 				'utf8' => $txt['yes'],
 				'description' => $file->fetch('description'),

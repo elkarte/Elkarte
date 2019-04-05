@@ -3,13 +3,12 @@
 /**
  * This file contains all the functions for paid subscriptions.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -391,27 +390,28 @@ function loadPaymentGateways()
 
 	try
 	{
-		$files = new FilesystemIterator(SUBSDIR, FilesystemIterator::SKIP_DOTS);
+		$files = new \FilesystemIterator(SOURCEDIR . '/ElkArte/Subscriptions/PaymentGateway', \FilesystemIterator::SKIP_DOTS);
 		foreach ($files as $file)
 		{
-			if ($file->isFile() && preg_match('~^Subscriptions-([A-Za-z\d]+)\.class\.php$~', $file->getFilename(), $matches))
+			if ($file->isDir())
 			{
 				// Check this is definitely a valid gateway!
 				$fp = fopen($file->getPathname(), 'rb');
 				$header = fread($fp, 4096);
 				fclose($fp);
+				$filename = $file->getFilename();
 
-				if (strpos($header, 'Payment Gateway: ' . $matches[1]) !== false)
+				if (strpos($header, 'Payment Gateway: ' . $filename) !== false)
 				{
 					require_once($file->getPathname());
 
 					$gateways[] = array(
 						'filename' => $file->getFilename(),
-						'code' => strtolower($matches[1]),
+						'code' => strtolower($filename),
 						// Don't need anything snazzier than this yet.
-						'valid_version' => class_exists($matches[1] . '_Payment') && class_exists($matches[1] . '_Display'),
-						'payment_class' => $matches[1] . '_Payment',
-						'display_class' => $matches[1] . '_Display',
+						'valid_version' => class_exists('\\ElkArte\\Subscriptions\\PaymentGateway\\' . $filename . '\\Payment') && class_exists($filename . '_Display'),
+						'payment_class' => '\\ElkArte\\Subscriptions\\PaymentGateway\\' . $filename . '\\Payment',
+						'display_class' => '\\ElkArte\\Subscriptions\\PaymentGateway\\' . $filename . '\\Display',
 					);
 				}
 			}
@@ -451,7 +451,7 @@ function loadSubscriptions()
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Pick a cost.
-		$costs = Util::unserialize($row['cost']);
+		$costs = \ElkArte\Util::unserialize($row['cost']);
 
 		if ($row['length'] != 'F' && !empty($modSettings['paid_currency_symbol']) && !empty($costs['fixed']))
 			$cost = sprintf($modSettings['paid_currency_symbol'], $costs['fixed']);
@@ -849,7 +849,7 @@ function getSubscriptionDetails($sub_id)
 			'id' => $row['id_subscribe'],
 			'name' => $row['name'],
 			'desc' => $row['description'],
-			'cost' => Util::unserialize($row['cost']),
+			'cost' => \ElkArte\Util::unserialize($row['cost']),
 			'span' => array(
 				'value' => $span_value,
 				'unit' => $span_unit,
@@ -875,7 +875,7 @@ function getSubscriptionDetails($sub_id)
  * @param int $id
  *
  * @return int
- * @throws Elk_Exception no_access
+ * @throws \ElkArte\Exceptions\Exception no_access
  */
 function validateSubscriptionID($id)
 {
@@ -896,7 +896,7 @@ function validateSubscriptionID($id)
 
 	// Humm this should not happen, if it does, boom
 	if ($sub_id === null)
-		throw new Elk_Exception('no_access', false);
+		throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 	return $sub_id;
 }
@@ -936,7 +936,7 @@ function alreadySubscribed($id_sub, $id_member)
  * @param int $log_id
  *
  * @return array
- * @throws Elk_Exception no_access
+ * @throws \ElkArte\Exceptions\Exception no_access
  */
 function getSubscriptionStatus($log_id)
 {
@@ -960,7 +960,7 @@ function getSubscriptionStatus($log_id)
 
 	// Nothing found?
 	if (empty($status))
-		throw new Elk_Exception('no_access', false);
+		throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 	return $status;
 }

@@ -3,9 +3,9 @@
 /**
  * Support functions for the drafts controller
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -275,7 +275,7 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $order = 
 			'order' => $order,
 			'limit' => $limit,
 		)
-	);
+	)->fetch_all();
 }
 
 /**
@@ -407,14 +407,15 @@ function getOldDrafts($days)
 	$db = database();
 
 	// Find all of the old drafts
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT
 			id_draft
 		FROM {db_prefix}user_drafts
 		WHERE poster_time <= {int:poster_time_old}',
 		array(
 			'poster_time_old' => time() - (86400 * $days),
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			return (int) $row['id_draft'];
@@ -431,7 +432,7 @@ function getOldDrafts($days)
  * @package Drafts
  * @param mixed[] $draft
  * @param boolean $check_last_save
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function saveDraft($draft, $check_last_save = false)
 {
@@ -460,12 +461,12 @@ function saveDraft($draft, $check_last_save = false)
 	}
 
 	// Be ready for surprises
-	$post_errors = ElkArte\Errors\ErrorContext::context('post', 1);
+	$post_errors = \ElkArte\Errors\ErrorContext::context('post', 1);
 
 	// The message and subject still need a bit more work
 	preparsecode($draft['body']);
-	if (Util::strlen($draft['subject']) > 100)
-		$draft['subject'] = Util::substr($draft['subject'], 0, 100);
+	if (\ElkArte\Util::strlen($draft['subject']) > 100)
+		$draft['subject'] = \ElkArte\Util::substr($draft['subject'], 0, 100);
 
 	if (!isset($draft['is_usersaved']))
 		$draft['is_usersaved'] = 0;
@@ -513,7 +514,7 @@ function saveDraft($draft, $check_last_save = false)
  * @param boolean $check_last_save
  *
  * @return bool|void
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function savePMDraft($recipientList, $draft, $check_last_save = false)
 {
@@ -522,7 +523,7 @@ function savePMDraft($recipientList, $draft, $check_last_save = false)
 	// Read in what was sent
 	$id_pm_draft = $draft['id_pm_draft'];
 	$draft_info = loadDraft($id_pm_draft, 1);
-	$post_errors = ElkArte\Errors\ErrorContext::context('pm', 1);
+	$post_errors = \ElkArte\Errors\ErrorContext::context('pm', 1);
 
 	// 5 seconds is the same limit we have for posting
 	if ($check_last_save && !empty($draft_info['poster_time']) && time() < $draft_info['poster_time'] + 5)
@@ -542,12 +543,12 @@ function savePMDraft($recipientList, $draft, $check_last_save = false)
 
 	// Determine who this is being sent to
 	if (!$check_last_save && !empty($draft_info['to_list']) && empty($recipientList))
-		$recipientList = Util::unserialize($draft_info['to_list']);
+		$recipientList = \ElkArte\Util::unserialize($draft_info['to_list']);
 
 	// message and subject always need a bit more work
 	preparsecode($draft['body']);
-	if (Util::strlen($draft['subject']) > 100)
-		$draft['subject'] = Util::substr($draft['subject'], 0, 100);
+	if (\ElkArte\Util::strlen($draft['subject']) > 100)
+		$draft['subject'] = \ElkArte\Util::substr($draft['subject'], 0, 100);
 
 	if (!isset($draft['is_usersaved']))
 		$draft['is_usersaved'] = 0;
@@ -646,7 +647,7 @@ function loadDraft($id_draft, $type = 0, $check = true, $load = false)
 			$_REQUEST['message'] = !empty($draft_info['body']) ? $draft_info['body'] : '';
 			$_REQUEST['replied_to'] = !empty($draft_info['id_reply']) ? $draft_info['id_reply'] : 0;
 			$context['id_pm_draft'] = !empty($draft_info['id_draft']) ? $draft_info['id_draft'] : 0;
-			$recipients = Util::unserialize($draft_info['to_list']);
+			$recipients = \ElkArte\Util::unserialize($draft_info['to_list']);
 
 			// Make sure we only have integers in this array
 			$recipients['to'] = array_map('intval', $recipients['to']);

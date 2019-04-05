@@ -14,8 +14,6 @@ class TestPBE extends \PHPUnit\Framework\TestCase
 	 */
 	public function setUp()
 	{
-		require_once(CONTROLLERDIR . '/Emailpost.controller.php');
-		require_once(SUBSDIR . '/EmailParse.class.php');
 		require_once(SUBSDIR . '/Emailpost.subs.php');
 
 		theme()->getTemplates()->loadLanguageFile('Maillist');
@@ -118,7 +116,7 @@ Regards, The ElkArte Community
 	public function testMailParse()
 	{
 		// Parse a simple email
-		$email_message = new Email_Parse();
+		$email_message = new \ElkArte\EmailParse();
 		$email_message->read_email(true, $this->_email);
 
 		// Basics

@@ -1,12 +1,11 @@
 <?php if (!defined('BB2_CWD')) die("I said no cheating!");
-define('BB2_VERSION', "2.2.20");
+define('BB2_VERSION', "2.2.22");
 
 // Bad Behavior entry point is bb2_start()
 // If you're reading this, you are probably lost.
 // Go read the bad-behavior-generic.php file.
 
 define('BB2_CORE', dirname(__FILE__));
-define('BB2_COOKIE', 'bb2_screener_');
 
 require_once(BB2_CORE . "/functions.inc.php");
 
@@ -230,10 +229,6 @@ function bb2_screen($settings, $package)
 			if ($r = bb2_post($settings, $package)) return $r;
 		}
 	}
-
-	// Last chance screening.
-	require_once(BB2_CORE . "/screener.inc.php");
-	bb2_screener($settings, $package);
 
 	// And that's about it.
 	bb2_approved($settings, $package);

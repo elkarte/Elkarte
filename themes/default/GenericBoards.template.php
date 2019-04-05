@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -112,7 +111,7 @@ function template_list_boards(array $boards, $id)
 		// Is it a redirection board?
 		elseif ($board['is_redirect'])
 			echo '
-							<span class="board_icon i-board-redirect" title="', sprintf($txt['redirect_board_to'], Util::htmlspecialchars($board['name'])), '"></span>';
+							<span class="board_icon i-board-redirect" title="', sprintf($txt['redirect_board_to'], \ElkArte\Util::htmlspecialchars($board['name'])), '"></span>';
 
 		// No new posts at all! The agony!!
 		else

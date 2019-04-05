@@ -31,8 +31,8 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 
 		foreach (array_keys($auto_actions) as $action)
 		{
-			$controller_name = ucfirst($action) . '_Controller';
-			$controller = new $controller_name(new Event_Manager());
+			$controller_name = '\\ElkArte\\Controller\\' . ucfirst($action);
+			$controller = new $controller_name(new \ElkArte\EventManager());
 			foreach ($auto_actions[$action] as $subaction)
 				$this->assertTrue(method_exists($controller, 'action_' . $subaction));
 		}
@@ -47,30 +47,30 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 		// controller hardcoded, sa action
 		// these are ?action=name routed to SomeController->action_name()
 		$actions = array(
-			'activate' => 'Register',
-			'attachapprove' => 'ModerateAttachments',
-			'addbuddy' => 'Members',
-			'collapse' => 'BoardIndex',
-			'contact' => 'Register',
-			'coppa' => 'Register',
-			'deletemsg' => 'RemoveTopic',
-			'dlattach' => 'Attachment',
-			'unwatchtopic' => 'Notify',
-			'quickhelp' => 'Help',
-			'login' => 'Auth',
-			'login2' => 'Auth',
-			'logout' => 'Auth',
-			'quotefast' => 'Post',
-			'quickmod' => 'MessageIndex',
-			'quickmod2' => 'Display',
-			'openidreturn' => 'OpenID',
+			'activate' => '\\ElkArte\\Controller\\Register',
+			'attachapprove' => '\\ElkArte\\Controller\\ModerateAttachments',
+			'addbuddy' => '\\ElkArte\\Controller\\Members',
+			'collapse' => '\\ElkArte\\Controller\\BoardIndex',
+			'contact' => '\\ElkArte\\Controller\\Register',
+			'coppa' => '\\ElkArte\\Controller\\Register',
+			'deletemsg' => '\\ElkArte\\Controller\\RemoveTopic',
+			'dlattach' => '\\ElkArte\\Controller\\Attachment',
+			'unwatchtopic' => '\\ElkArte\\Controller\\Notify',
+			'quickhelp' => '\\ElkArte\\Controller\\Help',
+			'login' => '\\ElkArte\\Controller\\Auth',
+			'login2' => '\\ElkArte\\Controller\\Auth',
+			'logout' => '\\ElkArte\\Controller\\Auth',
+			'quotefast' => '\\ElkArte\\Controller\\Post',
+			'quickmod' => '\\ElkArte\\Controller\\MessageIndex',
+			'quickmod2' => '\\ElkArte\\Controller\\Display',
+			'openidreturn' => '\\ElkArte\\Controller\\OpenID',
 
 		);
 
 		foreach (array_keys($actions) as $action)
 		{
-			$controller_name = ucfirst($actions[$action]) . '_Controller';
-			$controller = new $controller_name(new Event_Manager());
+			$controller_name = ucfirst($actions[$action]);
+			$controller = new $controller_name(new \ElkArte\EventManager());
 			$this->assertTrue(method_exists($controller, 'action_' . $action));
 		}
 
@@ -89,7 +89,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 				'test_name' => 'no action',
 				'result' => array(
 					'function_name' => 'action_boardindex',
-					'controller_name' => 'BoardIndex_Controller',
+					'controller_name' => '\\ElkArte\\Controller\\BoardIndex',
 				),
 			),
 			// A topic
@@ -99,7 +99,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 				'topic' => 1,
 				'result' => array(
 					'function_name' => 'action_display',
-					'controller_name' => 'Display_Controller',
+					'controller_name' => '\\ElkArte\\Controller\\Display',
 				),
 			),
 			// A board
@@ -108,7 +108,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 				'board' => 1,
 				'result' => array(
 					'function_name' => 'action_messageindex',
-					'controller_name' => 'MessageIndex_Controller',
+					'controller_name' => '\\ElkArte\\Controller\\MessageIndex',
 				),
 			),
 			// Non-existing action
@@ -117,7 +117,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 				'action' => 'qwerty',
 				'result' => array(
 					'function_name' => 'action_boardindex',
-					'controller_name' => 'BoardIndex_Controller',
+					'controller_name' => '\\ElkArte\\Controller\\BoardIndex',
 				),
 			),
 			// An existing one, no sub-action, naming patterns
@@ -126,7 +126,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 				'action' => 'announce',
 				'result' => array(
 					'function_name' => 'action_index',
-					'controller_name' => 'Announce_Controller',
+					'controller_name' => '\\ElkArte\\Controller\\Announce',
 				),
 			),
 			// An existing one, with sub-action, naming patterns
@@ -136,7 +136,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 				'sa' => 'test',
 				'result' => array(
 					'function_name' => 'action_index',
-					'controller_name' => 'Announce_Controller',
+					'controller_name' => '\\ElkArte\\Controller\\Announce',
 				),
 			),
 			// An existing one, action array, naming patterns, ADMINDIR
@@ -145,7 +145,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 				'action' => 'admin',
 				'result' => array(
 					'function_name' => 'action_index',
-					'controller_name' => 'Admin_Controller',
+					'controller_name' => '\\ElkArte\\AdminController\\Admin',
 				),
 			),
 			// An existing one, action array
@@ -154,7 +154,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 				'action' => 'removetopic2',
 				'result' => array(
 					'function_name' => 'action_removetopic2',
-					'controller_name' => 'RemoveTopic_Controller',
+					'controller_name' => '\\ElkArte\\Controller\\RemoveTopic',
 				),
 			),
 		);
@@ -170,7 +170,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 			);
 
 			// Start a new dispatcher every time (the dispatching is done on __construct)
-			$dispatcher = New Site_Dispatcher_Tester(new HttpReq);
+			$dispatcher = New SiteDispatcher_Tester(new \ElkArte\HttpReq);
 			$this->assertTrue($dispatcher->compare($test['result']), $test['test_name']);
 		}
 	}
@@ -193,14 +193,14 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 }
 
 /**
- * A small variation of Site_Dispatcher that provides a method to expose the
+ * A small variation of SiteDispatcher that provides a method to expose the
  * otherwise hidden results of the dispaching (_function_name and _controller_name)
  */
-class Site_Dispatcher_Tester extends Site_Dispatcher
+class SiteDispatcher_Tester extends \ElkArte\SiteDispatcher
 {
 	/**
 	 * This method compares the values of _function_name and
-	 * _controller_name obtained from the Site_Dispatcher and the expected values
+	 * _controller_name obtained from the SiteDispatcher and the expected values
 	 *
 	 * @param array An array containing the expected results of a dispaching in the form:
 	 *              'function_name' => 'function_name',

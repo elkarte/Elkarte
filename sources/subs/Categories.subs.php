@@ -3,13 +3,12 @@
 /**
  * This file contains the functions to add, modify, remove, collapse and expand categories.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -55,16 +54,22 @@ function modifyCategory($category_id, $catOptions)
 		while ($row = $db->fetch_assoc($request))
 		{
 			if ($row['id_cat'] != $category_id)
+			{
 				$cats[] = $row['id_cat'];
+			}
 			if ($row['id_cat'] == $catOptions['move_after'])
+			{
 				$cats[] = $category_id;
+			}
 			$cat_order[$row['id_cat']] = $row['cat_order'];
 		}
 		$db->free_result($request);
 
 		// Set the new order for the categories.
 		foreach ($cats as $index => $cat)
+		{
 			if ($index != $cat_order[$cat])
+			{
 				$db->query('', '
 					UPDATE {db_prefix}categories
 					SET cat_order = {int:new_order}
@@ -74,10 +79,12 @@ function modifyCategory($category_id, $catOptions)
 						'current_category' => $cat,
 					)
 				);
+			}
+		}
 
 		// If the category order changed, so did the board order.
-		require_once(SUBSDIR . '/Boards.subs.php');
-		reorderBoards();
+		$boardTree = new \ElkArte\BoardsTree($db);
+		$boardTree->reorderBoards();
 	}
 
 	if (isset($catOptions['cat_name']))
@@ -178,17 +185,15 @@ function createCategory($catOptions)
  *
  * @param int[] $categories
  * @param integer|null $moveBoardsTo = null
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function deleteCategories($categories, $moveBoardsTo = null)
 {
-	global $cat_tree;
-
 	$db = database();
 
 	require_once(SUBSDIR . '/Boards.subs.php');
 
-	getBoardTree();
+	$boardTree = new \ElkArte\BoardsTree($db);
 
 	call_integration_hook('integrate_delete_category', array($categories, &$moveBoardsTo));
 
@@ -198,13 +203,18 @@ function deleteCategories($categories, $moveBoardsTo = null)
 		$boards_inside = array_keys(fetchBoardsInfo(array('categories' => $categories)));
 
 		if (!empty($boards_inside))
-			deleteBoards($boards_inside, null);
+		{
+			$boardTree->deleteBoards($boards_inside, null);
+		}
 	}
 	// Make sure the safe category is really safe.
 	elseif (in_array($moveBoardsTo, $categories))
+	{
 		trigger_error('deleteCategories(): You cannot move the boards to a category that\'s being deleted', E_USER_ERROR);
+	}
 	// Move the boards inside the categories to a safe category.
 	else
+	{
 		$db->query('', '
 			UPDATE {db_prefix}boards
 			SET id_cat = {int:new_parent_cat}
@@ -214,6 +224,7 @@ function deleteCategories($categories, $moveBoardsTo = null)
 				'new_parent_cat' => $moveBoardsTo,
 			)
 		);
+	}
 
 	// No one will ever be able to collapse these categories anymore.
 	$db->query('', '
@@ -235,10 +246,12 @@ function deleteCategories($categories, $moveBoardsTo = null)
 
 	// Log what we've done.
 	foreach ($categories as $category)
-		logAction('delete_cat', array('catname' => $cat_tree[$category]['node']['name']), 'admin');
+	{
+		logAction('delete_cat', array('catname' => $boardTree->getCategoryNodeById($category)['name']), 'admin');
+	}
 
 	// Get all boards back into the right order.
-	reorderBoards();
+	$boardTree->reorderBoards();
 }
 
 /**
@@ -295,7 +308,7 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 			'insert' => array(),
 			'remove' => array(),
 		);
-		$db->fetchQueryCallback('
+		$db->fetchQuery('
 			SELECT mem.id_member, c.id_cat, COALESCE(cc.id_cat, 0) AS is_collapsed, c.can_collapse
 			FROM {db_prefix}members AS mem
 				INNER JOIN {db_prefix}categories AS c ON (c.id_cat IN ({array_int:category_list}))
@@ -305,7 +318,8 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 			array(
 				'category_list' => $categories,
 				'member_list' => $members,
-			),
+			)
+		)->fetch_callback(
 			function ($row) use (&$updates, $check_collapsable)
 			{
 				if (empty($row['is_collapsed']) && (!empty($row['can_collapse']) || !$check_collapsable))

@@ -130,6 +130,7 @@ $txt['no_theme'] = ' We can\'t find that theme.';
 $txt['theme_dir_wrong'] = 'The default theme\'s directory is wrong, please correct it by clicking this text.';
 $txt['registration_disabled'] = 'Sorry, registration is currently disabled.';
 $txt['registration_agreement_missing'] = 'The registration agreement file, agreement.txt, is either missing or empty.  Registrations will be disabled until this is fixed';
+$txt['registration_privacy_policy_missing'] = 'The privacy policy file, privacypolicy.txt, is either missing or empty.  Registrations will be disabled until this is fixed';
 $txt['registration_no_secret_question'] = 'Sorry, there is no secret question set for this member.';
 $txt['poll_range_error'] = 'Sorry, the poll must run for more than 0 days.';
 $txt['delFirstPost'] = 'You are not allowed to delete the first post in a topic.<p>If you want to delete this topic, click on the Remove link, or ask a moderator/administrator to do it for you.</p>';
@@ -428,4 +429,4 @@ $txt['error_sa_not_set'] = 'The Sub-action you requested is not defined';
 // Drag / Drop sort errors
 $txt['no_sortable_items'] = 'No sortable items were found';
 
-$txt['error_invalid_notification_id'] = 'An addons is trying to register a notification method with an existing ID. ID lower than 5 are protected and cannot be used by addons, if the ID is higher, than two addons may be sharing the same ID.';
+$txt['error_invalid_notification_id'] = 'An addon is trying to register a notification method with an existing ID. IDs lower than 5 are protected and cannot be used by addons. If the ID is higher, then two addons may be sharing the same ID.';

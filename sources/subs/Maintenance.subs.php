@@ -3,13 +3,12 @@
 /**
  * Forum maintenance support functions. Important stuff.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -83,7 +82,7 @@ function flushLogTables()
 function getMessageTableColumns()
 {
 	$table = db_table();
-	$colData = $table->db_list_columns('{db_prefix}messages', true);
+	$colData = $table->list_columns('{db_prefix}messages', true);
 
 	return $colData;
 }
@@ -98,7 +97,7 @@ function fetchBodyType()
 {
 	$table = db_table();
 
-	$colData = $table->db_list_columns('{db_prefix}messages', true);
+	$colData = $table->list_columns('{db_prefix}messages', true);
 	foreach ($colData as $column)
 		if ($column['name'] == 'body')
 			$body_type = $column['type'];
@@ -115,7 +114,7 @@ function fetchBodyType()
 function resizeMessageTableBody($type)
 {
 	$table = db_table();
-	$table->db_change_column('{db_prefix}messages', 'body', array('type' => $type));
+	$table->change_column('{db_prefix}messages', 'body', array('type' => $type));
 }
 
 /**
@@ -132,7 +131,7 @@ function detectExceedingMessages($start, $increment)
 {
 	$db = database();
 
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT /*!40001 SQL_NO_CACHE */ id_msg
 		FROM {db_prefix}messages
 		WHERE id_msg BETWEEN {int:start} AND {int:start} + {int:increment}
@@ -140,7 +139,8 @@ function detectExceedingMessages($start, $increment)
 		array(
 			'start' => $start,
 			'increment' => $increment - 1,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			return $row['id_msg'];
@@ -164,13 +164,14 @@ function getExceedingMessages($msg)
 
 	$db = database();
 
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT id_msg, id_topic, subject
 		FROM {db_prefix}messages
 		WHERE id_msg IN ({array_int:messages})',
 		array(
 			'messages' => $msg,
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($scripturl)
 		{
 			return '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>';
@@ -198,7 +199,7 @@ function getElkTables()
 	$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
 
 	// Get a list of tables, as well as how many there are.
-	$temp_tables = $db->db_list_tables(false, $real_prefix . '%');
+	$temp_tables = $db->list_tables(false, $real_prefix . '%');
 	foreach ($temp_tables as $table)
 			$tables[] = array('table_name' => $table);
 
@@ -239,7 +240,7 @@ function recountApprovedMessages($start, $increment)
 	$db = database();
 
 	// Recount approved messages
-	$db->fetchQueryCallback('
+	$db->fetchQuery('
 		SELECT /*!40001 SQL_NO_CACHE */ t.id_topic, MAX(t.num_replies) AS num_replies,
 			CASE WHEN COUNT(ma.id_msg) >= 1 THEN COUNT(ma.id_msg) - 1 ELSE 0 END AS real_num_replies
 		FROM {db_prefix}topics AS t
@@ -252,7 +253,8 @@ function recountApprovedMessages($start, $increment)
 			'is_approved' => 1,
 			'start' => $start,
 			'max_id' => $start + $increment,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			setTopicAttribute($row['id_topic'], array('num_replies' => $row['real_num_replies']));
@@ -272,7 +274,7 @@ function recountUnapprovedMessages($start, $increment)
 	$db = database();
 
 	// Recount unapproved messages
-	$db->fetchQueryCallback('
+	$db->fetchQuery('
 		SELECT /*!40001 SQL_NO_CACHE */ t.id_topic, MAX(t.unapproved_posts) AS unapproved_posts,
 			COUNT(mu.id_msg) AS real_unapproved_posts
 		FROM {db_prefix}topics AS t
@@ -285,7 +287,8 @@ function recountUnapprovedMessages($start, $increment)
 			'not_approved' => 0,
 			'start' => $start,
 			'max_id' => $start + $increment,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			setTopicAttribute($row['id_topic'], array('unapproved_posts' => $row['real_unapproved_posts']));
@@ -471,7 +474,7 @@ function updatePersonalMessagesCounter()
 
 	require_once(SUBSDIR . '/Members.subs.php');
 
-	$db->fetchQueryCallback('
+	$db->fetchQuery('
 		SELECT /*!40001 SQL_NO_CACHE */ mem.id_member, COUNT(pmr.id_pm) AS real_num,
 			MAX(mem.personal_messages) AS personal_messages
 		FROM {db_prefix}members AS mem
@@ -480,14 +483,15 @@ function updatePersonalMessagesCounter()
 		HAVING COUNT(pmr.id_pm) != MAX(mem.personal_messages)',
 		array(
 			'is_not_deleted' => 0,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			updateMemberData($row['id_member'], array('personal_messages' => $row['real_num']));
 		}
 	);
 
-	$db->fetchQueryCallback('
+	$db->fetchQuery('
 		SELECT /*!40001 SQL_NO_CACHE */ mem.id_member, COUNT(pmr.id_pm) AS real_num,
 			MAX(mem.unread_messages) AS unread_messages
 		FROM {db_prefix}members AS mem
@@ -497,7 +501,8 @@ function updatePersonalMessagesCounter()
 		array(
 			'is_not_deleted' => 0,
 			'is_not_read' => 0,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			updateMemberData($row['id_member'], array('unread_messages' => $row['real_num']));
@@ -652,14 +657,15 @@ function getTopicsToMove($id_board)
 	$db = database();
 
 	// Lets get the topics.
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT id_topic
 		FROM {db_prefix}topics
 		WHERE id_board = {int:id_board}
 		LIMIT 10',
 		array(
 			'id_board' => $id_board,
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			return $row['id_topic'];
@@ -767,13 +773,13 @@ function updateZeroPostMembers()
 			'string_zero' => '0',
 			'recycle' => $modSettings['recycle_board'],
 		)
-	) !== false;
+	)->hasResults() !== false;
 
-	if ($createTemporary)
+	if ($createTemporary->hasResults())
 	{
 		// Outer join the members table on the temporary table finding the members that
 		// have a post count but no posts in the message table
-		$members = $db->fetchQueryCallback('
+		$members = $db->fetchQuery('
 			SELECT mem.id_member, mem.posts
 			FROM {db_prefix}members AS mem
 				LEFT OUTER JOIN {db_prefix}tmp_maint_recountposts AS res ON (res.id_member = mem.id_member)
@@ -781,7 +787,8 @@ function updateZeroPostMembers()
 				AND mem.posts != {int:zero}',
 			array(
 				'zero' => 0,
-			),
+			)
+		)->fetch_callback(
 			function ($row)
 			{
 				// Set the post count to zero for any delinquents we may have found

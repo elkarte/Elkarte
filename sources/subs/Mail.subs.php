@@ -4,13 +4,12 @@
  * This file handles tasks related to mail.
  * The functions in this file do NOT check permissions.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -256,7 +255,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 				$unq_head_array[0] = md5($boardurl . microtime() . rand());
 				$unq_head_array[1] = $message_type;
 				$unq_head_array[2] = $message_id;
-				$unq_head = $unq_head_array[0] . '-' . $unq_head_array[2];
+				$unq_head = $unq_head_array[0] . '-' . $unq_head_array[1] . $unq_head_array[2];
 				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
 				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 				$message = mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break);
@@ -269,7 +268,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 			$old_return = ini_set('sendmail_from', $return_path);
 			if (!mail(strtr($to, array("\r" => '', "\n" => '')), $subject, $message, $headers . $unq_id, '-f ' . $return_path))
 			{
-				Errors::instance()->log_error(sprintf($txt['mail_send_unable'], $to));
+				\ElkArte\Errors\Errors::instance()->log_error(sprintf($txt['mail_send_unable'], $to));
 				$mail_result = false;
 			}
 			else
@@ -592,13 +591,13 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 		if (substr($modSettings['smtp_host'], 0, 4) == 'ssl:' && (empty($modSettings['smtp_port']) || $modSettings['smtp_port'] == 25))
 		{
 			if ($socket = fsockopen($modSettings['smtp_host'], 465, $errno, $errstr, 3))
-				Errors::instance()->log_error($txt['smtp_port_ssl']);
+				\ElkArte\Errors\Errors::instance()->log_error($txt['smtp_port_ssl']);
 		}
 
 		// Unable to connect!  Don't show any error message, but just log one and try to continue anyway.
 		if (!$socket)
 		{
-			Errors::instance()->log_error($txt['smtp_no_connect'] . ': ' . $errno . ' : ' . $errstr);
+			\ElkArte\Errors\Errors::instance()->log_error($txt['smtp_no_connect'] . ': ' . $errno . ' : ' . $errstr);
 			return false;
 		}
 	}
@@ -754,7 +753,7 @@ function server_parse($message, $socket, $response)
 		if (!($server_response = fgets($socket, 256)))
 		{
 			// @todo Change this message to reflect that it may mean bad user/password/server issues/etc.
-			Errors::instance()->log_error($txt['smtp_bad_response']);
+			\ElkArte\Errors\Errors::instance()->log_error($txt['smtp_bad_response']);
 			return false;
 		}
 
@@ -763,7 +762,7 @@ function server_parse($message, $socket, $response)
 
 	if (substr($server_response, 0, 3) != $response)
 	{
-		Errors::instance()->log_error($txt['smtp_error'] . $server_response);
+		\ElkArte\Errors\Errors::instance()->log_error($txt['smtp_error'] . $server_response);
 		return false;
 	}
 
@@ -819,7 +818,7 @@ function mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break)
  * @param string[] $additional_files - Additional language files to load
  *
  * @return array
- * @throws Elk_Exception email_no_template
+ * @throws \ElkArte\Exceptions\Exception email_no_template
  */
 function loadEmailTemplate($template, $replacements = array(), $lang = '', $loadLang = true, $suffixes = array(), $additional_files = array())
 {
@@ -840,7 +839,7 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 	}
 
 	if (!isset($txt[$template . '_subject']) || !isset($txt[$template . '_body']))
-		throw new Elk_Exception('email_no_template', 'template', array($template));
+		throw new \ElkArte\Exceptions\Exception('email_no_template', 'template', array($template));
 
 	$ret = array(
 		'subject' => $txt[$template . '_subject'],
@@ -1003,7 +1002,7 @@ function list_getMailQueue($start, $items_per_page, $sort)
 
 	$db = database();
 
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT
 			id_mail, time_sent, recipient, priority, private, subject
 		FROM {db_prefix}mail_queue
@@ -1013,7 +1012,8 @@ function list_getMailQueue($start, $items_per_page, $sort)
 			'start' => $start,
 			'sort' => $sort,
 			'items_per_page' => $items_per_page,
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($txt)
 		{
 			// Private PM/email subjects and similar shouldn't be shown in the mailbox area.
@@ -1231,13 +1231,14 @@ function emailsInfo($number)
 	$emails = array();
 
 	// Get the next $number emails, with all that's to know about them and one more.
-	$db->fetchQueryCallback('
+	$db->fetchQuery('
 		SELECT /*!40001 SQL_NO_CACHE */ id_mail, recipient, body, subject, headers, send_html, time_sent, priority, private, message_id
 		FROM {db_prefix}mail_queue
 		ORDER BY priority ASC, id_mail ASC
 		LIMIT ' . $number,
 		array(
-		),
+		)
+	)->fetch_callback(
 		function ($row) use(&$ids, &$emails)
 		{
 			// Just get the data and go.

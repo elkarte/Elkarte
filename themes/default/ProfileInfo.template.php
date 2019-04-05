@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -405,10 +404,12 @@ function template_action_statPanel()
 		// Draw a bar for every board.
 		foreach ($context['popular_boards'] as $board)
 		{
+			$position = intval(((int) $board['posts_percent'] / 5)) * 20;
+
 			echo '
 						<dt>', $board['link'], '</dt>
 						<dd>
-							<div class="profile_pie" style="background-position: -', ((int) ($board['posts_percent'] / 5) * 20), 'px 0;" title="', sprintf($txt['statPanel_topBoards_memberposts'], $board['posts'], $board['total_posts_member'], $board['posts_percent']), '">
+							<div class="profile_pie" style="background-position: -', $position, 'px 0;" title="', sprintf($txt['statPanel_topBoards_memberposts'], $board['posts'], $board['total_posts_member'], $board['posts_percent']), '">
 								', sprintf($txt['statPanel_topBoards_memberposts'], $board['posts'], $board['total_posts_member'], $board['posts_percent']), '
 							</div>
 							<span>', empty($context['hide_num_posts']) ? $board['posts'] : '', '</span>
@@ -439,10 +440,12 @@ function template_action_statPanel()
 		// Draw a bar for every board.
 		foreach ($context['board_activity'] as $activity)
 		{
+			$position = intval(((int) $activity['percent'] / 5)) * 20;
+
 			echo '
 						<dt>', $activity['link'], '</dt>
 						<dd>
-							<div class="profile_pie" style="background-position: -', ((int) ($activity['percent'] / 5) * 20), 'px 0;" title="', sprintf($txt['statPanel_topBoards_posts'], $activity['posts'], $activity['total_posts'], $activity['posts_percent']), '">
+							<div class="profile_pie" style="background-position: -', $position, 'px 0;" title="', sprintf($txt['statPanel_topBoards_posts'], $activity['posts'], $activity['total_posts'], $activity['posts_percent']), '">
 								', sprintf($txt['statPanel_topBoards_posts'], $activity['posts'], $activity['total_posts'], $activity['posts_percent']), '
 							</div>
 							<span>', $activity['percent'], '%</span>
@@ -522,7 +525,7 @@ function template_profile_block_summary()
 	echo '
 			<div class="profileblock_left">
 				<h2 class="category_header hdicon cat_img_profile">
-					', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'u' => $context['member']['name']]) . '">' . $txt['profile_user_summary'] . '</a>' : $txt['profile_user_summary'], '
+					', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'name' => $context['member']['name']]) . '">' . $txt['profile_user_summary'] . '</a>' : $txt['profile_user_summary'], '
 				</h2>
 				<div id="basicinfo">
 					<div class="username">
@@ -577,15 +580,15 @@ function template_profile_block_summary()
 	echo '
 						<dt>', $txt['profile_activity'], ': </dt>
 						<dd>
-							<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'showposts', 'u' => $context['member']['id'], 'u' => $context['member']['name']]), '">', $txt['showPosts'], '</a>
+							<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'showposts', 'u' => $context['member']['id'], 'name' => $context['member']['name']]), '">', $txt['showPosts'], '</a>
 							<br />';
 
 	if ($context['user']['is_owner'] && !empty($modSettings['drafts_enabled']))
 		echo '
-							<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => $context['member']['id'], 'u' => $context['member']['name']]), '">', $txt['drafts_show'], '</a>
+							<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => $context['member']['id'], 'name' => $context['member']['name']]), '">', $txt['drafts_show'], '</a>
 							<br />';
 	echo '
-							<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'statistics', 'u' => $context['member']['id'], 'u' => $context['member']['name']]), '">', $txt['statPanel'], '</a>
+							<a href="', getUrl('profile', ['action' => 'profile', 'area' => 'statistics', 'u' => $context['member']['id'], 'name' => $context['member']['name']]), '">', $txt['statPanel'], '</a>
 						</dd>';
 
 	// close this block up
@@ -609,7 +612,7 @@ function template_profile_block_user_info()
 	echo '
 		<div class="profileblock_right">
 			<h2 class="category_header hdicon cat_img_stats_info">
-				', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'u' => $context['member']['name']]) . '">' . $txt['profile_user_info'] . '</a>' : $txt['profile_user_info'], '
+				', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'name' => $context['member']['name']]) . '">' . $txt['profile_user_info'] . '</a>' : $txt['profile_user_info'], '
 			</h2>
 			<div class="profileblock">
 					<dl>';
@@ -792,7 +795,7 @@ function template_profile_block_other_info()
 	echo '
 		<div class="profileblock_right">
 			<h2 class="category_header hdicon cat_img_write">
-				', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'u' => $context['member']['name']]) . '">' . $txt['profile_more'] . '</a>' : $txt['profile_more'], '
+				', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'name' => $context['member']['name']]) . '">' . $txt['profile_more'] . '</a>' : $txt['profile_more'], '
 			</h2>
 			<div class="profileblock profileblock_signature">';
 
@@ -859,7 +862,7 @@ function template_profile_block_user_customprofileinfo()
 	echo '
 		<div class="profileblock_left">
 			<h2 class="category_header hdicon cat_img_plus">
-				', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'u' => $context['member']['name']]) . '">' . $txt['profile_info'] . '</a>' : $txt['profile_info'], '
+				', ($context['user']['is_owner']) ? '<a href="' . getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $context['member']['id'], 'name' => $context['member']['name']]) . '">' . $txt['profile_info'] . '</a>' : $txt['profile_info'], '
 			</h2>
 			<div class="profileblock">';
 

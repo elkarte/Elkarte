@@ -23,7 +23,7 @@ SHORT_PHP=${TRAVIS_PHP_VERSION:0:3}
 sudo apt-get clean && sudo apt-get update -qq
 
 # Specific version of MySQL ?
-if [ "$SHORT_DB" == "mysql" -a "$DB" != "mysql-5.6" ]
+if [[ "$SHORT_DB" == "mysql" && "$DB" != "mysql-5.6" ]]
 then
    # Travis is MySQL 5.6 on ubuntu 14.04
    sudo service mysql stop
@@ -37,13 +37,13 @@ then
 fi
 
 # Install basics for PHP CLI
-sudo apt-get -qq install php5-cli php5-mysql php5-pgsql
+# sudo apt-get -qq install php-cli php-mysql php-pgsql
 
 # Install Apache, mod-FPM and DB support
-if [ "$SHORT_DB" == "postgres" ]
+if [[ "$SHORT_DB" == "postgres" ]]
 then
     sudo apt-get -qq install apache2 libapache2-mod-fastcgi php5-pgsql > /dev/null
-elif [ "$SHORT_DB" == "mysql" -o "$SHORT_DB" == "mariadb" ]
+elif [[ "$SHORT_DB" == "mysql" || "$SHORT_DB" == "mariadb" ]]
 then
     sudo apt-get -qq --allow-downgrades install apache2 libapache2-mod-fastcgi php5-mysql > /dev/null
 else
@@ -52,14 +52,14 @@ fi
 
 # Configure and Enable php-fpm
 tests/travis-ci/travis-fpm.sh $(phpenv version-name)
-/home/$USER/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
+/home/${USER}/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
 
 # Setup a database if we are installing
-if [ "$SHORT_DB" == "postgres" ]
+if [[ "$SHORT_DB" == "postgres" ]]
 then
     psql -c "DROP DATABASE IF EXISTS elkarte_test;" -U postgres
     psql -c "create database elkarte_test;" -U postgres
-elif [ "$SHORT_DB" == "mysql" -o "$SHORT_DB" == "mariadb" ]
+elif [[ "$SHORT_DB" == "mysql" || "$SHORT_DB" == "mariadb" ]]
 then
     mysql -e "DROP DATABASE IF EXISTS elkarte_test;" -uroot
     mysql -e "create database IF NOT EXISTS elkarte_test;" -uroot
@@ -84,4 +84,4 @@ sudo a2enconf fqdn
 sudo service apache2 restart
 
 # if we are not creating code coverage reports, do not run xdebug
-if [ "$COVERAGE" != "true" -o "${TRAVIS_PULL_REQUEST}" == "false" ]; then phpenv config-rm xdebug.ini; fi
+if [[ "$COVERAGE" != "true" || "${TRAVIS_PULL_REQUEST}" == "false" ]]; then phpenv config-rm xdebug.ini; fi

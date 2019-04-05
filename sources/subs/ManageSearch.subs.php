@@ -3,13 +3,12 @@
 /**
  * Support functions for setting up the search features and creating search index's
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -28,7 +27,7 @@ function detectFulltextIndex()
 	$db = database();
 
 	// Something like 5.7.16
-	list($ver,) = explode('-', $db->db_server_version());
+	list($ver,) = explode('-', $db->server_version());
 
 	$request = $db->query('', '
 		SHOW INDEX
@@ -510,5 +509,5 @@ function drop_log_search_words()
 {
 	$db_table = db_table();
 
-	$db_table->db_drop_table('{db_prefix}log_search_words');
+	$db_table->drop_table('{db_prefix}log_search_words');
 }

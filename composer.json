@@ -1,30 +1,65 @@
 {
 	"name": "elkarte/elkarte",
-	"description": "ElkArte Forum Software application",
+	"description": "ElkArte PHP-based community discussion forum.",
 	"version": "2.0 dev",
 	"type": "project",
-	"keywords": ["elkarte", "forum"],
-	"homepage": "http://www.elkarte.net",
-	"license": "BSD-3",
+	"keywords": ["elkarte", "forum", "discussion", "php", "community"],
+	"homepage": "https://www.elkarte.net",
+	"license": "BSD-3-Clause",
+	"repository": [
+		{
+			"type": "git",
+			"url": "git+https://github.com/elkarte/Elkarte.git"
+		}
+	],
 	"authors": [
 		{
 			"name": "ElkArte Forum Contributors",
 			"email": "operations@elkarte.net",
-			"homepage": "http://www.elkarte.net"
+			"homepage": "https://www.elkarte.net"
 		}
 	],
 	"support": {
 		"issues": "https://github.com/elkarte/Elkarte/issues",
-		"forum": "http://www.elkarte.com/community/",
+		"forum": "https://www.elkarte.com/community/",
 		"wiki": "https://github.com/elkarte/Elkarte/wiki",
 		"irc": "irc://irc.freenode.org/elkarte"
 	},
+	"minimum-stability": "beta",
 	"scripts": {
 	},
 	"replace": {
 	},
 	"require": {
-		"php": ">=7.1.0"
+		"php": ">=7.1.0",
+      	"ext-json": "*",
+		"ext-gd": "*",
+		"ext-curl": "*",
+		"ext-mysqli": "*",
+		"ext-fileinfo": "*",
+		"ext-exif": "*"
+	},
+	"suggest": {
+		"ext-recode": "*",
+		"ext-openssl": "*",
+		"ext-ctype": "*",
+		"ext-memcache": "*",
+		"ext-bcmath": "*",
+		"ext-zlib": "*",
+		"ext-pgsql": "*",
+		"ext-pspell": "*",
+		"ext-imap": "*",
+		"ext-memcached": "*",
+		"ext-zend-opcache": "*",
+		"ext-apc": "*",
+		"ext-mbstring": "*",
+		"ext-apcu": "*",
+		"ext-libxml": "*",
+		"ext-dom": "*",
+		"ext-mcrypt": "*",
+		"ext-apache": "*",
+		"ext-iconv": "*",
+		"ext-imagick": "*"
 	},
 	"require-dev": {
 		"phpunit/phpunit-selenium": "~4.1",
@@ -33,7 +68,6 @@
 		"myclabs/deep-copy": "1.8.0"
 	},
 	"autoload": {
-		"files": ["sources/Autoloader.class.php"],
-		"psr-4": { "ElkArte\\": ["sources/", "sources/subs/"] }
+		"psr-4": { "ElkArte\\": ["sources/ElkArte"] }
 	}
 }

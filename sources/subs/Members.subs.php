@@ -3,13 +3,12 @@
 /**
  * This file contains some useful functions for members and membergroups.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -37,7 +36,7 @@
  * @package Members
  * @param int[]|int $users
  * @param bool $check_not_admin = false
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function deleteMembers($users, $check_not_admin = false)
 {
@@ -134,7 +133,7 @@ function deleteMembers($users, $check_not_admin = false)
 		);
 
 		// Remove any cached data if enabled.
-		Cache::instance()->remove('user_settings-' . $user[0]);
+		\ElkArte\Cache\Cache::instance()->remove('user_settings-' . $user[0]);
 	}
 
 	// Make these peoples' posts guest posts.
@@ -422,14 +421,15 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 
 	// These users are nobody's buddy nomore.
-	$db->fetchQueryCallback('
+	$db->fetchQuery('
 		SELECT id_member, pm_ignore_list, buddy_list
 		FROM {db_prefix}members
 		WHERE FIND_IN_SET({raw:pm_ignore_list}, pm_ignore_list) != 0 OR FIND_IN_SET({raw:buddy_list}, buddy_list) != 0',
 		array(
 			'pm_ignore_list' => implode(', pm_ignore_list) != 0 OR FIND_IN_SET(', $users),
 			'buddy_list' => implode(', buddy_list) != 0 OR FIND_IN_SET(', $users),
-		),
+		)
+	)->fetch_callback(
 		function ($row) use ($users)
 		{
 			updateMemberData($row['id_member'], array(
@@ -472,7 +472,7 @@ function deleteMembers($users, $check_not_admin = false)
  * @param string  $ErrorContext
  *
  * @return int the ID of the newly created member
- * @throws Elk_Exception no_theme
+ * @throws \ElkArte\Exceptions\Exception no_theme
  */
 function registerMember(&$regOptions, $ErrorContext = 'register')
 {
@@ -487,7 +487,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Put any errors in here.
-	$reg_errors = ElkArte\Errors\ErrorContext::context($ErrorContext, 0);
+	$reg_errors = \ElkArte\Errors\ErrorContext::context($ErrorContext, 0);
 
 	// What method of authorization are we going to use?
 	if (empty($regOptions['auth_method']) || !in_array($regOptions['auth_method'], array('password', 'openid')))
@@ -502,7 +502,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 	$regOptions['username'] = trim(preg_replace('~[\t\n\r \x0B\0\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}]+~u', ' ', $regOptions['username']));
 
 	// Valid emails only
-	if (!Data_Validator::is_valid($regOptions, array('email' => 'valid_email|required|max_length[255]'), array('email' => 'trim')))
+	if (!\ElkArte\DataValidator::is_valid($regOptions, array('email' => 'valid_email|required|max_length[255]'), array('email' => 'trim')))
 		$reg_errors->addError('bad_email');
 
 	validateUsername(0, $regOptions['username'], $ErrorContext, !empty($regOptions['check_reserved_name']));
@@ -572,9 +572,9 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 
 	// Can't change reserved vars.
 	if (isset($regOptions['theme_vars']) && count(array_intersect(array_keys($regOptions['theme_vars']), $reservedVars)) != 0)
-		throw new Elk_Exception('no_theme');
+		throw new \ElkArte\Exceptions\Exception('no_theme');
 
-	$tokenizer = new Token_Hash();
+	$tokenizer = new \ElkArte\TokenHash();
 
 	// @since 1.0.7 - This is necessary because validateLoginPassword
 	// uses a pass-by-ref and would convert to hash $regOptions['password']
@@ -826,7 +826,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
  * @param bool   $fatal
  *
  * @return bool
- * @throws Elk_Exception username_reserved, name_censored
+ * @throws \ElkArte\Exceptions\Exception username_reserved, name_censored
  */
 function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal = true)
 {
@@ -835,7 +835,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	$db = database();
 
 	$name = preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'replaceEntities__callback', $name);
-	$checkName = Util::strtolower($name);
+	$checkName = \ElkArte\Util::strtolower($name);
 
 	// Administrators are never restricted ;).
 	if (!allowedTo('admin_forum') && ((!empty($modSettings['reserveName']) && $is_name) || !empty($modSettings['reserveUser']) && !$is_name))
@@ -855,12 +855,12 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 
 			// Case sensitive name?
 			if (empty($modSettings['reserveCase']))
-				$reservedCheck = Util::strtolower($reservedCheck);
+				$reservedCheck = \ElkArte\Util::strtolower($reservedCheck);
 
 			// If it's not just entire word, check for it in there somewhere...
-			if ($checkMe == $reservedCheck || (Util::strpos($checkMe, $reservedCheck) !== false && empty($modSettings['reserveWord'])))
+			if ($checkMe == $reservedCheck || (\ElkArte\Util::strpos($checkMe, $reservedCheck) !== false && empty($modSettings['reserveWord'])))
 				if ($fatal)
-					throw new Elk_Exception('username_reserved', 'password', array($reserved));
+					throw new \ElkArte\Exceptions\Exception('username_reserved', 'password', array($reserved));
 				else
 					return true;
 		}
@@ -868,7 +868,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 		$censor_name = $name;
 		if (censor($censor_name) != $name)
 			if ($fatal)
-				throw new Elk_Exception('name_censored', 'password', array($name));
+				throw new \ElkArte\Exceptions\Exception('name_censored', 'password', array($name));
 			else
 				return true;
 	}
@@ -877,7 +877,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	foreach (array('*') as $char)
 		if (strpos($checkName, $char) !== false)
 			if ($fatal)
-				throw new Elk_Exception('username_reserved', 'password', array($char));
+				throw new \ElkArte\Exceptions\Exception('username_reserved', 'password', array($char));
 			else
 				return true;
 
@@ -936,7 +936,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
  *
  * @return array containing an array for the allowed membergroup ID's
  * and an array for the denied membergroup ID's.
- * @throws Elk_Exception no_board
+ * @throws \ElkArte\Exceptions\Exception no_board
  */
 function groupsAllowedTo($permission, $board_id = null)
 {
@@ -978,7 +978,7 @@ function groupsAllowedTo($permission, $board_id = null)
 			$board_data = fetchBoardsInfo(array('boards' => $board_id), array('selects' => 'permissions'));
 
 			if (empty($board_data))
-				throw new Elk_Exception('no_board');
+				throw new \ElkArte\Exceptions\Exception('no_board');
 			$profile_id = $board_data[$board_id]['id_profile'];
 		}
 		else
@@ -1017,7 +1017,7 @@ function groupsAllowedTo($permission, $board_id = null)
  * @param integer|null $board_id = null
  *
  * @return int[] an array containing member ID's.
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function membersAllowedTo($permission, $board_id = null)
 {
@@ -1031,7 +1031,7 @@ function membersAllowedTo($permission, $board_id = null)
 	$exclude_moderators = in_array(3, $member_groups['denied']) && $board_id !== null;
 	$member_groups['denied'] = array_diff($member_groups['denied'], array(3));
 
-	return $db->fetchQueryCallback('
+	return $db->fetchQuery('
 		SELECT mem.id_member
 		FROM {db_prefix}members AS mem' . ($include_moderators || $exclude_moderators ? '
 			LEFT JOIN {db_prefix}moderators AS mods ON (mods.id_member = mem.id_member AND mods.id_board = {int:board_id})' : '') . '
@@ -1043,7 +1043,8 @@ function membersAllowedTo($permission, $board_id = null)
 			'board_id' => $board_id,
 			'member_group_allowed_implode' => implode(', mem.additional_groups) != 0 OR FIND_IN_SET(', $member_groups['allowed']),
 			'member_group_denied_implode' => implode(', mem.additional_groups) != 0 OR FIND_IN_SET(', $member_groups['denied']),
-		),
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			return $row['id_member'];
@@ -1171,7 +1172,7 @@ function list_getMembers($start, $items_per_page, $sort, $where, $where_params =
 			'start' => $start,
 			'per_page' => $items_per_page,
 		))
-	);
+	)->fetch_all();
 
 	// If we want duplicates pass the members array off.
 	if ($get_duplicates)
@@ -1391,7 +1392,7 @@ function membersByIP($ip1, $match = 'exact', $ip2 = false)
 		FROM {db_prefix}members
 		WHERE ' . $where,
 		$ip_params
-	);
+	)->fetch_all();
 }
 
 /**
@@ -1552,15 +1553,23 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
 				foreach ($query_conditions as $condition => $query_condition)
 				{
 					if ($query_condition == 'member_names')
+					{
 						$query_parts[$condition === 'or' ? 'or' : 'and'][] = $allowed_conditions[$query_condition]($query_params);
+					}
 					else
+					{
 						$query_parts[$condition === 'or' ? 'or' : 'and'][] = isset($allowed_conditions[$query_condition]) ? $allowed_conditions[$query_condition] : $query_condition;
+					}
 				}
 			}
-			elseif ($query == 'member_names')
-				$query_parts[$condition === 'or' ? 'or' : 'and'][] = $allowed_conditions[$query]($query_params);
+			elseif ($query_conditions == 'member_names')
+			{
+				$query_parts['and'][] = $allowed_conditions[$query_conditions]($query_params);
+			}
 			else
-				$query_parts['and'][] = isset($allowed_conditions[$query]) ? $allowed_conditions[$query] : $query;
+			{
+				$query_parts['and'][] = isset($allowed_conditions[$query_conditions]) ? $allowed_conditions[$query_conditions] : $query_conditions;
+			}
 		}
 
 		if (!empty($query_parts['or']))
@@ -1665,7 +1674,7 @@ function maxMemberID()
  * - 'authentication' (bool) includes secret_answer, secret_question, openid_uri,
  *    is_activated, validation_code, passwd_flood
  * - 'preferences' (bool) includes lngfile, mod_prefs, notify_types, signature
- * @return array
+ * @return mixed[]|bool
  */
 function getBasicMemberData($member_ids, $options = array())
 {
@@ -1776,7 +1785,7 @@ function getMemberByName($name, $flexible = false)
 			OR {column_case_insensitive:member_name} LIKE {string_case_insensitive:name}' : '') . '
 		LIMIT 1',
 		array(
-			'name' => Util::strtolower($name),
+			'name' => \ElkArte\Util::strtolower($name),
 		)
 	);
 	if ($db->num_rows($request) == 0)
@@ -1810,7 +1819,7 @@ function getMember($search, $buddies = array())
 		),
 	);
 	// Find the member.
-	$xml_data['items']['children'] = $db->fetchQueryCallback('
+	$xml_data['items']['children'] = $db->fetchQuery('
 		SELECT id_member, real_name
 		FROM {db_prefix}members
 		WHERE {column_case_insensitive:real_name} LIKE {string_case_insensitive:search}' . (!empty($buddies) ? '
@@ -1822,8 +1831,9 @@ function getMember($search, $buddies = array())
 			'buddy_list' => $buddies,
 			'search' => $search,
 			'activation_status' => array(1, 12),
-			'limit' => Util::strlen($search) <= 2 ? 100 : 200,
-		),
+			'limit' => \ElkArte\Util::strlen($search) <= 2 ? 100 : 200,
+		)
+	)->fetch_callback(
 		function ($row)
 		{
 			$row['real_name'] = strtr($row['real_name'], array('&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;'));
@@ -2138,7 +2148,7 @@ function onlineMembers($conditions, $sort_method, $sort_direction, $start)
 			'offset' => $start,
 			'limit' => $modSettings['defaultMaxMembers'],
 		)
-	);
+	)->fetch_all();
 }
 
 /**
@@ -2188,7 +2198,7 @@ function recentMembers($limit)
 		array(
 			'limit' => $limit,
 		)
-	);
+	)->fetch_all();
 }
 
 /**
@@ -2526,11 +2536,12 @@ function updateMemberData($members, $data)
 				$member_names = array($user_info['username']);
 			else
 			{
-				$member_names = $db->fetchQueryCallback('
+				$member_names = $db->fetchQuery('
 					SELECT member_name
 					FROM {db_prefix}members
 					WHERE ' . $condition,
-					$parameters,
+					$parameters
+				)->fetch_callback(
 					function ($row)
 					{
 						return $row['member_name'];
@@ -2588,7 +2599,7 @@ function updateMemberData($members, $data)
 	require_once(SUBSDIR . '/Membergroups.subs.php');
 	updatePostGroupStats($members, array_keys($data));
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	// Clear any caching?
 	if ($cache->levelHigherThan(1) && !empty($members))
@@ -2641,4 +2652,28 @@ function loadMembersIPs($ip_string, $ip_var)
 	ksort($ips);
 
 	return $ips;
+}
+
+function registerAgreementAccepted($id_member, $ip, $agreement_version)
+{
+	$db = database();
+
+	$db->insert('',
+		'{db_prefix}log_agreement_accept',
+		array(
+			'version' => 'date',
+			'id_member' => 'int',
+			'accepted_date' => 'date',
+			'accepted_ip' => 'string-255',
+		),
+		array(
+			array(
+				'version' => $agreement_version,
+				'id_member' => $id_member,
+				'accepted_date' => strftime('%Y-%m-%d', forum_time(false)),
+				'accepted_ip' => $ip,
+			)
+		),
+		array('version', 'id_member')
+	);
 }

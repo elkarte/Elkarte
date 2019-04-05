@@ -4,13 +4,12 @@
  * This file has the very important job of ensuring forum security.
  * This task includes banning and permissions, namely.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -32,7 +31,7 @@
  * @param string $type = admin
  *
  * @return bool|string
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function validateSession($type = 'admin')
 {
@@ -175,7 +174,7 @@ function checkPassword($type, $hash = false)
  * @param boolean $is_fatal = true
  *
  * @return bool
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function is_not_guest($message = '', $is_fatal = true)
 {
@@ -246,7 +245,7 @@ function is_not_guest($message = '', $is_fatal = true)
  *
  * @param bool $forceCheck = false
  *
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function is_not_banned($forceCheck = false)
 {
@@ -316,14 +315,15 @@ function is_not_banned($forceCheck = false)
 				'cannot_post',
 				'cannot_register',
 			);
-			$db->fetchQueryCallback('
+			$db->fetchQuery('
 				SELECT bi.id_ban, bi.email_address, bi.id_member, bg.cannot_access, bg.cannot_register,
 					bg.cannot_post, bg.cannot_login, bg.reason, COALESCE(bg.expire_time, 0) AS expire_time
 				FROM {db_prefix}ban_items AS bi
 					INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group AND (bg.expire_time IS NULL OR bg.expire_time > {int:current_time}))
 				WHERE
 					(' . implode(' OR ', $ban_query) . ')',
-				$ban_query_vars,
+				$ban_query_vars
+			)->fetch_callback(
 				function ($row) use($user_info, $restrictions, &$flag_is_activated)
 				{
 					// Store every type of ban that applies to you in your session.
@@ -362,9 +362,11 @@ function is_not_banned($forceCheck = false)
 	{
 		$bans = explode(',', $_COOKIE[$cookiename . '_']);
 		foreach ($bans as $key => $value)
+		{
 			$bans[$key] = (int) $value;
+		}
 
-		$db->fetchQueryCallback('
+		$db->fetchQuery('
 			SELECT bi.id_ban, bg.reason
 			FROM {db_prefix}ban_items AS bi
 				INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group)
@@ -376,7 +378,8 @@ function is_not_banned($forceCheck = false)
 				'cannot_access' => 1,
 				'ban_list' => $bans,
 				'current_time' => time(),
-			),
+			)
+		)->fetch_callback(
 			function ($row)
 			{
 				$_SESSION['ban']['cannot_access']['ids'][] = $row['id_ban'];
@@ -401,7 +404,7 @@ function is_not_banned($forceCheck = false)
 		// We don't wanna see you!
 		if (!$user_info['is_guest'])
 		{
-			$controller = new Auth_Controller(new Event_manager());
+			$controller = new \ElkArte\Controller\Auth(new \ElkArte\EventManager());
 			$controller->action_logout(true, false);
 		}
 
@@ -437,7 +440,7 @@ function is_not_banned($forceCheck = false)
 		writeLog(true);
 
 		// You banned, sucka!
-		throw new Elk_Exception(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_access']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_access']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']), 'user');
+		throw new \ElkArte\Exceptions\Exception(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_access']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_access']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']), 'user');
 	}
 	// You're not allowed to log in but yet you are. Let's fix that.
 	elseif (isset($_SESSION['ban']['cannot_login']) && !$user_info['is_guest'])
@@ -474,11 +477,11 @@ function is_not_banned($forceCheck = false)
 		writeLog(true);
 
 		// Log them out
-		$controller = new Auth_Controller(new Event_manager());
+		$controller = new \ElkArte\Controller\Auth(new \ElkArte\EventManager());
 		$controller->action_logout(true, false);
 
 		// Tell them thanks
-		throw new Elk_Exception(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_login']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_login']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']) . '<br />' . $txt['ban_continue_browse'], 'user');
+		throw new \ElkArte\Exceptions\Exception(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_login']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_login']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']) . '<br />' . $txt['ban_continue_browse'], 'user');
 	}
 
 	// Fix up the banning permissions.
@@ -637,7 +640,7 @@ function log_ban($ban_ids = array(), $email = null)
  * @param string $restriction
  * @param string $error
  *
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function isBannedEmail($email, $restriction, $error)
 {
@@ -688,14 +691,14 @@ function isBannedEmail($email, $restriction, $error)
 		log_ban($_SESSION['ban']['cannot_access']['ids']);
 		$_SESSION['ban']['last_checked'] = time();
 
-		throw new Elk_Exception(sprintf($txt['your_ban'], $txt['guest_title']) . $_SESSION['ban']['cannot_access']['reason'], false);
+		throw new \ElkArte\Exceptions\Exception(sprintf($txt['your_ban'], $txt['guest_title']) . $_SESSION['ban']['cannot_access']['reason'], false);
 	}
 
 	if (!empty($ban_ids))
 	{
 		// Log this ban for future reference.
 		log_ban($ban_ids, $email);
-		throw new Elk_Exception($error . $ban_reason, false);
+		throw new \ElkArte\Exceptions\Exception($error . $ban_reason, false);
 	}
 }
 
@@ -715,7 +718,7 @@ function isBannedEmail($email, $restriction, $error)
  * @param bool   $is_fatal = true
  *
  * @return string the error message if is_fatal is false.
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 {
@@ -789,7 +792,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 		{
 			$error = 'verify_url_fail';
 			$log_error = true;
-			$sprintf = array(Util::htmlspecialchars($referrer_url));
+			$sprintf = array(\ElkArte\Util::htmlspecialchars($referrer_url));
 		}
 	}
 
@@ -798,7 +801,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	{
 		$error = 'verify_url_fail';
 		$log_error = true;
-		$sprintf = array(Util::htmlspecialchars($referrer_url));
+		$sprintf = array(\ElkArte\Util::htmlspecialchars($referrer_url));
 	}
 
 	// Everything is ok, return an empty string.
@@ -814,7 +817,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 			die;
 		}
 		else
-			throw new Elk_Exception($error, isset($log_error) ? 'user' : false, isset($sprintf) ? $sprintf : array());
+			throw new \ElkArte\Exceptions\Exception($error, isset($log_error) ? 'user' : false, isset($sprintf) ? $sprintf : array());
 	}
 	// A session error occurred, return the error to the calling function.
 	else
@@ -841,7 +844,7 @@ function createToken($action, $type = 'post')
 	global $context;
 
 	// Generate a new token token_var pair
-	$tokenizer = new Token_Hash();
+	$tokenizer = new \ElkArte\TokenHash();
 	$token_var = $tokenizer->generate_hash(rand(7, 12));
 	$token = $tokenizer->generate_hash(32);
 
@@ -875,7 +878,7 @@ function createToken($action, $type = 'post')
  * @param bool   $fatal if true a fatal_lang_error is issued for invalid tokens, otherwise false is returned
  *
  * @return bool except for $action == 'login' where the token is returned
- * @throws Elk_Exception token_verify_fail
+ * @throws \ElkArte\Exceptions\Exception token_verify_fail
  */
 function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 {
@@ -926,7 +929,7 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 		createToken($action, $type);
 
 		if ($fatal)
-			throw new Elk_Exception('token_verify_fail', false);
+			throw new \ElkArte\Exceptions\Exception('token_verify_fail', false);
 	}
 	// You don't get a new token
 	else
@@ -986,7 +989,7 @@ function cleanTokens($complete = false, $suffix = '')
  * @param bool   $is_fatal = true
  *
  * @return bool
- * @throws Elk_Exception error_form_already_submitted
+ * @throws \ElkArte\Exceptions\Exception error_form_already_submitted
  */
 function checkSubmitOnce($action, $is_fatal = false)
 {
@@ -998,7 +1001,7 @@ function checkSubmitOnce($action, $is_fatal = false)
 	// Register a form number and store it in the session stack. (use this on the page that has the form.)
 	if ($action == 'register')
 	{
-		$tokenizer = new Token_Hash();
+		$tokenizer = new \ElkArte\TokenHash();
 		$context['form_sequence_number'] = '';
 		while (empty($context['form_sequence_number']) || in_array($context['form_sequence_number'], $_SESSION['forms']))
 			$context['form_sequence_number'] = $tokenizer->generate_hash();
@@ -1015,7 +1018,7 @@ function checkSubmitOnce($action, $is_fatal = false)
 			return true;
 		}
 		elseif ($is_fatal)
-			throw new Elk_Exception('error_form_already_submitted', false);
+			throw new \ElkArte\Exceptions\Exception('error_form_already_submitted', false);
 		else
 			return false;
 	}
@@ -1122,7 +1125,7 @@ function allowedTo($permission, $boards = null)
  * @param string[]|string $permission array of or single string, of permissions to check
  * @param int[]|null      $boards = null
  *
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function isAllowedTo($permission, $boards = null)
 {
@@ -1162,7 +1165,7 @@ function isAllowedTo($permission, $boards = null)
 		$_GET['topic'] = '';
 		writeLog(true);
 
-		throw new Elk_Exception('cannot_' . $error_permission, false);
+		throw new \ElkArte\Exceptions\Exception('cannot_' . $error_permission, false);
 	}
 
 	// If you're doing something on behalf of some "heavy" permissions, validate your session.
@@ -1332,7 +1335,7 @@ function showEmailAddress($userProfile_hideEmail, $userProfile_id)
  * @param boolean $fatal is the spam check a fatal error on failure
  *
  * @return bool|int|mixed
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function spamProtection($error_type, $fatal = true)
 {
@@ -1384,7 +1387,7 @@ function spamProtection($error_type, $fatal = true)
 		// Spammer!  You only have to wait a *few* seconds!
 		if ($fatal)
 		{
-			throw new Elk_Exception($error_type . '_WaitTime_broken', false, array($timeLimit));
+			throw new \ElkArte\Exceptions\Exception($error_type . '_WaitTime_broken', false, array($timeLimit));
 		}
 		else
 			return $timeLimit;
@@ -1401,7 +1404,7 @@ function spamProtection($error_type, $fatal = true)
  * @param boolean $allow_localhost if access should be allowed to localhost
  * @param string $files (optional, default '*') parameter for the Files tag
  *
- * @return string|boolean on success error string if anything fails
+ * @return string[]|bool on success error string if anything fails
  */
 function secureDirectory($path, $allow_localhost = false, $files = '*')
 {
@@ -1521,11 +1524,13 @@ function constructBanQueryIP($fullip)
  * - Admins and Moderators get a free pass
  * - Optionally existing users with post counts over a limit are bypassed
  * - Others get a humane frisking
+ * @return bool|int
  */
 function loadBadBehavior()
 {
-	global $modSettings, $user_info, $bb2_results;
+	global $modSettings, $user_info;
 
+	$bb2_results = false;
 	// Bad Behavior Enabled?
 	if (!empty($modSettings['badbehavior_enabled']))
 	{
@@ -1550,6 +1555,8 @@ function loadBadBehavior()
 			theme()->addInlineJavascript(bb2_insert_head());
 		}
 	}
+
+	return $bb2_results;
 }
 
 /**
@@ -1564,7 +1571,7 @@ function loadBadBehavior()
  * @param string|bool $password_flood_value = false or string joined on |'s
  * @param boolean     $was_correct = false
  *
- * @throws Elk_Exception no_access
+ * @throws \ElkArte\Exceptions\Exception no_access
  */
 function validatePasswordFlood($id_member, $password_flood_value = false, $was_correct = false)
 {
@@ -1586,7 +1593,7 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 		redirectexit();
 
 		// Probably not needed, but still make sure...
-		throw new Elk_Exception('no_access', false);
+		throw new \ElkArte\Exceptions\Exception('no_access', false);
 	}
 
 	// Let's just initialize to something (and 0 is better than nothing)
@@ -1609,7 +1616,7 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 
 	// Broken the law?
 	if ($number_tries > 5)
-		throw new Elk_Exception('login_threshold_brute_fail', 'critical');
+		throw new \ElkArte\Exceptions\Exception('login_threshold_brute_fail', 'critical');
 
 	// Otherwise set the members data. If they correct on their first attempt then we actually clear it, otherwise we set it!
 	require_once(SUBSDIR . '/Members.subs.php');

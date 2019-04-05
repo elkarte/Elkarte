@@ -6,13 +6,12 @@
  * These functions (probably) do NOT make permissions checks. (they assume
  * those were already made).
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -180,7 +179,7 @@ function quoteMessageInfo($id_msg, $modify)
  * @param int $message
  *
  * @return array|bool
- * @throws Elk_Exception modify_post_time_passed
+ * @throws \ElkArte\Exceptions\Exception modify_post_time_passed
  */
 function checkMessagePermissions($message)
 {
@@ -190,7 +189,7 @@ function checkMessagePermissions($message)
 	{
 		// Give an extra five minutes over the disable time threshold, so they can type - assuming the post is public.
 		if ($message['approved'] && !empty($modSettings['edit_disable_time']) && $message['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
-			throw new Elk_Exception('modify_post_time_passed', false);
+			throw new \ElkArte\Exceptions\Exception('modify_post_time_passed', false);
 		elseif ($message['id_member_poster'] == $user_info['id'] && !allowedTo('modify_own'))
 			isAllowedTo('modify_replies');
 		else
@@ -251,7 +250,7 @@ function prepareMessageContext($message)
  * first messages of a topic
  *
  * @param int $memID The member id
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function removeNonTopicMessages($memID)
 {
@@ -285,13 +284,13 @@ function removeNonTopicMessages($memID)
  *
  * @param int $message The message id
  * @param bool $decreasePostCount if true users' post count will be reduced
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function removeMessage($message, $decreasePostCount = true)
 {
 	global $modSettings;
 
-	$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
+	$remover = new \ElkArte\MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
 	$remover->removeMessage($message, $decreasePostCount, true);
 }
 

@@ -1,13 +1,13 @@
 <?php
 
 /**
- * TestCase class for Controller_Redirect_Exception class.
+ * TestCase class for \ElkArte\Exceptions\ControllerRedirectException class.
  */
 class TestControllerRedirectException extends \PHPUnit\Framework\TestCase
 {
 	public function testBasicRedirect()
 	{
-		$exception = new Controller_Redirect_Exception('Mock_Controller', 'action_plain');
+		$exception = new \ElkArte\Exceptions\ControllerRedirectException('Mock_Controller', 'action_plain');
 		$result = $exception->doRedirect($this);
 
 		$this->assertSame($result, 'success');
@@ -15,7 +15,7 @@ class TestControllerRedirectException extends \PHPUnit\Framework\TestCase
 
 	public function testPredispatchRedirect()
 	{
-		$exception = new Controller_Redirect_Exception('Mockpre_Controller', 'action_plain');
+		$exception = new \ElkArte\Exceptions\ControllerRedirectException('Mockpre_Controller', 'action_plain');
 		$result = $exception->doRedirect($this);
 
 		$this->assertSame($result, 'success');
@@ -27,11 +27,11 @@ class TestControllerRedirectException extends \PHPUnit\Framework\TestCase
 	}
 }
 
-class Same_Controller extends Action_Controller
+class Same_Controller extends \ElkArte\AbstractController
 {
 	public function __construct($tester)
 	{
-		$exception = new Controller_Redirect_Exception('Same_Controller', 'action_plain');
+		$exception = new \ElkArte\Exceptions\ControllerRedirectException('Same_Controller', 'action_plain');
 		$result = $exception->doRedirect($this);
 
 		$tester->assertSame($result, 'success');
@@ -47,7 +47,7 @@ class Same_Controller extends Action_Controller
 	}
 }
 
-class Mock_Controller extends Action_Controller
+class Mock_Controller extends \ElkArte\AbstractController
 {
 	public function action_index()
 	{
@@ -59,7 +59,7 @@ class Mock_Controller extends Action_Controller
 	}
 }
 
-class Mockpre_Controller extends Action_Controller
+class Mockpre_Controller extends \ElkArte\AbstractController
 {
 	protected $_pre_run = false;
 

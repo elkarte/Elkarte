@@ -3,13 +3,12 @@
 /**
  * This file contains a couple of functions for the latest posts on forum.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -63,7 +62,7 @@ function getLastPosts($latestPostOptions)
 		$row['body'] = censor($row['body']);
 
 		$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
-		$row['body'] = Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
+		$row['body'] = \ElkArte\Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
 
 		$board_href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['board_name']]);
 		$poster_href = getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['poster_name']]);
@@ -84,7 +83,7 @@ function getLastPosts($latestPostOptions)
 				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $poster_href . '">' . $row['poster_name'] . '</a>'
 			),
 			'subject' => $row['subject'],
-			'short_subject' => Util::shorten_text($row['subject'], $modSettings['subject_length']),
+			'short_subject' => \ElkArte\Util::shorten_text($row['subject'], $modSettings['subject_length']),
 			'preview' => $row['body'],
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),
@@ -358,7 +357,7 @@ function getLastTopics($latestTopicOptions)
 		$row['body'] = censor($row['body']);
 
 		$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
-		$row['body'] = Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
+		$row['body'] = \ElkArte\Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
 
 		$board_href = getUrl('board', ['board' => $row['id_board'], 'start' => '0', 'name' => $row['board_name']]);
 		$poster_href = getUrl('profile', ['action' => 'profile', 'u' => $row['id_member'], 'name' => $row['poster_name']]);
@@ -379,7 +378,7 @@ function getLastTopics($latestTopicOptions)
 				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $poster_href . '">' . $row['poster_name'] . '</a>'
 			),
 			'subject' => $row['subject'],
-			'short_subject' => Util::shorten_text($row['subject'], $modSettings['subject_length']),
+			'short_subject' => \ElkArte\Util::shorten_text($row['subject'], $modSettings['subject_length']),
 			'preview' => $row['body'],
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),

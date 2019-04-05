@@ -16,9 +16,9 @@ class TestFiles extends \PHPUnit\Framework\TestCase
 	{
 		$this->_ourFiles = array();
 
-		$directory = new RecursiveDirectoryIterator(BOARDDIR);
-		$iterator = new RecursiveIteratorIterator($directory);
-		$regex = new RegexIterator($iterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
+		$directory = new \RecursiveDirectoryIterator(BOARDDIR);
+		$iterator = new \RecursiveIteratorIterator($directory);
+		$regex = new \RegexIterator($iterator, '/^.+\.php$/i', \RecursiveRegexIterator::GET_MATCH);
 
 		foreach ($regex as $fileo)
 		{
@@ -75,7 +75,7 @@ class TestFiles extends \PHPUnit\Framework\TestCase
 			$tokens = @token_get_all($file_content);
 			foreach ($tokens as $token)
 			{
-				if ($token === '{')
+				if ($token === '{' || (isset($token[1]) && $token[1] === '${'))
 					$level++;
 				elseif ($token === '}')
 					$level--;
@@ -118,7 +118,43 @@ class TestFiles extends \PHPUnit\Framework\TestCase
 	public function testHeaders()
 	{
 		$header_styles = array(
-			// Pure ElkArte
+			// Pure ElkArte 2
+			'^<\?php
+
+\/\*\*
+(?: \*.{0,200}\n)* \* @package\s{1,5}ElkArte Forum
+ \* @copyright ElkArte Forum contributors
+ \* @license\s{1,5}?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause \(see accompanying LICENSE\.txt file\)
+ \*
+ \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)?
+(?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
+			// ElkArte 2 w/smf credit
+			'^<\?php
+
+\/\*\*
+(?: \*.{0,200}\n)* \* @package\s{1,5}ElkArte Forum
+ \* @copyright ElkArte Forum contributors
+ \* @license\s{1,5}?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause \(see accompanying LICENSE\.txt file\)
+ \*
+ \* This file contains code covered by:
+ \* copyright:\s+20\d\d Simple Machines (?:Forum )?\(http:\/\/www\.simplemachines\.org\)(
+ \*
+ \* copyright:\s+?2004-2011, GreyWyvern - All rights reserved\.)?
+ \*
+ \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)?
+(?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
+			// Pure ElkArte 2 with php path
+			'^#!\/usr\/bin\/php -q
+<\?php
+
+\/\*\*
+(?: \*.{0,200}\n)* \* @package\s{1,5}ElkArte Forum
+ \* @copyright ElkArte Forum contributors
+ \* @license\s{1,5}?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause \(see accompanying LICENSE\.txt file\)
+ \*
+ \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)?
+(?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
+			// Pure ElkArte 1.x
 			'^<\?php
 
 \/\*\*
@@ -128,7 +164,7 @@ class TestFiles extends \PHPUnit\Framework\TestCase
  \*
  \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)?
 (?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
-			// Pure ElkArte with php path
+			// Pure ElkArte 1.x with php path
 			'^#!\/usr\/bin\/php -q
 <\?php
 

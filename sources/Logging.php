@@ -3,13 +3,12 @@
 /**
  * This file concerns itself with logging, whether in the database or files.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -67,7 +66,7 @@ function writeLog($force = false)
 	// Guests use 0, members use their session ID.
 	$session_id = $user_info['is_guest'] ? 'ip' . $user_info['ip'] : session_id();
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	// Grab the last all-of-Elk-specific log_online deletion time.
 	$do_delete = $cache->get('log_online-update', 30) < time() - 30;

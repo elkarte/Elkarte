@@ -4,13 +4,12 @@
  * This file does a lot of important stuff.  Mainly, this means it handles
  * the query string, request variables, and session management.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -31,11 +30,8 @@
  */
 function cleanRequest()
 {
-	require_once(SOURCEDIR . '/Request.php');
-	Elk_Autoloader::instance()->register(SUBSDIR . '/UrlGenerator', '\\ElkArte\\UrlGenerator');
-
 	// Make sure REMOTE_ADDR, other IPs, and the like are parsed
-	$req = Request::instance();
+	$req = \ElkArte\Request::instance();
 
 	$parser = initUrlGenerator()->getParser();
 
@@ -171,7 +167,7 @@ function expandIPv6($addr, $strict_check = true)
 function htmlspecialchars__recursive($var, $level = 0)
 {
 	if (!is_array($var))
-		return Util::htmlspecialchars($var, ENT_QUOTES);
+		return \ElkArte\Util::htmlspecialchars($var, ENT_QUOTES);
 
 	// Add the htmlspecialchars to every element.
 	foreach ($var as $k => $v)
@@ -200,7 +196,7 @@ function htmltrim__recursive($var, $level = 0)
 {
 	// Remove spaces (32), tabs (9), returns (13, 10, and 11), nulls (0), and hard spaces. (160)
 	if (!is_array($var))
-		return Util::htmltrim($var);
+		return \ElkArte\Util::htmltrim($var);
 
 	// Go through all the elements and remove the whitespace.
 	foreach ($var as $k => $v)
@@ -269,7 +265,7 @@ function JavaScriptEscape($string)
  */
 function ob_sessrewrite($buffer)
 {
-	global $scripturl, $modSettings;
+	global $scripturl;
 
 	// If $scripturl is set to nothing, or the SID is not defined (SSI?) just quit.
 	if ($scripturl == '' || !defined('SID'))

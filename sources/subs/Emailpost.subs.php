@@ -4,9 +4,9 @@
  * All the vital helper functions for use in email posting, formatting and conversion
  * and boy are there a bunch !
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -51,7 +51,7 @@ function pbe_email_to_bbc($text, $html)
 		// Run the parsers on the html
 		$text = pbe_run_parsers($text);
 
-		$bbc_converter = new Html_2_BBC($text);
+		$bbc_converter = new \ElkArte\Html2BBC($text);
 		$bbc_converter->skip_tags(array('font', 'span'));
 		$bbc_converter->skip_styles(array('font-family', 'font-size', 'color'));
 		$text = $bbc_converter->get_bbc();
@@ -76,14 +76,14 @@ function pbe_email_to_bbc($text, $html)
 		$text = str_replace(array('&gt;blockquote>', '&gt;/blockquote>'), array('<blockquote>', '</blockquote>'), $text);
 
 		// Convert any resulting HTML created by markup style text in the email to BBC
-		$bbc_converter = new Html_2_BBC($text, false);
+		$bbc_converter = new \ElkArte\Html2BBC($text, false);
 		$text = $bbc_converter->get_bbc();
 	}
 
 	// Some tags often end up as just empty tags - remove those.
 	$emptytags = array(
 		'~\[[bisu]\]\s*\[/[bisu]\]~' => '',
-		'~\[[bisu]\]\s*\[/[bisu]\]~' => '',
+		'~\[quote\]\s*\[/quote\]~' => '',
 		'~(\n){3,}~si' => "\n\n",
 	);
 	$text = preg_replace(array_keys($emptytags), array_values($emptytags), $text);
@@ -158,7 +158,7 @@ function pbe_fix_email_body($body, $real_name = '', $charset = 'UTF-8')
 	$body = preg_replace('~(\[quote\s?([a-zA-Z0-9"=]*)?\]\s*(\[br\]\s*)?\[/quote\])~s', '', $body);
 
 	// Reflow and Cleanup this message to something that looks normal-er
-	$formatter = new Email_Format();
+	$formatter = new \ElkArte\EmailFormat();
 	$body = $formatter->reflow($body, $real_name, $charset);
 
 	return $body;
@@ -640,10 +640,10 @@ function pbe_check_moderation(&$pbe)
  * @package Maillist
  *
  * @param string $error
- * @param Email_Parse $email_message
+ * @param \ElkArte\EmailParse $email_message
  *
  * @return bool
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function pbe_emailError($error, $email_message)
 {
@@ -756,7 +756,7 @@ function pbe_emailError($error, $email_message)
 	);
 
 	// Flush the moderator error number cache, if we are here it likely just changed.
-	Cache::instance()->remove('num_menu_errors');
+	\ElkArte\Cache\Cache::instance()->remove('num_menu_errors');
 
 	// If not running from the cli, then go back to the form
 	if (isset($_POST['item']))
@@ -783,10 +783,10 @@ function pbe_emailError($error, $email_message)
  * @package Maillist
  *
  * @param mixed[] $pbe
- * @param Email_Parse $email_message
+ * @param \ElkArte\EmailParse $email_message
  *
  * @return array
- * @throws Elk_Exception
+ * @throws \ElkArte\Exceptions\Exception
  */
 function pbe_email_attachments($pbe, $email_message)
 {
@@ -801,7 +801,7 @@ function pbe_email_attachments($pbe, $email_message)
 	if (!empty($modSettings['currentAttachmentUploadDir']))
 	{
 		if (!is_array($modSettings['attachmentUploadDir']))
-			$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
+			$modSettings['attachmentUploadDir'] = \ElkArte\Util::unserialize($modSettings['attachmentUploadDir']);
 
 		// The current directory, of course!
 		$current_attach_dir = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
@@ -889,7 +889,7 @@ function pbe_email_attachments($pbe, $email_message)
  *
  * @package Maillist
  *
- * @param Email_Parse $email_address
+ * @param \ElkArte\EmailParse $email_address
  *
  * @return int
  */
@@ -901,7 +901,7 @@ function pbe_find_board_number($email_address)
 	$board_number = 0;
 
 	// Load our valid email ids and the corresponding board ids
-	$data = (!empty($modSettings['maillist_receiving_address'])) ? Util::unserialize($modSettings['maillist_receiving_address']) : array();
+	$data = (!empty($modSettings['maillist_receiving_address'])) ? \ElkArte\Util::unserialize($modSettings['maillist_receiving_address']) : array();
 	foreach ($data as $key => $addr)
 		$valid_address[$addr[0]] = $addr[1];
 
@@ -1008,7 +1008,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	);
 
 	// Convert this to text (markdown)
-	$mark_down = new Html_2_Md($message);
+	$mark_down = new \ElkArte\Html2Md($message);
 	$message = $mark_down->get_markdown();
 
 	// Finally the sig, its goes as just plain text
@@ -1031,7 +1031,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
  * When finished, fire off a site notification informing the user of the action and reason
  *
  * @package Maillist
- * @param Email_Parse $email_message
+ * @param \ElkArte\EmailParse $email_message
  */
 function pbe_disable_user_notify($email_message)
 {
@@ -1083,8 +1083,8 @@ function pbe_disable_user_notify($email_message)
 		//Add a "mention" of email notification being disabled
 		if (!empty($modSettings['mentions_enabled']))
 		{
-			$notifier = Notifications::instance();
-			$notifier->add(new Notifications_Task(
+			$notifier = \ElkArte\Notifications::instance();
+			$notifier->add(new \ElkArte\NotificationsTask(
 				'mailfail',
 				0,
 				$id_member,
@@ -1134,7 +1134,7 @@ function quote_callback_2($matches)
 /**
  * Loads up the vital user information given an email address
  *
- * - Similar to loadMemberData, loadPermissions, loadUserSettings, but only loads a
+ * - Similar to \ElkArte\MembersList::load, loadPermissions, loadUserSettings, but only loads a
  * subset of that data, enough to validate that a user can make a post to a given board.
  * - Done this way to avoid over-writing user_info etc for those who are running
  * this function (on behalf of the email owner, similar to profile views etc)
@@ -1154,7 +1154,7 @@ function quote_callback_2($matches)
  */
 function query_load_user_info($email)
 {
-	global $user_profile, $modSettings, $language;
+	global $modSettings, $language;
 
 	$db = database();
 
@@ -1179,27 +1179,35 @@ function query_load_user_info($email)
 
 	// No user found ... back we go
 	if (empty($id_member))
+	{
 		return false;
+	}
 
 	// Load the users profile information
 	$pbe = array();
-	if (loadMemberData($id_member, false, 'profile'))
+	if (\ElkArte\MembersList::load($id_member, false, 'profile'))
 	{
-		$pbe['profile'] = $user_profile[$id_member];
+		$pbe['profile'] = \ElkArte\MembersList::get($id_member);
 
 		// Load in *some* user_info data just like loadUserSettings would do
 		if (empty($pbe['profile']['additional_groups']))
+		{
 			$pbe['user_info']['groups'] = array(
 				$pbe['profile']['id_group'], $pbe['profile']['id_post_group']);
+		}
 		else
+		{
 			$pbe['user_info']['groups'] = array_merge(
 				array($pbe['profile']['id_group'], $pbe['profile']['id_post_group']),
 				explode(',', $pbe['profile']['additional_groups'])
 			);
+		}
 
 		// Clean up the groups
 		foreach ($pbe['user_info']['groups'] as $k => $v)
+		{
 			$pbe['user_info']['groups'][$k] = (int) $v;
+		}
 		$pbe['user_info']['groups'] = array_unique($pbe['user_info']['groups']);
 
 		// Load the user's general permissions....
@@ -1210,9 +1218,13 @@ function query_load_user_info($email)
 
 		// Work out our query_see_board string for security
 		if (in_array(1, $pbe['user_info']['groups']))
+		{
 			$pbe['user_info']['query_see_board'] = '1=1';
+		}
 		else
+		{
 			$pbe['user_info']['query_see_board'] = '((FIND_IN_SET(' . implode(', b.member_groups) != 0 OR FIND_IN_SET(', $pbe['user_info']['groups']) . ', b.member_groups) != 0)' . (!empty($modSettings['deny_boards_access']) ? ' AND (FIND_IN_SET(' . implode(', b.deny_member_groups) = 0 AND FIND_IN_SET(', $pbe['user_info']['groups']) . ', b.deny_member_groups) = 0)' : '') . ')';
+		}
 
 		// Set some convenience items
 		$pbe['user_info']['is_admin'] = in_array(1, $pbe['user_info']['groups']) ? 1 : 0;
@@ -1280,6 +1292,7 @@ function query_load_permissions($type, &$pbe, $topic_info = array())
  *
  * @package Maillist
  * @param string $from
+ * @return mixed[]
  */
 function query_sender_wrapper($from)
 {
@@ -1337,14 +1350,14 @@ function query_user_keys($email)
 		array(
 			'email' => $email,
 		)
-	);
+	)->fetch_all();
 }
 
 /**
  * Return the email that a given key was sent to
  *
  * @package Maillist
- * @param Email_Parse $email_message
+ * @param \ElkArte\EmailParse $email_message
  * @return string email address the key was sent to
  */
 function query_key_owner($email_message)
@@ -1597,6 +1610,7 @@ function query_load_board($message_id)
  * @package Maillist
  * @param int $board_id
  * @param mixed[] $pbe
+ * @return mixed[]
  */
 function query_load_board_details($board_id, $pbe)
 {
@@ -1743,7 +1757,7 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $pe
  * - Updates the number of unread to reflect this
  *
  * @package Maillist
- * @param Email_Parse $email_message
+ * @param \ElkArte\EmailParse $email_message
  * @param mixed[] $pbe
  */
 function query_mark_pms($email_message, $pbe)
@@ -1807,7 +1821,7 @@ function query_mark_pms($email_message, $pbe)
  * - Also removes any old keys to minimize security issues
  *
  * @package Maillist
- * @param Email_Parse $email_message
+ * @param \ElkArte\EmailParse $email_message
  */
 function query_key_maintenance($email_message)
 {
@@ -1857,7 +1871,7 @@ function query_key_maintenance($email_message)
  *
  * @package Maillist
  * @param mixed[] $pbe
- * @param Email_Parse $email_message
+ * @param \ElkArte\EmailParse $email_message
  * @param mixed[] $topic_info
  */
 function query_update_member_stats($pbe, $email_message, $topic_info = array())
@@ -1910,4 +1924,337 @@ function query_update_member_stats($pbe, $email_message, $topic_info = array())
 		array($session_id, $pbe['profile']['id_member'], 0, $last_login, $member_ip, $serialized),
 		array('session')
 	);
+}
+
+/**
+ * Calls the necessary functions to extract and format the message so its ready for posting
+ *
+ * What it does:
+ *
+ * - Converts an email response (text or html) to a BBC equivalent via pbe_Email_to_bbc
+ * - Formats the email response so it looks structured and not chopped up (via pbe_fix_email_body)
+ *
+ * @package Maillist
+ *
+ * @param boolean $html
+ * @param \ElkArte\EmailParse $email_message
+ * @param mixed[] $pbe
+ *
+ * @return mixed|null|string|string[]
+ */
+function pbe_load_text(&$html, $email_message, $pbe)
+{
+	if (!$html || ($html && preg_match_all('~<table.*?>~i', $email_message->body, $match) >= 2))
+	{
+		// Some mobile responses wrap everything in a table structure so use plain text
+		$text = $email_message->plain_body;
+		$html = false;
+	}
+	else
+		$text = un_htmlspecialchars($email_message->body);
+
+	// Run filters now, before the data is manipulated
+	$text = pbe_filter_email_message($text);
+
+	// Convert to BBC and format it so it looks like a post
+	$text = pbe_email_to_bbc($text, $html);
+
+	$pbe['profile']['real_name'] = isset($pbe['profile']['real_name']) ? $pbe['profile']['real_name'] : '';
+	$text = pbe_fix_email_body($text, $pbe['profile']['real_name'], (empty($email_message->_converted_utf8) ? $email_message->headers['x-parameters']['content-type']['charset'] : 'UTF-8'));
+
+	// Do we even have a message left to post?
+	$text = \ElkArte\Util::htmltrim($text);
+	if (empty($text))
+		return '';
+
+	if ($email_message->message_type !== 'p')
+	{
+		// Prepare it for the database
+		require_once(SUBSDIR . '/Post.subs.php');
+		preparsecode($text);
+	}
+
+	return $text;
+}
+
+/**
+ * Attempts to create a reply post on the forum
+ *
+ * What it does:
+ *
+ * - Checks if the user has permissions to post/reply/postby email
+ * - Calls pbe_load_text to prepare text for the post
+ * - returns true if successful or false for any number of failures
+ *
+ * @package Maillist
+ *
+ * @param mixed[] $pbe array of all pbe user_info values
+ * @param \ElkArte\EmailParse $email_message
+ * @param mixed[] $topic_info
+ *
+ * @return bool
+ * @throws \ElkArte\Exceptions\Exception
+ */
+function pbe_create_post($pbe, $email_message, $topic_info)
+{
+	global $modSettings, $txt;
+
+	// Validate they have permission to reply
+	$becomesApproved = true;
+	if (!in_array('postby_email', $pbe['user_info']['permissions']) && !$pbe['user_info']['is_admin'])
+		return pbe_emailError('error_permission', $email_message);
+	elseif ($topic_info['locked'] && !$pbe['user_info']['is_admin'] && !in_array('moderate_forum', $pbe['user_info']['permissions']))
+		return pbe_emailError('error_locked', $email_message);
+	elseif ($topic_info['id_member_started'] === $pbe['profile']['id_member'] && !$pbe['user_info']['is_admin'])
+	{
+		if ($modSettings['postmod_active'] && in_array('post_unapproved_replies_any', $pbe['user_info']['permissions']) && (!in_array('post_reply_any', $pbe['user_info']['permissions'])))
+			$becomesApproved = false;
+		elseif (!in_array('post_reply_own', $pbe['user_info']['permissions']))
+			return pbe_emailError('error_cant_reply', $email_message);
+	}
+	elseif (!$pbe['user_info']['is_admin'])
+	{
+		if ($modSettings['postmod_active'] && in_array('post_unapproved_replies_any', $pbe['user_info']['permissions']) && (!in_array('post_reply_any', $pbe['user_info']['permissions'])))
+			$becomesApproved = false;
+		elseif (!in_array('post_reply_any', $pbe['user_info']['permissions']))
+			return pbe_emailError('error_cant_reply', $email_message);
+	}
+
+	// Convert to BBC and Format the message
+	$html = $email_message->html_found;
+	$text = pbe_load_text($html, $email_message, $pbe);
+	if (empty($text))
+		return pbe_emailError('error_no_message', $email_message);
+
+	// Seriously? Attachments?
+	if (!empty($email_message->attachments) && !empty($modSettings['maillist_allow_attachments']) && !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1)
+	{
+		if (($modSettings['postmod_active'] && in_array('post_unapproved_attachments', $pbe['user_info']['permissions'])) || in_array('post_attachment', $pbe['user_info']['permissions']))
+			$attachIDs = pbe_email_attachments($pbe, $email_message);
+		else
+			$text .= "\n\n" . $txt['error_no_attach'] . "\n";
+	}
+
+	// Setup the post variables.
+	$msgOptions = array(
+		'id' => 0,
+		'subject' => strpos($topic_info['subject'], trim($pbe['response_prefix'])) === 0 ? $topic_info['subject'] : $pbe['response_prefix'] . $topic_info['subject'],
+		'smileys_enabled' => true,
+		'body' => $text,
+		'attachments' => empty($attachIDs) ? array() : $attachIDs,
+		'approved' => $becomesApproved
+	);
+
+	$topicOptions = array(
+		'id' => $topic_info['id_topic'],
+		'board' => $topic_info['id_board'],
+		'mark_as_read' => true,
+		'is_approved' => !$modSettings['postmod_active'] || empty($topic_info['id_topic']) || !empty($topic_info['approved'])
+	);
+
+	$posterOptions = array(
+		'id' => $pbe['profile']['id_member'],
+		'name' => $pbe['profile']['real_name'],
+		'email' => $pbe['profile']['email_address'],
+		'update_post_count' => empty($topic_info['count_posts']),
+		'ip' => $email_message->load_ip() ? $email_message->ip : $pbe['profile']['member_ip']
+	);
+
+	// Make the post.
+	createPost($msgOptions, $topicOptions, $posterOptions);
+
+	// We need the auto_notify setting, it may be theme based so pass the theme in use
+	$theme_settings = query_get_theme($pbe['profile']['id_member'], $pbe['profile']['id_theme'], $topic_info);
+	$auto_notify = isset($theme_settings['auto_notify']) ? $theme_settings['auto_notify'] : 0;
+
+	// Turn notifications on or off
+	query_notifications($pbe['profile']['id_member'], $topic_info['id_board'], $topic_info['id_topic'], $auto_notify, $pbe['user_info']['permissions']);
+
+	// Notify members who have notification turned on for this,
+	// but only if it's going to be approved
+	if ($becomesApproved)
+	{
+		require_once(SUBSDIR . '/Notification.subs.php');
+		sendNotifications($topic_info['id_topic'], 'reply', array(), array(), $pbe);
+	}
+
+	return true;
+}
+
+/**
+ * Attempts to create a PM (reply) on the forum
+ *
+ * What it does
+ * - Checks if the user has permissions
+ * - Calls pbe_load_text to prepare text for the pm
+ * - Calls query_mark_pms to mark things as read
+ * - Returns true if successful or false for any number of failures
+ *
+ * @uses sendpm to do the actual "sending"
+ * @package Maillist
+ *
+ * @param mixed[] $pbe array of pbe 'user_info' values
+ * @param \ElkArte\EmailParse $email_message
+ * @param mixed[] $pm_info
+ *
+ * @return bool
+ * @throws \ElkArte\Exceptions\Exception
+ */
+function pbe_create_pm($pbe, $email_message, $pm_info)
+{
+	global $modSettings, $txt;
+
+	// Can they send?
+	if (!$pbe['user_info']['is_admin'] && !in_array('pm_send', $pbe['user_info']['permissions']))
+		return pbe_emailError('error_pm_not_allowed', $email_message);
+
+	// Convert the PM to BBC and Format the message
+	$html = $email_message->html_found;
+	$text = pbe_load_text($html, $email_message, $pbe);
+	if (empty($text))
+		return pbe_emailError('error_no_message', $email_message);
+
+	// If they tried to attach a file, just say sorry
+	if (!empty($email_message->attachments) && !empty($modSettings['maillist_allow_attachments']) && !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1)
+		$text .= "\n\n" . $txt['error_no_pm_attach'] . "\n";
+
+	// For sending the message...
+	$from = array(
+		'id' => $pbe['profile']['id_member'],
+		'name' => $pbe['profile']['real_name'],
+		'username' => $pbe['profile']['member_name']
+	);
+
+	$pm_info['subject'] = strpos($pm_info['subject'], trim($pbe['response_prefix'])) === 0 ? $pm_info['subject'] : $pbe['response_prefix'] . $pm_info['subject'];
+
+	// send/save the actual PM.
+	require_once(SUBSDIR . '/PersonalMessage.subs.php');
+	$pm_result = sendpm(array('to' => array($pm_info['id_member_from']), 'bcc' => array()), $pm_info['subject'], $text, true, $from, $pm_info['id_pm_head']);
+
+	// Assuming all went well, mark this as read, replied to and update the unread counter
+	if (!empty($pm_result))
+		query_mark_pms($email_message, $pbe);
+
+	return !empty($pm_result);
+}
+
+/**
+ * Create a new topic by email
+ *
+ * What it does:
+ *
+ * - Called by pbe_topic to create a new topic or by pbe_main to create a new topic via a subject change
+ * - checks posting permissions, but requires all email validation checks are complete
+ * - Calls pbe_load_text to prepare text for the post
+ * - Calls sendNotifications to announce the new post
+ * - Calls query_update_member_stats to show they did something
+ * - Requires the pbe, email_message and board_info arrays to be populated.
+ *
+ * @uses createPost to do the actual "posting"
+ * @package Maillist
+ *
+ * @param mixed[] $pbe array of pbe 'user_info' values
+ * @param \ElkArte\EmailParse $email_message
+ * @param mixed[] $board_info
+ *
+ * @return bool
+ * @throws \ElkArte\Exceptions\Exception
+ */
+function pbe_create_topic($pbe, $email_message, $board_info)
+{
+	global $txt, $modSettings;
+
+	// It does not work like that
+	if (empty($pbe) || empty($email_message))
+		return false;
+
+	// We have the board info, and their permissions - do they have a right to start a new topic?
+	$becomesApproved = true;
+	if (!$pbe['user_info']['is_admin'])
+	{
+		if (!in_array('postby_email', $pbe['user_info']['permissions']))
+			return pbe_emailError('error_permission', $email_message);
+		elseif ($modSettings['postmod_active'] && in_array('post_unapproved_topics', $pbe['user_info']['permissions']) && (!in_array('post_new', $pbe['user_info']['permissions'])))
+			$becomesApproved = false;
+		elseif (!in_array('post_new', $pbe['user_info']['permissions']))
+			return pbe_emailError('error_cant_start', $email_message);
+	}
+
+	// Approving all new topics by email anyway, smart admin this one is ;)
+	if (!empty($modSettings['maillist_newtopic_needsapproval']))
+		$becomesApproved = false;
+
+	// First on the agenda the subject
+	$subject = pbe_clean_email_subject($email_message->subject);
+	$subject = strtr(\ElkArte\Util::htmlspecialchars($subject), array("\r" => '', "\n" => '', "\t" => ''));
+
+	// Not to long not to short
+	if (\ElkArte\Util::strlen($subject) > 100)
+		$subject = \ElkArte\Util::substr($subject, 0, 100);
+	elseif ($subject == '')
+		return pbe_emailError('error_no_subject', $email_message);
+
+	// The message itself will need a bit of work
+	$html = $email_message->html_found;
+	$text = pbe_load_text($html, $email_message, $pbe);
+	if (empty($text))
+		return pbe_emailError('error_no_message', $email_message);
+
+	// Build the attachment array if needed
+	if (!empty($email_message->attachments) && !empty($modSettings['maillist_allow_attachments']) && !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1)
+	{
+		if (($modSettings['postmod_active'] && in_array('post_unapproved_attachments', $pbe['user_info']['permissions'])) || in_array('post_attachment', $pbe['user_info']['permissions']))
+			$attachIDs = pbe_email_attachments($pbe, $email_message);
+		else
+			$text .= "\n\n" . $txt['error_no_attach'] . "\n";
+	}
+
+	// If we get to this point ... then its time to play, lets start a topic !
+	require_once(SUBSDIR . '/Post.subs.php');
+
+	// Setup the topic variables.
+	$msgOptions = array(
+		'id' => 0,
+		'subject' => $subject,
+		'smileys_enabled' => true,
+		'body' => $text,
+		'attachments' => empty($attachIDs) ? array() : $attachIDs,
+		'approved' => $becomesApproved
+	);
+
+	$topicOptions = array(
+		'id' => 0,
+		'board' => $board_info['id_board'],
+		'mark_as_read' => false
+	);
+
+	$posterOptions = array(
+		'id' => $pbe['profile']['id_member'],
+		'name' => $pbe['profile']['real_name'],
+		'email' => $pbe['profile']['email_address'],
+		'update_post_count' => empty($board_info['count_posts']),
+		'ip' => (isset($email_message->ip)) ? $email_message->ip : $pbe['profile']['member_ip']
+	);
+
+	// Attempt to make the new topic.
+	createPost($msgOptions, $topicOptions, $posterOptions);
+
+	// The auto_notify setting
+	$theme_settings = query_get_theme($pbe['profile']['id_member'], $pbe['profile']['id_theme'], $board_info);
+	$auto_notify = isset($theme_settings['auto_notify']) ? $theme_settings['auto_notify'] : 0;
+
+	// Notifications on or off
+	query_notifications($pbe['profile']['id_member'], $board_info['id_board'], $topicOptions['id'], $auto_notify, $pbe['user_info']['permissions']);
+
+	// Notify members who have notification turned on for this, (if it's approved)
+	if ($becomesApproved)
+	{
+		require_once(SUBSDIR . '/Notification.subs.php');
+		sendNotifications($topicOptions['id'], 'reply', array(), array(), $pbe);
+	}
+
+	// Update this users info so the log shows them as active
+	query_update_member_stats($pbe, $email_message, $topicOptions);
+
+	return true;
 }

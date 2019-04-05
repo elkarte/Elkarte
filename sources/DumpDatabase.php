@@ -3,13 +3,12 @@
 /**
  * This file has a single job - database backup.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -108,7 +107,7 @@ function DumpDatabase2()
 
 	// Get all tables in the database....for our installation
 	$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
-	$tables = $database->db_list_tables(false, $real_prefix . '%');
+	$tables = $database->list_tables(false, $real_prefix . '%');
 
 	// Dump each table.
 	foreach ($tables as $tableName)
@@ -122,11 +121,11 @@ function DumpDatabase2()
 				'-- Table structure for table `' . $tableName . '`' . $crlf .
 				'--' . $crlf .
 				$crlf .
-				$database->db_table_sql($tableName) . ';' . $crlf;
+				$database->table_sql($tableName) . ';' . $crlf;
 		}
 		else
 			// This is needed to speedup things later
-			$database->db_table_sql($tableName);
+			$database->table_sql($tableName);
 
 		// How about the data?
 		if (!isset($_REQUEST['data']) || substr($tableName, -10) == 'log_errors')
@@ -163,7 +162,7 @@ function DumpDatabase2()
 			}
 			$db_chunks .=
 				$get_rows;
-			$current_used_memory += Util::strlen($db_chunks);
+			$current_used_memory += \ElkArte\Util::strlen($db_chunks);
 
 			$db_backup .= $db_chunks;
 			unset($db_chunks);

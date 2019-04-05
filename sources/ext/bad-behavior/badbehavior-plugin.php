@@ -6,9 +6,9 @@
  * Copyright (C) 2005,2006,2007,2008,2009,2010,2011,2012 Michael Hampton
  * License: LGPLv3
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * @version 2.0 dev
  *
@@ -39,6 +39,7 @@ function bb2_db_date()
  * Return affected rows from most recent query.
  *
  * @return int
+ * @throws \Exception
  */
 function bb2_db_affected_rows()
 {
@@ -52,6 +53,7 @@ function bb2_db_affected_rows()
  *
  * @param string $string
  * @return string
+ * @throws \Exception
  */
 function bb2_db_escape($string)
 {
@@ -65,6 +67,7 @@ function bb2_db_escape($string)
  *
  * @param object $result
  * @return int
+ * @throws \Exception
  */
 function bb2_db_num_rows($result)
 {
@@ -79,7 +82,8 @@ function bb2_db_num_rows($result)
  * Bad Behavior will use the return value here in other callbacks.
  *
  * @param string $query
- * @return bool or int
+ * @return bool|mixed[]
+ * @throws \Exception
  */
 function bb2_db_query($query)
 {
@@ -88,21 +92,33 @@ function bb2_db_query($query)
 	// First fix the horrors caused by bb's support of only mysql
 	// ok they are right its my horror :P
 	if (strpos($query, 'DATE_SUB') !== false)
+	{
 		$query = 'DELETE FROM {db_prefix}log_badbehavior WHERE date < ' . (bb2_db_date() - 7 * 86400);
+	}
 	elseif (strpos($query, 'OPTIMIZE TABLE') !== false)
+	{
 		return true;
+	}
 	elseif (strpos($query, '@@session.wait_timeout') !== false)
+	{
 		return true;
+	}
 
 	// Run the query, return success, failure or the actual results
-	$result = $db->query('', $query, array());
+	$result = $db->query('', $query, array())->getResultObject();
 
-	if (!$result)
+	if ($result === false)
+	{
 		return false;
+	}
 	elseif ($result === true)
+	{
 		return (bb2_db_affected_rows() !== 0);
+	}
 	elseif (bb2_db_num_rows($result) === 0)
+	{
 		return false;
+	}
 
 	return bb2_db_rows($result);
 }
@@ -114,6 +130,7 @@ function bb2_db_query($query)
  *
  * @param object $result
  * @return mixed[] associate array of query results
+ * @throws \Exception
  */
 function bb2_db_rows($result)
 {
@@ -121,7 +138,9 @@ function bb2_db_rows($result)
 
 	$temp = array();
 	while ($row = $db->fetch_assoc($result))
+	{
 		$temp[] = $row;
+	}
 	$db->free_result($result);
 
 	return $temp;
@@ -154,7 +173,9 @@ function bb2_insert($settings, $package, $key)
 
 	// Logging not enabled
 	if (!$settings['logging'])
+	{
 		return '';
+	}
 
 	// Clean the data that bb sent us
 	$ip = bb2_db_escape($package['ip']);
@@ -178,10 +199,10 @@ function bb2_insert($settings, $package, $key)
 		{
 			// Make sure this header it will fit in the db, if not move on to the next
 			// @todo increase the db space to 512 or convert to text?
-			$check = $length + Util::strlen($h) + Util::strlen($v) + 2;
+			$check = $length + \ElkArte\Util::strlen($h) + \ElkArte\Util::strlen($v) + 2;
 			if ($check < 255)
 			{
-				$headers .= bb2_db_escape($h . ': ' .  $v . "\n");
+				$headers .= bb2_db_escape($h . ': ' . $v . "\n");
 				$length = $check;
 			}
 		}
@@ -193,7 +214,9 @@ function bb2_insert($settings, $package, $key)
 		foreach ($package['request_entity'] as $h => $v)
 		{
 			if (is_array($v))
+			{
 				$v = bb2_multi_implode($v, ' | ');
+			}
 
 			$request_entity .= bb2_db_escape("$h: $v\n");
 		}
@@ -204,7 +227,9 @@ function bb2_insert($settings, $package, $key)
 
 		// Make it safe for the db
 		while (preg_match('~[\'\\\\]$~', substr($request_entity, -1)) === 1)
+		{
 			$request_entity = substr($request_entity, 0, -1);
+		}
 	}
 
 	// Add it
@@ -228,16 +253,22 @@ function bb2_insert($settings, $package, $key)
 function bb2_multi_implode($array, $glue = ',', $trim_all = false)
 {
 	if (!is_array($array))
+	{
 		$array = array($array);
+	}
 
 	foreach ($array as $key => $value)
 	{
 		if (is_array($value))
+		{
 			$array[$key] = bb2_multi_implode($value, $glue, $trim_all);
+		}
 	}
 
 	if ($trim_all)
+	{
 		$array = array_map('trim', $array);
+	}
 
 	return implode($glue, $array);
 }
@@ -246,7 +277,7 @@ function bb2_multi_implode($array, $glue = ',', $trim_all = false)
  * Retrieve whitelist
  *
  * @todo
- * @return type
+ * @return mixed[]|bool
  */
 function bb2_read_whitelist()
 {
@@ -259,14 +290,16 @@ function bb2_read_whitelist()
 		$whitelist[$list] = array();
 		if (!empty($modSettings[$list]))
 		{
-			$whitelist[$list] = Util::unserialize($modSettings[$list]);
+			$whitelist[$list] = \ElkArte\Util::unserialize($modSettings[$list]);
 			$whitelist[$list] = array_filter($whitelist[$list]);
 		}
 	}
 
 	// Nothing in the whitelist
 	if (empty($whitelist['badbehavior_ip_wl']) && empty($whitelist['badbehavior_useragent_wl']) && empty($whitelist['badbehavior_url_wl']))
+	{
 		return false;
+	}
 
 	// Build up the whitelist array so badbehavior can use it
 	return array_merge(
@@ -290,7 +323,9 @@ function bb2_read_settings()
 
 	// Make sure that the proxy addresses are split into an array, and if it's empty - make sure reverse proxy is disabled
 	if (!empty($modSettings['badbehavior_reverse_proxy_addresses']))
+	{
 		$badbehavior_reverse_proxy_addresses = explode('|', trim($modSettings['badbehavior_reverse_proxy_addresses']));
+	}
 	else
 	{
 		$badbehavior_reverse_proxy_addresses = array();
@@ -341,6 +376,7 @@ function bb2_insert_head()
  * This option is not available or has no effect when logging is not in use.
  *
  * @param bool $force
+ * @return string
  */
 function bb2_insert_stats($force = false)
 {
@@ -351,14 +387,16 @@ function bb2_insert_stats($force = false)
 	if ($force || $settings['display_stats'])
 	{
 		// Get the blocked count for the last 7 days ... cache this as well
-		if (!Cache::instance()->getVar($bb2_blocked, 'bb2_blocked', 900))
+		if (!\ElkArte\Cache\Cache::instance()->getVar($bb2_blocked, 'bb2_blocked', 900))
 		{
 			$bb2_blocked = bb2_db_query('SELECT COUNT(*) FROM {db_prefix}log_badbehavior WHERE valid NOT LIKE \'00000000\'');
-			Cache::instance()->put('bb2_blocked', $bb2_blocked, 900);
+			\ElkArte\Cache\Cache::instance()->put('bb2_blocked', $bb2_blocked, 900);
 		}
 
 		if ($bb2_blocked !== false)
+		{
 			return sprintf($txt['badbehavior_blocked'], $bb2_blocked[0]['COUNT(*)']);
+		}
 	}
 }
 

@@ -7,7 +7,7 @@
  *
  * @backupGlobals disabled
  */
-class TestAuth_Controller extends ElkArteWebTest
+class TestAuthController extends ElkArteWebTest
 {
 	public function testAlive()
 	{

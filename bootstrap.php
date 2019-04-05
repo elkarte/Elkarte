@@ -3,17 +3,20 @@
 /**
  * Initialize the ElkArte environment.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
  */
+
+use ElkArte\Errors;
+use ElkArte\Debug;
+use ElkArte\Hooks;
 
 /**
  * Class Bootstrap
@@ -24,12 +27,19 @@
 class Bootstrap
 {
 	/**
+	 * What is returned by the function getrusage.
+	 *
+	 * @var mixed[]
+	 */
+	protected $rusage_start = [];
+
+	/**
 	 * Bootstrap constructor.
 	 *
 	 * @param bool $standalone
 	 *  - true to boot outside of elkarte
 	 *  - false to bootstrap the main elkarte site.
-	 * @throws \Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function __construct($standalone = true)
 	{
@@ -101,18 +111,7 @@ class Bootstrap
 	 */
 	private function setRusage()
 	{
-		global $rusage_start;
-
-		// Directional only script time usage for display
-		// getrusage is missing in php < 7 on Windows
-		if (function_exists('getrusage'))
-		{
-			$rusage_start = getrusage();
-		}
-		else
-		{
-			$rusage_start = array();
-		}
+		$this->rusage_start = getrusage();
 	}
 
 	/**
@@ -140,13 +139,13 @@ class Bootstrap
 		global $cookiename, $db_type, $db_server, $db_port, $db_name, $db_user, $db_passwd;
 		global $ssi_db_user, $ssi_db_passwd, $db_prefix, $db_persist, $db_error_send, $cache_accelerator;
 		global $cache_uid, $cache_password, $cache_enable, $cache_memcached, $db_show_debug, $url_format;
-		global $cachedir, $boarddir, $sourcedir, $extdir, $languagedir, $ignore_install_dir;
+		global $cachedir, $boarddir, $sourcedir, $extdir, $languagedir;
 
 		// Where the Settings.php file is located
 		$settings_loc = __DIR__ . '/Settings.php';
 
 		// First thing: if the install dir exists, just send anybody there
-		// The ignore_install_dir var is for developers only. Do not add it on production sites
+		// The IGNORE_INSTALL_DIR constant is for developers only. Do not add it on production sites
 		if (file_exists('install'))
 		{
 			if (file_exists($settings_loc))
@@ -154,7 +153,7 @@ class Bootstrap
 				require_once($settings_loc);
 			}
 
-			if (empty($ignore_install_dir))
+			if (defined('IGNORE_INSTALL_DIR'))
 			{
 				if (file_exists($settings_loc) && empty($_SESSION['installing']))
 				{
@@ -216,8 +215,8 @@ class Bootstrap
 		define('EXTDIR', $extdir);
 		define('LANGUAGEDIR', $languagedir);
 		define('SOURCEDIR', $sourcedir);
-		define('ADMINDIR', $sourcedir . '/admin');
-		define('CONTROLLERDIR', $sourcedir . '/controllers');
+		define('ADMINDIR', $sourcedir . '/ElkArte/AdminController');
+		define('CONTROLLERDIR', $sourcedir . '/ElkArte/Controller');
 		define('SUBSDIR', $sourcedir . '/subs');
 		define('ADDONSDIR', $boarddir . '/addons');
 		unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
@@ -243,12 +242,12 @@ class Bootstrap
 	 */
 	private function loadAutoloader()
 	{
-		// Initialize the class Autoloader
-		require_once(SOURCEDIR . '/Autoloader.class.php');
-		$autoloader = Elk_Autoloader::instance();
-		$autoloader->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
-		$autoloader->register(SOURCEDIR, '\\ElkArte');
-		$autoloader->register(SOURCEDIR . '/subs/BBC', '\\BBC');
+		require_once(EXTDIR . '/ClassLoader.php');
+
+		$loader = new \ElkArte\ext\Composer\Autoload\ClassLoader();
+		$loader->setPsr4('ElkArte\\', SOURCEDIR . '/ElkArte');
+		$loader->setPsr4('BBC\\', SOURCEDIR . '/ElkArte/BBC');
+		$loader->register();
 	}
 
 	/**
@@ -261,7 +260,7 @@ class Bootstrap
 		// Don't do john didley if the forum's been shut down completely.
 		if (!empty($maintenance) && $maintenance == 2 && (!isset($ssi_maintenance_off) || $ssi_maintenance_off !== true))
 		{
-			Errors::instance()->display_maintenance_message();
+			\ElkArte\Errors\Errors::instance()->display_maintenance_message();
 		}
 	}
 
@@ -271,12 +270,12 @@ class Bootstrap
 	 */
 	private function setDebug()
 	{
-		global $db_show_debug, $rusage_start;
+		global $db_show_debug;
 
 		// Show lots of debug information below the page, not for production sites
 		if ($db_show_debug === true)
 		{
-			Debug::instance()->rusage('start', $rusage_start);
+			\ElkArte\Debug::instance()->rusage('start', $this->rusage_start);
 		}
 	}
 
@@ -294,10 +293,13 @@ class Bootstrap
 		loadDatabase();
 
 		// Let's set up our shiny new hooks handler.
-		Hooks::init(database(), Debug::instance());
+		\ElkArte\Hooks::init(database(), \ElkArte\Debug::instance());
 
 		// It's time for settings loaded from the database.
 		reloadSettings();
+
+		// Make sure we have ready the list of members for populating it
+		\ElkArte\MembersList::init(database(), \ElkArte\Cache\Cache::instance(),  \BBC\ParserWrapper::instance());
 
 		// Our good ole' contextual array, which will hold everything
 		if (empty($context))
@@ -310,12 +312,12 @@ class Bootstrap
 	 * If you are running SSI standalone, you need to call this function after bootstrap is
 	 * initialized.
 	 *
-	 * @throws \Elk_Exception
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function ssi_main()
 	{
 		global $ssi_layers, $ssi_theme, $ssi_gzip, $ssi_ban, $ssi_guest_access;
-		global $modSettings, $context, $sc, $board, $topic, $user_info, $txt;
+		global $modSettings, $context, $board, $topic, $user_info, $txt;
 
 		// Check on any hacking attempts.
 		$this->_validRequestCheck();
@@ -350,12 +352,11 @@ class Bootstrap
 
 			if (!isset($_SESSION['session_value']))
 			{
-				$tokenizer = new Token_Hash();
+				$tokenizer = new \ElkArte\TokenHash();
 				$_SESSION['session_value'] = $tokenizer->generate_hash(32, session_id());
 				$_SESSION['session_var'] = substr(preg_replace('~^\d+~', '', $tokenizer->generate_hash(16, session_id())), 0, rand(7, 12));
 			}
 
-			$sc = $_SESSION['session_value'];
 			// This is here only to avoid session errors in PHP7
 			// microtime effectively forces the replacing of the session in the db each
 			// time the page is loaded
@@ -375,7 +376,7 @@ class Bootstrap
 		loadPermissions();
 
 		// Load the current or SSI theme. (just use $ssi_theme = id_theme;)
-		new ElkArte\Themes\ThemeLoader(isset($ssi_theme) ? (int) $ssi_theme : 0);
+		new \ElkArte\Themes\ThemeLoader(isset($ssi_theme) ? (int) $ssi_theme : 0);
 
 		// Load BadBehavior functions
 		loadBadBehavior();
@@ -395,7 +396,7 @@ class Bootstrap
 		// Do we allow guests in here?
 		if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && basename($_SERVER['PHP_SELF']) !== 'SSI.php')
 		{
-			$controller = new Auth_Controller(new Event_manager());
+			$controller = new \ElkArte\Controller\Auth(new \ElkArte\EventManager());
 			$controller->action_kickguest();
 			obExit(null, true);
 		}
@@ -412,7 +413,7 @@ class Bootstrap
 		// Load the stuff like the menu bar, etc.
 		if (isset($ssi_layers))
 		{
-			$template_layers = Template_Layers::instance();
+			$template_layers = theme()->getLayers();
 			$template_layers->removeAll();
 			foreach ($ssi_layers as $layer)
 			{

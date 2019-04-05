@@ -5,13 +5,12 @@
  * verification is still accessible for all users, a sound clip is being added
  * that reads the letters that are being shown.
  *
- * @name      ElkArte Forum
+ * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 2.0 dev
  *
@@ -30,7 +29,7 @@ function createWaveFile($word)
 {
 	global $settings, $user_info;
 
-	$cache = Cache::instance();
+	$cache = \ElkArte\Cache\Cache::instance();
 
 	// Allow max 2 requests per 20 seconds.
 	if (($ip = $cache->get('wave_file/' . $user_info['ip'], 20)) > 2 || ($ip2 = $cache->get('wave_file/' . $user_info['ip2'], 20)) > 2)
