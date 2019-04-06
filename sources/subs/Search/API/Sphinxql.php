@@ -214,14 +214,18 @@ class Sphinxql extends SearchAPI
 			// Grouping by topic id makes it return only one result per topic, so don't set that for in-topic searches
 			if (empty($search_params['topic']))
 			{
-				// In the topic, base weights is the best ORDER BY param as relevance/rank is topic level
-				$query .= ' GROUP BY id_topic WITHIN GROUP ORDER BY ' . str_replace('rank ', 'weights ', $sphinx_sort);
+				// In the topic group, date based seems the most "normal" ORDER BY param for display purposes
+				$query .= ' GROUP BY id_topic WITHIN GROUP ORDER BY poster_time ASC';
 			}
 
 			$query .= ' ORDER BY ' . $sphinx_sort;
 			$query .= ' LIMIT 0,' . (int) $modSettings['sphinx_max_results'];
 
 			// Set any options needed, like field weights
+			// A better ranker expression is one based off the standard Sphinx SPH04 algo but boosted for
+			// exact_hit and use of proper BM25F instead of the short form BM25.  Use the following for best results
+			// ranker=expr(\'sum((4 * lcs + 2 * (min_hit_pos == 1) + 4 * exact_hit) * user_weight) * 1000 + bm25f(2.0, 0.75, {subject = 4, body = 1})\'),
+			// For proper use of bm25f add "index_field_lengths = 1" to your sphinx.conf and rebuild the index
 			$query .= ' OPTION field_weights=(subject=' . (!empty($modSettings['search_weight_subject']) ? $modSettings['search_weight_subject'] * 10 : 100) . ',body=100),
 			ranker=proximity_bm25,
 			idf=plain,
