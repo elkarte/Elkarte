@@ -94,6 +94,8 @@ class Calendar_Post_Module extends ElkArte\sources\modules\Abstract_Module
 		try
 		{
 			$save_data = $event->validate($_POST);
+			$save_data['id_board'] = $board;
+			$save_data['id_topic'] = $topic;
 		}
 		catch (Exception $e)
 		{
@@ -105,9 +107,6 @@ class Calendar_Post_Module extends ElkArte\sources\modules\Abstract_Module
 		{
 			// Make sure they can link an event to this post.
 			canLinkEvent();
-
-			$save_data['id_board'] = $board;
-			$save_data['id_topic'] = $topic;
 
 			// Insert the event.
 			$event->insert($save_data, $user_info['id']);
