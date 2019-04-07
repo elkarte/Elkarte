@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.2
+ * @version 1.1.6
  *
  */
 
@@ -673,9 +673,11 @@ function template_postarea_below()
 	{
 		template_verification_controls($context['visual_verification_id'], '
 						<div class="post_verification">
-							<span' . (!empty($context['post_error']['need_qr_verification']) ? ' class="error"' : '') . '>
-								<strong>' . $txt['verification'] . ':</strong>
-							</span>
+							<h2 class="category_header">
+							 	<span class="' . (!empty($context['post_error']['need_qr_verification']) ? ' error"' : '"') . '>
+									<strong>' . $txt['verification'] . ':</strong>
+								</span>	
+							</h2>
 							', '
 						</div>');
 	}

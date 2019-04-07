@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.6
  *
  */
 
@@ -1117,22 +1117,8 @@ class Register_Controller extends Action_Controller
 		{
 			require_once(SUBSDIR . '/Graphics.subs.php');
 
-			if (in_array('gd', get_loaded_extensions()) && !showCodeImage($code))
+			if (!showCodeImage($code))
 				header('HTTP/1.1 400 Bad Request');
-			// Otherwise just show a pre-defined letter.
-			elseif (isset($this->_req->query->letter))
-			{
-				$this->_req->query->letter = (int) $this->_req->query->letter;
-				if ($this->_req->query->letter > 0 && $this->_req->query->letter <= strlen($code) && !showLetterImage(strtolower($code{$this->_req->query->letter - 1})))
-				{
-					dieGif();
-				}
-			}
-			// You must be up to no good.
-			else
-			{
-				dieGif();
-			}
 		}
 		// Or direct link to the sound
 		elseif ($this->_req->query->format === '.wav')

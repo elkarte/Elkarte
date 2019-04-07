@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.1
+ * @version 1.1.6
  *
  */
 
@@ -1030,6 +1030,9 @@ if (!function_exists('imagecreatefrombmp'))
 function showCodeImage($code)
 {
 	global $gd2, $settings, $user_info, $modSettings;
+
+	if (!checkGD())
+		return false;
 
 	// What type are we going to be doing?
 	// Note: The higher the value of visual_verification_type the harder the verification is

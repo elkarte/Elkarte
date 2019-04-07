@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.6
  *
  */
 
@@ -80,13 +80,8 @@ function template_verification_control_captcha($verify_id, $verify_context)
 {
 	global $context, $txt;
 
-	if ($verify_context['use_graphic_library'])
-		echo '
+	echo '
 				<img src="', $verify_context['image_href'], '" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '" />';
-	else
-		for ($i = 0; $i < $verify_context['chars_number']; $i++)
-			echo '
-				<img src="', $verify_context['image_href'], ';letter=', $i, '" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '_', $i, '" />';
 
 	echo '
 				<div class="smalltext">
@@ -99,7 +94,7 @@ function template_verification_control_captcha($verify_id, $verify_context)
 		$(\'.playsound, .refreshimage\').Elk_Captcha({
 			\'uniqueID\': ' . JavaScriptEscape($verify_id) . ',
 			\'imageURL\': ' . JavaScriptEscape($verify_context['image_href']) . ',
-			\'useLibrary\': ' . ($verify_context['use_graphic_library'] ? 'true' : 'false') . ',
+			\'useLibrary\': \'true\',
 			\'letterCount\': ' . $verify_context['chars_number'] . '
 		});', true);
 }

@@ -29,8 +29,8 @@ then
    sudo service mysql stop
    sudo apt-get -qq install python-software-properties > /dev/null
    echo mysql-apt-config mysql-apt-config/select-server select "$DB" | sudo debconf-set-selections
-   wget http://dev.mysql.com/get/mysql-apt-config_0.8.6-1_all.deb > /dev/null
-   sudo dpkg --install mysql-apt-config_0.8.6-1_all.deb
+   wget http://dev.mysql.com/get/mysql-apt-config_0.8.12-1_all.deb > /dev/null
+   sudo dpkg --install mysql-apt-config_0.8.12-1_all.deb
    sudo apt-get update -qq
    sudo apt-get install -qq -o Dpkg::Options::=--force-confnew mysql-server
    sudo mysql_upgrade

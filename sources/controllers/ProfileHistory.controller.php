@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.6
  *
  */
 
@@ -439,7 +439,7 @@ class ProfileHistory_Controller extends Action_Controller
 			$context['whois_servers'] = array(
 				'afrinic' => array(
 					'name' => $txt['whois_afrinic'],
-					'url' => 'http://www.afrinic.net/cgi-bin/whois?searchtext=' . $context['ip'],
+					'url' => 'http://www.afrinic.net/whois?searchtext=' . $context['ip'],
 				),
 				'apnic' => array(
 					'name' => $txt['whois_apnic'],
