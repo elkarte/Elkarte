@@ -30,7 +30,7 @@ initialize_inputs();
 load_lang_file();
 
 // This is what we are.
-$installurl = $_SERVER['PHP_SELF'];
+$installurl = urlencode($_SERVER['PHP_SELF']);
 $_SESSION['installing'] = true;
 
 $action = new Install_Controller();
