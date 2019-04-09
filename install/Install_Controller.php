@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.6
  *
  */
 
@@ -759,6 +759,7 @@ class Install_Controller
 			}
 		}
 		$modSettings['disableQueryCheck'] = true;
+		$modSettings['time_offset'] = empty($modSettings['time_offset']) ? 0 : $modSettings['time_offset'];
 
 		// Since we are UTF8, select it. PostgreSQL requires passing it as a string...
 		$db->skip_next_error();
