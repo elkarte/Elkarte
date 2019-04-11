@@ -34,7 +34,11 @@ function loadSession()
 	@ini_set('url_rewriter.tags', '');
 	@ini_set('session.use_trans_sid', false);
 	@ini_set('arg_separator.output', '&amp;');
-
+	
+	// Secure PHPSESSIONID
+	if (parse_url($boardurl, PHP_URL_SCHEME)==='https')
+		@ini_set('session.cookie_secure', true);
+	
 	if (!empty($modSettings['globalCookies']))
 	{
 		$parsed_url = parse_url($boardurl);
