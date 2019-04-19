@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.6
  *
  */
 
@@ -187,7 +187,8 @@ class ManageAttachments_Controller extends Action_Controller
 			}
 
 			// Changing the attachment upload directory
-			if (isset($this->_req->post->attachmentUploadDir))
+			if (isset($this->_req->post->attachmentUploadDir)
+				|| !empty($this->_req->post->use_subdirectories_for_attachments))
 			{
 				if (!empty($this->_req->post->attachmentUploadDir) && file_exists($modSettings['attachmentUploadDir']) && $modSettings['attachmentUploadDir'] != $this->_req->post->attachmentUploadDir)
 					rename($modSettings['attachmentUploadDir'], $this->_req->post->attachmentUploadDir);
