@@ -1214,7 +1214,7 @@ class Html_2_Md
 	{
 		global $txt;
 
-		$replacement = $this->line_end . '[' . $txt['link'] . '](' . $matches[0] . ')';
+		$replacement = $this->line_end . '[' . $txt['link'] . '](' . trim($matches[0]) . ')';
 		$this->_check_link_lenght($replacement);
 
 		return $replacement;

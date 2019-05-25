@@ -766,6 +766,9 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 					'OPENID' => !empty($regOptions['openid']) ? $regOptions['openid'] : '',
 				);
 				$emaildata = loadEmailTemplate('register_' . ($regOptions['auth_method'] == 'openid' ? 'openid_' : '') . 'immediate', $replacements);
+				$mark_down = new Html_2_Md(str_replace("\n", '<br>', $emaildata['body']));
+				$emaildata['body'] = $mark_down->get_markdown();
+
 				sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 			}
 
@@ -778,8 +781,6 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		{
 
 			$emaildata = loadEmailTemplate('register_' . ($regOptions['auth_method'] == 'openid' ? 'openid_' : '') . ($regOptions['require'] == 'activation' ? 'activate' : 'coppa'), $replacements);
-
-			// Convert this to markdown
 			$mark_down = new Html_2_Md(str_replace("\n", '<br>', $emaildata['body']));
 			$emaildata['body'] = $mark_down->get_markdown();
 
@@ -797,6 +798,8 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 			);
 
 			$emaildata = loadEmailTemplate('register_' . ($regOptions['auth_method'] == 'openid' ? 'openid_' : '') . 'pending', $replacements);
+			$mark_down = new Html_2_Md(str_replace("\n", '<br>', $emaildata['body']));
+			$emaildata['body'] = $mark_down->get_markdown();
 
 			sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 
