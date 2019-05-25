@@ -58,6 +58,28 @@ class TestHTML2Md extends PHPUnit_Framework_TestCase
 				'<ol><li><strong><em>test test</em></strong></li></ol>',
 				'1. **_test test_**'
 			),
+			array(
+				'PlainTxtLink',
+				'Thank you for registering at Awesome Forum. Your username is SomeUser. If you forget your password, you can reset it by visiting https://www.awesomeforum.com/?action=reminder
+
+Before you can login, you first need to activate your account. To do so, please follow this link:
+
+<a href="https://www.awesomeforum.com/?action=register;sa=activate;u=12345;code=S5cv#4Xh">Reg Link</a>
+
+Should you have any problems with activation, please visit https://www.awesomeforum.com/?action=register;sa=activate;u=12345 use the code "S5cv#4Xh".
+
+Gracias',
+				'Thank you for registering at Awesome Forum. Your username is SomeUser. If you forget your
+password, you can reset it by visiting
+[Link](https://www.awesomeforum.com/?action=reminder)
+Before you can login, you first need to activate your account. To do so, please follow this
+link:
+[Reg Link](https://www.awesomeforum.com/?action=register;sa=activate;u=12345;code=S5cv#4Xh)
+Should you have any problems with activation, please visit
+[Link](https://www.awesomeforum.com/?action=register;sa=activate;u=12345) use the code
+"S5cv#4Xh".
+Gracias'
+			),
 		);
 	}
 
