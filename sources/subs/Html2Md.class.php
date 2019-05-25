@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.4
+ * @version 1.1.6
  *
  */
 
@@ -1201,7 +1201,7 @@ class Html_2_Md
 	 */
 	private function _convert_plaintxt_links()
 	{
-		$this->markdown = preg_replace_callback('/((https?):\/\/|www\.)[-\p{L}0-9+&@#\/%?=~_|!:,.;]*[\p{L}0-9+&@#\/%=~_|]/iu', array($this, '_plaintxt_callback'), $this->markdown);
+		$this->markdown = preg_replace_callback('/[^\(\/\]]((https?):\/\/|www\.)[-\p{L}0-9+&@#\/%?=~_|!:,.;]*[\p{L}0-9+&@#\/%=~_|]/iu', array($this, '_plaintxt_callback'), $this->markdown);
 	}
 
 	/**
