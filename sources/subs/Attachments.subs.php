@@ -398,12 +398,15 @@ function processAttachments($id_msg = null)
 		$ignore_temp = true;
 
 		// If new files are being added. We can't ignore those
-		foreach ($_FILES['attachment']['tmp_name'] as $dummy)
+		if (!empty($_FILES['attachment']['tmp_name']))
 		{
-			if (!empty($dummy))
+			foreach ($_FILES['attachment']['tmp_name'] as $dummy)
 			{
-				$ignore_temp = false;
-				break;
+				if (!empty($dummy))
+				{
+					$ignore_temp = false;
+					break;
+				}
 			}
 		}
 
