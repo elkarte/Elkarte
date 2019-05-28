@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.6
  */
 
 /**
@@ -43,7 +43,7 @@ class XmlPreview_Controller extends Action_Controller
 		);
 
 		// Valid action?
-		$action = new Action();
+		$action = new Action('xml_preview');
 		$subAction = $action->initialize($subActions, 'invalid', 'item');
 
 		if ($subAction === 'invalid')

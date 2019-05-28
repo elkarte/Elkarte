@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.6
  *
  */
 
@@ -49,7 +49,7 @@ class PostModeration_Controller extends Action_Controller
 		);
 
 		// Pick something valid...
-		$action = new Action();
+		$action = new Action('post_moderation');
 		$subAction = $action->initialize($subActions, 'replies');
 		$action->dispatch($subAction);
 	}
