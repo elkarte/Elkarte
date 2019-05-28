@@ -59,7 +59,7 @@ class TestHTML2BBC extends PHPUnit_Framework_TestCase
 			// Remove pretty print newlines
 			$result = str_replace("\n", '', $result);
 
-			$this->assertEquals($expected, $result);
+			$this->assertEquals($expected, $result, $name);
 		}
 	}
 }
