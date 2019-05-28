@@ -7,7 +7,7 @@
  * @copyright 2012 Michael Kliewe
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  *
- * @link http://www.phpgangsta.de/
+ * @link http://www.phpgangsta.de/  https://github.com/PHPGangsta/GoogleAuthenticator
  */
 
 class GoogleAuthenticator
@@ -110,7 +110,7 @@ class GoogleAuthenticator
 			$urlencoded .= urlencode('&issuer='.urlencode($title));
 		}
 
-		return 'https://chart.googleapis.com/chart?chs='.$width.'x'.$height.'&chld='.$level.'|0&cht=qr&chl='.$urlencoded.'';
+		return "https://api.qrserver.com/v1/create-qr-code/?data=$urlencoded&size=${width}x${height}&ecc=$level";
 	}
 
 	/**
