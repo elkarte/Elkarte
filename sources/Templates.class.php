@@ -54,7 +54,7 @@ class Templates
 	protected function __construct()
 	{
 		// We want to be able to figure out any errors...
-		if (version_compare(PHP_VERSION, '7.0.0', '<'))
+		if (version_compare(PHP_VERSION, '7.0.0', '>='))
 		{
 			error_clear_last();
 		}
