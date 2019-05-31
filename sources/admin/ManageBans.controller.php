@@ -52,7 +52,7 @@ class ManageBans_Controller extends Action_Controller
 		);
 
 		// Start up the controller
-		$action = new Action();
+		$action = new Action('manage_bans');
 
 		// Default the sub-action to 'view ban list'.
 		$subAction = $this->_req->getQuery('sa', 'strval', 'list');

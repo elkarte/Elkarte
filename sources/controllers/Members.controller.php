@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.6
  *
  */
 
@@ -37,7 +37,7 @@ class Members_Controller extends Action_Controller
 		);
 
 		// I don't think we know what to do... throw dies?
-		$action = new Action();
+		$action = new Action('members');
 		$subAction = $action->initialize($subActions, 'none');
 		$context['sub_action'] = $subAction;
 		$action->dispatch($subAction);

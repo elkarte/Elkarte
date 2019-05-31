@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.6
  *
  */
 
@@ -215,7 +215,7 @@ class Package_Actions extends Action_Controller
 		);
 
 		// Set up action/subaction stuff.
-		$action = new Action();
+		$action = new Action('package_actions_test');
 
 		foreach ($this->_passed_actions as $this->_action)
 		{
@@ -732,7 +732,7 @@ class Package_Actions extends Action_Controller
 		$this->failed_steps = array();
 
 		// Set up action/subaction stuff.
-		$action = new Action();
+		$action = new Action('package_actions_install');
 
 		foreach ($this->_passed_actions as $this->_action)
 		{

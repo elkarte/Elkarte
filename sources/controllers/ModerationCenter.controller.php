@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.6
  *
  */
 
@@ -1548,7 +1548,7 @@ class ModerationCenter_Controller extends Action_Controller
 		);
 
 		// Call the right function.
-		$action = new Action();
+		$action = new Action('moderation_center');
 		$subAction = $action->initialize($subActions, 'log');
 		$context['sub_action'] = $subAction;
 		$action->dispatch($subAction);

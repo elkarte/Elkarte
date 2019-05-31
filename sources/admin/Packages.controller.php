@@ -1129,11 +1129,13 @@ class Packages_Controller extends Action_Controller
 			if ($context['extracted_files'] && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
 			{
 				foreach ($context['extracted_files'] as $file)
+				{
 					if (basename($file['filename']) === 'package-info.xml')
 					{
 						$context['base_path'] = dirname($file['filename']) . '/';
 						break;
 					}
+				}
 			}
 
 			if (!isset($context['base_path']))

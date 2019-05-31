@@ -373,7 +373,7 @@ abstract class Database_Abstract implements Database
 		if (empty($log_message))
 			$log_message = $error_message;
 
-		foreach (debug_backtrace() as $step)
+		foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $step)
 		{
 			// Found it?
 			if (!method_exists($this, $step['function']) && !in_array(substr($step['function'], 0, 7), array('elk_db_', 'preg_re', 'db_erro', 'call_us')))

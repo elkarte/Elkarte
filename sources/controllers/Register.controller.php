@@ -89,7 +89,7 @@ class Register_Controller extends Action_Controller
 		);
 
 		// Setup the action handler
-		$action = new Action();
+		$action = new Action('register');
 		$subAction = $action->initialize($subActions, 'register');
 
 		// Call the action

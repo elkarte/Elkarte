@@ -1220,11 +1220,13 @@ class ManageAttachments_Controller extends Action_Controller
 					$use_subdirectories_for_attachments = 0;
 					if (!empty($modSettings['attachment_basedirectories']))
 						foreach ($modSettings['attachment_basedirectories'] as $bid => $base)
+						{
 							if (strpos($modSettings['attachmentUploadDir'][$this->current_dir], $base . DIRECTORY_SEPARATOR) !== false)
 							{
 								$use_subdirectories_for_attachments = 1;
 								break;
 							}
+						}
 
 					if ($use_subdirectories_for_attachments == 0 && strpos($modSettings['attachmentUploadDir'][$this->current_dir], BOARDDIR . DIRECTORY_SEPARATOR) !== false)
 						$bid = 0;

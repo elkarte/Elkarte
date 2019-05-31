@@ -478,7 +478,6 @@ class ManageSecurity_Controller extends Action_Controller
 				array('check', 'badbehavior_verbose', 'postinput' => $txt['badbehavior_default_off']),
 				array('check', 'badbehavior_strict', 'postinput' => $txt['badbehavior_default_off']),
 				array('check', 'badbehavior_offsite_forms', 'postinput' => $txt['badbehavior_default_off']),
-				array('check', 'badbehavior_eucookie', 'postinput' => $txt['badbehavior_default_off']),
 			'',
 				array('check', 'badbehavior_reverse_proxy', 'postinput' => $txt['badbehavior_default_off']),
 				array('text', 'badbehavior_reverse_proxy_header', 30, 'postinput' => $txt['badbehavior_reverse_proxy_header_desc']),

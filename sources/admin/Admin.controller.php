@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.6
  *
  */
 
@@ -758,7 +758,7 @@ class Admin_Controller extends Action_Controller
 		);
 
 		// Set the subaction
-		$action = new Action();
+		$action = new Action('admin_search');
 		$subAction = $action->initialize($subActions, 'internal');
 
 		// Keep track of what the admin wants in terms of advanced or not

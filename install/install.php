@@ -30,7 +30,7 @@ initialize_inputs();
 load_lang_file();
 
 // This is what we are.
-$installurl = urlencode($_SERVER['PHP_SELF']);
+$installurl = htmlspecialchars($_SERVER['PHP_SELF']);
 $_SESSION['installing'] = true;
 
 $action = new Install_Controller();
@@ -78,11 +78,18 @@ function initialize_inputs()
 		@session_start();
 
 	// Reject magic_quotes_sybase='on'.
-	if (ini_get('magic_quotes_sybase') || strtolower(ini_get('magic_quotes_sybase')) == 'on')
-		die('magic_quotes_sybase=on was detected: your host is using an insecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.');
+	if (version_compare(PHP_VERSION, '5.4.0', '<'))
+	{
+		if (ini_get('magic_quotes_sybase') || strtolower(ini_get('magic_quotes_sybase')) == 'on')
+		{
+			die('magic_quotes_sybase=on was detected: your host is using an insecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.');
+		}
 
-	if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc() != 0)
-		die('magic_quotes_gpc=on was detected: your host is using an insecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.');
+		if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc() != 0)
+		{
+			die('magic_quotes_gpc=on was detected: your host is using an insecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.');
+		}
+	}
 
 	// Add slashes, as long as they aren't already being added.
 	foreach ($_POST as $k => $v)

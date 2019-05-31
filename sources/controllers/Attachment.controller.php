@@ -80,7 +80,7 @@ class Attachment_Controller extends Action_Controller
 		);
 
 		// Setup the action handler
-		$action = new Action();
+		$action = new Action('attachments');
 		$subAction = $action->initialize($subActions, 'dlattach');
 
 		// Call the action

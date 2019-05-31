@@ -153,7 +153,7 @@ class ProfileOptions_Controller extends Action_Controller
 		);
 
 		// Set a subaction
-		$action = new Action();
+		$action = new Action('buddy_actions');
 		$subAction = $action->initialize($subActions, 'buddies');
 
 		// Create the tabs for the template.
