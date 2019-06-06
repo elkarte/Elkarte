@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.6
  */
 class Permissions
 {
@@ -65,9 +65,10 @@ class Permissions
 	);
 
 	/**
-	 * Load a few illegal permissions into context.
+	 * Load a few illegal permissions into the class and context.
 	 *
-	 * Calls hook: integrate_load_illegal_permissions
+	 * - Calls hook: integrate_load_illegal_permissions
+	 * - Calls hook: integrate_load_illegal_guest_permissions
 	 */
 	public function __construct()
 	{
@@ -77,6 +78,8 @@ class Permissions
 	}
 
 	/**
+	 * Return the list of illegal permissions
+	 *
 	 * @return string[]
 	 */
 	public function getIllegalPermissions()
@@ -85,7 +88,9 @@ class Permissions
 	}
 
 	/**
-	 * @return array
+	 * Return the list of illegal guest permissions
+	 *
+	 * @return string[]
 	 */
 	public function getIllegalGuestPermissions()
 	{
@@ -93,39 +98,33 @@ class Permissions
 	}
 
 	/**
-	 * @return array
+	 * Loads those reserved permissions into context.
 	 */
 	public function loadIllegal()
 	{
 		global $context;
 
-		$illegal_permissions = array();
 		foreach ($this->reserved_permissions as $illegal_permission)
 		{
 			if (!allowedTo($illegal_permission))
 			{
-				$illegal_permissions[] = $illegal_permission;
+				$this->illegal_permissions[] = $illegal_permission;
 			}
 		}
-		$context['illegal_permissions'] = $illegal_permissions;
-		call_integration_hook('integrate_load_illegal_permissions');
 
-		$this->illegal_permissions = $illegal_permissions;
+		call_integration_hook('integrate_load_illegal_permissions', array(&$this->illegal_permissions));
+		$context['illegal_permissions'] = $this->illegal_permissions;
 	}
 
 	/**
 	 * Loads those permissions guests cannot have, into context.
-	 *
-	 * @return array
 	 */
 	public function loadIllegalGuest()
 	{
 		global $context;
 
+		call_integration_hook('integrate_load_illegal_guest_permissions', array(&$this->illegal_guest_permissions));
 		$context['non_guest_permissions'] = $this->illegal_guest_permissions;
-		call_integration_hook('integrate_load_illegal_guest_permissions');
-
-		return $this->illegal_guest_permissions;
 	}
 
 	/**
