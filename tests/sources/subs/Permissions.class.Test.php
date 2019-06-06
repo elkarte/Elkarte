@@ -77,6 +77,20 @@ class TestPermissionsClass extends PHPUnit_Framework_TestCase
 
 		$valid = in_array('issue_warning', $this->illegal_guest_permissions);
 		$this->assertFalse($valid, 'issue_warning');
+
+		$valid = in_array('pm_read', $this->illegal_guest_permissions);
+		$this->assertFalse($valid, 'pm_read');
+
+		// Compatibility check
+		global $context;
+		$valid = in_array('no_bla_4_you', $context['non_guest_permissions']);
+		$this->assertTrue($valid, 'no_bla_4_you');
+
+		$valid = in_array('issue_warning', $context['non_guest_permissions']);
+		$this->assertFalse($valid, 'issue_warning');
+
+		$valid = in_array('pm_read', $context['non_guest_permissions']);
+		$this->assertFalse($valid, 'pm_read');
 	}
 }
 
@@ -85,6 +99,8 @@ class TestPermissionsClass extends PHPUnit_Framework_TestCase
  */
 function testIntegrationIGP(&$illegal_guest_permissions)
 {
+	global $context;
+
 	// add this
 	$illegal_guest_permissions[] = 'no_bla_4_you';
 
@@ -92,5 +108,11 @@ function testIntegrationIGP(&$illegal_guest_permissions)
 	if (($key = array_search('issue_warning', $illegal_guest_permissions)) !== false)
 	{
 		unset($illegal_guest_permissions[$key]);
+	}
+
+	// remove this
+	if (($key = array_search('pm_read', $context['non_guest_permissions'])) !== false)
+	{
+		unset($context['non_guest_permissions'][$key]);
 	}
 }

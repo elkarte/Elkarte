@@ -112,8 +112,8 @@ class Permissions
 			}
 		}
 
+		$context['illegal_permissions'] = &$this->illegal_permissions;
 		call_integration_hook('integrate_load_illegal_permissions', array(&$this->illegal_permissions));
-		$context['illegal_permissions'] = $this->illegal_permissions;
 	}
 
 	/**
@@ -123,8 +123,8 @@ class Permissions
 	{
 		global $context;
 
+		$context['non_guest_permissions'] = &$this->illegal_guest_permissions;
 		call_integration_hook('integrate_load_illegal_guest_permissions', array(&$this->illegal_guest_permissions));
-		$context['non_guest_permissions'] = $this->illegal_guest_permissions;
 	}
 
 	/**
