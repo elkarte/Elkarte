@@ -1544,7 +1544,7 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
 				}
 			}
 			elseif ($query == 'member_names')
-				$query_parts[$condition === 'or' ? 'or' : 'and'][] = $allowed_conditions[$query]($query_params);
+				$query_parts['and'][] = $allowed_conditions[$query]($query_params);
 			else
 				$query_parts['and'][] = isset($allowed_conditions[$query]) ? $allowed_conditions[$query] : $query;
 		}
