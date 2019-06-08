@@ -199,7 +199,7 @@ class ManageSearch_Controller extends Action_Controller
 
 		if (is_callable(array($searchAPI, 'searchSettings')))
 		{
-			call_user_func_array($searchAPI->searchSettings);
+			call_user_func_array($searchAPI->searchSettings, array());
 		}
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
@@ -318,8 +318,8 @@ class ManageSearch_Controller extends Action_Controller
 			checkSession('get');
 			validateToken('admin-msm', 'get');
 
-			$context['fulltext_index'] = true;
 			alterFullTextIndex('{db_prefix}messages', 'body', true);
+			$fulltext_index = true;
 		}
 		elseif ($this->_req->getQuery('sa', 'trim', '') === 'removefulltext' && !empty($fulltext_index))
 		{
@@ -327,6 +327,7 @@ class ManageSearch_Controller extends Action_Controller
 			validateToken('admin-msm', 'get');
 
 			alterFullTextIndex('{db_prefix}messages', $fulltext_index);
+			$fulltext_index = false;
 
 			// Go back to the default search method.
 			if (!empty($modSettings['search_index']) && $modSettings['search_index'] === 'fulltext')
@@ -406,6 +407,7 @@ class ManageSearch_Controller extends Action_Controller
 		$context['custom_index'] = !empty($modSettings['search_custom_index_config']);
 		$context['partial_custom_index'] = !empty($modSettings['search_custom_index_resume']) && empty($modSettings['search_custom_index_config']);
 		$context['double_index'] = !empty($context['fulltext_index']) && $context['custom_index'];
+		$context['fulltext_index'] = !empty($fulltext_index);
 
 		createToken('admin-msmpost');
 		createToken('admin-msm', 'get');

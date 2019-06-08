@@ -92,10 +92,6 @@ elseif (basename($_SERVER['PHP_SELF']) === 'SSI.php')
 }
 
 error_reporting($ssi_error_reporting);
-if (function_exists('set_magic_quotes_runtime'))
-{
-	@set_magic_quotes_runtime($ssi_magic_quotes_runtime);
-}
 
 return true;
 
