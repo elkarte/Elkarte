@@ -85,6 +85,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		$topicOptions['is_approved'] = true;
 	elseif (!empty($topicOptions['id']) && !isset($topicOptions['is_approved']))
 	{
+		require_once(SUBSDIR . '/Topic.subs.php');
 		$is_approved = topicAttribute($topicOptions['id'], array('approved'));
 		$topicOptions['is_approved'] = $is_approved['approved'];
 	}
