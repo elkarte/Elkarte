@@ -803,7 +803,7 @@ class ManageBans_Controller extends Action_Controller
 			// The first replaces the old one, the others are added new
 			// (simplification, otherwise it would require another query and some work...)
 			$dummy = (array) $this->_req->post;
-			$dummy['ban_suggestions'] = array_shift($this->_req->post->ban_suggestions);
+			$dummy['ban_suggestions'] = (array) array_shift($this->_req->post->ban_suggestions);
 			saveTriggers($dummy, $ban_group, 0, $ban_id);
 			if (!empty($this->_req->post->ban_suggestions))
 				saveTriggers((array) $this->_req->post, $ban_group);
