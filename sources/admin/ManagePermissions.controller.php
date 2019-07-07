@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.6
  *
  */
 
@@ -1056,7 +1056,7 @@ class ManagePermissions_Controller extends Action_Controller
 
 		$context['page_title'] = $txt['permissions_post_moderation'];
 		$context['sub_template'] = 'postmod_permissions';
-		$context['current_profile'] = $this->_req->getQuery('pid', 'intval', 1);
+		$context['current_profile'] = $this->_req->getPost('pid', 'intval', 1);
 
 		// Load all the permission profiles.
 		loadPermissionProfiles();
