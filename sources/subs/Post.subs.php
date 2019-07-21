@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.6
  *
  */
 
@@ -85,6 +85,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		$topicOptions['is_approved'] = true;
 	elseif (!empty($topicOptions['id']) && !isset($topicOptions['is_approved']))
 	{
+		require_once(SUBSDIR . '/Topic.subs.php');
 		$is_approved = topicAttribute($topicOptions['id'], array('approved'));
 		$topicOptions['is_approved'] = $is_approved['approved'];
 	}

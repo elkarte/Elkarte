@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1
+ * @version 1.1.6
  *
  */
 
@@ -52,7 +52,7 @@ class ManageBans_Controller extends Action_Controller
 		);
 
 		// Start up the controller
-		$action = new Action();
+		$action = new Action('manage_bans');
 
 		// Default the sub-action to 'view ban list'.
 		$subAction = $this->_req->getQuery('sa', 'strval', 'list');
@@ -424,7 +424,7 @@ class ManageBans_Controller extends Action_Controller
 							'class' => 'submitbutton',
 							'value' => '
 								<input type="submit" name="remove_selection" value="' . $txt['ban_remove_selected_triggers'] . '" class="right_submit" />
-								<a class="linkbutton" href="' . $scripturl . '?action=admin;area=ban;sa=edittrigger;bg=' . $ban_group_id . '">' . $txt['ban_add_trigger'] . '</a>
+								<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=ban;sa=edittrigger;bg=' . $ban_group_id . '">' . $txt['ban_add_trigger'] . '</a>
 								<input type="hidden" name="bg" value="' . $ban_group_id . '" />
 								<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 								<input type="hidden" name="' . $context['admin-bet_token_var'] . '" value="' . $context['admin-bet_token'] . '" />',
@@ -785,8 +785,8 @@ class ManageBans_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Bans.subs.php');
 
-		$ban_group = $this->_req->getQuery('bg', 'intval', 0);
-		$ban_id = $this->_req->getQuery('bi', 'intval', 0);
+		$ban_group = $this->_req->get('bg', 'intval', 0);
+		$ban_id = $this->_req->get('bi', 'intval', 0);
 
 		if (empty($ban_group))
 			throw new Elk_Exception('ban_not_found', false);
@@ -803,7 +803,7 @@ class ManageBans_Controller extends Action_Controller
 			// The first replaces the old one, the others are added new
 			// (simplification, otherwise it would require another query and some work...)
 			$dummy = (array) $this->_req->post;
-			$dummy['ban_suggestions'] = array_shift($this->_req->post->ban_suggestions);
+			$dummy['ban_suggestions'] = (array) array_shift($this->_req->post->ban_suggestions);
 			saveTriggers($dummy, $ban_group, 0, $ban_id);
 			if (!empty($this->_req->post->ban_suggestions))
 				saveTriggers((array) $this->_req->post, $ban_group);

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.6
  *
  * Original module by Mach8 - We'll never forget you.
  * ETA: Sorry, we did.
@@ -50,7 +50,7 @@ class MergeTopics_Controller extends Action_Controller
 		);
 
 		// ?action=mergetopics;sa=LETSBREAKIT won't work, sorry.
-		$action = new Action();
+		$action = new Action('merge_topics');
 		$subAction = $action->initialize($subActions, 'index');
 		$context['sub_action'] = $subAction;
 		$action->dispatch($subAction);

@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.6
  *
  */
 
@@ -199,7 +199,7 @@ class ManageSearch_Controller extends Action_Controller
 
 		if (is_callable(array($searchAPI, 'searchSettings')))
 		{
-			call_user_func_array($searchAPI->searchSettings);
+			call_user_func_array($searchAPI->searchSettings, array());
 		}
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
@@ -318,8 +318,8 @@ class ManageSearch_Controller extends Action_Controller
 			checkSession('get');
 			validateToken('admin-msm', 'get');
 
-			$context['fulltext_index'] = true;
 			alterFullTextIndex('{db_prefix}messages', 'body', true);
+			$fulltext_index = true;
 		}
 		elseif ($this->_req->getQuery('sa', 'trim', '') === 'removefulltext' && !empty($fulltext_index))
 		{
@@ -327,6 +327,7 @@ class ManageSearch_Controller extends Action_Controller
 			validateToken('admin-msm', 'get');
 
 			alterFullTextIndex('{db_prefix}messages', $fulltext_index);
+			$fulltext_index = false;
 
 			// Go back to the default search method.
 			if (!empty($modSettings['search_index']) && $modSettings['search_index'] === 'fulltext')
@@ -406,6 +407,7 @@ class ManageSearch_Controller extends Action_Controller
 		$context['custom_index'] = !empty($modSettings['search_custom_index_config']);
 		$context['partial_custom_index'] = !empty($modSettings['search_custom_index_resume']) && empty($modSettings['search_custom_index_config']);
 		$context['double_index'] = !empty($context['fulltext_index']) && $context['custom_index'];
+		$context['fulltext_index'] = !empty($fulltext_index);
 
 		createToken('admin-msmpost');
 		createToken('admin-msm', 'get');
@@ -547,18 +549,7 @@ class ManageSearch_Controller extends Action_Controller
 		{
 			checkSession();
 			validateToken('admin-mssphinx');
-
-			updateSettings(array(
-				'sphinx_index_prefix' => rtrim($this->_req->post->sphinx_index_prefix, '/'),
-				'sphinx_data_path' => rtrim($this->_req->post->sphinx_data_path, '/'),
-				'sphinx_log_path' => rtrim($this->_req->post->sphinx_log_path, '/'),
-				'sphinx_stopword_path' => $this->_req->post->sphinx_stopword_path,
-				'sphinx_indexer_mem' => (int) $this->_req->post->sphinx_indexer_mem,
-				'sphinx_searchd_server' => $this->_req->post->sphinx_searchd_server,
-				'sphinx_searchd_port' => (int) $this->_req->post->sphinx_searchd_port,
-				'sphinxql_searchd_port' => (int) $this->_req->post->sphinxql_searchd_port,
-				'sphinx_max_results' => (int) $this->_req->post->sphinx_max_results,
-			));
+			$this->_saveSphinxConfig();
 		}
 		// Checking if we can connect?
 		elseif (isset($this->_req->post->checkconnect))
@@ -633,6 +624,8 @@ class ManageSearch_Controller extends Action_Controller
 		{
 			checkSession();
 			validateToken('admin-mssphinx');
+			$this->_saveSphinxConfig();
+
 			require_once(SUBSDIR . '/ManageSearch.subs.php');
 
 			createSphinxConfig();
@@ -644,6 +637,26 @@ class ManageSearch_Controller extends Action_Controller
 		$context['page_description'] = $txt['sphinx_description'];
 		$context['sub_template'] = 'manage_sphinx';
 		createToken('admin-mssphinx');
+	}
+
+	/**
+	 * Save the form values in modsettings
+	 *
+	 * @throws \Elk_Exception
+	 */
+	private function _saveSphinxConfig()
+	{
+		updateSettings(array(
+			'sphinx_index_prefix' => rtrim($this->_req->post->sphinx_index_prefix, '/'),
+			'sphinx_data_path' => rtrim($this->_req->post->sphinx_data_path, '/'),
+			'sphinx_log_path' => rtrim($this->_req->post->sphinx_log_path, '/'),
+			'sphinx_stopword_path' => $this->_req->post->sphinx_stopword_path,
+			'sphinx_indexer_mem' => (int) $this->_req->post->sphinx_indexer_mem,
+			'sphinx_searchd_server' => $this->_req->post->sphinx_searchd_server,
+			'sphinx_searchd_port' => (int) $this->_req->post->sphinx_searchd_port,
+			'sphinxql_searchd_port' => (int) $this->_req->post->sphinxql_searchd_port,
+			'sphinx_max_results' => (int) $this->_req->post->sphinx_max_results,
+		));
 	}
 
 	/**

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.6
  *
  */
 
@@ -906,15 +906,21 @@ class Packages_Controller extends Action_Controller
 
 		$context['page_title'] .= ' - ' . $txt['browse_packages'];
 		$context['forum_version'] = FORUM_VERSION;
+		$context['available_addon'] = array();
+		$context['available_avatar'] = array();
+		$context['available_smiley'] = array();
+		$context['available_language'] = array();
+		$context['available_unknown'] = array();
+
 		$installed = $context['sub_action'] === 'installed' ? true : false;
-		$context['package_types'] = $installed ? array('modification') : array('modification', 'avatar', 'language', 'smiley', 'unknown');
+		$context['package_types'] = $installed ? array('addon') : array('addon', 'avatar', 'language', 'smiley', 'unknown');
 
 		foreach ($context['package_types'] as $type)
 		{
 			// Use the standard templates for showing this.
 			$listOptions = array(
 				'id' => 'packages_lists_' . $type,
-				'title' => $installed ? $txt['view_and_remove'] : $txt[$type . '_package'],
+				'title' => $installed ? $txt['view_and_remove'] : $txt[($type === 'addon' ? 'modification' : $type) . '_package'],
 				'no_items_label' => $txt['no_packages'],
 				'get_items' => array(
 					'function' => array($this, 'list_packages'),
@@ -1123,11 +1129,13 @@ class Packages_Controller extends Action_Controller
 			if ($context['extracted_files'] && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
 			{
 				foreach ($context['extracted_files'] as $file)
+				{
 					if (basename($file['filename']) === 'package-info.xml')
 					{
 						$context['base_path'] = dirname($file['filename']) . '/';
 						break;
 					}
+				}
 			}
 
 			if (!isset($context['base_path']))
@@ -1746,7 +1754,7 @@ class Packages_Controller extends Action_Controller
 	/**
 	 * Get a listing of all the packages
 	 *
-	 * - Determines if the package is a mod, avatar, language package
+	 * - Determines if the package is a ddon, smiley, avatar, language or unknown package
 	 * - Determines if the package has been installed or not
 	 *
 	 * @param int $start The item to start with (for pagination purposes)
@@ -1812,7 +1820,7 @@ class Packages_Controller extends Action_Controller
 			$sort_id = 1;
 			foreach ($instadds as $installed_add)
 			{
-				$context['available_modification'][$installed_add['package_id']] = array(
+				$context['available_addon'][$installed_add['package_id']] = array(
 					'sort_id' => $sort_id++,
 					'can_uninstall' => true,
 					'name' => $installed_add['name'],
@@ -1836,8 +1844,6 @@ class Packages_Controller extends Action_Controller
 
 			$dirs = array();
 			$sort_id = array(
-				'mod' => 1,
-				'modification' => 1,
 				'addon' => 1,
 				'avatar' => 1,
 				'language' => 1,
@@ -1964,49 +1970,47 @@ class Packages_Controller extends Action_Controller
 					// Add-on / Modification
 					if ($packageInfo['type'] === 'addon' || $packageInfo['type'] === 'modification' || $packageInfo['type'] === 'mod')
 					{
-						$sort_id['modification']++;
-						$sort_id['mod']++;
 						$sort_id['addon']++;
 						if ($installed)
 						{
-							if (!empty($context['available_modification'][$packageInfo['id']]))
+							if (!empty($context['available_addon'][$packageInfo['id']]))
 							{
 								$packages['modification'][strtolower($packageInfo[$sort]) . '_' . $sort_id['mod']] = $packageInfo['id'];
-								$context['available_modification'][$packageInfo['id']] = array_merge($context['available_modification'][$packageInfo['id']], $packageInfo);
+								$context['available_addon'][$packageInfo['id']] = array_merge($context['available_addon'][$packageInfo['id']], $packageInfo);
 							}
 						}
 						else
 						{
-							$packages['modification'][strtolower($packageInfo[$sort]) . '_' . $sort_id['mod']] = md5($package->getFilename());
-							$context['available_modification'][md5($package->getFilename())] = $packageInfo;
+							$packages['addon'][strtolower($packageInfo[$sort]) . '_' . $sort_id['addon']] = md5($package->getFilename());
+							$context['available_addon'][md5($package->getFilename())] = $packageInfo;
 						}
 					}
 					// Avatar package.
 					elseif ($packageInfo['type'] === 'avatar')
 					{
 						$sort_id[$packageInfo['type']]++;
-						$packages['avatar'][strtolower($packageInfo[$sort])] = md5($package->getFilename());
+						$packages['avatar'][strtolower($packageInfo[$sort]) . '_' . $sort_id['avatar']] = md5($package->getFilename());
 						$context['available_avatar'][md5($package->getFilename())] = $packageInfo;
 					}
 					// Smiley package.
 					elseif ($packageInfo['type'] === 'smiley')
 					{
 						$sort_id[$packageInfo['type']]++;
-						$packages['smiley'][strtolower($packageInfo[$sort])] = md5($package->getFilename());
+						$packages['smiley'][strtolower($packageInfo[$sort]) . '_' . $sort_id['smiley']] = md5($package->getFilename());
 						$context['available_smiley'][md5($package->getFilename())] = $packageInfo;
 					}
 					// Language package.
 					elseif ($packageInfo['type'] === 'language')
 					{
 						$sort_id[$packageInfo['type']]++;
-						$packages['language'][strtolower($packageInfo[$sort])] = md5($package->getFilename());
+						$packages['language'][strtolower($packageInfo[$sort]) . '_' . $sort_id['language']] = md5($package->getFilename());
 						$context['available_language'][md5($package->getFilename())] = $packageInfo;
 					}
 					// Other stuff.
 					else
 					{
 						$sort_id['unknown']++;
-						$packages['unknown'][strtolower($packageInfo[$sort])] = md5($package->getFilename());
+						$packages['unknown'][strtolower($packageInfo[$sort]) . '_' . $sort_id['unknown']] = md5($package->getFilename());
 						$context['available_unknown'][md5($package->getFilename())] = $packageInfo;
 					}
 				}
@@ -2124,7 +2128,7 @@ function fetchPerms__recursive($path, &$data, $level)
 		return;
 
 	// Now actually add the data, starting with the folders.
-	ksort($foundData['folders']);
+	uksort($foundData['folders'], 'strcasecmp');
 	foreach ($foundData['folders'] as $folder => $type)
 	{
 		$additional_data = array(
@@ -2164,7 +2168,7 @@ function fetchPerms__recursive($path, &$data, $level)
 	}
 
 	// Now we want to do a similar thing with files.
-	ksort($foundData['files']);
+	uksort($foundData['files'], 'strcasecmp');
 	$counter = -1;
 	foreach ($foundData['files'] as $file => $dummy)
 	{

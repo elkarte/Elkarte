@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.6
  *
  * Original module by Mach8 - We'll never forget you.
  */
@@ -77,7 +77,7 @@ class SplitTopics_Controller extends Action_Controller
 		);
 
 		// To the right sub action or index if an invalid choice was submitted
-		$action = new Action();
+		$action = new Action('split_topics');
 		$subAction = $action->initialize($subActions, 'index');
 		$action->dispatch($subAction);
 	}

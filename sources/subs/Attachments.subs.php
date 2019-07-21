@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.5
+ * @version 1.1.6
  *
  */
 
@@ -398,12 +398,15 @@ function processAttachments($id_msg = null)
 		$ignore_temp = true;
 
 		// If new files are being added. We can't ignore those
-		foreach ($_FILES['attachment']['tmp_name'] as $dummy)
+		if (!empty($_FILES['attachment']['tmp_name']))
 		{
-			if (!empty($dummy))
+			foreach ($_FILES['attachment']['tmp_name'] as $dummy)
 			{
-				$ignore_temp = false;
-				break;
+				if (!empty($dummy))
+				{
+					$ignore_temp = false;
+					break;
+				}
 			}
 		}
 

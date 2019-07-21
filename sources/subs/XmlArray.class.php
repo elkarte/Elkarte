@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.6
  *
  */
 
@@ -170,7 +170,7 @@ class Xml_Array
 					return $array[$el];
 				else
 				{
-					$trace = debug_backtrace();
+					$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 					$i = 0;
 					while ($i < count($trace) && isset($trace[$i]['class']) && $trace[$i]['class'] == get_class($this))
 						$i++;
@@ -728,7 +728,7 @@ class Xml_Array
 		// No results found...
 		if (empty($results))
 		{
-			$trace = debug_backtrace();
+			$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 			$i = 0;
 			while ($i < count($trace) && isset($trace[$i]['class']) && $trace[$i]['class'] == get_class($this))
 				$i++;

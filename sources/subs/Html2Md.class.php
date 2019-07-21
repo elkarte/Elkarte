@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1.4
+ * @version 1.1.6
  *
  */
 
@@ -158,6 +158,9 @@ class Html_2_Md
 
 		// Clean up any excess spacing etc
 		$this->_clean_markdown();
+
+		// Convert any clear text links to MD
+		$this->_convert_plaintxt_links();
 
 		// Wordwrap?
 		if (!empty($this->body_width))
@@ -1191,6 +1194,30 @@ class Html_2_Md
 		{
 			$this->body_width = $line_strlen;
 		}
+	}
+
+	/**
+	 * Helper function to find and wrap plain text links in MD format
+	 */
+	private function _convert_plaintxt_links()
+	{
+		$this->markdown = preg_replace_callback('/[^\(\/\]]((https?):\/\/|www\.)[-\p{L}0-9+&@#\/%?=~_|!:,.;]*[\p{L}0-9+&@#\/%=~_|]/iu', array($this, '_plaintxt_callback'), $this->markdown);
+	}
+
+	/**
+	 * Callback function used by _convert_plaintxt_links for plain link to MD
+	 *
+	 * @param string[] $matches
+	 * @return string
+	 */
+	private function _plaintxt_callback($matches)
+	{
+		global $txt;
+
+		$replacement = $this->line_end . '[' . $txt['link'] . '](' . trim($matches[0]) . ')';
+		$this->_check_link_lenght($replacement);
+
+		return $replacement;
 	}
 
 	/**

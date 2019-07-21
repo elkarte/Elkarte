@@ -11,7 +11,7 @@
  * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  * license:        BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.6
  *
  */
 
@@ -54,7 +54,10 @@ class Templates
 	protected function __construct()
 	{
 		// We want to be able to figure out any errors...
-		@ini_set('track_errors', '1');
+		if (version_compare(PHP_VERSION, '7.0.0', '>='))
+		{
+			error_clear_last();
+		}
 	}
 
 	/**
@@ -331,7 +334,7 @@ class Templates
 
 			$error = fetch_web_data($boardurl . strtr($filename, array(BOARDDIR => '', strtr(BOARDDIR, '\\', '/') => '')));
 			$last_error = error_get_last();
-			if (empty($error) && ini_get('track_errors') && !empty($last_error['message']))
+			if (empty($error) && !empty($last_error['message']))
 			{
 				$error = $last_error['message'];
 			}

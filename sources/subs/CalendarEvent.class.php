@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.6
  *
  */
 
@@ -155,6 +155,9 @@ class Calendar_Event
 		if (!allowedTo('post_new') && empty($this->_settings['disableNoPostingCalendarEdits']))
 			$eventProperties = getEventProperties($this->_event_id, true);
 
+		$id_board = isset($eventProperties['id_board']) ? $eventProperties['id_board'] : (isset($options['id_board']) ? $options['board'] : 0);
+		$id_topic = isset($eventProperties['id_topic']) ? $eventProperties['id_topic'] : (isset($options['id_topic']) ? $options['topic'] : 0);
+
 		if (empty($this->_settings['cal_allowspan']))
 			$span = 0;
 		elseif (empty($options['span']) || $options['span'] == 1)
@@ -168,8 +171,8 @@ class Calendar_Event
 			'title' => Util::substr($options['evtitle'], 0, 100),
 			'span' => $span,
 			'start_date' => strftime('%Y-%m-%d', mktime(0, 0, 0, (int) $options['month'], (int) $options['day'], (int) $options['year'])),
-			'id_board' => isset($eventProperties['id_board']) ? (int) $eventProperties['id_board'] : 0,
-			'id_topic' => isset($eventProperties['id_topic']) ? (int) $eventProperties['id_topic'] : 0,
+			'id_board' => (int) $id_board,
+			'id_topic' => (int) $id_topic,
 		);
 
 		modifyEvent($this->_event_id, $eventOptions);

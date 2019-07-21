@@ -14,7 +14,7 @@ matrix:
         - DB=mysql-5.6
         - WEBTESTS=false
         - COVERAGE=true
-    - php: 7.1
+    - php: 7.3
       env:
         - DB=mysql-5.7
         - WEBTESTS=false

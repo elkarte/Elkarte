@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.6
  *
  */
 
@@ -89,7 +89,7 @@ class Register_Controller extends Action_Controller
 		);
 
 		// Setup the action handler
-		$action = new Action();
+		$action = new Action('register');
 		$subAction = $action->initialize($subActions, 'register');
 
 		// Call the action
@@ -519,16 +519,6 @@ class Register_Controller extends Action_Controller
 		$regOptions['ip2'] = $req->ban_ip();
 		$memberID = registerMember($regOptions, 'register');
 
-		$lang = !empty($modSettings['userLanguage']) ? $modSettings['userLanguage'] : 'english';
-		$agreement = new Agreement($lang);
-		$agreement->accept($memberID, $user_info['ip'], empty($modSettings['agreementRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
-
-		if (!empty($modSettings['requirePrivacypolicy']))
-		{
-			$policy = new \PrivacyPolicy($lang);
-			$policy->accept($memberID, $user_info['ip'], empty($modSettings['privacypolicyRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacypolicyRevision']);
-		}
-
 		// If there are "important" errors and you are not an admin: log the first error
 		// Otherwise grab all of them and don't log anything
 		if ($reg_errors->hasErrors(1) && !$user_info['is_admin'])
@@ -543,6 +533,16 @@ class Register_Controller extends Action_Controller
 			$this->_req->post->step = 2;
 			$this->action_register();
 			return false;
+		}
+
+		$lang = !empty($modSettings['userLanguage']) ? $modSettings['userLanguage'] : 'english';
+		$agreement = new Agreement($lang);
+		$agreement->accept($memberID, $user_info['ip'], empty($modSettings['agreementRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
+
+		if (!empty($modSettings['requirePrivacypolicy']))
+		{
+			$policy = new \PrivacyPolicy($lang);
+			$policy->accept($memberID, $user_info['ip'], empty($modSettings['privacypolicyRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacypolicyRevision']);
 		}
 
 		// Do our spam protection now.
@@ -1117,22 +1117,8 @@ class Register_Controller extends Action_Controller
 		{
 			require_once(SUBSDIR . '/Graphics.subs.php');
 
-			if (in_array('gd', get_loaded_extensions()) && !showCodeImage($code))
+			if (!showCodeImage($code))
 				header('HTTP/1.1 400 Bad Request');
-			// Otherwise just show a pre-defined letter.
-			elseif (isset($this->_req->query->letter))
-			{
-				$this->_req->query->letter = (int) $this->_req->query->letter;
-				if ($this->_req->query->letter > 0 && $this->_req->query->letter <= strlen($code) && !showLetterImage(strtolower($code{$this->_req->query->letter - 1})))
-				{
-					dieGif();
-				}
-			}
-			// You must be up to no good.
-			else
-			{
-				dieGif();
-			}
 		}
 		// Or direct link to the sound
 		elseif ($this->_req->query->format === '.wav')

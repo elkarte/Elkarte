@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.4
+ * @version 1.1.6
  *
  */
 
@@ -153,7 +153,7 @@ class ProfileOptions_Controller extends Action_Controller
 		);
 
 		// Set a subaction
-		$action = new Action();
+		$action = new Action('buddy_actions');
 		$subAction = $action->initialize($subActions, 'buddies');
 
 		// Create the tabs for the template.
@@ -346,7 +346,7 @@ class ProfileOptions_Controller extends Action_Controller
 			{
 				// Now find out the id_member for the members in question.
 				require_once(SUBSDIR . '/ProfileOptions.subs.php');
-				$ignoreArray = getBuddiesID($new_entries, false);
+				$ignoreArray = array_merge($ignoreArray, getBuddiesID($new_entries, false));
 
 				// Now update the current users buddy list.
 				$user_profile[$this->_memID]['pm_ignore_list'] = implode(',', $ignoreArray);

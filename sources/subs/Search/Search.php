@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.3
+ * @version 1.1.6
  *
  */
 
@@ -717,11 +717,13 @@ class Search
 		{
 			$request = $this->_db->query('', '
 				SELECT ' . (empty($this->_search_params['maxage']) ? '0, ' : 'COALESCE(MIN(id_msg), -1), ') . (empty($this->_search_params['minage']) ? '0' : 'COALESCE(MAX(id_msg), -1)') . '
-				FROM {db_prefix}messages
+				FROM {db_prefix}messages AS m' . ($modSettings['postmod_active'] ? '
+					JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)' : '') . '
 				WHERE 1=1' . ($modSettings['postmod_active'] ? '
-					AND approved = {int:is_approved_true}' : '') . (empty($this->_search_params['minage']) ? '' : '
-					AND poster_time <= {int:timestamp_minimum_age}') . (empty($this->_search_params['maxage']) ? '' : '
-					AND poster_time >= {int:timestamp_maximum_age}'),
+					AND m.approved = {int:is_approved_true}
+					AND t.approved = {int:is_approved_true}' : '') . (empty($this->_search_params['minage']) ? '' : '
+					AND m.poster_time <= {int:timestamp_minimum_age}') . (empty($this->_search_params['maxage']) ? '' : '
+					AND m.poster_time >= {int:timestamp_maximum_age}'),
 				array(
 					'timestamp_minimum_age' => empty($this->_search_params['minage']) ? 0 : time() - 86400 * $this->_search_params['minage'],
 					'timestamp_maximum_age' => empty($this->_search_params['maxage']) ? 0 : time() - 86400 * $this->_search_params['maxage'],
@@ -1555,7 +1557,8 @@ class Search
 				LEFT JOIN {db_prefix}members AS first_mem ON (first_mem.id_member = first_m.id_member)
 				LEFT JOIN {db_prefix}members AS last_mem ON (last_mem.id_member = first_m.id_member)
 			WHERE m.id_msg IN ({array_int:message_list})' . ($modSettings['postmod_active'] ? '
-				AND m.approved = {int:is_approved}' : '') . '
+				AND m.approved = {int:is_approved}
+				AND t.approved = {int:is_approved}' : '') . '
 			ORDER BY FIND_IN_SET(m.id_msg, {string:message_list_in_set})
 			LIMIT {int:limit}',
 			array(

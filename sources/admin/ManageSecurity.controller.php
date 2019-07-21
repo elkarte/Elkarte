@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.6
  *
  */
 
@@ -478,7 +478,6 @@ class ManageSecurity_Controller extends Action_Controller
 				array('check', 'badbehavior_verbose', 'postinput' => $txt['badbehavior_default_off']),
 				array('check', 'badbehavior_strict', 'postinput' => $txt['badbehavior_default_off']),
 				array('check', 'badbehavior_offsite_forms', 'postinput' => $txt['badbehavior_default_off']),
-				array('check', 'badbehavior_eucookie', 'postinput' => $txt['badbehavior_default_off']),
 			'',
 				array('check', 'badbehavior_reverse_proxy', 'postinput' => $txt['badbehavior_default_off']),
 				array('text', 'badbehavior_reverse_proxy_header', 30, 'postinput' => $txt['badbehavior_reverse_proxy_header_desc']),

@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1
+ * @version 1.1.6
  *
  */
 
@@ -970,6 +970,7 @@ class Post_Controller extends Action_Controller
 				});'
 			);
 
+			$_REQUEST['preview'] = false;
 			return $this->action_post();
 		}
 

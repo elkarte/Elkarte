@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.5
+ * @version 1.1.6
  *
  */
 
@@ -92,10 +92,10 @@ class Bootstrap
 		define('ELKBOOT', '1');
 
 		// The software version
-		define('FORUM_VERSION', 'ElkArte 1.1.5');
+		define('FORUM_VERSION', 'ElkArte 1.1.6');
 
 		// Shortcut for the browser cache stale
-		define('CACHE_STALE', '?R115');
+		define('CACHE_STALE', '?R116');
 	}
 
 	/**
@@ -149,7 +149,7 @@ class Bootstrap
 
 		// First thing: if the install dir exists, just send anybody there
 		// The ignore_install_dir var is for developers only. Do not add it on production sites
-		if (file_exists('install'))
+		if (file_exists('install') && (file_exists('install/install.php') || file_exists('install/upgrade.php')))
 		{
 			if (file_exists($settings_loc))
 			{

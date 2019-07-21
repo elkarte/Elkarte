@@ -14,7 +14,7 @@
  * copyright:	2004-2011, GreyWyvern - All rights reserved.
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1.2
+ * @version 1.1.6
  *
  */
 
@@ -81,15 +81,27 @@ class Database_MySQL extends Database_Abstract
 
 		// This makes it possible to automatically change the sql_mode and autocommit if needed.
 		if (isset($mysql_set_mode) && $mysql_set_mode === true)
+		{
 			self::$_db->query('', 'SET sql_mode = \'\', AUTOCOMMIT = 1',
-			array(),
-			false
-		);
+				array(),
+				false
+			);
+		}
 
 		// Few databases still have not set UTF-8 as their default input charset
 		self::$_db->query('', '
 			SET NAMES UTF8',
 			array(
+			)
+		);
+
+		// Unfortunately Elk still have some trouble dealing with the most recent settings of MySQL/Mariadb
+		// disable ONLY_FULL_GROUP_BY
+		self::$_db->query('', '
+			SET sql_mode=(SELECT REPLACE(@@sql_mode, {string:disable}, {string:empty}))',
+			array(
+				'disable' => 'ONLY_FULL_GROUP_BY',
+				'empty' => ''
 			)
 		);
 
