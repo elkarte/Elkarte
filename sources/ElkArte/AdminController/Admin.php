@@ -759,7 +759,7 @@ class Admin extends \ElkArte\AbstractController
 		);
 
 		// Set the subaction
-		$action = new \ElkArte\Action();
+		$action = new \ElkArte\Action('admin_search');
 		$subAction = $action->initialize($subActions, 'internal');
 
 		// Keep track of what the admin wants in terms of advanced or not

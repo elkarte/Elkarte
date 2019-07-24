@@ -64,7 +64,7 @@ class Templates
 	public function __construct()
 	{
 		// We want to be able to figure out any errors...
-		@ini_set('track_errors', '1');
+		error_clear_last();
 	}
 
 	/**

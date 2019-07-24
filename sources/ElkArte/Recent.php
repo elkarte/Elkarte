@@ -236,9 +236,11 @@ class Recent
 				SELECT 
 					m.id_msg
 				FROM {db_prefix}messages AS m
-					INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
+					JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
+					JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
 				WHERE ' . $this->_query_this_board . '
 					AND m.approved = {int:is_approved}
+					AND t.approved = {int:is_approved}
 				ORDER BY m.id_msg DESC
 				LIMIT {int:offset}, {int:limit}',
 				array_merge($this->_query_parameters, array(

@@ -126,6 +126,12 @@ class VerificationControls
 			}
 		}
 
+		// Need GD for CAPTCHA images
+		if (!in_array('gd', get_loaded_extensions()))
+		{
+			array_unshift($foundControls, 'captcha');
+		}
+
 		// Let integration add some more controls
 		// @deprecated since 2.0 dev - remove before final
 		call_integration_hook('integrate_control_verification', array(&$foundControls));

@@ -206,7 +206,11 @@ class Maintenance extends \ElkArte\AbstractController
 
 		// Check few things to give advices before make a backup
 		// If safe mod is enable the external tool is *always* the best (and probably the only) solution
-		$context['safe_mode_enable'] = @ini_get('safe_mode');
+		$context['safe_mode_enable'] = false;
+		if (version_compare(PHP_VERSION, '5.4.0', '<'))
+		{
+			$context['safe_mode_enable'] = @ini_get('safe_mode');
+		}
 
 		// This is just a...guess
 		$messages = countMessages();

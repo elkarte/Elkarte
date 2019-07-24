@@ -459,8 +459,9 @@ function loadSubscriptions()
 			$cost = '???';
 
 		// Do the span.
-		preg_match('~(\d*)(\w)~', $row['length'], $match);
-		if (isset($match[2]))
+		$length = '??';
+		$num_length = 0;
+		if (preg_match('~^(\d*)([DWFMY]$)~', $row['length'], $match) === 1)
 		{
 			$num_length = $match[1];
 			$length = $match[1] . ' ';
@@ -482,10 +483,10 @@ function loadSubscriptions()
 					$length .= $txt['paid_mod_span_years'];
 					$num_length *= 31556926;
 					break;
+				default:
+					$length = '??';
 			}
 		}
-		else
-			$length = '??';
 
 		$context['subscriptions'][$row['id_subscribe']] = array(
 			'id' => $row['id_subscribe'],

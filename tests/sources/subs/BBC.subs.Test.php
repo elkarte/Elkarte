@@ -426,12 +426,12 @@ Should be an empty line in between.',
 			array(
 				'Named links',
 				'[url=http://www.elkarte.net/]ElkArte[/url]',
-				'<a href="http://www.elkarte.net/" class="bbc_link" target="_blank">ElkArte</a>',
+				'<a href="http://www.elkarte.net/" class="bbc_link" target="_blank" rel="noopener noreferrer">ElkArte</a>',
 			),
 			array(
 				'URL link',
 				'http://www.elkarte.net/',
-				'<a href="http://www.elkarte.net/" class="bbc_link" target="_blank">http://www.elkarte.net/</a>',
+				'<a href="http://www.elkarte.net/" class="bbc_link" target="_blank" rel="noopener noreferrer">http://www.elkarte.net/</a>',
 			),
 			array(
 				'Test italic coming from the db ref #3054',
@@ -530,7 +530,7 @@ Should be an empty line in between.',
 			array(
 				'UTF8',
 				'[url]www.ñchan.org[/url]',
-				'<a href="http://www.ñchan.org" class="bbc_link" target="_blank">www.ñchan.org</a>'
+				'<a href="http://www.ñchan.org" class="bbc_link" target="_blank" rel="noopener noreferrer">www.ñchan.org</a>'
 			),
 			array(
 				'ListCode1',
@@ -570,7 +570,7 @@ Should be an empty line in between.',
 			array(
 				'schemelessUrl',
 				'[url=//www.google.com]Google[/url]',
-				'<a href="http://www.google.com" class="bbc_link" target="_blank">Google</a>'
+				'<a href="http://www.google.com" class="bbc_link" target="_blank" rel="noopener noreferrer">Google</a>'
 			)
 		);
 	}

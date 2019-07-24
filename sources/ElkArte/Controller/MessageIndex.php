@@ -685,10 +685,10 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 						// $moveCache[0] is the topic, $moveCache[1] is the board to move to.
 						$moveCache[1][$row['id_topic']] = (int) (isset($this->_req->post->move_tos[$row['id_topic']]) ? $this->_req->post->move_tos[$row['id_topic']] : $this->_req->post->move_to);
 
-						if (empty($moveCache[1][$row['id_topic']]))
-							continue;
-
-						$moveCache[0][] = $row['id_topic'];
+						if (!empty($moveCache[1][$row['id_topic']]))
+						{
+							$moveCache[0][] = $row['id_topic'];
+						}
 						break;
 					case 'remove':
 						$removeCache[] = $row['id_topic'];

@@ -146,7 +146,7 @@ class Bootstrap
 
 		// First thing: if the install dir exists, just send anybody there
 		// The IGNORE_INSTALL_DIR constant is for developers only. Do not add it on production sites
-		if (file_exists('install'))
+		if (file_exists('install') && (file_exists('install/install.php') || file_exists('install/upgrade.php')))
 		{
 			if (file_exists($settings_loc))
 			{

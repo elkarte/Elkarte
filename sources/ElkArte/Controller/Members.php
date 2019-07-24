@@ -38,7 +38,7 @@ class Members extends \ElkArte\AbstractController
 		);
 
 		// I don't think we know what to do... throw dies?
-		$action = new \ElkArte\Action();
+		$action = new \ElkArte\Action('members');
 		$subAction = $action->initialize($subActions, 'none');
 		$context['sub_action'] = $subAction;
 		$action->dispatch($subAction);

@@ -80,7 +80,7 @@ class Attachment extends \ElkArte\AbstractController
 		);
 
 		// Setup the action handler
-		$action = new \ElkArte\Action();
+		$action = new \ElkArte\Action('attachments');
 		$subAction = $action->initialize($subActions, 'dlattach');
 
 		// Call the action
@@ -324,14 +324,12 @@ class Attachment extends \ElkArte\AbstractController
 		{
 			if (empty($topic) && !empty($id_attach))
 			{
+				$id_board = 0;
+				$id_topic = 0;
 				$attachPos = getAttachmentPosition($id_attach);
 				if ($attachPos !== false)
 				{
 					list($id_board, $id_topic) = array_values($attachPos);
-				}
-				else
-				{
-					$id_board = 0;
 				}
 			}
 			else
@@ -355,12 +353,12 @@ class Attachment extends \ElkArte\AbstractController
 				if (empty($attachment[1]))
 				{
 					$full_attach = getAttachmentFromTopic($id_attach, $id_topic);
-					$attachment[1] = $full_attach[1];
+					$attachment[1] = !empty($full_attach[1]) ? $full_attach[1] : '';
 					$attachment[4] = 0;
 					$attachment[5] = 0;
 
 					// return mime type ala mimetype extension
-					$check = returnMimeThumb($full_attach[3]);
+					$check = returnMimeThumb(!empty($full_attach[3]) ? $full_attach[3] : 'default');
 
 					if ($check !== false)
 					{

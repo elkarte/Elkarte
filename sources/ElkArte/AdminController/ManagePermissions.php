@@ -1058,7 +1058,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 
 		$context['page_title'] = $txt['permissions_post_moderation'];
 		$context['sub_template'] = 'postmod_permissions';
-		$context['current_profile'] = $this->_req->getQuery('pid', 'intval', 1);
+		$context['current_profile'] = $this->_req->getPost('pid', 'intval', 1);
 
 		// Load all the permission profiles.
 		loadPermissionProfiles();

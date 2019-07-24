@@ -672,9 +672,11 @@ function template_postarea_below()
 	{
 		template_verification_controls($context['visual_verification_id'], '
 						<div class="post_verification">
-							<span' . (!empty($context['post_error']['need_qr_verification']) ? ' class="error"' : '') . '>
-								<strong>' . $txt['verification'] . ':</strong>
-							</span>
+							<h2 class="category_header">
+							 	<span class="' . (!empty($context['post_error']['need_qr_verification']) ? ' error"' : '"') . '>
+									<strong>' . $txt['verification'] . ':</strong>
+								</span>	
+							</h2>
 							', '
 						</div>');
 	}

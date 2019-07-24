@@ -49,7 +49,7 @@ class PostModeration extends \ElkArte\AbstractController
 		);
 
 		// Pick something valid...
-		$action = new \ElkArte\Action();
+		$action = new \ElkArte\Action('post_moderation');
 		$subAction = $action->initialize($subActions, 'replies');
 		$action->dispatch($subAction);
 	}
