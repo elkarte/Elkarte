@@ -1,6 +1,6 @@
 <?php
 
-class TestMD2HTML extends PHPUnit_Framework_TestCase
+class TestMD2HTML extends \PHPUnit\Framework\TestCase
 {
 	protected $mdTestCases = array();
 

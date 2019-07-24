@@ -4,7 +4,7 @@
  * TestCase class for Permissions Class.
  */
 
-class TestPermissionsClass extends PHPUnit_Framework_TestCase
+class TestPermissionsClass extends \PHPUnit\Framework\TestCase
 {
 	public $permissionsObject;
 	private $illegal_permissions = array();
