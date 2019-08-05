@@ -103,11 +103,6 @@
 	background: #FCFCFC;
 }
 
-.theme_options .content {
-	border-top: 1px solid #CCCCCC;
-	border-bottom: 1px solid #CCCCCC;
-}
-
 /* the help ? icon in various spots */
 a.help .icon {
 	margin: 0;

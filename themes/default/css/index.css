@@ -228,6 +228,7 @@ textarea, .editor {
 
 /* Declarations for inputs, selects and buttons */
 input, .input_text, button, select {
+	font-size: .857em;
 	height: 2em;
 	min-height: 2em;
 	max-height: 2em;
@@ -246,10 +247,6 @@ select {
 	padding: 0 0 0 2px;
 	white-space: nowrap;
 	text-overflow: ellipsis;
-}
-
-input, .input_text, select, button {
-	font-size: .857em;
 }
 
 select option {
@@ -1776,6 +1773,9 @@ nav > .quickbuttons {
 /*.quickbuttons .listlevel1:hover .linklevel1:focus, .quickbuttons .listlevel1.sfhover .linklevel1:focus {
 	margin: 0;
 }*/
+/* The rest of them.
+ * @todo: font awesome yadda yadda
+ */
 
 .quickbuttons .linklevel1:before, .quickbuttons .linklevel2:before {
 	position: absolute;
@@ -1787,20 +1787,13 @@ nav > .quickbuttons {
 	height: 24px;
 	margin-top: -12px;
 	content: "";
+	background-image: url(../images/theme/quickbuttons.png);
+	/* A rare example of where longhand background declarations work well. */
+	background-repeat: no-repeat;
 }
 
 .quickmod_check {
 	left: 3px;
-}
-
-/* The rest of them.
- * @todo: font awesome yadda yadda
- */
-
-.quickbuttons .linklevel1:before, .quickbuttons .linklevel2:before {
-	background-image: url(../images/theme/quickbuttons.png);
-	/* A rare example of where longhand background declarations work well. */
-	background-repeat: no-repeat;
 }
 
 /* The long list of sprite coordinates is much less verbose this way. */

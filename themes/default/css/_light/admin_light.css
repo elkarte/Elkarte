@@ -241,9 +241,6 @@
 .theme_options .content:nth-child(even), .theme_options li:nth-child(even) {
 	border-top-color: #CCCCCC;
 	border-bottom-color: #CCCCCC;
-}
-
-.theme_options .content:nth-child(even), .theme_options li:nth-child(even) {
 	background: #FEFEFE;
 }
 

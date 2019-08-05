@@ -1877,10 +1877,6 @@ a.help .icon {
 		border-top: 1px solid #EEEEEE;
 	}
 
-	#top_section .wrapper {
-		padding: 0;
-	}
-
 	dd.statsbar {
 		padding: 0 !important;
 	}
@@ -2010,6 +2006,7 @@ a.help .icon {
 
 	#top_section .wrapper {
 		width: 100%;
+		padding: 0;
 	}
 
 	#main_menu .linklevel1 {

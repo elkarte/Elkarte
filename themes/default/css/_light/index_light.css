@@ -1910,10 +1910,6 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 	background: #FFEEEE url(../../images/profile/warning_mute.png) 10px 50% no-repeat;
 }
 
-.border_error {
-	border-color: #FF0000 !important;
-}
-
 /* -------------------------------------------------------
  *	$PROGRESS
  * -------------------------------------------------------
