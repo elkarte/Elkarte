@@ -11,8 +11,8 @@
 #core_features, #entry_form,
 #groupForm, #mailqueue_stats, #manage_maintenance,
 #new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper {
-	background: #EEEEEE;
 	border-color: #CCCCCC;
+	background: #EEEEEE;
 	box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.1);
 }
 
@@ -34,9 +34,9 @@
 }
 
 #advanced_panel_header {
+	border-color: #CCCCCC;
 	background: #FEFEFE;
 	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-	border-color: #CCCCCC;
 }
 
 #welcome {
@@ -52,11 +52,11 @@
 }
 
 #admin_main_section .content {
-	background: #FEFEFE;
+	border-color: #CCCCCC;
 	border-top-color: #BBBBBB;
 	border-bottom-color: #DDDDDD;
+	background: #FEFEFE;
 	box-shadow: 0 2px 2px rgba(255, 255, 255, 0.5), 0 -1px 2px rgba(0, 0, 0, 0.1);
-	border-color: #CCCCCC;
 }
 
 #live_news div.content dl {
@@ -93,9 +93,9 @@
 }
 
 #find_code, #replace_code {
-	background: #EEEEEE;
 	border-top-color: #999999;
 	border-bottom-color: #999999;
+	background: #EEEEEE;
 }
 
 /* Styles for the D&D indicators
@@ -120,15 +120,15 @@
 }
 
 #manage_boards span.modify_boards a {
-	background: #FEFEFE;
 	color: #222222;
-	box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 	border-color: #AFAFAF;
+	background: #FEFEFE;
+	box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 #manage_boards span.modify_boards a:hover {
-	background: #FEFEFE;
 	color: #444444;
+	background: #FEFEFE;
 	box-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
 }
 
@@ -155,8 +155,8 @@
 ------------------------------------------------- */
 
 #manage_maintenance div.content {
-	background: none;
 	border-bottom-color: #CCCCCC;
+	background: none;
 	box-shadow: 0 1px 0 #FEFEFE;
 }
 
@@ -212,17 +212,17 @@
 }
 
 #modcenter .content, #modcenter .generic_list_wrapper {
-	background: #FEFEFE;
-	border-bottom-color: #CCCCCC;
 	border-color: #DDDDDD;
+	border-bottom-color: #CCCCCC;
+	background: #FEFEFE;
 }
 
 #mod_main_section .content {
-	background: #FEFEFE;
+	border-color: #CCCCCC;
 	border-top-color: #BBBBBB;
 	border-bottom-color: #DDDDDD;
+	background: #FEFEFE;
 	box-shadow: 0 2px 2px rgba(255, 255, 255, 0.5), 0 -1px 2px rgba(0, 0, 0, 0.1);
-	border-color: #CCCCCC;
 }
 
 .moderation_notes li {
@@ -260,8 +260,8 @@
 
 .ui-dialog {
 	border-color: #999999;
-	box-shadow: 0 0 16px rgba(0, 0, 0, 0.3);
 	background-color: #F4F4F4;
+	box-shadow: 0 0 16px rgba(0, 0, 0, 0.3);
 }
 
 .ui-dialog .ui-dialog-titlebar {
@@ -269,14 +269,14 @@
 }
 
 .ui-widget-overlay {
-	background-color: #000000;
 	opacity: 0.3;
+	background-color: #000000;
 }
 
 /* This is the drag/drop placeholder, normally not visible */
 .ui-state-highlight {
-	background-color: #EEEEEE !important;
 	border-color: green !important;
+	background-color: #EEEEEE !important;
 }
 
 .sortable_smiley {

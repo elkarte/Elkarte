@@ -32,17 +32,17 @@
 @media print, projection {
 	.str { color: #006600 }
 
-	.kwd { color: #000066; font-weight: bold }
+	.kwd { font-weight: bold; color: #000066 }
 
-	.com { color: #660000; font-style: italic }
+	.com { font-style: italic; color: #660000 }
 
-	.typ { color: #440044; font-weight: bold }
+	.typ { font-weight: bold; color: #440044 }
 
 	.lit { color: #004444 }
 
 	.pun, .opn, .clo { color: #444400 }
 
-	.tag { color: #000066; font-weight: bold }
+	.tag { font-weight: bold; color: #000066 }
 
 	.atn { color: #440044 }
 

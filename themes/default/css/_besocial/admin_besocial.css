@@ -25,8 +25,8 @@
 }
 
 #admin_content .content {
-	background: #F6F6F6;
 	border: none;
+	background: #F6F6F6;
 	box-shadow: none;
 }
 
@@ -58,8 +58,8 @@
 }
 
 .ui-state-highlight {
-	background-color: #F5F5F5;
 	border: 1px dashed #298299;
+	background-color: #F5F5F5;
 }
 
 /* Styles for the manage membergroups.
@@ -77,18 +77,18 @@
 .ui-dialog {
 	border: 1px solid #999999;
 	border-radius: 4px 4px 0 0;
-	box-shadow: 0 0 16px rgba(0, 0, 0, 0.3);
 	background-color: #F5F5F5;
+	box-shadow: 0 0 16px rgba(0, 0, 0, 0.3);
 }
 
 .ui-dialog .ui-dialog-titlebar {
-	background-color: #FAFAFA;
 	border-radius: 4px 4px 0 0;
+	background-color: #FAFAFA;
 }
 
 .ui-widget-overlay {
-	background-color: #000000;
 	opacity: 0.3;
+	background-color: #000000;
 }
 
 /* Styles for the quick search bar */
@@ -98,9 +98,9 @@
 
 /* alternate row colors on Modify Themes,Copy a template */
 .theme_options .content {
-	background: #FCFCFC;
 	border-top: 1px solid #CCCCCC;
 	border-bottom: 1px solid #CCCCCC;
+	background: #FCFCFC;
 }
 
 .theme_options .content {

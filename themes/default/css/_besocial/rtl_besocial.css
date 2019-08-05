@@ -50,11 +50,11 @@
 /* Stop white band under footer on short pages. */
 /* This color should match $FOOTER background. */
 legend {
-	background: url(../../images/selected_open.png) no-repeat scroll right center transparent;
-	padding-left: 0;
-	padding-right: 20px;
-	margin-left: 0;
 	margin-right: 15px;
+	margin-left: 0;
+	padding-right: 20px;
+	padding-left: 0;
+	background: url(../../images/selected_open.png) no-repeat scroll right center transparent;
 }
 
 .collapsed legend {
@@ -63,8 +63,8 @@ legend {
 
 /* The OpenID login form */
 .openid_login {
-	padding-left: 0;
 	padding-right: 20px;
+	padding-left: 0;
 	background-position: 98% 50%;
 }
 
@@ -108,8 +108,8 @@ legend {
 
 /* /me uses this a lot. (emote, try typing /me in a post.) */
 .meaction {
-	color: #50AA3A;
 	vertical-align: bottom;
+	color: #50AA3A;
 }
 
 /*	$AJAX		*/
@@ -132,8 +132,8 @@ legend {
 
 /* News section. */
 #news > h2 {
-	margin: -2px 0 0 1em;
 	float: right;
+	margin: -2px 0 0 1em;
 }
 
 /*	$MENUS		*/
@@ -196,9 +196,9 @@ legend {
 /* Top level subsection indicators. */
 /* Level 1 active buttons. */
 .pm_indicator {
-	box-shadow: -1px 1px 2px #444444;
-	left: auto;
 	right: -1px;
+	left: auto;
+	box-shadow: -1px 1px 2px #444444;
 }
 
 /* Admin menu icons. */
@@ -224,13 +224,13 @@ legend {
 /* ------------------------------------------------------- */
 /* our buddies &laquo; &raquo; */
 .small_pagelinks:before {
-	content: '\00AB';
 	float: right;
+	content: '\00AB';
 }
 
 .small_pagelinks:after {
-	content: '\00BB';
 	float: right;
+	content: '\00BB';
 }
 
 /* Globally accessible top/bottom links. */
@@ -267,9 +267,9 @@ legend {
 }
 
 .board_stats {
-	text-align: right;
-	padding: 1px 0 1px 6px;
 	float: right;
+	padding: 1px 0 1px 6px;
+	text-align: right;
 }
 
 /*	$BOARDS		*/
@@ -303,8 +303,8 @@ legend {
 }
 
 .statsbar .bar {
-	background: #43A8DA;
 	border-radius: 0 4px 4px 0;
+	background: #43A8DA;
 }
 
 /* Styles for the $TABS	*/
@@ -312,9 +312,9 @@ legend {
 /* Styles for the profile summary tabs, or any jquery ui tabs */
 /* ---------------------------------------------------------- */
 .ui-tabs .ui-tabs-nav li {
-	box-shadow: -2px 0 0 rgba(0, 0, 0, 0.3);
-	margin-left: 0;
 	margin-right: 2px;
+	margin-left: 0;
+	box-shadow: -2px 0 0 rgba(0, 0, 0, 0.3);
 }
 
 /*	$MEDIA		*/
@@ -346,8 +346,8 @@ legend {
 	}
 
 	#forumtitle {
-		margin-left: 0;
 		margin-right: 10px;
+		margin-left: 0;
 	}
 
 	.topic_listing > li {

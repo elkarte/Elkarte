@@ -67,20 +67,20 @@ html {
 }
 
 body {
+	color: #585858;
 	background: #585858;
 	background-image: linear-gradient(to right, #333333 0%, #888888 50%, #333333 100%);
-	color: #585858;
 }
 
 fieldset {
-	background: transparent;
 	border-color: #CCCCCC;
+	background: transparent;
 	box-shadow: inset -1px -1px 3px #FEFEFE;
 }
 
 legend {
-	background: url(../../images/selected_open.png) 0 50% no-repeat;
 	color: #333333;
+	background: url(../../images/selected_open.png) 0 50% no-repeat;
 }
 
 .collapsed legend {
@@ -88,9 +88,9 @@ legend {
 }
 
 input, button, select, textarea, .editor {
+	color: #585858;
 	border-color: #CCCCCC;
 	background: #FAFAFA;
-	color: #585858;
 }
 
 input:hover, textarea:hover, button:hover, select:hover {
@@ -99,8 +99,8 @@ input:hover, textarea:hover, button:hover, select:hover {
 }
 
 textarea:hover, .editor:hover {
-	background: #FEFEFE;
 	color: #444444;
+	background: #FEFEFE;
 }
 
 input:focus, textarea:focus, button:focus, select:focus, .editor:focus {
@@ -123,24 +123,24 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 /* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
-	background: #F4F4F4;
 	color: #585858;
+	border-color: #AFAFAF;
 	border-top-color: #CFCFCF;
 	border-left-color: #BFBFBF;
-	box-shadow: 1px 1px 2px #E5E5E5, 0 -1px 0 #E5E5E5 inset;
-	border-color: #AFAFAF;
+	background: #F4F4F4;
 	background-image: linear-gradient(to bottom, #FEFEFE, #E4E4E4);
+	box-shadow: 1px 1px 2px #E5E5E5, 0 -1px 0 #E5E5E5 inset;
 }
 
 /* Hover effects. */
 input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:hover,
 .linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
-	background: #F0F0F0;
 	color: #585858;
+	border-color: #CCCCCC;
 	border-top-color: #AFAFAF;
 	border-left-color: #AFAFAF;
+	background: #F0F0F0;
 	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
-	border-color: #CCCCCC;
 }
 
 /* Don't show disabled buttons as active on hover */
@@ -153,20 +153,20 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 
 /* the new "button" */
 .new_posts, .new_posts:visited, .new_posts:link {
-	background: #27A348;
 	color: #FEFEFE;
+	background: #27A348;
 }
 
 /* approval indicator */
 .require_approval {
-	background: #27A348;
 	color: #FEFEFE;
+	background: #27A348;
 }
 
 /* Standard horizontal rule.. ([hr], etc.) */
 hr {
-	background: #EEEEEE;
 	border-top-color: #BBBBBB;
+	background: #EEEEEE;
 }
 
 strong {
@@ -175,35 +175,35 @@ strong {
 
 /* @todo - Test this everywhere. */
 .content {
+	border-color: #CCCCCC;
 	background: #FEFEFE;
 	box-shadow: 1px 2px 4px #EBEBEB;
-	border-color: #CCCCCC;
 }
 
 /* Styles for main headers. */
 .category_header, .forum_category .category_header {
-	background: #EBEBEB;
 	color: #566450;
+	border-color: #CCCCCC;
 	border-top-color: #DDDDDD;
 	border-bottom-color: #BBBBBB;
-	border-color: #CCCCCC;
+	background: #EBEBEB;
 	background-image: linear-gradient(to bottom, #FAFAFA, #EAEAEA);
 	text-shadow: 1px 1px 0 #EBEBEB;
 }
 
 /* Single ones a bit darker than board index ones. */
 .category_header, .content_category .category_header {
-	background: #EBEBEB;
 	border-top-color: #CFCFCF;
 	border-bottom-color: #BBBBBB;
+	background: #EBEBEB;
 	background-image: linear-gradient(to bottom, #FAFAFA, #E4E4E4);
 }
 
 /* Styles for subsection headers. @todo */
 .secondary_header {
-	background: #FAFAFA;
-	border-top-color: #DDDDDD;
 	border-color: #CCCCCC;
+	border-top-color: #DDDDDD;
+	background: #FAFAFA;
 	background-image: linear-gradient(to bottom, #FAFAFA, #EBEBEB);
 	text-shadow: 1px 1px 0 #FEFEFE;
 }
@@ -217,13 +217,13 @@ strong {
  */
 
 ::-moz-selection {
-	background: #D8FFDF;
 	color: #444444;
+	background: #D8FFDF;
 }
 
 ::selection {
-	background: #D8FFDF;
 	color: #444444;
+	background: #D8FFDF;
 }
 
 /* Other highlighted text, such as search results. */
@@ -279,13 +279,13 @@ strong {
 }
 
 .generic_list_wrapper .title_bar {
-	background: none;
 	border-bottom-color: #FEFEFE;
+	background: none;
 }
 
 .generic_list_wrapper .information {
-	background: none;
 	border-bottom-color: #FEFEFE;
+	background: none;
 }
 
 /* Styles used by the auto suggest control. */
@@ -302,8 +302,8 @@ strong {
 }
 
 .auto_suggest_item_hover {
-	background: #888888;
 	color: #EEEEEE;
+	background: #888888;
 }
 
 /* -------------------------------------------------------
@@ -313,9 +313,9 @@ strong {
 
 /* The "Quote:" and "Code:" header parts... */
 .codeheader, .quoteheader {
+	color: #585858;
 	border-color: #CCCCCC;
 	background: #FEFEFE;
-	color: #585858;
 }
 
 .codeheader {
@@ -342,9 +342,9 @@ strong {
 
 /* Extra code block styling. */
 .bbc_code {
-	background: #FAFAFA;
 	border-top-color: #AFAFAF;
 	border-bottom-color: #AFAFAF;
+	background: #FAFAFA;
 }
 
 /* Styling for BBC tags */
@@ -418,9 +418,9 @@ div.bbc_footnotes .meaction {
 
 /* The "Loading" bar for quick edit, etc. */
 #ajax_in_progress, .ajax_infobar {
-	background: #FEFEFE;
 	color: #3D6E32;
 	border-bottom-color: #3D6E32;
+	background: #FEFEFE;
 }
 
 #ajax_in_progress a {
@@ -434,11 +434,11 @@ div.bbc_footnotes .meaction {
 
 /* The top bar. */
 #top_section {
-	background: #F4F4F4;
 	border-top-color: #5BA048;
 	border-bottom-color: #3D6E32;
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 1px 0 #38642D inset;
+	background: #F4F4F4;
 	background-image: linear-gradient(to bottom, #FEFEFE, #EEEEEE);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 1px 0 #38642D inset;
 }
 
 /* Maintenance mode warning. */
@@ -455,13 +455,13 @@ div.bbc_footnotes .meaction {
 }
 
 #search_form select {
-	border-color: #AFAFAF;
 	opacity: 0.8;
+	border-color: #AFAFAF;
 }
 
 #search_form select:focus {
-	border-color: #999999;
 	opacity: 1;
+	border-color: #999999;
 }
 
 #search_form button {
@@ -487,27 +487,27 @@ div.bbc_footnotes .meaction {
 }
 
 #news_line, #news {
-	background: #FEFEFE;
 	color: #585858;
-	box-shadow: 1px 2px 3px #EEEEEE;
 	border-color: #CCCCCC;
+	background: #FEFEFE;
+	box-shadow: 1px 2px 3px #EEEEEE;
 }
 
 /* Main forum area. */
 /* Box-shadow only on this one. */
 #wrapper {
-	background: #FAFAFA;
+	border-color: #4B863C;
 	border-top-color: #5BA048;
 	border-bottom-color: #3D6E32;
+	background: #FAFAFA;
 	box-shadow: 0 2px 4px #111111;
-	border-color: #4B863C;
 }
 
 /* The footer with copyright links etc. */
 #footer_section {
-	background: #222222;
 	color: #BBBBBB;
 	border-top-color: #3D6E32;
+	background: #222222;
 	box-shadow: 0 -1px 0 #686868, 0 1px 0 #0E0E0E inset;
 }
 
@@ -516,8 +516,8 @@ div.bbc_footnotes .meaction {
 }
 
 #footer_section .rssfeeds {
-	background-color: white;
 	color: #FFA500;
+	background-color: white;
 	text-shadow: 1px 1px 0 #000000;
 }
 
@@ -527,8 +527,8 @@ div.bbc_footnotes .meaction {
 }
 
 #debug_logging {
-	background: #222222;
 	color: #BBBBBB;
+	background: #222222;
 }
 
 #debug_logging_wrapper {
@@ -536,8 +536,8 @@ div.bbc_footnotes .meaction {
 }
 
 .action_viewquery {
-	background: #222222;
 	color: #BBBBBB;
+	background: #222222;
 }
 
 .action_viewquery a {
@@ -564,13 +564,13 @@ div.bbc_footnotes .meaction {
 
 /* Level 1 Menu bar: link or button. General styling. */
 .linklevel1, .linklevel1:link, .linklevel1:visited {
-	background: #F4F4F4;
 	color: #566E4B;
+	border-color: #AFAFAF;
 	border-top-color: #CFCFCF;
 	border-left-color: #BFBFBF;
-	box-shadow: 1px 1px 2px #E4E4E4;
-	border-color: #AFAFAF;
+	background: #F4F4F4;
 	background-image: linear-gradient(to bottom, #FEFEFE, #E4E4E4);
+	box-shadow: 1px 1px 2px #E4E4E4;
 }
 
 /* Level 1 button hover and focus effects. */
@@ -579,12 +579,12 @@ div.bbc_footnotes .meaction {
 .linklevel3:hover, .listlevel3:hover .linklevel3,
 #menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1,
 #menu_current_area > strong > .linklevel1 {
-	background: #F0F0F0;
 	color: #686868;
+	border-color: #CCCCCC;
 	border-top-color: #AFAFAF;
 	border-left-color: #AFAFAF;
+	background: #F0F0F0;
 	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
-	border-color: #CCCCCC;
 }
 
 .poster li.listlevel1:hover {
@@ -593,22 +593,22 @@ div.bbc_footnotes .meaction {
 }
 
 .poster li.poster_online:hover .linklevel1 {
-	background: #F0F0F0;
 	color: #585858;
+	border-color: #CCCCCC;
 	border-top-color: #AFAFAF;
 	border-left-color: #AFAFAF;
+	background: #F0F0F0;
 	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
-	border-color: #CCCCCC;
 }
 
 .poster li.poster_online .nolink {
-	background: #F4F4F4;
 	color: #566E4B;
+	border-color: #AFAFAF;
 	border-top-color: #CFCFCF;
 	border-left-color: #BFBFBF;
-	box-shadow: 1px 1px 2px #E4E4E4;
-	border-color: #AFAFAF;
+	background: #F4F4F4;
 	background-image: linear-gradient(to bottom, #FEFEFE, #E4E4E4);
+	box-shadow: 1px 1px 2px #E4E4E4;
 }
 
 .poster li.poster_online .nolink img {
@@ -623,23 +623,23 @@ div.bbc_footnotes .meaction {
 /* Level 1 active buttons. */
 .linklevel1.active, .listlevel1:hover .active,
 #collapse_button .linklevel1, .pm_indicator, .likes_indicator {
-	background: #4B863C;
 	color: #FEFEFE;
+	border-color: #3D6E32;
 	border-top-color: #4B863C;
 	border-left-color: #38642D;
-	box-shadow: 1px 1px 2px #BBBBBB;
-	border-color: #3D6E32;
+	background: #4B863C;
 	background-image: linear-gradient(to bottom, #5BA048, #3D6E32);
+	box-shadow: 1px 1px 2px #BBBBBB;
 }
 
 /* Hover effects for those buttons. */
 .linklevel1.active:hover, .listlevel1:hover .linklevel1.active,
 #collapse_button .linklevel1:hover, .linklevel1:hover .pm_indicator {
-	background: #3D6E32;
+	border-color: #5BA048;
 	border-top-color: #2D5024;
 	border-left-color: #2D5024;
+	background: #3D6E32;
 	box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3) inset;
-	border-color: #5BA048;
 }
 
 .linklevel1:hover .pm_indicator {
@@ -683,8 +683,8 @@ div.bbc_footnotes .meaction {
 .poster_avatar .linklevel1, .poster_avatar:hover .linklevel1,
 .poster_avatar .linklevel1:focus,
 .name.linklevel1, .name.linklevel1:hover, .name.linklevel1:focus {
-	background: none;
 	color: #4B863C;
+	background: none;
 	box-shadow: none;
 }
 
@@ -694,11 +694,11 @@ div.bbc_footnotes .meaction {
 
 /* Levels 2 and 3: drop menu wrapper. */
 .menulevel2, .menulevel3 {
-	background: #FEFEFE;
+	border-color: #AFAFAF;
 	border-top-color: #CFCFCF;
 	border-left-color: #BFBFBF;
+	background: #FEFEFE;
 	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.2);
-	border-color: #AFAFAF;
 }
 
 /* Tricky PM indicator. Define it carefully,
@@ -723,8 +723,8 @@ div.bbc_footnotes .meaction {
 
 /* Levels 2 and 3 drop menus: link or button. */
 .linklevel2:link, .linklevel2:visited, .linklevel3:link, .linklevel3:visited {
-	border-color: transparent;
 	color: #585858;
+	border-color: transparent;
 }
 
 /* Admin menu icons. */
@@ -759,10 +759,10 @@ div.bbc_footnotes .meaction {
  */
 
 #menu_sidebar .linklevel1 {
-	background: none;
 	color: #585858;
-	box-shadow: none;
 	border-color: transparent;
+	background: none;
+	box-shadow: none;
 }
 
 /* End sidebar flyout coding. */
@@ -874,19 +874,19 @@ div.bbc_footnotes .meaction {
 
 .pagelinks .navPages {
 	color: #585858;
-	border-top-color: #BBBBBB;
 	border-color: #AFAFAF;
+	border-top-color: #BBBBBB;
 	background-image: linear-gradient(to bottom, #FEFEFE 0%, #E4E4E4 100%);
 }
 
 .pagelinks .navPages:hover, .pagelinks .current_page {
-	background: #F0F0F0;
 	/* @todo - Simplify. */
 	color: #585858;
+	border-color: #CCCCCC;
 	border-top-color: #AFAFAF;
 	border-left-color: #AFAFAF;
+	background: #F0F0F0;
 	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
-	border-color: #CCCCCC;
 }
 
 .pagelinks :first-child {
@@ -908,10 +908,10 @@ div.bbc_footnotes .meaction {
 
 /* Globally accessible top/bottom links. */
 #gotop, #gobottom {
+	opacity: 0.2;
+	color: #EEEEEE;
 	border-color: #222222;
 	background: #EEEEEE;
-	color: #EEEEEE;
-	opacity: 0.2;
 }
 
 #gobottom {
@@ -919,8 +919,8 @@ div.bbc_footnotes .meaction {
 }
 
 #gotop:hover, #gobottom:hover {
-	color: #444444;
 	opacity: 1;
+	color: #444444;
 }
 
 /* Skip navigation link. */
@@ -940,10 +940,10 @@ div.bbc_footnotes .meaction {
 }
 
 .table_head > th {
-	background: #FEFEFE;
 	color: #686868;
 	border-top-color: #DDDDDD;
 	border-bottom-color: #DDDDDD;
+	background: #FEFEFE;
 }
 
 /* Basic cells. */
@@ -965,8 +965,8 @@ div.bbc_footnotes .meaction {
  */
 
 .table_grid .standard_row.highlight2 {
-	background: #E4E4E4;
 	color: #585858;
+	background: #E4E4E4;
 }
 
 /* For Errors.template.php. */
@@ -1074,9 +1074,9 @@ div.bbc_footnotes .meaction {
 }
 
 #description_board .generalinfo, #forumposts .generalinfo {
-	background: #FEFEFE;
-	border-bottom-color: #CCCCCC;
 	border-color: #DDDDDD;
+	border-bottom-color: #CCCCCC;
+	background: #FEFEFE;
 }
 
 .topic_listing {
@@ -1150,15 +1150,15 @@ div.bbc_footnotes .meaction {
 }
 
 .jump_to_header {
-	background: #EBEBEB;
 	color: #566450;
-	box-shadow: 2px 1px rgba(1, 1, 1, 0.07) inset;
+	background: #EBEBEB;
 	background-image: linear-gradient(to bottom, #FAFAFA, #EAEAEA);
+	box-shadow: 2px 1px rgba(1, 1, 1, 0.07) inset;
 }
 
 .jump_to_header:hover {
-	background: #F0F0F0;
 	color: #585858;
+	background: #F0F0F0;
 }
 
 /* ---------------------------------------------------------------------
@@ -1267,9 +1267,9 @@ div.bbc_footnotes .meaction {
 }
 
 .poll_gradient {
+	border-color: #111111;
 	background: #5BA048;
 	background-image: linear-gradient(to bottom, #60BC78 0%, #27A348 100%);
-	border-color: #111111;
 }
 
 /* On to the posts */
@@ -1280,9 +1280,9 @@ div.bbc_footnotes .meaction {
 
 /* Poster and postarea + moderation area underneath */
 .forumposts {
-	background: #FEFEFE;
-	border-bottom-color: #CCCCCC;
 	border-color: #DDDDDD;
+	border-bottom-color: #CCCCCC;
+	background: #FEFEFE;
 }
 
 /* Colors for background of posts requiring approval */
@@ -1300,26 +1300,26 @@ div.bbc_footnotes .meaction {
 }
 
 .report_seperator {
-	background: #BBBBBB;
 	border-bottom-color: #EEEEEE;
+	background: #BBBBBB;
 }
 
 /* @todo - Save code by amalgamating common button background declarations. */
 .poster_online .linklevel1 {
-	background: #F4F4F4;
+	border-color: #AFAFAF;
 	border-top-color: #CFCFCF;
 	border-left-color: #BFBFBF;
-	box-shadow: 1px 1px 2px #EEEEEE;
-	border-color: #AFAFAF;
+	background: #F4F4F4;
 	background-image: linear-gradient(to bottom, #FEFEFE 0%, #E4E4E4 100%);
+	box-shadow: 1px 1px 2px #EEEEEE;
 }
 
 .poster_online .linklevel1:hover {
-	background: #F0F0F0;
+	border-color: #CCCCCC;
 	border-top-color: #AFAFAF;
 	border-left-color: #BBBBBB;
+	background: #F0F0F0;
 	box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.07) inset;
-	border-color: #CCCCCC;
 }
 
 .post_subject {
@@ -1341,9 +1341,9 @@ div.bbc_footnotes .meaction {
 
 /* attachment details below thumbnails */
 .attachment_name, .attachment_details {
-	background: #E4E4E4 !important;
 	color: #444444 !important;
 	border: solid 1px #AFAFAF;
+	background: #E4E4E4 !important;
 }
 
 .attachment_name {
@@ -1408,11 +1408,11 @@ div.bbc_footnotes .meaction {
 }
 
 .requiredfield {
-	background: #3D6E32;
 	color: #FEFEFE;
+	border-color: #2D5024;
 	border-right-color: #5BA048;
 	border-bottom-color: #5BA048;
-	border-color: #2D5024;
+	background: #3D6E32;
 }
 
 /* -------------------------------------------------------
@@ -1422,9 +1422,9 @@ div.bbc_footnotes .meaction {
 
 /* The main post editor section. */
 #preview_body {
-	background: #FEFEFE;
-	border-bottom-color: #CCCCCC;
 	border-color: #DDDDDD;
+	border-bottom-color: #CCCCCC;
+	background: #FEFEFE;
 }
 
 #postAdditionalOptionsHeader, #postDraftOptionsHeader {
@@ -1443,20 +1443,20 @@ div.bbc_footnotes .meaction {
 }
 
 .drop_area {
+	color: #444444;
 	border-color: #CCCCCC;
 	background-color: #E4E4E4;
-	color: #444444;
 }
 
 .statusbar {
-	background: #F0F0F0;
 	border-top-color: #A9CCD1;
 	border-bottom-color: #A9CCD1;
+	background: #F0F0F0;
 }
 
 .statusbar .insertoverlay {
-	background-color: #FAFAFA;
 	border-color: #A9CCD1;
+	background-color: #FAFAFA;
 }
 
 .insertoverlay .tabs li {
@@ -1468,8 +1468,8 @@ div.bbc_footnotes .meaction {
 }
 
 .statusbar .insertoverlay .button {
-	background: #008000;
 	color: #FAFAFA;
+	background: #008000;
 }
 
 .progressBar {
@@ -1477,8 +1477,8 @@ div.bbc_footnotes .meaction {
 }
 
 .progressBar div {
-	background-color: #008000;
 	color: #FEFEFE;
+	background-color: #008000;
 }
 
 .abort {
@@ -1514,9 +1514,9 @@ div.bbc_footnotes .meaction {
  */
 
 .ui-tabs .ui-tabs-panel {
-	background: #FEFEFE none repeat scroll 0 0;
-	border-top-color: #CCCCCC;
 	border-color: #DDDDDD;
+	border-top-color: #CCCCCC;
+	background: #FEFEFE none repeat scroll 0 0;
 }
 
 .ui-tabs .ui-tabs-nav li {
@@ -1526,10 +1526,10 @@ div.bbc_footnotes .meaction {
 }
 
 .ui-tabs .ui-tabs-nav .ui-tabs-anchor {
-	background: #F0F0F0;
 	border-bottom-color: #CCCCCC;
 	border-radius: 6px 6px 0 0;
 	outline: none;
+	background: #F0F0F0;
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-default .ui-tabs-anchor {
@@ -1539,27 +1539,27 @@ div.bbc_footnotes .meaction {
 
 .ui-tabs .ui-tabs-nav .ui-state-active .ui-tabs-anchor,
 .ui-tabs .ui-tabs-nav .ui-state-active {
+	color: #FEFEFE;
 	background: #4B863C;
 	background-image: linear-gradient(to bottom, #5BA048, #3D6E32);
-	color: #FEFEFE;
 }
 
 .ui-tabs .ui-tabs-nav li.ui-state-hover .ui-tabs-anchor {
-	background: #F0F0F0;
 	color: #585858;
+	border-color: #CCCCCC;
 	border-top-color: #AFAFAF;
 	border-left-color: #AFAFAF;
-	border-color: #CCCCCC;
+	background: #F0F0F0;
 }
 
 li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover,
 li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
-	background: #3D6E32;
 	color: #FEFEFE;
+	border-color: #5BA048;
 	border-top-color: #2D5024;
 	border-left-color: #2D5024;
+	background: #3D6E32;
 	box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3) inset;
-	border-color: #5BA048;
 }
 
 /* -------------------------------------------------------
@@ -1699,8 +1699,8 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 }
 
 .calendar_table {
-	background: #DDDDDD;
 	border-top-color: #DDDDDD;
+	background: #DDDDDD;
 }
 
 .calendar_table th, .calendar_table td {
@@ -1787,10 +1787,10 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 
 /* The text content, hopefully helpful. */
 .popup_content {
-	background: #FAFAFA;
-	border-bottom-color: #CCCCCC;
-	box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.1);
 	border-color: #BBBBBB;
+	border-bottom-color: #CCCCCC;
+	background: #FAFAFA;
+	box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* -------------------------------------------------------
@@ -1857,9 +1857,9 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
  */
 
 .coppa_contact {
+	color: #585858;
 	border-color: #585858;
 	background: #FEFEFE;
-	color: #585858;
 }
 
 .valid_input {
@@ -1887,27 +1887,27 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 }
 
 .warningbox {
-	background: #FFF5CD url(../../images/profile/warning_moderate.png) 10px 50% no-repeat;
 	border-top-color: #FFA500;
 	border-bottom-color: #FFA500;
+	background: #FFF5CD url(../../images/profile/warning_moderate.png) 10px 50% no-repeat;
 }
 
 .successbox {
-	background: #EEFFEE url(../../images/icons/field_valid.png) 10px 50% no-repeat;
 	border-top-color: #008000;
 	border-bottom-color: #008000;
+	background: #EEFFEE url(../../images/icons/field_valid.png) 10px 50% no-repeat;
 }
 
 .infobox {
-	background: #D9EDF7 url(../../images/icons/quick_sticky.png) 10px 50% no-repeat;
 	border-top-color: #3A87AD;
 	border-bottom-color: #3A87AD;
+	background: #D9EDF7 url(../../images/icons/quick_sticky.png) 10px 50% no-repeat;
 }
 
 .errorbox {
-	background: #FFEEEE url(../../images/profile/warning_mute.png) 10px 50% no-repeat;
 	border-top-color: #A80000;
 	border-bottom-color: #A80000;
+	background: #FFEEEE url(../../images/profile/warning_mute.png) 10px 50% no-repeat;
 }
 
 .border_error {
@@ -1943,8 +1943,8 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
  */
 
 .statistics .category_header {
-	background: none;
 	border-bottom-color: #CCCCCC;
+	background: none;
 	text-shadow: none;
 }
 
@@ -1990,9 +1990,9 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 
 /* floating error box currently used by like functionality */
 .floating_error {
+	color: #444444;
 	border-color: #E4E4E4;
 	background: #FEFEFE;
-	color: #444444;
 }
 
 .floating_error .error_heading {
@@ -2051,15 +2051,15 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 }
 
 .iconline {
+	border-color: #27A348;
 	background: #B4E391;
 	background-image: linear-gradient(to bottom, #B4E391 0%,#61C419 50%,#B4E391 100%);
-	border-color: #27A348;
 }
 
 .icoffline {
+	border-color: #828282;
 	background: #BBBBBB;
 	background-image: linear-gradient(to bottom, #BBBBBB 0%,#6F6F6F 50%,#BBBBBB 100%);
-	border-color: #828282;
 }
 
 /* -------------------------------------------------------

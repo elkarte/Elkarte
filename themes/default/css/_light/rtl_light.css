@@ -51,12 +51,12 @@ fieldset {
 }
 
 legend {
-	background: url(../../images/selected_open.png) no-repeat scroll right center transparent;
-	cursor: pointer;
+	margin-right: 15px;
+	margin-left: 0;
 	padding-right: 20px;
 	padding-left: 0;
-	margin-left: 0;
-	margin-right: 15px;
+	cursor: pointer;
+	background: url(../../images/selected_open.png) no-repeat scroll right center transparent;
 }
 
 .collapsed legend {
@@ -65,8 +65,8 @@ legend {
 
 /* The OpenID login form */
 .openid_login {
-	padding-left: 0;
 	padding-right: 20px;
+	padding-left: 0;
 	background-position: 98% 50%;
 }
 
@@ -147,8 +147,8 @@ legend {
 
 /* News section. */
 #news > h2 {
-	margin: -2px 0 0 1em;
 	float: right;
+	margin: -2px 0 0 1em;
 }
 
 /*	$MENUS		*/
@@ -301,13 +301,13 @@ legend {
 
 /* our buddies &laquo; &raquo; */
 .small_pagelinks:before {
-	content: '\00AB';
 	float: right;
+	content: '\00AB';
 }
 
 .small_pagelinks:after {
-	content: '\00BB';
 	float: right;
+	content: '\00BB';
 }
 
 /* Globally accessible top/bottom links. */
@@ -463,9 +463,9 @@ legend {
 .poster_avatar .linklevel1, .poster_avatar:hover .linklevel1,
 .poster_avatar .linklevel1:focus,
 .name.linklevel1, .name.linklevel1:hover, .name.linklevel1:focus {
-	background: none;
 	color: #4B863C;
 	border: none;
+	background: none;
 	box-shadow: none;
 }
 

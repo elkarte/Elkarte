@@ -53,8 +53,8 @@
 a, a:link, a:visited,
 /* Links that open in a new window. */
 a.new_win:link, a.new_win:visited {
-	color: #008299;
 	text-decoration: none;
+	color: #008299;
 }
 
 /* Cursor declared here.Should not be required anywhere else. */
@@ -71,25 +71,25 @@ html {
 }
 
 body {
-	padding-top: 35px;
-	background: #EEEEEE;
-	color: #4D4F53;
 	font: 90%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
+	padding-top: 35px;
+	color: #4D4F53;
+	background: #EEEEEE;
 }
 
 fieldset {
-	background: transparent;
 	border: 1px solid #CCCCCC;
+	background: transparent;
 	box-shadow: none;
 }
 
 legend {
+	font-size: 1.071em;
 	margin-left: 15px;
 	padding: 0 0 2px 20px;
-	background: url(../../images/selected_open.png) 0 50% no-repeat;
-	color: #333333;
-	font-size: 1.071em;
 	cursor: pointer;
+	color: #333333;
+	background: url(../../images/selected_open.png) 0 50% no-repeat;
 }
 
 .collapsed legend {
@@ -97,10 +97,10 @@ legend {
 }
 
 input, button, select, textarea, .editor {
-	background: #FFFFFF;
 	color: #666666;
 	border: 1px solid #CCCCCC;
 	border-radius: 2px;
+	background: #FFFFFF;
 }
 
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
@@ -140,46 +140,46 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 /* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
-	background: #F4F4F4;
 	color: #555555;
 	border: 1px solid #AFAFAF;
 	border-top: 1px solid #CFCFCF;
 	border-left: 1px solid #BFBFBF;
 	border-radius: 2px;
-	box-shadow: 1px 1px 2px #E5E5E5;
+	background: #F4F4F4;
 	background-image: linear-gradient(to bottom, #FFFFFF, #E4E4E4);
+	box-shadow: 1px 1px 2px #E5E5E5;
 }
 
 /* Hover effects. */
 input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:hover,
 .linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
-	background: #F0F0F0;
+	text-decoration: none;
 	color: #555555;
 	border: 1px solid #CCCCCC;
 	border-top: 1px solid #AFAFAF;
 	border-left: 1px solid #AFAFAF;
+	background: #F0F0F0;
 	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
-	text-decoration: none;
 }
 
 /* the new "button" */
 .new_posts, .new_posts:visited, .new_posts:link {
-	background: #7BB128;
 	color: #FFFFFF;
 	border-radius: 4px;
+	background: #7BB128;
 }
 
 /* approval indicator */
 .require_approval {
-	background: #F3B200;
 	color: #FFFFFF;
 	border-radius: 4px;
+	background: #F3B200;
 }
 
 /* Standard horizontal rule.. ([hr], etc.) */
 hr {
-	background: #EEEEEE;
 	border-top-color: #BBBBBB;
+	background: #EEEEEE;
 }
 
 
@@ -190,35 +190,35 @@ hr {
 }
 
 .standard_category {
-	background: #E4E4E4;
 	border-radius: 4px 4px 0 0;
+	background: #E4E4E4;
 }
 
 /* Styles for main headers. */
 .category_header, .forum_category .category_header {
-	background: #EEEEEE;
-	color: #666666;
 	font-size: 1.5em;
-	border-radius: 5px;
-	margin-bottom: 5px;
-	border-color: transparent;
-	text-shadow: 1px 1px 0 #EBEBEB;
 	font-weight: bolder;
+	margin-bottom: 5px;
+	color: #666666;
+	border-color: transparent;
+	border-radius: 5px;
+	background: #EEEEEE;
+	text-shadow: 1px 1px 0 #EBEBEB;
 }
 
 /* Single ones a bit darker than board index ones. */
 #forumposts .category_header, .content_category .category_header {
-	background: #EBEBEB;
 	border: 1px solid #CCCCCC;
 	border-top: 1px solid #CFCFCF;
 	border-bottom: 1px solid #B7B7B7;
+	background: #EBEBEB;
 }
 
 /* Styles for subsection headers. @todo */
 .secondary_header {
-	background: #FAFAFA;
 	border: 1px solid #CCCCCC;
 	border-top: 1px solid #DFDFDF;
+	background: #FAFAFA;
 	text-shadow: 1px 1px 0 #FFFFFF;
 }
 
@@ -239,13 +239,13 @@ hr {
 /* Custom highlighted text style for modern browsers. */
 /* Nicer than default. Needs two separate rules. */
 ::-moz-selection {
-	background: #7BB128;
 	color: white;
+	background: #7BB128;
 }
 
 ::selection {
-	background: #7BB128;
 	color: white;
+	background: #7BB128;
 }
 
 /* Other highlighted text, such as search results. */
@@ -281,8 +281,8 @@ hr {
 }
 
 .moderation_link, .moderation_link:visited {
-	color: #FF0000;
 	font-weight: bold;
+	color: #FF0000;
 }
 
 /* Legacy highlight color, for selected membergroups etc.
@@ -290,8 +290,8 @@ hr {
  */
 
 .table_grid .standard_row.highlight2 {
-	background: #D1E1EF;
 	color: #555555;
+	background: #D1E1EF;
 }
 
 .table_grid .standard_row {
@@ -315,14 +315,14 @@ hr {
 }
 
 .generic_list_wrapper .title_bar {
-	background: none;
 	border-bottom-color: #FFFFFF;
 	border-radius: 0;
+	background: none;
 }
 
 .generic_list_wrapper .information {
-	background: none;
 	border-bottom-color: #FFFFFF;
+	background: none;
 }
 
 /* Styles used by the auto suggest control. */
@@ -339,8 +339,8 @@ hr {
 }
 
 .auto_suggest_item_hover {
-	background: #888888;
 	color: #EEEEEE;
+	background: #888888;
 }
 
 /* -------------------------------------------------------
@@ -350,10 +350,10 @@ hr {
 
 /* The "Quote:" and "Code:" header parts... */
 .codeheader, .quoteheader {
-	background: #FFFFFF;
 	color: #555555;
-	border-bottom: none;
 	border-color: #CCCCCC;
+	border-bottom: none;
+	background: #FFFFFF;
 }
 
 .codeheader {
@@ -369,9 +369,9 @@ hr {
 .bbc_quote,
 /* A code block - maybe PHP ;) - shared styles. */
 .bbc_code {
-	background: #FFFFFF;
-	border-top: none;
 	border-color: #CCCCCC;
+	border-top: none;
+	background: #FFFFFF;
 }
 
 /* Extra quote styling */
@@ -381,9 +381,9 @@ hr {
 
 /* Extra code block styling. */
 .bbc_code {
-	background: #F8F8F8;
 	border-top-color: #AAAAAA;
 	border-bottom-color: #AAAAAA;
+	background: #F8F8F8;
 }
 
 /* Styling for BBC tags */
@@ -393,9 +393,9 @@ hr {
 }
 
 .bbc_link:hover {
+	text-decoration: none;
 	color: #377828;
 	box-shadow: 0 -1px 0 #66AA55 inset;
-	text-decoration: none;
 }
 /* Styling for tables inside posts */
 .inner > .bbc_table_container > .bbc_table td,
@@ -455,8 +455,8 @@ div.bbc_footnotes .meaction {
 .bbc_footnotes div:before {
 	display: block;
 	visibility: hidden;
-	margin-top: -75px;
 	height: 75px;
+	margin-top: -75px;
 	content: " ";
 }
 
@@ -467,14 +467,14 @@ div.bbc_footnotes .meaction {
 
 /* The "Loading" bar for quick edit, etc. */
 #ajax_in_progress, .ajax_infobar {
-	background: #FFFFFF;
 	color: #306430;
 	border-bottom-color: #3D6E32;
+	background: #FFFFFF;
 }
 
 #ajax_in_progress a {
-	color: #FFA500;
 	text-decoration: underline;
+	color: #FFA500;
 }
 
 /* -------------------------------------------------------
@@ -500,14 +500,14 @@ div.bbc_footnotes .meaction {
 }
 
 #search_form select {
+	opacity: 0.8;
 	border-color: #999999;
 	border-right: none;
-	opacity: 0.8;
 }
 
 #search_form select:focus {
-	border-right: none;
 	opacity: 1;
+	border-right: none;
 }
 
 #search_form button {
@@ -524,8 +524,8 @@ div.bbc_footnotes .meaction {
 }
 
 #debug_logging {
-	background: #222222;
 	color: #BBBBBB;
+	background: #222222;
 }
 
 #debug_logging_wrapper {
@@ -533,10 +533,10 @@ div.bbc_footnotes .meaction {
 }
 
 #footer_section {
+	text-align: center;
 	color: #CCCCCC;
 	border-top: 2px solid #444444;
 	background-color: #4D4F54;
-	text-align: center;
 }
 
 #footer_section a {
@@ -544,8 +544,8 @@ div.bbc_footnotes .meaction {
 }
 
 #footer_section .rssfeeds {
-	background-color: white;
 	color: orange;
+	background-color: white;
 	text-shadow: 1px 1px 0 #000000;
 }
 
@@ -556,15 +556,15 @@ div.bbc_footnotes .meaction {
 
 /* Level 1 Menu bar: link or button. General styling. */
 .linklevel1, .linklevel1:link, .linklevel1:visited {
-	background: #F4F4F4;
-	color: #666666;
 	font-size: 0.868em;
+	color: #666666;
 	border: 1px solid #AFAFAF;
 	border-top: 1px solid #CFCFCF;
 	border-left: 1px solid #BFBFBF;
 	border-radius: 2px;
-	box-shadow: 1px 1px 2px #E5E5E5;
+	background: #F4F4F4;
 	background-image: linear-gradient(to bottom, #EFEFEF, #E4E4E4);
+	box-shadow: 1px 1px 2px #E5E5E5;
 }
 
 .quickbuttons .listlevel1 {
@@ -581,13 +581,13 @@ div.bbc_footnotes .meaction {
 .linklevel3:hover, .listlevel3:hover .linklevel3,
 #menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1,
 #menu_current_area > strong > .linklevel1 {
-	background: #F0F0F0;
+	text-decoration: none;
 	color: #555555;
+	border-color: #CCCCCC;
 	border-top-color: #AFAFAF;
 	border-left-color: #AFAFAF;
+	background: #F0F0F0;
 	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
-	border-color: #CCCCCC;
-	text-decoration: none;
 }
 
 #main_menu .listlevel1.subsections {
@@ -603,22 +603,22 @@ div.bbc_footnotes .meaction {
 }
 
 .poster li.poster_online:hover .linklevel1 {
-	background: #F0F0F0;
 	color: #555555;
+	border-color: #CCCCCC;
 	border-top-color: #AFAFAF;
 	border-left-color: #AFAFAF;
+	background: #F0F0F0;
 	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
-	border-color: #CCCCCC;
 }
 
 .poster li.poster_online .nolink {
-	background: #F4F4F4;
 	color: #7BB128;
+	border-color: #AFAFAF;
 	border-top-color: #CFCFCF;
 	border-left-color: #BFBFBF;
-	box-shadow: 1px 1px 2px #E5E5E5;
-	border-color: #AFAFAF;
+	background: #F4F4F4;
 	background-image: linear-gradient(to bottom, #FFFFFF, #E4E4E4);
+	box-shadow: 1px 1px 2px #E5E5E5;
 }
 
 .poster li.poster_online .nolink img {
@@ -626,8 +626,8 @@ div.bbc_footnotes .meaction {
 }
 
 .poster li.subsections.listlevel1:hover .linklevel1 {
-	background: transparent;
 	border: 1px solid transparent;
+	background: transparent;
 	box-shadow: none;
 }
 
@@ -651,10 +651,10 @@ div.bbc_footnotes .meaction {
 }
 
 .poster .subsections > a:after, .poster .subsections:hover > .name.linklevel1:after {
-	margin: 0 0 0 10px;
-	color: #CCCCCC;
-	content: "\25BC";
 	font-size: 1.2em;
+	margin: 0 0 0 10px;
+	content: "\25BC";
+	color: #CCCCCC;
 }
 
 .report_seperator {
@@ -695,19 +695,19 @@ div.bbc_footnotes .meaction {
 }
 
 #menu_nav {
-	padding: 0;
-	background: #333333;
-	width: 100%;
-	color: #EEEEEE;
-	position: fixed;
-	top: 0;
-	z-index: 99;
-	min-height: 35px;
-	background-image: linear-gradient(to bottom, #4D4F53 0%, #333333 49%, #333333 51%, #4D4F53 100%);
 	line-height: 30px;
+	position: fixed;
+	z-index: 99;
+	top: 0;
+	width: 100%;
+	min-height: 35px;
+	padding: 0;
 	-webkit-transform: translateZ(0);
 	-ms-transform: translateZ(0);
 	transform: translateZ(0);
+	color: #EEEEEE;
+	background: #333333;
+	background-image: linear-gradient(to bottom, #4D4F53 0%, #333333 49%, #333333 51%, #4D4F53 100%);
 	-webkit-backface-visibility: hidden;
 	backface-visibility: hidden;
 }
@@ -715,8 +715,8 @@ div.bbc_footnotes .meaction {
 #main_menu {
 	margin: 0 auto;
 	padding: 0 !important;
-	background: transparent !important;
 	border: none !important;
+	background: transparent !important;
 }
 
 /* Override link colour for admin/profile/etc menus. */
@@ -728,8 +728,8 @@ div.bbc_footnotes .meaction {
 .admin_menu .linklevel1:hover, .admin_menu .linklevel1:focus,
 /* For secondary admin/profile/etc menus. */
 #adm_submenus .linklevel1:hover, #adm_submenus .linklevel1:focus {
-	color: #333333;
 	text-decoration: none;
+	color: #333333;
 }
 
 /* Main menu Level 1 active button and hover need a different border. */
@@ -741,17 +741,17 @@ div.bbc_footnotes .meaction {
 .admin_menu .active,
 /* ......and for secondary admin/profile/etc menu strip. */
 #adm_submenus .active {
-	background: #7BB128;
 	color: white;
 	border: 1px solid #AAAAAA;
+	background: #7BB128;
 	background-image: linear-gradient(to bottom, #9DD53A 0%, #A1D54F 21%, #80C217 63%, #7CBC0A 100%);
 }
 
 /* Hover effects for those buttons. */
 .admin_menu .active:hover, .admin_menu .listlevel1:hover .active, #adm_submenus .active:hover {
-	background: #43A8DA;
 	color: white;
 	border: 1px solid #AAAAAA;
+	background: #43A8DA;
 	background-image: linear-gradient(to bottom, #6DB3F2 0%, #54A3EE 30%, #3690F0 68%, #1E69DE 100%);
 }
 
@@ -763,31 +763,31 @@ a.active {
 /* Top level subsection indicators. */
 /* Level 1 active buttons. */
 .pm_indicator {
-	padding: 0 5px;
-	background: #F3B200;
-	float: none;
-	color: #FFFFFF;
-	border-radius: 4px;
-	box-shadow: 1px 1px 2px #444444;
+	font-weight: bold;
 	position: relative;
 	top: -5px;
 	left: -1px;
-	font-weight: bold;
+	float: none;
+	padding: 0 5px;
+	color: #FFFFFF;
 	border-color: transparent;
+	border-radius: 4px;
+	background: #F3B200;
+	box-shadow: 1px 1px 2px #444444;
 }
 
 .likes_indicator {
-	padding: 0 0.6em;
-	background: #F3B200;
-	color: #FFFFFF;
 	font-size: 0.786em;
-	border-radius: 4px;
-	box-shadow: 1px 1px 1px #444444;
+	font-weight: bold;
+	line-height: 1.4em;
 	position: absolute;
 	top: -1em;
 	right: -0.5em;
-	font-weight: bold;
-	line-height: 1.4em;
+	padding: 0 0.6em;
+	color: #FFFFFF;
+	border-radius: 4px;
+	background: #F3B200;
+	box-shadow: 1px 1px 1px #444444;
 }
 
 .poster .pm_indicator:hover, .linklevel1:hover .pm_indicator {
@@ -796,16 +796,16 @@ a.active {
 
 /* Levels 2 and 3: drop menu wrapper. */
 .menulevel2, .menulevel3 {
-	background: white;
 	border: 1px solid grey;
 	border-radius: 5px;
+	background: white;
 	box-shadow: 1px 2px 4px #CCCCCC;
 }
 
 /* Levels 2 and 3 drop menus: link or button. */
 .linklevel2, .linklevel3 {
-	color: black;
 	font-size: .868em;
+	color: black;
 	border: 1px solid transparent;
 	/* Applying a default transparent border stops links jumping on hover. */
 }
@@ -819,16 +819,16 @@ a.active {
 .listlevel2:hover .linklevel2, /* < highlighted with cursor over level 3. */
 .linklevel2:hover, .linklevel2:focus, .linklevel2.sfhover:focus,
 .linklevel3:hover, .linklevel3:focus, .linklevel3.sfhover:focus {
-	background: #7BB128;
-	color: #FFFFFF;
 	text-decoration: none;
+	color: #FFFFFF;
+	background: #7BB128;
 }
 
 /* Level 2: subsection indicators. */
 .listlevel2.subsections .linklevel2:after {
-	color: #CCCCCC;
-	content: "\25BA";
 	font-size: 1em;
+	content: "\25BA";
+	color: #CCCCCC;
 }
 
 /* Levels 2 and 3: highlighting of current section */
@@ -843,16 +843,16 @@ a.active {
 /* Styles for sidebar menus. */
 /* Same styling for Level 1 and Level 2. */
 #menu_sidebar .linklevel1, #menu_sidebar .linklevel2 {
-	border-color: transparent;
 	color: black;
+	border-color: transparent;
 }
 
 #menu_sidebar .linklevel1:hover, #menu_sidebar .linklevel1:focus, #menu_current_area .linklevel1,
 #menu_sidebar .linklevel2:hover, #menu_sidebar .linklevel2:focus {
+	text-decoration: none;
+	color: black;
 	border-color: darkgray;
 	background: gainsboro;
-	color: black;
-	text-decoration: none;
 }
 
 #menu_current_area .linklevel1 {
@@ -861,18 +861,18 @@ a.active {
 
 /* Level 1: subsection indicators. */
 #menu_sidebar .listlevel1.subsections .linklevel1:after {
+	font-size: 1em;
 	position: absolute;
 	right: 6px;
 	content: "\25BA";
-	font-size: 1em;
 }
 
 #menu_nav .listlevel1.subsections>a:before {
-	margin: 1px 3px 0 0;
-	float: left;
-	color: #43A8DA;
 	font-size: .75em;
+	float: left;
+	margin: 1px 3px 0 0;
 	content: "\25BC";
+	color: #43A8DA;
 }
 
 /* -------------------------------------------------------
@@ -890,36 +890,36 @@ a.active {
 }
 
 .pagelinks .navPages:hover, .pagelinks .current_page {
-	background: #7BB128;
-	color: white;
 	text-decoration: none;
+	color: white;
+	background: #7BB128;
 }
 
 .pagelinks .navPages, .pagelinks .current_page {
-	border-radius: 8px;
 	border-color: transparent;
+	border-radius: 8px;
 }
 
 /* our buddies &laquo; &raquo; */
 .small_pagelinks:before {
-	float: left;
-	color: #999999;
-	content: '\00AB';
 	font-size: 1.286em;
 	line-height: 1.3em;
+	float: left;
+	content: '\00AB';
+	color: #999999;
 }
 
 .small_pagelinks:after {
-	color: #999999;
 	line-height: 1.3em;
+	color: #999999;
 }
 
 /* Globally accessible top/bottom links. */
 #gotop, #gobottom {
+	opacity: 0.2;
+	color: #EEEEEE;
 	border-color: #222222;
 	background: #111111;
-	color: #EEEEEE;
-	opacity: 0.2;
 }
 
 #gobottom {
@@ -927,8 +927,8 @@ a.active {
 }
 
 #gotop:hover, #gobottom:hover {
-	color: #444444;
 	opacity: 1;
+	color: #444444;
 }
 
 /* Skip navigation link. */
@@ -974,20 +974,20 @@ a.active {
  */
 
 #wrapper {
-	background: white;
+	margin-top: 0;
 	border: 1px solid #CCCCCC;
 	border-top: none;
-	margin-top: 0;
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
+	background: white;
 }
 
 #forumtitle {
+	font-size: 2.5em;
+	font-weight: bolder;
 	margin: 0;
 	padding: 0;
 	text-shadow: 1px 1px 2px #FFFFFF;
-	font-weight: bolder;
-	font-size: 2.5em;
 }
 
 #forumtitle > a {
@@ -996,24 +996,24 @@ a.active {
 
 /* News section. */
 #news {
-	padding: 8px;
-	background-color: #F9F9F9;
 	font-size: 0.929em;
+	padding: 8px;
 	border-color: #FFFFFF;
+	background-color: #F9F9F9;
 }
 
 #news > h2 {
-	color: #7BB128;
-	font-weight: bold;
 	font-size: 1.5em;
+	font-weight: bold;
 	line-height: 1.2em;
+	color: #7BB128;
 }
 
 #news_line, #elkFadeScroller {
 	overflow: auto;
-	padding: 3px;
-	min-height: 60px;
 	height: 60px;
+	min-height: 60px;
+	padding: 3px;
 	color: #666666;
 }
 
@@ -1039,10 +1039,10 @@ a.active {
 	top: 0.25em;
 	width: 1.5em;
 	height: 1.5em;
-	background-image: linear-gradient(45deg, #FFFFFF 0%, #FFFFFF 50%, #EEEEEE 50%, #EEEEEE 100%);
 	-webkit-transform: rotate(45deg);
 	-ms-transform: rotate(45deg);
 	transform: rotate(45deg);
+	background-image: linear-gradient(45deg, #FFFFFF 0%, #FFFFFF 50%, #EEEEEE 50%, #EEEEEE 100%);
 }
 
 .linktree > span > a > i.i-home {
@@ -1065,9 +1065,9 @@ a.active {
  */
 
 .board_name > a {
-	color: #43A8DA;
-	font-weight: bold;
 	font-size: 1.214em;
+	font-weight: bold;
+	color: #43A8DA;
 }
 
 .board_row,
@@ -1115,8 +1115,8 @@ a.active {
 }
 
 .modified {
-	color: #888888;
 	font-size: 0.714em;
+	color: #888888;
 }
 
 .views_text {
@@ -1226,8 +1226,8 @@ a.active {
 }
 
 .board_stats {
-	padding: 1px 6px 1px 0;
 	float: left;
+	padding: 1px 6px 1px 0;
 	text-align: left;
 }
 
@@ -1236,9 +1236,9 @@ a.active {
 }
 
 #expanded_pages_container {
-	background: #FFFFFF;
 	border: 1px solid #EEEEEE;
 	border-radius: 2px;
+	background: #FFFFFF;
 }
 
 #pages_scroll_left, #pages_scroll_right {
@@ -1265,8 +1265,8 @@ a.active {
 }
 
 #poll_options .options .percentage {
-	background: #FFFFFF;
 	border-radius: 4px;
+	background: #FFFFFF;
 }
 
 .topic_details {
@@ -1280,20 +1280,20 @@ a.active {
 
 .drop_area {
 	color: #43A8DA;
-	border-radius: 5px;
 	border-color: #CCCCCC;
+	border-radius: 5px;
 	background-color: #EEEEEE;
 }
 
 .statusbar {
-	background: #EEEEEE;
 	border-top-color: #A9CCD1;
 	border-bottom-color: #A9CCD1;
+	background: #EEEEEE;
 }
 
 .statusbar .insertoverlay {
-	background-color: #FAFAFA;
 	border-color: #A9CCD1;
+	background-color: #FAFAFA;
 }
 
 .insertoverlay .tabs li {
@@ -1305,8 +1305,8 @@ a.active {
 }
 
 .statusbar .insertoverlay .button {
-	background: #008000;
 	color: #FAFAFA;
+	background: #008000;
 }
 
 .progressBar {
@@ -1314,8 +1314,8 @@ a.active {
 }
 
 .progressBar div {
-	background-color: #43A8DA;
 	color: #FFFFFF;
+	background-color: #43A8DA;
 }
 
 .remove {
@@ -1369,23 +1369,23 @@ a.active {
 
 /* More little boxes on a hillside. */
 .warningbox {
-	background: #FFF6CA;
 	border: 1px solid #FFD324;
+	background: #FFF6CA;
 }
 
 .successbox {
-	background: #E8F5DF;
 	border: 1px solid #9ECE9E;
+	background: #E8F5DF;
 }
 
 .infobox {
-	background: #D9EDF7;
 	border: 1px solid #3A87AD;
+	background: #D9EDF7;
 }
 
 .errorbox {
-	background: #F5DFDF;
 	border: 1px solid #CE9E9E;
+	background: #F5DFDF;
 }
 
 .warningbox, .successbox, .infobox, .errorbox {
@@ -1484,9 +1484,9 @@ a.active {
 }
 
 .activity_stats li .bar {
-	background: #FFFFFF;
-	border-bottom: none;
 	border-color: #CCCCCC;
+	border-bottom: none;
+	background: #FFFFFF;
 }
 
 .activity_stats li .bar div {
@@ -1507,8 +1507,8 @@ a.active {
 }
 
 .weeklist > li {
-	background: #FCFCFC;
 	border-color: transparent;
+	background: #FCFCFC;
 }
 
 #main_grid td.days, .calendar_table td.days, .weeklist h4 {
@@ -1556,11 +1556,11 @@ a.help .icon {
 
 /* The text content, hopefully helpful. */
 .popup_content {
-	background: #F5F5F5;
+	border-color: #BBBBBB;
 	border-bottom: 1px solid #CCCCCC;
 	border-radius: 6px 6px 2px 2px;
+	background: #F5F5F5;
 	box-shadow: 0 -2px 3px rgba(0, 0, 0, 0.15);
-	border-color: #BBBBBB;
 }
 
 /* -------------------------------------------------------
@@ -1603,8 +1603,8 @@ a.help .icon {
 
 /* Methinks topic links, etc need a little more oomph next to the orange bars. */
 #top_row .stats dd {
-	background: none;
 	border: 1px solid transparent;
+	background: none;
 }
 
 .statsbar {
@@ -1612,8 +1612,8 @@ a.help .icon {
 }
 
 .statsbar .bar {
-	background: #43A8DA;
 	border-radius: 4px 0 0 4px;
+	background: #43A8DA;
 }
 
 /* Absolute positioning stops these breaking the bars on narrow screens. */
@@ -1637,12 +1637,12 @@ a.help .icon {
 }
 
 .ui-tabs .ui-tabs-nav li {
+	margin-left: 2px;
 	color: #FFFFFF;
 	border: 2px solid #F0F0F0;
 	border-bottom: none;
 	border-radius: 5px 5px 0 0;
 	box-shadow: 2px 0 0 rgba(0, 0, 0, 0.3);
-	margin-left: 2px;
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-active a,
@@ -1651,28 +1651,28 @@ a.help .icon {
 }
 
 .ui-tabs .ui-tabs-nav .ui-tabs-anchor {
-	background: #F0F0F0;
 	border-bottom-color: #CCCCCC;
 	border-radius: 5px 5px 0 0;
 	outline: none;
+	background: #F0F0F0;
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-default .ui-tabs-anchor {
-	background: #FFFFFF;
 	color: #333333;
+	background: #FFFFFF;
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-active .ui-tabs-anchor,
 .ui-tabs .ui-tabs-nav .ui-state-active {
-	background: #F6F6F6;
 	color: #333333;
 	border-radius: 5px 5px 0 0;
+	background: #F6F6F6;
 }
 
 .ui-tabs .ui-tabs-nav li.ui-state-hover .ui-tabs-anchor {
-	background: #F0F0F0;
-	color: #555555;
 	text-decoration: none;
+	color: #555555;
+	background: #F0F0F0;
 }
 
 .admin_menu .subsections:hover .linklevel1:after {
@@ -1685,10 +1685,10 @@ a.help .icon {
 
 /* floating error box currently used by like functionality */
 .floating_error {
+	color: #404040;
 	border-color: #E4E4E4;
 	background: #FFFFFF;
 	background: rgba(255, 255, 255, 1);
-	color: #404040;
 }
 
 .floating_error .error_heading {
@@ -1785,14 +1785,14 @@ a.help .icon {
 
 @media screen and (max-width: 55em) and (min-width: 55em) {
 	.icon-menu {
-		margin: .05em;
-		padding: .35em;
 		display: inline-block;
 		width: 2em;
 		height: 2em;
+		margin: .05em;
+		padding: .35em;
+		vertical-align: middle;
 		border: .25em solid;
 		border-radius: .25em;
-		vertical-align: middle;
 	}
 
 	.button_title {
@@ -1812,10 +1812,10 @@ a.help .icon {
 	}
 
 	#menu_sidebar {
-		background: #FFFFFF;
-		border-radius: 4px;
-		box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);
 		border-color: #AAAAAA;
+		border-radius: 4px;
+		background: #FFFFFF;
+		box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);
 	}
 
 	#main_menu .linklevel1.active, #main_menu .linklevel1.active:hover {
@@ -1901,9 +1901,9 @@ a.help .icon {
 	}
 
 	.new_posts {
+		font-size: 0.714em;
 		position: relative;
 		top: -3px;
-		font-size: 0.714em;
 	}
 
 	.topic_name {
@@ -1912,10 +1912,10 @@ a.help .icon {
 
 	.topic_listing h4 {
 		overflow: hidden;
-		margin-bottom: 3px;
 		max-width: 20em;
-		text-overflow: ellipsis;
+		margin-bottom: 3px;
 		white-space: nowrap;
+		text-overflow: ellipsis;
 	}
 
 	.topic_listing li.sticky_row {
@@ -1935,8 +1935,8 @@ a.help .icon {
 	}
 
 	.topic_name h4 {
-		padding-bottom: 2px;
 		font-size: 1.429em;
+		padding-bottom: 2px;
 	}
 
 	.topic_latest:after {
@@ -1957,10 +1957,10 @@ a.help .icon {
 	}
 
 	.board_icon {
-		width: 25px;
-		height: 25px;
 		position: relative;
 		top: -5px;
+		width: 25px;
+		height: 25px;
 	}
 
 	.on_board, .on2_board {
@@ -1987,8 +1987,8 @@ a.help .icon {
 	}
 
 	.forum_category, .forumposts, .content_category {
-		background: #FFFFFF;
 		border: none;
+		background: #FFFFFF;
 	}
 
 	.listlevel2.subsections .linklevel2::after {
@@ -2004,8 +2004,8 @@ a.help .icon {
 	}
 
 	#top_section {
-		margin: 0;
 		width: 100%;
+		margin: 0;
 	}
 
 	#top_section .wrapper {
@@ -2028,8 +2028,8 @@ a.help .icon {
 	}
 
 	#search_form {
-		padding: 4px 0;
 		width: 100%;
+		padding: 4px 0;
 		border-bottom: 1px solid #CCCCCC;
 	}
 
