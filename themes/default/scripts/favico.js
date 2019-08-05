@@ -901,3 +901,61 @@
 	}
 
 })();
+
+/**
+ * @package   ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
+ *
+ * @version 2.0 dev
+ *
+ * This bits acts as middle-man between the Favico and the ElkNotifications
+ * providing the interface required by the latter.
+ */
+
+(function() {
+	var ElkFavicon = (function(opt) {
+		'use strict';
+		opt = (opt) ? opt : {};
+		var mentions;
+
+		var init = function(opt) {
+			mentions = new Favico(opt);
+			if (opt.number > 0)
+				mentions.badge(opt.number);
+		};
+
+		var send = function(request) {
+			if (request.mentions > 0)
+			{
+				mentions.badge(request.mentions);
+				$('#button_mentions .pm_indicator').html(request.mentions);
+			}
+			else
+			{
+				mentions.reset();
+			}
+		};
+
+		init(opt);
+		return {
+			send: send
+		}
+	});
+
+	// AMD / RequireJS
+	if ( typeof define !== 'undefined' && define.amd) {
+		define([], function() {
+			return ElkFavicon;
+		});
+	}
+	// CommonJS
+	else if ( typeof module !== 'undefined' && module.exports) {
+		module.exports = ElkFavicon;
+	}
+	// included directly via <script> tag
+	else {
+		this.ElkFavicon = ElkFavicon;
+	}
+
+})();
