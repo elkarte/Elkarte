@@ -50,7 +50,7 @@
 a, a:link, a:visited,
 /* Links that open in a new window. */
 a.new_win:link, a.new_win:visited {
-	color: #49643D;
+	color: #49643d;
 }
 
 /* Cursor declared here.Should not be required anywhere else. */
@@ -61,25 +61,26 @@ a:hover, a.new_win:hover {
 /* Stop white band under footer on short pages.
  * This color should match $FOOTER background.
  */
+
 html {
-	background: #222222;
+	background: #222;
 }
 
 body {
 	background: #585858;
-	background-image: linear-gradient(to right, #333333 0%, #888888 50%, #333333 100%);
+	background-image: linear-gradient(to right, #333 0%, #888 50%, #333 100%);
 	color: #585858;
 }
 
 fieldset {
 	background: transparent;
-	border-color: #CCCCCC;
-	box-shadow: inset -1px -1px 3px #FEFEFE;
+	border-color: #ccc;
+	box-shadow: inset -1px -1px 3px #fefefe;
 }
 
 legend {
 	background: url(../../images/selected_open.png) 0 50% no-repeat;
-	color: #333333;
+	color: #333;
 }
 
 .collapsed legend {
@@ -87,28 +88,28 @@ legend {
 }
 
 input, button, select, textarea, .editor {
-	border-color: #CCCCCC;
-	background: #FAFAFA;
+	border-color: #ccc;
+	background: #fafafa;
 	color: #585858;
 }
 
 input:hover, textarea:hover, button:hover, select:hover {
-	border-color: #999999;
-	background: #FEFEFE;
+	border-color: #999;
+	background: #fefefe;
 }
 
 textarea:hover, .editor:hover {
-	background: #FEFEFE;
-	color: #444444;
+	background: #fefefe;
+	color: #444;
 }
 
 input:focus, textarea:focus, button:focus, select:focus, .editor:focus {
-	border-color: #999999;
+	border-color: #999;
 }
 
 /* Give disabled text input elements a different background color. */
 input[disabled].input_text, input[disabled].input_password {
-	background: #EEEEEE;
+	background: #eee;
 }
 
 /* The OpenID login form */
@@ -122,50 +123,50 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 /* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
-	border-color: #AFAFAF;
-	border-top-color: #CFCFCF;
-	border-left-color: #BFBFBF;
-	background: #F4F4F4;
-	background-image: linear-gradient(to bottom, #FEFEFE, #E4E4E4);
-	box-shadow: 1px 1px 2px #E5E5E5, 0 -1px 0 #E5E5E5 inset;
+	background: #f4f4f4;
 	color: #585858;
+	border-top-color: #cfcfcf;
+	border-left-color: #bfbfbf;
+	box-shadow: 1px 1px 2px #e5e5e5, 0 -1px 0 #e5e5e5 inset;
+	border-color: #afafaf;
+	background-image: linear-gradient(to bottom, #fefefe, #e4e4e4);
 }
 
 /* Hover effects. */
 input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:hover,
 .linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
-	border-color: #CCCCCC;
-	border-top-color: #AFAFAF;
-	border-left-color: #AFAFAF;
-	background: #F0F0F0;
-	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
+	background: #f0f0f0;
 	color: #585858;
+	border-top-color: #afafaf;
+	border-left-color: #afafaf;
+	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
+	border-color: #ccc;
 }
 
 /* Don't show disabled buttons as active on hover */
 input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
-	border-color: #AFAFAF;
-	border-top-color: #CFCFCF;
-	border-left-color: #BFBFBF;
-	box-shadow: 1px 1px 2px #E4E4E4;
+	border-color: #afafaf;
+	border-top-color: #cfcfcf;
+	border-left-color: #bfbfbf;
+	box-shadow: 1px 1px 2px #e4e4e4;
 }
 
 /* the new "button" */
 .new_posts, .new_posts:visited, .new_posts:link {
-	background: #27A348;
-	color: #FEFEFE;
+	background: #27a348;
+	color: #fefefe;
 }
 
 /* approval indicator */
 .require_approval {
-	background: #27A348;
-	color: #FEFEFE;
+	background: #27a348;
+	color: #fefefe;
 }
 
 /* Standard horizontal rule.. ([hr], etc.) */
 hr {
-	border-top-color: #BBBBBB;
-	background: #EEEEEE;
+	background: #eee;
+	border-top-color: #bbb;
 }
 
 strong {
@@ -174,37 +175,37 @@ strong {
 
 /* @todo - Test this everywhere. */
 .content {
-	background: #FEFEFE;
-	box-shadow: 1px 2px 4px #EBEBEB;
-	border-color: #CCCCCC;
+	background: #fefefe;
+	box-shadow: 1px 2px 4px #ebebeb;
+	border-color: #ccc;
 }
 
 /* Styles for main headers. */
 .category_header, .forum_category .category_header {
-	border-color: #CCCCCC;
-	border-top-color: #DDDDDD;
-	border-bottom-color: #BBBBBB;
-	background: #EBEBEB;
-	background-image: linear-gradient(to bottom, #FAFAFA, #EAEAEA);
+	background: #ebebeb;
 	color: #566450;
-	text-shadow: 1px 1px 0 #EBEBEB;
+	border-top-color: #ddd;
+	border-bottom-color: #bbb;
+	border-color: #ccc;
+	background-image: linear-gradient(to bottom, #fafafa, #eaeaea);
+	text-shadow: 1px 1px 0 #ebebeb;
 }
 
 /* Single ones a bit darker than board index ones. */
 .category_header, .content_category .category_header {
-	border-top-color: #CFCFCF;
-	border-bottom-color: #BBBBBB;
-	background: #EBEBEB;
-	background-image: linear-gradient(to bottom, #FAFAFA, #E4E4E4);
+	background: #ebebeb;
+	border-top-color: #cfcfcf;
+	border-bottom-color: #bbb;
+	background-image: linear-gradient(to bottom, #fafafa, #e4e4e4);
 }
 
 /* Styles for subsection headers. @todo */
 .secondary_header {
-	border-color: #CCCCCC;
-	border-top-color: #DDDDDD;
-	background: #FAFAFA;
-	background-image: linear-gradient(to bottom, #FAFAFA, #EBEBEB);
-	text-shadow: 1px 1px 0 #FEFEFE;
+	background: #fafafa;
+	border-top-color: #ddd;
+	border-color: #ccc;
+	background-image: linear-gradient(to bottom, #fafafa, #ebebeb);
+	text-shadow: 1px 1px 0 #fefefe;
 }
 
 .category_header a:link {
@@ -214,42 +215,43 @@ strong {
 /* Custom highlighted text style for modern browsers.
  * Nicer than default. Needs two separate rules.
  */
+
 ::-moz-selection {
-	background: #D8FFDF;
-	color: #444444;
+	background: #d8ffdf;
+	color: #444;
 }
 
 ::selection {
-	background: #D8FFDF;
-	color: #444444;
+	background: #d8ffdf;
+	color: #444;
 }
 
 /* Other highlighted text, such as search results. */
 .highlight {
-	color: #FF7200;
+	color: #ff7200;
 }
 
 /* Sometimes there will be an error when you post */
 .error {
-	color: #FF0000 !important;
+	color: #f00 !important;
 }
 
 .border_error {
-	border-color: #FF0000 !important;
+	border-color: #f00 !important;
 }
 
 /* Messages that somehow need to attract the attention. */
 .alert {
-	color: #FF0000;
+	color: #f00;
 }
 
 /* Colors for warnings. */
 .warn_mute {
-	color: #FF0000;
+	color: #f00;
 }
 
 .warn_moderate, .softalert {
-	color: #FFA500;
+	color: #ffa500;
 }
 
 .warn_watch, .success {
@@ -257,18 +259,18 @@ strong {
 }
 
 .moderation_link, .moderation_link:visited {
-	color: #FF0000;
+	color: #f00;
 }
 
 /* Used for sections that need somewhat larger corners */
 .roundframe, .well {
-	border-color: #CCCCCC;
-	background: #FAFAFA;
+	border-color: #ccc;
+	background: #fafafa;
 }
 
 /* The generic wrapper thingy. */
 .generic_list_wrapper {
-	border-color: #CCCCCC;
+	border-color: #ccc;
 	box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.1);
 }
 
@@ -277,31 +279,31 @@ strong {
 }
 
 .generic_list_wrapper .title_bar {
-	border-bottom-color: #FEFEFE;
 	background: none;
+	border-bottom-color: #fefefe;
 }
 
 .generic_list_wrapper .information {
-	border-bottom-color: #FEFEFE;
 	background: none;
+	border-bottom-color: #fefefe;
 }
 
 /* Styles used by the auto suggest control. */
 .auto_suggest_div {
-	border-color: #BBBBBB;
+	border-color: #bbb;
 }
 
 .auto_suggest_div:focus {
-	border-color: #BBBBBB;
+	border-color: #bbb;
 }
 
 .auto_suggest_item {
-	background: #DDDDDD;
+	background: #ddd;
 }
 
 .auto_suggest_item_hover {
-	background: #888888;
-	color: #EEEEEE;
+	background: #888;
+	color: #eee;
 }
 
 /* -------------------------------------------------------
@@ -311,13 +313,13 @@ strong {
 
 /* The "Quote:" and "Code:" header parts... */
 .codeheader, .quoteheader {
-	border-color: #CCCCCC;
-	background: #FEFEFE;
+	border-color: #ccc;
+	background: #fefefe;
 	color: #585858;
 }
 
 .codeheader {
-	border-top-color: #AFAFAF;
+	border-top-color: #afafaf;
 }
 
 /* [Select] link to copy code. */
@@ -329,43 +331,45 @@ strong {
 .bbc_quote,
 /* A code block - maybe PHP ;) - shared styles. */
 .bbc_code {
-	border-color: #CCCCCC;
-	background: #FEFEFE;
+	border-color: #ccc;
+	background: #fefefe;
 }
 
 /* Extra quote styling */
 .bbc_quote, .quoteheader {
-	box-shadow: 2px 2px 2px #DDDDDD;
+	box-shadow: 2px 2px 2px #ddd;
 }
 
 /* Extra code block styling. */
 .bbc_code {
-	border-top-color: #AFAFAF;
-	border-bottom-color: #AFAFAF;
-	background: #FAFAFA;
+	background: #fafafa;
+	border-top-color: #afafaf;
+	border-bottom-color: #afafaf;
 }
 
 /* Styling for BBC tags */
 .bbc_link:link, .bbc_link:visited {
-	box-shadow: 0 -1px 0 #CEDCCB inset;
 	color: #377828;
+	box-shadow: 0 -1px 0 #cedccb inset;
 }
 
 .bbc_link:hover {
-	box-shadow: 0 -1px 0 #5BA048 inset;
 	color: #377828;
+	box-shadow: 0 -1px 0 #5ba048 inset;
 }
 /* Styling for tables inside posts */
 .inner > .bbc_table_container > .bbc_table td,
 .messageContent > .bbc_table_container > .bbc_table td {
-	border-bottom: 1px solid #ccc;
 	border-right: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
 }
+
 .inner > .bbc_table_container > .bbc_table th,
 .messageContent > .bbc_table_container > .bbc_table th {
-	border-bottom: 1px solid #bbb;
 	border-right: 1px solid #ccc;
+	border-bottom: 1px solid #bbb;
 }
+
 .inner > .bbc_table_container > .bbc_table td:last-child,
 .inner > .bbc_table_container > .bbc_table th:last-child,
 .messageContent > .bbc_table_container > .bbc_table td:last-child,
@@ -375,7 +379,7 @@ strong {
 
 /* /me uses this a lot. (emote, try typing /me in a post.) */
 .meaction {
-	color: #50AA3A;
+	color: #50aa3a;
 }
 
 .meaction:before {
@@ -387,20 +391,20 @@ strong {
 }
 
 .spoiler {
-	border-color: #CCCCCC;
-	background-color: #EEEEEE;
+	border-color: #ccc;
+	background-color: #eee;
 }
 
 div.bbc_footnotes {
-	border-top-color: #BFBFBF;
+	border-top-color: #bfbfbf;
 }
 
 .bbc_footnotes .target:target {
-	background-color: #D8FFDF;
+	background-color: #d8ffdf;
 }
 
 sup.bbc_footnotes, sup.bbc_footnotes a {
-	color: #50AA3A;
+	color: #50aa3a;
 }
 
 div.bbc_footnotes .meaction {
@@ -414,13 +418,13 @@ div.bbc_footnotes .meaction {
 
 /* The "Loading" bar for quick edit, etc. */
 #ajax_in_progress, .ajax_infobar {
-	border-bottom-color: #3D6E32;
-	background: #FEFEFE;
-	color: #3D6E32;
+	background: #fefefe;
+	color: #3d6e32;
+	border-bottom-color: #3d6e32;
 }
 
 #ajax_in_progress a {
-	color: #FFA500;
+	color: #ffa500;
 }
 
 /* -------------------------------------------------------
@@ -430,16 +434,16 @@ div.bbc_footnotes .meaction {
 
 /* The top bar. */
 #top_section {
-	border-top-color: #5BA048;
-	border-bottom-color: #3D6E32;
-	background: #F4F4F4;
-	background-image: linear-gradient(to bottom, #FEFEFE, #EEEEEE);
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 1px 0 #38642D inset;
+	background: #f4f4f4;
+	border-top-color: #5ba048;
+	border-bottom-color: #3d6e32;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 1px 0 #38642d inset;
+	background-image: linear-gradient(to bottom, #fefefe, #eee);
 }
 
 /* Maintenance mode warning. */
 #top_section_notice {
-	color: #A80000;
+	color: #a80000;
 }
 
 #search_form .input_text {
@@ -447,26 +451,26 @@ div.bbc_footnotes .meaction {
 }
 
 #search_form input[type="submit"] {
-	color: #333333;
+	color: #333;
 }
 
 #search_form select {
-	border-color: #AFAFAF;
+	border-color: #afafaf;
 	opacity: 0.8;
 }
 
 #search_form select:focus {
-	border-color: #999999;
+	border-color: #999;
 	opacity: 1;
 }
 
 #search_form button {
-	border-color: #CCCCCC;
+	border-color: #ccc;
 }
 
 .forumtitle > a {
 	color: #377828;
-	text-shadow: 1px 1px 0 #FEFEFE;
+	text-shadow: 1px 1px 0 #fefefe;
 }
 
 /* News section. */
@@ -475,7 +479,7 @@ div.bbc_footnotes .meaction {
 }
 
 #news > h2 {
-	color: #4B863C;
+	color: #4b863c;
 }
 
 #news > h2:after {
@@ -483,57 +487,57 @@ div.bbc_footnotes .meaction {
 }
 
 #news_line, #news {
-	border-color: #CCCCCC;
-	background: #FEFEFE;
-	box-shadow: 1px 2px 3px #EEEEEE;
+	background: #fefefe;
 	color: #585858;
+	box-shadow: 1px 2px 3px #eee;
+	border-color: #ccc;
 }
 
 /* Main forum area. */
 /* Box-shadow only on this one. */
 #wrapper {
-	border-color: #4B863C;
-	border-top-color: #5BA048;
-	border-bottom-color: #3D6E32;
-	background: #FAFAFA;
-	box-shadow: 0 2px 4px #111111;
+	background: #fafafa;
+	border-top-color: #5ba048;
+	border-bottom-color: #3d6e32;
+	box-shadow: 0 2px 4px #111;
+	border-color: #4b863c;
 }
 
 /* The footer with copyright links etc. */
 #footer_section {
-	border-top-color: #3D6E32;
-	background: #222222;
-	box-shadow: 0 -1px 0 #686868, 0 1px 0 #0E0E0E inset;
-	color: #BBBBBB;
+	background: #222;
+	color: #bbb;
+	border-top-color: #3d6e32;
+	box-shadow: 0 -1px 0 #686868, 0 1px 0 #0e0e0e inset;
 }
 
 #footer_section p, #footer_section a {
-	color: #BBBBBB;
+	color: #bbb;
 }
 
 #footer_section .rssfeeds {
 	background-color: white;
-	color: #FFA500;
-	text-shadow: 1px 1px 0 #000000;
+	color: #ffa500;
+	text-shadow: 1px 1px 0 #000;
 }
 
 .action_viewquery a, .action_viewquery strong,
 #debug_logging a, #debug_logging strong {
-	color: #FFFF00;
+	color: #ff0;
 }
 
 #debug_logging {
-	background: #222222;
-	color: #BBBBBB;
+	background: #222;
+	color: #bbb;
 }
 
 #debug_logging_wrapper {
-	background: #222222;
+	background: #222;
 }
 
 .action_viewquery {
-	background: #222222;
-	color: #BBBBBB;
+	background: #222;
+	color: #bbb;
 }
 
 .action_viewquery a {
@@ -560,13 +564,13 @@ div.bbc_footnotes .meaction {
 
 /* Level 1 Menu bar: link or button. General styling. */
 .linklevel1, .linklevel1:link, .linklevel1:visited {
-	border-color: #AFAFAF;
-	border-top-color: #CFCFCF;
-	border-left-color: #BFBFBF;
-	background: #F4F4F4;
-	background-image: linear-gradient(to bottom, #FEFEFE, #E4E4E4);
-	box-shadow: 1px 1px 2px #E4E4E4;
-	color: #566E4B;
+	background: #f4f4f4;
+	color: #566e4b;
+	border-top-color: #cfcfcf;
+	border-left-color: #bfbfbf;
+	box-shadow: 1px 1px 2px #e4e4e4;
+	border-color: #afafaf;
+	background-image: linear-gradient(to bottom, #fefefe, #e4e4e4);
 }
 
 /* Level 1 button hover and focus effects. */
@@ -575,12 +579,12 @@ div.bbc_footnotes .meaction {
 .linklevel3:hover, .listlevel3:hover .linklevel3,
 #menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1,
 #menu_current_area > strong > .linklevel1 {
-	border-color: #CCCCCC;
-	border-top-color: #AFAFAF;
-	border-left-color: #AFAFAF;
-	background: #F0F0F0;
-	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
+	background: #f0f0f0;
 	color: #686868;
+	border-top-color: #afafaf;
+	border-left-color: #afafaf;
+	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
+	border-color: #ccc;
 }
 
 .poster li.listlevel1:hover {
@@ -589,22 +593,22 @@ div.bbc_footnotes .meaction {
 }
 
 .poster li.poster_online:hover .linklevel1 {
-	border-color: #CCCCCC;
-	border-top-color: #AFAFAF;
-	border-left-color: #AFAFAF;
-	background: #F0F0F0;
-	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
+	background: #f0f0f0;
 	color: #585858;
+	border-top-color: #afafaf;
+	border-left-color: #afafaf;
+	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
+	border-color: #ccc;
 }
 
 .poster li.poster_online .nolink {
-	border-color: #AFAFAF;
-	border-top-color: #CFCFCF;
-	border-left-color: #BFBFBF;
-	background: #F4F4F4;
-	background-image: linear-gradient(to bottom, #FEFEFE, #E4E4E4);
-	box-shadow: 1px 1px 2px #E4E4E4;
-	color: #566E4B;
+	background: #f4f4f4;
+	color: #566e4b;
+	border-top-color: #cfcfcf;
+	border-left-color: #bfbfbf;
+	box-shadow: 1px 1px 2px #e4e4e4;
+	border-color: #afafaf;
+	background-image: linear-gradient(to bottom, #fefefe, #e4e4e4);
 }
 
 .poster li.poster_online .nolink img {
@@ -619,47 +623,48 @@ div.bbc_footnotes .meaction {
 /* Level 1 active buttons. */
 .linklevel1.active, .listlevel1:hover .active,
 #collapse_button .linklevel1, .pm_indicator, .likes_indicator {
-	border-color: #3D6E32;
-	border-top-color: #4B863C;
-	border-left-color: #38642D;
-	background: #4B863C;
-	background-image: linear-gradient(to bottom, #5BA048, #3D6E32);
-	box-shadow: 1px 1px 2px #BBBBBB;
-	color: #FEFEFE;
+	background: #4b863c;
+	color: #fefefe;
+	border-top-color: #4b863c;
+	border-left-color: #38642d;
+	box-shadow: 1px 1px 2px #bbb;
+	border-color: #3d6e32;
+	background-image: linear-gradient(to bottom, #5ba048, #3d6e32);
 }
 
 /* Hover effects for those buttons. */
 .linklevel1.active:hover, .listlevel1:hover .linklevel1.active,
 #collapse_button .linklevel1:hover, .linklevel1:hover .pm_indicator {
-	border-color: #5BA048;
-	border-top-color: #2D5024;
-	border-left-color: #2D5024;
-	background: #3D6E32;
+	background: #3d6e32;
+	border-top-color: #2d5024;
+	border-left-color: #2d5024;
 	box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3) inset;
+	border-color: #5ba048;
 }
 
 .linklevel1:hover .pm_indicator {
-	box-shadow: 0 -1px 0 #3D6E32 inset;
+	box-shadow: 0 -1px 0 #3d6e32 inset;
 }
 
 .linklevel1.active:hover .pm_indicator {
-	border-bottom-color: #2D5024;
+	border-bottom-color: #2d5024;
 }
 
 /* Top level subsection indicators.
  * Comment these out if you don't want them.
  */
+
 .subsections:hover .linklevel1:after {
 
 }
 
 #main_menu .subsections:hover .linklevel1:after {
-	color: #EEEEEE;
-	text-shadow: 0 4px 0 #3D6E32;
+	color: #eee;
+	text-shadow: 0 4px 0 #3d6e32;
 }
 
 .admin_menu .subsections:hover .linklevel1:after {
-	color: #3D6E32;
+	color: #3d6e32;
 }
 
 /* Corrections for other menus. */
@@ -668,7 +673,7 @@ div.bbc_footnotes .meaction {
 }
 
 .subsections:hover .name.linklevel1:after {
-	color: #5BA048;
+	color: #5ba048;
 }
 
 .poster2 .subsections:hover .name.linklevel1:after {
@@ -679,8 +684,8 @@ div.bbc_footnotes .meaction {
 .poster_avatar .linklevel1:focus,
 .name.linklevel1, .name.linklevel1:hover, .name.linklevel1:focus {
 	background: none;
+	color: #4b863c;
 	box-shadow: none;
-	color: #4B863C;
 }
 
 .name.linklevel1:hover {
@@ -689,18 +694,19 @@ div.bbc_footnotes .meaction {
 
 /* Levels 2 and 3: drop menu wrapper. */
 .menulevel2, .menulevel3 {
-	border-color: #AFAFAF;
-	border-top-color: #CFCFCF;
-	border-left-color: #BFBFBF;
-	background: #FEFEFE;
+	background: #fefefe;
+	border-top-color: #cfcfcf;
+	border-left-color: #bfbfbf;
 	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.2);
+	border-color: #afafaf;
 }
 
 /* Tricky PM indicator. Define it carefully,
  * just in case someone tries to use this class elsewhere.
  */
+
 .pm_indicator, .likes_indicator {
-	box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.25), 0 -1px 0 #3D6E32 inset;
+	box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.25), 0 -1px 0 #3d6e32 inset;
 }
 
 .poster .pm_indicator {
@@ -735,13 +741,14 @@ div.bbc_footnotes .meaction {
 
 /* Level 2: dividers between admin/moderation, and pm/profile links. */
 #button_admin .listlevel2.subsections, #button_pm .listlevel2.subsections {
-	border-top-color: #DDDDDD;
-	box-shadow: 0 -1px 0 #BBBBBB;
+	border-top-color: #ddd;
+	box-shadow: 0 -1px 0 #bbb;
 }
 
 /* Levels 2 and 3: highlighting of current section
  * @todo - Should probably be applied to main menu as well, for consistency.
  */
+
 .linklevel2.chosen, .linklevel3.chosen,
 #menu_current_area .linklevel1 {
 
@@ -750,11 +757,12 @@ div.bbc_footnotes .meaction {
 /* Styles for sidebar menus.
  * Cancel default backgrounds for sidebar.
  */
+
 #menu_sidebar .linklevel1 {
-	border-color: transparent;
 	background: none;
-	box-shadow: none;
 	color: #585858;
+	box-shadow: none;
+	border-color: transparent;
 }
 
 /* End sidebar flyout coding. */
@@ -766,9 +774,9 @@ div.bbc_footnotes .meaction {
 
 /* Wrapper/background. */
 .navigate_section {
-	border-color: #CCCCCC;
-	background: #FEFEFE;
-	box-shadow: 1px 2px 3px #EEEEEE;
+	border-color: #ccc;
+	background: #fefefe;
+	box-shadow: 1px 2px 3px #eee;
 }
 
 /* Color for linktree items. */
@@ -777,33 +785,33 @@ div.bbc_footnotes .meaction {
 }
 
 .linktree {
-	border-bottom-color: #CCCCCC;
-	box-shadow: 0 -2px 0 -1px #CCCCCC, 3px -2px 0 -1px #CCCCCC, 3px 1px 0 -1px #CCCCCC;
+	border-bottom-color: #ccc;
+	box-shadow: 0 -2px 0 -1px #ccc, 3px -2px 0 -1px #ccc, 3px 1px 0 -1px #ccc;
 }
 
 .linktree:hover a, .linktree > a:hover,
 .linktree:last-child, .linktree:last-child > span > a,
 .linktree:last-child > span > a:hover, .linktree:last-child strong {
-	color: #FEFEFE;
+	color: #fefefe;
 }
 
 .linktree:after {
-	background: #FEFEFE;
+	background: #fefefe;
 	box-shadow: 2px -2px 0 1px rgba(200, 204, 204, 0.9);
 }
 
 .linktree:hover, .linktree:last-child {
-	background: #5BA048;
-	background-image: linear-gradient(0deg, #4B863C, #5BA048);
+	background: #5ba048;
+	background-image: linear-gradient(0deg, #4b863c, #5ba048);
 }
 
 .linktree:hover:after, .linktree:last-child:after {
-	background: #5BA048;
-	background-image: linear-gradient(315deg, #4B863C, #5BA048);
+	background: #5ba048;
+	background-image: linear-gradient(315deg, #4b863c, #5ba048);
 }
 
 .linktree:last-child:hover, .linktree:last-child:hover:after {
-	background: #4B863C;
+	background: #4b863c;
 }
 
 /* -------------------------------------------------------
@@ -817,13 +825,14 @@ div.bbc_footnotes .meaction {
 
 /* Styles for the standard button lists.
 /* @todo - Save code by amalgamating common button background declarations. */
+
 .buttonlist li a.linklevel1 {
-	box-shadow: 1px 1px 2px #E4E4E4, 0 -1px 0 #E4E4E4 inset;
+	box-shadow: 1px 1px 2px #e4e4e4, 0 -1px 0 #e4e4e4 inset;
 }
 
 /* The active one */
 .buttonlist li a.active {
-	box-shadow: 1px 1px 2px #E4E4E4, 0 -1px 0 #3D6E32 inset;
+	box-shadow: 1px 1px 2px #e4e4e4, 0 -1px 0 #3d6e32 inset;
 }
 
 /* The quick buttons. */
@@ -864,20 +873,20 @@ div.bbc_footnotes .meaction {
 }
 
 .pagelinks .navPages {
-	border-color: #AFAFAF;
-	border-top-color: #BBBBBB;
-	background-image: linear-gradient(to bottom, #FEFEFE 0%, #E4E4E4 100%);
 	color: #585858;
+	border-top-color: #bbb;
+	border-color: #afafaf;
+	background-image: linear-gradient(to bottom, #fefefe 0%, #e4e4e4 100%);
 }
 
 .pagelinks .navPages:hover, .pagelinks .current_page {
-	border-color: #CCCCCC;
-	border-top-color: #AFAFAF;
-	border-left-color: #AFAFAF;
-	background: #F0F0F0;
-	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
+	background: #f0f0f0;
 	/* @todo - Simplify. */
 	color: #585858;
+	border-top-color: #afafaf;
+	border-left-color: #afafaf;
+	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
+	border-color: #ccc;
 }
 
 .pagelinks :first-child {
@@ -899,9 +908,9 @@ div.bbc_footnotes .meaction {
 
 /* Globally accessible top/bottom links. */
 #gotop, #gobottom {
-	border-color: #222222;
-	background: #EEEEEE;
-	color: #EEEEEE;
+	border-color: #222;
+	background: #eee;
+	color: #eee;
 	opacity: 0.2;
 }
 
@@ -910,14 +919,14 @@ div.bbc_footnotes .meaction {
 }
 
 #gotop:hover, #gobottom:hover {
-	color: #444444;
+	color: #444;
 	opacity: 1;
 }
 
 /* Skip navigation link. */
 #top {
-	border-color: #5BA048;
-	background: #FEFEFE;
+	border-color: #5ba048;
+	background: #fefefe;
 }
 
 /* -------------------------------------------------------
@@ -927,42 +936,43 @@ div.bbc_footnotes .meaction {
 
 /* A general table class. */
 .table_grid {
-	border-color: #DDDDDD;
+	border-color: #ddd;
 }
 
 .table_head > th {
-	border-top-color: #DDDDDD;
-	border-bottom-color: #DDDDDD;
-	background: #FEFEFE;
+	background: #fefefe;
 	color: #686868;
+	border-top-color: #ddd;
+	border-bottom-color: #ddd;
 }
 
 /* Basic cells. */
 .table_grid td, .letterspacing {
-	border-bottom-color: #CCCCCC;
+	border-bottom-color: #ccc;
 }
 
 /* Subtle zebra striping for rows. */
 .table_grid .standard_row:nth-child(even) {
-	background: #FAFAFA;
+	background: #fafafa;
 }
 
 .table_grid .standard_row:nth-child(odd) {
-	background: #FEFEFE;
+	background: #fefefe;
 }
 
 /* Legacy highlight color, for selected membergroups etc.
  * Used by JS to show a selected item. Still used in manage languages
  */
+
 .table_grid .standard_row.highlight2 {
-	background: #E4E4E4;
+	background: #e4e4e4;
 	color: #585858;
 }
 
 /* For Errors.template.php. */
 #errorfile_table .current {
-	border-color: #444444;
-	background: #FFF5CD;
+	border-color: #444;
+	background: #fff5cd;
 }
 
 /* -------------------------------------------------------
@@ -987,8 +997,8 @@ div.bbc_footnotes .meaction {
 
 /* The board categories and newsfader - some shared styling. */
 .forum_category, .content_category {
-	background: #DEEDDA;
-	box-shadow: 1px 2px 3px #EEEEEE;
+	background: #deedda;
+	box-shadow: 1px 2px 3px #eee;
 }
 
 .board_row,
@@ -996,8 +1006,8 @@ div.bbc_footnotes .meaction {
 .forumposts > li,
 .content_category > div,
 .content_category > li {
-	border-color: #CFCFCF;
-	background: #FEFEFE;
+	border-color: #cfcfcf;
+	background: #fefefe;
 }
 
 .board_row .parent_board {
@@ -1009,7 +1019,7 @@ div.bbc_footnotes .meaction {
 }
 
 .board_latest {
-	border-left-color: #CCCCCC;
+	border-left-color: #ccc;
 }
 
 .board_name > a {
@@ -1038,7 +1048,7 @@ div.bbc_footnotes .meaction {
 
 /* Styles for the info center on the board index. */
 .ic_section_header {
-	border-bottom-color: #DDDDDD;
+	border-bottom-color: #ddd;
 }
 
 .ic_section_header > a {
@@ -1046,41 +1056,41 @@ div.bbc_footnotes .meaction {
 }
 
 #ic_recentposts td, #ps_recentposts td, #ps_recenttopics td {
-	border-top-color: #DDDDDD;
+	border-top-color: #ddd;
 }
 
 .recentpost > strong > a, .inline > strong > a {
-	color: #4B863C;
+	color: #4b863c;
 }
 
 #expanded_pages_container a {
-	background: #FEFEFE;
+	background: #fefefe;
 }
 
 /* The board description and who-is-viewing stuff. */
 #description_board {
-	background: #E4E4E4;
-	box-shadow: 1px 2px 4px #EEEEEE;
+	background: #e4e4e4;
+	box-shadow: 1px 2px 4px #eee;
 }
 
 #description_board .generalinfo, #forumposts .generalinfo {
-	border-color: #DDDDDD;
-	border-bottom-color: #CCCCCC;
-	background: #FEFEFE;
+	background: #fefefe;
+	border-bottom-color: #ccc;
+	border-color: #ddd;
 }
 
 .topic_listing {
-	background: #E4E4E4;
-	box-shadow: 1px 2px 4px #EEEEEE;
+	background: #e4e4e4;
+	box-shadow: 1px 2px 4px #eee;
 }
 
 .topic_listing > li {
-	border-color: #DDDDDD;
-	border-bottom-color: #CCCCCC;
+	border-color: #ddd;
+	border-bottom-color: #ccc;
 }
 
 .basic_row {
-	background: #FEFEFE;
+	background: #fefefe;
 }
 
 .topic_sorting_row {
@@ -1088,19 +1098,19 @@ div.bbc_footnotes .meaction {
 }
 
 #sort_by {
-	border-color: #D1D1D1;
+	border-color: #d1d1d1;
 }
 
 #sort_by.topic_sorting_recent {
-	border-color: #D1D1D1;
+	border-color: #d1d1d1;
 }
 
 .sort_by_container {
-	border-color: #CCCCCC;
+	border-color: #ccc;
 }
 
 .topic_name h4 a {
-	color: #3D6E32;
+	color: #3d6e32;
 }
 
 .sticky_row .topic_name h4 a, .locked_row.sticky_row .topic_name h4 a {
@@ -1112,7 +1122,7 @@ div.bbc_footnotes .meaction {
 }
 
 .sticky_row .topic_name h4 a.new_posts, .locked_row.sticky_row .topic_name h4 a.new_posts, .locked_row .topic_name h4 a.new_posts {
-	color: #FEFEFE;
+	color: #fefefe;
 }
 
 .topic_stats {
@@ -1120,34 +1130,34 @@ div.bbc_footnotes .meaction {
 }
 
 .qaction_row {
-	background: #FEFEFE;
+	background: #fefefe;
 }
 
 .approvetopic_row, .approve_row {
-	background: #FFF5CD;
+	background: #fff5cd;
 }
 
 .sticky_row, .locked_row.sticky_row {
-	background: #FFFFE0;
+	background: #ffffe0;
 }
 
 .locked_row {
-	background: #F4F4F4;
+	background: #f4f4f4;
 }
 
 #topic_icons {
-	border-color: #DDDDDD;
+	border-color: #ddd;
 }
 
 .jump_to_header {
-	background: #EBEBEB;
-	background-image: linear-gradient(to bottom, #FAFAFA, #EAEAEA);
-	box-shadow: 2px 1px rgba(1, 1, 1, 0.07) inset;
+	background: #ebebeb;
 	color: #566450;
+	box-shadow: 2px 1px rgba(1, 1, 1, 0.07) inset;
+	background-image: linear-gradient(to bottom, #fafafa, #eaeaea);
 }
 
 .jump_to_header:hover {
-	background: #F0F0F0;
+	background: #f0f0f0;
 	color: #585858;
 }
 
@@ -1248,68 +1258,68 @@ div.bbc_footnotes .meaction {
 
 /* Poll vote options */
 #poll_options .options {
-	border-top-color: #DDDDDD;
+	border-top-color: #ddd;
 }
 
 /* Poll results */
 #poll_options .options .percentage {
-	background: #FEFEFE;
+	background: #fefefe;
 }
 
 .poll_gradient {
-	background: #5BA048;
-	background-image: linear-gradient(to bottom, #60BC78 0%, #27A348 100%);
+	background: #5ba048;
+	background-image: linear-gradient(to bottom, #60bc78 0%, #27a348 100%);
 	border-color: #111;
 }
 
 /* On to the posts */
 #quickreplybox, #forumposts, #searchform, #recentposts, #pmFolder, #topic_summary, #preview_section {
-	background: #E4E4E4;
-	box-shadow: 1px 2px 4px #EEEEEE;
+	background: #e4e4e4;
+	box-shadow: 1px 2px 4px #eee;
 }
 
 /* Poster and postarea + moderation area underneath */
 .forumposts {
-	border-color: #DDDDDD;
-	border-bottom-color: #CCCCCC;
-	background: #FEFEFE;
+	background: #fefefe;
+	border-bottom-color: #ccc;
+	border-color: #ddd;
 }
 
 /* Colors for background of posts requiring approval */
 .approvebg {
-	background: #FFF5CD;
+	background: #fff5cd;
 }
 
 .poster .name {
-	color: #3D6E32;
+	color: #3d6e32;
 }
 
 /* Drop menu for the poster info. */
 .poster .listlevel1.sfhover .menulevel2, .poster .listlevel1:hover .menulevel2 {
-	background: #FEFEFE;
+	background: #fefefe;
 }
 
 .report_seperator {
-	border-bottom-color: #EEEEEE;
-	background: #BBBBBB;
+	background: #bbb;
+	border-bottom-color: #eee;
 }
 
 /* @todo - Save code by amalgamating common button background declarations. */
 .poster_online .linklevel1 {
-	border-color: #AFAFAF;
-	border-top-color: #CFCFCF;
-	border-left-color: #BFBFBF;
-	background: #F4F4F4;
-	background-image: linear-gradient(to bottom, #FEFEFE 0%, #E4E4E4 100%);
-	box-shadow: 1px 1px 2px #EEEEEE;
+	background: #f4f4f4;
+	border-top-color: #cfcfcf;
+	border-left-color: #bfbfbf;
+	box-shadow: 1px 1px 2px #eee;
+	border-color: #afafaf;
+	background-image: linear-gradient(to bottom, #fefefe 0%, #e4e4e4 100%);
 }
 
 .poster_online .linklevel1:hover {
-	border-color: #CCCCCC;
-	border-top-color: #AFAFAF;
-	border-left-color: #BBBBBB;
-	background: #F0F0F0;
+	background: #f0f0f0;
+	border-top-color: #afafaf;
+	border-left-color: #bbb;
 	box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.07) inset;
+	border-color: #ccc;
 }
 
 .post_subject {
@@ -1317,31 +1327,34 @@ div.bbc_footnotes .meaction {
 }
 
 .keyinfo h5 a, .keyinfo h5 a strong {
-	color: #3D6E32;
+	color: #3d6e32;
 }
 
 .inner, .messageContent {
-	border-top-color: #BFBFBF;
+	border-top-color: #bfbfbf;
 }
 
 /* All the signatures used in the forum. */
 .signature, .attachments, .custom_fields_above_signature {
-	border-top-color: #BFBFBF;
+	border-top-color: #bfbfbf;
 }
 
 /* attachment details below thumbnails */
 .attachment_name, .attachment_details {
-	border: solid 1px #afafaf;
-	background: #E4E4E4 !important;
+	background: #e4e4e4 !important;
 	color: #444 !important;
+	border: solid 1px #afafaf;
 }
+
 .attachment_name {
 	border-bottom: none;
 }
+
 .attachment_details {
 	border-top: none;
 	border-radius: 0 0 .5em .5em;
 }
+
 .generic_border .attachment_name {
 	border: 1px solid transparent;
 }
@@ -1358,13 +1371,13 @@ div.bbc_footnotes .meaction {
 #elk_lb_expand,
 #elk_lb_next,
 #elk_lb_prev {
-	border-color: #CCCCCC;
+	border-color: #ccc;
 }
 
 #elk_lb_expand:before,
 #elk_lb_next:before,
 #elk_lb_prev:before {
-	color: #CCCCCC;
+	color: #ccc;
 }
 
 .new_post_separator {
@@ -1374,32 +1387,32 @@ div.bbc_footnotes .meaction {
 .new_post_separator:after, .new_post_separator:before {
 	border-width: 10px 10px 0;
 	border-style: solid;
-	border-color: #E4E4E4 transparent;
+	border-color: #e4e4e4 transparent;
 }
 
 .new_post_separator:before {
-	border-color: #BBBBBB transparent;
+	border-color: #bbb transparent;
 }
 
 /* Used by video embed JS when autolinking video links */
 .elk_video {
-	border-color: #27A348;
+	border-color: #27a348;
 }
 
 .elk_videoheader {
-	border-color: #27A348;
+	border-color: #27a348;
 }
 
 .requiredfield:before {
-	border-bottom-color: #3D6E32;
+	border-bottom-color: #3d6e32;
 }
 
 .requiredfield {
-	border-color: #2D5024;
-	border-right-color: #5BA048;
-	border-bottom-color: #5BA048;
-	background: #3D6E32;
-	color: #FEFEFE;
+	background: #3d6e32;
+	color: #fefefe;
+	border-right-color: #5ba048;
+	border-bottom-color: #5ba048;
+	border-color: #2d5024;
 }
 
 /* -------------------------------------------------------
@@ -1409,41 +1422,41 @@ div.bbc_footnotes .meaction {
 
 /* The main post editor section. */
 #preview_body {
-	border-color: #DDDDDD;
-	border-bottom-color: #CCCCCC;
-	background: #FEFEFE;
+	background: #fefefe;
+	border-bottom-color: #ccc;
+	border-color: #ddd;
 }
 
 #postAdditionalOptionsHeader, #postDraftOptionsHeader {
-	background: #FAFAFA;
-	background-image: linear-gradient(to bottom, #FAFAFA 0%, #EBEBEB 100%);
+	background: #fafafa;
+	background-image: linear-gradient(to bottom, #fafafa 0%, #ebebeb 100%);
 }
 
 #postAdditionalOptions, #postDraftOptions {
-	border-color: #CCCCCC;
-	background: #FEFEFE;
+	border-color: #ccc;
+	background: #fefefe;
 }
 
 #postAdditionalOptionsNC {
-	border-color: #CCCCCC;
-	background: #FEFEFE;
+	border-color: #ccc;
+	background: #fefefe;
 }
 
 .drop_area {
-	border-color: #CCCCCC;
-	background-color: #E4E4E4;
-	color: #444444;
+	border-color: #ccc;
+	background-color: #e4e4e4;
+	color: #444;
 }
 
 .statusbar {
-	border-top-color: #A9CCD1;
-	border-bottom-color: #A9CCD1;
-	background: #F0F0F0;
+	background: #f0f0f0;
+	border-top-color: #a9ccd1;
+	border-bottom-color: #a9ccd1;
 }
 
 .statusbar .insertoverlay {
-	background-color: #FAFAFA;
-	border-color: #A9CCD1;
+	background-color: #fafafa;
+	border-color: #a9ccd1;
 }
 
 .insertoverlay .tabs li {
@@ -1451,21 +1464,21 @@ div.bbc_footnotes .meaction {
 }
 
 .insertoverlay .tabs li.active {
-	background-color: #E4E4E4;
+	background-color: #e4e4e4;
 }
 
 .statusbar .insertoverlay .button {
 	background: #008000;
-	color: #FAFAFA;
+	color: #fafafa;
 }
 
 .progressBar {
-	border-color: #DDDDDD;
+	border-color: #ddd;
 }
 
 .progressBar div {
 	background-color: #008000;
-	color: #FEFEFE;
+	color: #fefefe;
 }
 
 .abort {
@@ -1481,19 +1494,18 @@ div.bbc_footnotes .meaction {
 }
 
 #postMoreOptions {
-	border-top-color: #CCCCCC;
+	border-top-color: #ccc;
 }
 
 #postDraftOptions .settings dd, #postDraftOptions .settings dt {
-	border-top-color: #E4E4E4;
+	border-top-color: #e4e4e4;
 }
 
 /* ------------------------------------------------------- */
 /*	$MODERATE	                                           */
 /* ------------------------------------------------------- */
-
 .split_messages .post {
-	border-top-color: #FEFEFE;
+	border-top-color: #fefefe;
 }
 
 /* -------------------------------------------------------
@@ -1502,52 +1514,52 @@ div.bbc_footnotes .meaction {
  */
 
 .ui-tabs .ui-tabs-panel {
-	border-color: #DDDDDD;
-	border-top-color: #CCCCCC;
-	background: #FEFEFE none repeat scroll 0 0;
+	background: #fefefe none repeat scroll 0 0;
+	border-top-color: #ccc;
+	border-color: #ddd;
 }
 
 .ui-tabs .ui-tabs-nav li {
-	border: 1px #CCCCCC solid;
+	color: #fefefe;
+	border: 1px #ccc solid;
 	border-radius: 6px 6px 0 0;
-	color: #FEFEFE;
 }
 
 .ui-tabs .ui-tabs-nav .ui-tabs-anchor {
-	outline: none;
-	border-bottom-color: #CCCCCC;
+	background: #f0f0f0;
+	border-bottom-color: #ccc;
 	border-radius: 6px 6px 0 0;
-	background: #F0F0F0;
+	outline: none;
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-default .ui-tabs-anchor {
-	background: #F4F4F4;
-	background-image: linear-gradient(to bottom, #FEFEFE, #E4E4E4);
+	background: #f4f4f4;
+	background-image: linear-gradient(to bottom, #fefefe, #e4e4e4);
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-active .ui-tabs-anchor,
 .ui-tabs .ui-tabs-nav .ui-state-active {
-	background: #4B863C;
-	background-image: linear-gradient(to bottom, #5BA048, #3D6E32);
-	color: #FEFEFE;
+	background: #4b863c;
+	background-image: linear-gradient(to bottom, #5ba048, #3d6e32);
+	color: #fefefe;
 }
 
 .ui-tabs .ui-tabs-nav li.ui-state-hover .ui-tabs-anchor {
-	border-color: #CCCCCC;
-	border-top-color: #AFAFAF;
-	border-left-color: #AFAFAF;
-	background: #F0F0F0;
+	background: #f0f0f0;
 	color: #585858;
+	border-top-color: #afafaf;
+	border-left-color: #afafaf;
+	border-color: #ccc;
 }
 
 li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover,
 li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
-	border-color: #5BA048;
-	border-top-color: #2D5024;
-	border-left-color: #2D5024;
-	background: #3D6E32;
+	background: #3d6e32;
+	color: #fefefe;
+	border-top-color: #2d5024;
+	border-left-color: #2d5024;
 	box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3) inset;
-	color: #FEFEFE;
+	border-color: #5ba048;
 }
 
 /* -------------------------------------------------------
@@ -1556,13 +1568,13 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
  */
 
 #profile_attachments {
-	border-color: #CCCCCC;
-	background: #EEEEEE;
+	border-color: #ccc;
+	background: #eee;
 	box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.1);
 }
 
 #profile_attachments .content {
-	background: #FEFEFE;
+	background: #fefefe;
 }
 
 .content_noframe {
@@ -1570,7 +1582,7 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 }
 
 .profileblock {
-	background: #FEFEFE none repeat scroll 0 0;
+	background: #fefefe none repeat scroll 0 0;
 }
 
 .profileblock ul li:not(:first-child):before {
@@ -1583,17 +1595,17 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 
 .activity_stats li span {
 	border-color: #585858;
-	background: #EEEEEE;
+	background: #eee;
 }
 
 .activity_stats li .bar {
-	border-color: #CCCCCC;
-	background: #FEFEFE;
+	border-color: #ccc;
+	background: #fefefe;
 }
 
 .activity_stats li .bar div {
-	background: #60BC78;
-	background-image: linear-gradient(to bottom, #60BC78 0%, #27A348 100%);
+	background: #60bc78;
+	background-image: linear-gradient(to bottom, #60bc78 0%, #27a348 100%);
 }
 
 .profile_pie {
@@ -1601,11 +1613,11 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 }
 
 .topic_details {
-	border-bottom-color: #999999;
+	border-bottom-color: #999;
 }
 
 .ignoreboards a {
-	border-bottom-color: #CCCCCC;
+	border-bottom-color: #ccc;
 }
 
 .ignoreboards a:hover {
@@ -1613,11 +1625,11 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 }
 
 .generic_border {
-	border-color: #CCCCCC;
+	border-color: #ccc;
 }
 
 .attachment_title {
-	border-bottom-color: #CCCCCC;
+	border-bottom-color: #ccc;
 }
 
 #warndiv .ui-widget-header {
@@ -1629,7 +1641,7 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 }
 
 #warndiv .moderated .ui-widget-header {
-	background: #FFA500;
+	background: #ffa500;
 }
 
 #warndiv .muted .ui-widget-header {
@@ -1646,23 +1658,23 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
  */
 
 #personal_messages .capacity_bar {
-	border-color: #AFAFAF;
+	border-color: #afafaf;
 }
 
 #personal_messages .capacity_bar span {
-	border-right-color: #AFAFAF;
+	border-right-color: #afafaf;
 }
 
 #personal_messages .capacity_bar .empty {
-	background: #60BC78;
+	background: #60bc78;
 }
 
 #personal_messages .capacity_bar .filled {
-	background: #FFA500;
+	background: #ffa500;
 }
 
 #personal_messages .capacity_bar .full {
-	background: #A80000;
+	background: #a80000;
 }
 
 .addrules dt.floatleft {
@@ -1675,7 +1687,7 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
  */
 
 .birthday {
-	color: #920AC4;
+	color: #920ac4;
 }
 
 .event {
@@ -1687,18 +1699,18 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 }
 
 .calendar_table {
-	border-top-color: #DDDDDD;
-	background: #DDDDDD;
+	background: #ddd;
+	border-top-color: #ddd;
 }
 
 .calendar_table th, .calendar_table td {
-	background: #FEFEFE;
+	background: #fefefe;
 }
 
 /* Used to indicate the current day. */
 #main_grid .calendar_today, #month_grid .calendar_today {
-	border-color: #AFAFAF;
-	background: #EBFFD8;
+	border-color: #afafaf;
+	background: #ebffd8;
 }
 
 #main_grid .weeks {
@@ -1714,12 +1726,12 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 }
 
 .weeklist {
-	background: #E4E4E4;
+	background: #e4e4e4;
 }
 
 .weeklist > li {
-	border-color: #DDDDDD;
-	background: #FEFEFE;
+	border-color: #ddd;
+	background: #fefefe;
 }
 
 .weeklist h4 a:hover {
@@ -1727,7 +1739,7 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 }
 
 .modify_event {
-	color: #A80000;
+	color: #a80000;
 }
 
 .hidelink {
@@ -1736,7 +1748,7 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 
 /* Add a background that fits with the calendar. */
 #calendar_navigation {
-	border-color: #DDDDDD;
+	border-color: #ddd;
 }
 
 /* -------------------------------------------------------
@@ -1745,14 +1757,14 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
  */
 
 #helpmain {
-	border-color: #CCCCCC;
+	border-color: #ccc;
 	box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* Styles for the tooltips. */
 .tooltip {
-	border-color: #AFAFAF;
-	background: #FEFEFE;
+	border-color: #afafaf;
+	background: #fefefe;
 	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);
 }
 
@@ -1764,7 +1776,7 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 /* The actual pop-up wrapper. */
 .popup_window {
 	border-color: #686868;
-	background-color: #FAFAFA;
+	background-color: #fafafa;
 	background-clip: padding-box;
 	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
@@ -1775,10 +1787,10 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 
 /* The text content, hopefully helpful. */
 .popup_content {
-	border-color: #BBBBBB;
-	border-bottom-color: #CCCCCC;
-	background: #FAFAFA;
+	background: #fafafa;
+	border-bottom-color: #ccc;
 	box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.1);
+	border-color: #bbb;
 }
 
 /* -------------------------------------------------------
@@ -1787,55 +1799,56 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
  */
 
 #mlsearch_options {
-	border-color: #DDDDDD;
-	background: #FAFAFA;
+	border-color: #ddd;
+	background: #fafafa;
 }
 
 .search_results_posts {
-	background: #FEFEFE;
+	background: #fefefe;
 }
 
 .search_results_posts .topic_body {
-	border-top-color: #CCCCCC;
-	box-shadow: 0 1px 0 #FEFEFE inset;
+	border-top-color: #ccc;
+	box-shadow: 0 1px 0 #fefefe inset;
 }
 
 .search_results_posts > li:not(:last-child) {
-	border-bottom-color: #DDDDDD;
+	border-bottom-color: #ddd;
 }
 
 /* -------------------------------------------------------
  *	$MEMBERLIST
  * -------------------------------------------------------
  */
+
 .mlist .mlist_header div {
 
 }
 
 .mlist li div, .whos_online dt div, .whos_online dd:nth-child(odd) div {
-	border-top-color: #CCCCCC;
-	border-bottom-color: #CCCCCC;
-	background-color: #FEFEFE;
+	border-top-color: #ccc;
+	border-bottom-color: #ccc;
+	background-color: #fefefe;
 }
 
 .mlist li.alternate_row div, .whos_online dd:nth-child(even) div {
-	border-top-color: #CCCCCC;
-	border-bottom-color: #CCCCCC;
-	background-color: #FAFAFA;
+	border-top-color: #ccc;
+	border-bottom-color: #ccc;
+	background-color: #fafafa;
 }
 
 .mlist li div:first-child {
-	border-left-color: #CCCCCC;
+	border-left-color: #ccc;
 }
 
 .mlist li div:last-child {
-	border-right-color: #CCCCCC;
+	border-right-color: #ccc;
 }
 
 .letter_row > h3 {
-	border-color: #CCCCCC;
-	background: #EBEBEB;
-	background-image: linear-gradient(to bottom, #FAFAFA, #EAEAEA);
+	border-color: #ccc;
+	background: #ebebeb;
+	background-image: linear-gradient(to bottom, #fafafa, #eaeaea);
 }
 
 /* -------------------------------------------------------
@@ -1845,16 +1858,16 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 
 .coppa_contact {
 	border-color: #585858;
-	background: #FEFEFE;
+	background: #fefefe;
 	color: #585858;
 }
 
 .valid_input {
-	background: #EBFFD8;
+	background: #ebffd8;
 }
 
 .invalid_input {
-	background: #FFEEEE;
+	background: #fee;
 }
 
 /* -------------------------------------------------------
@@ -1864,41 +1877,41 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 
 /* Lotsa boxes. */
 .description, .information, .warningbox, .successbox, .infobox, .errorbox {
-	border-color: #CCCCCC;
-	background: #FEFEFE;
+	border-color: #ccc;
+	background: #fefefe;
 }
 
 /* Information boxes. */
 .information {
-	background: #F0F6F0;
+	background: #f0f6f0;
 }
 
 .warningbox {
-	border-top-color: #FFA500;
-	border-bottom-color: #FFA500;
-	background: #FFF5CD url(../../images/profile/warning_moderate.png) 10px 50% no-repeat;
+	background: #fff5cd url(../../images/profile/warning_moderate.png) 10px 50% no-repeat;
+	border-top-color: #ffa500;
+	border-bottom-color: #ffa500;
 }
 
 .successbox {
+	background: #efe url(../../images/icons/field_valid.png) 10px 50% no-repeat;
 	border-top-color: #008000;
 	border-bottom-color: #008000;
-	background: #EEFFEE url(../../images/icons/field_valid.png) 10px 50% no-repeat;
 }
 
 .infobox {
-	border-top-color: #3A87AD;
-	border-bottom-color: #3A87AD;
-	background: #D9EDF7 url(../../images/icons/quick_sticky.png) 10px 50% no-repeat;
+	background: #d9edf7 url(../../images/icons/quick_sticky.png) 10px 50% no-repeat;
+	border-top-color: #3a87ad;
+	border-bottom-color: #3a87ad;
 }
 
 .errorbox {
-	border-top-color: #A80000;
-	border-bottom-color: #A80000;
-	background: #FFEEEE url(../../images/profile/warning_mute.png) 10px 50% no-repeat;
+	background: #fee url(../../images/profile/warning_mute.png) 10px 50% no-repeat;
+	border-top-color: #a80000;
+	border-bottom-color: #a80000;
 }
 
 .border_error {
-	border-color: #FF0000 !important;
+	border-color: #f00 !important;
 }
 
 /* -------------------------------------------------------
@@ -1921,7 +1934,7 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 }
 
 .progress_bar .blue_percent {
-	background-color: #0000FF;
+	background-color: #00f;
 }
 
 /* -------------------------------------------------------
@@ -1930,23 +1943,23 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
  */
 
 .statistics .category_header {
-	border-bottom-color: #CCCCCC;
 	background: none;
+	border-bottom-color: #ccc;
 	text-shadow: none;
 }
 
 .statistics .flow_hidden, #forum_history .flow_hidden {
-	border-color: #DDDDDD;
-	background: #FEFEFE;
+	border-color: #ddd;
+	background: #fefefe;
 }
 
 .stats.floatleft {
-	border-right-color: #CCCCCC;
+	border-right-color: #ccc;
 }
 
 #top_row .stats dd, .statsbar {
-	border-color: #AFAFAF;
-	background: #FEFEFE;
+	border-color: #afafaf;
+	background: #fefefe;
 	text-shadow: 0 -1px 0 rgba(234, 234, 234, 0.2);
 }
 
@@ -1958,13 +1971,13 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 
 /* Status Bar Green */
 .statsbar .bar {
-	background: #5BA048;
-	background-image: linear-gradient(to bottom, #60BC78 0%, #27A348 100%);
+	background: #5ba048;
+	background-image: linear-gradient(to bottom, #60bc78 0%, #27a348 100%);
 }
 
 /* Absolute positioning stops these breaking the bars on narrow screens. */
 .statsbar .righttext {
-	background: #FEFEFE;
+	background: #fefefe;
 }
 
 #stats {
@@ -1977,9 +1990,9 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 
 /* floating error box currently used by like functionality */
 .floating_error {
-	border-color: #E4E4E4;
-	background: #FEFEFE;
-	color: #444444;
+	border-color: #e4e4e4;
+	background: #fefefe;
+	color: #444;
 }
 
 .floating_error .error_heading {
@@ -1987,12 +2000,12 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 }
 
 .floating_error .error_msg {
-	color: #333333;
+	color: #333;
 }
 
 .floating_error .error_btn {
-	border-top-color: #D1D1D1;
-	color: #0000FF;
+	color: #00f;
+	border-top-color: #d1d1d1;
 }
 
 .floating_error .error_btn:hover {
@@ -2038,14 +2051,14 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 }
 
 .iconline {
-	background: #B4E391;
-	background-image: linear-gradient(to bottom, #B4E391 0%,#61C419 50%,#b4E391 100%);
-	border-color: #27A348;
+	background: #b4e391;
+	background-image: linear-gradient(to bottom, #b4e391 0%,#61c419 50%,#b4e391 100%);
+	border-color: #27a348;
 }
 
 .icoffline {
-	background: #BBBBBB;
-	background-image: linear-gradient(to bottom, #BBBBBB 0%,#6f6f6f 50%,#BBBBBB 100%);
+	background: #bbb;
+	background-image: linear-gradient(to bottom, #bbb 0%,#6f6f6f 50%,#bbb 100%);
 	border-color: #828282;
 }
 
@@ -2075,10 +2088,11 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
  */
 
 /* This one does 1024 screens at default font size. */
+
 @media screen and (max-width: 64em) {
 	#menu_sidebar {
-		border-color: #AFAFAF;
-		background: #FEFEFE;
+		border-color: #afafaf;
+		background: #fefefe;
 		box-shadow: .2em .2em .2em rgba(0, 0, 0, 0.3);
 	}
 
@@ -2087,7 +2101,7 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 	}
 
 	.icon-menu:hover {
-		border-color: #27A348;
+		border-color: #27a348;
 	}
 
 	.listlevel1#button_profile .linklevel1 {
@@ -2095,10 +2109,11 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 	}
 
 	.mlist li div.posts {
-		border-right-color: #CCCCCC;
+		border-right-color: #ccc;
 	}
 }
 /* This one does 800 screens at default font size. */
+
 @media screen and (max-width: 50em) {
 	#main_menu .linklevel1.active, #main_menu .linklevel1.active:hover {
 		border-color: transparent;
@@ -2106,36 +2121,37 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 	}
 
 	#main_menu .linklevel1.active .icon-menu {
-		border-color: #5BA048;
+		border-color: #5ba048;
 	}
 
 	#main_menu .linklevel1 .icon-menu:hover {
-		background: #F4F4F4;
+		background: #f4f4f4;
 	}
 }
 
 /* This one does up to 540 screens. */
+
 @media screen and (max-width: 33.750em) {
 	.board_lastpost {
-		border-top-color: #CCCCCC;
+		border-top-color: #ccc;
 	}
 
 	.topic_listing > li {
-		border-color: #AFAFAF;
-		box-shadow: 3px 3px 6px #E4E4E4;
+		border-color: #afafaf;
+		box-shadow: 3px 3px 6px #e4e4e4;
 	}
 
 	.poster:after, .posterarea:before {
-		border-bottom: 1px solid #BFBFBF;
+		border-bottom: 1px solid #bfbfbf;
 	}
 
 	.whos_online dd:nth-child(even), .whos_online dd:nth-child(odd) {
-		border-top-color: #CCCCCC;
+		border-top-color: #ccc;
 	}
 }
 
 @media screen and (max-width: 30em) {
 	.mlist li .group {
-		border-right-color: #CCCCCC;
+		border-right-color: #ccc;
 	}
 }

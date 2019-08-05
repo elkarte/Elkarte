@@ -54,8 +54,8 @@
 
 /* Dont show disabled buttons as active on hover */
 input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
-	border-left: 1px solid #AFAFAF;
-	border-right: 1px solid #BFBFBF;
+	border-right: 1px solid #bfbfbf;
+	border-left: 1px solid #afafaf;
 }
 
 /* @todo - A common, tag-agnostic class to hold submit buttons, etc. */
@@ -104,6 +104,7 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 
 /* Category Header icons as sprites
 ------------------------------------------------- */
+
 h2 a.collapse {
 	margin: 2px 0 -2px 4px;
 	float: left;
@@ -131,19 +132,19 @@ h2 a.collapse {
 .warningbox {
 	padding-left: 12px;
 	padding-right: 35px;
-	background: #FFF6CA url(../images/profile/warning_moderate.png) 99% 50% no-repeat;
+	background: #fff6ca url(../images/profile/warning_moderate.png) 99% 50% no-repeat;
 }
 
 .successbox {
 	padding-left: 12px;
 	padding-right: 35px;
-	background: #EEFFEE url(../images/icons/field_valid.png) 99% 50% no-repeat;
+	background: #efe url(../images/icons/field_valid.png) 99% 50% no-repeat;
 }
 
 .infobox {
 	padding-left: 12px;
 	padding-right: 35px;
-	background: #D9EDF7 url(../images/icons/quick_sticky.png) 99% 50% no-repeat;
+	background: #d9edf7 url(../images/icons/quick_sticky.png) 99% 50% no-repeat;
 }
 
 /*	$BBC		*/
@@ -210,9 +211,9 @@ h2 a.collapse {
 }
 
 #search_form select {
+	width: 10em;
 	border: 1px solid;
 	border-left: none;
-	width: 10em;
 }
 
 #search_form select:focus {
@@ -345,9 +346,10 @@ h2 a.collapse {
 */
 /* Styles for sidebar menus.
 ------------------------------------------------------- */
+
 #menu_sidebar {
-	float: right;
 	padding: 0 0 1em 10px;
+	float: right;
 }
 
 /* Same styling for Level 1 and Level 2. */
@@ -381,8 +383,8 @@ h2 a.collapse {
 }
 
 .linktree {
-	float: right;
 	padding: 0 2em 0 1.1em;
+	float: right;
 }
 
 /* Nifty indicators. */
@@ -405,9 +407,10 @@ h2 a.collapse {
 
 /* Styles for the standard button lists.
 /* ------------------------------------------------------- */
+
 .buttonlist li {
-	float: right;
 	margin: 0 4px 0 0;
+	float: right;
 }
 
 /* The quick buttons. */
@@ -418,8 +421,8 @@ h2 a.collapse {
 
 /* Follow ups and topic summary need it a bit different. */
 .follow_ups, #topic_summary .quickbuttons {
-	float: left;
 	margin: -7px 7px 0 0;
+	float: left;
 }
 
 /* Most of them. */
@@ -429,8 +432,8 @@ h2 a.collapse {
 
 /* Odd cases. */
 .quickbuttons .modified {
-	float: right;
 	padding: 0 6px 0 0;
+	float: right;
 }
 
 .quickbuttons .inline_mod_check {
@@ -439,8 +442,8 @@ h2 a.collapse {
 
 /* @todo - Save code by amalgamating common button background declarations. */
 .quickbuttons .linklevel1 {
-	float: right;
 	padding: 1px 22px 0 6px;
+	float: right;
 }
 
 /* @todo - Check with js disabled after sorting most of the other crud. */
@@ -448,6 +451,7 @@ h2 a.collapse {
 /*.quickbuttons .linklevel1:focus {
 	margin: 0 9910px 0 -9910px;
 }*/
+
 .quickbuttons .linklevel1:before, .quickbuttons .linklevel2:before {
 	left: auto;
 	right: 3px;
@@ -552,6 +556,7 @@ h2 a.collapse {
 
 /* Lists - settings use these a lot.
 /* @todo - Inefficient selector. Should not need dl tag. */
+
 dl.settings {
 	clear: left;
 }
@@ -646,8 +651,8 @@ dl.settings img {
 }
 
 .topic_icons {
-	float: right;
 	padding: 6px 0 0;
+	float: right;
 	text-align: inherit;
 }
 
@@ -708,6 +713,7 @@ dl.settings img {
 
 /* The display template (topic view).
 /* Events */
+
 .edit_event {
 	margin: 0 0 0 5px;
 }
@@ -765,13 +771,13 @@ dl.settings img {
 }
 
 .messageicon {
-	float: right;
 	margin: -2px 0 -6px 6px;
+	float: right;
 }
 
 .groupicon {
-	float: right;
 	margin: 2px 2px 0 0;
+	float: right;
 }
 
 .inner, .messageContent {
@@ -789,8 +795,8 @@ dl.settings img {
 }
 
 #moderationbuttons_strip {
-	float: right;
 	margin: 4px -4px 4px 0;
+	float: right;
 }
 
 #moderationbuttons ul li {
@@ -799,8 +805,8 @@ dl.settings img {
 
 /* The jump to box */
 #display_jump_to {
-	float: left;
 	padding: 6px 0 5px 5px;
+	float: left;
 }
 
 #display_jump_to input {
@@ -915,20 +921,20 @@ ul.post_options li {
 /* Styles for the profile summary tabs, or any jquery ui tabs */
 /* ---------------------------------------------------------- */
 .ui-tabs .ui-tabs-nav li {
-	float: right;
 	margin: 0 0 -1px 3px;
+	float: right;
 }
 
 /*	$PROFILE	*/
 /* ------------------------------------------------------- */
 .profileblock_left {
-	float: right;
 	margin: 0 4px 4px 0;
+	float: right;
 }
 
 .profileblock_right {
-	float: left;
 	margin: 0 0 4px 4px;
+	float: left;
 }
 
 .profileblock ul li {
@@ -948,8 +954,8 @@ ul.post_options li {
 }
 
 .profileblock .cf_icons {
-	float: right;
 	margin: 4px 0 0 5px;
+	float: right;
 }
 
 #detailedinfo {
@@ -1031,10 +1037,10 @@ ul.post_options li {
 }
 
 .profile_pie {
-	float: right;
 	margin: 0 0 0 12px;
 	/* Image will need changing to match new theme.*/
 	background: url(../images/stats_pie_rtl.png);
+	float: right;
 }
 
 /* View posts */
@@ -1057,8 +1063,8 @@ ul.post_options li {
 }
 
 #creator dd {
-	float: left;
 	margin: 0 2px 10px 0;
+	float: left;
 }
 
 .ignoreboards li {
@@ -1077,7 +1083,6 @@ ul.post_options li {
 
 /* $PERSONAL	*/
 /* ------------------------------------------------------- */
-
 #personal_messages .capacity_bar {
 	margin: 6px 12px 0 0;
 }
@@ -1116,8 +1121,8 @@ div.labels {
 /* $CALENDAR	*/
 /* ------------------------------------------------------- */
 #month_grid {
-	float: right;
 	padding: 0 0 0 15px;
+	float: right;
 }
 
 .previous_month, .next_month {
@@ -1159,18 +1164,18 @@ div.labels {
 }
 
 .stats dt {
-	float: right;
 	margin: 0 0 4px 2%;
+	float: right;
 }
 
 #top_row .stats dd, .statsbar {
-	float: left;
 	padding: 0 0 0 4px;
+	float: left;
 }
 
 .statsbar .bar {
-	float: right;
 	margin: 0 0 0 4px;
+	float: right;
 }
 
 /* Absolute positioning stops these breaking the bars on narrow screens. */
@@ -1236,8 +1241,8 @@ div.labels {
 }
 
 #advanced_search dd {
-	float: right;
 	margin: 0 6px 0 0;
+	float: right;
 	text-align: right;
 }
 
@@ -1334,6 +1339,7 @@ div.labels {
 /*	$MEDIA		*/
 /* ------------------------------------------------------- */
 /* This one does 800 screens at default font size. */
+
 @media screen and (max-width: 50em) {
 	#main_menu .linklevel1 {
 		margin-right: 0;
@@ -1381,12 +1387,13 @@ div.labels {
 	}
 
 	.stats {
-		float: none;
 		margin: 0;
+		float: none;
 	}
 }
 
 /* This one does 540 and smaller screens at default font size. */
+
 @media screen and (max-width: 33.750em) {
 	dt, dd, dd label, .login dt, #advanced_search dt {
 		text-align: right;
@@ -1419,8 +1426,8 @@ div.labels {
 	}
 
 	.postarea {
-		display: block;
 		margin: 0;
+		display: block;
 	}
 
 	h2 .views_text, h2 .nextlinks {
