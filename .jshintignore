@@ -1,4 +1,6 @@
 node_modules
 themes/default/scripts/jquery*
+themes/default/scripts/mailcheck.min.js
 themes/default/scripts/prettify.min.js
 themes/default/scripts/qrcode.js
+themes/default/scripts/undo.plugin.min.js

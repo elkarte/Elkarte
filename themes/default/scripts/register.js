@@ -437,7 +437,7 @@ function onCheckChange()
 			.always(function() {
 				// turn off the indicator
 				ajax_indicator(false);
-			})
+			});
 		});
 	});
 })(jQuery);
