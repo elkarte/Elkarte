@@ -43,11 +43,11 @@
 /*	$GENERAL	*/
 /* ------------------------------------------------------- */
 body {
-	background-image: linear-gradient(to left, #333 0%, #888 50%, #333 100%);
+	background-image: linear-gradient(to left, #333333 0%, #888888 50%, #333333 100%);
 }
 
 fieldset {
-	box-shadow: inset 1px -1px 3px #fff;
+	box-shadow: inset 1px -1px 3px #FFFFFF;
 }
 
 legend {
@@ -81,40 +81,40 @@ legend {
 	/* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
-	border-right: 1px solid #bfbfbf;
-	border-left: 1px solid #afafaf;
-	box-shadow: -1px 1px 2px #e5e5e5;
+	border-right: 1px solid #BFBFBF;
+	border-left: 1px solid #AFAFAF;
+	box-shadow: -1px 1px 2px #E5E5E5;
 }
 
 /* Hover effects. */
 .button_submit:hover, .right_submit:hover, .left_submit:hover,
 .button_reset:hover,
 .linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
-	border-right: 1px solid #afafaf;
-	border-left: 1px solid #ccc;
+	border-right: 1px solid #AFAFAF;
+	border-left: 1px solid #CCCCCC;
 	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
 
 /* @todo - Test this everywhere. */
 .standard_category {
-	box-shadow: -1px 2px 4px #eee;
+	box-shadow: -1px 2px 4px #EEEEEE;
 }
 
 /* Styles for main headers. */
 .category_header, .forum_category .category_header {
-	text-shadow: -1px 1px 0 #ebebeb;
+	text-shadow: -1px 1px 0 #EBEBEB;
 }
 
 /* Styles for subsection headers. @todo */
 .secondary_header {
-	text-shadow: -1px 1px 0 #fff;
+	text-shadow: -1px 1px 0 #FFFFFF;
 }
 
 /*	$BBC		*/
 /* ------------------------------------------------------- */
 /* Extra quote styling */
 .bbc_quote, .quoteheader {
-	box-shadow: -2px 2px 2px #ddd;
+	box-shadow: -2px 2px 2px #DDDDDD;
 }
 
 /*	$AJAX		*/
@@ -125,11 +125,11 @@ legend {
 /* Maintenance mode warning. */
 .notice {
 	font-weight: 700;
-	color: #a80000;
+	color: #A80000;
 }
 
 #search_form .input_text {
-	border-right: 1px solid #ccc;
+	border-right: 1px solid #CCCCCC;
 	border-radius: 0 2px 2px 0;
 }
 
@@ -142,7 +142,7 @@ legend {
 }
 
 .forumtitle > a {
-	text-shadow: -1px 1px 0 #fff;
+	text-shadow: -1px 1px 0 #FFFFFF;
 }
 
 /* News section. */
@@ -155,9 +155,9 @@ legend {
 /* ------------------------------------------------------- */
 /* Level 1 Menu bar: link or button. General styling. */
 .linklevel1, .linklevel1:link, .linklevel1:visited {
-	border-right: 1px solid #bfbfbf;
-	border-left: 1px solid #afafaf;
-	box-shadow: -1px 1px 2px #e5e5e5;
+	border-right: 1px solid #BFBFBF;
+	border-left: 1px solid #AFAFAF;
+	box-shadow: -1px 1px 2px #E5E5E5;
 }
 
 /* Level 1 button hover and focus effects. */
@@ -166,43 +166,43 @@ legend {
 .linklevel3:hover, .listlevel3:hover .linklevel3,
 #menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1,
 #menu_current_area > strong > .linklevel1 {
-	border-right: 1px solid #afafaf;
-	border-left: 1px solid #ccc;
+	border-right: 1px solid #AFAFAF;
+	border-left: 1px solid #CCCCCC;
 	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
 
 .poster li.poster_online:hover .linklevel1 {
-	border-right: 1px solid #afafaf;
-	border-left: 1px solid #ccc;
+	border-right: 1px solid #AFAFAF;
+	border-left: 1px solid #CCCCCC;
 	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
 
 .poster li.poster_online .nolink {
-	border-right: 1px solid #bfbfbf;
-	border-left: 1px solid #afafaf;
-	box-shadow: -1px 1px 2px #e5e5e5;
+	border-right: 1px solid #BFBFBF;
+	border-left: 1px solid #AFAFAF;
+	box-shadow: -1px 1px 2px #E5E5E5;
 }
 
 /* Level 1 active buttons. */
 .linklevel1.active, .listlevel1:hover .active,
 #collapse_button .linklevel1, .pm_indicator {
-	border-right: 1px solid #38642d;
-	border-left: 1px solid #38642e;
-	box-shadow: -1px 1px 2px #bbb;
+	border-right: 1px solid #38642D;
+	border-left: 1px solid #38642E;
+	box-shadow: -1px 1px 2px #BBBBBB;
 }
 
 /* Hover effects for those buttons. */
 .linklevel1.active:hover, .listlevel1:hover .linklevel1.active,
 #collapse_button .linklevel1:hover, .linklevel1:hover .pm_indicator {
-	border-right: 1px solid #2d5024;
-	border-left: 1px solid #5aa049;
+	border-right: 1px solid #2D5024;
+	border-left: 1px solid #5AA049;
 	box-shadow: -1px 1px 1px rgba(0, 0, 0, 0.3) inset;
 }
 
 /* Levels 2 and 3: drop menu wrapper. */
 .menulevel2, .menulevel3 {
-	border-right: 1px solid #bfbfbf;
-	border-left: 1px solid #afafaf;
+	border-right: 1px solid #BFBFBF;
+	border-left: 1px solid #AFAFAF;
 	box-shadow: -3px 3px 3px rgba(0, 0, 0, 0.2);
 }
 
@@ -214,7 +214,7 @@ legend {
 	left: -0.4em;
 	float: right;
 	border-radius: 8px 8px 0 8px;
-	box-shadow: -2px 2px 3px rgba(0, 0, 0, 0.25), 0 -1px 0 #3d6e32 inset;
+	box-shadow: -2px 2px 3px rgba(0, 0, 0, 0.25), 0 -1px 0 #3D6E32 inset;
 }
 
 #dropdown_menu_1 .pm_indicator {
@@ -246,7 +246,7 @@ legend {
 /* The navigation list (i.e. linktree) */
 /* Wrapper/background. */
 .navigate_section {
-	box-shadow: -1px 2px 3px #eee;
+	box-shadow: -1px 2px 3px #EEEEEE;
 }
 
 /* Color for linktree items. */
@@ -255,7 +255,7 @@ legend {
 }
 
 .linktree {
-	box-shadow: 0 2px 0 -1px #ccc, -3px 2px 0 -1px #ccc, -3px -1px 0 -1px #ccc;
+	box-shadow: 0 2px 0 -1px #CCCCCC, -3px 2px 0 -1px #CCCCCC, -3px -1px 0 -1px #CCCCCC;
 }
 
 /*	$BUTTONS	*/
@@ -268,7 +268,7 @@ legend {
 /* ------------------------------------------------------- */
 /* The active one */
 .buttonlist li a.active {
-	box-shadow: -1px 1px 2px #ccc;
+	box-shadow: -1px 1px 2px #CCCCCC;
 }
 
 /* The quick buttons. */
@@ -286,8 +286,8 @@ legend {
 /*	$PAGELINKS	*/
 /* ------------------------------------------------------- */
 .pagelinks .navPages:hover, .pagelinks .current_page {
-	border-right: 1px solid #afafaf;
-	border-left: 1px solid #ccc;
+	border-right: 1px solid #AFAFAF;
+	border-left: 1px solid #CCCCCC;
 	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
 
@@ -332,22 +332,22 @@ legend {
 
 /* The board categories and newsfader - some shared styling. */
 .forum_category, .forumposts, .content_category {
-	box-shadow: -1px 2px 3px #eee;
+	box-shadow: -1px 2px 3px #EEEEEE;
 }
 
 /* @todo - Clean this up, once new classes are assigned to old windowbg stuffz. */
 .board_latest {
-	border-right: 1px solid #ccc;
+	border-right: 1px solid #CCCCCC;
 	border-left: 0;
 }
 
 /* The board description and who-is-viewing stuff. */
 #description_board {
-	box-shadow: -1px 2px 4px #eee;
+	box-shadow: -1px 2px 4px #EEEEEE;
 }
 
 .topic_listing {
-	box-shadow: -1px 2px 4px #eee;
+	box-shadow: -1px 2px 4px #EEEEEE;
 }
 
 .jump_to_header {
@@ -443,19 +443,19 @@ legend {
 
 /* On to the posts */
 .forumposts {
-	box-shadow: -1px 2px 4px #eee;
+	box-shadow: -1px 2px 4px #EEEEEE;
 }
 
 /* @todo - Save code by amalgamating common button background declarations. */
 .poster_online .linklevel1 {
-	border-right: 1px solid #bfbfbf;
-	border-left: 1px solid #afafaf;
-	box-shadow: -1px 1px 2px #eee;
+	border-right: 1px solid #BFBFBF;
+	border-left: 1px solid #AFAFAF;
+	box-shadow: -1px 1px 2px #EEEEEE;
 }
 
 .poster_online .linklevel1:hover {
-	border-right: 1px solid #bbb;
-	border-left: 1px solid #ccc;
+	border-right: 1px solid #BBBBBB;
+	border-left: 1px solid #CCCCCC;
 	box-shadow: -1px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
 
@@ -464,14 +464,14 @@ legend {
 .poster_avatar .linklevel1:focus,
 .name.linklevel1, .name.linklevel1:hover, .name.linklevel1:focus {
 	background: none;
-	color: #4b863c;
+	color: #4B863C;
 	border: none;
 	box-shadow: none;
 }
 
 .requiredfield {
-	border-right: 1px solid #2d5024;
-	border-left: 1px solid #5aa049;
+	border-right: 1px solid #2D5024;
+	border-left: 1px solid #5AA049;
 }
 
 /*	$EDITOR		*/
@@ -485,8 +485,8 @@ legend {
 /* Styles for the profile summary tabs, or any jquery ui tabs */
 /* ---------------------------------------------------------- */
 .ui-tabs .ui-state-hover {
-	border-right: 1px solid #afafaf;
-	border-left: 1px solid #ccc;
+	border-right: 1px solid #AFAFAF;
+	border-left: 1px solid #CCCCCC;
 }
 
 /* $PROFILE	*/
@@ -499,7 +499,7 @@ legend {
 /* ------------------------------------------------------- */
 #personal_messages .capacity_bar span {
 	border-right: 0;
-	border-left: 1px solid #adadad;
+	border-left: 1px solid #ADADAD;
 }
 
 /* $CALENDAR	*/
@@ -522,7 +522,7 @@ legend {
 /*	$ERRORS		*/
 /* ------------------------------------------------------- */
 .errorbox {
-	background: #fee url(../../images/profile/warning_mute.png) 99% 50% no-repeat;
+	background: #FFEEEE url(../../images/profile/warning_mute.png) 99% 50% no-repeat;
 }
 
 /*	$PROGRESS	*/
@@ -532,7 +532,7 @@ legend {
 /* ------------------------------------------------------- */
 .stats.floatleft {
 	border-right: 0;
-	border-left: 1px solid #ccc;
+	border-left: 1px solid #CCCCCC;
 }
 
 /*	$MEDIA		*/
@@ -566,11 +566,11 @@ legend {
 	}
 
 	.topic_listing > li {
-		box-shadow: -3px 3px 6px #e5e5e5;
+		box-shadow: -3px 3px 6px #E5E5E5;
 	}
 
 	.forumposts .content {
-		box-shadow: -3px 3px 6px #e5e5e5;
+		box-shadow: -3px 3px 6px #E5E5E5;
 	}
 
 	.linktree:after {

@@ -1,6 +1,6 @@
 /* nice wrapper for the Modify Themes section */
 #admin_form_wrapper {
-	border: 1px solid #ccc;
+	border: 1px solid #CCCCCC;
 	border-radius: 7px;
 }
 
@@ -25,7 +25,7 @@
 }
 
 #admin_content .content {
-	background: #f6f6f6;
+	background: #F6F6F6;
 	border: none;
 	box-shadow: none;
 }
@@ -54,11 +54,11 @@
 }
 
 #manage_boards .post_group, #manage_boards .regular_members {
-	border-bottom: 1px dotted #000;
+	border-bottom: 1px dotted #000000;
 }
 
 .ui-state-highlight {
-	background-color: #f5f5f5;
+	background-color: #F5F5F5;
 	border: 1px dashed #298299;
 }
 
@@ -67,27 +67,27 @@
 
 .select_category, .select_all_box {
 	font-style: italic;
-	border-top: 1px dashed #ccc;
-	border-bottom: 1px dashed #ccc;
+	border-top: 1px dashed #CCCCCC;
+	border-bottom: 1px dashed #CCCCCC;
 }
 
 /* jQuery Dialog
 ------------------------------------------------- */
 
 .ui-dialog {
-	border: 1px solid #999;
+	border: 1px solid #999999;
 	border-radius: 4px 4px 0 0;
 	box-shadow: 0 0 16px rgba(0, 0, 0, 0.3);
-	background-color: #f5f5f5;
+	background-color: #F5F5F5;
 }
 
 .ui-dialog .ui-dialog-titlebar {
-	background-color: #fafafa;
+	background-color: #FAFAFA;
 	border-radius: 4px 4px 0 0;
 }
 
 .ui-widget-overlay {
-	background-color: #000;
+	background-color: #000000;
 	opacity: 0.3;
 }
 
@@ -98,14 +98,14 @@
 
 /* alternate row colors on Modify Themes,Copy a template */
 .theme_options .content {
-	background: #fcfcfc;
-	border-top: 1px solid #ccc;
-	border-bottom: 1px solid #ccc;
+	background: #FCFCFC;
+	border-top: 1px solid #CCCCCC;
+	border-bottom: 1px solid #CCCCCC;
 }
 
 .theme_options .content {
-	border-top: 1px solid #ccc;
-	border-bottom: 1px solid #ccc;
+	border-top: 1px solid #CCCCCC;
+	border-bottom: 1px solid #CCCCCC;
 }
 
 /* the help ? icon in various spots */
@@ -121,5 +121,5 @@ a.help .icon {
 }
 
 .sortable_smiley {
-	border-bottom-color: #ccc;
+	border-bottom-color: #CCCCCC;
 }

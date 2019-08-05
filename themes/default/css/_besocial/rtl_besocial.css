@@ -70,45 +70,45 @@ legend {
 
 /* Styles for main headers. */
 .category_header, .forum_category .category_header {
-	text-shadow: -1px 1px 0 #ebebeb;
+	text-shadow: -1px 1px 0 #EBEBEB;
 }
 
 /* Styles for subsection headers. @todo */
 .secondary_header {
-	text-shadow: -1px 1px 0 #fff;
+	text-shadow: -1px 1px 0 #FFFFFF;
 }
 
 /* More little boxes on a hillside. */
 .warningbox {
-	border-right: 5px solid #ffd324;
-	border-left: 1px solid #ffd324;
+	border-right: 5px solid #FFD324;
+	border-left: 1px solid #FFD324;
 }
 
 .successbox {
-	border-right: 5px solid #9ece9e;
-	border-left: 1px solid #9ece9e;
+	border-right: 5px solid #9ECE9E;
+	border-left: 1px solid #9ECE9E;
 }
 
 .infobox {
-	border-right: 5px solid #3a87ad;
-	border-left: 1px solid #3a87ad;
+	border-right: 5px solid #3A87AD;
+	border-left: 1px solid #3A87AD;
 }
 
 .errorbox {
-	border-right: 5px solid #ce9e9e;
-	border-left: 1px solid #ce9e9e;
+	border-right: 5px solid #CE9E9E;
+	border-left: 1px solid #CE9E9E;
 }
 
 /*	$BBC		*/
 /* ------------------------------------------------------- */
 /* Extra quote styling */
 .bbc_quote, .quoteheader {
-	box-shadow: -2px 2px 2px #ddd;
+	box-shadow: -2px 2px 2px #DDDDDD;
 }
 
 /* /me uses this a lot. (emote, try typing /me in a post.) */
 .meaction {
-	color: #50aa3a;
+	color: #50AA3A;
 	vertical-align: bottom;
 }
 
@@ -118,7 +118,7 @@ legend {
 /*	$MAIN.		*/
 /* ------------------------------------------------------- */
 #search_form .input_text {
-	border-right: 1px solid #ccc;
+	border-right: 1px solid #CCCCCC;
 	border-radius: 0 2px 2px 0;
 }
 
@@ -140,9 +140,9 @@ legend {
 /* ------------------------------------------------------- */
 /* Level 1 Menu bar: link or button. General styling. */
 .linklevel1, .linklevel1:link, .linklevel1:visited {
-	border-right: 1px solid #bfbfbf;
-	border-left: 1px solid #afafaf;
-	box-shadow: -1px 1px 2px #e5e5e5;
+	border-right: 1px solid #BFBFBF;
+	border-left: 1px solid #AFAFAF;
+	box-shadow: -1px 1px 2px #E5E5E5;
 }
 
 /* Level 1 button hover and focus effects. */
@@ -151,21 +151,21 @@ legend {
 .linklevel3:hover, .listlevel3:hover .linklevel3,
 #menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1,
 #menu_current_area > strong > .linklevel1 {
-	border-right: 1px solid #afafaf;
-	border-left: 1px solid #ccc;
+	border-right: 1px solid #AFAFAF;
+	border-left: 1px solid #CCCCCC;
 	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
 
 .poster li.poster_online:hover .linklevel1 {
-	border-right: 1px solid #afafaf;
-	border-left: 1px solid #ccc;
+	border-right: 1px solid #AFAFAF;
+	border-left: 1px solid #CCCCCC;
 	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
 
 .poster li.poster_online .nolink {
-	border-right: 1px solid #bfbfbf;
-	border-left: 1px solid #afafaf;
-	box-shadow: -1px 1px 2px #e5e5e5;
+	border-right: 1px solid #BFBFBF;
+	border-left: 1px solid #AFAFAF;
+	box-shadow: -1px 1px 2px #E5E5E5;
 }
 
 /* Common button styling. */
@@ -179,24 +179,24 @@ legend {
 	/* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
-	border-right: 1px solid #bfbfbf;
-	border-left: 1px solid #afafaf;
-	box-shadow: -1px 1px 2px #e5e5e5;
+	border-right: 1px solid #BFBFBF;
+	border-left: 1px solid #AFAFAF;
+	box-shadow: -1px 1px 2px #E5E5E5;
 }
 
 /* Hover effects. */
 .button_submit:hover, .right_submit:hover, .left_submit:hover,
 .button_reset:hover,
 .linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
-	border-right: 1px solid #afafaf;
-	border-left: 1px solid #ccc;
+	border-right: 1px solid #AFAFAF;
+	border-left: 1px solid #CCCCCC;
 	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
 
 /* Top level subsection indicators. */
 /* Level 1 active buttons. */
 .pm_indicator {
-	box-shadow: -1px 1px 2px #444;
+	box-shadow: -1px 1px 2px #444444;
 	left: auto;
 	right: -1px;
 }
@@ -247,7 +247,7 @@ legend {
 /*	$MAIN.		*/
 /* ------------------------------------------------------- */
 #forumtitle {
-	text-shadow: -1px 1px 2px #fff;
+	text-shadow: -1px 1px 2px #FFFFFF;
 }
 
 /*	$LINKTREE	*/
@@ -299,11 +299,11 @@ legend {
 /* ------------------------------------------------------- */
 .stats.floatleft {
 	border-right: 0;
-	border-left: 1px solid #ccc;
+	border-left: 1px solid #CCCCCC;
 }
 
 .statsbar .bar {
-	background: #43a8da;
+	background: #43A8DA;
 	border-radius: 0 4px 4px 0;
 }
 
@@ -351,11 +351,11 @@ legend {
 	}
 
 	.topic_listing > li {
-		box-shadow: -3px 3px 6px #e5e5e5;
+		box-shadow: -3px 3px 6px #E5E5E5;
 	}
 
 	.forumposts .windowbg, .forumposts .windowbg2 {
-		box-shadow: -3px 3px 6px #e5e5e5;
+		box-shadow: -3px 3px 6px #E5E5E5;
 	}
 
 	.admin_menu li {

@@ -2093,7 +2093,7 @@ nav > .quickbuttons {
 	top: -10em;
 	left: 3em;
 	padding: 1em 2em;
-	background: none repeat scroll 0 0 #fff;
+	background: none repeat scroll 0 0 #FFFFFF;
 	font-weight: bold;
 	transition: top .5s ease-out 0s, background 1s linear 0s;
 	border: 4px solid;

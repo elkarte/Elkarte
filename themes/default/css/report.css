@@ -1,6 +1,6 @@
 body {
-	color: #000;
-	background-color: #fff;
+	color: #000000;
+	background-color: #FFFFFF;
 }
 
 body, td, .normaltext {
@@ -9,7 +9,7 @@ body, td, .normaltext {
 }
 
 *, a:link, a:visited, a:hover, a:active {
-	color: #000 !important;
+	color: #000000 !important;
 }
 
 .smalltext, .quoteheader, .codeheader {
@@ -22,28 +22,28 @@ body, td, .normaltext {
 
 hr {
 	height: 1px;
-	color: #000;
+	color: #000000;
 	border: 0;
-	background-color: #000;
+	background-color: #000000;
 }
 
 .category_header {
-	background-color: #d6d6d6;
+	background-color: #D6D6D6;
 	font-weight: bold;
 }
 
 .bordercolor {
-	background-color: #333;
+	background-color: #333333;
 }
 
 .windowbg {
-	color: #000;
-	background-color: #fff;
+	color: #000000;
+	background-color: #FFFFFF;
 }
 
 .windowbg2 {
-	color: #000;
-	background-color: #f1f1f1;
+	color: #000000;
+	background-color: #F1F1F1;
 }
 
 .copyright {

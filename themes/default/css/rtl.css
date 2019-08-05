@@ -54,8 +54,8 @@
 
 /* Dont show disabled buttons as active on hover */
 input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
-	border-right: 1px solid #bfbfbf;
-	border-left: 1px solid #afafaf;
+	border-right: 1px solid #BFBFBF;
+	border-left: 1px solid #AFAFAF;
 }
 
 /* @todo - A common, tag-agnostic class to hold submit buttons, etc. */
@@ -132,19 +132,19 @@ h2 a.collapse {
 .warningbox {
 	padding-left: 12px;
 	padding-right: 35px;
-	background: #fff6ca url(../images/profile/warning_moderate.png) 99% 50% no-repeat;
+	background: #FFF6CA url(../images/profile/warning_moderate.png) 99% 50% no-repeat;
 }
 
 .successbox {
 	padding-left: 12px;
 	padding-right: 35px;
-	background: #efe url(../images/icons/field_valid.png) 99% 50% no-repeat;
+	background: #EEFFEE url(../images/icons/field_valid.png) 99% 50% no-repeat;
 }
 
 .infobox {
 	padding-left: 12px;
 	padding-right: 35px;
-	background: #d9edf7 url(../images/icons/quick_sticky.png) 99% 50% no-repeat;
+	background: #D9EDF7 url(../images/icons/quick_sticky.png) 99% 50% no-repeat;
 }
 
 /*	$BBC		*/

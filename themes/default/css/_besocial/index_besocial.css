@@ -67,19 +67,19 @@ a:hover, a.new_win:hover {
  */
 
 html {
-	background: #4d4f54;
+	background: #4D4F54;
 }
 
 body {
 	padding-top: 35px;
-	background: #eee;
-	color: #4d4f53;
+	background: #EEEEEE;
+	color: #4D4F53;
 	font: 90%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
 }
 
 fieldset {
 	background: transparent;
-	border: 1px solid #ccc;
+	border: 1px solid #CCCCCC;
 	box-shadow: none;
 }
 
@@ -87,7 +87,7 @@ legend {
 	margin-left: 15px;
 	padding: 0 0 2px 20px;
 	background: url(../../images/selected_open.png) 0 50% no-repeat;
-	color: #333;
+	color: #333333;
 	font-size: 1.071em;
 	cursor: pointer;
 }
@@ -97,9 +97,9 @@ legend {
 }
 
 input, button, select, textarea, .editor {
-	background: #fff;
-	color: #666;
-	border: 1px solid #ccc;
+	background: #FFFFFF;
+	color: #666666;
+	border: 1px solid #CCCCCC;
 	border-radius: 2px;
 }
 
@@ -113,20 +113,20 @@ input, button, select, textarea, .editor {
 }
 
 input:hover, textarea:hover, button:hover, select:hover {
-	border: 1px solid #999;
+	border: 1px solid #999999;
 }
 
 input:focus, textarea:focus, button:focus, select:focus, .editor:focus {
-	border: 1px solid #999;
+	border: 1px solid #999999;
 }
 
 textarea:hover, .editor:hover {
-	color: #444;
+	color: #444444;
 }
 
 /* Give disabled text input elements a different background color. */
 input[disabled].input_text {
-	background: #eee;
+	background: #EEEEEE;
 }
 
 /* The OpenID login form */
@@ -140,90 +140,90 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 /* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
-	background: #f4f4f4;
-	color: #555;
-	border: 1px solid #afafaf;
-	border-top: 1px solid #cfcfcf;
-	border-left: 1px solid #bfbfbf;
+	background: #F4F4F4;
+	color: #555555;
+	border: 1px solid #AFAFAF;
+	border-top: 1px solid #CFCFCF;
+	border-left: 1px solid #BFBFBF;
 	border-radius: 2px;
-	box-shadow: 1px 1px 2px #e5e5e5;
-	background-image: linear-gradient(to bottom, #fff, #e4e4e4);
+	box-shadow: 1px 1px 2px #E5E5E5;
+	background-image: linear-gradient(to bottom, #FFFFFF, #E4E4E4);
 }
 
 /* Hover effects. */
 input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:hover,
 .linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
-	background: #f0f0f0;
-	color: #555;
-	border: 1px solid #ccc;
-	border-top: 1px solid #afafaf;
-	border-left: 1px solid #afafaf;
+	background: #F0F0F0;
+	color: #555555;
+	border: 1px solid #CCCCCC;
+	border-top: 1px solid #AFAFAF;
+	border-left: 1px solid #AFAFAF;
 	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 	text-decoration: none;
 }
 
 /* the new "button" */
 .new_posts, .new_posts:visited, .new_posts:link {
-	background: #7bb128;
-	color: #fff;
+	background: #7BB128;
+	color: #FFFFFF;
 	border-radius: 4px;
 }
 
 /* approval indicator */
 .require_approval {
-	background: #f3b200;
-	color: #fff;
+	background: #F3B200;
+	color: #FFFFFF;
 	border-radius: 4px;
 }
 
 /* Standard horizontal rule.. ([hr], etc.) */
 hr {
-	background: #eee;
-	border-top-color: #bbb;
+	background: #EEEEEE;
+	border-top-color: #BBBBBB;
 }
 
 
 /* @todo - Test this everywhere. */
 .content {
-	border-color: #ddd;
-	background: #fff;
+	border-color: #DDDDDD;
+	background: #FFFFFF;
 }
 
 .standard_category {
-	background: #e4e4e4;
+	background: #E4E4E4;
 	border-radius: 4px 4px 0 0;
 }
 
 /* Styles for main headers. */
 .category_header, .forum_category .category_header {
-	background: #eee;
-	color: #666;
+	background: #EEEEEE;
+	color: #666666;
 	font-size: 1.5em;
 	border-radius: 5px;
 	margin-bottom: 5px;
 	border-color: transparent;
-	text-shadow: 1px 1px 0 #ebebeb;
+	text-shadow: 1px 1px 0 #EBEBEB;
 	font-weight: bolder;
 }
 
 /* Single ones a bit darker than board index ones. */
 #forumposts .category_header, .content_category .category_header {
-	background: #ebebeb;
-	border: 1px solid #ccc;
-	border-top: 1px solid #cfcfcf;
-	border-bottom: 1px solid #b7b7b7;
+	background: #EBEBEB;
+	border: 1px solid #CCCCCC;
+	border-top: 1px solid #CFCFCF;
+	border-bottom: 1px solid #B7B7B7;
 }
 
 /* Styles for subsection headers. @todo */
 .secondary_header {
-	background: #fafafa;
-	border: 1px solid #ccc;
-	border-top: 1px solid #dfdfdf;
-	text-shadow: 1px 1px 0 #fff;
+	background: #FAFAFA;
+	border: 1px solid #CCCCCC;
+	border-top: 1px solid #DFDFDF;
+	text-shadow: 1px 1px 0 #FFFFFF;
 }
 
 .category_header a:link, .category_header a:visited {
-	color: #777;
+	color: #777777;
 }
 
 /* Upshrink image in the general category headers */
@@ -239,41 +239,41 @@ hr {
 /* Custom highlighted text style for modern browsers. */
 /* Nicer than default. Needs two separate rules. */
 ::-moz-selection {
-	background: #7bb128;
+	background: #7BB128;
 	color: white;
 }
 
 ::selection {
-	background: #7bb128;
+	background: #7BB128;
 	color: white;
 }
 
 /* Other highlighted text, such as search results. */
 .highlight {
-	color: #ff7200;
+	color: #FF7200;
 }
 
 /* Sometimes there will be an error when you post */
 .error {
-	color: #f00 !important;
+	color: #FF0000 !important;
 }
 
 .border_error {
-	border-color: #f00 !important;
+	border-color: #FF0000 !important;
 }
 
 /* Messages that somehow need to attract the attention. */
 .alert {
-	color: #f00;
+	color: #FF0000;
 }
 
 /* Colors for warnings. */
 .warn_mute {
-	color: #f00;
+	color: #FF0000;
 }
 
 .warn_moderate, .softalert {
-	color: #ffa500;
+	color: #FFA500;
 }
 
 .warn_watch, .success {
@@ -281,7 +281,7 @@ hr {
 }
 
 .moderation_link, .moderation_link:visited {
-	color: #f00;
+	color: #FF0000;
 	font-weight: bold;
 }
 
@@ -290,24 +290,24 @@ hr {
  */
 
 .table_grid .standard_row.highlight2 {
-	background: #d1e1ef;
-	color: #555;
+	background: #D1E1EF;
+	color: #555555;
 }
 
 .table_grid .standard_row {
-	background: #fff;
+	background: #FFFFFF;
 }
 
 /* Used for sections that need somewhat larger corners */
 .roundframe, .well {
-	border-color: #c5c5c5;
-	background: #f5f5f5;
+	border-color: #C5C5C5;
+	background: #F5F5F5;
 }
 
 /* The generic wrapper thingy. */
 .generic_list_wrapper {
 	margin-top: 4px;
-	border-color: #ccc;
+	border-color: #CCCCCC;
 }
 
 .generic_list_wrapper .additional_row {
@@ -316,31 +316,31 @@ hr {
 
 .generic_list_wrapper .title_bar {
 	background: none;
-	border-bottom-color: #fff;
+	border-bottom-color: #FFFFFF;
 	border-radius: 0;
 }
 
 .generic_list_wrapper .information {
 	background: none;
-	border-bottom-color: #fff;
+	border-bottom-color: #FFFFFF;
 }
 
 /* Styles used by the auto suggest control. */
 .auto_suggest_div {
-	border-color: #bbb;
+	border-color: #BBBBBB;
 }
 
 .auto_suggest_div:focus {
-	border-color: #bbb;
+	border-color: #BBBBBB;
 }
 
 .auto_suggest_item {
-	background: #ddd;
+	background: #DDDDDD;
 }
 
 .auto_suggest_item_hover {
-	background: #888;
-	color: #eee;
+	background: #888888;
+	color: #EEEEEE;
 }
 
 /* -------------------------------------------------------
@@ -350,14 +350,14 @@ hr {
 
 /* The "Quote:" and "Code:" header parts... */
 .codeheader, .quoteheader {
-	background: #fff;
-	color: #555;
+	background: #FFFFFF;
+	color: #555555;
 	border-bottom: none;
-	border-color: #ccc;
+	border-color: #CCCCCC;
 }
 
 .codeheader {
-	border-top-color: #aaa;
+	border-top-color: #AAAAAA;
 }
 
 /* [Select] link to copy code. */
@@ -369,45 +369,45 @@ hr {
 .bbc_quote,
 /* A code block - maybe PHP ;) - shared styles. */
 .bbc_code {
-	background: #fff;
+	background: #FFFFFF;
 	border-top: none;
-	border-color: #ccc;
+	border-color: #CCCCCC;
 }
 
 /* Extra quote styling */
 .bbc_quote, .quoteheader {
-	box-shadow: 2px 2px 2px #ddd;
+	box-shadow: 2px 2px 2px #DDDDDD;
 }
 
 /* Extra code block styling. */
 .bbc_code {
-	background: #f8f8f8;
-	border-top-color: #aaa;
-	border-bottom-color: #aaa;
+	background: #F8F8F8;
+	border-top-color: #AAAAAA;
+	border-bottom-color: #AAAAAA;
 }
 
 /* Styling for BBC tags */
 .bbc_link:link, .bbc_link:visited {
 	color: #377828;
-	box-shadow: 0 -1px 0 #cedccb inset;
+	box-shadow: 0 -1px 0 #CEDCCB inset;
 }
 
 .bbc_link:hover {
 	color: #377828;
-	box-shadow: 0 -1px 0 #6a5 inset;
+	box-shadow: 0 -1px 0 #66AA55 inset;
 	text-decoration: none;
 }
 /* Styling for tables inside posts */
 .inner > .bbc_table_container > .bbc_table td,
 .messageContent > .bbc_table_container > .bbc_table td {
-	border-right: 1px solid #ccc;
-	border-bottom: 1px solid #ccc;
+	border-right: 1px solid #CCCCCC;
+	border-bottom: 1px solid #CCCCCC;
 }
 
 .inner > .bbc_table_container > .bbc_table th,
 .messageContent > .bbc_table_container > .bbc_table th {
-	border-right: 1px solid #ccc;
-	border-bottom: 1px solid #bbb;
+	border-right: 1px solid #CCCCCC;
+	border-bottom: 1px solid #BBBBBB;
 }
 
 .inner > .bbc_table_container > .bbc_table td:last-child,
@@ -419,7 +419,7 @@ hr {
 
 /* /me uses this a lot. (emote, try typing /me in a post.) */
 .meaction {
-	color: #50aa3a;
+	color: #50AA3A;
 }
 
 .meaction:before {
@@ -431,20 +431,20 @@ hr {
 }
 
 .spoiler {
-	border-color: #ccc;
-	background-color: #eee;
+	border-color: #CCCCCC;
+	background-color: #EEEEEE;
 }
 
 div.bbc_footnotes {
-	border-top-color: #bfbfbf;
+	border-top-color: #BFBFBF;
 }
 
 .bbc_footnotes .target:target {
-	background-color: #d8ffdf;
+	background-color: #D8FFDF;
 }
 
 sup.bbc_footnotes, sup.bbc_footnotes a {
-	color: #50aa3a;
+	color: #50AA3A;
 }
 
 div.bbc_footnotes .meaction {
@@ -467,13 +467,13 @@ div.bbc_footnotes .meaction {
 
 /* The "Loading" bar for quick edit, etc. */
 #ajax_in_progress, .ajax_infobar {
-	background: #fff;
+	background: #FFFFFF;
 	color: #306430;
-	border-bottom-color: #3d6e32;
+	border-bottom-color: #3D6E32;
 }
 
 #ajax_in_progress a {
-	color: #ffa500;
+	color: #FFA500;
 	text-decoration: underline;
 }
 
@@ -490,17 +490,17 @@ div.bbc_footnotes .meaction {
 
 #top_section .wrapper {
 	padding: 0 15px;
-	border-right: 1px solid #ccc;
-	border-left: 1px solid #ccc;
+	border-right: 1px solid #CCCCCC;
+	border-left: 1px solid #CCCCCC;
 	background-color: white;
 }
 
 #search_form input[type="submit"] {
-	color: #333;
+	color: #333333;
 }
 
 #search_form select {
-	border-color: #999;
+	border-color: #999999;
 	border-right: none;
 	opacity: 0.8;
 }
@@ -511,7 +511,7 @@ div.bbc_footnotes .meaction {
 }
 
 #search_form button {
-	border-color: #ccc;
+	border-color: #CCCCCC;
 }
 
 #mlsearch_options {
@@ -524,29 +524,29 @@ div.bbc_footnotes .meaction {
 }
 
 #debug_logging {
-	background: #222;
-	color: #bbb;
+	background: #222222;
+	color: #BBBBBB;
 }
 
 #debug_logging_wrapper {
-	background: #222;
+	background: #222222;
 }
 
 #footer_section {
-	color: #ccc;
-	border-top: 2px solid #444;
-	background-color: #4d4f54;
+	color: #CCCCCC;
+	border-top: 2px solid #444444;
+	background-color: #4D4F54;
 	text-align: center;
 }
 
 #footer_section a {
-	color: #fff;
+	color: #FFFFFF;
 }
 
 #footer_section .rssfeeds {
 	background-color: white;
 	color: orange;
-	text-shadow: 1px 1px 0 #000;
+	text-shadow: 1px 1px 0 #000000;
 }
 
 /* -------------------------------------------------------
@@ -556,15 +556,15 @@ div.bbc_footnotes .meaction {
 
 /* Level 1 Menu bar: link or button. General styling. */
 .linklevel1, .linklevel1:link, .linklevel1:visited {
-	background: #f4f4f4;
-	color: #666;
+	background: #F4F4F4;
+	color: #666666;
 	font-size: 0.868em;
-	border: 1px solid #afafaf;
-	border-top: 1px solid #cfcfcf;
-	border-left: 1px solid #bfbfbf;
+	border: 1px solid #AFAFAF;
+	border-top: 1px solid #CFCFCF;
+	border-left: 1px solid #BFBFBF;
 	border-radius: 2px;
-	box-shadow: 1px 1px 2px #e5e5e5;
-	background-image: linear-gradient(to bottom, #efefef, #e4e4e4);
+	box-shadow: 1px 1px 2px #E5E5E5;
+	background-image: linear-gradient(to bottom, #EFEFEF, #E4E4E4);
 }
 
 .quickbuttons .listlevel1 {
@@ -581,12 +581,12 @@ div.bbc_footnotes .meaction {
 .linklevel3:hover, .listlevel3:hover .linklevel3,
 #menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1,
 #menu_current_area > strong > .linklevel1 {
-	background: #f0f0f0;
-	color: #555;
-	border-top-color: #afafaf;
-	border-left-color: #afafaf;
+	background: #F0F0F0;
+	color: #555555;
+	border-top-color: #AFAFAF;
+	border-left-color: #AFAFAF;
 	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
-	border-color: #ccc;
+	border-color: #CCCCCC;
 	text-decoration: none;
 }
 
@@ -603,22 +603,22 @@ div.bbc_footnotes .meaction {
 }
 
 .poster li.poster_online:hover .linklevel1 {
-	background: #f0f0f0;
-	color: #555;
-	border-top-color: #afafaf;
-	border-left-color: #afafaf;
+	background: #F0F0F0;
+	color: #555555;
+	border-top-color: #AFAFAF;
+	border-left-color: #AFAFAF;
 	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
-	border-color: #ccc;
+	border-color: #CCCCCC;
 }
 
 .poster li.poster_online .nolink {
-	background: #f4f4f4;
-	color: #7bb128;
-	border-top-color: #cfcfcf;
-	border-left-color: #bfbfbf;
-	box-shadow: 1px 1px 2px #e5e5e5;
-	border-color: #afafaf;
-	background-image: linear-gradient(to bottom, #fff, #e4e4e4);
+	background: #F4F4F4;
+	color: #7BB128;
+	border-top-color: #CFCFCF;
+	border-left-color: #BFBFBF;
+	box-shadow: 1px 1px 2px #E5E5E5;
+	border-color: #AFAFAF;
+	background-image: linear-gradient(to bottom, #FFFFFF, #E4E4E4);
 }
 
 .poster li.poster_online .nolink img {
@@ -652,13 +652,13 @@ div.bbc_footnotes .meaction {
 
 .poster .subsections > a:after, .poster .subsections:hover > .name.linklevel1:after {
 	margin: 0 0 0 10px;
-	color: #ccc;
+	color: #CCCCCC;
 	content: "\25BC";
 	font-size: 1.2em;
 }
 
 .report_seperator {
-	border-bottom-color: #ccc;
+	border-bottom-color: #CCCCCC;
 }
 
 .subsections:hover .linklevel1:after {
@@ -690,20 +690,20 @@ div.bbc_footnotes .meaction {
  */
 
 #main_menu .linklevel1, .admin_menu .linklevel1, #adm_submenus .linklevel1 {
-	color: #eee;
+	color: #EEEEEE;
 	border: 1px solid transparent;
 }
 
 #menu_nav {
 	padding: 0;
-	background: #333;
+	background: #333333;
 	width: 100%;
-	color: #eee;
+	color: #EEEEEE;
 	position: fixed;
 	top: 0;
 	z-index: 99;
 	min-height: 35px;
-	background-image: linear-gradient(to bottom, #4d4f53 0%, #333 49%, #333 51%, #4d4f53 100%);
+	background-image: linear-gradient(to bottom, #4D4F53 0%, #333333 49%, #333333 51%, #4D4F53 100%);
 	line-height: 30px;
 	-webkit-transform: translateZ(0);
 	-ms-transform: translateZ(0);
@@ -728,7 +728,7 @@ div.bbc_footnotes .meaction {
 .admin_menu .linklevel1:hover, .admin_menu .linklevel1:focus,
 /* For secondary admin/profile/etc menus. */
 #adm_submenus .linklevel1:hover, #adm_submenus .linklevel1:focus {
-	color: #333;
+	color: #333333;
 	text-decoration: none;
 }
 
@@ -741,18 +741,18 @@ div.bbc_footnotes .meaction {
 .admin_menu .active,
 /* ......and for secondary admin/profile/etc menu strip. */
 #adm_submenus .active {
-	background: #7bb128;
+	background: #7BB128;
 	color: white;
-	border: 1px solid #aaa;
-	background-image: linear-gradient(to bottom, #9dd53a 0%, #a1d54f 21%, #80c217 63%, #7cbc0a 100%);
+	border: 1px solid #AAAAAA;
+	background-image: linear-gradient(to bottom, #9DD53A 0%, #A1D54F 21%, #80C217 63%, #7CBC0A 100%);
 }
 
 /* Hover effects for those buttons. */
 .admin_menu .active:hover, .admin_menu .listlevel1:hover .active, #adm_submenus .active:hover {
-	background: #43a8da;
+	background: #43A8DA;
 	color: white;
-	border: 1px solid #aaa;
-	background-image: linear-gradient(to bottom, #6db3f2 0%, #54a3ee 30%, #3690f0 68%, #1e69de 100%);
+	border: 1px solid #AAAAAA;
+	background-image: linear-gradient(to bottom, #6DB3F2 0%, #54A3EE 30%, #3690F0 68%, #1E69DE 100%);
 }
 
 /* Level 1 active buttons get a bit more weight. */
@@ -764,11 +764,11 @@ a.active {
 /* Level 1 active buttons. */
 .pm_indicator {
 	padding: 0 5px;
-	background: #f3b200;
+	background: #F3B200;
 	float: none;
-	color: #fff;
+	color: #FFFFFF;
 	border-radius: 4px;
-	box-shadow: 1px 1px 2px #444;
+	box-shadow: 1px 1px 2px #444444;
 	position: relative;
 	top: -5px;
 	left: -1px;
@@ -778,11 +778,11 @@ a.active {
 
 .likes_indicator {
 	padding: 0 0.6em;
-	background: #f3b200;
-	color: #fff;
+	background: #F3B200;
+	color: #FFFFFF;
 	font-size: 0.786em;
 	border-radius: 4px;
-	box-shadow: 1px 1px 1px #444;
+	box-shadow: 1px 1px 1px #444444;
 	position: absolute;
 	top: -1em;
 	right: -0.5em;
@@ -799,7 +799,7 @@ a.active {
 	background: white;
 	border: 1px solid grey;
 	border-radius: 5px;
-	box-shadow: 1px 2px 4px #ccc;
+	box-shadow: 1px 2px 4px #CCCCCC;
 }
 
 /* Levels 2 and 3 drop menus: link or button. */
@@ -819,14 +819,14 @@ a.active {
 .listlevel2:hover .linklevel2, /* < highlighted with cursor over level 3. */
 .linklevel2:hover, .linklevel2:focus, .linklevel2.sfhover:focus,
 .linklevel3:hover, .linklevel3:focus, .linklevel3.sfhover:focus {
-	background: #7bb128;
-	color: #fff;
+	background: #7BB128;
+	color: #FFFFFF;
 	text-decoration: none;
 }
 
 /* Level 2: subsection indicators. */
 .listlevel2.subsections .linklevel2:after {
-	color: #ccc;
+	color: #CCCCCC;
 	content: "\25BA";
 	font-size: 1em;
 }
@@ -837,7 +837,7 @@ a.active {
 }
 
 .linklevel2:link, .linklevel2:visited, .linklevel3:link, .linklevel3:visited {
-	border: 1px solid #fff;
+	border: 1px solid #FFFFFF;
 }
 
 /* Styles for sidebar menus. */
@@ -870,7 +870,7 @@ a.active {
 #menu_nav .listlevel1.subsections>a:before {
 	margin: 1px 3px 0 0;
 	float: left;
-	color: #43a8da;
+	color: #43A8DA;
 	font-size: .75em;
 	content: "\25BC";
 }
@@ -881,16 +881,16 @@ a.active {
  */
 
 .selectbox, .pagelinks {
-	color: #555;
+	color: #555555;
 }
 
 .pagelinks .navPages {
 	margin: 0 2px;
-	color: #555;
+	color: #555555;
 }
 
 .pagelinks .navPages:hover, .pagelinks .current_page {
-	background: #7bb128;
+	background: #7BB128;
 	color: white;
 	text-decoration: none;
 }
@@ -903,22 +903,22 @@ a.active {
 /* our buddies &laquo; &raquo; */
 .small_pagelinks:before {
 	float: left;
-	color: #999;
+	color: #999999;
 	content: '\00AB';
 	font-size: 1.286em;
 	line-height: 1.3em;
 }
 
 .small_pagelinks:after {
-	color: #999;
+	color: #999999;
 	line-height: 1.3em;
 }
 
 /* Globally accessible top/bottom links. */
 #gotop, #gobottom {
-	border-color: #222;
-	background: #111;
-	color: #eee;
+	border-color: #222222;
+	background: #111111;
+	color: #EEEEEE;
 	opacity: 0.2;
 }
 
@@ -927,14 +927,14 @@ a.active {
 }
 
 #gotop:hover, #gobottom:hover {
-	color: #444;
+	color: #444444;
 	opacity: 1;
 }
 
 /* Skip navigation link. */
 #top {
-	border-color: #1e69de;
-	background: #fefefe;
+	border-color: #1E69DE;
+	background: #FEFEFE;
 }
 
 #top:focus {
@@ -956,7 +956,7 @@ a.active {
 }
 
 .table_grid td, .letterspacing {
-	border-color: #ccc;
+	border-color: #CCCCCC;
 }
 
 /* -------------------------------------------------------
@@ -975,7 +975,7 @@ a.active {
 
 #wrapper {
 	background: white;
-	border: 1px solid #ccc;
+	border: 1px solid #CCCCCC;
 	border-top: none;
 	margin-top: 0;
 	border-top-left-radius: 0;
@@ -985,25 +985,25 @@ a.active {
 #forumtitle {
 	margin: 0;
 	padding: 0;
-	text-shadow: 1px 1px 2px #fff;
+	text-shadow: 1px 1px 2px #FFFFFF;
 	font-weight: bolder;
 	font-size: 2.5em;
 }
 
 #forumtitle > a {
-	color: #43a8da;
+	color: #43A8DA;
 }
 
 /* News section. */
 #news {
 	padding: 8px;
-	background-color: #f9f9f9;
+	background-color: #F9F9F9;
 	font-size: 0.929em;
-	border-color: #fff;
+	border-color: #FFFFFF;
 }
 
 #news > h2 {
-	color: #7bb128;
+	color: #7BB128;
 	font-weight: bold;
 	font-size: 1.5em;
 	line-height: 1.2em;
@@ -1014,7 +1014,7 @@ a.active {
 	padding: 3px;
 	min-height: 60px;
 	height: 60px;
-	color: #666;
+	color: #666666;
 }
 
 #news_line .bbc_link, #elkFadeScroller .bbc_link {
@@ -1028,7 +1028,7 @@ a.active {
 
 .navigate_section {
 	margin: 4px 0 0 0;
-	border: 1px solid #eee;
+	border: 1px solid #EEEEEE;
 }
 
 .linktree {
@@ -1039,7 +1039,7 @@ a.active {
 	top: 0.25em;
 	width: 1.5em;
 	height: 1.5em;
-	background-image: linear-gradient(45deg, #fff 0%, #fff 50%, #eee 50%, #eee 100%);
+	background-image: linear-gradient(45deg, #FFFFFF 0%, #FFFFFF 50%, #EEEEEE 50%, #EEEEEE 100%);
 	-webkit-transform: rotate(45deg);
 	-ms-transform: rotate(45deg);
 	transform: rotate(45deg);
@@ -1065,7 +1065,7 @@ a.active {
  */
 
 .board_name > a {
-	color: #43a8da;
+	color: #43A8DA;
 	font-weight: bold;
 	font-size: 1.214em;
 }
@@ -1079,7 +1079,7 @@ a.active {
 }
 
 .board_row, .childboard_row {
-	border-bottom: 1px solid #eee;
+	border-bottom: 1px solid #EEEEEE;
 }
 
 .childboards {
@@ -1087,7 +1087,7 @@ a.active {
 }
 
 .topic_name h4 a {
-	color: #43a8da;
+	color: #43A8DA;
 }
 
 .topic_listing .warningbox {
@@ -1095,27 +1095,27 @@ a.active {
 }
 
 .qaction_row {
-	background: #fff;
+	background: #FFFFFF;
 }
 
 .approvetopic_row, .approve_row {
-	background: #fff5cd;
+	background: #FFF5CD;
 }
 
 .sticky_row, .locked_row.sticky_row {
-	background: #f0f0ff;
+	background: #F0F0FF;
 }
 
 .locked_row {
-	background: #f7f7f7;
+	background: #F7F7F7;
 }
 
 #topic_icons {
-	border: 1px solid #ddd;
+	border: 1px solid #DDDDDD;
 }
 
 .modified {
-	color: #888;
+	color: #888888;
 	font-size: 0.714em;
 }
 
@@ -1144,16 +1144,16 @@ a.active {
 }
 
 .topic_listing li {
-	border-top: 1px solid #eee;
-	border-bottom: 1px solid #eee;
+	border-top: 1px solid #EEEEEE;
+	border-bottom: 1px solid #EEEEEE;
 }
 
 .topic_listing li.sticky_row {
-	border-bottom: 1px solid #fff;
+	border-bottom: 1px solid #FFFFFF;
 }
 
 .post_wrapper {
-	border: 1px solid #eaeaea;
+	border: 1px solid #EAEAEA;
 	border-radius: 10px;
 }
 
@@ -1168,7 +1168,7 @@ a.active {
 
 /* On to the posts */
 #searchform {
-	background: #e4e4e4;
+	background: #E4E4E4;
 }
 
 #quickreplybox, #forumposts, #recentposts, #pmFolder, #topic_summary, #preview_section {
@@ -1184,19 +1184,19 @@ a.active {
 }
 
 #elk_lb_content.expand {
-	border-color: #fff;
+	border-color: #FFFFFF;
 }
 
 #elk_lb_expand,
 #elk_lb_next,
 #elk_lb_prev {
-	border-color: #ccc;
+	border-color: #CCCCCC;
 }
 
 #elk_lb_expand:before,
 #elk_lb_next:before,
 #elk_lb_prev:before {
-	color: #bbb;
+	color: #BBBBBB;
 }
 
 #forumposts > div.forumposts, #recentposts > div.forumposts {
@@ -1204,17 +1204,17 @@ a.active {
 }
 
 .forumposts, .profile_content {
-	background: #f6f6f6;
+	background: #F6F6F6;
 }
 
 .forumposts:nth-of-type(even) {
 	margin-top: 2px;
-	background: #fcfcfc;
+	background: #FCFCFC;
 }
 
 .forumposts:nth-of-type(odd) {
 	margin-top: 2px;
-	background: #f6f6f6;
+	background: #F6F6F6;
 }
 
 .content_noframe {
@@ -1222,7 +1222,7 @@ a.active {
 }
 
 .approvebg {
-	background-color: #fff5cd;
+	background-color: #FFF5CD;
 }
 
 .board_stats {
@@ -1236,22 +1236,22 @@ a.active {
 }
 
 #expanded_pages_container {
-	background: #fff;
-	border: 1px solid #eee;
+	background: #FFFFFF;
+	border: 1px solid #EEEEEE;
 	border-radius: 2px;
 }
 
 #pages_scroll_left, #pages_scroll_right {
-	background-color: #fff;
+	background-color: #FFFFFF;
 }
 
 #sort_by {
-	border: 1px solid #eee;
+	border: 1px solid #EEEEEE;
 	border-bottom: none;
 }
 
 #sort_by.topic_sorting_recent {
-	border-color: #d1d1d1;
+	border-color: #D1D1D1;
 }
 
 /* -------------------------------------------------------
@@ -1265,12 +1265,12 @@ a.active {
 }
 
 #poll_options .options .percentage {
-	background: #fff;
+	background: #FFFFFF;
 	border-radius: 4px;
 }
 
 .topic_details {
-	border-bottom-color: #ccc;
+	border-bottom-color: #CCCCCC;
 }
 
 /* -------------------------------------------------------
@@ -1279,21 +1279,21 @@ a.active {
  */
 
 .drop_area {
-	color: #43a8da;
+	color: #43A8DA;
 	border-radius: 5px;
-	border-color: #ccc;
-	background-color: #eee;
+	border-color: #CCCCCC;
+	background-color: #EEEEEE;
 }
 
 .statusbar {
-	background: #eee;
-	border-top-color: #a9ccd1;
-	border-bottom-color: #a9ccd1;
+	background: #EEEEEE;
+	border-top-color: #A9CCD1;
+	border-bottom-color: #A9CCD1;
 }
 
 .statusbar .insertoverlay {
-	background-color: #fafafa;
-	border-color: #a9ccd1;
+	background-color: #FAFAFA;
+	border-color: #A9CCD1;
 }
 
 .insertoverlay .tabs li {
@@ -1301,29 +1301,29 @@ a.active {
 }
 
 .insertoverlay .tabs li.active {
-	background-color: #e4e4e4;
+	background-color: #E4E4E4;
 }
 
 .statusbar .insertoverlay .button {
 	background: #008000;
-	color: #fafafa;
+	color: #FAFAFA;
 }
 
 .progressBar {
-	border-color: #ddd;
+	border-color: #DDDDDD;
 }
 
 .progressBar div {
-	background-color: #43a8da;
-	color: #fff;
+	background-color: #43A8DA;
+	color: #FFFFFF;
 }
 
 .remove {
-	background-color: #a8352f;
+	background-color: #A8352F;
 }
 
 .abort {
-	border: 2px solid #a8352f;
+	border: 2px solid #A8352F;
 }
 
 .share {
@@ -1331,7 +1331,7 @@ a.active {
 }
 
 .drop_attachments_error {
-	color: #f00;
+	color: #FF0000;
 }
 
 #preview_body {
@@ -1358,34 +1358,34 @@ a.active {
 
 /* Lotsa boxes. */
 .description, .information, .warningbox, .successbox, .infobox, .errorbox {
-	border-color: #ccc;
-	background: #fff;
+	border-color: #CCCCCC;
+	background: #FFFFFF;
 }
 
 /* Information boxes. */
 .information {
-	background: #f0f6f0;
+	background: #F0F6F0;
 }
 
 /* More little boxes on a hillside. */
 .warningbox {
-	background: #fff6ca;
-	border: 1px solid #ffd324;
+	background: #FFF6CA;
+	border: 1px solid #FFD324;
 }
 
 .successbox {
-	background: #e8f5df;
-	border: 1px solid #9ece9e;
+	background: #E8F5DF;
+	border: 1px solid #9ECE9E;
 }
 
 .infobox {
-	background: #d9edf7;
-	border: 1px solid #3a87ad;
+	background: #D9EDF7;
+	border: 1px solid #3A87AD;
 }
 
 .errorbox {
-	background: #f5dfdf;
-	border: 1px solid #ce9e9e;
+	background: #F5DFDF;
+	border: 1px solid #CE9E9E;
 }
 
 .warningbox, .successbox, .infobox, .errorbox {
@@ -1399,7 +1399,7 @@ a.active {
  */
 
 .progress_bar {
-	border-color: #999;
+	border-color: #999999;
 	background: white;
 	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
 }
@@ -1409,11 +1409,11 @@ a.active {
 }
 
 .progress_bar .green_percent {
-	background-color: #7bb128;
+	background-color: #7BB128;
 }
 
 .progress_bar .blue_percent {
-	background-color: #43a8da;
+	background-color: #43A8DA;
 }
 
 /* -------------------------------------------------------
@@ -1423,7 +1423,7 @@ a.active {
 
 /* All the signatures used in the forum. */
 .signature, .attachments, .custom_fields_above_signature {
-	border-top-color: #e1e1e1;
+	border-top-color: #E1E1E1;
 }
 
 .signature {
@@ -1432,8 +1432,8 @@ a.active {
 
 /* attachment details below thumbnails */
 .attachment_name, .attachment_details {
-	color: #444 !important;
-	border: solid 1px #afafaf;
+	color: #444444 !important;
+	border: solid 1px #AFAFAF;
 }
 
 .attachment_name {
@@ -1456,7 +1456,7 @@ a.active {
  */
 
 .generic_border {
-	border-color: #ccc;
+	border-color: #CCCCCC;
 }
 
 #warndiv .ui-widget-header {
@@ -1477,20 +1477,20 @@ a.active {
 
 /* Profile colors */
 .activity_stats li span {
-	border-color: #555;
+	border-color: #555555;
 	border-right-style: none;
 	border-left-style: none;
-	background: #eee;
+	background: #EEEEEE;
 }
 
 .activity_stats li .bar {
-	background: #fff;
+	background: #FFFFFF;
 	border-bottom: none;
-	border-color: #ccc;
+	border-color: #CCCCCC;
 }
 
 .activity_stats li .bar div {
-	background: #43a8da;
+	background: #43A8DA;
 }
 
 /* -------------------------------------------------------
@@ -1507,12 +1507,12 @@ a.active {
 }
 
 .weeklist > li {
-	background: #fcfcfc;
+	background: #FCFCFC;
 	border-color: transparent;
 }
 
 #main_grid td.days, .calendar_table td.days, .weeklist h4 {
-	background: #f6f6f6;
+	background: #F6F6F6;
 }
 
 #main_grid td.calendar_today, .calendar_table td.calendar_today {
@@ -1525,7 +1525,7 @@ a.active {
  */
 
 #helpmain {
-	border-color: #ccc;
+	border-color: #CCCCCC;
 	box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.1);
 }
 
@@ -1536,8 +1536,8 @@ a.help .icon {
 
 /* Styles for the tooltips. */
 .tooltip {
-	border-color: #aaa;
-	background: #fff;
+	border-color: #AAAAAA;
+	background: #FFFFFF;
 	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);
 }
 
@@ -1548,19 +1548,19 @@ a.help .icon {
 
 /* The actual pop-up wrapper. */
 .popup_window {
-	border-color: #777;
+	border-color: #777777;
 	border-radius: 7px 7px 3px 3px;
-	background-color: #fafafa;
+	background-color: #FAFAFA;
 	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6);
 }
 
 /* The text content, hopefully helpful. */
 .popup_content {
-	background: #f5f5f5;
-	border-bottom: 1px solid #ccc;
+	background: #F5F5F5;
+	border-bottom: 1px solid #CCCCCC;
 	border-radius: 6px 6px 2px 2px;
 	box-shadow: 0 -2px 3px rgba(0, 0, 0, 0.15);
-	border-color: #bbb;
+	border-color: #BBBBBB;
 }
 
 /* -------------------------------------------------------
@@ -1569,7 +1569,7 @@ a.help .icon {
  */
 
 .search_results_posts > li {
-	border-bottom: 4px solid #ddd;
+	border-bottom: 4px solid #DDDDDD;
 }
 
 .ignoreboards a {
@@ -1582,23 +1582,23 @@ a.help .icon {
  */
 
 .statistics .category_header {
-	border-color: #ccc;
+	border-color: #CCCCCC;
 	background: none;
 	text-shadow: none;
 }
 
 .statistics .flow_hidden, #forum_history .flow_hidden {
-	border-color: #ddd;
-	background: #fefefe;
+	border-color: #DDDDDD;
+	background: #FEFEFE;
 }
 
 .stats.floatleft {
-	border-right-color: #ccc;
+	border-right-color: #CCCCCC;
 }
 
 #top_row .stats dd, .statsbar {
-	border-color: #eee;
-	background: #fff;
+	border-color: #EEEEEE;
+	background: #FFFFFF;
 }
 
 /* Methinks topic links, etc need a little more oomph next to the orange bars. */
@@ -1612,13 +1612,13 @@ a.help .icon {
 }
 
 .statsbar .bar {
-	background: #43a8da;
+	background: #43A8DA;
 	border-radius: 4px 0 0 4px;
 }
 
 /* Absolute positioning stops these breaking the bars on narrow screens. */
 .statsbar .righttext {
-	background: #fff;
+	background: #FFFFFF;
 }
 
 /* -------------------------------------------------------
@@ -1633,12 +1633,12 @@ a.help .icon {
 .ui-tabs .ui-tabs-panel {
 	padding: 0 !important;
 	border-color: transparent;
-	border-top: 8px solid #f6f6f6;
+	border-top: 8px solid #F6F6F6;
 }
 
 .ui-tabs .ui-tabs-nav li {
-	color: #fff;
-	border: 2px solid #f0f0f0;
+	color: #FFFFFF;
+	border: 2px solid #F0F0F0;
 	border-bottom: none;
 	border-radius: 5px 5px 0 0;
 	box-shadow: 2px 0 0 rgba(0, 0, 0, 0.3);
@@ -1651,27 +1651,27 @@ a.help .icon {
 }
 
 .ui-tabs .ui-tabs-nav .ui-tabs-anchor {
-	background: #f0f0f0;
-	border-bottom-color: #ccc;
+	background: #F0F0F0;
+	border-bottom-color: #CCCCCC;
 	border-radius: 5px 5px 0 0;
 	outline: none;
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-default .ui-tabs-anchor {
-	background: #fff;
-	color: #333;
+	background: #FFFFFF;
+	color: #333333;
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-active .ui-tabs-anchor,
 .ui-tabs .ui-tabs-nav .ui-state-active {
-	background: #f6f6f6;
-	color: #333;
+	background: #F6F6F6;
+	color: #333333;
 	border-radius: 5px 5px 0 0;
 }
 
 .ui-tabs .ui-tabs-nav li.ui-state-hover .ui-tabs-anchor {
-	background: #f0f0f0;
-	color: #555;
+	background: #F0F0F0;
+	color: #555555;
 	text-decoration: none;
 }
 
@@ -1680,13 +1680,13 @@ a.help .icon {
 }
 
 #ourAnnouncements dt, #ourAnnouncements dd {
-	border-top-color: #ccc !important;
+	border-top-color: #CCCCCC !important;
 }
 
 /* floating error box currently used by like functionality */
 .floating_error {
-	border-color: #e4e4e4;
-	background: #fff;
+	border-color: #E4E4E4;
+	background: #FFFFFF;
 	background: rgba(255, 255, 255, 1);
 	color: #404040;
 }
@@ -1696,12 +1696,12 @@ a.help .icon {
 }
 
 .floating_error .error_msg {
-	color: #3d3c3c;
+	color: #3D3C3C;
 }
 
 .floating_error .error_btn {
-	color: #157dfb;
-	border-top-color: #d6d6d6;
+	color: #157DFB;
+	border-top-color: #D6D6D6;
 }
 
 .floating_error .error_btn:hover {
@@ -1714,33 +1714,33 @@ a.help .icon {
  */
 
 .mlist .mlist_header div {
-	border-top: 1px solid #ccc;
+	border-top: 1px solid #CCCCCC;
 }
 
 .mlist li div, .whos_online dt div, .whos_online dd:nth-child(odd) div {
-	border-top-color: #ccc;
-	border-bottom-color: #ccc;
-	background-color: #fff;
+	border-top-color: #CCCCCC;
+	border-bottom-color: #CCCCCC;
+	background-color: #FFFFFF;
 }
 
 .mlist li.alternate_row div, .whos_online dd:nth-child(even) div {
-	border-top-color: #ccc;
-	border-bottom-color: #ccc;
-	background-color: #fafafa;
+	border-top-color: #CCCCCC;
+	border-bottom-color: #CCCCCC;
+	background-color: #FAFAFA;
 }
 
 .mlist li div:first-child {
-	border-top-color: #ccc;
-	border-left-color: #ccc;
+	border-top-color: #CCCCCC;
+	border-left-color: #CCCCCC;
 }
 
 .mlist li div:last-child {
-	border-top-color: #ccc;
-	border-right-color: #ccc;
+	border-top-color: #CCCCCC;
+	border-right-color: #CCCCCC;
 }
 
 .letter_row > h3 {
-	border-color: #ccc;
+	border-color: #CCCCCC;
 	border-bottom: none;
 }
 
@@ -1812,10 +1812,10 @@ a.help .icon {
 	}
 
 	#menu_sidebar {
-		background: #fff;
+		background: #FFFFFF;
 		border-radius: 4px;
 		box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);
-		border-color: #aaa;
+		border-color: #AAAAAA;
 	}
 
 	#main_menu .linklevel1.active, #main_menu .linklevel1.active:hover {
@@ -1823,11 +1823,11 @@ a.help .icon {
 	}
 
 	#main_menu .linklevel1.active .icon-menu {
-		border-color: #43a8da;
+		border-color: #43A8DA;
 	}
 
 	#main_menu .linklevel1 .icon-menu:hover {
-		background: #f4f4f4;
+		background: #F4F4F4;
 	}
 
 	.statistics .flow_hidden, .statistics .floatleft {
@@ -1837,13 +1837,13 @@ a.help .icon {
 	.statistics .category_header {
 		margin-bottom: 5px !important;
 		border: none;
-		border-bottom: 1px solid #ccc;
+		border-bottom: 1px solid #CCCCCC;
 		border-radius: 0;
-		background-color: #f6f6f6;
+		background-color: #F6F6F6;
 	}
 
 	.mlist li div.posts {
-		border-right: 1px solid #ccc;
+		border-right: 1px solid #CCCCCC;
 	}
 }
 
@@ -1864,9 +1864,9 @@ a.help .icon {
 	}
 
 	.board_row, .childboard_row {
-		border: 1px solid #ccc;
-		background-color: #f9f9f9;
-		box-shadow: 1px 1px 3px #ccc;
+		border: 1px solid #CCCCCC;
+		background-color: #F9F9F9;
+		box-shadow: 1px 1px 3px #CCCCCC;
 	}
 
 	.childboard_row {
@@ -1874,7 +1874,7 @@ a.help .icon {
 	}
 
 	.board_lastpost {
-		border-top: 1px solid #eee;
+		border-top: 1px solid #EEEEEE;
 	}
 
 	#top_section .wrapper {
@@ -1895,9 +1895,9 @@ a.help .icon {
 
 	.topic_listing > li {
 		margin-bottom: 8px;
-		border: 1px solid #bfbfbf;
+		border: 1px solid #BFBFBF;
 		border-radius: 3px;
-		box-shadow: 3px 3px 6px #e4e4e4;
+		box-shadow: 3px 3px 6px #E4E4E4;
 	}
 
 	.new_posts {
@@ -1907,7 +1907,7 @@ a.help .icon {
 	}
 
 	.topic_name {
-		border-bottom: 1px solid #ddd;
+		border-bottom: 1px solid #DDDDDD;
 	}
 
 	.topic_listing h4 {
@@ -1919,15 +1919,15 @@ a.help .icon {
 	}
 
 	.topic_listing li.sticky_row {
-		border-bottom: 1px solid #ccc;
+		border-bottom: 1px solid #CCCCCC;
 	}
 
 	.basic_row {
-		background-color: #fafafa;
+		background-color: #FAFAFA;
 	}
 
 	.topic_starter {
-		color: #777;
+		color: #777777;
 	}
 
 	.topic_sorting_row {
@@ -1949,7 +1949,7 @@ a.help .icon {
 	}
 
 	.poster:after, .posterarea:before {
-		border-bottom: 1px solid #bfbfbf;
+		border-bottom: 1px solid #BFBFBF;
 	}
 
 	.poster .subsections > a:after {
@@ -1976,18 +1976,18 @@ a.help .icon {
 	}
 
 	.forumposts:nth-child(odd) {
-		background-color: #fafafa;
+		background-color: #FAFAFA;
 	}
 
 	.forumposts .content {
 		margin-top: 8px;
-		border: 1px solid #bfbfbf;
+		border: 1px solid #BFBFBF;
 		border-radius: 3px;
-		box-shadow: 3px 3px 6px #e4e4e4;
+		box-shadow: 3px 3px 6px #E4E4E4;
 	}
 
 	.forum_category, .forumposts, .content_category {
-		background: #fff;
+		background: #FFFFFF;
 		border: none;
 	}
 
@@ -2013,7 +2013,7 @@ a.help .icon {
 	}
 
 	#main_menu .linklevel1 {
-		border-bottom: 1px solid #888;
+		border-bottom: 1px solid #888888;
 	}
 
 	.admin_menu li {
@@ -2030,7 +2030,7 @@ a.help .icon {
 	#search_form {
 		padding: 4px 0;
 		width: 100%;
-		border-bottom: 1px solid #ccc;
+		border-bottom: 1px solid #CCCCCC;
 	}
 
 	#search_form .input_text {
@@ -2049,16 +2049,16 @@ a.help .icon {
 
 	.whos_online dd:nth-child(even), .whos_online dd:nth-child(odd) {
 		margin-top: 1px;
-		border-top: 1px solid #ccc;
+		border-top: 1px solid #CCCCCC;
 	}
 
 	.whos_online dd:last-child {
-		border-bottom: 1px solid #ccc;
+		border-bottom: 1px solid #CCCCCC;
 	}
 }
 
 @media screen and (max-width: 30em) {
 	.mlist li .group {
-		border-right-color: #ccc;
+		border-right-color: #CCCCCC;
 	}
 }

@@ -13,11 +13,11 @@ h1.forumtitle {
 	margin: 0;
 	padding: 35px 0 0 15px;
 	float: left;
-	color: #4b863c;
+	color: #4B863C;
 	font-family: tahoma, serif;
 	font-size: 2em;
 	font-weight: normal;
-	text-shadow: -1px -1px 0 rgba(0,0,0,0.5), 1px 1px 0 #fff;
+	text-shadow: -1px -1px 0 rgba(0,0,0,0.5), 1px 1px 0 #FFFFFF;
 }
 /* Tweak the logo */
 img#logo {
@@ -26,7 +26,7 @@ img#logo {
 
 #inner_wrap {
 	min-height: 60px;
-	border-bottom: 1px solid #ccc;
+	border-bottom: 1px solid #CCCCCC;
 }
 
 #inner_wrap .news {
@@ -45,9 +45,9 @@ img#logo {
 
 #main_steps h2 {
 	margin: 0 1em 0.5em 0;
-	color: #4b863c;
+	color: #4B863C;
 	font-size: 1.2em;
-	border-bottom: 1px solid #4b863c;
+	border-bottom: 1px solid #4B863C;
 	line-height: 1.6em;
 }
 
@@ -59,21 +59,21 @@ img#logo {
 }
 
 #main_steps ul li.stepdone {
-	color: #aaa;
+	color: #AAAAAA;
 }
 
 #main_steps ul li.stepcurrent {
-	color: #222;
+	color: #222222;
 	font-weight: bold;
 }
 
 #main_steps ul li.stepwaiting {
-	color: #666;
+	color: #666666;
 }
 
 #progress_bar {
 	margin: 0.6em 0 0 4em;
-	background: #fff;
+	background: #FFFFFF;
 	float: left;
 	width: 33%;
 	height: 2.3em;
@@ -85,7 +85,7 @@ img#logo {
 
 #overall_text, #step_text {
 	z-index: 2;
-	color: #111;
+	color: #111111;
 	font-weight: bold;
 	position: absolute;
 	top: 0.5em;
@@ -99,7 +99,7 @@ img#logo {
 }
 
 #step_progress {
-	background: #ffd000;
+	background: #FFD000;
 }
 
 .overall_progress, .progress {
@@ -114,9 +114,9 @@ img#logo {
 
 #main_screen h2 {
 	margin: 0 0 0.5em 0;
-	color: #4b863c;
+	color: #4B863C;
 	font-size: 1.2em;
-	border-bottom: 1px solid #4b863c;
+	border-bottom: 1px solid #4B863C;
 	line-height: 1.6em;
 }
 
@@ -140,14 +140,14 @@ img#logo {
 
 .panel .button_submit, .panel .linkbutton {
 	padding: 3px 6px;
-	color: #333;
+	color: #333333;
 	font-size: 1em;
 	font-weight: bold;
 	text-decoration: none;
 }
 
 .panel .button_submit:hover, .panel .linkbutton:hover {
-	color: #af6700;
+	color: #AF6700;
 	text-decoration: none;
 }
 
@@ -166,8 +166,8 @@ img#logo {
 	margin: 1em 0.9em 0 0.9em;
 	padding: 6px 8px 8px 8px;
 	/* [WIP] */
-	background: /*#f0f4f7*/ #fcfcfc;
-	border: 1px solid #ccc;
+	background: /*#f0f4f7*/ #FCFCFC;
+	border: 1px solid #CCCCCC;
 	border-radius: 5px;
 	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
 	clear: both;
