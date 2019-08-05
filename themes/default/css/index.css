@@ -1884,12 +1884,8 @@ nav > .quickbuttons {
 }
 
 /* Show appropriate like/unlike action */
-.like_button:before, .likes_button:before, .unlike_button:before {
+.like_button:before, .likes_button:before {
 	background-position: 0 -480px;
-}
-
-.unlike_button:before {
-	background-position: 0 -408px;
 }
 
 .like_button:hover:before {
@@ -2943,6 +2939,7 @@ img.new_posts {
 .poster {
 	font-size: 0.857em;
 	display: table-cell;
+	float: left;
 	width: 15em;
 	vertical-align: top;
 	word-wrap: break-word;
@@ -2975,7 +2972,9 @@ img.new_posts {
 	margin-top: -0.4em;
 	padding: 6px;
 	text-align: center;
+	white-space: normal;
 	text-overflow: ellipsis;
+	word-break: normal;
 }
 
 .poster.poster2 .name {
@@ -2983,11 +2982,6 @@ img.new_posts {
 	margin-top: 0;
 	padding: 0 8px 0 0;
 	text-align: left;
-}
-
-.poster .name {
-	white-space: normal;
-	word-break: normal;
 }
 
 /* Drop menu for the poster info. */
@@ -3079,10 +3073,6 @@ img.new_posts {
 }
 
 /* End nifty new flyout. */
-.poster {
-	float: left;
-}
-
 .post_wrapper {
 	display: block;
 	clear: both;
@@ -6157,6 +6147,7 @@ a > i {
 
 	#postAttachment2 dt {
 		width: 100% !important;
+		width: 100% !important;
 	}
 
 	#search_options {
@@ -6286,6 +6277,7 @@ a > i {
 	}
 
 	#gotop {
+		margin-left: 1.45em;
 		border-radius: 0 0.5em 0 0;
 	}
 
@@ -6467,10 +6459,6 @@ a > i {
 		height: 1em;
 		padding: 0.2em 0.1em;
 		text-align: center;
-	}
-
-	#gotop {
-		margin-left: 1.45em;
 	}
 
 	.admin_menu li {
