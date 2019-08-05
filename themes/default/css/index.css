@@ -2255,6 +2255,7 @@ nav > .quickbuttons {
 }
 
 .childboard_row {
+	font-size: 0.857em;
 	margin: 0;
 	border-top: none;
 }
@@ -2337,10 +2338,6 @@ nav > .quickbuttons {
 
 .board_lasttime {
 	display: block;
-}
-
-.childboard_row {
-	font-size: 0.857em;
 }
 
 .childboards {
@@ -3650,10 +3647,6 @@ ul.post_options li {
 
 #event_main .event_options {
 	overflow: hidden;
-	padding: 0;
-}
-
-#event_main .event_options {
 	margin: 0;
 	padding: 1em 0.5em 0.5em 1em;
 }
@@ -6147,7 +6140,6 @@ a > i {
 
 	#postAttachment2 dt {
 		width: 100% !important;
-		width: 100% !important;
 	}
 
 	#search_options {
@@ -6227,8 +6219,10 @@ a > i {
 	}
 
 	.quickbuttons {
+		margin: 8px 8px 6px 3px;
 		white-space: nowrap;
 	}
+
 
 	.pagesection .buttonlist {
 		float: none;
@@ -6267,8 +6261,14 @@ a > i {
 	}
 
 	#gobottom, #gotop {
+		top: auto;
+		bottom: 0;
 		display: none;
+		width: 1.2em;
+		height: 1em;
+		padding: 0.2em 0.1em;
 		padding-right: 0.25em;
+		text-align: center;
 		border: 1px solid;
 	}
 
@@ -6452,15 +6452,6 @@ a > i {
 		display: none !important;
 	}
 
-	#gotop, #gobottom {
-		top: auto;
-		bottom: 0;
-		width: 1.2em;
-		height: 1em;
-		padding: 0.2em 0.1em;
-		text-align: center;
-	}
-
 	.admin_menu li {
 		display: block;
 		float: left;
@@ -6569,10 +6560,6 @@ a > i {
 
 	#button_profile .avatar {
 		display: none;
-	}
-
-	.quickbuttons {
-		margin: 8px 8px 6px 3px;
 	}
 
 	#search_form {
