@@ -1,3 +1,2 @@
-themes/default/css/jquery*
-themes/default/css/_besocial/jquery.sceditor.elk_wiz_besocial.css
-themes/default/css/_light/jquery.sceditor.elk_wiz_light.css
+*min.css
+*jquery*.css
