@@ -1635,7 +1635,7 @@ var ElkNotifier = new ElkNotifications();
 						$over.find('.customsize').slideDown();
 					});
 					$over.find(".range").on('input', function () {
-						var val = $(this).val()
+						var val = $(this).val();
 						$over.find(".visualizesize").val(val + 'px');
 					}).trigger('input');
 
