@@ -940,7 +940,7 @@
 		init(opt);
 		return {
 			send: send
-		}
+		};
 	});
 
 	// AMD / RequireJS
