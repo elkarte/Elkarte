@@ -26,6 +26,7 @@
 /** global: theme_id, frames, editFilename, txt_ban_name_empty, txt_ban_restriction_empty, ElkInfoBar, txt_invalid_response */
 /** global: feature_on_text, feature_off_text, core_settings_generic_error, startOptID, add_question_template, question_last_blank */
 /** global: ourLanguageVersions, ourVersions, txt_add_another_answer, txt_permissions_commit, Image */
+/* jshint -W069 */
 
 /**
  * Admin index class with the following methods
