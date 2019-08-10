@@ -540,31 +540,4 @@ class OpenID
 
 		return $return;
 	}
-
-	/**
-	 * Retrieve a member settings based on the claimed id
-	 *
-	 * @param string $claimed_id the claimed id
-	 *
-	 * @return array the member settings
-	 */
-	protected function memberByOpenID($claimed_id)
-	{
-		$db = database();
-
-		$result = $db->query('', '
-			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
-				openid_uri
-			FROM {db_prefix}members
-			WHERE openid_uri = {string:openid_uri}',
-			array(
-				'openid_uri' => $claimed_id,
-			)
-		);
-
-		$member_found = $db->fetch_assoc($result);
-		$db->free_result($result);
-
-		return $member_found;
-	}
 }
