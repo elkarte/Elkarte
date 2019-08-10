@@ -160,8 +160,7 @@ class Auth extends \ElkArte\AbstractController
 		// This is an OpenID login. Let's validate...
 		if (!empty($_POST['openid_identifier']) && !empty($modSettings['enableOpenID']))
 		{
-			require_once(SUBSDIR . '/OpenID.subs.php');
-			$open_id = new \OpenID();
+			$open_id = new \ElkArte\OpenID();
 
 			if (($open_id->validate($_POST['openid_identifier'])) !== 'no_data')
 				return $open_id;

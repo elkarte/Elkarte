@@ -768,8 +768,7 @@ class Profile extends \ElkArte\AbstractController
 			// If we're using OpenID try to re-validate.
 			if (!empty($user_settings['openid_uri']))
 			{
-				require_once(SUBSDIR . '/OpenID.subs.php');
-				$openID = new \OpenID();
+				$openID = new \ElkArte\OpenID();
 				$openID->revalidate();
 			}
 			else

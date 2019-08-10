@@ -57,9 +57,6 @@ class OpenID extends \ElkArte\AbstractController
 		if ($this->_req->query->openid_mode !== 'id_res')
 			throw new \ElkArte\Exceptions\Exception('openid_not_resolved');
 
-		// We'll need our subs.
-		require_once(SUBSDIR . '/OpenID.subs.php');
-
 		// This has annoying habit of removing the + from the base64 encoding.  So lets put them back.
 		foreach (array('openid_assoc_handle', 'openid_invalidate_handle', 'openid_sig', 'sf') as $key)
 		{
@@ -69,7 +66,7 @@ class OpenID extends \ElkArte\AbstractController
 			}
 		}
 
-		$openID = new \OpenID();
+		$openID = new \ElkArte\OpenID();
 
 		// Did they tell us to remove any associations?
 		if (!empty($this->_req->query->openid_invalidate_handle))

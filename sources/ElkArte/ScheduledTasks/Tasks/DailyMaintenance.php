@@ -112,8 +112,7 @@ class DailyMaintenance implements ScheduledTaskInterface
 		// Regenerate the Diffie-Hellman keys if OpenID is enabled.
 		if (!empty($modSettings['enableOpenID']))
 		{
-			require_once(SUBSDIR . '/OpenID.subs.php');
-			$openID = new \OpenID();
+			$openID = new \ElkArte\OpenID();
 			$openID->setup_DH(true);
 		}
 		elseif (!empty($modSettings['dh_keys']))

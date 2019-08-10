@@ -499,8 +499,7 @@ class Register extends \ElkArte\AbstractController
 				if (!in_array($k, array('sc', 'sesc', $context['session_var'], 'passwrd1', 'passwrd2', 'regSubmit')))
 					$save_variables[$k] = $v;
 
-			require_once(SUBSDIR . '/OpenID.subs.php');
-			$openID = new \OpenID();
+			$openID = new \ElkArte\OpenID();
 			$openID->validate($this->_req->post->openid_identifier, false, $save_variables);
 		}
 		// If we've come from OpenID set up some default stuff.

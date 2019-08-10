@@ -104,8 +104,7 @@ function validateSession($type = 'admin')
 	// OpenID?
 	if (!empty($user_settings['openid_uri']))
 	{
-		require_once(SUBSDIR . '/OpenID.subs.php');
-		$openID = new OpenID();
+		$openID = new \ElkArte\OpenID();
 		$openID->revalidate();
 
 		$_SESSION[$type . '_time'] = time();
