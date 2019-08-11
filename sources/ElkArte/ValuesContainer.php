@@ -68,6 +68,25 @@ class ValuesContainer implements \ArrayAccess
 	}
 
 	/**
+	 * Returns the value of the key, or the default if empty
+	 *
+	 * @param string|int $key
+	 * @param mixed $default
+	 * @return mixed
+	 */
+	public function getEmpty($key, $default)
+	{
+		if (!empty($this->data[$key]))
+		{
+			return $this->data[$key];
+		}
+		else
+		{
+			return $default;
+		}
+	}
+
+	/**
 	 * Calling as method uses the argument as default
 	 *
 	 * @param string|int $key

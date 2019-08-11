@@ -155,293 +155,10 @@ function reloadSettings()
  */
 function loadUserSettings()
 {
-	global $context, $modSettings, $user_settings, $cookiename, $user_info, $language;
+	global $user_info;
 
-	$db = database();
-	$cache = \ElkArte\Cache\Cache::instance();
-
-	// Check first the integration, then the cookie, and last the session.
-	if (count($integration_ids = call_integration_hook('integrate_verify_user')) > 0)
-	{
-		$id_member = 0;
-		foreach ($integration_ids as $integration_id)
-		{
-			$integration_id = (int) $integration_id;
-			if ($integration_id > 0)
-			{
-				$id_member = $integration_id;
-				$already_verified = true;
-				break;
-			}
-		}
-	}
-	else
-		$id_member = 0;
-
-	// We'll need IPs and user agent and stuff, they came to visit us with!
-	$req = request();
-
-	if (empty($id_member) && isset($_COOKIE[$cookiename]))
-	{
-		list ($id_member, $password) = serializeToJson($_COOKIE[$cookiename], function ($array_from) use ($cookiename) {
-			global $modSettings;
-
-			require_once(SUBSDIR . '/Auth.subs.php');
-			$_COOKIE[$cookiename] = json_encode($array_from);
-			setLoginCookie(60 * $modSettings['cookieTime'], $array_from[0], $array_from[1]);
-		});
-		$id_member = !empty($id_member) && strlen($password) > 0 ? (int) $id_member : 0;
-	}
-	elseif (empty($id_member) && isset($_SESSION['login_' . $cookiename]) && (!empty($modSettings['disableCheckUA']) || $_SESSION['USER_AGENT'] == $req->user_agent()))
-	{
-		// @todo Perhaps we can do some more checking on this, such as on the first octet of the IP?
-		list ($id_member, $password, $login_span) = serializeToJson($_SESSION['login_' . $cookiename], function ($array_from) use ($cookiename) {
-			$_SESSION['login_' . $cookiename] = json_encode($array_from);
-		});
-		$id_member = !empty($id_member) && strlen($password) == 64 && $login_span > time() ? (int) $id_member : 0;
-	}
-
-	// Only load this stuff if the user isn't a guest.
-	if ($id_member != 0)
-	{
-		// Is the member data cached?
-		if ($cache->levelLowerThan(2) || $cache->getVar($user_settings, 'user_settings-' . $id_member, 60) === false)
-		{
-			$this_user = $db->fetchQuery('
-				SELECT mem.*, COALESCE(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
-				FROM {db_prefix}members AS mem
-					LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = {int:id_member})
-				WHERE mem.id_member = {int:id_member}
-				LIMIT 1',
-				array(
-					'id_member' => $id_member,
-				)
-			);
-
-			$user_settings = $this_user->fetch_assoc();
-
-			// Make the ID specifically an integer
-			$user_settings['id_member'] = (int) ($user_settings['id_member'] ?? 0);
-
-			if ($cache->levelHigherThan(1))
-				$cache->put('user_settings-' . $id_member, $user_settings, 60);
-		}
-
-		// Did we find 'im?  If not, junk it.
-		if (!empty($user_settings))
-		{
-			// As much as the password should be right, we can assume the integration set things up.
-			if (!empty($already_verified) && $already_verified === true)
-				$check = true;
-			// SHA-256 passwords should be 64 characters long.
-			elseif (strlen($password) == 64)
-				$check = hash('sha256', ($user_settings['passwd'] . $user_settings['password_salt'])) == $password;
-			else
-				$check = false;
-
-			// Wrong password or not activated - either way, you're going nowhere.
-			$id_member = $check && ($user_settings['is_activated'] == 1 || $user_settings['is_activated'] == 11) ? (int) $user_settings['id_member'] : 0;
-		}
-		else
-			$id_member = 0;
-
-		// If we no longer have the member maybe they're being all hackey, stop brute force!
-		if (!$id_member)
-			validatePasswordFlood(!empty($user_settings['id_member']) ? $user_settings['id_member'] : $id_member, !empty($user_settings['passwd_flood']) ? $user_settings['passwd_flood'] : false, $id_member != 0);
-	}
-
-	// Found 'im, let's set up the variables.
-	if ($id_member != 0)
-	{
-		// Let's not update the last visit time in these cases...
-		// 1. SSI doesn't count as visiting the forum.
-		// 2. RSS feeds and XMLHTTP requests don't count either.
-		// 3. If it was set within this session, no need to set it again.
-		// 4. New session, yet updated < five hours ago? Maybe cache can help.
-		if (ELK != 'SSI' && !isset($_REQUEST['xml']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != '.xml') && empty($_SESSION['id_msg_last_visit']) && (!$cache->isEnabled() || !$cache->getVar($_SESSION['id_msg_last_visit'], 'user_last_visit-' . $id_member, 5 * 3600)))
-		{
-			// @todo can this be cached?
-			// Do a quick query to make sure this isn't a mistake.
-			require_once(SUBSDIR . '/Messages.subs.php');
-			$visitOpt = basicMessageInfo($user_settings['id_msg_last_visit'], true);
-
-			$_SESSION['id_msg_last_visit'] = $user_settings['id_msg_last_visit'];
-
-			// If it was *at least* five hours ago...
-			if ($visitOpt['poster_time'] < time() - 5 * 3600)
-			{
-				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData($id_member, array('id_msg_last_visit' => (int) $modSettings['maxMsgID'], 'last_login' => time(), 'member_ip' => $req->client_ip(), 'member_ip2' => $req->ban_ip()));
-				$user_settings['last_login'] = time();
-
-				if ($cache->levelHigherThan(1))
-					$cache->put('user_settings-' . $id_member, $user_settings, 60);
-
-				$cache->put('user_last_visit-' . $id_member, $_SESSION['id_msg_last_visit'], 5 * 3600);
-			}
-		}
-		elseif (empty($_SESSION['id_msg_last_visit']))
-			$_SESSION['id_msg_last_visit'] = $user_settings['id_msg_last_visit'];
-
-		$username = $user_settings['member_name'];
-
-		if (empty($user_settings['additional_groups']))
-			$user_info = array(
-				'groups' => array($user_settings['id_group'], $user_settings['id_post_group'])
-			);
-		else
-			$user_info = array(
-				'groups' => array_merge(
-					array($user_settings['id_group'], $user_settings['id_post_group']),
-					explode(',', $user_settings['additional_groups'])
-				)
-			);
-
-		// Because history has proven that it is possible for groups to go bad - clean up in case.
-		foreach ($user_info['groups'] as $k => $v)
-			$user_info['groups'][$k] = (int) $v;
-
-		// This is a logged in user, so definitely not a spider.
-		$user_info['possibly_robot'] = false;
-	}
-	// If the user is a guest, initialize all the critical user settings.
-	else
-	{
-		// This is what a guest's variables should be.
-		$username = '';
-		$user_info = array('groups' => array(-1));
-		$user_settings = array();
-
-		if (isset($_COOKIE[$cookiename]))
-			$_COOKIE[$cookiename] = '';
-
-		// Create a login token if it doesn't exist yet.
-		if (!isset($_SESSION['token']['post-login']))
-			createToken('login');
-		else
-			list ($context['login_token_var'],,, $context['login_token']) = $_SESSION['token']['post-login'];
-
-		// Do we perhaps think this is a search robot? Check every five minutes just in case...
-		if ((!empty($modSettings['spider_mode']) || !empty($modSettings['spider_group'])) && (!isset($_SESSION['robot_check']) || $_SESSION['robot_check'] < time() - 300))
-		{
-			require_once(SUBSDIR . '/SearchEngines.subs.php');
-			$user_info['possibly_robot'] = spiderCheck();
-		}
-		elseif (!empty($modSettings['spider_mode']))
-			$user_info['possibly_robot'] = isset($_SESSION['id_robot']) ? $_SESSION['id_robot'] : 0;
-		// If we haven't turned on proper spider hunts then have a guess!
-		else
-		{
-			$ci_user_agent = strtolower($req->user_agent());
-			$user_info['possibly_robot'] = (strpos($ci_user_agent, 'mozilla') === false && strpos($ci_user_agent, 'opera') === false) || preg_match('~(googlebot|slurp|crawl|msnbot|yandex|bingbot|baidu|duckduckbot)~u', $ci_user_agent) == 1;
-		}
-	}
-
-	// Set up the $user_info array.
-	$user_info += array(
-		'id' => $id_member,
-		'username' => $username,
-		'name' => isset($user_settings['real_name']) ? $user_settings['real_name'] : '',
-		'email' => isset($user_settings['email_address']) ? $user_settings['email_address'] : '',
-		'passwd' => isset($user_settings['passwd']) ? $user_settings['passwd'] : '',
-		'language' => empty($user_settings['lngfile']) || empty($modSettings['userLanguage']) ? $language : $user_settings['lngfile'],
-		'is_guest' => $id_member == 0,
-		'is_admin' => in_array(1, $user_info['groups']),
-		'is_mod' => false,
-		'theme' => empty($user_settings['id_theme']) ? 0 : $user_settings['id_theme'],
-		'last_login' => empty($user_settings['last_login']) ? 0 : $user_settings['last_login'],
-		'ip' => $req->client_ip(),
-		'ip2' => $req->ban_ip(),
-		'posts' => empty($user_settings['posts']) ? 0 : $user_settings['posts'],
-		'time_format' => empty($user_settings['time_format']) ? $modSettings['time_format'] : $user_settings['time_format'],
-		'time_offset' => empty($user_settings['time_offset']) ? 0 : $user_settings['time_offset'],
-		'avatar' => array_merge(array(
-			'url' => isset($user_settings['avatar']) ? $user_settings['avatar'] : '',
-			'filename' => empty($user_settings['filename']) ? '' : $user_settings['filename'],
-			'custom_dir' => !empty($user_settings['attachment_type']) && $user_settings['attachment_type'] == 1,
-			'id_attach' => isset($user_settings['id_attach']) ? $user_settings['id_attach'] : 0
-		), determineAvatar($user_settings)),
-		'smiley_set' => isset($user_settings['smiley_set']) ? $user_settings['smiley_set'] : '',
-		'messages' => empty($user_settings['personal_messages']) ? 0 : $user_settings['personal_messages'],
-		'mentions' => empty($user_settings['mentions']) ? 0 : max(0, $user_settings['mentions']),
-		'unread_messages' => empty($user_settings['unread_messages']) ? 0 : $user_settings['unread_messages'],
-		'total_time_logged_in' => empty($user_settings['total_time_logged_in']) ? 0 : $user_settings['total_time_logged_in'],
-		'buddies' => !empty($modSettings['enable_buddylist']) && !empty($user_settings['buddy_list']) ? explode(',', $user_settings['buddy_list']) : array(),
-		'ignoreboards' => !empty($user_settings['ignore_boards']) && !empty($modSettings['allow_ignore_boards']) ? explode(',', $user_settings['ignore_boards']) : array(),
-		'ignoreusers' => !empty($user_settings['pm_ignore_list']) ? explode(',', $user_settings['pm_ignore_list']) : array(),
-		'warning' => isset($user_settings['warning']) ? $user_settings['warning'] : 0,
-		'permissions' => array(),
-	);
-	$user_info['groups'] = array_unique($user_info['groups']);
-
-	// Make sure that the last item in the ignore boards array is valid.  If the list was too long it could have an ending comma that could cause problems.
-	if (!empty($user_info['ignoreboards']) && empty($user_info['ignoreboards'][$tmp = count($user_info['ignoreboards']) - 1]))
-		unset($user_info['ignoreboards'][$tmp]);
-
-	// Do we have any languages to validate this?
-	if (!empty($modSettings['userLanguage']) && (!empty($_GET['language']) || !empty($_SESSION['language'])))
-		$languages = getLanguages();
-
-	// Allow the user to change their language if its valid.
-	if (!empty($modSettings['userLanguage']) && !empty($_GET['language']) && isset($languages[strtr($_GET['language'], './\\:', '____')]))
-	{
-		$user_info['language'] = strtr($_GET['language'], './\\:', '____');
-		$_SESSION['language'] = $user_info['language'];
-	}
-	elseif (!empty($modSettings['userLanguage']) && !empty($_SESSION['language']) && isset($languages[strtr($_SESSION['language'], './\\:', '____')]))
-		$user_info['language'] = strtr($_SESSION['language'], './\\:', '____');
-
-	// Just build this here, it makes it easier to change/use - administrators can see all boards.
-	if ($user_info['is_admin'])
-		$user_info['query_see_board'] = '1=1';
-	// Otherwise just the groups in $user_info['groups'].
-	else
-		$user_info['query_see_board'] = '((FIND_IN_SET(' . implode(', b.member_groups) != 0 OR FIND_IN_SET(', $user_info['groups']) . ', b.member_groups) != 0)' . (!empty($modSettings['deny_boards_access']) ? ' AND (FIND_IN_SET(' . implode(', b.deny_member_groups) = 0 AND FIND_IN_SET(', $user_info['groups']) . ', b.deny_member_groups) = 0)' : '') . (isset($user_info['mod_cache']) ? ' OR ' . $user_info['mod_cache']['mq'] : '') . ')';
-	// Build the list of boards they WANT to see.
-	// This will take the place of query_see_boards in certain spots, so it better include the boards they can see also
-
-	// If they aren't ignoring any boards then they want to see all the boards they can see
-	if (empty($user_info['ignoreboards']))
-		$user_info['query_wanna_see_board'] = $user_info['query_see_board'];
-	// Ok I guess they don't want to see all the boards
-	else
-		$user_info['query_wanna_see_board'] = '(' . $user_info['query_see_board'] . ' AND b.id_board NOT IN (' . implode(',', $user_info['ignoreboards']) . '))';
-
-	if ($user_info['is_guest'] === false)
-	{
-		$http_request = \ElkArte\HttpReq::instance();
-		if (!empty($modSettings['force_accept_agreement']))
-		{
-			if (!empty($modSettings['agreementRevision']) && !empty($modSettings['requireAgreement']) && in_array($http_request->action, array('reminder', 'register')) === false)
-			{
-				if ($http_request->action !== 'profile' || $http_request->area !== 'deleteaccount')
-				{
-					$agreement = new \ElkArte\Agreement($user_info['language']);
-					if (false === $agreement->checkAccepted($id_member, $modSettings['agreementRevision']))
-					{
-						setOldUrl('agreement_url_redirect');
-						redirectexit('action=register;sa=agreement');
-					}
-				}
-			}
-		}
-		if (!empty($modSettings['force_accept_privacy_policy']))
-		{
-			if (!empty($modSettings['privacypolicyRevision']) && !empty($modSettings['requirePrivacypolicy']) && in_array($http_request->action, array('reminder', 'register')) === false)
-			{
-				if ($http_request->action !== 'profile' || $http_request->area !== 'deleteaccount')
-				{
-					$privacypol = new \ElkArte\PrivacyPolicy($user_info['language']);
-					if (false === $privacypol->checkAccepted($id_member, $modSettings['privacypolicyRevision']))
-					{
-						setOldUrl('agreement_url_redirect');
-						redirectexit('action=register;sa=privacypol');
-					}
-				}
-			}
-		}
-	}
-	call_integration_hook('integrate_user_info');
+	\ElkArte\User::load();
+	$user_info = \ElkArte\User::$info;
 }
 
 /**
@@ -688,8 +405,8 @@ function loadBoard()
 	}
 
 	// Set the template contextual information.
-	$context['user']['is_mod'] = &$user_info['is_mod'];
-	$context['user']['is_moderator'] = &$user_info['is_moderator'];
+	$context['user']['is_mod'] = $user_info['is_mod'];
+	$context['user']['is_moderator'] = $user_info['is_moderator'];
 	$context['current_topic'] = $topic;
 	$context['current_board'] = $board;
 
@@ -794,6 +511,7 @@ function loadPermissions()
 
 	if (empty($user_info['permissions']))
 	{
+		$permissions = [];
 		// Get the general permissions.
 		$request = $db->query('', '
 			SELECT
@@ -811,8 +529,9 @@ function loadPermissions()
 			if (empty($row['add_deny']))
 				$removals[] = $row['permission'];
 			else
-				$user_info['permissions'][] = $row['permission'];
+				$permissions[] = $row['permission'];
 		}
+		$user_info['permissions'] = $permissions;
 		$db->free_result($request);
 
 		if (isset($cache_groups))
@@ -826,6 +545,7 @@ function loadPermissions()
 		if (!isset($board_info['profile']))
 			throw new \ElkArte\Exceptions\Exception('no_board');
 
+		$permissions = [];
 		$request = $db->query('', '
 			SELECT
 				permission, add_deny
@@ -844,8 +564,9 @@ function loadPermissions()
 			if (empty($row['add_deny']))
 				$removals[] = $row['permission'];
 			else
-				$user_info['permissions'][] = $row['permission'];
+				$permissions[] = $row['permission'];
 		}
+		$user_info['permissions'] = $permissions;
 		$db->free_result($request);
 	}
 
@@ -922,10 +643,10 @@ function loadUserContext()
 	$context['user'] = array(
 		'id' => $user_info['id'],
 		'is_logged' => !$user_info['is_guest'],
-		'is_guest' => &$user_info['is_guest'],
-		'is_admin' => &$user_info['is_admin'],
-		'is_mod' => &$user_info['is_mod'],
-		'is_moderator' => &$user_info['is_moderator'],
+		'is_guest' => $user_info['is_guest'],
+		'is_admin' => $user_info['is_admin'],
+		'is_mod' => $user_info['is_mod'],
+		'is_moderator' => $user_info['is_moderator'],
 		// A user can mod if they have permission to see the mod center, or they are a board/group/approval moderator.
 		'can_mod' => allowedTo('access_mod_center') || (!$user_info['is_guest'] && ($user_info['mod_cache']['gq'] != '0=1' || $user_info['mod_cache']['bq'] != '0=1' || ($modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap'])))),
 		'username' => $user_info['username'],
@@ -1719,7 +1440,7 @@ function serverIs($server)
  */
 function doSecurityChecks()
 {
-	global $modSettings, $context, $maintenance, $user_info, $txt, $scripturl, $user_settings, $options;
+	global $modSettings, $context, $maintenance, $user_info, $txt, $scripturl, $options;
 
 	$show_warnings = false;
 
@@ -1797,7 +1518,7 @@ function doSecurityChecks()
 	if (allowedTo('moderate_forum') && ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion'])) && !empty($modSettings['unapprovedMembers']))
 		$context['warning_controls']['unapproved_members'] = sprintf($txt[$modSettings['unapprovedMembers'] == 1 ? 'approve_one_member_waiting' : 'approve_many_members_waiting'], $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve', $modSettings['unapprovedMembers']);
 
-	if (!empty($context['open_mod_reports']) && (empty($user_settings['mod_prefs']) || $user_settings['mod_prefs'][0] == 1))
+	if (!empty($context['open_mod_reports']) && (empty(\ElkArte\User::$settings['mod_prefs']) || \ElkArte\User::$settings['mod_prefs'][0] == 1))
 	{
 		$context['warning_controls']['open_mod_reports'] = '<a href="' . $scripturl . '?action=moderate;area=reports">' . sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']) . '</a>';
 	}

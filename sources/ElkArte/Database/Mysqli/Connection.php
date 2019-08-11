@@ -39,7 +39,7 @@ class Connection implements \ElkArte\Database\ConnectionInterface
 		// Something's wrong, show an error if its fatal (which we assume it is)
 		if (!$connection)
 		{
-			throw new \Exception('\\ElkArte\\Database\\Mysqli\\Connection::initiate');
+			throw new \Exception('Db initialization failed');
 		}
 
 		$query = new Query($db_prefix, $connection);

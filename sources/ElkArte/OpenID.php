@@ -125,15 +125,13 @@ class OpenID
 	 */
 	public function revalidate()
 	{
-		global $user_settings;
-
 		if (isset($_SESSION['openid_revalidate_time']) && $_SESSION['openid_revalidate_time'] > time() - 60)
 		{
 			unset($_SESSION['openid_revalidate_time']);
 			return true;
 		}
 		else
-			$this->validate($user_settings['openid_uri'], false, null, 'revalidate');
+			$this->validate(\ElkArte\User::$settings['openid_uri'], false, null, 'revalidate');
 
 		// We shouldn't get here.
 		trigger_error('Hacking attempt...', E_USER_ERROR);

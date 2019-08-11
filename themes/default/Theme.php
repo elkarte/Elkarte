@@ -737,9 +737,9 @@ class Theme extends BaseTheme
 
 		if (!$user_info['is_guest'])
 		{
-			$context['user']['messages'] = &$user_info['messages'];
-			$context['user']['unread_messages'] = &$user_info['unread_messages'];
-			$context['user']['mentions'] = &$user_info['mentions'];
+			$context['user']['messages'] = $user_info['messages'];
+			$context['user']['unread_messages'] = $user_info['unread_messages'];
+			$context['user']['mentions'] = $user_info['mentions'];
 
 			// Personal message popup...
 			if ($user_info['unread_messages'] > (isset($_SESSION['unread_messages']) ? $_SESSION['unread_messages'] : 0))

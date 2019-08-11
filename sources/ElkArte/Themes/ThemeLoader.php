@@ -292,7 +292,7 @@ class ThemeLoader
 	 */
 	public function __construct($id_theme = 0, $initialize = true)
 	{
-		global $user_info, $user_settings;
+		global $user_info;
 		global $txt, $scripturl, $mbname, $modSettings;
 		global $context, $settings, $options;
 
@@ -433,7 +433,7 @@ class ThemeLoader
 			empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] . 'logo_elk.png' : \ElkArte\Util::htmlspecialchars($settings['header_logo_url']);
 
 		// Allow overriding the board wide time/number formats.
-		if (empty($user_settings['time_format']) && !empty($txt['time_format']))
+		if (empty(\ElkArte\User::$settings['time_format']) && !empty($txt['time_format']))
 		{
 			$user_info['time_format'] = $txt['time_format'];
 		}

@@ -25,7 +25,7 @@ class TestProfileInfo extends \PHPUnit\Framework\TestCase
 			'is_guest' => false,
 			'username' => 'testing',
 			'query_wanna_see_board' => '1=1',
-			'is_moderator' => &$user_info['is_moderator'],
+			'is_moderator' => $user_info['is_moderator'],
 			'email' => 'a@a.com',
 			'ignoreusers' => '',
 			'name' => 'itsme',

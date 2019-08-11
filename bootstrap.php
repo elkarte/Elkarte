@@ -366,7 +366,7 @@ class Bootstrap
 		// Get rid of $board and $topic... do stuff loadBoard would do.
 		unset($board, $topic);
 		$user_info['is_mod'] = false;
-		$context['user']['is_mod'] = &$user_info['is_mod'];
+		$context['user']['is_mod'] = $user_info['is_mod'];
 		$context['linktree'] = array();
 
 		// Load the user and their cookie, as well as their settings.
