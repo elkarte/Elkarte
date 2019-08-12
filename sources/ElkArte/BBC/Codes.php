@@ -860,7 +860,7 @@ class Codes
 			array(
 				self::ATTR_TAG => 'url',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
-				self::ATTR_CONTENT => '<a href="$1" class="bbc_link" target="_blank">$1</a>',
+				self::ATTR_CONTENT => '<a href="$1" class="bbc_link" target="_blank" rel="noopener noreferrer">$1</a>',
 				self::ATTR_VALIDATE => function (&$data) {
 					$data = addProtocol($data);
 				},
@@ -871,7 +871,7 @@ class Codes
 			array(
 				self::ATTR_TAG => 'url',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
-				self::ATTR_BEFORE => '<a href="$1" class="bbc_link" target="_blank">',
+				self::ATTR_BEFORE => '<a href="$1" class="bbc_link" target="_blank" rel="noopener noreferrer">',
 				self::ATTR_AFTER => '</a>',
 				self::ATTR_VALIDATE => function (&$data) {
 					$data = addProtocol($data);

@@ -446,7 +446,7 @@ class ProfileHistory extends \ElkArte\AbstractController
 			$context['whois_servers'] = array(
 				'afrinic' => array(
 					'name' => $txt['whois_afrinic'],
-					'url' => 'http://www.afrinic.net/cgi-bin/whois?searchtext=' . $context['ip'],
+					'url' => 'http://www.afrinic.net/whois?searchtext=' . $context['ip'],
 				),
 				'apnic' => array(
 					'name' => $txt['whois_apnic'],

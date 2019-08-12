@@ -45,7 +45,7 @@ $upcontext['steps'] = array(
 $upcontext['database_step'] = 3;
 @set_time_limit(600);
 
-if (!ini_get('safe_mode'))
+if (version_compare(PHP_VERSION, '5.4.0', '>') || !ini_get('safe_mode'))
 {
 	ini_set('mysql.connect_timeout', -1);
 	ini_set('default_socket_timeout', 900);
@@ -359,7 +359,7 @@ function upgradeExit($fallThrough = false)
 		{
 			if (function_exists('debug_print_backtrace'))
 			{
-				debug_print_backtrace();
+				debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 			}
 
 			echo "\n" . 'Error: Unexpected call to use the ' . (isset($upcontext['sub_template']) ? $upcontext['sub_template'] : '') . ' template. Please copy and paste all the text above and visit the ElkArte Community to tell the Developers that they\'ve made a doh!; they\'ll get you up and running again.';
@@ -626,7 +626,7 @@ function action_welcomeLogin()
 	// Do they have ALTER privileges?
 	$db->skip_next_error();
 	if (!empty($databases[$db_type]['alter_support'])
-		&& $db->query('', '	ALTER TABLE {db_prefix}log_digest ORDER BY id_topic', array('security_override' => true)) === false)
+		&& $db->query('', '	ALTER TABLE {db_prefix}log_digest ORDER BY id_topic', array()) === false)
 	{
 		return throw_error('The ' . $databases[$db_type]['name'] . ' user you have set in Settings.php does not have proper privileges.<br /><br />Please ask your host to give this user the ALTER, CREATE, and DROP privileges.');
 	}
@@ -1866,7 +1866,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 
 	$db->skip_next_error();
 	if (!empty($databases[$db_type]['alter_support'])
-		&& $db->query('', '	ALTER TABLE {db_prefix}log_digest ORDER BY id_topic', array('security_override' => true)) === false)
+		&& $db->query('', '	ALTER TABLE {db_prefix}log_digest ORDER BY id_topic', array()) === false)
 	{
 		print_error('Error: The ' . $databases[$db_type]['name'] . ' account in Settings.php does not have sufficient privileges.', true);
 	}

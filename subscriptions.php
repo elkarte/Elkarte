@@ -25,7 +25,7 @@ require_once(dirname(__FILE__) . '/bootstrap.php');
 $ssi_guest_access = true;
 new Bootstrap(true);
 
-global $txt, $modSettings, $context;
+global $txt, $modSettings, $context, $scripturl;
 
 // Need lots of help
 require_once(SUBSDIR . '/PaidSubscriptions.subs.php');

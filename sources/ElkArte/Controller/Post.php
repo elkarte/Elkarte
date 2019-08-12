@@ -971,6 +971,7 @@ class Post extends \ElkArte\AbstractController
 				});'
 			);
 
+			$_REQUEST['preview'] = false;
 			return $this->action_post();
 		}
 

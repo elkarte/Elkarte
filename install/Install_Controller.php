@@ -765,6 +765,7 @@ class Install_Controller
 			}
 		}
 		$modSettings['disableQueryCheck'] = true;
+		$modSettings['time_offset'] = empty($modSettings['time_offset']) ? 0 : $modSettings['time_offset'];
 
 		// Since we are UTF8, select it. PostgreSQL requires passing it as a string...
 		$db->skip_next_error();

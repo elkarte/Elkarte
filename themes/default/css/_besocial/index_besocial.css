@@ -1729,6 +1729,28 @@ a.help .icon {
 }
 
 /* -------------------------------------------------------
+ *	$ICONS
+ * -------------------------------------------------------
+ *
+ * Icons. The color file is the place for this since we
+ * can't style embedded material.
+ *
+ * -------------------------------------------------------
+ */
+
+.iconline {
+	background: #B4E391;
+	background-image: linear-gradient(to bottom, #B4E391 0%,#61C419 50%,#b4E391 100%);
+	border-color: #27A348;
+}
+
+.icoffline {
+	background: #BBBBBB;
+	background-image: linear-gradient(to bottom, #BBBBBB 0%,#6f6f6f 50%,#BBBBBB 100%);
+	border-color: #828282;
+}
+
+/* -------------------------------------------------------
  *	$MEDIA
  * -------------------------------------------------------
  *  @TODO: This should be nearly empty for the colorized sheets.

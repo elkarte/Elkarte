@@ -230,6 +230,7 @@ class SearchParams extends \ElkArte\ValuesContainer
 				SELECT ' . (empty($this->_search_params['maxage']) ? '0, ' : 'COALESCE(MIN(id_msg), -1), ') . (empty($this->_search_params['minage']) ? '0' : 'COALESCE(MAX(id_msg), -1)') . '
 				FROM {db_prefix}messages
 				WHERE 1=1' . ($modSettings['postmod_active'] ? '
+					AND m.approved = {int:is_approved_true}
 					AND approved = {int:is_approved_true}' : '') . (empty($this->_search_params['minage']) ? '' : '
 					AND poster_time <= {int:timestamp_minimum_age}') . (empty($this->_search_params['maxage']) ? '' : '
 					AND poster_time >= {int:timestamp_maximum_age}'),

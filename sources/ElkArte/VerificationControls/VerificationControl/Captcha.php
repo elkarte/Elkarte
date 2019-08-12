@@ -65,13 +65,6 @@ class Captcha implements ControlInterface
 	private $_tested = false;
 
 	/**
-	 * If the GD library is available for use
-	 *
-	 * @var boolean
-	 */
-	private $_use_graphic_library = false;
-
-	/**
 	 * array of allowable characters that can be used in the image
 	 *
 	 * @var array
@@ -89,7 +82,6 @@ class Captcha implements ControlInterface
 	{
 		global $modSettings;
 
-		$this->_use_graphic_library = in_array('gd', get_loaded_extensions());
 		$this->_num_chars = $modSettings['visual_verification_num_chars'];
 
 		// Skip I, J, L, O, Q, S and Z.
@@ -170,7 +162,6 @@ class Captcha implements ControlInterface
 			'values' => array(
 				'image_href' => $this->_image_href,
 				'text_value' => $this->_text_value,
-				'use_graphic_library' => $this->_use_graphic_library,
 				'chars_number' => $this->_num_chars,
 				'is_error' => $this->_tested && !$this->_verifyCode($sessionVal),
 			)
@@ -212,6 +203,7 @@ class Captcha implements ControlInterface
 		$config_vars = array(
 			array('title', 'configure_verification_means'),
 			array('desc', 'configure_verification_means_desc'),
+			array('title', 'configure_captcha'),
 			array('int', 'visual_verification_num_chars'),
 			'vv' => array('select', 'visual_verification_type',
 				array($txt['setting_image_verification_off'], $txt['setting_image_verification_vsimple'], $txt['setting_image_verification_simple'], $txt['setting_image_verification_medium'], $txt['setting_image_verification_high'], $txt['setting_image_verification_extreme']),
@@ -230,10 +222,8 @@ class Captcha implements ControlInterface
 			$_SESSION['visual_verification_code'] .= $this->_standard_captcha_range[array_rand($this->_standard_captcha_range)];
 
 		// Some javascript for CAPTCHA.
-		if ($this->_use_graphic_library)
-		{
-			loadJavascriptFile('jquery.captcha.js');
-			theme()->addInlineJavascript('
+		loadJavascriptFile('jquery.captcha.js');
+		theme()->addInlineJavascript('
 		$(\'#visual_verification_type\').Elk_Captcha({
 			\'imageURL\': ' . JavaScriptEscape($verification_image) . ',
 			\'useLibrary\': true,
@@ -241,13 +231,9 @@ class Captcha implements ControlInterface
 			\'refreshevent\': \'change\',
 			\'admin\': true
 		});', true);
-		}
 
 		// Show the image itself, or text saying we can't.
-		if ($this->_use_graphic_library)
-			$config_vars['vv']['postinput'] = '<br /><img src="' . $verification_image . ';type=' . (empty($modSettings['visual_verification_type']) ? 0 : $modSettings['visual_verification_type']) . '" alt="' . $txt['setting_image_verification_sample'] . '" id="verification_image" /><br />';
-		else
-			$config_vars['vv']['postinput'] = '<br /><span class="smalltext">' . $txt['setting_image_verification_nogd'] . '</span>';
+		$config_vars['vv']['postinput'] = '<br /><img src="' . $verification_image . ';type=' . (empty($modSettings['visual_verification_type']) ? 0 : $modSettings['visual_verification_type']) . '" alt="' . $txt['setting_image_verification_sample'] . '" id="verification_image" /><br />';
 
 		return $config_vars;
 	}

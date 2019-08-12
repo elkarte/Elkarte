@@ -339,7 +339,7 @@
 						'   </div>' +
 						'   <div class="separator"></div>' +
 						'   <div class="well">' +
-						'       <p>' + data[i].member_liked_data.length + ' ' + txtStrings.usersWhoLiked + '</p>';
+						'       <p>' + txtStrings.usersWhoLiked.easyReplace({1 : data[i].member_liked_data.length}) + '</p>';
 
 					// All the members that liked this masterpiece of internet jibba jabba
 					for (var j = 0, likerslen = data[i].member_liked_data.length; j < likerslen; j++) {
@@ -541,7 +541,7 @@
 						'       <div class="content forumposts">' +
 						'	        <div class="topic_details">' +
 						'                <h5 class="like_stats_likers">' +
-						txtStrings.postedAt + ' ' + data[i].post_data[j].html_time + ': ' + txtStrings.likesReceived + ' (' + data[i].post_data[j].like_count + ')' +
+						txtStrings.postedAt + ' ' + data[i].post_data[j].html_time + ' - ' + data[i].post_data[j].like_count + ' ' + txtStrings.likesReceived +
 						'               </h5>' +
 						'           </div>' +
 						'          <div class="inner">' + data[i].post_data[j].body + '</div>' +

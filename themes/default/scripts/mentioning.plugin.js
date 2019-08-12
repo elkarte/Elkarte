@@ -175,10 +175,7 @@ var disableDrafts = false;
 			})
 			.done(function(data) {
 				$(data).find('item').each(function (idx, item) {
-					if (typeof oMentions.opts._names[oMentions.opts._names.length] === 'undefined')
-						oMentions.opts._names[oMentions.opts._names.length] = {};
-
-					oMentions.opts._names[oMentions.opts._names.length - 1] = {
+					oMentions.opts._names[idx] = {
 						"id": $(item).attr('id'),
 						"name": $(item).text()
 					};

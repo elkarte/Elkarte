@@ -27,7 +27,7 @@ class TestCurlFetchWebdata extends \PHPUnit\Framework\TestCase
 				'https://duckduckgo.com/html',
 				array('q' => 'elkarte+forum', 'ia' => 'about'),
 				200,
-				'ElkArte is designed to provide you with all the features you need for a full featured community forum and website right out of the box',
+				'<b>ElkArte</b>, Free and Open Source Community Forum Software',
 			),
 		);
 

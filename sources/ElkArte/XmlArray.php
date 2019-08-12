@@ -173,7 +173,7 @@ class XmlArray
 					return $array[$el];
 				else
 				{
-					$trace = debug_backtrace();
+					$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 					$i = 0;
 					while ($i < count($trace) && isset($trace[$i]['class']) && $trace[$i]['class'] == get_class($this))
 						$i++;
@@ -749,7 +749,7 @@ class XmlArray
 		// No results found...
 		if (empty($results))
 		{
-			$trace = debug_backtrace();
+			$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 			$i = 0;
 			while ($i < count($trace) && isset($trace[$i]['class']) && $trace[$i]['class'] == get_class($this))
 				$i++;

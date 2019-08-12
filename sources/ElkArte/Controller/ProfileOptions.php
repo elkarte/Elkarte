@@ -161,7 +161,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 		);
 
 		// Set a subaction
-		$action = new \ElkArte\Action();
+		$action = new \ElkArte\Action('buddy_actions');
 		$subAction = $action->initialize($subActions, 'buddies');
 
 		// Create the tabs for the template.
@@ -355,7 +355,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 			{
 				// Now find out the id_member for the members in question.
 				require_once(SUBSDIR . '/ProfileOptions.subs.php');
-				$ignoreArray = getBuddiesID($new_entries, false);
+				$ignoreArray = array_merge($ignoreArray, getBuddiesID($new_entries, false));
 
 				// Now update the current users buddy list.
 				$this->_profile['pm_ignore_list'] = implode(',', $ignoreArray);
