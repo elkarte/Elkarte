@@ -36,6 +36,9 @@ function showCodeImage($code)
 {
 	global $gd2, $settings, $user_info, $modSettings;
 
+	if (!checkGD())
+		return false;
+
 	// What type are we going to be doing?
 	// Note: The higher the value of visual_verification_type the harder the verification is
 	// from 0 as disabled through to 4 as "Very hard".

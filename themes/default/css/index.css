@@ -914,7 +914,7 @@ a.bbc_link {
 	display: inline-block;
 	overflow: hidden;
 	max-width: 100%;
-	vertical-align: top;
+	vertical-align: bottom;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	word-wrap: normal;
@@ -5803,6 +5803,11 @@ a > i {
 
 	#menu_nav {
 		padding: 6px 0;
+	}
+
+	.new_posts, .require_approval {
+		padding: 1px 6px 2px 4px;
+		font-size: .857em;
 	}
 }
 

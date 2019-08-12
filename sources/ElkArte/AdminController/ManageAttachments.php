@@ -188,7 +188,8 @@ class ManageAttachments extends \ElkArte\AbstractController
 			}
 
 			// Changing the attachment upload directory
-			if (isset($this->_req->post->attachmentUploadDir))
+			if (isset($this->_req->post->attachmentUploadDir)
+				|| !empty($this->_req->post->use_subdirectories_for_attachments))
 			{
 				if (!empty($this->_req->post->attachmentUploadDir) && file_exists($modSettings['attachmentUploadDir']) && $modSettings['attachmentUploadDir'] != $this->_req->post->attachmentUploadDir)
 					rename($modSettings['attachmentUploadDir'], $this->_req->post->attachmentUploadDir);
@@ -1218,11 +1219,13 @@ class ManageAttachments extends \ElkArte\AbstractController
 					$use_subdirectories_for_attachments = 0;
 					if (!empty($modSettings['attachment_basedirectories']))
 						foreach ($modSettings['attachment_basedirectories'] as $bid => $base)
+						{
 							if (strpos($modSettings['attachmentUploadDir'][$this->current_dir], $base . DIRECTORY_SEPARATOR) !== false)
 							{
 								$use_subdirectories_for_attachments = 1;
 								break;
 							}
+						}
 
 					if ($use_subdirectories_for_attachments == 0 && strpos($modSettings['attachmentUploadDir'][$this->current_dir], BOARDDIR . DIRECTORY_SEPARATOR) !== false)
 						$bid = 0;

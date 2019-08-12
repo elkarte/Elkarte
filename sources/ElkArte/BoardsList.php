@@ -11,7 +11,11 @@
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  *
+<<<<<<< HEAD:sources/ElkArte/BoardsList.php
  * @version 2.0 dev
+=======
+ * @version 1.1.6
+>>>>>>> master:sources/subs/BoardsList.class.php
  *
  */
 
@@ -372,8 +376,13 @@ class BoardsList
 			// Provide the href and link.
 			if ($row_board['subject'] != '')
 			{
+<<<<<<< HEAD:sources/ElkArte/BoardsList.php
 				$this_last_post['href'] = getUrl('topic', ['topic' => $row_board['id_topic'], 'start' => 'msg' . ($this->_user['is_guest'] ? $row_board['id_msg'] : $row_board['new_from']), 'subject' => $row_board['subject'], 0 => empty($row_board['is_read']) ? 'boardseen' : '']) . '#new';
 				$this_last_post['link'] = '<a href="' . $this_last_post['href'] . '" title="' . $row_board['subject'] . '">' . $row_board['short_subject'] . '</a>';
+=======
+				$this_last_post['href'] = $this->_scripturl . '?topic=' . $row_board['id_topic'] . '.msg' . ($this->_user['is_guest'] ? $row_board['id_msg'] : $row_board['new_from']) . (empty($row_board['is_read']) ? ';boardseen' : '') . '#new';
+				$this_last_post['link'] = '<a href="' . $this_last_post['href'] . '" title="' . Util::htmlspecialchars($row_board['subject']). '">' . $row_board['short_subject'] . '</a>';
+>>>>>>> master:sources/subs/BoardsList.class.php
 				/* The board's and children's 'last_post's have:
 				time, timestamp (a number that represents the time.), id (of the post), topic (topic id.),
 				link, href, subject, start (where they should go for the first unread post.),

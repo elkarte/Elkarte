@@ -101,6 +101,8 @@ class Post extends \ElkArte\Modules\AbstractModule
 		try
 		{
 			$save_data = $event->validate($_POST);
+			$save_data['id_board'] = $board;
+			$save_data['id_topic'] = $topic;
 		}
 		catch (\Exception $e)
 		{
@@ -112,9 +114,6 @@ class Post extends \ElkArte\Modules\AbstractModule
 		{
 			// Make sure they can link an event to this post.
 			canLinkEvent();
-
-			$save_data['id_board'] = $board;
-			$save_data['id_topic'] = $topic;
 
 			// Insert the event.
 			$event->insert($save_data, $user_info['id']);

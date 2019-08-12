@@ -77,7 +77,7 @@ class SplitTopics extends \ElkArte\AbstractController
 		);
 
 		// To the right sub action or index if an invalid choice was submitted
-		$action = new \ElkArte\Action();
+		$action = new \ElkArte\Action('split_topics');
 		$subAction = $action->initialize($subActions, 'index');
 		$action->dispatch($subAction);
 	}
