@@ -98,7 +98,7 @@ class OpenID extends \ElkArte\AbstractController
 		$context['openid_claimed_id'] = $this->_req->query->openid_claimed_id;
 
 		// Is there a user with this OpenID_uri?
-		$member_found = memberByOpenID($context['openid_claimed_id']);
+		$member_found = $openID->memberByOpenID($context['openid_claimed_id']);
 
 		if (empty($member_found) && $this->_req->getQuery('sa') === 'change_uri' && !empty($_SESSION['new_openid_uri']) && $_SESSION['new_openid_uri'] == $context['openid_claimed_id'])
 		{
