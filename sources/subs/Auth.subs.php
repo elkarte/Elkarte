@@ -913,7 +913,9 @@ function loadExistingMember($name, $is_id = false)
 
 	// Nothing? Ah the horror...
 	if ($db->num_rows($request) == 0)
+	{
 		$user_settings = false;
+	}
 	else
 	{
 		$user_settings = $db->fetch_assoc($request);
