@@ -546,7 +546,7 @@ class OpenID
 	 *
 	 * @return array the member settings
 	 */
-	protected function memberByOpenID($claimed_id)
+	public function memberByOpenID($claimed_id)
 	{
 		$db = database();
 

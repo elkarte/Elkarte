@@ -43,7 +43,7 @@ class OpenID extends \ElkArte\AbstractController
 	 */
 	public function action_openidreturn()
 	{
-		global $modSettings, $context, $user_settings;
+		global $modSettings, $context;
 
 		// Is OpenID even enabled?
 		if (empty($modSettings['enableOpenID']))
@@ -104,7 +104,7 @@ class OpenID extends \ElkArte\AbstractController
 		{
 			// Update the member.
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($user_settings['id_member'], array('openid_uri' => $context['openid_claimed_id']));
+			updateMemberData(\ElkArte\User::$settings['id_member'], array('openid_uri' => $context['openid_claimed_id']));
 
 			unset($_SESSION['new_openid_uri']);
 			$_SESSION['openid'] = array(
@@ -148,7 +148,7 @@ class OpenID extends \ElkArte\AbstractController
 			else
 				redirectexit('action=register');
 		}
-		elseif (isset($this->_req->query->sa) && $this->_req->query->sa === 'revalidate' && $user_settings['openid_uri'] == $openid_uri)
+		elseif (isset($this->_req->query->sa) && $this->_req->query->sa === 'revalidate' && \ElkArte\User::$settings['openid_uri'] == $openid_uri)
 		{
 			$_SESSION['openid_revalidate_time'] = time();
 
@@ -161,16 +161,17 @@ class OpenID extends \ElkArte\AbstractController
 		}
 		else
 		{
-			$user_settings = $member_found;
+			$db = database();
+			$cache = \ElkArte\Cache\Cache::instance();
+
+			$user = new \ElkArte\UserSettings($db, $cache, [$this->_req);
+			$user->loadUserById($member_found['id_member'], true, '');
 
 			// Generate an ElkArte hash for the db to protect this account
-			$user_settings['passwd'] = validateLoginPassword($this->_secret, '', $user_settings['member_name'], true);
-
-			$tokenizer = new \ElkArte\TokenHash();
-			$user_settings['password_salt'] = $tokenizer->generate_hash(4);
+			$user->rehashPassword($this->_secret, \ElkArte\User::$settings['member_name']);
 
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($user_settings['id_member'], array('passwd' => $user_settings['passwd'], 'password_salt' => $user_settings['password_salt']));
+			updateMemberData(\ElkArte\User::$settings['id_member'], array('passwd' => \ElkArte\User::$settings['passwd'], 'password_salt' => \ElkArte\User::$settings['password_salt']));
 
 			// Cleanup on Aisle 5.
 			$_SESSION['openid'] = array(

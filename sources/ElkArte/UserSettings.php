@@ -71,6 +71,44 @@ class UserSettings
 		$this->compileInfo($user_info);
 	}
 
+	public function rehashPassword($password, $user)
+	{
+		// Our hashing controller
+		require_once(EXTDIR . '/PasswordHash.php');
+
+		// Base-2 logarithm of the iteration count used for password stretching, the
+		// higher the number the more secure and CPU time consuming
+		$hash_cost_log2 = 10;
+
+		// Do we require the hashes to be portable to older systems (less secure)?
+		$hash_portable = false;
+
+		// Get an instance of the hasher
+		$hasher = new PasswordHash($hash_cost_log2, $hash_portable);
+
+		// If the password is not 64 characters, lets make it a (SHA-256)
+		if (strlen($password) !== 64)
+		{
+			$password = hash('sha256', \ElkArte\Util::strtolower($user) . un_htmlspecialchars($password));
+		}
+
+		$passhash = $hasher->HashPassword($password);
+
+		// Something is not right, we can not generate a valid hash that's <20 characters
+		if (strlen($passhash) < 20)
+		{
+			// @todo here we should throw an exception
+			$passhash = false;
+		}
+
+		unset($hasher);
+
+		if ($passhash !== false)
+		{
+			$this->settings->updatePassword($passhash);
+		}
+	}
+
 	protected function compileInfo($user_info)
 	{
 		global $modSettings;
@@ -248,10 +286,10 @@ class UserSettings
 	{
 		$this->settings = new class($user_settings) extends ValuesContainerReadOnly {
 			/**
-			* Stores the data of the user into an array
-			*
-			* @return mixed[]
-			*/
+			 * Stores the data of the user into an array
+			 *
+			 * @return mixed[]
+			 */
 			public function toArray()
 			{
 				return $this->data;
@@ -262,9 +300,12 @@ class UserSettings
 				$this->data['last_login'] = time();
 			}
 
-			public function validatePassword($password)
+			public function updatePassword($password)
 			{
-				
+				$this->data['passwd'] = $password;
+
+				$tokenizer = new \ElkArte\TokenHash();
+				$this->data['password_salt'] = $tokenizer->generate_hash(4);
 			}
 
 			public function updateTotalTimeLoggedIn($increment_offset)
