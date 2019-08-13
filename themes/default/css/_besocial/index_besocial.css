@@ -422,14 +422,6 @@ hr {
 	color: #50AA3A;
 }
 
-.meaction:before {
-
-}
-
-.spoilerheader {
-
-}
-
 .spoiler {
 	border-color: #CCCCCC;
 	background-color: #EEEEEE;
@@ -445,10 +437,6 @@ div.bbc_footnotes {
 
 sup.bbc_footnotes, sup.bbc_footnotes a {
 	color: #50AA3A;
-}
-
-div.bbc_footnotes .meaction {
-
 }
 
 /* Prevent the footnote named anchor from hiding under the menu */
@@ -621,10 +609,6 @@ div.bbc_footnotes .meaction {
 	box-shadow: 1px 1px 2px #E5E5E5;
 }
 
-.poster li.poster_online .nolink img {
-
-}
-
 .poster li.subsections.listlevel1:hover .linklevel1 {
 	border: 1px solid transparent;
 	background: transparent;
@@ -732,11 +716,6 @@ div.bbc_footnotes .meaction {
 	color: #333333;
 }
 
-/* Main menu Level 1 active button and hover need a different border. */
-#main_menu .active, #main_menu .linklevel1:hover, #main_menu .listlevel1:hover .linklevel1, #main_menu .linklevel1:focus {
-
-}
-
 /* Level 1 active buttons for primary admin/profile/etc drop menus... */
 .admin_menu .active,
 /* ......and for secondary admin/profile/etc menu strip. */
@@ -808,11 +787,6 @@ a.active {
 	color: black;
 	border: 1px solid transparent;
 	/* Applying a default transparent border stops links jumping on hover. */
-}
-
-/* Admin menu icons. */
-.linklevel2 > img {
-
 }
 
 /* Levels 2 and 3: hover effects. */
@@ -920,10 +894,6 @@ a.active {
 	color: #EEEEEE;
 	border-color: #222222;
 	background: #111111;
-}
-
-#gobottom {
-
 }
 
 #gotop:hover, #gobottom:hover {
@@ -1169,9 +1139,6 @@ a.active {
 /* On to the posts */
 #searchform {
 	background: #E4E4E4;
-}
-
-#quickreplybox, #forumposts, #recentposts, #pmFolder, #topic_summary, #preview_section {
 }
 
 .inner, .messageContent {
@@ -1691,10 +1658,6 @@ a.help .icon {
 	background: rgba(255, 255, 255, 1);
 }
 
-.floating_error .error_heading {
-
-}
-
 .floating_error .error_msg {
 	color: #3D3C3C;
 }
@@ -1755,15 +1718,15 @@ a.help .icon {
  */
 
 .iconline {
-	background: #B4E391;
-	background-image: linear-gradient(to bottom, #B4E391 0%,#61C419 50%,#b4E391 100%);
 	border-color: #27A348;
+	background: #B4E391;
+	background-image: linear-gradient(to bottom, #B4E391 0%,#61C419 50%,#B4E391 100%);
 }
 
 .icoffline {
-	background: #BBBBBB;
-	background-image: linear-gradient(to bottom, #BBBBBB 0%,#6f6f6f 50%,#BBBBBB 100%);
 	border-color: #828282;
+	background: #BBBBBB;
+	background-image: linear-gradient(to bottom, #BBBBBB 0%,#6F6F6F 50%,#BBBBBB 100%);
 }
 
 /* -------------------------------------------------------

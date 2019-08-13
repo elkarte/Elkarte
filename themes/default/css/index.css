@@ -1329,10 +1329,6 @@ a.bbc_link {
 	border: 1px solid;
 }
 
-.linklevel1:hover .pm_indicator {
-
-}
-
 .linklevel1.active:hover .pm_indicator {
 	border-bottom: 1px solid;
 }
@@ -2504,10 +2500,6 @@ img.new_posts {
 .action_unread .topic_sorting #sortby, .action_unread #sortby,
 .action_unreadreplies .topic_sorting #sortby, .action_unreadreplies #sortby {
 	width: 9em;
-}
-
-.action_viewquery {
-
 }
 
 .action_viewquery a {
@@ -5806,8 +5798,8 @@ a > i {
 	}
 
 	.new_posts, .require_approval {
-		padding: 1px 6px 2px 4px;
 		font-size: .857em;
+		padding: 1px 6px 2px 4px;
 	}
 }
 

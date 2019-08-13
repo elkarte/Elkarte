@@ -53,11 +53,6 @@ a.new_win:link, a.new_win:visited {
 	color: #49643D;
 }
 
-/* Cursor declared here.Should not be required anywhere else. */
-a:hover, a.new_win:hover {
-
-}
-
 /* Stop white band under footer on short pages.
  * This color should match $FOOTER background.
  */
@@ -274,10 +269,6 @@ strong {
 	box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.1);
 }
 
-.generic_list_wrapper .additional_row {
-
-}
-
 .generic_list_wrapper .title_bar {
 	border-bottom-color: #FEFEFE;
 	background: none;
@@ -320,11 +311,6 @@ strong {
 
 .codeheader {
 	border-top-color: #AFAFAF;
-}
-
-/* [Select] link to copy code. */
-.codeoperation {
-
 }
 
 /* A quote, perhaps from another post. */
@@ -382,14 +368,6 @@ strong {
 	color: #50AA3A;
 }
 
-.meaction:before {
-
-}
-
-.spoilerheader {
-
-}
-
 .spoiler {
 	border-color: #CCCCCC;
 	background-color: #EEEEEE;
@@ -405,10 +383,6 @@ div.bbc_footnotes {
 
 sup.bbc_footnotes, sup.bbc_footnotes a {
 	color: #50AA3A;
-}
-
-div.bbc_footnotes .meaction {
-
 }
 
 /* -------------------------------------------------------
@@ -446,10 +420,6 @@ div.bbc_footnotes .meaction {
 	color: #A80000;
 }
 
-#search_form .input_text {
-
-}
-
 #search_form input[type="submit"] {
 	color: #333333;
 }
@@ -474,16 +444,8 @@ div.bbc_footnotes .meaction {
 }
 
 /* News section. */
-#news {
-
-}
-
 #news > h2 {
 	color: #4B863C;
-}
-
-#news > h2:after {
-
 }
 
 #news_line, #news {
@@ -540,21 +502,9 @@ div.bbc_footnotes .meaction {
 	background: #222222;
 }
 
-.action_viewquery a {
-
-}
-
-.action_viewquery .explain {
-
-}
-
 .action_viewquery .explain th,
 .action_viewquery .explain td {
 	border-color: gray;
-}
-
-.action_viewquery .query {
-
 }
 
 /* -------------------------------------------------------
@@ -611,10 +561,6 @@ div.bbc_footnotes .meaction {
 	box-shadow: 1px 1px 2px #E4E4E4;
 }
 
-.poster li.poster_online .nolink img {
-
-}
-
 .poster li.subsections.listlevel1:hover .linklevel1 {
 	background: transparent;
 	box-shadow: none;
@@ -654,10 +600,6 @@ div.bbc_footnotes .meaction {
  * Comment these out if you don't want them.
  */
 
-.subsections:hover .linklevel1:after {
-
-}
-
 #main_menu .subsections:hover .linklevel1:after {
 	color: #EEEEEE;
 	text-shadow: 0 4px 0 #3D6E32;
@@ -667,16 +609,8 @@ div.bbc_footnotes .meaction {
 	color: #3D6E32;
 }
 
-/* Corrections for other menus. */
-.quickbuttons .subsections:hover .linklevel1:after {
-
-}
-
 .subsections:hover .name.linklevel1:after {
 	color: #5BA048;
-}
-
-.poster2 .subsections:hover .name.linklevel1:after {
 }
 
 /* Do one override here for .poster. Still saves code all round. */
@@ -686,10 +620,6 @@ div.bbc_footnotes .meaction {
 	color: #4B863C;
 	background: none;
 	box-shadow: none;
-}
-
-.name.linklevel1:hover {
-
 }
 
 /* Levels 2 and 3: drop menu wrapper. */
@@ -709,14 +639,6 @@ div.bbc_footnotes .meaction {
 	box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.25), 0 -1px 0 #3D6E32 inset;
 }
 
-.poster .pm_indicator {
-
-}
-
-#dropdown_menu_1 .pm_indicator {
-
-}
-
 .likes_indicator {
 	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.25);
 }
@@ -725,11 +647,6 @@ div.bbc_footnotes .meaction {
 .linklevel2:link, .linklevel2:visited, .linklevel3:link, .linklevel3:visited {
 	color: #585858;
 	border-color: transparent;
-}
-
-/* Admin menu icons. */
-.linklevel2 > img {
-
 }
 
 /* Level 2: subsection indicators. */
@@ -743,15 +660,6 @@ div.bbc_footnotes .meaction {
 #button_admin .listlevel2.subsections, #button_pm .listlevel2.subsections {
 	border-top-color: #DDDDDD;
 	box-shadow: 0 -1px 0 #BBBBBB;
-}
-
-/* Levels 2 and 3: highlighting of current section
- * @todo - Should probably be applied to main menu as well, for consistency.
- */
-
-.linklevel2.chosen, .linklevel3.chosen,
-#menu_current_area .linklevel1 {
-
 }
 
 /* Styles for sidebar menus.
@@ -845,24 +753,6 @@ div.bbc_footnotes .meaction {
 	color: #585858;
 }
 
-.quickbuttons .inline_mod_check {
-}
-
-/* Radius left end of the first (Quote) button. */
-.linklevel1.quote_button {
-
-}
-
-/* Radius right end of the last button. */
-.linklevel1.post_options, .linklevel1.remove_button {
-
-}
-
-/* Single buttons get all corners rounded. */
-.follow_ups .linklevel1, #topic_summary .linklevel1 {
-
-}
-
 /* -------------------------------------------------------
  *	$PAGELINKS
  * -------------------------------------------------------
@@ -889,33 +779,12 @@ div.bbc_footnotes .meaction {
 	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
 
-.pagelinks :first-child {
-
-}
-
-.pagelinks :last-child {
-
-}
-
-/* our buddies &laquo; &raquo; */
-.small_pagelinks:before {
-
-}
-
-.small_pagelinks:after {
-
-}
-
 /* Globally accessible top/bottom links. */
 #gotop, #gobottom {
 	opacity: 0.2;
 	color: #EEEEEE;
 	border-color: #222222;
 	background: #EEEEEE;
-}
-
-#gobottom {
-
 }
 
 #gotop:hover, #gobottom:hover {
@@ -1008,14 +877,6 @@ div.bbc_footnotes .meaction {
 .content_category > li {
 	border-color: #CFCFCF;
 	background: #FEFEFE;
-}
-
-.board_row .parent_board {
-
-}
-
-.childboard_row {
-
 }
 
 .board_latest {
@@ -1585,10 +1446,6 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 	background: #FEFEFE none repeat scroll 0 0;
 }
 
-.profileblock ul li:not(:first-child):before {
-
-}
-
 #detailedinfo dt, #tracking dt, .profileblock dt {
 	color: #585858;
 }
@@ -1713,18 +1570,6 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 	background: #EBFFD8;
 }
 
-#main_grid .weeks {
-
-}
-
-#main_grid .weeks a:hover {
-
-}
-
-#main_grid .days {
-
-}
-
 .weeklist {
 	background: #E4E4E4;
 }
@@ -1734,16 +1579,8 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 	background: #FEFEFE;
 }
 
-.weeklist h4 a:hover {
-
-}
-
 .modify_event {
 	color: #A80000;
-}
-
-.hidelink {
-
 }
 
 /* Add a background that fits with the calendar. */
@@ -1781,10 +1618,6 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
 
-.popup_window.in.content {
-
-}
-
 /* The text content, hopefully helpful. */
 .popup_content {
 	border-color: #BBBBBB;
@@ -1820,10 +1653,6 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
  *	$MEMBERLIST
  * -------------------------------------------------------
  */
-
-.mlist .mlist_header div {
-
-}
 
 .mlist li div, .whos_online dt div, .whos_online dd:nth-child(odd) div {
 	border-top-color: #CCCCCC;
@@ -1976,10 +1805,6 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 	background: #FEFEFE;
 }
 
-#stats {
-
-}
-
 #like_post_stats_overlay {
 	background: rgba(0, 0, 0, .5);
 }
@@ -1991,10 +1816,6 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 	background: #FEFEFE;
 }
 
-.floating_error .error_heading {
-
-}
-
 .floating_error .error_msg {
 	color: #333333;
 }
@@ -2002,10 +1823,6 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 .floating_error .error_btn {
 	color: #0000FF;
 	border-top-color: #D1D1D1;
-}
-
-.floating_error .error_btn:hover {
-
 }
 
 /* -------------------------------------------------------
@@ -2098,10 +1915,6 @@ li.ui-tab.ui-tabs-active.ui-state-active.ui-state-hover .ui-tabs-anchor {
 
 	.icon-menu:hover {
 		border-color: #27A348;
-	}
-
-	.listlevel1#button_profile .linklevel1 {
-
 	}
 
 	.mlist li div.posts {
