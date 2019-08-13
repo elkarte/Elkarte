@@ -113,7 +113,7 @@
 
 			// Run our BBC regex on the leading text
 			var matches;
-			while (matches = regex.exec(text)) {
+			while (matches = regex.exec(text)) { // jshint ignore:line
 				// Closing tag [/bbcName] found, remove one from the stack
 				// We could attempt to find a matching open in the stack as well ...
 				if (matches[3])

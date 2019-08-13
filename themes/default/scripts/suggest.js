@@ -139,7 +139,6 @@ smc_AutoSuggest.prototype.handleKey = function(oEvent)
 
 			// Continue to the next control.
 			return true;
-		break;
 
 		// Was it an Enter key - if so assume they are trying to select something.
 		case 13:

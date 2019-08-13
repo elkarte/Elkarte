@@ -1131,7 +1131,7 @@ errorbox_handler.prototype.init = function()
 		this.oChecks_on = this.opt.selector;
 	else if (this.opt.editor !== undefined)
 	{
-		this.oChecks_on = eval(this.opt.editor);
+		this.oChecks_on = eval(this.opt.editor); // jshint ignore:line
 		this.evaluate = true;
 	}
 
@@ -1149,7 +1149,7 @@ errorbox_handler.prototype.init = function()
 	{
 		var current_error_handler = this.opt.self;
 		$(function() {
-			var current_error = eval(current_error_handler);
+			var current_error = eval(current_error_handler); // jshint ignore:line
 			$editor_data[current_error.opt.editor_id].addEvent(current_error.opt.editor_id, 'keyup', function() {
 				current_error.checkErrors();
 			});
@@ -1251,13 +1251,13 @@ errorbox_handler.prototype.removeError = function(error_box, error_elem)
 function addAnotherOption(parent, oDtName, oDdName, oData)
 {
 	// Some defaults to use if none are passed
-	oDtName['type'] = oDtName.type || 'text';
+	oDtName.type = oDtName.type || 'text';
 	oDtName['class'] = oDtName['class'] || 'input_text';
-	oDtName['size'] = oDtName.size || '20';
+	oDtName.size = oDtName.size || '20';
 
-	oDdName['type'] = oDdName.type || 'text';
+	oDdName.type = oDdName.type || 'text';
 	oDdName['class'] = oDdName['class'] || 'input_text';
-	oDdName['size'] = oDdName.size || '20';
+	oDdName.size = oDdName.size || '20';
 	oData = oData || '';
 
 	// Our new <dt> element
@@ -1635,7 +1635,7 @@ var ElkNotifier = new ElkNotifications();
 						$over.find('.customsize').slideDown();
 					});
 					$over.find(".range").on('input', function () {
-						var val = $(this).val()
+						var val = $(this).val();
 						$over.find(".visualizesize").val(val + 'px');
 					}).trigger('input');
 

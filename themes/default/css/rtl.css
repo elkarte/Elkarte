@@ -54,8 +54,8 @@
 
 /* Dont show disabled buttons as active on hover */
 input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
-	border-left: 1px solid #AFAFAF;
 	border-right: 1px solid #BFBFBF;
+	border-left: 1px solid #AFAFAF;
 }
 
 /* @todo - A common, tag-agnostic class to hold submit buttons, etc. */
@@ -104,9 +104,10 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 
 /* Category Header icons as sprites
 ------------------------------------------------- */
+
 h2 a.collapse {
-	margin: 2px 0 -2px 4px;
 	float: left;
+	margin: 2px 0 -2px 4px;
 }
 
 /* Upshrink image in the general category headers */
@@ -129,20 +130,20 @@ h2 a.collapse {
 
 /* More little boxes on a hillside. */
 .warningbox {
-	padding-left: 12px;
 	padding-right: 35px;
+	padding-left: 12px;
 	background: #FFF6CA url(../images/profile/warning_moderate.png) 99% 50% no-repeat;
 }
 
 .successbox {
-	padding-left: 12px;
 	padding-right: 35px;
+	padding-left: 12px;
 	background: #EEFFEE url(../images/icons/field_valid.png) 99% 50% no-repeat;
 }
 
 .infobox {
-	padding-left: 12px;
 	padding-right: 35px;
+	padding-left: 12px;
 	background: #D9EDF7 url(../images/icons/quick_sticky.png) 99% 50% no-repeat;
 }
 
@@ -196,8 +197,8 @@ h2 a.collapse {
 }
 
 #search_form {
-	padding: .75em .5em .25em .25em;
 	float: left;
+	padding: .75em .5em .25em .25em;
 }
 
 #search_form button, #search_form input, #search_form label {
@@ -210,9 +211,9 @@ h2 a.collapse {
 }
 
 #search_form select {
+	width: 10em;
 	border: 1px solid;
 	border-left: none;
-	width: 10em;
 }
 
 #search_form select:focus {
@@ -240,8 +241,8 @@ h2 a.collapse {
 
 /* Tweak the logo */
 #logo {
-	margin: 0 0 0 8px;
 	float: left;
+	margin: 0 0 0 8px;
 }
 
 .rightheader #logo {
@@ -250,15 +251,15 @@ h2 a.collapse {
 
 /* The user info, news, etc.*/
 #news {
-	margin-left: 0;
 	margin-right: -1px;
+	margin-left: 0;
 }
 
 /* Main forum area. */
 /* The footer with copyright links etc. */
 #footer_section li {
-	padding-left: 5px;
 	padding-right: 0;
+	padding-left: 5px;
 }
 
 #footer_section .rssfeeds {
@@ -304,8 +305,8 @@ h2 a.collapse {
 /* Reposition Level 2 drop menu as visible on hover. */
 /* @todo - Check Superfish class. I think .sfhover may be deprecated. */
 .listlevel1:hover .menulevel2, .listlevel1.sfhover .menulevel2 {
-	left: auto;
 	right: 0;
+	left: auto;
 }
 
 .listlevel1#button_profile:hover .menulevel2, .listlevel1#button_profile.sfhover .menulevel2 {
@@ -315,14 +316,14 @@ h2 a.collapse {
 
 /* Hiding Level 3 drop menu off hover. */
 .listlevel1:hover .menulevel3, .listlevel1.sfhover .menulevel3 {
-	left: auto;
 	right: -9999px;
+	left: auto;
 }
 
 /* Reposition Level 3 drop menu as visible on hover. */
 .listlevel2:hover .menulevel3, .listlevel2.sfhover .menulevel3 {
-	left: auto;
 	right: -14px;
+	left: auto;
 }
 
 /* @todo - Note: The next declarations are for keyboard access with js disabled. */
@@ -345,6 +346,7 @@ h2 a.collapse {
 */
 /* Styles for sidebar menus.
 ------------------------------------------------------- */
+
 #menu_sidebar {
 	float: right;
 	padding: 0 0 1em 10px;
@@ -353,8 +355,8 @@ h2 a.collapse {
 /* Same styling for Level 1 and Level 2. */
 #menu_sidebar .listlevel1:hover .menulevel2,
 #menu_sidebar .listlevel1.sfhover .menulevel2 {
-	left: auto;
 	right: 170px;
+	left: auto;
 }
 
 /* @todo - Note: The next declarations are for keyboard access with js disabled. */
@@ -376,8 +378,8 @@ h2 a.collapse {
 /* ------------------------------------------------------- */
 /* The navigation list (i.e. linktree) */
 .navigate_section {
-	padding-left: 1em;
 	padding-right: 0;
+	padding-left: 1em;
 }
 
 .linktree {
@@ -405,6 +407,7 @@ h2 a.collapse {
 
 /* Styles for the standard button lists.
 /* ------------------------------------------------------- */
+
 .buttonlist li {
 	float: right;
 	margin: 0 4px 0 0;
@@ -448,14 +451,15 @@ h2 a.collapse {
 /*.quickbuttons .linklevel1:focus {
 	margin: 0 9910px 0 -9910px;
 }*/
+
 .quickbuttons .linklevel1:before, .quickbuttons .linklevel2:before {
-	left: auto;
 	right: 3px;
+	left: auto;
 }
 
 .quickmod_check {
-	left: auto;
 	right: 3px;
+	left: auto;
 }
 
 /* Quickbutton and follow ups drop menus. */
@@ -465,8 +469,8 @@ h2 a.collapse {
 
 .quickbuttons .listlevel1:hover .menulevel2,
 .quickbuttons .listlevel1.sfhover .menulevel2 {
-	left: -1px;
 	right: auto;
+	left: -1px;
 }
 
 .quickbuttons .linklevel2 {
@@ -513,8 +517,8 @@ h2 a.collapse {
 }
 
 #pages_scroll_left {
-	left: auto;
 	right: 0;
+	left: auto;
 }
 
 #pages_scroll_right {
@@ -524,14 +528,14 @@ h2 a.collapse {
 
 /* Globally accessible top/bottom links. */
 #gotop, #gobottom {
-	left: auto;
 	right: 0;
+	left: auto;
 }
 
 /* Skip navigation link. */
 #top {
-	left: auto;
 	right: 3em;
+	left: auto;
 }
 
 /*	$TABLES		*/
@@ -552,6 +556,7 @@ h2 a.collapse {
 
 /* Lists - settings use these a lot.
 /* @todo - Inefficient selector. Should not need dl tag. */
+
 dl.settings {
 	clear: left;
 }
@@ -577,8 +582,8 @@ dl.settings img {
 /* ------------------------------------------------------- */
 /* The board categories and newsfader - some shared styling. */
 .icon_anchor {
-	padding: 2px 0 0 6px;
 	float: right;
+	padding: 2px 0 0 6px;
 }
 
 .board_info .board_description, .board_info .moderators {
@@ -590,9 +595,9 @@ dl.settings img {
 }
 
 .board_stats {
-	text-align: left;
-	padding: 1px 6px 1px 0;
 	float: left;
+	padding: 1px 6px 1px 0;
+	text-align: left;
 }
 
 .board_avatar {
@@ -666,8 +671,8 @@ dl.settings img {
 }
 
 .topic_stats {
-	text-align: left;
 	float: left;
+	text-align: left;
 }
 
 .topic_lastpost img {
@@ -708,6 +713,7 @@ dl.settings img {
 
 /* The display template (topic view).
 /* Events */
+
 .edit_event {
 	margin: 0 0 0 5px;
 }
@@ -746,8 +752,8 @@ dl.settings img {
 
 /* Drop menu for the poster info. */
 .poster .listlevel1.sfhover .menulevel2, .poster .listlevel1:hover .menulevel2 {
-	left: auto;
 	right: 0;
+	left: auto;
 	text-align: right;
 }
 
@@ -809,13 +815,13 @@ dl.settings img {
 
 /* The send topic section. */
 .requiredfield:before {
-	left: auto;
 	right: 5%;
+	left: auto;
 }
 
 .requiredfield {
-	left: auto;
 	right: 5%;
+	left: auto;
 }
 
 /*	$EDITOR		*/
@@ -856,9 +862,9 @@ ul.post_options li {
 
 /* The event editor section. */
 #event_main #datepicker, #event_main #caption_evtitle {
+	padding-top: 0.5em;
 	padding-right: 1em;
 	padding-left: 0;
-	padding-top: 0.5em;
 }
 
 #event_main .event_options {
@@ -872,18 +878,18 @@ ul.post_options li {
 
 /* The poll editor section. */
 #poll_main #question {
-	margin-left: auto;
 	margin-right: 2em;
+	margin-left: auto;
 }
 
 #poll_main .poll_main li {
-	padding-left: auto;
 	padding-right: 12px;
+	padding-left: auto;
 }
 
 #poll_main .poll_main input {
-	margin-left: auto;
 	margin-right: 12px;
+	margin-left: auto;
 }
 
 #poll_main .poll_main, dl.poll_options {
@@ -943,8 +949,8 @@ ul.post_options li {
 }
 
 #basicinfo .windowbg .content {
-	padding-left: 0;
 	padding-right: 30px;
+	padding-left: 0;
 }
 
 .profileblock .cf_icons {
@@ -1008,8 +1014,8 @@ ul.post_options li {
 }
 
 .activity_stats li .bar span {
-	left: auto;
 	right: -1555em;
+	left: auto;
 }
 
 /* Most popular boards by posts and activity */
@@ -1077,7 +1083,6 @@ ul.post_options li {
 
 /* $PERSONAL	*/
 /* ------------------------------------------------------- */
-
 #personal_messages .capacity_bar {
 	margin: 6px 12px 0 0;
 }
@@ -1109,8 +1114,8 @@ div.labels {
 }
 
 .label_pms li {
-	margin-left: 0;
 	margin-right: 0.5em;
+	margin-left: 0;
 }
 
 /* $CALENDAR	*/
@@ -1201,8 +1206,8 @@ div.labels {
 
 /* Yes some ugly importants since we don't have specific admin rtl css */
 .settings .help .icon {
-	margin: 1px -25px 0 0 !important;
 	position: absolute !important;
+	margin: 1px -25px 0 0 !important;
 }
 
 .admincenter .content .settings {
@@ -1211,14 +1216,14 @@ div.labels {
 
 /* Styles for the tooltips. */
 .tooltip {
-	left: auto;
 	right: -9999px;
+	left: auto;
 }
 
 /* The darkened background for help pop-ups. */
 .popup_container {
-	left: auto;
 	right: 0;
+	left: auto;
 }
 
 /* The hide icon (red cross). */
@@ -1263,8 +1268,8 @@ div.labels {
 }
 
 #mlsearch_options .mlsearch_option .input_check {
-	margin-left: 0;
 	margin-right: 0.5em;
+	margin-left: 0;
 }
 
 /*	$LOGIN		*/
@@ -1300,8 +1305,8 @@ div.labels {
 }
 
 .coppa_contact {
-	margin-left: 0;
 	margin-right: 5ex;
+	margin-left: 0;
 }
 
 /*	$ERRORS		*/
@@ -1315,8 +1320,8 @@ div.labels {
 
 .errorbox .listlevel1,
 .warningbox .listlevel1 {
-	padding-left: 0;
 	padding-right: 1em;
+	padding-left: 0;
 }
 
 .errorbox .alert {
@@ -1324,8 +1329,8 @@ div.labels {
 }
 
 .errorbox .smalltext {
-	padding-left: 0;
 	padding-right: 1em;
+	padding-left: 0;
 }
 
 /*	$PROGRESS	*/
@@ -1334,6 +1339,7 @@ div.labels {
 /*	$MEDIA		*/
 /* ------------------------------------------------------- */
 /* This one does 800 screens at default font size. */
+
 @media screen and (max-width: 50em) {
 	#main_menu .linklevel1 {
 		margin-right: 0;
@@ -1350,8 +1356,8 @@ div.labels {
 	}
 
 	#menu_sidebar {
-		left: auto;
 		right: -0.8em;
+		left: auto;
 	}
 
 	#menu_sidebar:hover {
@@ -1387,14 +1393,15 @@ div.labels {
 }
 
 /* This one does 540 and smaller screens at default font size. */
+
 @media screen and (max-width: 33.750em) {
 	dt, dd, dd label, .login dt, #advanced_search dt {
 		text-align: right;
 	}
 
 	dd {
-		padding-left: 0;
 		padding-right: 8% !important;
+		padding-left: 0;
 	}
 
 	#main_content_section {
@@ -1406,8 +1413,8 @@ div.labels {
 	}
 
 	#wrapper {
-		padding-left: 2px;
 		padding-right: 2px;
+		padding-left: 2px;
 	}
 
 	#gotop {
@@ -1450,8 +1457,8 @@ div.labels {
 	}
 
 	.listlevel2:hover .menulevel3, .listlevel2.sfhover .menulevel3 {
-		left: auto;
 		right: -4px;
+		left: auto;
 	}
 
 	#main_menu li ul li, .admin_menu li ul li {
@@ -1515,7 +1522,7 @@ div.labels {
 }
 
 #manage_boards li .floatleft:before {
+	float: right !important;
 	padding-right: 0 !important;
 	padding-left: 5px;
-	float: right !important;
 }

@@ -51,12 +51,12 @@ fieldset {
 }
 
 legend {
-	background: url(../../images/selected_open.png) no-repeat scroll right center transparent;
-	cursor: pointer;
+	margin-right: 15px;
+	margin-left: 0;
 	padding-right: 20px;
 	padding-left: 0;
-	margin-left: 0;
-	margin-right: 15px;
+	cursor: pointer;
+	background: url(../../images/selected_open.png) no-repeat scroll right center transparent;
 }
 
 .collapsed legend {
@@ -65,8 +65,8 @@ legend {
 
 /* The OpenID login form */
 .openid_login {
-	padding-left: 0;
 	padding-right: 20px;
+	padding-left: 0;
 	background-position: 98% 50%;
 }
 
@@ -81,8 +81,8 @@ legend {
 	/* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
-	border-left: 1px solid #AFAFAF;
 	border-right: 1px solid #BFBFBF;
+	border-left: 1px solid #AFAFAF;
 	box-shadow: -1px 1px 2px #E5E5E5;
 }
 
@@ -90,8 +90,8 @@ legend {
 .button_submit:hover, .right_submit:hover, .left_submit:hover,
 .button_reset:hover,
 .linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
-	border-left: 1px solid #CCCCCC;
 	border-right: 1px solid #AFAFAF;
+	border-left: 1px solid #CCCCCC;
 	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
 
@@ -129,8 +129,8 @@ legend {
 }
 
 #search_form .input_text {
-	border-radius: 0 2px 2px 0;
 	border-right: 1px solid #CCCCCC;
+	border-radius: 0 2px 2px 0;
 }
 
 #search_form input[type="submit"] {
@@ -155,8 +155,8 @@ legend {
 /* ------------------------------------------------------- */
 /* Level 1 Menu bar: link or button. General styling. */
 .linklevel1, .linklevel1:link, .linklevel1:visited {
-	border-left: 1px solid #AFAFAF;
 	border-right: 1px solid #BFBFBF;
+	border-left: 1px solid #AFAFAF;
 	box-shadow: -1px 1px 2px #E5E5E5;
 }
 
@@ -166,48 +166,49 @@ legend {
 .linklevel3:hover, .listlevel3:hover .linklevel3,
 #menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1,
 #menu_current_area > strong > .linklevel1 {
-	border-left: 1px solid #CCCCCC;
 	border-right: 1px solid #AFAFAF;
+	border-left: 1px solid #CCCCCC;
 	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
 
 .poster li.poster_online:hover .linklevel1 {
-	border-left: 1px solid #CCCCCC;
 	border-right: 1px solid #AFAFAF;
+	border-left: 1px solid #CCCCCC;
 	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
 
 .poster li.poster_online .nolink {
-	border-left: 1px solid #AFAFAF;
 	border-right: 1px solid #BFBFBF;
+	border-left: 1px solid #AFAFAF;
 	box-shadow: -1px 1px 2px #E5E5E5;
 }
 
 /* Level 1 active buttons. */
 .linklevel1.active, .listlevel1:hover .active,
 #collapse_button .linklevel1, .pm_indicator {
-	border-left: 1px solid #38642E;
 	border-right: 1px solid #38642D;
+	border-left: 1px solid #38642E;
 	box-shadow: -1px 1px 2px #BBBBBB;
 }
 
 /* Hover effects for those buttons. */
 .linklevel1.active:hover, .listlevel1:hover .linklevel1.active,
 #collapse_button .linklevel1:hover, .linklevel1:hover .pm_indicator {
-	border-left: 1px solid #5AA049;
 	border-right: 1px solid #2D5024;
+	border-left: 1px solid #5AA049;
 	box-shadow: -1px 1px 1px rgba(0, 0, 0, 0.3) inset;
 }
 
 /* Levels 2 and 3: drop menu wrapper. */
 .menulevel2, .menulevel3 {
-	border-left: 1px solid #AFAFAF;
 	border-right: 1px solid #BFBFBF;
+	border-left: 1px solid #AFAFAF;
 	box-shadow: -3px 3px 3px rgba(0, 0, 0, 0.2);
 }
 
 /* Tricky PM indicator. Define it carefully,
 /* just in case someone tries to use this class elsewhere. */
+
 .pm_indicator {
 	right: auto;
 	left: -0.4em;
@@ -285,8 +286,8 @@ legend {
 /*	$PAGELINKS	*/
 /* ------------------------------------------------------- */
 .pagelinks .navPages:hover, .pagelinks .current_page {
-	border-left: 1px solid #CCCCCC;
 	border-right: 1px solid #AFAFAF;
+	border-left: 1px solid #CCCCCC;
 	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
 
@@ -300,13 +301,13 @@ legend {
 
 /* our buddies &laquo; &raquo; */
 .small_pagelinks:before {
-	content: '\00AB';
 	float: right;
+	content: '\00AB';
 }
 
 .small_pagelinks:after {
-	content: '\00BB';
 	float: right;
+	content: '\00BB';
 }
 
 /* Globally accessible top/bottom links. */
@@ -447,14 +448,14 @@ legend {
 
 /* @todo - Save code by amalgamating common button background declarations. */
 .poster_online .linklevel1 {
-	border-left: 1px solid #AFAFAF;
 	border-right: 1px solid #BFBFBF;
+	border-left: 1px solid #AFAFAF;
 	box-shadow: -1px 1px 2px #EEEEEE;
 }
 
 .poster_online .linklevel1:hover {
-	border-left: 1px solid #CCCCCC;
 	border-right: 1px solid #BBBBBB;
+	border-left: 1px solid #CCCCCC;
 	box-shadow: -1px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
 
@@ -462,15 +463,15 @@ legend {
 .poster_avatar .linklevel1, .poster_avatar:hover .linklevel1,
 .poster_avatar .linklevel1:focus,
 .name.linklevel1, .name.linklevel1:hover, .name.linklevel1:focus {
-	background: none;
-	border: none;
-	box-shadow: none;
 	color: #4B863C;
+	border: none;
+	background: none;
+	box-shadow: none;
 }
 
 .requiredfield {
-	border-left: 1px solid #5AA049;
 	border-right: 1px solid #2D5024;
+	border-left: 1px solid #5AA049;
 }
 
 /*	$EDITOR		*/
@@ -483,10 +484,9 @@ legend {
 /* We can't control what jqueryui pollutes the DOM with, so deal with it */
 /* Styles for the profile summary tabs, or any jquery ui tabs */
 /* ---------------------------------------------------------- */
-
 .ui-tabs .ui-state-hover {
-	border-left: 1px solid #CCCCCC;
 	border-right: 1px solid #AFAFAF;
+	border-left: 1px solid #CCCCCC;
 }
 
 /* $PROFILE	*/
@@ -497,7 +497,6 @@ legend {
 
 /* $PERSONAL	*/
 /* ------------------------------------------------------- */
-
 #personal_messages .capacity_bar span {
 	border-right: 0;
 	border-left: 1px solid #ADADAD;
@@ -522,7 +521,6 @@ legend {
 
 /*	$ERRORS		*/
 /* ------------------------------------------------------- */
-
 .errorbox {
 	background: #FFEEEE url(../../images/profile/warning_mute.png) 99% 50% no-repeat;
 }
@@ -540,6 +538,7 @@ legend {
 /*	$MEDIA		*/
 
 /* This one does 800 screens at default font size. */
+
 @media screen and (max-width: 50em) {
 	#menu_sidebar {
 		box-shadow: -3px 3px 3px rgba(0, 0, 0, 0.3);
@@ -552,6 +551,7 @@ legend {
 }
 
 /* This one does up to 540 screens. */
+
 @media screen and (max-width: 33.750em) {
 	#gobottom {
 		border-radius: 0;

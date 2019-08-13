@@ -11,12 +11,12 @@
 #core_features, #entry_form,
 #groupForm, #mailqueue_stats, #manage_maintenance,
 #new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper {
-	background: #EEEEEE;
 	border-color: #CCCCCC;
+	background: #EEEEEE;
 	box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.1);
 }
 
-#admin_content .content  {
+#admin_content .content {
 	background: #EFEFEF;
 	box-shadow: none;
 }
@@ -27,15 +27,16 @@
 
 /* News and newsletters screen.
 ---------------------------------------------*/
+
 #admin_newsletters .information {
 	border-color: #CCCCCC;
 	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
 }
 
 #advanced_panel_header {
+	border-color: #CCCCCC;
 	background: #FEFEFE;
 	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-	border-color: #CCCCCC;
 }
 
 #welcome {
@@ -75,8 +76,8 @@
 }
 
 .quick_tasks {
-	box-shadow: none;
 	background: #FEFEFE;
+	box-shadow: none;
 }
 
 #quick_tasks li {
@@ -86,18 +87,20 @@
 
 /* Styles for the package manager.
 ------------------------------------------------- */
+
 #package_list li {
 	border-color: #A9CCD1;
 }
 
 #find_code, #replace_code {
-	background: #EEEEEE;
 	border-top-color: #999999;
 	border-bottom-color: #999999;
+	background: #EEEEEE;
 }
 
 /* Styles for the D&D indicators
 ------------------------------------------------- */
+
 #sort_email_fp td:nth-child(2):before,
 #custom_profile_fields td:nth-child(2):before,
 #message_icon_list td:nth-child(1):before,
@@ -107,24 +110,25 @@
 
 /* Styles for the manage boards section.
 ------------------------------------------------- */
+
 #manage_boards .recycle_board {
 	background: #D9EDF7;
 }
 
 #manage_boards ul li {
-	border-top-color: #cccccc;
+	border-top-color: #CCCCCC;
 }
 
 #manage_boards span.modify_boards a {
-	background: #FEFEFE;
-	border-color: #AFAFAF;
-	box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 	color: #222222;
+	border-color: #AFAFAF;
+	background: #FEFEFE;
+	box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 #manage_boards span.modify_boards a:hover {
-	background: #FEFEFE;
 	color: #444444;
+	background: #FEFEFE;
 	box-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
 }
 
@@ -149,14 +153,16 @@
 
 /* Styles for the manage maintenance section.
 ------------------------------------------------- */
+
 #manage_maintenance div.content {
-	background: none;
 	border-bottom-color: #CCCCCC;
+	background: none;
 	box-shadow: 0 1px 0 #FEFEFE;
 }
 
 /* Styles for the manage membergroups.
 ------------------------------------------------- */
+
 .select_category, .select_all_box {
 	border-top-color: #CCCCCC;
 	border-bottom-color: #CCCCCC;
@@ -164,6 +170,7 @@
 
 /* Styles for the manage permissions section.
 ------------------------------------------------- */
+
 .perm_boards li {
 	border-color: #A9CCD1;
 }
@@ -198,6 +205,7 @@
 
 /* Styles for the moderation center.
 ------------------------------------------------- */
+
 #modcenter {
 	background: none repeat scroll 0 0 #DEEDDA;
 	box-shadow: 1px 2px 3px #EEEEEE;
@@ -223,18 +231,16 @@
 
 /* Styles for the Report generation
 ------------------------------------------------- */
+
 .report_results th {
-	border-left-color: #DDDDDD;
 	border-right-color: #DDDDDD;
+	border-left-color: #DDDDDD;
 }
 
 /* alternate row colors on Modify Themes,Copy a template */
 .theme_options .content:nth-child(even), .theme_options li:nth-child(even) {
 	border-top-color: #CCCCCC;
 	border-bottom-color: #CCCCCC;
-}
-
-.theme_options .content:nth-child(even), .theme_options li:nth-child(even) {
 	background: #FEFEFE;
 }
 
@@ -248,10 +254,11 @@
 
 /* jQuery Dialog
 ------------------------------------------------- */
+
 .ui-dialog {
 	border-color: #999999;
-	box-shadow: 0 0 16px rgba(0, 0, 0, 0.3);
 	background-color: #F4F4F4;
+	box-shadow: 0 0 16px rgba(0, 0, 0, 0.3);
 }
 
 .ui-dialog .ui-dialog-titlebar {
@@ -259,14 +266,14 @@
 }
 
 .ui-widget-overlay {
-	background-color: #000000;
 	opacity: 0.3;
+	background-color: #000000;
 }
 
 /* This is the drag/drop placeholder, normally not visible */
 .ui-state-highlight {
-	background-color: #EEEEEE !important;
 	border-color: green !important;
+	background-color: #EEEEEE !important;
 }
 
 .sortable_smiley {

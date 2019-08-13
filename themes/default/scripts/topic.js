@@ -843,7 +843,6 @@ InTopicModeration.prototype.handleSubmit = function (sSubmitType)
 
 		default:
 			return false;
-		break;
 	}
 
 	oForm.submit();

@@ -11,6 +11,8 @@
  * relates to a plain text box (no sceditor invocation)
  */
 
+/*jshint -W069 */
+
 /**
  * The constructor for the plain text box auto-saver
  *

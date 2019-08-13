@@ -50,11 +50,11 @@
 /* Stop white band under footer on short pages. */
 /* This color should match $FOOTER background. */
 legend {
-	background: url(../../images/selected_open.png) no-repeat scroll right center transparent;
-	padding-left: 0;
-	padding-right: 20px;
-	margin-left: 0;
 	margin-right: 15px;
+	margin-left: 0;
+	padding-right: 20px;
+	padding-left: 0;
+	background: url(../../images/selected_open.png) no-repeat scroll right center transparent;
 }
 
 .collapsed legend {
@@ -63,8 +63,8 @@ legend {
 
 /* The OpenID login form */
 .openid_login {
-	padding-left: 0;
 	padding-right: 20px;
+	padding-left: 0;
 	background-position: 98% 50%;
 }
 
@@ -80,23 +80,23 @@ legend {
 
 /* More little boxes on a hillside. */
 .warningbox {
-	border-left: 1px solid #FFD324;
 	border-right: 5px solid #FFD324;
+	border-left: 1px solid #FFD324;
 }
 
 .successbox {
-	border-left: 1px solid #9ECE9E;
 	border-right: 5px solid #9ECE9E;
+	border-left: 1px solid #9ECE9E;
 }
 
 .infobox {
-	border-left: 1px solid #3A87AD;
 	border-right: 5px solid #3A87AD;
+	border-left: 1px solid #3A87AD;
 }
 
 .errorbox {
-	border-left: 1px solid #CE9E9E;
 	border-right: 5px solid #CE9E9E;
+	border-left: 1px solid #CE9E9E;
 }
 
 /*	$BBC		*/
@@ -108,8 +108,8 @@ legend {
 
 /* /me uses this a lot. (emote, try typing /me in a post.) */
 .meaction {
-	color: #50AA3A;
 	vertical-align: bottom;
+	color: #50AA3A;
 }
 
 /*	$AJAX		*/
@@ -118,8 +118,8 @@ legend {
 /*	$MAIN.		*/
 /* ------------------------------------------------------- */
 #search_form .input_text {
-	border-radius: 0 2px 2px 0;
 	border-right: 1px solid #CCCCCC;
+	border-radius: 0 2px 2px 0;
 }
 
 #search_form input[type="submit"] {
@@ -140,8 +140,8 @@ legend {
 /* ------------------------------------------------------- */
 /* Level 1 Menu bar: link or button. General styling. */
 .linklevel1, .linklevel1:link, .linklevel1:visited {
-	border-left: 1px solid #AFAFAF;
 	border-right: 1px solid #BFBFBF;
+	border-left: 1px solid #AFAFAF;
 	box-shadow: -1px 1px 2px #E5E5E5;
 }
 
@@ -151,20 +151,20 @@ legend {
 .linklevel3:hover, .listlevel3:hover .linklevel3,
 #menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1,
 #menu_current_area > strong > .linklevel1 {
-	border-left: 1px solid #CCCCCC;
 	border-right: 1px solid #AFAFAF;
+	border-left: 1px solid #CCCCCC;
 	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
 
 .poster li.poster_online:hover .linklevel1 {
-	border-left: 1px solid #CCCCCC;
 	border-right: 1px solid #AFAFAF;
+	border-left: 1px solid #CCCCCC;
 	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
 
 .poster li.poster_online .nolink {
-	border-left: 1px solid #AFAFAF;
 	border-right: 1px solid #BFBFBF;
+	border-left: 1px solid #AFAFAF;
 	box-shadow: -1px 1px 2px #E5E5E5;
 }
 
@@ -179,8 +179,8 @@ legend {
 	/* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
-	border-left: 1px solid #AFAFAF;
 	border-right: 1px solid #BFBFBF;
+	border-left: 1px solid #AFAFAF;
 	box-shadow: -1px 1px 2px #E5E5E5;
 }
 
@@ -188,17 +188,17 @@ legend {
 .button_submit:hover, .right_submit:hover, .left_submit:hover,
 .button_reset:hover,
 .linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
-	border-left: 1px solid #CCCCCC;
 	border-right: 1px solid #AFAFAF;
+	border-left: 1px solid #CCCCCC;
 	box-shadow: -2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 }
 
 /* Top level subsection indicators. */
 /* Level 1 active buttons. */
 .pm_indicator {
-	box-shadow: -1px 1px 2px #444444;
-	left: auto;
 	right: -1px;
+	left: auto;
+	box-shadow: -1px 1px 2px #444444;
 }
 
 /* Admin menu icons. */
@@ -224,13 +224,13 @@ legend {
 /* ------------------------------------------------------- */
 /* our buddies &laquo; &raquo; */
 .small_pagelinks:before {
-	content: '\00AB';
 	float: right;
+	content: '\00AB';
 }
 
 .small_pagelinks:after {
-	content: '\00BB';
 	float: right;
+	content: '\00BB';
 }
 
 /* Globally accessible top/bottom links. */
@@ -267,9 +267,9 @@ legend {
 }
 
 .board_stats {
-	text-align: right;
-	padding: 1px 0 1px 6px;
 	float: right;
+	padding: 1px 0 1px 6px;
+	text-align: right;
 }
 
 /*	$BOARDS		*/
@@ -303,8 +303,8 @@ legend {
 }
 
 .statsbar .bar {
-	background: #43A8DA;
 	border-radius: 0 4px 4px 0;
+	background: #43A8DA;
 }
 
 /* Styles for the $TABS	*/
@@ -312,13 +312,14 @@ legend {
 /* Styles for the profile summary tabs, or any jquery ui tabs */
 /* ---------------------------------------------------------- */
 .ui-tabs .ui-tabs-nav li {
-	box-shadow: -2px 0 0 rgba(0, 0, 0, 0.3);
-	margin-left: 0;
 	margin-right: 2px;
+	margin-left: 0;
+	box-shadow: -2px 0 0 rgba(0, 0, 0, 0.3);
 }
 
 /*	$MEDIA		*/
 /* This one does 800 screens at default font size. */
+
 @media screen and (max-width: 64em) {
 	.board_lastpost {
 		float: none;
@@ -326,6 +327,7 @@ legend {
 }
 
 /* This one does 800 screens at default font size. */
+
 @media screen and (max-width: 50em) {
 	#menu_sidebar {
 		box-shadow: -3px 3px 3px rgba(0, 0, 0, 0.3);
@@ -333,6 +335,7 @@ legend {
 }
 
 /* This one does up to 540 screens. */
+
 @media screen and (max-width: 33.750em) {
 	#gobottom {
 		border-radius: 0;
@@ -343,8 +346,8 @@ legend {
 	}
 
 	#forumtitle {
-		margin-left: 0;
 		margin-right: 10px;
+		margin-left: 0;
 	}
 
 	.topic_listing > li {

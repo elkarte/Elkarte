@@ -27,7 +27,9 @@ var ua = navigator.userAgent.toLowerCase(),
 	is_webkit = ua.indexOf('applewebkit') !== -1;
 	is_osx = navigator.platform.toUpperCase().indexOf('MAC') >= 0,
 	is_mobile = navigator.userAgent.indexOf('Mobi') !== -1, // Common mobile including Mozilla, Safari, IE, Opera, Chrome
+	/*jshint -W030 */
 	is_touch = 'ontouchstart' in window || window.DocumentTouch && document instanceof DocumentTouch;
+	/*jshint +W030 */
 
 // Versions of ie < 9 do not have this built in
 if (!('getElementsByClassName' in document))
@@ -937,7 +939,7 @@ function create_ajax_indicator_ele()
 
 	// Add the image in and link to turn it off.
 	var cancel_link = document.createElement('a');
-	cancel_link.href = 'javascript:ajax_indicator(false)';
+	cancel_link.href = 'javascript:ajax_indicator(false)'; // jshint ignore:line
 
 	var cancel_img = document.createElement('img');
 	cancel_img.src = elk_images_url + '/icons/quick_remove.png';

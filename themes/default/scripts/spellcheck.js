@@ -262,7 +262,7 @@ function nextWord(ignoreall)
 		while (document.forms.spellingForm.suggestions.options.length > 0)
 			document.forms.spellingForm.suggestions.options[0] = null;
 
-		alert(txt['done']);
+		alert(txt.done);
 		document.forms.spellingForm.change.disabled = true;
 		document.forms.spellingForm.changeall.disabled = true;
 		document.forms.spellingForm.ignore.disabled = true;

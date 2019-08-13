@@ -1,0 +1,5 @@
+node_modules
+**/jquery*
+**/*.min.js
+themes/default/scripts/qrcode.js
+themes/default/scripts/sha256.js
