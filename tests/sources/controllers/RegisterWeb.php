@@ -49,6 +49,7 @@ class TestRegisterController extends ElkArteWebTest
 	public function registerMember()
 	{
 		$username = 'testuser';
+		$display = 'itsMe';
 		$email = 'valid@emailaddress.net';
 		$password = 'ainttellin';
 
@@ -58,11 +59,12 @@ class TestRegisterController extends ElkArteWebTest
 		$this->assertEquals('Registration Agreement', $this->title());
 
 		// Accept the agreement, we should see the Registration form
-		$this->clickit('#confirm_buttons input[type="submit"]');
+		$this->clickit('#confirm_buttons input[name="accept_agreement"]');
 		$this->assertEquals('Registration Form', $this->title());
 
 		// Fill out the registration form
 		$this->byId('elk_autov_username')->value($username);
+		// $this->byId('elk_autov_displayname')->value($display);
 		$this->byId('elk_autov_reserve1')->value($email);
 		$this->byId('elk_autov_pwmain')->value($password);
 		$this->byId('elk_autov_pwverify')->value($password);
