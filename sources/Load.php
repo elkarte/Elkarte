@@ -152,6 +152,7 @@ function reloadSettings()
  *
  * @event integrate_verify_user allow for integration to verify a user
  * @event integrate_user_info to allow for adding to $user_info array
+ * @deprecated kept until any trace of $user_info has been completely removed
  */
 function loadUserSettings()
 {

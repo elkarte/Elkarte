@@ -19,6 +19,10 @@ namespace ElkArte;
  */
 class UserSettings
 {
+	const HASH_LENGTH = 4;
+
+	const BAN_OFFSET = 10;
+
 	protected $id = 0;
 
 	protected $username = '';
@@ -28,6 +32,8 @@ class UserSettings
 	protected $cache = null;
 
 	protected $req = null;
+
+	protected $hasher = null;
 
 	protected $settings = null;
 
@@ -66,47 +72,65 @@ class UserSettings
 		{
 			$user_info = $this->initGuest();
 		}
-		\ElkArte\Hooks::instance()->hook('integrate_user_info');
+		\ElkArte\Hooks::instance()->hook('integrate_user_info', [$user_info]);
 
 		$this->compileInfo($user_info);
 	}
 
-	public function rehashPassword($password, $user)
+	public function rehashPassword($password)
 	{
-		// Our hashing controller
-		require_once(EXTDIR . '/PasswordHash.php');
-
-		// Base-2 logarithm of the iteration count used for password stretching, the
-		// higher the number the more secure and CPU time consuming
-		$hash_cost_log2 = 10;
-
-		// Do we require the hashes to be portable to older systems (less secure)?
-		$hash_portable = false;
-
-		// Get an instance of the hasher
-		$hasher = new PasswordHash($hash_cost_log2, $hash_portable);
+		$this->initHasher();
 
 		// If the password is not 64 characters, lets make it a (SHA-256)
 		if (strlen($password) !== 64)
 		{
-			$password = hash('sha256', \ElkArte\Util::strtolower($user) . un_htmlspecialchars($password));
+			$password = hash('sha256', \ElkArte\Util::strtolower($this->username) . un_htmlspecialchars($password));
 		}
 
-		$passhash = $hasher->HashPassword($password);
+		$passhash = $this->hasher->HashPassword($password);
 
 		// Something is not right, we can not generate a valid hash that's <20 characters
 		if (strlen($passhash) < 20)
 		{
 			// @todo here we should throw an exception
-			$passhash = false;
+			return false;
 		}
-
-		unset($hasher);
-
-		if ($passhash !== false)
+		else
 		{
 			$this->settings->updatePassword($passhash);
 		}
+	}
+
+	protected function initHasher()
+	{
+		if ($this->hasher === null)
+		{
+			// Our hashing controller
+			require_once(EXTDIR . '/PasswordHash.php');
+
+			// Base-2 logarithm of the iteration count used for password stretching, the
+			// higher the number the more secure and CPU time consuming
+			$hash_cost_log2 = 10;
+
+			// Do we require the hashes to be portable to older systems (less secure)?
+			$hash_portable = false;
+
+			// Get an instance of the hasher
+			$this->hasher = new PasswordHash($hash_cost_log2, $hash_portable);
+		}
+	}
+
+	public function validatePassword($password)
+	{
+		$this->initHasher();
+
+		// If the password is not 64 characters, lets make it a (SHA-256)
+		if (strlen($password) !== 64)
+		{
+			$password = hash('sha256', \ElkArte\Util::strtolower($this->username) . un_htmlspecialchars($password));
+		}
+
+		return (bool) $this->hasher->CheckPassword($password, $this->settings->passwd);
 	}
 
 	protected function compileInfo($user_info)
@@ -175,7 +199,12 @@ class UserSettings
 			$user_info['query_wanna_see_board'] = '(' . $user_info['query_see_board'] . ' AND b.id_board NOT IN (' . implode(',', $user_info['ignoreboards']) . '))';
 		}
 
-		$this->info = new \ElkArte\ValuesContainer($user_info);
+		$this->info = new class($user_info) extends \ElkArte\ValuesContainer{
+			public function isFirstLogin()
+			{
+				return $this->data['last_login'] === 0;
+			}
+		};
 	}
 
 	protected function buildAvatarArray()
@@ -305,12 +334,30 @@ class UserSettings
 				$this->data['passwd'] = $password;
 
 				$tokenizer = new \ElkArte\TokenHash();
-				$this->data['password_salt'] = $tokenizer->generate_hash(4);
+				$this->data['password_salt'] = $tokenizer->generate_hash(UserSettings::HASH_LENGTH);
 			}
 
 			public function updateTotalTimeLoggedIn($increment_offset)
 			{
 				$this->data['total_time_logged_in'] += time() - $increment_offset;
+			}
+
+			public function fixSalt($force = false)
+			{
+				// Correct password, but they've got no salt; fix it!
+				if ($this->data['password_salt'] === '' || $force === true)
+				{
+					$tokenizer = new \ElkArte\TokenHash();
+
+					$this->data['password_salt'] = $tokenizer->generate_hash(UserSettings::HASH_LENGTH);
+					return true;
+				}
+				return false;
+			}
+
+			public function getActivationStatus($strip_ban = true)
+			{
+				return $this->data['is_activated'] > UserSettings::BAN_OFFSET ? $this->data['is_activated'] - UserSettings::BAN_OFFSET : $this->data['is_activated']
 			}
 		};
 	}

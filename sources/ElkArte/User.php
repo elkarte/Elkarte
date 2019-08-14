@@ -51,6 +51,13 @@ class User
 		}
 	}
 
+	public static function reloadByUser(\ElkArte\UserSettings $user)
+	{
+		self::$instance->reloadInfo($user);
+		self::$settings = $user;
+		self::$info = self::$instance->getInfo();
+	}
+
 	protected static function loadFromIntegration()
 	{
 		// Check first the integration, then the cookie, and last the session.

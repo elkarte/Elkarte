@@ -109,14 +109,16 @@ class Auth extends \ElkArte\AbstractController
 	 */
 	public function action_login2()
 	{
-		global $txt, $user_info, $user_settings, $modSettings, $context;
+		global $txt, $modSettings, $context;
 
 		// Load cookie authentication and all stuff.
 		require_once(SUBSDIR . '/Auth.subs.php');
 
 		// Beyond this point you are assumed to be a guest trying to login.
-		if (!$user_info['is_guest'])
+		if (empty(\ElkArte\User::$info->is_guest))
+		{
 			redirectexit();
+		}
 
 		// Are you guessing with a script?
 		checkSession('post');
@@ -213,10 +215,16 @@ class Auth extends \ElkArte\AbstractController
 		}
 
 		// Find them... if we can
-		$user_settings = loadExistingMember($_POST['user']);
+		$member_found = loadExistingMember($_POST['user']);
+		$db = database();
+		$cache = \ElkArte\Cache\Cache::instance();
+
+		$user = new \ElkArte\UserSettings($db, $cache, $this->_req);
+		$user->loadUserById($member_found['id_member'], true, '');
+		$user_setting = $user->getSettings();
 
 		// User using 2FA for login? Let's validate the token...
-		if (!empty($modSettings['enableOTP']) && !empty($user_settings['enable_otp']) && empty($_POST['otp_token']))
+		if (!empty($modSettings['enableOTP']) && !empty($user_setting['enable_otp']) && empty($_POST['otp_token']))
 		{
 			$context['login_errors'] = array($txt['otp_required']);
 			return false;
@@ -227,15 +235,15 @@ class Auth extends \ElkArte\AbstractController
 			require_once(EXTDIR . '/GoogleAuthenticator.php');
 			$ga = New \GoogleAuthenticator();
 
-			$ga->getCode($user_settings['otp_secret']);
-			$checkResult = $ga->verifyCode($user_settings['otp_secret'], $_POST['otp_token'], 2);
+			$ga->getCode($user_setting['otp_secret']);
+			$checkResult = $ga->verifyCode($user_setting['otp_secret'], $_POST['otp_token'], 2);
 			if (!$checkResult)
 			{
 				$context['login_errors'] = array($txt['invalid_otptoken']);
 				return false;
 			}
 			// OTP already used? Sorry, but this is a ONE TIME password..
-			if ($user_settings['otp_used'] == $_POST['otp_token'])
+			if ($user_setting['otp_used'] == $_POST['otp_token'])
 			{
 				$context['login_errors'] = array($txt['otp_used']);
 				return false;
@@ -243,7 +251,7 @@ class Auth extends \ElkArte\AbstractController
 		}
 
 		// Let them try again, it didn't match anything...
-		if (empty($user_settings))
+		if (empty($member_found))
 		{
 			$context['login_errors'] = array($txt['username_no_exist']);
 			return false;
@@ -253,21 +261,21 @@ class Auth extends \ElkArte\AbstractController
 		if (isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) === 64)
 		{
 			// Challenge what was passed
-			$valid_password = validateLoginPassword($_POST['hash_passwrd'], $user_settings['passwd']);
+			$valid_password = $user->validatePassword($_POST['hash_passwrd']);
 
 			// Let them in
-			if ($valid_password)
+			if ($valid_password === true)
 			{
 				$sha_passwd = $_POST['hash_passwrd'];
-				$valid_password = true;
 			}
 			// Maybe is an old SHA-1 and needs upgrading if the db string is an actual 40 hexchar SHA-1
-			elseif (preg_match('/^[0-9a-f]{40}$/i', $user_settings['passwd']) && isset($_POST['old_hash_passwrd']) && $_POST['old_hash_passwrd'] === hash('sha1', $user_settings['passwd'] . $_SESSION['session_value']))
+			elseif (preg_match('/^[0-9a-f]{40}$/i', $user_setting['passwd']) && isset($_POST['old_hash_passwrd']) && $_POST['old_hash_passwrd'] === hash('sha1', $user_setting['passwd'] . $_SESSION['session_value']))
 			{
 				// Old password passed, turn off hashing and ask for it again so we can update the db to something more secure.
 				$context['login_errors'] = array($txt['login_hash_error']);
 				$context['disable_login_hashing'] = true;
-				unset($user_settings);
+				$user->loadUserById(0, true, '');
+				\ElkArte\User::reloadByUser($user);
 
 				return false;
 			}
@@ -275,21 +283,24 @@ class Auth extends \ElkArte\AbstractController
 			else
 			{
 				// Don't allow this!
-				validatePasswordFlood($user_settings['id_member'], $user_settings['passwd_flood']);
+				validatePasswordFlood($user_setting['id_member'], $user_setting['passwd_flood']);
 
 				$_SESSION['failed_login'] = isset($_SESSION['failed_login']) ? ($_SESSION['failed_login'] + 1) : 1;
 
 				// To many tries, maybe they need a reminder
 				if ($_SESSION['failed_login'] >= $modSettings['failed_login_threshold'])
+				{
 					redirectexit('action=reminder');
+				}
 				else
 				{
-					\ElkArte\Errors\Errors::instance()->log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', 'user');
+					\ElkArte\Errors\Errors::instance()->log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_setting['member_name'] . '</span>', 'user');
 
 					// Wrong password, lets enable plain text responses in case form hashing is causing problems
 					$context['disable_login_hashing'] = true;
 					$context['login_errors'] = array($txt['incorrect_password']);
-					unset($user_settings);
+					$user->loadUserById(0, true, '');
+					\ElkArte\User::reloadByUser($user);
 
 					return false;
 				}
@@ -300,28 +311,26 @@ class Auth extends \ElkArte\AbstractController
 		{
 			// validateLoginPassword will hash this like the form normally would and check its valid
 			$sha_passwd = $_POST['passwrd'];
-			$valid_password = validateLoginPassword($sha_passwd, $user_settings['passwd'], $user_settings['member_name']);
+			$valid_password = $user->validatePassword($sha_passwd);
 		}
 
 		// Bad password!  Thought you could fool the database?!
 		if ($valid_password === false)
 		{
 			// Let's be cautious, no hacking please. thanx.
-			validatePasswordFlood($user_settings['id_member'], $user_settings['passwd_flood']);
+			validatePasswordFlood($user_setting['id_member'], $user_setting['passwd_flood']);
 
 			// Maybe we were too hasty... let's try some other authentication methods.
-			$other_passwords = $this->_other_passwords($user_settings);
+			$other_passwords = $this->_other_passwords($_POST['passwrd'], $user_setting['password_salt'], $user_setting['passwd'], $user_setting['member_name']);
 
 			// Whichever encryption it was using, let's make it use ElkArte's now ;).
-			if (in_array($user_settings['passwd'], $other_passwords))
+			if (in_array($user_setting['passwd'], $other_passwords))
 			{
-				$tokenizer = new \ElkArte\TokenHash();
-				$user_settings['passwd'] = validateLoginPassword($sha_passwd, '', '', true);
-				$user_settings['password_salt'] = $tokenizer->generate_hash(4);
+				$user->rehashPassword($sha_passwd);
 
 				// Update the password hash and set up the salt.
 				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData($user_settings['id_member'], array('passwd' => $user_settings['passwd'], 'password_salt' => $user_settings['password_salt'], 'passwd_flood' => ''));
+				updateMemberData($user_setting['id_member'], array('passwd' => $user_setting['passwd'], 'password_salt' => $user_setting['password_salt'], 'passwd_flood' => ''));
 			}
 			// Okay, they for sure didn't enter the password!
 			else
@@ -336,43 +345,43 @@ class Auth extends \ElkArte\AbstractController
 				else
 				{
 					// Log an error so we know that it didn't go well in the error log.
-					\ElkArte\Errors\Errors::instance()->log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', 'user');
+					\ElkArte\Errors\Errors::instance()->log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_setting['member_name'] . '</span>', 'user');
 
 					$context['login_errors'] = array($txt['incorrect_password']);
 					return false;
 				}
 			}
 		}
-		elseif (!empty($user_settings['passwd_flood']))
+		elseif (!empty($user_setting['passwd_flood']))
 		{
 			// Let's be sure they weren't a little hacker.
-			validatePasswordFlood($user_settings['id_member'], $user_settings['passwd_flood'], true);
+			validatePasswordFlood($user_setting['id_member'], $user_setting['passwd_flood'], true);
 
 			// If we got here then we can reset the flood counter.
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($user_settings['id_member'], array('passwd_flood' => ''));
+			updateMemberData($user_setting['id_member'], array('passwd_flood' => ''));
 		}
 
-		// Correct password, but they've got no salt; fix it!
-		if ($user_settings['password_salt'] === '')
+		if ($user_setting->fixSalt() === true)
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			$tokenizer = new \ElkArte\TokenHash();
-			$user_settings['password_salt'] = $tokenizer->generate_hash(4);
-			updateMemberData($user_settings['id_member'], array('password_salt' => $user_settings['password_salt']));
+			updateMemberData($user_setting['id_member'], array('password_salt' => $user_setting['password_salt']));
 		}
+
 
 		// Let's track the last used one-time password.
 		if (!empty($_POST['otp_token']))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($user_settings['id_member'], array('otp_used' => (int) $_POST['otp_token']));
+			updateMemberData($user_setting['id_member'], array('otp_used' => (int) $_POST['otp_token']));
 		}
 		// Check their activation status.
 		if (!checkActivation())
+		{
 			return false;
+		}
 
-		doLogin();
+		doLogin($user);
 	}
 
 	/**
@@ -390,40 +399,46 @@ class Auth extends \ElkArte\AbstractController
 	 */
 	public function action_logout($internal = false, $redirect = true)
 	{
-		global $user_info, $user_settings;
-
 		// Make sure they aren't being auto-logged out.
 		if (!$internal)
+		{
 			checkSession('get');
+		}
 
 		require_once(SUBSDIR . '/Auth.subs.php');
 
 		if (isset($_SESSION['pack_ftp']))
+		{
 			$_SESSION['pack_ftp'] = null;
+		}
 
 		// They cannot be open ID verified any longer.
 		if (isset($_SESSION['openid']))
+		{
 			unset($_SESSION['openid']);
+		}
 
 		// It won't be first login anymore.
 		unset($_SESSION['first_login']);
 
 		// Just ensure they aren't a guest!
-		if (!$user_info['is_guest'])
+		if (empty(\ElkArte\User::$info['is_guest']))
 		{
 			// Pass the logout information to integrations.
-			call_integration_hook('integrate_logout', array($user_settings['member_name']));
+			call_integration_hook('integrate_logout', array(\ElkArte\User::$settings['member_name']));
 
 			// If you log out, you aren't online anymore :P.
 			require_once(SUBSDIR . '/Logging.subs.php');
-			logOnline($user_info['id'], false);
+			logOnline(\ElkArte\User::$info['id'], false);
 		}
 
 		// Logout? Let's kill the admin/moderate/other sessions, too.
 		$types = array('admin', 'moderate');
 		call_integration_hook('integrate_validateSession', array(&$types));
 		foreach ($types as $type)
+		{
 			unset($_SESSION[$type . '_time']);
+		}
 
 		$_SESSION['log_time'] = 0;
 
@@ -432,18 +447,20 @@ class Auth extends \ElkArte\AbstractController
 
 		// And some other housekeeping while we're at it.
 		session_destroy();
-		if (!empty($user_info['id']))
+		if (!empty(\ElkArte\User::$info['id']))
 		{
-			$tokenizer = new \ElkArte\TokenHash();
+			\ElkArte\User::$settings->fixSalt(true);
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($user_info['id'], array('password_salt' => $tokenizer->generate_hash(4)));
+			updateMemberData(\ElkArte\User::$info['id'], array('password_salt' => \ElkArte\User::$settings['password_salt']));
 		}
 
 		// Off to the merry board index we go!
 		if ($redirect)
 		{
 			if (empty($_SESSION['logout_url']))
+			{
 				redirectexit('', detectServer()->is('needs_login_fix'));
+			}
 			elseif (!empty($_SESSION['logout_url']) && (substr($_SESSION['logout_url'], 0, 7) !== 'http://' && substr($_SESSION['logout_url'], 0, 8) !== 'https://'))
 			{
 				unset($_SESSION['logout_url']);
@@ -518,7 +535,7 @@ class Auth extends \ElkArte\AbstractController
 	 */
 	public function action_check()
 	{
-		global $user_info, $modSettings, $user_settings;
+		global $user_info, $modSettings;
 
 		// Only our members, please.
 		if (!$user_info['is_guest'])
@@ -528,7 +545,7 @@ class Auth extends \ElkArte\AbstractController
 				throw new \ElkArte\Exceptions\Exception('login_cookie_error', false);
 
 			$user_info['can_mod'] = allowedTo('access_mod_center') || (!$user_info['is_guest'] && ($user_info['mod_cache']['gq'] != '0=1' || $user_info['mod_cache']['bq'] != '0=1' || ($modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']))));
-			if ($user_info['can_mod'] && isset($user_settings['openid_uri']) && empty($user_settings['openid_uri']))
+			if ($user_info['can_mod'] && isset(\ElkArte\User::$settings['openid_uri']) && empty(\ElkArte\User::$settings['openid_uri']))
 			{
 				$_SESSION['moderate_time'] = time();
 				unset($_SESSION['just_registered']);
@@ -568,82 +585,84 @@ class Auth extends \ElkArte\AbstractController
 	 * - Used when a board is converted to see if the user credentials and a 3rd
 	 * party hash satisfy whats in the db passwd field
 	 *
-	 * @param mixed[] $user_settings
+	 * @param string $member_name
+	 * @param string $passwrd
+	 * @param string $password_salt
 	 *
 	 * @return array
 	 */
-	private function _other_passwords($user_settings)
+	private function _other_passwords($posted_password, $member_name, $passwrd, $password_salt)
 	{
 		global $modSettings;
 
 		// What kind of data are we dealing with
-		$pw_strlen = strlen($user_settings['passwd']);
+		$pw_strlen = strlen($passwrd);
 
 		// Start off with none, that's safe
 		$other_passwords = array();
 
 		// None of the below cases will be used most of the time (because the salt is normally set.)
-		if (!empty($modSettings['enable_password_conversion']) && $user_settings['password_salt'] === '')
+		if (!empty($modSettings['enable_password_conversion']) && $password_salt === '')
 		{
 			// YaBB SE, Discus, MD5 (used a lot), SHA-1 (used some), SMF 1.0.x, IkonBoard, and none at all.
-			$other_passwords[] = crypt($_POST['passwrd'], substr($_POST['passwrd'], 0, 2));
-			$other_passwords[] = crypt($_POST['passwrd'], substr($user_settings['passwd'], 0, 2));
-			$other_passwords[] = md5($_POST['passwrd']);
-			$other_passwords[] = sha1($_POST['passwrd']);
-			$other_passwords[] = md5_hmac($_POST['passwrd'], strtolower($user_settings['member_name']));
-			$other_passwords[] = md5($_POST['passwrd'] . strtolower($user_settings['member_name']));
-			$other_passwords[] = md5(md5($_POST['passwrd']));
-			$other_passwords[] = $_POST['passwrd'];
+			$other_passwords[] = crypt($posted_password, substr($posted_password, 0, 2));
+			$other_passwords[] = crypt($posted_password, substr($passwrd, 0, 2));
+			$other_passwords[] = md5($posted_password);
+			$other_passwords[] = sha1($posted_password);
+			$other_passwords[] = md5_hmac($posted_password, strtolower($member_name));
+			$other_passwords[] = md5($posted_password . strtolower($member_name));
+			$other_passwords[] = md5(md5($posted_password));
+			$other_passwords[] = $posted_password;
 
 			// This one is a strange one... MyPHP, crypt() on the MD5 hash.
-			$other_passwords[] = crypt(md5($_POST['passwrd']), md5($_POST['passwrd']));
+			$other_passwords[] = crypt(md5($posted_password), md5($posted_password));
 
 			// SHA-256
 			if ($pw_strlen === 64)
 			{
 				// Snitz style
-				$other_passwords[] = bin2hex(hash('sha256', $_POST['passwrd']));
+				$other_passwords[] = bin2hex(hash('sha256', $posted_password));
 
 				// Normal SHA-256
-				$other_passwords[] = hash('sha256', $_POST['passwrd']);
+				$other_passwords[] = hash('sha256', $posted_password);
 			}
 
 			// phpBB3 users new hashing.  We now support it as well ;).
-			$other_passwords[] = phpBB3_password_check($_POST['passwrd'], $user_settings['passwd']);
+			$other_passwords[] = phpBB3_password_check($posted_password, $passwrd);
 
 			// APBoard 2 Login Method.
-			$other_passwords[] = md5(crypt($_POST['passwrd'], 'CRYPT_MD5'));
+			$other_passwords[] = md5(crypt($posted_password, 'CRYPT_MD5'));
 
 			// Xenforo 1.2+
-			$other_passwords[] = crypt($_POST['passwrd'], $user_settings['passwd']);
+			$other_passwords[] = crypt($posted_password, $passwrd);
 		}
 		// The hash should be 40 if it's SHA-1, so we're safe with more here too.
 		elseif (!empty($modSettings['enable_password_conversion']) && $pw_strlen === 32)
 		{
 			// vBulletin 3 style hashing?  Let's welcome them with open arms \o/.
-			$other_passwords[] = md5(md5($_POST['passwrd']) . stripslashes($user_settings['password_salt']));
+			$other_passwords[] = md5(md5($posted_password) . stripslashes($password_salt));
 
 			// Hmm.. p'raps it's Invision 2 style?
-			$other_passwords[] = md5(md5($user_settings['password_salt']) . md5($_POST['passwrd']));
+			$other_passwords[] = md5(md5($password_salt) . md5($posted_password));
 
 			// Some common md5 ones.
-			$other_passwords[] = md5($user_settings['password_salt'] . $_POST['passwrd']);
-			$other_passwords[] = md5($_POST['passwrd'] . $user_settings['password_salt']);
+			$other_passwords[] = md5($password_salt . $posted_password);
+			$other_passwords[] = md5($posted_password . $password_salt);
 		}
 		// The hash is 40 characters, lets try some SHA-1 style auth
 		elseif ($pw_strlen === 40)
 		{
 			// Maybe they are using a hash from before our password upgrade
-			$other_passwords[] = sha1(strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']));
-			$other_passwords[] = sha1($user_settings['passwd'] . $_SESSION['session_value']);
+			$other_passwords[] = sha1(strtolower($member_name) . un_htmlspecialchars($posted_password));
+			$other_passwords[] = sha1($passwrd . $_SESSION['session_value']);
 
 			if (!empty($modSettings['enable_password_conversion']))
 			{
 				// BurningBoard3 style of hashing.
-				$other_passwords[] = sha1($user_settings['password_salt'] . sha1($user_settings['password_salt'] . sha1($_POST['passwrd'])));
+				$other_passwords[] = sha1($password_salt . sha1($password_salt . sha1($posted_password)));
 
 				// PunBB 1.4 and later
-				$other_passwords[] = sha1($user_settings['password_salt'] . sha1($_POST['passwrd']));
+				$other_passwords[] = sha1($password_salt . sha1($posted_password));
 			}
 
 			// Perhaps we converted from a non UTF-8 db and have a valid password being hashed differently.
@@ -651,32 +670,32 @@ class Auth extends \ElkArte\AbstractController
 			{
 				// Try iconv first, for no particular reason.
 				if (function_exists('iconv'))
-					$other_passwords['iconv'] = sha1(strtolower(iconv('UTF-8', $modSettings['previousCharacterSet'], $user_settings['member_name'])) . un_htmlspecialchars(iconv('UTF-8', $modSettings['previousCharacterSet'], $_POST['passwrd'])));
+					$other_passwords['iconv'] = sha1(strtolower(iconv('UTF-8', $modSettings['previousCharacterSet'], $member_name)) . un_htmlspecialchars(iconv('UTF-8', $modSettings['previousCharacterSet'], $posted_password)));
 
 				// Say it aint so, iconv failed!
 				if (empty($other_passwords['iconv']) && function_exists('mb_convert_encoding'))
-					$other_passwords[] = sha1(strtolower(mb_convert_encoding($user_settings['member_name'], 'UTF-8', $modSettings['previousCharacterSet'])) . un_htmlspecialchars(mb_convert_encoding($_POST['passwrd'], 'UTF-8', $modSettings['previousCharacterSet'])));
+					$other_passwords[] = sha1(strtolower(mb_convert_encoding($member_name, 'UTF-8', $modSettings['previousCharacterSet'])) . un_htmlspecialchars(mb_convert_encoding($posted_password, 'UTF-8', $modSettings['previousCharacterSet'])));
 			}
 		}
 		// SHA-256 will be 64 characters long, lets check some of these possibilities
 		elseif (!empty($modSettings['enable_password_conversion']) && $pw_strlen === 64)
 		{
 			// PHP-Fusion7
-			$other_passwords[] = hash_hmac('sha256', $_POST['passwrd'], $user_settings['password_salt']);
+			$other_passwords[] = hash_hmac('sha256', $posted_password, $password_salt);
 
 			// Plain SHA-256?
-			$other_passwords[] = hash('sha256', $_POST['passwrd'] . $user_settings['password_salt']);
+			$other_passwords[] = hash('sha256', $posted_password . $password_salt);
 
 			// Xenforo?
-			$other_passwords[] = sha1(sha1($_POST['passwrd']) . $user_settings['password_salt']);
-			$other_passwords[] = hash('sha256', (hash('sha256', ($_POST['passwrd']) . $user_settings['password_salt'])));
+			$other_passwords[] = sha1(sha1($posted_password) . $password_salt);
+			$other_passwords[] = hash('sha256', (hash('sha256', ($posted_password) . $password_salt)));
 		}
 
 		// ElkArte's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
 		if (stripos(PHP_OS, 'win') !== 0)
 		{
 			require_once(SUBSDIR . '/Compat.subs.php');
-			$other_passwords[] = sha1_smf(strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']));
+			$other_passwords[] = sha1_smf(strtolower($member_name) . un_htmlspecialchars($posted_password));
 		}
 
 		// Allows mods to easily extend the $other_passwords array
@@ -703,30 +722,32 @@ class Auth extends \ElkArte\AbstractController
  */
 function checkActivation()
 {
-	global $context, $txt, $user_settings, $modSettings;
+	global $context, $txt, $modSettings;
 
 	if (!isset($context['login_errors']))
 		$context['login_errors'] = array();
 
 	// What is the true activation status of this account?
-	$activation_status = $user_settings['is_activated'] > 10 ? $user_settings['is_activated'] - 10 : $user_settings['is_activated'];
+	$activation_status = \ElkArte\User::$settings->getActivationStatus();
 
 	// Check if the account is activated - COPPA first...
 	if ($activation_status == 5)
 	{
-		$context['login_errors'][] = $txt['coppa_no_concent'] . ' <a href="' . getUrl('action', ['action' => 'register', 'sa' => 'coppa', 'member' => $user_settings['id_member']]) . '">' . $txt['coppa_need_more_details'] . '</a>';
+		$context['login_errors'][] = $txt['coppa_no_concent'] . ' <a href="' . getUrl('action', ['action' => 'register', 'sa' => 'coppa', 'member' => \ElkArte\User::$settings['id_member']]) . '">' . $txt['coppa_need_more_details'] . '</a>';
 		return false;
 	}
 	// Awaiting approval still?
 	elseif ($activation_status == 3)
+	{
 		throw new \ElkArte\Exceptions\Exception('still_awaiting_approval', 'user');
+	}
 	// Awaiting deletion, changed their mind?
 	elseif ($activation_status == 4)
 	{
 		if (isset($_REQUEST['undelete']))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($user_settings['id_member'], array('is_activated' => 1));
+			updateMemberData(\ElkArte\User::$settings['id_member'], array('is_activated' => 1));
 			updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > 0 ? $modSettings['unapprovedMembers'] - 1 : 0)));
 		}
 		else
@@ -740,9 +761,9 @@ function checkActivation()
 	// Standard activation?
 	elseif ($activation_status != 1)
 	{
-		\ElkArte\Errors\Errors::instance()->log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', false);
+		\ElkArte\Errors\Errors::instance()->log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . \ElkArte\User::$settings['member_name'] . '</span>', false);
 
-		$context['login_errors'][] = $txt['activate_not_completed1'] . ' <a class="linkbutton" href="' . getUrl('action', ['action' => 'register', 'sa' => 'activate', 'resend', 'u' => $user_settings['id_member']]) . '">' . $txt['activate_not_completed2'] . '</a>';
+		$context['login_errors'][] = $txt['activate_not_completed1'] . ' <a class="linkbutton" href="' . getUrl('action', ['action' => 'register', 'sa' => 'activate', 'resend', 'u' => \ElkArte\User::$settings['id_member']]) . '">' . $txt['activate_not_completed2'] . '</a>';
 		return false;
 	}
 	return true;
@@ -754,41 +775,44 @@ function checkActivation()
  * What it does:
  *  - It sets the cookie, it call hooks, updates runtime settings for the user.
  *
+ * @param \ElkArte\UserSettings $user
+ *
  * @package Authorization
  */
-function doLogin()
+function doLogin(\ElkArte\UserSettings $user)
 {
-	global $user_info, $user_settings, $maintenance, $modSettings, $context;
+	global $user_info, $maintenance, $modSettings, $context;
 
 	// Load authentication stuffs.
 	require_once(SUBSDIR . '/Auth.subs.php');
 
-	// Call login integration functions.
-	call_integration_hook('integrate_login', array($user_settings['member_name'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 64 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime']));
+	\ElkArte\User::reloadByUser($user);
+	// @deprecated kept until any trace of $user_info has been completely removed
+	$user_info = \ElkArte\User::$info;
 
-	// Get ready to set the cookie...
-	$user_info['id'] = $user_settings['id_member'];
+	// Call login integration functions.
+	call_integration_hook('integrate_login', array($user_setting['member_name'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 64 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime']));
 
 	// Bam!  Cookie set.  A session too, just in case.
-	setLoginCookie(60 * $modSettings['cookieTime'], $user_settings['id_member'], hash('sha256', ($user_settings['passwd'] . $user_settings['password_salt'])));
+	setLoginCookie(60 * $modSettings['cookieTime'], \ElkArte\User::$settings['id_member'], hash('sha256', (\ElkArte\User::$settings['passwd'] . \ElkArte\User::$settings['password_salt'])));
 
 	// Reset the login threshold.
 	if (isset($_SESSION['failed_login']))
+	{
 		unset($_SESSION['failed_login']);
-
-	$user_info['is_guest'] = false;
-	$user_settings['additional_groups'] = explode(',', $user_settings['additional_groups']);
-	$user_info['is_admin'] = $user_settings['id_group'] == 1 || in_array(1, $user_settings['additional_groups']);
+	}
 
 	// Are you banned?
 	is_not_banned(true);
 
 	// An administrator, set up the login so they don't have to type it again.
-	if ($user_info['is_admin'] && isset($user_settings['openid_uri']) && empty($user_settings['openid_uri']))
+	if (\ElkArte\User::$info['is_admin'] && isset(\ElkArte\User::$settings['openid_uri']) && empty(\ElkArte\User::$settings['openid_uri']))
 	{
 		// Let's validate if they really want..
 		if (!empty($modSettings['auto_admin_session']) && $modSettings['auto_admin_session'] == 1)
+		{
 			$_SESSION['admin_time'] = time();
+		}
 
 		unset($_SESSION['just_registered']);
 	}
@@ -797,10 +821,14 @@ function doLogin()
 	unset($_SESSION['language'], $_SESSION['id_theme']);
 
 	// We want to know if this is first login
-	if (isFirstLogin($user_info['id']))
+	if (\ElkArte\User::$info->isFirstLogin())
+	{
 		$_SESSION['first_login'] = true;
+	}
 	else
+	{
 		unset($_SESSION['first_login']);
+	}
 
 	// You're one of us: need to know all about you now, IP, stuff.
 	$req = request();
