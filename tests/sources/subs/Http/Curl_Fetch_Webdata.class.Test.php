@@ -25,9 +25,9 @@ class TestCurlFetchWebdata extends \PHPUnit\Framework\TestCase
 			),
 			array(
 				'https://duckduckgo.com/html',
-				array('q' => 'elkarte is a modern site:elkarte.net', 'ia' => 'about'),
+				array('q' => 'elkarte+forum', 'ia' => 'about'),
 				200,
-				'ElkArte is a modern, powerful community building forum software.',
+				'ElkArte, Free and Open Source Community Forum Software',
 			),
 		);
 

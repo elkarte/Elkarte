@@ -37,20 +37,6 @@ matrix:
         - stylelint "**/*.css"
       after_script:
       # nothing
-    - language: node_js
-      node_js:
-        - "node"
-      php:
-        # none
-      install:
-        - npm install --save-dev jshint stylelint stylelint-order stylelint-config-recommended
-      before_script:
-        # nothing
-      script:
-        - node_modules/jshint/bin/jshint .
-        - stylelint "**/*.css"
-      after_script:
-        # nothing
   fast_finish: true
 
 services:
