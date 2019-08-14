@@ -16,12 +16,14 @@
 
 namespace ElkArte\Subscriptions\PaymentGateway\PayPal;
 
+use ElkArte\Subscriptions\PaymentGateway\DisplayInterface;
+
 /**
  * Class for returning available form data for this gateway
  *
  * @package Subscriptions
  */
-class Display
+class Display implements DisplayInterface
 {
 	/**
 	 * Name of this payment gateway

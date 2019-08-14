@@ -357,6 +357,7 @@ function printMemberListRows($request)
 		$context['members'][$member]['id_group'] = empty($context['members'][$member]['group']) ? $context['members'][$member]['post_group'] : $context['members'][$member]['group'];
 		$context['members'][$member]['date_registered'] = $context['members'][$member]['registered'];
 
+		$member_options = $context['members'][$member]['options'];
 		// Take care of the custom fields if any are being displayed
 		if (!empty($context['custom_profile_fields']['columns']))
 		{
@@ -365,44 +366,45 @@ function printMemberListRows($request)
 				$curField = substr($key, 5);
 
 				// Does this member even have it filled out?
-				if (!isset($context['members'][$member]['options'][$curField]) && $context['custom_profile_fields']['columns'][$key]['default_value'] === '')
+				if (!isset($member_options[$curField]) && $context['custom_profile_fields']['columns'][$key]['default_value'] === '')
 				{
-					$context['members'][$member]['options'][$curField] = '';
+					$member_options[$curField] = '';
 					continue;
 				}
 				// Otherwise use the default value
-				if (!isset($context['members'][$member]['options'][$curField]))
+				if (!isset($member_options[$curField]))
 				{
-					$context['members'][$member]['options'][$curField] = $context['custom_profile_fields']['columns'][$key]['default_value'];
-					$context['members'][$member]['options'][$curField . '_key'] = $curField . '_0';
+					$member_options[$curField] = $context['custom_profile_fields']['columns'][$key]['default_value'];
+					$member_options[$curField . '_key'] = $curField . '_0';
 				}
 
 				// Should it be enclosed for display?
-				if (!empty($column['enclose']) && !empty($context['members'][$member]['options'][$curField]))
+				if (!empty($column['enclose']) && !empty($member_options[$curField]))
 				{
 					$replacements = array(
 						'{SCRIPTURL}' => $scripturl,
 						'{IMAGES_URL}' => $settings['images_url'],
 						'{DEFAULT_IMAGES_URL}' => $settings['default_images_url'],
-						'{INPUT}' => $context['members'][$member]['options'][$curField],
+						'{INPUT}' => $member_options[$curField],
 					);
 					if (in_array($column['type'], array('radio', 'select')))
 					{
-						$replacements['{KEY}'] = $context['members'][$member]['options'][$curField . '_key'];
+						$replacements['{KEY}'] = $member_options[$curField . '_key'];
 					}
-					$context['members'][$member]['options'][$curField] = strtr($column['enclose'], $replacements);
+					$member_options[$curField] = strtr($column['enclose'], $replacements);
 				}
 
 				// Anything else to make it look "nice"
 				if ($column['bbc'])
 				{
-					$context['members'][$member]['options'][$curField] = strip_tags($bbc_parser->parseCustomFields($context['members'][$member]['options'][$curField]));
+					$member_options[$curField] = strip_tags($bbc_parser->parseCustomFields($member_options[$curField]));
 				}
 				elseif ($column['type'] === 'check')
 				{
-					$context['members'][$member]['options'][$curField] = $context['members'][$member]['options'][$curField] == 0 ? $txt['no'] : $txt['yes'];
+					$member_options[$curField] = $member_options[$curField] == 0 ? $txt['no'] : $txt['yes'];
 				}
 			}
 		}
+		$context['members'][$member]['options'] = $member_options;
 	}
 }

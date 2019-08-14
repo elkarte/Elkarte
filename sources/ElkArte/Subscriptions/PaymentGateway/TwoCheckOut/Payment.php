@@ -16,12 +16,14 @@
 
 namespace ElkArte\Subscriptions\PaymentGateway\TwoCheckOut;
 
+use ElkArte\Subscriptions\PaymentGateway\PaymentInterface;
+
 /**
  * Class of functions to validate a twocheckout payment response and provide details of the payment
  *
  * @package Subscriptions
  */
-class Payment
+class Payment implements PaymentInterface
 {
 	/**
 	 * Validates that we have valid data to work with
