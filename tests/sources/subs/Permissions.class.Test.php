@@ -34,7 +34,7 @@ class TestPermissionsClass extends \PHPUnit\Framework\TestCase
 	 */
 	public function testDefaultIllegalPermissions()
 	{
-		$permissionsObject = new Permissions;
+		$permissionsObject = new \ElkArte\Permissions();
 		$this->illegal_permissions = $permissionsObject->getIllegalPermissions();
 
 		foreach (array('admin_forum', 'manage_membergroups', 'manage_permissions') as $check)
@@ -49,7 +49,7 @@ class TestPermissionsClass extends \PHPUnit\Framework\TestCase
 	 */
 	public function testDefaultIllegalGuestPermissions()
 	{
-		$permissionsObject = new Permissions;
+		$permissionsObject = new \ElkArte\Permissions();
 		$this->illegal_guest_permissions = $permissionsObject->getIllegalGuestPermissions();
 
 		// Simple spot check
@@ -68,7 +68,7 @@ class TestPermissionsClass extends \PHPUnit\Framework\TestCase
 		// Add simple integration to play with values
 		add_integration_function('integrate_load_illegal_guest_permissions', 'testIntegrationIGP', 'SOURCEDIR/Testing.php', false);
 
-		$permissionsObject = new Permissions;
+		$permissionsObject = new \ElkArte\Permissions();
 		$this->illegal_guest_permissions = $permissionsObject->getIllegalGuestPermissions();
 
 		// Check if the integration worked
