@@ -19,12 +19,12 @@ var disableDrafts = false;
 	var editor,
 		rangeHelper;
 
-	function elk_Mentions(options) {
+	function Elk_Mentions(options) {
 		// All the passed options and defaults are loaded to the opts object
 		this.opts = $.extend({}, this.defaults, options);
 	}
 
-	elk_Mentions.prototype.attachAtWho = function(oMentions, $element, oIframeWindow) {
+	Elk_Mentions.prototype.attachAtWho = function(oMentions, $element, oIframeWindow) {
 		var mentioned = $('#mentioned');
 
 		// Create / use a container to hold the results
@@ -277,14 +277,14 @@ var disableDrafts = false;
 		}
 	};
 
-	elk_Mentions.prototype.addUID = function(user_id, name) {
+	Elk_Mentions.prototype.addUID = function(user_id, name) {
 		this.opts._mentioned.append($('<input type="hidden" name="uid[]" />').val(user_id).attr('data-name', name));
 	};
 
 	/**
 	 * Private mention vars
 	 */
-	elk_Mentions.prototype.defaults = {
+	Elk_Mentions.prototype.defaults = {
 		_names: [],
 		_last_call: 0,
 		_mentioned: $('<div id="mentioned" style="display: none;" />')
@@ -293,7 +293,7 @@ var disableDrafts = false;
 	/**
 	 * Holds all current mention (defaults + passed options)
 	 */
-	elk_Mentions.prototype.opts = {};
+	Elk_Mentions.prototype.opts = {};
 
 	/**
 	 * Mentioning plugin interface to SCEditor
@@ -314,7 +314,7 @@ var disableDrafts = false;
 		 */
 		base.signalReady = function() {
 			// Init the mention instance, load in the options
-			oMentions = new elk_Mentions(this.opts.mentionOptions);
+			oMentions = new Elk_Mentions(this.opts.mentionOptions);
 
 			var $option_eid = $('#' + oMentions.opts.editor_id);
 
