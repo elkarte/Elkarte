@@ -1042,19 +1042,19 @@ function setBoardIds() {
 				$(this).hoverIntent({
 					sensitivity: oSettings.hoverIntent.sensitivity,
 					interval: oSettings.hoverIntent.interval,
-					over: site_tooltip_on,
+					over: Site_tooltip_on,
 					timeout: oSettings.hoverIntent.timeout,
-					out: site_tooltip_off
+					out: Site_tooltip_off
 				});
 			}
 			else
 			{
 				// Plain old hover it is
-				$(this).hover(site_tooltip_on, site_tooltip_off);
+				$(this).hover(Site_tooltip_on, Site_tooltip_off);
 			}
 
 			// Create the on tip action
-			function site_tooltip_on(event)
+			function Site_tooltip_on(event)
 			{
 				// If we have text in the hidden span element we created on page load
 				if ($(this).children('.' + oSettings.tooltipSwapClass).text())
@@ -1079,7 +1079,7 @@ function setBoardIds() {
 			}
 
 			// Create the Bye bye tip
-			function site_tooltip_off(event)
+			function Site_tooltip_off(event)
 			{
 				hideTooltip(this);
 				return false;
