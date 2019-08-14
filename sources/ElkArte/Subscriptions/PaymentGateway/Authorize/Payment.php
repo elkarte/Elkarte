@@ -129,8 +129,10 @@ class Payment implements PaymentInterface
 
 	/**
 	 * Redirect the user away.
+	 *
+	 * @param int $subscription_id
 	 */
-	public function close()
+	public function close($subscription_id)
 	{
 		exit();
 	}
