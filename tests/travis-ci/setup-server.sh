@@ -23,29 +23,25 @@ SHORT_PHP=${TRAVIS_PHP_VERSION:0:3}
 sudo apt-get clean && sudo apt-get update -qq
 
 # Specific version of MySQL ?
-if [[ "$SHORT_DB" == "mysql" && "$DB" != "mysql-5.6" ]]
+if [[ "$SHORT_DB" == "mysql" && "$DB" != "mysql-5.7" ]]
 then
-   # Travis is MySQL 5.6 on ubuntu 14.04
    sudo service mysql stop
    sudo apt-get -qq install python-software-properties > /dev/null
    echo mysql-apt-config mysql-apt-config/select-server select "$DB" | sudo debconf-set-selections
-   wget http://dev.mysql.com/get/mysql-apt-config_0.8.12-1_all.deb > /dev/null
-   sudo dpkg --install mysql-apt-config_0.8.12-1_all.deb
+   wget http://dev.mysql.com/get/mysql-apt-config_0.8.13-1_all.deb > /dev/null
+   sudo dpkg --install mysql-apt-config_0.8.13-1_all.deb
    sudo apt-get update -qq
    sudo apt-get install -qq -o Dpkg::Options::=--force-confnew mysql-server
    sudo mysql_upgrade
 fi
 
-# Install basics for PHP CLI
-# sudo apt-get -qq install php-cli php-mysql php-pgsql
-
 # Install Apache, mod-FPM and DB support
 if [[ "$SHORT_DB" == "postgres" ]]
 then
-    sudo apt-get -qq install apache2 libapache2-mod-fastcgi php5-pgsql > /dev/null
+    sudo apt-get -qq install apache2 libapache2-mod-fastcgi php-pgsql > /dev/null
 elif [[ "$SHORT_DB" == "mysql" || "$SHORT_DB" == "mariadb" ]]
 then
-    sudo apt-get -qq --allow-downgrades install apache2 libapache2-mod-fastcgi php5-mysql > /dev/null
+    sudo apt-get -qq --allow-downgrades install apache2 libapache2-mod-fastcgi php-mysql > /dev/null
 else
     sudo apt-get -qq --allow-downgrades install apache2 libapache2-mod-fastcgi > /dev/null
 fi
@@ -58,11 +54,11 @@ tests/travis-ci/travis-fpm.sh $(phpenv version-name)
 if [[ "$SHORT_DB" == "postgres" ]]
 then
     psql -c "DROP DATABASE IF EXISTS elkarte_test;" -U postgres
-    psql -c "create database elkarte_test;" -U postgres
+    psql -c "CREATE DATABASE elkarte_test;" -U postgres
 elif [[ "$SHORT_DB" == "mysql" || "$SHORT_DB" == "mariadb" ]]
 then
-    mysql -e "DROP DATABASE IF EXISTS elkarte_test;" -uroot
-    mysql -e "create database IF NOT EXISTS elkarte_test;" -uroot
+    mysql -e "DROP DATABASE IF EXISTS elkarte_test;" -u root
+    mysql -e "CREATE DATABASE IF NOT EXISTS elkarte_test;" -u root
 fi
 
 # Setup cache engines for elkarte cache testing

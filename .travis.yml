@@ -1,6 +1,6 @@
 sudo: required
 language: php
-dist: trusty
+dist: xenial
 
 matrix:
   include:
@@ -9,18 +9,34 @@ matrix:
         - DB=mysql-5.7
         - WEBTESTS=true
         - COVERAGE=true
-    - php: 7.1
+    - php: 7.3
       env:
-        - DB=postgres-9.5
-        - WEBTESTS=false
-        - COVERAGE=false
-    - php: 7.1
-      env:
-        - DB=mariadb-10.0
+        - DB=postgres-9.6
         - WEBTESTS=false
         - COVERAGE=false
       addons:
-        mariadb: '10.0'
+        postgresql: "9.6"
+    - php: 7.1
+      env:
+        - DB=mariadb-10.3
+        - WEBTESTS=false
+        - COVERAGE=false
+      addons:
+        mariadb: '10.3'
+    - language: node_js
+      node_js:
+        - "node"
+      php:
+      # none
+      install:
+        - npm install --save-dev jshint stylelint stylelint-order stylelint-config-recommended
+      before_script:
+      # nothing
+      script:
+        - node_modules/jshint/bin/jshint .
+        - stylelint "**/*.css"
+      after_script:
+      # nothing
     - language: node_js
       node_js:
         - "node"
@@ -38,7 +54,8 @@ matrix:
   fast_finish: true
 
 services:
-  memcached
+  - memcached
+  - mysql
 
 # Prepare the server (PHP, Apache, PHPUnit, APCu etc)
 install:
