@@ -64,7 +64,7 @@ class TestStreamFetchWebdata extends \PHPUnit\Framework\TestCase
 	/**
 	 * Test Stream fetching
 	 */
-	public function testFetch()
+	public function testStreamFetch()
 	{
 		// Start Stream, pass some default values for a test
 		$fsock = new \ElkArte\Http\StreamFetchWebdata(array(), 3);
@@ -76,20 +76,20 @@ class TestStreamFetchWebdata extends \PHPUnit\Framework\TestCase
 
 			// Check for correct results
 			if (!empty($testcase[1]))
-				$this->assertEquals($testcase[1], $fsock->result('code'));
+				$this->assertEquals($testcase[1], $fsock->result('code'), 'FetchCodeError:: ' . $testcase[0]);
 
 			if (!empty($testcase[2]))
-				$this->assertContains($testcase[2], $fsock->result('body'));
+				$this->assertContains($testcase[2], $fsock->result('body'), 'FetchBodyError:: ' . $testcase[0]);
 
 			if (!empty($testcase[3]))
-				$this->assertEquals($testcase[3], $fsock->result('redirects'));
+				$this->assertEquals($testcase[3], $fsock->result('redirects'), 'FectchRedirectError:: ' . $testcase[0]);
 		}
 	}
 
 	/**
 	 * Test Stream with posting data
 	 */
-	public function testPost()
+	public function testStreamPost()
 	{
 		// Start curl, pass some default values for a test
 		$fsock = new \ElkArte\Http\StreamFetchWebdata(array(), 3);
@@ -101,10 +101,10 @@ class TestStreamFetchWebdata extends \PHPUnit\Framework\TestCase
 
 			// Check for correct fetch
 			if (!empty($testcase[2]))
-				$this->assertEquals($testcase[2], $fsock->result('code'));
+				$this->assertEquals($testcase[2], $fsock->result('code'), 'PostCodeError:: ' . $testcase[0]);
 
 			if (!empty($testcase[3]))
-				$this->assertContains($testcase[3], $fsock->result('body'));
+				$this->assertContains($testcase[3], $fsock->result('body'), 'PostBodyError:: ' . $testcase[0]);
 		}
 	}
 }
