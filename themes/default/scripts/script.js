@@ -481,11 +481,17 @@ function array_search(variable, theArray)
 function selectRadioByName(oRadioGroup, sName)
 {
 	if (!('length' in oRadioGroup))
-		return oRadioGroup.checked = true;
+	{
+		oRadioGroup.checked = true;
+		return true;
+	}
 
 	for (var i = 0, n = oRadioGroup.length; i < n; i++)
 		if (oRadioGroup[i].value === sName)
-			return oRadioGroup[i].checked = true;
+		{
+			oRadioGroup[i].checked = true;
+			return true;
+		}
 
 	return false;
 }
