@@ -362,6 +362,7 @@ class UnZip
 					'md5' => md5($this->_file_info['data']),
 					'preview' => substr($this->_file_info['data'], 0, 100),
 					'size' => $this->_file_info['size'],
+					'formatted_size' => byte_format($this->_file_info['size']),
 					'skipped' => false,
 					'crc' => $this->_crc_check,
 				);
