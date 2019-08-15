@@ -25,9 +25,9 @@ class TestCurlFetchWebdata extends \PHPUnit\Framework\TestCase
 			),
 			array(
 				'https://duckduckgo.com/html',
-				array('q' => 'elkarte is a modern site:elkarte.net', 'ia' => 'about'),
+				array('q' => 'elkarte+forum', 'ia' => 'about'),
 				200,
-				'ElkArte is a modern, powerful community building forum software.',
+				'ElkArte, Free and Open Source Community Forum Software',
 			),
 		);
 
@@ -56,9 +56,9 @@ class TestCurlFetchWebdata extends \PHPUnit\Framework\TestCase
 	}
 
 	/**
-	* Test curl fetching
-	*/
-	public function testFetch()
+	 * Test curl fetching
+	 */
+	public function testCurlFetch()
 	{
 		// Start curl, pass some default values for a test
 		$curl = new \ElkArte\Http\CurlFetchWebdata(array(CURLOPT_RETURNTRANSFER => 1), 1);
@@ -77,9 +77,9 @@ class TestCurlFetchWebdata extends \PHPUnit\Framework\TestCase
 	}
 
 	/**
-	* Test curl with posting
-	*/
-	public function testPost()
+	 * Test curl with posting
+	 */
+	public function testCurlPost()
 	{
 		// Start curl, pass some default values for a test
 		$curl = new \ElkArte\Http\CurlFetchWebdata();

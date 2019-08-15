@@ -1437,7 +1437,8 @@ function initEditProfileBoards()
 function initEditPermissionProfiles()
 {
 	// We need a variable to be sure we are going to create only 1 cancel button
-	var run_once = false;
+	var run_once = false,
+		$cancel;
 
 	$('.rename_profile').each(function() {
 		var $this_profile = $(this);
@@ -1448,8 +1449,6 @@ function initEditPermissionProfiles()
 			// If we have already created the cancel let's skip it
 			if (!run_once)
 			{
-				var $cancel;
-
 				run_once = true;
 				$cancel = $('<a class="js-ed-rm linkbutton" />').on('click', function(ev) {
 					ev.preventDefault();

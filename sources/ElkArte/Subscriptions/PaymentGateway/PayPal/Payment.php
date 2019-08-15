@@ -225,7 +225,7 @@ class Payment implements PaymentInterface
 	/**
 	 * Record the transaction reference and exit
 	 *
-	 * @param string $subscription_id
+	 * @param int $subscription_id
 	 */
 	public function close($subscription_id)
 	{

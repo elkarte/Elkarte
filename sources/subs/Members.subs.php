@@ -766,7 +766,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 					'OPENID' => !empty($regOptions['openid']) ? $regOptions['openid'] : '',
 				);
 				$emaildata = loadEmailTemplate('register_' . ($regOptions['auth_method'] == 'openid' ? 'openid_' : '') . 'immediate', $replacements);
-				$mark_down = new Html_2_Md(str_replace("\n", '<br>', $emaildata['body']));
+				$mark_down = new \ElkArte\Html2Md(str_replace("\n", '<br>', $emaildata['body']));
 				$emaildata['body'] = $mark_down->get_markdown();
 
 				sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
@@ -781,7 +781,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 		{
 
 			$emaildata = loadEmailTemplate('register_' . ($regOptions['auth_method'] == 'openid' ? 'openid_' : '') . ($regOptions['require'] == 'activation' ? 'activate' : 'coppa'), $replacements);
-			$mark_down = new Html_2_Md(str_replace("\n", '<br>', $emaildata['body']));
+			$mark_down = new \ElkArte\Html2Md(str_replace("\n", '<br>', $emaildata['body']));
 			$emaildata['body'] = $mark_down->get_markdown();
 
 			sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
@@ -798,7 +798,7 @@ function registerMember(&$regOptions, $ErrorContext = 'register')
 			);
 
 			$emaildata = loadEmailTemplate('register_' . ($regOptions['auth_method'] == 'openid' ? 'openid_' : '') . 'pending', $replacements);
-			$mark_down = new Html_2_Md(str_replace("\n", '<br>', $emaildata['body']));
+			$mark_down = new \ElkArte\Html2Md(str_replace("\n", '<br>', $emaildata['body']));
 			$emaildata['body'] = $mark_down->get_markdown();
 
 			sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
@@ -2236,7 +2236,7 @@ function getConcernedMembers($groups, $where, $change_groups = false)
 
 	$db = database();
 
-		// Get the details of all the members concerned...
+	// Get the details of all the members concerned...
 	$request = $db->query('', '
 		SELECT lgr.id_request, lgr.id_member, lgr.id_group, mem.email_address, mem.id_group AS primary_group,
 			mem.additional_groups AS additional_groups, mem.lngfile, mem.member_name, mem.notify_types,
@@ -2270,10 +2270,10 @@ function getConcernedMembers($groups, $where, $change_groups = false)
 			}
 			else
 				$row['additional_groups'] = explode(',', $row['additional_groups']);
-				// Don't have it already?
+			// Don't have it already?
 			if ($row['primary_group'] == $row['id_group'] || in_array($row['id_group'], $row['additional_groups']))
 				continue;
-				// Should it become their primary?
+			// Should it become their primary?
 			if ($row['primary_group'] == 0 && $row['hidden'] == 0)
 				$row['primary_group'] = $row['id_group'];
 			else

@@ -65,7 +65,7 @@ class TestFsockFetchWebdata extends \PHPUnit\Framework\TestCase
 	/**
 	 * Test Fsockopen fetching
 	 */
-	public function testFetch()
+	public function testFsockFetch()
 	{
 		// Start Fsockopen, pass some default values for a test
 		$fsock = new \ElkArte\Http\FsockFetchWebdata(array(), 3);
@@ -90,7 +90,7 @@ class TestFsockFetchWebdata extends \PHPUnit\Framework\TestCase
 	/**
 	 * Test Fsockopen with posting data
 	 */
-	public function testPost()
+	public function testFsockPost()
 	{
 		// Start curl, pass some default values for a test
 		$fsock = new \ElkArte\Http\FsockFetchWebdata(array(), 3);

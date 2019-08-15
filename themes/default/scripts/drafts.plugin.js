@@ -18,7 +18,7 @@
 	// Editor instance
 	var editor;
 
-	function elk_Drafts(options) {
+	function Elk_Drafts(options) {
 		// All the passed options and defaults are loaded to the opts object
 		this.opts = $.extend({}, this.defaults, options);
 
@@ -33,7 +33,7 @@
 	 * - updates the display to show we are saving
 	 * - loads the form data and makes the ajax request
 	 */
-	elk_Drafts.prototype.draftSave = function() {
+	Elk_Drafts.prototype.draftSave = function() {
 		// No change since the last save, or form submitted
 		if (!this.opts._bCheckDraft || elk_formSubmitted || (typeof disableDrafts !== 'undefined' && disableDrafts))
 			return false;
@@ -74,7 +74,7 @@
 	 * - updates the display to show we are saving
 	 * - loads the form data and makes the ajax request
 	 */
-	elk_Drafts.prototype.draftPMSave = function()
+	Elk_Drafts.prototype.draftPMSave = function()
 	{
 		// No change since the last PM save, or elk is doing its thing
 		if (!this.opts._bCheckDraft || elk_formSubmitted)
@@ -137,7 +137,7 @@
 	 * @param {string[]} post
 	 * @param {string} action
 	 */
-	elk_Drafts.prototype.draftAjax = function(post, action)
+	Elk_Drafts.prototype.draftAjax = function(post, action)
 	{
 		// Send in the request to save the data
 		$.ajax({
@@ -182,7 +182,7 @@
 	 *
 	 * @param {string} sField name of the form elements we are getting
 	 */
-	elk_Drafts.prototype.draftGetRecipient = function(sField)
+	Elk_Drafts.prototype.draftGetRecipient = function(sField)
 	{
 		var oRecipient = document.forms.pmFolder.elements[sField],
 			aRecipient = [];
@@ -206,7 +206,7 @@
 	/**
 	 * If another auto save came in with one still pending we cancel out
 	 */
-	elk_Drafts.prototype.draftCancel = function() {
+	Elk_Drafts.prototype.draftCancel = function() {
 		this.opts._bInDraftMode = false;
 		document.getElementById('throbber').style.display = 'none';
 	};
@@ -214,7 +214,7 @@
 	/**
 	 * Starts the autosave timer for the current instance of the elk_draft object
 	 */
-	elk_Drafts.prototype.startSaver = function() {
+	Elk_Drafts.prototype.startSaver = function() {
 		var oInstance = this;
 		if (this.opts.bPM)
 			this.opts._interval_id = setInterval(function() {
@@ -231,7 +231,7 @@
 	 *
 	 * - Used to prevent saving an auto draft on input button (post, save, etc)
 	 */
-	elk_Drafts.prototype.formCheck = function() {
+	Elk_Drafts.prototype.formCheck = function() {
 		var oInstance = this,
 			formID = $('#' + this.opts.sTextareaID).closest("form").attr('id');
 
@@ -249,7 +249,7 @@
 	/**
 	 * Private draft vars to keep track of what/where/why
 	 */
-	elk_Drafts.prototype.defaults = {
+	Elk_Drafts.prototype.defaults = {
 		/**
 		 * If we are currently in draft saving mode
 		 * @type {Boolean}
@@ -284,7 +284,7 @@
 	/**
 	 * Holds all  current draft options (defaults + passed options)
 	 */
-	elk_Drafts.prototype.opts = {};
+	Elk_Drafts.prototype.opts = {};
 
 	/**
 	 * Draft plugin interface to SCEditor
@@ -304,7 +304,7 @@
 			editor = this;
 
 			// Init the draft instance, load in the options
-			oDrafts = new elk_Drafts(this.opts.draftOptions);
+			oDrafts = new Elk_Drafts(this.opts.draftOptions);
 			oDrafts.opts.bPM = oDrafts.opts.bPM ? true : false;
 			oDrafts.base = base;
 

@@ -474,6 +474,7 @@ function revalidateMentions(sForm, sInput)
 
 	for (var i = 0, count = all_elk_mentions.length; i < count; i++)
 	{
+		/* jshint loopfunc: true */
 		// Make sure this mention object is for this selector, safety first
 		if (all_elk_mentions[i].selector === sInput || all_elk_mentions[i].selector === '#' + sInput)
 		{
@@ -506,6 +507,9 @@ function revalidateMentions(sForm, sInput)
 			// and one at the end to simplify catching any last thing in the text
 			body = ' ' + body + ' ';
 
+			// @todo Functions declared within loops referencing an outer scoped variable may
+			// lead to confusing semantics.
+			//
 			// First check if all those in the list are really mentioned
 			$(mentions).find('input').each(function (idx, elem) {
 				var name = $(elem).data('name'),
@@ -870,10 +874,13 @@ function setBoardIds() {
 			// Calculate the new pages.
 			for (i = lastPage; i > firstPage; i -= perPage)
 			{
+				/* jshint loopfunc: true */
 				var bElem = aModel.clone(),
 					boxModelClone = boxModel.clone();
 
 				bElem.attr('href', baseurl.replace('%1$d', i - perPage)).text(i / perPage);
+				// @todo Functions declared within loops referencing an outer scoped variable may
+				// lead to confusing semantics.
 				boxModelClone.find('a').each(function() {
 					$(this).replaceWith(bElem[0]);
 				});
@@ -1042,19 +1049,19 @@ function setBoardIds() {
 				$(this).hoverIntent({
 					sensitivity: oSettings.hoverIntent.sensitivity,
 					interval: oSettings.hoverIntent.interval,
-					over: site_tooltip_on,
+					over: Site_tooltip_on,
 					timeout: oSettings.hoverIntent.timeout,
-					out: site_tooltip_off
+					out: Site_tooltip_off
 				});
 			}
 			else
 			{
 				// Plain old hover it is
-				$(this).hover(site_tooltip_on, site_tooltip_off);
+				$(this).hover(Site_tooltip_on, Site_tooltip_off);
 			}
 
 			// Create the on tip action
-			function site_tooltip_on(event)
+			function Site_tooltip_on(event)
 			{
 				// If we have text in the hidden span element we created on page load
 				if ($(this).children('.' + oSettings.tooltipSwapClass).text())
@@ -1079,7 +1086,7 @@ function setBoardIds() {
 			}
 
 			// Create the Bye bye tip
-			function site_tooltip_off(event)
+			function Site_tooltip_off(event)
 			{
 				hideTooltip(this);
 				return false;

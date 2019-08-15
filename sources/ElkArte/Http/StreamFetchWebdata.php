@@ -214,7 +214,7 @@ class StreamFetchWebdata
 
 			// Normalize / clean
 			$name = isset($temp[0]) ? strtolower($temp[0]) : '';
-			$value = isset($temp[1]) ? trim($temp[1]) : '';
+			$value = isset($temp[1]) ? trim($temp[1]) : null;
 
 			// How many redirects
 			if ($name === 'location')
@@ -223,7 +223,7 @@ class StreamFetchWebdata
 			}
 
 			// Server response is mixed in with the real headers
-			if (empty($value))
+			if ($value === null)
 			{
 				$this->_response['headers']['status'] = $name;
 			}
