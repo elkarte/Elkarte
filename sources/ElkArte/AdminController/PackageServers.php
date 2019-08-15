@@ -755,7 +755,7 @@ class PackageServers extends \ElkArte\AbstractController
 					if (!$ftp->chdir($this->_req->post->ftp_path))
 					{
 						$ftp_error = $ftp->error;
-						$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $this->_req->post->ftp_path));
+						$ftp->chdir(preg_replace('~^/home[2]?/[^/]+~', '', $this->_req->post->ftp_path));
 					}
 				}
 			}
