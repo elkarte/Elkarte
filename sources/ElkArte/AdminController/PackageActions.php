@@ -693,7 +693,7 @@ class PackageActions extends \ElkArte\AbstractController
 			else
 				$file = BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename'];
 
-			if (!file_exists($file))
+			if (!file_exists($file) && ($this->thisAction['type'] !== 'Create Tree' && $this->thisAction['type'] !== 'Create File'))
 			{
 				$this->has_failure = true;
 
