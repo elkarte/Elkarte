@@ -53,8 +53,8 @@ class User
 
 	public static function reloadByUser(\ElkArte\UserSettings $user)
 	{
-		self::$instance->reloadInfo($user);
-		self::$settings = $user;
+		self::$instance = $user;
+		self::$settings = self::$instance->getSettings();
 		self::$info = self::$instance->getInfo();
 	}
 

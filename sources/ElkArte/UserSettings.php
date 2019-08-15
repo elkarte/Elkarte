@@ -33,8 +33,6 @@ class UserSettings
 
 	protected $req = null;
 
-	protected $hasher = null;
-
 	protected $settings = null;
 
 	protected $info = null;
@@ -79,58 +77,79 @@ class UserSettings
 
 	public function rehashPassword($password)
 	{
-		$this->initHasher();
-
-		// If the password is not 64 characters, lets make it a (SHA-256)
-		if (strlen($password) !== 64)
-		{
-			$password = hash('sha256', \ElkArte\Util::strtolower($this->username) . un_htmlspecialchars($password));
-		}
-
-		$passhash = $this->hasher->HashPassword($password);
-
-		// Something is not right, we can not generate a valid hash that's <20 characters
-		if (strlen($passhash) < 20)
-		{
-			// @todo here we should throw an exception
-			return false;
-		}
-		else
-		{
-			$this->settings->updatePassword($passhash);
-		}
-	}
-
-	protected function initHasher()
-	{
-		if ($this->hasher === null)
-		{
-			// Our hashing controller
-			require_once(EXTDIR . '/PasswordHash.php');
-
-			// Base-2 logarithm of the iteration count used for password stretching, the
-			// higher the number the more secure and CPU time consuming
-			$hash_cost_log2 = 10;
-
-			// Do we require the hashes to be portable to older systems (less secure)?
-			$hash_portable = false;
-
-			// Get an instance of the hasher
-			$this->hasher = new PasswordHash($hash_cost_log2, $hash_portable);
-		}
+		$this->settings->rehashPassword($password);
 	}
 
 	public function validatePassword($password)
 	{
-		$this->initHasher();
+		$this->settings->validatePassword($password);
+	}
 
-		// If the password is not 64 characters, lets make it a (SHA-256)
-		if (strlen($password) !== 64)
+	/**
+	 * Check activation status of the current user.
+	 *
+	 * What it does:
+	 * is_activated value key is as follows:
+	 * - > 10 Banned with activation status as value - 10
+	 * - 5 = Awaiting COPPA consent
+	 * - 4 = Awaiting Deletion approval
+	 * - 3 = Awaiting Admin approval
+	 * - 2 = Awaiting reactivation from email change
+	 * - 1 = Approved and active
+	 * - 0 = Not active
+	 *
+	 * @param bool $undelete - whether the current request is to revert the
+	 *                         request to delete the account or not
+	 */
+	public function checkActivation($undelete)
+	{
+		global $context, $txt, $modSettings;
+
+		if (!isset($context['login_errors']))
 		{
-			$password = hash('sha256', \ElkArte\Util::strtolower($this->username) . un_htmlspecialchars($password));
+			$context['login_errors'] = array();
 		}
 
-		return (bool) $this->hasher->CheckPassword($password, $this->settings->passwd);
+		// What is the true activation status of this account?
+		$activation_status = $this->settings->getActivationStatus();
+
+		// Check if the account is activated - COPPA first...
+		if ($activation_status == 5)
+		{
+			$context['login_errors'][] = $txt['coppa_no_concent'] . ' <a href="' . getUrl('action', ['action' => 'register', 'sa' => 'coppa', 'member' => $this->settings['id_member']]) . '">' . $txt['coppa_need_more_details'] . '</a>';
+			return false;
+		}
+		// Awaiting approval still?
+		elseif ($activation_status == 3)
+		{
+			throw new \ElkArte\Exceptions\Exception('still_awaiting_approval', 'user');
+		}
+		// Awaiting deletion, changed their mind?
+		elseif ($activation_status == 4)
+		{
+			if ($undelete === true)
+			{
+				require_once(SUBSDIR . '/Members.subs.php');
+				updateMemberData($this->settings['id_member'], array('is_activated' => 1));
+				updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > 0 ? $modSettings['unapprovedMembers'] - 1 : 0)));
+			}
+			else
+			{
+				$context['disable_login_hashing'] = true;
+				$context['login_errors'][] = $txt['awaiting_delete_account'];
+				$context['login_show_undelete'] = true;
+				return false;
+			}
+		}
+		// Standard activation?
+		elseif ($activation_status != 1)
+		{
+			\ElkArte\Errors\Errors::instance()->log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . $this->settings['member_name'] . '</span>', false);
+
+			$context['login_errors'][] = $txt['activate_not_completed1'] . ' <a class="linkbutton" href="' . getUrl('action', ['action' => 'register', 'sa' => 'activate', 'resend', 'u' => $this->settings['id_member']]) . '">' . $txt['activate_not_completed2'] . '</a>';
+			return false;
+		}
+		return true;
 	}
 
 	protected function compileInfo($user_info)
@@ -314,6 +333,8 @@ class UserSettings
 	protected function initSettings($user_settings)
 	{
 		$this->settings = new class($user_settings) extends ValuesContainerReadOnly {
+			protected $hasher = null;
+
 			/**
 			 * Stores the data of the user into an array
 			 *
@@ -357,7 +378,76 @@ class UserSettings
 
 			public function getActivationStatus($strip_ban = true)
 			{
-				return $this->data['is_activated'] > UserSettings::BAN_OFFSET ? $this->data['is_activated'] - UserSettings::BAN_OFFSET : $this->data['is_activated']
+				return $this->is_activated > UserSettings::BAN_OFFSET ? $this->is_activated - UserSettings::BAN_OFFSET : $this->is_activated;
+			}
+
+			public function rehashPassword($password)
+			{
+				$this->initHasher();
+
+				// If the password is not 64 characters, lets make it a (SHA-256)
+				if (strlen($password) !== 64)
+				{
+					$password = hash('sha256', \ElkArte\Util::strtolower($this->username) . un_htmlspecialchars($password));
+				}
+
+				$passhash = $this->hasher->HashPassword($password);
+
+				// Something is not right, we can not generate a valid hash that's <20 characters
+				if (strlen($passhash) < 20)
+				{
+					// @todo here we should throw an exception
+					return false;
+				}
+				else
+				{
+					$this->settings->updatePassword($passhash);
+				}
+			}
+
+			protected function initHasher()
+			{
+				if ($this->hasher === null)
+				{
+					// Our hashing controller
+					require_once(EXTDIR . '/PasswordHash.php');
+
+					// Base-2 logarithm of the iteration count used for password stretching, the
+					// higher the number the more secure and CPU time consuming
+					$hash_cost_log2 = 10;
+
+					// Do we require the hashes to be portable to older systems (less secure)?
+					$hash_portable = false;
+
+					// Get an instance of the hasher
+					$this->hasher = new \PasswordHash($hash_cost_log2, $hash_portable);
+				}
+			}
+
+			/**
+			 * Checks whether a password meets the current forum rules
+			 *
+			 * What it does:
+			 *
+			 * - called when registering/choosing a password.
+			 * - checks the password obeys the current forum settings for password strength.
+			 * - if password checking is enabled, will check that none of the words in restrict_in appear in the password.
+			 * - returns an error identifier if the password is invalid.
+			 *
+			 * @param string $password
+			 * @return bool true or false
+			 */
+			public function validatePassword($password)
+			{
+				$this->initHasher();
+
+				// If the password is not 64 characters, lets make it a (SHA-256)
+				if (strlen($password) !== 64)
+				{
+					$password = hash('sha256', \ElkArte\Util::strtolower($this->username) . un_htmlspecialchars($password));
+				}
+
+				return (bool) $this->hasher->CheckPassword($password, $this->settings->passwd);
 			}
 		};
 	}
