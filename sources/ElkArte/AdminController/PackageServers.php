@@ -693,7 +693,7 @@ class PackageServers extends \ElkArte\AbstractController
 	 */
 	public function action_upload()
 	{
-		global $txt, $context;
+		global $txt, $context, $modSettings;
 
 		// Set up the upload template, and page title.
 		$context['sub_template'] = 'upload';
@@ -706,7 +706,7 @@ class PackageServers extends \ElkArte\AbstractController
 		$context['package_ftp'] = array(
 			'server' => '',
 			'port' => '',
-			'username' => '',
+			'username' => isset($modSettings['package_username']) ? $modSettings['package_username'] : '',
 			'path' => '',
 			'error' => '',
 		);

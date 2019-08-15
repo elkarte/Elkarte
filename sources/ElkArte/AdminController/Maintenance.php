@@ -269,7 +269,7 @@ class Maintenance extends \ElkArte\AbstractController
 				'form_elements_only' => true,
 				'server' => '',
 				'port' => '',
-				'username' => '',
+				'username' => isset($modSettings['package_username']) ? $modSettings['package_username'] : '',
 				'path' => '',
 				'error' => '',
 			);
