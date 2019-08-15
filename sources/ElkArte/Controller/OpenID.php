@@ -181,8 +181,9 @@ class OpenID extends \ElkArte\AbstractController
 		{
 			$db = database();
 			$cache = \ElkArte\Cache\Cache::instance();
+			$req = request();
 
-			$user = new \ElkArte\UserSettings($db, $cache, $this->_req);
+			$user = new \ElkArte\UserSettings($db, $cache, $req);
 			$user->loadUserById($member_found['id_member'], true, '');
 			$user_setting = $user->getSettings();
 
@@ -199,11 +200,14 @@ class OpenID extends \ElkArte\AbstractController
 			);
 
 			// Activation required?
-			if (!checkActivation())
-				return false;
+			// The isset check should not be necessary
+			if ($user->checkActivation(isset($_REQUEST['undelete'])))
+			{
+				// Finally do the login.
+				doLogin($user);
+			}
 
-			// Finally do the login.
-			doLogin($user);
+			return false;
 		}
 	}
 

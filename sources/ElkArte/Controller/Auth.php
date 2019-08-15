@@ -218,8 +218,9 @@ class Auth extends \ElkArte\AbstractController
 		$member_found = loadExistingMember($_POST['user']);
 		$db = database();
 		$cache = \ElkArte\Cache\Cache::instance();
+		$req = request();
 
-		$user = new \ElkArte\UserSettings($db, $cache, $this->_req);
+		$user = new \ElkArte\UserSettings($db, $cache, $req);
 		$user->loadUserById($member_found['id_member'], true, '');
 		$user_setting = $user->getSettings();
 
@@ -376,12 +377,12 @@ class Auth extends \ElkArte\AbstractController
 			updateMemberData($user_setting['id_member'], array('otp_used' => (int) $_POST['otp_token']));
 		}
 		// Check their activation status.
-		if (!checkActivation())
+		if ($user->checkActivation(isset($_REQUEST['undelete'])))
 		{
-			return false;
+			doLogin($user);
 		}
 
-		doLogin($user);
+		return false;
 	}
 
 	/**
