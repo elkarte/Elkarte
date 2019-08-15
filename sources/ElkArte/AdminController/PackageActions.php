@@ -90,7 +90,7 @@ class PackageActions extends \ElkArte\AbstractController
 	public $failed_steps = array();
 
 	/**
-	 * Other themems found that this addon can be installed in
+	 * Other themes found that this addon can be installed in
 	 * @var array
 	 */
 	public $themeFinds;
@@ -224,11 +224,12 @@ class PackageActions extends \ElkArte\AbstractController
 			$this->_failure = false;
 			$this->thisAction = array();
 
-			// Yes I know, but thats how this works right now
-			$_REQUEST['sa'] = $this->_action['type'];
-
 			// Work out exactly which test function we are calling
-			$subAction = $action->initialize($subActions, 'skip');
+			if (!array_key_exists($this->_action['type'], $subActions))
+			{
+				continue;
+			}
+			$subAction = $action->initialize($subActions, $this->_action['type'], '');
 
 			// Lets just do it!
 			$action->dispatch($subAction);
@@ -739,11 +740,12 @@ class PackageActions extends \ElkArte\AbstractController
 		{
 			$this->_failed_count++;
 
-			// Yes I know, but thats how this works right now
-			$_REQUEST['sa'] = $this->_action['type'];
-
 			// Work out exactly who it is we are calling. call integrate_sa_packages
-			$subAction = $action->initialize($subActions, 'skip');
+			if (!array_key_exists($this->_action['type'], $subActions))
+			{
+				continue;
+			}
+			$subAction = $action->initialize($subActions, $this->_action['type'], '');
 
 			// Lets just do it!
 			$action->dispatch($subAction);
