@@ -156,6 +156,10 @@ class PackageActions extends \ElkArte\AbstractController
 
 		// Run the test install, looking for problems
 		$this->action_test();
+
+		// Cleanup the chmod array
+		$this->chmod_files = array_unique($this->chmod_files);
+		$this->chmod_files = array_values(array_filter($this->chmod_files));
 	}
 
 	/**
