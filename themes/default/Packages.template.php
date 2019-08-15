@@ -499,11 +499,11 @@ function template_examine()
 
 	echo '
 	<div id="admincenter">
-		<h2 class="category_header">', $txt['package_examine_file'], '</h2>
-		<h2 class="category_header">', $txt['package_file_contents'], ' ', $context['filename'], ':</h2>
-		<div class="content">
-			<pre class="file_content">', $context['filedata'], '</pre>
-			<a href="', $scripturl, '?action=admin;area=packages;sa=list;package=', $context['package'], '">[ ', $txt['list_files'], ' ]</a>
+		<h2 class="category_header">', $txt['package_examine_file'], ' : ' , $context['package'], '</h2>
+		<h3 class="category_header">', $txt['package_file_contents'], ' ', $context['filename'], ':</h3>
+		<div class="content" style="font-size: 1.1em">
+			<code><pre class="file_content prettyprint">', $context['filedata'], '</pre></code>
+			<a href="', $scripturl, '?action=admin;area=packages;sa=list;package=', $context['package'], '" class="linkbutton_right">', $txt['list_files'], '</a>
 		</div>
 	</div>';
 }

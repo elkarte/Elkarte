@@ -841,9 +841,6 @@ class Packages extends \ElkArte\AbstractController
 				$context['filedata'] = htmlspecialchars(read_tgz_file(BOARDDIR . '/packages/' . $this->_req->query->package, $this->_req->query->file, true));
 			elseif (is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
 				$context['filedata'] = htmlspecialchars(file_get_contents(BOARDDIR . '/packages/' . $this->_req->query->package . '/' . $this->_req->query->file));
-
-			if (strtolower(strrchr($this->_req->query->file, '.')) === '.php')
-				$context['filedata'] = highlight_php_code($context['filedata']);
 		}
 	}
 
