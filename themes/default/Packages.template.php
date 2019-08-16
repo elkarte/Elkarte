@@ -501,7 +501,7 @@ function template_examine()
 	<div id="admincenter">
 		<h2 class="category_header">', $txt['package_examine_file'], ' : ' , $context['package'], '</h2>
 		<h3 class="category_header">', $txt['package_file_contents'], ' ', $context['filename'], ':</h3>
-		<div class="content" style="font-size: 1.1em">
+		<div class="content largetext">
 			<code><pre class="file_content prettyprint">', $context['filedata'], '</pre></code>
 			<a href="', $scripturl, '?action=admin;area=packages;sa=list;package=', $context['package'], '" class="linkbutton_right">', $txt['list_files'], '</a>
 		</div>
@@ -747,10 +747,10 @@ function template_file_permissions()
 	// This will handle expanding the selection.
 	echo '
 	<script>
-		var package_file_perms_writable = "', $txt['package_file_perms_writable'], '",
-			package_file_perms_chmod = "',  $txt['package_file_perms_chmod'], '",
-	    	package_file_perms_not_writable = "', $txt['package_file_perms_not_writable'], '",
-	    	package_file_perms_more_files = "', $txt['package_file_perms_more_files'], '";
+		var package_file_perms_writable = "', JavaScriptEscape($txt['package_file_perms_writable']), '",
+			package_file_perms_chmod = "', JavaScriptEscape($txt['package_file_perms_chmod']), '",
+	    	package_file_perms_not_writable = "', JavaScriptEscape($txt['package_file_perms_not_writable']), '",
+	    	package_file_perms_more_files = "', JavaScriptEscape($txt['package_file_perms_more_files']), '";
 
 		function dynamicAddMore()
 		{

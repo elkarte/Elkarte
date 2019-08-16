@@ -2049,13 +2049,13 @@ function onNewFolderReceived(oXMLDoc)
 
 	for (var i = 0; i < fileItems.length; i++)
 	{
-		if (fileItems[i].getAttribute('more') == 1)
+		if (fileItems[i].getAttribute('more') === 1)
 		{
 			isMore = true;
 			curOffset = fileItems[i].getAttribute('offset');
 		}
 
-		if (fileItems[i].getAttribute('more') != 1 && document.getElementById("insert_div_loc_" + fileItems[i].getAttribute('ident')))
+		if (fileItems[i].getAttribute('more') !== 1 && document.getElementById("insert_div_loc_" + fileItems[i].getAttribute('ident')))
 		{
 			ident = fileItems[i].getAttribute('ident');
 			my_ident = fileItems[i].getAttribute('my_ident');
@@ -2079,7 +2079,7 @@ function onNewFolderReceived(oXMLDoc)
 			curCol.innerHTML = php_str_repeat("&nbsp;", curLevel);
 
 			// Create the actual text.
-			if (fileItems[i].getAttribute('folder') == 1)
+			if (fileItems[i].getAttribute('folder') === 1)
 			{
 				linkData = document.createElement("a");
 				linkData.name = "fol_" + my_ident;
@@ -2130,7 +2130,7 @@ function onNewFolderReceived(oXMLDoc)
 				curInput = document.createElement("input");
 				curInput.name = "permStatus[" + curPath + "/" + fileItems[i].firstChild.nodeValue + "]";
 				curInput.type = "radio";
-				curInput.checked = (j == 4 ? "checked" : "");
+				curInput.checked = (j === 4 ? "checked" : "");
 				curInput.value = oRadioValues[j];
 
 				curCol.appendChild(curInput);
@@ -2141,7 +2141,7 @@ function onNewFolderReceived(oXMLDoc)
 			tableHandle.parentNode.insertBefore(curRow, tableHandle);
 
 			// Put in a new dummy section?
-			if (fileItems[i].getAttribute('folder') == 1)
+			if (fileItems[i].getAttribute('folder') === 1)
 			{
 				newRow = document.createElement("tr");
 				newRow.id = "insert_div_loc_" + my_ident;
