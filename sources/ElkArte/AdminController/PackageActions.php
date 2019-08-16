@@ -90,7 +90,7 @@ class PackageActions extends \ElkArte\AbstractController
 	public $failed_steps = array();
 
 	/**
-	 * Other themems found that this addon can be installed in
+	 * Other themes found that this addon can be installed in
 	 * @var array
 	 */
 	public $themeFinds;
@@ -156,6 +156,10 @@ class PackageActions extends \ElkArte\AbstractController
 
 		// Run the test install, looking for problems
 		$this->action_test();
+
+		// Cleanup the chmod array
+		$this->chmod_files = array_unique($this->chmod_files);
+		$this->chmod_files = array_values(array_filter($this->chmod_files));
 	}
 
 	/**
@@ -224,11 +228,12 @@ class PackageActions extends \ElkArte\AbstractController
 			$this->_failure = false;
 			$this->thisAction = array();
 
-			// Yes I know, but thats how this works right now
-			$_REQUEST['sa'] = $this->_action['type'];
-
 			// Work out exactly which test function we are calling
-			$subAction = $action->initialize($subActions, 'skip');
+			if (!array_key_exists($this->_action['type'], $subActions))
+			{
+				continue;
+			}
+			$subAction = $action->initialize($subActions, $this->_action['type'], '');
 
 			// Lets just do it!
 			$action->dispatch($subAction);
@@ -688,7 +693,7 @@ class PackageActions extends \ElkArte\AbstractController
 			else
 				$file = BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename'];
 
-			if (!file_exists($file))
+			if (!file_exists($file) && ($this->thisAction['type'] !== 'Create Tree' && $this->thisAction['type'] !== 'Create File'))
 			{
 				$this->has_failure = true;
 
@@ -739,11 +744,12 @@ class PackageActions extends \ElkArte\AbstractController
 		{
 			$this->_failed_count++;
 
-			// Yes I know, but thats how this works right now
-			$_REQUEST['sa'] = $this->_action['type'];
-
 			// Work out exactly who it is we are calling. call integrate_sa_packages
-			$subAction = $action->initialize($subActions, 'skip');
+			if (!array_key_exists($this->_action['type'], $subActions))
+			{
+				continue;
+			}
+			$subAction = $action->initialize($subActions, $this->_action['type'], '');
 
 			// Lets just do it!
 			$action->dispatch($subAction);

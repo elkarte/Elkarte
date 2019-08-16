@@ -347,6 +347,7 @@ class UnTgz
 					'md5' => md5($this->_current['data']),
 					'preview' => substr($this->_current['data'], 0, 100),
 					'size' => $this->_current['size'],
+					'formatted_size' => byte_format($this->_current['size']),
 					'skipped' => false,
 					'crc' => $this->_crc_check,
 				);

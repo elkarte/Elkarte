@@ -841,9 +841,6 @@ class Packages extends \ElkArte\AbstractController
 				$context['filedata'] = htmlspecialchars(read_tgz_file(BOARDDIR . '/packages/' . $this->_req->query->package, $this->_req->query->file, true));
 			elseif (is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
 				$context['filedata'] = htmlspecialchars(file_get_contents(BOARDDIR . '/packages/' . $this->_req->query->package . '/' . $this->_req->query->file));
-
-			if (strtolower(strrchr($this->_req->query->file, '.')) === '.php')
-				$context['filedata'] = highlight_php_code($context['filedata']);
 		}
 	}
 
@@ -1255,7 +1252,7 @@ class Packages extends \ElkArte\AbstractController
 						'writable_on' => 'restrictive',
 					),
 					'avatars' => array(
-						'type' => 'dir',
+						'type' => 'dir_recursive',
 						'writable_on' => 'standard',
 					),
 					'cache' => array(
@@ -1271,9 +1268,27 @@ class Packages extends \ElkArte\AbstractController
 						'writable_on' => 'standard',
 					),
 					'sources' => array(
-						'type' => 'dir',
+						'type' => 'dir_recursive',
 						'list_contents' => true,
 						'writable_on' => 'standard',
+						'contents' => array(
+							'database' => array(
+								'type' => 'dir',
+								'list_contents' => true,
+							),
+							'ElkArte' => array(
+								'type' => 'dir_recursive',
+								'list_contents' => true,
+							),
+							'ext' => array(
+								'type' => 'dir',
+								'list_contents' => true,
+							),
+							'subs' => array(
+								'type' => 'dir',
+								'list_contents' => true,
+							),
+						),
 					),
 					'themes' => array(
 						'type' => 'dir_recursive',
@@ -2110,10 +2125,12 @@ function fetchPerms__recursive($path, &$data, $level)
 
 					// If this wasn't expected inherit the recusiveness...
 					if (!isset($data['contents'][$entry->getFilename()]))
+					{
 						// We need to do this as we will be going all recursive.
 						$data['contents'][$entry->getFilename()] = array(
 							'type' => 'dir_recursive',
 						);
+					}
 
 					// Actually do the recursive stuff...
 					fetchPerms__recursive($entry->getPathname(), $data['contents'][$entry->getFilename()], $level + 1);
@@ -2130,12 +2147,15 @@ function fetchPerms__recursive($path, &$data, $level)
 		// @todo for now do nothing...
 	}
 
+	// Sort the output so it presents itself well in the template
+	uksort($foundData['folders'], 'strcasecmp');
+	uksort($foundData['files'], 'strcasecmp');
+
 	// Nothing to see here?
 	if (!$save_data)
 		return;
 
 	// Now actually add the data, starting with the folders.
-	uksort($foundData['folders'], 'strcasecmp');
 	foreach ($foundData['folders'] as $folder => $type)
 	{
 		$additional_data = array(
@@ -2175,7 +2195,6 @@ function fetchPerms__recursive($path, &$data, $level)
 	}
 
 	// Now we want to do a similar thing with files.
-	uksort($foundData['files'], 'strcasecmp');
 	$counter = -1;
 	foreach ($foundData['files'] as $file => $dummy)
 	{
@@ -2187,7 +2206,7 @@ function fetchPerms__recursive($path, &$data, $level)
 
 		// Gone too far?
 		if ($counter > ($context['file_offset'] + $context['file_limit']))
-			continue;
+			break;
 
 		$additional_data = array(
 			'perms' => array(

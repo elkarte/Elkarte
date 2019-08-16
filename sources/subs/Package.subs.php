@@ -156,7 +156,7 @@ function loadInstalledPackages()
 	$db = database();
 
 	// First, check that the database is valid, installed.list is still king.
-	$install_file = implode('', file(BOARDDIR . '/packages/installed.list'));
+	$install_file = @file_get_contents(BOARDDIR . '/packages/installed.list');
 	if (trim($install_file) == '')
 	{
 		$db->query('', '
@@ -419,7 +419,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 	}
 
 	// Just got a submission did we?
-	if ((empty($package_ftp) || ($package_ftp->error !== false)) && isset($_POST['ftp_username']))
+	if (isset($_POST['ftp_username'], $_POST['ftp_password']) && (empty($package_ftp) || ($package_ftp->error !== false)))
 	{
 		$ftp = new \ElkArte\Http\FtpConnection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 

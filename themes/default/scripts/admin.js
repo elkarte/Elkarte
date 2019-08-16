@@ -1982,3 +1982,219 @@ function confirmAgreement(text) {
 	}
 	return true;
 }
+
+/**
+ * Getting something back? Parse return data for the manage permission screen
+ *
+ * @param oXMLDoc
+ * @returns {boolean}
+ */
+function onNewFolderReceived(oXMLDoc)
+{
+	ajax_indicator(false);
+
+	var fileItems = oXMLDoc.getElementsByTagName('folders')[0].getElementsByTagName('folder');
+
+	// No folders, no longer worth going further.
+	if (fileItems.length < 1)
+	{
+		if (oXMLDoc.getElementsByTagName('roots')[0].getElementsByTagName('root')[0])
+		{
+			var rootName = oXMLDoc.getElementsByTagName('roots')[0].getElementsByTagName('root')[0].firstChild.nodeValue,
+				itemLink = document.getElementById('link_' + rootName);
+
+			// Move the children up.
+			for (i = 0; i <= itemLink.childNodes.length; i++)
+				itemLink.parentNode.insertBefore(itemLink.childNodes[0], itemLink);
+
+			// And remove the link.
+			itemLink.parentNode.removeChild(itemLink);
+		}
+
+		return false;
+	}
+
+	var tableHandle = false,
+		isMore = false,
+		ident = "",
+		my_ident = "",
+		curLevel = 0,
+		curOffset = "",
+		curRow = "",
+		curCol = "",
+		linkData = "",
+		folderImage = "",
+		writeSpan = "",
+		permData = "",
+		curInput = "",
+		newRow = "",
+		newCol = "",
+		fileName = "";
+
+	var oRadioColors = {
+		0: "#D1F7BF",
+		1: "#FFBBBB",
+		2: "#FDD7AF",
+		3: "#C2C6C0",
+		4: "#EEEEEE"
+	};
+
+	var oRadioValues = {
+		0: "read",
+		1: "writable",
+		2: "execute",
+		3: "custom",
+		4: "no_change"
+	};
+
+	for (var i = 0; i < fileItems.length; i++)
+	{
+		if (fileItems[i].getAttribute('more') === 1)
+		{
+			isMore = true;
+			curOffset = fileItems[i].getAttribute('offset');
+		}
+
+		if (fileItems[i].getAttribute('more') !== 1 && document.getElementById("insert_div_loc_" + fileItems[i].getAttribute('ident')))
+		{
+			ident = fileItems[i].getAttribute('ident');
+			my_ident = fileItems[i].getAttribute('my_ident');
+			curLevel = fileItems[i].getAttribute('level') * 5;
+			curPath = fileItems[i].getAttribute('path');
+
+			// Get where we're putting it next to.
+			tableHandle = document.getElementById("insert_div_loc_" + fileItems[i].getAttribute('ident'));
+
+			curRow = document.createElement("tr");
+			curRow.id = "content_" + my_ident;
+			curRow.style.display = "table-row";
+
+			curCol = document.createElement("td");
+			curCol.className = "smalltext grid30";
+
+			// This is the name.
+			fileName = document.createTextNode(' ' + fileItems[i].firstChild.nodeValue);
+
+			// Start by wacking in the spaces.
+			curCol.innerHTML = php_str_repeat("&nbsp;", curLevel);
+
+			// Create the actual text.
+			if (fileItems[i].getAttribute('folder') === 1)
+			{
+				linkData = document.createElement("a");
+				linkData.name = "fol_" + my_ident;
+				linkData.id = "link_" + my_ident;
+				linkData.href = '#';
+				linkData.path = curPath + "/" + fileItems[i].firstChild.nodeValue;
+				linkData.ident = my_ident;
+				linkData.onclick = dynamicExpandFolder;
+
+				folderImage = document.createElement("img");
+				folderImage.src = elk_images_url + '/board.png';
+				linkData.appendChild(folderImage);
+
+				linkData.appendChild(fileName);
+				curCol.appendChild(linkData);
+			}
+			else
+			{
+				curCol.appendChild(fileName);
+			}
+
+			curRow.appendChild(curCol);
+
+			// Right, the permissions.
+			curCol = document.createElement("td");
+			curCol.className = "smalltext grid30";
+
+			writeSpan = document.createElement("span");
+			writeSpan.style.color = fileItems[i].getAttribute('writable') ? "green" : "red";
+			writeSpan.innerHTML = fileItems[i].getAttribute('writable') ? package_file_perms_writable : package_file_perms_not_writable;
+			curCol.appendChild(writeSpan);
+
+			if (fileItems[i].getAttribute('permissions'))
+			{
+				permData = document.createTextNode("\u00a0(', package_file_perms_chmod : " + fileItems[i].getAttribute('permissions') + ")");
+				curCol.appendChild(permData);
+			}
+
+			curRow.appendChild(curCol);
+
+			// Now add the five radio buttons.
+			for (j = 0; j < 5; j++)
+			{
+				curCol = document.createElement("td");
+				curCol.style.backgroundColor = oRadioColors[j];
+				curCol.className = "centertext grid8";
+
+				curInput = document.createElement("input");
+				curInput.name = "permStatus[" + curPath + "/" + fileItems[i].firstChild.nodeValue + "]";
+				curInput.type = "radio";
+				curInput.checked = (j === 4 ? "checked" : "");
+				curInput.value = oRadioValues[j];
+
+				curCol.appendChild(curInput);
+				curRow.appendChild(curCol);
+			}
+
+			// Put the row in.
+			tableHandle.parentNode.insertBefore(curRow, tableHandle);
+
+			// Put in a new dummy section?
+			if (fileItems[i].getAttribute('folder') === 1)
+			{
+				newRow = document.createElement("tr");
+				newRow.id = "insert_div_loc_" + my_ident;
+				newRow.style.display = "none";
+				tableHandle.parentNode.insertBefore(newRow, tableHandle);
+
+				newCol = document.createElement("td");
+				newCol.colspan = 2;
+				newRow.appendChild(newCol);
+			}
+		}
+	}
+
+	// Is there some more to remove?
+	if (document.getElementById("content_" + ident + "_more"))
+	{
+		document.getElementById("content_" + ident + "_more").parentNode.removeChild(document.getElementById("content_" + ident + "_more"));
+	}
+
+	// Add more?
+	if (isMore && tableHandle)
+	{
+		// Create the actual link.
+		linkData = document.createElement("a");
+		linkData.href = '#fol_' + my_ident;
+		linkData.path = curPath;
+		linkData.offset = curOffset;
+		linkData.onclick = dynamicAddMore;
+		linkData.appendChild(document.createTextNode(package_file_perms_more_files));
+
+		curRow = document.createElement("tr");
+		curRow.id = "content_" + ident + "_more";
+		tableHandle.parentNode.insertBefore(curRow, tableHandle);
+		curCol = document.createElement("td");
+		curCol.className = "smalltext";
+		curCol.width = "40%";
+
+		curCol.innerHTML = php_str_repeat("&nbsp;", curLevel);
+		curCol.appendChild(document.createTextNode('\u00ab '));
+		curCol.appendChild(linkData);
+		curCol.appendChild(document.createTextNode(' \u00bb'));
+
+		curRow.appendChild(curCol);
+		curCol = document.createElement("td");
+		curCol.className = "smalltext";
+		curRow.appendChild(curCol);
+	}
+
+	// Keep track of it.
+	curInput = document.createElement("input");
+	curInput.name = "back_look[]";
+	curInput.type = "hidden";
+	curInput.value = curPath;
+
+	curCol.appendChild(curInput);
+}

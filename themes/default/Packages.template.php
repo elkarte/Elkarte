@@ -481,8 +481,7 @@ function template_list()
 
 	foreach ($context['files'] as $fileinfo)
 		echo '
-				<li><a href="', $scripturl, '?action=admin;area=packages;sa=examine;package=', $context['filename'], ';file=', $fileinfo['filename'], '" title="', $txt['view'], '">', $fileinfo['filename'], '</a> (', $fileinfo['size'], ' ', $txt['package_bytes'], ')</li>';
-
+				<li><a href="', $scripturl, '?action=admin;area=packages;sa=examine;package=', $context['filename'], ';file=', $fileinfo['filename'], '" title="', $txt['view'], '">', $fileinfo['filename'], '</a> (', $fileinfo['formatted_size'], ')</li>';
 	echo '
 			</ol>
 			<br />
@@ -500,11 +499,11 @@ function template_examine()
 
 	echo '
 	<div id="admincenter">
-		<h2 class="category_header">', $txt['package_examine_file'], '</h2>
-		<h2 class="category_header">', $txt['package_file_contents'], ' ', $context['filename'], ':</h2>
-		<div class="content">
-			<pre class="file_content">', $context['filedata'], '</pre>
-			<a href="', $scripturl, '?action=admin;area=packages;sa=list;package=', $context['package'], '">[ ', $txt['list_files'], ' ]</a>
+		<h2 class="category_header">', $txt['package_examine_file'], ' : ' , $context['package'], '</h2>
+		<h3 class="category_header">', $txt['package_file_contents'], ' ', $context['filename'], ':</h3>
+		<div class="content largetext">
+			<code><pre class="file_content prettyprint">', $context['filedata'], '</pre></code>
+			<a href="', $scripturl, '?action=admin;area=packages;sa=list;package=', $context['package'], '" class="linkbutton_right">', $txt['list_files'], '</a>
 		</div>
 	</div>';
 }
@@ -746,210 +745,18 @@ function template_file_permissions()
 	global $txt, $scripturl, $context, $settings;
 
 	// This will handle expanding the selection.
-	// @todo most of this code should go in to admin.js
 	echo '
 	<script>
-		var oRadioColors = {
-			0: "#D1F7BF",
-			1: "#FFBBBB",
-			2: "#FDD7AF",
-			3: "#C2C6C0",
-			4: "#EEEEEE"
-		}
-		var oRadioValues = {
-			0: "read",
-			1: "writable",
-			2: "execute",
-			3: "custom",
-			4: "no_change"
-		}
+		var package_file_perms_writable = "', JavaScriptEscape($txt['package_file_perms_writable']), '",
+			package_file_perms_chmod = "', JavaScriptEscape($txt['package_file_perms_chmod']), '",
+	    	package_file_perms_not_writable = "', JavaScriptEscape($txt['package_file_perms_not_writable']), '",
+	    	package_file_perms_more_files = "', JavaScriptEscape($txt['package_file_perms_more_files']), '";
 
 		function dynamicAddMore()
 		{
 			ajax_indicator(true);
 
 			getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + \'action=admin;area=packages;fileoffset=\' + (parseInt(this.offset) + ', $context['file_limit'], ') + \';onlyfind=\' + escape(this.path) + \';sa=perms;xml;', $context['session_var'], '=', $context['session_id'], '\', onNewFolderReceived);
-		}
-
-		// Getting something back?
-		function onNewFolderReceived(oXMLDoc)
-		{
-			ajax_indicator(false);
-
-			var fileItems = oXMLDoc.getElementsByTagName(\'folders\')[0].getElementsByTagName(\'folder\');
-
-			// No folders, no longer worth going further.
-			if (fileItems.length < 1)
-			{
-				if (oXMLDoc.getElementsByTagName(\'roots\')[0].getElementsByTagName(\'root\')[0])
-				{
-					var rootName = oXMLDoc.getElementsByTagName(\'roots\')[0].getElementsByTagName(\'root\')[0].firstChild.nodeValue;
-					var itemLink = document.getElementById(\'link_\' + rootName);
-
-					// Move the children up.
-					for (i = 0; i <= itemLink.childNodes.length; i++)
-						itemLink.parentNode.insertBefore(itemLink.childNodes[0], itemLink);
-
-					// And remove the link.
-					itemLink.parentNode.removeChild(itemLink);
-				}
-				return false;
-			}
-			var tableHandle = false,
-				isMore = false,
-				ident = "",
-				my_ident = "",
-				curLevel = 0;
-
-			for (var i = 0; i < fileItems.length; i++)
-			{
-				if (fileItems[i].getAttribute(\'more\') == 1)
-				{
-					isMore = true;
-					var curOffset = fileItems[i].getAttribute(\'offset\');
-				}
-
-				if (fileItems[i].getAttribute(\'more\') != 1 && document.getElementById("insert_div_loc_" + fileItems[i].getAttribute(\'ident\')))
-				{
-					ident = fileItems[i].getAttribute(\'ident\');
-					my_ident = fileItems[i].getAttribute(\'my_ident\');
-					curLevel = fileItems[i].getAttribute(\'level\') * 5;
-					curPath = fileItems[i].getAttribute(\'path\');
-
-					// Get where we\'re putting it next to.
-					tableHandle = document.getElementById("insert_div_loc_" + fileItems[i].getAttribute(\'ident\'));
-
-					var curRow = document.createElement("tr");
-					curRow.id = "content_" + my_ident;
-					curRow.style.display = "table-row";
-
-					var curCol = document.createElement("td");
-					curCol.className = "smalltext grid30";
-
-					// This is the name.
-					var fileName = document.createTextNode(fileItems[i].firstChild.nodeValue);
-
-					// Start by wacking in the spaces.
-					curCol.innerHTML = php_str_repeat("&nbsp;", curLevel);
-
-					// Create the actual text.
-					if (fileItems[i].getAttribute(\'folder\') == 1)
-					{
-						var linkData = document.createElement("a");
-						linkData.name = "fol_" + my_ident;
-						linkData.id = "link_" + my_ident;
-						linkData.href = \'#\';
-						linkData.path = curPath + "/" + fileItems[i].firstChild.nodeValue;
-						linkData.ident = my_ident;
-						linkData.onclick = dynamicExpandFolder;
-
-						var folderImage = document.createElement("img");
-						folderImage.src = \'', addcslashes($settings['default_images_url'], '\\'), '/board.png\';
-						linkData.appendChild(folderImage);
-
-						linkData.appendChild(fileName);
-						curCol.appendChild(linkData);
-					}
-					else
-						curCol.appendChild(fileName);
-
-					curRow.appendChild(curCol);
-
-					// Right, the permissions.
-					curCol = document.createElement("td");
-					curCol.className = "smalltext grid30";
-
-					var writeSpan = document.createElement("span");
-					writeSpan.style.color = fileItems[i].getAttribute(\'writable\') ? "green" : "red";
-					writeSpan.innerHTML = fileItems[i].getAttribute(\'writable\') ? \'', $txt['package_file_perms_writable'], '\' : \'', $txt['package_file_perms_not_writable'], '\';
-					curCol.appendChild(writeSpan);
-
-					if (fileItems[i].getAttribute(\'permissions\'))
-					{
-						var permData = document.createTextNode("\u00a0(', $txt['package_file_perms_chmod'], ': " + fileItems[i].getAttribute(\'permissions\') + ")");
-						curCol.appendChild(permData);
-					}
-
-					curRow.appendChild(curCol);
-
-					// Now add the five radio buttons.
-					for (j = 0; j < 5; j++)
-					{
-						curCol = document.createElement("td");
-						curCol.style.backgroundColor = oRadioColors[j];
-						curCol.className = "centertext grid8";
-
-						var curInput = document.createElement("input");
-						curInput.name = "permStatus[" + curPath + "/" + fileItems[i].firstChild.nodeValue + "]";
-						curInput.type = "radio";
-						curInput.checked = (j == 4 ? "checked" : "");
-						curInput.value = oRadioValues[j];
-
-						curCol.appendChild(curInput);
-						curRow.appendChild(curCol);
-					}
-
-					// Put the row in.
-					tableHandle.parentNode.insertBefore(curRow, tableHandle);
-
-					// Put in a new dummy section?
-					if (fileItems[i].getAttribute(\'folder\') == 1)
-					{
-						var newRow = document.createElement("tr");
-						newRow.id = "insert_div_loc_" + my_ident;
-						newRow.style.display = "none";
-						tableHandle.parentNode.insertBefore(newRow, tableHandle);
-
-						var newCol = document.createElement("td");
-						newCol.colspan = 2;
-						newRow.appendChild(newCol);
-					}
-				}
-			}
-
-			// Is there some more to remove?
-			if (document.getElementById("content_" + ident + "_more"))
-			{
-				document.getElementById("content_" + ident + "_more").parentNode.removeChild(document.getElementById("content_" + ident + "_more"));
-			}
-
-			// Add more?
-			if (isMore && tableHandle)
-			{
-				// Create the actual link.
-				var linkData = document.createElement("a");
-				linkData.href = \'#fol_\' + my_ident;
-				linkData.path = curPath;
-				linkData.offset = curOffset;
-				linkData.onclick = dynamicAddMore;
-
-				linkData.appendChild(document.createTextNode(\'', $txt['package_file_perms_more_files'], '\'));
-
-				curRow = document.createElement("tr");
-				curRow.id = "content_" + ident + "_more";
-				tableHandle.parentNode.insertBefore(curRow, tableHandle);
-				curCol = document.createElement("td");
-				curCol.className = "smalltext";
-				curCol.width = "40%";
-
-				curCol.innerHTML = php_str_repeat("&nbsp;", curLevel);
-				curCol.appendChild(document.createTextNode(\'\\u00ab \'));
-				curCol.appendChild(linkData);
-				curCol.appendChild(document.createTextNode(\' \\u00bb\'));
-
-				curRow.appendChild(curCol);
-				curCol = document.createElement("td");
-				curCol.className = "smalltext";
-				curRow.appendChild(curCol);
-			}
-
-			// Keep track of it.
-			var curInput = document.createElement("input");
-			curInput.name = "back_look[]";
-			curInput.type = "hidden";
-			curInput.value = curPath;
-
-			curCol.appendChild(curInput);
 		}
 	</script>';
 
@@ -1215,14 +1022,14 @@ function template_pause_action_permissions()
 		echo '
 					<input type="hidden" name="custom_value" value="', $context['custom_value'], '" />
 					<input type="hidden" name="totalItems" value="', $context['total_items'], '" />
-					<input type="hidden" name="toProcess" value="', base64_encode(serialize($context['to_process'])), '" />';
+					<input type="hidden" name="toProcess" value="', base64_encode(json_encode($context['to_process'])), '" />';
 	else
 		echo '
 					<input type="hidden" name="predefined" value="', $context['predefined_type'], '" />
 					<input type="hidden" name="fileOffset" value="', $context['file_offset'], '" />
 					<input type="hidden" name="totalItems" value="', $context['total_items'], '" />
-					<input type="hidden" name="dirList" value="', base64_encode(serialize($context['directory_list'])), '" />
-					<input type="hidden" name="specialFiles" value="', base64_encode(serialize($context['special_files'])), '" />';
+					<input type="hidden" name="dirList" value="', base64_encode(json_encode($context['directory_list'])), '" />
+					<input type="hidden" name="specialFiles" value="', base64_encode(json_encode($context['special_files'])), '" />';
 
 	// Are we not using FTP for whatever reason.
 	if (!empty($context['skip_ftp']))

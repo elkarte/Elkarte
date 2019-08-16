@@ -269,7 +269,7 @@ class Maintenance extends \ElkArte\AbstractController
 				'form_elements_only' => true,
 				'server' => '',
 				'port' => '',
-				'username' => '',
+				'username' => isset($modSettings['package_username']) ? $modSettings['package_username'] : '',
 				'path' => '',
 				'error' => '',
 			);
@@ -1089,7 +1089,7 @@ class Maintenance extends \ElkArte\AbstractController
 		{
 			// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
 			if (!$ftp->chdir($this->_req->post->ftp_path))
-				$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $this->_req->post->ftp_path));
+				$ftp->chdir(preg_replace('~^/home[2]?/[^/]+~', '', $this->_req->post->ftp_path));
 		}
 
 		// If we had an error...
