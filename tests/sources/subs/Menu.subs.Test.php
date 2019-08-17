@@ -7,6 +7,7 @@ class TestMenuSubs extends \PHPUnit\Framework\TestCase
 {
 	protected $test_areas;
 	protected $test_options;
+	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
 	 * Prepare some test data, to use in these tests.

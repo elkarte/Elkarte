@@ -11,6 +11,7 @@
  */
 class DispatcherTest extends \PHPUnit\Framework\TestCase
 {
+	protected $backupGlobalsBlacklist = ['user_info'];
 	/**
 	 * Tests automagical routing to an action
 	 */

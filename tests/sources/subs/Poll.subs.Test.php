@@ -8,6 +8,7 @@
  */
 class TestPoll extends \PHPUnit\Framework\TestCase
 {
+	protected $backupGlobalsBlacklist = ['user_info'];
 	/**
 	 * Prepare some test data, to use in these tests.
 	 * setUp() is run automatically by the testing framework before each test method.

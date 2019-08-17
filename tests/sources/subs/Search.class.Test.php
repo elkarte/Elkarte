@@ -8,6 +8,7 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 	protected $member_limited_access = 0;
 	protected $member_no_access = 0;
 	protected $run_tests = true;
+	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
 	 * Prepare what is necessary to use in these tests.
@@ -148,15 +149,22 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 	 */
 	public function testBasicAdminSearch()
 	{
-		global $cookiename;
+		global $cookiename, $user_info;
 
 		if ($this->run_tests === false)
 		{
 			return;
 		}
 
-		$_COOKIE[$cookiename] = json_encode([$this->member_full_access, $this->_getSalt($this->member_full_access)]);
-		loadUserSettings();
+		$db = database();
+		$cache = \ElkArte\Cache\Cache::instance();
+		$req = request();
+
+		$user = new \ElkArte\UserSettings($db, $cache, $req);
+		$user->loadUserById($this->member_full_access, true, '');
+		\ElkArte\User::reloadByUser($user);
+		// @deprecated kept until any trace of $user_info has been completely removed
+		$user_info = \ElkArte\User::$info;
 
 		$topics = $this->_performSearch();
 		$this->assertEquals(2, count($topics), 'Admin search results not correct, found ' . count($topics) . ' instead of 2');

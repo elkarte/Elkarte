@@ -19,6 +19,7 @@ class MockMemcached extends \ElkArte\Cache\CacheMethod\Memcached
 class TestCache extends \PHPUnit\Framework\TestCase
 {
 	private $_cache_obj = null;
+	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
 	 * Prepare some test data, to use in these tests.

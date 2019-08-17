@@ -9,6 +9,7 @@ class TestPermissionsClass extends \PHPUnit\Framework\TestCase
 	public $permissionsObject;
 	private $illegal_permissions = array();
 	private $illegal_guest_permissions = array();
+	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
 	 * Prepare what is necessary to use in these tests.
@@ -34,6 +35,9 @@ class TestPermissionsClass extends \PHPUnit\Framework\TestCase
 	 */
 	public function testDefaultIllegalPermissions()
 	{
+		global $user_info;
+
+		$user_info['is_admin'] = false;
 		$permissionsObject = new \ElkArte\Permissions();
 		$this->illegal_permissions = $permissionsObject->getIllegalPermissions();
 

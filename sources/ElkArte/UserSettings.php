@@ -82,7 +82,7 @@ class UserSettings
 
 	public function validatePassword($password)
 	{
-		$this->settings->validatePassword($password);
+		return $this->settings->validatePassword($password);
 	}
 
 	/**
@@ -159,7 +159,7 @@ class UserSettings
 		// Set up the $user_info array.
 		$user_info += array(
 			'id' => $this->id,
-			'username' => $this->username,
+			'username' => $this->member_name,
 			'name' => $this->settings->real_name(''),
 			'email' => $this->settings->email_address(''),
 			'passwd' => $this->settings->passwd(''),
@@ -175,7 +175,7 @@ class UserSettings
 			'time_format' => $this->settings->getEmpty('time_format', $modSettings['time_format']),
 			'time_offset' => (int) $this->settings->time_offset,
 			'avatar' => $this->buildAvatarArray(),
-			'smiley_set' => $this->settings->smiley_set(''),
+			'smiley_set' => determineSmileySet($this->settings->smiley_set(''), $modSettings['smiley_sets_known']),
 			'messages' => (int) $this->settings->personal_messages,
 			'mentions' => max(0, (int) $this->settings->mentions),
 			'unread_messages' => (int) $this->settings->unread_messages,
@@ -302,7 +302,7 @@ class UserSettings
 			$_SESSION['id_msg_last_visit'] = $this->settings['id_msg_last_visit'];
 		}
 
-		$this->username = $this->settings['member_name'];
+		$this->member_name = $this->settings['member_name'];
 
 		if (empty($this->settings['additional_groups']))
 		{
@@ -388,7 +388,7 @@ class UserSettings
 				// If the password is not 64 characters, lets make it a (SHA-256)
 				if (strlen($password) !== 64)
 				{
-					$password = hash('sha256', \ElkArte\Util::strtolower($this->username) . un_htmlspecialchars($password));
+					$password = hash('sha256', \ElkArte\Util::strtolower($this->member_name) . un_htmlspecialchars($password));
 				}
 
 				$passhash = $this->hasher->HashPassword($password);
@@ -444,10 +444,10 @@ class UserSettings
 				// If the password is not 64 characters, lets make it a (SHA-256)
 				if (strlen($password) !== 64)
 				{
-					$password = hash('sha256', \ElkArte\Util::strtolower($this->username) . un_htmlspecialchars($password));
+					$password = hash('sha256', \ElkArte\Util::strtolower($this->member_name) . un_htmlspecialchars($password));
 				}
 
-				return (bool) $this->hasher->CheckPassword($password, $this->settings->passwd);
+				return (bool) $this->hasher->CheckPassword($password, $this->passwd);
 			}
 		};
 	}
@@ -457,7 +457,7 @@ class UserSettings
 		global $cookiename, $modSettings, $context;
 
 		// This is what a guest's variables should be.
-		$this->username = '';
+		$this->member_name = '';
 		$user_info = array('groups' => array(-1));
 		$this->initSettings([]);
 

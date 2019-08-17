@@ -5,6 +5,7 @@ class TestSettingsForm extends \PHPUnit\Framework\TestCase
 	protected $configVars = array();
 	protected $permissionResults = array();
 	protected $configValues = array();
+	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
 	 * Prepare what is necessary to use in these tests.
@@ -18,7 +19,7 @@ class TestSettingsForm extends \PHPUnit\Framework\TestCase
 		theme()->getTemplates()->loadLanguageFile('Admin', 'english', true, true);
 
 		// Elevate the user.
-		$user_info['permissions'][] = 'manage_permissions';
+		$user_info['permissions'] = array_merge($user_info['permissions'], ['manage_permissions']);
 
 		$this->configVars = array(
 			array('text', 'name1'),

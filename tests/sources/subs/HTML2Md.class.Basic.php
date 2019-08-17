@@ -4,6 +4,7 @@ class TestHTML2Md extends \PHPUnit\Framework\TestCase
 {
 	protected $mdTestCases = array();
 	protected $restore_txt = false;
+	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
 	 * Prepare what is necessary to use in these tests.

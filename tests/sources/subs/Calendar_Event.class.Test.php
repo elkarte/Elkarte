@@ -5,6 +5,7 @@
  */
 class TestCalendarEvent extends \PHPUnit\Framework\TestCase
 {
+	protected $backupGlobalsBlacklist = ['user_info'];
 	/**
 	 * To avoid duplicated function declarations, we need an empty Calendar.subs.php
 	 */

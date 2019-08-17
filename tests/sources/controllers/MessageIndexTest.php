@@ -5,6 +5,7 @@
  */
 class TestMessageIndex extends \PHPUnit\Framework\TestCase
 {
+	protected $backupGlobalsBlacklist = ['user_info'];
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
@@ -18,7 +19,7 @@ class TestMessageIndex extends \PHPUnit\Framework\TestCase
 		$modSettings['default_forum_action'] = [];
 		$settings['default_theme_dir'] = '/var/www/themes/default';
 
-		$user_info = array(
+		$user_info = new \ElkArte\ValuesContainer([
 			'id' => 1,
 			'ip' => '127.0.0.1',
 			'language' => 'english',
@@ -27,7 +28,7 @@ class TestMessageIndex extends \PHPUnit\Framework\TestCase
 			'username' => 'testing',
 			'query_wanna_see_board' => '1=1',
 			'query_see_board' => '1=1',
-			'is_moderator' => $user_info['is_moderator'],
+			'is_moderator' => false,
 			'email' => 'a@a.com',
 			'ignoreusers' => '',
 			'name' => 'itsme',
@@ -39,7 +40,7 @@ class TestMessageIndex extends \PHPUnit\Framework\TestCase
 			'buddies' => array(),
 			'groups' => array(0 => 1),
 			'ignoreboards' => array(),
-		);
+		]);
 
 		$settings['page_index_template'] = array(
 			'base_link' => '<li></li>',

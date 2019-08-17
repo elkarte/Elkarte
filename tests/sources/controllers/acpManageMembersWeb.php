@@ -9,6 +9,7 @@
  */
 class TestManageMembersController extends ElkArteWebTest
 {
+	protected $backupGlobalsBlacklist = ['user_info'];
 	public function registerMembers()
 	{
 		require_once(SUBSDIR . '/Members.subs.php');

@@ -109,7 +109,7 @@ class Auth extends \ElkArte\AbstractController
 	 */
 	public function action_login2()
 	{
-		global $txt, $modSettings, $context;
+		global $txt, $modSettings, $context, $user_info;
 
 		// Load cookie authentication and all stuff.
 		require_once(SUBSDIR . '/Auth.subs.php');
@@ -277,6 +277,8 @@ class Auth extends \ElkArte\AbstractController
 				$context['disable_login_hashing'] = true;
 				$user->loadUserById(0, true, '');
 				\ElkArte\User::reloadByUser($user);
+				// @deprecated kept until any trace of $user_info has been completely removed
+				$user_info = \ElkArte\User::$info;
 
 				return false;
 			}
@@ -302,6 +304,8 @@ class Auth extends \ElkArte\AbstractController
 					$context['login_errors'] = array($txt['incorrect_password']);
 					$user->loadUserById(0, true, '');
 					\ElkArte\User::reloadByUser($user);
+					// @deprecated kept until any trace of $user_info has been completely removed
+					$user_info = \ElkArte\User::$info;
 
 					return false;
 				}

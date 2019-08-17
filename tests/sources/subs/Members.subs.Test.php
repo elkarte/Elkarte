@@ -11,6 +11,7 @@ use ElkArte\Errors\ErrorContext;
 class TestMembers extends \PHPUnit\Framework\TestCase
 {
 	private $memberID = null;
+	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
 	 * Prepare some test data, to use in these tests.

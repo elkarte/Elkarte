@@ -5,6 +5,7 @@ class TestBBC extends \PHPUnit\Framework\TestCase
 	protected $bbcTestCases;
 	protected $bbcInvalidTestCases;
 	protected $bbcPreparseTestCases;
+	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
 	 * Prepare what is necessary to use in these tests.
@@ -13,11 +14,14 @@ class TestBBC extends \PHPUnit\Framework\TestCase
 	 */
 	public function setUp()
 	{
-		global $modSettings;
+		global $modSettings, $context, $user_info;
 		$modSettings['user_access_mentions'] = array();
 		$modSettings['enablePostHTML'] = 1;
 
+		\ElkArte\User::load();
 		new ElkArte\Themes\ThemeLoader();
+		$context['user']['smiley_path'] = 'http://127.0.0.1/smileys/default/';
+		$user_info['smiley_set'] = 'default';
 
 		// Standard testcases
 		$this->bbcTestCases = array(
@@ -565,7 +569,7 @@ Should be an empty line in between.',
 			array(
 				'itsMe',
 				'/me likes this',
-				'<div class="meaction">&nbsp; likes this</div>'
+				'<div class="meaction">&nbsp;' . $user_info['name'] . ' likes this</div>'
 			),
 			array(
 				'schemelessUrl',
@@ -587,7 +591,7 @@ Should be an empty line in between.',
 			$test = $testcase[1];
 			$expected = $testcase[2];
 
-			$result = $parsers->parseMessage($test, 1);
+			$result = $parsers->parseMessage($test, true);
 
 			$this->assertEquals($expected, $result, $name);
 		}
@@ -604,7 +608,7 @@ Should be an empty line in between.',
 			$name = 'Broken ' . $testcase[0];
 			$test = $testcase[1];
 
-			$result = $parsers->parseMessage($test, 1);
+			$result = $parsers->parseMessage($test, true);
 
 			$this->assertEquals($test, $result, $name);
 		}
