@@ -1430,9 +1430,35 @@ RemoveHandler .php .php3 .phtml .cgi .fcgi .pl .fpl .shtml';
 		$fh = @fopen($path . '/.htaccess', 'w');
 		if ($fh)
 		{
-			fwrite($fh, '<Files ' . $files . '>
+			fwrite($fh, '# Apache 2.4
+<IfModule mod_authz_core.c>
+	Require all denied
+	<Files ~ ' . $files . '>
+		<RequireAll>
+			Require all granted
+			Require not env blockAccess' . (empty($allow_localhost) ? '
+		</RequireAll>
+	</Files>' : '
+		Require host localhost
+		</RequireAll>
+	</Files>
+
+	RemoveHandler .php .php3 .phtml .cgi .fcgi .pl .fpl .shtml') . '
+</IfModule>
+
+# Apache 2.2
+<IfModule !mod_authz_core.c>
 	Order Deny,Allow
-	Deny from all' . $close);
+	Deny from all
+
+	<Files ' . $files . '>
+		Allow from all' . (empty($allow_localhost) ? '
+	</Files>' : '
+		Allow from localhost
+	</Files>
+
+	RemoveHandler .php .php3 .phtml .cgi .fcgi .pl .fpl .shtml') . '
+</IfModule>');
 			fclose($fh);
 		}
 		$errors[] = 'htaccess_cannot_create_file';
