@@ -1416,12 +1416,6 @@ function secureDirectory($path, $allow_localhost = false, $files = '*')
 	$directoryname = basename($path);
 
 	$errors = array();
-	$close = empty($allow_localhost) ? '
-</Files>' : '
-	Allow from localhost
-</Files>
-
-RemoveHandler .php .php3 .phtml .cgi .fcgi .pl .fpl .shtml';
 
 	if (file_exists($path . '/.htaccess'))
 		$errors[] = 'htaccess_exists';
