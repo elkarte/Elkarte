@@ -796,7 +796,7 @@ function doLogin(\ElkArte\UserSettings $user)
 	$user_info = \ElkArte\User::$info;
 
 	// Call login integration functions.
-	call_integration_hook('integrate_login', array($user_setting['member_name'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 64 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime']));
+	call_integration_hook('integrate_login', array(\ElkArte\User::$settings['member_name'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 64 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime']));
 
 	// Bam!  Cookie set.  A session too, just in case.
 	setLoginCookie(60 * $modSettings['cookieTime'], \ElkArte\User::$settings['id_member'], hash('sha256', (\ElkArte\User::$settings['passwd'] . \ElkArte\User::$settings['password_salt'])));

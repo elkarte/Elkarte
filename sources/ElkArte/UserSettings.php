@@ -19,26 +19,71 @@ namespace ElkArte;
  */
 class UserSettings
 {
+	/**
+	 * @var int
+	 */
 	const HASH_LENGTH = 4;
 
+	/**
+	 * @var int
+	 */
 	const BAN_OFFSET = 10;
 
+	/**
+	 * The user id
+	 *
+	 * @var int
+	 */
 	protected $id = 0;
 
+	/**
+	 * The member_name field from the db
+	 *
+	 * @var string
+	 */
 	protected $username = '';
 
+	/**
+	 * The database object
+	 *
+	 * @var \ElkArte\Database\QueryInterface
+	 */
 	protected $db = null;
 
+	/**
+	 * The cache object
+	 *
+	 * @var \ElkArte\Cache\Cache
+	 */
 	protected $cache = null;
 
+	/**
+	 * The request object
+	 *
+	 * @var \ElkArte\Request
+	 */
 	protected $req = null;
 
+	/**
+	 * The settings data
+	 *
+	 * @var \ElkArte\ValuesContainerReadOnly
+	 */
 	protected $settings = null;
 
+	/**
+	 * The into data
+	 *
+	 * @var \ElkArte\ValuesContainer
+	 */
 	protected $info = null;
 
 	/**
 	 * Constructor
+	 *
+	 * @param \ElkArte\Database\QueryInterface $db
+	 * @param \ElkArte\Cache\Cache $cache
+	 * @param \ElkArte\Request $req
 	 */
 	public function __construct($db, $cache, $req)
 	{
@@ -47,16 +92,35 @@ class UserSettings
 		$this->req = $req;
 	}
 
+	/**
+	 * Returns the user settings
+	 *
+	 * @return \ElkArte\ValuesContainerReadOnly
+	 */
 	public function getSettings()
 	{
 		return $this->settings;
 	}
 
+	/**
+	 * Returns the user into
+	 *
+	 * @return \ElkArte\ValuesContainer
+	 */
 	public function getInfo()
 	{
 		return $this->info;
 	}
 
+	/**
+	 * Loads from the db the data of a user based on the member id
+	 *
+	 * @param int $id
+	 * @param bool $already_verified
+	 * @param string $session_password
+	 *
+	 * @event integrate_user_info
+	 */
 	public function loadUserById($id, $already_verified, $session_password)
 	{
 		$this->id = $id;
@@ -75,11 +139,23 @@ class UserSettings
 		$this->compileInfo($user_info);
 	}
 
+	/**
+	 * Repeat the hashing of the password, either because it was not previously
+	 * hashed or because it needs a new one
+	 *
+	 * @param string $password
+	 */
 	public function rehashPassword($password)
 	{
 		$this->settings->rehashPassword($password);
 	}
 
+	/**
+	 * Checkes the provided password is the same as the one in the database.
+	 *
+	 * @param string $password
+	 * @return bool
+	 */
 	public function validatePassword($password)
 	{
 		return $this->settings->validatePassword($password);
@@ -152,6 +228,11 @@ class UserSettings
 		return true;
 	}
 
+	/**
+	 * Fills up the $this->info variable
+	 *
+	 * @param mixed[] $user_info
+	 */
 	protected function compileInfo($user_info)
 	{
 		global $modSettings;
@@ -226,6 +307,11 @@ class UserSettings
 		};
 	}
 
+	/**
+	 * Prepares the data of the avatar (path, url, etc.)
+	 *
+	 * @return mixed[]
+	 */
 	protected function buildAvatarArray()
 	{
 		return array_merge([
@@ -236,6 +322,12 @@ class UserSettings
 			], determineAvatar($this->settings));
 	}
 
+	/**
+	 * Determines the language to be used.
+	 * Checks the current user setting, the $_GET['language'], the session and $modSettings
+	 *
+	 * @param mixed[] $user_info
+	 */
 	protected function getLanguage()
 	{
 		global $modSettings, $language;
@@ -261,6 +353,11 @@ class UserSettings
 		return $user_lang;
 	}
 
+	/**
+	 * Prepares the basic data necessary for $this->info
+	 *
+	 * @return mixed[]
+	 */
 	protected function initUser()
 	{
 		global $modSettings;
@@ -330,9 +427,19 @@ class UserSettings
 		return $user_info;
 	}
 
+	/**
+	 * Prepares the $this->settings property
+	 *
+	 * @param mixed[] $user_settings
+	 */
 	protected function initSettings($user_settings)
 	{
 		$this->settings = new class($user_settings) extends ValuesContainerReadOnly {
+			/**
+			 * The object used to create hashes
+			 *
+			 * @var \PasswordHash
+			 */
 			protected $hasher = null;
 
 			/**
@@ -345,11 +452,20 @@ class UserSettings
 				return $this->data;
 			}
 
+			/**
+			 * Sets last_login to the current time
+			 */
 			public function updateLastLogin()
 			{
 				$this->data['last_login'] = time();
 			}
 
+			/**
+			 * Changes the password to the provided one in $this->settings
+			 * Doesn't actually change the database.
+			 *
+			 * @param string $password The hashed password
+			 */
 			public function updatePassword($password)
 			{
 				$this->data['passwd'] = $password;
@@ -358,11 +474,21 @@ class UserSettings
 				$this->data['password_salt'] = $tokenizer->generate_hash(UserSettings::HASH_LENGTH);
 			}
 
+			/**
+			 * Updates total_time_logged_in
+			 *
+			 * @param int $increment_offset
+			 */
 			public function updateTotalTimeLoggedIn($increment_offset)
 			{
 				$this->data['total_time_logged_in'] += time() - $increment_offset;
 			}
 
+			/**
+			 * Fixes the password salt if not present or if it needs to be changed
+			 *
+			 * @param bool $force - If true the salt is changed no matter what
+			 */
 			public function fixSalt($force = false)
 			{
 				// Correct password, but they've got no salt; fix it!
@@ -376,11 +502,22 @@ class UserSettings
 				return false;
 			}
 
+			/**
+			 * Updates total_time_logged_in
+			 *
+			 * @param int $increment_offset
+			 */
 			public function getActivationStatus($strip_ban = true)
 			{
 				return $this->is_activated > UserSettings::BAN_OFFSET ? $this->is_activated - UserSettings::BAN_OFFSET : $this->is_activated;
 			}
 
+			/**
+			 * Repeat the hashing of the password
+			 *
+			 * @param string $password The plain text (or sha256 hashed) password
+			 * @return bool|null Returns false if something fails
+			 */
 			public function rehashPassword($password)
 			{
 				$this->initHasher();
@@ -405,6 +542,9 @@ class UserSettings
 				}
 			}
 
+			/**
+			 * Initialize the password hashing object
+			 */
 			protected function initHasher()
 			{
 				if ($this->hasher === null)
@@ -452,6 +592,11 @@ class UserSettings
 		};
 	}
 
+	/**
+	 * Initialize the data necessary to "load" a guest
+	 *
+	 * @return mixed[]
+	 */
 	protected function initGuest()
 	{
 		global $cookiename, $modSettings, $context;
@@ -488,6 +633,12 @@ class UserSettings
 		return $user_info;
 	}
 
+	/**
+	 * Loads the data of a certain member from the database
+	 *
+	 * @param bool $already_verified
+	 * @param string $session_password
+	 */
 	protected function loadUserData($already_verified, $session_password)
 	{
 		$user_settings = [];

@@ -156,10 +156,7 @@ function reloadSettings()
  */
 function loadUserSettings()
 {
-	global $user_info;
-
-	\ElkArte\User::load();
-	$user_info = \ElkArte\User::$info;
+	\ElkArte\User::load(true);
 }
 
 /**

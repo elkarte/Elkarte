@@ -19,22 +19,48 @@ namespace ElkArte;
  */
 class User
 {
+	/**
+	 * The user object
+	 *
+	 * @var \ElkArte\UserSettings
+	 */
 	protected static $instance = null;
 
+	/**
+	 * The user id
+	 *
+	 * @var int
+	 */
 	protected static $id = 0;
 
+	/**
+	 * The hashed password read from the cookies
+	 *
+	 * @var string
+	 */
 	protected static $session_password = '';
 
+	/**
+	 * Contains data regarding the user in a form that may be useful in the code
+	 * Basically the former $user_info
+	 *
+	 * @var \ElkArte\ValuesContainer
+	 */
 	public static $info = null;
 
 	/**
 	 * Contains the data read from the db.
 	 * Read-only by means of ValuesContainerReadOnly
-	 * @var ElkArte\ValuesContainerReadOnly
+	 * @var \ElkArte\ValuesContainerReadOnly
 	 */
 	public static $settings = null;
 
-	public static function load()
+	/**
+	 * Load all the important user information.
+	 *
+	 * @param bool $compat_mode if true sets the deprecated $user_info global
+	 */
+	public static function load($compat_mode = false)
 	{
 		if (self::$instance === null)
 		{
@@ -48,16 +74,38 @@ class User
 			self::$instance->loadUserById(self::$id, $already_verified, self::$session_password);
 			self::$settings = self::$instance->getSettings();
 			self::$info = self::$instance->getInfo();
+			if ($compat_mode === true)
+			{
+				global $user_info;
+				$user_info = \ElkArte\User::$info;
+			}
 		}
 	}
 
-	public static function reloadByUser(\ElkArte\UserSettings $user)
+	/**
+	 * Reload all the important user information into the static variables
+	 * based on the \ElkArte\UserSettings object passed to it
+	 *
+	 * @param \ElkArte\UserSettings $user An user
+	 * @param bool $compat_mode if true sets the deprecated $user_info global
+	 */
+	public static function reloadByUser(\ElkArte\UserSettings $user, $compat_mode = false)
 	{
 		self::$instance = $user;
 		self::$settings = self::$instance->getSettings();
 		self::$info = self::$instance->getInfo();
+		if ($compat_mode === true)
+		{
+			global $user_info;
+			$user_info = \ElkArte\User::$info;
+		}
 	}
 
+	/**
+	 * Tests any hook set to integrate_verify_user to set users
+	 * according to alternative validations
+	 * @event integrate_verify_user allow for integration to verify a user
+	 */
 	protected static function loadFromIntegration()
 	{
 		// Check first the integration, then the cookie, and last the session.
@@ -76,6 +124,11 @@ class User
 		return false;
 	}
 
+	/**
+	 * Reads data from the cookie to load the user identity
+	 * @param string $user_agent the Browser user agent, used to do some checkes
+	 *               based on the session data to reduce spamming and hacking
+	 */
 	protected static function loadFromCookie($user_agent)
 	{
 		global $cookiename, $modSettings;
