@@ -14,9 +14,17 @@
  *
  */
 
-use ElkArte\Errors;
 use ElkArte\Debug;
 use ElkArte\Hooks;
+use ElkArte\User;
+use ElkArte\TokenHash;
+use ElkArte\Errors\Errors;
+use ElkArte\MembersList;
+use ElkArte\Cache\Cache;
+use ElkArte\Themes\ThemeLoader;
+use ElkArte\Controller\Auth;
+use ElkArte\EventManager;
+use BBC\ParserWrapper;
 
 /**
  * Class Bootstrap
@@ -260,7 +268,7 @@ class Bootstrap
 		// Don't do john didley if the forum's been shut down completely.
 		if (!empty($maintenance) && $maintenance == 2 && (!isset($ssi_maintenance_off) || $ssi_maintenance_off !== true))
 		{
-			\ElkArte\Errors\Errors::instance()->display_maintenance_message();
+			Errors::instance()->display_maintenance_message();
 		}
 	}
 
@@ -275,7 +283,7 @@ class Bootstrap
 		// Show lots of debug information below the page, not for production sites
 		if ($db_show_debug === true)
 		{
-			\ElkArte\Debug::instance()->rusage('start', $this->rusage_start);
+			Debug::instance()->rusage('start', $this->rusage_start);
 		}
 	}
 
@@ -293,13 +301,13 @@ class Bootstrap
 		loadDatabase();
 
 		// Let's set up our shiny new hooks handler.
-		\ElkArte\Hooks::init(database(), \ElkArte\Debug::instance());
+		Hooks::init(database(), Debug::instance());
 
 		// It's time for settings loaded from the database.
 		reloadSettings();
 
 		// Make sure we have ready the list of members for populating it
-		\ElkArte\MembersList::init(database(), \ElkArte\Cache\Cache::instance(),  \BBC\ParserWrapper::instance());
+		MembersList::init(database(), Cache::instance(),  ParserWrapper::instance());
 
 		// Our good ole' contextual array, which will hold everything
 		if (empty($context))
@@ -317,7 +325,7 @@ class Bootstrap
 	public function ssi_main()
 	{
 		global $ssi_layers, $ssi_theme, $ssi_gzip, $ssi_ban, $ssi_guest_access;
-		global $modSettings, $context, $board, $topic, $user_info, $txt;
+		global $modSettings, $context, $board, $topic, $txt;
 
 		// Check on any hacking attempts.
 		$this->_validRequestCheck();
@@ -352,7 +360,7 @@ class Bootstrap
 
 			if (!isset($_SESSION['session_value']))
 			{
-				$tokenizer = new \ElkArte\TokenHash();
+				$tokenizer = new TokenHash();
 				$_SESSION['session_value'] = $tokenizer->generate_hash(32, session_id());
 				$_SESSION['session_var'] = substr(preg_replace('~^\d+~', '', $tokenizer->generate_hash(16, session_id())), 0, rand(7, 12));
 			}
@@ -365,8 +373,7 @@ class Bootstrap
 
 		// Get rid of $board and $topic... do stuff loadBoard would do.
 		unset($board, $topic);
-		$user_info['is_mod'] = false;
-		$context['user']['is_mod'] = $user_info['is_mod'];
+		$context['user']['is_mod'] = User::$info->is_mod = false;
 		$context['linktree'] = array();
 
 		// Load the user and their cookie, as well as their settings.
@@ -376,7 +383,7 @@ class Bootstrap
 		loadPermissions();
 
 		// Load the current or SSI theme. (just use $ssi_theme = id_theme;)
-		new \ElkArte\Themes\ThemeLoader(isset($ssi_theme) ? (int) $ssi_theme : 0);
+		new ThemeLoader(isset($ssi_theme) ? (int) $ssi_theme : 0);
 
 		// Load BadBehavior functions
 		loadBadBehavior();
@@ -394,9 +401,9 @@ class Bootstrap
 		}
 
 		// Do we allow guests in here?
-		if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && basename($_SERVER['PHP_SELF']) !== 'SSI.php')
+		if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && User::$info->is_guest && basename($_SERVER['PHP_SELF']) !== 'SSI.php')
 		{
-			$controller = new \ElkArte\Controller\Auth(new \ElkArte\EventManager());
+			$controller = new Auth(new EventManager());
 			$controller->action_kickguest();
 			obExit(null, true);
 		}
