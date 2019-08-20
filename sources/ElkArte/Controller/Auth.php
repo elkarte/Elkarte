@@ -549,7 +549,7 @@ class Auth extends \ElkArte\AbstractController
 			if ($_GET['member'] != $user_info['id'])
 				throw new \ElkArte\Exceptions\Exception('login_cookie_error', false);
 
-			$user_info['can_mod'] = allowedTo('access_mod_center') || (!$user_info['is_guest'] && ($user_info['mod_cache']['gq'] != '0=1' || $user_info['mod_cache']['bq'] != '0=1' || ($modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']))));
+			$user_info['can_mod'] = User::$info->canMod($modSettings['postmod_active']);
 			if ($user_info['can_mod'] && isset(\ElkArte\User::$settings['openid_uri']) && empty(\ElkArte\User::$settings['openid_uri']))
 			{
 				$_SESSION['moderate_time'] = time();
