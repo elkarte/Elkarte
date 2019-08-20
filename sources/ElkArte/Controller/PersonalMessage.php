@@ -54,7 +54,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 	 */
 	public function pre_dispatch()
 	{
-		global $txt, $scripturl, $context, $user_info, $user_settings, $modSettings;
+		global $txt, $scripturl, $context, $user_info, $modSettings;
 
 		// No guests!
 		is_not_guest();
@@ -86,7 +86,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		}
 
 		// Load the label counts data.
-		if ($user_settings['new_pm'] || !\ElkArte\Cache\Cache::instance()->getVar($context['labels'], 'labelCounts:' . $user_info['id'], 720))
+		if (\ElkArte\User::$settings['new_pm'] || !\ElkArte\Cache\Cache::instance()->getVar($context['labels'], 'labelCounts:' . $user_info['id'], 720))
 		{
 			$this->_loadLabels();
 
@@ -95,7 +95,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		}
 
 		// Now we have the labels, and assuming we have unsorted mail, apply our rules!
-		if ($user_settings['new_pm'])
+		if (\ElkArte\User::$settings['new_pm'])
 		{
 			// Apply our rules to the new PM's
 			applyRules();
@@ -126,7 +126,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		);
 
 		// Preferences...
-		$context['display_mode'] = $user_settings['pm_prefs'] & 3;
+		$context['display_mode'] = \ElkArte\User::$settings['pm_prefs'] & 3;
 	}
 
 	/**
@@ -158,9 +158,9 @@ class PersonalMessage extends \ElkArte\AbstractController
 	 */
 	private function _loadLabels()
 	{
-		global $context, $txt, $user_settings;
+		global $context, $txt;
 
-		$context['labels'] = $user_settings['message_labels'] === '' ? array() : explode(',', $user_settings['message_labels']);
+		$context['labels'] = explode(',', \ElkArte\User::$settings['message_labels']);
 
 		foreach ($context['labels'] as $id_label => $label_name)
 		{
@@ -402,14 +402,14 @@ class PersonalMessage extends \ElkArte\AbstractController
 	public function action_folder()
 	{
 		global $txt, $scripturl, $modSettings, $context, $subjects_request;
-		global $messages_request, $user_info, $options, $user_settings;
+		global $messages_request, $user_info, $options;
 
 		// Changing view?
 		if (isset($this->_req->query->view))
 		{
 			$context['display_mode'] = $context['display_mode'] > 1 ? 0 : $context['display_mode'] + 1;
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($user_info['id'], array('pm_prefs' => ($user_settings['pm_prefs'] & 252) | $context['display_mode']));
+			updateMemberData($user_info['id'], array('pm_prefs' => (\ElkArte\User::$settings['pm_prefs'] & 252) | $context['display_mode']));
 		}
 
 		// Make sure the starting location is valid.

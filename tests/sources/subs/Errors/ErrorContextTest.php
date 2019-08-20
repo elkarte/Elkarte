@@ -9,6 +9,7 @@ use ElkArte\Errors\ErrorContext;
  */
 class TestErrorContext extends \PHPUnit\Framework\TestCase
 {
+	protected $backupGlobalsBlacklist = ['user_info'];
 	public function testSimpleError()
 	{
 		$errorContext = ErrorContext::context();

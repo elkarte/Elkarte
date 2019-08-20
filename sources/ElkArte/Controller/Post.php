@@ -651,7 +651,7 @@ class Post extends \ElkArte\AbstractController
 	 */
 	public function action_post2()
 	{
-		global $board, $topic, $txt, $modSettings, $context, $user_settings;
+		global $board, $topic, $txt, $modSettings, $context;
 		global $user_info, $board_info, $options;
 
 		// Sneaking off, are we?
@@ -1109,7 +1109,7 @@ class Post extends \ElkArte\AbstractController
 					'msg' => $msgOptions['id'],
 					'board' => $board,
 					'topic' => $topic,
-					'signature' => (isset($user_settings['signature']) ? $user_settings['signature'] : ''),
+					'signature' => \ElkArte\User::$settings->signature(''),
 				);
 				sendBoardNotifications($notifyData);
 			}

@@ -1,4 +1,20 @@
-<Files "\.(js|css)$">
+# Apache 2.4
+<IfModule mod_authz_core.c>
+	Require all denied
+	<Files ~ "\.(css|js)">
+		<RequireAll>
+			Require all granted
+			Require not env blockAccess
+		</RequireAll>
+	</Files>
+</IfModule>
+
+# Apache 2.2
+<IfModule !mod_authz_core.c>
 	Order Deny,Allow
 	Deny from all
-</Files>
+
+	<Files "\.(js|css)$">
+		Allow from all
+	</Files>
+</IfModule>

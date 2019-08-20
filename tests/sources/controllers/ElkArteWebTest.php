@@ -18,6 +18,7 @@
 abstract class ElkArteWebTest extends \PHPUnit_Extensions_Selenium2TestCase
 {
 	protected $coverageScriptUrl = 'http://127.0.0.1/phpunit_coverage.php';
+	protected $backupGlobalsBlacklist = ['user_info'];
 
 	// Screenshots will not be available with htmlunit since it does not render
 	protected $captureScreenshotOnFailure = true;

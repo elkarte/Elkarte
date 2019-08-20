@@ -6,6 +6,7 @@
  */
 class TestHooks extends \PHPUnit\Framework\TestCase
 {
+	protected $backupGlobalsBlacklist = ['user_info'];
 	/**
 	 * Name of the hook used for testing
 	 */

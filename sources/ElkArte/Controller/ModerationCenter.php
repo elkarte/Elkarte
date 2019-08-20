@@ -313,7 +313,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 	 */
 	public function action_moderationHome()
 	{
-		global $txt, $context, $user_settings;
+		global $txt, $context;
 
 		theme()->getTemplates()->load('ModerationCenter');
 		loadJavascriptFile('admin.js', array(), 'admin_scripts');
@@ -341,10 +341,14 @@ class ModerationCenter extends \ElkArte\AbstractController
 
 		$valid_blocks['n'] = 'latestNews';
 
-		if (empty($user_settings['mod_prefs']))
+		if (empty(\ElkArte\User::$settings['mod_prefs']))
+		{
 			$user_blocks = 'n' . ($context['can_moderate_boards'] ? 'wra' : '') . ($context['can_moderate_groups'] ? 'g' : '');
+		}
 		else
-			list (, $user_blocks) = explode('|', $user_settings['mod_prefs']);
+		{
+			list (, $user_blocks) = explode('|', \ElkArte\User::$settings['mod_prefs']);
+		}
 
 		$user_blocks = str_split($user_blocks);
 
@@ -583,7 +587,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 	 */
 	public function action_moderationSettings()
 	{
-		global $context, $txt, $user_settings, $user_info;
+		global $context, $txt, $user_info;
 
 		// Some useful context stuff.
 		theme()->getTemplates()->load('ModerationCenter');
@@ -612,14 +616,16 @@ class ModerationCenter extends \ElkArte\AbstractController
 		}
 
 		// Does the user have any settings yet?
-		if (empty($user_settings['mod_prefs']))
+		if (empty(\ElkArte\User::$settings['mod_prefs']))
 		{
 			$mod_blocks = 'np' . ($context['can_moderate_boards'] ? 'wra' : '') . ($context['can_moderate_groups'] ? 'g' : '');
 			$pref_binary = 5;
 			$show_reports = 1;
 		}
 		else
-			list ($show_reports, $mod_blocks, $pref_binary) = explode('|', $user_settings['mod_prefs']);
+		{
+			list ($show_reports, $mod_blocks, $pref_binary) = explode('|', \ElkArte\User::$settings['mod_prefs']);
+		}
 
 		// Are we saving?
 		if (isset($this->_req->post->save))

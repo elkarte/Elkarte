@@ -8,6 +8,7 @@
  */
 class TestLikes extends \PHPUnit\Framework\TestCase
 {
+	protected $backupGlobalsBlacklist = ['user_info'];
 	/**
 	 * Prepare some test data, to use in these tests.
 	 *

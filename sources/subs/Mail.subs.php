@@ -971,7 +971,7 @@ function user_info_callback($matches)
 		return '';
 
 	$use_ref = true;
-	$ref = &$user_info;
+	$ref = $user_info;
 
 	foreach (explode('.', $matches[1]) as $index)
 	{

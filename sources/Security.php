@@ -35,7 +35,7 @@
  */
 function validateSession($type = 'admin')
 {
-	global $modSettings, $user_settings;
+	global $modSettings;
 
 	// Guests are not welcome here.
 	is_not_guest();
@@ -102,10 +102,9 @@ function validateSession($type = 'admin')
 	}
 
 	// OpenID?
-	if (!empty($user_settings['openid_uri']))
+	if (!empty(\ElkArte\User::$settings['openid_uri']))
 	{
-		require_once(SUBSDIR . '/OpenID.subs.php');
-		$openID = new OpenID();
+		$openID = new \ElkArte\OpenID();
 		$openID->revalidate();
 
 		$_SESSION[$type . '_time'] = time();
@@ -249,7 +248,7 @@ function is_not_guest($message = '', $is_fatal = true)
  */
 function is_not_banned($forceCheck = false)
 {
-	global $txt, $modSettings, $context, $user_info, $cookiename, $user_settings;
+	global $txt, $modSettings, $context, $user_info, $cookiename;
 
 	$db = database();
 
@@ -349,8 +348,8 @@ function is_not_banned($forceCheck = false)
 			log_ban(array_merge(isset($_SESSION['ban']['cannot_access']) ? $_SESSION['ban']['cannot_access']['ids'] : array(), isset($_SESSION['ban']['cannot_post']) ? $_SESSION['ban']['cannot_post']['ids'] : array(), isset($_SESSION['ban']['cannot_login']) ? $_SESSION['ban']['cannot_login']['ids'] : array()));
 
 		// If for whatever reason the is_activated flag seems wrong, do a little work to clear it up.
-		if ($user_info['id'] && (($user_settings['is_activated'] >= 10 && !$flag_is_activated)
-			|| ($user_settings['is_activated'] < 10 && $flag_is_activated)))
+		if ($user_info['id'] && ((\ElkArte\User::$settings['is_activated'] >= 10 && !$flag_is_activated)
+			|| (\ElkArte\User::$settings['is_activated'] < 10 && $flag_is_activated)))
 		{
 			require_once(SUBSDIR . '/Bans.subs.php');
 			updateBanMembers();
@@ -1431,9 +1430,35 @@ RemoveHandler .php .php3 .phtml .cgi .fcgi .pl .fpl .shtml';
 		$fh = @fopen($path . '/.htaccess', 'w');
 		if ($fh)
 		{
-			fwrite($fh, '<Files ' . $files . '>
+			fwrite($fh, '# Apache 2.4
+<IfModule mod_authz_core.c>
+	Require all denied
+	<Files ~ ' . $files . '>
+		<RequireAll>
+			Require all granted
+			Require not env blockAccess' . (empty($allow_localhost) ? '
+		</RequireAll>
+	</Files>' : '
+		Require host localhost
+		</RequireAll>
+	</Files>
+
+	RemoveHandler .php .php3 .phtml .cgi .fcgi .pl .fpl .shtml') . '
+</IfModule>
+
+# Apache 2.2
+<IfModule !mod_authz_core.c>
 	Order Deny,Allow
-	Deny from all' . $close);
+	Deny from all
+
+	<Files ' . $files . '>
+		Allow from all' . (empty($allow_localhost) ? '
+	</Files>' : '
+		Allow from localhost
+	</Files>
+
+	RemoveHandler .php .php3 .phtml .cgi .fcgi .pl .fpl .shtml') . '
+</IfModule>');
 			fclose($fh);
 		}
 		$errors[] = 'htaccess_cannot_create_file';

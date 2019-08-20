@@ -590,10 +590,9 @@ class ProfileOptions extends \ElkArte\AbstractController
 			// Not right yet!
 			elseif ($this->_req->post->authenticate === 'openid' && !empty($this->_req->post->openid_identifier))
 			{
-				require_once(SUBSDIR . '/OpenID.subs.php');
 				require_once(SUBSDIR . '/Members.subs.php');
 
-				$openID = new \OpenID();
+				$openID = new \ElkArte\OpenID();
 				$this->_req->post->openid_identifier = $openID->canonize($this->_req->post->openid_identifier);
 
 				if (memberExists($this->_req->post->openid_identifier))

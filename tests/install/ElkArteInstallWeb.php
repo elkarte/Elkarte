@@ -19,6 +19,7 @@
 class ElkArteInstallWeb extends ElkArteWebTest
 {
 	protected $forumPath = '/var/www/test';
+	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
 	 * You must provide a setUp() method for Selenium2TestCase

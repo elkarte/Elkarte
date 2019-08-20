@@ -1709,8 +1709,8 @@ function profileSendActivation()
 
 	loadUserSettings();
 
-	$context['user']['is_logged'] = false;
-	$context['user']['is_guest'] = true;
+	\ElkArte\User::$info['is_logged'] = $context['user']['is_logged'] = false;
+	\ElkArte\User::$info['is_guest'] = $context['user']['is_guest'] = true;
 
 	// Send them to the done-with-registration-login screen.
 	theme()->getTemplates()->load('Register');
@@ -1888,7 +1888,7 @@ function profileLoadAvatarData()
  */
 function profileLoadGroups()
 {
-	global $cur_profile, $context, $user_settings;
+	global $cur_profile, $context;
 
 	require_once(SUBSDIR . '/Membergroups.subs.php');
 
@@ -1909,7 +1909,7 @@ function profileLoadGroups()
 		$context['member_groups'][$id_group]['can_be_primary'] = $row['hidden'] != 2;
 	}
 
-	$context['member']['group_id'] = $user_settings['id_group'];
+	$context['member']['group_id'] = \ElkArte\User::$settings['id_group'];
 
 	return true;
 }

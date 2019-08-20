@@ -6,6 +6,7 @@
 class CensoringTest extends \PHPUnit\Framework\TestCase
 {
 	protected $tests;
+	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
 	 * prepare what is necessary to use in these tests.

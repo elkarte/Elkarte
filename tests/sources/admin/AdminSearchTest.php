@@ -9,6 +9,7 @@ class TestAdminSearch extends \PHPUnit\Framework\TestCase
 	 * @var ActionController
 	 */
 	private $controller;
+	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
 	 * Cleans up the environment after running a test.
@@ -56,7 +57,7 @@ class TestAdminSearch extends \PHPUnit\Framework\TestCase
 
 		// Set up the controller.
 		$_GET['action'] = 'admin';
-		$user_info['permissions'][] = 'admin_forum';
+		$user_info['permissions'] = array_merge($user_info['permissions'], ['admin_forum']);
 		$dispatcher = new \ElkArte\SiteDispatcher(new \ElkArte\HttpReq);
 		$this->controller = $dispatcher->getController();
 

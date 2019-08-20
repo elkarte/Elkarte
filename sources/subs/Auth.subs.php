@@ -743,6 +743,7 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
  * @package Authorization
  *
  * @param int $id_member the id of the member to check for
+ * @deprecated replaced by \ElkArte\User::$info->isFirstLogin()
  *
  * @return bool
  */
@@ -913,14 +914,16 @@ function loadExistingMember($name, $is_id = false)
 
 	// Nothing? Ah the horror...
 	if ($db->num_rows($request) == 0)
-		$user_settings = false;
+	{
+		$user_auth_data = false;
+	}
 	else
 	{
-		$user_settings = $db->fetch_assoc($request);
-		$user_settings['id_member'] = (int) $user_settings['id_member'];
+		$user_auth_data = $db->fetch_assoc($request);
+		$user_auth_data['id_member'] = (int) $user_auth_data['id_member'];
 	}
 
 	$db->free_result($request);
 
-	return $user_settings;
+	return $user_auth_data;
 }

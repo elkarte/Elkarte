@@ -2,6 +2,7 @@
 
 class TestDbAbstraction extends \PHPUnit\Framework\TestCase
 {
+	protected $backupGlobalsBlacklist = ['user_info'];
 	/**
 	 * Prepare what is necessary to use in these tests.
 	 *

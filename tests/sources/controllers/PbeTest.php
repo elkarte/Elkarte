@@ -6,6 +6,7 @@
 class TestPBE extends \PHPUnit\Framework\TestCase
 {
 	protected $_email;
+	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
 	 * Prepare what is necessary to use in these tests.

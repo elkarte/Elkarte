@@ -596,11 +596,11 @@ class Profile extends \ElkArte\AbstractController
 	 */
 	private function _save_updates()
 	{
-		global $txt, $user_info, $context, $modSettings, $user_settings, $post_errors, $profile_vars;
+		global $txt, $user_info, $context, $modSettings, $post_errors, $profile_vars;
 
 		// All the subactions that require a user password in order to validate.
 		$check_password = $context['user']['is_owner'] && !empty($this->_profile_include_data['password']);
-		$context['require_password'] = $check_password && empty($user_settings['openid_uri']);
+		$context['require_password'] = $check_password && empty(\ElkArte\User::$settings['openid_uri']);
 
 		// These will get populated soon!
 		$post_errors = array();
@@ -761,15 +761,14 @@ class Profile extends \ElkArte\AbstractController
 	 */
 	private function _check_password($check_password)
 	{
-		global $user_settings, $user_info, $post_errors, $context;
+		global $user_info, $post_errors, $context;
 
 		if ($check_password)
 		{
 			// If we're using OpenID try to re-validate.
-			if (!empty($user_settings['openid_uri']))
+			if (!empty(\ElkArte\User::$settings['openid_uri']))
 			{
-				require_once(SUBSDIR . '/OpenID.subs.php');
-				$openID = new \OpenID();
+				$openID = new \ElkArte\OpenID();
 				$openID->revalidate();
 			}
 			else

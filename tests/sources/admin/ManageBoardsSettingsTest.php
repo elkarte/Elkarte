@@ -5,6 +5,7 @@
  */
 class TestManageBoardsSettings extends \PHPUnit\Framework\TestCase
 {
+	protected $backupGlobalsBlacklist = ['user_info'];
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */

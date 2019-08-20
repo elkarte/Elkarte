@@ -5,6 +5,7 @@
  */
 class TestEvent extends \PHPUnit\Framework\TestCase
 {
+	protected $backupGlobalsBlacklist = ['user_info'];
 	public function testEmpty()
 	{
 		$event = new \ElkArte\Event(new \ElkArte\Priority());

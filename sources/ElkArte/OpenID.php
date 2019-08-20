@@ -14,6 +14,8 @@
  *
  */
 
+namespace ElkArte;
+
 /**
  * OpenID class, controls interfacing and communications for openid auth
  */
@@ -123,15 +125,13 @@ class OpenID
 	 */
 	public function revalidate()
 	{
-		global $user_settings;
-
 		if (isset($_SESSION['openid_revalidate_time']) && $_SESSION['openid_revalidate_time'] > time() - 60)
 		{
 			unset($_SESSION['openid_revalidate_time']);
 			return true;
 		}
 		else
-			$this->validate($user_settings['openid_uri'], false, null, 'revalidate');
+			$this->validate(\ElkArte\User::$settings['openid_uri'], false, null, 'revalidate');
 
 		// We shouldn't get here.
 		trigger_error('Hacking attempt...', E_USER_ERROR);
@@ -212,7 +212,7 @@ class OpenID
 		else
 		{
 			$parameters[] = 'openid.session_type=DH-SHA1';
-			$parameters[] = 'openid.dh_consumer_public=' . urlencode(base64_encode(long_to_binary($dh_keys['public'])));
+			$parameters[] = 'openid.dh_consumer_public=' . urlencode(base64_encode($this->long_to_binary($dh_keys['public'])));
 			$parameters[] = 'openid.assoc_type=HMAC-SHA1';
 		}
 
@@ -244,8 +244,8 @@ class OpenID
 		// Figure out the Diffie-Hellman secret.
 		if (!empty($assoc_data['enc_mac_key']))
 		{
-			$dh_secret = bcpowmod(binary_to_long(base64_decode($assoc_data['dh_server_public'])), $dh_keys['private'], $this->p);
-			$secret = base64_encode(binary_xor(sha1(long_to_binary($dh_secret), true), base64_decode($assoc_data['enc_mac_key'])));
+			$dh_secret = bcpowmod($this->binary_to_long(base64_decode($assoc_data['dh_server_public'])), $dh_keys['private'], $this->p);
+			$secret = base64_encode($this->binary_xor(sha1($this->long_to_binary($dh_secret), true), base64_decode($assoc_data['enc_mac_key'])));
 		}
 		else
 			$secret = $assoc_data['mac_key'];
@@ -375,7 +375,7 @@ class OpenID
 	{
 		static $cache = array();
 
-		$byte_string = long_to_binary($this->p);
+		$byte_string = $this->long_to_binary($this->p);
 
 		if (isset($cache[$byte_string]))
 			list ($dup, $num_bytes) = $cache[$byte_string];
@@ -398,7 +398,7 @@ class OpenID
 
 			$bytes = "\x00" . $str;
 
-			$num = binary_to_long($bytes);
+			$num = $this->binary_to_long($bytes);
 		} while (bccomp($num, $dup) < 0);
 
 		return bcadd(bcmod($num, $this->p), 1);
@@ -455,114 +455,114 @@ class OpenID
 
 		return $response_data;
 	}
-}
 
-/**
- * Given a binary string, returns the binary string converted to a long number.
- *
- * @param string $str
- * @return string
- */
-function binary_to_long($str)
-{
-	$bytes = array_merge(unpack('C*', $str));
-
-	$n = 0;
-
-	foreach ($bytes as $byte)
+	/**
+	 * Given a binary string, returns the binary string converted to a long number.
+	 *
+	 * @param string $str
+	 * @return string
+	 */
+	protected function binary_to_long($str)
 	{
-		$n = bcmul($n, 256);
-		$n = bcadd($n, $byte);
+		$bytes = array_merge(unpack('C*', $str));
+
+		$n = 0;
+
+		foreach ($bytes as $byte)
+		{
+			$n = bcmul($n, 256);
+			$n = bcadd($n, $byte);
+		}
+
+		return $n;
 	}
 
-	return $n;
-}
-
-/**
- * Given a long integer, returns the number converted to a binary
- * string.
- *
- * This function accepts long integer values of arbitrary
- * magnitude.
- *
- * @param string $value
- *
- * @return string
- * @throws \ElkArte\Exceptions\Exception Only non-negative integers allowed
- */
-function long_to_binary($value)
-{
-	$cmp = bccomp($value, 0);
-	if ($cmp < 0)
-		throw new \ElkArte\Exceptions\Exception('Only non-negative integers allowed.');
-
-	if ($cmp == 0)
-		return "\x00";
-
-	$bytes = array();
-
-	while (bccomp($value, 0) > 0)
+	/**
+	 * Given a long integer, returns the number converted to a binary
+	 * string.
+	 *
+	 * This function accepts long integer values of arbitrary
+	 * magnitude.
+	 *
+	 * @param string $value
+	 *
+	 * @return string
+	 * @throws \ElkArte\Exceptions\Exception Only non-negative integers allowed
+	 */
+	protected function long_to_binary($value)
 	{
-		array_unshift($bytes, bcmod($value, 256));
-		$value = bcdiv($value, 256);
+		$cmp = bccomp($value, 0);
+		if ($cmp < 0)
+			throw new \ElkArte\Exceptions\Exception('Only non-negative integers allowed.');
+
+		if ($cmp == 0)
+			return "\x00";
+
+		$bytes = array();
+
+		while (bccomp($value, 0) > 0)
+		{
+			array_unshift($bytes, bcmod($value, 256));
+			$value = bcdiv($value, 256);
+		}
+
+		if (!empty($bytes) && ($bytes[0] > 127))
+			array_unshift($bytes, 0);
+
+		$return = '';
+		foreach ($bytes as $byte)
+			$return .= pack('C', $byte);
+
+		return $return;
 	}
 
-	if (!empty($bytes) && ($bytes[0] > 127))
-		array_unshift($bytes, 0);
+	/**
+	 * Performs an exclusive or (^ bitwise operator) character for character on two stings.
+	 *
+	 * - The result of the biwise operator is 1 if and only if both bits differ.
+	 *
+	 * Returns a binary string representing the per character position comparison results.
+	 *
+	 * @param int $num1
+	 * @param int $num2
+	 *
+	 * @return string
+	 */
+	protected function binary_xor($num1, $num2)
+	{
+		$return = '';
 
-	$return = '';
-	foreach ($bytes as $byte)
-		$return .= pack('C', $byte);
+		$str_len = strlen($num2);
+		for ($i = 0; $i < $str_len; $i++)
+			$return .= $num1[$i] ^ $num2[$i];
 
-	return $return;
-}
+		return $return;
+	}
 
-/**
- * Performs an exclusive or (^ bitwise operator) character for character on two stings.
- *
- * - The result of the biwise operator is 1 if and only if both bits differ.
- *
- * Returns a binary string representing the per character position comparison results.
- *
- * @param int $num1
- * @param int $num2
- *
- * @return string
- */
-function binary_xor($num1, $num2)
-{
-	$return = '';
+	/**
+	 * Retrieve a member settings based on the claimed id
+	 *
+	 * @param string $claimed_id the claimed id
+	 *
+	 * @return array the member settings
+	 */
+	public function memberByOpenID($claimed_id)
+	{
+		$db = database();
 
-	$str_len = strlen($num2);
-	for ($i = 0; $i < $str_len; $i++)
-		$return .= $num1[$i] ^ $num2[$i];
+		$result = $db->query('', '
+			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
+				openid_uri
+			FROM {db_prefix}members
+			WHERE openid_uri = {string:openid_uri}',
+			array(
+				'openid_uri' => $claimed_id,
+			)
+		);
 
-	return $return;
-}
+		$member_found = $db->fetch_assoc($result);
+		$db->free_result($result);
 
-/**
- * Retrieve a member settings based on the claimed id
- *
- * @param string $claimed_id the claimed id
- *
- * @return array the member settings
- */
-function memberByOpenID($claimed_id)
-{
-	$db = database();
-
-	$result = $db->query('', '
-		SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
-			openid_uri
-		FROM {db_prefix}members
-		WHERE openid_uri = {string:openid_uri}',
-		array(
-			'openid_uri' => $claimed_id,
-		)
-	);
-
-	$member_found = $db->fetch_assoc($result);
-	$db->free_result($result);
-
-	return $member_found;
+		return $member_found;
+	}
 }

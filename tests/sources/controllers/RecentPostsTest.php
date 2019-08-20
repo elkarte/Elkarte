@@ -5,6 +5,7 @@
  */
 class TestRecentPosts extends \PHPUnit\Framework\TestCase
 {
+	protected $backupGlobalsBlacklist = ['user_info'];
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
@@ -19,7 +20,7 @@ class TestRecentPosts extends \PHPUnit\Framework\TestCase
 		$settings['default_theme_dir'] = '/var/www/themes/default';
 
 		// We are not logged in for this test, so lets fake it
-		$user_info = array(
+		$user_info = new \ElkArte\ValuesContainer([
 			'id' => 1,
 			'ip' => '127.0.0.1',
 			'language' => 'english',
@@ -27,7 +28,7 @@ class TestRecentPosts extends \PHPUnit\Framework\TestCase
 			'is_guest' => false,
 			'username' => 'testing',
 			'query_wanna_see_board' => '1=1',
-			'is_moderator' => &$user_info['is_moderator'],
+			'is_moderator' => $user_info['is_moderator'],
 			'email' => 'a@a.com',
 			'ignoreusers' => '',
 			'name' => 'itsme',
@@ -36,7 +37,7 @@ class TestRecentPosts extends \PHPUnit\Framework\TestCase
 			'time_format' => '',
 			'possibly_robot' => false,
 			'posts' => '15',
-		);
+		]);
 
 		$settings['page_index_template'] = array(
 			'base_link' => '<li></li>',

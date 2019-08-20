@@ -43,7 +43,7 @@ class OpenID extends \ElkArte\AbstractController
 	 */
 	public function action_openidreturn()
 	{
-		global $modSettings, $context, $user_settings;
+		global $modSettings, $context;
 
 		// Is OpenID even enabled?
 		if (empty($modSettings['enableOpenID']))
@@ -57,9 +57,6 @@ class OpenID extends \ElkArte\AbstractController
 		if ($this->_req->query->openid_mode !== 'id_res')
 			throw new \ElkArte\Exceptions\Exception('openid_not_resolved');
 
-		// We'll need our subs.
-		require_once(SUBSDIR . '/OpenID.subs.php');
-
 		// This has annoying habit of removing the + from the base64 encoding.  So lets put them back.
 		foreach (array('openid_assoc_handle', 'openid_invalidate_handle', 'openid_sig', 'sf') as $key)
 		{
@@ -69,7 +66,7 @@ class OpenID extends \ElkArte\AbstractController
 			}
 		}
 
-		$openID = new \OpenID();
+		$openID = new \ElkArte\OpenID();
 
 		// Did they tell us to remove any associations?
 		if (!empty($this->_req->query->openid_invalidate_handle))
@@ -81,33 +78,41 @@ class OpenID extends \ElkArte\AbstractController
 		// Get the association data.
 		$assoc = $openID->getAssociation($server_info['server'], $this->_req->query->openid_assoc_handle, true);
 		if ($assoc === null)
+		{
 			throw new \ElkArte\Exceptions\Exception('openid_no_assoc');
+		}
 
 		// Verify the OpenID signature.
 		if (!$this->_verify_string($assoc['secret']))
+		{
 			throw new \ElkArte\Exceptions\Exception('openid_sig_invalid', 'critical');
+		}
 
 		if (!isset($_SESSION['openid']['saved_data'][$this->_req->query->t]))
+		{
 			throw new \ElkArte\Exceptions\Exception('openid_load_data');
+		}
 
 		$openid_uri = $_SESSION['openid']['saved_data'][$this->_req->query->t]['openid_uri'];
 		$modSettings['cookieTime'] = $_SESSION['openid']['saved_data'][$this->_req->query->t]['cookieTime'];
 
 		if (empty($openid_uri))
+		{
 			throw new \ElkArte\Exceptions\Exception('openid_load_data');
+		}
 
 		// Any save fields to restore?
 		$openid_save_fields = isset($this->_req->query->sf) ? json_decode(base64_decode($this->_req->query->sf), true) : array();
 		$context['openid_claimed_id'] = $this->_req->query->openid_claimed_id;
 
 		// Is there a user with this OpenID_uri?
-		$member_found = memberByOpenID($context['openid_claimed_id']);
+		$member_found = $openID->memberByOpenID($context['openid_claimed_id']);
 
 		if (empty($member_found) && $this->_req->getQuery('sa') === 'change_uri' && !empty($_SESSION['new_openid_uri']) && $_SESSION['new_openid_uri'] == $context['openid_claimed_id'])
 		{
 			// Update the member.
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($user_settings['id_member'], array('openid_uri' => $context['openid_claimed_id']));
+			updateMemberData(\ElkArte\User::$settings['id_member'], array('openid_uri' => $context['openid_claimed_id']));
 
 			unset($_SESSION['new_openid_uri']);
 			$_SESSION['openid'] = array(
@@ -127,11 +132,17 @@ class OpenID extends \ElkArte\AbstractController
 			);
 
 			if (isset($this->_req->query->openid_sreg_nickname))
+			{
 				$_SESSION['openid']['nickname'] = $this->_req->query->openid_sreg_nickname;
+			}
 			if (isset($this->_req->query->openid_sreg_email))
+			{
 				$_SESSION['openid']['email'] = $this->_req->query->openid_sreg_email;
+			}
 			if (isset($this->_req->query->openid_sreg_dob))
+			{
 				$_SESSION['openid']['dob'] = $this->_req->query->openid_sreg_dob;
+			}
 
 			// Were we just verifying the registration state?
 			if (isset($this->_req->query->sa) && $this->_req->query->sa === 'register2')
@@ -140,7 +151,9 @@ class OpenID extends \ElkArte\AbstractController
 				if (!empty($openid_save_fields))
 				{
 					foreach ($openid_save_fields as $id => $value)
+					{
 						$this->_req->post->{$id} = $value;
+					}
 				}
 
 				$controller = new Register(new \ElkArte\EventManager());
@@ -149,9 +162,11 @@ class OpenID extends \ElkArte\AbstractController
 				return null;
 			}
 			else
+			{
 				redirectexit('action=register');
+			}
 		}
-		elseif (isset($this->_req->query->sa) && $this->_req->query->sa === 'revalidate' && $user_settings['openid_uri'] == $openid_uri)
+		elseif (isset($this->_req->query->sa) && $this->_req->query->sa === 'revalidate' && \ElkArte\User::$settings['openid_uri'] == $openid_uri)
 		{
 			$_SESSION['openid_revalidate_time'] = time();
 
@@ -164,16 +179,19 @@ class OpenID extends \ElkArte\AbstractController
 		}
 		else
 		{
-			$user_settings = $member_found;
+			$db = database();
+			$cache = \ElkArte\Cache\Cache::instance();
+			$req = request();
+
+			$user = new \ElkArte\UserSettings($db, $cache, $req);
+			$user->loadUserById($member_found['id_member'], true, '');
+			$user_setting = $user->getSettings();
 
 			// Generate an ElkArte hash for the db to protect this account
-			$user_settings['passwd'] = validateLoginPassword($this->_secret, '', $user_settings['member_name'], true);
-
-			$tokenizer = new \ElkArte\TokenHash();
-			$user_settings['password_salt'] = $tokenizer->generate_hash(4);
+			$user->$user_setting($this->_secret);
 
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($user_settings['id_member'], array('passwd' => $user_settings['passwd'], 'password_salt' => $user_settings['password_salt']));
+			updateMemberData($user_setting['id_member'], array('passwd' => $user_setting['passwd'], 'password_salt' => $user_setting['password_salt']));
 
 			// Cleanup on Aisle 5.
 			$_SESSION['openid'] = array(
@@ -182,11 +200,14 @@ class OpenID extends \ElkArte\AbstractController
 			);
 
 			// Activation required?
-			if (!checkActivation())
-				return false;
+			// The isset check should not be necessary
+			if ($user->checkActivation(isset($_REQUEST['undelete'])))
+			{
+				// Finally do the login.
+				doLogin($user);
+			}
 
-			// Finally do the login.
-			doLogin();
+			return false;
 		}
 	}
 

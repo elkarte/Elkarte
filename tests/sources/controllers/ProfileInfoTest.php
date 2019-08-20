@@ -5,6 +5,7 @@
  */
 class TestProfileInfo extends \PHPUnit\Framework\TestCase
 {
+	protected $backupGlobalsBlacklist = ['user_info'];
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
@@ -17,7 +18,7 @@ class TestProfileInfo extends \PHPUnit\Framework\TestCase
 		$modSettings['smileys_url'] = 'http://127.0.0.1/smileys';
 		$settings['default_theme_dir'] = '/var/www/themes/default';
 
-		$user_info = array(
+		$user_info = new \ElkArte\ValuesContainer([
 			'id' => 1,
 			'ip' => '127.0.0.1',
 			'language' => 'english',
@@ -25,7 +26,7 @@ class TestProfileInfo extends \PHPUnit\Framework\TestCase
 			'is_guest' => false,
 			'username' => 'testing',
 			'query_wanna_see_board' => '1=1',
-			'is_moderator' => &$user_info['is_moderator'],
+			'is_moderator' => $user_info['is_moderator'],
 			'email' => 'a@a.com',
 			'ignoreusers' => '',
 			'name' => 'itsme',
@@ -35,7 +36,7 @@ class TestProfileInfo extends \PHPUnit\Framework\TestCase
 			'possibly_robot' => false,
 			'posts' => '15',
 			'buddies' => array(),
-		);
+		]);
 
 		$settings['page_index_template'] = array(
 			'base_link' => '<li></li>',

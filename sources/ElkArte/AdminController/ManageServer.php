@@ -202,7 +202,7 @@ class ManageServer extends \ElkArte\AbstractController
 	 */
 	public function action_cookieSettings_display()
 	{
-		global $context, $scripturl, $txt, $modSettings, $cookiename, $user_settings, $boardurl;
+		global $context, $scripturl, $txt, $modSettings, $cookiename, $boardurl;
 
 		// Initialize the form
 		$settingsForm = new \ElkArte\SettingsForm\SettingsForm(\ElkArte\SettingsForm\SettingsForm::FILE_ADAPTER);
@@ -240,7 +240,7 @@ class ManageServer extends \ElkArte\AbstractController
 
 				// Set the new one.
 				$cookiename = $this->_req->post->cookiename;
-				setLoginCookie(60 * $modSettings['cookieTime'], $user_settings['id_member'], hash('sha256', $user_settings['passwd'] . $user_settings['password_salt']));
+				setLoginCookie(60 * $modSettings['cookieTime'], \ElkArte\User::$settings['id_member'], hash('sha256', \ElkArte\User::$settings['passwd'] . \ElkArte\User::$settings['password_salt']));
 
 				redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $original_session_id, detectServer()->is('needs_login_fix'));
 			}

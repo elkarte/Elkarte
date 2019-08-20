@@ -6,6 +6,7 @@
 class TestFiles extends \PHPUnit\Framework\TestCase
 {
 	protected $_ourFiles = array();
+	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
 	 * Prepare what is necessary to use in these tests.

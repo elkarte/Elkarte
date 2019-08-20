@@ -5,6 +5,7 @@
  */
 class TestControllerRedirectException extends \PHPUnit\Framework\TestCase
 {
+	protected $backupGlobalsBlacklist = ['user_info'];
 	public function testBasicRedirect()
 	{
 		$exception = new \ElkArte\Exceptions\ControllerRedirectException('Mock_Controller', 'action_plain');

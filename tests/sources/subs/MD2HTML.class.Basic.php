@@ -3,6 +3,7 @@
 class TestMD2HTML extends \PHPUnit\Framework\TestCase
 {
 	protected $mdTestCases = array();
+	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
 	 * Prepare what is necessary to use in these tests.

@@ -3,6 +3,7 @@
 class TestBrowser extends \PHPUnit\Framework\TestCase
 {
 	protected $browser_testcases = array();
+	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
 	 * Prepare what is necessary to use in these tests.

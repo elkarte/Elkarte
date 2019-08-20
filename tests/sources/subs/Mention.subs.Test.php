@@ -9,6 +9,7 @@
 class TestMentions extends \PHPUnit\Framework\TestCase
 {
 	protected $_posterOptions = null;
+	protected $backupGlobalsBlacklist = ['user_info'];
 
 	/**
 	 * Prepare some test data, to use in these tests.
@@ -24,14 +25,14 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 
 		$modSettings['enabled_mentions'] = 'likemsg,mentionmem';
 
-		$user_info = array(
+		$user_info = new \ElkArte\ValuesContainer([
 			'id' => 1,
 			'ip' => '127.0.0.1',
 			'language' => 'english',
 			'is_admin' => true,
 			'is_guest' => false,
 			'username' => 'testing',
-		);
+		]);
 
 		// Lets start by ensuring a topic exists by creating one
 		require_once(SUBSDIR . '/Post.subs.php');
@@ -188,17 +189,17 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 		global $user_info;
 
 		// User 1 has 1 unread mention (i.e. the like)
-		$user_info = array(
+		$user_info = new \ElkArte\ValuesContainer([
 			'id' => 1,
-		);
+		]);
 
 		$mentions = getUserMentions(0, 10, 'mtn.id_mention', true);
 
 		$this->assertEquals(1, count($mentions));
 
-		$user_info = array(
+		$user_info = new \ElkArte\ValuesContainer([
 			'id' => 2,
-		);
+		]);
 
 		// User 2 has 1 total mentions
 		$mentions = getUserMentions(1, 10, 'mtn.id_mention', true);
