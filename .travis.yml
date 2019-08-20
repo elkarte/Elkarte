@@ -13,7 +13,7 @@ matrix:
       env:
         - DB=mysql-5.7
         - WEBTESTS=true
-        - COVERAGE=true     -
+        - COVERAGE=true
     - php: 7.3
       env:
         - DB=postgres-9.6

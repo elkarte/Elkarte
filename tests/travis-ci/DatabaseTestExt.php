@@ -5,6 +5,8 @@
  */
 class TestDatabase extends \PHPUnit\Framework\TestCase
 {
+	protected $backupGlobalsBlacklist = ['user_info'];
+
 	/**
 	 * Prepare what is necessary to use in these tests.
 	 *
@@ -16,32 +18,6 @@ class TestDatabase extends \PHPUnit\Framework\TestCase
 
 	protected function bootstrap()
 	{
-		// We're going to need, cough, a few globals
-		global $mbname, $language;
-		global $boardurl, $webmaster_email, $cookiename;
-		global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send, $db_type, $db_port;
-		global $modSettings, $context, $user_info, $topic, $board, $txt;
-		global $scripturl, $db_passwd;
-		global $boarddir, $sourcedir;
-		global $ssi_db_user, $ssi_db_passwd;
-
-		DEFINE('ELK', '1');
-		DEFINE('CACHE_STALE', '?R11B2');
-
-		// Get the forum's settings for database and file paths.
-		require_once('/var/www/Settings.php');
-
-		// Set our site "variable" constants
-		DEFINE('BOARDDIR', $boarddir);
-		DEFINE('CACHEDIR', $cachedir);
-		DEFINE('EXTDIR', $extdir);
-		DEFINE('LANGUAGEDIR', $boarddir . '/themes/default/languages');
-		DEFINE('SOURCEDIR', $sourcedir);
-		DEFINE('ADMINDIR', $sourcedir . '/admin');
-		DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
-		DEFINE('SUBSDIR', $sourcedir . '/subs');
-		DEFINE('ADDONSDIR', $sourcedir . '/addons');
-
 		require_once('/var/www/tests/travis-ci/bootstrap.php');
 	}
 
@@ -139,7 +115,7 @@ class TestDatabase extends \PHPUnit\Framework\TestCase
 		foreach ($known_tables as $table)
 		{
 			$exists = in_array($db_prefix . $table, $tables);
-			$this->assertTrue($exists, 'The table ' . $table . ' doesn\'t esist');
+			$this->assertTrue($exists, 'The table ' . $table . ' doesn\'t exist');
 		}
 	}
 

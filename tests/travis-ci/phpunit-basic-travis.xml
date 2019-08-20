@@ -9,7 +9,7 @@
          stopOnFailure="false"
          verbose="true">
   <testsuites>
-      <testsuite name="ElkArte Basic Tests">
+      <testsuite name="Basic Tests">
           <directory suffix="Basic.php">/var/www/tests</directory>
       </testsuite>
   </testsuites>

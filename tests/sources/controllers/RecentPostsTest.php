@@ -2,10 +2,12 @@
 
 /**
  * TestCase class for recent posts
+ * @backupGlobals enabled
  */
 class TestRecentPosts extends \PHPUnit\Framework\TestCase
 {
 	protected $backupGlobalsBlacklist = ['user_info'];
+
 	/**
 	 * Initialize or add whatever necessary for these tests
 	 */
