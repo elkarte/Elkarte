@@ -50,7 +50,7 @@ class ProfileInfo extends \ElkArte\AbstractController
 	 */
 	public function pre_dispatch()
 	{
-		global $context, $user_info;
+		global $context;
 
 		require_once(SUBSDIR . '/Profile.subs.php');
 
@@ -59,7 +59,7 @@ class ProfileInfo extends \ElkArte\AbstractController
 
 		if (!isset($context['user']['is_owner']))
 		{
-			$context['user']['is_owner'] = (int) $this->_memID === (int) $user_info['id'];
+			$context['user']['is_owner'] = (int) $this->_memID === (int) $this->user->id;
 		}
 
 		theme()->getTemplates()->loadLanguageFile('Profile');
@@ -342,19 +342,19 @@ class ProfileInfo extends \ElkArte\AbstractController
 	 */
 	private function _load_buddies()
 	{
-		global $context, $modSettings, $user_info;
+		global $context, $modSettings;
 
 		// Would you be mine? Could you be mine? Be my buddy :D
 		$context['buddies'] = array();
 		if (!empty($modSettings['enable_buddylist'])
 			&& $context['user']['is_owner']
-			&& !empty($user_info['buddies'])
+			&& !empty($this->user->buddies)
 			&& in_array('buddies', $this->_summary_areas))
 		{
-			\ElkArte\MembersList::load($user_info['buddies'], false, 'profile');
+			\ElkArte\MembersList::load($this->user->buddies, false, 'profile');
 
 			// Get the info for this buddy
-			foreach ($user_info['buddies'] as $buddy)
+			foreach ($this->user->buddies as $buddy)
 			{
 				$member = \ElkArte\MembersList::get($buddy);
 				$member->loadContext(true);
@@ -449,7 +449,7 @@ class ProfileInfo extends \ElkArte\AbstractController
 	 */
 	public function action_showPosts()
 	{
-		global $txt, $user_info, $scripturl, $modSettings, $context, $board;
+		global $txt, $scripturl, $modSettings, $context, $board;
 
 		// Some initial context.
 		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
@@ -627,7 +627,7 @@ class ProfileInfo extends \ElkArte\AbstractController
 				)
 			);
 
-			if ($user_info['id'] == $row['id_member_started'])
+			if ($this->user->id == $row['id_member_started'])
 				$board_ids['own'][$row['id_board']][] = $counter;
 			$board_ids['any'][$row['id_board']][] = $counter;
 		}
@@ -823,10 +823,10 @@ class ProfileInfo extends \ElkArte\AbstractController
 	 */
 	public function action_showUnwatched()
 	{
-		global $txt, $user_info, $scripturl, $modSettings, $context;
+		global $txt, $scripturl, $modSettings, $context;
 
 		// Only the owner can see the list (if the function is enabled of course)
-		if ($user_info['id'] != $this->_memID || !$modSettings['enable_unwatch'])
+		if ($this->user->id != $this->_memID || !$modSettings['enable_unwatch'])
 			return;
 
 		// And here they are: the topics you don't like

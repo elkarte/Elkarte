@@ -168,7 +168,7 @@ class Post extends \ElkArte\AbstractController
 
 	protected function _before_prepare_context()
 	{
-		global $topic, $modSettings, $board, $user_info, $context;
+		global $topic, $modSettings, $board, $context;
 
 		// You must be posting to *some* board.
 		if (empty($board) && !$context['make_event'])
@@ -197,18 +197,18 @@ class Post extends \ElkArte\AbstractController
 		// Check if it's locked. It isn't locked if no topic is specified.
 		if (!empty($topic))
 		{
-			$this->_topic_attributes = topicUserAttributes($topic, $user_info['id']);
+			$this->_topic_attributes = topicUserAttributes($topic, $this->user->id);
 			$context['notify'] = $this->_topic_attributes['notify'];
 			$context['topic_last_message'] = $this->_topic_attributes['id_last_msg'];
 
 			if (empty($_REQUEST['msg']))
 			{
-				if ($user_info['is_guest'] && !allowedTo('post_reply_any') && (!$modSettings['postmod_active'] || !allowedTo('post_unapproved_replies_any')))
+				if ($this->user->is_guest && !allowedTo('post_reply_any') && (!$modSettings['postmod_active'] || !allowedTo('post_unapproved_replies_any')))
 					is_not_guest();
 
 				// By default the reply will be approved...
 				$context['becomes_approved'] = true;
-				if ($this->_topic_attributes['id_member'] != $user_info['id'])
+				if ($this->_topic_attributes['id_member'] != $this->user->id)
 				{
 					if ($modSettings['postmod_active'] && allowedTo('post_unapproved_replies_any') && !allowedTo('post_reply_any'))
 						$context['becomes_approved'] = false;
@@ -220,21 +220,31 @@ class Post extends \ElkArte\AbstractController
 					if ($modSettings['postmod_active'])
 					{
 						if (allowedTo('post_unapproved_replies_own') && !allowedTo('post_reply_own'))
+						{
 							$context['becomes_approved'] = false;
+						}
 						// Guests do not have post_unapproved_replies_own permission, so it's always post_unapproved_replies_any
-						elseif ($user_info['is_guest'] && allowedTo('post_unapproved_replies_any'))
+						elseif ($this->user->is_guest && allowedTo('post_unapproved_replies_any'))
+						{
 							$context['becomes_approved'] = false;
+						}
 						else
+						{
 							isAllowedTo('post_reply_own');
+						}
 					}
 					else
+					{
 						isAllowedTo('post_reply_own');
+					}
 				}
 			}
 			else
+			{
 				$context['becomes_approved'] = true;
+			}
 
-			$context['can_lock'] = allowedTo('lock_any') || ($user_info['id'] == $this->_topic_attributes['id_member'] && allowedTo('lock_own'));
+			$context['can_lock'] = allowedTo('lock_any') || ($this->user->id == $this->_topic_attributes['id_member'] && allowedTo('lock_own'));
 			$context['can_sticky'] = allowedTo('make_sticky');
 			$context['notify'] = !empty($context['notify']);
 			$context['sticky'] = isset($_REQUEST['sticky']) ? !empty($_REQUEST['sticky']) : $this->_topic_attributes['is_sticky'];
@@ -282,7 +292,7 @@ class Post extends \ElkArte\AbstractController
 
 	protected function _generating_message()
 	{
-		global $txt, $topic, $modSettings, $user_info, $context, $options;
+		global $txt, $topic, $modSettings, $context, $options;
 
 		// See if any new replies have come along.
 		if (empty($_REQUEST['msg']) && !empty($topic))
@@ -351,11 +361,11 @@ class Post extends \ElkArte\AbstractController
 				$this->_form_subject = \ElkArte\Util::substr($this->_form_subject, 0, 100);
 
 			// Are you... a guest?
-			if ($user_info['is_guest'])
+			if ($this->user->is_guest)
 			{
 				$context['name'] = !isset($_REQUEST['guestname']) ? '' : \ElkArte\Util::htmlspecialchars(trim($_REQUEST['guestname']));
 				$context['email'] = !isset($_REQUEST['email']) ? '' : \ElkArte\Util::htmlspecialchars(trim($_REQUEST['email']));
-				$user_info['name'] = $context['name'];
+				$this->user->name = $context['name'];
 			}
 
 			// Only show the preview stuff if they hit Preview.
@@ -478,7 +488,7 @@ class Post extends \ElkArte\AbstractController
 			$context['use_smileys'] = true;
 			$context['icon'] = 'xx';
 
-			if ($user_info['is_guest'])
+			if ($this->user->is_guest)
 			{
 				$context['name'] = isset($_SESSION['guest_name']) ? $_SESSION['guest_name'] : '';
 				$context['email'] = isset($_SESSION['guest_email']) ? $_SESSION['guest_email'] : '';
@@ -509,7 +519,7 @@ class Post extends \ElkArte\AbstractController
 
 	protected function _preparing_page()
 	{
-		global $txt, $topic, $modSettings, $board, $user_info, $context;
+		global $txt, $topic, $modSettings, $board, $context;
 
 		// Any errors occurred?
 		$context['post_error'] = array(
@@ -549,7 +559,7 @@ class Post extends \ElkArte\AbstractController
 			{
 				$post['is_new'] = !empty($context['new_replies']);
 				$post['counter'] = $counter++;
-				$post['is_ignored'] = !empty($modSettings['enable_buddylist']) && in_array($post['id_poster'], $user_info['ignoreusers']);
+				$post['is_ignored'] = !empty($modSettings['enable_buddylist']) && in_array($post['id_poster'], $this->user->ignoreusers);
 
 				if (!empty($context['new_replies']))
 					$context['new_replies']--;
@@ -652,7 +662,7 @@ class Post extends \ElkArte\AbstractController
 	public function action_post2()
 	{
 		global $board, $topic, $txt, $modSettings, $context;
-		global $user_info, $board_info, $options;
+		global $board_info, $options;
 
 		// Sneaking off, are we?
 		if (empty($_POST) && empty($topic))
@@ -720,7 +730,7 @@ class Post extends \ElkArte\AbstractController
 
 			// Do the permissions and approval stuff...
 			$becomesApproved = true;
-			if ($topic_info['id_member_started'] != $user_info['id'])
+			if ($topic_info['id_member_started'] != $this->user->id)
 			{
 				if ($modSettings['postmod_active'] && allowedTo('post_unapproved_replies_any') && !allowedTo('post_reply_any'))
 					$becomesApproved = false;
@@ -732,12 +742,18 @@ class Post extends \ElkArte\AbstractController
 				if ($modSettings['postmod_active'])
 				{
 					if (allowedTo('post_unapproved_replies_own') && !allowedTo('post_reply_own'))
+					{
 						$becomesApproved = false;
+					}
 					// Guests do not have post_unapproved_replies_own permission, so it's always post_unapproved_replies_any
-					elseif ($user_info['is_guest'] && allowedTo('post_unapproved_replies_any'))
+					elseif ($this->user->is_guest && allowedTo('post_unapproved_replies_any'))
+					{
 						$becomesApproved = false;
+					}
 					else
+					{
 						isAllowedTo('post_reply_own');
+					}
 				}
 			}
 
@@ -765,7 +781,7 @@ class Post extends \ElkArte\AbstractController
 				return $this->action_post();
 			}
 
-			$posterIsGuest = $user_info['is_guest'];
+			$posterIsGuest = $this->user->is_guest;
 		}
 		// Posting a new topic.
 		elseif (empty($topic))
@@ -791,7 +807,7 @@ class Post extends \ElkArte\AbstractController
 			if (isset($_POST['sticky']) && (empty($_POST['sticky']) || !allowedTo('make_sticky')))
 				unset($_POST['sticky']);
 
-			$posterIsGuest = $user_info['is_guest'];
+			$posterIsGuest = $this->user->is_guest;
 		}
 		// Modifying an existing message?
 		elseif (isset($_REQUEST['msg']) && !empty($topic))
@@ -818,16 +834,16 @@ class Post extends \ElkArte\AbstractController
 			if (isset($_POST['sticky']) && (!allowedTo('make_sticky') || $_POST['sticky'] == $topic_info['is_sticky']))
 				unset($_POST['sticky']);
 
-			if ($msgInfo['id_member'] == $user_info['id'] && !allowedTo('modify_any'))
+			if ($msgInfo['id_member'] == $this->user->id && !allowedTo('modify_any'))
 			{
 				if ((!$modSettings['postmod_active'] || $msgInfo['approved']) && !empty($modSettings['edit_disable_time']) && $msgInfo['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
 					throw new \ElkArte\Exceptions\Exception('modify_post_time_passed', false);
-				elseif ($topic_info['id_member_started'] == $user_info['id'] && !allowedTo('modify_own'))
+				elseif ($topic_info['id_member_started'] == $this->user->id && !allowedTo('modify_own'))
 					isAllowedTo('modify_replies');
 				else
 					isAllowedTo('modify_own');
 			}
-			elseif ($topic_info['id_member_started'] == $user_info['id'] && !allowedTo('modify_any'))
+			elseif ($topic_info['id_member_started'] == $this->user->id && !allowedTo('modify_any'))
 			{
 				isAllowedTo('modify_replies');
 
@@ -839,7 +855,7 @@ class Post extends \ElkArte\AbstractController
 				isAllowedTo('modify_any');
 
 				// Log it, assuming you're not modifying your own post.
-				if ($msgInfo['id_member'] != $user_info['id'])
+				if ($msgInfo['id_member'] != $this->user->id)
 					$moderationAction = true;
 			}
 
@@ -912,17 +928,23 @@ class Post extends \ElkArte\AbstractController
 			$this->_post_errors->addError('no_subject');
 
 		if (!isset($_POST['message']) || \ElkArte\Util::htmltrim(\ElkArte\Util::htmlspecialchars($_POST['message'], ENT_QUOTES)) === '')
+		{
 			$this->_post_errors->addError('no_message');
+		}
 		elseif (!empty($modSettings['max_messageLength']) && \ElkArte\Util::strlen($_POST['message']) > $modSettings['max_messageLength'])
+		{
 			$this->_post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
+		}
 		else
 		{
 			// Prepare the message a bit for some additional testing.
 			$_POST['message'] = \ElkArte\Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true);
 
 			// Preparse code. (Zef)
-			if ($user_info['is_guest'])
-				$user_info['name'] = $_POST['guestname'];
+			if ($this->user->is_guest)
+			{
+				$this->user->name = $_POST['guestname'];
+			}
 
 			$this->preparse->preparsecode($_POST['message']);
 
@@ -943,8 +965,8 @@ class Post extends \ElkArte\AbstractController
 		// If the user isn't a guest, get his or her name and email.
 		elseif (!isset($_REQUEST['msg']))
 		{
-			$_POST['guestname'] = $user_info['username'];
-			$_POST['email'] = $user_info['email'];
+			$_POST['guestname'] = $this->user->username;
+			$_POST['email'] = $this->user->email;
 		}
 
 		// Posting somewhere else? Are we sure you can?
@@ -1015,10 +1037,10 @@ class Post extends \ElkArte\AbstractController
 		);
 
 		$posterOptions = array(
-			'id' => $user_info['id'],
+			'id' => $this->user->id,
 			'name' => $_POST['guestname'],
 			'email' => $_POST['email'],
-			'update_post_count' => !$user_info['is_guest'] && !isset($_REQUEST['msg']) && $board_info['posts_count'],
+			'update_post_count' => $this->user->is_guest === false && !isset($_REQUEST['msg']) && $board_info['posts_count'],
 		);
 
 		// Trigger the pre_save_post event
@@ -1028,10 +1050,10 @@ class Post extends \ElkArte\AbstractController
 		if (!empty($_REQUEST['msg']))
 		{
 			// Have admins allowed people to hide their screwups?
-			if (time() - $msgInfo['poster_time'] > $modSettings['edit_wait_time'] || $user_info['id'] != $msgInfo['id_member'])
+			if (time() - $msgInfo['poster_time'] > $modSettings['edit_wait_time'] || $this->user->id != $msgInfo['id_member'])
 			{
 				$msgOptions['modify_time'] = time();
-				$msgOptions['modify_name'] = $user_info['name'];
+				$msgOptions['modify_name'] = $this->user->name;
 			}
 
 			// This will save some time...
@@ -1053,7 +1075,7 @@ class Post extends \ElkArte\AbstractController
 				// Some details changed
 				$topicOptions['board'] = $board;
 				$topicOptions['is_approved'] = !$modSettings['postmod_active'] || empty($topic) || !empty($board_info['cur_topic_approved']);
-				$posterOptions['update_post_count'] = !$user_info['is_guest'] && !isset($_REQUEST['msg']) && $board_info['posts_count'];
+				$posterOptions['update_post_count'] = $this->user->is_guest === false && !isset($_REQUEST['msg']) && $board_info['posts_count'];
 			}
 
 			createPost($msgOptions, $topicOptions, $posterOptions);
@@ -1067,7 +1089,7 @@ class Post extends \ElkArte\AbstractController
 
 		// Marking boards as read.
 		// (You just posted and they will be unread.)
-		if (!$user_info['is_guest'])
+		if ($this->user->is_guest === false)
 		{
 			$board_list = !empty($board_info['parent_boards']) ? array_keys($board_info['parent_boards']) : array();
 
@@ -1081,9 +1103,13 @@ class Post extends \ElkArte\AbstractController
 
 		// Turn notification on or off.
 		if (!empty($_POST['notify']) && allowedTo('mark_any_notify'))
-			setTopicNotification($user_info['id'], $topic, true);
+		{
+			setTopicNotification($this->user->id, $topic, true);
+		}
 		elseif (!$newTopic)
-			setTopicNotification($user_info['id'], $topic, false);
+		{
+			setTopicNotification($this->user->id, $topic, false);
+		}
 
 		// Log an act of moderation - modifying.
 		if (!empty($moderationAction))
@@ -1104,8 +1130,8 @@ class Post extends \ElkArte\AbstractController
 				$notifyData = array(
 					'body' => $_POST['message'],
 					'subject' => $_POST['subject'],
-					'name' => $user_info['name'],
-					'poster' => $user_info['id'],
+					'name' => $this->user->name,
+					'poster' => $this->user->id,
 					'msg' => $msgOptions['id'],
 					'board' => $board,
 					'topic' => $topic,
@@ -1153,7 +1179,7 @@ class Post extends \ElkArte\AbstractController
 	 */
 	public function action_quotefast()
 	{
-		global $user_info, $context;
+		global $context;
 
 		theme()->getTemplates()->loadLanguageFile('Post');
 
@@ -1164,7 +1190,7 @@ class Post extends \ElkArte\AbstractController
 
 		$context['sub_template'] = 'quotefast';
 		if (!empty($row))
-			$can_view_post = $row['approved'] || ($row['id_member'] != 0 && $row['id_member'] == $user_info['id']) || allowedTo('approve_posts', $row['id_board']);
+			$can_view_post = $row['approved'] || ($row['id_member'] != 0 && $row['id_member'] == $this->user->id) || allowedTo('approve_posts', $row['id_board']);
 
 		if (!empty($can_view_post))
 		{
@@ -1227,7 +1253,7 @@ class Post extends \ElkArte\AbstractController
 	public function action_jsmodify()
 	{
 		global $modSettings, $board, $topic;
-		global $user_info, $context;
+		global $context;
 
 		// We have to have a topic!
 		if (empty($topic))
@@ -1246,23 +1272,23 @@ class Post extends \ElkArte\AbstractController
 			if (!empty($row['locked']))
 				isAllowedTo('moderate_board');
 
-			if ($row['id_member'] == $user_info['id'] && !allowedTo('modify_any'))
+			if ($row['id_member'] == $this->user->id && !allowedTo('modify_any'))
 			{
 				if ((!$modSettings['postmod_active'] || $row['approved']) && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
 					throw new \ElkArte\Exceptions\Exception('modify_post_time_passed', false);
-				elseif ($row['id_member_started'] == $user_info['id'] && !allowedTo('modify_own'))
+				elseif ($row['id_member_started'] == $this->user->id && !allowedTo('modify_own'))
 					isAllowedTo('modify_replies');
 				else
 					isAllowedTo('modify_own');
 			}
 			// Otherwise, they're locked out; someone who can modify the replies is needed.
-			elseif ($row['id_member_started'] == $user_info['id'] && !allowedTo('modify_any'))
+			elseif ($row['id_member_started'] == $this->user->id && !allowedTo('modify_any'))
 				isAllowedTo('modify_replies');
 			else
 				isAllowedTo('modify_any');
 
 			// Only log this action if it wasn't your message.
-			$moderationAction = $row['id_member'] != $user_info['id'];
+			$moderationAction = $row['id_member'] != $this->user->id;
 		}
 
 		if (isset($_POST['subject']) && \ElkArte\Util::htmltrim(\ElkArte\Util::htmlspecialchars($_POST['subject'])) !== '')
@@ -1367,10 +1393,10 @@ class Post extends \ElkArte\AbstractController
 			if ((isset($_POST['subject']) && $_POST['subject'] != $row['subject']) || (isset($_POST['message']) && $_POST['message'] != $row['body']) || (isset($_REQUEST['icon']) && $_REQUEST['icon'] != $row['icon']))
 			{
 				// And even then only if the time has passed...
-				if (time() - $row['poster_time'] > $modSettings['edit_wait_time'] || $user_info['id'] != $row['id_member'])
+				if (time() - $row['poster_time'] > $modSettings['edit_wait_time'] || $this->user->id != $row['id_member'])
 				{
 					$msgOptions['modify_time'] = time();
-					$msgOptions['modify_name'] = $user_info['name'];
+					$msgOptions['modify_name'] = $this->user->name;
 				}
 			}
 			// If nothing was changed there's no need to add an entry to the moderation log.
@@ -1387,7 +1413,7 @@ class Post extends \ElkArte\AbstractController
 			}
 
 			// Changing the first subject updates other subjects to 'Re: new_subject'.
-			if (isset($_POST['subject']) && isset($_REQUEST['change_all_subjects']) && $row['id_first_msg'] == $row['id_msg'] && !empty($row['num_replies']) && (allowedTo('modify_any') || ($row['id_member_started'] == $user_info['id'] && allowedTo('modify_replies'))))
+			if (isset($_POST['subject']) && isset($_REQUEST['change_all_subjects']) && $row['id_first_msg'] == $row['id_msg'] && !empty($row['num_replies']) && (allowedTo('modify_any') || ($row['id_member_started'] == $this->user->id && allowedTo('modify_replies'))))
 			{
 				// Get the proper (default language) response prefix first.
 				$context['response_prefix'] = response_prefix();
@@ -1466,8 +1492,6 @@ class Post extends \ElkArte\AbstractController
 	 */
 	protected function _checkLocked($lock, $topic_info = null)
 	{
-		global $user_info;
-
 		// A new topic
 		if ($topic_info === null)
 		{
@@ -1486,7 +1510,7 @@ class Post extends \ElkArte\AbstractController
 		if ((empty($lock) && empty($topic_info['locked'])) || (!empty($lock) && !empty($topic_info['locked'])))
 			return null;
 		// You're simply not allowed to (un)lock this.
-		elseif (!allowedTo(array('lock_any', 'lock_own')) || (!allowedTo('lock_any') && $user_info['id'] != $topic_info['id_member_started']))
+		elseif (!allowedTo(array('lock_any', 'lock_own')) || (!allowedTo('lock_any') && $this->user->id != $topic_info['id_member_started']))
 			return null;
 		// You're only allowed to lock your own topics.
 		elseif (!allowedTo('lock_any'))

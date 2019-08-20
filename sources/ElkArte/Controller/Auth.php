@@ -57,11 +57,13 @@ class Auth extends \ElkArte\AbstractController
 	 */
 	public function action_login()
 	{
-		global $txt, $context, $user_info;
+		global $txt, $context;
 
 		// You are already logged in, go take a tour of the boards
-		if (!empty($user_info['id']))
+		if (!empty($this->user->id))
+		{
 			redirectexit();
+		}
 
 		// Load the Login template/language file.
 		theme()->getTemplates()->loadLanguageFile('Login');
@@ -540,17 +542,19 @@ class Auth extends \ElkArte\AbstractController
 	 */
 	public function action_check()
 	{
-		global $user_info, $modSettings;
+		global $modSettings;
 
 		// Only our members, please.
-		if (!$user_info['is_guest'])
+		if ($this->user->is_guest === false)
 		{
 			// Strike!  You're outta there!
-			if ($_GET['member'] != $user_info['id'])
+			if ($_GET['member'] != $this->user->id)
+			{
 				throw new \ElkArte\Exceptions\Exception('login_cookie_error', false);
+			}
 
-			$user_info['can_mod'] = User::$info->canMod($modSettings['postmod_active']);
-			if ($user_info['can_mod'] && isset(\ElkArte\User::$settings['openid_uri']) && empty(\ElkArte\User::$settings['openid_uri']))
+			$this->user->can_mod = User::$info->canMod($modSettings['postmod_active']);
+			if ($this->user->can_mod && isset(\ElkArte\User::$settings['openid_uri']) && empty(\ElkArte\User::$settings['openid_uri']))
 			{
 				$_SESSION['moderate_time'] = time();
 				unset($_SESSION['just_registered']);
@@ -840,20 +844,20 @@ function doLogin(\ElkArte\UserSettings $user)
 
 	// You've logged in, haven't you?
 	require_once(SUBSDIR . '/Members.subs.php');
-	updateMemberData($user_info['id'], array('last_login' => time(), 'member_ip' => $user_info['ip'], 'member_ip2' => $req->ban_ip()));
+	updateMemberData($this->user->id, array('last_login' => time(), 'member_ip' => $this->user->ip, 'member_ip2' => $req->ban_ip()));
 
 	// Get rid of the online entry for that old guest....
 	require_once(SUBSDIR . '/Logging.subs.php');
-	deleteOnline('ip' . $user_info['ip']);
+	deleteOnline('ip' . $this->user->ip);
 	$_SESSION['log_time'] = 0;
 
 	// Log this entry, only if we have it enabled.
 	if (!empty($modSettings['loginHistoryDays']))
-		logLoginHistory($user_info['id'], $user_info['ip'], $user_info['ip2']);
+		logLoginHistory($this->user->id, $this->user->ip, $this->user->ip2);
 
 	// Just log you back out if it's in maintenance mode and you AREN'T an admin.
 	if (empty($maintenance) || allowedTo('admin_forum'))
-		redirectexit('action=auth;sa=check;member=' . $user_info['id'], detectServer()->is('needs_login_fix'));
+		redirectexit('action=auth;sa=check;member=' . $this->user->id, detectServer()->is('needs_login_fix'));
 	else
 		redirectexit('action=logout;' . $context['session_var'] . '=' . $context['session_id'], detectServer()->is('needs_login_fix'));
 }

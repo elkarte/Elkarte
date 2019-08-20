@@ -49,7 +49,7 @@ class Poll extends \ElkArte\AbstractController
 	 */
 	public function action_vote()
 	{
-		global $topic, $user_info, $modSettings;
+		global $topic, $modSettings;
 
 		require_once(SUBSDIR . '/Poll.subs.php');
 
@@ -65,7 +65,7 @@ class Poll extends \ElkArte\AbstractController
 			throw new \ElkArte\Exceptions\Exception('poll_error', false);
 
 		// If this is a guest can they vote?
-		if ($user_info['is_guest'])
+		if ($this->user->is_guest)
 		{
 			// Guest voting disabled?
 			if (!$row['guest_vote'])
@@ -106,15 +106,15 @@ class Poll extends \ElkArte\AbstractController
 			throw new \ElkArte\Exceptions\Exception('poll_error', false);
 
 		// If they have already voted and aren't allowed to change their vote - hence they are outta here!
-		if (!$user_info['is_guest'] && $row['selected'] != -1 && empty($row['change_vote']))
+		if ($this->user->is_guest === false && $row['selected'] != -1 && empty($row['change_vote']))
 			throw new \ElkArte\Exceptions\Exception('poll_error', false);
 		// Otherwise if they can change their vote yet they haven't sent any options... remove their vote and redirect.
-		elseif (!empty($row['change_vote']) && !$user_info['is_guest'] && empty($this->_req->post->options))
+		elseif (!empty($row['change_vote']) && $this->user->is_guest === false && empty($this->_req->post->options))
 		{
 			checkSession('request');
 
 			// Find out what they voted for before.
-			$pollOptions = determineVote($user_info['id'], $row['id_poll']);
+			$pollOptions = determineVote($this->user->id, $row['id_poll']);
 
 			// Just skip it if they had voted for nothing before.
 			if (!empty($pollOptions))
@@ -123,7 +123,7 @@ class Poll extends \ElkArte\AbstractController
 				decreaseVoteCounter($row['id_poll'], $pollOptions);
 
 				// Delete off the log.
-				removeVote($user_info['id'], $row['id_poll']);
+				removeVote($this->user->id, $row['id_poll']);
 			}
 
 			// Redirect back to the topic so the user can vote again!
@@ -148,7 +148,7 @@ class Poll extends \ElkArte\AbstractController
 			$id = (int) $id;
 
 			$pollOptions[] = $id;
-			$inserts[] = array($row['id_poll'], $user_info['id'], $id);
+			$inserts[] = array($row['id_poll'], $this->user->id, $id);
 		}
 
 		// Add their vote to the tally.
@@ -156,7 +156,7 @@ class Poll extends \ElkArte\AbstractController
 		increaseVoteCounter($row['id_poll'], $pollOptions);
 
 		// If it's a guest don't let them vote again.
-		if ($user_info['is_guest'] && count($pollOptions) > 0)
+		if ($this->user->is_guest && count($pollOptions) > 0)
 		{
 			// Time is stored in case the poll is reset later, plus what they voted for.
 			$this->_req->cookie->guest_poll_vote = empty($this->_req->cookie->guest_poll_vote) ? '' : $this->_req->cookie->guest_poll_vote;
@@ -194,7 +194,7 @@ class Poll extends \ElkArte\AbstractController
 	 */
 	public function action_lockvoting()
 	{
-		global $topic, $user_info;
+		global $topic;
 
 		require_once(SUBSDIR . '/Poll.subs.php');
 
@@ -205,7 +205,7 @@ class Poll extends \ElkArte\AbstractController
 
 		// If the user _can_ modify the poll....
 		if (!allowedTo('poll_lock_any'))
-			isAllowedTo('poll_lock_' . ($user_info['id'] == $poll['id_member_started'] ? 'own' : 'any'));
+			isAllowedTo('poll_lock_' . ($this->user->id == $poll['id_member_started'] ? 'own' : 'any'));
 
 		// It's been locked by a non-moderator.
 		if ($poll['locked'] == '1')
@@ -247,7 +247,7 @@ class Poll extends \ElkArte\AbstractController
 	 */
 	public function action_editpoll()
 	{
-		global $txt, $user_info, $context, $topic, $board;
+		global $txt, $context, $topic, $board;
 
 		// No topic, means you can't edit the poll
 		if (empty($topic))
@@ -289,14 +289,14 @@ class Poll extends \ElkArte\AbstractController
 		// Can you do this?
 		if ($context['is_edit'] && !allowedTo('poll_edit_any'))
 		{
-			isAllowedTo('poll_edit_' . ($user_info['id'] == $pollinfo['id_member_started'] || ($pollinfo['poll_starter'] != 0 && $user_info['id'] == $pollinfo['poll_starter']) ? 'own' : 'any'));
+			isAllowedTo('poll_edit_' . ($this->user->id == $pollinfo['id_member_started'] || ($pollinfo['poll_starter'] != 0 && $this->user->id == $pollinfo['poll_starter']) ? 'own' : 'any'));
 		}
 		elseif (!$context['is_edit'] && !allowedTo('poll_add_any'))
 		{
-			isAllowedTo('poll_add_' . ($user_info['id'] == $pollinfo['id_member_started'] ? 'own' : 'any'));
+			isAllowedTo('poll_add_' . ($this->user->id == $pollinfo['id_member_started'] ? 'own' : 'any'));
 		}
 
-		$context['can_moderate_poll'] = isset($this->_req->post->add) ? true : allowedTo('poll_edit_' . ($user_info['id'] == $pollinfo['id_member_started'] || ($pollinfo['poll_starter'] != 0 && $user_info['id'] == $pollinfo['poll_starter']) ? 'own' : 'any'));
+		$context['can_moderate_poll'] = isset($this->_req->post->add) ? true : allowedTo('poll_edit_' . ($this->user->id == $pollinfo['id_member_started'] || ($pollinfo['poll_starter'] != 0 && $this->user->id == $pollinfo['poll_starter']) ? 'own' : 'any'));
 
 		// Do we enable guest voting?
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -530,7 +530,7 @@ class Poll extends \ElkArte\AbstractController
 	 */
 	public function action_editpoll2()
 	{
-		global $topic, $board, $user_info;
+		global $topic, $board;
 
 		// Sneaking off, are we?
 		if (empty($this->_req->post))
@@ -563,9 +563,9 @@ class Poll extends \ElkArte\AbstractController
 
 		// Check if they have the power to add or edit the poll.
 		if ($isEdit && !allowedTo('poll_edit_any'))
-			isAllowedTo('poll_edit_' . ($user_info['id'] == $bcinfo['id_member_started'] || ($bcinfo['poll_starter'] != 0 && $user_info['id'] == $bcinfo['poll_starter']) ? 'own' : 'any'));
+			isAllowedTo('poll_edit_' . ($this->user->id == $bcinfo['id_member_started'] || ($bcinfo['poll_starter'] != 0 && $this->user->id == $bcinfo['poll_starter']) ? 'own' : 'any'));
 		elseif (!$isEdit && !allowedTo('poll_add_any'))
-			isAllowedTo('poll_add_' . ($user_info['id'] == $bcinfo['id_member_started'] ? 'own' : 'any'));
+			isAllowedTo('poll_add_' . ($this->user->id == $bcinfo['id_member_started'] ? 'own' : 'any'));
 
 		$optionCount = 0;
 		$idCount = 0;
@@ -646,7 +646,7 @@ class Poll extends \ElkArte\AbstractController
 		else
 		{
 			// Create the poll.
-			$bcinfo['id_poll'] = createPoll($question, $user_info['id'], $user_info['username'],
+			$bcinfo['id_poll'] = createPoll($question, $this->user->id, $this->user->username,
 				$poll_max_votes, $poll_hide, $poll_expire,
 				$poll_change_vote, $poll_guest_vote
 			);
@@ -720,7 +720,7 @@ class Poll extends \ElkArte\AbstractController
 	 */
 	public function action_remove()
 	{
-		global $topic, $user_info;
+		global $topic;
 
 		// Make sure the topic is not empty.
 		if (empty($topic))
@@ -740,7 +740,7 @@ class Poll extends \ElkArte\AbstractController
 				throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 			list ($topicStarter, $pollStarter) = $pollStarters;
-			if ($topicStarter == $user_info['id'] || ($pollStarter != 0 && $pollStarter == $user_info['id']))
+			if ($topicStarter == $this->user->id || ($pollStarter != 0 && $pollStarter == $this->user->id))
 				isAllowedTo('poll_remove_own');
 		}
 

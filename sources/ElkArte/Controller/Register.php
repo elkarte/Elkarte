@@ -108,14 +108,18 @@ class Register extends \ElkArte\AbstractController
 	 */
 	public function action_register()
 	{
-		global $txt, $context, $modSettings, $user_info, $scripturl;
+		global $txt, $context, $modSettings, $scripturl;
 
 		// If this user is an admin - redirect them to the admin registration page.
-		if (allowedTo('moderate_forum') && !$user_info['is_guest'])
+		if (allowedTo('moderate_forum') && $this->user->is_guest === false)
+		{
 			redirectexit('action=admin;area=regcenter;sa=register');
+		}
 		// You are not a guest, so you are a member - and members don't get to register twice!
-		elseif (empty($user_info['is_guest']))
+		elseif (empty($this->user->is_guest))
+		{
 			redirectexit();
+		}
 
 		// Confused and want to contact the admins instead
 		if (isset($this->_req->post->show_contact))
@@ -216,7 +220,7 @@ class Register extends \ElkArte\AbstractController
 			$_SESSION['register']['timenow'] = time();
 
 		// If you have to agree to the agreement, it needs to be fetched from the file.
-		$agreement = new \ElkArte\Agreement($user_info['language']);
+		$agreement = new \ElkArte\Agreement($this->user->language);
 		$context['agreement'] = $agreement->getParsedText();
 
 		if (empty($context['agreement']))
@@ -229,7 +233,7 @@ class Register extends \ElkArte\AbstractController
 
 		if (!empty($context['require_privacypol']))
 		{
-			$privacypol = new \ElkArte\PrivacyPolicy($user_info['language']);
+			$privacypol = new \ElkArte\PrivacyPolicy($this->user->language);
 			$context['privacy_policy'] = $privacypol->getParsedText();
 
 			if (empty($context['privacy_policy']))
@@ -360,7 +364,7 @@ class Register extends \ElkArte\AbstractController
 	 */
 	public function do_register($verifiedOpenID = false)
 	{
-		global $txt, $modSettings, $context, $user_info;
+		global $txt, $modSettings, $context;
 
 		// Start collecting together any errors.
 		$reg_errors = ErrorContext::context('register', 0);
@@ -514,13 +518,13 @@ class Register extends \ElkArte\AbstractController
 		// Registration needs to know your IP
 		$req = request();
 
-		$regOptions['ip'] = $user_info['ip'];
+		$regOptions['ip'] = $this->user->ip;
 		$regOptions['ip2'] = $req->ban_ip();
 		$memberID = registerMember($regOptions, 'register');
 
 		// If there are "important" errors and you are not an admin: log the first error
 		// Otherwise grab all of them and don't log anything
-		if ($reg_errors->hasErrors(1) && !$user_info['is_admin'])
+		if ($reg_errors->hasErrors(1) && $this->user->is_admin === false)
 		{
 			foreach ($reg_errors->prepareErrors(1) as $error)
 				throw new \ElkArte\Exceptions\Exception($error, 'general');
@@ -536,12 +540,12 @@ class Register extends \ElkArte\AbstractController
 
 		$lang = !empty($modSettings['userLanguage']) ? $modSettings['userLanguage'] : 'english';
 		$agreement = new \ElkArte\Agreement($lang);
-		$agreement->accept($memberID, $user_info['ip'], empty($modSettings['agreementRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
+		$agreement->accept($memberID, $this->user->ip, empty($modSettings['agreementRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
 
 		if (!empty($modSettings['requirePrivacypolicy']))
 		{
 			$policy = new \ElkArte\PrivacyPolicy($lang);
-			$policy->accept($memberID, $user_info['ip'], empty($modSettings['privacypolicyRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacypolicyRevision']);
+			$policy->accept($memberID, $this->user->ip, empty($modSettings['privacypolicyRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacypolicyRevision']);
 		}
 
 		// Do our spam protection now.
@@ -701,7 +705,7 @@ class Register extends \ElkArte\AbstractController
 	 */
 	private function _load_language_support()
 	{
-		global $context, $modSettings, $language, $user_info;
+		global $context, $modSettings, $language;
 
 		// Language support enabled
 		if (!empty($modSettings['userLanguage']))
@@ -712,7 +716,7 @@ class Register extends \ElkArte\AbstractController
 			if (isset($this->_req->post->lngfile) && isset($languages[$this->_req->post->lngfile]))
 			{
 				$_SESSION['language'] = $this->_req->post->lngfile;
-				if ($_SESSION['language'] !== $user_info['language'])
+				if ($_SESSION['language'] !== $this->user->language)
 				{
 					return true;
 				}
@@ -744,7 +748,7 @@ class Register extends \ElkArte\AbstractController
 	 */
 	private function _load_profile_fields()
 	{
-		global $context, $modSettings, $user_info, $cur_profile;
+		global $context, $modSettings, $cur_profile;
 
 		// Any custom fields to load?
 		require_once(SUBSDIR . '/Profile.subs.php');
@@ -760,7 +764,7 @@ class Register extends \ElkArte\AbstractController
 			$context['user']['is_owner'] = true;
 
 			// Here, and here only, emulate the permissions the user would have to do this.
-			$user_info['permissions'] = array_merge($user_info['permissions'], array('profile_account_own', 'profile_extra_own'));
+			$this->user->permissions = array_merge($this->user->permissions, ['profile_account_own', 'profile_extra_own']);
 			$reg_fields = ProfileOptions::getFields('registration');
 
 			// We might have had some submissions on this front - go check.
@@ -789,13 +793,15 @@ class Register extends \ElkArte\AbstractController
 	 */
 	public function action_activate()
 	{
-		global $context, $txt, $modSettings, $user_info;
+		global $context, $txt, $modSettings;
 
 		require_once(SUBSDIR . '/Auth.subs.php');
 
 		// Logged in users should not bother to activate their accounts
-		if (!empty($user_info['id']))
+		if (!empty($this->user->id))
+		{
 			redirectexit();
+		}
 
 		theme()->getTemplates()->loadLanguageFile('Login');
 		theme()->getTemplates()->load('Login');
@@ -806,7 +812,9 @@ class Register extends \ElkArte\AbstractController
 		{
 			// Immediate 0 or disabled 3 means no need to try and activate
 			if (empty($modSettings['registration_method']) || $modSettings['registration_method'] == '3')
+			{
 				throw new \ElkArte\Exceptions\Exception('no_access', false);
+			}
 
 			// Otherwise its simply invalid
 			$context['member_id'] = 0;
@@ -1141,11 +1149,11 @@ class Register extends \ElkArte\AbstractController
 	 */
 	public function action_contact()
 	{
-		global $context, $txt, $user_info, $modSettings;
+		global $context, $txt, $modSettings;
 
 		// Users have no need to use this, just send a PM
 		// Disabled, you cannot enter.
-		if (!$user_info['is_guest'] || empty($modSettings['enable_contactform']) || $modSettings['enable_contactform'] === 'disabled')
+		if ($this->user->is_guest === false || empty($modSettings['enable_contactform']) || $modSettings['enable_contactform'] === 'disabled')
 			redirectexit();
 
 		theme()->getTemplates()->loadLanguageFile('Login');
@@ -1267,12 +1275,12 @@ class Register extends \ElkArte\AbstractController
 
 	public function action_agreement()
 	{
-		global $context, $user_info, $modSettings, $txt;
+		global $context, $modSettings, $txt;
 
 		if (isset($this->_req->post->accept_agreement))
 		{
-			$agreement = new \ElkArte\Agreement($user_info['language']);
-			$agreement->accept($user_info['id'], $user_info['ip'], empty($modSettings['agreementRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
+			$agreement = new \ElkArte\Agreement($this->user->language);
+			$agreement->accept($this->user->id, $this->user->ip, empty($modSettings['agreementRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['agreementRevision']);
 
 			$_SESSION['agreement_accepted'] = true;
 			if (isset($_SESSION['agreement_url_redirect']))
@@ -1298,7 +1306,7 @@ class Register extends \ElkArte\AbstractController
 		loadLanguage('Profile');
 		loadTemplate('Register');
 		// If you have to agree to the agreement, it needs to be fetched from the file.
-		$agreement = new \ElkArte\Agreement($user_info['language']);
+		$agreement = new \ElkArte\Agreement($this->user->language);
 		$context['agreement'] = $agreement->getParsedText();
 		$context['page_title'] = $txt['registration_agreement'];
 
@@ -1316,13 +1324,13 @@ class Register extends \ElkArte\AbstractController
 
 	public function action_privacypol()
 	{
-		global $context, $user_info, $modSettings, $txt;
+		global $context, $modSettings, $txt;
 
-		$policy = new \ElkArte\PrivacyPolicy($user_info['language']);
+		$policy = new \ElkArte\PrivacyPolicy($this->user->language);
 
 		if (isset($this->_req->post->accept_agreement))
 		{
-			$policy->accept($user_info['id'], $user_info['ip'], empty($modSettings['privacypolicyRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacypolicyRevision']);
+			$policy->accept($this->user->id, $this->user->ip, empty($modSettings['privacypolicyRevision']) ? strftime('%Y-%m-%d', forum_time(false)) : $modSettings['privacypolicyRevision']);
 
 			$_SESSION['privacypolicy_accepted'] = true;
 			if (isset($_SESSION['privacypolicy_url_redirect']))

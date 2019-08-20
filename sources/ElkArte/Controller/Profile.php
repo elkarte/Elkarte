@@ -88,7 +88,7 @@ class Profile extends \ElkArte\AbstractController
 	 */
 	public function action_index()
 	{
-		global $txt, $user_info, $context, $cur_profile;
+		global $txt, $context, $cur_profile;
 		global $profile_vars, $post_errors;
 
 		// Don't reload this as we may have processed error strings.
@@ -108,7 +108,7 @@ class Profile extends \ElkArte\AbstractController
 		$context['member']->loadContext();
 
 		// Is this the profile of the user himself or herself?
-		$context['user']['is_owner'] = (int) $this->_memID === (int) $user_info['id'];
+		$context['user']['is_owner'] = (int) $this->_memID === (int) $this->user->id;
 
 		// Create the menu of profile options
 		$this->_define_profile_menu();
@@ -122,7 +122,7 @@ class Profile extends \ElkArte\AbstractController
 			$this->_profile_include_data['enabled'] = false;
 
 		// No menu and guest? A warm welcome to register
-		if (!$this->_profile_include_data && $user_info['is_guest'])
+		if (!$this->_profile_include_data && $this->user->is_guest)
 			is_not_guest();
 
 		// No menu means no access at all.
@@ -596,7 +596,7 @@ class Profile extends \ElkArte\AbstractController
 	 */
 	private function _save_updates()
 	{
-		global $txt, $user_info, $context, $modSettings, $post_errors, $profile_vars;
+		global $txt, $context, $modSettings, $post_errors, $profile_vars;
 
 		// All the subactions that require a user password in order to validate.
 		$check_password = $context['user']['is_owner'] && !empty($this->_profile_include_data['password']);
@@ -619,7 +619,7 @@ class Profile extends \ElkArte\AbstractController
 			// Change the IP address in the database.
 			if ($context['user']['is_owner'])
 			{
-				$profile_vars['member_ip'] = $user_info['ip'];
+				$profile_vars['member_ip'] = $this->user->ip;
 			}
 
 			// Now call the sub-action function...
@@ -728,7 +728,7 @@ class Profile extends \ElkArte\AbstractController
 							'action' => $k,
 							'log_type' => 'user',
 							'extra' => array_merge($v, array(
-								'applicator' => $user_info['id'],
+								'applicator' => $this->user->id,
 								'member_affected' => $this->_memID,
 							)),
 						);
@@ -761,7 +761,7 @@ class Profile extends \ElkArte\AbstractController
 	 */
 	private function _check_password($check_password)
 	{
-		global $user_info, $post_errors, $context;
+		global $post_errors, $context;
 
 		if ($check_password)
 		{
@@ -789,7 +789,7 @@ class Profile extends \ElkArte\AbstractController
 				require_once(SUBSDIR . '/Auth.subs.php');
 
 				// Bad password!!!
-				if (!$good_password && !validateLoginPassword($this->_req->post->oldpasswrd, $user_info['passwd'], $this->_profile['member_name']))
+				if (!$good_password && !validateLoginPassword($this->_req->post->oldpasswrd, $this->user->passwd, $this->_profile['member_name']))
 				{
 					$post_errors[] = 'bad_password';
 				}

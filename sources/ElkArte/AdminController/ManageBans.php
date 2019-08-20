@@ -115,7 +115,7 @@ class ManageBans extends \ElkArte\AbstractController
 	 */
 	public function action_list()
 	{
-		global $txt, $context, $user_info;
+		global $txt, $context;
 
 		require_once(SUBSDIR . '/Bans.subs.php');
 
@@ -139,10 +139,14 @@ class ManageBans extends \ElkArte\AbstractController
 		}
 
 		// Create a date string so we don't overload them with date info.
-		if (preg_match('~%[AaBbCcDdeGghjmuYy](?:[^%]*%[AaBbCcDdeGghjmuYy])*~', $user_info['time_format'], $matches) == 0 || empty($matches[0]))
-			$context['ban_time_format'] = $user_info['time_format'];
+		if (preg_match('~%[AaBbCcDdeGghjmuYy](?:[^%]*%[AaBbCcDdeGghjmuYy])*~', $this->user->time_format, $matches) == 0 || empty($matches[0]))
+		{
+			$context['ban_time_format'] = $this->user->time_format;
+		}
 		else
+		{
 			$context['ban_time_format'] = $matches[0];
+		}
 
 		// Lets build a nice create list to show them the bans
 		$listOptions = array(

@@ -40,12 +40,19 @@ abstract class AbstractController
 	protected $_req;
 
 	/**
+	 * Holds instance of \ElkArte\User::$info object
+	 * @var \ElkArte\ValuesContainer
+	 */
+	protected $user;
+
+	/**
 	 * @param \ElkArte\EventManager $eventManager
 	 */
 	public function __construct($eventManager)
 	{
 		// Dependency injection will come later
 		$this->_req = HttpReq::instance();
+		$this->user = User::$info;
 
 		$this->_events = $eventManager;
 	}

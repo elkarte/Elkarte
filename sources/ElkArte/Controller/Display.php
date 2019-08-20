@@ -73,9 +73,9 @@ class Display extends \ElkArte\AbstractController
 	 */
 	public function trackStats($action = '')
 	{
-		global $user_info, $topic, $board_info;
+		global $topic, $board_info;
 
-		if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($user_info['id'] != $board_info['cur_topic_starter'] || $user_info['is_guest']))
+		if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($this->user->id != $board_info['cur_topic_starter'] || $this->user->is_guest))
 		{
 			throw new \ElkArte\Exceptions\Exception('not_a_topic', false);
 		}
@@ -99,7 +99,7 @@ class Display extends \ElkArte\AbstractController
 	public function action_display()
 	{
 		global $txt, $modSettings, $context, $settings;
-		global $options, $user_info, $board_info, $topic, $board;
+		global $options, $board_info, $topic, $board;
 		global $attachments, $messages_request;
 
 		$this->_events->trigger('pre_load', array('_REQUEST' => &$_REQUEST, 'topic' => $topic, 'board' => &$board));
@@ -146,8 +146,8 @@ class Display extends \ElkArte\AbstractController
 			if ($board_info['num_topics'] > 1)
 			{
 				$topic = $this->_req->query->prev_next === 'prev'
-					? previousTopic($topic, $board, $user_info['id'], $includeUnapproved)
-					: nextTopic($topic, $board, $user_info['id'], $includeUnapproved);
+					? previousTopic($topic, $board, $this->user->id, $includeUnapproved)
+					: nextTopic($topic, $board, $this->user->id, $includeUnapproved);
 				$context['current_topic'] = $topic;
 			}
 
@@ -156,7 +156,7 @@ class Display extends \ElkArte\AbstractController
 		}
 
 		// Add 1 to the number of views of this topic (except for robots).
-		if (!$user_info['possibly_robot'] && (empty($_SESSION['last_read_topic']) || $_SESSION['last_read_topic'] != $topic))
+		if ($this->user->possibly_robot === false && (empty($_SESSION['last_read_topic']) || $_SESSION['last_read_topic'] != $topic))
 		{
 			increaseViewCounter($topic);
 			$_SESSION['last_read_topic'] = $topic;
@@ -166,7 +166,7 @@ class Display extends \ElkArte\AbstractController
 		$topic_tables = array();
 		$topic_parameters = array(
 			'topic' => $topic,
-			'member' => $user_info['id'],
+			'member' => $this->user->id,
 			'board' => (int) $board,
 		);
 
@@ -181,7 +181,7 @@ class Display extends \ElkArte\AbstractController
 		// Is this a moved topic that we are redirecting to?
 		if (!empty($topicinfo['id_redirect_topic']) && !isset($this->_req->query->noredir))
 		{
-			markTopicsRead(array($user_info['id'], $topicinfo['id_topic'], $topicinfo['id_last_msg'], 0), $topicinfo['new_from'] !== 0);
+			markTopicsRead(array($this->user->id, $topicinfo['id_topic'], $topicinfo['id_last_msg'], 0), $topicinfo['new_from'] !== 0);
 			redirectexit('topic=' . $topicinfo['id_redirect_topic'] . '.0;redirfrom=' . $topicinfo['id_topic']);
 		}
 
@@ -201,7 +201,7 @@ class Display extends \ElkArte\AbstractController
 		}
 
 		// Did this user start the topic or not?
-		$context['user']['started'] = $user_info['id'] == $topicinfo['id_member_started'] && !$user_info['is_guest'];
+		$context['user']['started'] = $this->user->id == $topicinfo['id_member_started'] && !$this->user->is_guest;
 		$context['topic_starter_id'] = $topicinfo['id_member_started'];
 
 		$this->_events->trigger('topicinfo', array('topicinfo' => &$topicinfo, 'includeUnapproved' => $includeUnapproved));
@@ -211,13 +211,13 @@ class Display extends \ElkArte\AbstractController
 			$context['real_num_replies'] += $topicinfo['unapproved_posts'] - ($topicinfo['approved'] ? 0 : 1);
 
 		// If this topic has unapproved posts, we need to work out how many posts the user can see, for page indexing.
-		if (!$includeUnapproved && $topicinfo['unapproved_posts'] && !$user_info['is_guest'])
+		if (!$includeUnapproved && $topicinfo['unapproved_posts'] && $this->user->is_guest === false)
 		{
-			$myUnapprovedPosts = unapprovedPosts($topicinfo['id_topic'], $user_info['id']);
+			$myUnapprovedPosts = unapprovedPosts($topicinfo['id_topic'], $this->user->id);
 
 			$total_visible_posts = $context['num_replies'] + $myUnapprovedPosts + ($topicinfo['approved'] ? 1 : 0);
 		}
-		elseif ($user_info['is_guest'])
+		elseif ($this->user->is_guest)
 			$total_visible_posts = $context['num_replies'] + ($topicinfo['approved'] ? 1 : 0);
 		else
 			$total_visible_posts = $context['num_replies'] + $topicinfo['unapproved_posts'] + ($topicinfo['approved'] ? 1 : 0);
@@ -238,7 +238,7 @@ class Display extends \ElkArte\AbstractController
 			if ($this->_start === 'new')
 			{
 				// Guests automatically go to the last post.
-				if ($user_info['is_guest'])
+				if ($this->user->is_guest)
 				{
 					$context['start_from'] = $total_visible_posts - 1;
 					$this->_start = $context['start_from'];
@@ -274,7 +274,7 @@ class Display extends \ElkArte\AbstractController
 				else
 				{
 					$only_approved = $modSettings['postmod_active'] && $topicinfo['unapproved_posts'] && !allowedTo('approve_posts');
-					$context['start_from'] = countMessagesBefore($topicinfo['id_topic'], $this->_virtual_msg, false, $only_approved, !$user_info['is_guest']);
+					$context['start_from'] = countMessagesBefore($topicinfo['id_topic'], $this->_virtual_msg, false, $only_approved, $this->user->is_guest === false);
 				}
 
 				// We need to reverse the start as well in this case.
@@ -418,7 +418,7 @@ class Display extends \ElkArte\AbstractController
 		call_integration_hook('integrate_display_message_list', array(&$messages, &$posters));
 
 		// Guests can't mark topics read or for notifications, just can't sorry.
-		if (!$user_info['is_guest'] && !empty($messages))
+		if ($this->user->is_guest === false && !empty($messages))
 		{
 			$boardseen = isset($this->_req->query->boardseen);
 
@@ -427,7 +427,7 @@ class Display extends \ElkArte\AbstractController
 				$mark_at_msg = $modSettings['maxMsgID'];
 			if ($mark_at_msg >= $topicinfo['new_from'])
 			{
-				markTopicsRead(array($user_info['id'], $topicinfo['id_topic'], $mark_at_msg, $topicinfo['unwatched']), $topicinfo['new_from'] !== 0);
+				markTopicsRead(array($this->user->id, $topicinfo['id_topic'], $mark_at_msg, $topicinfo['unwatched']), $topicinfo['new_from'] !== 0);
 				$numNewTopics = getUnreadCountSince($board, empty($_SESSION['id_msg_last_visit']) ? 0 : $_SESSION['id_msg_last_visit']);
 
 				if (empty($numNewTopics))
@@ -529,7 +529,7 @@ class Display extends \ElkArte\AbstractController
 		$signature_settings = explode(',', $sig_limits);
 
 		$this->_icon_sources = new \ElkArte\MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
-		if ($user_info['is_guest'])
+		if ($this->user->is_guest)
 		{
 			$this->_show_signatures = !empty($signature_settings[8]) ? (int) $signature_settings[8] : 0;
 		}
@@ -590,15 +590,15 @@ class Display extends \ElkArte\AbstractController
 		$context['can_reply_approved'] = $context['can_reply'];
 
 		// Guests do not have post_unapproved_replies_own permission, so it's always post_unapproved_replies_any
-		if ($user_info['is_guest'] && allowedTo('post_unapproved_replies_any'))
+		if ($this->user->is_guest && allowedTo('post_unapproved_replies_any'))
 		{
 			$context['can_reply_approved'] = false;
 		}
 
 		$context['can_reply'] |= $context['can_reply_unapproved'];
 		$context['can_quote'] = $context['can_reply'] && (empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC'])));
-		$context['can_mark_unread'] = !$user_info['is_guest'] && $settings['show_mark_read'];
-		$context['can_unwatch'] = !$user_info['is_guest'] && $modSettings['enable_unwatch'];
+		$context['can_mark_unread'] = $this->user->is_guest === false && $settings['show_mark_read'];
+		$context['can_unwatch'] = $this->user->is_guest === false && $modSettings['enable_unwatch'];
 		$context['can_send_topic'] = (!$modSettings['postmod_active'] || $topicinfo['approved']) && allowedTo('send_topic');
 		$context['can_print'] = empty($modSettings['disable_print_topic']);
 
@@ -786,7 +786,7 @@ class Display extends \ElkArte\AbstractController
 	 */
 	public function action_quickmod2()
 	{
-		global $topic, $board, $user_info, $context, $modSettings;
+		global $topic, $board, $context, $modSettings;
 
 		// Check the session = get or post.
 		checkSession('request');
@@ -818,7 +818,7 @@ class Display extends \ElkArte\AbstractController
 			$allowed_all = true;
 		// Allowed to delete replies to their messages?
 		elseif (allowedTo('delete_replies'))
-			$allowed_all = $topic_info['id_member_started'] == $user_info['id'];
+			$allowed_all = $topic_info['id_member_started'] == $this->user->id;
 		else
 			$allowed_all = false;
 

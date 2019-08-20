@@ -721,7 +721,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 	 */
 	public function action_remove()
 	{
-		global $txt, $language, $user_info;
+		global $txt, $language;
 
 		checkSession('post');
 
@@ -743,7 +743,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 				{
 					theme()->getTemplates()->loadLanguageFile('index', $language, true);
 					setRemovalNotice($messages, $txt['attachment_delete_admin']);
-					theme()->getTemplates()->loadLanguageFile('index', $user_info['language'], true);
+					theme()->getTemplates()->loadLanguageFile('index', $this->user->language, true);
 				}
 			}
 		}

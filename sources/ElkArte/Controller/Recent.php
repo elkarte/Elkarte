@@ -174,10 +174,10 @@ class Recent extends \ElkArte\AbstractController implements \ElkArte\FrontpageIn
 	 */
 	public function action_recent()
 	{
-		global $txt, $scripturl, $context, $modSettings, $board, $user_info;
+		global $txt, $scripturl, $context, $modSettings, $board;
 
 		// Start up a new recent posts grabber
-		$this->_grabber = new \ElkArte\Recent($user_info['id']);
+		$this->_grabber = new \ElkArte\Recent($this->user->id);
 
 		// Set or use a starting point for pagination
 		$this->_start = $this->_req->getQuery('start', 'intval', 0);
@@ -236,10 +236,10 @@ class Recent extends \ElkArte\AbstractController implements \ElkArte\FrontpageIn
 
 			// Likes are always a bit particular
 			$post['you_liked'] = !empty($context['likes'][$counter]['member'])
-				&& isset($context['likes'][$counter]['member'][$user_info['id']]);
+				&& isset($context['likes'][$counter]['member'][$this->user->id]);
 			$post['use_likes'] = allowedTo('like_posts') && empty($context['is_locked'])
-				&& ($post['poster']['id'] != $user_info['id'] || !empty($modSettings['likeAllowSelf']))
-				&& (empty($modSettings['likeMinPosts']) ? true : $modSettings['likeMinPosts'] <= $user_info['posts']);
+				&& ($post['poster']['id'] != $this->user->id || !empty($modSettings['likeAllowSelf']))
+				&& (empty($modSettings['likeMinPosts']) ? true : $modSettings['likeMinPosts'] <= $this->user->posts);
 			$post['like_count'] = !empty($context['likes'][$counter]['count']) ? $context['likes'][$counter]['count'] : 0;
 			$post['can_like'] = !empty($post['tests']['can_like']) && $post['use_likes'];
 			$post['can_unlike'] = $post['use_likes'] && $post['you_liked'];

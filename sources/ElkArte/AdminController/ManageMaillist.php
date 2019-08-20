@@ -1778,7 +1778,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 	 */
 	public function action_modify_bounce_templates()
 	{
-		global $context, $txt, $user_info;
+		global $context, $txt;
 
 		require_once(SUBSDIR . '/Moderation.subs.php');
 
@@ -1829,7 +1829,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 				$template_body = strtr($template_body, array('<br />' => "\n"));
 
 				// Is this personal?
-				$recipient_id = !empty($this->_req->post->make_personal) ? $user_info['id'] : 0;
+				$recipient_id = !empty($this->_req->post->make_personal) ? $this->user->id : 0;
 
 				// Updating or adding ?
 				if ($context['is_edit'])

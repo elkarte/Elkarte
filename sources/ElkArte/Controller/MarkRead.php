@@ -92,7 +92,7 @@ class MarkRead extends \ElkArte\AbstractController
 	 */
 	public function action_index_api()
 	{
-		global $context, $txt, $user_info;
+		global $context, $txt;
 
 		theme()->getTemplates()->load('Xml');
 
@@ -100,7 +100,7 @@ class MarkRead extends \ElkArte\AbstractController
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		// Guests can't mark things.
-		if ($user_info['is_guest'])
+		if ($this->user->is_guest)
 		{
 			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
@@ -201,17 +201,17 @@ class MarkRead extends \ElkArte\AbstractController
 	 */
 	public function action_markreplies()
 	{
-		global $user_info, $modSettings;
+		global $modSettings;
 
 		// Make sure all the topics are integers!
 		$topics = array_map('intval', explode('-', $this->_req->query->topics));
 
 		require_once(SUBSDIR . '/Topic.subs.php');
-		$logged_topics = getLoggedTopics($user_info['id'], $topics);
+		$logged_topics = getLoggedTopics($this->user->id, $topics);
 
 		$markRead = array();
 		foreach ($topics as $id_topic)
-			$markRead[] = array($user_info['id'], (int) $id_topic, $modSettings['maxMsgID'], (int) !empty($logged_topics[$id_topic]));
+			$markRead[] = array($this->user->id, (int) $id_topic, $modSettings['maxMsgID'], (int) !empty($logged_topics[$id_topic]));
 
 		markTopicsRead($markRead, true);
 
@@ -228,7 +228,7 @@ class MarkRead extends \ElkArte\AbstractController
 	 */
 	public function action_marktopic()
 	{
-		global $board, $topic, $user_info;
+		global $board, $topic;
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
@@ -260,7 +260,7 @@ class MarkRead extends \ElkArte\AbstractController
 		}
 
 		// Blam, unread!
-		markTopicsRead(array($user_info['id'], $topic, $earlyMsg, $topicinfo['unwatched']), true);
+		markTopicsRead(array($this->user->id, $topic, $earlyMsg, $topicinfo['unwatched']), true);
 
 		return 'board=' . $board . '.0';
 	}

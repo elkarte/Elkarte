@@ -57,7 +57,7 @@ class BoardIndex extends \ElkArte\AbstractController implements FrontpageInterfa
 	 */
 	public function action_boardindex()
 	{
-		global $txt, $user_info, $modSettings, $context, $settings;
+		global $txt, $modSettings, $context, $settings;
 
 		theme()->getTemplates()->load('BoardIndex');
 
@@ -93,7 +93,7 @@ class BoardIndex extends \ElkArte\AbstractController implements FrontpageInterfa
 		);
 		$context += getMembersOnlineStats($membersOnlineOptions);
 
-		$context['show_buddies'] = !empty($user_info['buddies']);
+		$context['show_buddies'] = !empty($this->user->buddies);
 
 		// Are we showing all membergroups on the board index?
 		if (!empty($settings['show_group_key']))
@@ -108,15 +108,15 @@ class BoardIndex extends \ElkArte\AbstractController implements FrontpageInterfa
 		{
 			$latestPostOptions = array(
 				'number_posts' => $settings['number_recent_posts'],
-				'id_member' => $user_info['id'],
+				'id_member' => $this->user->id,
 			);
 			if (empty($settings['recent_post_topics']))
 			{
-				$context['latest_posts'] = \ElkArte\Cache\Cache::instance()->quick_get('boardindex-latest_posts:' . md5($user_info['query_wanna_see_board'] . $user_info['language']), 'subs/Recent.subs.php', 'cache_getLastPosts', array($latestPostOptions));
+				$context['latest_posts'] = \ElkArte\Cache\Cache::instance()->quick_get('boardindex-latest_posts:' . md5($this->user->query_wanna_see_board . $this->user->language), 'subs/Recent.subs.php', 'cache_getLastPosts', array($latestPostOptions));
 			}
 			else
 			{
-				$context['latest_posts'] = \ElkArte\Cache\Cache::instance()->quick_get('boardindex-latest_topics:' . md5($user_info['query_wanna_see_board'] . $user_info['language']), 'subs/Recent.subs.php', 'cache_getLastTopics', array($latestPostOptions));
+				$context['latest_posts'] = \ElkArte\Cache\Cache::instance()->quick_get('boardindex-latest_topics:' . md5($this->user->query_wanna_see_board . $this->user->language), 'subs/Recent.subs.php', 'cache_getLastTopics', array($latestPostOptions));
 			}
 		}
 
@@ -169,7 +169,7 @@ class BoardIndex extends \ElkArte\AbstractController implements FrontpageInterfa
 	 */
 	public function action_collapse()
 	{
-		global $user_info, $context;
+		global $context;
 
 		// Just in case, no need, no need.
 		$context['robot_no_index'] = true;
@@ -184,7 +184,7 @@ class BoardIndex extends \ElkArte\AbstractController implements FrontpageInterfa
 		{
 			// And collapse/expand/toggle the category.
 			require_once(SUBSDIR . '/Categories.subs.php');
-			collapseCategories(array((int) $this->_req->query->c), $this->_req->query->sa, array($user_info['id']));
+			collapseCategories(array((int) $this->_req->query->c), $this->_req->query->sa, array($this->user->id));
 		}
 
 		// And go back to the board index.

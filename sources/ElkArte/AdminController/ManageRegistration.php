@@ -130,7 +130,7 @@ class ManageRegistration extends \ElkArte\AbstractController
 	 */
 	public function action_register()
 	{
-		global $txt, $context, $scripturl, $user_info;
+		global $txt, $context, $scripturl;
 
 		if (!empty($this->_req->post->regSubmit))
 		{
@@ -176,7 +176,7 @@ class ManageRegistration extends \ElkArte\AbstractController
 
 			// If there are "important" errors and you are not an admin: log the first error
 			// Otherwise grab all of them and don't log anything
-			$error_severity = $reg_errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
+			$error_severity = $reg_errors->hasErrors(1) && !$this->user->is_admin ? 1 : null;
 			foreach ($reg_errors->prepareErrors($error_severity) as $error)
 			{
 				throw new \ElkArte\Exceptions\Exception($error, $error_severity === null ? false : 'general');

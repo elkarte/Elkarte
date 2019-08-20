@@ -313,7 +313,7 @@ class Mentions extends \ElkArte\AbstractController
 	 */
 	public function action_fetch()
 	{
-		global $user_info, $context, $txt, $modSettings;
+		global $context, $txt, $modSettings;
 
 		if (empty($modSettings['usernotif_favicon_enable']) && empty($modSettings['usernotif_desktop_enable']))
 			die();
@@ -332,18 +332,18 @@ class Mentions extends \ElkArte\AbstractController
 
 		// We only know AJAX for this particular action
 		$context['json_data'] = array(
-			'timelast' => getTimeLastMention($user_info['id'])
+			'timelast' => getTimeLastMention($this->user->id)
 		);
 
 		if (!empty($modSettings['usernotif_favicon_enable']))
 		{
-			$context['json_data']['mentions'] = !empty($user_info['mentions']) ? $user_info['mentions'] : 0;
+			$context['json_data']['mentions'] = (int) $this->user->mentions;
 		}
 
 		if (!empty($modSettings['usernotif_desktop_enable']))
 		{
 			$context['json_data']['desktop_notifications'] = array(
-				'new_from_last' => getNewMentions($user_info['id'], $lastsent),
+				'new_from_last' => getNewMentions($this->user->id, $lastsent),
 				'title' => sprintf($txt['forum_notification'], $context['forum_name']),
 			);
 			$context['json_data']['desktop_notifications']['message'] = sprintf($txt[$lastsent == 0 ? 'unread_notifications' : 'new_from_last_notifications'], $context['json_data']['desktop_notifications']['new_from_last']);

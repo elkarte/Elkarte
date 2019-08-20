@@ -52,7 +52,7 @@ class Members extends \ElkArte\AbstractController
 	 */
 	public function action_addbuddy()
 	{
-		global $user_info, $modSettings;
+		global $modSettings;
 
 		checkSession('get');
 		is_not_guest();
@@ -64,12 +64,12 @@ class Members extends \ElkArte\AbstractController
 		if (empty($user))
 			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
-		call_integration_hook('integrate_add_buddies', array($user_info['id'], &$user));
+		call_integration_hook('integrate_add_buddies', array($this->user->id, &$user));
 
 		// Add if it's not there (and not you).
-		if (!in_array($user, $user_info['buddies']) && $user_info['id'] != $user)
+		if (!in_array($user, $this->user->buddies) && $this->user->id != $user)
 		{
-			$user_info['buddies'][] = $user;
+			$this->user->buddies[] = $user;
 
 			// Do we want a mention for our newly added buddy?
 			if (!empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
@@ -78,7 +78,7 @@ class Members extends \ElkArte\AbstractController
 				$notifier->add(new \ElkArte\NotificationsTask(
 					'buddy',
 					$user,
-					$user_info['id'],
+					$this->user->id,
 					array('id_members' => array($user))
 				));
 			}
@@ -86,7 +86,7 @@ class Members extends \ElkArte\AbstractController
 
 		// Update the settings.
 		require_once(SUBSDIR . '/Members.subs.php');
-		updateMemberData($user_info['id'], array('buddy_list' => implode(',', $user_info['buddies'])));
+		updateMemberData($this->user->id, array('buddy_list' => implode(',', $this->user->buddies)));
 
 		// Redirect back to the profile
 		redirectexit('action=profile;u=' . $user);
@@ -100,12 +100,10 @@ class Members extends \ElkArte\AbstractController
 	 */
 	public function action_removebuddy()
 	{
-		global $user_info;
-
 		checkSession('get');
 		is_not_guest();
 
-		call_integration_hook('integrate_remove_buddy', array($user_info['id']));
+		call_integration_hook('integrate_remove_buddy', array($this->user->id));
 
 		// Yeah, they are no longer cool
 		$user = $this->_req->getQuery('u', 'intval', '');
@@ -115,12 +113,14 @@ class Members extends \ElkArte\AbstractController
 			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// Remove this user, assuming we can find them
-		if (in_array($user, $user_info['buddies']))
-			$user_info['buddies'] = array_diff($user_info['buddies'], array($user));
+		if (in_array($user, $this->user->buddies))
+		{
+			$this->user->buddies = array_diff($this->user->buddies, array($user));
+		}
 
 		// Update the settings.
 		require_once(SUBSDIR . '/Members.subs.php');
-		updateMemberData($user_info['id'], array('buddy_list' => implode(',', $user_info['buddies'])));
+		updateMemberData($this->user->id, array('buddy_list' => implode(',', $this->user->buddies)));
 
 		// Redirect back to the profile
 		redirectexit('action=profile;u=' . $user);

@@ -84,11 +84,13 @@ class News extends \ElkArte\AbstractController
 	 */
 	public function action_showfeed()
 	{
-		global $board, $board_info, $context, $txt, $modSettings, $user_info;
+		global $board, $board_info, $context, $txt, $modSettings;
 
 		// If it's not enabled, die.
 		if (empty($modSettings['xmlnews_enable']))
+		{
 			obExit(false);
+		}
 
 		theme()->getTemplates()->loadLanguageFile('Stats');
 		$txt['xml_rss_desc'] = replaceBasicActionUrl($txt['xml_rss_desc']);
@@ -121,11 +123,15 @@ class News extends \ElkArte\AbstractController
 			$boards = array_keys($boards_posts);
 
 			if (!empty($boards))
+			{
 				$this->_query_this_board = 'b.id_board IN (' . implode(', ', $boards) . ')';
+			}
 
 			// Try to limit the number of messages we look through.
 			if ($total_cat_posts > 100 && $total_cat_posts > $modSettings['totalMessages'] / 15)
+			{
 				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 400 - $this->_limit * 5);
+			}
 		}
 		// Maybe they only want to see feeds form some certain boards?
 		elseif (!empty($this->_req->query->boards))
@@ -138,14 +144,18 @@ class News extends \ElkArte\AbstractController
 			// Either the board specified doesn't exist or you have no access.
 			$num_boards = count($boards_data);
 			if ($num_boards == 0)
+			{
 				throw new \ElkArte\Exceptions\Exception('no_board');
+			}
 
 			$total_posts = 0;
 			$boards = array_keys($boards_data);
 			foreach ($boards_data as $row)
 			{
 				if ($num_boards == 1)
+				{
 					$feed_title = ' - ' . strip_tags($row['name']);
+				}
 
 				$total_posts += $row['num_posts'];
 			}
@@ -154,7 +164,9 @@ class News extends \ElkArte\AbstractController
 
 			// The more boards, the more we're going to look through...
 			if ($total_posts > 100 && $total_posts > $modSettings['totalMessages'] / 12)
+			{
 				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 500 - $this->_limit * 5);
+			}
 		}
 		// Just a single board
 		elseif (!empty($board))
@@ -168,7 +180,9 @@ class News extends \ElkArte\AbstractController
 
 			// Try to look through just a few messages, if at all possible.
 			if ($boards_data[(int) $board]['num_posts'] > 80 && $boards_data[(int) $board]['num_posts'] > $modSettings['totalMessages'] / 10)
+			{
 				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 600 - $this->_limit * 5);
+			}
 		}
 		else
 		{
@@ -208,15 +222,19 @@ class News extends \ElkArte\AbstractController
 		$cache = \ElkArte\Cache\Cache::instance();
 
 		// Get the associative array representing the xml.
-		if (!$user_info['is_guest'] || $cache->levelHigherThan(2))
-			$xml = $cache->get('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, 240);
+		if ($this->user->is_guest === false || $cache->levelHigherThan(2))
+		{
+			$xml = $cache->get('xmlfeed-' . $xml_format . ':' . ($this->user->is_guest ? '' : $this->user->id . '-') . $cachekey, 240);
+		}
 
 		if (empty($xml))
 		{
 			$xml = $this->{$subActions[$subAction][0]}($xml_format);
 
-			if ($cache->isEnabled() && (($user_info['is_guest'] && $cache->levelHigherThan(2)) || (!$user_info['is_guest'] && (microtime(true) - $cache_t > 0.2))))
-				$cache->put('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, $xml, 240);
+			if ($cache->isEnabled() && (($this->user->is_guest && $cache->levelHigherThan(2)) || ($this->user->is_guest === false && (microtime(true) - $cache_t > 0.2))))
+			{
+				$cache->put('xmlfeed-' . $xml_format . ':' . ($this->user->is_guest ? '' : $this->user->id . '-') . $cachekey, $xml, 240);
+			}
 		}
 
 		$context['feed_title'] = encode_special(strip_tags(un_htmlspecialchars($context['forum_name']) . (isset($feed_title) ? $feed_title : '')));
@@ -553,7 +571,7 @@ class News extends \ElkArte\AbstractController
 	 */
 	public function action_xmlprofile($xml_format)
 	{
-		global $scripturl, $modSettings, $user_info;
+		global $scripturl, $modSettings;
 
 		// You must input a valid user....
 		if (empty($this->_req->query->u))
@@ -621,7 +639,7 @@ class News extends \ElkArte\AbstractController
 		else
 		{
 			$data = array(
-				'username' => $user_info['is_admin'] || $user_info['id'] == $member['id'] ? cdata_parse($member['username']) : '',
+				'username' => $this->user->is_admin || $this->user->id == $member['id'] ? cdata_parse($member['username']) : '',
 				'name' => cdata_parse($member['name']),
 				'link' => $scripturl . '?action=profile;u=' . $member['id'],
 				'posts' => $member['posts'],

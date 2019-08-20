@@ -55,15 +55,13 @@ class Karma extends \ElkArte\AbstractController
 	 */
 	public function action_applaud()
 	{
-		global $user_info;
-
 		$id_target = $this->_req->getQuery('uid', 'intval', 0);
 
 		// Start off with no change in karma.
 		$action = $this->_prepare_karma($id_target);
 
 		// Applaud (if you can) and return
-		$this->_give_karma($user_info['id'], $id_target, $action, 1);
+		$this->_give_karma($this->user->id, $id_target, $action, 1);
 		$this->_redirect_karma();
 	}
 
@@ -72,7 +70,7 @@ class Karma extends \ElkArte\AbstractController
 	 */
 	public function action_smite()
 	{
-		global $user_info, $modSettings;
+		global $modSettings;
 
 		// Sometimes the community needs to chill
 		if (!empty($modSettings['karmaDisableSmite']))
@@ -85,7 +83,7 @@ class Karma extends \ElkArte\AbstractController
 		$action = $this->_prepare_karma($id_target);
 
 		// Give em a wack and run away
-		$this->_give_karma($user_info['id'], $this->_req->query->uid, $action, -1);
+		$this->_give_karma($this->user->id, $this->_req->query->uid, $action, -1);
 		$this->_redirect_karma();
 	}
 
@@ -126,7 +124,7 @@ class Karma extends \ElkArte\AbstractController
 	 */
 	private function _prepare_karma($id_target)
 	{
-		global $modSettings, $user_info;
+		global $modSettings;
 
 		// If the mod is disabled, show an error.
 		if (empty($modSettings['karmaMode']))
@@ -144,11 +142,11 @@ class Karma extends \ElkArte\AbstractController
 		// If you don't have enough posts, tough luck.
 		// @todo Should this be dropped in favor of post group permissions?
 		// Should this apply to the member you are smiting/applauding?
-		if (!$user_info['is_admin'] && $user_info['posts'] < $modSettings['karmaMinPosts'])
+		if ($this->user->is_admin === false && $this->user->posts < $modSettings['karmaMinPosts'])
 			throw new \ElkArte\Exceptions\Exception('not_enough_posts_karma', true, array($modSettings['karmaMinPosts']));
 
 		// And you can't modify your own, punk! (use the profile if you need to.)
-		if (empty($id_target) || $id_target == $user_info['id'])
+		if (empty($id_target) || $id_target == $this->user->id)
 			throw new \ElkArte\Exceptions\Exception('cant_change_own_karma', false);
 
 		// Delete any older items from the log so we can get the go ahead or not
@@ -159,7 +157,7 @@ class Karma extends \ElkArte\AbstractController
 		if (!empty($modSettings['karmaTimeRestrictAdmins']) || !allowedTo('moderate_forum'))
 		{
 			// Find out if this user has done this recently...
-			$action = lastActionOn($user_info['id'], $id_target);
+			$action = lastActionOn($this->user->id, $id_target);
 		}
 
 		return $action;

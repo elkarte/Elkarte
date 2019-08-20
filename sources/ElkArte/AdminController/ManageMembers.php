@@ -555,9 +555,7 @@ class ManageMembers extends \ElkArte\AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							global $user_info;
-
-							return '<input type="checkbox" name="members[]" value="' . $rowData['id_member'] . '" class="input_check" ' . ($rowData['id_member'] == $user_info['id'] || $rowData['id_group'] == 1 || in_array(1, explode(',', $rowData['additional_groups'])) ? 'disabled="disabled"' : '') . ' />';
+							return '<input type="checkbox" name="members[]" value="' . $rowData['id_member'] . '" class="input_check" ' . ($rowData['id_member'] == \ElkArte\User::$info->id || $rowData['id_group'] == 1 || in_array(1, explode(',', $rowData['additional_groups'])) ? 'disabled="disabled"' : '') . ' />';
 						},
 						'class' => 'centertext',
 					),
@@ -596,7 +594,7 @@ class ManageMembers extends \ElkArte\AbstractController
 	 */
 	protected function _multiMembersAction()
 	{
-		global $txt, $user_info;
+		global $txt;
 
 		// @todo add a token too?
 		checkSession();
@@ -606,7 +604,7 @@ class ManageMembers extends \ElkArte\AbstractController
 		foreach ($this->_req->post->members as $value)
 		{
 			// Don't delete yourself, idiot.
-			if ($this->_req->post->maction === 'delete' && $value == $user_info['id'])
+			if ($this->_req->post->maction === 'delete' && $value == $this->user->id)
 				continue;
 
 			$members[] = (int) $value;

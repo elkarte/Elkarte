@@ -54,7 +54,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 	 */
 	public function pre_dispatch()
 	{
-		global $txt, $scripturl, $context, $user_info, $modSettings;
+		global $txt, $scripturl, $context, $modSettings;
 
 		// No guests!
 		is_not_guest();
@@ -86,7 +86,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		}
 
 		// Load the label counts data.
-		if (\ElkArte\User::$settings['new_pm'] || !\ElkArte\Cache\Cache::instance()->getVar($context['labels'], 'labelCounts:' . $user_info['id'], 720))
+		if (\ElkArte\User::$settings['new_pm'] || !\ElkArte\Cache\Cache::instance()->getVar($context['labels'], 'labelCounts:' . $this->user->id, 720))
 		{
 			$this->_loadLabels();
 
@@ -101,10 +101,10 @@ class PersonalMessage extends \ElkArte\AbstractController
 			applyRules();
 
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($user_info['id'], array('new_pm' => 0));
+			updateMemberData($this->user->id, array('new_pm' => 0));
 
 			// Turn the new PM's status off, for the popup alert, since they have entered the PM area
-			toggleNewPM($user_info['id']);
+			toggleNewPM($this->user->id);
 		}
 
 		// This determines if we have more labels than just the standard inbox.
@@ -134,21 +134,21 @@ class PersonalMessage extends \ElkArte\AbstractController
 	 */
 	private function _loadMessageLimit()
 	{
-		global $context, $txt, $user_info;
+		global $context, $txt;
 
 		$context['message_limit'] = loadMessageLimit();
 
 		// Prepare the context for the capacity bar.
 		if (!empty($context['message_limit']))
 		{
-			$bar = ($user_info['messages'] * 100) / $context['message_limit'];
+			$bar = ($this->user->messages * 100) / $context['message_limit'];
 
 			$context['limit_bar'] = array(
-				'messages' => $user_info['messages'],
+				'messages' => $this->user->messages,
 				'allowed' => $context['message_limit'],
 				'percent' => $bar,
 				'bar' => min(100, (int) $bar),
-				'text' => sprintf($txt['pm_currently_using'], $user_info['messages'], round($bar, 1)),
+				'text' => sprintf($txt['pm_currently_using'], $this->user->messages, round($bar, 1)),
 			);
 		}
 	}
@@ -243,7 +243,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 	 */
 	private function _messageIndexBar($area)
 	{
-		global $txt, $context, $scripturl, $user_info;
+		global $txt, $context, $scripturl;
 
 		require_once(SUBSDIR . '/Menu.subs.php');
 
@@ -340,14 +340,14 @@ class PersonalMessage extends \ElkArte\AbstractController
 		// Do we have a limit on the amount of messages we can keep?
 		if (!empty($context['message_limit']))
 		{
-			$bar = round(($user_info['messages'] * 100) / $context['message_limit'], 1);
+			$bar = round(($this->user->messages * 100) / $context['message_limit'], 1);
 
 			$context['limit_bar'] = array(
-				'messages' => $user_info['messages'],
+				'messages' => $this->user->messages,
 				'allowed' => $context['message_limit'],
 				'percent' => $bar,
 				'bar' => $bar > 100 ? 100 : (int) $bar,
-				'text' => sprintf($txt['pm_currently_using'], $user_info['messages'], $bar)
+				'text' => sprintf($txt['pm_currently_using'], $this->user->messages, $bar)
 			);
 		}
 
@@ -365,7 +365,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		unset($pm_areas);
 
 		// No menu means no access.
-		if (!$pm_include_data && (!$user_info['is_guest'] || validateSession() !== true))
+		if (!$pm_include_data && ($this->user->is_guest === false || validateSession() !== true))
 		{
 			throw new \ElkArte\Exceptions\Exception('no_access', false);
 		}
@@ -402,14 +402,14 @@ class PersonalMessage extends \ElkArte\AbstractController
 	public function action_folder()
 	{
 		global $txt, $scripturl, $modSettings, $context, $subjects_request;
-		global $messages_request, $user_info, $options;
+		global $messages_request, $options;
 
 		// Changing view?
 		if (isset($this->_req->query->view))
 		{
 			$context['display_mode'] = $context['display_mode'] > 1 ? 0 : $context['display_mode'] + 1;
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($user_info['id'], array('pm_prefs' => (\ElkArte\User::$settings['pm_prefs'] & 252) | $context['display_mode']));
+			updateMemberData($this->user->id, array('pm_prefs' => (\ElkArte\User::$settings['pm_prefs'] & 252) | $context['display_mode']));
 		}
 
 		// Make sure the starting location is valid.
@@ -562,7 +562,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			'limit' => $modSettings['defaultMaxMessages'],
 			'folder' => $context['folder'],
 			'pmid' => isset($pmID) ? $pmID : 0,
-		), $user_info['id']);
+		), $this->user->id);
 
 		// Make sure that we have been given a correct head pm id if we are in conversation mode
 		if ($context['display_mode'] == 2 && !empty($pmID) && $pmID != $lastData['id'])
@@ -739,7 +739,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 	 */
 	public function action_send()
 	{
-		global $txt, $scripturl, $modSettings, $context, $user_info;
+		global $txt, $scripturl, $modSettings, $context;
 
 		// Load in some text and template dependencies
 		theme()->getTemplates()->loadLanguageFile('PersonalMessage');
@@ -756,10 +756,10 @@ class PersonalMessage extends \ElkArte\AbstractController
 		$context['reply'] = isset($this->_req->query->pmsg) || isset($this->_req->query->quote);
 
 		// Check whether we've gone over the limit of messages we can send per hour.
-		if (!empty($modSettings['pm_posts_per_hour']) && !allowedTo(array('admin_forum', 'moderate_forum', 'send_mail')) && $user_info['mod_cache']['bq'] === '0=1' && $user_info['mod_cache']['gq'] === '0=1')
+		if (!empty($modSettings['pm_posts_per_hour']) && !allowedTo(array('admin_forum', 'moderate_forum', 'send_mail')) && $this->user->mod_cache['bq'] === '0=1' && $this->user->mod_cache['gq'] === '0=1')
 		{
 			// How many messages have they sent this last hour?
-			$pmCount = pmCount($user_info['id'], 3600);
+			$pmCount = pmCount($this->user->id, 3600);
 
 			if (!empty($pmCount) && $pmCount >= $modSettings['pm_posts_per_hour'])
 			{
@@ -879,7 +879,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			if ($this->_req->query->u === 'all' && isset($row_quoted))
 			{
 				// Firstly, to reply to all we clearly already have $row_quoted - so have the original member from.
-				if ($row_quoted['id_member'] != $user_info['id'])
+				if ($row_quoted['id_member'] != $this->user->id)
 				{
 					$context['recipients']['to'][] = array(
 						'id' => $row_quoted['id_member'],
@@ -961,7 +961,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 	 */
 	public function action_send2()
 	{
-		global $txt, $context, $user_info, $modSettings;
+		global $txt, $context, $modSettings;
 
 		// All the helpers we need
 		require_once(SUBSDIR . '/Auth.subs.php');
@@ -978,12 +978,12 @@ class PersonalMessage extends \ElkArte\AbstractController
 		// Check whether we've gone over the limit of messages we can send per hour - fatal error if fails!
 		if (!empty($modSettings['pm_posts_per_hour'])
 			&& !allowedTo(array('admin_forum', 'moderate_forum', 'send_mail'))
-			&& $user_info['mod_cache']['bq'] === '0=1'
-			&& $user_info['mod_cache']['gq'] === '0=1'
+			&& $this->user->mod_cache['bq'] === '0=1'
+			&& $this->user->mod_cache['gq'] === '0=1'
 		)
 		{
 			// How many have they sent this last hour?
-			$pmCount = pmCount($user_info['id'], 3600);
+			$pmCount = pmCount($this->user->id, 3600);
 
 			if (!empty($pmCount) && $pmCount >= $modSettings['pm_posts_per_hour'])
 			{
@@ -1242,7 +1242,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		if (!empty($context['send_log']['sent']) && !empty($this->_req->post->replied_to) && $this->_req->getQuery('f') === 'inbox')
 		{
 			require_once(SUBSDIR . '/PersonalMessage.subs.php');
-			setPMRepliedStatus($user_info['id'], (int) $this->_req->post->replied_to);
+			setPMRepliedStatus($this->user->id, (int) $this->_req->post->replied_to);
 		}
 
 		$failed = !empty($context['send_log']['failed']);
@@ -1281,7 +1281,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 	 */
 	public function messagePostError($named_recipients, $recipient_ids = array(), $msg_options = null)
 	{
-		global $txt, $context, $scripturl, $modSettings, $user_info;
+		global $txt, $context, $scripturl, $modSettings;
 
 		if (isset($this->_req->query->xml))
 		{
@@ -1410,7 +1410,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		create_control_richedit($editorOptions);
 
 		// Check whether we need to show the code again.
-		$context['require_verification'] = !$user_info['is_admin'] && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'];
+		$context['require_verification'] = $this->user->is_admin === false && !empty($modSettings['pm_posts_verification']) && $this->user->posts < $modSettings['pm_posts_verification'];
 		if ($context['require_verification'] && !isset($this->_req->query->xml))
 		{
 			$verificationOptions = array(
@@ -1436,7 +1436,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 	 */
 	public function action_pmactions()
 	{
-		global $context, $user_info;
+		global $context;
 
 		checkSession('request');
 
@@ -1518,7 +1518,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		// Are we labelling anything?
 		if (!empty($to_label) && $context['folder'] === 'inbox')
 		{
-			$updateErrors = changePMLabels($to_label, $label_type, $user_info['id']);
+			$updateErrors = changePMLabels($to_label, $label_type, $this->user->id);
 
 			// Any errors?
 			if (!empty($updateErrors))
@@ -1577,7 +1577,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 	 */
 	public function action_prune()
 	{
-		global $txt, $context, $user_info, $scripturl;
+		global $txt, $context, $scripturl;
 
 		// Actually delete the messages.
 		if (isset($this->_req->post->age))
@@ -1588,7 +1588,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			$deleteTime = max(0, time() - (86400 * (int) $this->_req->post->age));
 
 			// Select all the messages older than $deleteTime.
-			$toDelete = getPMsOlderThan($user_info['id'], $deleteTime);
+			$toDelete = getPMsOlderThan($this->user->id, $deleteTime);
 
 			// Delete the actual messages.
 			deleteMessages($toDelete);
@@ -1611,7 +1611,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 	 */
 	public function action_manlabels()
 	{
-		global $txt, $context, $user_info, $scripturl;
+		global $txt, $context, $scripturl;
 
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
@@ -1720,7 +1720,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 			// Save the label status.
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($user_info['id'], array('message_labels' => implode(',', $the_labels)));
+			updateMemberData($this->user->id, array('message_labels' => implode(',', $the_labels)));
 
 			// Update all the messages currently with any label changes in them!
 			if (!empty($message_changes))
@@ -1733,7 +1733,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 						$searchArray[] = $i;
 				}
 
-				updateLabelsToPM($searchArray, $new_labels, $user_info['id']);
+				updateLabelsToPM($searchArray, $new_labels, $this->user->id);
 
 				// Now do the same the rules - check through each rule.
 				foreach ($context['rules'] as $k => $rule)
@@ -1770,19 +1770,19 @@ class PersonalMessage extends \ElkArte\AbstractController
 				foreach ($rule_changes as $k => $id)
 					if (!empty($context['rules'][$id]['actions']))
 					{
-						updatePMRuleAction($id, $user_info['id'], $context['rules'][$id]['actions']);
+						updatePMRuleAction($id, $this->user->id, $context['rules'][$id]['actions']);
 						unset($rule_changes[$k]);
 					}
 
 				// Anything left here means it's lost all actions...
 				if (!empty($rule_changes))
 				{
-					deletePMRules($user_info['id'], $rule_changes);
+					deletePMRules($this->user->id, $rule_changes);
 				}
 			}
 
 			// Make sure we're not caching this!
-			\ElkArte\Cache\Cache::instance()->remove('labelCounts:' . $user_info['id']);
+			\ElkArte\Cache\Cache::instance()->remove('labelCounts:' . $this->user->id);
 
 			// To make the changes appear right away, redirect.
 			redirectexit('action=pm;sa=manlabels');
@@ -1798,13 +1798,13 @@ class PersonalMessage extends \ElkArte\AbstractController
 	 */
 	public function action_settings()
 	{
-		global $txt, $user_info, $context, $scripturl, $profile_vars, $cur_profile;
+		global $txt, $context, $scripturl, $profile_vars, $cur_profile;
 
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		// Load the member data for editing
-		\ElkArte\MembersList::load($user_info['id'], false, 'profile');
-		$cur_profile = \ElkArte\MembersList::get($user_info['id']);
+		\ElkArte\MembersList::load($this->user->id, false, 'profile');
+		$cur_profile = \ElkArte\MembersList::get($this->user->id);
 
 		// Load up the profile template, its where PM settings are located
 		theme()->getTemplates()->loadLanguageFile('Profile');
@@ -1815,7 +1815,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 		$context['page_title'] = $txt['pm_settings'];
 		$context['user']['is_owner'] = true;
-		$context['id_member'] = $user_info['id'];
+		$context['id_member'] = $this->user->id;
 		$context['require_password'] = false;
 		$context['menu_item_selected'] = 'settings';
 		$context['submit_button_text'] = $txt['pm_settings'];
@@ -1843,13 +1843,13 @@ class PersonalMessage extends \ElkArte\AbstractController
 			if (!empty($profile_vars))
 			{
 				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData($user_info['id'], $profile_vars);
+				updateMemberData($this->user->id, $profile_vars);
 			}
 
 			// Invalidate any cached data and reload so we show the saved values
-			\ElkArte\Cache\Cache::instance()->remove('member_data-profile-' . $user_info['id']);
-			\ElkArte\MembersList::load($user_info['id'], false, 'profile');
-			$cur_profile = \ElkArte\MembersList::get($user_info['id']);
+			\ElkArte\Cache\Cache::instance()->remove('member_data-profile-' . $this->user->id);
+			\ElkArte\MembersList::load($this->user->id, false, 'profile');
+			$cur_profile = \ElkArte\MembersList::get($this->user->id);
 		}
 
 		// Load up the fields.
@@ -1871,7 +1871,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 	 */
 	public function action_report()
 	{
-		global $txt, $context, $user_info, $language, $modSettings;
+		global $txt, $context, $language, $modSettings;
 
 		// Check that this feature is even enabled!
 		if (empty($modSettings['enableReportPM']) || empty($this->_req->query->pmsg))
@@ -1957,7 +1957,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 					theme()->getTemplates()->loadLanguageFile('PersonalMessage', $cur_language, false);
 
 					// Make the body.
-					$report_body = str_replace(array('{REPORTER}', '{SENDER}'), array(un_htmlspecialchars($user_info['name']), $memberFromName), $txt['pm_report_pm_user_sent']);
+					$report_body = str_replace(array('{REPORTER}', '{SENDER}'), array(un_htmlspecialchars($this->user->name), $memberFromName), $txt['pm_report_pm_user_sent']);
 					$report_body .= "\n" . '[b]' . $this->_req->post->reason . '[/b]' . "\n\n";
 					if (!empty($recipients))
 					{
@@ -2008,7 +2008,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 	 */
 	public function action_manrules()
 	{
-		global $txt, $context, $user_info, $scripturl;
+		global $txt, $context, $scripturl;
 
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
@@ -2223,11 +2223,11 @@ class PersonalMessage extends \ElkArte\AbstractController
 			// Create the rule?
 			if (empty($context['rid']))
 			{
-				addPMRule($user_info['id'], $ruleName, $criteria, $actions, $doDelete, $isOr);
+				addPMRule($this->user->id, $ruleName, $criteria, $actions, $doDelete, $isOr);
 			}
 			else
 			{
-				updatePMRule($user_info['id'], $context['rid'], $ruleName, $criteria, $actions, $doDelete, $isOr);
+				updatePMRule($this->user->id, $context['rid'], $ruleName, $criteria, $actions, $doDelete, $isOr);
 			}
 
 			redirectexit('action=pm;sa=manrules');
@@ -2242,7 +2242,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 			if (!empty($toDelete))
 			{
-				deletePMRules($user_info['id'], $toDelete);
+				deletePMRules($this->user->id, $toDelete);
 			}
 
 			redirectexit('action=pm;sa=manrules');

@@ -194,7 +194,7 @@ class ManageThemes extends \ElkArte\AbstractController
 	 */
 	public function action_index_api()
 	{
-		global $txt, $context, $user_info;
+		global $txt, $context;
 
 		theme()->getTemplates()->load('Xml');
 
@@ -203,7 +203,7 @@ class ManageThemes extends \ElkArte\AbstractController
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		// No guests in here.
-		if ($user_info['is_guest'])
+		if ($this->user->is_guest)
 		{
 			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
@@ -953,7 +953,7 @@ class ManageThemes extends \ElkArte\AbstractController
 	 */
 	public function action_pick()
 	{
-		global $txt, $context, $modSettings, $user_info, $scripturl, $settings;
+		global $txt, $context, $modSettings, $scripturl, $settings;
 
 		require_once(SUBSDIR . '/Themes.subs.php');
 
@@ -999,14 +999,14 @@ class ManageThemes extends \ElkArte\AbstractController
 			if (!isset($u) || !allowedTo('admin_forum'))
 			{
 				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData($user_info['id'], array('id_theme' => $th));
+				updateMemberData($this->user->id, array('id_theme' => $th));
 
 				// A variants to save for the user?
 				if (!empty($vrt))
 				{
-					updateThemeOptions(array($th, $user_info['id'], 'theme_variant', $vrt));
+					updateThemeOptions(array($th, $this->user->id, 'theme_variant', $vrt));
 
-					\ElkArte\Cache\Cache::instance()->remove('theme_settings-' . $th . ':' . $user_info['id']);
+					\ElkArte\Cache\Cache::instance()->remove('theme_settings-' . $th . ':' . $this->user->id);
 
 					$_SESSION['id_variant'] = 0;
 				}
@@ -1057,8 +1057,10 @@ class ManageThemes extends \ElkArte\AbstractController
 					updateThemeOptions(array($th, $u, 'theme_variant', $vrt));
 					\ElkArte\Cache\Cache::instance()->remove('theme_settings-' . $th . ':' . $u);
 
-					if ($user_info['id'] == $u)
+					if ($this->user->id == $u)
+					{
 						$_SESSION['id_variant'] = 0;
+					}
 				}
 
 				redirectexit('action=profile;u=' . $u . ';area=theme');
@@ -1070,8 +1072,8 @@ class ManageThemes extends \ElkArte\AbstractController
 		// Figure out who the member of the minute is, and what theme they've chosen.
 		if (!isset($u) || !allowedTo('admin_forum'))
 		{
-			$context['current_member'] = $user_info['id'];
-			$current_theme = $user_info['theme'];
+			$context['current_member'] = $this->user->id;
+			$current_theme = $this->user->theme;
 		}
 		// Everyone can't chose just one.
 		elseif ($u === 0)
@@ -1374,7 +1376,7 @@ class ManageThemes extends \ElkArte\AbstractController
 	 */
 	public function action_jsoption()
 	{
-		global $settings, $user_info, $options;
+		global $settings, $options;
 
 		// Check the session id.
 		checkSession('get');
@@ -1384,8 +1386,10 @@ class ManageThemes extends \ElkArte\AbstractController
 			redirectexit($settings['images_url'] . '/blank.png');
 
 		// Sorry, guests can't go any further than this..
-		if ($user_info['is_guest'] || $user_info['id'] == 0)
+		if ($this->user->is_guest || $this->user->id == 0)
+		{
 			obExit(false);
+		}
 
 		$reservedVars = array(
 			'actual_theme_url',
@@ -1415,7 +1419,7 @@ class ManageThemes extends \ElkArte\AbstractController
 		if (isset($this->_req->query->th) || isset($this->_req->query->id))
 		{
 			// Invalidate the current themes cache too.
-			\ElkArte\Cache\Cache::instance()->remove('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id']);
+			\ElkArte\Cache\Cache::instance()->remove('theme_settings-' . $settings['theme_id'] . ':' . $this->user->id);
 
 			$settings['theme_id'] = $this->_req->getQuery('th', 'intval', $this->_req->getQuery('id', 'intval'));
 		}
@@ -1451,11 +1455,9 @@ class ManageThemes extends \ElkArte\AbstractController
 			if (!empty($options['minmax_preferences']))
 			{
 				$minmax_preferences = serializeToJson($options['minmax_preferences'], function ($array_form) {
-					global $settings, $user_info;
-
 					// Update the option.
 					require_once(SUBSDIR . '/Themes.subs.php');
-					updateThemeOptions(array($settings['theme_id'], $user_info['id'], 'minmax_preferences', json_encode($array_form)));
+					updateThemeOptions(array($settings['theme_id'], \ElkArte\User::$info->id, 'minmax_preferences', json_encode($array_form)));
 				});
 			}
 			else
@@ -1473,9 +1475,9 @@ class ManageThemes extends \ElkArte\AbstractController
 
 		// Update the option.
 		require_once(SUBSDIR . '/Themes.subs.php');
-		updateThemeOptions(array($settings['theme_id'], $user_info['id'], $this->_req->query->var, is_array($this->_req->query->val) ? implode(',', $this->_req->query->val) : $this->_req->query->val));
+		updateThemeOptions(array($settings['theme_id'], $this->user->id, $this->_req->query->var, is_array($this->_req->query->val) ? implode(',', $this->_req->query->val) : $this->_req->query->val));
 
-		\ElkArte\Cache\Cache::instance()->remove('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id']);
+		\ElkArte\Cache\Cache::instance()->remove('theme_settings-' . $settings['theme_id'] . ':' . $this->user->id);
 
 		// Don't output anything...
 		redirectexit($settings['images_url'] . '/blank.png');
@@ -1634,7 +1636,7 @@ class ManageThemes extends \ElkArte\AbstractController
 	 */
 	private function _action_edit_submit()
 	{
-		global $context, $settings, $user_info;
+		global $context, $settings;
 
 		$selectedTheme = $this->_req->getQuery('th', 'intval', $this->_req->getQuery('id', 'intval', 0));
 		if (empty($selectedTheme))
@@ -1682,7 +1684,7 @@ class ManageThemes extends \ElkArte\AbstractController
 				// Since we are running php code, let's track it, but only once in a while.
 				if (!recentlyLogged('editing_theme', 60))
 				{
-					logAction('editing_theme', array('member' => $user_info['id']), 'admin');
+					logAction('editing_theme', array('member' => $this->user->id), 'admin');
 
 					// But the email only once every 60 minutes should be fine
 					if (!recentlyLogged('editing_theme', 3600))
@@ -1692,7 +1694,7 @@ class ManageThemes extends \ElkArte\AbstractController
 
 						$theme_info = getBasicThemeInfos($context['theme_id']);
 						emailAdmins('editing_theme', array(
-							'EDIT_REALNAME' => $user_info['name'],
+							'EDIT_REALNAME' => $this->user->name,
 							'FILE_EDITED' => $this->_req->post->filename,
 							'THEME_NAME' => $theme_info[$context['theme_id']],
 						));

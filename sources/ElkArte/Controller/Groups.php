@@ -30,7 +30,7 @@ class Groups extends \ElkArte\AbstractController
 	 */
 	public function pre_dispatch()
 	{
-		global $context, $txt, $user_info;
+		global $context, $txt;
 
 		// Get the template stuff up and running.
 		theme()->getTemplates()->loadLanguageFile('ManageMembers');
@@ -86,7 +86,7 @@ class Groups extends \ElkArte\AbstractController
 	 */
 	public function action_list()
 	{
-		global $txt, $context, $user_info;
+		global $txt, $context;
 
 		$context['page_title'] = $txt['viewing_groups'];
 		$current_area = isset($context['admin_menu_name']) ? $context['admin_menu_name'] : (isset($context['moderation_menu_name']) ? $context['moderation_menu_name'] : '');
@@ -123,7 +123,7 @@ class Groups extends \ElkArte\AbstractController
 				'function' => 'list_getMembergroups',
 				'params' => array(
 					'regular',
-					$user_info['id'],
+					$this->user->id,
 					allowedTo('manage_membergroups'),
 					allowedTo('admin_forum'),
 				),
@@ -238,7 +238,7 @@ class Groups extends \ElkArte\AbstractController
 	 */
 	public function action_members()
 	{
-		global $txt, $context, $modSettings, $user_info, $settings;
+		global $txt, $context, $modSettings, $settings;
 
 		$current_group = $this->_req->getQuery('group', 'intval', 0);
 
@@ -283,7 +283,7 @@ class Groups extends \ElkArte\AbstractController
 				'name' => $name
 			);
 
-			if ($user_info['id'] == $id_member && $context['group']['group_type'] != 1)
+			if ($this->user->id == $id_member && $context['group']['group_type'] != 1)
 				$context['group']['can_moderate'] = true;
 		}
 
@@ -442,7 +442,7 @@ class Groups extends \ElkArte\AbstractController
 	 */
 	public function action_requests()
 	{
-		global $txt, $context, $user_info, $modSettings;
+		global $txt, $context, $modSettings;
 
 		// Set up the template stuff...
 		$context['page_title'] = $txt['mc_group_requests'];
@@ -452,11 +452,11 @@ class Groups extends \ElkArte\AbstractController
 		);
 
 		// Verify we can be here.
-		if ($user_info['mod_cache']['gq'] == '0=1')
+		if ($this->user->mod_cache['gq'] == '0=1')
 			isAllowedTo('manage_membergroups');
 
 		// Normally, we act normally...
-		$where = $user_info['mod_cache']['gq'] == '1=1' || $user_info['mod_cache']['gq'] == '0=1' ? $user_info['mod_cache']['gq'] : 'lgr.' . $user_info['mod_cache']['gq'];
+		$where = $this->user->mod_cache['gq'] == '1=1' || $this->user->mod_cache['gq'] == '0=1' ? $this->user->mod_cache['gq'] : 'lgr.' . $this->user->mod_cache['gq'];
 		$where_parameters = array();
 
 		// We've submitted?

@@ -166,7 +166,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 	 */
 	public function action_list()
 	{
-		global $txt, $scripturl, $context, $user_info, $modSettings;
+		global $txt, $scripturl, $context, $modSettings;
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -197,7 +197,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 				'function' => 'list_getMembergroups',
 				'params' => array(
 					'all',
-					$user_info['id'],
+					$this->user->id,
 					allowedTo('manage_membergroups'),
 					allowedTo('admin_forum'),
 					true,
@@ -340,7 +340,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 					'function' => 'list_getMembergroups',
 					'params' => array(
 						'post_count',
-						$user_info['id'],
+						$this->user->id,
 						allowedTo('manage_membergroups'),
 						allowedTo('admin_forum'),
 						false,
