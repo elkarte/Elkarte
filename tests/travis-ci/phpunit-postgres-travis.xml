@@ -10,10 +10,10 @@
          verbose="true"
          bootstrap="/var/www/tests/travis-ci/bootstrap.php">
   <testsuites>
-      <testsuite name="ElkArte Unit Tests">
+      <testsuite name="Unit Tests">
           <directory suffix="Test.php">/var/www/tests</directory>
       </testsuite>
-      <testsuite name="ElkArte Basic Tests">
+      <testsuite name="Basic Tests">
           <directory suffix="Basic.php">/var/www/tests</directory>
       </testsuite>
   </testsuites>

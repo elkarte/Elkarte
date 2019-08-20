@@ -5,6 +5,8 @@
  */
 class TestDatabase extends \PHPUnit\Framework\TestCase
 {
+	protected $backupGlobalsBlacklist = ['user_info'];
+
 	/**
 	 * Prepare what is necessary to use in these tests.
 	 *
@@ -139,7 +141,7 @@ class TestDatabase extends \PHPUnit\Framework\TestCase
 		foreach ($known_tables as $table)
 		{
 			$exists = in_array($db_prefix . $table, $tables);
-			$this->assertTrue($exists, 'The table ' . $table . ' doesn\'t esist');
+			$this->assertTrue($exists, 'The table ' . $table . ' doesn\'t exist');
 		}
 	}
 

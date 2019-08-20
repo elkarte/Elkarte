@@ -10,11 +10,17 @@
          verbose="true"
          bootstrap="/var/www/tests/travis-ci/bootstrap.php">
   <testsuites>
-      <testsuite name="ElkArte Unit Tests">
-          <directory suffix="Test.php">/var/www/tests</directory>
+      <testsuite name="DB Tests">
+          <directory suffix="DatabaseTestExt.php">/var/www/tests/travis-ci</directory>
       </testsuite>
-      <testsuite name="ElkArte Basic Tests">
-          <directory suffix="Basic.php">/var/www/tests</directory>
+      <testsuite name="Unit Tests">
+          <directory suffix="Test.php">/var/www/tests/sources</directory>
+      </testsuite>
+      <testsuite name="Basic Tests">
+          <directory suffix="Basic.php">/var/www/tests/sources</directory>
+      </testsuite>
+      <testsuite name="Bootstrap Tests">
+          <directory suffix="BootstrapRunTest.php">/var/www/tests/travis-ci</directory>
       </testsuite>
   </testsuites>
 
