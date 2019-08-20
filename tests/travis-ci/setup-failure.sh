@@ -18,9 +18,13 @@ SHORT_PHP=${TRAVIS_PHP_VERSION:0:3}
 
 # Show the php error log
 if [[ -f /var/www/error.log ]]; then cat /var/www/error.log; fi
+if [[ -f /var/log/error.log ]]; then cat /var/log/error.log; fi
+if [[ -f /var/log/php_errors.log ]]; then cat /var/log/php_errors.log; fi
 
 # Show the apache error log as well
 if [[ -f /var/www/apache-error.log ]]; then cat /var/www/apache-error.log; fi
+if [[ -f /var/log/apache-error.log ]]; then cat /var/log/apache-error.log; fi
+if [[ -f /var/log/apache2/apache-error.log ]]; then cat /var/log/apache2/apache-error.log; fi
 
 # Upload any selenium selfies
 if [[ "$COVERAGE" == "true"  && "$WEBTESTS" == "true" ]]
