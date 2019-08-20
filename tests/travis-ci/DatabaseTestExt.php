@@ -5,8 +5,6 @@
  */
 class TestDatabase extends \PHPUnit\Framework\TestCase
 {
-	protected $backupGlobalsBlacklist = ['user_info'];
-
 	/**
 	 * Prepare what is necessary to use in these tests.
 	 *
@@ -18,16 +16,43 @@ class TestDatabase extends \PHPUnit\Framework\TestCase
 
 	protected function bootstrap()
 	{
+		// We're going to need, cough, a few globals
+		global $mbname, $language;
+		global $boardurl, $webmaster_email, $cookiename;
+		global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send, $db_type, $db_port;
+		global $modSettings, $context, $user_info, $topic, $board, $txt;
+		global $scripturl, $db_passwd;
+		global $boarddir, $sourcedir;
+		global $ssi_db_user, $ssi_db_passwd;
+
+		DEFINE('ELK', '1');
+		DEFINE('CACHE_STALE', '?R11B2');
+
+		// Get the forum's settings for database and file paths.
+		require_once('/var/www/Settings.php');
+
+		// Set our site "variable" constants
+		DEFINE('BOARDDIR', $boarddir);
+		DEFINE('CACHEDIR', $cachedir);
+		DEFINE('EXTDIR', $extdir);
+		DEFINE('LANGUAGEDIR', $boarddir . '/themes/default/languages');
+		DEFINE('SOURCEDIR', $sourcedir);
+		DEFINE('ADMINDIR', $sourcedir . '/admin');
+		DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
+		DEFINE('SUBSDIR', $sourcedir . '/subs');
+		DEFINE('ADDONSDIR', $sourcedir . '/addons');
+
 		require_once('/var/www/tests/travis-ci/bootstrap.php');
 	}
 
 	/**
 	 * testTablesExist() get a list of tables and see if they all exist
 	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function testTablesExist()
 	{
-		$this->bootstrap();
+		//$this->bootstrap();
 
 		global $db_prefix;
 
@@ -123,10 +148,11 @@ class TestDatabase extends \PHPUnit\Framework\TestCase
 	 * This test is here to ensure that the tables that should contain something
 	 * at the end of the install actually contain what they are supposed to.
 	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function testTablesPopulated()
 	{
-		$this->bootstrap();
+		// $this->bootstrap();
 
 		$db = database();
 
@@ -144,7 +170,7 @@ class TestDatabase extends \PHPUnit\Framework\TestCase
 			'permission_profiles' => 4,
 			'permissions' => 40,
 			'scheduled_tasks' => 14,
-			'settings' => 205,
+			'settings' => 204,
 			'smileys' => 22,
 			'spiders' => 27,
 			'themes' => 22,

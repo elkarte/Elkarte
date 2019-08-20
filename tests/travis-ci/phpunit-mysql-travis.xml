@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<phpunit backupGlobals="false"
+<phpunit backupGlobals="true"
          colors="true"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
@@ -10,6 +10,9 @@
          verbose="true"
          bootstrap="/var/www/tests/travis-ci/bootstrap.php">
   <testsuites>
+      <testsuite name="DB Tests">
+          <directory suffix="DatabaseTestExt.php">/var/www/tests/travis-ci</directory>
+      </testsuite>
       <testsuite name="Unit Tests">
           <directory suffix="Test.php">/var/www/tests/sources</directory>
       </testsuite>
@@ -17,7 +20,7 @@
           <directory suffix="Basic.php">/var/www/tests/sources</directory>
       </testsuite>
       <testsuite name="Bootstrap Tests">
-          <directory suffix="BootstrapRunTest.php">/var/www/tests/travis-ci</directory>
+          <directory suffix="BootstrapRunTestExt.php">/var/www/tests/travis-ci</directory>
       </testsuite>
   </testsuites>
 

@@ -2,7 +2,6 @@
 
 /**
  * TestCase class for recent posts
- * @backupGlobals enabled
  */
 class TestRecentPosts extends \PHPUnit\Framework\TestCase
 {

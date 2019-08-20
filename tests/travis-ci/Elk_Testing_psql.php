@@ -80,12 +80,28 @@ class Elk_Testing_psql extends Elk_Testing_Setup
 		$db_passwd = $this->_db_passwd = '';
 		$db_prefix = $this->_db_prefix = 'elkarte_';
 
-		// Start the database interface
-		$this->_db = \ElkArte\Database\Postgresql\Connection::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd, $this->_db_prefix);
-		$this->_db_table = DbTable_PostgreSQL_Install::db_table($this->_db, $this->_db_prefix);
+		$link = pg_connect('host=' . $this->_db_server . ' dbname=' . $this->_db_name . ' user=\'' . $this->_db_user . '\' password=\'' . $this->_db_passwd . '\'');
+		if (!$link)
+		{
+			die('Could not connect: ' . pg_last_error($link));
+		}
+		$v = pg_version($link);
+		printf("PostgreSQL server version: %s\n", $v['client']);
 
-		$modSettings['disableQueryCheck'] = 1;
+		// Start the database interface
+		try
+		{
+			// Start the database interface
+			$this->_db = \ElkArte\Database\Postgresql\Connection::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd, $this->_db_prefix);
+			$this->_db_table = DbTable_PostgreSQL_Install::db_table($this->_db, $this->_db_prefix);
+		}
+		catch (\Exception $e)
+		{
+			die($e->getMessage());
+		}
+
 		// Load the postgre install sql queries
+		$modSettings['disableQueryCheck'] = 1;
 		$this->load_queries(BOARDDIR . '/install/install_' . DB_SCRIPT_VERSION . '_postgresql.php');
 		$this->run_queries();
 		$modSettings['disableQueryCheck'] = 0;
