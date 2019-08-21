@@ -29,6 +29,7 @@
           <directory suffix=".php">/var/www/themes/default</directory>
           <exclude>
               <directory suffix=".php">/var/www/sources/ext</directory>
+              <directory suffix=".php">/var/www/themes/default/languages/english</directory>
           </exclude>
       </whitelist>
   </filter>
