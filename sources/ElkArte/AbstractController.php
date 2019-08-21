@@ -52,9 +52,17 @@ abstract class AbstractController
 	{
 		// Dependency injection will come later
 		$this->_req = HttpReq::instance();
-		$this->user = User::$info;
 
 		$this->_events = $eventManager;
+	}
+
+	/**
+	 * Sets the $this->user property to the current user
+	 * @param \ElkArte\ValuesContainer $user
+	 */
+	public function setUser($user)
+	{
+		$this->user = $user;
 	}
 
 	/**

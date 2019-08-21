@@ -150,6 +150,15 @@ class SiteDispatcher
 	}
 
 	/**
+	 * Passes the \ElkArte\User::$info variable to the controller
+	 * @param \ElkArte\ValuesContainer $user
+	 */
+	public function setUser($user)
+	{
+		$this->_controller->setUser($user);
+	}
+
+	/**
 	 * Determine if guest access is restricted, and, if so,
 	 * only allow the listed actions
 	 *
