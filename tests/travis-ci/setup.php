@@ -45,7 +45,6 @@ Class Elk_Testing_Setup
 	protected $_passwd;
 
 	// Initialized from extended class
-	protected $_boardutl;
 	protected $_db_server;
 	protected $_db_user;
 	protected $_db_passwd;
@@ -287,8 +286,8 @@ Class Elk_Testing_Setup
 			array('id_member')
 		);
 
-		$server_offset = @mktime(0, 0, 0, 1, 1, 1970);
-		$timezone_id = 'Etc/GMT' . ($server_offset > 0 ? '+' : '') . ($server_offset / 3600);
+		// The old Etc/GMT value is discouraged and does not work in some installs
+		$timezone_id = 'America/Chicago';
 
 		if (date_default_timezone_set($timezone_id))
 		{
@@ -303,19 +302,6 @@ Class Elk_Testing_Setup
 				array('variable')
 			);
 		}
-
-		// @todo Do we really need to update stats cn testing mode? Comented for now...
-		//~ require_once(SUBSDIR . '/Members.subs.php');
-		//~ updateMemberStats();
-
-		//~ require_once(SUBSDIR . '/Messages.subs.php');
-		//~ updateMessageStats();
-
-		//~ require_once(SUBSDIR . '/Topic.subs.php');
-		//~ updateTopicStats();
-
-		//~ theme()->getTemplates()->loadLanguageFile('Install');
-		//~ updateSubjectStats(1, htmlspecialchars($txt['default_topic_subject']));
 	}
 }
 

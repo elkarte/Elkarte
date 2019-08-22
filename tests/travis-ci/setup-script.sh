@@ -23,16 +23,24 @@ then
 fi
 
 # Build a config string for PHPUnit
-COVER=""
+COVER="--prepend /tmp/xdebug-filter.php"
 WEB=""
 if [[ "$COVERAGE" != "true" || "${TRAVIS_PULL_REQUEST}" == "false" ]]; then COVER="--no-coverage"; fi
 if [[ "$WEBTESTS" == "true" ]]; then WEB="-with-webtest"; fi
-CONFIG="--verbose --debug --configuration /var/www/tests/travis-ci/phpunit${WEB}-${SHORT_DB}-travis.xml ${COVER}"
+CONFIG="--verbose --debug --configuration /var/www/tests/travis-ci/phpunit${WEB}-${SHORT_DB}-travis.xml"
 
-/var/www/vendor/bin/phpunit /var/www/tests/travis-ci/DatabaseTestExt.php;
+# Run PHPUnit test to ensure the DB was correctly installed/populated
+#/var/www/vendor/bin/phpunit /var/www/tests/travis-ci/DatabaseTestExt.php --coverage-clover /tmp/dbcoverage.xml;
 
 # Run PHPUnit tests for the site
-/var/www/vendor/bin/phpunit ${CONFIG}
+if [[ "$COVERAGE" == "true" && "$TRAVIS_PULL_REQUEST" != "false" ]]
+then
+  echo 'Creating Xdebug filter list'
+  /var/www/vendor/bin/phpunit --dump-xdebug-filter /tmp/xdebug-filter.php ${CONFIG}
+fi
+
+echo 'Running PHPUnit tests'
+/var/www/vendor/bin/phpunit ${CONFIG} ${COVER}
 
 # Run validation (lock file)
-if [[ "$SHORT_DB" != "none" ]]; then /var/www/vendor/bin/phpunit /var/www/tests/travis-ci/BootstrapRunTestExt.php; fi
+#if [[ "$SHORT_DB" != "none" ]]; then /var/www/vendor/bin/phpunit /var/www/tests/travis-ci/BootstrapRunTestExt.php; fi

@@ -7,19 +7,11 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
-         syntaxCheck="false"
          verbose="true"
          bootstrap="/var/www/tests/travis-ci/bootstrap.php">
-
   <testsuites>
-      <testsuite name="ElkArte Web Tests">
+      <testsuite name="Web Tests">
           <directory suffix="Web.php">/var/www/tests</directory>
-      </testsuite>
-      <testsuite name="ElkArte Unit Tests">
-          <directory suffix="Test.php">/var/www/tests</directory>
-      </testsuite>
-      <testsuite name="ElkArte Basic Tests">
-          <directory suffix="Basic.php">/var/www/tests</directory>
       </testsuite>
   </testsuites>
 
@@ -32,10 +24,12 @@
   </listeners>
 
   <filter>
-      <whitelist addUncoveredFilesFromWhitelist="true">
+      <whitelist addUncoveredFilesFromWhitelist="false">
           <directory suffix=".php">/var/www/sources</directory>
+          <directory suffix=".php">/var/www/themes/default</directory>
           <exclude>
               <directory suffix=".php">/var/www/sources/ext</directory>
+              <directory suffix=".php">/var/www/themes/default/languages/english</directory>
           </exclude>
       </whitelist>
   </filter>

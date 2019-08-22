@@ -73,16 +73,7 @@ loadDatabase();
 \ElkArte\Hooks::init(database(), \ElkArte\Debug::instance());
 reloadSettings();
 \ElkArte\MembersList::init(database(), \ElkArte\Cache\Cache::instance(),  \BBC\ParserWrapper::instance());
-/**
- * This next line is pointless, but without that tests fail in postgre.
- * I don't know why, so I'll opne an issue, but for the moment,
- * just for the sake of dropping the deprecated code and move on i'll
- * leave this updateSettings here.
- */
-updateSettings(array('something' => 123));
-/**
- * End of pointless line
- */
+
 loadSession();
 loadUserSettings();
 loadBoard();
@@ -95,6 +86,14 @@ updateSettings(array(
 	'attachmentUploadDir' => serialize(array(1 => $modSettings['attachmentUploadDir'])),
 	'currentAttachmentUploadDir' => 1,
 ));
+
+/**
+ * This next line is pointless, but without it DatabaseTestExt tests fail in postgre.
+ * This 'mentions_member_check' setting looks to be added as part of a scheduled task
+ * which is only happening on the postgre install *shrugs* removing it allows the line count
+ * to match whats expected.
+ */
+removeSettings('mentions_member_check');
 
 // Basic language is good to have for functional tests
 theme()->getTemplates()->loadLanguageFile('index+Errors');

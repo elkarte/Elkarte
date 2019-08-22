@@ -2,6 +2,8 @@
 
 class BootstrapRunTest extends \PHPUnit\Framework\TestCase
 {
+	protected $backupGlobalsBlacklist = ['user_info'];
+
 	/**
 	 * Verifies the bootstrap run until the end.
 	 * If the database is not properly setup, bootstrap would fail, but the build

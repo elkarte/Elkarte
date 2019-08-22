@@ -7,16 +7,21 @@ matrix:
     - php: 7.1
       env:
         - DB=mysql-5.7
+        - WEBTESTS=false
+        - COVERAGE=true
+    - php: 7.3
+      env:
+        - DB=mysql-5.7
         - WEBTESTS=true
         - COVERAGE=true
     - php: 7.3
       env:
         - DB=postgres-9.6
         - WEBTESTS=false
-        - COVERAGE=false
+        - COVERAGE=true
       addons:
         postgresql: "9.6"
-    - php: 7.1
+    - php: 7.2
       env:
         - DB=mariadb-10.3
         - WEBTESTS=false
