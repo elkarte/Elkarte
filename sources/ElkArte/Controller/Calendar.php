@@ -190,7 +190,7 @@ class Calendar extends \ElkArte\AbstractController
 	 */
 	public function action_post()
 	{
-		global $context, $txt, $user_info, $modSettings;
+		global $context, $txt, $modSettings;
 
 		// You need to view what you're doing :P
 		isAllowedTo('calendar_view');
@@ -216,7 +216,7 @@ class Calendar extends \ElkArte\AbstractController
 
 		$event = new \ElkArte\CalendarEvent($event_id, $modSettings);
 
-		$context['event'] = $event->load($_REQUEST, $user_info['id']);
+		$context['event'] = $event->load($_REQUEST, $this->user->id);
 
 		if ($event->isNew())
 		{
@@ -252,7 +252,7 @@ class Calendar extends \ElkArte\AbstractController
 		 */
 	public function action_save()
 	{
-		global $modSettings, $user_info;
+		global $modSettings;
 
 		checkSession();
 
@@ -278,7 +278,7 @@ class Calendar extends \ElkArte\AbstractController
 
 		// If you're not allowed to edit any events, you have to be the poster.
 		if (!$event->isNew() && !allowedTo('calendar_edit_any'))
-			isAllowedTo('calendar_edit_' . ($event->isStarter($user_info['id']) ? 'own' : 'any'));
+			isAllowedTo('calendar_edit_' . ($event->isStarter($this->user->id) ? 'own' : 'any'));
 
 		// New - and directing?
 		if ($event->isNew() && isset($_POST['link_to_board']))
@@ -290,7 +290,7 @@ class Calendar extends \ElkArte\AbstractController
 		// New...
 		if ($event->isNew())
 		{
-			$event->insert($save_data, $user_info['id']);
+			$event->insert($save_data, $this->user->id);
 		}
 		elseif (isset($_REQUEST['deleteevent']))
 		{
@@ -317,6 +317,7 @@ class Calendar extends \ElkArte\AbstractController
 	protected function _returnToPost()
 	{
 		$controller = new Post(new \ElkArte\EventManager());
+		$controller->setUser(\ElkArte\User::$info);
 		$hook = $controller->getHook();
 		$controller->pre_dispatch();
 		$function_name = 'action_post';

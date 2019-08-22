@@ -105,7 +105,7 @@ class Search extends \ElkArte\AbstractController
 	 */
 	public function action_search()
 	{
-		global $txt, $scripturl, $modSettings, $user_info, $context;
+		global $txt, $scripturl, $modSettings, $context;
 
 		// Is the load average too high to allow searching just now?
 		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
@@ -133,7 +133,7 @@ class Search extends \ElkArte\AbstractController
 		// This is hard coded maximum string length.
 		$context['search_string_limit'] = 100;
 
-		$context['require_verification'] = $user_info['is_guest'] && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']);
+		$context['require_verification'] = $this->user->is_guest && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']);
 		if ($context['require_verification'])
 		{
 			// Build a verification control for the form
@@ -195,7 +195,7 @@ class Search extends \ElkArte\AbstractController
 			$context['boards_in_category'][$cat] = count($category['boards']);
 			$category['child_ids'] = array_keys($category['boards']);
 			foreach ($category['boards'] as &$board)
-				$board['selected'] = (empty($context['search_params']['brd']) && (empty($modSettings['recycle_enable']) || $board['id'] != $modSettings['recycle_board']) && !in_array($board['id'], $user_info['ignoreboards'])) || (!empty($context['search_params']['brd']) && in_array($board['id'], $context['search_params']['brd']));
+				$board['selected'] = (empty($context['search_params']['brd']) && (empty($modSettings['recycle_enable']) || $board['id'] != $modSettings['recycle_board']) && !in_array($board['id'], $this->user->ignoreboards)) || (!empty($context['search_params']['brd']) && in_array($board['id'], $context['search_params']['brd']));
 		}
 
 		if (!empty($_REQUEST['topic']))
@@ -243,7 +243,7 @@ class Search extends \ElkArte\AbstractController
 	public function action_results()
 	{
 		global $scripturl, $modSettings, $txt, $settings;
-		global $user_info, $context, $options, $messages_request;
+		global $context, $options, $messages_request;
 
 		// No, no, no... this is a bit hard on the server, so don't you go prefetching it!
 		stop_prefetching();
@@ -276,7 +276,7 @@ class Search extends \ElkArte\AbstractController
 		isAllowedTo('search_posts');
 
 		$this->_search = new \ElkArte\Search\Search();
-		$this->_search->setWeights(new \ElkArte\Search\WeightFactors($modSettings, $user_info['is_admin']));
+		$this->_search->setWeights(new \ElkArte\Search\WeightFactors($modSettings, $this->user->is_admin));
 		$search_params = new \ElkArte\Search\SearchParams($_REQUEST['params'] ?? '');
 		$search_params->merge($_REQUEST, $recentPercentage, $maxMembersToSearch);
 		$this->_search->setParams($search_params, !empty($modSettings['search_simple_fulltext']));
@@ -419,14 +419,14 @@ class Search extends \ElkArte\AbstractController
 			if ($this->_search->noMessages($messages_request))
 				$context['topics'] = array();
 
-			$this->_prepareParticipants(!empty($modSettings['enableParticipation']), $user_info['is_guest'] ? $user_info['id'] : 0);
+			$this->_prepareParticipants(!empty($modSettings['enableParticipation']), (int) $this->user->id);
 		}
 
 		// Now that we know how many results to expect we can start calculating the page numbers.
 		$context['page_index'] = constructPageIndex($scripturl . '?action=search;sa=results;params=' . $context['params'], $_REQUEST['start'], $this->_search->getNumResults(), $modSettings['search_results_per_page'], false);
 
 		// Consider the search complete!
-		\ElkArte\Cache\Cache::instance()->remove('search_start:' . ($user_info['is_guest'] ? $user_info['ip'] : $user_info['id']));
+		\ElkArte\Cache\Cache::instance()->remove('search_start:' . ($this->user->is_guest ? $this->user->ip : $this->user->id));
 
 		$context['sub_template'] = 'results';
 		$context['page_title'] = $txt['search_results'];
@@ -455,10 +455,10 @@ class Search extends \ElkArte\AbstractController
 
 	protected function _controlVerifications()
 	{
-		global $user_info, $modSettings, $context;
+		global $modSettings, $context;
 
 		// Do we have captcha enabled?
-		if ($user_info['is_guest'] && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']) && (empty($_SESSION['last_ss']) || $_SESSION['last_ss'] != $this->_search->param('search')))
+		if ($this->user->is_guest && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']) && (empty($_SESSION['last_ss']) || $_SESSION['last_ss'] != $this->_search->param('search')))
 		{
 			// If we come from another search box tone down the error...
 			if (!isset($_REQUEST['search_vv']))

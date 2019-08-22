@@ -14,6 +14,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Load the $modSettings array and many necessary forum settings.
  *
@@ -181,16 +183,16 @@ function loadUserSettings()
 function loadBoard()
 {
 	global $txt, $scripturl, $context, $modSettings;
-	global $board_info, $board, $topic, $user_info;
+	global $board_info, $board, $topic;
 
 	$db = database();
 	$cache = \ElkArte\Cache\Cache::instance();
 
 	// Assume they are not a moderator.
-	$user_info['is_mod'] = false;
+	User::$info->is_mod = false;
 	// @since 1.0.5 - is_mod takes into account only local (board) moderators,
 	// and not global moderators, is_moderator is meant to take into account both.
-	$user_info['is_moderator'] = false;
+	User::$info->is_moderator = false;
 
 	// Start the linktree off empty..
 	$context['linktree'] = array();
@@ -344,7 +346,7 @@ function loadBoard()
 						AND approved = {int:unapproved}
 						AND id_board = {int:board}',
 					array(
-						'id_member' => $user_info['id'],
+						'id_member' => User::$info->id,
 						'unapproved' => 0,
 						'board' => $board,
 					)
@@ -380,12 +382,16 @@ function loadBoard()
 	if (!empty($board))
 	{
 		// Now check if the user is a moderator.
-		$user_info['is_mod'] = isset($board_info['moderators'][$user_info['id']]);
+		User::$info->is_mod = isset($board_info['moderators'][User::$info->id]);
 
-		if (count(array_intersect($user_info['groups'], $board_info['groups'])) == 0 && !$user_info['is_admin'])
+		if (count(array_intersect(User::$info->groups, $board_info['groups'])) == 0 && User::$info->is_admin === false)
+		{
 			$board_info['error'] = 'access';
-		if (!empty($modSettings['deny_boards_access']) && count(array_intersect($user_info['groups'], $board_info['deny_groups'])) != 0 && !$user_info['is_admin'])
+		}
+		if (!empty($modSettings['deny_boards_access']) && count(array_intersect(User::$info->groups, $board_info['deny_groups'])) != 0 && User::$info->is_admin === false)
+		{
 			$board_info['error'] = 'access';
+		}
 
 		// Build up the linktree.
 		$context['linktree'] = array_merge(
@@ -403,13 +409,13 @@ function loadBoard()
 	}
 
 	// Set the template contextual information.
-	$context['user']['is_mod'] = $user_info['is_mod'];
-	$context['user']['is_moderator'] = $user_info['is_moderator'];
+	$context['user']['is_mod'] = User::$info->is_mod;
+	$context['user']['is_moderator'] = User::$info->is_moderator;
 	$context['current_topic'] = $topic;
 	$context['current_board'] = $board;
 
 	// Hacker... you can't see this topic, I'll tell you that. (but moderators can!)
-	if (!empty($board_info['error']) && (!empty($modSettings['deny_boards_access']) || $board_info['error'] != 'access' || !$user_info['is_moderator']))
+	if (!empty($board_info['error']) && (!empty($modSettings['deny_boards_access']) || $board_info['error'] != 'access' || User::$info->is_moderator === false))
 	{
 		// The permissions and theme need loading, just to make sure everything goes smoothly.
 		loadPermissions();
@@ -436,7 +442,7 @@ function loadBoard()
 			header('HTTP/1.1 403 Forbidden');
 			exit;
 		}
-		elseif ($user_info['is_guest'])
+		elseif (User::$info->is_guest)
 		{
 			theme()->getTemplates()->loadLanguageFile('Errors');
 			is_not_guest($txt['topic_gone']);
@@ -445,8 +451,10 @@ function loadBoard()
 			throw new \ElkArte\Exceptions\Exception('topic_gone', false);
 	}
 
-	if ($user_info['is_mod'])
-		$user_info['groups'][] = 3;
+	if (User::$info->is_mod)
+	{
+		User::$info->groups = array_merge(User::$info->groups, [3]);
+	}
 }
 
 /**
@@ -463,11 +471,11 @@ function loadBoard()
  */
 function loadPermissions()
 {
-	global $user_info, $board, $board_info, $modSettings;
+	global $board, $board_info, $modSettings;
 
 	$db = database();
 
-	if ($user_info['is_admin'])
+	if (User::$info->is_admin)
 	{
 		banPermissions();
 		return;
@@ -479,35 +487,39 @@ function loadPermissions()
 
 	if ($cache->isEnabled())
 	{
-		$cache_groups = $user_info['groups'];
+		$cache_groups = User::$info->groups;
 		asort($cache_groups);
 		$cache_groups = implode(',', $cache_groups);
 
 		// If it's a spider then cache it different.
-		if ($user_info['possibly_robot'])
+		if (User::$info->possibly_robot)
+		{
 			$cache_groups .= '-spider';
+		}
+		$cache_key = 'permissions:' . $cache_groups;
+		$cache_board_key = 'permissions:' . $cache_groups . ':' . $board;
 
 		$temp = array();
-		if ($cache->levelHigherThan(1) && !empty($board) && $cache->getVar($temp, 'permissions:' . $cache_groups . ':' . $board, 240) && time() - 240 > $modSettings['settings_updated'])
+		if ($cache->levelHigherThan(1) && !empty($board) && $cache->getVar($temp, $cache_board_key, 240) && time() - 240 > $modSettings['settings_updated'])
 		{
-			list ($user_info['permissions']) = $temp;
+			list (User::$info->permissions) = $temp;
 			banPermissions();
 
 			return;
 		}
-		elseif ($cache->getVar($temp, 'permissions:' . $cache_groups, 240) && time() - 240 > $modSettings['settings_updated'])
+		elseif ($cache->getVar($temp, $cache_key, 240) && time() - 240 > $modSettings['settings_updated'])
 		{
 			if (is_array($temp))
 			{
-				list ($user_info['permissions'], $removals) = $temp;
+				list (User::$info->permissions, $removals) = $temp;
 			}
 		}
 	}
 
 	// If it is detected as a robot, and we are restricting permissions as a special group - then implement this.
-	$spider_restrict = $user_info['possibly_robot'] && !empty($modSettings['spider_group']) ? ' OR (id_group = {int:spider_group} AND add_deny = 0)' : '';
+	$spider_restrict = User::$info->possibly_robot && !empty($modSettings['spider_group']) ? ' OR (id_group = {int:spider_group} AND add_deny = 0)' : '';
 
-	if (empty($user_info['permissions']))
+	if (empty(User::$info->permissions))
 	{
 		$permissions = [];
 		// Get the general permissions.
@@ -518,7 +530,7 @@ function loadPermissions()
 			WHERE id_group IN ({array_int:member_groups})
 				' . $spider_restrict,
 			array(
-				'member_groups' => $user_info['groups'],
+				'member_groups' => User::$info->groups,
 				'spider_group' => !empty($modSettings['spider_group']) && $modSettings['spider_group'] != 1 ? $modSettings['spider_group'] : 0,
 			)
 		);
@@ -529,11 +541,13 @@ function loadPermissions()
 			else
 				$permissions[] = $row['permission'];
 		}
-		$user_info['permissions'] = $permissions;
+		User::$info->permissions = $permissions;
 		$db->free_result($request);
 
-		if (isset($cache_groups))
-			$cache->put('permissions:' . $cache_groups, array($user_info['permissions'], !empty($removals) ? $removals : array()), 2);
+		if (isset($cache_key))
+		{
+			$cache->put($cache_key, array((array) User::$info->permissions, !empty($removals) ? $removals : array()), 2);
+		}
 	}
 
 	// Get the board permissions.
@@ -541,7 +555,9 @@ function loadPermissions()
 	{
 		// Make sure the board (if any) has been loaded by loadBoard().
 		if (!isset($board_info['profile']))
+		{
 			throw new \ElkArte\Exceptions\Exception('no_board');
+		}
 
 		$permissions = [];
 		$request = $db->query('', '
@@ -552,7 +568,7 @@ function loadPermissions()
 				' . $spider_restrict . ')
 				AND id_profile = {int:id_profile}',
 			array(
-				'member_groups' => $user_info['groups'],
+				'member_groups' => User::$info->groups,
 				'id_profile' => $board_info['profile'],
 				'spider_group' => !empty($modSettings['spider_group']) && $modSettings['spider_group'] != 1 ? $modSettings['spider_group'] : 0,
 			)
@@ -564,31 +580,37 @@ function loadPermissions()
 			else
 				$permissions[] = $row['permission'];
 		}
-		$user_info['permissions'] = $permissions;
+		User::$info->permissions = $permissions;
 		$db->free_result($request);
 	}
 
 	// Remove all the permissions they shouldn't have ;).
 	if (!empty($modSettings['permission_enable_deny']))
-		$user_info['permissions'] = array_diff($user_info['permissions'], $removals);
+	{
+		User::$info->permissions = array_diff(User::$info->permissions, $removals);
+	}
 
-	if (isset($cache_groups) && !empty($board) && $cache->levelHigherThan(1))
-		$cache->put('permissions:' . $cache_groups . ':' . $board, array($user_info['permissions'], null), 240);
+	if (isset($cache_board_key) && !empty($board) && $cache->levelHigherThan(1))
+	{
+		$cache->put($cache_board_key, array(User::$info->permissions, null), 240);
+	}
 
 	// Banned?  Watch, don't touch..
 	banPermissions();
 
 	// Load the mod cache so we can know what additional boards they should see, but no sense in doing it for guests
-	if (!$user_info['is_guest'])
+	if (User::$info->is_guest === false)
 	{
-		$user_info['is_moderator'] = $user_info['is_mod'] || allowedTo('moderate_board');
+		User::$info->is_moderator = User::$info->is_mod || allowedTo('moderate_board');
 		if (!isset($_SESSION['mc']) || $_SESSION['mc']['time'] <= $modSettings['settings_updated'])
 		{
 			require_once(SUBSDIR . '/Auth.subs.php');
 			rebuildModCache();
 		}
 		else
-			$user_info['mod_cache'] = $_SESSION['mc'];
+		{
+			User::$info->mod_cache = $_SESSION['mc'];
+		}
 	}
 }
 
@@ -635,36 +657,36 @@ function loadTheme($id_theme = 0, $initialize = true)
  */
 function loadUserContext()
 {
-	global $context, $user_info, $txt, $modSettings;
+	global $context, $txt, $modSettings;
 
 	// Set up the contextual user array.
 	$context['user'] = array(
-		'id' => $user_info['id'],
-		'is_logged' => !$user_info['is_guest'],
-		'is_guest' => $user_info['is_guest'],
-		'is_admin' => $user_info['is_admin'],
-		'is_mod' => $user_info['is_mod'],
-		'is_moderator' => $user_info['is_moderator'],
+		'id' => User::$info->id,
+		'is_logged' => User::$info->is_guest === false,
+		'is_guest' => User::$info->is_guest,
+		'is_admin' => User::$info->is_admin,
+		'is_mod' => User::$info->is_mod,
+		'is_moderator' => User::$info->is_moderator,
 		// A user can mod if they have permission to see the mod center, or they are a board/group/approval moderator.
-		'can_mod' => allowedTo('access_mod_center') || (!$user_info['is_guest'] && ($user_info['mod_cache']['gq'] != '0=1' || $user_info['mod_cache']['bq'] != '0=1' || ($modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap'])))),
-		'username' => $user_info['username'],
-		'language' => $user_info['language'],
-		'email' => $user_info['email'],
-		'ignoreusers' => $user_info['ignoreusers'],
+		'can_mod' => User::$info->canMod($modSettings['postmod_active']),
+		'username' => User::$info->username,
+		'language' => User::$info->language,
+		'email' => User::$info->email,
+		'ignoreusers' => User::$info->ignoreusers,
 	);
 
 	// Something for the guests
 	if (!$context['user']['is_guest'])
 	{
-		$context['user']['name'] = $user_info['name'];
+		$context['user']['name'] = User::$info->name;
 	}
 	elseif ($context['user']['is_guest'] && !empty($txt['guest_title']))
 	{
 		$context['user']['name'] = $txt['guest_title'];
 	}
 
-	$context['user']['smiley_set'] = determineSmileySet($user_info['smiley_set'], $modSettings['smiley_sets_known']);
-	$context['smiley_enabled'] = $user_info['smiley_set'] !== 'none';
+	$context['user']['smiley_set'] = determineSmileySet(User::$info->smiley_set, $modSettings['smiley_sets_known']);
+	$context['smiley_enabled'] = User::$info->smiley_set !== 'none';
 	$context['user']['smiley_path'] = $modSettings['smileys_url'] . '/' . $context['user']['smiley_set'] . '/';
 }
 
@@ -1438,13 +1460,13 @@ function serverIs($server)
  */
 function doSecurityChecks()
 {
-	global $modSettings, $context, $maintenance, $user_info, $txt, $scripturl, $options;
+	global $modSettings, $context, $maintenance, $txt, $scripturl, $options;
 
 	$show_warnings = false;
 
 	$cache = \ElkArte\Cache\Cache::instance();
 
-	if (allowedTo('admin_forum') && !$user_info['is_guest'])
+	if (allowedTo('admin_forum') && User::$info->is_guest === false)
 	{
 		// If agreement is enabled, at least the english version shall exists
 		if ($modSettings['requireAgreement'] && !file_exists(BOARDDIR . '/agreement.txt'))
@@ -1497,7 +1519,7 @@ function doSecurityChecks()
 	// Check for database errors.
 	if (!empty($_SESSION['query_command_denied']))
 	{
-		if ($user_info['is_admin'])
+		if (User::$info->is_admin)
 		{
 			$context['security_controls_query']['title'] = $txt['query_command_denied'];
 			$show_warnings = true;
@@ -1529,7 +1551,7 @@ function doSecurityChecks()
 	if (isset($_SESSION['ban']['cannot_post']))
 	{
 		// An admin cannot be banned (technically he could), and if it is better he knows.
-		$context['security_controls_ban']['title'] = sprintf($txt['you_are_post_banned'], $user_info['is_guest'] ? $txt['guest_title'] : $user_info['name']);
+		$context['security_controls_ban']['title'] = sprintf($txt['you_are_post_banned'], User::$info->is_guest ? $txt['guest_title'] : User::$info->name);
 		$show_warnings = true;
 
 		$context['security_controls_ban']['errors']['reason'] = '';

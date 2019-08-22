@@ -127,7 +127,7 @@ class MoveTopic extends \ElkArte\AbstractController
 	 */
 	public function action_movetopic2()
 	{
-		global $board, $user_info;
+		global $board;
 
 		$this->_check_access_2();
 
@@ -161,7 +161,7 @@ class MoveTopic extends \ElkArte\AbstractController
 		moveTopics($this->_topic, $this->_toboard);
 
 		// Log that they moved this topic.
-		if (!allowedTo('move_own') || $this->_topic_info['id_member_started'] != $user_info['id'])
+		if (!allowedTo('move_own') || $this->_topic_info['id_member_started'] != $this->user->id)
 			logAction('move', array('topic' => $this->_topic, 'board_from' => $board, 'board_to' => $this->_toboard));
 
 		// Notify people that this topic has been moved?
@@ -180,7 +180,7 @@ class MoveTopic extends \ElkArte\AbstractController
 	 */
 	private function _prep_template()
 	{
-		global $context, $txt, $scripturl, $user_info, $language, $board;
+		global $context, $txt, $scripturl, $language, $board;
 
 		$context['is_approved'] = $this->_topic_info['approved'];
 		$context['subject'] = $this->_topic_info['subject'];
@@ -202,7 +202,7 @@ class MoveTopic extends \ElkArte\AbstractController
 		$context['back_to_topic'] = isset($this->_req->post->goback);
 
 		// Ugly !
-		if ($user_info['language'] != $language)
+		if ($this->user->language != $language)
 		{
 			theme()->getTemplates()->loadLanguageFile('index', $language);
 			$temp = $txt['movetopic_default'];
@@ -232,7 +232,7 @@ class MoveTopic extends \ElkArte\AbstractController
 	 */
 	private function _check_access()
 	{
-		global $modSettings, $user_info;
+		global $modSettings;
 
 		if (empty($this->_topic))
 			throw new \ElkArte\Exceptions\Exception('no_access', false);
@@ -249,7 +249,7 @@ class MoveTopic extends \ElkArte\AbstractController
 			isAllowedTo('approve_posts');
 
 		// Are they allowed to actually move any topics or even their own?
-		if (!allowedTo('move_any') && ($this->_topic_info['id_member_started'] == $user_info['id'] && !allowedTo('move_own')))
+		if (!allowedTo('move_any') && ($this->_topic_info['id_member_started'] == $this->user->id && !allowedTo('move_own')))
 			throw new \ElkArte\Exceptions\Exception('cannot_move_any', false);
 	}
 
@@ -268,7 +268,7 @@ class MoveTopic extends \ElkArte\AbstractController
 	 */
 	private function _check_access_2()
 	{
-		global $user_info, $board;
+		global $board;
 
 		if (empty($this->_topic))
 			throw new \ElkArte\Exceptions\Exception('no_access', false);
@@ -301,7 +301,7 @@ class MoveTopic extends \ElkArte\AbstractController
 		// Can they move topics on this board?
 		if (!allowedTo('move_any'))
 		{
-			if ($this->_topic_info['id_member_started'] == $user_info['id'])
+			if ($this->_topic_info['id_member_started'] == $this->user->id)
 			{
 				isAllowedTo('move_own');
 			}
@@ -366,14 +366,16 @@ class MoveTopic extends \ElkArte\AbstractController
 	 */
 	private function _post_redirect()
 	{
-		global $txt, $board, $scripturl, $language, $user_info;
+		global $txt, $board, $scripturl, $language;
 
 		// @todo Does this make sense if the topic was unapproved before? I'd just about say so.
 		if (isset($this->_req->post->postRedirect))
 		{
 			// Should be in the boardwide language.
-			if ($user_info['language'] != $language)
+			if ($this->user->language != $language)
+			{
 				theme()->getTemplates()->loadLanguageFile('index', $language);
+			}
 
 			$reason = \ElkArte\Util::htmlspecialchars($this->_req->post->reason, ENT_QUOTES);
 			preparsecode($reason);
@@ -410,7 +412,7 @@ class MoveTopic extends \ElkArte\AbstractController
 			);
 
 			$posterOptions = array(
-				'id' => $user_info['id'],
+				'id' => $this->user->id,
 				'update_post_count' => empty($this->_board_info['count_posts']),
 			);
 			createPost($msgOptions, $topicOptions, $posterOptions);

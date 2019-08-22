@@ -132,7 +132,7 @@ class Likes extends \ElkArte\AbstractController
 	 */
 	protected function _doLikePost($sign, $type)
 	{
-		global $user_info, $modSettings;
+		global $modSettings;
 
 		$this->_id_liked = $this->_req->getPost('msg', 'intval', (isset($this->_req->query->msg) ? (int) $this->_req->query->msg : 0));
 
@@ -147,7 +147,7 @@ class Likes extends \ElkArte\AbstractController
 			if ($liked_message && empty($liked_message['locked']))
 			{
 				// Like it
-				$likeResult = likePost($user_info['id'], $liked_message, $sign);
+				$likeResult = likePost($this->user->id, $liked_message, $sign);
 				if ($likeResult === true)
 				{
 					// Lets add in a mention to the member that just had their post liked
@@ -157,7 +157,7 @@ class Likes extends \ElkArte\AbstractController
 						$notifier->add(new \ElkArte\NotificationsTask(
 							$type,
 							$this->_id_liked,
-							$user_info['id'],
+							$this->user->id,
 							array('id_members' => array($liked_message['id_member']), 'rlike_notif' => empty($modSettings['mentions_dont_notify_rlike']))
 						));
 					}
@@ -178,7 +178,7 @@ class Likes extends \ElkArte\AbstractController
 	 */
 	public function action_unlikepost()
 	{
-		global $user_info, $topic;
+		global $topic;
 
 		$this->_doLikePost('-', 'rlikemsg');
 
@@ -186,7 +186,7 @@ class Likes extends \ElkArte\AbstractController
 		if (!isset($this->_req->query->profile))
 			redirectexit('topic=' . $topic . '.msg' . $this->_id_liked . '#msg' . $this->_id_liked);
 		else
-			redirectexit('action=profile;area=showlikes;sa=given;u=' . $user_info['id']);
+			redirectexit('action=profile;area=showlikes;sa=given;u=' . $this->user->id);
 	}
 
 	/**
@@ -225,7 +225,7 @@ class Likes extends \ElkArte\AbstractController
 	 */
 	private function prepare_like()
 	{
-		global $modSettings, $user_info, $txt;
+		global $modSettings, $txt;
 
 		$check = true;
 
@@ -246,11 +246,11 @@ class Likes extends \ElkArte\AbstractController
 		if (!empty($modSettings['likeRestrictAdmins']) || !allowedTo('moderate_forum'))
 		{
 			// Find out if this user has done this recently...
-			$check = lastLikeOn($user_info['id']);
+			$check = lastLikeOn($this->user->id);
 		}
 
 		// Past the post threshold?
-		if (!$user_info['is_admin'] && !empty($modSettings['likeMinPosts']) && $user_info['posts'] < $modSettings['likeMinPosts'])
+		if ($this->user->is_admin === false && !empty($modSettings['likeMinPosts']) && $this->user->posts < $modSettings['likeMinPosts'])
 			$check = false;
 
 		// If they have exceeded their limits, provide a message for the ajax response

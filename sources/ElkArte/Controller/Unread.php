@@ -70,7 +70,7 @@ class Unread extends \ElkArte\AbstractController
 	 */
 	public function pre_dispatch()
 	{
-		global $txt, $scripturl, $context, $settings, $modSettings, $options, $user_info;
+		global $txt, $scripturl, $context, $settings, $modSettings, $options;
 
 		// Guests can't have unread things, we don't know anything about them.
 		is_not_guest();
@@ -93,7 +93,7 @@ class Unread extends \ElkArte\AbstractController
 		$context['topics_per_page'] = (int) (empty($modSettings['disableCustomPerPage']) && !empty($options['topics_per_page']) ? $options['topics_per_page'] : $modSettings['defaultMaxTopics']);
 
 		// Initialize the Unread class
-		$this->_grabber = new \ElkArte\Unread($user_info['id'], $modSettings['postmod_active'], $modSettings['enable_unwatch'], $context['showing_all_topics']);
+		$this->_grabber = new \ElkArte\Unread($this->user->id, $modSettings['postmod_active'], $modSettings['enable_unwatch'], $context['showing_all_topics']);
 
 		// Make sure we can continue
 		$this->_checkServerLoad();
@@ -428,14 +428,14 @@ class Unread extends \ElkArte\AbstractController
 	 */
 	private function _exiting_unread()
 	{
-		global $scripturl, $user_info, $context, $settings, $modSettings, $txt;
+		global $scripturl, $context, $settings, $modSettings, $txt;
 
 		$topic_ids = array_keys($context['topics']);
 
 		if ($this->_is_topics && !empty($modSettings['enableParticipation']) && !empty($topic_ids))
 		{
 			require_once(SUBSDIR . '/MessageIndex.subs.php');
-			$topics_participated_in = topicsParticipation($user_info['id'], $topic_ids);
+			$topics_participated_in = topicsParticipation($this->user->id, $topic_ids);
 
 			foreach ($topics_participated_in as $topic)
 			{

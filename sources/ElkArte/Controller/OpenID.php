@@ -157,6 +157,7 @@ class OpenID extends \ElkArte\AbstractController
 				}
 
 				$controller = new Register(new \ElkArte\EventManager());
+				$controller->setUser(\ElkArte\User::$info);
 				$controller->pre_dispatch();
 				$controller->do_register(true);
 				return null;

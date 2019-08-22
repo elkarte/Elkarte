@@ -39,6 +39,7 @@ $_SERVER['SERVER_NAME'] = '';
 
 // Our mail controller
 $controller = new \ElkArte\Controller\Emailpost(new \ElkArte\EventManager());
+$controller->setUser(\ElkArte\User::$info);
 $controller->action_pbe_topic();
 
 // Always exit as successful

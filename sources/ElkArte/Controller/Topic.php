@@ -60,7 +60,7 @@ class Topic extends \ElkArte\AbstractController
 	 */
 	public function action_lock()
 	{
-		global $topic, $user_info, $board;
+		global $topic, $board;
 
 		// Just quit if there's no topic to lock.
 		if (empty($topic))
@@ -78,7 +78,7 @@ class Topic extends \ElkArte\AbstractController
 		// Can you lock topics here, mister?
 		$user_lock = !allowedTo('lock_any');
 
-		if ($user_lock && $starter == $user_info['id'])
+		if ($user_lock && $starter == $this->user->id)
 			isAllowedTo('lock_own');
 		else
 			isAllowedTo('lock_any');
@@ -172,7 +172,7 @@ class Topic extends \ElkArte\AbstractController
 	 */
 	public function action_printpage()
 	{
-		global $topic, $scripturl, $context, $user_info, $board_info, $modSettings;
+		global $topic, $scripturl, $context, $board_info, $modSettings;
 
 		// Redirect to the boardindex if no valid topic id is provided.
 		if (empty($topic))
@@ -198,7 +198,7 @@ class Topic extends \ElkArte\AbstractController
 		if (empty($topicinfo))
 			redirectexit();
 
-		$context['user']['started'] = $user_info['id'] == $topicinfo['id_member'] && !$user_info['is_guest'];
+		$context['user']['started'] = $this->user->id == $topicinfo['id_member'] && $this->user->is_guest === false;
 
 		// Whatever happens don't index this.
 		$context['robot_no_index'] = true;

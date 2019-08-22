@@ -162,6 +162,7 @@ class Xml extends \ElkArte\AbstractController
 		if ($validation === true)
 		{
 			$controller = new \ElkArte\AdminController\CoreFeatures(new \ElkArte\EventManager());
+			$controller->setUser(\ElkArte\User::$info);
 			$controller->pre_dispatch();
 			$result = $controller->action_index();
 

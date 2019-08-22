@@ -86,11 +86,13 @@ class Draft extends Post
 	 */
 	public function action_showProfileDrafts()
 	{
-		global $txt, $modSettings, $context, $user_info;
+		global $txt, $modSettings, $context;
 
 		// Safe is safe.
-		if ($this->_memID != $user_info['id'])
+		if ($this->_memID != $this->user->id)
+		{
 			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		}
 
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
@@ -189,21 +191,25 @@ class Draft extends Post
 	 */
 	public function action_showPMDrafts()
 	{
-		global $txt, $user_info, $modSettings, $context;
+		global $txt, $modSettings, $context;
 
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
 		// Quick check how we got here.
-		if ($this->_memID != $user_info['id'])
+		if ($this->_memID != $this->user->id)
+		{
 			// empty($modSettings['drafts_enabled']) || empty($modSettings['drafts_pm_enabled']))
 			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		}
 
 		// Set up what we will need
 		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
 
 		// If just deleting a draft, do it and then redirect back.
 		if (!empty($this->_req->query->delete) || !empty($this->_req->post->delete))
+		{
 			return $this->_action_delete('action=pm;sa=showpmdrafts;start=' . $context['start']);
+		}
 
 		// Perhaps a draft was selected for editing? if so pass this off
 		if (!empty($this->_req->query->id_draft) && !empty($context['drafts_pm_save']))

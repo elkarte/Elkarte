@@ -404,6 +404,7 @@ function is_not_banned($forceCheck = false)
 		if (!$user_info['is_guest'])
 		{
 			$controller = new \ElkArte\Controller\Auth(new \ElkArte\EventManager());
+			$controller->setUser(\ElkArte\User::$info);
 			$controller->action_logout(true, false);
 		}
 
@@ -477,6 +478,7 @@ function is_not_banned($forceCheck = false)
 
 		// Log them out
 		$controller = new \ElkArte\Controller\Auth(new \ElkArte\EventManager());
+		$controller->setUser(\ElkArte\User::$info);
 		$controller->action_logout(true, false);
 
 		// Tell them thanks
@@ -1416,12 +1418,6 @@ function secureDirectory($path, $allow_localhost = false, $files = '*')
 	$directoryname = basename($path);
 
 	$errors = array();
-	$close = empty($allow_localhost) ? '
-</Files>' : '
-	Allow from localhost
-</Files>
-
-RemoveHandler .php .php3 .phtml .cgi .fcgi .pl .fpl .shtml';
 
 	if (file_exists($path . '/.htaccess'))
 		$errors[] = 'htaccess_exists';

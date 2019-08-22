@@ -449,6 +449,7 @@ class Maintenance extends \ElkArte\AbstractController
 		validateToken('admin-maint');
 
 		$controller = new RepairBoards(new \ElkArte\EventManager());
+		$controller->setUser(\ElkArte\User::$info);
 		$controller->pre_dispatch();
 		$controller->action_repairboards();
 	}
@@ -1041,8 +1042,6 @@ class Maintenance extends \ElkArte\AbstractController
 	 */
 	public function action_backup_display()
 	{
-		global $user_info;
-
 		validateToken('admin-maint');
 
 		// Administrators only!
@@ -1061,9 +1060,9 @@ class Maintenance extends \ElkArte\AbstractController
 			require_once(SUBSDIR . '/Admin.subs.php');
 
 			emailAdmins('admin_backup_database', array(
-				'BAK_REALNAME' => $user_info['name']
+				'BAK_REALNAME' => $this->user->name
 			));
-			logAction('database_backup', array('member' => $user_info['id']), 'admin');
+			logAction('database_backup', array('member' => $this->user->id), 'admin');
 
 			require_once(SOURCEDIR . '/DumpDatabase.php');
 			DumpDatabase2();

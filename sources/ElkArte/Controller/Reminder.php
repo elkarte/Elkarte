@@ -59,7 +59,7 @@ class Reminder extends \ElkArte\AbstractController
 	 */
 	public function action_picktype()
 	{
-		global $context, $txt, $scripturl, $user_info, $webmaster_email, $language, $modSettings;
+		global $context, $txt, $scripturl, $webmaster_email, $language, $modSettings;
 
 		// Security
 		checkSession();
@@ -123,7 +123,7 @@ class Reminder extends \ElkArte\AbstractController
 			$replacements = array(
 				'REALNAME' => $member['real_name'],
 				'REMINDLINK' => $scripturl . '?action=reminder;sa=setpassword;u=' . $member['id_member'] . ';code=' . $password,
-				'IP' => $user_info['ip'],
+				'IP' => $this->user->ip,
 				'MEMBERNAME' => $member['member_name'],
 				'OPENID' => $member['openid_uri'],
 			);

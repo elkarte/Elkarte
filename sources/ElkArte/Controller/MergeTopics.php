@@ -68,7 +68,7 @@ class MergeTopics extends \ElkArte\AbstractController
 	 */
 	public function action_mergeIndex()
 	{
-		global $txt, $board, $context, $user_info, $modSettings;
+		global $txt, $board, $context, $modSettings;
 
 		// If we don't know where you are from we know where you go
 		$from = $this->_req->getQuery('from', 'intval', null);
@@ -81,7 +81,7 @@ class MergeTopics extends \ElkArte\AbstractController
 		// Prepare a handy query bit for approval...
 		if ($modSettings['postmod_active'])
 		{
-			$can_approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
+			$can_approve_boards = !empty($this->user->mod_cache['ap']) ? $this->user->mod_cache['ap'] : boardsAllowedTo('approve_posts');
 			$onlyApproved = $can_approve_boards !== array(0) && !in_array($target_board, $can_approve_boards);
 		}
 		else

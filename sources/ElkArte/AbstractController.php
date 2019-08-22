@@ -40,6 +40,12 @@ abstract class AbstractController
 	protected $_req;
 
 	/**
+	 * Holds instance of \ElkArte\User::$info object
+	 * @var \ElkArte\ValuesContainer
+	 */
+	protected $user;
+
+	/**
 	 * @param \ElkArte\EventManager $eventManager
 	 */
 	public function __construct($eventManager)
@@ -48,6 +54,15 @@ abstract class AbstractController
 		$this->_req = HttpReq::instance();
 
 		$this->_events = $eventManager;
+	}
+
+	/**
+	 * Sets the $this->user property to the current user
+	 * @param \ElkArte\ValuesContainer $user
+	 */
+	public function setUser($user)
+	{
+		$this->user = $user;
 	}
 
 	/**

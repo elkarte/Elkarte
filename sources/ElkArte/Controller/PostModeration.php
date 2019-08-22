@@ -59,14 +59,14 @@ class PostModeration extends \ElkArte\AbstractController
 	 */
 	public function action_unapproved()
 	{
-		global $txt, $scripturl, $context, $user_info;
+		global $txt, $scripturl, $context;
 
 		$context['current_view'] = $this->_req->getQuery('sa', 'trim', '') === 'topics' ? 'topics' : 'replies';
 		$context['page_title'] = $txt['mc_unapproved_posts'];
 		$context['header_title'] = $txt['mc_' . ($context['current_view'] === 'topics' ? 'topics' : 'posts')];
 
 		// Work out what boards we can work in!
-		$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
+		$approve_boards = !empty($this->user->mod_cache['ap']) ? $this->user->mod_cache['ap'] : boardsAllowedTo('approve_posts');
 
 		$this->_brd = $this->_req->getPost('brd', 'intval', $this->_req->getQuery('brd', 'intval', null));
 
@@ -164,13 +164,13 @@ class PostModeration extends \ElkArte\AbstractController
 				elseif ($curAction === 'delete')
 				{
 					// Own post is easy!
-					if ($row['id_member'] == $user_info['id'] && ($delete_own_boards == array(0) || in_array($row['id_board'], $delete_own_boards)))
+					if ($row['id_member'] == $this->user->id && ($delete_own_boards == array(0) || in_array($row['id_board'], $delete_own_boards)))
 						$can_add = true;
 					// Is it a reply to their own topic?
 					elseif ($row['id_member'] == $row['id_member_started'] && $row['id_msg'] != $row['id_first_msg'] && ($delete_own_replies == array(0) || in_array($row['id_board'], $delete_own_replies)))
 						$can_add = true;
 					// Someone else's?
-					elseif ($row['id_member'] != $user_info['id'] && ($delete_any_boards == array(0) || in_array($row['id_board'], $delete_any_boards)))
+					elseif ($row['id_member'] != $this->user->id && ($delete_any_boards == array(0) || in_array($row['id_board'], $delete_any_boards)))
 						$can_add = true;
 				}
 
@@ -266,12 +266,12 @@ class PostModeration extends \ElkArte\AbstractController
 	 */
 	public function action_unapproved_attachments()
 	{
-		global $txt, $scripturl, $context, $user_info, $modSettings;
+		global $txt, $scripturl, $context, $modSettings;
 
 		$context['page_title'] = $txt['mc_unapproved_attachments'];
 
 		// Once again, permissions are king!
-		$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
+		$approve_boards = !empty($this->user->mod_cache['ap']) ? $this->user->mod_cache['ap'] : boardsAllowedTo('approve_posts');
 
 		if ($approve_boards == array(0))
 			$approve_query = '';
@@ -472,7 +472,7 @@ class PostModeration extends \ElkArte\AbstractController
 	 */
 	public function action_approve()
 	{
-		global $user_info, $topic, $board;
+		global $topic, $board;
 
 		checkSession('get');
 
@@ -489,12 +489,12 @@ class PostModeration extends \ElkArte\AbstractController
 
 		// If it's the first in a topic then the whole topic gets approved!
 		if ($message_info['id_first_msg'] == $current_msg)
-			approveTopics($topic, !$message_info['approved'], $message_info['id_member_started'] != $user_info['id']);
+			approveTopics($topic, !$message_info['approved'], $message_info['id_member_started'] != $this->user->id);
 		else
 		{
 			approvePosts($current_msg, !$message_info['approved']);
 
-			if ($message_info['id_member'] != $user_info['id'])
+			if ($message_info['id_member'] != $this->user->id)
 				logAction(($message_info['approved'] ? 'un' : '') . 'approve', array('topic' => $topic, 'subject' => $message_info['subject'], 'member' => $message_info['id_member'], 'board' => $board));
 		}
 

@@ -34,6 +34,7 @@ class DispatcherTest extends \PHPUnit\Framework\TestCase
 		{
 			$controller_name = '\\ElkArte\\Controller\\' . ucfirst($action);
 			$controller = new $controller_name(new \ElkArte\EventManager());
+			$controller->setUser(\ElkArte\User::$info);
 			foreach ($auto_actions[$action] as $subaction)
 				$this->assertTrue(method_exists($controller, 'action_' . $subaction));
 		}

@@ -52,19 +52,23 @@ class ModerationCenter extends \ElkArte\AbstractController
 	 */
 	public function prepareModcenter()
 	{
-		global $txt, $context, $scripturl, $modSettings, $user_info, $options;
+		global $txt, $context, $scripturl, $modSettings, $options;
 
 		// Don't run this twice... and don't conflict with the admin bar.
 		if (isset($context['admin_area']))
+		{
 			return;
+		}
 
-		$context['can_moderate_boards'] = $user_info['mod_cache']['bq'] != '0=1';
-		$context['can_moderate_groups'] = $user_info['mod_cache']['gq'] != '0=1';
-		$context['can_moderate_approvals'] = $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']);
+		$context['can_moderate_boards'] = $this->user->mod_cache['bq'] != '0=1';
+		$context['can_moderate_groups'] = $this->user->mod_cache['gq'] != '0=1';
+		$context['can_moderate_approvals'] = $modSettings['postmod_active'] && !empty($this->user->mod_cache['ap']);
 
 		// Everyone using this area must be allowed here!
 		if (!$context['can_moderate_boards'] && !$context['can_moderate_groups'] && !$context['can_moderate_approvals'])
+		{
 			isAllowedTo('access_mod_center');
+		}
 
 		// We're gonna want a menu of some kind.
 		require_once(SUBSDIR . '/Menu.subs.php');
@@ -203,7 +207,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 					),
 					'pm_reports' => array(
 						'label' => $txt['mc_reported_pms'] . (!empty($mod_counts['pm_reports']) ? ' [' . $mod_counts['pm_reports'] . ']' : ''),
-						'enabled' => $user_info['is_admin'],
+						'enabled' => $this->user->is_admin,
 						'controller' => '\\ElkArte\\Controller\\ModerationCenter',
 						'function' => 'action_reportedPosts',
 						'subsections' => array(
@@ -413,7 +417,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 	 */
 	public function action_reportedPosts()
 	{
-		global $txt, $context, $scripturl, $user_info;
+		global $txt, $context, $scripturl;
 
 		theme()->getTemplates()->load('ModerationCenter');
 		require_once(SUBSDIR . '/Moderation.subs.php');
@@ -430,7 +434,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 		$context['sub_template'] = 'reported_posts';
 
 		// This comes under the umbrella of moderating posts.
-		if ($user_info['mod_cache']['bq'] === '0=1')
+		if ($this->user->mod_cache['bq'] === '0=1')
 			isAllowedTo('moderate_forum');
 
 		// Are they wanting to view a particular report?
@@ -587,7 +591,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 	 */
 	public function action_moderationSettings()
 	{
-		global $context, $txt, $user_info;
+		global $context, $txt;
 
 		// Some useful context stuff.
 		theme()->getTemplates()->load('ModerationCenter');
@@ -672,7 +676,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 			// Put it all together.
 			$mod_prefs = $show_reports . '|' . $mod_blocks . '|' . $pref_binary;
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($user_info['id'], array('mod_prefs' => $mod_prefs));
+			updateMemberData($this->user->id, array('mod_prefs' => $mod_prefs));
 		}
 
 		// What blocks does the user currently have selected?
@@ -693,7 +697,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 	 */
 	public function action_modifyWarningTemplate()
 	{
-		global $context, $txt, $user_info;
+		global $context, $txt;
 
 		require_once(SUBSDIR . '/Moderation.subs.php');
 		loadJavascriptFile('admin.js', array(), 'admin_scripts');
@@ -744,7 +748,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 				$template_body = strtr($template_body, array('<br />' => "\n"));
 
 				// Is this personal?
-				$recipient_id = !empty($this->_req->post->make_personal) ? $user_info['id'] : 0;
+				$recipient_id = !empty($this->_req->post->make_personal) ? $this->user->id : 0;
 
 				// If we are this far it's save time.
 				if ($context['is_edit'])
@@ -1030,7 +1034,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 	 */
 	public function action_viewWatchedUsers()
 	{
-		global $modSettings, $context, $txt, $scripturl, $user_info;
+		global $modSettings, $context, $txt, $scripturl;
 
 		// Some important context!
 		$context['page_title'] = $txt['mc_watched_users_title'];
@@ -1080,7 +1084,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 		else
 		{
 			// Still obey permissions!
-			$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
+			$approve_boards = !empty($this->user->mod_cache['ap']) ? $this->user->mod_cache['ap'] : boardsAllowedTo('approve_posts');
 			$delete_boards = boardsAllowedTo('delete_any');
 
 			if ($approve_boards == array(0))
@@ -1700,11 +1704,13 @@ class ModerationCenter extends \ElkArte\AbstractController
 	 */
 	public function block_groupRequests()
 	{
-		global $context, $user_info;
+		global $context;
 
 		// Make sure they can even moderate someone!
-		if ($user_info['mod_cache']['gq'] === '0=1')
+		if ($this->user->mod_cache['gq'] === '0=1')
+		{
 			return 'group_requests_block';
+		}
 
 		$context['group_requests'] = groupRequests();
 
@@ -1716,9 +1722,9 @@ class ModerationCenter extends \ElkArte\AbstractController
 	 */
 	public function block_latestNews()
 	{
-		global $context, $user_info;
+		global $context;
 
-		$context['time_format'] = urlencode($user_info['time_format']);
+		$context['time_format'] = urlencode($this->user->time_format);
 
 		// Return the template to use.
 		return 'latest_news';
@@ -1787,7 +1793,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 	 */
 	public function block_notes()
 	{
-		global $context, $scripturl, $txt, $user_info;
+		global $context, $scripturl, $txt;
 
 		// Are we saving a note?
 		if (isset($this->_req->post->makenote) && isset($this->_req->post->new_note))
@@ -1800,7 +1806,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 			if (!empty($new_note) && $new_note !== $txt['mc_click_add_note'])
 			{
 				// Insert it into the database then!
-				addModeratorNote($user_info['id'], $user_info['name'], $new_note);
+				addModeratorNote($this->user->id, $this->user->name, $new_note);
 
 				// Clear the cache.
 				\ElkArte\Cache\Cache::instance()->remove('moderator_notes');
@@ -1866,9 +1872,9 @@ class ModerationCenter extends \ElkArte\AbstractController
 	 */
 	public function block_reportedPosts()
 	{
-		global $context, $user_info, $scripturl;
+		global $context, $scripturl;
 
-		if ($user_info['mod_cache']['bq'] === '0=1')
+		if ($this->user->mod_cache['bq'] === '0=1')
 			return 'reported_posts_block';
 
 		$context['reported_posts'] = array();

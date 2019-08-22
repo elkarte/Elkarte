@@ -241,6 +241,7 @@ class AdminSettingsSearch
 			{
 				// an OOP controller: get the settings from the settings method.
 				$controller = new $setting_area[2](new EventManager());
+				$controller->setUser(\ElkArte\User::$info);
 				$controller->pre_dispatch();
 				$config_vars = $controller->{$setting_area[0]}();
 			}

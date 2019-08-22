@@ -90,6 +90,7 @@ function elk_main()
 
 		// Load the user's cookie (or set as guest) and load their settings.
 		loadUserSettings();
+		$dispatcher->setUser(\ElkArte\User::$info);
 
 		// Load the current board's information.
 		loadBoard();

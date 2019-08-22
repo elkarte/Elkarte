@@ -222,7 +222,7 @@ class ProfileHistory extends \ElkArte\AbstractController
 	 */
 	public function action_trackip()
 	{
-		global $scripturl, $txt, $user_info, $modSettings, $context;
+		global $scripturl, $txt, $modSettings, $context;
 
 		// Can the user do this?
 		isAllowedTo('moderate_forum');
@@ -233,7 +233,7 @@ class ProfileHistory extends \ElkArte\AbstractController
 
 		if ($this->_memID == 0)
 		{
-			$context['ip'] = $user_info['ip'];
+			$context['ip'] = $this->user->ip;
 			$context['page_title'] = $txt['profile'];
 			$context['base_url'] = $scripturl . '?action=trackip';
 		}

@@ -41,8 +41,6 @@ class ModerateAttachments extends \ElkArte\AbstractController
 	 */
 	public function action_attachapprove()
 	{
-		global $user_info;
-
 		// Security is our primary concern...
 		checkSession('get');
 
@@ -66,7 +64,7 @@ class ModerateAttachments extends \ElkArte\AbstractController
 
 		// @todo nb: this requires permission to approve posts, not manage attachments
 		// Now we have some ID's cleaned and ready to approve, but first - let's check we have permission!
-		$allowed_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
+		$allowed_boards = !empty($this->user->mod_cache['ap']) ? $this->user->mod_cache['ap'] : boardsAllowedTo('approve_posts');
 
 		if ($allowed_boards == array(0))
 		{

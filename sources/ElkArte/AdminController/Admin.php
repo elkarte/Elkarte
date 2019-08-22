@@ -640,7 +640,7 @@ class Admin extends \ElkArte\AbstractController
 	 */
 	public function action_home()
 	{
-		global $txt, $context, $user_info, $settings;
+		global $txt, $context, $settings;
 
 		// We need a little help
 		require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -656,7 +656,7 @@ class Admin extends \ElkArte\AbstractController
 		}
 
 		// This makes it easier to get the latest news with your time format.
-		$context['time_format'] = urlencode($user_info['time_format']);
+		$context['time_format'] = urlencode($this->user->time_format);
 		$context['forum_version'] = FORUM_VERSION;
 
 		// Get a list of current server versions.
@@ -687,7 +687,7 @@ class Admin extends \ElkArte\AbstractController
 	 */
 	public function action_credits()
 	{
-		global $txt, $context, $user_info;
+		global $txt, $context;
 
 		// We need a little help from our friends
 		require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -714,7 +714,7 @@ class Admin extends \ElkArte\AbstractController
 		$context += prepareCreditsData();
 
 		// This makes it easier to get the latest news with your time format.
-		$context['time_format'] = urlencode($user_info['time_format']);
+		$context['time_format'] = urlencode($this->user->time_format);
 		$context['forum_version'] = FORUM_VERSION;
 
 		// Get a list of current server versions.
@@ -732,7 +732,7 @@ class Admin extends \ElkArte\AbstractController
 			$context['latest_updates'] = replaceBasicActionUrl($txt[$index]);
 			require_once(SUBSDIR . '/Themes.subs.php');
 
-			updateThemeOptions(array(1, $user_info['id'], 'dismissed_' . $index, 1));
+			updateThemeOptions(array(1, $this->user->id, 'dismissed_' . $index, 1));
 		}
 	}
 
@@ -901,6 +901,7 @@ class Admin extends \ElkArte\AbstractController
 		$this->_req->post->types = '';
 
 		$managemembers = new ManageMembers(new \ElkArte\EventManager());
+		$managemembers->setUser(\ElkArte\User::$info);
 		$managemembers->pre_dispatch();
 		$managemembers->action_index();
 	}

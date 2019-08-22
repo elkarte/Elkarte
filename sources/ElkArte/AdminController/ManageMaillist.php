@@ -326,6 +326,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 
 					// Read/parse this message for viewing
 					$controller = new \ElkArte\Controller\Emailpost(new \ElkArte\EventManager());
+					$controller->setUser(\ElkArte\User::$info);
 					$result = $controller->action_pbe_preview($data);
 					$text = isset($result['body']) ? $result['body'] : '';
 					$email_to = isset($result['to']) ? $result['to'] : '';
@@ -431,6 +432,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 
 					// Lets TRY AGAIN to make a post!
 					$controller = new \ElkArte\Controller\Emailpost(new \ElkArte\EventManager());
+					$controller->setUser(\ElkArte\User::$info);
 					$text = $controller->action_pbe_post($data, $force, $key);
 
 					// Assuming all went well, remove this entry and file since we are done.
@@ -1778,7 +1780,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 	 */
 	public function action_modify_bounce_templates()
 	{
-		global $context, $txt, $user_info;
+		global $context, $txt;
 
 		require_once(SUBSDIR . '/Moderation.subs.php');
 
@@ -1829,7 +1831,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 				$template_body = strtr($template_body, array('<br />' => "\n"));
 
 				// Is this personal?
-				$recipient_id = !empty($this->_req->post->make_personal) ? $user_info['id'] : 0;
+				$recipient_id = !empty($this->_req->post->make_personal) ? $this->user->id : 0;
 
 				// Updating or adding ?
 				if ($context['is_edit'])

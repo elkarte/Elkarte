@@ -22,6 +22,7 @@ class TestManageBoardsSettings extends \PHPUnit\Framework\TestCase
 		global $txt;
 
 		$controller = new \ElkArte\AdminController\ManageBoards(new \ElkArte\EventManager());
+		$controller->setUser(\ElkArte\User::$info);
 		$controller->pre_dispatch();
 		$settings = $controller->settings_search();
 

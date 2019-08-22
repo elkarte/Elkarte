@@ -1425,7 +1425,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 	 */
 	public function action_install()
 	{
-		global $modSettings, $scripturl, $context, $txt, $user_info;
+		global $modSettings, $scripturl, $context, $txt;
 
 		isAllowedTo('manage_smileys');
 		checkSession('request');
@@ -1624,8 +1624,8 @@ class ManageSmileys extends \ElkArte\AbstractController
 				'name' => $smileyInfo['name'],
 				'package_id' => $smileyInfo['id'],
 				'version' => $smileyInfo['filename'],
-				'id_member' => $user_info['id'],
-				'member_name' => $user_info['name'],
+				'id_member' => $this->user->id,
+				'member_name' => $this->user->name,
 				'credits_tag' => $credits_tag,
 			);
 			logPackageInstall($installed);

@@ -52,6 +52,7 @@ class ControllerRedirectException extends \Exception
 		}
 
 		$controller = new $this->_controller(new \ElkArte\EventManager());
+		$controller->setUser(\ElkArte\User::$info);
 		$controller->pre_dispatch();
 
 		return $controller->{$this->_method}();

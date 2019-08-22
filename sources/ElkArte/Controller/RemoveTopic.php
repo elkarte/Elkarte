@@ -61,7 +61,7 @@ class RemoveTopic extends \ElkArte\AbstractController
 	 */
 	public function action_removetopic2()
 	{
-		global $user_info, $topic, $board, $modSettings;
+		global $topic, $board, $modSettings;
 
 		// Make sure they aren't being lead around by someone. (:@)
 		checkSession('get');
@@ -81,7 +81,7 @@ class RemoveTopic extends \ElkArte\AbstractController
 		$this->_topic_info = getTopicInfo($topic, 'message');
 
 		// Can you remove your own or any topic
-		if ($this->_topic_info['id_member_started'] == $user_info['id'] && !allowedTo('remove_any'))
+		if ($this->_topic_info['id_member_started'] == $this->user->id && !allowedTo('remove_any'))
 		{
 			isAllowedTo('remove_own');
 		}
@@ -100,7 +100,7 @@ class RemoveTopic extends \ElkArte\AbstractController
 		removeTopics($topic);
 
 		// Note, only log topic ID in native form if it's not gone forever.
-		if (allowedTo('remove_any') || (allowedTo('remove_own') && $this->_topic_info['id_member_started'] == $user_info['id']))
+		if (allowedTo('remove_any') || (allowedTo('remove_own') && $this->_topic_info['id_member_started'] == $this->user->id))
 		{
 			logAction('remove', array(
 				(empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $board ? 'topic' : 'old_topic_id') => $topic,
@@ -239,14 +239,14 @@ class RemoveTopic extends \ElkArte\AbstractController
 	 */
 	private function _verifyDeletePermissions()
 	{
-		global $user_info, $modSettings;
+		global $modSettings;
 
-		if ($this->_topic_info['id_member'] == $user_info['id'])
+		if ($this->_topic_info['id_member'] == $this->user->id)
 		{
 			// Are you allowed to delete it
 			if (!allowedTo('delete_own'))
 			{
-				if ($this->_topic_info['id_member_started'] == $user_info['id'] && !allowedTo('delete_any'))
+				if ($this->_topic_info['id_member_started'] == $this->user->id && !allowedTo('delete_any'))
 				{
 					isAllowedTo('delete_replies');
 				}
@@ -256,14 +256,14 @@ class RemoveTopic extends \ElkArte\AbstractController
 				}
 			}
 			elseif (!allowedTo('delete_any')
-				&& ($this->_topic_info['id_member_started'] != $user_info['id'] || !allowedTo('delete_replies'))
+				&& ($this->_topic_info['id_member_started'] != $this->user->id || !allowedTo('delete_replies'))
 				&& !empty($modSettings['edit_disable_time'])
 				&& $this->_topic_info['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
 			{
 				throw new \ElkArte\Exceptions\Exception('modify_post_time_passed', false);
 			}
 		}
-		elseif ($this->_topic_info['id_member_started'] == $user_info['id'] && !allowedTo('delete_any'))
+		elseif ($this->_topic_info['id_member_started'] == $this->user->id && !allowedTo('delete_any'))
 		{
 			isAllowedTo('delete_replies');
 		}
@@ -310,13 +310,13 @@ class RemoveTopic extends \ElkArte\AbstractController
 	 */
 	private function _checkApproval()
 	{
-		global $modSettings, $user_info;
+		global $modSettings;
 
 		// Verify they can see this!
 		if ($modSettings['postmod_active']
 			&& !$this->_topic_info['approved']
 			&& !empty($this->_topic_info['id_member'])
-			&& $this->_topic_info['id_member'] != $user_info['id'])
+			&& $this->_topic_info['id_member'] != $this->user->id)
 		{
 			isAllowedTo('approve_posts');
 		}

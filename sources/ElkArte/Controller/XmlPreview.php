@@ -129,14 +129,14 @@ class XmlPreview extends \ElkArte\AbstractController
 	 */
 	public function action_sig_preview()
 	{
-		global $context, $txt, $user_info;
+		global $context, $txt;
 
 		require_once(SUBSDIR . '/Profile.subs.php');
 		theme()->getTemplates()->loadLanguageFile('Profile');
 		theme()->getTemplates()->loadLanguageFile('Errors');
 
 		$user = isset($this->_req->post->user) ? (int) $this->_req->post->user : 0;
-		$is_owner = $user == $user_info['id'];
+		$is_owner = $user == $this->user->id;
 
 		// @todo Temporary
 		// Borrowed from loadAttachmentContext in Display.controller.php
@@ -214,7 +214,7 @@ class XmlPreview extends \ElkArte\AbstractController
 	 */
 	public function action_warning_preview()
 	{
-		global $context, $txt, $user_info, $scripturl, $mbname;
+		global $context, $txt, $scripturl, $mbname;
 
 		require_once(SUBSDIR . '/Post.subs.php');
 		theme()->getTemplates()->loadLanguageFile('Errors');
@@ -255,7 +255,7 @@ class XmlPreview extends \ElkArte\AbstractController
 					'{REGARDS}',
 				);
 				$replace = array(
-					$user_info['name'],
+					$this->user->name,
 					$mbname,
 					$scripturl,
 					replaceBasicActionUrl($txt['regards_team']),

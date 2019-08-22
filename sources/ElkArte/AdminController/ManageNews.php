@@ -528,7 +528,7 @@ class ManageNews extends \ElkArte\AbstractController
 	 */
 	public function action_mailingsend($clean_only = false)
 	{
-		global $txt, $context, $scripturl, $modSettings, $user_info;
+		global $txt, $context, $scripturl, $modSettings;
 
 		// A nice successful screen if you did it
 		if (isset($this->_req->query->success))
@@ -680,7 +680,7 @@ class ManageNews extends \ElkArte\AbstractController
 		}
 
 		// Use the default time format.
-		$user_info['time_format'] = $modSettings['time_format'];
+		$this->user->time_format = $modSettings['time_format'];
 
 		$variables = array(
 			'{$board_url}',

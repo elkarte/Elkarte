@@ -248,6 +248,7 @@ class Packages extends \ElkArte\AbstractController
 
 		// Now prepare things for the template using the package actions class
 		$pka = new PackageActions(new \ElkArte\EventManager());
+		$pka->setUser(\ElkArte\User::$info);
 		$pka->test_init($actions, $this->_uninstalling, $this->_base_path, $this->theme_paths);
 
 		$context['has_failure'] = $pka->has_failure;
@@ -647,6 +648,7 @@ class Packages extends \ElkArte\AbstractController
 		{
 			// @todo Make a log of any errors that occurred and output them?
 			$pka = new PackageActions(new \ElkArte\EventManager());
+			$pka->setUser(\ElkArte\User::$info);
 			$pka->install_init($install_log, $this->_uninstalling, $this->_base_path, $this->theme_paths, $themes_installed);
 			$failed_steps = $pka->failed_steps;
 			$themes_installed = $pka->themes_installed;

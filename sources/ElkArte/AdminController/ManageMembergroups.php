@@ -112,7 +112,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 	 */
 	public function action_list()
 	{
-		global $txt, $scripturl, $context, $user_info;
+		global $txt, $scripturl, $context;
 
 		$context['page_title'] = $txt['membergroups_title'];
 
@@ -127,7 +127,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 				'function' => 'list_getMembergroups',
 				'params' => array(
 					'regular',
-					$user_info['id'],
+					$this->user->id,
 					allowedTo('manage_membergroups'),
 					allowedTo('admin_forum'),
 				),
@@ -239,7 +239,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 				'function' => 'list_getMembergroups',
 				'params' => array(
 					'post_count',
-					$user_info['id'],
+					$this->user->id,
 					allowedTo('manage_membergroups'),
 					allowedTo('admin_forum'),
 				),

@@ -135,7 +135,7 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 	public function action_messageindex()
 	{
 		global $txt, $scripturl, $board, $modSettings, $context;
-		global $options, $settings, $board_info, $user_info;
+		global $options, $settings, $board_info;
 
 		// Fairly often, we'll work with boards. Current board, sub-boards.
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -245,7 +245,7 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 		}
 
 		// Mark current and parent boards as seen.
-		if (!$user_info['is_guest'])
+		if ($this->user->is_guest === false)
 		{
 			// We can't know they read it if we allow prefetches.
 			stop_prefetching();
@@ -281,7 +281,7 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 			}
 
 			// From now on, they've seen it. So we reset notifications.
-			$context['is_marked_notify'] = resetSentBoardNotification($user_info['id'], $board);
+			$context['is_marked_notify'] = resetSentBoardNotification($this->user->id, $board);
 		}
 		else
 			$context['is_marked_notify'] = false;
@@ -290,7 +290,7 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 		$context['page_title'] = strip_tags($board_info['name']);
 
 		// Set the variables up for the template.
-		$context['can_mark_notify'] = allowedTo('mark_notify') && !$user_info['is_guest'];
+		$context['can_mark_notify'] = allowedTo('mark_notify') && $this->user->is_guest === false;
 		$context['can_post_new'] = allowedTo('post_new') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_topics'));
 		$context['can_post_poll'] = !empty($modSettings['pollMode']) && allowedTo('poll_post') && $context['can_post_new'];
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
@@ -381,7 +381,7 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 		// Allow integration to modify / add to the $indexOptions
 		call_integration_hook('integrate_messageindex_topics', array(&$sort_column, &$indexOptions));
 
-		$topics_info = messageIndexTopics($board, $user_info['id'], $start, $maxindex, $context['sort_by'], $sort_column, $indexOptions);
+		$topics_info = messageIndexTopics($board, $this->user->id, $start, $maxindex, $context['sort_by'], $sort_column, $indexOptions);
 
 		$context['topics'] = \ElkArte\TopicUtil::prepareContext($topics_info, false, !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128);
 
@@ -394,9 +394,9 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 
 		$topic_ids = array_keys($context['topics']);
 
-		if (!empty($modSettings['enableParticipation']) && !$user_info['is_guest'] && !empty($topic_ids))
+		if (!empty($modSettings['enableParticipation']) && $this->user->is_guest === false && !empty($topic_ids))
 		{
-			$topics_participated_in = topicsParticipation($user_info['id'], $topic_ids);
+			$topics_participated_in = topicsParticipation($this->user->id, $topic_ids);
 			foreach ($topics_participated_in as $participated)
 			{
 				$context['topics'][$participated['id_topic']]['is_posted_in'] = true;
@@ -429,7 +429,7 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 			// Set permissions for all the topics.
 			foreach ($context['topics'] as $t => $topic)
 			{
-				$started = $topic['first_post']['member']['id'] == $user_info['id'];
+				$started = $topic['first_post']['member']['id'] == $this->user->id;
 				$context['topics'][$t]['quick_mod'] = array(
 					'lock' => allowedTo('lock_any') || ($started && allowedTo('lock_own')),
 					'sticky' => allowedTo('make_sticky'),
@@ -477,7 +477,7 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 		), true);
 
 		// They can only mark read if they are logged in and it's enabled!
-		if (!$user_info['is_guest'] && $settings['show_mark_read'])
+		if ($this->user->is_guest === false && $settings['show_mark_read'])
 			$context['normal_buttons']['markread'] = array(
 				'text' => 'mark_read_short',
 				'image' => 'markread.png',
@@ -497,7 +497,7 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 	 */
 	public function action_quickmod()
 	{
-		global $board, $user_info, $modSettings, $context;
+		global $board, $modSettings, $context;
 
 		// Check the session = get or post.
 		checkSession('request');
@@ -553,18 +553,30 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 			$redirect_url = isset($this->_req->post->redirect_url) ? $this->_req->post->redirect_url : (isset($_SESSION['old_url']) ? $_SESSION['old_url'] : getUrlQuery('action', $modSettings['default_forum_action']));
 		}
 
-		if (!$user_info['is_guest'])
+		if ($this->user->is_guest === false)
+		{
 			$possibleActions[] = 'markread';
+		}
 		if (!empty($boards_can['make_sticky']))
+		{
 			$possibleActions[] = 'sticky';
+		}
 		if (!empty($boards_can['move_any']) || !empty($boards_can['move_own']))
+		{
 			$possibleActions[] = 'move';
+		}
 		if (!empty($boards_can['remove_any']) || !empty($boards_can['remove_own']))
+		{
 			$possibleActions[] = 'remove';
+		}
 		if (!empty($boards_can['lock_any']) || !empty($boards_can['lock_own']))
+		{
 			$possibleActions[] = 'lock';
+		}
 		if (!empty($boards_can['merge_any']))
+		{
 			$possibleActions[] = 'merge';
+		}
 
 		// Two methods: $_REQUEST['actions'] (id_topic => action), and $_REQUEST['topics'] and $this->_req->post->qaction.
 		// (if action is 'move', $_REQUEST['move_to'] or $_REQUEST['move_tos'][$topic] is used.)
@@ -582,6 +594,7 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 					redirectexit($redirect_url);
 
 				$controller = new MergeTopics(new \ElkArte\EventManager());
+				$controller->setUser(\ElkArte\User::$info);
 				$controller->pre_dispatch();
 				return $controller->action_mergeExecute($this->_req->post->topics);
 			}
@@ -643,7 +656,7 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 					elseif ($all_actions[$row['id_topic']] === 'move'
 						&& !in_array(0, $boards_can['move_any'])
 						&& !in_array($row['id_board'], $boards_can['move_any'])
-						&& ($row['id_member_started'] != $user_info['id']
+						&& ($row['id_member_started'] != $this->user->id
 							|| (!in_array(0, $boards_can['move_own']) && !in_array($row['id_board'], $boards_can['move_own']))))
 					{
 						continue;
@@ -651,7 +664,7 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 					elseif ($all_actions[$row['id_topic']] === 'remove'
 						&& !in_array(0, $boards_can['remove_any'])
 						&& !in_array($row['id_board'], $boards_can['remove_any'])
-						&& ($row['id_member_started'] != $user_info['id']
+						&& ($row['id_member_started'] != $this->user->id
 							|| (!in_array(0, $boards_can['remove_own']) && !in_array($row['id_board'], $boards_can['remove_own']))))
 					{
 						continue;
@@ -659,7 +672,7 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 					elseif ($all_actions[$row['id_topic']] === 'lock'
 						&& !in_array(0, $boards_can['lock_any'])
 						&& !in_array($row['id_board'], $boards_can['lock_any'])
-						&& ($row['id_member_started'] != $user_info['id']
+						&& ($row['id_member_started'] != $this->user->id
 							|| $row['locked'] == 1
 							|| (!in_array(0, $boards_can['lock_own']) && !in_array($row['id_board'], $boards_can['lock_own']))))
 					{
@@ -704,40 +717,52 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 
 		// Do all the stickies...
 		if (!empty($stickyCache))
+		{
 			toggleTopicSticky($stickyCache, true);
+		}
 
 		// Move sucka! (this is, by the by, probably the most complicated part....)
 		if (!empty($moveCache[0]))
+		{
 			moveTopicsPermissions($moveCache);
+		}
 
 		// Now delete the topics...
 		if (!empty($removeCache))
+		{
 			removeTopicsPermissions($removeCache);
+		}
 
 		// And (almost) lastly, lock the topics...
 		if (!empty($lockCache))
+		{
 			toggleTopicsLock($lockCache, true);
+		}
 
 		if (!empty($markCache))
 		{
-			$logged_topics = getLoggedTopics($user_info['id'], $markCache);
+			$logged_topics = getLoggedTopics($this->user->id, $markCache);
 
 			$markArray = array();
 			foreach ($markCache as $topic)
-				$markArray[] = array($user_info['id'], $topic, $modSettings['maxMsgID'], (int) !empty($logged_topics[$topic]));
+			{
+				$markArray[] = array($this->user->id, $topic, $modSettings['maxMsgID'], (int) !empty($logged_topics[$topic]));
+			}
 
 			markTopicsRead($markArray, true);
 		}
 
 		updateTopicStats();
 		require_once(SUBSDIR . '/Messages.subs.php');
-			updateMessageStats();
+		updateMessageStats();
 		updateSettings(array(
 			'calendar_updated' => time(),
 		));
 
 		if (!empty($affectedBoards))
+		{
 			updateLastMessages(array_keys($affectedBoards));
+		}
 
 		redirectexit($redirect_url);
 	}

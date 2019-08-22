@@ -537,7 +537,7 @@ class ProfileAccount extends \ElkArte\AbstractController
 	 */
 	public function action_deleteaccount2()
 	{
-		global $user_info, $context, $cur_profile, $modSettings;
+		global $context, $cur_profile, $modSettings;
 
 		// Try get more time...
 		detectServer()->setTimeLimit(600);
@@ -576,7 +576,7 @@ class ProfileAccount extends \ElkArte\AbstractController
 		}
 
 		// Do you have permission to delete others profiles, or is that your profile you wanna delete?
-		if ($this->_memID != $user_info['id'])
+		if ($this->_memID != $this->user->id)
 		{
 			isAllowedTo('profile_remove_any');
 
@@ -623,6 +623,7 @@ class ProfileAccount extends \ElkArte\AbstractController
 			deleteMembers($this->_memID);
 
 			$controller = new Auth(new \ElkArte\EventManager());
+			$controller->setUser(\ElkArte\User::$info);
 			$controller->action_logout(true);
 
 			redirectexit();

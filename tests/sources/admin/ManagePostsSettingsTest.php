@@ -20,6 +20,7 @@ class TestManagePostsSettings extends \PHPUnit\Framework\TestCase
 	public function testSettings()
 	{
 		$controller = new \ElkArte\AdminController\ManagePosts(new \ElkArte\EventManager());
+		$controller->setUser(\ElkArte\User::$info);
 		$controller->pre_dispatch();
 		$settings = $controller->settings_search();
 

@@ -73,6 +73,7 @@ class TestRecentPosts extends \PHPUnit\Framework\TestCase
 		global $context;
 
 		$controller = new \ElkArte\Controller\Recent(new \ElkArte\EventManager());
+		$controller->setUser(\ElkArte\User::$info);
 		$controller->pre_dispatch();
 		$controller->action_recent();
 

@@ -282,11 +282,13 @@ class Emailuser extends \ElkArte\AbstractController
 	 */
 	public function action_email()
 	{
-		global $context, $user_info, $txt;
+		global $context, $txt;
 
 		// Can the user even see this information?
-		if ($user_info['is_guest'])
+		if ($this->user->is_guest)
+		{
 			throw new \ElkArte\Exceptions\Exception('no_access', false);
+		}
 
 		isAllowedTo('send_email_to_members');
 
@@ -375,7 +377,7 @@ class Emailuser extends \ElkArte\AbstractController
 			$validator->validate($this->_req->post);
 
 			// If it's a guest sort out their names.
-			if ($user_info['is_guest'])
+			if ($this->user->is_guest)
 			{
 				$errors = $validator->validation_errors(array('y_name', 'y_email'));
 				if ($errors)
@@ -393,8 +395,8 @@ class Emailuser extends \ElkArte\AbstractController
 			}
 			else
 			{
-				$from_name = $user_info['name'];
-				$from_email = $user_info['email'];
+				$from_name = $this->user->name;
+				$from_email = $this->user->email;
 			}
 
 			// Check we have a body (etc).
@@ -443,7 +445,7 @@ class Emailuser extends \ElkArte\AbstractController
 	 */
 	public function action_reporttm()
 	{
-		global $txt, $modSettings, $user_info, $context;
+		global $txt, $modSettings, $context;
 
 		$context['robot_no_index'] = true;
 
@@ -474,7 +476,7 @@ class Emailuser extends \ElkArte\AbstractController
 			throw new \ElkArte\Exceptions\Exception('no_board', false);
 
 		// Do we need to show the visual verification image?
-		$context['require_verification'] = $user_info['is_guest'] && !empty($modSettings['guests_report_require_captcha']);
+		$context['require_verification'] = $this->user->is_guest && !empty($modSettings['guests_report_require_captcha']);
 		if ($context['require_verification'])
 		{
 			$verificationOptions = array(
@@ -527,7 +529,7 @@ class Emailuser extends \ElkArte\AbstractController
 	 */
 	public function action_reporttm2()
 	{
-		global $txt, $topic, $board, $user_info, $modSettings, $language, $context;
+		global $txt, $topic, $board, $modSettings, $language, $context;
 
 		// You must have the proper permissions!
 		isAllowedTo('report_any');
@@ -553,18 +555,18 @@ class Emailuser extends \ElkArte\AbstractController
 			$report_errors->addError('post_too_long');
 
 		// Guests need to provide their address!
-		if ($user_info['is_guest'])
+		if ($this->user->is_guest)
 		{
 			if (!\ElkArte\DataValidator::is_valid($this->_req->post, array('email' => 'valid_email'), array('email' => 'trim')))
 				empty($this->_req->post->email) ? $report_errors->addError('no_email') : $report_errors->addError('bad_email');
 
 			isBannedEmail($this->_req->post->email, 'cannot_post', sprintf($txt['you_are_post_banned'], $txt['guest_title']));
 
-			$user_info['email'] = htmlspecialchars($this->_req->post->email, ENT_COMPAT, 'UTF-8');
+			$this->user->email = htmlspecialchars($this->_req->post->email, ENT_COMPAT, 'UTF-8');
 		}
 
 		// Could they get the right verification code?
-		if ($user_info['is_guest'] && !empty($modSettings['guests_report_require_captcha']))
+		if ($this->user->is_guest && !empty($modSettings['guests_report_require_captcha']))
 		{
 			$verificationOptions = array(
 				'id' => 'report',
@@ -593,7 +595,7 @@ class Emailuser extends \ElkArte\AbstractController
 			throw new \ElkArte\Exceptions\Exception('no_board', false);
 
 		$poster_name = un_htmlspecialchars($message['real_name']) . ($message['real_name'] != $message['poster_name'] ? ' (' . $message['poster_name'] . ')' : '');
-		$reporterName = un_htmlspecialchars($user_info['name']) . ($user_info['name'] != $user_info['username'] && $user_info['username'] != '' ? ' (' . $user_info['username'] . ')' : '');
+		$reporterName = un_htmlspecialchars($this->user->name) . ($this->user->name != $this->user->username && $this->user->username != '' ? ' (' . $this->user->username . ')' : '');
 		$subject = un_htmlspecialchars($message['subject']);
 
 		// Get a list of members with the moderate_board permission.
@@ -650,7 +652,7 @@ class Emailuser extends \ElkArte\AbstractController
 			$emaildata = loadEmailTemplate('report_to_moderator', $replacements, empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']);
 
 			// Send it to the moderator.
-			sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], $user_info['email'], null, false, 2);
+			sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], $this->user->email, null, false, 2);
 		}
 
 		// Keep track of when the mod reports get updated, that way we know when we need to look again.

@@ -35,10 +35,10 @@ class Attachment extends \ElkArte\AbstractController
 	 */
 	public function needTheme($action = '')
 	{
-		global $modSettings, $user_info, $maintenance;
+		global $modSettings, $maintenance;
 
 		// If guests are not allowed to browse and the use is a guest... kick him!
-		if (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'])
+		if (empty($modSettings['allow_guestAccess']) && $this->user->is_guest)
 		{
 			return true;
 		}
@@ -284,7 +284,7 @@ class Attachment extends \ElkArte\AbstractController
 	 */
 	public function action_dlattach()
 	{
-		global $modSettings, $user_info, $context, $topic, $board, $settings;
+		global $modSettings, $context, $topic, $board, $settings;
 
 		// Some defaults that we need.
 		$context['no_last_modified'] = true;
@@ -300,7 +300,7 @@ class Attachment extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Temporary attachment, special case...
-		if (isset($this->_req->query->attach) && strpos($this->_req->query->attach, 'post_tmp_' . $user_info['id'] . '_') !== false)
+		if (isset($this->_req->query->attach) && strpos($this->_req->query->attach, 'post_tmp_' . $this->user->id . '_') !== false)
 		{
 			$this->action_tmpattach();
 			return;
@@ -399,7 +399,7 @@ class Attachment extends \ElkArte\AbstractController
 		list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
 
 		// If it isn't yet approved, do they have permission to view it?
-		if (!$is_approved && ($id_member == 0 || $user_info['id'] != $id_member) && ($attachment_type == 0 || $attachment_type == 3))
+		if (!$is_approved && ($id_member == 0 || $this->user->id != $id_member) && ($attachment_type == 0 || $attachment_type == 3))
 			isAllowedTo('approve_posts', $id_board);
 
 		// Update the download counter (unless it's a thumbnail or an avatar).
@@ -486,7 +486,7 @@ class Attachment extends \ElkArte\AbstractController
 	 */
 	public function action_tmpattach()
 	{
-		global $modSettings, $user_info, $topic;
+		global $modSettings, $topic;
 
 		// Make sure some attachment was requested!
 		if (!isset($this->_req->query->attach))
@@ -523,7 +523,7 @@ class Attachment extends \ElkArte\AbstractController
 				list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
 
 				// If it isn't yet approved, do they have permission to view it?
-				if (!$is_approved && ($id_member == 0 || $user_info['id'] != $id_member) && ($attachment_type == 0 || $attachment_type == 3))
+				if (!$is_approved && ($id_member == 0 || $this->user->id != $id_member) && ($attachment_type == 0 || $attachment_type == 3))
 					isAllowedTo('approve_posts');
 
 				$filename = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $file_hash);

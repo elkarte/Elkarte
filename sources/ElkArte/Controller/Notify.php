@@ -57,7 +57,7 @@ class Notify extends \ElkArte\AbstractController
 	 */
 	public function action_notify()
 	{
-		global $topic, $scripturl, $txt, $user_info, $context;
+		global $topic, $scripturl, $txt, $context;
 
 		// Make sure they aren't a guest or something - guests can't really receive notifications!
 		is_not_guest();
@@ -74,7 +74,7 @@ class Notify extends \ElkArte\AbstractController
 			theme()->getTemplates()->load('Notify');
 
 			// Find out if they have notification set for this topic already.
-			$context['notification_set'] = hasTopicNotification($user_info['id'], $topic);
+			$context['notification_set'] = hasTopicNotification($this->user->id, $topic);
 
 			// Set the template variables...
 			$context['topic_href'] = $scripturl . '?topic=' . $topic . '.' . $this->_req->query->start;
@@ -104,7 +104,7 @@ class Notify extends \ElkArte\AbstractController
 	 */
 	public function action_notify_api()
 	{
-		global $topic, $txt, $scripturl, $context, $user_info;
+		global $topic, $txt, $scripturl, $context;
 
 		theme()->getTemplates()->load('Xml');
 
@@ -112,7 +112,7 @@ class Notify extends \ElkArte\AbstractController
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		// Even with Ajax, guests still can't do this
-		if ($user_info['is_guest'])
+		if ($this->user->is_guest)
 		{
 			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
@@ -161,10 +161,10 @@ class Notify extends \ElkArte\AbstractController
 	 */
 	private function _toggle_topic_notification()
 	{
-		global $user_info, $topic;
+		global $topic;
 
 		// Attempt to turn notifications on/off.
-		setTopicNotification($user_info['id'], $topic, $this->_req->query->sa === 'on');
+		setTopicNotification($this->user->id, $topic, $this->_req->query->sa === 'on');
 	}
 
 	/**
@@ -182,7 +182,7 @@ class Notify extends \ElkArte\AbstractController
 	 */
 	public function action_notifyboard()
 	{
-		global $scripturl, $txt, $board, $user_info, $context;
+		global $scripturl, $txt, $board, $context;
 
 		// Permissions are an important part of anything ;).
 		is_not_guest();
@@ -199,7 +199,7 @@ class Notify extends \ElkArte\AbstractController
 			theme()->getTemplates()->load('Notify');
 
 			// Find out if they have notification set for this board already.
-			$context['notification_set'] = hasBoardNotification($user_info['id'], $board);
+			$context['notification_set'] = hasBoardNotification($this->user->id, $board);
 
 			// Set the template variables...
 			$context['board_href'] = $scripturl . '?board=' . $board . '.' . $this->_req->query->start;
@@ -230,7 +230,7 @@ class Notify extends \ElkArte\AbstractController
 	 */
 	public function action_notifyboard_api()
 	{
-		global $scripturl, $txt, $board, $user_info, $context;
+		global $scripturl, $txt, $board, $context;
 
 		theme()->getTemplates()->load('Xml');
 
@@ -238,7 +238,7 @@ class Notify extends \ElkArte\AbstractController
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		// Permissions are an important part of anything ;).
-		if ($user_info['is_guest'])
+		if ($this->user->is_guest)
 		{
 			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
@@ -287,13 +287,13 @@ class Notify extends \ElkArte\AbstractController
 	 */
 	private function _toggle_board_notification()
 	{
-		global $user_info, $board;
+		global $board;
 
 		// Our board functions are here
 		require_once(SUBSDIR . '/Boards.subs.php');
 
 		// Turn notification on/off for this board.
-		setBoardNotification($user_info['id'], $board, $this->_req->query->sa === 'on');
+		setBoardNotification($this->user->id, $board, $this->_req->query->sa === 'on');
 	}
 
 	/**
@@ -309,12 +309,12 @@ class Notify extends \ElkArte\AbstractController
 	 */
 	public function action_unwatchtopic()
 	{
-		global $user_info, $topic, $modSettings;
+		global $topic, $modSettings;
 
 		is_not_guest();
 
 		// Let's do something only if the function is enabled
-		if (!$user_info['is_guest'] && !empty($modSettings['enable_unwatch']))
+		if ($this->user->is_guest === false && !empty($modSettings['enable_unwatch']))
 		{
 			checkSession('get');
 
@@ -332,7 +332,7 @@ class Notify extends \ElkArte\AbstractController
 	 */
 	public function action_unwatchtopic_api()
 	{
-		global $user_info, $topic, $modSettings, $txt, $context, $scripturl;
+		global $topic, $modSettings, $txt, $context, $scripturl;
 
 		theme()->getTemplates()->load('Xml');
 
@@ -340,7 +340,7 @@ class Notify extends \ElkArte\AbstractController
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		// Sorry guests just can't do this
-		if ($user_info['is_guest'])
+		if ($this->user->is_guest)
 		{
 			theme()->getTemplates()->loadLanguageFile('Errors');
 			$context['xml_data'] = array(
@@ -388,8 +388,8 @@ class Notify extends \ElkArte\AbstractController
 	 */
 	private function _toggle_topic_watch()
 	{
-		global $user_info, $topic;
+		global $topic;
 
-		setTopicWatch($user_info['id'], $topic, $this->_req->query->sa === 'on');
+		setTopicWatch($this->user->id, $topic, $this->_req->query->sa === 'on');
 	}
 }

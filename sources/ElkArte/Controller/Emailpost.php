@@ -53,7 +53,7 @@ class Emailpost extends \ElkArte\AbstractController
 	 */
 	public function action_pbe_post($data = null, $force = false, $key = null)
 	{
-		global $txt, $modSettings, $language, $user_info, $maintenance;
+		global $txt, $modSettings, $language, $maintenance;
 
 		// The function is not even on ...
 		if (empty($modSettings['maillist_enabled']))
@@ -136,8 +136,10 @@ class Emailpost extends \ElkArte\AbstractController
 			return pbe_emailError('error_key_sender_match', $email_message);
 
 		// In maintenance mode, just log it for now
-		if (!empty($maintenance) && $maintenance !== 2 && !$pbe['user_info']['is_admin'] && !$user_info['is_admin'])
+		if (!empty($maintenance) && $maintenance !== 2 && !$pbe['user_info']['is_admin'] && $this->user->is_admin === false)
+		{
 			return pbe_emailError('error_in_maintenance_mode', $email_message);
+		}
 
 		// The email looks valid, now on to check the actual user trying to make the post/pm
 		// lets load the topic/message info and any additional permissions we need
@@ -231,7 +233,7 @@ class Emailpost extends \ElkArte\AbstractController
 	 */
 	public function action_pbe_topic($data = null)
 	{
-		global $modSettings, $user_info, $maintenance;
+		global $modSettings, $maintenance;
 
 		// The function is not even on ...
 		if (empty($modSettings['maillist_enabled']))
@@ -309,7 +311,7 @@ class Emailpost extends \ElkArte\AbstractController
 			return pbe_emailError('error_not_find_board', $email_message);
 
 		// In maintenance mode so just save it for the moderators to deal with
-		if (!empty($maintenance) && $maintenance !== 2 && !$pbe['user_info']['is_admin'] && !$user_info['is_admin'])
+		if (!empty($maintenance) && $maintenance !== 2 && !$pbe['user_info']['is_admin'] && $this->user->is_admin === false)
 			return pbe_emailError('error_in_maintenance_mode', $email_message);
 
 		// Any additional spam / security checking
