@@ -78,6 +78,7 @@ class TestMessageIndex extends \PHPUnit\Framework\TestCase
 		global $context, $board_info;
 
 		$controller = new \ElkArte\Controller\MessageIndex(new \ElkArte\EventManager());
+		$controller->setUser(\ElkArte\User::$info);
 		$controller->pre_dispatch();
 		$controller->action_index();
 

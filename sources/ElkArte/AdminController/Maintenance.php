@@ -449,6 +449,7 @@ class Maintenance extends \ElkArte\AbstractController
 		validateToken('admin-maint');
 
 		$controller = new RepairBoards(new \ElkArte\EventManager());
+		$controller->setUser(\ElkArte\User::$info);
 		$controller->pre_dispatch();
 		$controller->action_repairboards();
 	}

@@ -626,12 +626,14 @@ class Profile extends \ElkArte\AbstractController
 			if ($this->_current_area === 'activateaccount' && empty($post_errors))
 			{
 				$controller = new ProfileAccount(new \ElkArte\EventManager());
+				$controller->setUser(\ElkArte\User::$info);
 				$controller->pre_dispatch();
 				$controller->action_activateaccount();
 			}
 			elseif ($this->_current_area === 'deleteaccount' && empty($post_errors))
 			{
 				$controller = new ProfileAccount(new \ElkArte\EventManager());
+				$controller->setUser(\ElkArte\User::$info);
 				$controller->pre_dispatch();
 				$controller->action_deleteaccount2();
 
@@ -641,6 +643,7 @@ class Profile extends \ElkArte\AbstractController
 			elseif ($this->_current_area === 'groupmembership' && empty($post_errors))
 			{
 				$controller = new ProfileOptions(new \ElkArte\EventManager());
+				$controller->setUser(\ElkArte\User::$info);
 				$controller->pre_dispatch();
 				$msg = $controller->action_groupMembership2();
 
@@ -651,6 +654,7 @@ class Profile extends \ElkArte\AbstractController
 			elseif ($this->_current_area === 'authentication')
 			{
 				$controller = new ProfileOptions(new \ElkArte\EventManager());
+				$controller->setUser(\ElkArte\User::$info);
 				$controller->pre_dispatch();
 				$controller->action_authentication(true);
 			}

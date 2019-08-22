@@ -404,6 +404,7 @@ class Bootstrap
 		if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && User::$info->is_guest && basename($_SERVER['PHP_SELF']) !== 'SSI.php')
 		{
 			$controller = new Auth(new EventManager());
+			$controller->setUser(\ElkArte\User::$info);
 			$controller->action_kickguest();
 			obExit(null, true);
 		}

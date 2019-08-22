@@ -901,6 +901,7 @@ class Admin extends \ElkArte\AbstractController
 		$this->_req->post->types = '';
 
 		$managemembers = new ManageMembers(new \ElkArte\EventManager());
+		$managemembers->setUser(\ElkArte\User::$info);
 		$managemembers->pre_dispatch();
 		$managemembers->action_index();
 	}

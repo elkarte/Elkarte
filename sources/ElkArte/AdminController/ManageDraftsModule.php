@@ -141,6 +141,7 @@ class ManageDraftsModule extends \ElkArte\AbstractController
 	{
 		$subActions['topics']['activities']['olddrafts'] = function () {
 			$controller = new ManageDraftsModule(new \ElkArte\EventManager());
+			$controller->setUser(\ElkArte\User::$info);
 			$controller->pre_dispatch();
 			$controller->action_olddrafts_display();
 		};

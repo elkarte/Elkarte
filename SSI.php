@@ -1543,6 +1543,7 @@ function ssi_pollVote()
 	loadBoard();
 
 	$poll_action = new \ElkArte\Controller\Poll(new \ElkArte\EventManager());
+	$poll_action->setUser(\ElkArte\User::$info);
 	$poll_action->pre_dispatch();
 
 	// The controller takes already care of redirecting properly or fail

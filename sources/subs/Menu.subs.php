@@ -377,6 +377,7 @@ function callMenu($selectedMenu)
 		// 'controller' => '\\ElkArte\\AdminController\\ManageAttachments'
 		// 'function' => 'action_avatars'
 		$controller = new $selectedMenu['controller'](new \ElkArte\EventManager());
+		$controller->setUser(\ElkArte\User::$info);
 
 		// always set up the environment
 		$controller->pre_dispatch();

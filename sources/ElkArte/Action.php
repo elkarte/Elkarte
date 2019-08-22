@@ -152,6 +152,7 @@ class Action
 			{
 				// Pointer to a controller to load
 				$controller = new $subAction['controller'](new EventManager());
+				$controller->setUser(\ElkArte\User::$info);
 
 				// always set up the environment
 				$controller->pre_dispatch();

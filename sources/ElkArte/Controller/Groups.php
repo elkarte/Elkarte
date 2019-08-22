@@ -42,6 +42,7 @@ class Groups extends \ElkArte\AbstractController
 		{
 			$this->_req->query->area = $this->_req->getQuery('sa') === 'requests' ? 'groups' : 'viewgroups';
 			$controller = new ModerationCenter(new \ElkArte\EventManager());
+			$controller->setUser(\ElkArte\User::$info);
 			$controller->pre_dispatch();
 			$controller->prepareModcenter();
 		}
