@@ -17,6 +17,8 @@
 
 namespace ElkArte\Search\API;
 
+use ElkArte\User;
+
 /**
  * SearchAPI-Sphinxql.class.php, SphinxQL API,
  *
@@ -137,11 +139,12 @@ class Sphinxql extends AbstractAPI
 	 */
 	public function searchQuery($search_words, $excluded_words, &$participants, &$search_results)
 	{
-		global $user_info, $context, $modSettings;
+		global $context, $modSettings;
 
 		// Only request the results if they haven't been cached yet.
 		$cached_results = array();
-		if (!\ElkArte\Cache\Cache::instance()->getVar($cached_results, 'searchql_results_' . md5($user_info['query_see_board'] . '_' . $context['params'])))
+		$cache_key = 'searchql_results_' . md5(User::$info->query_see_board . '_' . $context['params']);
+		if (!\ElkArte\Cache\Cache::instance()->getVar($cached_results, $cache_key))
 		{
 			// Create an instance of the sphinx client and set a few options.
 			$mySphinx = @mysqli_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']), '', '', '', (int) $modSettings['sphinxql_searchd_port']);
@@ -275,7 +278,7 @@ class Sphinxql extends AbstractAPI
 			$cached_results['num_results'] = count($cached_results['matches']);
 
 			// Store the search results in the cache.
-			\ElkArte\Cache\Cache::instance()->put('searchql_results_' . md5($user_info['query_see_board'] . '_' . $context['params']), $cached_results, 600);
+			\ElkArte\Cache\Cache::instance()->put($cache_key, $cached_results, 600);
 		}
 
 		$participants = array();

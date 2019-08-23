@@ -13,6 +13,8 @@
 
 namespace ElkArte;
 
+use ElkArte\User;
+
 class UserNotificationIntegrate
 {
 	/**
@@ -48,9 +50,7 @@ class UserNotificationIntegrate
 	 */
 	public static function integrate_load_theme()
 	{
-		global $user_info;
-
-		if ($user_info['is_guest'])
+		if (User::$info->is_guest)
 		{
 			return;
 		}

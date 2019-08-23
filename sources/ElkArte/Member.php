@@ -14,6 +14,8 @@
 
 namespace ElkArte;
 
+use ElkArte\User;
+
 /**
  * This class holds all the data belonging to a certain member.
  */
@@ -188,7 +190,7 @@ class Member extends ValuesContainer
 	 */
 	protected function loadExtended()
 	{
-		global $user_info, $modSettings, $txt, $settings, $context;
+		global $modSettings, $txt, $settings, $context;
 		if ($this->set !== MemberLoader::SET_MINIMAL)
 		{
 			$buddy_list = !empty($this->data['buddy_list']) ? explode(',', $this->data['buddy_list']) : array();
@@ -201,7 +203,7 @@ class Member extends ValuesContainer
 				'name_color' => '<span ' . $style_color . '>' . $this->data['real_name'] . '</span>',
 				'link_color' => '<a href="' . $this->data['href'] . '" title="' . $txt['profile_of'] . ' ' . $this->data['real_name'] . '" ' . $style_color . '>' . $this->data['real_name'] . '</a>',
 				'is_buddy' => $this->data['buddy'],
-				'is_reverse_buddy' => in_array($user_info['id'], $buddy_list),
+				'is_reverse_buddy' => in_array(User::$info->id, $buddy_list),
 				'buddies' => $buddy_list,
 				'title' => !empty($modSettings['titlesEnable']) ? $this->data['usertitle'] : '',
 				'website' => array(
@@ -217,8 +219,8 @@ class Member extends ValuesContainer
 				'karma' => array(
 					'good' => $this->data['karma_good'],
 					'bad' => $this->data['karma_bad'],
-					'allow' => !$user_info['is_guest'] && !empty($modSettings['karmaMode']) && $user_info['id'] != $this->data['id_member'] && allowedTo('karma_edit') &&
-					($user_info['posts'] >= $modSettings['karmaMinPosts'] || $user_info['is_admin']),
+					'allow' => User::$info->is_guest === false && !empty($modSettings['karmaMode']) && User::$info->id != $this->data['id_member'] && allowedTo('karma_edit') &&
+					(User::$info->posts >= $modSettings['karmaMinPosts'] || User::$info->is_admin),
 				),
 				'likes' => array(
 					'given' => $this->data['likes_given'],
@@ -264,7 +266,7 @@ class Member extends ValuesContainer
 								''
 							)
 						),
-				'local_time' => standardTime(time() + ($this->data['time_offset'] - $user_info['time_offset']) * 3600, false),
+				'local_time' => standardTime(time() + ($this->data['time_offset'] - User::$info->time_offset) * 3600, false),
 				'custom_fields' => array(),
 			));
 		}
@@ -304,8 +306,6 @@ class Member extends ValuesContainer
 	 */
 	protected function prepareBasics()
 	{
-		global $user_info;
-
 		$this->data['signature'] = censor($this->data['signature']);
 
 		// TODO: We should look into a censoring toggle for custom fields
@@ -318,7 +318,7 @@ class Member extends ValuesContainer
 		$this->data['icons'] = empty($this->data['icons']) ? array('', '') : explode('#', $this->data['icons']);
 
 		// Setup the buddy status here (One whole in_array call saved :P)
-		$this->data['buddy'] = in_array($this->data['id_member'], $user_info['buddies']);
+		$this->data['buddy'] = in_array($this->data['id_member'], User::$info->buddies);
 	}
 
 	/**
