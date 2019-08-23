@@ -125,7 +125,6 @@ class Mentioning extends \ElkArte\AbstractModel
 		if (empty($id_targets))
 			return array();
 
-		$mention_obj->setDb($this->_db);
 		$actually_mentioned = $mention_obj->insert($user_info['id'], $id_targets, $this->_validator->msg, $this->_validator->log_time, $this->_data['status']);
 
 		// Update the member mention count

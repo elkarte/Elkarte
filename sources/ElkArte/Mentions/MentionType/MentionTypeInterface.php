@@ -58,13 +58,6 @@ interface MentionTypeInterface
 	public function getUsersToNotify();
 
 	/**
-	 * Used to inject the database object.
-	 *
-	 * @param \ElkArte\Database\QueryInterface $db
-	 */
-	public function setDb(\ElkArte\Database\QueryInterface $db);
-
-	/**
 	 * Inserts a new mention into the database.
 	 * Checks if the mention already exists (in any status) to prevent any duplicates
 	 *

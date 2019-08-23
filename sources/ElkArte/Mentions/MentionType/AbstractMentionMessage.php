@@ -35,11 +35,27 @@ abstract class AbstractMentionMessage implements MentionTypeInterface
 	protected $_db = null;
 
 	/**
+	 * The current user object
+	 *
+	 * @var \ElkArte\ValuesContainer
+	 */
+	protected $user = null;
+
+	/**
 	 * The \ElkArte\NotificationsTask in use
 	 *
 	 * @var \ElkArte\NotificationsTask
 	 */
 	protected $_task = null;
+
+	/**
+	 * @param \ElkArte\Database\QueryInterface $db
+	 */
+	public static function __construct(\ElkArte\Database\QueryInterface $db, $user)
+	{
+		$this->_db = $db;
+		$this->user = $user;
+	}
 
 	/**
 	 * This static function is used to find the events to attach to a controller.
@@ -222,14 +238,6 @@ abstract class AbstractMentionMessage implements MentionTypeInterface
 		}
 
 		return $langtxt;
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public function setDb(\ElkArte\Database\QueryInterface $db)
-	{
-		$this->_db = $db;
 	}
 
 	/**

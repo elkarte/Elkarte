@@ -183,6 +183,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 	 *
 	 * @depends testAddMentionByLike
 	 * @depends testAddMentionByMember
+	 * @depends testReadMention
 	 */
 	public function testLoadCurrentUserMention()
 	{
