@@ -695,7 +695,7 @@ class Theme extends BaseTheme
 	 */
 	public function setupThemeContext($forceload = false)
 	{
-		global $modSettings, $user_info, $scripturl, $context, $settings, $options, $txt, $boardurl;
+		global $modSettings, $scripturl, $context, $settings, $options, $txt, $boardurl;
 
 		static $loaded = false;
 
@@ -710,7 +710,7 @@ class Theme extends BaseTheme
 
 		$context['current_time'] = standardTime(time(), false);
 		$context['current_action'] = isset($_GET['action']) ? $_GET['action'] : '';
-		$context['show_quick_login'] = !empty($modSettings['enableVBStyleLogin']) && $user_info['is_guest'];
+		$context['show_quick_login'] = !empty($modSettings['enableVBStyleLogin']) && $this->user->is_guest;
 		$context['robot_no_index'] = in_array($context['current_action'], $this->no_index_actions);
 
 		$bbc_parser = \BBC\ParserWrapper::instance();
@@ -735,14 +735,14 @@ class Theme extends BaseTheme
 			$context['upper_content_callbacks'][] = 'news_fader';
 		}
 
-		if (!$user_info['is_guest'])
+		if ($this->user->is_guest === false)
 		{
-			$context['user']['messages'] = $user_info['messages'];
-			$context['user']['unread_messages'] = $user_info['unread_messages'];
-			$context['user']['mentions'] = $user_info['mentions'];
+			$context['user']['messages'] = $this->user->messages;
+			$context['user']['unread_messages'] = $this->user->unread_messages;
+			$context['user']['mentions'] = $this->user->mentions;
 
 			// Personal message popup...
-			if ($user_info['unread_messages'] > (isset($_SESSION['unread_messages']) ? $_SESSION['unread_messages'] : 0))
+			if ($this->user->unread_messages > (isset($_SESSION['unread_messages']) ? $_SESSION['unread_messages'] : 0))
 			{
 				$context['user']['popup_messages'] = true;
 			}
@@ -751,18 +751,18 @@ class Theme extends BaseTheme
 				$context['user']['popup_messages'] = false;
 			}
 
-			$_SESSION['unread_messages'] = $user_info['unread_messages'];
+			$_SESSION['unread_messages'] = $this->user->unread_messages;
 
 			$context['user']['avatar'] = array(
-				'href' => !empty($user_info['avatar']['href']) ? $user_info['avatar']['href'] : '',
-				'image' => !empty($user_info['avatar']['image']) ? $user_info['avatar']['image'] : '',
+				'href' => !empty($this->user->avatar['href']) ? $this->user->avatar['href'] : '',
+				'image' => !empty($this->user->avatar['image']) ? $this->user->avatar['image'] : '',
 			);
 
 			// Figure out how long they've been logged in.
 			$context['user']['total_time_logged_in'] = array(
-				'days' => floor($user_info['total_time_logged_in'] / 86400),
-				'hours' => floor(($user_info['total_time_logged_in'] % 86400) / 3600),
-				'minutes' => floor(($user_info['total_time_logged_in'] % 3600) / 60)
+				'days' => floor($this->user->total_time_logged_in / 86400),
+				'hours' => floor(($this->user->total_time_logged_in % 86400) / 3600),
+				'minutes' => floor(($this->user->total_time_logged_in % 3600) / 60)
 			);
 		}
 		else
@@ -904,12 +904,12 @@ class Theme extends BaseTheme
 	 */
 	public function setupMenuContext()
 	{
-		global $context, $modSettings, $user_info, $settings;
+		global $context, $modSettings, $settings;
 
 		// Set up the menu privileges.
-		$context['allow_search'] = !empty($modSettings['allow_guestAccess']) ? allowedTo('search_posts') : (!$user_info['is_guest'] && allowedTo('search_posts'));
+		$context['allow_search'] = !empty($modSettings['allow_guestAccess']) ? allowedTo('search_posts') : ($this->user->is_guest === false && allowedTo('search_posts'));
 		$context['allow_admin'] = allowedTo(array('admin_forum', 'manage_boards', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_attachments', 'manage_smileys'));
-		$context['allow_edit_profile'] = !$user_info['is_guest'] && allowedTo(array('profile_view_own', 'profile_view_any', 'profile_identity_own', 'profile_identity_any', 'profile_extra_own', 'profile_extra_any', 'profile_remove_own', 'profile_remove_any', 'moderate_forum', 'manage_membergroups', 'profile_title_own', 'profile_title_any'));
+		$context['allow_edit_profile'] = $this->user->is_guest === false && allowedTo(array('profile_view_own', 'profile_view_any', 'profile_identity_own', 'profile_identity_any', 'profile_extra_own', 'profile_extra_any', 'profile_remove_own', 'profile_remove_any', 'moderate_forum', 'manage_membergroups', 'profile_title_own', 'profile_title_any'));
 		$context['allow_memberlist'] = allowedTo('view_mlist');
 		$context['allow_calendar'] = allowedTo('calendar_view') && !empty($modSettings['cal_enabled']);
 		$context['allow_moderation_center'] = $context['user']['can_mod'];
@@ -935,17 +935,17 @@ class Theme extends BaseTheme
 		$menu_count['unread_messages'] = $context['user']['unread_messages'];
 		$menu_count['mentions'] = $context['user']['mentions'];
 
-		if (!empty($user_info['avatar']['href']))
+		if (!empty($this->user->avatar['href']))
 		{
 			$this->addCSSRules('
 	.i-account:before {
 		content: "";
-		background-image: url("' . $user_info['avatar']['href'] . '");
+		background-image: url("' . $this->user->avatar['href'] . '");
 	}');
 		}
 
 		// All the buttons we can possible want and then some, try pulling the final list of buttons from cache first.
-		if (($menu_buttons = \ElkArte\Cache\Cache::instance()->get('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
+		if (($menu_buttons = \ElkArte\Cache\Cache::instance()->get('menu_buttons-' . implode('_', $this->user->groups) . '-' . $this->user->language, $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
 		{
 			// Start things up: this is what we know by default
 			require_once(SUBSDIR . '/Menu.subs.php');
@@ -1026,7 +1026,7 @@ class Theme extends BaseTheme
 
 			if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
 			{
-				\ElkArte\Cache\Cache::instance()->put('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $menu_buttons, $cacheTime);
+				\ElkArte\Cache\Cache::instance()->put('menu_buttons-' . implode('_', $this->user->groups) . '-' . $this->user->language, $menu_buttons, $cacheTime);
 			}
 		}
 
@@ -1053,7 +1053,7 @@ class Theme extends BaseTheme
 		{
 			$current_action = isset($_REQUEST['sa']) && $_REQUEST['sa'] === 'pick' ? 'profile' : 'admin';
 		}
-		elseif ($context['current_action'] === 'login2' || ($user_info['is_guest'] && $context['current_action'] === 'reminder'))
+		elseif ($context['current_action'] === 'login2' || ($this->user->is_guest && $context['current_action'] === 'reminder'))
 		{
 			$current_action = 'login';
 		}

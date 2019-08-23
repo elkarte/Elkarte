@@ -258,7 +258,7 @@ class ThemeLoader
 		// Setup the theme file.
 		require_once($settings['theme_dir'] . '/Theme.php');
 		$class = 'ElkArte\\Themes\\' . $themeName . '\\Theme';
-		$theme = new $class($this->id);
+		$theme = new $class($this->id, \ElkArte\User::$info);
 		$this->theme = $context['theme_instance'] = $theme;
 
 		// Reload the templates

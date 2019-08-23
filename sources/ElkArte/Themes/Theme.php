@@ -97,10 +97,12 @@ abstract class Theme
 	 * Theme constructor.
 	 *
 	 * @param int $id
+	 * @param \ElkArte\ValuesContainer $user
 	 */
-	public function __construct($id)
+	public function __construct($id, $user)
 	{
 		$this->id = $id;
+		$this->user = $user;
 		$this->layers = new TemplateLayers;
 		$this->templates = new Templates;
 
