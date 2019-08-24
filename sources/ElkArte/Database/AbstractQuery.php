@@ -186,20 +186,22 @@ abstract class AbstractQuery implements QueryInterface
 			\ElkArte\Errors\Errors::instance()->display_db_error('ElkArte\\Database\\AbstractQuery::replacement__callback');
 		}
 
-		if ($matches[1] === 'db_prefix')
-			return $this->_db_prefix;
-
-		if ($matches[1] === 'query_see_board')
-			return $this->query_see_board;
-
-		if ($matches[1] === 'query_wanna_see_board')
-			return $this->query_wanna_see_board;
-
-		if ($matches[1] === 'column_case_insensitive')
-			return $this->_replaceColumnCaseInsensitive($matches[2]);
+		switch ($matches[1])
+		{
+			case 'db_prefix':
+				return $this->_db_prefix;
+			case 'query_see_board':
+				return $this->query_see_board;
+			case 'query_wanna_see_board':
+				return $this->query_wanna_see_board;
+			case 'column_case_insensitive':
+				return $this->_replaceColumnCaseInsensitive($matches[2]);
+		}
 
 		if (!isset($matches[2]))
+		{
 			$this->error_backtrace('Invalid value inserted or no type specified.', '', E_USER_ERROR, __FILE__, __LINE__);
+		}
 
 		if (!isset($this->_db_callback_values[$matches[2]]))
 		{
