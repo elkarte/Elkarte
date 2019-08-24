@@ -89,7 +89,7 @@ class SearchRenderer extends Renderer
 	 */
 	protected function _buildOutputArray()
 	{
-		global $modSettings, $context, $options, $user_info, $txt;
+		global $modSettings, $context, $options, $txt;
 
 		// Make sure we don't end up with a practically empty message body.
 		$this->_this_message['body'] = preg_replace('~^(?:&nbsp;)+$~', '', $this->_this_message['body']);
@@ -133,7 +133,7 @@ class SearchRenderer extends Renderer
 
 		if (!empty($options['display_quick_mod']))
 		{
-			$started = $output['first_post']['member']['id'] == $user_info['id'];
+			$started = $output['first_post']['member']['id'] == $this->user->id;
 
 			$output['quick_mod'] = array(
 				'lock' => in_array(0, $this->_options['boards_can']['lock_any']) || in_array($output['board']['id'], $this->_options['boards_can']['lock_any']) || ($started && (in_array(0, $this->_options['boards_can']['lock_own']) || in_array($output['board']['id'], $this->_options['boards_can']['lock_own']))),

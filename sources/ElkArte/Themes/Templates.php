@@ -19,6 +19,7 @@ namespace ElkArte\Themes;
 use BadFunctionCallException;
 use \ElkArte\Exceptions\Exception;
 use ElkArte\Errors\Errors;
+use ElkArte\User;
 use Error;
 use Generator;
 
@@ -278,14 +279,14 @@ class Templates
 		$fatal = true,
 		$force_reload = false
 	) {
-		global $user_info, $language, $settings, $modSettings;
+		global $language, $settings, $modSettings;
 		global $db_show_debug, $txt;
 		static $already_loaded = [];
 
 		// Default to the user's language.
 		if ($lang == '')
 		{
-			$lang = isset($user_info['language']) ? $user_info['language'] : $language;
+			$lang = isset(User::$info->language) ? User::$info->language : $language;
 		}
 
 		// Make sure we have $settings - if not we're in trouble and need to find it!

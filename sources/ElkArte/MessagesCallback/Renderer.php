@@ -37,6 +37,12 @@ abstract class Renderer
 	protected $_dbRequest = null;
 
 	/**
+	 * The current user data
+	 * @var \ElkArte\UserInfo
+	 */
+	protected $user = null;
+
+	/**
 	 * The parser that will convert the body
 	 * @var BodyParserInterface
 	 */
@@ -86,9 +92,10 @@ abstract class Renderer
 	 * @param ValuesContainer $opt
 	 * @throws \Exception
 	 */
-	public function __construct($request, BodyParserInterface $bodyParser, ValuesContainer $opt = null)
+	public function __construct($request, $user, BodyParserInterface $bodyParser, ValuesContainer $opt = null)
 	{
 		$this->_dbRequest = $request;
+		$this->user = $user;
 		$this->_bodyParser = $bodyParser;
 		$this->_db = database();
 		$this->_idx_mapper = new ValuesContainer([
@@ -266,13 +273,13 @@ abstract class Renderer
 	 */
 	protected function _adjustMemberContext($member_context)
 	{
-		global $user_info, $context, $modSettings;
+		global $context, $modSettings;
 
 		$member_id = $this->_this_message[$this->_idx_mapper->id_member];
 
-		$member_context['can_view_profile'] = allowedTo('profile_view_any') || ($member_id == $user_info['id'] && allowedTo('profile_view_own'));
+		$member_context['can_view_profile'] = allowedTo('profile_view_any') || ($member_id == $this->user->id && allowedTo('profile_view_own'));
 		$member_context['is_topic_starter'] = $member_id == $context['topic_starter_id'];
-		$member_context['can_see_warning'] = !isset($context['disabled_fields']['warning_status']) && $member_context['warning_status'] && (!empty($context['user']['can_mod']) || (!$user_info['is_guest'] && !empty($modSettings['warning_show']) && ($modSettings['warning_show'] > 1 || $member_id == $user_info['id'])));
+		$member_context['can_see_warning'] = !isset($context['disabled_fields']['warning_status']) && $member_context['warning_status'] && (!empty($context['user']['can_mod']) || ($this->user->is_guest === false && !empty($modSettings['warning_show']) && ($modSettings['warning_show'] > 1 || $member_id == $this->user->id)));
 
 		if ($this->_options->show_signatures === 1)
 		{
@@ -315,8 +322,6 @@ abstract class Renderer
 	 */
 	protected function _buildOutputArray()
 	{
-		global $user_info;
-
 		return array(
 			'alternate' => $this->_counter % 2,
 			'id' => $this->_this_message[$this->_idx_mapper->id_msg],
@@ -327,7 +332,7 @@ abstract class Renderer
 			'timestamp' => forum_time(true, $this->_this_message[$this->_idx_mapper->time]),
 			'counter' => $this->_counter,
 			'body' => $this->_this_message['body'],
-			'can_see_ip' => allowedTo('moderate_forum') || ($this->_this_message[$this->_idx_mapper->id_member] == $user_info['id'] && !empty($user_info['id'])),
+			'can_see_ip' => allowedTo('moderate_forum') || ($this->_this_message[$this->_idx_mapper->id_member] == $this->user->id && !empty($this->user->id)),
 			'classes' => array()
 		);
 

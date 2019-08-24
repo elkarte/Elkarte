@@ -111,21 +111,19 @@ class Mentioning extends \ElkArte\AbstractModel
 	 */
 	public function create($mention_obj, $data)
 	{
-		global $user_info;
-
 		$this->_data = $this->_prepareData($data);
 
 		// Common checks to determine if we can go on
 		if (!$this->_isValid())
 			return array();
 
-		// Cleanup, validate and remove the invalid values (0 and $user_info['id'])
-		$id_targets = array_diff(array_map('intval', array_unique($this->_validator->uid)), array(0, $user_info['id']));
+		// Cleanup, validate and remove the invalid values (0 and $this->user->id)
+		$id_targets = array_diff(array_map('intval', array_unique($this->_validator->uid)), array(0, $this->user->id));
 
 		if (empty($id_targets))
 			return array();
 
-		$actually_mentioned = $mention_obj->insert($user_info['id'], $id_targets, $this->_validator->msg, $this->_validator->log_time, $this->_data['status']);
+		$actually_mentioned = $mention_obj->insert($this->user->id, $id_targets, $this->_validator->msg, $this->_validator->log_time, $this->_data['status']);
 
 		// Update the member mention count
 		foreach ($actually_mentioned as $id_target)
@@ -293,8 +291,6 @@ class Mentioning extends \ElkArte\AbstractModel
 	 */
 	protected function _changeStatus($id_mentions, $status = 'read')
 	{
-		global $user_info;
-
 		$this->_db->query('', '
 			UPDATE {db_prefix}log_mentions
 			SET status = {int:status}
@@ -309,7 +305,7 @@ class Mentioning extends \ElkArte\AbstractModel
 		// Update the top level mentions count
 		if ($success)
 		{
-			$this->_updateMenuCount($this->_known_status[$status], $user_info['id']);
+			$this->_updateMenuCount($this->_known_status[$status], $this->user->id);
 		}
 
 		return $success;

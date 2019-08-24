@@ -16,6 +16,8 @@
 
 namespace ElkArte\Search;
 
+use ElkArte\User;
+
 /**
  * Actually do the searches
  */
@@ -187,7 +189,7 @@ class SearchParams extends \ElkArte\ValuesContainer
 	 */
 	public function merge($params, $recentPercentage, $maxMembersToSearch)
 	{
-		global $user_info, $modSettings, $context;
+		global $modSettings, $context;
 
 		// Store whether simple search was used (needed if the user wants to do another query).
 		if (!isset($this->_search_params['advanced']))
@@ -386,7 +388,7 @@ class SearchParams extends \ElkArte\ValuesContainer
 			$this->_db->free_result($request);
 		}
 		// Select all boards you've selected AND are allowed to see.
-		elseif ($user_info['is_admin'] && (!empty($this->_search_params['advanced']) || !empty($query_boards)))
+		elseif (User::$info->is_admin && (!empty($this->_search_params['advanced']) || !empty($query_boards)))
 		{
 			$this->_search_params['brd'] = $query_boards;
 		}

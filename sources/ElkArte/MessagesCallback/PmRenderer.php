@@ -94,7 +94,7 @@ class PmRenderer extends Renderer
 	 */
 	protected function _buildOutputArray()
 	{
-		global $context, $user_info, $modSettings, $scripturl, $txt;
+		global $context, $modSettings, $scripturl, $txt;
 
 		$id_pm = $this->_this_message['id_pm'];
 
@@ -107,14 +107,14 @@ class PmRenderer extends Renderer
 			'is_replied_to' => &$context['message_replied'][$id_pm],
 			'is_unread' => &$context['message_unread'][$id_pm],
 			'is_selected' => !empty($this->_temp_pm_selected) && in_array($id_pm, $this->_temp_pm_selected),
-			'is_message_author' => $this->_this_message['id_member_from'] == $user_info['id'],
+			'is_message_author' => $this->_this_message['id_member_from'] == $this->user->id,
 			'can_report' => !empty($modSettings['enableReportPM']),
 		);
 
 		$context['additional_pm_drop_buttons'] = array();
 
 		// Can they report this message
-		if (!empty($output['can_report']) && $context['folder'] !== 'sent' && $output['member']['id'] != $user_info['id'])
+		if (!empty($output['can_report']) && $context['folder'] !== 'sent' && $output['member']['id'] != $this->user->id)
 		{
 			$context['additional_pm_drop_buttons']['warn_button'] = array(
 				'href' => $scripturl . '?action=pm;sa=report;l=' . $context['current_label_id'] . ';pmsg=' . $output['id'] . ';' . $context['session_var'] . '=' . $context['session_id'],
@@ -123,7 +123,7 @@ class PmRenderer extends Renderer
 		}
 
 		// Or mark it as unread
-		if (empty($output['is_unread']) && $context['folder'] !== 'sent' && $output['member']['id'] != $user_info['id'])
+		if (empty($output['is_unread']) && $context['folder'] !== 'sent' && $output['member']['id'] != $this->user->id)
 		{
 			$context['additional_pm_drop_buttons']['restore_button'] = array(
 				'href' => $scripturl . '?action=pm;sa=markunread;l=' . $context['current_label_id'] . ';pmsg=' . $output['id'] . ';' . $context['session_var'] . '=' . $context['session_id'],

@@ -13,6 +13,8 @@
 
 namespace ElkArte\Themes;
 
+use ElkArte\User;
+
 /**
  * Class ThemeLoader
  */
@@ -41,7 +43,7 @@ class ThemeLoader
 	 */
 	private function getThemeId()
 	{
-		global $modSettings, $user_info, $board_info, $ssi_theme;
+		global $modSettings, $board_info, $ssi_theme;
 
 		if (!empty($modSettings['theme_allow']) || allowedTo('admin_forum'))
 		{
@@ -57,9 +59,9 @@ class ThemeLoader
 				$this->id = (int) $_SESSION['theme'];
 			}
 			// The theme is just the user's choice. (might use ?board=1;theme=0 to force board theme.)
-			elseif (!empty($user_info['theme']))
+			elseif (!empty($this->user->theme))
 			{
-				$this->id = $user_info['theme'];
+				$this->id = $this->user->theme;
 			}
 		}
 		// The theme was specified by the board.
@@ -226,13 +228,13 @@ class ThemeLoader
 	 */
 	private function initTheme()
 	{
-		global $user_info, $settings, $options, $context;
+		global $settings, $options, $context;
 
 		// Validate / fetch the themes id
 		$this->getThemeId();
 
 		// Need to know who we are loading the theme for
-		$member = empty($user_info['id']) ? -1 : $user_info['id'];
+		$member = empty($this->user->id) ? -1 : $this->user->id;
 
 		// Load in the theme variables for them
 		$themeData = $this->getThemeData($member);
@@ -292,10 +294,10 @@ class ThemeLoader
 	 */
 	public function __construct($id_theme = 0, $initialize = true)
 	{
-		global $user_info;
 		global $txt, $scripturl, $mbname, $modSettings;
 		global $context, $settings, $options;
 
+		$this->user = User::$info;
 		$this->id = $id_theme;
 		$this->initTheme();
 
@@ -325,19 +327,19 @@ class ThemeLoader
 			$context['admin_preferences'] = [];
 		}
 
-		if (!$user_info['is_guest'])
+		if ($this->user->is_guest === false)
 		{
 			if (!empty($options['minmax_preferences']))
 			{
 				$context['minmax_preferences'] = serializeToJson($options['minmax_preferences'], function ($array_form)
 				{
-					global $settings, $user_info;
+					global $settings;
 
 					// Update the option.
 					require_once(SUBSDIR . '/Themes.subs.php');
 					updateThemeOptions([
 						$settings['theme_id'],
-						$user_info['id'],
+						\ElkArte\User::$info->id,
 						'minmax_preferences',
 						json_encode($array_form),
 					]);
@@ -349,7 +351,7 @@ class ThemeLoader
 			}
 		}
 		// Guest may have collapsed the header, check the cookie to prevent collapse jumping
-		elseif ($user_info['is_guest'] && isset($_COOKIE['upshrink']))
+		elseif ($this->user->is_guest && isset($_COOKIE['upshrink']))
 		{
 			$context['minmax_preferences'] = ['upshrink' => $_COOKIE['upshrink']];
 		}
@@ -361,7 +363,7 @@ class ThemeLoader
 		$context['forum_name_html_safe'] = $context['forum_name'];
 
 		// Set some permission related settings.
-		if ($user_info['is_guest'] && !empty($modSettings['enableVBStyleLogin']))
+		if ($this->user->is_guest && !empty($modSettings['enableVBStyleLogin']))
 		{
 			$context['show_login_bar'] = true;
 			$context['theme_header_callbacks'][] = 'login_bar';
@@ -435,7 +437,7 @@ class ThemeLoader
 		// Allow overriding the board wide time/number formats.
 		if (empty(\ElkArte\User::$settings['time_format']) && !empty($txt['time_format']))
 		{
-			$user_info['time_format'] = $txt['time_format'];
+			$this->user->time_format = $txt['time_format'];
 		}
 
 		if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'always')
@@ -447,7 +449,7 @@ class ThemeLoader
 
 		// Make a special URL for the language.
 		$settings['lang_images_url'] =
-			$settings['images_url'] . '/' . (!empty($txt['image_lang']) ? $txt['image_lang'] : $user_info['language']);
+			$settings['images_url'] . '/' . (!empty($txt['image_lang']) ? $txt['image_lang'] : $this->user->language);
 
 		// RTL languages require an additional stylesheet.
 		if ($context['right_to_left'])
