@@ -28,9 +28,9 @@ class Display extends \ElkArte\Modules\AbstractModule
 	 */
 	public static function hooks(\ElkArte\EventManager $eventsManager)
 	{
-		global $user_info, $modSettings;
+		global $modSettings;
 
-		if (!$user_info['is_admin'] && !$user_info['is_moderator'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
+		if ($this->user->is_admin === false && $this->user->is_moderator === false && !empty($modSettings['posts_require_captcha']) && ($this->user->posts < $modSettings['posts_require_captcha'] || ($this->user->is_guest && $modSettings['posts_require_captcha'] == -1)))
 		{
 			return array(
 				array('topicinfo', array('\\ElkArte\\Modules\\Verification\\Display', 'topicinfo'), array()),

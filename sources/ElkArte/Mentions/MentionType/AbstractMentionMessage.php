@@ -212,11 +212,9 @@ abstract class AbstractMentionMessage implements MentionTypeInterface
 	 */
 	protected function _loadStringsByTemplate($template, $users, $users_data, $lang_files = array(), $replacements = array())
 	{
-		global $user_info;
-
 		require_once(SUBSDIR . '/Mail.subs.php');
 
-		$lang = $user_info['language'];
+		$lang = $this->user->language;
 		$langs = array();
 		foreach ($users as $user)
 		{
@@ -231,7 +229,7 @@ abstract class AbstractMentionMessage implements MentionTypeInterface
 		}
 
 		// Better be sure we have the correct language loaded (though it may be useless)
-		if (!empty($lang_files) && $lang !== $user_info['language'])
+		if (!empty($lang_files) && $lang !== $this->user->language)
 		{
 			foreach ($lang_files as $file)
 				theme()->getTemplates()->loadLanguageFile($file);

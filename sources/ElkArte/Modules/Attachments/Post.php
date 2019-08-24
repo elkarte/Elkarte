@@ -131,7 +131,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 	 */
 	public function finalize_post_form(&$show_additional_options, $board, $topic)
 	{
-		global $txt, $context, $modSettings, $user_info, $scripturl;
+		global $txt, $context, $modSettings, $scripturl;
 
 		$context['attachments']['can']['post'] = self::$_attach_level == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 		$context['attachments']['ila_enabled'] = !empty($modSettings['attachment_inline_enabled']);
@@ -162,7 +162,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 				{
 					foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 					{
-						if (strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') !== false)
+						if (strpos($attachID, 'post_tmp_' . $this->user->id . '_') !== false)
 						{
 							@unlink($attachment['tmp_name']);
 							@unlink($attachment['tmp_name'] . '_thumb');
@@ -180,7 +180,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 						// See if any files still exist before showing the warning message and the files attached.
 						foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 						{
-							if (strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') === false)
+							if (strpos($attachID, 'post_tmp_' . $this->user->id . '_') === false)
 								continue;
 
 							if (file_exists($attachment['tmp_name']))
@@ -204,7 +204,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 						$file_list = array();
 						foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 						{
-							if (strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') !== false)
+							if (strpos($attachID, 'post_tmp_' . $this->user->id . '_') !== false)
 							{
 								$file_list[] = $attachment['name'];
 							}
@@ -236,7 +236,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 						break;
 
 					// Initial errors (such as missing directory), we can recover
-					if ($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') === false)
+					if ($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $this->user->id . '_') === false)
 						continue;
 
 					if ($attachID === 'initial_error')
@@ -365,7 +365,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 	 */
 	protected function saveAttachments($msg)
 	{
-		global $user_info, $context, $modSettings;
+		global $context, $modSettings;
 
 		// First check to see if they are trying to delete any current attachments.
 		if (isset($_POST['attach_del']))
@@ -378,7 +378,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 			{
 				$attachID = getAttachmentIdFromPublic($dummy);
 
-				if (strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') !== false)
+				if (strpos($attachID, 'post_tmp_' . $this->user->id . '_') !== false)
 					$keep_temp[] = $attachID;
 				else
 					$keep_ids[] = (int) $attachID;
@@ -388,7 +388,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 			{
 				foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 				{
-					if ((isset($_SESSION['temp_attachments']['post']['files'], $attachment['name']) && in_array($attachment['name'], $_SESSION['temp_attachments']['post']['files'])) || in_array($attachID, $keep_temp) || strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') === false)
+					if ((isset($_SESSION['temp_attachments']['post']['files'], $attachment['name']) && in_array($attachment['name'], $_SESSION['temp_attachments']['post']['files'])) || in_array($attachID, $keep_temp) || strpos($attachID, 'post_tmp_' . $this->user->id . '_') === false)
 						continue;
 
 					unset($_SESSION['temp_attachments'][$attachID]);
@@ -431,7 +431,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 	 */
 	public function pre_save_post(&$msgOptions)
 	{
-		global $context, $user_info, $modSettings;
+		global $context, $modSettings;
 
 		$this->_is_new_message = empty($msgOptions['id']);
 
@@ -442,7 +442,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 			{
-				if ($attachID !== 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') === false)
+				if ($attachID !== 'initial_error' && strpos($attachID, 'post_tmp_' . $this->user->id . '_') === false)
 					continue;
 
 				// If there was an initial error just show that message.
@@ -458,7 +458,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 					// Load the attachmentOptions array with the data needed to create an attachment
 					$attachmentOptions = array(
 						'post' => isset($_REQUEST['msg']) ? $_REQUEST['msg'] : 0,
-						'poster' => $user_info['id'],
+						'poster' => $this->user->id,
 						'name' => $attachment['name'],
 						'tmp_name' => $attachment['tmp_name'],
 						'size' => isset($attachment['size']) ? $attachment['size'] : 0,

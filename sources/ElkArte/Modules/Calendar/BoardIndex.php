@@ -43,7 +43,7 @@ class BoardIndex extends \ElkArte\Modules\AbstractModule
 	 */
 	public function pre_load()
 	{
-		global $modSettings, $user_info, $context;
+		global $modSettings, $context;
 
 		// Retrieve the calendar data (events, birthdays, holidays).
 		$eventOptions = array(
@@ -53,7 +53,7 @@ class BoardIndex extends \ElkArte\Modules\AbstractModule
 			'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 		);
 
-		$context += \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
+		$context += \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . ($this->user->time_offset + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 		// Whether one or multiple days are shown on the board index.
 		$context['calendar_only_today'] = $modSettings['cal_days_for_index'] == 1;
