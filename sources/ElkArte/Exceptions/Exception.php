@@ -129,6 +129,7 @@ class Exception extends \Exception
 			E::instance()->display_minimal_error($message);
 		}
 
+		$this->logMessage($message, $lang);
 		$msg = !isset($txt[$msg]) ? $msg : (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
 
 		return $msg;
