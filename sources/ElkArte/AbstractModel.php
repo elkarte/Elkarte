@@ -28,6 +28,12 @@ abstract class AbstractModel
 	protected $_db = null;
 
 	/**
+	 * The current user data
+	 * @var \ElkArte\UserInfo
+	 */
+	protected $user = null;
+
+	/**
 	 * The modSettings
 	 * @var object
 	 */
@@ -37,12 +43,14 @@ abstract class AbstractModel
 	 * Make "global" items available to the class
 	 *
 	 * @param object|null $db
+	 * @param object|null $user
 	 */
-	public function __construct($db = null)
+	public function __construct($db = null, $user = null)
 	{
 		global $modSettings;
 
 		$this->_db = $db ?: database();
+		$this->user = $user;
 		$this->_modSettings = new ValuesContainer($modSettings ?: array());
 	}
 }

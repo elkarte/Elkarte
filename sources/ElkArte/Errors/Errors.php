@@ -18,10 +18,12 @@
 
 namespace ElkArte\Errors;
 
+use \ElkArte\AbstractModel;
+
 /**
  * Class to handle all forum errors and exceptions
  */
-class Errors extends \ElkArte\AbstractModel
+class Errors extends AbstractModel
 {
 	/** @var Errors Sole private Errors instance */
 	private static $_errors = null;
@@ -43,10 +45,11 @@ class Errors extends \ElkArte\AbstractModel
 	 * from trying to initialize the database connection.
 	 *
 	 * @param $db \ElkArte\Database\QueryInterface|null
+	 * @param $user \ElkArte\UserInfo|null
 	 */
-	public function __construct($db = null)
+	public function __construct($db = null, $user = null)
 	{
-		parent::__construct($db);
+		parent::__construct($db, $user);
 	}
 
 	/**
@@ -119,22 +122,16 @@ class Errors extends \ElkArte\AbstractModel
 	 */
 	private function insertLog($query_string, $error_message, $error_type, $file, $line)
 	{
-		global $user_info, $last_error;
+		global $last_error;
 
 		$this->_db = database();
 
 		// Just in case there's no id_member or IP set yet.
-		if (empty($user_info['id']))
-		{
-			$user_info['id'] = 0;
-		}
-		if (empty($user_info['ip']))
-		{
-			$user_info['ip'] = '';
-		}
+		$user_id = $this->user->id ?? 0;
+		$user_ip = $this->user->ip ?? '';
 
 		// Don't log the same error countless times, as we can get in a cycle of depression...
-		$error_info = array($user_info['id'], time(), $user_info['ip'], $query_string, $error_message, isset($_SESSION['session_value']) ? (string) $_SESSION['session_value'] : 'no_session_data', $error_type, $file, $line);
+		$error_info = array($user_id, time(), $user_ip, $query_string, $error_message, isset($_SESSION['session_value']) ? (string) $_SESSION['session_value'] : 'no_session_data', $error_type, $file, $line);
 		if (empty($last_error) || $last_error != $error_info)
 		{
 			// Insert the error into the database.
@@ -222,11 +219,11 @@ class Errors extends \ElkArte\AbstractModel
 	 */
 	public function log_lang_error($error, $error_type = 'general', $sprintf = array(), $file = '', $line = 0)
 	{
-		global $user_info, $language, $txt;
+		global $language, $txt;
 
 		theme()->getTemplates()->loadLanguageFile('Errors', $language);
 
-		$reload_lang_file = $language != $user_info['language'];
+		$reload_lang_file = $language != $this->user->language;
 
 		$error_message = !isset($txt[$error]) ? $error : (empty($sprintf) ? $txt[$error] : vsprintf($txt[$error], $sprintf));
 		$this->log_error($error_message, $error_type, $file, $line);

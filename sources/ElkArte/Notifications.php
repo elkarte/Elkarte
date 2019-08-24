@@ -14,8 +14,6 @@
 
 namespace ElkArte;
 
-use ElkArte\User;
-
 /**
  * Class Notifications
  *
@@ -173,7 +171,7 @@ class Notifications extends AbstractModel
 	protected function _send_task(NotificationsTask $task)
 	{
 		$class = $task->getClass();
-		$obj = new $class($this->_db, User::$info);
+		$obj = new $class($this->_db, $this->user);
 		$obj->setTask($task);
 
 		require_once(SUBSDIR . '/Notification.subs.php');

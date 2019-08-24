@@ -15,8 +15,6 @@
 
 namespace ElkArte;
 
-use ElkArte\User;
-
 class UserNotification extends AbstractModel
 {
 	/**
@@ -57,7 +55,7 @@ class UserNotification extends AbstractModel
 	{
 		if (!empty($this->_modSettings['usernotif_favicon_enable']))
 		{
-			$this->_addFaviconNumbers(User::$info->mentions);
+			$this->_addFaviconNumbers($this->user->mentions);
 		}
 
 		if (!empty($this->_modSettings['usernotif_desktop_enable']))
