@@ -147,11 +147,12 @@ class TestBrowser extends \PHPUnit\Framework\TestCase
 			$_SERVER['HTTP_USER_AGENT'] = $testcase[0];
 
 			// What say you?
-			$detector->testdetectBrowser();
+			$browser = $detector->testdetectBrowser();
+			$browser_body_id = $detector->browserBodyId();
 
 			// Check for correct detection
-			$this->assertEquals($testcase[1], $context['browser_body_id']);
-			$this->assertArrayHasKey($testcase[2], array_flip(array_keys($context['browser'], true)));
+			$this->assertEquals($testcase[1], $browser_body_id);
+			$this->assertArrayHasKey($testcase[2], array_flip(array_keys($browser, true)));
 		}
 	}
 }
@@ -162,6 +163,6 @@ class testBrowserDetector extends \ElkArte\Http\BrowserDetector
 	{
 		// Init
 		$this->_ua = $_SERVER['HTTP_USER_AGENT'];
-		$this->detectBrowser();
+		return $this->detectBrowser();
 	}
 }
