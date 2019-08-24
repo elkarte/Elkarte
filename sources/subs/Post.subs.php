@@ -28,7 +28,7 @@
  */
 function preparsecode(&$message, $previewing = false)
 {
-	$preparse = \BBC\PreparseCode::instance();
+	$preparse = \BBC\PreparseCode::instance(\ElkArte\User::$info->name);
 	$preparse->preparsecode($message, $previewing);
 }
 
@@ -43,7 +43,7 @@ function preparsecode(&$message, $previewing = false)
  */
 function un_preparsecode($message)
 {
-	$un_preparse = \BBC\PreparseCode::instance();
+	$un_preparse = \BBC\PreparseCode::instance(\ElkArte\User::$info->name);
 	return $un_preparse->un_preparsecode($message);
 }
 

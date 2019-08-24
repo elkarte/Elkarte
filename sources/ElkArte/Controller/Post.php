@@ -52,7 +52,7 @@ class Post extends \ElkArte\AbstractController
 		$this->_post_errors = ErrorContext::context('post', 1);
 		$this->_template_layers = theme()->getLayers();
 
-		$this->preparse = \BBC\PreparseCode::instance();
+		$this->preparse = \BBC\PreparseCode::instance($this->user->name);
 
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');

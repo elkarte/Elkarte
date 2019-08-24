@@ -27,6 +27,8 @@ class PreparseCode
 	const NBS = '\x{A0}';
 	/** @var string the message to preparse */
 	public $message = '';
+	/** @var string the username of the current user */
+	public $user_name = '';
 	/** @var bool if this is just a preview */
 	protected $previewing = false;
 	/** @var array the code blocks that we want to protect */
@@ -36,9 +38,11 @@ class PreparseCode
 
 	/**
 	 * PreparseCode constructor.
+	 * @param string $user_name
 	 */
-	public function __construct()
+	protected function __construct($user_name)
 	{
+		$this->user_name = $user_name;
 	}
 
 	/**
@@ -519,20 +523,18 @@ class PreparseCode
 	 */
 	private function _itsAllAbout()
 	{
-		global $user_info;
-
 		$me_regex = '~(\A|\n)/me(?: |&nbsp;)([^\n]*)(?:\z)?~i';
 		$footnote_regex = '~(\[footnote\])/me(?: |&nbsp;)([^\n]*?)(\[\/footnote\])~i';
 
-		if (preg_match('~[\[\]\\"]~', $user_info['name']) !== false)
+		if (preg_match('~[\[\]\\"]~', $this->user_name) !== false)
 		{
-			$this->message = preg_replace($me_regex, '$1[me=&quot;' . $user_info['name'] . '&quot;]$2[/me]', $this->message);
-			$this->message = preg_replace($footnote_regex, '$1[me=&quot;' . $user_info['name'] . '&quot;]$2[/me]$3', $this->message);
+			$this->message = preg_replace($me_regex, '$1[me=&quot;' . $this->user_name . '&quot;]$2[/me]', $this->message);
+			$this->message = preg_replace($footnote_regex, '$1[me=&quot;' . $this->user_name . '&quot;]$2[/me]$3', $this->message);
 		}
 		else
 		{
-			$this->message = preg_replace($me_regex, '$1[me=' . $user_info['name'] . ']$2[/me]', $this->message);
-			$this->message = preg_replace($footnote_regex, '$1[me=' . $user_info['name'] . ']$2[/me]$3', $this->message);
+			$this->message = preg_replace($me_regex, '$1[me=' . $this->user_name . ']$2[/me]', $this->message);
+			$this->message = preg_replace($footnote_regex, '$1[me=' . $this->user_name . ']$2[/me]$3', $this->message);
 		}
 	}
 
@@ -782,13 +784,15 @@ class PreparseCode
 	 * Find and return PreparseCode instance if it exists,
 	 * or create a new instance
 	 *
+	 * @param string $user the name of the user (mostly used in quote tags)
+	 *
 	 * @return PreparseCode
 	 */
-	public static function instance()
+	public static function instance($user)
 	{
 		if (self::$instance === null)
 		{
-			self::$instance = new PreparseCode;
+			self::$instance = new PreparseCode($user);
 		}
 
 		return self::$instance;
