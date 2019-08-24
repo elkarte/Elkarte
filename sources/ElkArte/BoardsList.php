@@ -122,8 +122,7 @@ class BoardsList
 		$this->_subject_length = $modSettings['subject_length'];
 
 		$this->_user = User::$info;
-		$this->_user['mod_cache_ap'] = !empty($this->_user->mod_cache['ap']) ? $this->_user->mod_cache['ap'] : array(),
-		);
+		$this->_user['mod_cache_ap'] = !empty($this->_user->mod_cache['ap']) ? $this->_user->mod_cache['ap'] : array();
 
 		$this->_db = database();
 
