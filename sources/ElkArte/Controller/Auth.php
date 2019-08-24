@@ -222,7 +222,7 @@ class Auth extends \ElkArte\AbstractController
 		$cache = \ElkArte\Cache\Cache::instance();
 		$req = request();
 
-		$user = new \ElkArte\UserSettings($db, $cache, $req);
+		$user = new \ElkArte\UserSettingsLoader($db, $cache, $req);
 		$user->loadUserById($member_found['id_member'], true, '');
 		$user_setting = $user->getSettings();
 
@@ -784,11 +784,11 @@ function checkActivation()
  * What it does:
  *  - It sets the cookie, it call hooks, updates runtime settings for the user.
  *
- * @param \ElkArte\UserSettings $user
+ * @param \ElkArte\UserSettingsLoader $user
  *
  * @package Authorization
  */
-function doLogin(\ElkArte\UserSettings $user)
+function doLogin(\ElkArte\UserSettingsLoader $user)
 {
 	global $user_info, $maintenance, $modSettings, $context;
 

@@ -51,7 +51,7 @@ abstract class AbstractMentionMessage implements MentionTypeInterface
 	/**
 	 * @param \ElkArte\Database\QueryInterface $db
 	 */
-	public static function __construct(\ElkArte\Database\QueryInterface $db, $user)
+	public function __construct(\ElkArte\Database\QueryInterface $db, $user)
 	{
 		$this->_db = $db;
 		$this->user = $user;

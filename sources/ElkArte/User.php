@@ -68,7 +68,7 @@ class User
 			$cache = \ElkArte\Cache\Cache::instance();
 			$req = request();
 
-			self::$instance = new \ElkArte\UserSettings($db, $cache, $req);
+			self::$instance = new \ElkArte\UserSettingsLoader($db, $cache, $req);
 			$already_verified = self::loadFromIntegration();
 			self::loadFromCookie($req->user_agent());
 			self::$instance->loadUserById(self::$id, $already_verified, self::$session_password);
@@ -89,7 +89,7 @@ class User
 	 * @param \ElkArte\UserSettings $user An user
 	 * @param bool $compat_mode if true sets the deprecated $user_info global
 	 */
-	public static function reloadByUser(\ElkArte\UserSettings $user, $compat_mode = false)
+	public static function reloadByUser(\ElkArte\UserSettingsLoader $user, $compat_mode = false)
 	{
 		self::$instance = $user;
 		self::$settings = self::$instance->getSettings();

@@ -160,7 +160,7 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 		$cache = \ElkArte\Cache\Cache::instance();
 		$req = request();
 
-		$user = new \ElkArte\UserSettings($db, $cache, $req);
+		$user = new \ElkArte\UserSettingsLoader($db, $cache, $req);
 		$user->loadUserById($this->member_full_access, true, '');
 		\ElkArte\User::reloadByUser($user);
 		// @deprecated kept until any trace of $user_info has been completely removed

@@ -184,7 +184,7 @@ class OpenID extends \ElkArte\AbstractController
 			$cache = \ElkArte\Cache\Cache::instance();
 			$req = request();
 
-			$user = new \ElkArte\UserSettings($db, $cache, $req);
+			$user = new \ElkArte\UserSettingsLoader($db, $cache, $req);
 			$user->loadUserById($member_found['id_member'], true, '');
 			$user_setting = $user->getSettings();
 
