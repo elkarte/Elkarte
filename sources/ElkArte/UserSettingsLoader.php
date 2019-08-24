@@ -288,6 +288,8 @@ class UserSettingsLoader
 		{
 			$user_info['query_see_board'] = '((FIND_IN_SET(' . implode(', b.member_groups) != 0 OR FIND_IN_SET(', $user_info['groups']) . ', b.member_groups) != 0)' . (!empty($modSettings['deny_boards_access']) ? ' AND (FIND_IN_SET(' . implode(', b.deny_member_groups) = 0 AND FIND_IN_SET(', $user_info['groups']) . ', b.deny_member_groups) = 0)' : '') . (isset($user_info['mod_cache']) ? ' OR ' . $user_info['mod_cache']['mq'] : '') . ')';
 		}
+		$this->db->setSeeBoard($user_info['query_see_board']);
+
 		// Build the list of boards they WANT to see.
 		// This will take the place of query_see_boards in certain spots, so it better include the boards they can see also
 
@@ -301,6 +303,7 @@ class UserSettingsLoader
 		{
 			$user_info['query_wanna_see_board'] = '(' . $user_info['query_see_board'] . ' AND b.id_board NOT IN (' . implode(',', $user_info['ignoreboards']) . '))';
 		}
+		$this->db->setWannaSeeBoard($user_info['query_wanna_see_board']);
 
 		$this->info = new UserInfo($user_info);
 	}
