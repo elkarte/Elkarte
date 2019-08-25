@@ -84,7 +84,7 @@ class Mentioning extends \ElkArte\AbstractModel
 	 * @param \ElkArte\DataValidator $validator
 	 * @param string $enabled_mentions
 	 */
-	public function __construct($db, $validator, $enabled_mentions = '')
+	public function __construct($db, $user, $validator, $enabled_mentions = '')
 	{
 		$this->_known_status = array(
 			'new' => self::MNEW,

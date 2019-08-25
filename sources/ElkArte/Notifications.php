@@ -209,7 +209,7 @@ class Notifications extends AbstractModel
 	 */
 	protected function _send_notification(Mentions\MentionType\MentionTypeInterface $obj, NotificationsTask $task, $bodies)
 	{
-		$mentioning = new Mentions\Mentioning($this->_db, new DataValidator(), $this->_modSettings->enabled_mentions);
+		$mentioning = new Mentions\Mentioning($this->_db, $this->user, new DataValidator(), $this->_modSettings->enabled_mentions);
 		foreach ($bodies as $body)
 		{
 			$this->_to_actually_mention[$task['notification_type']] = $mentioning->create($obj, array(

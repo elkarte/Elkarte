@@ -25,7 +25,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 
 		$modSettings['enabled_mentions'] = 'likemsg,mentionmem';
 
-		$user_info = new \ElkArte\ValuesContainer([
+		$user_info = \ElkArte\User::$info = new \ElkArte\UserInfo([
 			'id' => 1,
 			'ip' => '127.0.0.1',
 			'language' => 'english',
@@ -53,7 +53,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 			'mark_as_read' => false
 		);
 		$posterOptions = array(
-			'id' => $user_info['id'],
+			'id' => \ElkArte\User::$info->id,
 			'name' => 'test-user',
 			'email' => 'noemail@test.tes',
 			'update_post_count' => false,
@@ -141,23 +141,21 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 	 */
 	public function testAddMentionByLike()
 	{
-		global $user_info;
-
-		$user_info['id'] = 2;
-		$user_info['ip'] = '127.0.0.1';
+		\ElkArte\User::$info->id = 2;
+		\ElkArte\User::$info->ip = '127.0.0.1';
 
 		$notifier = \ElkArte\Notifications::instance();
 		$notifier->add(new \ElkArte\NotificationsTask(
 			'likemsg',
 			$this->id_msg,
-			$user_info['id'],
+			\ElkArte\User::$info->id,
 			array('id_members' => array(1), 'rlike_notif' => true)
 		));
 
 		$notifier->send();
 
 		// Get the number of mentions, should be one
-		$count = countUserMentions(false, 'likemsg', $user_info['id']);
+		$count = countUserMentions(false, 'likemsg', \ElkArte\User::$info->id);
 		$this->assertEquals(1, $count);
 	}
 
@@ -171,7 +169,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 	{
 		global $modSettings;
 
-		$mentioning = new \ElkArte\Mentions\Mentioning(database(), new \ElkArte\DataValidator, $modSettings['enabled_mentions']);
+		$mentioning = new \ElkArte\Mentions\Mentioning(database(), \ElkArte\User::$info, new \ElkArte\DataValidator, $modSettings['enabled_mentions']);
 		// Mark mention 2 as read
 		$result = $mentioning->markread(2);
 
@@ -190,7 +188,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 		global $user_info;
 
 		// User 1 has 1 unread mention (i.e. the like)
-		$user_info = new \ElkArte\ValuesContainer([
+		$user_info = \ElkArte\User::$info = new \ElkArte\UserInfo([
 			'id' => 1,
 		]);
 
@@ -198,7 +196,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 
 		$this->assertEquals(1, count($mentions));
 
-		$user_info = new \ElkArte\ValuesContainer([
+		$user_info = \ElkArte\User::$info = new \ElkArte\UserInfo([
 			'id' => 2,
 		]);
 
