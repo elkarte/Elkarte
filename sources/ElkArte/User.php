@@ -101,6 +101,12 @@ class User
 		}
 	}
 
+	public static function logOutUser($compat_mode = false)
+	{
+		self::$instance->loadUserById(0, true, '');
+		reloadByUser(self::$instance, $compat_mode);
+	}
+
 	/**
 	 * Tests any hook set to integrate_verify_user to set users
 	 * according to alternative validations

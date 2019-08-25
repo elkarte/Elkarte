@@ -14,6 +14,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Updates the settings table as well as $modSettings... only does one at a time if $update is true.
  *
@@ -386,7 +388,7 @@ function byte_format($number)
  *
  * What it does:
  *
- * - Returns a pretty formatted version of time based on the user's format in $user_info['time_format'].
+ * - Returns a pretty formatted version of time based on the user's format in User::$info->time_format.
  * - Applies all necessary time offsets to the timestamp, unless offset_type is set.
  * - If todayMod is set and show_today was not not specified or true, an
  *   alternate format string is used to show the date with something to show it is "today" or "yesterday".
@@ -402,7 +404,7 @@ function byte_format($number)
  */
 function standardTime($log_time, $show_today = true, $offset_type = false)
 {
-	global $user_info, $txt, $modSettings;
+	global $txt, $modSettings;
 	static $non_twelve_hour, $is_win = null;
 
 	if ($is_win === null)
@@ -412,7 +414,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 
 	// Offset the time.
 	if (!$offset_type)
-		$time = $log_time + ($user_info['time_offset'] + $modSettings['time_offset']) * 3600;
+		$time = $log_time + (User::$info->time_offset + $modSettings['time_offset']) * 3600;
 	// Just the forum offset?
 	elseif ($offset_type === 'forum')
 		$time = $log_time + $modSettings['time_offset'] * 3600;
@@ -433,10 +435,10 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 		$now = @getdate($nowtime);
 
 		// Try to make something of a time format string...
-		$s = strpos($user_info['time_format'], '%S') === false ? '' : ':%S';
-		if (strpos($user_info['time_format'], '%H') === false && strpos($user_info['time_format'], '%T') === false)
+		$s = strpos(User::$info->time_format, '%S') === false ? '' : ':%S';
+		if (strpos(User::$info->time_format, '%H') === false && strpos(User::$info->time_format, '%T') === false)
 		{
-			$h = strpos($user_info['time_format'], '%l') === false ? '%I' : '%l';
+			$h = strpos(User::$info->time_format, '%l') === false ? '%I' : '%l';
 			$today_fmt = $h . ':%M' . $s . ' %p';
 		}
 		else
@@ -451,7 +453,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 			return sprintf($txt['yesterday'], standardTime($log_time, $today_fmt, $offset_type));
 	}
 
-	$str = !is_bool($show_today) ? $show_today : $user_info['time_format'];
+	$str = !is_bool($show_today) ? $show_today : User::$info->time_format;
 
 	// Windows requires a slightly different language code identifier (LCID).
 	// https://msdn.microsoft.com/en-us/library/cc233982.aspx
@@ -526,14 +528,14 @@ function htmlTime($timestamp)
  */
 function forum_time($use_user_offset = true, $timestamp = null)
 {
-	global $user_info, $modSettings;
+	global $modSettings;
 
 	if ($timestamp === null)
 		$timestamp = time();
 	elseif ($timestamp == 0)
 		return 0;
 
-	return $timestamp + ($modSettings['time_offset'] + ($use_user_offset ? $user_info['time_offset'] : 0)) * 3600;
+	return $timestamp + ($modSettings['time_offset'] + ($use_user_offset ? User::$info->time_offset : 0)) * 3600;
 }
 
 /**
@@ -1573,7 +1575,7 @@ function db_last_error()
  */
 function response_prefix()
 {
-	global $language, $user_info, $txt;
+	global $language, $txt;
 	static $response_prefix = null;
 
 	$cache = \ElkArte\Cache\Cache::instance();
@@ -1581,7 +1583,7 @@ function response_prefix()
 	// Get a response prefix, but in the forum's default language.
 	if ($response_prefix === null && (!$cache->getVar($response_prefix, 'response_prefix') || !$response_prefix))
 	{
-		if ($language === $user_info['language'])
+		if ($language === User::$info->language)
 			$response_prefix = $txt['response_prefix'];
 		else
 		{

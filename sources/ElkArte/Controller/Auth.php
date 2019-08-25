@@ -111,7 +111,7 @@ class Auth extends \ElkArte\AbstractController
 	 */
 	public function action_login2()
 	{
-		global $txt, $modSettings, $context, $user_info;
+		global $txt, $modSettings, $context;
 
 		// Load cookie authentication and all stuff.
 		require_once(SUBSDIR . '/Auth.subs.php');
@@ -277,10 +277,7 @@ class Auth extends \ElkArte\AbstractController
 				// Old password passed, turn off hashing and ask for it again so we can update the db to something more secure.
 				$context['login_errors'] = array($txt['login_hash_error']);
 				$context['disable_login_hashing'] = true;
-				$user->loadUserById(0, true, '');
-				\ElkArte\User::reloadByUser($user);
-				// @deprecated kept until any trace of $user_info has been completely removed
-				$user_info = \ElkArte\User::$info;
+				\ElkArte\User::logOutUser(true);
 
 				return false;
 			}
@@ -304,10 +301,7 @@ class Auth extends \ElkArte\AbstractController
 					// Wrong password, lets enable plain text responses in case form hashing is causing problems
 					$context['disable_login_hashing'] = true;
 					$context['login_errors'] = array($txt['incorrect_password']);
-					$user->loadUserById(0, true, '');
-					\ElkArte\User::reloadByUser($user);
-					// @deprecated kept until any trace of $user_info has been completely removed
-					$user_info = \ElkArte\User::$info;
+					\ElkArte\User::logOutUser(true);
 
 					return false;
 				}
@@ -790,14 +784,12 @@ function checkActivation()
  */
 function doLogin(\ElkArte\UserSettingsLoader $user)
 {
-	global $user_info, $maintenance, $modSettings, $context;
+	global $maintenance, $modSettings, $context;
 
 	// Load authentication stuffs.
 	require_once(SUBSDIR . '/Auth.subs.php');
 
-	\ElkArte\User::reloadByUser($user);
-	// @deprecated kept until any trace of $user_info has been completely removed
-	$user_info = \ElkArte\User::$info;
+	\ElkArte\User::reloadByUser($user, true);
 
 	// Call login integration functions.
 	call_integration_hook('integrate_login', array(\ElkArte\User::$settings['member_name'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 64 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime']));
