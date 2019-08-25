@@ -97,7 +97,7 @@ class Mentioning extends \ElkArte\AbstractModel
 
 		$this->_known_mentions = array_filter(array_unique(explode(',', $enabled_mentions)));
 
-		parent::__construct($db);
+		parent::__construct($db, $user);
 	}
 
 	/**

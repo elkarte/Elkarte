@@ -22,7 +22,9 @@ class TestInlinePermissionsForm extends \PHPUnit\Framework\TestCase
 		theme()->getTemplates()->loadLanguageFile('Admin', 'english', true, true);
 
 		// Elevate the user.
-		$user_info['permissions'] = array_merge($user_info['permissions'], ['manage_permissions']);
+		$user_info = \ElkArte\User::$info = new \ElkArte\UserInfo([
+			'permissions' => ['manage_permissions']
+		]);
 
 		// Make sure they can't do certain things,
 		// unless they have the right permissions.

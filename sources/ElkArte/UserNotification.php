@@ -41,8 +41,11 @@ class UserNotification extends AbstractModel
 
 	/**
 	 * Construct, just load the language file.
+	 *
+	 * @param \ElkArte\Database\QueryInterface $db
+	 * @param \ElkArte\UserInfo|null $user
 	 */
-	public function __construct()
+	public function __construct($db, $user)
 	{
 		parent::__construct();
 		theme()->getTemplates()->loadLanguageFile('UserNotifications');

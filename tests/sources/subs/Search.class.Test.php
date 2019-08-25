@@ -113,6 +113,7 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 		];
 		$posterOptions = [
 			'id' => $this->member_full_access,
+			'ip' => '127.0.0.1',
 			'name' => 'guestname',
 			'email' => $regOptions1['email'],
 			'update_post_count' => false,
@@ -137,6 +138,7 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 		];
 		$posterOptions = [
 			'id' => $this->member_full_access,
+			'ip' => '127.0.0.1',
 			'name' => 'guestname',
 			'email' => $regOptions1['email'],
 			'update_post_count' => false,

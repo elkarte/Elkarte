@@ -569,7 +569,7 @@ Should be an empty line in between.',
 			array(
 				'itsMe',
 				'/me likes this',
-				'<div class="meaction">&nbsp;' . $user_info['name'] . ' likes this</div>'
+				'<div class="meaction">&nbsp;' . \ElkArte\User::$info->name . ' likes this</div>'
 			),
 			array(
 				'schemelessUrl',

@@ -44,8 +44,8 @@ class Errors extends AbstractModel
 	 * this __construct will feed AbstractModel with a value just to stop it
 	 * from trying to initialize the database connection.
 	 *
-	 * @param $db \ElkArte\Database\QueryInterface|null
-	 * @param $user \ElkArte\UserInfo|null
+	 * @param \ElkArte\Database\QueryInterface|null $db
+	 * @param \ElkArte\UserInfo|null $user
 	 */
 	public function __construct($db = null, $user = null)
 	{
