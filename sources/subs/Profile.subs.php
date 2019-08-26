@@ -14,6 +14,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Find the ID of the "current" member
  *
@@ -25,7 +27,6 @@
  */
 function currentMemberID($fatal = true, $reload_id = false)
 {
-	global $user_info;
 	static $memID;
 
 	// If we already know who we're dealing with
@@ -45,7 +46,7 @@ function currentMemberID($fatal = true, $reload_id = false)
 	// If it was just ?action=profile, edit your own profile.
 	else
 	{
-		$memberResult = \ElkArte\MembersList::load($user_info['id'], false, 'profile');
+		$memberResult = \ElkArte\MembersList::load(User::$info->id, false, 'profile');
 	}
 
 	// Check if \ElkArte\MembersList::load() has returned a valid result.
@@ -166,7 +167,7 @@ function setupProfileContext($fields, $hook = '')
  */
 function loadCustomFields($memID, $area = 'summary', array $custom_fields = array())
 {
-	global $context, $txt, $user_info, $settings, $scripturl;
+	global $context, $txt, $settings, $scripturl;
 
 	$db = database();
 
@@ -175,16 +176,24 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 	if (!allowedTo('admin_forum') && $area !== 'register')
 	{
 		// If it's the owner they can see two types of private fields, regardless.
-		if ($memID == $user_info['id'])
+		if ($memID == User::$info->id)
+		{
 			$where .= $area === 'summary' ? ' AND private < 3' : ' AND (private = 0 OR private = 2)';
+		}
 		else
+		{
 			$where .= $area === 'summary' ? ' AND private < 2' : ' AND private = 0';
+		}
 	}
 
 	if ($area === 'register')
+	{
 		$where .= ' AND show_reg != 0';
+	}
 	elseif ($area !== 'summary')
+	{
 		$where .= ' AND show_profile = {string:area}';
+	}
 
 	// Load all the relevant fields - and data.
 	// The fully-qualified name for rows is here because it's a reserved word in Mariadb 10.2.4+ and quoting would be different for MySQL/Mariadb and PSQL
@@ -334,7 +343,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
  */
 function loadProfileFields($force_reload = false)
 {
-	global $context, $profile_fields, $txt, $scripturl, $modSettings, $user_info, $cur_profile, $language, $settings;
+	global $context, $profile_fields, $txt, $scripturl, $modSettings, $cur_profile, $language, $settings;
 
 	// Don't load this twice!
 	if (!empty($profile_fields) && !$force_reload)
@@ -453,22 +462,22 @@ function loadProfileFields($force_reload = false)
 		),
 		'date_registered' => array(
 			'type' => 'date',
-			'value' => empty($cur_profile['date_registered']) ? $txt['not_applicable'] : strftime('%Y-%m-%d', $cur_profile['date_registered'] + ($user_info['time_offset'] + $modSettings['time_offset']) * 3600),
+			'value' => empty($cur_profile['date_registered']) ? $txt['not_applicable'] : strftime('%Y-%m-%d', $cur_profile['date_registered'] + (User::$info->time_offset + $modSettings['time_offset']) * 3600),
 			'label' => $txt['date_registered'],
 			'log_change' => true,
 			'permission' => 'moderate_forum',
 			'input_validate' => function (&$value) {
-				global $txt, $user_info, $modSettings, $cur_profile;
+				global $txt, $modSettings, $cur_profile;
 
 				// Bad date!  Go try again - please?
 				if (($value = strtotime($value)) === -1)
 				{
 					$value = $cur_profile['date_registered'];
-					return $txt['invalid_registration'] . ' ' . strftime('%d %b %Y ' . (strpos($user_info['time_format'], '%H') !== false ? '%I:%M:%S %p' : '%H:%M:%S'), forum_time(false));
+					return $txt['invalid_registration'] . ' ' . strftime('%d %b %Y ' . (strpos(User::$info->time_format, '%H') !== false ? '%I:%M:%S %p' : '%H:%M:%S'), forum_time(false));
 				}
 				// As long as it doesn't equal "N/A"...
-				elseif ($value != $txt['not_applicable'] && $value != strtotime(strftime('%Y-%m-%d', $cur_profile['date_registered'] + ($user_info['time_offset'] + $modSettings['time_offset']) * 3600)))
-					$value = $value - ($user_info['time_offset'] + $modSettings['time_offset']) * 3600;
+				elseif ($value != $txt['not_applicable'] && $value != strtotime(strftime('%Y-%m-%d', $cur_profile['date_registered'] + (User::$info->time_offset + $modSettings['time_offset']) * 3600)))
+					$value = $value - (User::$info->time_offset + $modSettings['time_offset']) * 3600;
 				else
 					$value = $cur_profile['date_registered'];
 
@@ -621,7 +630,7 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_identity',
 			'prehtml' => allowedTo('admin_forum') && isset($_GET['changeusername']) ? '<div class="warningbox">' . $txt['username_warning'] . '</div>' : '',
 			'input_validate' => function (&$value) {
-				global $context, $user_info, $cur_profile;
+				global $context, $cur_profile;
 
 				if (allowedTo('admin_forum'))
 				{
@@ -630,7 +639,7 @@ function loadProfileFields($force_reload = false)
 
 					// Maybe they are trying to change their password as well?
 					$resetPassword = true;
-					if (isset($_POST['passwrd1']) && $_POST['passwrd1'] !== '' && isset($_POST['passwrd2']) && $_POST['passwrd1'] === $_POST['passwrd2'] && validatePassword($_POST['passwrd1'], $value, array($cur_profile['real_name'], $user_info['username'], $user_info['name'], $user_info['email'])) === null)
+					if (isset($_POST['passwrd1']) && $_POST['passwrd1'] !== '' && isset($_POST['passwrd2']) && $_POST['passwrd1'] === $_POST['passwrd2'] && validatePassword($_POST['passwrd1'], $value, array($cur_profile['real_name'], User::$info->username, User::$info->name, User::$info->email)) === null)
 					{
 						$resetPassword = false;
 					}
@@ -653,7 +662,7 @@ function loadProfileFields($force_reload = false)
 						{
 							// If there are "important" errors and you are not an admin: log the first error
 							// Otherwise grab all of them and do not log anything
-							$error_severity = $errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
+							$error_severity = $errors->hasErrors(1) && User::$info->is_admin === false ? 1 : null;
 							foreach ($errors->prepareErrors($error_severity) as $error)
 								throw new \ElkArte\Exceptions\Exception($error, $error_severity === null ? false : 'general');
 						}
@@ -673,7 +682,7 @@ function loadProfileFields($force_reload = false)
 			'save_key' => 'passwd',
 			// Note this will only work if passwrd2 also exists!
 			'input_validate' => function (&$value) {
-				global $user_info, $cur_profile;
+				global $cur_profile;
 
 				// If we didn't try it then ignore it!
 				if ($value == '')
@@ -685,7 +694,7 @@ function loadProfileFields($force_reload = false)
 
 				// Let's get the validation function into play...
 				require_once(SUBSDIR . '/Auth.subs.php');
-				$passwordErrors = validatePassword($value, $cur_profile['member_name'], array($cur_profile['real_name'], $user_info['username'], $user_info['name'], $user_info['email']));
+				$passwordErrors = validatePassword($value, $cur_profile['member_name'], array($cur_profile['real_name'], User::$info->username, User::$info->name, User::$info->email));
 
 				// Were there errors?
 				if ($passwordErrors !== null)
@@ -904,13 +913,13 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_extra',
 			'is_dummy' => true,
 			'preload' => function () {
-				global $context, $user_info;
+				global $context;
 
 				theme()->getTemplates()->loadLanguageFile('Settings');
 
 				// Can they disable censoring?
 				$context['allow_no_censored'] = false;
-				if ($user_info['is_admin'] || $context['user']['is_owner'])
+				if (User::$info->is_admin || $context['user']['is_owner'])
 					$context['allow_no_censored'] = allowedTo('disable_censor');
 
 				return true;
@@ -921,7 +930,7 @@ function loadProfileFields($force_reload = false)
 			'callback_func' => 'timeformat_modify',
 			'permission' => 'profile_extra',
 			'preload' => function () {
-				global $context, $user_info, $txt, $cur_profile, $modSettings;
+				global $context, $txt, $cur_profile, $modSettings;
 
 				$context['easy_timeformats'] = array(
 					array('format' => '', 'title' => $txt['timeformat_default']),
@@ -933,7 +942,7 @@ function loadProfileFields($force_reload = false)
 				);
 
 				$context['member']['time_format'] = $cur_profile['time_format'];
-				$context['current_forum_time'] = standardTime(time() - $user_info['time_offset'] * 3600, false);
+				$context['current_forum_time'] = standardTime(time() - User::$info->time_offset * 3600, false);
 				$context['current_forum_time_js'] = strftime('%Y,' . ((int) strftime('%m', time() + $modSettings['time_offset'] * 3600) - 1) . ',%d,%H,%M,%S', time() + $modSettings['time_offset'] * 3600);
 				$context['current_forum_time_hour'] = (int) strftime('%H', forum_time(false));
 				return true;
@@ -1313,7 +1322,7 @@ function saveProfileChanges(&$profile_vars, $memID)
  */
 function makeThemeChanges($memID, $id_theme)
 {
-	global $modSettings, $context, $user_info;
+	global $modSettings, $context;
 
 	$db = database();
 
@@ -1386,7 +1395,7 @@ function makeThemeChanges($memID, $id_theme)
 			if ($opt === 'topics_per_page' || $opt === 'messages_per_page')
 				$val = max(0, min($val, 50));
 			// Only let admins and owners change the censor.
-			elseif ($opt === 'allow_no_censored' && !$user_info['is_admin'] && !$context['user']['is_owner'])
+			elseif ($opt === 'allow_no_censored' && User::$info->is_admin && !$context['user']['is_owner'])
 				continue;
 
 			$themeSetArray[] = array(1, $memID, $opt, is_array($val) ? implode(',', $val) : $val);
@@ -1521,7 +1530,7 @@ function makeNotificationChanges($memID)
  */
 function makeCustomFieldChanges($memID, $area, $sanitize = true)
 {
-	global $context, $user_info, $modSettings;
+	global $context, $modSettings;
 
 	$db = database();
 
@@ -1551,7 +1560,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 			- The data is not invisible to users but editable by the owner (or if it is the user is not the owner)
 			- The area isn't registration, and if it is that the field is not supposed to be shown there.
 		*/
-		if ($row['private'] != 0 && !allowedTo('admin_forum') && ($memID != $user_info['id'] || $row['private'] != 2) && ($area !== 'register' || $row['show_reg'] == 0))
+		if ($row['private'] != 0 && !allowedTo('admin_forum') && ($memID != User::$info->id || $row['private'] != 2) && ($area !== 'register' || $row['show_reg'] == 0))
 			continue;
 
 		// Validate the user data.
@@ -1606,7 +1615,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 				'extra' => array(
 					'previous' => !empty($options[$row['col_name']]) ? $options[$row['col_name']] : '',
 					'new' => $value,
-					'applicator' => $user_info['id'],
+					'applicator' => User::$info->id,
 					'member_affected' => $memID,
 				),
 			);
@@ -2883,15 +2892,15 @@ function getNumUnwatchedBy($memID)
  */
 function count_user_posts($memID, $board = null)
 {
-	global $modSettings, $user_info;
+	global $modSettings;
 
 	$db = database();
 
-	$is_owner = $memID == $user_info['id'];
+	$is_owner = $memID == User::$info->id;
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
-		FROM {db_prefix}messages AS m' . ($user_info['query_see_board'] === '1=1' ? '' : '
+		FROM {db_prefix}messages AS m' . (User::$info->query_see_board === '1=1' ? '' : '
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . '
 		WHERE m.id_member = {int:current_member}' . (!empty($board) ? '
 			AND m.id_board = {int:board}' : '') . (!$modSettings['postmod_active'] || $is_owner ? '' : '
@@ -2920,15 +2929,15 @@ function count_user_posts($memID, $board = null)
  */
 function count_user_topics($memID, $board = null)
 {
-	global $modSettings, $user_info;
+	global $modSettings;
 
 	$db = database();
 
-	$is_owner = $memID == $user_info['id'];
+	$is_owner = $memID == User::$info->id;
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
-		FROM {db_prefix}topics AS t' . ($user_info['query_see_board'] === '1=1' ? '' : '
+		FROM {db_prefix}topics AS t' . (User::$info->query_see_board === '1=1' ? '' : '
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board AND {query_see_board})') . '
 		WHERE t.id_member_started = {int:current_member}' . (!empty($board) ? '
 			AND t.id_board = {int:board}' : '') . (!$modSettings['postmod_active'] || $is_owner ? '' : '
@@ -2959,11 +2968,11 @@ function count_user_topics($memID, $board = null)
  */
 function findMinMaxUserMessage($memID, $board = null)
 {
-	global $modSettings, $user_info;
+	global $modSettings;
 
 	$db = database();
 
-	$is_owner = $memID == $user_info['id'];
+	$is_owner = $memID == User::$info->id;
 
 	$request = $db->query('', '
 		SELECT MIN(id_msg), MAX(id_msg)
@@ -2996,11 +3005,11 @@ function findMinMaxUserMessage($memID, $board = null)
  */
 function findMinMaxUserTopic($memID, $board = null)
 {
-	global $modSettings, $user_info;
+	global $modSettings;
 
 	$db = database();
 
-	$is_owner = $memID == $user_info['id'];
+	$is_owner = $memID == User::$info->id;
 
 	$request = $db->query('', '
 		SELECT MIN(id_topic), MAX(id_topic)
@@ -3038,11 +3047,11 @@ function findMinMaxUserTopic($memID, $board = null)
  */
 function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = false, $board = null)
 {
-	global $modSettings, $user_info;
+	global $modSettings;
 
 	$db = database();
 
-	$is_owner = $memID == $user_info['id'];
+	$is_owner = $memID == User::$info->id;
 	$user_posts = array();
 
 	// Find this user's posts. The left join on categories somehow makes this faster, weird as it looks.
@@ -3105,11 +3114,11 @@ function load_user_posts($memID, $start, $count, $range_limit = '', $reverse = f
  */
 function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = false, $board = null)
 {
-	global $modSettings, $user_info;
+	global $modSettings;
 
 	$db = database();
 
-	$is_owner = $memID == $user_info['id'];
+	$is_owner = $memID == User::$info->id;
 	$user_topics = array();
 
 	// Find this user's topics.  The left join on categories somehow makes this faster, weird as it looks.

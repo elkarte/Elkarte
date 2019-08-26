@@ -14,6 +14,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Gets the member id's of added buddies
  *
@@ -25,7 +27,7 @@
  */
 function getBuddiesID($buddies, $adding = true)
 {
-	global $modSettings, $user_info;
+	global $modSettings;
 
 	$db = database();
 
@@ -59,7 +61,7 @@ function getBuddiesID($buddies, $adding = true)
 			$notifier->add(new \ElkArte\NotificationsTask(
 				'buddy',
 				$row['id_member'],
-				$user_info['id'],
+				User::$info->id,
 				array('id_members' => array($row['id_member']))
 			));
 		}

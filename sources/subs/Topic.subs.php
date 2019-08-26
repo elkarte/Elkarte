@@ -25,7 +25,7 @@
  */
 function removeTopicsPermissions($topics)
 {
-	global $board, $user_info;
+	global $board;
 
 	// They can only delete their own topics. (we wouldn't be here if they couldn't do that..)
 	$possible_remove = topicAttribute($topics, array('id_topic', 'id_board', 'id_member_started'));
@@ -36,7 +36,7 @@ function removeTopicsPermissions($topics)
 	foreach ($possible_remove as $row)
 	{
 		// Skip if we have to test the owner *and* the user is not the owner
-		if ($test_owner && $row['id_member_started'] != $user_info['id'])
+		if ($test_owner && $row['id_member_started'] != User::$info->id)
 			continue;
 
 		$removeCache[] = $row['id_topic'];
@@ -441,7 +441,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
  */
 function moveTopicsPermissions($moveCache)
 {
-	global $board, $user_info;
+	global $board;
 
 	$db = database();
 
@@ -454,7 +454,7 @@ function moveTopicsPermissions($moveCache)
 			AND t.id_member_started = {int:current_member}' : '') . '
 		LIMIT ' . count($moveCache[0]),
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'move_topic_ids' => $moveCache[0],
 		)
 	);
@@ -547,7 +547,7 @@ function moveTopicsPermissions($moveCache)
  */
 function moveTopics($topics, $toBoard, $log = false)
 {
-	global $user_info, $modSettings;
+	global $modSettings;
 
 	// No topics or no board?
 	if (empty($topics) || empty($toBoard))
@@ -803,14 +803,14 @@ function moveTopics($topics, $toBoard, $log = false)
 			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
 		WHERE b.id_board = {int:id_board}',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'id_board' => $toBoard,
 		)
 	);
 	list ($isSeen) = $db->fetch_row($request);
 	$db->free_result($request);
 
-	if (!empty($isSeen) && !$user_info['is_guest'])
+	if (!empty($isSeen) && User::$info->is_guest === false)
 	{
 		require_once(SUBSDIR . '/Boards.subs.php');
 		markBoardsRead($toBoard);
@@ -976,7 +976,7 @@ function markTopicsRead($mark_topics, $was_set = false)
  */
 function updateReadNotificationsFor($id_topic, $id_board)
 {
-	global $user_info, $context;
+	global $context;
 
 	$db = database();
 
@@ -989,7 +989,7 @@ function updateReadNotificationsFor($id_topic, $id_board)
 		LIMIT 2',
 		array(
 			'current_board' => $id_board,
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'current_topic' => $id_topic,
 		)
 	);
@@ -1010,7 +1010,7 @@ function updateReadNotificationsFor($id_topic, $id_board)
 					AND id_member = {int:current_member}',
 				array(
 					'current_board' => $id_board,
-					'current_member' => $user_info['id'],
+					'current_member' => User::$info->id,
 					'current_topic' => $id_topic,
 					'is_not_sent' => 0,
 				)
@@ -1030,8 +1030,6 @@ function updateReadNotificationsFor($id_topic, $id_board)
  */
 function getUnreadCountSince($id_board, $id_msg_last_visit)
 {
-	global $user_info;
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -1046,7 +1044,7 @@ function getUnreadCountSince($id_board, $id_msg_last_visit)
 			AND t.id_last_msg > {int:id_msg_last_visit}'),
 		array(
 			'current_board' => $id_board,
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'id_msg_last_visit' => (int) $id_msg_last_visit,
 		)
 	);
@@ -1241,12 +1239,10 @@ function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $inclu
  */
 function setTopicWatch($id_member, $topic, $on = false)
 {
-	global $user_info;
-
 	$db = database();
 
 	// find the current entry if it exists that is
-	$was_set = getLoggedTopics($user_info['id'], array($topic));
+	$was_set = getLoggedTopics(User::$info->id, array($topic));
 
 	// Set topic unwatched on/off for this topic.
 	$db->insert(empty($was_set[$topic]) ? 'ignore' : 'replace',
@@ -1275,7 +1271,7 @@ function setTopicWatch($id_member, $topic, $on = false)
  */
 function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables = array())
 {
-	global $user_info, $modSettings, $board;
+	global $modSettings, $board;
 
 	$db = database();
 
@@ -1287,7 +1283,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 	if (!is_array($topic_parameters))
 		$topic_parameters = array(
 			'topic' => $topic_parameters,
-			'member' => $user_info['id'],
+			'member' => User::$info->id,
 			'board' => (int) $board,
 		);
 
@@ -1304,13 +1300,13 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			t.id_redirect_topic, t.unapproved_posts, t.approved' . ($messages_table ? ',
 			ms.subject, ms.body, ms.id_member, ms.poster_time, ms.approved as msg_approved' : '') . ($members_table ? ',
 			COALESCE(mem.real_name, ms.poster_name) AS poster_name' : '') . ($logs_table ? ',
-			' . ($user_info['is_guest'] ? 't.id_last_msg + 1' : 'COALESCE(lt.id_msg, lmr.id_msg, -1) + 1') . ' AS new_from
+			' . (User::$info->is_guest ? 't.id_last_msg + 1' : 'COALESCE(lt.id_msg, lmr.id_msg, -1) + 1') . ' AS new_from
 			' . (!empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $board ? ', t.id_previous_board, t.id_previous_topic' : '') . '
-			' . (!$user_info['is_guest'] ? ', COALESCE(lt.unwatched, 0) as unwatched' : '') : '') .
+			' . (User::$info->is_guest === false ? ', COALESCE(lt.unwatched, 0) as unwatched' : '') : '') .
 			(!empty($selects) ? ', ' . implode(', ', $selects) : '') . '
 		FROM {db_prefix}topics AS t' . ($messages_table ? '
 			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' : '') . ($members_table ? '
-			LEFT JOIN {db_prefix}members as mem ON (mem.id_member = ms.id_member)' : '') . ($logs_table && !$user_info['is_guest'] ? '
+			LEFT JOIN {db_prefix}members as mem ON (mem.id_member = ms.id_member)' : '') . ($logs_table && User::$info->is_guest === false ? '
 			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = {int:topic} AND lt.id_member = {int:member})
 			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:board} AND lmr.id_member = {int:member})' : '') . (!empty($tables) ? '
 			' . implode("\n\t\t\t", $tables) : '') . '
@@ -1336,7 +1332,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
  */
 function getTopicInfoByMsg($topic, $msg = null)
 {
-	global $user_info, $modSettings;
+	global $modSettings;
 
 	// Nothing to do
 	if (empty($topic))
@@ -1356,7 +1352,7 @@ function getTopicInfoByMsg($topic, $msg = null)
 			AND (m.id_member != {int:guest_id} AND m.id_member = {int:current_member})' : '
 			AND (m.approved = {int:is_approved} OR (m.id_member != {int:guest_id} AND m.id_member = {int:current_member}))')),
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'current_topic' => $topic,
 			'id_msg' => empty($msg) ? 't.id_first_msg' : $msg,
 			'is_approved' => 1,
@@ -1553,8 +1549,6 @@ function countMessagesSince($id_topic, $id_msg, $include_current = false, $only_
  */
 function countMessagesBefore($id_topic, $id_msg, $include_current = false, $only_approved = false, $include_own = false)
 {
-	global $user_info;
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -1565,7 +1559,7 @@ function countMessagesBefore($id_topic, $id_msg, $include_current = false, $only
 			AND (approved = {int:is_approved}' . ($include_own ? '
 			OR id_member = {int:current_member}' : '') . ')' : ''),
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'current_topic' => $id_topic,
 			'id_msg' => $id_msg,
 			'is_approved' => 1,
@@ -1655,7 +1649,7 @@ function selectMessages($topic, $start, $items_per_page, $messages = array(), $o
  */
 function topicMessages($topic, $render = 'print')
 {
-	global $modSettings, $user_info;
+	global $modSettings;
 
 	$db = database();
 
@@ -1664,12 +1658,12 @@ function topicMessages($topic, $render = 'print')
 		FROM {db_prefix}messages AS m
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 		WHERE m.id_topic = {int:current_topic}' . ($modSettings['postmod_active'] && !allowedTo('approve_posts') ? '
-			AND (m.approved = {int:is_approved}' . ($user_info['is_guest'] ? '' : ' OR m.id_member = {int:current_member}') . ')' : '') . '
+			AND (m.approved = {int:is_approved}' . (User::$info->is_guest ? '' : ' OR m.id_member = {int:current_member}') . ')' : '') . '
 		ORDER BY m.id_msg',
 		array(
 			'current_topic' => $topic,
 			'is_approved' => 1,
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 		)
 	);
 
@@ -2162,7 +2156,7 @@ function topicsList($topic_ids)
  */
 function getTopicsPostsAndPoster($topic, $limit, $sort)
 {
-	global $modSettings, $user_info;
+	global $modSettings;
 
 	$db = database();
 
@@ -2175,11 +2169,11 @@ function getTopicsPostsAndPoster($topic, $limit, $sort)
 		SELECT id_msg, id_member, approved
 		FROM {db_prefix}messages
 		WHERE id_topic = {int:current_topic}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-			AND (approved = {int:is_approved}' . ($user_info['is_guest'] ? '' : ' OR id_member = {int:current_member}') . ')') . '
+			AND (approved = {int:is_approved}' . (User::$info->is_guest ? '' : ' OR id_member = {int:current_member}') . ')') . '
 		ORDER BY id_msg ' . ($sort ? '' : 'DESC') . ($limit['messages_per_page'] == -1 ? '' : '
 		LIMIT ' . $limit['start'] . ', ' . $limit['offset']),
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'current_topic' => $topic,
 			'is_approved' => 1,
 			'blank_id_member' => 0,
@@ -2336,11 +2330,13 @@ function approveTopics($topics, $approve = true, $log = false)
  */
 function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 {
-	global $user_info, $language, $txt, $topic, $board;
+	global $language, $txt, $topic, $board;
 
 	// Should be in the boardwide language.
-	if ($user_info['language'] != $language)
+	if (User::$info->language != $language)
+	{
 		theme()->getTemplates()->loadLanguageFile('index', $language);
+	}
 
 	preparsecode($reason);
 
@@ -2364,7 +2360,7 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 	);
 
 	$posterOptions = array(
-		'id' => $user_info['id'],
+		'id' => User::$info->id,
 		'update_post_count' => empty($board_info['count_posts']),
 	);
 
@@ -2645,7 +2641,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
  */
 function splitAttemptMove($boards, $totopic)
 {
-	global $board, $user_info;
+	global $board;
 
 	$db = database();
 
@@ -2658,7 +2654,7 @@ function splitAttemptMove($boards, $totopic)
 		else
 		{
 			$new_topic = getTopicInfo($totopic);
-			if ($new_topic['id_member_started'] == $user_info['id'] && allowedTo('move_own'))
+			if ($new_topic['id_member_started'] == User::$info->id && allowedTo('move_own'))
 				$doMove = true;
 		}
 
@@ -2748,16 +2744,16 @@ function splitDestinationBoard($toboard = 0)
  */
 function topicNotificationCount($memID)
 {
-	global $user_info, $modSettings;
+	global $modSettings;
 
 	$db = database();
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
-		FROM {db_prefix}log_notify AS ln' . (!$modSettings['postmod_active'] && $user_info['query_see_board'] === '1=1' ? '' : '
-			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ln.id_topic)') . ($user_info['query_see_board'] === '1=1' ? '' : '
+		FROM {db_prefix}log_notify AS ln' . (!$modSettings['postmod_active'] && User::$info->query_see_board === '1=1' ? '' : '
+			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ln.id_topic)') . (User::$info->query_see_board === '1=1' ? '' : '
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)') . '
-		WHERE ln.id_member = {int:selected_member}' . ($user_info['query_see_board'] === '1=1' ? '' : '
+		WHERE ln.id_member = {int:selected_member}' . (User::$info->query_see_board === '1=1' ? '' : '
 			AND {query_see_board}') . ($modSettings['postmod_active'] ? '
 			AND t.approved = {int:is_approved}' : ''),
 		array(
@@ -2783,7 +2779,7 @@ function topicNotificationCount($memID)
  */
 function topicNotifications($start, $items_per_page, $sort, $memID)
 {
-	global $user_info, $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -2807,7 +2803,7 @@ function topicNotifications($start, $items_per_page, $sort, $memID)
 		ORDER BY {raw:sort}
 		LIMIT {int:offset}, {int:items_per_page}',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'is_approved' => 1,
 			'selected_member' => $memID,
 			'sort' => $sort,
@@ -3252,7 +3248,7 @@ function updateTopicStats($increment = null)
  */
 function toggleTopicsLock($topics, $log = false)
 {
-	global $board, $user_info;
+	global $board;
 
 	$db = database();
 
@@ -3265,7 +3261,7 @@ function toggleTopicsLock($topics, $log = false)
 	{
 		// Skip the entry if it needs to be checked and the user is not the owen and
 		// the topic was not locked or locked by someone with more permissions
-		if ($needs_check && ($user_info['id'] != $row['id_member_started'] || !in_array($row['locked'], array(0, 2))))
+		if ($needs_check && (User::$info->id != $row['id_member_started'] || !in_array($row['locked'], array(0, 2))))
 			continue;
 
 		$lockCache[] = $row['id_topic'];

@@ -182,7 +182,7 @@ function topPosters($limit = null)
  */
 function topBoards($limit = null, $read_status = false)
 {
-	global $modSettings, $user_info;
+	global $modSettings;
 
 	$db = database();
 
@@ -194,7 +194,7 @@ function topBoards($limit = null, $read_status = false)
 		$limit = empty($limit) ? 10 : $limit;
 
 	$boards_result = $db->query('', '
-		SELECT b.id_board, b.name, b.num_posts, b.num_topics' . ($read_status ? ',' . (!$user_info['is_guest'] ? ' 1 AS is_read' : '
+		SELECT b.id_board, b.name, b.num_posts, b.num_topics' . ($read_status ? ',' . (User::$info->is_guest === false ? ' 1 AS is_read' : '
 			(COALESCE(lb.id_msg, 0) >= b.id_last_msg) AS is_read') : '') . '
 		FROM {db_prefix}boards AS b' . ($read_status ? '
 			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})' : '') . '
@@ -207,7 +207,7 @@ function topBoards($limit = null, $read_status = false)
 			'recycle_board' => $modSettings['recycle_board'],
 			'blank_redirect' => '',
 			'limit_boards' => $limit,
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 		)
 	);
 	$top_boards = array();
@@ -887,7 +887,7 @@ function UserStatsMostActiveBoard($memID, $limit = 10)
  */
 function UserStatsPostingTime($memID)
 {
-	global $user_info, $modSettings;
+	global $modSettings;
 
 	$posts_by_time = array();
 	$hours = array();
@@ -895,7 +895,7 @@ function UserStatsPostingTime($memID)
 	{
 		$posts_by_time[$hour] = array(
 			'hour' => $hour,
-			'hour_format' => stripos($user_info['time_format'], '%p') === false ? $hour : date('g a', mktime($hour)),
+			'hour_format' => stripos(User::$info->time_format, '%p') === false ? $hour : date('g a', mktime($hour)),
 			'posts' => 0,
 			'posts_percent' => 0,
 			'relative_percent' => 0,

@@ -59,7 +59,7 @@ function viewers($id, $session, $type = 'topic')
  */
 function formatViewers($id, $type)
 {
-	global $user_info, $context;
+	global $context;
 
 	// Lets say there's no one around. (what? could happen!)
 	$context['view_members'] = array();
@@ -67,7 +67,7 @@ function formatViewers($id, $type)
 	$context['view_num_hidden'] = 0;
 	$context['view_num_guests'] = 0;
 
-	$viewers = viewers($id, $user_info['is_guest'] ? 'ip' . $user_info['ip'] : session_id(), $type);
+	$viewers = viewers($id, User::$info->is_guest ? 'ip' . User::$info->ip : session_id(), $type);
 
 	foreach ($viewers as $viewer)
 	{
@@ -85,7 +85,7 @@ function formatViewers($id, $type)
 		else
 			$link = '<a href="' . $href . '">' . $viewer['real_name'] . '</a>';
 
-		$is_buddy = in_array($viewer['id_member'], $user_info['buddies']);
+		$is_buddy = in_array($viewer['id_member'], User::$info->buddies);
 		if ($is_buddy)
 			$link = '<strong>' . $link . '</strong>';
 
@@ -189,7 +189,7 @@ function addonsCredits()
  */
 function determineActions($urls, $preferred_prefix = false)
 {
-	global $txt, $user_info, $modSettings;
+	global $txt, $modSettings;
 
 	$db = database();
 
@@ -228,7 +228,7 @@ function determineActions($urls, $preferred_prefix = false)
 
 	if (!is_array($urls))
 	{
-		$url_list = array(array($urls, $user_info['id']));
+		$url_list = array(array($urls, User::$info->id));
 	}
 	else
 	{
@@ -296,7 +296,7 @@ function determineActions($urls, $preferred_prefix = false)
 					require_once(SUBSDIR . '/Profile.subs.php');
 					$memID = currentMemberID();
 
-					if ($memID == $user_info['id'])
+					if ($memID == User::$info->id)
 					{
 						$actions['u'] = $url[1];
 					}
@@ -476,7 +476,7 @@ function determineActions($urls, $preferred_prefix = false)
 		foreach ($result as $row)
 		{
 			// If they aren't allowed to view this person's profile, skip it.
-			if (!allowedTo('profile_view_any') && $user_info['id'] != $row['id_member'])
+			if (!allowedTo('profile_view_any') && User::$info->id != $row['id_member'])
 			{
 				continue;
 			}

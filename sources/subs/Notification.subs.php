@@ -30,13 +30,13 @@
  */
 function sendNotifications($topics, $type, $exclude = array(), $members_only = array(), $pbe = array())
 {
-	global $txt, $scripturl, $language, $user_info, $webmaster_email, $mbname, $modSettings;
+	global $txt, $scripturl, $language, $webmaster_email, $mbname, $modSettings;
 
 	$db = database();
 
 	// Coming in from emailpost or emailtopic, if so pbe values will be set to the credentials of the emailer
-	$user_id = (!empty($pbe['user_info']['id']) && !empty($modSettings['maillist_enabled'])) ? $pbe['user_info']['id'] : $user_info['id'];
-	$user_language = (!empty($pbe['user_info']['language']) && !empty($modSettings['maillist_enabled'])) ? $pbe['user_info']['language'] : $user_info['language'];
+	$user_id = (!empty($pbe['user_info']['id']) && !empty($modSettings['maillist_enabled'])) ? $pbe['user_info']['id'] : User::$info->id;
+	$user_language = (!empty($pbe['user_info']['language']) && !empty($modSettings['maillist_enabled'])) ? $pbe['user_info']['language'] : User::$info->language;
 
 	// Can't do it if there's no topics.
 	if (empty($topics))
@@ -88,7 +88,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			'last_id' => $row['id_last_msg'],
 			'topic' => $row['id_topic'],
 			'board' => $row['id_board'],
-			'name' => $type === 'reply' ? $row['poster_name'] : $user_info['name'],
+			'name' => $type === 'reply' ? $row['poster_name'] : User::$info->name,
 			'exclude' => '',
 			'signature' => $row['signature'],
 			'attachments' => $row['num_attach'],
@@ -391,7 +391,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
  */
 function sendBoardNotifications(&$topicData)
 {
-	global $scripturl, $language, $user_info, $modSettings, $webmaster_email;
+	global $scripturl, $language, $modSettings, $webmaster_email;
 
 	$db = database();
 
@@ -433,7 +433,7 @@ function sendBoardNotifications(&$topicData)
 	// Yea, we need to add this to the digest queue.
 	$digest_insert = array();
 	foreach ($topicData as $id => $data)
-		$digest_insert[] = array($data['topic'], $data['msg'], 'topic', $user_info['id']);
+		$digest_insert[] = array($data['topic'], $data['msg'], 'topic', User::$info->id);
 	$db->insert('',
 		'{db_prefix}log_digest',
 		array(
@@ -459,7 +459,7 @@ function sendBoardNotifications(&$topicData)
 			AND mem.notify_regularity < {int:notify_regularity}
 		ORDER BY mem.lngfile',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'board_list' => $board_index,
 			'is_activated' => 1,
 			'notify_types' => 4,
@@ -534,7 +534,7 @@ function sendBoardNotifications(&$topicData)
 	}
 	$db->free_result($members);
 
-	theme()->getTemplates()->loadLanguageFile('index', $user_info['language']);
+	theme()->getTemplates()->loadLanguageFile('index', User::$info->language);
 
 	// Sent!
 	$db->query('', '
@@ -543,7 +543,7 @@ function sendBoardNotifications(&$topicData)
 		WHERE id_board IN ({array_int:board_list})
 			AND id_member != {int:current_member}',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'board_list' => $board_index,
 			'is_sent' => 1,
 		)
@@ -558,7 +558,7 @@ function sendBoardNotifications(&$topicData)
  */
 function sendApprovalNotifications(&$topicData)
 {
-	global $scripturl, $language, $user_info, $modSettings;
+	global $scripturl, $language, $modSettings;
 
 	$db = database();
 
@@ -580,7 +580,7 @@ function sendApprovalNotifications(&$topicData)
 			pbe_prepare_text($topicData[$topic][$msgKey]['body'], $topicData[$topic][$msgKey]['subject']);
 
 			$topics[] = $msg['id'];
-			$digest_insert[] = array($msg['topic'], $msg['id'], 'reply', $user_info['id']);
+			$digest_insert[] = array($msg['topic'], $msg['id'], 'reply', User::$info->id);
 		}
 	}
 
@@ -618,7 +618,7 @@ function sendApprovalNotifications(&$topicData)
 		)
 	);
 	$sent = 0;
-	$current_language = $user_info['language'];
+	$current_language = User::$info->language;
 	while ($row = $db->fetch_assoc($members))
 	{
 		if ($row['id_group'] != 1)
@@ -675,7 +675,7 @@ function sendApprovalNotifications(&$topicData)
 	}
 	$db->free_result($members);
 
-	if (isset($current_language) && $current_language != $user_info['language'])
+	if (isset($current_language) && $current_language != User::$info->language)
 		theme()->getTemplates()->loadLanguageFile('Post');
 
 	// Sent!
@@ -686,7 +686,7 @@ function sendApprovalNotifications(&$topicData)
 			WHERE id_topic IN ({array_int:topic_list})
 				AND id_member != {int:current_member}',
 			array(
-				'current_member' => $user_info['id'],
+				'current_member' => User::$info->id,
 				'topic_list' => $topics,
 				'is_sent' => 1,
 			)
@@ -708,7 +708,7 @@ function sendApprovalNotifications(&$topicData)
  */
 function sendAdminNotifications($type, $memberID, $member_name = null)
 {
-	global $modSettings, $language, $scripturl, $user_info;
+	global $modSettings, $language, $scripturl;
 
 	$db = database();
 
@@ -765,7 +765,7 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
 		)
 	);
 
-	$current_language = $user_info['language'];
+	$current_language = User::$info->language;
 	while ($row = $db->fetch_assoc($request))
 	{
 		$replacements = array(
@@ -788,7 +788,7 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
 	}
 	$db->free_result($request);
 
-	if (isset($current_language) && $current_language != $user_info['language'])
+	if (isset($current_language) && $current_language != User::$info->language)
 		theme()->getTemplates()->loadLanguageFile('Login');
 }
 
