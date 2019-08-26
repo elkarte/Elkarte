@@ -11,6 +11,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Count the mentions of the current user
  * callback for createList in action_list of \ElkArte\Controller\Mentions

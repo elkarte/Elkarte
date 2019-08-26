@@ -18,6 +18,7 @@ class TestBBC extends \PHPUnit\Framework\TestCase
 		$modSettings['user_access_mentions'] = array();
 		$modSettings['enablePostHTML'] = 1;
 
+		\ElkArte\User::$info = new \ElkArte\UserInfo(['name' => 'name', 'is_guest' => true]);
 		\ElkArte\User::load();
 		new ElkArte\Themes\ThemeLoader();
 		$context['user']['smiley_path'] = 'http://127.0.0.1/smileys/default/';
