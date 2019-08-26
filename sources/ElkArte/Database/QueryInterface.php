@@ -31,7 +31,7 @@ interface QueryInterface
 	/**
 	 * Callback for preg_replace_callback on the query.
 	 * It allows to replace on the fly a few pre-defined strings, for convenience ('query_see_board', 'query_wanna_see_board'), with
-	 * their current values from $user_info.
+	 * their current values from User::$info.
 	 * In addition, it performs checks and sanitation on the values sent to the database.
 	 *
 	 * @param mixed[] $matches

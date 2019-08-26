@@ -1358,7 +1358,7 @@ function action_databaseChanges()
  */
 function action_deleteUpgrade()
 {
-	global $command_line, $language, $upcontext, $user_info, $maintenance, $db_type, $modSettings;
+	global $command_line, $language, $upcontext, $maintenance, $db_type, $modSettings;
 
 	// Now it's nice to have some of the basic source files.
 	if (!isset($_GET['ssi']) && !$command_line)
@@ -1414,9 +1414,9 @@ function action_deleteUpgrade()
 	$upcontext['can_delete_script'] = is_writable(__DIR__) || is_writable(__FILE__);
 
 	// Log what we've done.
-	if (empty($user_info['id']))
+	if (empty(ElkArte\User::$info->id))
 	{
-		$user_info['id'] = !empty($upcontext['user']['id']) ? $upcontext['user']['id'] : 0;
+		ElkArte\User::$info->id = !empty($upcontext['user']['id']) ? $upcontext['user']['id'] : 0;
 	}
 
 	// We need to log in the database
@@ -1430,13 +1430,13 @@ function action_deleteUpgrade()
 			'id_board' => 'int', 'id_topic' => 'int', 'id_msg' => 'int', 'extra' => 'string-65534',
 		),
 		array(
-			time(), 3, $user_info['id'], $command_line ? '127.0.0.1' : $user_info['ip'], 'upgrade',
-			0, 0, 0, serialize(array('version' => CURRENT_VERSION, 'member' => $user_info['id'])),
+			time(), 3, ElkArte\User::$info->id, $command_line ? '127.0.0.1' : ElkArte\User::$info->ip, 'upgrade',
+			0, 0, 0, serialize(array('version' => CURRENT_VERSION, 'member' => ElkArte\User::$info->id)),
 		),
 		array('id_action')
 	);
 
-	$user_info['id'] = 0;
+	ElkArte\User::$info->id = 0;
 
 	// Drop old check for MySQL 5.0.50 and 5.0.51 bug.
 	removeSettings('db_mysql_group_by_fix');
