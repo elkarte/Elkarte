@@ -14,6 +14,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Retrieve a list and several other statistics of the users currently online.
  *
@@ -27,7 +29,7 @@
  */
 function getMembersOnlineStats($membersOnlineOptions)
 {
-	global $user_info, $modSettings, $txt;
+	global $modSettings, $txt;
 
 	$db = database();
 
@@ -122,7 +124,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 		}
 
 		// Buddies get counted and highlighted.
-		$is_buddy = in_array($row['id_member'], $user_info['buddies']);
+		$is_buddy = in_array($row['id_member'], User::$info->buddies);
 		if ($is_buddy)
 		{
 			$membersOnlineStats['num_buddies']++;

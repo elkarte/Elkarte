@@ -16,6 +16,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Get a list of versions that are currently installed on the server.
  *
@@ -414,11 +416,13 @@ function updateDbLastError($time)
  */
 function updateAdminPreferences()
 {
-	global $options, $context, $settings, $user_info;
+	global $options, $context, $settings;
 
 	// This must exist!
 	if (!isset($context['admin_preferences']))
+	{
 		return false;
+	}
 
 	// This is what we'll be saving.
 	$options['admin_preferences'] = json_encode($context['admin_preferences']);
@@ -428,10 +432,10 @@ function updateAdminPreferences()
 	// Just check we haven't ended up with something theme exclusive somehow.
 	removeThemeOptions('custom', 'all', 'admin_preferences');
 
-	updateThemeOptions(array(1, $user_info['id'], 'admin_preferences', $options['admin_preferences']));
+	updateThemeOptions(array(1, User::$info->id, 'admin_preferences', $options['admin_preferences']));
 
 	// Make sure we invalidate any cache.
-	\ElkArte\Cache\Cache::instance()->put('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 0);
+	\ElkArte\Cache\Cache::instance()->put('theme_settings-' . $settings['theme_id'] . ':' . User::$info->id, null, 0);
 }
 
 /**

@@ -14,6 +14,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Get all birthdays within the given time range.
  *
@@ -103,7 +105,7 @@ function getBirthdayRange($low_date, $high_date)
  */
 function getEventRange($low_date, $high_date, $use_permissions = true, $limit = null)
 {
-	global $modSettings, $user_info;
+	global $modSettings;
 
 	$db = database();
 
@@ -179,7 +181,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 					'id_topic' => $row['id_topic'],
 					'href' => $row['id_board'] == 0 ? '' : $href,
 					'link' => $row['id_board'] == 0 ? $row['title'] : '<a href="' . $href . '">' . $row['title'] . '</a>',
-					'can_edit' => allowedTo('calendar_edit_any') || ($row['id_member'] == $user_info['id'] && allowedTo('calendar_edit_own')),
+					'can_edit' => allowedTo('calendar_edit_any') || ($row['id_member'] == User::$info->id && allowedTo('calendar_edit_own')),
 					'modify_href' => getUrl('action', $modify_href),
 					'can_export' => !empty($modSettings['cal_export']) ? true : false,
 					'export_href' => getUrl('action', ['action' => 'calendar', 'sa' => 'ical', 'eventid' => $row['id_event'], '{session_data}']),
@@ -280,11 +282,11 @@ function getHolidayRange($low_date, $high_date)
  * - if the user doesn't have proper permissions, an error will be shown.
  *
  * @package Calendar
- * @todo pass $board, $topic and $user_info['id'] as arguments with fallback for 1.1
+ * @todo pass $board, $topic and User::$info->id as arguments with fallback for 1.1
  */
 function canLinkEvent()
 {
-	global $user_info, $topic, $board;
+	global $topic, $board;
 
 	// If you can't post, you can't link.
 	isAllowedTo('calendar_post');
@@ -303,7 +305,7 @@ function canLinkEvent()
 		if (!empty($row))
 		{
 			// Not the owner of the topic.
-			if ($row['id_member_started'] != $user_info['id'])
+			if ($row['id_member_started'] != User::$info->id)
 				throw new \ElkArte\Exceptions\Exception('not_your_topic', 'user');
 		}
 		// Topic/Board doesn't exist.....
@@ -757,19 +759,17 @@ function cache_getRecentEvents($eventOptions)
  */
 function cache_getRecentEvents_post_retri_eval(&$cache_block, $params)
 {
-	global $user_info;
-
 	foreach ($cache_block['data']['calendar_events'] as $k => $event)
 	{
 		// Remove events that the user may not see or wants to ignore.
-		if ((count(array_intersect($user_info['groups'], $event['allowed_groups'])) === 0 && !allowedTo('admin_forum') && !empty($event['id_board'])) || in_array($event['id_board'], $user_info['ignoreboards']))
+		if ((count(array_intersect(User::$info->groups, $event['allowed_groups'])) === 0 && !allowedTo('admin_forum') && !empty($event['id_board'])) || in_array($event['id_board'], User::$info->ignoreboards))
 		{
 			unset($cache_block['data']['calendar_events'][$k]);
 		}
 		else
 		{
 			// Whether the event can be edited depends on the permissions.
-			$cache_block['data']['calendar_events'][$k]['can_edit'] = allowedTo('calendar_edit_any') || ($event['poster'] == $user_info['id'] && allowedTo('calendar_edit_own'));
+			$cache_block['data']['calendar_events'][$k]['can_edit'] = allowedTo('calendar_edit_any') || ($event['poster'] == User::$info->id && allowedTo('calendar_edit_own'));
 
 			if ($event['topic'] == 0)
 			{

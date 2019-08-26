@@ -11,6 +11,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Loads failed emails from the database
  *
@@ -28,7 +30,7 @@
  */
 function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sort = '')
 {
-	global $txt, $boardurl, $user_info;
+	global $txt, $boardurl;
 
 	$db = database();
 
@@ -39,7 +41,7 @@ function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sor
 	require_once(SUBSDIR . '/Emailpost.subs.php');
 
 	// Where can they approve items?
-	$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
+	$approve_boards = !empty(User::$info->mod_cache['ap']) ? User::$info->mod_cache['ap'] : boardsAllowedTo('approve_posts');
 
 	// Work out the query
 	if ($approve_boards == array(0))
@@ -111,12 +113,10 @@ function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sor
  */
 function list_maillist_count_unapproved()
 {
-	global $user_info;
-
 	$db = database();
 
 	// Where can they approve items?
-	$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
+	$approve_boards = !empty(User::$info->mod_cache['ap']) ? User::$info->mod_cache['ap'] : boardsAllowedTo('approve_posts');
 
 	// Work out the query
 	if ($approve_boards == array(0))
@@ -382,8 +382,6 @@ function enable_maillist_imap_cron($switch)
  */
 function maillist_templates($template_type, $subject = null)
 {
-	global $user_info;
-
 	$db = database();
 
 	return $db->fetchQuery('
@@ -394,7 +392,7 @@ function maillist_templates($template_type, $subject = null)
 		array(
 			'tpltype' => $template_type,
 			'generic' => 0,
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 		)
 	)->fetch_callback(
 		function ($row) use ($subject)

@@ -14,6 +14,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * @todo
  *
@@ -44,8 +46,6 @@ function deleteLogOnlineInterval($session_id)
  */
 function updateLogOnline($session_id, $serialized)
 {
-	global $user_info;
-
 	$db = database();
 
 	$db->query('', '
@@ -57,7 +57,7 @@ function updateLogOnline($session_id, $serialized)
 		WHERE session = {string:session}',
 		array(
 			'log_time' => time(),
-			'ip' => $user_info['ip'],
+			'ip' => User::$info->ip,
 			'url' => $serialized,
 			'session' => $session_id,
 		)
@@ -77,19 +77,21 @@ function updateLogOnline($session_id, $serialized)
  */
 function insertdeleteLogOnline($session_id, $serialized, $do_delete = false)
 {
-	global $user_info, $modSettings;
+	global $modSettings;
 
 	$db = database();
 
-	if ($do_delete || !empty($user_info['id']))
+	if ($do_delete || !empty(User::$info->id))
+	{
 		$db->query('', '
 			DELETE FROM {db_prefix}log_online
-			WHERE ' . ($do_delete ? 'log_time < {int:log_time}' : '') . ($do_delete && !empty($user_info['id']) ? ' OR ' : '') . (empty($user_info['id']) ? '' : 'id_member = {int:current_member}'),
+			WHERE ' . ($do_delete ? 'log_time < {int:log_time}' : '') . ($do_delete && !empty(User::$info->id) ? ' OR ' : '') . (empty(User::$info->id) ? '' : 'id_member = {int:current_member}'),
 			array(
-				'current_member' => $user_info['id'],
+				'current_member' => User::$info->id,
 				'log_time' => time() - $modSettings['lastActive'] * 60,
 			)
 		);
+	}
 
 	$db->insert($do_delete ? 'ignore' : 'replace',
 		'{db_prefix}log_online',
@@ -97,7 +99,7 @@ function insertdeleteLogOnline($session_id, $serialized, $do_delete = false)
 			'session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'string', 'url' => 'string'
 		),
 		array(
-			$session_id, $user_info['id'], empty($_SESSION['id_robot']) ? 0 : $_SESSION['id_robot'], time(), $user_info['ip'], $serialized
+			$session_id, User::$info->id, empty($_SESSION['id_robot']) ? 0 : $_SESSION['id_robot'], time(), User::$info->ip, $serialized
 		),
 		array(
 			'session'
@@ -220,15 +222,13 @@ function insertLogActions($inserts)
 
 function deleteMemberLogOnline()
 {
-	global $user_info;
-
 	$db = database();
 
 	$db->query('', '
 		DELETE FROM {db_prefix}log_online
 		WHERE id_member = {int:current_member}',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 		)
 	);
 }

@@ -15,6 +15,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Mark a board or multiple boards read.
  *
@@ -25,7 +27,7 @@
  */
 function markBoardsRead($boards, $unread = false, $resetTopics = false)
 {
-	global $user_info, $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -49,7 +51,7 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 			WHERE id_board IN ({array_int:board_list})
 				AND id_member = {int:current_member}',
 			array(
-				'current_member' => $user_info['id'],
+				'current_member' => User::$info->id,
 				'board_list' => $boards,
 			)
 		);
@@ -58,7 +60,7 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 			WHERE id_board IN ({array_int:board_list})
 				AND id_member = {int:current_member}',
 			array(
-				'current_member' => $user_info['id'],
+				'current_member' => User::$info->id,
 				'board_list' => $boards,
 			)
 		);
@@ -68,7 +70,7 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 	{
 		$markRead = array();
 		foreach ($boards as $board)
-			$markRead[] = array($modSettings['maxMsgID'], $user_info['id'], $board);
+			$markRead[] = array($modSettings['maxMsgID'], User::$info->id, $board);
 
 		$db->insert('replace',
 			'{db_prefix}log_boards',
@@ -106,7 +108,7 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 			FROM {db_prefix}log_topics
 			WHERE id_member = {int:current_member}',
 			array(
-				'current_member' => $user_info['id'],
+				'current_member' => User::$info->id,
 			)
 		);
 		list ($lowest_topic) = $db->fetch_row($result);
@@ -126,16 +128,16 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 			WHERE lt.id_member = {int:current_member}
 				AND lt.id_topic >= {int:lowest_topic}',
 			array(
-				'current_member' => $user_info['id'],
+				'current_member' => User::$info->id,
 				'board_list' => $boards,
 				'lowest_topic' => $lowest_topic,
 			)
 		)->fetch_callback(
-			function ($row) use (&$delete_topics, &$update_topics, $user_info, $modSettings)
+			function ($row) use (&$delete_topics, &$update_topics, $modSettings)
 			{
 				if (!empty($row['unwatched']))
 					$update_topics[] = array(
-						$user_info['id'],
+						User::$info->id,
 						$modSettings['maxMsgID'],
 						$row['id_topic'],
 						1,
@@ -164,7 +166,7 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 				WHERE id_member = {int:current_member}
 					AND id_topic IN ({array_int:topic_list})',
 				array(
-					'current_member' => $user_info['id'],
+					'current_member' => User::$info->id,
 					'topic_list' => $delete_topics,
 				)
 			);
@@ -965,8 +967,6 @@ function resetSentBoardNotification($id_member, $id_board, $check = true)
  */
 function getBoardNotificationsCount($memID)
 {
-	global $user_info;
-
 	$db = database();
 
 	// All the boards that you have notification enabled
@@ -978,7 +978,7 @@ function getBoardNotificationsCount($memID)
 		WHERE ln.id_member = {int:selected_member}
 			AND {query_see_board}',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'selected_member' => $memID,
 		)
 	);
@@ -1064,7 +1064,7 @@ function accessibleBoards($id_boards = null, $id_parents = null)
  */
 function wantedBoards($see_board, $hide_recycle = true)
 {
-	global $modSettings, $user_info;
+	global $modSettings;
 
 	$db = database();
 	$allowed_see = array(
@@ -1076,7 +1076,7 @@ function wantedBoards($see_board, $hide_recycle = true)
 	return $db->fetchQuery('
 		SELECT b.id_board
 		FROM {db_prefix}boards AS b
-		WHERE ' . $user_info[in_array($see_board, $allowed_see) ? $see_board : $allowed_see[0]] . ($hide_recycle && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+		WHERE ' . User::$info->{in_array($see_board, $allowed_see) ? $see_board : $allowed_see[0]} . ($hide_recycle && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 			AND b.id_board != {int:recycle_board}' : ''),
 		array(
 			'recycle_board' => (int) $modSettings['recycle_board'],
@@ -1706,7 +1706,7 @@ function decrementBoard($id_board, $values)
  */
 function boardNotifications($sort, $memID)
 {
-	global $user_info, $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -1720,7 +1720,7 @@ function boardNotifications($sort, $memID)
 			AND {query_see_board}
 		ORDER BY ' . $sort,
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'selected_member' => $memID,
 		)
 	)->fetch_callback(
@@ -1750,7 +1750,7 @@ function boardNotifications($sort, $memID)
 		ORDER BY ' . $sort,
 		array(
 			'selected_member' => $memID,
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'recycle_board' => $modSettings['recycle_board'],
 		)
 	);

@@ -15,6 +15,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * This function sends an email to the specified recipient(s).
  *
@@ -895,7 +897,7 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
  */
 function prepareMailingForPreview()
 {
-	global $context, $modSettings, $scripturl, $user_info, $txt;
+	global $context, $modSettings, $scripturl, $txt;
 
 	theme()->getTemplates()->loadLanguageFile('Errors');
 	require_once(SUBSDIR . '/Post.subs.php');
@@ -906,7 +908,7 @@ function prepareMailingForPreview()
 	);
 
 	// Use the default time format.
-	$user_info['time_format'] = $modSettings['time_format'];
+	User::$info->time_format = $modSettings['time_format'];
 
 	$variables = array(
 		'{$board_url}',
@@ -965,13 +967,11 @@ function prepareMailingForPreview()
  */
 function user_info_callback($matches)
 {
-	global $user_info;
-
 	if (empty($matches[1]))
 		return '';
 
 	$use_ref = true;
-	$ref = $user_info;
+	$ref = User::$info->toArray();
 
 	foreach (explode('.', $matches[1]) as $index)
 	{

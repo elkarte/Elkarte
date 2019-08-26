@@ -14,6 +14,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Sets the login cookie and session based on the id_member and password passed.
  *
@@ -179,7 +181,7 @@ function url_parts($local, $global)
  */
 function adminLogin($type = 'admin')
 {
-	global $context, $txt, $user_info;
+	global $context, $txt;
 
 	theme()->getTemplates()->loadLanguageFile('Admin');
 	theme()->getTemplates()->load('Login');
@@ -195,7 +197,7 @@ function adminLogin($type = 'admin')
 	{
 		// log some info along with it! referer, user agent
 		$req = request();
-		$txt['security_wrong'] = sprintf($txt['security_wrong'], isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $txt['unknown'], $req->user_agent(), $user_info['ip']);
+		$txt['security_wrong'] = sprintf($txt['security_wrong'], isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $txt['unknown'], $req->user_agent(), User::$info->ip);
 		\ElkArte\Errors\Errors::instance()->log_error($txt['security_wrong'], 'critical');
 
 		if (isset($_POST[$type . '_hash_pass']))
@@ -316,7 +318,7 @@ function construct_query_string($get)
  */
 function findMembers($names, $use_wildcards = false, $buddies_only = false, $max = 500)
 {
-	global $scripturl, $user_info;
+	global $scripturl;
 
 	$db = database();
 
@@ -369,7 +371,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 			AND is_activated IN (1, 11)
 		LIMIT {int:limit}',
 		array(
-			'buddy_list' => $user_info['buddies'],
+			'buddy_list' => User::$info->buddies,
 			'member_name_search' => $member_name . ' ' . $comparison . ' ' . implode( ' OR ' . $member_name . ' ' . $comparison . ' ', $names) . '',
 			'real_name_search' => $real_name . ' ' . $comparison . ' ' . implode( ' OR ' . $real_name . ' ' . $comparison . ' ', $names) . '',
 			'email_condition' => $email_condition,
@@ -414,7 +416,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
  */
 function resetPassword($memID, $username = null)
 {
-	global $modSettings, $language, $user_info;
+	global $modSettings, $language;
 
 	// Language... and a required file.
 	theme()->getTemplates()->loadLanguageFile('Login');
@@ -453,7 +455,7 @@ function resetPassword($memID, $username = null)
 
 		// If there are "important" errors and you are not an admin: log the first error
 		// Otherwise grab all of them and don't log anything
-		$error_severity = $errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
+		$error_severity = $errors->hasErrors(1) && User::$info->is_admin === false ? 1 : null;
 		foreach ($errors->prepareErrors($error_severity) as $error)
 			throw new \ElkArte\Exceptions\Exception($error, $error_severity === null ? false : 'general');
 
@@ -603,7 +605,9 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
 
 	// If the password is not 64 characters, lets make it a (SHA-256)
 	if (strlen($password) !== 64)
+	{
 		$password = hash('sha256', \ElkArte\Util::strtolower($user) . un_htmlspecialchars($password));
+	}
 
 	// They need a password hash, something to save in the db?
 	if ($returnhash)
@@ -612,11 +616,15 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
 
 		// Something is not right, we can not generate a valid hash that's <20 characters
 		if (strlen($passhash) < 20)
+		{
 			$passhash = false;
+		}
 	}
 	// Or doing a password check?
 	else
-	 	$passhash = (bool) $hasher->CheckPassword($password, $hash);
+	{
+		$passhash = (bool) $hasher->CheckPassword($password, $hash);
+	}
 
 	unset($hasher);
 
@@ -629,14 +637,12 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
  * What it does:
  *
  * - builds the moderator, group and board level querys for the user
- * - stores the information on the current users moderation powers in $user_info['mod_cache'] and $_SESSION['mc']
+ * - stores the information on the current users moderation powers in User::$info->mod_cache and $_SESSION['mc']
  *
  * @package Authorization
  */
 function rebuildModCache()
 {
-	global $user_info;
-
 	$db = database();
 
 	// What groups can they moderate?
@@ -649,7 +655,7 @@ function rebuildModCache()
 			FROM {db_prefix}group_moderators
 			WHERE id_member = {int:current_member}',
 			array(
-				'current_member' => $user_info['id'],
+				'current_member' => User::$info->id,
 			)
 		)->fetch_callback(
 			function ($row)
@@ -679,10 +685,10 @@ function rebuildModCache()
 
 	// What boards are they the moderator of?
 	$boards_mod = array();
-	if (!$user_info['is_guest'])
+	if (User::$info->is_guest === false)
 	{
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$boards_mod = boardsModerated($user_info['id']);
+		$boards_mod = boardsModerated(User::$info->id);
 	}
 
 	$mod_query = empty($boards_mod) ? '0=1' : 'b.id_board IN (' . implode(',', $boards_mod) . ')';
@@ -690,7 +696,7 @@ function rebuildModCache()
 	$_SESSION['mc'] = array(
 		'time' => time(),
 		// This looks a bit funny but protects against the login redirect.
-		'id' => $user_info['id'] && $user_info['name'] ? $user_info['id'] : 0,
+		'id' => User::$info->id && User::$info->name ? User::$info->id : 0,
 		// If you change the format of 'gq' and/or 'bq' make sure to adjust 'can_mod' in Load.php.
 		'gq' => $group_query,
 		'bq' => $board_query,
@@ -700,7 +706,7 @@ function rebuildModCache()
 	);
 	call_integration_hook('integrate_mod_cache');
 
-	$user_info['mod_cache'] = $_SESSION['mc'];
+	User::$info->mod_cache = $_SESSION['mc'];
 
 	// Might as well clean up some tokens while we are at it.
 	cleanTokens();

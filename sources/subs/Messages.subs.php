@@ -17,6 +17,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Get message and attachments data, for a message ID.
  * The function returns the data in an array with:
@@ -136,10 +138,10 @@ function basicMessageInfo($id_msg, $override_permissions = false, $detailed = fa
  */
 function quoteMessageInfo($id_msg, $modify)
 {
-	global $user_info;
-
 	if (empty($id_msg))
+	{
 		return false;
+	}
 
 	$db = database();
 
@@ -158,7 +160,7 @@ function quoteMessageInfo($id_msg, $modify)
 			AND (t.locked = {int:not_locked}' . (empty($moderate_boards) ? '' : ' OR b.id_board IN ({array_int:moderation_board_list})') . ')') . '
 		LIMIT 1',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'moderation_board_list' => $moderate_boards,
 			'id_msg' => $id_msg,
 			'not_locked' => 0,
@@ -183,19 +185,19 @@ function quoteMessageInfo($id_msg, $modify)
  */
 function checkMessagePermissions($message)
 {
-	global $user_info, $modSettings, $context;
+	global $modSettings, $context;
 
-	if ($message['id_member'] == $user_info['id'] && !allowedTo('modify_any'))
+	if ($message['id_member'] == User::$info->id && !allowedTo('modify_any'))
 	{
 		// Give an extra five minutes over the disable time threshold, so they can type - assuming the post is public.
 		if ($message['approved'] && !empty($modSettings['edit_disable_time']) && $message['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
 			throw new \ElkArte\Exceptions\Exception('modify_post_time_passed', false);
-		elseif ($message['id_member_poster'] == $user_info['id'] && !allowedTo('modify_own'))
+		elseif ($message['id_member_poster'] == User::$info->id && !allowedTo('modify_own'))
 			isAllowedTo('modify_replies');
 		else
 			isAllowedTo('modify_own');
 	}
-	elseif ($message['id_member_poster'] == $user_info['id'] && !allowedTo('modify_any'))
+	elseif ($message['id_member_poster'] == User::$info->id && !allowedTo('modify_any'))
 		isAllowedTo('modify_replies');
 	else
 		isAllowedTo('modify_any');
@@ -350,19 +352,19 @@ function associatedTopic($msg_id, $topicID = null)
  */
 function canAccessMessage($id_msg, $check_approval = true)
 {
-	global $user_info;
-
 	$message_info = basicMessageInfo($id_msg);
 
 	// Do we even have a message to speak of?
 	if (empty($message_info))
+	{
 		return false;
+	}
 
 	// Check for approval status?
 	if ($check_approval)
 	{
 		// The user can access this message if it's approved or they're owner
-		return (!empty($message_info['approved']) || $message_info['id_member'] == $user_info['id']);
+		return (!empty($message_info['approved']) || $message_info['id_member'] == User::$info->id);
 	}
 
 	// Otherwise, nope.
@@ -495,8 +497,6 @@ function messageAt($start, $id_topic, $params = array())
  */
 function recordReport($message, $poster_comment)
 {
-	global $user_info;
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -568,8 +568,8 @@ function recordReport($message, $poster_comment)
 				'member_ip' => 'string', 'comment' => 'string', 'time_sent' => 'int',
 			),
 			array(
-				$id_report, $user_info['id'], $user_info['name'], $user_info['email'],
-				$user_info['ip'], $poster_comment, time(),
+				$id_report, User::$info->id, User::$info->name, User::$info->email,
+				User::$info->ip, $poster_comment, time(),
 			),
 			array('id_comment')
 		);
@@ -588,7 +588,7 @@ function recordReport($message, $poster_comment)
  */
 function countNewPosts($topic, $topicinfo, $timestamp)
 {
-	global $user_info, $modSettings;
+	global $modSettings;
 
 	$db = database();
 	// Find the number of messages posted before said time...
@@ -597,10 +597,10 @@ function countNewPosts($topic, $topicinfo, $timestamp)
 		FROM {db_prefix}messages
 		WHERE poster_time < {int:timestamp}
 			AND id_topic = {int:current_topic}' . ($modSettings['postmod_active'] && $topicinfo['unapproved_posts'] && !allowedTo('approve_posts') ? '
-			AND (approved = {int:is_approved}' . ($user_info['is_guest'] ? '' : ' OR id_member = {int:current_member}') . ')' : ''),
+			AND (approved = {int:is_approved}' . (User::$info->is_guest ? '' : ' OR id_member = {int:current_member}') . ')' : ''),
 		array(
 			'current_topic' => $topic,
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'is_approved' => 1,
 			'timestamp' => $timestamp,
 		)
@@ -688,7 +688,7 @@ function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $optiona
  */
 function determineRemovableMessages($topic, $messages, $allowed_all)
 {
-	global $user_info, $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -701,7 +701,7 @@ function determineRemovableMessages($topic, $messages, $allowed_all)
 			AND id_member = {int:current_member}' : '') . '
 		LIMIT ' . count($messages),
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'current_topic' => $topic,
 			'message_list' => $messages,
 		)

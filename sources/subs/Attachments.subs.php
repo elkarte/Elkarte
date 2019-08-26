@@ -17,6 +17,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Check and create a directory automatically.
  *
@@ -357,7 +359,7 @@ function attachments_init_dir(&$tree, &$count)
  */
 function processAttachments($id_msg = null)
 {
-	global $context, $modSettings, $txt, $user_info, $topic, $board;
+	global $context, $modSettings, $txt, $topic, $board;
 
 	$attach_errors = \ElkArte\Errors\AttachmentErrorContext::context();
 
@@ -422,7 +424,7 @@ function processAttachments($id_msg = null)
 		{
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 			{
-				if (strpos($attachID, 'post_tmp_' . $user_info['id'] . '_') !== false)
+				if (strpos($attachID, 'post_tmp_' . User::$info->id . '_') !== false)
 					@unlink($attachment['tmp_name']);
 			}
 
@@ -475,7 +477,7 @@ function processAttachments($id_msg = null)
 		$errors = attachmentUploadChecks($n);
 
 		// Set the names and destination for this file
-		$attachID = 'post_tmp_' . $user_info['id'] . '_' . md5(mt_rand());
+		$attachID = 'post_tmp_' . User::$info->id . '_' . md5(mt_rand());
 		$destName = $context['attach_dir'] . '/' . $attachID;
 
 		// If we are error free, Try to move and rename the file before doing more checks on it.
@@ -485,7 +487,7 @@ function processAttachments($id_msg = null)
 				'name' => htmlspecialchars(basename($_FILES['attachment']['name'][$n]), ENT_COMPAT, 'UTF-8'),
 				'tmp_name' => $destName,
 				'attachid' => $attachID,
-				'public_attachid' => 'post_tmp_' . $user_info['id'] . '_' . md5(mt_rand()),
+				'public_attachid' => 'post_tmp_' . User::$info->id . '_' . md5(mt_rand()),
 				'size' => $_FILES['attachment']['size'][$n],
 				'type' => $_FILES['attachment']['type'][$n],
 				'id_folder' => $modSettings['currentAttachmentUploadDir'],
@@ -560,7 +562,7 @@ function processAttachments($id_msg = null)
 	}
 
 	// Mod authors, finally a hook to hang an alternate attachment upload system upon
-	// Upload to the current attachment folder with the file name $attachID or 'post_tmp_' . $user_info['id'] . '_' . md5(mt_rand())
+	// Upload to the current attachment folder with the file name $attachID or 'post_tmp_' . User::$info->id . '_' . md5(mt_rand())
 	// Populate $_SESSION['temp_attachments'][$attachID] with the following:
 	//   name => The file name
 	//   tmp_name => Path to the temp file ($context['attach_dir'] . '/' . $attachID).
@@ -619,7 +621,7 @@ function removeTempAttachById($attach_id)
  */
 function getTempAttachById($attach_id)
 {
-	global $modSettings, $user_info;
+	global $modSettings;
 
 	$attach_real_id = null;
 
@@ -657,7 +659,7 @@ function getTempAttachById($attach_id)
 	// Permissions: only author is allowed.
 	$pieces = explode('_', substr($id_attach, 9));
 
-	if (!isset($pieces[0]) || $pieces[0] != $user_info['id'])
+	if (!isset($pieces[0]) || $pieces[0] != User::$info->id)
 		throw new \Exception('no_access');
 
 	if (is_array($modSettings['attachmentUploadDir']))
@@ -1978,9 +1980,7 @@ function approved_attach_sort($a, $b)
  */
 function filter_accessible_attachment($attachment_info, $all_posters)
 {
-	global $user_info;
-
-	return !(!$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] != $user_info['id']));
+	return !(!$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] != User::$info->id));
 }
 
 /**

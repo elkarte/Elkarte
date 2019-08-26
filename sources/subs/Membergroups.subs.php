@@ -14,6 +14,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Delete one of more membergroups.
  *
@@ -1855,7 +1857,7 @@ function loadGroups($id_member, $show_hidden = false, $min_posts = -1)
 /**
  * Returns the groups that the current user can see.
  *
- * - uses $user_info and allowedTo().
+ * - uses User::$info and allowedTo().
  * - does not include post count based groups
  *
  * @package Membergroups
@@ -1863,8 +1865,6 @@ function loadGroups($id_member, $show_hidden = false, $min_posts = -1)
  */
 function accessibleGroups()
 {
-	global $user_info;
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -1874,7 +1874,7 @@ function accessibleGroups()
 		WHERE mg.min_posts = {int:min_posts}
 			AND mg.id_group != {int:moderator_group}',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'min_posts' => -1,
 			'moderator_group' => 3,
 		)

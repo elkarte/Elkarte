@@ -11,6 +11,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Create PM draft in the database
  *
@@ -611,7 +613,7 @@ function savePMDraft($recipientList, $draft, $check_last_save = false)
  */
 function loadDraft($id_draft, $type = 0, $check = true, $load = false)
 {
-	global $context, $user_info, $modSettings;
+	global $context, $modSettings;
 
 	// Like purell always clean to be sure
 	$id_draft = (int) $id_draft;
@@ -623,7 +625,7 @@ function loadDraft($id_draft, $type = 0, $check = true, $load = false)
 
 	// Load in this draft from the DB
 	$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
-	$draft_info = load_draft($id_draft, $user_info['id'], $type, $drafts_keep_days, $check);
+	$draft_info = load_draft($id_draft, User::$info->id, $type, $drafts_keep_days, $check);
 
 	// Load it up for the templates as well
 	if (!empty($load) && !empty($draft_info))

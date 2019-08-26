@@ -193,4 +193,14 @@ class ValuesContainer implements \ArrayAccess
 	{
 		$this->data = array_merge($this->data, $new_data);
 	}
+
+	/**
+	 * Returns the data of the user in an array format
+	 *
+	 * @return mixed[]
+	 */
+	public function toArray()
+	{
+		return $this->data;
+	}
 }
