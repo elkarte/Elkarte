@@ -17,8 +17,6 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 	 */
 	public function setUp()
 	{
-		global $user_info;
-
 		require_once(SUBSDIR . '/Auth.subs.php');
 		if (userByEmail('search@email1.tld'))
 		{
@@ -27,7 +25,7 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 		}
 
 		// This is here to cheat with allowedTo
-		$user_info['is_admin'] = true;
+		\ElkArte\User::$info->is_admin = true;
 		
 		// Create 2 boards
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -151,7 +149,7 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 	 */
 	public function testBasicAdminSearch()
 	{
-		global $cookiename, $user_info;
+		global $cookiename;
 
 		if ($this->run_tests === false)
 		{
@@ -165,8 +163,6 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 		$user = new \ElkArte\UserSettingsLoader($db, $cache, $req);
 		$user->loadUserById($this->member_full_access, true, '');
 		\ElkArte\User::reloadByUser($user);
-		// @deprecated kept until any trace of $user_info has been completely removed
-		$user_info = \ElkArte\User::$info;
 
 		$topics = $this->_performSearch();
 		$this->assertEquals(2, count($topics), 'Admin search results not correct, found ' . count($topics) . ' instead of 2');

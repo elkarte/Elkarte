@@ -26,11 +26,11 @@ class TestCalendarEvent extends \PHPUnit\Framework\TestCase
 
 	public function setUp()
 	{
-		global $context, $user_info;
+		global $context;
 
 		$context['linktree'] = array();
 		// Faking an admin
-		$user_info['is_admin'] = true;
+		\ElkArte\User::$info->is_admin = true;
 		// Fiddling with globals is a chore in PHPUnit.
 		theme()->getTemplates()->loadLanguageFile('Errors', 'english', true, true);
 	}

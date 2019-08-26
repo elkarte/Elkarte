@@ -11,7 +11,7 @@ class TestMessageIndex extends \PHPUnit\Framework\TestCase
 	 */
 	function setUp()
 	{
-		global $modSettings, $user_info, $settings, $board;
+		global $modSettings, $settings, $board;
 
 		// Lets add in just enough info for the system to think we are logged
 		$modSettings['smiley_sets_known'] = 'none';
@@ -19,7 +19,7 @@ class TestMessageIndex extends \PHPUnit\Framework\TestCase
 		$modSettings['default_forum_action'] = [];
 		$settings['default_theme_dir'] = '/var/www/themes/default';
 
-		$user_info = new \ElkArte\ValuesContainer([
+		\ElkArte\User::$info = new \ElkArte\ValuesContainer([
 			'id' => 1,
 			'ip' => '127.0.0.1',
 			'language' => 'english',
@@ -64,10 +64,11 @@ class TestMessageIndex extends \PHPUnit\Framework\TestCase
 	 */
 	public function tearDown()
 	{
-		global $modSettings, $user_info, $settings;
+		global $modSettings, $settings;
 
 		// remove temporary test data
-		unset($user_info, $settings, $modSettings);
+		unset($settings, $modSettings);
+		\ElkArte\User::$info = null;
 	}
 
 	/**

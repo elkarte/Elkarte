@@ -14,14 +14,14 @@ class TestBBC extends \PHPUnit\Framework\TestCase
 	 */
 	public function setUp()
 	{
-		global $modSettings, $context, $user_info;
+		global $modSettings, $context;
 		$modSettings['user_access_mentions'] = array();
 		$modSettings['enablePostHTML'] = 1;
 
 		\ElkArte\User::load();
 		new ElkArte\Themes\ThemeLoader();
 		$context['user']['smiley_path'] = 'http://127.0.0.1/smileys/default/';
-		$user_info['smiley_set'] = 'default';
+		\ElkArte\User::$info->smiley_set = 'default';
 
 		// Standard testcases
 		$this->bbcTestCases = array(

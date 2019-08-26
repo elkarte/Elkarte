@@ -14,6 +14,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Retrieve all installed themes
  */

@@ -18,6 +18,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Return the number of currently online members.
  *

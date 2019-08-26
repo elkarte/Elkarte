@@ -17,6 +17,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Removes the passed id_topic's checking for permissions.
  *

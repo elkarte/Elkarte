@@ -35,9 +35,7 @@ class TestPermissionsClass extends \PHPUnit\Framework\TestCase
 	 */
 	public function testDefaultIllegalPermissions()
 	{
-		global $user_info;
-
-		$user_info['is_admin'] = false;
+		\ElkArte\User::$info->is_admin = false;
 		$permissionsObject = new \ElkArte\Permissions();
 		$this->illegal_permissions = $permissionsObject->getIllegalPermissions();
 

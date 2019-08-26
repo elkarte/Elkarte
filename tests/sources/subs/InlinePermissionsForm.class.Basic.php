@@ -17,12 +17,10 @@ class TestInlinePermissionsForm extends \PHPUnit\Framework\TestCase
 	 */
 	public function setUp()
 	{
-		global $user_info;
-
 		theme()->getTemplates()->loadLanguageFile('Admin', 'english', true, true);
 
 		// Elevate the user.
-		$user_info = \ElkArte\User::$info = new \ElkArte\UserInfo([
+		\ElkArte\User::$info = new \ElkArte\UserInfo([
 			'permissions' => ['manage_permissions']
 		]);
 

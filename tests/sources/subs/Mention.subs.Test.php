@@ -18,14 +18,14 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 	 */
 	public function setUp()
 	{
-		global $modSettings, $user_info;
+		global $modSettings;
 
 		// We are not logged in for this test, so lets fake it
 		$modSettings['mentions_enabled'] = true;
 
 		$modSettings['enabled_mentions'] = 'likemsg,mentionmem';
 
-		$user_info = \ElkArte\User::$info = new \ElkArte\UserInfo([
+		\ElkArte\User::$info = new \ElkArte\UserInfo([
 			'id' => 1,
 			'ip' => '127.0.0.1',
 			'language' => 'english',
@@ -185,10 +185,8 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 	 */
 	public function testLoadCurrentUserMention()
 	{
-		global $user_info;
-
 		// User 1 has 1 unread mention (i.e. the like)
-		$user_info = \ElkArte\User::$info = new \ElkArte\UserInfo([
+		\ElkArte\User::$info = new \ElkArte\UserInfo([
 			'id' => 1,
 		]);
 
@@ -196,7 +194,7 @@ class TestMentions extends \PHPUnit\Framework\TestCase
 
 		$this->assertEquals(1, count($mentions));
 
-		$user_info = \ElkArte\User::$info = new \ElkArte\UserInfo([
+		\ElkArte\User::$info = new \ElkArte\UserInfo([
 			'id' => 2,
 		]);
 

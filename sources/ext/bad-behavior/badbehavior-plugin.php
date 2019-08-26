@@ -169,8 +169,6 @@ function bb2_email()
  */
 function bb2_insert($settings, $package, $key)
 {
-	global $user_info;
-
 	// Logging not enabled
 	if (!$settings['logging'])
 	{
@@ -184,7 +182,7 @@ function bb2_insert($settings, $package, $key)
 	$request_uri = bb2_db_escape($package['request_uri']);
 	$server_protocol = bb2_db_escape($package['server_protocol']);
 	$user_agent = bb2_db_escape($package['user_agent']);
-	$member_id = (int) !empty($user_info['id']) ? $user_info['id'] : 0;
+	$member_id = (int) !empty(\ElkArte\User::$info->id) ? \ElkArte\User::$info->id : 0;
 	$session = !empty($_SESSION['session_value']) ? (string) $_SESSION['session_value'] : '';
 
 	// Prepare the headers etc for db insertion

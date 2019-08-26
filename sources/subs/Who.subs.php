@@ -11,6 +11,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Checks, who is viewing a topic or board
  *

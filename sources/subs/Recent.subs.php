@@ -14,6 +14,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Get the latest posts of a forum.
  *
