@@ -417,7 +417,7 @@ function is_not_banned($forceCheck = false)
 		// 'Log' the user out.  Can't have any funny business... (save the name!)
 		$old_name = (string) User::$info->name != '' ? User::$info->name : $txt['guest_title'];
 		User::logOutUser(true);
-		loadUserContext()
+		loadUserContext();
 
 		// A goodbye present.
 		$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
@@ -442,7 +442,7 @@ function is_not_banned($forceCheck = false)
 		// 'Log' the user out.  Can't have any funny business... (save the name!)
 		$old_name = (string) User::$info->name != '' ? User::$info->name : $txt['guest_title'];
 		User::logOutUser(true);
-		loadUserContext()
+		loadUserContext();
 
 		// Wipe 'n Clean(r) erases all traces.
 		$_GET['action'] = '';
