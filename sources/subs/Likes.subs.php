@@ -106,15 +106,15 @@ function loadLikes($messages, $prepare = true)
  */
 function prepareLikes($likes)
 {
-	global $user_info, $modSettings, $txt;
+	global $modSettings, $txt;
 
 	// Prepare this like page context for the user
 	foreach ($likes as $msg_id => $like)
 	{
 		// Did they like this message ?
-		$you_liked = isset($like['member'][$user_info['id']]);
+		$you_liked = isset($like['member'][User::$info->id]);
 		if ($you_liked)
-			unset($likes[$msg_id]['member'][$user_info['id']]);
+			unset($likes[$msg_id]['member'][User::$info->id]);
 
 		// Any limits on how many to display
 		$limit = isset($modSettings['likeDisplayLimit']) ? $modSettings['likeDisplayLimit'] : 0;
@@ -127,7 +127,7 @@ function prepareLikes($likes)
 			$likes[$msg_id]['member'] = array_slice($likes[$msg_id]['member'], 0, $you_liked ? $limit - 1 : $limit);
 
 			// Trick, member id's below $limit will cause a wrong +x others due to the slice above
-			if ($user_info['id'] <= $limit)
+			if (User::$info->id <= $limit)
 				$like['count'] += 1;
 
 			// How many others liked this
@@ -136,7 +136,7 @@ function prepareLikes($likes)
 
 		// Top billing just for you, the big lights, the grand stage, plus we need that key returned
 		if ($you_liked)
-			$likes[$msg_id]['member'] = array($user_info['id'] => $txt['liked_you']) + $likes[$msg_id]['member'];
+			$likes[$msg_id]['member'] = array(User::$info->id => $txt['liked_you']) + $likes[$msg_id]['member'];
 	}
 
 	return $likes;
