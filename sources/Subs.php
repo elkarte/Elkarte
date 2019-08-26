@@ -1712,7 +1712,9 @@ function isBrowser($browser)
 
 	// Don't know any browser!
 	if (empty($context['browser']))
+	{
 		detectBrowser();
+	}
 
 	return !empty($context['browser'][$browser]) || !empty($context['browser']['is_' . $browser]) ? true : false;
 }

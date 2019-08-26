@@ -32,17 +32,17 @@ class DisplayRenderer extends Renderer
 	 */
 	protected function _setupPermissions()
 	{
-		global $context, $modSettings, $user_info;
+		global $context, $modSettings;
 
 		// Are you allowed to remove at least a single reply?
-		$context['can_remove_post'] |= allowedTo('delete_own') && (empty($modSettings['edit_disable_time']) || $this->_this_message['poster_time'] + $modSettings['edit_disable_time'] * 60 >= time()) && $this->_this_message['id_member'] == $user_info['id'];
+		$context['can_remove_post'] |= allowedTo('delete_own') && (empty($modSettings['edit_disable_time']) || $this->_this_message['poster_time'] + $modSettings['edit_disable_time'] * 60 >= time()) && $this->_this_message['id_member'] == $this->user->id;
 
 		// Have you liked this post, can you?
 		$this->_this_message['you_liked'] = !empty($context['likes'][$this->_this_message['id_msg']]['member'])
-			&& isset($context['likes'][$this->_this_message['id_msg']]['member'][$user_info['id']]);
+			&& isset($context['likes'][$this->_this_message['id_msg']]['member'][$this->user->id]);
 		$this->_this_message['use_likes'] = allowedTo('like_posts') && empty($context['is_locked'])
-			&& ($this->_this_message['id_member'] != $user_info['id'] || !empty($modSettings['likeAllowSelf']))
-			&& (empty($modSettings['likeMinPosts']) ? true : $modSettings['likeMinPosts'] <= $user_info['posts']);
+			&& ($this->_this_message['id_member'] != $this->user->id || !empty($modSettings['likeAllowSelf']))
+			&& (empty($modSettings['likeMinPosts']) ? true : $modSettings['likeMinPosts'] <= $this->user->posts);
 		$this->_this_message['like_count'] = !empty($context['likes'][$this->_this_message['id_msg']]['count']) ? $context['likes'][$this->_this_message['id_msg']]['count'] : 0;
 	}
 
@@ -68,7 +68,7 @@ class DisplayRenderer extends Renderer
 	 */
 	protected function _buildOutputArray()
 	{
-		global $topic, $context, $modSettings, $user_info, $txt;
+		global $topic, $context, $modSettings, $txt;
 
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
@@ -90,11 +90,11 @@ class DisplayRenderer extends Renderer
 			'approved' => $this->_this_message['approved'],
 			'first_new' => isset($context['start_from']) && $context['start_from'] == $this->_counter,
 			'is_ignored' => !empty($modSettings['enable_buddylist']) && in_array($this->_this_message['id_member'], $context['user']['ignoreusers']),
-			'is_message_author' => $this->_this_message['id_member'] == $user_info['id'],
+			'is_message_author' => $this->_this_message['id_member'] == $this->user->id,
 			'can_approve' => !$this->_this_message['approved'] && $context['can_approve'],
 			'can_unapprove' => !empty($modSettings['postmod_active']) && $context['can_approve'] && $this->_this_message['approved'],
-			'can_modify' => (!$context['is_locked'] || allowedTo('moderate_board')) && (allowedTo('modify_any') || (allowedTo('modify_replies') && $context['user']['started']) || (allowedTo('modify_own') && $this->_this_message['id_member'] == $user_info['id'] && (empty($modSettings['edit_disable_time']) || !$this->_this_message['approved'] || $this->_this_message['poster_time'] + $modSettings['edit_disable_time'] * 60 > time()))),
-			'can_remove' => allowedTo('delete_any') || (allowedTo('delete_replies') && $context['user']['started']) || (allowedTo('delete_own') && $this->_this_message['id_member'] == $user_info['id'] && (empty($modSettings['edit_disable_time']) || $this->_this_message['poster_time'] + $modSettings['edit_disable_time'] * 60 > time())),
+			'can_modify' => (!$context['is_locked'] || allowedTo('moderate_board')) && (allowedTo('modify_any') || (allowedTo('modify_replies') && $context['user']['started']) || (allowedTo('modify_own') && $this->_this_message['id_member'] == $this->user->id && (empty($modSettings['edit_disable_time']) || !$this->_this_message['approved'] || $this->_this_message['poster_time'] + $modSettings['edit_disable_time'] * 60 > time()))),
+			'can_remove' => allowedTo('delete_any') || (allowedTo('delete_replies') && $context['user']['started']) || (allowedTo('delete_own') && $this->_this_message['id_member'] == $this->user->id && (empty($modSettings['edit_disable_time']) || $this->_this_message['poster_time'] + $modSettings['edit_disable_time'] * 60 > time())),
 			'can_like' => $this->_this_message['use_likes'] && !$this->_this_message['you_liked'],
 			'can_unlike' => $this->_this_message['use_likes'] && $this->_this_message['you_liked'],
 			'like_counter' => $this->_this_message['like_count'],

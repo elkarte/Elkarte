@@ -41,8 +41,11 @@ class UserNotification extends AbstractModel
 
 	/**
 	 * Construct, just load the language file.
+	 *
+	 * @param \ElkArte\Database\QueryInterface $db
+	 * @param \ElkArte\UserInfo|null $user
 	 */
-	public function __construct()
+	public function __construct($db, $user)
 	{
 		parent::__construct();
 		theme()->getTemplates()->loadLanguageFile('UserNotifications');
@@ -53,11 +56,9 @@ class UserNotification extends AbstractModel
 	 */
 	public function present()
 	{
-		global $user_info;
-
 		if (!empty($this->_modSettings['usernotif_favicon_enable']))
 		{
-			$this->_addFaviconNumbers($user_info['mentions']);
+			$this->_addFaviconNumbers($this->user->mentions);
 		}
 
 		if (!empty($this->_modSettings['usernotif_desktop_enable']))

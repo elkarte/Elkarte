@@ -113,6 +113,7 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 		];
 		$posterOptions = [
 			'id' => $this->member_full_access,
+			'ip' => '127.0.0.1',
 			'name' => 'guestname',
 			'email' => $regOptions1['email'],
 			'update_post_count' => false,
@@ -137,6 +138,7 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 		];
 		$posterOptions = [
 			'id' => $this->member_full_access,
+			'ip' => '127.0.0.1',
 			'name' => 'guestname',
 			'email' => $regOptions1['email'],
 			'update_post_count' => false,
@@ -160,7 +162,7 @@ class TestSearchclass extends \PHPUnit\Framework\TestCase
 		$cache = \ElkArte\Cache\Cache::instance();
 		$req = request();
 
-		$user = new \ElkArte\UserSettings($db, $cache, $req);
+		$user = new \ElkArte\UserSettingsLoader($db, $cache, $req);
 		$user->loadUserById($this->member_full_access, true, '');
 		\ElkArte\User::reloadByUser($user);
 		// @deprecated kept until any trace of $user_info has been completely removed

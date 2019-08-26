@@ -61,7 +61,7 @@ abstract class AbstractMentionBoardAccess extends AbstractMentionMessage
 	 */
 	protected function _validateAccess($boards, &$mentions, $unset_keys)
 	{
-		global $user_info, $modSettings;
+		global $modSettings;
 
 		// Do the permissions checks and replace inappropriate messages
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -92,7 +92,7 @@ abstract class AbstractMentionBoardAccess extends AbstractMentionMessage
 			else
 				$modSettings['user_access_mentions'] = array();
 
-			$modSettings['user_access_mentions'][$user_info['id']] = 0;
+			$modSettings['user_access_mentions'][$this->user->id] = 0;
 			updateSettings(array('user_access_mentions' => serialize($modSettings['user_access_mentions'])));
 			scheduleTaskImmediate('user_access_mentions');
 		}

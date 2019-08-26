@@ -14,6 +14,8 @@
 
 namespace ElkArte;
 
+use ElkArte\User;
+
 /**
  * Class Notifications
  *
@@ -63,11 +65,12 @@ class Notifications extends AbstractModel
 	 * Registers the known notifications to the system, allows for integration to add more
 	 *
 	 * @param \ElkArte\Database\QueryInterface $db
+	 * @param \ElkArte\UserInfo|null $user
 	 * @throws \ElkArte\Exceptions\Exception
 	 */
-	public function __construct($db)
+	public function __construct($db, $user)
 	{
-		parent::__construct($db);
+		parent::__construct($db, $user);
 
 		// Let's register all the notifications we know by default
 		$this->register(1, 'notification', array($this, '_send_notification'));
@@ -171,7 +174,7 @@ class Notifications extends AbstractModel
 	protected function _send_task(NotificationsTask $task)
 	{
 		$class = $task->getClass();
-		$obj = new $class($this->_db);
+		$obj = new $class($this->_db, $this->user);
 		$obj->setTask($task);
 
 		require_once(SUBSDIR . '/Notification.subs.php');
@@ -209,7 +212,7 @@ class Notifications extends AbstractModel
 	 */
 	protected function _send_notification(Mentions\MentionType\MentionTypeInterface $obj, NotificationsTask $task, $bodies)
 	{
-		$mentioning = new Mentions\Mentioning($this->_db, new DataValidator(), $this->_modSettings->enabled_mentions);
+		$mentioning = new Mentions\Mentioning($this->_db, $this->user, new DataValidator(), $this->_modSettings->enabled_mentions);
 		foreach ($bodies as $body)
 		{
 			$this->_to_actually_mention[$task['notification_type']] = $mentioning->create($obj, array(
@@ -380,7 +383,7 @@ class Notifications extends AbstractModel
 	{
 		if (self::$_instance === null)
 		{
-			self::$_instance = new Notifications(database());
+			self::$_instance = new Notifications(database(), User::$info);
 		}
 
 		return self::$_instance;

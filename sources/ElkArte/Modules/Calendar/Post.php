@@ -91,7 +91,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 	 */
 	public function after_save_post()
 	{
-		global $user_info, $modSettings, $board, $topic;
+		global $modSettings, $board, $topic;
 
 		$req = \ElkArte\HttpReq::instance();
 		$eventid = $req->getPost('eventid', 'intval', -1);
@@ -116,7 +116,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 			canLinkEvent();
 
 			// Insert the event.
-			$event->insert($save_data, $user_info['id']);
+			$event->insert($save_data, $this->user->id);
 		}
 		else
 		{
@@ -126,7 +126,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 				$event_poster = getEventPoster($eventid);
 
 				// Silly hacker, Trix are for kids. ...probably trademarked somewhere, this is FAIR USE! (parody...)
-				isAllowedTo('calendar_edit_' . ($event_poster == $user_info['id'] ? 'own' : 'any'));
+				isAllowedTo('calendar_edit_' . ($event_poster == $this->user->id ? 'own' : 'any'));
 			}
 
 			// Delete it?
@@ -150,7 +150,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 	 */
 	public function prepare_context($id_member_poster)
 	{
-		global $user_info, $txt, $context;
+		global $txt, $context;
 
 		$event_id = isset($_REQUEST['eventid']) ? (int) $_REQUEST['eventid'] : -1;
 
@@ -158,7 +158,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 		if ($event_id != -1 && !isset($_REQUEST['subject']))
 		{
 			// If the user doesn't have permission to edit the post in this topic, redirect them.
-			if ((empty($id_member_poster) || $id_member_poster != $user_info['id'] || !allowedTo('modify_own')) && !allowedTo('modify_any'))
+			if ((empty($id_member_poster) || $id_member_poster != $this->user->id || !allowedTo('modify_own')) && !allowedTo('modify_any'))
 			{
 				throw new ControllerRedirectException('\\ElkArte\\Controller\\Calendar', 'action_post');
 			}
@@ -178,7 +178,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 	 */
 	private function _prepareEventContext($event_id)
 	{
-		global $context, $user_info, $modSettings, $board;
+		global $context, $modSettings, $board;
 
 		// They might want to pick a board.
 		if (!isset($context['current_board']))
@@ -201,7 +201,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 			$event_info = getEventProperties($context['event']['id']);
 
 			// Make sure the user is allowed to edit this event.
-			if ($event_info['member'] != $user_info['id'])
+			if ($event_info['member'] != $this->user->id)
 				isAllowedTo('calendar_edit_any');
 			elseif (!allowedTo('calendar_edit_any'))
 				isAllowedTo('calendar_edit_own');

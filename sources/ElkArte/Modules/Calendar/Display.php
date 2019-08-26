@@ -62,7 +62,7 @@ class Display extends \ElkArte\Modules\AbstractModule
 	 */
 	public function topicinfo(&$topicinfo, $topic)
 	{
-		global $context, $user_info, $scripturl;
+		global $context, $scripturl;
 
 		// If we want to show event information in the topic, prepare the data.
 		if (allowedTo('calendar_view'))
@@ -71,8 +71,8 @@ class Display extends \ElkArte\Modules\AbstractModule
 			require_once(SUBSDIR . '/Calendar.subs.php');
 
 			// First, try create a better time format, ignoring the "time" elements.
-			if (preg_match('~%[AaBbCcDdeGghjmuYy](?:[^%]*%[AaBbCcDdeGghjmuYy])*~', $user_info['time_format'], $matches) == 0 || empty($matches[0]))
-				$date_string = $user_info['time_format'];
+			if (preg_match('~%[AaBbCcDdeGghjmuYy](?:[^%]*%[AaBbCcDdeGghjmuYy])*~', $this->user->time_format, $matches) == 0 || empty($matches[0]))
+				$date_string = $this->user->time_format;
 			else
 				$date_string = $matches[0];
 
@@ -91,9 +91,9 @@ class Display extends \ElkArte\Modules\AbstractModule
 				$context['linked_calendar_events'][] = array(
 					'id' => $event['id_event'],
 					'title' => $event['title'],
-					'can_edit' => allowedTo('calendar_edit_any') || ($event['id_member'] == $user_info['id'] && allowedTo('calendar_edit_own')),
+					'can_edit' => allowedTo('calendar_edit_any') || ($event['id_member'] == $this->user->id && allowedTo('calendar_edit_own')),
 					'modify_href' => $scripturl . '?action=post;msg=' . $topicinfo['id_first_msg'] . ';topic=' . $topic . '.0;calendar;eventid=' . $event['id_event'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-					'can_export' => allowedTo('calendar_edit_any') || ($event['id_member'] == $user_info['id'] && allowedTo('calendar_edit_own')),
+					'can_export' => allowedTo('calendar_edit_any') || ($event['id_member'] == $this->user->id && allowedTo('calendar_edit_own')),
 					'export_href' => $scripturl . '?action=calendar;sa=ical;eventid=' . $event['id_event'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 				'start_date' => standardTime($start_date, $date_string, 'none'),
 					'start_timestamp' => $start_date,

@@ -569,7 +569,7 @@ Should be an empty line in between.',
 			array(
 				'itsMe',
 				'/me likes this',
-				'<div class="meaction">&nbsp;' . $user_info['name'] . ' likes this</div>'
+				'<div class="meaction">&nbsp;' . \ElkArte\User::$info->name . ' likes this</div>'
 			),
 			array(
 				'schemelessUrl',
@@ -619,7 +619,7 @@ Should be an empty line in between.',
 	 */
 	public function testPreparseBBcode()
 	{
-		$preparse = new \BBC\PreparseCode;
+		$preparse = \BBC\PreparseCode::instance('');
 		$parse = \BBC\ParserWrapper::instance();
 
 		foreach ($this->bbcPreparseTestCases as $testcase)

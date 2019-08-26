@@ -28,10 +28,10 @@ class PersonalMessage extends \ElkArte\Modules\AbstractModule
 	 */
 	public static function hooks(\ElkArte\EventManager $eventsManager)
 	{
-		global $user_info, $modSettings;
+		global $modSettings;
 
 		// Are controls required?
-		if (!$user_info['is_admin'] && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'])
+		if ($this->user->is_admin === false && !empty($modSettings['pm_posts_verification']) && $this->user->posts < $modSettings['pm_posts_verification'])
 		{
 			// Add the events to call for the verification
 			return array(

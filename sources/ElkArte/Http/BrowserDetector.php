@@ -16,6 +16,8 @@
 
 namespace ElkArte\Http;
 
+use ElkArte\User;
+
 /**
  * This class is an experiment for the job of correctly detecting browsers and
  * settings needed for them.
@@ -64,6 +66,13 @@ class BrowserDetector
 	protected $_ua = null;
 
 	/**
+	 * Body id
+	 *
+	 * @var string
+	 */
+	protected $_body_id = null;
+
+	/**
 	 * The main method of this class, you know the one that does the job: detect the thing.
 	 *
 	 * What it does:
@@ -76,8 +85,6 @@ class BrowserDetector
 	 */
 	public function detectBrowser()
 	{
-		global $context;
-
 		// Init
 		$this->_browsers = array();
 		$this->_is_mobile = false;
@@ -110,7 +117,7 @@ class BrowserDetector
 		$this->_setupBrowserPriority();
 
 		// Now see what you've done!
-		$context['browser'] = $this->_browsers;
+		return $this->_browsers;
 	}
 
 	/**
@@ -242,17 +249,15 @@ class BrowserDetector
 	 */
 	public function isPossibleRobot()
 	{
-		global $user_info;
-
 		// Be you robot or human?
 		if (!isset($this->_browsers['possibly_robot']))
 		{
-			if ($user_info['possibly_robot']) {
+			if (User::$info->possibly_robot) {
 				// This isn't meant to be reliable, it's just meant to catch most bots to prevent PHPSESSID from showing up.
-				$this->_browsers['possibly_robot'] = !empty($user_info['possibly_robot']);
+				$this->_browsers['possibly_robot'] = !empty(User::$info->possibly_robot);
 
 				// Robots shouldn't be logging in or registering.  So, they aren't a bot.  Better to be wrong than sorry (or people won't be able to log in!), anyway.
-				if ((isset($_REQUEST['action']) && in_array($_REQUEST['action'], array('login', 'login2', 'register'))) || !$user_info['is_guest'])
+				if ((isset($_REQUEST['action']) && in_array($_REQUEST['action'], array('login', 'login2', 'register'))) || User::$info->is_guest === false)
 					$this->_browsers['possibly_robot'] = false;
 			}
 			else
@@ -441,16 +446,14 @@ class BrowserDetector
 	 */
 	private function _setupBrowserPriority()
 	{
-		global $context;
-
 		if ($this->_is_mobile && !$this->_is_tablet)
 		{
-			$context['browser_body_id'] = 'mobile';
+			$this->_body_id = 'mobile';
 			$this->_browsers['is_mobile'] = true;
 		}
 		elseif ($this->_is_tablet)
 		{
-			$context['browser_body_id'] = 'tablet';
+			$this->_body_id = 'tablet';
 			$this->_browsers['is_tablet'] = true;
 		}
 		else
@@ -468,16 +471,24 @@ class BrowserDetector
 				'is_konqueror' => 'konqueror',
 			);
 
-			$context['browser_body_id'] = 'elkarte';
+			$this->_body_id = 'elkarte';
 			$active = array_reverse(array_keys($this->_browsers, true));
 			foreach ($active as $key => $browser)
 			{
 				if (array_key_exists($browser, $browser_priority))
 				{
-					$context['browser_body_id'] = $browser_priority[$browser];
+					$this->_body_id = $browser_priority[$browser];
 					break;
 				}
 			}
 		}
+	}
+
+	/**
+	 * Returns the browser name that we will use in the <body id="this_browser">
+	 */
+	public function browserBodyId()
+	{
+		return $this->_body_id;
 	}
 }

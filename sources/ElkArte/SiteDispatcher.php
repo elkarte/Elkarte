@@ -14,6 +14,8 @@
 
 namespace ElkArte;
 
+use ElkArte\User;
+
 /**
  * Dispatch the request to the function or method registered to handle it.
  *
@@ -166,11 +168,11 @@ class SiteDispatcher
 	 */
 	protected function restrictedGuestAccess()
 	{
-		global $modSettings, $user_info;
+		global $modSettings;
 
 		return
 			empty($modSettings['allow_guestAccess'])
-			&& $user_info['is_guest']
+			&& User::$info->is_guest
 			&& !in_array($this->action, array(
 				'login', 'login2', 'register', 'reminder',
 				'help', 'quickhelp', 'mailq', 'openidreturn'

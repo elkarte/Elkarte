@@ -47,6 +47,20 @@ abstract class AbstractQuery implements QueryInterface
 	protected $_db_prefix = '';
 
 	/**
+	 * String to match visible boards.
+	 * By default set to a false, so that unless it is set, nothing is returned.
+	 * @var string
+	 */
+	protected $query_see_board = '1!=1';
+
+	/**
+	 * String to match boards the user want to see.
+	 * By default set to a false, so that unless it is set, nothing is returned.
+	 * @var string
+	 */
+	protected $query_wanna_see_board = '1!=1';
+
+	/**
 	 * MySQL supports unbuffered queries, this remembers if we are running an
 	 * unbuffered or not
 	 * @var boolean
@@ -134,6 +148,24 @@ abstract class AbstractQuery implements QueryInterface
 	abstract public function last_error();
 
 	/**
+	 * Public setter for the string that defines which boards the user can see.
+	 * @param string $string
+	 */
+	public function setSeeBoard($string)
+	{
+		$this->query_see_board = $string;
+	}
+
+	/**
+	 * Public setter for the string that defines which boards the user want to see.
+	 * @param string $string
+	 */
+	public function setWannaSeeBoard($string)
+	{
+		$this->query_wanna_see_board = $string;
+	}
+
+	/**
 	 * Callback for preg_replace_callback on the query.
 	 * It allows to replace on the fly a few pre-defined strings, for
 	 * convenience ('query_see_board', 'query_wanna_see_board'), with
@@ -148,28 +180,28 @@ abstract class AbstractQuery implements QueryInterface
 	 */
 	public function replacement__callback($matches)
 	{
-		global $user_info;
-
 		// Connection gone???  This should *never* happen at this point, yet it does :'(
 		if (!$this->validConnection())
 		{
 			\ElkArte\Errors\Errors::instance()->display_db_error('ElkArte\\Database\\AbstractQuery::replacement__callback');
 		}
 
-		if ($matches[1] === 'db_prefix')
-			return $this->_db_prefix;
-
-		if ($matches[1] === 'query_see_board')
-			return $user_info['query_see_board'];
-
-		if ($matches[1] === 'query_wanna_see_board')
-			return $user_info['query_wanna_see_board'];
-
-		if ($matches[1] === 'column_case_insensitive')
-			return $this->_replaceColumnCaseInsensitive($matches[2]);
+		switch ($matches[1])
+		{
+			case 'db_prefix':
+				return $this->_db_prefix;
+			case 'query_see_board':
+				return $this->query_see_board;
+			case 'query_wanna_see_board':
+				return $this->query_wanna_see_board;
+			case 'column_case_insensitive':
+				return $this->_replaceColumnCaseInsensitive($matches[2]);
+		}
 
 		if (!isset($matches[2]))
+		{
 			$this->error_backtrace('Invalid value inserted or no type specified.', '', E_USER_ERROR, __FILE__, __LINE__);
+		}
 
 		if (!isset($this->_db_callback_values[$matches[2]]))
 		{

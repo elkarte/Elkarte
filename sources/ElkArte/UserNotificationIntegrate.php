@@ -13,6 +13,8 @@
 
 namespace ElkArte;
 
+use ElkArte\User;
+
 class UserNotificationIntegrate
 {
 	/**
@@ -48,14 +50,12 @@ class UserNotificationIntegrate
 	 */
 	public static function integrate_load_theme()
 	{
-		global $user_info;
-
-		if ($user_info['is_guest'])
+		if (User::$info->is_guest)
 		{
 			return;
 		}
 
-		$notification = new UserNotification;
+		$notification = new UserNotification(database(), User::$info);
 		$notification->present();
 	}
 
@@ -66,7 +66,7 @@ class UserNotificationIntegrate
 	 */
 	public static function integrate_modify_mention_settings(&$config_vars)
 	{
-		$notification = new UserNotification;
+		$notification = new UserNotification(database(), User::$info);
 
 		$notification_cfg = $notification->addConfig();
 		$config_vars = elk_array_insert($config_vars, $config_vars[1], $notification_cfg, 'after', false);
@@ -79,7 +79,7 @@ class UserNotificationIntegrate
 	{
 		$req = HttpReq::instance();
 
-		$notification = new UserNotification;
+		$notification = new UserNotification(database(), User::$info);
 		$req->post = $notification->validate($req->post);
 	}
 }

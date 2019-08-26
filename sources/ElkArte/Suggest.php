@@ -17,6 +17,8 @@
 
 namespace ElkArte;
 
+use ElkArte\User;
+
 /**
  * Suggesting names (basically a wrapper for getMember)
  */
@@ -51,15 +53,13 @@ class Suggest
 	 */
 	public function member()
 	{
-		global $user_info;
-
 		// Escape the search string
 		$this->_search = strtr($this->_search, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;'));
 
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// Find the member.
-		$xml_data = getMember($this->_search, !empty($this->_params['buddies']) ? $user_info['buddies'] : array());
+		$xml_data = getMember($this->_search, !empty($this->_params['buddies']) ? User::$info->buddies : array());
 
 		return $xml_data;
 	}

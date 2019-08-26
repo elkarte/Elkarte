@@ -18,6 +18,8 @@
 
 namespace ElkArte;
 
+use ElkArte\User;
+
 /**
  * Class TopicUtil
  *
@@ -38,7 +40,7 @@ class TopicUtil
 	 */
 	public static function prepareContext($topics_info, $topicseen = false, $preview_length = null)
 	{
-		global $modSettings, $options, $txt, $user_info, $settings;
+		global $modSettings, $options, $txt, $settings;
 
 		$topics = array();
 		$preview_length = (int) $preview_length;
@@ -115,7 +117,7 @@ class TopicUtil
 			$first_topic_href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => '0', $topicseen, 'subject' => $row['first_subject']]);
 			$last_poster_href = getUrl('profile', ['action' => 'profile', 'u' => $row['last_id_member'], 'name' => $row['last_display_name']]);
 
-			if ($user_info['is_guest'])
+			if (User::$info->is_guest)
 			{
 				$topic_href = getUrl('topic', ['topic' => $row['id_topic'], 'start' => ((int) (($row['num_replies']) / $messages_per_page)) * $messages_per_page, 'subject' => $row['first_subject'], $topicseen]) . '#msg' . $row['id_last_msg'];
 			}

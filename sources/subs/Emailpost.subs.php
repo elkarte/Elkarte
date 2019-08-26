@@ -941,7 +941,9 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 
 	// Check on some things needed by parse_bbc as an autotask does not load them
 	if (!isset($context['browser']))
+	{
 		detectBrowser();
+	}
 
 	// Server?
 	detectServer();

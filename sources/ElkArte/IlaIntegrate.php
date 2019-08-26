@@ -11,6 +11,8 @@
 
 namespace ElkArte;
 
+use ElkArte\User;
+
 /**
  * Class IlaIntegrate
  */
@@ -322,9 +324,9 @@ class IlaIntegrate
 	 */
 	public static function validate_url()
 	{
-		global $user_info, $scripturl, $context;
+		global $scripturl, $context;
 
-		return function (&$data, $disabled) use ($user_info, $scripturl, &$context)
+		return function (&$data, $disabled) use ($scripturl, &$context)
 		{
 			if (isset($disabled['attach']))
 			{
@@ -335,7 +337,7 @@ class IlaIntegrate
 			$attachment = false;
 
 			// Not a preview, then sanitize the attach id and determine the details
-			if (strpos($data, 'post_tmp_' . $user_info['id'] . '_') === false)
+			if (strpos($data, 'post_tmp_' . User::$info->id . '_') === false)
 			{
 				require_once(SUBSDIR . '/Attachments.subs.php');
 
@@ -373,9 +375,9 @@ class IlaIntegrate
 	 */
 	public static function validate_plain()
 	{
-		global $user_info, $scripturl, $context, $modSettings;
+		global $scripturl, $context, $modSettings;
 
-		return function (&$data, $disabled) use ($user_info, $scripturl, &$context, $modSettings)
+		return function (&$data, $disabled) use ($scripturl, &$context, $modSettings)
 		{
 			if (isset($disabled['attach']))
 			{
@@ -384,7 +386,7 @@ class IlaIntegrate
 
 			$num = $data;
 			$is_image = array();
-			$preview = strpos($data, 'post_tmp_' . $user_info['id'] . '_');
+			$preview = strpos($data, 'post_tmp_' . User::$info->id . '_');
 
 			// Not a preview, then sanitize the attach id and determine the actual type
 			if ($preview === false)
@@ -430,12 +432,12 @@ class IlaIntegrate
 	 */
 	public static function validate_options()
 	{
-		global $user_info, $scripturl, $context;
+		global $scripturl, $context;
 
-		return function (&$data) use ($user_info, $scripturl, &$context)
+		return function (&$data) use ($scripturl, &$context)
 		{
 			// Not a preview, then sanitize the attach id
-			if (strpos($data, 'post_tmp_' . $user_info['id'] . '_') === false)
+			if (strpos($data, 'post_tmp_' . User::$info->id . '_') === false)
 			{
 				$data = (int) $data;
 			}

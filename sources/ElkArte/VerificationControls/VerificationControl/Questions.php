@@ -17,6 +17,8 @@
 
 namespace ElkArte\VerificationControls\VerificationControl;
 
+use ElkArte\User;
+
 /**
  * Class to manage, prepare, show, and validate question -> answer verifications
  */
@@ -89,7 +91,7 @@ class Questions implements ControlInterface
 	 */
 	public function showVerification($sessionVal, $isNew, $force_refresh = true)
 	{
-		global $modSettings, $user_info, $language;
+		global $modSettings, $language;
 
 		if ($isNew)
 		{
@@ -103,7 +105,7 @@ class Questions implements ControlInterface
 
 			// Let's deal with languages
 			// First thing we need to know what language the user wants and if there is at least one question
-			$this->_questions_language = !empty($sessionVal['language']) ? $sessionVal['language'] : (!empty($user_info['language']) ? $user_info['language'] : $language);
+			$this->_questions_language = !empty($sessionVal['language']) ? $sessionVal['language'] : (!empty(User::$info->language) ? User::$info->language : $language);
 
 			// No questions in the selected language?
 			if (empty($modSettings['question_id_cache'][$this->_questions_language]))

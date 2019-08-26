@@ -141,7 +141,7 @@ class PersonalMessage extends \ElkArte\Modules\AbstractModule
 	 */
 	public function before_set_context($pmsg)
 	{
-		global $context, $user_info;
+		global $context;
 
 		// If drafts are enabled, lets generate a list of drafts that they can load in to the editor
 		if (!empty($context['drafts_pm_save']))
@@ -149,12 +149,12 @@ class PersonalMessage extends \ElkArte\Modules\AbstractModule
 			// Has a specific draft has been selected?  Load it up if there is not already a message already in the editor
 			if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
 			{
-				$this->_loadDraft($user_info['id'], (int) $_REQUEST['id_draft']);
+				$this->_loadDraft($this->user->id, (int) $_REQUEST['id_draft']);
 				throw new \ElkArte\Exceptions\PmErrorException($this->_loaded_draft->to_list, $this->_loaded_draft);
 			}
 			else
 			{
-				$this->_prepareDraftsContext($user_info['id'], $pmsg);
+				$this->_prepareDraftsContext($this->user->id, $pmsg);
 			}
 		}
 	}
@@ -321,7 +321,7 @@ class PersonalMessage extends \ElkArte\Modules\AbstractModule
 	 */
 	public function before_sending($recipientList)
 	{
-		global $context, $user_info, $modSettings;
+		global $context, $modSettings;
 
 		// Ajax calling
 		if (!isset($context['drafts_pm_save']))
@@ -341,7 +341,7 @@ class PersonalMessage extends \ElkArte\Modules\AbstractModule
 					'reply_id' => empty($_POST['replied_to']) ? 0 : (int) $_POST['replied_to'],
 					'body' => \ElkArte\Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true),
 					'subject' => strtr(\ElkArte\Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
-					'id_member' => $user_info['id'],
+					'id_member' => $this->user->id,
 					'is_usersaved' => (int) empty($_REQUEST['autosave']),
 				);
 
@@ -368,12 +368,12 @@ class PersonalMessage extends \ElkArte\Modules\AbstractModule
 	 */
 	public function message_sent($failed)
 	{
-		global $context, $user_info;
+		global $context;
 
 		// If we had a PM draft for this one, then its time to remove it since it was just sent
 		if (!$failed && $context['drafts_pm_save'] && !empty($_POST['id_pm_draft']))
 		{
-			deleteDrafts((int) $_POST['id_pm_draft'], $user_info['id']);
+			deleteDrafts((int) $_POST['id_pm_draft'], $this->user->id);
 		}
 	}
 }

@@ -95,7 +95,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 	 */
 	public function prepare_context($topic_attributes, $topic, $board)
 	{
-		global $context, $user_info, $txt;
+		global $context, $txt;
 
 		if (!empty($topic))
 		{
@@ -130,7 +130,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 			if (empty($topic))
 				isAllowedTo('poll_post');
 			// This is an old topic - but it is yours!  Can you add to it?
-			elseif ($user_info['id'] == $topic_attributes['id_member'] && !allowedTo('poll_add_any'))
+			elseif ($this->user->id == $topic_attributes['id_member'] && !allowedTo('poll_add_any'))
 				isAllowedTo('poll_add_own');
 			// If you're not the owner, can you add to any poll?
 			else
@@ -212,24 +212,30 @@ class Post extends \ElkArte\Modules\AbstractModule
 	 */
 	public function before_save_post($post_errors, $topic_info)
 	{
-		global $user_info;
-
 		// Validate the poll...
 		if (!empty($topic_info) && !isset($_REQUEST['msg']))
 			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// This is a new topic... so it's a new poll.
 		if (empty($topic_info))
+		{
 			isAllowedTo('poll_post');
+		}
 		// Can you add to your own topics?
-		elseif ($user_info['id'] == $topic_info['id_member_started'] && !allowedTo('poll_add_any'))
+		elseif ($this->user->id == $topic_info['id_member_started'] && !allowedTo('poll_add_any'))
+		{
 			isAllowedTo('poll_add_own');
+		}
 		// Can you add polls to any topic, then?
 		else
+		{
 			isAllowedTo('poll_add_any');
+		}
 
 		if (!isset($_POST['question']) || trim($_POST['question']) == '')
+		{
 			$post_errors->addError('no_question');
+		}
 
 		$_POST['options'] = empty($_POST['options']) ? array() : htmltrim__recursive($_POST['options']);
 
@@ -336,7 +342,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 	 */
 	protected function _createPoll($options, $user_name)
 	{
-		global $user_info, $board;
+		global $board;
 
 		// Make sure that the user has not entered a ridiculous number of options..
 		if (empty($options['poll_max_votes']) || $options['poll_max_votes'] <= 0)
@@ -386,7 +392,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 		require_once(SUBSDIR . '/Poll.subs.php');
 		$id_poll = createPoll(
 			$question,
-			$user_info['id'],
+			$this->user->id,
 			$user_name,
 			$poll_max_votes,
 			$poll_hide,

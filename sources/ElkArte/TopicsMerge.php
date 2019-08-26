@@ -16,6 +16,8 @@
 
 namespace ElkArte;
 
+use ElkArte\User;
+
 /**
  * This class has functions to handle merging of two or more topics
  * in to a single new or existing topic.
@@ -419,11 +421,11 @@ class TopicsMerge
 	 */
 	protected function _loadTopicDetails()
 	{
-		global $scripturl, $modSettings, $user_info;
+		global $scripturl, $modSettings;
 
 		// Joy of all joys, make sure they're not pi**ing about with unapproved topics they can't see :P
 		if ($modSettings['postmod_active'])
-			$can_approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
+			$can_approve_boards = !empty(User::$info->mod_cache['ap']) ? User::$info->mod_cache['ap'] : boardsAllowedTo('approve_posts');
 
 		// Get info about the topics and polls that will be merged.
 		$request = $this->_db->query('', '

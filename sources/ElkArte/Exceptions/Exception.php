@@ -16,6 +16,7 @@
 namespace ElkArte\Exceptions;
 
 use ElkArte\Errors\Errors as E;
+use ElkArte\User;
 
 /**
  * Class ElkArte\Exception
@@ -129,6 +130,7 @@ class Exception extends \Exception
 			E::instance()->display_minimal_error($message);
 		}
 
+		$this->logMessage($message, $lang);
 		$msg = !isset($txt[$msg]) ? $msg : (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
 
 		return $msg;
@@ -143,11 +145,11 @@ class Exception extends \Exception
 	 */
 	protected function logMessage($msg, $lang)
 	{
-		global $language, $txt, $user_info;
+		global $language, $txt;
 
 		// Don't need to reload the language file if both the user and
 		// the forum share the same language.
-		if ($language !== $user_info['language'] && $lang !== false)
+		if ($language !== User::$info->language && $lang !== false)
 		{
 			theme()->getTemplates()->loadLanguageFile($lang, $language);
 		}

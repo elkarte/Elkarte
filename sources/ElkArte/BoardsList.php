@@ -17,6 +17,8 @@
 
 namespace ElkArte;
 
+use \ElkArte\User;
+
 /**
  * This class fetches all the stuff needed to build a list of boards
  */
@@ -101,7 +103,7 @@ class BoardsList
 	 */
 	public function __construct($options)
 	{
-		global $user_info, $settings, $context, $modSettings;
+		global $settings, $context, $modSettings;
 
 		$this->_options = array_merge(array(
 			'include_categories' => false,
@@ -119,12 +121,8 @@ class BoardsList
 
 		$this->_subject_length = $modSettings['subject_length'];
 
-		$this->_user = array(
-			'id' => $user_info['id'],
-			'is_guest' => $user_info['is_guest'],
-			'ignoreboards' => $user_info['ignoreboards'],
-			'mod_cache_ap' => !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : array(),
-		);
+		$this->_user = User::$info;
+		$this->_user['mod_cache_ap'] = !empty($this->_user->mod_cache['ap']) ? $this->_user->mod_cache['ap'] : array();
 
 		$this->_db = database();
 

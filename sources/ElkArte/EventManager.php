@@ -12,6 +12,8 @@
 
 namespace ElkArte;
 
+use ElkArte\User;
+
 class EventManager
 {
 	/**
@@ -138,10 +140,12 @@ class EventManager
 	protected function _getInstance($class_name)
 	{
 		if (isset($this->_instances[$class_name]))
+		{
 			return $this->_instances[$class_name];
+		}
 		else
 		{
-			$instance = new $class_name(HttpReq::instance());
+			$instance = new $class_name(HttpReq::instance(), User::$info);
 			$this->_setInstance($class_name, $instance);
 
 			return $instance;

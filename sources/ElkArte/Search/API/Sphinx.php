@@ -137,7 +137,7 @@ class Sphinx extends AbstractAPI
 	 */
 	public function searchQuery($search_words, $excluded_words, &$participants, &$search_results)
 	{
-		global $user_info, $context, $modSettings;
+		global $context, $modSettings;
 
 		if (!$this->_searchParams->subject_only)
 		{
@@ -146,7 +146,8 @@ class Sphinx extends AbstractAPI
 
 		// Only request the results if they haven't been cached yet.
 		$cached_results = array();
-		if (!\ElkArte\Cache\Cache::instance()->getVar($cached_results, 'search_results_' . md5($user_info['query_see_board'] . '_' . $context['params'])))
+		$cache_key = 'search_results_' . md5(User::$info->query_see_board . '_' . $context['params']);
+		if (!\ElkArte\Cache\Cache::instance()->getVar($cached_results, $cache_key))
 		{
 			// The API communicating with the search daemon.
 			require_once(SOURCEDIR . '/sphinxapi.php');
@@ -282,7 +283,7 @@ class Sphinx extends AbstractAPI
 			}
 
 			// Store the search results in the cache.
-			\ElkArte\Cache\Cache::instance()->put('search_results_' . md5($user_info['query_see_board'] . '_' . $context['params']), $cached_results, 600);
+			\ElkArte\Cache\Cache::instance()->put($cache_key, $cached_results, 600);
 		}
 
 		$participants = array();

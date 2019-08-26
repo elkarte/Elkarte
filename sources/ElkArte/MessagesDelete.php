@@ -53,17 +53,30 @@ class MessagesDelete
 	private $_errors = array();
 
 	/**
+	 * The current user deleting something
+	 *
+	 * @var \ElkArte\ValuesContainer
+	 */
+	protected $user = null;
+
+	/**
 	 * Initialize the class! :P
 	 *
 	 * @param int|bool $recycle_enabled if the recycling is enabled.
 	 * @param int|null $recycle_board the id the the recycle board (if any)
 	 */
-	public function __construct($recycle_enabled = false, $recycle_board = null)
+	public function __construct($recycle_enabled, $recycle_board, $user)
 	{
 		if ($recycle_enabled)
+		{
 			$this->_recycle_board = (int) $recycle_board;
+		}
 		else
+		{
 			$this->_recycle_board = null;
+		}
+
+		$this->user = $user;
 	}
 
 	/**
@@ -338,7 +351,7 @@ class MessagesDelete
 	 */
 	public function removeMessage($message, $decreasePostCount = true, $check_permissions = true)
 	{
-		global $board, $modSettings, $user_info;
+		global $board, $modSettings;
 
 		$db = database();
 		$this->_errors = array();
@@ -452,7 +465,7 @@ class MessagesDelete
 					LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
 				WHERE b.id_board = {int:recycle_board}',
 				array(
-					'current_member' => $user_info['id'],
+					'current_member' => $this->user->id,
 					'recycle_board' => $this->_recycle_board,
 				)
 			);
@@ -535,14 +548,14 @@ class MessagesDelete
 				);
 
 				// Mark recycled topic as read.
-				if (!$user_info['is_guest'])
+				if ($this->user->is_guest === false)
 				{
 					require_once(SUBSDIR . '/Topic.subs.php');
-					markTopicsRead(array($user_info['id'], $topicID, $modSettings['maxMsgID'], 0), true);
+					markTopicsRead(array($this->user->id, $topicID, $modSettings['maxMsgID'], 0), true);
 				}
 
 				// Mark recycle board as seen, if it was marked as seen before.
-				if (!empty($isRead) && !$user_info['is_guest'])
+				if (!empty($isRead) && $this->user->is_guest === false)
 				{
 					require_once(SUBSDIR . '/Boards.subs.php');
 					markBoardsRead($this->_recycle_board);
@@ -723,7 +736,7 @@ class MessagesDelete
 		}
 
 		// Add it to the mod log.
-		if (allowedTo('delete_any') && (!allowedTo('delete_own') || $row['id_member'] != $user_info['id']))
+		if (allowedTo('delete_any') && (!allowedTo('delete_own') || $row['id_member'] != $this->user->id))
 			logAction('delete', array('topic' => $row['id_topic'], 'subject' => $row['subject'], 'member' => $row['id_member'], 'board' => $row['id_board']));
 
 		return false;
@@ -741,7 +754,7 @@ class MessagesDelete
 	 */
 	protected function _checkDeletePermissions($row, $board)
 	{
-		global $user_info, $modSettings;
+		global $modSettings;
 
 		if (empty($board) || $row['id_board'] != $board)
 		{
@@ -754,11 +767,11 @@ class MessagesDelete
 				$delete_replies = boardsAllowedTo('delete_replies');
 				$delete_replies = in_array(0, $delete_replies) || in_array($row['id_board'], $delete_replies);
 
-				if ($row['id_member'] == $user_info['id'])
+				if ($row['id_member'] == $this->user->id)
 				{
 					if (!$delete_own)
 					{
-						if ($row['id_member_poster'] == $user_info['id'])
+						if ($row['id_member_poster'] == $this->user->id)
 						{
 							if (!$delete_replies)
 								throw new Exceptions\Exception('cannot_delete_replies', 'permission');
@@ -766,10 +779,10 @@ class MessagesDelete
 						else
 							throw new Exceptions\Exception('cannot_delete_own', 'permission');
 					}
-					elseif (($row['id_member_poster'] != $user_info['id'] || !$delete_replies) && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
+					elseif (($row['id_member_poster'] != $this->user->id || !$delete_replies) && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
 						throw new Exceptions\Exception('modify_post_time_passed', false);
 				}
-				elseif ($row['id_member_poster'] == $user_info['id'])
+				elseif ($row['id_member_poster'] == $this->user->id)
 				{
 					if (!$delete_replies)
 						throw new Exceptions\Exception('cannot_delete_replies', 'permission');
@@ -779,9 +792,9 @@ class MessagesDelete
 			}
 
 			// Can't delete an unapproved message, if you can't see it!
-			if ($modSettings['postmod_active'] && !$row['approved'] && $row['id_member'] != $user_info['id'] && !(in_array(0, $delete_any) || in_array($row['id_board'], $delete_any)))
+			if ($modSettings['postmod_active'] && !$row['approved'] && $row['id_member'] != $this->user->id && !(in_array(0, $delete_any) || in_array($row['id_board'], $delete_any)))
 			{
-				$approve_posts = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
+				$approve_posts = !empty($this->user->mod_cache['ap']) ? $this->user->mod_cache['ap'] : boardsAllowedTo('approve_posts');
 				if (!in_array(0, $approve_posts) && !in_array($row['id_board'], $approve_posts))
 					return 'exit';
 			}
@@ -789,24 +802,24 @@ class MessagesDelete
 		else
 		{
 			// Check permissions to delete this message.
-			if ($row['id_member'] == $user_info['id'])
+			if ($row['id_member'] == $this->user->id)
 			{
 				if (!allowedTo('delete_own'))
 				{
-					if ($row['id_member_poster'] == $user_info['id'] && !allowedTo('delete_any'))
+					if ($row['id_member_poster'] == $this->user->id && !allowedTo('delete_any'))
 						isAllowedTo('delete_replies');
 					elseif (!allowedTo('delete_any'))
 						isAllowedTo('delete_own');
 				}
-				elseif (!allowedTo('delete_any') && ($row['id_member_poster'] != $user_info['id'] || !allowedTo('delete_replies')) && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
+				elseif (!allowedTo('delete_any') && ($row['id_member_poster'] != $this->user->id || !allowedTo('delete_replies')) && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
 					throw new Exceptions\Exception('modify_post_time_passed', false);
 			}
-			elseif ($row['id_member_poster'] == $user_info['id'] && !allowedTo('delete_any'))
+			elseif ($row['id_member_poster'] == $this->user->id && !allowedTo('delete_any'))
 				isAllowedTo('delete_replies');
 			else
 				isAllowedTo('delete_any');
 
-			if ($modSettings['postmod_active'] && !$row['approved'] && $row['id_member'] != $user_info['id'] && !allowedTo('delete_own'))
+			if ($modSettings['postmod_active'] && !$row['approved'] && $row['id_member'] != $this->user->id && !allowedTo('delete_own'))
 				isAllowedTo('approve_posts');
 		}
 
@@ -825,7 +838,7 @@ class MessagesDelete
 					$remove_own = in_array(0, $remove_own) || in_array($row['id_board'], $remove_own);
 				}
 
-				if ($row['id_member'] != $user_info['id'] && !$remove_any)
+				if ($row['id_member'] != $this->user->id && !$remove_any)
 					throw new Exceptions\Exception('cannot_remove_any', 'permission');
 				elseif (!$remove_any && !$remove_own)
 					throw new Exceptions\Exception('cannot_remove_own', 'permission');
@@ -833,7 +846,7 @@ class MessagesDelete
 			else
 			{
 				// Check permissions to delete a whole topic.
-				if ($row['id_member'] != $user_info['id'])
+				if ($row['id_member'] != $this->user->id)
 					isAllowedTo('remove_any');
 				elseif (!allowedTo('remove_any'))
 					isAllowedTo('remove_own');

@@ -123,7 +123,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 	 */
 	public function finalize_post_form(&$editorOptions, $board, $topic, $template_layers)
 	{
-		global $context, $user_info, $options, $txt;
+		global $context, $options, $txt;
 
 		// Are post drafts enabled?
 		$context['drafts_save'] = self::$_drafts_save;
@@ -134,7 +134,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 		{
 			theme()->getTemplates()->loadLanguageFile('Drafts');
 
-			$this->_prepareDraftsContext($user_info['id'], $topic);
+			$this->_prepareDraftsContext($this->user->id, $topic);
 
 			if (!empty($this->_loading_draft))
 			{
@@ -201,7 +201,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 	 */
 	public function before_save_post()
 	{
-		global $context, $board, $user_info;
+		global $context, $board;
 
 		// If drafts are enabled, then pass this off
 		if (isset($_POST['save_draft']))
@@ -220,7 +220,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 					'sticky' => isset($_POST['sticky']) ? (int) $_POST['sticky'] : 0,
 					'subject' => strtr(\ElkArte\Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
 					'body' => \ElkArte\Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true),
-					'id_member' => $user_info['id'],
+					'id_member' => $this->user->id,
 					'is_usersaved' => (int) empty($_REQUEST['autosave']),
 				);
 
@@ -253,11 +253,9 @@ class Post extends \ElkArte\Modules\AbstractModule
 	 */
 	public function after_save_post()
 	{
-		global $user_info;
-
 		// If we had a draft for this, its time to remove it since it was just posted
 		if (!empty($_POST['id_draft']))
-			deleteDrafts($_POST['id_draft'], $user_info['id']);
+			deleteDrafts($_POST['id_draft'], $this->user->id);
 	}
 
 	/**
