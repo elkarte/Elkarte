@@ -14,6 +14,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Retrieve all installed themes
  */
@@ -431,7 +433,7 @@ function countConfiguredGuestOptions()
  */
 function availableThemes($current_theme, $current_member)
 {
-	global $modSettings, $settings, $user_info, $txt, $language;
+	global $modSettings, $settings, $txt, $language;
 
 	$db = database();
 
@@ -537,8 +539,8 @@ function availableThemes($current_theme, $current_member)
 		$settings['images_url'] = &$theme_data['images_url'];
 		$theme_thumbnail_href = $theme_data['images_url'] . '/thumbnail.png';
 
-		if (file_exists($theme_data['theme_dir'] . '/languages/' . $user_info['language'] . '/Settings.' . $user_info['language'] . '.php'))
-			include($theme_data['theme_dir'] . '/languages/' . $user_info['language'] . '/Settings.' . $user_info['language'] . '.php');
+		if (file_exists($theme_data['theme_dir'] . '/languages/' . User::$info->language . '/Settings.' . User::$info->language . '.php'))
+			include($theme_data['theme_dir'] . '/languages/' . User::$info->language . '/Settings.' . User::$info->language . '.php');
 		elseif (file_exists($theme_data['theme_dir'] . '/languages/' . $language . '/Settings.' . $language . '.php'))
 			include($theme_data['theme_dir'] . '/languages/' . $language . '/Settings.' . $language . '.php');
 		else

@@ -14,6 +14,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Get the latest posts of a forum.
  *
@@ -132,7 +134,7 @@ function cache_getLastPosts($latestPostOptions)
  */
 function prepareRecentPosts($messages, $start)
 {
-	global $user_info, $modSettings;
+	global $modSettings;
 
 	$counter = $start + 1;
 	$posts = array();
@@ -198,7 +200,7 @@ function prepareRecentPosts($messages, $start)
 			'delete_possible' => ($row['id_first_msg'] != $row['id_msg'] || $row['id_last_msg'] == $row['id_msg']) && (empty($modSettings['edit_disable_time']) || $row['poster_time'] + $modSettings['edit_disable_time'] * 60 >= time()),
 		);
 
-		if ($user_info['id'] == $row['first_id_member'])
+		if (User::$info->id == $row['first_id_member'])
 			$board_ids['own'][$row['id_board']][] = $row['id_msg'];
 		$board_ids['any'][$row['id_board']][] = $row['id_msg'];
 	}
@@ -211,7 +213,7 @@ function prepareRecentPosts($messages, $start)
  */
 function earliest_msg()
 {
-	global $board, $user_info;
+	global $board;
 
 	$db = database();
 
@@ -224,7 +226,7 @@ function earliest_msg()
 				AND id_board = {int:current_board}',
 			array(
 				'current_board' => $board,
-				'current_member' => $user_info['id'],
+				'current_member' => User::$info->id,
 			)
 		);
 		list ($earliest_msg) = $db->fetch_row($request);
@@ -238,7 +240,7 @@ function earliest_msg()
 				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = b.id_board AND lmr.id_member = {int:current_member})
 			WHERE {query_see_board}',
 			array(
-				'current_member' => $user_info['id'],
+				'current_member' => User::$info->id,
 			)
 		);
 		list ($earliest_msg) = $db->fetch_row($request);
@@ -261,7 +263,7 @@ function earliest_msg()
 				FROM {db_prefix}log_topics
 				WHERE id_member = {int:current_member}',
 				array(
-					'current_member' => $user_info['id'],
+					'current_member' => User::$info->id,
 				)
 			);
 			list ($earliest_msg2) = $db->fetch_row($request);

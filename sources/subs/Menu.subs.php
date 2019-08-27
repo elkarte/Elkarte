@@ -14,6 +14,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Create a menu.
  *
@@ -62,7 +64,7 @@
  */
 function createMenu($menuData, $menuOptions = array())
 {
-	global $context, $settings, $options, $txt, $scripturl, $user_info;
+	global $context, $settings, $options, $txt, $scripturl;
 
 	$_req = \ElkArte\HttpReq::instance();
 
@@ -314,7 +316,7 @@ function createMenu($menuData, $menuOptions = array())
 	if (empty($menuOptions['menu_type']))
 	{
 		$menuOptions['menu_type'] = '_' . (empty($options['use_sidebar_menu']) ? 'dropdown' : 'sidebar');
-		$menu_context['can_toggle_drop_down'] = !$user_info['is_guest'] && isset($settings['theme_version']) && $settings['theme_version'] >= 2.0;
+		$menu_context['can_toggle_drop_down'] = User::$info->is_guest === false && isset($settings['theme_version']) && $settings['theme_version'] >= 2.0;
 	}
 	else
 		$menu_context['can_toggle_drop_down'] = !empty($menuOptions['can_toggle_drop_down']);
@@ -377,7 +379,7 @@ function callMenu($selectedMenu)
 		// 'controller' => '\\ElkArte\\AdminController\\ManageAttachments'
 		// 'function' => 'action_avatars'
 		$controller = new $selectedMenu['controller'](new \ElkArte\EventManager());
-		$controller->setUser(\ElkArte\User::$info);
+		$controller->setUser(User::$info);
 
 		// always set up the environment
 		$controller->pre_dispatch();
@@ -398,7 +400,7 @@ function callMenu($selectedMenu)
  */
 function loadDefaultMenuButtons()
 {
-	global $scripturl, $txt, $context, $user_info, $modSettings;
+	global $scripturl, $txt, $context, $modSettings;
 
 	$buttons = array(
 		'home' => array(
@@ -440,7 +442,7 @@ function loadDefaultMenuButtons()
 				'contact' => array(
 					'title' => $txt['contact'],
 					'href' => getUrl('action', ['action' => 'register', 'sa' => 'contact']),
-					'show' => $user_info['is_guest'] && !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] == 'menu',
+					'show' => User::$info->is_guest && !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] == 'menu',
 				),
 			),
 		)
@@ -492,24 +494,24 @@ function loadDefaultMenuButtons()
 							'title' => $txt['mc_reported_posts'],
 							'counter' => 'reports',
 							'href' => $scripturl . '?action=moderate;area=reports',
-							'show' => !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
+							'show' => !empty(User::$info->mod_cache) && User::$info->mod_cache['bq'] != '0=1',
 						),
 						'modlog' => array(
 							'title' => $txt['modlog_view'],
 							'href' => $scripturl . '?action=moderate;area=modlog',
-							'show' => !empty($modSettings['modlog_enabled']) && !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
+							'show' => !empty($modSettings['modlog_enabled']) && !empty(User::$info->mod_cache) && User::$info->mod_cache['bq'] != '0=1',
 						),
 						'attachments' => array(
 							'title' => $txt['mc_unapproved_attachments'],
 							'counter' => 'attachments',
 							'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
-							'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
+							'show' => $modSettings['postmod_active'] && !empty(User::$info->mod_cache['ap']),
 						),
 						'poststopics' => array(
 							'title' => $txt['mc_unapproved_poststopics'],
 							'counter' => 'postmod',
 							'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
-							'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
+							'show' => $modSettings['postmod_active'] && !empty(User::$info->mod_cache['ap']),
 						),
 						'postbyemail' => array(
 							'title' => $txt['mc_emailerror'],
@@ -535,24 +537,24 @@ function loadDefaultMenuButtons()
 					'title' => $txt['mc_reported_posts'],
 					'counter' => 'reports',
 					'href' => $scripturl . '?action=moderate;area=reports',
-					'show' => !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
+					'show' => !empty(User::$info->mod_cache) && User::$info->mod_cache['bq'] != '0=1',
 				),
 				'modlog' => array(
 					'title' => $txt['modlog_view'],
 					'href' => $scripturl . '?action=moderate;area=modlog',
-					'show' => !empty($modSettings['modlog_enabled']) && !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
+					'show' => !empty($modSettings['modlog_enabled']) && !empty(User::$info->mod_cache) && User::$info->mod_cache['bq'] != '0=1',
 				),
 				'attachments' => array(
 					'title' => $txt['mc_unapproved_attachments'],
 					'counter' => 'attachments',
 					'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
-					'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
+					'show' => $modSettings['postmod_active'] && !empty(User::$info->mod_cache['ap']),
 				),
 				'poststopics' => array(
 					'title' => $txt['mc_unapproved_poststopics'],
 					'counter' => 'postmod',
 					'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
-					'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
+					'show' => $modSettings['postmod_active'] && !empty(User::$info->mod_cache['ap']),
 				),
 				'postbyemail' => array(
 					'title' => $txt['mc_emailerror'],
@@ -566,35 +568,35 @@ function loadDefaultMenuButtons()
 
 	$buttons += array(
 		'profile' => array(
-			'title' => !empty($modSettings['displayMemberNames']) ? $user_info['name'] : $txt['account_short'],
-			'href' => getUrl('profile', ['action' => 'profile', 'u' => $user_info['id'], 'name' => $user_info['name']]),
+			'title' => !empty($modSettings['displayMemberNames']) ? User::$info->name : $txt['account_short'],
+			'href' => getUrl('profile', ['action' => 'profile', 'u' => User::$info->id, 'name' => User::$info->name]),
 			'data-icon' => 'i-account',
 			'show' => $context['allow_edit_profile'],
 			'sub_buttons' => array(
 				'account' => array(
 					'title' => $txt['account'],
-					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'account', 'u' => $user_info['id'], 'name' => $user_info['name']]),
+					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'account', 'u' => User::$info->id, 'name' => User::$info->name]),
 					'show' => allowedTo(array('profile_identity_any', 'profile_identity_own', 'manage_membergroups')),
 				),
 				'drafts' => array(
 					'title' => $txt['mydrafts'],
-					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => $user_info['id'], 'name' => $user_info['name']]),
+					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'showdrafts', 'u' => User::$info->id, 'name' => User::$info->name]),
 					'show' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft'),
 				),
 				'forumprofile' => array(
 					'title' => $txt['forumprofile'],
-					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => $user_info['id'], 'name' => $user_info['name']]),
+					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'forumprofile', 'u' => User::$info->id, 'name' => User::$info->name]),
 					'show' => allowedTo(array('profile_extra_any', 'profile_extra_own')),
 				),
 				'theme' => array(
 					'title' => $txt['theme'],
-					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'theme', 'u' => $user_info['id'], 'name' => $user_info['name']]),
+					'href' => getUrl('profile', ['action' => 'profile', 'area' => 'theme', 'u' => User::$info->id, 'name' => User::$info->name]),
 					'show' => allowedTo(array('profile_extra_any', 'profile_extra_own', 'profile_extra_any')),
 				),
 				'logout' => array(
 					'title' => $txt['logout'],
 					'href' => getUrl('action', ['action' => 'logout']),
-					'show' => !$user_info['is_guest'],
+					'show' => User::$info->is_guest === false,
 				),
 			),
 		),
@@ -624,7 +626,7 @@ function loadDefaultMenuButtons()
 			'counter' => 'mentions',
 			'href' => getUrl('action', ['action' => 'mentions']),
 			'data-icon' => ($context['user']['mentions'] ? 'i-bell' : 'i-bell-blank'),
-			'show' => !$user_info['is_guest'] && !empty($modSettings['mentions_enabled']),
+			'show' => User::$info->is_guest === false && !empty($modSettings['mentions_enabled']),
 		),
 		// The old language string made no sense, and was too long.
 		// "New posts" is better, because there are probably a pile
@@ -633,7 +635,7 @@ function loadDefaultMenuButtons()
 			'title' => $txt['view_unread_category'],
 			'href' => getUrl('action', ['action' => 'unread']),
 			'data-icon' => 'i-comments',
-			'show' => !$user_info['is_guest'],
+			'show' => User::$info->is_guest === false,
 		),
 		// The old language string made no sense, and was too long.
 		// "New replies" is better, because there are "updated topics"
@@ -642,20 +644,20 @@ function loadDefaultMenuButtons()
 			'title' => $txt['view_replies_category'],
 			'href' => getUrl('action', ['action' => 'unreadreplies']),
 			'data-icon' => 'i-comments-blank',
-			'show' => !$user_info['is_guest'],
+			'show' => User::$info->is_guest === false,
 		),
 		'login' => array(
 			'title' => $txt['login'],
 			'href' => getUrl('action', ['action' => 'login']),
 			'data-icon' => 'i-sign-in',
-			'show' => $user_info['is_guest'],
+			'show' => User::$info->is_guest,
 		),
 
 		'register' => array(
 			'title' => $txt['register'],
 			'href' => getUrl('action', ['action' => 'register']),
 			'data-icon' => 'i-register',
-			'show' => $user_info['is_guest'] && $context['can_register'],
+			'show' => User::$info->is_guest && $context['can_register'],
 		),
 	);
 

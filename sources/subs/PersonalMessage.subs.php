@@ -18,6 +18,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Loads information about the users personal message limit.
  *
@@ -25,14 +27,14 @@
  */
 function loadMessageLimit()
 {
-	global $user_info;
-
 	$db = database();
 
 	$message_limit = 0;
-	if ($user_info['is_admin'])
+	if (User::$info->is_admin)
+	{
 		$message_limit = 0;
-	elseif (!\ElkArte\Cache\Cache::instance()->getVar($message_limit, 'msgLimit:' . $user_info['id'], 360))
+	}
+	elseif (!\ElkArte\Cache\Cache::instance()->getVar($message_limit, 'msgLimit:' . User::$info->id, 360))
 	{
 		$request = $db->query('', '
 			SELECT
@@ -40,7 +42,7 @@ function loadMessageLimit()
 			FROM {db_prefix}membergroups
 			WHERE id_group IN ({array_int:users_groups})',
 			array(
-				'users_groups' => $user_info['groups'],
+				'users_groups' => User::$info->groups,
 			)
 		);
 		list ($maxMessage, $minMessage) = $db->fetch_row($request);
@@ -49,7 +51,7 @@ function loadMessageLimit()
 		$message_limit = $minMessage == 0 ? 0 : $maxMessage;
 
 		// Save us doing it again!
-		\ElkArte\Cache\Cache::instance()->put('msgLimit:' . $user_info['id'], $message_limit, 360);
+		\ElkArte\Cache\Cache::instance()->put('msgLimit:' . User::$info->id, $message_limit, 360);
 	}
 
 	return $message_limit;
@@ -65,8 +67,6 @@ function loadMessageLimit()
  */
 function loadPMLabels($labels)
 {
-	global $user_info;
-
 	$db = database();
 
 	// Looks like we need to reseek!
@@ -78,7 +78,7 @@ function loadPMLabels($labels)
 			AND deleted = {int:not_deleted}
 		GROUP BY labels, is_read',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'not_deleted' => 0,
 		)
 	);
@@ -100,7 +100,7 @@ function loadPMLabels($labels)
 	$db->free_result($result);
 
 	// Store it please!
-	\ElkArte\Cache\Cache::instance()->put('labelCounts:' . $user_info['id'], $labels, 720);
+	\ElkArte\Cache\Cache::instance()->put('labelCounts:' . User::$info->id, $labels, 720);
 
 	return $labels;
 }
@@ -116,7 +116,7 @@ function loadPMLabels($labels)
  */
 function getPMCount($descending = false, $pmID = null, $labelQuery = '')
 {
-	global $user_info, $context;
+	global $context;
 
 	$db = database();
 
@@ -131,7 +131,7 @@ function getPMCount($descending = false, $pmID = null, $labelQuery = '')
 				AND deleted_by_sender = {int:not_deleted}' . ($pmID !== null ? '
 				AND id_pm ' . ($descending ? '>' : '<') . ' {int:id_pm}' : ''),
 			array(
-				'current_member' => $user_info['id'],
+				'current_member' => User::$info->id,
 				'not_deleted' => 0,
 				'id_pm' => $pmID,
 			)
@@ -148,7 +148,7 @@ function getPMCount($descending = false, $pmID = null, $labelQuery = '')
 				AND pmr.deleted = {int:not_deleted}' . $labelQuery . ($pmID !== null ? '
 				AND pmr.id_pm ' . ($descending ? '>' : '<') . ' {int:id_pm}' : ''),
 			array(
-				'current_member' => $user_info['id'],
+				'current_member' => User::$info->id,
 				'not_deleted' => 0,
 				'id_pm' => $pmID,
 			)
@@ -171,16 +171,20 @@ function getPMCount($descending = false, $pmID = null, $labelQuery = '')
  */
 function deleteMessages($personal_messages, $folder = null, $owner = null)
 {
-	global $user_info;
-
 	$db = database();
 
 	if ($owner === null)
-		$owner = array($user_info['id']);
+	{
+		$owner = array(User::$info->id);
+	}
 	elseif (empty($owner))
+	{
 		return;
+	}
 	elseif (!is_array($owner))
+	{
 		$owner = array($owner);
+	}
 
 	if ($personal_messages !== null)
 	{
@@ -232,16 +236,22 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 		while ($row = $db->fetch_assoc($request))
 		{
 			if ($row['is_read'])
+			{
 				updateMemberData($row['id_member'], array('personal_messages' => $where == '' ? 0 : 'personal_messages - ' . $row['num_deleted_messages']));
+			}
 			else
+			{
 				updateMemberData($row['id_member'], array('personal_messages' => $where == '' ? 0 : 'personal_messages - ' . $row['num_deleted_messages'], 'unread_messages' => $where == '' ? 0 : 'unread_messages - ' . $row['num_deleted_messages']));
+			}
 
 			// If this is the current member we need to make their message count correct.
-			if ($user_info['id'] == $row['id_member'])
+			if (User::$info->id == $row['id_member'])
 			{
-				$user_info['messages'] -= $row['num_deleted_messages'];
+				User::$info->messages -= $row['num_deleted_messages'];
 				if (!($row['is_read']))
-					$user_info['unread_messages'] -= $row['num_deleted_messages'];
+				{
+					User::$info->unread_messages -= $row['num_deleted_messages'];
+				}
 			}
 		}
 		$db->free_result($request);
@@ -302,7 +312,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 	}
 
 	// Any cached numbers may be wrong now.
-	\ElkArte\Cache\Cache::instance()->put('labelCounts:' . $user_info['id'], null, 720);
+	\ElkArte\Cache\Cache::instance()->put('labelCounts:' . User::$info->id, null, 720);
 }
 
 /**
@@ -315,15 +325,17 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
  */
 function markMessages($personal_messages = null, $label = null, $owner = null)
 {
-	global $user_info;
-
-	$db = database();
-
 	if ($owner === null)
-		$owner = $user_info['id'];
+	{
+		$owner = User::$info->id;
+	}
 
 	if (!is_null($personal_messages) && !is_array($personal_messages))
+	{
 		$personal_messages = array($personal_messages);
+	}
+
+	$db = database();
 
 	$db->query('', '
 		UPDATE {db_prefix}pm_recipients
@@ -352,17 +364,19 @@ function markMessages($personal_messages = null, $label = null, $owner = null)
  */
 function markMessagesUnread($personal_messages)
 {
-	global $user_info;
+	if (empty($personal_messages))
+	{
+		return;
+	}
+
+	if (!is_array($personal_messages))
+	{
+		$personal_messages = array($personal_messages);
+	}
 
 	$db = database();
 
-	if (empty($personal_messages))
-		return;
-
-	if (!is_array($personal_messages))
-		$personal_messages = array($personal_messages);
-
-	$owner = $user_info['id'];
+	$owner = User::$info->id;
 
 	// Flip the "read" bit on this
 	$db->query('', '
@@ -379,7 +393,9 @@ function markMessagesUnread($personal_messages)
 
 	// If something was marked unread, update the number of unread messages remaining.
 	if ($db->affected_rows() > 0)
+	{
 		updatePMMenuCounts($owner);
+	}
 }
 
 /**
@@ -392,14 +408,16 @@ function markMessagesUnread($personal_messages)
  */
 function updatePMMenuCounts($owner)
 {
-	global $user_info, $context;
+	global $context;
 
 	$db = database();
 
-	if ($owner == $user_info['id'])
+	if ($owner == User::$info->id)
 	{
 		foreach ($context['labels'] as $label)
+		{
 			$context['labels'][(int) $label['id']]['unread_messages'] = 0;
+		}
 	}
 
 	$result = $db->query('', '
@@ -420,8 +438,10 @@ function updatePMMenuCounts($owner)
 	{
 		$total_unread += $row['num'];
 
-		if ($owner != $user_info['id'])
+		if ($owner != User::$info->id)
+		{
 			continue;
+		}
 
 		$this_labels = explode(',', $row['labels']);
 		foreach ($this_labels as $this_label)
@@ -434,9 +454,11 @@ function updatePMMenuCounts($owner)
 	require_once(SUBSDIR . '/Members.subs.php');
 	updateMemberData($owner, array('unread_messages' => $total_unread));
 
-	// If it was for the current member, reflect this in the $user_info array too.
-	if ($owner == $user_info['id'])
-		$user_info['unread_messages'] = $total_unread;
+	// If it was for the current member, reflect this in the User::$info array too.
+	if ($owner == User::$info->id)
+	{
+		User::$info->unread_messages = $total_unread;
+	}
 }
 
 /**
@@ -449,8 +471,6 @@ function updatePMMenuCounts($owner)
  */
 function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 {
-	global $user_info;
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -463,7 +483,7 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 			AND ((pm.id_member_from = {int:id_current_member} AND pm.deleted_by_sender = {int:not_deleted}) OR pmr.id_pm IS NOT NULL)',
 		array(
 			'id_pm' => $pmID,
-			'id_current_member' => $user_info['id'],
+			'id_current_member' => User::$info->id,
 			'not_deleted' => 0,
 		)
 	);
@@ -507,7 +527,7 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
  */
 function sendpm($recipients, $subject, $message, $store_outbox = true, $from = null, $pm_head = 0)
 {
-	global $scripturl, $txt, $user_info, $language, $modSettings, $webmaster_email;
+	global $scripturl, $txt, $language, $modSettings, $webmaster_email;
 
 	$db = database();
 
@@ -525,14 +545,18 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	);
 
 	if ($from === null)
+	{
 		$from = array(
-			'id' => $user_info['id'],
-			'name' => $user_info['name'],
-			'username' => $user_info['username']
+			'id' => User::$info->id,
+			'name' => User::$info->name,
+			'username' => User::$info->username
 		);
+	}
 	// Probably not needed.  /me something should be of the typer.
 	else
-		$user_info['name'] = $from['name'];
+	{
+		User::$info->name = $from['name'];
+	}
 
 	// Integrated PMs
 	call_integration_hook('integrate_personal_message', array(&$recipients, &$from, &$subject, &$message));
@@ -634,7 +658,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		$delete = false;
 		foreach ($criteria as $criterium)
 		{
-			if (($criterium['t'] == 'mid' && $criterium['v'] == $from['id']) || ($criterium['t'] == 'gid' && in_array($criterium['v'], $user_info['groups'])) || ($criterium['t'] == 'sub' && strpos($subject, $criterium['v']) !== false) || ($criterium['t'] == 'msg' && strpos($message, $criterium['v']) !== false))
+			if (($criterium['t'] == 'mid' && $criterium['v'] == $from['id']) || ($criterium['t'] == 'gid' && in_array($criterium['v'], User::$info->groups)) || ($criterium['t'] == 'sub' && strpos($subject, $criterium['v']) !== false) || ($criterium['t'] == 'msg' && strpos($message, $criterium['v']) !== false))
 				$delete = true;
 			// If we're adding and one criteria don't match then we stop!
 			elseif (!$row['is_or'])
@@ -761,7 +785,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		}
 
 		// If the receiving account is banned (>=10) or pending deletion (4), refuse to send the PM.
-		if ($row['is_activated'] >= 10 || ($row['is_activated'] == 4 && !$user_info['is_admin']))
+		if ($row['is_activated'] >= 10 || ($row['is_activated'] == 4 && User::$info->is_admin === false))
 		{
 			$log['failed'][$row['id_member']] = sprintf($txt['pm_error_user_cannot_read'], $row['real_name']);
 			unset($all_to[array_search($row['id_member'], $all_to)]);
@@ -1138,7 +1162,7 @@ function pmCount($id_member, $time)
  */
 function applyRules($all_messages = false)
 {
-	global $user_info, $context, $options;
+	global $context, $options;
 
 	$db = database();
 
@@ -1164,7 +1188,7 @@ function applyRules($all_messages = false)
 			AND pmr.deleted = {int:not_deleted}
 			' . $ruleQuery,
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'not_deleted' => 0,
 		)
 	);
@@ -1233,7 +1257,7 @@ function applyRules($all_messages = false)
 				WHERE id_pm = {int:id_pm}
 					AND id_member = {int:current_member}',
 				array(
-					'current_member' => $user_info['id'],
+					'current_member' => User::$info->id,
 					'id_pm' => $pm,
 					'new_labels' => empty($realLabels) ? '' : implode(',', $realLabels),
 				)
@@ -1250,7 +1274,7 @@ function applyRules($all_messages = false)
  */
 function loadRules($reload = false)
 {
-	global $user_info, $context;
+	global $context;
 
 	$db = database();
 
@@ -1277,7 +1301,7 @@ function loadRules($reload = false)
 		FROM {db_prefix}pm_rules
 		WHERE id_member = {int:current_member}',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 		)
 	);
 	$context['rules'] = array();
@@ -1772,8 +1796,6 @@ function setPMRepliedStatus($id_member, $replied_to)
  */
 function loadConversationList($head, &$recipients, $folder = '')
 {
-	global $user_info;
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -1786,7 +1808,7 @@ function loadConversationList($head, &$recipients, $folder = '')
 				OR (pmr.id_member = {int:current_member} AND pmr.deleted = {int:not_deleted}))
 		ORDER BY pm.id_pm',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'id_pm_head' => $head,
 			'not_deleted' => 0,
 		)
@@ -1796,9 +1818,9 @@ function loadConversationList($head, &$recipients, $folder = '')
 	while ($row = $db->fetch_assoc($request))
 	{
 		// This is, frankly, a joke. We will put in a workaround for people sending to themselves - yawn!
-		if ($folder == 'sent' && $row['id_member_from'] == $user_info['id'] && $row['deleted_by_sender'] == 1)
+		if ($folder == 'sent' && $row['id_member_from'] == User::$info->id && $row['deleted_by_sender'] == 1)
 			continue;
-		elseif (($row['id_member'] == $user_info['id']) && $row['deleted'] == 1)
+		elseif (($row['id_member'] == User::$info->id) && $row['deleted'] == 1)
 			continue;
 
 		if (!isset($recipients[$row['id_pm']]))
@@ -1829,8 +1851,6 @@ function loadConversationList($head, &$recipients, $folder = '')
  */
 function loadConversationUnreadStatus($pms)
 {
-	global $user_info;
-
 	$db = database();
 
 	// Make it an array if its not
@@ -1863,7 +1883,7 @@ function loadConversationUnreadStatus($pms)
 			AND (pmr.is_read & 1 = 0)
 		GROUP BY pm.id_pm_head',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'id_pm_head' => array_keys($head_pms),
 			'not_deleted' => 0,
 		)
@@ -1900,7 +1920,7 @@ function loadConversationUnreadStatus($pms)
  */
 function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = false)
 {
-	global $txt, $user_info, $scripturl, $context;
+	global $txt, $scripturl, $context;
 
 	$db = database();
 
@@ -1932,7 +1952,7 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
 			$recipients[$row['id_pm']][empty($row['bcc']) ? 'to' : 'bcc'][] = empty($row['id_member_to']) ? $txt['guest_title'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_to'] . '">' . $row['to_name'] . '</a>';
 
 		// Don't include bcc-recipients if its your inbox, you're not supposed to know :P
-		if ($row['id_member_to'] == $user_info['id'] && $folder !== 'sent')
+		if ($row['id_member_to'] == User::$info->id && $folder !== 'sent')
 		{
 			// Read and replied to status for this message
 			$message_replied[$row['id_pm']] = $row['is_read'] & 2;
@@ -2042,8 +2062,6 @@ function loadPMMessageRequest($display_pms, $sort_by_query, $sort_by, $descendin
  */
 function checkPMReceived($pmsg)
 {
-	global $user_info;
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -2054,7 +2072,7 @@ function checkPMReceived($pmsg)
 			AND id_member = {int:current_member}
 		LIMIT 1',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'id_pm' => $pmsg,
 		)
 	);
@@ -2076,8 +2094,6 @@ function checkPMReceived($pmsg)
  */
 function loadPMQuote($pmsg, $isReceived)
 {
-	global $user_info;
-
 	$db = database();
 
 	// Get the quoted message (and make sure you're allowed to see this quote!).
@@ -2094,7 +2110,7 @@ function loadPMQuote($pmsg, $isReceived)
 			AND pmr.id_member = {int:current_member}') . '
 		LIMIT 1',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'id_pm_head_empty' => 0,
 			'id_pm' => $pmsg,
 		)
@@ -2119,7 +2135,7 @@ function loadPMQuote($pmsg, $isReceived)
  */
 function loadPMRecipientsAll($pmsg, $bcc_count = false)
 {
-	global $user_info, $scripturl, $txt;
+	global $scripturl, $txt;
 
 	$db = database();
 
@@ -2132,7 +2148,7 @@ function loadPMRecipientsAll($pmsg, $bcc_count = false)
 			AND pmr.id_member != {int:current_member}' . ($bcc_count === true ? '' : '
 			AND pmr.bcc = {int:not_bcc}'),
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'id_pm' => $pmsg,
 			'not_bcc' => 0,
 		)
@@ -2179,8 +2195,6 @@ function loadPMRecipientsAll($pmsg, $bcc_count = false)
  */
 function loadPersonalMessage($pm_id)
 {
-	global $user_info;
-
 	$db = database();
 
 	// First, pull out the message contents, and verify it actually went to them!
@@ -2197,7 +2211,7 @@ function loadPersonalMessage($pm_id)
 			AND pmr.deleted = {int:not_deleted}
 		LIMIT 1',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'id_pm' => $pm_id,
 			'not_deleted' => 0,
 		)
@@ -2224,7 +2238,7 @@ function loadPersonalMessage($pm_id)
  */
 function numPMSeachResults($userQuery, $labelQuery, $timeQuery, $searchQuery, $searchq_parameters)
 {
-	global $context, $user_info;
+	global $context;
 
 	$db = database();
 
@@ -2242,7 +2256,7 @@ function numPMSeachResults($userQuery, $labelQuery, $timeQuery, $searchQuery, $s
 			' . $userQuery . $labelQuery . $timeQuery . '
 			AND (' . $searchQuery . ')',
 		array_merge($searchq_parameters, array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'not_deleted' => 0,
 		))
 	);
@@ -2268,7 +2282,7 @@ function numPMSeachResults($userQuery, $labelQuery, $timeQuery, $searchQuery, $s
  */
 function loadPMSearchMessages($userQuery, $labelQuery, $timeQuery, $searchQuery, $searchq_parameters, $search_params)
 {
-	global $context, $modSettings, $user_info;
+	global $context, $modSettings;
 
 	$db = database();
 
@@ -2287,7 +2301,7 @@ function loadPMSearchMessages($userQuery, $labelQuery, $timeQuery, $searchQuery,
 		ORDER BY ' . $search_params['sort'] . ' ' . $search_params['sort_dir'] . '
 		LIMIT ' . $context['start'] . ', ' . $modSettings['search_results_per_page'],
 		array_merge($searchq_parameters, array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'not_deleted' => 0,
 		))
 	);
@@ -2318,8 +2332,6 @@ function loadPMSearchMessages($userQuery, $labelQuery, $timeQuery, $searchQuery,
  */
 function loadPMSearchHeads($head_pms)
 {
-	global $user_info;
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -2334,7 +2346,7 @@ function loadPMSearchHeads($head_pms)
 		LIMIT {int:limit}',
 		array(
 			'head_pms' => array_unique($head_pms),
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'not_deleted' => 0,
 			'limit' => count($head_pms),
 		)

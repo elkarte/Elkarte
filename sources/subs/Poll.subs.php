@@ -12,6 +12,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * This function deals with the poll ID associated to a topic.
  * It allows to retrieve or update the poll ID associated with this topic ID.
@@ -554,8 +556,6 @@ function pollStarters($id_topic)
  */
 function checkVote($topic)
 {
-	global $user_info;
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -567,7 +567,7 @@ function checkVote($topic)
 		WHERE t.id_topic = {int:current_topic}
 		LIMIT 1',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'current_topic' => $topic,
 			'not_guest' => 0,
 		)
@@ -820,13 +820,13 @@ function getPollStarter($id_topic)
  */
 function loadPollContext($poll_id)
 {
-	global $context, $user_info, $txt;
+	global $context, $txt;
 
 	// Get the question and if it's locked.
 	$pollinfo = pollInfo($poll_id);
 
 	// Get all the options, and calculate the total votes.
-	$pollOptions = pollOptionsForMember($poll_id, $user_info['id']);
+	$pollOptions = pollOptionsForMember($poll_id, User::$info->id);
 
 	// Compute total votes.
 	$realtotal = 0;
@@ -838,7 +838,7 @@ function loadPollContext($poll_id)
 	}
 
 	// If this is a guest we need to do our best to work out if they have voted, and what they voted for.
-	if ($user_info['is_guest'] && $pollinfo['guest_vote'] && allowedTo('poll_vote'))
+	if (User::$info->is_guest && $pollinfo['guest_vote'] && allowedTo('poll_vote'))
 	{
 		if (!empty($_COOKIE['guest_poll_vote']) && preg_match('~^[0-9,;]+$~', $_COOKIE['guest_poll_vote']) && strpos($_COOKIE['guest_poll_vote'], ';' . $poll_id . ',') !== false)
 		{
@@ -915,7 +915,7 @@ function loadPollContext($poll_id)
 	// 4. the poll is not locked, and
 	// 5. you have the proper permissions, and
 	// 6. you haven't already voted before.
-	$context['allow_vote'] = !$context['poll']['is_expired'] && (!$user_info['is_guest'] || ($pollinfo['guest_vote'] && allowedTo('poll_vote'))) && empty($pollinfo['voting_locked']) && allowedTo('poll_vote') && !$context['poll']['has_voted'];
+	$context['allow_vote'] = !$context['poll']['is_expired'] && (User::$info->is_guest === false || ($pollinfo['guest_vote'] && allowedTo('poll_vote'))) && empty($pollinfo['voting_locked']) && allowedTo('poll_vote') && !$context['poll']['has_voted'];
 
 	// You're allowed to view the results if:
 	// 1. you're just a super-nice-guy, or
@@ -932,7 +932,7 @@ function loadPollContext($poll_id)
 	// 4. you have the proper permissions, and
 	// 5. you have already voted, and
 	// 6. the poll creator has said you can!
-	$context['allow_change_vote'] = !$context['poll']['is_expired'] && !$user_info['is_guest'] && empty($pollinfo['voting_locked']) && allowedTo('poll_vote') && $context['poll']['has_voted'] && $context['poll']['change_vote'];
+	$context['allow_change_vote'] = !$context['poll']['is_expired'] && User::$info->is_guest === false && empty($pollinfo['voting_locked']) && allowedTo('poll_vote') && $context['poll']['has_voted'] && $context['poll']['change_vote'];
 
 	// You're allowed to return to voting options if:
 	// 1. you are (still) allowed to vote.

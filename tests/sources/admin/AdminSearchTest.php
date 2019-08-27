@@ -16,9 +16,7 @@ class TestAdminSearch extends \PHPUnit\Framework\TestCase
 	 */
 	public function __destruct()
 	{
-		global $user_info;
-
-		$user_info['permissions'] = array();
+		\ElkArte\User::$info->permissions = array();
 	}
 
 	/**
@@ -47,7 +45,7 @@ class TestAdminSearch extends \PHPUnit\Framework\TestCase
 
 	public function settingsProvider()
 	{
-		global $context, $user_info;
+		global $context;
 
 		/*
 		 * Forcefully reload language files to combat PHPUnit
@@ -57,7 +55,7 @@ class TestAdminSearch extends \PHPUnit\Framework\TestCase
 
 		// Set up the controller.
 		$_GET['action'] = 'admin';
-		$user_info['permissions'] = array_merge($user_info['permissions'], ['admin_forum']);
+		\ElkArte\User::$info->permissions = array_merge(\ElkArte\User::$info->permissions, ['admin_forum']);
 		$dispatcher = new \ElkArte\SiteDispatcher(new \ElkArte\HttpReq);
 		$this->controller = $dispatcher->getController();
 

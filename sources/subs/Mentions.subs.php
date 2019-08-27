@@ -11,6 +11,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Count the mentions of the current user
  * callback for createList in action_list of \ElkArte\Controller\Mentions
@@ -25,11 +27,10 @@
  */
 function countUserMentions($all = false, $type = '', $id_member = null)
 {
-	global $user_info;
 	static $counts;
 
 	$db = database();
-	$id_member = $id_member === null ? $user_info['id'] : (int) $id_member;
+	$id_member = $id_member === null ? User::$info->id : (int) $id_member;
 
 	if (isset($counts[$id_member]))
 		return $counts[$id_member];
@@ -78,7 +79,7 @@ function countUserMentions($all = false, $type = '', $id_member = null)
  */
 function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 {
-	global $user_info, $txt;
+	global $txt;
 
 	$db = database();
 
@@ -100,7 +101,7 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:limit}',
 		array(
-			'current_user' => $user_info['id'],
+			'current_user' => User::$info->id,
 			'current_type' => $type,
 			'status' => $all ? array(0, 1) : array(0),
 			'guest_text' => $txt['guest'],
@@ -131,8 +132,6 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
  */
 function removeMentions($id_mentions)
 {
-	global $user_info;
-
 	$db = database();
 
 	$db->query('', '
@@ -146,7 +145,9 @@ function removeMentions($id_mentions)
 
 	// Update the top level mentions count
 	if ($success)
-		updateMentionMenuCount(null, $user_info['id']);
+	{
+		updateMentionMenuCount(null, User::$info->id);
+	}
 
 	return $success;
 }
@@ -270,12 +271,12 @@ function toggleMentionsAccessibility($mentions, $access)
  */
 function validate_ownmention($field, $input, $validation_parameters = null)
 {
-	global $user_info;
-
 	if (!isset($input[$field]))
+	{
 		return;
+	}
 
-	if (!findMemberMention($input[$field], $user_info['id']))
+	if (!findMemberMention($input[$field], User::$info->id))
 	{
 		return array(
 			'field' => $field,

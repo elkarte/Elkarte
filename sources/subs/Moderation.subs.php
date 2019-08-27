@@ -14,6 +14,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * How many open reports do we have?
  *  - if flush is true will clear the moderator menu count
@@ -29,14 +31,14 @@
  */
 function recountOpenReports($flush = true, $count_pms = false)
 {
-	global $user_info, $context;
+	global $context;
 
 	$db = database();
 
 	$request = $db->query('', '
 		SELECT type, COUNT(*) as num_reports
 		FROM {db_prefix}log_reported
-		WHERE ' . $user_info['mod_cache']['bq'] . '
+		WHERE ' . User::$info->mod_cache['bq'] . '
 			AND type IN ({array_string:rep_type})
 			AND closed = {int:not_closed}
 			AND ignore_all = {int:not_ignored}
@@ -62,7 +64,7 @@ function recountOpenReports($flush = true, $count_pms = false)
 		$open_reports['pm'] = 0;
 	}
 	$_SESSION['rc'] = array(
-		'id' => $user_info['id'],
+		'id' => User::$info->id,
 		'time' => time(),
 		'reports' => $open_reports['msg'],
 		'pm_reports' => $open_reports['pm'],
@@ -177,8 +179,6 @@ function recountFailedEmails($approve_query = null)
  */
 function totalReports($status = 0, $show_pms = false)
 {
-	global $user_info;
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -186,7 +186,7 @@ function totalReports($status = 0, $show_pms = false)
 		FROM {db_prefix}log_reported AS lr
 		WHERE lr.closed = {int:view_closed}
 			AND lr.type IN ({array_string:type})
-			AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']),
+			AND ' . (User::$info->mod_cache['bq'] == '1=1' || User::$info->mod_cache['bq'] == '0=1' ? User::$info->mod_cache['bq'] : 'lr.' . User::$info->mod_cache['bq']),
 		array(
 			'view_closed' => $status,
 			'type' => $show_pms ? array('pm') : array('msg'),
@@ -209,10 +209,10 @@ function totalReports($status = 0, $show_pms = false)
  */
 function updateReportsStatus($reports_id, $property = 'close', $status = 0)
 {
-	global $user_info;
-
 	if (empty($reports_id))
+	{
 		return 0;
+	}
 
 	$db = database();
 
@@ -222,7 +222,7 @@ function updateReportsStatus($reports_id, $property = 'close', $status = 0)
 		UPDATE {db_prefix}log_reported
 		SET ' . ($property == 'close' ? 'closed' : 'ignore_all') . '= {int:status}
 		WHERE id_report IN ({array_int:report_list})
-			AND ' . $user_info['mod_cache']['bq'],
+			AND ' . User::$info->mod_cache['bq'],
 		array(
 			'report_list' => $reports_id,
 			'status' => $status,
@@ -249,12 +249,12 @@ function updateReportsStatus($reports_id, $property = 'close', $status = 0)
  */
 function loadModeratorMenuCounts($brd = null)
 {
-	global $modSettings, $user_info;
+	global $modSettings;
 
 	static $menu_errors = array();
 
 	// Work out what boards they can work in!
-	$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
+	$approve_boards = !empty(User::$info->mod_cache['ap']) ? User::$info->mod_cache['ap'] : boardsAllowedTo('approve_posts');
 
 	// Supplied a specific board to check?
 	if (!empty($brd))
@@ -272,7 +272,7 @@ function loadModeratorMenuCounts($brd = null)
 		$approve_query = ' AND 1=0';
 
 	// Set up the cache key for this permissions level
-	$cache_key = md5($user_info['query_see_board'] . $approve_query . $user_info['mod_cache']['bq'] . $user_info['mod_cache']['gq'] . $user_info['mod_cache']['mq'] . (int) allowedTo('approve_emails') . '_' . (int) allowedTo('moderate_forum'));
+	$cache_key = md5(User::$info->query_see_board . $approve_query . User::$info->mod_cache['bq'] . User::$info->mod_cache['gq'] . User::$info->mod_cache['mq'] . (int) allowedTo('approve_emails') . '_' . (int) allowedTo('moderate_forum'));
 
 	if (isset($menu_errors[$cache_key]))
 		return $menu_errors[$cache_key];
@@ -313,7 +313,7 @@ function loadModeratorMenuCounts($brd = null)
 		}
 
 		// Reported posts (and PMs?)
-		if (!empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1')
+		if (!empty(User::$info->mod_cache) && User::$info->mod_cache['bq'] != '0=1')
 		{
 			$reports = recountOpenReports(false, allowedTo('admin_forum'));
 			$menu_errors[$cache_key]['reports'] = $reports['msg'];
@@ -330,7 +330,7 @@ function loadModeratorMenuCounts($brd = null)
 			$menu_errors[$cache_key]['emailmod'] = recountFailedEmails($approve_query);
 
 		// Group requests
-		if (!empty($user_info['mod_cache']) && $user_info['mod_cache']['gq'] != '0=1')
+		if (!empty(User::$info->mod_cache) && User::$info->mod_cache['gq'] != '0=1')
 			$menu_errors[$cache_key]['groupreq'] = count(groupRequests());
 
 		// Member requests
@@ -405,8 +405,6 @@ function logWarningNotice($subject, $body)
  */
 function logWarning($memberID, $real_name, $id_notice, $level_change, $warn_reason)
 {
-	global $user_info;
-
 	$db = database();
 
 	$db->insert('',
@@ -416,7 +414,7 @@ function logWarning($memberID, $real_name, $id_notice, $level_change, $warn_reas
 			'log_time' => 'int', 'id_notice' => 'int', 'counter' => 'int', 'body' => 'string-65534',
 		),
 		array(
-			$user_info['id'], $user_info['name'], 'warning', $memberID, $real_name,
+			User::$info->id, User::$info->name, 'warning', $memberID, $real_name,
 			time(), $id_notice, $level_change, $warn_reason,
 		),
 		array('id_comment')
@@ -433,8 +431,6 @@ function logWarning($memberID, $real_name, $id_notice, $level_change, $warn_reas
  */
 function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
 {
-	global $user_info;
-
 	$db = database();
 
 	// Log the actions.
@@ -448,7 +444,7 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
 			'delete_ids' => $id_tpl,
 			'tpltype' => $template_type,
 			'generic' => 0,
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
@@ -465,7 +461,7 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
 			'delete_ids' => $id_tpl,
 			'tpltype' => $template_type,
 			'generic' => 0,
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 		)
 	);
 }
@@ -483,7 +479,7 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
  */
 function warningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
 {
-	global $scripturl, $user_info;
+	global $scripturl;
 
 	$db = database();
 
@@ -500,7 +496,7 @@ function warningTemplates($start, $items_per_page, $sort, $template_type = 'warn
 		array(
 			'tpltype' => $template_type,
 			'generic' => 0,
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 		)
 	);
 	$templates = array();
@@ -533,8 +529,6 @@ function warningTemplates($start, $items_per_page, $sort, $template_type = 'warn
  */
 function warningTemplateCount($template_type = 'warntpl')
 {
-	global $user_info;
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -545,7 +539,7 @@ function warningTemplateCount($template_type = 'warntpl')
 		array(
 			'tpltype' => $template_type,
 			'generic' => 0,
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 		)
 	);
 	list ($totalWarns) = $db->fetch_row($request);
@@ -646,7 +640,7 @@ function warningCount($query_string = '', $query_params = array())
  */
 function modLoadTemplate($id_template, $template_type = 'warntpl')
 {
-	global $user_info, $context;
+	global $context;
 
 	$db = database();
 
@@ -660,7 +654,7 @@ function modLoadTemplate($id_template, $template_type = 'warntpl')
 			'id' => $id_template,
 			'tpltype' => $template_type,
 			'generic' => 0,
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
@@ -669,7 +663,7 @@ function modLoadTemplate($id_template, $template_type = 'warntpl')
 			'title' => $row['template_title'],
 			'body' => \ElkArte\Util::htmlspecialchars($row['body']),
 			'personal' => $row['id_recipient'],
-			'can_edit_personal' => $row['id_member'] == $user_info['id'],
+			'can_edit_personal' => $row['id_member'] == User::$info->id,
 		);
 	}
 	$db->free_result($request);
@@ -687,8 +681,6 @@ function modLoadTemplate($id_template, $template_type = 'warntpl')
  */
 function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $id_template, $edit = true, $type = 'warntpl')
 {
-	global $user_info;
-
 	$db = database();
 
 	if ($edit)
@@ -708,7 +700,7 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
 				'id' => $id_template,
 				'comment_type' => $type,
 				'generic' => 0,
-				'current_member' => $user_info['id'],
+				'current_member' => User::$info->id,
 			)
 		);
 	}
@@ -722,7 +714,7 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
 				'recipient_name' => 'string-255', 'body' => 'string-65535', 'log_time' => 'int',
 			),
 			array(
-				$user_info['id'], $user_info['name'], $type, $recipient_id,
+				User::$info->id, User::$info->name, $type, $recipient_id,
 				$template_title, $template_body, time(),
 			),
 			array('id_comment')
@@ -741,8 +733,6 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
  */
 function modReportDetails($id_report, $show_pms = false)
 {
-	global $user_info;
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -753,7 +743,7 @@ function modReportDetails($id_report, $show_pms = false)
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
 		WHERE lr.id_report = {int:id_report}
 			AND lr.type IN ({array_string:rep_type})
-			AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']) . '
+			AND ' . (User::$info->mod_cache['bq'] == '1=1' || User::$info->mod_cache['bq'] == '0=1' ? User::$info->mod_cache['bq'] : 'lr.' . User::$info->mod_cache['bq']) . '
 		LIMIT 1',
 		array(
 			'id_report' => $id_report,
@@ -785,8 +775,6 @@ function modReportDetails($id_report, $show_pms = false)
  */
 function getModReports($status = 0, $start = 0, $limit = 10, $show_pms = false)
 {
-	global $user_info;
-
 	$db = database();
 
 		$request = $db->query('', '
@@ -797,7 +785,7 @@ function getModReports($status = 0, $start = 0, $limit = 10, $show_pms = false)
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
 			WHERE lr.closed = {int:view_closed}
 				AND lr.type IN ({array_string:rep_type})
-				AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']) . '
+				AND ' . (User::$info->mod_cache['bq'] == '1=1' || User::$info->mod_cache['bq'] == '0=1' ? User::$info->mod_cache['bq'] : 'lr.' . User::$info->mod_cache['bq']) . '
 			ORDER BY lr.time_updated DESC
 			LIMIT {int:start}, {int:limit}',
 			array(
@@ -972,7 +960,7 @@ function watchedUserCount($warning_watch = 0)
  */
 function watchedUsers($start, $items_per_page, $sort)
 {
-	global $txt, $modSettings, $user_info;
+	global $txt, $modSettings;
 
 	$db = database();
 	$request = $db->query('', '
@@ -1008,7 +996,7 @@ function watchedUsers($start, $items_per_page, $sort)
 		// First get the latest messages from these users.
 		$request = $db->query('', '
 			SELECT m.id_member, MAX(m.id_msg) AS last_post_id
-			FROM {db_prefix}messages AS m' . ($user_info['query_see_board'] == '1=1' ? '' : '
+			FROM {db_prefix}messages AS m' . (User::$info->query_see_board == '1=1' ? '' : '
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . '
 			WHERE m.id_member IN ({array_int:member_list})' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
 				AND m.approved = {int:is_approved}') . '
@@ -1044,7 +1032,7 @@ function watchedUsers($start, $items_per_page, $sort)
 
 		$request = $db->query('', '
 			SELECT MAX(m.poster_time) AS last_post, MAX(m.id_msg) AS last_post_id, m.id_member
-			FROM {db_prefix}messages AS m' . ($user_info['query_see_board'] == '1=1' ? '' : '
+			FROM {db_prefix}messages AS m' . (User::$info->query_see_board == '1=1' ? '' : '
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . '
 			WHERE m.id_member IN ({array_int:member_list})' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
 				AND m.approved = {int:is_approved}') . '
@@ -1167,15 +1155,17 @@ function watchedUserPosts($start, $items_per_page, $approve_query, $delete_board
  */
 function groupRequests()
 {
-	global $user_info, $scripturl;
+	global $scripturl;
 
 	$db = database();
 
 	$group_requests = array();
 
 	// Make sure they can even moderate someone!
-	if ($user_info['mod_cache']['gq'] == '0=1')
+	if (User::$info->mod_cache['gq'] == '0=1')
+	{
 		return array();
+	}
 
 	// What requests are outstanding?
 	$request = $db->query('', '
@@ -1183,7 +1173,7 @@ function groupRequests()
 		FROM {db_prefix}log_group_requests AS lgr
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = lgr.id_member)
 			INNER JOIN {db_prefix}membergroups AS mg ON (mg.id_group = lgr.id_group)
-		WHERE ' . ($user_info['mod_cache']['gq'] == '1=1' || $user_info['mod_cache']['gq'] == '0=1' ? $user_info['mod_cache']['gq'] : 'lgr.' . $user_info['mod_cache']['gq']) . '
+		WHERE ' . (User::$info->mod_cache['gq'] == '1=1' || User::$info->mod_cache['gq'] == '0=1' ? User::$info->mod_cache['gq'] : 'lgr.' . User::$info->mod_cache['gq']) . '
 		ORDER BY lgr.id_request DESC
 		LIMIT 10',
 		array(
@@ -1256,12 +1246,10 @@ function basicWatchedUsers()
  */
 function reportedPosts($show_pms = false)
 {
-	global $user_info;
-
 	$db = database();
 
 	// Got the info already?
-	$cachekey = md5(serialize($user_info['mod_cache']['bq']));
+	$cachekey = md5(serialize(User::$info->mod_cache['bq']));
 
 	$reported_posts = array();
 	if (!\ElkArte\Cache\Cache::instance()->getVar($reported_posts, 'reported_posts_' . $cachekey, 90))
@@ -1275,7 +1263,7 @@ function reportedPosts($show_pms = false)
 				COALESCE(mem.id_member, 0) AS id_author
 			FROM {db_prefix}log_reported AS lr
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
-			WHERE ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']) . '
+			WHERE ' . (User::$info->mod_cache['bq'] == '1=1' || User::$info->mod_cache['bq'] == '0=1' ? User::$info->mod_cache['bq'] : 'lr.' . User::$info->mod_cache['bq']) . '
 				AND lr.closed = {int:not_closed}
 				AND lr.type IN ({array_string:rep_type})
 				AND lr.ignore_all = {int:not_ignored}
@@ -1380,14 +1368,11 @@ function addModeratorNote($id_poster, $poster_name, $contents)
 /**
  * Add a moderation comment to an actual moderation report
  *
- * @global int $user_info
  * @param int $report
  * @param string $newComment
  */
 function addReportComment($report, $newComment)
 {
-	global $user_info;
-
 	$db = database();
 
 	// Insert it into the database
@@ -1398,7 +1383,7 @@ function addReportComment($report, $newComment)
 			'id_notice' => 'int', 'body' => 'string', 'log_time' => 'int',
 		),
 		array(
-			$user_info['id'], $user_info['name'], 'reportc', '',
+			User::$info->id, User::$info->name, 'reportc', '',
 			$report, $newComment, time(),
 		),
 		array('id_comment')
@@ -1478,7 +1463,7 @@ function moderatorNotice($id_notice)
 }
 
 /**
- * Make sure the "current user" (uses $user_info) cannot go outside of the limit for the day.
+ * Make sure the "current user" (uses User::$info) cannot go outside of the limit for the day.
  *
  * @param int $member The member we are going to issue the warning to
  *
@@ -1486,8 +1471,6 @@ function moderatorNotice($id_notice)
  */
 function warningDailyLimit($member)
 {
-	global $user_info;
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -1498,7 +1481,7 @@ function warningDailyLimit($member)
 			AND comment_type = {string:warning}
 			AND log_time > {int:day_time_period}',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'selected_member' => $member,
 			'day_time_period' => time() - 86400,
 			'warning' => 'warning',
@@ -1511,7 +1494,7 @@ function warningDailyLimit($member)
 }
 
 /**
- * Make sure the "current user" (uses $user_info) cannot go outside of the limit for the day.
+ * Make sure the "current user" (uses User::$info) cannot go outside of the limit for the day.
  *
  * @param string $approve_query additional condition for the query
  * @param string $current_view defined whether return the topics (first
@@ -1531,7 +1514,7 @@ function warningDailyLimit($member)
  */
 function getUnapprovedPosts($approve_query, $current_view, $boards_allowed, $start, $limit = 10)
 {
-	global $context, $scripturl, $user_info, $modSettings;
+	global $context, $scripturl, $modSettings;
 
 	$db = database();
 
@@ -1562,13 +1545,13 @@ function getUnapprovedPosts($approve_query, $current_view, $boards_allowed, $sta
 	for ($i = 1; $row = $db->fetch_assoc($request); $i++)
 	{
 		// Can delete is complicated, let's solve it first... is it their own post?
-		if ($row['id_member'] == $user_info['id'] && ($boards_allowed['delete_own_boards'] == array(0) || in_array($row['id_board'], $boards_allowed['delete_own_boards'])))
+		if ($row['id_member'] == User::$info->id && ($boards_allowed['delete_own_boards'] == array(0) || in_array($row['id_board'], $boards_allowed['delete_own_boards'])))
 			$can_delete = true;
 		// Is it a reply to their own topic?
 		elseif ($row['id_member'] == $row['id_member_started'] && $row['id_msg'] != $row['id_first_msg'] && ($boards_allowed['delete_own_replies'] == array(0) || in_array($row['id_board'], $boards_allowed['delete_own_replies'])))
 			$can_delete = true;
 		// Someone else's?
-		elseif ($row['id_member'] != $user_info['id'] && ($boards_allowed['delete_any_boards'] == array(0) || in_array($row['id_board'], $boards_allowed['delete_any_boards'])))
+		elseif ($row['id_member'] != User::$info->id && ($boards_allowed['delete_any_boards'] == array(0) || in_array($row['id_board'], $boards_allowed['delete_any_boards'])))
 			$can_delete = true;
 		else
 			$can_delete = false;

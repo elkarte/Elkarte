@@ -11,6 +11,8 @@
  * @version 2.0 dev
  */
 
+use ElkArte\User;
+
 // Special thanks to Spaceman-Spiff for his contributions to this page.
 
 /**
@@ -45,7 +47,7 @@ template_ssi_above();
 	<div class="codeheader">
 		<a href="javascript:void(0);" onclick="return elkSelectText(this);" class="codeoperation">[Select]</a>
 	</div>
-	<pre class="bbc_code">&lt;?php require(&quot;<?php echo addslashes($user_info['is_admin'] ? realpath(BOARDDIR . '/SSI.php') : 'SSI.php'); ?>&quot;);</pre>
+	<pre class="bbc_code">&lt;?php require(&quot;<?php echo addslashes(User::$info->is_admin ? realpath(BOARDDIR . '/SSI.php') : 'SSI.php'); ?>&quot;);</pre>
 
 	<h2>Some notes on usage</h2>
 	<p>All the functions have an output method parameter.  This can either be &quot;echo&quot; (the default) or &quot;array&quot;</p>
@@ -132,7 +134,7 @@ template_ssi_above();
 				<a href="#" onclick="showSSIBlock('ssi_recentAttachments');return false;">Recent Attachments</a>
 			</li>
 		</ul>
-		<?php if ($user_info['is_admin'])
+		<?php if (User::$info->is_admin)
 		{
 			?>
 			<h3>Advanced Functions <i class="helpicon i-help" title="Functions that require additional tweaking, not just copy and paste."></i></h3>
@@ -835,8 +837,6 @@ function template_ssi_below()
 
 function template_homepage_sample1($method = 'source')
 {
-	global $user_info;
-
 	$header = '<!DOCTYPE html>
 <html>
 <head>
@@ -931,7 +931,7 @@ function template_homepage_sample1($method = 'source')
 
 	if ($method === 'source')
 	{
-		$header = '<?php require("' . ($user_info['is_admin'] ? addslashes(realpath(BOARDDIR . '/SSI.php')) : 'SSI.php') . '"); ?>' . "\n" . $header;
+		$header = '<?php require("' . (User::$info->is_admin ? addslashes(realpath(BOARDDIR . '/SSI.php')) : 'SSI.php') . '"); ?>' . "\n" . $header;
 		return $header . template_homepage_sample1_html() . $footer;
 	}
 	else

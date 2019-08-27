@@ -18,6 +18,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Show an image containing the visual verification code for registration.
  *
@@ -34,7 +36,7 @@
  */
 function showCodeImage($code)
 {
-	global $gd2, $settings, $user_info, $modSettings;
+	global $gd2, $settings, $modSettings;
 
 	if (!checkGD())
 		return false;
@@ -45,7 +47,7 @@ function showCodeImage($code)
 	$imageType = $modSettings['visual_verification_type'];
 
 	// Special case to allow the admin center to show samples.
-	if ($user_info['is_admin'] && isset($_GET['type']))
+	if (User::$info->is_admin && isset($_GET['type']))
 		$imageType = (int) $_GET['type'];
 
 	// Some quick references for what we do.

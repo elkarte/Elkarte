@@ -14,6 +14,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Delete one or more members.
  *
@@ -40,7 +42,7 @@
  */
 function deleteMembers($users, $check_not_admin = false)
 {
-	global $modSettings, $user_info;
+	global $modSettings;
 
 	$db = database();
 
@@ -66,7 +68,7 @@ function deleteMembers($users, $check_not_admin = false)
 	{
 		list ($user) = $users;
 
-		if ($user == $user_info['id'])
+		if ($user == User::$info->id)
 			isAllowedTo('profile_remove_own');
 		else
 			isAllowedTo('profile_remove_any');
@@ -107,7 +109,7 @@ function deleteMembers($users, $check_not_admin = false)
 		return;
 
 	// Make sure they aren't trying to delete administrators if they aren't one.  But don't bother checking if it's just themselves.
-	if (!empty($admins) && ($check_not_admin || (!allowedTo('admin_forum') && (count($users) != 1 || $users[0] != $user_info['id']))))
+	if (!empty($admins) && ($check_not_admin || (!allowedTo('admin_forum') && (count($users) != 1 || $users[0] != User::$info->id))))
 	{
 		$users = array_diff($users, $admins);
 		foreach ($admins as $id)
@@ -128,7 +130,7 @@ function deleteMembers($users, $check_not_admin = false)
 			'extra' => array(
 				'member' => $user[0],
 				'name' => $user[1],
-				'member_acted' => $user_info['name'],
+				'member_acted' => User::$info->name,
 			),
 		);
 
@@ -2309,7 +2311,7 @@ function getConcernedMembers($groups, $where, $change_groups = false)
 }
 
 /**
- * Determine if the current user ($user_info) can contact another user ($who)
+ * Determine if the current user (User::$info) can contact another user ($who)
  *
  * @package Members
  *
@@ -2319,8 +2321,6 @@ function getConcernedMembers($groups, $where, $change_groups = false)
  */
 function canContact($who)
 {
-	global $user_info;
-
 	$db = database();
 
 	$request = $db->query('', '
@@ -2339,16 +2339,24 @@ function canContact($who)
 
 	// 0 = all members
 	if ($receive_from == 0)
+	{
 		return true;
+	}
 	// 1 = all except ignore
 	elseif ($receive_from == 1)
-		return !(!empty($ignore_list) && in_array($user_info['id'], $ignore_list));
+	{
+		return !(!empty($ignore_list) && in_array(User::$info->id, $ignore_list));
+	}
 	// 2 = buddies and admin
 	elseif ($receive_from == 2)
-		return ($user_info['is_admin'] || (!empty($buddy_list) && in_array($user_info['id'], $buddy_list)));
+	{
+		return (User::$info->is_admin || (!empty($buddy_list) && in_array(User::$info->id, $buddy_list)));
+	}
 	// 3 = admin only
 	else
-		return (bool) $user_info['is_admin'];
+	{
+		return (bool) User::$info->is_admin;
+	}
 }
 
 /**
@@ -2486,7 +2494,7 @@ function memberQuerySeeBoard($id_member)
  */
 function updateMemberData($members, $data)
 {
-	global $modSettings, $user_info;
+	global $modSettings;
 
 	$db = database();
 
@@ -2539,8 +2547,8 @@ function updateMemberData($members, $data)
 		if (count($vars_to_integrate) != 0)
 		{
 			// Fetch a list of member_names if necessary
-			if ((!is_array($members) && $members === $user_info['id']) || (is_array($members) && count($members) == 1 && in_array($user_info['id'], $members)))
-				$member_names = array($user_info['username']);
+			if ((!is_array($members) && $members === User::$info->id) || (is_array($members) && count($members) == 1 && in_array(User::$info->id, $members)))
+				$member_names = array(User::$info->username);
 			else
 			{
 				$member_names = $db->fetchQuery('

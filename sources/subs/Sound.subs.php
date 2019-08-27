@@ -16,6 +16,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Creates a wave file that spells the letters of $word.
  * Tries the user's language first, and defaults to english.
@@ -27,29 +29,35 @@
  */
 function createWaveFile($word)
 {
-	global $settings, $user_info;
+	global $settings;
 
 	$cache = \ElkArte\Cache\Cache::instance();
 
 	// Allow max 2 requests per 20 seconds.
-	if (($ip = $cache->get('wave_file/' . $user_info['ip'], 20)) > 2 || ($ip2 = $cache->get('wave_file/' . $user_info['ip2'], 20)) > 2)
+	if (($ip = $cache->get('wave_file/' . User::$info->ip, 20)) > 2 || ($ip2 = $cache->get('wave_file/' . User::$info->ip2, 20)) > 2)
 		die(header('HTTP/1.1 400 Bad Request'));
 
-	$cache->put('wave_file/' . $user_info['ip'], $ip ? $ip + 1 : 1, 20);
-	$cache->put('wave_file/' . $user_info['ip2'], $ip2 ? $ip2 + 1 : 1, 20);
+	$cache->put('wave_file/' . User::$info->ip, $ip ? $ip + 1 : 1, 20);
+	$cache->put('wave_file/' . User::$info->ip2, $ip2 ? $ip2 + 1 : 1, 20);
 
 	$unpacked = unpack('n', md5($word . session_id()));
 	mt_srand(end($unpacked));
 
 	// Try to see if there's a sound font in the user's language.
-	if (file_exists($settings['default_theme_dir'] . '/fonts/sound/a.' . $user_info['language'] . '.wav'))
-		$sound_language = $user_info['language'];
+	if (file_exists($settings['default_theme_dir'] . '/fonts/sound/a.' . User::$info->language . '.wav'))
+	{
+		$sound_language = User::$info->language;
+	}
 	// English should be there.
 	elseif (file_exists($settings['default_theme_dir'] . '/fonts/sound/a.english.wav'))
+	{
 		$sound_language = 'english';
+	}
 	// Guess not...
 	else
+	{
 		return false;
+	}
 
 	// File names are in lower case so lets make sure that we are only using a lower case string
 	$word = strtolower($word);

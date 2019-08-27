@@ -12,6 +12,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * This does the installation steps
  */
@@ -1129,7 +1131,7 @@ class Install_Controller
 	private function action_deleteInstall()
 	{
 		global $txt, $incontext, $db_character_set;
-		global $databases, $modSettings, $user_info, $db_type;
+		global $databases, $modSettings, $db_type;
 
 		// A few items we will load in from settings and make avaialble.
 		global $boardurl, $db_prefix, $cookiename, $mbname, $language;
@@ -1272,8 +1274,8 @@ class Install_Controller
 			$forum_version = CURRENT_VERSION;
 
 			// We've just installed!
-			$user_info['ip'] = $_SERVER['REMOTE_ADDR'];
-			$user_info['id'] = isset($incontext['member_id']) ? $incontext['member_id'] : 0;
+			User::$info->ip = $_SERVER['REMOTE_ADDR'];
+			User::$info->id = isset($incontext['member_id']) ? $incontext['member_id'] : 0;
 			logAction('install', array('version' => $forum_version), 'admin');
 		}
 

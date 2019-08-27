@@ -16,13 +16,11 @@ class TestBoards extends \PHPUnit\Framework\TestCase
 	 */
 	public function setUp()
 	{
-		global $user_info;
-
 		// Set up some data for testing
 		//
 		// @todo might want to insert some boards, topics, and use those all through the tests here
 		require_once(SUBSDIR . '/Boards.subs.php');
-		$user_info['query_see_board'] = '1=1';
+		\ElkArte\User::$info->query_see_board = '1=1';
 	}
 
 	/**

@@ -16,6 +16,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Takes a message and parses it, returning the prepared message as a reference.
  *
@@ -66,7 +68,7 @@ function un_preparsecode($message)
  */
 function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
-	global $user_info, $txt, $modSettings;
+	global $txt, $modSettings;
 
 	$db = database();
 
@@ -83,7 +85,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	$topicOptions['redirect_expires'] = isset($topicOptions['redirect_expires']) ? $topicOptions['redirect_expires'] : null;
 	$topicOptions['redirect_topic'] = isset($topicOptions['redirect_topic']) ? $topicOptions['redirect_topic'] : null;
 	$posterOptions['id'] = empty($posterOptions['id']) ? 0 : (int) $posterOptions['id'];
-	$posterOptions['ip'] = empty($posterOptions['ip']) ? $user_info['ip'] : $posterOptions['ip'];
+	$posterOptions['ip'] = empty($posterOptions['ip']) ? User::$info->ip : $posterOptions['ip'];
 
 	// We need to know if the topic is approved. If we're told that's great - if not find out.
 	if (!$modSettings['postmod_active'])
@@ -104,7 +106,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			$posterOptions['name'] = $txt['guest_title'];
 			$posterOptions['email'] = '';
 		}
-		elseif ($posterOptions['id'] != $user_info['id'])
+		elseif ($posterOptions['id'] != User::$info->id)
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
 			$result = getBasicMemberData($posterOptions['id']);
@@ -124,8 +126,8 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		}
 		else
 		{
-			$posterOptions['name'] = $user_info['name'];
-			$posterOptions['email'] = $user_info['email'];
+			$posterOptions['name'] = User::$info->name;
+			$posterOptions['email'] = User::$info->email;
 		}
 	}
 
@@ -352,7 +354,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	}
 
 	// Mark inserted topic as read (only for the user calling this function).
-	if (!empty($topicOptions['mark_as_read']) && !$user_info['is_guest'])
+	if (!empty($topicOptions['mark_as_read']) && User::$info->is_guest === false)
 	{
 		// Since it's likely they *read* it before replying, let's try an UPDATE first.
 		if (!$new_topic)
@@ -387,8 +389,10 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	if (!empty($posterOptions['update_post_count']) && !empty($posterOptions['id']) && $msgOptions['approved'])
 	{
 		// Are you the one that happened to create this post?
-		if ($user_info['id'] == $posterOptions['id'])
-			$user_info['posts']++;
+		if (User::$info->id == $posterOptions['id'])
+		{
+			User::$info->posts++;
+		}
 
 		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberData($posterOptions['id'], array('posts' => '+'));
@@ -430,7 +434,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
  */
 function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
-	global $user_info, $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -509,7 +513,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		setTopicAttribute($topicOptions['id'], $attributes);
 
 	// Mark the edited post as read.
-	if (!empty($topicOptions['mark_as_read']) && !$user_info['is_guest'])
+	if (!empty($topicOptions['mark_as_read']) && User::$info->is_guest === false)
 	{
 		// Since it's likely they *read* it before editing, let's try an UPDATE first.
 		$db->query('', '
@@ -518,7 +522,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			WHERE id_member = {int:current_member}
 				AND id_topic = {int:id_topic}',
 			array(
-				'current_member' => $user_info['id'],
+				'current_member' => User::$info->id,
 				'id_msg' => $modSettings['maxMsgID'],
 				'id_topic' => $topicOptions['id'],
 			)
@@ -529,7 +533,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		if (empty($flag))
 		{
 			require_once(SUBSDIR . '/Topic.subs.php');
-			markTopicsRead(array($user_info['id'], $topicOptions['id'], $modSettings['maxMsgID'], 0), false);
+			markTopicsRead(array(User::$info->id, $topicOptions['id'], $modSettings['maxMsgID'], 0), false);
 		}
 	}
 

@@ -15,6 +15,8 @@
  *
  */
 
+use ElkArte\User;
+
 /**
  * Set this to one of three values depending on what you want to happen in the case of a fatal error.
  *  - false: Default, will just load the error sub template and die - not putting any theme layers around it.
@@ -74,7 +76,7 @@ global $boarddir, $sourcedir, $db_show_debug, $ssi_error_reporting;
 call_integration_hook('integrate_SSI');
 
 // Call a function passed by GET.
-if (isset($_GET['ssi_function']) && function_exists('ssi_' . $_GET['ssi_function']) && (!empty($modSettings['allow_guestAccess']) || !$user_info['is_guest']))
+if (isset($_GET['ssi_function']) && function_exists('ssi_' . $_GET['ssi_function']) && (!empty($modSettings['allow_guestAccess']) || User::$info->is_guest === false))
 {
 	call_user_func('ssi_' . $_GET['ssi_function']);
 	exit;
@@ -87,7 +89,7 @@ if (isset($_GET['ssi_function']))
 // You shouldn't just access SSI.php directly by URL!!
 elseif (basename($_SERVER['PHP_SELF']) === 'SSI.php')
 {
-	die(sprintf($txt['ssi_not_direct'], $user_info['is_admin'] ? '\'' . addslashes(__FILE__) . '\'' : '\'SSI.php\''));
+	die(sprintf($txt['ssi_not_direct'], User::$info->is_admin ? '\'' . addslashes(__FILE__) . '\'' : '\'SSI.php\''));
 }
 
 error_reporting($ssi_error_reporting);
@@ -308,7 +310,7 @@ function ssi_fetchPosts($post_ids = array(), $override_permissions = false, $out
  */
 function ssi_queryPosts($query_where = '', $query_where_params = array(), $query_limit = 10, $query_order = 'm.id_msg DESC', $output_method = 'echo', $limit_body = false, $override_permissions = false)
 {
-	global $scripturl, $txt, $user_info, $modSettings;
+	global $scripturl, $txt, $modSettings;
 
 	$db = database();
 
@@ -316,13 +318,13 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 	$request = $db->query('substring', '
 		SELECT
 			m.poster_time, m.subject, m.id_topic, m.id_member, m.id_msg, m.id_board, b.name AS board_name,
-			COALESCE(mem.real_name, m.poster_name) AS poster_name, ' . ($user_info['is_guest'] ? '1 AS is_read, 0 AS new_from' : '
+			COALESCE(mem.real_name, m.poster_name) AS poster_name, ' . (User::$info->is_guest ? '1 AS is_read, 0 AS new_from' : '
 			COALESCE(lt.id_msg, lmr.id_msg, 0) >= m.id_msg_modified AS is_read,
 			COALESCE(lt.id_msg, lmr.id_msg, -1) + 1 AS new_from') . ', ' . ($limit_body ? 'SUBSTRING(m.body, 1, 384) AS body' : 'm.body') . ', m.smileys_enabled
 		FROM {db_prefix}messages AS m
 			JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 			JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
-			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)' . (!$user_info['is_guest'] ? '
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)' . (!User::$info->is_guest ? '
 			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = m.id_topic AND lt.id_member = {int:current_member})
 			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = m.id_board AND lmr.id_member = {int:current_member})' : '') . '
 		WHERE 1=1 ' . ($override_permissions ? '' : '
@@ -333,7 +335,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 		ORDER BY ' . $query_order . '
 		' . (empty($query_limit) ? '' : 'LIMIT {int:query_limit}'),
 		array_merge($query_where_params, array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'is_approved' => 1,
 			'query_limit' => $query_limit,
 		))
@@ -428,7 +430,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
  */
 function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boards = null, $output_method = 'echo')
 {
-	global $settings, $scripturl, $txt, $user_info, $modSettings;
+	global $settings, $scripturl, $txt, $modSettings;
 
 	$db = database();
 
@@ -493,7 +495,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 	$topic_list = array_keys($topics);
 
 	// Count number of new posts per topic.
-	if (!$user_info['is_guest'])
+	if (User::$info->is_guest === false)
 	{
 		$request = $db->query('', '
 			SELECT
@@ -506,7 +508,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 				AND (m.id_msg > COALESCE(lt.id_msg, lmr.id_msg, 0))
 			GROUP BY m.id_topic',
 			array(
-				'current_member' => $user_info['id'],
+				'current_member' => User::$info->id,
 				'topic_list' => $topic_list
 			)
 		);
@@ -1018,7 +1020,7 @@ function ssi_boardStats($output_method = 'echo')
  */
 function ssi_whosOnline($output_method = 'echo')
 {
-	global $user_info, $txt, $settings;
+	global $txt, $settings;
 
 	require_once(SUBSDIR . '/MembersOnline.subs.php');
 	$membersOnlineOptions = array(
@@ -1043,7 +1045,7 @@ function ssi_whosOnline($output_method = 'echo')
 		', comma_format($return['num_guests']), ' ', $return['num_guests'] == 1 ? $txt['guest'] : $txt['guests'], ', ', comma_format($return['num_users_online']), ' ', $return['num_users_online'] == 1 ? $txt['user'] : $txt['users'];
 
 	$bracketList = array();
-	if (!empty($user_info['buddies']))
+	if (!empty(User::$info->buddies))
 	{
 		$bracketList[] = comma_format($return['num_buddies']) . ' ' . ($return['num_buddies'] == 1 ? $txt['buddy'] : $txt['buddies']);
 	}
@@ -1103,16 +1105,16 @@ function ssi_logOnline($output_method = 'echo')
  */
 function ssi_login($redirect_to = '', $output_method = 'echo')
 {
-	global $scripturl, $txt, $user_info, $modSettings, $context, $settings;
+	global $scripturl, $txt, $modSettings, $context, $settings;
 
 	if ($redirect_to !== '')
 	{
 		$_SESSION['login_url'] = $redirect_to;
 	}
 
-	if ($output_method !== 'echo' || !$user_info['is_guest'])
+	if ($output_method !== 'echo' || User::$info->is_guest === false)
 	{
-		return $user_info['is_guest'];
+		return User::$info->is_guest;
 	}
 
 	$context['default_username'] = isset($_POST['user']) ? preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($_POST['user'], ENT_COMPAT, 'UTF-8')) : '';
@@ -1204,7 +1206,7 @@ function ssi_topPoll($output_method = 'echo')
  */
 function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 {
-	global $txt, $boardurl, $user_info, $context, $modSettings;
+	global $txt, $boardurl, $context, $modSettings;
 
 	$boardsAllowed = array_intersect(boardsAllowedTo('poll_view'), boardsAllowedTo('poll_vote'));
 
@@ -1226,14 +1228,14 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 				AND lp.id_member = {int:current_member})
 		WHERE p.voting_locked = {int:voting_opened}
 			AND (p.expire_time = {int:no_expiration} OR {int:current_time} < p.expire_time)
-			AND ' . ($user_info['is_guest'] ? 'p.guest_vote = {int:guest_vote_allowed}' : 'lp.id_choice IS NULL') . '
+			AND ' . (User::$info->is_guest ? 'p.guest_vote = {int:guest_vote_allowed}' : 'lp.id_choice IS NULL') . '
 			AND {query_wanna_see_board}' . (!in_array(0, $boardsAllowed) ? '
 			AND b.id_board IN ({array_int:boards_allowed_list})' : '') . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 			AND b.id_board != {int:recycle_enable}' : '') . '
 		ORDER BY ' . ($topPollInstead ? 'pc.votes' : 'p.id_poll') . ' DESC
 		LIMIT 1',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => User::$info->id,
 			'boards_allowed_list' => $boardsAllowed,
 			'is_approved' => 1,
 			'guest_vote_allowed' => 1,
@@ -1254,7 +1256,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 	}
 
 	// If this is a guest who's voted we'll through ourselves to show poll to show the results.
-	if ($user_info['is_guest'] && (!$row['guest_vote'] || (isset($_COOKIE['guest_poll_vote']) && in_array($row['id_poll'], explode(',', $_COOKIE['guest_poll_vote'])))))
+	if (User::$info->is_guest && (!$row['guest_vote'] || (isset($_COOKIE['guest_poll_vote']) && in_array($row['id_poll'], explode(',', $_COOKIE['guest_poll_vote'])))))
 	{
 		return ssi_showPoll($row['id_topic'], $output_method);
 	}
@@ -1367,7 +1369,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
  */
 function ssi_showPoll($topicID = null, $output_method = 'echo')
 {
-	global $txt, $user_info, $context, $scripturl;
+	global $txt, $context, $scripturl;
 	static $last_board = null;
 
 	require_once(SUBSDIR . '/Poll.subs.php');
@@ -1403,7 +1405,7 @@ function ssi_showPoll($topicID = null, $output_method = 'echo')
 		return array();
 	}
 
-	$context['user']['started'] = $user_info['id'] == $topicinfo['id_member'] && !$user_info['is_guest'];
+	$context['user']['started'] = User::$info->id == $topicinfo['id_member'] && User::$info->is_guest === false;
 
 	$poll_id = associatedPoll($topicID);
 	loadPollContext($poll_id);
@@ -1603,7 +1605,7 @@ function ssi_news($output_method = 'echo')
  */
 function ssi_todaysBirthdays($output_method = 'echo')
 {
-	global $scripturl, $modSettings, $user_info;
+	global $scripturl, $modSettings;
 
 	if (empty($modSettings['cal_enabled']) || !allowedTo('calendar_view') || !allowedTo('profile_view_any'))
 	{
@@ -1614,7 +1616,7 @@ function ssi_todaysBirthdays($output_method = 'echo')
 		'include_birthdays' => true,
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
-	$return = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
+	$return = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . (User::$info->time_offset + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 	if ($output_method !== 'echo')
 	{
@@ -1636,7 +1638,7 @@ function ssi_todaysBirthdays($output_method = 'echo')
  */
 function ssi_todaysHolidays($output_method = 'echo')
 {
-	global $modSettings, $user_info;
+	global $modSettings;
 
 	if (empty($modSettings['cal_enabled']) || !allowedTo('calendar_view'))
 	{
@@ -1647,7 +1649,7 @@ function ssi_todaysHolidays($output_method = 'echo')
 		'include_holidays' => true,
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
-	$return = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
+	$return = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . (User::$info->time_offset + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 	if ($output_method !== 'echo')
 	{
@@ -1666,7 +1668,7 @@ function ssi_todaysHolidays($output_method = 'echo')
  */
 function ssi_todaysEvents($output_method = 'echo')
 {
-	global $modSettings, $user_info;
+	global $modSettings;
 
 	if (empty($modSettings['cal_enabled']) || !allowedTo('calendar_view'))
 	{
@@ -1677,7 +1679,7 @@ function ssi_todaysEvents($output_method = 'echo')
 		'include_events' => true,
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
-	$return = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
+	$return = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . (User::$info->time_offset + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 	if ($output_method !== 'echo')
 	{
@@ -1705,7 +1707,7 @@ function ssi_todaysEvents($output_method = 'echo')
  */
 function ssi_todaysCalendar($output_method = 'echo')
 {
-	global $modSettings, $txt, $scripturl, $user_info;
+	global $modSettings, $txt, $scripturl;
 
 	if (empty($modSettings['cal_enabled']) || !allowedTo('calendar_view'))
 	{
@@ -1719,7 +1721,7 @@ function ssi_todaysCalendar($output_method = 'echo')
 		'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 	);
 
-	$return = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
+	$return = \ElkArte\Cache\Cache::instance()->quick_get('calendar_index_offset_' . (User::$info->time_offset + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 	if ($output_method !== 'echo')
 	{

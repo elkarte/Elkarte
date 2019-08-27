@@ -16,7 +16,7 @@ class TestMenuSubs extends \PHPUnit\Framework\TestCase
 	 */
 	protected function setUp()
 	{
-		global $context, $user_info;
+		global $context;
 
 		require_once(SUBSDIR . '/Menu.subs.php');
 
@@ -97,7 +97,7 @@ class TestMenuSubs extends \PHPUnit\Framework\TestCase
 		$context['right_to_left'] = false;
 
 		// Your the admin now
-		$user_info['is_admin'] = true;
+		\ElkArte\User::$info->is_admin = true;
 		$context['current_action'] = 'section1';
 	}
 

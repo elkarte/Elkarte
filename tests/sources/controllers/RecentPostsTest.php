@@ -12,7 +12,7 @@ class TestRecentPosts extends \PHPUnit\Framework\TestCase
 	 */
 	function setUp()
 	{
-		global $modSettings, $user_info, $settings;
+		global $modSettings, $settings;
 
 		// Lets add in just enough info for the system to think we are logged
 		$modSettings['smiley_sets_known'] = 'none';
@@ -21,7 +21,7 @@ class TestRecentPosts extends \PHPUnit\Framework\TestCase
 		$settings['default_theme_dir'] = '/var/www/themes/default';
 
 		// We are not logged in for this test, so lets fake it
-		$user_info = new \ElkArte\ValuesContainer([
+		\ElkArte\User::$info = new \ElkArte\ValuesContainer([
 			'id' => 1,
 			'ip' => '127.0.0.1',
 			'language' => 'english',
@@ -29,7 +29,7 @@ class TestRecentPosts extends \PHPUnit\Framework\TestCase
 			'is_guest' => false,
 			'username' => 'testing',
 			'query_wanna_see_board' => '1=1',
-			'is_moderator' => $user_info['is_moderator'],
+			'is_moderator' => isset(\ElkArte\User::$info->is_moderator) ? \ElkArte\User::$info->is_moderator : false,
 			'email' => 'a@a.com',
 			'ignoreusers' => '',
 			'name' => 'itsme',
@@ -59,10 +59,11 @@ class TestRecentPosts extends \PHPUnit\Framework\TestCase
 	 */
 	public function tearDown()
 	{
-		global $modSettings, $user_info, $settings;
+		global $modSettings, $settings;
 
 		// remove temporary test data
-		unset($user_info, $settings, $modSettings);
+		unset($settings, $modSettings);
+		\ElkArte\User::$info = null;
 	}
 
 	/**

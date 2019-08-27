@@ -27,16 +27,6 @@ class UserSettings extends \ElkArte\ValuesContainerReadOnly
 	protected $hasher = null;
 
 	/**
-	 * Stores the data of the user into an array
-	 *
-	 * @return mixed[]
-	 */
-	public function toArray()
-	{
-		return $this->data;
-	}
-
-	/**
 	 * Sets last_login to the current time
 	 */
 	public function updateLastLogin()
