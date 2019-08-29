@@ -661,8 +661,8 @@ class PersonalMessage extends \ElkArte\AbstractController
 		// Initialize the subject and message render callbacks
 		$bodyParser = new \ElkArte\MessagesCallback\BodyParser\Normal(array(), false);
 		$opt = new \ElkArte\ValuesContainer(['recipients' => $recipients]);
-		$renderer = new \ElkArte\MessagesCallback\PmRenderer($messages_request, $bodyParser, $opt);
-		$subject_renderer = new \ElkArte\MessagesCallback\PmRenderer($subjects_request, $bodyParser, $opt);
+		$renderer = new \ElkArte\MessagesCallback\PmRenderer($messages_request, $this->user, $bodyParser, $opt);
+		$subject_renderer = new \ElkArte\MessagesCallback\PmRenderer($subjects_request, $this->user, $bodyParser, $opt);
 
 		// Subject and Message
 		$context['get_pmessage'] = array($renderer, 'getContext');

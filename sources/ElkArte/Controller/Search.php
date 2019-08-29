@@ -441,7 +441,7 @@ class Search extends \ElkArte\AbstractController
 			'show_signatures' => false,
 			'boards_can' => $boards_can,
 		]);
-		$renderer = new \ElkArte\MessagesCallback\SearchRenderer($messages_request, $bodyParser, $opt);
+		$renderer = new \ElkArte\MessagesCallback\SearchRenderer($messages_request, $this->user, $bodyParser, $opt);
 		$renderer->setParticipants($this->_participants);
 
 		$context['topic_starter_id'] = 0;
