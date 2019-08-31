@@ -145,7 +145,7 @@ class EventManager
 		}
 		else
 		{
-			$instance = new $class_name(HttpReq::instance(), User::$info);
+			$instance = new $class_name(HttpReq::instance(), database(), User::$info);
 			$this->_setInstance($class_name, $instance);
 
 			return $instance;

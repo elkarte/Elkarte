@@ -14,6 +14,9 @@
 namespace ElkArte\Mentions\MentionType\Event;
 
 use ElkArte\Mentions\MentionType\EventInterface;
+use ElkArte\HttpReq;
+use ElkArte\Database\QueryInterface;
+use ElkArte\UserInfo;
 
 /**
  * Class AbstractMentionMessage
@@ -42,11 +45,21 @@ abstract class AbstractMentionMessage implements EventInterface
 	protected $user = null;
 
 	/**
-	 * @param \ElkArte\HttpReq $http_req
+	 * The database object
+	 *
+	 * @var \ElkArte\Database\QueryInterface
 	 */
-	public function __construct(\ElkArte\HttpReq $http_req, $user)
+	protected $_db = null;
+
+	/**
+	 * @param \ElkArte\HttpReq $http_req
+	 * @param \ElkArte\Database\QueryInterface $db
+	 * @param \ElkArte\UserInfo $user
+	 */
+	public function __construct(HttpReq $http_req, QueryInterface $db, UserInfo $user)
 	{
 		$this->_request = $http_req;
+		$this->_db = $db;
 		$this->user = $user;
 	}
 
