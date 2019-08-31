@@ -19,8 +19,6 @@ use ElkArte\Mentions\MentionType\Event\AbstractMentionMessage;
  * Class BuddyMention
  *
  * Handles mentioning of buddies
- *
- * @package ElkArte\Mentions\MentionType
  */
 class Buddy extends AbstractMentionMessage
 {

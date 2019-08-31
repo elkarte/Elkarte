@@ -19,8 +19,6 @@ use ElkArte\Mentions\MentionType\Event\AbstractMentionBoardAccess;
  * Class MentionmemMention
  *
  * Handles the mentioning of members (@ member actions)
- *
- * @package ElkArte\Mentions\MentionType
  */
 class Mentionmem extends AbstractMentionBoardAccess
 {

@@ -17,8 +17,6 @@ use ElkArte\Mentions\MentionType\NotificationInterface;
 
 /**
  * Class AbstractMentionMessage
- *
- * @package ElkArte\Mentions\MentionType
  */
 abstract class AbstractMentionMessage implements NotificationInterface
 {

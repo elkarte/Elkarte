@@ -19,8 +19,6 @@ use ElkArte\Mentions\MentionType\Event\AbstractMentionBoardAccess;
  * Class QuotedmemMention
  *
  * Handles mentioning of members whose messages has been quoted
- *
- * @package ElkArte\Mentions\MentionType
  */
 class Quotedmem extends AbstractMentionBoardAccess
 {

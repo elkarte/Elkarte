@@ -19,8 +19,6 @@ use ElkArte\Mentions\MentionType\Notification\AbstractMentionBoardAccess;
  * Class MailfailMention
  *
  * Handles notifying users who have had email notifications disabled for failure to deliver
- *
- * @package ElkArte\Mentions\MentionType
  */
 class Mailfail extends AbstractMentionBoardAccess
 {

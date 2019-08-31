@@ -19,8 +19,6 @@ use ElkArte\Mentions\MentionType\Notification\AbstractMentionBoardAccess;
  * Class RlikemsgMention
  *
  * Handles the notification (or non-notification) of removed likes.
- *
- * @package ElkArte\Mentions\MentionType
  */
 class Rlikemsg extends AbstractMentionBoardAccess
 {
