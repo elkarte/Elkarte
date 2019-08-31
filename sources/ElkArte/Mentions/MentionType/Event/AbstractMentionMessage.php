@@ -15,7 +15,6 @@ namespace ElkArte\Mentions\MentionType\Event;
 
 use ElkArte\Mentions\MentionType\EventInterface;
 use ElkArte\HttpReq;
-use ElkArte\Database\QueryInterface;
 use ElkArte\UserInfo;
 
 /**
@@ -45,21 +44,12 @@ abstract class AbstractMentionMessage implements EventInterface
 	protected $user = null;
 
 	/**
-	 * The database object
-	 *
-	 * @var \ElkArte\Database\QueryInterface
-	 */
-	protected $_db = null;
-
-	/**
 	 * @param \ElkArte\HttpReq $http_req
-	 * @param \ElkArte\Database\QueryInterface $db
 	 * @param \ElkArte\UserInfo $user
 	 */
-	public function __construct(HttpReq $http_req, QueryInterface $db, UserInfo $user)
+	public function __construct(HttpReq $http_req, UserInfo $user)
 	{
 		$this->_request = $http_req;
-		$this->_db = $db;
 		$this->user = $user;
 	}
 
@@ -108,73 +98,5 @@ abstract class AbstractMentionMessage implements EventInterface
 				$row['subject'],
 			),
 			$txt['mention_' . $row['mention_type']]);
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public function insert($member_from, $members_to, $target, $time = null, $status = null, $is_accessible = null)
-	{
-		$inserts = array();
-
-		// $time is not checked because it's useless
-		$request = $this->_db->query('', '
-			SELECT id_member
-			FROM {db_prefix}log_mentions
-			WHERE id_member IN ({array_int:members_to})
-				AND mention_type = {string:type}
-				AND id_member_from = {int:member_from}
-				AND id_target = {int:target}',
-			array(
-				'members_to' => $members_to,
-				'type' => static::$_type,
-				'member_from' => $member_from,
-				'target' => $target,
-			)
-		);
-		$existing = array();
-		while ($row = $this->_db->fetch_assoc($request))
-			$existing[] = $row['id_member'];
-		$this->_db->free_result($request);
-
-		$actually_mentioned = array();
-		// If the member has already been mentioned, it's not necessary to do it again
-		foreach ($members_to as $id_member)
-		{
-			if (!in_array($id_member, $existing))
-			{
-				$inserts[] = array(
-					$id_member,
-					$target,
-					$status === null ? 0 : $status,
-					$is_accessible === null ? 1 : $is_accessible,
-					$member_from,
-					$time === null ? time() : $time,
-					static::$_type
-				);
-				$actually_mentioned[] = $id_member;
-			}
-		}
-
-		if (!empty($inserts))
-		{
-			// Insert the new mentions
-			$this->_db->insert('',
-				'{db_prefix}log_mentions',
-				array(
-					'id_member' => 'int',
-					'id_target' => 'int',
-					'status' => 'int',
-					'is_accessible' => 'int',
-					'id_member_from' => 'int',
-					'log_time' => 'int',
-					'mention_type' => 'string-12',
-				),
-				$inserts,
-				array('id_mention')
-			);
-		}
-
-		return $actually_mentioned;
 	}
 }
