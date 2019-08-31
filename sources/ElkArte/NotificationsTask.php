@@ -52,7 +52,7 @@ class NotificationsTask extends ValuesContainer
 
 		$this->data = array(
 			'notification_type' => $type,
-			'namespace' => empty($namespace) ? '\\ElkArte\\Mentions\\MentionType\\' : rtrim($namespace, '\\') . '\\',
+			'namespace' => empty($namespace) ? '\\ElkArte\\Mentions\\MentionType\\Notification\\' : rtrim($namespace, '\\') . '\\',
 			'id_target' => $id,
 			'id_member_from' => $id_member,
 			'source_data' => $data,

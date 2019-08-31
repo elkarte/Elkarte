@@ -206,7 +206,7 @@ class Notifications extends AbstractModel
 	/**
 	 * Inserts a new mention in the database (those that appear in the mentions area).
 	 *
-	 * @param \ElkArte\Mentions\MentionType\MentionTypeInterface $obj
+	 * @param \ElkArte\Mentions\MentionType\MentionType\NotificationInterface $obj
 	 * @param \ElkArte\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */

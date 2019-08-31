@@ -11,14 +11,16 @@
  *
  */
 
-namespace ElkArte\Mentions\MentionType;
+namespace ElkArte\Mentions\MentionType\Notification;
+
+use ElkArte\Mentions\MentionType\NotificationInterface;
 
 /**
  * Class AbstractMentionMessage
  *
  * @package ElkArte\Mentions\MentionType
  */
-abstract class AbstractMentionMessage implements MentionTypeInterface
+abstract class AbstractMentionMessage implements NotificationInterface
 {
 	/**
 	 * The identifier of the mention (the name that is stored in the db)
@@ -58,39 +60,12 @@ abstract class AbstractMentionMessage implements MentionTypeInterface
 	}
 
 	/**
-	 * This static function is used to find the events to attach to a controller.
-	 * The implementation of this abstract class is empty because it's
-	 * just a dummy to cover mentions that don't need to register anything.
-	 *
-	 * @param string $controller The name of the controller initializing the system
-	 *
-	 * @return array
-	 */
-	public static function getEvents($controller)
-	{
-		return array();
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public static function getModules($modules)
-	{
-		return $modules;
-	}
-
-	/**
 	 * {@inheritdoc }
 	 */
 	public static function getType()
 	{
 		return static::$_type;
 	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	abstract public function view($type, &$mentions);
 
 	/**
 	 * {@inheritdoc }
@@ -120,31 +95,6 @@ abstract class AbstractMentionMessage implements MentionTypeInterface
 	public function getLastId()
 	{
 		return null;
-	}
-
-	/**
-	 * Does the replacement of some placeholders with the corresponding
-	 * text/link/url.
-	 *
-	 * @param string[] $row A text string on which replacements are done
-	 * @return string the input string with the placeholders replaced
-	 */
-	protected function _replaceMsg($row)
-	{
-		global $txt, $scripturl, $context;
-
-		return str_replace(
-			array(
-				'{msg_link}',
-				'{msg_url}',
-				'{subject}',
-			),
-			array(
-				'<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_target'] . ';mentionread;mark=read;' . $context['session_var'] . '=' . $context['session_id'] . ';item=' . $row['id_mention'] . '#msg' . $row['id_target'] . '">' . $row['subject'] . '</a>',
-				$scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_target'] . ';mentionread;' . $context['session_var'] . '=' . $context['session_id'] . 'item=' . $row['id_mention'] . '#msg' . $row['id_target'],
-				$row['subject'],
-			),
-			$txt['mention_' . $row['mention_type']]);
 	}
 
 	/**

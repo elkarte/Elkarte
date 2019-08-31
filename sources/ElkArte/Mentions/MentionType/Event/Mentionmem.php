@@ -11,7 +11,9 @@
  *
  */
 
-namespace ElkArte\Mentions\MentionType;
+namespace ElkArte\Mentions\MentionType\Event;
+
+use ElkArte\Mentions\MentionType\Event\AbstractMentionBoardAccess;
 
 /**
  * Class MentionmemMention
@@ -184,27 +186,5 @@ class Mentionmem extends AbstractMentionBoardAccess
 		$modules['mentions'] = array('post', 'display');
 
 		return $modules;
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public function getNotificationBody($lang_data, $members)
-	{
-		if (empty($lang_data['suffix']))
-		{
-			return $this->_getNotificationStrings('', array('subject' => static::$_type, 'body' => static::$_type), $members, $this->_task);
-		}
-		else
-		{
-			$keys = array('subject' => 'notify_mentionmem_' . $lang_data['subject'], 'body' => 'notify_mentionmem_' . $lang_data['body']);
-		}
-
-		$replacements = array(
-			'ACTIONNAME' => $this->_task['source_data']['notifier_data']['name'],
-			'MSGLINK' => replaceBasicActionUrl('{script_url}?msg=' . $this->_task->id_target),
-		);
-
-		return $this->_getNotificationStrings('notify_mentionmem', $keys, $members, $this->_task, array(), $replacements);
 	}
 }

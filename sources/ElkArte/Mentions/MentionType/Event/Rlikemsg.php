@@ -11,7 +11,9 @@
  *
  */
 
-namespace ElkArte\Mentions\MentionType;
+namespace ElkArte\Mentions\MentionType\Event;
+
+use ElkArte\Mentions\MentionType\Event\AbstractMentionBoardAccess;
 
 /**
  * Class RlikemsgMention
@@ -26,29 +28,6 @@ class Rlikemsg extends AbstractMentionBoardAccess
 	 * {@inheritdoc }
 	 */
 	protected static $_type = 'rlikemsg';
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public function getUsersToNotify()
-	{
-		if ($this->_task['source_data']['rlike_notif'])
-		{
-			return (array) $this->_task['source_data']['id_members'];
-		}
-		else
-		{
-			return array();
-		}
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public function getNotificationBody($lang_data, $users)
-	{
-		return array();
-	}
 
 	/**
 	 * Depending on the value of $this->_task['source_data']['rlike_notif']

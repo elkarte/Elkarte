@@ -11,7 +11,9 @@
  *
  */
 
-namespace ElkArte\Mentions\MentionType;
+namespace ElkArte\Mentions\MentionType\Notification;
+
+use ElkArte\Mentions\MentionType\Notification\AbstractMentionBoardAccess;
 
 /**
  * Class MailfailMention

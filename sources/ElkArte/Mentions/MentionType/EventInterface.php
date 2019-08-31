@@ -14,11 +14,9 @@
 namespace ElkArte\Mentions\MentionType;
 
 /**
- * Interface \ElkArte\Mentions\MentionType\MentionTypeInterface
- *
- * @package ElkArte\Mentions\MentionType
+ * Interface \ElkArte\Mentions\MentionType\EventInterface
  */
-interface MentionTypeInterface
+interface EventInterface
 {
 	/**
 	 * This static function is used to obtain the events to register to a controller.
@@ -26,11 +24,6 @@ interface MentionTypeInterface
 	 * @param string $controller The name of the controller initializing the system
 	 */
 	public static function getEvents($controller);
-
-	/**
-	 * Just returns the _type property.
-	 */
-	public static function getType();
 
 	/**
 	 * Returns the modules to enable when turning on the mention.
@@ -51,13 +44,6 @@ interface MentionTypeInterface
 	public function view($type, &$mentions);
 
 	/**
-	 * Used by the Notifications class to find the users that want a notification.
-	 *
-	 * @return int[] An array of members id
-	 */
-	public function getUsersToNotify();
-
-	/**
 	 * Inserts a new mention into the database.
 	 * Checks if the mention already exists (in any status) to prevent any duplicates
 	 *
@@ -72,36 +58,4 @@ interface MentionTypeInterface
 	 * @return int[] An array of members id
 	 */
 	public function insert($member_from, $members_to, $target, $time = null, $status = null, $is_accessible = null);
-
-	/**
-	 * Used by the Notifications class to retrieve the notifications to send.
-	 *
-	 * @param array $lang_data
-	 * @param int[] $users
-	 *
-	 * @return mixed[] array(array(
-	 *                  id_member_to (int),
-	 *                  email_address (text),
-	 *                  subject (text),
-	 *                  body (text),
-	 *                  last_id (int), ???
-	 *                ))
-	 */
-	public function getNotificationBody($lang_data, $users);
-
-	/**
-	 * The \ElkArte\NotificationsTask contains few data that may be necessary for the processing
-	 * of the mention.
-	 *
-	 * @param \ElkArte\NotificationsTask $task
-	 */
-	public function setTask(\ElkArte\NotificationsTask $task);
-
-	/**
-	 * Used when sending an immediate email to get the last message id (email id)
-	 * so that the PbE can do its magic.
-	 *
-	 * @return string
-	 */
-	public function getLastId();
 }

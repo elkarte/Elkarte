@@ -426,12 +426,12 @@ class Mentions extends \ElkArte\AbstractController
 	{
 		if (!empty($type))
 		{
-			$to_register = array('\\ElkArte\\Mentions\\MentionType\\' . ucfirst($type));
+			$to_register = array('\\ElkArte\\Mentions\\MentionType\\Event\\' . ucfirst($type));
 		}
 		else
 		{
 			$to_register = array_map(function ($name) {
-				return '\\ElkArte\\Mentions\\MentionType\\' . ucfirst($name);
+				return '\\ElkArte\\Mentions\\MentionType\\Event\\' . ucfirst($name);
 			}, $this->_known_mentions);
 		}
 

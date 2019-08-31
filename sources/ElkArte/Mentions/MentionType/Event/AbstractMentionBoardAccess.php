@@ -11,12 +11,12 @@
  *
  */
 
-namespace ElkArte\Mentions\MentionType;
+namespace ElkArte\Mentions\MentionType\Event;
+
+use ElkArte\Mentions\MentionType\Event\AbstractMentionMessage;
 
 /**
  * Class AbstractMentionBoardAccess
- *
- * @package ElkArte\Mentions\MentionType
  */
 abstract class AbstractMentionBoardAccess extends AbstractMentionMessage
 {

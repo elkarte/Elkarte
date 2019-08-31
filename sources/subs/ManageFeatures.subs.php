@@ -763,13 +763,13 @@ function loadAllCustomFields()
  */
 function getNotificationTypes()
 {
-	$glob = new \GlobIterator(SOURCEDIR . '/ElkArte/Mentions/MentionType/*Mention.php', \FilesystemIterator::SKIP_DOTS);
+	$glob = new \GlobIterator(SOURCEDIR . '/ElkArte/Mentions/MentionType/Notification/*Mention.php', \FilesystemIterator::SKIP_DOTS);
 	$types = array();
 
 	// For each file found, call its getType method
 	foreach ($glob as $file)
 	{
-		$class_name = '\\ElkArte\\Mentions\\MentionType\\' . $file->getBasename('.php');
+		$class_name = '\\ElkArte\\Mentions\\MentionType\\Notification\\' . $file->getBasename('.php');
 		$types[] = $class_name::getType();
 	}
 
@@ -794,8 +794,11 @@ function getMentionsModules($enabled_mentions)
 
 	foreach ($enabled_mentions as $mention)
 	{
-		$class_name = '\\ElkArte\\Mentions\\MentionType\\' . ucfirst($mention);
-		$modules = $class_name::getModules($modules);
+		$class_name = '\\ElkArte\\Mentions\\MentionType\\Event\\' . ucfirst($mention);
+		if (class_exists($class_name))
+		{
+			$modules = $class_name::getModules($modules);
+		}
 	}
 
 	return $modules;

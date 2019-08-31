@@ -11,14 +11,14 @@
  *
  */
 
-namespace ElkArte\Mentions\MentionType;
+namespace ElkArte\Mentions\MentionType\Notification;
+
+use ElkArte\Mentions\MentionType\Notification\AbstractMentionMessage;
 
 /**
  * Class BuddyMention
  *
  * Handles mentioning of buddies
- *
- * @package ElkArte\Mentions\MentionType
  */
 class Buddy extends AbstractMentionMessage
 {
@@ -26,25 +26,6 @@ class Buddy extends AbstractMentionMessage
 	 * {@inheritdoc }
 	 */
 	protected static $_type = 'buddy';
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public function view($type, &$mentions)
-	{
-		foreach ($mentions as $key => $row)
-		{
-			// To ensure it is not done twice
-			if ($row['mention_type'] != static::$_type)
-			{
-				continue;
-			}
-
-			$mentions[$key]['message'] = $this->_replaceMsg($row);
-		}
-
-		return false;
-	}
 
 	/**
 	 * {@inheritdoc }
