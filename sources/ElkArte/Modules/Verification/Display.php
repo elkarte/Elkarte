@@ -16,6 +16,8 @@
 
 namespace ElkArte\Modules\Verification;
 
+use ElkArte\User;
+
 /**
  * Class \ElkArte\Modules\Verification\Display
  *
@@ -30,7 +32,7 @@ class Display extends \ElkArte\Modules\AbstractModule
 	{
 		global $modSettings;
 
-		if ($this->user->is_admin === false && $this->user->is_moderator === false && !empty($modSettings['posts_require_captcha']) && ($this->user->posts < $modSettings['posts_require_captcha'] || ($this->user->is_guest && $modSettings['posts_require_captcha'] == -1)))
+		if (User::$info->is_admin === false && User::$info->is_moderator === false && !empty($modSettings['posts_require_captcha']) && (User::$info->posts < $modSettings['posts_require_captcha'] || (User::$info->is_guest && $modSettings['posts_require_captcha'] == -1)))
 		{
 			return array(
 				array('topicinfo', array('\\ElkArte\\Modules\\Verification\\Display', 'topicinfo'), array()),

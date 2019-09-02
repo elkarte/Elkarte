@@ -103,7 +103,7 @@ class Mentioning extends \ElkArte\AbstractModel
 	/**
 	 * Inserts a new mention.
 	 *
-	 * @param ElkArte\Mentions\MentionType\\ElkArte\Mentions\MentionType\MentionTypeInterface $mention_obj The object that knows how to store
+	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $mention_obj The object that knows how to store
 	 *  the mention in the database
 	 * @param mixed[] $data must contain uid, type and msg at a minimum
 	 *

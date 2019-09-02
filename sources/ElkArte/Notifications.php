@@ -15,6 +15,7 @@
 namespace ElkArte;
 
 use ElkArte\User;
+use \ElkArte\Mentions\MentionType\NotificationInterface;
 
 /**
  * Class Notifications
@@ -206,11 +207,11 @@ class Notifications extends AbstractModel
 	/**
 	 * Inserts a new mention in the database (those that appear in the mentions area).
 	 *
-	 * @param \ElkArte\Mentions\MentionType\MentionTypeInterface $obj
+	 * @param \ElkArte\Mentions\MentionType\MentionType\NotificationInterface $obj
 	 * @param \ElkArte\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
-	protected function _send_notification(Mentions\MentionType\MentionTypeInterface $obj, NotificationsTask $task, $bodies)
+	protected function _send_notification(NotificationInterface $obj, NotificationsTask $task, $bodies)
 	{
 		$mentioning = new Mentions\Mentioning($this->_db, $this->user, new DataValidator(), $this->_modSettings->enabled_mentions);
 		foreach ($bodies as $body)
@@ -229,11 +230,11 @@ class Notifications extends AbstractModel
 	/**
 	 * Sends an immediate email notification.
 	 *
-	 * @param \ElkArte\Mentions\MentionType\MentionTypeInterface $obj
+	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
 	 * @param \ElkArte\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
-	protected function _send_email(Mentions\MentionType\MentionTypeInterface $obj, NotificationsTask $task, $bodies)
+	protected function _send_email(NotificationInterface $obj, NotificationsTask $task, $bodies)
 	{
 		$last_id = $obj->getLastId();
 		foreach ($bodies as $body)
@@ -248,11 +249,11 @@ class Notifications extends AbstractModel
 	/**
 	 * Stores data in the database to send a daily digest.
 	 *
-	 * @param \ElkArte\Mentions\MentionType\MentionTypeInterface $obj
+	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
 	 * @param \ElkArte\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
-	protected function _send_daily_email(Mentions\MentionType\MentionTypeInterface $obj, NotificationsTask $task, $bodies)
+	protected function _send_daily_email(NotificationInterface $obj, NotificationsTask $task, $bodies)
 	{
 		foreach ($bodies as $body)
 		{
@@ -272,11 +273,11 @@ class Notifications extends AbstractModel
 	/**
 	 * Stores data in the database to send a weekly digest.
 	 *
-	 * @param \ElkArte\Mentions\MentionType\MentionTypeInterface $obj
+	 * @param \ElkArte\Mentions\MentionType\NotificationInterface $obj
 	 * @param \ElkArte\NotificationsTask $task
 	 * @param mixed[] $bodies
 	 */
-	protected function _send_weekly_email(Mentions\MentionType\MentionTypeInterface $obj, NotificationsTask $task, $bodies)
+	protected function _send_weekly_email(NotificationInterface $obj, NotificationsTask $task, $bodies)
 	{
 		foreach ($bodies as $body)
 		{

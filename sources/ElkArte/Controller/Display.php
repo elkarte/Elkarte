@@ -545,7 +545,7 @@ class Display extends \ElkArte\AbstractController
 			'icon_sources' => $this->_icon_sources,
 			'show_signatures' => $this->_show_signatures,
 		]);
-		$renderer = new \ElkArte\MessagesCallback\DisplayRenderer($messages_request, $bodyParser, $opt);
+		$renderer = new \ElkArte\MessagesCallback\DisplayRenderer($messages_request, $this->user, $bodyParser, $opt);
 
 		$context['get_message'] = array($renderer, 'getContext');
 

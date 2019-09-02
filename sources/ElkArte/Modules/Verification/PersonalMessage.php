@@ -16,6 +16,8 @@
 
 namespace ElkArte\Modules\Verification;
 
+use ElkArte\User;
+
 /**
  * Class \ElkArte\Modules\Verification\PersonalMessage
  *
@@ -31,7 +33,7 @@ class PersonalMessage extends \ElkArte\Modules\AbstractModule
 		global $modSettings;
 
 		// Are controls required?
-		if ($this->user->is_admin === false && !empty($modSettings['pm_posts_verification']) && $this->user->posts < $modSettings['pm_posts_verification'])
+		if (User::$info->is_admin === false && !empty($modSettings['pm_posts_verification']) && User::$info->posts < $modSettings['pm_posts_verification'])
 		{
 			// Add the events to call for the verification
 			return array(
