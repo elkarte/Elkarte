@@ -24,6 +24,7 @@ use ElkArte\EventManager;
 use ElkArte\Exceptions\Exception;
 use ElkArte\MembersList;
 use ElkArte\User;
+use ElkArte\Util;
 
 /**
  * Has the job of showing and editing people's profiles.
@@ -645,8 +646,8 @@ class Profile extends AbstractController
 		if ($this->_completed_save)
 		{
 			// Clean up the POST variables.
-			$post = htmltrim__recursive((array) $this->_req->post);
-			$post = htmlspecialchars__recursive($post);
+			$post = Util::htmltrim__recursive((array) $this->_req->post);
+			$post = Util::htmlspecialchars__recursive($post);
 			$this->_req->post = new \ArrayObject($post, \ArrayObject::ARRAY_AS_PROPS);
 
 			// Does the change require the current password as well?

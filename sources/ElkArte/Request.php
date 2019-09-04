@@ -13,6 +13,8 @@
 
 namespace ElkArte;
 
+use ElkArte\Util;
+
 /**
  * Class to parse $_REQUEST for always necessary data, such as 'action', 'board', 'topic', 'start'.
  *
@@ -314,7 +316,7 @@ final class Request
 		$this->_cleanRequest();
 
 		// Add entities to GET.  This is kinda like the slashes on everything else.
-		$_GET = htmlspecialchars__recursive($_GET);
+		$_GET = Util::htmlspecialchars__recursive($_GET);
 
 		// Let's not depend on the ini settings... why even have COOKIE in there, anyway?
 		$_REQUEST = $_POST + $_GET;

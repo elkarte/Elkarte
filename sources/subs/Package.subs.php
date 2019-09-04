@@ -303,7 +303,7 @@ function getPackageInfo($gzfilename)
 	$packageInfo = $packageInfo->path('package-info[0]');
 
 	// Convert packageInfo to an array for use
-	$package = htmlspecialchars__recursive($packageInfo->to_array());
+	$package = Util::htmlspecialchars__recursive($packageInfo->to_array());
 	$package['xml'] = $packageInfo;
 	$package['filename'] = $gzfilename;
 

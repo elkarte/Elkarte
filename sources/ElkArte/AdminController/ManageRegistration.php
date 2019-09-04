@@ -149,7 +149,7 @@ class ManageRegistration extends AbstractController
 			{
 				if (!is_array($value))
 				{
-					$this->_req->post[$key] = htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
+					$this->_req->post[$key] = Util::htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
 				}
 			}
 
