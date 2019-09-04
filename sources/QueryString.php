@@ -110,22 +110,3 @@ function ob_sessrewrite($buffer)
 	// Return the changed buffer.
 	return $buffer;
 }
-
-/**
- * Callback function for the Rewrite URLs preg_replace_callback
- *
- * @param mixed[] $matches
- *
- * @return string
- */
-function buffer_callback($matches)
-{
-	global $scripturl;
-
-	if (!isBrowser('possibly_robot') && empty($_COOKIE) && defined('SID') && SID != '')
-	{
-		return '"' . $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html?' . SID . (isset($matches[2]) ? $matches[2] : '') . '"';
-	}
-
-	return '"' . $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html' . (isset($matches[2]) ? $matches[2] : '') . '"';
-}
