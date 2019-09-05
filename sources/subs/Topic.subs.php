@@ -1708,8 +1708,7 @@ function selectMessages($topic, $start, $items_per_page, $messages = array(), $o
 		SELECT 
 			m.subject, COALESCE(mem.real_name, m.poster_name) AS real_name, 
 			m.poster_time, m.body, m.id_msg, m.smileys_enabled, m.id_member
-		FROM {db_prefix}messages AS m
-			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
+		FROM (SELECT m.id_msg FROM {db_prefix}messages AS m
 		WHERE m.id_topic = {int:current_topic}' . (empty($messages['before']) ? '' : '
 			AND m.id_msg < {int:msg_before}') . (empty($messages['after']) ? '' : '
 			AND m.id_msg > {int:msg_after}') . (empty($messages['excluded']) ? '' : '
@@ -1717,7 +1716,9 @@ function selectMessages($topic, $start, $items_per_page, $messages = array(), $o
 			AND m.id_msg IN ({array_int:split_msgs})') . (!$only_approved ? '' : '
 			AND approved = {int:is_approved}') . '
 		ORDER BY m.id_msg DESC
-		LIMIT {int:start}, {int:messages_per_page}',
+		LIMIT {int:start}, {int:messages_per_page}) AS o JOIN {db_prefix}messages as m ON o.id_msg=m.id_msg LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
+		ORDER BY m.id_msg DESC
+		',
 		array(
 			'current_topic' => $topic,
 			'no_split_msgs' => !empty($messages['excluded']) ? $messages['excluded'] : array(),
@@ -2304,14 +2305,18 @@ function getTopicsPostsAndPoster($topic, $limit, $sort)
 		'all_posters' => array(),
 	);
 
-	$db->fetchQuery('
+	// When evaluating potentially huge offsets, grab the ids only, first.
+    // The performance impact is still significant going from three columns to one.
+ 	$db->fetchQuery('display_get_post_poster', '
 		SELECT 
 			id_msg, id_member, approved
-		FROM {db_prefix}messages
+		FROM (SELECT id_msg FROM {db_prefix}messages
 		WHERE id_topic = {int:current_topic}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-			AND (approved = {int:is_approved}' . (User::$info->is_guest ? '' : ' OR id_member = {int:current_member}') . ')') . '
+		GROUP BY id_msg
+		HAVING (approved = {int:is_approved}' . ($user_info['is_guest'] ? '' : ' OR id_member = {int:current_member}') . ')') . '
 		ORDER BY id_msg ' . ($sort ? '' : 'DESC') . ($limit['messages_per_page'] == -1 ? '' : '
-		LIMIT ' . $limit['start'] . ', ' . $limit['offset']),
+		LIMIT ' . $limit['start'] . ', ' . $limit['offset']) . ') AS o JOIN {db_prefix}messages as m ON o.id_msg=m.id_msg
+		ORDER BY m.id_msg ' . ($sort ? '' : 'DESC'),
 		array(
 			'current_member' => User::$info->id,
 			'current_topic' => $topic,
@@ -3138,15 +3143,18 @@ function mergeableTopics($id_board, $id_topic, $approved, $offset)
 	$topics = array();
 	$db->fetchQuery('
 		SELECT 
-			t.id_topic, m.subject, m.id_member, COALESCE(mem.real_name, m.poster_name) AS poster_name
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
+			t.id_topic, m.subject, m.id_member, COALESCE(mem.real_name, m.poster_name) AS poster_name FROM
+		(SELECT t.id_topic FROM {db_prefix}topics AS t
 		WHERE t.id_board = {int:id_board}
 			AND t.id_topic != {int:id_topic}' . (empty($approved) ? '
 			AND t.approved = {int:is_approved}' : '') . '
 		ORDER BY t.is_sticky DESC, t.id_last_msg DESC
-		LIMIT {int:offset}, {int:limit}',
+		LIMIT {int:offset}, {int:limit}) AS o 
+		    INNER JOIN {db_prefix}topics AS t ON (o.id_topic = t.id_topic)
+		    INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
+		ORDER BY t.is_sticky DESC, t.id_last_msg DESC
+		',
 		array(
 			'id_board' => $id_board,
 			'id_topic' => $id_topic,
