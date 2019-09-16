@@ -326,29 +326,11 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
  *
  * @package Attachments
  * @see getAttachmentPath()
+ * @deprecated since 2.0 see getAttachmentDirs
  */
 function attachmentPaths()
 {
-	global $modSettings;
-
-	if (empty($modSettings['attachmentUploadDir']))
-	{
-		return array(BOARDDIR . '/attachments');
-	}
-	elseif (!empty($modSettings['currentAttachmentUploadDir']))
-	{
-		// we have more directories
-		if (!is_array($modSettings['attachmentUploadDir']))
-		{
-			$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
-		}
-
-		return $modSettings['attachmentUploadDir'];
-	}
-	else
-	{
-		return array($modSettings['attachmentUploadDir']);
-	}
+	return getAttachmentDirs();
 }
 
 /**
@@ -440,25 +422,14 @@ function getAvatarCount()
  *
  * @return mixed[] the attachments directory/directories
  * @package Attachments
+ * @deprecated since 2.0 see AttachmentsDirectory->getPaths
  */
 function getAttachmentDirs()
 {
 	global $modSettings;
 
-	if (!empty($modSettings['currentAttachmentUploadDir']))
-	{
-		$attach_dirs = Util::unserialize($modSettings['attachmentUploadDir']);
-	}
-	elseif (!empty($modSettings['attachmentUploadDir']))
-	{
-		$attach_dirs = array($modSettings['attachmentUploadDir']);
-	}
-	else
-	{
-		$attach_dirs = array(BOARDDIR . '/attachments');
-	}
-
-	return $attach_dirs;
+	$attachmentDirectory = new AttachmentsDirectory($modSettings);
+	return $attachmentDirectory->getPaths();
 }
 
 /**
@@ -760,6 +731,7 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 	global $modSettings;
 
 	$db = database();
+	$attachmentDirectory = new AttachmentsDirectory($modSettings);
 
 	require_once(SUBSDIR . '/Attachments.subs.php');
 
@@ -797,18 +769,14 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 		if (!file_exists($filename))
 		{
 			// If we're lucky it might just be in a different folder.
-			if (!empty($modSettings['currentAttachmentUploadDir']))
+			if ($attachmentDirectory->hasMultiPaths())
 			{
 				// Get the attachment name without the folder.
 				$attachment_name = !empty($row['file_hash']) ? $row['id_attach'] . '_' . $row['file_hash'] . '.elk' : getLegacyAttachmentFilename($row['filename'], $row['id_attach'], null, true);
 
-				if (!is_array($modSettings['attachmentUploadDir']))
-				{
-					$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
-				}
-
 				// Loop through the other folders looking for this file
-				foreach ($modSettings['attachmentUploadDir'] as $id => $dir)
+				$attachmentDirs = $attachmentDirectory->getPaths();
+				foreach ($attachmentDirs as $id => $dir)
 				{
 					if (file_exists($dir . '/' . $attachment_name))
 					{
@@ -830,13 +798,8 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 					// It may be without the elk extension (something wrong during upgrade/conversion)
 					$attachment_name = $row['id_attach'] . '_' . $row['file_hash'];
 
-					if (!is_array($modSettings['attachmentUploadDir']))
-					{
-						$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
-					}
-
 					// Loop through the other folders looking for this file
-					foreach ($modSettings['attachmentUploadDir'] as $id => $dir)
+					foreach ($attachmentDirectory->getPaths() as $id => $dir)
 					{
 						if (file_exists($dir . '/' . $attachment_name))
 						{
@@ -1308,6 +1271,7 @@ function list_getAttachDirs()
 	global $modSettings, $context, $txt, $scripturl;
 
 	$db = database();
+	$attachmentsDir = new AttachmentsDirectory($modSettings);
 
 	$request = $db->query('', '
 		SELECT 
@@ -1329,7 +1293,7 @@ function list_getAttachDirs()
 	$db->free_result($request);
 
 	$attachdirs = array();
-	foreach ($modSettings['attachmentUploadDir'] as $id => $dir)
+	foreach ($attachmentDirectory->getPaths() as $id => $dir)
 	{
 		// If there aren't any attachments in this directory this won't exist.
 		if (!isset($expected_files[$id]))
@@ -1343,25 +1307,19 @@ function list_getAttachDirs()
 		// If it is one, let's show that it's a base directory.
 		$sub_dirs = 0;
 		$is_base_dir = false;
-		if (!empty($modSettings['attachment_basedirectories']))
+		if ($attachmentDirectory->hasBaseDir())
 		{
-			$is_base_dir = in_array($dir, $modSettings['attachment_basedirectories']);
+			$is_base_dir = $attachmentDirectory->hasBaseDir($dir);
 
 			// Count any sub-folders.
-			foreach ($modSettings['attachmentUploadDir'] as $sid => $sub)
-			{
-				if (strpos($sub, $dir . DIRECTORY_SEPARATOR) !== false)
-				{
-					$expected_files[$id]++;
-					$sub_dirs++;
-				}
-			}
+			$sub_dirs = $attachmentDirectory->countSubdirs($dir);
+			$expected_files[$id] += $sub_dirs;
 		}
 
 		$attachdirs[] = array(
 			'id' => $id,
-			'current' => $id == $modSettings['currentAttachmentUploadDir'],
-			'disable_current' => isset($modSettings['automanage_attachments']) && $modSettings['automanage_attachments'] > 1,
+			'current' => $attachmentsDir->isCurrentDirectoryId($id),
+			'disable_current' => $attachmentsDir->autoManageEnabled(AttachmentsDirectory::AUTO_SEQUENCE),
 			'disable_base_dir' => $is_base_dir && $sub_dirs > 0 && !empty($files) && empty($error),
 			'path' => $dir,
 			'current_size' => !empty($expected_size[$id]) ? comma_format($expected_size[$id] / 1024, 0) : 0,
@@ -1374,7 +1332,7 @@ function list_getAttachDirs()
 	if (isset($_REQUEST['new_path']))
 	{
 		$attachdirs[] = array(
-			'id' => max(array_merge(array_keys($expected_files), array_keys($modSettings['attachmentUploadDir']))) + 1,
+			'id' => max(array_merge(array_keys($expected_files), array_keys($attachmentDirectory->getPaths()))) + 1,
 			'current' => false,
 			'path' => '',
 			'current_size' => '',
@@ -1446,24 +1404,18 @@ function list_getBaseDirs()
 {
 	global $modSettings, $txt;
 
-	if (empty($modSettings['attachment_basedirectories']))
+	$attachmentsDir = new AttachmentsDirectory($modSettings);
+
+	if ($attachmentsDir->hasBaseDir() === false)
 	{
 		return;
 	}
 
 	// Get a list of the base directories.
 	$basedirs = array();
-	foreach ($modSettings['attachment_basedirectories'] as $id => $dir)
+	foreach ($attachmentsDir->getBaseDirs() as $id => $dir)
 	{
-		// Loop through the attach directory array to count any sub-directories
-		$expected_dirs = 0;
-		foreach ($modSettings['attachmentUploadDir'] as $sid => $sub)
-		{
-			if (strpos($sub, $dir . DIRECTORY_SEPARATOR) !== false)
-			{
-				$expected_dirs++;
-			}
-		}
+		$expected_dirs = $attachmentsDir->countSubdirs($dir);
 
 		if (!is_dir($dir))
 		{
@@ -1480,7 +1432,7 @@ function list_getBaseDirs()
 
 		$basedirs[] = array(
 			'id' => $id,
-			'current' => $dir === $modSettings['basedirectory_for_attachments'],
+			'current' => $attachmentsDir->isCurrentBaseDir($dir),
 			'path' => $expected_dirs > 0 ? $dir : ('<input type="text" name="base_dir[' . $id . ']" value="' . $dir . '" size="40" />'),
 			'num_dirs' => $expected_dirs,
 			'status' => $status == 'ok' ? $txt['attach_dir_ok'] : ('<span class="error">' . $txt['attach_dir_' . $status] . '</span>'),
@@ -1656,7 +1608,9 @@ function currentAttachDirProperties()
 {
 	global $modSettings;
 
-	return attachDirProperties($modSettings['currentAttachmentUploadDir']);
+	$attachmentsDir = new AttachmentsDirectory($modSettings);
+
+	return attachDirProperties($attachmentsDir->currentDirectoryId());
 }
 
 /**

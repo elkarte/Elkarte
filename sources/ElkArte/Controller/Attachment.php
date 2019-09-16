@@ -21,6 +21,7 @@ use ElkArte\Action;
 use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Graphics\Image;
+use ElkArte\AttachmentsDirectory;
 
 /**
  *
@@ -346,16 +347,9 @@ class Attachment extends AbstractController
 					}
 					else
 					{
-						if (!is_array($modSettings['attachmentUploadDir']))
-						{
-							$attachmentUploadDir = unserialize($modSettings['attachmentUploadDir']);
-						}
-						else
-						{
-							$attachmentUploadDir = $modSettings['attachmentUploadDir'];
-						}
+						$attachmentsDir = new AttachmentsDirectory($modSettings);
 
-						$filename = $attachmentUploadDir[$modSettings['currentAttachmentUploadDir']] . '/' . $attachment[1];
+						$filename = $attachmentsDir->getCurrent() . '/' . $attachment[1];
 					}
 
 					if (substr(get_finfo_mime($filename), 0, 5) !== 'image')

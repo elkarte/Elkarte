@@ -23,379 +23,7 @@ use ElkArte\Graphics\Image;
 use ElkArte\Http\FsockFetchWebdata;
 use ElkArte\User;
 use ElkArte\Util;
-
-/**
- * Check and create a directory automatically.
- *
- * @package Attachments
- */
-function automanage_attachments_check_directory()
-{
-	global $modSettings, $context;
-
-	// Not pretty, but since we don't want folders created for every post.
-	// It'll do unless a better solution can be found.
-	if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'admin')
-	{
-		$doit = true;
-	}
-	elseif (empty($modSettings['automanage_attachments']))
-	{
-		return;
-	}
-	elseif (!isset($_FILES))
-	{
-		return;
-	}
-	elseif (isset($_FILES['attachment']))
-	{
-		foreach ($_FILES['attachment']['tmp_name'] as $dummy)
-		{
-			if (!empty($dummy))
-			{
-				$doit = true;
-				break;
-			}
-		}
-	}
-
-	if (!isset($doit))
-	{
-		return;
-	}
-
-	// Get our date and random numbers for the directory choices
-	$year = date('Y');
-	$month = date('m');
-
-	$rand = md5(mt_rand());
-	$rand1 = $rand[1];
-	$rand = $rand[0];
-
-	if (!empty($modSettings['attachment_basedirectories']) && !empty($modSettings['use_subdirectories_for_attachments']))
-	{
-		if (!is_array($modSettings['attachment_basedirectories']))
-		{
-			$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
-		}
-
-		$base_dir = array_search($modSettings['basedirectory_for_attachments'], $modSettings['attachment_basedirectories']);
-	}
-	else
-	{
-		$base_dir = 0;
-	}
-
-	if ($modSettings['automanage_attachments'] == 1)
-	{
-		if (!isset($modSettings['last_attachments_directory']))
-		{
-			$modSettings['last_attachments_directory'] = array();
-		}
-		if (!is_array($modSettings['last_attachments_directory']))
-		{
-			$modSettings['last_attachments_directory'] = Util::unserialize($modSettings['last_attachments_directory']);
-		}
-		if (!isset($modSettings['last_attachments_directory'][$base_dir]))
-		{
-			$modSettings['last_attachments_directory'][$base_dir] = 0;
-		}
-	}
-
-	$basedirectory = (!empty($modSettings['use_subdirectories_for_attachments']) ? ($modSettings['basedirectory_for_attachments']) : BOARDDIR);
-
-	// Just to be sure: I don't want directory separators at the end
-	$sep = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '\/' : DIRECTORY_SEPARATOR;
-	$basedirectory = rtrim($basedirectory, $sep);
-
-	switch ($modSettings['automanage_attachments'])
-	{
-		case 1:
-			$updir = $basedirectory . DIRECTORY_SEPARATOR . 'attachments_' . (isset($modSettings['last_attachments_directory'][$base_dir]) ? $modSettings['last_attachments_directory'][$base_dir] : 0);
-			break;
-		case 2:
-			$updir = $basedirectory . DIRECTORY_SEPARATOR . $year;
-			break;
-		case 3:
-			$updir = $basedirectory . DIRECTORY_SEPARATOR . $year . DIRECTORY_SEPARATOR . $month;
-			break;
-		case 4:
-			$updir = $basedirectory . DIRECTORY_SEPARATOR . (empty($modSettings['use_subdirectories_for_attachments']) ? 'attachments-' : 'random_') . $rand;
-			break;
-		case 5:
-			$updir = $basedirectory . DIRECTORY_SEPARATOR . (empty($modSettings['use_subdirectories_for_attachments']) ? 'attachments-' : 'random_') . $rand . DIRECTORY_SEPARATOR . $rand1;
-			break;
-		default:
-			$updir = '';
-	}
-
-	if (!is_array($modSettings['attachmentUploadDir']))
-	{
-		$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
-	}
-
-	if (!in_array($updir, $modSettings['attachmentUploadDir']) && !empty($updir))
-	{
-		$outputCreation = automanage_attachments_create_directory($updir);
-	}
-	elseif (in_array($updir, $modSettings['attachmentUploadDir']))
-	{
-		$outputCreation = true;
-	}
-	else
-	{
-		$outputCreation = false;
-	}
-
-	if ($outputCreation)
-	{
-		$modSettings['currentAttachmentUploadDir'] = array_search($updir, $modSettings['attachmentUploadDir']);
-		$context['attach_dir'] = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
-
-		updateSettings(array(
-			'currentAttachmentUploadDir' => $modSettings['currentAttachmentUploadDir'],
-		));
-	}
-
-	return $outputCreation;
-}
-
-/**
- * Creates a directory as defined by the admin attach options
- *
- * What it does:
- *
- * - Attempts to make the directory writable
- * - Places an .htaccess in new directories for security
- *
- * @param string $updir
- *
- * @return bool
- * @package Attachments
- *
- */
-function automanage_attachments_create_directory($updir)
-{
-	global $modSettings, $context;
-
-	$tree = get_directory_tree_elements($updir);
-	$count = count($tree);
-
-	$directory = !empty($tree) ? attachments_init_dir($tree, $count) : false;
-	if ($directory === false)
-	{
-		// Maybe it's just the folder name
-		$tree = get_directory_tree_elements(BOARDDIR . DIRECTORY_SEPARATOR . $updir);
-		$count = count($tree);
-
-		$directory = !empty($tree) ? attachments_init_dir($tree, $count) : false;
-		if ($directory === false)
-		{
-			return false;
-		}
-	}
-
-	$directory .= DIRECTORY_SEPARATOR . array_shift($tree);
-
-	while (!@is_dir($directory) || $count != -1)
-	{
-		if (!@is_dir($directory))
-		{
-			if (!@mkdir($directory, 0755))
-			{
-				$context['dir_creation_error'] = 'attachments_no_create';
-
-				return false;
-			}
-		}
-
-		$directory .= DIRECTORY_SEPARATOR . array_shift($tree);
-		$count--;
-	}
-
-	// Try to make it writable
-	if (!is_writable($directory))
-	{
-		chmod($directory, 0755);
-		if (!is_writable($directory))
-		{
-			chmod($directory, 0775);
-			if (!is_writable($directory))
-			{
-				chmod($directory, 0777);
-				if (!is_writable($directory))
-				{
-					$context['dir_creation_error'] = 'attachments_no_write';
-
-					return false;
-				}
-			}
-		}
-	}
-
-	// Everything seems fine...let's create the .htaccess
-	if (!file_exists($directory . DIRECTORY_SEPARATOR . '.htaccess'))
-	{
-		secureDirectory($updir, true);
-	}
-
-	$sep = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '\/' : DIRECTORY_SEPARATOR;
-	$updir = rtrim($updir, $sep);
-
-	// Only update if it's a new directory
-	if (!in_array($updir, $modSettings['attachmentUploadDir']))
-	{
-		$modSettings['currentAttachmentUploadDir'] = max(array_keys($modSettings['attachmentUploadDir'])) + 1;
-		$modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']] = $updir;
-
-		updateSettings(array(
-			'attachmentUploadDir' => serialize($modSettings['attachmentUploadDir']),
-			'currentAttachmentUploadDir' => $modSettings['currentAttachmentUploadDir'],
-		), true);
-		$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
-	}
-
-	$context['attach_dir'] = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
-
-	return true;
-}
-
-/**
- * Determines the current base directory and attachment directory
- *
- * What it does:
- *
- * - Increments the above directory to the next available slot
- * - Uses automanage_attachments_create_directory to create the incremental directory
- *
- * @package Attachments
- */
-function automanage_attachments_by_space()
-{
-	global $modSettings;
-
-	if (!isset($modSettings['automanage_attachments']) || (!empty($modSettings['automanage_attachments']) && $modSettings['automanage_attachments'] != 1))
-	{
-		return;
-	}
-
-	$basedirectory = (!empty($modSettings['use_subdirectories_for_attachments']) ? ($modSettings['basedirectory_for_attachments']) : BOARDDIR);
-
-	// Just to be sure: I don't want directory separators at the end
-	$sep = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '\/' : DIRECTORY_SEPARATOR;
-	$basedirectory = rtrim($basedirectory, $sep);
-
-	// Get the current base directory
-	if (!empty($modSettings['use_subdirectories_for_attachments']) && !empty($modSettings['attachment_basedirectories']))
-	{
-		$base_dir = array_search($modSettings['basedirectory_for_attachments'], $modSettings['attachment_basedirectories']);
-		$base_dir = !empty($modSettings['automanage_attachments']) ? $base_dir : 0;
-	}
-	else
-	{
-		$base_dir = 0;
-	}
-
-	// Get the last attachment directory for that base directory
-	if (empty($modSettings['last_attachments_directory'][$base_dir]))
-	{
-		$modSettings['last_attachments_directory'][$base_dir] = 0;
-	}
-
-	// And increment it.
-	$modSettings['last_attachments_directory'][$base_dir]++;
-
-	$updir = $basedirectory . DIRECTORY_SEPARATOR . 'attachments_' . $modSettings['last_attachments_directory'][$base_dir];
-
-	// make sure it exists and is writable
-	if (automanage_attachments_create_directory($updir))
-	{
-		$modSettings['currentAttachmentUploadDir'] = array_search($updir, $modSettings['attachmentUploadDir']);
-		updateSettings(array(
-			'last_attachments_directory' => serialize($modSettings['last_attachments_directory']),
-			'currentAttachmentUploadDir' => $modSettings['currentAttachmentUploadDir'],
-		));
-		$modSettings['last_attachments_directory'] = Util::unserialize($modSettings['last_attachments_directory']);
-
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-/**
- * Finds the current directory tree for the supplied base directory
- *
- * @param string $directory
- * @return string[]|boolean on fail else array of directory names
- * @package Attachments
- */
-function get_directory_tree_elements($directory)
-{
-	/*
-		In Windows server both \ and / can be used as directory separators in paths
-		In Linux (and presumably *nix) servers \ can be part of the name
-		So for this reasons:
-			* in Windows we need to explode for both \ and /
-			* while in linux should be safe to explode only for / (aka DIRECTORY_SEPARATOR)
-	*/
-	if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
-	{
-		$tree = preg_split('#[\\\/]#', $directory);
-	}
-	else
-	{
-		if (substr($directory, 0, 1) != DIRECTORY_SEPARATOR)
-		{
-			return false;
-		}
-
-		$tree = explode(DIRECTORY_SEPARATOR, trim($directory, DIRECTORY_SEPARATOR));
-	}
-
-	return $tree;
-}
-
-/**
- * Helper function for automanage_attachments_create_directory
- *
- * What it does:
- *
- * - Gets the directory w/o drive letter for windows
- *
- * @param string[] $tree
- * @param int $count
- *
- * @return bool|mixed|string
- * @package Attachments
- *
- */
-function attachments_init_dir(&$tree, &$count)
-{
-	$directory = '';
-
-	// If on Windows servers the first part of the path is the drive (e.g. "C:")
-	if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
-	{
-		// Better be sure that the first part of the path is actually a drive letter...
-		// ...even if, I should check this in the admin page...isn't it?
-		// ...NHAAA Let's leave space for users' complains! :P
-		if (preg_match('/^[a-z]:$/i', $tree[0]))
-		{
-			$directory = array_shift($tree);
-		}
-		else
-		{
-			return false;
-		}
-
-		$count--;
-	}
-
-	return $directory;
-}
+use ElkArte\AttachmentsDirectory;
 
 /**
  * Handles the actual saving of attachments to a directory.
@@ -418,21 +46,14 @@ function processAttachments($id_msg = null)
 	$attach_errors = AttachmentErrorContext::context();
 
 	// Make sure we're uploading to the right place.
-	if (!empty($modSettings['automanage_attachments']))
+	$attachmentDirectory = new AttachmentsDirectory($modSettings);
+	$attachmentDirectory->automanage_attachments_check_directory(isset($_REQUEST['action']) && $_REQUEST['action'] == 'admin');
+	if ($attachmentDirectory->autoManageEnabled())
 	{
-		automanage_attachments_check_directory();
+		$attachmentDirectory->automanage_attachments_check_directory();
 	}
 
-	if (!is_array($modSettings['attachmentUploadDir']))
-	{
-		$attachmentUploadDir = Util::unserialize($modSettings['attachmentUploadDir']);
-		if (!empty($attachmentUploadDir))
-		{
-			$modSettings['attachmentUploadDir'] = $attachmentUploadDir;
-		}
-	}
-
-	$context['attach_dir'] = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
+	$context['attach_dir'] = $attachmentDirectory->getCurrent();
 
 	// Is the attachments folder actually there?
 	if (!empty($context['dir_creation_error']))
@@ -562,7 +183,7 @@ function processAttachments($id_msg = null)
 				'public_attachid' => 'post_tmp_' . User::$info->id . '_' . md5(mt_rand()),
 				'size' => $_FILES['attachment']['size'][$n],
 				'type' => $_FILES['attachment']['type'][$n],
-				'id_folder' => $modSettings['currentAttachmentUploadDir'],
+				'id_folder' => $attachmentDirectory->currentDirectoryId(),
 				'errors' => array(),
 			);
 
@@ -650,7 +271,7 @@ function processAttachments($id_msg = null)
 	//   tmp_name => Path to the temp file ($context['attach_dir'] . '/' . $attachID).
 	//   size => File size (required).
 	//   type => MIME type (optional if not available on upload).
-	//   id_folder => $modSettings['currentAttachmentUploadDir']
+	//   id_folder => AttachmentsDirectory->currentDirectoryId
 	//   errors => An array of errors (use the index of the $txt variable for that error).
 	// Template changes can be done using "integrate_upload_template".
 	call_integration_hook('integrate_attachment_upload');
@@ -750,16 +371,9 @@ function getTempAttachById($attach_id)
 		throw new Exception('no_access');
 	}
 
-	if (is_array($modSettings['attachmentUploadDir']))
-	{
-		$dirs = $modSettings['attachmentUploadDir'];
-	}
-	else
-	{
-		$dirs = unserialize($modSettings['attachmentUploadDir']);
-	}
+	$attachmentsDir = new AttachmentsDirectory($modSettings);
 
-	$attach_dir = $dirs[$modSettings['currentAttachmentUploadDir']];
+	$attach_dir = $attachmentsDir->getCurrent();
 
 	if (file_exists($attach_dir . '/' . $attach_real_id) && isset($_SESSION['temp_attachments'][$attach_real_id]))
 	{
@@ -900,72 +514,8 @@ function attachmentChecks($attachID)
 		}
 	}
 
-	// Is there room for this in the directory?
-	if (!empty($modSettings['attachmentDirSizeLimit']) || !empty($modSettings['attachmentDirFileLimit']))
-	{
-		// Check the folder size and count. If it hasn't been done already.
-		if (empty($context['dir_size']) || empty($context['dir_files']))
-		{
-			$request = $db->query('', '
-				SELECT COUNT(*), SUM(size)
-				FROM {db_prefix}attachments
-				WHERE id_folder = {int:folder_id}
-					AND attachment_type != {int:type}',
-				array(
-					'folder_id' => $modSettings['currentAttachmentUploadDir'],
-					'type' => 1,
-				)
-			);
-			list ($context['dir_files'], $context['dir_size']) = $db->fetch_row($request);
-			$db->free_result($request);
-		}
-		$context['dir_size'] += $_SESSION['temp_attachments'][$attachID]['size'];
-		$context['dir_files']++;
-
-		// Are we about to run out of room? Let's notify the admin then.
-		if (empty($modSettings['attachment_full_notified']) && !empty($modSettings['attachmentDirSizeLimit']) && $modSettings['attachmentDirSizeLimit'] > 4000 && $context['dir_size'] > ($modSettings['attachmentDirSizeLimit'] - 2000) * 1024
-			|| (!empty($modSettings['attachmentDirFileLimit']) && $modSettings['attachmentDirFileLimit'] * .95 < $context['dir_files'] && $modSettings['attachmentDirFileLimit'] > 500))
-		{
-			require_once(SUBSDIR . '/Admin.subs.php');
-			emailAdmins('admin_attachments_full');
-			updateSettings(array('attachment_full_notified' => 1));
-		}
-
-		// No room left.... What to do now???
-		if (!empty($modSettings['attachmentDirFileLimit']) && $context['dir_files'] + 2 > $modSettings['attachmentDirFileLimit']
-			|| (!empty($modSettings['attachmentDirSizeLimit']) && $context['dir_size'] > $modSettings['attachmentDirSizeLimit'] * 1024))
-		{
-			// If we are managing the directories space automatically, lets get to it
-			if (!empty($modSettings['automanage_attachments']) && $modSettings['automanage_attachments'] == 1)
-			{
-				// Move it to the new folder if we can.
-				if (automanage_attachments_by_space())
-				{
-					rename($_SESSION['temp_attachments'][$attachID]['tmp_name'], $context['attach_dir'] . '/' . $attachID);
-					$_SESSION['temp_attachments'][$attachID]['tmp_name'] = $context['attach_dir'] . '/' . $attachID;
-					$_SESSION['temp_attachments'][$attachID]['id_folder'] = $modSettings['currentAttachmentUploadDir'];
-					$context['dir_size'] = 0;
-					$context['dir_files'] = 0;
-				}
-				// Or, let the user know that its not going to happen.
-				else
-				{
-					if (isset($context['dir_creation_error']))
-					{
-						$_SESSION['temp_attachments'][$attachID]['errors'][] = $context['dir_creation_error'];
-					}
-					else
-					{
-						$_SESSION['temp_attachments'][$attachID]['errors'][] = 'ran_out_of_space';
-					}
-				}
-			}
-			else
-			{
-				$_SESSION['temp_attachments'][$attachID]['errors'][] = 'ran_out_of_space';
-			}
-		}
-	}
+	$attachmentDirectory = new AttachmentsDirectory($modSettings);
+	$attachmentDirectory->checkDirSpace($_SESSION['temp_attachments'][$attachID]['size']);
 
 	// Is the file too big?
 	if (!empty($modSettings['attachmentSizeLimit']) && $_SESSION['temp_attachments'][$attachID]['size'] > $modSettings['attachmentSizeLimit'] * 1024)
@@ -1051,6 +601,7 @@ function createAttachment(&$attachmentOptions)
 	global $modSettings, $context;
 
 	$db = database();
+	$attachmentsDir = new AttachmentsDirectory($modSettings);
 
 	$image = new Image();
 
@@ -1143,29 +694,13 @@ function createAttachment(&$attachmentOptions)
 			$thumb_path = $attachmentOptions['destination'] . '_thumb';
 
 			// We should check the file size and count here since thumbs are added to the existing totals.
-			if (!empty($modSettings['automanage_attachments']) && $modSettings['automanage_attachments'] == 1 && !empty($modSettings['attachmentDirSizeLimit']) || !empty($modSettings['attachmentDirFileLimit']))
-			{
-				$context['dir_size'] = isset($context['dir_size']) ? $context['dir_size'] += $thumb_size : $context['dir_size'] = 0;
-				$context['dir_files'] = isset($context['dir_files']) ? $context['dir_files']++ : $context['dir_files'] = 0;
-
-				// If the folder is full, try to create a new one and move the thumb to it.
-				if ($context['dir_size'] > $modSettings['attachmentDirSizeLimit'] * 1024 || $context['dir_files'] + 2 > $modSettings['attachmentDirFileLimit'])
-				{
-					if (automanage_attachments_by_space())
-					{
-						rename($thumb_path, $context['attach_dir'] . '/' . $thumb_filename);
-						$thumb_path = $context['attach_dir'] . '/' . $thumb_filename;
-						$context['dir_size'] = 0;
-						$context['dir_files'] = 0;
-					}
-				}
-			}
+			$attachmentsDir->checkDirSize($thumb_size);
 
 			// If a new folder has been already created. Gotta move this thumb there then.
-			if ($modSettings['currentAttachmentUploadDir'] !== $attachmentOptions['id_folder'])
+			if ($attachmentsDir->isCurrentDirectoryId($attachmentOptions['id_folder']) === false)
 			{
-				rename($thumb_path, $context['attach_dir'] . '/' . $thumb_filename);
-				$thumb_path = $context['attach_dir'] . '/' . $thumb_filename;
+				rename($thumb_path, $attachmentsDir->getCurrent() . '/' . $thumb_filename);
+				$thumb_path = $attachmentsDir->getCurrent() . '/' . $thumb_filename;
 			}
 
 			// To the database we go!
@@ -1176,7 +711,7 @@ function createAttachment(&$attachmentOptions)
 					'size' => 'int', 'width' => 'int', 'height' => 'int', 'mime_type' => 'string-20', 'approved' => 'int',
 				),
 				array(
-					$modSettings['currentAttachmentUploadDir'], (int) $attachmentOptions['post'], 3, $thumb_filename, $thumb_file_hash, $attachmentOptions['fileext'],
+					$attachmentsDir->currentDirectoryId(), (int) $attachmentOptions['post'], 3, $thumb_filename, $thumb_file_hash, $attachmentOptions['fileext'],
 					$thumb_size, $thumb_width, $thumb_height, $thumb_mime, (int) $attachmentOptions['approved'],
 				),
 				array('id_attach')
@@ -1195,7 +730,7 @@ function createAttachment(&$attachmentOptions)
 					)
 				);
 
-				rename($thumb_path, getAttachmentFilename($thumb_filename, $attachmentOptions['thumb'], $modSettings['currentAttachmentUploadDir'], false, $thumb_file_hash));
+				rename($thumb_path, getAttachmentFilename($thumb_filename, $attachmentOptions['thumb'], $attachmentsDir->currentDirectoryId(), false, $thumb_file_hash));
 			}
 		}
 	}
@@ -1633,42 +1168,19 @@ function url_image_size($url)
 /**
  * The current attachments path:
  *
- * What it does:
- *  - BOARDDIR . '/attachments', if nothing is set yet.
- *  - if the forum is using multiple attachments directories,
- *    then the current path is stored as unserialize($modSettings['attachmentUploadDir'])[$modSettings['currentAttachmentUploadDir']]
- *  - otherwise, the current path is $modSettings['attachmentUploadDir'].
+ * see AttachmentsDirectory->getCurrent
  *
  * @return string
+ * @deprecated since 2.0 see AttachmentsDirectory->getCurrent
  * @package Attachments
  */
 function getAttachmentPath()
 {
 	global $modSettings;
 
-	// Make sure this thing exists and it is unserialized
-	if (empty($modSettings['attachmentUploadDir']))
-	{
-		$attachmentDir = BOARDDIR . '/attachments';
-	}
-	elseif (!empty($modSettings['currentAttachmentUploadDir']) && !is_array($modSettings['attachmentUploadDir']) && (@unserialize($modSettings['attachmentUploadDir']) !== false))
-	{
-		// @todo this is here to prevent the package manager to die when complete the installation of the patch (the new Util class has not yet been loaded so we need the normal one)
-		if (function_exists('\\ElkArte\\Util::unserialize'))
-		{
-			$attachmentDir = Util::unserialize($modSettings['attachmentUploadDir']);
-		}
-		else
-		{
-			$attachmentDir = unserialize($modSettings['attachmentUploadDir']);
-		}
-	}
-	else
-	{
-		$attachmentDir = $modSettings['attachmentUploadDir'];
-	}
+	$attachmentsDir = new AttachmentsDirectory($modSettings);
 
-	return is_array($attachmentDir) ? $attachmentDir[$modSettings['currentAttachmentUploadDir']] : $attachmentDir;
+	return $attachmentsDir->getCurrent();
 }
 
 /**
@@ -1695,14 +1207,15 @@ function getAvatarPath()
  *
  * @return int 1 if multiple attachment directories are not enabled,
  * or the id of the current attachment directory otherwise.
+ * @deprecated since 2.0 see AttachmentsDirectory->currentDirectoryId
  * @package Attachments
  */
 function getAttachmentPathID()
 {
 	global $modSettings;
 
-	// utility function for the endless $id_folder computation for attachments.
-	return !empty($modSettings['currentAttachmentUploadDir']) ? $modSettings['currentAttachmentUploadDir'] : 1;
+	$attachmentsDir = new AttachmentsDirectory($modSettings);
+	return $attachmentsDir->currentDirectoryId();
 }
 
 /**
@@ -2208,19 +1721,8 @@ function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $ne
 		return $enc_name;
 	}
 
-	// Are we using multiple directories?
-	if (!empty($modSettings['currentAttachmentUploadDir']))
-	{
-		if (!is_array($modSettings['attachmentUploadDir']))
-		{
-			$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
-		}
-		$path = $modSettings['attachmentUploadDir'][$dir];
-	}
-	else
-	{
-		$path = $modSettings['attachmentUploadDir'];
-	}
+	$attachmentsDir = new AttachmentsDirectory($modSettings);
+	$path = $attachmentsDir->getCurrent();
 
 	$filename = file_exists($path . '/' . $enc_name) ? $path . '/' . $enc_name : $path . '/' . $clean_name;
 
@@ -2285,19 +1787,8 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 		return getLegacyAttachmentFilename($filename, $attachment_id, $dir, $new);
 	}
 
-	// Are we using multiple directories?
-	if (!empty($modSettings['currentAttachmentUploadDir']))
-	{
-		if (!is_array($modSettings['attachmentUploadDir']))
-		{
-			$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
-		}
-		$path = isset($modSettings['attachmentUploadDir'][$dir]) ? $modSettings['attachmentUploadDir'][$dir] : $modSettings['basedirectory_for_attachments'];
-	}
-	else
-	{
-		$path = $modSettings['attachmentUploadDir'];
-	}
+	$attachmentsDir = new AttachmentsDirectory($modSettings);
+	$path = $attachmentsDir->getCurrent();
 
 	return $path . '/' . $attachment_id . '_' . $file_hash . '.elk';
 }

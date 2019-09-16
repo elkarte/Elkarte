@@ -21,6 +21,7 @@ use ElkArte\Action;
 use ElkArte\Exceptions\Exception;
 use ElkArte\SettingsForm\SettingsForm;
 use ElkArte\Util;
+use ElkArte\AttachmentsDirectory;
 
 /**
  * This is the attachments and avatars controller class.
@@ -284,11 +285,11 @@ class ManageAttachments extends AbstractController
 		global $modSettings, $txt, $context;
 
 		// Get the current attachment directory.
-		$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
-		$context['attachmentUploadDir'] = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
+		$attachmentsDir = new AttachmentsDirectory($modSettings);
+		$context['attachmentUploadDir'] = $attachmentsDir->getCurrent();
 
 		// First time here?
-		if (empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && (is_array($modSettings['attachmentUploadDir']) && count($modSettings['attachmentUploadDir']) == 1))
+		if (empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && (is_array($modSettings['attachmentUploadDir']) && $attachmentsDir->countDirs() == 1))
 		{
 			$modSettings['attachmentUploadDir'] = $modSettings['attachmentUploadDir'][1];
 		}
@@ -301,7 +302,7 @@ class ManageAttachments extends AbstractController
 
 		$context['valid_upload_dir'] = is_dir($context['attachmentUploadDir']) && is_writable($context['attachmentUploadDir']);
 
-		if (!empty($modSettings['automanage_attachments']))
+		if ($attachmentsDir->autoManageEnabled())
 		{
 			$context['valid_basedirectory'] = !empty($modSettings['basedirectory_for_attachments']) && is_writable($modSettings['basedirectory_for_attachments']);
 		}
@@ -318,7 +319,7 @@ class ManageAttachments extends AbstractController
 		$txt['basedirectory_for_attachments_path'] = isset($modSettings['basedirectory_for_attachments']) ? $modSettings['basedirectory_for_attachments'] : '';
 		$txt['use_subdirectories_for_attachments_note'] = empty($modSettings['attachment_basedirectories']) || empty($modSettings['use_subdirectories_for_attachments']) ? $txt['use_subdirectories_for_attachments_note'] : '';
 		$txt['attachmentUploadDir_multiple_configure'] = '<a class="linkbutton" href="' . getUrl('admin', ['action' => 'admin', 'area' => 'manageattachments', 'sa' => 'attachpaths']) . '">' . $txt['attachmentUploadDir_multiple_configure'] . '</a>';
-		$txt['attach_current_dir'] = empty($modSettings['automanage_attachments']) ? $txt['attach_current_dir'] : $txt['attach_last_dir'];
+		$txt['attach_current_dir'] = $attachmentsDir->autoManageEnabled() ? $txt['attach_last_dir'] : $txt['attach_current_dir'];
 		$txt['attach_current_dir_warning'] = $txt['attach_current_dir'] . $txt['attach_current_dir_warning'];
 		$txt['basedirectory_for_attachments_warning'] = $txt['basedirectory_for_attachments_current'] . $txt['basedirectory_for_attachments_warning'];
 
@@ -658,14 +659,14 @@ class ManageAttachments extends AbstractController
 		$current_dir = currentAttachDirProperties();
 
 		// If they specified a limit only....
-		if (!empty($modSettings['attachmentDirSizeLimit']))
+		if ($attach_dirs->hasSizeLimit())
 		{
-			$context['attachment_space'] = comma_format(max($modSettings['attachmentDirSizeLimit'] - $current_dir['size'], 0), 2);
+			$context['attachment_space'] = comma_format($attach_dirs->remainingSpace($current_dir['size']), 2);
 		}
 
-		if (!empty($modSettings['attachmentDirFileLimit']))
+		if ($attach_dirs->hasNumFilesLimit())
 		{
-			$context['attachment_files'] = comma_format(max($modSettings['attachmentDirFileLimit'] - $current_dir['files'], 0), 0);
+			$context['attachment_files'] = comma_format($attach_dirs->remainingFiles($current_dir['files']), 0);
 		}
 
 		$context['attachment_current_size'] = byte_format($current_dir['size']);
@@ -1174,20 +1175,7 @@ class ManageAttachments extends AbstractController
 	{
 		global $modSettings, $context, $txt;
 
-		// Since this needs to be done eventually.
-		if (!is_array($modSettings['attachmentUploadDir']))
-		{
-			$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
-		}
-
-		if (!isset($modSettings['attachment_basedirectories']))
-		{
-			$modSettings['attachment_basedirectories'] = array();
-		}
-		elseif (!is_array($modSettings['attachment_basedirectories']))
-		{
-			$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
-		}
+		$attachmentsDir = new AttachmentsDirectory($modSettings);
 
 		$errors = array();
 
@@ -1196,7 +1184,7 @@ class ManageAttachments extends AbstractController
 		{
 			checkSession();
 
-			$this->current_dir = $this->_req->getPost('current_dir', 'intval', 0);
+			$current_dir = $this->_req->getPost('current_dir', 'intval', 0);
 			$new_dirs = array();
 
 			require_once(SUBSDIR . '/Themes.subs.php');
@@ -1225,10 +1213,10 @@ class ManageAttachments extends AbstractController
 				}
 
 				// Hmm, a new path maybe?
-				if (!array_key_exists($id, $modSettings['attachmentUploadDir']))
+				if ($attachmentsDir->directoryExists($id) === false)
 				{
 					// or is it?
-					if (in_array($path, $modSettings['attachmentUploadDir']) || in_array(BOARDDIR . DIRECTORY_SEPARATOR . $path, $modSettings['attachmentUploadDir']))
+					if ($attachmentsDir->directoryExists($path))
 					{
 						$errors[] = $path . ': ' . $txt['attach_dir_duplicate_msg'];
 						continue;
@@ -1242,188 +1230,49 @@ class ManageAttachments extends AbstractController
 					}
 
 					// OK, so let's try to create it then.
-					if (automanage_attachments_create_directory($path))
-					{
-						$this->current_dir = $modSettings['currentAttachmentUploadDir'];
-					}
-					else
+					if ($attachmentsDir->automanage_attachments_create_directory($path) === false)
 					{
 						$errors[] = $path . ': ' . $txt[$context['dir_creation_error']];
+						continue;
 					}
 				}
 
 				// Changing a directory name?
-				if (!empty($modSettings['attachmentUploadDir'][$id]) && !empty($path) && $real_path != $modSettings['attachmentUploadDir'][$id])
-				{
-					if ($real_path != $modSettings['attachmentUploadDir'][$id] && !is_dir($real_path))
+					try
 					{
-						if (!@rename($modSettings['attachmentUploadDir'][$id], $real_path))
+						if (!empty($path))
 						{
-							$errors[] = $real_path . ': ' . $txt['attach_dir_no_rename'];
-							$real_path = $modSettings['attachmentUploadDir'][$id];
-						}
-					}
-					else
-					{
-						$errors[] = $real_path . ': ' . $txt['attach_dir_exists_msg'];
-						$real_path = $modSettings['attachmentUploadDir'][$id];
-					}
-
-					// Update the base directory path
-					if (!empty($modSettings['attachment_basedirectories']) && array_key_exists($id, $modSettings['attachment_basedirectories']))
-					{
-						$base = $modSettings['basedirectory_for_attachments'] === $modSettings['attachmentUploadDir'][$id] ? $real_path : $modSettings['basedirectory_for_attachments'];
-
-						$modSettings['attachment_basedirectories'][$id] = $real_path;
-						updateSettings(array(
-							'attachment_basedirectories' => serialize($modSettings['attachment_basedirectories']),
-							'basedirectory_for_attachments' => $base,
-						));
-						$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
-					}
-				}
-
-				if (empty($path))
-				{
-					$real_path = $modSettings['attachmentUploadDir'][$id];
-
-					// It's not a good idea to delete the current directory.
-					if ($id == (!empty($this->current_dir) ? $this->current_dir : $modSettings['currentAttachmentUploadDir']))
-					{
-						$errors[] = $real_path . ': ' . $txt['attach_dir_is_current'];
-					}
-					// Or the current base directory
-					elseif (!empty($modSettings['basedirectory_for_attachments']) && $modSettings['basedirectory_for_attachments'] === $modSettings['attachmentUploadDir'][$id])
-					{
-						$errors[] = $real_path . ': ' . $txt['attach_dir_is_current_bd'];
-					}
-					else
-					{
-						// Let's not try to delete a path with files in it.
-						$num_attach = countAttachmentsInFolders($id);
-
-						// A check to see if it's a used base dir.
-						if (!empty($modSettings['attachment_basedirectories']))
-						{
-							// Count any sub-folders.
-							foreach ($modSettings['attachmentUploadDir'] as $sub)
-							{
-								if (strpos($sub, $real_path . DIRECTORY_SEPARATOR) !== false)
-								{
-									$num_attach++;
-								}
-							}
-						}
-
-						// It's safe to delete. So try to delete the folder also
-						if ($num_attach == 0)
-						{
-							if (is_dir($real_path))
-							{
-								$doit = true;
-							}
-							elseif (is_dir(BOARDDIR . DIRECTORY_SEPARATOR . $real_path))
-							{
-								$doit = true;
-								$real_path = BOARDDIR . DIRECTORY_SEPARATOR . $real_path;
-							}
-
-							if (isset($doit))
-							{
-								unlink($real_path . '/.htaccess');
-								unlink($real_path . '/index.php');
-								if (!@rmdir($real_path))
-								{
-									$error = $real_path . ': ' . $txt['attach_dir_no_delete'];
-								}
-							}
-
-							// Remove it from the base directory list.
-							if (empty($error) && !empty($modSettings['attachment_basedirectories']))
-							{
-								unset($modSettings['attachment_basedirectories'][$id]);
-								updateSettings(array('attachment_basedirectories' => serialize($modSettings['attachment_basedirectories'])));
-								$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
-							}
+							$attachmentsDir->rename($id, $real_path);
 						}
 						else
 						{
-							$error = $real_path . ': ' . $txt['attach_dir_no_remove'];
-						}
-
-						if (empty($error))
-						{
-							continue;
-						}
-						else
-						{
-							$errors[] = $error;
+							$attachmentsDir->delete($id);
 						}
 					}
-				}
+					catch (\Exception $e)
+					{
+						$errors[] = $real_path . ': ' . $txt[$e->getMessage()];
+					}
 
 				$new_dirs[$id] = $real_path;
 			}
 
 			// We need to make sure the current directory is right.
-			if (empty($this->current_dir) && !empty($modSettings['currentAttachmentUploadDir']))
+			if (empty($current_dir) && !empty($attachmentsDir->currentDirectoryId()))
 			{
-				$this->current_dir = $modSettings['currentAttachmentUploadDir'];
+				$current_dir = $attachmentsDir->currentDirectoryId();
 			}
 
 			// Find the current directory if there's no value carried,
-			if (empty($this->current_dir) || empty($new_dirs[$this->current_dir]))
+			if (empty($current_dir) || empty($new_dirs[$current_dir]))
 			{
-				if (array_key_exists($modSettings['currentAttachmentUploadDir'], $modSettings['attachmentUploadDir']))
-				{
-					$this->current_dir = $modSettings['currentAttachmentUploadDir'];
-				}
-				else
-				{
-					$this->current_dir = max(array_keys($modSettings['attachmentUploadDir']));
-				}
+				$current_dir = $attachmentsDir->currentDirectoryId();
 			}
 
 			// If the user wishes to go back, update the last_dir array
-			if ($this->current_dir !== $modSettings['currentAttachmentUploadDir'] && !empty($modSettings['last_attachments_directory']) && (isset($modSettings['last_attachments_directory'][$this->current_dir]) || isset($modSettings['last_attachments_directory'][0])))
+			if ($current_dir !== $attachmentsDir->currentDirectoryId())
 			{
-				if (!is_array($modSettings['last_attachments_directory']))
-				{
-					$modSettings['last_attachments_directory'] = Util::unserialize($modSettings['last_attachments_directory']);
-				}
-
-				$num = substr(strrchr($modSettings['attachmentUploadDir'][$this->current_dir], '_'), 1);
-				if (is_numeric($num))
-				{
-					// Need to find the base folder.
-					$bid = -1;
-					$use_subdirectories_for_attachments = 0;
-					if (!empty($modSettings['attachment_basedirectories']))
-					{
-						foreach ($modSettings['attachment_basedirectories'] as $bid => $base)
-						{
-							if (strpos($modSettings['attachmentUploadDir'][$this->current_dir], $base . DIRECTORY_SEPARATOR) !== false)
-							{
-								$use_subdirectories_for_attachments = 1;
-								break;
-							}
-						}
-					}
-
-					if ($use_subdirectories_for_attachments == 0 && strpos($modSettings['attachmentUploadDir'][$this->current_dir], BOARDDIR . DIRECTORY_SEPARATOR) !== false)
-					{
-						$bid = 0;
-					}
-
-					$modSettings['last_attachments_directory'][$bid] = (int) $num;
-					$modSettings['basedirectory_for_attachments'] = !empty($modSettings['basedirectory_for_attachments']) ? $modSettings['basedirectory_for_attachments'] : '';
-					$modSettings['use_subdirectories_for_attachments'] = !empty($modSettings['use_subdirectories_for_attachments']) ? $modSettings['use_subdirectories_for_attachments'] : 0;
-					updateSettings(array(
-						'last_attachments_directory' => serialize($modSettings['last_attachments_directory']),
-						'basedirectory_for_attachments' => $bid == 0 ? $modSettings['basedirectory_for_attachments'] : $modSettings['attachment_basedirectories'][$bid],
-						'use_subdirectories_for_attachments' => $use_subdirectories_for_attachments,
-					));
-				}
+				$attachmentsDir->updateLastDirs($current_dir);
 			}
 
 			// Going back to just one path?
@@ -1447,7 +1296,7 @@ class ManageAttachments extends AbstractController
 			{
 				// Save it to the database.
 				$update = array(
-					'currentAttachmentUploadDir' => $this->current_dir,
+					'currentAttachmentUploadDir' => $current_dir,
 					'attachmentUploadDir' => serialize($new_dirs),
 				);
 			}
@@ -1762,16 +1611,7 @@ class ManageAttachments extends AbstractController
 
 		checkSession();
 
-		// The list(s) of directory's that are available.
-		$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
-		if (!empty($modSettings['attachment_basedirectories']))
-		{
-			$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
-		}
-		else
-		{
-			$modSettings['basedirectory_for_attachments'] = array();
-		}
+		$attachmentsDir = new AttachmentsDirectory($modSettings);
 
 		// Clean the inputs
 		$this->from = $this->_req->getPost('from', 'intval');
@@ -1827,8 +1667,9 @@ class ManageAttachments extends AbstractController
 				$modSettings['basedirectory_for_attachments'] = $this->auto > 0 ? $modSettings['attachmentUploadDir'][$this->auto] : $modSettings['basedirectory_for_attachments'];
 
 				// Finally, where do they need to go
-				automanage_attachments_check_directory();
-				$new_dir = $modSettings['currentAttachmentUploadDir'];
+				$attachmentDirectory = new AttachmentsDirectory($modSettings);
+				$attachmentDirectory->automanage_attachments_check_directory(true);
+				$new_dir = $attachmentDirectory->currentDirectoryId();
 			}
 			// Or to a specified directory
 			else
@@ -1872,26 +1713,27 @@ class ManageAttachments extends AbstractController
 				// Move them
 				$moved = array();
 				$dir_size = empty($dir_size) ? 0 : $dir_size;
+				$limiting_by_size_num = $attachmentsDir->hasSizeLimit() || $attachmentsDir->hasNumFilesLimit();
+
 				foreach ($tomove as $row)
 				{
 					$source = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-					$dest = $modSettings['attachmentUploadDir'][$new_dir] . '/' . basename($source);
+					$dest = $attachmentsDir->getPathById($new_dir) . '/' . basename($source);
 
 					// Size and file count check
-					if (!empty($modSettings['attachmentDirSizeLimit']) || !empty($modSettings['attachmentDirFileLimit']))
+					if ($limiting_by_size_num)
 					{
 						$dir_files++;
 						$dir_size += !empty($row['size']) ? $row['size'] : filesize($source);
 
 						// If we've reached a directory limit. Do something if we are in auto mode, otherwise set an error.
-						if (!empty($modSettings['attachmentDirSizeLimit']) && $dir_size > $modSettings['attachmentDirSizeLimit'] * 1024 || (!empty($modSettings['attachmentDirFileLimit']) && $dir_files > $modSettings['attachmentDirFileLimit']))
+						if ($attachmentsDir->remainingSpace($dir_size) === 0 || $attachmentsDir->remainingFiles($dir_files) === 0)
 						{
 							// Since we're in auto mode. Create a new folder and reset the counters.
-							if (!empty($this->auto))
+							$create_result = $attachmentsDir->automanage_attachments_by_space();
+							if ($create_result === true)
 							{
-								automanage_attachments_by_space();
-
-								$results[] = sprintf($txt['attachments_transfered'], $total_moved, $modSettings['attachmentUploadDir'][$new_dir]);
+								$results[] = sprintf($txt['attachments_transfered'], $total_moved, $attachmentsDir->getPathById($new_dir));
 								if (!empty($total_not_moved))
 								{
 									$results[] = sprintf($txt['attachments_not_transfered'], $total_not_moved);
@@ -1954,7 +1796,7 @@ class ManageAttachments extends AbstractController
 				}
 			}
 
-			$results[] = sprintf($txt['attachments_transfered'], $total_moved, $modSettings['attachmentUploadDir'][$new_dir]);
+			$results[] = sprintf($txt['attachments_transfered'], $total_moved, $attachmentsDir->getPathById($new_dir));
 			if (!empty($total_not_moved))
 			{
 				$results[] = sprintf($txt['attachments_not_transfered'], $total_not_moved);
