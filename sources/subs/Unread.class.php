@@ -24,8 +24,6 @@ class Unread
 	const UNREADREPLIES = 1;
 
 	/** @var bool */
-	private $_have_temp_table = false;
-	/** @var bool */
 	private $_ascending = false;
 	/** @var string */
 	private $_sort_query = '';
@@ -131,22 +129,6 @@ class Unread
 	}
 
 	/**
-	 * Tries to create a temporary table according to the type of action the
-	 * class is performing
-	 */
-	public function createTempTable()
-	{
-		if ($this->_action === self::UNREAD)
-			$this->_recent_log_topics_unread_tempTable();
-		else
-		{
-			$board = !empty($this->_query_parameters['boards'][0]) && count($this->_query_parameters['boards']) === 1 ? $this->_query_parameters['boards'][0] : 0;
-
-			$this->_unreadreplies_tempTable($board);
-		}
-	}
-
-	/**
 	 * Sets if the data returned by the class will include a shorted version
 	 * of the body of the last message.
 	 *
@@ -160,14 +142,6 @@ class Unread
 			$this->_preview_bodies = 'all';
 		else
 			$this->_preview_bodies = (int) $chars;
-	}
-
-	/**
-	 * If a temporary table has been created
-	 */
-	public function hasTempTable()
-	{
-		return $this->_have_temp_table;
 	}
 
 	/**
@@ -384,26 +358,7 @@ class Unread
 	 */
 	private function _getUnreadReplies($start, $limit, $include_avatars = false)
 	{
-		if (!empty($this->_have_temp_table))
-		{
-			$request = $this->_db->query('', '
-				SELECT t.id_topic
-				FROM {db_prefix}topics_posted_in AS t
-					LEFT JOIN {db_prefix}log_topics_posted_in AS lt ON (lt.id_topic = t.id_topic)
-				WHERE t.id_board IN ({array_int:boards})
-					AND COALESCE(lt.id_msg, t.id_msg) < t.id_last_msg
-				ORDER BY {raw:order}
-				LIMIT {int:offset}, {int:limit}',
-				array_merge($this->_query_parameters, array(
-					'order' => (in_array($this->_sort_query, array('t.id_last_msg', 't.id_topic')) ? $this->_sort_query : 't.sort_key') . ($this->_ascending ? '' : ' DESC'),
-					'offset' => $start,
-					'limit' => $limit,
-				))
-			);
-		}
-		else
-		{
-			$request = $this->_db->query('unread_replies', '
+        $request = $this->_db->query('unread_replies', '
 				SELECT DISTINCT t.id_topic
 				FROM {db_prefix}topics AS t
 					INNER JOIN {db_prefix}messages AS m ON (m.id_topic = t.id_topic AND m.id_member = {int:current_member})' . (strpos($this->_sort_query, 'ms.') === false ? '' : '
@@ -414,20 +369,20 @@ class Unread
 				WHERE t.id_board IN ({array_int:boards})
 					AND t.id_last_msg >= {int:min_message}
 					AND COALESCE(lt.id_msg, lmr.id_msg, 0) < t.id_last_msg' .
-					($this->_post_mod ? ' AND t.approved = {int:is_approved}' : '') .
-					($this->_unwatch ? ' AND COALESCE(lt.unwatched, 0) != 1' : '') . '
+            ($this->_post_mod ? ' AND t.approved = {int:is_approved}' : '') .
+            ($this->_unwatch ? ' AND COALESCE(lt.unwatched, 0) != 1' : '') . '
 				ORDER BY {raw:order}
 				LIMIT {int:offset}, {int:limit}',
-				array_merge($this->_query_parameters, array(
-					'current_member' => $this->_user_id,
-					'min_message' => $this->_min_message,
-					'is_approved' => 1,
-					'order' => $this->_sort_query . ($this->_ascending ? '' : ' DESC'),
-					'offset' => $start,
-					'limit' => $limit,
-				))
-			);
-		}
+            array_merge($this->_query_parameters, array(
+                'current_member' => $this->_user_id,
+                'min_message' => $this->_min_message,
+                'is_approved' => 1,
+                'order' => $this->_sort_query . ($this->_ascending ? '' : ' DESC'),
+                'offset' => $start,
+                'limit' => $limit,
+            ))
+        );
+
 		$topics = array();
 		while ($row = $this->_db->fetch_assoc($request))
 			$topics[] = $row['id_topic'];
@@ -506,114 +461,5 @@ class Unread
 		$this->_db->free_result($request);
 
 		return Topic_Util::prepareContext($return, true, ((int) $this->_preview_bodies) + 128);
-	}
-
-	/**
-	 * Handle creation of temporary tables to track unread replies.
-	 * The main benefit of this temporary table is not that it's faster;
-	 * it's that it avoids locks later.
-	 *
-	 * @param int $board_id - id of a board if looking at the unread of a single
-	 *            board, 0 if looking at the unread of the entire forum
-	 */
-	private function _unreadreplies_tempTable($board_id)
-	{
-		$this->_db->query('', '
-			DROP TABLE IF EXISTS {db_prefix}topics_posted_in',
-			array(
-			)
-		);
-
-		$this->_db->query('', '
-			DROP TABLE IF EXISTS {db_prefix}log_topics_posted_in',
-			array(
-			)
-		);
-
-		$sortKey_joins = array(
-			'ms.subject' => '
-				INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)',
-			'COALESCE(mems.real_name, ms.poster_name)' => '
-				INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)
-				LEFT JOIN {db_prefix}members AS mems ON (mems.id_member = ms.id_member)',
-		);
-
-		$this->_db->skip_next_error();
-		$this->_have_temp_table = $this->_db->query('', '
-			CREATE TEMPORARY TABLE {db_prefix}topics_posted_in (
-				id_topic mediumint(8) unsigned NOT NULL default {string:string_zero},
-				id_board smallint(5) unsigned NOT NULL default {string:string_zero},
-				id_last_msg int(10) unsigned NOT NULL default {string:string_zero},
-				id_msg int(10) unsigned NOT NULL default {string:string_zero},
-				PRIMARY KEY (id_topic)
-			)
-			SELECT t.id_topic, t.id_board, t.id_last_msg, COALESCE(lmr.id_msg, 0) AS id_msg' . (!in_array($this->_sort_query, array('t.id_last_msg', 't.id_topic')) ? ', ' . $this->_sort_query . ' AS sort_key' : '') . '
-			FROM {db_prefix}messages AS m
-				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)' . ($this->_unwatch ? '
-				LEFT JOIN {db_prefix}log_topics AS lt ON (t.id_topic = lt.id_topic AND lt.id_member = {int:current_member})' : '') . '
-				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})' . (isset($sortKey_joins[$this->_sort_query]) ? $sortKey_joins[$this->_sort_query] : '') . '
-			WHERE m.id_member = {int:current_member}' . (!empty($board_id) ? '
-				AND t.id_board = {int:current_board}' : '') . ($this->_post_mod ? '
-				AND t.approved = {int:is_approved}' : '') . ($this->_unwatch ? '
-				AND COALESCE(lt.unwatched, 0) != 1' : '') . '
-			GROUP BY m.id_topic',
-			array(
-				'current_board' => $board_id,
-				'current_member' => $this->_user_id,
-				'is_approved' => 1,
-				'string_zero' => '0',
-			)
-		) !== false;
-
-		// If that worked, create a sample of the log_topics table too.
-		if ($this->_have_temp_table)
-		{
-			$this->_db->skip_next_error();
-			$this->_have_temp_table = $this->_db->query('', '
-				CREATE TEMPORARY TABLE {db_prefix}log_topics_posted_in (
-					PRIMARY KEY (id_topic)
-				)
-				SELECT lt.id_topic, lt.id_msg
-				FROM {db_prefix}log_topics AS lt
-					INNER JOIN {db_prefix}topics_posted_in AS pi ON (pi.id_topic = lt.id_topic)
-				WHERE lt.id_member = {int:current_member}',
-				array(
-					'current_member' => $this->_user_id,
-				)
-			) !== false;
-		}
-	}
-
-	/**
-	 * Creates a temporary table for logging of unread topics
-	 */
-	private function _recent_log_topics_unread_tempTable()
-	{
-		$this->_db->query('', '
-			DROP TABLE IF EXISTS {db_prefix}log_topics_unread',
-			array(
-			)
-		);
-
-		$this->_db->skip_next_error();
-		// Let's copy things out of the log_topics table, to reduce searching.
-		$this->_have_temp_table = $this->_db->query('', '
-			CREATE TEMPORARY TABLE {db_prefix}log_topics_unread (
-				PRIMARY KEY (id_topic)
-			)
-			SELECT lt.id_topic, lt.id_msg, lt.unwatched
-			FROM {db_prefix}topics AS t
-				INNER JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic)
-			WHERE lt.id_member = {int:current_member}
-				AND t.id_board IN ({array_int:boards})' . (empty($this->_earliest_msg) ? '' : '
-				AND t.id_last_msg > {int:earliest_msg}') . ($this->_post_mod ? '
-				AND t.approved = {int:is_approved}' : '') . ($this->_unwatch ? '
-				AND lt.unwatched != 1' : ''),
-			array_merge($this->_query_parameters, array(
-				'current_member' => $this->_user_id,
-				'earliest_msg' => $this->_earliest_msg,
-				'is_approved' => 1,
-			))
-		) !== false;
 	}
 }
