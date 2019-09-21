@@ -17,6 +17,8 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\User;
+
 /**
  * Deals with logging in and out members, and the validation of them
  *
@@ -117,7 +119,7 @@ class Auth extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/Auth.subs.php');
 
 		// Beyond this point you are assumed to be a guest trying to login.
-		if (empty(\ElkArte\User::$info->is_guest))
+		if (empty(User::$info->is_guest))
 		{
 			redirectexit();
 		}
@@ -277,7 +279,7 @@ class Auth extends \ElkArte\AbstractController
 				// Old password passed, turn off hashing and ask for it again so we can update the db to something more secure.
 				$context['login_errors'] = array($txt['login_hash_error']);
 				$context['disable_login_hashing'] = true;
-				\ElkArte\User::logOutUser(true);
+				User::logOutUser(true);
 
 				return false;
 			}
@@ -301,7 +303,7 @@ class Auth extends \ElkArte\AbstractController
 					// Wrong password, lets enable plain text responses in case form hashing is causing problems
 					$context['disable_login_hashing'] = true;
 					$context['login_errors'] = array($txt['incorrect_password']);
-					\ElkArte\User::logOutUser(true);
+					User::logOutUser(true);
 
 					return false;
 				}
@@ -423,14 +425,14 @@ class Auth extends \ElkArte\AbstractController
 		unset($_SESSION['first_login']);
 
 		// Just ensure they aren't a guest!
-		if (empty(\ElkArte\User::$info['is_guest']))
+		if (empty(User::$info['is_guest']))
 		{
 			// Pass the logout information to integrations.
-			call_integration_hook('integrate_logout', array(\ElkArte\User::$settings['member_name']));
+			call_integration_hook('integrate_logout', array(User::$settings['member_name']));
 
 			// If you log out, you aren't online anymore :P.
 			require_once(SUBSDIR . '/Logging.subs.php');
-			logOnline(\ElkArte\User::$info['id'], false);
+			logOnline(User::$info['id'], false);
 		}
 
 		// Logout? Let's kill the admin/moderate/other sessions, too.
@@ -448,11 +450,11 @@ class Auth extends \ElkArte\AbstractController
 
 		// And some other housekeeping while we're at it.
 		session_destroy();
-		if (!empty(\ElkArte\User::$info['id']))
+		if (!empty(User::$info['id']))
 		{
-			\ElkArte\User::$settings->fixSalt(true);
+			User::$settings->fixSalt(true);
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData(\ElkArte\User::$info['id'], array('password_salt' => \ElkArte\User::$settings['password_salt']));
+			updateMemberData(User::$info['id'], array('password_salt' => User::$settings['password_salt']));
 		}
 
 		// Off to the merry board index we go!
@@ -548,7 +550,7 @@ class Auth extends \ElkArte\AbstractController
 			}
 
 			$this->user->can_mod = User::$info->canMod($modSettings['postmod_active']);
-			if ($this->user->can_mod && isset(\ElkArte\User::$settings['openid_uri']) && empty(\ElkArte\User::$settings['openid_uri']))
+			if ($this->user->can_mod && isset(User::$settings['openid_uri']) && empty(User::$settings['openid_uri']))
 			{
 				$_SESSION['moderate_time'] = time();
 				unset($_SESSION['just_registered']);
@@ -731,12 +733,12 @@ function checkActivation()
 		$context['login_errors'] = array();
 
 	// What is the true activation status of this account?
-	$activation_status = \ElkArte\User::$settings->getActivationStatus();
+	$activation_status = User::$settings->getActivationStatus();
 
 	// Check if the account is activated - COPPA first...
 	if ($activation_status == 5)
 	{
-		$context['login_errors'][] = $txt['coppa_no_concent'] . ' <a href="' . getUrl('action', ['action' => 'register', 'sa' => 'coppa', 'member' => \ElkArte\User::$settings['id_member']]) . '">' . $txt['coppa_need_more_details'] . '</a>';
+		$context['login_errors'][] = $txt['coppa_no_concent'] . ' <a href="' . getUrl('action', ['action' => 'register', 'sa' => 'coppa', 'member' => User::$settings['id_member']]) . '">' . $txt['coppa_need_more_details'] . '</a>';
 		return false;
 	}
 	// Awaiting approval still?
@@ -750,7 +752,7 @@ function checkActivation()
 		if (isset($_REQUEST['undelete']))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData(\ElkArte\User::$settings['id_member'], array('is_activated' => 1));
+			updateMemberData(User::$settings['id_member'], array('is_activated' => 1));
 			updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > 0 ? $modSettings['unapprovedMembers'] - 1 : 0)));
 		}
 		else
@@ -764,9 +766,9 @@ function checkActivation()
 	// Standard activation?
 	elseif ($activation_status != 1)
 	{
-		\ElkArte\Errors\Errors::instance()->log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . \ElkArte\User::$settings['member_name'] . '</span>', false);
+		\ElkArte\Errors\Errors::instance()->log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . User::$settings['member_name'] . '</span>', false);
 
-		$context['login_errors'][] = $txt['activate_not_completed1'] . ' <a class="linkbutton" href="' . getUrl('action', ['action' => 'register', 'sa' => 'activate', 'resend', 'u' => \ElkArte\User::$settings['id_member']]) . '">' . $txt['activate_not_completed2'] . '</a>';
+		$context['login_errors'][] = $txt['activate_not_completed1'] . ' <a class="linkbutton" href="' . getUrl('action', ['action' => 'register', 'sa' => 'activate', 'resend', 'u' => User::$settings['id_member']]) . '">' . $txt['activate_not_completed2'] . '</a>';
 		return false;
 	}
 	return true;
@@ -789,13 +791,13 @@ function doLogin(\ElkArte\UserSettingsLoader $user)
 	// Load authentication stuffs.
 	require_once(SUBSDIR . '/Auth.subs.php');
 
-	\ElkArte\User::reloadByUser($user, true);
+	User::reloadByUser($user, true);
 
 	// Call login integration functions.
-	call_integration_hook('integrate_login', array(\ElkArte\User::$settings['member_name'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 64 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime']));
+	call_integration_hook('integrate_login', array(User::$settings['member_name'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 64 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime']));
 
 	// Bam!  Cookie set.  A session too, just in case.
-	setLoginCookie(60 * $modSettings['cookieTime'], \ElkArte\User::$settings['id_member'], hash('sha256', (\ElkArte\User::$settings['passwd'] . \ElkArte\User::$settings['password_salt'])));
+	setLoginCookie(60 * $modSettings['cookieTime'], User::$settings['id_member'], hash('sha256', (User::$settings['passwd'] . User::$settings['password_salt'])));
 
 	// Reset the login threshold.
 	if (isset($_SESSION['failed_login']))
@@ -807,7 +809,7 @@ function doLogin(\ElkArte\UserSettingsLoader $user)
 	is_not_banned(true);
 
 	// An administrator, set up the login so they don't have to type it again.
-	if (\ElkArte\User::$info['is_admin'] && isset(\ElkArte\User::$settings['openid_uri']) && empty(\ElkArte\User::$settings['openid_uri']))
+	if (User::$info->is_admin && isset(User::$settings->openid_uri) && empty(User::$settings->openid_uri))
 	{
 		// Let's validate if they really want..
 		if (!empty($modSettings['auto_admin_session']) && $modSettings['auto_admin_session'] == 1)
@@ -822,7 +824,7 @@ function doLogin(\ElkArte\UserSettingsLoader $user)
 	unset($_SESSION['language'], $_SESSION['id_theme']);
 
 	// We want to know if this is first login
-	if (\ElkArte\User::$info->isFirstLogin())
+	if (User::$info->isFirstLogin())
 	{
 		$_SESSION['first_login'] = true;
 	}
@@ -836,20 +838,20 @@ function doLogin(\ElkArte\UserSettingsLoader $user)
 
 	// You've logged in, haven't you?
 	require_once(SUBSDIR . '/Members.subs.php');
-	updateMemberData($this->user->id, array('last_login' => time(), 'member_ip' => $this->user->ip, 'member_ip2' => $req->ban_ip()));
+	updateMemberData(User::$info->id, array('last_login' => time(), 'member_ip' => User::$info->ip, 'member_ip2' => $req->ban_ip()));
 
 	// Get rid of the online entry for that old guest....
 	require_once(SUBSDIR . '/Logging.subs.php');
-	deleteOnline('ip' . $this->user->ip);
+	deleteOnline('ip' . User::$info->ip);
 	$_SESSION['log_time'] = 0;
 
 	// Log this entry, only if we have it enabled.
 	if (!empty($modSettings['loginHistoryDays']))
-		logLoginHistory($this->user->id, $this->user->ip, $this->user->ip2);
+		logLoginHistory(User::$info->id, User::$info->ip, User::$info->ip2);
 
 	// Just log you back out if it's in maintenance mode and you AREN'T an admin.
 	if (empty($maintenance) || allowedTo('admin_forum'))
-		redirectexit('action=auth;sa=check;member=' . $this->user->id, detectServer()->is('needs_login_fix'));
+		redirectexit('action=auth;sa=check;member=' . User::$info->id, detectServer()->is('needs_login_fix'));
 	else
 		redirectexit('action=logout;' . $context['session_var'] . '=' . $context['session_id'], detectServer()->is('needs_login_fix'));
 }

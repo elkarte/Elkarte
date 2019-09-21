@@ -40,9 +40,9 @@ class PmRenderer extends Renderer
 	/**
 	 * {@inheritdoc }
 	 */
-	public function __construct($request, BodyParserInterface $bodyParser, ValuesContainer $opt = null)
+	public function __construct($request, $user, BodyParserInterface $bodyParser, ValuesContainer $opt = null)
 	{
-		parent::__construct($request, $bodyParser, $opt);
+		parent::__construct($request, $user, $bodyParser, $opt);
 		$this->_idx_mapper = new ValuesContainer([
 			'id_msg' => 'id_pm',
 			'id_member' => 'id_member_from',
