@@ -198,14 +198,7 @@ class ManageRegistration extends \ElkArte\AbstractController
 		if (allowedTo('manage_membergroups'))
 		{
 			require_once(SUBSDIR . '/Membergroups.subs.php');
-			if (allowedTo('admin_forum'))
-			{
-				$includes = array('admin', 'globalmod', 'member');
-			}
-			else
-			{
-				$includes = array('globalmod', 'member', 'custom');
-			}
+			$includes = allowedTo('admin_forum') ? array('admin', 'globalmod', 'member') : array('globalmod', 'member', 'custom');
 
 			$groups = array();
 			$membergroups = getBasicMembergroupData($includes, array('hidden', 'protected'));

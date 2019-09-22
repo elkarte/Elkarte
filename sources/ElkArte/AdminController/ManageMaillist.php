@@ -436,7 +436,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 					$text = $controller->action_pbe_post($data, $force, $key);
 
 					// Assuming all went well, remove this entry and file since we are done.
-					if ($text === true)
+					if ($text)
 					{
 						maillist_delete_error_entry($id);
 
@@ -567,7 +567,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 		$context['warning_data'] = array('notify' => '', 'notify_subject' => '', 'notify_body' => '');
 		$context['body'] = isset($fullerrortext) ? \BBC\ParserWrapper::instance()->parseEmail($fullerrortext) : '';
 		$context['item'] = isset($this->_req->post->item) ? $this->_req->post->item : '';
-		$context['notice_to'] = $txt['to'] . ' ' . isset($temp_email[0]['from']) ? $temp_email[0]['from'] : '';
+		$context['notice_to'] = $txt['to'] . ' ' . isset($temp_email[0]['from']) !== '' ? $temp_email[0]['from'] : '';
 		$context['page_title'] = $txt['bounce_title'];
 		$context['sub_template'] = 'bounce_email';
 	}
@@ -932,7 +932,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 			// If its regex we do a quick check to see if its valid or not
 			if ($this->_req->post->filter_type === 'regex')
 			{
-				$valid = (@preg_replace($this->_req->post->filter_from, $this->_req->post->filter_to, 'ElkArte') === null) ? false : true;
+				$valid = @preg_replace($this->_req->post->filter_from, $this->_req->post->filter_to, 'ElkArte') !== null;
 				if (!$valid)
 				{
 					// Seems to be bad ... reload the form, set the message
@@ -1326,7 +1326,7 @@ class ManageMaillist extends \ElkArte\AbstractController
 			// Test the regex
 			if ($this->_req->post->filter_type === 'regex' && !empty($this->_req->post->filter_from))
 			{
-				$valid = (preg_replace($this->_req->post->filter_from, '', 'ElkArte') === null) ? false : true;
+				$valid = preg_replace($this->_req->post->filter_from, '', 'ElkArte') !== null;
 				if (!$valid)
 				{
 					// Regex did not compute .. Danger, Will Robinson

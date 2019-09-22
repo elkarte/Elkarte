@@ -157,7 +157,7 @@ class ManageNews extends \ElkArte\AbstractController
 
 			foreach ($this->_req->post->news as $i => $news)
 			{
-				if (trim($news) == '')
+				if (trim($news) === '')
 					unset($this->_req->post->news[$i]);
 				else
 				{
@@ -603,7 +603,7 @@ class ManageNews extends \ElkArte\AbstractController
 				foreach ($this->_req->post->groups as $group => $dummy)
 					$context['recipients']['groups'][] = (int) $group;
 			}
-			elseif (trim($this->_req->post->groups) != '')
+			elseif (trim($this->_req->post->groups) !== '')
 			{
 				$groups = explode(',', $this->_req->post->groups);
 				foreach ($groups as $group)
@@ -619,7 +619,7 @@ class ManageNews extends \ElkArte\AbstractController
 				foreach ($this->_req->post->exclude_groups as $group => $dummy)
 					$context['recipients']['exclude_groups'][] = (int) $group;
 			}
-			elseif (trim($this->_req->post->exclude_groups) != '')
+			elseif (trim($this->_req->post->exclude_groups) !== '')
 			{
 				$groups = explode(',', $this->_req->post->exclude_groups);
 				foreach ($groups as $group)
@@ -634,7 +634,7 @@ class ManageNews extends \ElkArte\AbstractController
 			foreach ($addressed as $curmem)
 			{
 				$curmem = trim($curmem);
-				if ($curmem != '')
+				if ($curmem !== '')
 					$context['recipients']['emails'][$curmem] = $curmem;
 			}
 		}
@@ -818,7 +818,7 @@ class ManageNews extends \ElkArte\AbstractController
 					);
 
 				// Excluded groups?
-				if (array_intersect($groups, $context['recipients']['exclude_groups']))
+				if (array_intersect($groups, $context['recipients']['exclude_groups']) !== [])
 					continue;
 
 				// We might need this

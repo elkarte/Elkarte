@@ -707,12 +707,7 @@ class ManageBans extends \ElkArte\AbstractController
 			$ban_info['cannot']['register'] = !empty($ban_info['full_ban']) || empty($this->_req->post->cannot_register) ? 0 : 1;
 			$ban_info['cannot']['login'] = !empty($ban_info['full_ban']) || empty($this->_req->post->cannot_login) ? 0 : 1;
 
-			// Adding a new ban group
-			if (empty($ban_info['id']))
-				$ban_group_id = insertBanGroup($ban_info);
-			// Editing an existing ban group
-			else
-				$ban_group_id = updateBanGroup($ban_info);
+			$ban_group_id = empty($ban_info['id']) ? insertBanGroup($ban_info) : updateBanGroup($ban_info);
 
 			if ($ban_group_id !== false)
 			{

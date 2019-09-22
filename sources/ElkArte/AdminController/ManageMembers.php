@@ -342,7 +342,7 @@ class ManageMembers extends \ElkArte\AbstractController
 				elseif ($param_info['type'] === 'checkbox')
 				{
 					// Each checkbox or no checkbox at all is checked -> ignore.
-					if (!is_array($search_params[$param_name]) || count($search_params[$param_name]) == 0 || count($search_params[$param_name]) == count($param_info['values']))
+					if (!is_array($search_params[$param_name]) || count($search_params[$param_name]) === 0 || count($search_params[$param_name]) === count($param_info['values']))
 						continue;
 
 					$query_parts[] = ($param_info['db_fields'][0]) . ' IN ({array_string:' . $param_name . '_check})';
@@ -363,14 +363,14 @@ class ManageMembers extends \ElkArte\AbstractController
 			$mg_query_parts = array();
 
 			// Primary membergroups, but only if at least was was not selected.
-			if (!empty($search_params['membergroups'][1]) && count($context['membergroups']) != count($search_params['membergroups'][1]))
+			if (!empty($search_params['membergroups'][1]) && count($context['membergroups']) !== count($search_params['membergroups'][1]))
 			{
 				$mg_query_parts[] = 'mem.id_group IN ({array_int:group_check})';
 				$where_params['group_check'] = $search_params['membergroups'][1];
 			}
 
 			// Additional membergroups (these are only relevant if not all primary groups where selected!).
-			if (!empty($search_params['membergroups'][2]) && (empty($search_params['membergroups'][1]) || count($context['membergroups']) != count($search_params['membergroups'][1])))
+			if (!empty($search_params['membergroups'][2]) && (empty($search_params['membergroups'][1]) || count($context['membergroups']) !== count($search_params['membergroups'][1])))
 				foreach ($search_params['membergroups'][2] as $mg)
 				{
 					$mg_query_parts[] = 'FIND_IN_SET({int:add_group_' . $mg . '}, mem.additional_groups) != 0';
@@ -382,7 +382,7 @@ class ManageMembers extends \ElkArte\AbstractController
 				$query_parts[] = '(' . implode(' OR ', $mg_query_parts) . ')';
 
 			// Get all selected post count related membergroups.
-			if (!empty($search_params['postgroups']) && count($search_params['postgroups']) != count($context['postgroups']))
+			if (!empty($search_params['postgroups']) && count($search_params['postgroups']) !== count($context['postgroups']))
 			{
 				$query_parts[] = 'id_post_group IN ({array_int:post_groups})';
 				$where_params['post_groups'] = $search_params['postgroups'];
@@ -517,15 +517,10 @@ class ManageMembers extends \ElkArte\AbstractController
 							require_once(SUBSDIR . '/Members.subs.php');
 
 							// Calculate number of days since last online.
-							if (empty($rowData['last_login']))
-								$difference = $txt['never'];
-							else
-							{
-								$difference = htmlTime($rowData['last_login']);
-							}
+							$difference = empty($rowData['last_login']) ? $txt['never'] : htmlTime($rowData['last_login']);
 
 							// Show it in italics if they're not activated...
-							if ($rowData['is_activated'] % 10 != 1)
+							if ($rowData['is_activated'] % 10 !== 1)
 								$difference = sprintf('<em title="%1$s">%2$s</em>', $txt['not_activated'], $difference);
 
 							return $difference;
@@ -555,7 +550,7 @@ class ManageMembers extends \ElkArte\AbstractController
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							return '<input type="checkbox" name="members[]" value="' . $rowData['id_member'] . '" class="input_check" ' . ($rowData['id_member'] == \ElkArte\User::$info->id || $rowData['id_group'] == 1 || in_array(1, explode(',', $rowData['additional_groups'])) ? 'disabled="disabled"' : '') . ' />';
+							return '<input type="checkbox" name="members[]" value="' . $rowData['id_member'] . '" class="input_check" ' . ($rowData['id_member'] === \ElkArte\User::$info->id || $rowData['id_group'] == 1 || in_array(1, explode(',', $rowData['additional_groups'])) ? 'disabled="disabled"' : '') . ' />';
 						},
 						'class' => 'centertext',
 					),
@@ -633,10 +628,7 @@ class ManageMembers extends \ElkArte\AbstractController
 			{
 				if ($this->_req->post->maction == $group . 'group' && !empty($this->_req->post->new_membergroup))
 				{
-					if ($group === 'p')
-						$type = 'force_primary';
-					else
-						$type = 'only_additional';
+					$type = $group === 'p' ? 'force_primary' : 'only_additional';
 
 					// Change all the selected members' group.
 					if ($this->_req->post->new_membergroup != -1)
@@ -759,7 +751,7 @@ class ManageMembers extends \ElkArte\AbstractController
 					'type' => $type,
 					'amount' => $amount,
 					'desc' => isset($txt['admin_browse_filter_type_' . $type]) ? $txt['admin_browse_filter_type_' . $type] : '?',
-					'selected' => $type == $context['current_filter']
+					'selected' => $type === $context['current_filter']
 				);
 		}
 
@@ -1096,7 +1088,7 @@ class ManageMembers extends \ElkArte\AbstractController
 		$current_filter = $this->conditions['activated_status'] = (int) $this->_req->post->orig_filter;
 
 		// If we are applying a filter do just that - then redirect.
-		if (isset($this->_req->post->filter) && $this->_req->post->filter != $this->_req->post->orig_filter)
+		if (isset($this->_req->post->filter) && $this->_req->post->filter !== $this->_req->post->orig_filter)
 			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->sort . ';filter=' . $this->_req->post->filter . ';start=' . $this->_req->start);
 
 		// Nothing to do?

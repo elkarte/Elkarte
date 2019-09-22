@@ -819,7 +819,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// Verify this isn't inherited.
-		if ($current_group_id == -1 || $current_group_id == 0)
+		if ($current_group_id === -1 || $current_group_id === 0)
 			$parent = -2;
 		else
 		{
@@ -834,7 +834,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 		$givePerms = array('membergroup' => array(), 'board' => array());
 
 		// Guest group, we need illegal, guest permissions.
-		if ($current_group_id == -1)
+		if ($current_group_id === -1)
 		{
 			$this->illegal_permissions = array_merge($this->illegal_permissions, $this->illegal_guest_permissions);
 		}
@@ -860,7 +860,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 		}
 
 		// Insert the general permissions.
-		if ($current_group_id != 3 && empty($this->_pid))
+		if ($current_group_id !== 3 && empty($this->_pid))
 		{
 			deleteInvalidPermissions($current_group_id, $this->illegal_permissions);
 
@@ -981,7 +981,7 @@ class ManagePermissions extends \ElkArte\AbstractController
 		$context['sub_template'] = 'edit_profiles';
 
 		// If we're creating a new one do it first.
-		if (isset($this->_req->post->create) && trim($this->_req->post->profile_name) != '')
+		if (isset($this->_req->post->create) && trim($this->_req->post->profile_name) !== '')
 		{
 			checkSession();
 			validateToken('admin-mpp');
@@ -1027,12 +1027,12 @@ class ManagePermissions extends \ElkArte\AbstractController
 		foreach ($context['profiles'] as $id => $profile)
 		{
 			// Can't delete special ones.
-			$context['profiles'][$id]['can_edit'] = isset($txt['permissions_profile_' . $profile['unformatted_name']]) ? false : true;
+			$context['profiles'][$id]['can_edit'] = !isset($txt['permissions_profile_' . $profile['unformatted_name']]);
 			if ($context['profiles'][$id]['can_edit'])
 				$context['can_edit_something'] = true;
 
 			// You can only delete it if you can edit it AND it's not in use.
-			$context['profiles'][$id]['can_delete'] = $context['profiles'][$id]['can_edit'] && empty($profile['in_use']) ? true : false;
+			$context['profiles'][$id]['can_delete'] = $context['profiles'][$id]['can_edit'] && empty($profile['in_use']);
 		}
 
 		theme()->addJavascriptVar(array(

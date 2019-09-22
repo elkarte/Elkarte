@@ -178,20 +178,20 @@ class ManagePosts extends \ElkArte\AbstractController
 		$censor_proper = explode("\n", $modSettings['censor_proper']);
 
 		$context['censored_words'] = array();
-		for ($i = 0, $n = count($censor_vulgar); $i < $n; $i++)
+		foreach ($censor_vulgar as $i => $censor_vulgar_i)
 		{
-			if (empty($censor_vulgar[$i]))
+			if (empty($censor_vulgar_i))
 			{
 				continue;
 			}
 
 			// Skip it, it's either spaces or stars only.
-			if (trim(strtr($censor_vulgar[$i], '*', ' ')) === '')
+			if (trim(strtr($censor_vulgar_i, '*', ' ')) === '')
 			{
 				continue;
 			}
 
-			$context['censored_words'][htmlspecialchars(trim($censor_vulgar[$i]))] = isset($censor_proper[$i])
+			$context['censored_words'][htmlspecialchars(trim($censor_vulgar_i))] = isset($censor_proper[$i])
 				? htmlspecialchars($censor_proper[$i], ENT_COMPAT, 'UTF-8')
 				: '';
 		}

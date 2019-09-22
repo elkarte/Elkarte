@@ -1051,7 +1051,7 @@ class Maintenance extends \ElkArte\AbstractController
 		checkSession('post');
 
 		// Validate access
-		if (defined('I_KNOW_IT_MAY_BE_UNSAFE') === false && $this->_validate_access() === false)
+		if (!defined('I_KNOW_IT_MAY_BE_UNSAFE') && $this->_validate_access() === false)
 		{
 			return $this->action_database();
 		}
@@ -1300,7 +1300,7 @@ class Maintenance extends \ElkArte\AbstractController
 
 		// Get the list of the current system hooks, filter them if needed
 		$currentHooks = get_integration_hooks();
-		if (isset($this->_req->query->filter) && in_array($this->_req->query->filter, array_keys($currentHooks)))
+		if (isset($this->_req->query->filter) && array_key_exists($this->_req->query->filter, $currentHooks))
 		{
 			$context['filter_url'] = ';filter=' . $this->_req->query->filter;
 			$context['current_filter'] = $this->_req->query->filter;

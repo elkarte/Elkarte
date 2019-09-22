@@ -164,14 +164,14 @@ class ManageLanguages extends \ElkArte\AbstractController
 			$available_langs = getLanguages();
 			foreach ($available_langs as $lang)
 			{
-				if ($this->_req->post->def_language == $lang['filename'])
+				if ($this->_req->post->def_language === $lang['filename'])
 				{
 					$lang_exists = true;
 					break;
 				}
 			}
 
-			if ($this->_req->post->def_language != $language && $lang_exists)
+			if ($this->_req->post->def_language !== $language && $lang_exists)
 			{
 				$language = $this->_req->post->def_language;
 				$this->updateLanguage($language);
@@ -414,7 +414,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 			}
 
 			// I love PHP files, that's why I'm a developer and not an artistic type spending my time drinking absinth and living a life of sin...
-			if ($extension == 'php' && preg_match('~\w+\.\w+(?:-utf8)?\.php~', $filename))
+			if ($extension === 'php' && preg_match('~\w+\.\w+(?:-utf8)?\.php~', $filename))
 			{
 				$context_data += array(
 					'version' => '??',
@@ -442,7 +442,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 						$context_data['cur_version'] = $match[1];
 
 						// How does this compare?
-						if ($context_data['cur_version'] == $context_data['version'])
+						if ($context_data['cur_version'] === $context_data['version'])
 							$context_data['version_compare'] = 'same';
 						elseif ($context_data['cur_version'] > $context_data['version'])
 							$context_data['version_compare'] = 'older';
@@ -645,7 +645,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 		// Check we have themes with a path and a name - just in case - and add the path.
 		foreach ($themes as $id => $data)
 		{
-			if (count($data) != 2)
+			if (count($data) !== 2)
 				unset($themes[$id]);
 			elseif (is_dir($data['theme_dir'] . '/languages/' . $context['lang_id']))
 				$lang_dirs[$id] = $data['theme_dir'] . '/languages/' . $context['lang_id'];
@@ -759,7 +759,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 		}
 
 		// If we are editing a file work away at that.
-		if ($current_file)
+		if ($current_file !== '')
 		{
 			$context['entries_not_writable_message'] = is_writable($current_file) ? '' : sprintf($txt['lang_entries_not_writable'], $current_file);
 
@@ -787,7 +787,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 			}
 
 			// Last entry to add?
-			if ($multiline_cache)
+			if ($multiline_cache !== '')
 			{
 				preg_match('~\$(helptxt|txt|editortxt)\[\'(.+)\'\]\s?=\s?(.+);~ms', strtr($multiline_cache, array("\r" => '')), $matches);
 				if (!empty($matches[3]))
@@ -865,7 +865,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 						foreach ($save_cache['entries'] as $k2 => $v2)
 						{
 							// Manually show the custom index.
-							if ($k2 != $cur_index)
+							if ($k2 !== $cur_index)
 							{
 								$items[] = $k2 . ' => \'' . $v2 . '\'';
 								$cur_index = $k2;
@@ -886,7 +886,7 @@ class ManageLanguages extends \ElkArte\AbstractController
 				else
 				{
 					// Saving?
-					if (isset($save_strings[$md5EntryKey]) && $save_strings[$md5EntryKey] != $entryValue['entry'])
+					if (isset($save_strings[$md5EntryKey]) && $save_strings[$md5EntryKey] !== $entryValue['entry'])
 					{
 						// @todo Fix this properly.
 						if ($save_strings[$md5EntryKey] == '')

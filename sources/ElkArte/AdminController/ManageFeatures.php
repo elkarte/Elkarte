@@ -935,7 +935,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 			validateToken('admin-ecp');
 
 			// Everyone needs a name - even the (bracket) unknown...
-			if (trim($this->_req->post->field_name) == '')
+			if (trim($this->_req->post->field_name) === '')
 				redirectexit('action=admin;area=featuresettings;sa=profileedit;fid=' . $this->_req->query->fid . ';msg=need_name');
 
 			// Regex you say?  Do a very basic test to see if the pattern is valid
@@ -990,7 +990,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 							$v = strtr($v, array(',' => ''));
 
 							// Nada, zip, etc...
-							if (trim($v) == '')
+							if (trim($v) === '')
 								continue;
 
 							// Otherwise, save it boy.
@@ -1083,7 +1083,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 					// Work out what's changed!
 					foreach ($context['field']['options'] as $k => $option)
 					{
-						if (trim($option) == '')
+						if (trim($option) === '')
 							continue;
 
 						// Still exists?
@@ -1419,10 +1419,7 @@ class ManageFeatures extends \ElkArte\AbstractController
 
 			foreach ($notification_methods as $method)
 			{
-				if ($method === 'notification')
-					$text_label = $txt['setting_notify_enable_this'];
-				else
-					$text_label = $txt['notify_' . $method];
+				$text_label = $method === 'notification' ? $txt['setting_notify_enable_this'] : $txt['notify_' . $method];
 
 				$config_vars[] = array('check', 'notifications[' . $title . '][' . $method . ']', 'text_label' => $text_label);
 				$modSettings['notifications[' . $title . '][' . $method . ']'] = !empty($current_settings[$title][$method]);

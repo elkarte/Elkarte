@@ -239,7 +239,9 @@ class PackageServers extends \ElkArte\AbstractController
 				}
 
 				// Sort them naturally
-				usort($context['package_list'][$packageSection]['items'], array($this, 'package_sort'));
+				usort($context['package_list'][$packageSection]['items'], function ($a, $b) {
+					return $this->package_sort($a, $b);
+				});
 
 				$context['package_list'][$packageSection]['text'] = sprintf($txt['mod_section_count'], $section_count);
 			}
@@ -610,7 +612,7 @@ class PackageServers extends \ElkArte\AbstractController
 						continue;
 
 					// If it was already uploaded under another name don't upload it again.
-					if ($packageInfo['id'] == $context['package']['id'] && compareVersions($packageInfo['version'], $context['package']['version']) == 0)
+					if ($packageInfo['id'] === $context['package']['id'] && compareVersions($packageInfo['version'], $context['package']['version']) == 0)
 					{
 						@unlink($destination);
 						theme()->getTemplates()->loadLanguageFile('Errors');

@@ -87,7 +87,7 @@ class Reports extends \ElkArte\AbstractController
 				'title' => isset($txt['gr_type_' . $k]) ? $txt['gr_type_' . $k] : $k,
 				'description' => isset($txt['gr_type_desc_' . $k]) ? $txt['gr_type_desc_' . $k] : null,
 				'function' => $temp,
-				'is_first' => $is_first++ == 0,
+				'is_first' => $is_first++ === 0,
 			);
 
 		$report_type = !empty($this->_req->post->rt) ? $this->_req->post->rt : (!empty($this->_req->query->rt) ? $this->_req->query->rt : null);
@@ -391,15 +391,7 @@ class Reports extends \ElkArte\AbstractController
 
 					$group_permissions = isset($groups[$id_group]) ? $groups[$id_group] : array();
 
-					// Do we have any data for this group?
-					if (isset($group_permissions[$ID_PERM]))
-					{
-						// Set the data for this group to be the local permission.
-						$curData[$id_group] = $group_permissions[$ID_PERM];
-					}
-					// Otherwise means it's set to disallow..
-					else
-						$curData[$id_group] = 'x';
+					$curData[$id_group] = isset($group_permissions[$ID_PERM]) ? $group_permissions[$ID_PERM] : 'x';
 
 					// Now actually make the data for the group look right.
 					if (empty($curData[$id_group]))
@@ -435,15 +427,9 @@ class Reports extends \ElkArte\AbstractController
 		$boards = array();
 		foreach ($raw_boards as $row)
 		{
-			if (trim($row['member_groups']) == '')
-				$groups = array(1);
-			else
-				$groups = array_merge(array(1), explode(',', $row['member_groups']));
+			$groups = trim($row['member_groups']) === '' ? array(1) : array_merge(array(1), explode(',', $row['member_groups']));
 
-			if (trim($row['deny_member_groups']) == '')
-				$denyGroups = array();
-			else
-				$denyGroups = explode(',', $row['deny_member_groups']);
+			$denyGroups = trim($row['deny_member_groups']) === '' ? array() : explode(',', $row['deny_member_groups']);
 
 			$boards[$row['id_board']] = array(
 				'id' => $row['id_board'],
@@ -891,11 +877,7 @@ function setKeys($method = 'rows', $keys = array(), $reverse = false)
 {
 	global $context;
 
-	// Do we want to use the keys of the keys as the keys? :P
-	if ($reverse)
-		$context['keys'] = array_flip($keys);
-	else
-		$context['keys'] = $keys;
+	$context['keys'] = $reverse ? array_flip($keys) : $keys;
 
 	// Rows or columns?
 	$context['key_method'] = $method === 'rows' ? 'rows' : 'cols';

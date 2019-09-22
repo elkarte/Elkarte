@@ -26,6 +26,12 @@ class UserInfo extends \ElkArte\ValuesContainer
 
 	public function canMod($postmodActive)
 	{
-		return allowedTo('access_mod_center') || ($this->data['is_guest'] === false && ($this->data['mod_cache']['gq'] != '0=1' || $this->data['mod_cache']['bq'] != '0=1' || ($postmodActive && !empty($this->data['mod_cache']['ap']))));
+		return allowedTo('access_mod_center')
+			|| ($this->data['is_guest'] === false
+				&& ($this->data['mod_cache']['gq'] != '0=1'
+					|| $this->data['mod_cache']['bq'] != '0=1'
+					|| ($postmodActive && !empty($this->data['mod_cache']['ap']))
+				)
+			);
 	}
 }

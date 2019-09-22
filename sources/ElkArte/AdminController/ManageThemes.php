@@ -288,7 +288,7 @@ class ManageThemes extends \ElkArte\AbstractController
 				'knownThemes' => implode(',', $this->_req->post->options['known_themes']),
 			));
 
-			if ((int) $this->_req->post->theme_reset == 0 || in_array($this->_req->post->theme_reset, $this->_req->post->options['known_themes']))
+			if ((int) $this->_req->post->theme_reset === 0 || in_array($this->_req->post->theme_reset, $this->_req->post->options['known_themes']))
 			{
 				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData(null, array('id_theme' => (int) $this->_req->post->theme_reset));
@@ -825,8 +825,7 @@ class ManageThemes extends \ElkArte\AbstractController
 
 		// Its no longer known
 		$known = explode(',', $modSettings['knownThemes']);
-		for ($i = 0, $n = count($known); $i < $n; $i++)
-		{
+		foreach ($known as $i => $known) {
 			if ($known[$i] == $theme)
 				unset($known[$i]);
 		}
@@ -836,7 +835,7 @@ class ManageThemes extends \ElkArte\AbstractController
 		deleteTheme($theme);
 
 		// Fix it if the theme was the overall default theme.
-		if ($modSettings['theme_guests'] == $theme)
+		if ($modSettings['theme_guests'] === $theme)
 			updateSettings(array('theme_guests' => '1', 'knownThemes' => $known));
 		else
 			updateSettings(array('knownThemes' => $known));
@@ -910,10 +909,12 @@ class ManageThemes extends \ElkArte\AbstractController
 
 		// It is a theme we know about?
 		$known = explode(',', $modSettings['knownThemes']);
-		for ($i = 0, $n = count($known); $i < $n; $i++)
+		foreach ($known as $i => $known)
 		{
 			if ($known[$i] == $theme)
+			{
 				unset($known[$i]);
+			}
 		}
 
 		// Finally, remove it
@@ -922,7 +923,7 @@ class ManageThemes extends \ElkArte\AbstractController
 		$known = strtr(implode(',', $known), array(',,' => ','));
 
 		// Fix it if the theme was the overall default theme.
-		if ($modSettings['theme_guests'] == $theme)
+		if ($modSettings['theme_guests'] === $theme)
 			updateSettings(array('theme_guests' => '1', 'knownThemes' => $known));
 		else
 			updateSettings(array('knownThemes' => $known));
@@ -1178,7 +1179,7 @@ class ManageThemes extends \ElkArte\AbstractController
 			throw new \ElkArte\Exceptions\Exception('theme_install_general', false);
 
 		// Something go wrong?
-		if ($this->theme_dir != '' && basename($this->theme_dir) !== 'themes')
+		if ($this->theme_dir !== '' && basename($this->theme_dir) !== 'themes')
 		{
 			// Defaults.
 			$install_info = array(
@@ -1589,23 +1590,24 @@ class ManageThemes extends \ElkArte\AbstractController
 		// For a PHP template file, we display each function in separate boxes.
 		$j = 0;
 		$context['file_parts'] = array(array('lines' => 0, 'line' => 1, 'data' => '', 'function' => ''));
-		for ($i = 0, $n = count($file_data); $i < $n; $i++)
+		foreach ($file_data as $i => $file_datum)
 		{
 			// @todo refactor this so the docblocks are in the function content window
-			if (substr($file_data[$i], 0, 9) === 'function ')
+			if (substr($file_datum, 0, 9) === 'function ')
 			{
 				// Try to format the functions a little nicer...
 				$context['file_parts'][$j]['data'] = trim($context['file_parts'][$j]['data']);
 
 				if (empty($context['file_parts'][$j]['lines']))
+				{
 					unset($context['file_parts'][$j]);
+				}
 
 				// Start a new function block
 				$context['file_parts'][++$j] = array('lines' => 0, 'line' => $i, 'data' => '');
 			}
-
 			$context['file_parts'][$j]['lines']++;
-			$context['file_parts'][$j]['data'] .= htmlspecialchars(strtr($file_data[$i], array("\t" => '   ')), ENT_COMPAT, 'UTF-8');
+			$context['file_parts'][$j]['data'] .= htmlspecialchars(strtr($file_datum, array("\t" => '   ')), ENT_COMPAT, 'UTF-8');
 		}
 
 		$context['entire_file'] = htmlspecialchars(strtr(implode('', $file_data), array("\t" => '   ')), ENT_COMPAT, 'UTF-8');
@@ -1664,11 +1666,7 @@ class ManageThemes extends \ElkArte\AbstractController
 		// Check you up
 		if (checkSession('post', '', false) === '' && validateToken('admin-te-' . md5($selectedTheme . '-' . $this->_req->post->filename), 'post', false) === true)
 		{
-			// Consolidate the format in which we received the file contents
-			if (is_array($file))
-				$entire_file = implode("\n", $file);
-			else
-				$entire_file = $file;
+			$entire_file = is_array($file) ? implode("\n", $file) : $file;
 
 			// Convert our tabs back to tabs!
 			$entire_file = rtrim(strtr($entire_file, array("\r" => '', '   ' => "\t")));
@@ -1728,11 +1726,7 @@ class ManageThemes extends \ElkArte\AbstractController
 			// I can't let you off the hook yet: syntax errors are a nasty beast.
 			else
 			{
-				// Pick the right sub-template for the next try
-				if ($is_template)
-					$context['sub_template'] = 'edit_template';
-				else
-					$context['sub_template'] = 'edit_file';
+				$context['sub_template'] = $is_template ? 'edit_template' : 'edit_file';
 
 				// Fill contextual data for the template, the errors to show
 				foreach ($errors as $error)
@@ -1858,7 +1852,7 @@ class ManageThemes extends \ElkArte\AbstractController
 
 			$temp = dirname($this->_req->query->directory);
 			array_unshift($context['theme_files'], array(
-				'filename' => $temp === '.' || $temp == '' ? '/ (..)' : $temp . ' (..)',
+				'filename' => $temp === '.' || $temp === '' ? '/ (..)' : $temp . ' (..)',
 				'is_writable' => is_writable($theme_dir . '/' . $temp),
 				'is_directory' => true,
 				'is_template' => false,
@@ -1897,10 +1891,7 @@ class ManageThemes extends \ElkArte\AbstractController
 				unset($context['themes'][$key]);
 			else
 			{
-				if (!isset($theme['theme_templates']))
-					$templates = array('index');
-				else
-					$templates = explode(',', $theme['theme_templates']);
+				$templates = !isset($theme['theme_templates']) ? array('index') : explode(',', $theme['theme_templates']);
 
 				foreach ($templates as $template)
 					if (file_exists($theme['theme_dir'] . '/' . $template . '.template.php'))

@@ -229,7 +229,7 @@ class ManageServer extends \ElkArte\AbstractController
 			$settingsForm->save();
 
 			// If the cookie name was changed, reset the cookie.
-			if ($cookiename != $this->_req->post->cookiename)
+			if ($cookiename !== $this->_req->post->cookiename)
 			{
 				require_once(SUBSDIR . '/Auth.subs.php');
 

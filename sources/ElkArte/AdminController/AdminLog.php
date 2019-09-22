@@ -189,7 +189,7 @@ class AdminLog extends \ElkArte\AbstractController
 	{
 		global $txt;
 
-		$config_vars = array(
+		return array(
 			// Even do the pruning?
 			// The array indexes are there so we can remove/change them before saving.
 			'pruningOptions' => array('check', 'pruningOptions'),
@@ -204,8 +204,6 @@ class AdminLog extends \ElkArte\AbstractController
 			array('int', 'pruneSpiderHitLog', 'postinput' => $txt['days_word'], 'subtext' => $txt['zero_to_disable']), // Log of the scheduled tasks and how long they ran.
 			// If you add any additional logs make sure to add them after this point.  Additionally, make sure you add them to the weekly scheduled task.
 		);
-
-		return $config_vars;
 	}
 
 	/**

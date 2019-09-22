@@ -220,7 +220,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 				'id' => $i,
 				'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
 				'name' => htmlspecialchars($set_names[$i], ENT_COMPAT, 'UTF-8'),
-				'selected' => $set == $modSettings['smiley_sets_default']
+				'selected' => $set === $modSettings['smiley_sets_default']
 			);
 
 		// Importing any smileys from an existing set?
@@ -541,7 +541,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 				'id' => $i,
 				'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
 				'name' => htmlspecialchars($set_names[$i], ENT_COMPAT, 'UTF-8'),
-				'selected' => $set == $modSettings['smiley_sets_default']
+				'selected' => $set === $modSettings['smiley_sets_default']
 			);
 
 		// Submitting a form?
@@ -642,7 +642,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 
 					if (empty($newName))
 						$newName = basename($_FILES[$name]['name']);
-					elseif (basename($_FILES[$name]['name']) != $newName)
+					elseif (basename($_FILES[$name]['name']) !== $newName)
 						throw new \ElkArte\Exceptions\Exception('smileys_upload_error_name');
 				}
 
@@ -842,7 +842,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 				'id' => $i,
 				'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
 				'name' => htmlspecialchars($set_names[$i], ENT_COMPAT, 'UTF-8'),
-				'selected' => $set == $modSettings['smiley_sets_default']
+				'selected' => $set === $modSettings['smiley_sets_default']
 			);
 
 		// Prepare overview of all (custom) smileys.
@@ -861,7 +861,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 				<select name="set" onchange="changeSet(this.options[this.selectedIndex].value);">';
 			foreach ($context['smiley_sets'] as $smiley_set)
 				$smileyset_option_list .= '
-					<option value="' . $smiley_set['path'] . '"' . ($modSettings['smiley_sets_default'] == $smiley_set['path'] ? ' selected="selected"' : '') . '>' . $smiley_set['name'] . '</option>';
+					<option value="' . $smiley_set['path'] . '"' . ($modSettings['smiley_sets_default'] === $smiley_set['path'] ? ' selected="selected"' : '') . '>' . $smiley_set['name'] . '</option>';
 			$smileyset_option_list .= '
 				</select>';
 
@@ -1070,7 +1070,7 @@ class ManageSmileys extends \ElkArte\AbstractController
 					'id' => $i,
 					'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
 					'name' => htmlspecialchars($set_names[$i], ENT_COMPAT, 'UTF-8'),
-					'selected' => $set == $modSettings['smiley_sets_default']
+					'selected' => $set === $modSettings['smiley_sets_default']
 				);
 
 			$context['selected_set'] = $modSettings['smiley_sets_default'];

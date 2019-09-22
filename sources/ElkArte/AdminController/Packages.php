@@ -761,7 +761,7 @@ class Packages extends \ElkArte\AbstractController
 	 */
 	private function _sort_table_first($a, $b)
 	{
-		if ($a[0] == $b[0])
+		if ($a[0] === $b[0])
 			return 0;
 
 		return $a[0] === 'remove_table' ? -1 : 1;
@@ -914,7 +914,7 @@ class Packages extends \ElkArte\AbstractController
 		$context['available_language'] = array();
 		$context['available_unknown'] = array();
 
-		$installed = $context['sub_action'] === 'installed' ? true : false;
+		$installed = $context['sub_action'] === 'installed';
 		$context['package_types'] = $installed ? array('addon') : array('addon', 'avatar', 'language', 'smiley', 'unknown');
 
 		foreach ($context['package_types'] as $type)
@@ -1119,7 +1119,7 @@ class Packages extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/Themes.subs.php');
 
 		// Uninstalling the mod?
-		$reverse = isset($this->_req->query->reverse) ? true : false;
+		$reverse = isset($this->_req->query->reverse);
 
 		// Get the base name.
 		$context['filename'] = preg_replace('~[\.]+~', '.', $this->_req->query->package);
@@ -2072,7 +2072,7 @@ function fetchPerms__recursive($path, &$data, $level)
 	$isLikelyPath = false;
 	foreach ($context['look_for'] as $possiblePath)
 	{
-		if (substr($possiblePath, 0, strlen($path)) == $path)
+		if (substr($possiblePath, 0, strlen($path)) === $path)
 			$isLikelyPath = true;
 	}
 
@@ -2120,10 +2120,7 @@ function fetchPerms__recursive($path, &$data, $level)
 							|| (!empty($data['contents'][$entry->getFilename()]['type'])
 								&& $data['contents'][$entry->getFilename()]['type'] === 'dir_recursive'))))
 				{
-					if (!isset($data['contents'][$entry->getFilename()]))
-						$foundData['folders'][$entry->getFilename()] = 'dir_recursive';
-					else
-						$foundData['folders'][$entry->getFilename()] = true;
+					$foundData['folders'][$entry->getFilename()] = !isset($data['contents'][$entry->getFilename()]) ? 'dir_recursive' : true;
 
 					// If this wasn't expected inherit the recusiveness...
 					if (!isset($data['contents'][$entry->getFilename()]))
@@ -2189,10 +2186,7 @@ function fetchPerms__recursive($path, &$data, $level)
 		}
 		elseif (!isset($_GET['xml']))
 		{
-			if (isset($data['contents'][$folder]))
-				$data['contents'][$folder] = array_merge($data['contents'][$folder], $additional_data);
-			else
-				$data['contents'][$folder] = $additional_data;
+			$data['contents'][$folder] = array_merge($data['contents'][$folder] ?? [], $additional_data);
 		}
 	}
 
@@ -2237,10 +2231,7 @@ function fetchPerms__recursive($path, &$data, $level)
 		}
 		elseif ($counter != ($context['file_offset'] + $context['file_limit']))
 		{
-			if (isset($data['contents'][$file]))
-				$data['contents'][$file] = array_merge($data['contents'][$file], $additional_data);
-			else
-				$data['contents'][$file] = $additional_data;
+			$data['contents'][$file] = array_merge($data['contents'][$file] ?? [], $additional_data);
 		}
 	}
 }

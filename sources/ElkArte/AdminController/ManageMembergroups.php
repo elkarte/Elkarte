@@ -350,7 +350,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// A form was submitted, we can start adding.
-		if (isset($this->_req->post->group_name) && trim($this->_req->post->group_name) != '')
+		if (isset($this->_req->post->group_name) && trim($this->_req->post->group_name) !== '')
 		{
 			checkSession();
 			validateToken('admin-mmg');
@@ -651,7 +651,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 			}
 
 			// Do we need to set inherited permissions?
-			if ($group_inherit != -2 && $group_inherit != $this->_req->post->old_inherit)
+			if ($group_inherit !== -2 && $group_inherit !== $this->_req->post->old_inherit)
 			{
 				$permissionsObject = new \ElkArte\Permissions;
 				$permissionsObject->updateChild($group_inherit);
@@ -669,13 +669,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 					$moderator_string = strtr(preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', htmlspecialchars($moderator_string, ENT_QUOTES, 'UTF-8')), array('&quot;' => '"'));
 					preg_match_all('~"([^"]+)"~', $moderator_string, $matches);
 					$moderators = array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $moderator_string)));
-					for ($k = 0, $n = count($moderators); $k < $n; $k++)
-					{
-						$moderators[$k] = trim($moderators[$k]);
-
-						if (strlen($moderators[$k]) == 0)
-							unset($moderators[$k]);
-					}
+					$moderators = array_filter(array_map('trim', $moderators));
 
 					// Find all the id_member's for the member_name's in the list.
 					if (!empty($moderators))

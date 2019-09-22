@@ -191,7 +191,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 			if (isset($this->_req->post->attachmentUploadDir)
 				|| !empty($this->_req->post->use_subdirectories_for_attachments))
 			{
-				if (!empty($this->_req->post->attachmentUploadDir) && file_exists($modSettings['attachmentUploadDir']) && $modSettings['attachmentUploadDir'] != $this->_req->post->attachmentUploadDir)
+				if (!empty($this->_req->post->attachmentUploadDir) && file_exists($modSettings['attachmentUploadDir']) && $modSettings['attachmentUploadDir'] !== $this->_req->post->attachmentUploadDir)
 					rename($modSettings['attachmentUploadDir'], $this->_req->post->attachmentUploadDir);
 
 				$modSettings['attachmentUploadDir'] = array(1 => $this->_req->post->attachmentUploadDir);
@@ -317,7 +317,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 						? $txt['basedirectory_for_attachments_current']
 						: $txt['basedirectory_for_attachments_warning']))
 				),
-				empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && (is_array($modSettings['attachmentUploadDir']) && count($modSettings['attachmentUploadDir']) == 1)
+				empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && (is_array($modSettings['attachmentUploadDir']) && count($modSettings['attachmentUploadDir']) === 1)
 					? array('text', 'attachmentUploadDir', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 40, 'invalid' => !$context['valid_upload_dir'])
 					: array('var_message', 'attach_current_directory', 'postinput' => $txt['attachmentUploadDir_multiple_configure'], 'message' => 'attachment_path', 'invalid' => empty($context['valid_upload_dir']), 'text_label' => (!empty($context['valid_upload_dir'])
 						? $txt['attach_current_dir']
@@ -625,7 +625,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 			$context['attachment_files'] = comma_format(max($modSettings['attachmentDirFileLimit'] - $current_dir['files'], 0), 0);
 		$context['attachment_current_files'] = comma_format($current_dir['files'], 0);
 
-		$context['attach_multiple_dirs'] = count($attach_dirs) > 1 ? true : false;
+		$context['attach_multiple_dirs'] = count($attach_dirs) > 1;
 		$context['attach_dirs'] = $attach_dirs;
 		$context['base_dirs'] = !empty($modSettings['attachment_basedirectories']) ? \ElkArte\Util::unserialize($modSettings['attachment_basedirectories']) : array();
 		$context['checked'] = $this->_req->getSession('checked', true);
@@ -841,7 +841,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 		$to_fix = !empty($_SESSION['attachments_to_fix']) ? $_SESSION['attachments_to_fix'] : array();
 		$context['repair_errors'] = $this->_req->getSession('attachments_to_fix2', $context['repair_errors']);
-		$fix_errors = isset($this->_req->query->fixErrors) ? true : false;
+		$fix_errors = isset($this->_req->query->fixErrors);
 
 		// Get stranded thumbnails.
 		if ($this->step <= 0)
@@ -1016,7 +1016,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 		$context['sub_template'] = 'attachment_repair';
 
 		// What stage are we at?
-		$context['completed'] = $fix_errors ? true : false;
+		$context['completed'] = $fix_errors;
 		$context['errors_found'] = false;
 		foreach ($context['repair_errors'] as $number)
 		{
@@ -1117,7 +1117,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 					// Update the base directory path
 					if (!empty($modSettings['attachment_basedirectories']) && array_key_exists($id, $modSettings['attachment_basedirectories']))
 					{
-						$base = $modSettings['basedirectory_for_attachments'] == $modSettings['attachmentUploadDir'][$id] ? $real_path : $modSettings['basedirectory_for_attachments'];
+						$base = $modSettings['basedirectory_for_attachments'] === $modSettings['attachmentUploadDir'][$id] ? $real_path : $modSettings['basedirectory_for_attachments'];
 
 						$modSettings['attachment_basedirectories'][$id] = $real_path;
 						updateSettings(array(
@@ -1136,7 +1136,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 					if ($id == (!empty($this->current_dir) ? $this->current_dir : $modSettings['currentAttachmentUploadDir']))
 						$errors[] = $real_path . ': ' . $txt['attach_dir_is_current'];
 					// Or the current base directory
-					elseif (!empty($modSettings['basedirectory_for_attachments']) && $modSettings['basedirectory_for_attachments'] == $modSettings['attachmentUploadDir'][$id])
+					elseif (!empty($modSettings['basedirectory_for_attachments']) && $modSettings['basedirectory_for_attachments'] === $modSettings['attachmentUploadDir'][$id])
 						$errors[] = $real_path . ': ' . $txt['attach_dir_is_current_bd'];
 					else
 					{
@@ -1206,7 +1206,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 			}
 
 			// If the user wishes to go back, update the last_dir array
-			if ($this->current_dir != $modSettings['currentAttachmentUploadDir'] && !empty($modSettings['last_attachments_directory']) && (isset($modSettings['last_attachments_directory'][$this->current_dir]) || isset($modSettings['last_attachments_directory'][0])))
+			if ($this->current_dir !== $modSettings['currentAttachmentUploadDir'] && !empty($modSettings['last_attachments_directory']) && (isset($modSettings['last_attachments_directory'][$this->current_dir]) || isset($modSettings['last_attachments_directory'][0])))
 			{
 				if (!is_array($modSettings['last_attachments_directory']))
 					$modSettings['last_attachments_directory'] = \ElkArte\Util::unserialize($modSettings['last_attachments_directory']);
@@ -1242,7 +1242,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 			}
 
 			// Going back to just one path?
-			if (count($new_dirs) == 1)
+			if (count($new_dirs) === 1)
 			{
 				// We might need to reset the paths. This loop will just loop through once.
 				foreach ($new_dirs as $id => $dir)
@@ -1283,7 +1283,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 			$this->current_base_dir = $this->_req->getQuery('current_base_dir', 'intval');
 			if (empty($this->_req->post->new_base_dir) && !empty($this->current_base_dir))
 			{
-				if ($modSettings['basedirectory_for_attachments'] != $modSettings['attachmentUploadDir'][$this->current_base_dir])
+				if ($modSettings['basedirectory_for_attachments'] !== $modSettings['attachmentUploadDir'][$this->current_base_dir])
 					$update = (array(
 						'basedirectory_for_attachments' => $modSettings['attachmentUploadDir'][$this->current_base_dir],
 					));
@@ -1293,7 +1293,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 			{
 				foreach ($this->_req->post->base_dir as $id => $dir)
 				{
-					if (!empty($dir) && $dir != $modSettings['attachmentUploadDir'][$id])
+					if (!empty($dir) && $dir !== $modSettings['attachmentUploadDir'][$id])
 					{
 						if (@rename($modSettings['attachmentUploadDir'][$id], $dir))
 						{
@@ -1309,7 +1309,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 					if (empty($dir))
 					{
-						if ($id == $this->current_base_dir)
+						if ($id === $this->current_base_dir)
 						{
 							$errors[] = $modSettings['attachmentUploadDir'][$id] . ': ' . $txt['attach_dir_is_current'];
 							continue;
@@ -1565,7 +1565,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 		$this->auto = $this->_req->getPost('auto', 'intval', 0);
 		$this->to = $this->_req->getPost('to', 'intval');
 		$start = !empty($this->_req->post->empty_it) ? 0 : $modSettings['attachmentDirFileLimit'];
-		$_SESSION['checked'] = !empty($this->_req->post->empty_it) ? true : false;
+		$_SESSION['checked'] = !empty($this->_req->post->empty_it);
 
 		// Prepare for the moving
 		$limit = 501;
@@ -1581,7 +1581,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 			$results[] = $txt['attachment_transfer_no_dir'];
 
 		// Same location, that's easy
-		if ($this->from == $this->to)
+		if ($this->from === $this->to)
 			$results[] = $txt['attachment_transfer_same_dir'];
 
 		// No errors so determine how many we may have to move
@@ -1617,7 +1617,7 @@ class ManageAttachments extends \ElkArte\AbstractController
 
 			$modSettings['currentAttachmentUploadDir'] = $new_dir;
 			$break = false;
-			while ($break === false)
+			while (!$break)
 			{
 				detectServer()->setTimeLimit(300);
 

@@ -183,7 +183,7 @@ class ManageBoards extends \ElkArte\AbstractController
 				'id' => $tree['node']['id'],
 				'boards' => array()
 			);
-			$move_cat = !empty($context['move_board']) && $boards[$context['move_board']]['category'] == $catid;
+			$move_cat = !empty($context['move_board']) && $boards[$context['move_board']]['category'] === $catid;
 			foreach ($boardList[$catid] as $boardid)
 			{
 				$boards[$boardid]['description'] = $bbc_parser->parseBoard($boards[$boardid]['description']);
@@ -192,7 +192,7 @@ class ManageBoards extends \ElkArte\AbstractController
 					'name' => $boards[$boardid]['name'],
 					'description' => $boards[$boardid]['description'],
 					'child_level' => $boards[$boardid]['level'],
-					'move' => $move_cat && ($boardid == $context['move_board'] || $boardTree->isChildOf($boardid, (int) $context['move_board'])),
+					'move' => $move_cat && ($boardid === $context['move_board'] || $boardTree->isChildOf($boardid, (int) $context['move_board'])),
 					'permission_profile' => $boards[$boardid]['profile'],
 				);
 			}
@@ -365,11 +365,11 @@ class ManageBoards extends \ElkArte\AbstractController
 		$prevCat = 0;
 		foreach ($cat_tree as $catid => $tree)
 		{
-			if ($catid == $this->cat && $prevCat > 0)
+			if ($catid === $this->cat && $prevCat > 0)
 			{
 				$context['category_order'][$prevCat]['selected'] = true;
 			}
-			elseif ($catid != $this->cat)
+			elseif ($catid !== $this->cat)
 			{
 				$context['category_order'][$catid] = array(
 					'id' => $catid,
@@ -615,9 +615,9 @@ class ManageBoards extends \ElkArte\AbstractController
 		foreach ($cat_tree as $catID => $tree)
 		{
 			$context['categories'][] = array(
-				'id' => $catID == $curBoard['category'] ? 0 : $catID,
+				'id' => $catID === $curBoard['category'] ? 0 : $catID,
 				'name' => $tree['node']['name'],
-				'selected' => $catID == $curBoard['category']
+				'selected' => $catID === $curBoard['category']
 			);
 		}
 
@@ -743,7 +743,7 @@ class ManageBoards extends \ElkArte\AbstractController
 			}
 
 			// Are they doing redirection?
-			$boardOptions['redirect'] = !empty($this->_req->post->redirect_enable) && isset($this->_req->post->redirect_address) && trim($this->_req->post->redirect_address) != '' ? trim($this->_req->post->redirect_address) : '';
+			$boardOptions['redirect'] = !empty($this->_req->post->redirect_enable) && isset($this->_req->post->redirect_address) && trim($this->_req->post->redirect_address) !== '' ? trim($this->_req->post->redirect_address) : '';
 
 			// Profiles...
 			$boardOptions['profile'] = $this->_req->post->profile;
@@ -760,7 +760,7 @@ class ManageBoards extends \ElkArte\AbstractController
 					unset($boardOptions['redirect']);
 				}
 				// Reset the redirection count when switching on/off.
-				elseif (empty($boardOptions['redirect']) != empty($properties['oldRedirect']))
+				elseif (empty($boardOptions['redirect']) !== empty($properties['oldRedirect']))
 				{
 					$boardOptions['num_posts'] = 0;
 				}

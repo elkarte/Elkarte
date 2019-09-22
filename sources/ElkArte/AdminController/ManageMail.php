@@ -279,7 +279,7 @@ class ManageMail extends \ElkArte\AbstractController
 		$i = 0;
 		foreach ($processedBirthdayEmails as $index => $email)
 		{
-			$is_last = ++$i == count($processedBirthdayEmails);
+			$is_last = ++$i === count($processedBirthdayEmails);
 			$javascript .= '
 				' . $index . ': {
 				subject: ' . JavaScriptEscape($email['subject']) . ',

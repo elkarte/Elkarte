@@ -94,7 +94,7 @@ class ManageErrors extends \ElkArte\AbstractController
 		$members = array();
 
 		// If this filter is empty...
-		if ($num_errors == 0 && !empty($filter))
+		if ($num_errors === 0 && !empty($filter))
 			redirectexit('action=admin;area=logs;sa=errorlog' . (isset($this->_req->query->desc) ? ';desc' : ''));
 
 		// Clean up start.
@@ -177,7 +177,7 @@ class ManageErrors extends \ElkArte\AbstractController
 					$context['filter']['value']['html'] = '<a href="' . getUrl('profile', ['action' => 'profile', 'u' => $id,  'name' => $name]) . '">' . $name . '</a>';
 					break;
 				case 'url':
-					$context['filter']['value']['html'] = '\'' . strtr(htmlspecialchars((substr($filter['value']['sql'], 0, 1) == '?' ? $scripturl : '') . $filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array('\_' => '_')) . '\'';
+					$context['filter']['value']['html'] = '\'' . strtr(htmlspecialchars((substr($filter['value']['sql'], 0, 1) === '?' ? $scripturl : '') . $filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array('\_' => '_')) . '\'';
 					break;
 				case 'message':
 					$context['filter']['value']['html'] = '\'' . strtr(htmlspecialchars($filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array("\n" => '<br />', '&lt;br /&gt;' => '<br />', "\t" => '&nbsp;&nbsp;&nbsp;', '\_' => '_', '\\%' => '%', '\\\\' => '\\')) . '\'';
