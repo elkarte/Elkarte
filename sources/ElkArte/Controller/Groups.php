@@ -17,6 +17,8 @@
 
 namespace ElkArte\Controller;
 
+use ElkArte\User;
+
 /**
  * Shows group access and allows for add/remove group members
  */
@@ -332,8 +334,7 @@ class Groups extends \ElkArte\AbstractController
 			foreach ($member_names as $index => $member_name)
 			{
 				$member_names[$index] = trim(\ElkArte\Util::strtolower($member_names[$index]));
-
-				if (strlen($member_names[$index]) == 0)
+				if ($member_names[$index] === '')
 					unset($member_names[$index]);
 			}
 
@@ -413,7 +414,7 @@ class Groups extends \ElkArte\AbstractController
 			$last_online = empty($row['last_login']) ? $txt['never'] : standardTime($row['last_login']);
 
 			// Italicize the online note if they aren't activated.
-			if ($row['is_activated'] % 10 != 1)
+			if ($row['is_activated'] % 10 !== 1)
 				$last_online = '<em title="' . $txt['not_activated'] . '">' . $last_online . '</em>';
 
 			$context['members'][$id] = array(
@@ -425,7 +426,7 @@ class Groups extends \ElkArte\AbstractController
 				'registered' => standardTime($row['date_registered']),
 				'last_online' => $last_online,
 				'posts' => comma_format($row['posts']),
-				'is_activated' => $row['is_activated'] % 10 == 1,
+				'is_activated' => $row['is_activated'] % 10 === 1,
 			);
 		}
 
@@ -514,7 +515,7 @@ class Groups extends \ElkArte\AbstractController
 						{
 							// Sanity check!
 							foreach ($groups['add'] as $key => $value)
-								if ($value == 0 || trim($value) == '')
+								if ($value == 0 || trim($value) === '')
 									unset($groups['add'][$key]);
 
 							assignGroupsToMember($id, $groups['primary'], $groups['add']);

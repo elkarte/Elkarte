@@ -64,7 +64,7 @@ class ManageMembergroups extends \ElkArte\AbstractController
 				'function' => 'action_list',
 				'permission' => 'manage_membergroups'),
 			'members' => array(
-				'controller' => '\\ElkArte\\AdminController\\Groups',
+				'controller' => '\\ElkArte\\Controller\\Groups',
 				'function' => 'action_index',
 				'permission' => 'manage_membergroups'),
 			'settings' => array(
