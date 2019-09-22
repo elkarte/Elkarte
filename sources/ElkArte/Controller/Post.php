@@ -369,7 +369,7 @@ class Post extends \ElkArte\AbstractController
 			}
 
 			// Only show the preview stuff if they hit Preview.
-			if ($really_previewing === true)
+			if ($really_previewing)
 			{
 				// Set up the preview message and subject
 				$context['preview_message'] = $this->_form_message;
@@ -895,7 +895,7 @@ class Post extends \ElkArte\AbstractController
 			if (empty($modSettings['guest_post_no_email']))
 			{
 				// Only check if they changed it!
-				if (!isset($msgInfo) || $msgInfo['poster_email'] != $_POST['email'])
+				if (!isset($msgInfo) || $msgInfo['poster_email'] !== $_POST['email'])
 				{
 					if (!allowedTo('moderate_forum') && !\ElkArte\DataValidator::is_valid($_POST, array('email' => 'valid_email|required'), array('email' => 'trim')))
 						empty($_POST['email']) ? $this->_post_errors->addError('no_email') : $this->_post_errors->addError('bad_email');
@@ -959,7 +959,7 @@ class Post extends \ElkArte\AbstractController
 		{
 			// If user is a guest, make sure the chosen name isn't taken.
 			require_once(SUBSDIR . '/Members.subs.php');
-			if (isReservedName($_POST['guestname'], 0, true, false) && (!isset($msgInfo['poster_name']) || $_POST['guestname'] != $msgInfo['poster_name']))
+			if (isReservedName($_POST['guestname'], 0, true, false) && (!isset($msgInfo['poster_name']) || $_POST['guestname'] !== $msgInfo['poster_name']))
 				$this->_post_errors->addError('bad_name');
 		}
 		// If the user isn't a guest, get his or her name and email.
@@ -1390,7 +1390,7 @@ class Post extends \ElkArte\AbstractController
 			$posterOptions = array();
 
 			// Only consider marking as editing if they have edited the subject, message or icon.
-			if ((isset($_POST['subject']) && $_POST['subject'] != $row['subject']) || (isset($_POST['message']) && $_POST['message'] != $row['body']) || (isset($_REQUEST['icon']) && $_REQUEST['icon'] != $row['icon']))
+			if ((isset($_POST['subject']) && $_POST['subject'] !== $row['subject']) || (isset($_POST['message']) && $_POST['message'] !== $row['body']) || (isset($_REQUEST['icon']) && $_REQUEST['icon'] !== $row['icon']))
 			{
 				// And even then only if the time has passed...
 				if (time() - $row['poster_time'] > $modSettings['edit_wait_time'] || $this->user->id != $row['id_member'])

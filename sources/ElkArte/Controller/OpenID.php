@@ -108,7 +108,7 @@ class OpenID extends \ElkArte\AbstractController
 		// Is there a user with this OpenID_uri?
 		$member_found = $openID->memberByOpenID($context['openid_claimed_id']);
 
-		if (empty($member_found) && $this->_req->getQuery('sa') === 'change_uri' && !empty($_SESSION['new_openid_uri']) && $_SESSION['new_openid_uri'] == $context['openid_claimed_id'])
+		if (empty($member_found) && $this->_req->getQuery('sa') === 'change_uri' && !empty($_SESSION['new_openid_uri']) && $_SESSION['new_openid_uri'] === $context['openid_claimed_id'])
 		{
 			// Update the member.
 			require_once(SUBSDIR . '/Members.subs.php');
@@ -167,7 +167,7 @@ class OpenID extends \ElkArte\AbstractController
 				redirectexit('action=register');
 			}
 		}
-		elseif (isset($this->_req->query->sa) && $this->_req->query->sa === 'revalidate' && \ElkArte\User::$settings['openid_uri'] == $openid_uri)
+		elseif (isset($this->_req->query->sa) && $this->_req->query->sa === 'revalidate' && \ElkArte\User::$settings['openid_uri'] === $openid_uri)
 		{
 			$_SESSION['openid_revalidate_time'] = time();
 

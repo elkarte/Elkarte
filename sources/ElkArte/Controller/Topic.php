@@ -101,7 +101,7 @@ class Topic extends \ElkArte\AbstractController
 
 		// If they are allowed a "moderator" permission, log it in the moderator log.
 		if (!$user_lock)
-			logAction($locked ? 'lock' : 'unlock', array('topic' => $topic, 'board' => $board));
+			logAction($locked !== '' ? 'lock' : 'unlock', array('topic' => $topic, 'board' => $board));
 
 		// Notify people that this topic has been locked?
 		sendNotifications($topic, empty($locked) ? 'unlock' : 'lock');

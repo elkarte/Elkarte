@@ -217,12 +217,12 @@ class RemoveTopic extends \ElkArte\AbstractController
 		}
 
 		// Lets send them back somewhere that may make sense
-		if (isset($actioned_messages) && count($actioned_messages) == 1 && empty($topics_to_restore))
+		if (isset($actioned_messages) && count($actioned_messages) === 1 && empty($topics_to_restore))
 		{
 			reset($actioned_messages);
 			redirectexit('topic=' . key($actioned_messages));
 		}
-		elseif (count($topics_to_restore) == 1)
+		elseif (count($topics_to_restore) === 1)
 		{
 			redirectexit('topic=' . $topics_to_restore[0]);
 		}

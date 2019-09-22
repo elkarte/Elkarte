@@ -112,7 +112,7 @@ class Help extends \ElkArte\AbstractController
 		theme()->getTemplates()->loadLanguageFile('Help');
 
 		// Load permission specific help
-		if (substr($help_str, 0, 14) == 'permissionhelp')
+		if (substr($help_str, 0, 14) === 'permissionhelp')
 			theme()->getTemplates()->loadLanguageFile('ManagePermissions');
 
 		// Load our template
@@ -144,7 +144,7 @@ class Help extends \ElkArte\AbstractController
 		}
 
 		// Link to the forum URL, and include session id.
-		if (preg_match('~%([0-9]+\$)?s\?~', $context['help_text'], $match))
+		if (preg_match('~%(\d+\$)?s\?~', $context['help_text'], $match))
 		{
 			$context['help_text'] = sprintf($context['help_text'], getUrl('boardindex', []), $context['session_id'], $context['session_var']);
 		}

@@ -360,9 +360,7 @@ class Likes extends \ElkArte\AbstractController
 						'function' => function ($row) {
 							global $txt;
 
-							$result = '<a href="' . $row['delete'] . '" onclick="return confirm(\'' . $txt['likes_confirm_delete'] . '\');" title="' . $txt['likes_delete'] . '"><i class="icon i-delete"></i></a>';
-
-							return $result;
+							return '<a href="' . $row['delete'] . '" onclick="return confirm(\'' . $txt['likes_confirm_delete'] . '\');" title="' . $txt['likes_delete'] . '"><i class="icon i-delete"></i></a>';
 						},
 						'class' => 'centertext',
 						'style' => 'width: 10%',
@@ -463,9 +461,7 @@ class Likes extends \ElkArte\AbstractController
 						'function' => function ($row) {
 							global $txt;
 
-							$result = '<a href="' . $row['who'] . '" title="' . $txt['likes_show_who'] . '"><i class="icon i-users"></i></a>';
-
-							return $result;
+							return '<a href="' . $row['who'] . '" title="' . $txt['likes_show_who'] . '"><i class="icon i-users"></i></a>';
 						},
 						'class' => 'centertext',
 						'style' => 'width: 10%',

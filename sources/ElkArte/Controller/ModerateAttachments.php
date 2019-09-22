@@ -45,7 +45,7 @@ class ModerateAttachments extends \ElkArte\AbstractController
 		checkSession('get');
 
 		// Is it approve or delete?
-		$is_approve = !isset($this->_req->query->sa) || $this->_req->query->sa !== 'reject' ? true : false;
+		$is_approve = !isset($this->_req->query->sa) || $this->_req->query->sa !== 'reject';
 
 		$attachments = array();
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');

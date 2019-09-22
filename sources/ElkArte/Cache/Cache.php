@@ -114,7 +114,7 @@ class Cache
 	public function __destruct()
 	{
 		$cached = $this->get('_cached_keys');
-		if (is_array($cached) === false)
+		if (!is_array($cached))
 		{
 			$cached = array();
 		}
@@ -346,7 +346,7 @@ class Cache
 	public function enable($enable)
 	{
 		// Enable it if we can
-		if ($this->enabled === false && $this->_cache_obj === null)
+		if (!$this->enabled && $this->_cache_obj === null)
 		{
 			$this->_init();
 		}

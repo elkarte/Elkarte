@@ -112,7 +112,7 @@ class Unread extends \ElkArte\AbstractController
 		$this->_wanted_boards();
 		$this->_sorting_conditions();
 
-		if (!empty($this->_req->query->c) && is_array($this->_req->query->c) && count($this->_req->query->c) == 1)
+		if (!empty($this->_req->query->c) && is_array($this->_req->query->c) && count($this->_req->query->c) === 1)
 		{
 			require_once(SUBSDIR . '/Categories.subs.php');
 			$name = categoryName((int) $this->_req->query->c[0]);

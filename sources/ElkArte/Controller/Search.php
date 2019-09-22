@@ -360,7 +360,7 @@ class Search extends \ElkArte\AbstractController
 			return $this->action_search();
 
 		// Spam me not, Spam-a-lot?
-		if (empty($_SESSION['last_ss']) || $_SESSION['last_ss'] != $this->_search->param('search'))
+		if (empty($_SESSION['last_ss']) || $_SESSION['last_ss'] !== $this->_search->param('search'))
 			spamProtection('search');
 
 		// Store the last search string to allow pages of results to be browsed.
@@ -458,7 +458,7 @@ class Search extends \ElkArte\AbstractController
 		global $modSettings, $context;
 
 		// Do we have captcha enabled?
-		if ($this->user->is_guest && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']) && (empty($_SESSION['last_ss']) || $_SESSION['last_ss'] != $this->_search->param('search')))
+		if ($this->user->is_guest && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']) && (empty($_SESSION['last_ss']) || $_SESSION['last_ss'] !== $this->_search->param('search')))
 		{
 			// If we come from another search box tone down the error...
 			if (!isset($_REQUEST['search_vv']))
@@ -545,12 +545,12 @@ class Search extends \ElkArte\AbstractController
 			foreach ($suggestions as $i => $s)
 			{
 				// Search is case insensitive.
-				if (\ElkArte\Util::strtolower($s) == \ElkArte\Util::strtolower($word))
+				if (\ElkArte\Util::strtolower($s) === \ElkArte\Util::strtolower($word))
 				{
 					unset($suggestions[$i]);
 				}
 				// Plus, don't suggest something the user thinks is rude!
-				elseif ($suggestions[$i] != censor($s))
+				elseif ($suggestions[$i] !== censor($s))
 				{
 					unset($suggestions[$i]);
 				}

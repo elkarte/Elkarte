@@ -594,8 +594,8 @@ class Emailuser extends \ElkArte\AbstractController
 		if (empty($message))
 			throw new \ElkArte\Exceptions\Exception('no_board', false);
 
-		$poster_name = un_htmlspecialchars($message['real_name']) . ($message['real_name'] != $message['poster_name'] ? ' (' . $message['poster_name'] . ')' : '');
-		$reporterName = un_htmlspecialchars($this->user->name) . ($this->user->name != $this->user->username && $this->user->username != '' ? ' (' . $this->user->username . ')' : '');
+		$poster_name = un_htmlspecialchars($message['real_name']) . ($message['real_name'] !== $message['poster_name'] ? ' (' . $message['poster_name'] . ')' : '');
+		$reporterName = un_htmlspecialchars($this->user->name) . ($this->user->name !== $this->user->username && $this->user->username != '' ? ' (' . $this->user->username . ')' : '');
 		$subject = un_htmlspecialchars($message['subject']);
 
 		// Get a list of members with the moderate_board permission.

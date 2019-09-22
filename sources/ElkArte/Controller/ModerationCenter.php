@@ -302,7 +302,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 				'name' => $mod_include_data['label'],
 			);
 
-		if (!empty($mod_include_data['current_subsection']) && $mod_include_data['subsections'][$mod_include_data['current_subsection']][0] != $mod_include_data['label'])
+		if (!empty($mod_include_data['current_subsection']) && $mod_include_data['subsections'][$mod_include_data['current_subsection']][0] !== $mod_include_data['label'])
 			$context['linktree'][] = array(
 				'url' => $scripturl . '?action=moderate;area=' . $mod_include_data['current_area'] . ';sa=' . $mod_include_data['current_subsection'],
 				'name' => $mod_include_data['subsections'][$mod_include_data['current_subsection']][0],
@@ -1269,7 +1269,7 @@ class ModerationCenter extends \ElkArte\AbstractController
 		$context['order'] = isset($this->_req->query->sort) && isset($searchTypes[$this->_req->query->sort]) ? $this->_req->query->sort : 'member';
 		$context['url_start'] = '?action=moderate;area=warnings;sa=log;sort=' . $context['order'];
 
-		if (!isset($search_params['string']) || (!empty($this->_req->post->search) && $search_params['string'] != $this->_req->post->search))
+		if (!isset($search_params['string']) || (!empty($this->_req->post->search) && $search_params['string'] !== $this->_req->post->search))
 			$search_params_string = empty($this->_req->post->search) ? '' : $this->_req->post->search;
 		else
 			$search_params_string = $search_params['string'];

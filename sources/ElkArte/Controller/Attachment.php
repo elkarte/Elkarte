@@ -48,7 +48,7 @@ class Attachment extends \ElkArte\AbstractController
 		{
 			$sa = $this->_req->get('sa');
 
-			return ($sa === 'ulattach' || $sa === 'rmattach') ? true : false;
+			return $sa === 'ulattach' || $sa === 'rmattach';
 		}
 		// else... politely kick him (or her).
 		else
@@ -399,7 +399,7 @@ class Attachment extends \ElkArte\AbstractController
 		list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
 
 		// If it isn't yet approved, do they have permission to view it?
-		if (!$is_approved && ($id_member == 0 || $this->user->id != $id_member) && ($attachment_type == 0 || $attachment_type == 3))
+		if (!$is_approved && ($id_member == 0 || $this->user->id !== $id_member) && ($attachment_type == 0 || $attachment_type == 3))
 			isAllowedTo('approve_posts', $id_board);
 
 		// Update the download counter (unless it's a thumbnail or an avatar).
@@ -416,7 +416,7 @@ class Attachment extends \ElkArte\AbstractController
 		$eTag = '"' . substr($id_attach . $real_filename . @filemtime($filename), 0, 64) . '"';
 		$use_compression = !empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java'));
 		$disposition = !isset($this->_req->query->image) ? 'attachment' : 'inline';
-		$do_cache = false === (!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '');
+		$do_cache = !(!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '');
 
 		// Make sure the mime type warrants an inline display.
 		if (isset($this->_req->query->image) && !empty($mime_type) && strpos($mime_type, 'image/') !== 0)
@@ -425,7 +425,7 @@ class Attachment extends \ElkArte\AbstractController
 			$mime_type = '';
 		}
 		// Does this have a mime type?
-		elseif (empty($mime_type) || !(isset($this->_req->query->image) || getValidMimeImageType($file_ext) === ''))
+		elseif (empty($mime_type) || !isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '')
 		{
 			$mime_type = '';
 			if (isset($this->_req->query->image))
@@ -523,7 +523,7 @@ class Attachment extends \ElkArte\AbstractController
 				list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
 
 				// If it isn't yet approved, do they have permission to view it?
-				if (!$is_approved && ($id_member == 0 || $this->user->id != $id_member) && ($attachment_type == 0 || $attachment_type == 3))
+				if (!$is_approved && ($id_member == 0 || $this->user->id !== $id_member) && ($attachment_type == 0 || $attachment_type == 3))
 					isAllowedTo('approve_posts');
 
 				$filename = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $file_hash);
@@ -547,7 +547,7 @@ class Attachment extends \ElkArte\AbstractController
 		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
 		$compressible_files = array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java');
 		$use_compression = !empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, $compressible_files);
-		$do_cache = false === (!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '');
+		$do_cache = !(!isset($this->_req->query->image) && getValidMimeImageType($file_ext) !== '');
 
 		$this->_send_headers($filename, $eTag, $mime_type, $use_compression, 'inline', $real_filename, $do_cache);
 
@@ -559,7 +559,7 @@ class Attachment extends \ElkArte\AbstractController
 		}
 		else
 		{
-			if ($use_compression === false)
+			if (!$use_compression)
 			{
 				header('Content-Length: ' . filesize($filename));
 			}
@@ -592,7 +592,7 @@ class Attachment extends \ElkArte\AbstractController
 		obStart($use_compression);
 
 		// No point in a nicer message, because this is supposed to be an attachment anyway...
-		if ($check_filename === true && !file_exists($filename))
+		if ($check_filename && !file_exists($filename))
 		{
 			theme()->getTemplates()->loadLanguageFile('Errors');
 
@@ -607,7 +607,7 @@ class Attachment extends \ElkArte\AbstractController
 		if (!empty($this->_req->server->HTTP_IF_MODIFIED_SINCE))
 		{
 			list ($modified_since) = explode(';', $this->_req->server->HTTP_IF_MODIFIED_SINCE);
-			if ($check_filename === false || strtotime($modified_since) >= filemtime($filename))
+			if (!$check_filename || strtotime($modified_since) >= filemtime($filename))
 			{
 				@ob_end_clean();
 
@@ -628,7 +628,7 @@ class Attachment extends \ElkArte\AbstractController
 
 		// Send the attachment headers.
 		header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT');
-		header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $check_filename === true ? filemtime($filename) : time() - 525600 * 60) . ' GMT');
+		header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $check_filename ? filemtime($filename) : time() - 525600 * 60) . ' GMT');
 		header('Accept-Ranges: bytes');
 		header('Connection: close');
 		header('ETag: ' . $eTag);
@@ -653,7 +653,7 @@ class Attachment extends \ElkArte\AbstractController
 			header('Content-Disposition: ' . $disposition . '; filename="' . $real_filename . '"');
 
 		// If this has an "image extension" - but isn't actually an image - then ensure it isn't cached cause of silly IE.
-		if ($do_cache === true)
+		if ($do_cache)
 		{
 			header('Cache-Control: max-age=' . (525600 * 60) . ', private');
 		}

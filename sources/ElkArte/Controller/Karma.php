@@ -107,7 +107,7 @@ class Karma extends \ElkArte\AbstractController
 		else
 		{
 			// If you are gonna try to repeat.... don't allow it.
-			if ($action == $dir)
+			if ($action === $dir)
 				throw new \ElkArte\Exceptions\Exception('karma_wait_time', false, array($modSettings['karmaWaitTime'], ($modSettings['karmaWaitTime'] == 1 ? strtolower($txt['hour']) : $txt['hours'])));
 
 			updateKarma($id_executor, $id_target, $dir);

@@ -579,16 +579,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 				$context['current_pm'] = 0;
 			}
 
-			// This is a list of the pm's that are used for "show all" display.
-			if ($context['display_mode'] == 0)
-			{
-				$display_pms = $pms;
-			}
-			// Just use the last pm the user received to start things off
-			else
-			{
-				$display_pms = array($lastData['id']);
-			}
+			$display_pms = $context['display_mode'] == 0 ? $pms : array($lastData['id']);
 
 			// At this point we know the main id_pm's. But if we are looking at conversations we need
 			// the PMs that make up the conversation
@@ -810,7 +801,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			$form_subject = $row_quoted['subject'];
 
 			// Add 'Re: ' to it....
-			if ($context['reply'] && trim($context['response_prefix']) != '' && \ElkArte\Util::strpos($form_subject, trim($context['response_prefix'])) !== 0)
+			if ($context['reply'] && trim($context['response_prefix']) !== '' && \ElkArte\Util::strpos($form_subject, trim($context['response_prefix'])) !== 0)
 			{
 				$form_subject = $context['response_prefix'] . $form_subject;
 			}
@@ -1261,7 +1252,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		// Message sent successfully?
 		else
 		{
-			$context['current_label_redirect'] = $context['current_label_redirect'] . ';done=sent';
+			$context['current_label_redirect'] .= ';done=sent';
 		}
 
 		// Go back to the where they sent from, if possible...
@@ -1529,7 +1520,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 
 		// Back to the folder.
 		$_SESSION['pm_selected'] = array_keys($to_label);
-		redirectexit($context['current_label_redirect'] . (count($to_label) == 1 ? '#msg_' . $_SESSION['pm_selected'][0] : ''), count($to_label) == 1 && isBrowser('ie'));
+		redirectexit($context['current_label_redirect'] . (count($to_label) === 1 ? '#msg_' . $_SESSION['pm_selected'][0] : ''), count($to_label) === 1 && isBrowser('ie'));
 	}
 
 	/**
@@ -1657,7 +1648,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 				{
 					$this->_req->post->label = \ElkArte\Util::substr($this->_req->post->label, 0, 30);
 				}
-				if ($this->_req->post->label != '')
+				if ($this->_req->post->label !== '')
 				{
 					$the_labels[] = $this->_req->post->label;
 				}
@@ -2183,7 +2174,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 				{
 					$criteria[] = array('t' => 'gid', 'v' => (int) $this->_req->post->ruledefgroup[$ind]);
 				}
-				elseif (in_array($type, array('sub', 'msg')) && trim($this->_req->post->ruledef[$ind]) != '')
+				elseif (in_array($type, array('sub', 'msg')) && trim($this->_req->post->ruledef[$ind]) !== '')
 				{
 					$criteria[] = array('t' => $type, 'v' => \ElkArte\Util::htmlspecialchars(trim($this->_req->post->ruledef[$ind])));
 				}
@@ -2502,7 +2493,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 				// Load this posters context info, if its not there then fill in the essentials...
 				$member = \ElkArte\MembersList::get($row['id_member_from']);
 				$member->loadContext(true);
-				if ($member->isEmpty() === false)
+				if (!$member->isEmpty())
 				{
 					$member['name'] = $row['from_name'];
 					$member['id'] = 0;
@@ -2530,7 +2521,10 @@ class PersonalMessage extends \ElkArte\AbstractController
 					$query = trim($query, '\*+');
 					$query = strtr(\ElkArte\Util::htmlspecialchars($query), array('\\\'' => '\''));
 
-					$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu', array($this, '_highlighted_callback'), $row['body']);
+					$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu',
+						function ($matches) {
+							return $this->_highlighted_callback($matches);
+					}, $row['body']);
 					$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $row['subject']);
 				}
 
@@ -2547,7 +2541,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 					'timestamp' => forum_time(true, $row['msgtime']),
 					'recipients' => &$recipients[$row['id_pm']],
 					'labels' => &$context['message_labels'][$row['id_pm']],
-					'fully_labeled' => count($context['message_labels'][$row['id_pm']]) == count($context['labels']),
+					'fully_labeled' => count($context['message_labels'][$row['id_pm']]) === count($context['labels']),
 					'is_replied_to' => &$context['message_replied'][$row['id_pm']],
 					'href' => $href,
 					'link' => '<a href="' . $href . '">' . $subject_highlighted . '</a>',
@@ -2630,7 +2624,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 				$context['search_errors']['no_labels_selected'] = true;
 			}
 			// Otherwise prepare the query!
-			elseif (count($this->_req->post->searchlabel) != count($context['labels']))
+			elseif (count($this->_req->post->searchlabel) !== count($context['labels']))
 			{
 				$labelQuery = '
 				AND {raw:label_implode}';
@@ -2690,7 +2684,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 			{
 				$userQuery = '';
 			}
-			elseif (count($members) == 0)
+			elseif (count($members) === 0)
 			{
 				if ($context['folder'] === 'inbox')
 				{
@@ -2901,7 +2895,7 @@ class PersonalMessage extends \ElkArte\AbstractController
 		}
 
 		// Are all the labels checked?
-		$context['check_all'] = empty($searchedLabels) || count($context['search_labels']) == count($searchedLabels);
+		$context['check_all'] = empty($searchedLabels) || count($context['search_labels']) === count($searchedLabels);
 
 		// Load the error text strings if there were errors in the search.
 		if (!empty($context['search_errors']))

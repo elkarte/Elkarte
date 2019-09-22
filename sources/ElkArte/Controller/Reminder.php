@@ -205,7 +205,7 @@ class Reminder extends \ElkArte\AbstractController
 		if (empty($this->_req->post->u) || !isset($this->_req->post->passwrd1, $this->_req->post->passwrd2))
 			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
-		if ($this->_req->post->passwrd1 != $this->_req->post->passwrd2)
+		if ($this->_req->post->passwrd1 !== $this->_req->post->passwrd2)
 			throw new \ElkArte\Exceptions\Exception('passwords_dont_match', false);
 
 		if ($this->_req->post->passwrd1 === '')
@@ -307,11 +307,11 @@ class Reminder extends \ElkArte\AbstractController
 		}
 
 		// You can't use a blank one!
-		if (strlen(trim($this->_req->post->passwrd1)) === 0)
+		if (trim($this->_req->post->passwrd1) === '')
 			throw new \ElkArte\Exceptions\Exception('no_password', false);
 
 		// They have to be the same too.
-		if ($this->_req->post->passwrd1 != $this->_req->post->passwrd2)
+		if ($this->_req->post->passwrd1 !== $this->_req->post->passwrd2)
 			throw new \ElkArte\Exceptions\Exception('passwords_dont_match', false);
 
 		// Make sure they have a strong enough password.

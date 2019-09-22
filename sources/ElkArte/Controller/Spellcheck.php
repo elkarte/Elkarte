@@ -151,7 +151,7 @@ class Spellcheck extends \ElkArte\AbstractController
 				// But first check they aren't going to be censored - no naughty words!
 				foreach ($suggestions as $k => $word)
 				{
-					if ($suggestions[$k] != censor($word))
+					if ($suggestions[$k] !== censor($word))
 					{
 						unset($suggestions[$k]);
 					}

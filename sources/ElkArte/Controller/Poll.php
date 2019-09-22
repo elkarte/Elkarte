@@ -381,7 +381,7 @@ class Poll extends \ElkArte\AbstractController
 						'number' => $number++,
 						'label' => $label,
 						'votes' => -1,
-						'is_last' => $count++ == $totalPostOptions && $totalPostOptions > 1 ? true : false,
+						'is_last' => $count++ === $totalPostOptions && $totalPostOptions > 1,
 					);
 				}
 			}
@@ -390,7 +390,7 @@ class Poll extends \ElkArte\AbstractController
 			if ($totalPostOptions < 2)
 			{
 				// Need two?
-				if ($totalPostOptions == 0)
+				if ($totalPostOptions === 0)
 				{
 					$context['poll']['choices'][] = array(
 						'id' => $last_id++,

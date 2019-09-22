@@ -31,7 +31,7 @@ function currentMemberID($fatal = true, $reload_id = false)
 
 	// If we already know who we're dealing with
 	if (isset($memID) && !$reload_id)
-		return $memID;
+		return (int) $memID;
 
 	// Did we get the user by name...
 	if (isset($_REQUEST['user']))
@@ -64,7 +64,7 @@ function currentMemberID($fatal = true, $reload_id = false)
 	// If all went well, we have a valid member ID!
 	list ($memID) = $memberResult;
 
-	return $memID;
+	return (int) $memID;
 }
 
 /**

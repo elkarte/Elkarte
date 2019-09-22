@@ -89,7 +89,7 @@ class Draft extends Post
 		global $txt, $modSettings, $context;
 
 		// Safe is safe.
-		if ($this->_memID != $this->user->id)
+		if ($this->_memID !== $this->user->id)
 		{
 			throw new \ElkArte\Exceptions\Exception('no_access', false);
 		}
@@ -196,7 +196,7 @@ class Draft extends Post
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
 		// Quick check how we got here.
-		if ($this->_memID != $this->user->id)
+		if ($this->_memID !== $this->user->id)
 		{
 			// empty($modSettings['drafts_enabled']) || empty($modSettings['drafts_pm_enabled']))
 			throw new \ElkArte\Exceptions\Exception('no_access', false);

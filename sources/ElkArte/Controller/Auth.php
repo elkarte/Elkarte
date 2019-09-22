@@ -197,7 +197,7 @@ class Auth extends \ElkArte\AbstractController
 		}
 
 		// Hmm... maybe 'admin' will login with no password. Uhh... NO!
-		if ((!isset($_POST['passwrd']) || $_POST['passwrd'] === '') && (!isset($_POST['hash_passwrd']) || strlen($_POST['hash_passwrd']) != 64))
+		if ((!isset($_POST['passwrd']) || $_POST['passwrd'] === '') && (!isset($_POST['hash_passwrd']) || strlen($_POST['hash_passwrd']) !== 64))
 		{
 			$context['login_errors'] = array($txt['no_password']);
 			return false;
@@ -211,7 +211,7 @@ class Auth extends \ElkArte\AbstractController
 		}
 
 		// Are we using any sort of integration to validate the login?
-		if (in_array('retry', call_integration_hook('integrate_validate_login', array($_POST['user'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 40 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime'])), true))
+		if (in_array('retry', call_integration_hook('integrate_validate_login', array($_POST['user'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) === 40 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime'])), true))
 		{
 			$context['login_errors'] = array($txt['login_hash_error']);
 			$context['disable_login_hashing'] = true;
@@ -248,7 +248,7 @@ class Auth extends \ElkArte\AbstractController
 				return false;
 			}
 			// OTP already used? Sorry, but this is a ONE TIME password..
-			if ($user_setting['otp_used'] == $_POST['otp_token'])
+			if ($user_setting['otp_used'] === $_POST['otp_token'])
 			{
 				$context['login_errors'] = array($txt['otp_used']);
 				return false;
@@ -269,7 +269,7 @@ class Auth extends \ElkArte\AbstractController
 			$valid_password = $user->validatePassword($_POST['hash_passwrd']);
 
 			// Let them in
-			if ($valid_password === true)
+			if ($valid_password)
 			{
 				$sha_passwd = $_POST['hash_passwrd'];
 			}
@@ -318,7 +318,7 @@ class Auth extends \ElkArte\AbstractController
 		}
 
 		// Bad password!  Thought you could fool the database?!
-		if ($valid_password === false)
+		if (!$valid_password)
 		{
 			// Let's be cautious, no hacking please. thanx.
 			validatePasswordFlood($user_setting['id_member'], $user_setting['passwd_flood']);
@@ -557,15 +557,7 @@ class Auth extends \ElkArte\AbstractController
 			}
 
 			// Some whitelisting for login_url...
-			if (empty($_SESSION['login_url']) || validLoginUrl($_SESSION['login_url']) === false)
-			{
-				$temp = '';
-			}
-			else
-			{
-				// Best not to clutter the session data too much...
-				$temp = $_SESSION['login_url'];
-			}
+			$temp = empty($_SESSION['login_url']) || validLoginUrl($_SESSION['login_url']) === false ? '' : $_SESSION['login_url'];
 			unset($_SESSION['login_url']);
 			redirectexit($temp);
 		}
@@ -783,6 +775,7 @@ function checkActivation()
  * @param \ElkArte\UserSettingsLoader $user
  *
  * @package Authorization
+ * @throws \ElkArte\Exceptions\Exception
  */
 function doLogin(\ElkArte\UserSettingsLoader $user)
 {
@@ -794,7 +787,7 @@ function doLogin(\ElkArte\UserSettingsLoader $user)
 	User::reloadByUser($user, true);
 
 	// Call login integration functions.
-	call_integration_hook('integrate_login', array(User::$settings['member_name'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 64 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime']));
+	call_integration_hook('integrate_login', array(User::$settings['member_name'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) === 64 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime']));
 
 	// Bam!  Cookie set.  A session too, just in case.
 	setLoginCookie(60 * $modSettings['cookieTime'], User::$settings['id_member'], hash('sha256', (User::$settings['passwd'] . User::$settings['password_salt'])));
@@ -881,7 +874,7 @@ function md5_hmac($data, $key)
 function phpBB3_password_check($passwd, $passwd_hash)
 {
 	// Too long or too short?
-	if (strlen($passwd_hash) != 34)
+	if (strlen($passwd_hash) !== 34)
 		return false;
 
 	// Range of characters allowed.
@@ -893,7 +886,7 @@ function phpBB3_password_check($passwd, $passwd_hash)
 	$salt = substr($passwd_hash, 4, 8);
 
 	$hash = md5($salt . $passwd, true);
-	for (; $count != 0; --$count)
+	for (; $count !== 0; --$count)
 		$hash = md5($hash . $passwd, true);
 
 	$output = substr($passwd_hash, 0, 12);

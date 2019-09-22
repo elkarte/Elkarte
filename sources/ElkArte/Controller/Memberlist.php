@@ -296,14 +296,14 @@ class Memberlist extends \ElkArte\AbstractController
 		{
 			$context['columns'][$col]['href'] = $scripturl . '?action=memberlist;sort=' . $col . ';start=0';
 
-			if ((!isset($desc) && $col == $sort)
-				|| ($col != $sort && !empty($column_details['default_sort_rev'])))
+			if ((!isset($desc) && $col === $sort)
+				|| ($col !== $sort && !empty($column_details['default_sort_rev'])))
 			{
 				$context['columns'][$col]['href'] .= ';desc';
 			}
 
 			$context['columns'][$col]['link'] = '<a href="' . $context['columns'][$col]['href'] . '" rel="nofollow">' . $context['columns'][$col]['label'] . '</a>';
-			$context['columns'][$col]['selected'] = $sort == $col;
+			$context['columns'][$col]['selected'] = $sort === $col;
 			if ($context['columns'][$col]['selected'])
 				$context['columns'][$col]['class'] .= ' selected';
 		}
@@ -375,7 +375,7 @@ class Memberlist extends \ElkArte\AbstractController
 			{
 				$this_letter = \ElkArte\Util::strtolower(\ElkArte\Util::substr($context['members'][$i]['name'], 0, 1));
 
-				if ($this_letter != $last_letter && preg_match('~[a-z]~', $this_letter) === 1)
+				if ($this_letter !== $last_letter && preg_match('~[a-z]~', $this_letter) === 1)
 				{
 					$context['members'][$i]['sort_letter'] = \ElkArte\Util::htmlspecialchars($this_letter);
 					$last_letter = $this_letter;
@@ -431,12 +431,12 @@ class Memberlist extends \ElkArte\AbstractController
 			{
 				$context['columns'][$col]['href'] = $scripturl . '?action=memberlist;sa=search;start=0;sort=' . $col;
 
-				if ((!isset($desc) && $col == $sort) || ($col != $sort && !empty($column_details['default_sort_rev'])))
+				if ((!isset($desc) && $col === $sort) || ($col !== $sort && !empty($column_details['default_sort_rev'])))
 					$context['columns'][$col]['href'] .= ';desc';
 
 				$context['columns'][$col]['href'] .= ';search=' . $search . ';fields=' . implode(',', $input_fields);
 				$context['columns'][$col]['link'] = '<a href="' . $context['columns'][$col]['href'] . '" rel="nofollow">' . $context['columns'][$col]['label'] . '</a>';
-				$context['columns'][$col]['selected'] = $sort == $col;
+				$context['columns'][$col]['selected'] = $sort === $col;
 			}
 
 			// set up some things for use in the template
@@ -511,7 +511,7 @@ class Memberlist extends \ElkArte\AbstractController
 				redirectexit('action=memberlist');
 
 			$validFields = array_unique($validFields);
-			$query = $search == '' ? '= {string:blank_string}' : ('LIKE {string_case_insensitive:search}');
+			$query = $search === '' ? '= {string:blank_string}' : ('LIKE {string_case_insensitive:search}');
 			$where = implode(' ' . $query . ' OR ', $fields) . ' ' . $query . $condition;
 
 			// Find the members from the database.

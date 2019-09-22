@@ -78,10 +78,7 @@ class Apc extends AbstractCacheMethod
 	{
 		$prefixedKey = $this->getprefixedKey($key);
 		$success = false;
-		if ($this->apcu)
-			$result = apcu_fetch($prefixedKey, $success);
-		else
-			$result = apc_fetch($prefixedKey, $success);
+		$result = $this->apcu ? apcu_fetch($prefixedKey, $success) : apc_fetch($prefixedKey, $success);
 		$this->is_miss = !$success;
 
 		/*

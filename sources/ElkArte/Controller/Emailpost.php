@@ -69,7 +69,7 @@ class Emailpost extends \ElkArte\AbstractController
 		// Load the email parser and get some data to work with
 		$email_message = new \ElkArte\EmailParse();
 		$email_message->read_data($data, BOARDDIR);
-		if (!$email_message->raw_message)
+		if (empty($email_message->raw_message))
 			return false;
 
 		// Ask for an html version (if available) and some needed details
@@ -190,7 +190,7 @@ class Emailpost extends \ElkArte\AbstractController
 			$current_subject = str_replace($pbe['response_prefix'], '', $topic_info['subject']);
 
 			// If it does not match, then we go to make a new topic instead
-			if (trim($subject) != trim($current_subject))
+			if (trim($subject) !== trim($current_subject))
 			{
 				$board_info = query_load_board_details($topic_info['id_board'], $pbe);
 				return pbe_create_topic($pbe, $email_message, $board_info);
@@ -249,7 +249,7 @@ class Emailpost extends \ElkArte\AbstractController
 		// Get the data from one of our sources
 		$email_message = new \ElkArte\EmailParse();
 		$email_message->read_data($data, BOARDDIR);
-		if (!$email_message->raw_message)
+		if (empty($email_message->raw_message))
 			return false;
 
 		// Parse the header and some needed details
@@ -359,7 +359,7 @@ class Emailpost extends \ElkArte\AbstractController
 		// Load the email parser and get some data to work with
 		$email_message = new \ElkArte\EmailParse();
 		$email_message->read_data($data, BOARDDIR);
-		if (!$email_message->raw_message)
+		if (empty($email_message->raw_message))
 			return false;
 
 		// Ask for an html version (if available) and some needed details
@@ -381,7 +381,7 @@ class Emailpost extends \ElkArte\AbstractController
 				$attachment_count = count($email_message->attachments);
 		}
 
-		if ($attachment_count)
+		if ($attachment_count !== 0)
 			$text .= "\n\n" . sprintf($txt['email_attachments'], $attachment_count);
 
 		// Return the parsed and formatted body and who it was sent to for the template

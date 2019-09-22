@@ -110,7 +110,7 @@ class News extends \ElkArte\AbstractController
 		{
 			$categories = array_map('intval', explode(',', $this->_req->query->c));
 
-			if (count($categories) == 1)
+			if (count($categories) === 1)
 			{
 				require_once(SUBSDIR . '/Categories.subs.php');
 				$feed_title = categoryName($categories[0]);
@@ -143,7 +143,7 @@ class News extends \ElkArte\AbstractController
 
 			// Either the board specified doesn't exist or you have no access.
 			$num_boards = count($boards_data);
-			if ($num_boards == 0)
+			if ($num_boards === 0)
 			{
 				throw new \ElkArte\Exceptions\Exception('no_board');
 			}
@@ -152,7 +152,7 @@ class News extends \ElkArte\AbstractController
 			$boards = array_keys($boards_data);
 			foreach ($boards_data as $row)
 			{
-				if ($num_boards == 1)
+				if ($num_boards === 1)
 				{
 					$feed_title = ' - ' . strip_tags($row['name']);
 				}
@@ -681,11 +681,11 @@ class News extends \ElkArte\AbstractController
 			if (in_array($member['show_email'], array('yes', 'yes_permission_override')))
 				$data['email'] = $member['email'];
 
-			if (!empty($member['birth_date']) && substr($member['birth_date'], 0, 4) != '0000')
+			if (!empty($member['birth_date']) && substr($member['birth_date'], 0, 4) !== '0000')
 			{
 				list ($birth_year, $birth_month, $birth_day) = sscanf($member['birth_date'], '%d-%d-%d');
 				$datearray = getdate(forum_time());
-				$data['age'] = $datearray['year'] - $birth_year - (($datearray['mon'] > $birth_month || ($datearray['mon'] == $birth_month && $datearray['mday'] >= $birth_day)) ? 0 : 1);
+				$data['age'] = $datearray['year'] - $birth_year - (($datearray['mon'] > $birth_month || ($datearray['mon'] === $birth_month && $datearray['mday'] >= $birth_day)) ? 0 : 1);
 			}
 		}
 
@@ -763,7 +763,7 @@ function cdata_parse($data, $ns = '', $override = null)
 			\ElkArte\Util::strpos($data, ']', $pos),
 		);
 
-		if ($ns != '')
+		if ($ns !== '')
 			$positions[] = \ElkArte\Util::strpos($data, '<', $pos);
 
 		foreach ($positions as $k => $dummy)

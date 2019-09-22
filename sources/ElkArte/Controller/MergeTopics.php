@@ -181,7 +181,7 @@ class MergeTopics extends \ElkArte\AbstractController
 			$topics = $this->_req->post->topics;
 
 		// There's nothing to merge with just one topic...
-		if (empty($topics) || !is_array($topics) || count($topics) == 1)
+		if (empty($topics) || !is_array($topics) || count($topics) === 1)
 			throw new \ElkArte\Exceptions\Exception('merge_need_more_topics');
 
 		// Send the topics to the TopicsMerge class

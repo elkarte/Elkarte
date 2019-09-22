@@ -105,7 +105,7 @@ class ProfileHistory extends \ElkArte\AbstractController
 
 		$context['last_ip'] = $this->_profile['member_ip'];
 
-		if ($context['last_ip'] != $this->_profile['member_ip2'])
+		if ($context['last_ip'] !== $this->_profile['member_ip2'])
 			$context['last_ip2'] = $this->_profile['member_ip2'];
 
 		$context['member']['name'] = $this->_profile['real_name'];
@@ -231,7 +231,7 @@ class ProfileHistory extends \ElkArte\AbstractController
 		theme()->getTemplates()->load('ProfileHistory');
 		theme()->getTemplates()->loadLanguageFile('Profile');
 
-		if ($this->_memID == 0)
+		if ($this->_memID === 0)
 		{
 			$context['ip'] = $this->user->ip;
 			$context['page_title'] = $txt['profile'];
@@ -481,7 +481,7 @@ class ProfileHistory extends \ElkArte\AbstractController
 	{
 		global $scripturl, $txt, $context;
 
-		if ($this->_memID == 0)
+		if ($this->_memID === 0)
 			$context['base_url'] = $scripturl . '?action=trackip';
 		else
 			$context['base_url'] = $scripturl . '?action=profile;area=history;sa=ip;u=' . $this->_memID;
@@ -639,9 +639,8 @@ class ProfileHistory extends \ElkArte\AbstractController
 	public function list_getUserErrorCount($where, $where_vars = array())
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
-		$count = getUserErrorCount($where, $where_vars);
 
-		return $count;
+		return getUserErrorCount($where, $where_vars);
 	}
 
 	/**
@@ -659,9 +658,8 @@ class ProfileHistory extends \ElkArte\AbstractController
 	public function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars = array())
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
-		$error_messages = getUserErrors($start, $items_per_page, $sort, $where, $where_vars);
 
-		return $error_messages;
+		return getUserErrors($start, $items_per_page, $sort, $where, $where_vars);
 	}
 
 	/**
@@ -676,9 +674,8 @@ class ProfileHistory extends \ElkArte\AbstractController
 	public function list_getIPMessageCount($where, $where_vars = array())
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
-		$count = getIPMessageCount($where, $where_vars);
 
-		return $count;
+		return getIPMessageCount($where, $where_vars);
 	}
 
 	/**
@@ -696,9 +693,8 @@ class ProfileHistory extends \ElkArte\AbstractController
 	public function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars = array())
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
-		$messages = getIPMessages($start, $items_per_page, $sort, $where, $where_vars);
 
-		return $messages;
+		return getIPMessages($start, $items_per_page, $sort, $where, $where_vars);
 	}
 
 	/**
@@ -714,9 +710,8 @@ class ProfileHistory extends \ElkArte\AbstractController
 	public function list_getLoginCount($where, $where_vars = array())
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
-		$count = getLoginCount($where, $where_vars);
 
-		return $count;
+		return getLoginCount($where, $where_vars);
 	}
 
 	/**
@@ -735,9 +730,8 @@ class ProfileHistory extends \ElkArte\AbstractController
 	public function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = array())
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
-		$logins = getLogins($where, $where_vars);
 
-		return $logins;
+		return getLogins($where, $where_vars);
 	}
 
 	/**
@@ -750,9 +744,8 @@ class ProfileHistory extends \ElkArte\AbstractController
 	public function list_getProfileEditCount()
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
-		$edit_count = getProfileEditCount($this->_memID);
 
-		return $edit_count;
+		return getProfileEditCount($this->_memID);
 	}
 
 	/**
@@ -768,8 +761,7 @@ class ProfileHistory extends \ElkArte\AbstractController
 	public function list_getProfileEdits($start, $items_per_page, $sort)
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
-		$edits = getProfileEdits($start, $items_per_page, $sort, $this->_memID);
 
-		return $edits;
+		return getProfileEdits($start, $items_per_page, $sort, $this->_memID);
 	}
 }

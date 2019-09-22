@@ -202,7 +202,7 @@ class MoveTopic extends \ElkArte\AbstractController
 		$context['back_to_topic'] = isset($this->_req->post->goback);
 
 		// Ugly !
-		if ($this->user->language != $language)
+		if ($this->user->language !== $language)
 		{
 			theme()->getTemplates()->loadLanguageFile('index', $language);
 			$temp = $txt['movetopic_default'];
@@ -336,7 +336,7 @@ class MoveTopic extends \ElkArte\AbstractController
 				$custom_subject = \ElkArte\Util::substr($custom_subject, 0, 100);
 
 			// If it's still valid move onwards and upwards.
-			if ($custom_subject != '')
+			if ($custom_subject !== '')
 			{
 				$all_messages = isset($this->_req->post->enforce_subject);
 				if ($all_messages)
@@ -372,7 +372,7 @@ class MoveTopic extends \ElkArte\AbstractController
 		if (isset($this->_req->post->postRedirect))
 		{
 			// Should be in the boardwide language.
-			if ($this->user->language != $language)
+			if ($this->user->language !== $language)
 			{
 				theme()->getTemplates()->loadLanguageFile('index', $language);
 			}

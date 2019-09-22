@@ -164,7 +164,7 @@ class Register extends \ElkArte\AbstractController
 		$current_step = isset($this->_req->post->step) ? (int) $this->_req->post->step : ($context['require_agreement'] && !$context['checkbox_agreement'] ? 1 : 2);
 
 		// Does this user agree to the registration agreement?
-		if ($current_step == 1 && (isset($this->_req->post->accept_agreement) || isset($this->_req->post->accept_agreement_coppa)))
+		if ($current_step === 1 && (isset($this->_req->post->accept_agreement) || isset($this->_req->post->accept_agreement_coppa)))
 		{
 			$context['registration_passed_agreement'] = $_SESSION['registration_agreed'] = true;
 			$context['registration_passed_privacypol'] = $_SESSION['registration_privacypolicy'] = true;
@@ -188,8 +188,8 @@ class Register extends \ElkArte\AbstractController
 			$current_step = 1;
 
 		// Show the user the right form.
-		$context['sub_template'] = $current_step == 1 ? 'registration_agreement' : 'registration_form';
-		$context['page_title'] = $current_step == 1 ? $txt['registration_agreement'] : $txt['registration_form'];
+		$context['sub_template'] = $current_step === 1 ? 'registration_agreement' : 'registration_form';
+		$context['page_title'] = $current_step === 1 ? $txt['registration_agreement'] : $txt['registration_form'];
 		loadJavascriptFile(array('register.js', 'mailcheck.min.js'));
 		theme()->addInlineJavascript('disableAutoComplete();
 		$("input[type=email]").on("blur", function(event) {
@@ -509,8 +509,8 @@ class Register extends \ElkArte\AbstractController
 		// If we've come from OpenID set up some default stuff.
 		elseif ($verifiedOpenID || ((!empty($this->_req->post->openid_identifier) || !empty($_SESSION['openid']['openid_uri'])) && $this->_req->post->authenticate === 'openid'))
 		{
-			$regOptions['username'] = !empty($this->_req->post->user) && trim($this->_req->post->user) != '' ? $this->_req->post->user : $_SESSION['openid']['nickname'];
-			$regOptions['email'] = !empty($this->_req->post->email) && trim($this->_req->post->email) != '' ? $this->_req->post->email : $_SESSION['openid']['email'];
+			$regOptions['username'] = !empty($this->_req->post->user) && trim($this->_req->post->user) !== '' ? $this->_req->post->user : $_SESSION['openid']['nickname'];
+			$regOptions['email'] = !empty($this->_req->post->email) && trim($this->_req->post->email) !== '' ? $this->_req->post->email : $_SESSION['openid']['email'];
 			$regOptions['auth_method'] = 'openid';
 			$regOptions['openid'] = !empty($_SESSION['openid']['openid_uri']) ? $_SESSION['openid']['openid_uri'] : (!empty($this->_req->post->openid_identifier) ? $this->_req->post->openid_identifier : '');
 		}
@@ -645,7 +645,7 @@ class Register extends \ElkArte\AbstractController
 			'hide_email', 'show_online',
 		);
 
-		if ($has_real_name && trim($this->_req->post->real_name) != '' && !isReservedName($this->_req->post->real_name) && \ElkArte\Util::strlen($this->_req->post->real_name) < 60)
+		if ($has_real_name && trim($this->_req->post->real_name) !== '' && !isReservedName($this->_req->post->real_name) && \ElkArte\Util::strlen($this->_req->post->real_name) < 60)
 			$possible_strings[] = 'real_name';
 
 		// Some of these fields we may not want.
@@ -731,7 +731,7 @@ class Register extends \ElkArte\AbstractController
 				$context['languages'][$key]['name'] = $lang['name'];
 
 				// Found it!
-				if ($selectedLanguage == $lang['filename'])
+				if ($selectedLanguage === $lang['filename'])
 				{
 					$context['languages'][$key]['selected'] = true;
 				}

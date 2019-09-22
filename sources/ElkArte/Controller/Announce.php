@@ -121,11 +121,9 @@ class Announce extends \ElkArte\AbstractController
 		$groups = array_merge($board_info['groups'], array(1));
 		$who = array();
 
-		// Load any supplied membergroups (from announcement_send template pause loop)
-		if (isset($this->_req->post->membergroups))
-			$_who = explode(',', $this->_req->post->membergroups);
-		else
-			$_who = $this->_req->post->who;
+		$_who = isset($this->_req->post->membergroups)
+			? explode(',', $this->_req->post->membergroups)
+			: $this->_req->post->who;
 
 		// Check that at least one membergroup was selected (set from announce sub template)
 		if (empty($_who))

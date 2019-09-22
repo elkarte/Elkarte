@@ -240,7 +240,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 			{
 				$new_buddies[$k] = strtr(trim($new_buddies[$k]), array('\'' => '&#039;'));
 
-				if (strlen($new_buddies[$k]) == 0 || in_array($new_buddies[$k], array($this->_profile['member_name'], $this->_profile['real_name'])))
+				if ($new_buddies[$k] === '' || in_array($new_buddies[$k], array($this->_profile['member_name'], $this->_profile['real_name'])))
 					unset($new_buddies[$k]);
 			}
 
@@ -347,7 +347,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 			{
 				$new_entries[$k] = strtr(trim($new_entries[$k]), array('\'' => '&#039;'));
 
-				if (strlen($new_entries[$k]) == 0 || in_array($new_entries[$k], array($this->_profile['member_name'], $this->_profile['real_name'])))
+				if ($new_entries[$k] === '' || in_array($new_entries[$k], array($this->_profile['member_name'], $this->_profile['real_name'])))
 					unset($new_entries[$k]);
 			}
 
@@ -550,7 +550,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 				if ($this->_req->post->passwrd1 === '')
 					$post_errors[] = 'no_password';
 				// Do the two entries for the password even match?
-				elseif (!isset($this->_req->post->passwrd2) || $this->_req->post->passwrd1 != $this->_req->post->passwrd2)
+				elseif (!isset($this->_req->post->passwrd2) || $this->_req->post->passwrd1 !== $this->_req->post->passwrd2)
 					$post_errors[] = 'bad_new_password';
 				// Is it valid?
 				else
@@ -962,7 +962,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 			'name' => $txt['regular_members'],
 			'desc' => $txt['regular_members_desc'],
 			'type' => 0,
-			'is_primary' => $context['primary_group'] == 0 ? true : false,
+			'is_primary' => $context['primary_group'] == 0,
 			'can_be_primary' => true,
 			'can_leave' => 0,
 		);
@@ -1015,7 +1015,7 @@ class ProfileOptions extends \ElkArte\AbstractController
 
 		// One way or another, we have a target group in mind...
 		$group_id = isset($group_id) ? $group_id : (int) $this->_req->post->primary;
-		$foundTarget = $changeType === 'primary' && $group_id == 0 ? true : false;
+		$foundTarget = $changeType === 'primary' && $group_id == 0;
 
 		// Sanity check!!
 		if ($group_id == 1)

@@ -404,7 +404,7 @@ class Mentions extends \ElkArte\AbstractController
 			$round++;
 
 			// If nothing has been removed OR there are not enough
-			if (count($mentions) != $count_possible || count($mentions) == $limit || ($totalMentions - $start < $limit))
+			if (count($mentions) !== $count_possible || count($mentions) === $limit || ($totalMentions - $start < $limit))
 				break;
 
 			// Let's start a bit further into the list

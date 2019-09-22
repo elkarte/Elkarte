@@ -174,7 +174,7 @@ class MessageIndex extends \ElkArte\AbstractController implements FrontpageInter
 				$context['robot_no_index'] = true;
 		}
 
-		if (!empty($this->_req->query->start) && (!is_numeric($this->_req->query->start) || $this->_req->query->start % $context['messages_per_page'] != 0))
+		if (!empty($this->_req->query->start) && (!is_numeric($this->_req->query->start) || $this->_req->query->start % $context['messages_per_page'] !== 0))
 		{
 			$context['robot_no_index'] = true;
 		}
