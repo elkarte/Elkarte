@@ -14,6 +14,9 @@ namespace ElkArte;
 
 use ElkArte\User;
 
+/**
+ * Handle events in controller and classes
+ */
 class EventManager
 {
 	/**
@@ -236,7 +239,7 @@ class EventManager
 		{
 			// Load the events for this area/class combination
 			$events = $class::hooks($this);
-			if (is_array($events) === false)
+			if (!is_array($events))
 			{
 				continue;
 			}

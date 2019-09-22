@@ -31,7 +31,7 @@ class SearchRenderer extends Renderer
 	const CONTEXT_HOOK = 'integrate_prepare_search_context';
 
 	/**
-	 * 
+	 *
 	 * @var mixed[]
 	 */
 	protected $_participants = [];
@@ -155,13 +155,16 @@ class SearchRenderer extends Renderer
 
 		foreach ($this->_bodyParser->getSearchArray() as $query)
 		{
-		
+
 			// Fix the international characters in the keyword too.
 			$query = un_htmlspecialchars($query);
 			$query = trim($query, '\*+');
 			$query = strtr(\ElkArte\Util::htmlspecialchars($query), array('\\\'' => '\''));
 
-			$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu', array($this, '_highlighted_callback'), $body_highlighted);
+			$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu',
+				function ($matches) {
+					return $this->_highlighted_callback($matches);
+				}, $body_highlighted);
 			$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $subject_highlighted);
 		}
 
@@ -228,6 +231,6 @@ class SearchRenderer extends Renderer
 	 */
 	private function _highlighted_callback($matches)
 	{
-		return isset($matches[2]) && $matches[2] == $matches[1] ? stripslashes($matches[1]) : '<span class="highlight">' . $matches[1] . '</span>';
+		return isset($matches[2]) && $matches[2] === $matches[1] ? stripslashes($matches[1]) : '<span class="highlight">' . $matches[1] . '</span>';
 	}
 }

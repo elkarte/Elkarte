@@ -74,10 +74,7 @@ class Event
 	 */
 	public function add($event, $priority)
 	{
-		if (is_array($event[1]))
-			$name = $event[1][0];
-		else
-			$name = $event[1];
+		$name = is_array($event[1]) ? $event[1][0] : $event[1];
 
 		$this->_priority->add($name, $priority);
 		$this->_events[$name] = $event;
@@ -90,7 +87,7 @@ class Event
 	 */
 	public function hasEvents()
 	{
-		if ($this->_sorted === false)
+		if (!$this->_sorted)
 		{
 			$this->_doSorting();
 		}
@@ -112,11 +109,15 @@ class Event
 	public function getEvents()
 	{
 		$return = array();
-		if ($this->_sorted === false)
+		if (!$this->_sorted)
+		{
 			$this->_doSorting();
+		}
 
 		foreach ($this->_priority->getSortedEntities() as $value)
+		{
 			$return[] = $this->_events[$value];
+		}
 
 		return $return;
 	}

@@ -381,7 +381,7 @@ class OpenID
 			list ($dup, $num_bytes) = $cache[$byte_string];
 		else
 		{
-			$num_bytes = strlen($byte_string) - ($byte_string[0] == "\x00" ? 1 : 0);
+			$num_bytes = strlen($byte_string) - ($byte_string[0] === "\x00" ? 1 : 0);
 
 			$max_rand = bcpow(256, $num_bytes);
 
@@ -448,10 +448,7 @@ class OpenID
 					$response_data[$match[1]] = $href_match[1];
 		}
 
-		if (empty($response_data['provider']))
-			$response_data['server'] = $openid_url;
-		else
-			$response_data['server'] = $response_data['provider'];
+		$response_data['server'] = empty($response_data['provider']) ? $openid_url : $response_data['provider'];
 
 		return $response_data;
 	}
@@ -495,7 +492,7 @@ class OpenID
 		if ($cmp < 0)
 			throw new \ElkArte\Exceptions\Exception('Only non-negative integers allowed.');
 
-		if ($cmp == 0)
+		if ($cmp === 0)
 			return "\x00";
 
 		$bytes = array();

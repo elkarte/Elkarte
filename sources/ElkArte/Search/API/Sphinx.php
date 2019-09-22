@@ -89,7 +89,7 @@ class Sphinx extends AbstractAPI
 	{
 		global $modSettings;
 
-		return !(empty($modSettings['sphinx_searchd_server']) || empty($modSettings['sphinx_searchd_port']));
+		return !empty($modSettings['sphinx_searchd_server']) && !empty($modSettings['sphinx_searchd_port']);
 	}
 
 	/**
@@ -126,7 +126,7 @@ class Sphinx extends AbstractAPI
 
 		$fulltextWord = count($subwords) === 1 ? $word : '"' . $word . '"';
 		$wordsSearch['indexed_words'][] = $fulltextWord;
-		if ($isExcluded)
+		if ($isExcluded !== '')
 		{
 			$wordsExclude[] = $fulltextWord;
 		}
@@ -216,7 +216,7 @@ class Sphinx extends AbstractAPI
 
 			// If no search terms are left after comparing against excluded words (i.e. "test -test" or "test last -test -last"),
 			// sending that to Sphinx would result in a fatal error
-			if (!count(array_diff($inc_words, $excluded_words)))
+			if (count(array_diff($inc_words, $excluded_words)) === 0)
 			{
 				// Instead, fail gracefully (return "no results")
 				return 0;
@@ -324,7 +324,7 @@ class Sphinx extends AbstractAPI
 		$sphinx_term = preg_replace('/""+/', '"', $sphinx_term);
 
 		// Unmatched (i.e. odd number of) quotation marks also cause fatal errors, so handle them
-		if (substr_count($sphinx_term, '"') % 2)
+		if (substr_count($sphinx_term, '"') % 2 !== 0)
 		{
 			// Using preg_replace since it supports limiting the number of replacements
 			$sphinx_term = preg_replace('/"/', '', $sphinx_term, 1);

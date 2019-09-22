@@ -167,14 +167,7 @@ class Db extends Adapter
 			}
 			foreach ($configVar['mask'] as $key => $mask)
 			{
-				if (isset($known_rules[$mask]))
-				{
-					$rules[$configVar[1]][] = $known_rules[$mask];
-				}
-				else
-				{
-					$rules[$configVar[1]][] = $mask;
-				}
+				$rules[$configVar[1]][] = isset($known_rules[$mask]) ? $known_rules[$mask] : $mask;
 			}
 			if (!empty($rules))
 			{
@@ -374,7 +367,8 @@ class Db extends Adapter
 				case 'select':
 					// Select boxes!
 					$setTypes[$var[1]] = 'string';
-					if (empty($var['multiple']) && in_array($this->configValues[$var[1]], array_keys($var[2])))
+
+					if (empty($var['multiple']) && array_key_exists($this->configValues[$var[1]], $var[2]))
 					{
 						$setArray[$var[1]] = $this->configValues[$var[1]];
 					}
@@ -402,7 +396,7 @@ class Db extends Adapter
 				case 'password':
 					// Passwords!
 					$setTypes[$var[1]] = 'string';
-					if (isset($this->configValues[$var[1]][1]) && $this->configValues[$var[1]][0] == $this->configValues[$var[1]][1])
+					if (isset($this->configValues[$var[1]][1]) && $this->configValues[$var[1]][0] === $this->configValues[$var[1]][1])
 					{
 						$setArray[$var[1]] = $this->configValues[$var[1]][0];
 					}

@@ -540,14 +540,7 @@ class Html2Md
 		$title = $node->getAttribute('title');
 		$value = $this->_get_value($node);
 
-		if (!empty($title))
-		{
-			$markdown = '*[' . $value . ']: ' . $title . $this->line_break;
-		}
-		else
-		{
-			$markdown = '';
-		}
+		$markdown = !empty($title) ? '*[' . $value . ']: ' . $title . $this->line_break : '';
 
 		return $markdown;
 	}
@@ -697,7 +690,7 @@ class Html2Md
 			if (!empty($ticks))
 			{
 				// If the ticks were at the start/end of the word space it off
-				if ($lines[0][0] == '`' || substr($lines[0], -1) == '`')
+				if ($lines[0][0] === '`' || substr($lines[0], -1) === '`')
 				{
 					$lines[0] = ' ' . $lines[0] . ' ';
 				}
@@ -761,14 +754,9 @@ class Html2Md
 		$alt = $node->getAttribute('alt');
 		$title = $node->getAttribute('title');
 
-		if (!empty($title))
-		{
-			$markdown = '![' . $alt . '](' . $src . ' "' . $title . '")';
-		}
-		else
-		{
-			$markdown = '![' . $alt . '](' . $src . ')';
-		}
+		$markdown = !empty($title)
+			? '![' . $alt . '](' . $src . ' "' . $title . '")'
+			: '![' . $alt . '](' . $src . ')';
 
 		// Adjust width if needed to maintain the image
 		$this->_check_link_lenght($markdown);
@@ -1185,7 +1173,10 @@ class Html2Md
 	 */
 	private function _convert_plaintxt_links()
 	{
-		$this->markdown = preg_replace_callback('/[^\(\/\]]((https?):\/\/|www\.)[-\p{L}0-9+&@#\/%?=~_|!:,.;]*[\p{L}0-9+&@#\/%=~_|]/iu', array($this, '_plaintxt_callback'), $this->markdown);
+		$this->markdown = preg_replace_callback('/[^\(\/\]]((https?):\/\/|www\.)[-\p{L}0-9+&@#\/%?=~_|!:,.;]*[\p{L}0-9+&@#\/%=~_|]/iu',
+			function ($matches) {
+				return $this->_plaintxt_callback($matches);
+		}, $this->markdown);
 	}
 
 	/**

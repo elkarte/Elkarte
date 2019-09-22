@@ -153,7 +153,7 @@ class MemberLoader
 
 		$to_load = $this->loadFromCache($users);
 
-		$this->loadByCondition('mem.id_member' . (count($to_load) == 1 ? ' = {int:users}' : ' IN ({array_int:users})'), $to_load);
+		$this->loadByCondition('mem.id_member' . (count($to_load) === 1 ? ' = {int:users}' : ' IN ({array_int:users})'), $to_load);
 
 		$this->loadModerators();
 
@@ -179,7 +179,7 @@ class MemberLoader
 		$users = array_unique((array) $name);
 		$this->loaded_ids = [];
 
-		$this->loadByCondition('{column_case_insensitive:mem.member_name}' . (count($users) == 1 ? ' = {string_case_insensitive:users}' : ' IN ({array_string_case_insensitive:users})'), $users);
+		$this->loadByCondition('{column_case_insensitive:mem.member_name}' . (count($users) === 1 ? ' = {string_case_insensitive:users}' : ' IN ({array_string_case_insensitive:users})'), $users);
 
 		$this->loadModerators();
 
@@ -218,7 +218,7 @@ class MemberLoader
 	 */
 	protected function loadFromCache($users)
 	{
-		if ($this->useCache === false)
+		if (!$this->useCache)
 		{
 			$to_load = $users;
 		}
@@ -254,7 +254,7 @@ class MemberLoader
 	 */
 	protected function storeInCache($new_loaded_ids)
 	{
-		if ($this->useCache === true)
+		if ($this->useCache)
 		{
 			foreach ($new_loaded_ids as $id)
 			{
@@ -357,7 +357,7 @@ class MemberLoader
 			WHERE ' . $where_clause,
 			array(
 				'blank_string' => '',
-				'users' => count($to_load) == 1 ? current($to_load) : $to_load,
+				'users' => count($to_load) === 1 ? current($to_load) : $to_load,
 			)
 		);
 
@@ -397,12 +397,13 @@ class MemberLoader
 		}
 
 		$request = $this->db->query('', '
-			SELECT cfd.id_member, cfd.variable, cfd.value, cf.field_options, cf.field_type
+			SELECT 
+				cfd.id_member, cfd.variable, cfd.value, cf.field_options, cf.field_type
 			FROM {db_prefix}custom_fields_data AS cfd
 			JOIN {db_prefix}custom_fields AS cf ON (cf.col_name = cfd.variable)
-			WHERE id_member' . (count($new_loaded_ids) == 1 ? ' = {int:loaded_ids}' : ' IN ({array_int:loaded_ids})'),
+			WHERE id_member' . (count($new_loaded_ids) === 1 ? ' = {int:loaded_ids}' : ' IN ({array_int:loaded_ids})'),
 			array(
-				'loaded_ids' => count($new_loaded_ids) == 1 ? $new_loaded_ids[0] : $new_loaded_ids,
+				'loaded_ids' => count($new_loaded_ids) === 1 ? $new_loaded_ids[0] : $new_loaded_ids,
 			)
 		);
 		$data = [];

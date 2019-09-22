@@ -60,7 +60,7 @@ class ApprovalNotification implements ScheduledTaskInterface
 				continue;
 
 			// What type is it?
-			if ($row['id_first_msg'] && $row['id_first_msg'] == $row['id_msg'])
+			if ($row['id_first_msg'] && $row['id_first_msg'] === $row['id_msg'])
 				$type = 'topic';
 			elseif ($row['id_attach'])
 				$type = 'attach';
@@ -183,7 +183,7 @@ class ApprovalNotification implements ScheduledTaskInterface
 			$emailbody = '';
 
 			// Load the language file as required.
-			if (empty($current_language) || $current_language != $member['language'])
+			if (empty($current_language) || $current_language !== $member['language'])
 				$current_language = theme()->getTemplates()->loadLanguageFile('EmailTemplates', $member['language'], false);
 
 			// Loop through each notice...
@@ -199,12 +199,12 @@ class ApprovalNotification implements ScheduledTaskInterface
 				if (!$access && isset($perms[$profiles[$board]]['add']))
 				{
 					// They can access?!
-					if (array_intersect($perms[$profiles[$board]]['add'], $member['groups']))
+					if (array_intersect($perms[$profiles[$board]]['add'], $member['groups']) !== [])
 						$access = true;
 
 					// If they have deny rights don't consider them!
 					if (isset($perms[$profiles[$board]]['deny']))
-						if (array_intersect($perms[$profiles[$board]]['deny'], $member['groups']))
+						if (array_intersect($perms[$profiles[$board]]['deny'], $member['groups']) !== [])
 							$access = false;
 				}
 
@@ -229,7 +229,7 @@ class ApprovalNotification implements ScheduledTaskInterface
 				}
 			}
 
-			if ($emailbody == '')
+			if ($emailbody === '')
 				continue;
 
 			$replacements = array(

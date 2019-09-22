@@ -20,7 +20,10 @@ use ElkArte\User;
  */
 class ThemeLoader
 {
-	/** @var int The id of the theme being used */
+	/**@var mixed|ElkArte\ValuesContainer */
+ 	public $user;
+
+ 	/** @var int The id of the theme being used */
 	private $id;
 
 	/** @var Theme The current theme. */
@@ -180,7 +183,7 @@ class ThemeLoader
 				if (!isset($themeData[$row['id_member']][$row['variable']]) || $row['id_theme'] != 1)
 				{
 					$themeData[$row['id_member']][$row['variable']] =
-						substr($row['variable'], 0, 5) == 'show_' ? $row['value'] == 1 : $row['value'];
+						substr($row['variable'], 0, 5) === 'show_' ? $row['value'] == 1 : $row['value'];
 				}
 			}
 			$db->free_result($result);
@@ -247,7 +250,7 @@ class ThemeLoader
 		$settings['actual_theme_dir'] = $settings['theme_dir'];
 
 		// Set the name of the default theme to something PHP will recognize.
-		$themeName = basename($settings['theme_dir']) == 'default'
+		$themeName = basename($settings['theme_dir']) === 'default'
 			? 'DefaultTheme'
 			: ucfirst(basename($settings['theme_dir']));
 
@@ -516,7 +519,7 @@ class ThemeLoader
 		// Check to see if they're accessing it from the wrong place.
 		if (isset($_SERVER['HTTP_HOST']) || isset($_SERVER['SERVER_NAME']))
 		{
-			$detected_url = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 'https://' : 'http://';
+			$detected_url = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) === 'on' ? 'https://' : 'http://';
 			$detected_url .= empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST'];
 			$temp = preg_replace('~/' . basename($scripturl) . '(/.+)?$~', '',
 				strtr(dirname($_SERVER['PHP_SELF']), '\\', '/'));
@@ -535,10 +538,10 @@ class ThemeLoader
 				foreach ($aliases as $alias)
 				{
 					// Rip off all the boring parts, spaces, etc.
-					if ($detected_url == trim($alias) || strtr($detected_url, [
+					if ($detected_url === trim($alias) || strtr($detected_url, [
 							'http://' => '',
 							'https://' => '',
-						]) == trim($alias)
+						]) === trim($alias)
 					)
 					{
 						$do_fix = true;
@@ -548,7 +551,7 @@ class ThemeLoader
 
 			// Hmm... check #2 - is it just different by a www?  Send them to the correct place!!
 			if (empty($do_fix) && strtr($detected_url,
-					['://' => '://www.']) == $boardurl && (empty($_GET) || count($_GET) == 1) && ELK != 'SSI'
+					['://' => '://www.']) == $boardurl && (empty($_GET) || count($_GET) === 1) && ELK != 'SSI'
 			)
 			{
 				// Okay, this seems weird, but we don't want an endless loop - this will make $_GET not empty ;).

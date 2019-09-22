@@ -67,14 +67,7 @@ class MessagesDelete
 	 */
 	public function __construct($recycle_enabled, $recycle_board, $user)
 	{
-		if ($recycle_enabled)
-		{
-			$this->_recycle_board = (int) $recycle_board;
-		}
-		else
-		{
-			$this->_recycle_board = null;
-		}
+		$this->_recycle_board = $recycle_enabled ? (int) $recycle_board : null;
 
 		$this->user = $user;
 	}
@@ -1002,7 +995,7 @@ class MessagesDelete
 		$db->free_result($request);
 
 		// Recycled topic.
-		if ($topic_exists === true)
+		if ($topic_exists)
 		{
 			// Fix the id_first_msg and id_last_msg for the source topic.
 			$source_topic_data = array(

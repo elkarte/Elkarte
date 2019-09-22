@@ -164,7 +164,7 @@ class UnZip
 	public function read_zip_data()
 	{
 		// Make sure we have a zip file
-		if ($this->check_valid_zip() === false)
+		if (!$this->check_valid_zip())
 			return false;
 
 		// The overall zip information for this archive
@@ -283,7 +283,7 @@ class UnZip
 			$temp = unpack('vversion/vversion_needed/vgeneral_purpose/vcompress_method/vfile_time/vfile_date/Vcrc/Vcompressed_size/Vsize/vfilename_length/vextra_field_length/vcomment_length/vdisk_number_start/vinternal_attributes/vexternal_attributes1/vexternal_attributes2/Vrelative_offset', substr($this->_data_cdr, $pointer + 4, 42));
 
 			// Extract the variable length data, filename, etc
-			$pointer = $pointer + 46;
+			$pointer += 46;
 			$temp['filename'] = substr($this->_data_cdr, $pointer, $temp['filename_length']);
 			$temp['extra_field'] = $temp['extra_field_length'] ? substr($this->_data_cdr, $pointer + $temp['filename_length'], $temp['extra_field_length']) : '';
 			$temp['file_comment'] = $temp['comment_length'] ? substr($this->_data_cdr, $pointer + $temp['filename_length'] + $temp['extra_field_length'], $temp['comment_length']) : '';
@@ -332,7 +332,7 @@ class UnZip
 			$this->_check_general_purpose_flag();
 
 			// Only inflate if we need to ;)
-			if (!empty($this->_file_info['compress_method']) || ($this->_file_info['compressed_size'] != $this->_file_info['size']))
+			if (!empty($this->_file_info['compress_method']) || ($this->_file_info['compressed_size'] !== $this->_file_info['size']))
 			{
 				if ($this->_file_info['compress_method'] == 8)
 					$this->_file_info['data'] = @gzinflate($this->_file_info['compress_data'], $this->_file_info['size']);
@@ -457,11 +457,11 @@ class UnZip
 			$this->_skip = true;
 
 		// Write it out then
-		if ($this->_skip === true)
+		if ($this->_skip)
 			return;
 		elseif (!empty($this->_found))
 			$this->_check_crc();
-		elseif ($this->_skip === false && $this->_found === false && $this->_check_crc())
+		elseif (!$this->_skip && $this->_found === false && $this->_check_crc())
 			package_put_contents($this->destination . '/' . $this->_filename, $this->_file_info['data']);
 	}
 
@@ -487,11 +487,11 @@ class UnZip
 	private function _check_general_purpose_flag()
 	{
 		// If bit 1 is set the file is encrypted so empty it instead of writing out gibberish
-		if ($this->_file_info['general_purpose'] & 0x0001)
+		if (($this->_file_info['general_purpose'] & 0x0001) !== 0)
 			$this->_file_info['data'] = '';
 
 		// See if bit 3 is set
-		if ($this->_file_info['general_purpose'] & 0x0008)
+		if (($this->_file_info['general_purpose'] & 0x0008) !== 0)
 		{
 			// Grab the 16 bytes after the compressed data
 			$general_purpose = substr($this->_file_info['data'], 30 + $this->_file_info['filename_length'] + $this->_file_info['extra_field_length'] + $this->_file_info['compressed_size'], 16);

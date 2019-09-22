@@ -76,14 +76,7 @@ class MembersList
 	 */
 	public static function load($users, $is_name = false, $set = 'normal')
 	{
-		if ($is_name === true)
-		{
-			$result = self::$loader->loadByName($users, $set);
-		}
-		else
-		{
-			$result = self::$loader->loadById($users, $set);
-		}
+		$result = $is_name ? self::$loader->loadByName($users, $set) : self::$loader->loadById($users, $set);
 
 		return !empty($result) ? $result : false;
 	}

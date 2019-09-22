@@ -128,12 +128,13 @@ class Post extends \ElkArte\Modules\AbstractModule
 	 * @param bool $show_additional_options
 	 * @param int $board
 	 * @param int $topic
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function finalize_post_form(&$show_additional_options, $board, $topic)
 	{
 		global $txt, $context, $modSettings, $scripturl;
 
-		$context['attachments']['can']['post'] = self::$_attach_level == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
+		$context['attachments']['can']['post'] = self::$_attach_level === 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 		$context['attachments']['ila_enabled'] = !empty($modSettings['attachment_inline_enabled']);
 
 		if ($context['attachments']['can']['post'])
@@ -152,7 +153,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 			}
 
 			// A bit of house keeping first.
-			if (!empty($_SESSION['temp_attachments']) && count($_SESSION['temp_attachments']) == 1)
+			if (!empty($_SESSION['temp_attachments']) && count($_SESSION['temp_attachments']) === 1)
 				unset($_SESSION['temp_attachments']);
 
 			if (!empty($_SESSION['temp_attachments']))
@@ -409,18 +410,11 @@ class Post extends \ElkArte\Modules\AbstractModule
 		}
 
 		// Then try to upload any attachments.
-		$context['attachments']['can']['post'] = self::$_attach_level == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
+		$context['attachments']['can']['post'] = self::$_attach_level === 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 		if ($context['attachments']['can']['post'] && empty($_POST['from_qr']))
 		{
 			require_once(SUBSDIR . '/Attachments.subs.php');
-			if (!empty($msg))
-			{
-				$this->ignore_temp = processAttachments((int) $msg);
-			}
-			else
-			{
-				$this->ignore_temp = processAttachments();
-			}
+			$this->ignore_temp = !empty($msg) ? processAttachments((int) $msg) : processAttachments();
 		}
 	}
 

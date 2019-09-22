@@ -370,7 +370,7 @@ class DataValidator
 			}
 		}
 
-		return count($this->_validation_errors) === 0 ? true : false;
+		return count($this->_validation_errors) === 0;
 	}
 
 	/**
@@ -796,11 +796,7 @@ class DataValidator
 		if (!isset($input[$field]))
 			return;
 
-		// Quick check, no @ in the email
-		if (strrpos($input[$field], '@') === false)
-			$valid = false;
-		else
-			$valid = filter_var($input[$field], FILTER_VALIDATE_EMAIL) !== false;
+		$valid = strrpos($input[$field], '@') === false ? false : filter_var($input[$field], FILTER_VALIDATE_EMAIL) !== false;
 
 		if ($valid)
 			return;
@@ -1133,7 +1129,7 @@ class DataValidator
 		if (!isset($input[$field]))
 			return;
 
-		if (!preg_match('`^(https{0,1}?:(//([a-z0-9\-._~%]+)(:[0-9]+)?(/[a-z0-9\-._~%!$&\'()*+,;=:@]+)*/?))(\?[a-z0-9\-._~%!$&\'()*+,;=:@/?]*)?(\#[a-z0-9\-._~%!$&\'()*+,;=:@/?]*)?$`', $input[$field], $matches))
+		if (!preg_match('`^(https{0,1}?:(//([a-z0-9\-._~%]+)(:\d+)?(/[a-z0-9\-._~%!$&\'()*+,;=:@]+)*/?))(\?[a-z0-9\-._~%!$&\'()*+,;=:@/?]*)?(\#[a-z0-9\-._~%!$&\'()*+,;=:@/?]*)?$`', $input[$field], $matches))
 		{
 			return array(
 				'field' => $field,

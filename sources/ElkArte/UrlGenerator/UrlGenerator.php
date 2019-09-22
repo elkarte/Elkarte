@@ -149,7 +149,7 @@ class UrlGenerator
 	 */
 	public function getQuery($type, $params)
 	{
-		if (isset($this->_generators[$type]) === false)
+		if (!isset($this->_generators[$type]))
 		{
 			$type = 'standard';
 		}

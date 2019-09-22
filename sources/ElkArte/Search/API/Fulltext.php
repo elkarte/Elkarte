@@ -165,7 +165,7 @@ class Fulltext extends Standard
 
 		$fulltextWord = count($subwords) === 1 ? $word : '"' . $word . '"';
 		$wordsSearch['indexed_words'][] = $fulltextWord;
-		if ($isExcluded)
+		if ($isExcluded !== '')
 		{
 			$wordsExclude[] = $fulltextWord;
 		}
@@ -288,7 +288,7 @@ class Fulltext extends Standard
 			}
 		}
 
-		$ignoreRequest = $db_search->search_query('insert_into_log_messages_fulltext', ($db->support_ignore() ? ('
+		return $db_search->search_query('insert_into_log_messages_fulltext', ($db->support_ignore() ? ('
 			INSERT IGNORE INTO {db_prefix}' . $search_data['insert_into'] . '
 				(' . implode(', ', array_keys($query_select)) . ')') : '') . '
 			SELECT ' . implode(', ', $query_select) . '
@@ -298,7 +298,5 @@ class Fulltext extends Standard
 			LIMIT ' . ($search_data['max_results'] - $search_data['indexed_results'])),
 			$query_params
 		);
-
-		return $ignoreRequest;
 	}
 }

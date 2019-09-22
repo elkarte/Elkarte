@@ -66,7 +66,7 @@ class UserSettings extends \ElkArte\ValuesContainerReadOnly
 	public function fixSalt($force = false)
 	{
 		// Correct password, but they've got no salt; fix it!
-		if ($this->data['password_salt'] === '' || $force === true)
+		if ($this->data['password_salt'] === '' || $force)
 		{
 			$tokenizer = new \ElkArte\TokenHash();
 

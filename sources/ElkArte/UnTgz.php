@@ -164,7 +164,7 @@ class UnTgz
 	public function read_tgz_data()
 	{
 		// Snif test that this is a .tgz tar.gz file
-		if (empty($this->_header) && $this->check_valid_tgz() === false)
+		if (empty($this->_header) && !$this->check_valid_tgz())
 			return false;
 
 		// The tgz information for this archive
@@ -244,14 +244,14 @@ class UnTgz
 		$this->_offset = 10;
 
 		// fEXTRA flag set we simply skip over its entry and the length of its data
-		if ($flags & 4)
+		if (($flags & 4) !== 0)
 		{
 			$xlen = unpack('vxlen', substr($this->data, $this->_offset, 2));
 			$this->_offset += $xlen['xlen'] + 2;
 		}
 
 		// Read the filename, its zero terminated
-		if ($flags & 8)
+		if (($flags & 8) !== 0)
 		{
 			$this->_header['filename'] = '';
 			while ($this->data[$this->_offset] !== "\0")
@@ -260,7 +260,7 @@ class UnTgz
 		}
 
 		// Read the comment, its also zero terminated
-		if ($flags & 16)
+		if (($flags & 16) !== 0)
 		{
 			$this->_header['comment'] = '';
 			while ($this->data[$this->_offset] !== "\0")
@@ -269,7 +269,7 @@ class UnTgz
 		}
 
 		// "Read" the header CRC $crc16 = unpack('vcrc16', substr($data, $this->_offset, 2));
-		if ($flags & 2)
+		if (($flags & 2) !== 0)
 			$this->_offset += 2;
 	}
 
@@ -389,10 +389,7 @@ class UnTgz
 		// Clean the header fields, convert octal to decimal as needed
 		foreach ($this->_current as $key => $value)
 		{
-			if (in_array($key, $octdec))
-				$this->_current[$key] = octdec(trim($value));
-			else
-				$this->_current[$key] = trim($value);
+			$this->_current[$key] = in_array($key, $octdec) ? octdec(trim($value)) : trim($value);
 		}
 	}
 
@@ -447,7 +444,7 @@ class UnTgz
 			$this->_skip = true;
 
 		// Write it out then
-		if ($this->_check_header_crc() && $this->_skip === false && $this->_found === false)
+		if ($this->_check_header_crc() && !$this->_skip && $this->_found === false)
 			package_put_contents($this->destination . '/' . $this->_current['filename'], $this->_current['data']);
 	}
 
@@ -460,7 +457,7 @@ class UnTgz
 		$crc_uncompressed = hash('crc32b', $this->data);
 		$this->_crc = str_pad(dechex($this->_crc), 8, '0', STR_PAD_LEFT);
 
-		return !($this->data === false || ($this->_crc !== $crc_uncompressed));
+		return $this->data !== false && $this->_crc === $crc_uncompressed;
 	}
 
 	/**

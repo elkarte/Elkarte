@@ -91,7 +91,7 @@ class DailyDigest implements ScheduledTaskInterface
 					'email' => $row['email_address'],
 					'name' => ($row['real_name'] == '') ? $row['member_name'] : un_htmlspecialchars($row['real_name']),
 					'id' => $row['id_member'],
-					'notifyMod' => $row['notify_types'] < 3 ? true : false,
+					'notifyMod' => $row['notify_types'] < 3,
 					'lang' => $row['lngfile'],
 				);
 				$langs[$row['lngfile']] = $row['lngfile'];

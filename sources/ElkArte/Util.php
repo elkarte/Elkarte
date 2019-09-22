@@ -280,10 +280,10 @@ class Util
 				if (!empty($space_pos) && ($length - $space_pos <= $buffer))
 					$string = self::substr($string, 0, $space_pos);
 
-				$string = rtrim($string) . ($ellipsis ? $ellipsis : '');
+				$string = rtrim($string) . ($ellipsis !== '' ? $ellipsis : '');
 			}
 			else
-				$string = self::substr($string, 0, $length - $ending) . ($ellipsis ? $ellipsis : '');
+				$string = self::substr($string, 0, $length - $ending) . ($ellipsis !== '' ? $ellipsis : '');
 		}
 
 		return $string;

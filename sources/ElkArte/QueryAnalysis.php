@@ -13,6 +13,11 @@
 
 namespace ElkArte;
 
+/**
+ * Class QueryAnalysis
+ *
+ * @package ElkArte
+ */
 class QueryAnalysis
 {
 	/**
@@ -133,7 +138,7 @@ class QueryAnalysis
 		foreach ($query as $line)
 		{
 			preg_match('/^(\t*)/', $line, $temp);
-			if (strlen($temp[0]) < $min_indent || $min_indent == 0)
+			if (strlen($temp[0]) < $min_indent || $min_indent === 0)
 				$min_indent = strlen($temp[0]);
 		}
 		foreach ($query as $l => $dummy)
@@ -151,7 +156,7 @@ class QueryAnalysis
 	 */
 	protected function _is_select_query($query_data)
 	{
-		$is_select_query = substr(trim($query_data), 0, 6) == 'SELECT';
+		$is_select_query = substr(trim($query_data), 0, 6) === 'SELECT';
 		$this->_select = '';
 
 		if ($is_select_query)

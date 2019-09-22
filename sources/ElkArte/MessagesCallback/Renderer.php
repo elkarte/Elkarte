@@ -108,14 +108,7 @@ abstract class Renderer
 		// opt:
 		// icon_sources
 		// show_signatures
-		if ($opt === null)
-		{
-			$this->_options = new ValuesContainer();
-		}
-		else
-		{
-			$this->_options = $opt;
-		}
+		$this->_options = $opt === null ? new ValuesContainer() : $opt;
 	}
 
 	/**
@@ -138,13 +131,13 @@ abstract class Renderer
 		}
 
 		// Remember which message this is.  (ie. reply #83)
-		if ($this->_counter === null || $reset === true)
+		if ($this->_counter === null || $reset)
 		{
 			$this->_counter = $context['start'];
 		}
 
 		// Start from the beginning...
-		if ($reset === true)
+		if ($reset)
 		{
 			$this->_currentContext($reset);
 		}

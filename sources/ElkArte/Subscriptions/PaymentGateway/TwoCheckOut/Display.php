@@ -40,12 +40,10 @@ class Display implements DisplayInterface
 	{
 		global $txt;
 
-		$setting_data = array(
+		return array(
 			array('text', '2co_id', 'subtext' => $txt['2co_id_desc']),
 			array('text', '2co_password', 'subtext' => $txt['2co_password_desc']),
 		);
-
-		return $setting_data;
 	}
 
 	/**

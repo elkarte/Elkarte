@@ -40,14 +40,12 @@ class Display implements DisplayInterface
 	{
 		global $txt;
 
-		$setting_data = array(
+		return array(
 			array(
 				'text', 'paypal_email',
 				'subtext' => $txt['paypal_email_desc']
 			),
 		);
-
-		return $setting_data;
 	}
 
 	/**

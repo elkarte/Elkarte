@@ -214,7 +214,7 @@ class TopicsMerge
 		}
 
 		// Determine which poll will survive and which polls won't.
-		$target_poll = count($this->_polls) > 1 ? (int) $details['poll'] : (count($this->_polls) == 1 ? $this->_polls[0] : 0);
+		$target_poll = count($this->_polls) > 1 ? (int) $details['poll'] : (count($this->_polls) === 1 ? $this->_polls[0] : 0);
 		if ($target_poll > 0 && !in_array($target_poll, $this->_polls))
 		{
 			$this->_errors[] = array('no_access', false);
@@ -233,7 +233,7 @@ class TopicsMerge
 				$target_subject = Util::substr($target_subject, 0, 100);
 
 			// Nothing left - odd but pick the first topics subject.
-			if ($target_subject == '')
+			if ($target_subject === '')
 				$target_subject = $this->topic_data[$this->firstTopic]['subject'];
 		}
 		// A subject was selected from the list.

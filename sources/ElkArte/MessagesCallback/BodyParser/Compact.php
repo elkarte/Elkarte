@@ -82,7 +82,7 @@ class Compact implements BodyParserInterface
 
 		if (\ElkArte\Util::strlen($body) > $charLimit)
 		{
-			if ($this->_highlight === false)
+			if (!$this->_highlight)
 			{
 				$body = \ElkArte\Util::substr($body, 0, $charLimit) . '<strong>...</strong>';
 			}

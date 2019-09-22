@@ -265,7 +265,7 @@ class Search
 	 */
 	public function getSearchParams($array = false)
 	{
-		if ($array === true)
+		if ($array)
 		{
 			return $this->_searchParams->get();
 		}
@@ -444,7 +444,7 @@ class Search
 	{
 		global $modSettings;
 
-		$request = $this->_db->query('', '
+		return $this->_db->query('', '
 			SELECT
 				m.id_msg, m.subject, m.poster_name, m.poster_email, m.poster_time,
 				m.id_member, m.icon, m.poster_ip, m.body, m.smileys_enabled,
@@ -481,8 +481,6 @@ class Search
 				'limit' => $limit,
 			)
 		);
-
-		return $request;
 	}
 
 	/**

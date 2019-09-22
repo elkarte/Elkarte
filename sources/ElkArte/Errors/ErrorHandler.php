@@ -54,7 +54,8 @@ final class ErrorHandler extends Errors
       		return $this->error_handler($error_level, $error_string, $file, $line);
   		});
 		set_exception_handler(function (Throwable $e) {
-      		return $this->exception_handler($e);
+      		$this->exception_handler($e);
+      		return;
   		});
 	}
 

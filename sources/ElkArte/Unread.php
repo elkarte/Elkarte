@@ -82,10 +82,7 @@ class Unread
 	 */
 	public function setBoards($boards)
 	{
-		if (is_array($boards))
-			$this->_query_parameters['boards'] = $boards;
-		else
-			$this->_query_parameters['boards'] = array($boards);
+		$this->_query_parameters['boards'] = is_array($boards) ? $boards : array($boards);
 	}
 
 	/**
@@ -157,10 +154,7 @@ class Unread
 	 */
 	public function bodyPreview($chars)
 	{
-		if ($chars === true)
-			$this->_preview_bodies = 'all';
-		else
-			$this->_preview_bodies = (int) $chars;
+		$this->_preview_bodies = $chars === true ? 'all' : (int) $chars;
 	}
 
 	/**
@@ -268,7 +262,7 @@ class Unread
 				ml.smileys_enabled AS last_smileys, ms.smileys_enabled AS first_smileys, t.id_first_msg, t.id_last_msg
 			FROM {db_prefix}messages AS ms
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ms.id_topic AND t.id_first_msg = ms.id_msg)
-				INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)' . ($join == 'topics' ? '
+				INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)' . ($join === 'topics' ? '
 				LEFT JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)' : '
 				LEFT JOIN {db_prefix}boards AS b ON (b.id_board = ms.id_board)') . '
 				LEFT JOIN {db_prefix}members AS mems ON (mems.id_member = ms.id_member)

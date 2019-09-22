@@ -153,7 +153,7 @@ class SiteCombiner
 		}
 
 		// Directory not writable then we are done
-		if ($this->_validDestination() === false)
+		if (!$this->_validDestination())
 		{
 			// Anything is spare
 			$this->_addSpare($files);
@@ -215,7 +215,7 @@ class SiteCombiner
 		}
 
 		// Directory not writable then we are done
-		if ($this->_validDestination() === false)
+		if (!$this->_validDestination())
 		{
 			// Anything is spare
 			$this->_addSpare($files);
@@ -358,7 +358,7 @@ class SiteCombiner
 		if (isset($options['dir']))
 		{
 			$filename = $options['dir'] . $options['basename'];
-			if (file_exists($filename) === false)
+			if (!file_exists($filename))
 			{
 				return false;
 			}
@@ -368,7 +368,7 @@ class SiteCombiner
 				'basename' => $options['basename'],
 				'url' => $options['url'],
 				'filemtime' => filemtime($filename),
-				'minimized' => (bool) strpos($options['basename'], '.min.js') !== false || strpos($options['basename'], '.min.css') !== false,
+				'minimized' => (bool) strpos($options['basename'], '.min.js') || strpos($options['basename'], '.min.css') !== false,
 			);
 
 			$this->_stales[] = $this->_combine_files[$options['basename']]['filemtime'];
@@ -513,7 +513,7 @@ class SiteCombiner
 		$fetch_data = $this->_closure_code_url();
 
 		// Nothing returned or an error, try our internal JSqueeze minimizer
-		if ($fetch_data === false || trim($fetch_data) == '' || preg_match('/^Error\(\d{1,2}\):\s/m', $fetch_data))
+		if ($fetch_data === false || trim($fetch_data) === '' || preg_match('/^Error\(\d{1,2}\):\s/m', $fetch_data))
 		{
 			// To prevent a stack overflow segmentation fault, which silently kills Apache, we need to limit
 			// recursion on windows.  This may cause JSqueeze to fail, but at least its then catchable.
@@ -526,11 +526,11 @@ class SiteCombiner
 		}
 
 		// If we still have no data, then try the post js_code method to the closure compiler
-		if ($fetch_data === false || trim($fetch_data) == '')
+		if ($fetch_data === false || trim($fetch_data) === '')
 			$fetch_data = $this->_closure_js_code();
 
 		// If we have nothing to return, use the original data
-		$fetch_data = ($fetch_data === false || trim($fetch_data) == '') ? $this->_cache : $fetch_data;
+		$fetch_data = ($fetch_data === false || trim($fetch_data) === '') ? $this->_cache : $fetch_data;
 
 		// Return a combined pre minimized + our minimized string
 		return $this->_min_cache . "\n" . $fetch_data;

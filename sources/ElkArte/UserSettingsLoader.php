@@ -23,6 +23,11 @@ use ElkArte\UserSettings;
 class UserSettingsLoader
 {
 	/**
+  	 * @var mixed|string
+  	*/
+ 	public $member_name;
+
+ 	/**
 	 * @var int
 	 */
 	const HASH_LENGTH = 4;
@@ -126,9 +131,9 @@ class UserSettingsLoader
 	 */
 	public function loadUserById($id, $already_verified, $session_password)
 	{
-		$this->id = $id;
+		$this->id = (int) $id;
 
-		if ($this->id != 0)
+		if ($this->id !== 0)
 		{
 			$this->loadUserData($already_verified, $session_password);
 			$user_info = $this->initUser();
@@ -137,6 +142,7 @@ class UserSettingsLoader
 		{
 			$user_info = $this->initGuest();
 		}
+
 		\ElkArte\Hooks::instance()->hook('integrate_user_info', [$user_info]);
 
 		$this->compileInfo($user_info);
@@ -206,7 +212,7 @@ class UserSettingsLoader
 		// Awaiting deletion, changed their mind?
 		elseif ($activation_status == 4)
 		{
-			if ($undelete === true)
+			if ($undelete)
 			{
 				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData($this->settings['id_member'], array('is_activated' => 1));
@@ -519,14 +525,14 @@ class UserSettingsLoader
 			$user_settings['id_member'] = (int) ($user_settings['id_member'] ?? 0);
 
 			// As much as the password should be right, we can assume the integration set things up.
-			if (!empty($already_verified) && $already_verified === true)
+			if (!empty($already_verified) && $already_verified)
 			{
 				$check = true;
 			}
 			// SHA-256 passwords should be 64 characters long.
-			elseif (strlen($session_password) == 64)
+			elseif (strlen($session_password) === 64)
 			{
-				$check = hash('sha256', ($user_settings['passwd'] . $user_settings['password_salt'])) == $session_password;
+				$check = hash('sha256', ($user_settings['passwd'] . $user_settings['password_salt'])) === $session_password;
 			}
 			else
 			{

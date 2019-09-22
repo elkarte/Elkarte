@@ -165,32 +165,33 @@ class EmailFormat
 	private function _prep_data($data, $bbc_br)
 	{
 		// Un-wordwrap the email, create a line by line array broken on the newlines
-		if ($bbc_br === true)
+		if ($bbc_br)
 			$data = str_replace('[br]', "\n", $data);
-		$temp = explode("\n", $data);
+		$temps = explode("\n", $data);
 
 		// Remove any 'stuck' whitespace using the trim value function on all lines
-		array_walk($temp, array($this, '_trim_value'));
+		array_walk($temps, function (&$value) {
+			$this->_trim_value($value);
+		});
 
-		// Get some processing details for each line
-		for ($i = 0, $num = count($temp); $i < $num; $i++)
+		foreach ($temps as $i => $temp)
 		{
-			$this->_body_array[$i]['content'] = $temp[$i];
-			$this->_body_array[$i]['length'] = Util::strlen($temp[$i]);
+			$this->_body_array[$i]['content'] = $temp;
+			$this->_body_array[$i]['length'] = Util::strlen($temp);
 
 			// Text lists a) 1. etc
-			$this->_body_array[$i]['list_item'] = $this->_in_plainlist($temp[$i]);
+			$this->_body_array[$i]['list_item'] = $this->_in_plainlist($temp);
 
 			// [quote]
-			$this->_in_quote($temp[$i]);
+			$this->_in_quote($temp);
 			$this->_body_array[$i]['in_quote'] = $this->_in_quote;
 
 			// [code]
-			$this->_in_code($temp[$i]);
+			$this->_in_code($temp);
 			$this->_body_array[$i]['in_code'] = $this->_in_code;
 
 			// [list]
-			$this->_in_bbclist($temp[$i]);
+			$this->_in_bbclist($temp);
 			$this->_body_array[$i]['in_bbclist'] = $this->_in_bbclist;
 		}
 

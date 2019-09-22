@@ -100,7 +100,7 @@ class Member extends ValuesContainer
 	 */
 	public function loadContext($display_custom_fields = false)
 	{
-		if ($this->loaded === true)
+		if ($this->loaded)
 		{
 			return true;
 		}
@@ -114,7 +114,7 @@ class Member extends ValuesContainer
 		$this->prepareBasics();
 		$this->loadBasics();
 		$this->loadExtended();
-		if ($display_custom_fields === true)
+		if ($display_custom_fields)
 		{
 			$this->loadOptions();
 		}
@@ -141,7 +141,7 @@ class Member extends ValuesContainer
 
 		foreach ($this->display_fields as $custom)
 		{
-			if (!isset($custom['title']) || trim($custom['title']) == '' || empty($this->data['options'][$custom['colname']]))
+			if (!isset($custom['title']) || trim($custom['title']) === '' || empty($this->data['options'][$custom['colname']]))
 			{
 				continue;
 			}

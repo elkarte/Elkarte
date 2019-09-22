@@ -120,7 +120,7 @@ class AdminSettingsSearch
 					$search_result['type'] = $section;
 					$search_result['url'] = $item[1] . ';' . $context['session_var'] . '=' . $context['session_id'];
 
-					if (substr($item[1], 0, 4) == 'area')
+					if (substr($item[1], 0, 4) === 'area')
 					{
 						$search_result['url'] = $scripturl . '?action=admin;' . $search_result['url'] . ($section == 'settings' && !empty($item['named_link']) ? '#' . $item['named_link'] : '');
 					}

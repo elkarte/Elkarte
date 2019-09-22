@@ -18,6 +18,8 @@ namespace ElkArte\Themes;
  */
 abstract class Theme
 {
+	/** @var \ElkArte\ValuesContainer */
+	public $user;
 	const STANDARD = 'standard';
 	const DEFERRED = 'defer';
 	const ALL = -1;

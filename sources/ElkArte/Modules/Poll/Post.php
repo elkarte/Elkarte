@@ -232,7 +232,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 			isAllowedTo('poll_add_any');
 		}
 
-		if (!isset($_POST['question']) || trim($_POST['question']) == '')
+		if (!isset($_POST['question']) || trim($_POST['question']) === '')
 		{
 			$post_errors->addError('no_question');
 		}
@@ -261,11 +261,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 	 */
 	public function pre_save_post(&$topicOptions)
 	{
-		// Make the poll...
-		if (self::$_make_poll)
-			$id_poll = $this->_createPoll($_POST, $_POST['guestname']);
-		else
-			$id_poll = 0;
+		$id_poll = self::$_make_poll ? $this->_createPoll($_POST, $_POST['guestname']) : 0;
 
 		$topicOptions['poll'] = self::$_make_poll ? $id_poll : null;
 	}
@@ -285,7 +281,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 		$_POST['options'] = empty($_POST['options']) ? array() : htmlspecialchars__recursive($_POST['options']);
 		foreach ($_POST['options'] as $option)
 		{
-			if (trim($option) == '')
+			if (trim($option) === '')
 				continue;
 
 			$context['poll']['choices'][] = array(
@@ -355,11 +351,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 		$poll_expire = (int) $options['poll_expire'];
 		$poll_expire = $poll_expire > 9999 ? 9999 : ($poll_expire < 0 ? 0 : $poll_expire);
 
-		// Just set it to zero if it's not there..
-		if (isset($options['poll_hide']))
-			$poll_hide = (int) $options['poll_hide'];
-		else
-			$poll_hide = 0;
+		$poll_hide = isset($options['poll_hide']) ? (int) $options['poll_hide'] : 0;
 
 		$poll_change_vote = isset($options['poll_change_vote']) ? 1 : 0;
 		$poll_guest_vote = isset($options['poll_guest_vote']) ? 1 : 0;
@@ -390,7 +382,8 @@ class Post extends \ElkArte\Modules\AbstractModule
 
 		// Finally, make the poll.
 		require_once(SUBSDIR . '/Poll.subs.php');
-		$id_poll = createPoll(
+
+		return createPoll(
 			$question,
 			$this->user->id,
 			$user_name,
@@ -401,7 +394,5 @@ class Post extends \ElkArte\Modules\AbstractModule
 			$poll_guest_vote,
 			$poll_options
 		);
-
-		return $id_poll;
 	}
 }

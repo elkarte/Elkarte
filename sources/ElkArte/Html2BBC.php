@@ -189,14 +189,15 @@ class Html2BBC
 
 		// Remove any html tags we left behind ( outside of code tags that is )
 		$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $bbc, -1, PREG_SPLIT_DELIM_CAPTURE);
-		for ($i = 0, $n = count($parts); $i < $n; $i++)
+		foreach ($parts as $i => $part)
 		{
-			if ($i % 4 == 0)
-				$parts[$i] = strip_tags($parts[$i]);
+			if ($i % 4 === 0)
+			{
+				$parts[$i] = strip_tags($part);
+			}
 		}
-		$bbc = implode('', $parts);
 
-		return $bbc;
+		return implode('', $parts);
 	}
 
 	/**
@@ -270,7 +271,7 @@ class Html2BBC
 		$needs_trailing_break = !in_array($next_tag, $this->block_elements) && $needs_leading_break;
 
 		// Flip things around inside li element, it looks better
-		if ($parent == 'li' && $needs_leading_break)
+		if ($parent === 'li' && $needs_leading_break)
 		{
 			$needs_trailing_break = true;
 			$needs_leading_break = false;
@@ -442,10 +443,7 @@ class Html2BBC
 		$title = $node->getAttribute('title');
 		$value = $this->_get_value($node);
 
-		if (!empty($title))
-			$bbc = '[abbr=' . $title . ']' . $value . '[/abbr]';
-		else
-			$bbc = '';
+		$bbc = !empty($title) ? '[abbr=' . $title . ']' . $value . '[/abbr]' : '';
 
 		return $bbc;
 	}
@@ -476,23 +474,17 @@ class Html2BBC
 		// Maybe an email link
 		elseif (substr($href, 0, 7) === 'mailto:')
 		{
-			if ($href != 'mailto:' . (isset($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : ''))
+			if ($href !== 'mailto:' . (isset($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : ''))
 				$href = substr($href, 7);
 			else
 				$href = '';
 
-			if (!empty($value))
-				$bbc = '[email=' . $href . ']' . $value . '[/email]';
-			else
-				$bbc = '[email]' . $href . '[/email]';
+			$bbc = !empty($value) ? '[email=' . $href . ']' . $value . '[/email]' : '[email]' . $href . '[/email]';
 		}
 		// FTP
 		elseif (substr($href, 0, 6) === 'ftp://')
 		{
-			if (!empty($value))
-				$bbc = '[ftp=' . $href . ']' . $value . '[/ftp]';
-			else
-				$bbc = '[ftp]' . $href . '[/ftp]';
+			$bbc = !empty($value) ? '[ftp=' . $href . ']' . $value . '[/ftp]' : '[ftp]' . $href . '[/ftp]';
 		}
 		// Oh a link then
 		else
@@ -508,10 +500,7 @@ class Html2BBC
 					$href = $baseURL . (empty($parsedURL['path']) ? '/' : preg_replace('~/(?:index\\.php)?$~', '', $parsedURL['path'])) . '/' . $href;
 			}
 
-			if (!empty($value))
-				$bbc = '[url=' . $href . ']' . $value . '[/url]';
-			else
-				$bbc = '[url]' . $href . '[/url]';
+			$bbc = !empty($value) ? '[url=' . $href . ']' . $value . '[/url]' : '[url]' . $href . '[/url]';
 		}
 
 		return $bbc;
@@ -534,7 +523,7 @@ class Html2BBC
 		$dir = htmlentities($node->getAttribute('dir'));
 		$value = $this->_get_value($node);
 
-		if ($dir == 'rtl' || $dir == 'ltr')
+		if ($dir === 'rtl' || $dir === 'ltr')
 			$bbc = '[bdo=' . $dir . ']' . $value . '[/bdo]';
 
 		return $bbc;
@@ -633,9 +622,8 @@ class Html2BBC
 		$hsize = array(1 => 7, 2 => 6, 3 => 5, 4 => 4, 5 => 3, 6 => 2, 7 => 1);
 
 		$size = isset($this->sizes_equivalence[$hsize[$level]]) ? $this->sizes_equivalence[$hsize[$level]] : $this->sizes_equivalence[4];
-		$bbc = '[size=' . $size . ']' . $content . '[/size]';
 
-		return $bbc;
+		return '[size=' . $size . ']' . $content . '[/size]';
 	}
 
 	/**
@@ -675,13 +663,13 @@ class Html2BBC
 			// Image size defined in the tag
 			if (isset($styles['width']))
 			{
-				preg_match('~^[0-9]*~', $styles['width'], $width);
+				preg_match('~^\d*~', $styles['width'], $width);
 				$size .= 'width=' . $width[0] . ' ';
 			}
 
 			if (isset($styles['height']))
 			{
-				preg_match('~^[0-9]*~', $styles['height'], $height);
+				preg_match('~^\d*~', $styles['height'], $height);
 				$size .= 'height=' . $height[0];
 			}
 		}
@@ -813,9 +801,7 @@ class Html2BBC
 		$colspan = trim($colspan);
 		$colspan = empty($colspan) ? 1 : (int) $colspan;
 
-		$bbc = '[td]' . $value . str_repeat('[/td][td]', $colspan - 1) . '[/td]';
-
-		return $bbc;
+		return '[td]' . $value . str_repeat('[/td][td]', $colspan - 1) . '[/td]';
 	}
 
 	/**

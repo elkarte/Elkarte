@@ -91,7 +91,7 @@ class Sphinxql extends AbstractAPI
 	{
 		global $modSettings;
 
-		return !(empty($modSettings['sphinx_searchd_server']) || empty($modSettings['sphinxql_searchd_port']));
+		return !empty($modSettings['sphinx_searchd_server']) && !empty($modSettings['sphinxql_searchd_port']);
 	}
 
 	/**
@@ -128,7 +128,7 @@ class Sphinxql extends AbstractAPI
 
 		$fulltextWord = count($subwords) === 1 ? $word : '"' . $word . '"';
 		$wordsSearch['indexed_words'][] = $fulltextWord;
-		if ($isExcluded)
+		if ($isExcluded !== '')
 		{
 			$wordsExclude[] = $fulltextWord;
 		}
@@ -235,7 +235,7 @@ class Sphinxql extends AbstractAPI
 			if ($request === false)
 			{
 				// Just log the error.
-				if (mysqli_error($mySphinx))
+				if (mysqli_error($mySphinx) !== '')
 				{
 					\ElkArte\Errors\Errors::instance()->log_error(mysqli_error($mySphinx));
 				}
@@ -249,7 +249,7 @@ class Sphinxql extends AbstractAPI
 				'matches' => array(),
 			);
 
-			if (mysqli_num_rows($request) != 0)
+			if (mysqli_num_rows($request) !== 0)
 			{
 				while ($match = mysqli_fetch_assoc($request))
 				{
@@ -388,7 +388,7 @@ class Sphinxql extends AbstractAPI
 		}
 
 		// Let's make sure they're not canceling each other out
-		if (!count(array_diff($keywords['include'], $keywords['exclude'])))
+		if (count(array_diff($keywords['include'], $keywords['exclude'])) === 0)
 		{
 			return '';
 		}

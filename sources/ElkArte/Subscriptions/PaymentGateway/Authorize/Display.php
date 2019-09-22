@@ -38,12 +38,10 @@ class Display implements DisplayInterface
 	{
 		global $txt;
 
-		$setting_data = array(
+		return array(
 			array('text', 'authorize_id', 'subtext' => $txt['authorize_id_desc']),
 			array('text', 'authorize_transid'),
 		);
-
-		return $setting_data;
 	}
 
 	/**

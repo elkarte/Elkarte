@@ -75,9 +75,9 @@ class Censor
 		// Quote them for use in regular expressions.
 		if ($this->options[self::WHOLE_WORD])
 		{
-			for ($i = 0, $n = count($vulgar); $i < $n; $i++)
+			foreach ($vulgar as $i => $vulgar_i)
 			{
-				$vulgar[$i] = str_replace(array('\\\\\\*', '\\*', '&', '\''), array('[*]', '[^\s]*?', '&amp;', '&#039;'), preg_quote($vulgar[$i], '/'));
+				$vulgar[$i] = str_replace(array('\\\\\\*', '\\*', '&', '\''), array('[*]', '[^\s]*?', '&amp;', '&#039;'), preg_quote($vulgar_i, '/'));
 				$vulgar[$i] = '/(?<=^|\W)' . $vulgar[$i] . '(?=$|\W)/u' . (!$this->options[self::IGNORE_CASE] ? '' : 'i');
 			}
 		}

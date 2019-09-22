@@ -27,14 +27,7 @@ class ParseQuery extends AbstractParseQuery
 	 */
 	public function parse($query)
 	{
-		if (isset($this->parsers[$query[0]]))
-		{
-			$call = $this->parsers[$query[0]];
-		}
-		else
-		{
-			$call = $this->parsers['s'];
-		}
+		$call = isset($this->parsers[$query[0]]) ? $this->parsers[$query[0]] : $this->parsers['s'];
 
 		return $this->{$call}($query);
 	}
@@ -88,8 +81,6 @@ class ParseQuery extends AbstractParseQuery
 	{
 		preg_match('~(?!board|topic),(\d+)\.([^\.]+)\.html(.*)~', $query, $parts);
 
-		$real_query = $parts[1] . '.' . $parts[2] . (!empty($parts[3]) ? $parts[3] : '');
-
-		return $real_query;
+		return $parts[1] . '.' . $parts[2] . (!empty($parts[3]) ? $parts[3] : '');
 	}
 }

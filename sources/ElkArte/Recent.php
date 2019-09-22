@@ -88,14 +88,7 @@ class Recent
 	 */
 	public function setBoards($boards)
 	{
-		if (is_array($boards))
-		{
-			$this->_query_parameters['boards'] = $boards;
-		}
-		else
-		{
-			$this->_query_parameters['boards'] = array($boards);
-		}
+		$this->_query_parameters['boards'] = is_array($boards) ? $boards : array($boards);
 
 		$this->_query_this_board .= 'b.id_board IN ({array_int:boards})';
 	}

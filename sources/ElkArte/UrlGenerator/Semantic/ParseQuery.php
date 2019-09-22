@@ -27,14 +27,7 @@ class ParseQuery extends AbstractParseQuery
 	 */
 	public function parse($query)
 	{
-		if (isset($this->parsers[$query[0]]))
-		{
-			$call = $this->parsers[$query[0]];
-		}
-		else
-		{
-			$call = $this->parsers['s'];
-		}
+		$call = isset($this->parsers[$query[0]]) ? $this->parsers[$query[0]] : $this->parsers['s'];
 
 		return $this->{$call}($query);
 	}
@@ -108,8 +101,7 @@ class ParseQuery extends AbstractParseQuery
 		{
 			$real_query = substr($split_query[0], strrpos($split_query[0], '-') + 1);
 		}
-		$real_query .= $this->separator . (isset($split_query[1]) ? $split_query[1] : '');
 
-		return $real_query;
+		return $real_query . ($this->separator . (isset($split_query[1]) ? $split_query[1] : ''));
 	}
 }

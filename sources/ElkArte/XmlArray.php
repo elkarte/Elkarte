@@ -180,7 +180,7 @@ class XmlArray
 					$debug = ' from ' . $trace[$i - 1]['file'] . ' on line ' . $trace[$i - 1]['line'];
 
 					// Cause an error.
-					if ($this->debug_level & E_NOTICE)
+					if (($this->debug_level & E_NOTICE) !== 0)
 						trigger_error('Undefined XML attribute: ' . substr($el, 1) . $debug, E_USER_NOTICE);
 
 					return false;
@@ -407,7 +407,7 @@ class XmlArray
 					$text_value = $this->_from_cdata(substr($data, 0, $data_strpos));
 					$data = substr($data, $data_strpos);
 
-					if ($text_value != '')
+					if ($text_value !== '')
 						$current[] = array(
 							'name' => '!',
 							'value' => $text_value
@@ -422,7 +422,7 @@ class XmlArray
 						$text_value = $this->_from_cdata(substr($data, 0, $data_strpos));
 						$data = substr($data, $data_strpos);
 
-						if ($text_value != '')
+						if ($text_value !== '')
 							$current[] = array(
 								'name' => '!',
 								'value' => $text_value
@@ -433,7 +433,7 @@ class XmlArray
 						$text_value = $this->_from_cdata($data);
 						$data = '';
 
-						if ($text_value != '')
+						if ($text_value !== '')
 							$current[] = array(
 								'name' => '!',
 								'value' => $text_value
@@ -450,7 +450,7 @@ class XmlArray
 			$el['name'] = $match[1];
 
 			// If this ISN'T empty, remove the close tag and parse the inner data.
-			if ((!isset($match[3]) || trim($match[3]) != '/') && (!isset($match[2]) || trim($match[2]) != '/'))
+			if ((!isset($match[3]) || trim($match[3]) !== '/') && (!isset($match[2]) || trim($match[2]) !== '/'))
 			{
 				// Because PHP 5.2.0+ seems to croak using regex, we'll have to do this the less fun way.
 				$last_tag_end = strpos($data, '</' . $match[1] . '>');
@@ -458,7 +458,7 @@ class XmlArray
 					continue;
 
 				$offset = 0;
-				while (1 == 1)
+				while (1 === 1)
 				{
 					// Where is the next start tag?
 					$next_tag_start = strpos($data, '<' . $match[1], $offset);
@@ -491,10 +491,10 @@ class XmlArray
 					// Parse the inner data.
 					if (strpos($inner_match, '<') !== false)
 						$el += $this->_parse($inner_match);
-					elseif (trim($inner_match) != '')
+					elseif (trim($inner_match) !== '')
 					{
 						$text_value = $this->_from_cdata($inner_match);
-						if ($text_value != '')
+						if (trim($text_value) !== '')
 							$el[] = array(
 								'name' => '!',
 								'value' => $text_value
@@ -654,7 +654,9 @@ class XmlArray
 		$trans_tbl = array_flip(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
 
 		// Translate all the entities out.
-		$data = preg_replace_callback('~&#(\d{1,4});~', array($this, '_from_cdata_callback'), $data);
+		$data = preg_replace_callback('~&#(\d{1,4});~', function ($match) {
+			return $this->_from_cdata_callback($match);
+		}, $data);
 		$data = strtr($data, $trans_tbl);
 
 		return $this->trim ? trim($data) : $data;

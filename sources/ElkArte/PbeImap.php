@@ -197,15 +197,7 @@ class PbeImap extends AbstractModel
 		$headers = imap_fetchheader($this->_inbox, $email_uid, FT_PREFETCHTEXT | FT_UID);
 		$message = imap_body($this->_inbox, $email_uid, FT_UID);
 
-		// Create the save-as email
-		if (!empty($headers) && !empty($message))
-		{
-			$email = $headers . "\n" . $message;
-		}
-		else
-		{
-			$email = '';
-		}
+		$email = !empty($headers) && !empty($message) ? $headers . "\n" . $message : '';
 
 		return $email;
 	}

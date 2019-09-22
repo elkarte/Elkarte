@@ -122,7 +122,7 @@ class Custom extends Standard
 				if (\ElkArte\Util::strlen($subword) >= $this->min_word_length && !in_array($subword, $this->bannedWords))
 				{
 					$wordsSearch['indexed_words'][] = $subword;
-					if ($isExcluded)
+					if ($isExcluded !== '')
 						$wordsExclude[] = $subword;
 				}
 			}
@@ -218,7 +218,7 @@ class Custom extends Standard
 			}
 		}
 
-		$ignoreRequest = $db_search->search_query('insert_into_log_messages_fulltext', ($db->support_ignore() ? ('
+		return $db_search->search_query('insert_into_log_messages_fulltext', ($db->support_ignore() ? ('
 			INSERT IGNORE INTO {db_prefix}' . $search_data['insert_into'] . '
 				(' . implode(', ', array_keys($query_select)) . ')') : '') . '
 			SELECT ' . implode(', ', $query_select) . '
@@ -232,8 +232,6 @@ class Custom extends Standard
 			LIMIT ' . ($search_data['max_results'] - $search_data['indexed_results'])),
 			$query_params
 		);
-
-		return $ignoreRequest;
 	}
 
 	/**

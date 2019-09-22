@@ -147,7 +147,7 @@ class Templates
 			$style_sheets = [$style_sheets];
 		}
 
-		if ($this->default_loaded === false)
+		if (!$this->default_loaded)
 		{
 			loadCSSFile('index.css');
 			$this->default_loaded = true;
@@ -164,7 +164,7 @@ class Templates
 			foreach ($style_sheets as $sheet)
 			{
 				$sheets[] = stripos('.css', $sheet) !== false ? $sheet : $sheet . '.css';
-				if ($sheet == 'admin' && !empty($context['theme_variant']))
+				if ($sheet === 'admin' && !empty($context['theme_variant']))
 				{
 					$sheets[] =
 						$context['theme_variant'] . '/admin' . $context['theme_variant'] . '.css';
@@ -284,7 +284,7 @@ class Templates
 		static $already_loaded = [];
 
 		// Default to the user's language.
-		if ($lang == '')
+		if ($lang === '')
 		{
 			$lang = isset(User::$info->language) ? User::$info->language : $language;
 		}
@@ -299,7 +299,7 @@ class Templates
 		// For each file open it up and write it out!
 		foreach ($template_name as $template)
 		{
-			if (!$force_reload && isset($already_loaded[$template]) && $already_loaded[$template] == $lang)
+			if (!$force_reload && isset($already_loaded[$template]) && $already_loaded[$template] === $lang)
 			{
 				return $lang;
 			}
@@ -382,7 +382,7 @@ class Templates
 	{
 		global $settings, $modSettings, $mbname, $context;
 
-		if (function_exists('database') === false)
+		if (!function_exists('database'))
 		{
 			throw new \Exception('');
 		}

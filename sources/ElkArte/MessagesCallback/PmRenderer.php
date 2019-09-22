@@ -103,7 +103,7 @@ class PmRenderer extends Renderer
 			'recipients' => $this->_options->recipients[$id_pm],
 			'number_recipients' => count($this->_options->recipients[$id_pm]['to']),
 			'labels' => &$context['message_labels'][$id_pm],
-			'fully_labeled' => count($context['message_labels'][$id_pm]) == count($context['labels']),
+			'fully_labeled' => count($context['message_labels'][$id_pm]) === count($context['labels']),
 			'is_replied_to' => &$context['message_replied'][$id_pm],
 			'is_unread' => &$context['message_unread'][$id_pm],
 			'is_selected' => !empty($this->_temp_pm_selected) && in_array($id_pm, $this->_temp_pm_selected),

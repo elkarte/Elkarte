@@ -155,7 +155,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 		$event_id = isset($_REQUEST['eventid']) ? (int) $_REQUEST['eventid'] : -1;
 
 		// Editing an event?  (but NOT previewing!?)
-		if ($event_id != -1 && !isset($_REQUEST['subject']))
+		if ($event_id !== -1 && !isset($_REQUEST['subject']))
 		{
 			// If the user doesn't have permission to edit the post in this topic, redirect them.
 			if ((empty($id_member_poster) || $id_member_poster != $this->user->id || !allowedTo('modify_own')) && !allowedTo('modify_any'))
@@ -217,21 +217,14 @@ class Post extends \ElkArte\Modules\AbstractModule
 			// Posting a new event? (or preview...)
 			$today = getdate();
 
-			// You must have a month and year specified!
-			if (isset($_REQUEST['month']))
-				$context['event']['month'] = (int) $_REQUEST['month'];
-			else
-				$context['event']['month'] = $today['mon'];
+			$context['event']['month'] = isset($_REQUEST['month']) ? (int) $_REQUEST['month'] : $today['mon'];
 
-			if (isset($_REQUEST['year']))
-				$context['event']['year'] = (int) $_REQUEST['year'];
-			else
-				$context['event']['year'] = $today['year'];
+			$context['event']['year'] = isset($_REQUEST['year']) ? (int) $_REQUEST['year'] : $today['year'];
 
 			if (isset($_REQUEST['day']))
 				$context['event']['day'] = (int) $_REQUEST['day'];
 			else
-				$context['event']['day'] = $context['event']['month'] == $today['mon'] ? $today['mday'] : 0;
+				$context['event']['day'] = $context['event']['month'] === $today['mon'] ? $today['mday'] : 0;
 
 			$context['event']['span'] = isset($_REQUEST['span']) ? $_REQUEST['span'] : 1;
 

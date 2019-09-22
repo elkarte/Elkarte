@@ -152,7 +152,7 @@ final class Request
 		$_SERVER['REMOTE_ADDR'] = $this->_client_ip;
 
 		// Set the scheme, for later use
-		$this->_scheme = (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on') ? 'https' : 'http';
+		$this->_scheme = (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) === 'on') ? 'https' : 'http';
 
 		// Make sure we know everything about you... HTTP_USER_AGENT!
 		$this->_user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? htmlspecialchars($_SERVER['HTTP_USER_AGENT'], ENT_QUOTES, 'UTF-8') : '';
@@ -209,9 +209,9 @@ final class Request
 		if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_CLIENT_IP']) && (preg_match('~^' . $this->_local_ip_pattern . '~', $_SERVER['HTTP_CLIENT_IP']) == 0 || preg_match('~^' . $this->_local_ip_pattern . '~', $this->_client_ip) != 0))
 		{
 			// Check the first forwarded for as the block - only switch if it's better that way.
-			if (strtok($_SERVER['HTTP_X_FORWARDED_FOR'], '.') != strtok($_SERVER['HTTP_CLIENT_IP'], '.')
+			if (strtok($_SERVER['HTTP_X_FORWARDED_FOR'], '.') !== strtok($_SERVER['HTTP_CLIENT_IP'], '.')
 					&& '.' . strtok($_SERVER['HTTP_X_FORWARDED_FOR'], '.') == strrchr($_SERVER['HTTP_CLIENT_IP'], '.')
-					&& (preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown)~', $_SERVER['HTTP_X_FORWARDED_FOR']) == 0 || preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown)~', $this->_client_ip) != 0))
+					&& (preg_match('~^((0|10|172\.(1[6-9]|2\d|3[01])|192\.168|255|127)\.|unknown)~', $_SERVER['HTTP_X_FORWARDED_FOR']) == 0 || preg_match('~^((0|10|172\.(1[6-9]|2\d|3[01])|192\.168|255|127)\.|unknown)~', $this->_client_ip) != 0))
 				$this->_ban_ip = implode('.', array_reverse(explode('.', $_SERVER['HTTP_CLIENT_IP'])));
 			else
 				$this->_ban_ip = $_SERVER['HTTP_CLIENT_IP'];
@@ -220,7 +220,7 @@ final class Request
 		if (!empty($_SERVER['HTTP_CLIENT_IP']) && (preg_match('~^' . $this->_local_ip_pattern . '~', $_SERVER['HTTP_CLIENT_IP']) == 0 || preg_match('~^' . $this->_local_ip_pattern . '~', $this->_client_ip) != 0))
 		{
 			// Since they are in different blocks, it's probably reversed.
-			if (strtok($this->_client_ip, '.') != strtok($_SERVER['HTTP_CLIENT_IP'], '.'))
+			if (strtok($this->_client_ip, '.') !== strtok($_SERVER['HTTP_CLIENT_IP'], '.'))
 				$this->_ban_ip = implode('.', array_reverse(explode('.', $_SERVER['HTTP_CLIENT_IP'])));
 			else
 				$this->_ban_ip = $_SERVER['HTTP_CLIENT_IP'];

@@ -394,10 +394,7 @@ final class Hooks
 	{
 		global $modSettings;
 
-		if (!empty($modSettings['autoload_integrate']))
-			$existing = explode(',', $modSettings['autoload_integrate']);
-		else
-			$existing = array();
+		$existing = !empty($modSettings['autoload_integrate']) ? explode(',', $modSettings['autoload_integrate']) : array();
 
 		return $existing;
 	}

@@ -314,7 +314,7 @@ class Questions implements ControlInterface
 				foreach ($save_answer[$id] as $answer)
 				{
 					$answer = trim(\ElkArte\Util::strtolower(\ElkArte\Util::htmlspecialchars($answer, ENT_COMPAT)));
-					if ($answer != '')
+					if ($answer !== '')
 						$answers[] = $answer;
 				}
 			}
@@ -325,7 +325,7 @@ class Questions implements ControlInterface
 				$count_questions++;
 
 				// Changed?
-				if ($question == '' || empty($answers))
+				if ($question === '' || empty($answers))
 				{
 					$this->_delete($id);
 					$count_questions--;
@@ -336,7 +336,7 @@ class Questions implements ControlInterface
 				}
 			}
 			// It's so shiney and new!
-			elseif ($question != '' && !empty($answers))
+			elseif ($question !== '' && !empty($answers))
 			{
 				$questionInserts[] = array(
 					'question' => $question,

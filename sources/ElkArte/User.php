@@ -74,7 +74,7 @@ class User
 			self::$instance->loadUserById(self::$id, $already_verified, self::$session_password);
 			self::$settings = self::$instance->getSettings();
 			self::$info = self::$instance->getInfo();
-			if ($compat_mode === true)
+			if ($compat_mode)
 			{
 				global $user_info;
 				$user_info = \ElkArte\User::$info;
@@ -94,7 +94,7 @@ class User
 		self::$instance = $user;
 		self::$settings = self::$instance->getSettings();
 		self::$info = self::$instance->getInfo();
-		if ($compat_mode === true)
+		if ($compat_mode)
 		{
 			global $user_info;
 			$user_info = \ElkArte\User::$info;
@@ -156,7 +156,7 @@ class User
 			list ($id, self::$session_password, $login_span) = serializeToJson($_SESSION['login_' . $cookiename], function ($array_from) use ($cookiename) {
 				$_SESSION['login_' . $cookiename] = json_encode($array_from);
 			});
-			self::$id = !empty($id) && strlen(self::$session_password) == 64 && $login_span > time() ? (int) $id : 0;
+			self::$id = !empty($id) && strlen(self::$session_password) === 64 && $login_span > time() ? (int) $id : 0;
 		}
 	}
 }

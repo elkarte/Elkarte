@@ -362,7 +362,7 @@ class SiteDispatcher
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
 		{
 			// You can only login
-			if ($this->action == 'login2' || $this->action == 'logout')
+			if ($this->action === 'login2' || $this->action === 'logout')
 			{
 				$this->_controller_name = '\\ElkArte\\Controller\\Auth';
 				$this->_function_name = 'action_' . $this->action;

@@ -411,7 +411,7 @@ class Standard extends AbstractAPI
 		call_integration_hook('integrate_main_search_query', array(&$main_query));
 
 		// Did we either get some indexed results, or otherwise did not do an indexed query?
-		if (!empty($indexedResults) || $this->useWordIndex() === false)
+		if (!empty($indexedResults) || !$this->useWordIndex())
 		{
 			$main_query['select']['relevance'] = $this->_build_relevance($main_query['weights']);
 			$num_results += $this->_build_search_results_log($main_query, 'insert_log_search_results_no_index');
@@ -446,7 +446,7 @@ class Standard extends AbstractAPI
 
 			$num_results += $this->_build_search_results_log($subject_query, 'insert_log_search_results_sub_only', true);
 		}
-		elseif ($num_results == -1)
+		elseif ($num_results === -1)
 		{
 			$num_results = 0;
 		}

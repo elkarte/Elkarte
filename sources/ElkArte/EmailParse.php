@@ -305,7 +305,7 @@ class EmailParse
 		// Main, will read, split, parse, decode an email
 		$this->read_data($data, $location);
 
-		if ($this->raw_message)
+		if ($this->raw_message !== '')
 		{
 			$this->_split_headers();
 			$this->_parse_headers();
@@ -1148,9 +1148,9 @@ class EmailParse
 		if (isset($this->headers['to']))
 		{
 			$to_addresses = explode(',', $this->headers['to']);
-			for ($i = 0, $num = count($to_addresses); $i < $num; $i++)
+			foreach ($to_addresses as $i => $to_address)
 			{
-				$this->_parse_address($to_addresses[$i]);
+				$this->_parse_address($to_address);
 				$this->email['to'][$i] = $this->_email_address;
 				$this->email['to_name'][$i] = $this->_email_name;
 			}
@@ -1160,9 +1160,9 @@ class EmailParse
 		if (isset($this->headers['cc']))
 		{
 			$cc_addresses = explode(',', $this->headers['cc']);
-			for ($i = 0, $num = count($cc_addresses); $i < $num; $i++)
+			foreach ($cc_addresses as $i => $cc_address)
 			{
-				$this->_parse_address($cc_addresses[$i]);
+				$this->_parse_address($cc_address);
 				$this->email['cc'][$i] = $this->_email_address;
 				$this->email['cc_name'][$i] = $this->_email_name;
 			}
@@ -1249,7 +1249,7 @@ class EmailParse
 	 */
 	private function _parse_ip($string)
 	{
-		if (preg_match('~\[?([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})\]?~', $string, $matches) !== 1)
+		if (preg_match('~\[?(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\]?~', $string, $matches) !== 1)
 		{
 			return '';
 		}

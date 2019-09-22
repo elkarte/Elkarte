@@ -1,8 +1,7 @@
 <?php
 
 /**
- * This file contains those functions specific to the various verification controls
- * used to challenge users, and hopefully robots as well.
+ * This file contains those functions specific to the cached search results in session
  *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -60,7 +59,7 @@ class Session
 
 	public function existsWithParams($params)
 	{
-		return $this->_params == $params;
+		return $this->_params === $params;
 	}
 
 	public function setNumResults($num_results = 0)

@@ -269,11 +269,10 @@ class SearchParams extends \ElkArte\ValuesContainer
 			preg_match_all('~"([^"]+)"~', $userString, $matches);
 			$possible_users = array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $userString)));
 
-			for ($k = 0, $n = count($possible_users); $k < $n; $k++)
+			foreach ($possible_users as $k => $possible_user)
 			{
-				$possible_users[$k] = trim($possible_users[$k]);
-
-				if (strlen($possible_users[$k]) == 0)
+				$possible_users[$k] = trim($possible_user);
+				if ($possible_users[$k] === '')
 				{
 					unset($possible_users[$k]);
 				}
@@ -404,7 +403,7 @@ class SearchParams extends \ElkArte\ValuesContainer
 			}
 		}
 
-		if (count($this->_search_params['brd']) != 0)
+		if (count($this->_search_params['brd']) !== 0)
 		{
 			foreach ($this->_search_params['brd'] as $k => $v)
 				$this->_search_params['brd'][$k] = (int) $v;

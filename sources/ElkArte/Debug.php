@@ -188,15 +188,12 @@ class Debug
 	public function rusage($point, $rusage = null)
 	{
 		// getrusage is missing in php < 7 on Windows
-		if ($this->_track === false || function_exists('getrusage') === false)
+		if (!$this->_track || !function_exists('getrusage'))
 		{
 			return;
 		}
 
-		if ($rusage === null)
-			$this->_rusage[$point] = getrusage();
-		else
-			$this->_rusage[$point] = $rusage;
+		$this->_rusage[$point] = $rusage === null ? getrusage() : $rusage;
 	}
 
 	/**
@@ -236,11 +233,14 @@ class Debug
 
 		$files = get_included_files();
 		$total_size = 0;
-		for ($i = 0, $n = count($files); $i < $n; $i++)
+		foreach ($files as $i => $file)
 		{
-			if (file_exists($files[$i]))
-				$total_size += filesize($files[$i]);
-			$this->add('files_included', strtr($files[$i], array(BOARDDIR => '.')));
+			if (file_exists($file))
+			{
+				$total_size += filesize($file);
+			}
+
+			$this->add('files_included', strtr($file, array(BOARDDIR => '.')));
 		}
 
 		if (!empty($this->_db_cache))

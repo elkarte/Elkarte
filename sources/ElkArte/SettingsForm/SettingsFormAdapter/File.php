@@ -286,7 +286,7 @@ class File extends Db
 		// Now sort everything into a big array, and figure out arrays and etc.
 		foreach ($config_passwords as $configVar)
 		{
-			if (isset($this->configValues[$configVar][1]) && $this->configValues[$configVar][0] == $this->configValues[$configVar][1])
+			if (isset($this->configValues[$configVar][1]) && $this->configValues[$configVar][0] === $this->configValues[$configVar][1])
 			{
 				$this->new_settings[$configVar] = '\'' . addcslashes($this->configValues[$configVar][0], '\'\\') . '\'';
 			}
@@ -410,7 +410,7 @@ class File extends Db
 		// Still more variables to go?  Then lets add them at the end.
 		if (!empty($this->new_settings))
 		{
-			if (trim($this->settingsArray[$end]) === '?' . '>')
+			if (trim($this->settingsArray[$end]) === '?>')
 			{
 				$this->settingsArray[$end++] = '';
 			}
