@@ -112,6 +112,7 @@ abstract class AbstractTable
 	 *                  'if_exists' => 'ignore',
 	 *                  'temporary' => false,
 	 *                )
+	 * @throws \ElkArte\Exceptions\Exception
 	 * @return bool
 	 */
 	public function create_table($table_name, $columns, $indexes = array(), $parameters = array())
@@ -169,7 +170,7 @@ abstract class AbstractTable
 		$table_query .= $this->_create_query_indexes($indexes, $table_name);
 
 		// No trailing commas!
-		if (substr($table_query, -1) == ',')
+		if (substr($table_query, -1) === ',')
 			$table_query = substr($table_query, 0, -1);
 
 		$table_query .= $this->_close_table_query($parameters['temporary']);

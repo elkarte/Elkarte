@@ -97,7 +97,7 @@ class Query extends AbstractQuery
 		// Limits need to be a little different.
 		$db_string = preg_replace('~\sLIMIT\s(\d+|{int:.+}),\s*(\d+|{int:.+})\s*$~i', 'LIMIT $2 OFFSET $1', $db_string);
 
-		if (trim($db_string) == '')
+		if (trim($db_string) === '')
 		{
 			return false;
 		}
@@ -121,7 +121,7 @@ class Query extends AbstractQuery
 		}
 
 		// Revert not to skip errors
-		if ($this->_skip_error === true)
+		if ($this->_skip_error)
 		{
 			$this->_skip_error = false;
 		}
@@ -148,14 +148,18 @@ class Query extends AbstractQuery
 	 */
 	public function transaction($type = 'commit')
 	{
-		if ($type == 'begin')
+		if ($type === 'begin')
 		{
 			$this->_in_transaction = true;
 			return @pg_query($this->connection, 'BEGIN');
 		}
-		elseif ($type == 'rollback')
+
+		if ($type === 'rollback')
+		{
 			return @pg_query($this->connection, 'ROLLBACK');
-		elseif ($type == 'commit')
+		}
+
+		if ($type === 'commit')
 		{
 			$this->_in_transaction = false;
 			return @pg_query($this->connection, 'COMMIT');
@@ -248,14 +252,14 @@ class Query extends AbstractQuery
 		$table = str_replace('{db_prefix}', $this->_db_prefix, $table);
 
 		$priv_trans = false;
-		if ((count($data) > 1 || $method == 'replace') && !$this->_in_transaction && !$disable_trans)
+		if ((count($data) > 1 || $method === 'replace') && !$this->_in_transaction && !$disable_trans)
 		{
 			$this->transaction('begin');
 			$priv_trans = true;
 		}
 
 		// PostgreSQL doesn't support replace: we implement a MySQL-compatible behavior instead
-		if ($method == 'replace')
+		if ($method === 'replace')
 		{
 			$count = 0;
 			$where = '';
@@ -312,7 +316,7 @@ class Query extends AbstractQuery
 				$insertRows[] = $this->quote($insertData, $this->_array_combine($indexed_columns, $dataRow));
 
 			$inserted_results = 0;
-			$skip_error = $method == 'ignore' || $table === $this->_db_prefix . 'log_errors';
+			$skip_error = $method === 'ignore' || $table === $this->_db_prefix . 'log_errors';
 			$this->_skip_error = $skip_error;
 
 			// Do the insert.

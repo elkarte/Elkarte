@@ -99,9 +99,9 @@ class Table extends \ElkArte\Database\AbstractTable
 			return false;
 
 		// Does it exist?
-		if ($force === true || $this->table_exists($full_table_name))
+		if ($force || $this->table_exists($full_table_name))
 		{
-			if ($force === true)
+			if ($force)
 			{
 				$this->_db->skip_next_error();
 			}
@@ -135,7 +135,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		if ($this->_get_column_info($table_name, $column_info['name']))
 		{
 			// If we're going to overwrite then use change column.
-			if ($if_exists == 'update')
+			if ($if_exists === 'update')
 				return $this->change_column($table_name, $column_info['name'], $column_info);
 			else
 				return false;
@@ -234,10 +234,10 @@ class Table extends \ElkArte\Database\AbstractTable
 		// Do we already have it?
 		foreach ($indexes as $index)
 		{
-			if ($index['name'] == $index_info['name'] || ($index['type'] == 'primary' && isset($index_info['type']) && $index_info['type'] == 'primary'))
+			if ($index['name'] === $index_info['name'] || ($index['type'] === 'primary' && isset($index_info['type']) && $index_info['type'] === 'primary'))
 			{
 				// If we want to overwrite simply remove the current one then continue.
-				if ($if_exists != 'update' || $index['type'] == 'primary')
+				if ($if_exists !== 'update' || $index['type'] === 'primary')
 					return false;
 				else
 					$this->remove_index($table_name, $index_info['name']);
@@ -245,7 +245,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		}
 
 		// If we're here we know we don't have the index - so just add it.
-		if (!empty($index_info['type']) && $index_info['type'] == 'primary')
+		if (!empty($index_info['type']) && $index_info['type'] === 'primary')
 		{
 			$this->_alter_table($table_name, '
 				ADD PRIMARY KEY (' . $columns . ')');
@@ -253,7 +253,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		else
 		{
 			$this->_alter_table($table_name, '
-				ADD ' . (isset($index_info['type']) && $index_info['type'] == 'unique' ? 'UNIQUE' : 'INDEX') . ' ' . $index_info['name'] . ' (' . $columns . ')');
+				ADD ' . (isset($index_info['type']) && $index_info['type'] === 'unique' ? 'UNIQUE' : 'INDEX') . ' ' . $index_info['name'] . ' (' . $columns . ')');
 		}
 	}
 
@@ -270,7 +270,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		foreach ($indexes as $index)
 		{
 			// If the name is primary we want the primary key!
-			if ($index['type'] == 'primary' && $index_name == 'primary')
+			if ($index['type'] === 'primary' && $index_name === 'primary')
 			{
 				// Dropping primary key?
 				$this->_alter_table($table_name, '
@@ -327,7 +327,7 @@ class Table extends \ElkArte\Database\AbstractTable
 			SHOW FIELDS
 			FROM {raw:table_name}',
 			array(
-				'table_name' => substr($table_name, 0, 1) == '`' ? $table_name : '`' . $table_name . '`',
+				'table_name' => substr($table_name, 0, 1) === '`' ? $table_name : '`' . $table_name . '`',
 			)
 		);
 		$columns = array();
@@ -340,7 +340,7 @@ class Table extends \ElkArte\Database\AbstractTable
 			else
 			{
 				// Is there an auto_increment?
-				$auto = strpos($row['Extra'], 'auto_increment') !== false ? true : false;
+				$auto = strpos($row['Extra'], 'auto_increment') !== false;
 
 				// Can we split out the size?
 				if (preg_match('~(.+?)\s*\((\d+)\)(?:(?:\s*)?(unsigned))?~i', $row['Type'], $matches) === 1)
@@ -358,7 +358,7 @@ class Table extends \ElkArte\Database\AbstractTable
 
 				$columns[$row['Field']] = array(
 					'name' => $row['Field'],
-					'null' => $row['Null'] != 'YES' ? false : true,
+					'null' => $row['Null'] === 'YES',
 					'default' => isset($row['Default']) ? $row['Default'] : null,
 					'type' => $type,
 					'size' => $size,
@@ -388,7 +388,7 @@ class Table extends \ElkArte\Database\AbstractTable
 			SHOW KEYS
 			FROM {raw:table_name}',
 			array(
-				'table_name' => substr($table_name, 0, 1) == '`' ? $table_name : '`' . $table_name . '`',
+				'table_name' => substr($table_name, 0, 1) === '`' ? $table_name : '`' . $table_name . '`',
 			)
 		);
 		$indexes = array();
@@ -501,9 +501,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		$row = $this->_db->fetch_assoc($request);
 		$this->_db->free_result($request);
 
-		$total_change = isset($row['Data_free']) && $data_before > $row['Data_free'] ? $data_before / 1024 : 0;
-
-		return $total_change;
+		return isset($row['Data_free']) && $data_before > $row['Data_free'] ? $data_before / 1024 : 0;
 	}
 
 	/**

@@ -57,7 +57,7 @@ abstract class AbstractSearch implements SearchInterface
 	 */
 	public function search_query($identifier, $db_string, $db_values = array())
 	{
-		if ($this->_skip_error === true)
+		if ($this->_skip_error)
 		{
 			$this->_db->skip_next_error();
 			$this->_skip_error = false;

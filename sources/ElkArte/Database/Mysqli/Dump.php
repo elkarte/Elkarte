@@ -143,7 +143,7 @@ namespace ElkArte\Database\Mysqli;
 			FROM `{raw:db_name_str}`
 			{raw:filter}',
 			array(
-				'db_name_str' => $db_name_str[0] == '`' ? strtr($db_name_str, array('`' => '')) : $db_name_str,
+				'db_name_str' => $db_name_str[0] === '`' ? strtr($db_name_str, array('`' => '')) : $db_name_str,
 				'filter' => $filter,
 			)
 		);
@@ -240,12 +240,9 @@ namespace ElkArte\Database\Mysqli;
 				unset($create[$k]);
 		}
 
-		if (!empty($create))
-			$create = '(
+		$create = !empty($create) ? '(
 				' . implode('
-				', $create) . ')';
-		else
-			$create = '';
+				', $create) . ')' : '';
 
 		$request = $this->_db->query('', '
 			CREATE TABLE {raw:backup_table} {raw:create}
@@ -262,9 +259,9 @@ namespace ElkArte\Database\Mysqli;
 			)
 		);
 
-		if ($auto_inc != '')
+		if ($auto_inc !== '')
 		{
-			if (preg_match('~\`(.+?)\`\s~', $auto_inc, $match) != 0 && substr($auto_inc, -1, 1) == ',')
+			if (preg_match('~\`(.+?)\`\s~', $auto_inc, $match) != 0 && substr($auto_inc, -1, 1) === ',')
 				$auto_inc = substr($auto_inc, 0, -1);
 
 			$this->_db->query('', '

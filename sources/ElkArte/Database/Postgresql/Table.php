@@ -124,12 +124,12 @@ class Table extends \ElkArte\Database\AbstractTable
 			return false;
 
 		// Does it exist?
-		if ($force === true || $this->table_exists($full_table_name))
+		if ($force || $this->table_exists($full_table_name))
 		{
 			// We can then drop the table.
 			$this->_db->transaction('begin');
 
-			if ($force === true)
+			if ($force)
 			{
 				$this->_db->skip_next_error();
 			}
@@ -145,7 +145,7 @@ class Table extends \ElkArte\Database\AbstractTable
 			$this->_db->transaction('commit');
 
 			// and the associated sequence, if any
-			if ($force === true)
+			if ($force)
 			{
 				$this->_db->skip_next_error();
 			}
@@ -179,7 +179,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		if ($this->_get_column_info($table_name, $column_info['name']))
 		{
 			// If we're going to overwrite then use change column.
-			if ($if_exists == 'update')
+			if ($if_exists === 'update')
 				return $this->change_column($table_name, $column_info['name'], $column_info);
 			else
 				return false;
@@ -198,7 +198,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		// If there's more attributes they need to be done via a change on PostgreSQL.
 		unset($column_info['type'], $column_info['size']);
 
-		if (count($column_info) != 1)
+		if (count($column_info) !== 1)
 			return $this->change_column($table_name, $column_info['name'], $column_info);
 		else
 			return true;
@@ -256,7 +256,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		}
 
 		// Different default?
-		if (isset($column_info['default']) && $column_info['default'] != $old_info['default'])
+		if (isset($column_info['default']) && $column_info['default'] !== $old_info['default'])
 		{
 			$action = $column_info['default'] !== null ? 'SET DEFAULT \'' . $this->_db->escape_string($column_info['default']) . '\'' : 'DROP DEFAULT';
 			$this->_alter_table($table_name, '
@@ -264,7 +264,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		}
 
 		// Is it null - or otherwise?
-		if (isset($column_info['null']) && $column_info['null'] != $old_info['null'])
+		if (isset($column_info['null']) && $column_info['null'] !== $old_info['null'])
 		{
 			$action = $column_info['null'] ? 'DROP' : 'SET';
 			$this->_db->transaction('begin');
@@ -287,7 +287,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		}
 
 		// What about a change in type?
-		if (isset($column_info['type']) && ($column_info['type'] != $old_info['type'] || (isset($column_info['size']) && $column_info['size'] != $old_info['size'])))
+		if (isset($column_info['type']) && ($column_info['type'] !== $old_info['type'] || (isset($column_info['size']) && $column_info['size'] !== $old_info['size'])))
 		{
 			$column_info['size'] = isset($column_info['size']) && is_numeric($column_info['size']) ? $column_info['size'] : null;
 			list ($type, $size) = $this->calculate_type($column_info['type'], $column_info['size']);
@@ -313,7 +313,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		}
 
 		// Finally - auto increment?!
-		if (isset($column_info['auto']) && $column_info['auto'] != $old_info['auto'])
+		if (isset($column_info['auto']) && $column_info['auto'] !== $old_info['auto'])
 		{
 			// Are we removing an old one?
 			if ($old_info['auto'])
@@ -382,10 +382,10 @@ class Table extends \ElkArte\Database\AbstractTable
 		// Do we already have it?
 		foreach ($indexes as $index)
 		{
-			if ($index['name'] == $index_info['name'] || ($index['type'] == 'primary' && isset($index_info['type']) && $index_info['type'] == 'primary'))
+			if ($index['name'] === $index_info['name'] || ($index['type'] === 'primary' && isset($index_info['type']) && $index_info['type'] === 'primary'))
 			{
 				// If we want to overwrite simply remove the current one then continue.
-				if ($if_exists != 'update' || $index['type'] == 'primary')
+				if ($if_exists !== 'update' || $index['type'] === 'primary')
 					return false;
 				else
 					$this->remove_index($table_name, $index_info['name']);
@@ -393,7 +393,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		}
 
 		// If we're here we know we don't have the index - so just add it.
-		if (!empty($index_info['type']) && $index_info['type'] == 'primary')
+		if (!empty($index_info['type']) && $index_info['type'] === 'primary')
 		{
 			$this->_alter_table($table_name, '
 				ADD PRIMARY KEY (' . $columns . ')');
@@ -418,13 +418,13 @@ class Table extends \ElkArte\Database\AbstractTable
 
 		// Better exist!
 		$indexes = $this->list_indexes($table_name, true);
-		if ($index_name != 'primary')
+		if ($index_name !== 'primary')
 			$index_name = $table_name . '_' . $index_name;
 
 		foreach ($indexes as $index)
 		{
 			// If the name is primary we want the primary key!
-			if ($index['type'] == 'primary' && $index_name == 'primary')
+			if ($index['type'] === 'primary' && $index_name === 'primary')
 			{
 				// Dropping primary key is odd...
 				$this->_alter_table($table_name, '
@@ -433,7 +433,7 @@ class Table extends \ElkArte\Database\AbstractTable
 				return true;
 			}
 
-			if ($index['name'] == $index_name)
+			if ($index['name'] === $index_name)
 			{
 				// Drop the bugger...
 				$this->_db->query('', '
@@ -484,7 +484,7 @@ class Table extends \ElkArte\Database\AbstractTable
 		// Got it? Change it!
 		if (isset($types[$type_name]))
 		{
-			if ($type_name == 'tinytext')
+			if ($type_name === 'tinytext')
 				$type_size = 255;
 			$type_name = $types[$type_name];
 		}
@@ -543,7 +543,7 @@ class Table extends \ElkArte\Database\AbstractTable
 					$default = null;
 					$auto = true;
 				}
-				elseif (trim($row['column_default']) != '')
+				elseif (trim($row['column_default']) !== '')
 					$default = strpos($row['column_default'], '::') === false ? $row['column_default'] : substr($row['column_default'], 0, strpos($row['column_default'], '::'));
 				else
 					$default = null;
@@ -553,7 +553,7 @@ class Table extends \ElkArte\Database\AbstractTable
 
 				$columns[$row['column_name']] = array(
 					'name' => $row['column_name'],
-					'null' => $row['is_nullable'] ? true : false,
+					'null' => (bool) $row['is_nullable'],
 					'default' => $default,
 					'type' => $type,
 					'size' => $size,
@@ -602,7 +602,7 @@ class Table extends \ElkArte\Database\AbstractTable
 				$columns[$k] = trim($v);
 
 			// Fix up the name to be consistent cross databases
-			if (substr($row['name'], -5) == '_pkey' && $row['is_primary'] == 1)
+			if (substr($row['name'], -5) === '_pkey' && $row['is_primary'] == 1)
 				$row['name'] = 'PRIMARY';
 			else
 				$row['name'] = str_replace($table_name . '_', '', $row['name']);
@@ -629,6 +629,7 @@ class Table extends \ElkArte\Database\AbstractTable
 	 * @param mixed[] $column
 	 * @param string $table_name
 	 *
+	 * @throws \ElkArte\Exceptions\Exception
 	 * @return string
 	 */
 	protected function _db_create_query_column($column, $table_name)

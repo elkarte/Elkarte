@@ -60,7 +60,7 @@ class Dump extends \ElkArte\Database\AbstractDump
 			$schema_create .= ' "' . $row['column_name'] . '" ' . $row['data_type'] . ($row['is_nullable'] != 'YES' ? ' NOT NULL' : '');
 
 			// Add a default...?
-			if (trim($row['column_default']) != '')
+			if (trim($row['column_default']) !== '')
 			{
 				$schema_create .= ' default ' . $row['column_default'] . '';
 

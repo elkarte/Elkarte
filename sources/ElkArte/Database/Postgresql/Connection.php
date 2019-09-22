@@ -23,15 +23,7 @@ class Connection implements \ElkArte\Database\ConnectionInterface
 	 */
 	public static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
-		// Non-standard port
-		if (!empty($db_options['port']))
-		{
-			$db_port = ' port=' . (int) $db_options['port'];
-		}
-		else
-		{
-			$db_port = '';
-		}
+		$db_port = !empty($db_options['port']) ? ' port=' . (int) $db_options['port'] : '';
 
 		if (!empty($db_options['persist']))
 		{
@@ -48,8 +40,6 @@ class Connection implements \ElkArte\Database\ConnectionInterface
 			throw new \Exception('\\ElkArte\\Database\\Postgresql\\Connection::initiate');
 		}
 
-		$query = new Query($db_prefix, $connection);
-
-		return $query;
+		return new Query($db_prefix, $connection);
 	}
 }

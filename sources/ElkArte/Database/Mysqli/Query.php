@@ -29,11 +29,9 @@ class Query extends AbstractQuery
 	 * {@inheritDoc}
 	 */
 	public function fix_prefix($db_prefix, $db_name)
-	{
-		$db_prefix = is_numeric(substr($db_prefix, 0, 1)) ? $db_name . '.' . $db_prefix : '`' . $db_name . '`.' . $db_prefix;
-
-		return $db_prefix;
-	}
+ {
+     return is_numeric(substr($db_prefix, 0, 1)) ? $db_name . '.' . $db_prefix : '`' . $db_name . '`.' . $db_prefix;
+ }
 
 	/**
 	 * {@inheritDoc}
@@ -61,18 +59,18 @@ class Query extends AbstractQuery
 
 		$this->_doSanityCheck($db_string, '\\');
 
-		if ($this->_unbuffered === false)
+		if (!$this->_unbuffered)
 			$ret = @mysqli_query($this->connection, $db_string);
 		else
 			$ret = @mysqli_query($this->connection, $db_string, MYSQLI_USE_RESULT);
 
-		if ($ret === false && $this->_skip_error === false)
+		if ($ret === false && !$this->_skip_error)
 		{
 			$ret = $this->error($db_string);
 		}
 
 		// Revert not to skip errors
-		if ($this->_skip_error === true)
+		if ($this->_skip_error)
 		{
 			$this->_skip_error = false;
 		}
@@ -173,15 +171,17 @@ class Query extends AbstractQuery
 	 */
 	public function transaction($type = 'commit')
 	{
-		if ($type == 'begin')
+		if ($type === 'begin')
 		{
 			return @mysqli_query($this->connection, 'BEGIN');
 		}
-		elseif ($type == 'rollback')
+
+		if ($type === 'rollback')
 		{
 			return @mysqli_query($this->connection, 'ROLLBACK');
 		}
-		elseif ($type == 'commit')
+
+		if ($type === 'commit')
 		{
 			return @mysqli_query($this->connection, 'COMMIT');
 		}
@@ -283,7 +283,7 @@ class Query extends AbstractQuery
 						foreach ($tables as $table)
 						{
 							// Now, it's still theoretically possible this could be an injection.  So backtick it!
-							if (trim($table) != '')
+							if (trim($table) !== '')
 								$fix_tables[] = '`' . strtr(trim($table), array('`' => '')) . '`';
 						}
 					}
@@ -453,7 +453,7 @@ class Query extends AbstractQuery
 		}
 
 		// Determine the method of insertion.
-		$queryTitle = $method === 'replace' ? 'REPLACE' : ($method == 'ignore' ? 'INSERT IGNORE' : 'INSERT');
+		$queryTitle = $method === 'replace' ? 'REPLACE' : ($method === 'ignore' ? 'INSERT IGNORE' : 'INSERT');
 
 		$skip_error = $table === $this->_db_prefix . 'log_errors';
 		$this->_skip_error = $skip_error;
