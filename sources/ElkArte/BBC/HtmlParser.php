@@ -22,7 +22,11 @@ namespace BBC;
  */
 class HtmlParser
 {
-	/** @var array tags that are stand alone */
+	/** @var int width of the image */
+	public $image_width;
+	/** @var int height of the image */
+ 	public $image_height;
+ 	/** @var array tags that are stand alone */
 	protected $empty_tags = array('br', 'hr');
 	/** @var array tags we will allow */
 	protected $closable_tags = array('b', 'u', 'i', 's', 'em', 'ins', 'del', 'pre', 'blockquote');
@@ -127,7 +131,7 @@ class HtmlParser
 			// Stray open tags, close them all!
 			if ($diff > 0)
 			{
-				$data = $data . str_repeat('</' . $tag . '>', $diff);
+				$data .= str_repeat('</' . $tag . '>', $diff);
 			}
 		}
 

@@ -73,7 +73,7 @@ class PreparseCode
 		$this->message = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $this->message);
 
 		// Clean up after nobbc ;).
-		$this->message = preg_replace_callback('~\[nobbc\](.+?)\[/nobbc\]~i', array($this, '_preparsecode_nobbc_callback'), $this->message);
+		$this->message = preg_replace_callback('~\[nobbc\](.+?)\[/nobbc\]~i', function ($matches) {return $this->_preparsecode_nobbc_callback($matches);}, $this->message);
 
 		// Remove \r's... they're evil!
 		$this->message = strtr($this->message, array("\r" => ''));
@@ -97,7 +97,10 @@ class PreparseCode
 		$this->_itsAllAbout();
 
 		// Make sure list and table tags are lowercase.
-		$this->message = preg_replace_callback('~\[([/]?)(list|li|table|tr|td|th)((\s[^\]]+)*)\]~i', array($this, '_preparsecode_lowertags_callback'), $this->message);
+		$this->message = preg_replace_callback('~\[([/]?)(list|li|table|tr|td|th)((\s[^\]]+)*)\]~i',
+			function ($matches) {
+				return $this->_preparsecode_lowertags_callback($matches);
+			}, $this->message);
 
 		// Don't leave any lists that were never opened or closed
 		$this->_validateLists();
@@ -113,7 +116,10 @@ class PreparseCode
 		$this->message = preg_replace('~\[color=(?:#[\da-fA-F]{3}|#[\da-fA-F]{6}|[A-Za-z]{1,20}|rgb\(\d{1,3}, ?\d{1,3}, ?\d{1,3}\))\]\s*\[/color\]~', '', $this->message);
 
 		// Font tags with multiple fonts (copy&paste in the WYSIWYG by some browsers).
-		$this->message = preg_replace_callback('~\[font=([^\]]*)\](.*?(?:\[/font\]))~s', array($this, '_preparsecode_font_callback'), $this->message);
+		$this->message = preg_replace_callback('~\[font=([^\]]*)\](.*?(?:\[/font\]))~s',
+			function ($matches) {
+				return $this->_preparsecode_font_callback($matches);
+			}, $this->message);
 
 		// Allow integration to do further processing on protected code block message
 		call_integration_hook('integrate_preparse_tokenized_code', array(&$this->message, $previewing, $this->code_blocks));
@@ -223,9 +229,7 @@ class PreparseCode
 		// Token generator
 		$tokenizer = new \ElkArte\TokenHash();
 
-		// Separate all code blocks
-		for ($i = 0, $n = count($parts); $i < $n; $i++)
-		{
+		foreach ($parts as $i => $part) {
 			// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
 			if ($i % 4 === 0 && isset($parts[$i + 3]))
 			{
@@ -308,7 +312,10 @@ class PreparseCode
 		}
 
 		// Now fix possible security problems with images loading links automatically...
-		$this->message = preg_replace_callback('~(\[img.*?\])(.+?)\[/img\]~is', array($this, '_fixTags_img_callback'), $this->message);
+		$this->message = preg_replace_callback('~(\[img.*?\])(.+?)\[/img\]~is',
+			function ($matches) {
+				return $this->_fixTags_img_callback($matches);
+			}, $this->message);
 
 		// Limit the size of images posted?
 		if (!empty($modSettings['max_image_width']) || !empty($modSettings['max_image_height']))
@@ -334,15 +341,7 @@ class PreparseCode
 
 		$replaces = array();
 
-		// Ensure it has a domain name, use the site name if needed
-		if (preg_match('~^([^:]+://[^/]+)~', $boardurl, $match) != 0)
-		{
-			$domain_url = $match[1];
-		}
-		else
-		{
-			$domain_url = $boardurl . '/';
-		}
+		$domain_url = preg_match('~^([^:]+://[^/]+)~', $boardurl, $match) != 0 ? $match[1] : $boardurl . '/';
 
 		if ($hasEqualSign)
 		{
@@ -553,7 +552,7 @@ class PreparseCode
 
 		if ($list_open - $list_close > 0)
 		{
-			$this->message = $this->message . str_repeat('[/list]', $list_open - $list_close);
+			$this->message .= str_repeat('[/list]', $list_open - $list_close);
 		}
 	}
 
@@ -675,7 +674,7 @@ class PreparseCode
 			else
 			{
 				// Only keep the tag if it's closing the right thing.
-				if (empty($table_array) || ($table_array[0] != $matches[2]))
+				if (empty($table_array) || ($table_array[0] !== $matches[2]))
 				{
 					$remove_tag = true;
 				}

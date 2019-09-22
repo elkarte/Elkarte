@@ -575,7 +575,7 @@ class BBCParser
 		}
 
 		// If there is a code that says you can't cache, the message can't be cached
-		if ($tag !== null && $this->can_cache !== false)
+		if ($tag !== null && $this->can_cache)
 		{
 			$this->can_cache = empty($tag[Codes::ATTR_NO_CACHE]);
 		}
@@ -898,7 +898,7 @@ class BBCParser
 			$quoted = false;
 		}
 
-		$this->pos2 = strpos($this->message, $quoted === false ? ']' : '&quot;]', $this->pos1);
+		$this->pos2 = strpos($this->message, !$quoted ? ']' : '&quot;]', $this->pos1);
 		if ($this->pos2 === false)
 		{
 			return true;
@@ -911,7 +911,7 @@ class BBCParser
 		}
 
 		$data = array(
-			substr($this->message, $this->pos2 + ($quoted === false ? 1 : 7), $this->pos3 - ($this->pos2 + ($quoted === false ? 1 : 7))),
+			substr($this->message, $this->pos2 + (!$quoted ? 1 : 7), $this->pos3 - ($this->pos2 + (!$quoted ? 1 : 7))),
 			substr($this->message, $this->pos1, $this->pos2 - $this->pos1)
 		);
 
@@ -1066,7 +1066,7 @@ class BBCParser
 			$quoted = false;
 		}
 
-		$this->pos2 = strpos($this->message, $quoted === false ? ']' : '&quot;]', $this->pos1);
+		$this->pos2 = strpos($this->message, !$quoted ? ']' : '&quot;]', $this->pos1);
 		if ($this->pos2 === false)
 		{
 			return true;
@@ -1092,7 +1092,7 @@ class BBCParser
 
 		$code = strtr($tag[Codes::ATTR_BEFORE], array('$1' => $data));
 		$tmp = $this->noSmileys($code);
-		$this->message = substr_replace($this->message, $tmp, $this->pos, $this->pos2 + ($quoted === false ? 1 : 7) - $this->pos);
+		$this->message = substr_replace($this->message, $tmp, $this->pos, $this->pos2 + (!$quoted ? 1 : 7) - $this->pos);
 		$this->pos += strlen($tmp) - 1;
 
 		return false;
@@ -1203,7 +1203,7 @@ class BBCParser
 		$this->fn_count = $fn_total;
 
 		// Replace our footnote text with a [1] link, save the text for use at the end of the message
-		$this->message = preg_replace_callback('~(%fn%(.*?)%fn%)~is', array($this, 'footnoteCallback'), $this->message);
+		$this->message = preg_replace_callback('~(%fn%(.*?)%fn%)~is', function (array $matches) {return $this->footnoteCallback($matches);}, $this->message);
 		$fn_total += $this->fn_num;
 
 		// If we have footnotes, add them in at the end of the message

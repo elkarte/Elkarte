@@ -125,7 +125,7 @@ final class ParserWrapper
 			call_integration_hook('integrate_' . $area . '_' . $parser_type . '_parser', array(&$parser, $this));
 
 			// If not, use the default one
-			if ($parser === false)
+			if (!$parser)
 			{
 				$parser = call_user_func(array($this, 'get' . ucfirst($parser_type) . 'Parser'), $area);
 			}

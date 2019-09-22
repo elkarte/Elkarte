@@ -113,7 +113,10 @@ class SmileyParser
 		}
 
 		// Replace away!
-		return preg_replace_callback($this->search, array($this, 'parser_callback'), $message);
+		return preg_replace_callback($this->search,
+			function (array $matches) {
+				return $this->parser_callback($matches);
+			}, $message);
 	}
 
 	/**
@@ -172,15 +175,14 @@ class SmileyParser
 
 		$replace = array(':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;');
 
-		for ($i = 0, $n = count($smileysfrom); $i < $n; $i++)
+		foreach ($smileysfrom as $i => $smileysfrom_i)
 		{
-			$specialChars = htmlspecialchars($smileysfrom[$i], ENT_QUOTES);
+			$specialChars = htmlspecialchars($smileysfrom_i, ENT_QUOTES);
 			$smileyCode = '<img src="' . $this->path . $smileysto[$i] . '" alt="' . strtr($specialChars, $replace) . '" title="' . strtr(htmlspecialchars($smileysdescs[$i]), $replace) . '" class="smiley" />';
+			$this->replace[$smileysfrom_i] = $smileyCode;
 
-			$this->replace[$smileysfrom[$i]] = $smileyCode;
-
-			$searchParts[] = preg_quote($smileysfrom[$i], '~');
-			if ($smileysfrom[$i] != $specialChars)
+			$searchParts[] = preg_quote($smileysfrom_i, '~');
+			if ($smileysfrom_i != $specialChars)
 			{
 				$this->replace[$specialChars] = $smileyCode;
 				$searchParts[] = preg_quote($specialChars, '~');

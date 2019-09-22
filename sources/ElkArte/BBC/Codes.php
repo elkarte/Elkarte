@@ -511,14 +511,7 @@ class Codes
 				self::ATTR_BEFORE => '<a href="$1" class="bbc_link">',
 				self::ATTR_AFTER => '</a>',
 				self::ATTR_VALIDATE => function (&$data) {
-					if ($data[0] === '#')
-					{
-						$data = '#post_' . substr($data, 1);
-					}
-					else
-					{
-						$data = addProtocol($data);
-					}
+					$data = $data[0] === '#' ? '#post_' . substr($data, 1) : addProtocol($data);
 				},
 				self::ATTR_DISALLOW_CHILDREN => array(
 					'email' => 1,
