@@ -153,7 +153,7 @@ class FtpConnection
 		if (!is_resource($this->connection))
 			return false;
 
-		if ($ftp_file == '')
+		if (trim($ftp_file) === '')
 			$ftp_file = '.';
 
 		// Convert the chmod value from octal (0777) to text ("777").
@@ -213,7 +213,7 @@ class FtpConnection
 		} while ((strlen($this->last_message) < 4 || strpos($this->last_message, ' ') === 0 || strpos($this->last_message, ' ', 3) !== 3) && time() - $time < 5);
 
 		// Was the desired response returned?
-		return is_array($desired) ? in_array(substr($this->last_message, 0, 3), $desired) : substr($this->last_message, 0, 3) == $desired;
+		return is_array($desired) ? in_array(substr($this->last_message, 0, 3), $desired) : substr($this->last_message, 0, 3) === $desired;
 	}
 
 	/**
@@ -312,7 +312,7 @@ class FtpConnection
 			return false;
 
 		// Get the listing!
-		fwrite($this->connection, 'LIST -1' . ($search ? 'R' : '') . ($ftp_path == '' ? '' : ' ' . $ftp_path) . "\r\n");
+		fwrite($this->connection, 'LIST -1' . ($search ? 'R' : '') . ($ftp_path === '' ? '' : ' ' . $ftp_path) . "\r\n");
 
 		// Connect, assuming we've got a connection.
 		$fp = @fsockopen($this->pasv['ip'], $this->pasv['port'], $err, $err, 5);
@@ -359,11 +359,7 @@ class FtpConnection
 					$response = fgets($this->connection, 1024);
 		} while (substr($response, 3, 1) !== ' ' && time() - $time < 5);
 
-		// Check for 257!
-		if (preg_match('~^257 "(.+?)" ~', $response, $match) != 0)
-			$current_dir = strtr($match[1], array('""' => '"'));
-		else
-			$current_dir = '';
+		$current_dir = preg_match('~^257 "(.+?)" ~', $response, $match) != 0 ? strtr($match[1], array('""' => '"')) : '';
 
 		for ($i = 0, $n = count($listing); $i < $n; $i++)
 		{
@@ -378,8 +374,10 @@ class FtpConnection
 
 			if ($file[0] == '*' && substr($listing[$i], -(strlen($file) - 1)) == substr($file, 1))
 				return $listing[$i];
+
 			if (substr($file, -1) == '*' && substr($listing[$i], 0, strlen($file) - 1) == substr($file, 0, -1))
 				return $listing[$i];
+
 			if (basename($listing[$i]) == $file || $listing[$i] == $file)
 				return $listing[$i];
 		}
@@ -429,7 +427,7 @@ class FtpConnection
 
 				$path = strtr($_SERVER['DOCUMENT_ROOT'], array('/home/' . $match[1] . '/' => '', '/home2/' . $match[1] . '/' => ''));
 
-				if (substr($path, -1) == '/')
+				if (substr($path, -1) === '/')
 					$path = substr($path, 0, -1);
 
 				if (strlen(dirname($_SERVER['PHP_SELF'])) > 1)

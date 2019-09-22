@@ -118,14 +118,7 @@ abstract class AbstractManipulator
 	{
 		try
 		{
-			if ($type === 'string')
-			{
-				$this->sizes = getimagesizefromstring($data);
-			}
-			else
-			{
-				$this->sizes = getimagesize($this->_fileName);
-			}
+			$this->sizes = $type === 'string' ? getimagesizefromstring($data) : getimagesize($this->_fileName);
 		}
 		catch (\Exception $e)
 		{

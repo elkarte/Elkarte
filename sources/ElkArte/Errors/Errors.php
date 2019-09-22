@@ -105,7 +105,7 @@ class Errors extends AbstractModel
 		// Just so we know what board error messages are from.
 		if (isset($_POST['board']) && !isset($_GET['board']))
 		{
-			$query_string .= ($query_string == '' ? 'board=' : ';board=') . $_POST['board'];
+			$query_string .= ($query_string === '' ? 'board=' : ';board=') . $_POST['board'];
 		}
 
 		return $query_string;
@@ -223,7 +223,7 @@ class Errors extends AbstractModel
 
 		theme()->getTemplates()->loadLanguageFile('Errors', $language);
 
-		$reload_lang_file = $language != $this->user->language;
+		$reload_lang_file = $language !== $this->user->language;
 
 		$error_message = !isset($txt[$error]) ? $error : (empty($sprintf) ? $txt[$error] : vsprintf($txt[$error], $sprintf));
 		$this->log_error($error_message, $error_type, $file, $line);
@@ -461,7 +461,7 @@ class Errors extends AbstractModel
 
 			// Language files aren't loaded yet :'(
 			$db_error = $this->_db->last_error();
-			@mail($webmaster_email, $mbname . ': Database Error!', 'There has been a problem with the database!' . ($db_error == '' ? '' : "\n" . $this->_db->title() . ' reported:' . "\n" . $db_error) . "\n\n" . 'This is a notice email to let you know that the system could not connect to the database, contact your host if this continues.');
+			@mail($webmaster_email, $mbname . ': Database Error!', 'There has been a problem with the database!' . ($db_error === '' ? '' : "\n" . $this->_db->title() . ' reported:' . "\n" . $db_error) . "\n\n" . 'This is a notice email to let you know that the system could not connect to the database, contact your host if this continues.');
 		}
 
 		// What to do?  Language files haven't and can't be loaded yet...
@@ -563,14 +563,7 @@ class Errors extends AbstractModel
 	{
 		if (self::$_errors === null)
 		{
-			if (function_exists('database'))
-			{
-				self::$_errors = new self;
-			}
-			else
-			{
-				self::$_errors = new self(1);
-			}
+			self::$_errors = function_exists('database') ? new self : new self(1);
 		}
 
 		return self::$_errors;

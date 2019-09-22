@@ -158,7 +158,7 @@ class CurlFetchWebdata
 	private function _curlRequest($url, $redirect = false)
 	{
 		// We do have a url I hope
-		if ($url == '')
+		if (trim($url) === '')
 			return false;
 		else
 			$this->_options[CURLOPT_URL] = $url;
@@ -180,8 +180,8 @@ class CurlFetchWebdata
 		$curl_content = curl_multi_getcontent($cr);
 		$url = $curl_info['url']; // Last effective URL
 		$http_code = $curl_info['http_code']; // Last HTTP code
-		$body = (!curl_error($cr)) ? substr($curl_content, $curl_info['header_size']) : false;
-		$error = (curl_error($cr)) ? curl_error($cr) : false;
+		$body = (curl_error($cr) === '') ? substr($curl_content, $curl_info['header_size']) : false;
+		$error = (curl_error($cr) !== '') ? curl_error($cr) : false;
 
 		// Close this request
 		curl_close($cr);
@@ -250,7 +250,7 @@ class CurlFetchWebdata
 		$max_result = count($this->_response) - 1;
 
 		// Just return a specified area or the entire result?
-		if ($area == '')
+		if (trim($area) === '')
 			return $this->_response[$max_result];
 		else
 			return isset($this->_response[$max_result][$area]) ? $this->_response[$max_result][$area] : $this->_response[$max_result];
@@ -322,7 +322,9 @@ class CurlFetchWebdata
 	private function _setOptions()
 	{
 		// Callback to parse the returned headers, if any
-		$this->default_options[CURLOPT_HEADERFUNCTION] = array($this, '_headerCallback');
+		$this->default_options[CURLOPT_HEADERFUNCTION] = function ($cr, $header) {
+      		return $this->_headerCallback($cr, $header);
+  		};
 
 		// Any user options to account for
 		if (is_array($this->_user_options))

@@ -50,8 +50,12 @@ final class ErrorHandler extends Errors
 		parent::__construct();
 
 		// Register the class handlers to the PHP handler functions
-		set_error_handler([$this, 'error_handler']);
-		set_exception_handler([$this, 'exception_handler']);
+		set_error_handler(function ($error_level, $error_string, $file, $line) {
+      		return $this->error_handler($error_level, $error_string, $file, $line);
+  		});
+		set_exception_handler(function (Throwable $e) {
+      		return $this->exception_handler($e);
+  		});
 	}
 
 	/**
@@ -120,7 +124,7 @@ final class ErrorHandler extends Errors
 		}
 
 		// Ignore errors if we're ignoring them or if the error code is not included in error_reporting.
-		if (!($error_level & error_reporting()))
+		if (($error_level & error_reporting()) === 0)
 		{
 			return true;
 		}
@@ -185,7 +189,7 @@ final class ErrorHandler extends Errors
 		}
 
 		// We should NEVER get to this point.  Any fatal error MUST quit, or very bad things can happen.
-		if ($this->error_level & $this->fatalErrors)
+		if (($this->error_level & $this->fatalErrors) !== 0)
 		{
 			$this->terminate('Hacking attempt...');
 		}

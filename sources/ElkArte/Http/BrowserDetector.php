@@ -317,13 +317,13 @@ class BrowserDetector
 	{
 		if ($this->_browsers['is_chrome'])
 		{
-			if (preg_match('~chrome[/]([0-9][0-9]?[.])~i', $this->_ua, $match) === 1)
+			if (preg_match('~chrome[/](\d\d?[.])~i', $this->_ua, $match) === 1)
 				$this->_browsers['is_chrome' . (int) $match[1]] = true;
 		}
 		elseif ($this->_browsers['is_edge'])
 		{
 			$this->_browsers['is_webkit'] = false;
-			if (preg_match('~edge[/]([0-9][0-9]?[.])~i', $this->_ua, $match) === 1)
+			if (preg_match('~edge[/](\d\d?[.])~i', $this->_ua, $match) === 1)
 				$this->_browsers['is_edge' . (int) $match[1]] = true;
 		}
 		elseif ($this->_browsers['is_safari'])
@@ -333,7 +333,7 @@ class BrowserDetector
 		}
 		elseif ($this->_browsers['is_opera'])
 		{
-			if (preg_match('~OPR[/]([0-9][0-9]?[.])~i', $this->_ua, $match) === 1)
+			if (preg_match('~OPR[/](\d\d?[.])~i', $this->_ua, $match) === 1)
 				$this->_browsers['is_opera' . (int) trim($match[1])] = true;
 
 			// Since opera >= 15 wants to look like chrome, set the body to do just that
@@ -356,7 +356,7 @@ class BrowserDetector
 		$this->_browsers['is_ie_compat_view'] = false;
 
 		// get the version of the browser from the msie tag
-		if (preg_match('~MSIE\s?([0-9][0-9]?.[0-9])~i', $this->_ua, $msie_match) === 1)
+		if (preg_match('~MSIE\s?(\d\d?.\d)~i', $this->_ua, $msie_match) === 1)
 		{
 			$msie_match[1] = trim($msie_match[1]);
 			$msie_match[1] = (($msie_match[1] - (int) $msie_match[1]) == 0) ? (int) $msie_match[1] : $msie_match[1];
@@ -375,7 +375,7 @@ class BrowserDetector
 		}
 
 		// IE mobile, ... shucks why not
-		if (preg_match('~IEMobile/[0-9][0-9]?\.[0-9]~i', $this->_ua, $msie_match) === 1)
+		if (preg_match('~IEMobile/\d\d?\.\d~i', $this->_ua, $msie_match) === 1)
 		{
 			$this->_browsers['is_ie_mobi'] = true;
 			$this->_is_mobile = true;
@@ -428,10 +428,10 @@ class BrowserDetector
 	private function _setupOpera()
 	{
 		// Opera 10+ uses the version tag at the end of the string
-		if (preg_match('~\sVersion/([0-9]+)\.[0-9]+(?:\s*|$)~', $this->_ua, $match))
+		if (preg_match('~\sVersion/(\d+)\.\d+(?:\s*|$)~', $this->_ua, $match))
 			$this->_browsers['is_opera' . (int) $match[1]] = true;
 		// Opera pre 10 is supposed to uses the Opera tag alone, as do some spoofers
-		elseif (preg_match('~Opera[ /]([0-9]+)(?!\\.[89])~', $this->_ua, $match))
+		elseif (preg_match('~Opera[ /](\d+)(?!\.[89])~', $this->_ua, $match))
 			$this->_browsers['is_opera' . (int) $match[1]] = true;
 	}
 

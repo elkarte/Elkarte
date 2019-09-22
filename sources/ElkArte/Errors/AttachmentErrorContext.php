@@ -89,14 +89,7 @@ class AttachmentErrorContext
 	 */
 	public function activate($id = null)
 	{
-		if (empty($id) || !isset($this->_attachs[$id]))
-		{
-			$this->_active_attach = 'generic';
-		}
-		else
-		{
-			$this->_active_attach = $id;
-		}
+		$this->_active_attach = empty($id) || !isset($this->_attachs[$id]) ? 'generic' : $id;
 
 		return $this;
 	}
@@ -114,7 +107,7 @@ class AttachmentErrorContext
 			return;
 		}
 
-		if ($this->_active_attach == 'generic')
+		if ($this->_active_attach === 'generic')
 		{
 			if (!isset($this->_attachs[$this->_active_attach]))
 			{

@@ -128,7 +128,7 @@ class FsockFetchWebdata
 		}
 
 		// Open a connection to the host & port
-		if ($this->_sockOpen() === false)
+		if (!$this->_sockOpen())
 		{
 			return false;
 		}
@@ -451,7 +451,7 @@ class FsockFetchWebdata
 	public function result($area = '')
 	{
 		// Just return a specified area or the entire result?
-		if ($area == '')
+		if (trim($area) === '')
 		{
 			return $this->_response;
 		}

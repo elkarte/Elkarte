@@ -91,7 +91,7 @@ class Image
 	protected function setManipulator()
 	{
 		// Later this could become an array of "manipulators" (or not) and remove the hard-coded IM/GD requirements
-		if ($this->_force_gd === false && Imagick::canUse())
+		if (!$this->_force_gd && Imagick::canUse())
 		{
 			$this->_manipulator = new Imagick($this->_fileName);
 		}

@@ -61,7 +61,7 @@ class Gd2 extends AbstractManipulator
 	public static function canUse()
 	{
 		// Check to see if GD is installed and what version.
-		return !(get_extension_funcs('gd') === false);
+		return get_extension_funcs('gd') !== false;
 	}
 
 	/**

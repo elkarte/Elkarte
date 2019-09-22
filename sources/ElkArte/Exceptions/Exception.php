@@ -131,9 +131,8 @@ class Exception extends \Exception
 		}
 
 		$this->logMessage($message, $lang);
-		$msg = !isset($txt[$msg]) ? $msg : (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
 
-		return $msg;
+		return !isset($txt[$msg]) ? $msg : (empty($this->sprintf) ? $txt[$msg] : vsprintf($txt[$msg], $this->sprintf));
 	}
 
 	/**
