@@ -392,36 +392,36 @@ class ProfileInfo extends \ElkArte\AbstractController
 			$mime_path = $settings['default_theme_dir'] . '/images/mime_images/';
 
 			// Load them in to $context for use in the template
-			for ($i = 0, $count = count($attachments); $i < $count; $i++)
+			foreach ($attachments as $i => $attachment)
 			{
 				$context['thumbs'][$i] = array(
-					'url' => $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'],
+					'url' => $scripturl . '?action=dlattach;topic=' . $attachment['topic'] . '.0;attach=' . $attachment['id'],
 					'img' => '',
-					'filename' => $attachments[$i]['filename'],
-					'downloads' => $attachments[$i]['downloads'],
-					'subject' => $attachments[$i]['subject'],
-					'id' => $attachments[$i]['id'],
+					'filename' => $attachment['filename'],
+					'downloads' => $attachment['downloads'],
+					'subject' => $attachment['subject'],
+					'id' => $attachment['id'],
 				);
 
 				// Show a thumbnail image as well?
-				if ($attachments[$i]['is_image'] && !empty($modSettings['attachmentShowImages']) && !empty($modSettings['attachmentThumbnails']))
+				if ($attachment['is_image'] && !empty($modSettings['attachmentShowImages']) && !empty($modSettings['attachmentThumbnails']))
 				{
-					if (!empty($attachments[$i]['id_thumb']))
+					if (!empty($attachment['id_thumb']))
 					{
-						$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachments[$i]['id'] . '" src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id_thumb'] . ';image" title="" alt="" />';
+						$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . $scripturl . '?action=dlattach;topic=' . $attachment['topic'] . '.0;attach=' . $attachment['id_thumb'] . ';image" title="" alt="" />';
 					}
 					else
 					{
 						// No thumbnail available ... use html instead
 						if (!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight']))
 						{
-							if ($attachments[$i]['width'] > $modSettings['attachmentThumbWidth'] || $attachments[$i]['height'] > $modSettings['attachmentThumbHeight'])
+							if ($attachment['width'] > $modSettings['attachmentThumbWidth'] || $attachment['height'] > $modSettings['attachmentThumbHeight'])
 							{
-								$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachments[$i]['id'] . '" src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'] . '" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
+								$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . $scripturl . '?action=dlattach;topic=' . $attachment['topic'] . '.0;attach=' . $attachment['id'] . '" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
 							}
 							else
 							{
-								$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachments[$i]['id'] . '" src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'] . '" title="" alt="" width="' . $attachments[$i]['width'] . '" height="' . $attachments[$i]['height'] . '" />';
+								$context['thumbs'][$i]['img'] = '<img id="thumb_' . $attachment['id'] . '" src="' . $scripturl . '?action=dlattach;topic=' . $attachment['topic'] . '.0;attach=' . $attachment['id'] . '" title="" alt="" width="' . $attachment['width'] . '" height="' . $attachment['height'] . '" />';
 							}
 						}
 					}
@@ -431,11 +431,11 @@ class ProfileInfo extends \ElkArte\AbstractController
 				{
 					if ((!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight'])) && (128 > $modSettings['attachmentThumbWidth'] || 128 > $modSettings['attachmentThumbHeight']))
 					{
-						$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!file_exists($mime_path . $attachments[$i]['fileext'] . '.png') ? 'default' : $attachments[$i]['fileext']) . '.png" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
+						$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!file_exists($mime_path . $attachment['fileext'] . '.png') ? 'default' : $attachment['fileext']) . '.png" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
 					}
 					else
 					{
-						$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!file_exists($mime_path . $attachments[$i]['fileext'] . '.png') ? 'default' : $attachments[$i]['fileext']) . '.png" title="" alt="" />';
+						$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!file_exists($mime_path . $attachment['fileext'] . '.png') ? 'default' : $attachment['fileext']) . '.png" title="" alt="" />';
 					}
 				}
 			}
@@ -494,7 +494,7 @@ class ProfileInfo extends \ElkArte\AbstractController
 			return $this->action_showUnwatched();
 
 		// Are we just viewing topics?
-		$context['is_topics'] = $action === 'topics' ? true : false;
+		$context['is_topics'] = $action === 'topics';
 
 		// If just deleting a message, do it and then redirect back.
 		if (isset($this->_req->query->delete) && !$context['is_topics'])
@@ -509,10 +509,7 @@ class ProfileInfo extends \ElkArte\AbstractController
 			redirectexit('action=profile;u=' . $this->_memID . ';area=showposts;start=' . $context['start']);
 		}
 
-		if ($context['is_topics'])
-			$msgCount = count_user_topics($this->_memID, $board);
-		else
-			$msgCount = count_user_posts($this->_memID, $board);
+		$msgCount = $context['is_topics'] ? count_user_topics($this->_memID, $board) : count_user_posts($this->_memID, $board);
 
 		list ($min_msg_member, $max_msg_member) = findMinMaxUserMessage($this->_memID, $board);
 		$range_limit = '';
@@ -1012,11 +1009,7 @@ class ProfileInfo extends \ElkArte\AbstractController
 		$board = empty($board) ? 0 : (int) $board;
 		$context['board'] = $board;
 
-		// Determine which groups this user is in.
-		if (empty($this->_profile['additional_groups']))
-			$curGroups = array();
-		else
-			$curGroups = explode(',', $this->_profile['additional_groups']);
+		$curGroups = empty($this->_profile['additional_groups']) ? array() : explode(',', $this->_profile['additional_groups']);
 
 		$curGroups[] = $this->_profile['id_group'];
 		$curGroups[] = $this->_profile['id_post_group'];
@@ -1184,7 +1177,8 @@ class ProfileInfo extends \ElkArte\AbstractController
 
 		checkSession('get');
 
-		// Need the ProfileInfo template
+		// Need the ProfileInfo and Index (for helper functions) templates
+		theme()->getTemplates()->load('Index');
 		theme()->getTemplates()->load('ProfileInfo');
 
 		// Prep for a buddy check
@@ -1376,7 +1370,7 @@ class ProfileInfo extends \ElkArte\AbstractController
 		global $context, $scripturl, $txt;
 
 		// If the user is awaiting activation, and the viewer has permission - setup some activation context messages.
-		if ($context['member']['is_activated'] % 10 != 1 && allowedTo('moderate_forum'))
+		if ($context['member']['is_activated'] % 10 !== 1 && allowedTo('moderate_forum'))
 		{
 			$context['activate_type'] = $context['member']['is_activated'];
 
@@ -1473,8 +1467,8 @@ class ProfileInfo extends \ElkArte\AbstractController
 		{
 			list ($birth_year, $birth_month, $birth_day) = sscanf($context['member']['birth_date'], '%d-%d-%d');
 			$datearray = getdate(forum_time());
-			$context['member']['age'] = $birth_year <= 4 ? $txt['not_applicable'] : $datearray['year'] - $birth_year - (($datearray['mon'] > $birth_month || ($datearray['mon'] == $birth_month && $datearray['mday'] >= $birth_day)) ? 0 : 1);
-			$context['member']['today_is_birthday'] = $datearray['mon'] == $birth_month && $datearray['mday'] == $birth_day;
+			$context['member']['age'] = $birth_year <= 4 ? $txt['not_applicable'] : $datearray['year'] - $birth_year - (($datearray['mon'] > $birth_month || ($datearray['mon'] === $birth_month && $datearray['mday'] >= $birth_day)) ? 0 : 1);
+			$context['member']['today_is_birthday'] = $datearray['mon'] === $birth_month && $datearray['mday'] === $birth_day;
 
 		}
 	}
