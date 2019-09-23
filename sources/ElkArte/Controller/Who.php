@@ -213,11 +213,10 @@ class Who extends \ElkArte\AbstractController
 			'name' => $txt['who_title']
 		);
 
-		// Put it in the context variables.
-		\ElkArte\MembersList::loadGuest();
 		foreach ($context['members'] as $i => $member)
 		{
 			$member_context = \ElkArte\MembersList::get($member['id']);
+
 			// The following happens when $member['id'] is not found among the loaded for any reason
 			// in such cases we load a guest dummy
 			if ($member_context->isEmpty())
@@ -242,13 +241,13 @@ class Who extends \ElkArte\AbstractController
 				$context['members'][$i] += $member_context->toArray()['data'];
 			}
 
-			if ($member['is_guest'])
+			if ($member_context['is_guest'])
 			{
-				$context['members'][$i]['track_href'] = getUrl('action', ['action' => 'trackip', 'searchip' => $member['ip']]);
+				$context['members'][$i]['track_href'] = getUrl('action', ['action' => 'trackip', 'searchip' => $member_context['ip']]);
 			}
 			else
 			{
-				$context['members'][$i]['track_href'] = getUrl('profile', ['action' => 'profile', 'area' => 'history', 'sa' => 'ip', 'u' => $member['id'], 'name' => $member['name'], 'searchip' => $member['ip']]);
+				$context['members'][$i]['track_href'] = getUrl('profile', ['action' => 'profile', 'area' => 'history', 'sa' => 'ip', 'u' => $member['id'], 'name' => $member_context['name'], 'searchip' => $member_context['ip']]);
 			}
 		}
 
