@@ -71,9 +71,7 @@ function bb2_db_escape($string)
  */
 function bb2_db_num_rows($result)
 {
-	$db = database();
-
-	return $db->num_rows($result);
+	return $result->num_rows;
 }
 
 /**
@@ -95,11 +93,17 @@ function bb2_db_query($query)
 	{
 		$query = 'DELETE FROM {db_prefix}log_badbehavior WHERE date < ' . (bb2_db_date() - 7 * 86400);
 	}
-	elseif (strpos($query, 'OPTIMIZE TABLE') !== false)
+
+	// Just intended to waste some time
+	if (strpos($query, 'OPTIMIZE TABLE') !== false)
 	{
+		usleep(500000);
+
 		return true;
 	}
-	elseif (strpos($query, '@@session.wait_timeout') !== false)
+
+	// Just a junk call from BB
+	if (strpos($query, '@@session.wait_timeout') !== false)
 	{
 		return true;
 	}
@@ -111,11 +115,13 @@ function bb2_db_query($query)
 	{
 		return false;
 	}
-	elseif ($result === true)
+
+	if ($result === true)
 	{
 		return (bb2_db_affected_rows() !== 0);
 	}
-	elseif (bb2_db_num_rows($result) === 0)
+
+	if (bb2_db_num_rows($result) === 0)
 	{
 		return false;
 	}
