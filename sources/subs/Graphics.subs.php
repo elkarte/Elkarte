@@ -206,6 +206,10 @@ function showCodeImage($code)
 
 	// Create an image.
 	$code_image = imagecreatetruecolor($total_width, $max_height);
+	if ($code_image === false)
+	{
+		die();
+	}
 
 	// Draw the background.
 	$bg_color = imagecolorallocate($code_image, $background_color[0], $background_color[1], $background_color[2]);
@@ -327,6 +331,10 @@ function showCodeImage($code)
 			if (!$can_do_ttf)
 			{
 				$char_image = imagecreatetruecolor($character['width'], $character['height']);
+				if ($char_image === false)
+				{
+					die();
+				}
 				$char_bgcolor = imagecolorallocate($char_image, $background_color[0], $background_color[1], $background_color[2]);
 				imagefilledrectangle($char_image, 0, 0, $character['width'] - 1, $character['height'] - 1, $char_bgcolor);
 				imagechar($char_image, $loaded_fonts[$character['font']], 0, 0, $character['id'], imagecolorallocate($char_image, $char_fg_color[0], $char_fg_color[1], $char_fg_color[2]));
