@@ -824,12 +824,7 @@ class ManageThemes extends \ElkArte\AbstractController
 			throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 		// Its no longer known
-		$known = explode(',', $modSettings['knownThemes']);
-		foreach ($known as $i => $known) {
-			if ($known[$i] == $theme)
-				unset($known[$i]);
-		}
-		$known = strtr(implode(',', $known), array(',,' => ','));
+		$known = $this->_knownTheme($theme);
 
 		// Remove it as an option everywhere
 		deleteTheme($theme);
@@ -908,19 +903,10 @@ class ManageThemes extends \ElkArte\AbstractController
 		}
 
 		// It is a theme we know about?
-		$known = explode(',', $modSettings['knownThemes']);
-		foreach ($known as $i => $known)
-		{
-			if ($known[$i] == $theme)
-			{
-				unset($known[$i]);
-			}
-		}
+		$known = $this->_knownTheme($theme);
 
 		// Finally, remove it
 		deleteTheme($theme);
-
-		$known = strtr(implode(',', $known), array(',,' => ','));
 
 		// Fix it if the theme was the overall default theme.
 		if ($modSettings['theme_guests'] === $theme)
@@ -935,6 +921,29 @@ class ManageThemes extends \ElkArte\AbstractController
 			'token_var' => $context['admin-tr_token_var'],
 			'token' => $context['admin-tr_token'],
 		);
+	}
+
+	/**
+	 * Small helper to return the list of known themes other than the current
+	 *
+	 * @param string $theme current theme
+	 * @return string
+	 */
+	private function _knownTheme($theme)
+	{
+		global $modSettings;
+
+		$known = explode(',', $modSettings['knownThemes']);
+		foreach ($known as $i => $knew)
+		{
+			if ($knew === $theme)
+			{
+				// I knew them at one time
+				unset($known[$i]);
+			}
+		}
+
+		return strtr(implode(',', $known), array(',,' => ','));
 	}
 
 	/**
