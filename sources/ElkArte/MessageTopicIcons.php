@@ -43,7 +43,7 @@ class MessageTopicIcons extends ValuesContainer
 	 * Icons that are default with ElkArte
 	 * @var array
 	 */
-	protected $_stable_icons = 	array();
+	protected $_stable_icons = array();
 
 	/**
 	 * Icons to load in addition to the default
@@ -73,7 +73,7 @@ class MessageTopicIcons extends ValuesContainer
 		$this->_loadStableIcons();
 
 		// Merge in additional ones
-		$custom_icons = array_map(function($element) {
+		$custom_icons = array_map(function ($element) {
 			return $element['first_icon'];
 		}, $custom);
 		$this->_stable_icons = array_merge($this->_stable_icons, $custom_icons);

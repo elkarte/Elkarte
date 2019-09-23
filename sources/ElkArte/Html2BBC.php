@@ -197,7 +197,7 @@ class Html2BBC
 			}
 		}
 
-		return implode('', $parts);
+		return empty($parts) ? '' : implode('', $parts);
 	}
 
 	/**

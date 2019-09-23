@@ -307,7 +307,7 @@ class Bootstrap
 		reloadSettings();
 
 		// Make sure we have ready the list of members for populating it
-		MembersList::init(database(), Cache::instance(),  ParserWrapper::instance());
+		MembersList::init(database(), Cache::instance(), ParserWrapper::instance());
 
 		// Our good ole' contextual array, which will hold everything
 		if (empty($context))

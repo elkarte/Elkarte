@@ -1313,7 +1313,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 	{
 		// Update next send time for our mail queue, if there was something to update. Otherwise bail out :P
 		$delay = updateNextSendTime();
-		if (!$delay)
+		if ($delay === false)
 			return false;
 
 		$modSettings['mail_next_send'] = time() + $delay;

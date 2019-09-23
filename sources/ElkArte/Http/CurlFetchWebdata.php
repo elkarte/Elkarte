@@ -322,9 +322,10 @@ class CurlFetchWebdata
 	private function _setOptions()
 	{
 		// Callback to parse the returned headers, if any
-		$this->default_options[CURLOPT_HEADERFUNCTION] = function ($cr, $header) {
-      		return $this->_headerCallback($cr, $header);
-  		};
+		$this->default_options[CURLOPT_HEADERFUNCTION] =
+			function ($cr, $header) {
+				return $this->_headerCallback($cr, $header);
+			};
 
 		// Any user options to account for
 		if (is_array($this->_user_options))

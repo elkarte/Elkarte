@@ -1396,7 +1396,7 @@ function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = tru
 		$position++;
 
 	// Insert as first
-	if ($position === 0)
+	if (empty($position))
 		$input = array_merge($insert, $input);
 	else
 		$input = array_merge(array_slice($input, 0, $position), $insert, array_slice($input, $position));

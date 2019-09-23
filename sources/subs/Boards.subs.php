@@ -210,7 +210,7 @@ function modifyBoard($board_id, &$boardOptions)
 	{
 		throw new \ElkArte\Exceptions\Exception('no_board');
 	}
-	if(isset($boardOptions['target_board']) && !isset($boards[$boardOptions['target_board']]))
+	if (isset($boardOptions['target_board']) && !isset($boards[$boardOptions['target_board']]))
 	{
 		throw new \ElkArte\Exceptions\Exception('no_board');
 	}

@@ -168,7 +168,7 @@ class StreamFetchWebdata
 		if (!empty($this->_post_data))
 		{
 			$this->_options['http']['method'] = 'POST';
-			$this->_options['http']['header'][] ='Content-Length: ' . strlen($this->_post_data);
+			$this->_options['http']['header'][] = 'Content-Length: ' . strlen($this->_post_data);
 			$this->_options['http']['content'] = $this->_post_data;
 		}
 	}

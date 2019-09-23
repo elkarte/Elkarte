@@ -23,8 +23,8 @@ use ElkArte\UserSettings;
 class UserSettingsLoader
 {
 	/**
-  	 * @var mixed|string
-  	*/
+	 * @var mixed|string
+	 */
  	public $member_name;
 
  	/**

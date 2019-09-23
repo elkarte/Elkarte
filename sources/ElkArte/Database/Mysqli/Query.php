@@ -29,9 +29,9 @@ class Query extends AbstractQuery
 	 * {@inheritDoc}
 	 */
 	public function fix_prefix($db_prefix, $db_name)
- {
-     return is_numeric(substr($db_prefix, 0, 1)) ? $db_name . '.' . $db_prefix : '`' . $db_name . '`.' . $db_prefix;
- }
+ 	{
+    	return is_numeric(substr($db_prefix, 0, 1)) ? $db_name . '.' . $db_prefix : '`' . $db_name . '`.' . $db_prefix;
+ 	}
 
 	/**
 	 * {@inheritDoc}

@@ -20,7 +20,7 @@ use ElkArte\User;
  */
 class ThemeLoader
 {
-	/**@var mixed|ElkArte\ValuesContainer */
+	/**@var mixed|\ElkArte\ValuesContainer */
  	public $user;
 
  	/** @var int The id of the theme being used */

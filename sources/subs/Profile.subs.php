@@ -2721,11 +2721,11 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
 		$row['subject'] = censor($row['subject']);
 		if (!$row['approved'])
 		{
-			$row['filename'] = str_replace(array('{attachment_link}', '{txt_awaiting}'), array('<a href="' . getUrl('attach', ['action' => 'dlattach', 'attach' => $row['id_attach'], 'name' => $row['filename'], 'topic' => $row['id_topic'], 'subject' => $row['subject'] ]) . '">' . $row['filename'] . '</a>', $txt['awaiting_approval']), $settings['attachments_awaiting_approval']);
+			$row['filename'] = str_replace(array('{attachment_link}', '{txt_awaiting}'), array('<a href="' . getUrl('attach', ['action' => 'dlattach', 'attach' => $row['id_attach'], 'name' => $row['filename'], 'topic' => $row['id_topic'], 'subject' => $row['subject']]) . '">' . $row['filename'] . '</a>', $txt['awaiting_approval']), $settings['attachments_awaiting_approval']);
 		}
 		else
 		{
-			$row['filename'] = '<a href="' . getUrl('attach', ['action' => 'dlattach', 'attach' => $row['id_attach'], 'name' => $row['filename'], 'topic' => $row['id_topic'], 'subject' => $row['subject']])  . '">' . $row['filename'] . '</a>';
+			$row['filename'] = '<a href="' . getUrl('attach', ['action' => 'dlattach', 'attach' => $row['id_attach'], 'name' => $row['filename'], 'topic' => $row['id_topic'], 'subject' => $row['subject']]) . '">' . $row['filename'] . '</a>';
 		}
 
 		$attachments[] = array(

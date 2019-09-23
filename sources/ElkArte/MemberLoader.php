@@ -138,7 +138,7 @@ class MemberLoader
 	 * @param string $set The data to load (see the constants SET_*)
 	 * @return bool|int[] The ids of the members loaded
 	 */
-	public function loadById($users,  $set = MemberLoader::SET_NORMAL)
+	public function loadById($users, $set = MemberLoader::SET_NORMAL)
 	{
 		// Can't just look for no users :P.
 		if (empty($users))
@@ -167,7 +167,7 @@ class MemberLoader
 	 * @param string $set The data to load (see the constants SET_*)
 	 * @return bool|int[] The ids of the members loaded
 	 */
-	public function loadByName($name,  $set = MemberLoader::SET_NORMAL)
+	public function loadByName($name, $set = MemberLoader::SET_NORMAL)
 	{
 		// Can't just look for no users :P.
 		if (empty($name))

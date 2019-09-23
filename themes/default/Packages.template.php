@@ -499,7 +499,7 @@ function template_examine()
 
 	echo '
 	<div id="admincenter">
-		<h2 class="category_header">', $txt['package_examine_file'], ' : ' , $context['package'], '</h2>
+		<h2 class="category_header">', $txt['package_examine_file'], ' : ', $context['package'], '</h2>
 		<h3 class="category_header">', $txt['package_file_contents'], ' ', $context['filename'], ':</h3>
 		<div class="content largetext">
 			<code><pre class="file_content prettyprint">', $context['filedata'], '</pre></code>

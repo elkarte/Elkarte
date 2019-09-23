@@ -32,7 +32,7 @@ class Server extends \ArrayObject
 	/** @var mixed */
 	public $SERVER_PORT;
 
- 	/**
+	/**
 	 * Server constructor.
 	 *
 	 * @param null|array $server

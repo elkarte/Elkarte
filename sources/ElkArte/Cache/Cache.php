@@ -254,7 +254,7 @@ class Cache
 	 * @param string $key
 	 * @param int $ttl = 120
 	 *
-	 * @return null|boolean if it was a hit
+	 * @return null|mixed if it was a hit
 	 */
 	public function get($key, $ttl = 120)
 	{

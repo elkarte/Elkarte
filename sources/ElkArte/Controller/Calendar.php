@@ -249,7 +249,7 @@ class Calendar extends \ElkArte\AbstractController
 
 	/**
 	 * Takes care of the saving process.
-		 */
+	 */
 	public function action_save()
 	{
 		global $modSettings;

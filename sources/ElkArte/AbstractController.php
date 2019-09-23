@@ -208,7 +208,7 @@ abstract class AbstractController
 	{
 		// Use the base controller name for the hook, ie post
 		$module_class = explode('\\', trim(get_class($this), '\\'));
-		$module_class= end($module_class);
+		$module_class = end($module_class);
 
 		return ucfirst($module_class);
 	}
