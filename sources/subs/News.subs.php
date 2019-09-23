@@ -311,7 +311,7 @@ function getXMLRecent($query_this_board, $board, $limit)
 			if (empty($_REQUEST['boards']) && empty($board))
 				unset($context['optimize_msg']['lowest']);
 			else
-				$context['optimize_msg']['lowest'] = $loops ? 'm.id_msg >= t.id_first_msg' : 'm.id_msg >= (t.id_last_msg - t.id_first_msg) / 2';
+				$context['optimize_msg']['lowest'] = $loops !== 0 ? 'm.id_msg >= t.id_first_msg' : 'm.id_msg >= (t.id_last_msg - t.id_first_msg) / 2';
 
 			$loops++;
 		}

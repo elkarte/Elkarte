@@ -476,13 +476,9 @@ function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $
 		// Base64 encode.
 		$string = base64_encode($string);
 
-		// Show the characterset and the transfer-encoding for header strings.
-		if ($with_charset)
-			$string = '=?' . $charset . '?B?' . $string . '?=';
-
-		// Break it up in lines (mail body).
-		else
-			$string = chunk_split($string, 76, $line_break);
+		$string = $with_charset
+			? '=?' . $charset . '?B?' . $string . '?='
+			: chunk_split($string, 76, $line_break);
 
 		return array($charset, $string, 'base64');
 	}
@@ -510,14 +506,17 @@ function entityConvert($match)
 
 	if ($c_strlen === 1 && $c_ord <= 0x7F)
 		return $c;
-	elseif ($c_strlen === 2 && $c_ord >= 0xC0 && $c_ord <= 0xDF)
+
+	if ($c_strlen === 2 && $c_ord >= 0xC0 && $c_ord <= 0xDF)
 		return '&#' . ((($c_ord ^ 0xC0) << 6) + (ord($c[1]) ^ 0x80)) . ';';
-	elseif ($c_strlen === 3 && $c_ord >= 0xE0 && $c_ord <= 0xEF)
+
+	if ($c_strlen === 3 && $c_ord >= 0xE0 && $c_ord <= 0xEF)
 		return '&#' . ((($c_ord ^ 0xE0) << 12) + ((ord($c[1]) ^ 0x80) << 6) + (ord($c[2]) ^ 0x80)) . ';';
-	elseif ($c_strlen === 4 && $c_ord >= 0xF0 && $c_ord <= 0xF7)
+
+	if ($c_strlen === 4 && $c_ord >= 0xF0 && $c_ord <= 0xF7)
 		return '&#' . ((($c_ord ^ 0xF0) << 18) + ((ord($c[1]) ^ 0x80) << 12) + ((ord($c[2]) ^ 0x80) << 6) + (ord($c[3]) ^ 0x80)) . ';';
-	else
-		return '';
+
+	return '';
 }
 
 /**
@@ -570,7 +569,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 	if ($modSettings['mail_type'] == 2 && $modSettings['smtp_username'] != '' && $modSettings['smtp_password'] != '')
 	{
 		$socket = fsockopen($modSettings['smtp_host'], 110, $errno, $errstr, 2);
-		if (!$socket && (substr($modSettings['smtp_host'], 0, 5) == 'smtp.' || substr($modSettings['smtp_host'], 0, 11) == 'ssl://smtp.'))
+		if (!$socket && (substr($modSettings['smtp_host'], 0, 5) === 'smtp.' || substr($modSettings['smtp_host'], 0, 11) === 'ssl://smtp.'))
 			$socket = fsockopen(strtr($modSettings['smtp_host'], array('smtp.' => 'pop.')), 110, $errno, $errstr, 2);
 
 		if ($socket)
@@ -590,7 +589,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 	if (!$socket = fsockopen($modSettings['smtp_host'], empty($modSettings['smtp_port']) ? 25 : $modSettings['smtp_port'], $errno, $errstr, 3))
 	{
 		// Maybe we can still save this?  The port might be wrong.
-		if (substr($modSettings['smtp_host'], 0, 4) == 'ssl:' && (empty($modSettings['smtp_port']) || $modSettings['smtp_port'] == 25))
+		if (substr($modSettings['smtp_host'], 0, 4) === 'ssl:' && (empty($modSettings['smtp_port']) || $modSettings['smtp_port'] == 25))
 		{
 			if ($socket = fsockopen($modSettings['smtp_host'], 465, $errno, $errstr, 3))
 				\ElkArte\Errors\Errors::instance()->log_error($txt['smtp_port_ssl']);
@@ -675,7 +674,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 		$headers = $real_headers . $unq_id;
 
 		// Reset the connection to send another email.
-		if ($i != 0)
+		if ($i !== 0)
 		{
 			if (!server_parse('RSET', $socket, '250'))
 				return false;
@@ -684,8 +683,10 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 		// From, to, and then start the data...
 		if (!server_parse('MAIL FROM: <' . (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']) . '>', $socket, '250'))
 			return false;
+
 		if (!server_parse('RCPT TO: <' . $mail_to . '>', $socket, '250'))
 			return false;
+
 		if (!server_parse('DATA', $socket, '354'))
 			return false;
 
@@ -751,7 +752,7 @@ function server_parse($message, $socket, $response)
 	// No response yet.
 	$server_response = '';
 
-	while (substr($server_response, 3, 1) != ' ')
+	while (substr($server_response, 3, 1) !== ' ')
 		if (!($server_response = fgets($socket, 256)))
 		{
 			// @todo Change this message to reflect that it may mean bad user/password/server issues/etc.
@@ -762,7 +763,7 @@ function server_parse($message, $socket, $response)
 	if ($response === null)
 		return substr($server_response, 0, 3);
 
-	if (substr($server_response, 0, 3) != $response)
+	if (substr($server_response, 0, 3) !== $response)
 	{
 		\ElkArte\Errors\Errors::instance()->log_error($txt['smtp_error'] . $server_response);
 		return false;
@@ -1189,7 +1190,7 @@ function resetNextSendTime()
  * - Requires an affected row
  *
  * @package Mail
- * @return bool
+ * @return int|bool
  */
 function updateNextSendTime()
 {
@@ -1214,7 +1215,7 @@ function updateNextSendTime()
 	if ($db->affected_rows() == 0)
 		return false;
 
-	return $delay;
+	return (int) $delay;
 }
 
 /**
@@ -1312,7 +1313,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 	{
 		// Update next send time for our mail queue, if there was something to update. Otherwise bail out :P
 		$delay = updateNextSendTime();
-		if ($delay === false)
+		if (!$delay)
 			return false;
 
 		$modSettings['mail_next_send'] = time() + $delay;
@@ -1480,7 +1481,8 @@ function posterDetails($id_msg, $topic_id)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT m.id_msg, m.id_topic, m.id_board, m.subject, m.body, m.id_member AS id_poster, m.poster_name, mem.real_name
+		SELECT 
+			m.id_msg, m.id_topic, m.id_board, m.subject, m.body, m.id_member AS id_poster, m.poster_name, mem.real_name
 		FROM {db_prefix}messages AS m
 			LEFT JOIN {db_prefix}members AS mem ON (m.id_member = mem.id_member)
 		WHERE m.id_msg = {int:id_msg}
@@ -1528,7 +1530,8 @@ function time_since($time_diff)
 	elseif ($time_diff > 60)
 	{
 		$minutes = (int) ($time_diff / 60);
-		return sprintf($minutes == 1 ? $txt['mq_minute'] : $txt['mq_minutes'], $minutes);
+
+		return sprintf($minutes === 1 ? $txt['mq_minute'] : $txt['mq_minutes'], $minutes);
 	}
 	// Otherwise must be second
 	else

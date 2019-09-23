@@ -86,9 +86,8 @@ function pbe_email_to_bbc($text, $html)
 		'~\[quote\]\s*\[/quote\]~' => '',
 		'~(\n){3,}~si' => "\n\n",
 	);
-	$text = preg_replace(array_keys($emptytags), array_values($emptytags), $text);
 
-	return $text;
+	return preg_replace(array_keys($emptytags), array_values($emptytags), $text);
 }
 
 /**
@@ -159,9 +158,8 @@ function pbe_fix_email_body($body, $real_name = '', $charset = 'UTF-8')
 
 	// Reflow and Cleanup this message to something that looks normal-er
 	$formatter = new \ElkArte\EmailFormat();
-	$body = $formatter->reflow($body, $real_name, $charset);
 
-	return $body;
+	return $formatter->reflow($body, $real_name, $charset);
 }
 
 /**
@@ -954,8 +952,8 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	$subject = censor(un_htmlspecialchars($subject));
 
 	// Convert bbc [quotes] before we go to parsebbc so they are easier to plain-textify later
-	$message = preg_replace_callback('~(\[quote)\s?author=(.*)\s?link=(.*)\s?date=([0-9]{10})(\])~sU', 'quote_callback', $message);
-	$message = preg_replace_callback('~(\[quote)\s?author=(.*)\s?date=([0-9]{10})\s?link=(.*)(\])~sU', 'quote_callback_2', $message);
+	$message = preg_replace_callback('~(\[quote)\s?author=(.*)\s?link=(.*)\s?date=(\d{10})(\])~sU', 'quote_callback', $message);
+	$message = preg_replace_callback('~(\[quote)\s?author=(.*)\s?date=(\d{10})\s?link=(.*)(\])~sU', 'quote_callback_2', $message);
 	$message = preg_replace('~(\[quote\s?\])~sU', "\n" . '<blockquote>', $message);
 	$message = str_replace('[/quote]', "</blockquote>\n\n", $message);
 
@@ -1070,8 +1068,8 @@ function pbe_disable_user_notify($email_message)
 			)
 		);
 
-		//Now that other notifications have been added, we need to turn off email for those, too.
-		//notification_level "1" = "Only mention/alert"
+		// Now that other notifications have been added, we need to turn off email for those, too.
+		// notification_level "1" = "Only mention/alert"
 		$db->query('', '
 			UPDATE {db_prefix}notifications_pref
 			SET
@@ -1662,10 +1660,7 @@ function query_get_theme($id_member, $id_theme, $board_info)
 	{
 		$themes = explode(',', $modSettings['knownThemes']);
 
-		if (!in_array($id_theme, $themes))
-			$id_theme = $modSettings['theme_guests'];
-		else
-			$id_theme = (int) $id_theme;
+		$id_theme = !in_array($id_theme, $themes) ? $modSettings['theme_guests'] : (int) $id_theme;
 	}
 	else
 		$id_theme = (int) $id_theme;
@@ -1889,7 +1884,7 @@ function query_update_member_stats($pbe, $email_message, $topic_info = array())
 	{
 		// not recently active so add some time to their login ....
 		$do_delete = true;
-		$total_time_logged_in = $total_time_logged_in + (60 * 10);
+		$total_time_logged_in += 60 * 10;
 	}
 
 	// Update the members total time logged in data
@@ -2193,7 +2188,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 	// Not to long not to short
 	if (\ElkArte\Util::strlen($subject) > 100)
 		$subject = \ElkArte\Util::substr($subject, 0, 100);
-	elseif ($subject == '')
+	elseif ($subject === '')
 		return pbe_emailError('error_no_subject', $email_message);
 
 	// The message itself will need a bit of work

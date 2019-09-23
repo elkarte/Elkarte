@@ -128,7 +128,7 @@ function DumpDatabase2()
 			$database->table_sql($tableName);
 
 		// How about the data?
-		if (!isset($_REQUEST['data']) || substr($tableName, -10) == 'log_errors')
+		if (!isset($_REQUEST['data']) || substr($tableName, -10) === 'log_errors')
 			continue;
 
 		$first_round = true;

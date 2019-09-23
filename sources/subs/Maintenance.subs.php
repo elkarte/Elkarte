@@ -13,6 +13,7 @@
  * @version 2.0 dev
  *
  */
+
 /**
  * Counts the total number of messages
  *
@@ -82,9 +83,8 @@ function flushLogTables()
 function getMessageTableColumns()
 {
 	$table = db_table();
-	$colData = $table->list_columns('{db_prefix}messages', true);
 
-	return $colData;
+	return $table->list_columns('{db_prefix}messages', true);
 }
 
 /**
@@ -132,7 +132,8 @@ function detectExceedingMessages($start, $increment)
 	$db = database();
 
 	return $db->fetchQuery('
-		SELECT /*!40001 SQL_NO_CACHE */ id_msg
+		SELECT 
+			/*!40001 SQL_NO_CACHE */ id_msg
 		FROM {db_prefix}messages
 		WHERE id_msg BETWEEN {int:start} AND {int:start} + {int:increment}
 			AND LENGTH(body) > 65535',
@@ -165,7 +166,8 @@ function getExceedingMessages($msg)
 	$db = database();
 
 	return $db->fetchQuery('
-		SELECT id_msg, id_topic, subject
+		SELECT 
+			id_msg, id_topic, subject
 		FROM {db_prefix}messages
 		WHERE id_msg IN ({array_int:messages})',
 		array(
@@ -820,7 +822,7 @@ function purgeMembers($type, $groups, $time_limit)
 	$where_vars = array(
 		'time_limit' => $time_limit,
 	);
-	if ($type == 'activated')
+	if ($type === 'activated')
 	{
 		$where = 'mem.date_registered < {int:time_limit} AND mem.is_activated = {int:is_activated}';
 		$where_vars['is_activated'] = 0;
@@ -830,7 +832,8 @@ function purgeMembers($type, $groups, $time_limit)
 
 	// Need to get *all* groups then work out which (if any) we avoid.
 	$request = $db->query('', '
-		SELECT id_group, group_name, min_posts
+		SELECT 
+			id_group, group_name, min_posts
 		FROM {db_prefix}membergroups',
 		array(
 		)

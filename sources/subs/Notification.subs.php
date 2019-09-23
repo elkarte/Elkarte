@@ -57,7 +57,8 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 
 	// Get the subject, body and basic poster details, number of attachments if any
 	$result = $db->query('', '
-		SELECT mf.subject, ml.body, ml.id_member, t.id_last_msg, t.id_topic, t.id_board, mem.signature,
+		SELECT 
+			mf.subject, ml.body, ml.id_member, t.id_last_msg, t.id_topic, t.id_board, mem.signature,
 			COALESCE(mem.real_name, ml.poster_name) AS poster_name, COUNT(a.id_attach) as num_attach
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
@@ -178,11 +179,11 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 					continue;
 
 				$email_perm = true;
-				if (validateNotificationAccess($row, $maillist, $email_perm) === false)
+				if (!validateNotificationAccess($row, $maillist, $email_perm))
 					continue;
 
 				$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
-				if (empty($current_language) || $current_language != $needed_language)
+				if (empty($current_language) || $current_language !== $needed_language)
 					$current_language = theme()->getTemplates()->loadLanguageFile('Post', $needed_language, false);
 
 				$message_type = 'notification_' . $type;
@@ -266,7 +267,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		array(
 			'current_member' => $user_id,
 			'topic_list' => $topics,
-			'notify_types' => $type == 'reply' ? 4 : 3,
+			'notify_types' => $type === 'reply' ? 4 : 3,
 			'notify_regularity' => 2,
 			'is_activated' => 1,
 			'members_only' => is_array($members_only) ? $members_only : array($members_only),
@@ -284,15 +285,15 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 
 		// Easier to check this here... if they aren't the topic poster do they really want to know?
 		// @todo perhaps just if they posted by email?
-		if ($type != 'reply' && $row['notify_types'] == 2 && $row['id_member'] != $row['id_member_started'])
+		if ($type !== 'reply' && $row['notify_types'] == 2 && $row['id_member'] != $row['id_member_started'])
 			continue;
 
 		$email_perm = true;
-		if (validateNotificationAccess($row, $maillist, $email_perm) === false)
+		if (!validateNotificationAccess($row, $maillist, $email_perm))
 			continue;
 
 		$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
-		if (empty($current_language) || $current_language != $needed_language)
+		if (empty($current_language) || $current_language !== $needed_language)
 			$current_language = theme()->getTemplates()->loadLanguageFile('Post', $needed_language, false);
 
 		$message_type = 'notification_' . $type;
@@ -306,20 +307,20 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			'BOARDNAME' => $row['name'],
 		);
 
-		if ($type == 'remove')
+		if ($type === 'remove')
 			unset($replacements['TOPICLINK'], $replacements['UNSUBSCRIBELINK']);
 
 		// Do they want the body of the message sent too?
-		if (!empty($row['notify_send_body']) && $type == 'reply')
+		if (!empty($row['notify_send_body']) && $type === 'reply')
 		{
 			$message_type .= '_body';
 			$replacements['MESSAGE'] = $topicData[$row['id_topic']]['body'];
 		}
-		if (!empty($row['notify_regularity']) && $type == 'reply')
+		if (!empty($row['notify_regularity']) && $type === 'reply')
 			$message_type .= '_once';
 
 		// Send only if once is off or it's on and it hasn't been sent.
-		if ($type != 'reply' || empty($row['notify_regularity']) || empty($row['sent']))
+		if ($type !== 'reply' || empty($row['notify_regularity']) || empty($row['sent']))
 		{
 			$emaildata = loadEmailTemplate((($maillist && $email_perm && $type === 'reply' && !empty($row['notify_send_body'])) ? 'pbe_' : '') . $message_type, $replacements, $needed_language);
 
@@ -339,11 +340,11 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	}
 	$db->free_result($members);
 
-	if (isset($current_language) && $current_language != $user_language)
+	if (isset($current_language) && $current_language !== $user_language)
 		theme()->getTemplates()->loadLanguageFile('Post');
 
 	// Sent!
-	if ($type == 'reply' && !empty($sent))
+	if ($type === 'reply' && !empty($sent))
 		$db->query('', '
 			UPDATE {db_prefix}log_notify
 			SET sent = {int:is_sent}
@@ -470,7 +471,7 @@ function sendBoardNotifications(&$topicData)
 	while ($rowmember = $db->fetch_assoc($members))
 	{
 		$email_perm = true;
-		if (validateNotificationAccess($rowmember, $maillist, $email_perm) === false)
+		if (!validateNotificationAccess($rowmember, $maillist, $email_perm))
 			continue;
 
 		$langloaded = theme()->getTemplates()->loadLanguageFile('index', empty($rowmember['lngfile']) || empty($modSettings['userLanguage']) ? $language : $rowmember['lngfile'], false);
@@ -628,12 +629,12 @@ function sendApprovalNotifications(&$topicData)
 			$row['additional_groups'][] = $row['id_group'];
 			$row['additional_groups'][] = $row['id_post_group'];
 
-			if (count(array_intersect($allowed, $row['additional_groups'])) == 0)
+			if (count(array_intersect($allowed, $row['additional_groups'])) === 0)
 				continue;
 		}
 
 		$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
-		if (empty($current_language) || $current_language != $needed_language)
+		if (empty($current_language) || $current_language !== $needed_language)
 			$current_language = theme()->getTemplates()->loadLanguageFile('Post', $needed_language, false);
 
 		$sent_this_time = false;
@@ -675,7 +676,7 @@ function sendApprovalNotifications(&$topicData)
 	}
 	$db->free_result($members);
 
-	if (isset($current_language) && $current_language != User::$info->language)
+	if (isset($current_language) && $current_language !== User::$info->language)
 		theme()->getTemplates()->loadLanguageFile('Post');
 
 	// Sent!
@@ -753,7 +754,8 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
 
 	// Get a list of all members who have ability to approve accounts - these are the people who we inform.
 	$request = $db->query('', '
-		SELECT id_member, lngfile, email_address
+		SELECT 
+			id_member, lngfile, email_address
 		FROM {db_prefix}members
 		WHERE (id_group IN ({array_int:group_list}) OR FIND_IN_SET({raw:group_array_implode}, additional_groups) != 0)
 			AND notify_types != {int:notify_types}
@@ -775,7 +777,7 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
 		$emailtype = 'admin_notify';
 
 		// If they need to be approved add more info...
-		if ($type == 'approval')
+		if ($type === 'approval')
 		{
 			$replacements['APPROVALLINK'] = $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve';
 			$emailtype .= '_approval';
@@ -788,7 +790,7 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
 	}
 	$db->free_result($request);
 
-	if (isset($current_language) && $current_language != User::$info->language)
+	if (isset($current_language) && $current_language !== User::$info->language)
 		theme()->getTemplates()->loadLanguageFile('Login');
 }
 

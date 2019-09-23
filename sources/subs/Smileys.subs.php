@@ -387,7 +387,7 @@ function isSmileySetInstalled($set)
 			'current_package' => $set,
 		)
 	);
-	return !($db->num_rows($request) > 0);
+	return $db->num_rows($request) <= 0;
 }
 
 /**

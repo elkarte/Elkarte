@@ -70,7 +70,7 @@ function updateSettings($changeArray, $update = false)
 	foreach ($changeArray as $variable => $value)
 	{
 		// Don't bother if it's already like that ;).
-		if (isset($modSettings[$variable]) && $modSettings[$variable] == $value)
+		if (isset($modSettings[$variable]) && $modSettings[$variable] === $value)
 			continue;
 		// If the variable isn't set, but would only be set to nothing'ness, then don't bother setting it.
 		elseif (!isset($modSettings[$variable]) && empty($value))
@@ -177,7 +177,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 		$start = 0;
 	// Not greater than the upper bound.
 	elseif ($start >= $max_value)
-		$start = max(0, (int) $max_value - (((int) $max_value % (int) $num_per_page) == 0 ? $num_per_page : ((int) $max_value % (int) $num_per_page)));
+		$start = max(0, (int) $max_value - ((int) $max_value % (int) $num_per_page === 0 ? $num_per_page : ((int) $max_value % (int) $num_per_page)));
 	// And it has to be a multiple of $num_per_page!
 	else
 		$start = max(0, (int) $start - ((int) $start % (int) $num_per_page));
@@ -190,16 +190,16 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 	if (empty($modSettings['compactTopicPagesEnable']))
 	{
 		// Show the left arrow.
-		$pageindex = $start == 0 || !$show['prev_next'] ? ' ' : sprintf($base_link, $start - $num_per_page, str_replace('{prev_txt}', $txt['prev'], $settings['page_index_template']['previous_page']));
+		$pageindex = $start === 0 || !$show['prev_next'] ? ' ' : sprintf($base_link, $start - $num_per_page, str_replace('{prev_txt}', $txt['prev'], $settings['page_index_template']['previous_page']));
 
 		// Show all the pages.
 		$display_page = 1;
 		for ($counter = 0; $counter < $max_value; $counter += $num_per_page)
-			$pageindex .= $start == $counter && !$start_invalid && empty($show['all_selected']) ? sprintf($settings['page_index_template']['current_page'], $display_page++) : sprintf($base_link, $counter, $display_page++);
+			$pageindex .= $start === $counter && !$start_invalid && empty($show['all_selected']) ? sprintf($settings['page_index_template']['current_page'], $display_page++) : sprintf($base_link, $counter, $display_page++);
 
 		// Show the right arrow.
 		$display_page = ($start + $num_per_page) > $max_value ? $max_value : ($start + $num_per_page);
-		if ($start != $counter - $max_value && !$start_invalid && $show['prev_next'] && empty($show['all_selected']))
+		if ($start !== $counter - $max_value && !$start_invalid && $show['prev_next'] && empty($show['all_selected']))
 			$pageindex .= $display_page > $counter - $num_per_page ? ' ' : sprintf($base_link, $display_page, str_replace('{next_txt}', $txt['next'], $settings['page_index_template']['next_page']));
 	}
 	else
@@ -283,7 +283,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 			$pageindex .= sprintf($base_link, $tmpMaxPages, $tmpMaxPages / $num_per_page + 1);
 
 		// Show the "next page" link. (prev page 1 ... 6 7 [8] 9 10 ... 15 >next page<)
-		if ($start != $tmpMaxPages && $show['prev_next'] && empty($show['all_selected']))
+		if ($start !== $tmpMaxPages && $show['prev_next'] && empty($show['all_selected']))
 			$pageindex .= sprintf($base_link, $start + $num_per_page, str_replace('{next_txt}', $txt['next'], $settings['page_index_template']['next_page']));
 	}
 
@@ -532,7 +532,7 @@ function forum_time($use_user_offset = true, $timestamp = null)
 
 	if ($timestamp === null)
 		$timestamp = time();
-	elseif ($timestamp == 0)
+	elseif ($timestamp === 0)
 		return 0;
 
 	return $timestamp + ($modSettings['time_offset'] + ($use_user_offset ? User::$info->time_offset : 0)) * 3600;
@@ -552,9 +552,8 @@ function forum_time($use_user_offset = true, $timestamp = null)
 function un_htmlspecialchars($string)
 {
 	$string = htmlspecialchars_decode($string, ENT_QUOTES);
-	$string = str_replace('&nbsp;', ' ', $string);
 
-	return $string;
+	return str_replace('&nbsp;', ' ', $string);
 }
 
 /**
@@ -637,10 +636,10 @@ function redirectexit($setLocation = '', $refresh = false)
 
 	\ElkArte\Notifications::instance()->send();
 
-	$add = preg_match('~^(ftp|http)[s]?://~', $setLocation) == 0 && substr($setLocation, 0, 6) != 'about:';
+	$add = preg_match('~^(ftp|http)[s]?://~', $setLocation) == 0 && substr($setLocation, 0, 6) !== 'about:';
 
 	if ($add)
-		$setLocation = $scripturl . ($setLocation != '' ? '?' . $setLocation : '');
+		$setLocation = $scripturl . ($setLocation !== '' ? '?' . $setLocation : '');
 
 	// Put the session ID in.
 	if (empty($_COOKIE) && defined('SID') && SID != '')
@@ -786,7 +785,8 @@ function setOldUrl($index = 'old_url')
 			break;
 		}
 	}
-	if ($make_old === true)
+
+	if ($make_old)
 	{
 		$_SESSION[$index] = $_SERVER['REQUEST_URL'];
 	}
@@ -946,17 +946,17 @@ function template_admin_warning_above()
 function ip2range($fullip)
 {
 	// If its IPv6, validate it first.
-	if (isValidIPv6($fullip) !== false)
+	if (isValidIPv6($fullip))
 	{
 		$ip_parts = explode(':', expandIPv6($fullip, false));
 		$ip_array = array();
 
-		if (count($ip_parts) != 8)
+		if (count($ip_parts) !== 8)
 			return array();
 
 		for ($i = 0; $i < 8; $i++)
 		{
-			if ($ip_parts[$i] == '*')
+			if ($ip_parts[$i] === '*')
 				$ip_array[$i] = array('low' => '0', 'high' => hexdec('ffff'));
 			elseif (preg_match('/^([0-9A-Fa-f]{1,4})\-([0-9A-Fa-f]{1,4})$/', $ip_parts[$i], $range) == 1)
 				$ip_array[$i] = array('low' => hexdec($range[1]), 'high' => hexdec($range[2]));
@@ -968,18 +968,18 @@ function ip2range($fullip)
 	}
 
 	// Pretend that 'unknown' is 255.255.255.255. (since that can't be an IP anyway.)
-	if ($fullip == 'unknown')
+	if ($fullip === 'unknown')
 		$fullip = '255.255.255.255';
 
 	$ip_parts = explode('.', $fullip);
 	$ip_array = array();
 
-	if (count($ip_parts) != 4)
+	if (count($ip_parts) !== 4)
 		return array();
 
 	for ($i = 0; $i < 4; $i++)
 	{
-		if ($ip_parts[$i] == '*')
+		if ($ip_parts[$i] === '*')
 			$ip_array[$i] = array('low' => '0', 'high' => '255');
 		elseif (preg_match('/^(\d{1,3})\-(\d{1,3})$/', $ip_parts[$i], $range) == 1)
 			$ip_array[$i] = array('low' => $range[1], 'high' => $range[2]);
@@ -1016,7 +1016,7 @@ function host_from_ip($ip)
 	$t = microtime(true);
 
 	// Try the Linux host command, perhaps?
-	if ((strpos(strtolower(PHP_OS), 'win') === false || strpos(strtolower(PHP_OS), 'darwin') !== false) && mt_rand(0, 1) == 1)
+	if ((stripos(PHP_OS, 'win') === false || stripos(PHP_OS, 'darwin') !== false) && mt_rand(0, 1) === 1)
 	{
 		if (!isset($modSettings['host_to_dis']))
 			$test = @shell_exec('host -W 1 ' . @escapeshellarg($ip));
@@ -1035,7 +1035,7 @@ function host_from_ip($ip)
 	}
 
 	// This is nslookup; usually only Windows, but possibly some Unix?
-	if (empty($host) && stripos(PHP_OS, 'win') !== false && strpos(strtolower(PHP_OS), 'darwin') === false && mt_rand(0, 1) == 1)
+	if (empty($host) && stripos(PHP_OS, 'win') !== false && stripos(PHP_OS, 'darwin') === false && mt_rand(0, 1) === 1)
 	{
 		$test = @shell_exec('nslookup -timeout=1 ' . @escapeshellarg($ip));
 
@@ -1386,11 +1386,7 @@ function currentContext($messages_request, $reset = false)
  */
 function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = true, $strict = false)
 {
-	// Search for key names or values
-	if ($assoc)
-		$position = array_search($key, array_keys($input), $strict);
-	else
-		$position = array_search($key, $input, $strict);
+	$position = $assoc ? array_search($key, array_keys($input), $strict) : array_search($key, $input, $strict);
 
 	// If the key is not found, just insert it at the end
 	if ($position === false)
@@ -1645,7 +1641,7 @@ function addProtocol($url, $protocols = array())
 		return strtolower($match[0]);
 	}, $url);
 
-	if ($found === true)
+	if ($found)
 	{
 			return $url;
 	}
@@ -1718,7 +1714,7 @@ function isBrowser($browser)
 		detectBrowser();
 	}
 
-	return !empty($context['browser'][$browser]) || !empty($context['browser']['is_' . $browser]) ? true : false;
+	return !empty($context['browser'][$browser]) || !empty($context['browser']['is_' . $browser]);
 }
 
 /**
@@ -1792,7 +1788,7 @@ function dieGif($expired = false)
 		die();
 	}
 
-	if ($expired === true)
+	if ($expired)
 	{
 		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 		header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
@@ -1815,7 +1811,7 @@ function obStart($use_compression = false)
 		@ob_end_clean();
 	}
 
-	if ($use_compression === true)
+	if ($use_compression)
 	{
 		ob_start('ob_gzhandler');
 	}

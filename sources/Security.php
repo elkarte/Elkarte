@@ -46,7 +46,7 @@ function validateSession($type = 'admin')
 	// Validate what type of session check this is.
 	$types = array();
 	call_integration_hook('integrate_validateSession', array(&$types));
-	$type = in_array($type, $types) || $type == 'moderate' ? $type : 'admin';
+	$type = in_array($type, $types) || $type === 'moderate' ? $type : 'admin';
 
 	// Set the lifetime for our admin session. Default is ten minutes.
 	$refreshTime = 10;
@@ -70,11 +70,11 @@ function validateSession($type = 'admin')
 	if (isset($_GET['xml']))
 		$refreshTime += 10;
 
-	$refreshTime = $refreshTime * 60;
+	$refreshTime *= 60;
 
 	// Is the security option off?
 	// @todo remove the exception (means update the db as well)
-	if (!empty($modSettings['securityDisable' . ($type != 'admin' ? '_' . $type : '')]))
+	if (!empty($modSettings['securityDisable' . ($type !== 'admin' ? '_' . $type : '')]))
 		return true;
 
 	// If their admin or moderator session hasn't expired yet, let it pass, let the admin session trump a moderation one as well
@@ -148,7 +148,7 @@ function checkPassword($type, $hash = false)
 	$password = $_POST[$type . ($hash ? '_hash_pass' : '_pass')];
 
 	// Allow integration to verify the password
-	$good_password = in_array(true, call_integration_hook('integrate_verify_password', array(User::$info->username, $password, $hash ? true : false)), true);
+	$good_password = in_array(true, call_integration_hook('integrate_verify_password', array(User::$info->username, $password, $hash)), true);
 
 	// Password correct?
 	if ($good_password || validateLoginPassword($password, User::$info->passwd, $hash ? '' : User::$info->username))

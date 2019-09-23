@@ -52,7 +52,7 @@ function deleteBadBehavior($type, $filter)
 		);
 	}
 	// Just specific entries?
-	elseif ($type == 'delete')
+	elseif ($type === 'delete')
 	{
 		$db->query('', '
 			DELETE FROM {db_prefix}log_badbehavior
@@ -144,7 +144,7 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 		}
 
 		$bb_entries[$row['id']] = array(
-			'alternate' => $i % 2 == 0,
+			'alternate' => $i % 2 === 0,
 			'ip' => $row['ip'],
 			'request_method' => $row['request_method'],
 			'server_protocol' => $row['server_protocol'],

@@ -770,7 +770,7 @@ function attachmentChecks($attachID)
 
 	if ($valid_mime !== '')
 	{
-		if ($image->checkImageContents($_SESSION['temp_attachments'][$attachID]['tmp_name']) === false)
+		if (!$image->checkImageContents($_SESSION['temp_attachments'][$attachID]['tmp_name']))
 		{
 			// It's bad. Last chance, maybe we can re-encode it?
 			if (empty($modSettings['attachment_image_reencode']) || (!$image->reencodeImage($_SESSION['temp_attachments'][$attachID]['tmp_name'])))
@@ -1018,7 +1018,7 @@ function createAttachment(&$attachmentOptions)
 			}
 
 			// If a new folder has been already created. Gotta move this thumb there then.
-			if ($modSettings['currentAttachmentUploadDir'] != $attachmentOptions['id_folder'])
+			if ($modSettings['currentAttachmentUploadDir'] !== $attachmentOptions['id_folder'])
 			{
 				rename($thumb_path, $context['attach_dir'] . '/' . $thumb_filename);
 				$thumb_path = $context['attach_dir'] . '/' . $thumb_filename;
@@ -1957,7 +1957,7 @@ function loadAttachmentContext($id_msg)
  */
 function approved_attach_sort($a, $b)
 {
-	if ($a['is_approved'] == $b['is_approved'])
+	if ($a['is_approved'] === $b['is_approved'])
 		return 0;
 
 	return $a['is_approved'] > $b['is_approved'] ? -1 : 1;
@@ -2022,10 +2022,7 @@ function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $ne
 	else
 		$path = $modSettings['attachmentUploadDir'];
 
-	if (file_exists($path . '/' . $enc_name))
-		$filename = $path . '/' . $enc_name;
-	else
-		$filename = $path . '/' . $clean_name;
+	$filename = file_exists($path . '/' . $enc_name) ? $path . '/' . $enc_name : $path . '/' . $clean_name;
 
 	return $filename;
 }
@@ -2112,7 +2109,8 @@ function getAttachmentPosition($id_attach)
 
 	// Make sure this attachment is on this board.
 	$request = $db->query('', '
-		SELECT m.id_board, m.id_topic
+		SELECT 
+			m.id_board, m.id_topic
 		FROM {db_prefix}attachments AS a
 			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -2152,14 +2150,7 @@ function elk_getimagesize($file, $error = 'array')
 	// Can't get it, what shall we return
 	if (empty($sizes))
 	{
-		if ($error === 'array')
-		{
-			$sizes = array(-1, -1, -1);
-		}
-		else
-		{
-			$sizes = false;
-		}
+		$sizes = $error === 'array' ? array(-1, -1, -1) : false;
 	}
 
 	return $sizes;
@@ -2212,9 +2203,8 @@ function returnMimeThumb($file_ext, $url = false)
 	}
 
 	$location = $url ? $settings['theme_url'] : $settings['theme_dir'];
-	$filename = $location . '/images/mime_images/' . $file_ext . '.png';
 
-	return $filename;
+	return $location . '/images/mime_images/' . $file_ext . '.png';
 }
 
 /**

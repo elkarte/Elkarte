@@ -241,7 +241,7 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
 	{
 		if (++$counter < $start)
 			continue;
-		elseif ($counter == $start + $items_per_page)
+		elseif ($counter === $start + $items_per_page)
 			break;
 
 		$hooks_data[] = $data;

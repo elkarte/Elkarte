@@ -111,7 +111,7 @@ function updateAllSignatures($applied_sigs)
 				$str_len = strlen($sig);
 				for ($i = 0; $i < $str_len; $i++)
 				{
-					if ($sig[$i] == "\n")
+					if ($sig[$i] === "\n")
 					{
 						$count++;
 						if ($count >= $sig_limits[2])
@@ -225,7 +225,7 @@ function updateAllSignatures($applied_sigs)
 						if ($matches[2][$key] && $sig_limits[5] && $matches[2][$key] > $sig_limits[5])
 						{
 							$width = $sig_limits[5];
-							$matches[4][$key] = $matches[4][$key] * ($width / $matches[2][$key]);
+							$matches[4][$key] *= $width / $matches[2][$key];
 						}
 						elseif ($matches[2][$key])
 							$width = $matches[2][$key];
@@ -235,7 +235,7 @@ function updateAllSignatures($applied_sigs)
 						{
 							$height = $sig_limits[6];
 							if ($width != -1)
-								$width = $width * ($height / $matches[4][$key]);
+								$width *= $height / $matches[4][$key];
 						}
 						elseif ($matches[4][$key])
 							$height = $matches[4][$key];
@@ -253,7 +253,7 @@ function updateAllSignatures($applied_sigs)
 								if ($sizes[0] > $sig_limits[5] && $sig_limits[5])
 								{
 									$width = $sig_limits[5];
-									$sizes[1] = $sizes[1] * ($width / $sizes[0]);
+									$sizes[1] *= $width / $sizes[0];
 								}
 
 								// Too high?
@@ -262,7 +262,7 @@ function updateAllSignatures($applied_sigs)
 									$height = $sig_limits[6];
 									if ($width == -1)
 										$width = $sizes[0];
-									$width = $width * ($height / $sizes[1]);
+									$width *= $height / $sizes[1];
 								}
 								elseif ($width != -1)
 									$height = $sizes[1];
@@ -438,7 +438,7 @@ function getProfileField($id_field)
 			'private' => $row['private'],
 			'can_search' => $row['can_search'],
 			'mask' => $row['mask'],
-			'regex' => substr($row['mask'], 0, 5) == 'regex' ? substr($row['mask'], 5) : '',
+			'regex' => substr($row['mask'], 0, 5) === 'regex' ? substr($row['mask'], 5) : '',
 			'enclose' => $row['enclose'],
 			'placement' => $row['placement'],
 		);
@@ -464,7 +464,8 @@ function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
 	for ($i = 0; !$unique && $i < 9; $i++)
 	{
 		$request = $db->query('', '
-			SELECT id_field
+			SELECT 
+				id_field
 			FROM {db_prefix}custom_fields
 			WHERE col_name = {string:current_column}',
 			array(

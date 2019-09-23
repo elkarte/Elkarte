@@ -318,7 +318,7 @@ function likesCount($memberID, $given = true)
 	$db = database();
 
 	// Give is a given, received takes a query so its only the unique messages
-	if ($given === true)
+	if ($given)
 	{
 		$likes = \ElkArte\MembersList::get($memberID)->likes_given;
 	}
@@ -472,11 +472,11 @@ function postLikers($start, $items_per_page, $sort, $messageID, $simple = true)
 	return $db->fetchQuery('
 		SELECT
 			l.id_member, l.id_msg,
-			m.real_name' . ($simple === true ? '' : ',
+			m.real_name' . ($simple ? '' : ',
 			COALESCE(a.id_attach, 0) AS id_attach,
 			a.filename, a.attachment_type, m.avatar, m.email_address') . '
 		FROM {db_prefix}message_likes AS l
-			LEFT JOIN {db_prefix}members AS m ON (m.id_member = l.id_member)' . ($simple === true ? '' : '
+			LEFT JOIN {db_prefix}members AS m ON (m.id_member = l.id_member)' . ($simple ? '' : '
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)') . '
 		WHERE l.id_msg = {int:id_message}
 		ORDER BY {raw:sort}
@@ -495,7 +495,7 @@ function postLikers($start, $items_per_page, $sort, $messageID, $simple = true)
 				'id_member' => $row['id_member'],
 				'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
 			);
-			if ($simple !== true)
+			if (!$simple)
 			{
 				$avatar = determineAvatar($row);
 				$like['href'] = !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '';

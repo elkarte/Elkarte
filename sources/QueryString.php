@@ -143,7 +143,7 @@ function expandIPv6($addr, $strict_check = true)
 	$converted[$addr] = $result;
 
 	// Quick check to make sure the length is as expected.
-	if (!$strict_check || strlen($result) == 39)
+	if (!$strict_check || strlen($result) === 39)
 		return $result;
 	else
 		return false;

@@ -427,7 +427,7 @@ function loadProfileFields($force_reload = false)
 				if (isset($_POST['bday2'], $_POST['bday3']) && $value > 0 && $_POST['bday2'] > 0)
 				{
 					// Set to blank?
-					if ((int) $_POST['bday3'] == 1 && (int) $_POST['bday2'] == 1 && (int) $value == 1)
+					if ((int) $_POST['bday3'] === 1 && (int) $_POST['bday2'] === 1 && (int) $value === 1)
 						$value = '0001-01-01';
 					else
 						$value = checkdate($value, $_POST['bday2'], $_POST['bday3'] < 4 ? 4 : $_POST['bday3']) ? sprintf('%04d-%02d-%02d', $_POST['bday3'] < 4 ? 4 : $_POST['bday3'], $_POST['bday1'], $_POST['bday2']) : '0001-01-01';
@@ -477,7 +477,7 @@ function loadProfileFields($force_reload = false)
 				}
 				// As long as it doesn't equal "N/A"...
 				elseif ($value != $txt['not_applicable'] && $value != strtotime(strftime('%Y-%m-%d', $cur_profile['date_registered'] + (User::$info->time_offset + $modSettings['time_offset']) * 3600)))
-					$value = $value - (User::$info->time_offset + $modSettings['time_offset']) * 3600;
+					$value -= (User::$info->time_offset + $modSettings['time_offset']) * 3600;
 				else
 					$value = $cur_profile['date_registered'];
 
@@ -493,7 +493,7 @@ function loadProfileFields($force_reload = false)
 			'input_validate' => function (&$value) {
 				global $context, $old_profile, $profile_vars, $modSettings;
 
-				if (strtolower($value) == strtolower($old_profile['email_address']))
+				if (strtolower($value) === strtolower($old_profile['email_address']))
 					return false;
 
 				$isValid = profileValidateEmail($value, $context['id_member']);
@@ -514,7 +514,7 @@ function loadProfileFields($force_reload = false)
 		),
 		'hide_email' => array(
 			'type' => 'check',
-			'value' => empty($cur_profile['hide_email']) ? true : false,
+			'value' => empty($cur_profile['hide_email']),
 			'label' => $txt['allow_user_email'],
 			'permission' => 'profile_identity',
 			'input_validate' => function (&$value) {
@@ -689,7 +689,7 @@ function loadProfileFields($force_reload = false)
 					return false;
 
 				// Do the two entries for the password even match?
-				if (!isset($_POST['passwrd2']) || $value != $_POST['passwrd2'])
+				if (!isset($_POST['passwrd2']) || $value !== $_POST['passwrd2'])
 					return 'bad_new_password';
 
 				// Let's get the validation function into play...
@@ -717,7 +717,7 @@ function loadProfileFields($force_reload = false)
 		),
 		'enable_otp' => array(
 			'type' => 'check',
-			'value' => empty($cur_profile['enable_otp']) ? false : true,
+			'value' => !empty($cur_profile['enable_otp']),
 			'subtext' => $txt['otp_enabled_help'],
 			'label' => $txt['otp_enabled'],
 			'permission' => 'profile_identity',
@@ -806,7 +806,7 @@ function loadProfileFields($force_reload = false)
 
 				$value = trim(preg_replace('~[\s]~u', ' ', $value));
 
-				if (trim($value) == '')
+				if (trim($value) === '')
 					return 'no_name';
 				elseif (\ElkArte\Util::strlen($value) > 60)
 					return 'name_too_long';
@@ -1280,7 +1280,7 @@ function saveProfileChanges(&$profile_vars, $memID)
 		foreach ($_POST['ignore_brd'] as $k => $d)
 		{
 			$d = (int) $d;
-			if ($d != 0)
+			if ($d !== 0)
 				$_POST['ignore_brd'][$k] = $d;
 			else
 				unset($_POST['ignore_brd'][$k]);
@@ -1346,12 +1346,13 @@ function makeThemeChanges($memID, $id_theme)
 	);
 
 	// Can't change reserved vars.
-	if ((isset($_POST['options']) && count(array_intersect(array_keys($_POST['options']), $reservedVars)) != 0) || (isset($_POST['default_options']) && count(array_intersect(array_keys($_POST['default_options']), $reservedVars)) != 0))
+	if ((isset($_POST['options']) && count(array_intersect(array_keys($_POST['options']), $reservedVars)) !== 0) || (isset($_POST['default_options']) && count(array_intersect(array_keys($_POST['default_options']), $reservedVars)) !== 0))
 		throw new \ElkArte\Exceptions\Exception('no_access', false);
 
 	// Don't allow any overriding of custom fields with default or non-default options.
 	$request = $db->query('', '
-		SELECT col_name
+		SELECT 
+			col_name
 		FROM {db_prefix}custom_fields
 		WHERE active = {int:is_active}',
 		array(
@@ -1541,7 +1542,8 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 
 	// Load the fields we are saving too - make sure we save valid data (etc).
 	$request = $db->query('', '
-		SELECT col_name, field_name, field_desc, field_type, field_length, field_options, default_value, show_reg, mask, private
+		SELECT 
+			col_name, field_name, field_desc, field_type, field_length, field_options, default_value, show_reg, mask, private
 		FROM {db_prefix}custom_fields
 		WHERE ' . $where . '
 			AND active = {int:is_active}',
@@ -1942,7 +1944,7 @@ function profileLoadLanguages()
 	ksort($context['profile_languages']);
 
 	// Return whether we should proceed with this.
-	return count($context['profile_languages']) > 1 ? true : false;
+	return count($context['profile_languages']) > 1;
 }
 
 /**
@@ -2093,7 +2095,7 @@ function profileValidateSignature(&$value)
 					if ($matches[2][$key] && $sig_limits[5] && $matches[2][$key] > $sig_limits[5])
 					{
 						$width = $sig_limits[5];
-						$matches[4][$key] = $matches[4][$key] * ($width / $matches[2][$key]);
+						$matches[4][$key] *= $width / $matches[2][$key];
 					}
 					elseif ($matches[2][$key])
 						$width = $matches[2][$key];
@@ -2103,7 +2105,7 @@ function profileValidateSignature(&$value)
 					{
 						$height = $sig_limits[6];
 						if ($width != -1)
-							$width = $width * ($height / $matches[4][$key]);
+							$width *= $height / $matches[4][$key];
 					}
 					elseif ($matches[4][$key])
 						$height = $matches[4][$key];
@@ -2119,7 +2121,7 @@ function profileValidateSignature(&$value)
 							if ($sizes[0] > $sig_limits[5] && $sig_limits[5])
 							{
 								$width = $sig_limits[5];
-								$sizes[1] = $sizes[1] * ($width / $sizes[0]);
+								$sizes[1] *= $width / $sizes[0];
 							}
 
 							// Too high?
@@ -2128,7 +2130,7 @@ function profileValidateSignature(&$value)
 								$height = $sig_limits[6];
 								if ($width == -1)
 									$width = $sizes[0];
-								$width = $width * ($height / $sizes[1]);
+								$width *= $height / $sizes[1];
 							}
 							elseif ($width != -1)
 								$height = $sizes[1];
@@ -2399,7 +2401,7 @@ function profileSaveAvatarData(&$value)
 				$valid_mime = getValidMimeImageType($size[2]);
 				if ($valid_mime !== '')
 				{
-					if ($image->checkImageContents($_FILES['attachment']['tmp_name']) === false)
+					if (!$image->checkImageContents($_FILES['attachment']['tmp_name']))
 					{
 						// It's bad. Try to re-encode the contents?
 						if (empty($modSettings['avatar_reencode']) || (!$image->reencodeImage($_FILES['attachment']['tmp_name'])))
@@ -2596,7 +2598,8 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, lc.member_name) AS member_name,
+		SELECT 
+			COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, lc.member_name) AS member_name,
 			lc.log_time, lc.body, lc.counter, lc.id_notice
 		FROM {db_prefix}log_comments AS lc
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
@@ -2642,7 +2645,8 @@ function list_getUserWarningCount($memID)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}log_comments
 		WHERE id_recipient = {int:selected_member}
 			AND comment_type = {string:warning}',
@@ -2681,7 +2685,8 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
 
 	// Retrieve some attachments.
 	$request = $db->query('', '
-		SELECT a.id_attach, a.id_msg, a.filename, a.downloads, a.approved, a.fileext, a.width, a.height, ' .
+		SELECT
+		 	a.id_attach, a.id_msg, a.filename, a.downloads, a.approved, a.fileext, a.width, a.height, ' .
 			(empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ' COALESCE(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height, ') . '
 			m.id_msg, m.id_topic, m.id_board, m.poster_time, m.subject, b.name
 		FROM {db_prefix}attachments AS a' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : '
@@ -2763,7 +2768,8 @@ function getNumAttachments($boardsAllowed, $memID)
 
 	// Get the total number of attachments they have posted.
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
@@ -2805,7 +2811,8 @@ function getUnwatchedBy($start, $items_per_page, $sort, $memID)
 
 	// Get the list of topics we can see
 	$request = $db->query('', '
-		SELECT lt.id_topic
+		SELECT
+		 	lt.id_topic
 		FROM {db_prefix}log_topics AS lt
 			LEFT JOIN {db_prefix}topics AS t ON (lt.id_topic = t.id_topic)
 			LEFT JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)
@@ -2833,7 +2840,8 @@ function getUnwatchedBy($start, $items_per_page, $sort, $memID)
 	if (!empty($topics))
 	{
 		$request = $db->query('', '
-			SELECT mf.subject, mf.poster_time as started_on, COALESCE(memf.real_name, mf.poster_name) as started_by, ml.poster_time as last_post_on, COALESCE(meml.real_name, ml.poster_name) as last_post_by, t.id_topic
+			SELECT 
+				mf.subject, mf.poster_time as started_on, COALESCE(memf.real_name, mf.poster_name) as started_by, ml.poster_time as last_post_on, COALESCE(meml.real_name, ml.poster_name) as last_post_by, t.id_topic
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
 				INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
@@ -2864,7 +2872,8 @@ function getNumUnwatchedBy($memID)
 
 	// Get the total number of attachments they have posted.
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT
+		 	COUNT(*)
 		FROM {db_prefix}log_topics AS lt
 		LEFT JOIN {db_prefix}topics AS t ON (lt.id_topic = t.id_topic)
 		LEFT JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)
@@ -2899,7 +2908,8 @@ function count_user_posts($memID, $board = null)
 	$is_owner = $memID == User::$info->id;
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}messages AS m' . (User::$info->query_see_board === '1=1' ? '' : '
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . '
 		WHERE m.id_member = {int:current_member}' . (!empty($board) ? '
@@ -2936,7 +2946,8 @@ function count_user_topics($memID, $board = null)
 	$is_owner = $memID == User::$info->id;
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}topics AS t' . (User::$info->query_see_board === '1=1' ? '' : '
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board AND {query_see_board})') . '
 		WHERE t.id_member_started = {int:current_member}' . (!empty($board) ? '
@@ -2975,7 +2986,8 @@ function findMinMaxUserMessage($memID, $board = null)
 	$is_owner = $memID == User::$info->id;
 
 	$request = $db->query('', '
-		SELECT MIN(id_msg), MAX(id_msg)
+		SELECT 
+			MIN(id_msg), MAX(id_msg)
 		FROM {db_prefix}messages AS m
 		WHERE m.id_member = {int:current_member}' . (!empty($board) ? '
 			AND m.id_board = {int:board}' : '') . (!$modSettings['postmod_active'] || $is_owner ? '' : '
@@ -3012,7 +3024,8 @@ function findMinMaxUserTopic($memID, $board = null)
 	$is_owner = $memID == User::$info->id;
 
 	$request = $db->query('', '
-		SELECT MIN(id_topic), MAX(id_topic)
+		SELECT 
+			MIN(id_topic), MAX(id_topic)
 		FROM {db_prefix}topics AS t
 		WHERE t.id_member_started = {int:current_member}' . (!empty($board) ? '
 			AND t.id_board = {int:board}' : '') . (!$modSettings['postmod_active'] || $is_owner ? '' : '
@@ -3179,7 +3192,8 @@ function getMemberGeneralPermissions($curGroups)
 
 	// Get all general permissions.
 	$request = $db->query('', '
-		SELECT p.permission, p.add_deny, mg.group_name, p.id_group
+		SELECT 
+			p.permission, p.add_deny, mg.group_name, p.id_group
 		FROM {db_prefix}permissions AS p
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = p.id_group)
 		WHERE p.id_group IN ({array_int:group_list})
@@ -3340,7 +3354,8 @@ function getMembersIPs($memID)
 	// @todo cache this
 	// Get all IP addresses this user has used for his messages.
 	$request = $db->query('', '
-		SELECT poster_ip
+		SELECT 
+			poster_ip
 		FROM {db_prefix}messages
 		WHERE id_member = {int:current_member} ' . (isset($min_msg_member) ? '
 			AND id_msg >= {int:min_msg_member} AND id_msg <= {int:max_msg_member}' : '') . '
@@ -3351,7 +3366,6 @@ function getMembersIPs($memID)
 			'max_msg_member' => !empty($max_msg_member) ? $max_msg_member : 0,
 		)
 	);
-
 	while ($row = $db->fetch_assoc($request))
 		$ips[] = $row['poster_ip'];
 
@@ -3359,7 +3373,8 @@ function getMembersIPs($memID)
 
 	// Now also get the IP addresses from the error messages.
 	$request = $db->query('', '
-		SELECT COUNT(*) AS error_count, ip
+		SELECT 
+			COUNT(*) AS error_count, ip
 		FROM {db_prefix}log_errors
 		WHERE id_member = {int:current_member}
 		GROUP BY ip',
@@ -3396,7 +3411,8 @@ function getMembersInRange($ips, $memID)
 
 	// Get member ID's which are in messages...
 	$request = $db->query('', '
-		SELECT mem.id_member
+		SELECT 
+			mem.id_member
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 		WHERE m.poster_ip IN ({array_string:ip_list})
@@ -3414,7 +3430,8 @@ function getMembersInRange($ips, $memID)
 
 	// And then get the member ID's belong to other users
 	$request = $db->query('', '
-		SELECT id_member
+		SELECT 
+			id_member
 		FROM {db_prefix}members
 		WHERE id_member != {int:current_member}
 			AND member_ip IN ({array_string:ip_list})',

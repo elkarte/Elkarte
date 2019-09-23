@@ -212,7 +212,7 @@ function createMenu($menuData, $menuOptions = array())
 											$first_sa = $sa;
 
 										// Is this the current subsection?
-										if (isset($_req->query->sa) && $_req->query->sa == $sa)
+										if (isset($_req->query->sa) && $_req->query->sa === $sa)
 											$menu_context['current_subsection'] = $sa;
 
 										elseif (isset($sub['active']) && isset($_req->query->sa) && in_array($_req->query->sa, $sub['active']))
@@ -351,7 +351,7 @@ function destroyMenu($menu_id = 'last')
 {
 	global $context;
 
-	$menu_name = $menu_id == 'last' && isset($context['max_menu_id']) && isset($context['menu_data_' . $context['max_menu_id']]) ? 'menu_data_' . $context['max_menu_id'] : 'menu_data_' . $menu_id;
+	$menu_name = $menu_id === 'last' && isset($context['max_menu_id']) && isset($context['menu_data_' . $context['max_menu_id']]) ? 'menu_data_' . $context['max_menu_id'] : 'menu_data_' . $menu_id;
 	if (!isset($context[$menu_name]))
 		return false;
 

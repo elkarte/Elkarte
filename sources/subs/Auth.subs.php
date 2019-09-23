@@ -190,7 +190,7 @@ function adminLogin($type = 'admin')
 	// Validate what type of session check this is.
 	$types = array();
 	call_integration_hook('integrate_validateSession', array(&$types));
-	$type = in_array($type, $types) || $type == 'moderate' ? $type : 'admin';
+	$type = in_array($type, $types) || $type === 'moderate' ? $type : 'admin';
 
 	// They used a wrong password, log it and unset that.
 	if (isset($_POST[$type . '_hash_pass']) || isset($_POST[$type . '_pass']))
@@ -363,7 +363,8 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 
 	// Search by username, display name, and email address.
 	$request = $db->query('', '
-		SELECT id_member, member_name, real_name, email_address, hide_email
+		SELECT 
+			id_member, member_name, real_name, email_address, hide_email
 		FROM {db_prefix}members
 		WHERE ({raw:member_name_search}
 			OR {raw:real_name_search} {raw:email_condition})
@@ -503,7 +504,7 @@ function validateUsername($memID, $username, $ErrorContext = 'register', $check_
 		$errors->addError('error_long_name');
 
 	// No name?!  How can you register with no name?
-	if ($username == '')
+	if ($username === '')
 		$errors->addError('need_username');
 
 	// Only these characters are permitted.
@@ -565,9 +566,9 @@ function validatePassword($password, $username, $restrict_in = array())
 
 	// Otherwise, hard test next, check for numbers and letters, uppercase too.
 	$good = preg_match('~(\D\d|\d\D)~', $password) != 0;
-	$good &= \ElkArte\Util::strtolower($password) != $password;
+	$good &= \ElkArte\Util::strtolower($password) !== $password;
 
-	return $good ? null : 'chars';
+	return $good !== 0 ? null : 'chars';
 }
 
 /**
@@ -664,10 +665,7 @@ function rebuildModCache()
 			}
 		);
 
-		if (empty($groups))
-			$group_query = '0=1';
-		else
-			$group_query = 'id_group IN (' . implode(',', $groups) . ')';
+		$group_query = empty($groups) ? '0=1' : 'id_group IN (' . implode(',', $groups) . ')';
 	}
 
 	// Then, same again, just the boards this time!
@@ -677,10 +675,7 @@ function rebuildModCache()
 	{
 		$boards = boardsAllowedTo('moderate_board', true);
 
-		if (empty($boards))
-			$board_query = '0=1';
-		else
-			$board_query = 'id_board IN (' . implode(',', $boards) . ')';
+		$board_query = empty($boards) ? '0=1' : 'id_board IN (' . implode(',', $boards) . ')';
 	}
 
 	// What boards are they the moderator of?

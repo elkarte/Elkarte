@@ -248,7 +248,7 @@ function setPermissionLevel($level, $group = null, $profile = null)
 		);
 	}
 	// Setting profile permissions for a specific group.
-	elseif ($profile !== null && $group !== null && ($profile == 1 || $profile > 4))
+	elseif ($profile !== null && $group !== null && ($profile === 1 || $profile > 4))
 	{
 		$group = (int) $group;
 		$profile = (int) $profile;
@@ -281,7 +281,7 @@ function setPermissionLevel($level, $group = null, $profile = null)
 		}
 	}
 	// Setting profile permissions for all groups.
-	elseif ($profile !== null && $group === null && ($profile == 1 || $profile > 4))
+	elseif ($profile !== null && $group === null && ($profile === 1 || $profile > 4))
 	{
 		$profile = (int) $profile;
 
@@ -596,7 +596,7 @@ function loadAllPermissions()
 			$bothGroups = array();
 
 			// Guests can have only any, registered users both
-			if (!isset($context['group']['id']) || !($context['group']['id'] == -1))
+			if (!isset($context['group']['id']) || $context['group']['id'] != -1)
 			{
 				$bothGroups['own'] = $own_group;
 			}
@@ -809,10 +809,10 @@ function copyPermission($copy_from, $groups, $illegal_permissions, $non_guest_pe
 			// No dodgy permissions please!
 			if (!empty($illegal_permissions) && in_array($perm, $illegal_permissions))
 				continue;
-			if ($group_id == -1 && in_array($perm, $non_guest_permissions))
+			if ($group_id === -1 && in_array($perm, $non_guest_permissions))
 				continue;
 
-			if ($group_id != 1 && $group_id != 3)
+			if ($group_id !== 1 && $group_id !== 3)
 			{
 				$inserts[] = array('permission' => $perm, 'id_group' => $group_id, 'add_deny' => $add_deny);
 			}
@@ -872,7 +872,7 @@ function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permis
 		foreach ($target_perm as $perm => $add_deny)
 		{
 			// Are these for guests?
-			if ($group_id == -1 && in_array($perm, $non_guest_permissions))
+			if ($group_id === -1 && in_array($perm, $non_guest_permissions))
 				continue;
 
 			$inserts[] = array($perm, $group_id, $add_deny, $profile_id);
@@ -1052,7 +1052,7 @@ function fetchBoardPermissions($id_group, $permission_type, $profile_id)
 			AND id_profile = {int:current_profile}',
 		array(
 			'current_group' => $id_group,
-			'current_profile' => $permission_type == 'membergroup' ? 1 : $profile_id,
+			'current_profile' => $permission_type === 'membergroup' ? 1 : $profile_id,
 		)
 	);
 	while ($row = $db->fetch_assoc($result))

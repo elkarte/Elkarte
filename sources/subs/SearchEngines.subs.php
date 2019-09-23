@@ -67,7 +67,7 @@ function spiderCheck()
 	foreach ($spider_data as $spider)
 	{
 		// User agent is easy.
-		if (!empty($spider['user_agent']) && strpos(strtolower($req->user_agent()), strtolower($spider['user_agent'])) !== false)
+		if (!empty($spider['user_agent']) && stripos($req->user_agent(), strtolower($spider['user_agent'])) !== false)
 			$_SESSION['id_robot'] = $spider['id_spider'];
 		// IP stuff is harder.
 		elseif (!empty($ip_parts))
@@ -590,9 +590,9 @@ function spidersStatsDates()
 		for ($m = 1; $m <= 12; $m++)
 		{
 			// This doesn't count?
-			if ($y == $min_year && $m < $min_month)
+			if ($y === $min_year && $m < $min_month)
 				continue;
-			if ($y == $max_year && $m > $max_month)
+			if ($y === $max_year && $m > $max_month)
 				break;
 
 			$date_choices[$y . $m] = $txt['months_short'][$m] . ' ' . $y;

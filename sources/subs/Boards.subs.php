@@ -31,11 +31,7 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 
 	$db = database();
 
-	// Force $boards to be an array.
-	if (!is_array($boards))
-		$boards = array($boards);
-	else
-		$boards = array_unique($boards);
+	$boards = !is_array($boards) ? array($boards) : array_unique($boards);
 
 	// No boards, nothing to mark as read.
 	if (empty($boards))
@@ -447,17 +443,16 @@ function modifyBoard($board_id, &$boardOptions)
 		);
 
 		// Validate and get the IDs of the new moderators.
-		if (isset($boardOptions['moderator_string']) && trim($boardOptions['moderator_string']) != '')
+		if (isset($boardOptions['moderator_string']) && trim($boardOptions['moderator_string']) !== '')
 		{
 			// Divvy out the usernames, remove extra space.
 			$moderator_string = strtr(\ElkArte\Util::htmlspecialchars($boardOptions['moderator_string'], ENT_QUOTES), array('&quot;' => '"'));
 			preg_match_all('~"([^"]+)"~', $moderator_string, $matches);
 			$moderators = array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $moderator_string)));
-			for ($k = 0, $n = count($moderators); $k < $n; $k++)
+			foreach ($moderators as $k => $moderator)
 			{
-				$moderators[$k] = trim($moderators[$k]);
-
-				if (strlen($moderators[$k]) == 0)
+				$moderators[$k] = trim($moderator);
+				if ($moderators[$k] === '')
 				{
 					unset($moderators[$k]);
 				}
@@ -468,6 +463,7 @@ function modifyBoard($board_id, &$boardOptions)
 			{
 				$boardOptions['moderators'] = array();
 			}
+
 			if (!empty($moderators))
 			{
 				$boardOptions['moderators'] = $db->fetchQuery('
@@ -538,7 +534,7 @@ function createBoard($boardOptions)
 	$db = database();
 
 	// Trigger an error if one of the required values is not set.
-	if (!isset($boardOptions['board_name']) || trim($boardOptions['board_name']) == '' || !isset($boardOptions['move_to']) || !isset($boardOptions['target_category']))
+	if (!isset($boardOptions['board_name']) || trim($boardOptions['board_name']) === '' || !isset($boardOptions['move_to']) || !isset($boardOptions['target_category']))
 		trigger_error('createBoard(): One or more of the required options is not set', E_USER_ERROR);
 
 	if (in_array($boardOptions['move_to'], array('child', 'before', 'after')) && !isset($boardOptions['target_board']))
@@ -1498,7 +1494,7 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
 	$select = $known_selects[empty($params['selects']) || !isset($known_selects[$params['selects']]) ? 'name' : $params['selects']];
 
 	// If $conditions wasn't set or is 'all', get all boards
-	if (!is_array($conditions) && $conditions == 'all')
+	if (!is_array($conditions) && $conditions === 'all')
 	{
 		// id_board, name, id_profile => used in admin/Reports.controller.php
 		$request = $db->query('', '
@@ -1740,7 +1736,8 @@ function boardNotifications($sort, $memID)
 
 	// and all the boards that you can see but don't have notify turned on for
 	$request = $db->query('', '
-		SELECT b.id_board, b.name, COALESCE(lb.id_msg, 0) AS board_read, b.id_msg_updated
+		SELECT 
+			b.id_board, b.name, COALESCE(lb.id_msg, 0) AS board_read, b.id_msg_updated
 		FROM {db_prefix}boards AS b
 			LEFT JOIN {db_prefix}log_notify AS ln ON (ln.id_board = b.id_board AND ln.id_member = {int:selected_member})
 			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
@@ -1798,7 +1795,7 @@ function countBoards($conditions = 'all', $params = array())
 	$clauseParameters = array();
 
 	// if $conditions wasn't set or is 'all', get all boards
-	if (!is_array($conditions) && $conditions == 'all')
+	if (!is_array($conditions) && $conditions === 'all')
 	{
 		// id_board, name, id_profile => used in admin/Reports.controller.php
 		$request = $db->query('', '

@@ -36,7 +36,8 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 		return $counts[$id_member];
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}log_mentions as mtn
 		WHERE mtn.id_member = {int:current_user}
 			AND mtn.is_accessible = {int:is_accessible}

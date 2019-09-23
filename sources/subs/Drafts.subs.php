@@ -635,7 +635,7 @@ function loadDraft($id_draft, $type = 0, $check = true, $load = false)
 			// A standard post draft?
 			$context['sticky'] = !empty($draft_info['is_sticky']) ? $draft_info['is_sticky'] : '';
 			$context['locked'] = !empty($draft_info['locked']) ? $draft_info['locked'] : '';
-			$context['use_smileys'] = !empty($draft_info['smileys_enabled']) ? true : false;
+			$context['use_smileys'] = !empty($draft_info['smileys_enabled']);
 			$context['icon'] = !empty($draft_info['icon']) ? $draft_info['icon'] : 'xx';
 			$context['message'] = !empty($draft_info['body']) ? $draft_info['body'] : '';
 			$context['subject'] = !empty($draft_info['subject']) ? $draft_info['subject'] : '';

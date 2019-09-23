@@ -323,7 +323,7 @@ function validateTriggers(&$triggers)
 				list ($value, $isAdmin) = $db->fetch_row($request);
 				$db->free_result($request);
 
-				if ($isAdmin && strtolower($isAdmin) != 'f')
+				if ($isAdmin && strtolower($isAdmin) !== 'f')
 				{
 					unset($value);
 					$ban_errors->addError('no_ban_admin');
@@ -673,9 +673,10 @@ function insertBanGroup($ban_info = array())
 
 	// Check whether a ban with this name already exists.
 	$request = $db->query('', '
-		SELECT id_ban_group
+		SELECT 
+			id_ban_group
 		FROM {db_prefix}ban_groups
-		WHERE name = {string:new_ban_name}' . '
+		WHERE name = {string:new_ban_name}
 		LIMIT 1',
 		array(
 			'new_ban_name' => $ban_info['name'],
@@ -731,12 +732,12 @@ function range2ip($low, $high)
 	// IPv6 check.
 	if (!empty($high[4]) || !empty($high[5]) || !empty($high[6]) || !empty($high[7]))
 	{
-		if (count($low) != 8 || count($high) != 8)
+		if (count($low) !== 8 || count($high) !== 8)
 			return '';
 
 		for ($i = 0; $i < 8; $i++)
 		{
-			if ($low[$i] == $high[$i])
+			if ($low[$i] === $high[$i])
 				$ip[$i] = dechex($low[$i]);
 			elseif ($low[$i] == '0' && $high[$i] == '255')
 				$ip[$i] = '*';
@@ -749,12 +750,12 @@ function range2ip($low, $high)
 
 	// Legacy IPv4 stuff.
 	// (count($low) != 4 || count($high) != 4) would not work because $low and $high always contain 8 elements!
-	if ((count($low) != 4 || count($high) != 4) && (count($low) != 8 || count($high) != 8))
+	if ((count($low) !== 4 || count($high) !== 4) && (count($low) !== 8 || count($high) !== 8))
 			return '';
 
 	for ($i = 0; $i < 4; $i++)
 	{
-		if ($low[$i] == $high[$i])
+		if ($low[$i] === $high[$i])
 			$ip[$i] = $low[$i];
 		elseif ($low[$i] == '0' && $high[$i] == '255')
 			$ip[$i] = '*';
@@ -791,7 +792,7 @@ function validateIPBan($ip_array, $fullip = '')
 
 	$db = database();
 
-	if (count($ip_array) == 4 || count($ip_array) == 8)
+	if (count($ip_array) === 4 || count($ip_array) === 8)
 		$values = array(
 			'ip_low1' => $ip_array[0]['low'],
 			'ip_high1' => $ip_array[0]['high'],
@@ -814,7 +815,8 @@ function validateIPBan($ip_array, $fullip = '')
 		$values = array('error' => 'invalid_ip');
 
 	$request = $db->query('', '
-		SELECT bg.id_ban_group, bg.name
+		SELECT 
+			bg.id_ban_group, bg.name
 		FROM {db_prefix}ban_groups AS bg
 		INNER JOIN {db_prefix}ban_items AS bi ON
 			(bi.id_ban_group = bg.id_ban_group)
@@ -862,7 +864,8 @@ function updateBanMembers()
 
 	// Start by getting all active bans - it's quicker doing this in parts...
 	$db->fetchQuery('
-		SELECT bi.id_member, bi.email_address
+		SELECT 
+			bi.id_member, bi.email_address
 		FROM {db_prefix}ban_items AS bi
 			INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group)
 		WHERE (bi.id_member > {int:no_member} OR bi.email_address != {string:blank_string})
@@ -916,7 +919,8 @@ function updateBanMembers()
 	if (!empty($queryPart))
 	{
 		$db->fetchQuery('
-			SELECT mem.id_member, mem.is_activated
+			SELECT 
+				mem.id_member, mem.is_activated
 			FROM {db_prefix}members AS mem
 			WHERE ' . implode(' OR ', $queryPart),
 			$queryValues
@@ -1071,7 +1075,7 @@ function BanCheckUser($memID, $hostname = '', $email = '')
 	$member->loadContext();
 
 	// This is a valid member id, we at least need that
-	if ($member->isEmpty() === false)
+	if (!$member->isEmpty())
 	{
 		$ban_query = array();
 		$ban_query_vars = array(
@@ -1091,7 +1095,7 @@ function BanCheckUser($memID, $hostname = '', $email = '')
 		}
 
 		// Check their email as well...
-		if (strlen($email) != 0)
+		if (strlen($email) !== 0)
 		{
 			$ban_query[] = '({string:email} LIKE bi.email_address)';
 			$ban_query_vars['email'] = $email;

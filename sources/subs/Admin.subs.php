@@ -143,7 +143,7 @@ function getQuickAdminTasks()
 		);
 	}
 
-	if (count($available_admin_tasks) % 2 == 1)
+	if (count($available_admin_tasks) % 2 === 1)
 	{
 		$available_admin_tasks[] = array(
 			'href' => '',
@@ -154,7 +154,7 @@ function getQuickAdminTasks()
 		);
 		$available_admin_tasks[count($available_admin_tasks) - 2]['is_last'] = true;
 	}
-	elseif (count($available_admin_tasks) != 0)
+	elseif (count($available_admin_tasks) !== 0)
 	{
 		$available_admin_tasks[count($available_admin_tasks) - 1]['is_last'] = true;
 		$available_admin_tasks[count($available_admin_tasks) - 2]['is_last'] = true;
@@ -267,7 +267,7 @@ function getFileVersions(&$versionOptions)
 	$this_dir = dir($lang_dir);
 	while ($path = $this_dir->read())
 	{
-		if ($path == '.' || $path == '..')
+		if ($path === '.' || $path === '..')
 			continue;
 
 		if (is_dir($lang_dir . '/' . $path))
@@ -277,7 +277,7 @@ function getFileVersions(&$versionOptions)
 			$this_lang = dir($this_lang_path);
 			while ($entry = $this_lang->read())
 			{
-				if (substr($entry, -4) == '.php' && $entry != 'index.php' && !is_dir($this_lang_path . '/' . $entry))
+				if (substr($entry, -4) === '.php' && $entry !== 'index.php' && !is_dir($this_lang_path . '/' . $entry))
 				{
 					if (!is_writable($this_lang_path . '/' . $entry))
 					{
@@ -339,7 +339,7 @@ function readFileVersions(&$version_info, $directories, $pattern, $recursive = f
 
 	foreach ($directories as $type => $dirname)
 	{
-		if ($recursive === true)
+		if ($recursive)
 		{
 			$iter = new \RecursiveIteratorIterator(
 				new \RecursiveDirectoryIterator($dirname, \RecursiveDirectoryIterator::SKIP_DOTS),
@@ -360,7 +360,7 @@ function readFileVersions(&$version_info, $directories, $pattern, $recursive = f
 			}
 			$entry = $dir->getFilename();
 
-			if (substr($entry, $ext_offset) == $pattern)
+			if (substr($entry, $ext_offset) === $pattern)
 			{
 				if ($dir->isWritable() === false)
 				{
@@ -369,21 +369,9 @@ function readFileVersions(&$version_info, $directories, $pattern, $recursive = f
 				// Read the first 768 bytes from the file.... enough for the header.
 				$header = file_get_contents($dir->getPathname(), false, null, 0, 768);
 
-				if ($recursive === true)
-				{
-					$entry_key = $dir->getPathname();
-				}
-				else
-				{
-					$entry_key = $entry;
-				}
+				$entry_key = $recursive ? $dir->getPathname() : $entry;
 
-				// Look for the version comment in the file header.
-				if (preg_match($version_regex, $header, $match) == 1)
-					$version_info[$type][$entry_key] = $match[1];
-				// It wasn't found, but the file was... show a $unknown_version.
-				else
-					$version_info[$type][$entry_key] = $unknown_version;
+				$version_info[$type][$entry_key] = preg_match($version_regex, $header, $match) == 1 ? $match[1] : $unknown_version;
 			}
 		}
 	}

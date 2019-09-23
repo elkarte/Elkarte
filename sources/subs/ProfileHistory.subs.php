@@ -27,7 +27,8 @@ function getUserErrorCount($where, $where_vars = array())
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*) AS error_count
+		SELECT 
+			COUNT(*) AS error_count
 		FROM {db_prefix}log_errors
 		WHERE ' . $where,
 		$where_vars
@@ -96,7 +97,8 @@ function getIPMessageCount($where, $where_vars = array())
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*) AS message_count
+		SELECT 
+			COUNT(*) AS message_count
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 		WHERE {query_see_board} AND ' . $where,
@@ -174,7 +176,8 @@ function getLoginCount($where, $where_vars = array())
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*) AS message_count
+		SELECT 
+			COUNT(*) AS message_count
 		FROM {db_prefix}member_logins
 		WHERE ' . $where,
 		array(
@@ -202,7 +205,8 @@ function getLogins($where, $where_vars = array())
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT time, ip, ip2
+		SELECT 
+			time, ip, ip2
 		FROM {db_prefix}member_logins
 		WHERE ' . $where . '
 		ORDER BY time DESC',
@@ -235,7 +239,8 @@ function getProfileEditCount($memID)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*) AS edit_count
+		SELECT 
+			COUNT(*) AS edit_count
 		FROM {db_prefix}log_actions
 		WHERE id_log = {int:log_type}
 			AND id_member = {int:owner}',
@@ -302,7 +307,7 @@ function getProfileEdits($start, $items_per_page, $sort, $memID)
 			$action_text = $row['action'];
 
 		// Parse BBC?
-		$parse_bbc = isset($context['custom_field_titles'][$row['action']]) && $context['custom_field_titles'][$row['action']]['parse_bbc'] ? true : false;
+		$parse_bbc = isset($context['custom_field_titles'][$row['action']]) && $context['custom_field_titles'][$row['action']]['parse_bbc'];
 
 		$edits[] = array(
 			'id' => $row['id_action'],
