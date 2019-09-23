@@ -21,7 +21,7 @@ namespace ElkArte\VerificationControls;
  * Class VerificationControls
  *
  * - Takes care of create the verification controls, do the tests, etc.
- * - Assumes the controls are available under /sources/subs/VerificationControl
+ * - Assumes the controls are available under /sources/ElkArte/VerificationControls/VerificationControl
  *   and implement \ElkArte\VerificationControl\ControlInterface
  * - It also provides a static method to load the available verifications (admin)
  *
@@ -49,6 +49,7 @@ class VerificationControls
 		{
 			$settings['known_verifications'] = self::discoverControls();
 		}
+
 		$this->_known_verifications = json_decode($settings['known_verifications'], true);
 		$this->_verification_options = $verificationOptions;
 		$this->_verification_options['render'] = false;
@@ -115,7 +116,7 @@ class VerificationControls
 	 */
 	protected static function loadFSControls()
 	{
-		$glob = new \GlobIterator(SUBSDIR . '/VerificationControl/*.php', \FilesystemIterator::SKIP_DOTS);
+		$glob = new \GlobIterator(SOURCEDIR . '/ElkArte/VerificationControls/VerificationControl/*.php', \FilesystemIterator::SKIP_DOTS);
 		$foundControls = array();
 
 		foreach ($glob as $file)
