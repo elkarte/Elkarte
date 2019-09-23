@@ -25,7 +25,7 @@ use ElkArte\User;
  *
  * What it does:
  *
- * - Requires the GD extension.
+ * - Requires the GD2 extension.
  * - Uses a random font for each letter from default_theme_dir/fonts.
  * - Outputs a png if possible, otherwise a gif.
  *
@@ -36,9 +36,10 @@ use ElkArte\User;
  */
 function showCodeImage($code)
 {
-	global $gd2, $settings, $modSettings;
+	global $settings, $modSettings;
 
-	if (!checkGD())
+	// No GD, No image code
+	if (!get_extension_funcs('gd'))
 		return false;
 
 	// What type are we going to be doing?
@@ -160,9 +161,9 @@ function showCodeImage($code)
 		{
 			// GD2 handles font size differently.
 			if ($fontSizeRandom)
-				$font_size = $gd2 ? mt_rand(17, 19) : mt_rand(25, 27);
+				$font_size = mt_rand(17, 19);
 			else
-				$font_size = $gd2 ? 17 : 27;
+				$font_size = 17;
 
 			$img_box = imagettfbbox($font_size, 0, $settings['default_theme_dir'] . '/fonts/' . $ttfont_list[$character['font']], $character['id']);
 
@@ -180,7 +181,7 @@ function showCodeImage($code)
 	}
 
 	// Create an image.
-	$code_image = $gd2 ? imagecreatetruecolor($total_width, $max_height) : imagecreate($total_width, $max_height);
+	$code_image = imagecreatetruecolor($total_width, $max_height);
 
 	// Draw the background.
 	$bg_color = imagecolorallocate($code_image, $background_color[0], $background_color[1], $background_color[2]);
@@ -252,9 +253,9 @@ function showCodeImage($code)
 			{
 				// GD2 handles font size differently.
 				if ($fontSizeRandom)
-					$font_size = $gd2 ? mt_rand(17, 19) : mt_rand(18, 25);
+					$font_size = mt_rand(17, 19);
 				else
-					$font_size = $gd2 ? 18 : 24;
+					$font_size = 18;
 
 				// Work out the sizes - also fix the character width cause TTF not quite so wide!
 				$font_x = $fontHorSpace === 'minus' && $cur_x > 0 ? $cur_x - 3 : $cur_x + 5;
@@ -285,7 +286,7 @@ function showCodeImage($code)
 
 			if (!$can_do_ttf)
 			{
-				$char_image = $gd2 ? imagecreatetruecolor($character['width'], $character['height']) : imagecreate($character['width'], $character['height']);
+				$char_image = imagecreatetruecolor($character['width'], $character['height']);
 				$char_bgcolor = imagecolorallocate($char_image, $background_color[0], $background_color[1], $background_color[2]);
 				imagefilledrectangle($char_image, 0, 0, $character['width'] - 1, $character['height'] - 1, $char_bgcolor);
 				imagechar($char_image, $loaded_fonts[$character['font']], 0, 0, $character['id'], imagecolorallocate($char_image, $char_fg_color[0], $char_fg_color[1], $char_fg_color[2]));
