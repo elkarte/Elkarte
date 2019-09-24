@@ -77,13 +77,14 @@ class UserSettings extends \ElkArte\ValuesContainerReadOnly
 	}
 
 	/**
-	 * Updates total_time_logged_in
+	 * Returns the true activation status of an account
 	 *
-	 * @param int $increment_offset
+	 * @param bool $strip_ban
+	 * @return int
 	 */
 	public function getActivationStatus($strip_ban = true)
 	{
-		return $this->is_activated > UserSettingsLoader::BAN_OFFSET ? $this->is_activated - UserSettingsLoader::BAN_OFFSET : $this->is_activated;
+		return (int) $this->is_activated > UserSettingsLoader::BAN_OFFSET ? $this->is_activated - UserSettingsLoader::BAN_OFFSET : $this->is_activated;
 	}
 
 	/**
@@ -149,7 +150,7 @@ class UserSettings extends \ElkArte\ValuesContainerReadOnly
 	 * - returns an error identifier if the password is invalid.
 	 *
 	 * @param string $password
-	 * @return bool true or false
+	 * @return bool
 	 */
 	public function validatePassword($password)
 	{

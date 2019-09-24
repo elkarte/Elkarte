@@ -9,7 +9,6 @@
  *
  * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- *
  * copyright:	2004-2011, GreyWyvern - All rights reserved.
  *
  * @version 2.0 dev
@@ -29,8 +28,8 @@ class Query extends AbstractQuery
 	 * {@inheritDoc}
 	 */
 	public function fix_prefix($db_prefix, $db_name)
- 	{
-    	return is_numeric(substr($db_prefix, 0, 1)) ? $db_name . '.' . $db_prefix : '`' . $db_name . '`.' . $db_prefix;
+	{
+		return is_numeric(substr($db_prefix, 0, 1)) ? $db_name . '.' . $db_prefix : '`' . $db_name . '`.' . $db_prefix;
  	}
 
 	/**

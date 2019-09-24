@@ -1,12 +1,14 @@
 <?php
 
 /**
+ * This file does all of the data loading for members.
+ *
  * @package   ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -25,9 +27,9 @@ class UserSettingsLoader
 	/**
 	 * @var mixed|string
 	 */
- 	public $member_name;
+	public $member_name;
 
- 	/**
+	/**
 	 * @var int
 	 */
 	const HASH_LENGTH = 4;
@@ -160,7 +162,7 @@ class UserSettingsLoader
 	}
 
 	/**
-	 * Checkes the provided password is the same as the one in the database.
+	 * Checks the provided password is the same as the one in the database.
 	 *
 	 * @param string $password
 	 * @return bool
@@ -185,6 +187,9 @@ class UserSettingsLoader
 	 *
 	 * @param bool $undelete - whether the current request is to revert the
 	 *                         request to delete the account or not
+	 *
+	 * @return bool
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function checkActivation($undelete)
 	{
@@ -202,38 +207,45 @@ class UserSettingsLoader
 		if ($activation_status == 5)
 		{
 			$context['login_errors'][] = $txt['coppa_no_concent'] . ' <a href="' . getUrl('action', ['action' => 'register', 'sa' => 'coppa', 'member' => $this->settings['id_member']]) . '">' . $txt['coppa_need_more_details'] . '</a>';
+
 			return false;
 		}
+
 		// Awaiting approval still?
-		elseif ($activation_status == 3)
+		if ($activation_status == 3)
 		{
 			throw new \ElkArte\Exceptions\Exception('still_awaiting_approval', 'user');
 		}
+
 		// Awaiting deletion, changed their mind?
-		elseif ($activation_status == 4)
+		if ($activation_status == 4)
 		{
 			if ($undelete)
 			{
 				require_once(SUBSDIR . '/Members.subs.php');
 				updateMemberData($this->settings['id_member'], array('is_activated' => 1));
 				updateSettings(array('unapprovedMembers' => ($modSettings['unapprovedMembers'] > 0 ? $modSettings['unapprovedMembers'] - 1 : 0)));
+
+				return true;
 			}
-			else
-			{
-				$context['disable_login_hashing'] = true;
-				$context['login_errors'][] = $txt['awaiting_delete_account'];
-				$context['login_show_undelete'] = true;
-				return false;
-			}
+
+			$context['disable_login_hashing'] = true;
+			$context['login_errors'][] = $txt['awaiting_delete_account'];
+			$context['login_show_undelete'] = true;
+
+			return false;
 		}
+
 		// Standard activation?
-		elseif ($activation_status != 1)
+		if ($activation_status != 1)
 		{
 			\ElkArte\Errors\Errors::instance()->log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . $this->settings['member_name'] . '</span>', false);
 
 			$context['login_errors'][] = $txt['activate_not_completed1'] . ' <a class="linkbutton" href="' . getUrl('action', ['action' => 'register', 'sa' => 'activate', 'resend', 'u' => $this->settings['id_member']]) . '">' . $txt['activate_not_completed2'] . '</a>';
+
 			return false;
 		}
+
 		return true;
 	}
 
@@ -294,6 +306,7 @@ class UserSettingsLoader
 		{
 			$user_info['query_see_board'] = '((FIND_IN_SET(' . implode(', b.member_groups) != 0 OR FIND_IN_SET(', $user_info['groups']) . ', b.member_groups) != 0)' . (!empty($modSettings['deny_boards_access']) ? ' AND (FIND_IN_SET(' . implode(', b.deny_member_groups) = 0 AND FIND_IN_SET(', $user_info['groups']) . ', b.deny_member_groups) = 0)' : '') . (isset($user_info['mod_cache']) ? ' OR ' . $user_info['mod_cache']['mq'] : '') . ')';
 		}
+
 		$this->db->setSeeBoard($user_info['query_see_board']);
 
 		// Build the list of boards they WANT to see.
@@ -322,11 +335,11 @@ class UserSettingsLoader
 	protected function buildAvatarArray()
 	{
 		return array_merge([
-				'url' => $this->settings->avatar(''),
-				'filename' => $this->settings->getEmpty('filename', ''),
-				'custom_dir' => $this->settings['attachment_type'] == 1,
-				'id_attach' => (int) $this->settings->id_attach
-			], determineAvatar($this->settings));
+			'url' => $this->settings->avatar(''),
+			'filename' => $this->settings->getEmpty('filename', ''),
+			'custom_dir' => $this->settings['attachment_type'] == 1,
+			'id_attach' => (int) $this->settings->id_attach
+		], determineAvatar($this->settings));
 	}
 
 	/**
@@ -334,6 +347,8 @@ class UserSettingsLoader
 	 * Checks the current user setting, the $_GET['language'], the session and $modSettings
 	 *
 	 * @param mixed[] $user_info
+	 *
+	 * @return string
 	 */
 	protected function getLanguage()
 	{
@@ -357,6 +372,7 @@ class UserSettingsLoader
 				$user_lang = strtr($_SESSION['language'], './\\:', '____');
 			}
 		}
+
 		return $user_lang;
 	}
 
@@ -396,7 +412,9 @@ class UserSettingsLoader
 				$this->settings->updateLastLogin();
 
 				if ($this->cache->levelHigherThan(1))
+				{
 					$this->cache->put('user_settings-' . $this->id, $this->settings->toArray(), 60);
+				}
 
 				$this->cache->put('user_last_visit-' . $this->id, $_SESSION['id_msg_last_visit'], 5 * 3600);
 			}
@@ -426,7 +444,9 @@ class UserSettingsLoader
 
 		// Because history has proven that it is possible for groups to go bad - clean up in case.
 		foreach ($user_info['groups'] as $k => $v)
+		{
 			$user_info['groups'][$k] = (int) $v;
+		}
 
 		// This is a logged in user, so definitely not a spider.
 		$user_info['possibly_robot'] = false;
@@ -459,13 +479,19 @@ class UserSettingsLoader
 		$this->initSettings([]);
 
 		if (isset($_COOKIE[$cookiename]))
+		{
 			$_COOKIE[$cookiename] = '';
+		}
 
 		// Create a login token if it doesn't exist yet.
 		if (!isset($_SESSION['token']['post-login']))
+		{
 			createToken('login');
+		}
 		else
-			list ($context['login_token_var'],,, $context['login_token']) = $_SESSION['token']['post-login'];
+		{
+			list ($context['login_token_var'], , , $context['login_token']) = $_SESSION['token']['post-login'];
+		}
 
 		// Do we perhaps think this is a search robot? Check every five minutes just in case...
 		if ((!empty($modSettings['spider_mode']) || !empty($modSettings['spider_group'])) && (!isset($_SESSION['robot_check']) || $_SESSION['robot_check'] < time() - 300))
@@ -474,7 +500,9 @@ class UserSettingsLoader
 			$user_info['possibly_robot'] = spiderCheck();
 		}
 		elseif (!empty($modSettings['spider_mode']))
+		{
 			$user_info['possibly_robot'] = isset($_SESSION['id_robot']) ? $_SESSION['id_robot'] : 0;
+		}
 		// If we haven't turned on proper spider hunts then have a guess!
 		else
 		{
@@ -490,6 +518,7 @@ class UserSettingsLoader
 	 *
 	 * @param bool $already_verified
 	 * @param string $session_password
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function loadUserData($already_verified, $session_password)
 	{
