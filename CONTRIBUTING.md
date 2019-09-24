@@ -54,7 +54,7 @@ The more eyes are on the code, on the PRs, the better: one can always spot somet
 Code reviews can be made from the github web interface, or by checking out of the code pulled in locally. You can also test the PRs. Please do, express your objections or approval, fix things or report them.
 
 ## Quick commands on how to pull in PRs:
-https://gist.github.com/3342247
+https://gist.github.com/piscisaureus/3342247
 
 ## Developer Documentation
 * Coding standards documentation: [Coding standards](https://github.com/elkarte/Elkarte/wiki/Coding-Standards)
