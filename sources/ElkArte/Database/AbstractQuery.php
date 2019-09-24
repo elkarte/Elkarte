@@ -9,7 +9,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause (see accompanying LICENSE.txt file)
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  *
  * @version 2.0 dev
  *
@@ -149,6 +149,7 @@ abstract class AbstractQuery implements QueryInterface
 
 	/**
 	 * Public setter for the string that defines which boards the user can see.
+	 *
 	 * @param string $string
 	 */
 	public function setSeeBoard($string)
@@ -158,6 +159,7 @@ abstract class AbstractQuery implements QueryInterface
 
 	/**
 	 * Public setter for the string that defines which boards the user want to see.
+	 *
 	 * @param string $string
 	 */
 	public function setWannaSeeBoard($string)
@@ -237,7 +239,7 @@ abstract class AbstractQuery implements QueryInterface
 				return $replacement;
 			default:
 				$this->error_backtrace('Undefined type used in the database query. (' . $matches[1] . ':' . $matches[2] . ')', '', false, __FILE__, __LINE__);
-			break;
+				break;
 		}
 
 		return '';
@@ -287,14 +289,18 @@ abstract class AbstractQuery implements QueryInterface
 		$is_numeric = array_filter(array_keys($values), 'is_numeric');
 
 		if (!empty($is_numeric))
+		{
 			return array_combine($keys, $values);
+		}
 		else
 		{
 			$combined = array();
 			foreach ($keys as $key)
 			{
 				if (isset($values[$key]))
+				{
 					$combined[$key] = $values[$key];
+				}
 			}
 
 			// @todo should throw an E_WARNING if count($combined) != count($keys)
@@ -313,7 +319,10 @@ abstract class AbstractQuery implements QueryInterface
 	protected function _replaceInt($identifier, $replacement)
 	{
 		if (!is_numeric($replacement) || (string) $replacement !== (string) (int) $replacement)
+		{
 			$this->error_backtrace('Wrong value type sent to the database. Integer expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+		}
+
 		return (string) (int) $replacement;
 	}
 
@@ -327,25 +336,29 @@ abstract class AbstractQuery implements QueryInterface
 	 */
 	protected function _replaceArrayInt($identifier, $replacement)
 	{
-			if (is_array($replacement))
+		if (is_array($replacement))
+		{
+			if (empty($replacement))
 			{
-				if (empty($replacement))
-					$this->error_backtrace('Database error, given array of integer values is empty. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+				$this->error_backtrace('Database error, given array of integer values is empty. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+			}
 
-				foreach ($replacement as $key => $value)
+			foreach ($replacement as $key => $value)
+			{
+				if (!is_numeric($value) || (string) $value !== (string) (int) $value)
 				{
-					if (!is_numeric($value) || (string) $value !== (string) (int) $value)
-						$this->error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-
-					$replacement[$key] = (string) (int) $value;
+					$this->error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
 				}
 
-				return implode(', ', $replacement);
+				$replacement[$key] = (string) (int) $value;
 			}
-			else
-			{
-				$this->error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-			}
+
+			return implode(', ', $replacement);
+		}
+		else
+		{
+			$this->error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+		}
 	}
 
 	/**
@@ -465,9 +478,13 @@ abstract class AbstractQuery implements QueryInterface
 	protected function _replaceDate($identifier, $replacement)
 	{
 		if (preg_match('~^(\d{4})-([0-1]?\d)-([0-3]?\d)$~', $replacement, $date_matches) === 1)
+		{
 			return sprintf('\'%04d-%02d-%02d\'', $date_matches[1], $date_matches[2], $date_matches[3]);
+		}
 		else
+		{
 			$this->error_backtrace('Wrong value type sent to the database. Date expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+		}
 	}
 
 	/**
@@ -481,7 +498,10 @@ abstract class AbstractQuery implements QueryInterface
 	protected function _replaceFloat($identifier, $replacement)
 	{
 		if (!is_numeric($replacement))
+		{
 			$this->error_backtrace('Wrong value type sent to the database. Floating point number expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+		}
+
 		return (string) (float) $replacement;
 	}
 
@@ -509,7 +529,8 @@ abstract class AbstractQuery implements QueryInterface
 	 *
 	 * @param string $db_string
 	 * @param mixed $db_values
-	 * @return null|string|string[]
+	 * @return string
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _prepareQuery($db_string, $db_values)
 	{
@@ -546,6 +567,7 @@ abstract class AbstractQuery implements QueryInterface
 	 * Tracks the initial status (time, file/line, query) for performance evaluation.
 	 *
 	 * @param string $db_string
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _preQueryDebug($db_string)
 	{
@@ -597,6 +619,7 @@ abstract class AbstractQuery implements QueryInterface
 	 *
 	 * @param string $db_string
 	 * @param string $escape_char
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	protected function _doSanityCheck($db_string, $escape_char)
 	{
@@ -612,7 +635,9 @@ abstract class AbstractQuery implements QueryInterface
 			{
 				$pos = strpos($db_string, '\'', $pos + 1);
 				if ($pos === false)
+				{
 					break;
+				}
 				$clean .= substr($db_string, $old_pos, $pos - $old_pos);
 
 				while (true)
@@ -621,7 +646,9 @@ abstract class AbstractQuery implements QueryInterface
 					$pos2 = strpos($db_string, $escape_char, $pos + 1);
 
 					if ($pos1 === false)
+					{
 						break;
+					}
 					elseif ($pos2 === false || $pos2 > $pos1)
 					{
 						$pos = $pos1;
@@ -640,12 +667,18 @@ abstract class AbstractQuery implements QueryInterface
 
 			// Comments?  We don't use comments in our queries, we leave 'em outside!
 			if (strpos($clean, '/*') > 2 || strpos($clean, '--') !== false || strpos($clean, ';') !== false)
+			{
 				$fail = true;
+			}
 			// Trying to change passwords, slow us down, or something?
 			elseif (strpos($clean, 'sleep') !== false && preg_match('~(^|[^a-z])sleep($|[^[_a-z])~s', $clean) != 0)
+			{
 				$fail = true;
+			}
 			elseif (strpos($clean, 'benchmark') !== false && preg_match('~(^|[^a-z])benchmark($|[^[a-z])~s', $clean) != 0)
+			{
 				$fail = true;
+			}
 
 			if (!empty($fail) && class_exists('\\ElkArte\\Errors\\Errors'))
 			{
@@ -670,7 +703,9 @@ abstract class AbstractQuery implements QueryInterface
 	public function error_backtrace($error_message, $log_message = '', $error_type = false, $file = null, $line = null)
 	{
 		if (empty($log_message))
+		{
 			$log_message = $error_message;
+		}
 
 		foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $step)
 		{
@@ -690,7 +725,9 @@ abstract class AbstractQuery implements QueryInterface
 
 		// A special case - we want the file and line numbers for debugging.
 		if ($error_type == 'return')
+		{
 			return array($file, $line);
+		}
 
 		// Is always a critical error.
 		if (class_exists('\\ElkArte\\Errors\\Errors'))
@@ -703,9 +740,13 @@ abstract class AbstractQuery implements QueryInterface
 			throw new \ElkArte\Exceptions\Exception([false, $error_message], false);
 		}
 		elseif ($error_type)
+		{
 			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''), $error_type);
+		}
 		else
+		{
 			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''));
+		}
 
 		return array('', '');
 	}
@@ -722,9 +763,11 @@ abstract class AbstractQuery implements QueryInterface
 		);
 
 		if ($translate_human_wildcards)
+		{
 			$replacements += array(
 				'*' => '%',
 			);
+		}
 
 		return strtr($string, $replacements);
 	}
@@ -829,6 +872,7 @@ abstract class AbstractQuery implements QueryInterface
 
 	/**
 	 * Temporary function to support migration to the new schema of the db layer
+	 *
 	 * @deprecated since 2.0
 	 */
 	public function fetch_row($result)
@@ -846,6 +890,7 @@ abstract class AbstractQuery implements QueryInterface
 
 	/**
 	 * Temporary function to support migration to the new schema of the db layer
+	 *
 	 * @deprecated since 2.0
 	 */
 	public function fetch_assoc($result)
@@ -863,6 +908,7 @@ abstract class AbstractQuery implements QueryInterface
 
 	/**
 	 * Temporary function to support migration to the new schema of the db layer
+	 *
 	 * @deprecated since 2.0
 	 */
 	public function free_result($result)
@@ -880,6 +926,7 @@ abstract class AbstractQuery implements QueryInterface
 
 	/**
 	 * Temporary function to supoprt migration to the new schema of the db layer
+	 *
 	 * @deprecated since 2.0
 	 */
 	public function affected_rows()
@@ -890,6 +937,7 @@ abstract class AbstractQuery implements QueryInterface
 
 	/**
 	 * Temporary function to support migration to the new schema of the db layer
+	 *
 	 * @deprecated since 2.0
 	 */
 	public function num_rows($result)
@@ -907,6 +955,7 @@ abstract class AbstractQuery implements QueryInterface
 
 	/**
 	 * Temporary function to support migration to the new schema of the db layer
+	 *
 	 * @deprecated since 2.0
 	 */
 	public function num_fields($result)
@@ -924,6 +973,7 @@ abstract class AbstractQuery implements QueryInterface
 
 	/**
 	 * Temporary function to support migration to the new schema of the db layer
+	 *
 	 * @deprecated since 2.0
 	 */
 	public function insert_id($table)
@@ -934,6 +984,7 @@ abstract class AbstractQuery implements QueryInterface
 
 	/**
 	 * Temporary function to support migration to the new schema of the db layer
+	 *
 	 * @deprecated since 2.0
 	 */
 	public function data_seek($result, $counter)
@@ -945,6 +996,7 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * Temporary function: I'm not sure this is the best place to have it, though it was
 	 * convenient while fixing other issues.
+	 *
 	 * @deprecated since 2.0
 	 */
 	public function supportMediumtext()
@@ -954,6 +1006,7 @@ abstract class AbstractQuery implements QueryInterface
 
 	/**
 	 * Temporary function to support migration to the new schema of the db layer
+	 *
 	 * @deprecated since 2.0
 	 */
 	abstract public function list_tables($db_name_str = false, $filter = false);
