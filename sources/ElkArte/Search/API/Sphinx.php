@@ -17,6 +17,10 @@
 
 namespace ElkArte\Search\API;
 
+use ElkArte\Cache\Cache;
+use ElkArte\Errors\Errors;
+use Elkarte\User;
+
 /**
  * SearchAPI-Sphinx.class.php, Sphinx API,
  *
@@ -147,9 +151,10 @@ class Sphinx extends AbstractAPI
 		// Only request the results if they haven't been cached yet.
 		$cached_results = array();
 		$cache_key = 'search_results_' . md5(User::$info->query_see_board . '_' . $context['params']);
-		if (!\ElkArte\Cache\Cache::instance()->getVar($cached_results, $cache_key))
+		if (!Cache::instance()->getVar($cached_results, $cache_key))
 		{
-			// The API communicating with the search daemon.
+			// The API communicating with the search daemon, this file is part of Sphinix and not distributed
+			// Elkarte
 			require_once(SOURCEDIR . '/sphinxapi.php');
 
 			// Create an instance of the sphinx client and set a few options.
@@ -257,10 +262,10 @@ class Sphinx extends AbstractAPI
 				// Just log the error.
 				if ($mySphinx->GetLastError())
 				{
-					\ElkArte\Errors\Errors::instance()->log_error($mySphinx->GetLastError());
+					Errors::instance()->log_error($mySphinx->GetLastError());
 				}
 
-				\ElkArte\Errors\Errors::instance()->fatal_lang_error('error_no_search_daemon');
+				Errors::instance()->fatal_lang_error('error_no_search_daemon');
 			}
 
 			// Get the relevant information from the search results.
@@ -283,7 +288,7 @@ class Sphinx extends AbstractAPI
 			}
 
 			// Store the search results in the cache.
-			\ElkArte\Cache\Cache::instance()->put($cache_key, $cached_results, 600);
+			Cache::instance()->put($cache_key, $cached_results, 600);
 		}
 
 		$participants = array();

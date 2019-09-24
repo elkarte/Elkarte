@@ -17,6 +17,8 @@
 
 namespace ElkArte\Search\API;
 
+use ElkArte\Cache\Cache;
+use ElkArte\Errors\Errors;
 use ElkArte\User;
 
 /**
@@ -144,7 +146,7 @@ class Sphinxql extends AbstractAPI
 		// Only request the results if they haven't been cached yet.
 		$cached_results = array();
 		$cache_key = 'searchql_results_' . md5(User::$info->query_see_board . '_' . $context['params']);
-		if (!\ElkArte\Cache\Cache::instance()->getVar($cached_results, $cache_key))
+		if (!Cache::instance()->getVar($cached_results, $cache_key))
 		{
 			// Create an instance of the sphinx client and set a few options.
 			$mySphinx = @mysqli_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']), '', '', '', (int) $modSettings['sphinxql_searchd_port']);
@@ -152,7 +154,7 @@ class Sphinxql extends AbstractAPI
 			// No connection, daemon not running?  log the error
 			if ($mySphinx === false)
 			{
-				\ElkArte\Errors\Errors::instance()->fatal_lang_error('error_no_search_daemon');
+				Errors::instance()->fatal_lang_error('error_no_search_daemon');
 			}
 
 			// Compile different options for our query
@@ -237,10 +239,10 @@ class Sphinxql extends AbstractAPI
 				// Just log the error.
 				if (mysqli_error($mySphinx) !== '')
 				{
-					\ElkArte\Errors\Errors::instance()->log_error(mysqli_error($mySphinx));
+					Errors::instance()->log_error(mysqli_error($mySphinx));
 				}
 
-				\ElkArte\Errors\Errors::instance()->fatal_lang_error('error_no_search_daemon');
+				Errors::instance()->fatal_lang_error('error_no_search_daemon');
 			}
 
 			// Get the relevant information from the search results.
@@ -278,7 +280,7 @@ class Sphinxql extends AbstractAPI
 			$cached_results['num_results'] = count($cached_results['matches']);
 
 			// Store the search results in the cache.
-			\ElkArte\Cache\Cache::instance()->put($cache_key, $cached_results, 600);
+			Cache::instance()->put($cache_key, $cached_results, 600);
 		}
 
 		$participants = array();
