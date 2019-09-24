@@ -139,7 +139,6 @@ class TestFiles extends \PHPUnit\Framework\TestCase
  \*
  \* This file contains code covered by:
  \* copyright:\s+20\d\d Simple Machines (?:Forum )?\(http:\/\/www\.simplemachines\.org\)(
- \*
  \* copyright:\s+?2004-2011, GreyWyvern - All rights reserved\.)?
  \*
  \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)?
