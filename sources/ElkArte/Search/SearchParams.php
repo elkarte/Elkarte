@@ -483,6 +483,11 @@ class SearchParams extends \ElkArte\ValuesContainer
 		}
 	}
 
+	/**
+	 * Return the current set of search details
+	 *
+	 * @return string[]
+	 */
 	public function get()
 	{
 		return $this->_search_params;

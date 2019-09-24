@@ -563,7 +563,7 @@ class ManageSearch extends \ElkArte\AbstractController
 			// Try to connect via Sphinx API?
 			if (empty($modSettings['search_index']) || $modSettings['search_index'] === 'Sphinx')
 			{
-				// This is included with sphinx
+				// This is included with sphinx and not distrubuted with ElkArte
 				if (file_exists(SOURCEDIR . '/sphinxapi.php'))
 				{
 					include_once(SOURCEDIR . '/sphinxapi.php');

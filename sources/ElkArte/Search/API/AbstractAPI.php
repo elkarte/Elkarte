@@ -45,7 +45,7 @@ abstract class AbstractAPI
 	protected $_excludedWords = array();
 
 	/**
-	 * 
+	 * Number of hits
 	 * @var int
 	 */
 	protected $_num_results = 0;
@@ -69,7 +69,7 @@ abstract class AbstractAPI
 	protected $config = null;
 
 	/**
-	 *
+	 * Parameters of the search
 	 * @var null|\ElkArte\Search\SearchParams
 	 */
 	protected $_searchParams = null;
@@ -112,15 +112,15 @@ abstract class AbstractAPI
 
 	/**
 	 * Database instance
-	 * @var \ElkArte\Database\QueryInterface|null
+	 * @var \ElkArte\Database\QueryInterface
 	 */
-	protected $_db = null;
+	protected $_db;
 
 	/**
 	 * Search db instance
-	 * @var \ElkArte\Database\AbstractSearch|null
+	 * @var \ElkArte\Database\AbstractSearch
 	 */
-	protected $_db_search = null;
+	protected $_db_search;
 
 	/**
 	 * Words excluded from indexes
