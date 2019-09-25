@@ -246,7 +246,7 @@ class SearchApiWrapper
 
 		// Try to initialize the API
 		$fqcn = '\\ElkArte\\Search\\API\\' . ucfirst($searchClass);
-		if (class_exists($fqcn) && is_a($fqcn, '\\ElkArte\\Search\\API\\SearchAPI', true))
+		if (class_exists($fqcn) && is_a($fqcn, '\\ElkArte\\Search\\API\\AbstractAPI', true))
 		{
 			// Create an instance of the search API and check it is valid for this version of the software.
 			$this->_searchAPI = new $fqcn($config, $searchParams);
