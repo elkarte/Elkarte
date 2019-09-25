@@ -88,6 +88,7 @@ abstract class Renderer
 	 * Renderer constructor, starts everything.
 	 *
 	 * @param Object $request
+	 * @param Object $user
 	 * @param BodyParserInterface $bodyParser
 	 * @param ValuesContainer $opt
 	 * @throws \Exception
