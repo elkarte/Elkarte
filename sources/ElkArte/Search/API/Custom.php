@@ -17,6 +17,8 @@
 
 namespace ElkArte\Search\API;
 
+use ElkArte\Util;
+
 /**
  * SearchAPI-Custom.class.php, Custom Search API class .. used when custom ElkArte index is used
  *
@@ -55,6 +57,8 @@ class Custom extends Standard
 	{
 		global $modSettings;
 
+		parent::__construct($config, $searchParams);
+
 		// Is this database supported?
 		if (!in_array($this->_db->title(), $this->supported_databases))
 		{
@@ -65,8 +69,7 @@ class Custom extends Standard
 		if (empty($modSettings['search_custom_index_config']))
 			return;
 
-		parent::__construct($config, $searchParams);
-		$this->indexSettings = \ElkArte\Util::unserialize($modSettings['search_custom_index_config']);
+		$this->indexSettings = Util::unserialize($modSettings['search_custom_index_config']);
 
 		$this->bannedWords = empty($modSettings['search_stopwords']) ? array() : explode(',', $modSettings['search_stopwords']);
 		$this->min_word_length = $this->indexSettings['bytes_per_word'];
@@ -119,7 +122,7 @@ class Custom extends Standard
 		{
 			foreach ($subwords as $subword)
 			{
-				if (\ElkArte\Util::strlen($subword) >= $this->min_word_length && !in_array($subword, $this->bannedWords))
+				if (Util::strlen($subword) >= $this->min_word_length && !in_array($subword, $this->bannedWords))
 				{
 					$wordsSearch['indexed_words'][] = $subword;
 					if ($isExcluded !== '')
@@ -247,7 +250,7 @@ class Custom extends Standard
 
 		$db = database();
 
-		$customIndexSettings = \ElkArte\Util::unserialize($modSettings['search_custom_index_config']);
+		$customIndexSettings = Util::unserialize($modSettings['search_custom_index_config']);
 
 		$inserts = array();
 		foreach (text2words($msgOptions['body'], $customIndexSettings['bytes_per_word'], true) as $word)
@@ -277,7 +280,7 @@ class Custom extends Standard
 
 		if (isset($msgOptions['body']))
 		{
-			$customIndexSettings = \ElkArte\Util::unserialize($modSettings['search_custom_index_config']);
+			$customIndexSettings = Util::unserialize($modSettings['search_custom_index_config']);
 			$stopwords = empty($modSettings['search_stopwords']) ? array() : explode(',', $modSettings['search_stopwords']);
 			$old_body = isset($msgOptions['old_body']) ? $msgOptions['old_body'] : '';
 

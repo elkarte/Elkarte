@@ -42,7 +42,7 @@ class Standard extends AbstractAPI
 	public $is_supported = true;
 
 	/**
-	 * 
+	 *
 	 * @var object
 	 */
 	protected $_search_cache = null;
@@ -55,12 +55,14 @@ class Standard extends AbstractAPI
 
 	/**
 	 * Wrapper for searchQuery of the SearchAPI
+	 *
 	 * @param string[] $search_words
 	 * @param string[] $excluded_words
 	 * @param bool[] $participants
 	 * @param string[] $search_results
 	 *
 	 * @return mixed[]
+	 * @throws \Exception
 	 */
 	public function searchQuery($search_words, $excluded_words, &$participants, &$search_results)
 	{
