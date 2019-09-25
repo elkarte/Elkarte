@@ -442,10 +442,8 @@ function resetPassword($memID, $username = null)
 	$newPassword = $tokenizer->generate_hash(14);
 
 	// Create a db hash for the generated password
-	require_once(EXTDIR . '/PasswordHash.php');
-	$t_hasher = new PasswordHash(8, false);
 	$newPassword_sha256 = hash('sha256', strtolower($user) . $newPassword);
-	$db_hash = $t_hasher->HashPassword($newPassword_sha256);
+	$db_hash = password_hash($newPassword_sha256, PASSWORD_BCRYPT, ['cost' => 8]);
 
 	// Do some checks on the username if needed.
 	require_once(SUBSDIR . '/Members.subs.php');
@@ -591,19 +589,6 @@ function validatePassword($password, $username, $restrict_in = array())
  */
 function validateLoginPassword(&$password, $hash, $user = '', $returnhash = false)
 {
-	// Our hashing controller
-	require_once(EXTDIR . '/PasswordHash.php');
-
-	// Base-2 logarithm of the iteration count used for password stretching, the
-	// higher the number the more secure and CPU time consuming
-	$hash_cost_log2 = 10;
-
-	// Do we require the hashes to be portable to older systems (less secure)?
-	$hash_portable = false;
-
-	// Get an instance of the hasher
-	$hasher = new PasswordHash($hash_cost_log2, $hash_portable);
-
 	// If the password is not 64 characters, lets make it a (SHA-256)
 	if (strlen($password) !== 64)
 	{
@@ -613,23 +598,13 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
 	// They need a password hash, something to save in the db?
 	if ($returnhash)
 	{
-		$passhash = $hasher->HashPassword($password);
+		$passhash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 10]);
 
-		// Something is not right, we can not generate a valid hash that's <20 characters
-		if (strlen($passhash) < 20)
-		{
-			$passhash = false;
-		}
-	}
-	// Or doing a password check?
-	else
-	{
-		$passhash = (bool) $hasher->CheckPassword($password, $hash);
+		return $passhash;
 	}
 
-	unset($hasher);
-
-	return $passhash;
+	// Doing a password check?
+	return (bool) password_verify($password, $hash);
 }
 
 /**
