@@ -180,6 +180,7 @@ class BoardsTree
 
 		foreach ($this->cat_tree[$catID]['children'] as $id => $node)
 		{
+			$this->boardList[$catID][] = $id;
 			$this->boardList[$catID] = array_merge($this->boardList[$catID], $this->allChildsOf($id));
 		}
 	}
@@ -513,13 +514,13 @@ class BoardsTree
 
 	public function allChildsOf($board_id)
 	{
-		if (empty($this->boards[$board_id]['children']))
+		if (empty($this->boards[$board_id]['tree']['children']))
 		{
 			return [];
 		}
 
 		$boardsList = [];
-		foreach ($this->boards[$board_id]['children'] as $id => $node)
+		foreach ($this->boards[$board_id]['tree']['children'] as $id => $node)
 		{
 			$boardsList[] = $id;
 			$boardsList = array_merge($boardsList, $this->allChildsOf($id));
