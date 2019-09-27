@@ -75,7 +75,7 @@ class Profile extends \ElkArte\AbstractController
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		$this->_memID = currentMemberID();
-		\ElkArte\MembersList::load($this->_memID);
+		\ElkArte\MembersList::load($this->_memID, false, 'profile');
 		$this->_profile = \ElkArte\MembersList::get($this->_memID);
 	}
 
@@ -88,12 +88,12 @@ class Profile extends \ElkArte\AbstractController
 	 */
 	public function action_index()
 	{
-		global $txt, $context, $cur_profile;
-		global $profile_vars, $post_errors;
+		global $txt, $context, $cur_profile, $profile_vars, $post_errors;
 
 		// Don't reload this as we may have processed error strings.
 		if (empty($post_errors))
 			theme()->getTemplates()->loadLanguageFile('Profile');
+
 		theme()->getTemplates()->load('Profile');
 
 		// Trigger profile pre-load event
