@@ -881,7 +881,9 @@ function loadProfileFields($force_reload = false)
 			'preload' => function () {
 				global $modSettings, $context, $txt, $cur_profile;
 
-				$context['member']['smiley_set']['id'] = empty($cur_profile['smiley_set']) ? '' : $cur_profile['smiley_set'];
+				$smiley_set = ['id' => '', 'name' => ''];
+
+				$smiley_set['id'] = empty($cur_profile['smiley_set']) ? '' : $cur_profile['smiley_set'];
 				$context['smiley_sets'] = explode(',', 'none,,' . $modSettings['smiley_sets_known']);
 				$set_names = explode("\n", $txt['smileys_none'] . "\n" . $txt['smileys_forum_board_default'] . "\n" . $modSettings['smiley_sets_names']);
 				foreach ($context['smiley_sets'] as $i => $set)
@@ -889,12 +891,18 @@ function loadProfileFields($force_reload = false)
 					$context['smiley_sets'][$i] = array(
 						'id' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
 						'name' => htmlspecialchars($set_names[$i], ENT_COMPAT, 'UTF-8'),
-						'selected' => $set == $context['member']['smiley_set']['id']
+						'selected' => $set == $smiley_set['id']
 					);
 
 					if ($context['smiley_sets'][$i]['selected'])
-						$context['member']['smiley_set']['name'] = $set_names[$i];
+						$smiley_set['name'] = $set_names[$i];
 				}
+
+				$context['member']['smiley_set'] = [
+					'id' => $smiley_set['id'],
+					'name' => $smiley_set['name']
+				];
+
 				return true;
 			},
 			'input_validate' => function (&$value) {
