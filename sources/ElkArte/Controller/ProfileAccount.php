@@ -238,10 +238,14 @@ class ProfileAccount extends \ElkArte\AbstractController
 			'base_href' => $scripturl . '?action=profile;area=issuewarning;sa=user;u=' . $this->_memID,
 			'default_sort_col' => 'log_time',
 			'get_items' => array(
-				'function' => array($this, 'list_getUserWarnings'),
+				'function' => function ($start, $items_per_page, $sort) {
+					return $this->list_getUserWarnings($start, $items_per_page, $sort);
+				},
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getUserWarningCount'),
+				'function' => function () {
+					return $this->list_getUserWarningCount();
+				},
 			),
 			'columns' => array(
 				'issued_by' => array(

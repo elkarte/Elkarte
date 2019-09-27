@@ -119,14 +119,18 @@ class ProfileHistory extends \ElkArte\AbstractController
 			'base_href' => $scripturl . '?action=profile;area=history;sa=user;u=' . $this->_memID,
 			'default_sort_col' => 'date',
 			'get_items' => array(
-				'function' => array($this, 'list_getUserErrors'),
+				'function' => function ($start, $items_per_page, $sort, $where, $where_vars = array()) {
+					return $this->list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars);
+				},
 				'params' => array(
 					'le.id_member = {int:current_member}',
 					array('current_member' => $this->_memID),
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getUserErrorCount'),
+				'function' => function ($where, $where_vars = array()) {
+					return $this->list_getUserErrorCount($where, $where_vars);
+				},
 				'params' => array(
 					'id_member = {int:current_member}',
 					array('current_member' => $this->_memID),
@@ -273,14 +277,18 @@ class ProfileHistory extends \ElkArte\AbstractController
 			'base_href' => $context['base_url'] . ';searchip=' . $context['ip'],
 			'default_sort_col' => 'date',
 			'get_items' => array(
-				'function' => array($this, 'list_getIPMessages'),
+				'function' => function ($start, $items_per_page, $sort, $where, $where_vars = array()) {
+					return $this->list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars);
+				},
 				'params' => array(
 					'm.poster_ip ' . $ip_string,
 					array('ip_address' => $ip_var),
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getIPMessageCount'),
+				'function' => function ($where, $where_vars = array()) {
+					return $this->list_getIPMessageCount($where, $where_vars);
+				},
 				'params' => array(
 					'm.poster_ip ' . $ip_string,
 					array('ip_address' => $ip_var),
@@ -362,14 +370,18 @@ class ProfileHistory extends \ElkArte\AbstractController
 			'base_href' => $context['base_url'] . ';searchip=' . $context['ip'],
 			'default_sort_col' => 'date2',
 			'get_items' => array(
-				'function' => array($this, 'list_getUserErrors'),
+				'function' => function ($start, $items_per_page, $sort, $where, $where_vars = array()) {
+					return $this->list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars);
+				},
 				'params' => array(
 					'le.ip ' . $ip_string,
 					array('ip_address' => $ip_var),
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getUserErrorCount'),
+				'function' => function ($where, $where_vars = array()) {
+					return $this->list_getUserErrorCount($where, $where_vars);
+				},
 				'params' => array(
 					'ip ' . $ip_string,
 					array('ip_address' => $ip_var),
@@ -493,14 +505,18 @@ class ProfileHistory extends \ElkArte\AbstractController
 			'no_items_label' => $txt['trackLogins_none_found'],
 			'base_href' => $context['base_url'],
 			'get_items' => array(
-				'function' => array($this, 'list_getLogins'),
+				'function' => function ($start, $items_per_page, $sort, $where, $where_vars = array()) {
+					return $this->list_getLogins($start, $items_per_page, $sort, $where, $where_vars);
+				},
 				'params' => array(
 					'id_member = {int:current_member}',
 					array('current_member' => $this->_memID),
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getLoginCount'),
+				'function' => function ($where, $where_vars = array()) {
+					return $this->list_getLoginCount($where, $where_vars);
+				},
 				'params' => array(
 					'id_member = {int:current_member}',
 					array('current_member' => $this->_memID),
@@ -566,10 +582,14 @@ class ProfileHistory extends \ElkArte\AbstractController
 			'base_href' => $scripturl . '?action=profile;area=history;sa=edits;u=' . $this->_memID,
 			'default_sort_col' => 'time',
 			'get_items' => array(
-				'function' => array($this, 'list_getProfileEdits'),
+				'function' => function ($start, $items_per_page, $sort) {
+					return $this->list_getProfileEdits($start, $items_per_page, $sort);
+				},
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getProfileEditCount'),
+				'function' => function () {
+					return $this->list_getProfileEditCount();
+				},
 			),
 			'columns' => array(
 				'action' => array(

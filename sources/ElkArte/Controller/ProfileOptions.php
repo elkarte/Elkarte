@@ -643,7 +643,9 @@ class ProfileOptions extends \ElkArte\AbstractController
 			'base_href' => $scripturl . '?action=profile;u=' . $this->_memID . ';area=notification',
 			'default_sort_col' => 'board_name',
 			'get_items' => array(
-				'function' => array($this, 'list_getBoardNotifications'),
+				'function' => function ($start, $items_per_page, $sort, $memID) {
+					return $this->list_getBoardNotifications($start, $items_per_page, $sort, $memID);
+				},
 				'params' => array(
 					$this->_memID,
 				),
@@ -728,13 +730,17 @@ class ProfileOptions extends \ElkArte\AbstractController
 			'base_href' => $scripturl . '?action=profile;u=' . $this->_memID . ';area=notification',
 			'default_sort_col' => 'last_post',
 			'get_items' => array(
-				'function' => array($this, 'list_getTopicNotifications'),
+				'function' => function ($start, $items_per_page, $sort, $memID) {
+					return $this->list_getTopicNotifications($start, $items_per_page, $sort, $memID);
+				},
 				'params' => array(
 					$this->_memID,
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getTopicNotificationCount'),
+				'function' => function ($memID) {
+					return $this->list_getTopicNotificationCount($memID);
+				},
 				'params' => array(
 					$this->_memID,
 				),

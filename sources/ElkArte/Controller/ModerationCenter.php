@@ -1106,14 +1106,26 @@ class ModerationCenter extends \ElkArte\AbstractController
 			'base_href' => $scripturl . '?action=moderate;area=userwatch;sa=' . ($context['view_posts'] ? 'post' : 'member'),
 			'default_sort_col' => $context['view_posts'] ? '' : 'member',
 			'get_items' => array(
-				'function' => $context['view_posts'] ? array($this, 'list_getWatchedUserPosts') : array($this, 'list_getWatchedUsers'),
+				'function' => $context['view_posts']
+					? function ($start, $items_per_page, $sort, $approve_query, $delete_boards) {
+						return $this->list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards);
+					}
+					: function ($start, $items_per_page, $sort) {
+						return $this->list_getWatchedUsers($start, $items_per_page, $sort);
+					},
 				'params' => array(
 					$approve_query,
 					$delete_boards,
 				),
 			),
 			'get_count' => array(
-				'function' => $context['view_posts'] ? array($this, 'list_getWatchedUserPostsCount') : array($this, 'list_getWatchedUserCount'),
+				'function' => $context['view_posts']
+					? function ($approve_query) {
+						return $this->list_getWatchedUserPostsCount($approve_query);
+					}
+					: function () {
+						return $this->list_getWatchedUserCount();
+					},
 				'params' => array(
 					$approve_query,
 				),
@@ -1302,14 +1314,18 @@ class ModerationCenter extends \ElkArte\AbstractController
 			'base_href' => $scripturl . '?action=moderate;area=warnings;sa=log;' . $context['session_var'] . '=' . $context['session_id'],
 			'default_sort_col' => 'time',
 			'get_items' => array(
-				'function' => array($this, 'list_getWarnings'),
+				'function' => function ($start, $items_per_page, $sort, $query_string, $query_params) {
+					return $this->list_getWarnings($start, $items_per_page, $sort, $query_string, $query_params);
+				},
 				'params' => array(
 					(!empty($search_params['string']) ? ' INSTR({raw:sql_type}, {string:search_string})' : ''),
 					array('sql_type' => $search_params_column, 'search_string' => $search_params['string']),
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getWarningCount'),
+				'function' => function ($query_string, $query_params) {
+					return $this->list_getWarningCount($query_string, $query_params);
+				},
 				'params' => array(
 					(!empty($search_params['string']) ? ' INSTR({raw:sql_type}, {string:search_string})' : ''),
 					array('sql_type' => $search_params_column, 'search_string' => $search_params['string']),
@@ -1450,10 +1466,14 @@ class ModerationCenter extends \ElkArte\AbstractController
 			'base_href' => $scripturl . '?action=moderate;area=warnings;sa=templates;' . $context['session_var'] . '=' . $context['session_id'],
 			'default_sort_col' => 'title',
 			'get_items' => array(
-				'function' => array($this, 'list_getWarningTemplates'),
+				'function' => function ($start, $items_per_page, $sort, $template_type = 'warntpl') {
+					return $this->list_getWarningTemplates($start, $items_per_page, $sort, $template_type);
+				},
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getWarningTemplateCount'),
+				'function' => function ($template_type = 'warntpl') {
+					return $this->list_getWarningTemplateCount($template_type);
+				},
 			),
 			'columns' => array(
 				'title' => array(

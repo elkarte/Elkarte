@@ -715,13 +715,17 @@ class ProfileInfo extends \ElkArte\AbstractController
 			'base_href' => $scripturl . '?action=profile;area=showposts;sa=attach;u=' . $this->_memID,
 			'default_sort_col' => 'filename',
 			'get_items' => array(
-				'function' => array($this, 'list_getAttachments'),
+				'function' => function ($start, $items_per_page, $sort, $boardsAllowed) {
+					return $this->list_getAttachments($start, $items_per_page, $sort, $boardsAllowed);
+				},
 				'params' => array(
 					$boardsAllowed,
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getNumAttachments'),
+				'function' => function ($boardsAllowed) {
+					return $this->list_getNumAttachments($boardsAllowed);
+				},
 				'params' => array(
 					$boardsAllowed,
 				),
@@ -835,10 +839,14 @@ class ProfileInfo extends \ElkArte\AbstractController
 			'base_href' => $scripturl . '?action=profile;area=showposts;sa=unwatchedtopics;u=' . $this->_memID,
 			'default_sort_col' => 'started_on',
 			'get_items' => array(
-				'function' => array($this, 'list_getUnwatched'),
+				'function' => function ($start, $items_per_page, $sort) {
+					return $this->list_getUnwatched($start, $items_per_page, $sort);
+				},
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getNumUnwatched'),
+				'function' => function () {
+					return $this->list_getNumUnwatched();
+				},
 			),
 			'columns' => array(
 				'subject' => array(

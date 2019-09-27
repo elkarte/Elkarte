@@ -159,7 +159,9 @@ class Modlog extends \ElkArte\AbstractController
 			'base_href' => $scripturl . $context['url_start'],
 			'default_sort_col' => 'time',
 			'get_items' => array(
-				'function' => array($this, 'getModLogEntries'),
+				'function' => function ($start, $items_per_page, $sort, $query_string, $query_params, $log_type) {
+					return $this->getModLogEntries($start, $items_per_page, $sort, $query_string, $query_params, $log_type);
+				},
 				'params' => array(
 					(!empty($search_params['string']) ? ' INSTR({raw:sql_type}, {string:search_string})' : ''),
 					array('sql_type' => $search_params_column, 'search_string' => $search_params['string']),
@@ -167,7 +169,9 @@ class Modlog extends \ElkArte\AbstractController
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'getModLogEntryCount'),
+				'function' => function ($query_string, $query_params, $log_type) {
+					return $this->getModLogEntryCount($query_string, $query_params, $log_type);
+				},
 				'params' => array(
 					(!empty($search_params['string']) ? ' INSTR({raw:sql_type}, {string:search_string})' : ''),
 					array('sql_type' => $search_params_column, 'search_string' => $search_params['string']),

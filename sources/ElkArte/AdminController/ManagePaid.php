@@ -614,7 +614,9 @@ class ManagePaid extends \ElkArte\AbstractController
 			'base_href' => $scripturl . '?action=admin;area=paidsubscribe;sa=viewsub;sid=' . $context['sub_id'],
 			'default_sort_col' => 'name',
 			'get_items' => array(
-				'function' => array($this, 'getSubscribedUsers'),
+				'function' => function ($start, $items_per_page, $sort, $id_sub, $search_string, $search_vars) {
+					return $this->getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $search_string, $search_vars);
+				},
 				'params' => array(
 					$context['sub_id'],
 					$search_string,
@@ -622,7 +624,9 @@ class ManagePaid extends \ElkArte\AbstractController
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'getSubscribedUserCount'),
+				'function' => function ($id_sub, $search_string, $search_vars) {
+					return $this->getSubscribedUserCount($id_sub, $search_string, $search_vars);
+				},
 				'params' => array(
 					$context['sub_id'],
 					$search_string,

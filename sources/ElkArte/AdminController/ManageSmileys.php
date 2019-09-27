@@ -1214,7 +1214,9 @@ class ManageSmileys extends \ElkArte\AbstractController
 			'sortable' => true,
 			'base_href' => $scripturl . '?action=admin;area=smileys;sa=editicons',
 			'get_items' => array(
-				'function' => array($this, 'list_fetchMessageIconsDetails'),
+				'function' => function () {
+					return $this->list_fetchMessageIconsDetails();
+				},
 			),
 			'no_items_label' => $txt['icons_no_entries'],
 			'columns' => array(

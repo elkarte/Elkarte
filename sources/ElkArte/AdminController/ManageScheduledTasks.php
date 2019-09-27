@@ -148,7 +148,9 @@ class ManageScheduledTasks extends \ElkArte\AbstractController
 			'title' => $txt['maintain_tasks'],
 			'base_href' => $scripturl . '?action=admin;area=scheduledtasks',
 			'get_items' => array(
-				'function' => array($this, 'list_getScheduledTasks'),
+				'function' => function () {
+					return $this->list_getScheduledTasks();
+				},
 			),
 			'columns' => array(
 				'name' => array(
@@ -353,10 +355,14 @@ class ManageScheduledTasks extends \ElkArte\AbstractController
 			'base_href' => $context['admin_area'] === 'scheduledtasks' ? $scripturl . '?action=admin;area=scheduledtasks;sa=tasklog' : $scripturl . '?action=admin;area=logs;sa=tasklog',
 			'default_sort_col' => 'date',
 			'get_items' => array(
-				'function' => array($this, 'list_getTaskLogEntries'),
+				'function' => function ($start, $items_per_page, $sort) {
+					return $this->list_getTaskLogEntries($start, $items_per_page, $sort);
+				},
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getNumTaskLogEntries'),
+				'function' => function () {
+					return $this->list_getNumTaskLogEntries();
+				},
 			),
 			'columns' => array(
 				'name' => array(

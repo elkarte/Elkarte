@@ -1313,10 +1313,14 @@ class Maintenance extends \ElkArte\AbstractController
 			'base_href' => getUrl('admin', ['action' => 'admin', 'area' => 'maintain', 'sa' => 'hooks', $context['filter_url'], '{session_data}']),
 			'default_sort_col' => 'hook_name',
 			'get_items' => array(
-				'function' => array($this, 'list_getIntegrationHooks'),
+				'function' => function ($start, $items_per_page, $sort) {
+					return $this->list_getIntegrationHooks($start, $items_per_page, $sort);
+				},
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getIntegrationHooksCount'),
+				'function' => function () {
+					return $this->list_getIntegrationHooksCount();
+				},
 			),
 			'no_items_label' => $txt['hooks_no_hooks'],
 			'columns' => array(

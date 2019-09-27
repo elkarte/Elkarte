@@ -302,13 +302,17 @@ class Likes extends \ElkArte\AbstractController
 			'base_href' => getUrl('profile', ['action' => 'profile', 'area' => 'showlikes', 'sa' => 'given', 'u' => $memID, 'name' => $name]),
 			'default_sort_col' => 'subject',
 			'get_items' => array(
-				'function' => array($this, 'list_loadLikesPosts'),
+				'function' => function ($start, $items_per_page, $sort, $memberID) {
+					return $this->list_loadLikesPosts($start, $items_per_page, $sort, $memberID);
+				},
 				'params' => array(
 					$memID,
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getLikesCount'),
+				'function' => function ($memberID, $given) {
+					return $this->list_getLikesCount($memberID, $given);
+				},
 				'params' => array(
 					$memID,
 					true
@@ -403,13 +407,17 @@ class Likes extends \ElkArte\AbstractController
 			'base_href' => getUrl('profile', ['action' => 'profile', 'area' => 'showlikes', 'sa' => 'received', 'u' => $memID, 'name' => $name]),
 			'default_sort_col' => 'subject',
 			'get_items' => array(
-				'function' => array($this, 'list_loadLikesReceived'),
+				'function' => function ($start, $items_per_page, $sort, $memberID) {
+					return $this->list_loadLikesReceived($start, $items_per_page, $sort, $memberID);
+				},
 				'params' => array(
 					$memID,
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getLikesCount'),
+				'function' => function ($memberID, $given) {
+					return $this->list_getLikesCount($memberID, $given);
+				},
 				'params' => array(
 					$memID,
 					false,
@@ -511,13 +519,17 @@ class Likes extends \ElkArte\AbstractController
 			'base_href' => getUrl('action', ['action' => 'likes', 'sa' => 'showWhoLiked', 'msg' => $message]),
 			'default_sort_col' => 'member',
 			'get_items' => array(
-				'function' => array($this, 'list_loadPostLikers'),
+				'function' => function ($start, $items_per_page, $sort, $messageID) {
+					return $this->list_loadPostLikers($start, $items_per_page, $sort, $messageID);
+				},
 				'params' => array(
 					$message,
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getMessageLikeCount'),
+				'function' => function ($messageID) {
+					return $this->list_getMessageLikeCount($messageID);
+				},
 				'params' => array(
 					$message,
 				),
