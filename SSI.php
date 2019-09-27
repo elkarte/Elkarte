@@ -454,7 +454,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 		$include_boards = array();
 	}
 
-	$icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
+	$icon_sources = new \ElkArte\MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
 
 	// Find all the posts in distinct topics. Newer ones will have higher IDs.
 	$request = $db->query('', '
@@ -951,8 +951,8 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 			echo '
 			<tr>
 				<td class="centertext">
-					', $query_members[$member]['link'], '
-					<br />', $query_members[$member]['avatar']['image'], '
+					', $query_members[$id]['link'], '
+					<br />', $query_members[$id]['avatar']['image'], '
 				</td>
 			</tr>';
 		}
@@ -1857,7 +1857,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 	$db->free_result($request);
 
 	// Load the message icons - the usual suspects.
-	$icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
+	$icon_sources = new \ElkArte\MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
 
 	// Find the posts.
 	$indexOptions = array(
@@ -1869,9 +1869,9 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 	);
 
 	require_once(SUBSDIR . '/MessageIndex.subs.php');
-	$request = messageIndexTopics($board, 0, $start, $limit, 'first_post', 't.id_topic', $indexOptions);
+	$topics_info = messageIndexTopics($board, 0, $start, $limit, 'first_post', 't.id_topic', $indexOptions);
 
-	if ($request->hasResults() === false)
+	if (empty($topics_info))
 	{
 		return false;
 	}
@@ -1879,7 +1879,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 	$bbc_parser = \BBC\ParserWrapper::instance();
 
 	$return = array();
-	foreach ($request as $row)
+	foreach ($topics_info as $row)
 	{
 		if (!isset($row[$preview . '_body']))
 		{
@@ -1910,7 +1910,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 			'body' => $row['body'],
 			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['num_replies'] . ' ' . ($row['num_replies'] == 1 ? $txt['ssi_comment'] : $txt['ssi_comments']) . '</a>',
-			'replies' => $row['num_replies'],
+			'replies' => comma_format($row['num_replies']),
 			'comment_href' => !empty($row['locked']) ? '' : $scripturl . '?action=post;topic=' . $row['id_topic'] . '.' . $row['num_replies'] . ';last_msg=' . $row['id_last_msg'],
 			'comment_link' => !empty($row['locked']) ? '' : '<a href="' . $scripturl . '?action=post;topic=' . $row['id_topic'] . '.' . $row['num_replies'] . ';last_msg=' . $row['id_last_msg'] . '">' . $txt['ssi_write_comment'] . '</a>',
 			'new_comment' => !empty($row['locked']) ? '' : '<a href="' . $scripturl . '?action=post;topic=' . $row['id_topic'] . '.' . $row['num_replies'] . '">' . $txt['ssi_write_comment'] . '</a>',
