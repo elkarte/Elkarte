@@ -784,7 +784,7 @@ class ManageThemes extends \ElkArte\AbstractController
 		}
 
 		// Restore the current theme.
-		new \ElkArte\Themes\ThemeLoader($old_id, false);
+		new \ElkArte\Themes\ThemeLoader($old_id, true);
 
 		$settings = $old_settings;
 
