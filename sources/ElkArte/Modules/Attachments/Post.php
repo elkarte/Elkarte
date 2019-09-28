@@ -63,7 +63,7 @@ class Post extends \ElkArte\Modules\AbstractModule
 
 		if (!empty($modSettings['attachmentEnable']))
 		{
-			self::$_attach_level = $modSettings['attachmentEnable'];
+			self::$_attach_level = (int) $modSettings['attachmentEnable'];
 
 			return array(
 				array('prepare_post', array('\\ElkArte\\Modules\\Attachments\\Post', 'prepare_post'), array()),
