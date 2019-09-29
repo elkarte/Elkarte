@@ -126,6 +126,7 @@ class UserSettingsLoader
 	 * @param string $session_password
 	 *
 	 * @event integrate_user_info
+	 * @throws \ElkArte\Exceptions\Exception
 	 */
 	public function loadUserById($id, $already_verified, $session_password)
 	{
@@ -367,7 +368,7 @@ class UserSettingsLoader
 
 		// Set up the $user_info array.
 		$user_info += array(
-			'id' => $this->id,
+			'id' => (int) $this->id,
 			'username' => $this->member_name,
 			'name' => $this->settings->real_name(''),
 			'email' => $this->settings->email_address(''),

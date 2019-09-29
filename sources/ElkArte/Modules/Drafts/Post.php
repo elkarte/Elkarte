@@ -213,7 +213,7 @@ class Post extends AbstractModule
 	 *
 	 * @param int $member_id
 	 * @param int|bool $id_topic if set, load drafts for the specified topic
-	 * @return false|null
+	 * @return bool|null
 	 */
 	protected function _prepareDraftsContext($member_id, $id_topic = false)
 	{

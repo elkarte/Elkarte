@@ -664,7 +664,7 @@ class Html2BBC
 	 * html: <h1>header</h1>
 	 * bbc: [size=36pt]header[/size]
 	 *
-	 * @param int $level
+	 * @param string $level
 	 * @param string $content
 	 *
 	 * @return string
@@ -674,7 +674,9 @@ class Html2BBC
 		$level = (int) trim($level, 'h');
 		$hsize = array(1 => 7, 2 => 6, 3 => 5, 4 => 4, 5 => 3, 6 => 2, 7 => 1);
 
-		$size = isset($this->sizes_equivalence[$hsize[$level]]) ? $this->sizes_equivalence[$hsize[$level]] : $this->sizes_equivalence[4];
+		$size = isset($this->sizes_equivalence[$hsize[$level]])
+			? $this->sizes_equivalence[$hsize[$level]]
+			: $this->sizes_equivalence[4];
 
 		return '[size=' . $size . ']' . $content . '[/size]';
 	}

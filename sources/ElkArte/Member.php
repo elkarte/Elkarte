@@ -239,21 +239,15 @@ class Member extends ValuesContainer
 				'warning_status' =>
 					!empty($modSettings['warning_mute'])
 					&&
-					$modSettings['warning_mute'] <= $this->data['warning'] ?
-						'mute' :
-						(
-						!empty($modSettings['warning_moderate'])
-						&&
-						$modSettings['warning_moderate'] <= $this->data['warning'] ?
-							'moderate' :
-							(
-							!empty($modSettings['warning_watch'])
-							&&
-							$modSettings['warning_watch'] <= $this->data['warning'] ?
-								'watch' :
-								''
-							)
-						),
+					$modSettings['warning_mute'] <= $this->data['warning']
+						? 'mute'
+						: (!empty($modSettings['warning_moderate']) && $modSettings['warning_moderate'] <= $this->data['warning']
+							? 'moderate'
+							: (!empty($modSettings['warning_watch']) && $modSettings['warning_watch'] <= $this->data['warning']
+								? 'watch'
+								: ''
+						)
+					),
 				'local_time' => standardTime(time() + ($this->data['time_offset'] - User::$info->time_offset) * 3600, false),
 				'custom_fields' => array(),
 			));
