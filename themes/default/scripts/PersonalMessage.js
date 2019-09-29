@@ -109,7 +109,7 @@ elk_PersonalMessageSend.prototype.showBcc = function()
 };
 
 // Prevent items to be added twice or to both the 'To' and 'Bcc'.
-elk_PersonalMessageSend.prototype.callbackAddItem = function(oAutoSuggestInstance, sSuggestId)
+elk_PersonalMessageSend.prototype.callbackAddItem = function(sSuggestId)
 {
 	this.oToAutoSuggest.deleteAddedItem(sSuggestId);
 	this.oBccAutoSuggest.deleteAddedItem(sSuggestId);
