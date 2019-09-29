@@ -105,8 +105,8 @@ function clean_cache($type = '')
  * Finds all the caching engines available and loads some details depending on
  * parameters.
  *
- * - Caching engines must follow the naming convention of XyzCache.class.php and
- * have a class name of Xyz_Cache
+ * - Caching engines must follow the naming convention of CacheName.php and
+ * have a class name of CacheName that extends AbstractCacheMethod
  *
  * @param bool $supported_only If true, for each engine supported by the server
  *             an array with 'title' and 'version' is returned.
@@ -119,13 +119,17 @@ function loadCacheEngines($supported_only = true)
 {
 	$engines = array();
 
-	$classes = new GlobIterator(SUBSDIR . '/CacheMethod/*.php', FilesystemIterator::SKIP_DOTS);
+	$classes = new GlobIterator(SOURCEDIR . '/ElkArte/Cache/CacheMethod/*.php', FilesystemIterator::SKIP_DOTS);
 
 	foreach ($classes as $file_path)
 	{
 		// Get the engine name from the file name
 		$parts = explode('.', $file_path->getBasename());
 		$engine_name = $parts[0];
+		if (in_array($engine_name, ['AbstractCacheMethod', 'CacheMethodInterface.php']))
+		{
+		   	continue;
+		}
 		$class = '\\ElkArte\\Cache\\CacheMethod\\' . $parts[0];
 
 		// Validate the class name exists
